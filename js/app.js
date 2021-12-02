@@ -44,6 +44,7 @@ var tecAdminApp = angular.module('tecAdminApp', ['step','entities','tecAdminCont
 	$httpProvider.defaults.headers.get['Cache-Control'] = 'no-cache';
 	$httpProvider.defaults.headers.get['Pragma'] = 'no-cache';
 	$httpProvider.defaults.withCredentials = true;
+	$httpProvider.interceptors.push('urlInterceptor');
 	$httpProvider.interceptors.push('authInterceptor');
 	$httpProvider.interceptors.push('genericErrorInterceptor');
 }])
@@ -1058,6 +1059,16 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 		}
 		return $q.reject(response);
 	};
+})
+
+.service('urlInterceptor', function() {
+	return {
+		'request': function(config) {
+			// config.url = 'https://stepos-nhy.exense.ch/' + config.url;
+			config.url = 'https://stepos-lst.exense.ch/' + config.url;
+			return config;
+		}
+	}
 })
 
 
