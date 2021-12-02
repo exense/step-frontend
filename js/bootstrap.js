@@ -19,7 +19,8 @@
 console.log("Initializing bootstrapper")
 var step = {
     bootstrap: function() {
-      $.get("rest/app/plugins",function(plugins) {
+      // $.get("https://stepos-nhy.exense.ch/rest/app/plugins",function(plugins) {
+      $.get("https://stepos-lst.exense.ch/rest/app/plugins",function(plugins) {
         console.log("Loading plugins")
         var scripts = [];
         var angularModules = [];
@@ -38,14 +39,14 @@ var step = {
 
         pipe.pipe(function() {
           _.each(angularModules, function(module) {
-            angular.module('tecAdminApp').requires.push(module);      
+            angular.module('tecAdminApp').requires.push(module);
           })
           console.log("Bootstrapping angular");
           angular.bootstrap(document,['tecAdminApp'])
         })
         
         deferred.resolve();
-      })      
+      })
     }
 }
 
