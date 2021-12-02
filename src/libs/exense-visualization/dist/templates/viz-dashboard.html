@@ -1,0 +1,111 @@
+<div class="well secondwell" style="justify-content: center; text-align: center;">
+    <div class="row" ng-show="displaymode === 'managed'">
+        <ul class="ul-control ul-control-alt">
+            <li class="li-title" style="display: inline-flex;">
+                <div class="btn-container" ng-show="dstate.globalsettings.chevron">
+                    <button class="btn btn-success viz-btn-success" ng-click="toggleChevron()" style="margin: 0px; padding: 0px; height: 16px;"
+                        uib-tooltip="Collapse settings" tooltip-placement="right">
+                        <span class="title glyphicon glyphicon-chevron-down glyphicon-control viz-chevron-span"></span>
+                    </button>
+                </div>
+                <div class="btn-container" ng-show="!dstate.globalsettings.chevron">
+                    <button class="btn btn-success viz-btn-success" ng-click="toggleChevron()" style="margin: 0px; padding: 0px; height: 18px;"
+                        uib-tooltip="Expand settings" tooltip-placement="right">
+                        <span class="title glyphicon glyphicon-chevron-right glyphicon-control viz-chevron-span"></span>
+                    </button>
+                </div>
+                <div class="btn-container">
+                    <span class="title">Dashboard options</span>
+                </div>
+            </li>
+            <li class="li-control li-control-alt" style="float: right;">
+                <div class="btn-container">
+                    <button class="btn btn-success viz-btn-success" ng-click="toggleAutorefresh()" ng-class="{active : dstate.globalsettings.autorefresh}"><span
+                            class="glyphicon glyphicon-refresh" uib-tooltip="Turn on autorefresh"></span></button>
+                </div>
+            </li>
+        </ul>
+        <div class="form-wrapper">
+            <div class="form-group left-block">
+                <div class="container settingsformcontainer">
+                    <div class="dashboardtab">
+                        <div ng-show="dstate.globalsettings.chevron">
+                            <div>
+                                <uib-accordion>
+                                    <div uib-accordion-group class="panel-default viz-panel-default" heading="Manage"
+                                        is-open="dstate.gui.status.open.info" is-disabled="infoalert.status.isFirstDisabled">
+                                        <div class="form-wrapper">
+                                            <div class="form-group center-block">
+                                                <div class="container innerformcontainer" style="text-align: left;">
+
+                                                    <div class="row">
+                                                        <div class="colmdstyle col-md-3 colcontain-grid">
+                                                            <label>Dashlet tools</label>
+                                                            <div class="viz-btn-inline-group" style="display: inline-flex;">
+                                                                <div class="btn-container">
+                                                                    <button class="btn btn-success viz-btn-success"
+                                                                        ng-click="$emit('dashlet-paste')">
+                                                                        <span class="glyphicon glyphicon-paste"
+                                                                            uib-tooltip="Paste from clipboard"></span>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="btn-container">
+                                                                    <button class="btn btn-success viz-btn-success"
+                                                                        ng-click="addWidget()">
+                                                                        <span class="glyphicon glyphicon-plus"></span>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="btn-container">
+                                                                    <button class="btn btn-success viz-btn-success"
+                                                                        ng-click="wwrap.clear()">
+                                                                        <span class="glyphicon glyphicon-minus"></span>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="colmdstyle col-md-3 colcontain-grid">
+                                                            <label>Tab name</label>
+                                                            <input class="form-control" ng-model="dstate.title" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </uib-accordion>
+                            </div>
+                            <div>
+                                <uib-accordion>
+                                    <div uib-accordion-group class="panel-default viz-panel-default" heading="Input"
+                                        is-open="dstate.gui.status.open.info">
+                                        <div class="form-wrapper">
+                                            <div class="form-group center-block">
+                                                <div class="container innerformcontainer">
+                                                    <div class="row">
+                                                        <div class="colmdstyle col-md-12 colcontain-grid">
+                                                            <key-val-collection ng-show="dstate.globalsettings.chevron"
+                                                                collection="dstate.globalsettings.placeholders"
+                                                                collectionname="dstate.globalsettings.name"></key-val-collection>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </uib-accordion>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div ng-repeat="o in dstate.widgets track by o.oid">
+            <viz-mgd-widget ng-if="dstate.displaytype !== 'exploded'" displaymode="displaymode" state="o.state" wstate="o.wstate"
+                widgetid="o.oid" headersheightinput="topmargin + 50" charttocontainerinput="" presets="presets" restprefix="restprefix" inputsettingscol="dstate.globalsettings.placeholders"></viz-mgd-widget>
+            <viz-dashlet ng-if="dstate.displaytype === 'exploded'" state="o.state" widgetid="'explorationDashlet'"
+                displaytype="'exploded'" displaymode="exploration" presets="presets" restprefix="restprefix"></viz-dashlet>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,43 @@
+<div class="row">
+    <div class="col-md-3">
+        <div class="row" style="display:-ms-grid;display: grid; margin-left:0;">
+            <label style="-ms-grid-row: 1;grid-row: 1;">Session</label>
+            <ul style="list-style-type: none !important; display: inline-flex; padding: 0; -ms-grid-row: 2;grid-row: 2;";>
+                <li><button class="btn btn-success btn-nav" ng-click="popNewSession()" uib-tooltip="New session"
+                        tooltip-placement="right">
+                        <span class="glyphicon glyphicon-file glyphicon-app"></span>
+                    </button></li>
+                <li><button class="btn btn-success btn-nav" ng-click="popTable()" uib-tooltip="Search session"
+                        tooltip-placement="bottom">
+                        <span class="glyphicon glyphicon-search glyphicon-app"></span>
+                    </button></li>
+                    <li><button class="btn btn-success btn-nav"
+                        ng-click="saveSession(currentsession)" uib-tooltip="Save session"
+                        tooltip-placement="bottom">
+                        <span class="glyphicon glyphicon-floppy-disk glyphicon-app"></span>
+                    </button></li>
+                    <li><button class="btn btn-success btn-nav"
+                        ng-click="deleteSession(currentsession)" uib-tooltip="Delete session"
+                        tooltip-placement="bottom">
+                        <span class="glyphicon glyphicon-remove glyphicon-app"></span>
+                    </button></li>
+                <li>
+                    <span style="display:-ms-grid;display: grid;margin-left: 20px;">
+                        <input class="form-control" ng-model="currentsession" style="-ms-grid-row: 1; grid-row: 1;"/>
+                    </span>
+                    <sessionNewParent />
+                </li>
+            </ul>
+            <span style="display:-ms-grid;display: grid">
+                <label style="-ms-grid-row: 1;grid-row: 1;">&nbsp;</label>
+
+            </span>
+            <sessionSearchParent toto="tuut" />
+        </div>
+    </div>
+    <div class="col-md-3">
+        <viz-toolbar dashboards="dashboards"></viz-toolbar>
+    </div>
+</div>
+<viz-dashboard-manager ng-if="dashboards" displaymode="'managed'" presets="staticPresets" dashboards="dashboards" restprefix="'/rest'"></viz-dashboard-manager>
+<viz-dashboard-manager ng-if="!dashboards" displaymode="'managed'" presets="staticPresets" dashboards="stdldashboards" restprefix="'/rest'"></viz-dashboard-manager>

@@ -1,0 +1,43 @@
+<div class="row">
+    <div class="col-md-6 colcontain-grid" style="height: calc(40vh - 40px); overflow-y: auto; display: block; text-align: left; padding-left: 40px; padding-right: 40px;">
+        <label class="col-md-12" style="background-color: #337AB7; color: white; text-align: center;">Measurement Selectors</label>
+        <div class="row" style="padding-left: 5px; padding-right: 10px; margin-left: 5px; margin-right: 10px; margin-top: 20px;">
+            <div class="btn-group viz-btn-group form-radio" style="margin-top: 20px;">
+                <button class="btn btn-warning viz-btn-success" ng-click="addSelector()" uib-tooltip="Select new group of measurements" tooltip-placement="bottom">Add Selector</button>
+                <button class="btn btn-danger viz-btn-success" ng-click="clearAll()"  uib-tooltip="Remove all selectors" tooltip-placement="bottom">Clear All</button>
+                <button class="btn btn-success viz-btn-success" ng-click="$emit('broadcastQueryFire')" uib-tooltip="Fire query"
+                    tooltip-placement="bottom" style="float: right;">
+                    <span style="padding: 0; margin: 0; font-size: 10px !important;"
+                        class="glyphicon glyphicon-flash glyphicon-app">Search</span>
+                </button>
+                <button class="btn btn-success viz-btn-success" ng-click="exportRaw('JSON')"  uib-tooltip="Export selected raw data as JSON"
+                    tooltip-placement="bottom" style="float: right;margin-right:20px;">
+                    <span style="padding: 0; margin: 0; font-size: 10px !important;" class="glyphicon glyphicon-export glyphicon-ap">
+                        JSON</span>
+                </button>
+                <button class="btn btn-success viz-btn-success" ng-click="exportRaw('CSV')"  uib-tooltip="Export selected raw data as CSV (custom fields exhaustivity not guaranteed)"
+                    tooltip-placement="bottom" style="float: right;margin-right:5px;">
+                    <span style="padding: 0; margin: 0; font-size: 10px !important;" class="glyphicon glyphicon-export glyphicon-ap">
+                        CSV</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="row" style="margin: 5px; padding: 5px;">
+            <div class="col-md-12" ng-repeat="selector in payload.selectors1"
+                style="display: block">
+                <!--  style="position: absolute; top: 10px; right: 0px;" -->
+                <rtm-selector textfilters="selector.textFilters" numericalfilters="selector.numericalFilters" />
+                <span class="btn-group-xs"  style="position: absolute; right: 0; top: 5px;">
+                    <button type="submit" class="btn btn-danger viz-btn-success" ng-click="removeSelector($index)">
+                        <span style="padding: 0; margin: 0; font-size: 10px !important;"
+                            class="glyphicon glyphicon-remove glyphicon-app"></span></button>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 colcontain-grid" style="height: calc(40vh - 40px); overflow-y: auto; display: block; padding-left: 40px; padding-right: 40px;">
+        <label class="col-md-12" style="background-color: #337AB7; color: white; text-align: center;">Service Configuration</label>
+        <rtm-service-params params="payload.serviceParams" query="query" masterstate="masterstate" slavestate="slavestate" style="padding: 10px; margin: 10px">
+    </div>
+</div>

@@ -1,0 +1,29 @@
+<table class="table" ng-style="{width:state.options.chart.width -30 + 'px'}" ng-if="!state.options.chart.dualtranspose">
+    <thead>
+        <tr>
+            <th style="text-align: center;" ng-repeat="h in state.gui.tabledata.headers"><label>{{h}}</label></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="row in state.gui.tabledata.data track by $index">
+            <td><label data-ng-bind="state.options.chart.xAxis.tickFormat(row[1])" /></td>
+            <td><label class="label label-success" ng-style="{ 'background-color': stringToColour(row[0])}" style="color: white;">{{row[0]}}</label></td>
+            <td ng-repeat="val in row track by $index" ng-if="$index > 1" class="viz-cell">{{val}}</td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="table" ng-style="{width:state.options.chart.width -30 + 'px'}" ng-if="state.options.chart.dualtranspose">
+    <thead>
+        <tr>
+            <th style="text-align: center;" ng-repeat="h in state.gui.tabledata.headers"><label>{{h}}</label></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="row in state.gui.tabledata.data track by $index">
+            <td><label data-ng-bind="state.options.chart.xAxis.tickFormat(row[0])" /></td>
+            <td><label class="label label-success" ng-style="{ 'background-color': stringToColour(row[1])}" style="color: white;">{{row[1]}}</label></td>
+            <td ng-repeat="val in row track by $index" ng-if="$index > 1" class="viz-cell">{{val}}</td>
+        </tr>
+    </tbody>
+</table>

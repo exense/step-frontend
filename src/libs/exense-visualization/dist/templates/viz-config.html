@@ -1,0 +1,152 @@
+<uib-accordion>
+    <div uib-accordion-group class="panel-default viz-panel-default" heading="Display" is-open="state.gui.status.open.display"
+        is-disabled="config.status.isFirstDisabled">
+        <div class="form-wrapper">
+            <div class="form-group center-block">
+                <div class="container innerformcontainer">
+                    <div class="row">
+                        <div class="colmdstyle col-md-2 colcontain-grid">
+                            <label>Show legend</label>
+                            <div class="btn-group viz-btn-group form-radio">
+                                <label class="btn btn-success viz-btn-success" ng-model="state.options.chart.showLegend"
+                                    uib-btn-radio="true">On</label>
+                                <label class="btn btn-success viz-btn-success" ng-model="state.options.chart.showLegend"
+                                    uib-btn-radio="false">Off</label>
+                            </div>
+                        </div>
+                        <div class="colmdstyle col-md-2 colcontain-grid">
+                            <label>Viz type</label>
+                            <div class="btn-group viz-btn-group form-radio">
+                                <select style="font-size: small;" ng-model="state.options.chart.type" ng-options="option as option for option in viztypes" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="colmdstyle col-md-2 colcontain-grid">
+                            <label>Autorefresh</label>
+                            <div class="btn-group viz-btn-group form-radio">
+                                <label class="btn btn-success viz-btn-success" ng-model="state.config.autorefresh"
+                                    uib-btn-radio="'On'">On</label>
+                                <label class="btn btn-success viz-btn-success" ng-model="state.config.autorefresh"
+                                    uib-btn-radio="'Off'">Off</label>
+                            </div>
+                        </div>
+                        <div class="colmdstyle col-md-2 colcontain-grid">
+                            <label>Autorefresh Duration</label>
+                            <div class="btn-group viz-btn-group form-radio">
+                                <input class="form-control" ng-model="state.config.autorefreshduration" />
+                            </div>
+                        </div>
+                        <div class="colmdstyle col-md-2 colcontain-grid">
+                            <label>Incremental Refresh</label>
+                            <div class="btn-group viz-btn-group form-radio">
+                                <label class="btn btn-success viz-btn-success" ng-model="state.config.incremental"
+                                    uib-btn-radio="'On'">On</label>
+                                <label class="btn btn-success viz-btn-success" ng-model="state.config.incremental"
+                                    uib-btn-radio="'Off'">Off</label>
+                            </div>
+                        </div>
+                        <div class="colmdstyle col-md-2 colcontain-grid">
+                            <label>Incremental Max Dots</label>
+                            <div class="btn-group viz-btn-group form-radio">
+                                <input class="form-control" ng-model="state.config.incmaxdots" />
+                            </div>
+                        </div>
+                        <div class="colmdstyle col-md-2 colcontain-grid">
+                            <label>Transpose table</label>
+                            <div class="btn-group viz-btn-group form-radio">
+                                <label class="btn btn-success viz-btn-success" ng-model="state.config.transposetable"
+                                    uib-btn-radio="'On'">On</label>
+                                <label class="btn btn-success viz-btn-success" ng-model="state.config.transposetable"
+                                    uib-btn-radio="'Off'">Off</label>
+                            </div>
+                        </div>
+                        <div class="colmdstyle col-md-2 colcontain-grid">
+                                <label>View toggle action</label>
+                                <div class="btn-group viz-btn-group form-radio">
+                                    <label class="btn btn-success viz-btn-success" ng-model="state.config.toggleaction"
+                                        uib-btn-radio="'None'">None</label>
+                                    <label class="btn btn-success viz-btn-success" ng-model="state.config.toggleaction"
+                                        uib-btn-radio="'Fire'">Fire</label>
+                                    <label class="btn btn-success viz-btn-success" ng-model="state.config.toggleaction"
+                                        uib-btn-radio="'Draw'">Draw</label>
+                                </div>
+                            </div>
+                        <div class="colmdstyle col-md-8 colcontain-grid">
+                            <label>Dashlet title</label>
+                            <div class="btn-group viz-btn-group form-radio">
+                                <input class="form-control" ng-model="state.title" ng-change="titleChange()" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</uib-accordion>
+<uib-accordion ng-show="showcoms">
+    <div uib-accordion-group class="panel-default viz-panel-default" heading="Coms" is-open="state.gui.status.open.coms"
+        is-disabled="config.status.isFirstDisabled">
+        <div class="form-wrapper">
+            <div class="form-group center-block">
+                <div class="container innerformcontainer">
+                    <div class="row">
+                        <div class="colmdstyle col-md-3 colcontain-grid">
+                            <label>Master control</label>
+                            <div class="btn-group viz-btn-group form-radio">
+                                <span class="key-val-collection btn btn-success viz-btn-success">
+                                    <input type="checkbox" class="form-control" ng-model="state.config.master" style="width: 15px; height: 15px; padding: 0px; margin-top: 2px; margin-bottom: 2px;"
+                                        ng-click="$emit('isMaster-changed', state.config.master)" />
+                                </span>
+                                <label class="viz-label" ng-class="{ active: state.config.master}">Make master</label>
+                            </div>
+                        </div>
+                        <div class="colmdstyle col-md-3 colcontain-grid">
+                            <label>Slave control</label>
+                            <div class="btn-group viz-btn-group form-radio">
+                                <span class="key-val-collection btn btn-success viz-btn-success">
+                                    <input type="checkbox" class="form-control" ng-model="state.config.slave" style="width: 15px; height: 15px; padding: 0px; margin-top: 2px; margin-bottom: 2px;" />
+                                </span>
+                                <label class="viz-label" ng-class="{active: state.config.slave}">Make slave</label>
+                            </div>
+                        </div>
+                        <div ng-if="state.config.slave" class="col-md-3 colcontain-grid">
+                            <label>Subscribe to</label>
+                            <div class="btn-group viz-btn-group form-radio" uib-dropdown is-open="state.gui.status.open.subscribeto">
+                                <button id="load-master" type="button" class="btn btn-success viz-btn-success"
+                                    uib-dropdown-toggle ng-disabled="disabled">
+                                    Choose master... <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="load-master">
+                                    <h5 ng-repeat="m in state.config.masters.getAsArray()" ng-click="loadMaster(m)">
+                                        {{m.title}}</h5>
+                                </ul>
+                            </div>
+                        </div>
+                        <div ng-if="state.config.slave" class="col-md-3 colcontain-grid">
+                            <label>Data target</label>
+                            <div class="btn-group viz-btn-group form-radio">
+                                <label class="btn btn-success viz-btn-success" ng-model="state.config.target"
+                                    uib-btn-radio="'state.data.rawresponse'">Raw</label>
+                                <label class="btn btn-success viz-btn-success" ng-model="state.config.target"
+                                    uib-btn-radio="'state.data.transformed'">Transformed</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="colmdstyle col-md-2 colcontain-grid">
+                            <label>Reset</label>
+                            <div class="btn-group viz-btn-group form-radio">
+                                <label class="btn btn-success viz-label" ng-click="$emit('coms-reset')">Reset</span>
+                            </div>
+                        </div>
+                        <div class="colmdstyle col-md-10 colcontain-grid">
+                            <label>Current master</label>
+                            <div class="btn-group viz-btn-group form-radio">
+                                {{state.config.currentmaster.title}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</uib-accordion>

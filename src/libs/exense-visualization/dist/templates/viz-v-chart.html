@@ -1,0 +1,8 @@
+<div ng-if="state.options.chart.type.endsWith('scatterChart')" class="chartcontainer">
+    <nvd3 options="state.options" api="indirection.api" data="state.gui.chartdata" config="{refreshDataOnly: false, deepWatchDataDepth: 0}"
+        style="text-align: center; justify-content: center;"></nvd3>
+</div>
+<div ng-if="!state.options.chart.type.endsWith('scatterChart')" class="chartcontainer">
+    <nvd3 options="state.options" api="state.api" data="state.gui.chartdata" config="{refreshDataOnly: true, deepWatchDataDepth: 0}"
+        style="text-align: center; justify-content: center;"></nvd3>
+</div>

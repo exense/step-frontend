@@ -1,0 +1,577 @@
+span.key-val-collection{
+    padding: 0px;
+}
+
+span.key-val-collection.table-input{
+    display: inline-table !important;
+}
+
+span.key-val-collection.table-input > span.glyphicon{
+    font-size: 13px !important;
+    padding: 0px;
+    width: 25px;
+}
+
+input.key-val-collection{
+    height: 25px !important;
+}
+
+.hide{
+    opacity: 0;
+}
+
+.glyphicon.paging {
+    display: block;
+	height: 20px;
+	width: 20px;
+	font-size: 8px;
+	text-align: center !important;
+	margin: 0px;
+	padding: 3px;
+}
+
+.glyphicon.paging:hover{
+	height: 20px;
+	width: 20px;
+	font-size: 8px;
+	text-align: center !important;
+	margin: 0px;
+	padding: 3px;
+}
+
+.glyphicon-viz.key-val-collection{
+    padding: 2px 4px !important;
+    font-size: 10px !important;
+    font-family: sans-serif !important;
+    font-weight: bold !important;
+    -webkit-text-size-adjust: 100%;
+}
+
+.viz-btn-success.key-val-collection{
+    padding: 2px 4px !important;
+    font-size: 10px !important;
+    font-family: sans-serif;
+    -webkit-text-size-adjust: 100%;
+}
+
+.viz-btn-success.key-val-collection:hover, .viz-panel-group:hover{
+    padding: 2px 4px !important;
+    font-size: 10px !important;
+    font-family: sans-serif;
+    -webkit-text-size-adjust: 100%;
+}
+
+.viz-btn-success.key-val-collection.active{
+    padding: 2px 4px !important;
+    font-size: 10px !important;
+    font-family: sans-serif;
+    -webkit-text-size-adjust: 100%;
+}
+
+
+.rtm-label {
+    font-weight: normal;
+    font-size: small;
+}
+
+.rtm-input {
+    height: 22px;
+    font-weight: normal;
+    font-size: small;
+}
+
+.rtm-ul, .rtm-li, .rtm-li a{
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+    margin: 0px !important;
+    font-weight: normal;
+    font-size: small;
+}
+
+.rtm-li span{
+    padding: 0px !important;
+    margin: 0px !important;
+}
+
+.rtm-li-inactive a {
+    background-color: rgb(235, 235, 235);
+    color: #337AB7;
+}
+
+.rtm-li-inactive a:hover, .rtm-li-active a:hover{
+    background-color: rgb(200, 200, 200);
+    color: #337AB7;
+}
+
+.rtm-li-active a {
+    background-color: #337AB7; color: white !important;
+}
+
+a:hover {
+    cursor: pointer;
+}
+
+.rtm-dropdown{
+    margin-top: 0px !important;
+    display: block !important;
+}
+
+.multiselect-parent.viz-btn-group{
+    margin-top: 5px !important;
+    display: block !important;
+}
+
+.multiselect-parent button {
+    font-weight: bold;
+    padding: 5px;
+    margin: 0;
+}
+
+.multiselect-parent span {
+    background-color: #337AB7; color: white !important;
+}
+
+.multiselect-parent li {
+    height: 22px;
+    margin: 0;
+    padding: 0;
+}
+
+.multiselect-parent input {
+    height: 20px;
+    margin: 0;
+    padding: 0;
+}
+
+.multiselect-parent label {
+    height: 18px;
+    margin: 0;
+    padding: 0;
+}
+
+.multiselect-parent a {
+    height: 24px;
+    margin: 0;
+    padding: 0;
+}
+
+.multiselect-parent .checkbox{
+height: 18px;
+margin: 0;
+padding: 0;
+}
+
+.rtm-input-sm{
+    height: 22px !important;
+    padding: 5px !important;
+}
+
+hr.rtm{
+    padding-top: 15px;
+    padding-bottom: 15px;
+    border: 0;
+    border-bottom: 1px solid black;
+    clear: both;
+    display: block;
+    height: 0;
+    width: 100%;
+}
+
+  .mainwell {
+    padding: 5px 20px;
+    border-color: transparent !important;
+    background-color: transparent !important;
+    background-image: none;
+    width: 99%
+  }
+
+  .secondwell {
+    margin: 5px;
+    padding: 10px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    border-color: transparent !important;
+    background-color: transparent !important;
+    background-image: none;
+  }
+
+  .subcontainer {
+    text-align: center !important;
+    justify-content: center !important;
+    margin-left: 0;
+    margin-right: 0 !important;
+  }
+
+
+.glyphicon-app {
+    font-size: 1.2em !important;
+}
+
+div.dashboardtab > ul > li{
+  margin-right: 5px !important;
+  margin-left: 0px !important;
+  border-left: 1px solid #333333 !important;
+  border-right: 1px solid #333333 !important;
+  border-top: 1px solid #333333 !important;
+}
+
+div.dashboardtab > * > li > a, div.dashboardtab > * > li > * > li> a > span {
+  padding-top: 5px !important;
+  padding-left: 5px !important;
+  padding-bottom: 0px!important;
+  padding-right: 5px!important;
+  cursor: pointer !important;
+  border: none !important;
+}
+
+div.btn-container {
+  padding-top: 2px !important;
+  padding-left: 5px !important;
+  padding-bottom: 0px!important;
+  padding-right: 0px!important;
+  cursor: pointer !important;
+  border: none !important;
+}
+
+.colmdstyle{
+	position: relative !important;
+	min-height: 1px !important;
+	padding-right: 2px !important;
+  padding-left: 2px !important;
+}
+
+ul.ul-control {
+  list-style-type: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 30px !important;
+  border: none !important;
+}
+
+.ul-control-alt{
+  background-color: #333333 !important;
+  color: white;
+}
+
+.ul-control-main{
+  background-color: white !important;
+}
+
+.left-block{
+  margin: 0;
+  padding: 0;
+  display: inline !important;
+}
+
+.settingsformcontainer {
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  justify-content: left;
+  width: 100% !important;
+}
+
+span.text-g{
+  color: black;
+}
+
+.li-control-alt{
+  background-color: #333333;
+}
+
+.alt-float-right{
+  float: right;
+  position: absolute;
+  top: 0px;
+  right: 15px;
+  display: flex;
+}
+
+li.li-control > * > button{
+  padding: 0px 5px;
+  margin-top: 2px;
+  margin-right: 2px;
+}
+
+.li-title {
+  float: left !important;
+  margin: 0px !important;
+  padding: 0px !important;
+}
+
+div.dashboardtab > * > li > a:hover, div.dashboardtab > * > li > a:focus,
+div.dashboardtab > * > li > * > li> a:hover > span, div.dashboardtab > * > li > * > li> a:focus > span {
+  color: #474747;
+}
+div.dashboardtab > * > li > a, div.dashboardtab > * > li > * > li> a > span {
+  color: #929292;
+}
+table{
+    font-size: 12px;
+}
+
+label{
+    margin: 0px;
+    padding: 0px;
+}
+
+.glyphicon-viz {
+    text-shadow: 1px 1px 1px #ccc;
+    font-size: 1.2em;
+}
+
+.glyphicon-viz:hover {
+    text-shadow: 1px 1px 1px #ccc;
+    font-size: 1.2em;
+}
+
+svg.nvd3-svg{
+    display: inline !important;
+}
+
+.viz-panel-body {
+    padding: 0 !important;
+}
+
+div.panel-default.viz-panel-default > * > div.panel-body{
+    padding: 0px;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+div.dashboardtab > div > * > uib-accordion > div.panel-group{
+    margin: 4px;
+}
+
+div.dashboardtab > div > * > uib-accordion > div.panel-group > div.panel-default > div > h4{
+    background-color: #929292;
+    text-align: center;
+}
+
+div.dashboardtab > div > * > uib-accordion > div.panel-group > div.panel-default > div > h4:hover{
+    background-color: #474747;;
+    text-align: center;
+}
+
+div.dashboardtab > div > * > uib-accordion > div.panel-group > div.panel-default > div > h4 > a{
+    color:  white;
+    text-decoration: none;
+    text-align: center;
+}
+
+div.dashboardtab > div > div > div > * > uib-accordion > div.panel-group > div.panel-default > div > h4{
+    background-color: #929292;
+    text-align: center;
+}
+
+div.dashboardtab > div > div > div >  * > uib-accordion > div.panel-group > div.panel-default > div > h4:hover{
+    background-color: #474747;;
+}
+
+div.dashboardtab > div > div > div >  * > uib-accordion > div.panel-group > div.panel-default > div > h4 > a{
+    color:  white;
+    text-decoration: none;
+}
+
+hr.viz-hr{
+    margin: 8px;
+}
+
+.innercontainer {
+    overflow-y: auto;
+    overflow-wrap: break-word;
+    justify-content: center;
+    text-align: center;
+}
+
+.viewcontainer {
+    vertical-align: middle !important;
+    justify-content: center !important;
+    text-align: center !important;
+    overflow-y: auto !important;
+}
+
+.chartcontainer{
+vertical-align: middle;
+text-align: center;
+overflow-y: hidden;
+overflow-wrap: break-word;
+}
+
+.tablecontain{
+    display: inline-block;
+    text-align: left;
+    justify-content: center;
+    margin-top: 20px;
+    vertical-align: middle !important;
+}
+
+.dashletbox{
+text-align: center;
+justify-content: center;
+vertical-align: middle;
+}
+
+.innerwell {
+    margin-left: 0;
+}
+
+div.ul-viewtab > div.tab-content {
+    padding: 0px;
+    margin: 0px;
+}
+
+div.dashlet > * > .nav-link {
+    border: 1px solid #ddd !important;
+    padding: 5px !important;
+}
+
+ul.ul-control  {
+    border: 1px solid #ddd !important;
+    margin-top: -1px !important;
+}
+
+div.ul-viewtab > ul{
+    border: 1px solid #ddd !important;
+}
+
+div.dashlet > ul > li > a, div.dashlet > ul > li.active > a, div.dashlet > ul > li > a:hover{
+    border: 1px solid #ddd !important;
+    padding: 2px 6px !important;
+}
+
+div.viz-panel-default > * >  h4.panel-title{
+    color: black !important;
+    text-decoration: none !important;
+}
+
+div.viz-panel-default > * > h4.panel-title > a:hover, div.viz-panel-default > * > h4.panel-title > a.active{
+    text-decoration: none !important;
+    text-decoration: none !important;
+}
+
+div.viz-panel-default >  div.panel-heading{
+    margin: 0;
+    padding: 0;
+}
+
+label.viz-label{
+    text-decoration: none !important;
+    font-weight: 1;
+    margin-left: 3px;
+    margin-top: 2px;
+}
+
+.viz-btn-success{
+    font-weight: bold;
+}
+
+.viz-btn-dashlet {
+    margin: 5px;
+    margin-bottom: 15px;
+}
+
+.viz-btn-container{
+    justify-content: right;
+    text-align: right;
+}
+
+.form-wrapper {
+    margin: 0px;
+    padding: 0px;
+}
+
+.center-block{
+    margin: 0;
+    padding: 0;
+    width: 100% !important;
+    display: inline-flex !important;;
+}
+
+.colcontain-grid{
+    display: inline-grid;
+}
+
+.colcontain-contents{
+    display: contents;
+}
+
+.innerformcontainer {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    justify-content: center;
+}
+
+.innerformcontainer > .row {
+    margin: 0;
+    padding: 2;
+    text-align: left;
+    justify-content: left;
+}
+
+div.form-radio > label.btn, div.form-radio > button{
+    padding: 2px 4px;
+    font-size: 10px;
+}
+
+.viz-btn-group{
+    margin-top: 5px !important;
+    display: block !important;
+}
+
+.viz-cell{
+    text-align: center;
+}
+
+.innerviewcontainer{
+    text-align: center;
+    justify-content: center;
+    margin: 10px;
+}
+
+.singlelabel{
+    font-weight: bold; padding: 5px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.singlevalue{
+    font-weight: bold; font-size: 20px;
+}
+table.dataTable tbody > tr{
+    cursor: pointer;
+}
+
+table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
+    background-color: #337ab7;
+    color: white;
+}
+
+.spinningloader {
+	position: absolute;
+	border: 8px solid #e0e0e0;
+	border-top: 8px solid #01b7e2;
+	border-bottom: 8px solid #01b7e2;
+	border-radius: 50%;
+	width: 20px;
+	height: 20px;
+	animation: spin 2s linear infinite;
+	text-align: center;
+	justify-content: center;
+}
+.dashletcontainer {
+    border: 1px solid #ddd !important;
+    overflow: hidden !important
+}
+
+.colmdclass{
+    margin-top: 5px !important;
+}
+
+.glyphicon-control{
+    margin: 0px;
+    padding: 0px;
+}

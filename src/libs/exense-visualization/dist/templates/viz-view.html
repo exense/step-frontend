@@ -1,0 +1,40 @@
+<div class="innerviewcontainer">
+	<span ng-class="{hide: isPagingOff()}"
+		class="glyphicon glyphicon-menu-left glyphicon-viz paging btn btn-success viz-btn-success"
+		style="position: absolute; left: 45px; top: 45px;"
+		ng-click="$emit('fireprevious')" uib-tooltip="Go to previous page"></span> <span
+		ng-class="{hide: isPagingOff()}"
+		class="glyphicon glyphicon-menu-right glyphicon-viz paging btn btn-success viz-btn-success"
+		style="position: absolute; right: 45px; top: 45px;"
+		ng-click="$emit('firenext')" uib-tooltip="Go to next page"></span>
+
+        <div class="spinningloader" ng-if="$parent.isOngoingQuery"></div>
+
+		<div ng-if="!state.gui.chartdata || (state.gui.chartdata.length == 0)">
+			<div
+				ng-if="!state.gui.tabledata || !state.gui.tabledata.data || (state.gui.tabledata.data.length == 0)">
+				<text class="nvd3 nv-noData" dy="-.7em" style="text-anchor: middle;">
+				<br />
+				No Data Available.</text>
+			</div>
+
+			<div
+				ng-if="state.gui.tabledata && state.gui.tabledata.data && (state.gui.tabledata.data.length > 0)">
+				<viz-v-seriestable
+					ng-if="state.options.chart.type === 'seriesTable'" state="state"
+					presets="presets" inputsettingscol="inputsettingscol"></viz-v-seriestable>
+				<viz-v-dualtable ng-if="(state.options.chart.type === 'dualTable' || state.options.chart.type === 'table')"
+					state="state" presets="presets" inputsettingscol="inputsettingscol"></viz-v-dualtable>
+				<viz-v-singlevaluetable
+					ng-if="state.options.chart.type === 'singleValueTable'"
+					state="state" presets="presets" inputsettingscol="inputsettingscol"></viz-v-singlevaluetable>
+				<viz-v-valuefulltext
+					ng-if="state.options.chart.type === 'singleValueFullText'"
+					state="state" presets="presets" inputsettingscol="inputsettingscol"></viz-v-valuefulltext>
+			</div>
+		</div>
+		<div ng-if="state.gui.chartdata && (state.gui.chartdata.length > 0)">
+			<viz-v-chart ng-if="state.options.chart.type.endsWith('Chart')"
+				state="state" presets="presets" inputsettingscol="inputsettingscol"></viz-v-chart>
+		</div>
+</div>

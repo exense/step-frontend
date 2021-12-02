@@ -1,0 +1,10 @@
+<div class="row" class="tablecontain" ng-style="{height: state.options.chart.height -30 + 'px'}" style="margin: 20px;">
+    <div style="display: block;" ng-repeat="val in state.data.transformed.dashdata">
+        <div ng-style="{ 'background-color': stringToColour(val.z), color: 'white' }">
+            <label>[{{val.x}}] {{val.z}}</label>
+        </div>
+        <div>
+            <p>{{val.y}}</p>
+        </div>
+    </div>
+</div>

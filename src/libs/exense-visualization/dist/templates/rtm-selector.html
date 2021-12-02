@@ -1,0 +1,54 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="row" style="background-color: antiquewhite;">
+      <div class="col-md-1">
+        <label style="position:absolute; left: 5px; top: 5px;">OR</label>
+      </div>
+
+      <div class="col-md-10 viz-btn-group">
+        <span class="btn-group-xs"><button type="submit" class="btn btn-warning" ng-click="addTextFilter()" uib-tooltip="Add text-based selection criterion">Add Text
+            Filter</button></span>
+        <span class="btn-group-xs"><button type="submit" class="btn btn-warning" ng-click="addNumericalFilter()"  uib-tooltip="Add numerical selection criterion">Add
+            Numerical Filter</button></span>
+        <span class="btn-group-xs"><button type="submit" class="btn btn-warning" ng-click="addDateFilter()"  uib-tooltip="Add date-based selection criterion">Add Date
+            Filter</button></span>
+      </div>
+
+      <div class="col-md-1">
+        <label style="text-align : left; padding: 5px;">&nbsp;</label>
+      </div>
+    </div>
+
+    <div class="row" ng-repeat="filter in textfilters" class="col-md-12" style="background-color:rgb(236, 236, 236)">
+      <div class="col-md-1">
+        <label style="float : right; padding: 5px;">AND</label>
+      </div>
+      <div class="col-md-10">
+        <rtm-text-filter key="filter.key" value="filter.value" regex="filter.regex" />
+      </div>
+      <div class="col-md-1">
+        <span class="btn-group-xs"><button type="submit" class="btn btn-danger viz-btn-success"
+            ng-click="removeTextfilter($index)"><span style="padding: 0; margin: 0; font-size: 10px !important;"
+              class="glyphicon glyphicon-remove glyphicon-app"></span></button></span></th>
+      </div>
+    </div>
+
+    <div class="row" ng-repeat="filter in numericalfilters" class=" col-md-12" style="background-color:rgb(236, 236, 236)">
+      <div class="col-md-1">
+        <label style="float : right; padding: 5px;">AND</label>
+      </div>
+      <div class="col-md-10">
+        <rtm-numerical-filter ng-if="filter.type === 'numerical'" key="filter.key" minvalue="filter.minValue"
+          maxvalue="filter.maxValue" />
+        <rtm-date-filter ng-if="filter.type === 'date'" key="filter.key" mindate="filter.minDate"
+          maxdate="filter.maxDate" />
+
+      </div>
+      <div class="col-md-1">
+        <span class="btn-group-xs"><button type="submit" class="btn btn-danger viz-btn-success"
+            ng-click="removeNumericalfilter($index)"><span style="padding: 0; margin: 0; font-size: 10px !important;"
+              class="glyphicon glyphicon-remove glyphicon-app"></button></span></th>
+      </div>
+    </div>
+  </div>
+</div>

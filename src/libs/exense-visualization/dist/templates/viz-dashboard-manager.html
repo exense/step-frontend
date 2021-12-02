@@ -1,0 +1,26 @@
+<div class="well mainwell">
+    <div class="row">
+        <div class="dashboardtab">
+            <ul ng-show="displaymode === 'managed'" vertical="false" justified="true" class="nav nav-tabs ul-control ul-control-main">
+                <li class="li-control li-control-main" ng-class="{active : isTabActive(d.oid)}" index="d.oid" ng-repeat="d in dashboards track by d.oid"
+                    style="display: inline-flex;">
+                    <a ng-click="selectTab(d.oid)">{{d.dstate.title}}</a>
+                    <ul class="ul-control">
+                        <li class="li-control li-control-main">
+                            <a><span class="glyphicon glyphicon-remove glyphicon-viz" ng-click="removeDashboard(d.oid)"></span></a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="dashboardtab">
+            <div ng-repeat="d in dashboards track by d.oid">
+                <div ng-show="d.oid === mgrtabstate">
+                    <viz-dashboard templatetype="d.type" displaymode="displaymode" presets="presets" dstate="d.dstate" dashboardid="d.oid" topmargin="topmargin" restprefix="restprefix"></viz-dashboard>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

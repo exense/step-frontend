@@ -1,0 +1,9 @@
+<span>
+	<button class="btn btn-success btn-nav viz-btn-nav" ng-click="$emit('top.dashboard-new', {title: 'new dash', displaytype: 'aggregated'})">
+		<span class="glyphicon glyphicon-file glyphicon-app"></span>
+	</button>
+	<button class="btn btn-success btn-nav viz-btn-nav" ng-click="$emit('top.dashboard-new', {title: 'new dash', displaytype: 'exploded'})">
+		<span class="glyphicon glyphicon-search glyphicon-app"></span>
+	</button>
+</span>
+<viz-dashboard-manager displaymode="'managed'" presets="staticPresetsInstance" dashboards="dashboardsendpoint" ></viz-dashboard-manager>
