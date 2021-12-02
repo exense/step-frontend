@@ -31,12 +31,13 @@
               "src/assets",
               {
                 "glob": "**/*",
-                "input": "src/libs",
+                "input": "src/app/angularjs/bower_components",
                 "output": "/public/libs/"
               },
               {
                 "glob": "**/*",
                 "input": "src/app/angularjs",
+                "ignore": ["src/app/angularjs/bower_components/*"],
                 "output": "/"
               }
             ],

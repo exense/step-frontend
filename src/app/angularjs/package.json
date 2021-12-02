@@ -4,15 +4,14 @@
   "description": "",
   "main": "Gruntfile.js",
   "scripts": {
-    "serve": "http-server -o -p 8080",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "bower install && cd scripteditor && bower install"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "bower": "^1.8.0",
     "grunt": "^1.0.1",
-    "grunt-wiredep": "^3.0.1",
-    "http-server": "^14.0.0"
+    "grunt-wiredep": "^3.0.1"
   }
 }
