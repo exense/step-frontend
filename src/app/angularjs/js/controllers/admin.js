@@ -249,43 +249,10 @@ angular.module('adminControllers', ['step' ])
       
       $scope.token = "";
       
-      $scope.changePwd=function() {
-        AuthService.showPasswordChangeDialog(false);
-      }
-
       $scope.showGenerateApiKeyDialog = function () {
         var modalInstance = $uibModal.open({backdrop: 'static',animation: false,templateUrl: 'partials/generateApiKey.html',
           controller: 'GenerateApiKeyModalCtrl'});
         return modalInstance.result;
-      }
-      
-      $scope.user = {};
-      $http.get("rest/admin/myaccount").then(function(response) {
-        var user = response.data;
-        $scope.user=user;
-        
-        $scope.preferences = [];
-        if($scope.user.preferences) {
-          _.mapObject($scope.user.preferences.preferences,function(val,key) {
-            $scope.preferences.push({key:key,value:val});
-          });        
-        }
-      });
-      
-      $scope.addPreference = function() {
-        $scope.preferences.push({key:"",value:""});
-      }
-            
-      $scope.savePreferences = function() {
-        var preferences = {preferences:{}};
-        _.each($scope.preferences, function(entry) {
-          preferences.preferences[entry.key]=entry.value;
-        });
-        $http.post("rest/admin/myaccount/preferences",preferences).then(function() {
-          
-        },function() {
-          $scope.error = "Unable to save preferences. Please contact your administrator.";
-        });  
       }
     })
 
