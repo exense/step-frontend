@@ -86,7 +86,8 @@
               "browserTarget": "step-frontend:build:production"
             },
             "development": {
-              "browserTarget": "step-frontend:build:development"
+              "browserTarget": "step-frontend:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

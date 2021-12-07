@@ -1,18 +1,18 @@
 /*******************************************************************************
  * Copyright (C) 2020, exense GmbH
- *  
+ *
  * This file is part of STEP
- *  
+ *
  * STEP is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *  
+ *
  * STEP is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with STEP.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
@@ -23,7 +23,7 @@ var tecAdminApp = angular.module('tecAdminApp', ['step','entities','tecAdminCont
 }])
 
 .config(['$compileProvider', function ($compileProvider) {
-	// Unfortunately required to retrieve scope from elements: angular.element(\'#MyCtrl\').scope() 
+	// Unfortunately required to retrieve scope from elements: angular.element(\'#MyCtrl\').scope()
 	$compileProvider.debugInfoEnabled(true);
 	//$compileProvider.commentDirectivesEnabled(false);
 	//$compileProvider.cssClassDirectivesEnabled(false);
@@ -32,8 +32,8 @@ var tecAdminApp = angular.module('tecAdminApp', ['step','entities','tecAdminCont
 .config(['$httpProvider', function($httpProvider) {
 	//initialize get if not there
 	if (!$httpProvider.defaults.headers.get) {
-		$httpProvider.defaults.headers.get = {};    
-	}    
+		$httpProvider.defaults.headers.get = {};
+	}
 
 	// Answer edited to include suggestions from comments
 	// because previous version of code introduced browser-related errors
@@ -44,7 +44,6 @@ var tecAdminApp = angular.module('tecAdminApp', ['step','entities','tecAdminCont
 	$httpProvider.defaults.headers.get['Cache-Control'] = 'no-cache';
 	$httpProvider.defaults.headers.get['Pragma'] = 'no-cache';
 	$httpProvider.defaults.withCredentials = true;
-	$httpProvider.interceptors.push('urlInterceptor');
 	$httpProvider.interceptors.push('authInterceptor');
 	$httpProvider.interceptors.push('genericErrorInterceptor');
 }])
@@ -72,7 +71,7 @@ var tecAdminApp = angular.module('tecAdminApp', ['step','entities','tecAdminCont
 
 	api.isPublicView = function (view) {
 		return getCustomView(view).isPublicView;
-	}  
+	}
 
 	api.registerView = function(viewId,template,isPublicView) {
 		if(!isPublicView) {
@@ -82,7 +81,7 @@ var tecAdminApp = angular.module('tecAdminApp', ['step','entities','tecAdminCont
 	}
 
 	api.registerCustomMenuEntry = function(label, viewId, mainMenu, menuIconClass, right) {
-		customMenuEntries.push({label: label, viewId: viewId, mainMenu: mainMenu, menuIconClass: menuIconClass, right: right, 
+		customMenuEntries.push({label: label, viewId: viewId, mainMenu: mainMenu, menuIconClass: menuIconClass, right: right,
 			isEnabledFct: function(){return true}})
 	}
 
@@ -228,7 +227,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 	function debug() {
 	  return AuthService.debug();
 	}
-	
+
 	var lockLocationChangesUntilPathIsReached = function(targetPath) {
 		if(!$rootScope.locationChangeBlocked) {
 			$rootScope.locationChangeBlocked = true;
@@ -314,7 +313,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 					if(debug()) {
 					  console.log('changing current path  to '+ newPath);
 					}
-					$rootScope.currentPath = newPath; 
+					$rootScope.currentPath = newPath;
 					if(!$rootScope.locationChangeBlocked) {
 						$location.path(newPath.join('/'));
 					}
@@ -331,7 +330,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 		if(this.persistState) {
 			return $cookies[k]
 		} else {
-			return this.localStore[k]      
+			return this.localStore[k]
 		}
 	};
 
@@ -420,7 +419,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
       }, resolve)
 		});
 	}
-	
+
 	authService.login = function (credentials) {
 		return $http
 		.post('rest/access/login', credentials)
@@ -447,7 +446,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 
 	authService.goToLoginPage = function () {
 		return $location.path('/root/login')
-	};  
+	};
 
 	authService.gotoDefaultPage = function() {
 		console.log('gotoDefaultPage', serviceContext.conf.defaultUrl);
@@ -473,9 +472,9 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 		  (right.endsWith('-write') || right.endsWith('-delete')  || right.endsWith('-execute'))) {
 	    return false;
 	  }
-	  
+
 		return $rootScope.context&&$rootScope.context.rights?$rootScope.context.rights.indexOf(right) !== -1:false;
-	}; 
+	};
 
 	authService.getConf = function() {
 		return serviceContext.conf;
@@ -485,7 +484,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 	  var conf = serviceContext.conf;
     return conf?conf.debug:false;
   }
-	
+
 	authService.showPasswordChangeDialog = function (otp) {
 		var modalInstance = $uibModal.open({backdrop: 'static',animation: false,templateUrl: 'partials/changePasswordForm.html',
 			controller: 'ChangePasswordModalCtrl', resolve: {
@@ -534,7 +533,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 	$scope.cancel = function () {
 		$uibModalInstance.close();
 	};
-	
+
 	$scope.showCancel = function() {
 		return $scope.otp;
 	}
@@ -600,7 +599,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 		});
 	};
 	$scope.logo = "images/logologin.png";
-	 
+
 	document.querySelectorAll('input[type=password]')[0].addEventListener('keyup', function (e) {
      if (e.getModifierState && e.getModifierState('CapsLock')) {
         $scope.capsWarning = true;
@@ -613,7 +612,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 
 .factory('ImportDialogs', function ($rootScope, $uibModal, EntityRegistry,$sce) {
   var dialogs = {};
-  
+
   dialogs.displayImportDialog = function(title,path,importAll,overwrite) {
     var modalInstance = $uibModal.open({
       backdrop: 'static',
@@ -636,8 +635,8 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
   $scope.path = path;
   $scope.importAll = importAll;
   $scope.overwrite = overwrite;
-  $scope.resourcePath; 
-  
+  $scope.resourcePath;
+
   $scope.save = function() {
     if($scope.resourcePath) {
       $http({url:"rest/import/" + path,method:"POST",params:{path:$scope.resourcePath,importAll:$scope.importAll,overwrite:$scope.overwrite}}).then(function(response) {
@@ -645,12 +644,12 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
         if (response.data && response.data.length > 0) {
           Dialogs.showListOfMsgs(response.data);
         }
-      })      
+      })
     } else {
       Dialogs.showErrorMsg("Upload not completed.");
     }
   }
-  
+
   $scope.cancel = function () {
     $uibModalInstance.dismiss('cancel');
   };
@@ -658,7 +657,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 
 .factory('ExportDialogs', function ($rootScope, $uibModal, EntityRegistry,$sce) {
   var dialogs = {};
-  
+
   dialogs.displayExportDialog = function(title, path, filename, recursively, parameters) {
     var modalInstance = $uibModal.open({
       backdrop: 'static',
@@ -683,7 +682,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
   $scope.filename = filename;
   $scope.recursively = recursively;
   $scope.parameters = parameters;
-  
+
   $scope.save = function() {
     if($scope.filename) {
       urlParams = "?recursively=" + $scope.recursively + "&filename=" + $scope.filename;
@@ -692,16 +691,16 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
       }
       ExportService.get("rest/export/" + $scope.path + urlParams);
       $uibModalInstance.close();
-      
-      
+
+
   /*    $http({url:"rest/import/" + path,method:"POST",params:{path:$scope.resourcePath,importAll:$scope.importAll,overwrite:$scope.overwrite}}).then(function(response) {
         $uibModalInstance.close(response.data);
-      })*/      
+      })*/
     } else {
       Dialogs.showErrorMsg("Upload not completed.");
     }
   }
-  
+
   $scope.cancel = function () {
     $uibModalInstance.dismiss('cancel');
   };
@@ -735,7 +734,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 
 	dialogs.showInfo = function(msg) {
 		var modalInstance = $uibModal.open({backdrop: 'static', animation: false, templateUrl: 'partials/infoMessageDialog.html',
-			controller: 'DialogCtrl', 
+			controller: 'DialogCtrl',
 			resolve: {message:function(){
 				return msg
 			}}});
@@ -762,7 +761,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 
 	dialogs.showErrorMsg = function(msg, callback) {
 		var modalInstance = $uibModal.open({backdrop: 'static',animation: false, templateUrl: 'partials/messageDialog.html',
-			controller: 'DialogCtrl', 
+			controller: 'DialogCtrl',
 			resolve: {message:function(){return  $sce.trustAsHtml(msg)}}}).result.then(
 				function () {
 					if(callback) {
@@ -771,10 +770,10 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 				});
 		return modalInstance.result;
 	}
-	
+
 	 dialogs.showListOfMsgs = function(messages) {
 	    var modalInstance = $uibModal.open({backdrop: 'static',animation: false, templateUrl: 'partials/messagesListDialog.html',
-	      controller: 'DialogCtrl', 
+	      controller: 'DialogCtrl',
 	      resolve: {message:function(){return  messages}}});
 	    return modalInstance.result;
 	  }
@@ -785,7 +784,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 			animation: false,
 			templateUrl: 'partials/textFieldDialog.html',
 			size: 'lg',
-			controller: 'DialogCtrl', 
+			controller: 'DialogCtrl',
 			resolve: {message:function(){return scope.ngModel}}
 		}).result.then(
 				function (value) {
@@ -827,8 +826,8 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 	dialogs.selectEntityOfType = function(entityName, singleSelection, id){
 	  console.log(entityName, EntityRegistry);
 	  console.log(id);
-	  var entityType = EntityRegistry.getEntityByName(entityName);  
-	  
+	  var entityType = EntityRegistry.getEntityByName(entityName);
+
 		var modalInstance = $uibModal.open(
 				{
 				  backdrop: 'static',
@@ -837,7 +836,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 					resolve: {
 					  entityType:function(){
 							return entityType;
-						}, 
+						},
 						singleSelection:function() {
 						  return singleSelection;
 						},
@@ -847,7 +846,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 
 		return modalInstance.result;
 	};
-	
+
 	//Select entity type only
 	dialogs.selectEntityType = function(excludeArray, id){
 		var modalInstance = $uibModal.open(
@@ -864,7 +863,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 
 		return modalInstance.result;
 	};
-	
+
 	//Select Type and then entities immedately after
 	dialogs.selectEntityTypeForEntities = function(excludeArray, callback, arg){
 		dialogs.selectEntityType(excludeArray, arg).then(function(result1){
@@ -878,9 +877,9 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 
 		});
 	};
-	
+
 	return dialogs;
-})  
+})
 
 .controller('SelectEntityTypeCtrl', function ($scope, $rootScope, $uibModalInstance, EntityRegistry, helpers, excludeArray, targetId) {
 
@@ -962,18 +961,18 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
     },
     template: '<ng-include src="templateUrl" />',
     controller: function($scope, EntityRegistry) {
-      var entityType = EntityRegistry.getEntityByName($scope.type);  
-      
+      var entityType = EntityRegistry.getEntityByName($scope.type);
+
       $scope.tableHandle = {}
-      
+
       $scope.templateUrl = entityType.templateUrl;
-      
+
       $scope.notifySelection = function(selection) {
         if($scope.onSelection) {
           $scope.onSelection(selection);
         }
       }
-      
+
       if($scope.handle) {
         $scope.handle.getSelection = function() {
           return $scope.tableHandle.getSelectedIds();
@@ -1010,7 +1009,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 	$scope.title = title;
 
 	$scope.ok = function() {
-		$uibModalInstance.close(); 
+		$uibModalInstance.close();
 	}
 
 	$scope.cancel = function () {
@@ -1060,17 +1059,6 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 		return $q.reject(response);
 	};
 })
-
-.service('urlInterceptor', function() {
-	return {
-		'request': function(config) {
-			// config.url = 'https://stepos-nhy.exense.ch/' + config.url;
-			config.url = 'https://stepos-lst.exense.ch/' + config.url;
-			return config;
-		}
-	}
-})
-
 
 .service('DashboardService', function($http) {
 

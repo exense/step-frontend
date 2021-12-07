@@ -1,0 +1,7 @@
+{
+  "/rest": {
+    "target": "https://stepos-nhy.exense.ch:443",
+    "secure": false,
+    "changeOrigin": true
+  }
+}
