@@ -1,7 +1,8 @@
-.account-container {
-    min-width: 600px;
+:host {
+  min-width: 600px;
+  display: block;
 }
 
 .generate-key {
-    vertical-align: top;
+  vertical-align: top;
 }
