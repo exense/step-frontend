@@ -32,12 +32,12 @@
               {
                 "glob": "**/*",
                 "input": "src/app/angularjs/bower_components",
-                "output": "/public/libs/"
+                "output": "/bower_components/"
               },
               {
                 "glob": "**/*",
                 "input": "src/app/angularjs",
-                "ignore": ["src/app/angularjs/bower_components/*"],
+                "ignore": ["src/app/angularjs/bower_components/*, src/app/angularjs/node_modules/*"],
                 "output": "/"
               }
             ],
@@ -86,7 +86,8 @@
               "browserTarget": "step-frontend:build:production"
             },
             "development": {
-              "browserTarget": "step-frontend:build:development"
+              "browserTarget": "step-frontend:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"
