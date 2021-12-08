@@ -1,29 +1,13 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { UrlInterceptor } from './services/url.interceptor';
+import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-
-
+import { AJS_PROVIDERS } from './shared/angularjs-providers';
 
 @NgModule({
   declarations: [],
-  imports: [
-    CommonModule,
-    FormsModule,
-    HttpClientModule
-  ],
-  exports: [
-    CommonModule,
-    FormsModule,
-    HttpClientModule
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: UrlInterceptor,
-      multi: true
-    }
-  ]
+  imports: [CommonModule, FormsModule, HttpClientModule],
+  exports: [CommonModule, FormsModule, HttpClientModule],
+  providers: [...AJS_PROVIDERS],
 })
-export class BaseModule { }
+export class BaseModule {}

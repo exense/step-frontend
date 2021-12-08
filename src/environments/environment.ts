@@ -4,7 +4,6 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'https://stepos-lst.exense.ch/'
 };
 
 /*

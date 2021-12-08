@@ -250,6 +250,7 @@ angular.module('adminControllers', ['step' ])
       $scope.token = "";
       
       $scope.showGenerateApiKeyDialog = function () {
+        console.log("Generate api key");
         var modalInstance = $uibModal.open({backdrop: 'static',animation: false,templateUrl: 'partials/generateApiKey.html',
           controller: 'GenerateApiKeyModalCtrl'});
         return modalInstance.result;

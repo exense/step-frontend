@@ -1,40 +1,44 @@
 import { DOCUMENT } from '@angular/common';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
+import { ConfigDto } from '@domain/config-dto';
+import { CredentialsDto } from '@domain/credentials-dto';
+import { SessionDto } from '@domain/serssion-dto';
 import { firstValueFrom, Observable } from 'rxjs';
+import { AJS_LOCATION, AJS_PREFERENCES, AJS_ROOT_SCOPE, AJS_UIB_MODAL } from '../shared/angularjs-providers';
+import { AJS_MODULE } from '../shared/constants';
 
 export interface AuthContext {
   userID: string;
-  rights: string;
+  rights: string[];
   role: string;
   otp: boolean;
   session: any;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-
   constructor(
     private _http: HttpClient,
-    @Inject('$rootScope') private _$rootScope: any,
-    @Inject('$location') private _$location: any,
+    @Inject(AJS_ROOT_SCOPE) private _$rootScope: any,
+    @Inject(AJS_LOCATION) private _$location: any,
     @Inject(DOCUMENT) private _document: Document,
-    @Inject('Preferences') private _preferences: any,
-    @Inject('$uibModal') private _$uibModal: any
-  ) { }
+    @Inject(AJS_PREFERENCES) private _preferences: any,
+    @Inject(AJS_UIB_MODAL) private _$uibModal: any
+  ) {}
 
-  private _serviceContext: any = {};
+  private _serviceContext: { conf?: ConfigDto } = {};
 
-  private setContext(session: any): void {
+  private setContext(session: SessionDto): void {
     const context: AuthContext = {
-      userID:session.username, 
-      rights:session.role.rights, 
-      role:session.role.attributes.name, 
-      otp:session.otp, 
-      session: {}
+      userID: session.username,
+      rights: session.role.rights,
+      role: session.role.attributes['name'],
+      otp: session.otp,
+      session: {},
     };
     this._$rootScope.context = context;
     this._preferences.load();
@@ -45,31 +49,30 @@ export class AuthService {
   }
 
   async init(): Promise<unknown> {
-    const response = await firstValueFrom(this._http.get('rest/access/conf') as Observable<HttpResponse<any>>);
-    this._serviceContext.conf = response.body;
+    this._serviceContext.conf = await firstValueFrom(this._http.get('rest/access/conf') as Observable<ConfigDto>);
     this._document.title = this._serviceContext.conf.title;
     return undefined;
   }
 
-  async getSession(): Promise<unknown> {
+  async getSession(): Promise<SessionDto | unknown> {
     try {
-      const response = await firstValueFrom(this._http.get('rest/access/session') as Observable<HttpResponse<any>>);
-      if (response.body.opt) {
+      const session = await firstValueFrom(this._http.get('rest/access/session') as Observable<SessionDto>);
+      if (session.otp) {
         await this.showPasswordChangeDialog(true);
-        response.body.opt = false;
-        this.setContext(response.body);
-        return response;
+        session.otp = false;
+        this.setContext(session);
+        return session;
       } else {
-        this.setContext(response.body);
-        return response;
+        this.setContext(session);
+        return session;
       }
     } catch (err) {
       return err;
     }
   }
 
-  async login(credentials: any): Promise<unknown> {
-    await firstValueFrom(this._http.post('rest/access/login', credentials));
+  async login(credentials: CredentialsDto): Promise<unknown> {
+    (await firstValueFrom(this._http.post('rest/access/login', credentials))) as Observable<{ token: string }>;
     await this.getSession();
     const context = this.getContext();
     if (context && !context.otp) {
@@ -79,48 +82,50 @@ export class AuthService {
       }
     }
     return undefined;
-	};
+  }
 
   async logout(): Promise<unknown> {
     await firstValueFrom(this._http.post('rest/access/logout', {}));
-    this._$rootScope.context = {userID: 'anonymous'};
+    this._$rootScope.context = { userID: 'anonymous' };
     this.gotoDefaultPage();
     return undefined;
   }
 
   goToLoginPage(): any {
-		return this._$location.path('/root/login')
-	}; 
+    return this._$location.path('/root/login');
+  }
 
   gotoDefaultPage(): void {
-    console.log('gotoDefaultPage', this._serviceContext.conf.defaultUrl);
-		if(this._serviceContext.conf && this._serviceContext.conf.defaultUrl) {
-			this._$location.path(this._serviceContext.conf.defaultUrl)
-		} else {
-			this._$location.path('/root/plans/list')
-		}
+    console.log('gotoDefaultPage', this._serviceContext?.conf?.defaultUrl);
+    if (this._serviceContext.conf && this._serviceContext.conf.defaultUrl) {
+      this._$location.path(this._serviceContext.conf.defaultUrl);
+    } else {
+      this._$location.path('/root/plans/list');
+    }
   }
 
   isAuthenticated(): boolean {
-    return this._$rootScope.context.userID && 
-           this._$rootScope.context.userID !== 'anonymous';
+    return this._$rootScope.context.userID && this._$rootScope.context.userID !== 'anonymous';
   }
 
   isExtLoginAuth(): boolean {
-    return this._serviceContext.conf.noLoginMask;
+    return !!this._serviceContext?.conf?.noLoginMask;
   }
 
   hasRight(right: string): boolean {
     // don't allow write- or delete- actions in the [All] tenant except for user and project
-	  if (this._$rootScope.tenant && (this._$rootScope.tenant.name === '[All]' || this._$rootScope.tenant.name === '[None]') &&
-    !(right.startsWith('user') || right.startsWith('project')) &&
-    (right.endsWith('-write') || right.endsWith('-delete')  || right.endsWith('-execute'))) {
+    if (
+      this._$rootScope.tenant &&
+      (this._$rootScope.tenant.name === '[All]' || this._$rootScope.tenant.name === '[None]') &&
+      !(right.startsWith('user') || right.startsWith('project')) &&
+      (right.endsWith('-write') || right.endsWith('-delete') || right.endsWith('-execute'))
+    ) {
       return false;
     }
-  
-    return this._$rootScope.context &&
-           this._$rootScope.context.rights ? 
-              this._$rootScope.context.rights.indexOf(right) !== -1 : false;
+
+    return this._$rootScope.context && this._$rootScope.context.rights
+      ? this._$rootScope.context.rights.indexOf(right) !== -1
+      : false;
   }
 
   getConf(): any {
@@ -133,21 +138,19 @@ export class AuthService {
   }
 
   showPasswordChangeDialog(otp: boolean): Promise<unknown> {
-      const modalInstance = this._$uibModal.open({
-        backdrop: 'static',
-        animation: false,
-        templateUrl: 'partials/changePasswordForm.html',
-        controller: 'ChangePasswordModalCtrl', resolve: {
-          otp: function () {
-            return otp;
-          }
-        }});
-      return new Promise<unknown>(
-        (resolve, reject) => modalInstance.result.then(resolve, reject)
-      ); 
+    const modalInstance = this._$uibModal.open({
+      backdrop: 'static',
+      animation: false,
+      templateUrl: 'partials/changePasswordForm.html',
+      controller: 'ChangePasswordModalCtrl',
+      resolve: {
+        otp: function () {
+          return otp;
+        },
+      },
+    });
+    return new Promise<unknown>((resolve, reject) => modalInstance.result.then(resolve, reject));
   }
 }
 
-getAngularJSGlobal()
-.module('tecAdminApp')
-.service('AuthService2', downgradeInjectable(AuthService));
+getAngularJSGlobal().module(AJS_MODULE).service('AuthService2', downgradeInjectable(AuthService));
