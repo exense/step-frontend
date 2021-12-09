@@ -16,6 +16,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with STEP.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
+
+// TODO: this file's logic should be moved to APP_INITALIZER in the Angular app 
 console.log("Initializing bootstrapper")
 var step = {
     bootstrap: function() {
@@ -42,7 +44,7 @@ var step = {
             angular.module('tecAdminApp').requires.push(module);
           })
           console.log("Bootstrapping angular");
-          angular.bootstrap(document,['tecAdminApp'])
+          // angular.bootstrap(document,['tecAdminApp'])
         })
 
         deferred.resolve();
