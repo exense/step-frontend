@@ -46,7 +46,6 @@ export class MyAccountComponent implements OnInit, OnChanges {
   }
 
   invokeShowGenerateApiKeyDialog(): void {
-    console.log('Emti generate api key event');
     this.showGenerateApiKeyDialog.emit({});
   }
 
