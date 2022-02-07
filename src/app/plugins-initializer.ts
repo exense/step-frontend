@@ -29,7 +29,7 @@ const loadSinglePlugin = async (pluginDefinition: PluginDefinition): Promise<str
     const scriptsLoad = pluginDefinition.scripts.map((script) => loadScript(script));
     await Promise.all(scriptsLoad);
   } catch (e) {
-    console.log(`Module(s) ${pluginDefinition.angularModules.join(', ')} load fail`, e);
+    console.error(`Module(s) ${pluginDefinition.angularModules.join(', ')} load fail`, e);
     return [];
   }
   return pluginDefinition.angularModules;
