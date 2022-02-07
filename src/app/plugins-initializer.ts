@@ -8,17 +8,19 @@ export interface PluginDefinition {
 }
 
 const loadScript = (fileName: string): Promise<unknown> =>
-  new Promise<unknown>((resolve) => {
-    const callback = () => {
+  new Promise<unknown>((resolve, reject) => {
+    const callbackSuccess = () => {
       console.log(`Loaded plugin script ${fileName}`);
       resolve(true);
     };
+    const callbackError = (err: any) => reject(err);
     const script = document.createElement('script');
     script.setAttribute('type', 'text/javascript');
     script.setAttribute('src', fileName);
     //@ts-ignore
-    script.onreadystatechange = callback;
-    script.onload = callback;
+    script.onreadystatechange = callbackSuccess;
+    script.onload = callbackSuccess;
+    script.onerror = callbackError;
     document.querySelector('head')!.appendChild(script);
   });
 
@@ -27,8 +29,7 @@ const loadSinglePlugin = async (pluginDefinition: PluginDefinition): Promise<str
     const scriptsLoad = pluginDefinition.scripts.map((script) => loadScript(script));
     await Promise.all(scriptsLoad);
   } catch (e) {
-    console.log(`Module(s) ${pluginDefinition.angularModules.join(', ')} load fail`);
-    console.log(e);
+    console.log(`Module(s) ${pluginDefinition.angularModules.join(', ')} load fail`, e);
     return [];
   }
   return pluginDefinition.angularModules;
@@ -40,8 +41,7 @@ const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
     const pluginsResponse = await fetch('/rest/app/plugins');
     result = (await pluginsResponse.json()) as PluginDefinition[];
   } catch (e) {
-    console.log('Fetch plugin definitions failed');
-    console.log(e);
+    console.log('Fetch plugin definitions failed', e);
   }
   return result;
 };
