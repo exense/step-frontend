@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
-import { BaseModule } from '../base/base.module';
+import { StepCoreModule } from '@exense/step-core';
 import { MyAccountComponent } from './components/my-account/my-account.component';
 
 @NgModule({
   declarations: [MyAccountComponent],
   exports: [MyAccountComponent],
-  imports: [BaseModule],
+  imports: [StepCoreModule],
 })
 export class AdminModule {}

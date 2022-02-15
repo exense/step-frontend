@@ -1,6 +1,6 @@
 import { LegacyPluginDefinition } from './shared/legacy-plugin-definition';
 import { getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '../modules/base/shared/constants';
+import { AJS_MODULE } from '@exense/step-core';
 
 const loadScript = (fileName: string): Promise<unknown> =>
   new Promise<unknown>((resolve, reject) => {

@@ -2,13 +2,12 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { UpgradeModule } from '@angular/upgrade/static';
 import { AdminModule } from './modules/admin/admin.module';
-import { BaseModule } from './modules/base/base.module';
-import { AJS_MODULE } from './modules/base/shared/constants';
 import { PLUGINS_INITIALIZER } from './plugins-initializer/plugins-initializer';
+import { StepCoreModule, AJS_MODULE } from '@exense/step-core';
 
 @NgModule({
   declarations: [],
-  imports: [BrowserModule, UpgradeModule, BaseModule, AdminModule],
+  imports: [BrowserModule, UpgradeModule, StepCoreModule, AdminModule],
   providers: [PLUGINS_INITIALIZER],
 })
 export class AppModule {

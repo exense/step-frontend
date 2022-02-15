@@ -1,13 +1,17 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { AJS_PROVIDERS } from './shared/angularjs-providers';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [],
   imports: [CommonModule, FormsModule, HttpClientModule],
   exports: [CommonModule, FormsModule, HttpClientModule],
-  providers: [...AJS_PROVIDERS],
 })
-export class BaseModule {}
+export class StepCoreModule {}
+
+export * from './services/auth.service';
+export * from './shared/angularjs-providers';
+export * from './shared/constants';
+export * from './domain';
+export * from './shared/view-registry.service';
