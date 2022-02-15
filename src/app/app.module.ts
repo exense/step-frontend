@@ -4,7 +4,7 @@ import { UpgradeModule } from '@angular/upgrade/static';
 import { AdminModule } from './modules/admin/admin.module';
 import { BaseModule } from './modules/base/base.module';
 import { AJS_MODULE } from './modules/base/shared/constants';
-import { PLUGINS_INITIALIZER } from './plugins-initializer';
+import { PLUGINS_INITIALIZER } from './plugins-initializer/plugins-initializer';
 
 @NgModule({
   declarations: [],

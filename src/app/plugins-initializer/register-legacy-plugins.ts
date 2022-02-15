@@ -1,11 +1,6 @@
-import { APP_INITIALIZER, ValueProvider } from '@angular/core';
+import { LegacyPluginDefinition } from './shared/legacy-plugin-definition';
 import { getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from './modules/base/shared/constants';
-
-export interface PluginDefinition {
-  angularModules: string[];
-  scripts: string[];
-}
+import { AJS_MODULE } from '../modules/base/shared/constants';
 
 const loadScript = (fileName: string): Promise<unknown> =>
   new Promise<unknown>((resolve, reject) => {
@@ -24,7 +19,7 @@ const loadScript = (fileName: string): Promise<unknown> =>
     document.querySelector('head')!.appendChild(script);
   });
 
-const loadSinglePlugin = async (pluginDefinition: PluginDefinition): Promise<string[]> => {
+const loadSinglePlugin = async (pluginDefinition: LegacyPluginDefinition): Promise<string[]> => {
   try {
     const scriptsLoad = pluginDefinition.scripts.map((script) => loadScript(script));
     await Promise.all(scriptsLoad);
@@ -35,19 +30,7 @@ const loadSinglePlugin = async (pluginDefinition: PluginDefinition): Promise<str
   return pluginDefinition.angularModules;
 };
 
-const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
-  let result: PluginDefinition[] = [];
-  try {
-    const pluginsResponse = await fetch('/rest/app/plugins');
-    result = (await pluginsResponse.json()) as PluginDefinition[];
-  } catch (e) {
-    console.log('Fetch plugin definitions failed', e);
-  }
-  return result;
-};
-
-const loadPlugins = async () => {
-  const pluginDefinitions = await fetchDefinitions();
+export const registerLegacyPlugins = async (pluginDefinitions: LegacyPluginDefinition[]) => {
   if (pluginDefinitions.length === 0) {
     return;
   }
@@ -60,10 +43,4 @@ const loadPlugins = async () => {
     .module(AJS_MODULE)
     .requires.push(...angularModules);
   console.log('angularJS plugins added');
-};
-
-export const PLUGINS_INITIALIZER: ValueProvider = {
-  provide: APP_INITIALIZER,
-  useValue: loadPlugins,
-  multi: true,
 };
