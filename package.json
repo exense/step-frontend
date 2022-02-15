@@ -7,9 +7,9 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "postinstall": "cd src/app/angularjs && npm install",
+    "postinstall": "cd projects/step-frontend/src/app/angularjs && npm install",
     "format:fix": "pretty-quick --staged",
-    "format:check": "prettier --config ./.prettierrc \"src/app/{modules,domain}/**/*{.ts,.html,.scss}\"",
+    "format:check": "prettier --config ./.prettierrc \"projects/step-frontend/src/app/{modules,domain}/**/*{.ts,.html,.scss}\"",
     "prepare": "husky install"
   },
   "private": true,

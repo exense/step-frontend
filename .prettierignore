@@ -1,4 +1,4 @@
-src/app/angularjs/**/*.*
+projects/step-frontend/src/app/angularjs/**/*.*
 .angular
 dist
 node_modules
