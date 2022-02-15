@@ -1,4 +1,4 @@
-import { A1PluginDefinition } from './shared/a1-plugin-definition';
+import { LegacyPluginDefinition } from './shared/legacy-plugin-definition';
 import { getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE } from '../modules/base/shared/constants';
 
@@ -19,7 +19,7 @@ const loadScript = (fileName: string): Promise<unknown> =>
     document.querySelector('head')!.appendChild(script);
   });
 
-const loadSinglePlugin = async (pluginDefinition: A1PluginDefinition): Promise<string[]> => {
+const loadSinglePlugin = async (pluginDefinition: LegacyPluginDefinition): Promise<string[]> => {
   try {
     const scriptsLoad = pluginDefinition.scripts.map((script) => loadScript(script));
     await Promise.all(scriptsLoad);
@@ -30,7 +30,7 @@ const loadSinglePlugin = async (pluginDefinition: A1PluginDefinition): Promise<s
   return pluginDefinition.angularModules;
 };
 
-export const registerA1Plugins = async (pluginDefinitions: A1PluginDefinition[]) => {
+export const registerLegacyPlugins = async (pluginDefinitions: LegacyPluginDefinition[]) => {
   if (pluginDefinitions.length === 0) {
     return;
   }

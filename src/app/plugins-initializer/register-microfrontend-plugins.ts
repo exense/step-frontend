@@ -1,6 +1,6 @@
 import { loadRemoteModule, LoadRemoteModuleOptions } from '@angular-architects/module-federation';
 import { Compiler, Injector, Type } from '@angular/core';
-import { A2PluginDefinition } from './shared/a2-plugin-definition';
+import { MicrofrontendPluginDefinition } from './shared/microfrontend-plugin-definition';
 import { AJS_MODULE } from '../modules/base/shared/constants';
 
 abstract class PluginModule {
@@ -17,11 +17,11 @@ export interface CompileCtx {
 }
 
 export interface PluginCtx {
-  definition: A2PluginDefinition;
+  definition: MicrofrontendPluginDefinition;
   declaration: PluginModuleDeclaration;
 }
 
-const loadModule = async (definition: A2PluginDefinition): Promise<PluginCtx | undefined> => {
+const loadModule = async (definition: MicrofrontendPluginDefinition): Promise<PluginCtx | undefined> => {
   let result: PluginCtx | undefined = undefined;
   try {
     const remoteEntry = definition.entryPoint.startsWith('/') ? definition.entryPoint : `/${definition.entryPoint}`;
@@ -58,8 +58,8 @@ const compileModule = async ({
   }
 };
 
-export const registerA2Plugins = async (
-  pluginsDefinitions: A2PluginDefinition[],
+export const registerMicrofrontendPlugins = async (
+  pluginsDefinitions: MicrofrontendPluginDefinition[],
   compileCtx: CompileCtx
 ): Promise<unknown> => {
   if (pluginsDefinitions.length === 0) {

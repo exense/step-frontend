@@ -1,12 +1,13 @@
 import { APP_INITIALIZER, Compiler, FactoryProvider, Injector } from '@angular/core';
-import { A1PluginDefinition } from './shared/a1-plugin-definition';
-import { A2PluginDefinition } from './shared/a2-plugin-definition';
-import { registerA1Plugins } from './register-a1-plugins';
-import { registerA2Plugins } from './register-a2-plugins';
+import { LegacyPluginDefinition } from './shared/legacy-plugin-definition';
+import { MicrofrontendPluginDefinition } from './shared/microfrontend-plugin-definition';
+import { registerLegacyPlugins } from './register-legacy-plugins';
+import { registerMicrofrontendPlugins } from './register-microfrontend-plugins';
 
+// TODO: modify in BE and remove override
 const OVERRIDE_PLUGINS = new Map<string, string>([['multitenancy', 'multitenancy/remoteEntry.js']]);
 
-export type PluginDefinition = A1PluginDefinition | A2PluginDefinition;
+export type PluginDefinition = LegacyPluginDefinition | MicrofrontendPluginDefinition;
 
 const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
   let result: PluginDefinition[] = [];
@@ -14,7 +15,7 @@ const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
     const pluginsResponse = await fetch('/rest/app/plugins');
 
     result = ((await pluginsResponse.json()) as PluginDefinition[]).map((plugin) => {
-      const angularModules = (plugin as A1PluginDefinition)?.angularModules || [];
+      const angularModules = (plugin as LegacyPluginDefinition)?.angularModules || [];
       const toOverride = angularModules.find((m) => OVERRIDE_PLUGINS.has(m));
       if (toOverride) {
         const entryPoint = OVERRIDE_PLUGINS.get(toOverride)!;
@@ -37,22 +38,25 @@ const loadPlugins = (compiler: Compiler, injector: Injector) => {
       return;
     }
 
-    const { a1Plugins, a2Plugins } = pluginDefinitions.reduce(
+    const { legacy, microfrontend } = pluginDefinitions.reduce(
       (res, plugin) => {
         if (plugin.hasOwnProperty('entryPoint')) {
-          res.a2Plugins.push(plugin as A2PluginDefinition);
+          res.microfrontend.push(plugin as MicrofrontendPluginDefinition);
         } else {
-          res.a1Plugins.push(plugin as A1PluginDefinition);
+          res.legacy.push(plugin as LegacyPluginDefinition);
         }
         return res;
       },
       {
-        a1Plugins: [] as A1PluginDefinition[],
-        a2Plugins: [] as A2PluginDefinition[],
+        legacy: [] as LegacyPluginDefinition[],
+        microfrontend: [] as MicrofrontendPluginDefinition[],
       }
     );
 
-    await Promise.all([registerA1Plugins(a1Plugins), registerA2Plugins(a2Plugins, { compiler, injector })]);
+    await Promise.all([
+      registerLegacyPlugins(legacy),
+      registerMicrofrontendPlugins(microfrontend, { compiler, injector }),
+    ]);
   };
 };
 

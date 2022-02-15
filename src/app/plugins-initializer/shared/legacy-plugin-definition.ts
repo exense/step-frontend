@@ -1,4 +1,4 @@
-export interface A1PluginDefinition {
+export interface LegacyPluginDefinition {
   angularModules: string[];
   scripts: string[];
 }
