@@ -2,11 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, Output, EventEmitter, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { Observable } from 'rxjs';
-import { AuthService } from 'src/app/modules/base/services/auth.service';
-import { AJS_MODULE } from 'src/app/modules/base/shared/constants';
-import { KeyValuePair } from '@domain/key-value-pair';
-import { MyAccountDto } from '@domain/my-account-dto';
-import { MyAccountPreferencesDto } from '@domain/my-account-preferences-dto';
+import { AuthService, AJS_MODULE, KeyValuePair, MyAccountDto, MyAccountPreferencesDto } from '@exense/step-core';
 
 const preferencesToKVPairArray = (preferences?: MyAccountPreferencesDto): KeyValuePair<string, string>[] => {
   const prefsObject = preferences?.preferences || {};

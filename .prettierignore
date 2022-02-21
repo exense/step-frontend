@@ -1,4 +1,5 @@
 src/app/angularjs/**/*.*
+src/index.html
 .angular
 dist
 node_modules

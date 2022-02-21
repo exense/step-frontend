@@ -1,7 +1,7 @@
 import { loadRemoteModule, LoadRemoteModuleOptions } from '@angular-architects/module-federation';
 import { Compiler, Injector, Type } from '@angular/core';
 import { MicrofrontendPluginDefinition } from './shared/microfrontend-plugin-definition';
-import { AJS_MODULE } from '../modules/base/shared/constants';
+import { AJS_MODULE } from '@exense/step-core';
 
 abstract class PluginModule {
   abstract registerPluginDependency(hostName: string): void;

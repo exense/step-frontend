@@ -125,6 +125,37 @@
           }
         }
       }
+    },
+    "@exense/step-core": {
+      "projectType": "library",
+      "root": "projects/step-core",
+      "sourceRoot": "projects/step-core/src",
+      "prefix": "step",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/step-core/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/step-core/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/step-core/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/step-core/src/test.ts",
+            "tsConfig": "projects/step-core/tsconfig.spec.json",
+            "karmaConfig": "projects/step-core/karma.conf.js"
+          }
+        }
+      }
     }
   },
   "defaultProject": "step-frontend"
