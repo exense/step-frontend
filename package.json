@@ -11,7 +11,7 @@
     "test": "ng test",
     "postinstall": "cd src/app/angularjs && npm install",
     "format:fix": "pretty-quick --staged",
-    "format:check": "prettier --config ./.prettierrc \"src/app/{modules,domain}/**/*{.ts,.html,.scss}\"",
+    "format:check": "prettier --config ./.prettierrc \"{src/app,projects/step-core/src}/!(angularjs)/**/*{.ts,.html,.scss}\"",
     "prepare": "husky install"
   },
   "private": true,
