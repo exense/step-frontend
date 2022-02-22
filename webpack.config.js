@@ -4,9 +4,7 @@ const path = require('path');
 const share = mf.share;
 
 const sharedMappings = new mf.SharedMappings();
-sharedMappings.register(path.join(__dirname, 'tsconfig.json'), [
-  /* mapped paths to share */
-]);
+sharedMappings.register(path.join(__dirname, 'tsconfig.json'), ['@exense/step-core']);
 
 module.exports = {
   output: {

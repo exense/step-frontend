@@ -10,8 +10,10 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class StepCoreModule {}
 
-export * from './services/auth.service';
-export * from './shared/angularjs-providers';
-export * from './shared/constants';
 export * from './domain';
-export * from './shared/view-registry.service';
+export * from './shared';
+export * from './decorators/plugin';
+export * from './services/auth.service';
+export * from './services/invoke-run.service';
+export * from './services/view-registry.service';
+export * from './services/deferred-view-registry.service';
