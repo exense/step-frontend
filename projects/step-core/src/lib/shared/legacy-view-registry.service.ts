@@ -27,9 +27,9 @@ export interface Dashlet {
   useFactory: ($injector: any) => $injector.get('ViewRegistry'),
   deps: [INJECTOR],
 })
-export abstract class ViewRegistryService {
+export abstract class LegacyViewRegistryService {
   abstract getViewTemplate(view: string): string;
-  abstract isPublicView(view: string): string;
+  abstract isPublicView(view: string): boolean;
   abstract registerView(viewId: string, template: string, isPublicView?: boolean): void;
   abstract registerCustomMenuEntry(label: string, viewId: string, menuIconsClass: string, right: string): void;
   abstract registerCustomMenuEntryOptional(
@@ -43,7 +43,7 @@ export abstract class ViewRegistryService {
   abstract getCustomMainMenuEntries(): MenuEntry[];
   abstract getDashlets(path: string): Dashlet[];
   abstract registerDashlet(path: string, label: string, template: string, id: string, before?: boolean): void;
-  abstract registerDasheltAdvanced(
+  abstract registerDashletAdvanced(
     path: string,
     label: string,
     template: string,

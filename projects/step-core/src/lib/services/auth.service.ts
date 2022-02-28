@@ -6,6 +6,7 @@ import { ConfigDto, CredentialsDto, SessionDto } from '../domain';
 import { firstValueFrom, Observable } from 'rxjs';
 import { AJS_LOCATION, AJS_PREFERENCES, AJS_ROOT_SCOPE, AJS_UIB_MODAL } from '../shared/angularjs-providers';
 import { AJS_MODULE } from '../shared/constants';
+import { a1Promise2Promise } from '../shared/utils';
 
 export interface AuthContext {
   userID: string;
@@ -147,7 +148,7 @@ export class AuthService {
         },
       },
     });
-    return new Promise<unknown>((resolve, reject) => modalInstance.result.then(resolve, reject));
+    return a1Promise2Promise(modalInstance.result);
   }
 }
 
