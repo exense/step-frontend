@@ -50,7 +50,7 @@ export class AuthService {
   async init(): Promise<unknown> {
     this._serviceContext.conf = await firstValueFrom(this._http.get('rest/access/conf') as Observable<ConfigDto>);
     this._document.title = this._serviceContext.conf.title;
-    return undefined;
+    return this._serviceContext?.conf?.debug || false;
   }
 
   async getSession(): Promise<SessionDto | unknown> {
@@ -127,7 +127,7 @@ export class AuthService {
       : false;
   }
 
-  getConf(): any {
+  getConf(): ConfigDto | undefined {
     return this._serviceContext.conf;
   }
 
@@ -152,4 +152,4 @@ export class AuthService {
   }
 }
 
-getAngularJSGlobal().module(AJS_MODULE).service('AuthService2', downgradeInjectable(AuthService));
+getAngularJSGlobal().module(AJS_MODULE).service('AuthService', downgradeInjectable(AuthService));
