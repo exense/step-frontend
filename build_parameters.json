@@ -1,0 +1,49 @@
+{
+  "NAME": "Step OSS frontend",
+  "OS": "LINUX",
+  "LOCK": "STEP",
+
+  "ACTIONS": [
+    {
+      "ACTION": "COMPILE",
+      "TYPE": "NPM",
+      "PARAMETERS": [
+        {
+          "NAME": "DEVELOPMENT",
+          "URL": "nexus-staging https://nexus-enterprise.exense.ch/repository/staging-npm/"
+        },
+        {
+          "NAME": "PRODUCTION",
+          "URL": "nexus-staging https://nexus-enterprise.exense.ch/repository/staging-npm/"
+        }
+      ],
+      "FOLDER": "."
+    },
+    {
+      "ACTION": "PUSH",
+      "TYPE": "MAVEN",
+      "PARAMETERS": [
+        {
+          "NAME": "DEVELOPMENT",
+          "URL": "nexus-staging::https://nexus-enterprise.exense.ch/repository/staging-maven/"
+        },
+        {
+          "NAME": "PRODUCTION",
+          "URL": "nexus-staging::https://nexus-enterprise.exense.ch/repository/staging-maven/"
+        }
+      ],
+      "ACTIONS": [
+        {
+          "ORIGIN": "dist/step-frontend",
+          "DESTINATION": "ch.exense.step.frontend:step-frontend-oss-${BRANCH}:${VERSION}",
+          "PACKAGING": "jar"
+        },
+        {
+          "ORIGIN": "dist/step-core/exense-step-core-${VERSION}.tgz",
+          "DESTINATION": "ch.exense.step.frontend:step-frontend-core-${BRANCH}:${VERSION}",
+          "PACKAGING": "tgz"
+        }
+      ]
+    }
+  ]
+}
