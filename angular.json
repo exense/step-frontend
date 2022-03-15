@@ -44,10 +44,24 @@
                 "input": "src/app/angularjs",
                 "ignore": ["src/app/angularjs/bower_components/*, src/app/angularjs/node_modules/*"],
                 "output": "/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@exense/visualization/dist",
+                "output": "/assets/exense-visualization"
               }
             ],
-            "styles": ["src/styles.scss"],
-            "scripts": [],
+            "styles": [
+              "src/styles.scss",
+              "node_modules/datatables.net-select-dt/css/select.dataTables.css",
+              "node_modules/nvd3/build/nv.d3.css"
+            ],
+            "scripts": [
+              "node_modules/datatables.net-select/js/dataTables.select.js",
+              "node_modules/d3/d3.js",
+              "node_modules/nvd3/build/nv.d3.js",
+              "node_modules/angular-nvd3/dist/angular-nvd3.js"
+            ],
             "extraWebpackConfig": "webpack.config.js",
             "commonChunk": false
           },
