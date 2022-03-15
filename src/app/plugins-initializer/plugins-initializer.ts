@@ -7,6 +7,12 @@ import { registerMicrofrontendPlugins } from './register-microfrontend-plugins';
 // TODO: modify in BE and remove override
 const OVERRIDE_PLUGINS = new Map<string, string>([['multitenancy', 'multitenancy/remoteEntry.js']]);
 
+// For testing purposes only
+// Allows to add plugins, that don't returned from BE
+const ADDITIONAL_PLUGINS: ReadonlyArray<string> = [
+  // Add strings like this 'pluginName/remoteEntry.js'
+];
+
 export type PluginDefinition = LegacyPluginDefinition | MicrofrontendPluginDefinition;
 
 const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
@@ -25,6 +31,13 @@ const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
 
       return plugin;
     });
+
+    if (ADDITIONAL_PLUGINS.length > 0) {
+      const additionalPlugins: MicrofrontendPluginDefinition[] = ADDITIONAL_PLUGINS.map((entryPoint) => ({
+        entryPoint,
+      }));
+      result = [...result, ...additionalPlugins];
+    }
   } catch (e) {
     console.log('Fetch plugin definitions failed', e);
   }

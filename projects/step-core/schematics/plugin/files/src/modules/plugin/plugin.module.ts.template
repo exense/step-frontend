@@ -1,0 +1,35 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { UpgradeModule } from '@angular/upgrade/static';
+import { StepCoreModule, Plugin, DeferredViewRegistryService } from '@exense/step-core';
+import { <%= camelize(nAJSModule) %>Module as ajsPluginModule } from './share';
+
+import { <%= classify(defaultView) %>Component } from './components/<%= dasherize(defaultView) %>/<%= dasherize(defaultView) %>.component';
+import './components/<%= dasherize(defaultView) %>/<%= dasherize(defaultView) %>.component';
+
+@Plugin(ajsPluginModule.name)
+@NgModule({
+  declarations: [
+    <%= classify(defaultView) %>Component
+  ],
+  imports: [
+    CommonModule,
+    UpgradeModule,
+    StepCoreModule
+  ],
+  exports: [
+    <%= classify(defaultView) %>Component
+  ]
+})
+export class PluginModule {
+  constructor(
+    viewRegistry: DeferredViewRegistryService,
+  ) {
+    viewRegistry.registerView(
+      '<%= camelize(defaultView) %>',
+      `<<%= dasherize(defaultViewSelector) %>-downgraded></<%= dasherize(defaultViewSelector) %>-downgraded>`
+    );
+  }
+}
+
+export * from './share';

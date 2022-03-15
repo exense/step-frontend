@@ -1,11 +1,19 @@
 {
   "name": "@exense/step-core",
   "version": "0.0.1",
+  "schematics": "./schematics/collection.json",
+  "scripts": {
+    "build": "tsc -p tsconfig.schematcis.json",
+    "postbuild": "copyfiles schematics/*/schema.json schematics/*/files/** schematics/*/files/**/.* schematics/collection.json ../../dist/step-core"
+  },
   "peerDependencies": {
+    "@angular-architects/module-federation": "14.0.1",
     "@angular/common": "13.1.1",
     "@angular/core": "13.1.1",
     "@angular/forms": "13.1.1",
     "@angular/upgrade": "13.1.1",
+    "@angular-devkit/schematics": "13.2.5",
+    "@schematics/angular": "13.1.2",
     "@types/angular": "1.7.4",
     "@types/uuid": "8.3.4",
     "uuid": "8.3.2",
@@ -13,5 +21,9 @@
   },
   "dependencies": {
     "tslib": "2.3.0"
+  },
+  "devDependencies": {
+    "copyfiles": "file:../../node_modules/copyfiles",
+    "typescript": "file:../../node_modules/typescript"
   }
 }

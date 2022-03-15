@@ -1,0 +1,16 @@
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { <%= camelize(nAJSModule) %>Module as ajsPluginModule } from '../../share';
+
+@Component({
+  selector: '<%= dasherize(defaultViewSelector) %>',
+  templateUrl: './<%= dasherize(defaultView) %>.component.html',
+  styles: []
+})
+export class <%= classify(defaultView) %>Component {
+  readonly pluginName = '<%= classify(pluginName) %>';
+}
+
+ajsPluginModule.directive('<%= camelize(defaultViewSelector) %>Downgraded', downgradeComponent({
+  component: <%= classify(defaultView) %>Component
+}));
