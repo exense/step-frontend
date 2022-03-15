@@ -1,0 +1,28 @@
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { UpgradeModule } from '@angular/upgrade/static';
+
+import { AppComponent } from './app.component';
+import { <%= camelize(nAJSModule) %>Module as ajsPluginModule, PluginModule } from './modules/plugin/plugin.module';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    PluginModule,
+    BrowserModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule {
+  constructor(
+    private _upgrade: UpgradeModule
+  ) {
+  }
+
+  ngDoBootstrap(): void {
+    this._upgrade.bootstrap(document.body, [ajsPluginModule.name])
+  }
+}

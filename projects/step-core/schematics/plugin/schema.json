@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "SchematicsPlugin",
+  "title": "Plugin schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the library.",
+      "pattern": "^(?:@[a-zA-Z0-9-*~][a-zA-Z0-9-*._~]*/)?[a-zA-Z0-9-~][a-zA-Z0-9-._~]*$",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the library?"
+    },
+    "port": {
+      "type": "string",
+      "description": "The port to use for the federated module (remote, micro frontend, etc.)",
+      "x-prompt": "Port to use",
+      "default": "5002"
+    },
+    "prefix": {
+      "type": "string",
+      "format": "html-selector",
+      "description": "A prefix to apply to generated selectors.",
+      "default": "plg",
+      "alias": "p"
+    }
+  }
+}
