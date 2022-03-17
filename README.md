@@ -10,9 +10,17 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app w
 
 Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
-## Build
+## Build OSS
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+1. Invoke the command `npm run build:core` it will assemble the library and put the result to the dist/step-core folder
+2. In the dist/step-core folder invoke the command `npm pack` it will create a tat.gz archive with library contents.
+3. Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+
+## Build OSS
+
+Then this archive can be copied manually to step-enterprise-frontend and setup as npm dependency in package.json like:
+"@exense/step-core": "./exense-step-core-0.0.1.tgz"
+npm install command will unpcak the archive and put it to the node_modules
 
 ## Running unit tests
 
