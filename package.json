@@ -11,7 +11,7 @@
     "start:app": "ng serve",
     "start": "npm run build:core && npm run start:app",
     "test": "ng test",
-    "pack":"cd dist/step-core && npm pack ",
+    "pack":"cd dist/step-core && npm pack && cp *.tgz ../step-frontend && cd ../step-frontend/ && npm install *.tgz --force && rm *.tgz",
     "postinstall": "cd src/app/angularjs && npm install",
     "format:fix": "pretty-quick --staged",
     "format:check": "prettier --config ./.prettierrc \"{src/app,projects/step-core/src}/!(angularjs)/**/*{.ts,.html,.scss}\"",
