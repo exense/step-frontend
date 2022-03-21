@@ -1,37 +1,37 @@
 /*******************************************************************************
  * Copyright (C) 2020, exense GmbH
- *  
+ *
  * This file is part of STEP
- *  
+ *
  * STEP is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *  
+ *
  * STEP is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with STEP.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 angular.module('reportNodes',['step','artefacts','screenConfigurationControllers'])
 
 .factory('ReportNodeCommons', function(ScreenTemplates) {
-  
+
   var api = {};
-  
+
   var functionAttributes = [];
-  
+
   ScreenTemplates.getScreenInputsByScreenId('functionTable').then(function(attributes) {
     functionAttributes = _.sortBy(attributes,function(value){return value.id});
   })
-  
+
   api.getFunctionAttributes = function() {
     return functionAttributes;
-  } 
-  
+  }
+
   return api;
 })
 
@@ -40,10 +40,10 @@ angular.module('reportNodes',['step','artefacts','screenConfigurationControllers
     restrict: 'E',
     scope: {
       id: '=',
-      showArtefact: '='
+      showArtefact: '=',
     },
     templateUrl: 'partials/reportnodes/reportNode.html',
-    controller: function($scope, $http) {
+    controller: function($scope, $http, Dialogs, LinkProcessor, $location) {
       var reportNodeTypes = {
           "step.artefacts.reports.CallFunctionReportNode":{template:"partials/reportnodes/callFunctionReportNode.html"},
           "step.artefacts.reports.EchoReportNode":{template:"partials/reportnodes/echo.html"},
@@ -51,7 +51,7 @@ angular.module('reportNodes',['step','artefacts','screenConfigurationControllers
           "step.artefacts.reports.RetryIfFailsReportNode":{template:"partials/reportnodes/retryIfFail.html"},
           "step.artefacts.reports.WaitForEventReportNode":{template:"partials/reportnodes/waitForEvent.html"}
       }
-      
+
       $scope.children = [];
       $scope.$watch('id',function(nodeId) {
         if(nodeId) {
@@ -65,6 +65,21 @@ angular.module('reportNodes',['step','artefacts','screenConfigurationControllers
           })
         }
       })
+
+      $scope.openPlan = function(node) {
+        $http.get('rest/executions/' + node.executionID).then(function(response) {
+          LinkProcessor.process(response.data.attributes.project).then(() => {
+            $location.search('artefactId', node.artefactID);
+            $location.path('/root/plans/editor/' + response.data.planId);
+            $scope.$apply();
+          }).catch((errorMessage) => {
+            if (errorMessage) {
+              console.error('reportNodes.openPlan', errorMessage);
+              Dialogs.showErrorMsg(errorMessage);
+            }
+          });
+        });
+      }
     }
   };
 })
@@ -145,7 +160,7 @@ angular.module('reportNodes',['step','artefacts','screenConfigurationControllers
     templateUrl: 'partials/reportnodes/reportNodeIcon.html',
     controller: function($scope,artefactTypes) {
       $scope.artefactTypes = artefactTypes;
-      
+
       $scope.cssClass = function() {
         var cssClass = '';
         var node = $scope.node;
@@ -202,15 +217,15 @@ angular.module('reportNodes',['step','artefacts','screenConfigurationControllers
       $scope.$watch("attachment",function(attachment) {
 
       })
-      
+
       $scope.isImage = function() {
         return $scope.attachment.name.endsWith(".jpg") || $scope.attachment.name.endsWith(".png")
       }
-      
+
       $scope.isText = function() {
         return $scope.attachment.name.endsWith(".log") || $scope.attachment.name.endsWith(".txt")
       }
-      
+
       $scope.showLabel = function() {
         return $scope.isText() || !$scope.attachment.name.startsWith("screenshot.");
       }

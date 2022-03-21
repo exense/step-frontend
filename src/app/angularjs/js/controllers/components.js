@@ -1,18 +1,18 @@
 /*******************************************************************************
  * Copyright (C) 2020, exense GmbH
- *  
+ *
  * This file is part of STEP
- *  
+ *
  * STEP is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *  
+ *
  * STEP is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with STEP.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
@@ -26,7 +26,7 @@ angular.module('components',['step'])
     },
     templateUrl: 'partials/components/statusSummary.html',
     controller: function($scope, $http) {
-      
+
     }
   };
 })
@@ -39,7 +39,7 @@ angular.module('components',['step'])
     },
     templateUrl: 'partials/components/gridStatusSummary.html',
     controller: function($scope, $http) {
-      
+
     }
   };
 })
@@ -72,7 +72,7 @@ angular.module('components',['step'])
       time: '='
     },
     template: "<span>{{ time | date:'dd.MM.yyyy HH:mm:ss'}}</span>",
-    controller: function() {  
+    controller: function() {
     }
   };
 })
@@ -96,7 +96,7 @@ angular.module('components',['step'])
       time: '='
     },
     template: "<span>{{ time | date:'HH:mm:ss'}}</span>",
-    controller: function() {  
+    controller: function() {
     }
   };
 })
@@ -307,7 +307,7 @@ angular.module('components',['step'])
         // Prevent default dragging of selected content
         event.preventDefault();
         modalResult = Dialogs.editTextField(scope);
-      });  
+      });
     },
     controller: function($scope) {
     }
@@ -320,6 +320,7 @@ angular.module('components',['step'])
     scope: {
       stType: '=',
       stBounded: "=?",
+      stDirectory: "=?",
       stModel: '=',
       stOnChange: '&?',
       saveButton: '@?',
@@ -331,20 +332,20 @@ angular.module('components',['step'])
       if(!$scope.saveButtonLabel) {
         $scope.saveButtonLabel="Save"
       }
-      
+
       $scope.stBounded = angular.isDefined($scope.stBounded)?$scope.stBounded:false;
-      
+
       function resetStaginModel() {
         // Initialize staging model
         // Using stagingModel.value and not value directly to avoid two-way binding issues caused by the ng-if in the template
         // See https://stackoverflow.com/questions/12618342/ng-model-does-not-update-controller-value
         $scope.stagingModel = {value: $scope.stModel};
       }
-      
+
       resetStaginModel();
-      
+
       $scope.stagingModel = {value: $scope.stModel};
-      
+
       // Called when the staging field is left
       $scope.blurStagingField = function() {
         // Commit the changes only if the save button is disabled.
@@ -352,22 +353,22 @@ angular.module('components',['step'])
           $scope.commitChanges();
         }
       }
-      
+
       // Called when the save button is clicked or the staging field is blurred (depending if the save button is enabled or not)
       $scope.commitChanges = function() {
         $scope.stModel = $scope.stagingModel.value;
         callOnChangeListener();
       }
-      
+
       $scope.showSaveButton = function() {
         return $scope.saveButton && $scope.saveButton=='true';
       }
-      
+
       function setResourceIdToFieldValue(resourceId) {
         $scope.stModel = "resource:"+resourceId;
         callOnChangeListener();
       }
-      
+
       function callOnChangeListener() {
         if($scope.stOnChange) {
           $timeout(function() {
@@ -375,21 +376,21 @@ angular.module('components',['step'])
           })
         }
       }
-      
+
       $scope.uploading = false;
       function upload(file, url) {
         if(file) {
           $scope.uploading = true;
-          // do not perform any duplicate check for bounded resources as we do not want to link bounded resources 
+          // do not perform any duplicate check for bounded resources as we do not want to link bounded resources
           // to any other resource
           Upload.upload({
-            url: url+"?type="+$scope.stType+"&duplicateCheck="+!$scope.stBounded,
+            url: url+"?type="+$scope.stType+"&duplicateCheck="+!$scope.stBounded+"&directory="+$scope.stDirectory,
             data: {file: file}
           }).then(function (resp) {
             $scope.uploading = false;
 
             var response = resp.data;
-            var resourceId = response.resource.id; 
+            var resourceId = response.resource.id;
             if(!response.similarResources) {
               // No similar resource found
               setResourceIdToFieldValue(resourceId)
@@ -417,7 +418,7 @@ angular.module('components',['step'])
           });
         }
       }
-      
+
       $scope.upload = function (file) {
         if($scope.isResource() && !$scope.resourceNotExisting) {
           if(!$scope.stBounded) {
@@ -439,13 +440,13 @@ angular.module('components',['step'])
           upload(file,'rest/resources/content');
         }
       };
-      
+
       $scope.selectResource = function() {
         ResourceDialogs.searchResource($scope.stType).then(function(resourceId) {
           setResourceIdToFieldValue(resourceId);
         })
       }
-      
+
       $scope.resourceFilename = "";
       $scope.$watch('stModel',function(newValue) {
         if(newValue) {
@@ -465,14 +466,14 @@ angular.module('components',['step'])
           }
         }
       })
-      
+
       $scope.clear = function() {
         $scope.stModel = "";
         $scope.absoluteFilepath = "";
         resetStaginModel();
         callOnChangeListener();
       }
-      
+
       $scope.isResource = function() {
         return $scope.stModel && (typeof $scope.stModel) == 'string' && $scope.stModel.indexOf('resource:')==0;
       }
@@ -480,7 +481,7 @@ angular.module('components',['step'])
         return $scope.stModel.replace("resource:","");
       }
     },
-    link: function($scope, element, attrs) {            
+    link: function($scope, element, attrs) {
       $scope.openFileChooser = function() {
       	element[0].querySelector('#fileInput').click();
       }
@@ -492,7 +493,7 @@ angular.module('components',['step'])
   return {
     restrict: 'E',
     scope: {
-      stModel: '=', 
+      stModel: '=',
       stFormat: '@?'
     },
     controller: function($scope,$http,$timeout,Upload,ResourceDialogs) {
@@ -516,7 +517,7 @@ angular.module('components',['step'])
           }
         }
       })
-      
+
       $scope.isResource = function() {
         return $scope.stModel && (typeof $scope.stModel) == 'string' && $scope.stModel.indexOf('resource:')==0;
       }
@@ -531,7 +532,7 @@ angular.module('components',['step'])
   return {
     restrict: 'E',
     scope: {
-      execution: '='    
+      execution: '='
     },
     templateUrl: 'partials/components/executionResult.html',
     controller: function($scope) {
@@ -547,7 +548,7 @@ angular.module('components',['step'])
             } else {
               css += ' glyphicon-exclamation-sign'
             }
-          }       
+          }
         }
         return css;
       }
@@ -562,7 +563,7 @@ angular.module('components',['step'])
               // backward compatibility with executions run before 3.9
               return "UNKNOW";
             }
-          }          
+          }
         } else {
           return "";
         }
@@ -576,7 +577,7 @@ angular.module('components',['step'])
     restrict: 'A',
     scope: {},
     link: function(scope, element, attrs) {
-      // workaround for IE as IE only pastes the first line 
+      // workaround for IE as IE only pastes the first line
       if (window.clipboardData) {
         element.bind('paste', function (e) {
             var clipped = window.clipboardData.getData('Text');
@@ -593,7 +594,7 @@ angular.module('components',['step'])
   return {
     restrict: 'E',
     scope: {action:'='},
-    link: function(scope, element, attr, tabsCtrl) { 
+    link: function(scope, element, attr, tabsCtrl) {
       scope.onEnter = function(event) {
         var inputValue = element.find('input').val();
         scope.action(inputValue);
@@ -602,9 +603,9 @@ angular.module('components',['step'])
     controller: function($scope){
       $scope.maxDate = new Date();
       $scope.open = false;
-      
-      
-      
+
+
+
     },
     templateUrl: 'partials/datepicker.html'
   };
@@ -633,14 +634,14 @@ angular.module('components',['step'])
         }
         return regexp;
       }
-      
+
       if($scope.handle) {
         $scope.handle.set = function(value) {
           $scope.model.inputtext = value;
           $scope.action($scope.model.inputtext);
         }
       }
-      
+
       $scope.$watchCollection('options', function(newOptions, oldOptions) {
         _.each(newOptions,function(option) {
           var oldOption = _.findWhere($scope.options, {text: option.text});

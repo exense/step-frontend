@@ -1,18 +1,18 @@
 /*******************************************************************************
  * Copyright (C) 2020, exense GmbH
- *  
+ *
  * This file is part of STEP
- *  
+ *
  * STEP is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *  
+ *
  * STEP is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with STEP.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
@@ -24,14 +24,14 @@ angular.module('resourcesControllers',['tables','step'])
   EntityRegistry.registerEntity('Resource', 'resources', 'resources', 'rest/resources/', 'rest/resources/', 'st-table', '/partials/resources/resourceSelectionTable.html');
 })
 
-.controller('ResourceListCtrl', function($rootScope, $scope, $http, stateStorage, Dialogs, ResourceDialogs, AuthService) {
-    stateStorage.push($scope, 'resources', {});	
+.controller('ResourceListCtrl', function($rootScope, $scope, $http, stateStorage, Dialogs, ResourceDialogs, AuthService, IsUsedByService, IsUsedByDialogs) {
+    stateStorage.push($scope, 'resources', {});
     $scope.authService = AuthService;
-    
+
     function reload() {
       $scope.tableHandle.reload();
     }
-    
+
     $scope.addResource = function() {
       ResourceDialogs.editResource(null, function() {reload()});
     }
@@ -39,7 +39,13 @@ angular.module('resourcesControllers',['tables','step'])
     $scope.editResource = function(id) {
       ResourceDialogs.editResource(id, function() {reload()});
     }
-    
+
+    $scope.lookUp = function(id, name) {
+      console.log(name);
+      const namePlaceholder = name ? '"' + name + '" ' : '';
+      IsUsedByDialogs.displayDialog('Resource ' + namePlaceholder + 'is used by', IsUsedByService.type.RESOURCE_ID, id);
+    }
+
     $scope.deleteResource = function(id, name) {
       Dialogs.showDeleteWarning(1, 'Resource "' + name + '"').then(function() {
         $http.delete("rest/resources/"+id).then(function() {
@@ -47,12 +53,12 @@ angular.module('resourcesControllers',['tables','step'])
         });
       })
     }
-    
+
     $scope.tableHandle = {};
   })
 
 .factory('ResourceDialogs', function ($uibModal, $http, Dialogs) {
-  
+
   function openModal(id) {
     var modalInstance = $uibModal.open({
       backdrop: 'static',
@@ -63,15 +69,15 @@ angular.module('resourcesControllers',['tables','step'])
 
       return modalInstance.result;
   }
-  
+
   var dialogs = {};
-  
+
   dialogs.editResource = function(id, callback) {
     openModal(id).then(function() {
       if(callback){callback()};
     })
   }
-  
+
   dialogs.searchResource = function(type) {
     var modalInstance = $uibModal.open({
       backdrop: 'static',
@@ -80,9 +86,9 @@ angular.module('resourcesControllers',['tables','step'])
       resolve: {type: function() {return type}}
     })
 
-    return modalInstance.result;    
+    return modalInstance.result;
   }
-  
+
   dialogs.showFileAlreadyExistsWarning = function(similarResources) {
     var modalInstance = $uibModal.open({
       backdrop: 'static',
@@ -91,9 +97,9 @@ angular.module('resourcesControllers',['tables','step'])
       resolve: {similarResources: function() {return similarResources}}
     })
 
-    return modalInstance.result;    
+    return modalInstance.result;
   }
-  
+
   dialogs.showUpdateResourceWarning = function(resource) {
     var modalInstance = $uibModal.open({
       backdrop: 'static',
@@ -102,20 +108,20 @@ angular.module('resourcesControllers',['tables','step'])
       resolve: {resource: function() {return resource}}
     })
 
-    return modalInstance.result;    
+    return modalInstance.result;
   }
-  
+
   return dialogs;
 })
 
 .controller('editResourceCtrl', function ($scope, $uibModalInstance, $http, AuthService, Upload, id) {
-  
+
   function loadResource(id) {
     $http.get("rest/resources/"+id).then(function(response){
       $scope.resource = response.data;
-    })    
+    })
   }
-  
+
   if(id==null) {
     $scope.resource={};
     $scope.mode = 'new';
@@ -124,7 +130,7 @@ angular.module('resourcesControllers',['tables','step'])
     $scope.mode = 'edit';
     loadResource(id);
   }
-  
+
   $scope.uploading = false;
 
   $scope.upload = function (file) {
@@ -145,7 +151,7 @@ angular.module('resourcesControllers',['tables','step'])
       });
     }
   };
-  
+
   $scope.openFileChooser = function() {
     $("#fileInput").click();
   }
@@ -155,16 +161,16 @@ angular.module('resourcesControllers',['tables','step'])
       $uibModalInstance.close();
     })
   }
-  
+
   $scope.cancel = function () {
     $uibModalInstance.dismiss('cancel');
   };
-  
+
   $scope.applyResourceType = function(type) {
     $scope.newResource.resourceType=type;
   }
-  
-  
+
+
   $scope.newResourceUpdate = function() {
     if ($scope.newResource.id){
       $scope.mode = 'edit';
@@ -176,11 +182,11 @@ angular.module('resourcesControllers',['tables','step'])
 .controller('searchResourceCtrl', function ($scope, $uibModalInstance, $http, AuthService, type) {
 
   $scope.type = type;
-  
+
   $scope.selectResource = function (id) {
     $uibModalInstance.close(id);
   }
-  
+
   $scope.cancel = function () {
     $uibModalInstance.dismiss('cancel');
   };
@@ -189,15 +195,15 @@ angular.module('resourcesControllers',['tables','step'])
 .controller('fileAlreadyExistsWarningCtrl', function ($scope, $uibModalInstance, $http, AuthService, similarResources) {
 
   $scope.similarResources = similarResources;
-  
+
   $scope.selectResource = function (id) {
     $uibModalInstance.close(id);
   }
-  
+
   $scope.createNewResource = function () {
     $uibModalInstance.close(null);
   }
-  
+
   $scope.cancel = function () {
     $uibModalInstance.dismiss('cancel');
   };
@@ -206,15 +212,15 @@ angular.module('resourcesControllers',['tables','step'])
 .controller('updateResourceWarningCtrl', function ($scope, $uibModalInstance, $http, AuthService, resource) {
 
   $scope.resource = resource;
-  
+
   $scope.updateResource = function () {
     $uibModalInstance.close(true);
   }
-  
+
   $scope.createNewResource = function () {
     $uibModalInstance.close(false);
   }
-  
+
   $scope.cancel = function () {
     $uibModalInstance.dismiss('cancel');
   };

@@ -1,18 +1,18 @@
 /*******************************************************************************
  * Copyright (C) 2020, exense GmbH
- *  
+ *
  * This file is part of STEP
- *  
+ *
  * STEP is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *  
+ *
  * STEP is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with STEP.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
@@ -23,8 +23,7 @@ angular.module('reportTree',['step','artefacts'])
     restrict: 'E',
     scope: {
       nodeid: '=',
-      handle: '='
-    
+      handle: '=',
     },
     controller: function($scope) {
       $scope.reportTreeSettings = {
@@ -34,7 +33,7 @@ angular.module('reportTree',['step','artefacts'])
     },
     link: function($scope, $element) {
       var nodeid = $scope.nodeid;
-      
+
       var treeDiv = angular.element($element[0]).find('#jstree_div');
       //console.log($scope.reportTreeSettings);
       var treeScrollDiv = angular.element($element[0]).find('#jstree_scroll_div')[0];
@@ -46,7 +45,7 @@ angular.module('reportTree',['step','artefacts'])
       getPreviousNodeLabel = function (node) {
         var cSkip = (paging[node.id]) ? paging[node.id].skip : 0;
         var newSkip = (cSkip>=limit) ? cSkip-limit:0;
-        return "Previous Nodes " +  ((cSkip > 0) ? "("+ newSkip + ".." + cSkip +")" : ""); 
+        return "Previous Nodes " +  ((cSkip > 0) ? "("+ newSkip + ".." + cSkip +")" : "");
       }
       getNextNodeLabel = function (node) {
         var nbChidlren = node.children.length;
@@ -75,7 +74,7 @@ angular.module('reportTree',['step','artefacts'])
                 cb.call(this,children);
               })
             }
-          }, 
+          },
           "plugins" : ["contextmenu"],
           "contextmenu": {
             "items": function ($node) {
@@ -89,7 +88,7 @@ angular.module('reportTree',['step','artefacts'])
                   "action": function (obj) {
                     $scope.pagingBefore(obj);
                   },
-                  "_disabled" : !(paging[$node.id] && paging[$node.id].skip > 0) 
+                  "_disabled" : !(paging[$node.id] && paging[$node.id].skip > 0)
                 },
                 "PagingNext": {
                   "separator_before": false,
@@ -104,9 +103,9 @@ angular.module('reportTree',['step','artefacts'])
               }
             }
           }
-          });    
+          });
       tree = treeDiv.jstree(true);
-      
+
       treeDiv.on('changed.jstree', function (e, data) {
         var selectedNodes = tree.get_selected(true);
         var selectedNodeId = selectedNodes?(selectedNodes.length>0?selectedNodes[0].id:null):null;
@@ -115,13 +114,13 @@ angular.module('reportTree',['step','artefacts'])
             $scope.selectedNode = response.data;
           })
         }
-        
+
         if(!$scope.$$phase) {
           $scope.$apply();
         }
       })
-      
-      treeDiv.on('refresh.jstree', function () { 
+
+      treeDiv.on('refresh.jstree', function () {
         if (scrollTopPos && scrollTopPos > 0) {
           treeScrollDiv.scrollTop = scrollTopPos;
         }
@@ -130,7 +129,7 @@ angular.module('reportTree',['step','artefacts'])
         }
         $scope.reloading = false;
       });
-      
+
       $scope.pagingBefore = function() {
         var node = tree.get_selected(true)[0];
         if (paging[node.id]) {
@@ -139,7 +138,7 @@ angular.module('reportTree',['step','artefacts'])
           $scope.handle.refresh();
         }
       }
-      
+
       $scope.pagingNext = function(obj) {
         var node = tree.get_selected(true)[0];
         pagingNextById(node.id);
@@ -153,11 +152,11 @@ angular.module('reportTree',['step','artefacts'])
         }
         $scope.handle.refresh();
       }
-      
+
       $scope.getDisplaiableProperties = function(node) {
         return _.without(_.keys(node),'id','_id','parentID','executionTime','duration','error','functionId','executionID','artefactID','customAttributes','_class','status','name','measures','attachments')
       }
-      
+
       $scope.skipRefesh=false;
       $scope.reloading=false;
       $scope.handle.refresh = function() {
@@ -168,12 +167,12 @@ angular.module('reportTree',['step','artefacts'])
           tree.refresh();
         }
       }
-      
+
       function expandPath(path, callback, prev) {
         var result = tree.open_node(path[0].id, function() {
           prev = path[0].id;
           path.shift();
-          if(path.length>0) { 
+          if(path.length>0) {
             $scope.handle.expandPath(path, callback, prev);
           } else {
             if(callback) {
@@ -209,7 +208,7 @@ angular.module('reportTree',['step','artefacts'])
           }
         }
       }
-      
+
       function selectNode(id) {
         tree.deselect_all();
         tree.select_node(id);
@@ -221,7 +220,7 @@ angular.module('reportTree',['step','artefacts'])
           treeScrollDiv.scrollLeft = el.offsetLeft;
         }
       }
-      
+
       $scope.handle.expandPath = function(path, reportTreeSettings, prev) {
         $scope.skipRefesh=true;
     	  expandPath(path.slice(0), function() {

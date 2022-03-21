@@ -5,7 +5,7 @@
 	<strong>{{description}}</strong>
 	<form ng-submit="save()">
 		<div class="form-group" ng-if="mode==='new'">
-			<label for="desc">Resource type</label> 			
+			<label for="desc">Resource type</label>
 			<div class="input-group">
 				<input class="form-control" id="desc" ng-model="newResource.resourceType" placeholder="resource type" autofocus>
 				<div class="input-group-btn" uib-dropdown>
@@ -25,16 +25,16 @@
 		<div class="form-group" ng-if="mode==='new'">
 			<fieldset style="padding:0px;" ng-disabled="newResource.resourceType == null">
 				<label>Content</label>
-				<resource-input  st-type="newResource.resourceType" st-model="newResource.id" st-on-change="newResourceUpdate()" 
+				<resource-input  st-type="newResource.resourceType" st-model="newResource.id" st-on-change="newResourceUpdate()"
 					upload-only="true"/>
 			</fieldset>
 		</div>
 		<div class="form-group" ng-if="mode==='edit'">
-			<label>Name</label> 
-			<input class="form-control"	ng-model="resource.resourceName" autofocus>
+			<label>Name</label>
+			<input class="form-control"	ng-model="resource.attributes.name" autofocus disabled>
 		</div>
 		<div class="form-group" ng-if="mode==='edit'">
-			<label>Type</label> 
+			<label>Type</label>
 			<input disabled class="form-control"	ng-model="resource.resourceType">
 		</div>
 		<div class="form-group" ng-if="mode==='edit'">
@@ -55,7 +55,7 @@
 			<input type="file" id="fileInput" style="display:none" ng-model="myFiles" ngf-select="upload($file)"/>
 			<uib-progressbar ng-if="uploading" max="100" value="progress"><b>{{progress}}%</b></uib-progressbar>
 		</div>
-		
+
 		<input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" />
 	</form>
 </div>

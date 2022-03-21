@@ -1,18 +1,18 @@
 /*******************************************************************************
  * Copyright (C) 2020, exense GmbH
- *  
+ *
  * This file is part of STEP
- *  
+ *
  * STEP is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *  
+ *
  * STEP is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with STEP.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
@@ -35,22 +35,22 @@ angular.module('adminControllers', ['step' ])
 
       // Select the "Users" tab per default
       if($scope.$state == null) { $scope.$state = 'users' };
-      
+
       // Returns the item number of the active tab
       $scope.activeTab = function() {
         return _.findIndex($scope.tabs,function(tab){return tab.id==$scope.$state});
       }
-      
+
       // Update the current $state and thus the browser location
       $scope.onSelection = function(tabid) {
         return $scope.$state=tabid;
       }
-    
-      $scope.autorefresh = true;
-   }])   
 
-.controller('UserListCtrl', function($scope, $interval, $http, helpers, $uibModal, Dialogs) {
-  
+      $scope.autorefresh = true;
+   }])
+
+.controller('UserListCtrl', function($scope, $interval, $http, helpers, $uibModal, Dialogs, AuthService) {
+
   $scope.loadTable = function loadTable() {
     $http.get("rest/admin/users").then(function(response) {
       var data = response.data;
@@ -59,7 +59,7 @@ angular.module('adminControllers', ['step' ])
   };
 
   $scope.loadTable();
-  
+
   //does not seem to be used anywhere
   $scope.resetPwd = function(id) {
     $http.post("rest/admin/user/"+id+"/resetpwd").then(function() {
@@ -72,30 +72,30 @@ angular.module('adminControllers', ['step' ])
         $scope.showResetPasswordPopup(id);
     });
   }
-  
+
   $scope.askAndRemoveUser = function(username) {
     Dialogs.showDeleteWarning(1, 'User "' + username + '"').then(function() {
-      $scope.removeUser(username)          
+      $scope.removeUser(username)
     })
   }
-  
+
   $scope.removeUser = function(username) {
     $http.delete("rest/admin/user/"+username).then(function() {
       $scope.loadTable();
     });
   }
-  
+
   $scope.addUser = function() {
     $scope.showEditUserPopup({});
   }
-  
+
   $scope.editUser = function(username) {
     $http.get("rest/admin/user/"+username).then(function(response) {
       var user = response.data;
       $scope.showEditUserPopup(user);
     });
   }
-  
+
   $scope.showEditUserPopup = function(user) {
     isNew = (user.username) ? false : true;
     var modalInstance = $uibModal.open({
@@ -109,15 +109,15 @@ angular.module('adminControllers', ['step' ])
         }
       }
     });
-      
+
     modalInstance.result.then(function(result) {
       console.log(result);
-      if (isNew && result === 'save') {
+      if (isNew && result === 'save' && AuthService.getConf().authenticatorName === 'DefaultAuthenticator') {
         $scope.showResetPasswordPopup(user);
       } else {
         $scope.loadTable();
       }
-    }, function () {}); 
+    }, function () {});
   }
 
   $scope.showResetPasswordPopup = function(user) {
@@ -136,7 +136,7 @@ angular.module('adminControllers', ['step' ])
     modalInstance.result.then(function() {$scope.loadTable()}, function () {});
   }
 })
-      
+
 .run(function(ViewRegistry) {
   ViewRegistry.registerDashlet('admin/controller','Maintenance','partials/maintenanceConfiguration.html','maintenance');
 })
@@ -145,7 +145,7 @@ angular.module('adminControllers', ['step' ])
   $scope.configurationItems = ViewRegistry.getDashlets("admin/controller");
 
   stateStorage.push($scope, 'controller', {});
-  
+
   $scope.$watch('$state',function() {
     if($scope.$state!=null) {
       $scope.currentConfigurationItem = _.find($scope.configurationItems,function(item) {
@@ -154,7 +154,7 @@ angular.module('adminControllers', ['step' ])
   });
 
   $scope.currentConfigurationItem = $scope.configurationItems[0];
-  
+
   $scope.setCurrentConfigurationItem = function(item) {
     $scope.$state = item.id;
     $scope.currentConfigurationItem = item;
@@ -183,30 +183,30 @@ angular.module('adminControllers', ['step' ])
 
 .controller('MaintenanceSettingsCtrl', function($scope, $http, ViewRegistry, MaintenanceService) {
   $scope.maintenanceMessage;
-  
+
   $scope.toggle = {};
   $scope.toggle.switch = false;
-  
+
   $http.get("rest/admin/maintenance/message").then(function(res) {
     $scope.maintenanceMessage = res.data;
   });
-  
+
   $http.get("rest/admin/maintenance/message/toggle").then(function(res) {
     $scope.toggle.switch = (res.data === 'true');
   });
-  
+
   $scope.saveMaintenanceMessage = function() {
     $http.post("rest/admin/maintenance/message", $scope.maintenanceMessage).then(function() {
       MaintenanceService.reloadMaintenanceMessage();
     });
   }
-  
+
   $scope.upateToggle = function() {
     $http.post("rest/admin/maintenance/message/toggle", $scope.toggle.switch).then(function() {
       MaintenanceService.reloadMaintenanceMessage();
     });
   }
-  
+
   $scope.switchToggle = function() {
     $scope.toggle.switch = !$scope.toggle.switch;
     $scope.upateToggle();
@@ -218,26 +218,26 @@ angular.module('adminControllers', ['step' ])
    $scope.roles = AuthService.getConf().roles;
    $scope.user = user;
    $scope.new = ($scope.user.username) ? false : true;
-   
+
    if(!user.role) {
-     user.role = $scope.roles[0];     
+     user.role = $scope.roles[0];
    }
-   
+
    $scope.save = function() {
      $http.post("rest/admin/user", user).then(function() {
        $uibModalInstance.close('save');
      });
    }
-   
+
    $scope.cancel = function() {
-     $uibModalInstance.close('cancel');     
+     $uibModalInstance.close('cancel');
    }
 })
 
 .controller('resetPasswordModalCtrl', function ($scope, $uibModalInstance, $http, $location, AuthService, user) {
   $scope.user = user;
   $http.post("rest/admin/user/" + user.username + "/resetpwd").then(function(response) {$scope.password = response.data.password});
-  
+
   $scope.close = function() {
       $uibModalInstance.close();
   }
@@ -246,9 +246,9 @@ angular.module('adminControllers', ['step' ])
 .controller('MyAccountCtrl',
     function($scope, $rootScope, $interval, $http, helpers, $uibModal, AuthService) {
       $scope.$state = 'myaccount';
-      
+
       $scope.token = "";
-      
+
       $scope.showGenerateApiKeyDialog = function () {
         var modalInstance = $uibModal.open({backdrop: 'static',animation: false,templateUrl: 'partials/generateApiKey.html',
           controller: 'GenerateApiKeyModalCtrl'});

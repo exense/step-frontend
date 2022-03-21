@@ -1,18 +1,18 @@
 /*******************************************************************************
  * Copyright (C) 2020, exense GmbH
- *  
+ *
  * This file is part of STEP
- *  
+ *
  * STEP is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *  
+ *
  * STEP is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with STEP.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
@@ -28,7 +28,7 @@ angular.module('plans',['tables','step','screenConfigurationControllers'])
   var api = {};
 
   var registry = {};
-  
+
   api.register = function(type, label, editor) {
     registry[type] = {
       editor: editor,
@@ -36,15 +36,15 @@ angular.module('plans',['tables','step','screenConfigurationControllers'])
       type: type
     };
   };
-  
+
   api.getEditorView = function(type){
     return registry[type].editor;
   };
-  
+
   api.getPlanTypes = function() {
     return _.values(registry);
   }
-  
+
   api.getPlanType = function(typeName) {
     return registry[typeName];
   }
@@ -53,7 +53,7 @@ angular.module('plans',['tables','step','screenConfigurationControllers'])
 })
 
 .controller('PlansCtrl', function($rootScope, $scope, stateStorage) {
-  stateStorage.push($scope, 'plans', {}); 
+  stateStorage.push($scope, 'plans', {});
 
   $scope.$watch('$state',function() {
     if($scope.$state!=null) {
@@ -62,16 +62,16 @@ angular.module('plans',['tables','step','screenConfigurationControllers'])
   });
 })
 
-.controller('PlanListCtrl', function($rootScope, $scope, $http, $location, $uibModal, stateStorage, Dialogs, PlanDialogs, ImportDialogs, ExportDialogs, AuthService) {
-    stateStorage.push($scope, 'list', {});	
+.controller('PlanListCtrl', function($rootScope, $scope, $http, $location, $uibModal, stateStorage, Dialogs, PlanDialogs, ImportDialogs, ExportDialogs, AuthService, IsUsedByService, IsUsedByDialogs) {
+    stateStorage.push($scope, 'list', {});
     $scope.authService = AuthService;
-    
+
     $scope.tableHandle = {};
-    
+
     function reload() {
       $scope.tableHandle.reload();
     }
-    
+
     $scope.addPlan = function() {
       PlanDialogs.createPlan(function(plan) {
         reload();
@@ -81,27 +81,21 @@ angular.module('plans',['tables','step','screenConfigurationControllers'])
     $scope.editPlan = function(id) {
       $location.path('/root/plans/editor/' + id);
     }
-    
+
     $scope.executePlan = function(id) {
       $location.path('/root/repository').search({repositoryId:'local',planid:id});
     }
-    
-    $scope.copyPlan = function(id) {
-      $rootScope.clipboard = {object:"plan",id:id};
+
+    $scope.duplicatePlan = function(id) {
+      $http.get("rest/plans/" + id + "/clone").then(function(response) {
+        const clone = response.data;
+        clone.attributes.name = clone.attributes.name + "_Copy"
+        $http.post("rest/plans", clone).then(function(response) {
+          reload();
+        })
+      });
     }
-    
-    $scope.pastePlan = function() {
-      if($rootScope.clipboard && $rootScope.clipboard.object=="plan") {
-        $http.get("rest/plans/"+$rootScope.clipboard.id+"/clone").then(function(response) {
-          var clone = response.data;
-          clone.attributes.name = clone.attributes.name + "_Copy" 
-          $http.post("rest/plans", clone).then(function(response) {
-            reload();
-          })
-        });
-      }
-    }
-    
+
     $scope.deletePlan = function(id, name) {
       Dialogs.showDeleteWarning(1, 'Plan "' + name + '"').then(function() {
         $http.delete("rest/plans/"+id).then(function() {
@@ -109,13 +103,13 @@ angular.module('plans',['tables','step','screenConfigurationControllers'])
         });
       })
     }
-    
+
     $scope.importPlans = function() {
       ImportDialogs.displayImportDialog('Plans import','plans', true, false).then(function () {
         reload();
       });
     }
-    
+
     $scope.exportPlans = function() {
       ExportDialogs.displayExportDialog('Plans export','plans', 'allPlans.sta', true, false).then(function () {})
     }
@@ -123,13 +117,17 @@ angular.module('plans',['tables','step','screenConfigurationControllers'])
     $scope.exportPlan = function(id, name) {
       ExportDialogs.displayExportDialog('Plans export','plans/'+id, name+'.sta', true, false).then(function () {})
     }
-    
+
+    $scope.lookUp = function(id, name) {
+      IsUsedByDialogs.displayDialog('Plan "' + name + '" is used by', IsUsedByService.type.PLAN_ID, id);
+    }
+
   })
-  
+
 .factory('PlanDialogs', function ($uibModal, $http, Dialogs) {
-  
+
   var dialogs = {};
-  
+
   dialogs.createPlan = function(callback) {
     var modalInstance = $uibModal.open({
       backdrop: 'static',
@@ -142,34 +140,34 @@ angular.module('plans',['tables','step','screenConfigurationControllers'])
       if(callback){callback(plan)};
     })
   }
-  
+
   dialogs.selectPlan = function(callback) {
     Dialogs.selectEntityOfType('plans', true).then(function(result) {
       var id = result.item;
       $http.get('rest/plans/'+id).then(function(response) {
         var plan = response.data;
         if(callback){callback(plan)};
-      }) 
+      })
     });
   }
-  
+
   return dialogs;
 })
 
 .controller('createPlanCtrl', function ($scope, $uibModalInstance, $location, $http, AuthService, ScreenTemplates, PlanTypeRegistry) {
   $scope.AuthService = AuthService;
-  
+
   $scope.template = 'TestCase';
   $scope.plan = {attributes:{}};
 
-  
+
   $scope.planTypes = PlanTypeRegistry.getPlanTypes();
   $scope.planType = PlanTypeRegistry.getPlanType('step.core.plans.Plan');
-  
+
   $http.get("rest/plans/artefact/templates").then(function(response){
     $scope.artefactTypes = response.data;
   })
-  
+
   $scope.save = function (editAfterSave) {
     $http.get("rest/plans?type="+$scope.planType.type+'&template='+$scope.template).then(function(response){
       var createdPlan = response.data;
@@ -185,7 +183,7 @@ angular.module('plans',['tables','step','screenConfigurationControllers'])
       })
     })
   }
-  
+
   $scope.cancel = function () {
     $uibModalInstance.dismiss('cancel');
   };
@@ -195,17 +193,35 @@ angular.module('plans',['tables','step','screenConfigurationControllers'])
   return {
     restrict: 'E',
     scope: {
-      planRef: '=?',
-      planId: '=?',
+      entityRef: '=?',
+      entityId: '=?',
+      entityTenant: '=?',
       description: '=?',
       linkOnly: '=?',
-      stOptions: '=?'
+      stOptions: '=?',
+      continueOnCancel: '=?'
     },
     templateUrl: 'partials/components/planLink.html',
-    controller: function($scope, $http) {
+    controller: function($scope, LinkProcessor, $location, Dialogs) {
       $scope.noLink = $scope.stOptions && $scope.stOptions.includes("noEditorLink")
-      if($scope.planRef && $scope.planRef.repositoryID=='local') {
-        $scope.planId = $scope.planRef.repositoryParameters.planid
+      if ($scope.entityRef && $scope.entityRef.repositoryID === 'local') {
+        $scope.entityId = $scope.entityRef.repositoryParameters.planid
+      }
+      $scope.openLink = () => {
+        LinkProcessor.process($scope.entityTenant).then(() => {
+            $location.path('/root/plans/editor/' + $scope.entityId);
+            $scope.$apply();
+          }, () => {
+            if ($scope.continueOnCancel) {
+              $location.path('/root/plans/editor/' + $scope.entityId);
+              $scope.$apply();
+            }
+          }
+        ).catch((errorMessage) => {
+          if (errorMessage) {
+            Dialogs.showErrorMsg(errorMessage);
+          }
+        });
       }
     }
   };
