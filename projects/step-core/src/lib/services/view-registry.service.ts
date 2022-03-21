@@ -2,7 +2,7 @@ import { ITemplateCacheService } from 'angular';
 import { Inject, Injectable } from '@angular/core';
 import { v4 } from 'uuid';
 import { AJS_TEMPLATES_CACHE } from '../shared/angularjs-providers';
-import { Dashlet, LegacyViewRegistryService, MenuEntry } from '../shared/legacy-view-registry.service';
+import { CustomView, Dashlet, LegacyViewRegistryService, MenuEntry } from '../shared/legacy-view-registry.service';
 
 @Injectable({
   providedIn: 'root',
@@ -73,5 +73,21 @@ export class ViewRegistryService implements LegacyViewRegistryService {
   registerView(viewId: string, template: string, isPublicView?: boolean): void {
     const virtualTemplateFilePath = this.registerTemplate(template);
     this._legacyViewRegistry.registerView(viewId, virtualTemplateFilePath, isPublicView);
+  }
+
+  getCustomView(view: string): CustomView {
+    return this._legacyViewRegistry.getCustomView(view);
+  }
+
+  isStaticView(view: string): boolean {
+    return this._legacyViewRegistry.isStaticView(view);
+  }
+
+  registerViewWithConfig(
+    viewId: string,
+    template: string,
+    config: { isPublicView: boolean; isStaticView: boolean }
+  ): void {
+    this._legacyViewRegistry.registerViewWithConfig(viewId, template, config);
   }
 }

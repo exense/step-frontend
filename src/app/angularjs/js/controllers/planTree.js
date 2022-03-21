@@ -1,22 +1,22 @@
 /*******************************************************************************
  * Copyright (C) 2020, exense GmbH
- *  
+ *
  * This file is part of STEP
- *  
+ *
  * STEP is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *  
+ *
  * STEP is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with STEP.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-angular.module('planTree',['step','artefacts','reportTable','dynamicForms','export'])
+angular.module('planTree',['step','artefacts','reportTable','dynamicForms','export','functionsControllers'])
 
 .directive('planTree', function(artefactTypes, $http,$timeout,$interval,stateStorage,$filter,$location, Dialogs, ScreenTemplates) {
   return {
@@ -28,11 +28,11 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
       interactiveSessionHandle: '=',
       readonly: '=',
     },
-    controller: function($scope,$location,$rootScope, AuthService) {
+    controller: function($scope,$location,$rootScope, AuthService, FunctionDialogs) {
       $scope.undoStackEntityId;
       $scope.undoStack=[];
       $scope.redoStack=[];
-      
+
       $scope.$watch('plan',function() {
         if($scope.plan) {
           if(!$scope.undoStackEntityId || $scope.undoStackEntityId != $scope.plan.id) {
@@ -51,6 +51,13 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
               tree.open_all();
               setupInitialState(root);
               overrideJSTreeKeyFunctions();
+              if ($location.search().artefactId) {
+                $timeout(() => {
+                  tree.deselect_all(true);
+                  tree.select_node($location.search().artefactId);
+                  $scope.openSelectedArtefact();
+                });
+              }
             });
           } else {
             load(function(root) {});
@@ -58,13 +65,13 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
 
         }
       });
-      
+
       function setupInitialState(root) {
         var initialState = $rootScope.planEditorInitialState;
         if(initialState) {
           if(initialState.selectedNode) {
             tree.deselect_all(true);
-            tree.select_node(initialState.selectedNode);            
+            tree.select_node(initialState.selectedNode);
           }
           if(initialState.interactive) {
             $scope.interactiveSessionHandle.start();
@@ -74,17 +81,17 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
           tree.select_node(root.id);
         }
       }
-      
+
       function setSelectedNode(o) {
-        if(o && o.length) { 
+        if(o && o.length) {
           var artefact = o[0];
           tree.deselect_all(true);
           tree._open_to(artefact.id);
-          tree.select_node(artefact.id);          
+          tree.select_node(artefact.id);
           focusOnNode(artefact.id);
         }
       }
-      
+
       function overrideJSTreeKeyFunctions() {
         kb = tree.settings.core.keyboard;
         if (kb.hasOwnProperty('up')) {
@@ -106,9 +113,9 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
           kb['down']=newfunction;
         }
       }
-      
+
       $scope.authService = AuthService;
-      
+
       var tree;
       $('#jstree_demo_div').jstree(
 				  {
@@ -119,13 +126,13 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
 					      if(operation=='move_node') {
 					        return node_parent.parent?true:false;
 					      } else {
-					        return true;	              
-					      }					      
+					        return true;
+					      }
 					    } else {
 					      return false;
 					    }
 					  }
-					}, 
+					},
 					"plugins" : ["dnd","contextmenu"],
 					"contextmenu": {
 					  "items": function ($node) {
@@ -227,7 +234,7 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
 					}
 				  });
       tree = $('#jstree_demo_div').jstree(true);
-      
+
       function getArtefactById(artefact, id) {
         if(artefact.id == id) {
           return artefact;
@@ -245,7 +252,7 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
           return null;
         }
       }
-      
+
       $('#jstree_demo_div').on('changed.jstree', function (e, data) {
       	var selectedNodes = tree.get_selected(true);
       	if(selectedNodes.length > 0) {
@@ -253,12 +260,12 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
       	}
       	$scope.$apply();
       })
-      
+
       $(document).on("dnd_move.vakata", function (e, data) {
-        //Triggered continuously during drag 
+        //Triggered continuously during drag
       }).bind("dnd_stop.vakata", function(e, data) { //Triggered on drag complete
         if ($scope.nodesToMove) {
-          // Important: We first sort the selected nodes by their position in the tree  
+          // Important: We first sort the selected nodes by their position in the tree
           // We have to do this as jstree sorts the selected node using the chronological order of selection
           var nodesToMove = sortNodeListByPositionInTree($scope.nodesToMove.nodes)
           var artefactToFocusAfterRefresh = null;
@@ -286,7 +293,7 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
           $scope.nodesToMove = null;
         }
       });
-      
+
       //Triggered for each node moved before the dnd_stop.vakata event
       $('#jstree_demo_div').on("move_node.jstree", function (e, data) {
         if (!$scope.nodesToMove) {
@@ -300,7 +307,7 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
         }
         $scope.nodesToMove.nodes.push(node);
       })
-      
+
       $("#jstree_demo_div").delegate("a","dblclick", function(e) {
         $scope.openSelectedArtefact();
       });
@@ -309,15 +316,15 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
         //Only react on keyboard while not renaming a node
         if (!$scope.renaming) {
           if(e.which === 46 && !$scope.readonly) {
-            e.preventDefault(); 
+            e.preventDefault();
             $scope.remove();
           }
           else if(e.which === 67 && (e.ctrlKey || e.metaKey) && !$scope.readonly) {
-            e.preventDefault(); 
+            e.preventDefault();
             $scope.copy();
           }
           else if(e.which === 86 && (e.ctrlKey || e.metaKey) && !$scope.readonly) {
-            e.preventDefault(); 
+            e.preventDefault();
             $scope.paste();
           }
           else if (e.which === 38 && (e.ctrlKey || e.metaKey) && !$scope.readonly) {
@@ -357,112 +364,111 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
         }
         return label;
       }
-      
+
       function load(callback) {
   	  	treeData = [];
       	function asJSTreeNode(currentNode) {
       	  var children = [];
       	  _.each(currentNode.children, function(child) {
       	    children.push(asJSTreeNode(child))
-      	  }) 	  
-      	  
+      	  })
+
       	  var artefact = currentNode;
 
       	  var icon = artefactTypes.getIcon(artefact._class);
-      	  
+
       	  var node = { "id" : artefact.id, "children" : children, "text" : getNodeLabel(artefact), icon:"glyphicon "+icon, data: {"artefact": artefact} }
       	  if (artefact.skipNode.value) {
       	    node.li_attr = { "class" : "text-muted" }
       	  }
-      	  
+
       	  if (artefact._class === 'CallPlan') {
       	    node.planId = artefact.id;
       	  } else if (artefact._class === 'CallKeyword') {
-      	    node.callFunctionId = artefact.id; 
+      	    node.callFunctionId = artefact.id;
       	  }
-      	  
+
       	  return node;
       	}
-      	
+
         // In some cases (Empty plain text plan for instance)
         // the root artefact doesn't exist
         if($scope.plan.root) {
           var root = asJSTreeNode($scope.plan.root);
-          
+
           treeData.push(root)
           tree.settings.core.data = treeData;
-          
+
           $('#jstree_demo_div').one("refresh.jstree", function() {
             if(callback) {
-              callback(root); 		
+              callback(root);
             }
           })
-  
+
           tree.refresh();
         }
       }
-      
+
       function focusOnNode(nodeId) {
         var node = tree.get_node(nodeId, true);
-        if (typeof node.children === "function" && (child = node.children('.jstree-anchor')) !== "undefined") { 
+        if (typeof node.children === "function" && (child = node.children('.jstree-anchor')) !== "undefined") {
           child.focus();
         }
       }
-      
+
       function reloadAfterArtefactInsertion(artefact) {
       	load(function() {
     			tree.deselect_all(true);
     			tree._open_to(artefact.id);
-    			tree.select_node(artefact.id);    			
+    			tree.select_node(artefact.id);
     			focusOnNode(artefact.id);
-    		});  
+    		});
       }
-      
+
       function addArtefactToCurrentNode(newArtefact) {
         var selectedArtefact = getSelectedArtefact();
         selectedArtefact.children.push(newArtefact);
         reloadAfterArtefactInsertion(newArtefact)
         $scope.fireChangeEvent();
       }
-      
-      if($scope.handle) {
+
+      if ($scope.handle) {
         $scope.handle.addFunction = function(id) {
-          var selectedArtefact = tree.get_selected(true);
-          
           $http.get("rest/functions/"+id).then(function(response) {
             var function_ = response.data;
-    
+
             $http.get("rest/plans/artefact/types/CallKeyword").then(function(response) {
               ScreenTemplates.getScreenInputsByScreenId('functionTable').then(inputs => {
-                var newArtefact = response.data;
+                const newArtefact = response.data;
                 newArtefact.attributes.name = function_.attributes.name;
 
-                var functionAttributes = {}
+                const functionAttributes = {}
                 _.mapObject(inputs, input => {
-                  var attributeId = input.id.replace("attributes.","");
-                  if(attributeId) {
-                    var value = function_.attributes[attributeId];
-                    if(value) {
+                  const attributeId = input.id.replace("attributes.","");
+                  if (attributeId) {
+                    const value = function_.attributes[attributeId];
+                    if (value) {
                       functionAttributes[attributeId] = {"value":value, "dynamic": false}
                     }
                   }
                 })
                 newArtefact.function = {value:JSON.stringify(functionAttributes), dynamic:false};
 
-                if(AuthService.getConf().miscParams.enforceschemas === 'true'){
-                  var targetObject = {};
+                if (AuthService.getConf().miscParams.enforceschemas === 'true') {
+                  const targetObject = {};
 
-                  if(function_.schema && function_.schema.properties){
+                  if (function_.schema && function_.schema.properties) {
                     _.each(Object.keys(function_.schema.properties), function(prop) {
-                      var value = "notype";
-                      if(function_.schema.properties[prop].type){
-                        var propValue = {};
-                        value = function_.schema.properties[prop].type;
-                        if(value === 'number' || value === 'integer')
+                      if (function_.schema.properties[prop].default) {
+                        targetObject[prop] = {"value" : function_.schema.properties[prop].default, "dynamic" : false};
+                      } else if (function_.schema.properties[prop].type) {
+                        let propValue = {};
+                        const value = function_.schema.properties[prop].type;
+                        if (value === 'number' || value === 'integer') {
                           propValue = {"expression" : "<" + value + ">", "dynamic" : true};
-                        else
+                        } else {
                           propValue = {"value" : "<" + value + ">", "dynamic" : false};
-
+                        }
                         targetObject[prop] = propValue;
                       }
                     });
@@ -491,14 +497,14 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
             });
           });
         }
-        
+
         $scope.handle.addControl = function(id) {
           $http.get("rest/plans/artefact/types/"+id).then(function(response) {
             var artefact = response.data;
             addArtefactToCurrentNode(artefact);
           });
         }
-        
+
         $scope.handle.addPlan = function(id) {
           $http.get("rest/plans/"+id).then(function(response) {
             var plan = response.data;
@@ -508,7 +514,7 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
               newArtefact.planId=id;
               addArtefactToCurrentNode(newArtefact);
             });
-            
+
           });
         }
 
@@ -546,8 +552,8 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
           return ($scope.redoStack.length > 0);
         }
       }
-      
-      
+
+
       $scope.openSelectedArtefact = function() {
         var selectedArtefact = tree.get_selected(true)[0];
         if (selectedArtefact.original.planId) {
@@ -567,9 +573,9 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
           var artefact = getSelectedArtefact();
           $http.post("rest/functions/lookup",artefact).then(function(response) {
             if (response.data) {
-              var planId = response.data.planId;
-              if (planId) {
-                openPlan(planId);
+              var functionId = response.data.id;
+              if (functionId) {
+                openFunctionEditor(functionId);
               } else {
                 Dialogs.showErrorMsg("No editor configured for this function type");
               }
@@ -579,13 +585,13 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
           });
         }
       }
-      
+
       $scope.isNodeDisabled = function() {
         var selectedNode = tree.get_selected(true)[0];
         var selectedArtefact = getArtefactById($scope.plan.root, selectedNode.id);
         return selectedArtefact.skipNode.value;
       }
-      
+
       $scope.switchDisable = function() {
         var selectedNodes = tree.get_selected(true);
         if (selectedNodes.length > 0) {
@@ -599,13 +605,13 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
           tree.redraw(true);
         }
       }
-      
+
       function getSelectedArtefact() {
         var selectedNode = tree.get_selected(true)[0];
         var selectedArtefact = getArtefactById($scope.plan.root, selectedNode.id);
         return selectedArtefact;
       }
-      
+
       function getSelectedArtefactsSortedByPositionInTree() {
         var sortedNodes = getSelectedNodesSortedByPositionInTree();
         return _.map(sortedNodes, function (node) {
@@ -613,12 +619,23 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
         });
       }
 
-      openPlan = function(planId) {
-        $timeout(function() {
-          $location.path('/root/plans/editor/' + planId);
+      function openPlan(planId) {
+        $http.get('rest/plans/' + planId).then(function(response) {
+          LinkProcessor.process(response.data.attributes.project).then(() => {
+            $location.path('/root/plans/editor/' + planId);
+            $scope.$apply();
+          }).catch((errorMessage) => {
+            if (errorMessage) {
+              Dialogs.showErrorMsg(errorMessage);
+            }
+          });
         });
       }
-      
+
+      openFunctionEditor = function(functionId) {
+        FunctionDialogs.openFunctionEditor(functionId);
+      }
+
       $scope.rename = function() {
         $scope.renaming=true;
         var selectedNode = tree.get_selected(true)[0];
@@ -636,7 +653,7 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
           $scope.fireChangeEvent();
         });
       }
-      
+
       $scope.copy = function () {
         var selectedArtefacts = getSelectedArtefactsSortedByPositionInTree();
         $rootScope.clipboard = { object: "artefact", artefactList: selectedArtefacts };
@@ -662,7 +679,7 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
           }
         }
       }
-      
+
       $scope.remove = function () {
         var selectedNodes = tree.get_selected(true);
         if (selectedNodes.length > 0) {
@@ -681,7 +698,7 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
           $scope.fireChangeEvent();
         }
       }
-      
+
       function byId(id) {
         return function(artefact) {
           return artefact.id == id;
@@ -735,7 +752,7 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
             var newIndex = index;
             var child;
 
-            /*		
+            /*
             Jumping selected nodes over for the following reason:
             Assuming that we have the sequence A-B-C-D and that we want to move the element A and B at the same time.
             Without jumping the selected nodes over the following situation would occur:
@@ -755,7 +772,7 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
               nodeToFocus = selectedArtefact;
 
               // Remove the node id from the list of the nodes to be moved
-              // Otherwise moving A-B from A-B-C-D would lead to C-D-A-B		
+              // Otherwise moving A-B from A-B-C-D would lead to C-D-A-B
               nodeIdsToBeMoved = _.reject(nodeIdsToBeMoved, function (id) { return id == node.id })
             }
           })
@@ -767,16 +784,16 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
           }
         }
       }
-      
+
       $scope.isInteractiveSessionActive = function() {
       	return $scope.interactiveSessionHandle.id!=null;
       }
-      
+
       $scope.execute = function () {
         var selectedArtefacts = getSelectedArtefactsSortedByPositionInTree();
         $scope.interactiveSessionHandle.execute(selectedArtefacts);
       }
-      
+
       $scope.onSelectedArtefactSave = function(artefact) {
         var currentNode = tree.get_node(artefact.id);
         if(currentNode) {
@@ -784,7 +801,7 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
           var newLabel = getNodeLabel(artefact);
           if(newLabel!=currentLabel) {
             tree.rename_node(currentNode,newLabel);
-          } 
+          }
           currentNode.li_attr = (artefact.skipNode.value) ? { "class" : "text-muted" } : {"class" : ""}
           $timeout(function(){tree.redraw(true)});
           $scope.fireChangeEvent();
@@ -792,7 +809,7 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
           console.error("Unable to find not with id: "+artefact.id);
         }
       }
-      
+
       $scope.fireChangeEvent = function(keepRedoStack, delayed) {
         if($scope.stOnChange) {
           if (delayed) {
@@ -807,7 +824,7 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
           $scope.redoStack = [];
         }
       }
-      
+
     },
     templateUrl: 'partials/plans/planTree.html'}
 })

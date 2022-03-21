@@ -4,6 +4,7 @@ import { INJECTOR } from './angularjs-provider-options';
 export interface CustomView {
   template: string;
   isPublicView: boolean;
+  isStaticView?: boolean;
 }
 
 export interface MenuEntry {
@@ -28,9 +29,16 @@ export interface Dashlet {
   deps: [INJECTOR],
 })
 export abstract class LegacyViewRegistryService {
+  abstract getCustomView(view: string): CustomView;
   abstract getViewTemplate(view: string): string;
   abstract isPublicView(view: string): boolean;
+  abstract isStaticView(view: string): boolean;
   abstract registerView(viewId: string, template: string, isPublicView?: boolean): void;
+  abstract registerViewWithConfig(
+    viewId: string,
+    template: string,
+    config: { isPublicView: boolean; isStaticView: boolean }
+  ): void;
   abstract registerCustomMenuEntry(label: string, viewId: string, menuIconsClass: string, right: string): void;
   abstract registerCustomMenuEntryOptional(
     label: string,

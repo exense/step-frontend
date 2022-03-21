@@ -1,36 +1,36 @@
 /*******************************************************************************
  * Copyright (C) 2020, exense GmbH
- *  
+ *
  * This file is part of STEP
- *  
+ *
  * STEP is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *  
+ *
  * STEP is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with STEP.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 angular.module('parametersControllers',['tables','step','screenConfigurationControllers'])
 
 .run(function(ViewRegistry, EntityRegistry) {
-  ViewRegistry.registerView('parameters','partials/parameters/parameterList.html');  
+  ViewRegistry.registerView('parameters','partials/parameters/parameterList.html');
   EntityRegistry.registerEntity('Parameter', 'parameters', 'parameters', 'rest/parameters/', 'rest/parameters/', 'st-table', '/partials/parameters/parameterSelectionTable.html', null, 'glyphicon glyphicon-list-alt');
 })
 
 .controller('ParameterListCtrl', function($rootScope, $scope, $http, $uibModal, stateStorage, ExportDialogs, Dialogs, ParameterDialogs, ImportDialogs, AuthService) {
-    stateStorage.push($scope, 'parameters', {});	
+    stateStorage.push($scope, 'parameters', {});
     $scope.authService = AuthService;
-    
+
     function reload() {
       $scope.tableHandle.reload();
     }
-    
+
     $scope.addParameter = function() {
       ParameterDialogs.editParameter(null, function() {reload()});
     }
@@ -38,7 +38,7 @@ angular.module('parametersControllers',['tables','step','screenConfigurationCont
     $scope.editParameter = function(id) {
       ParameterDialogs.editParameter(id, function() {reload()});
     }
-    
+
     $scope.deleteParameter = function(id, name) {
       Dialogs.showDeleteWarning(1, 'Parameter "' + id + '"').then(function() {
         $http.delete("rest/parameters/"+id).then(function() {
@@ -47,38 +47,32 @@ angular.module('parametersControllers',['tables','step','screenConfigurationCont
       })
     }
 
-    $scope.copyParameter = function(id) {
-      $rootScope.clipboard = {object:"parameter",id:id};
+    $scope.duplicateParameter = function(id) {
+      $http.post("rest/parameters/" + id + "/copy")
+      .then(function() {
+        reload();
+      });
     }
-    
-    $scope.pasteParameter = function() {
-      if($rootScope.clipboard && $rootScope.clipboard.object=="parameter") {
-        $http.post("rest/parameters/"+$rootScope.clipboard.id+"/copy")
-        .then(function() {
-          reload();
-        });
-      }
-    }
-    
+
     $scope.importParameters = function() {
       ImportDialogs.displayImportDialog('Parameters import','parameters',true).then(function () {
         reload();
       });
     }
-    
+
     $scope.exportParameters = function() {
       ExportDialogs.displayExportDialog('Parameters export','parameters', 'allParameters.sta', true).then(function () {})
     }
-    
+
     $scope.$on("parameter.edited",function(evt,data){
       reload();
     });
-    
+
     $scope.tableHandle = {};
   })
 
 .factory('ParameterDialogs', function ($uibModal, $http, Dialogs) {
-  
+
   function openModal(id) {
     var modalInstance = $uibModal.open({
       backdrop: 'static',
@@ -89,26 +83,26 @@ angular.module('parametersControllers',['tables','step','screenConfigurationCont
 
       return modalInstance.result;
   }
-  
+
   var dialogs = {};
-  
+
   dialogs.editParameter = function(id, callback) {
     openModal(id).then(function() {
       if(callback){callback()};
     })
   }
-  
+
   return dialogs;
 })
 
 .factory('ParameterScopeRenderer', function () {
   var api = {};
-  
+
   // Backward compatibility: assuming GLOBAL scope if not set
   api.normalizeScope = function(scope) {
     return scope?scope:'GLOBAL'
   }
-  
+
   api.scopeIcon = function(scope) {
     scope = api.normalizeScope(scope);
     if(scope == 'GLOBAL') {
@@ -117,9 +111,9 @@ angular.module('parametersControllers',['tables','step','screenConfigurationCont
       return 'glyphicon-record';
     } else if(scope == 'APPLICATION') {
       return 'glyphicon-book';
-    } 
+    }
   }
-  
+
   api.scopeCssClass = function(scope) {
     scope = api.normalizeScope(scope);
     if(scope == 'GLOBAL') {
@@ -128,14 +122,14 @@ angular.module('parametersControllers',['tables','step','screenConfigurationCont
       return 'parameter-scope-keyword';
     } else if(scope == 'APPLICATION') {
       return 'parameter-scope-application';
-    } 
+    }
   }
-  
+
   api.scopeSpanCssClass = function(scope) {
     scope = api.normalizeScope(scope);
     return 'parameter-scope '+api.scopeCssClass(scope)
   }
-  
+
   api.label = function(parameter) {
     if(parameter) {
       var scope = api.normalizeScope(parameter.scope);
@@ -146,7 +140,7 @@ angular.module('parametersControllers',['tables','step','screenConfigurationCont
       }
     }
   }
-  
+
   api.scopeLabel = function(scope) {
     if(scope == 'GLOBAL') {
       return 'Global';
@@ -154,15 +148,15 @@ angular.module('parametersControllers',['tables','step','screenConfigurationCont
       return 'Keyword';
     } else if(scope == 'APPLICATION') {
       return 'Application';
-    } 
+    }
   }
-  
+
   return api;
 })
 
 .controller('editParameterCtrl', function ($scope, $uibModalInstance, $http, AuthService, id, ParameterScopeRenderer, ScreenTemplates) {
   $scope.AuthService = AuthService;
-  
+
   $scope.scopeLabel = ParameterScopeRenderer.scopeLabel
   $scope.scopeCssClass = ParameterScopeRenderer.scopeCssClass
   $scope.scopeSpanCssClass = ParameterScopeRenderer.scopeSpanCssClass
@@ -172,25 +166,25 @@ angular.module('parametersControllers',['tables','step','screenConfigurationCont
     $scope.parameter.scopeEntity = '';
     $scope.parameter.scope = scope;
   }
-  
+
   $scope.isApplicationScopeEnabled = false;
   ScreenTemplates.getScreenInputByScreenId('functionTable','attributes.application').then(function(input) {
     if(input) {
       $scope.isApplicationScopeEnabled = true;
     }
   })
-  
+
   if(id==null) {
     $http.get("rest/parameters").then(function(response){
       $scope.parameter = response.data;
-    })  
+    })
   } else {
     $http.get("rest/parameters/"+id).then(function(response){
       $scope.parameter = response.data;
       if(!$scope.parameter.scope) {
         $scope.parameter.scope = ParameterScopeRenderer.normalizeScope($scope.parameter.scope)
       }
-    })      
+    })
   }
 
   $scope.save = function () {
@@ -198,7 +192,7 @@ angular.module('parametersControllers',['tables','step','screenConfigurationCont
       $uibModalInstance.close();
     })
   }
-  
+
   $scope.cancel = function () {
     $uibModalInstance.dismiss('cancel');
   };
@@ -228,7 +222,7 @@ angular.module('parametersControllers',['tables','step','screenConfigurationCont
     scope: {
       parameter: '='
     },
-    template: '<span uib-tooltip="{{scopeLabel}}" ng-class="scopeSpanCssClass">' + 
+    template: '<span uib-tooltip="{{scopeLabel}}" ng-class="scopeSpanCssClass">' +
               '<i style="display:inline-block" ng-class="scopeIcon" class="glyphicon"></i> {{label}}</span>',
     controller: function($scope, ParameterScopeRenderer) {
       $scope.scopeLabel = ParameterScopeRenderer.scopeLabel($scope.parameter.scope)

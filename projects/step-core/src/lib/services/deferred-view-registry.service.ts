@@ -6,6 +6,7 @@ import { ViewRegistryService } from './view-registry.service';
 type RegisterMethods =
   | 'registerCustomMenuEntry'
   | 'registerView'
+  | 'registerViewWithConfig'
   | 'registerCustomMenuEntryOptional'
   | 'registerDashlet'
   | 'registerDashletAdvanced';
@@ -60,6 +61,16 @@ export class DeferredViewRegistryService implements Pick<LegacyViewRegistryServi
   registerView(viewId: string, template: string, isPublicView?: boolean): void {
     this._invokeRunRegister.registerRun(() => {
       this._viewRegistry.registerView(viewId, template, isPublicView);
+    });
+  }
+
+  registerViewWithConfig(
+    viewId: string,
+    template: string,
+    config: { isPublicView: boolean; isStaticView: boolean }
+  ): void {
+    this._invokeRunRegister.registerRun(() => {
+      this._viewRegistry.registerViewWithConfig(viewId, template, config);
     });
   }
 }

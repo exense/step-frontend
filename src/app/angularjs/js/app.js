@@ -56,7 +56,7 @@ var tecAdminApp = angular.module('tecAdminApp', ['step','entities','tecAdminCont
 
 	var customMenuEntries = [];
 
-	function getCustomView(view) {
+	api.getCustomView = (view) => {
 		var customView = customViews[view];
 		if(customView) {
 			return customView;
@@ -66,19 +66,26 @@ var tecAdminApp = angular.module('tecAdminApp', ['step','entities','tecAdminCont
 	}
 
 	api.getViewTemplate = function (view) {
-		return getCustomView(view).template;
+		return api.getCustomView(view).template;
 	}
 
 	api.isPublicView = function (view) {
-		return getCustomView(view).isPublicView;
+		return api.getCustomView(view).isPublicView;
 	}
 
+  api.isStaticView = function(view) {
+    return api.getCustomView(view).isStaticView;
+  }
+
 	api.registerView = function(viewId,template,isPublicView) {
-		if(!isPublicView) {
-			isPublicView = false;
-		}
-		customViews[viewId] = {template:template, isPublicView:isPublicView}
+	  api.registerViewWithConfig(viewId, template, {isPublicView:isPublicView})
 	}
+
+	api.registerViewWithConfig = function(viewId,template,config) {
+	    var isPublicView = config.isPublicView || false;
+	    var isStaticView = config.isStaticView || false;
+  		customViews[viewId] = {template:template, isPublicView:isPublicView, isStaticView:isStaticView}
+  }
 
 	api.registerCustomMenuEntry = function(label, viewId, mainMenu, menuIconClass, right) {
 		customMenuEntries.push({label: label, viewId: viewId, mainMenu: mainMenu, menuIconClass: menuIconClass, right: right,
@@ -129,7 +136,7 @@ var tecAdminApp = angular.module('tecAdminApp', ['step','entities','tecAdminCont
 	ViewRegistry.registerView('login','partials/loginForm.html',true);
 })
 
-.controller('AppController', function($rootScope, $scope, $location, $http, stateStorage, AuthService, MaintenanceService, ViewRegistry) {
+.controller('AppController', function($rootScope, $scope, $location, $http, stateStorage, AuthService, MaintenanceService, ViewRegistry, DashboardService) {
 	stateStorage.push($scope, 'root',{});
 
 	$scope.isInitialized = false;
@@ -145,9 +152,10 @@ var tecAdminApp = angular.module('tecAdminApp', ['step','entities','tecAdminCont
 		})
 	});
 
-  $scope.isAllTenant = $location.search().tenant === '[All]';
-
-	$scope.isNoTenant = $location.search().tenant === '[None]';
+	$scope.$watch(function() {
+		$scope.isAllTenant = $location.search().tenant === '[All]';
+		$scope.isNoTenant = $location.search().tenant === '[None]';
+	})
 
 	$scope.setView = function (view) {
 		$scope.$state = view;
@@ -164,6 +172,10 @@ var tecAdminApp = angular.module('tecAdminApp', ['step','entities','tecAdminCont
 
 	$scope.isPublicView = function () {
 		return ViewRegistry.isPublicView($scope.$state);
+	};
+
+	$scope.isStaticView = function () {
+		return ViewRegistry.isStaticView($scope.$state);
 	};
 
 	$scope.authService = AuthService;
@@ -459,10 +471,9 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 			$rootScope.context = {'userID':'anonymous'};
 		}
 		if (response.status == 403){
-			// Fail silently for security reasons
-			// or implement something like:
-			//TODO: Dialogs.showErrorMsg("You are not authorized to perform this action.");
+			// error will be handled by genericErrorInterceptor
 		}
+
 		return $q.reject(response);
 	};
 })
@@ -616,6 +627,17 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 		return dialogs.showWarning(msg);
 	}
 
+	dialogs.showEntityInAnotherProject = function(newProjectName) {
+		var msg;
+		if (newProjectName) {
+			msg = 'This entity is part of the project "' + newProjectName + '". Do you wish to switch to this project?';
+		} else {
+			msg = 'This entity is part of another project. Do you wish to switch to this project?';
+		}
+
+		return dialogs.showWarning(msg);
+	}
+
 	dialogs.showInfo = function(msg) {
 		var modalInstance = $uibModal.open({backdrop: 'static', animation: false, templateUrl: 'partials/infoMessageDialog.html',
 			controller: 'DialogCtrl',
@@ -708,8 +730,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 
 	//Select entities knowing type
 	dialogs.selectEntityOfType = function(entityName, singleSelection, id){
-	  console.log(entityName, EntityRegistry);
-	  console.log(id);
+
 	  var entityType = EntityRegistry.getEntityByName(entityName);
 
 		var modalInstance = $uibModal.open(
@@ -829,6 +850,10 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 		$uibModalInstance.close({entity: entityType, array: resultArray});
 	};
 
+  $scope.proceedFiltered = function () {
+    $uibModalInstance.close({entity: entityType, filterQuery: $scope.selectEntityHandle.getFilter()});
+  };
+
 	$scope.cancel = function () {
 		$uibModalInstance.dismiss('cancel');
 	};
@@ -841,7 +866,7 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
       type: '=',
       multipleSelection: '=?',
       onSelection: '=?',
-      handle: '=?'
+      handle: '=?',
     },
     template: '<ng-include src="templateUrl" />',
     controller: function($scope, EntityRegistry) {
@@ -852,20 +877,134 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
       $scope.templateUrl = entityType.templateUrl;
 
       $scope.notifySelection = function(selection) {
-        if($scope.onSelection) {
+        if ($scope.onSelection) {
           $scope.onSelection(selection);
         }
       }
 
-      if($scope.handle) {
+      if ($scope.handle) {
         $scope.handle.getSelection = function() {
           return $scope.tableHandle.getSelectedIds();
+        }
+
+        $scope.handle.getFilter = function() {
+          const searchQuery = {};
+          for (const i in $scope.tableHandle.columns()[0]) {
+            let oAjaxData = $scope.tableHandle.columns(i).context[0].oAjaxData;
+            searchQuery['columns['+i+'][data]'] = oAjaxData.columns[i].data;
+            searchQuery['columns['+i+'][name]'] = oAjaxData.columns[i].name;
+            searchQuery['columns['+i+'][searchable]'] = oAjaxData.columns[i].searchable;
+            searchQuery['columns['+i+'][orderable]'] = oAjaxData.columns[i].orderable;
+            searchQuery['columns['+i+'][search][value]'] = oAjaxData.columns[i].search.value;
+            searchQuery['columns['+i+'][search][regex]'] = oAjaxData.columns[i].search.regex;
+            searchQuery['order[0][column]'] = oAjaxData.order[0].column;
+            searchQuery['order[0][dir]'] = oAjaxData.order[0].dir;
+            searchQuery['draw'] = oAjaxData.draw;
+            searchQuery['start'] = oAjaxData.start;
+            searchQuery['length'] = oAjaxData.length;
+          }
+          return searchQuery;
         }
       }
     }
   };
 })
 
+  .factory('IsUsedByDialogs', function ($rootScope, $uibModal, IsUsedByService) {
+    var dialogs = {};
+
+    dialogs.displayDialog = function(title, type, id) {
+      var modalInstance = $uibModal.open({
+        backdrop: 'static',
+        templateUrl: 'partials/isUsedByDialog.html',
+        controller: 'isUsedByDialogCtrl',
+        resolve: {
+          title: function () {
+            return title;
+          },
+          type: function () {
+            return type;
+          },
+          id: function () {
+            return id;
+          }
+        }
+      });
+      return modalInstance.result;
+    }
+
+    return dialogs;
+  })
+
+  .service('IsUsedByService', function($http,$rootScope) {
+
+    this.type = {
+      PLAN_ID: 'PLAN_ID',
+      KEYWORD_ID: 'KEYWORD_ID',
+      RESOURCE_ID: 'RESOURCE_ID'
+    };
+
+    this.lookUp = (value, searchType) => {
+      return $http.post("rest/references/findReferences", {"searchType":searchType, "searchValue": value});
+    }
+
+  })
+
+
+  .controller('isUsedByDialogCtrl', function ($scope, $http, $uibModalInstance, Upload, Dialogs, ExportService, title, type, id, IsUsedByService, EntityScopeResolver, $rootScope) {
+    $scope.title = title;
+    $scope.type = type;
+    $scope.id = id;
+    $scope.result = false;
+
+    IsUsedByService.lookUp(id, type).then(
+      (result) => {
+        $scope.hasProject = false;//result.data.some(e => e.attributes && e.attributes.project);
+        if (result.data && result.data.length) {
+          $scope.result = [];
+          //enrich data
+          result.data.forEach(e => {
+            e.showLink = true;
+            if (e.attributes && e.attributes.project) {
+              $scope.hasProject = true;
+              var resolved = EntityScopeResolver.getScope(e);
+              if (resolved) {
+                e.tenantName = resolved.tenantName;
+                e.showLink = ($rootScope.tenant.name === "[All]");
+              } else if ($rootScope.tenant) {
+                e.tenantName = $rootScope.tenant.name;
+              } else {
+                e.tenantName = "";
+              }
+            }
+          })
+        }
+        $scope.result = result.data;
+      }
+    );
+
+    $scope.close = function () {
+      $uibModalInstance.close();
+    };
+  })
+
+  .factory('LinkProcessor', function(Dialogs) {
+    const processors = [];
+
+    /*
+     * processor: function that will called before link is opened, needs to return a promise
+     */
+    this.registerProcessor = function(processor) {
+      processors.push(processor);
+    }
+
+    this.process = async function(scope) {
+      const promises = processors.map((processor) => processor(scope));
+      return Promise.all(promises);
+    };
+
+    return this;
+  })
 .directive('autofocus', function($timeout) {
   return {
     restrict: 'A',
@@ -940,26 +1079,60 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
 				}
 			}
 		}
+
 		return $q.reject(response);
 	};
 })
 
-.service('DashboardService', function($http) {
+.service('DashboardService', function($http,$rootScope,AuthService,ViewRegistry) {
 
-	this.isGrafanaAvailable = false;
+    this.checkAvailability = (override = false) => {
+      try {
+        if (AuthService.getConf()) {
+          if (AuthService.getConf().displayNewPerfDashboard && ViewRegistry.getCustomView('grafana')) {
+            this.isGrafanaAvailable = false;
+            $http.get("rest/g-dashboards/isGrafanaAvailable").then(response => {
+              this.isGrafanaAvailable = !!response.data.available;
+              if (this.isGrafanaAvailable) {
+                $rootScope.$broadcast('step.grafana.available');
+              }
+            });
+          } else {
+            this.isGrafanaAvailable = false;
+          }
+        }
+      } catch (e) {}
+    }
 
-	$http.get("rest/g-dashboards/isGrafanaAvailable").then(response => {
-		this.isGrafanaAvailable = !!response.data.available;
-	});
+    $rootScope.$on('step.login.succeeded', () => {
+      this.checkAvailability();
+    });
 
-	this.getDashboardLink = taskId => {
-		if (this.isGrafanaAvailable) {
-			return '/#/root/grafana?d=3JB9j357k&orgId=1&var-taskId_current=' + taskId;
-		} else {
-			return '/#/root/dashboards/__pp__RTMDashboard?__filter1__=text,taskId,' + taskId;
-		}
-	}
-})
+    this.getDashboardLink = taskId => {
+      if (typeof this.isGrafanaAvailable === 'undefined') {
+        this.checkAvailability();
+      }
+      if (this.isGrafanaAvailable) {
+        return '/#/root/grafana?d=3JB9j357k&orgId=1&var-taskId_current=' + taskId;
+      } else {
+        return '/#/root/dashboards/__pp__RTMDashboard?__filter1__=text,taskId,' + taskId;
+      }
+    }
+
+    this.whenGrafanaAvailable = (override = false) => {
+      return new Promise((resolve, reject) => {
+        this.checkAvailability(override);
+
+        if (this.isGrafanaAvailable) {
+          resolve();
+        }
+
+        $rootScope.$on('step.grafana.available', () => {
+          resolve();
+        });
+      });
+    }
+  })
 
 //The following functions are missing in IE11
 

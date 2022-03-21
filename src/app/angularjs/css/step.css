@@ -15,7 +15,7 @@ form.form-signin {
 
 .navbar {
   border-radius: 0px;
-  border: 0px;	
+  border: 0px;
 }
 
 .navbar-default {
@@ -168,7 +168,7 @@ a { cursor: pointer; }
 	background:#A0A0A0;
 	color:#A0A0A0;
 }
-	  
+
 .status-PASSED {
 	background:#5cb85c;
 	color:#5cb85c;
@@ -226,8 +226,8 @@ button.btn-run {
     color: #fff;
     background-color: #337ab7;
     border-color: #2d6ca2;
-}	  
-	  
+}
+
 .selected {
 	background:#abb9d3;
 }
@@ -313,7 +313,7 @@ footer, header {
   padding: 25px 35px 45px;
   margin: 0 auto;
   background-color: #fff;
-  border: 1px solid rgba(0,0,0,0.1); 
+  border: 1px solid rgba(0,0,0,0.1);
 }
 
 .text-grey {
@@ -591,11 +591,11 @@ resource-input .input-group {
 	.sectionViewPlanEditor.resizable {
 		flex: 0 0 70%;
 	}
-	
+
 	.sectionResizableTree.resizable {
 		flex: 0 0 33%;
 	}
-	
+
 	.sectionDualPlanEditor {
 		flex: 0 0 40%;
 	}
@@ -605,11 +605,11 @@ resource-input .input-group {
 	.sectionViewPlanEditor.resizable {
 		flex: 0 0 75%;
 	}
-	
+
 	.sectionResizableTree.resizable {
 		flex: 0 0 33%;
 	}
-	
+
 	.sectionDualPlanEditor {
 		flex: 0 0 40%;
 	}
@@ -647,10 +647,10 @@ resource-input .input-group {
 
 .btn-switch--on {
 	background-color: #9dc1e0;
-	border: 2px solid #9dc1e0; 
+	border: 2px solid #9dc1e0;
 }
 
-.btn-switch-circle--on { 
+.btn-switch-circle--on {
 	left : auto;
 	right: 0;
 	background-color: #337ab7;
@@ -713,7 +713,7 @@ tbody .form-group {
 }
 
 .autoRefreshSelect {
-	overflow-y: hidden;	
+	overflow-y: hidden;
 	scrollbar-width: none;
 }
 
@@ -810,7 +810,7 @@ fieldset {
 
 .section-content {
 	color: #454646;
-	width: 100%;	
+	width: 100%;
 	margin-bottom: 10px;
 
 }
@@ -849,7 +849,6 @@ fieldset {
   color:#555 !important;
   font-size: 12px;
   font-style: italic;
-  text-decoration: underline;
 }
 
 .toolbox-link, .node-text a.toolbox-link {

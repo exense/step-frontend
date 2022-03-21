@@ -95,7 +95,6 @@ export class AuthService {
   }
 
   gotoDefaultPage(): void {
-    console.log('gotoDefaultPage', this._serviceContext?.conf?.defaultUrl);
     if (this._serviceContext.conf && this._serviceContext.conf.defaultUrl) {
       this._$location.path(this._serviceContext.conf.defaultUrl);
     } else {
@@ -117,7 +116,10 @@ export class AuthService {
       this._$rootScope.tenant &&
       (this._$rootScope.tenant.name === '[All]' || this._$rootScope.tenant.name === '[None]') &&
       !(right.startsWith('user') || right.startsWith('project')) &&
-      (right.endsWith('-write') || right.endsWith('-delete') || right.endsWith('-execute'))
+      (right.endsWith('-write') ||
+        right.endsWith('-delete') ||
+        right.endsWith('-execute') ||
+        right.endsWith('dashboard-configure'))
     ) {
       return false;
     }
