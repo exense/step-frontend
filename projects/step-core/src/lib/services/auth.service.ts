@@ -104,7 +104,7 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return this._$rootScope.context.userID && this._$rootScope.context.userID !== 'anonymous';
+    return !!this._$rootScope.context?.userID && this._$rootScope.context?.userID !== 'anonymous';
   }
 
   isExtLoginAuth(): boolean {
