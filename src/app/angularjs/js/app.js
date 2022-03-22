@@ -136,7 +136,7 @@ var tecAdminApp = angular.module('tecAdminApp', ['step','entities','tecAdminCont
 	ViewRegistry.registerView('login','partials/loginForm.html',true);
 })
 
-.controller('AppController', function($rootScope, $scope, $location, $http, stateStorage, AuthService, MaintenanceService, ViewRegistry, DashboardService) {
+.controller('AppController', function($rootScope, $scope, $location, $http, stateStorage, AuthService, MaintenanceService, ViewRegistry, ViewState) {
 	stateStorage.push($scope, 'root',{});
 
 	$scope.isInitialized = false;
@@ -155,27 +155,32 @@ var tecAdminApp = angular.module('tecAdminApp', ['step','entities','tecAdminCont
 	$scope.$watch(function() {
 		$scope.isAllTenant = $location.search().tenant === '[All]';
 		$scope.isNoTenant = $location.search().tenant === '[None]';
-	})
+	});
+
+  $scope.$watch('$state', function (newValue) {
+    ViewState.setView(newValue);
+  });
 
 	$scope.setView = function (view) {
+    ViewState.setView(view);
 		$scope.$state = view;
 		stateStorage.store($scope, {lastview:view});
 	};
 
 	$scope.isViewActive = function (view) {
-		return ($scope.$state === view);
+		return ViewState.isViewActive(view);
 	};
 
 	$scope.getViewTemplate = function () {
-		return ViewRegistry.getViewTemplate($scope.$state);
+		return ViewState.viewTemplate;
 	};
 
 	$scope.isPublicView = function () {
-		return ViewRegistry.isPublicView($scope.$state);
+		return ViewState.isPublicView;
 	};
 
 	$scope.isStaticView = function () {
-		return ViewRegistry.isStaticView($scope.$state);
+		return ViewState.isStaticView;
 	};
 
 	$scope.authService = AuthService;
@@ -988,23 +993,6 @@ angular.module('step',['ngStorage','ngCookies','angularResizable'])
     };
   })
 
-  .factory('LinkProcessor', function(Dialogs) {
-    const processors = [];
-
-    /*
-     * processor: function that will called before link is opened, needs to return a promise
-     */
-    this.registerProcessor = function(processor) {
-      processors.push(processor);
-    }
-
-    this.process = async function(scope) {
-      const promises = processors.map((processor) => processor(scope));
-      return Promise.all(promises);
-    };
-
-    return this;
-  })
 .directive('autofocus', function($timeout) {
   return {
     restrict: 'A',
