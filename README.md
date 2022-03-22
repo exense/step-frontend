@@ -1,35 +1,26 @@
-# StepFrontend
+# step Frontend (step FE)
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.0.4.
+step FE is part of step and requires step BE (https://github.com/exense/step) in order to be used. Learn more about step in our official documentation on https://step.exense.ch/knowledgebase
+
+For support, our enterprise version or our no-maintenance-required SaaS solution check out our website: http://step.exense.ch
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Run `npm run start:local` to build and serve step FE & step FE CORE. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-## Code scaffolding
+## Connecting to step BE
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Start step BE on your local machine, with the start:local configuration the FE will map BE requests to port 8080
 
-## Build OSS
+## Build step
 
-1. Invoke the command `npm run build:core` it will assemble the library and put the result to the dist/step-core folder
-2. In the dist/step-core folder invoke the command `npm pack` it will create a tat.gz archive with library contents.
-3. Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Invoke the command `npm run build` it will assemble the core library and step FE
 
-## Build OSS
+## Export step:core
+
+After building, run `npm pack` in the dist/step-core folder, it will create a tat.gz archive with library contents.
 
 Then this archive can be copied manually to step-enterprise-frontend and setup as npm dependency in package.json like:
 "@exense/step-core": "./exense-step-core-0.0.1.tgz"
-npm install command will unpcak the archive and put it to the node_modules
 
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+npm install command will unpack the archive and put it to the node_modules
