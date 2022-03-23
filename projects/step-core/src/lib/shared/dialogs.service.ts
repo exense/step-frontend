@@ -24,4 +24,5 @@ export abstract class DialogsService {
   abstract selectEntityOfType(entityName: string, singleSelection: boolean, id: string): Promise<unknown>;
   abstract selectEntityType(excludeArray: string[], id: string): IPromise<unknown>;
   abstract selectEntityTypeForEntities(excludeArray: string, callback: Function, arg: unknown): void;
+  abstract showEntityInAnotherProject(newProjectName?: string): IPromise<unknown>;
 }
