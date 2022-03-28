@@ -448,13 +448,16 @@ angular.module('tables', ['export'])
 	        })
 
 	        // render second header
+          // NOTE: instead of "thead>tr:not(.searchheader)" we used "thead tr[role="row"]" these should be equivalent for this case
 	        tableElement.find('thead').append('<tr class="searchheader"/>');
-	        $('th',tableElement.find('thead tr[role="row"]').eq(0)).css({ 'border-bottom': '0' }).each( function (colIdx) {
+	        $('th',tableElement.find('thead>tr:not(.searchheader)').eq(0)).css({ 'border-bottom': '0' }).each( function (colIdx) {
 	          tableElement.find('thead tr.searchheader').append('<th style="border-top:0" />' );
 	        });
 	        table.columns().indexes().flatten().each(function(i) {
-	          var thIdx = $('th',tableElement.find('thead tr[role="row"]')).index(table.column(i).header());
-	          if(thIdx>=0) {
+	          var thIdx = $('th',tableElement.find('thead>tr:not(.searchheader)')).index(table.column(i).header());
+            console.log('thIdx', thIdx);
+
+            if (thIdx >= 0) {
 	            var secondHeader = $('th',tableElement.find('thead tr.searchheader')).eq(thIdx);
 	            table.settings()[0].aoColumns[i].secondHeaderRenderer(secondHeader,table.column(i),scope.handle);
 	          }
