@@ -19,7 +19,7 @@
             <div class="form-group form-group-sm">
                 <label>Package dependencies (Folder or Zip of Jars or DLLs/PDBs)</label>
                 <span class="glyphicon glyphicon-question-sign" uib-tooltip="Drag&drop your folder or zip containing Jars/DLLs/PDBs dependencies."></span>
-                <resource-input st-type="'functions'" st-bounded="true" st-model="functionPackage.packageLibrariesLocation" st-on-change="loadPackagePreview()" upload-only=true />
+                <resource-input st-type="'functions'" st-model="functionPackage.packageLibrariesLocation" st-on-change="loadPackagePreview()" />
             </div>
         </div>
     </div>
@@ -36,7 +36,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="panel panel-default" ng-show="!dialogConfig.lightForm">
 		<div class="panel-heading">
 			<a ng-click="showRoutingOptions = !showRoutingOptions">Routing options</a>
@@ -44,7 +44,7 @@
 		<div class="panel-body" ng-show="showRoutingOptions">
 			<div class="form-group">
 				<label>
-					<input type="checkbox" ng-model="functionPackage.executeLocally"> 
+					<input type="checkbox" ng-model="functionPackage.executeLocally">
 					<span class="ng-binding">Execute on controller</span>
 				</label>
 				<span class="glyphicon glyphicon-question-sign pull-right" uib-tooltip="Defines if the Keywords of this package should be executed on an agent or locally on the controller. Please change this only if you really now what you're doing. In most of the cases the default setting doesn't have to be changed."></span>
@@ -64,7 +64,7 @@
 									<tr ng-repeat="criterion in criteria">
 										<td style="padding:2px;"><input class="form-control input-sm" ng-model="criterion.key" placeholder="Key" ng-blur="saveRoutingCriteria()"></td>
 										<td style="padding:2px;"><input class="form-control input-sm" ng-model="criterion.value" placeholder="Value" ng-blur="saveRoutingCriteria()"></td>
-										<td style="padding:2px;"><button class="btn btn-danger btn-xs" ng-click="removeRoutingCriteria(criterion.key)" type="button"><i class="glyphicon glyphicon-remove"></i></button></td>	
+										<td style="padding:2px;"><button class="btn btn-danger btn-xs" ng-click="removeRoutingCriteria(criterion.key)" type="button"><i class="glyphicon glyphicon-remove"></i></button></td>
 									</tr>
 								</tbody>
 							</table>
