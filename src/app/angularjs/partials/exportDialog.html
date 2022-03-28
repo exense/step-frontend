@@ -24,7 +24,7 @@
 								<span class="ng-binding">Export all entities recursively</span>
 							</label>
 							<span class="glyphicon glyphicon-question-sign pull-right"
-										uib-tooltip="Defines if all referenced entities get exported as well (note that indirect references are not supported, this includes parameters in dynamic expression, call plan and call keyword by attributes...)."></span>
+										uib-tooltip="Defines if all referenced entities get exported as well (see details in the below notes)."></span>
 						</div>
 						<div ng-show="parameters!==undefined" class="form-group form-group-sm">
 							<label>
@@ -41,15 +41,15 @@
 		<div class="section-content section-content-border">
 			<strong>Notes: </strong>Please consider following remarks and limitations:
 			<ul>
-				<li>Export all entities will also export entities from accessible 'global' projects</li>
-				<li>Entities are exported recursively by default (see advanced options)</li>
-				<li>Indirect references are not resolved, this includes:
-					<ul>
-						<li>Plans and keywords called by attributes</li>
-						<li>Parameters used in plans and composite keywords (You can 'Include an export of all parameters' in advanced options)</li>
-					</ul>
-				</li>
-				<li>Only step resources are exported meaning that keyword libraries or dataset's files defined with a path are not included</li>
+        <li>Entities are exported recursively by default (see options)</li>
+        <li>Referenced entities from accessible 'global' projects will be exported too</li>
+				<li>Indirect references cannot be resolved and therefore are not exported. This includes:
+          <ul>
+            <li>Any reference using dynamic expression</li>
+            <li>Parameter references, choose the 'Include an export of all parameters' option when exporting plans if required</li>
+            <li>File resources (dataset files, keyword libraries...) defined with a filesystem path are not included, only step resources are</li>
+          </ul>
+        </li>
 				<li>Password parameters are exported with obfuscated values</li>
 			</ul>
 		</div>
@@ -57,9 +57,9 @@
 
 
 
-	
-		
-	
+
+
+
 </div>
 <div class="modal-footer">
 	<button class="btn btn-primary" type="button" ng-click="save()">Export</button>
