@@ -1,6 +1,6 @@
 import { Type } from '@angular/core';
 
-const hybridModuleNameField = Symbol('hybridModuleName');
+const hybridModuleNameField = '__hybridModuleName__';
 
 export interface PluginModuleMetaInfo {
   hybridModuleName?: string;

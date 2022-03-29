@@ -1,5 +1,5 @@
-src/app/angularjs/**/*.*
-src/index.html
+projects/step-frontend/src/lib/angularjs/**/*.*
+projects/step-app/src/index.html
 .angular
 dist
 node_modules

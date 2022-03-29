@@ -19,7 +19,8 @@
     "module": "es2020",
     "lib": ["es2020", "dom"],
     "paths": {
-      "@exense/step-core": ["dist/step-core", "dist/step-core/*"]
+      "@exense/step-core": ["dist/step-core", "dist/step-core/*"],
+      "@exense/step-frontend": ["dist/step-frontend", "dist/step-frontend/*"]
     }
   },
   "angularCompilerOptions": {
