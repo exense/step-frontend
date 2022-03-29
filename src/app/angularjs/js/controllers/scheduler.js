@@ -251,13 +251,7 @@ angular.module('schedulerControllers',[])
     $http.post("rest/settings/scheduler_execution_username", $scope.executionUser)
   };
 })
-
-.controller('SchedulerTaskSelectionCtrl', function ($scope, $http) {
-  $http.get("rest/scheduler/task").then(function(response) {
-    $scope.schedulerTasks = response.data;
-  });
-})
-
+  
 .directive('schedulerTaskLink', function() {
   return {
     restrict: 'E',
