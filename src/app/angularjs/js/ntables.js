@@ -455,7 +455,6 @@ angular.module('tables', ['export'])
 	        });
 	        table.columns().indexes().flatten().each(function(i) {
 	          var thIdx = $('th',tableElement.find('thead>tr:not(.searchheader)')).index(table.column(i).header());
-            console.log('thIdx', thIdx);
 
             if (thIdx >= 0) {
 	            var secondHeader = $('th',tableElement.find('thead tr.searchheader')).eq(thIdx);
