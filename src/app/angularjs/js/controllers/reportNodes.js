@@ -67,10 +67,10 @@ angular.module('reportNodes',['step','artefacts','screenConfigurationControllers
       })
 
       $scope.openPlan = function(node) {
-        $http.get('rest/executions/' + node.executionID).then(function(response) {
+        $http.get('rest/controller/reportnode/' + node.id + '/plan').then(function(response) {
           LinkProcessor.process(response.data.attributes.project).then(() => {
             $location.search('artefactId', node.artefactID);
-            $location.path('/root/plans/editor/' + response.data.planId);
+            $location.path('/root/plans/editor/' + response.data.id);
             $scope.$apply();
           }).catch((errorMessage) => {
             if (errorMessage) {
