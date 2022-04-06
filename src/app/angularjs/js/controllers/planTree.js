@@ -456,20 +456,28 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
 
                 if (AuthService.getConf().miscParams.enforceschemas === 'true') {
                   const targetObject = {};
-
+                  let isDynamic, type;
                   if (function_.schema && function_.schema.properties) {
-                    _.each(Object.keys(function_.schema.properties), function(prop) {
-                      if (function_.schema.properties[prop].default) {
-                        targetObject[prop] = {"value" : function_.schema.properties[prop].default, "dynamic" : false};
-                      } else if (function_.schema.properties[prop].type) {
-                        let propValue = {};
-                        const value = function_.schema.properties[prop].type;
-                        if (value === 'number' || value === 'integer') {
-                          propValue = {"expression" : "<" + value + ">", "dynamic" : true};
+                    _.each(Object.keys(function_.schema.properties), function (prop) {
+                      type = function_.schema.properties[prop].type;
+                      if (type === 'number' || type === 'integer' || type === 'boolean') {
+                        isDynamic = true;
+                      } else {
+                        isDynamic = false;
+                      }
+                      if (function_.schema.properties[prop].default !== undefined) {
+                        console.log('default:', function_.schema.properties[prop].default);
+                        if (isDynamic) {
+                          targetObject[prop] = { expression: function_.schema.properties[prop].default, dynamic: true };
                         } else {
-                          propValue = {"value" : "<" + value + ">", "dynamic" : false};
+                          targetObject[prop] = { value: function_.schema.properties[prop].default, dynamic: false };
                         }
-                        targetObject[prop] = propValue;
+                      } else if (type) {
+                        if (isDynamic) {
+                          targetObject[prop] = { expression: '<' + type + '>', dynamic: true };
+                        } else {
+                          targetObject[prop] = { value: '<' + type + '>', dynamic: false };
+                        }
                       }
                     });
 
