@@ -18,7 +18,7 @@
  *******************************************************************************/
 angular.module('planTree',['step','artefacts','reportTable','dynamicForms','export','functionsControllers'])
 
-.directive('planTree', function(artefactTypes, $http,$timeout,$interval,stateStorage,$filter,$location, Dialogs, ScreenTemplates) {
+.directive('planTree', function(artefactTypes, $http,$timeout,$interval,stateStorage,$filter,$location, Dialogs, ScreenTemplates, LinkProcessor) {
   return {
     restrict: 'E',
     scope: {
@@ -578,12 +578,11 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
             }
           });
         } else if (selectedArtefact.original.callFunctionId) {
-          var artefact = getSelectedArtefact();
+          const artefact = getSelectedArtefact();
           $http.post("rest/functions/lookup",artefact).then(function(response) {
             if (response.data) {
-              var functionId = response.data.id;
-              if (functionId) {
-                openFunctionEditor(functionId);
+              if (response.data.id) {
+                openFunctionEditor(response.data);
               } else {
                 Dialogs.showErrorMsg("No editor configured for this function type");
               }
@@ -640,8 +639,11 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
         });
       }
 
-      openFunctionEditor = function(functionId) {
-        FunctionDialogs.openFunctionEditor(functionId);
+      function openFunctionEditor(data) {
+        FunctionDialogs.openFunctionEditor(data.id).then( () => {
+            LinkProcessor.process(data.attributes.project)
+          }
+        );
       }
 
       $scope.rename = function() {

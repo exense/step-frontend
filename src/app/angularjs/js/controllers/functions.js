@@ -116,7 +116,7 @@ angular.module('functionsControllers',['step'])
 
   dialogs.openFunctionEditor = function(functionid, dialogConfig) {
     dialogConfig = (dialogConfig) ? dialogConfig : FunctionDialogsConfig.getDefaultConfig();
-    $http.get("rest/"+dialogConfig.serviceRoot+"/"+functionid+"/editor").then(function(response){
+    return $http.get("rest/"+dialogConfig.serviceRoot+"/"+functionid+"/editor").then(function(response){
       var path = response.data
       if(path) {
         $location.path(path);
@@ -383,9 +383,15 @@ function ($rootScope, $scope, $uibModalInstance, $http, $location, function_, di
       $scope.openFunctionEditor = function() {
         FunctionDialogs.openFunctionEditor($scope.function_.id, FunctionDialogsConfig.getConfigObject('Keyword','functions',[],false,'functionTable'))
       };
-      $scope.openLink = () => LinkProcessor.process($scope.function_.attributes.project).then(() => {
-        $scope.openFunctionEditor();
-      }).catch((errorMessage) => {
+      $scope.openLink = () => LinkProcessor.process($scope.function_.attributes.project).then(
+          () => {
+            $scope.openFunctionEditor();
+          },
+          () => {
+            if ($scope.continueOnCancel) {
+              $scope.openFunctionEditor();
+            }
+          }).catch((errorMessage) => {
         if (errorMessage) {
           Dialogs.showErrorMsg(errorMessage);
         }
