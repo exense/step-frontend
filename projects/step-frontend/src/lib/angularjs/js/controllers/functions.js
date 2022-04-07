@@ -143,7 +143,7 @@ angular
 
     dialogs.openFunctionEditor = function (functionid, dialogConfig) {
       dialogConfig = dialogConfig ? dialogConfig : FunctionDialogsConfig.getDefaultConfig();
-      $http.get('rest/' + dialogConfig.serviceRoot + '/' + functionid + '/editor').then(function (response) {
+      return $http.get('rest/' + dialogConfig.serviceRoot + '/' + functionid + '/editor').then(function (response) {
         var path = response.data;
         if (path) {
           $location.path(path);
@@ -476,9 +476,16 @@ angular
         };
         $scope.openLink = () =>
           LinkProcessor.process($scope.function_.attributes.project)
-            .then(() => {
-              $scope.openFunctionEditor();
-            })
+            .then(
+              () => {
+                $scope.openFunctionEditor();
+              },
+              () => {
+                if ($scope.continueOnCancel) {
+                  $scope.openFunctionEditor();
+                }
+              }
+            )
             .catch((errorMessage) => {
               if (errorMessage) {
                 Dialogs.showErrorMsg(errorMessage);

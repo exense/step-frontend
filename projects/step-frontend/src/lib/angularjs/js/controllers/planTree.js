@@ -21,7 +21,7 @@ angular
 
   .directive(
     'planTree',
-    function (artefactTypes, $http, $timeout, $interval, stateStorage, $filter, $location, Dialogs, ScreenTemplates) {
+    function (artefactTypes, $http, $timeout, $interval, stateStorage, $filter, $location, Dialogs, ScreenTemplates, LinkProcessor) {
       return {
         restrict: 'E',
         scope: {
@@ -578,12 +578,11 @@ angular
                   }
                 });
             } else if (selectedArtefact.original.callFunctionId) {
-              var artefact = getSelectedArtefact();
+              const artefact = getSelectedArtefact();
               $http.post('rest/functions/lookup', artefact).then(function (response) {
                 if (response.data) {
-                  var functionId = response.data.id;
-                  if (functionId) {
-                    openFunctionEditor(functionId);
+                  if (response.data.id) {
+                    openFunctionEditor(response.data);
                   } else {
                     Dialogs.showErrorMsg('No editor configured for this function type');
                   }
@@ -642,9 +641,12 @@ angular
             });
           }
 
-          openFunctionEditor = function (functionId) {
-            FunctionDialogs.openFunctionEditor(functionId);
-          };
+          function openFunctionEditor(data) {
+            FunctionDialogs.openFunctionEditor(data.id).then( () => {
+                LinkProcessor.process(data.attributes.project)
+              }
+            );
+          }
 
           $scope.rename = function () {
             $scope.renaming = true;
