@@ -21,8 +21,10 @@ const loadScript = (fileName: string): Promise<unknown> =>
 
 const loadSinglePlugin = async (pluginDefinition: LegacyPluginDefinition): Promise<string[]> => {
   try {
-    const scriptsLoad = pluginDefinition.scripts.map((script) => loadScript(script));
-    await Promise.all(scriptsLoad);
+    for (const script of pluginDefinition.scripts) {
+      await loadScript(script);
+    }
+    //await Promise.all(scriptsLoad);
   } catch (e) {
     console.error(`Module(s) ${pluginDefinition.angularModules.join(', ')} load fail`, e);
     return [];
