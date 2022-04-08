@@ -58,7 +58,7 @@ angular
                     $timeout(() => {
                       tree.deselect_all(true);
                       tree.select_node($location.search().artefactId);
-                      $scope.openSelectedArtefact();
+                      //$scope.openSelectedArtefact();
                     });
                   }
                 });
