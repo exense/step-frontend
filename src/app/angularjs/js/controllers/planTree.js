@@ -441,6 +441,7 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
               ScreenTemplates.getScreenInputsByScreenId('functionTable').then(inputs => {
                 const newArtefact = response.data;
                 newArtefact.attributes.name = function_.attributes.name;
+                newArtefact.dynamicName.dynamic = newArtefact.useDynamicName;
 
                 const functionAttributes = {}
                 _.mapObject(inputs, input => {
@@ -509,6 +510,7 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
         $scope.handle.addControl = function(id) {
           $http.get("rest/plans/artefact/types/"+id).then(function(response) {
             var artefact = response.data;
+            artefact.dynamicName.dynamic = artefact.useDynamicName;
             addArtefactToCurrentNode(artefact);
           });
         }
@@ -519,6 +521,7 @@ angular.module('planTree',['step','artefacts','reportTable','dynamicForms','expo
             $http.get("rest/plans/artefact/types/CallPlan").then(function(response) {
               var newArtefact = response.data;
               newArtefact.attributes.name=plan.attributes.name;
+              newArtefact.dynamicName.dynamic = newArtefact.useDynamicName;
               newArtefact.planId=id;
               addArtefactToCurrentNode(newArtefact);
             });
