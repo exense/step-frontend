@@ -248,15 +248,30 @@ var tecAdminApp = angular
       $scope.maintenanceService = MaintenanceService;
       $scope.viewRegistry = ViewRegistry;
 
-      $scope.handleKeys = function (e) {
+      function handleKeys(e) {
         if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
           $rootScope.$broadcast('undo-requested');
         } else if (e.key === 'y' && (e.ctrlKey || e.metaKey)) {
           $rootScope.$broadcast('redo-requested');
         }
-      };
+      }
+
+      document.body.addEventListener('keydown', handleKeys);
+      $scope.$on('$destroy', function(){
+        document.body.removeEventListener('keydown', handleKeys);
+      });
+
     }
   )
+
+  .directive('rootContent', function() {
+    return {
+      restrict: 'A',
+      scope: true,
+      controller: 'AppController',
+      templateUrl: 'partials/root.html'
+    };
+  })
 
   .directive('ngCompiledInclude', function ($compile, $templateCache, $http) {
     return {
