@@ -40,7 +40,7 @@
         },
         {
           "ORIGIN": "dist/step-core/exense-step-core-0.0.1.tgz",
-          "DESTINATION": "ch.exense.step.frontend:step-frontend-core:${VERSION}",
+          "DESTINATION": "ch.exense.step.frontend:step-core-${BRANCH}:${VERSION}",
           "PACKAGING": "tgz"
         }
       ]
