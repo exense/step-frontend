@@ -34,13 +34,18 @@
       ],
       "ACTIONS": [
         {
-          "ORIGIN": "dist/step-frontend",
-          "DESTINATION": "ch.exense.step.frontend:step-frontend-oss-${BRANCH}:${VERSION}",
+          "ORIGIN": "dist/step-app",
+          "DESTINATION": "ch.exense.step.frontend:step-app:${VERSION}",
           "PACKAGING": "jar"
         },
         {
+          "ORIGIN": "dist/step-frontend/exense-step-frontend-0.0.1.tgz",
+          "DESTINATION": "ch.exense.step.frontend:step-frontend-${BRANCH}:${VERSION}",
+          "PACKAGING": "tgz"
+        },
+        {
           "ORIGIN": "dist/step-core/exense-step-core-0.0.1.tgz",
-          "DESTINATION": "ch.exense.step.frontend:step-frontend-core-${BRANCH}:${VERSION}",
+          "DESTINATION": "ch.exense.step.frontend:step-core-${BRANCH}:${VERSION}",
           "PACKAGING": "tgz"
         }
       ]
