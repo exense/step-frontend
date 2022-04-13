@@ -39,7 +39,7 @@
           "PACKAGING": "jar"
         },
         {
-          "ORIGIN": "dist/step-core/exense-step-frontend-0.0.1.tgz",
+          "ORIGIN": "dist/step-frontend/exense-step-frontend-0.0.1.tgz",
           "DESTINATION": "ch.exense.step.frontend:step-frontend:${VERSION}",
           "PACKAGING": "tgz"
         },
