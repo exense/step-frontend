@@ -44,9 +44,9 @@
           "PACKAGING": "tgz"
         },
         {
-          "ORIGIN": "dist/step-frontend/exense-step-frontend-0.0.1.tgz",
+          "ORIGIN": "dist/step-frontend/",
           "DESTINATION": "ch.exense.step.frontend:step-frontend-${BRANCH}:${VERSION}",
-          "PACKAGING": "tgz"
+          "PACKAGING": "jar"
         }
       ]
     }
