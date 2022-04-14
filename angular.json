@@ -39,32 +39,12 @@
               },
               {
                 "glob": "**/*",
-                "input": "dist/step-frontend/src/lib/angularjs/bower_components",
-                "output": "/bower_components/"
-              },
-              {
-                "glob": "**/*",
                 "input": "dist/step-frontend/src/lib/angularjs",
-                "ignore": ["dist/step-frontend/src/lib/angularjs/bower_components/*"],
                 "output": "/"
-              },
-              {
-                "glob": "**/*",
-                "input": "node_modules/@exense/visualization/dist",
-                "output": "/assets/exense-visualization"
               }
             ],
-            "styles": [
-              "projects/step-app/src/styles.scss",
-              "node_modules/datatables.net-select-dt/css/select.dataTables.css",
-              "node_modules/nvd3/build/nv.d3.css"
-            ],
-            "scripts": [
-              "node_modules/datatables.net-select/js/dataTables.select.js",
-              "node_modules/d3/d3.js",
-              "node_modules/nvd3/build/nv.d3.js",
-              "node_modules/angular-nvd3/dist/angular-nvd3.js"
-            ],
+            "styles": ["projects/step-app/src/styles.scss"],
+            "scripts": [],
             "extraWebpackConfig": "projects/step-app/webpack.config.js",
             "commonChunk": false
           },

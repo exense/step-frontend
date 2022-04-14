@@ -2,7 +2,7 @@
   "name": "@exense/step-frontend",
   "version": "0.0.1",
   "scripts": {
-    "copy:angularjs": "copyfiles -e src/lib/angularjs/node_modules/** src/lib/angularjs/**/* ../../dist/step-frontend"
+    "compile": "gulp"
   },
   "peerDependencies": {
     "@angular-architects/module-federation": "14.0.1",
@@ -25,6 +25,7 @@
     "tslib": "2.3.0"
   },
   "devDependencies": {
-    "copyfiles": "file:../../node_modules/copyfiles"
+    "gulp": "file:../.../node_modules/gulp",
+    "gulp-concat": "file:../.../node_modules/gulp-concat"
   }
 }
