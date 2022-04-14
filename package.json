@@ -6,17 +6,22 @@
     "build:core:lib": "ng build @exense/step-core",
     "build:core:schematics": "cd projects/step-core && npm run build",
     "build:core": "npm run build:core:lib && npm run build:core:schematics",
+    "build:step-frontend:lib": "ng build @exense/step-frontend",
+    "build:step-frontend:resources": "cd projects/step-frontend && npm run compile",
+    "build:step-frontend": "npm run build:step-frontend:lib && npm run build:step-frontend:resources",
     "build:app": "ng build",
-    "build": "npm run build:core && npm run build:app",
+    "build": "npm run build:core && npm run build:step-frontend && npm run build:app",
     "start:app": "ng serve",
     "start:app:local": "ng serve -c local",
-    "start": "npm run build:core && npm run start:app",
-    "start:local": "npm run build:core && npm run start:app:local",
+    "start": "npm run build:core && npm run build:step-frontend  && npm run start:app",
+    "start:local": "npm run build:core && npm run build:step-frontend && npm run start:app:local",
     "test": "ng test",
-    "pack":"cd dist/step-core && npm pack && cp *.tgz ../step-frontend && cd ../step-frontend/ && npm install *.tgz && rm *.tgz",
-    "postinstall": "cd src/app/angularjs && npm install",
+    "pack:core":"cd dist/step-core && npm pack && cp *.tgz ../step-frontend && cd ../step-frontend/ && npm install *.tgz && rm *.tgz",
+    "pack:step-frontend":"cd dist/step-frontend && npm pack",
+    "pack": "npm run pack:core && npm run pack:step-frontend",
+    "postinstall": "cd projects/step-frontend/src/lib/angularjs && npm install",
     "format:fix": "pretty-quick --staged",
-    "format:check": "prettier --config ./.prettierrc \"{src/app,projects/step-core/src}/!(angularjs)/**/*{.ts,.html,.scss}\"",
+    "format:check": "prettier --config ./.prettierrc \"projects/{step-core/src/lib,step-frontend/src/lib,step-app/src}/!(angularjs)/**/*{.ts,.html,.scss}\"",
     "prepare": "husky install"
   },
   "private": true,
@@ -59,6 +64,8 @@
     "prettier": "2.5.1",
     "pretty-quick": "3.1.2",
     "typescript": "4.4.3",
-    "copyfiles": "2.4.1"
+    "copyfiles": "2.4.1",
+    "gulp": "4.0.2",
+    "gulp-concat": "2.6.1"
   }
 }

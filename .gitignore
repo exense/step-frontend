@@ -47,3 +47,7 @@ Thumbs.db
 
 # Plugins
 /src/plugins
+
+# managed packages
+bower_components
+node_modules
