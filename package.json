@@ -24,7 +24,7 @@
     "format:check": "prettier --config ./.prettierrc \"projects/{step-core/src/lib,step-frontend/src/lib,step-app/src}/!(angularjs)/**/*{.ts,.html,.scss}\"",
     "prepare": "husky install"
   },
-  "private": true,
+  "private": false,
   "dependencies": {
     "@angular-architects/module-federation": "14.0.1",
     "@angular/animations": "13.1.1",
