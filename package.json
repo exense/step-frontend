@@ -7,7 +7,7 @@
     "build:core:schematics": "cd projects/step-core && npm run compile",
     "build:core": "npm run build:core:lib && npm run build:core:schematics",
     "build:step-frontend:lib": "ng build @exense/step-frontend",
-    "build:step-frontend:resources": "cd projects/step-frontend && npm run compile",
+    "build:step-frontend:resources": "cd projects/step-frontend && npm run build",
     "build:step-frontend": "npm run build:step-frontend:lib && npm run build:step-frontend:resources",
     "build:app": "ng build",
     "build": "npm run build:core && npm run build:step-frontend && npm run build:app",
@@ -23,7 +23,7 @@
     "format:fix": "pretty-quick --staged",
     "format:check": "prettier --config ./.prettierrc \"projects/{step-core/src/lib,step-frontend/src/lib,step-app/src}/!(angularjs)/**/*{.ts,.html,.scss}\"",
     "prepare": "husky install",
-    "push": "rm dist/step-frontend/*.tgz && copyfiles projects/step-frontend/package.json dist/step-frontend && cd dist/step-frontend && npm publish"
+    "push": "rm dist/step-frontend/*.tgz && cd dist/step-frontend && npm publish"
   },
   "private": false,
   "dependencies": {
