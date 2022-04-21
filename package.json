@@ -23,7 +23,7 @@
     "format:fix": "pretty-quick --staged",
     "format:check": "prettier --config ./.prettierrc \"projects/{step-core/src/lib,step-frontend/src/lib,step-app/src}/!(angularjs)/**/*{.ts,.html,.scss}\"",
     "prepare": "husky install",
-    "push": "rm dist/step-frontend/*.tgz && cd dist/step-frontend  && npm pack && npm publish"
+    "push": "npm publish"
   },
   "private": false,
   "dependencies": {
