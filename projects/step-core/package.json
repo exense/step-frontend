@@ -25,6 +25,6 @@
     "tslib": "2.3.0"
   },
   "devDependencies": {
-    "copyfiles": "file:../../node_modules/copyfiles"
+    "copyfiles": "2.4.1"
   }
 }
