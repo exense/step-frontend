@@ -17,7 +17,7 @@
           "URL": "nexus-staging https://nexus-enterprise.exense.ch/repository/staging-npm/"
         }
       ],
-      "ACTIONS": [{ "FOLDER": "projects/step-core" }, { "FOLDER": "projects/step-frontend" }, { "FOLDER": "." }]
+      "FOLDER": "."
     },
     {
       "ACTION": "PUSH",
