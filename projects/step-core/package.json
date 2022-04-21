@@ -6,7 +6,7 @@
     "build": "tsc -p tsconfig.schematcis.json",
     "postbuild": "copyfiles schematics/*/schema.json schematics/*/files/** schematics/*/files/**/.* schematics/collection.json ../../dist/step-core ",
     "pack": "",
-    "push": "npm publish ../../dist/exense-*.tgz"
+    "push": "npm publish ../../dist/step-core/*.tgz"
   },
   "peerDependencies": {
     "@angular-architects/module-federation": "14.0.1",
