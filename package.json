@@ -22,7 +22,8 @@
     "postinstall": "cd projects/step-frontend/src/lib/angularjs && npm install",
     "format:fix": "pretty-quick --staged",
     "format:check": "prettier --config ./.prettierrc \"projects/{step-core/src/lib,step-frontend/src/lib,step-app/src}/!(angularjs)/**/*{.ts,.html,.scss}\"",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "push": "npm publish"
   },
   "private": false,
   "dependencies": {
