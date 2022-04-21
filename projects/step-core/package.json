@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "schematics": "./schematics/collection.json",
   "scripts": {
-    "build": "tsc -p tsconfig.schematcis.json",
+    "build": "bg build",
+    "compile": "tsc -p tsconfig.schematcis.json",
     "postbuild": "copyfiles schematics/*/schema.json schematics/*/files/** schematics/*/files/**/.* schematics/collection.json ../../dist/step-core",
     "pack": "npm pack"
   },
