@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.schematcis.json",
     "postbuild": "copyfiles schematics/*/schema.json schematics/*/files/** schematics/*/files/**/.* schematics/collection.json ../../dist/step-core",
-    "pack": ""
+    "pack": "npm pack"
   },
   "peerDependencies": {
     "@angular-architects/module-federation": "14.0.1",
