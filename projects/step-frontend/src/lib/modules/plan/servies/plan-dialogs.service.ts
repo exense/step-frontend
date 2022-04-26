@@ -31,7 +31,6 @@ export class PlanDialogsService {
       map((result) => result.item),
       switchMap((id) => this._httpClient.get<any>(`rest/plans/${id}`))
     );
-
     return plan$;
   }
 }
