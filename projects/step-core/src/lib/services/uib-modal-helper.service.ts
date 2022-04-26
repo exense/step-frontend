@@ -15,18 +15,20 @@ export class UibModalHelperService {
   constructor(@Inject(AJS_UIB_MODAL) private _$uibModal: any) {}
 
   open(modalOptions: any = {}): any {
-    const options = {
-      ...modalOptions,
-      ...{
-        controller: [
-          '$scope',
-          '$uibModalInstance',
-          ($scope: IScope, modalInstance: any) => {
-            ($scope as any).modalInstance = modalInstance;
+    const options = modalOptions?.controller
+      ? modalOptions
+      : {
+          ...modalOptions,
+          ...{
+            controller: [
+              '$scope',
+              '$uibModalInstance',
+              ($scope: IScope, modalInstance: any) => {
+                ($scope as any).modalInstance = modalInstance;
+              },
+            ],
           },
-        ],
-      },
-    };
+        };
     return this._$uibModal.open(options);
   }
 }

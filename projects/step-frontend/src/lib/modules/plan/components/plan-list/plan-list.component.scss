@@ -1,0 +1,51 @@
+:host {
+  position: relative;
+  display: block;
+}
+
+/*
+table {
+  width: 100%;
+}
+
+.spinner-container {
+  position: absolute;
+  z-index: 1;
+  width: 100px;
+  height: 100px;
+  left: calc(50% - 50px);
+  top: calc(50% - 50px);
+}
+
+th > mat-form-field {
+  width: 90%;
+}
+
+.no-data {
+  text-align: center;
+}
+*/
+
+.cell-actions {
+  width: 20rem;
+  button {
+    padding: 0;
+    min-width: 4rem;
+    min-height: 4rem;
+  }
+}
+
+.plans-header {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: flex-end;
+
+  .import-export button {
+    padding: 0;
+    min-width: 4rem;
+  }
+
+  step-btn-group {
+    margin-left: 1rem;
+  }
+}
