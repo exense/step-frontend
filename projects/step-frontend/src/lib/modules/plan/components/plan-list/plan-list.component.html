@@ -1,0 +1,103 @@
+<section class="plans-header">
+  <step-btn-group class="import-export">
+    <button
+      type="button"
+      mat-raised-button
+      matTooltip="Import plan"
+      matTooltipPosition="below"
+      [disabled]="!('plan-write' | hasRight | async)"
+      (click)="importPlans()"
+    >
+      <mat-icon>file_download</mat-icon>
+    </button>
+    <button
+      type="button"
+      mat-raised-button
+      matTooltip="Export all plans"
+      matTooltipPosition="below"
+      [disabled]="!('plan-read' | hasRight | async)"
+      (click)="exportPlans()"
+    >
+      <mat-icon>file_upload</mat-icon>
+    </button>
+  </step-btn-group>
+  <step-btn-group>
+    <button
+      type="button"
+      mat-raised-button
+      color="primary"
+      [disabled]="!('plan-write' | hasRight | async)"
+      (click)="addPlan()"
+    >
+      New plan
+    </button>
+  </step-btn-group>
+</section>
+<step-table [dataSource]="dataSource" matSort [matSortDisableClear]="true">
+  <ng-container matColumnDef="name" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+    <td mat-cell *matCellDef="let element">{{ element.attributes.name }}</td>
+  </ng-container>
+  <ng-container matColumnDef="type" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+    <td mat-cell *matCellDef="let element">{{ element.root._class }}</td>
+  </ng-container>
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef>Actions</th>
+    <td mat-cell *matCellDef="let element" class="cell-actions">
+      <step-btn-group>
+        <button
+          mat-stroked-button
+          matTooltip="Execute plan"
+          [disabled]="!('plan-write' | hasRight | async)"
+          (click)="executePlan(element.id)"
+        >
+          <mat-icon>play_arrow</mat-icon>
+        </button>
+        <button
+          mat-stroked-button
+          matTooltip="Duplicate plan"
+          [disabled]="!('plan-read' | hasRight | async)"
+          (click)="duplicatePlan(element.id)"
+        >
+          <mat-icon>content_copy</mat-icon>
+        </button>
+        <button
+          mat-stroked-button
+          matTooltip="Delete plan"
+          [disabled]="!('plan-read' | hasRight | async)"
+          (click)="deletePlan(element.id, element.attributes.name)"
+        >
+          <mat-icon>clear</mat-icon>
+        </button>
+        <button mat-stroked-button [matMenuTriggerFor]="menu" [matMenuTriggerData]="{ element: element }">
+          <mat-icon>more_horiz</mat-icon>
+        </button>
+      </step-btn-group>
+    </td>
+  </ng-container>
+</step-table>
+<mat-menu #menu="matMenu">
+  <ng-template matMenuContent let-element="element">
+    <button mat-menu-item [disabled]="!('plan-write' | hasRight | async)" (click)="editPlan(element.id)">
+      <mat-icon>edit</mat-icon>
+      Edit plan
+    </button>
+    <button
+      mat-menu-item
+      [disabled]="!('plan-read' | hasRight | async)"
+      (click)="exportPlan(element.id, element.attributes.name)"
+    >
+      <mat-icon>file_upload</mat-icon>
+      Export plan
+    </button>
+    <button
+      mat-menu-item
+      [disabled]="!('plan-read' | hasRight | async)"
+      (click)="lookUp(element.id, element.attributes.name)"
+    >
+      <mat-icon>search</mat-icon>
+      Find usages
+    </button>
+  </ng-template>
+</mat-menu>
