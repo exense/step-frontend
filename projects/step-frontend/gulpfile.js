@@ -83,6 +83,11 @@ const MAPS = [
 
 const FONTS = ['./src/lib/angularjs/bower_components/bootstrap/dist/fonts/**/*'];
 
+const IMAGES = [
+  './src/lib/angularjs/bower_components/jstree/dist/themes/default/*.png',
+  './src/lib/angularjs/bower_components/jstree/dist/themes/default/*.gif',
+];
+
 const OTHER = [
   './src/lib/angularjs/**/*',
   './src/lib/angularjs/**/*',
@@ -108,10 +113,12 @@ const styles = () =>
 
 const maps = () => src(MAPS).pipe(dest(`${DESTINATION}/app`));
 
+const images = () => src(IMAGES).pipe(dest(`${DESTINATION}/app`));
+
 const fonts = () => src(FONTS).pipe(dest(`${DESTINATION}/fonts`));
 
 const others = () => src(OTHER, { nodir: true }).pipe(dest(DESTINATION, { base: './src/lib/angularjs' }));
 
 const vizTemplates = () => src(VIZ_TEMPLATES).pipe(dest(`${DESTINATION}/app/templates`));
 
-exports.default = parallel(scripts, maps, styles, fonts, others, vizTemplates);
+exports.default = parallel(scripts, maps, styles, fonts, others, vizTemplates, images);
