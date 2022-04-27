@@ -76,9 +76,15 @@ const STYLES = [
   './src/lib/angularjs/js/chart.css',
 ];
 
+const MAPS = [
+  './src/lib/angularjs/bower_components/bootstrap/dist/css/bootstrap.css.map',
+  `${NODE_MODULES_PATH}/nvd3/build/nv.d3.js.map`,
+];
+
 const FONTS = ['./src/lib/angularjs/bower_components/bootstrap/dist/fonts/**/*'];
 
 const OTHER = [
+  './src/lib/angularjs/**/*',
   './src/lib/angularjs/**/*',
   '!./src/lib/angularjs/bower_components/**/*',
   '!./src/lib/angularjs/node_modules/**/*',
@@ -98,8 +104,10 @@ const styles = () =>
     .pipe(concat('styles.css'))
     .pipe(dest(`${DESTINATION}/app`));
 
+const maps = () => src(MAPS).pipe(dest(`${DESTINATION}/app`));
+
 const fonts = () => src(FONTS).pipe(dest(`${DESTINATION}/fonts`));
 
 const others = () => src(OTHER, { nodir: true }).pipe(dest(DESTINATION, { base: './src/lib/angularjs' }));
 
-exports.default = parallel(scripts, styles, fonts, others);
+exports.default = parallel(scripts, scripts_maps, styles, fonts, others);
