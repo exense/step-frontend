@@ -110,4 +110,4 @@ const fonts = () => src(FONTS).pipe(dest(`${DESTINATION}/fonts`));
 
 const others = () => src(OTHER, { nodir: true }).pipe(dest(DESTINATION, { base: './src/lib/angularjs' }));
 
-exports.default = parallel(scripts, scripts_maps, styles, fonts, others);
+exports.default = parallel(scripts, maps, styles, fonts, others);
