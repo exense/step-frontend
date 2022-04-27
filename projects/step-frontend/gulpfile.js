@@ -94,6 +94,8 @@ const OTHER = [
   '!./src/lib/angularjs/*.json',
 ];
 
+const VIZ_TEMPLATES = [`${NODE_MODULES_PATH}/@exense/visualization/dist/templates/**/*`];
+
 const scripts = () =>
   src(SCRIPTS)
     .pipe(concat('scripts.js'))
@@ -110,4 +112,6 @@ const fonts = () => src(FONTS).pipe(dest(`${DESTINATION}/fonts`));
 
 const others = () => src(OTHER, { nodir: true }).pipe(dest(DESTINATION, { base: './src/lib/angularjs' }));
 
-exports.default = parallel(scripts, maps, styles, fonts, others);
+const vizTemplates = () => src(VIZ_TEMPLATES).pipe(dest(`${DESTINATION}/app/templates`));
+
+exports.default = parallel(scripts, maps, styles, fonts, others, vizTemplates);
