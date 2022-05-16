@@ -2,7 +2,8 @@
   "name": "@exense/step-frontend",
   "version": "0.0.1",
   "scripts": {
-    "compile": "gulp"
+    "compile": "gulp",
+    "pack": ""
   },
   "peerDependencies": {
     "@angular-architects/module-federation": "14.0.1",
@@ -25,7 +26,7 @@
     "tslib": "2.3.0"
   },
   "devDependencies": {
-    "gulp": "file:../.../node_modules/gulp",
-    "gulp-concat": "file:../.../node_modules/gulp-concat"
+    "gulp": "4.0.2",
+    "gulp-concat": "2.6.1"
   }
 }
