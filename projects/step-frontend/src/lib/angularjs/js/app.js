@@ -590,7 +590,7 @@ angular
       AuthService.login(credentials).then(
         function (user) {},
         function (e) {
-          $scope.error = e.data;
+          $scope.error = e.error;
         }
       );
     };

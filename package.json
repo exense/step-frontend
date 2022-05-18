@@ -22,9 +22,10 @@
     "postinstall": "cd projects/step-frontend/src/lib/angularjs && npm install",
     "format:fix": "pretty-quick --staged",
     "format:check": "prettier --config ./.prettierrc \"projects/{step-core/src/lib,step-frontend/src/lib,step-app/src}/!(angularjs)/**/*{.ts,.html,.scss}\"",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "push": "npm publish dist/step-frontend/*.tgz"
   },
-  "private": true,
+  "private": false,
   "dependencies": {
     "@angular-architects/module-federation": "14.0.1",
     "@angular/animations": "13.1.1",
@@ -36,6 +37,9 @@
     "@angular/platform-browser-dynamic": "13.1.1",
     "@angular/router": "13.1.1",
     "@angular/upgrade": "13.1.1",
+    "@angular/material": "13.3.2",
+    "@angular/cdk": "13.3.2",
+    "material-icons-font": "2.1.0",
     "uuid": "8.3.2",
     "rxjs": "7.4.0",
     "tslib": "2.3.0",
