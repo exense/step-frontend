@@ -44,7 +44,6 @@
               }
             ],
             "styles": ["projects/step-app/src/styles.scss"],
-            "scripts": [],
             "extraWebpackConfig": "projects/step-app/webpack.config.js",
             "commonChunk": false
           },
@@ -122,7 +121,9 @@
             "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": ["src/styles.scss"],
-            "scripts": []
+            "scripts": [
+              "node_modules/uplot/dist/uPlot.iife.min.js"
+            ]
           }
         }
       }
