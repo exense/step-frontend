@@ -1,9 +1,9 @@
 import { DOCUMENT } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
+import { Inject, Injectable, OnDestroy } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { ConfigDto, CredentialsDto, SessionDto } from '../domain';
-import { firstValueFrom, Observable } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
 import { AJS_LOCATION, AJS_PREFERENCES, AJS_ROOT_SCOPE, AJS_UIB_MODAL } from '../shared/angularjs-providers';
 import { AJS_MODULE } from '../shared/constants';
 import { a1Promise2Promise } from '../shared/utils';
@@ -19,7 +19,7 @@ export interface AuthContext {
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService {
+export class AuthService implements OnDestroy {
   constructor(
     private _http: HttpClient,
     @Inject(AJS_ROOT_SCOPE) private _$rootScope: any,
@@ -31,6 +31,10 @@ export class AuthService {
 
   private _serviceContext: { conf?: ConfigDto } = {};
 
+  private _context$ = new BehaviorSubject<AuthContext | undefined>(undefined);
+
+  readonly context$ = this._context$.asObservable();
+
   private setContext(session: SessionDto): void {
     const context: AuthContext = {
       userID: session.username,
@@ -40,11 +44,12 @@ export class AuthService {
       session: {},
     };
     this._$rootScope.context = context;
+    this._context$.next(context);
     this._preferences.load();
   }
 
   getContext(): AuthContext {
-    return this._$rootScope.context as AuthContext;
+    return this._context$.value as AuthContext;
   }
 
   async init(): Promise<unknown> {
@@ -151,6 +156,10 @@ export class AuthService {
       },
     });
     return a1Promise2Promise(modalInstance.result);
+  }
+
+  ngOnDestroy(): void {
+    this._context$.complete();
   }
 }
 

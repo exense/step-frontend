@@ -1,0 +1,28 @@
+<div class="spinner-container" *ngIf="dataSource?.inProgress$ | async">
+  <mat-spinner></mat-spinner>
+</div>
+<table mat-table class="mat-elevation-z8" [dataSource]="dataSource!" [trackBy]="trackBy">
+  <ng-container
+    *ngFor="let searchCol of searchColumns; trackBy: trackBySearchColumn"
+    [matColumnDef]="searchCol.colName"
+  >
+    <th mat-header-cell *matHeaderCellDef>
+      <mat-form-field *ngIf="searchCol.searchName">
+        <input matInput type="text" (change)="onSearch(searchCol.searchName, $event)" />
+      </mat-form-field>
+    </th>
+  </ng-container>
+  <tr mat-header-row *matHeaderRowDef="displayColumns"></tr>
+  <ng-container *ngIf="displaySearchColumns.length > 0">
+    <tr mat-header-row *matHeaderRowDef="displaySearchColumns"></tr>
+  </ng-container>
+  <tr mat-row *matRowDef="let row; columns: displayColumns"></tr>
+  <tr class="mat-row" *matNoDataRow>
+    <td class="mat-cell no-data" [colSpan]="displayColumns.length">
+      <ng-container *ngIf="(dataSource?.total$ | async) === 0; then noTotal; else noSearch"></ng-container>
+      <ng-template #noTotal> No data available in table </ng-template>
+      <ng-template #noSearch> No matching records found </ng-template>
+    </td>
+  </tr>
+</table>
+<mat-paginator [length]="dataSource?.totalFiltered$ | async" [pageSizeOptions]="pageSizeOptions"> </mat-paginator>
