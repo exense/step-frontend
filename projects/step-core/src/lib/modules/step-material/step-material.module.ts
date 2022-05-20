@@ -29,10 +29,11 @@ import { OverlayModule } from '@angular/cdk/overlay';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { BtnGroupComponent } from './components/btn-group/btn-group.component';
+import { ThemeComponent } from './components/theme/theme.component';
 
 @NgModule({
   imports: [CommonModule],
-  declarations: [BtnGroupComponent],
+  declarations: [BtnGroupComponent, ThemeComponent],
   exports: [
     MatCheckboxModule,
     MatChipsModule,
@@ -63,8 +64,13 @@ import { BtnGroupComponent } from './components/btn-group/btn-group.component';
     OverlayModule,
     PortalModule,
     BtnGroupComponent,
+    ThemeComponent,
   ],
 })
 export class StepMaterialModule {}
 
 export * from './components/btn-group/btn-group.component';
+export * from './components/theme/theme.component';
+export * from './services/theme-register.service';
+export * from './shared/theme-definition';
+export * from './shared/theme-base.module';

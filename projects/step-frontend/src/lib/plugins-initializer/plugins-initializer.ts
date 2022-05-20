@@ -11,6 +11,8 @@ const OVERRIDE_PLUGINS = new Map<string, string>([['multitenancy', 'multitenancy
 // Allows to add plugins, that don't returned from BE
 const ADDITIONAL_PLUGINS: ReadonlyArray<string> = [
   // Add strings like this 'pluginName/remoteEntry.js'
+  // TODO: uncomment this line to test theme locally
+  //'theme/remoteEntry.js'
 ];
 
 export type PluginDefinition = LegacyPluginDefinition | MicrofrontendPluginDefinition;

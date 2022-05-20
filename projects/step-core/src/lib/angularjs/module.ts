@@ -3,6 +3,6 @@ import { TOOLTIP_DIRECTIVE, TooltipDirective } from './directives/tooltip.direct
 
 export const STEP_CORE_JS = 'stepCoreJS';
 
-getAngularJSGlobal()
+export const stepCoreModule = getAngularJSGlobal()
   .module(STEP_CORE_JS, ['ui.bootstrap', 'ui.bootstrap.tooltip'])
   .directive(TOOLTIP_DIRECTIVE, [() => TooltipDirective]);
