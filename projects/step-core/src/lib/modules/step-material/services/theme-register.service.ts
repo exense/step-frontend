@@ -1,5 +1,5 @@
-import { ComponentFactory, Injectable, Type } from '@angular/core';
-import { ThemeDefinition } from '@exense/step-core';
+import { ComponentFactory, Injectable } from '@angular/core';
+import { ThemeDefinition } from '../shared/theme-definition';
 
 @Injectable({
   providedIn: 'root',
