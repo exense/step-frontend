@@ -1,0 +1,25 @@
+:host {
+  height: 100%;
+}
+
+.dashboard-container {
+
+  max-width: calc(100vw - 56px);
+  display: flex;
+  height: 100%;
+  background-color: #F5F5F7;
+
+  .chart-container {
+    height: 360px;
+    padding: 12px;
+    padding-top: 24px;
+    //width: 50%;
+    flex-grow: 1;
+    background: #ffffff;
+    margin: 12px;
+    border-radius: 4px;
+    box-shadow: 1px 1px 9px #cdcdcd;
+  }
+}
+
+

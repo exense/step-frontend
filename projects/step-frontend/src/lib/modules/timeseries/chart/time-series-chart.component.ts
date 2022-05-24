@@ -1,87 +1,109 @@
-import { Component, ElementRef, OnInit, ViewChild } from "@angular/core";
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    Input,
+    OnChanges,
+    OnInit,
+    Self,
+    SimpleChanges,
+    ViewChild
+} from "@angular/core";
+import {TSChartSettings} from './model/ts-chart-settings';
 
 @Component({
   selector: 'step-timeseries-chart',
   templateUrl: './time-series-chart.component.html',
   styleUrls: ['./time-series-chart.component.scss'],
 })
-export class TimeSeriesChartComponent implements OnInit {
+export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChanges {
+
+    private readonly HEADER_WITH_FOOTER_SIZE = 94;
 
     @ViewChild('chartContainer') private chartContainer: ElementRef;
 
-    constructor() {
+    @Input('settings') settings: TSChartSettings;
 
-        var loop = 1e2;
+    uplot: uPlot;
 
-        let data = [
-            Array(loop),
-            Array(loop),
-        ];
+    constructor(@Self() private element: ElementRef) {
+        console.log();
+    }
 
-        for (var i = 0; i < loop; i++) {
-            let x = 2 * Math.PI * i / loop;
-            let y = Math.sin(x);
+    ngOnInit(): void {
+        // @ts-ignore
+    }
 
-            data[0][i] = x;
-            data[1][i] = y;
-        }
+    ngAfterViewInit(): void {
 
-        function getSize() {
+        let getSize = () => {
+            console.log(this.element.nativeElement.parentElement);
             return {
-                width: window.innerWidth - 100,
-                height: window.innerHeight - 200,
+                width: this.element.nativeElement.parentElement.offsetWidth,
+                height: this.element.nativeElement.parentElement.offsetHeight - this.HEADER_WITH_FOOTER_SIZE,
             }
         }
 
         const opts = {
-            title: "Resize",
+            title: this.settings.title,
             ...getSize(),
             scales: {
                 x: {
-                    time: false,
+                    time: true,
                 },
                 y: {
-                    auto: false,
-                    range: [-1.5, 1.5],
                 },
             },
             series: [
                 {
                     label: "x",
                 },
-                {
-                    label: "sin(x)",
-                    stroke: "red",
-                }
+                ...this.settings.series.map(input => {
+                   return {
+                       // show: true,
+                       // snapGaps: false,
+                       label: 'sa',
+                       // show: !input.hidden,
+                       stroke: input.stroke,
+                       // fill: input.fill,
+                       value: (self: any, rawValue: number) => input.valueFormatFunction(rawValue),
+                       dash: [],
+                       width: 1
+                   } ;
+                })
             ],
         };
 
         // @ts-ignore
-        let u = new uPlot(opts, data, this.chartContainer.nativeElement);
+        this.uplot = new uPlot(opts, [this.settings.xValues, ...this.settings.series.map(s => s.data)], this.chartContainer.nativeElement);
 
-        function throttle(cb: FrameRequestCallback, limit: number) {
-            var wait = false;
+        // function throttle(cb: FrameRequestCallback, limit: number) {
+        //     var wait = false;
+        //
+        //     return () => {
+        //         if (!wait) {
+        //             requestAnimationFrame(cb);
+        //             wait = true;
+        //             setTimeout(() => {
+        //                 wait = false;
+        //             }, limit);
+        //         }
+        //     }
+        // }
 
-            return () => {
-                if (!wait) {
-                    requestAnimationFrame(cb);
-                    wait = true;
-                    setTimeout(() => {
-                        wait = false;
-                    }, limit);
-                }
-            }
+        if (this.settings.autoResize) {
+            window.addEventListener("resize", e => {
+                this.uplot.setSize(getSize());
+            });
         }
-
         //	window.addEventListener("resize", throttle(() => u.setSize(getSize()), 100));
-        window.addEventListener("resize", e => {
-            u.setSize(getSize());
-        });
 
     }
 
-    ngOnInit(): void {
-        // @ts-ignore
+    ngOnChanges(changes: SimpleChanges): void {
+    }
+
+    update(): void {
 
     }
 
