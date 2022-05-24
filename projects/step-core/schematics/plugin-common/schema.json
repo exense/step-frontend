@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "$id": "SchematicsPlugin",
-  "title": "Plugin schema",
+  "$id": "SchematicsPluginCommon",
+  "title": "Plugin Common Schema",
   "type": "object",
   "properties": {
     "name": {
