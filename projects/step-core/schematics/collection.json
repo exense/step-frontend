@@ -3,8 +3,13 @@
   "schematics": {
     "plugin": {
       "description": "Generate a plugin module",
-      "factory": "./plugin/index",
-      "schema": "./plugin/schema.json"
+      "factory": "./plugin-wrapper/index",
+      "schema": "./plugin-wrapper/schema.json"
+    },
+    "plugin-common": {
+      "description": "Common logic for plugin generation",
+      "factory": "./plugin-common/index",
+      "schema": "./plugin-common/schema.json"
     }
   }
 }

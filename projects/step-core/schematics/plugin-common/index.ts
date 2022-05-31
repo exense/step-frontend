@@ -15,8 +15,8 @@ import { join, normalize, strings } from '@angular-devkit/core';
 import { getWorkspace } from '@schematics/angular/utility/workspace';
 import { camelize } from '@angular-devkit/core/src/utils/strings';
 import { JSONFile } from '@schematics/angular/utility/json-file';
-import { Schema } from './schema';
-import { createNames, Names } from './create-names';
+import { Schema } from '../shared/schema';
+import { createNames, Names } from '../shared/create-names';
 
 const CURRENT_VERSION = '0.0.1';
 
@@ -32,7 +32,7 @@ async function getProjectRoot(host: Tree): Promise<string> {
 
 function createPluginFiles({ names, projectRoot }: InnerOptions): Rule {
   return (_) => {
-    const srcApp = join(normalize(projectRoot), names.folderName, 'src', 'app');
+    const srcApp = join(normalize(projectRoot), names.folderName, 'src');
 
     const templateSource = apply(url('./files/src'), [
       applyTemplates({
@@ -43,6 +43,17 @@ function createPluginFiles({ names, projectRoot }: InnerOptions): Rule {
     ]);
 
     return mergeWith(templateSource, MergeStrategy.Overwrite);
+  };
+}
+
+function makeMainAsync({ names, projectRoot }: InnerOptions): Rule {
+  return (tree: Tree) => {
+    const srcRoot = join(normalize(projectRoot), names.folderName, 'src');
+    const main = join(srcRoot, 'main.ts');
+    const bootstrap = join(srcRoot, 'bootstrap.ts');
+    const mainContent = tree.read(main)!.toString();
+    tree.overwrite(bootstrap, mainContent);
+    tree.overwrite(main, "import('./bootstrap')\n\t.catch(err => console.error(err));\n");
   };
 }
 
@@ -101,6 +112,7 @@ export default function createPlugin(options: Schema): Rule {
       name: names.pluginName,
       prefix,
       routing: false,
+      skipInstall: true,
     });
 
     const federationRule = externalSchematic('@angular-architects/module-federation', 'config', {
@@ -111,7 +123,8 @@ export default function createPlugin(options: Schema): Rule {
     const pluginFiles = createPluginFiles(innerOptions);
     const configFiles = overrideConfigs(innerOptions);
     const packageJsonFile = modifyPackageJson(innerOptions);
+    const fixMain = makeMainAsync(innerOptions);
 
-    return chain([appRule, federationRule, pluginFiles, configFiles, packageJsonFile]);
+    return chain([appRule, pluginFiles, federationRule, configFiles, packageJsonFile, fixMain]);
   };
 }
