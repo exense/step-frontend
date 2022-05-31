@@ -1,13 +1,18 @@
 <step-execution-tabs></step-execution-tabs>
 
+<div>
+    <step-ts-ranger *ngIf="rangerSettings" [settings]="rangerSettings" [syncKey]="'test'">
 
+    </step-ts-ranger>
+</div>
 <div class="w-100" class="dashboard-container">
+
     <div class="chart-container">
-        <step-timeseries-chart *ngIf="chart1Settings" [settings]="chart1Settings">
+        <step-timeseries-chart *ngIf="chart1Settings" [settings]="chart1Settings" [syncKey]="'test'">
         </step-timeseries-chart>
     </div>
     <div class="chart-container">
-        <step-timeseries-chart *ngIf="chart2Settings" [settings]="chart2Settings">
+        <step-timeseries-chart *ngIf="chart2Settings" [settings]="chart2Settings" [syncKey]="'test'">
         </step-timeseries-chart>
     </div>
 </div>
