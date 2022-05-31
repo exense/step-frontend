@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, Output, EventEmitter, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { Observable } from 'rxjs';
-import { AuthService, AJS_MODULE, KeyValuePair, MyAccountDto, MyAccountPreferencesDto } from '@exense/step-core';
+import { AuthService, AJS_MODULE, KeyValuePair, UserDto, UserPreferencesDto } from '@exense/step-core';
 
-const preferencesToKVPairArray = (preferences?: MyAccountPreferencesDto): KeyValuePair<string, string>[] => {
+const preferencesToKVPairArray = (preferences?: UserPreferencesDto): KeyValuePair<string, string>[] => {
   const prefsObject = preferences?.preferences || {};
   const result = Object.keys(prefsObject).reduce((result, key) => {
     const value = prefsObject[key] || '';
@@ -13,7 +13,7 @@ const preferencesToKVPairArray = (preferences?: MyAccountPreferencesDto): KeyVal
   return result;
 };
 
-const kvPairArrayToPreferences = (values?: KeyValuePair<string, string>[]): MyAccountPreferencesDto => {
+const kvPairArrayToPreferences = (values?: KeyValuePair<string, string>[]): UserPreferencesDto => {
   const preferences = (values || []).reduce((res, { key, value }) => {
     res[key] = value;
     return res;
@@ -32,7 +32,7 @@ export class MyAccountComponent implements OnInit, OnChanges {
   @Input() error?: string;
   @Output() errorChange: EventEmitter<string | undefined> = new EventEmitter<string | undefined>();
 
-  user: Partial<MyAccountDto> = {};
+  user: Partial<UserDto> = {};
   preferences: KeyValuePair<string, string>[] = [];
 
   @Output() showGenerateApiKeyDialog: EventEmitter<any> = new EventEmitter<any>();
@@ -62,7 +62,7 @@ export class MyAccountComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    const response$ = this._http.get('rest/admin/myaccount') as Observable<Partial<MyAccountDto>>;
+    const response$ = this._http.get('rest/admin/myaccount') as Observable<Partial<UserDto>>;
     response$.subscribe((user) => {
       this.user = user || {};
       this.preferences = preferencesToKVPairArray(this.user?.preferences);

@@ -11,17 +11,21 @@ import {
   TrackByFunction,
   ViewChild,
 } from '@angular/core';
-import { BehaviorSubject, combineLatest, of, startWith, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, of, startWith, Subject, takeUntil } from 'rxjs';
 import { TableDataSource } from '../../shared/table-data-source';
 import { MatColumnDef, MatTable } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { SearchColDirective } from '../../directives/search-col.directive';
+import { TableRemoteDataSource } from '../../shared/table-remote-data-source';
+import { TableLocalDataSource } from '../../shared/table-local-data-source';
 
 export interface SearchColumn {
   colName: string;
   searchName?: string;
 }
+
+export type DataSource<T> = TableDataSource<T> | T[] | Observable<T[]>;
 
 @Component({
   selector: 'step-table',
@@ -41,7 +45,7 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy {
     }
   }
 
-  private setupRemoteDatasource(dataSource?: TableDataSource<T>): void {
+  private setupDatasource(dataSource?: DataSource<T>): void {
     this.terminate();
     this._terminator$ = new Subject<unknown>();
 
@@ -49,17 +53,31 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy {
       return;
     }
 
+    let tableDataSource: TableDataSource<T>;
+
+    if (dataSource instanceof TableRemoteDataSource || dataSource instanceof TableLocalDataSource) {
+      tableDataSource = dataSource;
+    } else {
+      tableDataSource = new TableLocalDataSource(dataSource as T[] | Observable<T[]>);
+    }
+    this.tableDataSource = tableDataSource;
+
     if (!this.page) {
       this._initRequired = true;
       return;
     }
 
-    const page$ = this.page!.page.pipe(startWith(undefined));
+    const initialPage: PageEvent = {
+      pageSize: this.pageSizeOptions[0] || 10,
+      pageIndex: 0,
+      length: 0,
+    };
+    const page$ = this.page!.page.pipe(startWith(initialPage));
     const sort$ = this._sort ? this._sort.sortChange.pipe(startWith(undefined)) : of(undefined);
 
     combineLatest([page$, sort$, this._search$])
       .pipe(takeUntil(this._terminator$))
-      .subscribe(([page, sort, search]) => dataSource.getTableData(page, sort, search));
+      .subscribe(([page, sort, search]) => tableDataSource.getTableData(page, sort, search));
   }
 
   private setupSearchColumns(): void {
@@ -82,7 +100,9 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy {
   }
 
   @Input() trackBy: TrackByFunction<T> = (index) => index;
-  @Input() dataSource?: TableDataSource<T>;
+  @Input() dataSource?: DataSource<T>;
+  @Input() inProgress?: boolean;
+  tableDataSource?: TableDataSource<T>;
   @Input() pageSizeOptions: ReadonlyArray<number> = [10, 25, 50, 100];
 
   @ViewChild(MatTable) private _table?: MatTable<any>;
@@ -115,7 +135,7 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy {
     this.setupSearchColumns();
 
     if (this._initRequired) {
-      this.setupRemoteDatasource(this.dataSource);
+      this.setupDatasource(this.dataSource);
     }
   }
 
@@ -127,7 +147,7 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy {
   ngOnChanges(changes: SimpleChanges): void {
     const cDatasource = changes['dataSource'];
     if (cDatasource?.previousValue !== cDatasource?.currentValue) {
-      this.setupRemoteDatasource(cDatasource.currentValue);
+      this.setupDatasource(cDatasource.currentValue);
     }
   }
 }

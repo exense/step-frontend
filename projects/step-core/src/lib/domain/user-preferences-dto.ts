@@ -1,3 +1,3 @@
-export interface MyAccountPreferencesDto {
+export interface UserPreferencesDto {
   preferences: { [key: string]: string };
 }
