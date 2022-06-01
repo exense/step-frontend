@@ -13,6 +13,7 @@ export class TableModule {}
 
 export * from './components/table/table.component';
 export * from './shared/table-remote-data-source';
+export * from './shared/table-local-data-source';
 export * from './shared/table-data-source';
 export * from './services/api/table-rest.service';
 export * from './directives/search-col.directive';

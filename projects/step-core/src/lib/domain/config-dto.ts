@@ -9,4 +9,5 @@ export interface ConfigDto {
   noLoginMask: boolean;
   roles: string[];
   title: string;
+  authenticatorName: string;
 }

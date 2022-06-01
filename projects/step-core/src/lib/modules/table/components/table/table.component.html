@@ -1,7 +1,7 @@
-<div class="spinner-container" *ngIf="dataSource?.inProgress$ | async">
+<div class="spinner-container" *ngIf="(tableDataSource?.inProgress$ | async) || inProgress">
   <mat-spinner></mat-spinner>
 </div>
-<table mat-table class="mat-elevation-z8" [dataSource]="dataSource!" [trackBy]="trackBy">
+<table mat-table class="mat-elevation-z8" [dataSource]="tableDataSource!" [trackBy]="trackBy">
   <ng-container
     *ngFor="let searchCol of searchColumns; trackBy: trackBySearchColumn"
     [matColumnDef]="searchCol.colName"
@@ -19,10 +19,10 @@
   <tr mat-row *matRowDef="let row; columns: displayColumns"></tr>
   <tr class="mat-row" *matNoDataRow>
     <td class="mat-cell no-data" [colSpan]="displayColumns.length">
-      <ng-container *ngIf="(dataSource?.total$ | async) === 0; then noTotal; else noSearch"></ng-container>
+      <ng-container *ngIf="(tableDataSource?.total$ | async) === 0; then noTotal; else noSearch"></ng-container>
       <ng-template #noTotal> No data available in table </ng-template>
       <ng-template #noSearch> No matching records found </ng-template>
     </td>
   </tr>
 </table>
-<mat-paginator [length]="dataSource?.totalFiltered$ | async" [pageSizeOptions]="pageSizeOptions"> </mat-paginator>
+<mat-paginator [length]="tableDataSource?.totalFiltered$ | async" [pageSizeOptions]="pageSizeOptions"> </mat-paginator>
