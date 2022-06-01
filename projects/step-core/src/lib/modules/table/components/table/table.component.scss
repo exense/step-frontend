@@ -1,0 +1,25 @@
+:host {
+  position: relative;
+  display: block;
+}
+
+table {
+  width: 100%;
+}
+
+th > mat-form-field {
+  width: 90%;
+}
+
+.spinner-container {
+  position: absolute;
+  z-index: 1;
+  width: 100px;
+  height: 100px;
+  left: calc(50% - 50px);
+  top: calc(50% - 50px);
+}
+
+.no-data {
+  text-align: center;
+}

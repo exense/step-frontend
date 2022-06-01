@@ -1,0 +1,13 @@
+/* To learn more about this file see: https://angular.io/config/tsconfig. */
+{
+  "extends": "./tsconfig.workspace.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/<%= dasherize(folderName) %>",
+    "types": []
+  },
+  "files": [
+    "step-enterprise-frontend/plugins/<%= dasherize(folderName) %>/src/main.ts",
+    "step-enterprise-frontend/plugins/<%= dasherize(folderName) %>/src/polyfills.ts"
+  ],
+  "include": ["src/**/*.d.ts"]
+}
