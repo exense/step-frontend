@@ -2,9 +2,10 @@ import { Component, ElementRef, OnChanges, OnInit, ViewChild } from "@angular/co
 import * as uPlot from "uplot";
 import {downgradeComponent, getAngularJSGlobal} from '@angular/upgrade/static';
 import { AJS_MODULE} from '@exense/step-core';
-import {TSChartSettings} from '../chart/model/ts-chart-settings';
+import {TSChartSeries, TSChartSettings} from '../chart/model/ts-chart-settings';
 import {TimeSeriesService} from '../time-series.service';
 import {TSRangerSettings} from '../ranger/ts-ranger-settings';
+import {FindBucketsRequest} from '../find-buckets-request';
 
 @Component({
   selector: 'step-execution-page',
@@ -24,7 +25,7 @@ export class ExecutionPageComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        let request = {
+        let request: FindBucketsRequest = {
             start: 0,
             end: 9999999999999,
             intervalSize: 2500,
@@ -111,41 +112,72 @@ export class ExecutionPageComponent implements OnInit {
                 ],
                 autoResize: true
             }
+            console.log(keyValues[keyValues.length - 1]);
+            this.initRangerSettings(keyValues, avgValues);
+        });
+        this.timeSeriesService.fetchBuckets({...request, groupDimensions: ['rnStatus']}).subscribe(byStatusResponse => {
+            const allSeries: TSChartSeries[] = [];
+            let labels: number[] = [];
+            let timestempsWereSet = false;
+            Object.keys(byStatusResponse).forEach(key => {
+                let bucketMap = byStatusResponse[key];
+                let seriesKeys = Object.keys(bucketMap);
+                let data: number[] = [];
+                let formattedKeys: number[] = [];
+                seriesKeys.forEach(key => {
+                    data.push(bucketMap[key].count);
+                    if (!timestempsWereSet) {
+                        formattedKeys.push(parseInt(key) / 1000);
+                    }
+                })
+                allSeries.push({
+                    label: key,
+                    data: data,
+                    // scale: 'mb',
+                    // value: (self, x) => Math.trunc(x) + ' ms',
+                    stroke: this.random_rgba()
+                });
+
+                if (!timestempsWereSet) {
+                    labels = formattedKeys; // TODO here we should got the min and max from the series, and make the complete list of timestamps, and also make sure we deal with the same number of values as timestamps
+                    timestempsWereSet = true;
+                }
+            });
+            console.log(labels);
+            console.log(allSeries);
             this.chart3Settings = {
-                title: 'Average Response Time',
-                xValues: keyValues,
-                series: [{
-                    label: 'Response Time',
-                    data: avgValues,
-                    value: (self, x) => Math.trunc(x) + ' ms',
-                    stroke: 'red'
-                }],
+                title: 'Keywords Statuses',
+                xValues: labels,
+                series: allSeries,
                 axes: [
-                    {
-                        scale: '1',
-                        values: (u, vals, space) => vals.map(v => +v.toFixed(2) + " ms"),
-                    },
+                    // {
+                    //     values: (u, vals, space) => vals.map(v => +v.toFixed(2) + " ms"),
+                    // },
                 ],
                 autoResize: true
             };
-            console.log(keyValues[keyValues.length - 1]);
-            this.rangerSettings = {
-                min: keyValues[0],
-                max: keyValues[keyValues.length - 1],
-                interval: 100,
-                series: [{
-                    label: 'Response Time',
-                    data: avgValues,
-                    value: (self, x) => Math.trunc(x) + ' ms',
-                    stroke: 'red'
-                }],
-            };
-
         });
     }
 
+    private initRangerSettings(keyValues: number[], avgValues: number[]) {
+        this.rangerSettings = {
+            min: keyValues[0],
+            max: keyValues[keyValues.length - 1],
+            interval: 100,
+            series: [{
+                label: 'Response Time',
+                data: avgValues,
+                value: (self, x) => Math.trunc(x) + ' ms',
+                stroke: 'red'
+            }],
+        };
+    }
 
-
+    random_rgba() {
+        var o = Math.round, r = Math.random, s = 255;
+        let alpha = Math.max(Number(r().toFixed(1)), 0.5);
+        return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + alpha + ')';
+    }
 
 }
 

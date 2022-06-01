@@ -34,7 +34,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     uplot: uPlot;
 
     constructor(@Self() private element: ElementRef) {
-        console.log();
     }
 
     ngOnInit(): void {

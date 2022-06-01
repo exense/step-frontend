@@ -2,7 +2,7 @@ export interface FindBucketsRequest {
   start: number;
   end: number;
   params: any;
-  groupDimensions?: [];
+  groupDimensions?: string[];
   numberOfBuckets?: number;
   intervalSize?: number; // in ms
 }

@@ -9,13 +9,14 @@
   display: flex;
   height: 100%;
   background-color: #F5F5F7;
+  flex-wrap: wrap;
 
   .chart-container {
     height: 360px;
     width: calc(50% - 24px);
 
     //width: 50%;
-    flex-grow: 1;
+    //flex-grow: 1;
     background: #ffffff;
     margin: 12px;
     border-radius: 4px;
