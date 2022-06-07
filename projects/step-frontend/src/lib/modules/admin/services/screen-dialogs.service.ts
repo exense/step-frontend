@@ -10,7 +10,8 @@ export class ScreenDialogsService {
   constructor(private _httpClient: HttpClient, private _uibModalHelper: UibModalHelperService) {}
 
   editScreen(
-    screen?: Partial<ScreenInputDto & { dbId: string }>,
+    screen?: Partial<ScreenInputDto>,
+    screenDbId?: string,
     screenChoice?: string
   ): Observable<{ screen: Partial<ScreenInputDto>; result: string }> {
     const modalInstance = this._uibModalHelper.open({
@@ -19,7 +20,7 @@ export class ScreenDialogsService {
       controller: 'editScreenInputCtrl',
       resolve: {
         id: function () {
-          return screen ? screen['dbId'] : null;
+          return screenDbId;
         },
         screenId: function () {
           return screenChoice;

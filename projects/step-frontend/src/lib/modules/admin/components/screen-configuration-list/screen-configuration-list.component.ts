@@ -1,16 +1,15 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
-  ScreenDto,
   ScreenInputDto,
   ScreenInputOptionDto,
-  ScreenInputActivationExpressionDto,
   DialogsService,
   AuthService,
   a1Promise2Observable,
   ContextService,
   Mutable,
+  TableLocalDataSource,
 } from '@exense/step-core';
 import { BehaviorSubject, switchMap, of, catchError, noop, shareReplay, tap, map } from 'rxjs';
 import { ScreenApiService } from '../../services/screen-api.service';
@@ -29,31 +28,26 @@ export class ScreenConfigurationListComponent implements OnDestroy {
   public currentlySelectedScreenChoice: string = this.CURRENT_SCREEN_CHOICE_DEFAULT;
 
   readonly _screenChoicesRequest$ = this._screenApi.getScreenChoices();
+
   private _screensRequest$ = new BehaviorSubject<unknown>({});
-  readonly screens$ = this._screensRequest$.pipe(
+  private screens$ = this._screensRequest$.pipe(
     tap((_) => ((this as InProgress).inProgress = true)),
-    switchMap((_) =>
-      this._screenApi.getScreenByScreenChoice(this.currentlySelectedScreenChoice).pipe(
-        map((screens: ScreenDto[]) =>
-          screens.map((screen: ScreenDto) => {
-            const screenInput: ScreenInputDto & {
-              searchableOptionsValueString?: string;
-              searchableActivationExprValueString?: string;
-              dbId?: string;
-            } = screen.input;
-            screenInput.searchableOptionsValueString = screenInput?.options
-              ?.map((option: ScreenInputOptionDto) => option.value)
-              .toString();
-            screenInput.searchableActivationExprValueString = screenInput?.activationExpression?.script;
-            screenInput.dbId = screen.id;
-            return screenInput;
-          })
-        )
-      )
-    ),
+    switchMap((_) => this._screenApi.getScreenByScreenChoice(this.currentlySelectedScreenChoice)),
     tap((_) => ((this as InProgress).inProgress = false)),
     shareReplay(1)
   );
+
+  readonly searchableScreens$ = new TableLocalDataSource(this.screens$, {
+    searchPredicates: {
+      label: (item, searchValue) => item.input.label.toLowerCase().includes(searchValue.toLowerCase()),
+      id: (item, searchValue) => item.input.id.toLowerCase().includes(searchValue.toLowerCase()),
+      type: (item, searchValue) => item.input.type.toLowerCase().includes(searchValue.toLowerCase()),
+      options: (item, searchValue) =>
+        this.optionsToString(item.input?.options).toLowerCase().includes(searchValue.toLowerCase()),
+      activationScript: (item, searchValue) =>
+        item.input?.activationExpression.script.toLowerCase().includes(searchValue.toLowerCase()),
+    },
+  });
 
   readonly currentUserName: string;
   readonly inProgress: boolean = false;
@@ -74,11 +68,13 @@ export class ScreenConfigurationListComponent implements OnDestroy {
   }
 
   addScreen(): void {
-    this._screenDialogs.editScreen(undefined, this.currentlySelectedScreenChoice).subscribe((_) => this.loadTable());
+    this._screenDialogs
+      .editScreen(undefined, undefined, this.currentlySelectedScreenChoice)
+      .subscribe((_) => this.loadTable());
   }
 
-  editScreen(screenInput: ScreenInputDto & { dbId: string }): void {
-    this._screenDialogs.editScreen(screenInput, undefined).subscribe((_) => this.loadTable());
+  editScreen(screenInput: ScreenInputDto, screenDbId: string): void {
+    this._screenDialogs.editScreen(screenInput, screenDbId, undefined).subscribe((_) => this.loadTable());
   }
 
   moveScreen(dbId: string, offset: number): void {
@@ -97,6 +93,10 @@ export class ScreenConfigurationListComponent implements OnDestroy {
           this.loadTable();
         }
       });
+  }
+
+  optionsToString(options: Array<ScreenInputOptionDto>): string {
+    return options ? options.map((option: ScreenInputOptionDto) => option.value).toString() : '';
   }
 
   private loadTable(): void {
