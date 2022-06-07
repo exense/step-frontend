@@ -1,0 +1,14 @@
+@import '../../../_common/styles/mixins';
+
+:host {
+  position: relative;
+  display: block;
+}
+
+.executions-header {
+  @include table-header;
+}
+
+.result {
+  display: flex;
+}

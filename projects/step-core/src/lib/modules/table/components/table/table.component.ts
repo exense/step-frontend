@@ -2,27 +2,32 @@ import {
   AfterViewInit,
   Component,
   ContentChildren,
+  forwardRef,
   Input,
   OnChanges,
   OnDestroy,
   Optional,
   QueryList,
   SimpleChanges,
+  TemplateRef,
   TrackByFunction,
   ViewChild,
 } from '@angular/core';
 import { BehaviorSubject, combineLatest, Observable, of, startWith, Subject, takeUntil } from 'rxjs';
 import { TableDataSource } from '../../shared/table-data-source';
 import { MatColumnDef, MatTable } from '@angular/material/table';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, Sort } from '@angular/material/sort';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { SearchColDirective } from '../../directives/search-col.directive';
 import { TableRemoteDataSource } from '../../shared/table-remote-data-source';
 import { TableLocalDataSource } from '../../shared/table-local-data-source';
+import { TableSearch } from '../../services/table.search';
+import { SearchValue } from '../../shared/search-value';
 
 export interface SearchColumn {
   colName: string;
   searchName?: string;
+  template?: TemplateRef<any>;
 }
 
 export type DataSource<T> = TableDataSource<T> | T[] | Observable<T[]>;
@@ -31,12 +36,18 @@ export type DataSource<T> = TableDataSource<T> | T[] | Observable<T[]>;
   selector: 'step-table',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
+  providers: [
+    {
+      provide: TableSearch,
+      useExisting: forwardRef(() => TableComponent),
+    },
+  ],
 })
-export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy {
+export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, TableSearch {
   constructor(@Optional() private _sort: MatSort) {}
 
   private _terminator$?: Subject<unknown>;
-  private _search$ = new BehaviorSubject<{ [column: string]: string }>({});
+  private _search$ = new BehaviorSubject<{ [column: string]: SearchValue }>({});
 
   private terminate(): void {
     if (this._terminator$) {
@@ -72,8 +83,16 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy {
       pageIndex: 0,
       length: 0,
     };
+
+    const initialSort: Sort | undefined = this._sort?.active
+      ? {
+          active: this._sort.active,
+          direction: this._sort.direction,
+        }
+      : undefined;
+
     const page$ = this.page!.page.pipe(startWith(initialPage));
-    const sort$ = this._sort ? this._sort.sortChange.pipe(startWith(undefined)) : of(undefined);
+    const sort$ = this._sort ? this._sort.sortChange.pipe(startWith(initialSort)) : of(undefined);
 
     combineLatest([page$, sort$, this._search$])
       .pipe(takeUntil(this._terminator$))
@@ -88,12 +107,16 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     const allColumns = this.colDef!.map((x) => x.name);
-    const searchColumns = this.searchColDef!.map((x) => x.searchColumnName);
+    const searchColumns = this.searchColDef!.map((x) => {
+      const searchName = x.searchColumnName;
+      const template = x?.searchCell?.template;
+      return { searchName, template };
+    });
 
     this.searchColumns = allColumns.map((col) => {
       const colName = `search-${col}`;
-      const searchName = searchColumns.includes(col) ? col : undefined;
-      return { colName, searchName };
+      const { searchName, template } = searchColumns.find((x) => x.searchName === col) || {};
+      return { colName, searchName, template };
     });
 
     this.displaySearchColumns = this.searchColumns.map((c) => c.colName);
@@ -119,10 +142,16 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy {
 
   readonly trackBySearchColumn: TrackByFunction<SearchColumn> = (index, item) => item.colName;
 
-  onSearch(column: string, event: Event): void {
-    const value = (event?.target as HTMLInputElement).value || '';
+  onSearch(column: string, value: string, regex?: boolean): void;
+  onSearch(column: string, event: Event, regex?: boolean): void;
+  onSearch(column: string, eventOrValue: Event | string, regex: boolean = false): void {
+    const value =
+      typeof eventOrValue === 'string'
+        ? (eventOrValue as string)
+        : ((eventOrValue as Event)?.target as HTMLInputElement).value || '';
+
     const search = { ...this._search$.value };
-    search[column] = value;
+    search[column] = regex ? { value, regex } : value;
     this._search$.next(search);
   }
 

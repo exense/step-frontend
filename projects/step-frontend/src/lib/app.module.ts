@@ -6,10 +6,19 @@ import { AdminModule } from './modules/admin/admin.module';
 import { PlanModule } from './modules/plan/plan.module';
 import { PLUGINS_INITIALIZER } from './plugins-initializer/plugins-initializer';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ExecutionModule } from './modules/execution/execution.module';
 
 @NgModule({
   declarations: [],
-  imports: [BrowserModule, UpgradeModule, StepCoreModule, AdminModule, PlanModule, BrowserAnimationsModule],
+  imports: [
+    BrowserModule,
+    UpgradeModule,
+    StepCoreModule,
+    AdminModule,
+    PlanModule,
+    ExecutionModule,
+    BrowserAnimationsModule,
+  ],
   providers: [PLUGINS_INITIALIZER],
 })
 export class AppModule {
