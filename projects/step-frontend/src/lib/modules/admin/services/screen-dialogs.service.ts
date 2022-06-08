@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ScreenInputDto, UibModalHelperService, a1Promise2Observable } from '@exense/step-core';
+import { Input, UibModalHelperService, a1Promise2Observable } from '@exense/step-core';
 import { map, Observable } from 'rxjs';
 
 @Injectable({
@@ -10,10 +10,10 @@ export class ScreenDialogsService {
   constructor(private _httpClient: HttpClient, private _uibModalHelper: UibModalHelperService) {}
 
   editScreen(
-    screen?: Partial<ScreenInputDto>,
+    screen?: Partial<Input>,
     screenDbId?: string,
     screenChoice?: string
-  ): Observable<{ screen: Partial<ScreenInputDto>; result: string }> {
+  ): Observable<{ screen: Partial<Input>; result: string }> {
     const modalInstance = this._uibModalHelper.open({
       backdrop: 'static',
       templateUrl: 'partials/screenconfiguration/editScreenInputDialog.html',
