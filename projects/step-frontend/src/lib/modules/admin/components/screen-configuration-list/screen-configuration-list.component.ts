@@ -2,17 +2,17 @@ import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
-  ScreenInputDto,
-  ScreenInputOptionDto,
+  Input,
+  Option,
   DialogsService,
   AuthService,
   a1Promise2Observable,
   ContextService,
   Mutable,
   TableLocalDataSource,
+  ScreensService
 } from '@exense/step-core';
 import { BehaviorSubject, switchMap, of, catchError, noop, shareReplay, tap, map } from 'rxjs';
-import { ScreenApiService } from '../../services/screen-api.service';
 import { ScreenDialogsService } from '../../services/screen-dialogs.service';
 
 type InProgress = Mutable<Pick<ScreenConfigurationListComponent, 'inProgress'>>;
@@ -27,12 +27,12 @@ export class ScreenConfigurationListComponent implements OnDestroy {
 
   public currentlySelectedScreenChoice: string = this.CURRENT_SCREEN_CHOICE_DEFAULT;
 
-  readonly _screenChoicesRequest$ = this._screenApi.getScreenChoices();
+  readonly _screenChoicesRequest$ = this._screensService.getScreens();
 
   private _screensRequest$ = new BehaviorSubject<unknown>({});
   private screens$ = this._screensRequest$.pipe(
     tap((_) => ((this as InProgress).inProgress = true)),
-    switchMap((_) => this._screenApi.getScreenByScreenChoice(this.currentlySelectedScreenChoice)),
+    switchMap((_) => this._screensService.getScreenInputsByScreenId(this.currentlySelectedScreenChoice)),
     tap((_) => ((this as InProgress).inProgress = false)),
     shareReplay(1)
   );
@@ -45,7 +45,7 @@ export class ScreenConfigurationListComponent implements OnDestroy {
       options: (item, searchValue) =>
         this.optionsToString(item.input?.options).toLowerCase().includes(searchValue.toLowerCase()),
       activationScript: (item, searchValue) =>
-        item.input?.activationExpression.script.toLowerCase().includes(searchValue.toLowerCase()),
+        item.input?.activationExpression?.script.toLowerCase().includes(searchValue.toLowerCase()),
     },
   });
 
@@ -53,7 +53,7 @@ export class ScreenConfigurationListComponent implements OnDestroy {
   readonly inProgress: boolean = false;
 
   constructor(
-    private _screenApi: ScreenApiService,
+    private _screensService: ScreensService,
     private _dialogs: DialogsService,
     private _screenDialogs: ScreenDialogsService,
     private _auth: AuthService,
@@ -73,18 +73,18 @@ export class ScreenConfigurationListComponent implements OnDestroy {
       .subscribe((_) => this.loadTable());
   }
 
-  editScreen(screenInput: ScreenInputDto, screenDbId: string): void {
+  editScreen(screenInput: Input, screenDbId: string): void {
     this._screenDialogs.editScreen(screenInput, screenDbId, undefined).subscribe((_) => this.loadTable());
   }
 
   moveScreen(dbId: string, offset: number): void {
-    this._screenApi.moveScreenPosition(dbId, offset).subscribe((_) => this.loadTable());
+    this._screensService.moveInput(dbId, offset).subscribe((_) => this.loadTable());
   }
 
   removeScreen(dbId: string, label: string): void {
     a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Screen "${label}"`))
       .pipe(
-        switchMap((_) => this._screenApi.removeScreen(dbId)),
+        switchMap((_) => this._screensService.deleteInput(dbId)),
         map((_) => true),
         catchError((_) => of(false))
       )
@@ -95,8 +95,8 @@ export class ScreenConfigurationListComponent implements OnDestroy {
       });
   }
 
-  optionsToString(options: Array<ScreenInputOptionDto>): string {
-    return options ? options.map((option: ScreenInputOptionDto) => option.value).toString() : '';
+  optionsToString(options: Array<Option>): string {
+    return options ? options.map((option: Option) => option.value).toString() : '';
   }
 
   private loadTable(): void {
