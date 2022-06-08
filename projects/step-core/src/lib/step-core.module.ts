@@ -57,3 +57,9 @@ export * from './pipes/has-right.pipe';
 export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
 export * from './client/generated/index';
+
+export { ApiError } from './client/generated/core/ApiError';
+export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
+export { CancelablePromise, CancelError } from './client/generated/core/CancelablePromise';
+export { OpenAPI } from './client/generated/core/OpenAPI';
+export type { OpenAPIConfig } from './client/generated/core/OpenAPI';
