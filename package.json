@@ -23,7 +23,8 @@
     "format:fix": "pretty-quick --staged",
     "format:check": "prettier --config ./.prettierrc \"projects/{step-core/src/lib,step-frontend/src/lib,step-app/src}/!(angularjs)/**/*{.ts,.html,.scss}\"",
     "prepare": "husky install",
-    "push": "npm publish dist/step-frontend/*.tgz"
+    "push": "npm publish dist/step-frontend/*.tgz",
+    "openapi:generate:nhy": "openapi --input https://stepee-nhy.exense.ch/rest/openapi.json --output ./projects/step-core/src/lib/client/generated --client angular --useUnionTypes --name StepClientModule --exportCore false"
   },
   "private": false,
   "dependencies": {
@@ -71,6 +72,7 @@
     "typescript": "4.4.3",
     "copyfiles": "2.4.1",
     "gulp": "4.0.2",
-    "gulp-concat": "2.6.1"
+    "gulp-concat": "2.6.1",
+    "openapi-typescript-codegen": "^0.23.0"
   }
 }

@@ -8,6 +8,7 @@ import { CORE_INITIALIZER } from './core-initialiser';
 import { StepMaterialModule } from './modules/step-material/step-material.module';
 import { HasRightPipe } from './pipes/has-right.pipe';
 import { TableModule } from './modules/table/table.module';
+import { StepClientModule } from './client/generated/StepClientModule';
 
 @NgModule({
   declarations: [TooltipDirective, HasRightPipe],
@@ -19,6 +20,7 @@ import { TableModule } from './modules/table/table.module';
     UpgradeModule,
     StepMaterialModule,
     TableModule,
+    StepClientModule
   ],
   exports: [
     CommonModule,
@@ -30,6 +32,7 @@ import { TableModule } from './modules/table/table.module';
     StepMaterialModule,
     HasRightPipe,
     TableModule,
+    StepClientModule
   ],
   providers: [CORE_INITIALIZER],
 })
@@ -53,3 +56,4 @@ export * from './directives/tooltip.directive';
 export * from './pipes/has-right.pipe';
 export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
+export * from './client/generated/index';
