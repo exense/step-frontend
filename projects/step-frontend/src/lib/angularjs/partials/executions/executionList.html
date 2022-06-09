@@ -7,7 +7,7 @@
 			<st-column name="description">
 				<header>Description</header>
 				<second-header><inputdropdown action="search" initial-value="initialValue"></inputdropdown></second-header>
-				<cell><entity-icon entity="row" entity-name="'executions'"/><report-node-icon node="row.rootReportNode" /> <a href="#/root/test/{{row.id}}">{{row.description}}</a></cell>
+				<cell><entity-icon entity="row" entity-name="'executions'"/><report-node-icon node="row.rootReportNode" /> <a href="#/root/executions/{{row.id}}">{{row.description}}</a></cell>
 			</st-column>
 			<st-column name="startTime">
 				<header>Start time</header>
@@ -44,6 +44,8 @@
 							</td>
 						</tr>
 					</table>
+					<a style="position: absolute; right: -20px; display: block; width: 8px; height: 8px; background: rgba(0,169,0,0.33); border-radius: 50%;"
+					   href="#/root/test/{{row.id}}"></a>
 				</cell>
 			</st-column>
 		</st-columns>

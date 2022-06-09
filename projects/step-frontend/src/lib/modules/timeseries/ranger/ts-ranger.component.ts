@@ -80,7 +80,6 @@ export class TsRangerComponent implements OnInit, AfterViewInit {
                 off("mouseup", document, _onUp);
                 off("mousemove", document, _onMove);
                 let linkedCharts = uPlot.sync('test').plots;
-                console.log(this.uplot);
                 let minMax: any = {
                     min: this.uplot.posToVal(this.uplot.select.left , 'x'),
                     max: this.uplot.posToVal(this.uplot.select.left + this.uplot.select.width , 'x'),
@@ -109,7 +108,6 @@ export class TsRangerComponent implements OnInit, AfterViewInit {
 
         // @ts-ignore
         let zoom = (newLft, newWid) => {
-            console.log('zoom');
             // minMax.min = this.uplot.posToVal(newLft, 'x');
             // minMax.max = this.uplot.posToVal(newLft + newWid, 'x');
             // uZoomed.setScale('x', minMax);
@@ -173,7 +171,6 @@ export class TsRangerComponent implements OnInit, AfterViewInit {
                         uRanger.setSelect({left, width, height}, false);
 
                         const sel = uRanger.root.querySelector(".u-select");
-                        console.log(sel);
 
                         // @ts-ignore
                         on("mousedown", sel, e => {
@@ -197,7 +194,6 @@ export class TsRangerComponent implements OnInit, AfterViewInit {
                 setSelect: [
                     // @ts-ignore
                     uRanger => {
-                        console.log('SET SELECT', uRanger);
                         zoom(uRanger.select.left, uRanger.select.width);
                     }
                 ],

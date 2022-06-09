@@ -24,4 +24,21 @@
   }
 }
 
+.pie-chart-container {
+  width: 300px;
+}
+
+.color-cell {
+  display: flex;
+  align-items: center;
+
+
+  .color-square {
+    display: inline-block;
+    width: 38px;
+    height: 14px;
+    margin-right: 12px;
+  }
+
+}
 

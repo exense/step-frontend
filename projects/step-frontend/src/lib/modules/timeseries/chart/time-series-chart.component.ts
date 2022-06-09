@@ -70,6 +70,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         const opts = {
             title: this.settings.title,
             ...getSize(),
+            legend: {show: this.settings.showLegend},
             cursor: cursorOpts,
             scales: {
                 x: {
