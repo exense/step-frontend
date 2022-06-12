@@ -7,6 +7,10 @@ import {TSRangerSettings} from '../ranger/ts-ranger-settings';
 import {FindBucketsRequest} from '../find-buckets-request';
 import {SeriesColorsPool} from '../util/series-colors-pool';
 import {Bucket} from '../bucket';
+import {TimeSeriesChartComponent} from '../chart/time-series-chart.component';
+import {KeyValue} from '@angular/common';
+import {TSTimeRange} from '../chart/model/ts-time-range';
+import {TSRangerComponent} from '../ranger/ts-ranger.component';
 
 declare const uPlot: any;
 
@@ -17,13 +21,19 @@ declare const uPlot: any;
 })
 export class ExecutionPageComponent implements OnInit {
 
+    syncKey = 'test';
     executionId = window.location.href.split('/').slice(-1)[0]; // last part of URL
 
     chart1Settings: TSChartSettings;
     chart2Settings: TSChartSettings;
     chart3Settings: TSChartSettings;
     chart4Settings: TSChartSettings;
+    chart5Settings: TSChartSettings;
     rangerSettings: TSRangerSettings;
+
+    @ViewChild('ranger') ranger: TSRangerComponent;
+    @ViewChild('chart4') chart4: TimeSeriesChartComponent;
+    @ViewChild('chart5') chart5: TimeSeriesChartComponent;
 
     tableColumns = ['name', 'count', 'sum', 'avg', 'min', 'max'];
     tableDataSource: Bucket[] = [];
@@ -33,14 +43,31 @@ export class ExecutionPageComponent implements OnInit {
 
     barsFunction = uPlot.paths.bars;
 
+    keywords: {[key: string]: {isSelected: boolean, color: string}} = {};
+    keywordSearchValue: string;
+
     // @ts-ignore
     paths = (u, seriesIdx: number, idx0: number, idx1: number, extendGap, buildClip) => {
         return this.barsFunction(u, seriesIdx, idx0, idx1, extendGap, buildClip);
     }
 
+    valueAscOrder = (a: KeyValue<string,any>, b: KeyValue<string,any>): number => {
+        return a.key.localeCompare(b.key);
+    }
+
+    onKeywordToggle(keyword: string) {
+        this.chart4.toggleSeries(keyword);
+        this.chart5.toggleSeries(keyword);
+        // let filteredSource: Bucket[] = [];
+        // this.tableDataSource.forEach(e => {
+        //     if (this.keywords[e.attributes.name].isSelected) {
+        //         filteredSource.push(e);
+        //     }
+        // });
+        // this.tableDataSource = filteredSource;
+    }
 
     constructor(private timeSeriesService: TimeSeriesService) {
-        console.log(this.barsFunction);
     }
 
     ngOnInit(): void {
@@ -55,10 +82,14 @@ export class ExecutionPageComponent implements OnInit {
             request.end = details.endTime + 1;
             this.createTableChart(request);
             this.createByStatusChart(request);
-            this.createMeasurementsChart(request);
+            this.createByMeasurementsCharts(request);
             this.createSummaryChart(request);
             this.createRanger(request);
         });
+    }
+
+    onZoomReset() {
+        console.log('zoom reset!');
     }
 
     createRanger(request: FindBucketsRequest) {
@@ -136,19 +167,22 @@ export class ExecutionPageComponent implements OnInit {
         });
     }
 
+
+
     createTableChart(request: FindBucketsRequest) {
         let dimensionKey = 'name';
         this.timeSeriesService.fetchBucketsNew({...request, groupDimensions: [dimensionKey], numberOfBuckets: 1}).subscribe(response => {
             console.log(response);
             this.tableDataSource = response.matrix.map((series, i) => {
-                console.log(series);
                 if (series.length != 1) { // we should have just one bucket
                     throw new Error('Something went wrong');
                 }
                 let attributes = response.matrixKeys[i];
                 series[0].attributes = attributes;
-                series[0].attributes.color = this.colorsPool.getColor(attributes[dimensionKey]);
+                let color = this.colorsPool.getColor(attributes[dimensionKey]);
+                series[0].attributes.color = color;
                 series[0].attributes.avg = (series[0].sum / series[0].count).toFixed(0);
+                this.keywords[attributes[dimensionKey]] = {color: color, isSelected: true};
                 return series[0];
             });
             this.tableIsLoading = false;
@@ -201,31 +235,41 @@ export class ExecutionPageComponent implements OnInit {
         });
     }
 
-    createMeasurementsChart(request: FindBucketsRequest) {
+    createByMeasurementsCharts(request: FindBucketsRequest) {
         let dimensionKey = 'name';
         this.timeSeriesService.fetchBucketsNew({...request, groupDimensions: [dimensionKey]}).subscribe(response => {
             let timeLabels = this.createTimeLabels(response.start, response.end, response.interval);
             let totalData: number[] = Array(response.matrix[0].length); // TODO handle empty response
+            let avgSeries :TSChartSeries[] = [];
+            let countSeries = [];
             let series = response.matrixKeys.map((key, i) => {
                 key = key[dimensionKey];
+                let avgSeriesData: number[] = [];
                 let color = this.colorsPool.getColor(key);
-                let seriesData = response.matrix[i].map((b, j) => {
+                let countData = response.matrix[i].map((b, j) => {
                     let bucketValue = b?.count;
                     if (totalData[j] == undefined) {
                         totalData[j] = bucketValue;
                     } else if (bucketValue) {
                         totalData[j] += bucketValue;
                     }
+                    if (b) {
+                        avgSeriesData.push(b.sum / b.count);
+                    }
                     return bucketValue;
                 });
-                return {
+                let series = {
                     scale: '1',
                     label: key,
-                    data: seriesData,
+                    id: key,
+                    data: countData,
                     value: (x, v) => Math.trunc(v) + ' hits',
                     stroke: color,
                     points: {show: false}
                 } as TSChartSeries;
+                countSeries.push(series);
+                avgSeries.push({...series, data: avgSeriesData});
+                return series;
             });
 
             this.chart4Settings = {
@@ -261,8 +305,20 @@ export class ExecutionPageComponent implements OnInit {
                         grid: {show: false},
 
                     }
-                ],
-                autoResize: true
+                ]
+            };
+
+            this.chart5Settings = {
+                title: 'Response time by keywords',
+                xValues: timeLabels,
+                showLegend: true,
+                series: avgSeries,
+                axes: [
+                    {
+                        scale: '1',
+                        values: (u, vals, space) => vals.map(v => +v.toFixed(2) + " hits"),
+                    },
+                ]
             };
         });
     }
@@ -281,6 +337,10 @@ export class ExecutionPageComponent implements OnInit {
         };
     }
 
+    onRangeChange(newRange: TSTimeRange) {
+        console.log('RANGE CHANGED');
+    }
+
     random_rgba() {
         var o = Math.round, r = Math.random, s = 255;
         let alpha = Math.max(Number(r().toFixed(1)), 0.5);
@@ -289,7 +349,6 @@ export class ExecutionPageComponent implements OnInit {
 
     createTimeLabels(start: number, end: number, interval: number): number[] {
         let intervals = Math.ceil((end - start) / interval);
-        console.log(intervals);
         const result = Array(intervals);
         for (let i = 0; i < intervals; i++) {
             result[i] = (start + (i * interval)) / 1000; // uplot uses seconds

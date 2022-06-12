@@ -1,10 +1,10 @@
 import {
     AfterViewInit,
     Component,
-    ElementRef,
+    ElementRef, EventEmitter,
     Input,
     OnChanges,
-    OnInit,
+    OnInit, Output,
     Self,
     SimpleChanges,
     ViewChild
@@ -29,9 +29,12 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
     @Input('settings') settings: TSChartSettings;
     @Input('syncKey') syncKey: string;
-    @Input('type') type: 'standard' | 'ranger' = 'standard';
+
+    @Output('onZoomReset') onZoomReset = new EventEmitter();
 
     uplot: uPlot;
+
+    seriesIndexesByIds: {[key: string]: number} = {};
 
     constructor(@Self() private element: ElementRef) {
     }
@@ -51,21 +54,39 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
             }
         }
 
+
         const cursorOpts = {
-                lock: true,
-                focus: {
-                    prox: 16,
-                },
+                lock: false,
+                // focus: {
+                //     prox: 16,
+                // },
                 y: false,
-                sync: {}
+                sync: {},
+                bind: {
+                    // @ts-ignore
+                    dblclick: (self, b, handler) => {
+                                return (e: any) => {
+                                    console.log(self);
+                                    this.onZoomReset.emit(true);
+                                    handler(e);
+                                    console.log(self.select.width);
+                                };
+                    }
+                }
             };
         if (this.syncKey) {
             cursorOpts.sync = {
                 key: this.syncKey,
-                    setSeries: true,
+                    setSeries: false,
                     match: [UplotSyncService.syncFunction, UplotSyncService.syncFunction],
             }
         }
+
+        this.settings.series.forEach((series, i) => {
+            if (series.id) {
+                this.seriesIndexesByIds[series.id] = i + 1; // because the first series is the time
+            }
+        })
 
         const opts = {
             title: this.settings.title,
@@ -89,28 +110,14 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
                 },
                 ...this.settings.series
             ],
+            hooks: {
+                // setSelect: [ () => console.log('select')],
+                // setScale: [ () => console.log('scale')]
+            }
         };
 
-        if (this.type === 'ranger') {
-            // @ts-ignore
-            opts.hooks = {
-                hooks: {
-                    ready: [
-                        (uRanger: any) => {
-                            let height = uRanger.bbox.height / devicePixelRatio;
-                            uRanger.setSelect({height}, false);
-                        }
-                    ]
-                }
-            };
-            // @ts-ignore
-            opts.legend = {show: false}; opts.scales = {x: {time: false}};
-
-        }
-
         this.uplot = new uPlot(opts, [this.settings.xValues, ...this.settings.series.map(s => s.data)], this.chartElement.nativeElement);
-
-        if (this.settings.autoResize) {
+        if (this.settings.autoResize !== false) {
             window.addEventListener("resize", e => {
                 this.uplot.setSize(getSize());
             });
@@ -123,6 +130,25 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
     update(): void {
 
+    }
+
+    showSeries(id: string) {
+        let index = this.seriesIndexesByIds[id];
+        if (index == undefined) return;
+        this.uplot.setSeries(index, {show: true});
+    }
+
+    hideSeries(id: string) {
+        let index = this.seriesIndexesByIds[id];
+        if (index == undefined) return;
+        this.uplot.setSeries(index, {show: false});
+    }
+
+    toggleSeries(id: string) {
+        let index = this.seriesIndexesByIds[id];
+        if (index == undefined) return;
+        let currentState = this.uplot.series[index].show;
+        this.uplot.setSeries(index, {show: !currentState});
     }
 
 }

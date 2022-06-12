@@ -8,9 +8,10 @@ import { CORE_INITIALIZER } from './core-initialiser';
 import { StepMaterialModule } from './modules/step-material/step-material.module';
 import { HasRightPipe } from './pipes/has-right.pipe';
 import { TableModule } from './modules/table/table.module';
+import {TextFilterPipePipe} from './pipes/filter.pipe';
 
 @NgModule({
-  declarations: [TooltipDirective, HasRightPipe],
+  declarations: [TooltipDirective, HasRightPipe, TextFilterPipePipe],
   imports: [
     CommonModule,
     FormsModule,
@@ -30,6 +31,7 @@ import { TableModule } from './modules/table/table.module';
     StepMaterialModule,
     HasRightPipe,
     TableModule,
+    TextFilterPipePipe
   ],
   providers: [CORE_INITIALIZER],
 })

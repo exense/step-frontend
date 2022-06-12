@@ -4,14 +4,17 @@ import { StepCoreModule } from '@exense/step-core';
 import {ExecutionPageComponent} from "./execution-page/execution-page.component";
 import {TimeSeriesChartComponent} from "./chart/time-series-chart.component";
 import {ExecutionTabsComponent} from './execution-page/tabs/execution-tabs.component';
-import {TsRangerComponent} from './ranger/ts-ranger.component';
+import {TSRangerComponent} from './ranger/ts-ranger.component';
 import { TableModule } from '@exense/step-core';
-import * as uPlot from "uplot"; // this is mandatory for compile
+import * as uPlot from "uplot";
+import {FormsModule} from '@angular/forms';
+import {MatTableModule} from '@angular/material/table';
+import {CommonModule} from '@angular/common'; // this is mandatory for compile
 
 @NgModule({
-  declarations: [ExecutionPageComponent, TimeSeriesChartComponent, ExecutionTabsComponent, TsRangerComponent],
+  declarations: [ExecutionPageComponent, TimeSeriesChartComponent, ExecutionTabsComponent, TSRangerComponent],
   exports: [ExecutionPageComponent],
-  imports: [StepCoreModule, TableModule],
+  imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule],
 })
 export class TimeSeriesModule {
 }

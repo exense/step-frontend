@@ -1,6 +1,7 @@
-import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation} from '@angular/core';
 import {TSRangerSettings} from './ts-ranger-settings';
 import {UplotSyncService} from '../chart/uplot-sync-service';
+import {TSTimeRange} from '../chart/model/ts-time-range';
 
 declare const uPlot: any;
 
@@ -10,21 +11,31 @@ declare const uPlot: any;
     styleUrls: ['./ts-ranger.component.scss'],
     encapsulation: ViewEncapsulation.None
 })
-export class TsRangerComponent implements OnInit, AfterViewInit {
+export class TSRangerComponent implements OnInit, AfterViewInit {
 
     @ViewChild('chart') private chartElement: ElementRef;
 
     @Input('settings') settings: TSRangerSettings;
     @Input('syncKey') syncKey: string;
 
+    @Output('onRangeChange') onRangeChange = new EventEmitter<TSTimeRange>();
+
     uplot: any;
+    lastRange: TSTimeRange;
 
     ngOnInit(): void {
-        uPlot.sync(this.syncKey);
+        if (this.syncKey) {
+            uPlot.sync(this.syncKey);
+        }
+
     }
 
     ngAfterViewInit(): void {
         this.createRanger();
+    }
+
+    resetSelect() {
+
     }
 
     createRanger() {
@@ -79,11 +90,12 @@ export class TsRangerComponent implements OnInit, AfterViewInit {
             const _onUp = e => {
                 off("mouseup", document, _onUp);
                 off("mousemove", document, _onMove);
-                let linkedCharts = uPlot.sync('test').plots;
+                let linkedCharts = uPlot.sync(this.syncKey).plots;
                 let minMax: any = {
                     min: this.uplot.posToVal(this.uplot.select.left , 'x'),
                     max: this.uplot.posToVal(this.uplot.select.left + this.uplot.select.width , 'x'),
                 };
+                this.emitRangeEventIfChanged();
                 linkedCharts.forEach((chart: any) => {
                     if (chart === this.uplot) { // TODO find a better way to avoid this
                         return;
@@ -92,6 +104,7 @@ export class TsRangerComponent implements OnInit, AfterViewInit {
                     // minMax.max = this.uplot.posToVal(newLft + newWid, 'x');
                     chart.setScale('x', minMax);
                 })
+
                 // viaGrip = false;
             };
             on("mouseup", document, _onUp);
@@ -138,7 +151,7 @@ export class TsRangerComponent implements OnInit, AfterViewInit {
                     y: false,
                 },
                 sync: {
-                    key: "test"
+                    key: this.syncKey
                 }
             },
             legend: {
@@ -169,10 +182,10 @@ export class TsRangerComponent implements OnInit, AfterViewInit {
                         let width = Math.round(uRanger.valToPos(this.settings.max, 'x')) - left;
                         let height = uRanger.bbox.height / devicePixelRatio;
                         uRanger.setSelect({left, width, height}, false);
-
+                        this.lastRange = {start: this.settings.min, end: this.settings.max};
                         const sel = uRanger.root.querySelector(".u-select");
 
-                        // @ts-ignore
+                        //@ts-ignore
                         on("mousedown", sel, e => {
                             // @ts-ignore
                             bindMove(e, e => update(lft0 + (e.clientX - x0), wid0));
@@ -194,12 +207,39 @@ export class TsRangerComponent implements OnInit, AfterViewInit {
                 setSelect: [
                     // @ts-ignore
                     uRanger => {
-                        zoom(uRanger.select.left, uRanger.select.width);
+                        // this is triggered when the synced charts are zooming
+                        // this is triggered many times when clicking on the ranger.
+                        this.emitRangeEventIfChanged();
+
+                        // zoom(uRanger.select.left, uRanger.select.width);
+                    }
+                ],
+                setScale: [
+                    // @ts-ignore
+                    uRanger => {
+                        // this.onRangeChange.next(this.getCurrentRange());
+                        // this is triggered when the synced charts are zooming
+                        // zoom(uRanger.select.left, uRanger.select.width);
                     }
                 ],
             }
         };
         this.uplot = new uPlot(rangerOpts, [this.getXValues(), ...this.settings.series.map(s => s.data)], this.chartElement.nativeElement);
+    }
+
+    getCurrentRange(): TSTimeRange {
+        let u = this.uplot;
+        let min = u.posToVal(u.select.left, 'x');
+        let max = u.posToVal(u.select.left + u.select.width, 'x');
+        return {start: min, end: max};
+    }
+
+    emitRangeEventIfChanged() {
+        let currentRange = this.getCurrentRange();
+        if (currentRange.start != this.lastRange.start || currentRange.end !== this.lastRange.end) {
+            this.lastRange = currentRange;
+            this.onRangeChange.next(currentRange);
+        }
     }
 
     getXValues(): number[] {
