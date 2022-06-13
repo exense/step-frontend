@@ -102,7 +102,7 @@ export class ParametersService {
      * @returns Parameter default response
      * @throws ApiError
      */
-    public getAll5(
+    public getAll4(
         skip?: number,
         limit?: number,
     ): Observable<Array<Parameter>> {

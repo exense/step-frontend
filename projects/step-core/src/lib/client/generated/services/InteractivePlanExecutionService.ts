@@ -43,7 +43,7 @@ export class InteractivePlanExecutionService {
      * @returns string default response
      * @throws ApiError
      */
-    public start1(
+    public start(
         requestBody?: ExecutionParameters,
     ): Observable<string> {
         return this.httpRequest.request({

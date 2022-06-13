@@ -7,7 +7,6 @@ import type { Observable } from 'rxjs';
 import type { AggregationRequest } from '../models/AggregationRequest';
 import type { ComparisonRequest } from '../models/ComparisonRequest';
 import type { DirectMongoQuery } from '../models/DirectMongoQuery';
-import type { ExecutionReport } from '../models/ExecutionReport';
 import type { FileVersion } from '../models/FileVersion';
 import type { FileVersionId } from '../models/FileVersionId';
 import type { FormDataContentDisposition } from '../models/FormDataContentDisposition';
@@ -628,61 +627,6 @@ export class DefaultService {
             url: '/grid/file/unregister',
             body: requestBody,
             mediaType: 'application/json',
-        });
-    }
-
-    /**
-     * @param id
-     * @returns string default response
-     * @throws ApiError
-     */
-    public next(
-        id: string,
-    ): Observable<string> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/cypress/{id}/next',
-            path: {
-                'id': id,
-            },
-        });
-    }
-
-    /**
-     * @param id
-     * @param requestBody
-     * @returns any default response
-     * @throws ApiError
-     */
-    public report(
-        id: string,
-        requestBody?: ExecutionReport,
-    ): Observable<any> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/cypress/{id}/report',
-            path: {
-                'id': id,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
-
-    /**
-     * @param id
-     * @returns any default response
-     * @throws ApiError
-     */
-    public start(
-        id: string,
-    ): Observable<any> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/cypress/{id}/start',
-            path: {
-                'id': id,
-            },
         });
     }
 

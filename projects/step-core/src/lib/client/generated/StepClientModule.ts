@@ -14,23 +14,16 @@ import { AdminService } from './services/AdminService';
 import { CollectionsService } from './services/CollectionsService';
 import { ControllerService } from './services/ControllerService';
 import { DefaultService } from './services/DefaultService';
-import { DocumentCompareService } from './services/DocumentCompareService';
-import { EventBrokerService } from './services/EventBrokerService';
 import { ExecutionsService } from './services/ExecutionsService';
 import { ExportsService } from './services/ExportsService';
 import { GridService } from './services/GridService';
-import { HousekeepingService } from './services/HousekeepingService';
 import { ImportsService } from './services/ImportsService';
 import { InteractivePlanExecutionService } from './services/InteractivePlanExecutionService';
 import { KeywordEditorService } from './services/KeywordEditorService';
 import { KeywordPackagesService } from './services/KeywordPackagesService';
 import { KeywordsService } from './services/KeywordsService';
-import { MonitoringDashboardService } from './services/MonitoringDashboardService';
-import { NotificationsService } from './services/NotificationsService';
 import { ParametersService } from './services/ParametersService';
-import { PlanEditorService } from './services/PlanEditorService';
 import { PlansService } from './services/PlansService';
-import { ProjectsService } from './services/ProjectsService';
 import { QuotaManagerService } from './services/QuotaManagerService';
 import { ReferencesService } from './services/ReferencesService';
 import { ResourcesService } from './services/ResourcesService';
@@ -66,23 +59,16 @@ import { TablesService } from './services/TablesService';
         CollectionsService,
         ControllerService,
         DefaultService,
-        DocumentCompareService,
-        EventBrokerService,
         ExecutionsService,
         ExportsService,
         GridService,
-        HousekeepingService,
         ImportsService,
         InteractivePlanExecutionService,
         KeywordEditorService,
         KeywordPackagesService,
         KeywordsService,
-        MonitoringDashboardService,
-        NotificationsService,
         ParametersService,
-        PlanEditorService,
         PlansService,
-        ProjectsService,
         QuotaManagerService,
         ReferencesService,
         ResourcesService,
