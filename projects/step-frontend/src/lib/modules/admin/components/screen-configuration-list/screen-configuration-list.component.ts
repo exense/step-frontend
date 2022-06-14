@@ -95,7 +95,7 @@ export class ScreenConfigurationListComponent implements OnDestroy {
       });
   }
 
-  optionsToString(options: Array<Option>): string {
+  optionsToString(options?: Array<Option>): string {
     return options ? options.map((option: Option) => option.value).toString() : '';
   }
 
