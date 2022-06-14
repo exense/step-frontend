@@ -7,6 +7,7 @@ import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
 import { AJS_LOCATION, AJS_PREFERENCES, AJS_ROOT_SCOPE, AJS_UIB_MODAL } from '../shared/angularjs-providers';
 import { AJS_MODULE } from '../shared/constants';
 import { a1Promise2Promise } from '../shared/utils';
+import { AdditionalRightRuleService } from './additional-right-rule.service';
 
 export interface AuthContext {
   userID: string;
@@ -26,8 +27,13 @@ export class AuthService implements OnDestroy {
     @Inject(AJS_LOCATION) private _$location: any,
     @Inject(DOCUMENT) private _document: Document,
     @Inject(AJS_PREFERENCES) private _preferences: any,
-    @Inject(AJS_UIB_MODAL) private _$uibModal: any
+    @Inject(AJS_UIB_MODAL) private _$uibModal: any,
+    private _additionalRightRules: AdditionalRightRuleService
   ) {}
+
+  private _triggerRightCheck$ = new BehaviorSubject<unknown>(undefined);
+
+  readonly triggerRightCheck$ = this._triggerRightCheck$.asObservable();
 
   private _serviceContext: { conf?: ConfigDto } = {};
 
@@ -45,6 +51,7 @@ export class AuthService implements OnDestroy {
     };
     this._$rootScope.context = context;
     this._context$.next(context);
+    this.triggerRightCheck();
     this._preferences.load();
   }
 
@@ -116,16 +123,8 @@ export class AuthService implements OnDestroy {
   }
 
   hasRight(right: string): boolean {
-    // don't allow write- or delete- actions in the [All] tenant except for user and project
-    if (
-      this._$rootScope.tenant &&
-      (this._$rootScope.tenant.name === '[All]' || this._$rootScope.tenant.name === '[None]') &&
-      !(right.startsWith('user') || right.startsWith('project')) &&
-      (right.endsWith('-write') ||
-        right.endsWith('-delete') ||
-        right.endsWith('-execute') ||
-        right.endsWith('dashboard-configure'))
-    ) {
+    const additionalRulesCheckResult = this._additionalRightRules.checkRight(right);
+    if (!additionalRulesCheckResult) {
       return false;
     }
 
@@ -158,8 +157,13 @@ export class AuthService implements OnDestroy {
     return a1Promise2Promise(modalInstance.result);
   }
 
+  triggerRightCheck(): void {
+    this._triggerRightCheck$.next(undefined);
+  }
+
   ngOnDestroy(): void {
     this._context$.complete();
+    this._triggerRightCheck$.complete();
   }
 }
 

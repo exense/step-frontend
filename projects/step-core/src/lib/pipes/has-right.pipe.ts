@@ -8,7 +8,7 @@ import { AuthService } from '../services/auth.service';
 export class HasRightPipe implements PipeTransform {
   constructor(private _authService: AuthService) {}
 
-  transform(right: string): Observable<boolean> {
-    return this._authService.context$.pipe(map((ctx) => (!ctx ? false : this._authService.hasRight(right))));
+  transform(right: string, marker?: string): Observable<boolean> {
+    return this._authService.triggerRightCheck$.pipe(map((_) => this._authService.hasRight(right)));
   }
 }
