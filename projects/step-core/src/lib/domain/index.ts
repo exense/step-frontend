@@ -6,3 +6,7 @@ export * from './user-preferences-dto';
 export * from './session-dto';
 export * from './async-task-result-dto';
 export * from './async-task-result-item-dto';
+export * from './screen-dto';
+export * from './screen-input-dto';
+export * from './screen-input-option-dto';
+export * from './screen-input-activation-expression-dto';

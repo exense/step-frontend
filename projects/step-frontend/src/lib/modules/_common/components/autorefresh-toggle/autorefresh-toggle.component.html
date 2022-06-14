@@ -1,0 +1,8 @@
+<button mat-raised-button [matMenuTriggerFor]="menu">
+  <mat-icon>autorenew</mat-icon>
+</button>
+<mat-menu #menu="matMenu">
+  <button *ngFor="let p of presets" (click)="changeRefreshInterval(p.value)" mat-menu-item>
+    {{ p.label }}
+  </button>
+</mat-menu>

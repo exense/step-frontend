@@ -11,7 +11,7 @@
     <div class="tab-pane ng-scope" ng-repeat="tab in tabs track by tab.id" ng-class="{active: isTabActive(tab.id)}">
       <div ng-if="tab.type=='list'">
         <div class="panel-body">
-          <div ng-include="'partials/executions/executionList.html'"></div>
+          <step-execution-list></step-execution-list>
         </div>
       </div>
       <div class="panel-body" ng-if="tab.type=='progress'">

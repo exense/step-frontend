@@ -1,0 +1,5 @@
+<div class="distribution" [matTooltip]="tooltipMessage">
+  <div class="bar-PASSED" [style.width.%]="percentPassed">{{ passed }}</div>
+  <div class="bar-FAILED" [style.width.%]="percentFailed">{{ failed }}</div>
+  <div class="bar-TECHNICAL_ERROR" [style.width.%]="percentTechError">{{ techError }}</div>
+</div>

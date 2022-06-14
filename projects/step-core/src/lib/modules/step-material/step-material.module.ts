@@ -29,6 +29,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { BtnGroupComponent } from './components/btn-group/btn-group.component';
+import { MatLuxonDateModule } from '@angular/material-luxon-adapter';
 
 @NgModule({
   imports: [CommonModule],
@@ -60,6 +61,7 @@ import { BtnGroupComponent } from './components/btn-group/btn-group.component';
     MatToolbarModule,
     MatButtonModule,
     MatTooltipModule,
+    MatLuxonDateModule,
     OverlayModule,
     PortalModule,
     BtnGroupComponent,

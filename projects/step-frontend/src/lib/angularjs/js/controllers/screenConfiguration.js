@@ -98,59 +98,6 @@ angular
     return api;
   })
 
-  .controller(
-    'ScreenConfigurationCtrl',
-    function ($rootScope, $scope, $http, stateStorage, ScreenTemplates, Dialogs, InputDialogs, AuthService) {
-      stateStorage.push($scope, 'screenconfiguration', {});
-      $scope.authService = AuthService;
-
-      $scope.currentScreenId = 'executionParameters';
-
-      ScreenTemplates.getScreens().then(function (res) {
-        $scope.screens = res;
-      });
-
-      function reload() {
-        $http.get('rest/screens/input/byscreen/' + $scope.currentScreenId).then(function (res) {
-          $scope.screenInputs = res.data;
-          ScreenTemplates.clearCache();
-        });
-      }
-
-      $scope.reload = reload;
-
-      reload();
-
-      $scope.addInput = function () {
-        InputDialogs.editScreenInput(null, $scope.currentScreenId, function () {
-          reload();
-        });
-      };
-
-      $scope.editInput = function (id) {
-        InputDialogs.editScreenInput(id, null, function () {
-          reload();
-        });
-      };
-
-      $scope.moveInput = function (id, offset) {
-        $http.post('rest/screens/input/' + id + '/move', offset).then(function () {
-          reload();
-        });
-      };
-
-      $scope.deleteInput = function (id, name) {
-        Dialogs.showDeleteWarning(1, 'Input "' + name + '"').then(function () {
-          $http.delete('rest/screens/input/' + id).then(function () {
-            reload();
-          });
-        });
-      };
-
-      $scope.tableHandle = {};
-    }
-  )
-
   .factory('InputDialogs', function ($uibModal, $http, Dialogs) {
     function openModal(id, screenId) {
       var modalInstance = $uibModal.open({
