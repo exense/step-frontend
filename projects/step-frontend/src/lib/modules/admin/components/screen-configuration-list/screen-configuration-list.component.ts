@@ -41,14 +41,14 @@ export class ScreenConfigurationListComponent implements OnDestroy {
   readonly searchableScreens$ = new TableLocalDataSource(this.screens$, {
     searchPredicates: {
       label: (item: ScreenDto, searchValue: string) =>
-        item?.input?.label.toLowerCase().includes(searchValue.toLowerCase()),
-      id: (item: ScreenDto, searchValue: string) => item?.input?.id.toLowerCase().includes(searchValue.toLowerCase()),
+        item.input!.label!.toLowerCase().includes(searchValue.toLowerCase()),
+      id: (item: ScreenDto, searchValue: string) => item.input!.id!.toLowerCase().includes(searchValue.toLowerCase()),
       type: (item: ScreenDto, searchValue: string) =>
-        item?.input?.type.toLowerCase().includes(searchValue.toLowerCase()),
+        item.input!.type!.toLowerCase().includes(searchValue.toLowerCase()),
       options: (item: ScreenDto, searchValue: string) =>
-        this.optionsToString(item?.input?.options).toLowerCase().includes(searchValue.toLowerCase()),
+        this.optionsToString(item.input?.options).toLowerCase().includes(searchValue.toLowerCase()),
       activationScript: (item: ScreenDto, searchValue: string) =>
-        item?.input?.activationExpression?.script.toLowerCase().includes(searchValue.toLowerCase()),
+        item.input!.activationExpression!.script!.toLowerCase().includes(searchValue.toLowerCase()),
     },
   });
 
@@ -98,7 +98,7 @@ export class ScreenConfigurationListComponent implements OnDestroy {
       });
   }
 
-  optionsToString(options: Array<ScreenInputOptionDto>): string {
+  optionsToString(options?: Array<ScreenInputOptionDto>): string {
     return options ? options.map((option: ScreenInputOptionDto) => option.value).toString() : '';
   }
 
