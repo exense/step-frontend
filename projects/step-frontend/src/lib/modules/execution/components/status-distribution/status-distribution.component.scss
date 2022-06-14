@@ -1,0 +1,20 @@
+@use 'sass:map';
+@import '../../../_common/styles/variables';
+
+@mixin bar($status) {
+  .bar-#{$status} {
+    background: map-get($statuses, $status);
+    color: #fff;
+    text-align: center;
+  }
+}
+
+div.distribution {
+  display: flex;
+  width: 160px;
+  box-shadow: inset rgba(0, 0, 0, 0.3) 0px 1px 3px 0px;
+
+  @include bar('PASSED');
+  @include bar('FAILED');
+  @include bar('TECHNICAL_ERROR');
+}

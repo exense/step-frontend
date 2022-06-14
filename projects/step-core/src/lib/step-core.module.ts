@@ -8,6 +8,8 @@ import { CORE_INITIALIZER } from './core-initialiser';
 import { StepMaterialModule } from './modules/step-material/step-material.module';
 import { HasRightPipe } from './pipes/has-right.pipe';
 import { TableModule } from './modules/table/table.module';
+import { MAT_LUXON_DATE_ADAPTER_OPTIONS, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
+import { MAT_DATE_FORMATS } from '@angular/material/core';
 
 @NgModule({
   declarations: [TooltipDirective, HasRightPipe],
@@ -31,7 +33,27 @@ import { TableModule } from './modules/table/table.module';
     HasRightPipe,
     TableModule,
   ],
-  providers: [CORE_INITIALIZER],
+  providers: [
+    CORE_INITIALIZER,
+    {
+      provide: MAT_LUXON_DATE_ADAPTER_OPTIONS,
+      useValue: { useUtc: true },
+    },
+    {
+      provide: MAT_DATE_FORMATS,
+      useValue: {
+        parse: {
+          dateInput: 'dd.MM.yyyy',
+        },
+        display: {
+          dateInput: 'dd.MM.yyyy',
+          monthYearLabel: 'MMM yyyy',
+          dateA11yLabel: 'LL',
+          monthYearA11yLabel: 'MMMM yyyy',
+        },
+      },
+    },
+  ],
 })
 export class StepCoreModule {}
 
