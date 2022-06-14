@@ -10,6 +10,7 @@ import {
   ContextService,
   Mutable,
   TableLocalDataSource,
+  ScreenDto,
 } from '@exense/step-core';
 import { BehaviorSubject, switchMap, of, catchError, noop, shareReplay, tap, map } from 'rxjs';
 import { ScreenApiService } from '../../services/screen-api.service';
@@ -39,13 +40,15 @@ export class ScreenConfigurationListComponent implements OnDestroy {
 
   readonly searchableScreens$ = new TableLocalDataSource(this.screens$, {
     searchPredicates: {
-      label: (item, searchValue) => item.input.label.toLowerCase().includes(searchValue.toLowerCase()),
-      id: (item, searchValue) => item.input.id.toLowerCase().includes(searchValue.toLowerCase()),
-      type: (item, searchValue) => item.input.type.toLowerCase().includes(searchValue.toLowerCase()),
-      options: (item, searchValue) =>
-        this.optionsToString(item.input?.options).toLowerCase().includes(searchValue.toLowerCase()),
-      activationScript: (item, searchValue) =>
-        item.input?.activationExpression.script.toLowerCase().includes(searchValue.toLowerCase()),
+      label: (item: ScreenDto, searchValue: string) =>
+        item?.input?.label.toLowerCase().includes(searchValue.toLowerCase()),
+      id: (item: ScreenDto, searchValue: string) => item?.input?.id.toLowerCase().includes(searchValue.toLowerCase()),
+      type: (item: ScreenDto, searchValue: string) =>
+        item?.input?.type.toLowerCase().includes(searchValue.toLowerCase()),
+      options: (item: ScreenDto, searchValue: string) =>
+        this.optionsToString(item?.input?.options).toLowerCase().includes(searchValue.toLowerCase()),
+      activationScript: (item: ScreenDto, searchValue: string) =>
+        item?.input?.activationExpression?.script.toLowerCase().includes(searchValue.toLowerCase()),
     },
   });
 
