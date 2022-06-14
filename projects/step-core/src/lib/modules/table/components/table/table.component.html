@@ -7,9 +7,14 @@
     [matColumnDef]="searchCol.colName"
   >
     <th mat-header-cell *matHeaderCellDef>
-      <mat-form-field *ngIf="searchCol.searchName">
-        <input matInput type="text" (change)="onSearch(searchCol.searchName, $event)" />
-      </mat-form-field>
+      <ng-template #defaultSearchRender>
+        <mat-form-field>
+          <input matInput type="text" (change)="onSearch(searchCol.searchName!, $event)" />
+        </mat-form-field>
+      </ng-template>
+      <ng-container *ngIf="searchCol.searchName">
+        <ng-container *ngIf="!!searchCol.template; then searchCol.template!; else defaultSearchRender"> </ng-container>
+      </ng-container>
     </th>
   </ng-container>
   <tr mat-header-row *matHeaderRowDef="displayColumns"></tr>

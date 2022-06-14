@@ -46,4 +46,9 @@ export class TableRestService {
     const params = this.createParams(tableRequest);
     return this._httpClient.post<TableResponse>(url, params);
   }
+
+  requestColumnValues(tableId: string, columnName: string): Observable<string[]> {
+    const url = `${ROOT}/${tableId}/column/${columnName}/distinct`;
+    return this._httpClient.get<string[]>(url);
+  }
 }

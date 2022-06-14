@@ -13,7 +13,7 @@ export class ScreenDialogsService {
     screen?: Partial<Input>,
     screenDbId?: string,
     screenChoice?: string
-  ): Observable<{ screen: Partial<Input>; result: string }> {
+  ): Observable<{ screen?: Partial<Input>; result: string }> {
     const modalInstance = this._uibModalHelper.open({
       backdrop: 'static',
       templateUrl: 'partials/screenconfiguration/editScreenInputDialog.html',

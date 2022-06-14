@@ -3,11 +3,12 @@ import { CollectionViewer } from '@angular/cdk/collections';
 import { BehaviorSubject, combineLatest, map, Observable, of, Subject, takeUntil } from 'rxjs';
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
+import { SearchValue } from './search-value';
 
 interface Request {
   page?: PageEvent;
   sort?: Sort;
-  search?: { [key: string]: string };
+  search?: { [key: string]: SearchValue };
 }
 
 export type SearchPredicate<T> = (item: T, searchValue: string) => boolean;
@@ -70,14 +71,15 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     this.data$ = requestResult$.pipe(map((r) => r.data));
   }
 
-  private applySearch(source: T[], search?: { [key: string]: string }): T[] {
+  private applySearch(source: T[], search?: { [key: string]: SearchValue }): T[] {
     if (!search || Object.keys(search).length === 0) {
       return source;
     }
 
     const predicates = Object.entries(search)
       .map(([column, value]) => {
-        const searchValue = (value || '').trim().toLowerCase();
+        let searchValue = typeof value === 'string' ? value : value?.value;
+        searchValue = (searchValue || '').trim().toLowerCase();
 
         if (!searchValue) {
           return undefined;
@@ -163,7 +165,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     this._request$.complete();
   }
 
-  getTableData(page?: PageEvent, sort?: Sort, search?: { [key: string]: string }): void {
+  getTableData(page?: PageEvent, sort?: Sort, search?: { [key: string]: SearchValue }): void {
     const request = { ...this._request$.value };
     request.page = page || request.page;
     request.sort = sort || request.sort;
