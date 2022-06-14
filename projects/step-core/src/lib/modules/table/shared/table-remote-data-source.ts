@@ -19,8 +19,15 @@ import { TableResponse } from '../services/api/dto/table-response';
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { TableDataSource } from './table-data-source';
+import { SearchValue } from './search-value';
 
 export class TableRequest {
+  columns: string[];
+  searchBy: { column: string; search: string; regex: boolean }[];
+  orderBy?: { column: string; order: 'asc' | 'desc' };
+  start?: number;
+  length?: number;
+
   constructor(data?: Partial<TableRequest>) {
     this.columns = data?.columns || [];
     this.searchBy = data?.searchBy || [];
@@ -28,12 +35,6 @@ export class TableRequest {
     this.start = data?.start || undefined;
     this.length = data?.length || undefined;
   }
-
-  columns: string[];
-  searchBy: { column: string; search: string; regex: boolean }[];
-  orderBy?: { column: string; order: 'asc' | 'desc' };
-  start?: number;
-  length?: number;
 }
 
 const convertTableRequest = (req: TableRequest): TableRequestData => {
@@ -80,8 +81,8 @@ const convertTableRequest = (req: TableRequest): TableRequestData => {
 export class TableRemoteDataSource<T> implements TableDataSource<T> {
   private _terminator$ = new Subject<any>();
   private _inProgress$ = new BehaviorSubject<boolean>(false);
+  readonly inProgress$ = this._inProgress$.asObservable();
   private _request$ = new BehaviorSubject<TableRequest | undefined>(undefined);
-
   private _response$: Observable<TableResponse | null> = this._request$.pipe(
     filter((x) => !!x),
     map((x) => convertTableRequest(x!)),
@@ -96,16 +97,12 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     shareReplay(1),
     takeUntil(this._terminator$)
   ) as Observable<TableResponse | null>;
-
   readonly data$: Observable<T[]> = this._response$.pipe(
     map((r) => r?.data || []),
     map((items) => items.map((x) => JSON.parse(x[0]) as T))
   );
-
   readonly total$ = this._response$.pipe(map((r) => r?.recordsTotal || 0));
   readonly totalFiltered$ = this._response$.pipe(map((r) => r?.recordsFiltered || 0));
-
-  readonly inProgress$ = this._inProgress$.asObservable();
 
   constructor(
     private _tableId: string,
@@ -124,9 +121,13 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     this._terminator$.complete();
   }
 
-  getTableData(page?: PageEvent, sort?: Sort, search?: { [key: string]: string }): void;
+  getTableData(page?: PageEvent, sort?: Sort, search?: { [key: string]: SearchValue }): void;
   getTableData(req: TableRequest): void;
-  getTableData(reqOrPage: TableRequest | PageEvent | undefined, sort?: Sort, search?: { [key: string]: string }): void {
+  getTableData(
+    reqOrPage: TableRequest | PageEvent | undefined,
+    sort?: Sort,
+    search?: { [key: string]: SearchValue }
+  ): void {
     if (arguments.length === 1 && reqOrPage instanceof TableRequest) {
       const req = reqOrPage as TableRequest;
       this._request$.next(req);
@@ -138,11 +139,21 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     const tableRequest: TableRequest = new TableRequest({
       columns: Object.values(this._requestColumnsMap),
       searchBy: Object.entries(search || {})
-        .map(([name, search]) => ({
-          column: this._requestColumnsMap[name],
-          regex: false,
-          search,
-        }))
+        .map(([name, searchValue]) => {
+          const column = this._requestColumnsMap[name];
+          let search: string;
+          let regex: boolean;
+
+          if (typeof searchValue === 'string') {
+            search = searchValue;
+            regex = false;
+          } else {
+            search = searchValue?.value || '';
+            regex = searchValue?.regex || false;
+          }
+
+          return { column, search, regex };
+        })
         .filter((x) => !!x.search),
     });
 

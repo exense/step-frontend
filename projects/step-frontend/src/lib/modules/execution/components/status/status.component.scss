@@ -1,0 +1,12 @@
+@import '../../../_common/styles/variables';
+
+@mixin status($status, $color) {
+  .step-#{$status} {
+    background: $color;
+    color: #fff;
+  }
+}
+
+@each $status, $color in $statuses {
+  @include status($status, $color);
+}
