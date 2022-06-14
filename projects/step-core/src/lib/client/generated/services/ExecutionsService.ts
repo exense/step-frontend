@@ -12,7 +12,7 @@ import type { RepositoryObjectReference } from '../models/RepositoryObjectRefere
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({providedIn:'root'})
 export class ExecutionsService {
 
     constructor(public readonly httpRequest: BaseHttpRequest) {}

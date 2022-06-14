@@ -10,7 +10,7 @@ import type { SessionResponse } from '../models/SessionResponse';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({providedIn:'root'})
 export class AccessService {
 
     constructor(public readonly httpRequest: BaseHttpRequest) {}

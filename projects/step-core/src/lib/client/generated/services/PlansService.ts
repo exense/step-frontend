@@ -10,7 +10,7 @@ import type { PlanCompilationResult } from '../models/PlanCompilationResult';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({providedIn:'root'})
 export class PlansService {
 
     constructor(public readonly httpRequest: BaseHttpRequest) {}

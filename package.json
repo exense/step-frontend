@@ -24,7 +24,7 @@
     "format:check": "prettier --config ./.prettierrc \"projects/{step-core/src/lib,step-frontend/src/lib,step-app/src}/!(angularjs)/**/*{.ts,.html,.scss}\"",
     "prepare": "husky install",
     "push": "npm publish dist/step-frontend/*.tgz",
-    "openapi:generate:nhy": "openapi --input https://stepos-nhy.exense.ch/rest/openapi.json --output ./projects/step-core/src/lib/client/generated --client angular --useUnionTypes --name StepClientModule --exportCore false --exportSchemas true"
+    "openapi:generate:nhy": "./generate-openapi-client.sh https://stepos-nhy.exense.ch/rest/openapi.json"
   },
   "private": false,
   "dependencies": {

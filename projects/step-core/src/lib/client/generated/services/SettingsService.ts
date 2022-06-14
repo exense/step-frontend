@@ -6,7 +6,7 @@ import type { Observable } from 'rxjs';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({providedIn:'root'})
 export class SettingsService {
 
     constructor(public readonly httpRequest: BaseHttpRequest) {}

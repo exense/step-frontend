@@ -8,7 +8,7 @@ import type { ExecutiontTaskParameters } from '../models/ExecutiontTaskParameter
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({providedIn:'root'})
 export class SchedulerService {
 
     constructor(public readonly httpRequest: BaseHttpRequest) {}

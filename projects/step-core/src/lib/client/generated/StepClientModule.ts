@@ -9,29 +9,6 @@ import { BaseHttpRequest } from './core/BaseHttpRequest';
 import type { OpenAPIConfig } from './core/OpenAPI';
 import { OpenAPI } from './core/OpenAPI';
 
-import { AccessService } from './services/AccessService';
-import { AdminService } from './services/AdminService';
-import { CollectionsService } from './services/CollectionsService';
-import { ControllerService } from './services/ControllerService';
-import { DefaultService } from './services/DefaultService';
-import { ExecutionsService } from './services/ExecutionsService';
-import { ExportsService } from './services/ExportsService';
-import { GridService } from './services/GridService';
-import { ImportsService } from './services/ImportsService';
-import { InteractivePlanExecutionService } from './services/InteractivePlanExecutionService';
-import { KeywordEditorService } from './services/KeywordEditorService';
-import { KeywordPackagesService } from './services/KeywordPackagesService';
-import { KeywordsService } from './services/KeywordsService';
-import { ParametersService } from './services/ParametersService';
-import { PlansService } from './services/PlansService';
-import { QuotaManagerService } from './services/QuotaManagerService';
-import { ReferencesService } from './services/ReferencesService';
-import { ResourcesService } from './services/ResourcesService';
-import { SchedulerService } from './services/SchedulerService';
-import { ScreensService } from './services/ScreensService';
-import { SettingsService } from './services/SettingsService';
-import { SystemService } from './services/SystemService';
-import { TablesService } from './services/TablesService';
 
 @NgModule({
     imports: [HttpClientModule],
@@ -54,29 +31,6 @@ import { TablesService } from './services/TablesService';
             provide: BaseHttpRequest,
             useClass: AngularHttpRequest,
         },
-        AccessService,
-        AdminService,
-        CollectionsService,
-        ControllerService,
-        DefaultService,
-        ExecutionsService,
-        ExportsService,
-        GridService,
-        ImportsService,
-        InteractivePlanExecutionService,
-        KeywordEditorService,
-        KeywordPackagesService,
-        KeywordsService,
-        ParametersService,
-        PlansService,
-        QuotaManagerService,
-        ReferencesService,
-        ResourcesService,
-        SchedulerService,
-        ScreensService,
-        SettingsService,
-        SystemService,
-        TablesService,
     ]
 })
 export class StepClientModule {}

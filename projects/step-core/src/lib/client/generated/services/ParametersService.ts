@@ -8,7 +8,7 @@ import type { Parameter } from '../models/Parameter';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({providedIn:'root'})
 export class ParametersService {
 
     constructor(public readonly httpRequest: BaseHttpRequest) {}

@@ -8,7 +8,7 @@ import type { ExportStatus } from '../models/ExportStatus';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({providedIn:'root'})
 export class ExportsService {
 
     constructor(public readonly httpRequest: BaseHttpRequest) {}

@@ -10,7 +10,7 @@ import type { WebPlugin } from '../models/WebPlugin';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({providedIn:'root'})
 export class TablesService {
 
     constructor(public readonly httpRequest: BaseHttpRequest) {}
