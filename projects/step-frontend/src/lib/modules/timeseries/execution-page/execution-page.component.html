@@ -1,7 +1,8 @@
 <step-execution-tabs></step-execution-tabs>
 
 <div>
-    <step-ts-ranger *ngIf="rangerSettings"
+    <step-ts-ranger #ranger
+                    *ngIf="rangerSettings"
                     [settings]="rangerSettings"
                     [syncKey]="syncKey"
                     (onRangeChange)="onRangeChange($event)">
@@ -14,25 +15,35 @@
             (onZoomReset)="onZoomReset()">
         </step-timeseries-chart>
     </div>
-<!--    <div class="chart-container" *ngIf="chart2Settings">-->
-<!--        <step-timeseries-chart  [settings]="chart2Settings" [syncKey]="syncKey">-->
-<!--        </step-timeseries-chart>-->
-<!--    </div>-->
+    <div class="chart-container" *ngIf="chart2Settings">
+        <step-timeseries-chart  [settings]="chart2Settings" [syncKey]="syncKey"
+                                (onZoomReset)="onZoomReset()">
+        </step-timeseries-chart>
+    </div>
 
-<!--    <div class="chart-container" *ngIf="chart3Settings">-->
-<!--        <step-timeseries-chart [settings]="chart3Settings" [syncKey]="syncKey">-->
-<!--        </step-timeseries-chart>-->
-<!--    </div>-->
+    <div class="chart-container" *ngIf="chart3Settings">
+        <step-timeseries-chart [settings]="chart3Settings" [syncKey]="syncKey"
+                               (onZoomReset)="onZoomReset()">
+        </step-timeseries-chart>
+    </div>
 
-<!--    <div class="chart-container" *ngIf="chart5Settings">-->
-<!--        <step-timeseries-chart #chart5 [settings]="chart5Settings" [syncKey]="syncKey">-->
-<!--        </step-timeseries-chart>-->
-<!--    </div>-->
+    <div class="chart-container" *ngIf="chart5Settings">
+        <step-timeseries-chart #chart5 [settings]="chart5Settings" [syncKey]="syncKey"
+                               (onZoomReset)="onZoomReset()">
+        </step-timeseries-chart>
+    </div>
 
-<!--    <div class="chart-container" *ngIf="chart4Settings">-->
-<!--        <step-timeseries-chart #chart4 [settings]="chart4Settings" [syncKey]="syncKey">-->
-<!--        </step-timeseries-chart>-->
-<!--    </div>-->
+    <div class="chart-container" *ngIf="chart4Settings">
+        <step-timeseries-chart #chart4 [settings]="chart4Settings" [syncKey]="syncKey"
+                               (onZoomReset)="onZoomReset()">
+        </step-timeseries-chart>
+    </div>
+
+    <div class="chart-container">
+        <step-timeseries-chart #chart6 [settings]="chart6Settings" *ngIf="chart6Settings" [syncKey]="syncKey"
+                               (onZoomReset)="onZoomReset()">
+        </step-timeseries-chart>
+    </div>
 
 
 
@@ -51,7 +62,7 @@
     </div>
 
     <div class="chart-container">
-        <step-table [dataSource]="tableDataSource">
+        <step-table [dataSource]="tableDataSource" [inProgress]="tableIsLoading">
             <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef>Name</th>
                 <td mat-cell *matCellDef="let element">

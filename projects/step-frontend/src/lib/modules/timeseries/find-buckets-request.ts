@@ -5,4 +5,5 @@ export interface FindBucketsRequest {
   groupDimensions?: string[];
   numberOfBuckets?: number;
   intervalSize?: number; // in ms
+  threadGroupBuckets?: boolean;
 }

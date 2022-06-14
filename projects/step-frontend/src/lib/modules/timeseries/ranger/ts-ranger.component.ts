@@ -2,6 +2,8 @@ import {AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Outpu
 import {TSRangerSettings} from './ts-ranger-settings';
 import {UplotSyncService} from '../chart/uplot-sync-service';
 import {TSTimeRange} from '../chart/model/ts-time-range';
+import {UPlotUtils} from '../uplot/uPlot.utils';
+import {timeout} from 'rxjs';
 
 declare const uPlot: any;
 
@@ -35,7 +37,18 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
     }
 
     resetSelect() {
-
+        // this is a 'hack'. when dblclick is triggered in another synced chart, it will remove the select for the ranger. this function is executed before that.
+        // we have to wait the minimum amount of time so that sync event happens, and the selection is destroyed
+        setTimeout(() => {
+            let left = Math.round(this.uplot.valToPos(this.settings.min, 'x'));
+            let width = Math.round(this.uplot.valToPos(this.settings.max, 'x')) - left;
+            let height = this.uplot.bbox.height / devicePixelRatio;
+            this.uplot.setSelect({left, width, height}, false);
+            let xData = this.uplot.data[0];
+            let start = xData[0];
+            let end = xData[xData.length - 1];
+            this.onRangeChange.emit({start, end});
+        }, 50);
     }
 
     createRanger() {
@@ -152,6 +165,19 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
                 },
                 sync: {
                     key: this.syncKey
+                },
+                bind: {
+                    // @ts-ignore
+                    dblclick: (self, b, handler) => {
+                        return (e: any) => {
+                            let hasSelection = this.uplot.select.width > 0;
+                            handler(e);
+                            if (hasSelection) { // has selection
+                               this.resetSelect();
+                            }
+
+                        };
+                    }
                 }
             },
             legend: {
@@ -227,16 +253,13 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
         this.uplot = new uPlot(rangerOpts, [this.getXValues(), ...this.settings.series.map(s => s.data)], this.chartElement.nativeElement);
     }
 
-    getCurrentRange(): TSTimeRange {
+
+    emitRangeEventIfChanged() {
         let u = this.uplot;
         let min = u.posToVal(u.select.left, 'x');
         let max = u.posToVal(u.select.left + u.select.width, 'x');
-        return {start: min, end: max};
-    }
-
-    emitRangeEventIfChanged() {
-        let currentRange = this.getCurrentRange();
-        if (currentRange.start != this.lastRange.start || currentRange.end !== this.lastRange.end) {
+        if (min != this.lastRange.start || max !== this.lastRange.end) {
+            let currentRange = {start: min, end: max};
             this.lastRange = currentRange;
             this.onRangeChange.next(currentRange);
         }

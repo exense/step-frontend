@@ -11,6 +11,7 @@ import {
 } from "@angular/core";
 import {TSChartSettings} from './model/ts-chart-settings';
 import {UplotSyncService} from './uplot-sync-service';
+import {UPlotUtils} from '../uplot/uPlot.utils';
 
 declare const uPlot: any;
 
@@ -66,10 +67,10 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
                     // @ts-ignore
                     dblclick: (self, b, handler) => {
                                 return (e: any) => {
-                                    console.log(self);
-                                    this.onZoomReset.emit(true);
-                                    handler(e);
-                                    console.log(self.select.width);
+                                    if (UPlotUtils.isZoomed(this.uplot)) {
+                                        this.onZoomReset.emit(true);
+                                        handler(e);
+                                    }
                                 };
                     }
                 }
@@ -112,7 +113,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
             ],
             hooks: {
                 // setSelect: [ () => console.log('select')],
-                // setScale: [ () => console.log('scale')]
+                // setScale: [ (x: any) => console.log(this.isZoomed())]
             }
         };
 
@@ -150,5 +151,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         let currentState = this.uplot.series[index].show;
         this.uplot.setSeries(index, {show: !currentState});
     }
+
+
 
 }

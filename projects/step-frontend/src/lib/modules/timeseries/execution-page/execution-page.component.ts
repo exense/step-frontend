@@ -21,6 +21,7 @@ declare const uPlot: any;
 })
 export class ExecutionPageComponent implements OnInit {
 
+    private RESOLUTION_MS = 1000; // in seconds
     syncKey = 'test';
     executionId = window.location.href.split('/').slice(-1)[0]; // last part of URL
 
@@ -29,6 +30,7 @@ export class ExecutionPageComponent implements OnInit {
     chart3Settings: TSChartSettings;
     chart4Settings: TSChartSettings;
     chart5Settings: TSChartSettings;
+    chart6Settings: TSChartSettings;
     rangerSettings: TSRangerSettings;
 
     @ViewChild('ranger') ranger: TSRangerComponent;
@@ -45,6 +47,8 @@ export class ExecutionPageComponent implements OnInit {
 
     keywords: {[key: string]: {isSelected: boolean, color: string}} = {};
     keywordSearchValue: string;
+
+    findRequest: FindBucketsRequest;
 
     // @ts-ignore
     paths = (u, seriesIdx: number, idx0: number, idx1: number, extendGap, buildClip) => {
@@ -71,25 +75,100 @@ export class ExecutionPageComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        let request: FindBucketsRequest = {
+        this.findRequest = {
             start: 0,
-            end: 9999999999999,
+            end: -1,
             intervalSize: 2500,
             params: {eId: this.executionId}
         };
         this.timeSeriesService.getExecutionDetails(this.executionId).subscribe(details => {
-            request.start = details.startTime;
-            request.end = details.endTime + 1;
-            this.createTableChart(request);
-            this.createByStatusChart(request);
-            this.createByMeasurementsCharts(request);
-            this.createSummaryChart(request);
-            this.createRanger(request);
+            this.findRequest.start = details.startTime - details.startTime % this.RESOLUTION_MS;
+            this.findRequest.end = details.endTime + (this.RESOLUTION_MS - details.endTime % this.RESOLUTION_MS);
+            this.createTableChart(this.findRequest);
+            // this.createByStatusChart(this.findRequest);
+            // this.createByMeasurementsCharts(this.findRequest);
+            // this.createSummaryChart(this.findRequest);
+            // this.createRanger(this.findRequest);
+            // this.createThreadGroupsChart(this.findRequest);
         });
     }
 
     onZoomReset() {
-        console.log('zoom reset!');
+        this.ranger.resetSelect();
+
+    }
+
+    createThreadGroupsChart(request: FindBucketsRequest) {
+        let dimensionKey = 'name';
+        this.timeSeriesService.fetchBucketsNew({...request, threadGroupBuckets: true, groupDimensions: [dimensionKey]}).subscribe(response => {
+            let timeLabels = this.createTimeLabels(response.start, response.end, response.interval);
+            if (response.matrix.length === 0) {
+                return; // TODO handle
+            }
+            let totalData: number[] = Array(response.matrix[0].length);
+            let countSeries = [];
+            let series = response.matrixKeys.map((key, i) => {
+                key = key[dimensionKey]; // get just the name
+                let color = this.colorsPool.getColor(key);
+                let countData = response.matrix[i].map((b, j) => {
+                    let bucketValue = b?.count;
+                    if (totalData[j] == undefined) {
+                        totalData[j] = bucketValue;
+                    } else if (bucketValue) {
+                        totalData[j] += bucketValue;
+                    }
+                    return bucketValue;
+                });
+                let series = {
+                    scale: '1',
+                    label: key,
+                    id: key,
+                    data: countData,
+                    value: (x, v) => Math.trunc(v),
+                    stroke: color,
+                    points: {show: false}
+                } as TSChartSeries;
+                countSeries.push(series);
+                return series;
+            });
+
+            this.chart6Settings = {
+                title: 'Thread Groups (Concurrency)',
+                xValues: timeLabels,
+                showLegend: true,
+                series: [{
+                    scale: '2',
+                    label: 'Total',
+                    data: totalData,
+                    value: (x, v) => Math.trunc(v),
+                    // stroke: '#E24D42',
+                    fill: 'rgba(143,161,210,0.38)',
+                    // fill: 'rgba(255,212,166,0.64)',
+                    // points: {show: false},
+                    // @ts-ignore
+                    drawStyle: 1,
+                    paths: this.barsFunction({size: [0.9, 100]}),
+                    points: {show: false}
+                },
+                    ...series,
+                ],
+                axes: [
+                    {
+                        scale: '1',
+                        values: (u, vals, space) => vals.map(v => +v.toFixed(0)),
+                    },
+                    {
+                        side: 1,
+                        // size: 60,
+                        scale: '2',
+                        values: (u, vals, space) => vals.map(v => +v.toFixed(0) ),
+                        grid: {show: false},
+
+                    }
+                ]
+            };
+
+        });
     }
 
     createRanger(request: FindBucketsRequest) {
@@ -117,6 +196,9 @@ export class ExecutionPageComponent implements OnInit {
             let xLabels = this.createTimeLabels(response.start, response.end, response.interval);
             let avgValues: number[] = [];
             let countValues: number[] = [];
+            if (response.matrix.length === 0) {
+                return; // TODO handle
+            }
             response.matrix[0].forEach(bucket => {
                 avgValues.push(bucket ? (bucket.sum / bucket.count) : null);
                 countValues.push(bucket?.count);
@@ -338,7 +420,7 @@ export class ExecutionPageComponent implements OnInit {
     }
 
     onRangeChange(newRange: TSTimeRange) {
-        console.log('RANGE CHANGED');
+        console.log('RANGE CHANGED', newRange);
     }
 
     random_rgba() {
