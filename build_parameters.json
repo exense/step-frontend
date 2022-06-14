@@ -6,6 +6,7 @@
     {
       "ACTION": "COMPILE",
       "TYPE": "NPM",
+      "BEFORE": "step-frontend-before-compile",
       "PARAMETERS": [
         {
           "URL": "nexus-staging https://nexus-enterprise.exense.ch/repository/staging-npm/"
