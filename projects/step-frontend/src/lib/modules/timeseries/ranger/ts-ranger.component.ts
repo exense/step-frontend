@@ -25,10 +25,15 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
     uplot: any;
     lastRange: TSTimeRange;
 
+    start: number;
+    end: number;
+
     ngOnInit(): void {
         if (this.syncKey) {
             uPlot.sync(this.syncKey);
         }
+        this.start = this.settings.xValues[0];
+            this.end = this.settings.xValues[this.settings.xValues.length - 1];
 
     }
 
@@ -40,8 +45,8 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
         // this is a 'hack'. when dblclick is triggered in another synced chart, it will remove the select for the ranger. this function is executed before that.
         // we have to wait the minimum amount of time so that sync event happens, and the selection is destroyed
         setTimeout(() => {
-            let left = Math.round(this.uplot.valToPos(this.settings.min, 'x'));
-            let width = Math.round(this.uplot.valToPos(this.settings.max, 'x')) - left;
+            let left = Math.round(this.uplot.valToPos(this.start, 'x'));
+            let width = Math.round(this.uplot.valToPos(this.end, 'x')) - left;
             let height = this.uplot.bbox.height / devicePixelRatio;
             this.uplot.setSelect({left, width, height}, false);
             let xData = this.uplot.data[0];
@@ -153,6 +158,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
         let rangerOpts = {
             width: 800,
             height: 100,
+            ms: 1, // if not specified it's going be in seconds
             cursor: {
                 y: false,
                 points: {
@@ -204,11 +210,11 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
                 ready: [
                     // @ts-ignore
                     uRanger => {
-                        let left = Math.round(uRanger.valToPos(this.settings.min, 'x'));
-                        let width = Math.round(uRanger.valToPos(this.settings.max, 'x')) - left;
+                        let left = Math.round(uRanger.valToPos(this.start, 'x'));
+                        let width = Math.round(uRanger.valToPos(this.end, 'x')) - left;
                         let height = uRanger.bbox.height / devicePixelRatio;
                         uRanger.setSelect({left, width, height}, false);
-                        this.lastRange = {start: this.settings.min, end: this.settings.max};
+                        this.lastRange = {start: this.start, end: this.end};
                         const sel = uRanger.root.querySelector(".u-select");
 
                         //@ts-ignore
@@ -250,7 +256,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
                 ],
             }
         };
-        this.uplot = new uPlot(rangerOpts, [this.getXValues(), ...this.settings.series.map(s => s.data)], this.chartElement.nativeElement);
+        this.uplot = new uPlot(rangerOpts, [this.settings.xValues, ...this.settings.series.map(s => s.data)], this.chartElement.nativeElement);
     }
 
 
@@ -265,12 +271,5 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
         }
     }
 
-    getXValues(): number[] {
-        let result: number[] = [];
-        for (let i = this.settings.min; i <= this.settings.max; i+= 2.5) {
-            result.push(i);
-        }
-        return result;
-    }
 
 }

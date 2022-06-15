@@ -73,7 +73,8 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
                                     }
                                 };
                     }
-                }
+                },
+                ...this.settings.cursor
             };
         if (this.syncKey) {
             cursorOpts.sync = {
@@ -91,6 +92,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
         const opts = {
             title: this.settings.title,
+            ms: 1, // if not specified it's going to be in seconds
             ...getSize(),
             legend: {show: this.settings.showLegend},
             cursor: cursorOpts,

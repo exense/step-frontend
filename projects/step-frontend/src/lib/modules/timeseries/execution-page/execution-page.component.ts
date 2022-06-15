@@ -5,12 +5,14 @@ import {TSChartSeries, TSChartSettings} from '../chart/model/ts-chart-settings';
 import {TimeSeriesService} from '../time-series.service';
 import {TSRangerSettings} from '../ranger/ts-ranger-settings';
 import {FindBucketsRequest} from '../find-buckets-request';
-import {SeriesColorsPool} from '../util/series-colors-pool';
+import {TimeseriesColorsPool} from '../util/timeseries-colors-pool';
 import {Bucket} from '../bucket';
 import {TimeSeriesChartComponent} from '../chart/time-series-chart.component';
 import {KeyValue} from '@angular/common';
 import {TSTimeRange} from '../chart/model/ts-time-range';
 import {TSRangerComponent} from '../ranger/ts-ranger.component';
+import {UPlotUtils} from '../uplot/uPlot.utils';
+import {TimeSeriesConfig} from '../time-series.config';
 
 declare const uPlot: any;
 
@@ -21,7 +23,7 @@ declare const uPlot: any;
 })
 export class ExecutionPageComponent implements OnInit {
 
-    private RESOLUTION_MS = 1000; // in seconds
+    private RESOLUTION_MS = 1000;
     syncKey = 'test';
     executionId = window.location.href.split('/').slice(-1)[0]; // last part of URL
 
@@ -41,11 +43,12 @@ export class ExecutionPageComponent implements OnInit {
     tableDataSource: Bucket[] = [];
     tableIsLoading = true;
 
-    colorsPool = new SeriesColorsPool();
+    colorsPool = new TimeseriesColorsPool();
 
     barsFunction = uPlot.paths.bars;
+    stepped = uPlot.paths.stepped;
 
-    keywords: {[key: string]: {isSelected: boolean, color: string}} = {};
+    keywords: { [key: string]: { isSelected: boolean, color: string } } = {};
     keywordSearchValue: string;
 
     findRequest: FindBucketsRequest;
@@ -55,7 +58,7 @@ export class ExecutionPageComponent implements OnInit {
         return this.barsFunction(u, seriesIdx, idx0, idx1, extendGap, buildClip);
     }
 
-    valueAscOrder = (a: KeyValue<string,any>, b: KeyValue<string,any>): number => {
+    valueAscOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => {
         return a.key.localeCompare(b.key);
     }
 
@@ -84,17 +87,17 @@ export class ExecutionPageComponent implements OnInit {
         this.timeSeriesService.getExecutionDetails(this.executionId).subscribe(details => {
             this.findRequest.start = details.startTime - details.startTime % this.RESOLUTION_MS;
             this.findRequest.end = details.endTime + (this.RESOLUTION_MS - details.endTime % this.RESOLUTION_MS);
+            this.createRanger(this.findRequest);
+            this.createSummaryChart(this.findRequest);
             this.createTableChart(this.findRequest);
-            // this.createByStatusChart(this.findRequest);
-            // this.createByMeasurementsCharts(this.findRequest);
-            // this.createSummaryChart(this.findRequest);
-            // this.createRanger(this.findRequest);
-            // this.createThreadGroupsChart(this.findRequest);
+            this.createByStatusChart(this.findRequest);
+            this.createByKeywordsCharts(this.findRequest);
+            this.createThreadGroupsChart(this.findRequest);
         });
     }
 
     onZoomReset() {
-        this.ranger.resetSelect();
+        this.ranger.resetSelect(); // this will trigger a range change event
 
     }
 
@@ -109,10 +112,9 @@ export class ExecutionPageComponent implements OnInit {
             let countSeries = [];
             let series = response.matrixKeys.map((key, i) => {
                 key = key[dimensionKey]; // get just the name
-                let color = this.colorsPool.getColor(key);
                 let countData = response.matrix[i].map((b, j) => {
-                    let bucketValue = b?.count;
-                    if (totalData[j] == undefined) {
+                    let bucketValue = b?.sum;
+                    if (totalData[j] === undefined) {
                         totalData[j] = bucketValue;
                     } else if (bucketValue) {
                         totalData[j] += bucketValue;
@@ -125,31 +127,38 @@ export class ExecutionPageComponent implements OnInit {
                     id: key,
                     data: countData,
                     value: (x, v) => Math.trunc(v),
-                    stroke: color,
+                    stroke: '#024981',
+                    width: 2,
+                    paths: this.stepped({align: 1}),
                     points: {show: false}
                 } as TSChartSeries;
                 countSeries.push(series);
                 return series;
             });
-
+            console.log(series);
+            console.log(totalData);
             this.chart6Settings = {
                 title: 'Thread Groups (Concurrency)',
                 xValues: timeLabels,
                 showLegend: true,
-                series: [{
-                    scale: '2',
-                    label: 'Total',
-                    data: totalData,
-                    value: (x, v) => Math.trunc(v),
-                    // stroke: '#E24D42',
-                    fill: 'rgba(143,161,210,0.38)',
-                    // fill: 'rgba(255,212,166,0.64)',
-                    // points: {show: false},
-                    // @ts-ignore
-                    drawStyle: 1,
-                    paths: this.barsFunction({size: [0.9, 100]}),
-                    points: {show: false}
+                cursor: {
+                    dataIdx: UPlotUtils.closestNotEmptyPointFunction
                 },
+                series: [
+                    {
+                        scale: '2',
+                        label: 'Total',
+                        data: totalData,
+                        value: (x, v) => Math.trunc(v),
+                        // stroke: '#E24D42',
+                        fill: 'rgba(143,161,210,0.38)',
+                        // fill: 'rgba(255,212,166,0.64)',
+                        // points: {show: false},
+                        // @ts-ignore
+                        // drawStyle: 1,
+                        paths: this.stepped({align: 1}),
+                        points: {show: false},
+                    },
                     ...series,
                 ],
                 axes: [
@@ -161,7 +170,7 @@ export class ExecutionPageComponent implements OnInit {
                         side: 1,
                         // size: 60,
                         scale: '2',
-                        values: (u, vals, space) => vals.map(v => +v.toFixed(0) ),
+                        values: (u, vals, space) => vals.map(v => +v.toFixed(0)),
                         grid: {show: false},
 
                     }
@@ -172,22 +181,19 @@ export class ExecutionPageComponent implements OnInit {
     }
 
     createRanger(request: FindBucketsRequest) {
-        this.timeSeriesService.fetchBuckets(request).subscribe((buckets: any) => {
-            let bucketsMap = buckets['{}'];
-            let keys = Object.keys(bucketsMap);
-            // console.log(keys, bucketsMap);
-            // const data = [[1,2,3,4,5,6], [4,5,6,7,8,9]];
-            let avgValues: number[] = [];
-            let countValues: number[] = [];
-            keys.forEach(key => {
-                let bucket = bucketsMap[key];
-                avgValues.push(bucket.sum / bucket.count);
-                countValues.push(bucket.count);
-            });
-            let keyValues = keys.map(key => parseInt(key) / 1000);
-
-            console.log(keyValues[keyValues.length - 1]);
-            this.initRangerSettings(keyValues, avgValues);
+        this.timeSeriesService.fetchBucketsNew(request).subscribe(response => {
+            let timeLabels = this.createTimeLabels(response.start, response.end, response.interval);
+            console.log('TIME: ', response.start, response.end);
+            let avgData = response.matrix[0].map(b => b ? b.sum / b.count : null);
+            this.rangerSettings = {
+                xValues: timeLabels,
+                series: [{
+                    label: 'Response Time',
+                    data: avgData,
+                    // value: (self, x) => Math.trunc(x) + ' ms',
+                    stroke: 'red'
+                }],
+            };
         });
     }
 
@@ -250,11 +256,10 @@ export class ExecutionPageComponent implements OnInit {
     }
 
 
-
     createTableChart(request: FindBucketsRequest) {
         let dimensionKey = 'name';
+        this.tableIsLoading = true;
         this.timeSeriesService.fetchBucketsNew({...request, groupDimensions: [dimensionKey], numberOfBuckets: 1}).subscribe(response => {
-            console.log(response);
             this.tableDataSource = response.matrix.map((series, i) => {
                 if (series.length != 1) { // we should have just one bucket
                     throw new Error('Something went wrong');
@@ -266,63 +271,90 @@ export class ExecutionPageComponent implements OnInit {
                 series[0].attributes.avg = (series[0].sum / series[0].count).toFixed(0);
                 this.keywords[attributes[dimensionKey]] = {color: color, isSelected: true};
                 return series[0];
-            });
+            }).sort((a, b) => a.attributes.name.toLowerCase() > b.attributes.name.toLowerCase() ? 1 : -1);
             this.tableIsLoading = false;
         });
     }
 
     createByStatusChart(request: FindBucketsRequest) {
-        this.timeSeriesService.fetchBuckets({...request, groupDimensions: ['rnStatus']}).subscribe(byStatusResponse => {
-            const allSeries: TSChartSeries[] = [];
-            let labels: number[] = [];
-            let timestempsWereSet = false;
-            Object.keys(byStatusResponse).forEach(key => {
-                let bucketMap = byStatusResponse[key];
-                let seriesKeys = Object.keys(bucketMap);
-                let data: number[] = [];
-                let formattedKeys: number[] = [];
-                seriesKeys.forEach(key => {
-                    data.push(bucketMap[key].count);
-                    if (!timestempsWereSet) {
-                        formattedKeys.push(parseInt(key) / 1000);
-                    }
-                })
-                let color = this.random_rgba();
-                allSeries.push({
-                    label: key,
-                    data: data,
+        this.timeSeriesService.fetchBucketsNew({...request, groupDimensions: ['rnStatus']}).subscribe(response => {
+            let xLabels = this.createTimeLabels(response.start, response.end, response.interval);
+            let series: TSChartSeries[] = response.matrix.map((series, i) => {
+                let status = response.matrixKeys[i]['rnStatus'];
+                let color = this.colorsPool.getStatusColor(status);
+                return {
+                    label: status,
+                    data: series.map(b => b? b.count: null),
                     // scale: 'mb',
                     // value: (self, x) => Math.trunc(x) + ' ms',
                     stroke: color,
-                    fill: color.slice(0, -2) + '08'
-                });
-
-                if (!timestempsWereSet) {
-                    labels = formattedKeys; // TODO here we should got the min and max from the series, and make the complete list of timestamps, and also make sure we deal with the same number of values as timestamps
-                    timestempsWereSet = true;
+                    fill: color + '20'
                 }
             });
             this.chart3Settings = {
-                title: 'Keywords Statuses',
+                title: 'Keyword Statuses',
                 showLegend: true,
-                xValues: labels,
-                series: allSeries,
+                xValues: xLabels,
+                series: series,
                 axes: [
-                    // {
-                    //     values: (u, vals, space) => vals.map(v => +v.toFixed(2) + " ms"),
-                    // },
-                ],
-                autoResize: true
-            };
+                    {
+                        values: (u, vals, space) => vals.map(v => Math.trunc(v)),
+                    }]
+            }
         });
+        // this.timeSeriesService.fetchBuckets({...request, groupDimensions: ['rnStatus']}).subscribe(byStatusResponse => {
+        //     const allSeries: TSChartSeries[] = [];
+        //     let labels: number[] = [];
+        //     let timestampsWereSet = false;
+        //     Object.keys(byStatusResponse).forEach(key => {
+        //         let bucketMap = byStatusResponse[key];
+        //         let seriesKeys = Object.keys(bucketMap);
+        //         let data: number[] = [];
+        //         let formattedKeys: number[] = [];
+        //         seriesKeys.forEach(key => {
+        //             data.push(bucketMap[key].count);
+        //             if (!timestampsWereSet) {
+        //                 formattedKeys.push(parseInt(key));
+        //             }
+        //         });
+        //         key = key.replace('{rnStatus=', '').slice(0, -1); // last }
+        //         let color = this.colorsPool.getStatusColor(key);
+        //         console.log(color);
+        //         allSeries.push({
+        //             label: key,
+        //             data: data,
+        //             // scale: 'mb',
+        //             // value: (self, x) => Math.trunc(x) + ' ms',
+        //             stroke: color,
+        //             fill: color + '20'
+        //         });
+        //
+        //         if (!timestampsWereSet) {
+        //             labels = formattedKeys; // TODO here we should got the min and max from the series, and make the complete list of timestamps, and also make sure we deal with the same number of values as timestamps
+        //             timestampsWereSet = true;
+        //         }
+        //     });
+        //     this.chart3Settings = {
+        //         title: 'Keywords Statuses',
+        //         showLegend: true,
+        //         xValues: labels,
+        //         series: allSeries,
+        //         axes: [
+        //             // {
+        //             //     values: (u, vals, space) => vals.map(v => +v.toFixed(2) + " ms"),
+        //             // },
+        //         ],
+        //         autoResize: true
+        //     };
+        // });
     }
 
-    createByMeasurementsCharts(request: FindBucketsRequest) {
+    createByKeywordsCharts(request: FindBucketsRequest) {
         let dimensionKey = 'name';
         this.timeSeriesService.fetchBucketsNew({...request, groupDimensions: [dimensionKey]}).subscribe(response => {
             let timeLabels = this.createTimeLabels(response.start, response.end, response.interval);
             let totalData: number[] = Array(response.matrix[0].length); // TODO handle empty response
-            let avgSeries :TSChartSeries[] = [];
+            let avgSeries: TSChartSeries[] = [];
             let countSeries = [];
             let series = response.matrixKeys.map((key, i) => {
                 key = key[dimensionKey];
@@ -405,39 +437,22 @@ export class ExecutionPageComponent implements OnInit {
         });
     }
 
-    private initRangerSettings(keyValues: number[], avgValues: number[]) {
-        this.rangerSettings = {
-            min: keyValues[0],
-            max: keyValues[keyValues.length - 1],
-            interval: 100,
-            series: [{
-                label: 'Response Time',
-                data: avgValues,
-                value: (self, x) => Math.trunc(x) + ' ms',
-                stroke: 'red'
-            }],
-        };
-    }
-
     onRangeChange(newRange: TSTimeRange) {
-        console.log('RANGE CHANGED', newRange);
-    }
-
-    random_rgba() {
-        var o = Math.round, r = Math.random, s = 255;
-        let alpha = Math.max(Number(r().toFixed(1)), 0.5);
-        return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + alpha + ')';
+        this.findRequest.start = Math.trunc(newRange.start);
+        this.findRequest.end = Math.trunc(newRange.end);
+        this.createTableChart(this.findRequest);
     }
 
     createTimeLabels(start: number, end: number, interval: number): number[] {
         let intervals = Math.ceil((end - start) / interval);
-        const result = Array(intervals);
+        const result = Array(intervals + 1);
         for (let i = 0; i < intervals; i++) {
-            result[i] = (start + (i * interval)) / 1000; // uplot uses seconds
+            result[i] = (start + (i * interval)); //
         }
+        result[intervals] = result[intervals - 1] + TimeSeriesConfig.RESOLUTION; // we add one second as a small padding
+
         return result;
     }
-
 
 
 }
