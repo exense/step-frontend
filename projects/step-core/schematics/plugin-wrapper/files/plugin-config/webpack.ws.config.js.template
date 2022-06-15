@@ -38,7 +38,7 @@ module.exports = {
           "@angular/common/http": { singleton: true, strictVersion: true, requiredVersion: 'auto' },
           "@angular/router": { singleton: true, strictVersion: true, requiredVersion: 'auto' },
           "@angular/forms": { singleton: true, strictVersion: true, requiredVersion: 'auto' },
-          "@exense/step-core": { singleton: true, strictVersion: true, requiredVersion: 'auto' },
+          "@exense/step-core": { singleton: true, strictVersion: true },
 
           ...sharedMappings.getDescriptors()
         })
