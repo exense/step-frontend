@@ -8,6 +8,7 @@ import { CORE_INITIALIZER } from './core-initialiser';
 import { StepMaterialModule } from './modules/step-material/step-material.module';
 import { HasRightPipe } from './pipes/has-right.pipe';
 import { TableModule } from './modules/table/table.module';
+import { StepClientModule } from './client/generated/StepClientModule';
 import { MAT_LUXON_DATE_ADAPTER_OPTIONS, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
 
@@ -21,6 +22,7 @@ import { MAT_DATE_FORMATS } from '@angular/material/core';
     UpgradeModule,
     StepMaterialModule,
     TableModule,
+    StepClientModule,
   ],
   exports: [
     CommonModule,
@@ -32,6 +34,7 @@ import { MAT_DATE_FORMATS } from '@angular/material/core';
     StepMaterialModule,
     HasRightPipe,
     TableModule,
+    StepClientModule,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -75,3 +78,10 @@ export * from './directives/tooltip.directive';
 export * from './pipes/has-right.pipe';
 export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
+export * from './client/generated/index';
+
+export { ApiError } from './client/generated/core/ApiError';
+export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
+export { CancelablePromise, CancelError } from './client/generated/core/CancelablePromise';
+export { OpenAPI } from './client/generated/core/OpenAPI';
+export type { OpenAPIConfig } from './client/generated/core/OpenAPI';
