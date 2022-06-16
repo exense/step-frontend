@@ -4,7 +4,7 @@ const path = require('path');
 const share = mf.share;
 
 const sharedMappings = new mf.SharedMappings();
-sharedMappings.register(path.join(__dirname, '../../tsconfig.json'), ['@exense/step-core']);
+sharedMappings.register(path.join(__dirname, '../../tsconfig.json'));
 
 module.exports = {
   output: {
@@ -35,6 +35,7 @@ module.exports = {
         '@angular/common/http': { singleton: true, strictVersion: true, requiredVersion: 'auto' },
         '@angular/router': { singleton: true, strictVersion: true, requiredVersion: 'auto' },
         '@angular/forms': { singleton: true, strictVersion: true, requiredVersion: 'auto' },
+        '@exense/step-core': { singleton: true, strictVersion: true, requiredVersion: '0.0.1' },
 
         ...sharedMappings.getDescriptors(),
       }),
