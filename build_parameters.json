@@ -6,6 +6,7 @@
     {
       "ACTION": "COMPILE",
       "TYPE": "NPM",
+      "BEFORE": "step-frontend-before-compile",
       "PARAMETERS": [
         {
           "URL": "nexus-staging https://nexus-enterprise.exense.ch/repository/staging-npm/"
@@ -28,12 +29,12 @@
           "PACKAGING": "jar"
         },
         {
-          "ORIGIN": "dist/step-frontend/exense-step-frontend-0.0.1.tgz",
+          "ORIGIN": "dist/step-frontend/exense-step-frontend-0.1.2.tgz",
           "DESTINATION": "ch.exense.step.frontend:step-frontend-${BRANCH}:${VERSION}",
           "PACKAGING": "tgz"
         },
         {
-          "ORIGIN": "dist/step-core/exense-step-core-0.0.1.tgz",
+          "ORIGIN": "dist/step-core/exense-step-core-0.1.2.tgz",
           "DESTINATION": "ch.exense.step.frontend:step-core-${BRANCH}:${VERSION}",
           "PACKAGING": "tgz"
         }
