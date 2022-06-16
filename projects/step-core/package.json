@@ -17,6 +17,7 @@
     "@angular-devkit/schematics": "13.2.5",
     "@angular/material": "13.3.2",
     "@angular/material-luxon-adapter": "13.3.2",
+    "@types/luxon": "2.3.2",
     "@angular/cdk": "13.3.2",
     "@schematics/angular": "13.1.2",
     "@types/angular": "1.7.4",
