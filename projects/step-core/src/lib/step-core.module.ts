@@ -8,6 +8,7 @@ import { CORE_INITIALIZER } from './core-initialiser';
 import { StepMaterialModule } from './modules/step-material/step-material.module';
 import { HasRightPipe } from './pipes/has-right.pipe';
 import { TableModule } from './modules/table/table.module';
+import { StepClientModule } from './client/generated/StepClientModule';
 import { MAT_LUXON_DATE_ADAPTER_OPTIONS, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { EntityModule } from './modules/entity/entity.module';
@@ -23,6 +24,7 @@ import { EntityModule } from './modules/entity/entity.module';
     StepMaterialModule,
     TableModule,
     EntityModule,
+    StepClientModule,
   ],
   exports: [
     CommonModule,
@@ -35,6 +37,7 @@ import { EntityModule } from './modules/entity/entity.module';
     HasRightPipe,
     TableModule,
     EntityModule,
+    StepClientModule,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -72,9 +75,17 @@ export * from './services/link-processor.service';
 export * from './services/deferred-link-processor.service';
 export * from './services/view-state.service';
 export * from './services/context.service';
+export * from './services/additional-right-rule.service';
 export { UibModalInstance, UibModalHelperService } from './services/uib-modal-helper.service';
 export * from './angularjs';
 export * from './directives/tooltip.directive';
 export * from './pipes/has-right.pipe';
 export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
+export * from './client/generated/index';
+
+export { ApiError } from './client/generated/core/ApiError';
+export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
+export { CancelablePromise, CancelError } from './client/generated/core/CancelablePromise';
+export { OpenAPI } from './client/generated/core/OpenAPI';
+export type { OpenAPIConfig } from './client/generated/core/OpenAPI';
