@@ -10,6 +10,7 @@ import { HasRightPipe } from './pipes/has-right.pipe';
 import { TableModule } from './modules/table/table.module';
 import { MAT_LUXON_DATE_ADAPTER_OPTIONS, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
+import { EntityModule } from './modules/entity/entity.module';
 
 @NgModule({
   declarations: [TooltipDirective, HasRightPipe],
@@ -21,6 +22,7 @@ import { MAT_DATE_FORMATS } from '@angular/material/core';
     UpgradeModule,
     StepMaterialModule,
     TableModule,
+    EntityModule,
   ],
   exports: [
     CommonModule,
@@ -32,6 +34,7 @@ import { MAT_DATE_FORMATS } from '@angular/material/core';
     StepMaterialModule,
     HasRightPipe,
     TableModule,
+    EntityModule,
   ],
   providers: [
     CORE_INITIALIZER,

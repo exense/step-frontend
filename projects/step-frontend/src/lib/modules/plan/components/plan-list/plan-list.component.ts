@@ -75,7 +75,7 @@ export class PlanListComponent {
           isDeleteConfirmed ? this._httpClient.delete(`rest/plans/${id}`).pipe(map((_) => true)) : of(false)
         )
       )
-      .subscribe((result) => {
+      .subscribe((result: any) => {
         if (result) {
           this.dataSource.reload();
         }
