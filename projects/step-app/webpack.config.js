@@ -4,7 +4,7 @@ const path = require('path');
 const share = mf.share;
 
 const sharedMappings = new mf.SharedMappings();
-sharedMappings.register(path.join(__dirname, '../../tsconfig.json'));
+sharedMappings.register(path.join(__dirname, '../../tsconfig.build.json'));
 
 module.exports = {
   output: {
