@@ -1,6 +1,6 @@
 {
   "name": "@exense/step-core",
-  "version": "0.0.1",
+  "version": "0.1.2",
   "schematics": "./schematics/collection.json",
   "scripts": {
     "build": "tsc -p tsconfig.schematcis.json",
