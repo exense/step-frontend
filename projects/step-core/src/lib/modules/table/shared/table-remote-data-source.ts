@@ -130,7 +130,8 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   getTableData(
     reqOrPage: TableRequest | PageEvent | undefined,
     sort?: Sort,
-    search?: { [key: string]: SearchValue }
+    search?: { [key: string]: SearchValue },
+    filter?: string
   ): void {
     if (arguments.length === 1 && reqOrPage instanceof TableRequest) {
       const req = reqOrPage as TableRequest;
@@ -161,8 +162,8 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
         .filter((x) => !!x.search),
     });
 
-    if (this._filter) {
-      tableRequest.filter = this._filter;
+    if (filter) {
+      tableRequest.filter = filter;
     }
 
     if (page) {

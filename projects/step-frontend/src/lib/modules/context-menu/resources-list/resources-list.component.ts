@@ -27,16 +27,11 @@ export class ResourcesListComponent {
   readonly RESOURCE_TABLE_ID = 'resources';
   readonly RESOURCE_SEARCH_TYPE = 'RESOURCE_ID';
 
-  readonly dataSource = new TableRemoteDataSource(
-    this.RESOURCE_TABLE_ID,
-    this._tableRest,
-    {
-      name: 'attributes.name',
-      resourceType: 'resourceType',
-      id: 'id',
-    },
-    'not(resourceType=attachment)'
-  );
+  readonly dataSource = new TableRemoteDataSource(this.RESOURCE_TABLE_ID, this._tableRest, {
+    name: 'attributes.name',
+    resourceType: 'resourceType',
+    id: 'id',
+  });
 
   readonly currentUserName: string;
   readonly inProgress: boolean = false;

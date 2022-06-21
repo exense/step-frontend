@@ -44,10 +44,40 @@ export type DataSource<T> = TableDataSource<T> | T[] | Observable<T[]>;
   ],
 })
 export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, TableSearch {
-  constructor(@Optional() private _sort: MatSort) {}
+  @Input() trackBy: TrackByFunction<T> = (index) => index;
+  @Input() dataSource?: DataSource<T>;
+  @Input() inProgress?: boolean;
+  tableDataSource?: TableDataSource<T>;
+  @Input() pageSizeOptions: ReadonlyArray<number> = [10, 25, 50, 100];
+  @Input() set filter(value: string | undefined) {
+    if (value === this.filter) {
+      return;
+    }
+    this._filter$.next(value);
+  }
+  get filter(): string | undefined {
+    return this._filter$.value;
+  }
+
+  @ViewChild(MatTable) private _table?: MatTable<any>;
+  @ViewChild(MatPaginator, { static: true }) page!: MatPaginator;
+  @ContentChildren(MatColumnDef, { descendants: true }) colDef?: QueryList<MatColumnDef>;
+  @ContentChildren(SearchColDirective) searchColDef?: QueryList<SearchColDirective>;
+
+  private _initRequired: boolean = false;
+
+  displayColumns: string[] = [];
+  displaySearchColumns: string[] = [];
+
+  searchColumns: SearchColumn[] = [];
+
+  readonly trackBySearchColumn: TrackByFunction<SearchColumn> = (index, item) => item.colName;
 
   private _terminator$?: Subject<unknown>;
   private _search$ = new BehaviorSubject<{ [column: string]: SearchValue }>({});
+  private _filter$ = new BehaviorSubject<string | undefined>(undefined);
+
+  constructor(@Optional() private _sort: MatSort) {}
 
   private terminate(): void {
     if (this._terminator$) {
@@ -94,9 +124,9 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     const page$ = this.page!.page.pipe(startWith(initialPage));
     const sort$ = this._sort ? this._sort.sortChange.pipe(startWith(initialSort)) : of(undefined);
 
-    combineLatest([page$, sort$, this._search$])
+    combineLatest([page$, sort$, this._search$, this._filter$])
       .pipe(takeUntil(this._terminator$))
-      .subscribe(([page, sort, search]) => tableDataSource.getTableData(page, sort, search));
+      .subscribe(([page, sort, search, filter]) => tableDataSource.getTableData(page, sort, search, filter));
   }
 
   private setupSearchColumns(): void {
@@ -121,26 +151,6 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
 
     this.displaySearchColumns = this.searchColumns.map((c) => c.colName);
   }
-
-  @Input() trackBy: TrackByFunction<T> = (index) => index;
-  @Input() dataSource?: DataSource<T>;
-  @Input() inProgress?: boolean;
-  tableDataSource?: TableDataSource<T>;
-  @Input() pageSizeOptions: ReadonlyArray<number> = [10, 25, 50, 100];
-
-  @ViewChild(MatTable) private _table?: MatTable<any>;
-  @ViewChild(MatPaginator, { static: true }) page!: MatPaginator;
-  @ContentChildren(MatColumnDef, { descendants: true }) colDef?: QueryList<MatColumnDef>;
-  @ContentChildren(SearchColDirective) searchColDef?: QueryList<SearchColDirective>;
-
-  private _initRequired: boolean = false;
-
-  displayColumns: string[] = [];
-  displaySearchColumns: string[] = [];
-
-  searchColumns: SearchColumn[] = [];
-
-  readonly trackBySearchColumn: TrackByFunction<SearchColumn> = (index, item) => item.colName;
 
   onSearch(column: string, value: string, regex?: boolean): void;
   onSearch(column: string, event: Event, regex?: boolean): void;
