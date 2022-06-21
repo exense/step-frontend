@@ -77,7 +77,7 @@ export class ResourcesListComponent {
 
   searchResource(resource: Resource): void {
     a1Promise2Observable(
-      this._isUsedByDialogs.displayDialog(resource.resourceName, this.RESOURCE_SEARCH_TYPE, resource.id)
+      this._isUsedByDialogs.displayDialog(resource.resourceName || '', this.RESOURCE_SEARCH_TYPE, resource.id)
     ).subscribe();
   }
 }
