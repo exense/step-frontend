@@ -80,6 +80,7 @@ export * from './pipes/has-right.pipe';
 export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
 export * from './client/generated/index';
+export * from './client/augmented/augmented-step-client-module';
 
 export { ApiError } from './client/generated/core/ApiError';
 export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
