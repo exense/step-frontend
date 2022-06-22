@@ -54,7 +54,7 @@ export class PlanListComponent {
       .clonePlan(id)
       .pipe(
         map((clone: Plan) => {
-          clone['attributes']['name'] += '_Copy';
+          clone['attributes']!['name']! += '_Copy';
           return clone;
         }),
         switchMap((clone) => this._augmentedPlansService.save4(clone))
