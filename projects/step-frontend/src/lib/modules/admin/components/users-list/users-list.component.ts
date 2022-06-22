@@ -2,16 +2,16 @@ import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
-  UserDto,
   DialogsService,
   AuthService,
   a1Promise2Observable,
   ContextService,
   Mutable,
+  AdminService,
+  User,
 } from '@exense/step-core';
 import { BehaviorSubject, switchMap, of, catchError, noop, shareReplay, tap, map } from 'rxjs';
 import { UserDialogsService } from '../../services/user-dialogs.service';
-import { AdminApiService } from '../../services/admin-api.service';
 
 type InProgress = Mutable<Pick<UsersListComponent, 'inProgress'>>;
 
@@ -25,7 +25,7 @@ export class UsersListComponent implements OnDestroy {
 
   readonly users$ = this._usersRequest$.pipe(
     tap((_) => ((this as InProgress).inProgress = true)),
-    switchMap((_) => this._adminApi.getUsers()),
+    switchMap((_) => this._adminService.getUserList()),
     tap((_) => ((this as InProgress).inProgress = false)),
     shareReplay(1)
   );
@@ -35,7 +35,7 @@ export class UsersListComponent implements OnDestroy {
   readonly inProgress: boolean = false;
 
   constructor(
-    private _adminApi: AdminApiService,
+    private _adminService: AdminService,
     private _dialogs: DialogsService,
     private _userDialogs: UserDialogsService,
     private _auth: AuthService,
@@ -48,7 +48,7 @@ export class UsersListComponent implements OnDestroy {
     this._usersRequest$.next({});
   }
 
-  resetUserPassword(user: UserDto): void {
+  resetUserPassword(user: User): void {
     const message = 'Are you sure you want to reset this users password?';
     a1Promise2Observable(this._dialogs.showWarning(message))
       .pipe(
@@ -61,7 +61,7 @@ export class UsersListComponent implements OnDestroy {
   removeUser(username: string): void {
     a1Promise2Observable(this._dialogs.showDeleteWarning(1, `User "${username}"`))
       .pipe(
-        switchMap((_) => this._adminApi.removeUser(username)),
+        switchMap((_) => this._adminService.remove(username)),
         map((_) => true),
         catchError((_) => of(false))
       )
@@ -89,7 +89,7 @@ export class UsersListComponent implements OnDestroy {
   }
 
   editUser(username: string): void {
-    this._adminApi
+    this._adminService
       .getUser(username)
       .pipe(switchMap((user) => this._userDialogs.editUser(user)))
       .subscribe((_) => this.loadTable());

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { UserDto, UibModalHelperService, a1Promise2Observable } from '@exense/step-core';
+import { User, UibModalHelperService, a1Promise2Observable } from '@exense/step-core';
 import { map, Observable } from 'rxjs';
 
 @Injectable({
@@ -9,7 +9,7 @@ import { map, Observable } from 'rxjs';
 export class UserDialogsService {
   constructor(private _httpClient: HttpClient, private _uibModalHelper: UibModalHelperService) {}
 
-  editUser(user: Partial<UserDto> = {}): Observable<{ user: Partial<UserDto>; result: string }> {
+  editUser(user: Partial<User> = {}): Observable<{ user: Partial<User>; result: string }> {
     const modalInstance = this._uibModalHelper.open({
       backdrop: 'static',
       templateUrl: 'partials/users/editUserModalContent.html',
@@ -23,7 +23,7 @@ export class UserDialogsService {
     return result$.pipe(map((result) => ({ result, user })));
   }
 
-  resetPassword(user: Partial<UserDto>): Observable<any> {
+  resetPassword(user: Partial<User>): Observable<any> {
     const modalInstance = this._uibModalHelper.open({
       backdrop: 'static',
       templateUrl: 'partials/users/resetPasswordContent.html',
