@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 
-import { StepClientModule } from '../generated';
+import { StepGeneratedClientModule } from '../generated';
 
 @NgModule({
-  imports: [HttpClientModule, StepClientModule],
+  imports: [HttpClientModule, StepGeneratedClientModule],
   providers: [],
 })
-export class AugmentedStepClientModule {}
+export class StepAugmentedClientModule {}
 
 export { AugmentedPlansService } from './services/augmented-plans-service';

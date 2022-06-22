@@ -33,5 +33,5 @@ import { OpenAPI } from './core/OpenAPI';
         },
     ]
 })
-export class StepClientModule {}
+export class StepGeneratedClientModule {}
 
