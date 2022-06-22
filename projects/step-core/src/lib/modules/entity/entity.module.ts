@@ -11,3 +11,5 @@ import { CommonModule } from '@angular/common';
 export class EntityModule {}
 
 export * from '../entity/components/entity-icon/entity-icon.component';
+export * from '../entity/services/entity-registry';
+export * from '../entity/services/entity-scope-resolver';

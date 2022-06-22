@@ -9,7 +9,7 @@ import { EntityRegistry } from '../../services/entity-registry';
   styleUrls: ['./entity-icon.component.scss'],
 })
 export class EntityIconComponent {
-  @Input() entityName: string = '';
+  @Input() entityName?: string;
   @Input() entity!: Entity;
 
   icon?: string;
@@ -17,20 +17,23 @@ export class EntityIconComponent {
 
   constructor(private entityScopeResolver: EntityScopeResolver, private entityRegistry: EntityRegistry) {}
 
-  ngOnInit(): void {
-    console.log('ngOnInit');
+  ngOnChanges(): void {
+    this.icon = 'adjust';
+    this.tooltip = 'In this project';
 
-    console.log('this.entity', this.entity);
-    this.icon = 'public';
     const entityScope = this.entityScopeResolver.getScope(this.entity);
     if (entityScope) {
       this.icon = entityScope.icon;
       this.tooltip = entityScope.tooltip;
     } else {
+      if (!this.entityName) {
+        return;
+      }
       const entityType = this.entityRegistry.getEntityByName(this.entityName);
-      if (entityType && entityType.icon) {
-        this.icon = entityType.icon;
-        this.tooltip = '';
+      console.log('entityType', entityType);
+      console.log('entityName', this.entityName);
+      if (entityType && entityType.iconAG2) {
+        this.icon = entityType.iconAG2;
       }
     }
   }

@@ -82,6 +82,7 @@ export * from './directives/tooltip.directive';
 export * from './pipes/has-right.pipe';
 export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
+export * from './modules/entity/entity.module';
 export * from './client/generated/index';
 
 export { ApiError } from './client/generated/core/ApiError';
