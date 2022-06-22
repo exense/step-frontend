@@ -31,7 +31,7 @@ export class ExecutionPageComponent implements OnInit {
     chart2Settings: TSChartSettings;
     chart3Settings: TSChartSettings;
     chart4Settings: TSChartSettings;
-    chart5Settings: TSChartSettings;
+    responseTypeByKeywordsChart: TSChartSettings;
     chart6Settings: TSChartSettings;
     rangerSettings: TSRangerSettings;
 
@@ -389,7 +389,7 @@ export class ExecutionPageComponent implements OnInit {
             this.chart4Settings = {
                 title: 'Throughput by keywords',
                 xValues: timeLabels,
-                showLegend: true,
+                showLegend: false,
                 series: [{
                     scale: '2',
                     label: 'Total',
@@ -422,10 +422,10 @@ export class ExecutionPageComponent implements OnInit {
                 ]
             };
 
-            this.chart5Settings = {
+            this.responseTypeByKeywordsChart = {
                 title: 'Response time by keywords',
                 xValues: timeLabels,
-                showLegend: true,
+                showLegend: false,
                 series: avgSeries,
                 axes: [
                     {

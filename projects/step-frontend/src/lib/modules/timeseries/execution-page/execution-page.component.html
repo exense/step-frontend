@@ -27,10 +27,15 @@
         </step-timeseries-chart>
     </div>
 
-    <div class="chart-container" *ngIf="chart5Settings">
-        <step-timeseries-chart #chart5 [settings]="chart5Settings" [syncKey]="syncKey"
+    <div class="chart-container">
+        <step-timeseries-chart #chart5 *ngIf="responseTypeByKeywordsChart" [settings]="responseTypeByKeywordsChart" [syncKey]="syncKey"
                                (onZoomReset)="onZoomReset()">
         </step-timeseries-chart>
+        <div class="chart-footer-actions">
+            <span>AVG</span>
+            <span>MIN</span>
+            <span>MAX</span>
+        </div>
     </div>
 
     <div class="chart-container" *ngIf="chart4Settings">
