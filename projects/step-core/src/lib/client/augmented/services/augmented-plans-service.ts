@@ -1,15 +1,12 @@
 import { Injectable } from '@angular/core';
-import type { Observable } from 'rxjs';
-import { PlansService } from '../../generated';
-import { TableRestService } from '../../../modules/table/services/api/table-rest.service';
+import { Plan, PlansService } from '../../generated';
+import { TableRestService } from '../../table/services/table-rest.service';
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
 import { TableRemoteDataSource } from '../../../modules/table/shared/table-remote-data-source';
-import { DataSource } from '../../../modules/table/components/table/table.component';
-import { TableResponse } from '../../../modules/table/services/api/dto/table-response';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedPlansService extends PlansService {
-  readonly dataSource = new TableRemoteDataSource('plans', this._tableRest, {
+  readonly dataSource: TableRemoteDataSource<Plan> = new TableRemoteDataSource<Plan>('plans', this._tableRest, {
     name: 'attributes.name',
     type: 'root._class',
     actions: '',
@@ -19,7 +16,7 @@ export class AugmentedPlansService extends PlansService {
     super(httpRequest);
   }
 
-  public getPlansTableDataSource(): TableRemoteDataSource<unknown> {
+  public getPlansTableDataSource(): TableRemoteDataSource<Plan> {
     return this.dataSource;
   }
 }

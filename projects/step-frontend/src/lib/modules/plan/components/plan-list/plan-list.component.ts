@@ -7,6 +7,7 @@ import {
   DialogsService,
   AugmentedPlansService,
   Plan,
+  TableRemoteDataSource,
 } from '@exense/step-core';
 import { PlanDialogsService } from '../../servies/plan-dialogs.service';
 import { ExportDialogsService } from '../../../_common/services/export-dialogs.service';
@@ -22,7 +23,7 @@ import { ILocationService } from 'angular';
   styleUrls: ['./plan-list.component.scss'],
 })
 export class PlanListComponent {
-  readonly dataSource;
+  readonly dataSource: TableRemoteDataSource<Plan>;
 
   constructor(
     private _augmentedPlansService: AugmentedPlansService,
