@@ -110,8 +110,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   constructor(
     private _tableId: string,
     private _rest: TableRestService,
-    private _requestColumnsMap: { [key: string]: string },
-    private _filter?: string
+    private _requestColumnsMap: { [key: string]: string }
   ) {}
 
   connect(collectionViewer: CollectionViewer): Observable<T[]> {

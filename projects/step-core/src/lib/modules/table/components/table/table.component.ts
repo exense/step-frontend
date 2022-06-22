@@ -181,6 +181,7 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
   ngOnDestroy(): void {
     this.terminate();
     this._search$.complete();
+    this._filter$.complete();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
