@@ -6,4 +6,5 @@ export interface TimeSeriesChartResponse {
     interval: number;
     matrix: Bucket[][];
     matrixKeys: any[];
+    
 }
