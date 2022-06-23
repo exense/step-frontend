@@ -3,6 +3,9 @@ import { EntityScopeResolver } from '../../services/entity-scope-resolver';
 import { Entity } from '../../types/entity';
 import { EntityRegistry } from '../../services/entity-registry';
 
+import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
+import { AJS_MODULE } from '../../../../shared';
+
 @Component({
   selector: 'entity-icon',
   templateUrl: './entity-icon.component.html',
@@ -38,3 +41,7 @@ export class EntityIconComponent {
     }
   }
 }
+
+getAngularJSGlobal()
+  .module(AJS_MODULE)
+  .directive('entityIcon', downgradeComponent({ component: EntityIconComponent }));
