@@ -8,6 +8,7 @@ import { PLUGINS_INITIALIZER } from './plugins-initializer/plugins-initializer';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ExecutionModule } from './modules/execution/execution.module';
 import { ContextMenuModule } from './modules/context-menu/context-menu.module';
+import { ParameterModule } from './modules/parameter/parameter.module';
 
 @NgModule({
   declarations: [],
@@ -20,6 +21,7 @@ import { ContextMenuModule } from './modules/context-menu/context-menu.module';
     ExecutionModule,
     BrowserAnimationsModule,
     ContextMenuModule,
+    ParameterModule,
   ],
   providers: [PLUGINS_INITIALIZER],
 })
