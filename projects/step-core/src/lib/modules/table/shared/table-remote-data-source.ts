@@ -27,6 +27,7 @@ export class TableRequest {
   orderBy?: { column: string; order: 'asc' | 'desc' };
   start?: number;
   length?: number;
+  filter?: string;
 
   constructor(data?: Partial<TableRequest>) {
     this.columns = data?.columns || [];
@@ -34,6 +35,7 @@ export class TableRequest {
     this.orderBy = data?.orderBy || undefined;
     this.start = data?.start || undefined;
     this.length = data?.length || undefined;
+    this.filter = data?.filter || undefined;
   }
 }
 
@@ -48,6 +50,7 @@ const convertTableRequest = (req: TableRequest): TableRequestData => {
       value: '',
       regex: false,
     },
+    filter: req.filter,
   };
 
   result.columns = req.columns.map((name) => {
@@ -126,7 +129,8 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   getTableData(
     reqOrPage: TableRequest | PageEvent | undefined,
     sort?: Sort,
-    search?: { [key: string]: SearchValue }
+    search?: { [key: string]: SearchValue },
+    filter?: string
   ): void {
     if (arguments.length === 1 && reqOrPage instanceof TableRequest) {
       const req = reqOrPage as TableRequest;
@@ -156,6 +160,10 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
         })
         .filter((x) => !!x.search),
     });
+
+    if (filter) {
+      tableRequest.filter = filter;
+    }
 
     if (page) {
       tableRequest.start = page.pageIndex * page.pageSize;
