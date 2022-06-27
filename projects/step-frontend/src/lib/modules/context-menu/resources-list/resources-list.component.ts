@@ -13,8 +13,9 @@ import {
   TableRemoteDataSource,
   Resource,
 } from '@exense/step-core';
-import { BehaviorSubject, switchMap, of, catchError, noop, shareReplay, tap, map, Observable } from 'rxjs';
+import { switchMap, of, catchError, map } from 'rxjs';
 import { ResourceDialogsService } from '../services/resource-dialogs.service';
+import { Location } from '@angular/common';
 
 type InProgress = Mutable<Pick<ResourcesListComponent, 'inProgress'>>;
 
@@ -43,6 +44,7 @@ export class ResourcesListComponent {
     private _isUsedByDialogs: IsUsedByDialogsService,
     private _auth: AuthService,
     private _tableRest: TableRestService,
+    public _location: Location,
     context: ContextService
   ) {
     this.currentUserName = context.userName;

@@ -30,10 +30,12 @@
     <th mat-header-cell *matHeaderCellDef>Actions</th>
     <td mat-cell *matCellDef="let element" class="cell-actions">
       <step-btn-group>
-        <button mat-stroked-button matTooltip="Download Resource">
-          <a href="rest/resources/{{ element.id }}/content">
-            <mat-icon>cloud_download</mat-icon>
-          </a>
+        <button
+          mat-stroked-button
+          matTooltip="Download Resource"
+          (click)="this._location.go('rest/resources/{{ element.id }}/content')"
+        >
+          <mat-icon>cloud_download</mat-icon>
         </button>
         <button
           mat-stroked-button
