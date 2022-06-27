@@ -1,0 +1,130 @@
+<step-execution-tabs></step-execution-tabs>
+
+<div>
+  <step-ts-ranger
+    #ranger
+    *ngIf="rangerSettings"
+    [settings]="rangerSettings"
+    [syncKey]="syncKey"
+    (onRangeChange)="onRangeChange($event)"
+  >
+  </step-ts-ranger>
+</div>
+<div class="w-100 dashboard-container">
+  <div class="chart-container">
+    <step-timeseries-chart
+      *ngIf="chart1Settings"
+      [settings]="chart1Settings"
+      [syncKey]="syncKey"
+      (onZoomReset)="onZoomReset()"
+    >
+    </step-timeseries-chart>
+  </div>
+  <div class="chart-container" *ngIf="chart2Settings">
+    <step-timeseries-chart [settings]="chart2Settings" [syncKey]="syncKey" (onZoomReset)="onZoomReset()">
+    </step-timeseries-chart>
+  </div>
+
+  <div class="chart-container" *ngIf="chart3Settings">
+    <step-timeseries-chart [settings]="chart3Settings" [syncKey]="syncKey" (onZoomReset)="onZoomReset()">
+    </step-timeseries-chart>
+  </div>
+
+  <div class="chart-container">
+    <step-timeseries-chart
+      #chart5
+      *ngIf="responseTypeByKeywordsChart"
+      [settings]="responseTypeByKeywordsChart"
+      [syncKey]="syncKey"
+      (onZoomReset)="onZoomReset()"
+    >
+    </step-timeseries-chart>
+    <div class="chart-footer-actions">
+      <span>AVG</span>
+      <span>MIN</span>
+      <span>MAX</span>
+    </div>
+  </div>
+
+  <div class="chart-container" *ngIf="chart4Settings">
+    <step-timeseries-chart #chart4 [settings]="chart4Settings" [syncKey]="syncKey" (onZoomReset)="onZoomReset()">
+    </step-timeseries-chart>
+  </div>
+
+  <div class="chart-container">
+    <step-timeseries-chart
+      #chart6
+      [settings]="chart6Settings"
+      *ngIf="chart6Settings"
+      [syncKey]="syncKey"
+      (onZoomReset)="onZoomReset()"
+    >
+    </step-timeseries-chart>
+  </div>
+
+  <div class="chart-container" *ngIf="chart4Settings">
+    <input [(ngModel)]="keywordSearchValue" placeholder="Search" />
+    <div *ngFor="let item of keywords | keyvalue: valueAscOrder">
+      <ng-container *ngIf="!keywordSearchValue || item.key.toLowerCase().indexOf(keywordSearchValue) >= 0">
+        <div class="color-cell">
+          <input
+            type="checkbox"
+            [(ngModel)]="item.value.isSelected"
+            class="checkbox"
+            (change)="onKeywordToggle(item.key)"
+          />
+          <span class="color-square" [style.background-color]="item.value.color"></span>
+          <span>{{ item.key }}</span>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <step-table [dataSource]="tableDataSource" [inProgress]="tableIsLoading">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let element">
+          <div class="color-cell">
+            <span class="color-square" [style.background-color]="element.attributes.color"></span>
+            <span>{{ element.attributes.name }}</span>
+          </div>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="count">
+        <th mat-header-cell *matHeaderCellDef>Count</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.count }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="sum">
+        <th mat-header-cell *matHeaderCellDef>Sum</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.sum }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="avg">
+        <th mat-header-cell *matHeaderCellDef>Avg</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.attributes.avg }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="min">
+        <th mat-header-cell *matHeaderCellDef>Min</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.min }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="max">
+        <th mat-header-cell *matHeaderCellDef>Max</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.max }}
+        </td>
+      </ng-container>
+      <!--            <mat-row *matRowDef="let row; columns: tableColumns"-->
+      <!--                     [class.display-none]="!keywords[row.attributes.name].isSelected"></mat-row>-->
+    </step-table>
+  </div>
+
+  <div class="chart-container pie-chart-container"></div>
+</div>

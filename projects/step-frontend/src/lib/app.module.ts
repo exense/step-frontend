@@ -7,6 +7,7 @@ import { PlanModule } from './modules/plan/plan.module';
 import { PLUGINS_INITIALIZER } from './plugins-initializer/plugins-initializer';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ExecutionModule } from './modules/execution/execution.module';
+import { TimeSeriesModule } from './modules/timeseries/time-series.module';
 
 @NgModule({
   declarations: [],
@@ -18,6 +19,7 @@ import { ExecutionModule } from './modules/execution/execution.module';
     PlanModule,
     ExecutionModule,
     BrowserAnimationsModule,
+    TimeSeriesModule,
   ],
   providers: [PLUGINS_INITIALIZER],
 })
