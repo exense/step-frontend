@@ -47,16 +47,16 @@
     <th mat-header-cell *matHeaderCellDef>Actions</th>
     <td mat-cell *matCellDef="let element" class="cell-actions">
       <step-btn-group>
-        <button mat-stroked-button matTooltip="Move Down" (click)="moveScreen(element.id, 1)">
+        <button mat-icon-button matTooltip="Move Down" (click)="moveScreen(element.id, 1)">
           <mat-icon>keyboard_arrow_down</mat-icon>
         </button>
-        <button mat-stroked-button matTooltip="Move Up" (click)="moveScreen(element.id, -1)">
+        <button mat-icon-button matTooltip="Move Up" (click)="moveScreen(element.id, -1)">
           <mat-icon>keyboard_arrow_up</mat-icon>
         </button>
-        <button mat-stroked-button matTooltip="Edit" (click)="editScreen(element.input, element.id)">
+        <button mat-icon-button matTooltip="Edit" (click)="editScreen(element.input, element.id)">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-stroked-button matTooltip="Delete Screen" (click)="removeScreen(element.id, element.input.label)">
+        <button mat-icon-button matTooltip="Delete Screen" (click)="removeScreen(element.id, element.input.label)">
           <mat-icon>delete</mat-icon>
         </button>
       </step-btn-group>

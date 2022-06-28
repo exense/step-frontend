@@ -24,14 +24,14 @@
     <th mat-header-cell *matHeaderCellDef>Actions</th>
     <td mat-cell *matCellDef="let element" class="cell-actions">
       <step-btn-group>
-        <button mat-stroked-button matTooltip="Edit user" (click)="editUser(element.username)">
+        <button mat-icon-button matTooltip="Edit user" (click)="editUser(element.username)">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-stroked-button matTooltip="Reset user password" (click)="resetUserPassword(element)">
+        <button mat-icon-button matTooltip="Reset user password" (click)="resetUserPassword(element)">
           <mat-icon>lock</mat-icon>
         </button>
         <button
-          mat-stroked-button
+          mat-icon-button
           matTooltip="Delete user"
           [disabled]="currentUserName === element.username"
           (click)="removeUser(element.username)"

@@ -47,7 +47,7 @@
     <td mat-cell *matCellDef="let element" class="cell-actions">
       <step-btn-group>
         <button
-          mat-stroked-button
+          mat-icon-button
           matTooltip="Execute plan"
           [disabled]="!('plan-write' | hasRight | async)"
           (click)="executePlan(element.id)"
@@ -55,7 +55,7 @@
           <mat-icon>play_arrow</mat-icon>
         </button>
         <button
-          mat-stroked-button
+          mat-icon-button
           matTooltip="Duplicate plan"
           [disabled]="!('plan-read' | hasRight | async)"
           (click)="duplicatePlan(element.id)"
@@ -63,14 +63,14 @@
           <mat-icon>content_copy</mat-icon>
         </button>
         <button
-          mat-stroked-button
+          mat-icon-button
           matTooltip="Delete plan"
           [disabled]="!('plan-read' | hasRight | async)"
           (click)="deletePlan(element.id, element.attributes.name)"
         >
           <mat-icon>clear</mat-icon>
         </button>
-        <button mat-stroked-button [matMenuTriggerFor]="menu" [matMenuTriggerData]="{ element: element }">
+        <button mat-icon-button [matMenuTriggerFor]="menu" [matMenuTriggerData]="{ element: element }">
           <mat-icon>more_horiz</mat-icon>
         </button>
       </step-btn-group>
