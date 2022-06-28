@@ -33,7 +33,64 @@ angular
       'glyphicon glyphicon-list-alt'
     );
   })
+  .factory('ParameterScopeRenderer', function () {
+    var api = {};
 
+    // Backward compatibility: assuming GLOBAL scope if not set
+    api.normalizeScope = function (scope) {
+      return scope ? scope : 'GLOBAL';
+    };
+
+    api.scopeIcon = function (scope) {
+      scope = api.normalizeScope(scope);
+      if (scope == 'GLOBAL') {
+        return 'glyphicon-unchecked';
+      } else if (scope == 'FUNCTION') {
+        return 'glyphicon-record';
+      } else if (scope == 'APPLICATION') {
+        return 'glyphicon-book';
+      }
+    };
+
+    api.scopeCssClass = function (scope) {
+      scope = api.normalizeScope(scope);
+      if (scope == 'GLOBAL') {
+        return 'parameter-scope-global';
+      } else if (scope == 'FUNCTION') {
+        return 'parameter-scope-keyword';
+      } else if (scope == 'APPLICATION') {
+        return 'parameter-scope-application';
+      }
+    };
+
+    api.scopeSpanCssClass = function (scope) {
+      scope = api.normalizeScope(scope);
+      return 'parameter-scope ' + api.scopeCssClass(scope);
+    };
+
+    api.label = function (parameter) {
+      if (parameter) {
+        var scope = api.normalizeScope(parameter.scope);
+        if (scope == 'GLOBAL') {
+          return 'Global';
+        } else {
+          return parameter.scopeEntity;
+        }
+      }
+    };
+
+    api.scopeLabel = function (scope) {
+      if (scope == 'GLOBAL') {
+        return 'Global';
+      } else if (scope == 'FUNCTION') {
+        return 'Keyword';
+      } else if (scope == 'APPLICATION') {
+        return 'Application';
+      }
+    };
+
+    return api;
+  })
   .controller(
     'editParameterCtrl',
     function ($scope, $uibModalInstance, $http, AuthService, id, ParameterScopeRenderer, ScreenTemplates) {
