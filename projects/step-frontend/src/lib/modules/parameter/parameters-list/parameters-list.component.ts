@@ -34,6 +34,7 @@ export class ParametersListComponent {
     scope: 'scope',
     key: 'key',
     value: 'value',
+    activationExpressionScript: 'activationExpression.script',
     priority: 'priority',
   });
 
