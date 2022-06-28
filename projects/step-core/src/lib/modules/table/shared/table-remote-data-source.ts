@@ -67,16 +67,17 @@ const convertTableRequest = (req: TableRequest): TableRequestData => {
       : { name };
   });
 
-  const orderColumnIndex = !!req.orderBy ? req.columns.indexOf(req.orderBy.column) : -1;
-  if (orderColumnIndex >= 0) {
-    result.columns[orderColumnIndex].orderable = true;
-    result.order = [
-      {
-        column: orderColumnIndex,
-        dir: req.orderBy!.order,
-      },
-    ];
+  let orderColumnIndex = 0; //if not specified otherwise, the first column is sorted ascendingly
+  if (!!req.orderBy && req.columns.indexOf(req.orderBy.column) >= 0) {
+    orderColumnIndex = req.columns.indexOf(req.orderBy.column);
   }
+  result.columns[orderColumnIndex].orderable = true;
+  result.order = [
+    {
+      column: orderColumnIndex,
+      dir: !!req.orderBy?.order ? req.orderBy.order : 'asc',
+    },
+  ];
 
   return result;
 };
@@ -174,11 +175,6 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     if (order) {
       const column = this._requestColumnsMap[sort.active];
       tableRequest.orderBy = column ? { column, order } : undefined;
-    } else {
-      tableRequest.orderBy = {
-        column: this._requestColumnsMap['name'],
-        order: 'asc',
-      };
     }
 
     this.getTableData(tableRequest);

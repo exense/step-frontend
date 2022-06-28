@@ -1,0 +1,99 @@
+<section class="users-header">
+  <step-btn-group>
+    <button
+      type="button"
+      mat-raised-button
+      matTooltipPosition="below"
+      matTooltip="Import Parameter"
+      [disabled]="!('user-write' | hasRight | async)"
+      (click)="importParameter()"
+    >
+      <mat-icon>file_download</mat-icon>
+    </button>
+    <button
+      type="button"
+      mat-raised-button
+      matTooltipPosition="below"
+      matTooltip="Export Parameter"
+      [disabled]="!('user-read' | hasRight | async)"
+      (click)="exportParameter()"
+    >
+      <mat-icon>file_upload</mat-icon>
+    </button>
+  </step-btn-group>
+  <step-btn-group>
+    <button
+      type="button"
+      mat-raised-button
+      color="primary"
+      [disabled]="!('user-write' | hasRight | async)"
+      (click)="createParameter()"
+    >
+      New Parameter
+    </button>
+  </step-btn-group>
+</section>
+<step-table [dataSource]="dataSource" matSort [matSortDisableClear]="true">
+  <ng-container matColumnDef="scope" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Scope</th>
+    <td mat-cell *matCellDef="let element">
+      <span
+        class="scope"
+        [class]="{
+          'scope-global': element.scope === 'GLOBAL',
+          'scope-application': element.scope === 'APPLICATION',
+          'scope-function': element.scope === 'FUNCTION'
+        }"
+      >
+        {{ element.scope }}
+      </span>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="key" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Key</th>
+    <td mat-cell *matCellDef="let element">{{ element.key }}</td>
+  </ng-container>
+  <ng-container matColumnDef="value" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Value</th>
+    <td mat-cell *matCellDef="let element">{{ element.value }}</td>
+  </ng-container>
+  <ng-container matColumnDef="activationExpressionScript" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Activation script</th>
+    <td mat-cell *matCellDef="let element">{{ element.activationExpression.script }}</td>
+  </ng-container>
+  <ng-container matColumnDef="priority" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Priority</th>
+    <td mat-cell *matCellDef="let element">{{ element.priority }}</td>
+  </ng-container>
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef>Actions</th>
+    <td mat-cell *matCellDef="let element" class="cell-actions">
+      <step-btn-group>
+        <button
+          mat-stroked-button
+          matTooltip="Edit Parameter"
+          [disabled]="!('user-write' | hasRight | async)"
+          (click)="editParameter(element)"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-stroked-button
+          matTooltip="Duplicate Parameter"
+          [disabled]="!('user-write' | hasRight | async)"
+          (click)="duplicateParameter(element)"
+        >
+          <mat-icon>file_copy</mat-icon>
+        </button>
+        <button
+          mat-stroked-button
+          matTooltip="Delete Parameter"
+          [disabled]="!('user-write' | hasRight | async)"
+          (click)="deleteParameter(element.id, element.key)"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </step-btn-group>
+    </td>
+  </ng-container>
+</step-table>
