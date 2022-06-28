@@ -1,13 +1,15 @@
-<section class="users-header">
+<section class="header">
   <step-btn-group>
     <button
       type="buton"
-      mat-raised-button
-      color="primary"
+      mat-icon-button
+      class="primary"
+      matTooltip="Add user"
+      matTooltipPosition="below"
       [disabled]="!('user-write' | hasRight | async)"
       (click)="addUser()"
     >
-      Add user
+      <mat-icon>add</mat-icon>
     </button>
   </step-btn-group>
 </section>

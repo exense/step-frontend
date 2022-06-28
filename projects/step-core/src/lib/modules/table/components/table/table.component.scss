@@ -7,6 +7,10 @@ table {
   width: 100%;
 }
 
+tr.mat-row {
+  background: #f8f9f9;
+}
+
 th > mat-form-field {
   width: 90%;
 }
@@ -22,6 +26,10 @@ th > mat-form-field {
 
 .no-data {
   text-align: center;
+}
+
+mat-paginator {
+  border-radius: 0 0 16px 16px;
 }
 
 :host tr {

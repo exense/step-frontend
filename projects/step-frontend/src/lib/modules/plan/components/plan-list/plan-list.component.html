@@ -1,8 +1,8 @@
-<section class="plans-header">
+<section class="header">
   <step-btn-group class="import-export">
     <button
       type="button"
-      mat-raised-button
+      mat-icon-button
       matTooltip="Import plan"
       matTooltipPosition="below"
       [disabled]="!('plan-write' | hasRight | async)"
@@ -12,7 +12,7 @@
     </button>
     <button
       type="button"
-      mat-raised-button
+      mat-icon-button
       matTooltip="Export all plans"
       matTooltipPosition="below"
       [disabled]="!('plan-read' | hasRight | async)"
@@ -24,12 +24,14 @@
   <step-btn-group>
     <button
       type="button"
-      mat-raised-button
-      color="primary"
+      mat-icon-button
+      class="primary"
+      matTooltip="Add plan"
+      matTooltipPosition="below"
       [disabled]="!('plan-write' | hasRight | async)"
       (click)="addPlan()"
     >
-      New plan
+      <mat-icon>add</mat-icon>
     </button>
   </step-btn-group>
 </section>

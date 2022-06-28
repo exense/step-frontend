@@ -1,4 +1,4 @@
-<section class="users-header">
+<section class="header">
   <mat-form-field appearance="fill">
     <mat-label>{{ currentlySelectedScreenChoice }}</mat-label>
     <mat-select>
@@ -13,12 +13,14 @@
   <step-btn-group>
     <button
       type="button"
-      mat-raised-button
-      color="primary"
+      mat-icon-button
+      class="primary"
+      matTooltip="Add new"
+      matTooltipPosition="below"
       [disabled]="!('user-write' | hasRight | async)"
       (click)="addScreen()"
     >
-      New
+      <mat-icon>add</mat-icon>
     </button>
   </step-btn-group>
 </section>
