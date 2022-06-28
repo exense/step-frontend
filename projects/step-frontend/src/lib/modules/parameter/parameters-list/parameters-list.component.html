@@ -1,4 +1,4 @@
-<section class="users-header">
+<section class="header">
   <step-btn-group>
     <button
       type="button"
@@ -24,12 +24,14 @@
   <step-btn-group>
     <button
       type="button"
-      mat-raised-button
-      color="primary"
+      mat-icon-button
+      class="primary"
+      matTooltipPosition="below"
+      matTooltip="New parameter"
       [disabled]="!('user-write' | hasRight | async)"
       (click)="createParameter()"
     >
-      New Parameter
+      <mat-icon>add</mat-icon>
     </button>
   </step-btn-group>
 </section>

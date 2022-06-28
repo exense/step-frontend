@@ -14,3 +14,8 @@ $MaterialIcons_FontPath: '~material-icons-font/fonts';
 .w-100 {
   width: 100%;
 }
+
+button.primary {
+  background-color: var(--button-color);
+  color: white;
+}
