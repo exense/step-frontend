@@ -1,17 +1,21 @@
-<div id="SchedulerCtrl" ng-controller="SchedulerCtrl">
+<div id="SchedulerCtrl">
+  <step-execution-task-parameters-list></step-execution-task-parameters-list>
+</div>
+
+<!--
 	<st-table data="schedulerTasks" uid="'schedulerTaskList'" persist-state="true" use-spinner="true">
-		<st-actions>	
-			<div class="btn-group btn-group-menu">				
+		<st-actions>
+			<div class="btn-group btn-group-menu">
 				<button type="button" ng-disabled="!authService.hasRight('task-write')" class="btn btn-success" ng-click="addSchedulerEntry()">New task</button>
 			</div>
-			
+
 			<div class="btn-group btn-group-menu">
 				<button ng-if="authService.hasRight('admin')" type="button" class="btn btn-default" ng-click="configureScheduler()" uib-tooltip="Configure scheduler" tooltip-append-to-body="true" tooltip-placement="bottom" >
 					<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
 				</button>
-			</div>							
+			</div>
 		</st-actions>
-		
+
 		<st-columns>
 			<st-custom-columns st-screen="schedulerTable" st-exclude-fields="[]"/>
 			<st-column name="cronExpression">
@@ -23,9 +27,9 @@
 				<header>Status</header>
 				<second-header><inputdropdown action="search" initial-value="initialValue"></inputdropdown></second-header>
 				<cell>
-				
+
 					<button type="button" ng-class="model.schedulerEnabledToggle ? 'btn btn-primary': 'btn'" ng-click="$parent.toggleTaskState(row.id, row.active)" uib-tooltip="{{ model.schedulerEnabledToggle ? '': 'Scheduler has been disabled by your administrator' }}" tooltip-append-to-body="true" ng-disabled="!authService.hasRight('task-write')" aria-pressed="false" autocomplete="off">{{row.active?'On':'Off'}}</button>
-				
+
 				</cell>
 			</st-column>
 			<st-column width="'150px'">
@@ -48,4 +52,4 @@
 			</st-column>
 		</st-columns>
 	</st-table>
-</div>
+</div>-->

@@ -1280,7 +1280,7 @@ angular
     };
   })
 
-  .service('DashboardService', function ($http, $rootScope, AuthService, ViewRegistry) {
+ /* .service('DashboardService', function ($http, $rootScope, AuthService, ViewRegistry) {
     this.checkAvailability = (override = false) => {
       try {
         if (AuthService.getConf()) {
@@ -1328,7 +1328,7 @@ angular
       });
     };
   });
-
+*/
 //The following functions are missing in IE11
 
 if (!String.prototype.endsWith) {

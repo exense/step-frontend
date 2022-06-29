@@ -149,6 +149,7 @@ angular
     };
   })
 
+/*
   .controller(
     'SchedulerCtrl',
     function (
@@ -245,6 +246,8 @@ angular
       $scope.loadTable($scope, $http);
     }
   )
+*/
+/*
 
   .factory('schedulerServices', function ($http, $location, $uibModal) {
     var factory = {};
@@ -273,6 +276,7 @@ angular
 
     return factory;
   })
+*/
 
   .controller('SchedulerConfigurationCtrl', function ($scope, $http, AuthService) {
     $scope.authService = AuthService;

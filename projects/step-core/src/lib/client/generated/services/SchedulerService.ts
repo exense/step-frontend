@@ -112,6 +112,10 @@ export class SchedulerService {
         id: string,
     ): Observable<string> {
         return this.httpRequest.request({
+            headers: {
+              Accept: "text/plain, */*",
+              Content: "text/html; charset=UTF-8"
+            },
             method: 'POST',
             url: '/scheduler/task/{id}/execute',
             path: {
