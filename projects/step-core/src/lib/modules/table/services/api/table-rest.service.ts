@@ -19,6 +19,9 @@ export class TableRestService {
     params['length'] = tableRequest.length;
     params['search[value]'] = tableRequest.search.value;
     params['search[regex]'] = tableRequest.search.regex;
+    if (tableRequest.filter) {
+      params['filter'] = tableRequest.filter;
+    }
 
     tableRequest.columns.forEach((col, i) => {
       const prefix = `columns[${i}]`;

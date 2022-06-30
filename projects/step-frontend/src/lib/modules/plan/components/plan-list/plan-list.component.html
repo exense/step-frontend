@@ -1,8 +1,8 @@
-<section class="plans-header">
+<section class="header">
   <step-btn-group class="import-export">
     <button
       type="button"
-      mat-raised-button
+      mat-icon-button
       matTooltip="Import plan"
       matTooltipPosition="below"
       [disabled]="!('plan-write' | hasRight | async)"
@@ -12,7 +12,7 @@
     </button>
     <button
       type="button"
-      mat-raised-button
+      mat-icon-button
       matTooltip="Export all plans"
       matTooltipPosition="below"
       [disabled]="!('plan-read' | hasRight | async)"
@@ -24,12 +24,14 @@
   <step-btn-group>
     <button
       type="button"
-      mat-raised-button
-      color="primary"
+      mat-icon-button
+      class="primary"
+      matTooltip="Add plan"
+      matTooltipPosition="below"
       [disabled]="!('plan-write' | hasRight | async)"
       (click)="addPlan()"
     >
-      New plan
+      <mat-icon>add</mat-icon>
     </button>
   </step-btn-group>
 </section>
@@ -52,7 +54,7 @@
     <td mat-cell *matCellDef="let element" class="cell-actions">
       <step-btn-group>
         <button
-          mat-stroked-button
+          mat-icon-button
           matTooltip="Execute plan"
           [disabled]="!('plan-write' | hasRight | async)"
           (click)="executePlan(element.id)"
@@ -60,7 +62,7 @@
           <mat-icon>play_arrow</mat-icon>
         </button>
         <button
-          mat-stroked-button
+          mat-icon-button
           matTooltip="Duplicate plan"
           [disabled]="!('plan-read' | hasRight | async)"
           (click)="duplicatePlan(element.id)"
@@ -68,14 +70,14 @@
           <mat-icon>content_copy</mat-icon>
         </button>
         <button
-          mat-stroked-button
+          mat-icon-button
           matTooltip="Delete plan"
           [disabled]="!('plan-read' | hasRight | async)"
           (click)="deletePlan(element.id, element.attributes.name)"
         >
           <mat-icon>clear</mat-icon>
         </button>
-        <button mat-stroked-button [matMenuTriggerFor]="menu" [matMenuTriggerData]="{ element: element }">
+        <button mat-icon-button [matMenuTriggerFor]="menu" [matMenuTriggerData]="{ element: element }">
           <mat-icon>more_horiz</mat-icon>
         </button>
       </step-btn-group>
