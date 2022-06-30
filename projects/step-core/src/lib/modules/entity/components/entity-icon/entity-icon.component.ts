@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, SimpleChanges } from '@angular/core';
 import { EntityScopeResolver } from '../../services/entity-scope-resolver';
 import { Entity } from '../../types/entity';
 import { EntityRegistry } from '../../services/entity-registry';
@@ -20,7 +20,16 @@ export class EntityIconComponent {
 
   constructor(private entityScopeResolver: EntityScopeResolver, private entityRegistry: EntityRegistry) {}
 
-  ngOnChanges(): void {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes['entity'].previousValue !== changes['entity'].currentValue ||
+      changes['entityName']?.previousValue !== changes['entityName']?.currentValue
+    ) {
+      this.update();
+    }
+  }
+
+  update(): void {
     this.icon = 'adjust';
     this.tooltip = 'In this project';
 
@@ -35,6 +44,7 @@ export class EntityIconComponent {
       const entityType = this.entityRegistry.getEntityByName(this.entityName);
       console.log('entityType', entityType);
       console.log('entityName', this.entityName);
+
       if (entityType && entityType.iconAG2) {
         this.icon = entityType.iconAG2;
       }
