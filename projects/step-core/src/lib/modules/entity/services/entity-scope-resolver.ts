@@ -12,13 +12,11 @@ export class EntityScopeResolver {
   resolvers: Resolver<Entity>[] = [];
 
   registerResolver(resolver: Resolver<Entity>) {
-    console.log('registerResolver', resolver);
     this.resolvers.push(resolver);
   }
 
   /* Will return result of first resolver that is not null */
   getScope(entity: Entity) {
-    console.log('resolvers', this.resolvers[0](entity));
     for (const resolver of this.resolvers) {
       const entityScope = resolver(entity);
       if (entityScope != null) {

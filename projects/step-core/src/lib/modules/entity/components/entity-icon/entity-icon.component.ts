@@ -42,8 +42,6 @@ export class EntityIconComponent {
         return;
       }
       const entityType = this.entityRegistry.getEntityByName(this.entityName);
-      console.log('entityType', entityType);
-      console.log('entityName', this.entityName);
 
       if (entityType && entityType.iconAG2) {
         this.icon = entityType.iconAG2;
