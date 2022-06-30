@@ -9,4 +9,5 @@ export interface TableRequestData {
   start: number;
   length: number;
   search: TableSearch;
+  filter?: string;
 }

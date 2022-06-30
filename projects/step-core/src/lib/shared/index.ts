@@ -3,5 +3,6 @@ export * from './constants';
 export * from './legacy-view-registry.service';
 export * from './utils';
 export * from './dialogs.service';
+export * from './is-used-by-dialogs.service';
 export * from './mutable';
 export * from './additional-right-rule';

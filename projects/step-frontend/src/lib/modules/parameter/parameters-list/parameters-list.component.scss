@@ -5,6 +5,25 @@
   border-radius: 16px;
 }
 
+.scope {
+  padding: 6px;
+  border-radius: 3px;
+  text-transform: capitalize;
+  color: black;
+}
+
+.scope-global {
+  background-color: #35c163;
+}
+
+.scope-function {
+  background-color: #d90606;
+}
+
+.scope-application {
+  background-color: #f5e30a;
+}
+
 .cell-actions {
   width: 20rem;
 
