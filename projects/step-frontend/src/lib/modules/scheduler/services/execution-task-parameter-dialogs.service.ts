@@ -38,8 +38,8 @@ export class ExecutionTaskParameterDialogsService {
   }
 
   removeExecutionTaskParameter(task: ExecutiontTaskParameters): Observable<any> {
-    return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Parameter "${task.attributes['name']}"`)).pipe(
-      switchMap((_) => this._schedulerService.removeExecutionTask(task.id, true)),
+    return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Parameter "${task!.attributes['name']!}"`)).pipe(
+      switchMap((_) => this._schedulerService.removeExecutionTask(task.id!, true)),
       map((_) => true),
       catchError((_) => of(false))
     );

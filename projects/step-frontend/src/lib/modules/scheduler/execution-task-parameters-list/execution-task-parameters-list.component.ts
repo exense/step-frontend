@@ -58,7 +58,7 @@ export class ExecutionTaskParametersListComponent {
         elementA.executionsParameters!.customParameters!['env'].localeCompare(
           elementB.executionsParameters!.customParameters!['env']
         ),
-      status: (elementA, elementB) => +elementB.active - +elementA.active,
+      status: (elementA, elementB) => +elementB.active! - +elementA.active!,
     },
   });
 
@@ -89,12 +89,12 @@ export class ExecutionTaskParametersListComponent {
 
   switchActive(executionTaskParameters: ExecutiontTaskParameters) {
     this._schedulerService
-      .getExecutionTask(executionTaskParameters.id)
+      .getExecutionTask(executionTaskParameters.id!)
       .pipe(
         switchMap((task) =>
           task.active
-            ? this._schedulerService.removeExecutionTask(task.id, false)
-            : this._schedulerService.enableExecutionTask(task.id)
+            ? this._schedulerService.removeExecutionTask(task.id!, false)
+            : this._schedulerService.enableExecutionTask(task.id!)
         )
       )
       .subscribe(() => this.loadTable());
@@ -120,7 +120,7 @@ export class ExecutionTaskParametersListComponent {
 
   editParameter(executionTaskParameters: ExecutiontTaskParameters): void {
     this._schedulerService
-      .getExecutionTask(executionTaskParameters.id)
+      .getExecutionTask(executionTaskParameters.id!)
       .pipe(switchMap((task) => this._executionTaskParameterDialogs.editExecutionTaskParameter(task)))
       .subscribe((_) => this.loadTable());
   }

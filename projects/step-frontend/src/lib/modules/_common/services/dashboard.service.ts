@@ -29,7 +29,10 @@ export class DashboardService {
   checkAvailability(override = false) {
     try {
       if (this._authService.getConf()) {
-        if (this._authService.getConf().displayNewPerfDashboard && this._viewRegistryService.getCustomView('grafana')) {
+        if (
+          this._authService!.getConf()!.displayNewPerfDashboard &&
+          this._viewRegistryService.getCustomView('grafana')
+        ) {
           this._http.get<any>('rest/g-dashboards/isGrafanaAvailable').subscribe((response) => {
             this.isGrafanaAvailable = !!response.data.available;
           });
