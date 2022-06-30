@@ -15,13 +15,15 @@ export class EntityIconComponent {
   @Input() entityName?: string;
   @Input() entity!: Entity;
 
-  icon?: string;
-  tooltip?: string;
+  icon: string = '';
+  tooltip: string = '';
 
   constructor(private entityScopeResolver: EntityScopeResolver, private entityRegistry: EntityRegistry) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (
+      changes['entity'].firstChange ||
+      changes['entityName']?.firstChange ||
       changes['entity'].previousValue !== changes['entity'].currentValue ||
       changes['entityName']?.previousValue !== changes['entityName']?.currentValue
     ) {
@@ -30,13 +32,14 @@ export class EntityIconComponent {
   }
 
   update(): void {
+    console.log('update');
     this.icon = 'adjust';
     this.tooltip = 'In this project';
 
     const entityScope = this.entityScopeResolver.getScope(this.entity);
     if (entityScope) {
-      this.icon = entityScope.icon;
-      this.tooltip = entityScope.tooltip;
+      this.icon = entityScope.icon ?? '';
+      this.tooltip = entityScope.tooltip ?? '';
     } else {
       if (!this.entityName) {
         return;
@@ -44,7 +47,7 @@ export class EntityIconComponent {
       const entityType = this.entityRegistry.getEntityByName(this.entityName);
 
       if (entityType && entityType.iconAG2) {
-        this.icon = entityType.iconAG2;
+        this.icon = entityType.iconAG2 ?? '';
       }
     }
   }
