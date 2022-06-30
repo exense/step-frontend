@@ -148,107 +148,6 @@ angular
       });
     };
   })
-
-/*
-  .controller(
-    'SchedulerCtrl',
-    function (
-      $rootScope,
-      $scope,
-      $http,
-      $location,
-      stateStorage,
-      $uibModal,
-      AuthService,
-      Dialogs,
-      SchedulerTaskDialogs,
-      DashboardService
-    ) {
-      stateStorage.push($scope, 'scheduler', {});
-
-      $scope.authService = AuthService;
-      $scope.DashboardService = DashboardService;
-      $scope.model = {};
-
-      $http.get('rest/settings/scheduler_enabled').then(function (response) {
-        $scope.model.schedulerEnabledToggle = response.data ? response.data == 'true' : false;
-      });
-
-      $scope.configureScheduler = function () {
-        $location.path('/root/admin/controller/scheduler');
-      };
-
-      $scope.loadTable = function loadTable() {
-        $http.get('rest/scheduler/task').then(function (response) {
-          $scope.schedulerTasks = response.data;
-        });
-      };
-
-      $scope.enableSelected = function (remove) {
-        var rows = $scope.datatable.getSelection().selectedItems;
-
-        for (i = 0; i < rows.length; i++) {
-          $scope.enableTask(rows[i][0]);
-        }
-      };
-
-      $scope.toggleTaskState = function (id, currentState) {
-        if (currentState) {
-          $scope.deleteTask(id, false);
-        } else {
-          $scope.enableTask(id);
-        }
-      };
-
-      $scope.enableTask = function (id) {
-        $http.put('rest/scheduler/task/' + id).then(function () {
-          $scope.loadTable();
-        });
-      };
-
-      $scope.saveTask = function (task) {
-        $http.post('rest/scheduler/task', task).then();
-      };
-
-      $scope.executeTask = function (task) {
-        $http.post('rest/scheduler/task/' + task.id + '/execute').then(function (response) {
-          var eId = response.data;
-
-          $location.$$search = {};
-          $location.path('/root/executions/' + eId);
-        });
-      };
-
-      $scope.addSchedulerEntry = function () {
-        SchedulerTaskDialogs.addSchedulerTask(function () {
-          $scope.loadTable();
-        });
-      };
-
-      $scope.editTask = function (id) {
-        SchedulerTaskDialogs.editSchedulerTask(id, function () {
-          $scope.loadTable();
-        });
-      };
-
-      $scope.askAndDeleteTask = function (id, name) {
-        Dialogs.showDeleteWarning(1, 'Task "' + name + '"').then(function () {
-          $scope.deleteTask(id, true);
-        });
-      };
-
-      $scope.deleteTask = function (id, remove) {
-        $http.delete('rest/scheduler/task/' + id + '?remove=' + remove).then(function () {
-          $scope.loadTable();
-        });
-      };
-
-      $scope.loadTable($scope, $http);
-    }
-  )
-*/
-/*
-
   .factory('schedulerServices', function ($http, $location, $uibModal) {
     var factory = {};
 
@@ -276,7 +175,6 @@ angular
 
     return factory;
   })
-*/
 
   .controller('SchedulerConfigurationCtrl', function ($scope, $http, AuthService) {
     $scope.authService = AuthService;
