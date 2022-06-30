@@ -101,7 +101,7 @@ export class ExecutionTaskParametersListComponent {
   }
 
   navToStats(executionTaskParameters: ExecutiontTaskParameters) {
-    window.open(this._dashboardService.getDashboardLink(executionTaskParameters.id), '_blank');
+    window.open(this._dashboardService.getDashboardLink(executionTaskParameters.id!), '_blank');
   }
 
   navToPlan(planId: string) {
