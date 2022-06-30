@@ -38,7 +38,7 @@ export class ExecutionTaskParameterDialogsService {
   }
 
   removeExecutionTaskParameter(task: ExecutiontTaskParameters): Observable<any> {
-    const paramName: string = task.attributes['name']!;
+    const paramName: string = task.attributes!['name']!;
     return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Parameter "${paramName}"`)).pipe(
       switchMap((_) => this._schedulerService.removeExecutionTask(task.id!, true)),
       map((_) => true),
