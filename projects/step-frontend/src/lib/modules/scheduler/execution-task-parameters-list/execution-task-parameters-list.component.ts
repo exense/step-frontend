@@ -83,11 +83,8 @@ export class ExecutionTaskParametersListComponent {
 
   executeParameter(executionTaskParameters: ExecutiontTaskParameters) {
     //@ts-ignore
-    this._httpClient
-      .post<any>('rest/scheduler/task/' + executionTaskParameters.id + '/execute', null, { responseType: 'text' })
-      .subscribe((executionId) => {
-        this._location.go('#/root/executions/' + executionId);
-      });
+    // prettier-ignore
+    this._httpClient.post<any>('rest/scheduler/task/' + executionTaskParameters.id + '/execute', null, { responseType: 'text' }).subscribe((executionId) => { this._location.go('#/root/executions/' + executionId) });
   }
 
   switchActive(executionTaskParameters: ExecutiontTaskParameters) {
