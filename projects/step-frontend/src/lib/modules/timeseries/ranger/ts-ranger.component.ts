@@ -24,18 +24,18 @@ declare const uPlot: any;
   encapsulation: ViewEncapsulation.None,
 })
 export class TSRangerComponent implements OnInit, AfterViewInit {
-  @ViewChild('chart') private chartElement: ElementRef;
+  @ViewChild('chart') private chartElement!: ElementRef;
 
-  @Input('settings') settings: TSRangerSettings;
-  @Input('syncKey') syncKey: string;
+  @Input('settings') settings!: TSRangerSettings;
+  @Input('syncKey') syncKey: string | undefined;
 
   @Output('onRangeChange') onRangeChange = new EventEmitter<TSTimeRange>();
 
-  uplot: any;
-  lastRange: TSTimeRange;
+  uplot!: any;
+  previousRange: TSTimeRange | undefined;
 
-  start: number;
-  end: number;
+  start!: number;
+  end!: number;
 
   ngOnInit(): void {
     if (this.syncKey) {
@@ -222,7 +222,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
             let width = Math.round(uRanger.valToPos(this.end, 'x')) - left;
             let height = uRanger.bbox.height / devicePixelRatio;
             uRanger.setSelect({ left, width, height }, false);
-            this.lastRange = { start: this.start, end: this.end };
+            this.previousRange = { start: this.start, end: this.end };
             const sel = uRanger.root.querySelector('.u-select');
 
             //@ts-ignore
@@ -275,9 +275,9 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
     let u = this.uplot;
     let min = u.posToVal(u.select.left, 'x');
     let max = u.posToVal(u.select.left + u.select.width, 'x');
-    if (min != this.lastRange.start || max !== this.lastRange.end) {
+    if (min != this.previousRange?.start || max !== this.previousRange?.end) {
       let currentRange = { start: min, end: max };
-      this.lastRange = currentRange;
+      this.previousRange = currentRange;
       this.onRangeChange.next(currentRange);
     }
   }

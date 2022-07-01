@@ -11,7 +11,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { TSChartSettings } from './model/ts-chart-settings';
+import { TSChartSeries, TSChartSettings } from './model/ts-chart-settings';
 import { UplotSyncService } from './uplot-sync-service';
 import { UPlotUtils } from '../uplot/uPlot.utils';
 
@@ -27,14 +27,14 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   readonly WRAPPER_PADDING_PX = 12;
   readonly WRAPPER_PADDING = '12px';
 
-  @ViewChild('chart') private chartElement: ElementRef;
+  @ViewChild('chart') private chartElement!: ElementRef;
 
-  @Input('settings') settings: TSChartSettings;
-  @Input('syncKey') syncKey: string;
+  @Input('settings') settings!: TSChartSettings;
+  @Input('syncKey') syncKey: string | undefined;
 
   @Output('onZoomReset') onZoomReset = new EventEmitter();
 
-  uplot: uPlot;
+  uplot!: uPlot;
 
   seriesIndexesByIds: { [key: string]: number } = {};
 
@@ -100,7 +100,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         },
         y: {},
       },
-      axes: [{}, ...this.settings.axes],
+      axes: [{}, ...(this.settings.axes || [])],
       series: [
         {
           label: 'Timestamp',
@@ -146,5 +146,52 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     if (index == undefined) return;
     let currentState = this.uplot.series[index].show;
     this.uplot.setSeries(index, { show: !currentState });
+  }
+
+  addSeries(series: TSChartSeries) {
+    let existingSeries = this.seriesIndexesByIds[series.id];
+    if (existingSeries) {
+      throw new Error('Series already exists with id ' + series.id);
+    }
+    this.uplot.addSeries(series);
+    this.seriesIndexesByIds[series.id] = this.uplot.series.length;
+  }
+
+  getSeriesIndex(key: string): number {
+    return this.seriesIndexesByIds[key];
+  }
+
+  hasSeries(id: string) {
+    return !!this.seriesIndexesByIds[id];
+  }
+
+  addDataByKey(data: number[], key: string) {
+    let index = this.seriesIndexesByIds[key];
+    if (index === undefined) {
+      throw new Error('Series id not found: ' + key);
+    } else {
+      this.addData(data, index);
+    }
+  }
+
+  // this is removing the last element in the chart. this is used while streaming, in order to replace the element with a full set of data
+  removeTail() {
+    this.uplot.data.forEach((series) => {
+      (series as number[]).pop();
+    });
+  }
+
+  addData(data: number[], seriesIndex: number) {
+    let existingData = this.uplot.data[seriesIndex] as number[];
+    this.uplot.data[seriesIndex] = [...existingData, ...data];
+  }
+
+  redraw() {
+    this.uplot.setData(this.uplot.data);
+  }
+
+  getLastTimestamp(): number {
+    let timestampSeries = this.uplot.data[0];
+    return timestampSeries[timestampSeries.length - 1];
   }
 }

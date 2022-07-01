@@ -1,7 +1,5 @@
 import uPlot from '../../uplot/uPlot';
-import Axis = uPlot.Axis;
-import Series = uPlot.Series;
-import Cursor = uPlot.Cursor;
+import { Axis, Cursor, Series } from 'uplot';
 
 export interface TSChartSettings {
   title: string;
@@ -10,10 +8,10 @@ export interface TSChartSettings {
   series: TSChartSeries[];
   autoResize?: boolean;
   axes?: Axis[];
-  showLegend: boolean;
+  showLegend?: boolean;
 }
 
 export interface TSChartSeries extends Series {
-  data: number[];
-  id?: string;
+  data: (number | null)[];
+  id: string;
 }

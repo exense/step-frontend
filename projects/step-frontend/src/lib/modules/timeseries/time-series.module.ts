@@ -9,10 +9,17 @@ import { TableModule } from '@exense/step-core';
 import * as uPlot from 'uplot';
 import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
-import { CommonModule } from '@angular/common'; // this is mandatory for compile
+import { CommonModule } from '@angular/common';
+import { TimeseriesTableComponent } from './execution-page/table/timeseries-table.component'; // this is mandatory for compile
 
 @NgModule({
-  declarations: [ExecutionPageComponent, TimeSeriesChartComponent, ExecutionTabsComponent, TSRangerComponent],
+  declarations: [
+    ExecutionPageComponent,
+    TimeSeriesChartComponent,
+    ExecutionTabsComponent,
+    TSRangerComponent,
+    TimeseriesTableComponent,
+  ],
   exports: [ExecutionPageComponent],
   imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule],
 })

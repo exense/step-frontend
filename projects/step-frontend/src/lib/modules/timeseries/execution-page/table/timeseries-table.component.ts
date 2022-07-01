@@ -17,7 +17,7 @@ export class TimeseriesTableComponent implements OnInit {
   tableIsLoading = true;
   dimensionKey = 'name';
 
-  @Input('colorsPool') colorsPool: TimeseriesColorsPool;
+  @Input('colorsPool') colorsPool!: TimeseriesColorsPool;
   @Output('onKeywordsFetched') onKeywordsFetched = new EventEmitter<string[]>();
 
   sortByNameAttributeFn = (a: Bucket, b: Bucket) =>

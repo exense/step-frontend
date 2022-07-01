@@ -33,8 +33,8 @@
   <div class="chart-container">
     <step-timeseries-chart
       #chart5
-      *ngIf="responseTypeByKeywordsChart"
-      [settings]="responseTypeByKeywordsChart"
+      *ngIf="responseTypeByKeywordsSettings"
+      [settings]="responseTypeByKeywordsSettings"
       [syncKey]="syncKey"
       (onZoomReset)="onZoomReset()"
     >
@@ -81,49 +81,11 @@
   </div>
 
   <div class="chart-container">
-    <step-table [dataSource]="tableDataSource" [inProgress]="tableIsLoading">
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Name</th>
-        <td mat-cell *matCellDef="let element">
-          <div class="color-cell">
-            <span class="color-square" [style.background-color]="element.attributes.color"></span>
-            <span>{{ element.attributes.name }}</span>
-          </div>
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="count">
-        <th mat-header-cell *matHeaderCellDef>Count</th>
-        <td mat-cell *matCellDef="let element">
-          {{ element.count }}
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="sum">
-        <th mat-header-cell *matHeaderCellDef>Sum</th>
-        <td mat-cell *matCellDef="let element">
-          {{ element.sum }}
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="avg">
-        <th mat-header-cell *matHeaderCellDef>Avg</th>
-        <td mat-cell *matCellDef="let element">
-          {{ element.attributes.avg }}
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="min">
-        <th mat-header-cell *matHeaderCellDef>Min</th>
-        <td mat-cell *matCellDef="let element">
-          {{ element.min }}
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="max">
-        <th mat-header-cell *matHeaderCellDef>Max</th>
-        <td mat-cell *matCellDef="let element">
-          {{ element.max }}
-        </td>
-      </ng-container>
-      <!--            <mat-row *matRowDef="let row; columns: tableColumns"-->
-      <!--                     [class.display-none]="!keywords[row.attributes.name].isSelected"></mat-row>-->
-    </step-table>
+    <step-timeseries-table
+      #tableChart
+      [colorsPool]="colorsPool"
+      (onKeywordsFetched)="onKeywordsFetched($event)"
+    ></step-timeseries-table>
   </div>
 
   <div class="chart-container pie-chart-container"></div>
