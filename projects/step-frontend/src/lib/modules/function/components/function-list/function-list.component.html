@@ -33,9 +33,12 @@
     >
       <mat-icon>add</mat-icon>
     </button>
+  </step-btn-group>
+  <step-btn-group>
     <button
       type="button"
-      mat-raised-button
+      mat-flat-button
+      color="primary"
       [disabled]="!('kw-write' | hasRight | async)"
       (click)="addFunctionPackage()"
     >
@@ -54,18 +57,17 @@
   </ng-container>
   <ng-container matColumnDef="package" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Package</th>
-    <td mat-cell *matCellDef="let element">{{ element.customFields.functionPackageId }}</td>
+    <td mat-cell *matCellDef="let element">{{ element.customFields?.functionPackageId }}</td>
   </ng-container>
   <ng-container matColumnDef="actions">
     <th mat-header-cell *matHeaderCellDef>Actions</th>
     <td mat-cell *matCellDef="let element" class="cell-actions">
       <step-btn-group>
         <button
-          mat-menu-item
+          mat-icon-button
+          matTooltip="Configure keyword"
           [disabled]="!('kw-read' | hasRight | async)"
-          matTooltip="Edit keyword"
-          matTooltipPosition="below"
-          (click)="editFunction(element.id)"
+          (click)="configureFunction(element.id)"
         >
           <mat-icon>edit</mat-icon>
         </button>
@@ -95,21 +97,35 @@
 <mat-menu #menu="matMenu">
   <ng-template matMenuContent let-element="element">
     <button
-      mat-icon-button
+      mat-menu-item
+      matTooltip="Edit keyword"
+      [disabled]="!('kw-write' | hasRight | async)"
+      (click)="editFunction(element.id)"
+    >
+      <mat-icon>edit</mat-icon>
+      Edit Keyword
+    </button>
+
+    <button
+      mat-menu-item
       matTooltip="Duplicate keyword"
       [disabled]="!('kw-write' | hasRight | async)"
       (click)="duplicateFunction(element.id)"
     >
       <mat-icon>content_copy</mat-icon>
+      Duplicate Keyword
     </button>
+
     <button
       mat-menu-item
+      matTooltip="Duplicate keyword"
       [disabled]="!('kw-read' | hasRight | async)"
-      (click)="exportPlan(element.id, element.attributes.name)"
+      (click)="exportFunction(element.id, element.attributes.name)"
     >
-      <mat-icon>file_upload</mat-icon>
-      Export plan
+      <mat-icon>content_copy</mat-icon>
+      Export Keyword
     </button>
+
     <button
       mat-menu-item
       [disabled]="!('kw-read' | hasRight | async)"
