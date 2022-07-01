@@ -9,6 +9,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ExecutionModule } from './modules/execution/execution.module';
 import { ContextMenuModule } from './modules/context-menu/context-menu.module';
 import { ParameterModule } from './modules/parameter/parameter.module';
+import { FunctionListComponent } from './modules/function/components/function-list/function-list.component';
+import { FunctionModule } from './modules/function/function.module';
 
 @NgModule({
   declarations: [],
@@ -18,6 +20,7 @@ import { ParameterModule } from './modules/parameter/parameter.module';
     StepCoreModule,
     AdminModule,
     PlanModule,
+    FunctionModule,
     ExecutionModule,
     BrowserAnimationsModule,
     ContextMenuModule,
