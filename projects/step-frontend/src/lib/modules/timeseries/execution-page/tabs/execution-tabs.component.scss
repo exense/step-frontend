@@ -1,0 +1,27 @@
+.tabs-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  margin-bottom: 16px;
+
+  .tab {
+    padding: 6px 20px;
+    display: inline-block;
+    cursor: pointer;
+
+    &.selected {
+      background-color: #ffffff;
+      opacity: 1;
+      border: 1px solid #c5c5c5;
+      border-radius: 1px;
+      box-shadow: 1px 1px 4px #f1f1f1;
+    }
+  }
+
+  .separator-line {
+    flex-grow: 1;
+    height: 3px;
+    background: #d7d7d7;
+  }
+}
