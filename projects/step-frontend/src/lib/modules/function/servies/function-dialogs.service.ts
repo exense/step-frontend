@@ -24,7 +24,6 @@ export class FunctionDialogsService {
   ) {}
 
   openModal(function_: any, dialogConfig?: any): Observable<any> {
-    console.log('function_', function_);
     const modalInstance = this._uibModalHelper.open({
       backdrop: 'static',
       templateUrl: 'partials/functions/functionConfigurationDialog.html',

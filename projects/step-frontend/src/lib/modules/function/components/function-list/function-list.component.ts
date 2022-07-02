@@ -17,6 +17,7 @@ import { IsUsedByType } from '../../../_common/shared/is-used-by-type.enum';
 import { catchError, map, noop, of, switchMap, tap } from 'rxjs';
 import { ILocationService, IRootScopeService } from 'angular';
 import { FunctionDialogsService } from '../../servies/function-dialogs.service';
+import { FunctionPackageDialogsService } from '../../servies/function-package-dialogs.service';
 
 @Component({
   selector: 'step-function-list',
@@ -36,6 +37,7 @@ export class FunctionListComponent {
     private _tableRest: TableRestService,
     private _dialogs: DialogsService,
     private _functionDialogs: FunctionDialogsService,
+    private _functionPackageDialogs: FunctionPackageDialogsService,
     private _exportDialogs: ExportDialogsService,
     private _importDialogs: ImportDialogsService,
     private _isUsedByDialogs: IsUsedByDialogsService,
@@ -48,7 +50,7 @@ export class FunctionListComponent {
   }
 
   addFunctionPackage(): void {
-    //this._functionDialogs.addFunction( $scope.config);
+    this._functionPackageDialogs.addFunctionPackage().subscribe((_) => this.dataSource.reload());
   }
 
   editFunction(id: string): void {
@@ -67,13 +69,13 @@ export class FunctionListComponent {
 
   duplicateFunction(id: string): void {
     this._httpClient
-      .get<any>(`rest/plans/${id}/clone`)
+      .post<any>(`rest/functions/${id}/copy`, {})
       .pipe(
         map((clone) => {
           clone.attributes.name += '_Copy';
           return clone;
         }),
-        switchMap((clone) => this._httpClient.post('rest/plans', clone))
+        switchMap((clone) => this._httpClient.post('rest/functions', clone))
       )
       .subscribe((_) => this.dataSource.reload());
   }
