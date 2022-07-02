@@ -10,6 +10,7 @@ import { ExecutionModule } from './modules/execution/execution.module';
 import { ContextMenuModule } from './modules/context-menu/context-menu.module';
 import { ParameterModule } from './modules/parameter/parameter.module';
 import { FunctionModule } from './modules/function/function.module';
+import { TimeSeriesModule } from './modules/timeseries/time-series.module';
 
 @NgModule({
   declarations: [],
@@ -24,6 +25,7 @@ import { FunctionModule } from './modules/function/function.module';
     BrowserAnimationsModule,
     ContextMenuModule,
     ParameterModule,
+    TimeSeriesModule,
   ],
   providers: [PLUGINS_INITIALIZER],
 })
