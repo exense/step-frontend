@@ -9,6 +9,10 @@ export const AJS_ROOT_SCOPE = new InjectionToken<IRootScopeService>(
 export const AJS_LOCATION = new InjectionToken<ILocationService>('$location', angularJsProviderOptions('$location'));
 export const AJS_PREFERENCES = new InjectionToken<any>('Preferences', angularJsProviderOptions('Preferences'));
 export const AJS_UIB_MODAL = new InjectionToken<any>('$uibModal', angularJsProviderOptions('$uibModal'));
+export const AJS_FUNCTION_DIALOGS_CONFIG = new InjectionToken<any>(
+  'FunctionDialogsConfig',
+  angularJsProviderOptions('FunctionDialogsConfig')
+);
 export const AJS_TEMPLATES_CACHE = new InjectionToken<ITemplateCacheService>(
   '$templateCache',
   angularJsProviderOptions('$templateCache')

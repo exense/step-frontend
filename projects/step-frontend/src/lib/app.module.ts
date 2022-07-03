@@ -10,6 +10,7 @@ import { ExecutionModule } from './modules/execution/execution.module';
 import { ContextMenuModule } from './modules/context-menu/context-menu.module';
 import { ParameterModule } from './modules/parameter/parameter.module';
 import { TimeSeriesModule } from './modules/timeseries/time-series.module';
+import { MaskModule } from './modules/mask/mask.module';
 
 @NgModule({
   declarations: [],
@@ -24,6 +25,7 @@ import { TimeSeriesModule } from './modules/timeseries/time-series.module';
     ContextMenuModule,
     ParameterModule,
     TimeSeriesModule,
+    MaskModule,
   ],
   providers: [PLUGINS_INITIALIZER],
 })

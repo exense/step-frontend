@@ -111,7 +111,8 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   constructor(
     private _tableId: string,
     private _rest: TableRestService,
-    private _requestColumnsMap: { [key: string]: string }
+    private _requestColumnsMap: { [key: string]: string },
+    private _fixedFilter?: { [key: string]: string }
   ) {}
 
   connect(collectionViewer: CollectionViewer): Observable<T[]> {
@@ -133,6 +134,10 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     search?: { [key: string]: SearchValue },
     filter?: string
   ): void {
+    if (this._fixedFilter) {
+      search = { ...search, ...this._fixedFilter };
+    }
+
     if (arguments.length === 1 && reqOrPage instanceof TableRequest) {
       const req = reqOrPage as TableRequest;
       this._request$.next(req);
