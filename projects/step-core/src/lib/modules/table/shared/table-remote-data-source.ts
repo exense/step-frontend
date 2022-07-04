@@ -13,9 +13,9 @@ import {
   takeUntil,
   tap,
 } from 'rxjs';
-import { TableRestService } from '../services/api/table-rest.service';
-import { TableRequestData } from '../services/api/dto/table-request-data';
-import { TableResponse } from '../services/api/dto/table-response';
+import { TableRestService } from '../../../client/table/services/table-rest.service';
+import { TableRequestData } from '../../../client/table/models/table-request-data';
+import { TableResponse } from '../../../client/table/models/table-response';
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { TableDataSource } from './table-data-source';
