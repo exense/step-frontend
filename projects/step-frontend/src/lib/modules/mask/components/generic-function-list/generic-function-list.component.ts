@@ -2,6 +2,7 @@ import { Component, Inject, Input } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   a1Promise2Observable,
+  AJS_FUNCTION_TYPE_REGISTRY,
   AJS_LOCATION,
   AJS_MODULE,
   AJS_ROOT_SCOPE,
@@ -37,7 +38,8 @@ export class GenericFunctionListComponent {
     private _functionDialogs: FunctionDialogsService,
     private _isUsedByDialogs: IsUsedByDialogsService,
     @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService,
-    @Inject(AJS_LOCATION) private _location: ILocationService
+    @Inject(AJS_LOCATION) private _location: ILocationService,
+    @Inject(AJS_FUNCTION_TYPE_REGISTRY) private _functionTypeRegistry: any
   ) {}
 
   ngOnInit() {
@@ -115,6 +117,10 @@ export class GenericFunctionListComponent {
 
   configureFunction(id: string) {
     this._functionDialogs.configureFunction(id, this.config).subscribe((_) => this.dataSource.reload());
+  }
+
+  functionTypeLabel(type: string) {
+    return this._functionTypeRegistry.getLabel(type);
   }
 }
 
