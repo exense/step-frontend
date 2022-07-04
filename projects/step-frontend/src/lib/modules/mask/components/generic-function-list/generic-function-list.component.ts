@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, Input } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   a1Promise2Observable,
@@ -17,24 +17,17 @@ import { ILocationService, IRootScopeService } from 'angular';
 import { FunctionDialogsService } from '../../../function/servies/function-dialogs.service';
 
 @Component({
-  selector: 'step-mask-list',
-  templateUrl: './mask-list.component.html',
-  styleUrls: ['./mask-list.component.scss'],
+  selector: 'step-generic-function-list',
+  templateUrl: './generic-function-list.component.html',
+  styleUrls: ['./generic-function-list.component.scss'],
 })
-export class MaskListComponent {
-  readonly dataSource = new TableRemoteDataSource(
-    'functions',
-    this._tableRest,
-    {
-      name: 'attributes.name',
-      type: 'type',
-      actions: '',
-    },
-    {
-      type: 'PdfTest|ImageCompare',
-    }
-  );
+export class GenericFunctionListComponent {
+  @Input() filter?: [string];
+  @Input() filterclass?: [string];
+  @Input() title?: string;
+  @Input() serviceroot?: string;
 
+  dataSource!: TableRemoteDataSource<any>;
   config: any;
 
   constructor(
@@ -45,11 +38,24 @@ export class MaskListComponent {
     private _isUsedByDialogs: IsUsedByDialogsService,
     @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService,
     @Inject(AJS_LOCATION) private _location: ILocationService
-  ) {
+  ) {}
+
+  ngOnInit() {
+    this.dataSource = new TableRemoteDataSource(
+      'functions',
+      this._tableRest,
+      {
+        name: 'attributes.name',
+        type: 'type',
+        actions: '',
+      },
+      this.filter
+    );
+
     this.config = this._functionDialogs._functionDialogsConfig.getConfigObject(
-      'Mask',
-      'masks',
-      ['step.plugins.pdftest.PdfTestFunction', 'step.plugins.compare.image.ImageCompareFunction'],
+      this.title,
+      this.serviceroot,
+      this.filterclass,
       true,
       'functionTable'
     );
@@ -114,4 +120,4 @@ export class MaskListComponent {
 
 getAngularJSGlobal()
   .module(AJS_MODULE)
-  .directive('stepMaskList', downgradeComponent({ component: MaskListComponent }));
+  .directive('stepGenericFunctionList', downgradeComponent({ component: GenericFunctionListComponent }));

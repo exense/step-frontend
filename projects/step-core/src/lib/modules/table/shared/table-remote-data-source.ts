@@ -107,13 +107,18 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   );
   readonly total$ = this._response$.pipe(map((r) => r?.recordsTotal || 0));
   readonly totalFiltered$ = this._response$.pipe(map((r) => r?.recordsFiltered || 0));
+  private typeFilter?: { [key: string]: string };
 
   constructor(
     private _tableId: string,
     private _rest: TableRestService,
     private _requestColumnsMap: { [key: string]: string },
-    private _fixedFilter?: { [key: string]: string }
-  ) {}
+    private _typeFilter?: [string]
+  ) {
+    if (_typeFilter) {
+      this.typeFilter = { type: _typeFilter.join('|') };
+    }
+  }
 
   connect(collectionViewer: CollectionViewer): Observable<T[]> {
     return this.data$;
@@ -134,8 +139,8 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     search?: { [key: string]: SearchValue },
     filter?: string
   ): void {
-    if (this._fixedFilter) {
-      search = { ...search, ...this._fixedFilter };
+    if (this.typeFilter) {
+      search = { ...search, ...this.typeFilter };
     }
 
     if (arguments.length === 1 && reqOrPage instanceof TableRequest) {
