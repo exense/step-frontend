@@ -33,6 +33,7 @@ angular
       'screens'
     );
   })
+  // FIXME: find solution to add EntityRegistry.registerEntity(Input
 
   .factory('ScreenTemplates', function ($http, $q) {
     var api = {};
