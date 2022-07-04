@@ -70,16 +70,7 @@ export class FunctionListComponent {
   }
 
   duplicateFunction(id: string): void {
-    this._httpClient
-      .post<any>(`rest/functions/${id}/copy`, {})
-      .pipe(
-        map((clone) => {
-          clone.attributes.name += '_Copy';
-          return clone;
-        }),
-        switchMap((clone) => this._httpClient.post('rest/functions', clone))
-      )
-      .subscribe((_) => this.dataSource.reload());
+    this._httpClient.post<any>(`rest/functions/${id}/copy`, {}).subscribe((_) => this.dataSource.reload());
   }
 
   deleteFunction(id: string, name: string): void {
