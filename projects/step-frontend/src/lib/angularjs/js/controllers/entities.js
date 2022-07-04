@@ -81,28 +81,3 @@ angular
 
     return api;
   })
-
-  .directive('entityIcon', function ($http) {
-    return {
-      restrict: 'E',
-      scope: {
-        entity: '=',
-        entityName: '=',
-      },
-      link: function (scope, element, attr) {},
-      controller: function ($scope, EntityRegistry, EntityScopeResolver) {
-        var entityScope = EntityScopeResolver.getScope($scope.entity);
-        if (entityScope) {
-          $scope.cssClass = entityScope.cssClass;
-          $scope.tooltip = entityScope.tooltip;
-        } else {
-          var entityType = EntityRegistry.getEntityByName($scope.entityName);
-          if (entityType && entityType.icon) {
-            $scope.cssClass = entityType.icon;
-            $scope.tooltip = null;
-          }
-        }
-      },
-      templateUrl: 'partials/entities/entityIcon.html',
-    };
-  });
