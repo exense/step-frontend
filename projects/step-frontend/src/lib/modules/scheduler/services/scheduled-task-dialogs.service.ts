@@ -12,7 +12,7 @@ import { pipe, map, Observable, switchMap, catchError, of } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
-export class ExecutionTaskParameterDialogsService {
+export class ScheduledTaskDialogsService {
   constructor(
     private _httpClient: HttpClient,
     private _uibModalHelper: UibModalHelperService,
@@ -20,24 +20,24 @@ export class ExecutionTaskParameterDialogsService {
     private _schedulerService: SchedulerService
   ) {}
 
-  editExecutionTaskParameter(
-    executionTaskParameters?: Partial<ExecutiontTaskParameters>
-  ): Observable<{ executionTaskParameters?: Partial<ExecutiontTaskParameters>; result: string }> {
+  editScheduledTask(
+    scheduledTask?: Partial<ExecutiontTaskParameters>
+  ): Observable<{ scheduledTask?: Partial<ExecutiontTaskParameters>; result: string }> {
     const modalInstance = this._uibModalHelper.open({
       backdrop: 'static',
       templateUrl: 'partials/scheduler/editSchedulerTaskDialog.html',
       controller: 'editSchedulerTaskModalCtrl',
       resolve: {
         task: function (): any {
-          return executionTaskParameters;
+          return scheduledTask;
         },
       },
     });
     const result$ = a1Promise2Observable(modalInstance.result) as Observable<string>;
-    return result$.pipe(map((result) => ({ result, executionTaskParameters: executionTaskParameters })));
+    return result$.pipe(map((result) => ({ result, scheduledTask: scheduledTask })));
   }
 
-  removeExecutionTaskParameter(task: ExecutiontTaskParameters): Observable<any> {
+  removeScheduledTask(task: ExecutiontTaskParameters): Observable<any> {
     const paramName: string = task.attributes!['name']!;
     return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Parameter "${paramName}"`)).pipe(
       switchMap((_) => this._schedulerService.removeExecutionTask(task.id!, true)),

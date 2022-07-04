@@ -14,33 +14,33 @@ import {
   TableLocalDataSource,
 } from '@exense/step-core';
 import { BehaviorSubject, switchMap, of, catchError, noop, shareReplay, tap, map, lastValueFrom } from 'rxjs';
-import { ExecutionTaskParameterDialogsService } from '../services/execution-task-parameter-dialogs.service';
+import { ScheduledTaskDialogsService } from '../services/scheduled-task-dialogs.service';
 import { Location } from '@angular/common';
 import { DashboardService } from '../../_common/services/dashboard.service';
 
-type InProgress = Mutable<Pick<ExecutionTaskParametersListComponent, 'inProgress'>>;
+type InProgress = Mutable<Pick<ScheduledTaskListComponent, 'inProgress'>>;
 
 @Component({
-  selector: 'step-execution-task-parameters-list',
-  templateUrl: './execution-task-parameters-list.component.html',
-  styleUrls: ['./execution-task-parameters-list.component.scss'],
+  selector: 'step-scheduled-task-list',
+  templateUrl: './scheduled-task-list.component.html',
+  styleUrls: ['./scheduled-task-list.component.scss'],
 })
-export class ExecutionTaskParametersListComponent {
+export class ScheduledTaskListComponent {
   readonly STATUS_ACTIVE_STRING = 'On';
   readonly STATUS_INACTIVE_STRING = 'Off';
 
   readonly currentUserName: string;
   readonly inProgress: boolean = false;
 
-  private executionTaskParametersRequest$ = new BehaviorSubject<any>({});
-  private executionTaskParameters$ = this.executionTaskParametersRequest$.pipe(
+  private scheduledTaskRequest$ = new BehaviorSubject<any>({});
+  private scheduledTask$ = this.scheduledTaskRequest$.pipe(
     tap((_) => ((this as InProgress).inProgress = true)),
     switchMap((_) => this._schedulerService.getScheduledExecutions()),
     tap((_) => ((this as InProgress).inProgress = false)),
     shareReplay(1)
   );
 
-  readonly searchableExecutionTaskParameters$ = new TableLocalDataSource(this.executionTaskParameters$, {
+  readonly searchableScheduledTask$ = new TableLocalDataSource(this.scheduledTask$, {
     searchPredicates: {
       name: (element, searchValue) => element.attributes!['name'].toLowerCase().includes(searchValue.toLowerCase()),
       environment: (element, searchValue) =>
@@ -66,7 +66,7 @@ export class ExecutionTaskParametersListComponent {
     private _dashboardService: DashboardService,
     private _schedulerService: AugmentedSchedulerService,
     private _dialogs: DialogsService,
-    private _executionTaskParameterDialogs: ExecutionTaskParameterDialogsService,
+    private _scheduledTaskDialogs: ScheduledTaskDialogsService,
     private _isUsedByDialogs: IsUsedByDialogsService,
     private _auth: AuthService,
     private _tableRest: TableRestService,
@@ -78,18 +78,18 @@ export class ExecutionTaskParametersListComponent {
   }
 
   private loadTable(): void {
-    this.executionTaskParametersRequest$.next({});
+    this.scheduledTaskRequest$.next({});
   }
 
-  executeParameter(executionTaskParameters: ExecutiontTaskParameters) {
-    this._schedulerService.execute1(executionTaskParameters.id!).subscribe((executionId) => {
+  executeParameter(scheduledTask: ExecutiontTaskParameters) {
+    this._schedulerService.execute1(scheduledTask.id!).subscribe((executionId) => {
       this._location.go('#/root/executions/' + executionId);
     });
   }
 
-  switchActive(executionTaskParameters: ExecutiontTaskParameters) {
+  switchActive(scheduledTask: ExecutiontTaskParameters) {
     this._schedulerService
-      .getExecutionTask(executionTaskParameters.id!)
+      .getExecutionTask(scheduledTask.id!)
       .pipe(
         switchMap((task) =>
           task.active
@@ -100,8 +100,8 @@ export class ExecutionTaskParametersListComponent {
       .subscribe(() => this.loadTable());
   }
 
-  navToStats(executionTaskParameters: ExecutiontTaskParameters) {
-    window.open(this._dashboardService.getDashboardLink(executionTaskParameters.id!), '_blank');
+  navToStats(scheduledTask: ExecutiontTaskParameters) {
+    window.open(this._dashboardService.getDashboardLink(scheduledTask.id!), '_blank');
   }
 
   navToPlan(planId: string) {
@@ -112,30 +112,25 @@ export class ExecutionTaskParametersListComponent {
     this._location.go('#/root/admin/controller/scheduler');
   }
 
-  deletePrameter(executionTaskParameters: ExecutiontTaskParameters): void {
-    this._executionTaskParameterDialogs
-      .removeExecutionTaskParameter(executionTaskParameters)
-      .subscribe(() => this.loadTable());
+  deletePrameter(scheduledTask: ExecutiontTaskParameters): void {
+    this._scheduledTaskDialogs.removeScheduledTask(scheduledTask).subscribe(() => this.loadTable());
   }
 
-  editParameter(executionTaskParameters: ExecutiontTaskParameters): void {
+  editParameter(scheduledTask: ExecutiontTaskParameters): void {
     this._schedulerService
-      .getExecutionTask(executionTaskParameters.id!)
-      .pipe(switchMap((task) => this._executionTaskParameterDialogs.editExecutionTaskParameter(task)))
+      .getExecutionTask(scheduledTask.id!)
+      .pipe(switchMap((task) => this._scheduledTaskDialogs.editScheduledTask(task)))
       .subscribe((_) => this.loadTable());
   }
 
   createParameter() {
     this._schedulerService
       .createExecutionTask()
-      .pipe(switchMap((task) => this._executionTaskParameterDialogs.editExecutionTaskParameter(task)))
+      .pipe(switchMap((task) => this._scheduledTaskDialogs.editScheduledTask(task)))
       .subscribe((_) => this.loadTable());
   }
 }
 
 getAngularJSGlobal()
   .module(AJS_MODULE)
-  .directive(
-    'stepExecutionTaskParametersList',
-    downgradeComponent({ component: ExecutionTaskParametersListComponent })
-  );
+  .directive('stepScheduledTaskList', downgradeComponent({ component: ScheduledTaskListComponent }));
