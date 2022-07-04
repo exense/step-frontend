@@ -2,7 +2,7 @@
 
 SPEC_URL=$1
 GENERATED_CODE_LOCATION=./projects/step-core/src/lib/client/generated
-CLIENT_MODULE_NAME=StepClientModule
+CLIENT_MODULE_NAME=StepGeneratedClientModule
 
 npx openapi --input $SPEC_URL --output $GENERATED_CODE_LOCATION --client angular --useUnionTypes --name $CLIENT_MODULE_NAME --exportCore false --exportSchemas true
 

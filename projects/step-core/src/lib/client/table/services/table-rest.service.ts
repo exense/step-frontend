@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { TableRequestData } from './dto/table-request-data';
-import { TableResponse } from './dto/table-response';
+import { TableRequestData } from '../models/table-request-data';
+import { TableResponse } from '../models/table-response';
 import { Observable } from 'rxjs';
 
 const ROOT = 'rest/table';
@@ -19,6 +19,9 @@ export class TableRestService {
     params['length'] = tableRequest.length;
     params['search[value]'] = tableRequest.search.value;
     params['search[regex]'] = tableRequest.search.regex;
+    if (tableRequest.filter) {
+      params['filter'] = tableRequest.filter;
+    }
 
     tableRequest.columns.forEach((col, i) => {
       const prefix = `columns[${i}]`;

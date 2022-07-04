@@ -32,61 +32,6 @@ angular
       '/partials/resources/resourceSelectionTable.html'
     );
   })
-
-  .controller(
-    'ResourceListCtrl',
-    function (
-      $rootScope,
-      $scope,
-      $http,
-      stateStorage,
-      Dialogs,
-      ResourceDialogs,
-      AuthService,
-      IsUsedByService,
-      IsUsedByDialogs
-    ) {
-      stateStorage.push($scope, 'resources', {});
-      $scope.authService = AuthService;
-
-      function reload() {
-        $scope.tableHandle.reload();
-      }
-
-      $scope.addResource = function () {
-        ResourceDialogs.editResource(null, function () {
-          reload();
-        });
-      };
-
-      $scope.editResource = function (id) {
-        ResourceDialogs.editResource(id, function () {
-          reload();
-        });
-      };
-
-      $scope.lookUp = function (id, name) {
-        console.log(name);
-        const namePlaceholder = name ? '"' + name + '" ' : '';
-        IsUsedByDialogs.displayDialog(
-          'Resource ' + namePlaceholder + 'is used by',
-          IsUsedByService.type.RESOURCE_ID,
-          id
-        );
-      };
-
-      $scope.deleteResource = function (id, name) {
-        Dialogs.showDeleteWarning(1, 'Resource "' + name + '"').then(function () {
-          $http.delete('rest/resources/' + id).then(function () {
-            reload();
-          });
-        });
-      };
-
-      $scope.tableHandle = {};
-    }
-  )
-
   .factory('ResourceDialogs', function ($uibModal, $http, Dialogs) {
     function openModal(id) {
       var modalInstance = $uibModal.open({

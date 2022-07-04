@@ -13,9 +13,9 @@ import {
   takeUntil,
   tap,
 } from 'rxjs';
-import { TableRestService } from '../services/api/table-rest.service';
-import { TableRequestData } from '../services/api/dto/table-request-data';
-import { TableResponse } from '../services/api/dto/table-response';
+import { TableRestService } from '../../../client/table/services/table-rest.service';
+import { TableRequestData } from '../../../client/table/models/table-request-data';
+import { TableResponse } from '../../../client/table/models/table-response';
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { TableDataSource } from './table-data-source';
@@ -27,6 +27,7 @@ export class TableRequest {
   orderBy?: { column: string; order: 'asc' | 'desc' };
   start?: number;
   length?: number;
+  filter?: string;
 
   constructor(data?: Partial<TableRequest>) {
     this.columns = data?.columns || [];
@@ -34,6 +35,7 @@ export class TableRequest {
     this.orderBy = data?.orderBy || undefined;
     this.start = data?.start || undefined;
     this.length = data?.length || undefined;
+    this.filter = data?.filter || undefined;
   }
 }
 
@@ -48,6 +50,7 @@ const convertTableRequest = (req: TableRequest): TableRequestData => {
       value: '',
       regex: false,
     },
+    filter: req.filter,
   };
 
   result.columns = req.columns.map((name) => {
@@ -64,16 +67,17 @@ const convertTableRequest = (req: TableRequest): TableRequestData => {
       : { name };
   });
 
-  const orderColumnIndex = !!req.orderBy ? req.columns.indexOf(req.orderBy.column) : -1;
-  if (orderColumnIndex >= 0) {
-    result.columns[orderColumnIndex].orderable = true;
-    result.order = [
-      {
-        column: orderColumnIndex,
-        dir: req.orderBy!.order,
-      },
-    ];
+  let orderColumnIndex = 0; //if not specified otherwise, the first column is sorted ascendingly
+  if (!!req.orderBy && req.columns.indexOf(req.orderBy.column) >= 0) {
+    orderColumnIndex = req.columns.indexOf(req.orderBy.column);
   }
+  result.columns[orderColumnIndex].orderable = true;
+  result.order = [
+    {
+      column: orderColumnIndex,
+      dir: !!req.orderBy?.order ? req.orderBy.order : 'asc',
+    },
+  ];
 
   return result;
 };
@@ -126,7 +130,8 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   getTableData(
     reqOrPage: TableRequest | PageEvent | undefined,
     sort?: Sort,
-    search?: { [key: string]: SearchValue }
+    search?: { [key: string]: SearchValue },
+    filter?: string
   ): void {
     if (arguments.length === 1 && reqOrPage instanceof TableRequest) {
       const req = reqOrPage as TableRequest;
@@ -157,6 +162,10 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
         .filter((x) => !!x.search),
     });
 
+    if (filter) {
+      tableRequest.filter = filter;
+    }
+
     if (page) {
       tableRequest.start = page.pageIndex * page.pageSize;
       tableRequest.length = page.pageSize;
@@ -166,11 +175,6 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     if (order) {
       const column = this._requestColumnsMap[sort.active];
       tableRequest.orderBy = column ? { column, order } : undefined;
-    } else {
-      tableRequest.orderBy = {
-        column: this._requestColumnsMap['name'],
-        order: 'asc',
-      };
     }
 
     this.getTableData(tableRequest);

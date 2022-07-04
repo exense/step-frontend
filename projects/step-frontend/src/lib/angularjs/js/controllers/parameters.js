@@ -33,103 +33,6 @@ angular
       'glyphicon glyphicon-list-alt'
     );
   })
-
-  .controller(
-    'ParameterListCtrl',
-    function (
-      $rootScope,
-      $scope,
-      $http,
-      $uibModal,
-      stateStorage,
-      ExportDialogs,
-      Dialogs,
-      ParameterDialogs,
-      ImportDialogs,
-      AuthService
-    ) {
-      stateStorage.push($scope, 'parameters', {});
-      $scope.authService = AuthService;
-
-      function reload() {
-        $scope.tableHandle.reload();
-      }
-
-      $scope.addParameter = function () {
-        ParameterDialogs.editParameter(null, function () {
-          reload();
-        });
-      };
-
-      $scope.editParameter = function (id) {
-        ParameterDialogs.editParameter(id, function () {
-          reload();
-        });
-      };
-
-      $scope.deleteParameter = function (id, name) {
-        Dialogs.showDeleteWarning(1, 'Parameter "' + id + '"').then(function () {
-          $http.delete('rest/parameters/' + id).then(function () {
-            reload();
-          });
-        });
-      };
-
-      $scope.duplicateParameter = function (id) {
-        $http.post('rest/parameters/' + id + '/copy').then(function () {
-          reload();
-        });
-      };
-
-      $scope.importParameters = function () {
-        ImportDialogs.displayImportDialog('Parameters import', 'parameters', true).then(function () {
-          reload();
-        });
-      };
-
-      $scope.exportParameters = function () {
-        ExportDialogs.displayExportDialog('Parameters export', 'parameters', 'allParameters.sta', true).then(
-          function () {}
-        );
-      };
-
-      $scope.$on('parameter.edited', function (evt, data) {
-        reload();
-      });
-
-      $scope.tableHandle = {};
-    }
-  )
-
-  .factory('ParameterDialogs', function ($uibModal, $http, Dialogs) {
-    function openModal(id) {
-      var modalInstance = $uibModal.open({
-        backdrop: 'static',
-        templateUrl: 'partials/parameters/editParameterDialog.html',
-        controller: 'editParameterCtrl',
-        resolve: {
-          id: function () {
-            return id;
-          },
-        },
-      });
-
-      return modalInstance.result;
-    }
-
-    var dialogs = {};
-
-    dialogs.editParameter = function (id, callback) {
-      openModal(id).then(function () {
-        if (callback) {
-          callback();
-        }
-      });
-    };
-
-    return dialogs;
-  })
-
   .factory('ParameterScopeRenderer', function () {
     var api = {};
 
@@ -188,7 +91,6 @@ angular
 
     return api;
   })
-
   .controller(
     'editParameterCtrl',
     function ($scope, $uibModalInstance, $http, AuthService, id, ParameterScopeRenderer, ScreenTemplates) {
