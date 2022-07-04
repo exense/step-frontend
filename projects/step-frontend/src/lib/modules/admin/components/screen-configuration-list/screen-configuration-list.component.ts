@@ -1,15 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import {
-  AJS_MODULE,
-  Input,
-  Option,
-  AuthService,
-  ContextService,
-  Mutable,
-  TableLocalDataSource,
-  ScreensService,
-} from '@exense/step-core';
+import { AJS_MODULE, Input, Option, Mutable, TableLocalDataSource, ScreensService } from '@exense/step-core';
 import { BehaviorSubject, switchMap, shareReplay, tap } from 'rxjs';
 import { ScreenDialogsService } from '../../services/screen-dialogs.service';
 
@@ -47,17 +38,9 @@ export class ScreenConfigurationListComponent implements OnDestroy {
     },
   });
 
-  readonly currentUserName: string;
   readonly inProgress: boolean = false;
 
-  constructor(
-    private _screensService: ScreensService,
-    private _screenDialogs: ScreenDialogsService,
-    private _auth: AuthService,
-    context: ContextService
-  ) {
-    this.currentUserName = context.userName;
-  }
+  constructor(private _screensService: ScreensService, private _screenDialogs: ScreenDialogsService) {}
 
   public reloadTableForCurrentChoice(choice: string) {
     this.currentlySelectedScreenChoice = choice;

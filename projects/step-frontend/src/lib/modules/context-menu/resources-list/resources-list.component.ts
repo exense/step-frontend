@@ -1,8 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, ContextService, TableRestService, TableRemoteDataSource, Resource } from '@exense/step-core';
+import { AJS_MODULE, Resource, AugmentedResourcesService } from '@exense/step-core';
 import { ResourceDialogsService } from '../services/resource-dialogs.service';
-import { Location } from '@angular/common';
 
 @Component({
   selector: 'step-resources-list',
@@ -10,24 +9,12 @@ import { Location } from '@angular/common';
   styleUrls: ['./resources-list.component.scss'],
 })
 export class ResourcesListComponent {
-  readonly RESOURCE_TABLE_ID = 'resources';
-
-  readonly dataSource = new TableRemoteDataSource(this.RESOURCE_TABLE_ID, this._tableRest, {
-    name: 'attributes.name',
-    resourceType: 'resourceType',
-    id: 'id',
-  });
-
-  readonly currentUserName: string;
+  readonly dataSource = this._augmentedResourcesService.getResourcesTableDataSource();
 
   constructor(
     private _resourceDialogs: ResourceDialogsService,
-    private _tableRest: TableRestService,
-    public _location: Location,
-    context: ContextService
-  ) {
-    this.currentUserName = context.userName;
-  }
+    private _augmentedResourcesService: AugmentedResourcesService
+  ) {}
 
   editResource(resource: Resource): void {
     this._resourceDialogs.editResource(resource).subscribe((_) => this.dataSource.reload());

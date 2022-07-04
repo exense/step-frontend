@@ -1,13 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import {
-  AJS_MODULE,
-  ContextService,
-  ParametersService,
-  TableRestService,
-  TableRemoteDataSource,
-  Parameter,
-} from '@exense/step-core';
+import { AJS_MODULE, Parameter, AugmentedParametersService } from '@exense/step-core';
 import { ParameterDialogsService } from '../services/parameter-dialogs.service';
 
 @Component({
@@ -16,26 +9,12 @@ import { ParameterDialogsService } from '../services/parameter-dialogs.service';
   styleUrls: ['./parameters-list.component.scss'],
 })
 export class ParametersListComponent {
-  readonly PARAMETER_TABLE_ID = 'parameters';
-
-  readonly dataSource = new TableRemoteDataSource(this.PARAMETER_TABLE_ID, this._tableRest, {
-    scope: 'scope',
-    key: 'key',
-    value: 'value',
-    activationExpressionScript: 'activationExpression.script',
-    priority: 'priority',
-  });
-
-  readonly currentUserName: string;
+  readonly dataSource = this._parametersService.getParametersTableDataSource();
 
   constructor(
-    private _parametersService: ParametersService,
-    private _parameterDialogs: ParameterDialogsService,
-    private _tableRest: TableRestService,
-    context: ContextService
-  ) {
-    this.currentUserName = context.userName;
-  }
+    private _parametersService: AugmentedParametersService,
+    private _parameterDialogs: ParameterDialogsService
+  ) {}
 
   importParameter(): void {
     this._parameterDialogs.importParameter().subscribe(() => this.dataSource.reload());
