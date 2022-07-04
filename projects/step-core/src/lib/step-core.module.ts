@@ -24,7 +24,6 @@ import { EntityModule } from './modules/entity/entity.module';
     StepMaterialModule,
     TableModule,
     EntityModule,
-    StepClientModule,
     StepGeneratedClientModule,
   ],
   exports: [
@@ -38,7 +37,6 @@ import { EntityModule } from './modules/entity/entity.module';
     HasRightPipe,
     TableModule,
     EntityModule,
-    StepClientModule,
     StepGeneratedClientModule,
   ],
   providers: [
