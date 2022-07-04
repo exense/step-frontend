@@ -10,6 +10,7 @@ import { ExecutionModule } from './modules/execution/execution.module';
 import { SchedulerModule } from './modules/scheduler/scheduler.module';
 import { ContextMenuModule } from './modules/context-menu/context-menu.module';
 import { ParameterModule } from './modules/parameter/parameter.module';
+import { TimeSeriesModule } from './modules/timeseries/time-series.module';
 
 @NgModule({
   declarations: [],
@@ -24,6 +25,7 @@ import { ParameterModule } from './modules/parameter/parameter.module';
     SchedulerModule,
     ContextMenuModule,
     ParameterModule,
+    TimeSeriesModule,
   ],
   providers: [PLUGINS_INITIALIZER],
 })

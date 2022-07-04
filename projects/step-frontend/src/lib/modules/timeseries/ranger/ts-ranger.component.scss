@@ -1,0 +1,40 @@
+.chart-wrapper {
+  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  padding-top: 24px;
+}
+
+.uplot {
+  display: block;
+}
+
+.ranger {
+  .u-select {
+    pointer-events: all;
+    cursor: grabbing;
+    box-shadow: rgb(135 135 135) 1px 1px 7px;
+    background: rgb(19 92 255 / 18%);
+  }
+
+  .u-grip {
+    position: absolute;
+    width: 6px;
+    height: 100%;
+    background: white;
+    border: 1px solid #b7b7b7;
+    cursor: ew-resize;
+    box-shadow: 1px 1px 5px #bdbbbb;
+    border-radius: 2px;
+  }
+
+  .u-grip-l {
+    @extend .u-grip;
+    left: -5px;
+  }
+
+  .u-grip-r {
+    @extend .u-grip;
+    right: -5px;
+  }
+}
