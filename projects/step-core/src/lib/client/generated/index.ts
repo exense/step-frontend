@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export { StepClientModule } from './StepClientModule';
+export { StepGeneratedClientModule } from './StepGeneratedClientModule';
 
 
 export type { AbstractArtefact } from './models/AbstractArtefact';

@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { a1Promise2Observable, DialogsService, UibModalHelperService } from '@exense/step-core';
-import { HttpClient } from '@angular/common/http';
+import { a1Promise2Observable, AugmentedPlansService, DialogsService, UibModalHelperService } from '@exense/step-core';
 import { map, Observable, switchMap } from 'rxjs';
 
 @Injectable({
@@ -8,7 +7,7 @@ import { map, Observable, switchMap } from 'rxjs';
 })
 export class PlanDialogsService {
   constructor(
-    private _httpClient: HttpClient,
+    private _augmentedPlansService: AugmentedPlansService,
     private _uibModalHelper: UibModalHelperService,
     private _dialogs: DialogsService
   ) {}
@@ -26,10 +25,9 @@ export class PlanDialogsService {
 
   selectPlan(): Observable<any> {
     const selectedEntity$ = a1Promise2Observable<any>(this._dialogs.selectEntityOfType('plans', true));
-
     const plan$ = selectedEntity$.pipe(
       map((result) => result.item),
-      switchMap((id) => this._httpClient.get<any>(`rest/plans/${id}`))
+      switchMap((id) => this._augmentedPlansService.get5(id))
     );
     return plan$;
   }

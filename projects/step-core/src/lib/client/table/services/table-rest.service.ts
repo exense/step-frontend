@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { TableRequestData } from './dto/table-request-data';
-import { TableResponse } from './dto/table-response';
+import { TableRequestData } from '../models/table-request-data';
+import { TableResponse } from '../models/table-response';
 import { Observable } from 'rxjs';
 
 const ROOT = 'rest/table';
