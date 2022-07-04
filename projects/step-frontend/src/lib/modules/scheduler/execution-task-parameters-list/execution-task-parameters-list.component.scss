@@ -35,13 +35,24 @@
   }
 }
 
-.users-header {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+.header {
   display: flex;
   justify-content: flex-end;
+  padding: 8px;
+
+  .import-export button {
+    padding: 0;
+    min-width: 4rem;
+  }
 
   step-btn-group {
     margin-left: 1rem;
   }
+}
+
+:host {
+  position: relative;
+  display: block;
+  background: white;
+  border-radius: 16px;
 }

@@ -8,7 +8,7 @@ import {
   AuthService,
   ContextService,
   Mutable,
-  SchedulerService,
+  AugmentedSchedulerService,
   TableRestService,
   ExecutiontTaskParameters,
   TableLocalDataSource,
@@ -64,7 +64,7 @@ export class ExecutionTaskParametersListComponent {
 
   constructor(
     private _dashboardService: DashboardService,
-    private _schedulerService: SchedulerService,
+    private _schedulerService: AugmentedSchedulerService,
     private _dialogs: DialogsService,
     private _executionTaskParameterDialogs: ExecutionTaskParameterDialogsService,
     private _isUsedByDialogs: IsUsedByDialogsService,
@@ -82,9 +82,9 @@ export class ExecutionTaskParametersListComponent {
   }
 
   executeParameter(executionTaskParameters: ExecutiontTaskParameters) {
-    //@ts-ignore
-    // prettier-ignore
-    this._httpClient.post<any>('rest/scheduler/task/' + executionTaskParameters.id + '/execute', null, { responseType: 'text' }).subscribe((executionId) => { this._location.go('#/root/executions/' + executionId) });
+    this._schedulerService.execute1(executionTaskParameters.id!).subscribe((executionId) => {
+      this._location.go('#/root/executions/' + executionId);
+    });
   }
 
   switchActive(executionTaskParameters: ExecutiontTaskParameters) {
