@@ -4,15 +4,13 @@ import {
   AJS_MODULE,
   Input,
   Option,
-  DialogsService,
   AuthService,
-  a1Promise2Observable,
   ContextService,
   Mutable,
   TableLocalDataSource,
   ScreensService,
 } from '@exense/step-core';
-import { BehaviorSubject, switchMap, of, catchError, noop, shareReplay, tap, map } from 'rxjs';
+import { BehaviorSubject, switchMap, shareReplay, tap } from 'rxjs';
 import { ScreenDialogsService } from '../../services/screen-dialogs.service';
 
 type InProgress = Mutable<Pick<ScreenConfigurationListComponent, 'inProgress'>>;
@@ -54,7 +52,6 @@ export class ScreenConfigurationListComponent implements OnDestroy {
 
   constructor(
     private _screensService: ScreensService,
-    private _dialogs: DialogsService,
     private _screenDialogs: ScreenDialogsService,
     private _auth: AuthService,
     context: ContextService
@@ -82,17 +79,11 @@ export class ScreenConfigurationListComponent implements OnDestroy {
   }
 
   removeScreen(dbId: string, label: string): void {
-    a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Screen "${label}"`))
-      .pipe(
-        switchMap((_) => this._screensService.deleteInput(dbId)),
-        map((_) => true),
-        catchError((_) => of(false))
-      )
-      .subscribe((result: boolean) => {
-        if (result) {
-          this.loadTable();
-        }
-      });
+    this._screenDialogs.removeScreen(dbId, label).subscribe((result: boolean) => {
+      if (result) {
+        this.loadTable();
+      }
+    });
   }
 
   optionsToString(options?: Array<Option>): string {

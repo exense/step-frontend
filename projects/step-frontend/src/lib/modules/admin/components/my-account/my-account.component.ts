@@ -1,8 +1,6 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, Output, EventEmitter, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { Observable } from 'rxjs';
-import { AuthService, AJS_MODULE, KeyValuePair, User, Preferences } from '@exense/step-core';
+import { AuthService, AJS_MODULE, KeyValuePair, User, Preferences, AdminService } from '@exense/step-core';
 
 const preferencesToKVPairArray = (preferences?: Preferences): KeyValuePair<string, string>[] => {
   const prefsObject = preferences?.preferences || {};
@@ -27,7 +25,7 @@ const kvPairArrayToPreferences = (values?: KeyValuePair<string, string>[]): Pref
   styleUrls: ['./my-account.component.scss'],
 })
 export class MyAccountComponent implements OnInit, OnChanges {
-  constructor(private _http: HttpClient, private _authService: AuthService) {}
+  constructor(private _adminApiService: AdminService, private _authService: AuthService) {}
 
   @Input() error?: string;
   @Output() errorChange: EventEmitter<string | undefined> = new EventEmitter<string | undefined>();
@@ -53,7 +51,7 @@ export class MyAccountComponent implements OnInit, OnChanges {
 
   savePreferences(): void {
     const preferences = kvPairArrayToPreferences(this.preferences);
-    this._http.post('rest/admin/myaccount/preferences', preferences).subscribe({
+    this._adminApiService.putPreference(preferences).subscribe({
       error: (err) => {
         this.error = 'Unable to save preferences. Please contact your administrator.';
         this.errorChange.emit(this.error);
@@ -62,8 +60,7 @@ export class MyAccountComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    const response$ = this._http.get('rest/admin/myaccount') as Observable<Partial<User>>;
-    response$.subscribe((user) => {
+    this._adminApiService.getMyUser().subscribe((user) => {
       this.user = user || {};
       this.preferences = preferencesToKVPairArray(this.user?.preferences);
     });

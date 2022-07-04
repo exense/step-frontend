@@ -1,16 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import {
-  AJS_MODULE,
-  DialogsService,
-  AuthService,
-  a1Promise2Observable,
-  ContextService,
-  Mutable,
-  AdminService,
-  User,
-} from '@exense/step-core';
-import { BehaviorSubject, switchMap, of, catchError, noop, shareReplay, tap, map } from 'rxjs';
+import { AJS_MODULE, AuthService, ContextService, Mutable, AdminService, User } from '@exense/step-core';
+import { BehaviorSubject, switchMap, of, noop, shareReplay, tap } from 'rxjs';
 import { UserDialogsService } from '../../services/user-dialogs.service';
 
 type InProgress = Mutable<Pick<UsersListComponent, 'inProgress'>>;
@@ -25,7 +16,7 @@ export class UsersListComponent implements OnDestroy {
 
   readonly users$ = this._usersRequest$.pipe(
     tap((_) => ((this as InProgress).inProgress = true)),
-    switchMap((_) => this._adminService.getUserList()),
+    switchMap((_) => this._adminApiService.getUserList()),
     tap((_) => ((this as InProgress).inProgress = false)),
     shareReplay(1)
   );
@@ -35,8 +26,7 @@ export class UsersListComponent implements OnDestroy {
   readonly inProgress: boolean = false;
 
   constructor(
-    private _adminService: AdminService,
-    private _dialogs: DialogsService,
+    private _adminApiService: AdminService,
     private _userDialogs: UserDialogsService,
     private _auth: AuthService,
     context: ContextService
@@ -49,32 +39,19 @@ export class UsersListComponent implements OnDestroy {
   }
 
   resetUserPassword(user: User): void {
-    const message = 'Are you sure you want to reset this users password?';
-    a1Promise2Observable(this._dialogs.showWarning(message))
-      .pipe(
-        switchMap((_) => this._userDialogs.resetPassword(user)),
-        catchError((_) => of(false))
-      )
-      .subscribe(noop);
+    this._userDialogs.resetUserPasswordWithWarning(user).subscribe(noop);
   }
 
   removeUser(username: string): void {
-    a1Promise2Observable(this._dialogs.showDeleteWarning(1, `User "${username}"`))
-      .pipe(
-        switchMap((_) => this._adminService.remove(username)),
-        map((_) => true),
-        catchError((_) => of(false))
-      )
-      .subscribe((result: boolean) => {
-        if (result) {
-          this.loadTable();
-        }
-      });
+    this._userDialogs.removeUser(username).subscribe((result: boolean) => {
+      if (result) {
+        this.loadTable();
+      }
+    });
   }
 
   addUser(): void {
     const isDefaultAuthenticator = this._auth.getConf()?.authenticatorName === 'DefaultAuthenticator';
-
     this._userDialogs
       .editUser()
       .pipe(
@@ -89,10 +66,10 @@ export class UsersListComponent implements OnDestroy {
   }
 
   editUser(username: string): void {
-    this._adminService
+    this._adminApiService
       .getUser(username)
       .pipe(switchMap((user) => this._userDialogs.editUser(user)))
-      .subscribe((_) => this.loadTable());
+      .subscribe(() => this.loadTable());
   }
 
   ngOnDestroy(): void {
