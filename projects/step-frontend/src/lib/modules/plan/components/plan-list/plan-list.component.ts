@@ -67,7 +67,7 @@ export class PlanListComponent {
           isDeleteConfirmed ? this._plansApiService.delete3(id).pipe(map((_) => true)) : of(false)
         )
       )
-      .subscribe((result) => {
+      .subscribe((result: any) => {
         if (result) {
           this._plansApiService.reloadPlansTableDataSource();
         }
