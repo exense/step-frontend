@@ -1,0 +1,45 @@
+:host {
+  position: relative;
+  display: block;
+  background: white;
+  border-radius: 16px;
+}
+
+.scope {
+  padding: 6px;
+  border-radius: 3px;
+  text-transform: capitalize;
+  color: black;
+}
+
+.scope-global {
+  background-color: #35c163;
+}
+
+.scope-function {
+  background-color: #d90606;
+}
+
+.scope-application {
+  background-color: #f5e30a;
+}
+
+.cell-actions {
+  width: 20rem;
+
+  button {
+    padding: 0;
+    min-width: 4rem;
+    min-height: 4rem;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px;
+
+  step-btn-group {
+    margin-left: 1rem;
+  }
+}
