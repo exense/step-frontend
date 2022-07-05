@@ -10,6 +10,7 @@ import { ExecutionModule } from './modules/execution/execution.module';
 import { SchedulerModule } from './modules/scheduler/scheduler.module';
 import { ContextMenuModule } from './modules/context-menu/context-menu.module';
 import { ParameterModule } from './modules/parameter/parameter.module';
+import { FunctionModule } from './modules/function/function.module';
 import { TimeSeriesModule } from './modules/timeseries/time-series.module';
 
 @NgModule({
@@ -20,6 +21,7 @@ import { TimeSeriesModule } from './modules/timeseries/time-series.module';
     StepCoreModule,
     AdminModule,
     PlanModule,
+    FunctionModule,
     ExecutionModule,
     BrowserAnimationsModule,
     SchedulerModule,
