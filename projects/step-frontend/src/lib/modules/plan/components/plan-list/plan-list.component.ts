@@ -5,10 +5,9 @@ import {
   AJS_LOCATION,
   AJS_MODULE,
   DialogsService,
-  TableRemoteDataSource,
-  TableRestService,
+  AugmentedPlansService,
+  Plan,
 } from '@exense/step-core';
-import { HttpClient } from '@angular/common/http';
 import { PlanDialogsService } from '../../servies/plan-dialogs.service';
 import { ExportDialogsService } from '../../../_common/services/export-dialogs.service';
 import { ImportDialogsService } from '../../../_common/services/import-dialogs.service';
@@ -23,15 +22,8 @@ import { ILocationService } from 'angular';
   styleUrls: ['./plan-list.component.scss'],
 })
 export class PlanListComponent {
-  readonly dataSource = new TableRemoteDataSource('plans', this._tableRest, {
-    name: 'attributes.name',
-    type: 'root._class',
-    actions: '',
-  });
-
   constructor(
-    private _httpClient: HttpClient,
-    private _tableRest: TableRestService,
+    readonly _plansApiService: AugmentedPlansService,
     private _dialogs: DialogsService,
     private _planDialogs: PlanDialogsService,
     private _exportDialogs: ExportDialogsService,
@@ -41,7 +33,7 @@ export class PlanListComponent {
   ) {}
 
   addPlan(): void {
-    this._planDialogs.createPlan().subscribe((_) => this.dataSource.reload());
+    this._planDialogs.createPlan().subscribe((_) => this._plansApiService.reloadPlansTableDataSource());
   }
 
   editPlan(id: string): void {
@@ -53,16 +45,16 @@ export class PlanListComponent {
   }
 
   duplicatePlan(id: string): void {
-    this._httpClient
-      .get<any>(`rest/plans/${id}/clone`)
+    this._plansApiService
+      .clonePlan(id)
       .pipe(
-        map((clone) => {
-          clone.attributes.name += '_Copy';
+        map((clone: Plan) => {
+          clone['attributes']!['name']! += '_Copy';
           return clone;
         }),
-        switchMap((clone) => this._httpClient.post('rest/plans', clone))
+        switchMap((clone) => this._plansApiService.save4(clone))
       )
-      .subscribe((_) => this.dataSource.reload());
+      .subscribe((_) => this._plansApiService.reloadPlansTableDataSource());
   }
 
   deletePlan(id: string, name: string): void {
@@ -72,12 +64,12 @@ export class PlanListComponent {
         catchError((_) => of(false)),
         tap((isDeleteConfirmed) => console.log('IS DELETE CONFIRMED', isDeleteConfirmed)),
         switchMap((isDeleteConfirmed) =>
-          isDeleteConfirmed ? this._httpClient.delete(`rest/plans/${id}`).pipe(map((_) => true)) : of(false)
+          isDeleteConfirmed ? this._plansApiService.delete3(id).pipe(map((_) => true)) : of(false)
         )
       )
-      .subscribe((result) => {
+      .subscribe((result: any) => {
         if (result) {
-          this.dataSource.reload();
+          this._plansApiService.reloadPlansTableDataSource();
         }
       });
   }
@@ -85,13 +77,13 @@ export class PlanListComponent {
   importPlans(): void {
     this._importDialogs
       .displayImportDialog('Plans import', 'plans', true, false)
-      .subscribe((_) => this.dataSource.reload());
+      .subscribe((_) => this._plansApiService.reloadPlansTableDataSource());
   }
 
   exportPlans(): void {
     this._exportDialogs
       .displayExportDialog('Plans export', 'plans', 'allPlans.sta', true, false)
-      .subscribe((_) => this.dataSource.reload());
+      .subscribe((_) => this._plansApiService.reloadPlansTableDataSource());
   }
 
   exportPlan(id: string, name: string): void {

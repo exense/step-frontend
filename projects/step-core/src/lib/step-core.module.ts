@@ -9,9 +9,9 @@ import { StepMaterialModule } from './modules/step-material/step-material.module
 import { HasRightPipe } from './pipes/has-right.pipe';
 import { TableModule } from './modules/table/table.module';
 import { StepBasicsModule } from './modules/basics/step-basics.module';
-import { StepClientModule } from './client/generated/StepClientModule';
 import { MAT_LUXON_DATE_ADAPTER_OPTIONS, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
+import { EntityModule } from './modules/entity/entity.module';
 
 @NgModule({
   declarations: [TooltipDirective, HasRightPipe],
@@ -24,7 +24,8 @@ import { MAT_DATE_FORMATS } from '@angular/material/core';
     StepMaterialModule,
     TableModule,
     StepBasicsModule,
-    StepClientModule,
+    EntityModule,
+    StepGeneratedClientModule,
   ],
   exports: [
     CommonModule,
@@ -37,7 +38,8 @@ import { MAT_DATE_FORMATS } from '@angular/material/core';
     HasRightPipe,
     TableModule,
     StepBasicsModule,
-    StepClientModule,
+    EntityModule,
+    StepGeneratedClientModule,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -83,7 +85,9 @@ export * from './pipes/has-right.pipe';
 export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
 export * from './modules/basics/step-basics.module';
+export * from './modules/entity/entity.module';
 export * from './client/generated/index';
+export * from './client/step-client-module';
 
 export { ApiError } from './client/generated/core/ApiError';
 export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';

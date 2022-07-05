@@ -32,18 +32,8 @@ angular
       'partials/screenconfiguration/screenConfiguration.html',
       'screens'
     );
-    EntityRegistry.registerEntity(
-      'Input',
-      'screenInputs',
-      'screenInputs',
-      'rest/screens/input/',
-      'rest/screens/input/',
-      'st-table',
-      '/partials/screenconfiguration/screenInputSelectionTable.html',
-      null,
-      'glyphicon glyphicon-modal-window'
-    );
   })
+  // FIXME: find solution to add EntityRegistry.registerEntity(Input
 
   .factory('ScreenTemplates', function ($http, $q) {
     var api = {};

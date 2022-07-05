@@ -1279,56 +1279,6 @@ angular
       return $q.reject(response);
     };
   })
-
-  .service('DashboardService', function ($http, $rootScope, AuthService, ViewRegistry) {
-    this.checkAvailability = (override = false) => {
-      try {
-        if (AuthService.getConf()) {
-          if (AuthService.getConf().displayNewPerfDashboard && ViewRegistry.getCustomView('grafana')) {
-            this.isGrafanaAvailable = false;
-            $http.get('rest/g-dashboards/isGrafanaAvailable').then((response) => {
-              this.isGrafanaAvailable = !!response.data.available;
-              if (this.isGrafanaAvailable) {
-                $rootScope.$broadcast('step.grafana.available');
-              }
-            });
-          } else {
-            this.isGrafanaAvailable = false;
-          }
-        }
-      } catch (e) {}
-    };
-
-    $rootScope.$on('step.login.succeeded', () => {
-      this.checkAvailability();
-    });
-
-    this.getDashboardLink = (taskId) => {
-      if (typeof this.isGrafanaAvailable === 'undefined') {
-        this.checkAvailability();
-      }
-      if (this.isGrafanaAvailable) {
-        return '/#/root/grafana?d=3JB9j357k&orgId=1&var-taskId_current=' + taskId;
-      } else {
-        return '/#/root/dashboards/__pp__RTMDashboard?__filter1__=text,taskId,' + taskId;
-      }
-    };
-
-    this.whenGrafanaAvailable = (override = false) => {
-      return new Promise((resolve, reject) => {
-        this.checkAvailability(override);
-
-        if (this.isGrafanaAvailable) {
-          resolve();
-        }
-
-        $rootScope.$on('step.grafana.available', () => {
-          resolve();
-        });
-      });
-    };
-  });
-
 //The following functions are missing in IE11
 
 if (!String.prototype.endsWith) {
