@@ -12,35 +12,40 @@ import {
   TableRestService,
   ExecutiontTaskParameters,
   TableLocalDataSource,
+  TableAdapterService,
+  TableAdapter,
 } from '@exense/step-core';
-import { BehaviorSubject, switchMap, of, catchError, noop, shareReplay, tap, map, lastValueFrom } from 'rxjs';
+import {
+  Observable,
+  BehaviorSubject,
+  switchMap,
+  of,
+  catchError,
+  noop,
+  shareReplay,
+  tap,
+  map,
+  lastValueFrom,
+} from 'rxjs';
 import { ScheduledTaskDialogsService } from '../services/scheduled-task-dialogs.service';
 import { Location } from '@angular/common';
 import { DashboardService } from '../../_common/services/dashboard.service';
-
-type InProgress = Mutable<Pick<ScheduledTaskListComponent, 'inProgress'>>;
 
 @Component({
   selector: 'step-scheduled-task-list',
   templateUrl: './scheduled-task-list.component.html',
   styleUrls: ['./scheduled-task-list.component.scss'],
 })
-export class ScheduledTaskListComponent {
+export class ScheduledTaskListComponent implements OnDestroy {
   readonly STATUS_ACTIVE_STRING = 'On';
   readonly STATUS_INACTIVE_STRING = 'Off';
 
-  readonly currentUserName: string;
-  readonly inProgress: boolean = false;
-
-  private scheduledTaskRequest$ = new BehaviorSubject<any>({});
-  private scheduledTask$ = this.scheduledTaskRequest$.pipe(
-    tap((_) => ((this as InProgress).inProgress = true)),
-    switchMap((_) => this._schedulerService.getScheduledExecutions()),
-    tap((_) => ((this as InProgress).inProgress = false)),
-    shareReplay(1)
+  readonly tableAdapter: TableAdapter = this._tableAdapterService.getTableAdapterForApiRequest(
+    this._schedulerService.test()
   );
-
-  readonly searchableScheduledTask$ = new TableLocalDataSource(this.scheduledTask$, {
+  private request$: Observable<Array<ExecutiontTaskParameters>> = this.tableAdapter.request!;
+  private subject$ = this.tableAdapter.subject;
+  readonly searchableScheduledTask$ = new TableLocalDataSource(this.request$, {
     searchPredicates: {
       name: (element, searchValue) => element.attributes!['name'].toLowerCase().includes(searchValue.toLowerCase()),
       environment: (element, searchValue) =>
@@ -63,22 +68,15 @@ export class ScheduledTaskListComponent {
   });
 
   constructor(
+    private _tableAdapterService: TableAdapterService,
     private _dashboardService: DashboardService,
     private _schedulerService: AugmentedSchedulerService,
-    private _dialogs: DialogsService,
     private _scheduledTaskDialogs: ScheduledTaskDialogsService,
-    private _isUsedByDialogs: IsUsedByDialogsService,
-    private _auth: AuthService,
-    private _tableRest: TableRestService,
-    public _location: Location,
-    private _httpClient: HttpClient,
-    context: ContextService
-  ) {
-    this.currentUserName = context.userName;
-  }
+    public _location: Location
+  ) {}
 
   private loadTable(): void {
-    this.scheduledTaskRequest$.next({});
+    this.subject$!.next({});
   }
 
   executeParameter(scheduledTask: ExecutiontTaskParameters) {
@@ -128,6 +126,10 @@ export class ScheduledTaskListComponent {
       .createExecutionTask()
       .pipe(switchMap((task) => this._scheduledTaskDialogs.editScheduledTask(task)))
       .subscribe((_) => this.loadTable());
+  }
+
+  ngOnDestroy(): void {
+    this.subject$!.complete();
   }
 }
 

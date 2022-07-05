@@ -19,5 +19,6 @@ export * from './shared/table-remote-data-source';
 export * from './shared/table-local-data-source';
 export * from './shared/table-data-source';
 export * from './services/table.search';
+export * from './services/table-adapter.service';
 export * from './directives/search-col.directive';
 export * from './directives/search-cell-def.directive';

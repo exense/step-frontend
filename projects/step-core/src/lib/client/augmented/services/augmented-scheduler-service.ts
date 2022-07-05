@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 import { Injectable } from '@angular/core';
-import type { Observable } from 'rxjs';
+import { Observable, from, of, concatMap, delay, pipe } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
-import { SchedulerService } from '../../generated';
+import { ExecutiontTaskParameters, SchedulerService } from '../../generated';
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
 
 @Injectable({ providedIn: 'root' })
@@ -25,5 +25,13 @@ export class AugmentedSchedulerService extends SchedulerService {
   public override execute1(id: string): Observable<string> {
     //@ts-ignore
     return this._httpClient.post<any>('rest/scheduler/task/' + id + '/execute', null, { responseType: 'text' });
+  }
+
+  /**
+   * delete me
+   * simulates a delayed api call, so spinner can be seen
+   */
+  public test(): Observable<Array<ExecutiontTaskParameters>> {
+    return from([[]]).pipe(concatMap((item) => of(item).pipe(delay(5000))));
   }
 }
