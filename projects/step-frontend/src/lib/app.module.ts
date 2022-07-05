@@ -7,6 +7,7 @@ import { PlanModule } from './modules/plan/plan.module';
 import { PLUGINS_INITIALIZER } from './plugins-initializer/plugins-initializer';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ExecutionModule } from './modules/execution/execution.module';
+import { SchedulerModule } from './modules/scheduler/scheduler.module';
 import { ContextMenuModule } from './modules/context-menu/context-menu.module';
 import { ParameterModule } from './modules/parameter/parameter.module';
 import { TimeSeriesModule } from './modules/timeseries/time-series.module';
@@ -21,6 +22,7 @@ import { TimeSeriesModule } from './modules/timeseries/time-series.module';
     PlanModule,
     ExecutionModule,
     BrowserAnimationsModule,
+    SchedulerModule,
     ContextMenuModule,
     ParameterModule,
     TimeSeriesModule,
