@@ -33,6 +33,7 @@
       <mat-icon
         *ngIf="!!element.executionsParameters?.repositoryObject?.repositoryParameters?.planid"
         class="nav-to-plan-icon"
+        matTooltip="Go to plan"
         (click)="navToPlan(element.executionsParameters?.repositoryObject?.repositoryParameters?.planid)"
         >insert_drive_file</mat-icon
       >
