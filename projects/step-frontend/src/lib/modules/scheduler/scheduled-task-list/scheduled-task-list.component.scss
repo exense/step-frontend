@@ -1,0 +1,60 @@
+.nav-to-plan-icon {
+  transform: scale(0.7);
+  margin-bottom: 6px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.status {
+  color: black;
+  padding: 5px;
+  border-radius: 3px;
+  cursor: pointer;
+  border-width: 1px;
+  border-style: solid;
+  &:hover {
+    border-style: none;
+  }
+}
+
+.status-on {
+  background-color: #35c163;
+  border-color: #35c163;
+}
+
+.status-off {
+  background-color: #d90606;
+  border-color: #d90606;
+}
+
+.cell-actions {
+  width: 20rem;
+
+  button {
+    padding: 0;
+    min-width: 4rem;
+    min-height: 4rem;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px;
+
+  .import-export button {
+    padding: 0;
+    min-width: 4rem;
+  }
+
+  step-btn-group {
+    margin-left: 1rem;
+  }
+}
+
+:host {
+  position: relative;
+  display: block;
+  background: white;
+  border-radius: 16px;
+}
