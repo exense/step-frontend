@@ -12,6 +12,7 @@ import { StepBasicsModule } from './modules/basics/step-basics.module';
 import { MAT_LUXON_DATE_ADAPTER_OPTIONS, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { EntityModule } from './modules/entity/entity.module';
+import { StepGeneratedClientModule } from './client/generated';
 
 @NgModule({
   declarations: [TooltipDirective, HasRightPipe],
