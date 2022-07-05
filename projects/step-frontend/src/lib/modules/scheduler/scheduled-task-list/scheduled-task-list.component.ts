@@ -1,15 +1,18 @@
 import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
+import { BehaviorSubject, switchMap, of, catchError, noop, shareReplay, tap, map, lastValueFrom } from 'rxjs';
 import {
   AJS_MODULE,
   AugmentedSchedulerService,
   ExecutiontTaskParameters,
   TableLocalDataSource,
+  Mutable,
 } from '@exense/step-core';
-import { BehaviorSubject, switchMap } from 'rxjs';
 import { ScheduledTaskDialogsService } from '../services/scheduled-task-dialogs.service';
 import { Location } from '@angular/common';
 import { DashboardService } from '../../_common/services/dashboard.service';
+
+type InProgress = Mutable<Pick<ScheduledTaskListComponent, 'inProgress'>>;
 
 @Component({
   selector: 'step-scheduled-task-list',
@@ -20,7 +23,6 @@ export class ScheduledTaskListComponent implements OnDestroy {
   readonly STATUS_ACTIVE_STRING = 'On';
   readonly STATUS_INACTIVE_STRING = 'Off';
 
-  readonly currentUserName: string;
   readonly inProgress: boolean = false;
 
   private scheduledTaskRequest$ = new BehaviorSubject<any>({});
@@ -61,7 +63,7 @@ export class ScheduledTaskListComponent implements OnDestroy {
   ) {}
 
   private loadTable(): void {
-    this.schedulerTaskRequestSubject$.next({});
+    this.scheduledTaskRequest$.next({});
   }
 
   executeParameter(scheduledTask: ExecutiontTaskParameters) {
@@ -114,7 +116,7 @@ export class ScheduledTaskListComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.schedulerTaskRequestSubject$.complete();
+    this.scheduledTaskRequest$.complete();
   }
 }
 
