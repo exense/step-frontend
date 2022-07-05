@@ -10,3 +10,4 @@ import { StepGeneratedClientModule } from '../generated';
 export class StepAugmentedClientModule {}
 
 export { AugmentedPlansService } from './services/augmented-plans-service';
+export { AugmentedSchedulerService } from './services/augmented-scheduler-service';
