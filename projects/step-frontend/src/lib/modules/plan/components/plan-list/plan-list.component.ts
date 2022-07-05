@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_LOCATION, AJS_MODULE, AugmentedPlansService } from '@exense/step-core';
-import { PlanDialogsService } from '../../servies/plan-dialogs.service';
+import { PlanDialogsService } from '../../services/plan-dialogs.service';
 import { noop } from 'rxjs';
 import { ILocationService } from 'angular';
 
