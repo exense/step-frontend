@@ -1,13 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  ElementRef,
-  Input,
-  OnChanges,
-  Renderer2,
-  SimpleChanges,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { TokenGroupCapacity } from '@exense/step-core';
 
 @Component({
@@ -17,7 +8,7 @@ import { TokenGroupCapacity } from '@exense/step-core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StatusSummaryComponent {
-  @Input() tokenGroup?: TokenGroupCapacity;
+  @Input() tokenGroup!: TokenGroupCapacity;
 
   constructor() {}
 }

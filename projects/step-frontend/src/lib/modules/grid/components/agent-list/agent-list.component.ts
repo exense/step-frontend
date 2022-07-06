@@ -48,15 +48,15 @@ export class AgentListComponent implements OnDestroy {
 
   readonly searchableAgent$ = new TableLocalDataSource(this.agentRequest$, {
     searchPredicates: {
-      url: (element, searchValue) => element.agentRef!['agentUrl'].toLowerCase().includes(searchValue.toLowerCase()),
+      url: (element, searchValue) => element.agentRef!['agentUrl']!.toLowerCase().includes(searchValue.toLowerCase()),
       type: (element, searchValue) =>
-        this.TYPE_LABEL_TRANSLATIONS[element.agentRef!.agentType].toLowerCase().includes(searchValue.toLowerCase()),
+        this.TYPE_LABEL_TRANSLATIONS[element.agentRef!.agentType!]!.toLowerCase().includes(searchValue.toLowerCase()),
     },
     sortPredicates: {
-      url: (elementA, elementB) => elementA.agentRef!['agentUrl'].localeCompare(elementB.agentRef!['agentUrl']),
+      url: (elementA, elementB) => elementA.agentRef!['agentUrl']!.localeCompare(elementB!.agentRef!['agentUrl']!),
       type: (elementA, elementB) =>
-        this.TYPE_LABEL_TRANSLATIONS[elementA.agentRef!.agentType].localeCompare(
-          this.TYPE_LABEL_TRANSLATIONS[elementB.agentRef!.agentType]
+        this.TYPE_LABEL_TRANSLATIONS[elementA.agentRef!.agentType!]!.localeCompare(
+          this.TYPE_LABEL_TRANSLATIONS[elementB.agentRef!.agentType!]!
         ),
     },
   });
