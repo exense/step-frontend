@@ -70,6 +70,7 @@ export * from './domain';
 export * from './shared';
 export * from './decorators/plugin';
 export * from './services/auth.service';
+export * from './services/dashboard.service';
 export * from './services/invoke-run.service';
 export * from './services/view-registry.service';
 export * from './services/deferred-view-registry.service';

@@ -12,11 +12,11 @@ import {
   TableRestService,
   ExecutiontTaskParameters,
   TableLocalDataSource,
+  DashboardService,
 } from '@exense/step-core';
 import { BehaviorSubject, switchMap, of, catchError, noop, shareReplay, tap, map, lastValueFrom } from 'rxjs';
 import { ScheduledTaskDialogsService } from '../services/scheduled-task-dialogs.service';
 import { Location } from '@angular/common';
-import { DashboardService } from '../../_common/services/dashboard.service';
 
 type InProgress = Mutable<Pick<ScheduledTaskListComponent, 'inProgress'>>;
 
