@@ -1,0 +1,140 @@
+<section class="header">
+  <step-btn-group class="import-export">
+    <button
+      type="button"
+      mat-icon-button
+      matTooltip="Import keyword"
+      matTooltipPosition="below"
+      [disabled]="!('kw-write' | hasRight | async)"
+      (click)="importFunctions()"
+    >
+      <mat-icon>file_download</mat-icon>
+    </button>
+    <button
+      type="button"
+      mat-icon-button
+      matTooltip="Export all keywords"
+      matTooltipPosition="below"
+      [disabled]="!('kw-read' | hasRight | async)"
+      (click)="exportFunctions()"
+    >
+      <mat-icon>file_upload</mat-icon>
+    </button>
+  </step-btn-group>
+  <step-btn-group>
+    <button
+      type="button"
+      mat-icon-button
+      class="primary"
+      matTooltip="New keyword"
+      matTooltipPosition="below"
+      [disabled]="!('kw-write' | hasRight | async)"
+      (click)="addFunction()"
+    >
+      <mat-icon>add</mat-icon>
+    </button>
+  </step-btn-group>
+  <step-btn-group>
+    <button
+      type="button"
+      mat-flat-button
+      color="primary"
+      [disabled]="!('kw-write' | hasRight | async)"
+      (click)="addFunctionPackage()"
+    >
+      New Keyword Package
+    </button>
+  </step-btn-group>
+</section>
+<step-table [dataSource]="dataSource" matSort [matSortDisableClear]="true">
+  <ng-container matColumnDef="name" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+    <td mat-cell *matCellDef="let element">{{ element.attributes.name }}</td>
+  </ng-container>
+  <ng-container matColumnDef="type" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+    <td mat-cell *matCellDef="let element">{{ functionTypeLabel(element.type) }}</td>
+  </ng-container>
+  <ng-container matColumnDef="package" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Package</th>
+    <td mat-cell *matCellDef="let element">
+      <function-package-link [id]="element.customFields?.functionPackageId"></function-package-link>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef>Actions</th>
+    <td mat-cell *matCellDef="let element" class="cell-actions">
+      <step-btn-group>
+        <button
+          mat-icon-button
+          matTooltip="Configure keyword"
+          [disabled]="!('kw-read' | hasRight | async)"
+          (click)="configureFunction(element.id)"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          matTooltip="Execute keyword"
+          [disabled]="!('kw-write' | hasRight | async)"
+          (click)="executeFunction(element.id)"
+        >
+          <mat-icon>play_arrow</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          matTooltip="Delete keyword"
+          [disabled]="!('kw-read' | hasRight | async)"
+          (click)="deleteFunction(element.id, element.attributes.name)"
+        >
+          <mat-icon>clear</mat-icon>
+        </button>
+        <button mat-icon-button [matMenuTriggerFor]="menu" [matMenuTriggerData]="{ element: element }">
+          <mat-icon>more_horiz</mat-icon>
+        </button>
+      </step-btn-group>
+    </td>
+  </ng-container>
+</step-table>
+<mat-menu #menu="matMenu">
+  <ng-template matMenuContent let-element="element">
+    <button
+      mat-menu-item
+      matTooltip="Edit keyword"
+      [disabled]="!('kw-write' | hasRight | async)"
+      (click)="editFunction(element.id)"
+    >
+      <mat-icon>edit</mat-icon>
+      Edit Keyword
+    </button>
+
+    <button
+      mat-menu-item
+      matTooltip="Duplicate keyword"
+      [disabled]="!('kw-write' | hasRight | async)"
+      (click)="duplicateFunction(element.id)"
+    >
+      <mat-icon>content_copy</mat-icon>
+      Duplicate Keyword
+    </button>
+
+    <button
+      mat-menu-item
+      matTooltip="Duplicate keyword"
+      [disabled]="!('kw-read' | hasRight | async)"
+      (click)="exportFunction(element.id, element.attributes.name)"
+    >
+      <mat-icon>content_copy</mat-icon>
+      Export Keyword
+    </button>
+
+    <button
+      mat-menu-item
+      [disabled]="!('kw-read' | hasRight | async)"
+      (click)="lookUp(element.id, element.attributes.name)"
+    >
+      <mat-icon>search</mat-icon>
+      Find usages
+    </button>
+  </ng-template>
+</mat-menu>

@@ -1,0 +1,14 @@
+div:hover button {
+  opacity: 1;
+}
+
+button {
+  opacity: 0;
+  height: 20px;
+  width: 28px;
+  line-height: 20px;
+
+  mat-icon {
+    font-size: 18px;
+  }
+}
