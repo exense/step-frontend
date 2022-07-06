@@ -685,7 +685,7 @@ angular
             return filename;
           },
           recursively: function () {
-            return recursively;
+            return true;
           },
           parameters: function () {
             return parameters;
