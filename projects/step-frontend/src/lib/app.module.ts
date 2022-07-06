@@ -12,6 +12,7 @@ import { ContextMenuModule } from './modules/context-menu/context-menu.module';
 import { ParameterModule } from './modules/parameter/parameter.module';
 import { FunctionModule } from './modules/function/function.module';
 import { TimeSeriesModule } from './modules/timeseries/time-series.module';
+import { GridModule } from './modules/grid/grid.module';
 
 @NgModule({
   declarations: [],
@@ -27,6 +28,7 @@ import { TimeSeriesModule } from './modules/timeseries/time-series.module';
     SchedulerModule,
     ContextMenuModule,
     ParameterModule,
+    GridModule,
     TimeSeriesModule,
   ],
   providers: [PLUGINS_INITIALIZER],

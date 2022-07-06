@@ -56,60 +56,6 @@ angular
     },
   ])
 
-  .controller('AgentListCtrl', [
-    '$scope',
-    '$interval',
-    '$http',
-    'helpers',
-    function ($scope, $interval, $http, helpers) {
-      $scope.$state = 'agents';
-
-      $scope.datatable = {};
-
-      $scope.loadTable = function loadTable() {
-        $http.get('rest/grid/agent?notokens=true').then(function (response) {
-          $scope.agents = [];
-          _.each(response.data, function (e) {
-            var type = e.agentRef.agentType;
-            $scope.agents.push({
-              id: e.agentRef.agentId,
-              url: e.agentRef.agentUrl,
-              typeLabel:
-                type == 'default' ? 'Java' : type == 'node' ? 'Node.js' : type == 'dotnet' ? '.NET' : 'Unknown',
-              tokensCapacity: e.tokensCapacity,
-              type: type,
-            });
-          });
-        });
-      };
-
-      $scope.loadTable();
-
-      $scope.interrupt = function (id) {
-        $http.put('rest/grid/agent/' + id + '/interrupt').then(function () {
-          $scope.loadTable();
-        });
-      };
-
-      $scope.resume = function (id) {
-        $http.put('rest/grid/agent/' + id + '/resume').then(function () {
-          $scope.loadTable();
-        });
-      };
-
-      $scope.removeTokenErrors = function (id) {
-        $http.delete('/rest/grid/agent/' + id + '/tokens/errors').then(function () {
-          $scope.loadTable();
-        });
-      };
-
-      var refresh = function () {
-        $scope.loadTable();
-      };
-      $scope.autorefresh = { enabled: true, interval: 5000, refreshFct: refresh };
-    },
-  ])
-
   .controller('AdapterListCtrl', [
     '$scope',
     '$compile',

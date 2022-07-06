@@ -30,17 +30,6 @@ angular
     };
   })
 
-  .directive('gridStatusDistribution', function () {
-    return {
-      restrict: 'E',
-      scope: {
-        tokenGroup: '=',
-      },
-      templateUrl: 'partials/components/gridStatusSummary.html',
-      controller: function ($scope, $http) {},
-    };
-  })
-
   .directive('executionLink', function () {
     return {
       restrict: 'E',
