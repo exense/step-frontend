@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 export class ImportDialogsService {
   constructor(private _uitModalHelper: UibModalHelperService) {}
 
-  displayImportDialog<T>(title: string, path: string, importAll: boolean, overwrite: boolean): Observable<T> {
+  displayImportDialog<T>(title: string, path: string): Observable<T> {
     const modalInstance = this._uitModalHelper.open({
       backdrop: 'static',
       templateUrl: 'partials/importDialog.html',
@@ -16,8 +16,8 @@ export class ImportDialogsService {
       resolve: {
         title: () => title,
         path: () => path,
-        importAll: () => importAll,
-        overwrite: () => overwrite,
+        importAll: () => false,
+        overwrite: () => false,
       },
     });
     return a1Promise2Observable(modalInstance.resolve);
