@@ -92,19 +92,17 @@ export class FunctionListComponent {
 
   exportFunction(id: string, name: string): void {
     this._exportDialogs
-      .displayExportDialog('Keyword export', 'functions/' + id, name + '.sta', true, false)
+      .displayExportDialog('Keyword export', 'functions/' + id, name + '.sta')
       .subscribe((_) => this.dataSource.reload());
   }
 
   importFunctions(): void {
-    this._importDialogs
-      .displayImportDialog('Keyword import', 'functions', true, false)
-      .subscribe((_) => this.dataSource.reload());
+    this._importDialogs.displayImportDialog('Keyword import', 'functions').subscribe((_) => this.dataSource.reload());
   }
 
   exportFunctions(): void {
     this._exportDialogs
-      .displayExportDialog('Keyword export', 'functions', 'allKeywords.sta', true, false)
+      .displayExportDialog('Keyword export', 'functions', 'allKeywords.sta')
       .subscribe((_) => this.dataSource.reload());
   }
 

@@ -76,18 +76,18 @@ export class PlanListComponent {
 
   importPlans(): void {
     this._importDialogs
-      .displayImportDialog('Plans import', 'plans', true, false)
+      .displayImportDialog('Plans import', 'plans')
       .subscribe((_) => this._plansApiService.reloadPlansTableDataSource());
   }
 
   exportPlans(): void {
     this._exportDialogs
-      .displayExportDialog('Plans export', 'plans', 'allPlans.sta', true, false)
+      .displayExportDialog('Plans export', 'plans', 'allPlans.sta')
       .subscribe((_) => this._plansApiService.reloadPlansTableDataSource());
   }
 
   exportPlan(id: string, name: string): void {
-    this._exportDialogs.displayExportDialog('Plans export', `plans/${id}`, `${name}.sta`, true, false).subscribe(noop);
+    this._exportDialogs.displayExportDialog('Plans export', `plans/${id}`, `${name}.sta`).subscribe(noop);
   }
 
   lookUp(id: string, name: string): void {
