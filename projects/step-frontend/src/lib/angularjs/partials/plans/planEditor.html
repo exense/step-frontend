@@ -61,7 +61,7 @@
 								</div>
 							</uib-tab>
 							<uib-tab heading="Other plans">
-                <step-other-plan-list></step-other-plan-list>
+                <step-other-plan-list (on-selection)="addPlan($event)"></step-other-plan-list>
 <!--								<div class="row">-->
 <!--									<div class="panel-body">-->
 <!--										<select-entity type="'plans'" on-selection="addPlan" />-->
