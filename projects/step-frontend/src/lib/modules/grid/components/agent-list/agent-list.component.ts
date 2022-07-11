@@ -20,7 +20,6 @@ import {
   map,
   lastValueFrom,
 } from 'rxjs';
-import { AgentDialogsService } from '../../services/agent-dialogs.service';
 
 type InProgress = Mutable<Pick<AgentListComponent, 'inProgress'>>;
 
@@ -61,7 +60,7 @@ export class AgentListComponent implements OnDestroy {
     },
   });
 
-  constructor(private _gridService: GridService, private _AgentDialogs: AgentDialogsService, context: ContextService) {}
+  constructor(private _gridService: GridService, context: ContextService) {}
 
   public loadTable(): void {
     this.agentRequestSubject$.next({});
