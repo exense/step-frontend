@@ -19,8 +19,4 @@ export class AugmentedPlansService extends PlansService {
   public getPlansTableDataSource(): TableRemoteDataSource<Plan> {
     return this.dataSource;
   }
-
-  public reloadPlansTableDataSource(): void {
-    this.dataSource.reload();
-  }
 }

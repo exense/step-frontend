@@ -7,9 +7,9 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedResourcesService extends ResourcesService {
-  readonly RESOURCES_TABLE_ID = 'resources';
+  private readonly RESOURCES_TABLE_ID = 'resources';
 
-  readonly dataSource = new TableRemoteDataSource(this.RESOURCES_TABLE_ID, this._tableRest, {
+  private readonly dataSource = new TableRemoteDataSource(this.RESOURCES_TABLE_ID, this._tableRest, {
     name: 'attributes.name',
     resourceType: 'resourceType',
     id: 'id',
@@ -21,9 +21,5 @@ export class AugmentedResourcesService extends ResourcesService {
 
   public getResourcesTableDataSource(): TableRemoteDataSource<any> {
     return this.dataSource;
-  }
-
-  public reloadResourcesTableDataSource(): void {
-    this.dataSource.reload();
   }
 }

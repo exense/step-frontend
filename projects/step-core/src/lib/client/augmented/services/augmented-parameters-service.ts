@@ -6,9 +6,9 @@ import { TableRemoteDataSource } from '../../../modules/table/shared/table-remot
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedParametersService extends ParametersService {
-  readonly PARAMETERS_TABLE_ID = 'parameters';
+  private readonly PARAMETERS_TABLE_ID = 'parameters';
 
-  readonly dataSource = new TableRemoteDataSource(this.PARAMETERS_TABLE_ID, this._tableRest, {
+  private readonly dataSource = new TableRemoteDataSource(this.PARAMETERS_TABLE_ID, this._tableRest, {
     scope: 'scope',
     key: 'key',
     value: 'value',
@@ -22,9 +22,5 @@ export class AugmentedParametersService extends ParametersService {
 
   public getParametersTableDataSource(): TableRemoteDataSource<any> {
     return this.dataSource;
-  }
-
-  public reloadParametersTableDataSource(): void {
-    this.dataSource.reload();
   }
 }

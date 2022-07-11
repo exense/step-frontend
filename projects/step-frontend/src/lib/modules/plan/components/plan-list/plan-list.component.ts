@@ -11,6 +11,8 @@ import { ILocationService } from 'angular';
   styleUrls: ['./plan-list.component.scss'],
 })
 export class PlanListComponent {
+  readonly dataSource = this._plansApiService.getPlansTableDataSource();
+
   constructor(
     readonly _plansApiService: AugmentedPlansService,
     private _planDialogs: PlanDialogsService,
@@ -18,7 +20,7 @@ export class PlanListComponent {
   ) {}
 
   addPlan(): void {
-    this._planDialogs.createPlan().subscribe(() => this._plansApiService.reloadPlansTableDataSource());
+    this._planDialogs.createPlan().subscribe(() => this.dataSource.reload());
   }
 
   editPlan(id: string): void {
@@ -30,23 +32,23 @@ export class PlanListComponent {
   }
 
   duplicatePlan(id: string): void {
-    this._planDialogs.duplicatePlan(id).subscribe((_) => this._plansApiService.reloadPlansTableDataSource());
+    this._planDialogs.duplicatePlan(id).subscribe((_) => this.dataSource.reload());
   }
 
   deletePlan(id: string, name: string): void {
     this._planDialogs.deletePlan(id, name).subscribe((result) => {
       if (result) {
-        this._plansApiService.reloadPlansTableDataSource();
+        this.dataSource.reload();
       }
     });
   }
 
   importPlans(): void {
-    this._planDialogs.importPlans().subscribe((_) => this._plansApiService.reloadPlansTableDataSource());
+    this._planDialogs.importPlans().subscribe((_) => this.dataSource.reload());
   }
 
   exportPlans(): void {
-    this._planDialogs.exportPlans().subscribe((_) => this._plansApiService.reloadPlansTableDataSource());
+    this._planDialogs.exportPlans().subscribe((_) => this.dataSource.reload());
   }
 
   exportPlan(id: string, name: string): void {

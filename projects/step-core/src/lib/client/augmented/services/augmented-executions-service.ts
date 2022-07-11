@@ -7,9 +7,9 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedExecutionsService extends ExecutionsService {
-  readonly EXECUTIONS_TABLE_ID = 'executions';
+  private readonly EXECUTIONS_TABLE_ID = 'executions';
 
-  readonly dataSource = new TableRemoteDataSource(this.EXECUTIONS_TABLE_ID, this._tableRest, {
+  private readonly dataSource = new TableRemoteDataSource(this.EXECUTIONS_TABLE_ID, this._tableRest, {
     description: 'description',
     startTime: 'startTime',
     endTime: 'endTime',
@@ -25,10 +25,6 @@ export class AugmentedExecutionsService extends ExecutionsService {
 
   public getExecutionsTableDataSource(): TableRemoteDataSource<any> {
     return this.dataSource;
-  }
-
-  public reloadExecutionsTableDataSource(): void {
-    this.dataSource.reload();
   }
 
   public getResultColumnItems(): Observable<string[]> {
