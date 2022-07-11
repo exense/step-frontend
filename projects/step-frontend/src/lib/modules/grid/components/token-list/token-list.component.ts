@@ -59,8 +59,7 @@ export class TokenListComponent implements OnDestroy {
         this.strigifyAttributes(element.token!.attributes!).includes(searchValue.toLowerCase()),
       state: (element, searchValue) => searchValue.toUpperCase().includes(element.state!.toUpperCase()),
       //@ts-ignore
-      executionDescription: (element, searchValue) =>
-        element.currentOwner?.executionDescription.includes(searchValue.toLowerCase()),
+      executionDescription: (element, searchValue) => element.currentOwner?.executionDescription.includes(searchValue.toLowerCase()),
     },
     sortPredicates: {
       id: (elementA, elementB) => elementA.token!.id!.localeCompare(elementB.token!.id!),
@@ -70,8 +69,7 @@ export class TokenListComponent implements OnDestroy {
         ),
       agent: (elementA, elementB) => elementA.agent!.agentUrl!.localeCompare(elementB.agent!.agentUrl!),
       //@ts-ignore
-      executionDescription: (elementA, elementB) =>
-        elementA.currentOwner?.executionDescription.localeCompare(elementB.currentOwner?.executionDescription),
+      executionDescription: (elementA, elementB) => elementA.currentOwner?.executionDescription.localeCompare(elementB.currentOwner?.executionDescription),
     },
   });
 
