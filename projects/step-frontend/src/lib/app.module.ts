@@ -12,6 +12,7 @@ import { ContextMenuModule } from './modules/context-menu/context-menu.module';
 import { ParameterModule } from './modules/parameter/parameter.module';
 import { FunctionModule } from './modules/function/function.module';
 import { TimeSeriesModule } from './modules/timeseries/time-series.module';
+import { GenericFunctionModule } from './modules/mask/generic-function.module';
 
 @NgModule({
   declarations: [],
@@ -28,6 +29,7 @@ import { TimeSeriesModule } from './modules/timeseries/time-series.module';
     ContextMenuModule,
     ParameterModule,
     TimeSeriesModule,
+    GenericFunctionModule,
   ],
   providers: [PLUGINS_INITIALIZER],
 })
