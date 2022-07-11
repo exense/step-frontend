@@ -1,0 +1,49 @@
+.header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px;
+
+  .import-export button {
+    padding: 0;
+    min-width: 4rem;
+  }
+
+  step-btn-group {
+    margin-left: 1rem;
+  }
+}
+
+:host {
+  position: relative;
+  display: block;
+  background: white;
+  border-radius: 16px;
+}
+
+.token-status {
+  color: white;
+  padding: 4px;
+  border-radius: 10px;
+  font-size: 75%;
+  width: 100px;
+}
+
+.token-status-IN_USE {
+  background: #337ab7;
+}
+
+.token-status-ERROR {
+  background: black;
+}
+
+.token-status-FREE {
+  background: #5cb85c;
+}
+
+.token-status-MAINTENANCE_REQUESTED {
+  background: #749dc0;
+}
+
+.token-status-MAINTENANCE {
+  background: #fbd544;
+}

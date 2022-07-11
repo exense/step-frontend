@@ -8,18 +8,7 @@ import {
   GridService,
   AgentListEntry,
 } from '@exense/step-core';
-import {
-  Observable,
-  BehaviorSubject,
-  switchMap,
-  of,
-  catchError,
-  noop,
-  shareReplay,
-  tap,
-  map,
-  lastValueFrom,
-} from 'rxjs';
+import { Observable, BehaviorSubject, switchMap, shareReplay, tap } from 'rxjs';
 
 type InProgress = Mutable<Pick<AgentListComponent, 'inProgress'>>;
 
