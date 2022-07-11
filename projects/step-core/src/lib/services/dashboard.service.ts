@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { a1Promise2Observable, AuthService, UibModalHelperService, ViewRegistryService } from '@exense/step-core';
-import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { AuthService } from './auth.service';
+import { ViewRegistryService } from './view-registry.service';
+import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
+import { AJS_MODULE } from '../shared';
 
 @Injectable({
   providedIn: 'root',
@@ -43,3 +45,5 @@ export class DashboardService {
     } catch (e) {}
   }
 }
+
+getAngularJSGlobal().module(AJS_MODULE).service('DashboardService', downgradeInjectable(DashboardService));
