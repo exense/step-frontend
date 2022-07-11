@@ -18,7 +18,7 @@ import { IsUsedByType } from '../../../_common/shared/is-used-by-type.enum';
 import { catchError, map, noop, of, switchMap, tap } from 'rxjs';
 import { ILocationService, IRootScopeService } from 'angular';
 import { FunctionDialogsService } from '../../servies/function-dialogs.service';
-import { FunctionPackageDialogsService } from '../../servies/function-package-dialogs.service';
+import { FunctionPackageActionsService } from '../../servies/function-package-actions.service';
 
 @Component({
   selector: 'step-function-list',
@@ -38,7 +38,7 @@ export class FunctionListComponent {
     private _tableRest: TableRestService,
     private _dialogs: DialogsService,
     private _functionDialogs: FunctionDialogsService,
-    private _functionPackageDialogs: FunctionPackageDialogsService,
+    private _functionPackageDialogs: FunctionPackageActionsService,
     private _exportDialogs: ExportDialogsService,
     private _importDialogs: ImportDialogsService,
     private _isUsedByDialogs: IsUsedByDialogsService,
@@ -48,11 +48,11 @@ export class FunctionListComponent {
   ) {}
 
   addFunction(): void {
-    this._functionDialogs.addFunction().subscribe((_) => this.dataSource.reload());
+    this._functionDialogs.addFunction().subscribe(() => this.dataSource.reload());
   }
 
   addFunctionPackage(): void {
-    this._functionPackageDialogs.addFunctionPackage().subscribe((_) => this.dataSource.reload());
+    this._functionPackageDialogs.addFunctionPackage().subscribe(() => this.dataSource.reload());
   }
 
   editFunction(id: string): void {

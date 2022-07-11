@@ -198,72 +198,12 @@ angular
 
   .controller('FunctionPackageListCtrl', [
     '$scope',
-    '$rootScope',
-    '$compile',
-    '$http',
     'stateStorage',
-    '$interval',
-    '$uibModal',
-    'Dialogs',
-    'FunctionPackagesDialogs',
-    '$location',
-    'AuthService',
-    'FunctionPackageTypeRegistry',
     function (
       $scope,
-      $rootScope,
-      $compile,
-      $http,
       $stateStorage,
-      $interval,
-      $uibModal,
-      Dialogs,
-      FunctionPackagesDialogs,
-      $location,
-      AuthService,
-      FunctionPackageTypeRegistry
     ) {
       $stateStorage.push($scope, 'functionPackages', {});
-
-      $scope.isRefreshing = false;
-
-      $scope.authService = AuthService;
-
-      $scope.tableHandle = {};
-
-      function reload() {
-        $scope.tableHandle.reload();
-      }
-
-      $scope.editFunctionPackage = function (id) {
-        FunctionPackagesDialogs.editFunctionPackage(id, function () {
-          reload();
-        });
-      };
-
-      $scope.addFunctionPackage = function () {
-        FunctionPackagesDialogs.addFunctionPackage(function () {
-          reload();
-        });
-      };
-
-      $scope.refreshFunctionPackage = function (id) {
-        $scope.isRefreshing = true;
-        $http
-          .post('rest/functionpackages/' + id + '/reload')
-          .then(function () {})
-          .finally(function () {
-            $scope.isRefreshing = false;
-          });
-      };
-
-      $scope.deleteFunctionPackage = function (id, name) {
-        Dialogs.showDeleteWarning(1, 'Keyword Package "' + name + '"').then(function () {
-          $http.delete('rest/functionpackages/' + id).then(function () {
-            reload();
-          });
-        });
-      };
     },
   ])
 
