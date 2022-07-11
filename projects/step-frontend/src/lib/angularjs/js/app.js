@@ -608,7 +608,7 @@ angular
   .factory('ImportDialogs', function ($rootScope, $uibModal, EntityRegistry, $sce) {
     var dialogs = {};
 
-    dialogs.displayImportDialog = function (title, path, importAll, overwrite) {
+    dialogs.displayImportDialog = function (title, path) {
       var modalInstance = $uibModal.open({
         backdrop: 'static',
         templateUrl: 'partials/importDialog.html',
@@ -621,10 +621,10 @@ angular
             return path;
           },
           importAll: function () {
-            return importAll;
+            return false;
           },
           overwrite: function () {
-            return overwrite;
+            return false;
           },
         },
       });
@@ -669,7 +669,7 @@ angular
   .factory('ExportDialogs', function ($rootScope, $uibModal, EntityRegistry, $sce) {
     var dialogs = {};
 
-    dialogs.displayExportDialog = function (title, path, filename, recursively, parameters) {
+    dialogs.displayExportDialog = function (title, path, filename) {
       var modalInstance = $uibModal.open({
         backdrop: 'static',
         templateUrl: 'partials/exportDialog.html',
@@ -685,10 +685,10 @@ angular
             return filename;
           },
           recursively: function () {
-            return recursively;
+            return true;
           },
           parameters: function () {
-            return parameters;
+            return false;
           },
         },
       });
@@ -720,17 +720,13 @@ angular
       $scope.parameters = parameters;
 
       $scope.save = function () {
+        $scope.exporting = true;
         if ($scope.filename) {
           urlParams = '?recursively=' + $scope.recursively + '&filename=' + $scope.filename;
           if ($scope.parameters) {
             urlParams += '&additionalEntities=parameters';
           }
-          ExportService.get('rest/export/' + $scope.path + urlParams);
-          $uibModalInstance.close();
-
-          /*    $http({url:"rest/import/" + path,method:"POST",params:{path:$scope.resourcePath,importAll:$scope.importAll,overwrite:$scope.overwrite}}).then(function(response) {
-        $uibModalInstance.close(response.data);
-      })*/
+          ExportService.get("rest/export/" + $scope.path + urlParams, () => $uibModalInstance.close());
         } else {
           Dialogs.showErrorMsg('Upload not completed.');
         }

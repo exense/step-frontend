@@ -131,17 +131,17 @@ angular
       };
 
       $scope.importPlans = function () {
-        ImportDialogs.displayImportDialog('Plans import', 'plans', true, false).then(function () {
+        ImportDialogs.displayImportDialog('Plans import', 'plans').then(function () {
           reload();
         });
       };
 
       $scope.exportPlans = function () {
-        ExportDialogs.displayExportDialog('Plans export', 'plans', 'allPlans.sta', true, false).then(function () {});
+        ExportDialogs.displayExportDialog('Plans export', 'plans', 'allPlans.sta').then(function () {});
       };
 
       $scope.exportPlan = function (id, name) {
-        ExportDialogs.displayExportDialog('Plans export', 'plans/' + id, name + '.sta', true, false).then(
+        ExportDialogs.displayExportDialog('Plans export', 'plans/' + id, name + '.sta').then(
           function () {}
         );
       };
