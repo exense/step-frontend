@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, Input } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   a1Promise2Observable,
@@ -11,52 +11,64 @@ import {
   TableRestService,
 } from '@exense/step-core';
 import { HttpClient } from '@angular/common/http';
-import { ExportDialogsService } from '../../../_common/services/export-dialogs.service';
-import { ImportDialogsService } from '../../../_common/services/import-dialogs.service';
 import { IsUsedByDialogsService } from '../../../_common/services/is-used-by-dialogs.service';
 import { IsUsedByType } from '../../../_common/shared/is-used-by-type.enum';
 import { catchError, map, noop, of, switchMap, tap } from 'rxjs';
 import { ILocationService, IRootScopeService } from 'angular';
-import { FunctionDialogsService } from '../../servies/function-dialogs.service';
-import { FunctionPackageDialogsService } from '../../servies/function-package-dialogs.service';
+import { FunctionDialogsService } from '../../../function/servies/function-dialogs.service';
 
 @Component({
-  selector: 'step-function-list',
-  templateUrl: './function-list.component.html',
-  styleUrls: ['./function-list.component.scss'],
+  selector: 'step-generic-function-list',
+  templateUrl: './generic-function-list.component.html',
+  styleUrls: ['./generic-function-list.component.scss'],
 })
-export class FunctionListComponent {
-  readonly dataSource = new TableRemoteDataSource('functions', this._tableRest, {
-    name: 'attributes.name',
-    type: 'type',
-    package: 'customFields.functionPackageId',
-    actions: '',
-  });
+export class GenericFunctionListComponent {
+  @Input() filter?: [string];
+  @Input() filterclass?: [string];
+  @Input() title?: string;
+  @Input() serviceroot?: string;
+
+  dataSource!: TableRemoteDataSource<any>;
+  config: any;
 
   constructor(
     private _httpClient: HttpClient,
     private _tableRest: TableRestService,
     private _dialogs: DialogsService,
     private _functionDialogs: FunctionDialogsService,
-    private _functionPackageDialogs: FunctionPackageDialogsService,
-    private _exportDialogs: ExportDialogsService,
-    private _importDialogs: ImportDialogsService,
     private _isUsedByDialogs: IsUsedByDialogsService,
     @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService,
     @Inject(AJS_LOCATION) private _location: ILocationService,
     @Inject(AJS_FUNCTION_TYPE_REGISTRY) private _functionTypeRegistry: any
   ) {}
 
-  addFunction(): void {
-    this._functionDialogs.addFunction().subscribe((_) => this.dataSource.reload());
+  ngOnInit() {
+    this.dataSource = new TableRemoteDataSource(
+      'functions',
+      this._tableRest,
+      {
+        name: 'attributes.name',
+        type: 'type',
+        actions: '',
+      },
+      this.filter
+    );
+
+    this.config = this._functionDialogs._functionDialogsConfig.getConfigObject(
+      this.title,
+      this.serviceroot,
+      this.filterclass,
+      true,
+      'functionTable'
+    );
   }
 
-  addFunctionPackage(): void {
-    this._functionPackageDialogs.addFunctionPackage().subscribe((_) => this.dataSource.reload());
+  addMask(): void {
+    this._functionDialogs.addFunction(this.config).subscribe((_) => this.dataSource.reload());
   }
 
   editFunction(id: string): void {
-    this._functionDialogs.openFunctionEditor(id);
+    this._functionDialogs.openFunctionEditor(id, this.config);
   }
 
   executeFunction(id: string): void {
@@ -90,28 +102,12 @@ export class FunctionListComponent {
       });
   }
 
-  exportFunction(id: string, name: string): void {
-    this._exportDialogs
-      .displayExportDialog('Keyword export', 'functions/' + id, name + '.sta')
-      .subscribe((_) => this.dataSource.reload());
-  }
-
-  importFunctions(): void {
-    this._importDialogs.displayImportDialog('Keyword import', 'functions').subscribe((_) => this.dataSource.reload());
-  }
-
-  exportFunctions(): void {
-    this._exportDialogs
-      .displayExportDialog('Keyword export', 'functions', 'allKeywords.sta')
-      .subscribe((_) => this.dataSource.reload());
-  }
-
   lookUp(id: string, name: string): void {
     this._isUsedByDialogs.displayDialog(`Keyword "${name}" is used by`, IsUsedByType.KEYWORD_ID, id).subscribe(noop);
   }
 
   configureFunction(id: string) {
-    this._functionDialogs.configureFunction(id).subscribe((_) => this.dataSource.reload());
+    this._functionDialogs.configureFunction(id, this.config).subscribe((_) => this.dataSource.reload());
   }
 
   functionTypeLabel(type: string) {
@@ -121,4 +117,4 @@ export class FunctionListComponent {
 
 getAngularJSGlobal()
   .module(AJS_MODULE)
-  .directive('stepFunctionList', downgradeComponent({ component: FunctionListComponent }));
+  .directive('stepGenericFunctionList', downgradeComponent({ component: GenericFunctionListComponent }));

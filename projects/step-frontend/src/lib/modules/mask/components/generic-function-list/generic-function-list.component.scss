@@ -1,0 +1,30 @@
+:host {
+  position: relative;
+  display: block;
+  background: white;
+  border-radius: 16px;
+}
+
+.cell-actions {
+  width: 20rem;
+  button {
+    padding: 0;
+    min-width: 4rem;
+    min-height: 4rem;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px;
+
+  .import-export button {
+    padding: 0;
+    min-width: 4rem;
+  }
+
+  step-btn-group {
+    margin-left: 1rem;
+  }
+}

@@ -107,8 +107,6 @@ angular
           'Plans export',
           'plans/' + $scope.planId,
           $scope.model.plan.attributes.name + '.sta',
-          true,
-          false
         ).then(function () {});
       };
 
