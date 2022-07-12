@@ -66,15 +66,15 @@ export class PlanDialogsService {
   }
 
   importPlans(): Observable<any> {
-    return this._importDialogs.displayImportDialog('Plans import', 'plans', true, false);
+    return this._importDialogs.displayImportDialog('Plans import', 'plans');
   }
 
   exportPlans(): Observable<any> {
-    return this._exportDialogs.displayExportDialog('Plans export', 'plans', 'allPlans.sta', true, false);
+    return this._exportDialogs.displayExportDialog('Plans export', 'plans', 'allPlans.sta');
   }
 
   exportPlan(id: string, name: string): Observable<any> {
-    return this._exportDialogs.displayExportDialog('Plans export', `plans/${id}`, `${name}.sta`, true, false);
+    return this._exportDialogs.displayExportDialog('Plans export', `plans/${id}`, `${name}.sta`);
   }
 
   lookUp(id: string, name: string): Observable<any> {

@@ -26,11 +26,11 @@ export class ParameterDialogsService {
   ) {}
 
   importParameter(): Observable<any> {
-    return this._importDialogs.displayImportDialog('Parameters import', 'parameters', true, false);
+    return this._importDialogs.displayImportDialog('Parameters import', 'parameters');
   }
 
   exportParameter(): Observable<any> {
-    return this._exportDialogs.displayExportDialog('Parameters export', 'parameters', 'allParameters.sta', true, false);
+    return this._exportDialogs.displayExportDialog('Parameters export', 'parameters', 'allParameters.sta');
   }
 
   editParameter(parameter?: Partial<Parameter>): Observable<{ parameter?: Partial<Parameter>; result: string }> {
