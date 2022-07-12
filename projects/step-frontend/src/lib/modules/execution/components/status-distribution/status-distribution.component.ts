@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { ExecutionSummaryDto } from '../../shared/execution-summary-dto';
+import { ExecutionSummaryDto } from '@exense/step-core';
 
 @Component({
   selector: 'step-status-distribution',
