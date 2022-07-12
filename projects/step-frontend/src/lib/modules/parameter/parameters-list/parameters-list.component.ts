@@ -58,13 +58,13 @@ export class ParametersListComponent {
 
   importParameter(): void {
     this._importDialogs
-      .displayImportDialog('Parameters import', 'parameters', true, false)
+      .displayImportDialog('Parameters import', 'parameters')
       .subscribe((_) => this.dataSource.reload());
   }
 
   exportParameter(): void {
     this._exportDialogs
-      .displayExportDialog('Parameters export', 'parameters', 'allParameters.sta', true, false)
+      .displayExportDialog('Parameters export', 'parameters', 'allParameters.sta')
       .subscribe((_) => this.dataSource.reload());
   }
 
