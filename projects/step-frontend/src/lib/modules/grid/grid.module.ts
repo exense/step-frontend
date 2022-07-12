@@ -7,7 +7,7 @@ import { CalcStatusSummaryProgressbarWithPercentPipe } from './components/status
 
 @NgModule({
   declarations: [AgentListComponent, StatusSummaryComponent, CalcStatusSummaryProgressbarWithPercentPipe],
-  exports: [AgentListComponent, StatusSummaryComponent],
+  exports: [AgentListComponent],
   imports: [StepCoreModule, StepCommonModule],
 })
 export class GridModule {}
