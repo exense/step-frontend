@@ -103,29 +103,18 @@
 </step-table>
 <mat-menu #menu="matMenu">
   <ng-template matMenuContent let-element="element">
-    <button
-      mat-menu-item
-      matTooltip="Edit keyword"
-      [disabled]="!('kw-write' | hasRight | async)"
-      (click)="editFunction(element.id)"
-    >
+    <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="editFunction(element.id)">
       <mat-icon>edit</mat-icon>
       Edit Keyword
     </button>
 
-    <button
-      mat-menu-item
-      matTooltip="Duplicate keyword"
-      [disabled]="!('kw-write' | hasRight | async)"
-      (click)="duplicateFunction(element.id)"
-    >
+    <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="duplicateFunction(element.id)">
       <mat-icon>content_copy</mat-icon>
       Duplicate Keyword
     </button>
 
     <button
       mat-menu-item
-      matTooltip="Duplicate keyword"
       [disabled]="!('kw-read' | hasRight | async)"
       (click)="exportFunction(element.id, element.attributes.name)"
     >
