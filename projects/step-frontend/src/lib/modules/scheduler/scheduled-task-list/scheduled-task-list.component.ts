@@ -7,10 +7,10 @@ import {
   ExecutiontTaskParameters,
   TableLocalDataSource,
   Mutable,
+  DashboardService,
 } from '@exense/step-core';
 import { ScheduledTaskDialogsService } from '../services/scheduled-task-dialogs.service';
 import { Location } from '@angular/common';
-import { DashboardService } from '../../_common/services/dashboard.service';
 
 type InProgress = Mutable<Pick<ScheduledTaskListComponent, 'inProgress'>>;
 

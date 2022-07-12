@@ -8,13 +8,7 @@ import { Observable } from 'rxjs';
 export class ExportDialogsService {
   constructor(private _uibModalHelper: UibModalHelperService) {}
 
-  displayExportDialog<T>(
-    title: string,
-    path: string,
-    filename: string,
-    recursively: boolean,
-    parameters: boolean
-  ): Observable<T> {
+  displayExportDialog<T>(title: string, path: string, filename: string): Observable<T> {
     const modalInstance = this._uibModalHelper.open({
       backdrop: 'static',
       templateUrl: 'partials/exportDialog.html',
@@ -23,8 +17,8 @@ export class ExportDialogsService {
         title: () => title,
         path: () => path,
         filename: () => filename,
-        recursively: () => recursively,
-        parameters: () => parameters,
+        recursively: () => true,
+        parameters: () => false,
       },
     });
 

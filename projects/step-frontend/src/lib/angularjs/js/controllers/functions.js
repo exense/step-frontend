@@ -111,7 +111,7 @@ angular
             return function_;
           },
           dialogConfig: function () {
-            return dialogConfig ? dialogConfig : FunctionDialogsConfig.getDefaultConfig();
+            return dialogConfig;
           },
         },
       });

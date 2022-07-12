@@ -1,0 +1,32 @@
+<div *ngIf="functionPackage">
+  <a (click)="$event.preventDefault(); edit()">
+    <step-resource-label [stModel]="functionPackage.packageLocation" stFormat="filename"></step-resource-label>
+  </a>
+  <step-btn-group>
+    <button
+      mat-icon-button
+      matTooltip="Refresh package"
+      [disabled]="!('kw-read' | hasRight | async) || isRefreshing"
+      (click)="refresh()"
+    >
+      <mat-icon>refresh</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      matTooltip="Edit package"
+      [disabled]="!('kw-write' | hasRight | async) || isRefreshing"
+      (click)="edit()"
+    >
+      <mat-icon>edit</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      matTooltip="Delete package"
+      [disabled]="!('kw-write' | hasRight | async) || isRefreshing"
+      (click)="delete()"
+    >
+      <mat-icon>delete</mat-icon>
+    </button>
+  </step-btn-group>
+</div>
+<div *ngIf="!functionPackage" matTooltip="This keyword is not part of a Keyword package">-</div>

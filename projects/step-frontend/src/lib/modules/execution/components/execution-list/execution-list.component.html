@@ -33,7 +33,7 @@
   </ng-container>
   <ng-container matColumnDef="environment" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Environment</th>
-    <td mat-cell *matCellDef="let element">{{ element?.executionParameters?.customParameters.env }}</td>
+    <td mat-cell *matCellDef="let element">{{ element?.executionParameters?.customParameters?.env }}</td>
   </ng-container>
   <ng-container matColumnDef="status" stepSearchCol #searchStatus="SearchCol">
     <step-array-filter
