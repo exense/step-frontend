@@ -1,0 +1,25 @@
+<section class="header">
+  <div class="token-group-checkboxes">
+    <span class="token-group-checkboxes-groupby">Group by:</span>
+    <span class="token-group-checkboxes-checkbox" *ngFor="let key of checkedMapKeys"
+      ><input type="checkbox" [checked]="checkedMap[key]" (click)="toggleCheckBox(key)" />{{ key }}</span
+    >
+  </div>
+  <step-btn-group>
+    <step-autorefresh-toggle [interval]="5000" (refresh)="loadTable()"> </step-autorefresh-toggle>
+  </step-btn-group>
+</section>
+<step-table [dataSource]="searchableTokenGroupRequest$" [inProgress]="inProgress" matSort [matSortDisableClear]="true">
+  <ng-container matColumnDef="key" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef>Key</th>
+    <td mat-cell *matCellDef="let element">
+      {{ _flatObjectFormatService.format(element.key) }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="capacity">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Token states</th>
+    <td mat-cell *matCellDef="let element">
+      <step-status-summary [tokenGroup]="element"></step-status-summary>
+    </td>
+  </ng-container>
+</step-table>

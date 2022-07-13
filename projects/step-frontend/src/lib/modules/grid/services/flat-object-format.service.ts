@@ -7,11 +7,10 @@ export class FlatObjectFormatService {
   constructor() {}
 
   format(obj: any): string {
-    return JSON.stringify(obj)
-      .replace(/{/g, '')
-      .replace(/}/g, '')
-      .replace(/:/g, '=')
-      .replace(/,/g, ', ')
-      .replace(/"/g, '');
+    let str = '';
+    for (let key of Object.keys(obj)) {
+      str = str.concat(key).concat('=').concat(obj[key]).concat(', ');
+    }
+    return str;
   }
 }

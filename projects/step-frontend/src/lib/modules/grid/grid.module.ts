@@ -5,15 +5,17 @@ import { AgentListComponent } from './components/agent-list/agent-list.component
 import { StatusSummaryComponent } from './components/status-summary/status-summary.component';
 import { TokenListComponent } from './components/token-list/token-list.component';
 import { CalcStatusSummaryProgressbarWithPercentPipe } from './components/status-summary/calc-status-summary-progressbar-with-percent.pipe';
+import { TokenGroupListComponent } from './components/token-group-list/token-group-list.component';
 
 @NgModule({
   declarations: [
     AgentListComponent,
     TokenListComponent,
+    TokenGroupListComponent,
     StatusSummaryComponent,
     CalcStatusSummaryProgressbarWithPercentPipe,
   ],
-  exports: [AgentListComponent, TokenListComponent, StatusSummaryComponent],
+  exports: [AgentListComponent, TokenListComponent, TokenGroupListComponent, StatusSummaryComponent],
   imports: [StepCoreModule, StepCommonModule],
 })
 export class GridModule {}
