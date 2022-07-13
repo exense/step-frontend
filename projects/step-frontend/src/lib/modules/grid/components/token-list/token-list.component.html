@@ -26,7 +26,7 @@
   <ng-container matColumnDef="attributes" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef>Attributes</th>
     <td mat-cell *matCellDef="let element">
-      {{ strigifyAttributes(element.token!.attributes!) }}
+      {{ _flatObjectFormatService.format(element.token!.attributes!) }}
     </td>
   </ng-container>
   <ng-container matColumnDef="state" stepSearchCol #searchState="SearchCol">

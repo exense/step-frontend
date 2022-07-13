@@ -20,6 +20,7 @@ import {
   map,
   lastValueFrom,
 } from 'rxjs';
+import { FlatObjectFormatService } from '../../services/flat-object-format.service';
 
 type InProgress = Mutable<Pick<TokenListComponent, 'inProgress'>>;
 
@@ -56,10 +57,11 @@ export class TokenListComponent implements OnDestroy {
         ),
       agent: (element, searchValue) => element.agent!.agentUrl!.toLowerCase().includes(searchValue.toLowerCase()),
       attributes: (element, searchValue) =>
-        this.strigifyAttributes(element.token!.attributes!).includes(searchValue.toLowerCase()),
+        this._flatObjectFormatService.format(element.token!.attributes!).includes(searchValue.toLowerCase()),
       state: (element, searchValue) => searchValue.toUpperCase().includes(element.state!.toUpperCase()),
-      //@ts-ignore
-      executionDescription: (element, searchValue) => element.currentOwner?.executionDescription.includes(searchValue.toLowerCase()),
+      //@ts-ignore // prettier-ignore
+      executionDescription: (element, searchValue) =>
+        element.currentOwner?.executionDescription.includes(searchValue.toLowerCase()),
     },
     sortPredicates: {
       id: (elementA, elementB) => elementA.token!.id!.localeCompare(elementB.token!.id!),
@@ -68,24 +70,16 @@ export class TokenListComponent implements OnDestroy {
           this.TYPE_LABEL_TRANSLATIONS[elementB.token!.attributes!['$agenttype']]!
         ),
       agent: (elementA, elementB) => elementA.agent!.agentUrl!.localeCompare(elementB.agent!.agentUrl!),
-      //@ts-ignore
-      executionDescription: (elementA, elementB) => elementA.currentOwner?.executionDescription.localeCompare(elementB.currentOwner?.executionDescription),
+      //@ts-ignore // prettier-ignore
+      executionDescription: (elementA, elementB) =>
+        elementA.currentOwner?.executionDescription.localeCompare(elementB.currentOwner?.executionDescription),
     },
   });
 
-  constructor(private _gridService: GridService, context: ContextService) {}
+  constructor(private _gridService: GridService, public _flatObjectFormatService: FlatObjectFormatService) {}
 
   public loadTable(): void {
     this.tokenRequestSubject$.next({});
-  }
-
-  public strigifyAttributes(attributes: any): string {
-    return JSON.stringify(attributes)
-      .replace(/{/g, '')
-      .replace(/}/g, '')
-      .replace(/:/g, '=')
-      .replace(/,/g, ', ')
-      .replace(/"/g, '');
   }
 
   public pause(id: string): void {
