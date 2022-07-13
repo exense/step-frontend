@@ -3,14 +3,18 @@ import { LegacyPluginDefinition } from './shared/legacy-plugin-definition';
 import { MicrofrontendPluginDefinition } from './shared/microfrontend-plugin-definition';
 import { registerLegacyPlugins } from './register-legacy-plugins';
 import { registerMicrofrontendPlugins } from './register-microfrontend-plugins';
+import { PluginInfoRegistryService } from '@exense/step-core';
 
-// TODO: modify in BE and remove override
-const OVERRIDE_PLUGINS = new Map<string, string>([['multitenancy', 'multitenancy/remoteEntry.js']]);
+const OVERRIDE_PLUGINS = new Map<string, string>();
+
+// Ignore original multitenancy since it's become part of enterprise core
+const IGNORE_PLUGINS: ReadonlyArray<string> = ['multitenancy'];
 
 // For testing purposes only
 // Allows to add plugins, that don't returned from BE
-const ADDITIONAL_PLUGINS: ReadonlyArray<string> = [
-  // Add strings like this 'pluginName/remoteEntry.js'
+const ADDITIONAL_PLUGINS: ReadonlyArray<MicrofrontendPluginDefinition> = [
+  // Add object like this {name: 'pluginName', entryPoint: 'pluginName/remoteEntry.js' }
+  { name: 'stepEnterpriseCore', entryPoint: 'step-enterprise-core/remoteEntry.js' },
 ];
 
 export type PluginDefinition = LegacyPluginDefinition | MicrofrontendPluginDefinition;
@@ -24,19 +28,17 @@ const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
       const angularModules = (plugin as LegacyPluginDefinition)?.angularModules || [];
       const toOverride = angularModules.find((m) => OVERRIDE_PLUGINS.has(m));
       if (toOverride) {
+        const name = toOverride;
         const entryPoint = OVERRIDE_PLUGINS.get(toOverride)!;
-        console.log(`Plugin "${toOverride}" configuration was overridden to the new format`);
-        return { entryPoint };
+        console.log(`Plugin "${name}" configuration was overridden to the new format`);
+        return { entryPoint, name };
       }
 
       return plugin;
     });
 
     if (ADDITIONAL_PLUGINS.length > 0) {
-      const additionalPlugins: MicrofrontendPluginDefinition[] = ADDITIONAL_PLUGINS.map((entryPoint) => ({
-        entryPoint,
-      }));
-      result = [...result, ...additionalPlugins];
+      result = [...result, ...ADDITIONAL_PLUGINS];
     }
   } catch (e) {
     console.log('Fetch plugin definitions failed', e);
@@ -44,14 +46,14 @@ const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
   return result;
 };
 
-const loadPlugins = (compiler: Compiler, injector: Injector) => {
+const loadPlugins = (compiler: Compiler, injector: Injector, registry: PluginInfoRegistryService) => {
   return async () => {
     const pluginDefinitions = await fetchDefinitions();
     if (pluginDefinitions.length === 0) {
       return;
     }
 
-    const { legacy, microfrontend } = pluginDefinitions.reduce(
+    let { legacy, microfrontend } = pluginDefinitions.reduce(
       (res, plugin) => {
         if (plugin.hasOwnProperty('entryPoint')) {
           res.microfrontend.push(plugin as MicrofrontendPluginDefinition);
@@ -66,6 +68,19 @@ const loadPlugins = (compiler: Compiler, injector: Injector) => {
       }
     );
 
+    const pluginNames = [
+      ...legacy.reduce((res, pluginInfo) => [...res, ...pluginInfo.angularModules], [] as string[]),
+      ...microfrontend.map((pluginInfo) => pluginInfo.name),
+    ];
+    registry.register(...pluginNames);
+
+    legacy = legacy.filter((l) => {
+      const ignoredPlugins = IGNORE_PLUGINS.filter((name) => l.angularModules.includes(name));
+      return ignoredPlugins.length === 0;
+    });
+
+    microfrontend = microfrontend.filter((m) => !IGNORE_PLUGINS.includes(m.name));
+
     await Promise.all([
       registerLegacyPlugins(legacy),
       registerMicrofrontendPlugins(microfrontend, { compiler, injector }),
@@ -76,6 +91,6 @@ const loadPlugins = (compiler: Compiler, injector: Injector) => {
 export const PLUGINS_INITIALIZER: FactoryProvider = {
   provide: APP_INITIALIZER,
   useFactory: loadPlugins,
-  deps: [Compiler, Injector],
+  deps: [Compiler, Injector, PluginInfoRegistryService],
   multi: true,
 };

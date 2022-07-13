@@ -1,7 +1,7 @@
 import { loadRemoteModule, LoadRemoteModuleOptions } from '@angular-architects/module-federation';
 import { Compiler, Injector, Type } from '@angular/core';
 import { MicrofrontendPluginDefinition } from './shared/microfrontend-plugin-definition';
-import { AJS_MODULE, getPluginMetaInfo } from '@exense/step-core';
+import { AJS_MODULE, getPluginMetaInfo, PluginOnInit } from '@exense/step-core';
 import { getAngularJSGlobal } from '@angular/upgrade/static';
 
 interface PluginModuleDeclaration {
@@ -66,6 +66,14 @@ export const registerMicrofrontendPlugins = async (
 
   const compileModules = pluginCtxs.map((ctx) => compileModule({ ...compileCtx, ...ctx }));
   const modules = (await Promise.all(compileModules)).filter((x) => !!x);
+
+  const modulesWithInit = modules
+    .map((m) => m.moduleInstance as Partial<PluginOnInit>)
+    .filter((m) => !!m.pluginOnInit) as PluginOnInit[];
+
+  if (modulesWithInit.length > 0) {
+    await Promise.all(modulesWithInit.map((m) => m.pluginOnInit()));
+  }
 
   const hybridModules = modules
     .map((module) => getPluginMetaInfo(module.moduleClass)?.hybridModuleName)
