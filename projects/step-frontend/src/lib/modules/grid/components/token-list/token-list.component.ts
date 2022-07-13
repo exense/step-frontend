@@ -59,9 +59,9 @@ export class TokenListComponent implements OnDestroy {
       attributes: (element, searchValue) =>
         this._flatObjectFormatService.format(element.token!.attributes!).includes(searchValue.toLowerCase()),
       state: (element, searchValue) => searchValue.toUpperCase().includes(element.state!.toUpperCase()),
-      //@ts-ignore // prettier-ignore
-      executionDescription: (element, searchValue) =>
-        element.currentOwner?.executionDescription.includes(searchValue.toLowerCase()),
+      // prettier-ignore
+      //@ts-ignore
+      executionDescription: (element, searchValue) => element.currentOwner?.executionDescription.includes(searchValue.toLowerCase()),
     },
     sortPredicates: {
       id: (elementA, elementB) => elementA.token!.id!.localeCompare(elementB.token!.id!),
@@ -70,9 +70,9 @@ export class TokenListComponent implements OnDestroy {
           this.TYPE_LABEL_TRANSLATIONS[elementB.token!.attributes!['$agenttype']]!
         ),
       agent: (elementA, elementB) => elementA.agent!.agentUrl!.localeCompare(elementB.agent!.agentUrl!),
-      //@ts-ignore // prettier-ignore
-      executionDescription: (elementA, elementB) =>
-        elementA.currentOwner?.executionDescription.localeCompare(elementB.currentOwner?.executionDescription),
+      // prettier-ignore
+      //@ts-ignore
+      executionDescription: (elementA, elementB) => elementA.currentOwner?.executionDescription.localeCompare(elementB.currentOwner?.executionDescription),
     },
   });
 
