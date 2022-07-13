@@ -1,48 +1,15 @@
 <section class="header">
-  <step-btn-group class="import-export">
-    <button
-      type="button"
-      mat-icon-button
-      matTooltip="Import keyword"
-      matTooltipPosition="below"
-      [disabled]="!('kw-write' | hasRight | async)"
-      (click)="importFunctions()"
-    >
-      <mat-icon>file_download</mat-icon>
-    </button>
-    <button
-      type="button"
-      mat-icon-button
-      matTooltip="Export all keywords"
-      matTooltipPosition="below"
-      [disabled]="!('kw-read' | hasRight | async)"
-      (click)="exportFunctions()"
-    >
-      <mat-icon>file_upload</mat-icon>
-    </button>
-  </step-btn-group>
   <step-btn-group>
     <button
       type="button"
       mat-icon-button
       class="primary"
-      matTooltip="New keyword"
+      matTooltip="New Mask"
       matTooltipPosition="below"
       [disabled]="!('kw-write' | hasRight | async)"
-      (click)="addFunction()"
+      (click)="addMask()"
     >
       <mat-icon>add</mat-icon>
-    </button>
-  </step-btn-group>
-  <step-btn-group>
-    <button
-      type="button"
-      mat-flat-button
-      color="primary"
-      [disabled]="!('kw-write' | hasRight | async)"
-      (click)="addFunctionPackage()"
-    >
-      New Keyword Package
     </button>
   </step-btn-group>
 </section>
@@ -56,15 +23,9 @@
       </a>
     </td>
   </ng-container>
-  <ng-container matColumnDef="type" stepSearchCol>
+  <ng-container matColumnDef="type">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
     <td mat-cell *matCellDef="let element">{{ functionTypeLabel(element.type) }}</td>
-  </ng-container>
-  <ng-container matColumnDef="package" stepSearchCol>
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Package</th>
-    <td mat-cell *matCellDef="let element">
-      <function-package-link [id]="element.customFields?.functionPackageId"></function-package-link>
-    </td>
   </ng-container>
   <ng-container matColumnDef="actions">
     <th mat-header-cell *matHeaderCellDef>Actions</th>
@@ -72,7 +33,7 @@
       <step-btn-group>
         <button
           mat-icon-button
-          matTooltip="Configure keyword"
+          matTooltip="Configure mask"
           [disabled]="!('kw-read' | hasRight | async)"
           (click)="configureFunction(element.id)"
         >
@@ -80,7 +41,7 @@
         </button>
         <button
           mat-icon-button
-          matTooltip="Execute keyword"
+          matTooltip="Execute mask"
           [disabled]="!('kw-write' | hasRight | async)"
           (click)="executeFunction(element.id)"
         >
@@ -88,7 +49,7 @@
         </button>
         <button
           mat-icon-button
-          matTooltip="Delete keyword"
+          matTooltip="Delete mask"
           [disabled]="!('kw-read' | hasRight | async)"
           (click)="deleteFunction(element.id, element.attributes.name)"
         >
@@ -112,16 +73,6 @@
       <mat-icon>content_copy</mat-icon>
       Duplicate Keyword
     </button>
-
-    <button
-      mat-menu-item
-      [disabled]="!('kw-read' | hasRight | async)"
-      (click)="exportFunction(element.id, element.attributes.name)"
-    >
-      <mat-icon>content_copy</mat-icon>
-      Export Keyword
-    </button>
-
     <button
       mat-menu-item
       [disabled]="!('kw-read' | hasRight | async)"
