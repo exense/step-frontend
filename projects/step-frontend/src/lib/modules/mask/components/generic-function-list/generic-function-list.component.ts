@@ -1,78 +1,56 @@
-import { Component, Inject, Input } from '@angular/core';
+import { Component, Inject, Input, OnInit } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
+import { GenericFunctionDialogService } from '../services/generic-function-dialogs.service';
 import {
-  a1Promise2Observable,
   AJS_FUNCTION_TYPE_REGISTRY,
   AJS_LOCATION,
   AJS_MODULE,
   AJS_ROOT_SCOPE,
-  DialogsService,
+  InteractivePlanExecutionService,
   TableRemoteDataSource,
-  TableRestService,
+  AugmentedKeywordsService,
+  FunctionPackage,
 } from '@exense/step-core';
-import { HttpClient } from '@angular/common/http';
-import { IsUsedByDialogsService } from '../../../_common/services/is-used-by-dialogs.service';
-import { IsUsedByType } from '../../../_common/shared/is-used-by-type.enum';
-import { catchError, map, noop, of, switchMap, tap } from 'rxjs';
+import { noop } from 'rxjs';
 import { ILocationService, IRootScopeService } from 'angular';
-import { FunctionDialogsService } from '../../../function/servies/function-dialogs.service';
 
 @Component({
   selector: 'step-generic-function-list',
   templateUrl: './generic-function-list.component.html',
   styleUrls: ['./generic-function-list.component.scss'],
 })
-export class GenericFunctionListComponent {
+export class GenericFunctionListComponent implements OnInit {
   @Input() filter?: [string];
   @Input() filterclass?: [string];
   @Input() title?: string;
   @Input() serviceroot?: string;
 
-  dataSource!: TableRemoteDataSource<any>;
-  config: any;
+  readonly dataSource: TableRemoteDataSource<FunctionPackage> =
+    this._augmentedKeywordsService.createFilteredTableDataSource(this.filter);
 
   constructor(
-    private _httpClient: HttpClient,
-    private _tableRest: TableRestService,
-    private _dialogs: DialogsService,
-    private _functionDialogs: FunctionDialogsService,
-    private _isUsedByDialogs: IsUsedByDialogsService,
+    private _interactivePlanExecutionService: InteractivePlanExecutionService,
+    private _genericFunctionDialogService: GenericFunctionDialogService,
+    private _augmentedKeywordsService: AugmentedKeywordsService,
     @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService,
     @Inject(AJS_LOCATION) private _location: ILocationService,
     @Inject(AJS_FUNCTION_TYPE_REGISTRY) private _functionTypeRegistry: any
   ) {}
 
   ngOnInit() {
-    this.dataSource = new TableRemoteDataSource(
-      'functions',
-      this._tableRest,
-      {
-        name: 'attributes.name',
-        type: 'type',
-        actions: '',
-      },
-      this.filter
-    );
-
-    this.config = this._functionDialogs._functionDialogsConfig.getConfigObject(
-      this.title,
-      this.serviceroot,
-      this.filterclass,
-      true,
-      'functionTable'
-    );
+    this._genericFunctionDialogService.configure(this.title, this.serviceroot, this.filterclass);
   }
 
   addMask(): void {
-    this._functionDialogs.addFunction(this.config).subscribe((_) => this.dataSource.reload());
+    this._genericFunctionDialogService.openAddMaskDialog().subscribe((_) => this.dataSource.reload());
   }
 
   editFunction(id: string): void {
-    this._functionDialogs.openFunctionEditor(id, this.config);
+    this._genericFunctionDialogService.openEditMaskDialog(id);
   }
 
   executeFunction(id: string): void {
-    this._httpClient.post<any>(`rest/interactive/functiontest/${id}/start`, {}).subscribe((result: any) => {
+    this._interactivePlanExecutionService.startFunctionTestingSession(id).subscribe((result: any) => {
       (this._$rootScope as any).planEditorInitialState = {
         interactive: true,
         selectedNode: result.callFunctionId,
@@ -82,32 +60,23 @@ export class GenericFunctionListComponent {
   }
 
   duplicateFunction(id: string): void {
-    this._httpClient.post<any>(`rest/functions/${id}/copy`, {}).subscribe((_) => this.dataSource.reload());
+    this._augmentedKeywordsService.copyFunction(id).subscribe((_) => this.dataSource.reload());
   }
 
   deleteFunction(id: string, name: string): void {
-    a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Keyword "${name}"`))
-      .pipe(
-        map((_) => true),
-        catchError((_) => of(false)),
-        tap((isDeleteConfirmed) => console.log('IS DELETE CONFIRMED', isDeleteConfirmed)),
-        switchMap((isDeleteConfirmed) =>
-          isDeleteConfirmed ? this._httpClient.delete(`rest/functions/${id}`).pipe(map((_) => true)) : of(false)
-        )
-      )
-      .subscribe((result) => {
-        if (result) {
-          this.dataSource.reload();
-        }
-      });
+    this._genericFunctionDialogService.openDeleteDialog(id, name).subscribe((result) => {
+      if (result) {
+        this.dataSource.reload();
+      }
+    });
   }
 
   lookUp(id: string, name: string): void {
-    this._isUsedByDialogs.displayDialog(`Keyword "${name}" is used by`, IsUsedByType.KEYWORD_ID, id).subscribe(noop);
+    this._genericFunctionDialogService.openLookupDialog(id, name).subscribe(noop);
   }
 
   configureFunction(id: string) {
-    this._functionDialogs.configureFunction(id, this.config).subscribe((_) => this.dataSource.reload());
+    this._genericFunctionDialogService.openConfigDialog(id).subscribe((_) => this.dataSource.reload());
   }
 
   functionTypeLabel(type: string) {
