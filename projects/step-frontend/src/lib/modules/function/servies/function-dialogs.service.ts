@@ -19,7 +19,7 @@ export class FunctionDialogsService {
     private _httpClient: HttpClient,
     private _uibModalHelper: UibModalHelperService,
     private _dialogs: DialogsService,
-    @Inject(AJS_FUNCTION_DIALOGS_CONFIG) private _functionDialogsConfig: any,
+    @Inject(AJS_FUNCTION_DIALOGS_CONFIG) public _functionDialogsConfig: any,
     @Inject(AJS_LOCATION) private _location: ILocationService
   ) {}
 

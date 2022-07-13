@@ -2,11 +2,8 @@
 @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
 @import '@angular/material/theming';
 
-@import '~material-icons-font/sass/variables';
-@import '~material-icons-font/sass/mixins';
-$MaterialIcons_FontPath: '~material-icons-font/fonts';
-@import '~material-icons-font/sass/main';
-@import '~material-icons-font/sass/Regular';
+$material-design-icons-font-directory-path: '~material-design-icons-iconfont/dist/fonts/';
+@import '~material-design-icons-iconfont/src/material-design-icons';
 
 @include angular-material-typography();
 

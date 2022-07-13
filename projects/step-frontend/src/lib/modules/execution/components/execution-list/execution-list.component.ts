@@ -1,9 +1,7 @@
 import { Component } from '@angular/core';
-import { TableRestService, TableRemoteDataSource, AJS_MODULE } from '@exense/step-core';
+import { AJS_MODULE, AugmentedExecutionsService } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { DateFormat } from '../../../_common/shared/date-format.enum';
-
-const EXECUTIONS_TABLE_ID = 'executions';
 
 @Component({
   selector: 'step-execution-list',
@@ -11,23 +9,13 @@ const EXECUTIONS_TABLE_ID = 'executions';
   styleUrls: ['./execution-list.component.scss'],
 })
 export class ExecutionListComponent {
-  readonly dataSource = new TableRemoteDataSource(EXECUTIONS_TABLE_ID, this._tableRest, {
-    description: 'description',
-    startTime: 'startTime',
-    endTime: 'endTime',
-    user: 'executionParameters.userID',
-    environment: 'executionParameters.customParameters.env',
-    status: 'status',
-    result: 'result',
-  });
+  readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
 
   readonly DateFormat = DateFormat;
+  readonly resultItems$ = this._augmentedExecutionsService.getResultColumnItems();
+  readonly statusItems$ = this._augmentedExecutionsService.getStatusColumnItems();
 
-  readonly resultItems$ = this._tableRest.requestColumnValues(EXECUTIONS_TABLE_ID, 'result');
-
-  readonly statusItems$ = this._tableRest.requestColumnValues(EXECUTIONS_TABLE_ID, 'status');
-
-  constructor(private _tableRest: TableRestService) {}
+  constructor(public _augmentedExecutionsService: AugmentedExecutionsService) {}
 }
 
 getAngularJSGlobal()
