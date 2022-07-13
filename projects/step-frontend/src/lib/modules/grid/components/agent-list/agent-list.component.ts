@@ -1,13 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import {
-  AJS_MODULE,
-  ContextService,
-  Mutable,
-  TableLocalDataSource,
-  GridService,
-  AgentListEntry,
-} from '@exense/step-core';
+import { AJS_MODULE, Mutable, TableLocalDataSource, GridService, AgentListEntry } from '@exense/step-core';
 import { Observable, BehaviorSubject, switchMap, shareReplay, tap } from 'rxjs';
 
 type InProgress = Mutable<Pick<AgentListComponent, 'inProgress'>>;
@@ -49,7 +42,7 @@ export class AgentListComponent implements OnDestroy {
     },
   });
 
-  constructor(private _gridService: GridService, context: ContextService) {}
+  constructor(private _gridService: GridService) {}
 
   public loadTable(): void {
     this.agentRequestSubject$.next({});
