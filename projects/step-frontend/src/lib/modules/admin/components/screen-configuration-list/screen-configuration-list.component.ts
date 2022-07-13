@@ -1,18 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import {
-  AJS_MODULE,
-  Input,
-  Option,
-  DialogsService,
-  AuthService,
-  a1Promise2Observable,
-  ContextService,
-  Mutable,
-  TableLocalDataSource,
-  ScreensService,
-} from '@exense/step-core';
-import { BehaviorSubject, switchMap, of, catchError, noop, shareReplay, tap, map } from 'rxjs';
+import { AJS_MODULE, Input, Option, Mutable, TableLocalDataSource, ScreensService } from '@exense/step-core';
+import { BehaviorSubject, switchMap, shareReplay, tap } from 'rxjs';
 import { ScreenDialogsService } from '../../services/screen-dialogs.service';
 
 type InProgress = Mutable<Pick<ScreenConfigurationListComponent, 'inProgress'>>;
@@ -49,18 +38,9 @@ export class ScreenConfigurationListComponent implements OnDestroy {
     },
   });
 
-  readonly currentUserName: string;
   readonly inProgress: boolean = false;
 
-  constructor(
-    private _screensService: ScreensService,
-    private _dialogs: DialogsService,
-    private _screenDialogs: ScreenDialogsService,
-    private _auth: AuthService,
-    context: ContextService
-  ) {
-    this.currentUserName = context.userName;
-  }
+  constructor(private _screensService: ScreensService, private _screenDialogs: ScreenDialogsService) {}
 
   public reloadTableForCurrentChoice(choice: string) {
     this.currentlySelectedScreenChoice = choice;
@@ -82,17 +62,11 @@ export class ScreenConfigurationListComponent implements OnDestroy {
   }
 
   removeScreen(dbId: string, label: string): void {
-    a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Screen "${label}"`))
-      .pipe(
-        switchMap((_) => this._screensService.deleteInput(dbId)),
-        map((_) => true),
-        catchError((_) => of(false))
-      )
-      .subscribe((result: boolean) => {
-        if (result) {
-          this.loadTable();
-        }
-      });
+    this._screenDialogs.removeScreen(dbId, label).subscribe((result: boolean) => {
+      if (result) {
+        this.loadTable();
+      }
+    });
   }
 
   optionsToString(options?: Array<Option>): string {
