@@ -240,6 +240,7 @@ tecAdminControllers.directive('executionProgress', [
   '$window',
   'reportTableFactory',
   'ViewRegistry',
+  'executionsPanelsService',
   function (
     $http,
     $timeout,
@@ -250,7 +251,8 @@ tecAdminControllers.directive('executionProgress', [
     viewFactory,
     $window,
     reportTableFactory,
-    ViewRegistry
+    ViewRegistry,
+    executionsPanelsService,
   ) {
     return {
       restrict: 'E',
@@ -263,6 +265,7 @@ tecAdminControllers.directive('executionProgress', [
       controller: function ($scope, $location, $anchorScroll, $compile, $element) {
         var eId = $scope.eid;
         $stateStorage.push($scope, eId, {});
+        executionsPanelsService.initialize();
 
         $scope.tabs = ViewRegistry.getDashlets('executionTab');
         $scope.tabs = _.filter($scope.tabs, function (dash) {
@@ -295,6 +298,7 @@ tecAdminControllers.directive('executionProgress', [
           return ($scope.$stateExec = tabid);
         };
 
+/*
         var panels = {
           testCases: { label: 'Test cases', show: false, enabled: false },
           steps: { label: 'Keyword calls', show: true, enabled: true },
@@ -311,37 +315,38 @@ tecAdminControllers.directive('executionProgress', [
         _.each($scope.customPanels, function (panel) {
           panels[panel.id] = { label: panel.label, show: true, enabled: true };
         });
+*/
+
+        $scope.panels = executionsPanelsService.panels;
+        $scope.customPanels = executionsPanelsService.customPanels;
 
         $scope.scrollTo = function (viewId) {
-          panels[viewId].show = true;
+          executionsPanelsService.setShowPanel(viewId, true);
           $location.hash($scope.getPanelId(viewId));
           $anchorScroll();
         };
 
         $scope.isShowPanel = function (viewId) {
-          return panels[viewId].show;
+          return executionsPanelsService.isShowPanel(viewId);
         };
         $scope.setShowPanel = function (viewId, show) {
-          panels[viewId].show = show;
+          executionsPanelsService.setShowPanel(viewId, show);
         };
         $scope.isPanelEnabled = function (viewId) {
-          return panels[viewId].enabled;
+          return executionsPanelsService.isPanelEnabled(viewId);
         };
         $scope.toggleShowPanel = function (viewId) {
-          panels[viewId].show = !panels[viewId].show;
+          executionsPanelsService.toggleShowPanel(viewId);
         };
         $scope.enablePanel = function (viewId, enabled) {
-          panels[viewId].enabled = enabled;
+          executionsPanelsService.enablePanel(viewId, enabled);
         };
         $scope.getPanelId = function (viewId) {
           return eId + viewId;
         };
         $scope.getPanelTitle = function (viewId) {
-          return panels[viewId].label;
+          return executionsPanelsService.getPanelTitle(viewId);
         };
-        $scope.panels = _.map(_.keys(panels), function (viewId) {
-          return { id: viewId, label: panels[viewId].label };
-        });
 
         $scope.testCaseTable = {};
         $scope.drillDownTestcase = function (id) {

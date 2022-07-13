@@ -1,0 +1,50 @@
+<mat-accordion multi>
+  <ng-container *ngIf="panelTestCases?.enabled">
+    <mat-expansion-panel
+      [attr.id]="eId | panelId: ID_TEST_CASES"
+      [(expanded)]="panelTestCases!.show"
+      togglePosition="before"
+    >
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          {{ panelTestCases!.label }}
+        </mat-panel-title>
+        <step-status-distribution
+          *ngIf="execution!.status != 'ENDED' && testCasesProgress!.countForecast > 0"
+          class="progress-distribution"
+          [summary]="testCasesProgress"
+          [isProgress]="true"
+        >
+        </step-status-distribution>
+        <step-status-distribution [summary]="testCasesProgress"> </step-status-distribution>
+      </mat-expansion-panel-header>
+      <div>Test Cases Panel content</div>
+    </mat-expansion-panel>
+  </ng-container>
+
+  <ng-container *ngIf="panelSteps?.enabled">
+    <mat-expansion-panel [attr.id]="eId | panelId: ID_STEPS" [(expanded)]="panelSteps!.show" togglePosition="before">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          {{ panelSteps!.label }}
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div>Steps Panel content</div>
+    </mat-expansion-panel>
+  </ng-container>
+
+  <ng-container *ngIf="panelParameters?.enabled">
+    <mat-expansion-panel
+      [attr.id]="eId | panelId: ID_PARAMETERS"
+      [(expanded)]="panelParameters!.show"
+      togglePosition="before"
+    >
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          {{ panelParameters!.label }}
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div>Parameters content</div>
+    </mat-expansion-panel>
+  </ng-container>
+</mat-accordion>
