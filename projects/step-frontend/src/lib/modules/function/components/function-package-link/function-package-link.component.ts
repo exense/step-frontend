@@ -1,8 +1,7 @@
 import { Component, Inject, Input, SimpleChanges } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { a1Promise2Observable, AJS_MODULE, AJS_ROOT_SCOPE, DialogsService } from '@exense/step-core';
-import { HttpClient } from '@angular/common/http';
-import { FunctionPackageDialogsService } from '../../servies/function-package-dialogs.service';
+import { AJS_MODULE, AJS_ROOT_SCOPE, DialogsService, FunctionPackage, KeywordPackagesService } from '@exense/step-core';
+import { FunctionPackageActionsService } from '../../servies/function-package-actions.service';
 import { IRootScopeService } from 'angular';
 
 @Component({
@@ -12,12 +11,12 @@ import { IRootScopeService } from 'angular';
 })
 export class FunctionPackageLinkComponent {
   @Input() id?: string;
-  functionPackage?: any = false;
+  functionPackage?: FunctionPackage;
   isRefreshing: boolean = false;
 
   constructor(
-    private _httpClient: HttpClient,
-    private _functionPackageDialogsService: FunctionPackageDialogsService,
+    private _api: KeywordPackagesService,
+    private _functionPackageActionsService: FunctionPackageActionsService,
     private _dialogs: DialogsService,
     @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService
   ) {}
@@ -34,21 +33,20 @@ export class FunctionPackageLinkComponent {
 
   delete() {
     this.isRefreshing = true;
-    a1Promise2Observable(
-      this._dialogs.showDeleteWarning(1, 'Keyword Package "' + this.functionPackage.attributes.name + '"')
-    )
-      .subscribe(() =>
-        this._httpClient.delete<any>(`rest/functionpackages/${this.id!}`).subscribe(() => {
+    this._functionPackageActionsService
+      .deleteFunctionPackage(this.id!, this.functionPackage!.attributes!['name'])
+      .subscribe((result) => {
+        if (result) {
           this.reload();
-        })
-      )
+        }
+      })
       .add(() => (this.isRefreshing = false));
   }
 
   refresh() {
     this.isRefreshing = true;
-    this._httpClient
-      .get<any>(`rest/functionpackages/${this.id!}/reload`)
+    this._api
+      .reload(this.id!)
       .subscribe(() => {
         this.reload();
       })
@@ -57,7 +55,7 @@ export class FunctionPackageLinkComponent {
 
   edit() {
     this.isRefreshing = true;
-    this._functionPackageDialogsService
+    this._functionPackageActionsService
       .editFunctionPackage(this.id!)
       .subscribe()
       .add(() => (this.isRefreshing = false));
@@ -69,7 +67,7 @@ export class FunctionPackageLinkComponent {
   }
 
   loadFunctionPackage() {
-    this._httpClient.get<any>(`rest/functionpackages/${this.id!}`).subscribe((response) => {
+    this._api.get7(this.id!).subscribe((response) => {
       this.functionPackage = response;
     });
   }

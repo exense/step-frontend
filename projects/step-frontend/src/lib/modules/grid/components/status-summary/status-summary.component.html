@@ -1,0 +1,37 @@
+<div
+  class="progress"
+  matTooltip="Used: {{ tokenGroup.countByState!['IN_USE'] }}, In error: {{
+    tokenGroup.countByState!['ERROR']
+  }}, Total: {{ tokenGroup.capacity }} "
+>
+  <div
+    class="progress-bar token-status-IN_USE"
+    [style.width.%]="tokenGroup | calcStatusSummaryProgressbarWithPercentPipe: 'IN_USE'"
+  >
+    {{ tokenGroup.countByState!['IN_USE'] }}
+  </div>
+  <div
+    class="progress-bar token-status-MAINTENANCE_REQUESTED"
+    [style.width.%]="tokenGroup | calcStatusSummaryProgressbarWithPercentPipe: 'MAINTENANCE_REQUESTED'"
+  >
+    {{ tokenGroup.countByState!['MAINTENANCE_REQUESTED'] }}
+  </div>
+  <div
+    class="progress-bar token-status-MAINTENANCE"
+    [style.width.%]="tokenGroup | calcStatusSummaryProgressbarWithPercentPipe: 'MAINTENANCE'"
+  >
+    {{ tokenGroup.countByState!['MAINTENANCE'] }}
+  </div>
+  <div
+    class="progress-bar token-status-ERROR"
+    [style.width.%]="tokenGroup | calcStatusSummaryProgressbarWithPercentPipe: 'ERROR'"
+  >
+    {{ tokenGroup.countByState!['ERROR'] }}
+  </div>
+  <div
+    class="progress-bar token-status-FREE"
+    [style.width.%]="tokenGroup | calcStatusSummaryProgressbarWithPercentPipe: 'FREE'"
+  >
+    {{ tokenGroup.countByState!['FREE'] }}
+  </div>
+</div>
