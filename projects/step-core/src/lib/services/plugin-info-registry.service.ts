@@ -13,8 +13,4 @@ export class PluginInfoRegistryService {
   isRegistered(plugin: string): boolean {
     return this._registeredPlugins.has(plugin);
   }
-
-  showAllPlugins(): void {
-    console.log(this._registeredPlugins);
-  }
 }
