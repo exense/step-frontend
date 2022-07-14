@@ -241,6 +241,7 @@ tecAdminControllers.directive('executionProgress', [
   'reportTableFactory',
   'ViewRegistry',
   'executionsPanelsService',
+  'selectionCollectorFactoryService',
   function (
     $http,
     $timeout,
@@ -253,6 +254,7 @@ tecAdminControllers.directive('executionProgress', [
     reportTableFactory,
     ViewRegistry,
     executionsPanelsService,
+    selectionCollectorFactoryService
   ) {
     return {
       restrict: 'E',
@@ -266,6 +268,18 @@ tecAdminControllers.directive('executionProgress', [
         var eId = $scope.eid;
         $stateStorage.push($scope, eId, {});
         executionsPanelsService.initialize();
+
+        const testCasesSelection = selectionCollectorFactoryService.create('artefactID');
+        $scope.$on('$destroy', () => testCasesSelection.destroy());
+        $scope.testCasesSelection = testCasesSelection;
+        $scope.determineDefaultSelection = () => {
+          if (!$scope.testCases || !$scope.execution) {
+            return;
+          }
+
+          const selectedTestCases = $scope.testCases.filter(value => $scope.testCaseTableDefaultSelection(value));
+          testCasesSelection.select(...selectedTestCases);
+        }
 
         $scope.tabs = ViewRegistry.getDashlets('executionTab');
         $scope.tabs = _.filter($scope.tabs, function (dash) {
@@ -352,6 +366,10 @@ tecAdminControllers.directive('executionProgress', [
         $scope.drillDownTestcase = function (id) {
           $scope.testCaseTable.deselectAll(false);
           $scope.testCaseTable.select(id);
+
+          testCasesSelection.clear();
+          testCasesSelection.selectById(id);
+
           $scope.enablePanel('steps', true);
           $scope.scrollTo('steps');
         };
@@ -395,6 +413,10 @@ tecAdminControllers.directive('executionProgress', [
                 if (node.resolvedArtefact && node.resolvedArtefact._class == 'TestCase') {
                   $scope.testCaseTable.deselectAll(false);
                   $scope.testCaseTable.select(node.resolvedArtefact.id);
+
+                  testCasesSelection.clear();
+                  testCasesSelection.selectById(node.resolvedArtefact.id);
+
                   $scope.enablePanel('testCases', true);
                 }
               });
@@ -478,6 +500,7 @@ tecAdminControllers.directive('executionProgress', [
                 $scope.enablePanel('testCases', true);
               }
               $scope.testCases = data;
+              $scope.determineDefaultSelection();
             });
         };
 
@@ -491,6 +514,7 @@ tecAdminControllers.directive('executionProgress', [
               }
             }
             $scope.execution = data;
+            $scope.determineDefaultSelection();
             var showTestCaseCurrentOperation = $scope.execution.parameters.find(
               (o) => o.key === 'step.executionView.testcases.current-operations'
             );

@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { SelectionCollector } from '../../services/selection-collector/selection-collector';
-import { map, Observable, of } from 'rxjs';
+import { map, Observable, of, tap } from 'rxjs';
 import { Mutable } from '../../../../shared';
 
 type FieldAccessor = Mutable<Pick<EntitySelectionComponent<any, any>, 'isSelected$'>>;
@@ -8,7 +8,7 @@ type FieldAccessor = Mutable<Pick<EntitySelectionComponent<any, any>, 'isSelecte
 @Component({
   selector: 'step-entity-selection',
   templateUrl: './entity-selection.component.html',
-  styleUrls: ['./entity-selection.component.css'],
+  styleUrls: ['./entity-selection.component.scss'],
 })
 export class EntitySelectionComponent<KEY, ENTITY> implements OnChanges {
   @Input() selectionCollector?: SelectionCollector<KEY, ENTITY>;
@@ -49,7 +49,8 @@ export class EntitySelectionComponent<KEY, ENTITY> implements OnChanges {
     }
 
     (this as FieldAccessor).isSelected$ = selectionCollector!.selected$.pipe(
-      map(() => selectionCollector!.isSelected(entity!))
+      map(() => selectionCollector!.isSelected(entity!)),
+      tap((x) => console.log('SELECTION FLAG VALUE', x, entity))
     );
   }
 }

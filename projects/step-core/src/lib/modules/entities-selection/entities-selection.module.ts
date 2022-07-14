@@ -12,3 +12,4 @@ export class EntitiesSelectionModule {}
 
 export * from './services/selection-collector/selection-collector';
 export * from './services/selection-collector/selection-collector-factory.service';
+export * from './components/entity-selection/entity-selection.component';

@@ -1,8 +1,12 @@
 <div class="panel-body">
 
-  <step-execution-step [e-id]="eid"
-                       [test-cases-progress]="testcasesProgress"
-                       [execution]="execution">
+  <step-execution-step
+    [e-id]="eid"
+    [test-cases-progress]="testcasesProgress"
+    [execution]="execution"
+    [test-cases]="testCases"
+    [test-cases-selection]="testCasesSelection"
+    (drilldown-test-case)="drillDownTestcase($event)">
   </step-execution-step>
 
   <div ng-attr-id="{{getPanelId('testCases')}}"
