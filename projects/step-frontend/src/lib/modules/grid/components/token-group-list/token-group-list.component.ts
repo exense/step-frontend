@@ -2,7 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, Mutable, GridService, TokenGroupCapacity, TableLocalDataSource } from '@exense/step-core';
 import { Observable, BehaviorSubject, switchMap, shareReplay, tap } from 'rxjs';
-import { FlatObjectFormatService } from '../../services/flat-object-format.service';
+import { FlatObjectStringFormatPipe } from '../../services/flat-object-format.pipe';
 
 type InProgress = Mutable<Pick<TokenGroupListComponent, 'inProgress'>>;
 
@@ -25,7 +25,7 @@ export class TokenGroupListComponent implements OnDestroy {
   readonly searchableTokenGroupRequest$ = new TableLocalDataSource(this.tokenGroupRequest$, {
     searchPredicates: {
       key: (element, searchValue) =>
-        this._flatObjectFormatService.format(element.key!).toLowerCase().includes(searchValue.toLowerCase()),
+        FlatObjectStringFormatPipe.format(element.key!).toLowerCase().includes(searchValue.toLowerCase()),
     },
   });
 
@@ -39,7 +39,7 @@ export class TokenGroupListComponent implements OnDestroy {
   };
   readonly checkedMapKeys = Object.keys(this.checkedMap);
 
-  constructor(private _gridService: GridService, public _flatObjectFormatService: FlatObjectFormatService) {}
+  constructor(private _gridService: GridService) {}
 
   public toggleCheckBox(key: string): void {
     this.checkedMap[key] = !this.checkedMap[key];

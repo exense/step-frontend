@@ -23,13 +23,7 @@ import { TokenGroupListComponent } from './components/token-group-list/token-gro
     AddPrefixPipe,
     TokenGroupListComponent,
   ],
-  exports: [
-    AgentListComponent,
-    TokenListComponent,
-    StatusSummaryComponent,
-    TokenGroupListComponent,
-    TokenStateProgressbarComponent,
-  ],
+  exports: [AgentListComponent, TokenListComponent, TokenGroupListComponent, TokenStateProgressbarComponent],
   imports: [StepCoreModule, StepCommonModule],
 })
 export class GridModule {}

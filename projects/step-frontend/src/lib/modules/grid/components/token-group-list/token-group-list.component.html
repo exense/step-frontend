@@ -13,13 +13,13 @@
   <ng-container matColumnDef="key" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef>Key</th>
     <td mat-cell *matCellDef="let element">
-      {{ _flatObjectFormatService.format(element.key) }}
+      {{ element.key | flatObjectStringFormat }}
     </td>
   </ng-container>
   <ng-container matColumnDef="capacity">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Token states</th>
     <td mat-cell *matCellDef="let element">
-      <step-status-summary [tokenGroup]="element"></step-status-summary>
+      <step-token-state-progressbar [tokenGroup]="element"></step-token-state-progressbar>
     </td>
   </ng-container>
 </step-table>
