@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { Execution, ExecutionsService } from '@exense/step-core';
 
 @Component({
@@ -6,14 +6,13 @@ import { Execution, ExecutionsService } from '@exense/step-core';
   templateUrl: './execution-link.component.html',
   styleUrls: ['./execution-link.component.scss'],
 })
-export class ExecutionLinkComponent implements OnInit {
+export class ExecutionLinkComponent implements OnChanges {
   @Input() executionId?: string;
-
   @Input() executionDescription?: string;
 
   constructor(private _executionService: ExecutionsService) {}
 
-  ngOnInit(): void {
+  ngOnChanges(): void {
     if (this.executionId && !this.executionDescription) {
       this._executionService.get3(this.executionId!).subscribe((ex: Execution) => {
         this.executionDescription = ex?.description;
