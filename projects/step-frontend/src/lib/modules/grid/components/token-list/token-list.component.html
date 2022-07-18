@@ -13,8 +13,7 @@
   <ng-container matColumnDef="type" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
     <td mat-cell *matCellDef="let element">
-      <span class="token-type" [class]="'token-type-'.concat(element.token!.attributes!.$agenttype)"></span>
-      {{ TYPE_LABEL_TRANSLATIONS[element.token!.attributes!.$agenttype] }}
+      <step-token-type [type]="element.token!.attributes!.$agenttype"></step-token-type>
     </td>
   </ng-container>
   <ng-container matColumnDef="agent" stepSearchCol>
@@ -26,7 +25,7 @@
   <ng-container matColumnDef="attributes" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef>Attributes</th>
     <td mat-cell *matCellDef="let element">
-      {{ _flatObjectFormatService.format(element.token!.attributes!) }}
+      {{ element.token!.attributes! | flatObjectStringFormat }}
     </td>
   </ng-container>
   <ng-container matColumnDef="state" stepSearchCol #searchState="SearchCol">
@@ -37,7 +36,7 @@
     ></step-array-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>State</th>
     <td mat-cell *matCellDef="let element">
-      <div [class]="['text-center', 'token-status', 'token-status-' + element.state]">{{ element.state! }}</div>
+      <step-token-state [state]="element.state!"></step-token-state>
     </td>
   </ng-container>
   <ng-container matColumnDef="executionDescription" stepSearchCol>
@@ -47,7 +46,7 @@
         *ngIf="element.currentOwner?.executionId"
         [executionId]="element.currentOwner!.executionId"
       ></step-execution-link>
-      <span *ngIf="element.currentOwner?._class == 'step.functions.services.FunctionServiceTokenWrapperOwner'"
+      <span *ngIf="element.currentOwner?._class === 'step.functions.services.FunctionServiceTokenWrapperOwner'"
         >Remote client ({{ element.currentOwner.username }}, {{ element.currentOwner.ipAddress }})</span
       >
     </td>
@@ -55,7 +54,7 @@
   <ng-container matColumnDef="errorMessage" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Error</th>
     <td mat-cell *matCellDef="let element">
-      <div *ngIf="element.state == 'ERROR'">
+      <div *ngIf="element.state === 'ERROR'">
         <div>{{ element.errorMessage }}</div>
         <div *ngIf="element.tokenHealth?.tokenWrapperOwner">
           Caused by:
@@ -73,7 +72,7 @@
     <td mat-cell *matCellDef="let element" class="cell-actions">
       <step-btn-group>
         <button
-          *ngIf="element.state! != 'MAINTENANCE'"
+          *ngIf="element.state! !== 'MAINTENANCE'"
           mat-icon-button
           [disabled]="!('user-write' | hasRight | async)"
           (click)="pause(element.token!.id!)"
@@ -81,7 +80,7 @@
           <mat-icon>pause</mat-icon>
         </button>
         <button
-          *ngIf="element.state! == 'MAINTENANCE'"
+          *ngIf="element.state! === 'MAINTENANCE'"
           mat-icon-button
           [disabled]="!('user-write' | hasRight | async)"
           (click)="play(element.token!.id!)"
@@ -89,7 +88,7 @@
           <mat-icon>play_arrow</mat-icon>
         </button>
         <button
-          *ngIf="element.state! == 'ERROR'"
+          *ngIf="element.state! === 'ERROR'"
           uib-tooltip="Remove token error and set state to 'FREE'"
           mat-icon-button
           [disabled]="!('user-write' | hasRight | async)"

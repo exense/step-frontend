@@ -2,12 +2,12 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { TokenGroupCapacity } from '@exense/step-core';
 
 @Component({
-  selector: 'step-status-summary',
-  templateUrl: './status-summary.component.html',
-  styleUrls: ['./status-summary.component.scss'],
+  selector: 'step-token-state-progressbar',
+  templateUrl: './token-state-progressbar.component.html',
+  styleUrls: ['./token-state-progressbar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StatusSummaryComponent {
+export class TokenStateProgressbarComponent {
   @Input() tokenGroup!: TokenGroupCapacity;
 
   constructor() {}

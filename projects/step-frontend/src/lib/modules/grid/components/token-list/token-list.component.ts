@@ -1,26 +1,9 @@
 import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import {
-  AJS_MODULE,
-  ContextService,
-  Mutable,
-  TableLocalDataSource,
-  GridService,
-  TokenWrapper,
-} from '@exense/step-core';
-import {
-  Observable,
-  BehaviorSubject,
-  switchMap,
-  of,
-  catchError,
-  noop,
-  shareReplay,
-  tap,
-  map,
-  lastValueFrom,
-} from 'rxjs';
-import { FlatObjectFormatService } from '../../services/flat-object-format.service';
+import { AJS_MODULE, Mutable, TableLocalDataSource, GridService, TokenWrapper } from '@exense/step-core';
+import { Observable, BehaviorSubject, switchMap, shareReplay, tap } from 'rxjs';
+import { FlatObjectStringFormatPipe } from '../../services/flat-object-format.pipe';
+import { TokenTypeComponent } from '../token-type/token-type.component';
 
 type InProgress = Mutable<Pick<TokenListComponent, 'inProgress'>>;
 
@@ -30,15 +13,7 @@ type InProgress = Mutable<Pick<TokenListComponent, 'inProgress'>>;
   styleUrls: ['./token-list.component.scss'],
 })
 export class TokenListComponent implements OnDestroy {
-  readonly TYPE_LABEL_TRANSLATIONS: { [key: string]: string } = {
-    default: 'Java',
-    node: 'Node.js',
-    dotnet: '.NET',
-  };
-
   readonly inProgress: boolean = false;
-
-  readonly json = JSON;
 
   private tokenRequestSubject$ = new BehaviorSubject<any>({});
   readonly tokenRequest$: Observable<TokenWrapper[]> = this.tokenRequestSubject$.pipe(
@@ -52,12 +27,12 @@ export class TokenListComponent implements OnDestroy {
     searchPredicates: {
       id: (element, searchValue) => element.token!.id!.toLowerCase().includes(searchValue.toLowerCase()),
       type: (element, searchValue) =>
-        this.TYPE_LABEL_TRANSLATIONS[element.token!.attributes!['$agenttype']]!.toLowerCase().includes(
+        TokenTypeComponent.TYPE_LABEL_TRANSLATIONS[element.token!.attributes!['$agenttype']]!.toLowerCase().includes(
           searchValue.toLowerCase()
         ),
       agent: (element, searchValue) => element.agent!.agentUrl!.toLowerCase().includes(searchValue.toLowerCase()),
       attributes: (element, searchValue) =>
-        this._flatObjectFormatService.format(element.token!.attributes!).includes(searchValue.toLowerCase()),
+        FlatObjectStringFormatPipe.format(element.token!.attributes!).includes(searchValue.toLowerCase()),
       state: (element, searchValue) => searchValue.toUpperCase().includes(element.state!.toUpperCase()),
       // prettier-ignore
       //@ts-ignore
@@ -66,8 +41,8 @@ export class TokenListComponent implements OnDestroy {
     sortPredicates: {
       id: (elementA, elementB) => elementA.token!.id!.localeCompare(elementB.token!.id!),
       type: (elementA, elementB) =>
-        this.TYPE_LABEL_TRANSLATIONS[elementA.token!.attributes!['$agenttype']]!.localeCompare(
-          this.TYPE_LABEL_TRANSLATIONS[elementB.token!.attributes!['$agenttype']]!
+        TokenTypeComponent.TYPE_LABEL_TRANSLATIONS[elementA.token!.attributes!['$agenttype']]!.localeCompare(
+          TokenTypeComponent.TYPE_LABEL_TRANSLATIONS[elementB.token!.attributes!['$agenttype']]!
         ),
       agent: (elementA, elementB) => elementA.agent!.agentUrl!.localeCompare(elementB.agent!.agentUrl!),
       // prettier-ignore
@@ -76,7 +51,7 @@ export class TokenListComponent implements OnDestroy {
     },
   });
 
-  constructor(private _gridService: GridService, public _flatObjectFormatService: FlatObjectFormatService) {}
+  constructor(private _gridService: GridService) {}
 
   public loadTable(): void {
     this.tokenRequestSubject$.next({});
