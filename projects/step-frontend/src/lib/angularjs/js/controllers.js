@@ -391,9 +391,17 @@ tecAdminControllers.directive('executionProgress', [
           }
         };
 
+/*
         $scope.testCaseTableOnSelectionChange = function () {
           $scope.refresh();
         };
+*/
+
+        testCasesSelection.selected$.subscribe(() => {
+          if ($scope.refresh) {
+            $scope.refresh();
+          }
+        });
 
         $scope.operationOptions = { showAll: false };
 
@@ -432,6 +440,11 @@ tecAdminControllers.directive('executionProgress', [
         $scope.stepsTable = reportTableFactory.get(
           function () {
             var filter = { eid: eId };
+            // if not all items are selected
+            if (testCasesSelection.length !== $scope.testCases.length) {
+              filter.testcases = [...testCasesSelection.selected];
+            }
+/*
             if ($scope.testCaseTable.getSelection) {
               var testCaseSelection = $scope.testCaseTable.getSelection();
               // if not all items are selected
@@ -443,7 +456,7 @@ tecAdminControllers.directive('executionProgress', [
                 filter.testcases = testcases;
               }
             }
-
+*/
             return filter;
           },
           $scope,

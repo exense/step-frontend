@@ -9,6 +9,8 @@ import { ExecutionStepComponent } from './components/execution-step/execution-st
 import './components/execution-step/execution-step.component';
 
 import { PanelIdPipe } from './pipes/panel-id.pipe';
+import { KeywordWrapperDirective } from './directives/keyword-wrapper.directive';
+import { OperationsModule } from '../operations/operations.module';
 
 @NgModule({
   declarations: [
@@ -18,8 +20,9 @@ import { PanelIdPipe } from './pipes/panel-id.pipe';
     ExecutionResultComponent,
     ExecutionStepComponent,
     PanelIdPipe,
+    KeywordWrapperDirective,
   ],
-  imports: [StepCommonModule],
+  imports: [StepCommonModule, OperationsModule],
   exports: [ExecutionListComponent, ExecutionStepComponent],
 })
 export class ExecutionModule {}

@@ -4,11 +4,16 @@
     [e-id]="eid"
     [test-cases-progress]="testcasesProgress"
     [execution]="execution"
+    [steps-table]="stepsTable"
     [test-cases]="testCases"
     [test-cases-selection]="testCasesSelection"
+    [steps-table-server-side-parameters]="stepsTableServerSideParameters"
+    [execution-view-services]="executionViewServices"
+    [show-test-case-current-operation]="showTestCaseCurrentOperation"
     (drilldown-test-case)="drillDownTestcase($event)">
   </step-execution-step>
 
+<!--
   <div ng-attr-id="{{getPanelId('testCases')}}"
        class="panel panel-default" ng-if="isPanelEnabled('testCases')">
     <div class="panel-heading">
@@ -136,4 +141,5 @@
       </st-table>
     </div>
   </div>
+-->
 </div>
