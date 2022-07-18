@@ -12,6 +12,7 @@ import { ContextMenuModule } from './modules/context-menu/context-menu.module';
 import { ParameterModule } from './modules/parameter/parameter.module';
 import { FunctionModule } from './modules/function/function.module';
 import { TimeSeriesModule } from './modules/timeseries/time-series.module';
+import { GridModule } from './modules/grid/grid.module';
 import { GenericFunctionModule } from './modules/mask/generic-function.module';
 
 @NgModule({
@@ -28,6 +29,7 @@ import { GenericFunctionModule } from './modules/mask/generic-function.module';
     SchedulerModule,
     ContextMenuModule,
     ParameterModule,
+    GridModule,
     TimeSeriesModule,
     GenericFunctionModule,
   ],

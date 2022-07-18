@@ -1,0 +1,14 @@
+@import '../../../_common/styles/mixins';
+
+:host {
+  @include table-container;
+}
+
+.header {
+  @include table-header;
+  padding: 0.8rem;
+}
+
+.cell-actions {
+  width: 20rem;
+}
