@@ -1,0 +1,61 @@
+<section class="header">
+  <step-btn-group>
+    <button type="button" mat-flat-button color="primary" (click)="add()" [disabled]="!('kw-write' | hasRight | async)">
+      New Keyword Package
+    </button>
+  </step-btn-group>
+</section>
+<step-table [dataSource]="dataSource" matSort [matSortDisableClear]="true">
+  <ng-container matColumnDef="name" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Package name</th>
+    <td mat-cell *matCellDef="let element">
+      <a href="#" (click)="edit(element.id); (false)">{{ element.attributes.name }}</a>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="packageLocation">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Package file</th>
+    <td mat-cell *matCellDef="let element">
+      <step-resource-label [stModel]="element.packageLocation"> </step-resource-label>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="version" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef>Version</th>
+    <td mat-cell *matCellDef="let element">
+      <step-resource-label [stModel]="element.packageAttributes.version"> </step-resource-label>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let element" class="cell-actions">
+      <step-btn-group>
+        <button
+          type="button"
+          mat-icon-button
+          matTooltip="Refresh package"
+          [disabled]="isRefreshing"
+          (click)="refresh(element.id)"
+        >
+          <mat-icon>autorenew</mat-icon>
+        </button>
+        <button
+          type="button"
+          mat-icon-button
+          matTooltip="Edit package"
+          [disabled]="isRefreshing"
+          (click)="edit(element.id)"
+        >
+          <mat-icon>build</mat-icon>
+        </button>
+        <button
+          type="button"
+          mat-icon-button
+          matTooltip="Delete package"
+          [disabled]="isRefreshing"
+          (click)="delete(element.id, element.attributes.name)"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </step-btn-group>
+    </td>
+  </ng-container>
+</step-table>

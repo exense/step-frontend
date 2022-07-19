@@ -577,38 +577,10 @@ angular
     };
   })
 
-  .controller('LoginController', function ($scope, $rootScope, AuthService) {
-    $scope.credentials = {
-      username: '',
-      password: '',
-    };
-    if (AuthService.getConf().demo) {
-      $scope.credentials.password = 'init';
-      $scope.credentials.username = 'admin';
-    }
-    $scope.login = function (credentials) {
-      AuthService.login(credentials).then(
-        function (user) {},
-        function (e) {
-          $scope.error = e.error;
-        }
-      );
-    };
-    $scope.logo = 'images/logologin.png';
-
-    document.querySelectorAll('input[type=password]')[0].addEventListener('keyup', function (e) {
-      if (e.getModifierState && e.getModifierState('CapsLock')) {
-        $scope.capsWarning = true;
-      } else {
-        $scope.capsWarning = false;
-      }
-    });
-  })
-
   .factory('ImportDialogs', function ($rootScope, $uibModal, EntityRegistry, $sce) {
     var dialogs = {};
 
-    dialogs.displayImportDialog = function (title, path, importAll, overwrite) {
+    dialogs.displayImportDialog = function (title, path) {
       var modalInstance = $uibModal.open({
         backdrop: 'static',
         templateUrl: 'partials/importDialog.html',
@@ -621,10 +593,10 @@ angular
             return path;
           },
           importAll: function () {
-            return importAll;
+            return false;
           },
           overwrite: function () {
-            return overwrite;
+            return false;
           },
         },
       });
@@ -669,7 +641,7 @@ angular
   .factory('ExportDialogs', function ($rootScope, $uibModal, EntityRegistry, $sce) {
     var dialogs = {};
 
-    dialogs.displayExportDialog = function (title, path, filename, recursively, parameters) {
+    dialogs.displayExportDialog = function (title, path, filename) {
       var modalInstance = $uibModal.open({
         backdrop: 'static',
         templateUrl: 'partials/exportDialog.html',
@@ -685,10 +657,10 @@ angular
             return filename;
           },
           recursively: function () {
-            return recursively;
+            return true;
           },
           parameters: function () {
-            return parameters;
+            return false;
           },
         },
       });
@@ -720,17 +692,13 @@ angular
       $scope.parameters = parameters;
 
       $scope.save = function () {
+        $scope.exporting = true;
         if ($scope.filename) {
           urlParams = '?recursively=' + $scope.recursively + '&filename=' + $scope.filename;
           if ($scope.parameters) {
             urlParams += '&additionalEntities=parameters';
           }
-          ExportService.get('rest/export/' + $scope.path + urlParams);
-          $uibModalInstance.close();
-
-          /*    $http({url:"rest/import/" + path,method:"POST",params:{path:$scope.resourcePath,importAll:$scope.importAll,overwrite:$scope.overwrite}}).then(function(response) {
-        $uibModalInstance.close(response.data);
-      })*/
+          ExportService.get("rest/export/" + $scope.path + urlParams, () => $uibModalInstance.close());
         } else {
           Dialogs.showErrorMsg('Upload not completed.');
         }
@@ -1279,56 +1247,6 @@ angular
       return $q.reject(response);
     };
   })
-
-  .service('DashboardService', function ($http, $rootScope, AuthService, ViewRegistry) {
-    this.checkAvailability = (override = false) => {
-      try {
-        if (AuthService.getConf()) {
-          if (AuthService.getConf().displayNewPerfDashboard && ViewRegistry.getCustomView('grafana')) {
-            this.isGrafanaAvailable = false;
-            $http.get('rest/g-dashboards/isGrafanaAvailable').then((response) => {
-              this.isGrafanaAvailable = !!response.data.available;
-              if (this.isGrafanaAvailable) {
-                $rootScope.$broadcast('step.grafana.available');
-              }
-            });
-          } else {
-            this.isGrafanaAvailable = false;
-          }
-        }
-      } catch (e) {}
-    };
-
-    $rootScope.$on('step.login.succeeded', () => {
-      this.checkAvailability();
-    });
-
-    this.getDashboardLink = (taskId) => {
-      if (typeof this.isGrafanaAvailable === 'undefined') {
-        this.checkAvailability();
-      }
-      if (this.isGrafanaAvailable) {
-        return '/#/root/grafana?d=3JB9j357k&orgId=1&var-taskId_current=' + taskId;
-      } else {
-        return '/#/root/dashboards/__pp__RTMDashboard?__filter1__=text,taskId,' + taskId;
-      }
-    };
-
-    this.whenGrafanaAvailable = (override = false) => {
-      return new Promise((resolve, reject) => {
-        this.checkAvailability(override);
-
-        if (this.isGrafanaAvailable) {
-          resolve();
-        }
-
-        $rootScope.$on('step.grafana.available', () => {
-          resolve();
-        });
-      });
-    };
-  });
-
 //The following functions are missing in IE11
 
 if (!String.prototype.endsWith) {

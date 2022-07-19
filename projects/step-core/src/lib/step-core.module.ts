@@ -8,12 +8,15 @@ import { CORE_INITIALIZER } from './core-initialiser';
 import { StepMaterialModule } from './modules/step-material/step-material.module';
 import { HasRightPipe } from './pipes/has-right.pipe';
 import { TableModule } from './modules/table/table.module';
-import { StepClientModule } from './client/generated/StepClientModule';
+import { StepBasicsModule } from './modules/basics/step-basics.module';
 import { MAT_LUXON_DATE_ADAPTER_OPTIONS, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
+import { EntityModule } from './modules/entity/entity.module';
+import { StepGeneratedClientModule } from './client/generated';
+import { CapsLockDirective } from './directives/caps-lock.directive';
 
 @NgModule({
-  declarations: [TooltipDirective, HasRightPipe],
+  declarations: [TooltipDirective, HasRightPipe, CapsLockDirective],
   imports: [
     CommonModule,
     FormsModule,
@@ -22,7 +25,9 @@ import { MAT_DATE_FORMATS } from '@angular/material/core';
     UpgradeModule,
     StepMaterialModule,
     TableModule,
-    StepClientModule,
+    StepBasicsModule,
+    EntityModule,
+    StepGeneratedClientModule,
   ],
   exports: [
     CommonModule,
@@ -31,10 +36,13 @@ import { MAT_DATE_FORMATS } from '@angular/material/core';
     HttpClientModule,
     UpgradeModule,
     TooltipDirective,
+    CapsLockDirective,
     StepMaterialModule,
     HasRightPipe,
     TableModule,
-    StepClientModule,
+    StepBasicsModule,
+    EntityModule,
+    StepGeneratedClientModule,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -64,6 +72,7 @@ export * from './domain';
 export * from './shared';
 export * from './decorators/plugin';
 export * from './services/auth.service';
+export * from './services/dashboard.service';
 export * from './services/invoke-run.service';
 export * from './services/view-registry.service';
 export * from './services/deferred-view-registry.service';
@@ -72,14 +81,19 @@ export * from './services/link-processor.service';
 export * from './services/deferred-link-processor.service';
 export * from './services/view-state.service';
 export * from './services/context.service';
+export * from './services/plugin-info-registry.service';
 export * from './services/additional-right-rule.service';
 export { UibModalInstance, UibModalHelperService } from './services/uib-modal-helper.service';
 export * from './angularjs';
 export * from './directives/tooltip.directive';
+export * from './directives/caps-lock.directive';
 export * from './pipes/has-right.pipe';
 export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
+export * from './modules/basics/step-basics.module';
+export * from './modules/entity/entity.module';
 export * from './client/generated/index';
+export * from './client/step-client-module';
 
 export { ApiError } from './client/generated/core/ApiError';
 export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';

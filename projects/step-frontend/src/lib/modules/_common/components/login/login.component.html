@@ -1,0 +1,23 @@
+<mat-card>
+  <div style="margin: 0 auto 20px; width: 200px">
+    <img alt="" style="max-width: 200px; margin: 0 auto" src="{{ logo }}" />
+  </div>
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Username</mat-label>
+    <input matInput [(ngModel)]="credentials.username" name="username" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" (stepCapsLock)="capsLock = $event">
+    <mat-label>Password</mat-label>
+    <input matInput [(ngModel)]="credentials.password" name="password" />
+    <span *ngIf="capsLock" class="capslock-warning"> <mat-icon>warning</mat-icon> Caps lock is on </span>
+  </mat-form-field>
+
+  <div mat-dialog-actions align="end">
+    <button mat-stroked-button color="primary" aria-label="Login" (click)="login()">
+      <mat-icon>login</mat-icon> Login
+    </button>
+  </div>
+</mat-card>

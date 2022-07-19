@@ -1,13 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Input, UibModalHelperService, a1Promise2Observable } from '@exense/step-core';
-import { map, Observable } from 'rxjs';
+import { Input, UibModalHelperService, a1Promise2Observable, DialogsService, ScreensService } from '@exense/step-core';
+import { Observable, switchMap, of, catchError, map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ScreenDialogsService {
-  constructor(private _httpClient: HttpClient, private _uibModalHelper: UibModalHelperService) {}
+  constructor(
+    private _httpClient: HttpClient,
+    private _uibModalHelper: UibModalHelperService,
+    private _dialogs: DialogsService,
+    private _screensService: ScreensService
+  ) {}
 
   editScreen(
     screen?: Partial<Input>,
@@ -30,5 +35,13 @@ export class ScreenDialogsService {
 
     const result$ = a1Promise2Observable(modalInstance.result) as Observable<string>;
     return result$.pipe(map((result) => ({ result, screen })));
+  }
+
+  removeScreen(dbId: string, label: string): Observable<any> {
+    return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Screen "${label}"`)).pipe(
+      switchMap((_) => this._screensService.deleteInput(dbId)),
+      map((_) => true),
+      catchError((_) => of(false))
+    );
   }
 }

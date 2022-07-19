@@ -1,3 +1,10 @@
+@mixin table-container {
+  position: relative;
+  display: block;
+  background: white;
+  border-radius: 1.6rem;
+}
+
 @mixin table-header {
   margin-bottom: 1rem;
   display: flex;

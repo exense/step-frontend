@@ -1,0 +1,97 @@
+<section class="header">
+  <step-btn-group>
+    <button
+      type="button"
+      mat-icon-button
+      class="primary"
+      matTooltip="New Task"
+      matTooltipPosition="below"
+      [disabled]="!('user-write' | hasRight | async)"
+      (click)="createParameter()"
+    >
+      <mat-icon>add</mat-icon>
+    </button>
+  </step-btn-group>
+
+  <button
+    type="button"
+    mat-icon-button
+    matTooltip="Configure Scheduler"
+    matTooltipPosition="below"
+    [disabled]="!('plan-write' | hasRight | async)"
+    (click)="navToSettings()"
+  >
+    <mat-icon>settings</mat-icon>
+  </button>
+</section>
+<step-table [dataSource]="searchableScheduledTask$" [inProgress]="inProgress" matSort [matSortDisableClear]="true">
+  <ng-container matColumnDef="name" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+    <td mat-cell *matCellDef="let element">
+      <entity-icon entityName="tasks" [entity]="element"></entity-icon>
+      <a (click)="$event.preventDefault(); editParameter(element)">{{ element.attributes.name }}</a>
+      <mat-icon
+        *ngIf="!!element.executionsParameters?.repositoryObject?.repositoryParameters?.planid"
+        class="nav-to-plan-icon"
+        matTooltip="Go to plan"
+        (click)="navToPlan(element.executionsParameters?.repositoryObject?.repositoryParameters?.planid)"
+        >insert_drive_file</mat-icon
+      >
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="environment" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Environment</th>
+    <td mat-cell *matCellDef="let element">{{ element.executionsParameters.customParameters?.env }}</td>
+  </ng-container>
+  <ng-container matColumnDef="cronExpression" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>CronExpression</th>
+    <td mat-cell *matCellDef="let element">{{ element.cronExpression }}</td>
+  </ng-container>
+  <ng-container matColumnDef="status" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+    <td mat-cell *matCellDef="let element">
+      <span class="status" [class]="element.active ? 'status-on' : 'status-off'" (click)="switchActive(element)">
+        {{ element.active ? STATUS_ACTIVE_STRING : STATUS_INACTIVE_STRING }}
+      </span>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef>Actions</th>
+    <td mat-cell *matCellDef="let element" class="cell-actions">
+      <step-btn-group>
+        <button
+          mat-icon-button
+          matTooltip="Execute"
+          [disabled]="!('user-write' | hasRight | async)"
+          (click)="executeParameter(element)"
+        >
+          <mat-icon>play_arrow</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          matTooltip="Edit"
+          [disabled]="!('user-write' | hasRight | async)"
+          (click)="editParameter(element)"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          matTooltip="Delete"
+          [disabled]="!('user-write' | hasRight | async)"
+          (click)="deletePrameter(element)"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          matTooltip="Analyze performance in interactive session"
+          [disabled]="!('user-write' | hasRight | async)"
+          (click)="navToStats(element)"
+        >
+          <mat-icon>trending_up</mat-icon>
+        </button>
+      </step-btn-group>
+    </td>
+  </ng-container>
+</step-table>
