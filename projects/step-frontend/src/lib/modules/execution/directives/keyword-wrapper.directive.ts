@@ -12,4 +12,6 @@ export class KeywordWrapperDirective extends UpgradeComponent {
 
   @Input() stepsTable: any;
   @Input() stepsTableServerSideParameters: any;
+  @Input() executionViewServices: any;
+  @Input() reportNodeStatusOptions: any;
 }

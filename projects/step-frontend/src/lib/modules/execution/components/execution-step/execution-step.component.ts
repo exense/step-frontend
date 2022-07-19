@@ -13,11 +13,13 @@ import { ExecutionViewServices } from '../../../operations/shared/execution-view
 export class ExecutionStepComponent implements OnChanges {
   @Input() eId: string = '';
   @Input() testCasesProgress?: ExecutionSummaryDto;
+  @Input() progress?: ExecutionSummaryDto;
   @Input() execution?: Execution;
   @Input() stepsTable: any;
   @Input() stepsTableServerSideParameters: any;
   @Input() executionViewServices?: ExecutionViewServices;
   @Input() showTestCaseCurrentOperation?: boolean;
+  @Input() reportNoteStatusOptions?: any;
 
   @Input() testCases?: ReportNode[];
 

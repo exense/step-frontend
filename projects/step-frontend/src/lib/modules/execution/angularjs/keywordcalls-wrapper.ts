@@ -13,6 +13,8 @@ getAngularJSGlobal()
         scope: {
           stepsTable: '=',
           stepsTableServerSideParameters: '=',
+          executionViewServices: '=',
+          reportNodeStatusOptions: '=',
         },
         template: `<ng-include src="'partials/executions/keywordCalls.html'"/>`,
       };
