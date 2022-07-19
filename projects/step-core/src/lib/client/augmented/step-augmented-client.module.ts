@@ -10,6 +10,7 @@ import { StepGeneratedClientModule } from '../generated';
 export class StepAugmentedClientModule {}
 
 export type { ExecutionSummaryDto } from './models/execution-summary-dto';
+export type { AugmentedTokenWrapperOwner } from './models/augmented-token-wrapper-owner';
 
 export { AugmentedPlansService } from './services/augmented-plans-service';
 export { AugmentedExecutionsService } from './services/augmented-executions-service';

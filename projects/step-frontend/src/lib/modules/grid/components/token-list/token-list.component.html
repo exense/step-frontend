@@ -1,0 +1,102 @@
+<section class="header">
+  <step-btn-group>
+    <step-autorefresh-toggle [interval]="5000" (refresh)="loadTable()"> </step-autorefresh-toggle>
+  </step-btn-group>
+</section>
+<step-table [dataSource]="searchableToken$" [inProgress]="inProgress" matSort [matSortDisableClear]="true">
+  <ng-container matColumnDef="id" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Id</th>
+    <td mat-cell *matCellDef="let element">
+      {{ element.token!.id! }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="type" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+    <td mat-cell *matCellDef="let element">
+      <step-token-type [type]="element.token!.attributes!.$agenttype"></step-token-type>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="agent" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Agent</th>
+    <td mat-cell *matCellDef="let element">
+      {{ element.agent!.agentUrl! }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="attributes" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef>Attributes</th>
+    <td mat-cell *matCellDef="let element">
+      {{ element.token!.attributes! | flatObjectStringFormat }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="state" stepSearchCol #searchState="SearchCol">
+    <step-array-filter
+      *stepSearchCellDef
+      [items]="['IN_USE', 'MAINTENANCE', 'ERROR', 'FREE']"
+      (selectedItemsChange)="searchState.search($event, true)"
+    ></step-array-filter>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>State</th>
+    <td mat-cell *matCellDef="let element">
+      <step-token-state [state]="element.state!"></step-token-state>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="executionDescription" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Used By</th>
+    <td mat-cell *matCellDef="let element">
+      <step-execution-link
+        *ngIf="element.currentOwner?.executionId"
+        [executionId]="element.currentOwner!.executionId"
+      ></step-execution-link>
+      <span *ngIf="element.currentOwner?._class === 'step.functions.services.FunctionServiceTokenWrapperOwner'"
+        >Remote client ({{ element.currentOwner.username }}, {{ element.currentOwner.ipAddress }})</span
+      >
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="errorMessage" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Error</th>
+    <td mat-cell *matCellDef="let element">
+      <div *ngIf="element.state === 'ERROR'">
+        <div>{{ element.errorMessage }}</div>
+        <div *ngIf="element.tokenHealth?.tokenWrapperOwner">
+          Caused by:
+          <step-execution-link
+            [executionId]="element.tokenHealth.tokenWrapperOwner.executionId"
+            [executionDescription]="element.tokenHealth.tokenWrapperOwner.executionDescription"
+          ></step-execution-link>
+        </div>
+      </div>
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef>Actions</th>
+    <td mat-cell *matCellDef="let element" class="cell-actions">
+      <step-btn-group>
+        <button
+          *ngIf="element.state! !== 'MAINTENANCE'"
+          mat-icon-button
+          [disabled]="!('user-write' | hasRight | async)"
+          (click)="pause(element.token!.id!)"
+        >
+          <mat-icon>pause</mat-icon>
+        </button>
+        <button
+          *ngIf="element.state! === 'MAINTENANCE'"
+          mat-icon-button
+          [disabled]="!('user-write' | hasRight | async)"
+          (click)="play(element.token!.id!)"
+        >
+          <mat-icon>play_arrow</mat-icon>
+        </button>
+        <button
+          *ngIf="element.state! === 'ERROR'"
+          uib-tooltip="Remove token error and set state to 'FREE'"
+          mat-icon-button
+          [disabled]="!('user-write' | hasRight | async)"
+          (click)="removeTokenErrors(element.token!.id)"
+        >
+          <mat-icon>check</mat-icon>
+        </button>
+      </step-btn-group>
+    </td>
+  </ng-container>
+</step-table>

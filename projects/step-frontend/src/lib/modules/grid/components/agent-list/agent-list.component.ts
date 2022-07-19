@@ -2,6 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, Mutable, TableLocalDataSource, GridService, AgentListEntry } from '@exense/step-core';
 import { Observable, BehaviorSubject, switchMap, shareReplay, tap } from 'rxjs';
+import { TokenTypeComponent } from '../token-type/token-type.component';
 
 type InProgress = Mutable<Pick<AgentListComponent, 'inProgress'>>;
 
@@ -11,12 +12,6 @@ type InProgress = Mutable<Pick<AgentListComponent, 'inProgress'>>;
   styleUrls: ['./agent-list.component.scss'],
 })
 export class AgentListComponent implements OnDestroy {
-  readonly TYPE_LABEL_TRANSLATIONS: { [key: string]: string } = {
-    default: 'Java',
-    node: 'Node.js',
-    dotnet: '.NET',
-  };
-
   readonly inProgress: boolean = false;
 
   private agentRequestSubject$ = new BehaviorSubject<any>({});
@@ -31,13 +26,15 @@ export class AgentListComponent implements OnDestroy {
     searchPredicates: {
       url: (element, searchValue) => element.agentRef!['agentUrl']!.toLowerCase().includes(searchValue.toLowerCase()),
       type: (element, searchValue) =>
-        this.TYPE_LABEL_TRANSLATIONS[element.agentRef!.agentType!]!.toLowerCase().includes(searchValue.toLowerCase()),
+        TokenTypeComponent.TYPE_LABEL_TRANSLATIONS[element.agentRef!.agentType!]!.toLowerCase().includes(
+          searchValue.toLowerCase()
+        ),
     },
     sortPredicates: {
       url: (elementA, elementB) => elementA.agentRef!['agentUrl']!.localeCompare(elementB!.agentRef!['agentUrl']!),
       type: (elementA, elementB) =>
-        this.TYPE_LABEL_TRANSLATIONS[elementA.agentRef!.agentType!]!.localeCompare(
-          this.TYPE_LABEL_TRANSLATIONS[elementB.agentRef!.agentType!]!
+        TokenTypeComponent.TYPE_LABEL_TRANSLATIONS[elementA.agentRef!.agentType!]!.localeCompare(
+          TokenTypeComponent.TYPE_LABEL_TRANSLATIONS[elementB.agentRef!.agentType!]!
         ),
     },
   });
