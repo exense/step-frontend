@@ -13,9 +13,10 @@ import { MAT_LUXON_DATE_ADAPTER_OPTIONS, MAT_LUXON_DATE_FORMATS } from '@angular
 import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { EntityModule } from './modules/entity/entity.module';
 import { StepGeneratedClientModule } from './client/generated';
+import { CapsLockDirective } from './directives/caps-lock.directive';
 
 @NgModule({
-  declarations: [TooltipDirective, HasRightPipe],
+  declarations: [TooltipDirective, HasRightPipe, CapsLockDirective],
   imports: [
     CommonModule,
     FormsModule,
@@ -35,6 +36,7 @@ import { StepGeneratedClientModule } from './client/generated';
     HttpClientModule,
     UpgradeModule,
     TooltipDirective,
+    CapsLockDirective,
     StepMaterialModule,
     HasRightPipe,
     TableModule,
@@ -84,6 +86,7 @@ export * from './services/additional-right-rule.service';
 export { UibModalInstance, UibModalHelperService } from './services/uib-modal-helper.service';
 export * from './angularjs';
 export * from './directives/tooltip.directive';
+export * from './directives/caps-lock.directive';
 export * from './pipes/has-right.pipe';
 export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';

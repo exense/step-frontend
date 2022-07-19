@@ -30,6 +30,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { BtnGroupComponent } from './components/btn-group/btn-group.component';
 import { MatLuxonDateModule } from '@angular/material-luxon-adapter';
+import { MatCardModule } from '@angular/material/card';
 
 @NgModule({
   imports: [CommonModule],
@@ -65,6 +66,7 @@ import { MatLuxonDateModule } from '@angular/material-luxon-adapter';
     OverlayModule,
     PortalModule,
     BtnGroupComponent,
+    MatCardModule,
   ],
 })
 export class StepMaterialModule {}
