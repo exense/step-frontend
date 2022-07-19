@@ -2,7 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, Mutable, GridService, TokenGroupCapacity, TableLocalDataSource } from '@exense/step-core';
 import { Observable, BehaviorSubject, switchMap, shareReplay, tap } from 'rxjs';
-import { FlatObjectStringFormatPipe } from '../../services/flat-object-format.pipe';
+import { FlatObjectStringFormatPipe } from '../../pipes/flat-object-format.pipe';
 
 type InProgress = Mutable<Pick<TokenGroupListComponent, 'inProgress'>>;
 

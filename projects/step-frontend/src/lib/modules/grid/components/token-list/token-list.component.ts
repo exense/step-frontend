@@ -1,8 +1,15 @@
 import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, Mutable, TableLocalDataSource, GridService, TokenWrapper } from '@exense/step-core';
+import {
+  AJS_MODULE,
+  Mutable,
+  TableLocalDataSource,
+  GridService,
+  TokenWrapper,
+  AugmentedTokenWrapperOwner,
+} from '@exense/step-core';
 import { Observable, BehaviorSubject, switchMap, shareReplay, tap } from 'rxjs';
-import { FlatObjectStringFormatPipe } from '../../services/flat-object-format.pipe';
+import { FlatObjectStringFormatPipe } from '../../pipes/flat-object-format.pipe';
 import { TokenTypeComponent } from '../token-type/token-type.component';
 
 type InProgress = Mutable<Pick<TokenListComponent, 'inProgress'>>;
@@ -34,9 +41,8 @@ export class TokenListComponent implements OnDestroy {
       attributes: (element, searchValue) =>
         FlatObjectStringFormatPipe.format(element.token!.attributes!).includes(searchValue.toLowerCase()),
       state: (element, searchValue) => searchValue.toUpperCase().includes(element.state!.toUpperCase()),
-      // prettier-ignore
-      //@ts-ignore
-      executionDescription: (element, searchValue) => element.currentOwner?.executionDescription.includes(searchValue.toLowerCase()),
+      executionDescription: (element, searchValue) =>
+        (element.currentOwner as AugmentedTokenWrapperOwner)?.executionDescription.includes(searchValue.toLowerCase()),
     },
     sortPredicates: {
       id: (elementA, elementB) => elementA.token!.id!.localeCompare(elementB.token!.id!),
@@ -45,9 +51,10 @@ export class TokenListComponent implements OnDestroy {
           TokenTypeComponent.TYPE_LABEL_TRANSLATIONS[elementB.token!.attributes!['$agenttype']]!
         ),
       agent: (elementA, elementB) => elementA.agent!.agentUrl!.localeCompare(elementB.agent!.agentUrl!),
-      // prettier-ignore
-      //@ts-ignore
-      executionDescription: (elementA, elementB) => elementA.currentOwner?.executionDescription.localeCompare(elementB.currentOwner?.executionDescription),
+      executionDescription: (elementA, elementB) =>
+        (elementA.currentOwner as AugmentedTokenWrapperOwner)?.executionDescription.localeCompare(
+          (elementB.currentOwner as AugmentedTokenWrapperOwner)?.executionDescription
+        ),
     },
   });
 
