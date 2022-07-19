@@ -81,6 +81,7 @@ export * from './services/link-processor.service';
 export * from './services/deferred-link-processor.service';
 export * from './services/view-state.service';
 export * from './services/context.service';
+export * from './services/plugin-info-registry.service';
 export * from './services/additional-right-rule.service';
 export { UibModalInstance, UibModalHelperService } from './services/uib-modal-helper.service';
 export * from './angularjs';
