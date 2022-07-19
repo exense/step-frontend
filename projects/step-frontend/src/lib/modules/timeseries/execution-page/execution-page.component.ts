@@ -46,7 +46,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   @ViewChild('threadGroupChart') threadGroupChart!: TimeSeriesChartComponent;
   @ViewChild('tableChart') tableChart!: TimeseriesTableComponent;
 
-  @ViewChild('timeSelection') timeSelection: ExecutionPageTimeSelectionComponent;
+  @ViewChild('timeSelection') timeSelection!: ExecutionPageTimeSelectionComponent;
 
   colorsPool = new TimeseriesColorsPool();
 
@@ -602,7 +602,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
           },
         ],
       };
-      if (isUpdate && this.responseTimeByKeywordsChart) {
+      if (isUpdate && this.responseTimeByKeywordsChart && this.throughputChartSettings) {
         this.responseTimeByKeywordsChart.redrawChart(this.responseTypeByKeywordsSettings);
         this.throughputByKeywordsChart.redrawChart(this.throughputChartSettings);
       }

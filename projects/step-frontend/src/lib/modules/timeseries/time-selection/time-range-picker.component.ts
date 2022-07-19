@@ -9,7 +9,7 @@ import { RelativeTimeSelection } from './model/relative-time-selection';
   styleUrls: ['./time-range-picker.component.scss'],
 })
 export class TimeRangePicker implements OnInit {
-  @ViewChild(MatMenuTrigger) menuTrigger: MatMenuTrigger;
+  @ViewChild(MatMenuTrigger) menuTrigger!: MatMenuTrigger;
 
   @Output('selectionChange') onSelectionChange = new EventEmitter<TimeSelection>();
 
@@ -23,10 +23,10 @@ export class TimeRangePicker implements OnInit {
     { label: 'Last 3 hours', timeInMs: this._30_MINUTES * 6 },
   ];
 
-  from: Date;
-  to: Date;
+  from: Date | undefined;
+  to: Date | undefined;
 
-  activeSelection: TimeSelection;
+  activeSelection: TimeSelection | undefined;
 
   ngOnInit(): void {}
 
@@ -45,7 +45,7 @@ export class TimeRangePicker implements OnInit {
 
   selectRelativeInterval(option: RelativeTimeSelection) {
     this.resetCustomDates();
-    this.activeSelection = { isRelativeSelection: true, relativeSelection: option, absoluteSelection: null };
+    this.activeSelection = { isRelativeSelection: true, relativeSelection: option, absoluteSelection: undefined };
     this.emitSelectionChange();
   }
 

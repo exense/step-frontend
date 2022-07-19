@@ -15,7 +15,7 @@ import { TSChartSettings } from '../../chart/model/ts-chart-settings';
 export class ExecutionPageTimeSelectionComponent implements OnInit {
   @Input('execution') execution!: any;
 
-  ranger: uPlot;
+  ranger: uPlot | undefined;
   rangerSettings: TSChartSettings | undefined;
 
   constructor(private timeSeriesService: TimeSeriesService) {}
