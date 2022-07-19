@@ -1,0 +1,55 @@
+<div>
+  <button mat-raised-button [matMenuTriggerFor]="menu">
+    {{
+      activeSelection
+        ? activeSelection.isRelativeSelection
+          ? activeSelection.relativeSelection.label
+          : 'Custom Selection'
+        : 'Full time range'
+    }}
+  </button>
+  <mat-menu #menu="matMenu" class="time-selector-menu">
+    <div (click)="$event.stopPropagation()">
+      <div class="time-selector-container">
+        <div class="left-section">
+          <div class="title" style="margin-bottom: 14px">Absolute time range</div>
+          <div>
+            <mat-form-field appearance="fill">
+              <mat-label>From</mat-label>
+              <input matInput [matDatepicker]="fromPicker" disabled />
+              <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+              <mat-datepicker #fromPicker disabled="false"></mat-datepicker>
+            </mat-form-field>
+          </div>
+          <div>
+            <mat-form-field appearance="fill">
+              <mat-label>To</mat-label>
+              <input matInput [matDatepicker]="toPicker" disabled />
+              <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+              <mat-datepicker #toPicker disabled="false"></mat-datepicker>
+            </mat-form-field>
+          </div>
+          <button (click)="applyAbsoluteInterval()" mat-raised-button color="primary">Apply time range</button>
+        </div>
+        <div class="right-section" (click)="closeMenu()">
+          <div class="title">Relative time ranges</div>
+          <div
+            *ngFor="let rangeOption of relativeRangeOptions"
+            (click)="selectRelativeInterval(rangeOption)"
+            class="time-option"
+          >
+            {{ rangeOption.label }}
+          </div>
+          <div (click)="selectFullRange()" class="time-option">Full Range</div>
+        </div>
+      </div>
+      <div class="timezone-container">
+        <div>Europe/Zurich</div>
+        <div>
+          <span class="tz-label">UTC+02:00</span>
+          <button mat-raised-button>Change time zone</button>
+        </div>
+      </div>
+    </div>
+  </mat-menu>
+</div>

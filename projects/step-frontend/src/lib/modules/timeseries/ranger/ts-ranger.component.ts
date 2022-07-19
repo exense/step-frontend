@@ -64,6 +64,10 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
     }, 50);
   }
 
+  redrawChart() {
+    this.createRanger();
+  }
+
   createRanger() {
     // @ts-ignore
     let x0;
@@ -264,6 +268,9 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
         ],
       },
     };
+    if (this.uplot) {
+      this.uplot.destroy();
+    }
     this.uplot = new uPlot(
       rangerOpts,
       [this.settings.xValues, ...this.settings.series.map((s) => s.data)],

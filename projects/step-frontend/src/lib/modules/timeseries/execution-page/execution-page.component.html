@@ -1,92 +1,132 @@
-<step-execution-tabs></step-execution-tabs>
+<div class="page-container">
+  <div class="view-content">
+    <step-execution-tabs></step-execution-tabs>
+    <step-execution-time-selection
+      #timeSelection
+      *ngIf="execution"
+      [execution]="execution"
+    ></step-execution-time-selection>
+    <!--    <div>-->
+    <!--      <div class="ranger-skeleton" *ngIf=" !rangerSettings">-->
 
-<div>
-  <step-ts-ranger
-    #ranger
-    *ngIf="rangerSettings"
-    [settings]="rangerSettings"
-    [syncKey]="syncKey"
-    (onRangeChange)="onRangeChange($event)"
-  >
-  </step-ts-ranger>
-</div>
-<div class="w-100 dashboard-container">
-  <div class="chart-container">
-    <step-timeseries-chart
-      *ngIf="chart1Settings"
-      [settings]="chart1Settings"
-      [syncKey]="syncKey"
-      (onZoomReset)="onZoomReset()"
-    >
-    </step-timeseries-chart>
-  </div>
-  <div class="chart-container" *ngIf="chart2Settings">
-    <step-timeseries-chart [settings]="chart2Settings" [syncKey]="syncKey" (onZoomReset)="onZoomReset()">
-    </step-timeseries-chart>
-  </div>
+    <!--      </div>-->
+    <!--      <step-ts-ranger-->
+    <!--        #ranger-->
+    <!--        *ngIf="rangerSettings"-->
+    <!--        [settings]="rangerSettings"-->
+    <!--        [syncKey]="syncKey"-->
+    <!--        (onRangeChange)="onRangeChange($event)"-->
+    <!--      >-->
+    <!--      </step-ts-ranger>-->
+    <!--    </div>-->
+    <div class="w-100 dashboard-container">
+      <div class="chart-container">
+        <step-chart-skeleton *ngIf="!summaryChartSettings"></step-chart-skeleton>
+        <step-timeseries-chart
+          #summaryChart
+          *ngIf="summaryChartSettings"
+          [settings]="summaryChartSettings"
+          [syncKey]="syncKey"
+          (onZoomReset)="onZoomReset()"
+        >
+        </step-timeseries-chart>
+      </div>
+      <!--  <div class="chart-container">-->
+      <!--    <step-timeseries-chart *ngIf="chart2Settings" [settings]="chart2Settings" [syncKey]="syncKey" (onZoomReset)="onZoomReset()">-->
+      <!--    </step-timeseries-chart>-->
+      <!--  </div>-->
 
-  <div class="chart-container" *ngIf="chart3Settings">
-    <step-timeseries-chart [settings]="chart3Settings" [syncKey]="syncKey" (onZoomReset)="onZoomReset()">
-    </step-timeseries-chart>
-  </div>
+      <div class="chart-container">
+        <step-chart-skeleton *ngIf="!byStatusSettings"></step-chart-skeleton>
+        <step-timeseries-chart
+          #byStatusChart
+          *ngIf="byStatusSettings"
+          [settings]="byStatusSettings"
+          [syncKey]="syncKey"
+          (onZoomReset)="onZoomReset()"
+        >
+        </step-timeseries-chart>
+      </div>
 
-  <div class="chart-container">
-    <step-timeseries-chart
-      #chart5
-      *ngIf="responseTypeByKeywordsSettings"
-      [settings]="responseTypeByKeywordsSettings"
-      [syncKey]="syncKey"
-      (onZoomReset)="onZoomReset()"
-    >
-    </step-timeseries-chart>
-    <div class="chart-footer-actions">
-      <span>AVG</span>
-      <span>MIN</span>
-      <span>MAX</span>
-    </div>
-  </div>
-
-  <div class="chart-container" *ngIf="chart4Settings">
-    <step-timeseries-chart #chart4 [settings]="chart4Settings" [syncKey]="syncKey" (onZoomReset)="onZoomReset()">
-    </step-timeseries-chart>
-  </div>
-
-  <div class="chart-container">
-    <step-timeseries-chart
-      #chart6
-      [settings]="chart6Settings"
-      *ngIf="chart6Settings"
-      [syncKey]="syncKey"
-      (onZoomReset)="onZoomReset()"
-    >
-    </step-timeseries-chart>
-  </div>
-
-  <div class="chart-container" *ngIf="chart4Settings">
-    <input [(ngModel)]="keywordSearchValue" placeholder="Search" />
-    <div *ngFor="let item of keywords | keyvalue: valueAscOrder">
-      <ng-container *ngIf="!keywordSearchValue || item.key.toLowerCase().indexOf(keywordSearchValue) >= 0">
-        <div class="color-cell">
-          <input
-            type="checkbox"
-            [(ngModel)]="item.value.isSelected"
-            class="checkbox"
-            (change)="onKeywordToggle(item.key)"
-          />
-          <span class="color-square" [style.background-color]="item.value.color"></span>
-          <span>{{ item.key }}</span>
+      <div class="chart-container">
+        <step-chart-skeleton *ngIf="!responseTypeByKeywordsSettings"></step-chart-skeleton>
+        <step-timeseries-chart
+          #chart5
+          *ngIf="responseTypeByKeywordsSettings"
+          [settings]="responseTypeByKeywordsSettings"
+          [syncKey]="syncKey"
+          (onZoomReset)="onZoomReset()"
+        >
+        </step-timeseries-chart>
+        <div class="chart-footer-actions">
+          <span>AVG</span>
+          <span>MIN</span>
+          <span>MAX</span>
         </div>
-      </ng-container>
+      </div>
+
+      <div class="chart-container">
+        <step-chart-skeleton *ngIf="!throughputChartSettings"></step-chart-skeleton>
+        <step-timeseries-chart
+          *ngIf="throughputChartSettings"
+          #chart4
+          [settings]="throughputChartSettings"
+          [syncKey]="syncKey"
+          (onZoomReset)="onZoomReset()"
+        >
+        </step-timeseries-chart>
+      </div>
+
+      <div class="chart-container">
+        <step-chart-skeleton *ngIf="!threadGroupSettings"></step-chart-skeleton>
+        <step-timeseries-chart
+          *ngIf="threadGroupSettings"
+          #threadGroupChart
+          [settings]="threadGroupSettings"
+          [syncKey]="syncKey"
+          (onZoomReset)="onZoomReset()"
+        >
+        </step-timeseries-chart>
+      </div>
+
+      <div class="chart-container">
+        <step-timeseries-table
+          #tableChart
+          [colorsPool]="colorsPool"
+          (onKeywordsFetched)="onKeywordsFetched($event)"
+        ></step-timeseries-table>
+      </div>
+
+      <div class="chart-container pie-chart-container"></div>
     </div>
   </div>
-
-  <div class="chart-container">
-    <step-timeseries-table
-      #tableChart
-      [colorsPool]="colorsPool"
-      (onKeywordsFetched)="onKeywordsFetched($event)"
-    ></step-timeseries-table>
+  <div class="side-panel">
+    <div class="chart-container" *ngIf="throughputChartSettings" style="overflow: auto">
+      <input [(ngModel)]="keywordSearchValue" placeholder="Search" style="width: 100%; margin-bottom: 12px" />
+      <div *ngFor="let item of keywords | keyvalue: valueAscOrder">
+        <ng-container *ngIf="!keywordSearchValue || item.key.toLowerCase().indexOf(keywordSearchValue) >= 0">
+          <div class="color-cell">
+            <input
+              type="checkbox"
+              [(ngModel)]="item.value.isSelected"
+              class="checkbox"
+              (change)="onKeywordToggle(item.key)"
+            />
+            <span class="color-square" [style.background-color]="item.value.color"></span>
+            <span>{{ item.key }}</span>
+          </div>
+        </ng-container>
+      </div>
+    </div>
   </div>
-
-  <div class="chart-container pie-chart-container"></div>
 </div>
+
+<!--<ng-template #skeleton>-->
+<!--  <div class="chart-scheleton">-->
+<!--    <svg width="100%" height="100%" viewBox="0 0 157 52" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">-->
+<!--      <g transform="translate(-40 -35)">-->
+<!--        <path d="m41 61 20 9.1 17-9.1 25-4.9 13-20 21 29 19-13 5.9 8.9 21-0.76 15-15v42h-157z" fill="#efefef"/>-->
+<!--      </g>-->
+<!--    </svg>-->
+<!--  </div>-->
+<!--</ng-template>-->
