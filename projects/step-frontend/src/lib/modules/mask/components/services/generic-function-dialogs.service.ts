@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { a1Promise2Observable, DialogsService, AugmentedKeywordsService } from '@exense/step-core';
 import { Observable, catchError, map, of, switchMap, tap } from 'rxjs';
-import { FunctionDialogsService } from '../../../function/servies/function-dialogs.service';
+import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
 import { IsUsedByDialogsService } from '../../../_common/services/is-used-by-dialogs.service';
 import { IsUsedByType } from '../../../_common/shared/is-used-by-type.enum';
 
@@ -29,7 +29,7 @@ export class GenericFunctionDialogService {
   }
 
   openAddMaskDialog(): Observable<any> {
-    return this._functionDialogs.addFunction(this.config);
+    return this._functionDialogs.openAddFunctionModal(this.config);
   }
 
   openEditMaskDialog(id: string): void {

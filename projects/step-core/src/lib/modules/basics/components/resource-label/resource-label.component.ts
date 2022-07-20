@@ -29,7 +29,6 @@ export class ResourceLabelComponent {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('stModel', this.stModel);
     const cStModel = changes['stModel'];
     if (cStModel?.isFirstChange() || cStModel?.previousValue !== cStModel?.currentValue) {
       const stModel = cStModel?.currentValue;
