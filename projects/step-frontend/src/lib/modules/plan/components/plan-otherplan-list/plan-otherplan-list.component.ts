@@ -5,11 +5,11 @@ import { AJS_LOCATION, AJS_MODULE, AugmentedPlansService, Plan } from '@exense/s
 import { ILocationService } from 'angular';
 
 @Component({
-  selector: 'step-other-plan-list',
-  templateUrl: './other-plan-list.component.html',
-  styleUrls: ['./other-plan-list.component.scss'],
+  selector: 'step-plan-otherplan-list',
+  templateUrl: './plan-otherplan-list.component.html',
+  styleUrls: ['./plan-otherplan-list.component.scss'],
 })
-export class OtherPlanListComponent {
+export class PlanOtherplanListComponent {
   @Output() onSelection = new EventEmitter<string>();
 
   constructor(
@@ -25,4 +25,4 @@ export class OtherPlanListComponent {
 
 getAngularJSGlobal()
   .module(AJS_MODULE)
-  .directive('stepOtherPlanList', downgradeComponent({ component: OtherPlanListComponent }));
+  .directive('stepPlanOtherplanList', downgradeComponent({ component: PlanOtherplanListComponent }));

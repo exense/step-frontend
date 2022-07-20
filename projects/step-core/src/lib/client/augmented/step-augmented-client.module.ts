@@ -18,3 +18,4 @@ export { AugmentedResourcesService } from './services/augmented-resources-servic
 export { AugmentedSchedulerService } from './services/augmented-scheduler-service';
 export { AugmentedKeywordPackagesService } from './services/augmented-keyword-packages.service';
 export { AugmentedKeywordsService } from './services/augmented-keywords-service';
+export { AugmentedControllerService } from './services/augmented-controller-service';
