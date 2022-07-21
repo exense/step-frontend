@@ -38,7 +38,7 @@ export class FunctionPackageActionsService {
     return a1Promise2Observable(modalInstance.result);
   }
 
-  addFunctionPackage(): Observable<any> {
+  openAddFunctionPackageDialog(): Observable<any> {
     return this.openModal();
   }
 

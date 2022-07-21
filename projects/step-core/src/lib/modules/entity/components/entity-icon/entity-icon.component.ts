@@ -32,7 +32,6 @@ export class EntityIconComponent {
   }
 
   update(): void {
-    console.log('update');
     this.icon = 'adjust';
     this.tooltip = 'In this project';
 
