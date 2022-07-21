@@ -1,0 +1,59 @@
+<strong *ngIf="!showOnlyDetails">{{ operation?.name }}</strong>
+<button
+  *ngIf="operation?.reportNodeId && executionViewServices"
+  (click)="executionViewServices!.showNodeInTree(operation!.reportNodeId!)"
+  type="button"
+  mat-icon-button
+  matTooltip="Show this node in the tree view"
+>
+  <mat-icon>account_tree</mat-icon>
+</button>
+<div class="details" [ngSwitch]="operation?.name">
+  <ng-container *ngSwitchCase="SpecificOperations.KEYWORD_CALL">
+    <div *ngIf="operation?.details[0]">{{ operation!.details[0].name }}</div>
+    <div *ngIf="operation?.details[1]">
+      <small>{{ operation!.details[1].id }}</small>
+    </div>
+    <div *ngIf="operation?.details[2]">
+      <small>{{ operation!.details[2].agentUrl }}</small>
+    </div>
+  </ng-container>
+  <ng-container *ngSwitchCase="SpecificOperations.QUOTA_ACQUISITION">
+    <div *ngIf="operation?.details">
+      <small>ID: {{ operation!.details!.id }}({{ operation!.details!.permits }})</small>
+    </div>
+    <div *ngIf="operation?.details?.description">
+      <small>{{ operation!.details!.description }})</small>
+    </div>
+  </ng-container>
+  <ng-container *ngSwitchCase="SpecificOperations.TOKEN_SELECTION">
+    <div *ngIf="operation?.details">
+      <small>
+        <label>Criteria: </label>
+        <span *ngFor="let item; in: operation!.details | keyvalue">
+          <strong>{{ item.key }}=</strong>{{ item.value.selectionPattern }}
+        </span>
+      </small>
+    </div>
+  </ng-container>
+  <ng-container *ngSwitchCase="SpecificOperations.WAITING_FOR_LOCK">
+    <div *ngIf="operation?.details">
+      <small>Lock name: {{ operation!.details }}</small>
+    </div>
+  </ng-container>
+  <ng-container *ngSwitchCase="SpecificOperations.WAITING_FOR_GLOBAL_LOCK">
+    <div *ngIf="operation?.details">
+      <small>Lock name: {{ operation!.details }}</small>
+    </div>
+  </ng-container>
+  <ng-container *ngSwitchDefault>
+    <div *ngIf="isObject">
+      <div *ngFor="let item of operation!.details | keyvalue">
+        <small>{{ item.key }}: {{ item.value }}</small>
+      </div>
+    </div>
+    <div *ngIf="!isObject">
+      <small>{{ operation?.details }}</small>
+    </div>
+  </ng-container>
+</div>

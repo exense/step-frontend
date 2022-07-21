@@ -240,6 +240,8 @@ tecAdminControllers.directive('executionProgress', [
   '$window',
   'reportTableFactory',
   'ViewRegistry',
+  'executionsPanelsService',
+  'selectionCollectorFactoryService',
   function (
     $http,
     $timeout,
@@ -250,7 +252,9 @@ tecAdminControllers.directive('executionProgress', [
     viewFactory,
     $window,
     reportTableFactory,
-    ViewRegistry
+    ViewRegistry,
+    executionsPanelsService,
+    selectionCollectorFactoryService
   ) {
     return {
       restrict: 'E',
@@ -263,6 +267,19 @@ tecAdminControllers.directive('executionProgress', [
       controller: function ($scope, $location, $anchorScroll, $compile, $element) {
         var eId = $scope.eid;
         $stateStorage.push($scope, eId, {});
+        executionsPanelsService.initialize();
+
+        const testCasesSelection = selectionCollectorFactoryService.create('artefactID');
+        $scope.$on('$destroy', () => testCasesSelection.destroy());
+        $scope.testCasesSelection = testCasesSelection;
+        $scope.determineDefaultSelection = () => {
+          if (!$scope.testCases || !$scope.execution) {
+            return;
+          }
+
+          const selectedTestCases = $scope.testCases.filter(value => $scope.testCaseTableDefaultSelection(value));
+          testCasesSelection.select(...selectedTestCases);
+        }
 
         $scope.tabs = ViewRegistry.getDashlets('executionTab');
         $scope.tabs = _.filter($scope.tabs, function (dash) {
@@ -295,6 +312,7 @@ tecAdminControllers.directive('executionProgress', [
           return ($scope.$stateExec = tabid);
         };
 
+/*
         var panels = {
           testCases: { label: 'Test cases', show: false, enabled: false },
           steps: { label: 'Keyword calls', show: true, enabled: true },
@@ -311,42 +329,47 @@ tecAdminControllers.directive('executionProgress', [
         _.each($scope.customPanels, function (panel) {
           panels[panel.id] = { label: panel.label, show: true, enabled: true };
         });
+*/
+
+        $scope.panels = executionsPanelsService.panels;
+        $scope.customPanels = executionsPanelsService.customPanels;
 
         $scope.scrollTo = function (viewId) {
-          panels[viewId].show = true;
+          executionsPanelsService.setShowPanel(viewId, true);
           $location.hash($scope.getPanelId(viewId));
           $anchorScroll();
         };
 
         $scope.isShowPanel = function (viewId) {
-          return panels[viewId].show;
+          return executionsPanelsService.isShowPanel(viewId);
         };
         $scope.setShowPanel = function (viewId, show) {
-          panels[viewId].show = show;
+          executionsPanelsService.setShowPanel(viewId, show);
         };
         $scope.isPanelEnabled = function (viewId) {
-          return panels[viewId].enabled;
+          return executionsPanelsService.isPanelEnabled(viewId);
         };
         $scope.toggleShowPanel = function (viewId) {
-          panels[viewId].show = !panels[viewId].show;
+          executionsPanelsService.toggleShowPanel(viewId);
         };
         $scope.enablePanel = function (viewId, enabled) {
-          panels[viewId].enabled = enabled;
+          executionsPanelsService.enablePanel(viewId, enabled);
         };
         $scope.getPanelId = function (viewId) {
           return eId + viewId;
         };
         $scope.getPanelTitle = function (viewId) {
-          return panels[viewId].label;
+          return executionsPanelsService.getPanelTitle(viewId);
         };
-        $scope.panels = _.map(_.keys(panels), function (viewId) {
-          return { id: viewId, label: panels[viewId].label };
-        });
 
         $scope.testCaseTable = {};
         $scope.drillDownTestcase = function (id) {
           $scope.testCaseTable.deselectAll(false);
           $scope.testCaseTable.select(id);
+
+          testCasesSelection.clear();
+          testCasesSelection.selectById(id);
+
           $scope.enablePanel('steps', true);
           $scope.scrollTo('steps');
         };
@@ -368,9 +391,17 @@ tecAdminControllers.directive('executionProgress', [
           }
         };
 
+/*
         $scope.testCaseTableOnSelectionChange = function () {
           $scope.refresh();
         };
+*/
+
+        testCasesSelection.selected$.subscribe(() => {
+          if ($scope.refresh) {
+            $scope.refresh();
+          }
+        });
 
         $scope.operationOptions = { showAll: false };
 
@@ -390,6 +421,10 @@ tecAdminControllers.directive('executionProgress', [
                 if (node.resolvedArtefact && node.resolvedArtefact._class == 'TestCase') {
                   $scope.testCaseTable.deselectAll(false);
                   $scope.testCaseTable.select(node.resolvedArtefact.id);
+
+                  testCasesSelection.clear();
+                  testCasesSelection.selectById(node.resolvedArtefact.id);
+
                   $scope.enablePanel('testCases', true);
                 }
               });
@@ -405,6 +440,11 @@ tecAdminControllers.directive('executionProgress', [
         $scope.stepsTable = reportTableFactory.get(
           function () {
             var filter = { eid: eId };
+            // if not all items are selected
+            if (testCasesSelection.length !== $scope.testCases.length) {
+              filter.testcases = [...testCasesSelection.selected];
+            }
+/*
             if ($scope.testCaseTable.getSelection) {
               var testCaseSelection = $scope.testCaseTable.getSelection();
               // if not all items are selected
@@ -416,7 +456,7 @@ tecAdminControllers.directive('executionProgress', [
                 filter.testcases = testcases;
               }
             }
-
+*/
             return filter;
           },
           $scope,
@@ -473,6 +513,7 @@ tecAdminControllers.directive('executionProgress', [
                 $scope.enablePanel('testCases', true);
               }
               $scope.testCases = data;
+              $scope.determineDefaultSelection();
             });
         };
 
@@ -486,6 +527,7 @@ tecAdminControllers.directive('executionProgress', [
               }
             }
             $scope.execution = data;
+            $scope.determineDefaultSelection();
             var showTestCaseCurrentOperation = $scope.execution.parameters.find(
               (o) => o.key === 'step.executionView.testcases.current-operations'
             );
