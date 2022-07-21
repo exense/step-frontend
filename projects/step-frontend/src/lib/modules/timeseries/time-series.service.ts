@@ -18,7 +18,7 @@ export class TimeSeriesService {
     return this.http.post<TimeSeriesChartResponse>(`/rest/time-series/buckets-new`, request);
   }
 
-  getExecutionDetails(id: string) {
+  getExecutionDetails(id: string): Observable<any> {
     return this.http.get<any>(`/rest/executions/${id}`);
   }
 }

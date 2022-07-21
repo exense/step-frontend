@@ -10,7 +10,10 @@ import * as uPlot from 'uplot';
 import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
-import { TimeseriesTableComponent } from './execution-page/table/timeseries-table.component'; // this is mandatory for compile
+import { TimeseriesTableComponent } from './execution-page/table/timeseries-table.component';
+import { TimeRangePicker } from './time-selection/time-range-picker.component';
+import { ChartSkeletonComponent } from './chart/skeleton/chart-skeleton.component';
+import { ExecutionPageTimeSelectionComponent } from './execution-page/time-selection/execution-page-time-selection.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +22,9 @@ import { TimeseriesTableComponent } from './execution-page/table/timeseries-tabl
     ExecutionTabsComponent,
     TSRangerComponent,
     TimeseriesTableComponent,
+    TimeRangePicker,
+    ChartSkeletonComponent,
+    ExecutionPageTimeSelectionComponent,
   ],
   exports: [ExecutionPageComponent],
   imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule],

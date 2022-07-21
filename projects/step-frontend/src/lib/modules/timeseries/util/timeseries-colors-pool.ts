@@ -1,25 +1,29 @@
 export class TimeseriesColorsPool {
-  private allColors: string[];
+  private predefinedColors: string[];
   private assignedColors: { [key: string]: string } = {};
 
   constructor() {
-    this.allColors = [...colors];
+    this.predefinedColors = [...colors];
   }
 
   assignColor(key: string): string {
-    if (this.allColors.length == 0) {
-      let randomColor = this.randomRGBA();
-      this.allColors.push(randomColor);
+    let color;
+    if (this.predefinedColors.length == 0) {
+      color = this.randomRGBA();
+    } else {
+      color = this.predefinedColors[0];
+      this.predefinedColors.shift();
     }
-    let color = this.allColors[0];
     this.assignedColors[key] = color;
-    this.allColors.shift();
     return color;
   }
 
   getColor(key: string): string {
-    if (this.assignedColors[key]) return this.assignedColors[key];
-    return this.assignColor(key);
+    if (this.assignedColors[key]) {
+      return this.assignedColors[key];
+    } else {
+      return this.assignColor(key);
+    }
   }
 
   randomRGBA() {
