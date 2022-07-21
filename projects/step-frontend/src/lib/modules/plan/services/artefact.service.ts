@@ -14,7 +14,7 @@ export type ArtefactType = {
   providedIn: 'root',
 })
 export class ArtefactService {
-  public availableArtefacts?: Array<ArtefactType>; // artefacts loaded from server and enriched with info from the registry
+  availableArtefacts?: Array<ArtefactType>; // artefacts loaded from server and enriched with info from the registry
   private registry: { [key: string]: ArtefactType } = {}; // maps artefact names to additional artefact details
 
   constructor(private _planApiService: PlansService) {
@@ -34,7 +34,7 @@ export class ArtefactService {
     return this.registry[typeName] != null;
   }
 
-  public register(typeName: string, artefactType: ArtefactType): void {
+  register(typeName: string, artefactType: ArtefactType): void {
     if (!artefactType.label) {
       artefactType.label = typeName;
     }
@@ -44,11 +44,11 @@ export class ArtefactService {
     this.registry[typeName] = artefactType;
   }
 
-  public getDefaultIcon(): string {
+  getDefaultIcon(): string {
     return 'glyphicon-unchecked';
   }
 
-  public isSelectable(typeName: string): boolean {
+  isSelectable(typeName: string): boolean {
     return this.typeExist(typeName) && !!this.getType(typeName).isSelectable;
   }
 

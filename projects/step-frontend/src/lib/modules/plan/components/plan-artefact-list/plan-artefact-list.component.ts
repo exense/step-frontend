@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_LOCATION, AJS_MODULE, AugmentedControllerService } from '@exense/step-core';
+import { AJS_LOCATION, AJS_MODULE } from '@exense/step-core';
 import { ILocationService } from 'angular';
 import { ArtefactService } from '../../services/artefact.service';
 
@@ -15,7 +15,6 @@ export class PlanArtefactListComponent {
 
   constructor(
     readonly _artefactService: ArtefactService,
-    readonly _controllerApiService: AugmentedControllerService,
     private _httpClient: HttpClient,
     @Inject(AJS_LOCATION) private _location: ILocationService
   ) {}
