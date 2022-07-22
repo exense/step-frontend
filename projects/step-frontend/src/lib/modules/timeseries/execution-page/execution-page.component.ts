@@ -98,8 +98,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   constructor(private timeSeriesService: TimeSeriesService) {}
 
   ngOnInit(): void {
-    this.barsFunction = uPlot.paths.bars;
-    this.stepped = uPlot.paths.stepped;
+    this.barsFunction = uPlot?.paths.bars;
+    this.stepped = uPlot?.paths.stepped;
 
     this.timeSeriesService.getExecutionDetails(this.executionId).subscribe((details) => {
       this.findRequest.start = details.startTime - (details.startTime % this.RESOLUTION_MS);
