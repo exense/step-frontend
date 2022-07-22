@@ -23,6 +23,7 @@ export abstract class DialogsService {
   ): void;
   abstract selectEntityOfType(entityName: string, singleSelection: boolean, id?: string): IPromise<unknown>;
   abstract selectEntityType(excludeArray: string[], id: string): IPromise<unknown>;
-  abstract selectEntityTypeForEntities(excludeArray: string, callback: Function, arg: unknown): void;
+  abstract selectEntityTypeForEntities(excludeArray: string[], callback: Function, arg: unknown): void;
   abstract showEntityInAnotherProject(newProjectName?: string): IPromise<unknown>;
+  abstract showAssignmentWarning(msg: string): IPromise<unknown>;
 }
