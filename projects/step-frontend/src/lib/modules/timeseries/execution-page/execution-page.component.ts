@@ -43,9 +43,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   colorsPool = new TimeseriesColorsPool();
 
-  barsFunction = uPlot.paths.bars;
-  stepped = uPlot.paths.stepped;
-
   keywords: { [key: string]: { isSelected: boolean; color: string } } = {};
   keywordSearchValue: string = '';
 
@@ -62,6 +59,9 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   subscriptions: Subscription = new Subscription();
   intervalExecution: any;
   intervalShouldBeCanceled = false;
+
+  barsFunction: any;
+  stepped: any;
 
   // @ts-ignore
   paths = (u, seriesIdx: number, idx0: number, idx1: number, extendGap, buildClip) => {
@@ -98,6 +98,9 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   constructor(private timeSeriesService: TimeSeriesService) {}
 
   ngOnInit(): void {
+    this.barsFunction = uPlot.paths.bars;
+    this.stepped = uPlot.paths.stepped;
+
     this.timeSeriesService.getExecutionDetails(this.executionId).subscribe((details) => {
       this.findRequest.start = details.startTime - (details.startTime % this.RESOLUTION_MS);
       this.executionStart = this.findRequest.start;
