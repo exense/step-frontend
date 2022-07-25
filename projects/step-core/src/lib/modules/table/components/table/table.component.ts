@@ -23,6 +23,7 @@ import { TableRemoteDataSource } from '../../shared/table-remote-data-source';
 import { TableLocalDataSource } from '../../shared/table-local-data-source';
 import { TableSearch } from '../../services/table.search';
 import { SearchValue } from '../../shared/search-value';
+import { ColumnDirective } from '../../directives/column.directive';
 
 export interface SearchColumn {
   colName: string;
@@ -53,18 +54,29 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     if (value === this.filter) {
       return;
     }
-    this._filter$.next(value);
+    this.filter$.next(value);
   }
   get filter(): string | undefined {
-    return this._filter$.value;
+    return this.filter$.value;
   }
 
   @ViewChild(MatTable) private _table?: MatTable<any>;
   @ViewChild(MatPaginator, { static: true }) page!: MatPaginator;
-  @ContentChildren(MatColumnDef, { descendants: true }) colDef?: QueryList<MatColumnDef>;
-  @ContentChildren(SearchColDirective) searchColDef?: QueryList<SearchColDirective>;
 
-  private _initRequired: boolean = false;
+  @ContentChildren(ColumnDirective) columns?: QueryList<ColumnDirective>;
+
+  private get allCollDef(): MatColumnDef[] {
+    return (this.columns || []).reduce((res, col) => [...res, ...col.columnDefinitions], [] as MatColumnDef[]);
+  }
+
+  private get allSearchColDef(): SearchColDirective[] {
+    return (this.columns || [])
+      .reduce((res, col) => [...res, ...col.searchColumnDefinitions], [] as SearchColDirective[])
+      .filter((x) => !x.isSearchDisabled);
+  }
+
+  private initRequired: boolean = false;
+  private hasCustom: boolean = false;
 
   displayColumns: string[] = [];
   displaySearchColumns: string[] = [];
@@ -73,22 +85,23 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
 
   readonly trackBySearchColumn: TrackByFunction<SearchColumn> = (index, item) => item.colName;
 
-  private _terminator$?: Subject<unknown>;
-  private _search$ = new BehaviorSubject<{ [column: string]: SearchValue }>({});
-  private _filter$ = new BehaviorSubject<string | undefined>(undefined);
+  private terminator$ = new Subject();
+  private dataSourceTerminator$?: Subject<unknown>;
+  private search$ = new BehaviorSubject<{ [column: string]: SearchValue }>({});
+  private filter$ = new BehaviorSubject<string | undefined>(undefined);
 
   constructor(@Optional() private _sort: MatSort) {}
 
-  private terminate(): void {
-    if (this._terminator$) {
-      this._terminator$.next({});
-      this._terminator$.complete();
+  private terminateDatasource(): void {
+    if (this.dataSourceTerminator$) {
+      this.dataSourceTerminator$.next({});
+      this.dataSourceTerminator$.complete();
     }
   }
 
   private setupDatasource(dataSource?: DataSource<T>): void {
-    this.terminate();
-    this._terminator$ = new Subject<unknown>();
+    this.terminateDatasource();
+    this.dataSourceTerminator$ = new Subject<unknown>();
 
     if (!dataSource) {
       return;
@@ -101,10 +114,11 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     } else {
       tableDataSource = new TableLocalDataSource(dataSource as T[] | Observable<T[]>);
     }
+
     this.tableDataSource = tableDataSource;
 
     if (!this.page) {
-      this._initRequired = true;
+      this.initRequired = true;
       return;
     }
 
@@ -124,20 +138,36 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     const page$ = this.page!.page.pipe(startWith(initialPage));
     const sort$ = this._sort ? this._sort.sortChange.pipe(startWith(initialSort)) : of(undefined);
 
-    combineLatest([page$, sort$, this._search$, this._filter$])
-      .pipe(takeUntil(this._terminator$))
+    combineLatest([page$, sort$, this.search$, this.filter$])
+      .pipe(takeUntil(this.dataSourceTerminator$))
       .subscribe(([page, sort, search, filter]) => tableDataSource.getTableData(page, sort, search, filter));
   }
 
+  private addCustomColumnsDefinitionsToRemoteDatasource(): void {
+    if (this.dataSource instanceof TableRemoteDataSource && this.hasCustom) {
+      this.columns!.reduce((res, col) => {
+        if (!col.isCustom) {
+          return res;
+        }
+        const names = col.columnDefinitions.map((x) => x.name);
+        return [...res, ...names];
+      }, [] as string[]).forEach((name) => {
+        (this.dataSource as TableRemoteDataSource<T>).setColumnMap(name, name);
+      });
+    }
+  }
+
   private setupSearchColumns(): void {
-    if (!this.searchColDef?.length) {
+    const searchColDef = this.allSearchColDef;
+
+    if (!searchColDef.length) {
       this.searchColumns = [];
       this.displaySearchColumns = [];
       return;
     }
 
-    const allColumns = this.colDef!.map((x) => x.name);
-    const searchColumns = this.searchColDef!.map((x) => {
+    const allColumns = this.allCollDef.map((x) => x.name);
+    const searchColumns = searchColDef.map((x) => {
       const searchName = x.searchColumnName;
       const template = x?.searchCell?.template;
       return { searchName, template };
@@ -152,6 +182,16 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     this.displaySearchColumns = this.searchColumns.map((c) => c.colName);
   }
 
+  private setupColumns(): void {
+    const allCollDef = this.allCollDef;
+
+    allCollDef.forEach((col) => this._table!.addColumnDef(col));
+
+    setTimeout(() => {
+      this.displayColumns = allCollDef.map((x) => x.name);
+    });
+  }
+
   onSearch(column: string, value: string, regex?: boolean): void;
   onSearch(column: string, event: Event, regex?: boolean): void;
   onSearch(column: string, eventOrValue: Event | string, regex: boolean = false): void {
@@ -160,28 +200,40 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
         ? (eventOrValue as string)
         : ((eventOrValue as Event)?.target as HTMLInputElement).value || '';
 
-    const search = { ...this._search$.value };
+    const search = { ...this.search$.value };
     search[column] = regex ? { value, regex } : value;
-    this._search$.next(search);
+    this.search$.next(search);
   }
 
   ngAfterViewInit(): void {
-    this.colDef?.forEach((col) => this._table!.addColumnDef(col));
-    setTimeout(() => {
-      this.displayColumns = this.colDef!.map((x) => x.name);
-    });
+    const setup = () => {
+      this.setupColumns();
+      this.setupSearchColumns();
 
-    this.setupSearchColumns();
+      if (this.initRequired) {
+        this.setupDatasource(this.dataSource);
+      }
 
-    if (this._initRequired) {
-      this.setupDatasource(this.dataSource);
+      this.addCustomColumnsDefinitionsToRemoteDatasource();
+    };
+
+    const customCols = this.columns?.filter((col) => col.isCustom) || [];
+
+    if (!customCols?.length) {
+      setup();
+    } else {
+      this.hasCustom = true;
+      const ready$ = combineLatest(customCols.map((col) => col.ready$));
+      ready$.pipe(takeUntil(this.terminator$)).subscribe(setup);
     }
   }
 
   ngOnDestroy(): void {
-    this.terminate();
-    this._search$.complete();
-    this._filter$.complete();
+    this.terminateDatasource();
+    this.search$.complete();
+    this.filter$.complete();
+    this.terminator$.next({});
+    this.terminator$.complete();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
