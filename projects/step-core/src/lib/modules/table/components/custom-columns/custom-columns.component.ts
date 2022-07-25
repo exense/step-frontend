@@ -34,7 +34,7 @@ export class CustomColumnsComponent implements OnChanges {
   @ViewChildren(MatColumnDef) colDef?: QueryList<MatColumnDef>;
   @ViewChildren(SearchColDirective) searchColDef?: QueryList<SearchColDirective>;
 
-  constructor(private _screens: AugmentedScreenService) {}
+  constructor(private _screenApiService: AugmentedScreenService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     const cScreen = changes['screen'];
@@ -65,7 +65,7 @@ export class CustomColumnsComponent implements OnChanges {
       return;
     }
 
-    this._screens
+    this._screenApiService
       .getInputsForScreen1(screen)
       .pipe(
         map((inputs) => {
