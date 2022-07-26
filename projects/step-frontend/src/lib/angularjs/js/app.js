@@ -577,34 +577,6 @@ angular
     };
   })
 
-  .controller('LoginController', function ($scope, $rootScope, AuthService) {
-    $scope.credentials = {
-      username: '',
-      password: '',
-    };
-    if (AuthService.getConf().demo) {
-      $scope.credentials.password = 'init';
-      $scope.credentials.username = 'admin';
-    }
-    $scope.login = function (credentials) {
-      AuthService.login(credentials).then(
-        function (user) {},
-        function (e) {
-          $scope.error = e.error;
-        }
-      );
-    };
-    $scope.logo = 'images/logologin.png';
-
-    document.querySelectorAll('input[type=password]')[0].addEventListener('keyup', function (e) {
-      if (e.getModifierState && e.getModifierState('CapsLock')) {
-        $scope.capsWarning = true;
-      } else {
-        $scope.capsWarning = false;
-      }
-    });
-  })
-
   .factory('ImportDialogs', function ($rootScope, $uibModal, EntityRegistry, $sce) {
     var dialogs = {};
 
