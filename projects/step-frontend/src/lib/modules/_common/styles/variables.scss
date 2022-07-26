@@ -12,3 +12,11 @@ $statuses: (
   'TECHNICAL_ERROR': black,
   'INTERRRUPTED': #f9c038,
 );
+
+$tokenstates: (
+  'IN_USE': #337ab7,
+  'ERROR': black,
+  'FREE': #5cb85c,
+  'MAINTENANCE_REQUESTED': #749dc0,
+  'MAINTENANCE': #fbd544,
+);
