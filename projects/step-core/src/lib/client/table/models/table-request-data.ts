@@ -1,13 +1,12 @@
-import { TableColumn } from './table-column';
-import { ColumnOrder } from './column-order';
-import { TableSearch } from './table-search';
+import { FieldFilter } from './field-filter';
+import { FullTextFilter } from './full-text-filter';
+import { FieldSort } from './field-sort';
+import { TableParameters } from './table-parameters';
 
 export interface TableRequestData {
-  draw: number;
-  columns: TableColumn[];
-  order: ColumnOrder[];
-  start: number;
-  length: number;
-  search: TableSearch;
-  filter?: string;
+  filters?: (FieldFilter | FullTextFilter)[];
+  sort?: FieldSort;
+  start?: number;
+  length?: number;
+  tableParameters?: TableParameters;
 }
