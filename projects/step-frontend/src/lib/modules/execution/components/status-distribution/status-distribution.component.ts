@@ -8,16 +8,20 @@ import { ExecutionSummaryDto } from '@exense/step-core';
 })
 export class StatusDistributionComponent implements OnChanges {
   @Input() summary?: ExecutionSummaryDto;
+  @Input() isProgress: boolean = false;
 
   passed: number = 0;
   failed: number = 0;
   techError: number = 0;
+  count: number = 0;
 
   percentPassed: number = 0;
   percentFailed: number = 0;
   percentTechError: number = 0;
+  countPercent: number = 0;
 
   tooltipMessage: string = '';
+  tooltipProgressMessage: string = '';
 
   ngOnChanges(changes: SimpleChanges): void {
     const cSummary = changes['summary'];
@@ -30,15 +34,22 @@ export class StatusDistributionComponent implements OnChanges {
     [this.passed, this.percentPassed] = this.getCountAndPercent(summary, 'PASSED');
     [this.failed, this.percentFailed] = this.getCountAndPercent(summary, 'FAILED');
     [this.techError, this.percentTechError] = this.getCountAndPercent(summary, 'TECHNICAL_ERROR');
+    [this.count, this.countPercent] = this.calcPercent(summary?.count, summary?.countForecast);
 
     this.tooltipMessage = `${summary?.label || ''} PASSED: ${this.passed}, FAILED: ${this.failed}, TECHNICAL_ERROR: ${
       this.techError
     }`;
+
+    this.tooltipProgressMessage = `Progress: ${summary?.count || 0}/${summary?.countForecast || 0}`;
+  }
+
+  private calcPercent(count: number, total: number): [number, number] {
+    const percent = total ? (count / total) * 100 : 0;
+    return [count, percent];
   }
 
   private getCountAndPercent(summary: ExecutionSummaryDto, type: string): [number, number] {
     const count = summary?.distribution?.[type]?.count || 0;
-    const percent = summary?.count ? (count / summary.count) * 100 : 0;
-    return [count, percent];
+    return this.calcPercent(count, summary?.count);
   }
 }

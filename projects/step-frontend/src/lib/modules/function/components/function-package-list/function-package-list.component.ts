@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { AJS_MODULE, AugmentedKeywordPackagesService, FunctionPackage, TableRemoteDataSource } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { FunctionPackageActionsService } from '../../servies/function-package-actions.service';
+import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
 
 @Component({
   selector: 'step-function-package-list',
@@ -18,7 +18,7 @@ export class FunctionPackageListComponent {
   }
 
   add(): void {
-    this._actions.addFunctionPackage().subscribe(() => this.dataSource.reload());
+    this._actions.openAddFunctionPackageDialog().subscribe(() => this.dataSource.reload());
   }
 
   edit(id: string): void {

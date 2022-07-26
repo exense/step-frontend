@@ -54,12 +54,8 @@
 								</div>
 							</uib-tab>
 							<uib-tab heading="Keywords">
-								<div class="row">
-									<div class="panel-body">
-										<select-entity type="'functions'" on-selection="addFunction" />
-									</div>
-								</div>
-							</uib-tab>
+                <step-plan-function-list (on-selection)="addFunction($event)"></step-plan-function-list>
+  						</uib-tab>
 							<uib-tab heading="Other plans">
                 <step-other-plan-list (on-selection)="addPlan($event)"></step-other-plan-list>
 							</uib-tab>

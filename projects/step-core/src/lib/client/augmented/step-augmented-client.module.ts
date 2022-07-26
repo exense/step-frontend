@@ -10,6 +10,7 @@ import { StepGeneratedClientModule } from '../generated';
 export class StepAugmentedClientModule {}
 
 export type { ExecutionSummaryDto } from './models/execution-summary-dto';
+export type { AugmentedTokenWrapperOwner } from './models/augmented-token-wrapper-owner';
 export type { ProjectDto } from './models/project-dto';
 
 export { AugmentedPlansService } from './services/augmented-plans-service';
@@ -19,4 +20,5 @@ export { AugmentedResourcesService } from './services/augmented-resources-servic
 export { AugmentedSchedulerService } from './services/augmented-scheduler-service';
 export { AugmentedKeywordPackagesService } from './services/augmented-keyword-packages.service';
 export { AugmentedKeywordsService } from './services/augmented-keywords-service';
+export { AugmentedScreenService } from './services/augmented-screen.service';
 export { AugmentedAdminService } from './services/augmented-admin-service';
