@@ -1,5 +1,19 @@
 @import '../../../_common/styles/mixins.scss';
 
+.token-group-checkboxes {
+  padding: 8px;
+  .token-group-checkboxes-groupby {
+    margin-right: 20px;
+    font-weight: bold;
+  }
+  .token-group-checkboxes-checkbox {
+    margin-left: 10px;
+    input {
+      margin-right: 5px;
+    }
+  }
+}
+
 .nav-to-plan-icon {
   transform: scale(0.7);
   margin-bottom: 6px;
@@ -9,6 +23,7 @@
 
 .cell-actions {
   width: 20rem;
+
   button {
     padding: 0;
     min-width: 4rem;
@@ -18,6 +33,7 @@
 
 .header {
   @include table-header;
+  justify-content: space-between;
   padding: 8px;
 
   .import-export button {
