@@ -1,7 +1,7 @@
 import { Component, Inject, Input, SimpleChanges } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, AJS_ROOT_SCOPE, DialogsService, FunctionPackage, KeywordPackagesService } from '@exense/step-core';
-import { FunctionPackageActionsService } from '../../servies/function-package-actions.service';
+import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
 import { IRootScopeService } from 'angular';
 
 @Component({
