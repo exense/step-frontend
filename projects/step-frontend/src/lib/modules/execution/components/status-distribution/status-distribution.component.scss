@@ -14,7 +14,15 @@ div.distribution {
   width: 160px;
   box-shadow: inset rgba(0, 0, 0, 0.3) 0px 1px 3px 0px;
 
+  &.in-progress {
+    width: 200px;
+  }
+
   @include bar('PASSED');
   @include bar('FAILED');
   @include bar('TECHNICAL_ERROR');
+  @include bar('RUNNING');
+  .bar-RUNNING {
+    min-width: 2em;
+  }
 }

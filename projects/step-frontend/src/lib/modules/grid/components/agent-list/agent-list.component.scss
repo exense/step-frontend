@@ -1,24 +1,5 @@
 @import '../../../_common/styles/mixins.scss';
 
-.agent-type {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-
-.agent-type-default {
-  background: #007396;
-}
-
-.agent-type-node {
-  background: #6cc24a;
-}
-
-.agent-type-dotnet {
-  background: #ffbb00;
-}
-
 .nav-to-plan-icon {
   transform: scale(0.7);
   margin-bottom: 6px;
@@ -26,31 +7,8 @@
   cursor: pointer;
 }
 
-.status {
-  color: black;
-  padding: 5px;
-  border-radius: 3px;
-  cursor: pointer;
-  border-width: 1px;
-  border-style: solid;
-  &:hover {
-    border-style: none;
-  }
-}
-
-.status-on {
-  background-color: #35c163;
-  border-color: #35c163;
-}
-
-.status-off {
-  background-color: #d90606;
-  border-color: #d90606;
-}
-
 .cell-actions {
   width: 20rem;
-
   button {
     padding: 0;
     min-width: 4rem;

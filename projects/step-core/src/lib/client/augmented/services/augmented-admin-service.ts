@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { AdminService, Plan } from '../../generated';
+import { AdminService, FunctionPackage, KeywordsService, Plan } from '../../generated';
 import { TableRestService } from '../../table/services/table-rest.service';
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
 import { TableRemoteDataSource } from '../../../modules/table/shared/table-remote-data-source';
@@ -66,4 +66,5 @@ export class AugmentedAdminService extends AdminService {
       headers: { 'Content-Type': 'application/json; charset=utf-8' },
     });
   }
+
 }

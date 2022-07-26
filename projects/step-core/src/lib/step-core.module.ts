@@ -13,6 +13,7 @@ import { MAT_LUXON_DATE_ADAPTER_OPTIONS, MAT_LUXON_DATE_FORMATS } from '@angular
 import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { EntityModule } from './modules/entity/entity.module';
 import { StepGeneratedClientModule } from './client/generated';
+import { EntitiesSelectionModule } from './modules/entities-selection/entities-selection.module';
 import { CapsLockDirective } from './directives/caps-lock.directive';
 
 @NgModule({
@@ -27,6 +28,7 @@ import { CapsLockDirective } from './directives/caps-lock.directive';
     TableModule,
     StepBasicsModule,
     EntityModule,
+    EntitiesSelectionModule,
     StepGeneratedClientModule,
   ],
   exports: [
@@ -42,6 +44,7 @@ import { CapsLockDirective } from './directives/caps-lock.directive';
     TableModule,
     StepBasicsModule,
     EntityModule,
+    EntitiesSelectionModule,
     StepGeneratedClientModule,
   ],
   providers: [
@@ -92,6 +95,7 @@ export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
 export * from './modules/basics/step-basics.module';
 export * from './modules/entity/entity.module';
+export * from './modules/entities-selection/entities-selection.module';
 export * from './client/generated/index';
 export * from './client/step-client-module';
 
