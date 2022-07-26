@@ -160,65 +160,6 @@ angular
     },
   ])
 
-  .controller('TokenListCtrl', [
-    '$scope',
-    '$interval',
-    '$http',
-    function ($scope, $interval, $http) {
-      $scope.$state = 'tokens';
-
-      $scope.tokens;
-
-      $scope.loadTable = function loadTable() {
-        $http.get('rest/grid/token').then(function (response) {
-          $scope.tokens = [];
-          _.each(response.data, function (e) {
-            var type = e.token.attributes.$agenttype;
-            $scope.tokens.push({
-              id: e.token.id,
-              typeLabel:
-                type == 'default' ? 'Java' : type == 'node' ? 'Node.js' : type == 'dotnet' ? '.NET' : 'Unknown',
-              type: type,
-              attributes: e.token.attributes,
-              attributesAsString: JSON.stringify(e.token.attributes),
-              agentUrl: e.agent.agentUrl,
-              executionId: e.currentOwner ? e.currentOwner.executionId : null,
-              executionDescription: e.currentOwner ? e.currentOwner.executionDescription : null,
-              currentOwner: e.currentOwner,
-              state: e.state,
-              errorMessage: e.tokenHealth.errorMessage,
-              tokenHealth: e.tokenHealth,
-            });
-          });
-        });
-      };
-
-      $scope.removeTokenError = function (tokenId) {
-        $http.delete('rest/grid/token/' + tokenId + '/error').then(function () {
-          $scope.loadTable();
-        });
-      };
-
-      $scope.startTokenMaintenance = function (tokenId) {
-        $http.post('rest/grid/token/' + tokenId + '/maintenance').then(function () {
-          $scope.loadTable();
-        });
-      };
-
-      $scope.stopTokenMaintenance = function (tokenId) {
-        $http.delete('rest/grid/token/' + tokenId + '/maintenance').then(function () {
-          $scope.loadTable();
-        });
-      };
-
-      $scope.loadTable();
-      var refresh = function () {
-        $scope.loadTable();
-      };
-      $scope.autorefresh = { enabled: true, interval: 5000, refreshFct: refresh };
-    },
-  ])
-
   .controller('QuotaManagerCtrl', [
     '$scope',
     '$http',

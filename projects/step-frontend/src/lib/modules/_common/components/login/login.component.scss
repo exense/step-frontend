@@ -1,5 +1,18 @@
 mat-form-field {
   width: 100%;
+
+  ::ng-deep .mat-form-field-flex {
+    background: none !important;
+  }
+
+  ::ng-deep input {
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus,
+    &:-webkit-autofill:active {
+      transition: background-color 5000s ease-in-out 0s;
+    }
+  }
 }
 
 :host {
