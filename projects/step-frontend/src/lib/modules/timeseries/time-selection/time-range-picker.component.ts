@@ -2,6 +2,7 @@ import { AfterViewInit, Component, EventEmitter, OnInit, Output, ViewChild, View
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TimeSelection } from './model/time-selection';
 import { RelativeTimeSelection } from './model/relative-time-selection';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 
 @Component({
   selector: 'step-time-range-picker',
@@ -16,6 +17,7 @@ export class TimeRangePicker implements OnInit {
   _30_MINUTES = 30 * 60 * 1000; // in ms
 
   relativeRangeOptions: RelativeTimeSelection[] = [
+    { label: 'Last 1 minute', timeInMs: this._30_MINUTES / 30 },
     { label: 'Last 5 minutes', timeInMs: this._30_MINUTES / 6 },
     { label: 'Last 15 minutes', timeInMs: this._30_MINUTES / 2 },
     { label: 'Last 30 minutes', timeInMs: this._30_MINUTES },
@@ -26,6 +28,9 @@ export class TimeRangePicker implements OnInit {
   from: Date | undefined;
   to: Date | undefined;
 
+  fromString: string | undefined;
+  toString: string | undefined;
+
   activeSelection: TimeSelection | undefined;
 
   ngOnInit(): void {}
@@ -35,9 +40,12 @@ export class TimeRangePicker implements OnInit {
   }
 
   applyAbsoluteInterval() {
+    let fromTs = this.fromString ? new Date(this.fromString).getTime() : undefined;
+    let toTs = this.fromString ? new Date(this.toString).getTime() : undefined;
+    console.log(fromTs);
     this.activeSelection = {
       isRelativeSelection: false,
-      absoluteSelection: { from: this.from?.getTime(), to: this.to?.getTime() },
+      absoluteSelection: { from: fromTs, to: toTs },
     };
     this.emitSelectionChange();
     this.closeMenu();
@@ -55,8 +63,18 @@ export class TimeRangePicker implements OnInit {
     this.emitSelectionChange();
   }
 
+  setCustomSelection(from?: number, to?: number) {
+    this.activeSelection = { isRelativeSelection: false, absoluteSelection: { from, to } };
+  }
+
   emitSelectionChange() {
     this.onSelectionChange.emit(this.activeSelection);
+  }
+
+  setFromDate(event: MatDatepickerInputEvent<any>) {
+    console.log(event.value.ts);
+    let date = new Date(event.value.ts);
+    this.fromString = `${date.toLocaleDateString()} 00:00:00`;
   }
 
   resetCustomDates() {

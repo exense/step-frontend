@@ -5,6 +5,5 @@ export interface Bucket {
   sum: number;
   min: number;
   max: number;
-  pclPrecision: number;
-  distribution: { [key: number]: number };
+  pclPrecisions: { [key: number]: number };
 }

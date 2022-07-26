@@ -151,12 +151,16 @@ export function tooltipPlugin() {
         yPoints.sort((a, b) => (a.value - b.value) * -1);
         let allSeriesLength = yPoints.length;
         let elementsToSelect = 5;
-        if (yPoints.length > 10) {
+        let elipsisBefore = true;
+        let elipsisAfter = true;
+        if (yPoints.length > elementsToSelect) {
           var closestIndex = getClosestIndex(hoveredValue, yPoints);
           if (closestIndex < elementsToSelect / 2) {
             yPoints = yPoints.slice(0, elementsToSelect);
+            elipsisBefore = false;
           } else if (yPoints.length - closestIndex < elementsToSelect / 2) {
             yPoints = yPoints.slice(-elementsToSelect);
+            elipsisAfter = false;
           } else {
             yPoints = yPoints.slice(closestIndex - elementsToSelect / 2, closestIndex + elementsToSelect / 2);
           }
@@ -165,12 +169,6 @@ export function tooltipPlugin() {
         //   console.log(u.series);
         // }
         overlay.innerHTML = '';
-        let dots1 = document.createElement('div');
-        let dots2 = document.createElement('div');
-        dots1.classList.add('dots');
-        dots2.classList.add('dots');
-        dots1.textContent = '...';
-        dots2.textContent = '...';
         yPoints.forEach((point) => {
           var rowElement = document.createElement('div');
           rowElement.classList.add('tooltip-row');
@@ -184,13 +182,24 @@ export function tooltipPlugin() {
           overlay.appendChild(rowElement);
         });
         if (yPoints.length < allSeriesLength) {
-          overlay.prepend(dots1);
-          overlay.appendChild(dots2);
+          if (elipsisBefore) {
+            let dots = document.createElement('div');
+            dots.classList.add('dots');
+            dots.textContent = '...';
+            overlay.prepend(dots);
+          }
+          if (elipsisAfter) {
+            let dots = document.createElement('div');
+            dots.classList.add('dots');
+            dots.textContent = '...';
+            overlay.appendChild(dots);
+          }
         }
 
         // overlay.appendChild(dots);
         // the feature will display the closest value for the y scale only, and just one value for the second scale (if present)
-        const anchor = { left: left + bLeft, top: top + bTop };
+        let anchorPadding = 12;
+        const anchor = { left: left + bLeft + anchorPadding, top: top + bTop };
         // overlay.textContent = `${x} at ${Math.round(left)},${Math.round(top)}`;
         placement(overlay, anchor, 'right', 'start', { bound });
       },

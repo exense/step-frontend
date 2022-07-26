@@ -51,6 +51,10 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     }
   }
 
+  resetZoom() {
+    this.uplot.setData(this.uplot.data, true);
+  }
+
   createChart(settings: TSChartSettings) {
     let getSize = () => {
       return {
@@ -67,6 +71,20 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       y: false,
       sync: {},
       bind: {
+        // @ts-ignore
+        click: (self, b, handler) => {
+          return (e: any) => {
+            console.log('CLICK', e);
+            handler(e);
+          };
+        },
+        // @ts-ignore
+        // mouseup: (self, b, handler) => {
+        //   return (e: any) => {
+        //     console.log('MOUSE UP', e);
+        //       handler(e);
+        //   };
+        // },
         // @ts-ignore
         dblclick: (self, b, handler) => {
           return (e: any) => {
@@ -110,10 +128,30 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       series: [
         {
           label: 'Timestamp',
+          value: (x: uPlot, timestamp: number) => {
+            let date = new Date(timestamp);
+            return date.toLocaleDateString() + ` ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+          },
         },
         ...settings.series,
       ],
       hooks: {
+        init: [
+          (u: any) => {
+            u.root.addEventListener('click', (e: any) => {
+              console.log('CLICKEDDDDD');
+              let hoveredSeriesIdx = u.cursor.idxs.findIndex((v: number) => v != null);
+
+              if (hoveredSeriesIdx != -1) {
+                let hoveredDataIdx = u.cursor.idxs[hoveredSeriesIdx];
+                let seriesOpts = u.series[hoveredSeriesIdx];
+                let facetsData = u.data[hoveredSeriesIdx];
+
+                console.log(seriesOpts.label);
+              }
+            });
+          },
+        ],
         // setSelect: [ () => console.log('select')],
         // setScale: [ (x: any) => console.log(this.isZoomed())]
       },

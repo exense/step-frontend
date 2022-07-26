@@ -71,18 +71,20 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   intervalExecution: any;
   intervalShouldBeCanceled = false;
 
-  // @ts-ignore
-  paths = (u, seriesIdx: number, idx0: number, idx1: number, extendGap, buildClip) => {
-    return this.barsFunction(u, seriesIdx, idx0, idx1, extendGap, buildClip);
-  };
+  allSeriesChecked = true;
 
   valueAscOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => {
     return a.key.localeCompare(b.key);
   };
 
-  onKeywordToggle(keyword: string) {
-    this.throughputByKeywordsChart.toggleSeries(keyword);
-    this.responseTimeByKeywordsChart.toggleSeries(keyword);
+  onKeywordToggle(keyword: string, event: any) {
+    this.toggleKeyword(keyword);
+    let checked = event.target.checked;
+
+    if (!checked) {
+      this.allSeriesChecked = false;
+    }
+
     // let filteredSource: Bucket[] = [];
     // this.tableDataSource.forEach(e => {
     //     if (this.keywords[e.attributes.name].isSelected) {
@@ -90,6 +92,11 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     //     }
     // });
     // this.tableDataSource = filteredSource;
+  }
+
+  toggleKeyword(keyword: string) {
+    this.throughputByKeywordsChart.toggleSeries(keyword);
+    this.responseTimeByKeywordsChart.toggleSeries(keyword);
   }
 
   onKeywordsFetched(keywords: string[]) {
@@ -308,9 +315,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   // }
 
   onZoomReset() {
-    if (this.ranger) {
-      this.ranger.resetSelect(); // this will trigger a range change event
-    }
+    this.timeSelection.resetZoom();
   }
 
   createThreadGroupsChart(request: FindBucketsRequest, isUpdate = false) {
@@ -395,27 +400,27 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   createRanger(request: FindBucketsRequest) {
-    this.timeSeriesService.fetchBucketsNew(request).subscribe((response) => {
-      let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-      console.log('TIME: ', response.start, response.end);
-      let avgData = response.matrix[0].map((b) => (b ? b.sum / b.count : null));
-      this.rangerSettings = {
-        title: 'Ranger',
-        xValues: timeLabels,
-        series: [
-          {
-            id: 'avg',
-            label: 'Response Time',
-            data: avgData,
-            // value: (self, x) => Math.trunc(x) + ' ms',
-            stroke: 'red',
-          },
-        ],
-      };
-      if (this.ranger) {
-        this.ranger.redrawChart();
-      }
-    });
+    // this.timeSeriesService.fetchBucketsNew(request).subscribe((response) => {
+    //   let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
+    //   console.log('TIME: ', response.start, response.end);
+    //   let avgData = response.matrix[0].map((b) => (b ? b.sum / b.count : null));
+    //   this.rangerSettings = {
+    //     title: 'Ranger',
+    //     xValues: timeLabels,
+    //     series: [
+    //       {
+    //         id: 'avg',
+    //         label: 'Response Time',
+    //         data: avgData,
+    //         // value: (self, x) => Math.trunc(x) + ' ms',
+    //         stroke: 'red',
+    //       },
+    //     ],
+    //   };
+    //   if (this.ranger) {
+    //     this.ranger.redrawChart();
+    //   }
+    // });
   }
 
   createSummaryChart(request: FindBucketsRequest, isUpdate = false) {
@@ -578,7 +583,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         axes: [
           {
             scale: 'y',
-            values: (u, vals, space) => vals.map((v) => +v.toFixed(2)),
+            values: (u, vals, space) => vals.map((v) => +v.toFixed(2) + ' ms'),
           },
           {
             side: 1,
@@ -609,10 +614,35 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  onRangeChange(newRange: TSTimeRange) {
-    this.findRequest.start = Math.trunc(newRange.start);
-    this.findRequest.end = Math.trunc(newRange.end);
-    this.tableChart.init(this.findRequest);
+  handleTableRangeChange(newRange: TSTimeRange) {
+    let clonedRequest = JSON.parse(JSON.stringify(this.findRequest)); // we make a clone in order to not pollute the global request
+    clonedRequest.start = Math.trunc(newRange.start);
+    clonedRequest.end = Math.trunc(newRange.end);
+    this.tableChart.init(clonedRequest); // refresh the table
+  }
+
+  handleRangeReset(newRange: TSTimeRange) {
+    console.log('RESET ZOOM');
+    this.responseTimeByKeywordsChart.resetZoom();
+    this.byStatusChart.resetZoom();
+    this.byStatusChart.resetZoom();
+    this.summaryChart.resetZoom();
+    this.throughputByKeywordsChart.resetZoom();
+    this.handleTableRangeChange(newRange);
+  }
+
+  onAllSeriesCheckboxClick(event: any) {
+    let checked = event.target.checked;
+    if (checked) {
+      this.throughputByKeywordsChart.showAllSeries();
+      this.responseTimeByKeywordsChart.showAllSeries();
+    } else {
+      this.throughputByKeywordsChart.hideAllSeries();
+      this.responseTimeByKeywordsChart.hideAllSeries();
+    }
+    Object.keys(this.keywords).forEach((keyword) => {
+      this.keywords[keyword].isSelected = checked;
+    });
   }
 
   ngOnDestroy(): void {

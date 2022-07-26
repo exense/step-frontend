@@ -11,11 +11,13 @@ import { TimeSeriesChartResponse } from '../../time-series-chart-response';
   styleUrls: ['./timeseries-table.component.scss'],
 })
 export class TimeseriesTableComponent implements OnInit {
-  tableColumns = ['name', 'count', 'sum', 'avg', 'min', 'max'];
+  // TODO use a dynamic list for percentiles
+  tableColumns = ['name', 'count', 'sum', 'avg', 'min', 'max', 'pcl_90', 'pcl_90', 'pcl_99', 'tps'];
   tableDataSource: Bucket[] = [];
   bucketsByKeywords: { [key: string]: Bucket } = {};
   tableIsLoading = true;
   dimensionKey = 'name';
+  response: TimeSeriesChartResponse | undefined;
 
   @Input('colorsPool') colorsPool!: TimeseriesColorsPool;
   @Output('onKeywordsFetched') onKeywordsFetched = new EventEmitter<string[]>();
@@ -58,8 +60,14 @@ export class TimeseriesTableComponent implements OnInit {
   init(request: FindBucketsRequest) {
     this.tableIsLoading = true;
     this.timeSeriesService
-      .fetchBucketsNew({ ...request, groupDimensions: [this.dimensionKey], numberOfBuckets: 1 })
+      .fetchBucketsNew({
+        ...request,
+        groupDimensions: [this.dimensionKey],
+        numberOfBuckets: 1,
+        pclPrecisions: [80, 90, 99],
+      })
       .subscribe((response) => {
+        this.response = response;
         let keywords: string[] = [];
         this.tableDataSource = response.matrix
           .map((series, i) => {
@@ -82,5 +90,9 @@ export class TimeseriesTableComponent implements OnInit {
         this.onKeywordsFetched.emit(keywords);
         this.tableIsLoading = false;
       });
+  }
+
+  get Math() {
+    return Math;
   }
 }

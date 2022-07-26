@@ -2,23 +2,13 @@
   <div class="view-content">
     <step-execution-tabs></step-execution-tabs>
     <step-execution-time-selection
+      (onRangeChange)="handleTableRangeChange($event)"
+      (onRangeReset)="handleRangeReset($event)"
       #timeSelection
       *ngIf="execution"
       [execution]="execution"
-    ></step-execution-time-selection>
-    <!--    <div>-->
-    <!--      <div class="ranger-skeleton" *ngIf=" !rangerSettings">-->
-
-    <!--      </div>-->
-    <!--      <step-ts-ranger-->
-    <!--        #ranger-->
-    <!--        *ngIf="rangerSettings"-->
-    <!--        [settings]="rangerSettings"-->
-    <!--        [syncKey]="syncKey"-->
-    <!--        (onRangeChange)="onRangeChange($event)"-->
-    <!--      >-->
-    <!--      </step-ts-ranger>-->
-    <!--    </div>-->
+    >
+    </step-execution-time-selection>
     <div class="w-100 dashboard-container">
       <div class="chart-container">
         <step-chart-skeleton *ngIf="!summaryChartSettings"></step-chart-skeleton>
@@ -102,7 +92,17 @@
   </div>
   <div class="side-panel">
     <div class="chart-container" *ngIf="throughputChartSettings" style="overflow: auto">
-      <input [(ngModel)]="keywordSearchValue" placeholder="Search" style="width: 100%; margin-bottom: 12px" />
+      <div>
+        <input
+          type="checkbox"
+          class="checkbox"
+          [(ngModel)]="allSeriesChecked"
+          (change)="onAllSeriesCheckboxClick($event)"
+          style="display: inline"
+        />
+        <input [(ngModel)]="keywordSearchValue" placeholder="Search" style="width: 110px; margin-bottom: 12px" />
+      </div>
+
       <div *ngFor="let item of keywords | keyvalue: valueAscOrder">
         <ng-container *ngIf="!keywordSearchValue || item.key.toLowerCase().indexOf(keywordSearchValue) >= 0">
           <div class="color-cell">
@@ -110,7 +110,7 @@
               type="checkbox"
               [(ngModel)]="item.value.isSelected"
               class="checkbox"
-              (change)="onKeywordToggle(item.key)"
+              (change)="onKeywordToggle(item.key, $event)"
             />
             <span class="color-square" [style.background-color]="item.value.color"></span>
             <span>{{ item.key }}</span>
