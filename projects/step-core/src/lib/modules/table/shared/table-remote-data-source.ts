@@ -179,6 +179,10 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     this.getTableData(tableRequest);
   }
 
+  setColumnMap(key: string, value: string): void {
+    this._requestColumnsMap[key] = value;
+  }
+
   reload() {
     this._request$.next(this._request$.value);
   }

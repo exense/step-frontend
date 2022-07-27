@@ -1,0 +1,20 @@
+<ng-template #allOperations>
+  <step-operation
+    *ngFor="let operation of currentOperation"
+    [operation]="operation"
+    [executionViewServices]="executionViewServices"
+  >
+  </step-operation>
+</ng-template>
+<ng-template #firstOperation>
+  <step-operation
+    *ngIf="currentOperation[0]"
+    [operation]="currentOperation[0]"
+    [executionViewServices]="executionViewServices"
+  >
+  </step-operation>
+</ng-template>
+<ng-container *ngIf="showAll; then allOperations; else firstOperation"> </ng-container>
+<button *ngIf="currentOperation.length > 1" type="button" mat-icon-button (click)="showAll = !showAll">
+  <mat-icon>more_horiz</mat-icon>
+</button>
