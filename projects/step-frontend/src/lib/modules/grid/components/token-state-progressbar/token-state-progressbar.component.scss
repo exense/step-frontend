@@ -1,0 +1,21 @@
+@import '../../../_common/styles/variables';
+
+.token-status-IN_USE {
+  background: map-get($tokenstates, 'IN_USE');
+}
+
+.token-status-ERROR {
+  background: map-get($tokenstates, 'ERROR');
+}
+
+.token-status-FREE {
+  background: map-get($tokenstates, 'FREE');
+}
+
+.token-status-MAINTENANCE_REQUESTED {
+  background: map-get($tokenstates, 'MAINTENANCE_REQUESTED');
+}
+
+.token-status-MAINTENANCE {
+  background: map-get($tokenstates, 'MAINTENANCE');
+}

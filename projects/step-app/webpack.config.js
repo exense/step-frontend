@@ -6,6 +6,8 @@ const share = mf.share;
 const sharedMappings = new mf.SharedMappings();
 sharedMappings.register(path.join(__dirname, '../../tsconfig.build.json'), ['@exense/step-core']);
 
+const sharedLibraryConfig = require('./shared-libraries.config');
+
 module.exports = {
   output: {
     uniqueName: 'stepFrontend',
@@ -31,12 +33,7 @@ module.exports = {
 
       // NOTE: all required descriptors, for shared libraries should be set manually
       shared: share({
-        '@angular/core': { singleton: true, strictVersion: true, requiredVersion: 'auto' },
-        '@angular/common': { singleton: true, strictVersion: true, requiredVersion: 'auto' },
-        '@angular/common/http': { singleton: true, strictVersion: true, requiredVersion: 'auto' },
-        '@angular/router': { singleton: true, strictVersion: true, requiredVersion: 'auto' },
-        '@angular/forms': { singleton: true, strictVersion: true, requiredVersion: 'auto' },
-        '@exense/step-core': { singleton: true, strictVersion: true, requiredVersion: '0.1.2' },
+        ...sharedLibraryConfig,
       }),
     }),
     sharedMappings.getPlugin(),

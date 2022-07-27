@@ -13,14 +13,13 @@
   <ng-container matColumnDef="type" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
     <td mat-cell *matCellDef="let element">
-      <span class="agent-type" [class]="'agent-type-'.concat(element.agentRef!.agentType)"></span>
-      {{ TYPE_LABEL_TRANSLATIONS[element.agentRef!.agentType] }}
+      <step-token-type [type]="element.agentRef!.agentType"></step-token-type>
     </td>
   </ng-container>
   <ng-container matColumnDef="capacity">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Token states</th>
     <td mat-cell *matCellDef="let element">
-      <step-status-summary [tokenGroup]="element.tokensCapacity"></step-status-summary>
+      <step-token-state-progressbar [tokenGroup]="element.tokensCapacity"></step-token-state-progressbar>
     </td>
   </ng-container>
 
