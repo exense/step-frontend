@@ -1,8 +1,9 @@
-import { AfterViewInit, Component, EventEmitter, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
-import { TimeSelection } from './model/time-selection';
 import { RelativeTimeSelection } from './model/relative-time-selection';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { TimeRangePickerSelection } from './time-range-picker-selection';
+import { RangeSelectionType } from './model/range-selection-type';
 
 @Component({
   selector: 'step-time-range-picker',
@@ -12,7 +13,7 @@ import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 export class TimeRangePicker implements OnInit {
   @ViewChild(MatMenuTrigger) menuTrigger!: MatMenuTrigger;
 
-  @Output('selectionChange') onSelectionChange = new EventEmitter<TimeSelection>();
+  @Output('selectionChange') onSelectionChange = new EventEmitter<TimeRangePickerSelection>();
 
   _30_MINUTES = 30 * 60 * 1000; // in ms
 
@@ -25,60 +26,97 @@ export class TimeRangePicker implements OnInit {
     { label: 'Last 3 hours', timeInMs: this._30_MINUTES * 6 },
   ];
 
-  from: Date | undefined;
-  to: Date | undefined;
+  // from: Date | undefined; // used for mat picker
+  // to: Date | undefined; // used for mat picker
 
-  fromString: string | undefined;
-  toString: string | undefined;
+  fromDateString: string | undefined; // used for formatting the date together with time
+  toDateString: string | undefined;
 
-  activeSelection: TimeSelection | undefined;
+  activeSelection: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
 
   ngOnInit(): void {}
 
-  closeMenu() {
-    this.menuTrigger.closeMenu();
-  }
-
   applyAbsoluteInterval() {
-    let fromTs = this.fromString ? new Date(this.fromString).getTime() : undefined;
-    let toTs = this.fromString ? new Date(this.toString).getTime() : undefined;
-    console.log(fromTs);
-    this.activeSelection = {
-      isRelativeSelection: false,
-      absoluteSelection: { from: fromTs, to: toTs },
-    };
-    this.emitSelectionChange();
+    let from = undefined;
+    let to = undefined;
+    if (this.fromDateString && this.isValidDate(this.fromDateString)) {
+      from = new Date(this.fromDateString).getTime();
+    } else {
+      // the date is invalid
+      this.fromDateString = undefined;
+    }
+    if (this.toDateString && this.isValidDate(this.toDateString)) {
+      to = new Date(this.toDateString).getTime();
+    } else {
+      // the date is invalid
+      this.toDateString = undefined;
+    }
+    if (!from && !to) {
+      this.emitSelectionChange({ type: RangeSelectionType.FULL });
+    } else {
+      let newSelection = {
+        type: RangeSelectionType.ABSOLUTE,
+        absoluteSelection: { from: from, to: to },
+      };
+      this.emitSelectionChange(newSelection);
+    }
     this.closeMenu();
   }
 
   selectRelativeInterval(option: RelativeTimeSelection) {
     this.resetCustomDates();
-    this.activeSelection = { isRelativeSelection: true, relativeSelection: option, absoluteSelection: undefined };
-    this.emitSelectionChange();
+    this.emitSelectionChange({ type: RangeSelectionType.RELATIVE, relativeSelection: option });
   }
 
   selectFullRange() {
     this.resetCustomDates();
-    this.activeSelection = undefined;
-    this.emitSelectionChange();
+    this.emitSelectionChange({ type: RangeSelectionType.FULL });
   }
 
-  setCustomSelection(from?: number, to?: number) {
-    this.activeSelection = { isRelativeSelection: false, absoluteSelection: { from, to } };
+  setAbsoluteSelection(from?: number, to?: number) {
+    this.resetCustomDates();
+    if (from) {
+      let date = new Date(from);
+      this.fromDateString = `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    }
+    if (to) {
+      let date = new Date(to);
+      this.toDateString = `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    }
+    this.emitSelectionChange({ type: RangeSelectionType.ABSOLUTE, absoluteSelection: { from, to } });
   }
 
-  emitSelectionChange() {
-    this.onSelectionChange.emit(this.activeSelection);
+  emitSelectionChange(selection: TimeRangePickerSelection) {
+    this.activeSelection = selection;
+    this.onSelectionChange.emit(selection);
   }
 
   setFromDate(event: MatDatepickerInputEvent<any>) {
-    console.log(event.value.ts);
     let date = new Date(event.value.ts);
-    this.fromString = `${date.toLocaleDateString()} 00:00:00`;
+    this.fromDateString = `${date.toLocaleDateString()} 00:00:00`;
+  }
+
+  setToDate(event: MatDatepickerInputEvent<any>) {
+    let date = new Date(event.value.ts);
+    this.toDateString = `${date.toLocaleDateString()} 00:00:00`;
   }
 
   resetCustomDates() {
-    this.from = undefined;
-    this.to = undefined;
+    this.fromDateString = undefined;
+    this.toDateString = undefined;
+  }
+
+  closeMenu() {
+    this.menuTrigger.closeMenu();
+  }
+
+  isValidDate(stringValue: string): boolean {
+    let dateObject = new Date(stringValue);
+    // @ts-ignore
+    return dateObject !== 'Invalid Date' && !isNaN(dateObject); // from mozilla+chrome and IE8
+  }
+
+  get RangeSelectionType() {
+    return RangeSelectionType;
   }
 }

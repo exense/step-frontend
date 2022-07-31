@@ -4,8 +4,10 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  OnChanges,
   OnInit,
   Output,
+  SimpleChanges,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -14,6 +16,8 @@ import { UplotSyncService } from '../chart/uplot-sync-service';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { UPlotUtils } from '../uplot/uPlot.utils';
 import { from, timeout } from 'rxjs';
+import { TSChartSettings } from '../chart/model/ts-chart-settings';
+import { TimeSeriesExecutionService } from '../execution-page/time-series-execution.service';
 
 declare const uPlot: any;
 
@@ -30,11 +34,12 @@ declare const uPlot: any;
   styleUrls: ['./ts-ranger.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class TSRangerComponent implements OnInit, AfterViewInit {
+export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
   @ViewChild('chart') private chartElement!: ElementRef;
 
   @Input('settings') settings!: TSRangerSettings;
   @Input('syncKey') syncKey: string | undefined;
+  @Input('selection') selection?: TSTimeRange;
 
   /**
    * This should emit the following events only:
@@ -51,19 +56,36 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
   start!: number;
   end!: number;
 
+  constructor(private executionService: TimeSeriesExecutionService) {}
+
   ngOnInit(): void {
     if (this.syncKey) {
       uPlot.sync(this.syncKey);
     }
-    this.start = this.settings.xValues[0];
-    this.end = this.settings.xValues[this.settings.xValues.length - 1];
+
+    this.init(this.settings);
+  }
+
+  init(settings: TSRangerSettings) {
+    this.start = settings.xValues[0];
+    this.end = settings.xValues[this.settings.xValues.length - 1];
   }
 
   ngAfterViewInit(): void {
     this.createRanger();
   }
 
-  selectRange(fromTimestamp?: number, toTimestamp?: number, emitChangeEvent = true) {
+  ngOnChanges(changes: SimpleChanges): void {
+    let settings = changes['settings'];
+    if (settings && settings.previousValue) {
+      // it's a real change
+      this.init(settings.currentValue);
+      console.log(settings.currentValue);
+      this.createRanger();
+    }
+  }
+
+  selectRange(fromTimestamp?: number, toTimestamp?: number) {
     let left, width;
     let height = this.uplot.bbox.height / devicePixelRatio;
     if (!fromTimestamp) {
@@ -77,7 +99,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
       width = Math.round(this.uplot.valToPos(toTimestamp, 'x')) - left;
     }
 
-    this.uplot.setSelect({ left, width, height }, emitChangeEvent);
+    this.uplot.setSelect({ left, width, height }, false);
     this.emitSelectionToLinkedCharts();
 
     // if (emitChangeEvent) {
@@ -85,7 +107,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
     // }
   }
 
-  resetSelect(emitEvent = true) {
+  resetSelect(emitResetEvent = false) {
     // this is a 'hack'. when dblclick is triggered in another synced chart, it will remove the select for the ranger. this function is executed before that.
     // we have to wait the minimum amount of time so that sync event happens, and the selection is destroyed
     setTimeout(() => {
@@ -96,8 +118,9 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
       let xData = this.uplot.data[0];
       let start = xData[0];
       let end = xData[xData.length - 1];
-      if (emitEvent) {
-        this.onZoomReset.emit({ start, end });
+      this.emitSelectionToLinkedCharts();
+      if (emitResetEvent) {
+        this.onZoomReset.emit({ from: start, to: end });
       }
     }, 50);
   }
@@ -194,11 +217,20 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
         // zoom(newLft, newWid);
       }
     };
-
     let rangerOpts = {
       width: 800,
       height: 100,
       ms: 1, // if not specified it's going be in seconds
+      // select: {left: 0, width: 300, height: 33},
+      axes: [
+        {},
+        {
+          show: false,
+          scale: 'y',
+
+          grid: { show: false },
+        },
+      ],
       cursor: {
         y: false,
         points: {
@@ -220,7 +252,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
               handler(e);
               if (hasSelection) {
                 // has selection
-                this.resetSelect();
+                this.resetSelect(true);
               }
             };
           },
@@ -229,10 +261,17 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
       legend: {
         show: false,
       },
-      scales: {},
+      scales: {
+        x: {
+          time: true,
+          min: this.selection?.from,
+          max: this.selection?.to,
+        },
+      },
       series: [
         {},
         {
+          scale: 'y',
           points: { show: false },
           stroke: '#9fd6ff',
           fill: () => {
@@ -252,7 +291,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
             let width = Math.round(uRanger.valToPos(this.end, 'x')) - left;
             let height = uRanger.bbox.height / devicePixelRatio;
             uRanger.setSelect({ left, width, height }, false);
-            this.previousRange = { start: this.start, end: this.end };
+            this.previousRange = { from: this.start, to: this.end };
             const sel = uRanger.root.querySelector('.u-select');
 
             //@ts-ignore
@@ -324,10 +363,11 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
 
   emitRangeEventIfChanged() {
     let u = this.uplot;
-    let min = u.posToVal(u.select.left, 'x');
-    let max = u.posToVal(u.select.left + u.select.width, 'x');
-    if (min != this.previousRange?.start || max !== this.previousRange?.end) {
-      let currentRange = { start: min, end: max };
+    // we could use just postToVal, but it's better to have an exact value from the X data
+    let min = u.data[0][u.valToIdx(u.posToVal(u.select.left, 'x'))];
+    let max = u.data[0][u.valToIdx(u.posToVal(u.select.left + u.select.width, 'x'))];
+    if (min != this.previousRange?.from || max !== this.previousRange?.to) {
+      let currentRange = { from: min, to: max };
       this.previousRange = currentRange;
       this.onRangeChange.next(currentRange);
     }

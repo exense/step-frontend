@@ -17,6 +17,7 @@
           *ngIf="summaryChartSettings"
           [settings]="summaryChartSettings"
           [syncKey]="syncKey"
+          [selection]="timeSelection?.absoluteSelection"
           (onZoomReset)="onZoomReset()"
         >
         </step-timeseries-chart>
@@ -32,6 +33,7 @@
           #byStatusChart
           *ngIf="byStatusSettings"
           [settings]="byStatusSettings"
+          [selection]="timeSelection?.absoluteSelection"
           [syncKey]="syncKey"
           (onZoomReset)="onZoomReset()"
         >
@@ -44,6 +46,7 @@
           #chart5
           *ngIf="responseTypeByKeywordsSettings"
           [settings]="responseTypeByKeywordsSettings"
+          [selection]="timeSelection?.absoluteSelection"
           [syncKey]="syncKey"
           (onZoomReset)="onZoomReset()"
         >
@@ -61,6 +64,7 @@
           *ngIf="throughputChartSettings"
           #chart4
           [settings]="throughputChartSettings"
+          [selection]="timeSelection?.absoluteSelection"
           [syncKey]="syncKey"
           (onZoomReset)="onZoomReset()"
         >
@@ -73,6 +77,7 @@
           *ngIf="threadGroupSettings"
           #threadGroupChart
           [settings]="threadGroupSettings"
+          [selection]="timeSelection?.absoluteSelection"
           [syncKey]="syncKey"
           (onZoomReset)="onZoomReset()"
         >

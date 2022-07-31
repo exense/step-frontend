@@ -123,12 +123,14 @@ export function tooltipPlugin() {
           overlay.style.display = 'none';
         };
       },
+      destroy: (u: uPlot) => {
+        overlay.remove();
+      },
       setSize: (u: uPlot) => {
         syncBounds();
       },
       setCursor: (u: uPlot) => {
         const { left, top, idx } = u.cursor;
-        const x = new Date(u.data[0][idx]);
         let hoveredValue = u.posToVal(top, 'y');
         if (top < 0) {
           // some weird uplot behaviour. it happens to be -10 many times
@@ -139,7 +141,7 @@ export function tooltipPlugin() {
           let series = u.series[i];
           if (series.scale === 'y' && series.show) {
             let value = u.data[i][idx];
-            if (value) {
+            if (value != undefined) {
               yPoints.push({ value: value, name: series.label, color: series._stroke });
             }
             continue;
@@ -165,9 +167,9 @@ export function tooltipPlugin() {
             yPoints = yPoints.slice(closestIndex - elementsToSelect / 2, closestIndex + elementsToSelect / 2);
           }
         }
-        // if (yPoints.length === 0) {
-        //   console.log(u.series);
-        // }
+        if (yPoints.length === 0) {
+          return; // there is no data to show
+        }
         overlay.innerHTML = '';
         yPoints.forEach((point) => {
           var rowElement = document.createElement('div');

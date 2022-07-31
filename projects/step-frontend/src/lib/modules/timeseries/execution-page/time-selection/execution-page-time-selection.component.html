@@ -5,6 +5,7 @@
       *ngIf="rangerSettings"
       [settings]="rangerSettings"
       [syncKey]="'test'"
+      [selection]="selection.absoluteSelection"
       (onRangeChange)="onRangerSelectionChange($event)"
       (onZoomReset)="onRangerZoomReset($event)"
     >

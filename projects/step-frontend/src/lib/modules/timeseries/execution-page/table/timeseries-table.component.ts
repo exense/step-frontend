@@ -58,7 +58,6 @@ export class TimeseriesTableComponent implements OnInit {
   }
 
   init(request: FindBucketsRequest) {
-    this.tableIsLoading = true;
     this.timeSeriesService
       .fetchBucketsNew({
         ...request,

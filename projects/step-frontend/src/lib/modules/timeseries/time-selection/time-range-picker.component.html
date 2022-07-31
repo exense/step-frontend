@@ -1,12 +1,8 @@
 <div>
   <button mat-raised-button [matMenuTriggerFor]="menu">
-    {{
-      activeSelection
-        ? activeSelection.isRelativeSelection
-          ? activeSelection.relativeSelection?.label
-          : 'Custom Selection'
-        : 'Full time range'
-    }}
+    {{ activeSelection.type === RangeSelectionType.FULL ? 'Full time range' : '' }}
+    {{ activeSelection.type === RangeSelectionType.RELATIVE ? activeSelection.relativeSelection?.label : '' }}
+    {{ activeSelection.type === RangeSelectionType.ABSOLUTE ? 'Custom Selection' : '' }}
   </button>
   <mat-menu #menu="matMenu" class="time-selector-menu">
     <div (click)="$event.stopPropagation()">
@@ -16,7 +12,7 @@
           <div>
             <mat-form-field appearance="fill">
               <mat-label>From</mat-label>
-              <input matInput [(ngModel)]="fromString" />
+              <input matInput [(ngModel)]="fromDateString" class="ng-invalid" />
               <input matInput [matDatepicker]="fromPicker" style="display: none" (dateChange)="setFromDate($event)" />
               <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
               <mat-datepicker #fromPicker disabled="false"></mat-datepicker>
@@ -25,7 +21,8 @@
           <div>
             <mat-form-field appearance="fill">
               <mat-label>To</mat-label>
-              <input matInput [matDatepicker]="toPicker" />
+              <input matInput [(ngModel)]="toDateString" />
+              <input matInput [matDatepicker]="toPicker" style="display: none" (dateChange)="setToDate($event)" />
               <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
               <mat-datepicker #toPicker disabled="false"></mat-datepicker>
             </mat-form-field>

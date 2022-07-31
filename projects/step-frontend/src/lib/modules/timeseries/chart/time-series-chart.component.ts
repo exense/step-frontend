@@ -16,6 +16,8 @@ import { TSChartSeries, TSChartSettings } from './model/ts-chart-settings';
 import { UplotSyncService } from './uplot-sync-service';
 import { UPlotUtils } from '../uplot/uPlot.utils';
 import { tooltipPlugin } from './tooltip-plugin';
+import { TimeSeriesExecutionService } from '../execution-page/time-series-execution.service';
+import { TSTimeRange } from './model/ts-time-range';
 
 declare const uPlot: any;
 
@@ -34,6 +36,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   @Input('settings') settings!: TSChartSettings;
   @Input('syncKey') syncKey: string | undefined;
+  @Input('selection') selection: TSTimeRange | undefined;
 
   @Output('onZoomReset') onZoomReset = new EventEmitter();
 
@@ -43,7 +46,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   recreateOnInputChange = true;
 
-  constructor(@Self() private element: ElementRef) {}
+  constructor(@Self() private element: ElementRef, private executionService: TimeSeriesExecutionService) {}
 
   ngOnInit(): void {
     if (this.syncKey) {
@@ -55,6 +58,10 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     this.uplot.setData(this.uplot.data, true);
   }
 
+  /**
+   * @param settings
+   * @param selectedRange - optional, if a specific zoom has to be set
+   */
   createChart(settings: TSChartSettings) {
     let getSize = () => {
       return {
@@ -72,12 +79,12 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       sync: {},
       bind: {
         // @ts-ignore
-        click: (self, b, handler) => {
-          return (e: any) => {
-            console.log('CLICK', e);
-            handler(e);
-          };
-        },
+        // click: (self, b, handler) => {
+        //   return (e: any) => {
+        //     console.log('CLICK', e);
+        //     handler(e);
+        //   };
+        // },
         // @ts-ignore
         // mouseup: (self, b, handler) => {
         //   return (e: any) => {
@@ -110,7 +117,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         this.seriesIndexesByIds[series.id] = i + 1; // because the first series is the time
       }
     });
-
     const opts = {
       title: settings.title,
       ms: 1, // if not specified it's going to be in seconds
@@ -120,6 +126,8 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       scales: {
         x: {
           time: true,
+          min: this.selection?.from,
+          max: this.selection?.to,
         },
         y: {},
       },
@@ -139,15 +147,12 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         init: [
           (u: any) => {
             u.root.addEventListener('click', (e: any) => {
-              console.log('CLICKEDDDDD');
               let hoveredSeriesIdx = u.cursor.idxs.findIndex((v: number) => v != null);
 
               if (hoveredSeriesIdx != -1) {
                 let hoveredDataIdx = u.cursor.idxs[hoveredSeriesIdx];
                 let seriesOpts = u.series[hoveredSeriesIdx];
                 let facetsData = u.data[hoveredSeriesIdx];
-
-                console.log(seriesOpts.label);
               }
             });
           },
@@ -176,7 +181,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   ngOnChanges(changes: SimpleChanges): void {
     if (this.recreateOnInputChange) {
       let settings = changes['settings'];
-      if (settings.previousValue) {
+      if (settings && settings.previousValue) {
         // it's a real edit
         this.createChart(this.settings);
       }
@@ -265,7 +270,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     let data = [this.settings.xValues, ...series.map((s) => s.data)];
     this.uplot.batch(() => {
       this.clearChart();
-      console.log(this.uplot.series);
       this.uplot.addSeries({
         label: 'Timestamp',
       });
@@ -278,7 +282,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   clearChart() {
     let seriesLength = this.uplot.series.length;
     for (let i = 0; i < seriesLength; i++) {
-      console.log('deleted one');
       this.uplot.delSeries(1); // we clean everything
     }
     this.uplot.delSeries(0);

@@ -1,12 +1,10 @@
-import { Component, ElementRef, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE } from '@exense/step-core';
 import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
 import { TimeSeriesService } from '../time-series.service';
-import { TSRangerSettings } from '../ranger/ts-ranger-settings';
 import { FindBucketsRequest } from '../find-buckets-request';
 import { TimeseriesColorsPool } from '../util/timeseries-colors-pool';
-import { Bucket } from '../bucket';
 import { TimeSeriesChartComponent } from '../chart/time-series-chart.component';
 import { KeyValue } from '@angular/common';
 import { TSTimeRange } from '../chart/model/ts-time-range';
@@ -17,6 +15,9 @@ import { TimeseriesTableComponent } from './table/timeseries-table.component';
 import { Subscription } from 'rxjs';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { ExecutionPageTimeSelectionComponent } from './time-selection/execution-page-time-selection.component';
+import { TimeSeriesExecutionService } from './time-series-execution.service';
+import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
+import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 
 declare const uPlot: any;
 
@@ -46,7 +47,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   @ViewChild('threadGroupChart') threadGroupChart!: TimeSeriesChartComponent;
   @ViewChild('tableChart') tableChart!: TimeseriesTableComponent;
 
-  @ViewChild('timeSelection') timeSelection!: ExecutionPageTimeSelectionComponent;
+  @ViewChild(ExecutionPageTimeSelectionComponent) timeSelectionComponent!: ExecutionPageTimeSelectionComponent;
 
   colorsPool = new TimeseriesColorsPool();
 
@@ -66,6 +67,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   execution: any;
   executionStart: number = 0;
   executionInProgress = false;
+  timeSelection!: ExecutionTimeSelection;
 
   subscriptions: Subscription = new Subscription();
   intervalExecution: any;
@@ -76,6 +78,75 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   valueAscOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => {
     return a.key.localeCompare(b.key);
   };
+
+  ngOnInit(): void {
+    this.executionService.onActiveSelectionChange().subscribe((newRange) => (this.timeSelection = newRange));
+
+    this.timeSeriesService.getExecutionDetails(this.executionId).subscribe((details) => {
+      this.executionService.activeExecution = details;
+      this.execution = details;
+      this.findRequest.start = details.startTime - (details.startTime % this.RESOLUTION_MS);
+      this.executionStart = this.findRequest.start;
+      // let now = new Date().getTime();
+      let endTime = details.endTime;
+      if (endTime) {
+        // execution is over
+        endTime = endTime + (this.RESOLUTION_MS - (endTime % this.RESOLUTION_MS)); // not sure if needed
+      } else {
+        this.executionInProgress = true;
+        endTime = new Date().getTime();
+      }
+      this.findRequest.end = endTime;
+      this.executionService.setActiveSelection({ type: RangeSelectionType.FULL });
+      this.findRequest.intervalSize = this.computeIntervalSize(this.findRequest.start, this.findRequest.end);
+
+      this.createSummaryChart(this.findRequest);
+      this.tableChart.init(this.findRequest);
+      this.createByStatusChart(this.findRequest);
+      this.createByKeywordsCharts(this.findRequest);
+      this.createThreadGroupsChart(this.findRequest);
+
+      if (this.executionInProgress) {
+        this.startRefreshInterval(5000);
+      }
+    });
+  }
+
+  startRefreshInterval(interval: number) {
+    this.intervalExecution = setInterval(() => {
+      if (this.intervalShouldBeCanceled) {
+        clearTimeout(this.intervalExecution);
+      }
+      let now = new Date().getTime();
+      // this.findRequest.start = lastEnd - ((lastEnd - this.executionStart) % this.findRequest.intervalSize);
+      this.findRequest.end = now;
+      this.findRequest.intervalSize = this.computeIntervalSize(this.findRequest.start, this.findRequest.end);
+      // this.tableChart.accumulateData(this.findRequest);
+      // this.updateByKeywordsCharts();
+      this.timeSelectionComponent.refresh();
+      if (this.timeSelection.type === RangeSelectionType.FULL) {
+        this.timeSelection.absoluteSelection = undefined;
+      } else if (this.timeSelection.type === RangeSelectionType.RELATIVE && this.timeSelection.relativeSelection) {
+        let endTime = this.execution.endTime || new Date().getTime();
+        let from = endTime - this.timeSelection.relativeSelection.timeInMs;
+        this.timeSelection.absoluteSelection = { from, to: endTime };
+      }
+      this.recreateAllCharts();
+      this.timeSeriesService.getExecutionDetails(this.executionId).subscribe((details) => {
+        if (details.endTime) {
+          this.intervalShouldBeCanceled = true;
+        }
+      });
+    }, interval);
+  }
+
+  recreateAllCharts() {
+    this.createSummaryChart(this.findRequest, true);
+    this.tableChart.init(this.findRequest);
+    this.createByStatusChart(this.findRequest, true);
+    this.createByKeywordsCharts(this.findRequest, true);
+    this.createThreadGroupsChart(this.findRequest, true);
+  }
 
   onKeywordToggle(keyword: string, event: any) {
     this.toggleKeyword(keyword);
@@ -110,62 +181,13 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  constructor(private timeSeriesService: TimeSeriesService) {}
+  constructor(private timeSeriesService: TimeSeriesService, private executionService: TimeSeriesExecutionService) {}
 
-  ngOnInit(): void {
-    this.timeSeriesService.getExecutionDetails(this.executionId).subscribe((details) => {
-      this.execution = details;
-      this.findRequest.start = details.startTime - (details.startTime % this.RESOLUTION_MS);
-      this.executionStart = this.findRequest.start;
-      // let now = new Date().getTime();
-      let endTime = details.endTime;
-      let executionInProgress = details.status === 'RUNNING';
-      if (executionInProgress) {
-        // we have no end
-        // endTime = now;
-        // this.findRequest.end = endTime - (endTime % this.RESOLUTION_MS) - 1;
-        this.findRequest.end = new Date().getTime();
-      } else {
-        this.findRequest.end = endTime + (this.RESOLUTION_MS - (endTime % this.RESOLUTION_MS));
-        let duration = this.findRequest.end - this.findRequest.start;
-        let nrOfPoints = 100;
-        let roundedInterval =
-          Math.round(duration / nrOfPoints / TimeSeriesConfig.RESOLUTION) * TimeSeriesConfig.RESOLUTION;
-        this.findRequest.intervalSize = Math.max(roundedInterval, TimeSeriesConfig.RESOLUTION);
-      }
-      this.executionInProgress = executionInProgress;
-
-      this.createRanger(this.findRequest);
-      this.createSummaryChart(this.findRequest);
-      this.tableChart.init(this.findRequest);
-      this.createByStatusChart(this.findRequest);
-      this.createByKeywordsCharts(this.findRequest);
-      this.createThreadGroupsChart(this.findRequest);
-      if (executionInProgress) {
-        this.intervalExecution = setInterval(() => {
-          if (this.intervalShouldBeCanceled) {
-            clearTimeout(this.intervalExecution);
-          }
-          let now = new Date().getTime();
-          let lastEnd = this.findRequest.end;
-          // this.findRequest.start = lastEnd - ((lastEnd - this.executionStart) % this.findRequest.intervalSize);
-          this.findRequest.end = now;
-          // this.tableChart.accumulateData(this.findRequest);
-          // this.updateByKeywordsCharts();
-          this.createRanger(this.findRequest);
-          this.createSummaryChart(this.findRequest, true);
-          // this.tableChart.init(this.findRequest, true);
-          this.createByStatusChart(this.findRequest, true);
-          this.createByKeywordsCharts(this.findRequest, true);
-          this.createThreadGroupsChart(this.findRequest, true);
-          this.timeSeriesService.getExecutionDetails(this.executionId).subscribe((details) => {
-            if (details.endTime) {
-              this.intervalShouldBeCanceled = true;
-            }
-          });
-        }, 5000);
-      }
-    });
+  computeIntervalSize(start: number, end: number): number {
+    let duration = end - start;
+    let nrOfPoints = 100;
+    let roundedInterval = Math.round(duration / nrOfPoints / TimeSeriesConfig.RESOLUTION) * TimeSeriesConfig.RESOLUTION;
+    return (this.findRequest.intervalSize = Math.max(roundedInterval, TimeSeriesConfig.RESOLUTION));
   }
 
   // updateByKeywordsCharts() {
@@ -315,7 +337,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   // }
 
   onZoomReset() {
-    this.timeSelection.resetZoom();
+    this.timeSelectionComponent.resetZoom();
   }
 
   createThreadGroupsChart(request: FindBucketsRequest, isUpdate = false) {
@@ -328,11 +350,14 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
           return; // TODO handle
         }
         let totalData: number[] = Array(response.matrix[0].length);
-        let countSeries = [];
-        let series = response.matrixKeys.map((key, i) => {
+        let dynamicSeries = response.matrixKeys.map((key, i) => {
           key = key[dimensionKey]; // get just the name
-          let countData = response.matrix[i].map((b, j) => {
+          let filledData = response.matrix[i].map((b, j) => {
             let bucketValue = b?.sum;
+            if (bucketValue == null && j > 0) {
+              // we try to keep a constant line
+              bucketValue = response.matrix[i][j - 1]?.sum;
+            }
             if (totalData[j] === undefined) {
               totalData[j] = bucketValue;
             } else if (bucketValue) {
@@ -340,19 +365,17 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
             }
             return bucketValue;
           });
-          let series = {
-            scale: 'total',
+          return {
+            scale: 'y',
             label: key,
             id: key,
-            data: countData,
+            data: filledData,
             value: (x, v) => Math.trunc(v),
             stroke: '#024981',
             width: 2,
             paths: this.stepped({ align: 1 }),
             points: { show: false },
           } as TSChartSeries;
-          countSeries.push(series);
-          return series;
         });
         this.threadGroupSettings = {
           title: 'Thread Groups (Concurrency)',
@@ -377,7 +400,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
               paths: this.stepped({ align: 1 }),
               points: { show: false },
             },
-            ...series,
+            ...dynamicSeries,
           ],
           axes: [
             {
@@ -397,30 +420,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
           this.threadGroupChart.redrawChart(this.threadGroupSettings);
         }
       });
-  }
-
-  createRanger(request: FindBucketsRequest) {
-    // this.timeSeriesService.fetchBucketsNew(request).subscribe((response) => {
-    //   let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-    //   console.log('TIME: ', response.start, response.end);
-    //   let avgData = response.matrix[0].map((b) => (b ? b.sum / b.count : null));
-    //   this.rangerSettings = {
-    //     title: 'Ranger',
-    //     xValues: timeLabels,
-    //     series: [
-    //       {
-    //         id: 'avg',
-    //         label: 'Response Time',
-    //         data: avgData,
-    //         // value: (self, x) => Math.trunc(x) + ' ms',
-    //         stroke: 'red',
-    //       },
-    //     ],
-    //   };
-    //   if (this.ranger) {
-    //     this.ranger.redrawChart();
-    //   }
-    // });
   }
 
   createSummaryChart(request: FindBucketsRequest, isUpdate = false) {
@@ -616,8 +615,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   handleTableRangeChange(newRange: TSTimeRange) {
     let clonedRequest = JSON.parse(JSON.stringify(this.findRequest)); // we make a clone in order to not pollute the global request
-    clonedRequest.start = Math.trunc(newRange.start);
-    clonedRequest.end = Math.trunc(newRange.end);
+    if (newRange.from) clonedRequest.start = Math.trunc(newRange.from);
+    if (newRange.to) clonedRequest.end = Math.trunc(newRange.to);
     this.tableChart.init(clonedRequest); // refresh the table
   }
 
