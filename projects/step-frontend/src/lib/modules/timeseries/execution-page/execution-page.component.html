@@ -9,6 +9,9 @@
       [execution]="execution"
     >
     </step-execution-time-selection>
+    <button *ngIf="executionInProgress" (click)="toggleRefresh()">
+      Toggle refresh ({{ refreshEnabled ? 'ON' : 'OFF' }})
+    </button>
     <div class="w-100 dashboard-container">
       <div class="chart-container">
         <step-chart-skeleton *ngIf="!summaryChartSettings"></step-chart-skeleton>

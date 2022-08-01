@@ -6,5 +6,5 @@ export interface FindBucketsRequest {
   numberOfBuckets?: number;
   intervalSize: number; // in ms
   threadGroupBuckets?: boolean;
-  pclPrecisions?: number[];
+  percentiles?: number[];
 }

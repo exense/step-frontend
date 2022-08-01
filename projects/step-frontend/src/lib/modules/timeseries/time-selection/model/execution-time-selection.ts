@@ -5,5 +5,5 @@ import { RangeSelectionType } from './range-selection-type';
 export interface ExecutionTimeSelection {
   type: RangeSelectionType;
   relativeSelection?: RelativeTimeSelection; // last X minutes
-  absoluteSelection?: { from?: number; to?: number };
+  absoluteSelection?: TSTimeRange;
 }

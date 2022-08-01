@@ -10,6 +10,9 @@ import { TimeRangePicker } from '../../time-selection/time-range-picker.componen
 import { TimeSeriesExecutionService } from '../time-series-execution.service';
 import { RangeSelectionType } from '../../time-selection/model/range-selection-type';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
+import { TimeSeriesConfig } from '../../time-series.config';
+import { Select } from 'uplot';
+import { TSRangerSettings } from '../../ranger/ts-ranger-settings';
 
 @Component({
   selector: 'step-execution-time-selection',
@@ -22,7 +25,7 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
   @Output('onRangeChange') onRangeChange = new EventEmitter<TSTimeRange>();
   @Output('onRangeReset') onRangeReset = new EventEmitter<TSTimeRange>();
 
-  rangerSettings: TSChartSettings | undefined;
+  rangerSettings: TSRangerSettings | undefined;
   @ViewChild(TSRangerComponent) rangerComponent!: TSRangerComponent;
   @ViewChild(TimeRangePicker) timeRangePicker!: TimeRangePicker;
 
@@ -35,29 +38,33 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
   ngOnInit(): void {
     this.executionService.onActiveSelectionChange().subscribe((range) => {
       this.selection = range;
-      console.log(this.selection);
     });
     this.createRanger();
   }
 
-  refresh() {
+  refreshRanger() {
     this.createRanger();
   }
 
   createRanger() {
+    let startTime = this.execution.startTime;
+    let endTime = this.execution.endTime || new Date().getTime();
     let request: FindBucketsRequest = {
       intervalSize: 0,
       params: { eId: this.execution.id },
-      start: this.execution.startTime,
-      end: this.execution.endTime || new Date().getTime(), // to current time if it's not ended
-      numberOfBuckets: 100,
+      start: startTime,
+      end: endTime, // to current time if it's not ended
+      numberOfBuckets: Math.trunc(
+        Math.min(TimeSeriesConfig.MAX_BUCKETS_IN_CHART, (endTime - startTime) / TimeSeriesConfig.RESOLUTION / 2)
+      ),
     };
     this.timeSeriesService.fetchBucketsNew(request).subscribe((response) => {
       this.timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
       let avgData = response.matrix[0].map((b) => (b ? b.sum / b.count : null));
+      let timeRange = this.prepareSelectForRanger(this.selection);
       this.rangerSettings = {
-        title: 'Ranger',
         xValues: this.timeLabels,
+        selection: timeRange,
         series: [
           {
             id: 'avg',
@@ -72,6 +79,15 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
       //   this.ranger.redrawChart();
       // }
     });
+  }
+
+  prepareSelectForRanger(selection: ExecutionTimeSelection): TSTimeRange | undefined {
+    if (selection.type === RangeSelectionType.FULL) {
+      return undefined;
+    } else {
+      // it is relative or absolute
+      return selection.absoluteSelection;
+    }
   }
 
   resetZoom() {
@@ -93,9 +109,11 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
     } else if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
       let endTime = this.execution.endTime || new Date().getTime();
       let from = endTime - timeSelection.relativeSelection.timeInMs;
-      this.selection.absoluteSelection = { from, to: endTime };
+      selectionToEmit.relativeSelection = timeSelection.relativeSelection;
+      selectionToEmit.absoluteSelection = { from, to: endTime };
       this.rangerComponent.selectRange(from, endTime);
     } else if (timeSelection.type === RangeSelectionType.ABSOLUTE && timeSelection.absoluteSelection) {
+      selectionToEmit.absoluteSelection = timeSelection.absoluteSelection;
       this.rangerComponent.selectRange(timeSelection.absoluteSelection.from, timeSelection.absoluteSelection.to);
     }
 

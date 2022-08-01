@@ -80,17 +80,36 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     if (settings && settings.previousValue) {
       // it's a real change
       this.init(settings.currentValue);
-      console.log(settings.currentValue);
+      let end = this.settings.xValues[this.settings.xValues.length - 1];
+      let start = this.settings.xValues[0];
+      console.log(new Date(start), new Date(end));
       this.createRanger();
     }
   }
 
   selectRange(fromTimestamp?: number, toTimestamp?: number) {
+    let select = this.transformRangeToSelect({ from: fromTimestamp, to: toTimestamp });
+
+    this.uplot.setSelect(select, false);
+    this.emitSelectionToLinkedCharts();
+
+    // if (emitChangeEvent) {
+    //   this.onRangeChange.emit({ start: fromTimestamp, end: toTimestamp });
+    // }
+  }
+
+  transformRangeToSelect(range?: TSTimeRange) {
+    if (!range) {
+      return undefined;
+    }
+    let fromTimestamp = range.from;
+    let toTimestamp = range.to;
     let left, width;
     let height = this.uplot.bbox.height / devicePixelRatio;
     if (!fromTimestamp) {
       left = Math.round(this.uplot.valToPos(this.start, 'x'));
     } else {
+      // console.log('LeftValToPos=', this.uplot.valToPos(fromTimestamp, 'x'), fromTimestamp);
       left = Math.max(this.uplot.valToPos(fromTimestamp, 'x'), 0);
     }
     if (!toTimestamp) {
@@ -98,13 +117,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     } else {
       width = Math.round(this.uplot.valToPos(toTimestamp, 'x')) - left;
     }
-
-    this.uplot.setSelect({ left, width, height }, false);
-    this.emitSelectionToLinkedCharts();
-
-    // if (emitChangeEvent) {
-    //   this.onRangeChange.emit({ start: fromTimestamp, end: toTimestamp });
-    // }
+    return { left, width, height };
   }
 
   resetSelect(emitResetEvent = false) {
@@ -217,11 +230,17 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
         // zoom(newLft, newWid);
       }
     };
+    let select;
+    if (this.settings.selection) {
+      select = this.transformRangeToSelect(this.settings.selection);
+    }
+    // console.log('CREATING WITH SELECT: ', this.settings.selection);
     let rangerOpts = {
       width: 800,
       height: 100,
       ms: 1, // if not specified it's going be in seconds
       // select: {left: 0, width: 300, height: 33},
+      // select: select,
       axes: [
         {},
         {
@@ -264,8 +283,6 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       scales: {
         x: {
           time: true,
-          min: this.selection?.from,
-          max: this.selection?.to,
         },
       },
       series: [
@@ -290,7 +307,10 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
             let left = 0;
             let width = Math.round(uRanger.valToPos(this.end, 'x')) - left;
             let height = uRanger.bbox.height / devicePixelRatio;
-            uRanger.setSelect({ left, width, height }, false);
+            if (!this.settings.selection) {
+              // we deal with full selection
+              // uRanger.setSelect({ left, width, height }, false);
+            }
             this.previousRange = { from: this.start, to: this.end };
             const sel = uRanger.root.querySelector('.u-select');
 

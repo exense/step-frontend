@@ -1,5 +1,6 @@
 import uPlot from '../../uplot/uPlot';
 import { Axis, Cursor, Series } from 'uplot';
+import Select = uPlot.Select;
 
 export interface TSChartSettings {
   title: string;

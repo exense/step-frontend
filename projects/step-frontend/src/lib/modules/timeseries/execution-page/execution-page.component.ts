@@ -67,6 +67,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   execution: any;
   executionStart: number = 0;
   executionInProgress = false;
+  refreshEnabled = false;
   timeSelection!: ExecutionTimeSelection;
 
   subscriptions: Subscription = new Subscription();
@@ -85,7 +86,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     this.timeSeriesService.getExecutionDetails(this.executionId).subscribe((details) => {
       this.executionService.activeExecution = details;
       this.execution = details;
-      this.findRequest.start = details.startTime - (details.startTime % this.RESOLUTION_MS);
+      let startTime = details.startTime - (details.startTime % this.RESOLUTION_MS);
+      this.findRequest.start = startTime;
       this.executionStart = this.findRequest.start;
       // let now = new Date().getTime();
       let endTime = details.endTime;
@@ -98,8 +100,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       }
       this.findRequest.end = endTime;
       this.executionService.setActiveSelection({ type: RangeSelectionType.FULL });
-      this.findRequest.intervalSize = this.computeIntervalSize(this.findRequest.start, this.findRequest.end);
-
+      // this.findRequest.intervalSize = this.computeIntervalSize(this.findRequest.start, this.findRequest.end);
+      this.findRequest.numberOfBuckets = this.calculateIdealNumberOfBuckets(startTime, endTime);
       this.createSummaryChart(this.findRequest);
       this.tableChart.init(this.findRequest);
       this.createByStatusChart(this.findRequest);
@@ -107,7 +109,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       this.createThreadGroupsChart(this.findRequest);
 
       if (this.executionInProgress) {
-        this.startRefreshInterval(5000);
+        this.startRefreshInterval(3000);
+        this.refreshEnabled = true;
       }
     });
   }
@@ -120,18 +123,22 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       let now = new Date().getTime();
       // this.findRequest.start = lastEnd - ((lastEnd - this.executionStart) % this.findRequest.intervalSize);
       this.findRequest.end = now;
-      this.findRequest.intervalSize = this.computeIntervalSize(this.findRequest.start, this.findRequest.end);
+      this.findRequest.numberOfBuckets = this.calculateIdealNumberOfBuckets(
+        this.findRequest.start,
+        this.findRequest.end
+      );
       // this.tableChart.accumulateData(this.findRequest);
       // this.updateByKeywordsCharts();
-      this.timeSelectionComponent.refresh();
-      if (this.timeSelection.type === RangeSelectionType.FULL) {
-        this.timeSelection.absoluteSelection = undefined;
-      } else if (this.timeSelection.type === RangeSelectionType.RELATIVE && this.timeSelection.relativeSelection) {
-        let endTime = this.execution.endTime || new Date().getTime();
-        let from = endTime - this.timeSelection.relativeSelection.timeInMs;
-        this.timeSelection.absoluteSelection = { from, to: endTime };
-      }
-      this.recreateAllCharts();
+      this.timeSelectionComponent.refreshRanger();
+      // if (this.timeSelection.type === RangeSelectionType.FULL) {
+      //   this.timeSelection.absoluteSelection = undefined;
+      // } else if (this.timeSelection.type === RangeSelectionType.RELATIVE && this.timeSelection.relativeSelection) {
+      //   let endTime = this.execution.endTime || new Date().getTime();
+      //   let from = endTime - this.timeSelection.relativeSelection.timeInMs;
+      //   this.timeSelection.absoluteSelection = { from, to: endTime };
+      // }
+      // this.executionService.setActiveSelection(this.timeSelection);
+      // this.recreateAllCharts();
       this.timeSeriesService.getExecutionDetails(this.executionId).subscribe((details) => {
         if (details.endTime) {
           this.intervalShouldBeCanceled = true;
@@ -182,13 +189,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   constructor(private timeSeriesService: TimeSeriesService, private executionService: TimeSeriesExecutionService) {}
-
-  computeIntervalSize(start: number, end: number): number {
-    let duration = end - start;
-    let nrOfPoints = 100;
-    let roundedInterval = Math.round(duration / nrOfPoints / TimeSeriesConfig.RESOLUTION) * TimeSeriesConfig.RESOLUTION;
-    return (this.findRequest.intervalSize = Math.max(roundedInterval, TimeSeriesConfig.RESOLUTION));
-  }
 
   // updateByKeywordsCharts() {
   //   let dimensionKey = 'name';
@@ -613,6 +613,15 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * If the execution is very short (or just started), we don't want a big number of buckets.
+   */
+  calculateIdealNumberOfBuckets(startTime: number, endTime: number): number {
+    return Math.trunc(
+      Math.min(TimeSeriesConfig.MAX_BUCKETS_IN_CHART, (endTime - startTime) / TimeSeriesConfig.RESOLUTION / 2)
+    );
+  }
+
   handleTableRangeChange(newRange: TSTimeRange) {
     let clonedRequest = JSON.parse(JSON.stringify(this.findRequest)); // we make a clone in order to not pollute the global request
     if (newRange.from) clonedRequest.start = Math.trunc(newRange.from);
@@ -621,13 +630,22 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   handleRangeReset(newRange: TSTimeRange) {
-    console.log('RESET ZOOM');
     this.responseTimeByKeywordsChart.resetZoom();
     this.byStatusChart.resetZoom();
     this.byStatusChart.resetZoom();
     this.summaryChart.resetZoom();
     this.throughputByKeywordsChart.resetZoom();
     this.handleTableRangeChange(newRange);
+  }
+
+  toggleRefresh() {
+    this.refreshEnabled = !this.refreshEnabled;
+    if (this.refreshEnabled) {
+      // new status
+      this.startRefreshInterval(3000);
+    } else {
+      clearTimeout(this.intervalExecution);
+    }
   }
 
   onAllSeriesCheckboxClick(event: any) {

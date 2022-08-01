@@ -63,7 +63,7 @@ export class TimeseriesTableComponent implements OnInit {
         ...request,
         groupDimensions: [this.dimensionKey],
         numberOfBuckets: 1,
-        pclPrecisions: [80, 90, 99],
+        percentiles: [80, 90, 99],
       })
       .subscribe((response) => {
         this.response = response;
