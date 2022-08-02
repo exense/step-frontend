@@ -51,3 +51,4 @@ Thumbs.db
 # managed packages
 bower_components
 node_modules
+.npmrc
