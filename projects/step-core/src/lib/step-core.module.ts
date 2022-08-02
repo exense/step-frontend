@@ -93,6 +93,7 @@ export * from './angularjs';
 export * from './directives/tooltip.directive';
 export * from './directives/caps-lock.directive';
 export * from './pipes/has-right.pipe';
+export * from './pipes/dashboard-link.pipe';
 export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
 export * from './modules/basics/step-basics.module';
