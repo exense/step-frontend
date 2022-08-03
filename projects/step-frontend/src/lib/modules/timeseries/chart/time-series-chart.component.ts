@@ -251,9 +251,9 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   // this is removing the last element in the chart. this is used while streaming, in order to replace the element with a full set of data
   removeTail() {
-    this.uplot.data.forEach((series) => {
-      (series as number[]).pop();
-    });
+    // this.uplot.data.forEach((series) => {
+    //   (series as number[]).pop();
+    // });
   }
 
   addData(data: number[], seriesIndex: number) {

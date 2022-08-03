@@ -6,4 +6,5 @@ export interface Bucket {
   min: number;
   max: number;
   pclValues: { [key: number]: number };
+  throughputPerHour: number;
 }

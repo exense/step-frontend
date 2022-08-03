@@ -240,7 +240,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       height: 100,
       ms: 1, // if not specified it's going be in seconds
       // select: {left: 0, width: 300, height: 33},
-      // select: select,
+      select: select,
       axes: [
         {},
         {
@@ -309,7 +309,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
             let height = uRanger.bbox.height / devicePixelRatio;
             if (!this.settings.selection) {
               // we deal with full selection
-              // uRanger.setSelect({ left, width, height }, false);
+              uRanger.setSelect({ left, width, height }, false);
             }
             this.previousRange = { from: this.start, to: this.end };
             const sel = uRanger.root.querySelector('.u-select');

@@ -4,6 +4,7 @@ import { TimeSeriesService } from '../../time-series.service';
 import { FindBucketsRequest } from '../../find-buckets-request';
 import { TimeseriesColorsPool } from '../../util/timeseries-colors-pool';
 import { TimeSeriesChartResponse } from '../../time-series-chart-response';
+import { TimeSeriesKeywordsService } from '../time-series-keywords.service';
 
 @Component({
   selector: 'step-timeseries-table',
@@ -19,15 +20,26 @@ export class TimeseriesTableComponent implements OnInit {
   dimensionKey = 'name';
   response: TimeSeriesChartResponse | undefined;
 
-  @Input('colorsPool') colorsPool!: TimeseriesColorsPool;
-  @Output('onKeywordsFetched') onKeywordsFetched = new EventEmitter<string[]>();
+  @Input('keywordsService') keywordsService!: TimeSeriesKeywordsService;
+
+  // @Output('onKeywordsFetched') onKeywordsFetched = new EventEmitter<string[]>();
+  // @Output('onKeywordToggled') onKeywordToggled = new EventEmitter<string>();
 
   sortByNameAttributeFn = (a: Bucket, b: Bucket) =>
     a.attributes.name.toLowerCase() > b.attributes.name.toLowerCase() ? 1 : -1;
 
   constructor(private timeSeriesService: TimeSeriesService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.keywordsService.onKeywordToggled().subscribe((selection) => {
+      console.log('KEYWORD TOGGLED!', selection);
+      this.bucketsByKeywords[selection.id].attributes.isSelected = selection.isSelected;
+    });
+  }
+
+  onKeywordToggle(keyword: string, event: any) {
+    this.keywordsService.toggleKeyword(keyword);
+  }
 
   // for live streaming
   accumulateData(request: FindBucketsRequest) {
@@ -48,7 +60,7 @@ export class TimeseriesTableComponent implements OnInit {
             existingBucketForKeyword.count += bucket.count;
             existingBucketForKeyword.min = Math.min(existingBucketForKeyword.min, bucket.min);
             existingBucketForKeyword.max = Math.min(existingBucketForKeyword.max, bucket.max);
-            // TODO update distribution
+            // TODO update percentiles
           } else {
             this.bucketsByKeywords[keywordName] = bucket;
           }
@@ -78,15 +90,17 @@ export class TimeseriesTableComponent implements OnInit {
             let bucket = series[0];
             bucket.attributes = attributes;
             let keywordName = attributes[this.dimensionKey];
-            bucket.attributes.color = this.colorsPool.getColor(keywordName);
+            bucket.attributes.color = this.keywordsService.getColor(keywordName);
             bucket.attributes.avg = (bucket.sum / bucket.count).toFixed(0);
+            let keywordSelection = this.keywordsService.getKeywordSelection(keywordName);
+            bucket.attributes.isSelected = keywordSelection ? keywordSelection.isSelected : true; // true because it has not been loaded yet
             // this.keywords[attributes[dimensionKey]] = { color: color, isSelected: true };
             keywords.push(keywordName);
             this.bucketsByKeywords[keywordName] = bucket;
             return bucket;
           })
           .sort(this.sortByNameAttributeFn);
-        this.onKeywordsFetched.emit(keywords);
+        this.keywordsService.setKeywords(keywords);
         this.tableIsLoading = false;
       });
   }

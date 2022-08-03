@@ -6,6 +6,16 @@ export class UPlotUtils {
     return !(xData[0] === uplot.scales['x'].min && xData[xData.length - 1] === uplot.scales['x'].max);
   }
 
+  static formatMilliseconds(value: number): string {
+    if (value >= 1000) {
+      let seconds = Math.floor(value / 1000);
+      let decimal = String(Math.floor(value % 1000).toFixed(2))[0];
+      return `${seconds}.${decimal} s`;
+    } else {
+      return Math.trunc(value) + ' ms';
+    }
+  }
+
   // @ts-ignore
   static closestNotEmptyPointFunction = (self, seriesIdx, hoveredIdx, cursorXVal) => {
     let xValues = self.data[0];

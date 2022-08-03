@@ -147,7 +147,7 @@ export function tooltipPlugin() {
             continue;
           }
           if (series.scale === 'total') {
-            // TODO add this info somewhere
+            // TODO add this secondary axis somewhere
           }
         }
         yPoints.sort((a, b) => (a.value - b.value) * -1);
@@ -168,6 +168,7 @@ export function tooltipPlugin() {
           }
         }
         if (yPoints.length === 0) {
+          overlay.style.display = 'none';
           return; // there is no data to show
         }
         overlay.innerHTML = '';
@@ -176,10 +177,12 @@ export function tooltipPlugin() {
           rowElement.classList.add('tooltip-row');
           let content = document.createElement('div');
           content.textContent = `${point.name} : ${Math.trunc(point.value)}`;
-          let colorDiv = document.createElement('div');
-          colorDiv.classList.add('color');
-          colorDiv.style.backgroundColor = point.color;
-          rowElement.appendChild(colorDiv);
+          if (point.color) {
+            let colorDiv = document.createElement('div');
+            colorDiv.classList.add('color');
+            colorDiv.style.backgroundColor = point.color;
+            rowElement.appendChild(colorDiv);
+          }
           rowElement.appendChild(content);
           overlay.appendChild(rowElement);
         });

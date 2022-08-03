@@ -3,6 +3,13 @@
     <th mat-header-cell *matHeaderCellDef>Name</th>
     <td mat-cell *matCellDef="let element">
       <div class="color-cell">
+        <input
+          style="margin: unset; margin-right: 6px"
+          type="checkbox"
+          [(ngModel)]="element.attributes.isSelected"
+          class="checkbox"
+          (change)="onKeywordToggle(element.attributes[dimensionKey], $event)"
+        />
         <span class="color-square" [style.background-color]="element.attributes.color"></span>
         <span>{{ element.attributes.name }}</span>
       </div>

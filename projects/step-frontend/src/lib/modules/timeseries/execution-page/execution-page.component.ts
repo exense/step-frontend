@@ -18,6 +18,7 @@ import { ExecutionPageTimeSelectionComponent } from './time-selection/execution-
 import { TimeSeriesExecutionService } from './time-series-execution.service';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
+import { KeywordSelection, TimeSeriesKeywordsService } from './time-series-keywords.service';
 
 declare const uPlot: any;
 
@@ -28,6 +29,7 @@ declare const uPlot: any;
 })
 export class ExecutionPageComponent implements OnInit, OnDestroy {
   private RESOLUTION_MS = 1000;
+  private LEGEND_SIZE = 65;
   syncKey = 'test';
   executionId = window.location.href.split('/').slice(-1)[0]; // last part of URL
 
@@ -49,12 +51,10 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   @ViewChild(ExecutionPageTimeSelectionComponent) timeSelectionComponent!: ExecutionPageTimeSelectionComponent;
 
-  colorsPool = new TimeseriesColorsPool();
-
   barsFunction = uPlot.paths.bars;
   stepped = uPlot.paths.stepped;
 
-  keywords: { [key: string]: { isSelected: boolean; color: string } } = {};
+  keywords: { [key: string]: KeywordSelection } = {};
   keywordSearchValue: string = '';
 
   findRequest: FindBucketsRequest = {
@@ -74,13 +74,33 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   intervalExecution: any;
   intervalShouldBeCanceled = false;
 
-  allSeriesChecked = true;
+  allSeriesChecked: boolean = true;
+
+  private colorsPool = new TimeseriesColorsPool();
+  keywordsService = new TimeSeriesKeywordsService(this.colorsPool);
 
   valueAscOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => {
     return a.key.localeCompare(b.key);
   };
 
+  constructor(private timeSeriesService: TimeSeriesService, private executionService: TimeSeriesExecutionService) {}
+
+  onAllSeriesCheckboxClick(event: any) {
+    this.keywordsService.toggleSelectAll();
+  }
+
   ngOnInit(): void {
+    this.keywordsService.onAllSelectionChanged().subscribe((selected) => {
+      this.allSeriesChecked = selected;
+    });
+    this.keywordsService.onKeywordToggled().subscribe((selection) => {
+      this.throughputByKeywordsChart.toggleSeries(selection.id);
+      this.responseTimeByKeywordsChart.toggleSeries(selection.id);
+      this.keywords[selection.id] = selection;
+    });
+    this.keywordsService.onKeywordsUpdated().subscribe((keywords) => {
+      this.keywords = keywords;
+    });
     this.executionService.onActiveSelectionChange().subscribe((newRange) => (this.timeSelection = newRange));
 
     this.timeSeriesService.getExecutionDetails(this.executionId).subscribe((details) => {
@@ -99,7 +119,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         endTime = new Date().getTime();
       }
       this.findRequest.end = endTime;
-      this.executionService.setActiveSelection({ type: RangeSelectionType.FULL });
       // this.findRequest.intervalSize = this.computeIntervalSize(this.findRequest.start, this.findRequest.end);
       this.findRequest.numberOfBuckets = this.calculateIdealNumberOfBuckets(startTime, endTime);
       this.createSummaryChart(this.findRequest);
@@ -123,6 +142,10 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       let now = new Date().getTime();
       // this.findRequest.start = lastEnd - ((lastEnd - this.executionStart) % this.findRequest.intervalSize);
       this.findRequest.end = now;
+      if (this.timeSelection.type === RangeSelectionType.RELATIVE && this.timeSelection.relativeSelection) {
+        let from = now - this.timeSelection.relativeSelection.timeInMs;
+        this.timeSelection.absoluteSelection = { from: from, to: now };
+      }
       this.findRequest.numberOfBuckets = this.calculateIdealNumberOfBuckets(
         this.findRequest.start,
         this.findRequest.end
@@ -138,7 +161,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       //   this.timeSelection.absoluteSelection = { from, to: endTime };
       // }
       // this.executionService.setActiveSelection(this.timeSelection);
-      // this.recreateAllCharts();
+      this.recreateAllCharts();
       this.timeSeriesService.getExecutionDetails(this.executionId).subscribe((details) => {
         if (details.endTime) {
           this.intervalShouldBeCanceled = true;
@@ -156,12 +179,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   onKeywordToggle(keyword: string, event: any) {
-    this.toggleKeyword(keyword);
-    let checked = event.target.checked;
-
-    if (!checked) {
-      this.allSeriesChecked = false;
-    }
+    this.keywordsService.toggleKeyword(keyword);
 
     // let filteredSource: Bucket[] = [];
     // this.tableDataSource.forEach(e => {
@@ -172,23 +190,16 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     // this.tableDataSource = filteredSource;
   }
 
-  toggleKeyword(keyword: string) {
-    this.throughputByKeywordsChart.toggleSeries(keyword);
-    this.responseTimeByKeywordsChart.toggleSeries(keyword);
-  }
-
-  onKeywordsFetched(keywords: string[]) {
-    keywords.forEach((keyword) => {
-      let existingKeyword = this.keywords[keyword];
-      if (existingKeyword) {
-        // don't override existing keywords
-        return;
-      }
-      this.keywords[keyword] = { isSelected: true, color: this.colorsPool.getColor(keyword) };
-    });
-  }
-
-  constructor(private timeSeriesService: TimeSeriesService, private executionService: TimeSeriesExecutionService) {}
+  // onKeywordsFetched(keywords: string[]) {
+  //   keywords.forEach((keyword) => {
+  //     let existingKeyword = this.keywords[keyword];
+  //     if (existingKeyword) {
+  //       // don't override existing keywords
+  //       return;
+  //     }
+  //     this.keywords[keyword] = { isSelected: true, color: this.colorsPool.getColor(keyword) };
+  //   });
+  // }
 
   // updateByKeywordsCharts() {
   //   let dimensionKey = 'name';
@@ -353,10 +364,10 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         let dynamicSeries = response.matrixKeys.map((key, i) => {
           key = key[dimensionKey]; // get just the name
           let filledData = response.matrix[i].map((b, j) => {
-            let bucketValue = b?.sum;
+            let bucketValue = b?.max;
             if (bucketValue == null && j > 0) {
               // we try to keep a constant line
-              bucketValue = response.matrix[i][j - 1]?.sum;
+              bucketValue = response.matrix[i][j - 1]?.max;
             }
             if (totalData[j] === undefined) {
               totalData[j] = bucketValue;
@@ -405,13 +416,14 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
           axes: [
             {
               scale: 'y',
-              values: (u, vals, space) => vals.map((v) => +v.toFixed(0)),
+              size: this.LEGEND_SIZE,
+              values: (u, vals, space) => vals.map((v) => UPlotUtils.formatMilliseconds(v)),
             },
             {
               side: 1,
-              // size: 60,
+              size: this.LEGEND_SIZE,
               scale: 'total',
-              values: (u, vals, space) => vals.map((v) => +v.toFixed(0)),
+              values: (u, vals, space) => vals.map((v) => v),
               grid: { show: false },
             },
           ],
@@ -469,13 +481,14 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         axes: [
           {
             scale: 'y',
-            values: (u, vals, space) => vals.map((v) => +v.toFixed(2) + ' ms'),
+            size: this.LEGEND_SIZE,
+            values: (u, vals, space) => vals.map((v) => UPlotUtils.formatMilliseconds(v)),
           },
           {
             side: 1,
-            // size: 60,
+            size: this.LEGEND_SIZE,
             scale: 'total',
-            values: (u, vals, space) => vals.map((v) => +v.toFixed(2)),
+            values: (u, vals, space) => vals.map((v) => v),
             grid: { show: false },
           },
         ],
@@ -510,7 +523,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         series: series,
         axes: [
           {
-            values: (u, vals, space) => vals.map((v) => Math.trunc(v)),
+            size: this.LEGEND_SIZE,
+            values: (u, vals, space) => vals.map((v) => UPlotUtils.formatMilliseconds(v)),
           },
         ],
       };
@@ -543,8 +557,10 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
           }
           return bucketValue;
         });
+        let keywordSelection = this.keywordsService.getKeywordSelection(key);
         let series = {
           scale: 'y',
+          show: keywordSelection ? keywordSelection.isSelected : true,
           label: key,
           id: key,
           data: countData,
@@ -582,13 +598,14 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         axes: [
           {
             scale: 'y',
-            values: (u, vals, space) => vals.map((v) => +v.toFixed(2) + ' ms'),
+            size: this.LEGEND_SIZE,
+            values: (u, vals, space) => vals.map((v) => UPlotUtils.formatMilliseconds(v)),
           },
           {
             side: 1,
-            // size: 60,
+            size: this.LEGEND_SIZE,
             scale: 'total',
-            values: (u, vals, space) => vals.map((v) => +v.toFixed(2)),
+            values: (u, vals, space) => vals.map((v) => v),
             grid: { show: false },
           },
         ],
@@ -602,7 +619,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         axes: [
           {
             scale: 'y',
-            values: (u, vals, space) => vals.map((v) => +v.toFixed(2)),
+            size: this.LEGEND_SIZE,
+            values: (u, vals, space) => vals.map((v) => UPlotUtils.formatMilliseconds(v)),
           },
         ],
       };
@@ -646,20 +664,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     } else {
       clearTimeout(this.intervalExecution);
     }
-  }
-
-  onAllSeriesCheckboxClick(event: any) {
-    let checked = event.target.checked;
-    if (checked) {
-      this.throughputByKeywordsChart.showAllSeries();
-      this.responseTimeByKeywordsChart.showAllSeries();
-    } else {
-      this.throughputByKeywordsChart.hideAllSeries();
-      this.responseTimeByKeywordsChart.hideAllSeries();
-    }
-    Object.keys(this.keywords).forEach((keyword) => {
-      this.keywords[keyword].isSelected = checked;
-    });
   }
 
   ngOnDestroy(): void {

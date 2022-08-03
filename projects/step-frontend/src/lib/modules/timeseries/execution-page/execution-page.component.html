@@ -88,14 +88,12 @@
       </div>
 
       <div class="chart-container">
-        <step-timeseries-table
-          #tableChart
-          [colorsPool]="colorsPool"
-          (onKeywordsFetched)="onKeywordsFetched($event)"
-        ></step-timeseries-table>
+        <step-timeseries-table #tableChart [keywordsService]="keywordsService"></step-timeseries-table>
       </div>
 
-      <div class="chart-container pie-chart-container"></div>
+      <!--      <div class="chart-container pie-chart-container">-->
+      <!--        -->
+      <!--      </div>-->
     </div>
   </div>
   <div class="side-panel">
@@ -116,7 +114,7 @@
           <div class="color-cell">
             <input
               type="checkbox"
-              [(ngModel)]="item.value.isSelected"
+              [ngModel]="item.value.isSelected"
               class="checkbox"
               (change)="onKeywordToggle(item.key, $event)"
             />
