@@ -42,13 +42,11 @@ export class DashboardService {
   }
 
   private makeDashboardLink(taskId: string, isGrafanaAvailable?: boolean) {
-    let result: string;
     if (isGrafanaAvailable) {
-      result = '/#/root/grafana?d=3JB9j357k&orgId=1&var-taskId_current=' + taskId;
+      return '/#/root/grafana?d=3JB9j357k&orgId=1&var-taskId_current=' + taskId;
     } else {
-      result = '/#/root/dashboards/__pp__RTMDashboard?__filter1__=text,taskId,' + taskId;
+      return '/#/root/dashboards/__pp__RTMDashboard?__filter1__=text,taskId,' + taskId;
     }
-    return result;
   }
 
   checkAvailability(taskId: string) {
