@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { BehaviorSubject, switchMap, of, catchError, noop, shareReplay, tap, map, lastValueFrom } from 'rxjs';
+import { BehaviorSubject, switchMap, of, catchError, noop, shareReplay, tap, map, lastValueFrom, first } from 'rxjs';
 import {
   AJS_MODULE,
   AugmentedSchedulerService,
@@ -86,7 +86,12 @@ export class ScheduledTaskListComponent implements OnDestroy {
   }
 
   navToStats(scheduledTask: ExecutiontTaskParameters) {
-    window.open(this._dashboardService.getDashboardLink(scheduledTask.id!), '_blank');
+    this._dashboardService
+      .getDashboardLink(scheduledTask.id!)
+      .pipe(first())
+      .subscribe((url) => {
+        window.open(url, '_blank');
+      });
   }
 
   navToPlan(planId: string) {
