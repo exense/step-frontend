@@ -49,7 +49,7 @@ export class DashboardService {
     }
   }
 
-  checkAvailability(taskId: string) {
+  private checkAvailability(taskId: string) {
     this.requestingGrafanaAvailable = true;
 
     try {
