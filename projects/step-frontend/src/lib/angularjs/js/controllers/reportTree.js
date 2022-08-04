@@ -1,4 +1,4 @@
-/*******************************************************************************
+  /*******************************************************************************
  * Copyright (C) 2020, exense GmbH
  *
  * This file is part of STEP
@@ -150,7 +150,7 @@ angular
 
         $scope.pagingNext = function (obj) {
           var node = tree.get_selected(true)[0];
-          pagingNextById(node.id);
+          $scope.pagingNextById(node.id);
         };
 
         $scope.pagingNextById = function (id) {
