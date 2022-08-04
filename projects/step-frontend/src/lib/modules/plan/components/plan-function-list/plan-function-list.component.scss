@@ -1,0 +1,19 @@
+@import '../../../_common/styles/mixins';
+
+.plans-function-name-searchfield {
+  width: 85%;
+}
+
+step-btn-group {
+  float: right;
+  margin-left: 1rem;
+}
+
+:host {
+  @include table-container;
+}
+
+.header {
+  @include table-header;
+  padding: 8px;
+}

@@ -47,21 +47,13 @@
 				<div class="panel-body">
 						<uib-tabset  active="componentTabs.selectedTab">
 							<uib-tab heading="Controls">
-								<div class="panel-body">
-									<div class="row">
-										<select-entity type="'artefact'" on-selection="addControl" />
-									</div>
-								</div>
+                <step-plan-artefact-list (on-selection)="addControl($event)"></step-plan-artefact-list>
 							</uib-tab>
 							<uib-tab heading="Keywords">
-								<div class="row">
-									<div class="panel-body">
-										<select-entity type="'functions'" on-selection="addFunction" />
-									</div>
-								</div>
-							</uib-tab>
+                <step-plan-function-list (on-selection)="addFunction($event)"></step-plan-function-list>
+  						</uib-tab>
 							<uib-tab heading="Other plans">
-                <step-other-plan-list (on-selection)="addPlan($event)"></step-other-plan-list>
+                <step-plan-otherplan-list (on-selection)="addPlan($event)"></step-plan-otherplan-list>
 							</uib-tab>
 							<uib-tab heading="Console" ng-if="isInteractiveSessionActive()">
 								<div class="row">

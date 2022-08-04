@@ -6,18 +6,16 @@
 
   <mat-form-field appearance="fill">
     <mat-label>Username</mat-label>
-    <input matInput [(ngModel)]="credentials.username" name="username" />
+    <input matInput [(ngModel)]="credentials.username" name="username" (keyup.enter)="login()" />
   </mat-form-field>
 
   <mat-form-field appearance="fill" (stepCapsLock)="capsLock = $event">
     <mat-label>Password</mat-label>
-    <input matInput [(ngModel)]="credentials.password" name="password" />
+    <input matInput [(ngModel)]="credentials.password" name="password" type="password" (keyup.enter)="login()" />
     <span *ngIf="capsLock" class="capslock-warning"> <mat-icon>warning</mat-icon> Caps lock is on </span>
   </mat-form-field>
 
   <div mat-dialog-actions align="end">
-    <button mat-stroked-button color="primary" aria-label="Login" (click)="login()">
-      <mat-icon>login</mat-icon> Login
-    </button>
+    <button mat-button color="primary" aria-label="Login" (click)="login()"><mat-icon>login</mat-icon> Login</button>
   </div>
 </mat-card>

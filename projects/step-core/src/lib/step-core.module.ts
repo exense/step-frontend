@@ -7,16 +7,18 @@ import { TooltipDirective } from './directives/tooltip.directive';
 import { CORE_INITIALIZER } from './core-initialiser';
 import { StepMaterialModule } from './modules/step-material/step-material.module';
 import { HasRightPipe } from './pipes/has-right.pipe';
+import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { TableModule } from './modules/table/table.module';
 import { StepBasicsModule } from './modules/basics/step-basics.module';
 import { MAT_LUXON_DATE_ADAPTER_OPTIONS, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { EntityModule } from './modules/entity/entity.module';
 import { StepGeneratedClientModule } from './client/generated';
+import { EntitiesSelectionModule } from './modules/entities-selection/entities-selection.module';
 import { CapsLockDirective } from './directives/caps-lock.directive';
 
 @NgModule({
-  declarations: [TooltipDirective, HasRightPipe, CapsLockDirective],
+  declarations: [TooltipDirective, HasRightPipe, DashboardLinkPipe, CapsLockDirective],
   imports: [
     CommonModule,
     FormsModule,
@@ -27,6 +29,7 @@ import { CapsLockDirective } from './directives/caps-lock.directive';
     TableModule,
     StepBasicsModule,
     EntityModule,
+    EntitiesSelectionModule,
     StepGeneratedClientModule,
   ],
   exports: [
@@ -39,9 +42,11 @@ import { CapsLockDirective } from './directives/caps-lock.directive';
     CapsLockDirective,
     StepMaterialModule,
     HasRightPipe,
+    DashboardLinkPipe,
     TableModule,
     StepBasicsModule,
     EntityModule,
+    EntitiesSelectionModule,
     StepGeneratedClientModule,
   ],
   providers: [
@@ -88,10 +93,12 @@ export * from './angularjs';
 export * from './directives/tooltip.directive';
 export * from './directives/caps-lock.directive';
 export * from './pipes/has-right.pipe';
+export * from './pipes/dashboard-link.pipe';
 export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
 export * from './modules/basics/step-basics.module';
 export * from './modules/entity/entity.module';
+export * from './modules/entities-selection/entities-selection.module';
 export * from './client/generated/index';
 export * from './client/step-client-module';
 

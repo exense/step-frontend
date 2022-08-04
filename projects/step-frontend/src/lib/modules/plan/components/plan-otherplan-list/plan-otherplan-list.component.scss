@@ -1,0 +1,18 @@
+@import '../../../_common/styles/mixins';
+
+.otherplans-name-searchfield {
+  width: 85%;
+}
+
+step-btn-group {
+  float: right;
+}
+
+:host {
+  @include table-container;
+}
+
+.header {
+  @include table-header;
+  padding: 8px;
+}

@@ -538,7 +538,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     let dimensionKey = 'name';
     this.timeSeriesService.fetchBucketsNew({ ...request, groupDimensions: [dimensionKey] }).subscribe((response) => {
       let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-      let totalData: number[] = Array(response.matrix[0].length); // TODO handle empty response
+      let totalData: number[] = !!response.matrix[0] ? Array(response.matrix[0].length) : []; // TODO handle empty response
       let avgSeries: TSChartSeries[] = [];
       let countSeries = [];
       let series = response.matrixKeys.map((key, i) => {

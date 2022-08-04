@@ -4,10 +4,24 @@ import { AutorefreshToggleComponent } from './components/autorefresh-toggle/auto
 import { ArrayFilterComponent } from './components/array-filter/array-filter.component';
 import { DateFilterComponent } from './components/date-filter/date-filter.component';
 import { LoginComponent } from './components/login/login.component';
+import { ExecutionLinkComponent } from './components/execution-link/execution-link.component';
 
 @NgModule({
-  declarations: [AutorefreshToggleComponent, ArrayFilterComponent, DateFilterComponent, LoginComponent],
-  exports: [AutorefreshToggleComponent, ArrayFilterComponent, DateFilterComponent, StepCoreModule, LoginComponent],
+  declarations: [
+    AutorefreshToggleComponent,
+    ArrayFilterComponent,
+    DateFilterComponent,
+    LoginComponent,
+    ExecutionLinkComponent,
+  ],
+  exports: [
+    AutorefreshToggleComponent,
+    ArrayFilterComponent,
+    DateFilterComponent,
+    StepCoreModule,
+    LoginComponent,
+    ExecutionLinkComponent,
+  ],
   imports: [StepCoreModule],
 })
 export class StepCommonModule {}

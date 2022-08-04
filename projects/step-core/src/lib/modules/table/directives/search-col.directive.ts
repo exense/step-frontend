@@ -11,6 +11,7 @@ export class SearchColDirective {
   constructor(@Self() private _matColumnDef: MatColumnDef, private _tableSearch: TableSearch) {}
 
   @Input('stepSearchCol') searchCol?: string;
+  @Input() isSearchDisabled?: boolean;
 
   get searchColumnName(): string {
     return this.searchCol || this._matColumnDef.name;
