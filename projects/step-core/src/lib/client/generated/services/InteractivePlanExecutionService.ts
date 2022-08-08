@@ -39,22 +39,6 @@ export class InteractivePlanExecutionService {
     }
 
     /**
-     * @param requestBody
-     * @returns string default response
-     * @throws ApiError
-     */
-    public start(
-        requestBody?: ExecutionParameters,
-    ): Observable<string> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/interactive/start',
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
-
-    /**
      * @param keywordid
      * @returns FunctionTestingSession default response
      * @throws ApiError
@@ -72,11 +56,27 @@ export class InteractivePlanExecutionService {
     }
 
     /**
+     * @param requestBody
+     * @returns string default response
+     * @throws ApiError
+     */
+    public startInteractiveSession(
+        requestBody?: ExecutionParameters,
+    ): Observable<string> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/interactive/start',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
      * @param id
      * @returns any default response
      * @throws ApiError
      */
-    public stop(
+    public stopInteractiveSession(
         id: string,
     ): Observable<any> {
         return this.httpRequest.request({

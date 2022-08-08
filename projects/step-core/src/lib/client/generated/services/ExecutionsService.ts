@@ -41,7 +41,7 @@ export class ExecutionsService {
      * @returns Execution default response
      * @throws ApiError
      */
-    public get3(
+    public getExecutionById(
         id: string,
     ): Observable<Execution> {
         return this.httpRequest.request({
@@ -59,7 +59,7 @@ export class ExecutionsService {
      * @returns any default response
      * @throws ApiError
      */
-    public delete2(
+    public deleteExecution(
         id: string,
     ): Observable<any> {
         return this.httpRequest.request({
@@ -106,30 +106,13 @@ export class ExecutionsService {
     }
 
     /**
-     * Returns the executions matching the provided attributes.
-     * @param requestBody
-     * @returns Execution default response
-     * @throws ApiError
-     */
-    public get4(
-        requestBody?: Record<string, string>,
-    ): Observable<Execution> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/executions/search',
-            body: requestBody,
-            mediaType: '*/*',
-        });
-    }
-
-    /**
      * Returns all executions.
      * @param skip
      * @param limit
      * @returns Execution default response
      * @throws ApiError
      */
-    public getAll2(
+    public getAll(
         skip?: number,
         limit?: number,
     ): Observable<Array<Execution>> {
@@ -149,12 +132,29 @@ export class ExecutionsService {
      * @returns Execution default response
      * @throws ApiError
      */
-    public save3(
+    public saveExecution(
         requestBody?: Execution,
     ): Observable<Execution> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/executions',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * Returns the executions matching the provided attributes.
+     * @param requestBody
+     * @returns Execution default response
+     * @throws ApiError
+     */
+    public getExecutionByAttribute(
+        requestBody?: Record<string, string>,
+    ): Observable<Execution> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/executions/search',
             body: requestBody,
             mediaType: 'application/json',
         });

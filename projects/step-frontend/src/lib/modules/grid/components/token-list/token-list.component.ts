@@ -4,7 +4,7 @@ import {
   AJS_MODULE,
   Mutable,
   TableLocalDataSource,
-  GridService,
+  AugmentedGridService,
   TokenWrapper,
   AugmentedTokenWrapperOwner,
 } from '@exense/step-core';
@@ -58,7 +58,7 @@ export class TokenListComponent implements OnDestroy {
     },
   });
 
-  constructor(private _gridService: GridService) {}
+  constructor(private _gridService: AugmentedGridService) {}
 
   public loadTable(): void {
     this.tokenRequestSubject$.next({});
@@ -77,7 +77,7 @@ export class TokenListComponent implements OnDestroy {
   }
 
   public removeTokenErrors(id: string): void {
-    this._gridService.removeTokenError(id).subscribe(() => {
+    this._gridService.removeAgentTokenErrors(id).subscribe(() => {
       this.loadTable();
     });
   }

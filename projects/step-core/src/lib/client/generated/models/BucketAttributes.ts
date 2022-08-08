@@ -2,7 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type StreamId = {
-    streamedSessionId?: string;
-};
-
+export type BucketAttributes = Record<string, any>;

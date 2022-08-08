@@ -6,7 +6,6 @@ import type { Observable } from 'rxjs';
 
 import type { DataTableResponse } from '../models/DataTableResponse';
 import type { ExportStatus } from '../models/ExportStatus';
-import type { WebPlugin } from '../models/WebPlugin';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
@@ -100,17 +99,6 @@ export class TablesService {
             path: {
                 'id': id,
             },
-        });
-    }
-
-    /**
-     * @returns WebPlugin default response
-     * @throws ApiError
-     */
-    public getWebPlugins(): Observable<Array<WebPlugin>> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/table/plugins',
         });
     }
 

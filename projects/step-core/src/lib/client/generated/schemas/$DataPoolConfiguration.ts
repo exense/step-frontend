@@ -1,16 +1,14 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $TextFilter = {
+export const $DataPoolConfiguration = {
     properties: {
-        key: {
-            type: 'string',
+        forWrite: {
+            type: 'DynamicValueBoolean',
         },
-        value: {
+        _class: {
             type: 'string',
-        },
-        regex: {
-            type: 'boolean',
+            isRequired: true,
         },
     },
 } as const;
