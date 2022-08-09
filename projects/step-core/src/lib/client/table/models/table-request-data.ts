@@ -2,9 +2,10 @@ import { FieldFilter } from './field-filter';
 import { FullTextFilter } from './full-text-filter';
 import { FieldSort } from './field-sort';
 import { TableParameters } from './table-parameters';
+import { OQLFilter } from './oql-filter';
 
 export interface TableRequestData {
-  filters?: (FieldFilter | FullTextFilter)[];
+  filters?: (FieldFilter | FullTextFilter | OQLFilter)[];
   sort?: FieldSort;
   start?: number;
   length?: number;

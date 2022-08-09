@@ -14,6 +14,7 @@ import {
   tap,
 } from 'rxjs';
 import {
+  OQLFilter,
   SortDirection,
   TableRequestData,
   TableResponse,
@@ -66,9 +67,10 @@ const convertTableRequest = (req: TableRequest): TableRequestData => {
         direction: SortDirection.ASCENDING,
       };
 
-  // if (req.filter) {
-  // todo vad: for now it is not clear how to proceed queries like filter: "not(resourceType=attachment)'"
-  // }
+  if (req.filter) {
+    const oql: OQLFilter = { oql: req.filter };
+    result.filters = !!result.filters ? [...result.filters, oql] : [oql];
+  }
 
   return result;
 };
