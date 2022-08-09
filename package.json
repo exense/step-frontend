@@ -24,7 +24,7 @@
     "format:check": "prettier --config ./.prettierrc \"projects/{step-core/src/lib,step-frontend/src/lib,step-app/src}/!(angularjs)/**/*{.ts,.html,.scss}\"",
     "prepare": "husky install",
     "push": "npm publish projects/step-core/ && npm publish dist/step-frontend/*.tgz",
-    "openapi:generate:nhy": "./generate-openapi-client.sh https://stepos-nhy.exense.ch/rest/openapi.json"
+    "openapi:generate:nhy": "./generate-openapi-client.sh https://stepos-nhy.exense.ch/rest/private-openapi.json"
   },
   "private": false,
   "dependencies": {
