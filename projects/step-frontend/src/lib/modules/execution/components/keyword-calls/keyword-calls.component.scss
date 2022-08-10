@@ -1,0 +1,33 @@
+@import '../../../_common/styles/mixins';
+
+mat-form-field.step-search {
+  width: 90%;
+}
+
+.header {
+  @include table-header;
+  padding: 8px;
+}
+
+.cell-execution-time,
+.cell-step,
+.cell-status {
+  vertical-align: top;
+  padding-top: 10px;
+}
+
+.cell-status {
+  padding-top: 20px;
+}
+
+.cell-execution-time {
+  width: 130px;
+  & > div {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.cell-status {
+  width: 80px;
+}

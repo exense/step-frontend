@@ -28,6 +28,7 @@ export class TableRequest {
   start?: number;
   length?: number;
   filter?: string;
+  params?: unknown;
 
   constructor(data?: Partial<TableRequest>) {
     this.columns = data?.columns || [];
@@ -36,6 +37,7 @@ export class TableRequest {
     this.start = data?.start || undefined;
     this.length = data?.length || undefined;
     this.filter = data?.filter || undefined;
+    this.params = data?.params || undefined;
   }
 }
 
@@ -51,6 +53,7 @@ const convertTableRequest = (req: TableRequest): TableRequestData => {
       regex: false,
     },
     filter: req.filter,
+    params: req.params,
   };
 
   result.columns = req.columns.map((name) => {
@@ -137,7 +140,8 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     reqOrPage: TableRequest | PageEvent | undefined,
     sort?: Sort,
     search?: { [key: string]: SearchValue },
-    filter?: string
+    filter?: string,
+    params?: unknown
   ): void {
     if (this.typeFilter) {
       search = { ...search, ...this.typeFilter };
@@ -176,6 +180,10 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
       tableRequest.filter = filter;
     }
 
+    if (params) {
+      tableRequest.params = params;
+    }
+
     if (page) {
       tableRequest.start = page.pageIndex * page.pageSize;
       tableRequest.length = page.pageSize;
@@ -196,5 +204,9 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
 
   reload() {
     this._request$.next(this._request$.value);
+  }
+
+  exportAsCSV(params?: unknown): void {
+    this._rest.exportAsCSV(this._tableId, params);
   }
 }

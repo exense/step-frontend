@@ -1,0 +1,11 @@
+@import '../../../_common/styles/mixins';
+
+:host {
+  display: inline-block;
+}
+
+@include reportNodeStatuses;
+
+mat-icon {
+  background: none !important;
+}
