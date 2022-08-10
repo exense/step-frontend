@@ -16,6 +16,7 @@ import {
 import {
   OQLFilter,
   SortDirection,
+  TableParameters,
   TableRequestData,
   TableResponse,
   TableRestService,
@@ -32,6 +33,7 @@ export class TableRequest {
   start?: number;
   length?: number;
   filter?: string;
+  params?: TableParameters;
 
   constructor(data?: Partial<TableRequest>) {
     this.columns = data?.columns || [];
@@ -40,6 +42,7 @@ export class TableRequest {
     this.start = data?.start || undefined;
     this.length = data?.length || undefined;
     this.filter = data?.filter || undefined;
+    this.params = data?.params || undefined;
   }
 }
 
@@ -70,6 +73,10 @@ const convertTableRequest = (req: TableRequest): TableRequestData => {
   if (req.filter) {
     const oql: OQLFilter = { oql: req.filter };
     result.filters = !!result.filters ? [...result.filters, oql] : [oql];
+  }
+
+  if (req.params) {
+    result.tableParameters = req.params;
   }
 
   return result;
@@ -128,7 +135,8 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     reqOrPage: TableRequest | PageEvent | undefined,
     sort?: Sort,
     search?: { [key: string]: SearchValue },
-    filter?: string
+    filter?: string,
+    params?: TableParameters
   ): void {
     if (this.typeFilter) {
       search = { ...search, ...this.typeFilter };
@@ -165,6 +173,10 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
 
     if (filter) {
       tableRequest.filter = filter;
+    }
+
+    if (params) {
+      tableRequest.params = params;
     }
 
     if (page) {
