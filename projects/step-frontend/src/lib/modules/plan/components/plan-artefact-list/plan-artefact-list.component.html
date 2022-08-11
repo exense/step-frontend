@@ -1,0 +1,25 @@
+<section class="header"></section>
+<step-table [dataSource]="_artefactService.availableArtefacts" matSort [matSortDisableClear]="true">
+  <ng-container matColumnDef="label" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="plan-artefact-name-searchfield">Name</th>
+    <td mat-cell *matCellDef="let element">
+      <i class="artefact-icon glyphicon" [class]="element.icon"></i>
+      {{ element.label }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef>Actions</th>
+    <td mat-cell *matCellDef="let element">
+      <span class="artefact-info-and-addbutton">
+        <mat-icon class="artefact-info-icon" *ngIf="element.description" [matTooltip]="element.description"
+          >info</mat-icon
+        >
+        <step-btn-group>
+          <button mat-icon-button matTooltip="Add Control" (click)="addControl(element.label)">
+            <mat-icon>add</mat-icon>
+          </button>
+        </step-btn-group>
+      </span>
+    </td>
+  </ng-container>
+</step-table>

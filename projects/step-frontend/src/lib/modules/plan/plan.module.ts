@@ -1,12 +1,13 @@
 import { NgModule } from '@angular/core';
 import { PlanListComponent } from './components/plan-list/plan-list.component';
 import { StepCommonModule } from '../_common/step-common.module';
-import { OtherPlanListComponent } from './components/other-plan-list/other-plan-list.component';
+import { PlanOtherplanListComponent } from './components/plan-otherplan-list/plan-otherplan-list.component';
 import { PlanFunctionListComponent } from './components/plan-function-list/plan-function-list.component';
+import { PlanArtefactListComponent } from './components/plan-artefact-list/plan-artefact-list.component';
 
 @NgModule({
-  declarations: [PlanListComponent, OtherPlanListComponent, PlanFunctionListComponent],
+  declarations: [PlanListComponent, PlanOtherplanListComponent, PlanFunctionListComponent, PlanArtefactListComponent],
   imports: [StepCommonModule],
-  exports: [PlanListComponent, OtherPlanListComponent, PlanFunctionListComponent],
+  exports: [PlanListComponent, PlanOtherplanListComponent, PlanFunctionListComponent, PlanArtefactListComponent],
 })
 export class PlanModule {}

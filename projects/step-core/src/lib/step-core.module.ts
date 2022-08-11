@@ -7,6 +7,7 @@ import { TooltipDirective } from './directives/tooltip.directive';
 import { CORE_INITIALIZER } from './core-initialiser';
 import { StepMaterialModule } from './modules/step-material/step-material.module';
 import { HasRightPipe } from './pipes/has-right.pipe';
+import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { TableModule } from './modules/table/table.module';
 import { StepBasicsModule } from './modules/basics/step-basics.module';
 import { MAT_LUXON_DATE_ADAPTER_OPTIONS, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
@@ -18,7 +19,7 @@ import { CapsLockDirective } from './directives/caps-lock.directive';
 import { CustomRegistriesModule } from './modules/custom-registeries/custom-registries.module';
 
 @NgModule({
-  declarations: [TooltipDirective, HasRightPipe, CapsLockDirective],
+  declarations: [TooltipDirective, HasRightPipe, DashboardLinkPipe, CapsLockDirective],
   imports: [
     CommonModule,
     FormsModule,
@@ -43,6 +44,7 @@ import { CustomRegistriesModule } from './modules/custom-registeries/custom-regi
     CapsLockDirective,
     StepMaterialModule,
     HasRightPipe,
+    DashboardLinkPipe,
     TableModule,
     StepBasicsModule,
     EntityModule,
@@ -94,6 +96,7 @@ export * from './angularjs';
 export * from './directives/tooltip.directive';
 export * from './directives/caps-lock.directive';
 export * from './pipes/has-right.pipe';
+export * from './pipes/dashboard-link.pipe';
 export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
 export * from './modules/basics/step-basics.module';
