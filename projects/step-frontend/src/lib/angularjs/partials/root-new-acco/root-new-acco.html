@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="root-new-acco.css">
+  <style>
+  </style>
+</head>
+<body>
+
+<div id="mySidebar" class="sidebar">
+  <div id="sidebar-logo-and-burgermenu">
+    <span>M</span>
+    <span class="sidebar-aligned-text">ooo step</span>
+  </div>
+  <div id="sidebar-home-and-settings">
+    <div>
+      <span>H</span>
+      <span class="sidebar-aligned-text">Project Name</span>
+    </div>
+    <span class="sidebar-home-and-settings-divider">|</span>
+    <span class="sidebar-home-and-settings-icon">S</span>
+  </div>
+  <div id="sidebar-categories">
+    <div class="sidebar-categories-categories">Categories</div>
+    <div class="accordion">
+      <!-- FIRST TAB -->
+      <div class="tab">
+        <input id="tab-1" type="checkbox">
+        <label for="tab-1">Tab 1</label>
+        <div class="content">
+          <p>Next to the risk dictates a nurse.</p>
+        </div>
+      </div>
+
+      <!-- SECOND TAB -->
+      <div class="tab">
+        <input id="tab-2" type="checkbox">
+        <label for="tab-2">Tab 2</label>
+        <div class="content"><p>Should the pace attack?</p></div>
+      </div>
+
+      <!-- THIRD TAB -->
+      <div class="tab">
+        <input id="tab-3" type="checkbox">
+        <label for="tab-3">Tab 3</label>
+        <div class="content"><p>A circumstance strikes a deserved trap.</p></div>
+      </div>
+    </div>
+  </div>
+  <div id="sidebar-cost-and-upgrade">
+    <div>Step<br>
+    No-cost $0/month
+    </div>
+    <div>Upgrade</div>
+  </div>
+  <div id="sidebar-help-and-support">
+    <div><span>?</span></div>  <span>Help & Support</span>
+  </div>
+</div>
+
+<div id="main">
+  <header class="header-parent">
+    <div id="header-spacer-part"></div>
+    <div class="header-white-part"></div>
+  </header>
+  <button class="openbtn" onclick="toggleNavBar()">Open Sidebar</button>
+  <h2>Collapsed Sidebar</h2>
+  <p>Click on the hamburger menu/bar icon to open the sidebar, and push this content to the right.</p>
+</div>
+
+<script>
+  let navBarOpen = true;
+
+  function toggleNavBar() {
+    if (navBarOpen) {
+      closeNav();
+    } else {
+      openNav();
+    }
+  }
+
+  function openNav() {
+    document.getElementById("mySidebar").style.width = "var(--sidebar-width-open)";
+    document.getElementById("main").style.marginLeft = "var(--sidebar-width-open)";
+    navBarOpen = true;
+  }
+
+  function closeNav() {
+    document.getElementById("mySidebar").style.width = "var(--sidebar-width-closed)";
+    document.getElementById("main").style.marginLeft = "var(--sidebar-width-closed)";
+    navBarOpen = false;
+  }
+
+  openNav();
+</script>
+
+</body>
+</html>

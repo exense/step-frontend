@@ -1,0 +1,244 @@
+:root {
+  --header-height: 48px;
+  --top-blue-border-height: 15px;
+  --top-blue-border-edge-radius: 30px;
+  --sidebar-width-open: 254px;
+  --sidebar-width-closed: 10px;
+  --sidebar-section-height-help-and-support: 56px;
+
+  --sidebar-elements-padding: 12px;
+  --sidebar-elements-text-padding: 10px;
+  --sidebar-settings-divider-padding-right: 45px;
+
+  --sidebar-aligned-text-margin-left: 60px;
+}
+
+body {
+  font-family: "Lato", sans-serif;
+  margin: 0px;
+}
+
+.sidebar a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  color: white;
+  display: block;
+  transition: 0.3s;
+}
+
+.sidebar a:hover {
+  color: #f1f1f1;
+}
+
+.openbtn {
+  font-size: 20px;
+  cursor: pointer;
+  background-color: #111;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+}
+
+.openbtn:hover {
+  background-color: #444;
+}
+
+#main {
+  transition: margin-left .5s;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+  .sidebar {
+    padding-top: 15px;
+  }
+
+  .sidebar a {
+    font-size: 18px;
+  }
+}
+
+.header-parent {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #02629a;
+
+  height: var(--header-height);
+}
+
+.header-white-part {
+  bottom: 0px;
+  height: calc(100% - var(--top-blue-border-height));
+  background-color: white;
+  border-radius: var(--top-blue-border-edge-radius) 0 0 0;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #02629a;
+  overflow-x: hidden;
+  transition: 0.5s;
+  color: white;
+}
+
+.sidebar > div {
+  padding: 0 var(--sidebar-elements-text-padding) 0 var(--sidebar-elements-text-padding);
+
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-aligned-text {
+  padding: 0px !important;
+  position: absolute;
+  left: var(--sidebar-aligned-text-margin-left);
+}
+
+#sidebar-logo-and-burgermenu {
+  height: 48px;
+}
+
+#sidebar-logo-and-burgermenu > span {
+  padding: var(--sidebar-elements-text-padding);
+}
+
+
+#sidebar-home-and-settings {
+  height: 64px;
+}
+
+#sidebar-home-and-settings > span {
+  position: absolute;
+  padding: var(--sidebar-elements-text-padding);
+}
+
+#sidebar-home-and-settings > div {
+  padding: var(--sidebar-elements-text-padding);
+}
+
+#sidebar-home-and-settings > .sidebar-home-and-settings-divider {
+  right: var(--sidebar-settings-divider-padding-right);
+  color: #3582ae;
+}
+
+#sidebar-home-and-settings > .sidebar-home-and-settings-icon {
+  right: var(--sidebar-elements-text-padding);
+}
+
+#sidebar-categories {
+  display: block;
+  flex-grow: 1;
+}
+
+#sidebar-categories .sidebar-categories-categories {
+  height: 58px;
+  font-size: smaller;
+  padding: 0 var(--sidebar-elements-text-padding) 0 var(--sidebar-elements-text-padding) ;
+  display: flex;
+  align-items: center;
+}
+
+#sidebar-cost-and-upgrade {
+  height: 56px;
+  justify-content: space-between;
+  font-size: small;
+}
+
+#sidebar-cost-and-upgrade > div {
+  padding: var(--sidebar-elements-text-padding);
+}
+
+#sidebar-help-and-support {
+  height: 56px;
+  font-size: small;
+}
+
+#sidebar-help-and-support > div {
+  padding: var(--sidebar-elements-text-padding);
+}
+
+#sidebar-home-and-settings, #sidebar-categories, #sidebar-cost-and-upgrade, #sidebar-help-and-support {
+  border-top: 1px solid #3582ae;
+}
+
+/* (A) TABS CONTAINER */
+.tab, .tab * {
+  font-family: arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.tab {
+  margin-top: 1px;
+  max-width: 600px;
+}
+
+/* (B) HIDE CHECKBOX */
+.tab input {
+  display: none;
+}
+
+/* (C) TAB LABEL */
+.tab label {
+  /* (C1) DIMENSIONS */
+  position: relative; /* required for (f2) position:absolute */
+  display: block;
+  width: 100%;
+  padding: var(--sidebar-elements-text-padding);
+
+  /* (C2) COSMETICS */
+  font-weight: 700;
+  color: #fff;
+  background: #1b72a4;
+  cursor: pointer;
+}
+
+/* (D) TAB CONTENT - HIDDEN BY DEFAULT */
+/* css animation will not work with auto height */
+/* this is why we use max-height instead */
+.tab .content {
+  background: #1b72a4;
+  overflow: hidden;
+  transition: max-height 0.3s;
+  max-height: 0;
+}
+
+.tab .content p {
+  padding: var(--sidebar-elements-text-padding);
+}
+
+/* (E) OPEN TAB ON CHECKED */
+.tab input:checked ~ .content {
+  max-height: 100vh;
+}
+
+/* (F) EXTRA - ADD ARROW INDICATOR */
+.tab label::after {
+  /* (F1) RIGHT ARROW */
+  display: block;
+  content: "\25b6";
+
+  /* (F2) PLACE AT RIGHT SIDE */
+  position: absolute;
+  right: 10px;
+  top: 10px;
+
+  /* (F3) ANIMATED ARROW */
+  transition: all 0.4s;
+}
+
+/* (F4) ROTATE ARROW ON CHECKED */
+.tab input:checked ~ label::after {
+  transform: rotate(90deg);
+}
+

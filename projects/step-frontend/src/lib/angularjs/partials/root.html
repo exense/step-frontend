@@ -1,9 +1,150 @@
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --header-height: 48px;
+      --top-blue-border-height: 15px;
+      --top-blue-border-edge-radius: 30px;
+      --sidebar-width-open: 254px;
+      --sidebar-width-closed: 10px;
+    }
+
+    body {
+      font-family: "Lato", sans-serif;
+      margin: 0px;
+    }
+
+    .sidebar {
+      height: 100%;
+      width: 0;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      background-color: #02629a;
+      overflow-x: hidden;
+      transition: 0.5s;
+      padding-top: 60px;
+    }
+
+    .sidebar a {
+      padding: 8px 8px 8px 32px;
+      text-decoration: none;
+      font-size: 25px;
+      color: white;
+      display: block;
+      transition: 0.3s;
+    }
+
+    .sidebar a:hover {
+      color: #f1f1f1;
+    }
+
+    .sidebar .closebtn {
+      position: absolute;
+      top: 0;
+      right: 25px;
+      font-size: 36px;
+      margin-left: 50px;
+    }
+
+    .openbtn {
+      font-size: 20px;
+      cursor: pointer;
+      background-color: #111;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+    }
+
+    .openbtn:hover {
+      background-color: #444;
+    }
+
+    #main {
+      transition: margin-left .5s;
+    }
+
+    /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+    @media screen and (max-height: 450px) {
+      .sidebar {padding-top: 15px;}
+      .sidebar a {font-size: 18px;}
+    }
+
+    .header-parent {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background-color: #02629a;
+
+      height: var(--header-height);;
+    }
+
+    .header-white-part {
+      bottom: 0px;
+      height: calc(100% - var(--top-blue-border-height));
+      background-color: white;
+      border-radius: var(--top-blue-border-edge-radius) 0 0 0;
+    }
+  </style>
+</head>
+
+<div id="mySidebar" class="sidebar">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">X</a>
+  <a href="#">About</a>
+  <a href="#">Services</a>
+  <a href="#">Clients</a>
+  <a href="#">Contact</a>
+<!--  <div ng-include="'partials/nav.html'" class="container main-header"></div>-->
+</div>
+
+<div id="main">
+  <header class="header-parent" ng-if-start="isInitialized && (authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())">
+    <div id="header-spacer-part"></div>
+    <div class="header-white-part"></div>
+  </header>
+  <button class="openbtn" onclick="openNav()">Open Sidebar</button>
+  <div ng-if-end ng-include="'partials/main.html'" class="st-flex-row"></div>
+</div>
+
+<div
+  ng-if="isInitialized && !(authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())"
+  ng-include="'partials/loginForm.html'"
+  class="st-flex-row"
+></div>
+
+
+<footer class="main-footer">
+  <div class="container main-footer">
+    <p style="text-align: center; margin-top: 10px">STEP ${project.version} - Copyright &#169; exense GmbH</p>
+    <span style="display:none;" id="frontend-os">${project.versionFEOS}</span>
+    <span style="display:none;" id="frontend-ee">${project.versionFEEE}</span>
+    <span style="display:none;" id="backend-os">${project.versionBEOS}</span>
+    <span style="display:none;" id="backend-ee">${project.versionBEEE}</span>
+  </div>
+</footer>
+
+<script>
+  function openNav() {
+    document.getElementById("mySidebar").style.width = "var(--sidebar-width-open)";
+    document.getElementById("main").style.marginLeft = "var(--sidebar-width-open)";
+  }
+
+  function closeNav() {
+    document.getElementById("mySidebar").style.width = "var(--sidebar-width-closed)";
+    document.getElementById("main").style.marginLeft= "var(--sidebar-width-closed)";
+  }
+  openNav();
+</script>
+
+
+<!--
 <div class="main-page">
   <header
     class="main-header"
     ng-if-start="isInitialized && (authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())"
   >
-    <div ng-include="'partials/nav.html'" class="container main-header"></div>
+&lt;!&ndash;    <div ng-include="'partials/nav.html'" class="container main-header"></div>&ndash;&gt;
   </header>
   <div ng-if-end ng-include="'partials/main.html'" class="st-flex-row"></div>
 
@@ -23,3 +164,4 @@
     </div>
   </footer>
 </div>
+-->
