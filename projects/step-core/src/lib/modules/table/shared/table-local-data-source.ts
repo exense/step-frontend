@@ -178,6 +178,6 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
   }
 
   exportAsCSV(params?: unknown): void {
-    console.log(`TableLocalDataSource doesn't support export to CSV`);
+    console.error(`TableLocalDataSource doesn't support export to CSV`);
   }
 }
