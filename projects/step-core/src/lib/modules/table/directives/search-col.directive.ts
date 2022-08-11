@@ -20,7 +20,7 @@ export class SearchColDirective {
   @ContentChild(SearchCellDefDirective)
   searchCell?: SearchCellDefDirective;
 
-  search(value: string, regex?: boolean): void {
-    this._tableSearch.onSearch(this.searchColumnName, value, regex);
+  search(eventOrValue: Event | string, regex?: boolean): void {
+    this._tableSearch.onSearch(this.searchColumnName, eventOrValue, regex);
   }
 }

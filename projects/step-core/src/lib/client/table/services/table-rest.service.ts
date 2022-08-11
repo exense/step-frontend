@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TableRequestData } from '../models/table-request-data';
 import { TableResponse } from '../models/table-response';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
+import { ExportService } from '../../../services/export.service';
 
 const ROOT = 'rest/table';
 
@@ -10,7 +11,7 @@ const ROOT = 'rest/table';
   providedIn: 'root',
 })
 export class TableRestService {
-  constructor(private _httpClient: HttpClient) {}
+  constructor(private _httpClient: HttpClient, private _exportService: ExportService) {}
 
   requestTable<T>(tableId: string, tableRequest: TableRequestData): Observable<TableResponse<T>> {
     const url = `${ROOT}/${tableId}`;
@@ -20,5 +21,21 @@ export class TableRestService {
   requestColumnValues(tableId: string, columnName: string): Observable<string[]> {
     const url = `${ROOT}/${tableId}/column/${columnName}/distinct`;
     return this._httpClient.get<string[]>(url);
+  }
+
+  getExportUrl(tableId: string, params?: unknown): string {
+    let url = `${ROOT}/${tableId}/export`;
+    if (params) {
+      url = `${url}?params=${encodeURIComponent(JSON.stringify(params))}`;
+    }
+    return url;
+  }
+
+  exportAsCSV(tableId: string, params?: unknown): void {
+    const url = this.getExportUrl(tableId, params);
+    this._httpClient
+      .get<{ exportID: string }>(url)
+      .pipe(map(({ exportID }) => `${ROOT}/exports/${exportID}`))
+      .subscribe((pollUrl) => this._exportService.pollUrl(pollUrl));
   }
 }

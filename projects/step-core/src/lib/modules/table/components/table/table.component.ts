@@ -257,4 +257,12 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
       this.setupDatasource(cDatasource.currentValue);
     }
   }
+
+  exportAsCSV(): void {
+    if (!this.tableDataSource) {
+      console.error('No datasource for export');
+      return;
+    }
+    this.tableDataSource.exportAsCSV(this.tableParams);
+  }
 }

@@ -1,0 +1,9 @@
+@import '../../../_common/styles/mixins';
+@import '../../../_common/styles/variables';
+
+@include reportNodeStatuses;
+
+.status {
+  color: $white !important;
+  text-align: center;
+}

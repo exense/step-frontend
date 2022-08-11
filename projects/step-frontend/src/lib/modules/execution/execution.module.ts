@@ -9,8 +9,9 @@ import { ExecutionStepComponent } from './components/execution-step/execution-st
 import './components/execution-step/execution-step.component';
 
 import { PanelIdPipe } from './pipes/panel-id.pipe';
-import { KeywordWrapperDirective } from './directives/keyword-wrapper.directive';
 import { OperationsModule } from '../operations/operations.module';
+import { KeywordCallsComponent } from './components/keyword-calls/keyword-calls.component';
+import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 
 @NgModule({
   declarations: [
@@ -20,9 +21,9 @@ import { OperationsModule } from '../operations/operations.module';
     ExecutionResultComponent,
     ExecutionStepComponent,
     PanelIdPipe,
-    KeywordWrapperDirective,
+    KeywordCallsComponent,
   ],
-  imports: [StepCommonModule, OperationsModule],
+  imports: [StepCommonModule, OperationsModule, ReportNodesModule],
   exports: [ExecutionListComponent, ExecutionStepComponent],
 })
 export class ExecutionModule {}

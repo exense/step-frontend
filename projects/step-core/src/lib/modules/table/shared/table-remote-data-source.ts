@@ -200,4 +200,8 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   reload() {
     this._request$.next(this._request$.value);
   }
+
+  exportAsCSV(params?: unknown): void {
+    this._rest.exportAsCSV(this._tableId, params);
+  }
 }
