@@ -24,6 +24,7 @@ import { TableLocalDataSource } from '../../shared/table-local-data-source';
 import { TableSearch } from '../../services/table.search';
 import { SearchValue } from '../../shared/search-value';
 import { ColumnDirective } from '../../directives/column.directive';
+import { TableParameters } from '../../../../client/table/models/table-parameters';
 
 export interface SearchColumn {
   colName: string;
@@ -60,13 +61,13 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     return this.filter$.value;
   }
 
-  @Input() set tableParams(value: unknown | undefined) {
+  @Input() set tableParams(value: TableParameters | undefined) {
     if (value === this.tableParams) {
       return;
     }
     this.tableParams$.next(value);
   }
-  get tableParams(): unknown | undefined {
+  get tableParams(): TableParameters | undefined {
     return this.tableParams$.value;
   }
 
@@ -99,7 +100,7 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
   private dataSourceTerminator$?: Subject<unknown>;
   private search$ = new BehaviorSubject<{ [column: string]: SearchValue }>({});
   private filter$ = new BehaviorSubject<string | undefined>(undefined);
-  private tableParams$ = new BehaviorSubject<unknown | undefined>(undefined);
+  private tableParams$ = new BehaviorSubject<TableParameters | undefined>(undefined);
 
   constructor(@Optional() private _sort: MatSort) {}
 
@@ -245,6 +246,7 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     this.terminateDatasource();
     this.search$.complete();
     this.filter$.complete();
+    this.tableParams$.complete();
     this.terminator$.next({});
     this.terminator$.complete();
   }

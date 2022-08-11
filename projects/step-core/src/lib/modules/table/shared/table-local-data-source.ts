@@ -4,6 +4,7 @@ import { BehaviorSubject, combineLatest, map, Observable, of, Subject, takeUntil
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { SearchValue } from './search-value';
+import { TableParameters } from '../../../client/table/models/table-parameters';
 
 interface Request {
   page?: PageEvent;
@@ -177,7 +178,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     this._request$.next(this._request$.value);
   }
 
-  exportAsCSV(params?: unknown): void {
+  exportAsCSV(params?: TableParameters): void {
     console.error(`TableLocalDataSource doesn't support export to CSV`);
   }
 }

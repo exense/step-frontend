@@ -129,8 +129,11 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
     }
 
     this.selectionTerminator$ = new Subject<any>();
+
+    const type = 'step.core.execution.LeafReportNodesFilter.LeafReportNodesTableParameters';
     (this as FieldAccessor).keywordParameters$ = testCasesSelection!.selected$.pipe(
       map((testcases) => ({
+        type,
         eid,
         testcases,
       })),

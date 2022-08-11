@@ -27,7 +27,7 @@
   matSortDirection="desc"
   [dataSource]="leafReportsDataSource"
   [matSortDisableClear]="true"
-  [tableParams]="keywordParameters$ | async"
+  [tableParams]="(keywordParameters$ | async)!"
 >
   <ng-container matColumnDef="executionTime">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Begin</th>
