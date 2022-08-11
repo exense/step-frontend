@@ -4,6 +4,7 @@ import { TableRequestData } from '../models/table-request-data';
 import { TableResponse } from '../models/table-response';
 import { map, Observable } from 'rxjs';
 import { ExportService } from '../../../services/export.service';
+import { TableParameters } from '../models/table-parameters';
 
 const ROOT = 'rest/table';
 
@@ -23,7 +24,7 @@ export class TableRestService {
     return this._httpClient.get<string[]>(url);
   }
 
-  getExportUrl(tableId: string, params?: unknown): string {
+  getExportUrl(tableId: string, params?: TableParameters): string {
     let url = `${ROOT}/${tableId}/export`;
     if (params) {
       url = `${url}?params=${encodeURIComponent(JSON.stringify(params))}`;
@@ -31,7 +32,7 @@ export class TableRestService {
     return url;
   }
 
-  exportAsCSV(tableId: string, params?: unknown): void {
+  exportAsCSV(tableId: string, params?: TableParameters): void {
     const url = this.getExportUrl(tableId, params);
     this._httpClient
       .get<{ exportID: string }>(url)
