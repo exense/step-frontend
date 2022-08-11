@@ -49,6 +49,10 @@
             "commonChunk": false
           },
           "configurations": {
+            "local": {
+              "styles": ["projects/step-app/src/styles.scss", "../node_modules/uplot/dist/uPlot.min.css"],
+              "scripts": ["../node_modules/uplot/dist/uPlot.iife.min.js"]
+            },
             "production": {
               "budgets": [
                 {
