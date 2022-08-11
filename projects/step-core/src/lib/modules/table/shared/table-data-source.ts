@@ -17,5 +17,5 @@ export interface TableDataSource<T> extends DataSource<T> {
     params?: TableParameters
   ): void;
   reload(): void;
-  exportAsCSV(params?: TableParameters): void;
+  exportAsCSV(fields: string[], params?: TableParameters): void;
 }

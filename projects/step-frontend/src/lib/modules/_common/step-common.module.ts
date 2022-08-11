@@ -31,3 +31,5 @@ import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
   imports: [StepCoreModule],
 })
 export class StepCommonModule {}
+
+export * from './shared/status.enum';

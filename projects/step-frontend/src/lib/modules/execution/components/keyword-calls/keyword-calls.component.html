@@ -14,7 +14,7 @@
       mat-icon-button
       matTooltip="Export as CSV"
       matTooltipPosition="below"
-      (click)="keywordsTable.exportAsCSV()"
+      (click)="keywordsTable.exportAsCSV(EXPORT_FIELDS)"
     >
       <mat-icon>file_upload</mat-icon>
     </button>
@@ -30,7 +30,7 @@
   [tableParams]="(keywordParameters$ | async)!"
 >
   <ng-container matColumnDef="executionTime">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Begin</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="cell-execution-time">Begin</th>
     <td mat-cell *matCellDef="let element" class="cell-execution-time">
       <div>
         <button type="button" mat-icon-button matTooltip="Show/hide details" (click)="toggleRowDetails(element.id)">
@@ -45,7 +45,7 @@
     <mat-form-field class="step-search" *stepSearchCellDef>
       <input matInput type="text" (change)="stepSearchColStep.search($event, true)" />
     </mat-form-field>
-    <th mat-header-cell *matHeaderCellDef>Step</th>
+    <th mat-header-cell *matHeaderCellDef class="cell-step">Step</th>
     <td mat-cell *matCellDef="let element" class="cell-step">
       <step-report-node-short
         [node]="element"
@@ -61,11 +61,11 @@
   <ng-container matColumnDef="status" stepSearchCol #stepSearchColStatus="SearchCol">
     <step-array-filter
       *stepSearchCellDef
-      [items]="(statusOptions$ | async)!"
+      [items]="statusOptions"
       (selectedItemsChange)="stepSearchColStatus.search($event, true)"
     >
     </step-array-filter>
-    <th mat-header-cell *matHeaderCellDef>Status</th>
+    <th mat-header-cell *matHeaderCellDef class="cell-status">Status</th>
     <td mat-cell *matCellDef="let element" class="cell-status">
       <step-report-node-status [status]="element.status"> </step-report-node-status>
     </td>

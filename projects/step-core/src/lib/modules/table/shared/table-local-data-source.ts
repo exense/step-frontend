@@ -178,7 +178,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     this._request$.next(this._request$.value);
   }
 
-  exportAsCSV(params?: TableParameters): void {
+  exportAsCSV(fields: string[], params?: TableParameters): void {
     console.error(`TableLocalDataSource doesn't support export to CSV`);
   }
 }

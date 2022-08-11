@@ -26,12 +26,4 @@ export class AugmentedExecutionsService extends ExecutionsService {
   getExecutionsTableDataSource(): TableRemoteDataSource<any> {
     return this.dataSource;
   }
-
-  getResultColumnItems(): Observable<string[]> {
-    return this._tableRest.requestColumnValues(this.EXECUTIONS_TABLE_ID, 'result');
-  }
-
-  getStatusColumnItems(): Observable<string[]> {
-    return this._tableRest.requestColumnValues(this.EXECUTIONS_TABLE_ID, 'status');
-  }
 }

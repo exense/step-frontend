@@ -48,8 +48,8 @@ export class TableRequest {
 
 const convertTableRequest = (req: TableRequest): TableRequestData => {
   const result: TableRequestData = {
-    start: req.start || 0,
-    length: req.length || 10,
+    skip: req.start || 0,
+    limit: req.length || 10,
   };
 
   if (req.searchBy && req.searchBy.length > 0) {
@@ -201,7 +201,16 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     this._request$.next(this._request$.value);
   }
 
-  exportAsCSV(params?: TableParameters): void {
-    this._rest.exportAsCSV(this._tableId, params);
+  exportAsCSV(fields: string[], params?: TableParameters): void {
+    const request = new TableRequest({
+      ...(this._request$.value || {}),
+      params,
+    });
+
+    const tableRequest = convertTableRequest(request);
+    delete tableRequest.skip;
+    delete tableRequest.limit;
+
+    this._rest.exportAsCSV(this._tableId, fields, tableRequest);
   }
 }
