@@ -1,21 +1,15 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { ExecutionsPanelsService } from '../../services/executions-panels.service';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import {
-  AJS_MODULE,
-  AugmentedExecutionsService,
-  Execution,
-  ExecutionSummaryDto,
-  Mutable,
-  ReportNode,
-  SelectionCollector,
-} from '@exense/step-core';
+import { AJS_MODULE, Execution, ExecutionSummaryDto, Mutable, ReportNode, SelectionCollector } from '@exense/step-core';
 import { ExecutionStepPanel } from '../../shared/execution-step-panel';
 import { ExecutionViewServices } from '../../../operations/shared/execution-view-services';
-import { map, Observable, shareReplay, Subject, takeUntil } from 'rxjs';
+import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 
 type FieldAccessor = Mutable<Pick<ExecutionStepComponent, 'keywordParameters$'>>;
+
+const TYPE_LEAF_REPORT_NODES_TABLE_PARAMS = 'step.core.execution.LeafReportNodesTableParameters';
 
 @Component({
   selector: 'step-execution-step',
@@ -53,11 +47,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
   readonly panelSteps?: ExecutionStepPanel;
   readonly panelParameters?: ExecutionStepPanel;
 
-  readonly statusOptions$ = this._augExecutionsApi
-    .getResultColumnItems()
-    .pipe(shareReplay(1), takeUntil(this.terminator$));
-
-  constructor(private _augExecutionsApi: AugmentedExecutionsService, public _panelService: ExecutionsPanelsService) {
+  constructor(public _panelService: ExecutionsPanelsService) {
     [this.panelTestCases, this.panelSteps, this.panelParameters] = [
       this.ID_TEST_CASES,
       this.ID_STEPS,
@@ -130,10 +120,9 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
 
     this.selectionTerminator$ = new Subject<any>();
 
-    const type = 'step.core.execution.LeafReportNodesFilter.LeafReportNodesTableParameters';
     (this as FieldAccessor).keywordParameters$ = testCasesSelection!.selected$.pipe(
       map((testcases) => ({
-        type,
+        type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
         eid,
         testcases,
       })),

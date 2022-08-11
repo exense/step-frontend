@@ -7,7 +7,7 @@ import { OQLFilter } from './oql-filter';
 export interface TableRequestData {
   filters?: (FieldFilter | FullTextFilter | OQLFilter)[];
   sort?: FieldSort;
-  start?: number;
-  length?: number;
+  skip?: number;
+  limit?: number;
   tableParameters?: TableParameters;
 }
