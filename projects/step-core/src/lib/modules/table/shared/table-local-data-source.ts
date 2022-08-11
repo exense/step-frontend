@@ -176,4 +176,8 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
   reload(): void {
     this._request$.next(this._request$.value);
   }
+
+  exportAsCSV(params?: unknown): void {
+    console.error(`TableLocalDataSource doesn't support export to CSV`);
+  }
 }

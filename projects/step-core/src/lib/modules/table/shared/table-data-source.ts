@@ -8,6 +8,13 @@ export interface TableDataSource<T> extends DataSource<T> {
   readonly inProgress$: Observable<boolean>;
   readonly total$: Observable<number>;
   readonly totalFiltered$: Observable<number>;
-  getTableData(page?: PageEvent, sort?: Sort, search?: { [key: string]: SearchValue }, filter?: string): void;
+  getTableData(
+    page?: PageEvent,
+    sort?: Sort,
+    search?: { [key: string]: SearchValue },
+    filter?: string,
+    params?: unknown
+  ): void;
+  exportAsCSV(params?: unknown): void;
   reload(): void;
 }

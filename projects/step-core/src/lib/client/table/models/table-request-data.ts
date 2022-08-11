@@ -10,4 +10,5 @@ export interface TableRequestData {
   length: number;
   search: TableSearch;
   filter?: string;
+  params?: unknown;
 }

@@ -5,6 +5,8 @@ import { ArrayFilterComponent } from './components/array-filter/array-filter.com
 import { DateFilterComponent } from './components/date-filter/date-filter.component';
 import { LoginComponent } from './components/login/login.component';
 import { ExecutionLinkComponent } from './components/execution-link/execution-link.component';
+import { JsonViewerDirective } from './directives/json-viewer.directive';
+import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
 
 @NgModule({
   declarations: [
@@ -13,6 +15,8 @@ import { ExecutionLinkComponent } from './components/execution-link/execution-li
     DateFilterComponent,
     LoginComponent,
     ExecutionLinkComponent,
+    JsonViewerDirective,
+    IsEmptyJsonPipe,
   ],
   exports: [
     AutorefreshToggleComponent,
@@ -21,6 +25,8 @@ import { ExecutionLinkComponent } from './components/execution-link/execution-li
     StepCoreModule,
     LoginComponent,
     ExecutionLinkComponent,
+    JsonViewerDirective,
+    IsEmptyJsonPipe,
   ],
   imports: [StepCoreModule],
 })

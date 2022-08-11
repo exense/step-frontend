@@ -60,6 +60,16 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     return this.filter$.value;
   }
 
+  @Input() set tableParams(value: unknown | undefined) {
+    if (value === this.tableParams) {
+      return;
+    }
+    this.tableParams$.next(value);
+  }
+  get tableParams(): unknown | undefined {
+    return this.tableParams$.value;
+  }
+
   @ViewChild(MatTable) private _table?: MatTable<any>;
   @ViewChild(MatPaginator, { static: true }) page!: MatPaginator;
 
@@ -89,6 +99,7 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
   private dataSourceTerminator$?: Subject<unknown>;
   private search$ = new BehaviorSubject<{ [column: string]: SearchValue }>({});
   private filter$ = new BehaviorSubject<string | undefined>(undefined);
+  private tableParams$ = new BehaviorSubject<unknown | undefined>(undefined);
 
   constructor(@Optional() private _sort: MatSort) {}
 
@@ -138,9 +149,11 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     const page$ = this.page!.page.pipe(startWith(initialPage));
     const sort$ = this._sort ? this._sort.sortChange.pipe(startWith(initialSort)) : of(undefined);
 
-    combineLatest([page$, sort$, this.search$, this.filter$])
+    combineLatest([page$, sort$, this.search$, this.filter$, this.tableParams$])
       .pipe(takeUntil(this.dataSourceTerminator$))
-      .subscribe(([page, sort, search, filter]) => tableDataSource.getTableData(page, sort, search, filter));
+      .subscribe(([page, sort, search, filter, tableParams]) =>
+        tableDataSource.getTableData(page, sort, search, filter, tableParams)
+      );
   }
 
   private addCustomColumnsDefinitionsToRemoteDatasource(): void {
@@ -241,5 +254,13 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     if (cDatasource?.previousValue !== cDatasource?.currentValue) {
       this.setupDatasource(cDatasource.currentValue);
     }
+  }
+
+  exportAsCSV(): void {
+    if (!this.tableDataSource) {
+      console.error('No datasource for export');
+      return;
+    }
+    this.tableDataSource.exportAsCSV(this.tableParams);
   }
 }

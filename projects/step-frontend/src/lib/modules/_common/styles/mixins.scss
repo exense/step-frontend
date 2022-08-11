@@ -1,3 +1,5 @@
+@import 'variables';
+
 @mixin table-container {
   position: relative;
   display: block;
@@ -12,5 +14,18 @@
 
   step-btn-group {
     margin-left: 1rem;
+  }
+}
+
+@mixin reportNodeStatus($status, $color) {
+  .step-node-status-#{$status} {
+    background: $color;
+    color: $color;
+  }
+}
+
+@mixin reportNodeStatuses {
+  @each $status, $color in $statuses {
+    @include reportNodeStatus($status, $color);
   }
 }

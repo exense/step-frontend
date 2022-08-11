@@ -395,17 +395,17 @@ tecAdminControllers.directive('executionProgress', [
         $scope.testCaseTableOnSelectionChange = function () {
           $scope.refresh();
         };
-*/
 
         testCasesSelection.selected$.subscribe(() => {
           if ($scope.refresh) {
             $scope.refresh();
           }
         });
+*/
 
         $scope.operationOptions = { showAll: false };
 
-        var executionViewServices = {
+        $scope.executionViewServices = {
           showNodeInTree: function (nodeId) {
             $http.get('/rest/controller/reportnode/' + nodeId + '/path').then(function (response) {
               $scope.$stateExec = 'tree';
@@ -437,6 +437,7 @@ tecAdminControllers.directive('executionProgress', [
           },
         };
 
+/*
         $scope.stepsTable = reportTableFactory.get(
           function () {
             var filter = { eid: eId };
@@ -444,7 +445,6 @@ tecAdminControllers.directive('executionProgress', [
             if (testCasesSelection.length !== $scope.testCases.length) {
               filter.testcases = [...testCasesSelection.selected];
             }
-/*
             if ($scope.testCaseTable.getSelection) {
               var testCaseSelection = $scope.testCaseTable.getSelection();
               // if not all items are selected
@@ -456,12 +456,12 @@ tecAdminControllers.directive('executionProgress', [
                 filter.testcases = testcases;
               }
             }
-*/
             return filter;
           },
           $scope,
           executionViewServices
         );
+*/
 
         $scope.getIncludedTestcases = function () {
           var table = $scope.testCaseTable;

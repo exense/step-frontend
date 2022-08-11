@@ -1,0 +1,43 @@
+@import '../../../_common/styles/variables';
+
+@mixin flexCenter {
+  display: flex;
+  align-items: center;
+}
+
+header {
+  @include flexCenter;
+  justify-content: space-between;
+}
+
+.m-left {
+  margin-left: 10px;
+}
+
+.m-right {
+  margin-right: 10px;
+}
+
+section.name {
+  @include flexCenter;
+  .mat-subheading-1 {
+    margin: 0;
+  }
+}
+
+section.content {
+  @include flexCenter;
+}
+
+.detail-container {
+  @include flexCenter;
+}
+
+.muted,
+.detail-label {
+  color: $muted;
+}
+
+.detail {
+  color: $dark-gray;
+}

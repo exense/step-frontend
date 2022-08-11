@@ -1,0 +1,17 @@
+@import '../../../_common/styles/variables';
+
+:host {
+  display: flex;
+  align-items: center;
+}
+
+.text-node {
+  color: $dark-gray;
+  font-size: 12px !important;
+  overflow-wrap: anywhere;
+  -ms-word-wrap: anywhere;
+}
+
+.m-left {
+  margin-left: 10px;
+}
