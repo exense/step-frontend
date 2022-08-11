@@ -7,7 +7,13 @@ import { LoginComponent } from './components/login/login.component';
 import { ExecutionLinkComponent } from './components/execution-link/execution-link.component';
 
 @NgModule({
-  declarations: [AutorefreshToggleComponent, ArrayFilterComponent, DateFilterComponent, LoginComponent, ExecutionLinkComponent],
+  declarations: [
+    AutorefreshToggleComponent,
+    ArrayFilterComponent,
+    DateFilterComponent,
+    LoginComponent,
+    ExecutionLinkComponent,
+  ],
   exports: [
     AutorefreshToggleComponent,
     ArrayFilterComponent,
