@@ -8,9 +8,11 @@ import { StepTableClientModule } from '../../client/table/step-table-client.modu
 import { CustomColumnsComponent } from './components/custom-columns/custom-columns.component';
 import { CustomCellValuePipe } from './pipe/custom-cell-value.pipe';
 import { ColumnDirective } from './directives/column.directive';
+import { CustomRegistriesModule } from '../custom-registeries/custom-registries.module';
+import { CustomCellComponentsPipe } from './pipe/custom-cell-components.pipe';
 
 @NgModule({
-  imports: [CommonModule, StepMaterialModule, StepTableClientModule],
+  imports: [CommonModule, StepMaterialModule, StepTableClientModule, CustomRegistriesModule],
   declarations: [
     TableComponent,
     SearchColDirective,
@@ -18,6 +20,7 @@ import { ColumnDirective } from './directives/column.directive';
     CustomColumnsComponent,
     CustomCellValuePipe,
     ColumnDirective,
+    CustomCellComponentsPipe,
   ],
   exports: [TableComponent, SearchColDirective, SearchCellDefDirective, CustomColumnsComponent, ColumnDirective],
 })

@@ -1,0 +1,16 @@
+:host {
+  display: flex;
+  align-items: center;
+}
+
+a {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.nav-to-plan-icon {
+  transform: scale(0.7);
+  margin-bottom: 6px;
+  vertical-align: middle;
+  cursor: pointer;
+}

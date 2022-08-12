@@ -3,6 +3,7 @@ import { CustomRegistryType } from '../../shared/custom-registry-type.enum';
 import { CustomRegistryItem } from '../../shared/custom-registry-item';
 import { Mutable } from '../../../../shared';
 import { CustomRegistryService } from '../../services/custom-registry.service';
+import { CustomComponent } from '../../shared/custom-component';
 
 type FieldAccessor = Mutable<Pick<BaseItemComponent<any>, 'component'>>;
 
@@ -10,17 +11,18 @@ type FieldAccessor = Mutable<Pick<BaseItemComponent<any>, 'component'>>;
   template: '',
 })
 export abstract class BaseItemComponent<T extends CustomRegistryItem> implements OnChanges {
-  readonly component?: Type<unknown>;
+  readonly component?: Type<CustomComponent>;
 
   protected abstract readonly registryType: CustomRegistryType;
 
   @Input() itemKey?: string;
+  @Input() context?: any;
 
   protected constructor(private _customRegistryService: CustomRegistryService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     const cItemKey = changes['itemKey'];
-    if (cItemKey?.previousValue != cItemKey?.currentValue) {
+    if (cItemKey?.previousValue != cItemKey?.currentValue && cItemKey?.firstChange) {
       this.onKeyUpdate(cItemKey?.currentValue);
     }
   }
@@ -32,10 +34,11 @@ export abstract class BaseItemComponent<T extends CustomRegistryItem> implements
     }
 
     const item = this._customRegistryService.getRegisteredItem(this.registryType, itemKey) as T;
+    console.log('GET ITEM', this.registryType, itemKey, item);
     (this as FieldAccessor).component = !item ? undefined : this.resolveComponent(item);
   }
 
-  protected resolveComponent(item: T): Type<unknown> | undefined {
+  protected resolveComponent(item: T): Type<CustomComponent> | undefined {
     return item.component;
   }
 }
