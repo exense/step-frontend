@@ -2,6 +2,7 @@ import { CustomRegistryType } from '../shared/custom-registry-type.enum';
 import { CustomRegistryService } from './custom-registry.service';
 import { Type } from '@angular/core';
 import { CustomRegistryItem } from '../shared/custom-registry-item';
+import { CustomComponent } from '../shared/custom-component';
 
 type ItemInfo = Pick<CustomRegistryItem, 'type' | 'label'>;
 
@@ -18,7 +19,7 @@ export abstract class BaseRegistryService {
 
   protected constructor(protected _customRegistry: CustomRegistryService) {}
 
-  register(type: string, label: string, component?: Type<unknown>): void {
+  register(type: string, label: string, component?: Type<CustomComponent>): void {
     this._customRegistry.register(this.registryType, type, { type, label, component });
   }
 

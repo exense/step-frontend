@@ -194,6 +194,8 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     });
 
     this.displaySearchColumns = this.searchColumns.map((c) => c.colName);
+    console.log('ALL COLUMNS', allColumns);
+    console.log('SEARCH COLUMNS', this.searchColumns);
   }
 
   private setupColumns(): void {

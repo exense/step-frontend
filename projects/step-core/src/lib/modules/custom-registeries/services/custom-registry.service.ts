@@ -9,6 +9,7 @@ export class CustomRegistryService {
   private store = new Map<CustomRegistryType, Map<string, CustomRegistryItem>>();
 
   register(storeType: CustomRegistryType, key: string, item: CustomRegistryItem): void {
+    console.log('REGISTER ITEM', storeType, key, item);
     this.getStoreForType(storeType).set(key, item);
   }
 
