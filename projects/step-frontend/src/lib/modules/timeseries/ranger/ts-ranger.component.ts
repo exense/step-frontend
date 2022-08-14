@@ -17,7 +17,7 @@ import { TSTimeRange } from '../chart/model/ts-time-range';
 import { UPlotUtils } from '../uplot/uPlot.utils';
 import { from, timeout } from 'rxjs';
 import { TSChartSettings } from '../chart/model/ts-chart-settings';
-import { TimeSeriesExecutionService } from '../execution-page/time-series-execution.service';
+import { ExecutionTabContext } from '../execution-page/execution-tab-context';
 
 declare const uPlot: any;
 
@@ -56,7 +56,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
   start!: number;
   end!: number;
 
-  constructor(private executionService: TimeSeriesExecutionService) {}
+  constructor() {}
 
   ngOnInit(): void {
     if (this.syncKey) {

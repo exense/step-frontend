@@ -48,19 +48,19 @@
   <ng-container matColumnDef="pcl_80">
     <th mat-header-cell *matHeaderCellDef>Pcl. 80</th>
     <td mat-cell *matCellDef="let element">
-      {{ element.pclValues[80] }}
+      {{ element.pclValues?.[80] }}
     </td>
   </ng-container>
   <ng-container matColumnDef="pcl_90">
     <th mat-header-cell *matHeaderCellDef>Pcl. 90</th>
     <td mat-cell *matCellDef="let element">
-      {{ element.pclValues[90] }}
+      {{ element.pclValues?.[90] }}
     </td>
   </ng-container>
   <ng-container matColumnDef="pcl_99">
     <th mat-header-cell *matHeaderCellDef>Pcl. 99</th>
     <td mat-cell *matCellDef="let element">
-      {{ element.pclValues[99] }}
+      {{ element.pclValues?.[99] }}
     </td>
   </ng-container>
   <ng-container matColumnDef="tps">

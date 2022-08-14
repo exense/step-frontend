@@ -9,9 +9,14 @@
       [execution]="execution"
     >
     </step-execution-time-selection>
-    <button *ngIf="executionInProgress" (click)="toggleRefresh()">
-      Toggle refresh ({{ refreshEnabled ? 'ON' : 'OFF' }})
-    </button>
+    <div *ngIf="executionInProgress">
+      <button mat-raised-button [matMenuTriggerFor]="refreshMenu">Refresh ({{ selectedRefreshInterval.label }})</button>
+      <mat-menu #refreshMenu="matMenu">
+        <button mat-menu-item *ngFor="let interval of refreshIntervals" (click)="changeRefreshInterval(interval)">
+          {{ interval.label }}
+        </button>
+      </mat-menu>
+    </div>
     <div class="w-100 dashboard-container">
       <div class="chart-container">
         <step-chart-skeleton *ngIf="!summaryChartSettings"></step-chart-skeleton>
@@ -55,9 +60,12 @@
         >
         </step-timeseries-chart>
         <div class="chart-footer-actions">
-          <span>AVG</span>
-          <span>MIN</span>
-          <span>MAX</span>
+          <button mat-button [matMenuTriggerFor]="menu">Metric ({{ selectedMetric.label }})</button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item *ngFor="let metric of responseTimeMetrics" (click)="switchChartMetric(metric)">
+              {{ metric.label }}
+            </button>
+          </mat-menu>
         </div>
       </div>
 
@@ -88,7 +96,7 @@
       </div>
 
       <div class="chart-container">
-        <step-timeseries-table #tableChart [keywordsService]="keywordsService"></step-timeseries-table>
+        <step-timeseries-table #tableChart [executionId]="executionId"></step-timeseries-table>
       </div>
 
       <!--      <div class="chart-container pie-chart-container">-->

@@ -88,7 +88,7 @@ let placement = function (o, r, f, a, i) {
   (o.dataset.side = f), (o.dataset.align = a);
 };
 
-export function tooltipPlugin() {
+export function tooltipPlugin(yScaleUnit?: string) {
   let over: any;
   let bound: any;
   let bLeft: any;
@@ -176,7 +176,11 @@ export function tooltipPlugin() {
           var rowElement = document.createElement('div');
           rowElement.classList.add('tooltip-row');
           let content = document.createElement('div');
-          content.textContent = `${point.name} : ${Math.trunc(point.value)}`;
+          let textContent = `${point.name} : ${Math.trunc(point.value)} `;
+          if (yScaleUnit) {
+            textContent += yScaleUnit;
+          }
+          content.textContent = textContent;
           if (point.color) {
             let colorDiv = document.createElement('div');
             colorDiv.classList.add('color');

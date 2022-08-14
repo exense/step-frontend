@@ -4,7 +4,8 @@ import { TimeSeriesService } from '../../time-series.service';
 import { FindBucketsRequest } from '../../find-buckets-request';
 import { TimeseriesColorsPool } from '../../util/timeseries-colors-pool';
 import { TimeSeriesChartResponse } from '../../time-series-chart-response';
-import { TimeSeriesKeywordsService } from '../time-series-keywords.service';
+import { TimeSeriesKeywordsContext } from '../time-series-keywords.context';
+import { ExecutionsPageService } from '../../executions-page.service';
 
 @Component({
   selector: 'step-timeseries-table',
@@ -20,7 +21,9 @@ export class TimeseriesTableComponent implements OnInit {
   dimensionKey = 'name';
   response: TimeSeriesChartResponse | undefined;
 
-  @Input('keywordsService') keywordsService!: TimeSeriesKeywordsService;
+  private keywordsService!: TimeSeriesKeywordsContext;
+
+  @Input('executionId') executionId!: string;
 
   // @Output('onKeywordsFetched') onKeywordsFetched = new EventEmitter<string[]>();
   // @Output('onKeywordToggled') onKeywordToggled = new EventEmitter<string>();
@@ -28,11 +31,12 @@ export class TimeseriesTableComponent implements OnInit {
   sortByNameAttributeFn = (a: Bucket, b: Bucket) =>
     a.attributes.name.toLowerCase() > b.attributes.name.toLowerCase() ? 1 : -1;
 
-  constructor(private timeSeriesService: TimeSeriesService) {}
+  constructor(private timeSeriesService: TimeSeriesService, private executionsPageService: ExecutionsPageService) {}
 
   ngOnInit(): void {
+    let context = this.executionsPageService.getContext(this.executionId);
+    this.keywordsService = context.getKeywordsContext();
     this.keywordsService.onKeywordToggled().subscribe((selection) => {
-      console.log('KEYWORD TOGGLED!', selection);
       this.bucketsByKeywords[selection.id].attributes.isSelected = selection.isSelected;
     });
   }
