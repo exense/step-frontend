@@ -17,7 +17,6 @@ export class ExecutionsPageService {
     }
     let context = this.executionsContexts[executionId];
     if (!context) {
-      console.log('NEW CONTEXT NEEDED', executionId);
       context = new ExecutionTabContext(executionId);
       this.executionsContexts[executionId] = context;
     }

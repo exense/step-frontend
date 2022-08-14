@@ -143,7 +143,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       this.keywords[selection.id] = selection;
     });
     this.keywordsService.onKeywordsUpdated().subscribe((keywords) => {
-      console.log('KEYWORDS UPDATED!', keywords);
       this.keywords = keywords;
     });
     this.executionService.onActiveSelectionChange().subscribe((newRange) => (this.timeSelection = newRange));
@@ -720,7 +719,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       data[i + 1] = bucketArray.map((b) => this.selectedMetric.mapping(b));
     });
     this.responseTimeByKeywordsChart.setData(data, false);
-    console.log(data);
   }
 
   formatAxisValue(num: number) {
