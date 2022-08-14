@@ -23,15 +23,7 @@ export class AugmentedExecutionsService extends ExecutionsService {
     super(httpRequest);
   }
 
-  public getExecutionsTableDataSource(): TableRemoteDataSource<any> {
+  getExecutionsTableDataSource(): TableRemoteDataSource<any> {
     return this.dataSource;
-  }
-
-  public getResultColumnItems(): Observable<string[]> {
-    return this._tableRest.requestColumnValues(this.EXECUTIONS_TABLE_ID, 'result');
-  }
-
-  public getStatusColumnItems(): Observable<string[]> {
-    return this._tableRest.requestColumnValues(this.EXECUTIONS_TABLE_ID, 'status');
   }
 }
