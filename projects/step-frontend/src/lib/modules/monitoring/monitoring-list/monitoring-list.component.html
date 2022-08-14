@@ -1,0 +1,106 @@
+<section class="header">
+  <step-btn-group>
+    <span>Last update: {{ now | date: DateFormat.date }}</span>
+    <button type="button" mat-icon-button matTooltip="Export as CSV" matTooltipPosition="below" (click)="exportAsCSV()">
+      <mat-icon>file_download</mat-icon>
+    </button>
+  </step-btn-group>
+
+  <button
+    type="button"
+    mat-icon-button
+    matTooltip="Configure Scheduler"
+    matTooltipPosition="below"
+    [disabled]="!('monitoring-dashboard-configure' | hasRight | async)"
+    (click)="navigateToMonitoringSettings()"
+  >
+    <mat-icon>settings</mat-icon>
+  </button>
+</section>
+<step-table [dataSource]="dataSource" [inProgress]="inProgress" matSort [matSortDisableClear]="true">
+  <ng-container matColumnDef="name" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+    <td mat-cell *matCellDef="let element">
+      <a routerLink="" (click)="navigateToPlanEditor(element)">{{ element.schedulerTask.attributes.name }}</a>
+      <mat-icon
+        *ngIf="!!element.executionsParameters?.repositoryObject?.repositoryParameters?.planid"
+        class="nav-to-plan-icon"
+        matTooltip="Go to plan"
+        >insert_drive_file</mat-icon
+      >
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="cronExpression" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>CRON Expression</th>
+    <td mat-cell *matCellDef="let element">
+      {{ element.schedulerTask.cronExpression }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="environment" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Environment</th>
+    <td mat-cell *matCellDef="let element">
+      {{ element.schedulerTask.executionsParameters.customParameters.env }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="lastExecution">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Last execution</th>
+    <td mat-cell *matCellDef="let element">
+      <ng-container *ngIf="element.lastExecution">
+        <a routerLink="" (click)="navigateToExecution(element)">{{
+          element.lastExecution?.startTime | date: DateFormat.date
+        }}</a>
+        <span class="duration-field" style="opacity: 0.7">{{ element.relativeExecutionTime }}</span>
+      </ng-container>
+      <span *ngIf="!element.lastExecution">No execution until now</span>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="lastStatusChange">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Last status change</th>
+    <td mat-cell *matCellDef="let element">
+      <span>{{ element.lastExecutionBeforeResultChange?.startTime | date: DateFormat.date }}</span>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="simplifiedStatus" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+    <td mat-cell *matCellDef="let element">
+      <div class="text-center small reportNodeStatus" [ngClass]="'status-' + element.simplifiedStatus">
+        {{ element.simplifiedStatus }}
+      </div>
+    </td>
+  </ng-container>
+  <!--  <ng-container matColumnDef="environment" stepSearchCol>-->
+  <!--    <th mat-header-cell *matHeaderCellDef mat-sort-header>Environment</th>-->
+  <!--    <td mat-cell *matCellDef="let element">{{ element.executionsParameters.customParameters?.env }}</td>-->
+  <!--  </ng-container>-->
+  <!--  <step-custom-columns screen="schedulerTable"> </step-custom-columns>-->
+  <!--  <ng-container matColumnDef="cronExpression" stepSearchCol>-->
+  <!--    <th mat-header-cell *matHeaderCellDef mat-sort-header>CronExpression</th>-->
+  <!--    <td mat-cell *matCellDef="let element">{{ element.cronExpression }}</td>-->
+  <!--  </ng-container>-->
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef>Actions</th>
+    <td mat-cell *matCellDef="let element" class="cell-actions">
+      <step-btn-group>
+        <button
+          mat-icon-button
+          matTooltip="Execute scheduler task"
+          (click)="executeTask(element.schedulerTask)"
+          [disabled]="!('user-write' | hasRight | async)"
+        >
+          <mat-icon>play_arrow</mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="Edit scheduler task" (click)="editTask(element.schedulerTask.id)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          matTooltip="Analyze performance in interactive session"
+          (click)="navToStats(element.schedulerTask)"
+          [disabled]="!('task-write' | hasRight | async)"
+        >
+          <mat-icon>bar_chart</mat-icon>
+        </button>
+      </step-btn-group>
+    </td>
+  </ng-container>
+</step-table>
