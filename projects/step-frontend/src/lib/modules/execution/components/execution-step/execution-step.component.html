@@ -76,13 +76,13 @@
         <step-status-distribution [summary]="progress"> </step-status-distribution>
       </mat-expansion-panel-header>
       <div>
-        <step-keyword-wrapper
-          [stepsTable]="stepsTable"
-          [stepsTableServerSideParameters]="stepsTableServerSideParameters"
-          [executionViewServices]="executionViewServices"
-          [reportNodeStatusOptions]="reportNoteStatusOptions"
+        <step-keyword-calls
+          [execution]="execution"
+          [keywordParameters$]="keywordParameters$"
+          (showNodeInTree)="handleShowNodeInTree($event)"
+          (showTestCase)="handleShowTestCase($event)"
         >
-        </step-keyword-wrapper>
+        </step-keyword-calls>
       </div>
     </mat-expansion-panel>
   </ng-container>

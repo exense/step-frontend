@@ -1,0 +1,73 @@
+<ng-template #chevronRight>
+  <mat-icon>chevron_right</mat-icon>
+</ng-template>
+<ng-template #chevronDown>
+  <mat-icon>expand_more</mat-icon>
+</ng-template>
+<section class="header">
+  <step-btn-group>
+    <a href="#" (click)="toggleFooter(); (false)">
+      {{ showFooter ? 'hide details' : 'display details' }}
+    </a>
+    <button
+      type="button"
+      mat-icon-button
+      matTooltip="Export as CSV"
+      matTooltipPosition="below"
+      (click)="keywordsTable.exportAsCSV(EXPORT_FIELDS)"
+    >
+      <mat-icon>file_upload</mat-icon>
+    </button>
+  </step-btn-group>
+</section>
+<step-table
+  #keywordsTable
+  matSort
+  matSortActive="executionTime"
+  matSortDirection="desc"
+  [dataSource]="leafReportsDataSource"
+  [matSortDisableClear]="true"
+  [tableParams]="(keywordParameters$ | async)!"
+>
+  <ng-container matColumnDef="executionTime">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="cell-execution-time">Begin</th>
+    <td mat-cell *matCellDef="let element" class="cell-execution-time">
+      <div>
+        <button type="button" mat-icon-button matTooltip="Show/hide details" (click)="toggleRowDetails(element.id)">
+          <ng-container *ngIf="rowDetailsVisibilityFlags[element.id]; then chevronDown; else chevronRight">
+          </ng-container>
+        </button>
+        <span>{{ element.executionTime | date: 'HH:mm:ss' }}</span>
+      </div>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="step" stepSearchCol #stepSearchColStep="SearchCol">
+    <mat-form-field class="step-search" *stepSearchCellDef>
+      <input matInput type="text" (change)="stepSearchColStep.search($event, true)" />
+    </mat-form-field>
+    <th mat-header-cell *matHeaderCellDef class="cell-step">Step</th>
+    <td mat-cell *matCellDef="let element" class="cell-step">
+      <step-report-node-short
+        [node]="element"
+        [showFooter]="showFooter"
+        [showDetails]="rowDetailsVisibilityFlags[element.id]"
+        [isShowTestCaseVisible]="execution?.executionType === 'TestSet'"
+        (showNodeInTree)="showNodeInTree.emit($event)"
+        (showTestCase)="showTestCase.emit($event)"
+      >
+      </step-report-node-short>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="status" stepSearchCol #stepSearchColStatus="SearchCol">
+    <step-array-filter
+      *stepSearchCellDef
+      [items]="statusOptions"
+      (selectedItemsChange)="stepSearchColStatus.search($event, true)"
+    >
+    </step-array-filter>
+    <th mat-header-cell *matHeaderCellDef class="cell-status">Status</th>
+    <td mat-cell *matCellDef="let element" class="cell-status">
+      <step-report-node-status [status]="element.status"> </step-report-node-status>
+    </td>
+  </ng-container>
+</step-table>
