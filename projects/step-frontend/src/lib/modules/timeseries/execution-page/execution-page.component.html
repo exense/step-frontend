@@ -1,6 +1,6 @@
 <div class="page-container">
   <div class="view-content">
-    <step-execution-tabs></step-execution-tabs>
+    <!--    <step-execution-tabs></step-execution-tabs>-->
     <step-execution-time-selection
       (onRangeChange)="handleTableRangeChange($event)"
       (onRangeReset)="handleRangeReset($event)"
@@ -24,7 +24,7 @@
           #summaryChart
           *ngIf="summaryChartSettings"
           [settings]="summaryChartSettings"
-          [syncKey]="syncKey"
+          [syncKey]="executionId"
           [selection]="timeSelection?.absoluteSelection"
           (onZoomReset)="onZoomReset()"
         >
@@ -38,7 +38,7 @@
           *ngIf="byStatusSettings"
           [settings]="byStatusSettings"
           [selection]="timeSelection?.absoluteSelection"
-          [syncKey]="syncKey"
+          [syncKey]="executionId"
           (onZoomReset)="onZoomReset()"
         >
         </step-timeseries-chart>
@@ -51,7 +51,7 @@
           *ngIf="responseTypeByKeywordsSettings"
           [settings]="responseTypeByKeywordsSettings"
           [selection]="timeSelection?.absoluteSelection"
-          [syncKey]="syncKey"
+          [syncKey]="executionId"
           (onZoomReset)="onZoomReset()"
         >
         </step-timeseries-chart>
@@ -72,7 +72,7 @@
           #chart4
           [settings]="throughputChartSettings"
           [selection]="timeSelection?.absoluteSelection"
-          [syncKey]="syncKey"
+          [syncKey]="executionId"
           (onZoomReset)="onZoomReset()"
         >
         </step-timeseries-chart>
@@ -85,14 +85,14 @@
           #threadGroupChart
           [settings]="threadGroupSettings"
           [selection]="timeSelection?.absoluteSelection"
-          [syncKey]="syncKey"
+          [syncKey]="executionId"
           (onZoomReset)="onZoomReset()"
         >
         </step-timeseries-chart>
       </div>
 
       <div class="chart-container">
-        <step-timeseries-table #tableChart [executionId]="executionId"></step-timeseries-table>
+        <step-timeseries-table #tableChart *ngIf="executionId" [executionId]="executionId"></step-timeseries-table>
       </div>
     </div>
   </div>

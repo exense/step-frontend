@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE } from '@exense/step-core';
 import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
@@ -33,8 +33,6 @@ declare const uPlot: any;
 export class ExecutionPageComponent implements OnInit, OnDestroy {
   private RESOLUTION_MS = 1000;
   private LEGEND_SIZE = 65;
-  executionId = window.location.href.split('/').slice(-1)[0]; // last part of URL
-  syncKey: string = this.executionId;
 
   summaryChartSettings: TSChartSettings | undefined;
   byStatusSettings: TSChartSettings | undefined;
@@ -53,6 +51,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   @ViewChild(ExecutionPageTimeSelectionComponent) timeSelectionComponent!: ExecutionPageTimeSelectionComponent;
 
+  @Input('executionId') executionId!: string;
+
   barsFunction = uPlot.paths.bars;
   stepped = uPlot.paths.stepped;
 
@@ -61,12 +61,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   byKeywordsChartResponseCache?: TimeSeriesChartResponse; // for caching
 
-  findRequest: FindBucketsRequest = {
-    start: 0,
-    end: -1,
-    intervalSize: 2500,
-    params: { eId: this.executionId },
-  };
+  findRequest!: FindBucketsRequest;
 
   execution: any;
   executionStart: number = 0;
@@ -90,28 +85,24 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   allSeriesChecked: boolean = true;
 
   private colorsPool = new TimeseriesColorsPool();
-  private keywordsService: TimeSeriesKeywordsContext;
+  private keywordsService!: TimeSeriesKeywordsContext;
 
   responseTimeMetrics = [
     { label: 'AVG', mapping: (b: Bucket) => b.sum / b.throughputPerHour },
     { label: 'MIN', mapping: (b: Bucket) => b.min },
     { label: 'MAX', mapping: (b: Bucket) => b.max },
-    { label: 'STDDEV', mapping: (b: Bucket) => b.max },
     { label: 'Perc. 90', mapping: (b: Bucket) => b.pclValues[90] },
     { label: 'Perc. 99', mapping: (b: Bucket) => b.pclValues[99] },
   ];
   selectedMetric = this.responseTimeMetrics[0];
 
-  private executionService: ExecutionTabContext;
+  private executionService!: ExecutionTabContext;
 
   valueAscOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => {
     return a.key.localeCompare(b.key);
   };
 
-  constructor(private timeSeriesService: TimeSeriesService, private executionsPageService: ExecutionsPageService) {
-    this.executionService = executionsPageService.getContext(this.executionId);
-    this.keywordsService = this.executionService.getKeywordsContext();
-  }
+  constructor(private timeSeriesService: TimeSeriesService, private executionsPageService: ExecutionsPageService) {}
 
   onAllSeriesCheckboxClick(event: any) {
     this.keywordsService.toggleSelectAll();
@@ -134,6 +125,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.initContext();
     this.keywordsService.onAllSelectionChanged().subscribe((selected) => {
       this.allSeriesChecked = selected;
     });
@@ -176,6 +168,20 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         this.refreshEnabled = true;
       }
     });
+  }
+
+  private initContext() {
+    if (!this.executionId) {
+      throw new Error('Execution id is not specified!');
+    }
+    this.findRequest = {
+      start: 0,
+      end: -1,
+      intervalSize: 2500,
+      params: { eId: this.executionId },
+    };
+    this.executionService = this.executionsPageService.getContext(this.executionId);
+    this.keywordsService = this.executionService.getKeywordsContext();
   }
 
   startRefreshInterval(interval: number) {
