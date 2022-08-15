@@ -30,10 +30,6 @@
         >
         </step-timeseries-chart>
       </div>
-      <!--  <div class="chart-container">-->
-      <!--    <step-timeseries-chart *ngIf="chart2Settings" [settings]="chart2Settings" [syncKey]="syncKey" (onZoomReset)="onZoomReset()">-->
-      <!--    </step-timeseries-chart>-->
-      <!--  </div>-->
 
       <div class="chart-container">
         <step-chart-skeleton *ngIf="!byStatusSettings"></step-chart-skeleton>
@@ -98,10 +94,6 @@
       <div class="chart-container">
         <step-timeseries-table #tableChart [executionId]="executionId"></step-timeseries-table>
       </div>
-
-      <!--      <div class="chart-container pie-chart-container">-->
-      <!--        -->
-      <!--      </div>-->
     </div>
   </div>
   <div class="side-panel">
@@ -134,13 +126,3 @@
     </div>
   </div>
 </div>
-
-<!--<ng-template #skeleton>-->
-<!--  <div class="chart-scheleton">-->
-<!--    <svg width="100%" height="100%" viewBox="0 0 157 52" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">-->
-<!--      <g transform="translate(-40 -35)">-->
-<!--        <path d="m41 61 20 9.1 17-9.1 25-4.9 13-20 21 29 19-13 5.9 8.9 21-0.76 15-15v42h-157z" fill="#efefef"/>-->
-<!--      </g>-->
-<!--    </svg>-->
-<!--  </div>-->
-<!--</ng-template>-->
