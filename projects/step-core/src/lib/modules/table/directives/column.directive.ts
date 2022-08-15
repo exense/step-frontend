@@ -5,7 +5,7 @@ import { Observable, of } from 'rxjs';
 import { SearchColDirective } from './search-col.directive';
 
 @Directive({
-  selector: '[matColumnDef]:not([internal]),step-custom-columns',
+  selector: '[matColumnDef]:not([internal]):not([stepAdditionalCol]),step-custom-columns',
 })
 export class ColumnDirective {
   constructor(

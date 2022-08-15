@@ -129,27 +129,11 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     this._terminator$.complete();
   }
 
-  getTableData(page?: PageEvent, sort?: Sort, search?: { [key: string]: SearchValue }): void;
-  getTableData(req: TableRequest): void;
-  getTableData(
-    reqOrPage: TableRequest | PageEvent | undefined,
-    sort?: Sort,
+  private createInternalRequestObject(
     search?: { [key: string]: SearchValue },
     filter?: string,
     params?: TableParameters
-  ): void {
-    if (this.typeFilter) {
-      search = { ...search, ...this.typeFilter };
-    }
-
-    if (arguments.length === 1 && reqOrPage instanceof TableRequest) {
-      const req = reqOrPage as TableRequest;
-      this._request$.next(req);
-      return;
-    }
-
-    const page = reqOrPage as PageEvent | undefined;
-
+  ): TableRequest {
     const tableRequest: TableRequest = new TableRequest({
       columns: Object.values(this._requestColumnsMap),
       searchBy: Object.entries(search || {})
@@ -179,6 +163,32 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
       tableRequest.params = params;
     }
 
+    return tableRequest;
+  }
+
+  getTableData(page?: PageEvent, sort?: Sort, search?: { [key: string]: SearchValue }): void;
+  getTableData(req: TableRequest): void;
+  getTableData(
+    reqOrPage: TableRequest | PageEvent | undefined,
+    sort?: Sort,
+    search?: { [key: string]: SearchValue },
+    filter?: string,
+    params?: TableParameters
+  ): void {
+    if (this.typeFilter) {
+      search = { ...search, ...this.typeFilter };
+    }
+
+    if (arguments.length === 1 && reqOrPage instanceof TableRequest) {
+      const req = reqOrPage as TableRequest;
+      this._request$.next(req);
+      return;
+    }
+
+    const tableRequest = this.createInternalRequestObject(search, filter, params);
+
+    const page = reqOrPage as PageEvent | undefined;
+
     if (page) {
       tableRequest.start = page.pageIndex * page.pageSize;
       tableRequest.length = page.pageSize;
@@ -199,6 +209,17 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
 
   reload() {
     this._request$.next(this._request$.value);
+  }
+
+  getFilterRequest(
+    search?: { [p: string]: SearchValue },
+    filter?: string,
+    params?: TableParameters
+  ): TableRequestData | undefined {
+    if (!search && !filter && !params) {
+      return undefined;
+    }
+    return convertTableRequest(this.createInternalRequestObject(search, filter, params));
   }
 
   exportAsCSV(fields: string[], params?: TableParameters): void {

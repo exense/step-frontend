@@ -2,14 +2,37 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EntitySelectionComponent } from './components/entity-selection/entity-selection.component';
 import { StepMaterialModule } from '../step-material/step-material.module';
+import { BulkSelectionComponent } from './components/bulk-selection/bulk-selection.component';
+import { BulkSelectionDiComponent } from './components/bulk-selection/bulk-selection-di.component';
+import { EntitySelectionDiComponent } from './components/entity-selection/entity-selection-di.component';
+import { BulkSelectionLabelComponent } from './components/bulk-selection-label/bulk-selection-label.component';
 
 @NgModule({
-  declarations: [EntitySelectionComponent],
+  declarations: [
+    EntitySelectionComponent,
+    EntitySelectionDiComponent,
+    BulkSelectionComponent,
+    BulkSelectionDiComponent,
+    BulkSelectionLabelComponent,
+  ],
   imports: [CommonModule, StepMaterialModule],
-  exports: [EntitySelectionComponent],
+  exports: [
+    EntitySelectionComponent,
+    EntitySelectionDiComponent,
+    BulkSelectionComponent,
+    BulkSelectionDiComponent,
+    BulkSelectionLabelComponent,
+  ],
 })
 export class EntitiesSelectionModule {}
 
 export * from './services/selection-collector/selection-collector';
 export * from './services/selection-collector/selection-collector-factory.service';
+export * from './services/selection-collector.provider';
 export * from './components/entity-selection/entity-selection.component';
+export * from './components/entity-selection/entity-selection-di.component';
+export * from './components/bulk-selection/bulk-selection.component';
+export * from './components/bulk-selection/bulk-selection-di.component';
+export * from './components/bulk-selection-label/bulk-selection-label.component';
+export * from './shared/auto-deselect-strategy.enum';
+export * from './shared/bulk-selection-type.enum';

@@ -1,6 +1,7 @@
 import {
   AfterViewInit,
   Component,
+  ContentChild,
   ContentChildren,
   forwardRef,
   Input,
@@ -25,6 +26,9 @@ import { TableSearch } from '../../services/table.search';
 import { SearchValue } from '../../shared/search-value';
 import { ColumnDirective } from '../../directives/column.directive';
 import { TableParameters } from '../../../../client/table/models/table-parameters';
+import { TableRequestData } from '../../../../client/table/models/table-request-data';
+import { AdditionalHeaderDirective } from '../../directives/additional-header.directive';
+import { TableFilter } from '../../services/table.filter';
 
 export interface SearchColumn {
   colName: string;
@@ -43,9 +47,13 @@ export type DataSource<T> = TableDataSource<T> | T[] | Observable<T[]>;
       provide: TableSearch,
       useExisting: forwardRef(() => TableComponent),
     },
+    {
+      provide: TableFilter,
+      useExisting: forwardRef(() => TableComponent),
+    },
   ],
 })
-export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, TableSearch {
+export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, TableSearch, TableFilter {
   @Input() trackBy: TrackByFunction<T> = (index) => index;
   @Input() dataSource?: DataSource<T>;
   @Input() inProgress?: boolean;
@@ -74,6 +82,7 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
   @ViewChild(MatTable) private _table?: MatTable<any>;
   @ViewChild(MatPaginator, { static: true }) page!: MatPaginator;
 
+  @ContentChild(AdditionalHeaderDirective) additionalHeader?: AdditionalHeaderDirective;
   @ContentChildren(ColumnDirective) columns?: QueryList<ColumnDirective>;
 
   private get allCollDef(): MatColumnDef[] {
@@ -217,6 +226,10 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     const search = { ...this.search$.value };
     search[column] = regex ? { value, regex } : value;
     this.search$.next(search);
+  }
+
+  getTableFilterRequest(): TableRequestData | undefined {
+    return this.tableDataSource?.getFilterRequest(this.search$.value, this.filter$.value, this.tableParams$.value);
   }
 
   ngAfterViewInit(): void {

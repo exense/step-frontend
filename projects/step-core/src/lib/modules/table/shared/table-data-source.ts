@@ -3,7 +3,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { Observable } from 'rxjs';
 import { SearchValue } from './search-value';
-import { TableParameters } from '../../../client/table/step-table-client.module';
+import { TableParameters, TableRequestData } from '../../../client/table/step-table-client.module';
 
 export interface TableDataSource<T> extends DataSource<T> {
   readonly inProgress$: Observable<boolean>;
@@ -16,6 +16,11 @@ export interface TableDataSource<T> extends DataSource<T> {
     filter?: string,
     params?: TableParameters
   ): void;
+  getFilterRequest(
+    search?: { [key: string]: SearchValue },
+    filter?: string,
+    params?: TableParameters
+  ): TableRequestData | undefined;
   reload(): void;
   exportAsCSV(fields: string[], params?: TableParameters): void;
 }

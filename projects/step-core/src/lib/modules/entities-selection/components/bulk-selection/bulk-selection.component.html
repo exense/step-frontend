@@ -1,0 +1,17 @@
+<mat-menu #menu="matMenu">
+  <button *ngFor="let selectionType of selectionTypes" mat-menu-item (click)="changeType(selectionType)">
+    {{ selectionType }}
+  </button>
+</mat-menu>
+<mat-checkbox
+  color="primary"
+  [checked]="isChecked"
+  [indeterminate]="isIntermediate"
+  (change)="handleCheckboxChange($event.checked)"
+>
+</mat-checkbox>
+<button type="button" mat-icon-button [matMenuTriggerFor]="menu">
+  <mat-icon>arrow_drop_down</mat-icon>
+</button>
+<step-bulk-selection-label *ngIf="showLabel" [selectionType]="selectionType" [selectionCollector]="selectionCollector">
+</step-bulk-selection-label>

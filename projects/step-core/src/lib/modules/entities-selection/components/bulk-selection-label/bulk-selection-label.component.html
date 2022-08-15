@@ -1,0 +1,6 @@
+<mat-label [ngSwitch]="selectionType">
+  <ng-container *ngSwitchCase="BulkSelectionType.None"> No items selected </ng-container>
+  <ng-container *ngSwitchCase="BulkSelectionType.All"> All items selected </ng-container>
+  <ng-container *ngSwitchCase="BulkSelectionType.Filtered"> Filtered items selected </ng-container>
+  <ng-container *ngSwitchDefault> {{ selectionCollector?.length$ | async }} item(s) selected </ng-container>
+</mat-label>
