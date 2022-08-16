@@ -46,10 +46,14 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Last execution</th>
     <td mat-cell *matCellDef="let element">
       <ng-container *ngIf="element.lastExecution">
-        <a routerLink="" (click)="navigateToExecution(element)">{{
+        <a routerLink="" (click)="navigateToExecution(element)" style="margin-right: 8px">{{
           element.lastExecution?.startTime | date: DateFormat.date
         }}</a>
-        <span class="duration-field" style="opacity: 0.7">{{ element.relativeExecutionTime }}</span>
+        <span
+          class="duration-field"
+          [style.opacity]="0.5 + (0.5 * (now.getTime() - element.lastExecution!.startTime!)) / 86400000"
+          >{{ element.relativeExecutionTime }}</span
+        >
       </ng-container>
       <span *ngIf="!element.lastExecution">No execution until now</span>
     </td>
@@ -57,7 +61,14 @@
   <ng-container matColumnDef="lastStatusChange">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Last status change</th>
     <td mat-cell *matCellDef="let element">
-      <span>{{ element.lastExecutionBeforeResultChange?.startTime | date: DateFormat.date }}</span>
+      <ng-container *ngIf="element.lastExecution">
+        <span>{{ element.lastExecutionBeforeResultChange?.startTime | date: DateFormat.date }}</span>
+        <span
+          class="duration-field"
+          [style.opacity]="0.5 + 0.5 * (now.getTime() - element.lastExecutionBeforeResultChange!.startTime!)"
+          >{{ element.relativeExecutionTime }}</span
+        >
+      </ng-container>
     </td>
   </ng-container>
   <ng-container matColumnDef="simplifiedStatus" stepSearchCol>

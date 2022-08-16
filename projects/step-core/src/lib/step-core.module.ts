@@ -93,7 +93,6 @@ export * from './services/plugin-info-registry.service';
 export * from './services/additional-right-rule.service';
 export * from './services/artefact-types.service';
 export * from './services/report-node-commons.service';
-export * from './services/export.service';
 export { UibModalInstance, UibModalHelperService } from './services/uib-modal-helper.service';
 export * from './angularjs';
 export * from './directives/tooltip.directive';
