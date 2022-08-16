@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { AJS_MODULE, AugmentedExecutionsService } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { DateFormat } from '../../../_common/shared/date-format.enum';
+import { EXECUTION_RESULT, EXECUTION_STATUS } from '../../../_common/shared/status.enum';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'step-execution-list',
@@ -12,8 +14,8 @@ export class ExecutionListComponent {
   readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
 
   readonly DateFormat = DateFormat;
-  readonly resultItems$ = this._augmentedExecutionsService.getResultColumnItems();
-  readonly statusItems$ = this._augmentedExecutionsService.getStatusColumnItems();
+  readonly resultItems$ = of(EXECUTION_RESULT);
+  readonly statusItems$ = of(EXECUTION_STATUS);
 
   constructor(public _augmentedExecutionsService: AugmentedExecutionsService) {}
 }

@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { SelectionCollector } from '../../services/selection-collector/selection-collector';
-import { map, Observable, of, tap } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { Mutable } from '../../../../shared';
 
 type FieldAccessor = Mutable<Pick<EntitySelectionComponent<any, any>, 'isSelected$'>>;
@@ -49,8 +49,7 @@ export class EntitySelectionComponent<KEY, ENTITY> implements OnChanges {
     }
 
     (this as FieldAccessor).isSelected$ = selectionCollector!.selected$.pipe(
-      map(() => selectionCollector!.isSelected(entity!)),
-      tap((x) => console.log('SELECTION FLAG VALUE', x, entity))
+      map(() => selectionCollector!.isSelected(entity!))
     );
   }
 }

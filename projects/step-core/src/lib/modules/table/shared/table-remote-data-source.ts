@@ -1,4 +1,4 @@
-import { CollectionViewer, DataSource } from '@angular/cdk/collections';
+import { CollectionViewer } from '@angular/cdk/collections';
 import {
   BehaviorSubject,
   catchError,
@@ -13,71 +13,71 @@ import {
   takeUntil,
   tap,
 } from 'rxjs';
-import { TableRestService } from '../../../client/table/services/table-rest.service';
-import { TableRequestData } from '../../../client/table/models/table-request-data';
-import { TableResponse } from '../../../client/table/models/table-response';
+import {
+  OQLFilter,
+  SortDirection,
+  TableParameters,
+  TableRequestData,
+  TableResponse,
+  TableRestService,
+} from '../../../client/table/step-table-client.module';
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { TableDataSource } from './table-data-source';
 import { SearchValue } from './search-value';
 
-export class RemoteTableRequest {
+export class TableRequest {
   columns: string[];
-  searchBy: { column: string; search: string; regex: boolean }[];
+  searchBy?: { column: string; search: string; regex: boolean }[];
   orderBy?: { column: string; order: 'asc' | 'desc' };
   start?: number;
   length?: number;
   filter?: string;
+  params?: TableParameters;
 
-  constructor(data?: Partial<RemoteTableRequest>) {
+  constructor(data?: Partial<TableRequest>) {
     this.columns = data?.columns || [];
     this.searchBy = data?.searchBy || [];
     this.orderBy = data?.orderBy || undefined;
     this.start = data?.start || undefined;
     this.length = data?.length || undefined;
     this.filter = data?.filter || undefined;
+    this.params = data?.params || undefined;
   }
 }
 
-const convertTableRequest = (req: RemoteTableRequest): TableRequestData => {
+const convertTableRequest = (req: TableRequest): TableRequestData => {
   const result: TableRequestData = {
-    draw: 1,
-    columns: [],
-    start: req.start || 0,
-    length: req.length || 10,
-    order: [],
-    search: {
-      value: '',
-      regex: false,
-    },
-    filter: req.filter,
+    skip: req.start || 0,
+    limit: req.length || 10,
   };
 
-  result.columns = req.columns.map((name) => {
-    const searchColumn = (req.searchBy || []).find((s) => s.column === name);
-    return searchColumn
-      ? {
-          name,
-          searchable: true,
-          search: {
-            value: searchColumn.search,
-            regex: searchColumn.regex,
-          },
-        }
-      : { name };
-  });
-
-  let orderColumnIndex = 0; //if not specified otherwise, the first column is sorted ascendingly
-  if (!!req.orderBy && req.columns.indexOf(req.orderBy.column) >= 0) {
-    orderColumnIndex = req.columns.indexOf(req.orderBy.column);
+  if (req.searchBy && req.searchBy.length > 0) {
+    result.filters = req.searchBy.map(({ column: field, search: value, regex: isRegex }) => ({
+      field,
+      value,
+      isRegex,
+    }));
   }
-  result.columns[orderColumnIndex].orderable = true;
-  result.order = [
-    {
-      column: orderColumnIndex,
-      dir: !!req.orderBy?.order ? req.orderBy.order : 'asc',
-    },
-  ];
+
+  result.sort = req.orderBy
+    ? {
+        field: req.orderBy.column,
+        direction: req.orderBy.order === 'asc' ? SortDirection.ASCENDING : SortDirection.DESCENDING,
+      }
+    : {
+        field: req.columns[0],
+        direction: SortDirection.ASCENDING,
+      };
+
+  if (req.filter) {
+    const oql: OQLFilter = { oql: req.filter };
+    result.filters = !!result.filters ? [...result.filters, oql] : [oql];
+  }
+
+  if (req.params) {
+    result.tableParameters = req.params;
+  }
 
   return result;
 };
@@ -86,12 +86,12 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   private _terminator$ = new Subject<any>();
   private _inProgress$ = new BehaviorSubject<boolean>(false);
   readonly inProgress$ = this._inProgress$.asObservable();
-  private _request$ = new BehaviorSubject<RemoteTableRequest | undefined>(undefined);
-  private _response$: Observable<TableResponse | null> = this._request$.pipe(
+  private _request$ = new BehaviorSubject<TableRequest | undefined>(undefined);
+  private _response$: Observable<TableResponse<T> | null> = this._request$.pipe(
     filter((x) => !!x),
     map((x) => convertTableRequest(x!)),
     tap((_) => this._inProgress$.next(true)),
-    switchMap((request) => this._rest.requestTable(this._tableId, request)),
+    switchMap((request) => this._rest.requestTable<T>(this._tableId, request)),
     catchError((err) => {
       console.error(err);
       return of(null);
@@ -100,11 +100,9 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     startWith(null),
     shareReplay(1),
     takeUntil(this._terminator$)
-  ) as Observable<TableResponse | null>;
-  readonly data$: Observable<T[]> = this._response$.pipe(
-    map((r) => r?.data || []),
-    map((items) => items.map((x) => JSON.parse(x[0]) as T))
-  );
+  ) as Observable<TableResponse<T> | null>;
+  readonly data$: Observable<T[]> = this._response$.pipe(map((r) => r?.data || []));
+
   readonly total$ = this._response$.pipe(map((r) => r?.recordsTotal || 0));
   readonly totalFiltered$ = this._response$.pipe(map((r) => r?.recordsFiltered || 0));
   private typeFilter?: { [key: string]: string };
@@ -132,26 +130,27 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   }
 
   getTableData(page?: PageEvent, sort?: Sort, search?: { [key: string]: SearchValue }): void;
-  getTableData(req: RemoteTableRequest): void;
+  getTableData(req: TableRequest): void;
   getTableData(
-    reqOrPage: RemoteTableRequest | PageEvent | undefined,
+    reqOrPage: TableRequest | PageEvent | undefined,
     sort?: Sort,
     search?: { [key: string]: SearchValue },
-    filter?: string
+    filter?: string,
+    params?: TableParameters
   ): void {
     if (this.typeFilter) {
       search = { ...search, ...this.typeFilter };
     }
 
-    if (arguments.length === 1 && reqOrPage instanceof RemoteTableRequest) {
-      const req = reqOrPage as RemoteTableRequest;
+    if (arguments.length === 1 && reqOrPage instanceof TableRequest) {
+      const req = reqOrPage as TableRequest;
       this._request$.next(req);
       return;
     }
 
     const page = reqOrPage as PageEvent | undefined;
 
-    const tableRequest: RemoteTableRequest = new RemoteTableRequest({
+    const tableRequest: TableRequest = new TableRequest({
       columns: Object.values(this._requestColumnsMap),
       searchBy: Object.entries(search || {})
         .map(([name, searchValue]) => {
@@ -176,6 +175,10 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
       tableRequest.filter = filter;
     }
 
+    if (params) {
+      tableRequest.params = params;
+    }
+
     if (page) {
       tableRequest.start = page.pageIndex * page.pageSize;
       tableRequest.length = page.pageSize;
@@ -196,5 +199,18 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
 
   reload() {
     this._request$.next(this._request$.value);
+  }
+
+  exportAsCSV(fields: string[], params?: TableParameters): void {
+    const request = new TableRequest({
+      ...(this._request$.value || {}),
+      params,
+    });
+
+    const tableRequest = convertTableRequest(request);
+    delete tableRequest.skip;
+    delete tableRequest.limit;
+
+    this._rest.exportAsCSV(this._tableId, fields, tableRequest);
   }
 }

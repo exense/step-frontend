@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { TableRequestData } from '../models/table-request-data';
 import { TableResponse } from '../models/table-response';
 import { Observable } from 'rxjs';
+import { ExportService } from '../../../services/export.service';
+import { ExportStatus } from '../../generated';
 
 const ROOT = 'rest/table';
 
@@ -10,48 +12,21 @@ const ROOT = 'rest/table';
   providedIn: 'root',
 })
 export class TableRestService {
-  constructor(private _httpClient: HttpClient) {}
+  constructor(private _httpClient: HttpClient, private _exportService: ExportService) {}
 
-  private createParams(tableRequest: TableRequestData): HttpParams {
-    const params: { [key: string]: string | number | boolean } = {};
-    params['draw'] = tableRequest.draw;
-    params['start'] = tableRequest.start;
-    params['length'] = tableRequest.length;
-    params['search[value]'] = tableRequest.search.value;
-    params['search[regex]'] = tableRequest.search.regex;
-    if (tableRequest.filter) {
-      params['filter'] = tableRequest.filter;
-    }
-
-    tableRequest.columns.forEach((col, i) => {
-      const prefix = `columns[${i}]`;
-      if (col.data) params[`${prefix}[data]`] = col.data;
-      params[`${prefix}[name]`] = col.name;
-      if (col.searchable !== undefined) params[`${prefix}[searchable]`] = col.searchable;
-      if (col.orderable !== undefined) params[`${prefix}[orderable]`] = col.orderable;
-      if (col.search) {
-        params[`${prefix}[search][value]`] = col.search.value;
-        params[`${prefix}[search][regex]`] = col.search.regex;
-      }
-    });
-
-    tableRequest.order.forEach((ord, i) => {
-      const prefix = `order[${i}]`;
-      params[`${prefix}[column]`] = ord.column;
-      params[`${prefix}[dir]`] = ord.dir;
-    });
-
-    return new HttpParams({ fromObject: params });
+  requestTable<T>(tableId: string, tableRequest: TableRequestData): Observable<TableResponse<T>> {
+    const url = `${ROOT}/${tableId}`;
+    return this._httpClient.post<TableResponse<T>>(url, tableRequest);
   }
 
-  requestTable(tableId: string, tableRequest: TableRequestData): Observable<TableResponse> {
-    const url = `${ROOT}/${tableId}/data`;
-    const params = this.createParams(tableRequest);
-    return this._httpClient.post<TableResponse>(url, params);
+  exportTable(tableId: string, tableRequest: TableRequestData, fields: string[]): Observable<ExportStatus> {
+    const url = `${ROOT}/${tableId}/export`;
+    return this._httpClient.post<ExportStatus>(url, { tableRequest, fields });
   }
 
-  requestColumnValues(tableId: string, columnName: string): Observable<string[]> {
-    const url = `${ROOT}/${tableId}/column/${columnName}/distinct`;
-    return this._httpClient.get<string[]>(url);
+  exportAsCSV(tableId: string, fields: string[], tableRequest: TableRequestData = {}): void {
+    this.exportTable(tableId, tableRequest, fields).subscribe((exportStatus) => {
+      this._exportService.poll(exportStatus.id!);
+    });
   }
 }

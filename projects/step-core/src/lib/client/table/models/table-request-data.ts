@@ -1,13 +1,13 @@
-import { TableColumn } from './table-column';
-import { ColumnOrder } from './column-order';
-import { TableSearch } from './table-search';
+import { FieldFilter } from './field-filter';
+import { FullTextFilter } from './full-text-filter';
+import { FieldSort } from './field-sort';
+import { TableParameters } from './table-parameters';
+import { OQLFilter } from './oql-filter';
 
 export interface TableRequestData {
-  draw: number;
-  columns: TableColumn[];
-  order: ColumnOrder[];
-  start: number;
-  length: number;
-  search: TableSearch;
-  filter?: string;
+  filters?: (FieldFilter | FullTextFilter | OQLFilter)[];
+  sort?: FieldSort;
+  skip?: number;
+  limit?: number;
+  tableParameters?: TableParameters;
 }

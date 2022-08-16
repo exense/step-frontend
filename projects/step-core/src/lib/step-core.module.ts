@@ -16,6 +16,7 @@ import { EntityModule } from './modules/entity/entity.module';
 import { StepGeneratedClientModule } from './client/generated';
 import { EntitiesSelectionModule } from './modules/entities-selection/entities-selection.module';
 import { CapsLockDirective } from './directives/caps-lock.directive';
+import { CustomRegistriesModule } from './modules/custom-registeries/custom-registries.module';
 
 @NgModule({
   declarations: [TooltipDirective, HasRightPipe, DashboardLinkPipe, CapsLockDirective],
@@ -31,6 +32,7 @@ import { CapsLockDirective } from './directives/caps-lock.directive';
     EntityModule,
     EntitiesSelectionModule,
     StepGeneratedClientModule,
+    CustomRegistriesModule,
   ],
   exports: [
     CommonModule,
@@ -48,6 +50,7 @@ import { CapsLockDirective } from './directives/caps-lock.directive';
     EntityModule,
     EntitiesSelectionModule,
     StepGeneratedClientModule,
+    CustomRegistriesModule,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -88,6 +91,9 @@ export * from './services/view-state.service';
 export * from './services/context.service';
 export * from './services/plugin-info-registry.service';
 export * from './services/additional-right-rule.service';
+export * from './services/artefact-types.service';
+export * from './services/report-node-commons.service';
+export * from './services/export.service';
 export { UibModalInstance, UibModalHelperService } from './services/uib-modal-helper.service';
 export * from './angularjs';
 export * from './directives/tooltip.directive';
@@ -101,6 +107,7 @@ export * from './modules/entity/entity.module';
 export * from './modules/entities-selection/entities-selection.module';
 export * from './client/generated/index';
 export * from './client/step-client-module';
+export * from './modules/custom-registeries/custom-registries.module';
 
 export { ApiError } from './client/generated/core/ApiError';
 export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
