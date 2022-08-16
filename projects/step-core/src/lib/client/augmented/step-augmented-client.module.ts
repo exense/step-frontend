@@ -15,7 +15,6 @@ export type { ProjectMemberDto } from './models/project-member-dto';
 export type { AugmentedTokenWrapperOwner } from './models/augmented-token-wrapper-owner';
 
 export { AugmentedPlansService } from './services/augmented-plans-service';
-export { AugmentedGridService } from './services/augmented-grid-service';
 export { AugmentedExecutionsService } from './services/augmented-executions-service';
 export { AugmentedParametersService } from './services/augmented-parameters-service';
 export { AugmentedResourcesService } from './services/augmented-resources-service';

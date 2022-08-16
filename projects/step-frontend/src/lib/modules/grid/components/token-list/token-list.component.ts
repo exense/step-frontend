@@ -4,7 +4,7 @@ import {
   AJS_MODULE,
   Mutable,
   TableLocalDataSource,
-  AugmentedGridService,
+  GridService,
   TokenWrapper,
   AugmentedTokenWrapperOwner,
 } from '@exense/step-core';
@@ -58,7 +58,7 @@ export class TokenListComponent implements OnDestroy {
     },
   });
 
-  constructor(private _gridService: AugmentedGridService) {}
+  constructor(private _gridService: GridService) {}
 
   public loadTable(): void {
     this.tokenRequestSubject$.next({});

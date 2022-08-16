@@ -21,7 +21,7 @@ import { Sort } from '@angular/material/sort';
 import { TableDataSource } from './table-data-source';
 import { SearchValue } from './search-value';
 
-export class TableRequest {
+export class RemoteTableRequest {
   columns: string[];
   searchBy: { column: string; search: string; regex: boolean }[];
   orderBy?: { column: string; order: 'asc' | 'desc' };
@@ -29,7 +29,7 @@ export class TableRequest {
   length?: number;
   filter?: string;
 
-  constructor(data?: Partial<TableRequest>) {
+  constructor(data?: Partial<RemoteTableRequest>) {
     this.columns = data?.columns || [];
     this.searchBy = data?.searchBy || [];
     this.orderBy = data?.orderBy || undefined;
@@ -39,7 +39,7 @@ export class TableRequest {
   }
 }
 
-const convertTableRequest = (req: TableRequest): TableRequestData => {
+const convertTableRequest = (req: RemoteTableRequest): TableRequestData => {
   const result: TableRequestData = {
     draw: 1,
     columns: [],
@@ -86,7 +86,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   private _terminator$ = new Subject<any>();
   private _inProgress$ = new BehaviorSubject<boolean>(false);
   readonly inProgress$ = this._inProgress$.asObservable();
-  private _request$ = new BehaviorSubject<TableRequest | undefined>(undefined);
+  private _request$ = new BehaviorSubject<RemoteTableRequest | undefined>(undefined);
   private _response$: Observable<TableResponse | null> = this._request$.pipe(
     filter((x) => !!x),
     map((x) => convertTableRequest(x!)),
@@ -132,9 +132,9 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   }
 
   getTableData(page?: PageEvent, sort?: Sort, search?: { [key: string]: SearchValue }): void;
-  getTableData(req: TableRequest): void;
+  getTableData(req: RemoteTableRequest): void;
   getTableData(
-    reqOrPage: TableRequest | PageEvent | undefined,
+    reqOrPage: RemoteTableRequest | PageEvent | undefined,
     sort?: Sort,
     search?: { [key: string]: SearchValue },
     filter?: string
@@ -143,15 +143,15 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
       search = { ...search, ...this.typeFilter };
     }
 
-    if (arguments.length === 1 && reqOrPage instanceof TableRequest) {
-      const req = reqOrPage as TableRequest;
+    if (arguments.length === 1 && reqOrPage instanceof RemoteTableRequest) {
+      const req = reqOrPage as RemoteTableRequest;
       this._request$.next(req);
       return;
     }
 
     const page = reqOrPage as PageEvent | undefined;
 
-    const tableRequest: TableRequest = new TableRequest({
+    const tableRequest: RemoteTableRequest = new RemoteTableRequest({
       columns: Object.values(this._requestColumnsMap),
       searchBy: Object.entries(search || {})
         .map(([name, searchValue]) => {
