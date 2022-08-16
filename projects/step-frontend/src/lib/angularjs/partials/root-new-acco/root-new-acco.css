@@ -7,7 +7,7 @@
   --sidebar-section-height-help-and-support: 56px;
 
   --sidebar-elements-padding: 12px;
-  --sidebar-elements-text-padding: 10px;
+  --sidebar-elements-text-padding: 14px;
   --sidebar-settings-divider-padding-right: 45px;
 
   --sidebar-aligned-text-margin-left: 60px;
@@ -31,18 +31,64 @@ body {
   color: #f1f1f1;
 }
 
+/* OPEN/CLOSE SIDEBAR */
 .openbtn {
-  font-size: 20px;
+  top: 50vh;
+  margin-left: calc(var(--sidebar-width-open) - 5px);
+  z-index: 100;
+  position: fixed;
   cursor: pointer;
-  background-color: #111;
+  background-color: #1b72a4;
   color: white;
-  padding: 10px 15px;
+  padding: 10px 5px;
   border: none;
+  transition: 0.5s;
 }
 
 .openbtn:hover {
   background-color: #444;
 }
+
+#collapsable-sidebar-button {
+  display: none;
+}
+#collapsable-sidebar-button:checked ~ .sidebar {
+  width: var(--sidebar-width-closed);
+}
+#collapsable-sidebar-button:checked ~ #main, .openbtn {
+  margin-left: var(--sidebar-width-closed);
+}
+#collapsable-sidebar-button:not(:checked) ~ .sidebar {
+  width: var(--sidebar-width-open);
+}
+#collapsable-sidebar-button:not(:checked) ~ #main {
+  margin-left: var(--sidebar-width-open);
+}
+
+#collapsable-sidebar-button:not(:checked) ~ .openbtn {
+  margin-left: var(--sidebar-width-open);
+  transform: scaleX(-1);
+}
+
+#collapsable-sidebar-button:checked ~ .sidebar span:not(.visible-when-collapsed),
+#collapsable-sidebar-button:checked ~ .sidebar label::after {
+  visibility: hidden;
+}
+
+#collapsable-sidebar-button:checked ~ .sidebar span.only-visible-when-collapsed{
+  display: block;
+  visibility: visible;
+  font-size: large;
+}
+
+.only-visible-when-collapsed {
+  display: none;
+}
+
+#sidebar-collapsed-settings-icon {
+  visibility: hidden;
+}
+
 
 #main {
   transition: margin-left .5s;
@@ -147,6 +193,14 @@ body {
   flex-grow: 1;
 }
 
+#collapsable-tab-1 ~ label {
+  border-radius: 5px 5px 0 0;
+}
+
+#collapsable-tab-3 ~ label {
+  border-radius: 0 0 5px 5px;
+}
+
 #sidebar-categories .sidebar-categories-categories {
   height: 58px;
   font-size: smaller;
@@ -228,10 +282,6 @@ body {
   height: 32px;
 }
 
-
-.sidebar .visible-when-collapsed {
-
-}
 
 
 /* (E) OPEN TAB ON CHECKED */

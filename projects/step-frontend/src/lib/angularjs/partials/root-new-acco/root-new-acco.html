@@ -8,35 +8,38 @@
 </head>
 <body>
 
+<input id="collapsable-sidebar-button" type="checkbox">
+<label class="openbtn" for="collapsable-sidebar-button">></label>
+
 <div id="mySidebar" class="sidebar">
   <div id="sidebar-logo-and-burgermenu">
-    <span>M</span>
+    <span class="visible-when-collapsed">M</span>
     <span class="sidebar-aligned-text">ooo step</span>
   </div>
   <div id="sidebar-home-and-settings">
-    <span>H</span>
+    <span class="visible-when-collapsed">H</span>
     <span class="sidebar-aligned-text">Project Name</span>
     <span class="sidebar-home-and-settings-divider">|</span>
     <span class="sidebar-home-and-settings-icon">S</span>
   </div>
   <div id="sidebar-categories">
-    <div class="sidebar-categories-categories">Categories</div>
-    <div>
+    <div class="sidebar-categories-categories"><span class='only-visible-when-collapsed'>S</span><span>Categories</span></div>
+    <div id="sidebar-categories-tabs">
       <!-- FIRST TAB -->
       <div class="sidebar-collapsable-tab">
         <input id="collapsable-tab-1" type="checkbox">
         <label for="collapsable-tab-1">
-          <span>A</span>
+          <span class="visible-when-collapsed">A</span>
           <span class="sidebar-aligned-text">Tab A</span>
         </label>
         <div class="content">
           <div class="sidebar-subtab">
-            <span>1</span>
+            <span class="visible-when-collapsed">1</span>
             <span class="sidebar-aligned-subtext">SubTab 1</span>
           </div>
           <div class="sidebar-subtab">
-            <span>1</span>
-            <span class="sidebar-aligned-subtext">SubTab 1</span>
+            <span class="visible-when-collapsed">2</span>
+            <span class="sidebar-aligned-subtext">SubTab 2</span>
           </div>
         </div>
       </div>
@@ -45,17 +48,17 @@
       <div class="sidebar-collapsable-tab">
         <input id="collapsable-tab-2" type="checkbox">
         <label for="collapsable-tab-2">
-          <span>B</span>
+          <span class="visible-when-collapsed">B</span>
           <span class="sidebar-aligned-text">Tab B</span>
         </label>
         <div class="content">
           <div class="sidebar-subtab">
-            <span>1</span>
+            <span class="visible-when-collapsed">1</span>
             <span class="sidebar-aligned-subtext">SubTab 1</span>
           </div>
           <div class="sidebar-subtab">
-            <span>1</span>
-            <span class="sidebar-aligned-subtext">SubTab 1</span>
+            <span class="visible-when-collapsed">2</span>
+            <span class="sidebar-aligned-subtext">SubTab 2</span>
           </div>
         </div>
       </div>
@@ -69,12 +72,12 @@
         </label>
         <div class="content">
           <div class="sidebar-subtab">
-            <span>1</span>
+            <span class="visible-when-collapsed">1</span>
             <span class="sidebar-aligned-subtext">SubTab 1</span>
           </div>
           <div class="sidebar-subtab">
-            <span>1</span>
-            <span class="sidebar-aligned-subtext">SubTab 1</span>
+            <span class="visible-when-collapsed">2</span>
+            <span class="sidebar-aligned-subtext">SubTab 2</span>
           </div>
 
         </div>
@@ -82,13 +85,14 @@
     </div>
   </div>
   <div id="sidebar-cost-and-upgrade">
-    <div>Step<br>
-    No-cost $0/month
+    <div><span>Step</span><br>
+      <span>No-cost $0/month</span>
     </div>
-    <div>Upgrade</div>
+    <div><span>Upgrade</span></div>
   </div>
   <div id="sidebar-help-and-support">
-    <div><span>?</span></div>  <span>Help & Support</span>
+    <div><span class="visible-when-collapsed">?</span></div>
+    <span>Help & Support</span>
   </div>
 </div>
 
@@ -97,36 +101,9 @@
     <div id="header-spacer-part"></div>
     <div class="header-white-part"></div>
   </header>
-  <button class="openbtn" onclick="toggleNavBar()">Open Sidebar</button>
   <h2>Collapsed Sidebar</h2>
   <p>Click on the hamburger menu/bar icon to open the sidebar, and push this content to the right.</p>
 </div>
-
-<script>
-  let navBarOpen = true;
-
-  function toggleNavBar() {
-    if (navBarOpen) {
-      closeNav();
-    } else {
-      openNav();
-    }
-  }
-
-  function openNav() {
-    document.getElementById("mySidebar").style.width = "var(--sidebar-width-open)";
-    document.getElementById("main").style.marginLeft = "var(--sidebar-width-open)";
-    navBarOpen = true;
-  }
-
-  function closeNav() {
-    document.getElementById("mySidebar").style.width = "var(--sidebar-width-closed)";
-    document.getElementById("main").style.marginLeft = "var(--sidebar-width-closed)";
-    navBarOpen = false;
-  }
-
-  openNav();
-</script>
 
 </body>
 </html>
