@@ -31,12 +31,6 @@ angular
         $scope.stepsTableServerSideParameters = filterFactory;
         $scope.executionViewServices = executionViewServices;
 
-        $http.get('/rest/table/executions/column/result/distinct').then(function (response) {
-          $scope.reportNodeStatusOptions = _.map(response.data, function (e) {
-            return { text: e };
-          });
-        });
-
         stepsTable.beforeRequest = function () {
           var tableAPI = $scope.stepsTable.Datatable;
           if (tableAPI && tableAPI.hasOwnProperty('settings') && tableAPI.settings()[0].jqXHR) {
