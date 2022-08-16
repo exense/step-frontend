@@ -2,40 +2,43 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="root-new-acco.css">
-  <style>
-  </style>
+  <link rel="stylesheet" href="root-new-acco.css"/>
+  <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css"/>
+  <!--  <link rel="stylesheet" href="material-design-icons.css"/>-->
 </head>
 <body>
 
 <input id="collapsable-sidebar-button" type="checkbox">
-<label class="openbtn" for="collapsable-sidebar-button">></label>
 
 <div id="mySidebar" class="sidebar">
   <div id="sidebar-logo-and-burgermenu">
-    <span class="visible-when-collapsed">M</span>
+    <span class="visible-when-collapsed"><label for="collapsable-sidebar-button"><i
+      class="glyphicon glyphicon-menu-hamburger"></i></label></span>
     <span class="sidebar-aligned-text">ooo step</span>
   </div>
   <div id="sidebar-home-and-settings">
     <span class="visible-when-collapsed">H</span>
     <span class="sidebar-aligned-text">Project Name</span>
     <span class="sidebar-home-and-settings-divider">|</span>
-    <span class="sidebar-home-and-settings-icon">S</span>
+    <span class="sidebar-home-and-settings-icon"><i class="glyphicon glyphicon-cog"></i></span>
   </div>
   <div id="sidebar-categories">
-    <div class="sidebar-categories-categories"><span class='only-visible-when-collapsed'>S</span><span>Categories</span></div>
+    <div class="sidebar-categories-categories">
+      <span class='only-visible-when-collapsed'><i class="glyphicon glyphicon-cog"></i></span>
+      <span>Categories</span>
+    </div>
     <div id="sidebar-categories-tabs">
       <!-- FIRST TAB -->
       <div class="sidebar-collapsable-tab">
         <input id="collapsable-tab-1" type="checkbox">
         <label for="collapsable-tab-1">
-          <span class="visible-when-collapsed">A</span>
+          <i class="glyphicon glyphicon-play visible-when-collapsed"></i>
           <span class="sidebar-aligned-text">Tab A</span>
         </label>
         <div class="content">
           <div class="sidebar-subtab">
-            <span class="visible-when-collapsed">1</span>
-            <span class="sidebar-aligned-subtext">SubTab 1</span>
+              <i class="glyphicon glyphicon-record visible-when-collapsed"></i>
+              <span class="sidebar-aligned-subtext">SubTab 1</span>
           </div>
           <div class="sidebar-subtab">
             <span class="visible-when-collapsed">2</span>
@@ -48,7 +51,7 @@
       <div class="sidebar-collapsable-tab">
         <input id="collapsable-tab-2" type="checkbox">
         <label for="collapsable-tab-2">
-          <span class="visible-when-collapsed">B</span>
+          <i class="glyphicon glyphicon-play visible-when-collapsed"></i>
           <span class="sidebar-aligned-text">Tab B</span>
         </label>
         <div class="content">
@@ -67,7 +70,7 @@
       <div class="sidebar-collapsable-tab">
         <input id="collapsable-tab-3" type="checkbox">
         <label for="collapsable-tab-3">
-          <span class="visible-when-collapsed">C</span>
+          <i class="glyphicon glyphicon-play visible-when-collapsed"></i>
           <span class="sidebar-aligned-text">Tab C</span>
         </label>
         <div class="content">
@@ -91,7 +94,7 @@
     <div><span>Upgrade</span></div>
   </div>
   <div id="sidebar-help-and-support">
-    <div><span class="visible-when-collapsed">?</span></div>
+    <div><span class="visible-when-collapsed"><i class="glyphicon glyphicon-question-sign"></i></span></div>
     <span>Help & Support</span>
   </div>
 </div>

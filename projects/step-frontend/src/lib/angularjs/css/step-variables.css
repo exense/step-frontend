@@ -6,4 +6,18 @@
   --button-color: #17d821;
   --button-hover-color: #13b91c;
   --button-active-color: #0c7311;
+
+  /* SIDEBAR */
+  --header-height: calc(48px + 64px);
+  --top-blue-border-height: 15px;
+  --top-blue-border-edge-radius: 30px;
+  --sidebar-width-open: 254px;
+  --sidebar-width-closed: 72px;
+  --sidebar-section-height-help-and-support: 56px;
+
+  --sidebar-elements-padding: 12px;
+  --sidebar-elements-text-padding: 15px;
+  --sidebar-settings-divider-padding-right: 45px;
+
+  --sidebar-aligned-text-margin-left: 60px;
 }

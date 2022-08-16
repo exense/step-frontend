@@ -1,109 +1,161 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    :root {
-      --header-height: 48px;
-      --top-blue-border-height: 15px;
-      --top-blue-border-edge-radius: 30px;
-      --sidebar-width-open: 254px;
-      --sidebar-width-closed: 10px;
-    }
-
-    body {
-      font-family: "Lato", sans-serif;
-      margin: 0px;
-    }
-
-    .sidebar {
-      height: 100%;
-      width: 0;
-      position: fixed;
-      z-index: 1;
-      top: 0;
-      left: 0;
-      background-color: #02629a;
-      overflow-x: hidden;
-      transition: 0.5s;
-      padding-top: 60px;
-    }
-
-    .sidebar a {
-      padding: 8px 8px 8px 32px;
-      text-decoration: none;
-      font-size: 25px;
-      color: white;
-      display: block;
-      transition: 0.3s;
-    }
-
-    .sidebar a:hover {
-      color: #f1f1f1;
-    }
-
-    .sidebar .closebtn {
-      position: absolute;
-      top: 0;
-      right: 25px;
-      font-size: 36px;
-      margin-left: 50px;
-    }
-
-    .openbtn {
-      font-size: 20px;
-      cursor: pointer;
-      background-color: #111;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-    }
-
-    .openbtn:hover {
-      background-color: #444;
-    }
-
-    #main {
-      transition: margin-left .5s;
-    }
-
-    /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
-    @media screen and (max-height: 450px) {
-      .sidebar {padding-top: 15px;}
-      .sidebar a {font-size: 18px;}
-    }
-
-    .header-parent {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      background-color: #02629a;
-
-      height: var(--header-height);;
-    }
-
-    .header-white-part {
-      bottom: 0px;
-      height: calc(100% - var(--top-blue-border-height));
-      background-color: white;
-      border-radius: var(--top-blue-border-edge-radius) 0 0 0;
-    }
-  </style>
 </head>
 
+<input id="collapsable-sidebar-button" type="checkbox">
+
 <div id="mySidebar" class="sidebar">
-  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">X</a>
-  <a href="#">About</a>
-  <a href="#">Services</a>
-  <a href="#">Clients</a>
-  <a href="#">Contact</a>
-<!--  <div ng-include="'partials/nav.html'" class="container main-header"></div>-->
+  <div id="sidebar-logo-and-burgermenu">
+    <span class="visible-when-collapsed"><label for="collapsable-sidebar-button"><i class="glyphicon glyphicon-menu-hamburger"></i></label></span>
+    <span class="sidebar-aligned-text">ooo step</span>
+  </div>
+  <div id="sidebar-home-and-settings">
+    <span class="visible-when-collapsed">H</span>
+    <span class="sidebar-aligned-text">Project Name</span>
+    <span class="sidebar-home-and-settings-divider">|</span>
+    <span class="sidebar-home-and-settings-icon"><i class="glyphicon glyphicon-cog"></i></span>
+  </div>
+  <div id="sidebar-categories">
+    <div class="sidebar-categories-categories">
+      <span class='only-visible-when-collapsed' style="font-size: medium"><i class="glyphicon glyphicon-cog"></i></span>
+      <span>Categories</span>
+    </div>
+    <div id="sidebar-categories-tabs">
+      <!-- AUTOMATION -->
+      <div class="sidebar-collapsable-tab">
+        <input id="collapsable-tab-1" type="checkbox">
+        <label for="collapsable-tab-1">
+          <i class="glyphicon glyphicon-play visible-when-collapsed"></i>
+          <span class="sidebar-aligned-text">Automation</span>
+        </label>
+        <div class="content">
+          <div class="sidebar-subtab">
+            <i class="glyphicon glyphicon-record visible-when-collapsed"></i>
+            <span class="sidebar-aligned-subtext"><a ng-click="setView('functions')">Keywords</a></span>
+          </div>
+          <div class="sidebar-subtab">
+            <span class="visible-when-collapsed">2</span>
+            <span class="sidebar-aligned-subtext">Keyword Packages</span>
+          </div>
+          <div class="sidebar-subtab">
+            <i class="glyphicon glyphicon-file visible-when-collapsed"></i>
+            <span class="sidebar-aligned-subtext"><a href="#/root/plans/list">Plans</a></span>
+          </div>
+          <div class="sidebar-subtab">
+            <span class="visible-when-collapsed">4</span>
+            <span class="sidebar-aligned-subtext">Parameters</span>
+          </div>
+          <div class="sidebar-subtab">
+            <span class="visible-when-collapsed">5</span>
+            <span class="sidebar-aligned-subtext">Resources</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXECUTE -->
+      <div class="sidebar-collapsable-tab">
+        <input id="collapsable-tab-2" type="checkbox">
+        <label for="collapsable-tab-2">
+          <span class="visible-when-collapsed">B</span>
+          <span class="sidebar-aligned-text">Execute</span>
+        </label>
+        <div class="content">
+          <div class="sidebar-subtab">
+            <span class="visible-when-collapsed">1</span>
+            <span class="sidebar-aligned-subtext">Executions</span>
+          </div>
+          <div class="sidebar-subtab">
+            <span class="visible-when-collapsed">2</span>
+            <span class="sidebar-aligned-subtext">Scheduler</span>
+          </div>
+          <div class="sidebar-subtab">
+            <span class="visible-when-collapsed">3</span>
+            <span class="sidebar-aligned-subtext">Monitoring</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALERTING -->
+      <div class="sidebar-collapsable-tab">
+        <input id="collapsable-tab-3" type="checkbox">
+        <label for="collapsable-tab-3">
+          <span class="visible-when-collapsed">C</span>
+          <span class="sidebar-aligned-text">Alerting</span>
+        </label>
+        <div class="content">
+          <div class="sidebar-subtab">
+            <span class="visible-when-collapsed">1</span>
+            <span class="sidebar-aligned-subtext">SubTab 1</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLUGIN -->
+      <div class="sidebar-collapsable-tab">
+        <input id="collapsable-tab-4" type="checkbox">
+        <label for="collapsable-tab-4">
+          <span class="visible-when-collapsed">D</span>
+          <span class="sidebar-aligned-text">Plugins</span>
+        </label>
+        <div class="content">
+          <div class="sidebar-subtab">
+            <span class="visible-when-collapsed">1</span>
+            <span class="sidebar-aligned-subtext">SubTab 1</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATUS -->
+      <div class="sidebar-collapsable-tab">
+        <input id="collapsable-tab-5" type="checkbox">
+        <label for="collapsable-tab-5">
+          <span class="visible-when-collapsed">E</span>
+          <span class="sidebar-aligned-text">Status</span>
+        </label>
+        <div class="content">
+          <div class="sidebar-subtab">
+            <span class="visible-when-collapsed">1</span>
+            <span class="sidebar-aligned-subtext">SubTab 1</span>
+          </div>
+<!--          <div class="sidebar-subtab">
+            <span class="visible-when-collapsed">2</span>
+            <span class="sidebar-aligned-subtext">SubTab 2</span>
+          </div>
+          <div class="sidebar-subtab">
+            <span class="visible-when-collapsed">3</span>
+            <span class="sidebar-aligned-subtext">SubTab 3</span>
+          </div>
+          <div class="sidebar-subtab">
+            <span class="visible-when-collapsed">4</span>
+            <span class="sidebar-aligned-subtext">SubTab 4</span>
+          </div>
+          <div class="sidebar-subtab">
+            <span class="visible-when-collapsed">5</span>
+            <span class="sidebar-aligned-subtext">SubTab 5</span>
+          </div>-->
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="sidebar-cost-and-upgrade">
+    <div><span>Step</span><br>
+      <span>No-cost $0/month</span>
+    </div>
+    <div><span>Upgrade</span></div>
+  </div>
+  <div id="sidebar-help-and-support">
+    <div><span class="visible-when-collapsed"><i class="glyphicon glyphicon-question-sign"></i></span></div>
+    <span>Help & Support</span>
+  </div>
 </div>
 
 <div id="main">
   <header class="header-parent" ng-if-start="isInitialized && (authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())">
     <div id="header-spacer-part"></div>
-    <div class="header-white-part"></div>
+    <div class="header-white-part">
+      <a style="position: fixed; top: 40px; right: 20px"><i class="glyphicon glyphicon-user" ></i> {{context.userID}} [{{context.role}}]</a>
+    </div>
   </header>
-  <button class="openbtn" onclick="openNav()">Open Sidebar</button>
   <div ng-if-end ng-include="'partials/main.html'" class="st-flex-row"></div>
 </div>
 
@@ -123,19 +175,6 @@
     <span style="display:none;" id="backend-ee">${project.versionBEEE}</span>
   </div>
 </footer>
-
-<script>
-  function openNav() {
-    document.getElementById("mySidebar").style.width = "var(--sidebar-width-open)";
-    document.getElementById("main").style.marginLeft = "var(--sidebar-width-open)";
-  }
-
-  function closeNav() {
-    document.getElementById("mySidebar").style.width = "var(--sidebar-width-closed)";
-    document.getElementById("main").style.marginLeft= "var(--sidebar-width-closed)";
-  }
-  openNav();
-</script>
 
 
 <!--
