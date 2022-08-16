@@ -110,12 +110,63 @@ export class GridService {
      * @returns any default response
      * @throws ApiError
      */
+    public removeTokenError(
+        id: string,
+    ): Observable<any> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/grid/token/{id}/error',
+            path: {
+                'id': id,
+            },
+        });
+    }
+
+    /**
+     * @param id
+     * @returns any default response
+     * @throws ApiError
+     */
     public resumeAgent(
         id: string,
     ): Observable<any> {
         return this.httpRequest.request({
             method: 'PUT',
             url: '/grid/agent/{id}/resume',
+            path: {
+                'id': id,
+            },
+        });
+    }
+
+    /**
+     * @param id
+     * @returns any default response
+     * @throws ApiError
+     */
+    public startTokenMaintenance(
+        id: string,
+    ): Observable<any> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/grid/token/{id}/maintenance',
+            path: {
+                'id': id,
+            },
+        });
+    }
+
+    /**
+     * @param id
+     * @returns any default response
+     * @throws ApiError
+     */
+    public stopTokenMaintenance(
+        id: string,
+    ): Observable<any> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/grid/token/{id}/maintenance',
             path: {
                 'id': id,
             },

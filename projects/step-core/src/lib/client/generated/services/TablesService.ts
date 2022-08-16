@@ -4,8 +4,11 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
-import type { DataTableResponse } from '../models/DataTableResponse';
 import type { ExportStatus } from '../models/ExportStatus';
+import type { TableExportRequest } from '../models/TableExportRequest';
+import type { TableRequest } from '../models/TableRequest';
+import type { TableResponseObject } from '../models/TableResponseObject';
+import type { WebPlugin } from '../models/WebPlugin';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
@@ -15,111 +18,52 @@ export class TablesService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
 
     /**
-     * @param id
-     * @returns string default response
-     * @throws ApiError
-     */
-    public createExport(
-        id: string,
-    ): Observable<string> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/table/{id}/export',
-            path: {
-                'id': id,
-            },
-        });
-    }
-
-    /**
-     * @param id
+     * @param tableName
+     * @param requestBody
      * @returns ExportStatus default response
      * @throws ApiError
      */
-    public getExport(
-        id: string,
+    public createExport(
+        tableName: string,
+        requestBody?: TableExportRequest,
     ): Observable<ExportStatus> {
         return this.httpRequest.request({
-            method: 'GET',
-            url: '/table/exports/{id}',
-            path: {
-                'id': id,
-            },
-        });
-    }
-
-    /**
-     * @param id
-     * @param column
-     * @returns string default response
-     * @throws ApiError
-     */
-    public getTableColumnDistinct(
-        id: string,
-        column: string,
-    ): Observable<Array<string>> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/table/{id}/column/{column}/distinct',
-            path: {
-                'id': id,
-                'column': column,
-            },
-        });
-    }
-
-    /**
-     * @param id
-     * @returns DataTableResponse default response
-     * @throws ApiError
-     */
-    public getTableDataGet(
-        id: string,
-    ): Observable<DataTableResponse> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/table/{id}/data',
-            path: {
-                'id': id,
-            },
-        });
-    }
-
-    /**
-     * @param id
-     * @returns DataTableResponse default response
-     * @throws ApiError
-     */
-    public getTableDataPost(
-        id: string,
-    ): Observable<DataTableResponse> {
-        return this.httpRequest.request({
             method: 'POST',
-            url: '/table/{id}/data',
+            url: '/table/{tableName}/export',
             path: {
-                'id': id,
+                'tableName': tableName,
             },
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
 
     /**
-     * @param id
-     * @param column
+     * @returns WebPlugin default response
+     * @throws ApiError
+     */
+    public getWebPlugins1(): Observable<Array<WebPlugin>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/table/plugins',
+        });
+    }
+
+    /**
+     * @param tableName
      * @param requestBody
-     * @returns string default response
+     * @returns TableResponseObject default response
      * @throws ApiError
      */
-    public searchIdsBy(
-        id: string,
-        column: string,
-        requestBody?: string,
-    ): Observable<Array<string>> {
+    public request(
+        tableName: string,
+        requestBody?: TableRequest,
+    ): Observable<TableResponseObject> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/table/{id}/searchIdsBy/{column}',
+            url: '/table/{tableName}',
             path: {
-                'id': id,
-                'column': column,
+                'tableName': tableName,
             },
             body: requestBody,
             mediaType: 'application/json',
