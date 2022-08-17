@@ -62,7 +62,7 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
         Math.min(TimeSeriesConfig.MAX_BUCKETS_IN_CHART, (endTime - startTime) / TimeSeriesConfig.RESOLUTION / 2)
       ),
     };
-    this.timeSeriesService.fetchBucketsNew(request).subscribe((response) => {
+    this.timeSeriesService.fetchBuckets(request).subscribe((response) => {
       this.timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
       let avgData = response.matrix[0].map((b) => (b ? b.sum / b.count : null));
       let timeRange = this.prepareSelectForRanger(this.selection);

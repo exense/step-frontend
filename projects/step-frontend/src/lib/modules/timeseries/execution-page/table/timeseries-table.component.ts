@@ -48,7 +48,7 @@ export class TimeseriesTableComponent implements OnInit {
   // for live streaming
   accumulateData(request: FindBucketsRequest) {
     this.timeSeriesService
-      .fetchBucketsNew({ ...request, groupDimensions: [this.dimensionKey], numberOfBuckets: 1 })
+      .fetchBuckets({ ...request, groupDimensions: [this.dimensionKey], numberOfBuckets: 1 })
       .subscribe((response: TimeSeriesChartResponse) => {
         response.matrix.map((series, i) => {
           if (series.length != 1) {
@@ -75,7 +75,7 @@ export class TimeseriesTableComponent implements OnInit {
 
   init(request: FindBucketsRequest) {
     this.timeSeriesService
-      .fetchBucketsNew({
+      .fetchBuckets({
         ...request,
         groupDimensions: [this.dimensionKey],
         numberOfBuckets: 1,

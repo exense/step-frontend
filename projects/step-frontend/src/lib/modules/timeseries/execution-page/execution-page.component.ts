@@ -404,7 +404,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   createThreadGroupsChart(request: FindBucketsRequest, isUpdate = false) {
     let dimensionKey = 'name';
     this.timeSeriesService
-      .fetchBucketsNew({ ...request, threadGroupBuckets: true, groupDimensions: [dimensionKey] })
+      .fetchBuckets({ ...request, threadGroupBuckets: true, groupDimensions: [dimensionKey] })
       .subscribe((response) => {
         let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
         if (response.matrix.length === 0) {
@@ -485,7 +485,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   createSummaryChart(request: FindBucketsRequest, isUpdate = false) {
-    this.timeSeriesService.fetchBucketsNew(request).subscribe((response) => {
+    this.timeSeriesService.fetchBuckets(request).subscribe((response) => {
       let xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
       let avgValues: (number | null)[] = [];
       let countValues: (number | null)[] = [];
@@ -552,7 +552,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   createByStatusChart(request: FindBucketsRequest, isUpdate = false) {
-    this.timeSeriesService.fetchBucketsNew({ ...request, groupDimensions: ['rnStatus'] }).subscribe((response) => {
+    this.timeSeriesService.fetchBuckets({ ...request, groupDimensions: ['rnStatus'] }).subscribe((response) => {
       let xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
       let series: TSChartSeries[] = response.matrix.map((series, i) => {
         let status = response.matrixKeys[i]['rnStatus'];
@@ -588,7 +588,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   createByKeywordsCharts(request: FindBucketsRequest, isUpdate = false) {
     let dimensionKey = 'name';
     this.timeSeriesService
-      .fetchBucketsNew({ ...request, groupDimensions: [dimensionKey], percentiles: [90, 99] })
+      .fetchBuckets({ ...request, groupDimensions: [dimensionKey], percentiles: [90, 99] })
       .subscribe((response) => {
         this.byKeywordsChartResponseCache = response;
         let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);

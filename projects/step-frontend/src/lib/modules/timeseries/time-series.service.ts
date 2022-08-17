@@ -10,12 +10,12 @@ import { TimeSeriesChartResponse } from './time-series-chart-response';
 export class TimeSeriesService {
   constructor(private http: HttpClient) {}
 
-  fetchBuckets(request: FindBucketsRequest): Observable<any> {
-    return this.http.post<any>(`/rest/time-series/buckets`, request);
-  }
+  // fetchBuckets(request: FindBucketsRequest): Observable<any> {
+  //   return this.http.post<any>(`/rest/time-series/buckets`, request);
+  // }
 
-  fetchBucketsNew(request: FindBucketsRequest): Observable<TimeSeriesChartResponse> {
-    return this.http.post<TimeSeriesChartResponse>(`/rest/time-series/buckets-new`, request);
+  fetchBuckets(request: FindBucketsRequest): Observable<TimeSeriesChartResponse> {
+    return this.http.post<TimeSeriesChartResponse>(`/rest/time-series/buckets`, request);
   }
 
   getExecutionDetails(id: string): Observable<any> {
