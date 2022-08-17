@@ -14,13 +14,12 @@ import {
   tap,
 } from 'rxjs';
 import {
-  OQLFilter,
   SortDirection,
-  TableParameters,
   TableRequestData,
   TableResponse,
-  TableRestService,
+  TableApiWrapperService,
 } from '../../../client/table/step-table-client.module';
+import { OQLFilter, TableParameters } from '../../../client/generated';
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { TableDataSource } from './table-data-source';
@@ -109,7 +108,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
 
   constructor(
     private _tableId: string,
-    private _rest: TableRestService,
+    private _rest: TableApiWrapperService,
     private _requestColumnsMap: { [key: string]: string },
     private _typeFilter?: [string]
   ) {
