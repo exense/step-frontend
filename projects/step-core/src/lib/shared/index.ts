@@ -8,3 +8,4 @@ export * from './mutable';
 export * from './additional-right-rule';
 export * from './plugin-on-init';
 export * from './export.service';
+export * from './date-format.enum';

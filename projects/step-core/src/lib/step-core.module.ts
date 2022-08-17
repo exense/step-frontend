@@ -17,9 +17,18 @@ import { StepGeneratedClientModule } from './client/generated';
 import { EntitiesSelectionModule } from './modules/entities-selection/entities-selection.module';
 import { CapsLockDirective } from './directives/caps-lock.directive';
 import { CustomRegistriesModule } from './modules/custom-registeries/custom-registries.module';
+import { ArrayFilterComponent } from './components/array-filter/array-filter.component';
+import { DateFilterComponent } from './components/date-filter/date-filter.component';
 
 @NgModule({
-  declarations: [TooltipDirective, HasRightPipe, DashboardLinkPipe, CapsLockDirective],
+  declarations: [
+    TooltipDirective,
+    HasRightPipe,
+    DashboardLinkPipe,
+    CapsLockDirective,
+    ArrayFilterComponent,
+    DateFilterComponent,
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -51,6 +60,8 @@ import { CustomRegistriesModule } from './modules/custom-registeries/custom-regi
     EntitiesSelectionModule,
     StepGeneratedClientModule,
     CustomRegistriesModule,
+    ArrayFilterComponent,
+    DateFilterComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -87,6 +98,7 @@ export * from './services/deferred-view-registry.service';
 export * from './services/async-task.service';
 export * from './services/link-processor.service';
 export * from './services/deferred-link-processor.service';
+export * from './services/scheduled-task-dialogs.service';
 export * from './services/view-state.service';
 export * from './services/context.service';
 export * from './services/plugin-info-registry.service';
@@ -113,3 +125,5 @@ export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
 export { CancelablePromise, CancelError } from './client/generated/core/CancelablePromise';
 export { OpenAPI } from './client/generated/core/OpenAPI';
 export type { OpenAPIConfig } from './client/generated/core/OpenAPI';
+export { ArrayFilterComponent } from './components/array-filter/array-filter.component';
+export { DateFilterComponent } from './components/date-filter/date-filter.component';
