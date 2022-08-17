@@ -4,7 +4,7 @@
 
 <input id="collapsable-sidebar-button" type="checkbox">
 
-<div id="mySidebar" class="sidebar">
+<div id="mySidebar" class="sidebar" ng-if="isInitialized && (authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())">
   <div id="sidebar-logo-and-burgermenu">
     <span class="visible-when-collapsed"><label for="collapsable-sidebar-button"><i class="glyphicon glyphicon-menu-hamburger"></i></label></span>
     <span class="sidebar-aligned-text">ooo step</span>
@@ -13,11 +13,11 @@
     <span class="visible-when-collapsed">H</span>
     <span class="sidebar-aligned-text">Project Name</span>
     <span class="sidebar-home-and-settings-divider">|</span>
-    <span class="sidebar-home-and-settings-icon"><i class="glyphicon glyphicon-cog"></i></span>
+    <span ng-click="setView('admin')" ng-if="authService.hasRight('admin')" class="sidebar-home-and-settings-icon"><i class="glyphicon glyphicon-cog"></i></span>
   </div>
   <div id="sidebar-categories">
     <div class="sidebar-categories-categories">
-      <span class='only-visible-when-collapsed' style="font-size: medium"><i class="glyphicon glyphicon-cog"></i></span>
+      <span ng-click="setView('admin')" ng-if="authService.hasRight('admin')" class='only-visible-when-collapsed' style="font-size: medium"><i class="glyphicon glyphicon-cog"></i></span>
       <span>Categories</span>
     </div>
     <div id="sidebar-categories-tabs">
@@ -29,23 +29,23 @@
           <span class="sidebar-aligned-text">Automation</span>
         </label>
         <div class="content">
-          <div class="sidebar-subtab">
+          <div class="sidebar-subtab" ng-click="setView('functions')">
             <i class="glyphicon glyphicon-record visible-when-collapsed"></i>
-            <span class="sidebar-aligned-subtext"><a ng-click="setView('functions')">Keywords</a></span>
+            <span class="sidebar-aligned-subtext"><a>Keywords</a></span>
           </div>
-          <div class="sidebar-subtab">
+          <div class="sidebar-subtab" ng-click="setView('functionPackages')">
             <span class="visible-when-collapsed">2</span>
             <span class="sidebar-aligned-subtext">Keyword Packages</span>
           </div>
-          <div class="sidebar-subtab">
+          <div class="sidebar-subtab" ng-click="setView('plans')">
             <i class="glyphicon glyphicon-file visible-when-collapsed"></i>
-            <span class="sidebar-aligned-subtext"><a href="#/root/plans/list">Plans</a></span>
+            <span class="sidebar-aligned-subtext"><a>Plans (!)</a></span>
           </div>
-          <div class="sidebar-subtab">
+          <div class="sidebar-subtab" ng-click="setView('parameters')">
             <span class="visible-when-collapsed">4</span>
             <span class="sidebar-aligned-subtext">Parameters</span>
           </div>
-          <div class="sidebar-subtab">
+          <div class="sidebar-subtab" ng-click="setView('resources')">
             <span class="visible-when-collapsed">5</span>
             <span class="sidebar-aligned-subtext">Resources</span>
           </div>
@@ -60,11 +60,11 @@
           <span class="sidebar-aligned-text">Execute</span>
         </label>
         <div class="content">
-          <div class="sidebar-subtab">
+          <div class="sidebar-subtab" ng-click="setView('executions')">
             <span class="visible-when-collapsed">1</span>
             <span class="sidebar-aligned-subtext">Executions</span>
           </div>
-          <div class="sidebar-subtab">
+          <div class="sidebar-subtab" ng-click="setView('scheduler')">
             <span class="visible-when-collapsed">2</span>
             <span class="sidebar-aligned-subtext">Scheduler</span>
           </div>
@@ -113,26 +113,27 @@
           <span class="sidebar-aligned-text">Status</span>
         </label>
         <div class="content">
-          <div class="sidebar-subtab">
+          <div class="sidebar-subtab" ng-click="setView('operations')">
             <span class="visible-when-collapsed">1</span>
-            <span class="sidebar-aligned-subtext">SubTab 1</span>
+            <span class="sidebar-aligned-subtext">Current operation</span>
           </div>
-<!--          <div class="sidebar-subtab">
+          <div class="sidebar-subtab" ng-click="setView('gridagents')">
             <span class="visible-when-collapsed">2</span>
-            <span class="sidebar-aligned-subtext">SubTab 2</span>
+            <span class="sidebar-aligned-subtext">Agents</span>
           </div>
-          <div class="sidebar-subtab">
+          <div class="sidebar-subtab" ng-click="setView('gridtokens')">
             <span class="visible-when-collapsed">3</span>
-            <span class="sidebar-aligned-subtext">SubTab 3</span>
+            <span class="sidebar-aligned-subtext">Agent tokens</span>
           </div>
-          <div class="sidebar-subtab">
+          <div class="sidebar-subtab" ng-click="setView('gridtokengroups')">
             <span class="visible-when-collapsed">4</span>
-            <span class="sidebar-aligned-subtext">SubTab 4</span>
+            <span class="sidebar-aligned-subtext">Token Groups</span>
           </div>
-          <div class="sidebar-subtab">
+          <div class="sidebar-subtab" ng-click="setView('gridquotamanager')">
             <span class="visible-when-collapsed">5</span>
-            <span class="sidebar-aligned-subtext">SubTab 5</span>
-          </div>-->
+            <span class="sidebar-aligned-subtext">Quota Manager (!)</span>
+          </div>
+
         </div>
       </div>
     </div>
@@ -144,8 +145,8 @@
     <div><span>Upgrade</span></div>
   </div>
   <div id="sidebar-help-and-support">
-    <div><span class="visible-when-collapsed"><i class="glyphicon glyphicon-question-sign"></i></span></div>
-    <span>Help & Support</span>
+    <div><a href="https://step.exense.ch/knowledgebase"><span class="visible-when-collapsed"><i class="glyphicon glyphicon-question-sign"></i></span></a></div>
+    <a href="https://step.exense.ch/knowledgebase"><span>Help & Support</span></a>
   </div>
 </div>
 

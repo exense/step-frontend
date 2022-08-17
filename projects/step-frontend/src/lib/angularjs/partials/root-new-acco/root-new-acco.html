@@ -31,18 +31,25 @@
       <!-- FIRST TAB -->
       <div class="sidebar-collapsable-tab">
         <input id="collapsable-tab-1" type="checkbox">
-        <label for="collapsable-tab-1">
+        <label class="collapsable-menu-heading" for="collapsable-tab-1">
           <i class="glyphicon glyphicon-play visible-when-collapsed"></i>
           <span class="sidebar-aligned-text">Tab A</span>
         </label>
         <div class="content">
-          <div class="sidebar-subtab">
+          <input type="radio" id="selectable-radiobutton-1" name="sidebar-selectable" value="selectable-radiobutton-1">
+          <label for="selectable-radiobutton-1" class="collapsable-menu-selectable">
+            <div class="sidebar-subtab">
               <i class="glyphicon glyphicon-record visible-when-collapsed"></i>
               <span class="sidebar-aligned-subtext">SubTab 1</span>
-          </div>
+            </div>
+          </label>
           <div class="sidebar-subtab">
-            <span class="visible-when-collapsed">2</span>
-            <span class="sidebar-aligned-subtext">SubTab 2</span>
+            <input type="radio" id="selectable-radiobutton-2" name="sidebar-selectable"
+                   value="selectable-radiobutton-2">
+            <label for="selectable-radiobutton-2" class="collapsable-menu-selectable">
+              <span class="visible-when-collapsed">2</span>
+              <span class="sidebar-aligned-subtext">SubTab 2</span>
+            </label>
           </div>
         </div>
       </div>
@@ -50,7 +57,7 @@
       <!-- SECOND TAB -->
       <div class="sidebar-collapsable-tab">
         <input id="collapsable-tab-2" type="checkbox">
-        <label for="collapsable-tab-2">
+        <label for="collapsable-tab-2" class="collapsable-menu-heading">
           <i class="glyphicon glyphicon-play visible-when-collapsed"></i>
           <span class="sidebar-aligned-text">Tab B</span>
         </label>
@@ -69,7 +76,7 @@
       <!-- THIRD TAB -->
       <div class="sidebar-collapsable-tab">
         <input id="collapsable-tab-3" type="checkbox">
-        <label for="collapsable-tab-3">
+        <label for="collapsable-tab-3" class="collapsable-menu-heading">
           <i class="glyphicon glyphicon-play visible-when-collapsed"></i>
           <span class="sidebar-aligned-text">Tab C</span>
         </label>

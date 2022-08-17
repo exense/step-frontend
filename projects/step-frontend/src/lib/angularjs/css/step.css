@@ -1227,13 +1227,18 @@ fieldset {
   max-height: 0;
   font-weight: normal;
   align-items: center;
-  padding: 0 var(--sidebar-elements-text-padding) 0 var(--sidebar-elements-text-padding);
 }
 
 .sidebar-subtab {
   display: flex;
   align-items: center;
   height: 32px;
+  padding: 0 var(--sidebar-elements-text-padding) 0 var(--sidebar-elements-text-padding);
+  cursor: pointer;
+}
+
+.sidebar-subtab:hover {
+  background: #3280ad;
 }
 
 

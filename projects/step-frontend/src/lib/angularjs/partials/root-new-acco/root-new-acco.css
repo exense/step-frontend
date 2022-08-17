@@ -249,7 +249,7 @@ body {
 }
 
 /* (C) TAB LABEL */
-.sidebar-collapsable-tab label {
+.sidebar-collapsable-tab .collapsable-menu-heading {
   /* (C1) DIMENSIONS */
   position: relative; /* required for (f2) position:absolute */
   display: block;
@@ -260,6 +260,21 @@ body {
   color: #fff;
   background: #1b72a4;
   cursor: pointer;
+}
+
+#selectable-radiobutton-*:checked ~ .collapsable-menu-selectable {
+  background: #3c763d;
+}
+
+.sidebar-subtab input {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  visibility: visible;
+}
+
+.collapsable-menu-selectable {
+  width: 100%;
 }
 
 /* (D) TAB CONTENT - HIDDEN BY DEFAULT */
