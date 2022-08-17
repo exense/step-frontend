@@ -89,9 +89,7 @@ export class FunctionDialogsService {
     const httpOptions: Object = {
       headers: new HttpHeaders({
         Accept: 'text/html',
-        'Content-Type': 'text/plain; charset=utf-8',
       }),
-      responseType: 'text',
     };
     return this._httpClient
       .get<string>(`rest/${dialogConfig.serviceRoot}/${id}/editor`, httpOptions)
