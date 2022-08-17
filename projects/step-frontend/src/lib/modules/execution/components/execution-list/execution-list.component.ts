@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
-import { AJS_MODULE, AugmentedExecutionsService } from '@exense/step-core';
+import { AJS_MODULE, AugmentedExecutionsService, DateFormat } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { DateFormat } from '../../../_common/shared/date-format.enum';
 import { EXECUTION_RESULT, EXECUTION_STATUS } from '../../../_common/shared/status.enum';
 import { of } from 'rxjs';
 
