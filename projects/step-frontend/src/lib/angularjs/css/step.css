@@ -979,8 +979,17 @@ fieldset {
   white-space: pre-line;
 }
 
+.navbar-top-user-logout {
+  margin-right: 20px;
+}
 
 /* SIDEBAR */
+.sidebar-logo {
+  max-width:100px;
+  margin-left: -12px;
+  transform: scale(0.8);
+}
+
 .sidebar a {
   color: white;
 }
@@ -1145,6 +1154,14 @@ fieldset {
 
 #sidebar-home-and-settings > .sidebar-home-and-settings-icon {
   right: var(--sidebar-elements-text-padding);
+  margin-right: -10px;
+  padding-top: 18px;
+  font-size: medium;
+  cursor: pointer;
+}
+
+.sidebar-home-and-settings-icon-collapsed {
+  cursor: pointer;
 }
 
 #sidebar-categories {

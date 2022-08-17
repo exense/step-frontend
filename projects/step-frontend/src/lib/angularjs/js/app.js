@@ -116,7 +116,7 @@ var tecAdminApp = angular
       customViews[viewId] = { template: template, isPublicView: isPublicView, isStaticView: isStaticView };
     };
 
-    api.registerCustomMenuEntry = function (label, viewId, mainMenu, menuIconClass, right) {
+    api.registerCustomMenuEntry = function (label, viewId, mainMenu, menuIconClass, right, includedInMainMenu) {
       customMenuEntries.push({
         label: label,
         viewId: viewId,
@@ -126,10 +126,11 @@ var tecAdminApp = angular
         isEnabledFct: function () {
           return true;
         },
+        includedInMainMenu: includedInMainMenu
       });
     };
 
-    api.registerCustomMenuEntryOptional = function (label, viewId, mainMenu, menuIconClass, right, isEnabledFct) {
+    api.registerCustomMenuEntryOptional = function (label, viewId, mainMenu, menuIconClass, right, isEnabledFct, includedInMainMenu) {
       customMenuEntries.push({
         label: label,
         viewId: viewId,
@@ -137,12 +138,19 @@ var tecAdminApp = angular
         menuIconClass: menuIconClass,
         right: right,
         isEnabledFct: isEnabledFct,
+        includedInMainMenu: includedInMainMenu
       });
     };
 
     api.getCustomMenuEntries = function () {
       return _.filter(customMenuEntries, function (e) {
         return !e.mainMenu && e && e.isEnabledFct();
+      });
+    };
+
+    api.getCustomMenuEntriesIncludedInMainMenu = function (mainMenuName) {
+      return _.filter(customMenuEntries, function (e) {
+        return !e.mainMenu && e && e.isEnabledFct() && e.includedInMainMenu === mainMenuName;
       });
     };
 

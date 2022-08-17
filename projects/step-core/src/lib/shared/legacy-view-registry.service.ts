@@ -14,6 +14,7 @@ export interface MenuEntry {
   menuIconClass: string;
   right: string;
   inEnabledFct(): boolean;
+  includedInMainMenu?: string;
 }
 
 export interface Dashlet {

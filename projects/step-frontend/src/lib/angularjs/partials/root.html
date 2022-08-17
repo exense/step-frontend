@@ -7,17 +7,18 @@
 <div id="mySidebar" class="sidebar" ng-if="isInitialized && (authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())">
   <div id="sidebar-logo-and-burgermenu">
     <span class="visible-when-collapsed"><label for="collapsable-sidebar-button"><i class="glyphicon glyphicon-menu-hamburger"></i></label></span>
-    <span class="sidebar-aligned-text">ooo step</span>
+    <span class="sidebar-aligned-text"><img class="sidebar-logo" alt="" ng-src="{{logo}}"></span>
   </div>
   <div id="sidebar-home-and-settings">
     <span class="visible-when-collapsed">H</span>
-    <span class="sidebar-aligned-text">Project Name</span>
+    <step-tenant-selection-downgraded class="sidebar-aligned-text"></step-tenant-selection-downgraded>
+<!--    <span class="sidebar-aligned-text">Project Name</span>-->
     <span class="sidebar-home-and-settings-divider">|</span>
     <span ng-click="setView('admin')" ng-if="authService.hasRight('admin')" class="sidebar-home-and-settings-icon"><i class="glyphicon glyphicon-cog"></i></span>
   </div>
   <div id="sidebar-categories">
     <div class="sidebar-categories-categories">
-      <span ng-click="setView('admin')" ng-if="authService.hasRight('admin')" class='only-visible-when-collapsed' style="font-size: medium"><i class="glyphicon glyphicon-cog"></i></span>
+      <span ng-click="setView('admin')" ng-if="authService.hasRight('admin')" class='only-visible-when-collapsed sidebar-home-and-settings-icon-collapsed' style="font-size: medium"><i class="glyphicon glyphicon-cog"></i></span>
       <span>Categories</span>
     </div>
     <div id="sidebar-categories-tabs">
@@ -33,22 +34,20 @@
             <i class="glyphicon glyphicon-record visible-when-collapsed"></i>
             <span class="sidebar-aligned-subtext"><a>Keywords</a></span>
           </div>
-          <div class="sidebar-subtab" ng-click="setView('functionPackages')">
-            <span class="visible-when-collapsed">2</span>
-            <span class="sidebar-aligned-subtext">Keyword Packages</span>
-          </div>
           <div class="sidebar-subtab" ng-click="setView('plans')">
             <i class="glyphicon glyphicon-file visible-when-collapsed"></i>
-            <span class="sidebar-aligned-subtext"><a>Plans (!)</a></span>
+            <span class="sidebar-aligned-subtext"><a>Plans</a></span>
           </div>
           <div class="sidebar-subtab" ng-click="setView('parameters')">
-            <span class="visible-when-collapsed">4</span>
+            <span class="visible-when-collapsed">3</span>
             <span class="sidebar-aligned-subtext">Parameters</span>
           </div>
-          <div class="sidebar-subtab" ng-click="setView('resources')">
-            <span class="visible-when-collapsed">5</span>
-            <span class="sidebar-aligned-subtext">Resources</span>
-          </div>
+          <section ng-repeat="entry in viewRegistry.getCustomMenuEntriesIncludedInMainMenu('Automation')">
+            <div class="sidebar-subtab" ng-click="setView(entry.viewId)">
+              <span class="{{entry.menuIconClass}} visible-when-collapsed"></span>
+              <span class="sidebar-aligned-subtext">{{entry.label}}</span>
+            </div>
+          </section>
         </div>
       </div>
 
@@ -68,10 +67,12 @@
             <span class="visible-when-collapsed">2</span>
             <span class="sidebar-aligned-subtext">Scheduler</span>
           </div>
-          <div class="sidebar-subtab">
-            <span class="visible-when-collapsed">3</span>
-            <span class="sidebar-aligned-subtext">Monitoring</span>
-          </div>
+          <section ng-repeat="entry in viewRegistry.getCustomMenuEntriesIncludedInMainMenu('Execute')">
+            <div class="sidebar-subtab" ng-click="setView(entry.viewId)">
+              <span class="{{entry.menuIconClass}} visible-when-collapsed"></span>
+              <span class="sidebar-aligned-subtext">{{entry.label}}</span>
+            </div>
+          </section>
         </div>
       </div>
 
@@ -83,10 +84,12 @@
           <span class="sidebar-aligned-text">Alerting</span>
         </label>
         <div class="content">
-          <div class="sidebar-subtab">
-            <span class="visible-when-collapsed">1</span>
-            <span class="sidebar-aligned-subtext">SubTab 1</span>
-          </div>
+          <section ng-repeat="entry in viewRegistry.getCustomMenuEntriesIncludedInMainMenu('Alerting')">
+            <div class="sidebar-subtab" ng-click="setView(entry.viewId)">
+              <span class="{{entry.menuIconClass}} visible-when-collapsed"></span>
+              <span class="sidebar-aligned-subtext">{{entry.label}}</span>
+            </div>
+          </section>
         </div>
       </div>
 
@@ -98,10 +101,12 @@
           <span class="sidebar-aligned-text">Plugins</span>
         </label>
         <div class="content">
-          <div class="sidebar-subtab">
-            <span class="visible-when-collapsed">1</span>
-            <span class="sidebar-aligned-subtext">SubTab 1</span>
-          </div>
+          <section ng-repeat="entry in viewRegistry.getCustomMenuEntriesIncludedInMainMenu('Plugins')">
+            <div class="sidebar-subtab" ng-click="setView(entry.viewId)">
+              <span class="{{entry.menuIconClass}} visible-when-collapsed"></span>
+              <span class="sidebar-aligned-subtext">{{entry.label}}</span>
+            </div>
+          </section>
         </div>
       </div>
 
@@ -113,27 +118,28 @@
           <span class="sidebar-aligned-text">Status</span>
         </label>
         <div class="content">
-          <div class="sidebar-subtab" ng-click="setView('operations')">
-            <span class="visible-when-collapsed">1</span>
-            <span class="sidebar-aligned-subtext">Current operation</span>
-          </div>
           <div class="sidebar-subtab" ng-click="setView('gridagents')">
-            <span class="visible-when-collapsed">2</span>
+            <span class="visible-when-collapsed">1</span>
             <span class="sidebar-aligned-subtext">Agents</span>
           </div>
           <div class="sidebar-subtab" ng-click="setView('gridtokens')">
-            <span class="visible-when-collapsed">3</span>
+            <span class="visible-when-collapsed">2</span>
             <span class="sidebar-aligned-subtext">Agent tokens</span>
           </div>
           <div class="sidebar-subtab" ng-click="setView('gridtokengroups')">
-            <span class="visible-when-collapsed">4</span>
+            <span class="visible-when-collapsed">3</span>
             <span class="sidebar-aligned-subtext">Token Groups</span>
           </div>
           <div class="sidebar-subtab" ng-click="setView('gridquotamanager')">
-            <span class="visible-when-collapsed">5</span>
-            <span class="sidebar-aligned-subtext">Quota Manager (!)</span>
+            <span class="visible-when-collapsed">4</span>
+            <span class="sidebar-aligned-subtext">Quota Manager</span>
           </div>
-
+          <section ng-repeat="entry in viewRegistry.getCustomMenuEntriesIncludedInMainMenu('Status')">
+            <div class="sidebar-subtab" ng-click="setView(entry.viewId)">
+              <span class="{{entry.menuIconClass}} visible-when-collapsed"></span>
+              <span class="sidebar-aligned-subtext">{{entry.label}}</span>
+            </div>
+          </section>
         </div>
       </div>
     </div>
@@ -154,7 +160,19 @@
   <header class="header-parent" ng-if-start="isInitialized && (authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())">
     <div id="header-spacer-part"></div>
     <div class="header-white-part">
-      <a style="position: fixed; top: 40px; right: 20px"><i class="glyphicon glyphicon-user" ></i> {{context.userID}} [{{context.role}}]</a>
+      <ul class="nav navbar-nav navbar-right navbar-top-user-logout">
+        <li ng-repeat="entry in viewRegistry.getDashlets('/menu/navbar/right')" >
+          <div ng-include="entry.template"></div>
+        </li>
+        <li>
+          <a id="sessionDropdown" data-toggle="dropdown"><i class="glyphicon glyphicon-user" ></i> {{context.userID}} [{{context.role}}]</a>
+          <ul class="dropdown-menu" aria-labelledby="sessionDropdown">
+            <li><a ng-click="setView('myaccount')"><span class="glyphicon glyphicon-cog"></span> My account</a></li>
+            <li ng-if="authService.getConf().authentication && authService.isAuthenticated()"><a ng-click="authService.logout()"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
+            <li ng-if="authService.getConf().authentication && !authService.isAuthenticated()"><a ng-click="authService.goToLoginPage()">Sign in</a></li>
+          </ul>
+        </li>
+      </ul>
     </div>
   </header>
   <div ng-if-end ng-include="'partials/main.html'" class="st-flex-row"></div>
@@ -176,32 +194,3 @@
     <span style="display:none;" id="backend-ee">${project.versionBEEE}</span>
   </div>
 </footer>
-
-
-<!--
-<div class="main-page">
-  <header
-    class="main-header"
-    ng-if-start="isInitialized && (authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())"
-  >
-&lt;!&ndash;    <div ng-include="'partials/nav.html'" class="container main-header"></div>&ndash;&gt;
-  </header>
-  <div ng-if-end ng-include="'partials/main.html'" class="st-flex-row"></div>
-
-  <div
-    ng-if="isInitialized && !(authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())"
-    ng-include="'partials/loginForm.html'"
-    class="st-flex-row"
-  ></div>
-
-  <footer class="main-footer">
-    <div class="container main-footer">
-      <p style="text-align: center; margin-top: 10px">STEP ${project.version} - Copyright &#169; exense GmbH</p>
-      <span style="display:none;" id="frontend-os">${project.versionFEOS}</span>
-      <span style="display:none;" id="frontend-ee">${project.versionFEEE}</span>
-      <span style="display:none;" id="backend-os">${project.versionBEOS}</span>
-      <span style="display:none;" id="backend-ee">${project.versionBEEE}</span>
-    </div>
-  </footer>
-</div>
--->
