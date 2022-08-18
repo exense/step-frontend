@@ -1169,7 +1169,7 @@ fieldset {
   flex-grow: 1;
 }
 
-#collapsable-tab-1 ~ label {
+div#sidebar-categories-tabs .sidebar-collapsable-tab:first-child label {
   border-radius: 5px 5px 0 0;
 }
 
@@ -1273,19 +1273,22 @@ fieldset {
 .sidebar-collapsable-tab label::after {
   /* (F1) RIGHT ARROW */
   display: block;
-  content: "^";
+  content: ">";
 
   /* (F2) PLACE AT RIGHT SIDE */
   position: absolute;
-  right: 10px;
-  top: 10px;
+  right: 15px;
+  top: 15px;
 
   /* (F3) ANIMATED ARROW */
-  transition: all 0.2s;
+  /*transition: all 0.2s;*/
 }
 
 /* (F4) ROTATE ARROW ON CHECKED */
 .sidebar-collapsable-tab input:checked ~ label::after {
-  transform: rotate(180deg);
+  transform: rotate(90deg);
+}
+.sidebar-collapsable-tab input:not(:checked) ~ label::after {
+  transform: rotate(-90deg);
 }
 

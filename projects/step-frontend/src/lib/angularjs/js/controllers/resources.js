@@ -21,7 +21,7 @@ angular
 
   .run(function (ViewRegistry, EntityRegistry) {
     ViewRegistry.registerView('resources', 'partials/resources/resourceList.html');
-    ViewRegistry.registerCustomMenuEntry('Resources', 'resources', undefined, undefined, undefined, "Automation");
+    ViewRegistry.registerCustomMenuEntry('Resources', 'resources', undefined, 'glyphicon glyphicon-book', undefined, "Automation");
     EntityRegistry.registerEntity(
       'Resource',
       'resources',
