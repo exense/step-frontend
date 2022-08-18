@@ -22,7 +22,7 @@ export class AugmentedSchedulerService extends SchedulerService {
    * @returns string default response
    * @throws ApiError
    */
-  public override execute1(id: string): Observable<string> {
+  public override executeTask(id: string): Observable<string> {
     //@ts-ignore
     return this._httpClient.post<any>('rest/scheduler/task/' + id + '/execute', null, { responseType: 'text' });
   }

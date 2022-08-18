@@ -14,7 +14,7 @@ export class ExecutionLinkComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.executionId && !this.executionDescription) {
-      this._executionService.get3(this.executionId!).subscribe((ex: Execution) => {
+      this._executionService.getExecutionById(this.executionId!).subscribe((ex: Execution) => {
         this.executionDescription = ex?.description;
       });
     }

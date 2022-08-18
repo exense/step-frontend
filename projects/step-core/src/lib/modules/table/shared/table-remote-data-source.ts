@@ -14,19 +14,18 @@ import {
   tap,
 } from 'rxjs';
 import {
-  OQLFilter,
   SortDirection,
-  TableParameters,
   TableRequestData,
   TableResponse,
-  TableRestService,
+  TableApiWrapperService,
 } from '../../../client/table/step-table-client.module';
+import { OQLFilter, TableParameters } from '../../../client/generated';
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { TableDataSource } from './table-data-source';
 import { SearchValue } from './search-value';
 
-export class TableRequest {
+export class RemoteTableRequest {
   columns: string[];
   searchBy?: { column: string; search: string; regex: boolean }[];
   orderBy?: { column: string; order: 'asc' | 'desc' };
@@ -35,7 +34,7 @@ export class TableRequest {
   filter?: string;
   params?: TableParameters;
 
-  constructor(data?: Partial<TableRequest>) {
+  constructor(data?: Partial<RemoteTableRequest>) {
     this.columns = data?.columns || [];
     this.searchBy = data?.searchBy || [];
     this.orderBy = data?.orderBy || undefined;
@@ -46,7 +45,7 @@ export class TableRequest {
   }
 }
 
-const convertTableRequest = (req: TableRequest): TableRequestData => {
+const convertTableRequest = (req: RemoteTableRequest): TableRequestData => {
   const result: TableRequestData = {
     skip: req.start || 0,
     limit: req.length || 10,
@@ -86,7 +85,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   private _terminator$ = new Subject<any>();
   private _inProgress$ = new BehaviorSubject<boolean>(false);
   readonly inProgress$ = this._inProgress$.asObservable();
-  private _request$ = new BehaviorSubject<TableRequest | undefined>(undefined);
+  private _request$ = new BehaviorSubject<RemoteTableRequest | undefined>(undefined);
   private _response$: Observable<TableResponse<T> | null> = this._request$.pipe(
     filter((x) => !!x),
     map((x) => convertTableRequest(x!)),
@@ -109,7 +108,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
 
   constructor(
     private _tableId: string,
-    private _rest: TableRestService,
+    private _rest: TableApiWrapperService,
     private _requestColumnsMap: { [key: string]: string },
     private _typeFilter?: [string]
   ) {
@@ -130,9 +129,9 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   }
 
   getTableData(page?: PageEvent, sort?: Sort, search?: { [key: string]: SearchValue }): void;
-  getTableData(req: TableRequest): void;
+  getTableData(req: RemoteTableRequest): void;
   getTableData(
-    reqOrPage: TableRequest | PageEvent | undefined,
+    reqOrPage: RemoteTableRequest | PageEvent | undefined,
     sort?: Sort,
     search?: { [key: string]: SearchValue },
     filter?: string,
@@ -142,15 +141,15 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
       search = { ...search, ...this.typeFilter };
     }
 
-    if (arguments.length === 1 && reqOrPage instanceof TableRequest) {
-      const req = reqOrPage as TableRequest;
+    if (arguments.length === 1 && reqOrPage instanceof RemoteTableRequest) {
+      const req = reqOrPage as RemoteTableRequest;
       this._request$.next(req);
       return;
     }
 
     const page = reqOrPage as PageEvent | undefined;
 
-    const tableRequest: TableRequest = new TableRequest({
+    const tableRequest: RemoteTableRequest = new RemoteTableRequest({
       columns: Object.values(this._requestColumnsMap),
       searchBy: Object.entries(search || {})
         .map(([name, searchValue]) => {
@@ -202,7 +201,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   }
 
   exportAsCSV(fields: string[], params?: TableParameters): void {
-    const request = new TableRequest({
+    const request = new RemoteTableRequest({
       ...(this._request$.value || {}),
       params,
     });
