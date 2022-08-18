@@ -1,8 +1,5 @@
-export type TableResponseItem = [string, null, null];
-
-export interface TableResponse {
-  draw: number;
-  data: TableResponseItem[];
+export interface TableResponse<T> {
+  data: T[];
   recordsFiltered: number;
   recordsTotal: number;
 }

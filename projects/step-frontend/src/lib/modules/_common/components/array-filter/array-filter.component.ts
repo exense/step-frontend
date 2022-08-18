@@ -9,7 +9,7 @@ import { MatSelectChange } from '@angular/material/select';
 export class ArrayFilterComponent {
   @Output() selectedItemsChange = new EventEmitter<string>();
 
-  @Input() items: string[] = [];
+  @Input() items: string[] | ReadonlyArray<string> = [];
 
   handleChange(selection: MatSelectChange): void {
     const values = selection.value as string[];
