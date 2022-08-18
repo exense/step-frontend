@@ -16,36 +16,36 @@ export class PlansService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
 
     /**
-     * Clones the provided artefacts.
-     * @param requestBody
-     * @returns AbstractArtefact default response
-     * @throws ApiError
-     */
-    public cloneArtefact(
-        requestBody?: Array<AbstractArtefact>,
-    ): Observable<Array<AbstractArtefact>> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/plans/artefacts/clonemany',
-            body: requestBody,
-            mediaType: '*/*',
-        });
-    }
-
-    /**
      * Clones the provided artefact.
      * @param requestBody
      * @returns AbstractArtefact default response
      * @throws ApiError
      */
-    public cloneArtefact1(
+    public cloneArtefact(
         requestBody?: AbstractArtefact,
     ): Observable<AbstractArtefact> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/plans/artefacts/clone',
             body: requestBody,
-            mediaType: '*/*',
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * Clones the provided artefacts.
+     * @param requestBody
+     * @returns AbstractArtefact default response
+     * @throws ApiError
+     */
+    public cloneArtefacts(
+        requestBody?: Array<AbstractArtefact>,
+    ): Observable<Array<AbstractArtefact>> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/plans/artefacts/clonemany',
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
 
@@ -68,12 +68,29 @@ export class PlansService {
     }
 
     /**
+     * Compiles the provided plan.
+     * @param requestBody
+     * @returns PlanCompilationResult default response
+     * @throws ApiError
+     */
+    public compilePlan(
+        requestBody?: Plan,
+    ): Observable<PlanCompilationResult> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/plans/compile',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
      * Compiles the plan with the given id.
      * @param id
      * @returns PlanCompilationResult default response
      * @throws ApiError
      */
-    public compilePlan(
+    public compilePlanWithId(
         id: string,
     ): Observable<PlanCompilationResult> {
         return this.httpRequest.request({
@@ -86,29 +103,12 @@ export class PlansService {
     }
 
     /**
-     * Compiles the provided plan.
-     * @param requestBody
-     * @returns PlanCompilationResult default response
-     * @throws ApiError
-     */
-    public compilePlan1(
-        requestBody?: Plan,
-    ): Observable<PlanCompilationResult> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/plans/compile',
-            body: requestBody,
-            mediaType: '*/*',
-        });
-    }
-
-    /**
      * Returns the plan with the given id.
      * @param id
      * @returns Plan default response
      * @throws ApiError
      */
-    public get5(
+    public getPlanById(
         id: string,
     ): Observable<Plan> {
         return this.httpRequest.request({
@@ -126,7 +126,7 @@ export class PlansService {
      * @returns any default response
      * @throws ApiError
      */
-    public delete3(
+    public deletePlan(
         id: string,
     ): Observable<any> {
         return this.httpRequest.request({
@@ -144,29 +144,12 @@ export class PlansService {
      * @returns Plan default response
      * @throws ApiError
      */
-    public findMany1(
+    public findPlansByAttributes(
         requestBody?: Record<string, string>,
     ): Observable<Array<Plan>> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/plans/find',
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
-
-    /**
-     * Returns the first plan matching the given attributes.
-     * @param requestBody
-     * @returns Plan default response
-     * @throws ApiError
-     */
-    public get6(
-        requestBody?: Record<string, string>,
-    ): Observable<Plan> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/plans/search',
             body: requestBody,
             mediaType: 'application/json',
         });
@@ -179,7 +162,7 @@ export class PlansService {
      * @returns Plan default response
      * @throws ApiError
      */
-    public getAll3(
+    public getAllPlans(
         skip?: number,
         limit?: number,
     ): Observable<Array<Plan>> {
@@ -236,6 +219,23 @@ export class PlansService {
     }
 
     /**
+     * Returns the first plan matching the given attributes.
+     * @param requestBody
+     * @returns Plan default response
+     * @throws ApiError
+     */
+    public getPlanByAttributes(
+        requestBody?: Record<string, string>,
+    ): Observable<Plan> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/plans/search',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
      * Returns the plan referenced by the given artifact within the given plan.
      * @param id
      * @param artefactid
@@ -283,7 +283,7 @@ export class PlansService {
      * @returns Plan default response
      * @throws ApiError
      */
-    public save4(
+    public savePlan(
         requestBody?: Plan,
     ): Observable<Plan> {
         return this.httpRequest.request({

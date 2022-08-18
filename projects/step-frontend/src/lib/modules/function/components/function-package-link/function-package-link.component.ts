@@ -46,7 +46,7 @@ export class FunctionPackageLinkComponent {
   refresh() {
     this.isRefreshing = true;
     this._api
-      .reload(this.id!)
+      .reloadFunctionPackage(this.id!)
       .subscribe(() => {
         this.reload();
       })
@@ -67,7 +67,7 @@ export class FunctionPackageLinkComponent {
   }
 
   loadFunctionPackage() {
-    this._api.get7(this.id!).subscribe((response) => {
+    this._api.getFunctionPackage(this.id!).subscribe((response) => {
       this.functionPackage = response;
     });
   }

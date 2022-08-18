@@ -15,7 +15,7 @@ export class UserDialogsService {
 
   removeUser(username: string): Observable<any> {
     return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `User "${username}"`)).pipe(
-      switchMap((_) => this._adminApiService.remove(username)),
+      switchMap((_) => this._adminApiService.removeUser(username)),
       map((_) => true),
       catchError((_) => of(false))
     );

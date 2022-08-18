@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ParametersService } from '../../generated';
-import { TableRestService } from '../../table/services/table-rest.service';
+import { TableApiWrapperService } from '../../table/services/table-api-wrapper.service';
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
 import { TableRemoteDataSource } from '../../../modules/table/shared/table-remote-data-source';
 
@@ -16,7 +16,7 @@ export class AugmentedParametersService extends ParametersService {
     priority: 'priority',
   });
 
-  constructor(override httpRequest: BaseHttpRequest, private _tableRest: TableRestService) {
+  constructor(override httpRequest: BaseHttpRequest, private _tableRest: TableApiWrapperService) {
     super(httpRequest);
   }
 
