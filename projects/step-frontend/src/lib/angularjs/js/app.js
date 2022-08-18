@@ -286,7 +286,7 @@ var tecAdminApp = angular
         ViewRegistry.registerCustomMenuEntry('Plans', 'plans', false, 'glyphicon glyphicon-file', undefined, 'Automation');
         ViewRegistry.registerCustomMenuEntry('Parameters', 'parameters', false, 'glyphicon glyphicon-list-alt', undefined, 'Automation');
         // Sub Menus Execute
-        ViewRegistry.registerCustomMenuEntry('Executions', 'executions', false, 'glyphicon glyphicon-screenshot', undefined, 'Execute');
+        ViewRegistry.registerCustomMenuEntry('Executions', 'executions', false, 'glyphicon glyphicon-tasks', undefined, 'Execute');
         ViewRegistry.registerCustomMenuEntry('Scheduler', 'scheduler', false, 'glyphicon glyphicon-time', undefined, 'Execute');
         // Sub Menus Status
         ViewRegistry.registerCustomMenuEntry('Agents', 'gridagents', false, 'glyphicon glyphicon-briefcase', undefined, 'Status');
