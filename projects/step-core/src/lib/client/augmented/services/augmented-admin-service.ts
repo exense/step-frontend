@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { AdminService, FunctionPackage, KeywordsService, Plan } from '../../generated';
-import { TableRestService } from '../../table/services/table-rest.service';
+import { AdminService, Plan } from '../../generated';
+import { TableApiWrapperService } from '../../table/services/table-api-wrapper.service';
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
 import { TableRemoteDataSource } from '../../../modules/table/shared/table-remote-data-source';
 import type { Observable } from 'rxjs';
@@ -19,7 +19,7 @@ export class AugmentedAdminService extends AdminService {
 
   constructor(
     override httpRequest: BaseHttpRequest,
-    private _tableRest: TableRestService,
+    private _tableRest: TableApiWrapperService,
     private _httpClient: HttpClient
   ) {
     super(httpRequest);

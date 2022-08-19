@@ -73,7 +73,7 @@ export class ScreensService {
      * @returns Input default response
      * @throws ApiError
      */
-    public getInputsForScreen(
+    public getInputsForScreenGet(
         id: string,
     ): Observable<Array<Input>> {
         return this.httpRequest.request({
@@ -91,7 +91,7 @@ export class ScreensService {
      * @returns Input default response
      * @throws ApiError
      */
-    public getInputsForScreen1(
+    public getInputsForScreenPost(
         id: string,
         requestBody?: any,
     ): Observable<Array<Input>> {
@@ -151,7 +151,7 @@ export class ScreensService {
                 'id': id,
             },
             body: requestBody,
-            mediaType: '*/*',
+            mediaType: 'application/json',
         });
     }
 

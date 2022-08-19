@@ -45,7 +45,7 @@ export class KeywordEditorService {
                 'functionid': functionid,
             },
             body: requestBody,
-            mediaType: '*/*',
+            mediaType: 'application/json',
         });
     }
 
@@ -83,7 +83,7 @@ export class KeywordEditorService {
                 'filename': filename,
             },
             body: requestBody,
-            mediaType: '*/*',
+            mediaType: 'application/json',
         });
     }
 

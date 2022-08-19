@@ -51,7 +51,7 @@ export class MyAccountComponent implements OnInit, OnChanges {
 
   savePreferences(): void {
     const preferences = kvPairArrayToPreferences(this.preferences);
-    this._adminApiService.putPreference(preferences).subscribe({
+    this._adminApiService.putPreferences(preferences).subscribe({
       error: (err) => {
         this.error = 'Unable to save preferences. Please contact your administrator.';
         this.errorChange.emit(this.error);
