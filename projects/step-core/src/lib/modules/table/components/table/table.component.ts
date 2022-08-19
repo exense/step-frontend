@@ -24,7 +24,7 @@ import { TableLocalDataSource } from '../../shared/table-local-data-source';
 import { TableSearch } from '../../services/table.search';
 import { SearchValue } from '../../shared/search-value';
 import { ColumnDirective } from '../../directives/column.directive';
-import { TableParameters } from '../../../../client/table/models/table-parameters';
+import { TableParameters } from '../../../../client/generated';
 
 export interface SearchColumn {
   colName: string;

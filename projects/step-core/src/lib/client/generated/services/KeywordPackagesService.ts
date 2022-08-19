@@ -20,7 +20,7 @@ export class KeywordPackagesService {
      * @returns FunctionPackage default response
      * @throws ApiError
      */
-    public get7(
+    public getFunctionPackage(
         id: string,
     ): Observable<FunctionPackage> {
         return this.httpRequest.request({
@@ -37,7 +37,7 @@ export class KeywordPackagesService {
      * @returns any default response
      * @throws ApiError
      */
-    public delete4(
+    public deleteFunctionPackage(
         id: string,
     ): Observable<any> {
         return this.httpRequest.request({
@@ -104,7 +104,7 @@ export class KeywordPackagesService {
      * @returns FunctionPackage default response
      * @throws ApiError
      */
-    public reload(
+    public reloadFunctionPackage(
         id: string,
     ): Observable<FunctionPackage> {
         return this.httpRequest.request({
@@ -121,7 +121,7 @@ export class KeywordPackagesService {
      * @returns FunctionPackage default response
      * @throws ApiError
      */
-    public save5(
+    public saveFunctionPackage(
         requestBody?: FunctionPackage,
     ): Observable<FunctionPackage> {
         return this.httpRequest.request({
@@ -137,7 +137,7 @@ export class KeywordPackagesService {
      * @returns FunctionPackage default response
      * @throws ApiError
      */
-    public update(
+    public updateFunctionPackage(
         requestBody?: FunctionPackage,
     ): Observable<FunctionPackage> {
         return this.httpRequest.request({

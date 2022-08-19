@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Execution, Mutable, ReportNode, TableRemoteDataSource, TableRestService } from '@exense/step-core';
+import { Execution, Mutable, ReportNode, TableRemoteDataSource, TableApiWrapperService } from '@exense/step-core';
 import { Observable } from 'rxjs';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { REPORT_NODE_STATUS } from '../../../_common/shared/status.enum';
@@ -40,7 +40,7 @@ export class KeywordCallsComponent {
 
   readonly rowDetailsVisibilityFlags: { [id: string]: boolean } = {};
 
-  constructor(private _tableRest: TableRestService) {}
+  constructor(private _tableRest: TableApiWrapperService) {}
 
   toggleFooter(): void {
     (this as FieldsAccessor).showFooter = !this.showFooter;

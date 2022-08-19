@@ -12,10 +12,10 @@ export class AugmentedScreenService extends ScreensService {
     this.screenCache = {};
   }
 
-  override getInputsForScreen1(id: string, requestBody?: any): Observable<Input[]> {
+  override getInputsForScreenPost(id: string, requestBody?: any): Observable<Input[]> {
     if (!requestBody && !!this.screenCache[id]) {
       return of(this.screenCache[id]);
     }
-    return super.getInputsForScreen1(id, requestBody).pipe(tap((inputs) => (this.screenCache[id] = inputs)));
+    return super.getInputsForScreenPost(id, requestBody).pipe(tap((inputs) => (this.screenCache[id] = inputs)));
   }
 }

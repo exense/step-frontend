@@ -43,12 +43,12 @@ export class FunctionPackageActionsService {
   }
 
   editFunctionPackage(id: string): Observable<any> {
-    return this._api.get7(id).pipe(switchMap((response) => this.openModal(response, id)));
+    return this._api.getFunctionPackage(id).pipe(switchMap((response) => this.openModal(response, id)));
   }
 
   deleteFunctionPackage(id: string, name: string): Observable<boolean> {
     return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Keyword Package "${name}"`)).pipe(
-      switchMap((_) => this._api.delete4(id)),
+      switchMap((_) => this._api.deleteFunctionPackage(id)),
       map((_) => true),
       catchError((_) => of(false))
     );
