@@ -50,7 +50,7 @@ export class GenericFunctionDialogService {
       catchError((_) => of(false)),
       tap((isDeleteConfirmed) => console.log('IS DELETE CONFIRMED', isDeleteConfirmed)),
       switchMap((isDeleteConfirmed) =>
-        isDeleteConfirmed ? this._augmentedKeywordsService.delete(id).pipe(map((_) => true)) : of(false)
+        isDeleteConfirmed ? this._augmentedKeywordsService.deleteFunction(id).pipe(map((_) => true)) : of(false)
       )
     );
   }

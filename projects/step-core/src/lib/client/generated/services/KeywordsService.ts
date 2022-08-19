@@ -20,12 +20,33 @@ export class KeywordsService {
 
     /**
      * @param id
+     * @param requestBody
+     * @returns OutputJsonObject default response
+     * @throws ApiError
+     */
+    public callFunctionByAttributes(
+        id: string,
+        requestBody?: FunctionInputJsonObject,
+    ): Observable<OutputJsonObject> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/functions/executor/tokens/{id}/execute',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * @param id
      * @param functionId
      * @param requestBody
      * @returns OutputJsonObject default response
      * @throws ApiError
      */
-    public callFunction(
+    public callFunctionById(
         id: string,
         functionId: string,
         requestBody?: FunctionInputJsonObject,
@@ -38,28 +59,7 @@ export class KeywordsService {
                 'functionId': functionId,
             },
             body: requestBody,
-            mediaType: '*/*',
-        });
-    }
-
-    /**
-     * @param id
-     * @param requestBody
-     * @returns OutputJsonObject default response
-     * @throws ApiError
-     */
-    public callFunction1(
-        id: string,
-        requestBody?: FunctionInputJsonObject,
-    ): Observable<OutputJsonObject> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/functions/executor/tokens/{id}/execute',
-            path: {
-                'id': id,
-            },
-            body: requestBody,
-            mediaType: '*/*',
+            mediaType: 'application/json',
         });
     }
 
@@ -85,7 +85,7 @@ export class KeywordsService {
      * @returns Function default response
      * @throws ApiError
      */
-    public get(
+    public getFunction(
         id: string,
     ): Observable<Function> {
         return this.httpRequest.request({
@@ -102,7 +102,7 @@ export class KeywordsService {
      * @returns any default response
      * @throws ApiError
      */
-    public delete(
+    public deleteFunction(
         id: string,
     ): Observable<any> {
         return this.httpRequest.request({
@@ -131,28 +131,12 @@ export class KeywordsService {
     }
 
     /**
-     * @param requestBody
-     * @returns Function default response
-     * @throws ApiError
-     */
-    public get1(
-        requestBody?: Record<string, string>,
-    ): Observable<Function> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/functions/search',
-            body: requestBody,
-            mediaType: '*/*',
-        });
-    }
-
-    /**
      * @param skip
      * @param limit
      * @returns Function default response
      * @throws ApiError
      */
-    public getAll1(
+    public getAllFunctions(
         skip?: number,
         limit?: number,
     ): Observable<Array<Function>> {
@@ -171,7 +155,7 @@ export class KeywordsService {
      * @returns Function default response
      * @throws ApiError
      */
-    public save(
+    public saveFunction(
         requestBody?: Function,
     ): Observable<Function> {
         return this.httpRequest.request({
@@ -262,6 +246,22 @@ export class KeywordsService {
             path: {
                 'id': id,
             },
+        });
+    }
+
+    /**
+     * @param requestBody
+     * @returns Function default response
+     * @throws ApiError
+     */
+    public searchFunction(
+        requestBody?: Record<string, string>,
+    ): Observable<Function> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/functions/search',
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
 

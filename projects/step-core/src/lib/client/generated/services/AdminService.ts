@@ -57,7 +57,7 @@ export class AdminService {
             method: 'POST',
             url: '/admin/maintenance/message',
             body: requestBody,
-            mediaType: '*/*',
+            mediaType: 'application/json',
         });
     }
 
@@ -84,7 +84,7 @@ export class AdminService {
             method: 'POST',
             url: '/admin/maintenance/message/toggle',
             body: requestBody,
-            mediaType: '*/*',
+            mediaType: 'application/json',
         });
     }
 
@@ -126,14 +126,14 @@ export class AdminService {
      * @returns any default response
      * @throws ApiError
      */
-    public putPreference(
+    public putPreferences(
         requestBody?: Preferences,
     ): Observable<any> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/admin/myaccount/preferences',
             body: requestBody,
-            mediaType: '*/*',
+            mediaType: 'application/json',
         });
     }
 
@@ -159,7 +159,7 @@ export class AdminService {
      * @returns any default response
      * @throws ApiError
      */
-    public remove(
+    public removeUser(
         id: string,
     ): Observable<any> {
         return this.httpRequest.request({
@@ -188,7 +188,7 @@ export class AdminService {
      * @returns any default response
      * @throws ApiError
      */
-    public putPreference1(
+    public putPreference(
         id: string,
         requestBody?: any,
     ): Observable<any> {
@@ -199,7 +199,7 @@ export class AdminService {
                 'id': id,
             },
             body: requestBody,
-            mediaType: '*/*',
+            mediaType: 'application/json',
         });
     }
 
@@ -215,7 +215,7 @@ export class AdminService {
             method: 'POST',
             url: '/admin/serviceaccount/resetpwd',
             body: requestBody,
-            mediaType: '*/*',
+            mediaType: 'application/json',
         });
     }
 
@@ -241,7 +241,7 @@ export class AdminService {
      * @returns any default response
      * @throws ApiError
      */
-    public save1(
+    public saveUser(
         requestBody?: User,
     ): Observable<any> {
         return this.httpRequest.request({

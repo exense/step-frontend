@@ -1,7 +1,7 @@
 import { FunctionPackage, KeywordPackagesService } from '../../generated';
 import { Injectable } from '@angular/core';
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
-import { TableRestService } from '../../table/services/table-rest.service';
+import { TableApiWrapperService } from '../../table/services/table-api-wrapper.service';
 import { TableRemoteDataSource } from '../../../modules/table/shared/table-remote-data-source';
 
 @Injectable({
@@ -14,7 +14,7 @@ export class AugmentedKeywordPackagesService extends KeywordPackagesService {
     actions: '',
   });
 
-  constructor(httpRequest: BaseHttpRequest, private _tableRest: TableRestService) {
+  constructor(httpRequest: BaseHttpRequest, private _tableRest: TableApiWrapperService) {
     super(httpRequest);
   }
 }

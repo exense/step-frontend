@@ -63,7 +63,7 @@ export class FunctionDialogsService {
       catchError((_) => of(false)),
       tap((isDeleteConfirmed) => console.log('IS DELETE CONFIRMED', isDeleteConfirmed)),
       switchMap((isDeleteConfirmed) =>
-        isDeleteConfirmed ? this._functionApiService.delete(id).pipe(map((_) => true)) : of(false)
+        isDeleteConfirmed ? this._functionApiService.deleteFunction(id).pipe(map((_) => true)) : of(false)
       )
     );
   }
@@ -107,7 +107,7 @@ export class FunctionDialogsService {
     const selectedEntity$ = a1Promise2Observable<any>(this._dialogs.selectEntityOfType('function', true));
     const function$ = selectedEntity$.pipe(
       map((result) => result.item),
-      switchMap((id) => this._functionApiService.get(id))
+      switchMap((id) => this._functionApiService.getFunction(id))
     );
     return function$;
   }

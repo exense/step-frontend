@@ -39,7 +39,7 @@ export class PlanDialogsService {
     const selectedEntity$ = a1Promise2Observable<any>(this._dialogs.selectEntityOfType('plans', true));
     const plan$ = selectedEntity$.pipe(
       map((result) => result.item),
-      switchMap((id) => this._plansApiService.get5(id))
+      switchMap((id) => this._plansApiService.getPlanById(id))
     );
     return plan$;
   }
@@ -50,7 +50,7 @@ export class PlanDialogsService {
         clone['attributes']!['name']! += '_Copy';
         return clone;
       }),
-      switchMap((clone) => this._plansApiService.save4(clone))
+      switchMap((clone) => this._plansApiService.savePlan(clone))
     );
   }
 
@@ -60,7 +60,7 @@ export class PlanDialogsService {
       catchError((_) => of(false)),
       tap((isDeleteConfirmed) => console.log('IS DELETE CONFIRMED', isDeleteConfirmed)),
       switchMap((isDeleteConfirmed) =>
-        isDeleteConfirmed ? this._plansApiService.delete3(id).pipe(map((_) => true)) : of(false)
+        isDeleteConfirmed ? this._plansApiService.deletePlan(id).pipe(map((_) => true)) : of(false)
       )
     );
   }
