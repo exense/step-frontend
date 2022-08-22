@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
 import { ExecutionTabContext } from './execution-page/execution-tab-context';
 
+/**
+ * This is a singleton which handles all contexts for the execution tabs.
+ * Each tab will have one 'ExecutionTabContext', where we store things about the execution, like time-selection, filters, used colors, etc.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -9,7 +13,7 @@ export class ExecutionsPageService {
   private executionsContexts: { [key: string]: ExecutionTabContext } = {};
 
   /**
-   * The method will create the context if it doesn't exist yet.
+   * The method will create a new context if it doesn't exist yet.
    */
   getContext(executionId: string): ExecutionTabContext {
     if (!executionId) {

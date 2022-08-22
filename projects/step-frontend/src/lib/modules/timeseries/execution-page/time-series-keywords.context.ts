@@ -2,6 +2,10 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { TimeseriesColorsPool } from '../util/timeseries-colors-pool';
 
+/**
+ * Every execution will have a list of custom keywords depending on the actual measurements that were found.
+ * This class stores all the keywords with their attributes like assigned colors, if they are selected in the view or not, etc
+ */
 export class TimeSeriesKeywordsContext {
   private keywords: { [key: string]: KeywordSelection } = {};
   private allKeywordsSelected = true;
@@ -16,7 +20,7 @@ export class TimeSeriesKeywordsContext {
     this.colorsPool = colorsPool;
   }
 
-  getColor(keyword: string) {
+  getColor(keyword: string): string {
     return this.colorsPool.getColor(keyword);
   }
 
@@ -88,8 +92,12 @@ export class TimeSeriesKeywordsContext {
 }
 
 export interface KeywordSelection {
-  id: string;
+  id: string; // unique id, usually the keyword name
+  /**
+   * If a zoom is applied, there may be keywords that are not present anymore in the buckets. we don't want to remove them, but hide them. when the zoom.
+   * Eventually when the zoom is reset eventually, the 'present' keywords will be shown again, with their previous selection.
+   */
   isVisible: boolean;
-  isSelected: boolean;
-  color: string;
+  isSelected: boolean; // if it's checked or not in the view.
+  color: string; // it's assigned color
 }

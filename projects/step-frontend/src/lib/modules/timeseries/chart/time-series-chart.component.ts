@@ -36,16 +36,16 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   @ViewChild('chart') private chartElement!: ElementRef;
 
   @Input('settings') settings!: TSChartSettings;
-  @Input('syncKey') syncKey: string | undefined;
+  @Input('syncKey') syncKey: string | undefined; // all the charts with the same syncKey in the app will be synced
   @Input('selection') selection: TSTimeRange | undefined;
 
   @Output('onZoomReset') onZoomReset = new EventEmitter();
 
   uplot!: uPlot;
 
-  seriesIndexesByIds: { [key: string]: number } = {};
+  seriesIndexesByIds: { [key: string]: number } = {}; // for fast accessing
 
-  recreateOnInputChange = true;
+  recreateOnInputChange = true; // the chart will be destroyed and recreated every time a setting or data is changed.
 
   constructor(@Self() private element: ElementRef) {}
 
@@ -55,15 +55,14 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     }
   }
 
-  resetZoom() {
+  resetZoom(): void {
     this.uplot.setData(this.uplot.data, true);
   }
 
   /**
    * @param settings
-   * @param selectedRange - optional, if a specific zoom has to be set
    */
-  createChart(settings: TSChartSettings) {
+  createChart(settings: TSChartSettings): void {
     let getSize = () => {
       return {
         width: this.element.nativeElement.parentElement.offsetWidth - 24,
@@ -73,28 +72,10 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
     const cursorOpts = {
       lock: false,
-      // focus: {
-      //     prox: 16,
-      // },
       y: false,
       sync: {},
       bind: {
-        // @ts-ignore
-        // click: (self, b, handler) => {
-        //   return (e: any) => {
-        //     console.log('CLICK', e);
-        //     handler(e);
-        //   };
-        // },
-        // @ts-ignore
-        // mouseup: (self, b, handler) => {
-        //   return (e: any) => {
-        //     console.log('MOUSE UP', e);
-        //       handler(e);
-        //   };
-        // },
-        // @ts-ignore
-        dblclick: (self, b, handler) => {
+        dblclick: (self: uPlot, b: any, handler: any) => {
           return (e: any) => {
             if (UPlotUtils.isZoomed(this.uplot)) {
               this.onZoomReset.emit(true);
@@ -189,13 +170,13 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     }
   }
 
-  showSeries(id: string) {
+  showSeries(id: string): void {
     let index = this.seriesIndexesByIds[id];
     if (index == undefined) return;
     this.uplot.setSeries(index, { show: true });
   }
 
-  hideSeries(id: string) {
+  hideSeries(id: string): void {
     let index = this.seriesIndexesByIds[id];
     if (index == undefined) return;
     this.uplot.setSeries(index, { show: false });
@@ -216,11 +197,11 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     this.uplot.redraw();
   }
 
-  getData() {
+  getData(): AlignedData {
     return this.uplot.data;
   }
 
-  setAllSeries(visible: boolean) {
+  setAllSeries(visible: boolean): void {
     this.uplot.batch(() => {
       this.uplot.series.forEach((s, i) => {
         this.uplot.setSeries(i, { show: visible });
@@ -228,14 +209,17 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     });
   }
 
-  toggleSeries(id: string) {
+  /**
+   * Switches the state of the specified series.
+   */
+  toggleSeries(id: string): void {
     let index = this.seriesIndexesByIds[id];
     if (index == undefined) return;
     let currentState = this.uplot.series[index].show;
     this.uplot.setSeries(index, { show: !currentState });
   }
 
-  addSeries(series: TSChartSeries) {
+  addSeries(series: TSChartSeries): void {
     let existingSeries = this.seriesIndexesByIds[series.id];
     if (existingSeries) {
       throw new Error('Series already exists with id ' + series.id);
@@ -244,40 +228,36 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     this.seriesIndexesByIds[series.id] = this.uplot.series.length;
   }
 
+  /**
+   * Series settings and data are index related.
+   */
   getSeriesIndex(key: string): number {
     return this.seriesIndexesByIds[key];
   }
 
-  hasSeries(id: string) {
+  hasSeries(id: string): boolean {
     return !!this.seriesIndexesByIds[id];
   }
 
-  addDataByKey(data: number[], key: string) {
-    let index = this.seriesIndexesByIds[key];
+  addDataBySeries(data: number[], seriesKey: string): void {
+    let index = this.seriesIndexesByIds[seriesKey];
     if (index === undefined) {
-      throw new Error('Series id not found: ' + key);
+      throw new Error('Series id not found: ' + seriesKey);
     } else {
-      this.addData(data, index);
+      this.addDataBySeriesIndex(data, index);
     }
   }
 
-  // this is removing the last element in the chart. this is used while streaming, in order to replace the element with a full set of data
-  removeTail() {
-    // this.uplot.data.forEach((series) => {
-    //   (series as number[]).pop();
-    // });
-  }
-
-  addData(data: number[], seriesIndex: number) {
+  addDataBySeriesIndex(data: number[], seriesIndex: number): void {
     let existingData = this.uplot.data[seriesIndex] as number[];
     this.uplot.data[seriesIndex] = [...existingData, ...data];
   }
 
-  redrawChart(settings: TSChartSettings) {
-    // this.createChart(settings);
-  }
-
-  updateFullData(series: TSChartSeries[]) {
+  /**
+   * The complete chart data will be override
+   * @param series
+   */
+  updateFullData(series: TSChartSeries[]): void {
     this.seriesIndexesByIds = {};
     let data = [this.settings.xValues, ...series.map((s) => s.data)];
     this.uplot.batch(() => {
@@ -299,7 +279,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     this.uplot.delSeries(0);
   }
 
-  redraw() {
+  redraw(): void {
     this.uplot.setData(this.uplot.data);
   }
 

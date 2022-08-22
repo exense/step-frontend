@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '@exense/step-core';
+import { AJS_MODULE, Execution } from '@exense/step-core';
 import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
 import { TimeSeriesService } from '../time-series.service';
 import { FindBucketsRequest } from '../find-buckets-request';
@@ -32,7 +32,7 @@ declare const uPlot: any;
 })
 export class ExecutionPageComponent implements OnInit, OnDestroy {
   private RESOLUTION_MS = 1000;
-  private LEGEND_SIZE = 65;
+  private CHART_LEGEND_SIZE = 65;
 
   summaryChartSettings: TSChartSettings | undefined;
   byStatusSettings: TSChartSettings | undefined;
@@ -53,8 +53,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   @Input('executionId') executionId!: string;
 
-  barsFunction = uPlot.paths.bars;
-  stepped = uPlot.paths.stepped;
+  barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
+  stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
 
   keywords: { [key: string]: KeywordSelection } = {};
   keywordSearchValue: string = '';
@@ -63,10 +63,12 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   findRequest!: FindBucketsRequest;
 
-  execution: any;
+  execution: Execution | undefined;
   executionStart: number = 0;
   executionInProgress = false;
   refreshEnabled = false;
+
+  // this is just for running executions
   refreshIntervals: RefreshInterval[] = [
     { label: '5 Sec', value: 5000 },
     { label: '30 Sec', value: 30 * 1000 },
@@ -139,10 +141,14 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     });
     this.executionService.onActiveSelectionChange().subscribe((newRange) => (this.timeSelection = newRange));
 
+    this.executionService.onFiltersChange().subscribe((filters) => {
+      // TODO here we will refresh all the charts and update the request to contain all specified filters.
+    });
+
     this.timeSeriesService.getExecutionDetails(this.executionId).subscribe((details) => {
       this.executionService.activeExecution = details;
       this.execution = details;
-      let startTime = details.startTime - (details.startTime % this.RESOLUTION_MS);
+      let startTime = details.startTime! - (details.startTime! % this.RESOLUTION_MS);
       this.findRequest.start = startTime;
       this.executionStart = this.findRequest.start;
       // let now = new Date().getTime();
@@ -157,11 +163,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       this.findRequest.end = endTime;
       // this.findRequest.intervalSize = this.computeIntervalSize(this.findRequest.start, this.findRequest.end);
       this.findRequest.numberOfBuckets = this.calculateIdealNumberOfBuckets(startTime, endTime);
-      this.createSummaryChart(this.findRequest);
-      if (this.tableChart) this.tableChart.init(this.findRequest);
-      this.createByStatusChart(this.findRequest);
-      this.createByKeywordsCharts(this.findRequest);
-      this.createThreadGroupsChart(this.findRequest);
+
+      this.createAllCharts();
 
       if (this.executionInProgress) {
         this.startRefreshInterval(this.selectedRefreshInterval.value);
@@ -200,18 +203,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         this.findRequest.start,
         this.findRequest.end
       );
-      // this.tableChart.accumulateData(this.findRequest);
-      // this.updateByKeywordsCharts();
       this.timeSelectionComponent.refreshRanger();
-      // if (this.timeSelection.type === RangeSelectionType.FULL) {
-      //   this.timeSelection.absoluteSelection = undefined;
-      // } else if (this.timeSelection.type === RangeSelectionType.RELATIVE && this.timeSelection.relativeSelection) {
-      //   let endTime = this.execution.endTime || new Date().getTime();
-      //   let from = endTime - this.timeSelection.relativeSelection.timeInMs;
-      //   this.timeSelection.absoluteSelection = { from, to: endTime };
-      // }
-      // this.executionService.setActiveSelection(this.timeSelection);
-      this.recreateAllCharts();
+      this.updateAllCharts();
       this.timeSeriesService.getExecutionDetails(this.executionId).subscribe((details) => {
         if (details.endTime) {
           this.intervalShouldBeCanceled = true;
@@ -220,7 +213,15 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     }, interval);
   }
 
-  recreateAllCharts() {
+  createAllCharts() {
+    this.createSummaryChart(this.findRequest);
+    if (this.tableChart) this.tableChart.init(this.findRequest);
+    this.createByStatusChart(this.findRequest);
+    this.createByKeywordsCharts(this.findRequest);
+    this.createThreadGroupsChart(this.findRequest);
+  }
+
+  updateAllCharts() {
     this.createSummaryChart(this.findRequest, true);
     this.tableChart.init(this.findRequest);
     this.createByStatusChart(this.findRequest, true);
@@ -230,26 +231,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   onKeywordToggle(keyword: string, event: any) {
     this.keywordsService.toggleKeyword(keyword);
-
-    // let filteredSource: Bucket[] = [];
-    // this.tableDataSource.forEach(e => {
-    //     if (this.keywords[e.attributes.name].isSelected) {
-    //         filteredSource.push(e);
-    //     }
-    // });
-    // this.tableDataSource = filteredSource;
   }
-
-  // onKeywordsFetched(keywords: string[]) {
-  //   keywords.forEach((keyword) => {
-  //     let existingKeyword = this.keywords[keyword];
-  //     if (existingKeyword) {
-  //       // don't override existing keywords
-  //       return;
-  //     }
-  //     this.keywords[keyword] = { isSelected: true, color: this.colorsPool.getColor(keyword) };
-  //   });
-  // }
 
   // updateByKeywordsCharts() {
   //   let dimensionKey = 'name';
@@ -466,21 +448,18 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
           axes: [
             {
               scale: 'y',
-              size: this.LEGEND_SIZE,
+              size: this.CHART_LEGEND_SIZE,
               values: (u, vals, space) => vals.map((v) => v),
             },
             {
               side: 1,
-              size: this.LEGEND_SIZE,
+              size: this.CHART_LEGEND_SIZE,
               scale: 'total',
               values: (u, vals, space) => vals.map((v) => v),
               grid: { show: false },
             },
           ],
         };
-        if (isUpdate) {
-          this.threadGroupChart.redrawChart(this.threadGroupSettings);
-        }
       });
   }
 
@@ -532,12 +511,12 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         axes: [
           {
             scale: 'y',
-            size: this.LEGEND_SIZE,
+            size: this.CHART_LEGEND_SIZE,
             values: (u, vals, space) => vals.map((v) => UPlotUtils.formatMilliseconds(v)),
           },
           {
             side: 1,
-            size: this.LEGEND_SIZE,
+            size: this.CHART_LEGEND_SIZE,
             scale: 'total',
             values: (u, vals, space) => vals.map((v) => this.formatAxisValue(v)),
             grid: { show: false },
@@ -545,9 +524,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         ],
         autoResize: true,
       };
-      if (isUpdate && this.byStatusChart) {
-        this.summaryChart.redrawChart(this.summaryChartSettings);
-      }
     });
   }
 
@@ -574,14 +550,11 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         series: series,
         axes: [
           {
-            size: this.LEGEND_SIZE,
+            size: this.CHART_LEGEND_SIZE,
             values: (u, vals, space) => vals.map((v) => this.formatAxisValue(v)),
           },
         ],
       };
-      if (isUpdate && this.byStatusChart) {
-        this.byStatusChart.redrawChart(this.byStatusSettings);
-      }
     });
   }
 
@@ -652,12 +625,12 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
           axes: [
             {
               scale: 'y',
-              size: this.LEGEND_SIZE,
+              size: this.CHART_LEGEND_SIZE,
               values: (u, vals, space) => vals.map((v) => this.formatAxisValue(v)),
             },
             {
               side: 1,
-              size: this.LEGEND_SIZE,
+              size: this.CHART_LEGEND_SIZE,
               scale: 'total',
               values: (u, vals, space) => vals.map((v) => this.formatAxisValue(v)),
               grid: { show: false },
@@ -674,15 +647,11 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
           axes: [
             {
               scale: 'y',
-              size: this.LEGEND_SIZE,
+              size: this.CHART_LEGEND_SIZE,
               values: (u, vals, space) => vals.map((v) => UPlotUtils.formatMilliseconds(v)),
             },
           ],
         };
-        if (isUpdate && this.responseTimeByKeywordsChart && this.throughputChartSettings) {
-          this.responseTimeByKeywordsChart.redrawChart(this.responseTypeByKeywordsSettings);
-          this.throughputByKeywordsChart.redrawChart(this.throughputChartSettings);
-        }
       });
   }
 
