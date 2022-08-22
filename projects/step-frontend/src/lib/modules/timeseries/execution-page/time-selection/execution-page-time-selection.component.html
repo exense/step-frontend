@@ -4,7 +4,7 @@
     <step-ts-ranger
       *ngIf="rangerSettings"
       [settings]="rangerSettings"
-      [syncKey]="execution.id"
+      [syncKey]="'test'"
       [selection]="selection.absoluteSelection"
       (onRangeChange)="onRangerSelectionChange($event)"
       (onZoomReset)="onRangerZoomReset($event)"

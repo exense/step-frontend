@@ -7,13 +7,12 @@ import { TSChartSettings } from '../../chart/model/ts-chart-settings';
 import { TSRangerComponent } from '../../ranger/ts-ranger.component';
 import { TSTimeRange } from '../../chart/model/ts-time-range';
 import { TimeRangePicker } from '../../time-selection/time-range-picker.component';
-import { ExecutionTabContext } from '../execution-tab-context';
+import { TimeSeriesExecutionService } from '../time-series-execution.service';
 import { RangeSelectionType } from '../../time-selection/model/range-selection-type';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
 import { TimeSeriesConfig } from '../../time-series.config';
 import { Select } from 'uplot';
 import { TSRangerSettings } from '../../ranger/ts-ranger-settings';
-import { ExecutionsPageService } from '../../executions-page.service';
 
 @Component({
   selector: 'step-execution-time-selection',
@@ -34,12 +33,9 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
 
   selection!: ExecutionTimeSelection;
 
-  private executionService!: ExecutionTabContext;
-
-  constructor(private timeSeriesService: TimeSeriesService, private executionsPageService: ExecutionsPageService) {}
+  constructor(private timeSeriesService: TimeSeriesService, private executionService: TimeSeriesExecutionService) {}
 
   ngOnInit(): void {
-    this.executionService = this.executionsPageService.getContext(this.execution.id);
     this.executionService.onActiveSelectionChange().subscribe((range) => {
       this.selection = range;
     });

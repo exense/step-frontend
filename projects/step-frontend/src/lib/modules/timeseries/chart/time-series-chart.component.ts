@@ -16,9 +16,8 @@ import { TSChartSeries, TSChartSettings } from './model/ts-chart-settings';
 import { UplotSyncService } from './uplot-sync-service';
 import { UPlotUtils } from '../uplot/uPlot.utils';
 import { tooltipPlugin } from './tooltip-plugin';
-import { ExecutionTabContext } from '../execution-page/execution-tab-context';
+import { TimeSeriesExecutionService } from '../execution-page/time-series-execution.service';
 import { TSTimeRange } from './model/ts-time-range';
-import { AlignedData } from 'uplot';
 
 declare const uPlot: any;
 
@@ -47,7 +46,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   recreateOnInputChange = true;
 
-  constructor(@Self() private element: ElementRef) {}
+  constructor(@Self() private element: ElementRef, private executionService: TimeSeriesExecutionService) {}
 
   ngOnInit(): void {
     if (this.syncKey) {
@@ -130,9 +129,9 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
           min: this.selection?.from,
           max: this.selection?.to,
         },
-        // y: {auto: true},
+        y: {},
       },
-      plugins: [tooltipPlugin(this.settings.yScaleUnit)],
+      plugins: [tooltipPlugin()],
       axes: [{}, ...(settings.axes || [])],
       series: [
         {
@@ -207,17 +206,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   showAllSeries(): void {
     this.setAllSeries(true);
-  }
-
-  setData(data: AlignedData, resetScale = false) {
-    let scale = this.uplot.scales['x'];
-    console.log(scale);
-    this.uplot.setData(data, resetScale); // if it is false, it's not going change the X scale (zooming)
-    this.uplot.redraw();
-  }
-
-  getData() {
-    return this.uplot.data;
   }
 
   setAllSeries(visible: boolean) {

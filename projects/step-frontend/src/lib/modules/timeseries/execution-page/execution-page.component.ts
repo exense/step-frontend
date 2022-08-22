@@ -15,13 +15,10 @@ import { TimeseriesTableComponent } from './table/timeseries-table.component';
 import { Subscription } from 'rxjs';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { ExecutionPageTimeSelectionComponent } from './time-selection/execution-page-time-selection.component';
-import { ExecutionTabContext } from './execution-tab-context';
+import { TimeSeriesExecutionService } from './time-series-execution.service';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
-import { KeywordSelection, TimeSeriesKeywordsContext } from './time-series-keywords.context';
-import { Bucket } from '../bucket';
-import { TimeSeriesChartResponse } from '../time-series-chart-response';
-import { ExecutionsPageService } from '../executions-page.service';
+import { KeywordSelection, TimeSeriesKeywordsService } from './time-series-keywords.service';
 
 declare const uPlot: any;
 
@@ -33,10 +30,11 @@ declare const uPlot: any;
 export class ExecutionPageComponent implements OnInit, OnDestroy {
   private RESOLUTION_MS = 1000;
   private LEGEND_SIZE = 65;
+  syncKey = 'test';
   executionId = window.location.href.split('/').slice(-1)[0]; // last part of URL
-  syncKey: string = this.executionId;
 
   summaryChartSettings: TSChartSettings | undefined;
+  chart2Settings: TSChartSettings | undefined;
   byStatusSettings: TSChartSettings | undefined;
   throughputChartSettings: TSChartSettings | undefined;
   responseTypeByKeywordsSettings: TSChartSettings | undefined;
@@ -59,8 +57,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   keywords: { [key: string]: KeywordSelection } = {};
   keywordSearchValue: string = '';
 
-  byKeywordsChartResponseCache?: TimeSeriesChartResponse; // for caching
-
   findRequest: FindBucketsRequest = {
     start: 0,
     end: -1,
@@ -72,15 +68,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   executionStart: number = 0;
   executionInProgress = false;
   refreshEnabled = false;
-  refreshIntervals: RefreshInterval[] = [
-    { label: '5 Sec', value: 5000 },
-    { label: '30 Sec', value: 30 * 1000 },
-    { label: '1 Min', value: 60 * 1000 },
-    { label: '5 Min', value: 5 * 60 * 1000 },
-    { label: '30 Min', value: 30 * 60 * 1000 },
-    { label: 'Off', value: 0 },
-  ];
-  selectedRefreshInterval: RefreshInterval = this.refreshIntervals[0];
   timeSelection!: ExecutionTimeSelection;
 
   subscriptions: Subscription = new Subscription();
@@ -90,47 +77,16 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   allSeriesChecked: boolean = true;
 
   private colorsPool = new TimeseriesColorsPool();
-  private keywordsService: TimeSeriesKeywordsContext;
-
-  responseTimeMetrics = [
-    { label: 'AVG', mapping: (b: Bucket) => b.sum / b.throughputPerHour },
-    { label: 'MIN', mapping: (b: Bucket) => b.min },
-    { label: 'MAX', mapping: (b: Bucket) => b.max },
-    { label: 'STDDEV', mapping: (b: Bucket) => b.max },
-    { label: 'Perc. 90', mapping: (b: Bucket) => b.pclValues[90] },
-    { label: 'Perc. 99', mapping: (b: Bucket) => b.pclValues[99] },
-  ];
-  selectedMetric = this.responseTimeMetrics[0];
-
-  private executionService: ExecutionTabContext;
+  keywordsService = new TimeSeriesKeywordsService(this.colorsPool);
 
   valueAscOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => {
     return a.key.localeCompare(b.key);
   };
 
-  constructor(private timeSeriesService: TimeSeriesService, private executionsPageService: ExecutionsPageService) {
-    this.executionService = executionsPageService.getContext(this.executionId);
-    this.keywordsService = this.executionService.getKeywordsContext();
-  }
+  constructor(private timeSeriesService: TimeSeriesService, private executionService: TimeSeriesExecutionService) {}
 
   onAllSeriesCheckboxClick(event: any) {
     this.keywordsService.toggleSelectAll();
-  }
-
-  changeRefreshInterval(newInterval: RefreshInterval) {
-    if (newInterval.value) {
-      if (this.selectedRefreshInterval.value === newInterval.value) {
-        return;
-      }
-      this.refreshEnabled = true;
-      clearInterval(this.intervalExecution);
-      this.startRefreshInterval(newInterval.value);
-    } else {
-      // we need to stop it
-      this.refreshEnabled = false;
-      clearInterval(this.intervalExecution);
-    }
-    this.selectedRefreshInterval = newInterval;
   }
 
   ngOnInit(): void {
@@ -143,7 +99,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       this.keywords[selection.id] = selection;
     });
     this.keywordsService.onKeywordsUpdated().subscribe((keywords) => {
-      console.log('KEYWORDS UPDATED!', keywords);
       this.keywords = keywords;
     });
     this.executionService.onActiveSelectionChange().subscribe((newRange) => (this.timeSelection = newRange));
@@ -167,13 +122,13 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       // this.findRequest.intervalSize = this.computeIntervalSize(this.findRequest.start, this.findRequest.end);
       this.findRequest.numberOfBuckets = this.calculateIdealNumberOfBuckets(startTime, endTime);
       this.createSummaryChart(this.findRequest);
-      if (this.tableChart) this.tableChart.init(this.findRequest);
+      this.tableChart.init(this.findRequest);
       this.createByStatusChart(this.findRequest);
       this.createByKeywordsCharts(this.findRequest);
       this.createThreadGroupsChart(this.findRequest);
 
       if (this.executionInProgress) {
-        this.startRefreshInterval(this.selectedRefreshInterval.value);
+        this.startRefreshInterval(3000);
         this.refreshEnabled = true;
       }
     });
@@ -462,7 +417,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
             {
               scale: 'y',
               size: this.LEGEND_SIZE,
-              values: (u, vals, space) => vals.map((v) => v),
+              values: (u, vals, space) => vals.map((v) => UPlotUtils.formatMilliseconds(v)),
             },
             {
               side: 1,
@@ -489,13 +444,12 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       }
       response.matrix[0].forEach((bucket) => {
         avgValues.push(bucket ? bucket.sum / bucket.count : null);
-        countValues.push(bucket?.throughputPerHour);
+        countValues.push(bucket?.count);
       });
       this.summaryChartSettings = {
         title: 'Average Response Time',
         showLegend: true,
         xValues: xLabels,
-        yScaleUnit: 'ms',
         series: [
           {
             id: 'avg',
@@ -517,7 +471,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
           {
             id: 'count',
             scale: 'total',
-            label: 'Hits/h',
+            label: 'Hits/sec',
             data: countValues,
             value: (x, v) => Math.trunc(v),
             fill: 'rgba(255,124,18,0.4)',
@@ -534,7 +488,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
             side: 1,
             size: this.LEGEND_SIZE,
             scale: 'total',
-            values: (u, vals, space) => vals.map((v) => this.formatAxisValue(v)),
+            values: (u, vals, space) => vals.map((v) => v),
             grid: { show: false },
           },
         ],
@@ -570,7 +524,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         axes: [
           {
             size: this.LEGEND_SIZE,
-            values: (u, vals, space) => vals.map((v) => this.formatAxisValue(v)),
+            values: (u, vals, space) => vals.map((v) => UPlotUtils.formatMilliseconds(v)),
           },
         ],
       };
@@ -582,103 +536,99 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   createByKeywordsCharts(request: FindBucketsRequest, isUpdate = false) {
     let dimensionKey = 'name';
-    this.timeSeriesService
-      .fetchBucketsNew({ ...request, groupDimensions: [dimensionKey], percentiles: [90, 99] })
-      .subscribe((response) => {
-        this.byKeywordsChartResponseCache = response;
-        let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-        let totalThroughput: number[] = Array(response.matrix[0].length); // TODO handle empty response
-        let responseTimeSeries: TSChartSeries[] = [];
-        let throughputSeries: TSChartSeries[] = [];
-        response.matrixKeys.map((key, i) => {
-          key = key[dimensionKey];
-          let responseTimeData: number[] = [];
-          let color = this.colorsPool.getColor(key);
-          let countData = response.matrix[i].map((b, j) => {
-            let bucketValue = b?.throughputPerHour;
-            if (totalThroughput[j] == undefined) {
-              totalThroughput[j] = bucketValue;
-            } else if (bucketValue) {
-              totalThroughput[j] += bucketValue;
-            }
-            if (b) {
-              responseTimeData.push(this.selectedMetric.mapping(b));
-            }
-            return bucketValue;
-          });
-          let keywordSelection = this.keywordsService.getKeywordSelection(key);
-          let series = {
-            scale: 'y',
-            show: keywordSelection ? keywordSelection.isSelected : true,
-            label: key,
-            id: key,
-            data: [], // will override it
-            value: (x, v) => Math.trunc(v),
-            stroke: color,
-            points: { show: false },
-          } as TSChartSeries;
-          throughputSeries.push({ ...series, data: countData });
-          responseTimeSeries.push({ ...series, data: responseTimeData });
-          return series;
+    this.timeSeriesService.fetchBucketsNew({ ...request, groupDimensions: [dimensionKey] }).subscribe((response) => {
+      let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
+      let totalData: number[] = !!response.matrix[0] ? Array(response.matrix[0].length) : []; // TODO handle empty response
+      let avgSeries: TSChartSeries[] = [];
+      let countSeries = [];
+      let series = response.matrixKeys.map((key, i) => {
+        key = key[dimensionKey];
+        let avgSeriesData: number[] = [];
+        let color = this.colorsPool.getColor(key);
+        let countData = response.matrix[i].map((b, j) => {
+          let bucketValue = b?.count;
+          if (totalData[j] == undefined) {
+            totalData[j] = bucketValue;
+          } else if (bucketValue) {
+            totalData[j] += bucketValue;
+          }
+          if (b) {
+            avgSeriesData.push(b.sum / b.count);
+          }
+          return bucketValue;
         });
-
-        this.throughputChartSettings = {
-          title: 'Throughput by keywords / h',
-          xValues: timeLabels,
-          showLegend: false,
-          series: [
-            {
-              scale: 'total',
-              label: 'Total',
-              id: 'secondary',
-              data: totalThroughput,
-              value: (x, v) => Math.trunc(v) + ' total',
-              // stroke: '#E24D42',
-              fill: 'rgba(143,161,210,0.38)',
-              // fill: 'rgba(255,212,166,0.64)',
-              // points: {show: false},
-              // @ts-ignore
-              drawStyle: 1,
-              paths: this.barsFunction({ size: [0.9, 100] }),
-              points: { show: false },
-            },
-            ...throughputSeries,
-          ],
-          axes: [
-            {
-              scale: 'y',
-              size: this.LEGEND_SIZE,
-              values: (u, vals, space) => vals.map((v) => this.formatAxisValue(v)),
-            },
-            {
-              side: 1,
-              size: this.LEGEND_SIZE,
-              scale: 'total',
-              values: (u, vals, space) => vals.map((v) => this.formatAxisValue(v)),
-              grid: { show: false },
-            },
-          ],
-        };
-
-        this.responseTypeByKeywordsSettings = {
-          title: 'Response time by keywords',
-          xValues: timeLabels,
-          showLegend: false,
-          series: responseTimeSeries,
-          yScaleUnit: 'ms',
-          axes: [
-            {
-              scale: 'y',
-              size: this.LEGEND_SIZE,
-              values: (u, vals, space) => vals.map((v) => UPlotUtils.formatMilliseconds(v)),
-            },
-          ],
-        };
-        if (isUpdate && this.responseTimeByKeywordsChart && this.throughputChartSettings) {
-          this.responseTimeByKeywordsChart.redrawChart(this.responseTypeByKeywordsSettings);
-          this.throughputByKeywordsChart.redrawChart(this.throughputChartSettings);
-        }
+        let keywordSelection = this.keywordsService.getKeywordSelection(key);
+        let series = {
+          scale: 'y',
+          show: keywordSelection ? keywordSelection.isSelected : true,
+          label: key,
+          id: key,
+          data: countData,
+          value: (x, v) => Math.trunc(v),
+          stroke: color,
+          points: { show: false },
+        } as TSChartSeries;
+        countSeries.push(series);
+        avgSeries.push({ ...series, data: avgSeriesData });
+        return series;
       });
+
+      this.throughputChartSettings = {
+        title: 'Throughput by keywords',
+        xValues: timeLabels,
+        showLegend: false,
+        series: [
+          {
+            scale: 'total',
+            label: 'Total',
+            id: 'secondary',
+            data: totalData,
+            value: (x, v) => Math.trunc(v) + ' total',
+            // stroke: '#E24D42',
+            fill: 'rgba(143,161,210,0.38)',
+            // fill: 'rgba(255,212,166,0.64)',
+            // points: {show: false},
+            // @ts-ignore
+            drawStyle: 1,
+            paths: this.barsFunction({ size: [0.9, 100] }),
+            points: { show: false },
+          },
+          ...series,
+        ],
+        axes: [
+          {
+            scale: 'y',
+            size: this.LEGEND_SIZE,
+            values: (u, vals, space) => vals.map((v) => UPlotUtils.formatMilliseconds(v)),
+          },
+          {
+            side: 1,
+            size: this.LEGEND_SIZE,
+            scale: 'total',
+            values: (u, vals, space) => vals.map((v) => v),
+            grid: { show: false },
+          },
+        ],
+      };
+
+      this.responseTypeByKeywordsSettings = {
+        title: 'Response time by keywords',
+        xValues: timeLabels,
+        showLegend: false,
+        series: avgSeries,
+        axes: [
+          {
+            scale: 'y',
+            size: this.LEGEND_SIZE,
+            values: (u, vals, space) => vals.map((v) => UPlotUtils.formatMilliseconds(v)),
+          },
+        ],
+      };
+      if (isUpdate && this.responseTimeByKeywordsChart && this.throughputChartSettings) {
+        this.responseTimeByKeywordsChart.redrawChart(this.responseTypeByKeywordsSettings);
+        this.throughputByKeywordsChart.redrawChart(this.throughputChartSettings);
+      }
+    });
   }
 
   /**
@@ -706,49 +656,19 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     this.handleTableRangeChange(newRange);
   }
 
-  switchChartMetric(metric: { label: string; mapping: (b: Bucket) => number }) {
-    if (metric.label === this.selectedMetric.label) {
-      // it is a real change
-      return;
+  toggleRefresh() {
+    this.refreshEnabled = !this.refreshEnabled;
+    if (this.refreshEnabled) {
+      // new status
+      this.startRefreshInterval(3000);
+    } else {
+      clearTimeout(this.intervalExecution);
     }
-    if (!this.byKeywordsChartResponseCache) {
-      return;
-    }
-    this.selectedMetric = metric;
-    let data = this.responseTimeByKeywordsChart.getData();
-    this.byKeywordsChartResponseCache.matrix.map((bucketArray, i) => {
-      data[i + 1] = bucketArray.map((b) => this.selectedMetric.mapping(b));
-    });
-    this.responseTimeByKeywordsChart.setData(data, false);
-    console.log(data);
-  }
-
-  formatAxisValue(num: number) {
-    const lookup = [
-      { value: 1, symbol: '' },
-      { value: 1e3, symbol: 'k' },
-      { value: 1e6, symbol: 'M' },
-      { value: 1e9, symbol: 'B' },
-    ];
-    const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
-    var item = lookup
-      .slice()
-      .reverse()
-      .find(function (item) {
-        return num >= item.value;
-      });
-    return item ? (num / item.value).toFixed(2).replace(rx, '$1') + item.symbol : '0';
   }
 
   ngOnDestroy(): void {
     clearInterval(this.intervalExecution);
-    this.executionsPageService.destroyContext(this.executionId);
   }
-}
-
-interface RefreshInterval {
-  label: string;
-  value: number; // 0 if it's off
 }
 
 getAngularJSGlobal()
