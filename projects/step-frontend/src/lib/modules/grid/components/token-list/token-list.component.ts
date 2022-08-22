@@ -77,7 +77,7 @@ export class TokenListComponent implements OnDestroy {
   }
 
   public removeTokenErrors(id: string): void {
-    this._gridService.removeTokenError(id).subscribe(() => {
+    this._gridService.removeAgentTokenErrors(id).subscribe(() => {
       this.loadTable();
     });
   }

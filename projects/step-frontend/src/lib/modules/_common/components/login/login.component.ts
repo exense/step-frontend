@@ -27,7 +27,6 @@ export class LoginComponent {
   }
 
   login() {
-    console.log(this.credentials);
     this._auth.login(this.credentials).then(
       function (user) {},
       (e) => (this.error = e.error)

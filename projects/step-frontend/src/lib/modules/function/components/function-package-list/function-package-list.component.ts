@@ -28,7 +28,7 @@ export class FunctionPackageListComponent {
   refresh(id: string): void {
     this.isRefreshing = true;
     this._augApi
-      .reload(id)
+      .reloadFunctionPackage(id)
       .subscribe()
       .add(() => (this.isRefreshing = false));
   }

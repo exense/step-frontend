@@ -50,7 +50,7 @@ export class ParameterDialogsService {
 
   deleteParameter(id: string, label: string): Observable<any> {
     return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Parameter "${label}"`)).pipe(
-      switchMap((_) => this._parametersService.delete5(id)),
+      switchMap((_) => this._parametersService.deleteParameter(id)),
       map((_) => true),
       catchError((_) => of(false))
     );

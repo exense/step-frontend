@@ -66,7 +66,7 @@ export class CustomColumnsComponent implements OnChanges {
     }
 
     this._screenApiService
-      .getInputsForScreen1(screen)
+      .getInputsForScreenPost(screen)
       .pipe(
         map((inputs) => {
           inputs = inputs.filter(({ id }) => !!id);
