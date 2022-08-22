@@ -3,10 +3,9 @@ import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static
 import { AJS_MODULE } from '../../../shared';
 import { TableRequestData } from '../../../client/table/models/table-request-data';
 import { SortDirection } from '../../../client/table/models/sort-direction.enum';
-import { OQLFilter } from '../../../client/table/models/oql-filter';
-import { TableParameters } from '../../../client/table/models/table-parameters';
 import { FieldSort } from '../../../client/table/models/field-sort';
 import { TableResponse } from '../../../client/table/models/table-response';
+import { OQLFilter, TableParameters } from '../../../client/generated';
 
 export interface LegacyColumnOrder {
   column: number;
