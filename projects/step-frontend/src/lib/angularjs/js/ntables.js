@@ -145,7 +145,9 @@ angular
       scopesTracker.newCycle();
     };
   })
-  .directive('stTable', function ($compile, $http, Preferences, stateStorage, $timeout, Dialogs, ExportService) {
+  .directive('stTable', [
+    '$compile', '$http', 'Preferences', 'stateStorage', '$timeout', 'Dialogs', 'ExportService','tableLegacyUtilsService',
+    function ($compile, $http, Preferences, stateStorage, $timeout, Dialogs, ExportService,  tableLegacyUtils) {
     return {
       restrict: 'E',
       scope: {
@@ -363,11 +365,25 @@ angular
             }
 
             if (serverSide) {
-              var query = 'rest/table/' + scope.collection + '/data?';
+              var query = 'rest/table/' + scope.collection;
               var loadRequestCount = 0;
               tableOptions.ajax = {
                 url: query,
                 type: 'POST',
+                contentType: 'application/json',
+                data: function (data) {
+                  if (scope.filter) {
+                    data.filter = scope.filter;
+                  }
+                  if (scope.serverSideParameters) {
+                    data.params = scope.serverSideParameters;
+                  }
+                  return JSON.stringify(tableLegacyUtils.transformRequestLegacy2New(data));
+                },
+                dataSrc: function (data) {
+                  const result = tableLegacyUtils.transformResponseNew2Legacy(data, tableOptions.columns.length);
+                  return result.data;
+                },
                 beforeSend: function (a, b) {
                   // Avoid stacking of requests
                   if (loadRequestCount >= 5) {
@@ -375,12 +391,6 @@ angular
                     a.abort();
                   } else {
                     loadRequestCount++;
-                    if (scope.filter) {
-                      b.data += '&filter=' + encodeURIComponent(scope.filter);
-                    }
-                    if (scope.serverSideParameters) {
-                      b.data += '&params=' + encodeURIComponent(JSON.stringify(scope.serverSideParameters()));
-                    }
                   }
                 },
                 complete: function (qXHR, textStatus) {
@@ -546,7 +556,7 @@ angular
       },
       templateUrl: 'partials/ntable.html',
     };
-  })
+  }])
 
   .directive('stColumn', function ($compile, $http, Preferences, stateStorage) {
     return {
