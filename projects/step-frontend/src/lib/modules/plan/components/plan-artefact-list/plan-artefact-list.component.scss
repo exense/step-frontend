@@ -30,3 +30,10 @@
   @include table-header;
   padding: 8px;
 }
+
+mat-icon {
+  transform: scale(0.8);
+}
+.artefact-icon-label {
+  padding-left: 15px;
+}
