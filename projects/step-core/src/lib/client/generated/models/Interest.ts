@@ -3,7 +3,6 @@
 /* eslint-disable */
 
 export type Interest = {
-    selectionPattern?: any;
-    must?: boolean;
+  selectionPattern?: any;
+  must?: boolean;
 };
-

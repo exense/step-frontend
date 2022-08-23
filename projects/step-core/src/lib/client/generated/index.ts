@@ -3,7 +3,6 @@
 /* eslint-disable */
 export { StepGeneratedClientModule } from './StepGeneratedClientModule';
 
-
 export type { AbstractArtefact } from './models/AbstractArtefact';
 export type { AccessConfiguration } from './models/AccessConfiguration';
 export type { AgentListEntry } from './models/AgentListEntry';

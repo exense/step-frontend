@@ -3,6 +3,5 @@
 /* eslint-disable */
 
 export type Preferences = {
-    preferences?: Record<string, any>;
+  preferences?: Record<string, any>;
 };
-

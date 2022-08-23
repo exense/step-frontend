@@ -5,7 +5,6 @@
 import type { TableRequest } from './TableRequest';
 
 export type TableExportRequest = {
-    tableRequest?: TableRequest;
-    fields?: Array<string>;
+  tableRequest?: TableRequest;
+  fields?: Array<string>;
 };
-

@@ -3,8 +3,7 @@
 /* eslint-disable */
 
 export type AgentRef = {
-    agentId?: string;
-    agentUrl?: string;
-    agentType?: string;
+  agentId?: string;
+  agentUrl?: string;
+  agentType?: string;
 };
-
