@@ -4,8 +4,8 @@ import { BehaviorSubject, combineLatest, map, Observable, of, Subject, takeUntil
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { SearchValue } from './search-value';
-import { TableParameters } from '../../../client/table/models/table-parameters';
 import { TableRequestData } from '../../../client/table/models/table-request-data';
+import { TableParameters } from '../../../client/generated';
 
 interface Request {
   page?: PageEvent;

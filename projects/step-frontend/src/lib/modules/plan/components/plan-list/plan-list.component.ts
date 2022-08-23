@@ -1,17 +1,35 @@
 import { Component, Inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_LOCATION, AJS_MODULE, AugmentedPlansService } from '@exense/step-core';
+import {
+  AJS_LOCATION,
+  AJS_MODULE,
+  AugmentedPlansService,
+  AutoDeselectStrategy,
+  BulkOperation,
+  BulkOperationsInvokeService,
+  Plan,
+  selectionCollectionProvider,
+} from '@exense/step-core';
 import { PlanDialogsService } from '../../services/plan-dialogs.service';
 import { noop } from 'rxjs';
 import { ILocationService } from 'angular';
+import { PlansBulkOperationsInvokeService } from '../../services/plans-bulk-operations-invoke.service';
 
 @Component({
   selector: 'step-plan-list',
   templateUrl: './plan-list.component.html',
   styleUrls: ['./plan-list.component.scss'],
+  providers: [
+    selectionCollectionProvider<string, Plan>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    {
+      provide: BulkOperationsInvokeService,
+      useClass: PlansBulkOperationsInvokeService,
+    },
+  ],
 })
 export class PlanListComponent {
   readonly dataSource = this._plansApiService.getPlansTableDataSource();
+  readonly availableBulkOperations = [BulkOperation.delete, BulkOperation.duplicate];
 
   constructor(
     readonly _plansApiService: AugmentedPlansService,

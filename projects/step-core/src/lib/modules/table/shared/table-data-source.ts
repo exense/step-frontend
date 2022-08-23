@@ -3,7 +3,8 @@ import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { Observable } from 'rxjs';
 import { SearchValue } from './search-value';
-import { TableParameters, TableRequestData } from '../../../client/table/step-table-client.module';
+import { TableRequestData } from '../../../client/table/step-table-client.module';
+import { TableParameters } from '../../../client/generated';
 
 export interface TableDataSource<T> extends DataSource<T> {
   readonly inProgress$: Observable<boolean>;

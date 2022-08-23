@@ -6,12 +6,7 @@ import {
   AJS_MODULE,
   AJS_ROOT_SCOPE,
   AugmentedKeywordsService,
-  AutoDeselectStrategy,
-  BulkOperation,
-  BulkOperationsInvokeService,
-  FunctionPackage,
   InteractivePlanExecutionService,
-  selectionCollectionProvider,
 } from '@exense/step-core';
 import { noop } from 'rxjs';
 import { ILocationService, IRootScopeService } from 'angular';
@@ -22,14 +17,9 @@ import { FunctionPackageActionsService } from '../../services/function-package-a
   selector: 'step-function-list',
   templateUrl: './function-list.component.html',
   styleUrls: ['./function-list.component.scss'],
-  providers: [
-    selectionCollectionProvider<string, FunctionPackage>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
-    BulkOperationsInvokeService, //todo Each module will have to provide it's own implementation for BulkOperationsService
-  ],
 })
 export class FunctionListComponent {
   readonly dataSource = this._functionApiService.createFilteredTableDataSource();
-  readonly availableBulkOperations = [BulkOperation.delete, BulkOperation.duplicate, BulkOperation.export];
 
   constructor(
     private _functionApiService: AugmentedKeywordsService,

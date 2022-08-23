@@ -40,7 +40,7 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
 
   ngOnChanges(changes: SimpleChanges): void {
     const cSelectionCollector = changes['selectionCollector'];
-    if (cSelectionCollector?.previousValue !== cSelectionCollector?.currentValue || cSelectionCollector.firstChange) {
+    if (cSelectionCollector?.previousValue !== cSelectionCollector?.currentValue || cSelectionCollector?.firstChange) {
       this.setupCollector(cSelectionCollector?.currentValue);
     }
     const cSelectionType = changes['selectionType'];
@@ -110,7 +110,10 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
     // update individual
     selectionCollector.selected$
       .pipe(
-        filter((selected) => selected.length > 0 && selected.length < selectionCollector!.possibleLength),
+        filter(
+          (selected) =>
+            (selected.length > 0 && selected.length < selectionCollector!.possibleLength) || selected.length === 1
+        ),
         takeUntil(this.terminator$)
       )
       .subscribe(() => {

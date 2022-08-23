@@ -22,13 +22,14 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { SearchColDirective } from '../../directives/search-col.directive';
 import { TableRemoteDataSource } from '../../shared/table-remote-data-source';
 import { TableLocalDataSource } from '../../shared/table-local-data-source';
-import { TableSearch } from '../../services/table.search';
+import { TableSearch } from '../../services/table-search';
 import { SearchValue } from '../../shared/search-value';
 import { ColumnDirective } from '../../directives/column.directive';
-import { TableParameters } from '../../../../client/table/models/table-parameters';
 import { TableRequestData } from '../../../../client/table/models/table-request-data';
 import { AdditionalHeaderDirective } from '../../directives/additional-header.directive';
-import { TableFilter } from '../../services/table.filter';
+import { TableFilter } from '../../services/table-filter';
+import { TableParameters } from '../../../../client/generated';
+import { TableReload } from '../../services/table-reload';
 
 export interface SearchColumn {
   colName: string;
@@ -51,9 +52,13 @@ export type DataSource<T> = TableDataSource<T> | T[] | Observable<T[]>;
       provide: TableFilter,
       useExisting: forwardRef(() => TableComponent),
     },
+    {
+      provide: TableReload,
+      useExisting: forwardRef(() => TableComponent),
+    },
   ],
 })
-export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, TableSearch, TableFilter {
+export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, TableSearch, TableFilter, TableReload {
   @Input() trackBy: TrackByFunction<T> = (index) => index;
   @Input() dataSource?: DataSource<T>;
   @Input() inProgress?: boolean;
@@ -230,6 +235,10 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
 
   getTableFilterRequest(): TableRequestData | undefined {
     return this.tableDataSource?.getFilterRequest(this.search$.value, this.filter$.value, this.tableParams$.value);
+  }
+
+  reload(): void {
+    return this.tableDataSource?.reload();
   }
 
   ngAfterViewInit(): void {
