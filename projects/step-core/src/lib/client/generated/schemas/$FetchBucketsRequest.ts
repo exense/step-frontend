@@ -34,7 +34,7 @@ export const $FetchBucketsRequest = {
       type: 'number',
       format: 'int64',
     },
-    pclPrecisions: {
+    percentiles: {
       type: 'array',
       contains: {
         type: 'number',

@@ -29,12 +29,16 @@ export const $BucketResponse = {
       type: 'number',
       format: 'int64',
     },
-    pclPrecisions: {
+    pclValues: {
       type: 'dictionary',
       contains: {
         type: 'number',
         format: 'int64',
       },
+    },
+    throughputPerHour: {
+      type: 'number',
+      format: 'int64',
     },
   },
 } as const;

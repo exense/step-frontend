@@ -16,7 +16,7 @@ export class EntitiesService {
    * @returns any default response
    * @throws ApiError
    */
-  public get(type: string, id: string): Observable<any> {
+  public getEntity(type: string, id: string): Observable<any> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/entities/{type}/{id}',
@@ -33,7 +33,7 @@ export class EntitiesService {
    * @returns any default response
    * @throws ApiError
    */
-  public delete1(type: string, id: string): Observable<any> {
+  public deleteEntity(type: string, id: string): Observable<any> {
     return this.httpRequest.request({
       method: 'DELETE',
       url: '/entities/{type}/{id}',
@@ -50,7 +50,7 @@ export class EntitiesService {
    * @returns any default response
    * @throws ApiError
    */
-  public find1(type: string, requestBody?: Record<string, string>): Observable<any> {
+  public findEntity(type: string, requestBody?: Record<string, string>): Observable<any> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/entities/{type}/find',
@@ -68,7 +68,7 @@ export class EntitiesService {
    * @returns any default response
    * @throws ApiError
    */
-  public save1(type: string, requestBody?: any): Observable<any> {
+  public saveEntity(type: string, requestBody?: any): Observable<any> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/entities/{type}',

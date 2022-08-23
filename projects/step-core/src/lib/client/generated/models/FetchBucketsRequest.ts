@@ -10,5 +10,5 @@ export type FetchBucketsRequest = {
   groupDimensions?: Array<string>;
   numberOfBuckets?: number;
   intervalSize?: number;
-  pclPrecisions?: Array<number>;
+  percentiles?: Array<number>;
 };

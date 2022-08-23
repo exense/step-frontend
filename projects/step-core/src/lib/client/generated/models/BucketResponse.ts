@@ -9,5 +9,6 @@ export type BucketResponse = {
   sum?: number;
   min?: number;
   max?: number;
-  pclPrecisions?: Record<string, number>;
+  pclValues?: Record<string, number>;
+  throughputPerHour?: number;
 };

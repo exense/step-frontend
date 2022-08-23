@@ -5,6 +5,8 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import type { AbstractArtefact } from '../models/AbstractArtefact';
+import type { BulkOperationParameters } from '../models/BulkOperationParameters';
+import type { ExportStatus } from '../models/ExportStatus';
 import type { Plan } from '../models/Plan';
 import type { PlanCompilationResult } from '../models/PlanCompilationResult';
 
@@ -57,6 +59,21 @@ export class PlansService {
       path: {
         id: id,
       },
+    });
+  }
+
+  /**
+   * Bulk clone plans according to the provided parameters
+   * @param requestBody
+   * @returns ExportStatus default response
+   * @throws ApiError
+   */
+  public clonePlans(requestBody?: BulkOperationParameters): Observable<ExportStatus> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/plans/bulk/clone',
+      body: requestBody,
+      mediaType: 'application/json',
     });
   }
 
@@ -120,6 +137,21 @@ export class PlansService {
       path: {
         id: id,
       },
+    });
+  }
+
+  /**
+   * Bulk delete plans according to the provided parameters
+   * @param requestBody
+   * @returns ExportStatus default response
+   * @throws ApiError
+   */
+  public deletePlans(requestBody?: BulkOperationParameters): Observable<ExportStatus> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/plans/bulk/delete',
+      body: requestBody,
+      mediaType: 'application/json',
     });
   }
 
