@@ -63,7 +63,7 @@ export class ScheduledTaskLogicService implements OnDestroy {
   }
 
   executeParameter(scheduledTask: ExecutiontTaskParameters) {
-    this._schedulerService.execute1(scheduledTask.id!).subscribe((executionId) => {
+    this._schedulerService.executeTask(scheduledTask.id!).subscribe((executionId) => {
       this._location.go('#/root/executions/' + executionId);
     });
   }
