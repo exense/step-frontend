@@ -18,7 +18,7 @@ export class ParametersService {
      * @returns Parameter default response
      * @throws ApiError
      */
-    public copy(
+    public copyParameter(
         id: string,
     ): Observable<Parameter> {
         return this.httpRequest.request({
@@ -35,7 +35,7 @@ export class ParametersService {
      * @returns Parameter default response
      * @throws ApiError
      */
-    public get8(
+    public getParameterById(
         id: string,
     ): Observable<Parameter> {
         return this.httpRequest.request({
@@ -52,7 +52,7 @@ export class ParametersService {
      * @returns any default response
      * @throws ApiError
      */
-    public delete5(
+    public deleteParameter(
         id: string,
     ): Observable<any> {
         return this.httpRequest.request({
@@ -69,30 +69,14 @@ export class ParametersService {
      * @returns Parameter default response
      * @throws ApiError
      */
-    public findMany2(
+    public findParametersByAttributes(
         requestBody?: Record<string, string>,
     ): Observable<Array<Parameter>> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/parameters/find',
             body: requestBody,
-            mediaType: '*/*',
-        });
-    }
-
-    /**
-     * @param requestBody
-     * @returns Parameter default response
-     * @throws ApiError
-     */
-    public get9(
-        requestBody?: Record<string, string>,
-    ): Observable<Parameter> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/parameters/search',
-            body: requestBody,
-            mediaType: '*/*',
+            mediaType: 'application/json',
         });
     }
 
@@ -102,7 +86,7 @@ export class ParametersService {
      * @returns Parameter default response
      * @throws ApiError
      */
-    public getAll4(
+    public getAllParameters(
         skip?: number,
         limit?: number,
     ): Observable<Array<Parameter>> {
@@ -113,6 +97,22 @@ export class ParametersService {
                 'skip': skip,
                 'limit': limit,
             },
+        });
+    }
+
+    /**
+     * @param requestBody
+     * @returns Parameter default response
+     * @throws ApiError
+     */
+    public getParameterByAttributes(
+        requestBody?: Record<string, string>,
+    ): Observable<Parameter> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/parameters/search',
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
 
@@ -132,7 +132,7 @@ export class ParametersService {
      * @returns Parameter default response
      * @throws ApiError
      */
-    public save6(
+    public saveParameter(
         requestBody?: Parameter,
     ): Observable<Parameter> {
         return this.httpRequest.request({

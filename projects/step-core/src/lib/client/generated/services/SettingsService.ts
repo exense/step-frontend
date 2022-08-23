@@ -16,7 +16,7 @@ export class SettingsService {
      * @returns string default response
      * @throws ApiError
      */
-    public get2(
+    public getSetting(
         id: string,
     ): Observable<string> {
         return this.httpRequest.request({
@@ -34,7 +34,7 @@ export class SettingsService {
      * @returns any default response
      * @throws ApiError
      */
-    public save2(
+    public saveSetting(
         id: string,
         requestBody?: string,
     ): Observable<any> {
@@ -54,7 +54,7 @@ export class SettingsService {
      * @returns any default response
      * @throws ApiError
      */
-    public delete1(
+    public deleteSetting(
         id: string,
     ): Observable<any> {
         return this.httpRequest.request({

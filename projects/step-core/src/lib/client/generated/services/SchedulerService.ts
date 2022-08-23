@@ -108,14 +108,10 @@ export class SchedulerService {
      * @returns string default response
      * @throws ApiError
      */
-    public execute1(
+    public executeTask(
         id: string,
     ): Observable<string> {
         return this.httpRequest.request({
-            headers: {
-              Accept: "text/plain, */*",
-              Content: "text/html; charset=UTF-8"
-            },
             method: 'POST',
             url: '/scheduler/task/{id}/execute',
             path: {

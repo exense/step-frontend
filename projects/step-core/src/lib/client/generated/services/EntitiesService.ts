@@ -7,42 +7,65 @@ import type { Observable } from 'rxjs';
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
 @Injectable({providedIn:'root'})
-export class KeywordEditorService {
+export class EntitiesService {
 
     constructor(public readonly httpRequest: BaseHttpRequest) {}
 
     /**
-     * @param functionid
-     * @returns string default response
+     * @param type
+     * @param id
+     * @returns any default response
      * @throws ApiError
      */
-    public getFunctionScript(
-        functionid: string,
-    ): Observable<string> {
+    public getEntity(
+        type: string,
+        id: string,
+    ): Observable<any> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/scripteditor/function/{functionid}/file',
+            url: '/entities/{type}/{id}',
             path: {
-                'functionid': functionid,
+                'type': type,
+                'id': id,
             },
         });
     }
 
     /**
-     * @param functionid
+     * @param type
+     * @param id
+     * @returns any default response
+     * @throws ApiError
+     */
+    public deleteEntity(
+        type: string,
+        id: string,
+    ): Observable<any> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/entities/{type}/{id}',
+            path: {
+                'type': type,
+                'id': id,
+            },
+        });
+    }
+
+    /**
+     * @param type
      * @param requestBody
      * @returns any default response
      * @throws ApiError
      */
-    public saveFunctionScript(
-        functionid: string,
-        requestBody?: string,
+    public findEntity(
+        type: string,
+        requestBody?: Record<string, string>,
     ): Observable<any> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/scripteditor/function/{functionid}/file',
+            url: '/entities/{type}/find',
             path: {
-                'functionid': functionid,
+                'type': type,
             },
             body: requestBody,
             mediaType: 'application/json',
@@ -50,37 +73,20 @@ export class KeywordEditorService {
     }
 
     /**
-     * @param filename
-     * @returns string default response
-     * @throws ApiError
-     */
-    public getScript(
-        filename: string,
-    ): Observable<string> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/scripteditor/file/{filename}',
-            path: {
-                'filename': filename,
-            },
-        });
-    }
-
-    /**
-     * @param filename
+     * @param type
      * @param requestBody
      * @returns any default response
      * @throws ApiError
      */
-    public saveScript(
-        filename: string,
-        requestBody?: string,
+    public saveEntity(
+        type: string,
+        requestBody?: any,
     ): Observable<any> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/scripteditor/file/{filename}',
+            url: '/entities/{type}',
             path: {
-                'filename': filename,
+                'type': type,
             },
             body: requestBody,
             mediaType: 'application/json',
