@@ -1,27 +1,22 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { TableRequestData } from '../models/table-request-data';
 import { TableResponse } from '../models/table-response';
 import { Observable } from 'rxjs';
 import { ExportService } from '../../../services/export.service';
-import { ExportStatus } from '../../generated';
-
-const ROOT = 'rest/table';
+import { ExportStatus, TablesService } from '../../generated';
 
 @Injectable({
   providedIn: 'root',
 })
-export class TableRestService {
-  constructor(private _httpClient: HttpClient, private _exportService: ExportService) {}
+export class TableApiWrapperService {
+  constructor(private _tables: TablesService, private _exportService: ExportService) {}
 
   requestTable<T>(tableId: string, tableRequest: TableRequestData): Observable<TableResponse<T>> {
-    const url = `${ROOT}/${tableId}`;
-    return this._httpClient.post<TableResponse<T>>(url, tableRequest);
+    return this._tables.request(tableId, tableRequest) as Observable<TableResponse<T>>;
   }
 
   exportTable(tableId: string, tableRequest: TableRequestData, fields: string[]): Observable<ExportStatus> {
-    const url = `${ROOT}/${tableId}/export`;
-    return this._httpClient.post<ExportStatus>(url, { tableRequest, fields });
+    return this._tables.createExport(tableId, { tableRequest, fields });
   }
 
   exportAsCSV(tableId: string, fields: string[], tableRequest: TableRequestData = {}): void {
