@@ -3,7 +3,6 @@
 /* eslint-disable */
 
 export type WebPlugin = {
-    scripts?: Array<string>;
-    angularModules?: Array<string>;
+  scripts?: Array<string>;
+  angularModules?: Array<string>;
 };
-

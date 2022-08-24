@@ -1,19 +1,22 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $PlanCompilationResult = {
+export const $BulkOperationParameters = {
   properties: {
-    hasError: {
+    simulate: {
       type: 'boolean',
     },
-    errors: {
+    targetType: {
+      type: 'Enum',
+    },
+    ids: {
       type: 'array',
       contains: {
-        type: 'PlanCompilationError',
+        type: 'string',
       },
     },
-    plan: {
-      type: 'Plan',
+    filter: {
+      type: 'TableFilter',
     },
   },
 } as const;

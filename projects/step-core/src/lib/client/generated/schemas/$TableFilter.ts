@@ -2,6 +2,5 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $TableFilter = {
-    properties: {
-    },
+  properties: {},
 } as const;

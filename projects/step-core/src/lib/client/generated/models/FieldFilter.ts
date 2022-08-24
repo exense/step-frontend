@@ -4,9 +4,8 @@
 
 import type { TableFilter } from './TableFilter';
 
-export type FieldFilter = (TableFilter & {
-    field?: string;
-    value?: string;
-    regex?: boolean;
-});
-
+export type FieldFilter = TableFilter & {
+  field?: string;
+  value?: string;
+  regex?: boolean;
+};
