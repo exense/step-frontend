@@ -3,9 +3,8 @@
 /* eslint-disable */
 
 export type Attachment = {
-    name?: string;
-    description?: string;
-    hexContent?: string;
-    isDirectory?: boolean;
+  name?: string;
+  description?: string;
+  hexContent?: string;
+  isDirectory?: boolean;
 };
-

@@ -13,22 +13,21 @@ import { request as __request } from './request';
 
 @Injectable()
 export class AngularHttpRequest extends BaseHttpRequest {
+  constructor(
+    @Inject(OpenAPI)
+    config: OpenAPIConfig,
+    http: HttpClient
+  ) {
+    super(config, http);
+  }
 
-    constructor(
-        @Inject(OpenAPI)
-        config: OpenAPIConfig,
-        http: HttpClient,
-    ) {
-        super(config, http);
-    }
-
-    /**
-     * Request method
-     * @param options The request options from the service
-     * @returns Observable<T>
-     * @throws ApiError
-     */
-    public override request<T>(options: ApiRequestOptions): Observable<T> {
-        return __request(this.config, this.http, options);
-    }
+  /**
+   * Request method
+   * @param options The request options from the service
+   * @returns Observable<T>
+   * @throws ApiError
+   */
+  public override request<T>(options: ApiRequestOptions): Observable<T> {
+    return __request(this.config, this.http, options);
+  }
 }

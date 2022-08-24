@@ -3,6 +3,5 @@
 /* eslint-disable */
 
 export type TokenWrapperOwner = {
-    _class: string;
+  _class: string;
 };
-

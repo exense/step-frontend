@@ -2,18 +2,18 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $Attachment = {
-    properties: {
-        name: {
-            type: 'string',
-        },
-        description: {
-            type: 'string',
-        },
-        hexContent: {
-            type: 'string',
-        },
-        isDirectory: {
-            type: 'boolean',
-        },
+  properties: {
+    name: {
+      type: 'string',
     },
+    description: {
+      type: 'string',
+    },
+    hexContent: {
+      type: 'string',
+    },
+    isDirectory: {
+      type: 'boolean',
+    },
+  },
 } as const;

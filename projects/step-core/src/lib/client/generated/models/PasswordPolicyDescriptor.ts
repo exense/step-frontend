@@ -3,7 +3,6 @@
 /* eslint-disable */
 
 export type PasswordPolicyDescriptor = {
-    rule?: string;
-    description?: string;
+  rule?: string;
+  description?: string;
 };
-

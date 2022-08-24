@@ -3,7 +3,6 @@
 /* eslint-disable */
 
 export type ChangePasswordRequest = {
-    oldPwd?: string;
-    newPwd?: string;
+  oldPwd?: string;
+  newPwd?: string;
 };
-

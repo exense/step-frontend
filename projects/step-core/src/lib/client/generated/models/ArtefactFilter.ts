@@ -3,6 +3,5 @@
 /* eslint-disable */
 
 export type ArtefactFilter = {
-    class: string;
+  class: string;
 };
-

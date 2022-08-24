@@ -1,5 +1,4 @@
 projects/step-frontend/src/lib/angularjs/**/*.*
-projects/step-core/src/lib/client/generated/**/*.*
 projects/step-app/src/index.html
 .angular
 dist

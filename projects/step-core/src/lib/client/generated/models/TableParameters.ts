@@ -3,6 +3,5 @@
 /* eslint-disable */
 
 export type TableParameters = {
-    type: string;
+  type: string;
 };
-

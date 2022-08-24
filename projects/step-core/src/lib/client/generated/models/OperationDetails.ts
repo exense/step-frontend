@@ -5,10 +5,9 @@
 import type { Operation } from './Operation';
 
 export type OperationDetails = {
-    execId?: string;
-    planId?: string;
-    planName?: string;
-    testcase?: string;
-    operation?: Operation;
+  execId?: string;
+  planId?: string;
+  planName?: string;
+  testcase?: string;
+  operation?: Operation;
 };
-

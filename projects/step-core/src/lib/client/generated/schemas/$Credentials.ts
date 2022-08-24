@@ -2,12 +2,12 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $Credentials = {
-    properties: {
-        username: {
-            type: 'string',
-        },
-        password: {
-            type: 'string',
-        },
+  properties: {
+    username: {
+      type: 'string',
     },
+    password: {
+      type: 'string',
+    },
+  },
 } as const;

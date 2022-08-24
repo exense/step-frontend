@@ -3,6 +3,5 @@
 /* eslint-disable */
 
 export type JsonValue = {
-    valueType?: 'ARRAY' | 'OBJECT' | 'STRING' | 'NUMBER' | 'TRUE' | 'FALSE' | 'NULL';
+  valueType?: 'ARRAY' | 'OBJECT' | 'STRING' | 'NUMBER' | 'TRUE' | 'FALSE' | 'NULL';
 };
-

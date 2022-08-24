@@ -5,8 +5,7 @@
 import type { Role } from './Role';
 
 export type SessionResponse = {
-    username?: string;
-    role?: Role;
-    otp?: boolean;
+  username?: string;
+  role?: Role;
+  otp?: boolean;
 };
-

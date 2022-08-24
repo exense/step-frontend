@@ -7,8 +7,7 @@ import type { TokenGroupCapacity } from './TokenGroupCapacity';
 import type { TokenWrapper } from './TokenWrapper';
 
 export type AgentListEntry = {
-    agentRef?: AgentRef;
-    tokens?: Array<TokenWrapper>;
-    tokensCapacity?: TokenGroupCapacity;
+  agentRef?: AgentRef;
+  tokens?: Array<TokenWrapper>;
+  tokensCapacity?: TokenGroupCapacity;
 };
-
