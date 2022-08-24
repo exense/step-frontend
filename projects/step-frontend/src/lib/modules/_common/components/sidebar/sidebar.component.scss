@@ -191,3 +191,7 @@ div[lastSidebarMainMenuLabel='true'] > .sidebar-subtab:last-child,
 div[lastSidebarMainMenuLabel='true'] > input:checked ~ div.content {
   border-radius: 0 0 5px 5px;
 }
+
+span.sidebar-version {
+  padding-left: 25px;
+}

@@ -29,7 +29,7 @@
     <div
       class="sidebar-collapsable-tab"
       *ngFor="let mme of _viewRegistryService.getCustomMainMenuEntries(); index as i"
-      [attr.lastSidebarMainMenuLabel]="i === _viewRegistryService.getCustomMainMenuEntries().length - 1"
+      [attr.lastSidebarMainMenuLabel]="i === mainMenuEntriesAmount"
     >
       <input #mainMenuCheckBox name="{{ mme.label }}" id="collapsable-tab-{{ mme.label }}" type="checkbox" />
       <label for="collapsable-tab-{{ mme.label }}">
@@ -37,10 +37,7 @@
         <span class="sidebar-aligned-text">{{ mme.label }}</span>
       </label>
       <div class="content">
-        <section
-          *ngFor="let entry of _viewRegistryService.getCustomMenuEntriesIncludedInMainMenu(mme.label); index as j"
-        >
-          <!--todo: keine methode vom view aufrufen-->
+        <section *ngFor="let entry of _viewRegistryService.getCustomMenuEntriesIncludedInMainMenu(mme.label)">
           <div
             class="sidebar-subtab"
             [class.sidebar-highlighted-subtab]="_viewStateService.isViewActive(entry.viewId)"

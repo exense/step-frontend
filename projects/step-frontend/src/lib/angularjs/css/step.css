@@ -1048,7 +1048,8 @@ fieldset {
 step-tenant-selection-downgraded {
   position: fixed;
   top: 70px;
-  left: 70px;
+  left: 56px;
+  z-index: 2;
 }
 
 #collapsable-sidebar-toggle-checkbox:checked ~ step-tenant-selection-downgraded {

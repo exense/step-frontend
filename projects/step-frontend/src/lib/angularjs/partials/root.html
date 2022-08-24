@@ -4,7 +4,7 @@
   </head>
 
   <input id="collapsable-sidebar-toggle-checkbox" type="checkbox">
-  <step-tenant-selection-downgraded></step-tenant-selection-downgraded>
+  <step-tenant-selection-downgraded ng-if="isInitialized && (authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())"></step-tenant-selection-downgraded>
   <div step-sidebar class="sidebar"
        ng-if="isInitialized && (authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())">
   </div>

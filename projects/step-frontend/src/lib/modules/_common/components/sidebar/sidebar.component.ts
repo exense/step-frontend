@@ -12,6 +12,8 @@ export class SidebarComponent implements AfterViewInit {
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<any>;
   @Input() logo: string = 'images/logotopleft.png';
 
+  public mainMenuEntriesAmount: number;
+
   constructor(
     public _authService: AuthService,
     public _viewRegistryService: ViewRegistryService,
@@ -97,6 +99,7 @@ export class SidebarComponent implements AfterViewInit {
       undefined,
       'Status'
     );
+    this.mainMenuEntriesAmount = _viewRegistryService.getCustomMainMenuEntries().length - 1;
   }
 
   ngAfterViewInit(): void {
