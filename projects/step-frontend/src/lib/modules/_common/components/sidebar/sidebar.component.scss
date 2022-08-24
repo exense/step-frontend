@@ -1,0 +1,193 @@
+#sidebar-collapsed-settings-icon {
+  visibility: hidden;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+  .sidebar {
+    padding-top: 15px;
+  }
+
+  .sidebar a {
+    font-size: 18px;
+  }
+}
+
+#sidebar-logo-and-burgermenu {
+  height: 48px;
+}
+
+#sidebar-logo-and-burgermenu > span {
+  padding: var(--sidebar-elements-text-padding);
+}
+
+#sidebar-home-and-settings {
+  min-height: 64px;
+}
+
+#sidebar-home-and-settings > span {
+  position: absolute;
+  padding: var(--sidebar-elements-text-padding);
+}
+
+#sidebar-home-and-settings > div {
+  padding: var(--sidebar-elements-text-padding);
+}
+
+#sidebar-home-and-settings > .sidebar-home-and-settings-divider {
+  right: var(--sidebar-settings-divider-padding-right);
+  color: #3582ae;
+}
+
+#sidebar-home-and-settings > .sidebar-home-and-settings-icon {
+  right: var(--sidebar-elements-text-padding);
+  margin-right: -10px;
+  padding-top: 18px;
+  font-size: medium;
+  cursor: pointer;
+}
+
+.sidebar-home-button {
+  cursor: pointer;
+}
+
+.sidebar-home-and-settings-icon-collapsed {
+  cursor: pointer;
+}
+
+#sidebar-categories {
+  display: block;
+  flex-grow: 1;
+}
+
+div#sidebar-categories-tabs .sidebar-collapsable-tab:first-child label {
+  border-radius: 5px 5px 0 0;
+}
+
+#sidebar-categories .sidebar-categories-categories {
+  height: 58px;
+  font-size: smaller;
+  padding: 0 var(--sidebar-elements-text-padding) 0 var(--sidebar-elements-text-padding);
+  display: flex;
+  align-items: center;
+}
+
+#sidebar-cost-and-upgrade > div {
+  padding: var(--sidebar-elements-text-padding);
+}
+
+#sidebar-help-and-support {
+  height: 56px;
+  font-size: small;
+  margin-top: 20px;
+}
+
+#sidebar-help-and-support > div {
+  padding: var(--sidebar-elements-text-padding);
+}
+
+#sidebar-home-and-settings,
+#sidebar-categories,
+#sidebar-help-and-support {
+  border-top: 1px solid #3582ae;
+}
+
+/* (A) TABS CONTAINER */
+.sidebar-collapsable-tab,
+.sidebar-collapsable-tab * {
+  box-sizing: border-box;
+}
+
+.sidebar-collapsable-tab {
+  font-weight: bold;
+  margin-top: 1px;
+  max-width: 600px;
+}
+
+/* (B) HIDE CHECKBOX */
+.sidebar-collapsable-tab input {
+  display: none;
+}
+
+/* (C) TAB LABEL */
+.sidebar-collapsable-tab label {
+  /* (C1) DIMENSIONS */
+  position: relative; /* required for (f2) position:absolute */
+  display: block;
+  width: 100%;
+  padding: var(--sidebar-elements-text-padding);
+
+  /* (C2) COSMETICS */
+  color: #fff;
+  background: #1b72a4;
+  cursor: pointer;
+}
+
+/* (D) TAB CONTENT - HIDDEN BY DEFAULT */
+/* css animation will not work with auto height */
+/* this is why we use max-height instead */
+.sidebar-collapsable-tab .content {
+  background: #1b72a4;
+  overflow: hidden;
+  transition: max-height;
+  max-height: 0;
+  font-weight: normal;
+  align-items: center;
+}
+
+.sidebar-subtab {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 var(--sidebar-elements-text-padding) 0 var(--sidebar-elements-text-padding);
+  cursor: pointer;
+}
+
+.sidebar-highlighted-subtab {
+  background-color: #3280ad;
+}
+
+.sidebar-subtab:hover {
+  background: #3280ad;
+}
+
+/* (E) OPEN TAB ON CHECKED */
+.sidebar-collapsable-tab input:checked ~ .content {
+  max-height: 100vh;
+}
+/* (E) OPEN TAB ON CHECKED */
+.sidebar-collapsable-tab input:not(:checked) ~ .content {
+  visibility: hidden;
+}
+
+/* (F) EXTRA - ADD ARROW INDICATOR */
+.sidebar-collapsable-tab label::after {
+  /* (F1) RIGHT ARROW */
+  display: block;
+  content: '>';
+
+  /* (F2) PLACE AT RIGHT SIDE */
+  position: absolute;
+  right: 15px;
+  top: 15px;
+
+  /* (F3) ANIMATED ARROW */
+  /*transition: all 0.2s;*/
+}
+
+/* (F4) ROTATE ARROW ON CHECKED */
+.sidebar-collapsable-tab input:checked ~ label::after {
+  transform: rotate(90deg);
+}
+.sidebar-collapsable-tab input:not(:checked) ~ label::after {
+  transform: rotate(-90deg);
+}
+
+div[lastSidebarMainMenuLabel='true'] > input:not(:checked) ~ label {
+  border-radius: 0 0 5px 5px;
+}
+
+div[lastSidebarMainMenuLabel='true'] > .sidebar-subtab:last-child,
+div[lastSidebarMainMenuLabel='true'] > input:checked ~ div.content {
+  border-radius: 0 0 5px 5px;
+}

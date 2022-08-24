@@ -4,6 +4,7 @@ import { AutorefreshToggleComponent } from './components/autorefresh-toggle/auto
 import { ArrayFilterComponent } from './components/array-filter/array-filter.component';
 import { DateFilterComponent } from './components/date-filter/date-filter.component';
 import { LoginComponent } from './components/login/login.component';
+import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { ExecutionLinkComponent } from './components/execution-link/execution-link.component';
 import { JsonViewerDirective } from './directives/json-viewer.directive';
 import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
@@ -14,6 +15,7 @@ import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
     ArrayFilterComponent,
     DateFilterComponent,
     LoginComponent,
+    SidebarComponent,
     ExecutionLinkComponent,
     JsonViewerDirective,
     IsEmptyJsonPipe,
@@ -24,6 +26,7 @@ import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
     DateFilterComponent,
     StepCoreModule,
     LoginComponent,
+    SidebarComponent,
     ExecutionLinkComponent,
     JsonViewerDirective,
     IsEmptyJsonPipe,

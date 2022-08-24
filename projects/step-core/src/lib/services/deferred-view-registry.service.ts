@@ -21,9 +21,16 @@ export class DeferredViewRegistryService implements Pick<LegacyViewRegistryServi
     return this._injector.get(ViewRegistryService);
   }
 
-  registerCustomMenuEntry(label: string, viewId: string, menuIconsClass: string, right: string): void {
+  registerCustomMenuEntry(
+    label: string,
+    viewId?: string,
+    mainMenu?: boolean,
+    menuIconsClass?: string,
+    right?: string,
+    includedInMainMenu?: string
+  ): void {
     this._invokeRunRegister.registerRun(() => {
-      this._viewRegistry.registerCustomMenuEntry(label, viewId, menuIconsClass, right);
+      this._viewRegistry.registerCustomMenuEntry(label, viewId, mainMenu, menuIconsClass, right, includedInMainMenu);
     });
   }
 

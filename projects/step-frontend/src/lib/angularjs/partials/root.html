@@ -1,92 +1,55 @@
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
+<div class="main-page">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
 
-<input id="collapsable-sidebar-button" type="checkbox">
+  <input id="collapsable-sidebar-toggle-checkbox" type="checkbox">
+  <step-tenant-selection-downgraded></step-tenant-selection-downgraded>
+  <div step-sidebar class="sidebar"
+       ng-if="isInitialized && (authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())">
+  </div>
 
-<div id="mySidebar" class="sidebar" ng-if="isInitialized && (authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())">
-  <div id="sidebar-logo-and-burgermenu">
-    <span class="visible-when-collapsed"><label for="collapsable-sidebar-button"><i class="glyphicon glyphicon-menu-hamburger"></i></label></span>
-    <span class="sidebar-aligned-text"><img class="sidebar-logo" alt="" ng-src="{{logo}}"></span>
-  </div>
-  <div id="sidebar-home-and-settings">
-    <span class="visible-when-collapsed">H</span>
-    <step-tenant-selection-downgraded class="sidebar-aligned-text"></step-tenant-selection-downgraded>
-<!--    <span class="sidebar-aligned-text">Project Name</span>-->
-    <span class="sidebar-home-and-settings-divider">|</span>
-    <span ng-click="setView('admin')" ng-if="authService.hasRight('admin')" class="sidebar-home-and-settings-icon"><i class="glyphicon glyphicon-cog"></i></span>
-  </div>
-  <div id="sidebar-categories">
-    <div class="sidebar-categories-categories">
-      <span ng-click="setView('admin')" ng-if="authService.hasRight('admin')" class='only-visible-when-collapsed sidebar-home-and-settings-icon-collapsed' style="font-size: medium"><i class="glyphicon glyphicon-cog"></i></span>
-      <span>Categories</span>
-    </div>
-    <div id="sidebar-categories-tabs">
-      <!-- MENU -->
-      <div class="sidebar-collapsable-tab" ng-repeat="mme in viewRegistry.getCustomMainMenuEntries()">
-        <input id="collapsable-tab-{{mme.label}}" type="checkbox">
-        <label for="collapsable-tab-{{mme.label}}">
-          <span class="{{mme.menuIconClass}} visible-when-collapsed"></span>
-          <span class="sidebar-aligned-text">{{mme.label}}</span>
-        </label>
-        <div class="content">
-          <section ng-repeat="entry in viewRegistry.getCustomMenuEntriesIncludedInMainMenu(mme.label)">
-            <div class="sidebar-subtab" ng-click="setView(entry.viewId)">
-              <span class="{{entry.menuIconClass}} visible-when-collapsed"></span>
-              <span class="sidebar-aligned-subtext">{{entry.label}}</span>
-            </div>
-          </section>
-        </div>
+
+  <div id="main">
+    <header class="header-parent"
+            ng-if-start="isInitialized && (authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())">
+      <div id="header-spacer-part"></div>
+      <div class="header-white-part">
+        <ul class="nav navbar-nav navbar-right navbar-top-user-logout">
+          <li ng-repeat="entry in viewRegistry.getDashlets('/menu/navbar/right')">
+            <div ng-include="entry.template"></div>
+          </li>
+          <li>
+            <a id="sessionDropdown" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> {{context.userID}}
+              [{{context.role}}]</a>
+            <ul class="dropdown-menu" aria-labelledby="sessionDropdown">
+              <li><a ng-click="setView('myaccount')"><span class="glyphicon glyphicon-cog"></span> My account</a></li>
+              <li ng-if="authService.getConf().authentication && authService.isAuthenticated()"><a
+                ng-click="authService.logout()"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
+              <li ng-if="authService.getConf().authentication && !authService.isAuthenticated()"><a
+                ng-click="authService.goToLoginPage()">Sign in</a></li>
+            </ul>
+          </li>
+        </ul>
       </div>
+    </header>
+    <div ng-if-end ng-include="'partials/main.html'" class="st-flex-row"></div>
+  </div>
+
+  <div
+    ng-if="isInitialized && !(authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())"
+    ng-include="'partials/loginForm.html'"
+    class="st-flex-row"
+  ></div>
+
+
+  <footer class="main-footer">
+    <div class="container main-footer">
+      <p style="display:none;">STEP ${project.version} - Copyright &#169; exense GmbH</p>
+      <span style="display:none;" id="frontend-os">${project.versionFEOS}</span>
+      <span style="display:none;" id="frontend-ee">${project.versionFEEE}</span>
+      <span style="display:none;" id="backend-os">${project.versionBEOS}</span>
+      <span style="display:none;" id="backend-ee">${project.versionBEEE}</span>
     </div>
-  </div>
-  <div id="sidebar-cost-and-upgrade">
-    <div><span>Step</span><br>
-      <span>No-cost $0/month</span>
-    </div>
-    <div><span>Upgrade</span></div>
-  </div>
-  <div id="sidebar-help-and-support">
-    <div><a href="https://step.exense.ch/knowledgebase"><span class="visible-when-collapsed"><i class="glyphicon glyphicon-question-sign"></i></span></a></div>
-    <a href="https://step.exense.ch/knowledgebase"><span>Help & Support</span></a>
-  </div>
+  </footer>
 </div>
-
-<div id="main">
-  <header class="header-parent" ng-if-start="isInitialized && (authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())">
-    <div id="header-spacer-part"></div>
-    <div class="header-white-part">
-      <ul class="nav navbar-nav navbar-right navbar-top-user-logout">
-        <li ng-repeat="entry in viewRegistry.getDashlets('/menu/navbar/right')" >
-          <div ng-include="entry.template"></div>
-        </li>
-        <li>
-          <a id="sessionDropdown" data-toggle="dropdown"><i class="glyphicon glyphicon-user" ></i> {{context.userID}} [{{context.role}}]</a>
-          <ul class="dropdown-menu" aria-labelledby="sessionDropdown">
-            <li><a ng-click="setView('myaccount')"><span class="glyphicon glyphicon-cog"></span> My account</a></li>
-            <li ng-if="authService.getConf().authentication && authService.isAuthenticated()"><a ng-click="authService.logout()"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
-            <li ng-if="authService.getConf().authentication && !authService.isAuthenticated()"><a ng-click="authService.goToLoginPage()">Sign in</a></li>
-          </ul>
-        </li>
-      </ul>
-    </div>
-  </header>
-  <div ng-if-end ng-include="'partials/main.html'" class="st-flex-row"></div>
-</div>
-
-<div
-  ng-if="isInitialized && !(authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())"
-  ng-include="'partials/loginForm.html'"
-  class="st-flex-row"
-></div>
-
-
-<footer class="main-footer">
-  <div class="container main-footer">
-    <p style="text-align: center; margin-top: 10px">STEP ${project.version} - Copyright &#169; exense GmbH</p>
-    <span style="display:none;" id="frontend-os">${project.versionFEOS}</span>
-    <span style="display:none;" id="frontend-ee">${project.versionFEEE}</span>
-    <span style="display:none;" id="backend-os">${project.versionBEOS}</span>
-    <span style="display:none;" id="backend-ee">${project.versionBEEE}</span>
-  </div>
-</footer>

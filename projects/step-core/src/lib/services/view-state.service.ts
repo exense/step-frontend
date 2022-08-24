@@ -33,6 +33,10 @@ export class ViewStateService {
   isViewActive(view: string): boolean {
     return this._view === view;
   }
+
+  getViewName(): string | undefined {
+    return this._view;
+  }
 }
 
 getAngularJSGlobal().module(AJS_MODULE).service('ViewState', downgradeInjectable(ViewStateService));

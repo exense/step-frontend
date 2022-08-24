@@ -40,7 +40,14 @@ export abstract class LegacyViewRegistryService {
     template: string,
     config: { isPublicView: boolean; isStaticView: boolean }
   ): void;
-  abstract registerCustomMenuEntry(label: string, viewId: string, menuIconsClass: string, right: string): void;
+  abstract registerCustomMenuEntry(
+    label: string,
+    viewId?: string,
+    mainMenu?: boolean,
+    menuIconsClass?: string,
+    right?: string,
+    includedInMainMenu?: string
+  ): void;
   abstract registerCustomMenuEntryOptional(
     label: string,
     viewId: string,
@@ -49,7 +56,9 @@ export abstract class LegacyViewRegistryService {
     isEnabledFct: () => boolean
   ): void;
   abstract getCustomMenuEntries(): MenuEntry[];
+  abstract getCustomMenuEntriesIncludedInMainMenu(mainMenuName: string): MenuEntry[];
   abstract getCustomMainMenuEntries(): MenuEntry[];
+  abstract getMainMenuNameOfSubmenu(subMenuName: string): string;
   abstract getDashlets(path: string): Dashlet[];
   abstract registerDashlet(path: string, label: string, template: string, id: string, before?: boolean): void;
   abstract registerDashletAdvanced(

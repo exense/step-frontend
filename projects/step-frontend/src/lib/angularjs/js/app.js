@@ -166,11 +166,17 @@ var tecAdminApp = angular
       })
     };
 
-    api.getCustomMainMenuEntry = function (mainMenuEntryName) {
-      return _.filter(customMenuEntries, function (e) {
-        return e.mainMenu == true && e && e.isEnabledFct() && e.label === mainMenuEntryName;
+    // returns the name of the main menu that contains the submenu or undefined
+    api.getMainMenuNameOfSubmenu = function (subMenuName) {
+      let subMenu = _.filter(customMenuEntries, function (e) {
+        return e.mainMenu == false && e && e.isEnabledFct() && e.viewId === subMenuName;
       });
-    };
+      if( subMenu.length === 1 ) {
+        return subMenu[0].includedInMainMenu;
+      } else {
+        return undefined;
+      }
+    }
 
     var customDashlets = {};
 
@@ -275,27 +281,6 @@ var tecAdminApp = angular
           $rootScope.$broadcast('redo-requested');
         }
       }
-
-      function registerBasicMenuEntries() {
-        // Main Menus
-        ViewRegistry.registerCustomMenuEntry('Automation', undefined, true, 'glyphicon glyphicon-play');
-        ViewRegistry.registerCustomMenuEntry('Execute', undefined, true, 'glyphicon glyphicon-tasks');
-        ViewRegistry.registerCustomMenuEntry('Status', undefined, true, 'glyphicon glyphicon-ok');
-        // Sub Menus Automation
-        ViewRegistry.registerCustomMenuEntry('Keywords', 'functions', false, 'glyphicon glyphicon-record', undefined, 'Automation');
-        ViewRegistry.registerCustomMenuEntry('Plans', 'plans', false, 'glyphicon glyphicon-file', undefined, 'Automation');
-        ViewRegistry.registerCustomMenuEntry('Parameters', 'parameters', false, 'glyphicon glyphicon-list-alt', undefined, 'Automation');
-        // Sub Menus Execute
-        ViewRegistry.registerCustomMenuEntry('Executions', 'executions', false, 'glyphicon glyphicon-tasks', undefined, 'Execute');
-        ViewRegistry.registerCustomMenuEntry('Scheduler', 'scheduler', false, 'glyphicon glyphicon-time', undefined, 'Execute');
-        // Sub Menus Status
-        ViewRegistry.registerCustomMenuEntry('Agents', 'gridagents', false, 'glyphicon glyphicon-briefcase', undefined, 'Status');
-        ViewRegistry.registerCustomMenuEntry('Agent tokens', 'gridtokens', false, 'glyphicon glyphicon-tag', undefined, 'Status');
-        ViewRegistry.registerCustomMenuEntry('Token Groups', 'gridtokengroups', false, 'glyphicon glyphicon glyphicon-tags', undefined, 'Status');
-        ViewRegistry.registerCustomMenuEntry('Quota Manager', 'gridquotamanager', false, 'glyphicon glyphicon-road', undefined, 'Status');
-      }
-
-      registerBasicMenuEntries();
 
       document.body.addEventListener('keydown', handleKeys);
       $scope.$on('$destroy', function () {

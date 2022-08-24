@@ -27,6 +27,14 @@ export class ViewRegistryService implements LegacyViewRegistryService {
     return this._legacyViewRegistry.getCustomMenuEntries();
   }
 
+  getCustomMenuEntriesIncludedInMainMenu(mainMenuName: string): MenuEntry[] {
+    return this._legacyViewRegistry.getCustomMenuEntriesIncludedInMainMenu(mainMenuName);
+  }
+
+  getMainMenuNameOfSubmenu(subMenuName: string): string {
+    return this._legacyViewRegistry.getMainMenuNameOfSubmenu(subMenuName);
+  }
+
   getDashlets(path: string): Dashlet[] {
     return this._legacyViewRegistry.getDashlets(path);
   }
@@ -39,8 +47,22 @@ export class ViewRegistryService implements LegacyViewRegistryService {
     return this._legacyViewRegistry.isPublicView(view);
   }
 
-  registerCustomMenuEntry(label: string, viewId: string, menuIconsClass: string, right: string): void {
-    this._legacyViewRegistry.registerCustomMenuEntry(label, viewId, menuIconsClass, right);
+  registerCustomMenuEntry(
+    label: string,
+    viewId?: string,
+    mainMenu?: boolean,
+    menuIconsClass?: string,
+    right?: string,
+    includedInMainMenu?: string
+  ): void {
+    this._legacyViewRegistry.registerCustomMenuEntry(
+      label,
+      viewId,
+      mainMenu,
+      menuIconsClass,
+      right,
+      includedInMainMenu
+    );
   }
 
   registerCustomMenuEntryOptional(
