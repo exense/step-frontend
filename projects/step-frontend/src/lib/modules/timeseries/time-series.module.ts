@@ -14,6 +14,7 @@ import { TimeseriesTableComponent } from './execution-page/table/timeseries-tabl
 import { TimeRangePicker } from './time-selection/time-range-picker.component';
 import { ChartSkeletonComponent } from './chart/skeleton/chart-skeleton.component';
 import { ExecutionPageTimeSelectionComponent } from './execution-page/time-selection/execution-page-time-selection.component';
+import { ExecutionFiltersComponent } from './execution-page/filters/execution-filters.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { ExecutionPageTimeSelectionComponent } from './execution-page/time-selec
     TimeRangePicker,
     ChartSkeletonComponent,
     ExecutionPageTimeSelectionComponent,
+    ExecutionFiltersComponent,
   ],
   exports: [ExecutionPageComponent],
   imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule],

@@ -16,9 +16,9 @@ import { TSChartSeries, TSChartSettings } from './model/ts-chart-settings';
 import { UplotSyncService } from './uplot-sync-service';
 import { UPlotUtils } from '../uplot/uPlot.utils';
 import { tooltipPlugin } from './tooltip-plugin';
-import { ExecutionTabContext } from '../execution-page/execution-tab-context';
 import { TSTimeRange } from './model/ts-time-range';
 import { AlignedData } from 'uplot';
+import MouseListener = uPlot.Cursor.MouseListener;
 
 declare const uPlot: any;
 
@@ -75,7 +75,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       y: false,
       sync: {},
       bind: {
-        dblclick: (self: uPlot, b: any, handler: any) => {
+        dblclick: (self: uPlot, target: HTMLElement, handler: MouseListener) => {
           return (e: any) => {
             if (UPlotUtils.isZoomed(this.uplot)) {
               this.onZoomReset.emit(true);

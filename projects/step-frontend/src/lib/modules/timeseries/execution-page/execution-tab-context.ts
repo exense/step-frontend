@@ -62,4 +62,8 @@ export class ExecutionTabContext {
   onFiltersChange(): Observable<BucketFilters> {
     return this.filtersChangeSubject.asObservable();
   }
+
+  updateFilters(filters: BucketFilters): void {
+    this.filtersChangeSubject.next(filters);
+  }
 }

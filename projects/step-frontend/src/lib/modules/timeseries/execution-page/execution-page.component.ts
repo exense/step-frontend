@@ -31,6 +31,10 @@ declare const uPlot: any;
   styleUrls: ['./execution-page.component.scss'],
 })
 export class ExecutionPageComponent implements OnInit, OnDestroy {
+  private readonly METRIC_TYPE_KEY = 'metricType';
+  private readonly METRIC_TYPE_RESPONSE_TIME = 'response-time'; // this is for normal measurements
+  private readonly METRIC_TYPE_SAMPLER = 'sampler'; // this is for thread groups measurements
+
   private RESOLUTION_MS = 1000;
   private CHART_LEGEND_SIZE = 65;
 
@@ -142,7 +146,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     this.executionService.onActiveSelectionChange().subscribe((newRange) => (this.timeSelection = newRange));
 
     this.executionService.onFiltersChange().subscribe((filters) => {
-      // TODO here we will refresh all the charts and update the request to contain all specified filters.
+      this.findRequest.params = { ...filters, [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_RESPONSE_TIME };
+      this.updateAllCharts();
     });
 
     this.timeSeriesService.getExecutionDetails(this.executionId).subscribe((details) => {
@@ -181,7 +186,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       start: 0,
       end: -1,
       intervalSize: 2500,
-      params: { eId: this.executionId },
+      params: { eId: this.executionId, [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_RESPONSE_TIME },
     };
     this.executionService = this.executionsPageService.getContext(this.executionId);
     this.keywordsService = this.executionService.getKeywordsContext();
@@ -385,82 +390,84 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   createThreadGroupsChart(request: FindBucketsRequest, isUpdate = false) {
     let dimensionKey = 'name';
-    this.timeSeriesService
-      .fetchBuckets({ ...request, threadGroupBuckets: true, groupDimensions: [dimensionKey] })
-      .subscribe((response) => {
-        let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-        if (response.matrix.length === 0) {
-          return; // TODO handle
-        }
-        let totalData: number[] = Array(response.matrix[0].length);
-        let dynamicSeries = response.matrixKeys.map((key, i) => {
-          key = key[dimensionKey]; // get just the name
-          let filledData = response.matrix[i].map((b, j) => {
-            let bucketValue = b?.max;
-            if (bucketValue == null && j > 0) {
-              // we try to keep a constant line
-              bucketValue = response.matrix[i][j - 1]?.max;
-            }
-            if (totalData[j] === undefined) {
-              totalData[j] = bucketValue;
-            } else if (bucketValue) {
-              totalData[j] += bucketValue;
-            }
-            return bucketValue;
-          });
-          return {
-            scale: 'y',
-            label: key,
-            id: key,
-            data: filledData,
+    let updatedParams: { [key: string]: string } = {
+      ...request.params,
+      [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_SAMPLER,
+    };
+    this.timeSeriesService.fetchBuckets({ ...request, params: updatedParams }).subscribe((response) => {
+      let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
+      if (response.matrix.length === 0) {
+        return; // TODO handle
+      }
+      let totalData: number[] = Array(response.matrix[0].length);
+      let dynamicSeries = response.matrixKeys.map((key, i) => {
+        key = key[dimensionKey]; // get just the name
+        let filledData = response.matrix[i].map((b, j) => {
+          let bucketValue = b?.max;
+          if (bucketValue == null && j > 0) {
+            // we try to keep a constant line
+            bucketValue = response.matrix[i][j - 1]?.max;
+          }
+          if (totalData[j] === undefined) {
+            totalData[j] = bucketValue;
+          } else if (bucketValue) {
+            totalData[j] += bucketValue;
+          }
+          return bucketValue;
+        });
+        return {
+          scale: 'y',
+          label: key,
+          id: key,
+          data: filledData,
+          value: (x, v) => Math.trunc(v),
+          stroke: '#024981',
+          width: 2,
+          paths: this.stepped({ align: 1 }),
+          points: { show: false },
+        } as TSChartSeries;
+      });
+      this.threadGroupSettings = {
+        title: 'Thread Groups (Concurrency)',
+        xValues: timeLabels,
+        showLegend: true,
+        cursor: {
+          dataIdx: UPlotUtils.closestNotEmptyPointFunction,
+        },
+        series: [
+          {
+            id: 'total',
+            scale: 'total',
+            label: 'Total',
+            data: totalData,
             value: (x, v) => Math.trunc(v),
-            stroke: '#024981',
-            width: 2,
+            // stroke: '#E24D42',
+            fill: 'rgba(143,161,210,0.38)',
+            // fill: 'rgba(255,212,166,0.64)',
+            // points: {show: false},
+            // @ts-ignore
+            // drawStyle: 1,
             paths: this.stepped({ align: 1 }),
             points: { show: false },
-          } as TSChartSeries;
-        });
-        this.threadGroupSettings = {
-          title: 'Thread Groups (Concurrency)',
-          xValues: timeLabels,
-          showLegend: true,
-          cursor: {
-            dataIdx: UPlotUtils.closestNotEmptyPointFunction,
           },
-          series: [
-            {
-              id: 'total',
-              scale: 'total',
-              label: 'Total',
-              data: totalData,
-              value: (x, v) => Math.trunc(v),
-              // stroke: '#E24D42',
-              fill: 'rgba(143,161,210,0.38)',
-              // fill: 'rgba(255,212,166,0.64)',
-              // points: {show: false},
-              // @ts-ignore
-              // drawStyle: 1,
-              paths: this.stepped({ align: 1 }),
-              points: { show: false },
-            },
-            ...dynamicSeries,
-          ],
-          axes: [
-            {
-              scale: 'y',
-              size: this.CHART_LEGEND_SIZE,
-              values: (u, vals, space) => vals.map((v) => v),
-            },
-            {
-              side: 1,
-              size: this.CHART_LEGEND_SIZE,
-              scale: 'total',
-              values: (u, vals, space) => vals.map((v) => v),
-              grid: { show: false },
-            },
-          ],
-        };
-      });
+          ...dynamicSeries,
+        ],
+        axes: [
+          {
+            scale: 'y',
+            size: this.CHART_LEGEND_SIZE,
+            values: (u, vals, space) => vals.map((v) => v),
+          },
+          {
+            side: 1,
+            size: this.CHART_LEGEND_SIZE,
+            scale: 'total',
+            values: (u, vals, space) => vals.map((v) => v),
+            grid: { show: false },
+          },
+        ],
+      };
+    });
   }
 
   createSummaryChart(request: FindBucketsRequest, isUpdate = false) {
