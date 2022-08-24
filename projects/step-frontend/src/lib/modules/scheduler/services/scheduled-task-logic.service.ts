@@ -7,7 +7,7 @@ import {
   TableLocalDataSource,
 } from '@exense/step-core';
 import { BehaviorSubject, first, shareReplay, switchMap, tap } from 'rxjs';
-import { ScheduledTaskDialogsService } from './scheduled-task-dialogs.service';
+import { ScheduledTaskDialogsService } from '@exense/step-core';
 import { Location } from '@angular/common';
 
 type InProgress = Mutable<Pick<ScheduledTaskLogicService, 'inProgress'>>;
