@@ -12,6 +12,8 @@ import { PanelIdPipe } from './pipes/panel-id.pipe';
 import { OperationsModule } from '../operations/operations.module';
 import { KeywordCallsComponent } from './components/keyword-calls/keyword-calls.component';
 import { ReportNodesModule } from '../report-nodes/report-nodes.module';
+import { ExecutionTabsComponent } from './components/execution-tabs/execution-tabs.component';
+import './components/execution-tabs/execution-tabs.component';
 
 @NgModule({
   declarations: [
@@ -22,8 +24,9 @@ import { ReportNodesModule } from '../report-nodes/report-nodes.module';
     ExecutionStepComponent,
     PanelIdPipe,
     KeywordCallsComponent,
+    ExecutionTabsComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule],
-  exports: [ExecutionListComponent, ExecutionStepComponent],
+  exports: [ExecutionListComponent, ExecutionStepComponent, ExecutionTabsComponent],
 })
 export class ExecutionModule {}

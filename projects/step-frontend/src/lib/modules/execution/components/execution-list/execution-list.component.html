@@ -58,7 +58,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Result</th>
     <td mat-cell *matCellDef="let element">
       <div class="result">
-        <step-execution-result [execution]="element"> </step-execution-result>
+        <step-execution-result [result]="element.result" [status]="element.status"> </step-execution-result>
         <step-status-distribution [summary]="element.executionSummary"> </step-status-distribution>
       </div>
     </td>

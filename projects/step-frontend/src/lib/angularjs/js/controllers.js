@@ -686,7 +686,7 @@ tecAdminControllers.controller('ExecutionTabsCtrl', [
     $scope.tabs = $stateStorag.get($scope).tabs;
 
     $scope.newTab = function (eid, title) {
-      $scope.tabs.push({ id: eid, title: title, active: false, type: 'progress' });
+      $scope.tabs = [...$scope.tabs, { id: eid, title: title, active: false, type: 'progress' }];
       $stateStorag.store($scope, { tabs: $scope.tabs });
       $scope.selectTab(eid);
     };
@@ -710,17 +710,10 @@ tecAdminControllers.controller('ExecutionTabsCtrl', [
     };
 
     $scope.closeTab = function (eid) {
-      var pos = -1;
-      var tabs = $scope.tabs;
-      for (i = 0; i < tabs.length; i++) {
-        if (tabs[i].id == eid) {
-          pos = i;
-        }
-      }
+      $scope.tabs = $scope.tabs.filter(tab => tab.id !== eid);
 
-      tabs.splice(pos, 1);
       if ($scope.$state == eid) {
-        $scope.$state = tabs[tabs.length - 1].id;
+        $scope.$state = $scope.tabs[$scope.tabs.length - 1].id;
       }
       $stateStorag.store($scope, { tabs: $scope.tabs });
 

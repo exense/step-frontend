@@ -1,0 +1,10 @@
+<nav mat-tab-nav-bar>
+  <ng-container *ngFor="let tab of tabs; trackBy: trackByTab">
+    <a href="#" mat-tab-link [active]="tab.id === activeTabId" (click)="selectTab(tab); (false)">
+      <ng-template #label>{{ tab.label }}</ng-template>
+      <ng-container *ngIf="tabTemplate; else label">
+        <ng-container *ngTemplateOutlet="tabTemplate; context: { $implicit: tab }"></ng-container>
+      </ng-container>
+    </a>
+  </ng-container>
+</nav>

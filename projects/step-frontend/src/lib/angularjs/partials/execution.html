@@ -1,4 +1,5 @@
 <div ng-controller="ExecutionTabsCtrl" style="max-width: 97vw">
+<!--
   <ul class="nav nav-tabs">
     <li role="presentation" ng-class="{active: isTabActive(tab.id)}" ng-repeat="tab in tabs track by tab.id">
       <a ng-click="selectTab(tab.id)"
@@ -7,6 +8,13 @@
       </a>
     </li>
   </ul>
+-->
+  <step-execution-tabs
+    [tabs]="tabs"
+    [active-tab-id]="$state"
+    (active-tab-id-change)="selectTab($event)"
+    (close-tab)="closeTab($event)">
+  </step-execution-tabs>
   <div class="tab-content">
     <div class="tab-pane ng-scope" ng-repeat="tab in tabs track by tab.id" ng-class="{active: isTabActive(tab.id)}">
       <div ng-if="tab.type=='list'">
