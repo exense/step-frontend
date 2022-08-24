@@ -3,9 +3,8 @@
 /* eslint-disable */
 
 export type DynamicValueBoolean = {
-    dynamic?: boolean;
-    value?: boolean;
-    expression?: string;
-    expressionType?: string;
+  dynamic?: boolean;
+  value?: boolean;
+  expression?: string;
+  expressionType?: string;
 };
-

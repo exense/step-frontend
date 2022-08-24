@@ -2,6 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type TableFilter = {
-};
-
+export type TableFilter = {};

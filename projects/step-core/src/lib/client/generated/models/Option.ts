@@ -5,8 +5,7 @@
 import type { Expression } from './Expression';
 
 export type Option = {
-    activationExpression?: Expression;
-    priority?: number;
-    value?: string;
+  activationExpression?: Expression;
+  priority?: number;
+  value?: string;
 };
-

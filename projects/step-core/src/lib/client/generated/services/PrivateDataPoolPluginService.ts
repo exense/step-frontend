@@ -8,26 +8,22 @@ import type { DataPoolConfiguration } from '../models/DataPoolConfiguration';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable({providedIn:'root'})
+@Injectable({ providedIn: 'root' })
 export class PrivateDataPoolPluginService {
+  constructor(public readonly httpRequest: BaseHttpRequest) {}
 
-    constructor(public readonly httpRequest: BaseHttpRequest) {}
-
-    /**
-     * @param id
-     * @returns DataPoolConfiguration default response
-     * @throws ApiError
-     */
-    public getDataPoolDefaultInstance(
-        id: string,
-    ): Observable<DataPoolConfiguration> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/datapool/types/{id}',
-            path: {
-                'id': id,
-            },
-        });
-    }
-
+  /**
+   * @param id
+   * @returns DataPoolConfiguration default response
+   * @throws ApiError
+   */
+  public getDataPoolDefaultInstance(id: string): Observable<DataPoolConfiguration> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/datapool/types/{id}',
+      path: {
+        id: id,
+      },
+    });
+  }
 }

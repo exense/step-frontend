@@ -6,10 +6,9 @@ import type { Filter } from './Filter';
 import type { SearchOrder } from './SearchOrder';
 
 export type FindRequest = {
-    filter?: Filter;
-    order?: SearchOrder;
-    skip?: number;
-    limit?: number;
-    maxTime?: number;
+  filter?: Filter;
+  order?: SearchOrder;
+  skip?: number;
+  limit?: number;
+  maxTime?: number;
 };
-
