@@ -23,6 +23,10 @@ export abstract class BaseRegistryService {
     this._customRegistry.register(this.registryType, type, { type, label, component });
   }
 
+  filterKeys(keys: string[]): string[] {
+    return this._customRegistry.filterKeys(this.registryType, keys);
+  }
+
   getItemInfos(): ReadonlyArray<ItemInfo> {
     return this._customRegistry.getRegisteredItems(this.registryType).map((x) => convert(x)!);
   }

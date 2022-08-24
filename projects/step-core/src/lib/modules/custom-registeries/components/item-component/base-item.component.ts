@@ -34,7 +34,6 @@ export abstract class BaseItemComponent<T extends CustomRegistryItem> implements
     }
 
     const item = this._customRegistryService.getRegisteredItem(this.registryType, itemKey) as T;
-    console.log('GET ITEM', this.registryType, itemKey, item);
     (this as FieldAccessor).component = !item ? undefined : this.resolveComponent(item);
   }
 

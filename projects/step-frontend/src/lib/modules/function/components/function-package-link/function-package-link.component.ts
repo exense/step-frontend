@@ -1,16 +1,41 @@
-import { Component, Inject, Input, SimpleChanges } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, AJS_ROOT_SCOPE, DialogsService, FunctionPackage, KeywordPackagesService } from '@exense/step-core';
+import { Component, Inject } from '@angular/core';
+import {
+  AJS_ROOT_SCOPE,
+  CustomComponent,
+  DialogsService,
+  Function as KeywordFunction,
+  FunctionPackage,
+  KeywordPackagesService,
+} from '@exense/step-core';
 import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
 import { IRootScopeService } from 'angular';
 
 @Component({
-  selector: 'function-package-link',
+  selector: 'step-function-package-link',
   templateUrl: './function-package-link.component.html',
   styleUrls: ['./function-package-link.component.scss'],
 })
-export class FunctionPackageLinkComponent {
-  @Input() id?: string;
+export class FunctionPackageLinkComponent implements CustomComponent {
+  private innerContext?: KeywordFunction;
+
+  get context(): KeywordFunction | undefined {
+    return this.innerContext;
+  }
+
+  set context(value: KeywordFunction | undefined) {
+    if (value === this.innerContext) {
+      return;
+    }
+    this.innerContext = value;
+    if (!!this.innerContext?.id) {
+      this.loadFunctionPackage();
+    }
+  }
+
+  private get functionPackageId(): string {
+    return this.innerContext?.customFields?.['functionPackageId'];
+  }
+
   functionPackage?: FunctionPackage;
   isRefreshing: boolean = false;
 
@@ -21,20 +46,13 @@ export class FunctionPackageLinkComponent {
     @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService
   ) {}
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (!this.id) {
+  delete(): void {
+    if (!this.functionPackageId) {
       return;
     }
-
-    if (changes['id'].isFirstChange() || changes['id'].previousValue !== changes['id'].currentValue) {
-      this.loadFunctionPackage();
-    }
-  }
-
-  delete() {
     this.isRefreshing = true;
     this._functionPackageActionsService
-      .deleteFunctionPackage(this.id!, this.functionPackage!.attributes!['name'])
+      .deleteFunctionPackage(this.functionPackageId, this.functionPackage!.attributes!['name'])
       .subscribe((result) => {
         if (result) {
           this.reload();
@@ -43,36 +61,41 @@ export class FunctionPackageLinkComponent {
       .add(() => (this.isRefreshing = false));
   }
 
-  refresh() {
+  refresh(): void {
+    if (!this.functionPackageId) {
+      return;
+    }
     this.isRefreshing = true;
     this._api
-      .reloadFunctionPackage(this.id!)
+      .reloadFunctionPackage(this.functionPackageId)
       .subscribe(() => {
         this.reload();
       })
       .add(() => (this.isRefreshing = false));
   }
 
-  edit() {
+  edit(): void {
+    if (!this.functionPackageId) {
+      return;
+    }
     this.isRefreshing = true;
     this._functionPackageActionsService
-      .editFunctionPackage(this.id!)
+      .editFunctionPackage(this.functionPackageId)
       .subscribe()
       .add(() => (this.isRefreshing = false));
   }
 
-  reload() {
+  reload(): void {
     this._$rootScope.$broadcast('functions.collection.change', {});
     this.loadFunctionPackage();
   }
 
-  loadFunctionPackage() {
-    this._api.getFunctionPackage(this.id!).subscribe((response) => {
+  private loadFunctionPackage(): void {
+    if (!this.functionPackageId) {
+      return;
+    }
+    this._api.getFunctionPackage(this.functionPackageId).subscribe((response) => {
       this.functionPackage = response;
     });
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('function-package-link', downgradeComponent({ component: FunctionPackageLinkComponent }));

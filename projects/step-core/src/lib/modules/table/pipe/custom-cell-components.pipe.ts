@@ -1,25 +1,15 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { Input as ColInput } from '../../../client/generated';
+import { CustomCellRegistryService } from '../../custom-registeries/services/custom-cell-registry.service';
 
 @Pipe({
   name: 'customCellComponents',
 })
 export class CustomCellComponentsPipe implements PipeTransform {
-  transform(column: ColInput, screen?: string): string[] | undefined {
-    // Temporary returns the hardcoded custom cell keys for a special screens, in case if the column contains defined valueHtmlTemplate
-    // The final implementation, should extract those keys from column itself (required backend changes)
+  constructor(protected _customCells: CustomCellRegistryService) {}
 
-    if (!column?.valueHtmlTemplate) {
-      return undefined;
-    }
-
-    switch (screen) {
-      case 'planTable':
-        return ['planLink'];
-      case 'schedulerTable':
-        return ['taskLink'];
-      default:
-        return undefined;
-    }
+  transform(column: ColInput): string[] | undefined {
+    const componentKeys = this._customCells.filterKeys(column?.customUIComponents || []);
+    return componentKeys.length === 0 ? undefined : componentKeys;
   }
 }

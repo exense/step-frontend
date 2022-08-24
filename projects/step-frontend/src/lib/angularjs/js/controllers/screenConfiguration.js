@@ -119,7 +119,23 @@ angular
 
     return dialogs;
   })
+  .directive('customUiComponents', () => ({
+    restrict: 'A',
+    require: 'ngModel',
+    link: ($scope, $element, $attrs, $ngModel) => {
 
+      $ngModel.$formatters.push((value) => (value || []).join(', '));
+
+      $ngModel.$parsers.push((value) => {
+        const result = (value || '')
+          .split(',')
+          .map((x) => x.trim())
+          .filter((x) => !!x);
+
+        return result.length === 0 ? null : result;
+      });
+    }
+  }))
   .controller('editScreenInputCtrl', function ($scope, $uibModalInstance, $http, AuthService, id, screenId) {
     if (id == null) {
       $scope.input = { screenId: screenId, input: {} };

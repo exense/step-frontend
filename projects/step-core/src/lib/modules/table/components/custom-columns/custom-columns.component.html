@@ -15,9 +15,9 @@
     <ng-template #cellValue>
       {{ element | customCellValue: col.id! }}
     </ng-template>
-    <ng-container *ngIf="col | customCellComponents: screen as customCellKeys; else cellValue">
+    <div class="custom-cell-container" *ngIf="col | customCellComponents as customCellKeys; else cellValue">
       <step-custom-cell *ngFor="let cellKey of customCellKeys" [itemKey]="cellKey" [context]="element">
       </step-custom-cell>
-    </ng-container>
+    </div>
   </td>
 </ng-container>

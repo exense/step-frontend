@@ -9,12 +9,16 @@ export class CustomRegistryService {
   private store = new Map<CustomRegistryType, Map<string, CustomRegistryItem>>();
 
   register(storeType: CustomRegistryType, key: string, item: CustomRegistryItem): void {
-    console.log('REGISTER ITEM', storeType, key, item);
     this.getStoreForType(storeType).set(key, item);
   }
 
   getRegisteredItem(storeType: CustomRegistryType, key: string): CustomRegistryItem | undefined {
     return this.getStoreForType(storeType).get(key);
+  }
+
+  filterKeys(storeType: CustomRegistryType, keys: string[]): string[] {
+    const store = this.getStoreForType(storeType);
+    return keys.filter((key) => store.has(key));
   }
 
   getRegisteredItems(storeType: CustomRegistryType): ReadonlyArray<CustomRegistryItem> {

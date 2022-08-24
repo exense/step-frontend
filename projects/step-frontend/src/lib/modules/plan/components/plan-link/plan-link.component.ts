@@ -1,6 +1,7 @@
-import { Component, Inject } from '@angular/core';
-import { AJS_LOCATION, CustomComponent, Plan } from '@exense/step-core';
+import { Component, Inject, Optional } from '@angular/core';
+import { AJS_LOCATION, CustomColumnOptions, CustomComponent, Plan } from '@exense/step-core';
 import { ILocationService } from 'angular';
+import { map, of } from 'rxjs';
 
 @Component({
   selector: 'step-plan-link',
@@ -10,7 +11,14 @@ import { ILocationService } from 'angular';
 export class PlanLinkComponent implements CustomComponent {
   context?: Plan;
 
-  constructor(@Inject(AJS_LOCATION) private _location: ILocationService) {}
+  readonly noLink$ = (this._customColumnOptions?.options$ || of([])).pipe(
+    map((options) => options.includes('noEditorLink'))
+  );
+
+  constructor(
+    @Inject(AJS_LOCATION) private _location: ILocationService,
+    @Optional() private _customColumnOptions?: CustomColumnOptions
+  ) {}
 
   editPlan(): void {
     if (!this.context) {

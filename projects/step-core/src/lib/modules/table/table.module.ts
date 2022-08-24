@@ -37,3 +37,4 @@ export * from './services/table.search';
 export * from './services/table-legacy-utils.service';
 export * from './directives/search-col.directive';
 export * from './directives/search-cell-def.directive';
+export * from './services/custom-column-options';
