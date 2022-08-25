@@ -2,12 +2,12 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $ChangePasswordResponse = {
-    properties: {
-        status: {
-            type: 'string',
-        },
-        message: {
-            type: 'string',
-        },
+  properties: {
+    status: {
+      type: 'string',
     },
+    message: {
+      type: 'string',
+    },
+  },
 } as const;

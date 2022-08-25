@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $Password = {
-    properties: {
-        password: {
-            type: 'string',
-        },
+  properties: {
+    password: {
+      type: 'string',
     },
+  },
 } as const;

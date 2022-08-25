@@ -25,7 +25,7 @@ export class ParametersListComponent {
   }
 
   duplicateParameter(parameter: Parameter): void {
-    this._parametersService.copy(parameter.id!).subscribe(() => this.dataSource.reload());
+    this._parametersService.copyParameter(parameter.id!).subscribe(() => this.dataSource.reload());
   }
 
   editParameter(parameter: Parameter): void {

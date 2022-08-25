@@ -5,7 +5,6 @@
 import type { Filter } from './Filter';
 
 export type CountRequest = {
-    filter?: Filter;
-    limit?: number;
+  filter?: Filter;
+  limit?: number;
 };
-

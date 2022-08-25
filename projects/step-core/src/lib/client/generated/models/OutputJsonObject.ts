@@ -8,9 +8,8 @@ import type { JsonValue } from './JsonValue';
 import type { Measure } from './Measure';
 
 export type OutputJsonObject = {
-    payload?: Record<string, JsonValue>;
-    error?: Error;
-    attachments?: Array<Attachment>;
-    measures?: Array<Measure>;
+  payload?: Record<string, JsonValue>;
+  error?: Error;
+  attachments?: Array<Attachment>;
+  measures?: Array<Measure>;
 };
-

@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $JsonValue = {
-    properties: {
-        valueType: {
-            type: 'Enum',
-        },
+  properties: {
+    valueType: {
+      type: 'Enum',
     },
+  },
 } as const;

@@ -9,54 +9,48 @@ import type { OperationDetails } from '../models/OperationDetails';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable({providedIn:'root'})
+@Injectable({ providedIn: 'root' })
 export class SystemService {
+  constructor(public readonly httpRequest: BaseHttpRequest) {}
 
-    constructor(public readonly httpRequest: BaseHttpRequest) {}
+  /**
+   * @param eid
+   * @returns Operation default response
+   * @throws ApiError
+   */
+  public getCurrentOperations(eid?: string): Observable<Array<Operation>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/threadmanager/operations',
+      query: {
+        eid: eid,
+      },
+    });
+  }
 
-    /**
-     * @param eid
-     * @returns Operation default response
-     * @throws ApiError
-     */
-    public getCurrentOperations(
-        eid?: string,
-    ): Observable<Array<Operation>> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/threadmanager/operations',
-            query: {
-                'eid': eid,
-            },
-        });
-    }
+  /**
+   * @returns OperationDetails default response
+   * @throws ApiError
+   */
+  public getCurrentOperationsList(): Observable<Array<OperationDetails>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/threadmanager/operations/list',
+    });
+  }
 
-    /**
-     * @returns OperationDetails default response
-     * @throws ApiError
-     */
-    public getCurrentOperationsList(): Observable<Array<OperationDetails>> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/threadmanager/operations/list',
-        });
-    }
-
-    /**
-     * @param reportnodeid
-     * @returns Operation default response
-     * @throws ApiError
-     */
-    public getOperationsByReportNodeId(
-        reportnodeid: string,
-    ): Observable<Array<Operation>> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/threadmanager/operations/{reportnodeid}',
-            path: {
-                'reportnodeid': reportnodeid,
-            },
-        });
-    }
-
+  /**
+   * @param reportnodeid
+   * @returns Operation default response
+   * @throws ApiError
+   */
+  public getOperationsByReportNodeId(reportnodeid: string): Observable<Array<Operation>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/threadmanager/operations/{reportnodeid}',
+      path: {
+        reportnodeid: reportnodeid,
+      },
+    });
+  }
 }

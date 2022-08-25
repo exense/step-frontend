@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
 import { StepCoreModule } from '@exense/step-core';
 import { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
-import { ArrayFilterComponent } from './components/array-filter/array-filter.component';
-import { DateFilterComponent } from './components/date-filter/date-filter.component';
 import { LoginComponent } from './components/login/login.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { ExecutionLinkComponent } from './components/execution-link/execution-link.component';
@@ -12,8 +10,6 @@ import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
 @NgModule({
   declarations: [
     AutorefreshToggleComponent,
-    ArrayFilterComponent,
-    DateFilterComponent,
     LoginComponent,
     SidebarComponent,
     ExecutionLinkComponent,
@@ -22,8 +18,6 @@ import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
   ],
   exports: [
     AutorefreshToggleComponent,
-    ArrayFilterComponent,
-    DateFilterComponent,
     StepCoreModule,
     LoginComponent,
     SidebarComponent,
