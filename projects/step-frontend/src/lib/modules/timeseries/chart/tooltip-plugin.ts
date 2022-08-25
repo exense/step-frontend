@@ -88,7 +88,7 @@ let placement = function (o, r, f, a, i) {
   (o.dataset.side = f), (o.dataset.align = a);
 };
 
-export function tooltipPlugin(yScaleUnit?: string) {
+export function tooltipPlugin(yScaleUnit?: string): uPlot.Hooks {
   let over: any;
   let bound: any;
   let bLeft: any;

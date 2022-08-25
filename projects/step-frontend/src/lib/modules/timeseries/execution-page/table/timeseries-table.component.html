@@ -1,6 +1,6 @@
-<step-table [dataSource]="tableDataSource" [inProgress]="tableIsLoading">
+<step-table [dataSource]="tableDataSource" [inProgress]="tableIsLoading" matSort>
   <ng-container matColumnDef="name">
-    <th mat-header-cell *matHeaderCellDef>Name</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
     <td mat-cell *matCellDef="let element">
       <div class="color-cell">
         <input
@@ -16,58 +16,58 @@
     </td>
   </ng-container>
   <ng-container matColumnDef="count">
-    <th mat-header-cell *matHeaderCellDef>Count</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Count</th>
     <td mat-cell *matCellDef="let element">
       {{ element.count }}
     </td>
   </ng-container>
   <ng-container matColumnDef="sum">
-    <th mat-header-cell *matHeaderCellDef>Sum</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Sum</th>
     <td mat-cell *matCellDef="let element">
       {{ element.sum }}
     </td>
   </ng-container>
   <ng-container matColumnDef="avg">
-    <th mat-header-cell *matHeaderCellDef>Avg</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Avg</th>
     <td mat-cell *matCellDef="let element">
       {{ element.attributes.avg }}
     </td>
   </ng-container>
   <ng-container matColumnDef="min">
-    <th mat-header-cell *matHeaderCellDef>Min</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Min</th>
     <td mat-cell *matCellDef="let element">
       {{ element.min }}
     </td>
   </ng-container>
   <ng-container matColumnDef="max">
-    <th mat-header-cell *matHeaderCellDef>Max</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Max</th>
     <td mat-cell *matCellDef="let element">
       {{ element.max }}
     </td>
   </ng-container>
   <ng-container matColumnDef="pcl_80">
-    <th mat-header-cell *matHeaderCellDef>Pcl. 80</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Pcl. 80</th>
     <td mat-cell *matCellDef="let element">
       {{ element.pclValues?.[80] }}
     </td>
   </ng-container>
   <ng-container matColumnDef="pcl_90">
-    <th mat-header-cell *matHeaderCellDef>Pcl. 90</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Pcl. 90</th>
     <td mat-cell *matCellDef="let element">
       {{ element.pclValues?.[90] }}
     </td>
   </ng-container>
   <ng-container matColumnDef="pcl_99">
-    <th mat-header-cell *matHeaderCellDef>Pcl. 99</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Pcl. 99</th>
     <td mat-cell *matCellDef="let element">
       {{ element.pclValues?.[99] }}
     </td>
   </ng-container>
   <ng-container matColumnDef="tps">
-    <th mat-header-cell *matHeaderCellDef>Tps</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Tps</th>
     <td mat-cell *matCellDef="let element">
       <ng-container *ngIf="response">
-        {{ Math.trunc(element.count / ((response.end - response.start) / 1000)) }}
+        {{ element.attributes.tps }}
       </ng-container>
     </td>
   </ng-container>

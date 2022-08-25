@@ -20,13 +20,13 @@ import { TSTimeRange } from './model/ts-time-range';
 import { AlignedData } from 'uplot';
 import MouseListener = uPlot.Cursor.MouseListener;
 
-declare const uPlot: any;
+//@ts-ignore
+import uPlot = require('uplot');
 
 @Component({
   selector: 'step-timeseries-chart',
   templateUrl: './time-series-chart.component.html',
   styleUrls: ['./time-series-chart.component.scss'],
-  encapsulation: ViewEncapsulation.None,
 })
 export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChanges {
   private readonly HEADER_WITH_FOOTER_SIZE = 94;
@@ -35,9 +35,9 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   @ViewChild('chart') private chartElement!: ElementRef;
 
-  @Input('settings') settings!: TSChartSettings;
-  @Input('syncKey') syncKey: string | undefined; // all the charts with the same syncKey in the app will be synced
-  @Input('selection') selection: TSTimeRange | undefined;
+  @Input() settings!: TSChartSettings;
+  @Input() syncKey: string | undefined; // all the charts with the same syncKey in the app will be synced
+  @Input() selection: TSTimeRange | undefined;
 
   @Output('onZoomReset') onZoomReset = new EventEmitter();
 
@@ -70,10 +70,9 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       };
     };
 
-    const cursorOpts = {
+    const cursorOpts: uPlot.Cursor = {
       lock: false,
       y: false,
-      sync: {},
       bind: {
         dblclick: (self: uPlot, target: HTMLElement, handler: MouseListener) => {
           return (e: any) => {
@@ -81,6 +80,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
               this.onZoomReset.emit(true);
               handler(e);
             }
+            return null;
           };
         },
       },
@@ -99,7 +99,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         this.seriesIndexesByIds[series.id] = i + 1; // because the first series is the time
       }
     });
-    const opts = {
+    const opts: uPlot.Options = {
       title: settings.title,
       ms: 1, // if not specified it's going to be in seconds
       ...getSize(),
@@ -144,7 +144,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       },
     };
 
-    let data = [settings.xValues, ...settings.series.map((s) => s.data)];
+    let data: AlignedData = [settings.xValues, ...settings.series.map((s) => s.data)];
     if (this.uplot) {
       this.uplot.destroy();
     }

@@ -14,6 +14,7 @@ import { TimeSeriesConfig } from '../../time-series.config';
 import { Select } from 'uplot';
 import { TSRangerSettings } from '../../ranger/ts-ranger-settings';
 import { ExecutionsPageService } from '../../executions-page.service';
+import { Execution } from '@exense/step-core';
 
 @Component({
   selector: 'step-execution-time-selection',
@@ -21,7 +22,7 @@ import { ExecutionsPageService } from '../../executions-page.service';
   styleUrls: ['./execution-page-time-selection.component.scss'],
 })
 export class ExecutionPageTimeSelectionComponent implements OnInit {
-  @Input('execution') execution!: any;
+  @Input() execution!: Execution;
 
   @Output('onRangeChange') onRangeChange = new EventEmitter<TSTimeRange>();
   @Output('onRangeReset') onRangeReset = new EventEmitter<TSTimeRange>();
@@ -39,7 +40,7 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
   constructor(private timeSeriesService: TimeSeriesService, private executionsPageService: ExecutionsPageService) {}
 
   ngOnInit(): void {
-    this.executionService = this.executionsPageService.getContext(this.execution.id);
+    this.executionService = this.executionsPageService.getContext(this.execution.id!);
     this.executionService.onActiveSelectionChange().subscribe((range) => {
       this.selection = range;
     });
@@ -51,11 +52,11 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
   }
 
   createRanger() {
-    let startTime = this.execution.startTime;
+    let startTime = this.execution.startTime!;
     let endTime = this.execution.endTime || new Date().getTime();
     let request: FindBucketsRequest = {
       intervalSize: 0,
-      params: { eId: this.execution.id },
+      params: { eId: this.execution.id! },
       start: startTime,
       end: endTime, // to current time if it's not ended
       numberOfBuckets: Math.trunc(

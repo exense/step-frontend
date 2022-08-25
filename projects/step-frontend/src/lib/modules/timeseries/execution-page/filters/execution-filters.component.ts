@@ -17,7 +17,7 @@ import { BucketFilters } from '../../model/bucket-filters';
 export class ExecutionFiltersComponent implements OnInit {
   attributesPair: { key?: string; value?: string }[] = [{}, {}, {}, {}];
 
-  @Input('executionId') executionId!: string;
+  @Input() executionId!: string;
 
   private executionContext!: ExecutionTabContext;
 

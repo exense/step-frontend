@@ -12,14 +12,10 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { TSRangerSettings } from './ts-ranger-settings';
-import { UplotSyncService } from '../chart/uplot-sync-service';
 import { TSTimeRange } from '../chart/model/ts-time-range';
-import { UPlotUtils } from '../uplot/uPlot.utils';
-import { from, timeout } from 'rxjs';
-import { TSChartSettings } from '../chart/model/ts-chart-settings';
-import { ExecutionTabContext } from '../execution-page/execution-tab-context';
 
-declare const uPlot: any;
+//@ts-ignore
+import uPlot = require('uplot');
 
 /**
  * There are 3 ways of interaction with the ranger:
@@ -37,9 +33,9 @@ declare const uPlot: any;
 export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
   @ViewChild('chart') private chartElement!: ElementRef;
 
-  @Input('settings') settings!: TSRangerSettings;
-  @Input('syncKey') syncKey: string | undefined;
-  @Input('selection') selection?: TSTimeRange;
+  @Input() settings!: TSRangerSettings;
+  @Input() syncKey!: string;
+  @Input() selection?: TSTimeRange;
 
   /**
    * This should emit the following events only:
@@ -98,7 +94,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     // }
   }
 
-  transformRangeToSelect(range?: TSTimeRange) {
+  transformRangeToSelect(range?: TSTimeRange): uPlot.Select | undefined {
     if (!range) {
       return undefined;
     }
@@ -117,7 +113,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     } else {
       width = Math.round(this.uplot.valToPos(toTimestamp, 'x')) - left;
     }
-    return { left, width, height };
+    return { left, width, height, top: 0 };
   }
 
   resetSelect(emitResetEvent = false) {
@@ -235,7 +231,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       select = this.transformRangeToSelect(this.settings.selection);
     }
     // console.log('CREATING WITH SELECT: ', this.settings.selection);
-    let rangerOpts = {
+    let rangerOpts: uPlot.Options = {
       width: 800,
       height: 100,
       ms: 1, // if not specified it's going be in seconds
@@ -309,7 +305,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
             let height = uRanger.bbox.height / devicePixelRatio;
             if (!this.settings.selection) {
               // we deal with full selection
-              uRanger.setSelect({ left, width, height }, false);
+              uRanger.setSelect({ left, width, height, top: 0 }, false);
             }
             this.previousRange = { from: this.start, to: this.end };
             const sel = uRanger.root.querySelector('.u-select');

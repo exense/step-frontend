@@ -26,11 +26,11 @@ import { ExecutionsPageService } from '../executions-page.service';
 declare const uPlot: any;
 
 @Component({
-  selector: 'step-execution-page',
-  templateUrl: './execution-page.component.html',
-  styleUrls: ['./execution-page.component.scss'],
+  selector: 'step-performance-view',
+  templateUrl: './performance-view.component.html',
+  styleUrls: ['./performance-view.component.scss'],
 })
-export class ExecutionPageComponent implements OnInit, OnDestroy {
+export class PerformanceViewComponent implements OnInit, OnDestroy {
   private readonly METRIC_TYPE_KEY = 'metricType';
   private readonly METRIC_TYPE_RESPONSE_TIME = 'response-time'; // this is for normal measurements
   private readonly METRIC_TYPE_SAMPLER = 'sampler'; // this is for thread groups measurements
@@ -55,7 +55,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   @ViewChild(ExecutionPageTimeSelectionComponent) timeSelectionComponent!: ExecutionPageTimeSelectionComponent;
 
-  @Input('executionId') executionId!: string;
+  @Input() executionId!: string;
 
   barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
   stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
@@ -479,7 +479,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         return; // TODO handle
       }
       response.matrix[0].forEach((bucket) => {
-        avgValues.push(bucket ? bucket.sum / bucket.count : null);
+        avgValues.push(bucket ? Math.trunc(bucket.sum / bucket.count) : null);
         countValues.push(bucket?.throughputPerHour);
       });
       this.summaryChartSettings = {
@@ -501,9 +501,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
             //   gradient.addColorStop(1, '#ff000006');
             //   return gradient;
             // },
-            fill: 'rgba(143,161,210,0.38)',
-            paths: this.barsFunction({ size: [0.9, 100] }),
-            points: { show: false },
+            width: 2,
+            stroke: 'rgba(255,109,18,0.59)',
           },
           {
             id: 'count',
@@ -511,7 +510,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
             label: 'Hits/h',
             data: countValues,
             value: (x, v) => Math.trunc(v),
-            fill: 'rgba(255,124,18,0.4)',
+            fill: 'rgba(143,161,210,0.38)',
+            paths: this.barsFunction({ size: [0.9, 100] }),
             points: { show: false },
           },
         ],
@@ -733,4 +733,4 @@ interface RefreshInterval {
 
 getAngularJSGlobal()
   .module(AJS_MODULE)
-  .directive('stepExecutionPage', downgradeComponent({ component: ExecutionPageComponent }));
+  .directive('stepPerformanceView', downgradeComponent({ component: PerformanceViewComponent }));

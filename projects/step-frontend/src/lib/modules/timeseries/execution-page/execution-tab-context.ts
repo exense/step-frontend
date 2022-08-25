@@ -18,9 +18,7 @@ export class ExecutionTabContext {
 
   private readonly activeSelectionChange: BehaviorSubject<ExecutionTimeSelection> =
     new BehaviorSubject<ExecutionTimeSelection>(this.activeTimeSelection);
-  private readonly filtersChangeSubject: BehaviorSubject<BucketFilters> = new BehaviorSubject<BucketFilters>(
-    this.activeFilters
-  );
+  private readonly filtersChangeSubject: Subject<BucketFilters> = new Subject();
 
   private readonly keywordsContext: TimeSeriesKeywordsContext;
   private readonly colorsPool: TimeseriesColorsPool;
