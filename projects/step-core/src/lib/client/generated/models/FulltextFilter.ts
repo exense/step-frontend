@@ -4,7 +4,6 @@
 
 import type { TableFilter } from './TableFilter';
 
-export type FulltextFilter = (TableFilter & {
-    text?: string;
-});
-
+export type FulltextFilter = TableFilter & {
+  text?: string;
+};

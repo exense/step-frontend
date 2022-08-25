@@ -1,13 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {
-  ExecutiontTaskParameters,
-  UibModalHelperService,
-  a1Promise2Observable,
-  DialogsService,
-  SchedulerService,
-} from '@exense/step-core';
-import { pipe, map, Observable, switchMap, catchError, of } from 'rxjs';
+import { map, Observable, switchMap, catchError, of } from 'rxjs';
+import { UibModalHelperService } from './uib-modal-helper.service';
+import { a1Promise2Observable, DialogsService } from '../shared';
+import { ExecutiontTaskParameters, SchedulerService } from '../client/generated';
 
 @Injectable({
   providedIn: 'root',

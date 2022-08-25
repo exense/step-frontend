@@ -3,8 +3,7 @@
 /* eslint-disable */
 
 export type TokenGroupCapacity = {
-    key?: Record<string, string>;
-    countByState?: Record<string, number>;
-    capacity?: number;
+  key?: Record<string, string>;
+  countByState?: Record<string, number>;
+  capacity?: number;
 };
-

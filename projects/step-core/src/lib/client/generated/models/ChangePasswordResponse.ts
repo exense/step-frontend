@@ -3,7 +3,6 @@
 /* eslint-disable */
 
 export type ChangePasswordResponse = {
-    status?: string;
-    message?: string;
+  status?: string;
+  message?: string;
 };
-

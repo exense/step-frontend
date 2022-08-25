@@ -5,7 +5,6 @@
 import type { Function } from './Function';
 
 export type PackagePreview = {
-    loadingError?: string;
-    functions?: Array<Function>;
+  loadingError?: string;
+  functions?: Array<Function>;
 };
-

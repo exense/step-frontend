@@ -3,7 +3,6 @@
 /* eslint-disable */
 
 export type FunctionTestingSession = {
-    planId?: string;
-    callFunctionId?: string;
+  planId?: string;
+  callFunctionId?: string;
 };
-

@@ -2,12 +2,12 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $Expression = {
-    properties: {
-        script: {
-            type: 'string',
-        },
-        scriptEngine: {
-            type: 'string',
-        },
+  properties: {
+    script: {
+      type: 'string',
     },
+    scriptEngine: {
+      type: 'string',
+    },
+  },
 } as const;

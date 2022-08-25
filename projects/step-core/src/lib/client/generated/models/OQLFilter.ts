@@ -4,7 +4,6 @@
 
 import type { TableFilter } from './TableFilter';
 
-export type OQLFilter = (TableFilter & {
-    oql?: string;
-});
-
+export type OQLFilter = TableFilter & {
+  oql?: string;
+};

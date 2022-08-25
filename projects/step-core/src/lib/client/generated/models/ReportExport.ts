@@ -3,8 +3,7 @@
 /* eslint-disable */
 
 export type ReportExport = {
-    status?: 'SUCCESSFUL' | 'FAILED';
-    error?: string;
-    url?: string;
+  status?: 'SUCCESSFUL' | 'FAILED';
+  error?: string;
+  url?: string;
 };
-

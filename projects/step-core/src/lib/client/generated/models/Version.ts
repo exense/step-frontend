@@ -3,8 +3,7 @@
 /* eslint-disable */
 
 export type Version = {
-    major?: number;
-    minor?: number;
-    revision?: number;
+  major?: number;
+  minor?: number;
+  revision?: number;
 };
-

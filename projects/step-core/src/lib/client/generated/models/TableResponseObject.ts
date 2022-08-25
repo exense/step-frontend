@@ -3,8 +3,7 @@
 /* eslint-disable */
 
 export type TableResponseObject = {
-    recordsTotal?: number;
-    recordsFiltered?: number;
-    data?: Array<any>;
+  recordsTotal?: number;
+  recordsFiltered?: number;
+  data?: Array<any>;
 };
-

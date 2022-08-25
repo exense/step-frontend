@@ -2,24 +2,23 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $Operation = {
-    properties: {
-        name: {
-            type: 'string',
-        },
-        start: {
-            type: 'string',
-            format: 'date-time',
-        },
-        details: {
-            properties: {
-            },
-        },
-        reportNodeId: {
-            type: 'string',
-        },
-        tid: {
-            type: 'number',
-            format: 'int64',
-        },
+  properties: {
+    name: {
+      type: 'string',
     },
+    start: {
+      type: 'string',
+      format: 'date-time',
+    },
+    details: {
+      properties: {},
+    },
+    reportNodeId: {
+      type: 'string',
+    },
+    tid: {
+      type: 'number',
+      format: 'int64',
+    },
+  },
 } as const;

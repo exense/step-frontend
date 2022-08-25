@@ -3,6 +3,5 @@
 /* eslint-disable */
 
 export type RTMLink = {
-    link?: string;
+  link?: string;
 };
-
