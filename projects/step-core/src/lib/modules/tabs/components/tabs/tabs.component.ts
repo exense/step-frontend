@@ -12,6 +12,7 @@ import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static'
 export class TabsComponent {
   readonly trackByTab: TrackByFunction<Tab> = (index, item) => item.id;
 
+  @Input() disablePagination: boolean = false;
   @Input() tabs: Tab[] = [];
   @Input() activeTabId?: string;
   @Input() tabTemplate?: TemplateRef<unknown>;

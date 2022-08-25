@@ -45,7 +45,7 @@
 					<div class="auto-margin">Available components</div>
 				</div>
 				<div class="panel-body">
-          <step-tabs [tabs]="componentTabs.tabs" [(active-tab-id)]="componentTabs.selectedTab">
+          <step-tabs [tabs]="componentTabs.tabs" [(active-tab-id)]="componentTabs.selectedTab" [disable-pagination]="true">
           </step-tabs>
           <div class="tab-content">
             <div class="tab-pane active" ng-if="componentTabs.selectedTab === 'controls'">
