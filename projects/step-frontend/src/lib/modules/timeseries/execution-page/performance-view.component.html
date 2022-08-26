@@ -44,38 +44,44 @@
         </step-timeseries-chart>
       </div>
 
-      <div class="chart-container">
-        <step-chart-skeleton *ngIf="!responseTypeByKeywordsSettings"></step-chart-skeleton>
-        <step-timeseries-chart
-          #chart5
-          *ngIf="responseTypeByKeywordsSettings"
-          [settings]="responseTypeByKeywordsSettings"
-          [selection]="timeSelection?.absoluteSelection"
-          [syncKey]="executionId"
-          (onZoomReset)="onZoomReset()"
-        >
-        </step-timeseries-chart>
-        <div class="chart-footer-actions">
-          <button mat-button [matMenuTriggerFor]="menu">Metric ({{ selectedMetric.label }})</button>
-          <mat-menu #menu="matMenu">
-            <button mat-menu-item *ngFor="let metric of responseTimeMetrics" (click)="switchChartMetric(metric)">
-              {{ metric.label }}
-            </button>
-          </mat-menu>
+      <div class="charts-section">
+        <div class="chart-container">
+          <step-chart-skeleton *ngIf="!responseTypeByKeywordsSettings"></step-chart-skeleton>
+          <step-timeseries-chart
+            #chart5
+            *ngIf="responseTypeByKeywordsSettings"
+            [settings]="responseTypeByKeywordsSettings"
+            [selection]="timeSelection?.absoluteSelection"
+            [syncKey]="executionId"
+            (onZoomReset)="onZoomReset()"
+          >
+          </step-timeseries-chart>
+          <div class="chart-footer-actions">
+            <button mat-button [matMenuTriggerFor]="menu">Metric ({{ selectedMetric.label }})</button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item *ngFor="let metric of responseTimeMetrics" (click)="switchChartMetric(metric)">
+                {{ metric.label }}
+              </button>
+            </mat-menu>
+          </div>
         </div>
-      </div>
 
-      <div class="chart-container">
-        <step-chart-skeleton *ngIf="!throughputChartSettings"></step-chart-skeleton>
-        <step-timeseries-chart
-          *ngIf="throughputChartSettings"
-          #chart4
-          [settings]="throughputChartSettings"
-          [selection]="timeSelection?.absoluteSelection"
-          [syncKey]="executionId"
-          (onZoomReset)="onZoomReset()"
-        >
-        </step-timeseries-chart>
+        <div class="chart-container">
+          <step-chart-skeleton *ngIf="!throughputChartSettings"></step-chart-skeleton>
+          <step-timeseries-chart
+            *ngIf="throughputChartSettings"
+            #chart4
+            [settings]="throughputChartSettings"
+            [selection]="timeSelection?.absoluteSelection"
+            [syncKey]="executionId"
+            (onZoomReset)="onZoomReset()"
+          >
+          </step-timeseries-chart>
+        </div>
+
+        <div class="chart-container" style="width: 100%">
+          <step-timeseries-table #tableChart *ngIf="executionId" [executionId]="executionId"></step-timeseries-table>
+        </div>
       </div>
 
       <div class="chart-container">
@@ -90,13 +96,9 @@
         >
         </step-timeseries-chart>
       </div>
-
-      <div class="chart-container">
-        <step-timeseries-table #tableChart *ngIf="executionId" [executionId]="executionId"></step-timeseries-table>
-      </div>
     </div>
   </div>
-  <div class="side-panel">
+  <div class="side-panel" *ngIf="false">
     <div class="chart-container" *ngIf="throughputChartSettings" style="overflow: auto">
       <div>
         <input
