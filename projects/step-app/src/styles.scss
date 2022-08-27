@@ -34,6 +34,17 @@ header.blue-header {
 
   #sessionDropdown {
     color: white;
+    user-select: none;
+    background: none !important;
+  }
+
+  .dropdown-menu {
+    margin-right: -10px;
+    min-width: auto;
+
+    li {
+      width: 100%;
+    }
   }
 
   .navbar-right li {
