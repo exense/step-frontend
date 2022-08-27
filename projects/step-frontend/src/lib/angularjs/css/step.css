@@ -1011,7 +1011,7 @@ fieldset {
 
 .header-white-part {
   bottom: 0px;
-  height: calc(100% - var(--top-blue-border-height));
+  height: 24px;
   background-color: white;
   border-radius: var(--top-blue-border-edge-radius) 0 0 0;
 }
