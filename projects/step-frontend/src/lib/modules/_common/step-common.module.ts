@@ -6,6 +6,7 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { ExecutionLinkComponent } from './components/execution-link/execution-link.component';
 import { JsonViewerDirective } from './directives/json-viewer.directive';
 import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
+import { MenuFilterPipe } from './pipes/menu-filter.pipe';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
     ExecutionLinkComponent,
     JsonViewerDirective,
     IsEmptyJsonPipe,
+    MenuFilterPipe,
   ],
   exports: [
     AutorefreshToggleComponent,
@@ -24,6 +26,7 @@ import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
     ExecutionLinkComponent,
     JsonViewerDirective,
     IsEmptyJsonPipe,
+    MenuFilterPipe,
   ],
   imports: [StepCoreModule],
 })

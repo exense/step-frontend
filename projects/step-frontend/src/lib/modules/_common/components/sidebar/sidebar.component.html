@@ -18,7 +18,7 @@
     <!-- MENU -->
     <div
       class="sidebar-collapsable-tab"
-      *ngFor="let mainMenuEntry of _viewRegistryService.getMenuRootEntries(); index as i"
+      *ngFor="let mainMenuEntry of _viewRegistryService.customMenuEntries | menuFilter: 'root'; index as i"
       [attr.lastSidebarMainMenuLabel]="i === mainMenuEntriesAmount"
     >
       <input
@@ -33,7 +33,7 @@
         <mat-icon class="chevron">chevron_right</mat-icon>
       </label>
       <div class="content">
-        <section *ngFor="let entry of _viewRegistryService.getMenuEntries(mainMenuEntry.viewId)">
+        <section *ngFor="let entry of _viewRegistryService.customMenuEntries | menuFilter: mainMenuEntry.viewId">
           <div
             class="sidebar-subtab"
             [class.sidebar-highlighted-subtab]="_viewStateService.isViewActive(entry.viewId)"
