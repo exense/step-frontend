@@ -1,29 +1,19 @@
 <div id="sidebar-logo-and-burgermenu">
-  <span class="visible-when-collapsed"
-    ><label for="collapsable-sidebar-toggle-checkbox"><i class="glyphicon glyphicon-menu-hamburger"></i></label
+  <span class="visible-when-collapsed">
+    <label for="collapsable-sidebar-toggle-checkbox"><i class="glyphicon glyphicon-menu-hamburger"></i></label
   ></span>
   <span class="sidebar-aligned-text"><img class="sidebar-logo" alt="" [src]="logo" /></span>
 </div>
 <div id="sidebar-home-and-settings">
-  <span class="visible-when-collapsed sidebar-home-button" (click)="navigateTo('')"
+  <span class="visible-when-collapsed sidebar-home-button" (click)="navigateTo('home')"
     ><i class="glyphicon glyphicon-home"></i
   ></span>
   <span class="sidebar-home-and-settings-divider">|</span>
-  <span (click)="navigateTo('admin')" *ngIf="_authService.hasRight('admin')" class="sidebar-home-and-settings-icon"
-    ><i class="glyphicon glyphicon-cog"></i
+  <span (click)="navigateTo('admin')" *ngIf="_authService.hasRight('admin')" class="sidebar-home-and-settings-icon">
+    <i class="glyphicon glyphicon-cog"></i
   ></span>
 </div>
 <div id="sidebar-categories">
-  <div class="sidebar-categories-categories">
-    <span
-      (click)="navigateTo('admin')"
-      *ngIf="_authService.hasRight('admin')"
-      class="only-visible-when-collapsed sidebar-home-and-settings-icon-collapsed"
-      style="font-size: medium"
-      ><i class="glyphicon glyphicon-cog"></i
-    ></span>
-    <span>Categories</span>
-  </div>
   <div id="sidebar-categories-tabs">
     <!-- MENU -->
     <div
@@ -33,7 +23,7 @@
     >
       <input
         #mainMenuCheckBox
-        [name]="mainMenuEntry.label"
+        [name]="mainMenuEntry.viewId"
         id="collapsable-tab-{{ mainMenuEntry.label }}"
         type="checkbox"
       />

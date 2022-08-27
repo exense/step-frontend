@@ -101,8 +101,8 @@ export class SidebarComponent implements AfterViewInit {
 
   public navigateTo(viewId: string): void {
     switch (viewId) {
-      case 'plans':
-        this._location.go('#/root/plans/list');
+      case 'home':
+        this._authService.gotoDefaultPage();
         break;
       default:
         this._location.go('#/root/' + viewId);
