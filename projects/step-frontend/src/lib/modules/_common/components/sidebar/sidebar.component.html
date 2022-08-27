@@ -40,6 +40,7 @@
       <label for="collapsable-tab-{{ mainMenuEntry.label }}">
         <span class="{{ mainMenuEntry.icon }} visible-when-collapsed"></span>
         <span class="sidebar-aligned-text">{{ mainMenuEntry.label }}</span>
+        <mat-icon class="chevron">chevron_right</mat-icon>
       </label>
       <div class="content">
         <section *ngFor="let entry of _viewRegistryService.getMenuEntries(mainMenuEntry.viewId)">

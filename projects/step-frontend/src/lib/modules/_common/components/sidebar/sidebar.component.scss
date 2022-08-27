@@ -160,27 +160,17 @@ div#sidebar-categories-tabs .sidebar-collapsable-tab:first-child label {
   visibility: hidden;
 }
 
-/* (F) EXTRA - ADD ARROW INDICATOR */
-.sidebar-collapsable-tab label::after {
-  /* (F1) RIGHT ARROW */
-  display: block;
-  content: '>';
-
-  /* (F2) PLACE AT RIGHT SIDE */
+.sidebar-collapsable-tab .chevron {
   position: absolute;
-  right: 15px;
-  top: 15px;
-
-  /* (F3) ANIMATED ARROW */
-  /*transition: all 0.2s;*/
+  right: 8px;
 }
 
 /* (F4) ROTATE ARROW ON CHECKED */
-.sidebar-collapsable-tab input:checked ~ label::after {
-  transform: rotate(90deg);
-}
-.sidebar-collapsable-tab input:not(:checked) ~ label::after {
+.sidebar-collapsable-tab input:checked ~ label .chevron {
   transform: rotate(-90deg);
+}
+.sidebar-collapsable-tab input:not(:checked) ~ label .chevron {
+  transform: rotate(90deg);
 }
 
 div[lastSidebarMainMenuLabel='true'] > input:not(:checked) ~ label {
