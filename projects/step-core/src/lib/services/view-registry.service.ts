@@ -30,8 +30,6 @@ export interface Dashlet {
   providedIn: 'root',
 })
 export class ViewRegistryService {
-  constructor(@Inject(AJS_TEMPLATES_CACHE) private _templatesCache: ITemplateCacheService) {}
-
   customViews: { [key: string]: CustomView } = {};
   customMenuEntries: MenuEntry[] = [];
   customDashlets: { [key: string]: Dashlet[] } = {};
@@ -86,8 +84,8 @@ export class ViewRegistryService {
     label: string,
     viewId: string,
     icon: string,
+    parentMenu: string,
     isEnabledFct: () => boolean,
-    parentMenu?: string,
     right?: string
   ): void {
     this.customMenuEntries.push({ label, viewId, parentMenu, icon, right, isEnabledFct });
@@ -110,7 +108,7 @@ export class ViewRegistryService {
   }
 
   // returns the name of the main menu that contains the submenu or undefined
-  // FIXME: use MenuEntry.parentMenu instead of string reference as input
+  // FIXME: we can find a nicer solution than using this function
   getMainMenuNameOfSubmenu(subMenuName: string) {
     let subMenu = this.customMenuEntries.filter(
       (entry) => entry?.parentMenu && entry.isEnabledFct() && entry.viewId === subMenuName
