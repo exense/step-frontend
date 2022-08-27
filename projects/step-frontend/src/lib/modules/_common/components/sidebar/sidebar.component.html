@@ -28,22 +28,27 @@
     <!-- MENU -->
     <div
       class="sidebar-collapsable-tab"
-      *ngFor="let mme of _viewRegistryService.getCustomMainMenuEntries(); index as i"
+      *ngFor="let mainMenuEntry of _viewRegistryService.getMenuRootEntries(); index as i"
       [attr.lastSidebarMainMenuLabel]="i === mainMenuEntriesAmount"
     >
-      <input #mainMenuCheckBox name="{{ mme.label }}" id="collapsable-tab-{{ mme.label }}" type="checkbox" />
-      <label for="collapsable-tab-{{ mme.label }}">
-        <span class="{{ mme.menuIconClass }} visible-when-collapsed"></span>
-        <span class="sidebar-aligned-text">{{ mme.label }}</span>
+      <input
+        #mainMenuCheckBox
+        [name]="mainMenuEntry.label"
+        id="collapsable-tab-{{ mainMenuEntry.label }}"
+        type="checkbox"
+      />
+      <label for="collapsable-tab-{{ mainMenuEntry.label }}">
+        <span class="{{ mainMenuEntry.icon }} visible-when-collapsed"></span>
+        <span class="sidebar-aligned-text">{{ mainMenuEntry.label }}</span>
       </label>
       <div class="content">
-        <section *ngFor="let entry of _viewRegistryService.getCustomMenuEntriesIncludedInMainMenu(mme.label)">
+        <section *ngFor="let entry of _viewRegistryService.getMenuEntries(mainMenuEntry.viewId)">
           <div
             class="sidebar-subtab"
             [class.sidebar-highlighted-subtab]="_viewStateService.isViewActive(entry.viewId)"
             (click)="navigateTo(entry.viewId)"
           >
-            <span class="{{ entry.menuIconClass }} visible-when-collapsed"></span>
+            <span class="{{ entry.icon }} visible-when-collapsed"></span>
             <span class="sidebar-aligned-subtext">{{ entry.label }}</span>
           </div>
         </section>

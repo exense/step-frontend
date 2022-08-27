@@ -21,83 +21,61 @@ export class SidebarComponent implements AfterViewInit {
     public _location: Location
   ) {
     // Main Menus
-    this._viewRegistryService.registerCustomMenuEntry('Automation', undefined, true, 'glyphicon glyphicon-play');
-    this._viewRegistryService.registerCustomMenuEntry('Execute', undefined, true, 'glyphicon glyphicon-tasks');
-    this._viewRegistryService.registerCustomMenuEntry('Status', undefined, true, 'glyphicon glyphicon-ok');
+    this._viewRegistryService.registerCustomMenuEntry('Automation', 'automation-root', 'glyphicon glyphicon-play');
+    this._viewRegistryService.registerCustomMenuEntry('Execute', 'execute-root', 'glyphicon glyphicon-tasks');
+    this._viewRegistryService.registerCustomMenuEntry('Status', 'status-root', 'glyphicon glyphicon-ok');
+
     // Sub Menus Automation
     this._viewRegistryService.registerCustomMenuEntry(
       'Keywords',
       'functions',
-      false,
       'glyphicon glyphicon-record',
-      undefined,
-      'Automation'
+      'automation-root'
     );
-    this._viewRegistryService.registerCustomMenuEntry(
-      'Plans',
-      'plans',
-      false,
-      'glyphicon glyphicon-file',
-      undefined,
-      'Automation'
-    );
+    this._viewRegistryService.registerCustomMenuEntry('Plans', 'plans', 'glyphicon glyphicon-file', 'automation-root');
     this._viewRegistryService.registerCustomMenuEntry(
       'Parameters',
       'parameters',
-      false,
       'glyphicon glyphicon-list-alt',
-      undefined,
-      'Automation'
+      'automation-root'
     );
     // Sub Menus Execute
     this._viewRegistryService.registerCustomMenuEntry(
       'Executions',
       'executions',
-      false,
       'glyphicon glyphicon-tasks',
-      undefined,
-      'Execute'
+      'execute-root'
     );
     this._viewRegistryService.registerCustomMenuEntry(
       'Scheduler',
       'scheduler',
-      false,
       'glyphicon glyphicon-time',
-      undefined,
-      'Execute'
+      'execute-root'
     );
     // Sub Menus Status
     this._viewRegistryService.registerCustomMenuEntry(
       'Agents',
       'gridagents',
-      false,
       'glyphicon glyphicon-briefcase',
-      undefined,
-      'Status'
+      'status-root'
     );
     this._viewRegistryService.registerCustomMenuEntry(
       'Agent tokens',
       'gridtokens',
-      false,
       'glyphicon glyphicon-tag',
-      undefined,
-      'Status'
+      'status-root'
     );
     this._viewRegistryService.registerCustomMenuEntry(
       'Token Groups',
       'gridtokengroups',
-      false,
       'glyphicon glyphicon glyphicon-tags',
-      undefined,
-      'Status'
+      'status-root'
     );
     this._viewRegistryService.registerCustomMenuEntry(
       'Quota Manager',
       'gridquotamanager',
-      false,
       'glyphicon glyphicon-road',
-      undefined,
-      'Status'
+      'status-root'
     );
     this.mainMenuEntriesAmount = _viewRegistryService.getCustomMainMenuEntries().length - 1;
   }
@@ -106,7 +84,9 @@ export class SidebarComponent implements AfterViewInit {
     let initialViewName = this._viewStateService.getViewName();
     if (initialViewName) {
       let initiallyExpandedMainMenu = this._viewRegistryService.getMainMenuNameOfSubmenu(initialViewName!);
-      this.openMainMenu(initiallyExpandedMainMenu);
+      if (initiallyExpandedMainMenu) {
+        this.openMainMenu(initiallyExpandedMainMenu);
+      }
     }
   }
 

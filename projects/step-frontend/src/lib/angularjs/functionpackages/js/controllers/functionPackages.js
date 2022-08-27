@@ -54,7 +54,7 @@ angular
 
   .run(function (FunctionTypeRegistry, ViewRegistry, EntityRegistry) {
     ViewRegistry.registerView('functionPackages', 'functionpackages/partials/functionPackageList.html');
-    ViewRegistry.registerCustomMenuEntry('Keyword packages', 'functionPackages', undefined, 'glyphicon glyphicon-gift', undefined, "Automation");
+    ViewRegistry.registerCustomMenuEntry('Keyword packages', 'functionPackages', 'glyphicon glyphicon-gift', "automation-root");
     ViewRegistry.registerDashlet('/functions/actions', '', 'functionpackages/partials/functionPackageActions.html', '');
     EntityRegistry.registerEntity(
       'KeywordPackage',

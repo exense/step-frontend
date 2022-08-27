@@ -21,7 +21,7 @@ angular
 
   .run(function (ViewRegistry, EntityRegistry) {
     ViewRegistry.registerView('operations', 'partials/operations/operationsList.html');
-    ViewRegistry.registerCustomMenuEntry('Current Operations', 'operations', null, 'glyphicon glyphicon-eye-open', 'admin', "Status");
+    ViewRegistry.registerCustomMenuEntry('Current Operations', 'operations', 'glyphicon glyphicon-eye-open',  "status-root", 'admin');
   })
 
   .controller(

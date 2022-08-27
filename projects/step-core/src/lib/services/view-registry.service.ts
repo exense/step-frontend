@@ -1,78 +1,142 @@
 import { ITemplateCacheService } from 'angular';
 import { Inject, Injectable } from '@angular/core';
-import { v4 } from 'uuid';
 import { AJS_TEMPLATES_CACHE } from '../shared/angularjs-providers';
-import { CustomView, Dashlet, LegacyViewRegistryService, MenuEntry } from '../shared/legacy-view-registry.service';
+import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
+import { AJS_MODULE } from '../shared';
+
+export interface CustomView {
+  template: string;
+  isPublicView: boolean;
+  isStaticView?: boolean;
+}
+
+export interface MenuEntry {
+  label: string;
+  viewId: string;
+  parentMenu?: string;
+  icon: string;
+  right?: string;
+  isEnabledFct(): boolean;
+}
+
+export interface Dashlet {
+  label: string;
+  template: string;
+  id: string;
+  isEnabledFct?(): boolean;
+}
 
 @Injectable({
   providedIn: 'root',
 })
-export class ViewRegistryService implements LegacyViewRegistryService {
-  constructor(
-    private _legacyViewRegistry: LegacyViewRegistryService,
-    @Inject(AJS_TEMPLATES_CACHE) private _templatesCache: ITemplateCacheService
-  ) {}
+export class ViewRegistryService {
+  constructor(@Inject(AJS_TEMPLATES_CACHE) private _templatesCache: ITemplateCacheService) {}
 
-  private registerTemplate(templateContent: string): string {
-    const virtualPath = `upgraded/${v4()}.html`;
-    this._templatesCache.put(virtualPath, templateContent);
-    return virtualPath;
+  customViews: { [key: string]: CustomView } = {};
+  customMenuEntries: MenuEntry[] = [];
+  customDashlets: { [key: string]: Dashlet[] } = {};
+
+  getCustomView(view: string): CustomView {
+    const customView = this.customViews[view];
+    if (customView) {
+      return customView;
+    } else {
+      throw 'Undefined view: ' + view;
+    }
   }
 
-  getCustomMainMenuEntries(): MenuEntry[] {
-    return this._legacyViewRegistry.getCustomMainMenuEntries();
+  getViewTemplate(view: string) {
+    return this.getCustomView(view).template;
   }
 
-  getCustomMenuEntries(): MenuEntry[] {
-    return this._legacyViewRegistry.getCustomMenuEntries();
+  isPublicView(view: string) {
+    return this.getCustomView(view).isPublicView;
   }
 
-  getCustomMenuEntriesIncludedInMainMenu(mainMenuName: string): MenuEntry[] {
-    return this._legacyViewRegistry.getCustomMenuEntriesIncludedInMainMenu(mainMenuName);
+  isStaticView(view: string) {
+    return this.getCustomView(view).isStaticView;
   }
 
-  getMainMenuNameOfSubmenu(subMenuName: string): string {
-    return this._legacyViewRegistry.getMainMenuNameOfSubmenu(subMenuName);
+  registerView(viewId: string, template: string, isPublicView?: boolean): void {
+    this.registerViewWithConfig(viewId, template, { isPublicView: isPublicView });
   }
 
-  getDashlets(path: string): Dashlet[] {
-    return this._legacyViewRegistry.getDashlets(path);
-  }
-
-  getViewTemplate(view: string): string {
-    return this._legacyViewRegistry.getViewTemplate(view);
-  }
-
-  isPublicView(view: string): boolean {
-    return this._legacyViewRegistry.isPublicView(view);
-  }
-
-  registerCustomMenuEntry(
-    label: string,
-    viewId?: string,
-    mainMenu?: boolean,
-    menuIconsClass?: string,
-    right?: string,
-    includedInMainMenu?: string
+  registerViewWithConfig(
+    viewId: string,
+    template: string,
+    config: { isPublicView?: boolean; isStaticView?: boolean }
   ): void {
-    this._legacyViewRegistry.registerCustomMenuEntry(
+    const isPublicView = config.isPublicView || false;
+    const isStaticView = config.isStaticView || false;
+    this.customViews[viewId] = { template: template, isPublicView: isPublicView, isStaticView: isStaticView };
+  }
+
+  registerCustomMenuEntry(label: string, viewId: string, icon: string, parentMenu?: string, right?: string): void {
+    this.customMenuEntries.push({
       label,
       viewId,
-      mainMenu,
-      menuIconsClass,
+      parentMenu,
+      icon,
       right,
-      includedInMainMenu
-    );
+      isEnabledFct: () => true,
+    });
   }
 
   registerCustomMenuEntryOptional(
     label: string,
     viewId: string,
-    menuIconsClass: string,
-    right: string,
-    isEnabledFct: () => boolean
+    icon: string,
+    isEnabledFct: () => boolean,
+    parentMenu?: string,
+    right?: string
   ): void {
-    this._legacyViewRegistry.registerCustomMenuEntryOptional(label, viewId, menuIconsClass, right, isEnabledFct);
+    this.customMenuEntries.push({ label, viewId, parentMenu, icon, right, isEnabledFct });
+  }
+
+  getMenuRootEntries() {
+    return this.customMenuEntries.filter((entry) => entry && !entry.parentMenu && entry.isEnabledFct());
+  }
+
+  getMenuEntries(parentMenu: string) {
+    const filteredEntries = this.customMenuEntries.filter(
+      (entry) => entry?.parentMenu === parentMenu && entry.isEnabledFct()
+    );
+    return filteredEntries.sort((a, b) => a.label.localeCompare(b.label));
+  }
+
+  getCustomMainMenuEntries() {
+    let filteredEntries = this.customMenuEntries.filter((entry) => entry?.parentMenu && entry.isEnabledFct());
+    return filteredEntries.sort((a, b) => a.label.localeCompare(b.label));
+  }
+
+  // returns the name of the main menu that contains the submenu or undefined
+  // FIXME: use MenuEntry.parentMenu instead of string reference as input
+  getMainMenuNameOfSubmenu(subMenuName: string) {
+    let subMenu = this.customMenuEntries.filter(
+      (entry) => entry?.parentMenu && entry.isEnabledFct() && entry.viewId === subMenuName
+    );
+    if (subMenu.length === 1) {
+      return subMenu[0].parentMenu;
+    } else {
+      return undefined;
+    }
+  }
+
+  getDashlets(path: string) {
+    let dashlets = this.customDashlets[path];
+    if (!dashlets) {
+      dashlets = [];
+      this.customDashlets[path] = dashlets;
+    }
+    return dashlets;
+  }
+
+  registerDashlet(path: string, label: string, template: string, id: string, before?: boolean): void {
+    if (before) {
+      this.getDashlets(path).unshift({ label: label, template: template, id: id });
+    } else {
+      this.getDashlets(path).push({ label: label, template: template, id: id });
+    }
   }
 
   registerDashletAdvanced(
@@ -83,33 +147,13 @@ export class ViewRegistryService implements LegacyViewRegistryService {
     position: number,
     isEnabledFct: () => boolean
   ): void {
-    const virtualTemplateFilePath = this.registerTemplate(template);
-    this._legacyViewRegistry.registerDashletAdvanced(path, label, virtualTemplateFilePath, id, position, isEnabledFct);
-  }
-
-  registerDashlet(path: string, label: string, template: string, id: string, before?: boolean): void {
-    const virtualTemplateFilePath = this.registerTemplate(template);
-    this._legacyViewRegistry.registerDashlet(path, label, virtualTemplateFilePath, id, before);
-  }
-
-  registerView(viewId: string, template: string, isPublicView?: boolean): void {
-    const virtualTemplateFilePath = this.registerTemplate(template);
-    this._legacyViewRegistry.registerView(viewId, virtualTemplateFilePath, isPublicView);
-  }
-
-  getCustomView(view: string): CustomView {
-    return this._legacyViewRegistry.getCustomView(view);
-  }
-
-  isStaticView(view: string): boolean {
-    return this._legacyViewRegistry.isStaticView(view);
-  }
-
-  registerViewWithConfig(
-    viewId: string,
-    template: string,
-    config: { isPublicView: boolean; isStaticView: boolean }
-  ): void {
-    this._legacyViewRegistry.registerViewWithConfig(viewId, template, config);
+    this.getDashlets(path).splice(position, 0, {
+      label: label,
+      template: template,
+      id: id,
+      isEnabledFct: isEnabledFct,
+    });
   }
 }
+
+getAngularJSGlobal().module(AJS_MODULE).service('ViewRegistry', downgradeInjectable(ViewRegistryService));
