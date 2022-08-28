@@ -81,6 +81,12 @@ div#sidebar-categories-tabs .sidebar-collapsable-tab:first-child label {
   height: 56px;
   font-size: small;
   margin-top: 20px;
+  flex-direction: column;
+  justify-content: center;
+
+  i {
+    padding: 0 8px 0 0;
+  }
 }
 
 #sidebar-help-and-support > div {
