@@ -3,7 +3,6 @@
 /* eslint-disable */
 
 export type Expression = {
-    script?: string;
-    scriptEngine?: string;
+  script?: string;
+  scriptEngine?: string;
 };
-

@@ -5,9 +5,8 @@
 import type { Interest } from './Interest';
 
 export type Token = {
-    id?: string;
-    agentid?: string;
-    attributes?: Record<string, string>;
-    selectionPatterns?: Record<string, Interest>;
+  id?: string;
+  agentid?: string;
+  attributes?: Record<string, string>;
+  selectionPatterns?: Record<string, Interest>;
 };
-

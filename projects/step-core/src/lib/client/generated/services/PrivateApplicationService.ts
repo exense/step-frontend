@@ -8,20 +8,18 @@ import type { WebPlugin } from '../models/WebPlugin';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable({providedIn:'root'})
+@Injectable({ providedIn: 'root' })
 export class PrivateApplicationService {
+  constructor(public readonly httpRequest: BaseHttpRequest) {}
 
-    constructor(public readonly httpRequest: BaseHttpRequest) {}
-
-    /**
-     * @returns WebPlugin default response
-     * @throws ApiError
-     */
-    public getWebPlugins(): Observable<Array<WebPlugin>> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/app/plugins',
-        });
-    }
-
+  /**
+   * @returns WebPlugin default response
+   * @throws ApiError
+   */
+  public getWebPlugins(): Observable<Array<WebPlugin>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/app/plugins',
+    });
+  }
 }

@@ -5,7 +5,6 @@
 import type { DynamicValueBoolean } from './DynamicValueBoolean';
 
 export type DataPoolConfiguration = {
-    forWrite?: DynamicValueBoolean;
-    _class: string;
+  forWrite?: DynamicValueBoolean;
+  _class: string;
 };
-

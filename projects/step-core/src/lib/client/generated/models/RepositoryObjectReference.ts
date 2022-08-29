@@ -3,7 +3,6 @@
 /* eslint-disable */
 
 export type RepositoryObjectReference = {
-    repositoryID?: string;
-    repositoryParameters?: Record<string, string>;
+  repositoryID?: string;
+  repositoryParameters?: Record<string, string>;
 };
-

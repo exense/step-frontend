@@ -5,7 +5,6 @@
 import type { Resource } from './Resource';
 
 export type ResourceUploadResponse = {
-    resource?: Resource;
-    similarResources?: Array<Resource>;
+  resource?: Resource;
+  similarResources?: Array<Resource>;
 };
-

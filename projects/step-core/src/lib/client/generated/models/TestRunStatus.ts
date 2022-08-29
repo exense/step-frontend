@@ -3,8 +3,7 @@
 /* eslint-disable */
 
 export type TestRunStatus = {
-    id?: string;
-    testplanName?: string;
-    status?: 'TECHNICAL_ERROR' | 'FAILED' | 'PASSED' | 'INTERRUPTED' | 'SKIPPED' | 'NORUN' | 'RUNNING';
+  id?: string;
+  testplanName?: string;
+  status?: 'TECHNICAL_ERROR' | 'FAILED' | 'PASSED' | 'INTERRUPTED' | 'SKIPPED' | 'NORUN' | 'RUNNING';
 };
-

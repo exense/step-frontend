@@ -3,6 +3,5 @@
 /* eslint-disable */
 
 export type PlanCompilationError = {
-    message?: string;
+  message?: string;
 };
-

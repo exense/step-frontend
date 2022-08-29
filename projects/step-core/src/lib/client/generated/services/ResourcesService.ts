@@ -10,155 +10,141 @@ import type { ResourceUploadResponse } from '../models/ResourceUploadResponse';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable({providedIn:'root'})
+@Injectable({ providedIn: 'root' })
 export class ResourcesService {
+  constructor(public readonly httpRequest: BaseHttpRequest) {}
 
-    constructor(public readonly httpRequest: BaseHttpRequest) {}
-
-    /**
-     * @param type
-     * @param duplicateCheck
-     * @param directory
-     * @param formData
-     * @returns ResourceUploadResponse default response
-     * @throws ApiError
-     */
-    public createResource(
-        type?: string,
-        duplicateCheck?: boolean,
-        directory?: boolean,
-        formData?: {
-            file?: FormDataContentDisposition;
-        },
-    ): Observable<ResourceUploadResponse> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/resources/content',
-            query: {
-                'type': type,
-                'duplicateCheck': duplicateCheck,
-                'directory': directory,
-            },
-            formData: formData,
-            mediaType: 'multipart/form-data',
-        });
+  /**
+   * @param type
+   * @param duplicateCheck
+   * @param directory
+   * @param formData
+   * @returns ResourceUploadResponse default response
+   * @throws ApiError
+   */
+  public createResource(
+    type?: string,
+    duplicateCheck?: boolean,
+    directory?: boolean,
+    formData?: {
+      file?: FormDataContentDisposition;
     }
+  ): Observable<ResourceUploadResponse> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/resources/content',
+      query: {
+        type: type,
+        duplicateCheck: duplicateCheck,
+        directory: directory,
+      },
+      formData: formData,
+      mediaType: 'multipart/form-data',
+    });
+  }
 
-    /**
-     * @param id
-     * @returns Resource default response
-     * @throws ApiError
-     */
-    public getResource(
-        id: string,
-    ): Observable<Resource> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/resources/{id}',
-            path: {
-                'id': id,
-            },
-        });
+  /**
+   * @param id
+   * @returns Resource default response
+   * @throws ApiError
+   */
+  public getResource(id: string): Observable<Resource> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/resources/{id}',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
+   * @param id
+   * @returns any default response
+   * @throws ApiError
+   */
+  public deleteResource(id: string): Observable<any> {
+    return this.httpRequest.request({
+      method: 'DELETE',
+      url: '/resources/{id}',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
+   * @param id
+   * @param inline
+   * @returns any default response
+   * @throws ApiError
+   */
+  public getResourceContent(id: string, inline?: boolean): Observable<any> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/resources/{id}/content',
+      path: {
+        id: id,
+      },
+      query: {
+        inline: inline,
+      },
+    });
+  }
+
+  /**
+   * @param id
+   * @param formData
+   * @returns ResourceUploadResponse default response
+   * @throws ApiError
+   */
+  public saveResourceContent(
+    id: string,
+    formData?: {
+      file?: FormDataContentDisposition;
     }
+  ): Observable<ResourceUploadResponse> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/resources/{id}/content',
+      path: {
+        id: id,
+      },
+      formData: formData,
+      mediaType: 'multipart/form-data',
+    });
+  }
 
-    /**
-     * @param id
-     * @returns any default response
-     * @throws ApiError
-     */
-    public deleteResource(
-        id: string,
-    ): Observable<any> {
-        return this.httpRequest.request({
-            method: 'DELETE',
-            url: '/resources/{id}',
-            path: {
-                'id': id,
-            },
-        });
-    }
+  /**
+   * @param id
+   * @param inline
+   * @returns any default response
+   * @throws ApiError
+   */
+  public getResourceRevisionContent(id: string, inline?: boolean): Observable<any> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/resources/revision/{id}/content',
+      path: {
+        id: id,
+      },
+      query: {
+        inline: inline,
+      },
+    });
+  }
 
-    /**
-     * @param id
-     * @param inline
-     * @returns any default response
-     * @throws ApiError
-     */
-    public getResourceContent(
-        id: string,
-        inline?: boolean,
-    ): Observable<any> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/resources/{id}/content',
-            path: {
-                'id': id,
-            },
-            query: {
-                'inline': inline,
-            },
-        });
-    }
-
-    /**
-     * @param id
-     * @param formData
-     * @returns ResourceUploadResponse default response
-     * @throws ApiError
-     */
-    public saveResourceContent(
-        id: string,
-        formData?: {
-            file?: FormDataContentDisposition;
-        },
-    ): Observable<ResourceUploadResponse> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/resources/{id}/content',
-            path: {
-                'id': id,
-            },
-            formData: formData,
-            mediaType: 'multipart/form-data',
-        });
-    }
-
-    /**
-     * @param id
-     * @param inline
-     * @returns any default response
-     * @throws ApiError
-     */
-    public getResourceRevisionContent(
-        id: string,
-        inline?: boolean,
-    ): Observable<any> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/resources/revision/{id}/content',
-            path: {
-                'id': id,
-            },
-            query: {
-                'inline': inline,
-            },
-        });
-    }
-
-    /**
-     * @param requestBody
-     * @returns Resource default response
-     * @throws ApiError
-     */
-    public saveResource(
-        requestBody?: Resource,
-    ): Observable<Resource> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/resources',
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
-
+  /**
+   * @param requestBody
+   * @returns Resource default response
+   * @throws ApiError
+   */
+  public saveResource(requestBody?: Resource): Observable<Resource> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/resources',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
 }
