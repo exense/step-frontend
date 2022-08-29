@@ -4,3 +4,14 @@
   max-height: 100%;
   padding-top: 24px;
 }
+
+.u-axis {
+  //width: 100px !important;
+}
+
+.ranger {
+  .u-grip-l,
+  .u-grip-r {
+    z-index: 100 !important;
+  }
+}

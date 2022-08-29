@@ -4,32 +4,47 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  OnChanges,
   OnInit,
   Output,
+  SimpleChanges,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { TSRangerSettings } from './ts-ranger-settings';
-import { UplotSyncService } from '../chart/uplot-sync-service';
 import { TSTimeRange } from '../chart/model/ts-time-range';
-import { UPlotUtils } from '../uplot/uPlot.utils';
-import { timeout } from 'rxjs';
 
-declare const uPlot: any;
+//@ts-ignore
+import uPlot = require('uplot');
 
+/**
+ * There are 3 ways of interaction with the ranger:
+ * 1. Dragging the handle bars
+ * 2. Dbl clicking (zoom reset)
+ * 3. zooming from a linked chart
+ * 4. resetting zoom from a linked chart -> a manual reset function has to be called here
+ */
 @Component({
   selector: 'step-ts-ranger',
   templateUrl: './ts-ranger.component.html',
   styleUrls: ['./ts-ranger.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class TSRangerComponent implements OnInit, AfterViewInit {
+export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
   @ViewChild('chart') private chartElement!: ElementRef;
 
-  @Input('settings') settings!: TSRangerSettings;
-  @Input('syncKey') syncKey: string | undefined;
+  @Input() settings!: TSRangerSettings;
+  @Input() syncKey!: string;
+  @Input() selection?: TSTimeRange;
 
+  /**
+   * This should emit the following events only:
+   * 1. when a synced chart or this chart is zooming
+   * 2. when the grips are moved
+   */
   @Output('onRangeChange') onRangeChange = new EventEmitter<TSTimeRange>();
+
+  @Output('onZoomReset') onZoomReset = new EventEmitter<TSTimeRange>();
 
   uplot!: any;
   previousRange: TSTimeRange | undefined;
@@ -37,34 +52,93 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
   start!: number;
   end!: number;
 
+  constructor() {}
+
   ngOnInit(): void {
     if (this.syncKey) {
       uPlot.sync(this.syncKey);
     }
-    this.start = this.settings.xValues[0];
-    this.end = this.settings.xValues[this.settings.xValues.length - 1];
+
+    this.init(this.settings);
+  }
+
+  init(settings: TSRangerSettings) {
+    this.start = settings.xValues[0];
+    this.end = settings.xValues[this.settings.xValues.length - 1];
   }
 
   ngAfterViewInit(): void {
     this.createRanger();
   }
 
-  resetSelect() {
+  ngOnChanges(changes: SimpleChanges): void {
+    let settings = changes['settings'];
+    if (settings && settings.previousValue) {
+      // it's a real change
+      this.init(settings.currentValue);
+      let end = this.settings.xValues[this.settings.xValues.length - 1];
+      let start = this.settings.xValues[0];
+      console.log(new Date(start), new Date(end));
+      this.createRanger();
+    }
+  }
+
+  selectRange(fromTimestamp?: number, toTimestamp?: number) {
+    let select = this.transformRangeToSelect({ from: fromTimestamp, to: toTimestamp });
+
+    this.uplot.setSelect(select, false);
+    this.emitSelectionToLinkedCharts();
+
+    // if (emitChangeEvent) {
+    //   this.onRangeChange.emit({ start: fromTimestamp, end: toTimestamp });
+    // }
+  }
+
+  transformRangeToSelect(range?: TSTimeRange): uPlot.Select | undefined {
+    if (!range) {
+      return undefined;
+    }
+    let fromTimestamp = range.from;
+    let toTimestamp = range.to;
+    let left, width;
+    let height = this.uplot.bbox.height / devicePixelRatio;
+    if (!fromTimestamp) {
+      left = Math.round(this.uplot.valToPos(this.start, 'x'));
+    } else {
+      // console.log('LeftValToPos=', this.uplot.valToPos(fromTimestamp, 'x'), fromTimestamp);
+      left = Math.max(this.uplot.valToPos(fromTimestamp, 'x'), 0);
+    }
+    if (!toTimestamp) {
+      width = Math.round(this.uplot.valToPos(this.end, 'x')) - left;
+    } else {
+      width = Math.round(this.uplot.valToPos(toTimestamp, 'x')) - left;
+    }
+    return { left, width, height, top: 0 };
+  }
+
+  resetSelect(emitResetEvent = false) {
     // this is a 'hack'. when dblclick is triggered in another synced chart, it will remove the select for the ranger. this function is executed before that.
     // we have to wait the minimum amount of time so that sync event happens, and the selection is destroyed
     setTimeout(() => {
-      let left = Math.round(this.uplot.valToPos(this.start, 'x'));
+      let left = 0;
       let width = Math.round(this.uplot.valToPos(this.end, 'x')) - left;
       let height = this.uplot.bbox.height / devicePixelRatio;
-      this.uplot.setSelect({ left, width, height }, false);
+      this.uplot.setSelect({ left, width, height }, false); // this is just to change the highlight
       let xData = this.uplot.data[0];
       let start = xData[0];
       let end = xData[xData.length - 1];
-      this.onRangeChange.emit({ start, end });
+      this.emitSelectionToLinkedCharts();
+      if (emitResetEvent) {
+        this.onZoomReset.emit({ from: start, to: end });
+      }
     }, 50);
   }
 
-  createRanger() {
+  redrawChart() {
+    this.createRanger();
+  }
+
+  private createRanger() {
     // @ts-ignore
     let x0;
     let lft0: number;
@@ -117,21 +191,9 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
       const _onUp = (e) => {
         off('mouseup', document, _onUp);
         off('mousemove', document, _onMove);
-        let linkedCharts = uPlot.sync(this.syncKey).plots;
-        let minMax: any = {
-          min: this.uplot.posToVal(this.uplot.select.left, 'x'),
-          max: this.uplot.posToVal(this.uplot.select.left + this.uplot.select.width, 'x'),
-        };
+
+        this.emitSelectionToLinkedCharts();
         this.emitRangeEventIfChanged();
-        linkedCharts.forEach((chart: any) => {
-          if (chart === this.uplot) {
-            // TODO find a better way to avoid this
-            return;
-          }
-          // minMax.min = this.uplot.min
-          // minMax.max = this.uplot.posToVal(newLft + newWid, 'x');
-          chart.setScale('x', minMax);
-        });
 
         // viaGrip = false;
       };
@@ -141,7 +203,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
     };
 
     // @ts-ignore
-    let select = (newLft, newWid) => {
+    let setSelect = (newLft, newWid) => {
       lftWid.left = newLft;
       lftWid.width = newWid;
       this.uplot.setSelect(lftWid, false);
@@ -160,15 +222,30 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
       let maxRgt = this.uplot.bbox.width / devicePixelRatio;
 
       if (newLft >= 0 && newRgt <= maxRgt) {
-        select(newLft, newWid);
-        zoom(newLft, newWid);
+        setSelect(newLft, newWid);
+        // zoom(newLft, newWid);
       }
     };
-
-    let rangerOpts = {
+    let select;
+    if (this.settings.selection) {
+      select = this.transformRangeToSelect(this.settings.selection);
+    }
+    // console.log('CREATING WITH SELECT: ', this.settings.selection);
+    let rangerOpts: uPlot.Options = {
       width: 800,
       height: 100,
       ms: 1, // if not specified it's going be in seconds
+      // select: {left: 0, width: 300, height: 33},
+      select: select,
+      axes: [
+        {},
+        {
+          show: false,
+          scale: 'y',
+
+          grid: { show: false },
+        },
+      ],
       cursor: {
         y: false,
         points: {
@@ -190,7 +267,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
               handler(e);
               if (hasSelection) {
                 // has selection
-                this.resetSelect();
+                this.resetSelect(true);
               }
             };
           },
@@ -199,10 +276,15 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
       legend: {
         show: false,
       },
-      scales: {},
+      scales: {
+        x: {
+          time: true,
+        },
+      },
       series: [
         {},
         {
+          scale: 'y',
           points: { show: false },
           stroke: '#9fd6ff',
           fill: () => {
@@ -218,11 +300,14 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
         ready: [
           // @ts-ignore
           (uRanger) => {
-            let left = Math.round(uRanger.valToPos(this.start, 'x'));
+            let left = 0;
             let width = Math.round(uRanger.valToPos(this.end, 'x')) - left;
             let height = uRanger.bbox.height / devicePixelRatio;
-            uRanger.setSelect({ left, width, height }, false);
-            this.previousRange = { start: this.start, end: this.end };
+            if (!this.settings.selection) {
+              // we deal with full selection
+              uRanger.setSelect({ left, width, height, top: 0 }, false);
+            }
+            this.previousRange = { from: this.start, to: this.end };
             const sel = uRanger.root.querySelector('.u-select');
 
             //@ts-ignore
@@ -250,7 +335,6 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
             // this is triggered when the synced charts are zooming
             // this is triggered many times when clicking on the ranger.
             this.emitRangeEventIfChanged();
-
             // zoom(uRanger.select.left, uRanger.select.width);
           },
         ],
@@ -264,6 +348,9 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
         ],
       },
     };
+    if (this.uplot) {
+      this.uplot.destroy();
+    }
     this.uplot = new uPlot(
       rangerOpts,
       [this.settings.xValues, ...this.settings.series.map((s) => s.data)],
@@ -271,12 +358,32 @@ export class TSRangerComponent implements OnInit, AfterViewInit {
     );
   }
 
+  emitSelectionToLinkedCharts() {
+    let linkedCharts = uPlot.sync(this.syncKey).plots;
+    let minMax: any = {
+      min: this.uplot.posToVal(this.uplot.select.left, 'x'),
+      max: this.uplot.posToVal(this.uplot.select.left + this.uplot.select.width, 'x'),
+    };
+    // this.uplot.setSelect(minMax);
+
+    linkedCharts.forEach((chart: any) => {
+      if (chart === this.uplot) {
+        // TODO find a better way to avoid this
+        return;
+      }
+      // minMax.min = this.uplot.min
+      // minMax.max = this.uplot.posToVal(newLft + newWid, 'x');
+      chart.setScale('x', minMax);
+    });
+  }
+
   emitRangeEventIfChanged() {
     let u = this.uplot;
-    let min = u.posToVal(u.select.left, 'x');
-    let max = u.posToVal(u.select.left + u.select.width, 'x');
-    if (min != this.previousRange?.start || max !== this.previousRange?.end) {
-      let currentRange = { start: min, end: max };
+    // we could use just postToVal, but it's better to have an exact value from the X data
+    let min = u.data[0][u.valToIdx(u.posToVal(u.select.left, 'x'))];
+    let max = u.data[0][u.valToIdx(u.posToVal(u.select.left + u.select.width, 'x'))];
+    if (min != this.previousRange?.from || max !== this.previousRange?.to) {
+      let currentRange = { from: min, to: max };
       this.previousRange = currentRange;
       this.onRangeChange.next(currentRange);
     }
