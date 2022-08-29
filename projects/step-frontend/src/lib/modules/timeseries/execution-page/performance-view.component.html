@@ -1,0 +1,129 @@
+<div class="page-container">
+  <div class="view-content">
+    <!--    <step-execution-tabs></step-execution-tabs>-->
+    <step-execution-time-selection
+      (onRangeChange)="handleTableRangeChange($event)"
+      (onRangeReset)="handleRangeReset($event)"
+      #timeSelection
+      *ngIf="execution"
+      [execution]="execution"
+    >
+    </step-execution-time-selection>
+    <div *ngIf="executionInProgress">
+      <button mat-raised-button [matMenuTriggerFor]="refreshMenu">Refresh ({{ selectedRefreshInterval.label }})</button>
+      <mat-menu #refreshMenu="matMenu">
+        <button mat-menu-item *ngFor="let interval of refreshIntervals" (click)="changeRefreshInterval(interval)">
+          {{ interval.label }}
+        </button>
+      </mat-menu>
+    </div>
+    <div class="w-100 dashboard-container">
+      <div class="chart-container">
+        <step-chart-skeleton *ngIf="!summaryChartSettings"></step-chart-skeleton>
+        <step-timeseries-chart
+          #summaryChart
+          *ngIf="summaryChartSettings"
+          [settings]="summaryChartSettings"
+          [syncKey]="executionId"
+          [selection]="timeSelection?.absoluteSelection"
+          (onZoomReset)="onZoomReset()"
+        >
+        </step-timeseries-chart>
+      </div>
+
+      <div class="chart-container">
+        <step-chart-skeleton *ngIf="!byStatusSettings"></step-chart-skeleton>
+        <step-timeseries-chart
+          #byStatusChart
+          *ngIf="byStatusSettings"
+          [settings]="byStatusSettings"
+          [selection]="timeSelection?.absoluteSelection"
+          [syncKey]="executionId"
+          (onZoomReset)="onZoomReset()"
+        >
+        </step-timeseries-chart>
+      </div>
+
+      <div class="chart-container">
+        <step-chart-skeleton *ngIf="!responseTypeByKeywordsSettings"></step-chart-skeleton>
+        <step-timeseries-chart
+          #chart5
+          *ngIf="responseTypeByKeywordsSettings"
+          [settings]="responseTypeByKeywordsSettings"
+          [selection]="timeSelection?.absoluteSelection"
+          [syncKey]="executionId"
+          (onZoomReset)="onZoomReset()"
+        >
+        </step-timeseries-chart>
+        <div class="chart-footer-actions">
+          <button mat-button [matMenuTriggerFor]="menu">Metric ({{ selectedMetric.label }})</button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item *ngFor="let metric of responseTimeMetrics" (click)="switchChartMetric(metric)">
+              {{ metric.label }}
+            </button>
+          </mat-menu>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <step-chart-skeleton *ngIf="!throughputChartSettings"></step-chart-skeleton>
+        <step-timeseries-chart
+          *ngIf="throughputChartSettings"
+          #chart4
+          [settings]="throughputChartSettings"
+          [selection]="timeSelection?.absoluteSelection"
+          [syncKey]="executionId"
+          (onZoomReset)="onZoomReset()"
+        >
+        </step-timeseries-chart>
+      </div>
+
+      <div class="chart-container">
+        <step-chart-skeleton *ngIf="!threadGroupSettings"></step-chart-skeleton>
+        <step-timeseries-chart
+          *ngIf="threadGroupSettings"
+          #threadGroupChart
+          [settings]="threadGroupSettings"
+          [selection]="timeSelection?.absoluteSelection"
+          [syncKey]="executionId"
+          (onZoomReset)="onZoomReset()"
+        >
+        </step-timeseries-chart>
+      </div>
+
+      <div class="chart-container">
+        <step-timeseries-table #tableChart *ngIf="executionId" [executionId]="executionId"></step-timeseries-table>
+      </div>
+    </div>
+  </div>
+  <div class="side-panel">
+    <div class="chart-container" *ngIf="throughputChartSettings" style="overflow: auto">
+      <div>
+        <input
+          type="checkbox"
+          class="checkbox"
+          [(ngModel)]="allSeriesChecked"
+          (change)="onAllSeriesCheckboxClick($event)"
+          style="display: inline"
+        />
+        <input [(ngModel)]="keywordSearchValue" placeholder="Search" style="width: 110px; margin-bottom: 12px" />
+      </div>
+
+      <div *ngFor="let item of keywords | keyvalue: valueAscOrder">
+        <ng-container *ngIf="!keywordSearchValue || item.key.toLowerCase().indexOf(keywordSearchValue) >= 0">
+          <div class="color-cell">
+            <input
+              type="checkbox"
+              [ngModel]="item.value.isSelected"
+              class="checkbox"
+              (change)="onKeywordToggle(item.key, $event)"
+            />
+            <span class="color-square" [style.background-color]="item.value.color"></span>
+            <span>{{ item.key }}</span>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+    <step-execution-filters *ngIf="executionId" [executionId]="executionId"></step-execution-filters>
+  </div>
+</div>
