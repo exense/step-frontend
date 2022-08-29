@@ -3,38 +3,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
 
-  <input id="collapsable-sidebar-toggle-checkbox" type="checkbox">
-  <step-tenant-selection-downgraded ng-if="isInitialized && (authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())"></step-tenant-selection-downgraded>
-  <div step-sidebar class="sidebar"
-       ng-if="isInitialized && (authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())">
-  </div>
-
-
-  <div id="main">
-    <header class="header-parent blue-header"
-            ng-if-start="isInitialized && (authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())">
-      <div id="header-spacer-part"></div>
-      <ul class="nav navbar-nav navbar-right navbar-top-user-logout">
-        <li ng-repeat="entry in viewRegistry.getDashlets('/menu/navbar/right')">
-          <div ng-include="entry.template"></div>
-        </li>
-        <li>
-          <a id="sessionDropdown" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> {{context.userID}}
-            [{{context.role}}]</a>
-          <ul class="dropdown-menu" aria-labelledby="sessionDropdown">
-            <li><a ng-click="setView('myaccount')"><span class="glyphicon glyphicon-cog"></span> My account</a></li>
-            <li ng-if="authService.getConf().authentication && authService.isAuthenticated()"><a
-              ng-click="authService.logout()"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
-            <li ng-if="authService.getConf().authentication && !authService.isAuthenticated()"><a
-              ng-click="authService.goToLoginPage()">Sign in</a></li>
-          </ul>
-        </li>
-      </ul>
-      <div class="header-white-part">
-      </div>
-    </header>
-    <div ng-if-end ng-include="'partials/main.html'" class="st-flex-row"></div>
-  </div>
+  <section ng-if="isInitialized && (authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())">
+    <step-tenant-selection-downgraded></step-tenant-selection-downgraded>
+    <step-sidebar></step-sidebar>
+    <div id="main">
+      <header class="header-parent blue-header">
+        <div id="header-spacer-part"></div>
+        <ul class="nav navbar-nav navbar-right navbar-top-user-logout">
+          <li ng-repeat="entry in viewRegistry.getDashlets('/menu/navbar/right')">
+            <div ng-include="entry.template"></div>
+          </li>
+          <li>
+            <a id="sessionDropdown" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> {{context.userID}}
+              [{{context.role}}]</a>
+            <ul class="dropdown-menu" aria-labelledby="sessionDropdown">
+              <li><a ng-click="setView('myaccount')"><span class="glyphicon glyphicon-cog"></span> My account</a></li>
+              <li ng-if="authService.getConf().authentication && authService.isAuthenticated()"><a
+                ng-click="authService.logout()"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
+              <li ng-if="authService.getConf().authentication && !authService.isAuthenticated()"><a
+                ng-click="authService.goToLoginPage()">Sign in</a></li>
+            </ul>
+          </li>
+        </ul>
+        <div class="header-white-part">
+        </div>
+      </header>
+      <div ng-include="'partials/main.html'" class="st-flex-row"></div>
+    </div>
+  </section>
 
   <div
     ng-if="isInitialized && !(authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth())"

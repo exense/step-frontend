@@ -103,7 +103,9 @@ export class ViewRegistryService {
   }
 
   getCustomMainMenuEntries() {
-    let filteredEntries = this.customMenuEntries.filter((entry) => entry?.parentMenu && entry.isEnabledFct());
+    let filteredEntries = this.customMenuEntries.filter(
+      (entry) => entry?.parentMenu && (!!entry.isEnabledFct ? entry.isEnabledFct() : true)
+    );
     return filteredEntries.sort((a, b) => a.label.localeCompare(b.label));
   }
 
@@ -111,7 +113,8 @@ export class ViewRegistryService {
   // FIXME: we can find a nicer solution than using this function
   getMainMenuNameOfSubmenu(subMenuName: string) {
     let subMenu = this.customMenuEntries.filter(
-      (entry) => entry?.parentMenu && entry.isEnabledFct() && entry.viewId === subMenuName
+      (entry) =>
+        entry?.parentMenu && (!!entry.isEnabledFct ? entry.isEnabledFct() : true) && entry.viewId === subMenuName
     );
     if (subMenu.length === 1) {
       return subMenu[0].parentMenu;

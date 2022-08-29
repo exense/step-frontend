@@ -12,7 +12,8 @@ export class SidebarComponent implements AfterViewInit {
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<any>;
   @Input() logo: string = 'images/logotopleft.png';
 
-  public mainMenuEntriesAmount: number;
+  mainMenuEntriesAmount: number;
+  sideBarOpen: boolean = true;
 
   constructor(
     public _authService: AuthService,
@@ -111,20 +112,21 @@ export class SidebarComponent implements AfterViewInit {
   }
 
   /**
-   * this is a workaround to downgrade the component to AngularJS as an attribute directive rather than an element directive
-   * @param componentFactory
+   * todo: communicate open/close state as output to parent component instead of selecting global dom element
    */
-  static allowAttribute(componentFactory: any) {
-    const wrapper = function ($compile: any, $injector: any, $parse: any) {
-      const component = componentFactory($compile, $injector, $parse);
-      component.restrict = 'A';
-      return component;
-    };
-    wrapper.$inject = ['$compile', '$injector', '$parse'];
-    return wrapper;
+  toggleOpenClose() {
+    if (this.sideBarOpen) {
+      document.querySelector('#main')!.classList.add('main-when-sidebar-closed');
+      this.sideBarOpen = false;
+      console.log('closed');
+    } else {
+      document.querySelector('#main')!.classList.remove('main-when-sidebar-closed');
+      this.sideBarOpen = true;
+      console.log('open');
+    }
   }
 }
 
 getAngularJSGlobal()
   .module(AJS_MODULE)
-  .directive('stepSidebar', SidebarComponent.allowAttribute(downgradeComponent({ component: SidebarComponent })));
+  .directive('stepSidebar', downgradeComponent({ component: SidebarComponent }));

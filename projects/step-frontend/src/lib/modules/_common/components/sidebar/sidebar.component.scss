@@ -1,3 +1,36 @@
+.sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.sidebar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.sidebar-logo {
+  max-width: 100px;
+  margin-left: -12px;
+  transform: scale(0.8);
+}
+
+.sidebar a {
+  color: white;
+}
+
+.sidebar a:link {
+  text-decoration: none;
+}
+.sidebar a:visited {
+  text-decoration: none;
+}
+.sidebar a:hover {
+  text-decoration: none;
+}
+.sidebar a:active {
+  text-decoration: none;
+}
+
 #sidebar-collapsed-settings-icon {
   visibility: hidden;
 }
@@ -191,4 +224,70 @@ div[lastSidebarMainMenuLabel='true'] > input:checked ~ div.content {
 
 span.sidebar-version {
   padding-left: 25px;
+}
+
+/* SIDEBAR */
+#collapsable-sidebar-toggle-checkbox {
+  display: none;
+}
+#collapsable-sidebar-toggle-checkbox:checked ~ .sidebar {
+  width: var(--sidebar-width-closed);
+}
+#collapsable-sidebar-toggle-checkbox:not(:checked) ~ .sidebar {
+  width: var(--sidebar-width-open);
+}
+
+#collapsable-sidebar-toggle-checkbox:checked ~ .sidebar span:not(.visible-when-collapsed),
+#collapsable-sidebar-toggle-checkbox:checked ~ .sidebar label::after {
+  display: none;
+}
+
+#collapsable-sidebar-toggle-checkbox:checked ~ .sidebar span.only-visible-when-collapsed {
+  display: block;
+  visibility: visible;
+  font-size: large;
+}
+
+#collapsable-sidebar-toggle-checkbox:checked ~ step-tenant-selection-downgraded {
+  visibility: hidden;
+}
+
+.only-visible-when-collapsed {
+  display: none;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #02629a;
+  overflow-x: hidden;
+  transition: 0.2s;
+  color: white;
+}
+
+.sidebar > div {
+  padding: 0 var(--sidebar-elements-text-padding) 0 var(--sidebar-elements-text-padding);
+
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-aligned-text {
+  font-size: medium;
+  position: absolute;
+  left: var(--sidebar-aligned-text-margin-left);
+}
+
+.sidebar-aligned-subtext {
+  font-size: small;
+  position: absolute;
+  left: calc(var(--sidebar-aligned-text-margin-left) + var(--sidebar-elements-text-padding));
 }
