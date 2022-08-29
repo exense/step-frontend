@@ -2,10 +2,13 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type TaskStatus = {
+import type { Resource } from './Resource';
+
+export type AsyncTaskStatusResource = {
   id?: string;
   ready?: boolean;
   progress?: number;
   warnings?: Array<string>;
-  result?: any;
+  error?: string;
+  result?: Resource;
 };

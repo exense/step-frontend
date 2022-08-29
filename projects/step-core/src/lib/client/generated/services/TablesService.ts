@@ -4,7 +4,7 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
-import type { ExportStatus } from '../models/ExportStatus';
+import type { AsyncTaskStatusResource } from '../models/AsyncTaskStatusResource';
 import type { TableExportRequest } from '../models/TableExportRequest';
 import type { TableRequest } from '../models/TableRequest';
 import type { TableResponseObject } from '../models/TableResponseObject';
@@ -19,10 +19,10 @@ export class TablesService {
   /**
    * @param tableName
    * @param requestBody
-   * @returns ExportStatus default response
+   * @returns AsyncTaskStatusResource default response
    * @throws ApiError
    */
-  public createExport(tableName: string, requestBody?: TableExportRequest): Observable<ExportStatus> {
+  public createExport(tableName: string, requestBody?: TableExportRequest): Observable<AsyncTaskStatusResource> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/table/{tableName}/export',

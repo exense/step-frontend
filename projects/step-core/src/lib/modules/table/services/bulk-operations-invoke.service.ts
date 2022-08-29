@@ -1,12 +1,12 @@
 import { Observable, of } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import { BulkOperation } from '../shared/bulk-operation.enum';
 import { TableRequestData } from '../../../client/table/models/table-request-data';
 import { BulkSelectionType } from '../../entities-selection/shared/bulk-selection-type.enum';
-import { BulkOperationParameters, ExportsService, ExportStatus } from '../../../client/generated';
+import { AsyncTasksService, AsyncTaskStatusVoid, BulkOperationParameters } from '../../../client/generated';
 import { TableFilter } from './table-filter';
-import { pollExport } from '../../../client/augmented/rxjs-operators/poll-export';
+import { pollAsyncTask } from '../../../client/augmented/rxjs-operators/poll-async-task';
 import { a1Promise2Observable, DialogsService } from '../../../shared';
-import { catchError, switchMap } from 'rxjs/operators';
 
 export interface BulkOperationConfig<ID> {
   operationType: BulkOperation;
@@ -17,11 +17,11 @@ export interface BulkOperationConfig<ID> {
 }
 
 export abstract class BulkOperationsInvokeService<ID> {
-  protected constructor(protected _exportService: ExportsService, protected _dialogs: DialogsService) {}
+  protected constructor(protected _asyncTaskService: AsyncTasksService, protected _dialogs: DialogsService) {}
 
-  protected abstract invokeDelete?(requestBody?: BulkOperationParameters): Observable<ExportStatus>;
-  protected abstract invokeDuplicate?(requestBody?: BulkOperationParameters): Observable<ExportStatus>;
-  protected abstract invokeExport?(requestBody?: BulkOperationParameters): Observable<ExportStatus>;
+  protected abstract invokeDelete?(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid>;
+  protected abstract invokeDuplicate?(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid>;
+  protected abstract invokeExport?(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid>;
 
   protected transformConfig(config: BulkOperationConfig<ID>): BulkOperationParameters {
     // todo: simulation logic isn't supported on BE, don't forget to update the FE, when simulation will appear
@@ -64,8 +64,8 @@ export abstract class BulkOperationsInvokeService<ID> {
     return { targetType, ids, filter, simulate };
   }
 
-  invoke(config: BulkOperationConfig<ID>): Observable<ExportStatus | undefined> {
-    let operation: ((params: BulkOperationParameters) => Observable<ExportStatus>) | undefined;
+  invoke(config: BulkOperationConfig<ID>): Observable<AsyncTaskStatusVoid | undefined> {
+    let operation: ((params: BulkOperationParameters) => Observable<AsyncTaskStatusVoid>) | undefined;
     switch (config.operationType) {
       case BulkOperation.delete:
         operation = !!this.invokeDelete ? (params) => this.invokeDelete!(params) : undefined;
@@ -89,7 +89,7 @@ export abstract class BulkOperationsInvokeService<ID> {
 
     return a1Promise2Observable(this._dialogs.showWarning(confirmMessage)).pipe(
       switchMap(() => operation!(this.transformConfig(config))),
-      pollExport(this._exportService),
+      pollAsyncTask(this._asyncTaskService),
       catchError(() => of(undefined))
     );
   }

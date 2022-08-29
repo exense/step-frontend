@@ -9,7 +9,7 @@ import { ResourceDialogsService } from '../services/resource-dialogs.service';
   styleUrls: ['./resources-list.component.scss'],
 })
 export class ResourcesListComponent {
-  readonly dataSource = this._augmentedResourcesService.getResourcesTableDataSource();
+  readonly dataSource = this._augmentedResourcesService.dataSource;
 
   constructor(
     private _resourceDialogs: ResourceDialogsService,

@@ -8,7 +8,6 @@ import type { ArtefactInfo } from '../models/ArtefactInfo';
 import type { Plan } from '../models/Plan';
 import type { ReportNode } from '../models/ReportNode';
 import type { RepositoryObjectReference } from '../models/RepositoryObjectReference';
-import type { TaskStatus } from '../models/TaskStatus';
 import type { TestSetStatusOverview } from '../models/TestSetStatusOverview';
 import type { Version } from '../models/Version';
 
@@ -29,21 +28,6 @@ export class ControllerService {
       url: '/controller/repository/artefact/info',
       body: requestBody,
       mediaType: 'application/json',
-    });
-  }
-
-  /**
-   * @param id
-   * @returns TaskStatus default response
-   * @throws ApiError
-   */
-  public getAsyncTaskStatus(id: string): Observable<TaskStatus> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/controller/async-task/{id}',
-      path: {
-        id: id,
-      },
     });
   }
 

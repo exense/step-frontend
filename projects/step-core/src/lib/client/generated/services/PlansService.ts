@@ -5,8 +5,8 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import type { AbstractArtefact } from '../models/AbstractArtefact';
+import type { AsyncTaskStatusVoid } from '../models/AsyncTaskStatusVoid';
 import type { BulkOperationParameters } from '../models/BulkOperationParameters';
-import type { ExportStatus } from '../models/ExportStatus';
 import type { Plan } from '../models/Plan';
 import type { PlanCompilationResult } from '../models/PlanCompilationResult';
 
@@ -65,10 +65,10 @@ export class PlansService {
   /**
    * Bulk clone plans according to the provided parameters
    * @param requestBody
-   * @returns ExportStatus default response
+   * @returns AsyncTaskStatusVoid default response
    * @throws ApiError
    */
-  public clonePlans(requestBody?: BulkOperationParameters): Observable<ExportStatus> {
+  public clonePlans(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/plans/bulk/clone',
@@ -143,10 +143,10 @@ export class PlansService {
   /**
    * Bulk delete plans according to the provided parameters
    * @param requestBody
-   * @returns ExportStatus default response
+   * @returns AsyncTaskStatusVoid default response
    * @throws ApiError
    */
-  public deletePlans(requestBody?: BulkOperationParameters): Observable<ExportStatus> {
+  public deletePlans(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/plans/bulk/delete',

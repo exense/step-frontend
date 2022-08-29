@@ -1,27 +1,50 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { TableRequestData } from '../models/table-request-data';
 import { TableResponse } from '../models/table-response';
-import { Observable } from 'rxjs';
-import { ExportService } from '../../../services/export.service';
-import { ExportStatus, TablesService } from '../../generated';
+import { map, Observable } from 'rxjs';
+import { AsyncTasksService, AsyncTaskStatusResource, AsyncTaskStatusVoid, TablesService } from '../../generated';
+import { pollAsyncTask } from '../../augmented/rxjs-operators/poll-async-task';
+import { DOCUMENT } from '@angular/common';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TableApiWrapperService {
-  constructor(private _tables: TablesService, private _exportService: ExportService) {}
+  constructor(
+    private _tables: TablesService,
+    private _asyncTaskService: AsyncTasksService,
+    @Inject(DOCUMENT) private _document: Document
+  ) {}
 
   requestTable<T>(tableId: string, tableRequest: TableRequestData): Observable<TableResponse<T>> {
     return this._tables.request(tableId, tableRequest) as Observable<TableResponse<T>>;
   }
 
-  exportTable(tableId: string, tableRequest: TableRequestData, fields: string[]): Observable<ExportStatus> {
+  exportTable(tableId: string, tableRequest: TableRequestData, fields: string[]): Observable<AsyncTaskStatusVoid> {
     return this._tables.createExport(tableId, { tableRequest, fields });
   }
 
   exportAsCSV(tableId: string, fields: string[], tableRequest: TableRequestData = {}): void {
-    this.exportTable(tableId, tableRequest, fields).subscribe((exportStatus) => {
-      this._exportService.poll(exportStatus.id!);
-    });
+    this.exportTable(tableId, tableRequest, fields)
+      .pipe(
+        pollAsyncTask(this._asyncTaskService),
+        map((status: AsyncTaskStatusResource) => {
+          if (!status?.result?.id) {
+            throw 'Invalid attachment id';
+          }
+          return status.result.id;
+        })
+      )
+      .subscribe((attachmentId) => {
+        this.downloadDatasource(attachmentId);
+      });
+  }
+
+  private downloadDatasource(id: string): void {
+    const url = `rest/resources/${id}/content`;
+    const $ = (this._document.defaultView as any).$;
+    $.fileDownload(url)
+      .done(() => {})
+      .fail();
   }
 }
