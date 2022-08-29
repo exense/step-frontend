@@ -3,6 +3,7 @@ import { EntityItem } from '../../shared/entity-item';
 import { CustomRegistryType } from '../../shared/custom-registry-type.enum';
 import { Component, Input, Type } from '@angular/core';
 import { CustomRegistryService } from '../../services/custom-registry.service';
+import { CustomComponent } from '../../shared/custom-component';
 
 @Component({
   selector: 'step-entity-icon',
@@ -18,7 +19,7 @@ export class EntityIconNewComponent extends BaseItemComponent<EntityItem> {
     super(_customRegistryService);
   }
 
-  protected override resolveComponent(item: EntityItem): Type<unknown> | undefined {
+  protected override resolveComponent(item: EntityItem): Type<CustomComponent> | undefined {
     return item.icon;
   }
 }

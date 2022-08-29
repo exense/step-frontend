@@ -5,6 +5,7 @@ import { EntityComponent } from './components/item-component/entity.component';
 import { EntityIconNewComponent } from './components/item-component/entity-icon.component';
 import { PlanTypeComponent } from './components/item-component/plan-type.component';
 import { FunctionTypeComponent } from './components/item-component/function-type.component';
+import { CustomCellComponent } from './components/item-component/custom-cell.component';
 
 @NgModule({
   declarations: [
@@ -13,9 +14,10 @@ import { FunctionTypeComponent } from './components/item-component/function-type
     EntityIconNewComponent,
     PlanTypeComponent,
     FunctionTypeComponent,
+    CustomCellComponent,
   ],
   imports: [CommonModule],
-  exports: [EntityComponent, EntityIconNewComponent, PlanTypeComponent, FunctionTypeComponent],
+  exports: [EntityComponent, EntityIconNewComponent, PlanTypeComponent, FunctionTypeComponent, CustomCellComponent],
 })
 export class CustomRegistriesModule {}
 
@@ -24,11 +26,14 @@ export * from './components/item-component/entity.component';
 export * from './components/item-component/entity-icon.component';
 export * from './components/item-component/function-type.component';
 export * from './components/item-component/plan-type.component';
+export * from './components/item-component/custom-cell.component';
 export * from './services/entity-registry.service';
 export * from './services/function-package-type-registry.service';
 export * from './services/function-type-registry.service';
 export * from './services/plan-type-registry.service';
 export * from './services/custom-registry.service';
+export * from './services/custom-cell-registry.service';
 export * from './shared/custom-registry-item';
 export * from './shared/custom-registry-type.enum';
+export * from './shared/custom-component';
 export * from './shared/entity-item';
