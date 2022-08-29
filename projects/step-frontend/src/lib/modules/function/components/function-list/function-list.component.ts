@@ -1,7 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  a1Promise2Observable,
   AJS_FUNCTION_TYPE_REGISTRY,
   AJS_LOCATION,
   AJS_MODULE,

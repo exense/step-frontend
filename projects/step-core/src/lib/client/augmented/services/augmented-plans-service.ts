@@ -7,7 +7,6 @@ import { TableRemoteDataSource } from '../../../modules/table/shared/table-remot
 @Injectable({ providedIn: 'root' })
 export class AugmentedPlansService extends PlansService {
   private dataSource: TableRemoteDataSource<Plan> = new TableRemoteDataSource<Plan>('plans', this._tableRest, {
-    name: 'attributes.name',
     type: 'root._class',
     actions: '',
   });

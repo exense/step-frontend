@@ -16,6 +16,11 @@ export class CustomRegistryService {
     return this.getStoreForType(storeType).get(key);
   }
 
+  filterKeys(storeType: CustomRegistryType, keys: string[]): string[] {
+    const store = this.getStoreForType(storeType);
+    return keys.filter((key) => store.has(key));
+  }
+
   getRegisteredItems(storeType: CustomRegistryType): ReadonlyArray<CustomRegistryItem> {
     return Array.from(this.getStoreForType(storeType)!.values());
   }
