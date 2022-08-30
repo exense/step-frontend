@@ -8,11 +8,22 @@
   --button-active-color: #0c7311;
 
   /* SIDEBAR */
+  --sidebar-width-open: 254px;
+  --sidebar-width-closed: 72px;
+
+  --sidebar-background-color: #026299;
+  --sidebar-menu-background-color: #1b72a4;
+  --sidebar-divider-color: #3582ae;
+  --sidebar-highlight-color: #3280ad;
+
+  --sidebar-openclose-transition: 0.2s;
+
+  --sidebar-logo-and-burgermenu-height: 48px;
+  --sidebar-home-and-settings-height: 64px;
+
   --header-height: calc(48px + 64px);
   --top-blue-border-height: 15px;
   --top-blue-border-edge-radius: 30px;
-  --sidebar-width-open: 254px;
-  --sidebar-width-closed: 72px;
   --sidebar-section-height-help-and-support: 56px;
 
   --sidebar-elements-padding: 12px;
