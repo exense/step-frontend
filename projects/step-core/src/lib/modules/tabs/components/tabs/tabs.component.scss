@@ -1,41 +1,63 @@
+// todo this color should be defined by custom material theme
+$primary-tabs-color: #673ab7;
+
 step-tabs {
-  display: block;
-  mat-ink-bar {
-    display: none;
-  }
+  &.tab-mode-buttons {
+    display: block;
 
-  .mat-tab-list {
-    display: flex;
-    margin-bottom: 10px;
-  }
-
-  .mat-tab-links {
-    border: solid 1px #f3f5f7;
-    border-radius: 8px;
-    background: #f9fafa;
-    padding: 4px;
-  }
-
-  .mat-tab-link {
-    margin: 0 8px;
-    min-width: 100px;
-    text-decoration: none;
-    height: 38px;
-
-    &:first-child {
-      margin-left: 0;
-    }
-    &:last-child {
-      margin-right: 0;
+    mat-ink-bar {
+      display: none;
     }
 
-    border-radius: 8px;
+    .mat-tab-list {
+      display: flex;
+      margin-bottom: 10px;
+    }
 
-    &.mat-tab-label-active {
-      background: #fff;
-      box-shadow: 0 3px 1px -2px #0003, 0 2px 2px #00000024, 0 1px 5px #0000001f;
-      color: #000;
-      font-weight: bold;
+    .mat-tab-links {
+      border: solid 1px #f3f5f7;
+      border-radius: 8px;
+      background: #f9fafa;
+      padding: 4px;
+    }
+
+    .mat-tab-link {
+      margin: 0 8px;
+      min-width: 100px;
+      text-decoration: none;
+      height: 38px;
+
+      &:first-child {
+        margin-left: 0;
+      }
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      border-radius: 8px;
+
+      &.mat-tab-label-active {
+        background: #fff;
+        box-shadow: 0 3px 1px -2px #0003, 0 2px 2px #00000024, 0 1px 5px #0000001f;
+        color: #000;
+        font-weight: bold;
+      }
+    }
+  }
+
+  &.tab-mode-tabs {
+    .mat-tab-link {
+      min-width: auto;
+      padding: 0 10px;
+      opacity: 1;
+      text-decoration: none;
+    }
+
+    .mat-primary {
+      .mat-tab-link.mat-tab-label-active {
+        color: $primary-tabs-color;
+      }
     }
   }
 }
@@ -48,7 +70,7 @@ step-tabs {
     .mat-tab-link.mat-tab-label-active {
       span,
       .mat-icon-close {
-        color: #673ab7;
+        color: $primary-tabs-color;
       }
     }
   }
