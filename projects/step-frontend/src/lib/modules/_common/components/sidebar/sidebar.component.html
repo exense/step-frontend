@@ -31,9 +31,9 @@
           type="checkbox"
         />
         <label for="collapsable-tab-{{ mainMenuEntry.label }}">
-          <span class="{{ mainMenuEntry.icon }} visible-when-collapsed"></span>
+          <span [class]="mainMenuEntry.icon + ' visible-when-collapsed'"></span>
           <span class="sidebar-aligned-text">{{ mainMenuEntry.label }}</span>
-          <mat-icon class="chevron">chevron_right</mat-icon>
+          <span><mat-icon class="chevron">chevron_right</mat-icon></span>
         </label>
         <div class="content">
           <section *ngFor="let entry of _viewRegistryService.customMenuEntries | menuFilter: mainMenuEntry.viewId">
@@ -42,7 +42,7 @@
               [class.sidebar-highlighted-subtab]="_viewStateService.isViewActive(entry.viewId)"
               (click)="navigateTo(entry.viewId)"
             >
-              <span class="{{ entry.icon }} visible-when-collapsed"></span>
+              <span [class]="entry.icon + ' visible-when-collapsed'"></span>
               <span class="sidebar-aligned-subtext">{{ entry.label }}</span>
             </div>
           </section>

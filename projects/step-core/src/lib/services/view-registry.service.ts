@@ -32,6 +32,7 @@ export interface Dashlet {
 export class ViewRegistryService {
   customViews: { [key: string]: CustomView } = {};
   customMenuEntries: MenuEntry[] = [];
+  subMenuToMainMenuMap: { [submenuName: string]: string } = {};
   customDashlets: { [key: string]: Dashlet[] } = {};
 
   getCustomView(view: string): CustomView {
@@ -78,6 +79,9 @@ export class ViewRegistryService {
       right,
       isEnabledFct: () => true,
     });
+    if (parentMenu) {
+      this.subMenuToMainMenuMap[viewId] = parentMenu;
+    }
   }
 
   registerCustomMenuEntryOptional(
@@ -110,17 +114,8 @@ export class ViewRegistryService {
   }
 
   // returns the name of the main menu that contains the submenu or undefined
-  // FIXME: we can find a nicer solution than using this function
-  getMainMenuNameOfSubmenu(subMenuName: string) {
-    let subMenu = this.customMenuEntries.filter(
-      (entry) =>
-        entry?.parentMenu && (!!entry.isEnabledFct ? entry.isEnabledFct() : true) && entry.viewId === subMenuName
-    );
-    if (subMenu.length === 1) {
-      return subMenu[0].parentMenu;
-    } else {
-      return undefined;
-    }
+  getMainMenuNameOfSubmenu(subMenuName: string): string | undefined {
+    return this.subMenuToMainMenuMap[subMenuName];
   }
 
   getDashlets(path: string) {

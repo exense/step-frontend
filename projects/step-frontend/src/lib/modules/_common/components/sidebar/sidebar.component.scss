@@ -164,8 +164,12 @@
   }
 }
 
-div#sidebar-categories-tabs .sidebar-collapsable-tab:first-child label {
-  border-radius: 5px 5px 0 0;
+div#sidebar-categories-tabs {
+  margin-bottom: calc(var(--sidebar-help-and-support-height) + 10px);
+
+  .sidebar-collapsable-tab:first-child label {
+    border-radius: 5px 5px 0 0;
+  }
 }
 
 #sidebar-cost-and-upgrade > div {
@@ -178,7 +182,7 @@ div#sidebar-categories-tabs .sidebar-collapsable-tab:first-child label {
   background-color: var(--sidebar-background-color);
   width: var(--sidebar-width-open);
   bottom: 0px;
-  height: 56px;
+  height: var(--sidebar-help-and-support-height);
   font-size: small;
   flex-direction: column;
   justify-content: center;
@@ -281,6 +285,7 @@ span.sidebar-version {
 }
 
 .sidebar-aligned-subtext {
+  max-width: 150px;
   font-size: small;
   position: absolute;
   left: calc(var(--sidebar-aligned-text-margin-left) + var(--sidebar-elements-text-padding));

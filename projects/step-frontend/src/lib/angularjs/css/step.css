@@ -999,12 +999,15 @@ fieldset {
   border-radius: var(--top-blue-border-edge-radius) 0 0 0;
 }
 
-
 step-tenant-selection-downgraded {
+  display: block;
   position: fixed;
   top: 70px;
   left: 56px;
   z-index: 2;
+}
+.tenant-selector-when-sidebar-closed {
+  display: none;
 }
 
 #main {

@@ -112,16 +112,20 @@ export class SidebarComponent implements AfterViewInit {
   }
 
   /**
-   * todo: communicate open/close state as output to parent component instead of selecting global dom element
+   * FIXME: communicate open/close state as output to parent component instead of selecting global dom element
    */
   toggleOpenClose() {
     if (this.sideBarOpen) {
-      document.querySelector('#main')!.classList.add('main-when-sidebar-closed');
       this.sideBarOpen = false;
+      document.querySelector('#main')!.classList.add('main-when-sidebar-closed');
+      document.querySelector('step-tenant-selection-downgraded')!.classList.add('tenant-selector-when-sidebar-closed');
       console.log('closed');
     } else {
-      document.querySelector('#main')!.classList.remove('main-when-sidebar-closed');
       this.sideBarOpen = true;
+      document.querySelector('#main')!.classList.remove('main-when-sidebar-closed');
+      document
+        .querySelector('step-tenant-selection-downgraded')!
+        .classList.remove('tenant-selector-when-sidebar-closed');
       console.log('open');
     }
   }
