@@ -119,14 +119,12 @@ export class SidebarComponent implements AfterViewInit {
       this.sideBarOpen = false;
       document.querySelector('#main')!.classList.add('main-when-sidebar-closed');
       document.querySelector('step-tenant-selection-downgraded')!.classList.add('tenant-selector-when-sidebar-closed');
-      console.log('closed');
     } else {
       this.sideBarOpen = true;
       document.querySelector('#main')!.classList.remove('main-when-sidebar-closed');
       document
         .querySelector('step-tenant-selection-downgraded')!
         .classList.remove('tenant-selector-when-sidebar-closed');
-      console.log('open');
     }
   }
 }
