@@ -104,7 +104,7 @@ export class ViewRegistryService {
 
   getCustomMainMenuEntries() {
     let filteredEntries = this.customMenuEntries.filter(
-      (entry) => entry?.parentMenu && (!!entry.isEnabledFct ? entry.isEnabledFct() : true)
+      (entry) => !entry?.parentMenu && (!!entry.isEnabledFct ? entry.isEnabledFct() : true)
     );
     return filteredEntries.sort((a, b) => a.label.localeCompare(b.label));
   }
