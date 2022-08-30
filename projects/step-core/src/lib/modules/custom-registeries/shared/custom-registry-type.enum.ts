@@ -3,4 +3,5 @@ export enum CustomRegistryType {
   planType = 'planType',
   functionType = 'functionType',
   functionPackageType = 'functionPackageType',
+  customCell = 'customCell',
 }

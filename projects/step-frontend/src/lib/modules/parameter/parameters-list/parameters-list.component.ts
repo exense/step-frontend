@@ -9,7 +9,7 @@ import { ParameterDialogsService } from '../services/parameter-dialogs.service';
   styleUrls: ['./parameters-list.component.scss'],
 })
 export class ParametersListComponent {
-  readonly dataSource = this._parametersService.getParametersTableDataSource();
+  readonly dataSource = this._parametersService.dataSource;
 
   constructor(
     private _parametersService: AugmentedParametersService,

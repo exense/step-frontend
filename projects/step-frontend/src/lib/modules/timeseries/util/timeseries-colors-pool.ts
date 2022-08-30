@@ -1,28 +1,43 @@
+/**
+ * The pool is responsible for storing and assigning one color for every unique string key. A list of predefined colors are stored in the pool.
+ * If more keys are requested, new random colors will be generated and stored in the pool.
+ */
 export class TimeseriesColorsPool {
-  private allColors: string[];
-  private assignedColors: { [key: string]: string } = {};
+  private predefinedColors: string[];
+  private assignedColors: { [key: string]: string } = {}; // every unique key has a unique color assigned
 
   constructor() {
-    this.allColors = [...colors];
+    this.predefinedColors = [...colors];
   }
 
+  /**
+   * @param key - If it is new, a new color will be assigned, otherwise a new color is generated.
+   */
   assignColor(key: string): string {
-    if (this.allColors.length == 0) {
-      let randomColor = this.randomRGBA();
-      this.allColors.push(randomColor);
+    let color;
+    if (this.predefinedColors.length == 0) {
+      color = this.randomRGBA();
+    } else {
+      color = this.predefinedColors[0];
+      this.predefinedColors.shift();
     }
-    let color = this.allColors[0];
     this.assignedColors[key] = color;
-    this.allColors.shift();
     return color;
   }
 
+  /**
+   * Return the color for a given key. If the key has no color attached, a new one will be created.
+   * @param key
+   */
   getColor(key: string): string {
-    if (this.assignedColors[key]) return this.assignedColors[key];
-    return this.assignColor(key);
+    if (this.assignedColors[key]) {
+      return this.assignedColors[key];
+    } else {
+      return this.assignColor(key);
+    }
   }
 
-  randomRGBA() {
+  randomRGBA(): string {
     var o = Math.round,
       r = Math.random,
       s = 255;
@@ -30,6 +45,10 @@ export class TimeseriesColorsPool {
     return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + alpha + ')';
   }
 
+  /**
+   * These colors are globally scoped. Every pool will share the same status colors. When a color is requested for a new status, a new color is created.
+   * @param status
+   */
   getStatusColor(status: string): string {
     if (!status) {
       let randomColor = this.randomRGBA();

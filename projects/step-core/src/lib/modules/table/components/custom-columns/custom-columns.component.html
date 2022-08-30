@@ -12,6 +12,12 @@
     {{ col.label }}
   </th>
   <td mat-cell *matCellDef="let element">
-    {{ element | customCellValue: col.id! }}
+    <ng-template #cellValue>
+      {{ element | customCellValue: col.id! }}
+    </ng-template>
+    <div class="custom-cell-container" *ngIf="col | customCellComponents as customCellKeys; else cellValue">
+      <step-custom-cell *ngFor="let cellKey of customCellKeys" [itemKey]="cellKey" [context]="element">
+      </step-custom-cell>
+    </div>
   </td>
 </ng-container>

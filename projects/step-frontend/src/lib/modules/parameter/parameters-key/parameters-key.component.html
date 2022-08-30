@@ -1,0 +1,9 @@
+<ng-template #link>
+  <a href="#" (click)="editParameter(); (false)">{{ context?.key }}</a>
+</ng-template>
+<ng-container *ngIf="noLink$ | async; else link">
+  {{ context?.key }}
+</ng-container>
+<ng-container *ngIf="context?.description">
+  <mat-icon [matTooltip]="context!.description!">help</mat-icon>
+</ng-container>
