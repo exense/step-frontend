@@ -5,6 +5,7 @@ import { BulkOperationConfig, BulkOperationsInvokeService } from '../../services
 import { BulkOperation } from '../../shared/bulk-operation.enum';
 import { DialogsService } from '../../../../shared';
 import { TableReload } from '../../services/table-reload';
+import { map, of } from 'rxjs';
 
 @Component({
   selector: 'step-bulk-operations',
@@ -16,8 +17,11 @@ export class BulkOperationsComponent<KEY, ENTITY> {
 
   @Input() availableOperations: BulkOperation[] = [];
 
+  readonly isOperationsDisabled$ = (this._selectionCollector?.selected$ || of([])).pipe(
+    map((selected) => selected.length === 0)
+  );
+
   constructor(
-    private _dialogs: DialogsService,
     @Optional() public _selectionCollector?: SelectionCollector<KEY, ENTITY>,
     @Optional() private _tableFilter?: TableFilter,
     @Optional() private _tableReload?: TableReload,
@@ -51,8 +55,6 @@ export class BulkOperationsComponent<KEY, ENTITY> {
       if (!status?.ready) {
         return;
       }
-      const message = `Bulk ${operation} completed`;
-      this._dialogs.showInfo(message);
       this._tableReload?.reload();
       if (this._selectionCollector) {
         this._selectionCollector.clear();

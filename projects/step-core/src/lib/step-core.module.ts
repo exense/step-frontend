@@ -119,6 +119,7 @@ export * from './modules/entities-selection/entities-selection.module';
 export * from './client/generated/index';
 export * from './client/step-client-module';
 export * from './modules/custom-registeries/custom-registries.module';
+export * from './modules/async-operations/async-operations.module';
 
 export { ApiError } from './client/generated/core/ApiError';
 export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';

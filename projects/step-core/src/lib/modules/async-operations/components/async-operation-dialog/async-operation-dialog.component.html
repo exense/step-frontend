@@ -1,0 +1,25 @@
+<h3 mat-dialog-title>{{ _dialogData.title | titlecase }}</h3>
+<div mat-dialog-content>
+  <div class="content">
+    <ng-container [ngSwitch]="state">
+      <ng-container *ngSwitchDefault>{{ _dialogData.confirmMessage }}</ng-container>
+      <ng-container *ngSwitchCase="AsyncOperationDialogState.success">{{ _dialogData.successMessage }}</ng-container>
+      <ng-container *ngSwitchCase="AsyncOperationDialogState.error">{{ _dialogData.errorMessage }}</ng-container>
+      <ng-container *ngSwitchCase="AsyncOperationDialogState.progress">
+        <mat-progress-bar [value]="progress" color="primary" mode="buffer"> </mat-progress-bar>
+      </ng-container>
+    </ng-container>
+  </div>
+</div>
+<div mat-dialog-actions class="actions">
+  <ng-container [ngSwitch]="state">
+    <ng-container *ngSwitchDefault>
+      <button type="button" mat-flat-button color="primary" (click)="close()">Ok</button>
+    </ng-container>
+    <ng-container *ngSwitchCase="AsyncOperationDialogState.confirm">
+      <button type="button" mat-flat-button color="primary" (click)="performAnOperation()">Yes</button>
+      <button type="button" mat-flat-button (click)="close()">No</button>
+    </ng-container>
+    <ng-container *ngSwitchCase="AsyncOperationDialogState.progress"> </ng-container>
+  </ng-container>
+</div>

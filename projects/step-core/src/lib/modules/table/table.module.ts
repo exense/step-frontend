@@ -14,9 +14,17 @@ import { AdditionalHeaderDirective } from './directives/additional-header.direct
 import { BulkOperationsComponent } from './components/bulk-operations/bulk-operations.component';
 import { EntitiesSelectionModule } from '../entities-selection/entities-selection.module';
 import { BulkOperationIconPipe } from './pipe/bulk-operation-icon.pipe';
+import { AsyncOperationsModule } from '../async-operations/async-operations.module';
 
 @NgModule({
-  imports: [CommonModule, StepMaterialModule, StepTableClientModule, EntitiesSelectionModule, CustomRegistriesModule],
+  imports: [
+    CommonModule,
+    StepMaterialModule,
+    StepTableClientModule,
+    EntitiesSelectionModule,
+    CustomRegistriesModule,
+    AsyncOperationsModule,
+  ],
   declarations: [
     TableComponent,
     SearchColDirective,

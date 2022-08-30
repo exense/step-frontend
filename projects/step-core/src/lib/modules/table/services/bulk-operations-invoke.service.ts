@@ -1,12 +1,10 @@
 import { Observable, of } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
 import { BulkOperation } from '../shared/bulk-operation.enum';
 import { TableRequestData } from '../../../client/table/models/table-request-data';
 import { BulkSelectionType } from '../../entities-selection/shared/bulk-selection-type.enum';
-import { AsyncTasksService, AsyncTaskStatusVoid, BulkOperationParameters } from '../../../client/generated';
+import { AsyncTaskStatusVoid, BulkOperationParameters } from '../../../client/generated';
 import { TableFilter } from './table-filter';
-import { pollAsyncTask } from '../../../client/augmented/rxjs-operators/poll-async-task';
-import { a1Promise2Observable, DialogsService } from '../../../shared';
+import { AsyncOperationService } from '../../async-operations/services/async-operation.service';
 
 export interface BulkOperationConfig<ID> {
   operationType: BulkOperation;
@@ -17,7 +15,7 @@ export interface BulkOperationConfig<ID> {
 }
 
 export abstract class BulkOperationsInvokeService<ID> {
-  protected constructor(protected _asyncTaskService: AsyncTasksService, protected _dialogs: DialogsService) {}
+  protected constructor(protected _asyncOperationService: AsyncOperationService) {}
 
   protected abstract invokeDelete?(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid>;
   protected abstract invokeDuplicate?(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid>;
@@ -86,11 +84,15 @@ export abstract class BulkOperationsInvokeService<ID> {
     // Confirmation message should be provided by simulation logic
     // Until it is not implemented, the simple confirm was added
     const confirmMessage = `Do you want to perform the bulk ${config.operationType} operation over selected items?`;
+    const successMessage = `Bulk operation ${config.operationType} completed`;
+    const errorMessage = `An error occurred while ${config.operationType} operation`;
+    const title = config.operationType;
 
-    return a1Promise2Observable(this._dialogs.showWarning(confirmMessage)).pipe(
-      switchMap(() => operation!(this.transformConfig(config))),
-      pollAsyncTask(this._asyncTaskService),
-      catchError(() => of(undefined))
-    );
+    return this._asyncOperationService.performOperation(() => operation!(this.transformConfig(config)), {
+      confirmMessage,
+      successMessage,
+      errorMessage,
+      title,
+    });
   }
 }
