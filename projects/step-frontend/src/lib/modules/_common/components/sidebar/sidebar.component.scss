@@ -35,19 +35,13 @@
   visibility: hidden;
 }
 
-/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
-@media screen and (max-height: 450px) {
-  .sidebar {
-    padding-top: 15px;
-  }
-
-  .sidebar a {
-    font-size: 18px;
-  }
-}
-
 #sidebar-logo-and-burgermenu {
-  height: 48px;
+  position: fixed;
+  z-index: 100;
+  background-color: var(--sidebar-background-color);
+  width: var(--sidebar-width-open);
+  height: var(--sidebar-logo-and-burgermenu-height);
+  transition: var(--sidebar-openclose-transition);
 }
 
 #sidebar-logo-and-burgermenu > span {
@@ -55,7 +49,16 @@
 }
 
 #sidebar-home-and-settings {
-  min-height: 64px;
+  position: fixed;
+  z-index: 100;
+  background-color: var(--sidebar-background-color);
+  width: var(--sidebar-width-open);
+  margin-top: var(--sidebar-logo-and-burgermenu-height);
+  height: var(--sidebar-home-and-settings-height);
+  border-top: 1px solid var(--sidebar-divider-color);
+  border-bottom: 1px solid var(--sidebar-divider-color);
+
+  transition: var(--sidebar-openclose-transition);
 }
 
 #sidebar-home-and-settings > span {
@@ -69,7 +72,7 @@
 
 #sidebar-home-and-settings > .sidebar-home-and-settings-divider {
   right: var(--sidebar-settings-divider-padding-right);
-  color: #3582ae;
+  color: var(--sidebar-divider-color);
 }
 
 #sidebar-home-and-settings > .sidebar-home-and-settings-icon {
@@ -92,6 +95,7 @@
   display: block;
   flex-grow: 1;
   padding-top: 16px;
+  margin-top: calc(var(--sidebar-logo-and-burgermenu-height) + var(--sidebar-home-and-settings-height));
 }
 
 div#sidebar-categories-tabs .sidebar-collapsable-tab:first-child label {
@@ -111,11 +115,17 @@ div#sidebar-categories-tabs .sidebar-collapsable-tab:first-child label {
 }
 
 #sidebar-help-and-support {
+  position: fixed;
+  z-index: 100;
+  background-color: var(--sidebar-background-color);
+  width: var(--sidebar-width-open);
+  bottom: 0px;
   height: 56px;
   font-size: small;
-  margin-top: 20px;
   flex-direction: column;
   justify-content: center;
+  border-top: 1px solid var(--sidebar-divider-color);
+  transition: var(--sidebar-openclose-transition);
 
   i {
     padding: 0 8px 0 0;
@@ -124,12 +134,6 @@ div#sidebar-categories-tabs .sidebar-collapsable-tab:first-child label {
 
 #sidebar-help-and-support > div {
   padding: var(--sidebar-elements-text-padding);
-}
-
-#sidebar-home-and-settings,
-#sidebar-categories,
-#sidebar-help-and-support {
-  border-top: 1px solid #3582ae;
 }
 
 /* (A) TABS CONTAINER */
@@ -159,7 +163,7 @@ div#sidebar-categories-tabs .sidebar-collapsable-tab:first-child label {
 
   /* (C2) COSMETICS */
   color: #fff;
-  background: #1b72a4;
+  background: var(--sidebar-menu-background-color);
   cursor: pointer;
 }
 
@@ -167,7 +171,7 @@ div#sidebar-categories-tabs .sidebar-collapsable-tab:first-child label {
 /* css animation will not work with auto height */
 /* this is why we use max-height instead */
 .sidebar-collapsable-tab .content {
-  background: #1b72a4;
+  background: var(--sidebar-menu-background-color);
   overflow: hidden;
   transition: max-height;
   max-height: 0;
@@ -184,11 +188,11 @@ div#sidebar-categories-tabs .sidebar-collapsable-tab:first-child label {
 }
 
 .sidebar-highlighted-subtab {
-  background-color: #3280ad;
+  background-color: var(--sidebar-highlight-color);
 }
 
 .sidebar-subtab:hover {
-  background: #3280ad;
+  background: var(--sidebar-highlight-color);
 }
 
 /* (E) OPEN TAB ON CHECKED */
@@ -249,7 +253,23 @@ span.sidebar-version {
 }
 
 #collapsable-sidebar-toggle-checkbox:checked ~ step-tenant-selection-downgraded {
+  width: var(--sidebar-width-closed);
   visibility: hidden;
+}
+
+#collapsable-sidebar-toggle-checkbox:checked ~ .sidebar {
+  #sidebar-logo-and-burgermenu {
+    width: var(--sidebar-width-closed);
+  }
+
+  #sidebar-home-and-settings {
+    width: var(--sidebar-width-closed);
+  }
+
+  #sidebar-help-and-support {
+    width: var(--sidebar-width-closed);
+    font-size: medium;
+  }
 }
 
 .only-visible-when-collapsed {
@@ -267,9 +287,9 @@ span.sidebar-version {
   z-index: 1;
   top: 0;
   left: 0;
-  background-color: #02629a;
+  background-color: var(--sidebar-background-color);
   overflow-x: hidden;
-  transition: 0.2s;
+  transition: var(--sidebar-openclose-transition);
   color: white;
 }
 
