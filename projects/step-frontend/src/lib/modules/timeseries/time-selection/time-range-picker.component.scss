@@ -1,0 +1,55 @@
+.time-selector-container {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px solid #d7d7d7;
+
+  .left-section {
+    border-right: 1px solid #d7d7d7;
+    white-space: nowrap;
+    padding: 12px;
+  }
+
+  .title {
+    font-weight: bold;
+  }
+
+  .right-section {
+    white-space: nowrap;
+    padding-bottom: 12px;
+    width: 220px;
+
+    .title {
+      padding: 14px;
+    }
+
+    .time-option {
+      cursor: pointer;
+      padding: 4px 14px;
+
+      &:hover {
+        background: #f1f1f1;
+      }
+    }
+  }
+}
+
+.timezone-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 12px;
+  margin-top: 8px;
+
+  .tz-label {
+    margin-right: 12px;
+    padding: 4px;
+    background: #f1f1f1;
+    font-size: 12px;
+  }
+}
+
+::ng-deep {
+  .time-selector-menu {
+    max-width: unset !important;
+  }
+}
