@@ -12,6 +12,7 @@ import { BulkSelectionType } from '../../shared/bulk-selection-type.enum';
 import { SelectionCollector } from '../../services/selection-collector/selection-collector';
 import { Mutable } from '../../../../shared';
 import { filter, Subject, takeUntil } from 'rxjs';
+import { MAT_CHECKBOX_DEFAULT_OPTIONS, MatCheckboxDefaultOptions } from '@angular/material/checkbox';
 
 type FieldAccessor = Mutable<Pick<BulkSelectionComponent<any, any>, 'isChecked' | 'isIntermediate'>>;
 
@@ -19,6 +20,14 @@ type FieldAccessor = Mutable<Pick<BulkSelectionComponent<any, any>, 'isChecked' 
   selector: 'step-bulk-selection',
   templateUrl: './bulk-selection.component.html',
   styleUrls: ['./bulk-selection.component.scss'],
+  providers: [
+    {
+      provide: MAT_CHECKBOX_DEFAULT_OPTIONS,
+      useValue: {
+        clickAction: 'noop',
+      } as MatCheckboxDefaultOptions,
+    },
+  ],
 })
 export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy {
   private terminator$?: Subject<unknown>;
@@ -53,8 +62,8 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
     this.terminate();
   }
 
-  handleCheckboxChange(isAll: boolean): void {
-    this.changeType(isAll ? BulkSelectionType.All : BulkSelectionType.None);
+  handleCheckboxChange(): void {
+    this.changeType(this.selectionType !== BulkSelectionType.None ? BulkSelectionType.None : BulkSelectionType.Visible);
   }
 
   changeType(selectionType: BulkSelectionType): void {

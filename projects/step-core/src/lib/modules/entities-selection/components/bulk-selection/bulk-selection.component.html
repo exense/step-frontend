@@ -3,12 +3,7 @@
     {{ selectionType }}
   </button>
 </mat-menu>
-<mat-checkbox
-  color="primary"
-  [checked]="isChecked"
-  [indeterminate]="isIntermediate"
-  (change)="handleCheckboxChange($event.checked)"
->
+<mat-checkbox color="primary" [checked]="isChecked" [indeterminate]="isIntermediate" (click)="handleCheckboxChange()">
 </mat-checkbox>
 <button type="button" mat-icon-button [matMenuTriggerFor]="menu">
   <mat-icon>arrow_drop_down</mat-icon>
