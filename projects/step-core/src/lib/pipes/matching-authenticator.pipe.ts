@@ -3,9 +3,9 @@ import { map, Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
 @Pipe({
-  name: 'matchingUserAuthenticator',
+  name: 'matchingAuthenticator',
 })
-export class MatchingUserAuthenticator implements PipeTransform {
+export class MatchingAuthenticator implements PipeTransform {
   constructor(private _authService: AuthService) {}
 
   transform(authenticator: string): boolean {

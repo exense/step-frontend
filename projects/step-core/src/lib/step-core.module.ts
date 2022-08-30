@@ -7,7 +7,7 @@ import { TooltipDirective } from './directives/tooltip.directive';
 import { CORE_INITIALIZER } from './core-initialiser';
 import { StepMaterialModule } from './modules/step-material/step-material.module';
 import { HasRightPipe } from './pipes/has-right.pipe';
-import { MatchingUserAuthenticator } from './pipes/matching-user-authenticator.pipe';
+import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { TableModule } from './modules/table/table.module';
 import { StepBasicsModule } from './modules/basics/step-basics.module';
@@ -25,7 +25,7 @@ import { DateFilterComponent } from './components/date-filter/date-filter.compon
   declarations: [
     TooltipDirective,
     HasRightPipe,
-    MatchingUserAuthenticator,
+    MatchingAuthenticator,
     DashboardLinkPipe,
     CapsLockDirective,
     ArrayFilterComponent,
@@ -55,7 +55,7 @@ import { DateFilterComponent } from './components/date-filter/date-filter.compon
     CapsLockDirective,
     StepMaterialModule,
     HasRightPipe,
-    MatchingUserAuthenticator,
+    MatchingAuthenticator,
     DashboardLinkPipe,
     TableModule,
     StepBasicsModule,
@@ -113,7 +113,7 @@ export * from './angularjs';
 export * from './directives/tooltip.directive';
 export * from './directives/caps-lock.directive';
 export * from './pipes/has-right.pipe';
-export * from './pipes/matching-user-authenticator.pipe';
+export * from './pipes/matching-authenticator.pipe';
 export * from './pipes/dashboard-link.pipe';
 export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';

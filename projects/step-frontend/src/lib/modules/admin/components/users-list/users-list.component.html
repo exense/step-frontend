@@ -33,7 +33,7 @@
           mat-icon-button
           matTooltip="Reset user password"
           (click)="resetUserPassword(element)"
-          [disabled]="!('DefaultAuthenticator' | matchingUserAuthenticator)"
+          [disabled]="!('DefaultAuthenticator' | matchingAuthenticator)"
         >
           <mat-icon>lock</mat-icon>
         </button>
