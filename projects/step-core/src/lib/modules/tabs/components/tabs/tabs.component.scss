@@ -39,3 +39,35 @@ step-tabs {
     }
   }
 }
+
+.step-legacy-tabs {
+  // temporary solution.
+  // these class and it's color configuration should be a part of custom material theme
+
+  &.mat-primary {
+    .mat-tab-link.mat-tab-label-active {
+      span,
+      .mat-icon-close {
+        color: #673ab7;
+      }
+    }
+  }
+
+  .mat-tab-link {
+    min-width: auto;
+    padding: 0 10px;
+    opacity: 1;
+  }
+
+  execution-result {
+    margin-right: 11px;
+  }
+
+  .mat-icon.mat-icon-close {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    margin-left: 11px;
+    cursor: pointer;
+  }
+}
