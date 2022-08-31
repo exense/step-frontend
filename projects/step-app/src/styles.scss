@@ -39,8 +39,10 @@ header.blue-header {
   }
 
   .dropdown-menu {
-    margin-right: -10px;
     min-width: auto;
+    top: initial;
+    left: initial;
+    margin-left: -20px;
 
     li {
       width: 100%;

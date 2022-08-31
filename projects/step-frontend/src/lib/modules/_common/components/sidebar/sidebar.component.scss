@@ -296,3 +296,8 @@ span.sidebar-version {
   position: absolute;
   left: calc(var(--sidebar-aligned-text-margin-left) + var(--sidebar-elements-text-padding));
 }
+
+.version {
+  max-height: 16px;
+  overflow: hidden;
+}
