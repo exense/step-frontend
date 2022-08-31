@@ -1,6 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { User, UibModalHelperService, a1Promise2Observable, AdminService, DialogsService } from '@exense/step-core';
+import {
+  User,
+  UibModalHelperService,
+  a1Promise2Observable,
+  AdminService,
+  DialogsService,
+  AuthService,
+} from '@exense/step-core';
 import { Observable, switchMap, of, catchError, map } from 'rxjs';
 @Injectable({
   providedIn: 'root',
@@ -10,7 +17,8 @@ export class UserDialogsService {
     private _httpClient: HttpClient,
     private _uibModalHelper: UibModalHelperService,
     private _adminApiService: AdminService,
-    private _dialogs: DialogsService
+    private _dialogs: DialogsService,
+    private _authService: AuthService
   ) {}
 
   removeUser(username: string): Observable<any> {
@@ -22,11 +30,17 @@ export class UserDialogsService {
   }
 
   resetUserPasswordWithWarning(user: User): Observable<any> {
-    const message = 'Are you sure you want to reset this users password?';
-    return a1Promise2Observable(this._dialogs.showWarning(message)).pipe(
-      switchMap((_) => this.resetPassword(user)),
-      catchError((_) => of(false))
-    );
+    if (this._authService.getConf()?.authenticatorName === 'DefaultAuthenticator') {
+      const message = 'Are you sure you want to reset this users password?';
+      return a1Promise2Observable(this._dialogs.showWarning(message)).pipe(
+        switchMap((_) => this.resetPassword(user)),
+        catchError((_) => of(false))
+      );
+    } else {
+      const message =
+        'Managing password is not supported by the ' + this._authService.getConf()?.authenticatorName + '.';
+      return a1Promise2Observable(this._dialogs.showWarning(message));
+    }
   }
 
   resetPassword(user: Partial<User>): Observable<any> {

@@ -7,6 +7,7 @@ import { TooltipDirective } from './directives/tooltip.directive';
 import { CORE_INITIALIZER } from './core-initialiser';
 import { StepMaterialModule } from './modules/step-material/step-material.module';
 import { HasRightPipe } from './pipes/has-right.pipe';
+import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { TableModule } from './modules/table/table.module';
 import { StepBasicsModule } from './modules/basics/step-basics.module';
@@ -25,6 +26,7 @@ import { TabsModule } from './modules/tabs/tabs.module';
   declarations: [
     TooltipDirective,
     HasRightPipe,
+    MatchingAuthenticator,
     DashboardLinkPipe,
     CapsLockDirective,
     ArrayFilterComponent,
@@ -55,6 +57,7 @@ import { TabsModule } from './modules/tabs/tabs.module';
     CapsLockDirective,
     StepMaterialModule,
     HasRightPipe,
+    MatchingAuthenticator,
     DashboardLinkPipe,
     TableModule,
     StepBasicsModule,
@@ -113,6 +116,7 @@ export * from './angularjs';
 export * from './directives/tooltip.directive';
 export * from './directives/caps-lock.directive';
 export * from './pipes/has-right.pipe';
+export * from './pipes/matching-authenticator.pipe';
 export * from './pipes/dashboard-link.pipe';
 export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
