@@ -14,12 +14,17 @@
 			<div class="toolbar">
 				<auto-refresh-commands ng-show="$stateExec!=='grafana'" autorefresh="autorefresh" />
 			</div>
-			<uib-tabset active="activeTab()">
-				<uib-tab ng-repeat="entry in tabs" heading="{{entry.label}}" select="onSelection(entry.id)">
-					<ng-include class=st-flex-column ng-if="includeTab(entry)" src="entry.template"></ng-include>
-				</uib-tab>
-			</uib-tabset>
-		</div>
+      <div class="st-flex-column">
+        <step-tabs [tabs]="tabs" [active-tab-id]="$stateExec" (active-tab-id-change)="onSelection($event)">
+        </step-tabs>
+        <div class="tab-content">
+          <div class="tab-pane" ng-repeat="entry in tabs" ng-class="{active: entry.id === $stateExec}" src="entry.template">
+            <ng-include ng-if="includeTab(entry)" src="entry.template">
+            </ng-include>
+          </div>
+        </div>
+      </div>
+      </div>
 		<div class="st-flex-column sectionResizable resizable-panel-right">
 			<div class="panel panel-default">
 				<div class="panel-body" ng-if="execution">

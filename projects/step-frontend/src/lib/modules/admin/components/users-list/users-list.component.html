@@ -29,7 +29,12 @@
         <button mat-icon-button matTooltip="Edit user" (click)="editUser(element.username)">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button matTooltip="Reset user password" (click)="resetUserPassword(element)">
+        <button
+          mat-icon-button
+          matTooltip="Reset user password"
+          (click)="resetUserPassword(element)"
+          [disabled]="!('DefaultAuthenticator' | matchingAuthenticator)"
+        >
           <mat-icon>lock</mat-icon>
         </button>
         <button

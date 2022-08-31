@@ -266,6 +266,13 @@ angular
         },
         templateUrl: 'partials/jsonEditor.html',
         controller: function ($scope, $location, $rootScope, $attrs, AuthService) {
+
+          $scope.tabs = [
+            {id: 'table', label: 'Table'},
+            {id: 'raw', label: 'Raw (JSON)'},
+          ];
+          $scope.activeTab = 'table';
+
           $scope.localModel = { json: '' };
           $scope.argumentAsTable = [];
           $scope.isFocusOnLastRow = false;
