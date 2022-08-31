@@ -16,7 +16,7 @@ export class SidebarComponent implements AfterViewInit {
   sideBarOpen: boolean = true;
 
   constructor(
-    @Inject(DOCUMENT) private _doc: Document,
+    @Inject(DOCUMENT) private _document: Document,
     public _authService: AuthService,
     public _viewRegistryService: ViewRegistryService,
     public _viewStateService: ViewStateService,
@@ -101,12 +101,14 @@ export class SidebarComponent implements AfterViewInit {
   toggleOpenClose() {
     if (this.sideBarOpen) {
       this.sideBarOpen = false;
-      this._doc.querySelector('#main')!.classList.add('main-when-sidebar-closed');
-      this._doc.querySelector('step-tenant-selection-downgraded')!.classList.add('tenant-selector-when-sidebar-closed');
+      this._document.querySelector('#main')!.classList.add('main-when-sidebar-closed');
+      this._document
+        .querySelector('step-tenant-selection-downgraded')!
+        .classList.add('tenant-selector-when-sidebar-closed');
     } else {
       this.sideBarOpen = true;
-      this._doc.querySelector('#main')!.classList.remove('main-when-sidebar-closed');
-      this._doc
+      this._document.querySelector('#main')!.classList.remove('main-when-sidebar-closed');
+      this._document
         .querySelector('step-tenant-selection-downgraded')!
         .classList.remove('tenant-selector-when-sidebar-closed');
     }
