@@ -1,0 +1,69 @@
+<input id="collapsable-sidebar-toggle-checkbox" type="checkbox" />
+<div class="sidebar">
+  <div id="sidebar-logo-and-burgermenu">
+    <span class="visible-when-collapsed">
+      <label for="collapsable-sidebar-toggle-checkbox" (click)="toggleOpenClose()"
+        ><i class="glyphicon glyphicon-menu-hamburger"></i></label
+    ></span>
+    <span class="sidebar-aligned-text"><img class="sidebar-logo" alt="" [src]="logo" /></span>
+  </div>
+  <div id="sidebar-home-and-settings">
+    <span class="visible-when-collapsed sidebar-home-button" (click)="navigateTo('home')"
+      ><i class="glyphicon glyphicon-home"></i
+    ></span>
+    <span class="sidebar-home-and-settings-divider">|</span>
+    <span (click)="navigateTo('admin')" *ngIf="'admin' | hasRight | async" class="sidebar-home-and-settings-icon">
+      <i class="glyphicon glyphicon-cog"></i
+    ></span>
+  </div>
+  <div id="sidebar-categories">
+    <div id="sidebar-categories-tabs">
+      <!-- MENU -->
+      <div
+        class="sidebar-collapsable-tab"
+        *ngFor="let mainMenuEntry of _viewRegistryService.registeredMenuEntries | menuFilter: 'root'; index as i"
+        [attr.lastSidebarMainMenuLabel]="i === mainMenuEntriesAmount"
+      >
+        <input
+          #mainMenuCheckBox
+          [name]="mainMenuEntry.viewId"
+          id="collapsable-tab-{{ mainMenuEntry.label }}"
+          type="checkbox"
+        />
+        <label for="collapsable-tab-{{ mainMenuEntry.label }}">
+          <span class="visible-when-collapsed" [ngClass]="mainMenuEntry.icon"></span>
+          <span class="sidebar-aligned-text">{{ mainMenuEntry.label }}</span>
+          <span><mat-icon class="chevron">chevron_right</mat-icon></span>
+        </label>
+        <div class="content">
+          <section *ngFor="let entry of _viewRegistryService.registeredMenuEntries | menuFilter: mainMenuEntry.viewId">
+            <div
+              class="sidebar-subtab"
+              [class.sidebar-highlighted-subtab]="_viewStateService.isViewActive(entry.viewId)"
+              (click)="navigateTo(entry.viewId)"
+            >
+              <span class="visible-when-collapsed" [ngClass]="entry.icon"></span>
+              <span class="sidebar-aligned-subtext">{{ entry.label }}</span>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="sidebar-help-and-support">
+    <a href="https://step.exense.ch/knowledgebase">
+      <div>
+        <i class="glyphicon glyphicon-question-sign"></i>
+        <span class="help-and-support-span">Help & Support</span>
+      </div>
+    </a>
+    <span class="version" title="{{ '${project.version}' }}"
+      >{{ '${project.version}' }}
+      <span style="display: none" id="frontend-os">{{ '${project.versionFEOS}' }}</span>
+      <span style="display: none" id="frontend-ee">{{ '${project.versionFEEE}' }}</span>
+      <span style="display: none" id="backend-os">{{ '${project.versionBEOS}' }}</span>
+      <span style="display: none" id="backend-ee">{{ '${project.versionBEEE}' }}</span>
+    </span>
+  </div>
+</div>

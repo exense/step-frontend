@@ -18,7 +18,36 @@ button.primary {
 }
 
 body {
-  background-color: #f3f1f1;
+  background-color: white;
+}
+
+.container-fluid {
+  padding: 0;
+}
+
+header.blue-header {
+  height: 58px;
+
+  .navbar-nav > li > a {
+    padding: 0;
+  }
+
+  #session-dropdown {
+    color: white;
+    user-select: none;
+    background: none !important;
+  }
+
+  .dropdown-menu {
+    min-width: auto;
+    top: initial;
+    left: initial;
+    margin-left: -20px;
+
+    li {
+      width: 100%;
+    }
+  }
 }
 
 .ts-tooltip {
