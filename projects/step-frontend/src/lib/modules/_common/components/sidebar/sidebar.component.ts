@@ -1,7 +1,7 @@
-import { Component, Input, QueryList, ViewChildren, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, Input, QueryList, ViewChildren, AfterViewInit, ElementRef, Inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, AuthService, ViewRegistryService, ViewStateService } from '@exense/step-core';
-import { Location } from '@angular/common';
+import { DOCUMENT, Location } from '@angular/common';
 
 @Component({
   selector: '[step-sidebar]',
@@ -16,6 +16,7 @@ export class SidebarComponent implements AfterViewInit {
   sideBarOpen: boolean = true;
 
   constructor(
+    @Inject(DOCUMENT) private _document: Document,
     public _authService: AuthService,
     public _viewRegistryService: ViewRegistryService,
     public _viewStateService: ViewStateService,
@@ -100,12 +101,14 @@ export class SidebarComponent implements AfterViewInit {
   toggleOpenClose() {
     if (this.sideBarOpen) {
       this.sideBarOpen = false;
-      document.querySelector('#main')!.classList.add('main-when-sidebar-closed');
-      document.querySelector('step-tenant-selection-downgraded')!.classList.add('tenant-selector-when-sidebar-closed');
+      this._document.querySelector('#main')!.classList.add('main-when-sidebar-closed');
+      this._document
+        .querySelector('step-tenant-selection-downgraded')!
+        .classList.add('tenant-selector-when-sidebar-closed');
     } else {
       this.sideBarOpen = true;
-      document.querySelector('#main')!.classList.remove('main-when-sidebar-closed');
-      document
+      this._document.querySelector('#main')!.classList.remove('main-when-sidebar-closed');
+      this._document
         .querySelector('step-tenant-selection-downgraded')!
         .classList.remove('tenant-selector-when-sidebar-closed');
     }

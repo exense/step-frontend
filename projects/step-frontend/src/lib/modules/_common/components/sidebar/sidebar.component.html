@@ -42,7 +42,7 @@
               [class.sidebar-highlighted-subtab]="_viewStateService.isViewActive(entry.viewId)"
               (click)="navigateTo(entry.viewId)"
             >
-              <span [class]="entry.icon + ' visible-when-collapsed'"></span>
+              <span class="visible-when-collapsed" [ngClass]="entry.icon"></span>
               <span class="sidebar-aligned-subtext">{{ entry.label }}</span>
             </div>
           </section>
