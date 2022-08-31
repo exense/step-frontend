@@ -28,10 +28,6 @@ body {
 header.blue-header {
   height: 58px;
 
-  .navbar-nav > li > a {
-    padding: 0;
-  }
-
   #session-dropdown {
     color: white;
     user-select: none;
@@ -47,6 +43,28 @@ header.blue-header {
     li {
       width: 100%;
     }
+  }
+
+  .header-navbar {
+    margin: 6px 20px;
+
+    li {
+      float: right;
+    }
+  }
+
+  .header-parent {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: var(--dark-background-color);
+  }
+
+  .header-white-part {
+    bottom: 0;
+    height: 24px;
+    background-color: white;
+    border-radius: var(--top-blue-border-edge-radius) 0 0 0;
   }
 }
 

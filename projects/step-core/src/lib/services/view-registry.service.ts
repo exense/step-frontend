@@ -13,6 +13,7 @@ export interface MenuEntry {
   viewId: string;
   parentMenu?: string;
   icon: string;
+  weight?: number;
   right?: string;
   isEnabledFct(): boolean;
 }
@@ -67,33 +68,35 @@ export class ViewRegistryService {
     this.registeredViews[viewId] = { template: template, isPublicView: isPublicView, isStaticView: isStaticView };
   }
 
-  registerMenuEntry(label: string, viewId: string, icon: string, parentMenu?: string, right?: string): void {
+  registerMenuEntry(
+    label: string,
+    viewId: string,
+    icon: string,
+    weight?: number,
+    parentMenu?: string,
+    right?: string
+  ): void {
     this.registeredMenuEntries.push({
       label,
       viewId,
       parentMenu,
       icon,
+      weight,
       right,
       isEnabledFct: () => true,
     });
   }
 
   registerMenuEntryOptional(
+    isEnabledFct: () => boolean,
     label: string,
     viewId: string,
     icon: string,
-    parentMenu: string,
-    isEnabledFct: () => boolean,
+    weight?: number,
+    parentMenu?: string,
     right?: string
   ): void {
-    this.registeredMenuEntries.push({ label, viewId, parentMenu, icon, right, isEnabledFct });
-  }
-
-  getCustomMainMenuEntries() {
-    let filteredEntries = this.registeredMenuEntries.filter(
-      (entry) => !entry?.parentMenu && (!!entry.isEnabledFct ? entry.isEnabledFct() : true)
-    );
-    return filteredEntries.sort((a, b) => a.label.localeCompare(b.label));
+    this.registeredMenuEntries.push({ label, viewId, parentMenu, icon, weight, right, isEnabledFct });
   }
 
   getMainMenuKey(subMenuKey: string): string | undefined {

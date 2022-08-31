@@ -21,8 +21,7 @@
       <!-- MENU -->
       <div
         class="sidebar-collapsable-tab"
-        *ngFor="let mainMenuEntry of _viewRegistryService.registeredMenuEntries | menuFilter: 'root'; index as i"
-        [attr.lastSidebarMainMenuLabel]="i === mainMenuEntriesAmount"
+        *ngFor="let mainMenuEntry of _viewRegistryService.registeredMenuEntries | menuFilter: 'root'"
       >
         <input
           #mainMenuCheckBox
