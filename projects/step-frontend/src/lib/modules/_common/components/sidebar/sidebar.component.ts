@@ -22,57 +22,42 @@ export class SidebarComponent implements AfterViewInit {
     public _location: Location
   ) {
     // Main Menus
-    this._viewRegistryService.registerCustomMenuEntry('Automation', 'automation-root', 'glyphicon glyphicon-play');
-    this._viewRegistryService.registerCustomMenuEntry('Execute', 'execute-root', 'glyphicon glyphicon-tasks');
-    this._viewRegistryService.registerCustomMenuEntry('Status', 'status-root', 'glyphicon glyphicon-ok');
+    this._viewRegistryService.registerMenuEntry('Automation', 'automation-root', 'glyphicon glyphicon-play');
+    this._viewRegistryService.registerMenuEntry('Execute', 'execute-root', 'glyphicon glyphicon-tasks');
+    this._viewRegistryService.registerMenuEntry('Status', 'status-root', 'glyphicon glyphicon-ok');
 
     // Sub Menus Automation
-    this._viewRegistryService.registerCustomMenuEntry(
+    this._viewRegistryService.registerMenuEntry(
       'Keywords',
       'functions',
       'glyphicon glyphicon-record',
       'automation-root'
     );
-    this._viewRegistryService.registerCustomMenuEntry('Plans', 'plans', 'glyphicon glyphicon-file', 'automation-root');
-    this._viewRegistryService.registerCustomMenuEntry(
+    this._viewRegistryService.registerMenuEntry('Plans', 'plans', 'glyphicon glyphicon-file', 'automation-root');
+    this._viewRegistryService.registerMenuEntry(
       'Parameters',
       'parameters',
       'glyphicon glyphicon-list-alt',
       'automation-root'
     );
     // Sub Menus Execute
-    this._viewRegistryService.registerCustomMenuEntry(
+    this._viewRegistryService.registerMenuEntry(
       'Executions',
       'executions',
       'glyphicon glyphicon-tasks',
       'execute-root'
     );
-    this._viewRegistryService.registerCustomMenuEntry(
-      'Scheduler',
-      'scheduler',
-      'glyphicon glyphicon-time',
-      'execute-root'
-    );
+    this._viewRegistryService.registerMenuEntry('Scheduler', 'scheduler', 'glyphicon glyphicon-time', 'execute-root');
     // Sub Menus Status
-    this._viewRegistryService.registerCustomMenuEntry(
-      'Agents',
-      'gridagents',
-      'glyphicon glyphicon-briefcase',
-      'status-root'
-    );
-    this._viewRegistryService.registerCustomMenuEntry(
-      'Agent tokens',
-      'gridtokens',
-      'glyphicon glyphicon-tag',
-      'status-root'
-    );
-    this._viewRegistryService.registerCustomMenuEntry(
+    this._viewRegistryService.registerMenuEntry('Agents', 'gridagents', 'glyphicon glyphicon-briefcase', 'status-root');
+    this._viewRegistryService.registerMenuEntry('Agent tokens', 'gridtokens', 'glyphicon glyphicon-tag', 'status-root');
+    this._viewRegistryService.registerMenuEntry(
       'Token Groups',
       'gridtokengroups',
       'glyphicon glyphicon glyphicon-tags',
       'status-root'
     );
-    this._viewRegistryService.registerCustomMenuEntry(
+    this._viewRegistryService.registerMenuEntry(
       'Quota Manager',
       'gridquotamanager',
       'glyphicon glyphicon-road',
@@ -84,7 +69,7 @@ export class SidebarComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     let initialViewName = this._viewStateService.getViewName();
     if (initialViewName) {
-      let initiallyExpandedMainMenu = this._viewRegistryService.getMainMenuNameOfSubmenu(initialViewName!);
+      let initiallyExpandedMainMenu = this._viewRegistryService.getMainMenuKey(initialViewName!);
       if (initiallyExpandedMainMenu) {
         this.openMainMenu(initiallyExpandedMainMenu);
       }

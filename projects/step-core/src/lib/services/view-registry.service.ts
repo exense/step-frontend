@@ -1,6 +1,4 @@
-import { ITemplateCacheService } from 'angular';
-import { Inject, Injectable } from '@angular/core';
-import { AJS_TEMPLATES_CACHE } from '../shared/angularjs-providers';
+import { Injectable } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE } from '../shared';
 
@@ -30,13 +28,12 @@ export interface Dashlet {
   providedIn: 'root',
 })
 export class ViewRegistryService {
-  customViews: { [key: string]: CustomView } = {};
-  customMenuEntries: MenuEntry[] = [];
-  subMenuToMainMenuMap: { [submenuName: string]: string } = {};
-  customDashlets: { [key: string]: Dashlet[] } = {};
+  registeredViews: { [key: string]: CustomView } = {};
+  registeredMenuEntries: MenuEntry[] = [];
+  registeredDashlets: { [key: string]: Dashlet[] } = {};
 
   getCustomView(view: string): CustomView {
-    const customView = this.customViews[view];
+    const customView = this.registeredViews[view];
     if (customView) {
       return customView;
     } else {
@@ -67,11 +64,11 @@ export class ViewRegistryService {
   ): void {
     const isPublicView = config.isPublicView || false;
     const isStaticView = config.isStaticView || false;
-    this.customViews[viewId] = { template: template, isPublicView: isPublicView, isStaticView: isStaticView };
+    this.registeredViews[viewId] = { template: template, isPublicView: isPublicView, isStaticView: isStaticView };
   }
 
-  registerCustomMenuEntry(label: string, viewId: string, icon: string, parentMenu?: string, right?: string): void {
-    this.customMenuEntries.push({
+  registerMenuEntry(label: string, viewId: string, icon: string, parentMenu?: string, right?: string): void {
+    this.registeredMenuEntries.push({
       label,
       viewId,
       parentMenu,
@@ -79,12 +76,9 @@ export class ViewRegistryService {
       right,
       isEnabledFct: () => true,
     });
-    if (parentMenu) {
-      this.subMenuToMainMenuMap[viewId] = parentMenu;
-    }
   }
 
-  registerCustomMenuEntryOptional(
+  registerMenuEntryOptional(
     label: string,
     viewId: string,
     icon: string,
@@ -92,37 +86,25 @@ export class ViewRegistryService {
     isEnabledFct: () => boolean,
     right?: string
   ): void {
-    this.customMenuEntries.push({ label, viewId, parentMenu, icon, right, isEnabledFct });
-  }
-
-  getMenuRootEntries() {
-    return this.customMenuEntries.filter((entry) => entry && !entry.parentMenu && entry.isEnabledFct());
-  }
-
-  getMenuEntries(parentMenu: string) {
-    const filteredEntries = this.customMenuEntries.filter(
-      (entry) => entry?.parentMenu === parentMenu && entry.isEnabledFct()
-    );
-    return filteredEntries.sort((a, b) => a.label.localeCompare(b.label));
+    this.registeredMenuEntries.push({ label, viewId, parentMenu, icon, right, isEnabledFct });
   }
 
   getCustomMainMenuEntries() {
-    let filteredEntries = this.customMenuEntries.filter(
+    let filteredEntries = this.registeredMenuEntries.filter(
       (entry) => !entry?.parentMenu && (!!entry.isEnabledFct ? entry.isEnabledFct() : true)
     );
     return filteredEntries.sort((a, b) => a.label.localeCompare(b.label));
   }
 
-  // returns the name of the main menu that contains the submenu or undefined
-  getMainMenuNameOfSubmenu(subMenuName: string): string | undefined {
-    return this.subMenuToMainMenuMap[subMenuName];
+  getMainMenuKey(subMenuKey: string): string | undefined {
+    return this.registeredMenuEntries.find((entry: MenuEntry) => entry.viewId === subMenuKey)?.parentMenu;
   }
 
   getDashlets(path: string) {
-    let dashlets = this.customDashlets[path];
+    let dashlets = this.registeredDashlets[path];
     if (!dashlets) {
       dashlets = [];
-      this.customDashlets[path] = dashlets;
+      this.registeredDashlets[path] = dashlets;
     }
     return dashlets;
   }
