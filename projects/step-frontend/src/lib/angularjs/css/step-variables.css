@@ -1,8 +1,8 @@
 :root {
-  --main-header-bg-color: #000000;
-  --main-header-color: #d8d9da;
-  --main-header-hover-color: #f0f6f0;
-  --main-bg-color: #828282;
+  --dark-background-color: #293E50;
+  --lighten-background-10: rgba(255,255,255,0.1);
+  --sidebar-divider-color: rgba(255,255,255,0.2);
+
   --button-color: #17d821;
   --button-hover-color: #13b91c;
   --button-active-color: #0c7311;
@@ -14,11 +14,6 @@
   /* SIDEBAR */
   --sidebar-width-open: 254px;
   --sidebar-width-closed: 72px;
-
-  --sidebar-background-color: #026299;
-  --sidebar-menu-background-color: #1b72a4;
-  --sidebar-divider-color: #3582ae;
-  --sidebar-highlight-color: #3280ad;
 
   --sidebar-openclose-transition: 0.2s;
 

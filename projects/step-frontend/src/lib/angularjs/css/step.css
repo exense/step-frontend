@@ -14,90 +14,6 @@ form.form-signin {
   background-color: white;
 }
 
-.navbar {
-  border-radius: 0px;
-  border: 0px;
-}
-
-.navbar-default {
-  background-color: var(--main-header-bg-color);
-  border-color: var(--main-bg-color);
-}
-.navbar-default .navbar-brand {
-  color: var(--main-header-color);
-}
-.navbar-default .navbar-brand:hover,
-.navbar-default .navbar-brand:focus {
-  color: var(--main-header-hover-color);
-}
-.navbar-default .navbar-text {
-  color: var(--main-header-color);
-}
-.navbar-default .navbar-nav > li > a {
-  color: var(--main-header-color);
-}
-.navbar-default .navbar-nav > li > a:hover,
-.navbar-default .navbar-nav > li > a:focus {
-  color: var(--main-header-hover-color);
-}
-.navbar-default .navbar-nav > .active > a,
-.navbar-default .navbar-nav > .active > a:hover,
-.navbar-default .navbar-nav > .active > a:focus {
-  color: var(--main-header-hover-color);
-  background-color: var(--main-bg-color);
-}
-.navbar-default .navbar-nav > .open > a,
-.navbar-default .navbar-nav > .open > a:hover,
-.navbar-default .navbar-nav > .open > a:focus {
-  color: var(--main-header-hover-color);
-  background-color: var(--main-bg-color);
-}
-.navbar-default .navbar-toggle {
-  border-color: var(--main-bg-color);
-}
-.navbar-default .navbar-toggle:hover,
-.navbar-default .navbar-toggle:focus {
-  background-color: var(--main-bg-color);
-}
-.navbar-default .navbar-toggle .icon-bar {
-  background-color: var(--main-header-color);
-}
-.navbar-default .navbar-collapse,
-.navbar-default .navbar-form {
-  border-color: var(--main-header-color);
-}
-.navbar-default .navbar-link {
-  color: var(--main-header-color);
-}
-.navbar-default .navbar-link:hover {
-  color: var(--main-header-hover-color);
-}
-
-.navbar-right {
-  float: right !important;
-}
-
-.navbar-nav > li > div {
-  padding: 14px 15px;
-  position: relative;
-}
-
-@media (max-width: 767px) {
-  .navbar-default .navbar-nav .open .dropdown-menu > li > a {
-    color: var(--main-header-color);
-  }
-  .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover,
-  .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
-    color: var(--main-header-hover-color);
-  }
-  .navbar-default .navbar-nav .open .dropdown-menu > .active > a,
-  .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover,
-  .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
-    color: var(--main-header-hover-color);
-    background-color: var(--main-bg-color);
-  }
-}
-
 .btn-success,
 .btn-success:focus {
   background-color: var(--button-color) !important;
@@ -987,8 +903,7 @@ fieldset {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: #02629a;
-
+  background-color: var(--dark-background-color);
   height: var(--header-height);
 }
 

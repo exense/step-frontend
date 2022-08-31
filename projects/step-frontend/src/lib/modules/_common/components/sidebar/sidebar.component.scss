@@ -9,7 +9,7 @@
   z-index: 1;
   top: 0;
   left: 0;
-  background-color: var(--sidebar-background-color);
+  background-color: var(--dark-background-color);
   overflow-x: hidden;
   transition: var(--sidebar-openclose-transition);
   color: white;
@@ -47,6 +47,7 @@
 
 #collapsable-sidebar-toggle-checkbox {
   display: none;
+  cursor: pointer;
 }
 #collapsable-sidebar-toggle-checkbox:not(:checked) ~ .sidebar {
   width: var(--sidebar-width-open);
@@ -102,19 +103,24 @@
 #sidebar-logo-and-burgermenu {
   position: fixed;
   z-index: 100;
-  background-color: var(--sidebar-background-color);
+  background-color: var(--dark-background-color);
   width: var(--sidebar-width-open);
   height: var(--sidebar-logo-and-burgermenu-height);
   transition: var(--sidebar-openclose-transition);
+
   > span {
     padding: var(--sidebar-elements-text-padding);
+  }
+
+  label {
+    cursor: pointer;
   }
 }
 
 #sidebar-home-and-settings {
   position: fixed;
   z-index: 100;
-  background-color: var(--sidebar-background-color);
+  background-color: var(--dark-background-color);
   width: var(--sidebar-width-open);
   margin-top: var(--sidebar-logo-and-burgermenu-height);
   height: var(--sidebar-home-and-settings-height);
@@ -179,7 +185,7 @@ div#sidebar-categories-tabs {
 #sidebar-help-and-support {
   position: fixed;
   z-index: 100;
-  background-color: var(--sidebar-background-color);
+  background-color: var(--dark-background-color);
   width: var(--sidebar-width-open);
   bottom: 0px;
   height: var(--sidebar-help-and-support-height);
@@ -218,11 +224,11 @@ div#sidebar-categories-tabs {
 
     /* (C2) COSMETICS */
     color: #fff;
-    background: var(--sidebar-menu-background-color);
+    background: var(--lighten-background-10);
     cursor: pointer;
   }
   .content {
-    background: var(--sidebar-menu-background-color);
+    background: var(--lighten-background-10);
     overflow: hidden;
     transition: max-height;
     max-height: 0;
@@ -255,11 +261,11 @@ div#sidebar-categories-tabs {
 }
 
 .sidebar-highlighted-subtab {
-  background-color: var(--sidebar-highlight-color);
+  background-color: var(--lighten-background-10);
 }
 
 .sidebar-subtab:hover {
-  background: var(--sidebar-highlight-color);
+  background: var(--lighten-background-10);
 }
 
 div[lastSidebarMainMenuLabel='true'] > input:not(:checked) ~ label {
