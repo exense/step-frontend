@@ -13,9 +13,9 @@
             <div ng-include="entry.template"></div>
           </li>
           <li>
-            <a id="sessionDropdown" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> {{context.userID}}
+            <a id="session-dropdown" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> {{context.userID}}
               [{{context.role}}]</a>
-            <ul class="dropdown-menu" aria-labelledby="sessionDropdown">
+            <ul class="dropdown-menu" aria-labelledby="session-dropdown">
               <li><a ng-click="setView('myaccount')"><span class="glyphicon glyphicon-cog"></span> My account</a></li>
               <li ng-if="authService.getConf().authentication && authService.isAuthenticated()"><a
                 ng-click="authService.logout()"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
