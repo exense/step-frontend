@@ -139,7 +139,14 @@ angular
       // ------------------------------------
       // Component tables
       //--------------------------------------
-      $scope.componentTabs = { selectedTab: 0 };
+      $scope.componentTabs = {
+        selectedTab: 'controls',
+        tabs: [
+          {id: 'controls', label: 'Controls'},
+          {id: 'keywords', label: 'Keywords'},
+          {id: 'other', label: 'Other Plans'},
+        ]
+      };
       $scope.handle = {};
 
       // Controls
@@ -172,7 +179,7 @@ angular
       $scope.interactiveSession = {
         execute: function (artefacts) {
           var sessionId = $scope.interactiveSession.id;
-          $scope.componentTabs.selectedTab = 3;
+          $scope.componentTabs.selectedTab = 'other';
 
           function execute(artefacts, callback) {
             if (artefacts.length > 0) {
@@ -198,6 +205,24 @@ angular
       $scope.isInteractiveSessionActive = function () {
         return $scope.interactiveSession.id != null;
       };
+
+      function toggleConsoleTab(shouldConsoleExists) {
+        const hasConsole = $scope.componentTabs.tabs.some(tab => tab.id === 'console');
+        if (hasConsole === shouldConsoleExists) {
+          return;
+        }
+        if (shouldConsoleExists) {
+          $scope.componentTabs.tabs = [...$scope.componentTabs.tabs, {id: 'console', label: 'Console'}];
+          return;
+        }
+        $scope.componentTabs.tabs = $scope.componentTabs.tabs.filter(tab => tab.id !== 'console');
+      }
+
+      $scope.$watch('interactiveSession.id', (newValue, oldValue) => {
+        if (newValue !== oldValue) {
+          toggleConsoleTab(!!newValue);
+        }
+      });
 
       $scope.startInteractive = function () {
         var executionParameters = {

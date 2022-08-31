@@ -1,9 +1,8 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Execution } from '@exense/step-core';
 
-interface ExecutionResultInfo {
-  status: string;
-  result: string;
-}
+type Status = Execution['status'];
+type Result = Execution['result'];
 
 @Component({
   selector: 'step-execution-result',
@@ -11,44 +10,63 @@ interface ExecutionResultInfo {
   styleUrls: ['./execution-result.component.scss'],
 })
 export class ExecutionResultComponent implements OnChanges {
-  @Input() execution?: ExecutionResultInfo;
+  @Input() status?: Status;
+  @Input() result?: Result;
 
-  result: string = '';
+  displayResult: string = '';
   icon: string = '';
   statusClass: string = '';
 
   ngOnChanges(changes: SimpleChanges): void {
-    const cExecution = changes['execution'];
-    if (cExecution?.currentValue === cExecution?.previousValue) {
-      return;
+    let status: Status | undefined;
+    let result: Result | undefined;
+
+    const cStatus = changes['status'];
+    const cResult = changes['result'];
+
+    if (cStatus?.previousValue !== cStatus?.currentValue || cStatus?.firstChange) {
+      status = cStatus?.currentValue;
     }
-    this.icon = this.restreiveIcon(cExecution?.currentValue);
-    this.result = this.retreiveResult(cExecution?.currentValue);
-    this.statusClass = this.result ? `step-icon-${this.result}` : '';
+
+    if (cResult?.previousValue !== cResult?.currentValue || cResult?.firstChange) {
+      result = cResult?.currentValue;
+      this.statusClass = result ? `step-icon-${result}` : '';
+    }
+
+    if (result || status) {
+      this.icon = this.restreiveIcon(status, result);
+      this.displayResult = this.retreiveResult(status, result);
+    }
   }
 
-  private retreiveResult(execution?: ExecutionResultInfo): string {
-    if (!execution) {
+  private retreiveResult(status?: Status, result?: Result): string {
+    status = status || this.status;
+    result = result || this.result;
+
+    if (!status && !result) {
       return '';
     }
 
-    if (execution.status !== 'ENDED') {
-      return execution.status;
+    if (status !== 'ENDED') {
+      return status!;
     }
 
-    return execution.result || 'UNKNOW';
+    return result || 'UNKNOW';
   }
 
-  private restreiveIcon(execution?: ExecutionResultInfo): string {
-    if (!execution) {
+  private restreiveIcon(status?: Status, result?: Result): string {
+    status = status || this.status;
+    result = result || this.result;
+
+    if (!status && !result) {
       return '';
     }
 
-    if (execution.status !== 'ENDED') {
+    if (status !== 'ENDED') {
       return 'autorenew';
     }
 
-    if (execution.result === 'PASSED') {
+    if (result === 'PASSED') {
       return 'check_circle';
     }
 
