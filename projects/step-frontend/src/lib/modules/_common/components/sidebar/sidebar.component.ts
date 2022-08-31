@@ -1,7 +1,7 @@
-import { Component, Input, QueryList, ViewChildren, AfterViewInit } from '@angular/core';
+import { Component, Input, QueryList, ViewChildren, AfterViewInit, ElementRef, Inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, AuthService, ViewRegistryService, ViewStateService } from '@exense/step-core';
-import { Location } from '@angular/common';
+import { DOCUMENT, Location } from '@angular/common';
 
 @Component({
   selector: '[step-sidebar]',
@@ -9,13 +9,14 @@ import { Location } from '@angular/common';
   styleUrls: ['./sidebar.component.scss'],
 })
 export class SidebarComponent implements AfterViewInit {
-  @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<any>;
+  @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
   @Input() logo: string = 'images/logotopleft.png';
 
   mainMenuEntriesAmount: number;
   sideBarOpen: boolean = true;
 
   constructor(
+    @Inject(DOCUMENT) private _doc: Document,
     public _authService: AuthService,
     public _viewRegistryService: ViewRegistryService,
     public _viewStateService: ViewStateService,
@@ -67,7 +68,7 @@ export class SidebarComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    let initialViewName = this._viewStateService.getViewName();
+    const initialViewName = this._viewStateService.getViewName();
     if (initialViewName) {
       let initiallyExpandedMainMenu = this._viewRegistryService.getMainMenuKey(initialViewName!);
       if (initiallyExpandedMainMenu) {
@@ -77,11 +78,9 @@ export class SidebarComponent implements AfterViewInit {
   }
 
   private openMainMenu(mainMenuName: string): void {
-    for (let checkbox of this.mainMenuCheckBoxes!) {
-      let name = checkbox.nativeElement.getAttribute('name');
-      if (name === mainMenuName) {
-        checkbox.nativeElement.setAttribute('checked', true);
-      }
+    const checkbox = this.mainMenuCheckBoxes?.find((item) => item.nativeElement.getAttribute('name') === mainMenuName);
+    if (checkbox) {
+      checkbox.nativeElement.setAttribute('checked', true);
     }
   }
 
@@ -102,12 +101,12 @@ export class SidebarComponent implements AfterViewInit {
   toggleOpenClose() {
     if (this.sideBarOpen) {
       this.sideBarOpen = false;
-      document.querySelector('#main')!.classList.add('main-when-sidebar-closed');
-      document.querySelector('step-tenant-selection-downgraded')!.classList.add('tenant-selector-when-sidebar-closed');
+      this._doc.querySelector('#main')!.classList.add('main-when-sidebar-closed');
+      this._doc.querySelector('step-tenant-selection-downgraded')!.classList.add('tenant-selector-when-sidebar-closed');
     } else {
       this.sideBarOpen = true;
-      document.querySelector('#main')!.classList.remove('main-when-sidebar-closed');
-      document
+      this._doc.querySelector('#main')!.classList.remove('main-when-sidebar-closed');
+      this._doc
         .querySelector('step-tenant-selection-downgraded')!
         .classList.remove('tenant-selector-when-sidebar-closed');
     }
