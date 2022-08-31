@@ -268,12 +268,9 @@ div#sidebar-categories-tabs {
   background: var(--lighten-background-10);
 }
 
-div[lastSidebarMainMenuLabel='true'] > input:not(:checked) ~ label {
+#sidebar-categories-tabs > div:last-child {
   border-radius: 0 0 5px 5px;
-}
-div[lastSidebarMainMenuLabel='true'] > .sidebar-subtab:last-child,
-div[lastSidebarMainMenuLabel='true'] > input:checked ~ div.content {
-  border-radius: 0 0 5px 5px;
+  overflow: hidden;
 }
 
 span.sidebar-version {

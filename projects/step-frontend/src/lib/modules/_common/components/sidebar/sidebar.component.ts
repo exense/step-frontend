@@ -12,7 +12,6 @@ export class SidebarComponent implements AfterViewInit {
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
   @Input() logo: string = 'images/logotopleft.png';
 
-  mainMenuEntriesAmount: number;
   sideBarOpen: boolean = true;
 
   constructor(
@@ -23,22 +22,24 @@ export class SidebarComponent implements AfterViewInit {
     public _location: Location
   ) {
     // Main Menus
-    this._viewRegistryService.registerMenuEntry('Automation', 'automation-root', 'glyphicon glyphicon-play');
-    this._viewRegistryService.registerMenuEntry('Execute', 'execute-root', 'glyphicon glyphicon-tasks');
-    this._viewRegistryService.registerMenuEntry('Status', 'status-root', 'glyphicon glyphicon-ok');
+    this._viewRegistryService.registerMenuEntry('Automation', 'automation-root', 'glyphicon glyphicon-play', 10);
+    this._viewRegistryService.registerMenuEntry('Execute', 'execute-root', 'glyphicon glyphicon-tasks', 20);
+    this._viewRegistryService.registerMenuEntry('Status', 'status-root', 'glyphicon glyphicon-ok', 50);
 
     // Sub Menus Automation
     this._viewRegistryService.registerMenuEntry(
       'Keywords',
       'functions',
       'glyphicon glyphicon-record',
+      10,
       'automation-root'
     );
-    this._viewRegistryService.registerMenuEntry('Plans', 'plans', 'glyphicon glyphicon-file', 'automation-root');
+    this._viewRegistryService.registerMenuEntry('Plans', 'plans', 'glyphicon glyphicon-file', 30, 'automation-root');
     this._viewRegistryService.registerMenuEntry(
       'Parameters',
       'parameters',
       'glyphicon glyphicon-list-alt',
+      40,
       'automation-root'
     );
     // Sub Menus Execute
@@ -46,25 +47,45 @@ export class SidebarComponent implements AfterViewInit {
       'Executions',
       'executions',
       'glyphicon glyphicon-tasks',
+      10,
       'execute-root'
     );
-    this._viewRegistryService.registerMenuEntry('Scheduler', 'scheduler', 'glyphicon glyphicon-time', 'execute-root');
+    this._viewRegistryService.registerMenuEntry(
+      'Scheduler',
+      'scheduler',
+      'glyphicon glyphicon-time',
+      20,
+      'execute-root'
+    );
     // Sub Menus Status
-    this._viewRegistryService.registerMenuEntry('Agents', 'gridagents', 'glyphicon glyphicon-briefcase', 'status-root');
-    this._viewRegistryService.registerMenuEntry('Agent tokens', 'gridtokens', 'glyphicon glyphicon-tag', 'status-root');
+    this._viewRegistryService.registerMenuEntry(
+      'Agents',
+      'gridagents',
+      'glyphicon glyphicon-briefcase',
+      20,
+      'status-root'
+    );
+    this._viewRegistryService.registerMenuEntry(
+      'Agent tokens',
+      'gridtokens',
+      'glyphicon glyphicon-tag',
+      30,
+      'status-root'
+    );
     this._viewRegistryService.registerMenuEntry(
       'Token Groups',
       'gridtokengroups',
       'glyphicon glyphicon glyphicon-tags',
+      40,
       'status-root'
     );
     this._viewRegistryService.registerMenuEntry(
       'Quota Manager',
       'gridquotamanager',
       'glyphicon glyphicon-road',
+      50,
       'status-root'
     );
-    this.mainMenuEntriesAmount = _viewRegistryService.getCustomMainMenuEntries().length - 1;
   }
 
   ngAfterViewInit(): void {
@@ -85,6 +106,8 @@ export class SidebarComponent implements AfterViewInit {
   }
 
   public navigateTo(viewId: string): void {
+    console.log(viewId);
+
     switch (viewId) {
       case 'home':
         this._authService.gotoDefaultPage();
