@@ -8,8 +8,7 @@
     <step-sidebar></step-sidebar>
     <div id="main">
       <header class="header-parent blue-header">
-        <div id="header-spacer-part"></div>
-        <ul class="nav navbar-nav navbar-right navbar-top-user-logout">
+        <ul class="header-navbar">
           <li ng-repeat="entry in viewRegistry.getDashlets('/menu/navbar/right')">
             <div ng-include="entry.template"></div>
           </li>

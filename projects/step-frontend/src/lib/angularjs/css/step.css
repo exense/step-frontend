@@ -895,8 +895,12 @@ fieldset {
   white-space: pre-line;
 }
 
-.navbar-top-user-logout {
+.header-navbar {
   margin-right: 20px;
+}
+
+.header-navbar li {
+  float: right;
 }
 
 .header-parent {
@@ -904,7 +908,6 @@ fieldset {
   flex-direction: column;
   justify-content: space-between;
   background-color: var(--dark-background-color);
-  height: var(--header-height);
 }
 
 .header-white-part {
