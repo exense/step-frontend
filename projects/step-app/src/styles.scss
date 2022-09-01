@@ -12,6 +12,10 @@ $material-design-icons-font-directory-path: '~material-design-icons-iconfont/dis
   width: 100%;
 }
 
+#main > div {
+  margin-top: -24px;
+}
+
 button.primary {
   background-color: var(--button-color);
   color: white;

@@ -8,9 +8,9 @@
 }
 
 @mixin table-header {
-  margin-bottom: 1rem;
   display: flex;
   justify-content: flex-end;
+  padding: 0 8px;
 
   step-btn-group {
     margin-left: 1rem;
