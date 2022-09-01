@@ -14,7 +14,7 @@ export class AugmentedResourcesService extends ResourcesService {
     id: 'id',
   });
 
-  constructor(httpRequest: BaseHttpRequest, private _tableRest: TableApiWrapperService, private _document: Document) {
+  constructor(httpRequest: BaseHttpRequest, private _tableRest: TableApiWrapperService) {
     super(httpRequest);
   }
 }

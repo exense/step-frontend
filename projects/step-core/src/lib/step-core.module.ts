@@ -100,7 +100,6 @@ export * from './services/auth.service';
 export * from './services/dashboard.service';
 export * from './services/invoke-run.service';
 export * from './services/view-registry.service';
-export * from './services/async-task.service';
 export * from './services/link-processor.service';
 export * from './services/deferred-link-processor.service';
 export * from './services/scheduled-task-dialogs.service';

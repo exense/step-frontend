@@ -3,7 +3,6 @@ import { BulkSelectionType, SelectionCollector } from '../../../entities-selecti
 import { TableFilter } from '../../services/table-filter';
 import { BulkOperationConfig, BulkOperationsInvokeService } from '../../services/bulk-operations-invoke.service';
 import { BulkOperation } from '../../shared/bulk-operation.enum';
-import { DialogsService } from '../../../../shared';
 import { TableReload } from '../../services/table-reload';
 import { map, of } from 'rxjs';
 

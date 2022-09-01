@@ -28,8 +28,11 @@ export const $Input = {
     description: {
       type: 'string',
     },
-    valueHtmlTemplate: {
-      type: 'string',
+    customUIComponents: {
+      type: 'array',
+      contains: {
+        type: 'string',
+      },
     },
     searchMapperService: {
       type: 'string',

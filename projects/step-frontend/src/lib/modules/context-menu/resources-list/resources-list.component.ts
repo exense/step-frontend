@@ -14,7 +14,9 @@ export class ResourcesListComponent {
   constructor(
     private _resourceDialogs: ResourceDialogsService,
     private _augmentedResourcesService: AugmentedResourcesService
-  ) {}
+  ) {
+    console.log('AUG', this._augmentedResourcesService);
+  }
 
   editResource(resource: Resource): void {
     this._resourceDialogs.editResource(resource).subscribe((_) => this.dataSource.reload());

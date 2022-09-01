@@ -58,7 +58,7 @@ export class ScheduledTaskLogicService implements OnDestroy {
     public _location: Location
   ) {}
 
-  private loadTable(): void {
+  loadTable(): void {
     this.scheduledTaskRequest$.next({});
   }
 
@@ -70,12 +70,12 @@ export class ScheduledTaskLogicService implements OnDestroy {
 
   switchActive(scheduledTask: ExecutiontTaskParameters) {
     this._schedulerService
-      .getExecutionTask(scheduledTask.id!)
+      .getExecutionTaskById(scheduledTask.id!)
       .pipe(
         switchMap((task) =>
           task.active
-            ? this._schedulerService.removeExecutionTask(task.id!, false)
-            : this._schedulerService.enableExecutionTask(task.id!)
+            ? this._schedulerService.enableExecutionTask(task.id!, false)
+            : this._schedulerService.enableExecutionTask(task.id!, true)
         )
       )
       .subscribe(() => this.loadTable());
@@ -104,7 +104,7 @@ export class ScheduledTaskLogicService implements OnDestroy {
 
   editParameter(scheduledTask: ExecutiontTaskParameters): void {
     this._schedulerService
-      .getExecutionTask(scheduledTask.id!)
+      .getExecutionTaskById(scheduledTask.id!)
       .pipe(switchMap((task) => this._scheduledTaskDialogs.editScheduledTask(task)))
       .subscribe((_) => this.loadTable());
   }

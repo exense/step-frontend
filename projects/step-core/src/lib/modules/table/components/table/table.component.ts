@@ -3,11 +3,13 @@ import {
   Component,
   ContentChild,
   ContentChildren,
+  EventEmitter,
   forwardRef,
   Input,
   OnChanges,
   OnDestroy,
   Optional,
+  Output,
   QueryList,
   SimpleChanges,
   TemplateRef,
@@ -59,6 +61,7 @@ export type DataSource<T> = TableDataSource<T> | T[] | Observable<T[]>;
   ],
 })
 export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, TableSearch, TableFilter, TableReload {
+  @Output() onReload = new EventEmitter<unknown>();
   @Input() trackBy: TrackByFunction<T> = (index) => index;
   @Input() dataSource?: DataSource<T>;
   @Input() inProgress?: boolean;
@@ -238,7 +241,8 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
   }
 
   reload(): void {
-    return this.tableDataSource?.reload();
+    this.onReload.emit({});
+    this.tableDataSource?.reload();
   }
 
   ngAfterViewInit(): void {

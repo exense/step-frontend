@@ -104,16 +104,20 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
 
   readonly total$ = this._response$.pipe(map((r) => r?.recordsTotal || 0));
   readonly totalFiltered$ = this._response$.pipe(map((r) => r?.recordsFiltered || 0));
-  private typeFilter?: { [key: string]: string };
+  private typeFilter?: { [key: string]: SearchValue };
 
   constructor(
     private _tableId: string,
     private _rest: TableApiWrapperService,
     private _requestColumnsMap: { [key: string]: string },
-    private _typeFilter?: [string]
+    private _typeFilter?: string[]
   ) {
     if (_typeFilter) {
-      this.typeFilter = { type: _typeFilter.join('|') };
+      if (_typeFilter.length === 1) {
+        this.typeFilter = { type: _typeFilter[0] };
+      } else {
+        this.typeFilter = { type: { value: `(${_typeFilter.join('|')})`, regex: true } };
+      }
     }
   }
 

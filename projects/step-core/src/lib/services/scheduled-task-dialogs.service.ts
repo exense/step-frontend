@@ -36,7 +36,7 @@ export class ScheduledTaskDialogsService {
   removeScheduledTask(task: ExecutiontTaskParameters): Observable<any> {
     const paramName: string = task.attributes!['name']!;
     return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Task "${paramName}"`)).pipe(
-      switchMap((_) => this._schedulerService.removeExecutionTask(task.id!, true)),
+      switchMap((_) => this._schedulerService.deleteExecutionTask(task.id!)),
       map((_) => true),
       catchError((_) => of(false))
     );
