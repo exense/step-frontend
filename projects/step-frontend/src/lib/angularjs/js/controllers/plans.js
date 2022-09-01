@@ -64,6 +64,9 @@ angular
 
   .controller('PlansCtrl', function ($rootScope, $scope, stateStorage) {
     stateStorage.push($scope, 'plans', {});
+    if ($scope.$state == null) {
+      $scope.$state = 'list';
+    }
 
     $scope.$watch('$state', function () {
       if ($scope.$state != null) {
@@ -71,86 +74,6 @@ angular
       }
     });
   })
-
-  .controller(
-    'PlanListCtrl',
-    function (
-      $rootScope,
-      $scope,
-      $http,
-      $location,
-      $uibModal,
-      stateStorage,
-      Dialogs,
-      PlanDialogs,
-      ImportDialogs,
-      ExportDialogs,
-      AuthService,
-      IsUsedByService,
-      IsUsedByDialogs
-    ) {
-      stateStorage.push($scope, 'list', {});
-      $scope.authService = AuthService;
-
-      $scope.tableHandle = {};
-
-      function reload() {
-        $scope.tableHandle.reload();
-      }
-
-      $scope.addPlan = function () {
-        PlanDialogs.createPlan(function (plan) {
-          reload();
-        });
-      };
-
-      $scope.editPlan = function (id) {
-        $location.path('/root/plans/editor/' + id);
-      };
-
-      $scope.executePlan = function (id) {
-        $location.path('/root/repository').search({ repositoryId: 'local', planid: id });
-      };
-
-      $scope.duplicatePlan = function (id) {
-        $http.get('rest/plans/' + id + '/clone').then(function (response) {
-          const clone = response.data;
-          clone.attributes.name = clone.attributes.name + '_Copy';
-          $http.post('rest/plans', clone).then(function (response) {
-            reload();
-          });
-        });
-      };
-
-      $scope.deletePlan = function (id, name) {
-        Dialogs.showDeleteWarning(1, 'Plan "' + name + '"').then(function () {
-          $http.delete('rest/plans/' + id).then(function () {
-            reload();
-          });
-        });
-      };
-
-      $scope.importPlans = function () {
-        ImportDialogs.displayImportDialog('Plans import', 'plans').then(function () {
-          reload();
-        });
-      };
-
-      $scope.exportPlans = function () {
-        ExportDialogs.displayExportDialog('Plans export', 'plans', 'allPlans.sta').then(function () {});
-      };
-
-      $scope.exportPlan = function (id, name) {
-        ExportDialogs.displayExportDialog('Plans export', 'plans/' + id, name + '.sta').then(
-          function () {}
-        );
-      };
-
-      $scope.lookUp = function (id, name) {
-        IsUsedByDialogs.displayDialog('Plan "' + name + '" is used by', IsUsedByService.type.PLAN_ID, id);
-      };
-    }
-  )
 
   .factory('PlanDialogs', function ($uibModal, $http, Dialogs) {
     var dialogs = {};

@@ -21,7 +21,8 @@
   <ng-container matColumnDef="version" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef>Version</th>
     <td mat-cell *matCellDef="let element">
-      <step-resource-label [stModel]="element.packageAttributes.version"> </step-resource-label>
+      <step-resource-label [stModel]="element.packageAttributes?.version ? element.packageAttributes.version : 'n/a'">
+      </step-resource-label>
     </td>
   </ng-container>
   <ng-container matColumnDef="actions">
