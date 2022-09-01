@@ -34,7 +34,6 @@
 .header {
   @include table-header;
   justify-content: space-between;
-  padding: 8px;
 
   .import-export button {
     padding: 0;

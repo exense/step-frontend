@@ -60,11 +60,19 @@ step-tabs {
       }
     }
   }
+
+  .mat-tab-links {
+    margin-left: 16px;
+  }
 }
 
 .step-legacy-tabs {
   // temporary solution.
   // these class and it's color configuration should be a part of custom material theme
+
+  .mat-tab-links {
+    margin-left: 16px;
+  }
 
   &.mat-primary {
     .mat-tab-link.mat-tab-label-active {
