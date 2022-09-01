@@ -17,11 +17,25 @@ export type ArtefactType = {
 })
 export class ArtefactService {
   availableArtefacts?: Array<ArtefactType>; // artefacts loaded from server and enriched with info from the registry
-  private registry: { [key: string]: ArtefactType } = {}; // maps artefact names to additional artefact details
+  private registry: { [key: string]: ArtefactType } = {}; // maps artefact names to additional artefact details, provided statically in fillArtefactsRegistry()
 
   constructor(private _planApiService: PlansService) {
     this.fillArtefactsRegistry();
-    this.fetchArtefacts();
+  }
+
+  fetchAndProvideAvailableArtefacts(): void {
+    this._planApiService
+      .getArtefactTypes()
+      .pipe(
+        map((artefactNames: Array<string>) => {
+          return artefactNames
+            .filter((artefactName) => this.isSelectable(artefactName))
+            .map((artefactName) => this.getType(artefactName));
+        })
+      )
+      .subscribe((artifacts) => {
+        this.availableArtefacts = artifacts;
+      });
   }
 
   private getType(typeName: string): ArtefactType {
@@ -77,21 +91,6 @@ export class ArtefactService {
 
   isSelectable(typeName: string): boolean {
     return this.typeExist(typeName) && !!this.getType(typeName).isSelectable;
-  }
-
-  private fetchArtefacts(): void {
-    this._planApiService
-      .getArtefactTypes()
-      .pipe(
-        map((artefactNames: Array<string>) => {
-          return artefactNames
-            .filter((artefactName) => this.isSelectable(artefactName))
-            .map((artefactName) => this.getType(artefactName));
-        })
-      )
-      .subscribe((artifacts) => {
-        this.availableArtefacts = artifacts;
-      });
   }
 
   private fillArtefactsRegistry(): void {
