@@ -13,7 +13,6 @@ export class AugmentedExecutionsService extends ExecutionsService {
     startTime: 'startTime',
     endTime: 'endTime',
     user: 'executionParameters.userID',
-    environment: 'executionParameters.customParameters.env',
     status: 'status',
     result: 'result',
   });
