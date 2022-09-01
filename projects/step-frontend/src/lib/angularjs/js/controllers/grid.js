@@ -21,10 +21,10 @@ angular
 
   .run(function (ViewRegistry, EntityRegistry) {
     ViewRegistry.registerView('grid', 'partials/grid/grid.html');
-    ViewRegistry.registerDashlet('grid', 'Agents', 'partials/grid/gridAgents.html', 'agents');
-    ViewRegistry.registerDashlet('grid', 'Tokens', 'partials/grid/gridTokens.html', 'tokens');
-    ViewRegistry.registerDashlet('grid', 'Token Groups', 'partials/grid/gridTokenGroups.html', 'tokengroups');
-    ViewRegistry.registerDashlet('grid', 'Quota Manager', 'partials/grid/gridQuotaManager.html', 'quotamanager');
+    ViewRegistry.registerView('gridagents', 'partials/grid/gridAgents.html');
+    ViewRegistry.registerView('gridtokens', 'partials/grid/gridTokens.html');
+    ViewRegistry.registerView('gridtokengroups', 'partials/grid/gridTokenGroups.html');
+    ViewRegistry.registerView('gridquotamanager', 'partials/grid/gridQuotaManager.html');
   })
 
   .controller('GridCtrl', [
