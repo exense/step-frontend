@@ -17,9 +17,6 @@ export const $FetchBucketsRequest = {
         type: 'string',
       },
     },
-    threadGroupBuckets: {
-      type: 'boolean',
-    },
     groupDimensions: {
       type: 'array',
       contains: {

@@ -1,4 +1,4 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Inject, Input, OnInit } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { GenericFunctionDialogService } from '../services/generic-function-dialogs.service';
 import {
@@ -10,23 +10,25 @@ import {
   TableRemoteDataSource,
   AugmentedKeywordsService,
   FunctionPackage,
+  Mutable,
 } from '@exense/step-core';
 import { noop } from 'rxjs';
 import { ILocationService, IRootScopeService } from 'angular';
+
+type FieldAccessor = Mutable<Pick<GenericFunctionListComponent, 'dataSource'>>;
 
 @Component({
   selector: 'step-generic-function-list',
   templateUrl: './generic-function-list.component.html',
   styleUrls: ['./generic-function-list.component.scss'],
 })
-export class GenericFunctionListComponent implements OnInit {
-  @Input() filter?: [string];
-  @Input() filterclass?: [string];
+export class GenericFunctionListComponent implements OnInit, AfterViewInit {
+  @Input() filter?: string[];
+  @Input() filterclass?: string[];
   @Input() title?: string;
   @Input() serviceroot?: string;
 
-  readonly dataSource: TableRemoteDataSource<FunctionPackage> =
-    this._augmentedKeywordsService.createFilteredTableDataSource(this.filter);
+  readonly dataSource?: TableRemoteDataSource<FunctionPackage>;
 
   constructor(
     private _interactivePlanExecutionService: InteractivePlanExecutionService,
@@ -37,12 +39,16 @@ export class GenericFunctionListComponent implements OnInit {
     @Inject(AJS_FUNCTION_TYPE_REGISTRY) private _functionTypeRegistry: any
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this._genericFunctionDialogService.configure(this.title, this.serviceroot, this.filterclass);
   }
 
+  ngAfterViewInit(): void {
+    (this as FieldAccessor).dataSource = this._augmentedKeywordsService.createFilteredTableDataSource(this.filter);
+  }
+
   addMask(): void {
-    this._genericFunctionDialogService.openAddMaskDialog().subscribe((_) => this.dataSource.reload());
+    this._genericFunctionDialogService.openAddMaskDialog().subscribe((_) => this.dataSource?.reload());
   }
 
   editFunction(id: string): void {
@@ -60,13 +66,13 @@ export class GenericFunctionListComponent implements OnInit {
   }
 
   duplicateFunction(id: string): void {
-    this._augmentedKeywordsService.copyFunction(id).subscribe((_) => this.dataSource.reload());
+    this._augmentedKeywordsService.cloneFunction(id).subscribe((_) => this.dataSource?.reload());
   }
 
   deleteFunction(id: string, name: string): void {
     this._genericFunctionDialogService.openDeleteDialog(id, name).subscribe((result) => {
       if (result) {
-        this.dataSource.reload();
+        this.dataSource?.reload();
       }
     });
   }
@@ -76,7 +82,7 @@ export class GenericFunctionListComponent implements OnInit {
   }
 
   configureFunction(id: string) {
-    this._genericFunctionDialogService.openConfigDialog(id).subscribe((_) => this.dataSource.reload());
+    this._genericFunctionDialogService.openConfigDialog(id).subscribe((_) => this.dataSource?.reload());
   }
 
   functionTypeLabel(type: string) {

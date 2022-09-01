@@ -1,15 +1,32 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, Parameter, AugmentedParametersService } from '@exense/step-core';
+import {
+  AJS_MODULE,
+  AugmentedParametersService,
+  AutoDeselectStrategy,
+  BulkOperation,
+  BulkOperationsInvokeService,
+  Parameter,
+  selectionCollectionProvider,
+} from '@exense/step-core';
 import { ParameterDialogsService } from '../services/parameter-dialogs.service';
+import { ParametersBulkOperationsInvokeService } from '../services/parameters-bulk-operations-invoke.service';
 
 @Component({
   selector: 'step-parameters-list',
   templateUrl: './parameters-list.component.html',
   styleUrls: ['./parameters-list.component.scss'],
+  providers: [
+    selectionCollectionProvider<string, Parameter>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    {
+      provide: BulkOperationsInvokeService,
+      useClass: ParametersBulkOperationsInvokeService,
+    },
+  ],
 })
 export class ParametersListComponent {
   readonly dataSource = this._parametersService.dataSource;
+  readonly availableBulkOperations = [BulkOperation.delete, BulkOperation.duplicate];
 
   constructor(
     private _parametersService: AugmentedParametersService,
@@ -25,7 +42,7 @@ export class ParametersListComponent {
   }
 
   duplicateParameter(parameter: Parameter): void {
-    this._parametersService.copyParameter(parameter.id!).subscribe(() => this.dataSource.reload());
+    this._parametersService.cloneParameter(parameter.id!).subscribe(() => this.dataSource.reload());
   }
 
   editParameter(parameter: Parameter): void {

@@ -23,3 +23,5 @@ export { AugmentedKeywordPackagesService } from './services/augmented-keyword-pa
 export { AugmentedKeywordsService } from './services/augmented-keywords-service';
 export { AugmentedScreenService } from './services/augmented-screen.service';
 export { AugmentedAdminService } from './services/augmented-admin-service';
+export { pollAsyncTask } from './rxjs-operators/poll-async-task';
+export { AsyncTaskStatus } from './shared/async-task-status';

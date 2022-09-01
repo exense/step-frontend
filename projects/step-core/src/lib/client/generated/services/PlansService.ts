@@ -5,8 +5,8 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import type { AbstractArtefact } from '../models/AbstractArtefact';
+import type { AsyncTaskStatusVoid } from '../models/AsyncTaskStatusVoid';
 import type { BulkOperationParameters } from '../models/BulkOperationParameters';
-import type { ExportStatus } from '../models/ExportStatus';
 import type { Plan } from '../models/Plan';
 import type { PlanCompilationResult } from '../models/PlanCompilationResult';
 
@@ -15,6 +15,37 @@ import { BaseHttpRequest } from '../core/BaseHttpRequest';
 @Injectable({ providedIn: 'root' })
 export class PlansService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
+
+  /**
+   * Deletes the entities according to the provided parameters
+   * @param requestBody
+   * @returns AsyncTaskStatusVoid default response
+   * @throws ApiError
+   */
+  public deletePlans(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/plans/bulk/delete',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Clones the entity with the given Id
+   * @param id
+   * @returns Plan default response
+   * @throws ApiError
+   */
+  public clonePlan(id: string): Observable<Plan> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/plans/{id}/clone',
+      path: {
+        id: id,
+      },
+    });
+  }
 
   /**
    * Clones the provided artefact.
@@ -47,28 +78,12 @@ export class PlansService {
   }
 
   /**
-   * Clones and returns the plan with the given id. The result of this method will have to be saved with the dedicated method.
-   * @param id
-   * @returns Plan default response
-   * @throws ApiError
-   */
-  public clonePlan(id: string): Observable<Plan> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/plans/{id}/clone',
-      path: {
-        id: id,
-      },
-    });
-  }
-
-  /**
-   * Bulk clone plans according to the provided parameters
+   * Clones the entities according to the provided parameters
    * @param requestBody
-   * @returns ExportStatus default response
+   * @returns AsyncTaskStatusVoid default response
    * @throws ApiError
    */
-  public clonePlans(requestBody?: BulkOperationParameters): Observable<ExportStatus> {
+  public clonePlans(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/plans/bulk/clone',
@@ -109,7 +124,7 @@ export class PlansService {
   }
 
   /**
-   * Returns the plan with the given id.
+   * Retrieves an entity by its Id
    * @param id
    * @returns Plan default response
    * @throws ApiError
@@ -125,7 +140,7 @@ export class PlansService {
   }
 
   /**
-   * Deletes the plan with the given id.
+   * Deletes the entity with the given Id
    * @param id
    * @returns any default response
    * @throws ApiError
@@ -141,22 +156,7 @@ export class PlansService {
   }
 
   /**
-   * Bulk delete plans according to the provided parameters
-   * @param requestBody
-   * @returns ExportStatus default response
-   * @throws ApiError
-   */
-  public deletePlans(requestBody?: BulkOperationParameters): Observable<ExportStatus> {
-    return this.httpRequest.request({
-      method: 'POST',
-      url: '/plans/bulk/delete',
-      body: requestBody,
-      mediaType: 'application/json',
-    });
-  }
-
-  /**
-   * Returns the plans matching the given attributes.
+   * Returns the list of entities matching the provided attributes
    * @param requestBody
    * @returns Plan default response
    * @throws ApiError
@@ -280,7 +280,7 @@ export class PlansService {
   }
 
   /**
-   * Creates / updates the given plan.
+   * Saves the provided entity
    * @param requestBody
    * @returns Plan default response
    * @throws ApiError

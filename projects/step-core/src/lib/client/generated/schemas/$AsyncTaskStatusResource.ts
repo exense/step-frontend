@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $TaskStatus = {
+export const $AsyncTaskStatusResource = {
   properties: {
     id: {
       type: 'string',
@@ -19,8 +19,11 @@ export const $TaskStatus = {
         type: 'string',
       },
     },
+    error: {
+      type: 'string',
+    },
     result: {
-      properties: {},
+      type: 'Resource',
     },
   },
 } as const;

@@ -100,7 +100,6 @@ export * from './services/auth.service';
 export * from './services/dashboard.service';
 export * from './services/invoke-run.service';
 export * from './services/view-registry.service';
-export * from './services/async-task.service';
 export * from './services/link-processor.service';
 export * from './services/deferred-link-processor.service';
 export * from './services/scheduled-task-dialogs.service';
@@ -125,6 +124,7 @@ export * from './modules/entities-selection/entities-selection.module';
 export * from './client/generated/index';
 export * from './client/step-client-module';
 export * from './modules/custom-registeries/custom-registries.module';
+export * from './modules/async-operations/async-operations.module';
 export * from './modules/tabs/tabs.module';
 
 export { ApiError } from './client/generated/core/ApiError';

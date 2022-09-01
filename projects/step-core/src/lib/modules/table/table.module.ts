@@ -10,9 +10,21 @@ import { CustomCellValuePipe } from './pipe/custom-cell-value.pipe';
 import { ColumnDirective } from './directives/column.directive';
 import { CustomRegistriesModule } from '../custom-registeries/custom-registries.module';
 import { CustomCellComponentsPipe } from './pipe/custom-cell-components.pipe';
+import { AdditionalHeaderDirective } from './directives/additional-header.directive';
+import { BulkOperationsComponent } from './components/bulk-operations/bulk-operations.component';
+import { EntitiesSelectionModule } from '../entities-selection/entities-selection.module';
+import { BulkOperationIconPipe } from './pipe/bulk-operation-icon.pipe';
+import { AsyncOperationsModule } from '../async-operations/async-operations.module';
 
 @NgModule({
-  imports: [CommonModule, StepMaterialModule, StepTableClientModule, CustomRegistriesModule],
+  imports: [
+    CommonModule,
+    StepMaterialModule,
+    StepTableClientModule,
+    EntitiesSelectionModule,
+    CustomRegistriesModule,
+    AsyncOperationsModule,
+  ],
   declarations: [
     TableComponent,
     SearchColDirective,
@@ -21,8 +33,19 @@ import { CustomCellComponentsPipe } from './pipe/custom-cell-components.pipe';
     CustomCellValuePipe,
     ColumnDirective,
     CustomCellComponentsPipe,
+    AdditionalHeaderDirective,
+    BulkOperationsComponent,
+    BulkOperationIconPipe,
   ],
-  exports: [TableComponent, SearchColDirective, SearchCellDefDirective, CustomColumnsComponent, ColumnDirective],
+  exports: [
+    TableComponent,
+    SearchColDirective,
+    SearchCellDefDirective,
+    CustomColumnsComponent,
+    ColumnDirective,
+    AdditionalHeaderDirective,
+    BulkOperationsComponent,
+  ],
 })
 export class TableModule {}
 
@@ -33,8 +56,12 @@ export * from './shared/search-value';
 export * from './shared/table-remote-data-source';
 export * from './shared/table-local-data-source';
 export * from './shared/table-data-source';
-export * from './services/table.search';
+export * from './services/table-search';
 export * from './services/table-legacy-utils.service';
 export * from './directives/search-col.directive';
 export * from './directives/search-cell-def.directive';
 export * from './services/custom-column-options';
+export * from './directives/additional-header.directive';
+export * from './components/bulk-operations/bulk-operations.component';
+export * from './services/bulk-operations-invoke.service';
+export * from './shared/bulk-operation.enum';

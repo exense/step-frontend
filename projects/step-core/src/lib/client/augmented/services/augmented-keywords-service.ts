@@ -8,7 +8,7 @@ import { TableRemoteDataSource } from '../../../modules/table/shared/table-remot
 export class AugmentedKeywordsService extends KeywordsService {
   private readonly FUNCTIONS_TABLE_ID = 'functions';
 
-  createFilteredTableDataSource(filter?: [string]) {
+  createFilteredTableDataSource(filter?: string[]) {
     return new TableRemoteDataSource<KeywordFunction>(
       this.FUNCTIONS_TABLE_ID,
       this._tableRest,

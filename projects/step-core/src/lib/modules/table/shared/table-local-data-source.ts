@@ -4,6 +4,7 @@ import { BehaviorSubject, combineLatest, map, Observable, of, Subject, takeUntil
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { SearchValue } from './search-value';
+import { TableRequestData } from '../../../client/table/models/table-request-data';
 import { TableParameters } from '../../../client/generated';
 
 interface Request {
@@ -176,6 +177,14 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
 
   reload(): void {
     this._request$.next(this._request$.value);
+  }
+
+  getFilterRequest(
+    search?: { [p: string]: SearchValue },
+    filter?: string,
+    params?: TableParameters
+  ): TableRequestData | undefined {
+    return undefined;
   }
 
   exportAsCSV(fields: string[], params?: TableParameters): void {

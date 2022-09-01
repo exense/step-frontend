@@ -1,12 +1,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $ExportStatus = {
+export const $AsyncTaskStatusObject = {
   properties: {
     id: {
-      type: 'string',
-    },
-    attachmentID: {
       type: 'string',
     },
     ready: {
@@ -21,6 +18,12 @@ export const $ExportStatus = {
       contains: {
         type: 'string',
       },
+    },
+    error: {
+      type: 'string',
+    },
+    result: {
+      properties: {},
     },
   },
 } as const;

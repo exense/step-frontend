@@ -1,7 +1,7 @@
 import { ContentChild, Directive, Input, Self } from '@angular/core';
 import { MatColumnDef } from '@angular/material/table';
 import { SearchCellDefDirective } from './search-cell-def.directive';
-import { TableSearch } from '../services/table.search';
+import { TableSearch } from '../services/table-search';
 
 @Directive({
   selector: '[matColumnDef][stepSearchCol]',

@@ -1,0 +1,10 @@
+<step-bulk-selection-di [(selectionType)]="selectionType" [showLabel]="false"> </step-bulk-selection-di>
+<div>
+  <ng-container *ngFor="let operation of availableOperations">
+    <button type="button" mat-icon-button (click)="invoke(operation)" [disabled]="isOperationsDisabled$ | async">
+      <mat-icon>{{ operation | bulkOperationIcon }}</mat-icon>
+    </button>
+  </ng-container>
+</div>
+<step-bulk-selection-label [selectionType]="selectionType" [selectionCollector]="_selectionCollector">
+</step-bulk-selection-label>
