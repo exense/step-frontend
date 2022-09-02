@@ -21,7 +21,7 @@ angular
 
   .run(function (ViewRegistry, EntityRegistry) {
     ViewRegistry.registerView('operations', 'partials/operations/operationsList.html');
-    ViewRegistry.registerMenuEntry('Current Operations', 'operations', 'glyphicon glyphicon-eye-open',  10,"status-root", 'admin');
+    ViewRegistry.registerMenuEntry('Current Operations', 'operations', 'glyphicon glyphicon-eye-open',  10,"status-root", 'operations-read');
   })
 
   .controller(
