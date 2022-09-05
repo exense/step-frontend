@@ -12,9 +12,20 @@
       ><i class="glyphicon glyphicon-home"></i
     ></span>
     <span class="sidebar-home-and-settings-divider">|</span>
-    <span (click)="navigateTo('admin')" *ngIf="'admin' | hasRight | async" class="sidebar-home-and-settings-icon">
-      <i class="glyphicon glyphicon-cog"></i
-    ></span>
+    <span
+      (click)="navigateTo('admin')"
+      *ngIf="'admin-ui-menu' | hasRight | async"
+      class="sidebar-home-and-settings-icon"
+    >
+      <i class="glyphicon glyphicon-cog"></i>
+    </span>
+    <span
+      (click)="navigateTo('settings')"
+      *ngIf="('settings-ui-menu' | hasRight | async) && !('admin-ui-menu' | hasRight | async)"
+      class="sidebar-home-and-settings-icon"
+    >
+      <i class="glyphicon glyphicon-cog"></i>
+    </span>
   </div>
   <div id="sidebar-categories">
     <div id="sidebar-categories-tabs">
