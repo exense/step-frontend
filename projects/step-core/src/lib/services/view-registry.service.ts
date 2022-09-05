@@ -31,7 +31,35 @@ export interface Dashlet {
 export class ViewRegistryService {
   registeredViews: { [key: string]: CustomView } = {};
   registeredMenuEntries: MenuEntry[] = [];
+  registeredMenuIds: string[] = [];
   registeredDashlets: { [key: string]: Dashlet[] } = {};
+
+  constructor() {
+    this.registerStandardMenuEntries();
+  }
+
+  /**
+   * Registers basic set of main- and submenu entries
+   */
+  registerStandardMenuEntries() {
+    // Main Menus
+    this.registerMenuEntry('Automation', 'automation-root', 'glyphicon glyphicon-play', 10);
+    this.registerMenuEntry('Execute', 'execute-root', 'glyphicon glyphicon-tasks', 20);
+    this.registerMenuEntry('Status', 'status-root', 'glyphicon glyphicon-ok', 50);
+
+    // Sub Menus Automation
+    this.registerMenuEntry('Keywords', 'functions', 'glyphicon glyphicon-record', 10, 'automation-root');
+    this.registerMenuEntry('Plans', 'plans', 'glyphicon glyphicon-file', 30, 'automation-root');
+    this.registerMenuEntry('Parameters', 'parameters', 'glyphicon glyphicon-list-alt', 40, 'automation-root');
+    // Sub Menus Execute
+    this.registerMenuEntry('Executions', 'executions', 'glyphicon glyphicon-tasks', 10, 'execute-root');
+    this.registerMenuEntry('Scheduler', 'scheduler', 'glyphicon glyphicon-time', 20, 'execute-root');
+    // Sub Menus Status
+    this.registerMenuEntry('Agents', 'gridagents', 'glyphicon glyphicon-briefcase', 20, 'status-root');
+    this.registerMenuEntry('Agent tokens', 'gridtokens', 'glyphicon glyphicon-tag', 30, 'status-root');
+    this.registerMenuEntry('Token Groups', 'gridtokengroups', 'glyphicon glyphicon glyphicon-tags', 40, 'status-root');
+    this.registerMenuEntry('Quota Manager', 'gridquotamanager', 'glyphicon glyphicon-road', 50, 'status-root');
+  }
 
   getCustomView(view: string): CustomView {
     const customView = this.registeredViews[view];
@@ -76,6 +104,10 @@ export class ViewRegistryService {
     parentMenu?: string,
     right?: string
   ): void {
+    if (!viewId || this.registeredMenuIds.includes(viewId)) {
+      return;
+    }
+    this.registeredMenuIds.push(viewId);
     this.registeredMenuEntries.push({
       label,
       viewId,

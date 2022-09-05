@@ -12,16 +12,30 @@
       ><i class="glyphicon glyphicon-home"></i
     ></span>
     <span class="sidebar-home-and-settings-divider">|</span>
-    <span (click)="navigateTo('admin')" *ngIf="'admin' | hasRight | async" class="sidebar-home-and-settings-icon">
-      <i class="glyphicon glyphicon-cog"></i
-    ></span>
+    <span
+      (click)="navigateTo('admin')"
+      *ngIf="'admin-ui-menu' | hasRight | async"
+      class="sidebar-home-and-settings-icon"
+    >
+      <i class="glyphicon glyphicon-cog"></i>
+    </span>
+    <span
+      (click)="navigateTo('settings')"
+      *ngIf="('settings-ui-menu' | hasRight | async) && !('admin-ui-menu' | hasRight | async)"
+      class="sidebar-home-and-settings-icon"
+    >
+      <i class="glyphicon glyphicon-cog"></i>
+    </span>
   </div>
   <div id="sidebar-categories">
     <div id="sidebar-categories-tabs">
       <!-- MENU -->
       <div
         class="sidebar-collapsable-tab"
-        *ngFor="let mainMenuEntry of _viewRegistryService.registeredMenuEntries | menuFilter: 'root'"
+        *ngFor="
+          let mainMenuEntry of _viewRegistryService.registeredMenuEntries | menuFilter: 'root';
+          trackBy: trackByFn
+        "
       >
         <input
           #mainMenuCheckBox
@@ -35,7 +49,12 @@
           <span><mat-icon class="chevron">chevron_right</mat-icon></span>
         </label>
         <div class="content">
-          <section *ngFor="let entry of _viewRegistryService.registeredMenuEntries | menuFilter: mainMenuEntry.viewId">
+          <section
+            *ngFor="
+              let entry of _viewRegistryService.registeredMenuEntries | menuFilter: mainMenuEntry.viewId;
+              trackBy: trackByFn
+            "
+          >
             <div
               class="sidebar-subtab"
               [class.sidebar-highlighted-subtab]="_viewStateService.isViewActive(entry.viewId)"

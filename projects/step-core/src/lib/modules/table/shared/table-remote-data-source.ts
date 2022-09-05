@@ -126,10 +126,12 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   }
 
   disconnect(collectionViewer: CollectionViewer): void {
-    this._request$.complete();
-    this._inProgress$.complete();
-    this._terminator$.next(undefined);
-    this._terminator$.complete();
+    // While datasources exist in services, subjects completion don't allow to reuse them
+    // TODO the lines below should be uncommented back while SED-1243 implementation
+    // this._request$.complete();
+    // this._inProgress$.complete();
+    // this._terminator$.next(undefined);
+    // this._terminator$.complete();
   }
 
   private createInternalRequestObject(
