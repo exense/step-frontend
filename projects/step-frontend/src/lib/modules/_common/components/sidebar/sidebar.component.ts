@@ -1,4 +1,4 @@
-import { Component, Input, QueryList, ViewChildren, AfterViewInit, ElementRef, Inject } from '@angular/core';
+import { Component, Input, QueryList, ViewChildren, AfterViewInit, ElementRef, Inject, OnDestroy } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, AuthService, MenuEntry, ViewRegistryService, ViewStateService } from '@exense/step-core';
 import { DOCUMENT, Location } from '@angular/common';
@@ -8,11 +8,13 @@ import { DOCUMENT, Location } from '@angular/common';
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
 })
-export class SidebarComponent implements AfterViewInit {
+export class SidebarComponent implements AfterViewInit, OnDestroy {
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
   @Input() logo: string = 'images/logotopleft.png';
 
   sideBarOpen: boolean = true;
+
+  private locationStateSubscription: any;
 
   constructor(
     @Inject(DOCUMENT) private _document: Document,
@@ -20,22 +22,34 @@ export class SidebarComponent implements AfterViewInit {
     public _viewRegistryService: ViewRegistryService,
     public _viewStateService: ViewStateService,
     public _location: Location
-  ) {}
+  ) {
+    this.locationStateSubscription = this._location.subscribe((popState: any) => {
+      this.openMainMenuBasedOnActualView();
+    });
+  }
 
   ngAfterViewInit(): void {
-    const initialViewName = this._viewStateService.getViewName();
-    if (initialViewName) {
-      let initiallyExpandedMainMenu = this._viewRegistryService.getMainMenuKey(initialViewName!);
-      if (initiallyExpandedMainMenu) {
-        this.openMainMenu(initiallyExpandedMainMenu);
+    this.openMainMenuBasedOnActualView();
+  }
+
+  ngOnDestroy(): void {
+    this.locationStateSubscription.unsubscribe();
+  }
+
+  private openMainMenuBasedOnActualView(): void {
+    const actualViewName = this._viewStateService.getViewName();
+    if (actualViewName) {
+      let initiallyExpandedMainMenuKey = this._viewRegistryService.getMainMenuKey(actualViewName!);
+      if (initiallyExpandedMainMenuKey) {
+        this.openMainMenu(initiallyExpandedMainMenuKey);
       }
     }
   }
 
-  private openMainMenu(mainMenuName: string): void {
-    const checkbox = this.mainMenuCheckBoxes?.find((item) => item.nativeElement.getAttribute('name') === mainMenuName);
+  private openMainMenu(mainMenuKey: string): void {
+    const checkbox = this.mainMenuCheckBoxes?.find((item) => item.nativeElement.getAttribute('name') === mainMenuKey);
     if (checkbox) {
-      checkbox.nativeElement.setAttribute('checked', true);
+      checkbox.nativeElement.checked = true;
     }
   }
 
@@ -44,8 +58,6 @@ export class SidebarComponent implements AfterViewInit {
   }
 
   public navigateTo(viewId: string): void {
-    console.log(viewId);
-
     switch (viewId) {
       case 'home':
         this._authService.gotoDefaultPage();
