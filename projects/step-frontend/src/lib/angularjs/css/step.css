@@ -36,6 +36,7 @@ a {
 }
 
 .toolbar {
+  z-index: 10;
   position: absolute;
   margin-top: 10px;
   right: 20px;
