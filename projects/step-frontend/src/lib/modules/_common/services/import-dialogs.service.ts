@@ -20,6 +20,6 @@ export class ImportDialogsService {
         overwrite: () => false,
       },
     });
-    return a1Promise2Observable(modalInstance.resolve);
+    return a1Promise2Observable(modalInstance.result);
   }
 }
