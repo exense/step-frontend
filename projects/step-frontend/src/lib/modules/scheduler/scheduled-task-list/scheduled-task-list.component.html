@@ -18,7 +18,7 @@
     mat-icon-button
     matTooltip="Configure Scheduler"
     matTooltipPosition="below"
-    [disabled]="!('plan-write' | hasRight | async)"
+    [disabled]="!('scheduler-manage' | hasRight | async)"
     (click)="_logic.navToSettings()"
   >
     <mat-icon>settings</mat-icon>
