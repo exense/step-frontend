@@ -1,3 +1,3 @@
-import { AsyncTaskStatusObject, AsyncTaskStatusResource, AsyncTaskStatusVoid } from '../../generated';
+import { AsyncTaskStatusObject, AsyncTaskStatusResource } from '../../generated';
 
-export type AsyncTaskStatus = AsyncTaskStatusVoid | AsyncTaskStatusObject | AsyncTaskStatusResource;
+export type AsyncTaskStatus = AsyncTaskStatusObject | AsyncTaskStatusResource;
