@@ -179,7 +179,7 @@ angular
       $scope.interactiveSession = {
         execute: function (artefacts) {
           var sessionId = $scope.interactiveSession.id;
-          $scope.componentTabs.selectedTab = 'other';
+          $scope.componentTabs.selectedTab = 'console';
 
           function execute(artefacts, callback) {
             if (artefacts.length > 0) {
