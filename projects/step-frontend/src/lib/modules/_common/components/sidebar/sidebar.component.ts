@@ -1,6 +1,13 @@
-import { Component, Input, QueryList, ViewChildren, AfterViewInit, ElementRef, Inject, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Inject, Input, OnDestroy, QueryList, ViewChildren } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_LOCATION, AJS_MODULE, AuthService, MenuEntry, ViewRegistryService, ViewStateService } from '@exense/step-core';
+import {
+  AJS_LOCATION,
+  AJS_MODULE,
+  AuthService,
+  MenuEntry,
+  ViewRegistryService,
+  ViewStateService,
+} from '@exense/step-core';
 import { DOCUMENT, Location } from '@angular/common';
 import { ILocationService } from 'angular';
 
@@ -22,7 +29,8 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
     public _authService: AuthService,
     public _viewRegistryService: ViewRegistryService,
     public _viewStateService: ViewStateService,
-    @Inject(AJS_LOCATION) private _location: ILocationService
+    public _location: Location,
+    @Inject(AJS_LOCATION) private _ajsLocation: ILocationService
   ) {
     this.locationStateSubscription = this._location.subscribe((popState: any) => {
       this.openMainMenuBasedOnActualView();
@@ -64,11 +72,11 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
         this._authService.gotoDefaultPage();
         break;
       default:
-        if (this._location.path().includes('/root/' + viewId)) {
-          this._location.path('/');
-          setTimeout(() => this._location.path('/root/' + viewId));
+        if (this._ajsLocation.path().includes('/root/' + viewId)) {
+          this._ajsLocation.path('/');
+          setTimeout(() => this._ajsLocation.path('/root/' + viewId));
         } else {
-          this._location.path('/root/' + viewId);
+          this._ajsLocation.path('/root/' + viewId);
         }
         break;
     }
