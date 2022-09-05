@@ -7,7 +7,7 @@ import type { Observable } from 'rxjs';
 import type { AsyncTaskStatusResource } from '../models/AsyncTaskStatusResource';
 import type { TableExportRequest } from '../models/TableExportRequest';
 import type { TableRequest } from '../models/TableRequest';
-import type { TableResponseObject } from '../models/TableResponseObject';
+import type { TableResponse } from '../models/TableResponse';
 import type { WebPlugin } from '../models/WebPlugin';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -48,10 +48,10 @@ export class TablesService {
   /**
    * @param tableName
    * @param requestBody
-   * @returns TableResponseObject default response
+   * @returns TableResponse default response
    * @throws ApiError
    */
-  public request(tableName: string, requestBody?: TableRequest): Observable<TableResponseObject> {
+  public request(tableName: string, requestBody?: TableRequest): Observable<TableResponse> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/table/{tableName}',
