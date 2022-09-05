@@ -57,10 +57,6 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
     return item.viewId;
   }
 
-  public trackByFn(index: number, item: MenuEntry) {
-    return item.viewId;
-  }
-
   public navigateTo(viewId: string): void {
     switch (viewId) {
       case 'home':
