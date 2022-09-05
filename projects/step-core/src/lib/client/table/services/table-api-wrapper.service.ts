@@ -1,10 +1,11 @@
 import { Inject, Injectable } from '@angular/core';
 import { TableRequestData } from '../models/table-request-data';
-import { TableResponse } from '../models/table-response';
+import { TableResponseGeneric } from '../models/table-response-generic';
 import { map, Observable } from 'rxjs';
-import { AsyncTasksService, AsyncTaskStatusResource, AsyncTaskStatusVoid, TablesService } from '../../generated';
+import { AsyncTasksService, AsyncTaskStatusResource, TablesService } from '../../generated';
 import { pollAsyncTask } from '../../augmented/rxjs-operators/poll-async-task';
 import { DOCUMENT } from '@angular/common';
+import { AsyncTaskStatus } from '../../augmented/shared/async-task-status';
 
 @Injectable({
   providedIn: 'root',
@@ -16,11 +17,11 @@ export class TableApiWrapperService {
     @Inject(DOCUMENT) private _document: Document
   ) {}
 
-  requestTable<T>(tableId: string, tableRequest: TableRequestData): Observable<TableResponse<T>> {
-    return this._tables.request(tableId, tableRequest) as Observable<TableResponse<T>>;
+  requestTable<T>(tableId: string, tableRequest: TableRequestData): Observable<TableResponseGeneric<T>> {
+    return this._tables.request(tableId, tableRequest) as Observable<TableResponseGeneric<T>>;
   }
 
-  exportTable(tableId: string, tableRequest: TableRequestData, fields: string[]): Observable<AsyncTaskStatusVoid> {
+  exportTable(tableId: string, tableRequest: TableRequestData, fields: string[]): Observable<AsyncTaskStatus> {
     return this._tables.createExport(tableId, { tableRequest, fields });
   }
 

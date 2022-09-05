@@ -2,11 +2,13 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type AsyncTaskStatusVoid = {
+import type { BulkOperationReport } from './BulkOperationReport';
+
+export type AsyncTaskStatusBulkOperationReport = {
   id?: string;
   ready?: boolean;
   progress?: number;
   warnings?: Array<string>;
   error?: string;
-  result?: any;
+  result?: BulkOperationReport;
 };

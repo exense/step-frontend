@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type TableResponseObject = {
+export type TableResponse = {
   recordsTotal?: number;
   recordsFiltered?: number;
   data?: Array<any>;

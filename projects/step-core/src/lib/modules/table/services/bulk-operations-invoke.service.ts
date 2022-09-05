@@ -2,9 +2,10 @@ import { Observable, of } from 'rxjs';
 import { BulkOperation } from '../shared/bulk-operation.enum';
 import { TableRequestData } from '../../../client/table/models/table-request-data';
 import { BulkSelectionType } from '../../entities-selection/shared/bulk-selection-type.enum';
-import { AsyncTaskStatusVoid, BulkOperationParameters } from '../../../client/generated';
+import { BulkOperationParameters } from '../../../client/generated';
 import { TableFilter } from './table-filter';
 import { AsyncOperationService } from '../../async-operations/services/async-operation.service';
+import { AsyncTaskStatus } from '../../../client/augmented/shared/async-task-status';
 
 export interface BulkOperationConfig<ID> {
   operationType: BulkOperation;
@@ -17,13 +18,13 @@ export interface BulkOperationConfig<ID> {
 export abstract class BulkOperationsInvokeService<ID> {
   protected constructor(protected _asyncOperationService: AsyncOperationService) {}
 
-  protected abstract invokeDelete?(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid>;
-  protected abstract invokeDuplicate?(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid>;
-  protected abstract invokeExport?(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid>;
+  protected abstract invokeDelete?(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatus>;
+  protected abstract invokeDuplicate?(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatus>;
+  protected abstract invokeExport?(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatus>;
 
   protected transformConfig(config: BulkOperationConfig<ID>): BulkOperationParameters {
-    // todo: simulation logic isn't supported on BE, don't forget to update the FE, when simulation will appear
-    const simulate = false; //config.isDraft;
+    // todo: preview logic will be implemented later
+    const preview = false; //config.isDraft;
 
     let targetType: BulkOperationParameters['targetType'] = 'LIST';
     let ids: string[] | undefined = undefined;
@@ -59,11 +60,11 @@ export abstract class BulkOperationsInvokeService<ID> {
       targetType = 'ALL';
     }
 
-    return { targetType, ids, filter, simulate };
+    return { targetType, ids, filter, preview };
   }
 
-  invoke(config: BulkOperationConfig<ID>): Observable<AsyncTaskStatusVoid | undefined> {
-    let operation: ((params: BulkOperationParameters) => Observable<AsyncTaskStatusVoid>) | undefined;
+  invoke(config: BulkOperationConfig<ID>): Observable<AsyncTaskStatus | undefined> {
+    let operation: ((params: BulkOperationParameters) => Observable<AsyncTaskStatus>) | undefined;
     switch (config.operationType) {
       case BulkOperation.delete:
         operation = !!this.invokeDelete ? (params) => this.invokeDelete!(params) : undefined;

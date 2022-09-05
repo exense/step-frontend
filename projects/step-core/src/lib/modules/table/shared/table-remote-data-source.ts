@@ -17,7 +17,7 @@ import {
   SortDirection,
   TableRequestData,
   TableApiWrapperService,
-  TableResponse,
+  TableResponseGeneric,
 } from '../../../client/table/step-table-client.module';
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
@@ -86,7 +86,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   private _inProgress$ = new BehaviorSubject<boolean>(false);
   readonly inProgress$ = this._inProgress$.asObservable();
   private _request$ = new BehaviorSubject<TableRequestInternal | undefined>(undefined);
-  private _response$: Observable<TableResponse<T> | null> = this._request$.pipe(
+  private _response$: Observable<TableResponseGeneric<T> | null> = this._request$.pipe(
     filter((x) => !!x),
     map((x) => convertTableRequest(x!)),
     tap((_) => this._inProgress$.next(true)),
@@ -99,7 +99,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     startWith(null),
     shareReplay(1),
     takeUntil(this._terminator$)
-  ) as Observable<TableResponse<T> | null>;
+  ) as Observable<TableResponseGeneric<T> | null>;
   readonly data$: Observable<T[]> = this._response$.pipe(map((r) => r?.data || []));
 
   readonly total$ = this._response$.pipe(map((r) => r?.recordsTotal || 0));

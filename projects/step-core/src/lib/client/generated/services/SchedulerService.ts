@@ -4,7 +4,7 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
-import type { AsyncTaskStatusVoid } from '../models/AsyncTaskStatusVoid';
+import type { AsyncTaskStatusBulkOperationReport } from '../models/AsyncTaskStatusBulkOperationReport';
 import type { BulkOperationParameters } from '../models/BulkOperationParameters';
 import type { ExecutiontTaskParameters } from '../models/ExecutiontTaskParameters';
 
@@ -17,10 +17,10 @@ export class SchedulerService {
   /**
    * Deletes the entities according to the provided parameters
    * @param requestBody
-   * @returns AsyncTaskStatusVoid default response
+   * @returns AsyncTaskStatusBulkOperationReport default response
    * @throws ApiError
    */
-  public deleteExecutionTasks(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid> {
+  public deleteExecutionTasks(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/scheduler/task/bulk/delete',
@@ -48,10 +48,10 @@ export class SchedulerService {
   /**
    * Clones the entities according to the provided parameters
    * @param requestBody
-   * @returns AsyncTaskStatusVoid default response
+   * @returns AsyncTaskStatusBulkOperationReport default response
    * @throws ApiError
    */
-  public cloneExecutionTasks(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid> {
+  public cloneExecutionTasks(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/scheduler/task/bulk/clone',

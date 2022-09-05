@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {
   AsyncOperationService,
-  AsyncTaskStatusVoid,
+  AsyncTaskStatus,
   BulkOperationParameters,
   BulkOperationsInvokeService,
   PlansService,
@@ -14,10 +14,10 @@ export class PlansBulkOperationsInvokeService extends BulkOperationsInvokeServic
     super(_asyncService);
   }
 
-  protected override invokeDelete(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid> {
+  protected override invokeDelete(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatus> {
     return this._plans.deletePlans(requestBody);
   }
-  protected override invokeDuplicate(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid> {
+  protected override invokeDuplicate(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatus> {
     return this._plans.clonePlans(requestBody);
   }
 

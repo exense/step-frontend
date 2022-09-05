@@ -1,6 +1,6 @@
 import {
   AsyncOperationService,
-  AsyncTaskStatusVoid,
+  AsyncTaskStatus,
   AugmentedParametersService,
   BulkOperationParameters,
   BulkOperationsInvokeService,
@@ -16,11 +16,11 @@ export class ParametersBulkOperationsInvokeService extends BulkOperationsInvokeS
     super(_asyncService);
   }
 
-  protected override invokeDelete(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid> {
+  protected override invokeDelete(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatus> {
     return this._api.deleteParameters(requestBody);
   }
 
-  protected override invokeDuplicate(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid> {
+  protected override invokeDuplicate(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatus> {
     return this._api.cloneParameters(requestBody);
   }
 }
