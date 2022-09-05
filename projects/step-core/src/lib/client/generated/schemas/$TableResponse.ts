@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $TableResponseObject = {
+export const $TableResponse = {
   properties: {
     recordsTotal: {
       type: 'number',

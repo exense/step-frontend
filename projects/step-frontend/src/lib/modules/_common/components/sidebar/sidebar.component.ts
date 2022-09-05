@@ -1,6 +1,6 @@
-import { Component, Input, QueryList, ViewChildren, AfterViewInit, ElementRef, Inject } from '@angular/core';
+import { Component, Input, QueryList, ViewChildren, AfterViewInit, ElementRef, Inject, OnDestroy } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_LOCATION, AJS_MODULE, AuthService, ViewRegistryService, ViewStateService } from '@exense/step-core';
+import { AJS_LOCATION, AJS_MODULE, AuthService, MenuEntry, ViewRegistryService, ViewStateService } from '@exense/step-core';
 import { DOCUMENT, Location } from '@angular/common';
 import { ILocationService } from 'angular';
 
@@ -9,11 +9,13 @@ import { ILocationService } from 'angular';
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
 })
-export class SidebarComponent implements AfterViewInit {
+export class SidebarComponent implements AfterViewInit, OnDestroy {
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
   @Input() logo: string = 'images/logotopleft.png';
 
   sideBarOpen: boolean = true;
+
+  private locationStateSubscription: any;
 
   constructor(
     @Inject(DOCUMENT) private _document: Document,
@@ -22,88 +24,38 @@ export class SidebarComponent implements AfterViewInit {
     public _viewStateService: ViewStateService,
     @Inject(AJS_LOCATION) private _location: ILocationService
   ) {
-    // Main Menus
-    this._viewRegistryService.registerMenuEntry('Automation', 'automation-root', 'glyphicon glyphicon-play', 10);
-    this._viewRegistryService.registerMenuEntry('Execute', 'execute-root', 'glyphicon glyphicon-tasks', 20);
-    this._viewRegistryService.registerMenuEntry('Status', 'status-root', 'glyphicon glyphicon-ok', 50);
-
-    // Sub Menus Automation
-    this._viewRegistryService.registerMenuEntry(
-      'Keywords',
-      'functions',
-      'glyphicon glyphicon-record',
-      10,
-      'automation-root'
-    );
-    this._viewRegistryService.registerMenuEntry('Plans', 'plans', 'glyphicon glyphicon-file', 30, 'automation-root');
-    this._viewRegistryService.registerMenuEntry(
-      'Parameters',
-      'parameters',
-      'glyphicon glyphicon-list-alt',
-      40,
-      'automation-root'
-    );
-    // Sub Menus Execute
-    this._viewRegistryService.registerMenuEntry(
-      'Executions',
-      'executions',
-      'glyphicon glyphicon-tasks',
-      10,
-      'execute-root'
-    );
-    this._viewRegistryService.registerMenuEntry(
-      'Scheduler',
-      'scheduler',
-      'glyphicon glyphicon-time',
-      20,
-      'execute-root'
-    );
-    // Sub Menus Status
-    this._viewRegistryService.registerMenuEntry(
-      'Agents',
-      'gridagents',
-      'glyphicon glyphicon-briefcase',
-      20,
-      'status-root'
-    );
-    this._viewRegistryService.registerMenuEntry(
-      'Agent tokens',
-      'gridtokens',
-      'glyphicon glyphicon-tag',
-      30,
-      'status-root'
-    );
-    this._viewRegistryService.registerMenuEntry(
-      'Token Groups',
-      'gridtokengroups',
-      'glyphicon glyphicon glyphicon-tags',
-      40,
-      'status-root'
-    );
-    this._viewRegistryService.registerMenuEntry(
-      'Quota Manager',
-      'gridquotamanager',
-      'glyphicon glyphicon-road',
-      50,
-      'status-root'
-    );
+    this.locationStateSubscription = this._location.subscribe((popState: any) => {
+      this.openMainMenuBasedOnActualView();
+    });
   }
 
   ngAfterViewInit(): void {
-    const initialViewName = this._viewStateService.getViewName();
-    if (initialViewName) {
-      let initiallyExpandedMainMenu = this._viewRegistryService.getMainMenuKey(initialViewName!);
-      if (initiallyExpandedMainMenu) {
-        this.openMainMenu(initiallyExpandedMainMenu);
+    this.openMainMenuBasedOnActualView();
+  }
+
+  ngOnDestroy(): void {
+    this.locationStateSubscription.unsubscribe();
+  }
+
+  private openMainMenuBasedOnActualView(): void {
+    const actualViewName = this._viewStateService.getViewName();
+    if (actualViewName) {
+      let initiallyExpandedMainMenuKey = this._viewRegistryService.getMainMenuKey(actualViewName!);
+      if (initiallyExpandedMainMenuKey) {
+        this.openMainMenu(initiallyExpandedMainMenuKey);
       }
     }
   }
 
-  private openMainMenu(mainMenuName: string): void {
-    const checkbox = this.mainMenuCheckBoxes?.find((item) => item.nativeElement.getAttribute('name') === mainMenuName);
+  private openMainMenu(mainMenuKey: string): void {
+    const checkbox = this.mainMenuCheckBoxes?.find((item) => item.nativeElement.getAttribute('name') === mainMenuKey);
     if (checkbox) {
-      checkbox.nativeElement.setAttribute('checked', true);
+      checkbox.nativeElement.checked = true;
     }
+  }
+
+  public trackByFn(index: number, item: MenuEntry) {
+    return item.viewId;
   }
 
   public navigateTo(viewId: string): void {

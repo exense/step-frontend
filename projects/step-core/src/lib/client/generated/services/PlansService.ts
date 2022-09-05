@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import type { AbstractArtefact } from '../models/AbstractArtefact';
-import type { AsyncTaskStatusVoid } from '../models/AsyncTaskStatusVoid';
+import type { AsyncTaskStatusBulkOperationReport } from '../models/AsyncTaskStatusBulkOperationReport';
 import type { BulkOperationParameters } from '../models/BulkOperationParameters';
 import type { Plan } from '../models/Plan';
 import type { PlanCompilationResult } from '../models/PlanCompilationResult';
@@ -19,10 +19,10 @@ export class PlansService {
   /**
    * Deletes the entities according to the provided parameters
    * @param requestBody
-   * @returns AsyncTaskStatusVoid default response
+   * @returns AsyncTaskStatusBulkOperationReport default response
    * @throws ApiError
    */
-  public deletePlans(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid> {
+  public deletePlans(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/plans/bulk/delete',
@@ -80,10 +80,10 @@ export class PlansService {
   /**
    * Clones the entities according to the provided parameters
    * @param requestBody
-   * @returns AsyncTaskStatusVoid default response
+   * @returns AsyncTaskStatusBulkOperationReport default response
    * @throws ApiError
    */
-  public clonePlans(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusVoid> {
+  public clonePlans(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/plans/bulk/clone',
