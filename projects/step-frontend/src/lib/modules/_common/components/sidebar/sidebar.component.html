@@ -21,7 +21,10 @@
       <!-- MENU -->
       <div
         class="sidebar-collapsable-tab"
-        *ngFor="let mainMenuEntry of _viewRegistryService.registeredMenuEntries | menuFilter: 'root'"
+        *ngFor="
+          let mainMenuEntry of _viewRegistryService.registeredMenuEntries | menuFilter: 'root';
+          trackBy: trackByFn
+        "
       >
         <input
           #mainMenuCheckBox
@@ -35,7 +38,12 @@
           <span><mat-icon class="chevron">chevron_right</mat-icon></span>
         </label>
         <div class="content">
-          <section *ngFor="let entry of _viewRegistryService.registeredMenuEntries | menuFilter: mainMenuEntry.viewId">
+          <section
+            *ngFor="
+              let entry of _viewRegistryService.registeredMenuEntries | menuFilter: mainMenuEntry.viewId;
+              trackBy: trackByFn
+            "
+          >
             <div
               class="sidebar-subtab"
               [class.sidebar-highlighted-subtab]="_viewStateService.isViewActive(entry.viewId)"
