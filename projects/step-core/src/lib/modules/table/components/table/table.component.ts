@@ -191,7 +191,7 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
   private setupSearchColumns(): void {
     const searchColDef = this.allSearchColDef;
 
-    if (!searchColDef.length) {
+    if (!searchColDef?.length) {
       this.searchColumns = [];
       this.displaySearchColumns = [];
       return;

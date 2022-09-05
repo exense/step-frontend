@@ -3,7 +3,7 @@
 /* eslint-disable */
 export const $BulkOperationParameters = {
   properties: {
-    simulate: {
+    preview: {
       type: 'boolean',
     },
     targetType: {

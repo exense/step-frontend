@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $AsyncTaskStatusVoid = {
+export const $AsyncTaskStatusBulkOperationReport = {
   properties: {
     id: {
       type: 'string',
@@ -23,7 +23,7 @@ export const $AsyncTaskStatusVoid = {
       type: 'string',
     },
     result: {
-      properties: {},
+      type: 'BulkOperationReport',
     },
   },
 } as const;
