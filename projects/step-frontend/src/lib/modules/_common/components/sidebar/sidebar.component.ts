@@ -1,7 +1,8 @@
 import { Component, Input, QueryList, ViewChildren, AfterViewInit, ElementRef, Inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, AuthService, ViewRegistryService, ViewStateService } from '@exense/step-core';
+import { AJS_LOCATION, AJS_MODULE, AuthService, ViewRegistryService, ViewStateService } from '@exense/step-core';
 import { DOCUMENT, Location } from '@angular/common';
+import { ILocationService } from 'angular';
 
 @Component({
   selector: '[step-sidebar]',
@@ -19,7 +20,7 @@ export class SidebarComponent implements AfterViewInit {
     public _authService: AuthService,
     public _viewRegistryService: ViewRegistryService,
     public _viewStateService: ViewStateService,
-    public _location: Location
+    @Inject(AJS_LOCATION) private _location: ILocationService
   ) {
     // Main Menus
     this._viewRegistryService.registerMenuEntry('Automation', 'automation-root', 'glyphicon glyphicon-play', 10);
@@ -106,14 +107,17 @@ export class SidebarComponent implements AfterViewInit {
   }
 
   public navigateTo(viewId: string): void {
-    console.log(viewId);
-
     switch (viewId) {
       case 'home':
         this._authService.gotoDefaultPage();
         break;
       default:
-        this._location.go('#/root/' + viewId);
+        if (this._location.path().includes('/root/' + viewId)) {
+          this._location.path('/');
+          setTimeout(() => this._location.path('/root/' + viewId));
+        } else {
+          this._location.path('/root/' + viewId);
+        }
         break;
     }
   }
