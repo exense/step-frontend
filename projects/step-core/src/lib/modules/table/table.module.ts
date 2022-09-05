@@ -15,6 +15,7 @@ import { BulkOperationsComponent } from './components/bulk-operations/bulk-opera
 import { EntitiesSelectionModule } from '../entities-selection/entities-selection.module';
 import { BulkOperationIconPipe } from './pipe/bulk-operation-icon.pipe';
 import { AsyncOperationsModule } from '../async-operations/async-operations.module';
+import { BulkOperationLabelPipe } from './pipe/bulk-operation-label.pipe';
 
 @NgModule({
   imports: [
@@ -36,6 +37,7 @@ import { AsyncOperationsModule } from '../async-operations/async-operations.modu
     AdditionalHeaderDirective,
     BulkOperationsComponent,
     BulkOperationIconPipe,
+    BulkOperationLabelPipe,
   ],
   exports: [
     TableComponent,
@@ -65,3 +67,5 @@ export * from './directives/additional-header.directive';
 export * from './components/bulk-operations/bulk-operations.component';
 export * from './services/bulk-operations-invoke.service';
 export * from './shared/bulk-operation.enum';
+export * from './pipe/bulk-operation-label.pipe';
+export * from './pipe/bulk-operation-icon.pipe';
