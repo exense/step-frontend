@@ -5,6 +5,7 @@ import { BulkOperationConfig, BulkOperationsInvokeService } from '../../services
 import { BulkOperation } from '../../shared/bulk-operation.enum';
 import { TableReload } from '../../services/table-reload';
 import { map, of } from 'rxjs';
+import { AsyncOperationCloseStatus } from '../../../async-operations/async-operations.module';
 
 @Component({
   selector: 'step-bulk-operations',
@@ -39,7 +40,7 @@ export class BulkOperationsComponent<KEY, ENTITY> {
     const config: BulkOperationConfig<KEY> = {
       selectionType: this.selectionType,
       operationType: operation,
-      isDraft: true,
+      withPreview: true,
     };
 
     if (this.selectionType === BulkSelectionType.Filtered) {
@@ -50,8 +51,8 @@ export class BulkOperationsComponent<KEY, ENTITY> {
       config.ids = this._selectionCollector?.selected || undefined;
     }
 
-    this._bulkOperationsInvoke.invoke(config).subscribe((status) => {
-      if (!status?.ready) {
+    this._bulkOperationsInvoke.invoke(config).subscribe((result) => {
+      if (result?.closeStatus !== AsyncOperationCloseStatus.success) {
         return;
       }
       this._tableReload?.reload();
