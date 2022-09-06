@@ -2,9 +2,10 @@ import { NgModule } from '@angular/core';
 import { EntityIconComponent } from '../entity/components/entity-icon/entity-icon.component';
 import { StepMaterialModule } from '../step-material/step-material.module';
 import { CommonModule } from '@angular/common';
+import { CustomRegistriesModule } from '../custom-registeries/custom-registries.module';
 
 @NgModule({
-  imports: [CommonModule, StepMaterialModule],
+  imports: [CommonModule, StepMaterialModule, CustomRegistriesModule],
   declarations: [EntityIconComponent],
   exports: [EntityIconComponent],
 })

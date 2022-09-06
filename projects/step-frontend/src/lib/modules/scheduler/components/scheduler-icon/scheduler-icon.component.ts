@@ -1,9 +1,11 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component } from '@angular/core';
+import { CustomComponent, ExecutiontTaskParameters } from '@exense/step-core';
 
 @Component({
   selector: 'step-scheduler-icon',
-  template: `<mat-icon>schedule</mat-icon>`,
+  template: `<entity-icon *ngIf="context" [entity]="context!" entityName="tasks"> </entity-icon>`,
   styleUrls: [],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SchedulerIconComponent {}
+export class SchedulerIconComponent implements CustomComponent {
+  context?: ExecutiontTaskParameters;
+}
