@@ -1,6 +1,7 @@
 <section class="header">
   <step-btn-group>
-    <step-autorefresh-toggle [interval]="5000" (refresh)="dataSource.reload()"> </step-autorefresh-toggle>
+    <step-autorefresh-toggle [interval]="5000" (refresh)="dataSource.reload({ hideProgress: true })">
+    </step-autorefresh-toggle>
   </step-btn-group>
 </section>
 <step-table
