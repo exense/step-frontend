@@ -85,11 +85,15 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   private _terminator$ = new Subject<any>();
   private _inProgress$ = new BehaviorSubject<boolean>(false);
   readonly inProgress$ = this._inProgress$.asObservable();
-  private _request$ = new BehaviorSubject<TableRequestInternal | undefined>(undefined);
+  private _request$ = new BehaviorSubject<(TableRequestInternal & { hideProgress?: boolean }) | undefined>(undefined);
   private _response$: Observable<TableResponseGeneric<T> | null> = this._request$.pipe(
     filter((x) => !!x),
-    map((x) => convertTableRequest(x!)),
-    tap((_) => this._inProgress$.next(true)),
+    map((x) => {
+      return { ...convertTableRequest(x!), ...{ hideProgress: x?.hideProgress } };
+    }),
+    tap((x) => {
+      this._inProgress$.next(!x.hideProgress);
+    }),
     switchMap((request) => this._rest.requestTable<T>(this._tableId, request)),
     catchError((err) => {
       console.error(err);
@@ -212,8 +216,10 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     this._requestColumnsMap[key] = value;
   }
 
-  reload() {
-    this._request$.next(this._request$.value);
+  reload(hideProgress?: boolean) {
+    let val = this._request$.value;
+    val!.hideProgress = !!hideProgress;
+    this._request$.next(val);
   }
 
   getFilterRequest(

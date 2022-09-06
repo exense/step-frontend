@@ -22,6 +22,6 @@ export interface TableDataSource<T> extends DataSource<T> {
     filter?: string,
     params?: TableParameters
   ): TableRequestData | undefined;
-  reload(): void;
+  reload(hideProgress?: boolean): void;
   exportAsCSV(fields: string[], params?: TableParameters): void;
 }
