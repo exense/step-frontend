@@ -124,7 +124,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
       map((testcases) => ({
         type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
         eid,
-        testcases: testcases?.length > 0 ? testcases : null,
+        testcases: testcases?.length > 0 ? testcases : undefined,
       })),
       takeUntil(this.selectionTerminator$)
     );
