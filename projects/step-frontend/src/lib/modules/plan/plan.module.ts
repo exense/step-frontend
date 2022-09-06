@@ -4,7 +4,7 @@ import { StepCommonModule } from '../_common/step-common.module';
 import { PlanOtherplanListComponent } from './components/plan-otherplan-list/plan-otherplan-list.component';
 import { PlanFunctionListComponent } from './components/plan-function-list/plan-function-list.component';
 import { PlanArtefactListComponent } from './components/plan-artefact-list/plan-artefact-list.component';
-import { CustomCellRegistryService, EntityRegistryService } from '@exense/step-core';
+import { CustomCellRegistryService, EntityRegistry } from '@exense/step-core';
 import { PlanIconComponent } from './components/plan-icon/plan-icon.component';
 import { PlanLinkComponent } from './components/plan-link/plan-link.component';
 
@@ -21,8 +21,8 @@ import { PlanLinkComponent } from './components/plan-link/plan-link.component';
   exports: [PlanListComponent, PlanOtherplanListComponent, PlanFunctionListComponent, PlanArtefactListComponent],
 })
 export class PlanModule {
-  constructor(_entityRegister: EntityRegistryService, _cellsRegister: CustomCellRegistryService) {
-    _entityRegister.register('plans', 'Plan', undefined, PlanIconComponent);
+  constructor(_entityRegistry: EntityRegistry, _cellsRegister: CustomCellRegistryService) {
+    _entityRegistry.register('plans', 'Plan', 'description');
     _cellsRegister.registerCell('planEntityIcon', PlanIconComponent);
     _cellsRegister.registerCell('planLink', PlanLinkComponent);
   }

@@ -3,7 +3,6 @@ import { Entity } from '../types/entity';
 import { Resolver } from '../types/resolver';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE } from '../../../shared';
-import { EntityRegistry } from './entity-registry';
 
 @Injectable({
   providedIn: 'root',
@@ -11,12 +10,12 @@ import { EntityRegistry } from './entity-registry';
 export class EntityScopeResolver {
   resolvers: Resolver<Entity>[] = [];
 
-  registerResolver(resolver: Resolver<Entity>) {
+  registerResolver(resolver: Resolver<Entity>): void {
     this.resolvers.push(resolver);
   }
 
   /* Will return result of first resolver that is not null */
-  getScope(entity: Entity) {
+  getScope(entity: Entity): any {
     for (const resolver of this.resolvers) {
       const entityScope = resolver(entity);
       if (entityScope != null) {
