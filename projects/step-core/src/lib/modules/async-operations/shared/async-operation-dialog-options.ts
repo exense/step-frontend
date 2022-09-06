@@ -3,10 +3,8 @@ import { AsyncTaskStatus } from '../../../client/augmented/shared/async-task-sta
 
 export interface AsyncOperationDialogOptions {
   title: string;
-  confirmMessage: string;
-  successMessage: string;
-  errorMessage: string;
-  onSuccess?(result?: AsyncTaskStatus): void;
-  onError?(error: Error): void;
+  showCloseButtonOnSuccess?: boolean;
+  successMessage(result?: AsyncTaskStatus): string;
+  errorMessage(errorOrResult: Error | AsyncTaskStatus): string;
   asyncOperation(): Observable<AsyncTaskStatus>;
 }
