@@ -1,6 +1,4 @@
-<div class="spinner-container" *ngIf="(tableDataSource?.inProgress$ | async) || inProgress">
-  <mat-spinner></mat-spinner>
-</div>
+<step-spinner [show]="!!((tableDataSource?.inProgress$ | async) || inProgress)" [showOnlyOnce]="true"></step-spinner>
 <ng-container *ngIf="additionalHeader?.template">
   <div class="additional-header">
     <ng-container *ngTemplateOutlet="additionalHeader!.template"> </ng-container>
