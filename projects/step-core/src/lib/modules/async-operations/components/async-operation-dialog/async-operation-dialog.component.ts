@@ -1,24 +1,30 @@
-import { Component, Inject } from '@angular/core';
+import { AfterViewInit, Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AsyncOperationDialogState } from '../../shared/async-operation-dialog-state.enum';
 import { AsyncOperationDialogOptions } from '../../shared/async-operation-dialog-options';
-import { Mutable } from '../../../../shared';
-import { pollAsyncTask } from '../../../../client/augmented/step-augmented-client.module';
+import { AsyncTaskStatus, pollAsyncTask } from '../../../../client/augmented/step-augmented-client.module';
 import { AsyncTasksService } from '../../../../client/generated';
 import { catchError, switchMap } from 'rxjs/operators';
 import { map, of, timer } from 'rxjs';
-
-type FieldAccessor = Mutable<Pick<AsyncOperationDialogComponent, 'state' | 'progress'>>;
+import { AsyncOperationDialogResult } from '../../shared/async-operation-dialog-result';
+import { AsyncOperationCloseStatus } from '../../shared/async-operation-close-status.enum';
 
 @Component({
   selector: 'step-async-operation-dialog',
   templateUrl: './async-operation-dialog.component.html',
   styleUrls: ['./async-operation-dialog.component.scss'],
 })
-export class AsyncOperationDialogComponent {
+export class AsyncOperationDialogComponent implements AfterViewInit {
   readonly AsyncOperationDialogState = AsyncOperationDialogState;
-  readonly state: AsyncOperationDialogState = AsyncOperationDialogState.confirm;
-  readonly progress: number = 0;
+
+  state: AsyncOperationDialogState = AsyncOperationDialogState.progress;
+  progress: number = 0;
+
+  successMessage: string = '';
+  errorMessage: string = '';
+
+  error?: AsyncTaskStatus | Error;
+  operationStatus?: AsyncTaskStatus;
 
   constructor(
     private _dialogRef: MatDialogRef<AsyncOperationDialogComponent>,
@@ -26,26 +32,48 @@ export class AsyncOperationDialogComponent {
     @Inject(MAT_DIALOG_DATA) public _dialogData: AsyncOperationDialogOptions
   ) {}
 
-  close(): void {
-    if (this.state === AsyncOperationDialogState.confirm && this._dialogData.onSuccess) {
-      this._dialogData.onSuccess(undefined);
-    }
-    this._dialogRef.close();
+  ngAfterViewInit(): void {
+    this.performAnOperation();
   }
 
-  performAnOperation(): void {
-    (this as FieldAccessor).state = AsyncOperationDialogState.progress;
+  cancel(): void {
+    const result: AsyncOperationDialogResult = { closeStatus: AsyncOperationCloseStatus.noAction };
+    this._dialogRef.close(result);
+  }
+
+  closeOk(): void {
+    let result: AsyncOperationDialogResult;
+    if (this.state === AsyncOperationDialogState.success) {
+      result = {
+        closeStatus: AsyncOperationCloseStatus.success,
+        operationStatus: this.operationStatus,
+      };
+    } else {
+      result = {
+        closeStatus: AsyncOperationCloseStatus.error,
+        error: this.error,
+      };
+    }
+    this._dialogRef.close(result);
+  }
+
+  private performAnOperation(): void {
     this._dialogData
       .asyncOperation()
       .pipe(
         pollAsyncTask(this._asyncService, (progress) => {
-          (this as FieldAccessor).progress = progress * 100;
+          this.progress = progress * 100;
+        }),
+        map((result) => {
+          if (result.error) {
+            throw result;
+          }
+          return result;
         }),
         catchError((err) => {
-          (this as FieldAccessor).state = AsyncOperationDialogState.error;
-          if (this._dialogData.onError) {
-            this._dialogData.onError(err);
-          }
+          this.errorMessage = this._dialogData.errorMessage(err);
+          this.error = err;
+          this.state = AsyncOperationDialogState.error;
           console.error(err);
           return of(undefined);
         }),
@@ -56,10 +84,9 @@ export class AsyncOperationDialogComponent {
         if (!result) {
           return;
         }
-        (this as FieldAccessor).state = AsyncOperationDialogState.success;
-        if (this._dialogData.onSuccess) {
-          this._dialogData.onSuccess(result);
-        }
+        this.successMessage = this._dialogData.successMessage(result);
+        this.operationStatus = result;
+        this.state = AsyncOperationDialogState.success;
       });
   }
 }

@@ -1,10 +1,15 @@
-import { Observable, of } from 'rxjs';
+import { Observable, of, switchMap } from 'rxjs';
 import { BulkOperation } from '../shared/bulk-operation.enum';
 import { TableRequestData } from '../../../client/table/models/table-request-data';
 import { BulkSelectionType } from '../../entities-selection/shared/bulk-selection-type.enum';
 import { BulkOperationParameters } from '../../../client/generated';
 import { TableFilter } from './table-filter';
-import { AsyncOperationService } from '../../async-operations/services/async-operation.service';
+import {
+  AsyncOperationCloseStatus,
+  AsyncOperationDialogOptions,
+  AsyncOperationDialogResult,
+  AsyncOperationService,
+} from '../../async-operations/async-operations.module';
 import { AsyncTaskStatus } from '../../../client/augmented/shared/async-task-status';
 
 export interface BulkOperationConfig<ID> {
@@ -12,7 +17,7 @@ export interface BulkOperationConfig<ID> {
   selectionType: BulkSelectionType;
   ids?: ReadonlyArray<ID>;
   filterRequest?: TableRequestData;
-  isDraft: boolean;
+  withPreview: boolean;
 }
 
 export abstract class BulkOperationsInvokeService<ID> {
@@ -22,10 +27,7 @@ export abstract class BulkOperationsInvokeService<ID> {
   protected abstract invokeDuplicate?(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatus>;
   protected abstract invokeExport?(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatus>;
 
-  protected transformConfig(config: BulkOperationConfig<ID>): BulkOperationParameters {
-    // todo: preview logic will be implemented later
-    const preview = false; //config.isDraft;
-
+  protected transformConfig(config: BulkOperationConfig<ID>, isPreview: boolean): BulkOperationParameters {
     let targetType: BulkOperationParameters['targetType'] = 'LIST';
     let ids: string[] | undefined = undefined;
     let filter: TableFilter | undefined = undefined;
@@ -60,10 +62,10 @@ export abstract class BulkOperationsInvokeService<ID> {
       targetType = 'ALL';
     }
 
-    return { targetType, ids, filter, preview };
+    return { targetType, ids, filter, preview: isPreview };
   }
 
-  invoke(config: BulkOperationConfig<ID>): Observable<AsyncTaskStatus | undefined> {
+  invoke(config: BulkOperationConfig<ID>): Observable<AsyncOperationDialogResult | undefined> {
     let operation: ((params: BulkOperationParameters) => Observable<AsyncTaskStatus>) | undefined;
     switch (config.operationType) {
       case BulkOperation.delete:
@@ -82,18 +84,70 @@ export abstract class BulkOperationsInvokeService<ID> {
       return of(undefined);
     }
 
-    // Confirmation message should be provided by simulation logic
-    // Until it is not implemented, the simple confirm was added
-    const confirmMessage = `Do you want to perform the bulk ${config.operationType} operation over selected items?`;
-    const successMessage = `Bulk operation ${config.operationType} completed`;
-    const errorMessage = `An error occurred while ${config.operationType} operation`;
-    const title = config.operationType;
+    const optionsPerform: AsyncOperationDialogOptions = {
+      asyncOperation: () => operation!(this.transformConfig(config, false)),
+      title: this.createPerformTitle(config),
+      successMessage: this.createSuccessMessageHandler(config),
+      errorMessage: this.createErrorMessageHandler(config),
+    };
 
-    return this._asyncOperationService.performOperation(() => operation!(this.transformConfig(config)), {
-      confirmMessage,
-      successMessage,
-      errorMessage,
-      title,
-    });
+    if (!config.withPreview) {
+      return this._asyncOperationService.performOperation(optionsPerform);
+    }
+
+    const optionsPreview: AsyncOperationDialogOptions = {
+      asyncOperation: () => operation!(this.transformConfig(config, true)),
+      title: this.createPreviewTitle(config),
+      showCloseButtonOnSuccess: true,
+      successMessage: this.createSuccessMessagePreviewHandler(config),
+      errorMessage: this.createErrorMessageHandler(config),
+    };
+
+    return this._asyncOperationService.performOperation(optionsPreview).pipe(
+      switchMap((result) => {
+        if (result.closeStatus !== AsyncOperationCloseStatus.success) {
+          return of(result);
+        }
+        return this._asyncOperationService.performOperation(optionsPerform);
+      })
+    );
+  }
+
+  protected createPreviewTitle(config: BulkOperationConfig<ID>): string {
+    return `Confirm ${config.operationType}`;
+  }
+
+  protected createPerformTitle(config: BulkOperationConfig<ID>): string {
+    return config.operationType;
+  }
+
+  protected createErrorMessageHandler(
+    config: BulkOperationConfig<ID>
+  ): (errorOrReulst: Error | AsyncTaskStatus) => string {
+    return (errorOrResult) => {
+      if (!(errorOrResult instanceof Error) && errorOrResult.error) {
+        return `Error: ${errorOrResult.error}`;
+      }
+
+      return `An error occurred while ${config.operationType} operation`;
+    };
+  }
+
+  protected createSuccessMessageHandler(config: BulkOperationConfig<ID>): (result?: AsyncTaskStatus) => string {
+    return (result) => {
+      const count = result?.result?.count;
+      return count
+        ? `Bulk operation ${config.operationType} for ${count} item(s) completed`
+        : `Bulk operation ${config.operationType} completed`;
+    };
+  }
+
+  protected createSuccessMessagePreviewHandler(config: BulkOperationConfig<ID>): (result?: AsyncTaskStatus) => string {
+    return (result) => {
+      const count = result?.result?.count;
+      return count
+        ? `Do you want to perform the bulk ${config.operationType} for ${count} item(s)?`
+        : `Do you want to perform the bulk ${config.operationType} operation over selected items?`;
+    };
   }
 }
