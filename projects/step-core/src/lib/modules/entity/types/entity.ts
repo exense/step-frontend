@@ -1,5 +1,3 @@
 export type Entity = {
-  attributes?: {
-    project: string;
-  };
+  attributes?: Record<string, string>;
 };

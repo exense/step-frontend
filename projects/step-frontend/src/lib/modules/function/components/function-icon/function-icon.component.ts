@@ -1,9 +1,11 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component } from '@angular/core';
+import { Function as KeywordFunction } from '@exense/step-core';
 
 @Component({
   selector: 'step-function-icon',
-  template: `<mat-icon>radio_button_checked</mat-icon>`,
+  template: `<entity-icon *ngIf="context" [entity]="context!" entityName="functions"> </entity-icon>`,
   styleUrls: [],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FunctionIconComponent {}
+export class FunctionIconComponent {
+  context?: KeywordFunction;
+}

@@ -1,9 +1,11 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component } from '@angular/core';
+import { CustomComponent, Parameter } from '@exense/step-core';
 
 @Component({
   selector: 'step-parameters-icon',
-  template: `<mat-icon>list_alt</mat-icon>`,
+  template: `<entity-icon *ngIf="context" [entity]="context!" entityName="parameters"> </entity-icon>`,
   styleUrls: [],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ParametersIconComponent {}
+export class ParametersIconComponent implements CustomComponent {
+  context?: Parameter;
+}
