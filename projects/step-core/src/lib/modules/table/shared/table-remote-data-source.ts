@@ -218,9 +218,9 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     this._requestColumnsMap[key] = value;
   }
 
-  reload(hideProgress?: boolean) {
+  reload(reloadOptions?: { hideProgress: boolean }) {
     let val = this._request$.value;
-    val!.hideProgress = !!hideProgress;
+    val!.hideProgress = reloadOptions?.hideProgress;
     this._request$.next(val);
   }
 
