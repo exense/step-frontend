@@ -7,6 +7,8 @@ import type { Observable } from 'rxjs';
 import type { AsyncTaskStatusBulkOperationReport } from '../models/AsyncTaskStatusBulkOperationReport';
 import type { BulkOperationParameters } from '../models/BulkOperationParameters';
 import type { Parameter } from '../models/Parameter';
+import type { TableRequest } from '../models/TableRequest';
+import type { TableResponseParameter } from '../models/TableResponseParameter';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
@@ -159,6 +161,21 @@ export class ParametersService {
     return this.httpRequest.request({
       method: 'POST',
       url: '/parameters',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Get the table view according to provided request
+   * @param requestBody
+   * @returns TableResponseParameter default response
+   * @throws ApiError
+   */
+  public getParameterTable(requestBody?: TableRequest): Observable<TableResponseParameter> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/parameters/table',
       body: requestBody,
       mediaType: 'application/json',
     });

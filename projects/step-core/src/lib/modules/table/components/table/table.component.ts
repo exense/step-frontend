@@ -223,16 +223,15 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     });
   }
 
+  onSearch(column: string, searchValue: SearchValue): void;
   onSearch(column: string, value: string, regex?: boolean): void;
-  onSearch(column: string, event: Event, regex?: boolean): void;
-  onSearch(column: string, eventOrValue: Event | string, regex: boolean = false): void {
-    const value =
-      typeof eventOrValue === 'string'
-        ? (eventOrValue as string)
-        : ((eventOrValue as Event)?.target as HTMLInputElement).value || '';
-
+  onSearch(column: string, searchValue: string | SearchValue, regex?: boolean): void {
     const search = { ...this.search$.value };
-    search[column] = regex ? { value, regex } : value;
+    if (typeof searchValue === 'string') {
+      search[column] = regex ? { value: searchValue, regex } : searchValue;
+    } else {
+      search[column] = searchValue;
+    }
     this.search$.next(search);
   }
 

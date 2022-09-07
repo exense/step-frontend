@@ -24,10 +24,12 @@ import { Sort } from '@angular/material/sort';
 import { TableDataSource } from './table-data-source';
 import { SearchValue } from './search-value';
 import { OQLFilter, TableParameters } from '../../../client/generated';
+import { TableRequestFilter } from '../../../client/table/models/table-request-data';
+import { FilterCondition } from './filter-condition';
 
 export class TableRequestInternal {
   columns: string[];
-  searchBy?: { column: string; search: string; regex: boolean }[];
+  searchBy?: { column: string; value: SearchValue }[];
   orderBy?: { column: string; order: 'asc' | 'desc' };
   start?: number;
   length?: number;
@@ -45,18 +47,42 @@ export class TableRequestInternal {
   }
 }
 
+const convertFilter = (field: string, searchValue: SearchValue): Array<TableRequestFilter | undefined> => {
+  if (!searchValue) {
+    return [undefined];
+  }
+
+  if (typeof searchValue === 'string') {
+    return [{ field, value: searchValue, regex: false }];
+  }
+
+  if (searchValue instanceof FilterCondition) {
+    return searchValue.toRequestFilter(field);
+  }
+
+  const value: string = searchValue?.value || '';
+  const regex: boolean = searchValue?.regex || false;
+
+  if (!value) {
+    return [undefined];
+  }
+
+  return [{ field, value, regex }];
+};
+
 const convertTableRequest = (req: TableRequestInternal): TableRequestData => {
   const result: TableRequestData = {
     skip: req.start || 0,
     limit: req.length || 10,
   };
 
-  if (req.searchBy && req.searchBy.length > 0) {
-    result.filters = req.searchBy.map(({ column: field, search: value, regex: isRegex }) => ({
-      field,
-      value,
-      isRegex,
-    }));
+  const filters = (req.searchBy || [])
+    .map(({ column, value }) => convertFilter(column, value))
+    .reduce((result, filters) => [...result, ...filters], [])
+    .filter((x) => !!x) as TableRequestFilter[];
+
+  if (filters.length > 0) {
+    result.filters = filters;
   }
 
   result.sort = req.orderBy
@@ -147,23 +173,10 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   ): TableRequestInternal {
     const tableRequest: TableRequestInternal = new TableRequestInternal({
       columns: Object.values(this._requestColumnsMap),
-      searchBy: Object.entries(search || {})
-        .map(([name, searchValue]) => {
-          const column = this._requestColumnsMap[name];
-          let search: string;
-          let regex: boolean;
-
-          if (typeof searchValue === 'string') {
-            search = searchValue;
-            regex = false;
-          } else {
-            search = searchValue?.value || '';
-            regex = searchValue?.regex || false;
-          }
-
-          return { column, search, regex };
-        })
-        .filter((x) => !!x.search),
+      searchBy: Object.entries(search || {}).map(([name, value]) => {
+        const column = this._requestColumnsMap[name];
+        return { column, value };
+      }),
     });
 
     if (filter) {

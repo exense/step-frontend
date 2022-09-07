@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { DateTime } from 'luxon';
 
@@ -8,12 +8,10 @@ import { DateTime } from 'luxon';
   styleUrls: ['./date-filter.component.scss'],
 })
 export class DateFilterComponent {
-  @Output() dateChanged = new EventEmitter<string>();
-
-  @Input() outputFormat = 'dd.MM.yyyy';
+  @Output() dateChanged = new EventEmitter<DateTime | undefined>();
 
   handleDateChange(event: MatDatepickerInputEvent<DateTime>): void {
-    const date = event?.value ? event.value.toFormat(this.outputFormat) : '';
+    const date = event?.value || undefined;
     this.dateChanged.emit(date);
   }
 }
