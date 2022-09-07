@@ -8,7 +8,7 @@ import type { AsyncTaskStatusObject } from '../models/AsyncTaskStatusObject';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class AsyncTasksService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

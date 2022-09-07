@@ -9,7 +9,7 @@ import type { ScreenInput } from '../models/ScreenInput';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ScreensService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

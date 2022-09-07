@@ -9,7 +9,7 @@ import type { OperationDetails } from '../models/OperationDetails';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class SystemService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

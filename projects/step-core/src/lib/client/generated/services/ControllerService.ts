@@ -13,7 +13,7 @@ import type { Version } from '../models/Version';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ControllerService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

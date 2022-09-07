@@ -8,7 +8,7 @@ import type { DataPoolConfiguration } from '../models/DataPoolConfiguration';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class PrivateDataPoolPluginService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

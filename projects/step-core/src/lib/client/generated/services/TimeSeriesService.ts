@@ -11,7 +11,7 @@ import type { TimeSeriesRebuildRequest } from '../models/TimeSeriesRebuildReques
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class TimeSeriesService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

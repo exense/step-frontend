@@ -12,7 +12,7 @@ import type { TableResponseParameter } from '../models/TableResponseParameter';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ParametersService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

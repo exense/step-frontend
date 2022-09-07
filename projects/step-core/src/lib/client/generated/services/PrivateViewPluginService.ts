@@ -8,7 +8,7 @@ import type { ViewModel } from '../models/ViewModel';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class PrivateViewPluginService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

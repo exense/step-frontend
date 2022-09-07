@@ -9,7 +9,7 @@ import type { Plan } from '../models/Plan';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class PrivateStagingRepositoryService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

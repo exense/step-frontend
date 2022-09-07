@@ -17,7 +17,7 @@ import type { TokenWrapper } from '../models/TokenWrapper';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class KeywordsService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

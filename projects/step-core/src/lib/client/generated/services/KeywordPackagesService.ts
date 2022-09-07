@@ -10,7 +10,7 @@ import type { PackagePreview } from '../models/PackagePreview';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class KeywordPackagesService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

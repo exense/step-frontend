@@ -12,7 +12,7 @@ import type { TableResponseExecutiontTaskParameters } from '../models/TableRespo
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class SchedulerService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 
