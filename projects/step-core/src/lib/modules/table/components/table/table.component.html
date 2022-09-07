@@ -14,7 +14,7 @@
     <th mat-header-cell *matHeaderCellDef>
       <ng-template #defaultSearchRender>
         <mat-form-field>
-          <input matInput type="text" (change)="onSearch(searchCol.searchName!, $event)" />
+          <input matInput type="text" #searchField (change)="onSearch(searchCol.searchName!, searchField.value)" />
         </mat-form-field>
       </ng-template>
       <ng-container *ngIf="searchCol.searchName">

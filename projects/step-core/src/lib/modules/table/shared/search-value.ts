@@ -1,1 +1,3 @@
-export type SearchValue = { regex: boolean; value: string } | string;
+import { FilterCondition } from './filter-condition';
+
+export type SearchValue = string | { regex?: boolean; value: string } | FilterCondition;
