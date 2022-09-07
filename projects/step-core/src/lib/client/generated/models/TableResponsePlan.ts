@@ -2,8 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type TableResponse = {
+import type { Plan } from './Plan';
+
+export type TableResponsePlan = {
   recordsTotal?: number;
   recordsFiltered?: number;
-  data?: Array<any>;
+  data?: Array<Plan>;
 };

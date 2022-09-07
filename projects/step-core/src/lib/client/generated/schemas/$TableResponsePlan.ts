@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $TableResponse = {
+export const $TableResponsePlan = {
   properties: {
     recordsTotal: {
       type: 'number',
@@ -14,7 +14,7 @@ export const $TableResponse = {
     data: {
       type: 'array',
       contains: {
-        properties: {},
+        type: 'Plan',
       },
     },
   },
