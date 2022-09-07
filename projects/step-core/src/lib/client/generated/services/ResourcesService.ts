@@ -10,7 +10,7 @@ import type { ResourceUploadResponse } from '../models/ResourceUploadResponse';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class ResourcesService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

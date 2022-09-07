@@ -7,10 +7,12 @@ import type { Observable } from 'rxjs';
 import type { AsyncTaskStatusBulkOperationReport } from '../models/AsyncTaskStatusBulkOperationReport';
 import type { BulkOperationParameters } from '../models/BulkOperationParameters';
 import type { ExecutiontTaskParameters } from '../models/ExecutiontTaskParameters';
+import type { TableRequest } from '../models/TableRequest';
+import type { TableResponseExecutiontTaskParameters } from '../models/TableResponseExecutiontTaskParameters';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class SchedulerService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 
@@ -195,6 +197,21 @@ export class SchedulerService {
     return this.httpRequest.request({
       method: 'POST',
       url: '/scheduler/task',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Get the table view according to provided request
+   * @param requestBody
+   * @returns TableResponseExecutiontTaskParameters default response
+   * @throws ApiError
+   */
+  public getExecutionTaskTable(requestBody?: TableRequest): Observable<TableResponseExecutiontTaskParameters> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/scheduler/task/table',
       body: requestBody,
       mediaType: 'application/json',
     });

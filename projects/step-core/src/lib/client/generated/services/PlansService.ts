@@ -9,10 +9,12 @@ import type { AsyncTaskStatusBulkOperationReport } from '../models/AsyncTaskStat
 import type { BulkOperationParameters } from '../models/BulkOperationParameters';
 import type { Plan } from '../models/Plan';
 import type { PlanCompilationResult } from '../models/PlanCompilationResult';
+import type { TableRequest } from '../models/TableRequest';
+import type { TableResponsePlan } from '../models/TableResponsePlan';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class PlansService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 
@@ -289,6 +291,21 @@ export class PlansService {
     return this.httpRequest.request({
       method: 'POST',
       url: '/plans',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Get the table view according to provided request
+   * @param requestBody
+   * @returns TableResponsePlan default response
+   * @throws ApiError
+   */
+  public getPlanTable(requestBody?: TableRequest): Observable<TableResponsePlan> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/plans/table',
       body: requestBody,
       mediaType: 'application/json',
     });

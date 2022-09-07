@@ -8,7 +8,7 @@ import type { WebPlugin } from '../models/WebPlugin';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class PrivateApplicationService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

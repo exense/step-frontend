@@ -6,7 +6,7 @@ import type { Observable } from 'rxjs';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class QuotaManagerService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

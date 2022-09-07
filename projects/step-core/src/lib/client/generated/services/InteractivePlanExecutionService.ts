@@ -10,7 +10,7 @@ import type { ReportNode } from '../models/ReportNode';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class InteractivePlanExecutionService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

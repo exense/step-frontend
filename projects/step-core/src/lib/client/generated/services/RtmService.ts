@@ -8,7 +8,7 @@ import type { RTMLink } from '../models/RTMLink';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class RtmService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

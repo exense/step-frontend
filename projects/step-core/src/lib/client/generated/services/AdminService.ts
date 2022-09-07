@@ -13,7 +13,7 @@ import type { User } from '../models/User';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class AdminService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

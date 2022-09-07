@@ -10,7 +10,7 @@ import type { FindRequest } from '../models/FindRequest';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class CollectionsService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

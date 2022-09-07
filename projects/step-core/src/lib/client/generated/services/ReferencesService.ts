@@ -9,7 +9,7 @@ import type { FindReferencesResponse } from '../models/FindReferencesResponse';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class ReferencesService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

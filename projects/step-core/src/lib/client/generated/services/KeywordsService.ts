@@ -11,11 +11,13 @@ import type { Function } from '../models/Function';
 import type { FunctionInputJsonObject } from '../models/FunctionInputJsonObject';
 import type { GetTokenHandleParameter } from '../models/GetTokenHandleParameter';
 import type { OutputJsonObject } from '../models/OutputJsonObject';
+import type { TableRequest } from '../models/TableRequest';
+import type { TableResponseFunction } from '../models/TableResponseFunction';
 import type { TokenWrapper } from '../models/TokenWrapper';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class KeywordsService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 
@@ -241,6 +243,21 @@ export class KeywordsService {
       path: {
         id: id,
       },
+    });
+  }
+
+  /**
+   * Get the table view according to provided request
+   * @param requestBody
+   * @returns TableResponseFunction default response
+   * @throws ApiError
+   */
+  public getFunctionTable(requestBody?: TableRequest): Observable<TableResponseFunction> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/functions/table',
+      body: requestBody,
+      mediaType: 'application/json',
     });
   }
 

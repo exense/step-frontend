@@ -10,7 +10,7 @@ import type { TokenWrapper } from '../models/TokenWrapper';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class GridService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 
