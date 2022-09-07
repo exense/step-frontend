@@ -43,7 +43,7 @@
   </ng-container>
   <ng-container matColumnDef="step" stepSearchCol #stepSearchColStep="SearchCol">
     <mat-form-field class="step-search" *stepSearchCellDef>
-      <input matInput type="text" (change)="stepSearchColStep.search($event, true)" />
+      <input matInput type="text" #stepSearch (change)="stepSearchColStep.search(stepSearch.value, true)" />
     </mat-form-field>
     <th mat-header-cell *matHeaderCellDef class="cell-step">Step</th>
     <td mat-cell *matCellDef="let element" class="cell-step">

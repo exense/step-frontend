@@ -10,3 +10,4 @@ import { ResourceLabelComponent } from './components/resource-label/resource-lab
 export class StepBasicsModule {}
 
 export * from './components/resource-label/resource-label.component';
+export * from './shared/compare-condition.enum';

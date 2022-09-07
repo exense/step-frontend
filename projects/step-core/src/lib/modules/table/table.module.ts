@@ -69,3 +69,5 @@ export * from './services/bulk-operations-invoke.service';
 export * from './shared/bulk-operation.enum';
 export * from './pipe/bulk-operation-label.pipe';
 export * from './pipe/bulk-operation-icon.pipe';
+export * from './shared/filter-condition';
+export * from './services/filter-condition-factory.service';
