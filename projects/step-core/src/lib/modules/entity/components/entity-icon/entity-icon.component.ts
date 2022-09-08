@@ -33,18 +33,18 @@ export class EntityIconComponent {
 
   update(): void {
     this.icon = 'adjust';
-    this.tooltip = 'In this project';
+    this.tooltip = '';
+    let entityType;
 
-    const entityScope = this.entityScopeResolver.getScope(this.entity);
+    if (this.entityName) {
+      entityType = this.entityRegistry.getEntityByName(this.entityName);
+    }
+
+    const entityScope = this.entityScopeResolver.getScope(this.entity, entityType);
     if (entityScope) {
       this.icon = entityScope.icon ?? '';
       this.tooltip = entityScope.tooltip ?? '';
     } else {
-      if (!this.entityName) {
-        return;
-      }
-      const entityType = this.entityRegistry.getEntityByName(this.entityName);
-
       if (entityType && entityType.iconAG2) {
         this.icon = entityType.iconAG2 ?? '';
       }

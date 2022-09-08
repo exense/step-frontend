@@ -15,9 +15,9 @@ export class EntityScopeResolver {
   }
 
   /* Will return result of first resolver that is not null */
-  getScope(entity: Entity): any {
+  getScope(entity: Entity, type: any): any {
     for (const resolver of this.resolvers) {
-      const entityScope = resolver(entity);
+      const entityScope = resolver(entity, type);
       if (entityScope != null) {
         return entityScope;
       }
