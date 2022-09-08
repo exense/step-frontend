@@ -30,7 +30,8 @@ angular
       'st-table',
       '/partials/parameters/parameterSelectionTable.html',
       null,
-      'glyphicon glyphicon-list-alt'
+      'glyphicon glyphicon-list-alt',
+      'list_alt'
     );
   })
   .factory('ParameterScopeRenderer', function () {

@@ -16,14 +16,14 @@ export class EntityRegistry {
   registerEntity(
     displayName: string,
     entityName: string,
-    entityCollectionName: string | null,
-    getUrl: string | null,
-    postUrl: string | null,
-    tableType: string | null,
-    templateUrl: string | null,
-    callback: Function | null,
-    icon: string | null,
-    iconAG2: string | null
+    entityCollectionName?: string,
+    getUrl?: string,
+    postUrl?: string,
+    tableType?: string,
+    templateUrl?: string,
+    callback?: Function,
+    icon?: string,
+    iconAG2?: string
   ): void {
     const type = entityName;
     const label = displayName;
@@ -51,7 +51,18 @@ export class EntityRegistry {
    * @param icon
    */
   register(type: string, label: string, icon: string): void {
-    return this.registerEntity(label, type, null, null, null, null, null, null, null, icon);
+    return this.registerEntity(
+      label,
+      type,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      icon
+    );
   }
 
   getEntities(): ReadonlyArray<EntityMeta> {

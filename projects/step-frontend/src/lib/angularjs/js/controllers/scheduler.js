@@ -36,7 +36,8 @@ angular
       'st-table',
       '/partials/scheduler/schedulerTaskSelectionTable.html',
       null,
-      'glyphicon glyphicon-time'
+      'glyphicon glyphicon-time',
+      'schedule'
     );
   })
 

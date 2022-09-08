@@ -29,7 +29,7 @@ angular
       'rest/resources/',
       'rest/resources/',
       'st-table',
-      '/partials/resources/resourceSelectionTable.html'
+      '/partials/resources/resourceSelectionTable.html',
     );
   })
   .factory('ResourceDialogs', function ($uibModal, $http, Dialogs) {

@@ -35,7 +35,8 @@ angular
       'st-table',
       '/partials/functions/functionSelectionTable.html',
       null,
-      'glyphicon glyphicon-record'
+      'glyphicon glyphicon-record',
+      'radio_button_checked'
     );
   })
 

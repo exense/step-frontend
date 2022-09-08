@@ -30,7 +30,8 @@ angular
       'st-table',
       '/partials/plans/planSelectionTable.html',
       null,
-      'glyphicon glyphicon-file'
+      'glyphicon glyphicon-file',
+      'description'
     );
   })
 
