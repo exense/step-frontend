@@ -30,6 +30,9 @@ angular
       'rest/resources/',
       'st-table',
       '/partials/resources/resourceSelectionTable.html',
+      undefined,
+      'glyphicon glyphicon-book',
+      'library_books'
     );
   })
   .factory('ResourceDialogs', function ($uibModal, $http, Dialogs) {
