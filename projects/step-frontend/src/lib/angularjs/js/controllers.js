@@ -51,16 +51,16 @@ tecAdminControllers.run(function (ViewRegistry, EntityRegistry, AuthService) {
       return true;
     }
   );
-  isDashletEnabled = function () {
-    return AuthService.getConf().displayLegacyPerfDashboard;
-  };
+
   ViewRegistry.registerDashletAdvanced(
     'executionTab',
     'Performance',
     'partials/execution/executionViz.html',
     'viz',
     2,
-    isDashletEnabled
+    function () {
+      return true;
+    }
   );
   ViewRegistry.registerDashletAdvanced(
     'executionTab',

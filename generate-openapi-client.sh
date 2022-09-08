@@ -4,10 +4,8 @@ SPEC_URL=$1
 GENERATED_CODE_LOCATION=./projects/step-core/src/lib/client/generated
 CLIENT_MODULE_NAME=StepGeneratedClientModule
 
+# downloading file before executing openapi to make sure it is already generated in the BE
 curl $SPEC_URL  > /dev/null
-
-echo "Waiting so openapi specs can be generated"
-sleep 30
 
 npx openapi --input $SPEC_URL --output $GENERATED_CODE_LOCATION --client angular --useUnionTypes --name $CLIENT_MODULE_NAME --exportCore false --exportSchemas true
 
