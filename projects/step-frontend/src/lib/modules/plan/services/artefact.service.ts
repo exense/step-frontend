@@ -19,6 +19,8 @@ export class ArtefactService {
   availableArtefacts?: Array<ArtefactType>; // artefacts loaded from server and enriched with info from the registry
   private registry: { [key: string]: ArtefactType } = {}; // maps artefact names to additional artefact details, provided statically in fillArtefactsRegistry()
 
+  private missingArtefactErrorThrown: { [key: string]: boolean } = {};
+
   constructor(private _planApiService: PlansService) {
     this.fillArtefactsRegistry();
   }
@@ -29,8 +31,8 @@ export class ArtefactService {
       .pipe(
         map((artefactNames: Array<string>) => {
           return artefactNames
-            .filter((artefactName) => this.isSelectable(artefactName))
-            .map((artefactName) => this.getType(artefactName));
+            .filter((artefactName) => this.isSelectable(artefactName) && !!this.getType(artefactName))
+            .map((artefactName) => this.getType(artefactName)!);
         })
       )
       .subscribe((artifacts) => {
@@ -38,12 +40,14 @@ export class ArtefactService {
       });
   }
 
-  private getType(typeName: string): ArtefactType {
+  private getType(typeName: string): ArtefactType | undefined {
     if (this.registry[typeName]) {
       return this.registry[typeName];
-    } else {
-      throw 'Unknown artefact type ' + typeName;
+    } else if (!this.missingArtefactErrorThrown[typeName]) {
+      this.missingArtefactErrorThrown[typeName] = true;
+      throw 'Unknown artefact type "' + typeName + '". Please add it to the type-registry.';
     }
+    return undefined;
   }
 
   private typeExist(typeName: string): boolean {
@@ -62,7 +66,7 @@ export class ArtefactService {
 
   /* @deprecated legacy */
   getEditor(typeName: string) {
-    return this.getType(typeName).form;
+    return this.getType(typeName)?.form;
   }
   /* @deprecated legacy */
   getDefaultIcon(): string {
@@ -70,19 +74,19 @@ export class ArtefactService {
   }
   /* @deprecated legacy */
   getIcon(typeName: string) {
-    return this.getType(typeName).icon;
+    return this.getType(typeName)?.icon;
   }
   /* @deprecated legacy */
   getIconNg2(typeName: string) {
-    return this.getType(typeName).iconNg2;
+    return this.getType(typeName)?.iconNg2;
   }
   /* @deprecated legacy */
   getDescription(typeName: string) {
-    return this.getType(typeName).description;
+    return this.getType(typeName)?.description;
   }
   /* @deprecated legacy */
   getLabel(typeName: string): string {
-    return this.getType(typeName).label || '';
+    return this.getType(typeName)?.label || '';
   }
   /* @deprecated legacy */
   getTypes(): string[] {
@@ -90,7 +94,7 @@ export class ArtefactService {
   }
 
   isSelectable(typeName: string): boolean {
-    return this.typeExist(typeName) && !!this.getType(typeName).isSelectable;
+    return this.typeExist(typeName) && !!this.getType(typeName)?.isSelectable;
   }
 
   private fillArtefactsRegistry(): void {
