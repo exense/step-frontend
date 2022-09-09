@@ -97,3 +97,72 @@ header.blue-header {
     font-size: 18px;
   }
 }
+
+/* Design to align with new step layout */
+
+#PlansCtrl {
+  margin-top: 16px;
+}
+
+#main > div {
+  max-height: calc(100vh - 36px);
+  overflow: auto;
+
+  /* Designing for scroll-bar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: gainsboro;
+    border-radius: 5px;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: var(--dark-background-color);
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--dark-background-color);
+    opacity: 0.8;
+  }
+
+  .ng-scope {
+    .row {
+      margin-right: 0;
+      margin-left: 0;
+    }
+
+    .panel,
+    .panel-default > .panel-heading {
+      background: none;
+      border: none;
+    }
+
+    .panel-default > .panel-heading {
+      font-weight: bold;
+    }
+
+    button,
+    input[type='text'] {
+      padding: 6px 12px;
+      height: 32px;
+    }
+
+    input[type='text']:not(.mat-input-element) {
+      /* Step - Colors/Primary/White */
+      background: #ffffff;
+
+      /* Menu grays/Gray border */
+      border: 1px solid #d9d9d9;
+
+      /* Shadow/xs */
+      box-shadow: 0px 1px 2px rgba(16, 24, 40, 0.05);
+      border-radius: 8px;
+    }
+  }
+}
