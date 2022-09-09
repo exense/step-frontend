@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FunctionPackage, KeywordsService } from '../../generated';
+import { Function as KeywordFunction, KeywordsService } from '../../generated';
 import { TableApiWrapperService } from '../../table/services/table-api-wrapper.service';
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
 import { TableRemoteDataSource } from '../../../modules/table/shared/table-remote-data-source';
@@ -8,8 +8,8 @@ import { TableRemoteDataSource } from '../../../modules/table/shared/table-remot
 export class AugmentedKeywordsService extends KeywordsService {
   private readonly FUNCTIONS_TABLE_ID = 'functions';
 
-  createFilteredTableDataSource(filter?: [string]) {
-    return new TableRemoteDataSource<FunctionPackage>(
+  createFilteredTableDataSource(filter?: string[]) {
+    return new TableRemoteDataSource<KeywordFunction>(
       this.FUNCTIONS_TABLE_ID,
       this._tableRest,
       {

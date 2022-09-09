@@ -1,21 +1,26 @@
 import { Observable } from 'rxjs';
 
-export interface SelectionCollector<KEY, ENTITY> {
-  readonly selected$: Observable<ReadonlyArray<KEY>>;
-  readonly selected: ReadonlyArray<KEY>;
+export abstract class SelectionCollector<KEY, ENTITY> {
+  abstract readonly selected$: Observable<ReadonlyArray<KEY>>;
+  abstract readonly selected: ReadonlyArray<KEY>;
 
-  readonly length$: Observable<number>;
-  readonly length: number;
+  abstract readonly length$: Observable<number>;
+  abstract readonly length: number;
 
-  isSelected(item: ENTITY): boolean;
-  isSelectedById(id: KEY): boolean;
-  toggleSelection(item: ENTITY): void;
-  toggleSelectionById(id: KEY): void;
-  select(...items: ENTITY[]): void;
-  selectById(...ids: KEY[]): void;
-  deselect(...items: ENTITY[]): void;
-  deselectById(...ids: KEY[]): void;
-  clear(): void;
+  abstract readonly possibleLength: number;
 
-  destroy(): void;
+  abstract isSelected(item: ENTITY): boolean;
+  abstract isSelectedById(id: KEY): boolean;
+  abstract toggleSelection(item: ENTITY): void;
+  abstract toggleSelectionById(id: KEY): void;
+  abstract select(...items: ENTITY[]): void;
+  abstract selectById(...ids: KEY[]): void;
+  abstract deselect(...items: ENTITY[]): void;
+  abstract deselectById(...ids: KEY[]): void;
+  abstract clear(): void;
+  abstract selectPossibleItems(): void;
+  abstract registerPossibleSelection(item: ENTITY): void;
+  abstract unregisterPossibleSelection(item: ENTITY): void;
+
+  abstract destroy(): void;
 }

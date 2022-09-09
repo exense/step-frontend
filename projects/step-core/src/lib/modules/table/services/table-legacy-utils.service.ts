@@ -4,7 +4,7 @@ import { AJS_MODULE } from '../../../shared';
 import { TableRequestData } from '../../../client/table/models/table-request-data';
 import { SortDirection } from '../../../client/table/models/sort-direction.enum';
 import { FieldSort } from '../../../client/table/models/field-sort';
-import { TableResponse } from '../../../client/table/models/table-response';
+import { TableResponseGeneric } from '../../../client/table/models/table-response-generic';
 import { OQLFilter, TableParameters } from '../../../client/generated';
 
 export interface LegacyColumnOrder {
@@ -90,7 +90,7 @@ export class TableLegacyUtilsService {
     return result;
   }
 
-  transformResponseNew2Legacy(resp: TableResponse<any>, columnsCount: number): LegacyTableResponse {
+  transformResponseNew2Legacy(resp: TableResponseGeneric<any>, columnsCount: number): LegacyTableResponse {
     const transformResultRow = (data: any): (string | null)[] => {
       const row: (string | null)[] = new Array(columnsCount).fill(null);
       row[0] = JSON.stringify(data);

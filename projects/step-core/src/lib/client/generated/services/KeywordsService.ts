@@ -4,11 +4,15 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
+import type { AsyncTaskStatusBulkOperationReport } from '../models/AsyncTaskStatusBulkOperationReport';
+import type { BulkOperationParameters } from '../models/BulkOperationParameters';
 import type { CallFunction } from '../models/CallFunction';
 import type { Function } from '../models/Function';
 import type { FunctionInputJsonObject } from '../models/FunctionInputJsonObject';
 import type { GetTokenHandleParameter } from '../models/GetTokenHandleParameter';
 import type { OutputJsonObject } from '../models/OutputJsonObject';
+import type { TableRequest } from '../models/TableRequest';
+import type { TableResponseFunction } from '../models/TableResponseFunction';
 import type { TokenWrapper } from '../models/TokenWrapper';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -16,6 +20,21 @@ import { BaseHttpRequest } from '../core/BaseHttpRequest';
 @Injectable({ providedIn: 'root' })
 export class KeywordsService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
+
+  /**
+   * Deletes the entities according to the provided parameters
+   * @param requestBody
+   * @returns AsyncTaskStatusBulkOperationReport default response
+   * @throws ApiError
+   */
+  public deleteFunctions(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusBulkOperationReport> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/functions/bulk/delete',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
 
   /**
    * @param id
@@ -60,14 +79,15 @@ export class KeywordsService {
   }
 
   /**
+   * Clones the entity with the given Id
    * @param id
-   * @returns any default response
+   * @returns Function default response
    * @throws ApiError
    */
-  public copyFunction(id: string): Observable<any> {
+  public cloneFunction(id: string): Observable<Function> {
     return this.httpRequest.request({
-      method: 'POST',
-      url: '/functions/{id}/copy',
+      method: 'GET',
+      url: '/functions/{id}/clone',
       path: {
         id: id,
       },
@@ -75,11 +95,27 @@ export class KeywordsService {
   }
 
   /**
+   * Clones the entities according to the provided parameters
+   * @param requestBody
+   * @returns AsyncTaskStatusBulkOperationReport default response
+   * @throws ApiError
+   */
+  public cloneFunctions(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusBulkOperationReport> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/functions/bulk/clone',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Retrieves an entity by its Id
    * @param id
    * @returns Function default response
    * @throws ApiError
    */
-  public getFunction(id: string): Observable<Function> {
+  public getFunctionById(id: string): Observable<Function> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/functions/{id}',
@@ -90,6 +126,7 @@ export class KeywordsService {
   }
 
   /**
+   * Deletes the entity with the given Id
    * @param id
    * @returns any default response
    * @throws ApiError
@@ -105,11 +142,12 @@ export class KeywordsService {
   }
 
   /**
+   * Returns the list of entities matching the provided attributes
    * @param requestBody
    * @returns Function default response
    * @throws ApiError
    */
-  public findMany(requestBody?: Record<string, string>): Observable<Array<Function>> {
+  public findFunctionsByAttributes(requestBody?: Record<string, string>): Observable<Array<Function>> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/functions/find',
@@ -136,6 +174,7 @@ export class KeywordsService {
   }
 
   /**
+   * Saves the provided entity
    * @param requestBody
    * @returns Function default response
    * @throws ApiError
@@ -169,7 +208,7 @@ export class KeywordsService {
    * @returns TokenWrapper default response
    * @throws ApiError
    */
-  public getTokenHandle(requestBody?: GetTokenHandleParameter): Observable<TokenWrapper> {
+  public getFunctionTokenHandle(requestBody?: GetTokenHandleParameter): Observable<TokenWrapper> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/functions/executor/tokens/select',
@@ -208,11 +247,26 @@ export class KeywordsService {
   }
 
   /**
+   * Get the table view according to provided request
+   * @param requestBody
+   * @returns TableResponseFunction default response
+   * @throws ApiError
+   */
+  public getFunctionTable(requestBody?: TableRequest): Observable<TableResponseFunction> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/functions/table',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
    * @param id
    * @returns any default response
    * @throws ApiError
    */
-  public returnTokenHandle(id: string): Observable<any> {
+  public returnFunctionTokenHandle(id: string): Observable<any> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/functions/executor/tokens/{id}/return',

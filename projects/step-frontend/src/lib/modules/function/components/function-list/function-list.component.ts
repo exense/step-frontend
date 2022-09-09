@@ -1,26 +1,39 @@
 import { Component, Inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  a1Promise2Observable,
   AJS_FUNCTION_TYPE_REGISTRY,
   AJS_LOCATION,
   AJS_MODULE,
   AJS_ROOT_SCOPE,
   AugmentedKeywordsService,
+  AutoDeselectStrategy,
+  BulkOperation,
+  BulkOperationsInvokeService,
+  Function as KeywordFunction,
   InteractivePlanExecutionService,
+  selectionCollectionProvider,
 } from '@exense/step-core';
 import { noop } from 'rxjs';
 import { ILocationService, IRootScopeService } from 'angular';
 import { FunctionDialogsService } from '../../services/function-dialogs.service';
 import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
+import { FunctionBulkOperationsInvokeService } from '../../services/function-bulk-operations-invoke.service';
 
 @Component({
   selector: 'step-function-list',
   templateUrl: './function-list.component.html',
   styleUrls: ['./function-list.component.scss'],
+  providers: [
+    selectionCollectionProvider<string, KeywordFunction>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    {
+      provide: BulkOperationsInvokeService,
+      useClass: FunctionBulkOperationsInvokeService,
+    },
+  ],
 })
 export class FunctionListComponent {
   readonly dataSource = this._functionApiService.createFilteredTableDataSource();
+  readonly availableBulkOperations = [BulkOperation.delete, BulkOperation.duplicate];
 
   constructor(
     private _functionApiService: AugmentedKeywordsService,
@@ -55,7 +68,7 @@ export class FunctionListComponent {
   }
 
   duplicateFunction(id: string): void {
-    this._functionApiService.copyFunction(id).subscribe((_) => this.dataSource.reload());
+    this._functionApiService.cloneFunction(id).subscribe((_) => this.dataSource.reload());
   }
 
   deleteFunction(id: string, name: string): void {

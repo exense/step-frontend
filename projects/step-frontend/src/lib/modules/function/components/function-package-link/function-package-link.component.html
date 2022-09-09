@@ -1,5 +1,8 @@
-<div *ngIf="functionPackage">
-  <a (click)="$event.preventDefault(); edit()">
+<ng-template #noPackage>
+  <div matTooltip="This keyword is not part of a Keyword package">-</div>
+</ng-template>
+<div *ngIf="functionPackage; else noPackage">
+  <a href="#" (click)="edit(); (false)">
     <step-resource-label [stModel]="functionPackage.packageLocation" stFormat="filename"></step-resource-label>
   </a>
   <step-btn-group>
@@ -29,4 +32,3 @@
     </button>
   </step-btn-group>
 </div>
-<div *ngIf="!functionPackage" matTooltip="This keyword is not part of a Keyword package">-</div>

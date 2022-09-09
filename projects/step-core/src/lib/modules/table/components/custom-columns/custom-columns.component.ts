@@ -1,8 +1,10 @@
 import {
   Component,
   EventEmitter,
+  forwardRef,
   Input,
   OnChanges,
+  OnDestroy,
   Output,
   QueryList,
   SimpleChanges,
@@ -11,19 +13,30 @@ import {
 } from '@angular/core';
 import { AugmentedScreenService } from '../../../../client/augmented/step-augmented-client.module';
 import { Input as ColInput } from '../../../../client/generated';
-import { map } from 'rxjs';
+import { BehaviorSubject, map } from 'rxjs';
 import { MatColumnDef } from '@angular/material/table';
 import { SearchColDirective } from '../../directives/search-col.directive';
+import { CustomColumnOptions } from '../../services/custom-column-options';
 
 @Component({
   selector: 'step-custom-columns',
   templateUrl: './custom-columns.component.html',
   styleUrls: ['./custom-columns.component.scss'],
+  providers: [
+    {
+      provide: CustomColumnOptions,
+      useExisting: forwardRef(() => CustomColumnsComponent),
+    },
+  ],
 })
-export class CustomColumnsComponent implements OnChanges {
+export class CustomColumnsComponent implements OnChanges, OnDestroy, CustomColumnOptions {
+  private readonly sbjOptions$ = new BehaviorSubject<string[]>([]);
+  readonly options$ = this.sbjOptions$.asObservable();
+
   @Input() screen!: string;
   @Input() excludeFields?: string[];
   @Input() isSearchDisabled?: boolean;
+  @Input() options?: string | string[];
 
   @Output() columnsReady = new EventEmitter<unknown>();
 
@@ -39,6 +52,7 @@ export class CustomColumnsComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     const cScreen = changes['screen'];
     const cExcludeFields = changes['excludeFields'];
+    const cOptions = changes['options'];
 
     let screen: string | undefined;
     let excludeFields: string[] | undefined;
@@ -54,6 +68,22 @@ export class CustomColumnsComponent implements OnChanges {
     if (screen || excludeFields) {
       this.loadColumns(screen, excludeFields);
     }
+
+    if (cOptions?.currentValue !== cOptions?.previousValue || cOptions?.firstChange) {
+      this.updateOptions(cOptions?.currentValue);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.sbjOptions$.complete();
+  }
+
+  private updateOptions(value?: string | string[]): void {
+    let result: string[] = [];
+    if (value) {
+      result = value instanceof Array ? value : [value];
+    }
+    this.sbjOptions$.next(result);
   }
 
   private loadColumns(screen?: string, excludeFields?: string[]): void {

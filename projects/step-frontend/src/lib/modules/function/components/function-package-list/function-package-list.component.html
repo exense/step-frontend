@@ -6,22 +6,11 @@
   </step-btn-group>
 </section>
 <step-table [dataSource]="dataSource" matSort [matSortDisableClear]="true">
-  <ng-container matColumnDef="name" stepSearchCol>
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Package name</th>
-    <td mat-cell *matCellDef="let element">
-      <a href="#" (click)="edit(element.id); (false)">{{ element.attributes.name }}</a>
-    </td>
-  </ng-container>
+  <step-custom-columns screen="functionTable"> </step-custom-columns>
   <ng-container matColumnDef="packageLocation">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Package file</th>
     <td mat-cell *matCellDef="let element">
       <step-resource-label [stModel]="element.packageLocation"> </step-resource-label>
-    </td>
-  </ng-container>
-  <ng-container matColumnDef="version" stepSearchCol>
-    <th mat-header-cell *matHeaderCellDef>Version</th>
-    <td mat-cell *matCellDef="let element">
-      <step-resource-label [stModel]="element.packageAttributes.version"> </step-resource-label>
     </td>
   </ng-container>
   <ng-container matColumnDef="actions">

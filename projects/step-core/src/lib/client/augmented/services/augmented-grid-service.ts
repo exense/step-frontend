@@ -9,7 +9,7 @@ export class AugmentedGridService extends GridService {
    * @returns any default response
    * @throws ApiError
    */
-  public startTokenMaintenance(id: string): Observable<any> {
+  public override startTokenMaintenance(id: string): Observable<any> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/grid/token/{id}/maintenance',
@@ -24,7 +24,7 @@ export class AugmentedGridService extends GridService {
    * @returns any default response
    * @throws ApiError
    */
-  public stopTokenMaintenance(id: string): Observable<any> {
+  public override stopTokenMaintenance(id: string): Observable<any> {
     return this.httpRequest.request({
       method: 'DELETE',
       url: '/grid/token/{id}/maintenance',

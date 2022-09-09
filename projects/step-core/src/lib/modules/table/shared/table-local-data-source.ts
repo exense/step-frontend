@@ -4,7 +4,9 @@ import { BehaviorSubject, combineLatest, map, Observable, of, Subject, takeUntil
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { SearchValue } from './search-value';
+import { TableRequestData } from '../../../client/table/models/table-request-data';
 import { TableParameters } from '../../../client/generated';
+import { FilterCondition } from './filter-condition';
 
 interface Request {
   page?: PageEvent;
@@ -79,6 +81,11 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
 
     const predicates = Object.entries(search)
       .map(([column, value]) => {
+        // ignore complicated remote filters fol local data sources
+        if (!value || value instanceof FilterCondition) {
+          return undefined;
+        }
+
         let searchValue = typeof value === 'string' ? value : value?.value;
         searchValue = (searchValue || '').trim().toLowerCase();
 
@@ -97,7 +104,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
               ? ((item as any) || '').toString()
               : ((item || {})[column] || '').toString();
 
-            return itemValue.trim().toLowerCase().includes(searchValue);
+            return itemValue.trim().toLowerCase().includes(searchValue!);
           };
         }
 
@@ -176,6 +183,14 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
 
   reload(): void {
     this._request$.next(this._request$.value);
+  }
+
+  getFilterRequest(
+    search?: { [p: string]: SearchValue },
+    filter?: string,
+    params?: TableParameters
+  ): TableRequestData | undefined {
+    return undefined;
   }
 
   exportAsCSV(fields: string[], params?: TableParameters): void {

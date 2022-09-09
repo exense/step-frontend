@@ -1,12 +1,15 @@
 import {
   AfterViewInit,
   Component,
+  ContentChild,
   ContentChildren,
+  EventEmitter,
   forwardRef,
   Input,
   OnChanges,
   OnDestroy,
   Optional,
+  Output,
   QueryList,
   SimpleChanges,
   TemplateRef,
@@ -21,10 +24,14 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { SearchColDirective } from '../../directives/search-col.directive';
 import { TableRemoteDataSource } from '../../shared/table-remote-data-source';
 import { TableLocalDataSource } from '../../shared/table-local-data-source';
-import { TableSearch } from '../../services/table.search';
+import { TableSearch } from '../../services/table-search';
 import { SearchValue } from '../../shared/search-value';
 import { ColumnDirective } from '../../directives/column.directive';
+import { TableRequestData } from '../../../../client/table/models/table-request-data';
+import { AdditionalHeaderDirective } from '../../directives/additional-header.directive';
+import { TableFilter } from '../../services/table-filter';
 import { TableParameters } from '../../../../client/generated';
+import { TableReload } from '../../services/table-reload';
 
 export interface SearchColumn {
   colName: string;
@@ -43,9 +50,18 @@ export type DataSource<T> = TableDataSource<T> | T[] | Observable<T[]>;
       provide: TableSearch,
       useExisting: forwardRef(() => TableComponent),
     },
+    {
+      provide: TableFilter,
+      useExisting: forwardRef(() => TableComponent),
+    },
+    {
+      provide: TableReload,
+      useExisting: forwardRef(() => TableComponent),
+    },
   ],
 })
-export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, TableSearch {
+export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, TableSearch, TableFilter, TableReload {
+  @Output() onReload = new EventEmitter<unknown>();
   @Input() trackBy: TrackByFunction<T> = (index) => index;
   @Input() dataSource?: DataSource<T>;
   @Input() inProgress?: boolean;
@@ -74,6 +90,7 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
   @ViewChild(MatTable) private _table?: MatTable<any>;
   @ViewChild(MatPaginator, { static: true }) page!: MatPaginator;
 
+  @ContentChild(AdditionalHeaderDirective) additionalHeader?: AdditionalHeaderDirective;
   @ContentChildren(ColumnDirective) columns?: QueryList<ColumnDirective>;
 
   private get allCollDef(): MatColumnDef[] {
@@ -174,7 +191,7 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
   private setupSearchColumns(): void {
     const searchColDef = this.allSearchColDef;
 
-    if (!searchColDef.length) {
+    if (!searchColDef?.length) {
       this.searchColumns = [];
       this.displaySearchColumns = [];
       return;
@@ -206,17 +223,25 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     });
   }
 
+  onSearch(column: string, searchValue: SearchValue): void;
   onSearch(column: string, value: string, regex?: boolean): void;
-  onSearch(column: string, event: Event, regex?: boolean): void;
-  onSearch(column: string, eventOrValue: Event | string, regex: boolean = false): void {
-    const value =
-      typeof eventOrValue === 'string'
-        ? (eventOrValue as string)
-        : ((eventOrValue as Event)?.target as HTMLInputElement).value || '';
-
+  onSearch(column: string, searchValue: string | SearchValue, regex?: boolean): void {
     const search = { ...this.search$.value };
-    search[column] = regex ? { value, regex } : value;
+    if (typeof searchValue === 'string') {
+      search[column] = regex ? { value: searchValue, regex } : searchValue;
+    } else {
+      search[column] = searchValue;
+    }
     this.search$.next(search);
+  }
+
+  getTableFilterRequest(): TableRequestData | undefined {
+    return this.tableDataSource?.getFilterRequest(this.search$.value, this.filter$.value, this.tableParams$.value);
+  }
+
+  reload(): void {
+    this.onReload.emit({});
+    this.tableDataSource?.reload();
   }
 
   ngAfterViewInit(): void {

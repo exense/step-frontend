@@ -1,12 +1,26 @@
 <div ng-controller="ExecutionTabsCtrl" style="max-width: 97vw">
-  <ul class="nav nav-tabs">
-    <li role="presentation" ng-class="{active: isTabActive(tab.id)}" ng-repeat="tab in tabs track by tab.id">
-      <a ng-click="selectTab(tab.id)"
-        ><execution-result ng-if="tab.id!='list'" execution="getTabExecution(tab.id)" /> {{tab.title}}
-        <i class="glyphicon glyphicon-remove" ng-if="tab.id!='list'" ng-click="closeTab(tab.id)" aria-hidden="true" />
-      </a>
-    </li>
-  </ul>
+  <!--
+    Invisible step-tabs is required to be sure that basic material tab styles,
+    were loaded. Because ng2+ styles are loading on demand
+  -->
+  <step-tabs style="display: none"></step-tabs>
+  <nav class="mat-tab-nav-bar mat-tab-header mat-primary step-legacy-tabs">
+    <div class="mat-tab-link-container">
+      <div class="mat-tab-list" stype="transform: translateX(0px);">
+        <div class="mat-tab-links">
+          <div class="mat-tab-link mat-focus-indicator"
+             tabindex="0"
+             ng-repeat="tab in tabs track by tab.id"
+             ng-class="{'mat-tab-label-active': isTabActive(tab.id)}"
+             ng-click="selectTab(tab.id)">
+            <execution-result ng-if="tab.id!='list'" execution="getTabExecution(tab.id)" /> <span>{{tab.title}}</span>
+            <div ng-if="tab.id!='list'" role="img" ng-click="closeTab(tab.id)" class="mat-icon notranslate material-icons mat-icon-no-color ng-star-inserted mat-icon-close" aria-hidden="true" data-mat-icon-type="font">close</div>
+            <div ng-if="isTabActive(tab.id)" class="mat-ink-bar" style="visibility: visible; left: 0; right: 0"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
   <div class="tab-content">
     <div class="tab-pane ng-scope" ng-repeat="tab in tabs track by tab.id" ng-class="{active: isTabActive(tab.id)}">
       <div ng-if="tab.type=='list'">

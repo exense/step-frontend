@@ -11,4 +11,4 @@ export { TableApiWrapperService } from './services/table-api-wrapper.service';
 export { FieldSort } from './models/field-sort';
 export { SortDirection } from './models/sort-direction.enum';
 export { TableRequestData } from './models/table-request-data';
-export { TableResponse } from './models/table-response';
+export { TableResponseGeneric } from './models/table-response-generic';

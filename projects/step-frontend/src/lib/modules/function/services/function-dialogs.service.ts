@@ -107,7 +107,7 @@ export class FunctionDialogsService {
     const selectedEntity$ = a1Promise2Observable<any>(this._dialogs.selectEntityOfType('function', true));
     const function$ = selectedEntity$.pipe(
       map((result) => result.item),
-      switchMap((id) => this._functionApiService.getFunction(id))
+      switchMap((id) => this._functionApiService.getFunctionById(id))
     );
     return function$;
   }

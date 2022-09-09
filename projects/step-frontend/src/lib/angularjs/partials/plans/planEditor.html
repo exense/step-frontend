@@ -40,30 +40,31 @@
 			</div>
 		</div>
 		<div class="st-flex-column sectionResizable resizable-panel-right">
-			<div class="panel panel-default">
+			<div class="panel panel-default" style="min-width: fit-content">
 				<div class="panel-heading flex flex-row p1">
 					<div class="auto-margin">Available components</div>
 				</div>
 				<div class="panel-body">
-						<uib-tabset  active="componentTabs.selectedTab">
-							<uib-tab heading="Controls">
-                <step-plan-artefact-list (on-selection)="addControl($event)"></step-plan-artefact-list>
-							</uib-tab>
-							<uib-tab heading="Keywords">
-                <step-plan-function-list (on-selection)="addFunction($event)"></step-plan-function-list>
-  						</uib-tab>
-							<uib-tab heading="Other plans">
-                <step-plan-otherplan-list (on-selection)="addPlan($event)"></step-plan-otherplan-list>
-							</uib-tab>
-							<uib-tab heading="Console" ng-if="isInteractiveSessionActive()">
-								<div class="row">
-									<div class="panel-body">
-										<ng-include src="'partials/executions/keywordCalls.html'" />
-									</div>
-								</div>
-							</uib-tab>
-						</uib-tabset>
-					</div>
+          <step-tabs [tabs]="componentTabs.tabs" [(active-tab-id)]="componentTabs.selectedTab" [disable-pagination]="true">
+          </step-tabs>
+          <div class="tab-content">
+            <div class="tab-pane active" ng-if="componentTabs.selectedTab === 'controls'">
+              <step-plan-artefact-list (on-selection)="addControl($event)"></step-plan-artefact-list>
+            </div>
+            <div class="tab-pane active" ng-if="componentTabs.selectedTab === 'keywords'">
+              <step-plan-function-list (on-selection)="addFunction($event)"></step-plan-function-list>
+            </div>
+            <div class="tab-pane active" ng-if="componentTabs.selectedTab === 'other'">
+              <step-plan-otherplan-list (on-selection)="addPlan($event)"></step-plan-otherplan-list>
+            </div>
+            <div class="tab-pane active" ng-if="componentTabs.selectedTab === 'console'">
+              <div class="row">
+                <div class="panel-body">
+                  <ng-include src="'partials/executions/keywordCalls.html'" />
+                </div>
+              </div>
+            </div>
+          </div>
 				</div>
 			</div>
 		</div>

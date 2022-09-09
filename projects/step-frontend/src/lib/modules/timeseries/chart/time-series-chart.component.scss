@@ -32,3 +32,14 @@
   border-bottom: 1px solid #d9d9d9;
   border-top: 1px solid #d9d9d9;
 }
+
+.u-axis {
+  //width: 100px !important;
+}
+
+.ranger {
+  .u-grip-l,
+  .u-grip-r {
+    z-index: 100 !important;
+  }
+}

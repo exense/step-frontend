@@ -5,7 +5,7 @@
 import type { TableFilter } from './TableFilter';
 
 export type BulkOperationParameters = {
-  simulate?: boolean;
+  preview?: boolean;
   targetType?: 'ALL' | 'LIST' | 'FILTER';
   ids?: Array<string>;
   filter?: TableFilter;

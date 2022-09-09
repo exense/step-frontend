@@ -13,7 +13,7 @@ export type Input = {
   type?: 'TEXT' | 'TEXT_DROPDOWN' | 'DROPDOWN' | 'DATE_RANGE' | 'CHECKBOX' | 'NONE';
   label?: string;
   description?: string;
-  valueHtmlTemplate?: string;
+  customUIComponents?: Array<string>;
   searchMapperService?: string;
   defaultValue?: string;
 };

@@ -1,13 +1,14 @@
 <section class="header">
   <step-btn-group>
-    <step-autorefresh-toggle [interval]="5000" (refresh)="dataSource.reload()"> </step-autorefresh-toggle>
+    <step-autorefresh-toggle [interval]="5000" (refresh)="dataSource.reload({ hideProgress: true })">
+    </step-autorefresh-toggle>
   </step-btn-group>
 </section>
 <step-table
   [dataSource]="dataSource"
   matSort
-  matSortActive="description"
-  matSortDirection="asc"
+  matSortActive="startTime"
+  matSortDirection="desc"
   [matSortDisableClear]="true"
 >
   <ng-container matColumnDef="description" stepSearchCol>
@@ -17,12 +18,12 @@
     </td>
   </ng-container>
   <ng-container matColumnDef="startTime" stepSearchCol #searchStartTime="SearchCol">
-    <step-date-filter *stepSearchCellDef (dateChanged)="searchStartTime.search($event)"> </step-date-filter>
+    <step-date-filter *stepSearchCellDef (dateChanged)="searchByDate(searchStartTime, $event)"></step-date-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Start time</th>
     <td mat-cell *matCellDef="let element">{{ element?.startTime | date: DateFormat.date }}</td>
   </ng-container>
   <ng-container matColumnDef="endTime" stepSearchCol #searchEndTime="SearchCol">
-    <step-date-filter *stepSearchCellDef (dateChanged)="searchEndTime.search($event)"> </step-date-filter>
+    <step-date-filter *stepSearchCellDef (dateChanged)="searchByDate(searchEndTime, $event)"></step-date-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>End time</th>
     <td mat-cell *matCellDef="let element">{{ element?.endTime | date: DateFormat.date }}</td>
   </ng-container>
@@ -31,10 +32,6 @@
     <td mat-cell *matCellDef="let element">{{ element?.executionParameters?.userID }}</td>
   </ng-container>
   <step-custom-columns screen="executionTable"> </step-custom-columns>
-  <ng-container matColumnDef="environment" stepSearchCol>
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Environment</th>
-    <td mat-cell *matCellDef="let element">{{ element?.executionParameters?.customParameters?.env }}</td>
-  </ng-container>
   <ng-container matColumnDef="status" stepSearchCol #searchStatus="SearchCol">
     <step-array-filter
       *stepSearchCellDef
@@ -57,7 +54,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Result</th>
     <td mat-cell *matCellDef="let element">
       <div class="result">
-        <step-execution-result [execution]="element"> </step-execution-result>
+        <step-execution-result [result]="element.result" [status]="element.status"> </step-execution-result>
         <step-status-distribution [summary]="element.executionSummary"> </step-status-distribution>
       </div>
     </td>

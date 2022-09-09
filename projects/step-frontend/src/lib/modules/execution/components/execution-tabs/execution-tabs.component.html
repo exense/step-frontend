@@ -1,0 +1,19 @@
+<ng-template #tabRender let-tab>
+  <div class="tab-content">
+    <step-execution-result
+      *ngIf="tab.id !== 'list'"
+      [status]="tab?.execution?.status"
+      [result]="tab?.execution?.result"
+    >
+    </step-execution-result>
+    {{ tab.title }}
+    <mat-icon *ngIf="tab.id !== 'list'" (click)="closeTab.emit(tab.id); (false)">close</mat-icon>
+  </div>
+</ng-template>
+<step-tabs
+  [tabs]="tabs"
+  [tabTemplate]="tabRender"
+  [activeTabId]="activeTabId"
+  (activeTabIdChange)="activeTabIdChange.emit($event)"
+>
+</step-tabs>

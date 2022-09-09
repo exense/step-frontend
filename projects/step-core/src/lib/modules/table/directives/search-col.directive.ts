@@ -1,7 +1,8 @@
 import { ContentChild, Directive, Input, Self } from '@angular/core';
 import { MatColumnDef } from '@angular/material/table';
 import { SearchCellDefDirective } from './search-cell-def.directive';
-import { TableSearch } from '../services/table.search';
+import { TableSearch } from '../services/table-search';
+import { SearchValue } from '../shared/search-value';
 
 @Directive({
   selector: '[matColumnDef][stepSearchCol]',
@@ -20,7 +21,12 @@ export class SearchColDirective {
   @ContentChild(SearchCellDefDirective)
   searchCell?: SearchCellDefDirective;
 
-  search(eventOrValue: Event | string, regex?: boolean): void {
-    this._tableSearch.onSearch(this.searchColumnName, eventOrValue, regex);
+  search(value: string, regex?: boolean): void;
+  search(searchValue: SearchValue): void;
+  search(value: SearchValue, regex?: boolean): void {
+    if (typeof value === 'string') {
+      this._tableSearch.onSearch(this.searchColumnName, value, regex);
+    }
+    this._tableSearch.onSearch(this.searchColumnName, value);
   }
 }

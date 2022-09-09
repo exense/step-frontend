@@ -4,7 +4,7 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
-import type { ExportStatus } from '../models/ExportStatus';
+import type { AsyncTaskStatusResource } from '../models/AsyncTaskStatusResource';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
@@ -17,7 +17,7 @@ export class ExportsService {
    * @param recursively
    * @param filename
    * @param additionalEntities
-   * @returns ExportStatus default response
+   * @returns AsyncTaskStatusResource default response
    * @throws ApiError
    */
   public exportEntities(
@@ -25,7 +25,7 @@ export class ExportsService {
     recursively?: boolean,
     filename?: string,
     additionalEntities?: Array<string>
-  ): Observable<ExportStatus> {
+  ): Observable<AsyncTaskStatusResource> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/export/{entity}',
@@ -46,7 +46,7 @@ export class ExportsService {
    * @param recursively
    * @param filename
    * @param additionalEntities
-   * @returns ExportStatus default response
+   * @returns AsyncTaskStatusResource default response
    * @throws ApiError
    */
   public exportEntityById(
@@ -55,7 +55,7 @@ export class ExportsService {
     recursively?: boolean,
     filename?: string,
     additionalEntities?: Array<string>
-  ): Observable<ExportStatus> {
+  ): Observable<AsyncTaskStatusResource> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/export/{entity}/{id}',
@@ -67,21 +67,6 @@ export class ExportsService {
         recursively: recursively,
         filename: filename,
         additionalEntities: additionalEntities,
-      },
-    });
-  }
-
-  /**
-   * @param id
-   * @returns ExportStatus default response
-   * @throws ApiError
-   */
-  public getExportStatus(id: string): Observable<ExportStatus> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/export/{id}/status',
-      path: {
-        id: id,
       },
     });
   }

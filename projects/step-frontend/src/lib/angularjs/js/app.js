@@ -78,108 +78,6 @@ var tecAdminApp = angular
     },
   ])
 
-  .factory('ViewRegistry', function () {
-    var api = {};
-
-    var customViews = {};
-
-    var customMenuEntries = [];
-
-    api.getCustomView = (view) => {
-      var customView = customViews[view];
-      if (customView) {
-        return customView;
-      } else {
-        throw 'Undefined view: ' + view;
-      }
-    };
-
-    api.getViewTemplate = function (view) {
-      return api.getCustomView(view).template;
-    };
-
-    api.isPublicView = function (view) {
-      return api.getCustomView(view).isPublicView;
-    };
-
-    api.isStaticView = function (view) {
-      return api.getCustomView(view).isStaticView;
-    };
-
-    api.registerView = function (viewId, template, isPublicView) {
-      api.registerViewWithConfig(viewId, template, { isPublicView: isPublicView });
-    };
-
-    api.registerViewWithConfig = function (viewId, template, config) {
-      var isPublicView = config.isPublicView || false;
-      var isStaticView = config.isStaticView || false;
-      customViews[viewId] = { template: template, isPublicView: isPublicView, isStaticView: isStaticView };
-    };
-
-    api.registerCustomMenuEntry = function (label, viewId, mainMenu, menuIconClass, right) {
-      customMenuEntries.push({
-        label: label,
-        viewId: viewId,
-        mainMenu: mainMenu,
-        menuIconClass: menuIconClass,
-        right: right,
-        isEnabledFct: function () {
-          return true;
-        },
-      });
-    };
-
-    api.registerCustomMenuEntryOptional = function (label, viewId, mainMenu, menuIconClass, right, isEnabledFct) {
-      customMenuEntries.push({
-        label: label,
-        viewId: viewId,
-        mainMenu: mainMenu,
-        menuIconClass: menuIconClass,
-        right: right,
-        isEnabledFct: isEnabledFct,
-      });
-    };
-
-    api.getCustomMenuEntries = function () {
-      return _.filter(customMenuEntries, function (e) {
-        return !e.mainMenu && e && e.isEnabledFct();
-      });
-    };
-
-    api.getCustomMainMenuEntries = function () {
-      return _.filter(customMenuEntries, function (e) {
-        return e.mainMenu == true && e && e.isEnabledFct();
-      });
-    };
-
-    var customDashlets = {};
-
-    api.getDashlets = function (path) {
-      var dashlets = customDashlets[path];
-      if (!dashlets) {
-        dashlets = [];
-        customDashlets[path] = dashlets;
-      }
-      return dashlets;
-    };
-
-    api.registerDashlet = function (path, label, template, id, before) {
-      if (before) {
-        api.getDashlets(path).unshift({ label: label, template: template, id: id });
-      } else {
-        api.getDashlets(path).push({ label: label, template: template, id: id });
-      }
-    };
-
-    api.registerDashletAdvanced = function (path, label, template, id, position, isEnabledFct) {
-      api
-        .getDashlets(path)
-        .splice(position, 0, { label: label, template: template, id: id, isEnabledFct: isEnabledFct });
-    };
-
-    return api;
-  })
-
   .run(function (ViewRegistry, EntityRegistry) {
     ViewRegistry.registerView('myaccount', 'partials/myaccount.html');
     ViewRegistry.registerView('login', 'partials/loginForm.html', true);
@@ -225,7 +123,7 @@ var tecAdminApp = angular
       $scope.setView = function (view) {
         ViewState.setView(view);
         $scope.$state = view;
-        stateStorage.store($scope, { lastview: view });
+        stateStorage.store($scope, {lastview: view});
       };
 
       $scope.isViewActive = function (view) {
@@ -257,14 +155,14 @@ var tecAdminApp = angular
       }
 
       document.body.addEventListener('keydown', handleKeys);
-      $scope.$on('$destroy', function(){
+      $scope.$on('$destroy', function () {
         document.body.removeEventListener('keydown', handleKeys);
       });
 
     }
   )
 
-  .directive('rootContent', function() {
+  .directive('rootContent', function () {
     return {
       restrict: 'A',
       scope: true,
@@ -280,7 +178,7 @@ var tecAdminApp = angular
       compile: function (element, attrs) {
         var templatePath = attrs.ngCompiledInclude;
         return function (scope, element) {
-          $http.get(templatePath, { cache: $templateCache }).then(function (response) {
+          $http.get(templatePath, {cache: $templateCache}).then(function (response) {
             var contents = element.html(response).contents();
             $compile(contents)(scope);
           });
@@ -359,9 +257,9 @@ angular
           if (debug()) {
             console.log(
               'existing scope pushed. id:' +
-                $scope.$id +
-                '. Path matched. Setting $state. path ' +
-                path.slice($scope.$$statepath.length, $scope.$$statepath.length + 1)[0]
+              $scope.$id +
+              '. Path matched. Setting $state. path ' +
+              path.slice($scope.$$statepath.length, $scope.$$statepath.length + 1)[0]
             );
           }
           $scope.$state = path.slice($scope.$$statepath.length, $scope.$$statepath.length + 1)[0];
@@ -385,9 +283,9 @@ angular
           if (debug()) {
             console.log(
               'new scope pushed. id:' +
-                $scope.$id +
-                '. Path matched. Setting $state. path ' +
-                path.slice($scope.$$statepath.length, $scope.$$statepath.length + 1)[0]
+              $scope.$id +
+              '. Path matched. Setting $state. path ' +
+              path.slice($scope.$$statepath.length, $scope.$$statepath.length + 1)[0]
             );
           }
           $scope.$state = path.slice($scope.$$statepath.length, $scope.$$statepath.length + 1)[0];
@@ -399,11 +297,11 @@ angular
             if (debug()) {
               console.log(
                 'scope ' +
-                  $scope.$id +
-                  ' remains selected after path change. new path ' +
-                  path.slice(0, $scope.$$statepath.length).toString() +
-                  ' scope path:' +
-                  $scope.$$statepath.toString()
+                $scope.$id +
+                ' remains selected after path change. new path ' +
+                path.slice(0, $scope.$$statepath.length).toString() +
+                ' scope path:' +
+                $scope.$$statepath.toString()
               );
             }
             $scope.$state = path.slice($scope.$$statepath.length, $scope.$$statepath.length + 1)[0];
@@ -493,13 +391,13 @@ angular
 
   .controller('ChangePasswordModalCtrl', function ($scope, $rootScope, $uibModalInstance, $http, $location, otp) {
     $scope.otp = otp;
-    $scope.model = { newPwd: '' };
+    $scope.model = {newPwd: ''};
     $scope.repeatPwd = '';
 
-    $http.get('rest/admin/security/passwordpolicies').then(function ({ data }) {
+    $http.get('rest/admin/security/passwordpolicies').then(function ({data}) {
       if (data.length > 0) {
         $scope.passwordScheme = data.map((element) => {
-          return { rule: new RegExp('^(?=' + element.rule + ')'), description: element.description };
+          return {rule: new RegExp('^(?=' + element.rule + ')'), description: element.description};
         });
       }
     });
@@ -567,7 +465,7 @@ angular
     var service = this;
     service.responseError = function (response) {
       if (response.status == 401) {
-        $rootScope.context = { userID: 'anonymous' };
+        $rootScope.context = {userID: 'anonymous'};
       }
       if (response.status == 403) {
         // error will be handled by genericErrorInterceptor
@@ -620,7 +518,7 @@ angular
           $http({
             url: 'rest/import/' + path,
             method: 'POST',
-            params: { path: $scope.resourcePath, importAll: $scope.importAll, overwrite: $scope.overwrite },
+            params: {path: $scope.resourcePath, importAll: $scope.importAll, overwrite: $scope.overwrite},
           }).then(function (response) {
             $uibModalInstance.close(response.data);
             if (response.data && response.data.length > 0) {
@@ -935,7 +833,7 @@ angular
             callback(result2, arg);
           });
         } else {
-          callback({ entity: result1.entity, assignAll: true }, arg);
+          callback({entity: result1.entity, assignAll: true}, arg);
         }
       });
     };
@@ -978,7 +876,7 @@ angular
       });
 
       $scope.proceed = function () {
-        $uibModalInstance.close({ entity: $scope.currentEntityType, selectAll: $scope.selectAll === 'true' });
+        $uibModalInstance.close({entity: $scope.currentEntityType, selectAll: $scope.selectAll === 'true'});
       };
 
       $scope.cancel = function () {
@@ -1000,7 +898,7 @@ angular
       }
 
       $scope.select = function (item) {
-        $uibModalInstance.close({ entity: entityType, item: item });
+        $uibModalInstance.close({entity: entityType, item: item});
       };
 
       $scope.proceed = function () {
@@ -1008,11 +906,11 @@ angular
         _.each($scope.selectEntityHandle.getSelection(), function (key) {
           resultArray.push(key);
         });
-        $uibModalInstance.close({ entity: entityType, array: resultArray });
+        $uibModalInstance.close({entity: entityType, array: resultArray});
       };
 
       $scope.proceedFiltered = function () {
-        $uibModalInstance.close({ entity: entityType, filterQuery: $scope.selectEntityHandle.getFilter() });
+        $uibModalInstance.close({entity: entityType, filterQuery: $scope.selectEntityHandle.getFilter()});
       };
 
       $scope.cancel = function () {
@@ -1110,7 +1008,7 @@ angular
     };
 
     this.lookUp = (value, searchType) => {
-      return $http.post('rest/references/findReferences', { searchType: searchType, searchValue: value });
+      return $http.post('rest/references/findReferences', {searchType: searchType, searchValue: value});
     };
   })
 
@@ -1180,6 +1078,7 @@ angular
                 }
               }
             }
+
             focusChild($element[0]);
           });
         }

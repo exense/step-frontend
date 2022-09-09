@@ -27,11 +27,15 @@ export class ViewStateService {
     const propsAccessor = this as PropsAccessor;
     propsAccessor.viewTemplate = this._view ? this._viewRegistry.getViewTemplate(this._view) : undefined;
     propsAccessor.isPublicView = this._view ? this._viewRegistry.isPublicView(this._view) : false;
-    propsAccessor.isStaticView = this._view ? this._viewRegistry.isStaticView(this._view) : false;
+    propsAccessor.isStaticView = this._view ? !!this._viewRegistry.isStaticView(this._view) : false;
   }
 
   isViewActive(view: string): boolean {
     return this._view === view;
+  }
+
+  getViewName(): string | undefined {
+    return this._view;
   }
 }
 

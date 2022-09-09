@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import { SelectionCollector } from '../../services/selection-collector/selection-collector';
 import { map, Observable, of } from 'rxjs';
 import { Mutable } from '../../../../shared';
@@ -10,7 +10,7 @@ type FieldAccessor = Mutable<Pick<EntitySelectionComponent<any, any>, 'isSelecte
   templateUrl: './entity-selection.component.html',
   styleUrls: ['./entity-selection.component.scss'],
 })
-export class EntitySelectionComponent<KEY, ENTITY> implements OnChanges {
+export class EntitySelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy {
   @Input() selectionCollector?: SelectionCollector<KEY, ENTITY>;
   @Input() entity?: ENTITY;
 
@@ -23,6 +23,12 @@ export class EntitySelectionComponent<KEY, ENTITY> implements OnChanges {
     this.selectionCollector!.toggleSelection(this.entity!);
   }
 
+  ngOnDestroy(): void {
+    if (this.entity && this.selectionCollector) {
+      this.selectionCollector.unregisterPossibleSelection(this.entity);
+    }
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     let entity: ENTITY | undefined = undefined;
     let selectionCollector: SelectionCollector<KEY, ENTITY> | undefined = undefined;
@@ -30,14 +36,43 @@ export class EntitySelectionComponent<KEY, ENTITY> implements OnChanges {
     const cEntity = changes['entity'];
     if (cEntity?.previousValue !== cEntity?.currentValue) {
       entity = cEntity?.currentValue;
+      this.onEntityChange(cEntity?.currentValue, cEntity?.previousValue);
     }
 
     const cSelectionCollector = changes['selectionCollector'];
     if (cSelectionCollector?.previousValue !== cSelectionCollector?.currentValue) {
       selectionCollector = cSelectionCollector?.currentValue;
+      this.onSelectionCollectorChange(cSelectionCollector?.currentValue, cSelectionCollector?.previousValue);
     }
 
     this.setupStreams(entity, selectionCollector);
+  }
+
+  private onEntityChange(currentValue?: ENTITY, previousValue?: ENTITY): void {
+    if (!this.selectionCollector) {
+      return;
+    }
+    if (previousValue) {
+      this.selectionCollector.unregisterPossibleSelection(previousValue);
+    }
+    if (currentValue) {
+      this.selectionCollector.registerPossibleSelection(currentValue);
+    }
+  }
+
+  private onSelectionCollectorChange(
+    currentValue?: SelectionCollector<KEY, ENTITY>,
+    previousValue?: SelectionCollector<KEY, ENTITY>
+  ): void {
+    if (!this.entity) {
+      return;
+    }
+    if (previousValue) {
+      previousValue.unregisterPossibleSelection(this.entity);
+    }
+    if (currentValue) {
+      currentValue.registerPossibleSelection(this.entity);
+    }
   }
 
   private setupStreams(entity?: ENTITY, selectionCollector?: SelectionCollector<KEY, ENTITY>): void {

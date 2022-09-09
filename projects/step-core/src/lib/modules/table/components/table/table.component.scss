@@ -7,8 +7,8 @@ table {
   width: 100%;
 }
 
-tr.mat-row {
-  background: #f8f9f9;
+tr.mat-row:hover {
+  background: var(--darken-background-10);
 }
 
 th > mat-form-field {
@@ -22,6 +22,10 @@ th > mat-form-field {
   height: 100px;
   left: calc(50% - 50px);
   top: calc(50% - 50px);
+}
+
+.additional-header {
+  padding: 0 24px;
 }
 
 .no-data {
