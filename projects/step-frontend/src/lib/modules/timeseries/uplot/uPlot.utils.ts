@@ -21,26 +21,36 @@ export class UPlotUtils {
     }
   }
 
-  // @ts-ignore
-  static closestNotEmptyPointFunction = (self: uPlot, seriesIdx, hoveredIdx, cursorXVal) => {
+  /**
+   * This method find the closest point in the chart (left-right) that is not null.
+   * If the hovered point is not null, it is returned.
+   * @param self
+   * @param seriesIdx
+   * @param hoveredIdx
+   * @param cursorXVal
+   */
+  static closestNotEmptyPointFunction = (self: uPlot, seriesIdx: number, hoveredIdx: number, cursorXVal: number) => {
     let xValues = self.data[0];
-    let yValues = self.data[seriesIdx];
+    let seriesData = self.data[seriesIdx];
 
-    // todo: only scan in-view indices
+    if (seriesData[hoveredIdx] == null) {
+      let nonNullLft = null;
+      let nonNullRgt = null;
+      let i = hoveredIdx;
 
-    if (yValues[hoveredIdx] == null) {
-      let nonNullLft = null,
-        nonNullRgt = null,
-        i;
-
-      i = hoveredIdx;
       while (nonNullLft == null && i-- > 0) {
-        if (yValues[i] != null) nonNullLft = i;
+        // find the closest point in the left
+        if (seriesData[i] != null) nonNullLft = i;
       }
 
       i = hoveredIdx;
-      while (nonNullRgt == null && i++ < yValues.length) {
-        if (yValues[i] != null) nonNullRgt = i;
+      while (nonNullRgt == null && i++ < seriesData.length) {
+        // find the closest point in the right
+        if (seriesData[i] != null) nonNullRgt = i;
+      }
+
+      if (nonNullLft == null && nonNullRgt == null) {
+        return hoveredIdx;
       }
 
       let rgtVal = nonNullRgt == null ? Infinity : xValues[nonNullRgt];
@@ -49,7 +59,7 @@ export class UPlotUtils {
       let lftDelta = cursorXVal - lftVal;
       let rgtDelta = rgtVal - cursorXVal;
 
-      hoveredIdx = lftDelta <= rgtDelta ? nonNullLft : nonNullRgt;
+      return lftDelta <= rgtDelta ? nonNullLft! : nonNullRgt!;
     }
 
     return hoveredIdx;

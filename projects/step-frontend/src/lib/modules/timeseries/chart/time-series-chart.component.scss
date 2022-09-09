@@ -3,6 +3,7 @@
   max-width: 100%;
   max-height: 100%;
   padding-top: 24px;
+  position: relative;
 }
 
 .u-axis {
@@ -14,4 +15,20 @@
   .u-grip-r {
     z-index: 100 !important;
   }
+}
+
+.no-data-tag {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 134px;
+  text-align: center;
+  font-weight: bold;
+  background: white;
+  font-size: 15px;
+  line-height: 49px;
+  color: rgba(0, 0, 0, 0.38);
+  border-bottom: 1px solid #d9d9d9;
+  border-top: 1px solid #d9d9d9;
 }

@@ -1,5 +1,6 @@
 <div class="page-container">
   <div class="view-content">
+    <step-execution-filters [executionId]="executionId"></step-execution-filters>
     <!--    <step-execution-tabs></step-execution-tabs>-->
     <step-execution-time-selection
       (onRangeChange)="handleTableRangeChange($event)"
@@ -48,7 +49,7 @@
         <div class="chart-container">
           <step-chart-skeleton *ngIf="!responseTypeByKeywordsSettings"></step-chart-skeleton>
           <step-timeseries-chart
-            #chart5
+            #responseTimeChart
             *ngIf="responseTypeByKeywordsSettings"
             [settings]="responseTypeByKeywordsSettings"
             [selection]="timeSelection?.absoluteSelection"
@@ -70,7 +71,7 @@
           <step-chart-skeleton *ngIf="!throughputChartSettings"></step-chart-skeleton>
           <step-timeseries-chart
             *ngIf="throughputChartSettings"
-            #chart4
+            #throughputChart
             [settings]="throughputChartSettings"
             [selection]="timeSelection?.absoluteSelection"
             [syncKey]="executionId"

@@ -15,10 +15,12 @@ export class ExecutionTabContext {
   activeTimeSelection: ExecutionTimeSelection = { type: RangeSelectionType.FULL };
   activeExecution: Execution | undefined;
   activeFilters: { [key: string]: any } = {};
+  activeGroupings: string[] = ['name']; // group dimensions
 
   private readonly activeSelectionChange: BehaviorSubject<ExecutionTimeSelection> =
     new BehaviorSubject<ExecutionTimeSelection>(this.activeTimeSelection);
   private readonly filtersChangeSubject: Subject<BucketFilters> = new Subject();
+  private readonly groupingChangeSubject: Subject<string[]> = new Subject();
 
   private readonly keywordsContext: TimeSeriesKeywordsContext;
   private readonly colorsPool: TimeseriesColorsPool;
@@ -57,11 +59,25 @@ export class ExecutionTabContext {
     return this.activeSelectionChange.asObservable();
   }
 
+  onGroupingChange(): Observable<string[]> {
+    return this.groupingChangeSubject.asObservable();
+  }
+
   onFiltersChange(): Observable<BucketFilters> {
     return this.filtersChangeSubject.asObservable();
   }
 
   updateFilters(filters: BucketFilters): void {
+    this.activeFilters = filters;
     this.filtersChangeSubject.next(filters);
+  }
+
+  updateGrouping(grouping: string[]) {
+    this.activeGroupings = grouping;
+    this.groupingChangeSubject.next(grouping);
+  }
+
+  getGroupDimensions(): string[] {
+    return this.activeGroupings;
   }
 }

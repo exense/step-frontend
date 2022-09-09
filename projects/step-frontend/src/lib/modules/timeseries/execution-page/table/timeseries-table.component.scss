@@ -9,3 +9,11 @@
     margin-right: 12px;
   }
 }
+
+.ts-table {
+  ::ng-deep {
+    .mat-row {
+      height: 30px !important;
+    }
+  }
+}

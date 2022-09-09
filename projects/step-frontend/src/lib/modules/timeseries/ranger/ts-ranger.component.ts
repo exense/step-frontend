@@ -7,6 +7,7 @@ import {
   OnChanges,
   OnInit,
   Output,
+  Self,
   SimpleChanges,
   ViewChild,
   ViewEncapsulation,
@@ -16,6 +17,7 @@ import { TSTimeRange } from '../chart/model/ts-time-range';
 
 //@ts-ignore
 import uPlot = require('uplot');
+import MouseListener = uPlot.Cursor.MouseListener;
 
 /**
  * There are 3 ways of interaction with the ranger:
@@ -31,6 +33,8 @@ import uPlot = require('uplot');
   encapsulation: ViewEncapsulation.None,
 })
 export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
+  private readonly CHART_HEIGHT = 100;
+
   @ViewChild('chart') private chartElement!: ElementRef;
 
   @Input() settings!: TSRangerSettings;
@@ -52,7 +56,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
   start!: number;
   end!: number;
 
-  constructor() {}
+  constructor(@Self() private element: ElementRef) {}
 
   ngOnInit(): void {
     if (this.syncKey) {
@@ -139,37 +143,33 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   private createRanger() {
-    // @ts-ignore
-    let x0;
+    let getSize = () => {
+      return {
+        width: this.element.nativeElement.parentElement.offsetWidth,
+        height: this.CHART_HEIGHT,
+      };
+    };
+    let x0: number;
     let lft0: number;
     let wid0: number;
-    // @ts-ignore
-    const lftWid = { left: null, width: null };
-    // @ts-ignore
+    const lftWid: { left: number; width: number } = { left: 0, width: 0 };
     const minMax = { min: null, max: null };
 
-    // @ts-ignore
-    let placeDiv = function (par, cls) {
+    let placeDiv = function (par: any, cls: any) {
       let el = document.createElement('div');
       el.classList.add(cls);
       par.appendChild(el);
       return el;
     };
-    // @ts-ignore
-    let on = function (ev, el, fn) {
+    let on = function (ev: any, el: any, fn: any) {
       el.addEventListener(ev, fn);
     };
-    // @ts-ignore
-    let off = function (ev, el, fn) {
+    let off = function (ev: any, el: any, fn: any) {
       el.removeEventListener(ev, fn);
     };
-    // @ts-ignore
-    let debounce = function (fn) {
-      // @ts-ignore
-      let raf;
-      // @ts-ignore
-      return (...args) => {
-        // @ts-ignore
+    let debounce = function (fn: any) {
+      let raf: any;
+      return (...args: any[]) => {
         if (raf) return;
 
         raf = requestAnimationFrame(() => {
@@ -178,8 +178,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
         });
       };
     };
-    // @ts-ignore
-    let bindMove = (e, onMove) => {
+    let bindMove = (e: any, onMove: any) => {
       x0 = e.clientX;
       lft0 = this.uplot.select.left;
       wid0 = this.uplot.select.width;
@@ -187,8 +186,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       const _onMove = debounce(onMove);
       on('mousemove', document, _onMove);
 
-      // @ts-ignore
-      const _onUp = (e) => {
+      const _onUp = (e: any) => {
         off('mouseup', document, _onUp);
         off('mousemove', document, _onMove);
 
@@ -202,22 +200,19 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       e.stopPropagation();
     };
 
-    // @ts-ignore
-    let setSelect = (newLft, newWid) => {
+    let setSelect = (newLft: number, newWid: number) => {
       lftWid.left = newLft;
       lftWid.width = newWid;
       this.uplot.setSelect(lftWid, false);
     };
 
-    // @ts-ignore
-    let zoom = (newLft, newWid) => {
+    let zoom = (newLft: number, newWid: number) => {
       // minMax.min = this.uplot.posToVal(newLft, 'x');
       // minMax.max = this.uplot.posToVal(newLft + newWid, 'x');
       // uZoomed.setScale('x', minMax);
     };
 
-    // @ts-ignore
-    let update = (newLft, newWid) => {
+    let update = (newLft: number, newWid: number) => {
       let newRgt = newLft + newWid;
       let maxRgt = this.uplot.bbox.width / devicePixelRatio;
 
@@ -232,8 +227,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     }
     // console.log('CREATING WITH SELECT: ', this.settings.selection);
     let rangerOpts: uPlot.Options = {
-      width: 800,
-      height: 100,
+      ...getSize(),
       ms: 1, // if not specified it's going be in seconds
       // select: {left: 0, width: 300, height: 33},
       select: select,
@@ -260,8 +254,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
           key: this.syncKey,
         },
         bind: {
-          // @ts-ignore
-          dblclick: (self, b, handler) => {
+          dblclick: (self: uPlot, b, handler: MouseListener) => {
             return (e: any) => {
               let hasSelection = this.uplot.select.width > 0;
               handler(e);
@@ -269,6 +262,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
                 // has selection
                 this.resetSelect(true);
               }
+              return null;
             };
           },
         },
@@ -298,8 +292,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       ],
       hooks: {
         ready: [
-          // @ts-ignore
-          (uRanger) => {
+          (uRanger: uPlot) => {
             let left = 0;
             let width = Math.round(uRanger.valToPos(this.end, 'x')) - left;
             let height = uRanger.bbox.height / devicePixelRatio;
@@ -310,28 +303,21 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
             this.previousRange = { from: this.start, to: this.end };
             const sel = uRanger.root.querySelector('.u-select');
 
-            //@ts-ignore
-            on('mousedown', sel, (e) => {
-              // @ts-ignore
-              bindMove(e, (e) => update(lft0 + (e.clientX - x0), wid0));
+            on('mousedown', sel, (e: any) => {
+              bindMove(e, (e: any) => update(lft0 + (e.clientX - x0), wid0));
             });
 
-            // @ts-ignore
-            on('mousedown', placeDiv(sel, 'u-grip-l'), (e) => {
-              // @ts-ignore
-              bindMove(e, (e) => update(lft0 + (e.clientX - x0), wid0 - (e.clientX - x0)));
+            on('mousedown', placeDiv(sel, 'u-grip-l'), (e: any) => {
+              bindMove(e, (e: any) => update(lft0 + (e.clientX - x0), wid0 - (e.clientX - x0)));
             });
 
-            // @ts-ignore
-            on('mousedown', placeDiv(sel, 'u-grip-r'), (e) => {
-              // @ts-ignore
-              bindMove(e, (e) => update(lft0, wid0 + (e.clientX - x0)));
+            on('mousedown', placeDiv(sel, 'u-grip-r'), (e: any) => {
+              bindMove(e, (e: any) => update(lft0, wid0 + (e.clientX - x0)));
             });
           },
         ],
         setSelect: [
-          // @ts-ignore
-          (uRanger) => {
+          (uRanger: uPlot) => {
             // this is triggered when the synced charts are zooming
             // this is triggered many times when clicking on the ranger.
             this.emitRangeEventIfChanged();
@@ -339,8 +325,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
           },
         ],
         setScale: [
-          // @ts-ignore
-          (uRanger) => {
+          (uRanger: uPlot) => {
             // this.onRangeChange.next(this.getCurrentRange());
             // this is triggered when the synced charts are zooming
             // zoom(uRanger.select.left, uRanger.select.width);

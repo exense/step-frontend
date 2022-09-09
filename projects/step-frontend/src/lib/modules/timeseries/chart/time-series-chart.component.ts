@@ -15,13 +15,13 @@ import {
 import { TSChartSeries, TSChartSettings } from './model/ts-chart-settings';
 import { UplotSyncService } from './uplot-sync-service';
 import { UPlotUtils } from '../uplot/uPlot.utils';
-import { tooltipPlugin } from './tooltip-plugin';
 import { TSTimeRange } from './model/ts-time-range';
 import { AlignedData } from 'uplot';
 import MouseListener = uPlot.Cursor.MouseListener;
 
 //@ts-ignore
 import uPlot = require('uplot');
+import { TooltipPlugin } from './tooltip-plugin';
 
 @Component({
   selector: 'step-timeseries-chart',
@@ -46,6 +46,8 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   seriesIndexesByIds: { [key: string]: number } = {}; // for fast accessing
 
   recreateOnInputChange = true; // the chart will be destroyed and recreated every time a setting or data is changed.
+
+  emptyChart = false; // meaning the chart is already created, but it has no data
 
   constructor(@Self() private element: ElementRef) {}
 
@@ -99,11 +101,12 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         this.seriesIndexesByIds[series.id] = i + 1; // because the first series is the time
       }
     });
+    this.emptyChart = settings.series.length === 0;
     const opts: uPlot.Options = {
       title: settings.title,
       ms: 1, // if not specified it's going to be in seconds
       ...getSize(),
-      legend: { show: settings.showLegend },
+      legend: { show: this.emptyChart ? false : settings.showLegend },
       cursor: cursorOpts,
       scales: {
         x: {
@@ -113,7 +116,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         },
         // y: {auto: true},
       },
-      plugins: [tooltipPlugin(this.settings.yScaleUnit)],
+      plugins: [TooltipPlugin.getInstance(this.settings.yScaleUnit)],
       axes: [{}, ...(settings.axes || [])],
       series: [
         {
@@ -191,8 +194,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   }
 
   setData(data: AlignedData, resetScale = false) {
-    let scale = this.uplot.scales['x'];
-    console.log(scale);
     this.uplot.setData(data, resetScale); // if it is false, it's not going change the X scale (zooming)
     this.uplot.redraw();
   }
@@ -253,27 +254,33 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     this.uplot.data[seriesIndex] = [...existingData, ...data];
   }
 
+  clear() {
+    this.updateFullData([]);
+    this.emptyChart = true;
+    this.uplot.axes[0].show = false;
+    this.uplot.legend.show = false;
+  }
+
   /**
-   * The complete chart data will be override
+   * The complete chart data will be overriden
    * @param series
    */
   updateFullData(series: TSChartSeries[]): void {
     this.seriesIndexesByIds = {};
-    let data = [this.settings.xValues, ...series.map((s) => s.data)];
+    let data: AlignedData = [this.settings.xValues, ...series.map((s) => s.data)];
     this.uplot.batch(() => {
-      this.clearChart();
+      this.removeAllSeries();
       this.uplot.addSeries({
         label: 'Timestamp',
       });
       series.forEach((s) => this.uplot.addSeries(s));
-      // @ts-ignore
       this.uplot.setData(data, true);
     });
   }
 
-  clearChart() {
+  private removeAllSeries() {
     let seriesLength = this.uplot.series.length;
-    for (let i = 0; i < seriesLength; i++) {
+    for (let i = 1; i < seriesLength; i++) {
       this.uplot.delSeries(1); // we clean everything
     }
     this.uplot.delSeries(0);
