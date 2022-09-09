@@ -101,7 +101,15 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         this.seriesIndexesByIds[series.id] = i + 1; // because the first series is the time
       }
     });
-    this.emptyChart = settings.series.length === 0;
+    let noData = true;
+    for (let series of settings.series) {
+      if (series.data.length > 0) {
+        // if at least one series has data, it is not empty
+        noData = false;
+        break;
+      }
+    }
+    this.emptyChart = noData;
     const opts: uPlot.Options = {
       title: settings.title,
       ms: 1, // if not specified it's going to be in seconds

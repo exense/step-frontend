@@ -5,9 +5,9 @@ import { FindBucketsRequest } from '../../find-buckets-request';
 import { TimeseriesColorsPool } from '../../util/timeseries-colors-pool';
 import { TimeSeriesChartResponse } from '../../time-series-chart-response';
 import { TimeSeriesKeywordsContext } from '../time-series-keywords.context';
-import { ExecutionsPageService } from '../../executions-page.service';
+import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
 import { BucketAttributes, TableDataSource, TableLocalDataSource, TableLocalDataSourceConfig } from '@exense/step-core';
-import { ExecutionTabContext } from '../execution-tab-context';
+import { ExecutionContext } from '../execution-context';
 
 @Component({
   selector: 'step-timeseries-table',
@@ -22,13 +22,11 @@ export class TimeseriesTableComponent implements OnInit {
   tableIsLoading = true;
   dimensionKey = 'name';
   response: TimeSeriesChartResponse | undefined;
-  findRequest: FindBucketsRequest | undefined;
+  @Input() findRequest!: FindBucketsRequest;
   groupDimensions: string[] = [];
 
   private keywordsService!: TimeSeriesKeywordsContext;
-  private executionContext!: ExecutionTabContext;
-
-  @Input() executionId!: string;
+  @Input() executionContext!: ExecutionContext;
 
   // @Output('onKeywordsFetched') onKeywordsFetched = new EventEmitter<string[]>();
   // @Output('onKeywordToggled') onKeywordToggled = new EventEmitter<string>();
@@ -36,10 +34,15 @@ export class TimeseriesTableComponent implements OnInit {
   sortByNameAttributeFn = (a: Bucket, b: Bucket) =>
     a.attributes.name.toLowerCase() > b.attributes.name.toLowerCase() ? 1 : -1;
 
-  constructor(private timeSeriesService: TimeSeriesService, private executionsPageService: ExecutionsPageService) {}
+  constructor(private timeSeriesService: TimeSeriesService, private executionsPageService: TimeSeriesContextsFactory) {}
 
   ngOnInit(): void {
-    this.executionContext = this.executionsPageService.getContext(this.executionId);
+    if (!this.executionContext) {
+      throw new Error('Execution context is mandatory');
+    }
+    if (!this.findRequest) {
+      throw new Error('FindRequest input is mandatory');
+    }
     this.keywordsService = this.executionContext.getKeywordsContext();
     this.keywordsService.onKeywordToggled().subscribe((selection) => {
       this.bucketsByKeywords[selection.id].attributes.isSelected = selection.isSelected;
@@ -51,6 +54,7 @@ export class TimeseriesTableComponent implements OnInit {
       }
       this.fetchBuckets(this.findRequest, (keywords) => this.keywordsService.setKeywords(keywords, true));
     });
+    this.fetchBuckets(this.findRequest, (keywords) => this.keywordsService.setKeywords(keywords));
   }
 
   onKeywordToggle(keyword: string, event: any) {
@@ -58,8 +62,7 @@ export class TimeseriesTableComponent implements OnInit {
   }
 
   init(request: FindBucketsRequest) {
-    this.findRequest = request;
-    this.fetchBuckets(request, (keywords) => this.keywordsService.setKeywords(keywords));
+    // this.findRequest = request;
   }
 
   private fetchBuckets(request: FindBucketsRequest, keywordsCallback: (series: string[]) => void) {

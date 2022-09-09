@@ -9,7 +9,7 @@ import { BucketFilters } from '../model/bucket-filters';
 /**
  * This class is responsible for managing the state of an execution tab. Here we store time selection, colors, filters, etc.
  */
-export class ExecutionTabContext {
+export class ExecutionContext {
   executionId!: string;
 
   activeTimeSelection: ExecutionTimeSelection = { type: RangeSelectionType.FULL };

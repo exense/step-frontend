@@ -1,9 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ExecutionsPageService } from '../../executions-page.service';
-import { ExecutionTabContext } from '../execution-tab-context';
+import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
+import { ExecutionContext } from '../execution-context';
 import { BucketFilters } from '../../model/bucket-filters';
 import { KeywordSelection, TimeSeriesKeywordsContext } from '../time-series-keywords.context';
-import { KeywordsService } from '@exense/step-core';
 import { KeyValue } from '@angular/common';
 
 @Component({
@@ -28,27 +27,37 @@ export class ExecutionFiltersComponent implements OnInit {
   keywordSearchValue: string = '';
   allSeriesChecked: boolean = true;
 
-  @Input() executionId!: string;
-
-  private executionContext!: ExecutionTabContext;
+  @Input() executionContext!: ExecutionContext;
   private keywordsService!: TimeSeriesKeywordsContext;
   keywords: { [key: string]: KeywordSelection } = {};
 
   activeKeywords = 0;
 
-  constructor(private executionPageService: ExecutionsPageService) {}
+  constructor(private executionPageService: TimeSeriesContextsFactory) {}
 
   ngOnInit(): void {
-    this.executionContext = this.executionPageService.getContext(this.executionId);
+    if (!this.executionContext) {
+      throw new Error('Context parameter is mandatory');
+    }
     this.keywordsService = this.executionContext.getKeywordsContext();
     this.keywordsService.onKeywordsUpdated().subscribe((keywords) => {
       this.keywords = keywords;
       this.activeKeywords = 0;
       Object.keys(keywords).forEach((key) => {
         if (keywords[key].isVisible && keywords[key].isSelected) {
+          console.log(key + ' ' + keywords[key].isSelected);
           this.activeKeywords++;
         }
       });
+    });
+    this.keywordsService.onKeywordToggled().subscribe((selection) => {
+      let isSelected = this.keywords[selection.id].isSelected;
+      if (isSelected) {
+        this.activeKeywords++;
+      } else {
+        this.allSeriesChecked = false;
+        this.activeKeywords--;
+      }
     });
   }
 

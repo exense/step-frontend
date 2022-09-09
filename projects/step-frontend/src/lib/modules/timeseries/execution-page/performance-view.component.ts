@@ -15,13 +15,14 @@ import { TimeseriesTableComponent } from './table/timeseries-table.component';
 import { Subscription } from 'rxjs';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { ExecutionPageTimeSelectionComponent } from './time-selection/execution-page-time-selection.component';
-import { ExecutionTabContext } from './execution-tab-context';
+import { ExecutionContext } from './execution-context';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { KeywordSelection, TimeSeriesKeywordsContext } from './time-series-keywords.context';
 import { Bucket } from '../bucket';
 import { TimeSeriesChartResponse } from '../time-series-chart-response';
-import { ExecutionsPageService } from '../executions-page.service';
+import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
+import { PerformanceViewSettings } from './performance-view-settings';
 
 declare const uPlot: any;
 
@@ -55,7 +56,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   @ViewChild(ExecutionPageTimeSelectionComponent) timeSelectionComponent!: ExecutionPageTimeSelectionComponent;
 
-  @Input() executionId!: string;
+  // @Input() executionId!: string;
+  @Input() settings: PerformanceViewSettings | undefined;
 
   barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
   stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
@@ -103,13 +105,14 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   ];
   selectedMetric = this.responseTimeMetrics[0];
 
-  private executionService!: ExecutionTabContext;
+  readonly contextId = Math.random().toString(36).substr(2, 9); // a unique value. Below 10k values this is safe for collisions.
+  executionContext!: ExecutionContext;
 
   valueAscOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => {
     return a.key.localeCompare(b.key);
   };
 
-  constructor(private timeSeriesService: TimeSeriesService, private executionsPageService: ExecutionsPageService) {}
+  constructor(private timeSeriesService: TimeSeriesService, private contextFactory: TimeSeriesContextsFactory) {}
 
   onAllSeriesCheckboxClick(event: any) {
     this.keywordsService.toggleSelectAll();
@@ -132,6 +135,14 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    if (!this.settings) {
+      throw new Error('Settings input is not specified!');
+    }
+    this.findRequest = this.prepareFindRequest(this.settings);
+    this.findRequest.numberOfBuckets = this.calculateIdealNumberOfBuckets(
+      this.settings.startTime,
+      this.settings.endTime
+    );
     this.initContext();
     this.keywordsService.onAllSelectionChanged().subscribe((selected) => {
       this.allSeriesChecked = selected;
@@ -144,57 +155,64 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.keywordsService.onKeywordsUpdated().subscribe((keywords) => {
       this.keywords = keywords;
     });
-    this.executionService.onActiveSelectionChange().subscribe((newRange) => (this.timeSelection = newRange));
+    this.executionContext.onActiveSelectionChange().subscribe((newRange) => (this.timeSelection = newRange));
 
-    this.executionService.onFiltersChange().subscribe((filters) => {
+    this.executionContext.onFiltersChange().subscribe((filters) => {
       this.findRequest.params = { ...filters, [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_RESPONSE_TIME };
       this.updateAllCharts();
     });
-    this.executionService.onGroupingChange().subscribe((groupDimensions: string[]) => {
+    this.executionContext.onGroupingChange().subscribe((groupDimensions: string[]) => {
       this.groupDimensions = groupDimensions;
       this.createByKeywordsCharts({ ...this.findRequest, groupDimensions: groupDimensions });
     });
 
-    this.timeSeriesService.getExecutionDetails(this.executionId).subscribe((details) => {
-      this.executionService.activeExecution = details;
-      this.execution = details;
-      let startTime = details.startTime! - (details.startTime! % this.RESOLUTION_MS);
-      this.findRequest.start = startTime;
-      this.executionStart = this.findRequest.start;
-      // let now = new Date().getTime();
-      let endTime = details.endTime;
-      if (endTime) {
-        // execution is over
-        endTime = endTime + (this.RESOLUTION_MS - (endTime % this.RESOLUTION_MS)); // not sure if needed
-      } else {
-        this.executionInProgress = true;
-        endTime = new Date().getTime();
-      }
-      this.findRequest.end = endTime;
-      // this.findRequest.intervalSize = this.computeIntervalSize(this.findRequest.start, this.findRequest.end);
-      this.findRequest.numberOfBuckets = this.calculateIdealNumberOfBuckets(startTime, endTime);
+    if (!this.settings.endTime) {
+      // execution is in progress TODO
+      console.log('Execution in progress');
+      return;
+    }
+    this.createAllCharts();
 
-      this.createAllCharts();
-
-      if (this.executionInProgress) {
-        this.startRefreshInterval(this.selectedRefreshInterval.value);
-        this.refreshEnabled = true;
-      }
-    });
+    // this.timeSeriesService.getExecutionDetails(this.executionId).subscribe((details: Execution) => {
+    //   this.executionContext.activeExecution = details;
+    //   this.execution = details;
+    //   let startTime = details.startTime! - (details.startTime! % this.RESOLUTION_MS);
+    //   this.findRequest.start = startTime;
+    //   this.executionStart = this.findRequest.start;
+    //   // let now = new Date().getTime();
+    //   let endTime = details.endTime;
+    //   if (endTime) {
+    //     // execution is over
+    //     endTime = endTime + (this.RESOLUTION_MS - (endTime % this.RESOLUTION_MS)); // not sure if needed
+    //   } else {
+    //     this.executionInProgress = true;
+    //     endTime = new Date().getTime();
+    //   }
+    //   this.findRequest.end = endTime;
+    //   // this.findRequest.intervalSize = this.computeIntervalSize(this.findRequest.start, this.findRequest.end);
+    //   this.findRequest.numberOfBuckets = this.calculateIdealNumberOfBuckets(startTime, endTime);
+    //
+    //   this.createAllCharts();
+    //
+    //   if (this.executionInProgress) {
+    //     this.startRefreshInterval(this.selectedRefreshInterval.value);
+    //     this.refreshEnabled = true;
+    //   }
+    // });
   }
 
   private initContext() {
-    if (!this.executionId) {
-      throw new Error('Execution id is not specified!');
-    }
-    this.findRequest = {
-      start: 0,
-      end: -1,
+    this.executionContext = this.contextFactory.getContext(this.contextId);
+    this.keywordsService = this.executionContext.getKeywordsContext();
+  }
+
+  prepareFindRequest(settings: PerformanceViewSettings) {
+    return {
+      start: settings.startTime,
+      end: settings.endTime,
       intervalSize: 2500,
-      params: { eId: this.executionId, [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_RESPONSE_TIME },
+      params: { ...settings.contextualFilters, [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_RESPONSE_TIME },
     };
-    this.executionService = this.executionsPageService.getContext(this.executionId);
-    this.keywordsService = this.executionService.getKeywordsContext();
   }
 
   startRefreshInterval(interval: number) {
@@ -215,17 +233,17 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       );
       this.timeSelectionComponent.refreshRanger();
       this.updateAllCharts();
-      this.timeSeriesService.getExecutionDetails(this.executionId).subscribe((details) => {
-        if (details.endTime) {
-          this.intervalShouldBeCanceled = true;
-        }
-      });
+      // this.timeSeriesService.getExecutionDetails(this.executionId).subscribe((details) => {
+      //   if (details.endTime) {
+      //     this.intervalShouldBeCanceled = true;
+      //   }
+      // });
     }, interval);
   }
 
   createAllCharts() {
     this.createSummaryChart(this.findRequest);
-    if (this.tableChart) this.tableChart.init(this.findRequest);
+    // this.tableChart.init(this.findRequest);
     this.createByStatusChart(this.findRequest);
     this.createByKeywordsCharts(this.findRequest);
     this.createThreadGroupsChart(this.findRequest);
@@ -233,7 +251,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   updateAllCharts() {
     this.createSummaryChart(this.findRequest, true);
-    this.tableChart.init(this.findRequest);
+    // this.tableChart.init(this.findRequest);
     this.createByStatusChart(this.findRequest);
     this.createByKeywordsCharts(this.findRequest);
     this.createThreadGroupsChart(this.findRequest, true);
@@ -401,10 +419,11 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     };
     this.timeSeriesService.fetchBuckets({ ...request, params: updatedParams }).subscribe((response) => {
       let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-      if (response.matrix.length === 0) {
-        return; // TODO handle
+      if (response.matrix.length === 0 && this.throughputChart) {
+        this.threadGroupChart.clear();
+        return;
       }
-      let totalData: number[] = Array(response.matrix[0].length);
+      let totalData: number[] = response.matrix[0] ? Array(response.matrix[0].length) : [];
       let dynamicSeries = response.matrixKeys.map((key, i) => {
         key = key[dimensionKey]; // get just the name
         let filledData = response.matrix[i].map((b, j) => {
@@ -481,13 +500,17 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       let countValues: (number | null)[] = [];
       if (response.matrixKeys.length === 0) {
         // empty data
-        this.summaryChart.clear();
-        return;
+        if (this.summaryChart) {
+          this.summaryChart.clear();
+          return;
+        }
+      } else {
+        response.matrix[0].forEach((bucket) => {
+          avgValues.push(bucket ? Math.trunc(bucket.sum / bucket.count) : null);
+          countValues.push(bucket?.throughputPerHour);
+        });
       }
-      response.matrix[0].forEach((bucket) => {
-        avgValues.push(bucket ? Math.trunc(bucket.sum / bucket.count) : null);
-        countValues.push(bucket?.throughputPerHour);
-      });
+
       this.summaryChartSettings = {
         title: 'Performance Overview',
         showLegend: true,
@@ -542,9 +565,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   createByStatusChart(request: FindBucketsRequest) {
     this.timeSeriesService.fetchBuckets({ ...request, groupDimensions: ['rnStatus'] }).subscribe((response) => {
-      if (response.matrixKeys.length === 0) {
+      if (response.matrixKeys.length === 0 && this.byStatusChart) {
         // empty data
-        this.byStatusChart.clear();
+        this.byStatusChart?.clear();
         return;
       }
       let xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
@@ -577,19 +600,21 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   createByKeywordsCharts(request: FindBucketsRequest) {
-    let groupDimensions = this.executionService.getGroupDimensions();
+    let groupDimensions = this.executionContext.getGroupDimensions();
     this.timeSeriesService
       .fetchBuckets({ ...request, groupDimensions: groupDimensions, percentiles: [90, 99] })
       .subscribe((response) => {
         this.byKeywordsChartResponseCache = response;
         if (response.matrixKeys.length === 0) {
           // empty data
-          this.responseTimeChart.clear();
-          this.throughputChart.clear();
-          return;
+          if (this.responseTimeChart) {
+            this.responseTimeChart?.clear();
+            this.throughputChart?.clear();
+            return;
+          }
         }
         let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-        let totalThroughput: number[] = Array(response.matrix[0].length); // TODO handle empty response
+        let totalThroughput: number[] = response.matrix[0] ? Array(response.matrix[0]?.length) : [];
         let responseTimeSeries: TSChartSeries[] = [];
         let throughputSeries: TSChartSeries[] = [];
         response.matrixKeys.map((key, i) => {
@@ -728,7 +753,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     clearInterval(this.intervalExecution);
-    this.executionsPageService.destroyContext(this.executionId);
+    this.contextFactory.destroyContext(this.contextId);
   }
 }
 

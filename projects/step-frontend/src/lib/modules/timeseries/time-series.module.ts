@@ -13,6 +13,8 @@ import { ChartSkeletonComponent } from './chart/skeleton/chart-skeleton.componen
 import { ExecutionPageTimeSelectionComponent } from './execution-page/time-selection/execution-page-time-selection.component';
 import { ExecutionFiltersComponent } from './execution-page/filters/execution-filters.component';
 import { PerformanceViewComponent } from './execution-page/performance-view.component';
+import { ExecutionPageComponent } from './execution-page/execution-page.component';
+import { SyntheticMonitoringPageComponent } from './synthetic-monitoring/synthetic-monitoring-page.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +27,8 @@ import { PerformanceViewComponent } from './execution-page/performance-view.comp
     ChartSkeletonComponent,
     ExecutionPageTimeSelectionComponent,
     ExecutionFiltersComponent,
+    ExecutionPageComponent,
+    SyntheticMonitoringPageComponent,
   ],
   exports: [PerformanceViewComponent],
   imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule],

@@ -123,3 +123,8 @@ header.blue-header {
     font-size: 18px;
   }
 }
+
+#main {
+  max-height: 100vh;
+  overflow: auto;
+}
