@@ -1,9 +1,5 @@
 @use '@angular/material' as mat;
-@use '@exense/step-core/styles/core-mixins' as core;
-
-$material-design-icons-font-directory-path: '~material-design-icons-iconfont/dist/fonts/';
-@import '~material-design-icons-iconfont/src/material-design-icons';
-@import '~@fontsource/roboto/latin.css';
+@use 'projects/step-core/styles/core-mixins' as core;
 
 $dark-primary-text: rgba(black, 0.87);
 $light-primary-text: white;

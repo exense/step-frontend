@@ -11,6 +11,9 @@
     },
     "./styles/common-variables": {
       "sass": "./styles/_common-variables.scss"
+    },
+    "./styles/fonts-setup": {
+      "sass": "./styles/_fonts-setup.scss"
     }
   },
   "peerDependencies": {
