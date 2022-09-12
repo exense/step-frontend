@@ -23,16 +23,14 @@ angular
     var factory = {};
 
     factory.pollUrl = function (exportUrl, callback) {
-      var pollCount = 0;
       (function poll() {
         $http.get(exportUrl).then(function (response) {
-          pollCount++;
           var status = response.data;
           if (status.ready) {
             if (callback) {
               callback();
             }
-            var attachmentID = status.attachmentID;
+            var attachmentID = status.result.id;
             if (status.warnings !== undefined && status.warnings !== null && status.warnings.length > 0) {
               Dialogs.showListOfMsgs(status.warnings).then(function () {
                 downloadExport(attachmentID);
@@ -41,8 +39,6 @@ angular
               downloadExport(attachmentID);
             }
           } else {
-            if (pollCount == 4) {
-            }
             $timeout(poll, 500);
           }
         });
@@ -66,7 +62,7 @@ angular
     };
 
     factory.poll = function (exportId, callback) {
-      factory.pollUrl('rest/export/' + exportId + '/status', callback);
+      factory.pollUrl('rest/async/' + exportId, callback);
     };
 
     factory.get = function (exportUrl, callback) {
