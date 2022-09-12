@@ -76,7 +76,7 @@ export class ReportNodeShortComponent implements OnChanges {
       (this as FieldsAccessor).headerText = '';
       return;
     }
-    if (node._class === 'step.artefacts.reports.CallFunctionReportNode') {
+    if (node!.resolvedArtefact!._class === 'CallKeyword') {
       (this as FieldsAccessor).headerText = this.concatenate(node.functionAttributes);
     } else {
       (this as FieldsAccessor).headerText = this._artefactTypes.getLabel(node!.resolvedArtefact!._class);
