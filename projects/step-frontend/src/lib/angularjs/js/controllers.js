@@ -51,16 +51,16 @@ tecAdminControllers.run(function (ViewRegistry, EntityRegistry, AuthService) {
       return true;
     }
   );
-  isDashletEnabled = function () {
-    return AuthService.getConf().displayLegacyPerfDashboard;
-  };
+
   ViewRegistry.registerDashletAdvanced(
     'executionTab',
     'Performance',
     'partials/execution/executionViz.html',
     'viz',
     2,
-    isDashletEnabled
+    function () {
+      return true;
+    }
   );
   ViewRegistry.registerDashletAdvanced(
     'executionTab',
@@ -544,7 +544,6 @@ tecAdminControllers.directive('executionProgress', [
         };
 
         $scope.throughputchart = {};
-        $scope.threadGroupsChart = {};
         $scope.responseTimeByFunctionChart = {};
 
         var refresh = function () {
@@ -620,7 +619,6 @@ tecAdminControllers.directive('executionProgress', [
             refreshExecution();
             if ($scope.execution == null || $scope.execution.status != 'ENDED') {
               if ($scope.active()) {
-                $scope.currentEndTime = Date.now();
                 refresh();
                 refreshTestCaseTable();
               }
@@ -645,7 +643,6 @@ tecAdminControllers.directive('executionProgress', [
             if (newStatus === 'ENDED') {
               refreshFct(); //perform final refresh
               $scope.initAutoRefresh(false, 0, 0);
-              $scope.currentEndTime = $scope.execution.endTime;
             } else {
               if (oldStatus == null) {
                 $scope.initAutoRefresh(true, 100, 5000);
@@ -654,15 +651,6 @@ tecAdminControllers.directive('executionProgress', [
           }
         });
 
-        $scope.$watch('currentEndTime', function (newStatus, oldStatus) {
-          if (newStatus && $scope.execution) {
-            viewFactory
-              .getTimeBasedGaugeChart('ThreadGroupStatistics', eId, $scope.execution.startTime, $scope.currentEndTime)
-              .then(function (chart) {
-                $scope.threadGroupsChart = chart;
-              });
-          }
-        });
       },
       templateUrl: 'partials/execution/progress.html',
     };

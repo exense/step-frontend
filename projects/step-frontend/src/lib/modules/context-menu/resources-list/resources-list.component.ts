@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, Resource, AugmentedResourcesService } from '@exense/step-core';
 import { ResourceDialogsService } from '../services/resource-dialogs.service';

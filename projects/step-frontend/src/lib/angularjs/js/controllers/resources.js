@@ -25,11 +25,12 @@ angular
     EntityRegistry.registerEntity(
       'Resource',
       'resources',
+      'library_books',
       'resources',
       'rest/resources/',
       'rest/resources/',
       'st-table',
-      '/partials/resources/resourceSelectionTable.html'
+      '/partials/resources/resourceSelectionTable.html',
     );
   })
   .factory('ResourceDialogs', function ($uibModal, $http, Dialogs) {
