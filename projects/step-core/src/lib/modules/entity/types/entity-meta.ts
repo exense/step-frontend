@@ -10,5 +10,4 @@ export interface EntityMeta extends CustomRegistryItem {
   templateUrl?: string;
   callback?: Function;
   icon?: string;
-  iconAG2?: string; //FIXME: rename / replace to icon when fully switching this to AG2
 }

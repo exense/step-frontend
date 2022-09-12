@@ -27,18 +27,6 @@ angular
       'partials/scheduler/schedulerConfiguration.html',
       'scheduler'
     );
-    EntityRegistry.registerEntity(
-      'Scheduler task',
-      'tasks',
-      'tasks',
-      'rest/scheduler/task/',
-      'rest/scheduler/task/',
-      'st-table',
-      '/partials/scheduler/schedulerTaskSelectionTable.html',
-      null,
-      'glyphicon glyphicon-time',
-      'schedule'
-    );
   })
 
   .factory('SchedulerTaskDialogs', function ($rootScope, $uibModal, $http, Dialogs) {

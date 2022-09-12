@@ -21,18 +21,6 @@ angular
 
   .run(function (ViewRegistry, EntityRegistry) {
     ViewRegistry.registerView('plans', 'partials/plans/plans.html');
-    EntityRegistry.registerEntity(
-      'Plan',
-      'plans',
-      'plans',
-      'rest/plans/',
-      'rest/plans/',
-      'st-table',
-      '/partials/plans/planSelectionTable.html',
-      null,
-      'glyphicon glyphicon-file',
-      'description'
-    );
   })
 
   .factory('PlanTypeRegistry', function () {

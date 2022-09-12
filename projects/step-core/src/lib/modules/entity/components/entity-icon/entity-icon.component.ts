@@ -45,8 +45,8 @@ export class EntityIconComponent {
       this.icon = entityScope.icon ?? '';
       this.tooltip = entityScope.tooltip ?? '';
     } else {
-      if (entityType && entityType.iconAG2) {
-        this.icon = entityType.iconAG2 ?? '';
+      if (entityType && entityType.icon) {
+        this.icon = entityType.icon ?? '';
       }
     }
   }
