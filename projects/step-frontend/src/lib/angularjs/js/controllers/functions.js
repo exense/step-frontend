@@ -26,17 +26,6 @@ angular
       'Composite',
       'partials/functions/forms/composite.html'
     );
-    EntityRegistry.registerEntity(
-      'Keyword',
-      'functions',
-      'functions',
-      'rest/functions/',
-      'rest/functions/',
-      'st-table',
-      '/partials/functions/functionSelectionTable.html',
-      null,
-      'glyphicon glyphicon-record'
-    );
   })
 
   .factory('FunctionTypeRegistry', function () {
