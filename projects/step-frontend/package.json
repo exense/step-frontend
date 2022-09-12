@@ -5,6 +5,14 @@
     "compile": "gulp",
     "pack": ""
   },
+  "exports": {
+    "./styles/common-mixins": {
+      "sass": "./styles/_common-mixins.scss"
+    },
+    "./styles/common-variables": {
+      "sass": "./styles/_common-variables.scss"
+    }
+  },
   "peerDependencies": {
     "@angular-architects/module-federation": "14.0.1",
     "@angular/animations": "13.1.1",

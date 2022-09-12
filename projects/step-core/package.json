@@ -8,6 +8,14 @@
     "pack": "",
     "push": "npm publish ../../dist/step-core/*.tgz"
   },
+  "exports": {
+    "./styles/core-mixins": {
+      "sass": "./styles/_core-mixins.scss"
+    },
+    "./styles/core-variables": {
+      "sass": "./styles/_core-variables.scss"
+    }
+  },
   "peerDependencies": {
     "@angular-architects/module-federation": "14.0.1",
     "@angular/common": "13.1.1",

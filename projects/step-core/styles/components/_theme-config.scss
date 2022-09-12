@@ -1,0 +1,42 @@
+@use '@angular/material' as mat;
+@use 'step-tabs';
+@use 'step-sidebar';
+@use 'step-header';
+
+@forward 'step-sidebar' show step-define-sidebar-config;
+@forward 'step-header' show step-define-header-config;
+
+@mixin step-theme(
+  $mat-primary-palette,
+  $mat-typography-config: null,
+  $mat-accent-palette: null,
+  $step-sidebar-config: null,
+  $step-header-config: null
+) {
+  @if not $mat-typography-config {
+    $mat-typography-config: mat.define-typography-config();
+  }
+
+  @if not $mat-accent-palette {
+    $mat-accent-palette: mat.define-palette(mat.$pink-palette);
+  }
+
+  $mat-theme: mat.define-light-theme(
+    (
+      color: (
+        primary: $mat-primary-palette,
+        accent: $mat-accent-palette,
+      ),
+    )
+  );
+
+  font-family: map-get($mat-typography-config, font-family);
+  @include mat.core($mat-typography-config);
+  @include mat.all-component-themes($mat-theme);
+
+  $primary-color: map-get($mat-primary-palette, default);
+
+  @include step-tabs.tabbar($primary-color);
+  @include step-sidebar.sidebar($step-sidebar-config);
+  @include step-header.header($step-header-config);
+}

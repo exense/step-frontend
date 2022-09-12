@@ -1,0 +1,27 @@
+@mixin ts-tooltip {
+  .ts-tooltip {
+    position: absolute;
+    z-index: 1000;
+    pointer-events: none;
+    display: block;
+    padding: 8px 12px;
+    background: #fffaf2d9;
+    box-shadow: 2px 2px 5px 2px #a3a3a3;
+
+    .tooltip-row {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+
+      .color {
+        width: 20px;
+        height: 10px;
+        margin-right: 8px;
+      }
+    }
+
+    .dots {
+      font-size: 18px;
+    }
+  }
+}
