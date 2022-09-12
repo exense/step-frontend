@@ -1,1 +1,1 @@
-export type Resolver<E> = (arg0: E) => any;
+export type Resolver<E> = (arg0: E, arg1: any) => any;

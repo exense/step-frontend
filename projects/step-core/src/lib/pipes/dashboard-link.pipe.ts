@@ -8,7 +8,7 @@ import { DashboardService } from '../services/dashboard.service';
 export class DashboardLinkPipe implements PipeTransform {
   constructor(private _dashboardService: DashboardService) {}
 
-  transform(taskId: string): Observable<string> {
+  transform(taskId: string): string {
     return this._dashboardService.getDashboardLink(taskId);
   }
 }
