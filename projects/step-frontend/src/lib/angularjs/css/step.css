@@ -937,3 +937,7 @@ step-tenant-selection-downgraded {
   margin-left: var(--sidebar-width-closed);
 }
 
+#step-main-scrollable-content {
+  height: calc(100vh - 36px);
+  overflow: auto;
+}

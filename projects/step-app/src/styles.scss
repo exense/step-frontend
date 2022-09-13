@@ -30,7 +30,7 @@ body {
 }
 
 header.blue-header {
-  height: 58px;
+  height: 72px;
 
   #session-dropdown {
     color: white;
@@ -67,8 +67,9 @@ header.blue-header {
   .header-white-part {
     bottom: 0;
     height: 24px;
+    margin-bottom: 24px;
     background-color: white;
-    border-radius: var(--top-blue-border-edge-radius) 0 0 0;
+    border-radius: var(--top-blue-border-edge-radius) var(--top-blue-border-edge-radius) 0 0;
   }
 }
 
