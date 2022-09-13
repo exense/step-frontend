@@ -138,7 +138,7 @@ export abstract class BulkOperationsInvokeService<ID> {
       const count = result?.result?.count;
       return count
         ? `Bulk operation ${config.operationType} for ${count} item(s) completed`
-        : `Bulk operation ${config.operationType} completed`;
+        : `Bulk operation ${config.operationType} for selected items completed`;
     };
   }
 
@@ -146,8 +146,8 @@ export abstract class BulkOperationsInvokeService<ID> {
     return (result) => {
       const count = result?.result?.count;
       return count
-        ? `Do you want to perform the bulk ${config.operationType} for ${count} item(s)?`
-        : `Do you want to perform the bulk ${config.operationType} operation over selected items?`;
+        ? `Do you want to ${config.operationType} the ${count} selected item(s)?`
+        : `Do you want to ${config.operationType} all selected items?`;
     };
   }
 }

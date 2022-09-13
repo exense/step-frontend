@@ -8,11 +8,11 @@ export class BulkOperationLabelPipe implements PipeTransform {
   transform(value: BulkOperation): string {
     switch (value) {
       case BulkOperation.delete:
-        return 'Bulk Delete';
+        return 'Delete selected';
       case BulkOperation.duplicate:
-        return 'Bulk Duplicate';
+        return 'Clone selected';
       case BulkOperation.export:
-        return 'Bulk Export';
+        return 'Export selected';
       default:
         return '';
     }
