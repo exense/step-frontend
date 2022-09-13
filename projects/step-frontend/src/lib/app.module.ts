@@ -14,6 +14,7 @@ import { FunctionModule } from './modules/function/function.module';
 import { TimeSeriesModule } from './modules/timeseries/time-series.module';
 import { GridModule } from './modules/grid/grid.module';
 import { GenericFunctionModule } from './modules/mask/generic-function.module';
+import { DefaultThemeModule } from './modules/default-theme/default-theme.module';
 
 @NgModule({
   declarations: [],
@@ -31,6 +32,7 @@ import { GenericFunctionModule } from './modules/mask/generic-function.module';
     ParameterModule,
     GridModule,
     TimeSeriesModule,
+    DefaultThemeModule,
     GenericFunctionModule,
   ],
   providers: [PLUGINS_INITIALIZER],

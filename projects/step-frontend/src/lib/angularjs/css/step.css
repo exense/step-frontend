@@ -894,28 +894,3 @@ fieldset {
 .alert {
   white-space: pre-line;
 }
-
-step-tenant-selection-downgraded {
-  display: block;
-  position: fixed;
-  top: 70px;
-  left: 56px;
-  z-index: 2;
-}
-.tenant-selector-when-sidebar-closed {
-  display: none;
-}
-
-#main {
-  transition: margin-left .2s;
-  margin-left: var(--sidebar-width-open);
-}
-
-#main.main-when-sidebar-closed {
-  margin-left: var(--sidebar-width-closed);
-}
-
-#step-main-scrollable-content {
-  height: calc(100vh - 36px);
-  overflow: auto;
-}

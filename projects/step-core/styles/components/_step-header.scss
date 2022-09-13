@@ -1,0 +1,68 @@
+@use 'sass:map';
+
+@function step-define-header-config(
+  $main-background-color: #293e50,
+  $main-text-color: #fff,
+  $alt-background-color: #fff,
+) {
+  $config: (
+    main-background-color: $main-background-color,
+    main-text-color: $main-text-color,
+    alt-background-color: $alt-background-color,
+  );
+
+  @return $config;
+}
+
+@mixin header($config: null) {
+  @if not $config {
+    $config: step-define-header-config();
+  }
+
+  header.app-header {
+    background-color: map.get($config, main-background-color);
+
+    section.content {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      height: 32px;
+    }
+
+    #session-dropdown {
+      color: map.get($config, main-text-color);
+      user-select: none;
+      background: none !important;
+    }
+
+    .dropdown-menu {
+      min-width: auto;
+      top: initial;
+      left: initial;
+      margin-left: -20px;
+
+      li {
+        width: 100%;
+      }
+    }
+
+    .app-header-nav {
+      margin: 6px 20px;
+      list-style-type: none;
+
+      li {
+        float: right;
+      }
+    }
+
+    &::after {
+      content: ' ';
+      display: block;
+      width: 100%;
+      background-color: map.get($config, alt-background-color);
+      border-top-left-radius: 16px;
+      height: 16px;
+    }
+  }
+}

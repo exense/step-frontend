@@ -1,4 +1,14 @@
-import { AfterViewInit, Component, ElementRef, Inject, Input, OnDestroy, QueryList, ViewChildren } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Inject,
+  Input,
+  OnDestroy,
+  QueryList,
+  ViewChildren,
+  ViewEncapsulation,
+} from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_LOCATION,
@@ -12,13 +22,13 @@ import { DOCUMENT, Location } from '@angular/common';
 import { ILocationService } from 'angular';
 
 @Component({
-  selector: '[step-sidebar]',
+  selector: 'step-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class SidebarComponent implements AfterViewInit, OnDestroy {
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
-  @Input() logo: string = 'images/logotopleft.png';
 
   sideBarOpen: boolean = true;
 

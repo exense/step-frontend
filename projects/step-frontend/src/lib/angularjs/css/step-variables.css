@@ -1,29 +1,5 @@
 :root {
-  --dark-background-color: #293E50;
-  --lighten-background-10: rgba(255,255,255,0.1);
-  --sidebar-divider-color: rgba(255,255,255,0.2);
-
   --button-color: #17d821;
   --button-hover-color: #13b91c;
   --button-active-color: #0c7311;
-
-  --top-blue-border-height: 15px;
-  --top-blue-border-edge-radius: 16px;
-
-  /* SIDEBAR */
-  --sidebar-width-open: 254px;
-  --sidebar-width-closed: 72px;
-
-  --sidebar-openclose-transition: 0.2s;
-
-  --sidebar-logo-and-burgermenu-height: 48px;
-  --sidebar-home-and-settings-height: 64px;
-
-  --sidebar-help-and-support-height: 56px;
-
-  --sidebar-elements-padding: 12px;
-  --sidebar-elements-text-padding: 15px;
-  --sidebar-settings-divider-padding-right: 45px;
-
-  --sidebar-aligned-text-margin-left: 60px;
 }
