@@ -4,7 +4,6 @@ import { AuthService } from './auth.service';
 import { ViewRegistryService } from './view-registry.service';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE } from '../shared';
-import { lastValueFrom, Observable, ReplaySubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -23,3 +22,5 @@ export class DashboardService {
   }
 
 }
+
+getAngularJSGlobal().module(AJS_MODULE).service('DashboardService', downgradeInjectable(DashboardService));

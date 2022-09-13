@@ -895,3 +895,7 @@ fieldset {
   white-space: pre-line;
 }
 
+#step-main-scrollable-content {
+  height: calc(100vh - 36px);
+  overflow: auto;
+}
