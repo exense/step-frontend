@@ -29,8 +29,20 @@ body {
   padding: 0;
 }
 
-header.blue-header {
-  height: 58px;
+.header-navbar {
+  margin: 6px 20px;
+}
+
+.header-navbar li {
+  float: right;
+}
+
+.header-parent {
+  height: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: var(--dark-background-color);
 
   #session-dropdown {
     color: white;
@@ -57,18 +69,12 @@ header.blue-header {
     }
   }
 
-  .header-parent {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background-color: var(--dark-background-color);
-  }
-
-  .header-white-part {
+  .header-white-part-with-rounded-corners {
     bottom: 0;
     height: 24px;
+    margin-bottom: 24px;
     background-color: white;
-    border-radius: var(--top-blue-border-edge-radius) 0 0 0;
+    border-radius: var(--top-blue-border-edge-radius) var(--top-blue-border-edge-radius) 0 0;
   }
 }
 
