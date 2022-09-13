@@ -5,6 +5,8 @@
   $menu-color: rgba(255, 255, 255, 0.1),
   $selection-color: rgba(255, 255, 255, 0.1),
   $divider-color: rgba(255, 255, 255, 0.2),
+  $menu-secondary: #C9D1D9,
+  $menu-text: #ffffff,
   $width-open: 254px,
   $width-closed: 72px,
   $openclose-transition: 0.2s,
@@ -21,6 +23,8 @@
     menu-color: $menu-color,
     selection-color: $selection-color,
     divider-color: $divider-color,
+    menu-secondary: $menu-secondary,
+    menu-text: $menu-text,
     width-open: $width-open,
     width-closed: $width-closed,
     openclose-transition: $openclose-transition,
@@ -78,7 +82,7 @@
       background-color: map.get($config, background-color);
       overflow-x: hidden;
       transition: map.get($config, openclose-transition);
-      color: white;
+      color: map.get($config, menu-text);
 
       -ms-overflow-style: none; /* No Scrollbar: IE and Edge */
       scrollbar-width: none; /* No Scrollbar: Firefox */
@@ -91,7 +95,7 @@
       }
 
       a {
-        color: white;
+        color: map.get($config, menu-text);
       }
 
       a:link {
@@ -212,7 +216,7 @@
       margin-bottom: calc($helpSupportHeight + 10px);
 
       .sidebar-collapsable-tab:first-child label {
-        border-radius: 5px 5px 0 0;
+        border-radius: 8px 8px 0 0;
       }
     }
 
@@ -265,7 +269,7 @@
         padding: map.get($config, elements-text-padding);
 
         /* (C2) COSMETICS */
-        color: #fff;
+        color: map.get($config, menu-text);
         background: map.get($config, menu-color);
         cursor: pointer;
       }
@@ -285,6 +289,7 @@
         height: 32px;
         padding: 0 $elements-text-padding 0 $elements-text-padding;
         cursor: pointer;
+        color: map.get($config, menu-secondary);
       }
 
       input:checked ~ .content {
@@ -311,6 +316,7 @@
 
     .sidebar-highlighted-subtab {
       background-color: map.get($config, selection-color);
+      color: map.get($config, menu-text) !important;
     }
 
     .sidebar-subtab:hover {
@@ -318,7 +324,7 @@
     }
 
     #sidebar-categories-tabs > div:last-child {
-      border-radius: 0 0 5px 5px;
+      border-radius: 0 0 8px 8px;
       overflow: hidden;
     }
 
@@ -333,16 +339,20 @@
     $alignedTextMarginLeft: map.get($config, aligned-text-margin-left);
 
     .sidebar-aligned-text {
-      font-size: medium;
       position: absolute;
       left: $alignedTextMarginLeft;
+      font-size: 16px;
+      line-height: 24px;
+      font-weight: 400;
     }
 
     .sidebar-aligned-subtext {
       max-width: 150px;
-      font-size: small;
       position: absolute;
       left: calc($alignedTextMarginLeft + $elements-text-padding);
+      font-size: 16px;
+      line-height: 24px;
+      font-weight: 300;
     }
 
     .version {

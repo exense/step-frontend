@@ -1,4 +1,5 @@
 @use '@angular/material' as mat;
+@use 'sass:map';
 @use 'step-tabs';
 @use 'step-sidebar';
 @use 'step-header';
@@ -6,7 +7,26 @@
 @forward 'step-sidebar' show step-define-sidebar-config;
 @forward 'step-header' show step-define-header-config;
 
+@function extend-mat-theme($theme, $overrides) {
+  $color: map.get($theme, color);
+  $foreground: map.get($color, foreground);
+
+  $foreground-ext: map.merge($foreground, (
+    secondary-text: map.get($overrides, secondary-text),
+    base: map.get($overrides, base),
+    icon: map.get($overrides, icon),
+    text: map.get($overrides, text),
+  ));
+
+  $result: map.merge($color, (
+    foreground: $foreground-ext
+  ));
+
+  @return $result;
+}
+
 @mixin step-theme(
+  $text-color,
   $mat-primary-palette,
   $mat-typography-config: null,
   $mat-accent-palette: null,
@@ -26,17 +46,27 @@
       color: (
         primary: $mat-primary-palette,
         accent: $mat-accent-palette,
-      ),
+      )
     )
   );
 
+  $mat-theme-ext: extend-mat-theme($mat-theme, (
+    secondary-text: $text-color,
+    base: $text-color,
+    icon: $text-color,
+    text: $text-color,
+  ));
+
   font-family: map-get($mat-typography-config, font-family);
   @include mat.core($mat-typography-config);
-  @include mat.all-component-themes($mat-theme);
+  @include mat.all-component-themes($mat-theme-ext);
 
   $primary-color: map-get($mat-primary-palette, default);
 
   @include step-tabs.tabbar($primary-color);
   @include step-sidebar.sidebar($step-sidebar-config);
   @include step-header.header($step-header-config);
+
+  color: $text-color;
+  line-height: 16px;
 }

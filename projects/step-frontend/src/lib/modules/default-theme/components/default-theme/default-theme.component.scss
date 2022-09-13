@@ -1,9 +1,9 @@
 @use '@angular/material' as mat;
 @use 'projects/step-core/styles/core-mixins' as core;
 
-$dark-primary-text: rgba(black, 0.87);
-$light-primary-text: white;
 $dark-background-color: #293e50;
+$dark-primary-text: $dark-background-color;
+$light-primary-text: white;
 $lighten-background-10: rgba(255, 255, 255, 0.1);
 $sidebar-divider-color: rgba(255, 255, 255, 0.2);
 
@@ -36,8 +36,8 @@ $os-primary-pallete: mat.define-palette($step-palette, 500);
 
 $os-typography: mat.define-typography-config(
   $font-family: 'Roboto',
-  $body-1: mat.define-typography-level(12px, 16px, 500),
-  $body-2: mat.define-typography-level(14px, 20px, 400),
+  $body-1: mat.define-typography-level(12px, 16px, 400),
+  $body-2: mat.define-typography-level(14px, 20px, 500),
   $button: mat.define-typography-level(14px, 20px, 500),
 );
 
@@ -68,6 +68,7 @@ $header-config: core.step-define-header-config(
 
 .default-theme {
   @include core.step-theme(
+    $text-color: $dark-primary-text,
     $mat-primary-palette: $os-primary-pallete,
     $mat-typography-config: $os-typography,
     $step-sidebar-config: $sidebar-config,
