@@ -69,4 +69,8 @@
 
   color: $text-color;
   line-height: 16px;
+
+  .mat-mini-fab {
+    box-shadow: none !important;
+  }
 }

@@ -4,38 +4,14 @@
   $main-background-color: #293e50,
   $main-text-color: #fff,
   $alt-background-color: #fff,
-  $alt-text-color: rgba(0, 0, 0, 0.87),
-  $force-alt-mode: false
 ) {
   $config: (
     main-background-color: $main-background-color,
     main-text-color: $main-text-color,
     alt-background-color: $alt-background-color,
-    alt-text-color: $alt-text-color,
-    force-alt-mode: $force-alt-mode,
   );
 
   @return $config;
-}
-
-@mixin alt-mode($config) {
-  &::before {
-    content: '';
-    display: block;
-    width: 100%;
-    background-color: map.get($config, main-background-color);
-    height: 30px;
-  }
-
-  section.content {
-    border-top-left-radius: 16px;
-    background: map.get($config, alt-background-color);
-    margin-top: -16px;
-  }
-
-  #session-dropdown {
-    color: map.get($config, alt-text-color);
-  }
 }
 
 @mixin header($config: null) {
@@ -44,7 +20,6 @@
   }
 
   header.app-header {
-    height: 48px;
     background-color: map.get($config, main-background-color);
 
     section.content {
@@ -52,7 +27,7 @@
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
-      height: 100%;
+      height: 32px;
     }
 
     #session-dropdown {
@@ -81,12 +56,13 @@
       }
     }
 
-    @if map.get($config, force-alt-mode) {
-      @include alt-mode($config);
-    } @else {
-      &.alt-mode {
-        @include alt-mode($config);
-      }
+    &::after {
+      content: ' ';
+      display: block;
+      width: 100%;
+      background-color: map.get($config, alt-background-color);
+      border-top-left-radius: 16px;
+      height: 16px;
     }
   }
 }

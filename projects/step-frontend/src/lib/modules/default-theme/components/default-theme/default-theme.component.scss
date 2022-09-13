@@ -61,9 +61,7 @@ $sidebar-config: core.step-define-sidebar-config(
 $header-config: core.step-define-header-config(
   $main-background-color: $dark-background-color,
   $main-text-color: $light-primary-text,
-  $alt-background-color: $light-primary-text,
-  $alt-text-color: $dark-primary-text,
-  $force-alt-mode: true,
+  $alt-background-color: $light-primary-text
 );
 
 .default-theme {
