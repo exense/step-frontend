@@ -1,3 +1,18 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
+$sidebar-config: core.step-define-sidebar-config(
+  $logo-path: '/images/logotopleft.png'
+);
+
+.default-theme {
+  @include core.step-theme(
+    $step-sidebar-config: $sidebar-config,
+  );
+}
+
+/*
+
+// Full theme example
 @use '@angular/material' as mat;
 @use 'projects/step-core/styles/core-mixins' as core;
 
@@ -56,6 +71,7 @@ $sidebar-config: core.step-define-sidebar-config(
   $elements-text-padding: 15px,
   $settings-divider-padding-right: 45px,
   $aligned-text-margin-left: 60px,
+  $logo-path: '/images/logotopleft.png'
 );
 
 $header-config: core.step-define-header-config(
@@ -67,9 +83,11 @@ $header-config: core.step-define-header-config(
 .default-theme {
   @include core.step-theme(
     $text-color: $dark-primary-text,
-    $mat-primary-palette: $os-primary-pallete,
+    $mat-primary-palette: $os-primary-pallette,
     $mat-typography-config: $os-typography,
     $step-sidebar-config: $sidebar-config,
     $step-header-config: $header-config
   );
 }
+
+ */

@@ -29,7 +29,6 @@ import { ILocationService } from 'angular';
 })
 export class SidebarComponent implements AfterViewInit, OnDestroy {
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
-  @Input() logo: string = 'images/logotopleft.png';
 
   sideBarOpen: boolean = true;
 

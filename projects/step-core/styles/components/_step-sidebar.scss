@@ -16,7 +16,8 @@
   $elements-padding: 12px,
   $elements-text-padding: 15px,
   $settings-divider-padding-right: 45px,
-  $aligned-text-margin-left: 60px
+  $aligned-text-margin-left: 60px,
+  $logo-path: '/images/logotopleft.png'
 ) {
   $config: (
     background-color: $background-color,
@@ -35,6 +36,7 @@
     elements-text-padding: $elements-text-padding,
     settings-divider-padding-right: $settings-divider-padding-right,
     aligned-text-margin-left: $aligned-text-margin-left,
+    logo-path: $logo-path
   );
 
   @return $config;
@@ -125,9 +127,13 @@
     }
 
     .sidebar-logo {
-      max-width: 100px;
+      $logo-path: map.get($config, logo-path);
+      width: 100%;
+      height: 30px;
       margin-left: -12px;
       transform: scale(0.8);
+      background: url($logo-path) no-repeat no-repeat;
+      background-size: contain;
     }
 
     #sidebar-collapsed-settings-icon {
@@ -143,6 +149,7 @@
       transition: map.get($config, openclose-transition);
 
       > span {
+        width: 180px;
         padding: map.get($config, elements-text-padding);
       }
 
