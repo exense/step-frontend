@@ -59,6 +59,7 @@ angular
     EntityRegistry.registerEntity(
       'KeywordPackage',
       'functionPackage',
+      'package',
       'functionPackage',
       '/rest/functionpackages/',
       '/rest/functionpackages/',

@@ -15,7 +15,6 @@ export class ExecutionsPanelsService {
     testCases: { label: 'Test cases', show: false, enabled: false },
     steps: { label: 'Keyword calls', show: true, enabled: true },
     throughput: { label: 'Keyword throughput', show: true, enabled: true },
-    threadGroups: { label: 'ThreadGroup Usage', show: true, enabled: true },
     performance: { label: 'Performance', show: true, enabled: true },
     reportTree: { label: 'Execution tree', show: true, enabled: true },
     executionDetails: { label: 'Execution details', show: true, enabled: true },
