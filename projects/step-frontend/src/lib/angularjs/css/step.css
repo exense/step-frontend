@@ -895,28 +895,6 @@ fieldset {
   white-space: pre-line;
 }
 
-.header-navbar {
-  margin: 6px 20px;
-}
-
-.header-navbar li {
-  float: right;
-}
-
-.header-parent {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background-color: var(--dark-background-color);
-}
-
-.header-white-part {
-  bottom: 0px;
-  height: 24px;
-  background-color: white;
-  border-radius: var(--top-blue-border-edge-radius) 0 0 0;
-}
-
 step-tenant-selection-downgraded {
   display: block;
   position: fixed;
@@ -937,3 +915,7 @@ step-tenant-selection-downgraded {
   margin-left: var(--sidebar-width-closed);
 }
 
+#step-main-scrollable-content {
+  height: calc(100vh - 36px);
+  overflow: auto;
+}
