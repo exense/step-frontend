@@ -29,8 +29,20 @@ body {
   padding: 0;
 }
 
-header.blue-header {
+.header-navbar {
+  margin: 6px 20px;
+}
+
+.header-navbar li {
+  float: right;
+}
+
+.header-parent {
   height: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: var(--dark-background-color);
 
   #session-dropdown {
     color: white;
@@ -57,14 +69,7 @@ header.blue-header {
     }
   }
 
-  .header-parent {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background-color: var(--dark-background-color);
-  }
-
-  .header-white-part {
+  .header-white-part-with-rounded-corners {
     bottom: 0;
     height: 24px;
     margin-bottom: 24px;
