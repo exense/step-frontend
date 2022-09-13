@@ -59,25 +59,3 @@ angular
 
     return api;
   })
-
-  .factory('EntityScopeResolver', function () {
-    var api = {};
-    var resolvers = [];
-
-    api.registerResolver = function (resolver) {
-      resolvers.push(resolver);
-    };
-
-    api.getScope = function (entity) {
-      for (i = 0; i < resolvers.length; i++) {
-        var resolver = resolvers[i];
-        var entityScope = resolver(entity);
-        if (entityScope != null) {
-          return entityScope;
-        }
-      }
-      return null;
-    };
-
-    return api;
-  })

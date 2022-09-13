@@ -22,15 +22,6 @@ angular
   .run(function (ViewRegistry, EntityRegistry) {
     ViewRegistry.registerView('executions', 'partials/execution.html');
     ViewRegistry.registerView('test', 'partials/execution/time-series-page.html');
-    EntityRegistry.registerEntity(
-      'Execution',
-      'executions',
-      'executions',
-      'rest/executions/',
-      'rest/executions/',
-      'st-table',
-      '/partials/executions/executionSelectionTable.html'
-    );
     //  ViewRegistry.registerDashlet('execution','History','partials/executions/latestExecutions.html','latestExecutions');
   })
 
