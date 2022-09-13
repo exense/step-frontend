@@ -12,10 +12,6 @@ $material-design-icons-font-directory-path: '~material-design-icons-iconfont/dis
   width: 100%;
 }
 
-#main > div {
-  margin-top: -24px;
-}
-
 button.primary {
   background-color: var(--button-color);
   color: white;
@@ -38,7 +34,7 @@ body {
 }
 
 .header-parent {
-  height: 72px;
+  height: 48px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -72,9 +68,8 @@ body {
   .header-white-part-with-rounded-corners {
     bottom: 0;
     height: 24px;
-    margin-bottom: 24px;
     background-color: white;
-    border-radius: var(--top-blue-border-edge-radius) var(--top-blue-border-edge-radius) 0 0;
+    border-radius: var(--top-blue-border-edge-radius) 0 0 0;
   }
 }
 
