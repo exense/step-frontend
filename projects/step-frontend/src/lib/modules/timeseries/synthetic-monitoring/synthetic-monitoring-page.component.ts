@@ -1,7 +1,13 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AJS_MODULE } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { PerformanceViewSettings } from '../execution-page/performance-view-settings';
+import { PerformanceViewSettings } from '../performance-view/performance-view-settings';
+import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
+import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
+import { TimeRangePicker } from '../time-selection/time-range-picker.component';
+import { TSTimeRange } from '../chart/model/ts-time-range';
+import { RangeSelectionType } from '../time-selection/model/range-selection-type';
+import { PerformanceViewComponent } from '../performance-view/performance-view.component';
 
 @Component({
   selector: 'step-synthetic-monitoring',
@@ -9,24 +15,61 @@ import { PerformanceViewSettings } from '../execution-page/performance-view-sett
   styleUrls: ['./synthetic-monitoring-page.component.scss'],
 })
 export class SyntheticMonitoringPageComponent implements OnInit {
-  @Input() taskId: string = '631b474d1be382468920a391';
+  readonly ONE_HOUR_MS = 3600 * 1000;
+
+  @ViewChild(TimeRangePicker) rangePicker!: TimeRangePicker;
+  @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
+  @Input() taskId: string = window.location.href.split('taskId,')[1];
 
   performanceViewSettings: PerformanceViewSettings | undefined;
 
-  constructor() {}
+  timeRangeOptions: RelativeTimeSelection[] = [
+    { label: 'Last Hour', timeInMs: this.ONE_HOUR_MS },
+    { label: 'Last Day', timeInMs: this.ONE_HOUR_MS * 24 },
+    { label: 'Last Week', timeInMs: this.ONE_HOUR_MS * 24 * 7 },
+    { label: 'Last Month', timeInMs: this.ONE_HOUR_MS * 24 * 31 },
+  ];
+
+  constructor(private changeDetector: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     if (!this.taskId) {
       throw new Error('ExecutionId parameter is not present');
     }
-    const now = new Date();
-    const yesterday = new Date(now);
-    yesterday.setDate(now.getDate() - 1);
-    this.performanceViewSettings = {
+    let timeRange = this.calculateRangeInterval({
+      type: RangeSelectionType.RELATIVE,
+      relativeSelection: this.timeRangeOptions[0],
+    });
+    this.performanceViewSettings = this.getViewSettings(timeRange);
+  }
+
+  getViewSettings(timeRange: TSTimeRange) {
+    return {
+      contextId: this.taskId,
       contextualFilters: { taskId: this.taskId },
-      startTime: yesterday.getTime(),
-      endTime: now.getTime(),
+      startTime: timeRange.from!,
+      endTime: timeRange.to!,
     };
+  }
+
+  calculateRangeInterval(pickerSelection: TimeRangePickerSelection): TSTimeRange {
+    const now = new Date().getTime();
+    switch (pickerSelection.type) {
+      case RangeSelectionType.FULL:
+        throw new Error('Full range not available');
+      case RangeSelectionType.ABSOLUTE:
+        return pickerSelection.absoluteSelection!;
+      case RangeSelectionType.RELATIVE:
+        return { from: now - pickerSelection.relativeSelection!.timeInMs, to: now };
+    }
+  }
+
+  onTimeRangeChange(selection: TimeRangePickerSelection) {
+    let newInterval = this.calculateRangeInterval(selection);
+    this.performanceViewSettings = undefined;
+    this.changeDetector.detectChanges();
+    this.performanceViewSettings = this.getViewSettings(newInterval);
+    this.changeDetector.detectChanges();
   }
 }
 getAngularJSGlobal()

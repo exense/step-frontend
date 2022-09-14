@@ -58,7 +58,6 @@ angular
             inputs.push({ key: item, value: $location.$$search[item], isDynamic: dyn });
           });
         }
-
         return inputs;
       };
 
@@ -69,6 +68,7 @@ angular
           // apply inputs
           dashboardInst.dstate.globalsettings.placeholders = $scope.getDynInputs();
           $scope.dashboardsendpoint.push(dashboardInst);
+          $scope.taskId = dashboardInst.dstate.globalsettings.placeholders[0].value[3]; // TODO short dangerous implementation.
         }
       };
 

@@ -1,13 +1,13 @@
 <div class="page-container">
   <div class="view-content">
     <step-execution-filters *ngIf="executionContext" [executionContext]="executionContext"></step-execution-filters>
-    <!--    <step-execution-tabs></step-execution-tabs>-->
     <step-execution-time-selection
+      [timePicker]="includeTimeRangePicker"
       (onRangeChange)="handleTableRangeChange($event)"
       (onRangeReset)="handleRangeReset($event)"
       #timeSelection
-      *ngIf="execution"
-      [execution]="execution"
+      *ngIf="executionContext"
+      [settings]="settings"
     >
     </step-execution-time-selection>
     <div *ngIf="executionInProgress">
@@ -25,7 +25,7 @@
           #summaryChart
           *ngIf="summaryChartSettings"
           [settings]="summaryChartSettings"
-          [syncKey]="contextId"
+          [syncKey]="settings.contextId"
           [selection]="timeSelection?.absoluteSelection"
           (onZoomReset)="onZoomReset()"
         >
@@ -39,7 +39,7 @@
           *ngIf="byStatusSettings"
           [settings]="byStatusSettings"
           [selection]="timeSelection?.absoluteSelection"
-          [syncKey]="contextId"
+          [syncKey]="settings.contextId"
           (onZoomReset)="onZoomReset()"
         >
         </step-timeseries-chart>
@@ -47,13 +47,19 @@
 
       <div class="charts-section">
         <div class="container chart">
+          <div class="measurements-toggle" *ngIf="throughputChartSettings">
+            <step-measurements-picker
+              *ngIf="settings.contextId"
+              [contextId]="settings.contextId"
+            ></step-measurements-picker>
+          </div>
           <step-chart-skeleton *ngIf="!responseTypeByKeywordsSettings"></step-chart-skeleton>
           <step-timeseries-chart
             #responseTimeChart
             *ngIf="responseTypeByKeywordsSettings"
             [settings]="responseTypeByKeywordsSettings"
             [selection]="timeSelection?.absoluteSelection"
-            [syncKey]="contextId"
+            [syncKey]="settings.contextId"
             (onZoomReset)="onZoomReset()"
           >
           </step-timeseries-chart>
@@ -68,13 +74,19 @@
         </div>
 
         <div class="container chart">
+          <div class="measurements-toggle" *ngIf="throughputChartSettings">
+            <step-measurements-picker
+              *ngIf="settings.contextId"
+              [contextId]="settings.contextId"
+            ></step-measurements-picker>
+          </div>
           <step-chart-skeleton *ngIf="!throughputChartSettings"></step-chart-skeleton>
           <step-timeseries-chart
             *ngIf="throughputChartSettings"
             #throughputChart
             [settings]="throughputChartSettings"
             [selection]="timeSelection?.absoluteSelection"
-            [syncKey]="contextId"
+            [syncKey]="settings.contextId"
             (onZoomReset)="onZoomReset()"
           >
           </step-timeseries-chart>
@@ -90,14 +102,14 @@
         </div>
       </div>
 
-      <div class="container chart">
+      <div class="container chart" *ngIf="includeThreadGroupChart">
         <step-chart-skeleton *ngIf="!threadGroupSettings"></step-chart-skeleton>
         <step-timeseries-chart
           *ngIf="threadGroupSettings"
           #threadGroupChart
           [settings]="threadGroupSettings"
           [selection]="timeSelection?.absoluteSelection"
-          [syncKey]="contextId"
+          [syncKey]="settings.contextId"
           (onZoomReset)="onZoomReset()"
         >
         </step-timeseries-chart>

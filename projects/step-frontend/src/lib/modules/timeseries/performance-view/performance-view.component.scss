@@ -23,6 +23,7 @@
   .chart {
     height: 360px;
     width: calc(50% - 24px);
+    position: relative;
   }
 }
 
@@ -86,4 +87,11 @@
   display: flex;
   background-color: #f5f5f7;
   flex-wrap: wrap;
+
+  .measurements-toggle {
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    z-index: 10;
+  }
 }

@@ -4,10 +4,10 @@ import { TimeSeriesService } from '../../time-series.service';
 import { FindBucketsRequest } from '../../find-buckets-request';
 import { TimeseriesColorsPool } from '../../util/timeseries-colors-pool';
 import { TimeSeriesChartResponse } from '../../time-series-chart-response';
-import { TimeSeriesKeywordsContext } from '../time-series-keywords.context';
+import { TimeSeriesKeywordsContext } from '../../execution-page/time-series-keywords.context';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
 import { BucketAttributes, TableDataSource, TableLocalDataSource, TableLocalDataSourceConfig } from '@exense/step-core';
-import { ExecutionContext } from '../execution-context';
+import { ExecutionContext } from '../../execution-page/execution-context';
 
 @Component({
   selector: 'step-timeseries-table',

@@ -1,1 +1,16 @@
-<step-performance-view *ngIf="performanceViewSettings" [settings]="performanceViewSettings"></step-performance-view>
+<step-time-range-picker
+  #rangePicker
+  [customRelativeOptions]="timeRangeOptions"
+  [initialSelectionIndex]="0"
+  [includeFullRangeOption]="false"
+  (selectionChange)="onTimeRangeChange($event)"
+>
+</step-time-range-picker>
+
+<step-performance-view
+  *ngIf="performanceViewSettings"
+  [settings]="performanceViewSettings"
+  [includeThreadGroupChart]="false"
+  [includeTimeRangePicker]="false"
+>
+</step-performance-view>

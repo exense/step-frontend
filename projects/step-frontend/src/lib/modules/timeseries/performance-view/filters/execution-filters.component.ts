@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
-import { ExecutionContext } from '../execution-context';
+import { ExecutionContext } from '../../execution-page/execution-context';
 import { BucketFilters } from '../../model/bucket-filters';
-import { KeywordSelection, TimeSeriesKeywordsContext } from '../time-series-keywords.context';
+import { KeywordSelection, TimeSeriesKeywordsContext } from '../../execution-page/time-series-keywords.context';
 import { KeyValue } from '@angular/common';
 
 @Component({
@@ -24,9 +24,6 @@ export class ExecutionFiltersComponent implements OnInit {
   ];
   groupingAttributes = this.groupingOptions[0].attributes;
 
-  keywordSearchValue: string = '';
-  allSeriesChecked: boolean = true;
-
   @Input() executionContext!: ExecutionContext;
   private keywordsService!: TimeSeriesKeywordsContext;
   keywords: { [key: string]: KeywordSelection } = {};
@@ -39,26 +36,6 @@ export class ExecutionFiltersComponent implements OnInit {
     if (!this.executionContext) {
       throw new Error('Context parameter is mandatory');
     }
-    this.keywordsService = this.executionContext.getKeywordsContext();
-    this.keywordsService.onKeywordsUpdated().subscribe((keywords) => {
-      this.keywords = keywords;
-      this.activeKeywords = 0;
-      Object.keys(keywords).forEach((key) => {
-        if (keywords[key].isVisible && keywords[key].isSelected) {
-          console.log(key + ' ' + keywords[key].isSelected);
-          this.activeKeywords++;
-        }
-      });
-    });
-    this.keywordsService.onKeywordToggled().subscribe((selection) => {
-      let isSelected = this.keywords[selection.id].isSelected;
-      if (isSelected) {
-        this.activeKeywords++;
-      } else {
-        this.allSeriesChecked = false;
-        this.activeKeywords--;
-      }
-    });
   }
 
   applyParams(): void {
@@ -74,23 +51,6 @@ export class ExecutionFiltersComponent implements OnInit {
   emitGroupDimensions(): void {
     this.executionContext.updateGrouping(this.groupingAttributes);
   }
-
-  onAllSeriesCheckboxClick(event: any) {
-    this.keywordsService.toggleSelectAll();
-  }
-
-  onKeywordToggle(keyword: string, event: any) {
-    this.keywordsService.toggleKeyword(keyword);
-    if (event.target.checked) {
-      this.activeKeywords++;
-    } else {
-      this.activeKeywords--;
-    }
-  }
-
-  valueAscOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => {
-    return a.key.localeCompare(b.key);
-  };
 }
 
 interface FilterItem {
