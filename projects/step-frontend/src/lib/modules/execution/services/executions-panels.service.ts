@@ -50,7 +50,7 @@ export class ExecutionsPanelsService {
   }
 
   observePanel(viewId: string, eid: string): Observable<ExecutionStepPanel | undefined> {
-    if (!this._panels$[eid] || !this._panels$[eid][viewId]) {
+    if (!this._panels$?.[eid]?.[viewId]) {
       this._panels$[eid] = this._panels$[eid] || {};
       this._panels$[eid][viewId] = new BehaviorSubject<ExecutionStepPanel | undefined>(this.getPanel(viewId, eid));
       return this._panels$[eid][viewId];
@@ -82,7 +82,7 @@ export class ExecutionsPanelsService {
   enablePanel(viewId: string, enabled: boolean, eid: string): void {
     if (!this._panels[eid]) {
       // deep copy
-      this._panels[eid] = JSON.parse(JSON.stringify(this._defaultPanels));
+      this._panels[eid] = this._copyDefaultPanels();
     }
     (this._panels[eid][viewId] as EditablePanel).enabled = enabled;
 
@@ -97,6 +97,13 @@ export class ExecutionsPanelsService {
     if (this._panels$[eid] && this._panels$[eid][viewId]) {
       this._panels$[eid][viewId].next(this._panels[eid][viewId]);
     }
+  }
+
+  private _copyDefaultPanels(): Record<string, ExecutionStepPanel> {
+    return Object.entries(this._defaultPanels).reduce((result, [key, panel]) => {
+      result[key] = { ...panel };
+      return result;
+    }, {} as Record<string, ExecutionStepPanel>);
   }
 }
 

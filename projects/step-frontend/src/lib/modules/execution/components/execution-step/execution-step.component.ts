@@ -50,9 +50,18 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
   constructor(public _panelService: ExecutionsPanelsService) {}
 
   ngOnInit() {
-    this._panelService.observePanel(this.ID_TEST_CASES, this.eId).subscribe((panel) => (this.panelTestCases = panel));
-    this._panelService.observePanel(this.ID_STEPS, this.eId).subscribe((panel) => (this.panelSteps = panel));
-    this._panelService.observePanel(this.ID_PARAMETERS, this.eId).subscribe((panel) => (this.panelParameters = panel));
+    this._panelService
+      .observePanel(this.ID_TEST_CASES, this.eId)
+      .pipe(takeUntil(this.terminator$))
+      .subscribe((panel) => (this.panelTestCases = panel));
+    this._panelService
+      .observePanel(this.ID_STEPS, this.eId)
+      .pipe(takeUntil(this.terminator$))
+      .subscribe((panel) => (this.panelSteps = panel));
+    this._panelService
+      .observePanel(this.ID_PARAMETERS, this.eId)
+      .pipe(takeUntil(this.terminator$))
+      .subscribe((panel) => (this.panelParameters = panel));
   }
 
   chooseTestcase(testCase: ReportNode): void {
