@@ -43,16 +43,16 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
   readonly ID_STEPS = 'steps';
   readonly ID_PARAMETERS = 'parameters';
 
-  readonly panelTestCases?: ExecutionStepPanel;
-  readonly panelSteps?: ExecutionStepPanel;
-  readonly panelParameters?: ExecutionStepPanel;
+  panelTestCases?: ExecutionStepPanel;
+  panelSteps?: ExecutionStepPanel;
+  panelParameters?: ExecutionStepPanel;
 
-  constructor(public _panelService: ExecutionsPanelsService) {
-    [this.panelTestCases, this.panelSteps, this.panelParameters] = [
-      this.ID_TEST_CASES,
-      this.ID_STEPS,
-      this.ID_PARAMETERS,
-    ].map((id) => _panelService.getPanel(id));
+  constructor(public _panelService: ExecutionsPanelsService) {}
+
+  ngOnInit() {
+    this._panelService.observePanel(this.ID_TEST_CASES, this.eId).subscribe((panel) => (this.panelTestCases = panel));
+    this._panelService.observePanel(this.ID_STEPS, this.eId).subscribe((panel) => (this.panelSteps = panel));
+    this._panelService.observePanel(this.ID_PARAMETERS, this.eId).subscribe((panel) => (this.panelParameters = panel));
   }
 
   chooseTestcase(testCase: ReportNode): void {
@@ -124,7 +124,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
       map((testcases) => ({
         type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
         eid,
-        testcases: this.execution?.executionType === 'TestSet' ? testcases : undefined,
+        testcases: this.panelTestCases?.enabled ? testcases : undefined,
       })),
       takeUntil(this.selectionTerminator$)
     );
