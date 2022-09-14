@@ -32,11 +32,10 @@ import { BtnGroupComponent } from './components/btn-group/btn-group.component';
 import { MatLuxonDateModule } from '@angular/material-luxon-adapter';
 import { MatCardModule } from '@angular/material/card';
 import { ThemeComponent } from './components/theme/theme.component';
-import { FeatherModule } from 'angular-feather';
-import { allIcons } from 'angular-feather/icons';
+import { StepIconsModule } from '../step-icons/step-icons.module';
 
 @NgModule({
-  imports: [CommonModule, FeatherModule.pick(allIcons)],
+  imports: [CommonModule, StepIconsModule],
   declarations: [BtnGroupComponent, ThemeComponent],
   exports: [
     MatCheckboxModule,
@@ -71,7 +70,7 @@ import { allIcons } from 'angular-feather/icons';
     BtnGroupComponent,
     MatCardModule,
     ThemeComponent,
-    FeatherModule
+    StepIconsModule
   ],
 })
 export class StepMaterialModule {}

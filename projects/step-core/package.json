@@ -31,7 +31,6 @@
     "@types/angular": "1.7.4",
     "@types/uuid": "8.3.4",
     "uuid": "8.3.2",
-    "angular-feather": "6.3.0",
     "rxjs": "^7.4.0"
   },
   "dependencies": {
