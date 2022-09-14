@@ -64,8 +64,7 @@ export class ExecutionsPanelsService {
 
   setShowPanel(viewId: string, show: boolean, eid: string): void {
     if (!this._panels[eid]) {
-      // deep copy
-      this._panels[eid] = JSON.parse(JSON.stringify(this._defaultPanels));
+      this._panels[eid] = this._copyDefaultPanels();
     }
     (this._panels[eid][viewId] as EditablePanel).show = show;
     this.updateObservable(viewId, eid);
@@ -81,7 +80,6 @@ export class ExecutionsPanelsService {
 
   enablePanel(viewId: string, enabled: boolean, eid: string): void {
     if (!this._panels[eid]) {
-      // deep copy
       this._panels[eid] = this._copyDefaultPanels();
     }
     (this._panels[eid][viewId] as EditablePanel).enabled = enabled;
