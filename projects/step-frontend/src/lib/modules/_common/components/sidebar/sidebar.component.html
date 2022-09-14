@@ -5,7 +5,9 @@
       <label for="collapsable-sidebar-toggle-checkbox" (click)="toggleOpenClose()"
         ><i class="glyphicon glyphicon-menu-hamburger"></i></label
     ></span>
-    <span class="sidebar-aligned-text"><img class="sidebar-logo" alt="" [src]="logo" /></span>
+    <span class="sidebar-aligned-text">
+      <div class="sidebar-logo"></div>
+    </span>
   </div>
   <div id="sidebar-home-and-settings">
     <span class="visible-when-collapsed sidebar-home-button" (click)="navigateTo('home')"

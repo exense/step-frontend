@@ -5,8 +5,7 @@ import { AsyncTaskStatus } from '../shared/async-task-status';
 
 export const pollAsyncTask = (
   asyncService: AsyncTasksService,
-  progressHandler?: (value: number) => void,
-  pollCount: number = 4
+  progressHandler?: (value: number) => void
 ): ((src: Observable<AsyncTaskStatus>) => Observable<AsyncTaskStatus>) => {
   return (src) =>
     src.pipe(
@@ -16,14 +15,14 @@ export const pollAsyncTask = (
         }
       }),
       switchMap((status) => {
-        if (!status || status.ready || pollCount === 0 || !status.id) {
+        if (!status || status.ready || !status.id) {
           return of(status);
         }
 
         const id = status.id;
         return timer(500).pipe(
           switchMap((_) => asyncService.getAsyncTaskStatus(id)),
-          pollAsyncTask(asyncService, progressHandler, pollCount - 1)
+          pollAsyncTask(asyncService, progressHandler)
         );
       })
     );

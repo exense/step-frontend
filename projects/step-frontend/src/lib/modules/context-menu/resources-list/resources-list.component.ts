@@ -1,7 +1,8 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, Resource, AugmentedResourcesService } from '@exense/step-core';
 import { ResourceDialogsService } from '../services/resource-dialogs.service';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'step-resources-list',
@@ -13,10 +14,9 @@ export class ResourcesListComponent {
 
   constructor(
     private _resourceDialogs: ResourceDialogsService,
-    private _augmentedResourcesService: AugmentedResourcesService
-  ) {
-    console.log('AUG', this._augmentedResourcesService);
-  }
+    private _augmentedResourcesService: AugmentedResourcesService,
+    @Inject(DOCUMENT) private _document: Document
+  ) {}
 
   editResource(resource: Resource): void {
     this._resourceDialogs.editResource(resource).subscribe((_) => this.dataSource.reload());
@@ -32,6 +32,11 @@ export class ResourcesListComponent {
         this.dataSource.reload();
       }
     });
+  }
+
+  downloadResource(id: string): void {
+    const url = `rest/resources/${id}/content`;
+    this._document.defaultView!.open(url, '_blank');
   }
 
   searchResource(resource: Resource): void {

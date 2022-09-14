@@ -36,11 +36,5 @@ export const $AccessConfiguration = {
     title: {
       type: 'string',
     },
-    displayLegacyPerfDashboard: {
-      type: 'boolean',
-    },
-    displayNewPerfDashboard: {
-      type: 'boolean',
-    },
   },
 } as const;

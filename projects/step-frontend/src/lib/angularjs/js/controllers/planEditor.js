@@ -251,6 +251,7 @@ angular
       $scope.stopInteractive = function () {
         $http.post('rest/interactive/' + $scope.interactiveSession.id + '/stop').then();
         $scope.interactiveSession.id = null;
+        $scope.componentTabs.selectedTab = 'controls';
         //need to reset the context of the console table
         $scope.stepsTable = reportTableFactory.get(function () {
           return { eid: $scope.interactiveSession.id };

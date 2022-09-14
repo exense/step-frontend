@@ -12,6 +12,4 @@ export type AccessConfiguration = {
   miscParams?: Record<string, string>;
   defaultUrl?: string;
   title?: string;
-  displayLegacyPerfDashboard?: boolean;
-  displayNewPerfDashboard?: boolean;
 };

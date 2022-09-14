@@ -21,17 +21,6 @@ angular
 
   .run(function (ViewRegistry, EntityRegistry) {
     ViewRegistry.registerView('parameters', 'partials/parameters/parameterList.html');
-    EntityRegistry.registerEntity(
-      'Parameter',
-      'parameters',
-      'parameters',
-      'rest/parameters/',
-      'rest/parameters/',
-      'st-table',
-      '/partials/parameters/parameterSelectionTable.html',
-      null,
-      'glyphicon glyphicon-list-alt'
-    );
   })
   .factory('ParameterScopeRenderer', function () {
     var api = {};

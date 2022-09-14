@@ -1,0 +1,14 @@
+@mixin common-styles {
+  .w-100 {
+    width: 100%;
+  }
+
+  .container-fluid {
+    padding: 0;
+  }
+
+  #step-main-scrollable-content {
+    height: calc(100vh - 36px);
+    overflow: auto;
+  }
+}

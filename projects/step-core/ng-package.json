@@ -3,5 +3,6 @@
   "dest": "../../dist/step-core",
   "lib": {
     "entryFile": "src/public-api.ts"
-  }
+  },
+  "assets": ["styles/**/*.scss"]
 }
