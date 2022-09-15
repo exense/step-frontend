@@ -4,13 +4,11 @@ import { AuthService } from './auth.service';
 import { ViewRegistryService } from './view-registry.service';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE } from '../shared';
-import { lastValueFrom, Observable, ReplaySubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DashboardService {
-
   constructor(
     private _http: HttpClient,
     private _authService: AuthService,
@@ -21,5 +19,6 @@ export class DashboardService {
   getDashboardLink(taskId: string): string {
     return '/#/root/dashboards/__pp__RTMDashboard?__filter1__=text,taskId,' + taskId;
   }
-
 }
+
+getAngularJSGlobal().module(AJS_MODULE).service('DashboardService', downgradeInjectable(DashboardService));
