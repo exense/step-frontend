@@ -21,11 +21,11 @@ angular
 
   .run(function (ViewRegistry, EntityRegistry) {
     ViewRegistry.registerView('resources', 'partials/resources/resourceList.html');
-    ViewRegistry.registerMenuEntry('Resources', 'resources', 'glyphicon glyphicon-book',  50,"automation-root");
+    ViewRegistry.registerMenuEntry('Resources', 'resources', 'book',  50,"automation-root");
     EntityRegistry.registerEntity(
       'Resource',
       'resources',
-      'layers',
+      'book',
       'resources',
       'rest/resources/',
       'rest/resources/',

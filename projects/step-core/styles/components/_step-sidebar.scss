@@ -14,7 +14,7 @@
   $home-and-settings-height: 64px,
   $help-and-support-height: 56px,
   $elements-padding: 12px,
-  $elements-text-padding: 15px,
+  $elements-text-padding: 14px,
   $settings-divider-padding-right: 45px,
   $aligned-text-margin-left: 60px,
   $logo-path: '/images/logotopleft.png'
@@ -409,6 +409,13 @@
     #collapsable-sidebar-toggle-checkbox:checked ~ step-tenant-selection-downgraded {
       width: map.get($config, width-closed);
       visibility: hidden;
+    }
+
+    step-icon {
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      min-height: 20px;
     }
   }
 }
