@@ -1,7 +1,10 @@
+@use '../../../../../../styles/core-mixins' as core;
+
+@include core.table-space-between-columns;
+
 :host {
   position: relative;
   display: block;
-  min-width: 500px;
 }
 
 table {
@@ -12,19 +15,8 @@ table {
   width: auto !important;
 }
 
-::ng-deep .mat-cell {
-  border-style: solid;
-  border-color: rgba(255, 255, 255, 0);
-  border-width: 0 10px 0 0;
-}
-
 tr.mat-row:hover {
   background: var(--darken-background-10);
-}
-
-th > mat-form-field {
-  width: 100%;
-  padding: 0 5px 0 5px;
 }
 
 .spinner-container {
