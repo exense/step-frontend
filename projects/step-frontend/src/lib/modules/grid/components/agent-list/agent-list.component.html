@@ -33,7 +33,7 @@
           [disabled]="!('user-write' | hasRight | async)"
           (click)="interrupt(element.agentRef!.agentId)"
         >
-          <mat-icon>pause</mat-icon>
+          <step-icon name="pause"></step-icon>
         </button>
         <button
           mat-icon-button
@@ -41,7 +41,7 @@
           [disabled]="!('user-write' | hasRight | async)"
           (click)="resume(element.agentRef!.agentId)"
         >
-          <mat-icon>play_arrow</mat-icon>
+          <step-icon name="play"></step-icon>
         </button>
         <button
           mat-icon-button
@@ -49,7 +49,7 @@
           [disabled]="!('user-write' | hasRight | async)"
           (click)="removeTokenErrors(element.agentRef!.agentId)"
         >
-          <mat-icon>check</mat-icon>
+          <step-icon name="check"></step-icon>
         </button>
       </step-btn-group>
     </td>

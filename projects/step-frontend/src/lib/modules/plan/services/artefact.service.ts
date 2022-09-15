@@ -102,156 +102,156 @@ export class ArtefactService {
     });
     this.register('TestCase', {
       icon: 'glyphicon-list-alt',
-      iconNg2: 'list_alt',
+      iconNg2: 'list',
       form: 'partials/artefacts/testCase.html',
       description:
         'Specific container for a group of nodes, it will activate the top-level panel in the execution view for high-level test case execution monitoring',
     });
     this.register('TestScenario', {
       icon: 'glyphicon-equalizer',
-      iconNg2: 'equalizer',
+      iconNg2: 'bar-chart-2',
       form: 'partials/artefacts/testScenario.html',
       description: 'Usually used to parallelize the execution of multiple ThreadGroups or ‘sub’ plans',
     });
     this.register('CallPlan', {
       icon: 'glyphicon-new-window',
-      iconNg2: 'open_in_new',
+      iconNg2: 'external-link',
       form: 'partials/artefacts/callPlan.html',
       description: 'Used to invoke a plan from within another plan',
     });
     this.register('CallKeyword', {
       icon: 'glyphicon-record',
-      iconNg2: 'radio_button_checked',
+      iconNg2: 'target',
       form: 'partials/artefacts/callFunction.html',
       description:
         'Technical node used as part of keyword invocation. Can be used explicitly in order to call a keyword by reflection',
     });
     this.register('For', {
       icon: 'glyphicon-th',
-      iconNg2: 'apps',
+      iconNg2: 'cpu',
       form: 'partials/artefacts/for.html',
       description: 'Creates a For loop at execution time and iterates through its children',
     });
     this.register('ForEach', {
       icon: 'glyphicon-th',
-      iconNg2: 'apps',
+      iconNg2: 'cpu',
       form: 'partials/artefacts/forEach.html',
       description: 'Creates a ForEach loop based on a collection and iterates through the child nodes',
     });
     this.register('While', {
       icon: 'glyphicon-repeat',
-      iconNg2: 'replay',
+      iconNg2: 'rotate-cw',
       form: 'partials/artefacts/while.html',
       description: 'Iterates over the node content until the given condition is not met',
     });
     this.register('DataSet', {
       icon: 'glyphicon-th-large',
-      iconNg2: 'grid_view',
+      iconNg2: 'grid',
       form: 'partials/artefacts/dataSet.html',
       description: 'Used to iterate over rows of data in a table',
     });
     this.register('Synchronized', {
       icon: 'glyphicon-align-justify',
-      iconNg2: 'format_align_justify',
+      iconNg2: 'align-justify',
       form: 'partials/artefacts/synchronized.html',
       description:
         'Guarantee thread safety within a test block by synchronizing all threads on the entire Test Execution',
     });
     this.register('Sequence', {
       icon: 'glyphicon-align-justify',
-      iconNg2: 'format_align_justify',
+      iconNg2: 'align-justify',
       form: 'partials/artefacts/sequence.html',
       description: 'Guarantees the ordering of the child nodes, as displayed in the tree.',
     });
     this.register('BeforeSequence', {
       icon: 'glyphicon-arrow-up',
-      iconNg2: 'arrow_upward',
+      iconNg2: 'arrow-up',
       form: 'partials/artefacts/sequence.html',
       description: '',
     });
     this.register('AfterSequence', {
       icon: 'glyphicon-arrow-down',
-      iconNg2: 'arrow_downward',
+      iconNg2: 'arrow-down',
       form: 'partials/artefacts/sequence.html',
       description: '',
     });
     this.register('Return', {
       icon: 'glyphicon-share-alt',
-      iconNg2: 'reply',
+      iconNg2: 'corner-up-right',
       form: 'partials/artefacts/return.html',
       description: 'Used within a Composite Keyword, set the Composite output to the returned value(s)',
     });
     this.register('Echo', {
       icon: 'glyphicon-zoom-in',
-      iconNg2: 'zoom_in',
+      iconNg2: 'zoom-in',
       form: 'partials/artefacts/echo.html',
       description: 'Used to print data in the report nodes of a plan, mostly for debugging or information purposes',
     });
     this.register('If', {
       icon: 'glyphicon-unchecked',
-      iconNg2: 'check_box_outline_blank',
+      iconNg2: 'square',
       form: 'partials/artefacts/if.html',
       description: 'Only executes the child nodes if the condition is met',
     });
     this.register('Session', {
       icon: 'glyphicon-magnet',
-      iconNg2: 'view_timeline',
+      iconNg2: 'briefcase',
       form: 'partials/artefacts/functionGroup.html',
       description: 'Guarantees that Keywords are executed within the the same Session i.e. Agent Token',
     });
     this.register('Set', {
       icon: 'glyphicon-save',
       form: 'partials/artefacts/set.html',
-      iconNg2: 'file_download',
+      iconNg2: 'download',
       description: 'Sets a value to a variable, which can then be accessed throughout Plans and sub Plans',
     });
     this.register('Sleep', {
       icon: 'glyphicon-hourglass',
-      iconNg2: 'hourglass_empty',
+      iconNg2: 'coffee',
       form: 'partials/artefacts/sleep.html',
       description: 'Causes the thread to sleep',
     });
     this.register('Script', {
       icon: 'glyphicon-align-left',
-      iconNg2: 'format_align_left',
+      iconNg2: 'align-left',
       form: 'partials/artefacts/script.html',
       description:
         'Executes any arbitrary groovy code. The script context is local, which means that variable used in the script control cannot be accessed externally by other nodes',
     });
     this.register('ThreadGroup', {
       icon: 'glyphicon-resize-horizontal',
-      iconNg2: 'settings_ethernet',
+      iconNg2: 'code',
       form: 'partials/artefacts/threadGroup.html',
       description: 'Starts multiple threads which will execute the node content in parallel',
     });
     this.register('BeforeThread', {
       icon: 'glyphicon-arrow-left',
-      iconNg2: 'arrow_back',
+      iconNg2: 'chevron-left',
       form: 'partials/artefacts/sequence.html',
       description: '',
     });
     this.register('AfterThread', {
       icon: 'glyphicon-arrow-right',
-      iconNg2: 'arrow_forward',
+      iconNg2: 'chevron-right',
       form: 'partials/artefacts/sequence.html',
       description: '',
     });
     this.register('Thread', {
       icon: 'glyphicon-resize-horizontal',
-      iconNg2: 'settings_ethernet',
+      iconNg2: 'code',
       form: 'partials/artefacts/threadGroup.html',
       description: '',
       isSelectable: false,
     });
     this.register('Switch', {
       icon: 'glyphicon-option-vertical',
-      iconNg2: 'settings_ethernet',
+      iconNg2: 'more-vertical',
       form: 'partials/artefacts/switch.html',
       description: 'Same as in any programming language, to use in combinaison with the "Case" control',
     });
     this.register('Case', {
       icon: 'glyphicon-minus',
-      iconNg2: 'remove',
+      iconNg2: 'minus',
       form: 'partials/artefacts/case.html',
       description: 'Same as in any programming language, to use in combinaison with the "Switch" control',
     });
@@ -263,26 +263,26 @@ export class ArtefactService {
     });
     this.register('Check', {
       icon: 'glyphicon-ok',
-      iconNg2: 'done',
+      iconNg2: 'check',
       form: 'partials/artefacts/check.html',
       description:
         'Performs a custom assertion using groovy expressions. Useful for validating the output of the parent node. For standard assertions use the Control Assert instead',
     });
     this.register('Assert', {
       icon: 'glyphicon-ok',
-      iconNg2: 'done',
+      iconNg2: 'check',
       form: 'partials/artefacts/assert.html',
       description: 'Validates the output of a keyword execution.',
     });
     this.register('Placeholder', {
       icon: 'glyphicon-unchecked',
-      iconNg2: 'check_box_outline_blank',
+      iconNg2: 'square',
       form: 'partials/artefacts/placeholder.html',
       description: '',
     });
     this.register('Export', {
       icon: 'glyphicon-export',
-      iconNg2: 'file_upload',
+      iconNg2: 'upload',
       form: 'partials/artefacts/export.html',
       description: '',
     });

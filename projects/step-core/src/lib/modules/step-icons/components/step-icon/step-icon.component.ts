@@ -6,7 +6,8 @@ import {
   Input,
   OnChanges,
   Renderer2,
-  SimpleChanges
+  SimpleChanges,
+  ViewEncapsulation
 } from '@angular/core';
 import { IconProviderService } from '../../services/icon-provider.service';
 
@@ -14,11 +15,12 @@ import { IconProviderService } from '../../services/icon-provider.service';
   selector: 'step-icon',
   templateUrl: './step-icon.component.html',
   styleUrls: ['./step-icon.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None
 })
 export class StepIconComponent implements OnChanges {
 
-  @Input() name!: string;
+  @Input() name?: string;
 
   constructor(
     private iconProvider: IconProviderService,
@@ -28,7 +30,7 @@ export class StepIconComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     const cName = changes['name'];
-    if (cName?.previousValue !== cName?.currentValue && cName?.firstChange) {
+    if (cName?.previousValue !== cName?.currentValue || cName?.firstChange) {
       const iconKey = cName?.currentValue || '';
       const icon = this.iconProvider.getIcon(iconKey);
       if (icon) {

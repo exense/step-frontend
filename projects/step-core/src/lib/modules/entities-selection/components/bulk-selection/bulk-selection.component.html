@@ -6,7 +6,7 @@
 <mat-checkbox color="primary" [checked]="isChecked" [indeterminate]="isIntermediate" (click)="handleCheckboxChange()">
 </mat-checkbox>
 <button type="button" mat-icon-button [matMenuTriggerFor]="menu">
-  <mat-icon>arrow_drop_down</mat-icon>
+  <step-icon name="chevron-down"></step-icon>
 </button>
 <step-bulk-selection-label *ngIf="showLabel" [selectionType]="selectionType" [selectionCollector]="selectionCollector">
 </step-bulk-selection-label>

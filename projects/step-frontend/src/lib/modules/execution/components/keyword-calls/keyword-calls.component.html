@@ -1,8 +1,8 @@
 <ng-template #chevronRight>
-  <mat-icon>chevron_right</mat-icon>
+  <step-icon name="chevron_right"></step-icon>
 </ng-template>
 <ng-template #chevronDown>
-  <mat-icon>expand_more</mat-icon>
+  <step-icon name="chevron-down"></step-icon>
 </ng-template>
 <section class="header">
   <step-btn-group>
@@ -16,7 +16,7 @@
       matTooltipPosition="below"
       (click)="keywordsTable.exportAsCSV(EXPORT_FIELDS)"
     >
-      <mat-icon>file_upload</mat-icon>
+      <step-icon name="upload"></step-icon>
     </button>
   </step-btn-group>
 </section>

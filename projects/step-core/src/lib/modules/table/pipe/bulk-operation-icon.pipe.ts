@@ -8,11 +8,11 @@ export class BulkOperationIconPipe implements PipeTransform {
   transform(value: BulkOperation): string {
     switch (value) {
       case BulkOperation.delete:
-        return 'clear';
+        return 'x';
       case BulkOperation.duplicate:
-        return 'content_copy';
+        return 'copy';
       case BulkOperation.export:
-        return 'share';
+        return 'upload';
       default:
         return '';
     }

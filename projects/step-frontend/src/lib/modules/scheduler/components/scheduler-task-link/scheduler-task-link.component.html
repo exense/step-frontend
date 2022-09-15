@@ -1,8 +1,8 @@
 <a href="#" (click)="editParameter(); (false)">{{ context?.attributes?.['name'] }}</a>
-<mat-icon
+<step-icon
   *ngIf="!!context?.executionsParameters?.repositoryObject?.repositoryParameters?.['planid']"
   class="nav-to-plan-icon"
   matTooltip="Go to plan"
-  (click)="navToPlan()"
-  >insert_drive_file</mat-icon
->
+  name="file"
+  (click)="navToPlan()">
+</step-icon>

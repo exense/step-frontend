@@ -25,7 +25,7 @@ angular
     EntityRegistry.registerEntity(
       'Resource',
       'resources',
-      'library_books',
+      'layers',
       'resources',
       'rest/resources/',
       'rest/resources/',
