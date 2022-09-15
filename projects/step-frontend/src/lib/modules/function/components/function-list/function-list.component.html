@@ -31,7 +31,7 @@
       [disabled]="!('kw-write' | hasRight | async)"
       (click)="addFunction()"
     >
-      <step-icon name="plus">add</step-icon>
+      <step-icon name="plus"></step-icon>
     </button>
   </step-btn-group>
   <step-btn-group>
@@ -112,7 +112,7 @@
       [disabled]="!('kw-read' | hasRight | async)"
       (click)="exportFunction(element.id, element.attributes.name)"
     >
-      <step-icon name="copy"></step-icon>
+      <step-icon name="upload"></step-icon>
       Export Keyword
     </button>
 
