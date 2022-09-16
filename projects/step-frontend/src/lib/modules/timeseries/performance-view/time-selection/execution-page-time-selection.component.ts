@@ -62,7 +62,7 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
 
   createRanger() {
     let startTime = this.settings.startTime!;
-    let endTime = this.settings.endTime || new Date().getTime();
+    let endTime = this.settings.endTime || new Date().getTime() - 5000; // minus 5 seconds
     let request: FindBucketsRequest = {
       intervalSize: 0,
       params: this.settings.contextualFilters,

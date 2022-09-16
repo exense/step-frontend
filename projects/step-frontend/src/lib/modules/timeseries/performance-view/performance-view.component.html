@@ -10,14 +10,6 @@
       [settings]="settings"
     >
     </step-execution-time-selection>
-    <div *ngIf="executionInProgress">
-      <button mat-raised-button [matMenuTriggerFor]="refreshMenu">Refresh ({{ selectedRefreshInterval.label }})</button>
-      <mat-menu #refreshMenu="matMenu">
-        <button mat-menu-item *ngFor="let interval of refreshIntervals" (click)="changeRefreshInterval(interval)">
-          {{ interval.label }}
-        </button>
-      </mat-menu>
-    </div>
     <div class="w-100 dashboard-container">
       <div class="container chart">
         <step-chart-skeleton *ngIf="!summaryChartSettings"></step-chart-skeleton>

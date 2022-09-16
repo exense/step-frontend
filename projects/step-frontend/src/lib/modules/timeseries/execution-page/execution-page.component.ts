@@ -52,27 +52,27 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     if (!this.executionId) {
       throw new Error('ExecutionId parameter is not present');
     }
-    this.executionService.getExecutionById(this.executionId).subscribe((details) => {
-      let startTime = details.startTime! - (details.startTime! % TimeSeriesConfig.RESOLUTION);
+    this.executionService.getExecutionById(this.executionId).subscribe((execution) => {
+      let startTime = execution.startTime! - (execution.startTime! % TimeSeriesConfig.RESOLUTION);
       // let now = new Date().getTime();
       let endTime = undefined;
-      if (details.endTime) {
+      if (execution.endTime) {
         // execution is over
-        endTime = details.endTime + (TimeSeriesConfig.RESOLUTION - (details.endTime % TimeSeriesConfig.RESOLUTION)); // not sure if needed
+        endTime = execution.endTime; // + (TimeSeriesConfig.RESOLUTION - (execution.endTime % TimeSeriesConfig.RESOLUTION)); // not sure if needed
       } else {
+        this.executionInProgress = true;
         endTime = new Date().getTime();
       }
-      if (this.executionInProgress) {
-        // this.startRefreshInterval(this.selectedRefreshInterval.value);
-        // this.refreshEnabled = true;
-      }
-
       this.performanceViewSettings = {
         contextId: this.executionId,
         startTime: startTime,
         endTime: endTime,
         contextualFilters: { eId: this.executionId },
       };
+      if (this.executionInProgress) {
+        this.startRefreshInterval(this.selectedRefreshInterval.value);
+        this.refreshEnabled = true;
+      }
     });
   }
 
@@ -93,29 +93,36 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   startRefreshInterval(interval: number) {
-    // this.intervalExecution = setInterval(() => {
-    //   if (this.intervalShouldBeCanceled) {
-    //     clearTimeout(this.intervalExecution);
-    //   }
-    //   let now = new Date().getTime();
-    //   // this.findRequest.start = lastEnd - ((lastEnd - this.executionStart) % this.findRequest.intervalSize);
-    //   this.findRequest.end = now;
-    //   const timeSelection = this.performanceView.getTimeRangeSelection();
-    //   if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
-    //     let from = now - this.timeSelection.relativeSelection.timeInMs;
-    //     timeSelection.absoluteSelection = { from: from, to: now };
-    //   }
-    //   this.findRequest.numberOfBuckets = this.calculateIdealNumberOfBuckets(
-    //     this.findRequest.start,
-    //     this.findRequest.end
-    //   );
-    //   this.performanceView.updateAllCharts();
-    // this.timeSeriesService.getExecutionDetails(this.executionId).subscribe((details) => {
-    //   if (details.endTime) {
-    //     this.intervalShouldBeCanceled = true;
-    //   }
-    // });
-    // }, interval);
+    this.intervalExecution = setInterval(() => {
+      let now = new Date().getTime();
+      if (this.intervalShouldBeCanceled) {
+        clearTimeout(this.intervalExecution);
+        // the end time is updated already.
+      } else {
+        this.performanceViewSettings!.endTime =
+          now - (this.intervalShouldBeCanceled ? 0 : TimeSeriesConfig.RESOLUTION * 5); // if the execution is not ended, we don't fetch until the end.
+      }
+
+      // this.findRequest.start = lastEnd - ((lastEnd - this.executionStart) % this.findRequest.intervalSize);
+      //   this.findRequest.end = now;
+      const timeSelection = this.performanceView.getTimeRangeSelection();
+      if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
+        let from = now - timeSelection.relativeSelection.timeInMs;
+        timeSelection.absoluteSelection = { from: from, to: now };
+      }
+      //   this.findRequest.numberOfBuckets = this.calculateIdealNumberOfBuckets(
+      //     this.findRequest.start,
+      //     this.findRequest.end
+      //   );
+      this.performanceView.updateAllCharts();
+      this.executionService.getExecutionById(this.executionId).subscribe((details) => {
+        if (details.endTime) {
+          this.performanceViewSettings!.endTime = details.endTime;
+          this.intervalShouldBeCanceled = true;
+          this.executionInProgress = false;
+        }
+      });
+    }, interval);
   }
 
   ngOnDestroy(): void {

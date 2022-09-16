@@ -52,9 +52,13 @@ export class TimeseriesTableComponent implements OnInit {
       if (!this.findRequest) {
         return;
       }
-      this.fetchBuckets(this.findRequest, (keywords) => this.keywordsService.setKeywords(keywords, true));
+      this.fetchBuckets(true);
     });
-    this.fetchBuckets(this.findRequest, (keywords) => this.keywordsService.setKeywords(keywords));
+    this.fetchBuckets();
+  }
+
+  fetchBuckets(autoSelectAll = false) {
+    this.getBuckets(this.findRequest, (keywords) => this.keywordsService.setKeywords(keywords, autoSelectAll));
   }
 
   onKeywordToggle(keyword: string, event: any) {
@@ -65,7 +69,11 @@ export class TimeseriesTableComponent implements OnInit {
     // this.findRequest = request;
   }
 
-  private fetchBuckets(request: FindBucketsRequest, keywordsCallback: (series: string[]) => void) {
+  refresh() {
+    this.fetchBuckets();
+  }
+
+  private getBuckets(request: FindBucketsRequest, keywordsCallback: (series: string[]) => void) {
     let groupDimensions = this.executionContext.getGroupDimensions();
     this.timeSeriesService
       .fetchBuckets({

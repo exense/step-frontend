@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { AJS_MODULE } from '@exense/step-core';
+import { AJS_MODULE, DashboardService } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PerformanceViewSettings } from '../performance-view/performance-view-settings';
 import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
@@ -19,7 +19,7 @@ export class SyntheticMonitoringPageComponent implements OnInit {
 
   @ViewChild(TimeRangePicker) rangePicker!: TimeRangePicker;
   @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
-  @Input() taskId: string = window.location.href.split('taskId,')[1];
+  @Input() taskId: string = window.location.href.substring(window.location.href.lastIndexOf('/') + 1);
 
   performanceViewSettings: PerformanceViewSettings | undefined;
 
@@ -30,7 +30,7 @@ export class SyntheticMonitoringPageComponent implements OnInit {
     { label: 'Last Month', timeInMs: this.ONE_HOUR_MS * 24 * 31 },
   ];
 
-  constructor(private changeDetector: ChangeDetectorRef) {}
+  constructor(private changeDetector: ChangeDetectorRef, private dashboardService: DashboardService) {}
 
   ngOnInit(): void {
     if (!this.taskId) {
@@ -70,6 +70,10 @@ export class SyntheticMonitoringPageComponent implements OnInit {
     this.changeDetector.detectChanges();
     this.performanceViewSettings = this.getViewSettings(newInterval);
     this.changeDetector.detectChanges();
+  }
+
+  navigateToRtmDashboard() {
+    window.open(this.dashboardService.getRtmDashboardLink(this.taskId));
   }
 }
 getAngularJSGlobal()

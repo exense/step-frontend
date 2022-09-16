@@ -148,10 +148,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       throw new Error('Settings input is not specified!');
     }
     this.findRequest = this.prepareFindRequest(this.settings);
-    this.findRequest.numberOfBuckets = this.calculateIdealNumberOfBuckets(
-      this.settings.startTime,
-      this.settings.endTime
-    );
     this.initContext();
     this.keywordsService.onAllSelectionChanged().subscribe((selected) => {
       this.allSeriesChecked = selected;
@@ -211,10 +207,12 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   prepareFindRequest(settings: PerformanceViewSettings) {
+    const numberOfBuckets = this.calculateIdealNumberOfBuckets(settings.startTime, settings.endTime);
     return {
       start: settings.startTime,
       end: settings.endTime,
       intervalSize: 2500,
+      numberOfBuckets: numberOfBuckets,
       params: { ...settings.contextualFilters, [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_RESPONSE_TIME },
     };
   }
@@ -256,9 +254,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   updateAllCharts() {
+    this.findRequest = this.prepareFindRequest(this.settings);
     this.timeSelectionComponent.refreshRanger();
     this.createSummaryChart(this.findRequest, true);
-    // this.tableChart.init(this.findRequest);
+    this.tableChart?.refresh();
     this.createByStatusChart(this.findRequest);
     this.createByKeywordsCharts(this.findRequest);
     if (this.includeThreadGroupChart) {
