@@ -10,7 +10,7 @@
   }
 }
 
-.ts-table {
+:host .ts-table {
   ::ng-deep {
     .mat-row {
       height: 30px !important;

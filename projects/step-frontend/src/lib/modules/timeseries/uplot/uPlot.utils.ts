@@ -25,43 +25,52 @@ export class UPlotUtils {
    * This method find the closest point in the chart (left-right) that is not null.
    * If the hovered point is not null, it is returned.
    * @param self
-   * @param seriesIdx
-   * @param hoveredIdx
+   * @param seriesIndex
+   * @param hoveredIndex
    * @param cursorXVal
    */
-  static closestNotEmptyPointFunction = (self: uPlot, seriesIdx: number, hoveredIdx: number, cursorXVal: number) => {
+  static closestNotEmptyPointFunction = (
+    self: uPlot,
+    seriesIndex: number,
+    hoveredIndex: number,
+    cursorXVal: number
+  ) => {
     let xValues = self.data[0];
-    let seriesData = self.data[seriesIdx];
+    let seriesData = self.data[seriesIndex];
 
-    if (seriesData[hoveredIdx] == null) {
-      let nonNullLft = null;
-      let nonNullRgt = null;
-      let i = hoveredIdx;
+    if (seriesData[hoveredIndex] == null) {
+      let nonNullLeft = null;
+      let nonNullRight = null;
+      let i = hoveredIndex;
 
-      while (nonNullLft == null && i-- > 0) {
+      while (nonNullLeft == null && i-- > 0) {
         // find the closest point in the left
-        if (seriesData[i] != null) nonNullLft = i;
+        if (seriesData[i] != null) {
+          nonNullLeft = i;
+        }
       }
 
-      i = hoveredIdx;
-      while (nonNullRgt == null && i++ < seriesData.length) {
+      i = hoveredIndex;
+      while (nonNullRight == null && i++ < seriesData.length) {
         // find the closest point in the right
-        if (seriesData[i] != null) nonNullRgt = i;
+        if (seriesData[i] != null) {
+          nonNullRight = i;
+        }
       }
 
-      if (nonNullLft == null && nonNullRgt == null) {
-        return hoveredIdx;
+      if (nonNullLeft == null && nonNullRight == null) {
+        return hoveredIndex;
       }
 
-      let rgtVal = nonNullRgt == null ? Infinity : xValues[nonNullRgt];
-      let lftVal = nonNullLft == null ? -Infinity : xValues[nonNullLft];
+      let rightValue = nonNullRight == null ? Infinity : xValues[nonNullRight];
+      let leftValue = nonNullLeft == null ? -Infinity : xValues[nonNullLeft];
 
-      let lftDelta = cursorXVal - lftVal;
-      let rgtDelta = rgtVal - cursorXVal;
+      let leftDelta = cursorXVal - leftValue;
+      let rightDelta = rightValue - cursorXVal;
 
-      return lftDelta <= rgtDelta ? nonNullLft! : nonNullRgt!;
+      return leftDelta <= rightDelta ? nonNullLeft! : nonNullRight!;
     }
 
-    return hoveredIdx;
+    return hoveredIndex;
   };
 }
