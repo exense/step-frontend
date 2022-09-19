@@ -5,14 +5,14 @@
 :host {
   position: relative;
   display: block;
+
+  ::ng-deep .mat-form-field-infix {
+    width: auto !important;
+  }
 }
 
 table {
   width: 100%;
-}
-
-::ng-deep .mat-form-field-infix {
-  width: auto !important;
 }
 
 tr.mat-row:hover {
