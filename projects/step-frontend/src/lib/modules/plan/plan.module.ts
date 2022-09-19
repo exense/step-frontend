@@ -22,7 +22,7 @@ import { PlanLinkComponent } from './components/plan-link/plan-link.component';
 })
 export class PlanModule {
   constructor(_entityRegistry: EntityRegistry, _cellsRegister: CustomCellRegistryService) {
-    _entityRegistry.register('plans', 'Plan', 'file');
+    _entityRegistry.register('plans', 'Plan', 'file', '/partials/plans/planSelectionTable.html');
     _cellsRegister.registerCell('planEntityIcon', PlanIconComponent);
     _cellsRegister.registerCell('planLink', PlanLinkComponent);
   }
