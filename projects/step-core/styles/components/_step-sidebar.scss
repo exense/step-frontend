@@ -5,7 +5,7 @@
   $menu-color: rgba(255, 255, 255, 0.1),
   $selection-color: rgba(255, 255, 255, 0.1),
   $divider-color: rgba(255, 255, 255, 0.2),
-  $menu-secondary: #C9D1D9,
+  $menu-secondary: #c9d1d9,
   $menu-text: #ffffff,
   $width-open: 254px,
   $width-closed: 72px,
@@ -36,7 +36,7 @@
     elements-text-padding: $elements-text-padding,
     settings-divider-padding-right: $settings-divider-padding-right,
     aligned-text-margin-left: $aligned-text-margin-left,
-    logo-path: $logo-path
+    logo-path: $logo-path,
   );
 
   @return $config;
@@ -125,6 +125,11 @@
     #collapsable-sidebar-toggle-checkbox {
       display: none;
       cursor: pointer;
+    }
+
+    .sidebar-logo-container {
+      position: absolute;
+      left: 60px;
     }
 
     .sidebar-logo {
@@ -274,7 +279,7 @@
         position: relative; /* required for (f2) position:absolute */
         display: block;
         width: 100%;
-        padding: map.get($config, elements-text-padding);
+        padding: 14px;
 
         /* (C2) COSMETICS */
         color: map.get($config, menu-text);
@@ -295,7 +300,7 @@
         display: flex;
         align-items: center;
         height: 32px;
-        padding: 0 $elements-text-padding 0 $elements-text-padding;
+        padding: 0 14px 0 16px;
         cursor: pointer;
         color: map.get($config, menu-secondary);
       }
@@ -347,8 +352,9 @@
     $alignedTextMarginLeft: map.get($config, aligned-text-margin-left);
 
     .sidebar-aligned-text {
-      position: absolute;
-      left: $alignedTextMarginLeft;
+      // position: absolute;
+      // left: $alignedTextMarginLeft;
+      margin-left: 16px;
       font-size: 16px;
       line-height: 24px;
       font-weight: 400;
@@ -357,8 +363,9 @@
 
     .sidebar-aligned-subtext {
       max-width: 150px;
-      position: absolute;
-      left: calc($alignedTextMarginLeft + $elements-text-padding);
+      // position: absolute;
+      // left: calc($alignedTextMarginLeft + $elements-text-padding);
+      margin-left: 16px;
       font-size: 16px;
       line-height: 24px;
       font-weight: 300;
@@ -404,18 +411,20 @@
         width: map.get($config, width-closed);
         font-size: medium;
       }
+
+      .sidebar-collapsable-tab > label {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .sidebar-subtab {
+        padding: 0 12px;
+      }
     }
 
     #collapsable-sidebar-toggle-checkbox:checked ~ step-tenant-selection-downgraded {
       width: map.get($config, width-closed);
       visibility: hidden;
-    }
-
-    step-icon {
-      width: 20px;
-      height: 20px;
-      min-width: 20px;
-      min-height: 20px;
     }
   }
 }

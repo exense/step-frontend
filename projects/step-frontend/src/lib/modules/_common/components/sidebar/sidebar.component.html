@@ -1,4 +1,4 @@
-<input id="collapsable-sidebar-toggle-checkbox" type="checkbox"/>
+<input id="collapsable-sidebar-toggle-checkbox" type="checkbox" />
 <div class="sidebar">
   <div id="sidebar-logo-and-burgermenu">
     <span class="visible-when-collapsed">
@@ -6,13 +6,12 @@
         <step-icon name="menu"></step-icon>
       </label>
     </span>
-    <span class="sidebar-aligned-text">
+    <span class="sidebar-logo-container">
       <div class="sidebar-logo"></div>
     </span>
   </div>
   <div id="sidebar-home-and-settings">
-    <span class="visible-when-collapsed sidebar-home-button"
-          (click)="navigateTo('home')">
+    <span class="visible-when-collapsed sidebar-home-button" (click)="navigateTo('home')">
       <step-icon name="home"></step-icon>
     </span>
     <span class="sidebar-home-and-settings-divider">|</span>
@@ -81,7 +80,7 @@
       </div>
     </a>
     <span class="version" title="{{ '${project.version}' }}"
-    >{{ '${project.version}' }}
+      >{{ '${project.version}' }}
       <span style="display: none" id="frontend-os">{{ '${project.versionFEOS}' }}</span>
       <span style="display: none" id="frontend-ee">{{ '${project.versionFEEE}' }}</span>
       <span style="display: none" id="backend-os">{{ '${project.versionBEOS}' }}</span>

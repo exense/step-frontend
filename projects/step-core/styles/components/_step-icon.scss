@@ -1,0 +1,30 @@
+@mixin step-icon($size: 20px, $offset: 6px) {
+  step-icon,
+  step-ajs-icon {
+    display: inline-block;
+    width: $size;
+    height: $size;
+    min-width: $size;
+    min-height: $size;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vertical-align: middle;
+  }
+
+  .mat-menu-item > step-icon {
+    vertical-align: top;
+    margin: $offset $offset 0 0;
+  }
+
+  .mat-button > .mat-button-wrapper > step-icon {
+    vertical-align: text-bottom;
+  }
+
+  .mat-icon-button > .mat-button-wrapper > step-icon {
+    vertical-align: top;
+    margin-top: $offset;
+  }
+}
