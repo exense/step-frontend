@@ -47,9 +47,10 @@ export class EntityRegistry {
    * @param type
    * @param label
    * @param icon
+   * @param templateUrl
    */
-  register(type: string, label: string, icon: string): void {
-    return this.registerEntity(label, type, icon);
+  register(type: string, label: string, icon: string, templateUrl?: string): void {
+    return this.registerEntity(label, type, icon, undefined, undefined, undefined, undefined, templateUrl);
   }
 
   getEntities(): ReadonlyArray<EntityMeta> {

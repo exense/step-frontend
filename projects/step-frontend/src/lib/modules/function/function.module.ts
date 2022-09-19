@@ -20,7 +20,12 @@ import { FunctionLinkComponent } from './components/function-link/function-link.
 })
 export class FunctionModule {
   constructor(_entityRegistry: EntityRegistry, _cellsRegistry: CustomCellRegistryService) {
-    _entityRegistry.register('functions', 'Keyword', 'radio_button_checked');
+    _entityRegistry.register(
+      'functions',
+      'Keyword',
+      'radio_button_checked',
+      '/partials/functions/functionSelectionTable.html'
+    );
     _cellsRegistry.registerCell('functionEntityIcon', FunctionIconComponent);
     _cellsRegistry.registerCell('functionLink', FunctionLinkComponent);
     _cellsRegistry.registerCell('functionPackageLink', FunctionPackageLinkComponent);
