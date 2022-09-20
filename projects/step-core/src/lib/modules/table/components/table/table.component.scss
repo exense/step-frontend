@@ -6,45 +6,50 @@
   position: relative;
   display: block;
 
+  table {
+    width: 100%;
+    border-spacing: 10px 0 !important;
+  }
+
   ::ng-deep .mat-form-field-infix {
     width: auto !important;
   }
-}
 
-table {
-  width: 100%;
-}
-
-tr.mat-row:hover {
-  background: var(--darken-background-10);
-}
-
-.spinner-container {
-  position: absolute;
-  z-index: 1;
-  width: 100px;
-  height: 100px;
-  left: calc(50% - 50px);
-  top: calc(50% - 50px);
-}
-
-.additional-header {
-  padding: 0 24px;
-}
-
-.no-data {
-  text-align: center;
-}
-
-mat-paginator {
-  border-radius: 0 0 16px 16px;
-}
-
-:host tr {
-  ::ng-deep step-btn-group {
-    opacity: 0.5;
+  ::ng-deep tr > td.mat-cell:not(.mat-column-bulkSelection):not(.mat-column-actions) {
+    padding: 0 8px;
   }
-  &:hover ::ng-deep step-btn-group {
-    opacity: 1;
+
+  tr.mat-row:hover {
+    background: var(--darken-background-10);
+  }
+
+  .spinner-container {
+    position: absolute;
+    z-index: 1;
+    width: 100px;
+    height: 100px;
+    left: calc(50% - 50px);
+    top: calc(50% - 50px);
+  }
+
+  .additional-header {
+    padding: 0 24px;
+  }
+
+  .no-data {
+    text-align: center;
+  }
+
+  mat-paginator {
+    border-radius: 0 0 16px 16px;
+  }
+
+  :host tr {
+    ::ng-deep step-btn-group {
+      opacity: 0.5;
+    }
+    &:hover ::ng-deep step-btn-group {
+      opacity: 1;
+    }
   }
 }
