@@ -17,10 +17,10 @@
 
     .step-login-logo {
       margin: 0 auto 30px;
-      width: 130px;
+      width: 120px;
 
       img {
-        max-width: 130px;
+        max-width: 120px;
         margin: 0 auto;
       }
     }
@@ -64,7 +64,7 @@
 
       input:focus {
         outline: none !important;
-        border-color: #0081caff !important;
+        border-color: #0081caff;
         border-width: thin;
       }
     }
