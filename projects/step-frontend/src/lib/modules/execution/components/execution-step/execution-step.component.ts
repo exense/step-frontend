@@ -78,7 +78,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     const cExecution = changes['execution'];
-    if (!this.parameters.length || cExecution?.currentValue !== cExecution?.previousValue) {
+    if (!this.parameters?.length || cExecution?.currentValue !== cExecution?.previousValue) {
       this.parameters = cExecution?.currentValue?.parameters;
     }
 

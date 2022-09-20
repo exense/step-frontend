@@ -225,7 +225,7 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
 
   onSearch(column: string, searchValue: SearchValue): void;
   onSearch(column: string, value: string, regex?: boolean): void;
-  onSearch(column: string, searchValue: string | SearchValue, regex?: boolean): void {
+  onSearch(column: string, searchValue: string | SearchValue, regex: boolean = true): void {
     const search = { ...this.search$.value };
     if (typeof searchValue === 'string') {
       search[column] = regex ? { value: searchValue, regex } : searchValue;
