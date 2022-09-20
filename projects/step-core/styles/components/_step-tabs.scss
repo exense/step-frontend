@@ -1,3 +1,10 @@
+@mixin tabbar-icon {
+  width: 16px;
+  height: 16px;
+  margin-left: 11px;
+  cursor: pointer;
+}
+
 @mixin tabbar($primary-tabs-color) {
   step-tabs {
     &.tab-mode-buttons {
@@ -51,9 +58,16 @@
         text-decoration: none;
       }
 
+      step-icon {
+        @include tabbar-icon();
+      }
+
       .mat-primary {
         .mat-tab-link.mat-tab-label-active {
           color: $primary-tabs-color;
+          step-icon {
+            color: $primary-tabs-color;
+          }
         }
       }
     }
@@ -64,17 +78,18 @@
   }
 
   .step-legacy-tabs {
-    // temporary solution.
-    // these class and it's color configuration should be a part of custom material theme
-
     .mat-tab-links {
       margin-left: 16px;
     }
 
+    step-ajs-icon {
+      @include tabbar-icon;
+    }
+
     &.mat-primary {
       .mat-tab-link.mat-tab-label-active {
-        span,
-        .mat-icon-close {
+        color: $primary-tabs-color;
+        step-ajs-icon {
           color: $primary-tabs-color;
         }
       }
@@ -88,14 +103,6 @@
 
     execution-result {
       margin-right: 11px;
-    }
-
-    .mat-icon.mat-icon-close {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
-      margin-left: 11px;
-      cursor: pointer;
     }
   }
 }

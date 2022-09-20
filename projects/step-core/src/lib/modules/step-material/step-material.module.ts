@@ -7,7 +7,6 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatGridListModule } from '@angular/material/grid-list';
-import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
@@ -32,9 +31,10 @@ import { BtnGroupComponent } from './components/btn-group/btn-group.component';
 import { MatLuxonDateModule } from '@angular/material-luxon-adapter';
 import { MatCardModule } from '@angular/material/card';
 import { ThemeComponent } from './components/theme/theme.component';
+import { StepIconsModule } from '../step-icons/step-icons.module';
 
 @NgModule({
-  imports: [CommonModule],
+  imports: [CommonModule, StepIconsModule],
   declarations: [BtnGroupComponent, ThemeComponent],
   exports: [
     MatCheckboxModule,
@@ -45,7 +45,6 @@ import { ThemeComponent } from './components/theme/theme.component';
     MatDividerModule,
     MatExpansionModule,
     MatGridListModule,
-    MatIconModule,
     MatInputModule,
     MatListModule,
     MatMenuModule,
@@ -69,6 +68,7 @@ import { ThemeComponent } from './components/theme/theme.component';
     BtnGroupComponent,
     MatCardModule,
     ThemeComponent,
+    StepIconsModule
   ],
 })
 export class StepMaterialModule {}

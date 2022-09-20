@@ -1,0 +1,97 @@
+:host {
+  height: 100%;
+}
+
+.dashboard-container {
+  max-width: 100%;
+  //max-width: 100%;
+  display: flex;
+  height: 100%;
+  background-color: #f5f5f7;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+
+  .container {
+    //width: 50%;
+    //flex-grow: 1;
+    background: #ffffff;
+    margin: 8px;
+    border-radius: 4px;
+    box-shadow: 1px 1px 9px #cdcdcd;
+  }
+
+  .chart {
+    height: 360px;
+    width: calc(50% - 24px);
+    position: relative;
+  }
+}
+
+.pie-chart-container {
+  width: 300px;
+}
+
+.chart-footer-actions {
+  margin-left: 20px;
+
+  span {
+    margin-right: 20px;
+  }
+}
+
+.checkbox {
+  margin-right: 8px;
+}
+.display-none {
+  display: none;
+}
+
+.color-cell {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+
+  .color-square {
+    display: inline-block;
+    width: 24px;
+    height: 10px;
+    margin-right: 10px;
+  }
+}
+
+.page-container {
+  display: flex;
+  flex-direction: row;
+  padding-top: 20px;
+
+  .view-content {
+    flex-grow: 1;
+    max-width: 100%;
+  }
+
+  .side-panel {
+    width: 160px;
+    box-shadow: -3px 0px 10px #bdbdbd;
+    height: calc(100% - 110px);
+    padding: 12px;
+    background: white;
+    //position: fixed;
+    right: 37px;
+  }
+}
+
+.charts-section {
+  width: 100%;
+  max-width: 100%;
+  //max-width: 100%;
+  display: flex;
+  background-color: #f5f5f7;
+  flex-wrap: wrap;
+
+  .measurements-toggle {
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    z-index: 10;
+  }
+}

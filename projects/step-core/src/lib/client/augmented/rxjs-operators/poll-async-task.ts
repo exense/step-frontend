@@ -5,7 +5,7 @@ import { AsyncTaskStatus } from '../shared/async-task-status';
 
 export const pollAsyncTask = (
   asyncService: AsyncTasksService,
-  progressHandler?: (value: number) => void,
+  progressHandler?: (value: number) => void
 ): ((src: Observable<AsyncTaskStatus>) => Observable<AsyncTaskStatus>) => {
   return (src) =>
     src.pipe(

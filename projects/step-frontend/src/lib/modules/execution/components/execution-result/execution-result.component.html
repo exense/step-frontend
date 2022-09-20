@@ -1,5 +1,4 @@
 <span [matTooltip]="displayResult" [class]="statusClass">
-  <mat-icon [class.spin-animation]="icon === 'autorenew'">
-    {{ icon }}
-  </mat-icon>
+  <step-icon [name]="icon" [class.spin-animation]="icon === 'refresh-cw'">
+  </step-icon>
 </span>

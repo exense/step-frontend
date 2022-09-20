@@ -126,6 +126,7 @@ export * from './client/step-client-module';
 export * from './modules/custom-registeries/custom-registries.module';
 export * from './modules/async-operations/async-operations.module';
 export * from './modules/tabs/tabs.module';
+export * from './modules/step-icons/step-icons.module';
 
 export { ApiError } from './client/generated/core/ApiError';
 export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';

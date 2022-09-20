@@ -1,0 +1,35 @@
+<button mat-raised-button [matMenuTriggerFor]="menu">
+  <!--  Measurements {{ activeKeywords ? '(' + activeKeywords + ')' : '' }}-->
+  <mat-icon matTooltip="Measurements">bar_chart</mat-icon>
+</button>
+<mat-menu #menu="matMenu" class="time-selector-menu">
+  <div (click)="$event.stopPropagation()">
+    <div>
+      <input [(ngModel)]="keywordSearchValue" placeholder="Search" style="width: 110px; margin-bottom: 12px" />
+    </div>
+    <div>
+      <input
+        type="checkbox"
+        class="checkbox"
+        [(ngModel)]="allSeriesChecked"
+        (change)="onAllSeriesCheckboxClick($event)"
+        style="display: inline"
+      />
+      <span>All keywords</span>
+    </div>
+    <ng-container *ngFor="let item of keywords | keyvalue: valueAscOrder">
+      <ng-container *ngIf="!keywordSearchValue || item.key.toLowerCase().indexOf(keywordSearchValue) >= 0">
+        <div class="color-cell" *ngIf="item.value.isVisible">
+          <input
+            type="checkbox"
+            [ngModel]="item.value.isSelected"
+            class="checkbox"
+            (change)="onKeywordToggle(item.key, $event)"
+          />
+          <span class="color-square" [style.background-color]="item.value.color"></span>
+          <span>{{ item.key }}</span>
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+</mat-menu>

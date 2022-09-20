@@ -1,13 +1,11 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 
 $sidebar-config: core.step-define-sidebar-config(
-  $logo-path: '/images/logotopleft.png'
+  $logo-path: '/images/logotopleft.png',
 );
 
 .default-theme {
-  @include core.step-theme(
-    $step-sidebar-config: $sidebar-config,
-  );
+  @include core.step-theme($step-sidebar-config: $sidebar-config);
 }
 
 /*
@@ -68,7 +66,7 @@ $sidebar-config: core.step-define-sidebar-config(
   $home-and-settings-height: 64px,
   $help-and-support-height: 56px,
   $elements-padding: 12px,
-  $elements-text-padding: 15px,
+  $elements-text-padding: 14px,
   $settings-divider-padding-right: 45px,
   $aligned-text-margin-left: 60px,
   $logo-path: '/images/logotopleft.png'

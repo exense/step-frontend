@@ -8,7 +8,7 @@
       [matTooltip]="operation | bulkOperationLabel"
       [disabled]="isOperationsDisabled$ | async"
     >
-      <mat-icon>{{ operation | bulkOperationIcon }}</mat-icon>
+      <step-icon [name]="operation | bulkOperationIcon"></step-icon>
     </button>
   </ng-container>
 </div>
