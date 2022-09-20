@@ -1,2 +1,9 @@
 @use 'components/theme-config';
 @forward 'components/theme-config';
+
+@mixin table-space-between-columns {
+  mat-form-field {
+    width: 100%;
+    padding-right: 10px;
+  }
+}

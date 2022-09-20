@@ -95,12 +95,8 @@ export class FunctionListComponent {
     this._functionDialogs.openLookUpFunctionDialog(id, name).subscribe(noop);
   }
 
-  configureFunction(id: string) {
+  configureFunction(id: string): void {
     this._functionDialogs.configureFunction(id).subscribe((_) => this.dataSource.reload());
-  }
-
-  functionTypeLabel(type: string) {
-    return this._functionTypeRegistry.getLabel(type);
   }
 }
 

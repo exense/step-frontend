@@ -1,0 +1,165 @@
+@use 'sass:map';
+
+@function step-define-login-config(
+  $palette: null,
+  $login-secondary-text-color: gray,
+  $login-button-text-color: white,
+  $login-bg-path: '/images/log-in-mountains-background.jpg'
+) {
+  $config: (
+    login-button-bg-color: map.get($palette, 500),
+    login-secondary-text-color: $login-secondary-text-color,
+    login-button-text-color: $login-button-text-color,
+    login-input-field-border-color: map.get($palette, 500),
+    login-link-text-color: map.get($palette, 600),
+    login-bg-path: $login-bg-path,
+  );
+
+  @return $config;
+}
+
+@mixin login-page($config: null, $palette) {
+  @if not $config {
+    $config: step-define-login-config($palette);
+  }
+
+  step-login {
+    width: 100%;
+    display: flex;
+
+    .step-login-flex-child {
+      flex: 1;
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: center;
+      flex-direction: row;
+      align-items: center;
+
+      .step-login-content {
+        width: 360px;
+        margin-top: -20vh;
+
+        .step-login-logo {
+          margin: 0 auto 30px;
+          width: 120px;
+
+          img {
+            max-width: 120px;
+            margin: 0 auto;
+          }
+        }
+
+        .step-login-heading-text {
+          text-align: center;
+          font-size: 28px;
+          font-weight: 600;
+          line-height: 32px;
+        }
+
+        .step-login-heading-text-additional-margin {
+          margin-bottom: 40px;
+        }
+
+        .step-login-description-text {
+          text-align: center;
+          font-size: 16px;
+          line-height: 24px;
+          color: map.get($config, login-secondary-text-color);
+          margin-bottom: 30px;
+        }
+
+        .step-login-input-wrapper {
+          margin-top: 25px;
+
+          .step-login-input-label {
+            font-weight: 500;
+          }
+
+          input {
+            width: 100%;
+            border-style: solid;
+            border-color: map.get($config, login-secondary-text-color);
+            border-width: thin;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 400;
+            padding: 12px;
+          }
+
+          input:focus {
+            outline: none !important;
+            border-color: map.get($config, login-input-field-border-color);
+            border-width: thin;
+          }
+        }
+
+        .step-login-forgot-password-text {
+          font-weight: 500;
+          margin-top: 30px;
+          margin-bottom: -10px;
+          color: map.get($config, login-link-text-color);
+        }
+
+        .step-login-button {
+          margin-top: 40px;
+          height: 44px;
+          color: map.get($config, login-button-text-color);
+          border-radius: 8px;
+          background-color: map.get($config, login-button-bg-color);
+          width: 100%;
+          font-weight: 400;
+          font-size: 16px;
+        }
+
+        .step-login-signup-text {
+          margin-top: 30px;
+          font-size: 14px;
+          font-weight: 400;
+          text-align: center;
+
+          span {
+            font-weight: 500;
+            color: map.get($config, login-link-text-color);
+          }
+        }
+      }
+    }
+
+    .step-mountain-background {
+      $bg-path: map.get($config, login-bg-path);
+      background: url($bg-path) no-repeat no-repeat;
+      background-position: right;
+    }
+
+    .capslock-warning {
+      margin-top: 8px;
+      display: flex;
+      position: absolute;
+
+      mat-icon {
+        font-size: 16px;
+        height: 16px;
+        width: 16px;
+        margin-right: 4px;
+      }
+      span {
+        margin: 2px 0 0 5px;
+      }
+    }
+
+    .step-login-version {
+      position: fixed;
+      bottom: 32px;
+      left: 32px;
+      color: map.get($config, login-secondary-text-color);
+    }
+  }
+
+  @media (max-width: 800px) {
+    step-login {
+      .step-mountain-background {
+        display: none;
+      }
+    }
+  }
+}
