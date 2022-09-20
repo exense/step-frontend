@@ -14,6 +14,6 @@ import { SchedulerTaskLinkComponent } from '../scheduler/components/scheduler-ta
 })
 export class AdminModule {
   constructor(_entityRegistry: EntityRegistry, _cellRegistry: CustomCellRegistryService) {
-    _entityRegistry.register('users', 'User', 'person', '/partials/users/userSelectionTable.html');
+    _entityRegistry.register('users', 'User', 'user', '/partials/users/userSelectionTable.html');
   }
 }
