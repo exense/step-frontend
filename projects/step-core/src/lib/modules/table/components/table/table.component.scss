@@ -44,7 +44,7 @@
     border-radius: 0 0 16px 16px;
   }
 
-  :host tr {
+  tr {
     ::ng-deep step-btn-group {
       opacity: 0.5;
     }
