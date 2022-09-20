@@ -77,6 +77,11 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   }
 
   public navigateTo(viewId: string): void {
+    if (viewId.startsWith(ViewRegistryService.VIEW_ID_LINK_PREFIX)) {
+      const link = viewId.split('link:')[1];
+      window.open(link, '_blank');
+      return;
+    }
     switch (viewId) {
       case 'home':
         this._authService.gotoDefaultPage();

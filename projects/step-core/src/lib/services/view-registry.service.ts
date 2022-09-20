@@ -29,6 +29,8 @@ export interface Dashlet {
   providedIn: 'root',
 })
 export class ViewRegistryService {
+  static readonly VIEW_ID_LINK_PREFIX: string = 'link:';
+
   registeredViews: { [key: string]: CustomView } = {};
   registeredMenuEntries: MenuEntry[] = [];
   registeredMenuIds: string[] = [];
@@ -46,6 +48,7 @@ export class ViewRegistryService {
     this.registerMenuEntry('Automation', 'automation-root', 'play', 10);
     this.registerMenuEntry('Execute', 'execute-root', 'sun', 20);
     this.registerMenuEntry('Status', 'status-root', 'check-square', 50);
+    this.registerMenuEntry('Support', 'support-root', 'phone', 100);
 
     // Sub Menus Automation
     this.registerMenuEntry('Keywords', 'functions', 'target', 10, 'automation-root');
@@ -59,6 +62,28 @@ export class ViewRegistryService {
     this.registerMenuEntry('Agent tokens', 'gridtokens', 'circle', 30, 'status-root');
     this.registerMenuEntry('Token Groups', 'gridtokengroups', 'tag', 40, 'status-root');
     this.registerMenuEntry('Quota Manager', 'gridquotamanager', 'sidebar', 50, 'status-root');
+    // Sub Menus Support
+    this.registerMenuEntry(
+      'Documentation',
+      ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('https://step.exense.ch/knowledgebase/'),
+      'help-circle',
+      20,
+      'support-root'
+    );
+    this.registerMenuEntry(
+      'REST API',
+      ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('/doc/rest/'),
+      'hexagon',
+      20,
+      'support-root'
+    );
+    this.registerMenuEntry(
+      'About',
+      ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('https://step.exense.ch/'),
+      'book-open',
+      20,
+      'support-root'
+    );
   }
 
   getCustomView(view: string): CustomView {
