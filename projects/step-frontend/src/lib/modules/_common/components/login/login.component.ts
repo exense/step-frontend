@@ -17,6 +17,8 @@ export class LoginComponent {
 
   @Input() logo: string = 'images/logologin.png';
 
+  readonly loginDescriptionText: string = '';
+
   constructor(private _auth: AuthService) {}
 
   ngOnInit() {
