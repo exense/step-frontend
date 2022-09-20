@@ -1,0 +1,430 @@
+@use 'sass:map';
+
+@function step-define-sidebar-config(
+  $background-color: #293e50,
+  $menu-color: rgba(255, 255, 255, 0.1),
+  $selection-color: rgba(255, 255, 255, 0.1),
+  $divider-color: rgba(255, 255, 255, 0.2),
+  $menu-secondary: #c9d1d9,
+  $menu-text: #ffffff,
+  $width-open: 254px,
+  $width-closed: 72px,
+  $openclose-transition: 0.2s,
+  $logo-and-burgermenu-height: 48px,
+  $home-and-settings-height: 64px,
+  $help-and-support-height: 56px,
+  $elements-padding: 12px,
+  $elements-text-padding: 14px,
+  $settings-divider-padding-right: 45px,
+  $aligned-text-margin-left: 60px,
+  $logo-path: '/images/logotopleft.png'
+) {
+  $config: (
+    background-color: $background-color,
+    menu-color: $menu-color,
+    selection-color: $selection-color,
+    divider-color: $divider-color,
+    menu-secondary: $menu-secondary,
+    menu-text: $menu-text,
+    width-open: $width-open,
+    width-closed: $width-closed,
+    openclose-transition: $openclose-transition,
+    logo-and-burgermenu-height: $logo-and-burgermenu-height,
+    home-and-settings-height: $home-and-settings-height,
+    help-and-support-height: $help-and-support-height,
+    elements-padding: $elements-padding,
+    elements-text-padding: $elements-text-padding,
+    settings-divider-padding-right: $settings-divider-padding-right,
+    aligned-text-margin-left: $aligned-text-margin-left,
+    logo-path: $logo-path,
+  );
+
+  @return $config;
+}
+
+@mixin sidebar($config: null) {
+  @if not $config {
+    $config: step-define-sidebar-config();
+  }
+
+  $elements-text-padding: map.get($config, elements-text-padding);
+
+  #main {
+    transition: margin-left map.get($config, openclose-transition);
+    margin-left: map.get($config, width-open);
+  }
+
+  #main.main-when-sidebar-closed {
+    margin-left: map.get($config, width-closed);
+  }
+
+  step-tenant-selection-downgraded {
+    display: block;
+    position: fixed;
+    top: 70px;
+    left: 56px;
+    z-index: 2;
+    max-width: 130px;
+  }
+  .tenant-selector-when-sidebar-closed {
+    display: none;
+  }
+
+  step-sidebar {
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      height: 100%;
+      width: 0;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      background-color: map.get($config, background-color);
+      overflow-x: hidden;
+      transition: map.get($config, openclose-transition);
+      color: map.get($config, menu-text);
+
+      -ms-overflow-style: none; /* No Scrollbar: IE and Edge */
+      scrollbar-width: none; /* No Scrollbar: Firefox */
+
+      > div {
+        padding: 0 $elements-text-padding 0 $elements-text-padding;
+
+        display: flex;
+        align-items: center;
+      }
+
+      a {
+        color: map.get($config, menu-text);
+      }
+
+      a:link {
+        text-decoration: none;
+      }
+
+      a:visited {
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: none;
+      }
+
+      a:active {
+        text-decoration: none;
+      }
+    }
+
+    .sidebar::-webkit-scrollbar {
+      display: none;
+    }
+
+    #collapsable-sidebar-toggle-checkbox {
+      display: none;
+      cursor: pointer;
+    }
+
+    .sidebar-logo-container {
+      position: absolute;
+      left: 60px;
+    }
+
+    .sidebar-logo {
+      $logo-path: map.get($config, logo-path);
+      width: 100%;
+      height: 30px;
+      margin-left: -12px;
+      transform: scale(0.8);
+      background: url($logo-path) no-repeat no-repeat;
+      background-size: contain;
+    }
+
+    #sidebar-collapsed-settings-icon {
+      visibility: hidden;
+    }
+
+    #sidebar-logo-and-burgermenu {
+      position: fixed;
+      z-index: 100;
+      background-color: map.get($config, background-color);
+      width: map.get($config, width-open);
+      height: map.get($config, logo-and-burgermenu-height);
+      transition: map.get($config, openclose-transition);
+
+      > span {
+        width: 180px;
+        padding: map.get($config, elements-text-padding);
+      }
+
+      label {
+        cursor: pointer;
+      }
+    }
+
+    #sidebar-home-and-settings {
+      position: fixed;
+      z-index: 100;
+      background-color: map.get($config, background-color);
+      width: map.get($config, width-open);
+      margin-top: map.get($config, logo-and-burgermenu-height);
+      height: map.get($config, home-and-settings-height);
+      border-top: 1px solid map.get($config, divider-color);
+      border-bottom: 1px solid map.get($config, divider-color);
+      transition: map.get($config, openclose-transition);
+
+      > span {
+        position: absolute;
+        padding: map.get($config, elements-text-padding);
+      }
+
+      > div {
+        padding: map.get($config, elements-text-padding);
+      }
+
+      > .sidebar-home-and-settings-divider {
+        right: map.get($config, settings-divider-padding-right);
+        color: map.get($config, divider-color);
+      }
+
+      > .sidebar-home-and-settings-icon {
+        right: map.get($config, elements-text-padding);
+        margin-right: -10px;
+        padding-top: 18px;
+        font-size: medium;
+        cursor: pointer;
+      }
+    }
+
+    .sidebar-home-button {
+      cursor: pointer;
+    }
+
+    .sidebar-home-and-settings-icon-collapsed {
+      cursor: pointer;
+    }
+
+    #sidebar-categories {
+      $logoHeight: map.get($config, logo-and-burgermenu-height);
+      $homeSettingHeight: map.get($config, home-and-settings-height);
+
+      display: block;
+      flex-grow: 1;
+      padding-top: 16px;
+      margin-top: calc($logoHeight + $homeSettingHeight);
+
+      .sidebar-categories-categories {
+        height: 58px;
+        font-size: smaller;
+        padding: 0 $elements-text-padding 0 $elements-text-padding;
+        display: flex;
+        align-items: center;
+      }
+    }
+
+    div#sidebar-categories-tabs {
+      $helpSupportHeight: map.get($config, help-and-support-height);
+      margin-bottom: calc($helpSupportHeight + 10px);
+
+      .sidebar-collapsable-tab:first-child label {
+        border-radius: 8px 8px 0 0;
+      }
+    }
+
+    #sidebar-cost-and-upgrade > div {
+      padding: map.get($config, elements-text-padding);
+    }
+
+    #sidebar-help-and-support {
+      position: fixed;
+      z-index: 100;
+      background-color: map.get($config, background-color);
+      width: map.get($config, width-open);
+      bottom: 0px;
+      height: map.get($config, help-and-support-height);
+      font-size: small;
+      flex-direction: column;
+      justify-content: center;
+      border-top: 1px solid map.get($config, divider-color);
+      transition: map.get($config, openclose-transition);
+
+      .help-and-support-span {
+        padding: 0 0 0 8px;
+      }
+
+      > div {
+        padding: map.get($config, elements-text-padding);
+      }
+    }
+
+    /* (A) TABS CONTAINER */
+    .sidebar-collapsable-tab,
+    .sidebar-collapsable-tab * {
+      box-sizing: border-box;
+    }
+
+    .sidebar-collapsable-tab {
+      font-weight: bold;
+      margin-top: 1px;
+      max-width: 600px;
+
+      input {
+        display: none;
+      }
+
+      label {
+        /* (C1) DIMENSIONS */
+        position: relative; /* required for (f2) position:absolute */
+        display: block;
+        width: 100%;
+        padding: 14px;
+
+        /* (C2) COSMETICS */
+        color: map.get($config, menu-text);
+        background: map.get($config, menu-color);
+        cursor: pointer;
+      }
+
+      .content {
+        background: map.get($config, menu-color);
+        overflow: hidden;
+        transition: max-height;
+        max-height: 0;
+        font-weight: normal;
+        align-items: center;
+      }
+
+      .sidebar-subtab {
+        display: flex;
+        align-items: center;
+        height: 32px;
+        padding: 0 14px 0 16px;
+        cursor: pointer;
+        color: map.get($config, menu-secondary);
+      }
+
+      input:checked ~ .content {
+        max-height: 100vh;
+      }
+
+      input:not(:checked) ~ .content {
+        visibility: hidden;
+      }
+
+      .chevron {
+        position: absolute;
+        right: 8px;
+      }
+
+      input:checked ~ label .chevron {
+        transform: rotate(-90deg);
+      }
+
+      input:not(:checked) ~ label .chevron {
+        transform: rotate(90deg);
+      }
+    }
+
+    .sidebar-highlighted-subtab {
+      background-color: map.get($config, selection-color);
+      color: map.get($config, menu-text) !important;
+    }
+
+    .sidebar-subtab:hover {
+      background: map.get($config, selection-color);
+    }
+
+    #sidebar-categories-tabs > div:last-child {
+      border-radius: 0 0 8px 8px;
+      overflow: hidden;
+    }
+
+    span.sidebar-version {
+      padding-left: 25px;
+    }
+
+    .only-visible-when-collapsed {
+      display: none;
+    }
+
+    $alignedTextMarginLeft: map.get($config, aligned-text-margin-left);
+
+    .sidebar-aligned-text {
+      // position: absolute;
+      // left: $alignedTextMarginLeft;
+      margin-left: 16px;
+      font-size: 16px;
+      line-height: 24px;
+      font-weight: 400;
+      white-space: nowrap;
+    }
+
+    .sidebar-aligned-subtext {
+      max-width: 150px;
+      // position: absolute;
+      // left: calc($alignedTextMarginLeft + $elements-text-padding);
+      margin-left: 16px;
+      font-size: 16px;
+      line-height: 24px;
+      font-weight: 300;
+      white-space: nowrap;
+    }
+
+    .version {
+      max-height: 16px;
+      overflow: hidden;
+    }
+
+    #collapsable-sidebar-toggle-checkbox:not(:checked) ~ .sidebar {
+      width: map.get($config, width-open);
+    }
+
+    #collapsable-sidebar-toggle-checkbox:checked ~ .sidebar {
+      // collapsed sidebar
+      width: map.get($config, width-closed);
+
+      span:not(.visible-when-collapsed) {
+        display: none;
+      }
+
+      label::after {
+        display: none;
+      }
+
+      span.only-visible-when-collapsed {
+        display: block;
+        visibility: visible;
+        font-size: large;
+      }
+
+      #sidebar-logo-and-burgermenu {
+        width: map.get($config, width-closed);
+      }
+
+      #sidebar-home-and-settings {
+        width: map.get($config, width-closed);
+      }
+
+      #sidebar-help-and-support {
+        width: map.get($config, width-closed);
+        font-size: medium;
+      }
+
+      .sidebar-collapsable-tab > label {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .sidebar-subtab {
+        padding: 0 12px;
+      }
+    }
+
+    #collapsable-sidebar-toggle-checkbox:checked ~ step-tenant-selection-downgraded {
+      width: map.get($config, width-closed);
+      visibility: hidden;
+    }
+  }
+}

@@ -312,61 +312,38 @@ tecAdminControllers.directive('executionProgress', [
           return ($scope.$stateExec = tabid);
         };
 
-/*
-        var panels = {
-          testCases: { label: 'Test cases', show: false, enabled: false },
-          steps: { label: 'Keyword calls', show: true, enabled: true },
-          throughput: { label: 'Keyword throughput', show: true, enabled: true },
-          threadGroups: { label: 'ThreadGroup Usage', show: true, enabled: true },
-          performance: { label: 'Performance', show: true, enabled: true },
-          reportTree: { label: 'Execution tree', show: true, enabled: true },
-          executionDetails: { label: 'Execution details', show: true, enabled: true },
-          parameters: { label: 'Execution parameters', show: false, enabled: true },
-          currentOperations: { label: 'Current operations', show: true, enabled: true },
-        };
-
-        $scope.customPanels = ViewRegistry.getDashlets('execution');
-        _.each($scope.customPanels, function (panel) {
-          panels[panel.id] = { label: panel.label, show: true, enabled: true };
-        });
-*/
-
         $scope.panels = executionsPanelsService.panels;
         $scope.customPanels = executionsPanelsService.customPanels;
 
         $scope.scrollTo = function (viewId) {
-          executionsPanelsService.setShowPanel(viewId, true);
+          executionsPanelsService.setShowPanel(viewId, true, eId);
           $location.hash($scope.getPanelId(viewId));
           $anchorScroll();
         };
 
         $scope.isShowPanel = function (viewId) {
-          return executionsPanelsService.isShowPanel(viewId);
+          return executionsPanelsService.isShowPanel(viewId, eId);
         };
         $scope.setShowPanel = function (viewId, show) {
-          executionsPanelsService.setShowPanel(viewId, show);
+          executionsPanelsService.setShowPanel(viewId, show, eId);
         };
         $scope.isPanelEnabled = function (viewId) {
-          return executionsPanelsService.isPanelEnabled(viewId);
+          return executionsPanelsService.isPanelEnabled(viewId, eId);
         };
         $scope.toggleShowPanel = function (viewId) {
-          executionsPanelsService.toggleShowPanel(viewId);
+          executionsPanelsService.toggleShowPanel(viewId, eId);
         };
         $scope.enablePanel = function (viewId, enabled) {
-          executionsPanelsService.enablePanel(viewId, enabled);
+          executionsPanelsService.enablePanel(viewId, enabled, eId);
         };
         $scope.getPanelId = function (viewId) {
           return eId + viewId;
         };
         $scope.getPanelTitle = function (viewId) {
-          return executionsPanelsService.getPanelTitle(viewId);
+          return executionsPanelsService.getPanelTitle(viewId, eId);
         };
 
-        $scope.testCaseTable = {};
         $scope.drillDownTestcase = function (id) {
-          $scope.testCaseTable.deselectAll(false);
-          $scope.testCaseTable.select(id);
-
           testCasesSelection.clear();
           testCasesSelection.selectById(id);
 
@@ -391,18 +368,6 @@ tecAdminControllers.directive('executionProgress', [
           }
         };
 
-/*
-        $scope.testCaseTableOnSelectionChange = function () {
-          $scope.refresh();
-        };
-
-        testCasesSelection.selected$.subscribe(() => {
-          if ($scope.refresh) {
-            $scope.refresh();
-          }
-        });
-*/
-
         $scope.operationOptions = { showAll: false };
 
         $scope.executionViewServices = {
@@ -418,14 +383,11 @@ tecAdminControllers.directive('executionProgress', [
             $http.get('/rest/controller/reportnode/' + nodeId + '/path').then(function (response) {
               var path = response.data;
               _.each(path, function (node) {
-                if (node.resolvedArtefact && node.resolvedArtefact._class == 'TestCase') {
-                  $scope.testCaseTable.deselectAll(false);
-                  $scope.testCaseTable.select(node.resolvedArtefact.id);
-
+                if (node.resolvedArtefact && node.resolvedArtefact._class === 'TestCase') {
                   testCasesSelection.clear();
                   testCasesSelection.selectById(node.resolvedArtefact.id);
-
                   $scope.enablePanel('testCases', true);
+                  $scope.setShowPanel('testCases', true);
                 }
               });
               $scope.$stateExec = 'steps';
@@ -436,32 +398,6 @@ tecAdminControllers.directive('executionProgress', [
             return $scope.execution;
           },
         };
-
-/*
-        $scope.stepsTable = reportTableFactory.get(
-          function () {
-            var filter = { eid: eId };
-            // if not all items are selected
-            if (testCasesSelection.length !== $scope.testCases.length) {
-              filter.testcases = [...testCasesSelection.selected];
-            }
-            if ($scope.testCaseTable.getSelection) {
-              var testCaseSelection = $scope.testCaseTable.getSelection();
-              // if not all items are selected
-              if (testCaseSelection.notSelectedItems.length > 0) {
-                var testcases = [];
-                _.each(testCaseSelection.selectedItems, function (testCase) {
-                  testcases.push(testCase.artefactID);
-                });
-                filter.testcases = testcases;
-              }
-            }
-            return filter;
-          },
-          $scope,
-          executionViewServices
-        );
-*/
 
         $scope.getIncludedTestcases = function () {
           var table = $scope.testCaseTable;
@@ -504,7 +440,6 @@ tecAdminControllers.directive('executionProgress', [
             .get('rest/executions/' + eId + '/reportnodes?limit=500&class=step.artefacts.reports.TestCaseReportNode')
             .then(function (response) {
               var data = response.data;
-              var dataSet = [];
               if (data.length > 0) {
                 if (data.length > 1 && !$scope.isPanelEnabled('testCases')) {
                   $scope.setShowPanel('steps', false);
@@ -521,11 +456,6 @@ tecAdminControllers.directive('executionProgress', [
         var refreshExecution = function () {
           $http.get('rest/executions/' + eId).then(function (response) {
             var data = response.data;
-            if ($scope.execution == null) {
-              if ($scope.testCaseTable.resetSelection) {
-                $scope.testCaseTable.resetSelection();
-              }
-            }
             $scope.execution = data;
             $scope.determineDefaultSelection();
             var showTestCaseCurrentOperation = $scope.execution.parameters.find(

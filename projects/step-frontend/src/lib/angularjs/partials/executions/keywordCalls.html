@@ -1,5 +1,5 @@
-<st-table collection="'leafReports'" handle="stepsTable" uid="'functionCallList'" server-side-parameters="stepsTableServerSideParameters" 
-order="[[0, &quot;desc&quot;]]">
+<st-table collection="'leafReports'" handle="stepsTable" uid="'functionCallList'" server-side-parameters="stepsTableServerSideParameters"
+order="[[0, &quot;desc&quot;]]" filter="'executionID='+interactiveSession.id">
 	<st-actions>
 		<a ng-click="$parent.showFooter=!$parent.showFooter">
 			<span ng-if="!$parent.showFooter">display details</span>

@@ -1,0 +1,108 @@
+@mixin tabbar-icon {
+  width: 16px;
+  height: 16px;
+  margin-left: 11px;
+  cursor: pointer;
+}
+
+@mixin tabbar($primary-tabs-color) {
+  step-tabs {
+    &.tab-mode-buttons {
+      display: block;
+
+      mat-ink-bar {
+        display: none;
+      }
+
+      .mat-tab-list {
+        display: flex;
+        margin-bottom: 10px;
+      }
+
+      .mat-tab-links {
+        border: solid 1px #f3f5f7;
+        border-radius: 8px;
+        background: #f9fafa;
+        padding: 4px;
+      }
+
+      .mat-tab-link {
+        margin: 0 8px;
+        min-width: 100px;
+        text-decoration: none;
+        height: 38px;
+
+        &:first-child {
+          margin-left: 0;
+        }
+
+        &:last-child {
+          margin-right: 0;
+        }
+
+        border-radius: 8px;
+
+        &.mat-tab-label-active {
+          background: #fff;
+          box-shadow: 0 3px 1px -2px #0003, 0 2px 2px #00000024, 0 1px 5px #0000001f;
+          font-weight: bold;
+        }
+      }
+    }
+
+    &.tab-mode-tabs {
+      .mat-tab-link {
+        min-width: auto;
+        padding: 0 10px;
+        opacity: 1;
+        text-decoration: none;
+      }
+
+      step-icon {
+        @include tabbar-icon();
+      }
+
+      .mat-primary {
+        .mat-tab-link.mat-tab-label-active {
+          color: $primary-tabs-color;
+          step-icon {
+            color: $primary-tabs-color;
+          }
+        }
+      }
+    }
+
+    .mat-tab-links {
+      margin-left: 16px;
+    }
+  }
+
+  .step-legacy-tabs {
+    .mat-tab-links {
+      margin-left: 16px;
+    }
+
+    step-ajs-icon {
+      @include tabbar-icon;
+    }
+
+    &.mat-primary {
+      .mat-tab-link.mat-tab-label-active {
+        color: $primary-tabs-color;
+        step-ajs-icon {
+          color: $primary-tabs-color;
+        }
+      }
+    }
+
+    .mat-tab-link {
+      min-width: auto;
+      padding: 0 10px;
+      opacity: 1;
+    }
+
+    execution-result {
+      margin-right: 11px;
+    }
+  }
+}

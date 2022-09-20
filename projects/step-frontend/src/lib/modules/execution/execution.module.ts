@@ -34,6 +34,6 @@ import { PlanLinkComponent } from '../plan/components/plan-link/plan-link.compon
 })
 export class ExecutionModule {
   constructor(_entityRegistry: EntityRegistry, _cellsRegister: CustomCellRegistryService) {
-    _entityRegistry.register('executions', 'Execution', 'commit');
+    _entityRegistry.register('executions', 'Execution', 'commit', '/partials/executions/executionSelectionTable.html');
   }
 }

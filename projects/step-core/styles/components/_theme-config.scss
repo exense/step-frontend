@@ -1,0 +1,135 @@
+@use '@angular/material' as mat;
+@use 'sass:map';
+@use 'step-tabs';
+@use 'step-sidebar';
+@use 'step-header';
+@use 'step-icon';
+
+@forward 'step-sidebar' show step-define-sidebar-config;
+@forward 'step-header' show step-define-header-config;
+
+$dark-primary-text: #293e50;
+$light-primary-text: white;
+
+@function extend-mat-theme($theme, $overrides) {
+  $color: map.get($theme, color);
+  $foreground: map.get($color, foreground);
+
+  $foreground-ext: map.merge(
+    $foreground,
+    (
+      secondary-text: map.get($overrides, secondary-text),
+      base: map.get($overrides, base),
+      icon: map.get($overrides, icon),
+      text: map.get($overrides, text),
+    )
+  );
+
+  $result: map.merge(
+    $color,
+    (
+      foreground: $foreground-ext,
+    )
+  );
+
+  @return $result;
+}
+
+@function step-default-primary-palette() {
+  $step-palette: (
+    50: #e6f3fa,
+    100: #b3daf0,
+    200: #80c0e6,
+    300: #4da8dc,
+    400: #339bd7,
+    500: #0082cb,
+    600: #005180,
+    700: #004166,
+    800: #00304c,
+    900: #002033,
+    contrast: (
+      50: $dark-primary-text,
+      100: $dark-primary-text,
+      200: $dark-primary-text,
+      300: $dark-primary-text,
+      400: $dark-primary-text,
+      500: $light-primary-text,
+      600: $light-primary-text,
+      700: $light-primary-text,
+      800: $light-primary-text,
+      900: $light-primary-text,
+    ),
+  );
+
+  @return mat.define-palette($step-palette, 500);
+}
+
+@function step-default-typography() {
+  $result: mat.define-typography-config(
+    $font-family: 'Roboto',
+    $body-1: mat.define-typography-level(12px, 16px, 400),
+    $body-2: mat.define-typography-level(14px, 20px, 500),
+    $button: mat.define-typography-level(14px, 20px, 500),
+  );
+
+  @return $result;
+}
+
+@mixin step-theme(
+  $text-color: $dark-primary-text,
+  $mat-primary-palette: null,
+  $mat-typography-config: null,
+  $mat-accent-palette: null,
+  $step-sidebar-config: null,
+  $step-header-config: null
+) {
+  @if not $mat-primary-palette {
+    $mat-primary-palette: step-default-primary-palette();
+  }
+
+  @if not $mat-typography-config {
+    $mat-typography-config: step-default-typography();
+  }
+
+  @if not $mat-accent-palette {
+    $mat-accent-palette: mat.define-palette(mat.$pink-palette);
+  }
+
+  $mat-theme: mat.define-light-theme(
+    (
+      color: (
+        primary: $mat-primary-palette,
+        accent: $mat-accent-palette,
+      ),
+    )
+  );
+
+  $mat-theme-ext: extend-mat-theme(
+    $mat-theme,
+    (
+      secondary-text: $text-color,
+      base: $text-color,
+      icon: $text-color,
+      text: $text-color,
+    )
+  );
+
+  font-family: map-get($mat-typography-config, font-family);
+  @include mat.core($mat-typography-config);
+  @include mat.all-component-themes($mat-theme-ext);
+
+  $primary-color: map-get($mat-primary-palette, default);
+
+  @include step-tabs.tabbar($primary-color);
+  @include step-sidebar.sidebar($step-sidebar-config);
+  @include step-header.header($step-header-config);
+
+  color: $text-color;
+  line-height: 16px;
+
+  .mat-mini-fab {
+    box-shadow: none !important;
+  }
+
+  @include step-icon.step-icon();
+}

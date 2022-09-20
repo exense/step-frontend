@@ -77,7 +77,7 @@
           [disabled]="!('user-write' | hasRight | async)"
           (click)="pause(element.token!.id!)"
         >
-          <mat-icon>pause</mat-icon>
+          <step-icon name="pause"></step-icon>
         </button>
         <button
           *ngIf="element.state! === 'MAINTENANCE'"
@@ -85,7 +85,7 @@
           [disabled]="!('user-write' | hasRight | async)"
           (click)="play(element.token!.id!)"
         >
-          <mat-icon>play_arrow</mat-icon>
+          <step-icon name="play"></step-icon>
         </button>
         <button
           *ngIf="element.state! === 'ERROR'"
@@ -94,7 +94,7 @@
           [disabled]="!('user-write' | hasRight | async)"
           (click)="removeTokenErrors(element.token!.id)"
         >
-          <mat-icon>check</mat-icon>
+          <step-icon name="check"></step-icon>
         </button>
       </step-btn-group>
     </td>

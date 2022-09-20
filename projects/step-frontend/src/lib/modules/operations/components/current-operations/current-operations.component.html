@@ -16,5 +16,5 @@
 </ng-template>
 <ng-container *ngIf="showAll; then allOperations; else firstOperation"> </ng-container>
 <button *ngIf="currentOperation.length > 1" type="button" mat-icon-button (click)="showAll = !showAll">
-  <mat-icon>more_horiz</mat-icon>
+  <step-icon name="more-horizontal">more_horiz</step-icon>
 </button>

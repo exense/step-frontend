@@ -16,7 +16,7 @@
         matTooltip="Show this node in the tree view"
         (click)="showNodeInTree.emit(reportNodeId)"
       >
-        <mat-icon>account_tree</mat-icon>
+        <step-icon name="git-pull-request">account_tree</step-icon>
       </button>
       <button
         *ngIf="isShowTestCaseVisible"
@@ -25,7 +25,7 @@
         matTooltip="Select the test case containing this node in the test case table"
         (click)="showTestCase.emit(reportNodeId)"
       >
-        <mat-icon>list_alt</mat-icon>
+        <step-icon name="list"></step-icon>
       </button>
     </step-btn-group>
     <span *ngIf="includeStatus">

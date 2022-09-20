@@ -14,7 +14,7 @@
              ng-class="{'mat-tab-label-active': isTabActive(tab.id)}"
              ng-click="selectTab(tab.id)">
             <execution-result ng-if="tab.id!='list'" execution="getTabExecution(tab.id)" /> <span>{{tab.title}}</span>
-            <div ng-if="tab.id!='list'" role="img" ng-click="closeTab(tab.id)" class="mat-icon notranslate material-icons mat-icon-no-color ng-star-inserted mat-icon-close" aria-hidden="true" data-mat-icon-type="font">close</div>
+            <step-ajs-icon name="x" ng-if="tab.id!='list'" ng-click="closeTab(tab.id)"></step-ajs-icon>
             <div ng-if="isTabActive(tab.id)" class="mat-ink-bar" style="visibility: visible; left: 0; right: 0"></div>
           </div>
         </div>

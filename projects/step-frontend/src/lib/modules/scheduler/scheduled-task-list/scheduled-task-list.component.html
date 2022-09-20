@@ -2,14 +2,14 @@
   <step-btn-group>
     <button
       type="button"
-      mat-icon-button
-      class="primary"
+      mat-mini-fab
+      color="primary"
       matTooltip="New Task"
       matTooltipPosition="below"
       [disabled]="!('user-write' | hasRight | async)"
       (click)="_logic.createParameter()"
     >
-      <mat-icon>add</mat-icon>
+      <step-icon name="plus"></step-icon>
     </button>
   </step-btn-group>
 
@@ -21,7 +21,7 @@
     [disabled]="!('scheduler-manage' | hasRight | async)"
     (click)="_logic.navToSettings()"
   >
-    <mat-icon>settings</mat-icon>
+    <step-icon name="settings"></step-icon>
   </button>
 </section>
 <step-table
@@ -61,7 +61,7 @@
           [disabled]="!('user-write' | hasRight | async)"
           (click)="_logic.executeParameter(element)"
         >
-          <mat-icon>play_arrow</mat-icon>
+          <step-icon name="play"></step-icon>
         </button>
         <button
           mat-icon-button
@@ -69,7 +69,7 @@
           [disabled]="!('user-write' | hasRight | async)"
           (click)="_logic.editParameter(element)"
         >
-          <mat-icon>edit</mat-icon>
+          <step-icon name="edit-2"></step-icon>
         </button>
         <button
           mat-icon-button
@@ -77,7 +77,7 @@
           [disabled]="!('user-write' | hasRight | async)"
           (click)="_logic.deletePrameter(element)"
         >
-          <mat-icon>delete</mat-icon>
+          <step-icon name="trash-2"></step-icon>
         </button>
         <button
           mat-icon-button
@@ -85,7 +85,7 @@
           [disabled]="!('user-write' | hasRight | async)"
           (click)="_logic.navToStats(element)"
         >
-          <mat-icon>trending_up</mat-icon>
+          <step-icon name="trending-up"></step-icon>
         </button>
       </step-btn-group>
     </td>

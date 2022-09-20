@@ -5,5 +5,5 @@
   {{ context?.key }}
 </ng-container>
 <ng-container *ngIf="context?.description">
-  <mat-icon [matTooltip]="context!.description!">help</mat-icon>
+  <step-icon name="help" [matTooltip]="context!.description!"></step-icon>
 </ng-container>

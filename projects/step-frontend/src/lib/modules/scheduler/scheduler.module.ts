@@ -12,7 +12,12 @@ import { SchedulerTaskLinkComponent } from './components/scheduler-task-link/sch
 })
 export class SchedulerModule {
   constructor(_entityRegistry: EntityRegistry, _cellRegistry: CustomCellRegistryService) {
-    _entityRegistry.register('tasks', 'Scheduler task', 'schedule');
+    _entityRegistry.register(
+      'tasks',
+      'Scheduler task',
+      'clock',
+      '/partials/scheduler/schedulerTaskSelectionTable.html'
+    );
     _cellRegistry.registerCell('taskEntityIcon', SchedulerIconComponent);
     _cellRegistry.registerCell('schedulerTaskLink', SchedulerTaskLinkComponent);
   }
