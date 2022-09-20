@@ -1,5 +1,11 @@
 <section class="header"></section>
-<step-table [dataSource]="_artefactService.availableArtefacts" matSort [matSortDisableClear]="true">
+<step-table
+  [dataSource]="_artefactService.availableArtefacts"
+  matSort
+  matSortActive="label"
+  matSortDirection="asc"
+  [matSortDisableClear]="true"
+>
   <ng-container matColumnDef="label" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header class="plan-artefact-name-searchfield">Name</th>
     <td mat-cell *matCellDef="let element">
@@ -15,7 +21,8 @@
           class="artefact-info-icon"
           *ngIf="element.description"
           [matTooltip]="element.description"
-          name="alert-circle">
+          name="alert-circle"
+        >
         </step-icon>
         <step-btn-group>
           <button mat-icon-button matTooltip="Add Control" (click)="addControl(element.label)">
