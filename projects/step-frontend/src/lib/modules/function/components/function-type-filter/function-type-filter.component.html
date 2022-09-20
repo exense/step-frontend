@@ -1,0 +1,7 @@
+<mat-form-field>
+  <mat-select multiple (selectionChange)="handleChange($event)">
+    <mat-option *ngFor="let item of functionTypes" [value]="item.key">
+      {{ item.value }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
