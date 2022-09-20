@@ -125,7 +125,7 @@ $light-primary-text: white;
   @include step-tabs.tabbar($primary-color);
   @include step-sidebar.sidebar($step-sidebar-config);
   @include step-header.header($step-header-config);
-  @include step-login.login-page($step-login-config);
+  @include step-login.login-page($step-login-config, $mat-primary-palette);
 
   color: $text-color;
   line-height: 16px;

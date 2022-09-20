@@ -1,28 +1,26 @@
 @use 'sass:map';
 
 @function step-define-login-config(
-  $login-button-bg-color: #0081caff,
+  $palette: null,
   $login-secondary-text-color: gray,
   $login-button-text-color: white,
-  $login-input-field-border-color: #0081caff,
-  $login-link-text-color: #006299,
   $login-bg-path: '/images/log-in-mountains-background.jpg'
 ) {
   $config: (
-    login-button-bg-color: $login-button-bg-color,
+    login-button-bg-color: map.get($palette, 500),
     login-secondary-text-color: $login-secondary-text-color,
     login-button-text-color: $login-button-text-color,
-    login-input-field-border-color: $login-input-field-border-color,
-    login-link-text-color: $login-link-text-color,
+    login-input-field-border-color: map.get($palette, 500),
+    login-link-text-color: map.get($palette, 600),
     login-bg-path: $login-bg-path,
   );
 
   @return $config;
 }
 
-@mixin login-page($config: null) {
+@mixin login-page($config: null, $palette) {
   @if not $config {
-    $config: step-define-login-config();
+    $config: step-define-login-config($palette);
   }
 
   step-login {
