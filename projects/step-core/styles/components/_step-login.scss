@@ -134,7 +134,7 @@
     }
 
     .capslock-warning {
-      margin-top: 5px;
+      margin-top: 8px;
       display: flex;
       position: absolute;
 
@@ -143,6 +143,9 @@
         height: 16px;
         width: 16px;
         margin-right: 4px;
+      }
+      span {
+        margin: 2px 0 0 5px;
       }
     }
 
