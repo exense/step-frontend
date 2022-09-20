@@ -4,14 +4,14 @@
     <step-ts-ranger
       *ngIf="rangerSettings"
       [settings]="rangerSettings"
-      [syncKey]="execution.id!"
+      [syncKey]="settings.contextId"
       [selection]="selection.absoluteSelection"
       (onRangeChange)="onRangerSelectionChange($event)"
       (onZoomReset)="onRangerZoomReset($event)"
     >
     </step-ts-ranger>
   </div>
-  <div class="time-picker-container">
+  <div class="time-picker-container" *ngIf="timePicker">
     <step-time-range-picker (selectionChange)="handleTimePickerSelectionChange($event)"></step-time-range-picker>
   </div>
 </div>

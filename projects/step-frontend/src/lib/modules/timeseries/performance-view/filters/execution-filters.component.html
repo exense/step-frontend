@@ -1,0 +1,36 @@
+<!--<div class="attributes-container">-->
+<!--  <span>Key</span>-->
+<!--  <span>Value</span>-->
+<!--</div>-->
+<!--<div *ngFor="let pair of attributesPair" class="attributes-container">-->
+<!--  <input [(ngModel)]="pair.key" />-->
+<!--  <input [(ngModel)]="pair.value" />-->
+<!--</div>-->
+
+<!--<button mat-button id="apply-button" (click)="applyParams()">Apply</button>-->
+<div style="display: flex; justify-content: space-between">
+  <div class="filter-bar">
+    <div class="filter-item" *ngFor="let item of filterItems">
+      <mat-form-field appearance="fill" class="filter-item">
+        <mat-label>{{ item.label }}</mat-label>
+        <mat-select [(ngModel)]="item.selectedValue" (ngModelChange)="applyParams()">
+          <mat-option [value]="undefined">All</mat-option>
+          <mat-option *ngFor="let option of item.options" [value]="option">
+            {{ option }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="filter-item">
+      <mat-form-field appearance="fill" class="filter-item">
+        <mat-label>Grouping</mat-label>
+        <mat-select [(ngModel)]="groupingAttributes" (ngModelChange)="emitGroupDimensions()">
+          <mat-option *ngFor="let option of groupingOptions" [value]="option.attributes">
+            {{ option.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+</div>

@@ -82,8 +82,7 @@ export class ScheduledTaskLogicService implements OnDestroy {
   }
 
   navToStats(scheduledTask: ExecutiontTaskParameters) {
-    const url = this._dashboardService
-      .getDashboardLink(scheduledTask.id!)
+    const url = this._dashboardService.getDashboardLink(scheduledTask.id!);
     window.open(url, '_blank');
   }
 

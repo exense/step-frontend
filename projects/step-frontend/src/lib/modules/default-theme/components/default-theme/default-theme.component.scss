@@ -1,13 +1,11 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 
 $sidebar-config: core.step-define-sidebar-config(
-  $logo-path: '/images/logotopleft.png'
+  $logo-path: '/images/logotopleft.png',
 );
 
 .default-theme {
-  @include core.step-theme(
-    $step-sidebar-config: $sidebar-config,
-  );
+  @include core.step-theme($step-sidebar-config: $sidebar-config);
 }
 
 /*

@@ -3,7 +3,7 @@
 @function step-define-header-config(
   $main-background-color: #293e50,
   $main-text-color: #fff,
-  $alt-background-color: #fff,
+  $alt-background-color: #fff
 ) {
   $config: (
     main-background-color: $main-background-color,
