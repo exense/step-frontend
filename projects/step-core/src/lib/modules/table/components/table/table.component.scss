@@ -1,4 +1,4 @@
-@use '../../../../../../styles/core-mixins' as core;
+@use 'projects/step-core/styles/core-mixins' as core;
 
 @include core.table-space-between-columns;
 
@@ -17,10 +17,6 @@
 
   ::ng-deep tr > td.mat-cell:not(.mat-column-bulkSelection):not(.mat-column-actions) {
     padding: 0 8px;
-  }
-
-  tr.mat-row:hover {
-    background: var(--darken-background-10);
   }
 
   .spinner-container {
