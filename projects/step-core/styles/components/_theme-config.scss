@@ -3,6 +3,7 @@
 @use 'step-tabs';
 @use 'step-sidebar';
 @use 'step-header';
+@use 'step-icon';
 
 @forward 'step-sidebar' show step-define-sidebar-config;
 @forward 'step-header' show step-define-header-config;
@@ -129,4 +130,6 @@ $light-primary-text: white;
   .mat-mini-fab {
     box-shadow: none !important;
   }
+
+  @include step-icon.step-icon();
 }

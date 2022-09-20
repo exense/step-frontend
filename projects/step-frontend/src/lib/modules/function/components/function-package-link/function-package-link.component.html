@@ -12,7 +12,7 @@
       [disabled]="!('kw-read' | hasRight | async) || isRefreshing"
       (click)="refresh()"
     >
-      <mat-icon>refresh</mat-icon>
+      <step-icon name="refresh-cw"></step-icon>
     </button>
     <button
       mat-icon-button
@@ -20,7 +20,7 @@
       [disabled]="!('kw-write' | hasRight | async) || isRefreshing"
       (click)="edit()"
     >
-      <mat-icon>edit</mat-icon>
+      <step-icon name="edit-2">edit</step-icon>
     </button>
     <button
       mat-icon-button
@@ -28,7 +28,7 @@
       [disabled]="!('kw-write' | hasRight | async) || isRefreshing"
       (click)="delete()"
     >
-      <mat-icon>delete</mat-icon>
+      <step-icon name="trash-2"></step-icon>
     </button>
   </step-btn-group>
 </div>

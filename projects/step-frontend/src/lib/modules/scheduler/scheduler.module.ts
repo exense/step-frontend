@@ -15,7 +15,7 @@ export class SchedulerModule {
     _entityRegistry.register(
       'tasks',
       'Scheduler task',
-      'schedule',
+      'clock',
       '/partials/scheduler/schedulerTaskSelectionTable.html'
     );
     _cellRegistry.registerCell('taskEntityIcon', SchedulerIconComponent);

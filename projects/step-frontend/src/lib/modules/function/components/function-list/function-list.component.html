@@ -8,7 +8,7 @@
       [disabled]="!('kw-write' | hasRight | async)"
       (click)="importFunctions()"
     >
-      <mat-icon>file_download</mat-icon>
+      <step-icon name="download"></step-icon>
     </button>
     <button
       type="button"
@@ -18,7 +18,7 @@
       [disabled]="!('kw-read' | hasRight | async)"
       (click)="exportFunctions()"
     >
-      <mat-icon>file_upload</mat-icon>
+      <step-icon name="upload"></step-icon>
     </button>
   </step-btn-group>
   <step-btn-group>
@@ -31,7 +31,7 @@
       [disabled]="!('kw-write' | hasRight | async)"
       (click)="addFunction()"
     >
-      <mat-icon>add</mat-icon>
+      <step-icon name="plus"></step-icon>
     </button>
   </step-btn-group>
   <step-btn-group>
@@ -70,7 +70,7 @@
           [disabled]="!('kw-read' | hasRight | async)"
           (click)="configureFunction(element.id)"
         >
-          <mat-icon>edit</mat-icon>
+          <step-icon name="edit-2"></step-icon>
         </button>
         <button
           mat-icon-button
@@ -78,7 +78,7 @@
           [disabled]="!('kw-write' | hasRight | async)"
           (click)="executeFunction(element.id)"
         >
-          <mat-icon>play_arrow</mat-icon>
+          <step-icon name="play"></step-icon>
         </button>
         <button
           mat-icon-button
@@ -86,10 +86,10 @@
           [disabled]="!('kw-read' | hasRight | async)"
           (click)="deleteFunction(element.id, element.attributes.name)"
         >
-          <mat-icon>clear</mat-icon>
+          <step-icon name="x"></step-icon>
         </button>
         <button mat-icon-button [matMenuTriggerFor]="menu" [matMenuTriggerData]="{ element: element }">
-          <mat-icon>more_horiz</mat-icon>
+          <step-icon name="more-horizontal"></step-icon>
         </button>
       </step-btn-group>
     </td>
@@ -98,12 +98,12 @@
 <mat-menu #menu="matMenu">
   <ng-template matMenuContent let-element="element">
     <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="editFunction(element.id)">
-      <mat-icon>edit</mat-icon>
+      <step-icon name="edit-2"></step-icon>
       Edit Keyword
     </button>
 
     <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="duplicateFunction(element.id)">
-      <mat-icon>content_copy</mat-icon>
+      <step-icon name="copy"></step-icon>
       Duplicate Keyword
     </button>
 
@@ -112,7 +112,7 @@
       [disabled]="!('kw-read' | hasRight | async)"
       (click)="exportFunction(element.id, element.attributes.name)"
     >
-      <mat-icon>file_upload</mat-icon>
+      <step-icon name="upload"></step-icon>
       Export Keyword
     </button>
 
@@ -121,7 +121,7 @@
       [disabled]="!('kw-read' | hasRight | async)"
       (click)="lookUp(element.id, element.attributes.name)"
     >
-      <mat-icon>search</mat-icon>
+      <step-icon name="search"></step-icon>
       Find usages
     </button>
   </ng-template>

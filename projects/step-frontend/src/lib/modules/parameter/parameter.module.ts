@@ -12,12 +12,7 @@ import { ParametersKeyComponent } from './parameters-key/parameters-key.componen
 })
 export class ParameterModule {
   constructor(_entityRegistry: EntityRegistry, _cellRegister: CustomCellRegistryService) {
-    _entityRegistry.register(
-      'parameters',
-      'Parameters',
-      'list_alt',
-      '/partials/parameters/parameterSelectionTable.html'
-    );
+    _entityRegistry.register('parameters', 'Parameters', 'list', '/partials/parameters/parameterSelectionTable.html');
     _cellRegister.registerCell('parameterEntityIcon', ParametersIconComponent);
     _cellRegister.registerCell('parameterKey', ParametersKeyComponent);
   }

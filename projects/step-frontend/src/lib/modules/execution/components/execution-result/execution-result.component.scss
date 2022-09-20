@@ -1,5 +1,9 @@
 @import '../../../_common/styles/variables';
 
+:host {
+  margin-right: 5px;
+}
+
 @mixin status-icon($status, $color) {
   .step-icon-#{$status} {
     color: $color;

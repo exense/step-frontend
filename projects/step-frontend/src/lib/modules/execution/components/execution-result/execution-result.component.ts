@@ -63,13 +63,13 @@ export class ExecutionResultComponent implements OnChanges {
     }
 
     if (status !== 'ENDED') {
-      return 'autorenew';
+      return 'refresh-cw';
     }
 
     if (result === 'PASSED') {
-      return 'check_circle';
+      return 'check-circle';
     }
 
-    return 'error';
+    return 'alert-circle';
   }
 }

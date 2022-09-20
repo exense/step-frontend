@@ -23,7 +23,7 @@ angular
     EntityRegistry.registerEntity(
       'Control',
       'artefact',
-      'nest_remote',
+      'wifi',
       'artefacts',
       null,
       null,
