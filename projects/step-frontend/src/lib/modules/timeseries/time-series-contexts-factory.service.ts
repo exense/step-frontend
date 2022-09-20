@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ExecutionTabContext } from './execution-page/execution-tab-context';
+import { ExecutionContext } from './execution-page/execution-context';
 
 /**
  * This is a singleton which handles all contexts for the execution tabs.
@@ -8,21 +8,21 @@ import { ExecutionTabContext } from './execution-page/execution-tab-context';
 @Injectable({
   providedIn: 'root',
 })
-export class ExecutionsPageService {
+export class TimeSeriesContextsFactory {
   // key is the executionId
-  private executionsContexts: { [key: string]: ExecutionTabContext } = {};
+  private executionsContexts: { [key: string]: ExecutionContext } = {};
 
   /**
    * The method will create a new context if it doesn't exist yet.
    */
-  getContext(executionId: string): ExecutionTabContext {
-    if (!executionId) {
-      throw new Error('Execution id must be specified!');
+  getContext(contextId: string): ExecutionContext {
+    if (!contextId) {
+      throw new Error('Context id must be specified!');
     }
-    let context = this.executionsContexts[executionId];
+    let context = this.executionsContexts[contextId];
     if (!context) {
-      context = new ExecutionTabContext(executionId);
-      this.executionsContexts[executionId] = context;
+      context = new ExecutionContext(contextId);
+      this.executionsContexts[contextId] = context;
     }
     return context;
   }

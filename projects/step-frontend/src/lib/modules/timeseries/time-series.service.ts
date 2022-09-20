@@ -5,6 +5,7 @@ import { FindBucketsRequest } from './find-buckets-request';
 import { TimeSeriesChartResponse } from './time-series-chart-response';
 import { Execution } from '@exense/step-core';
 
+// TODO provide it it TimeSeriesModule
 @Injectable({
   providedIn: 'root',
 })
@@ -13,9 +14,5 @@ export class TimeSeriesService {
 
   fetchBuckets(request: FindBucketsRequest): Observable<TimeSeriesChartResponse> {
     return this.http.post<TimeSeriesChartResponse>(`/rest/time-series/buckets`, request);
-  }
-
-  getExecutionDetails(id: string): Observable<Execution> {
-    return this.http.get<Execution>(`/rest/executions/${id}`);
   }
 }

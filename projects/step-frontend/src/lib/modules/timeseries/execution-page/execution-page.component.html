@@ -1,0 +1,10 @@
+<div *ngIf="executionInProgress">
+  <button mat-raised-button [matMenuTriggerFor]="refreshMenu">Refresh ({{ selectedRefreshInterval.label }})</button>
+  <mat-menu #refreshMenu="matMenu">
+    <button mat-menu-item *ngFor="let interval of refreshIntervals" (click)="changeRefreshInterval(interval)">
+      {{ interval.label }}
+    </button>
+  </mat-menu>
+</div>
+
+<step-performance-view *ngIf="performanceViewSettings" [settings]="performanceViewSettings"></step-performance-view>

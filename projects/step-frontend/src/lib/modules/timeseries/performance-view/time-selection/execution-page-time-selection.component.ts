@@ -7,14 +7,14 @@ import { TSChartSettings } from '../../chart/model/ts-chart-settings';
 import { TSRangerComponent } from '../../ranger/ts-ranger.component';
 import { TSTimeRange } from '../../chart/model/ts-time-range';
 import { TimeRangePicker } from '../../time-selection/time-range-picker.component';
-import { ExecutionTabContext } from '../execution-tab-context';
+import { ExecutionContext } from '../../execution-page/execution-context';
 import { RangeSelectionType } from '../../time-selection/model/range-selection-type';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
 import { TimeSeriesConfig } from '../../time-series.config';
-import { Select } from 'uplot';
 import { TSRangerSettings } from '../../ranger/ts-ranger-settings';
-import { ExecutionsPageService } from '../../executions-page.service';
+import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
 import { Execution } from '@exense/step-core';
+import { PerformanceViewSettings } from '../performance-view-settings';
 
 @Component({
   selector: 'step-execution-time-selection',
@@ -22,29 +22,38 @@ import { Execution } from '@exense/step-core';
   styleUrls: ['./execution-page-time-selection.component.scss'],
 })
 export class ExecutionPageTimeSelectionComponent implements OnInit {
-  @Input() execution!: Execution;
+  // @Input() execution!: Execution;
+  @Input() settings!: PerformanceViewSettings;
+  @Input() timePicker: boolean = true;
 
   @Output('onRangeChange') onRangeChange = new EventEmitter<TSTimeRange>();
   @Output('onRangeReset') onRangeReset = new EventEmitter<TSTimeRange>();
 
   rangerSettings: TSRangerSettings | undefined;
   @ViewChild(TSRangerComponent) rangerComponent!: TSRangerComponent;
-  @ViewChild(TimeRangePicker) timeRangePicker!: TimeRangePicker;
+  @ViewChild(TimeRangePicker) timeRangePicker: TimeRangePicker | undefined;
 
   timeLabels: number[] = [];
 
   selection!: ExecutionTimeSelection;
 
-  private executionService!: ExecutionTabContext;
+  private executionService!: ExecutionContext;
 
-  constructor(private timeSeriesService: TimeSeriesService, private executionsPageService: ExecutionsPageService) {}
+  constructor(private timeSeriesService: TimeSeriesService, private executionsPageService: TimeSeriesContextsFactory) {}
 
   ngOnInit(): void {
-    this.executionService = this.executionsPageService.getContext(this.execution.id!);
+    if (!this.settings) {
+      throw new Error('Settings input is required');
+    }
+    this.executionService = this.executionsPageService.getContext(this.settings.contextId);
     this.executionService.onActiveSelectionChange().subscribe((range) => {
       this.selection = range;
     });
     this.createRanger();
+  }
+
+  getActiveSelection(): ExecutionTimeSelection {
+    return this.selection;
   }
 
   refreshRanger() {
@@ -52,11 +61,11 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
   }
 
   createRanger() {
-    let startTime = this.execution.startTime!;
-    let endTime = this.execution.endTime || new Date().getTime();
+    let startTime = this.settings.startTime!;
+    let endTime = this.settings.endTime || new Date().getTime() - 5000; // minus 5 seconds
     let request: FindBucketsRequest = {
       intervalSize: 0,
-      params: { eId: this.execution.id! },
+      params: this.settings.contextualFilters,
       start: startTime,
       end: endTime, // to current time if it's not ended
       numberOfBuckets: Math.trunc(
@@ -65,7 +74,11 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
     };
     this.timeSeriesService.fetchBuckets(request).subscribe((response) => {
       this.timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-      let avgData = response.matrix[0].map((b) => (b ? b.sum / b.count : null));
+      let avgData: (number | null)[] = [];
+      if (response.matrix[0]) {
+        avgData = response.matrix[0].map((b) => (b ? b.sum / b.count : null));
+      }
+
       let timeRange = this.prepareSelectForRanger(this.selection);
       this.rangerSettings = {
         xValues: this.timeLabels,
@@ -104,7 +117,7 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
     //   end: this.rangerSettings.xValues[this.rangerSettings.xValues.length - 1],
     // });
     this.rangerComponent.resetSelect(false);
-    this.timeRangePicker.selectFullRange();
+    this.timeRangePicker?.selectFullRange();
   }
 
   handleTimePickerSelectionChange(timeSelection: TimeRangePickerSelection) {
@@ -112,7 +125,7 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
     if (timeSelection.type === RangeSelectionType.FULL) {
       this.rangerComponent.resetSelect(false);
     } else if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
-      let endTime = this.execution.endTime || new Date().getTime();
+      let endTime = this.settings.endTime || new Date().getTime();
       let from = endTime - timeSelection.relativeSelection.timeInMs;
       selectionToEmit.relativeSelection = timeSelection.relativeSelection;
       selectionToEmit.absoluteSelection = { from, to: endTime };
@@ -123,34 +136,19 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
     }
 
     this.executionService.setActiveSelection(selectionToEmit);
-
-    // if (!timeSelection) {
-    //   // we deal with a full range
-    //   this.resetZoom();
-    //   this.executionService.setActiveSelection()
-    //   return;
-    // }
-    // if (timeSelection.isRelativeSelection && timeSelection.relativeSelection) {
-    //   let start = this.execution.endTime - timeSelection.relativeSelection.timeInMs;
-    //   let now = new Date().getTime();
-    //   timeSelection.range = {start: start, end: now};
-    //   this.rangerComponent.selectRange(start, undefined, false);
-    //   this.onRangeChange.emit({ start: start, end: this.execution.endTime });
-    // }
-    // this.executionService.setActiveSelection(timeSelection);
   }
 
   onRangerSelectionChange(event: TSTimeRange) {
     if (this.timeLabels[0] === event.from && this.timeLabels[this.timeLabels.length - 1] === event.to) {
-      this.timeRangePicker.selectFullRange();
+      this.timeRangePicker?.selectFullRange();
     } else {
-      this.timeRangePicker.setAbsoluteSelection(event.from, event.to);
+      this.timeRangePicker?.setAbsoluteSelection(event.from, event.to);
     }
 
     // this.onRangeChange.emit(event);
   }
 
   onRangerZoomReset(event: TSTimeRange) {
-    this.timeRangePicker.selectFullRange();
+    this.timeRangePicker?.selectFullRange();
   }
 }

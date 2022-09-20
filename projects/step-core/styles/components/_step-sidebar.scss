@@ -5,7 +5,7 @@
   $menu-color: rgba(255, 255, 255, 0.1),
   $selection-color: rgba(255, 255, 255, 0.1),
   $divider-color: rgba(255, 255, 255, 0.2),
-  $menu-secondary: #C9D1D9,
+  $menu-secondary: #c9d1d9,
   $menu-text: #ffffff,
   $width-open: 254px,
   $width-closed: 72px,
@@ -36,7 +36,7 @@
     elements-text-padding: $elements-text-padding,
     settings-divider-padding-right: $settings-divider-padding-right,
     aligned-text-margin-left: $aligned-text-margin-left,
-    logo-path: $logo-path
+    logo-path: $logo-path,
   );
 
   @return $config;
