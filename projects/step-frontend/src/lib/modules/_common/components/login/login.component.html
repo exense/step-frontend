@@ -1,21 +1,57 @@
-<mat-card>
-  <div style="margin: 0 auto 20px; width: 200px">
-    <img alt="" style="max-width: 200px; margin: 0 auto" src="{{ logo }}" />
+<div class="step-login-flex-child">
+  <div class="step-login-content">
+    <div class="step-login-logo">
+      <img alt="" src="{{ logo }}" />
+    </div>
+    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+    <p class="step-login-heading-text" [class.step-login-heading-text-additional-margin]="!loginDescriptionText">
+      Log in
+    </p>
+    <p class="step-login-description-text">{{ loginDescriptionText }}</p>
+
+    <form>
+      <div class="step-login-input-wrapper">
+        <p class="step-login-input-label">Username</p>
+        <input
+          [(ngModel)]="credentials.username"
+          name="username"
+          (keyup.enter)="login()"
+          placeholder="Enter your username"
+        />
+      </div>
+
+      <div class="step-login-input-wrapper" (stepCapsLock)="capsLock = $event" style="width: 100%">
+        <p class="step-login-input-label">Password</p>
+        <input
+          [(ngModel)]="credentials.password"
+          name="password"
+          type="password"
+          (keyup.enter)="login()"
+          placeholder="Enter your password"
+        />
+        <span *ngIf="capsLock" class="capslock-warning">
+          <step-icon name="alert-triangle"></step-icon><span>Caps lock is on</span>
+        </span>
+      </div>
+      <!--            <p class="step-login-forgot-password-text">Forgot password</p>-->
+      <div>
+        <button class="step-login-button" mat-button color="primary" aria-label="Login" (click)="login()">
+          Sign in
+        </button>
+      </div>
+      <!--            <p class="step-login-signup-text">Don't have an account? <span>Sign up</span></p>-->
+    </form>
   </div>
-  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+</div>
+<div class="step-login-flex-child step-mountain-background"></div>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Username</mat-label>
-    <input matInput [(ngModel)]="credentials.username" name="username" (keyup.enter)="login()" />
-  </mat-form-field>
-
-  <mat-form-field appearance="fill" (stepCapsLock)="capsLock = $event">
-    <mat-label>Password</mat-label>
-    <input matInput [(ngModel)]="credentials.password" name="password" type="password" (keyup.enter)="login()" />
-    <span *ngIf="capsLock" class="capslock-warning"> <step-icon name="alert-triangle"></step-icon> Caps lock is on </span>
-  </mat-form-field>
-
-  <div mat-dialog-actions align="end">
-    <button mat-button color="primary" aria-label="Login" (click)="login()"><step-icon name="log-in"></step-icon> Login</button>
-  </div>
-</mat-card>
+<div class="step-login-version">
+  <span class="version" title="{{ '${project.version}' }}"
+    >{{ '${project.version}' }} © exense GmbH
+    <span style="display: none" id="frontend-os">{{ '${project.versionFEOS}' }}</span>
+    <span style="display: none" id="frontend-ee">{{ '${project.versionFEEE}' }}</span>
+    <span style="display: none" id="backend-os">{{ '${project.versionBEOS}' }}</span>
+    <span style="display: none" id="backend-ee">{{ '${project.versionBEEE}' }}</span>
+  </span>
+</div>
