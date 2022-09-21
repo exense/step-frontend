@@ -1,0 +1,7 @@
+export enum TsChartType {
+  OVERVIEW,
+  BY_STATUS,
+  RESPONSE_TIME,
+  THROUGHPUT,
+  THREAD_GROUP,
+}
