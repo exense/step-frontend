@@ -82,7 +82,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       this.init(settings.currentValue);
       let end = this.settings.xValues[this.settings.xValues.length - 1];
       let start = this.settings.xValues[0];
-      console.log(new Date(start), new Date(end));
+      console.log(this.settings.selection);
       this.createRanger();
     }
   }
@@ -225,7 +225,6 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     if (this.settings.selection) {
       select = this.transformRangeToSelect(this.settings.selection);
     }
-    // console.log('CREATING WITH SELECT: ', this.settings.selection);
     let rangerOpts: uPlot.Options = {
       ...getSize(),
       ms: 1, // if not specified it's going be in seconds

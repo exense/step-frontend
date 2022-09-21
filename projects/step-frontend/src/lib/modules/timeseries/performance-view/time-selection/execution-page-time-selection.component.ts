@@ -46,6 +46,7 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
       throw new Error('Settings input is required');
     }
     this.executionService = this.executionsPageService.getContext(this.settings.contextId);
+    this.selection = this.executionService.getActiveSelection();
     this.executionService.onActiveSelectionChange().subscribe((range) => {
       this.selection = range;
     });
@@ -58,6 +59,9 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
 
   refreshRanger() {
     this.createRanger();
+    // this.timeSeriesService.fetchBuckets(this.r).subscribe((response) => {
+    //
+    // });
   }
 
   createRanger() {
@@ -79,7 +83,7 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
         avgData = response.matrix[0].map((b) => (b ? b.sum / b.count : null));
       }
 
-      let timeRange = this.prepareSelectForRanger(this.selection);
+      let timeRange = this.prepareSelectForRanger(this.executionService.getActiveSelection());
       this.rangerSettings = {
         xValues: this.timeLabels,
         selection: timeRange,
@@ -100,6 +104,7 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
   }
 
   prepareSelectForRanger(selection: ExecutionTimeSelection): TSTimeRange | undefined {
+    console.log(selection);
     if (selection.type === RangeSelectionType.FULL) {
       return undefined;
     } else {
@@ -134,18 +139,19 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
       selectionToEmit.absoluteSelection = timeSelection.absoluteSelection;
       this.rangerComponent.selectRange(timeSelection.absoluteSelection.from, timeSelection.absoluteSelection.to);
     }
-
     this.executionService.setActiveSelection(selectionToEmit);
+    this.onRangeChange.emit(selectionToEmit.absoluteSelection);
   }
 
   onRangerSelectionChange(event: TSTimeRange) {
+    console.log('CHANGED', event);
     if (this.timeLabels[0] === event.from && this.timeLabels[this.timeLabels.length - 1] === event.to) {
       this.timeRangePicker?.selectFullRange();
     } else {
       this.timeRangePicker?.setAbsoluteSelection(event.from, event.to);
     }
 
-    // this.onRangeChange.emit(event);
+    this.onRangeChange.emit(event);
   }
 
   onRangerZoomReset(event: TSTimeRange) {

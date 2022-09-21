@@ -17,8 +17,7 @@ export class ExecutionContext {
   activeFilters: { [key: string]: any } = {};
   activeGroupings: string[] = ['name']; // group dimensions
 
-  private readonly activeSelectionChange: BehaviorSubject<ExecutionTimeSelection> =
-    new BehaviorSubject<ExecutionTimeSelection>(this.activeTimeSelection);
+  private readonly activeSelectionChange: Subject<ExecutionTimeSelection> = new Subject<ExecutionTimeSelection>();
   private readonly filtersChangeSubject: Subject<BucketFilters> = new Subject();
   private readonly groupingChangeSubject: Subject<string[]> = new Subject();
 
