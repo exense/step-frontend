@@ -33,13 +33,7 @@ export class ChartGenerators {
     let xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     let avgValues: (number | null)[] = [];
     let countValues: (number | null)[] = [];
-    if (response.matrixKeys.length === 0) {
-      // empty data
-      // if (this.summaryChart) {
-      //   this.summaryChart.clear();
-      //   return;
-      // }
-    } else {
+    if (response.matrixKeys.length !== 0) {
       response.matrix[0].forEach((bucket) => {
         avgValues.push(bucket ? Math.trunc(bucket.sum / bucket.count) : null);
         countValues.push(bucket?.throughputPerHour);
@@ -58,13 +52,6 @@ export class ChartGenerators {
           label: 'Response Time',
           data: avgValues,
           value: (x, v) => Math.trunc(v) + ' ms',
-          // stroke: 'rgba(0,117,187,0.41)',
-          // fill: (self, idx) => {
-          //   let gradient = self.ctx.createLinearGradient(0, 0, 0, 400);
-          //   gradient.addColorStop(0, 'rgba(49,116,197,0.73)');
-          //   gradient.addColorStop(1, '#ff000006');
-          //   return gradient;
-          // },
           width: 2,
           stroke: 'rgba(255,109,18,0.59)',
         },
