@@ -18,6 +18,10 @@ export class DashboardService {
   getDashboardLink(taskId: string): string {
     return '/#/root/dashboards/' + taskId;
   }
+
+  getRtmDashboardLink(taskId: string): string {
+    return '/#/root/dashboards-rtm/__pp__RTMDashboard?__filter1__=text,taskId,' + taskId;
+  }
 }
 
 getAngularJSGlobal().module(AJS_MODULE).service('DashboardService', downgradeInjectable(DashboardService));
