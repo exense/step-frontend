@@ -7,7 +7,7 @@
     >
     </step-execution-result>
     {{ tab.title }}
-    <mat-icon *ngIf="tab.id !== 'list'" (click)="closeTab.emit(tab.id); (false)">close</mat-icon>
+    <step-icon *ngIf="tab.id !== 'list'" (click)="closeTab.emit(tab.id); (false)" name="x"></step-icon>
   </div>
 </ng-template>
 <step-tabs

@@ -22,7 +22,7 @@ angular
   .run(function (ViewRegistry, EntityRegistry) {
     ViewRegistry.registerViewWithConfig('repository', 'partials/repository.html', { isStaticView: true });
 
-    EntityRegistry.registerEntity('Repository', 'repository', 'summarize');
+    EntityRegistry.registerEntity('Repository', 'repository', 'database');
   })
 
   // This controller is used to force reload of the following Controllers after location change. This is a trick but it works

@@ -9,7 +9,7 @@
       [disabled]="!('user-write' | hasRight | async)"
       (click)="createResource()"
     >
-      <mat-icon>add</mat-icon>
+      <step-icon name="plus"></step-icon>
     </button>
   </step-btn-group>
 </section>
@@ -34,7 +34,7 @@
     <td mat-cell *matCellDef="let element" class="cell-actions">
       <step-btn-group>
         <button mat-icon-button matTooltip="Download Resource" (click)="downloadResource(element.id)">
-          <mat-icon>cloud_download</mat-icon>
+          <step-icon name="download-cloud"></step-icon>
         </button>
         <button
           mat-icon-button
@@ -42,13 +42,13 @@
           [disabled]="element.resourceType !== 'datasource' && element.resourceType !== 'functions'"
           (click)="searchResource(element)"
         >
-          <mat-icon>search</mat-icon>
+          <step-icon name="search"></step-icon>
         </button>
         <button mat-icon-button matTooltip="Edit Resource" (click)="editResource(element)">
-          <mat-icon>edit</mat-icon>
+          <step-icon name="edit-2"></step-icon>
         </button>
         <button mat-icon-button matTooltip="Delete Resource" (click)="deleteResource(element.id, element.resourceName)">
-          <mat-icon>delete</mat-icon>
+          <step-icon name="trash-2">delete</step-icon>
         </button>
       </step-btn-group>
     </td>

@@ -1,0 +1,20 @@
+<div class="relative">
+  <step-time-range-picker
+    #rangePicker
+    [customRelativeOptions]="timeRangeOptions"
+    [initialSelectionIndex]="0"
+    [includeFullRangeOption]="false"
+    (selectionChange)="onTimeRangeChange($event)"
+  >
+  </step-time-range-picker>
+
+  <button mat-raised-button class="interactive-btn" (click)="navigateToRtmDashboard()">Interactive Session</button>
+
+  <step-performance-view
+    *ngIf="performanceViewSettings"
+    [settings]="performanceViewSettings"
+    [includeThreadGroupChart]="false"
+    [includeTimeRangePicker]="false"
+  >
+  </step-performance-view>
+</div>

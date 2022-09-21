@@ -14,7 +14,7 @@
   $home-and-settings-height: 64px,
   $help-and-support-height: 56px,
   $elements-padding: 12px,
-  $elements-text-padding: 15px,
+  $elements-text-padding: 14px,
   $settings-divider-padding-right: 45px,
   $aligned-text-margin-left: 60px,
   $logo-path: '/images/logotopleft.png'
@@ -127,6 +127,11 @@
       cursor: pointer;
     }
 
+    .sidebar-logo-container {
+      position: absolute;
+      left: 60px;
+    }
+
     .sidebar-logo {
       $logo-path: map.get($config, logo-path);
       width: 100%;
@@ -208,20 +213,12 @@
       display: block;
       flex-grow: 1;
       padding-top: 16px;
-      margin-top: calc($logoHeight + $homeSettingHeight);
-
-      .sidebar-categories-categories {
-        height: 58px;
-        font-size: smaller;
-        padding: 0 $elements-text-padding 0 $elements-text-padding;
-        display: flex;
-        align-items: center;
-      }
+      margin-top: calc(#{$logoHeight} + #{$homeSettingHeight});
     }
 
     div#sidebar-categories-tabs {
       $helpSupportHeight: map.get($config, help-and-support-height);
-      margin-bottom: calc($helpSupportHeight + 10px);
+      margin-bottom: calc(#{$helpSupportHeight} + 10px);
 
       .sidebar-collapsable-tab:first-child label {
         border-radius: 8px 8px 0 0;
@@ -232,7 +229,7 @@
       padding: map.get($config, elements-text-padding);
     }
 
-    #sidebar-help-and-support {
+    #sidebar-bottom {
       position: fixed;
       z-index: 100;
       background-color: map.get($config, background-color);
@@ -274,7 +271,7 @@
         position: relative; /* required for (f2) position:absolute */
         display: block;
         width: 100%;
-        padding: map.get($config, elements-text-padding);
+        padding: 14px;
 
         /* (C2) COSMETICS */
         color: map.get($config, menu-text);
@@ -295,7 +292,7 @@
         display: flex;
         align-items: center;
         height: 32px;
-        padding: 0 $elements-text-padding 0 $elements-text-padding;
+        padding: 0 14px 0 16px;
         cursor: pointer;
         color: map.get($config, menu-secondary);
       }
@@ -347,8 +344,9 @@
     $alignedTextMarginLeft: map.get($config, aligned-text-margin-left);
 
     .sidebar-aligned-text {
-      position: absolute;
-      left: $alignedTextMarginLeft;
+      // position: absolute;
+      // left: $alignedTextMarginLeft;
+      margin-left: 16px;
       font-size: 16px;
       line-height: 24px;
       font-weight: 400;
@@ -357,8 +355,9 @@
 
     .sidebar-aligned-subtext {
       max-width: 150px;
-      position: absolute;
-      left: calc($alignedTextMarginLeft + $elements-text-padding);
+      // position: absolute;
+      // left: calc($alignedTextMarginLeft + $elements-text-padding);
+      margin-left: 16px;
       font-size: 16px;
       line-height: 24px;
       font-weight: 300;
@@ -400,9 +399,18 @@
         width: map.get($config, width-closed);
       }
 
-      #sidebar-help-and-support {
+      #sidebar-bottom {
         width: map.get($config, width-closed);
         font-size: medium;
+      }
+
+      .sidebar-collapsable-tab > label {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .sidebar-subtab {
+        padding: 0 12px;
       }
     }
 

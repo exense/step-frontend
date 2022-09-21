@@ -32,6 +32,9 @@ export class StatusDistributionComponent implements OnChanges {
     const summary = cSummary.currentValue as ExecutionSummaryDto;
 
     [this.passed, this.percentPassed] = this.getCountAndPercent(summary, 'PASSED');
+    if (!this.isProgress && summary?.count === 0) {
+      this.percentPassed = 100; // show a green bar if there have been zero keyword calls on completion
+    }
     [this.failed, this.percentFailed] = this.getCountAndPercent(summary, 'FAILED');
     [this.techError, this.percentTechError] = this.getCountAndPercent(summary, 'TECHNICAL_ERROR');
     [this.count, this.countPercent] = this.calcPercent(summary?.count, summary?.countForecast);

@@ -16,7 +16,7 @@
         matTooltip="Show this node in the tree view"
         (click)="showNodeInTree.emit(reportNodeId)"
       >
-        <mat-icon>account_tree</mat-icon>
+        <step-icon name="git-pull-request">account_tree</step-icon>
       </button>
       <button
         *ngIf="isShowTestCaseVisible"
@@ -25,7 +25,7 @@
         matTooltip="Select the test case containing this node in the test case table"
         (click)="showTestCase.emit(reportNodeId)"
       >
-        <mat-icon>list_alt</mat-icon>
+        <step-icon name="list"></step-icon>
       </button>
     </step-btn-group>
     <span *ngIf="includeStatus">
@@ -35,7 +35,7 @@
 </header>
 <!-- Specific content -->
 <!-- CallFunction -->
-<div *ngIf="node?._class === 'step.artefacts.reports.CallFunctionReportNode'">
+<div *ngIf="node?.resolvedArtefact?._class === 'CallKeyword'">
   <div *ngIf="showDetails">
     <a href="#" (click)="toggleInput(); (false)">Input</a>
   </div>
@@ -52,14 +52,14 @@
   </div>
 </div>
 <!-- Echo -->
-<div *ngIf="node?._class === 'step.artefacts.reports.EchoReportNode'">
+<div *ngIf="node?.resolvedArtefact?._class === 'Echo'">
   <div *ngIf="node?.echo">
     <span class="muted mat-small">Echo</span>
     <span class="m-left detail">{{ node!.echo }}</span>
   </div>
 </div>
 <!-- Assert -->
-<div *ngIf="node?._class === 'step.artefacts.reports.AssertReportNode'">
+<div *ngIf="node?.resolvedArtefact?._class === 'Assert'">
   <div *ngIf="node?.message" class="detail">
     {{ node!.message }}
   </div>
@@ -97,8 +97,8 @@
   <hr />
   <div>
     <span class="muted mat-small">Start: {{ node?.executionTime | date: 'dd.MM.yyyy HH:mm:ss:sss' }}</span>
-    <span class="muted mat-small">| Duration (ms): {{ node?.duration }}</span>
-    <span class="muted mat-small" *ngIf="node?._class === 'step.artefacts.reports.CallFunctionReportNode'">
+    <span class="muted mat-small"> | Duration (ms): {{ node?.duration }}</span>
+    <span class="muted mat-small" *ngIf="node?.resolvedArtefact?._class === 'CallKeyword'">
       | Agent: {{ node?.agentUrl }}
     </span>
   </div>

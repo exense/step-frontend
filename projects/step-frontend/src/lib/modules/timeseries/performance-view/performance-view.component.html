@@ -1,0 +1,141 @@
+<div class="page-container">
+  <div class="view-content">
+    <step-execution-filters *ngIf="executionContext" [executionContext]="executionContext"></step-execution-filters>
+    <step-execution-time-selection
+      [timePicker]="includeTimeRangePicker"
+      (onRangeChange)="handleTableRangeChange($event)"
+      (onRangeReset)="handleRangeReset($event)"
+      #timeSelection
+      *ngIf="executionContext"
+      [settings]="settings"
+    >
+    </step-execution-time-selection>
+    <div class="w-100 dashboard-container">
+      <div class="container chart">
+        <step-chart-skeleton *ngIf="!summaryChartSettings"></step-chart-skeleton>
+        <step-timeseries-chart
+          #summaryChart
+          *ngIf="summaryChartSettings"
+          [settings]="summaryChartSettings"
+          [syncKey]="settings.contextId"
+          [selection]="timeSelection?.absoluteSelection"
+          (onZoomReset)="onZoomReset()"
+        >
+        </step-timeseries-chart>
+      </div>
+
+      <div class="container chart">
+        <step-chart-skeleton *ngIf="!byStatusSettings"></step-chart-skeleton>
+        <step-timeseries-chart
+          #byStatusChart
+          *ngIf="byStatusSettings"
+          [settings]="byStatusSettings"
+          [selection]="timeSelection?.absoluteSelection"
+          [syncKey]="settings.contextId"
+          (onZoomReset)="onZoomReset()"
+        >
+        </step-timeseries-chart>
+      </div>
+
+      <div class="charts-section">
+        <div class="container chart">
+          <div class="measurements-toggle" *ngIf="throughputChartSettings">
+            <step-measurements-picker
+              *ngIf="settings.contextId"
+              [contextId]="settings.contextId"
+            ></step-measurements-picker>
+          </div>
+          <step-chart-skeleton *ngIf="!responseTypeByKeywordsSettings"></step-chart-skeleton>
+          <step-timeseries-chart
+            #responseTimeChart
+            *ngIf="responseTypeByKeywordsSettings"
+            [settings]="responseTypeByKeywordsSettings"
+            [selection]="timeSelection?.absoluteSelection"
+            [syncKey]="settings.contextId"
+            (onZoomReset)="onZoomReset()"
+          >
+          </step-timeseries-chart>
+          <div class="chart-footer-actions">
+            <button mat-button [matMenuTriggerFor]="menu">Metric ({{ selectedMetric.label }})</button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item *ngFor="let metric of responseTimeMetrics" (click)="switchChartMetric(metric)">
+                {{ metric.label }}
+              </button>
+            </mat-menu>
+          </div>
+        </div>
+
+        <div class="container chart">
+          <div class="measurements-toggle" *ngIf="throughputChartSettings">
+            <step-measurements-picker
+              *ngIf="settings.contextId"
+              [contextId]="settings.contextId"
+            ></step-measurements-picker>
+          </div>
+          <step-chart-skeleton *ngIf="!throughputChartSettings"></step-chart-skeleton>
+          <step-timeseries-chart
+            *ngIf="throughputChartSettings"
+            #throughputChart
+            [settings]="throughputChartSettings"
+            [selection]="timeSelection?.absoluteSelection"
+            [syncKey]="settings.contextId"
+            (onZoomReset)="onZoomReset()"
+          >
+          </step-timeseries-chart>
+        </div>
+
+        <div class="container" style="width: 100%">
+          <step-timeseries-table
+            #tableChart
+            *ngIf="executionContext"
+            [findRequest]="findRequest"
+            [executionContext]="executionContext"
+          ></step-timeseries-table>
+        </div>
+      </div>
+
+      <div class="container chart" *ngIf="includeThreadGroupChart">
+        <step-chart-skeleton *ngIf="!threadGroupSettings"></step-chart-skeleton>
+        <step-timeseries-chart
+          *ngIf="threadGroupSettings"
+          #threadGroupChart
+          [settings]="threadGroupSettings"
+          [selection]="timeSelection?.absoluteSelection"
+          [syncKey]="settings.contextId"
+          (onZoomReset)="onZoomReset()"
+        >
+        </step-timeseries-chart>
+      </div>
+    </div>
+  </div>
+  <!--  <div class="side-panel" *ngIf="false">-->
+  <!--    <div class="container chart" *ngIf="throughputChartSettings" style="overflow: auto">-->
+  <!--      <div>-->
+  <!--        <input-->
+  <!--          type="checkbox"-->
+  <!--          class="checkbox"-->
+  <!--          [(ngModel)]="allSeriesChecked"-->
+  <!--          (change)="onAllSeriesCheckboxClick($event)"-->
+  <!--          style="display: inline"-->
+  <!--        />-->
+  <!--        <input [(ngModel)]="keywordSearchValue" placeholder="Search" style="width: 110px; margin-bottom: 12px" />-->
+  <!--      </div>-->
+
+  <!--      <div *ngFor="let item of keywords | keyvalue: valueAscOrder">-->
+  <!--        <ng-container *ngIf="!keywordSearchValue || item.key.toLowerCase().indexOf(keywordSearchValue) >= 0">-->
+  <!--          <div class="color-cell">-->
+  <!--            <input-->
+  <!--              type="checkbox"-->
+  <!--              [ngModel]="item.value.isSelected"-->
+  <!--              class="checkbox"-->
+  <!--              (change)="onKeywordToggle(item.key, $event)"-->
+  <!--            />-->
+  <!--            <span class="color-square" [style.background-color]="item.value.color"></span>-->
+  <!--            <span>{{ item.key }}</span>-->
+  <!--          </div>-->
+  <!--        </ng-container>-->
+  <!--      </div>-->
+  <!--    </div>-->
+  <!--    <step-execution-filters *ngIf="executionId" [executionId]="executionId"></step-execution-filters>-->
+  <!--  </div>-->
+</div>

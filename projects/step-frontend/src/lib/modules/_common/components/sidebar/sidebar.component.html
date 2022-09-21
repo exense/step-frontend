@@ -2,31 +2,32 @@
 <div class="sidebar">
   <div id="sidebar-logo-and-burgermenu">
     <span class="visible-when-collapsed">
-      <label for="collapsable-sidebar-toggle-checkbox" (click)="toggleOpenClose()"
-        ><i class="glyphicon glyphicon-menu-hamburger"></i></label
-    ></span>
-    <span class="sidebar-aligned-text">
+      <label for="collapsable-sidebar-toggle-checkbox" (click)="toggleOpenClose()">
+        <step-icon name="menu"></step-icon>
+      </label>
+    </span>
+    <span class="sidebar-logo-container">
       <div class="sidebar-logo"></div>
     </span>
   </div>
   <div id="sidebar-home-and-settings">
-    <span class="visible-when-collapsed sidebar-home-button" (click)="navigateTo('home')"
-      ><i class="glyphicon glyphicon-home"></i
-    ></span>
+    <span class="visible-when-collapsed sidebar-home-button" (click)="navigateTo('home')">
+      <step-icon name="home"></step-icon>
+    </span>
     <span class="sidebar-home-and-settings-divider">|</span>
     <span
       (click)="navigateTo('admin')"
       *ngIf="'admin-ui-menu' | hasRight | async"
       class="sidebar-home-and-settings-icon"
     >
-      <i class="glyphicon glyphicon-cog"></i>
+      <step-icon name="settings"></step-icon>
     </span>
     <span
       (click)="navigateTo('settings')"
       *ngIf="('settings-ui-menu' | hasRight | async) && !('admin-ui-menu' | hasRight | async)"
       class="sidebar-home-and-settings-icon"
     >
-      <i class="glyphicon glyphicon-cog"></i>
+      <step-icon name="settings"></step-icon>
     </span>
   </div>
   <div id="sidebar-categories">
@@ -46,9 +47,9 @@
           type="checkbox"
         />
         <label for="collapsable-tab-{{ mainMenuEntry.label }}">
-          <span class="visible-when-collapsed" [ngClass]="mainMenuEntry.icon"></span>
+          <step-icon class="visible-when-collapsed" [name]="mainMenuEntry.icon"></step-icon>
           <span class="sidebar-aligned-text">{{ mainMenuEntry.label }}</span>
-          <span><mat-icon class="chevron">chevron_right</mat-icon></span>
+          <span><step-icon class="chevron" name="chevron-right"></step-icon></span>
         </label>
         <div class="content">
           <section
@@ -62,7 +63,7 @@
               [class.sidebar-highlighted-subtab]="_viewStateService.isViewActive(entry.viewId)"
               (click)="navigateTo(entry.viewId)"
             >
-              <span class="visible-when-collapsed" [ngClass]="entry.icon"></span>
+              <step-icon class="visible-when-collapsed" [name]="entry.icon"></step-icon>
               <span class="sidebar-aligned-subtext">{{ entry.label }}</span>
             </div>
           </section>
@@ -71,13 +72,7 @@
     </div>
   </div>
 
-  <div id="sidebar-help-and-support">
-    <a href="https://step.exense.ch/knowledgebase">
-      <div>
-        <i class="glyphicon glyphicon-question-sign"></i>
-        <span class="help-and-support-span">Help & Support</span>
-      </div>
-    </a>
+  <div id="sidebar-bottom">
     <span class="version" title="{{ '${project.version}' }}"
       >{{ '${project.version}' }}
       <span style="display: none" id="frontend-os">{{ '${project.versionFEOS}' }}</span>

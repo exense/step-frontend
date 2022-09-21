@@ -15,9 +15,8 @@ export class DashboardService {
     private _viewRegistryService: ViewRegistryService
   ) {}
 
-  // FIXME: link to new dashboard
   getDashboardLink(taskId: string): string {
-    return '/#/root/dashboards/__pp__RTMDashboard?__filter1__=text,taskId,' + taskId;
+    return '/#/root/dashboards/' + taskId;
   }
 }
 

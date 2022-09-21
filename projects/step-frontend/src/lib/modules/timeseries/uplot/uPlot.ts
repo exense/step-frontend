@@ -1,5 +1,4 @@
 // @ts-ignore
-// @ts-ignore
 
 declare class uPlot {
   /** when passing a function for @targ, call init() after attaching self.root to the DOM */

@@ -21,6 +21,7 @@ angular
 
   .run(function (ViewRegistry) {
     ViewRegistry.registerView('dashboards', 'partials/dashboards/dashboardsController.html');
+    ViewRegistry.registerView('dashboards-rtm', 'partials/dashboards/dashboardsControllerRtm.html');
   })
 
   .controller(
@@ -41,7 +42,7 @@ angular
       $element,
       $uibModal
     ) {
-      stateStorage.push($scope, 'dashboards', {});
+      stateStorage.push($scope, 'dashboards-rtm', {});
       $scope.authService = AuthService;
       $scope.staticPresets = new StaticPresets();
       $scope.dashboardsendpoint = [];
@@ -58,7 +59,6 @@ angular
             inputs.push({ key: item, value: $location.$$search[item], isDynamic: dyn });
           });
         }
-
         return inputs;
       };
 

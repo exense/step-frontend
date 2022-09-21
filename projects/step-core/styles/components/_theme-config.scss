@@ -3,6 +3,8 @@
 @use 'step-tabs';
 @use 'step-sidebar';
 @use 'step-header';
+@use 'step-icon';
+@use 'step-login';
 
 @forward 'step-sidebar' show step-define-sidebar-config;
 @forward 'step-header' show step-define-header-config;
@@ -80,7 +82,8 @@ $light-primary-text: white;
   $mat-typography-config: null,
   $mat-accent-palette: null,
   $step-sidebar-config: null,
-  $step-header-config: null
+  $step-header-config: null,
+  $step-login-config: null
 ) {
   @if not $mat-primary-palette {
     $mat-primary-palette: step-default-primary-palette();
@@ -122,6 +125,7 @@ $light-primary-text: white;
   @include step-tabs.tabbar($primary-color);
   @include step-sidebar.sidebar($step-sidebar-config);
   @include step-header.header($step-header-config);
+  @include step-login.login-page($step-login-config, $mat-primary-palette);
 
   color: $text-color;
   line-height: 16px;
@@ -129,4 +133,6 @@ $light-primary-text: white;
   .mat-mini-fab {
     box-shadow: none !important;
   }
+
+  @include step-icon.step-icon();
 }

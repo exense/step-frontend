@@ -1,3 +1,4 @@
 <div class="chart-wrapper" [style.padding]="WRAPPER_PADDING">
   <div #chart></div>
+  <div class="no-data-tag" *ngIf="emptyChart">No data...</div>
 </div>

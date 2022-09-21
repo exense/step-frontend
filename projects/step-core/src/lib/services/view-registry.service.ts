@@ -29,6 +29,8 @@ export interface Dashlet {
   providedIn: 'root',
 })
 export class ViewRegistryService {
+  static readonly VIEW_ID_LINK_PREFIX: string = 'link:';
+
   registeredViews: { [key: string]: CustomView } = {};
   registeredMenuEntries: MenuEntry[] = [];
   registeredMenuIds: string[] = [];
@@ -43,22 +45,45 @@ export class ViewRegistryService {
    */
   registerStandardMenuEntries() {
     // Main Menus
-    this.registerMenuEntry('Automation', 'automation-root', 'glyphicon glyphicon-play', 10);
-    this.registerMenuEntry('Execute', 'execute-root', 'glyphicon glyphicon-tasks', 20);
-    this.registerMenuEntry('Status', 'status-root', 'glyphicon glyphicon-ok', 50);
+    this.registerMenuEntry('Automation', 'automation-root', 'play', 10);
+    this.registerMenuEntry('Execute', 'execute-root', 'sun', 20);
+    this.registerMenuEntry('Status', 'status-root', 'check-square', 50);
+    this.registerMenuEntry('Support', 'support-root', 'life-buoy', 100);
 
     // Sub Menus Automation
-    this.registerMenuEntry('Keywords', 'functions', 'glyphicon glyphicon-record', 10, 'automation-root');
-    this.registerMenuEntry('Plans', 'plans', 'glyphicon glyphicon-file', 30, 'automation-root');
-    this.registerMenuEntry('Parameters', 'parameters', 'glyphicon glyphicon-list-alt', 40, 'automation-root');
+    this.registerMenuEntry('Keywords', 'functions', 'target', 10, 'automation-root');
+    this.registerMenuEntry('Plans', 'plans', 'file', 30, 'automation-root');
+    this.registerMenuEntry('Parameters', 'parameters', 'list', 40, 'automation-root');
     // Sub Menus Execute
-    this.registerMenuEntry('Executions', 'executions', 'glyphicon glyphicon-tasks', 10, 'execute-root');
-    this.registerMenuEntry('Scheduler', 'scheduler', 'glyphicon glyphicon-time', 20, 'execute-root');
+    this.registerMenuEntry('Executions', 'executions', 'rotate-cw', 10, 'execute-root');
+    this.registerMenuEntry('Scheduler', 'scheduler', 'clock', 20, 'execute-root');
     // Sub Menus Status
-    this.registerMenuEntry('Agents', 'gridagents', 'glyphicon glyphicon-briefcase', 20, 'status-root');
-    this.registerMenuEntry('Agent tokens', 'gridtokens', 'glyphicon glyphicon-tag', 30, 'status-root');
-    this.registerMenuEntry('Token Groups', 'gridtokengroups', 'glyphicon glyphicon glyphicon-tags', 40, 'status-root');
-    this.registerMenuEntry('Quota Manager', 'gridquotamanager', 'glyphicon glyphicon-road', 50, 'status-root');
+    this.registerMenuEntry('Agents', 'gridagents', 'users', 20, 'status-root');
+    this.registerMenuEntry('Agent tokens', 'gridtokens', 'circle', 30, 'status-root');
+    this.registerMenuEntry('Token Groups', 'gridtokengroups', 'tag', 40, 'status-root');
+    this.registerMenuEntry('Quota Manager', 'gridquotamanager', 'sidebar', 50, 'status-root');
+    // Sub Menus Support
+    this.registerMenuEntry(
+      'Documentation',
+      ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('https://step.exense.ch/knowledgebase/'),
+      'help-circle',
+      10,
+      'support-root'
+    );
+    this.registerMenuEntry(
+      'REST API',
+      ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('/doc/rest/'),
+      'compass',
+      20,
+      'support-root'
+    );
+    this.registerMenuEntry(
+      'About',
+      ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('https://step.exense.ch/'),
+      'book-open',
+      30,
+      'support-root'
+    );
   }
 
   getCustomView(view: string): CustomView {

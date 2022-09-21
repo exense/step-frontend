@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { RelativeTimeSelection } from './model/relative-time-selection';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
@@ -13,11 +13,15 @@ import { RangeSelectionType } from './model/range-selection-type';
 export class TimeRangePicker implements OnInit {
   @ViewChild(MatMenuTrigger) menuTrigger!: MatMenuTrigger;
 
+  @Input() customRelativeOptions: RelativeTimeSelection[] | undefined;
+  @Input() initialSelectionIndex: number | undefined;
+  @Input() includeFullRangeOption: boolean = true;
+
   @Output('selectionChange') onSelectionChange = new EventEmitter<TimeRangePickerSelection>();
 
   _30_MINUTES = 30 * 60 * 1000; // in ms
 
-  relativeRangeOptions: RelativeTimeSelection[] = [
+  defaultRelativeOptions: RelativeTimeSelection[] = [
     { label: 'Last 1 minute', timeInMs: this._30_MINUTES / 30 },
     { label: 'Last 5 minutes', timeInMs: this._30_MINUTES / 6 },
     { label: 'Last 15 minutes', timeInMs: this._30_MINUTES / 2 },
@@ -32,9 +36,25 @@ export class TimeRangePicker implements OnInit {
   fromDateString: string | undefined; // used for formatting the date together with time
   toDateString: string | undefined;
 
-  activeSelection: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
+  activeSelection!: TimeRangePickerSelection;
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if (this.initialSelectionIndex != undefined) {
+      this.activeSelection = {
+        type: RangeSelectionType.RELATIVE,
+        relativeSelection: (this.customRelativeOptions || this.defaultRelativeOptions)[this.initialSelectionIndex],
+      };
+    } else {
+      if (this.includeFullRangeOption) {
+        this.activeSelection = { type: RangeSelectionType.FULL };
+      } else {
+        this.activeSelection = {
+          type: RangeSelectionType.RELATIVE,
+          relativeSelection: (this.customRelativeOptions || this.defaultRelativeOptions)[0],
+        };
+      }
+    }
+  }
 
   applyAbsoluteInterval() {
     let from = undefined;
@@ -114,6 +134,10 @@ export class TimeRangePicker implements OnInit {
     let dateObject = new Date(stringValue);
     // @ts-ignore
     return dateObject !== 'Invalid Date' && !isNaN(dateObject); // from mozilla+chrome and IE8
+  }
+
+  getActiveSelection() {
+    return this.activeSelection;
   }
 
   get RangeSelectionType() {

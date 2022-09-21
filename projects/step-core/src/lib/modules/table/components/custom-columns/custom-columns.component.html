@@ -7,7 +7,7 @@
 >
   <th mat-header-cell *matHeaderCellDef mat-sort-header>
     <ng-container *ngIf="col.description">
-      <mat-icon [matTooltip]="col.description"> help </mat-icon>
+      <step-icon [matTooltip]="col.description" name="help-circle"></step-icon>
     </ng-container>
     {{ col.label }}
   </th>
