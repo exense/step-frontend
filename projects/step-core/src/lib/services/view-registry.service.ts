@@ -48,7 +48,7 @@ export class ViewRegistryService {
     this.registerMenuEntry('Automation', 'automation-root', 'play', 10);
     this.registerMenuEntry('Execute', 'execute-root', 'sun', 20);
     this.registerMenuEntry('Status', 'status-root', 'check-square', 50);
-    this.registerMenuEntry('Support', 'support-root', 'phone', 100);
+    this.registerMenuEntry('Support', 'support-root', 'life-buoy', 100);
 
     // Sub Menus Automation
     this.registerMenuEntry('Keywords', 'functions', 'target', 10, 'automation-root');
@@ -67,13 +67,13 @@ export class ViewRegistryService {
       'Documentation',
       ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('https://step.exense.ch/knowledgebase/'),
       'help-circle',
-      20,
+      10,
       'support-root'
     );
     this.registerMenuEntry(
       'REST API',
       ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('/doc/rest/'),
-      'hexagon',
+      'compass',
       20,
       'support-root'
     );
@@ -81,7 +81,7 @@ export class ViewRegistryService {
       'About',
       ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('https://step.exense.ch/'),
       'book-open',
-      20,
+      30,
       'support-root'
     );
   }
