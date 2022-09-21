@@ -30,7 +30,7 @@
           type="button"
           mat-icon-button
           matTooltip="Edit package"
-          [disabled]="isRefreshing"
+          [disabled]="isRefreshing || !('user-write' | hasRight | async)"
           (click)="edit(element.id)"
         >
           <step-icon name="tool"></step-icon>
@@ -39,7 +39,7 @@
           type="button"
           mat-icon-button
           matTooltip="Delete package"
-          [disabled]="isRefreshing"
+          [disabled]="isRefreshing || !('user-write' | hasRight | async)"
           (click)="delete(element.id, element.attributes.name)"
         >
           <step-icon name="trash-2">delete</step-icon>

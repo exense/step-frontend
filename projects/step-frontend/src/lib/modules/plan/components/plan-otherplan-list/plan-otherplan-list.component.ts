@@ -12,8 +12,10 @@ import { ILocationService } from 'angular';
 export class PlanOtherplanListComponent {
   @Output() onSelection = new EventEmitter<string>();
 
+  readonly dataSource = this._plansApiService.getPlansTableDataSource();
+
   constructor(
-    readonly _plansApiService: AugmentedPlansService,
+    private _plansApiService: AugmentedPlansService,
     private _httpClient: HttpClient,
     @Inject(AJS_LOCATION) private _location: ILocationService
   ) {}
