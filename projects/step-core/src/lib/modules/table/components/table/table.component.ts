@@ -172,6 +172,14 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
       .subscribe(([page, sort, search, filter, tableParams]) =>
         tableDataSource.getTableData(page, sort, search, filter, tableParams)
       );
+
+    tableDataSource.forceNavigateToFirstPage$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe(() => {
+      // Unfortunately firstPage method invoking doesn't trigger page change event.
+      // It just updates the page index in component and redraw it.
+      // To trigger the event _changePageSize is invoked
+      this.page!.firstPage();
+      this.page!._changePageSize(this.page.pageSize);
+    });
   }
 
   private addCustomColumnsDefinitionsToRemoteDatasource(): void {

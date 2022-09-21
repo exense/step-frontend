@@ -10,6 +10,7 @@ export interface TableDataSource<T> extends DataSource<T> {
   readonly inProgress$: Observable<boolean>;
   readonly total$: Observable<number>;
   readonly totalFiltered$: Observable<number>;
+  readonly forceNavigateToFirstPage$: Observable<unknown>;
   getTableData(
     page?: PageEvent,
     sort?: Sort,
