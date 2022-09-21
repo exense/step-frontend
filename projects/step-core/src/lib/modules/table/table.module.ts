@@ -16,6 +16,7 @@ import { EntitiesSelectionModule } from '../entities-selection/entities-selectio
 import { BulkOperationIconPipe } from './pipe/bulk-operation-icon.pipe';
 import { AsyncOperationsModule } from '../async-operations/async-operations.module';
 import { BulkOperationLabelPipe } from './pipe/bulk-operation-label.pipe';
+import { CustomSearchCellComponentsPipe } from './pipe/custom-search-cell-components.pipe';
 
 @NgModule({
   imports: [
@@ -38,6 +39,7 @@ import { BulkOperationLabelPipe } from './pipe/bulk-operation-label.pipe';
     BulkOperationsComponent,
     BulkOperationIconPipe,
     BulkOperationLabelPipe,
+    CustomSearchCellComponentsPipe,
   ],
   exports: [
     TableComponent,
