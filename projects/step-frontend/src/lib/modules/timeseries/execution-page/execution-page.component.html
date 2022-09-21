@@ -7,4 +7,6 @@
   </mat-menu>
 </div>
 
+<button mat-raised-button class="interactive-btn" (click)="navigateToRtmDashboard()">Interactive Session</button>
+
 <step-performance-view *ngIf="performanceViewSettings" [settings]="performanceViewSettings"></step-performance-view>

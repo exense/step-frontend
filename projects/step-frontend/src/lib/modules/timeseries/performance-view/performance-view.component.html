@@ -3,7 +3,6 @@
     <step-execution-filters *ngIf="executionContext" [executionContext]="executionContext"></step-execution-filters>
     <step-execution-time-selection
       [timePicker]="includeTimeRangePicker"
-      (onRangeChange)="handleTableRangeChange($event)"
       (onRangeReset)="handleRangeReset($event)"
       #timeSelection
       *ngIf="executionContext"
@@ -12,11 +11,11 @@
     </step-execution-time-selection>
     <div class="w-100 dashboard-container">
       <div class="container chart">
-        <step-chart-skeleton *ngIf="!summaryChartSettings"></step-chart-skeleton>
+        <step-chart-skeleton *ngIf="!chartsSettings[TsChartType.OVERVIEW]"></step-chart-skeleton>
         <step-timeseries-chart
           #summaryChart
-          *ngIf="summaryChartSettings"
-          [settings]="summaryChartSettings"
+          *ngIf="chartsSettings[TsChartType.OVERVIEW]"
+          [settings]="chartsSettings[TsChartType.OVERVIEW]"
           [syncKey]="settings.contextId"
           [selection]="timeSelection?.absoluteSelection"
           (onZoomReset)="onZoomReset()"
