@@ -37,7 +37,7 @@ export class ExecutionModule {
     _entityRegistry.register(
       'executions',
       'Execution',
-      'git-commit',
+      'sun',
       '/partials/executions/executionSelectionTable.html'
     );
   }
