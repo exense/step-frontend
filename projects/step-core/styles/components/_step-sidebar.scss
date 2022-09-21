@@ -237,7 +237,7 @@
       padding: map.get($config, elements-text-padding);
     }
 
-    #sidebar-help-and-support {
+    #sidebar-bottom {
       position: fixed;
       z-index: 100;
       background-color: map.get($config, background-color);
@@ -407,7 +407,7 @@
         width: map.get($config, width-closed);
       }
 
-      #sidebar-help-and-support {
+      #sidebar-bottom {
         width: map.get($config, width-closed);
         font-size: medium;
       }
