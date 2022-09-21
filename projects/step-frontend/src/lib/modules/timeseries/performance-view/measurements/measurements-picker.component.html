@@ -1,6 +1,6 @@
 <button mat-raised-button [matMenuTriggerFor]="menu">
   <!--  Measurements {{ activeKeywords ? '(' + activeKeywords + ')' : '' }}-->
-  <mat-icon matTooltip="Measurements">bar_chart</mat-icon>
+  <step-icon name="settings"></step-icon>
 </button>
 <mat-menu #menu="matMenu" class="time-selector-menu">
   <div (click)="$event.stopPropagation()">
