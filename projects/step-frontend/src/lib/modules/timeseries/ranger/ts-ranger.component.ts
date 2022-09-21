@@ -82,7 +82,6 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       this.init(settings.currentValue);
       let end = this.settings.xValues[this.settings.xValues.length - 1];
       let start = this.settings.xValues[0];
-      console.log(this.settings.selection);
       this.createRanger();
     }
   }
@@ -109,7 +108,6 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     if (!fromTimestamp) {
       left = Math.round(this.uplot.valToPos(this.start, 'x'));
     } else {
-      // console.log('LeftValToPos=', this.uplot.valToPos(fromTimestamp, 'x'), fromTimestamp);
       left = Math.max(this.uplot.valToPos(fromTimestamp, 'x'), 0);
     }
     if (!toTimestamp) {

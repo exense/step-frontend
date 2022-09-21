@@ -104,7 +104,6 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
   }
 
   prepareSelectForRanger(selection: ExecutionTimeSelection): TSTimeRange | undefined {
-    console.log(selection);
     if (selection.type === RangeSelectionType.FULL) {
       return undefined;
     } else {
@@ -144,7 +143,6 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
   }
 
   onRangerSelectionChange(event: TSTimeRange) {
-    console.log('CHANGED', event);
     if (this.timeLabels[0] === event.from && this.timeLabels[this.timeLabels.length - 1] === event.to) {
       this.timeRangePicker?.selectFullRange();
     } else {

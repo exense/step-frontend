@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AJS_MODULE, ExecutionsService } from '@exense/step-core';
+import { AJS_MODULE, DashboardService, ExecutionsService } from '@exense/step-core';
 import { TimeSeriesConfig } from '../time-series.config';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PerformanceViewSettings } from '../performance-view/performance-view-settings';
@@ -38,7 +38,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   constructor(
     private timeSeriesService: TimeSeriesService,
     private contextsFactory: TimeSeriesContextsFactory,
-    private executionService: ExecutionsService
+    private executionService: ExecutionsService,
+    private dashboardService: DashboardService
   ) {}
 
   ngOnInit(): void {
@@ -116,6 +117,10 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         }
       });
     }, interval);
+  }
+
+  navigateToRtmDashboard() {
+    window.open(this.dashboardService.getRtmExecutionLink(this.executionId));
   }
 
   ngOnDestroy(): void {
