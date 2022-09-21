@@ -4,4 +4,5 @@ export enum CustomRegistryType {
   functionType = 'functionType',
   functionPackageType = 'functionPackageType',
   customCell = 'customCell',
+  customSearchCell = 'customSearchCell',
 }

@@ -92,6 +92,7 @@ export class FunctionPackageLinkComponent implements CustomComponent {
 
   private loadFunctionPackage(): void {
     if (!this.functionPackageId) {
+      this.functionPackage = undefined;
       return;
     }
     this._api.getFunctionPackage(this.functionPackageId).subscribe((response) => {

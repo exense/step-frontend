@@ -1,5 +1,6 @@
 <mat-form-field>
-  <input matInput [matDatepicker]="picker" (dateChange)="handleDateChange($event)" />
+  <input matInput #dateInput [matDatepicker]="picker" [formControl]="dateControl" />
   <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
   <mat-datepicker #picker></mat-datepicker>
+  <mat-error *ngIf="dateControl.invalid">Invalid date</mat-error>
 </mat-form-field>
