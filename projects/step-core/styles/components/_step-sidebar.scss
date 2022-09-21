@@ -213,20 +213,12 @@
       display: block;
       flex-grow: 1;
       padding-top: 16px;
-      margin-top: calc($logoHeight + $homeSettingHeight);
-
-      .sidebar-categories-categories {
-        height: 58px;
-        font-size: smaller;
-        padding: 0 $elements-text-padding 0 $elements-text-padding;
-        display: flex;
-        align-items: center;
-      }
+      margin-top: calc(#{$logoHeight} + #{$homeSettingHeight});
     }
 
     div#sidebar-categories-tabs {
       $helpSupportHeight: map.get($config, help-and-support-height);
-      margin-bottom: calc($helpSupportHeight + 10px);
+      margin-bottom: calc(#{$helpSupportHeight} + 10px);
 
       .sidebar-collapsable-tab:first-child label {
         border-radius: 8px 8px 0 0;
@@ -237,7 +229,7 @@
       padding: map.get($config, elements-text-padding);
     }
 
-    #sidebar-help-and-support {
+    #sidebar-bottom {
       position: fixed;
       z-index: 100;
       background-color: map.get($config, background-color);
@@ -407,7 +399,7 @@
         width: map.get($config, width-closed);
       }
 
-      #sidebar-help-and-support {
+      #sidebar-bottom {
         width: map.get($config, width-closed);
         font-size: medium;
       }
