@@ -29,6 +29,6 @@ import { ReportNodeShortComponent } from './components/report-node-short/report-
     ReportNodeShortComponent,
   ],
   imports: [StepCommonModule],
-  exports: [ReportNodeShortComponent, ReportNodeStatusComponent],
+  exports: [ReportNodeShortComponent, ReportNodeStatusComponent, ReportNodeIconComponent],
 })
 export class ReportNodesModule {}

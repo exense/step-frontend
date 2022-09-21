@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, AuthService } from '@exense/step-core';
 
@@ -6,6 +6,7 @@ import { AJS_MODULE, AuthService } from '@exense/step-core';
   selector: 'step-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class LoginComponent {
   credentials = {
@@ -16,6 +17,8 @@ export class LoginComponent {
   capsLock?: boolean;
 
   @Input() logo: string = 'images/logologin.png';
+
+  readonly loginDescriptionText: string = '';
 
   constructor(private _auth: AuthService) {}
 
