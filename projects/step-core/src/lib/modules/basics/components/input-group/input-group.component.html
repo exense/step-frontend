@@ -1,0 +1,9 @@
+<div class="step-input-label" #labelRef [class.invisible]="labelRef.children.length === 0">
+  <ng-content select="label"></ng-content>
+</div>
+<div class="step-input-group">
+  <ng-content></ng-content>
+</div>
+<div class="step-input-other">
+  <ng-content select="mat-error"></ng-content>
+</div>
