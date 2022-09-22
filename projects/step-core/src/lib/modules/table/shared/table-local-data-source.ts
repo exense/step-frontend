@@ -1,6 +1,18 @@
 import { TableDataSource } from './table-data-source';
 import { CollectionViewer } from '@angular/cdk/collections';
-import { BehaviorSubject, combineLatest, map, Observable, of, Subject, takeUntil } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  filter,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  Subject,
+  switchMap,
+  takeUntil,
+  timer,
+} from 'rxjs';
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { SearchValue } from './search-value';
@@ -35,6 +47,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
   readonly total$: Observable<number>;
   readonly data$: Observable<T[]>;
   readonly totalFiltered$: Observable<number>;
+  readonly forceNavigateToFirstPage$: Observable<unknown>;
 
   constructor(source: T[] | Observable<T[]>, private _config: TableLocalDataSourceConfig<T> = {}) {
     const source$ = source instanceof Array ? of(source) : source;
@@ -66,12 +79,25 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
           total,
           totalFiltered,
         };
-      })
+      }),
+      shareReplay(1)
     );
 
     this.total$ = requestResult$.pipe(map((r) => r.total));
     this.totalFiltered$ = requestResult$.pipe(map((r) => r.totalFiltered));
     this.data$ = requestResult$.pipe(map((r) => r.data));
+    this.forceNavigateToFirstPage$ = combineLatest([this.data$, this.totalFiltered$]).pipe(
+      map(([data, totalFiltered]) => {
+        const recordsInPage = (data || []).length;
+        const recordsFiltered = totalFiltered || 0;
+        return recordsFiltered > 0 && recordsInPage === 0;
+      }),
+      filter((forceNavigate) => forceNavigate === true),
+      // Little time gap is required for local data source, to make sure that all previous data is rendered.
+      // Otherwise, navigating to the first page may happen and data will be valid
+      // but sum previous data maybe rendered
+      switchMap(() => timer(100))
+    );
   }
 
   private applySearch(source: T[], search?: { [key: string]: SearchValue }): T[] {

@@ -5,6 +5,10 @@
   stepSearchCol
   [isSearchDisabled]="isSearchDisabled"
 >
+  <ng-container *ngIf="col | customSearchCellComponent as customSearchCellKey">
+    <step-search-custom-cell *stepSearchCellDef [itemKey]="customSearchCellKey" [context]="col">
+    </step-search-custom-cell>
+  </ng-container>
   <th mat-header-cell *matHeaderCellDef mat-sort-header>
     <ng-container *ngIf="col.description">
       <step-icon [matTooltip]="col.description" name="help-circle"></step-icon>

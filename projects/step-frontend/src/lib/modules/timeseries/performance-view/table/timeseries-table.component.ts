@@ -65,11 +65,8 @@ export class TimeseriesTableComponent implements OnInit {
     this.keywordsService.toggleKeyword(keyword);
   }
 
-  init(request: FindBucketsRequest) {
-    // this.findRequest = request;
-  }
-
-  refresh() {
+  refresh(request: FindBucketsRequest) {
+    this.findRequest = request;
     this.fetchBuckets();
   }
 

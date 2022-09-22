@@ -136,6 +136,15 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
 
   readonly total$ = this._response$.pipe(map((r) => r?.recordsTotal || 0));
   readonly totalFiltered$ = this._response$.pipe(map((r) => r?.recordsFiltered || 0));
+  readonly forceNavigateToFirstPage$ = this._response$.pipe(
+    map((r) => {
+      const recordsInPage = (r?.data || []).length;
+      const recordsFiltered = r?.recordsFiltered || 0;
+      return recordsFiltered > 0 && recordsInPage === 0;
+    }),
+    filter((forceNavigate) => forceNavigate === true)
+  );
+
   private typeFilter?: { [key: string]: SearchValue };
 
   constructor(
