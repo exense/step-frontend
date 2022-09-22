@@ -1,18 +1,11 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AJS_MODULE, ExecutionsService } from '@exense/step-core';
+import { AJS_MODULE, DashboardService, ExecutionsService } from '@exense/step-core';
 import { TimeSeriesConfig } from '../time-series.config';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PerformanceViewSettings } from '../performance-view/performance-view-settings';
 import { TimeSeriesService } from '../time-series.service';
 import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
-import { FindBucketsRequest } from '../find-buckets-request';
-import { TimeSeriesUtils } from '../time-series-utils';
-import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
-import { TSTimeRange } from '../chart/model/ts-time-range';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
-import { TSRangerComponent } from '../ranger/ts-ranger.component';
-import { TimeRangePicker } from '../time-selection/time-range-picker.component';
-import { TSRangerSettings } from '../ranger/ts-ranger-settings';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
 
 @Component({
@@ -45,7 +38,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   constructor(
     private timeSeriesService: TimeSeriesService,
     private contextsFactory: TimeSeriesContextsFactory,
-    private executionService: ExecutionsService
+    private executionService: ExecutionsService,
+    private dashboardService: DashboardService
   ) {}
 
   ngOnInit(): void {
@@ -123,6 +117,10 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         }
       });
     }, interval);
+  }
+
+  navigateToRtmDashboard() {
+    window.open(this.dashboardService.getRtmExecutionLink(this.executionId));
   }
 
   ngOnDestroy(): void {
