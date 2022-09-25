@@ -3,6 +3,7 @@
  * If more keys are requested, new random colors will be generated and stored in the pool.
  */
 export class TimeseriesColorsPool {
+  private readonly NO_STATUS = 'No status';
   private predefinedColors: string[];
   private assignedColors: { [key: string]: string } = {}; // every unique key has a unique color assigned
 
@@ -51,11 +52,16 @@ export class TimeseriesColorsPool {
    */
   getStatusColor(status: string): string {
     if (!status) {
-      let randomColor = this.randomRGBA();
-      statusColors[status.toLowerCase()] = randomColor;
-      return randomColor;
+      let grey = '#cccccc';
+      statusColors[this.NO_STATUS] = grey;
+      return grey;
     } else {
-      return statusColors[status.toLowerCase()];
+      let foundColor = statusColors[status.toLowerCase()];
+      if (!foundColor) {
+        foundColor = this.randomRGBA();
+        statusColors[status.toLowerCase()] = foundColor;
+      }
+      return foundColor;
     }
   }
 }

@@ -1,12 +1,26 @@
-<div *ngIf="executionInProgress">
-  <button mat-raised-button [matMenuTriggerFor]="refreshMenu">Refresh ({{ selectedRefreshInterval.label }})</button>
-  <mat-menu #refreshMenu="matMenu">
-    <button mat-menu-item *ngFor="let interval of refreshIntervals" (click)="changeRefreshInterval(interval)">
-      {{ interval.label }}
-    </button>
-  </mat-menu>
+<ng-container *ngIf="!executionHasToBeBuilt">
+  <div *ngIf="executionInProgress">
+    <button mat-raised-button [matMenuTriggerFor]="refreshMenu">Refresh ({{ selectedRefreshInterval.label }})</button>
+    <mat-menu #refreshMenu="matMenu">
+      <button mat-menu-item *ngFor="let interval of refreshIntervals" (click)="changeRefreshInterval(interval)">
+        {{ interval.label }}
+      </button>
+    </mat-menu>
+  </div>
+
+  <button mat-raised-button class="interactive-btn" (click)="navigateToRtmDashboard()">Interactive Session</button>
+
+  <step-performance-view *ngIf="performanceViewSettings" [settings]="performanceViewSettings"></step-performance-view>
+</ng-container>
+<div *ngIf="executionHasToBeBuilt" class="info-container">
+  <div class="content">
+    <div class="msg">
+      This execution has no time-series created yet. Start the building process clicking the button below.
+    </div>
+    <ng-container *ngIf="migrationInProgress">
+      <mat-spinner [diameter]="20"></mat-spinner>
+      <div style="margin-top: 4px">Building in progress...</div>
+    </ng-container>
+    <button *ngIf="!migrationInProgress" mat-raised-button (click)="rebuildTimeSeries()">Build time-series</button>
+  </div>
 </div>
-
-<button mat-raised-button class="interactive-btn" (click)="navigateToRtmDashboard()">Interactive Session</button>
-
-<step-performance-view *ngIf="performanceViewSettings" [settings]="performanceViewSettings"></step-performance-view>

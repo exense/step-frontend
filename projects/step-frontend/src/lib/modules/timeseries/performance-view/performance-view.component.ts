@@ -382,7 +382,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   createByStatusChart(request: FindBucketsRequest) {
-    this.timeSeriesService.fetchBuckets({ ...request, groupDimensions: ['rnStatus'] }).subscribe((response) => {
+    let stausAttribute = 'rnStatus';
+    this.timeSeriesService.fetchBuckets({ ...request, groupDimensions: [stausAttribute] }).subscribe((response) => {
       if (response.matrixKeys.length === 0 && this.byStatusChart) {
         // empty data
         this.byStatusChart?.clear();
@@ -390,8 +391,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       }
       let xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
       let series: TSChartSeries[] = response.matrix.map((series, i) => {
-        let status = response.matrixKeys[i]['rnStatus'];
+        let status = response.matrixKeys[i][stausAttribute];
         let color = this.colorsPool.getStatusColor(status);
+        status = status || 'No Status';
+        console.log(status, color);
         return {
           id: status,
           label: status,
