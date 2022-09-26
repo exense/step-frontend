@@ -21,7 +21,7 @@ angular
 
   .directive(
     'planTree',
-    function (artefactTypes, $http, $timeout, $interval, stateStorage, $filter, $location, Dialogs, ScreenTemplates, LinkProcessor) {
+    function (artefactTypes, $http, $timeout, $interval, stateStorage, $filter, $location, Dialogs, ScreenTemplates, LinkProcessor, $compile) {
       return {
         restrict: 'E',
         scope: {
@@ -32,6 +32,7 @@ angular
           readonly: '=',
         },
         controller: function ($scope, $location, $rootScope, AuthService, FunctionDialogs) {
+
           $scope.undoStackEntityId;
           $scope.undoStack = [];
           $scope.redoStack = [];
@@ -254,6 +255,17 @@ angular
             }
           }
 
+          function updateIcons() {
+            setTimeout(() => {
+              $('#jstree_demo_div')[0].querySelectorAll('.step-ajs-icon').forEach(el => {
+                const html = el.outerHTML;
+                el.outerHTML = $compile(html)($scope)[0].outerHTML;
+              });
+            }, 50);
+          }
+
+          $('#jstree_demo_div').on('load_node.jstree', updateIcons);
+          $('#jstree_demo_div').on('after_open.jstree', updateIcons);
           $('#jstree_demo_div').on('changed.jstree', function (e, data) {
             var selectedNodes = tree.get_selected(true);
             if (selectedNodes.length > 0) {
@@ -372,13 +384,13 @@ angular
 
               var artefact = currentNode;
 
-              var icon = artefactTypes.getIcon(artefact._class);
+              var icon = artefactTypes.getIconNg2(artefact._class);
 
               var node = {
                 id: artefact.id,
                 children: children,
                 text: getNodeLabel(artefact),
-                icon: 'glyphicon ' + icon,
+                icon: 'step-ajs-icon ' + icon,
                 data: { artefact: artefact },
               };
               if (artefact.skipNode.value) {
