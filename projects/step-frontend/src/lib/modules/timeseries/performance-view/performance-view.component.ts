@@ -25,6 +25,8 @@ import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.servi
 import { PerformanceViewSettings } from './performance-view-settings';
 import { ChartGenerators } from './chart-generators/chart-generators';
 import { TsChartType } from './ts-chart-type';
+import { BucketFilters } from '../model/bucket-filters';
+import { ExecutionFiltersComponent } from './filters/execution-filters.component';
 
 declare const uPlot: any;
 
@@ -51,6 +53,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   // key: TsChartType
   chartsSettings: { [key: string]: TSChartSettings } = {};
 
+  @ViewChild(ExecutionFiltersComponent) filtersComponent!: ExecutionFiltersComponent;
   @ViewChild('ranger') ranger!: TSRangerComponent;
   @ViewChild('throughputChart') throughputChart!: TimeSeriesChartComponent;
   @ViewChild('summaryChart') summaryChart!: TimeSeriesChartComponent;
@@ -75,6 +78,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   byKeywordsChartResponseCache?: TimeSeriesChartResponse; // for caching
 
   findRequest!: FindBucketsRequest;
+  activeFilters: BucketFilters = {};
   groupDimensions: string[] = [];
 
   execution: Execution | undefined;
@@ -118,11 +122,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     return a.key.localeCompare(b.key);
   };
 
-  constructor(
-    private timeSeriesService: TimeSeriesService,
-    private contextFactory: TimeSeriesContextsFactory,
-    private executionService: ExecutionsService
-  ) {}
+  constructor(private timeSeriesService: TimeSeriesService, private contextFactory: TimeSeriesContextsFactory) {}
 
   onAllSeriesCheckboxClick(event: any) {
     this.keywordsService.toggleSelectAll();
@@ -172,8 +172,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     });
 
     this.executionContext.onFiltersChange().subscribe((filters) => {
+      this.activeFilters = filters;
+      this.deleteObjectProperties(this.findRequest.params, this.filtersComponent.getAllFilterAttributes()); // we clean the request first
       Object.assign(this.findRequest.params, filters);
-      // this.findRequest.params = { ...this.findRequest.params, ...filters};
       this.updateAllCharts();
     });
     this.executionContext.onGroupingChange().subscribe((groupDimensions: string[]) => {
@@ -182,6 +183,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     });
 
     this.createAllCharts();
+  }
+
+  deleteObjectProperties(object: any, keys: string[]) {
+    keys.forEach((key) => delete object[key]);
   }
 
   private initContext() {
@@ -249,7 +254,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   updateAllCharts() {
+    console.log(this.findRequest);
     this.timeSelectionComponent.refreshRanger();
+    // we clone the object so the find request is not poluted with the filters (we can't clean it back)
     this.createSummaryChart(this.findRequest, true);
     this.updateTable();
     this.createByStatusChart(this.findRequest);
@@ -545,7 +552,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       this.tableChart.refresh(this.findRequest); // refresh the table
       return;
     }
-    let clonedRequest = JSON.parse(JSON.stringify(this.findRequest)); // we make a clone in order to not pollute the global request
+    // we make a clone in order to not pollute the global request, since we change from and to params
+    let clonedRequest = JSON.parse(JSON.stringify(this.findRequest));
     if (newRange.from) {
       clonedRequest.start = Math.trunc(newRange.from);
     }

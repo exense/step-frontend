@@ -38,6 +38,10 @@ export class ExecutionFiltersComponent implements OnInit {
     }
   }
 
+  getAllFilterAttributes() {
+    return this.filterItems.map((item) => item.attributeName);
+  }
+
   applyParams(): void {
     const filters: BucketFilters = {};
     this.filterItems.forEach((item) => {
