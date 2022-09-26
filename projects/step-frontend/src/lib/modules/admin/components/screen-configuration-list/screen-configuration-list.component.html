@@ -1,9 +1,9 @@
 <section class="header">
-  <mat-form-field appearance="fill">
-    <mat-label>{{ currentlySelectedScreenChoice }}</mat-label>
-    <mat-select>
+  <mat-form-field class="step-view">
+    <mat-select [value]="currentlySelectedScreenChoice">
       <mat-option
         *ngFor="let screenChoice of _screenChoicesRequest$ | async"
+        [value]="screenChoice"
         (click)="reloadTableForCurrentChoice(screenChoice)"
       >
         {{ screenChoice }}

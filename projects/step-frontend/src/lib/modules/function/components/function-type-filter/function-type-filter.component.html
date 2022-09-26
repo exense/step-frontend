@@ -1,4 +1,4 @@
-<mat-form-field>
+<mat-form-field class="step-view">
   <mat-select multiple (selectionChange)="handleChange($event)">
     <mat-option *ngFor="let item of functionTypes" [value]="item.key">
       {{ item.value }}

@@ -49,7 +49,7 @@ export class EntityRegistry {
    * @param icon
    * @param templateUrl
    */
-  register(type: string, label: string, icon: string, templateUrl?: string): void {
+  register(type: string, label: string, icon?: string, templateUrl?: string): void {
     return this.registerEntity(label, type, icon, undefined, undefined, undefined, undefined, templateUrl);
   }
 

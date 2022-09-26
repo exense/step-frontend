@@ -4,6 +4,7 @@
 @use 'step-sidebar';
 @use 'step-header';
 @use 'step-icon';
+@use 'step-inputs';
 @use 'step-login';
 
 @forward 'step-sidebar' show step-define-sidebar-config;
@@ -125,6 +126,13 @@ $light-primary-text: white;
   @include step-tabs.tabbar($primary-color);
   @include step-sidebar.sidebar($step-sidebar-config);
   @include step-header.header($step-header-config);
+
+  $inputs-config: step-inputs.step-define-inputs-config(
+    $primary-color: $primary-color,
+  );
+
+  @include step-inputs.inputs($inputs-config);
+
   @include step-login.login-page($step-login-config, $mat-primary-palette);
 
   color: $text-color;
@@ -132,6 +140,10 @@ $light-primary-text: white;
 
   .mat-mini-fab {
     box-shadow: none !important;
+  }
+
+  .invisible {
+    display: none;
   }
 
   @include step-icon.step-icon();
