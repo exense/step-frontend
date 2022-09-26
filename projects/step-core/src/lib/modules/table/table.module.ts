@@ -17,6 +17,7 @@ import { BulkOperationIconPipe } from './pipe/bulk-operation-icon.pipe';
 import { AsyncOperationsModule } from '../async-operations/async-operations.module';
 import { BulkOperationLabelPipe } from './pipe/bulk-operation-label.pipe';
 import { CustomSearchCellComponentsPipe } from './pipe/custom-search-cell-components.pipe';
+import { StepBasicsModule } from '../basics/step-basics.module';
 
 @NgModule({
   imports: [
@@ -26,6 +27,7 @@ import { CustomSearchCellComponentsPipe } from './pipe/custom-search-cell-compon
     EntitiesSelectionModule,
     CustomRegistriesModule,
     AsyncOperationsModule,
+    StepBasicsModule,
   ],
   declarations: [
     TableComponent,
