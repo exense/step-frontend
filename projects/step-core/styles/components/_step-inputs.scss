@@ -1,0 +1,204 @@
+@use 'sass:map';
+
+@function step-define-inputs-config(
+  $primary-text: #293e50,
+  $primary-color: #0082cb,
+  $border-color: #d0d5dd,
+  $error-color: #ff0000
+) {
+  $config: (
+    primary-text: $primary-text,
+    primary-color: $primary-color,
+    border-color: $border-color,
+    error-color: $error-color,
+  );
+
+  @return $config;
+}
+
+$border-radius: 8px;
+
+@mixin border-base {
+  border-top-style: solid;
+  border-bottom-style: solid;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+  border-left: none;
+  border-right: none;
+}
+
+@mixin left-border {
+  border-left-width: 1px;
+  border-left-style: solid;
+}
+
+@mixin left-border-round {
+  border-top-left-radius: $border-radius;
+  border-bottom-left-radius: $border-radius;
+}
+
+@mixin right-border {
+  border-right-width: 1px;
+  border-right-style: solid;
+}
+
+@mixin right-border-round {
+  border-top-right-radius: $border-radius;
+  border-bottom-right-radius: $border-radius;
+}
+
+@mixin input-group($config) {
+  $border-focus-color: map.get($config, primary-color);
+  $border-color: map.get($config, border-color);
+  $error-color: map.get($config, error-color);
+
+  step-input-group {
+    display: block;
+    position: relative;
+
+    .step-input-label {
+      margin-bottom: 5px;
+      & > label {
+        font-weight: 500;
+      }
+    }
+
+    .step-input-group {
+      display: flex;
+
+      & > input {
+        flex-grow: 1;
+        @include border-base;
+        @include left-border;
+        @include left-border-round;
+        @include right-border;
+        border-color: $border-color;
+        font-weight: 400;
+        padding: 10px 14px;
+        line-height: 20px;
+
+        &:focus {
+          outline: none;
+          border-color: $border-focus-color;
+
+          & + .step-input-addon {
+            border-color: $border-focus-color;
+            step-icon {
+              color: $border-focus-color;
+            }
+          }
+        }
+
+        &:last-child {
+          @include right-border-round;
+        }
+
+        & + .step-input-addon {
+          @include border-base;
+          @include right-border;
+          @include right-border-round;
+          border-color: $border-color;
+          width: 52px;
+          height: 42px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        &.ng-invalid.ng-dirty {
+          border-color: $error-color;
+          & + .step-input-addon {
+            border-color: $error-color;
+            step-icon {
+              color: $error-color;
+            }
+          }
+        }
+      }
+    }
+
+    .step-input-other {
+      position: absolute;
+    }
+  }
+
+  th {
+    step-input-group .step-input-group {
+      input {
+        line-height: 16px;
+        padding: 8px 14px;
+      }
+      .step-input-addon {
+        height: 34px;
+      }
+    }
+  }
+}
+
+@mixin material-hot-fix($config) {
+  $primary-text: map.get($config, primary-text);
+  $border-focus-color: map.get($config, primary-color);
+  $border-color: map.get($config, border-color);
+
+  mat-form-field.step-view {
+    .mat-form-field-wrapper {
+      padding-bottom: 0;
+    }
+
+    .mat-form-field-underline {
+      display: none;
+    }
+
+    .mat-form-field-infix {
+      padding: 0;
+      border: none;
+    }
+
+    mat-select {
+      @include border-base;
+      @include left-border;
+      @include left-border-round;
+      @include right-border;
+      @include right-border-round;
+      border-color: $border-color;
+      font-weight: 400;
+      padding: 10px 14px;
+      line-height: 20px;
+      &:focus {
+        border-color: $border-focus-color;
+      }
+
+      &.label-margin {
+        margin-top: 12px;
+      }
+    }
+
+    .mat-form-field-label-wrapper {
+      label {
+        color: $primary-text !important;
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 20px;
+        transform: none !important;
+        position: absolute;
+        top: 0;
+      }
+    }
+  }
+
+  th {
+    mat-form-field.step-view mat-select {
+      line-height: 16px;
+      padding: 8px 14px;
+    }
+  }
+}
+
+@mixin inputs($config: null) {
+  @if not $config {
+    $config: step-define-inputs-config();
+  }
+
+  @include input-group($config);
+  @include material-hot-fix($config);
+}
