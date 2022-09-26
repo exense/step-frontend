@@ -30,6 +30,7 @@ export class TabsComponent implements OnChanges {
   @Input() tabTemplate?: TemplateRef<unknown>;
   @Output() activeTabIdChange = new EventEmitter<string>();
 
+  @HostBinding('class.shrink') @Input() shrink: boolean = false;
   @HostBinding('class.tab-mode-buttons') isTabModeButtons: boolean = true;
   @HostBinding('class.tab-mode-tabs') isTabModeTabs: boolean = false;
 
