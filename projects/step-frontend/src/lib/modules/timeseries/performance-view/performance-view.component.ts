@@ -218,10 +218,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   // we assume the settings input has been changed
   reconstructAllCharts() {
     this.findRequest = this.prepareFindRequest(this.settings); // we don't want to lose active filters
-    // this.findRequest.numberOfBuckets = this.calculateIdealNumberOfBuckets(
-    //   this.settings.startTime,
-    //   this.settings.endTime
-    // );
     this.updateAllCharts();
   }
 
