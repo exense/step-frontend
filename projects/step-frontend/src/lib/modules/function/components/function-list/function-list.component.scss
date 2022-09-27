@@ -16,16 +16,14 @@
 .header {
   display: flex;
   justify-content: flex-end;
-  padding: 8px;
+}
 
-  .import-export button {
-    padding: 0;
-    min-width: 4rem;
-  }
+.create-keyword-button-group button {
+  margin-left: 1rem;
+}
 
-  step-btn-group {
-    margin-left: 1rem;
-  }
+.import-keyword-button-group button {
+  margin-left: -10px;
 }
 
 .bulk-selection-cell {

@@ -90,7 +90,8 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
   @ViewChild(MatTable) private _table?: MatTable<any>;
   @ViewChild(MatPaginator, { static: true }) page!: MatPaginator;
 
-  @ContentChild(AdditionalHeaderDirective) additionalHeader?: AdditionalHeaderDirective;
+  @ContentChildren(AdditionalHeaderDirective) additionalHeaders?: QueryList<AdditionalHeaderDirective>;
+  additionalHeaderGroups?: Array<Array<AdditionalHeaderDirective>>;
   @ContentChildren(ColumnDirective) columns?: QueryList<ColumnDirective>;
 
   private get allCollDef(): MatColumnDef[] {
@@ -221,6 +222,28 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     this.displaySearchColumns = this.searchColumns.map((c) => c.colName);
   }
 
+  /**
+   * initialize array of distinct headerGroups
+   */
+  private setupAdditionalsHeaderGroups(): void {
+    if (!this.additionalHeaders) {
+      return;
+    }
+    let headerGroupIdToHeaders: { [headerGroupId: string]: AdditionalHeaderDirective[] } = {};
+    let nonGroupedHeaderIdSuffix: number = 1;
+    for (let additionalHeader of this.additionalHeaders) {
+      if (!additionalHeader.headerGroupId) {
+        additionalHeader.headerGroupId = 'non-grouped-header-'.concat(nonGroupedHeaderIdSuffix.toString());
+        nonGroupedHeaderIdSuffix++;
+      }
+      if (!headerGroupIdToHeaders[additionalHeader.headerGroupId]) {
+        headerGroupIdToHeaders[additionalHeader.headerGroupId] = [];
+      }
+      headerGroupIdToHeaders[additionalHeader.headerGroupId].push(additionalHeader);
+    }
+    this.additionalHeaderGroups = Object.values(headerGroupIdToHeaders);
+  }
+
   private setupColumns(): void {
     const allCollDef = this.allCollDef;
 
@@ -254,6 +277,7 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
 
   ngAfterViewInit(): void {
     const setup = () => {
+      this.setupAdditionalsHeaderGroups();
       this.setupColumns();
       this.setupSearchColumns();
 
