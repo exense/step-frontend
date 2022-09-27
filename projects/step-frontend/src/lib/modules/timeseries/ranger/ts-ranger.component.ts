@@ -56,6 +56,13 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
   start!: number;
   end!: number;
 
+  getSize = () => {
+    return {
+      width: this.element.nativeElement.parentElement.offsetWidth,
+      height: this.CHART_HEIGHT,
+    };
+  };
+
   constructor(@Self() private element: ElementRef) {}
 
   ngOnInit(): void {
@@ -88,7 +95,9 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
 
   selectRange(fromTimestamp?: number, toTimestamp?: number) {
     let select = this.transformRangeToSelect({ from: fromTimestamp, to: toTimestamp });
-
+    // select!.width = select!.width! + 100;
+    // console.log(this.getSize(), select);
+    console.log(this.uplot.bbox, select);
     this.uplot.setSelect(select, false);
     this.emitSelectionToLinkedCharts();
 
@@ -108,13 +117,19 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     if (!fromTimestamp) {
       left = Math.round(this.uplot.valToPos(this.start, 'x'));
     } else {
-      left = Math.max(this.uplot.valToPos(fromTimestamp, 'x'), 0);
+      left = this.uplot.valToPos(fromTimestamp, 'x');
     }
+    left = Math.max(left, 0); // in case it is negative
     if (!toTimestamp) {
       width = Math.round(this.uplot.valToPos(this.end, 'x')) - left;
     } else {
       width = Math.round(this.uplot.valToPos(toTimestamp, 'x')) - left;
     }
+    // by some reasons, sometimes relative selection get out of the canvas
+    if (left + width > this.uplot.bbox.width) {
+      width = this.uplot.bbox.width - left;
+    }
+
     return { left, width, height, top: 0 };
   }
 
@@ -141,12 +156,6 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   private createRanger() {
-    let getSize = () => {
-      return {
-        width: this.element.nativeElement.parentElement.offsetWidth,
-        height: this.CHART_HEIGHT,
-      };
-    };
     let x0: number;
     let lft0: number;
     let wid0: number;
@@ -224,7 +233,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       select = this.transformRangeToSelect(this.settings.selection);
     }
     let rangerOpts: uPlot.Options = {
-      ...getSize(),
+      ...this.getSize(),
       ms: 1, // if not specified it's going be in seconds
       // select: {left: 0, width: 300, height: 33},
       select: select,

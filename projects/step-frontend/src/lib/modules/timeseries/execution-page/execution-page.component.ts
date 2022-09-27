@@ -154,7 +154,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       //     this.findRequest.start,
       //     this.findRequest.end
       //   );
-      this.performanceView.updateAllCharts();
+      this.performanceView.reconstructAllCharts();
       this.executionService.getExecutionById(this.executionId).subscribe((details) => {
         if (details.endTime) {
           this.performanceViewSettings!.endTime = details.endTime;
@@ -171,6 +171,9 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.contextsFactory.destroyContext(this.executionId);
+    if (this.intervalExecution) {
+      clearInterval(this.intervalExecution);
+    }
   }
 }
 
