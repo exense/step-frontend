@@ -228,6 +228,12 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     this.uplot.setSeries(index, { show: !currentState });
   }
 
+  setSeriesVisibility(id: string, visible: boolean) {
+    let index = this.seriesIndexesByIds[id];
+    if (index == undefined) return;
+    this.uplot.setSeries(index, { show: visible });
+  }
+
   addSeries(series: TSChartSeries): void {
     let existingSeries = this.seriesIndexesByIds[series.id];
     if (existingSeries) {

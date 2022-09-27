@@ -79,4 +79,8 @@ export class ExecutionContext {
   getGroupDimensions(): string[] {
     return this.activeGroupings;
   }
+
+  getActiveFilters(): BucketFilters {
+    return this.activeFilters;
+  }
 }

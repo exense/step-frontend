@@ -24,6 +24,10 @@ export class TimeSeriesKeywordsContext {
     return this.colorsPool.getColor(keyword);
   }
 
+  getStatusColor(status: string): string {
+    return this.colorsPool.getStatusColor(status);
+  }
+
   getKeywordSelection(keyword: string): KeywordSelection {
     return this.keywords[keyword];
   }

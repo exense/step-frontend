@@ -3,7 +3,9 @@
  * If more keys are requested, new random colors will be generated and stored in the pool.
  */
 export class TimeseriesColorsPool {
-  private readonly NO_STATUS = 'No status';
+  static readonly NO_STATUS = 'No status';
+  static readonly GREY_COLOR = '#cccccc';
+
   private predefinedColors: string[];
   private assignedColors: { [key: string]: string } = {}; // every unique key has a unique color assigned
 
@@ -52,9 +54,7 @@ export class TimeseriesColorsPool {
    */
   getStatusColor(status: string): string {
     if (!status) {
-      let grey = '#cccccc';
-      statusColors[this.NO_STATUS] = grey;
-      return grey;
+      return statusColors[TimeseriesColorsPool.NO_STATUS];
     } else {
       let foundColor = statusColors[status.toLowerCase()];
       if (!foundColor) {
@@ -71,4 +71,5 @@ const colors = ['#c90e00', '#ffa845', '#009359', '#050c91', '#7baaff', '#ffd61f'
 const statusColors: { [key: string]: string } = {
   passed: '#009359',
   failed: '#c71300',
+  [TimeseriesColorsPool.NO_STATUS]: TimeseriesColorsPool.GREY_COLOR,
 };
