@@ -1,10 +1,10 @@
 <step-table [dataSource]="dataSource" matSort [matSortDisableClear]="true">
   <step-bulk-operations
-    *stepAdditionalHeader="'bulk-and-create-buttons'"
+    *stepAdditionalHeader="'buttongroup-bulk-create'"
     [availableOperations]="availableBulkOperations"
   >
   </step-bulk-operations>
-  <section class="header" *stepAdditionalHeader="'bulk-and-create-buttons'">
+  <section class="header" *stepAdditionalHeader="'buttongroup-bulk-create'">
     <step-btn-group class="import-keyword-button-group">
       <button
         type="button"
