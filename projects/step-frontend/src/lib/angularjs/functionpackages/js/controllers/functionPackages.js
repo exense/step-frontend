@@ -117,6 +117,7 @@ angular
     return dialogs;
   })
 
+/*
   .directive('functionPackageLink', function () {
     return {
       restrict: 'E',
@@ -188,6 +189,7 @@ angular
       },
     };
   })
+*/
 
   .controller('FunctionPackageActionsCtrl', function ($scope, $rootScope, FunctionPackagesDialogs) {
     $scope.addFunctionPackage = function () {

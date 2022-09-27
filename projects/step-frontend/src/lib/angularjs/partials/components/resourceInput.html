@@ -11,12 +11,12 @@
       />
       <div class="input-group-btn">
         <a class="btn btn-default btn-auto-size" href="rest/resources/{{getResourceId()}}/content">
-          <span
-            class="glyphicon glyphicon-download-alt"
+          <step-ajs-icon
+            name="download"
             aria-hidden="true"
             uib-tooltip="Download this file"
             tooltip-append-to-body="true"
-          ></span>
+          ></step-ajs-icon>
         </a>
         <button
           type="button"
@@ -25,7 +25,7 @@
           uib-tooltip="Select from file system"
           tooltip-append-to-body="true"
         >
-          <span class="glyphicon glyphicon-folder-open"></span>
+          <step-ajs-icon name="folder-plus"></step-ajs-icon>
         </button>
         <button
           type="button"
@@ -33,20 +33,20 @@
           class="btn btn-default btn-auto-size"
           ng-click="selectResource()"
         >
-          <span
-            class="glyphicon glyphicon-search"
+          <step-ajs-icon
+            name="search"
             aria-hidden="true"
             uib-tooltip="Select an existing resource"
             tooltip-append-to-body="true"
-          ></span>
+          ></step-ajs-icon>
         </button>
         <button class="btn btn-default btn-auto-size" ng-click="clear()">
-          <span
-            class="glyphicon glyphicon-remove"
+          <step-ajs-icon
+            name="x"
             aria-hidden="true"
             uib-tooltip="Clear"
             tooltip-append-to-body="true"
-          ></span>
+          ></step-ajs-icon>
         </button>
       </div>
     </div>
@@ -61,12 +61,12 @@
       />
       <div class="input-group-btn">
         <button class="btn btn-default btn-auto-size" ng-click="clear()">
-          <span
-            class="glyphicon glyphicon-remove"
+          <step-ajs-icon
+            name="x"
             aria-hidden="true"
             uib-tooltip="Clear"
             tooltip-append-to-body="true"
-          ></span>
+          ></step-ajs-icon>
         </button>
       </div>
     </div>
@@ -91,12 +91,12 @@
         {{saveButtonLabel}}
       </button>
       <button ng-disabled="uploadOnly" type="button" class="btn btn-default btn-auto-size" ng-click="selectResource()">
-        <span
-          class="glyphicon glyphicon-search"
+        <step-ajs-icon
+          name="search"
           aria-hidden="true"
           uib-tooltip="Select an existing resource"
           tooltip-append-to-body="true"
-        ></span>
+        ></step-ajs-icon>
       </button>
       <button
         type="button"
@@ -105,7 +105,7 @@
         uib-tooltip="Select from file system"
         tooltip-append-to-body="true"
       >
-        <span class="glyphicon glyphicon-folder-open"></span>
+        <step-ajs-icon name="folder-plus"></step-ajs-icon>
       </button>
     </div>
   </div>

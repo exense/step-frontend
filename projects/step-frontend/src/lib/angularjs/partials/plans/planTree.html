@@ -5,9 +5,9 @@
 				<div class="st-flex-fixed input-group" style="margin-bottom:10px;">
 					<div class="btn-group" ng-show="!readonly">
 						<button type="submit" ng-disabled="!authService.hasRight('plan-write')" class="btn btn-default btn-sm" ng-click="move(-1)" data-toggle="tooltip" data-placement="bottom" title="Move seleted node upward (ctrl+up)">
-						<span class="glyphicon glyphicon glyphicon-chevron-up" aria-hidden="true"></span></button>
+						<step-ajs-icon name="chevron-up" aria-hidden="true"></step-ajs-icon></button>
 			    		<button type="submit" ng-disabled="!authService.hasRight('plan-write')" class="btn btn-default btn-sm" ng-click="move(1)" data-toggle="tooltip" data-placement="bottom" title="Move seleted node downward (ctrl+down)">
-			    		<span class="glyphicon glyphicon glyphicon-chevron-down" aria-hidden="true"></span></button>
+                <step-ajs-icon name="chevron-down" aria-hidden="true"></step-ajs-icon></button>
 			  		</div>
 			  		<div class="btn-group" ng-show="!readonly">
 			    		<button type="submit" ng-disabled="!authService.hasRight('plan-write')" class="btn btn-default btn-sm" ng-click="copy()" data-toggle="tooltip" data-placement="bottom" title="Copy selected node (ctrl+c)">Copy</button>

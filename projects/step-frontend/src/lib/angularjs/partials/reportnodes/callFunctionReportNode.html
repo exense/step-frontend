@@ -1,5 +1,5 @@
 <div ng-if="children && children.length>0">
-	<assert-report-node-short ng-repeat="child in children" ng-if="(child._class=='step.artefacts.reports.AssertReportNode' || 
+	<assert-report-node-short ng-repeat="child in children" ng-if="(child._class=='step.artefacts.reports.AssertReportNode' ||
 				child._class=='step.artefacts.reports.PerformanceAssertReportNode')" node ="child"/>
 </div>
 <div ng-show="node.measures">
@@ -29,7 +29,7 @@
 					<cell>
 						<a href="/#/root/dashboards/__pp__RTMDashboard?__filter1__=text,eId,{{node.executionID}},Off&__filter2__=text,name,{{row.name}},Off"
 							uib-tooltip="Search in interactive session" tooltip-append-to-body="true" target="_blank">
-							<span class="glyphicon glyphicon-new-window"></span>
+              <step-ajs-icon name="external-link"></step-ajs-icon>
 						</a>
 	          		</cell>
 				</st-column>
