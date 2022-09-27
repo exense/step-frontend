@@ -1,8 +1,11 @@
 @use 'sass:map';
 
+@use 'default-colors' as dc;
+$default-color: dc.default-colors();
+
 @function step-define-header-config(
-  $main-background-color: #293e50,
-  $main-text-color: #fff,
+  $main-background-color: map.get($default-color, main-header-bg-color),
+  $main-text-color: map.get($default-color, main-header-color),
   $alt-background-color: #fff
 ) {
   $config: (

@@ -1,0 +1,9 @@
+@function default-colors($main-header-bg-color: #293e50, $main-header-color: #c9d1d9, $main-header-hover-color: #fff) {
+  $result: (
+    main-header-bg-color: var(--main-header-bg-color, $main-header-bg-color),
+    main-header-color: var(--main-header-color, $main-header-color),
+    main-header-hover-color: var(--main-header-hover-color, $main-header-hover-color),
+  );
+
+  @return $result;
+}
