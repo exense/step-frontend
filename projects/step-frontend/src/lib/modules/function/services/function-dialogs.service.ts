@@ -90,6 +90,7 @@ export class FunctionDialogsService {
       headers: new HttpHeaders({
         Accept: 'text/html',
       }),
+      responseType: 'text',
     };
     return this._httpClient
       .get<string>(`rest/${dialogConfig.serviceRoot}/${id}/editor`, httpOptions)
