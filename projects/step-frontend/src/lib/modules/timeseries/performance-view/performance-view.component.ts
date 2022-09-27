@@ -373,6 +373,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
         let status = response.matrixKeys[i][stausAttribute];
         let color = this.keywordsService.getStatusColor(status);
         status = status || 'No Status';
+
         return {
           id: status,
           label: status,

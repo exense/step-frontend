@@ -5,6 +5,7 @@
 export class TimeseriesColorsPool {
   static readonly NO_STATUS = 'No status';
   static readonly GREY_COLOR = '#cccccc';
+
   private predefinedColors: string[];
   private assignedColors: { [key: string]: string } = {}; // every unique key has a unique color assigned
 
