@@ -149,7 +149,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     );
     this.subscriptions.add(
       this.keywordsService.onKeywordsUpdated().subscribe((keywords) => {
-        console.log('KEYWORDS UPDATED');
         this.keywords = keywords;
       })
     );
@@ -168,7 +167,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     );
     this.subscriptions.add(
       this.executionContext.onGroupingChange().subscribe((groupDimensions: string[]) => {
-        console.log('GROUPING CHANGE');
         this.groupDimensions = groupDimensions;
         this.mergeRequestWithActiveFilters();
         this.createByKeywordsCharts({ ...this.findRequest, groupDimensions: groupDimensions });
