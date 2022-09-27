@@ -1,6 +1,6 @@
 <div id="PlanEditorCtrl" ng-controller="PlanEditorCtrl" class="container-fluid st-flex-column">
 	<div ng-if="isInteractiveSessionActive()" class="alert alert-info" role="alert">Welcome to the interactive mode. In this mode you can select tree nodes and run them directly by clicking the button 'Run interactively'</div>
-	<div class="row st-flex-row">
+	<div class="st-flex-row">
 		<div class="flex sectionResizable sectionViewPlanEditor" resizable r-directions="['right']" r-flex="true">
 			<div class="st-flex-column panel panel-default overflow-x-auto overflow-y-hidden">
 				<div class="panel-heading st-flex-fixed">{{model.plan.root?model.plan.root._class:''}} - {{model.plan.attributes.name}}
@@ -41,7 +41,7 @@
 					<div class="auto-margin">Available components</div>
 				</div>
 				<div class="panel-body">
-          <step-tabs [tabs]="componentTabs.tabs" [(active-tab-id)]="componentTabs.selectedTab" [disable-pagination]="true">
+          <step-tabs [tabs]="componentTabs.tabs" [(active-tab-id)]="componentTabs.selectedTab" [disable-pagination]="true" [shrink]="true">
           </step-tabs>
           <div class="tab-content">
             <div class="tab-pane active" ng-if="componentTabs.selectedTab === 'controls'">

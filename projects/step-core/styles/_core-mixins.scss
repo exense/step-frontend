@@ -2,7 +2,8 @@
 @forward 'components/theme-config';
 
 @mixin table-space-between-columns {
-  mat-form-field {
+  mat-form-field,
+  step-input-group {
     width: 100%;
     padding-right: 10px;
   }
