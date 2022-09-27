@@ -32,7 +32,7 @@ export class EntityIconComponent {
   }
 
   update(): void {
-    this.icon = 'target';
+    this.icon = '';
     this.tooltip = '';
     let entityType;
 

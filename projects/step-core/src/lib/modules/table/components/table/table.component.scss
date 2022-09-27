@@ -15,7 +15,7 @@
     width: auto !important;
   }
 
-  ::ng-deep tr > td.mat-cell:not(.mat-column-bulkSelection):not(.mat-column-actions) {
+  ::ng-deep tr > td.mat-cell:not(:first-of-type):not(.mat-column-actions) {
     padding: 0 8px;
   }
 

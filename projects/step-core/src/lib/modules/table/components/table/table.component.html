@@ -13,9 +13,9 @@
   >
     <th mat-header-cell *matHeaderCellDef>
       <ng-template #defaultSearchRender>
-        <mat-form-field>
-          <input matInput type="text" #searchField (change)="onSearch(searchCol.searchName!, searchField.value)" />
-        </mat-form-field>
+        <step-input-group>
+          <input type="text" #searchField (change)="onSearch(searchCol.searchName!, searchField.value)" />
+        </step-input-group>
       </ng-template>
       <ng-container *ngIf="searchCol.searchName">
         <ng-container *ngIf="!!searchCol.template; then searchCol.template!; else defaultSearchRender"> </ng-container>

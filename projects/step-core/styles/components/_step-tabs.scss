@@ -48,6 +48,17 @@
           font-weight: bold;
         }
       }
+
+      &.shrink {
+        .mat-tab-links {
+          margin-left: 0;
+        }
+
+        .mat-tab-link {
+          min-width: 80px;
+          padding: 0 8px;
+        }
+      }
     }
 
     &.tab-mode-tabs {

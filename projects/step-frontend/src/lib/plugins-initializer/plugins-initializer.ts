@@ -14,7 +14,6 @@ const IGNORE_PLUGINS: ReadonlyArray<string> = ['multitenancy', 'monitoringdashbo
 // Allows to add plugins, that don't returned from BE
 const ADDITIONAL_PLUGINS: ReadonlyArray<MicrofrontendPluginDefinition> = [
   // Add object like this {name: 'pluginName', entryPoint: 'pluginName/remoteEntry.js' }
-  { name: 'stepEnterpriseCore', entryPoint: 'step-enterprise-core/remoteEntry.js' },
 ];
 
 export type PluginDefinition = LegacyPluginDefinition | MicrofrontendPluginDefinition;
@@ -25,6 +24,14 @@ const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
     const pluginsResponse = await fetch('/rest/app/plugins');
 
     result = ((await pluginsResponse.json()) as PluginDefinition[]).map((plugin) => {
+      console.log('received plugins', plugin);
+      // @ts-ignore
+      if (plugin['angularModules'] === ['stepEnterpriseCore']) {
+        // @ts-ignore
+        plugin['name'] = 'stepEnterpriseCore';
+        // @ts-ignore
+        plugin['entryPoint'] = plugin['scripts'][0];
+      }
       const angularModules = (plugin as LegacyPluginDefinition)?.angularModules || [];
       const toOverride = angularModules.find((m) => OVERRIDE_PLUGINS.has(m));
       if (toOverride) {

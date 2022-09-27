@@ -1,9 +1,9 @@
 <div style="display: flex; justify-content: space-between">
   <div class="filter-bar">
     <div class="filter-item" *ngFor="let item of filterItems">
-      <mat-form-field appearance="fill" class="filter-item">
+      <mat-form-field class="filter-item step-view" floatLabel="always">
         <mat-label>{{ item.label }}</mat-label>
-        <mat-select [(ngModel)]="item.selectedValue" (ngModelChange)="applyParams()">
+        <mat-select [(ngModel)]="item.selectedValue" (ngModelChange)="applyParams()" class="label-margin">
           <mat-option [value]="undefined">All</mat-option>
           <mat-option *ngFor="let option of item.options" [value]="option">
             {{ option }}
@@ -13,9 +13,9 @@
     </div>
 
     <div class="filter-item">
-      <mat-form-field appearance="fill" class="filter-item">
+      <mat-form-field class="filter-item step-view" floatLabel="always">
         <mat-label>Grouping</mat-label>
-        <mat-select [(ngModel)]="groupingAttributes" (ngModelChange)="emitGroupDimensions()">
+        <mat-select [(ngModel)]="groupingAttributes" (ngModelChange)="emitGroupDimensions()" class="label-margin">
           <mat-option *ngFor="let option of groupingOptions" [value]="option.attributes">
             {{ option.label }}
           </mat-option>
