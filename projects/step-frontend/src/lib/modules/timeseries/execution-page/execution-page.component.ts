@@ -1,5 +1,12 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AJS_MODULE, DashboardService, ExecutionsService } from '@exense/step-core';
+import {
+  AJS_MODULE,
+  AsyncTasksService,
+  AsyncTaskStatusResource,
+  DashboardService,
+  ExecutionsService,
+  pollAsyncTask,
+} from '@exense/step-core';
 import { TimeSeriesConfig } from '../time-series.config';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PerformanceViewSettings } from '../performance-view/performance-view-settings';
@@ -7,6 +14,7 @@ import { TimeSeriesService } from '../time-series.service';
 import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
+import { delay, map } from 'rxjs';
 
 @Component({
   selector: 'step-execution-performance',
@@ -24,6 +32,9 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   intervalExecution: any;
   intervalShouldBeCanceled = false;
 
+  executionHasToBeBuilt = false;
+  migrationInProgress = false;
+
   // this is just for running executions
   refreshIntervals: RefreshInterval[] = [
     { label: '5 Sec', value: 5000 },
@@ -39,13 +50,24 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     private timeSeriesService: TimeSeriesService,
     private contextsFactory: TimeSeriesContextsFactory,
     private executionService: ExecutionsService,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private _asyncTaskService: AsyncTasksService
   ) {}
 
   ngOnInit(): void {
     if (!this.executionId) {
       throw new Error('ExecutionId parameter is not present');
     }
+    this.timeSeriesService.timeSeriesIsBuilt(this.executionId).subscribe((exists) => {
+      if (exists) {
+        this.init();
+      } else {
+        this.executionHasToBeBuilt = true;
+      }
+    });
+  }
+
+  init() {
     this.executionService.getExecutionById(this.executionId).subscribe((execution) => {
       let startTime = execution.startTime! - (execution.startTime! % TimeSeriesConfig.RESOLUTION);
       // let now = new Date().getTime();
@@ -68,6 +90,30 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         this.refreshEnabled = true;
       }
     });
+  }
+
+  rebuildTimeSeries() {
+    this.migrationInProgress = true;
+    this.timeSeriesService
+      .rebuildTimeSeries(this.executionId)
+      .pipe(
+        pollAsyncTask(this._asyncTaskService),
+        delay(10_000) // in order for the migration to be completed as much as possible
+      )
+      .subscribe(
+        (task) => {
+          if (task.ready) {
+            this.migrationInProgress = false;
+            this.executionHasToBeBuilt = false;
+            this.init();
+          } else {
+            console.error('The task is not finished yet');
+          }
+        },
+        (error) => {
+          console.error(error);
+        }
+      );
   }
 
   changeRefreshInterval(newInterval: RefreshInterval) {
