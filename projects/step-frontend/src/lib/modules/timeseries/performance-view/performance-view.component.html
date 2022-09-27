@@ -54,7 +54,7 @@
             (onZoomReset)="onZoomReset()"
           >
           </step-timeseries-chart>
-          <div class="chart-footer-actions">
+          <div class="chart-footer-actions" *ngIf="responseTypeByKeywordsSettings">
             <button mat-button [matMenuTriggerFor]="menu">Metric ({{ selectedMetric.label }})</button>
             <mat-menu #menu="matMenu">
               <button mat-menu-item *ngFor="let metric of responseTimeMetrics" (click)="switchChartMetric(metric)">

@@ -1,12 +1,15 @@
 @use 'sass:map';
+@use 'default-colors' as dc;
+
+$default-color: dc.default-colors();
 
 @function step-define-sidebar-config(
-  $background-color: #293e50,
+  $background-color: map.get($default-color, main-header-bg-color),
   $menu-color: rgba(255, 255, 255, 0.1),
   $selection-color: rgba(255, 255, 255, 0.1),
   $divider-color: rgba(255, 255, 255, 0.2),
-  $menu-secondary: #c9d1d9,
-  $menu-text: #ffffff,
+  $menu-secondary: map.get($default-color, main-header-color),
+  $menu-text: map.get($default-color, main-header-hover-color),
   $width-open: 254px,
   $width-closed: 72px,
   $openclose-transition: 0.2s,

@@ -7,3 +7,21 @@
   top: 24px;
   right: 0;
 }
+
+.info-container {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+
+  .content {
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .msg {
+      margin-bottom: 20px;
+    }
+  }
+}
