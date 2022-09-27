@@ -96,10 +96,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     this.migrationInProgress = true;
     this.timeSeriesService
       .rebuildTimeSeries(this.executionId)
-      .pipe(
-        pollAsyncTask(this._asyncTaskService),
-        delay(10_000) // in order for the migration to be completed as much as possible
-      )
+      .pipe(pollAsyncTask(this._asyncTaskService))
       .subscribe(
         (task) => {
           if (task.ready) {
