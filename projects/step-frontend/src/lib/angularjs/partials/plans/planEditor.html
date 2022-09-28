@@ -15,16 +15,12 @@
 							<button type="button" ng-disabled="!hasRedo()" ng-type="submit" class="btn btn-default btn-xs" ng-click="redo()" uib-tooltip="Redo (ctrl+y)" tooltip-append-to-body="true" tooltip-placement="bottom">
                 <step-ajs-icon name="rotate-cw" aria-hidden="true"></step-ajs-icon>
 							</button>
-						</div>
-						<button type="submit" class="btn btn-default btn-xs" ng-click="clonePlan()">Clone</button>
-						<button type="submit" class="btn btn-default btn-xs" ng-click="exportPlan()">Export</button>
-						<div class="btn-group" style="margin-right:5px;">
+              <button type="submit" class="btn btn-default btn-xs" ng-click="clonePlan()">Clone</button>
+              <button type="submit" class="btn btn-default btn-xs" ng-click="exportPlan()">Export</button>
 							<button ng-disabled="isInteractiveSessionActive()" type="submit" class="btn btn-default btn-xs" ng-click="startInteractive()">Start interactive session</button>
 							<button ng-if="isInteractiveSessionActive()" type="submit" class="btn btn-default btn-xs" ng-click="resetInteractive()">Reset</button>
 							<button ng-if="isInteractiveSessionActive()" type="submit" class="btn btn-default btn-xs" ng-click="stopInteractive()">Stop</button>
 							<button ng-if="isInteractiveSessionActive()" type="button" class="btn btn-default btn-xs" uib-popover-template="'executionParametersPopover.html'" popover-placement="bottom" popover-trigger="'outsideClick'" popover-append-to-body="true">Session parameters</button>
-						</div>
-						<div class="btn-group">
 							<button uib-popover-template="'executionCommandsPopover.html'" popover-placement="bottom-right" popover-trigger="'outsideClick'" popover-append-to-body="true" type="submit" class="btn btn-default btn-xs btn-run" title="Execute this plan" ng-click="execute()">
                 <step-ajs-icon name="play" aria-hidden="true"></step-ajs-icon>
               </button>
@@ -42,7 +38,7 @@
 			</div>
 		</div>
 		<div class="st-flex-column sectionResizable resizable-panel-right">
-			<div class="panel panel-default" style="min-width: fit-content">
+			<div class="panel panel-default">
 				<div class="panel-heading flex flex-row p1">
 					<div class="auto-margin">Available components</div>
 				</div>
