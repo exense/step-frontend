@@ -1,5 +1,7 @@
 @use 'components/ts-tooltip';
 @use 'components/common-styles';
+@use 'components/legacy-styles';
 
 @forward 'components/ts-tooltip';
 @forward 'components/common-styles';
+@forward 'components/legacy-styles';
