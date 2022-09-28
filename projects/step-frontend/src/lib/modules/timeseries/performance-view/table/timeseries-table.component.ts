@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { Bucket } from '../../bucket';
 import { TimeSeriesService } from '../../time-series.service';
 import { FindBucketsRequest } from '../../find-buckets-request';
@@ -8,13 +8,14 @@ import { TimeSeriesKeywordsContext } from '../../execution-page/time-series-keyw
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
 import { BucketAttributes, TableDataSource, TableLocalDataSource, TableLocalDataSourceConfig } from '@exense/step-core';
 import { ExecutionContext } from '../../execution-page/execution-context';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'step-timeseries-table',
   templateUrl: './timeseries-table.component.html',
   styleUrls: ['./timeseries-table.component.scss'],
 })
-export class TimeseriesTableComponent implements OnInit {
+export class TimeseriesTableComponent implements OnInit, OnDestroy {
   // TODO use a dynamic list for percentiles
   tableColumns = ['name', 'count', 'sum', 'avg', 'min', 'max', 'pcl_90', 'pcl_90', 'pcl_99', 'tps'];
   tableDataSource: TableDataSource<Bucket> | undefined;
@@ -27,6 +28,8 @@ export class TimeseriesTableComponent implements OnInit {
 
   private keywordsService!: TimeSeriesKeywordsContext;
   @Input() executionContext!: ExecutionContext;
+
+  subscriptions: Subscription = new Subscription();
 
   // @Output('onKeywordsFetched') onKeywordsFetched = new EventEmitter<string[]>();
   // @Output('onKeywordToggled') onKeywordToggled = new EventEmitter<string>();
@@ -44,16 +47,20 @@ export class TimeseriesTableComponent implements OnInit {
       throw new Error('FindRequest input is mandatory');
     }
     this.keywordsService = this.executionContext.getKeywordsContext();
-    this.keywordsService.onKeywordToggled().subscribe((selection) => {
-      this.bucketsByKeywords[selection.id].attributes.isSelected = selection.isSelected;
-    });
-    this.executionContext.onGroupingChange().subscribe((groupDimensions) => {
-      this.groupDimensions = groupDimensions;
-      if (!this.findRequest) {
-        return;
-      }
-      this.fetchBuckets(true);
-    });
+    this.subscriptions.add(
+      this.keywordsService.onKeywordToggled().subscribe((selection) => {
+        this.bucketsByKeywords[selection.id].attributes.isSelected = selection.isSelected;
+      })
+    );
+    this.subscriptions.add(
+      this.executionContext.onGroupingChange().subscribe((groupDimensions) => {
+        this.groupDimensions = groupDimensions;
+        if (!this.findRequest) {
+          return;
+        }
+        this.fetchBuckets(true);
+      })
+    );
     this.fetchBuckets();
   }
 
@@ -165,5 +172,11 @@ export class TimeseriesTableComponent implements OnInit {
 
   get Math() {
     return Math;
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscriptions) {
+      this.subscriptions.unsubscribe();
+    }
   }
 }
