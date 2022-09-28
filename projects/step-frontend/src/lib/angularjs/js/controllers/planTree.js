@@ -255,9 +255,20 @@ angular
             }
           }
 
+          function getIconName(el) {
+            const classValueParts = (el.className || '').split(' ');
+            const index = classValueParts.indexOf('step-ajs-icon');
+            return classValueParts[index + 1];
+          }
+
           function updateIcons() {
             setTimeout(() => {
               $('#jstree_demo_div')[0].querySelectorAll('.step-ajs-icon').forEach(el => {
+                const iconName = getIconName(el);
+                if (el.dataset.renderedIcon === iconName) {
+                  return;
+                }
+                el.dataset.renderedIcon = iconName;
                 const html = el.outerHTML;
                 el.outerHTML = $compile(html)($scope)[0].outerHTML;
               });
@@ -266,6 +277,7 @@ angular
 
           $('#jstree_demo_div').on('load_node.jstree', updateIcons);
           $('#jstree_demo_div').on('after_open.jstree', updateIcons);
+          $('#jstree_demo_div').on('redraw.jstree', updateIcons);
           $('#jstree_demo_div').on('changed.jstree', function (e, data) {
             var selectedNodes = tree.get_selected(true);
             if (selectedNodes.length > 0) {

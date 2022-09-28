@@ -156,4 +156,21 @@ $light-primary-text: white;
       vertical-align: text-top;
     }
   }
+  .btn-sm,
+  .btn-auto-size,
+  a:not(.jstree-anchor) {
+    @include step-icon.step-icon(16px);
+    step-icon,
+    step-ajs-icon,
+    .step-ajs-icon {
+      vertical-align: top;
+    }
+  }
+
+  label + step-ajs-icon {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+  }
 }
