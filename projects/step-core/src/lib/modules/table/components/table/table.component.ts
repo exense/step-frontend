@@ -229,18 +229,17 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     if (!this.additionalHeaders) {
       return;
     }
-    let headerGroupIdToHeaders: { [headerGroupId: string]: AdditionalHeaderDirective[] } = {};
-    let nonGroupedHeaderIdSuffix: number = 1;
-    for (let additionalHeader of this.additionalHeaders) {
-      if (!additionalHeader.headerGroupId) {
-        additionalHeader.headerGroupId = 'non-grouped-header-'.concat(nonGroupedHeaderIdSuffix.toString());
-        nonGroupedHeaderIdSuffix++;
-      }
-      if (!headerGroupIdToHeaders[additionalHeader.headerGroupId]) {
-        headerGroupIdToHeaders[additionalHeader.headerGroupId] = [];
-      }
-      headerGroupIdToHeaders[additionalHeader.headerGroupId].push(additionalHeader);
-    }
+    this.additionalHeaders
+      .filter((header) => !header.headerGroupId)
+      .forEach((header, i) => (header.headerGroupId = `non-grouped-header-${i + 1}`));
+
+    const headerGroupIdToHeaders = this.additionalHeaders.reduce((result, additionalHeader) => {
+      const id = additionalHeader.headerGroupId!;
+      const headerGroup = (result[id] = result[id] || []);
+      headerGroup.push(additionalHeader);
+      return result;
+    }, {} as Record<string, AdditionalHeaderDirective[]>);
+
     this.additionalHeaderGroups = Object.values(headerGroupIdToHeaders);
   }
 
