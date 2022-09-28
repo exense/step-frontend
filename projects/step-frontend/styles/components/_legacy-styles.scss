@@ -20,7 +20,7 @@
     }
 
     button.btn,
-    input[type='text']:not([matinput]) {
+    input[type='text'].form-control {
       padding: 6px 12px;
       height: 32px;
     }
@@ -32,8 +32,8 @@
       }
     }
 
-    input[type='text']:not(.mat-input-element),
-    textarea:not(.mat-input-element) {
+    input[type='text'].form-control,
+    textarea.form-control {
       /* Step - Colors/Primary/White */
       background: #ffffff;
 
