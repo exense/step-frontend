@@ -11,7 +11,7 @@
     "build:step-frontend": "npm run build:step-frontend:lib && npm run build:step-frontend:resources",
     "build:app": "ng build",
     "build:app:local": "ng build --configuration=local,production",
-    "build": "npm run build:core && npm run build:step-frontend && npm run build:app && ./postbuild.sh",
+    "build": "npm run build:core && npm run build:step-frontend && npm run build:app",
     "build:local": "npm run build:core && npm run build:step-frontend && npm run build:app:local",
     "start:app": "ng serve",
     "start:app:local": "ng serve -c local",
