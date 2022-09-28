@@ -1,4 +1,4 @@
-function loadJS(FILE_URL) {
+function loadLegacyJS(FILE_URL) {
   let scriptEle = document.createElement('script');
 
   scriptEle.setAttribute('src', FILE_URL);
@@ -15,4 +15,4 @@ function loadJS(FILE_URL) {
     console.log('Error on loading file', ev);
   });
 }
-loadJS('/app/_HASHED_LEGACY_SCRIPTS_JS_');
+loadLegacyJS('app/_HASHED_LEGACY_SCRIPTS_JS_');
