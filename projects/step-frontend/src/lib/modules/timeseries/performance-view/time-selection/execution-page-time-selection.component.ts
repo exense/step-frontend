@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { ExecutionTimeSelection } from '../../time-selection/model/execution-time-selection';
 import { FindBucketsRequest } from '../../find-buckets-request';
 import { TimeSeriesService } from '../../time-series.service';
@@ -15,13 +15,14 @@ import { TSRangerSettings } from '../../ranger/ts-ranger-settings';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
 import { Execution } from '@exense/step-core';
 import { PerformanceViewSettings } from '../performance-view-settings';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'step-execution-time-selection',
   templateUrl: './execution-page-time-selection.component.html',
   styleUrls: ['./execution-page-time-selection.component.scss'],
 })
-export class ExecutionPageTimeSelectionComponent implements OnInit {
+export class ExecutionPageTimeSelectionComponent implements OnInit, OnDestroy {
   // @Input() execution!: Execution;
   @Input() settings!: PerformanceViewSettings;
   @Input() timePicker: boolean = true;
@@ -35,6 +36,8 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
 
   timeLabels: number[] = [];
 
+  subscriptions: Subscription = new Subscription();
+
   selection!: ExecutionTimeSelection;
 
   private executionService!: ExecutionContext;
@@ -47,9 +50,11 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
     }
     this.executionService = this.executionsPageService.getContext(this.settings.contextId);
     this.selection = this.executionService.getActiveSelection();
-    this.executionService.onActiveSelectionChange().subscribe((range) => {
-      this.selection = range;
-    });
+    this.subscriptions.add(
+      this.executionService.onActiveSelectionChange().subscribe((range) => {
+        this.selection = range;
+      })
+    );
     this.createRanger();
   }
 
@@ -154,5 +159,11 @@ export class ExecutionPageTimeSelectionComponent implements OnInit {
 
   onRangerZoomReset(event: TSTimeRange) {
     this.timeRangePicker?.selectFullRange();
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscriptions) {
+      this.subscriptions.unsubscribe();
+    }
   }
 }

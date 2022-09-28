@@ -25,6 +25,8 @@ import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.servi
 import { PerformanceViewSettings } from './performance-view-settings';
 import { ChartGenerators } from './chart-generators/chart-generators';
 import { TsChartType } from './ts-chart-type';
+import { BucketFilters } from '../model/bucket-filters';
+import { ExecutionFiltersComponent } from './filters/execution-filters.component';
 
 declare const uPlot: any;
 
@@ -51,6 +53,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   // key: TsChartType
   chartsSettings: { [key: string]: TSChartSettings } = {};
 
+  @ViewChild(ExecutionFiltersComponent) filtersComponent!: ExecutionFiltersComponent;
   @ViewChild('ranger') ranger!: TSRangerComponent;
   @ViewChild('throughputChart') throughputChart!: TimeSeriesChartComponent;
   @ViewChild('summaryChart') summaryChart!: TimeSeriesChartComponent;
@@ -95,12 +98,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   timeSelection!: ExecutionTimeSelection;
 
   subscriptions: Subscription = new Subscription();
-  intervalExecution: any;
   intervalShouldBeCanceled = false;
 
   allSeriesChecked: boolean = true;
 
-  private colorsPool = new TimeseriesColorsPool();
   private keywordsService!: TimeSeriesKeywordsContext;
 
   responseTimeMetrics = [
@@ -118,11 +119,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     return a.key.localeCompare(b.key);
   };
 
-  constructor(
-    private timeSeriesService: TimeSeriesService,
-    private contextFactory: TimeSeriesContextsFactory,
-    private executionService: ExecutionsService
-  ) {}
+  constructor(private timeSeriesService: TimeSeriesService, private contextFactory: TimeSeriesContextsFactory) {}
 
   onAllSeriesCheckboxClick(event: any) {
     this.keywordsService.toggleSelectAll();
@@ -132,56 +129,58 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     return this.timeSelectionComponent.getActiveSelection();
   }
 
-  changeRefreshInterval(newInterval: RefreshInterval) {
-    if (newInterval.value) {
-      if (this.selectedRefreshInterval.value === newInterval.value) {
-        return;
-      }
-      this.refreshEnabled = true;
-      clearInterval(this.intervalExecution);
-      this.startRefreshInterval(newInterval.value);
-    } else {
-      // we need to stop it
-      this.refreshEnabled = false;
-      clearInterval(this.intervalExecution);
-    }
-    this.selectedRefreshInterval = newInterval;
-  }
-
   ngOnInit(): void {
     if (!this.settings) {
       throw new Error('Settings input is not specified!');
     }
     this.findRequest = this.prepareFindRequest(this.settings);
     this.initContext();
-    this.keywordsService.onAllSelectionChanged().subscribe((selected) => {
-      this.allSeriesChecked = selected;
-    });
-    this.keywordsService.onKeywordToggled().subscribe((selection) => {
-      this.throughputChart.toggleSeries(selection.id);
-      this.responseTimeChart.toggleSeries(selection.id);
-      this.keywords[selection.id] = selection;
-    });
-    this.keywordsService.onKeywordsUpdated().subscribe((keywords) => {
-      this.keywords = keywords;
-    });
-    this.executionContext.onActiveSelectionChange().subscribe((newRange) => {
-      this.timeSelection = newRange;
-      this.updateTable();
-      // the event is handled from the parent, so no action needed here.
-    });
+    this.subscriptions.add(
+      this.keywordsService.onAllSelectionChanged().subscribe((selected) => {
+        this.allSeriesChecked = selected;
+      })
+    );
+    this.subscriptions.add(
+      this.keywordsService.onKeywordToggled().subscribe((selection) => {
+        this.throughputChart.setSeriesVisibility(selection.id, selection.isSelected);
+        this.responseTimeChart.setSeriesVisibility(selection.id, selection.isSelected);
+        this.keywords[selection.id] = selection;
+      })
+    );
+    this.subscriptions.add(
+      this.keywordsService.onKeywordsUpdated().subscribe((keywords) => {
+        this.keywords = keywords;
+      })
+    );
+    this.subscriptions.add(
+      this.executionContext.onActiveSelectionChange().subscribe((newRange) => {
+        this.timeSelection = newRange;
+        this.updateTable();
+        // the event is handled from the parent, so no action needed here.
+      })
+    );
 
-    this.executionContext.onFiltersChange().subscribe((filters) => {
-      Object.assign(this.findRequest.params, filters);
-      // this.findRequest.params = { ...this.findRequest.params, ...filters};
-      this.updateAllCharts();
-    });
-    this.executionContext.onGroupingChange().subscribe((groupDimensions: string[]) => {
-      this.groupDimensions = groupDimensions;
-      this.createByKeywordsCharts({ ...this.findRequest, groupDimensions: groupDimensions });
-    });
+    this.subscriptions.add(
+      this.executionContext.onFiltersChange().subscribe((filters) => {
+        this.updateAllCharts();
+      })
+    );
+    this.subscriptions.add(
+      this.executionContext.onGroupingChange().subscribe((groupDimensions: string[]) => {
+        this.groupDimensions = groupDimensions;
+        this.mergeRequestWithActiveFilters();
+        this.createByKeywordsCharts({ ...this.findRequest, groupDimensions: groupDimensions });
+      })
+    );
 
     this.createAllCharts();
+  }
+
+  deleteObjectProperties(object: any, keys: string[]) {
+    if (!keys) {
+      return;
+    }
+    keys.forEach((key) => delete object[key]);
   }
 
   private initContext() {
@@ -189,7 +188,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.keywordsService = this.executionContext.getKeywordsContext();
   }
 
-  prepareFindRequest(settings: PerformanceViewSettings, customFilters?: any) {
+  prepareFindRequest(settings: PerformanceViewSettings, customFilters?: any): FindBucketsRequest {
     const numberOfBuckets = this.calculateIdealNumberOfBuckets(settings.startTime, settings.endTime);
     return {
       start: settings.startTime,
@@ -204,32 +203,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     };
   }
 
-  startRefreshInterval(interval: number) {
-    this.intervalExecution = setInterval(() => {
-      if (this.intervalShouldBeCanceled) {
-        clearTimeout(this.intervalExecution);
-      }
-      let now = new Date().getTime();
-      // this.findRequest.start = lastEnd - ((lastEnd - this.executionStart) % this.findRequest.intervalSize);
-      this.findRequest.end = now;
-      if (this.timeSelection.type === RangeSelectionType.RELATIVE && this.timeSelection.relativeSelection) {
-        let from = now - this.timeSelection.relativeSelection.timeInMs;
-        this.timeSelection.absoluteSelection = { from: from, to: now };
-      }
-      this.findRequest.numberOfBuckets = this.calculateIdealNumberOfBuckets(
-        this.findRequest.start,
-        this.findRequest.end
-      );
-      this.timeSelectionComponent.refreshRanger();
-      this.updateAllCharts();
-      // this.timeSeriesService.getExecutionDetails(this.executionId).subscribe((details) => {
-      //   if (details.endTime) {
-      //     this.intervalShouldBeCanceled = true;
-      //   }
-      // });
-    }, interval);
-  }
-
   createAllCharts() {
     this.createSummaryChart(this.findRequest);
     // this.tableChart.init(this.findRequest);
@@ -240,16 +213,21 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     }
   }
 
+  // we assume the settings input has been changed
   reconstructAllCharts() {
-    this.findRequest.numberOfBuckets = this.calculateIdealNumberOfBuckets(
-      this.settings.startTime,
-      this.settings.endTime
-    );
+    this.findRequest = this.prepareFindRequest(this.settings); // we don't want to lose active filters
     this.updateAllCharts();
+  }
+
+  mergeRequestWithActiveFilters() {
+    this.deleteObjectProperties(this.findRequest.params, this.filtersComponent.getAllFilterAttributes()); // we clean the request first
+    Object.assign(this.findRequest.params, this.executionContext.getActiveFilters());
   }
 
   updateAllCharts() {
     this.timeSelectionComponent.refreshRanger();
+    this.mergeRequestWithActiveFilters();
+    // we clone the object so the find request is not polluted with the filters (we can't clean it back)
     this.createSummaryChart(this.findRequest, true);
     this.updateTable();
     this.createByStatusChart(this.findRequest);
@@ -273,6 +251,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       ...request.params,
       [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_SAMPLER,
     };
+    this.deleteObjectProperties(updatedParams, this.filtersComponent?.getAllFilterAttributes()); // we remove all custom filters
     this.timeSeriesService.fetchBuckets({ ...request, params: updatedParams }).subscribe((response) => {
       let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
       if (response.matrix.length === 0 && this.threadGroupChart) {
@@ -382,7 +361,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   createByStatusChart(request: FindBucketsRequest) {
-    this.timeSeriesService.fetchBuckets({ ...request, groupDimensions: ['rnStatus'] }).subscribe((response) => {
+    let stausAttribute = 'rnStatus';
+    this.timeSeriesService.fetchBuckets({ ...request, groupDimensions: [stausAttribute] }).subscribe((response) => {
       if (response.matrixKeys.length === 0 && this.byStatusChart) {
         // empty data
         this.byStatusChart?.clear();
@@ -390,8 +370,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       }
       let xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
       let series: TSChartSeries[] = response.matrix.map((series, i) => {
-        let status = response.matrixKeys[i]['rnStatus'];
-        let color = this.colorsPool.getStatusColor(status);
+        let status = response.matrixKeys[i][stausAttribute];
+        let color = this.keywordsService.getStatusColor(status);
+        status = status || 'No Status';
+
         return {
           id: status,
           label: status,
@@ -438,7 +420,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
         response.matrixKeys.map((key, i) => {
           key = this.getSeriesKey(key, groupDimensions);
           let responseTimeData: (number | null)[] = [];
-          let color = this.colorsPool.getColor(key);
+          let color = this.keywordsService.getColor(key);
           let countData = response.matrix[i].map((b, j) => {
             let bucketValue = b?.throughputPerHour;
             if (totalThroughput[j] == undefined) {
@@ -542,7 +524,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       this.tableChart.refresh(this.findRequest); // refresh the table
       return;
     }
-    let clonedRequest = JSON.parse(JSON.stringify(this.findRequest)); // we make a clone in order to not pollute the global request
+    // we make a clone in order to not pollute the global request, since we change from and to params
+    let clonedRequest = JSON.parse(JSON.stringify(this.findRequest));
     if (newRange.from) {
       clonedRequest.start = Math.trunc(newRange.from);
     }
@@ -585,7 +568,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    clearInterval(this.intervalExecution);
+    if (this.subscriptions) {
+      this.subscriptions.unsubscribe();
+    }
   }
 
   get TsChartType() {
