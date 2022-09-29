@@ -75,7 +75,7 @@
         <button
           mat-icon-button
           matTooltip="Delete"
-          [disabled]="!('task-write' | hasRight | async)"
+          [disabled]="!('task-delete' | hasRight | async)"
           (click)="_logic.deletePrameter(element)"
         >
           <step-icon name="trash-2"></step-icon>
