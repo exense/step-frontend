@@ -51,7 +51,7 @@
           <button
             mat-icon-button
             matTooltip="Delete mask"
-            [disabled]="!('kw-write' | hasRight | async)"
+            [disabled]="!('mask-delete' | hasRight | async)"
             (click)="deleteFunction(element.id, element.attributes.name)"
           >
             <step-icon name="x"></step-icon>
