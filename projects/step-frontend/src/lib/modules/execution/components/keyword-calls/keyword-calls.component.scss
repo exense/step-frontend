@@ -8,15 +8,18 @@
   @include table-header;
 }
 
-.cell-execution-time,
-.cell-step,
-.cell-status {
-  vertical-align: top;
-  padding-top: 10px;
+thead > tr > th,
+tbody > tr > td {
+  &.cell-execution-time,
+  &.cell-step,
+  &.cell-status {
+    vertical-align: top;
+    padding-top: 10px;
+  }
 }
 
-.cell-status {
-  padding-top: 20px;
+td.mat-cell.cell-status {
+  width: 80px;
 }
 
 .cell-execution-time {
@@ -25,8 +28,4 @@
     display: flex;
     align-items: center;
   }
-}
-
-.cell-status {
-  width: 80px;
 }

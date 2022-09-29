@@ -1,6 +1,8 @@
 @import '../../../_common/styles/variables';
 
 :host {
+  display: flex;
+  align-items: center;
   margin-right: 5px;
 }
 

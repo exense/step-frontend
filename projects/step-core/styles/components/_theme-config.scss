@@ -175,4 +175,8 @@ $light-primary-text: white;
     @include step-icon.step-icon-size(18px);
     margin-top: -2px;
   }
+
+  tbody .form-group {
+    margin-bottom: 15px;
+  }
 }
