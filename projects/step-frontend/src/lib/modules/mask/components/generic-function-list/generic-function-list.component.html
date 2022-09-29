@@ -43,7 +43,7 @@
           <button
             mat-icon-button
             matTooltip="Execute mask"
-            [disabled]="!('kw-execute' | hasRight | async)"
+            [disabled]="!('mask-execute' | hasRight | async)"
             (click)="executeFunction(element.id)"
           >
             <step-icon name="play"></step-icon>
