@@ -35,7 +35,7 @@
           <button
             mat-icon-button
             matTooltip="Configure mask"
-            [disabled]="!('kw-write' | hasRight | async)"
+            [disabled]="!('mask-write' | hasRight | async)"
             (click)="configureFunction(element.id)"
           >
             <step-icon name="edit-2"></step-icon>
