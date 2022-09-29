@@ -7,7 +7,7 @@ order="[[0, &quot;desc&quot;]]" filter="'executionID='+interactiveSession.id">
 		</a>
 		<div class="btn-group btn-group-menu">
 			<button type="button" class="btn btn-default" ng-click="$parent.exportAsCSV()" uib-tooltip="Export as CSV" tooltip-append-to-body="true">
-				<span class="glyphicon glyphicon-export"></span>
+        <step-ajs-icon name="upload"></step-ajs-icon>
 			</button>
 		</div>
 	</st-actions>
@@ -17,10 +17,10 @@ order="[[0, &quot;desc&quot;]]" filter="'executionID='+interactiveSession.id">
 			<second-header></second-header>
 			<cell>
 				<button ng-if="!rowScope.showDetails" type="button" class="btn btn-default btn-xxs" uib-tooltip="Show/hide details" tooltip-append-to-body="true" ng-click="rowScope.showDetails=!rowScope.showDetails">
-					<span class="glyphicon glyphicon-chevron-right" />
+          <step-ajs-icon name="chevron-right"></step-ajs-icon>
 				</button>
 				<button ng-if="rowScope.showDetails" type="button" class="btn btn-default btn-xxs" uib-tooltip="Show/hide details" tooltip-append-to-body="true" ng-click="rowScope.showDetails=!rowScope.showDetails">
-					<span class="glyphicon glyphicon-chevron-down" />
+          <step-ajs-icon name="chevron-down"></step-ajs-icon>
 				</button>
 				<time time="row.executionTime" />
 			</cell>

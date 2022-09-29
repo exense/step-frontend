@@ -12,10 +12,10 @@
     <div class="panel-body">
       <div class="form-group form-group-sm">
         <label>Package file (Jar file, DLL file, or maven snippet)</label>
-        <span
-          class="glyphicon glyphicon-question-sign"
+        <step-ajs-icon
+          name="help-circle"
           uib-tooltip="Drag&drop your jar/DLL file containing keywords or copy-paste the maven snippet of the repository artifact"
-        ></span>
+        ></step-ajs-icon>
         <resource-input
           st-type="'functions'"
           st-bounded="true"
@@ -26,10 +26,10 @@
       </div>
       <div class="form-group form-group-sm">
         <label>Package dependencies (Folder or Zip of Jars or DLLs/PDBs)</label>
-        <span
-          class="glyphicon glyphicon-question-sign"
+        <step-ajs-icon
+          name="help-circle"
           uib-tooltip="Drag&drop your folder or zip containing Jars/DLLs/PDBs dependencies."
-        ></span>
+        ></step-ajs-icon>
         <resource-input
           st-type="'functions'"
           st-model="functionPackage.packageLibrariesLocation"
@@ -43,10 +43,10 @@
     <div class="panel-heading">
       <a ng-click="hideCustomAttributes = !hideCustomAttributes"
         >Custom attributes
-        <span
-          class="glyphicon glyphicon-question-sign"
+        <step-ajs-icon
+          name="help-circle"
           uib-tooltip="Custom attributes applied to all keywords and derived from the functionTable screenInput"
-        ></span
+        ></step-ajs-icon
       ></a>
     </div>
     <div class="panel-body ng-hide" ng-show="!hideCustomAttributes">
@@ -73,22 +73,23 @@
           <input type="checkbox" ng-model="functionPackage.executeLocally" />
           <span class="ng-binding">Execute on controller</span>
         </label>
-        <span
-          class="glyphicon glyphicon-question-sign pull-right"
+        <step-ajs-icon
+          name="help-circle"
           uib-tooltip="Defines if the Keywords of this package should be executed on an agent or locally on the controller. Please change this only if you really now what you're doing. In most of the cases the default setting doesn't have to be changed."
-        ></span>
+        ></step-ajs-icon>
       </div>
       <div ng-if="!functionPackage.executeLocally">
         <label
           >Agent token selection criteria
           <button type="button" class="btn btn-default btn-xs" ng-click="addRoutingCriteria()">
-            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            <step-ajs-icon name="plus" aria-hidden="true"></step-ajs-icon>
           </button>
         </label>
-        <span
-          class="glyphicon glyphicon-question-sign pull-right"
+        <step-ajs-icon
+          name="help-circle"
+          class="pull-right"
           uib-tooltip="Defines additional selection criteria for the agent token on which the keywords of this package should be executed"
-        ></span>
+        ></step-ajs-icon>
         <div class="panel panel-default">
           <div class="panel-body">
             <div>
@@ -117,7 +118,7 @@
                         ng-click="removeRoutingCriteria(criterion.key)"
                         type="button"
                       >
-                        <i class="glyphicon glyphicon-remove"></i>
+                        <step-ajs-icon name="x"></step-ajs-icon>
                       </button>
                     </td>
                   </tr>

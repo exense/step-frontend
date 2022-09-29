@@ -12,7 +12,7 @@
 					<span class="icon-tree" />
 				</button>
 				<button ng-if="executionViewServices.getExecution()&&executionViewServices.getExecution().executionType=='TestSet'" type="button" class="btn btn-default btn-xs" uib-tooltip="Select the test case containing this node in the test case table" tooltip-append-to-body="true" ng-click="executionViewServices.showTestCase(reportNodeId)">
-					<span class="glyphicon glyphicon-list-alt" />
+          <step-ajs-icon name="list"></step-ajs-icon>
 				</button>
 			</div>
 		</span>
@@ -50,7 +50,7 @@
 	<div ng-if="!showDetails && children && children.length>0" class="node-detail-row">
 		<div class="node-detail-label">Errors</div>
 		<div class="node-detail-text">
-			<assert-report-node-short ng-repeat="child in children" ng-if="(child._class=='step.artefacts.reports.AssertReportNode' || 
+			<assert-report-node-short ng-repeat="child in children" ng-if="(child._class=='step.artefacts.reports.AssertReportNode' ||
 				child._class=='step.artefacts.reports.PerformanceAssertReportNode') && child.status != 'PASSED'" node ="child"/>
 		</div>
 	</div>

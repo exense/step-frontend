@@ -13,12 +13,13 @@
         <second-header><inputdropdown action="search" initial-value="initialValue"></inputdropdown></second-header>
         <cell
           ><i style="display: inline-block" ng-class="artefactIcon(row.name)" /> {{row.name}}
-          <span
+          <step-ajs-icon
             ng-if="artefactDescription(row.name)"
-            class="glyphicon glyphicon-question-sign pull-right"
+            name="help-circle"
+            class="pull-right"
             uib-tooltip="{{artefactDescription(row.name)}}"
             tooltip-append-to-body="true"
-          ></span>
+          ></step-ajs-icon>
         </cell>
       </st-column>
       <st-selection-column />

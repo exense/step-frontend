@@ -34,7 +34,7 @@
     title="Use a dynamic expression to set this attribute"
     ng-click="useDynamicExpression()"
   >
-    <span class="glyphicon glyphicon-flash"></span>
+    <step-ajs-icon name="zap"></step-ajs-icon>
   </button>
   <json-editor model="dynamicValue.value" type="{{type}}" on-change="save(json)" />
 </div>
@@ -63,7 +63,7 @@
       ng-click="editKeyword.editing = !editKeyword.editing"
       style="margin-left: auto; height: 22px"
     >
-      <i class="glyphicon glyphicon-pencil"></i>
+      <step-ajs-icon name="edit-2"></step-ajs-icon>
     </div>
   </div>
   <label style="padding-top: 24px" ng-if="editKeyword.editing">Keyword selection parameters</label>

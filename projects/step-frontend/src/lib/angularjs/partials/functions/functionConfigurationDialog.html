@@ -22,7 +22,7 @@
 				<input type="checkbox" ng-model="function_.useCustomTemplate">
 				<span class="ng-binding">Custom HTML template</span>
 			</label>
-			<span class="glyphicon glyphicon-question-sign pull-right" uib-tooltip="Used to overwrite the default HTML template."></span>
+      <steap-ajs-icon name="help-circle" class="pull-right" uib-tooltip="Used to overwrite the default HTML template."></steap-ajs-icon>
 			<textarea ng-model="function_.htmlTemplate" class="form-control form-control-sm"></textarea>
 		</div>
 
@@ -46,15 +46,15 @@
 						<input type="checkbox" ng-model="function_.executeLocally">
 						<span class="ng-binding">Execute on controller</span>
 					</label>
-					<span class="glyphicon glyphicon-question-sign pull-right" uib-tooltip="Defines if the Keyword has to be executed on an agent or locally on the controller. Please change this only if you really now what you're doing. In most of the cases the default setting doesn't have to be changed."></span>
+          <step-ajs-icon name="help-circle" class="pull-right" uib-tooltip="Defines if the Keyword has to be executed on an agent or locally on the controller. Please change this only if you really now what you're doing. In most of the cases the default setting doesn't have to be changed."></step-ajs-icon>
 				</div>
 				<div ng-if="!function_.executeLocally">
 					<label>Agent token selection criteria
 						<button type="button" class="btn btn-default btn-xs" ng-click="addRoutingCriteria()">
-							<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+              <step-ajs-icon name="plus" aria-hidden="true"></step-ajs-icon>
 						</button>
 					</label>
-					<span class="glyphicon glyphicon-question-sign pull-right" uib-tooltip="Defines additional selection criteria for the agent token on which the keyword should be executed"></span>
+          <step-ajs-icon name="help-circle" class="pull-right" uib-tooltip="Defines additional selection criteria for the agent token on which the keyword should be executed"></step-ajs-icon>
 					<div class="panel panel-default">
 						<div class="panel-body">
 							<div>
@@ -63,7 +63,11 @@
 										<tr ng-repeat="criterion in criteria">
 											<td style="padding:2px;"><input class="form-control input-sm" ng-model="criterion.key" placeholder="Key" ng-blur="saveRoutingCriteria()"></td>
 											<td style="padding:2px;"><input class="form-control input-sm" ng-model="criterion.value" placeholder="Value" ng-blur="saveRoutingCriteria()"></td>
-											<td style="padding:2px;"><button class="btn btn-danger btn-xs" ng-click="removeRoutingCriteria(criterion.key)" type="button"><i class="glyphicon glyphicon-remove"></i></button></td>
+											<td style="padding:2px;">
+                        <button class="btn btn-danger btn-xs" ng-click="removeRoutingCriteria(criterion.key)" type="button">
+                          <step-ajs-icon name="minus"></step-ajs-icon>
+                        </button>
+                      </td>
 										</tr>
 									</tbody>
 								</table>

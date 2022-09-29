@@ -6,12 +6,12 @@
 	<div class="panel-body" ng-controller="RepositoryCtrl" ng-if="reload">
 		<div ng-show="error">
 			<div class="alert alert-danger" role="alert">
-  				<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+  				<step-ajs-icon name="alert-circle" aria-hidden="true"></step-ajs-icon>
   				<span class="sr-only">Error:</span>
   				{{error}}
 			</div>
 		</div>
-		<div ng-show="loading" class="row"><div class="col-md-6"><i class="glyphicon glyphicon-refresh icon-refresh-animate"/> Loading...</div></div>
+    <div ng-show="loading" class="row"><div class="col-md-6"><step-ajs-icon name="refresh-cw" class="icon-refresh-animate"></step-ajs-icon> Loading...</div></div>
 		<div ng-show="artefactInfo" class="row">
 			<div class="col-md-8">
 				<h4>{{artefactInfo.name}}</h4>
@@ -34,12 +34,12 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<div class="row">&nbsp;</div>
-		
+
 		<div ng-if="artefactInfo.type=='TestSet'" ng-controller="TestSetOverviewCtrl">
 			<div>
-				<div ng-show="!testCases" class="row"><div class="col-md-6"><i class="glyphicon glyphicon-refresh icon-refresh-animate"/> Loading...</div></div>
+        <div ng-show="!testCases" class="row"><div class="col-md-6"><step-ajs-icon name="refresh-cw" class="icon-refresh-animate"></step-ajs-icon> Loading...</div></div>
 				<div ng-show="testCases">
 					<st-table data="testCases" handle="tableHandle" uid="'testCaseList'" persist-state="true" selection-attribute="trackTestcasesBy" default-selection="'all'" multiple-selection="true">
 						<st-actions>

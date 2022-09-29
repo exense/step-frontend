@@ -2,13 +2,13 @@
 	 <div class="flex-ns items-center justify-start ma1">
 	 	<label class="mb0 mr1">Maintenance message</label>
 
-	
-		<span class="glyphicon glyphicon-question-sign"
-			uib-tooltip="The following message will be displayed as warning on the header to all users. 
+
+		<step-ajs-icon name="help-circle"
+			uib-tooltip="The following message will be displayed as warning on the header to all users.
 			Use the switch button on the right, or below radio buttons to toggle it on/off."
 					tooltip-append-to-body="true">
-		</span>
-		
+		</step-ajs-icon>
+
 		<div class="btn-switch ml-auto" ng-class="{'btn-switch--on':toggle.switch}"
 			ng-model="toggle.switch" ng-click="switchToggle()">
 			<div class="btn-switch-circle"
