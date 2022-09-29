@@ -85,7 +85,7 @@
         <button
           mat-stroked-button
           matTooltip="Delete Parameter"
-          [disabled]="!('param-write' | hasRight | async)"
+          [disabled]="!('param-delete' | hasRight | async)"
           (click)="deleteParameter(element.id, element.key)"
         >
           <step-icon name="trash-2"></step-icon>
