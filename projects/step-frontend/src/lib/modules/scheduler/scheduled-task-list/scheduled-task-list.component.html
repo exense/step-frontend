@@ -15,7 +15,7 @@
         color="primary"
         matTooltip="New Task"
         matTooltipPosition="below"
-        [disabled]="!('user-write' | hasRight | async)"
+        [disabled]="!('task-write' | hasRight | async)"
         (click)="_logic.createParameter()"
       >
         <step-icon name="plus"></step-icon>
@@ -59,7 +59,7 @@
         <button
           mat-icon-button
           matTooltip="Execute"
-          [disabled]="!('user-write' | hasRight | async)"
+          [disabled]="!('task-write' | hasRight | async)"
           (click)="_logic.executeParameter(element)"
         >
           <step-icon name="play"></step-icon>
@@ -67,7 +67,7 @@
         <button
           mat-icon-button
           matTooltip="Edit"
-          [disabled]="!('user-write' | hasRight | async)"
+          [disabled]="!('task-write' | hasRight | async)"
           (click)="_logic.editParameter(element)"
         >
           <step-icon name="edit-2"></step-icon>
@@ -75,7 +75,7 @@
         <button
           mat-icon-button
           matTooltip="Delete"
-          [disabled]="!('user-write' | hasRight | async)"
+          [disabled]="!('task-write' | hasRight | async)"
           (click)="_logic.deletePrameter(element)"
         >
           <step-icon name="trash-2"></step-icon>
@@ -83,7 +83,7 @@
         <button
           mat-icon-button
           matTooltip="Analyze performance in interactive session"
-          [disabled]="!('user-write' | hasRight | async)"
+          [disabled]="!('task-write' | hasRight | async)"
           (click)="_logic.navToStats(element)"
         >
           <step-icon name="trending-up"></step-icon>
