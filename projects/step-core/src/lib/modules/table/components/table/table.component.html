@@ -1,9 +1,11 @@
 <div class="spinner-container" *ngIf="(tableDataSource?.inProgress$ | async) || inProgress">
   <mat-spinner></mat-spinner>
 </div>
-<ng-container *ngIf="additionalHeader?.template">
-  <div class="additional-header">
-    <ng-container *ngTemplateOutlet="additionalHeader!.template"> </ng-container>
+<ng-container *ngFor="let additionalHeaderGroup of additionalHeaderGroups">
+  <div class="additional-header" [class.additional-header-flex]="!!additionalHeaderGroup[1]">
+    <ng-container *ngFor="let additionalHeader of additionalHeaderGroup">
+      <ng-container *ngTemplateOutlet="additionalHeader!.template"></ng-container>
+    </ng-container>
   </div>
 </ng-container>
 <table mat-table [dataSource]="tableDataSource!" [trackBy]="trackBy">
