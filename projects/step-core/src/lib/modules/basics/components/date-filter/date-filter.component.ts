@@ -1,6 +1,6 @@
 import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { DateTime } from 'luxon';
-import { AbstractControl, FormBuilder, FormControl, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, ValidatorFn } from '@angular/forms';
 import { debounceTime, map, Subject, takeUntil } from 'rxjs';
 
 @Component({

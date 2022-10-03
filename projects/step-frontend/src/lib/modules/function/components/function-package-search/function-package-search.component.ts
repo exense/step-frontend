@@ -13,9 +13,7 @@ export class FunctionPackageSearchComponent implements CustomComponent, AfterVie
 
   context?: ColInput;
 
-  readonly form = this._formBuilder.group({
-    search: [''],
-  });
+  readonly searchControl = this._formBuilder.control('');
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -24,7 +22,7 @@ export class FunctionPackageSearchComponent implements CustomComponent, AfterVie
   ) {}
 
   ngAfterViewInit(): void {
-    this.form.controls['search'].valueChanges
+    this.searchControl.valueChanges
       .pipe(
         debounceTime(200),
         switchMap((searchValue) => {
