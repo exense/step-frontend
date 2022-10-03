@@ -37,9 +37,10 @@
 
       <div ng-attr-id="{{getPanelId('executionDetails')}}"
            class="panel panel-default">
-        <div class="panel-heading">
+        <div class="panel-heading" style="display: flex; justify-content: space-between; align-items: center">
           <a ng-click="toggleShowPanel('executionDetails')">{{getPanelTitle('executionDetails')}}</a>
-          <div class="executionStatus status-{{execution.status}} pull-right">{{execution.status}}</div>
+          <step-status [status]="execution.status">
+          </step-status>
         </div>
         <div class="panel-body" ng-show="isShowPanel('executionDetails')">
           <ul class="list-unstyled">

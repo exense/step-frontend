@@ -1,3 +1,4 @@
+@use 'projects/step-core/styles/core-mixins' as core;
 @import '../../../_common/styles/mixins';
 @import '../../../_common/styles/variables';
 
@@ -5,5 +6,6 @@
 
 .status {
   color: $white !important;
-  text-align: center;
+  @include core.status-shape();
+  width: 100%;
 }
