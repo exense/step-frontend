@@ -47,9 +47,7 @@
     </td>
   </ng-container>
   <ng-container matColumnDef="scope" stepSearchCol>
-    <step-input-group *stepSearchCellDef>
-      <input type="text" #scopeInput (change)="searchByScope(scopeInput.value)" />
-    </step-input-group>
+    <step-input-filter *stepSearchCellDef (searchChange)="searchByScope($event)"> </step-input-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Scope</th>
     <td mat-cell *matCellDef="let element">
       <span
