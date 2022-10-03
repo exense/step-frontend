@@ -39,5 +39,8 @@ section.content {
 }
 
 .detail {
+  max-width: 30vw;
+  word-wrap: break-word;
+  display: inline-block;
   color: $dark-gray;
 }
