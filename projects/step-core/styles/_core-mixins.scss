@@ -8,3 +8,28 @@
     padding-right: 10px;
   }
 }
+
+@mixin status-common {
+  display: inline-flex;
+  align-items: center;
+  min-height: 16px;
+  padding: 3px 10px;
+  font-weight: normal;
+  justify-content: center;
+}
+
+@mixin status-left-side {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+@mixin status-right-side {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+@mixin status-shape {
+  @include status-common;
+  @include status-left-side;
+  @include status-right-side;
+}
