@@ -377,9 +377,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
         return {
           id: status,
           label: status,
-          data: series.map((b) => (b ? b.count : null)),
+          data: series.map((b) => (b ? b.throughputPerHour : null)),
           // scale: 'mb',
-          // value: (self, x) => Math.trunc(x) + ' ms',
+          value: (self, x) => TimeSeriesUtils.formatAxisValue(x) + '/h',
           stroke: color,
           fill: color + '20',
         };
@@ -389,10 +389,11 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
         showLegend: true,
         xValues: xLabels,
         series: series,
+        yScaleUnit: '/ h',
         axes: [
           {
             size: this.CHART_LEGEND_SIZE,
-            values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v)),
+            values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
           },
         ],
       };
@@ -476,13 +477,13 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             {
               scale: 'y',
               size: this.CHART_LEGEND_SIZE,
-              values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v)),
+              values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
             },
             {
               side: 1,
               size: this.CHART_LEGEND_SIZE,
               scale: 'total',
-              values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v)),
+              values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
               grid: { show: false },
             },
           ],

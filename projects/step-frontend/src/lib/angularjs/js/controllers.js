@@ -401,7 +401,7 @@ tecAdminControllers.directive('executionProgress', [
 
         $scope.getIncludedTestcases = function () {
           var table = $scope.testCaseTable;
-          var selectionMode = table.getSelectionMode ? table.getSelectionMode() : 'all';
+          var selectionMode = (table && table.getSelectionMode) ? table.getSelectionMode() : 'all';
           if (selectionMode == 'all' || table.areAllSelected()) {
             return null;
           } else if (selectionMode == 'custom' || selectionMode == 'none') {
