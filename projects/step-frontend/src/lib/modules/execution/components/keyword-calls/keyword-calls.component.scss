@@ -8,18 +8,18 @@
   @include table-header;
 }
 
-thead > tr > th,
-tbody > tr > td {
+th,
+td {
   &.cell-execution-time,
   &.cell-step,
   &.cell-status {
     vertical-align: top;
-    padding-top: 10px;
   }
 }
 
 td.mat-cell.cell-status {
   width: 80px;
+  padding-top: 10px !important;
 }
 
 .cell-execution-time {

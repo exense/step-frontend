@@ -7,4 +7,5 @@
 .status {
   color: $white !important;
   @include core.status-shape();
+  width: 100%;
 }
