@@ -33,6 +33,10 @@ section.content {
   @include flexCenter;
 }
 
+.wordbreak {
+  word-break: break-word;
+}
+
 .muted,
 .detail-label {
   color: $muted;
