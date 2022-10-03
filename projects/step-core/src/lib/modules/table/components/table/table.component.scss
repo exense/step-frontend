@@ -46,6 +46,10 @@
     border-radius: 0 0 16px 16px;
   }
 
+  tr[mat-header-row] {
+    height: 63px;
+  }
+
   tr {
     ::ng-deep step-btn-group {
       opacity: 0.5;
