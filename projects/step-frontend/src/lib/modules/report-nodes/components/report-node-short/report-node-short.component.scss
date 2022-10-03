@@ -33,14 +33,15 @@ section.content {
   @include flexCenter;
 }
 
+.wordbreak {
+  word-break: break-word;
+}
+
 .muted,
 .detail-label {
   color: $muted;
 }
 
 .detail {
-  max-width: 30vw;
-  word-wrap: break-word;
-  display: inline-block;
   color: $dark-gray;
 }
