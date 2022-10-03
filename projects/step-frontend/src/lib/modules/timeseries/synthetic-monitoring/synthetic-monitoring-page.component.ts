@@ -19,7 +19,7 @@ export class SyntheticMonitoringPageComponent implements OnInit {
 
   @ViewChild(TimeRangePicker) rangePicker!: TimeRangePicker;
   @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
-  @Input() taskId: string = window.location.href.substring(window.location.href.lastIndexOf('/') + 1);
+  @Input() taskId: string = window.location.href.split('?')[0].substring(window.location.href.lastIndexOf('/') + 1);
 
   performanceViewSettings: PerformanceViewSettings | undefined;
 
