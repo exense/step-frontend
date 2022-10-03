@@ -76,6 +76,8 @@ $border-radius: 8px;
         font-weight: 400;
         padding: 10px 14px;
         line-height: 20px;
+        width: 100%;
+        min-width: 80px;
 
         &:focus {
           outline: none;
