@@ -18,20 +18,10 @@ import { StepGeneratedClientModule } from './client/generated';
 import { EntitiesSelectionModule } from './modules/entities-selection/entities-selection.module';
 import { CapsLockDirective } from './directives/caps-lock.directive';
 import { CustomRegistriesModule } from './modules/custom-registeries/custom-registries.module';
-import { ArrayFilterComponent } from './components/array-filter/array-filter.component';
-import { DateFilterComponent } from './components/date-filter/date-filter.component';
 import { TabsModule } from './modules/tabs/tabs.module';
 
 @NgModule({
-  declarations: [
-    TooltipDirective,
-    HasRightPipe,
-    MatchingAuthenticator,
-    DashboardLinkPipe,
-    CapsLockDirective,
-    ArrayFilterComponent,
-    DateFilterComponent,
-  ],
+  declarations: [TooltipDirective, HasRightPipe, MatchingAuthenticator, DashboardLinkPipe, CapsLockDirective],
   imports: [
     CommonModule,
     FormsModule,
@@ -65,8 +55,6 @@ import { TabsModule } from './modules/tabs/tabs.module';
     EntitiesSelectionModule,
     StepGeneratedClientModule,
     CustomRegistriesModule,
-    ArrayFilterComponent,
-    DateFilterComponent,
     TabsModule,
   ],
   providers: [
@@ -133,5 +121,3 @@ export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
 export { CancelablePromise, CancelError } from './client/generated/core/CancelablePromise';
 export { OpenAPI } from './client/generated/core/OpenAPI';
 export type { OpenAPIConfig } from './client/generated/core/OpenAPI';
-export { ArrayFilterComponent } from './components/array-filter/array-filter.component';
-export { DateFilterComponent } from './components/date-filter/date-filter.component';
