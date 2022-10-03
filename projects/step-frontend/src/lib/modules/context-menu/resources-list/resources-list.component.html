@@ -6,7 +6,6 @@
       color="primary"
       matTooltip="New Resource"
       matTooltipPosition="below"
-      [disabled]="!('user-write' | hasRight | async)"
       (click)="createResource()"
     >
       <step-icon name="plus"></step-icon>

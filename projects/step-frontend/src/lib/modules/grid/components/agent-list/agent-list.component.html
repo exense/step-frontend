@@ -30,7 +30,7 @@
         <button
           mat-icon-button
           matTooltip="Pause agent and enter maintenance mode"
-          [disabled]="!('user-write' | hasRight | async)"
+          [disabled]="!('token-manage' | hasRight | async)"
           (click)="interrupt(element.agentRef!.agentId)"
         >
           <step-icon name="pause"></step-icon>
@@ -38,7 +38,7 @@
         <button
           mat-icon-button
           matTooltip="Resume agent and exit maintenance mode"
-          [disabled]="!('user-write' | hasRight | async)"
+          [disabled]="!('token-manage' | hasRight | async)"
           (click)="resume(element.agentRef!.agentId)"
         >
           <step-icon name="play"></step-icon>
@@ -46,7 +46,7 @@
         <button
           mat-icon-button
           matTooltip="Remove all token errors"
-          [disabled]="!('user-write' | hasRight | async)"
+          [disabled]="!('token-manage' | hasRight | async)"
           (click)="removeTokenErrors(element.agentRef!.agentId)"
         >
           <step-icon name="check"></step-icon>

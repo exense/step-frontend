@@ -10,7 +10,7 @@
         mat-icon-button
         matTooltipPosition="below"
         matTooltip="Import parameter"
-        [disabled]="!('user-write' | hasRight | async)"
+        [disabled]="!('param-write' | hasRight | async)"
         (click)="importParameter()"
       >
         <step-icon name="download"></step-icon>
@@ -20,7 +20,7 @@
         mat-icon-button
         matTooltipPosition="below"
         matTooltip="Export all parameters"
-        [disabled]="!('user-read' | hasRight | async)"
+        [disabled]="!('param-read' | hasRight | async)"
         (click)="exportParameter()"
       >
         <step-icon name="upload"></step-icon>
@@ -33,7 +33,7 @@
         color="primary"
         matTooltipPosition="below"
         matTooltip="New parameter"
-        [disabled]="!('user-write' | hasRight | async)"
+        [disabled]="!('param-write' | hasRight | async)"
         (click)="createParameter()"
       >
         <step-icon name="plus"></step-icon>
@@ -69,7 +69,7 @@
         <button
           mat-stroked-button
           matTooltip="Edit Parameter"
-          [disabled]="!('user-write' | hasRight | async)"
+          [disabled]="!('param-write' | hasRight | async)"
           (click)="editParameter(element)"
         >
           <step-icon name="edit-2">edit</step-icon>
@@ -77,7 +77,7 @@
         <button
           mat-stroked-button
           matTooltip="Duplicate Parameter"
-          [disabled]="!('user-write' | hasRight | async)"
+          [disabled]="!('param-write' | hasRight | async)"
           (click)="duplicateParameter(element)"
         >
           <step-icon name="copy"></step-icon>
@@ -85,7 +85,7 @@
         <button
           mat-stroked-button
           matTooltip="Delete Parameter"
-          [disabled]="!('user-write' | hasRight | async)"
+          [disabled]="!('param-delete' | hasRight | async)"
           (click)="deleteParameter(element.id, element.key)"
         >
           <step-icon name="trash-2"></step-icon>
