@@ -74,7 +74,7 @@
         <button
           *ngIf="element.state! !== 'MAINTENANCE'"
           mat-icon-button
-          [disabled]="!('user-write' | hasRight | async)"
+          [disabled]="!('token-manage' | hasRight | async)"
           (click)="pause(element.token!.id!)"
         >
           <step-icon name="pause"></step-icon>
@@ -82,7 +82,7 @@
         <button
           *ngIf="element.state! === 'MAINTENANCE'"
           mat-icon-button
-          [disabled]="!('user-write' | hasRight | async)"
+          [disabled]="!('token-manage' | hasRight | async)"
           (click)="play(element.token!.id!)"
         >
           <step-icon name="play"></step-icon>
@@ -91,7 +91,7 @@
           *ngIf="element.state! === 'ERROR'"
           uib-tooltip="Remove token error and set state to 'FREE'"
           mat-icon-button
-          [disabled]="!('user-write' | hasRight | async)"
+          [disabled]="!('token-manage' | hasRight | async)"
           (click)="removeTokenErrors(element.token!.id)"
         >
           <step-icon name="check"></step-icon>

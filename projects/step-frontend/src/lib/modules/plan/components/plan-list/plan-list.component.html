@@ -58,7 +58,7 @@
         <button
           mat-icon-button
           matTooltip="Execute plan"
-          [disabled]="!('plan-write' | hasRight | async)"
+          [disabled]="!('plan-execute' | hasRight | async)"
           (click)="executePlan(element.id)"
         >
           <step-icon name="play"></step-icon>
@@ -66,7 +66,7 @@
         <button
           mat-icon-button
           matTooltip="Duplicate plan"
-          [disabled]="!('plan-read' | hasRight | async)"
+          [disabled]="!('plan-write' | hasRight | async)"
           (click)="duplicatePlan(element.id)"
         >
           <step-icon name="copy"></step-icon>
@@ -74,7 +74,7 @@
         <button
           mat-icon-button
           matTooltip="Delete plan"
-          [disabled]="!('plan-read' | hasRight | async)"
+          [disabled]="!('plan-delete' | hasRight | async)"
           (click)="deletePlan(element.id, element.attributes.name)"
         >
           <step-icon name="x"></step-icon>
