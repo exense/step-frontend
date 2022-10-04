@@ -2,12 +2,12 @@ import { DOCUMENT } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, OnDestroy } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { ConfigDto, CredentialsDto, SessionDto } from '../domain';
+import { ConfigDto, CredentialsDto, SessionDto } from '../../../domain';
 import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
-import { AJS_LOCATION, AJS_PREFERENCES, AJS_ROOT_SCOPE, AJS_UIB_MODAL } from '../shared/angularjs-providers';
-import { AJS_MODULE } from '../shared/constants';
-import { a1Promise2Promise } from '../shared/utils';
-import { AdditionalRightRuleService } from './additional-right-rule.service';
+import { AJS_LOCATION, AJS_PREFERENCES, AJS_ROOT_SCOPE, AJS_UIB_MODAL } from '../../../shared/angularjs-providers';
+import { AJS_MODULE } from '../../../shared/constants';
+import { a1Promise2Promise } from '../../../shared/utils';
+import { AdditionalRightRuleService } from '../../../services/additional-right-rule.service';
 
 export interface AuthContext {
   userID: string;

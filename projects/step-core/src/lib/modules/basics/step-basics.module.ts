@@ -7,6 +7,8 @@ import { DateFilterComponent } from './components/date-filter/date-filter.compon
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StepMaterialModule } from '../step-material/step-material.module';
 import { InputFilterComponent } from './components/input-filter/input-filter.component';
+import { HasRightPipe } from './pipes/has-right.pipe';
+import { AuthService } from './services/auth.service';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
@@ -16,6 +18,7 @@ import { InputFilterComponent } from './components/input-filter/input-filter.com
     ArrayFilterComponent,
     DateFilterComponent,
     InputFilterComponent,
+    HasRightPipe,
   ],
   exports: [
     ResourceLabelComponent,
@@ -23,6 +26,7 @@ import { InputFilterComponent } from './components/input-filter/input-filter.com
     ArrayFilterComponent,
     DateFilterComponent,
     InputFilterComponent,
+    HasRightPipe,
   ],
 })
 export class StepBasicsModule {}
@@ -33,3 +37,5 @@ export * from './components/array-filter/array-filter.component';
 export * from './components/date-filter/date-filter.component';
 export * from './components/input-filter/input-filter.component';
 export * from './shared/compare-condition.enum';
+export * from './pipes/has-right.pipe';
+export * from './services/auth.service';

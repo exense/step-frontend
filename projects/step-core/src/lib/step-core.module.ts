@@ -6,7 +6,6 @@ import { UpgradeModule } from '@angular/upgrade/static';
 import { TooltipDirective } from './directives/tooltip.directive';
 import { CORE_INITIALIZER } from './core-initialiser';
 import { StepMaterialModule } from './modules/step-material/step-material.module';
-import { HasRightPipe } from './pipes/has-right.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { TableModule } from './modules/table/table.module';
@@ -24,7 +23,6 @@ import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-c
 @NgModule({
   declarations: [
     TooltipDirective,
-    HasRightPipe,
     MatchingAuthenticator,
     DashboardLinkPipe,
     CapsLockDirective,
@@ -54,7 +52,6 @@ import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-c
     TooltipDirective,
     CapsLockDirective,
     StepMaterialModule,
-    HasRightPipe,
     MatchingAuthenticator,
     DashboardLinkPipe,
     TableModule,
@@ -93,7 +90,6 @@ export class StepCoreModule {}
 export * from './domain';
 export * from './shared';
 export * from './decorators/plugin';
-export * from './services/auth.service';
 export * from './services/dashboard.service';
 export * from './services/invoke-run.service';
 export * from './services/view-registry.service';
@@ -111,7 +107,6 @@ export * from './angularjs';
 export * from './directives/tooltip.directive';
 export * from './directives/caps-lock.directive';
 export * from './directives/tooltip-immediate-close.directive';
-export * from './pipes/has-right.pipe';
 export * from './pipes/matching-authenticator.pipe';
 export * from './pipes/dashboard-link.pipe';
 export * from './modules/step-material/step-material.module';

@@ -6,7 +6,9 @@
       mat-icon-button
       (click)="invoke(operation)"
       [matTooltip]="operation.operation | bulkOperationLabel"
-      [disabled]="!(operation.permission | hasRight | async) || (isOperationsDisabled$ | async)"
+      [disabled]="
+        (operation.permission && !(operation.permission | hasRight | async)) || (isOperationsDisabled$ | async)
+      "
     >
       <step-icon [name]="operation.operation | bulkOperationIcon"></step-icon>
     </button>

@@ -18,7 +18,6 @@ import { AsyncOperationsModule } from '../async-operations/async-operations.modu
 import { BulkOperationLabelPipe } from './pipe/bulk-operation-label.pipe';
 import { CustomSearchCellComponentsPipe } from './pipe/custom-search-cell-components.pipe';
 import { StepBasicsModule } from '../basics/step-basics.module';
-import { HasRightPipe } from '../../pipes/has-right.pipe';
 
 @NgModule({
   imports: [
@@ -43,7 +42,6 @@ import { HasRightPipe } from '../../pipes/has-right.pipe';
     BulkOperationIconPipe,
     BulkOperationLabelPipe,
     CustomSearchCellComponentsPipe,
-    HasRightPipe,
   ],
   exports: [
     TableComponent,
@@ -53,7 +51,6 @@ import { HasRightPipe } from '../../pipes/has-right.pipe';
     ColumnDirective,
     AdditionalHeaderDirective,
     BulkOperationsComponent,
-    HasRightPipe,
   ],
 })
 export class TableModule {}
