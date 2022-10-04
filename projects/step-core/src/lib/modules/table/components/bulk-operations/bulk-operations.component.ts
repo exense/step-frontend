@@ -2,7 +2,7 @@ import { Component, Input, Optional } from '@angular/core';
 import { BulkSelectionType, SelectionCollector } from '../../../entities-selection/entities-selection.module';
 import { TableFilter } from '../../services/table-filter';
 import { BulkOperationConfig, BulkOperationsInvokeService } from '../../services/bulk-operations-invoke.service';
-import { BulkOperation } from '../../shared/bulk-operation.enum';
+import { BulkOperation } from '../../types/bulk-operation';
 import { TableReload } from '../../services/table-reload';
 import { map, of } from 'rxjs';
 import { AsyncOperationCloseStatus } from '../../../async-operations/async-operations.module';
@@ -39,7 +39,7 @@ export class BulkOperationsComponent<KEY, ENTITY> {
 
     const config: BulkOperationConfig<KEY> = {
       selectionType: this.selectionType,
-      operationType: operation,
+      operationType: operation.operation,
       withPreview: true,
     };
 

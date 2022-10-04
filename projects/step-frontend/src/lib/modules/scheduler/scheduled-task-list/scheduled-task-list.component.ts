@@ -3,7 +3,7 @@ import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static'
 import {
   AJS_MODULE,
   AutoDeselectStrategy,
-  BulkOperation,
+  BulkOperationType,
   BulkOperationsInvokeService,
   ExecutiontTaskParameters,
   selectionCollectionProvider,
@@ -25,7 +25,10 @@ import { ScheduledTaskBulkOperationsInvokeService } from '../services/scheduled-
   ],
 })
 export class ScheduledTaskListComponent {
-  readonly availableBulkOperations = [BulkOperation.delete, BulkOperation.duplicate];
+  readonly availableBulkOperations = [
+    { operation: BulkOperationType.delete, permission: 'task-delete' },
+    { operation: BulkOperationType.duplicate, permission: 'task-write' },
+  ];
   constructor(public readonly _logic: ScheduledTaskLogicService) {}
 }
 

@@ -5,7 +5,7 @@ import {
   AJS_MODULE,
   AugmentedPlansService,
   AutoDeselectStrategy,
-  BulkOperation,
+  BulkOperationType,
   BulkOperationsInvokeService,
   Plan,
   selectionCollectionProvider,
@@ -29,8 +29,10 @@ import { PlansBulkOperationsInvokeService } from '../../services/plans-bulk-oper
 })
 export class PlanListComponent {
   readonly dataSource = this._plansApiService.getPlansTableDataSource();
-  readonly availableBulkOperations = [BulkOperation.delete, BulkOperation.duplicate];
-
+  readonly availableBulkOperations = [
+    { operation: BulkOperationType.delete, permission: 'plan-delete' },
+    { operation: BulkOperationType.duplicate, permission: 'plan-write' },
+  ];
   constructor(
     readonly _plansApiService: AugmentedPlansService,
     private _planDialogs: PlanDialogsService,
