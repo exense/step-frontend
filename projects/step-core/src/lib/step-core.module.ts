@@ -19,9 +19,17 @@ import { EntitiesSelectionModule } from './modules/entities-selection/entities-s
 import { CapsLockDirective } from './directives/caps-lock.directive';
 import { CustomRegistriesModule } from './modules/custom-registeries/custom-registries.module';
 import { TabsModule } from './modules/tabs/tabs.module';
+import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 
 @NgModule({
-  declarations: [TooltipDirective, HasRightPipe, MatchingAuthenticator, DashboardLinkPipe, CapsLockDirective],
+  declarations: [
+    TooltipDirective,
+    HasRightPipe,
+    MatchingAuthenticator,
+    DashboardLinkPipe,
+    CapsLockDirective,
+    TooltipImmediateCloseDirective,
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -56,6 +64,7 @@ import { TabsModule } from './modules/tabs/tabs.module';
     StepGeneratedClientModule,
     CustomRegistriesModule,
     TabsModule,
+    TooltipImmediateCloseDirective,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -101,6 +110,7 @@ export { UibModalInstance, UibModalHelperService } from './services/uib-modal-he
 export * from './angularjs';
 export * from './directives/tooltip.directive';
 export * from './directives/caps-lock.directive';
+export * from './directives/tooltip-immediate-close.directive';
 export * from './pipes/has-right.pipe';
 export * from './pipes/matching-authenticator.pipe';
 export * from './pipes/dashboard-link.pipe';
