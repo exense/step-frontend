@@ -140,6 +140,11 @@ $light-primary-text: white;
 
   .mat-mini-fab {
     box-shadow: none !important;
+    width: 36px;
+    height: 36px;
+    .mat-button-wrapper {
+      padding: 0;
+    }
   }
 
   .invisible {
