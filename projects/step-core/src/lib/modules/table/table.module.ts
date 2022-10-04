@@ -18,6 +18,7 @@ import { AsyncOperationsModule } from '../async-operations/async-operations.modu
 import { BulkOperationLabelPipe } from './pipe/bulk-operation-label.pipe';
 import { CustomSearchCellComponentsPipe } from './pipe/custom-search-cell-components.pipe';
 import { StepBasicsModule } from '../basics/step-basics.module';
+import { HasRightPipe } from '../../pipes/has-right.pipe';
 
 @NgModule({
   imports: [
@@ -42,6 +43,7 @@ import { StepBasicsModule } from '../basics/step-basics.module';
     BulkOperationIconPipe,
     BulkOperationLabelPipe,
     CustomSearchCellComponentsPipe,
+    HasRightPipe,
   ],
   exports: [
     TableComponent,
@@ -51,6 +53,7 @@ import { StepBasicsModule } from '../basics/step-basics.module';
     ColumnDirective,
     AdditionalHeaderDirective,
     BulkOperationsComponent,
+    HasRightPipe,
   ],
 })
 export class TableModule {}
@@ -70,7 +73,7 @@ export * from './services/custom-column-options';
 export * from './directives/additional-header.directive';
 export * from './components/bulk-operations/bulk-operations.component';
 export * from './services/bulk-operations-invoke.service';
-export * from './shared/bulk-operation.enum';
+export * from './shared/bulk-operation-type.enum';
 export * from './pipe/bulk-operation-label.pipe';
 export * from './pipe/bulk-operation-icon.pipe';
 export * from './shared/filter-condition';

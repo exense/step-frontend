@@ -4,7 +4,7 @@ import {
   AJS_MODULE,
   AugmentedParametersService,
   AutoDeselectStrategy,
-  BulkOperation,
+  BulkOperationType,
   BulkOperationsInvokeService,
   FilterConditionFactoryService,
   Parameter,
@@ -31,7 +31,10 @@ export class ParametersListComponent {
   private readonly tableSearch!: TableSearch;
 
   readonly dataSource = this._parametersService.dataSource;
-  readonly availableBulkOperations = [BulkOperation.delete, BulkOperation.duplicate];
+  readonly availableBulkOperations = [
+    { operation: BulkOperationType.delete, permission: 'param-delete' },
+    { operation: BulkOperationType.duplicate, permission: 'param-write' },
+  ];
 
   constructor(
     private _parametersService: AugmentedParametersService,

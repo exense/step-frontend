@@ -1,17 +1,17 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { BulkOperation } from '../shared/bulk-operation.enum';
+import { BulkOperationType } from '../shared/bulk-operation-type.enum';
 
 @Pipe({
   name: 'bulkOperationLabel',
 })
 export class BulkOperationLabelPipe implements PipeTransform {
-  transform(value: BulkOperation): string {
+  transform(value: BulkOperationType): string {
     switch (value) {
-      case BulkOperation.delete:
+      case BulkOperationType.delete:
         return 'Delete selected';
-      case BulkOperation.duplicate:
+      case BulkOperationType.duplicate:
         return 'Clone selected';
-      case BulkOperation.export:
+      case BulkOperationType.export:
         return 'Export selected';
       default:
         return '';

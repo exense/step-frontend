@@ -5,10 +5,10 @@
       type="button"
       mat-icon-button
       (click)="invoke(operation)"
-      [matTooltip]="operation | bulkOperationLabel"
-      [disabled]="isOperationsDisabled$ | async"
+      [matTooltip]="operation.operation | bulkOperationLabel"
+      [disabled]="!(operation.permission | hasRight | async) || (isOperationsDisabled$ | async)"
     >
-      <step-icon [name]="operation | bulkOperationIcon"></step-icon>
+      <step-icon [name]="operation.operation | bulkOperationIcon"></step-icon>
     </button>
   </ng-container>
 </div>
