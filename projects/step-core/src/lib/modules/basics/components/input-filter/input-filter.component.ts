@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormControl } from '@angular/forms';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -10,20 +10,27 @@ import { debounceTime, Subject, takeUntil } from 'rxjs';
 export class InputFilterComponent implements OnInit, OnDestroy {
   private terminator$ = new Subject<unknown>();
 
-  readonly searchControl = this.formBuilder.control('');
+  readonly searchControl = this.createControl();
 
   @Output() searchChange = new EventEmitter<string>();
 
-  constructor(private formBuilder: FormBuilder) {}
+  constructor(protected formBuilder: FormBuilder) {}
 
   ngOnInit(): void {
-    this.searchControl.valueChanges
-      .pipe(debounceTime(200), takeUntil(this.terminator$))
-      .subscribe((searchValue) => this.searchChange.emit(searchValue));
+    this.searchControl.valueChanges.pipe(debounceTime(200), takeUntil(this.terminator$)).subscribe((searchValue) => {
+      if (this.searchControl.invalid) {
+        return;
+      }
+      this.searchChange.emit(searchValue);
+    });
   }
 
   ngOnDestroy(): void {
     this.terminator$.next({});
     this.terminator$.complete();
+  }
+
+  protected createControl(): FormControl {
+    return this.formBuilder.control('');
   }
 }
