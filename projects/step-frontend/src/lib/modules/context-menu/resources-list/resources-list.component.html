@@ -24,7 +24,9 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
     <td mat-cell *matCellDef="let element">{{ element.resourceType }}</td>
   </ng-container>
-  <ng-container matColumnDef="id" stepSearchCol>
+  <ng-container matColumnDef="id" stepSearchCol #stepSearchColId="SearchCol">
+    <step-hexadecimal-input-filter *stepSearchCellDef (searchChange)="stepSearchColId.search($event, false)">
+    </step-hexadecimal-input-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Id</th>
     <td mat-cell *matCellDef="let element">{{ element.id }}</td>
   </ng-container>

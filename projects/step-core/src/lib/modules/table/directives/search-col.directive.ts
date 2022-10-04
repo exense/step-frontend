@@ -26,6 +26,7 @@ export class SearchColDirective {
   search(value: SearchValue, regex?: boolean): void {
     if (typeof value === 'string') {
       this._tableSearch.onSearch(this.searchColumnName, value, regex);
+      return;
     }
     this._tableSearch.onSearch(this.searchColumnName, value);
   }
