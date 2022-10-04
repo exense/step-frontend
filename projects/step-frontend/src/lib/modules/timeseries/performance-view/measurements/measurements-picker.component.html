@@ -3,7 +3,7 @@
   <step-icon name="settings"></step-icon>
 </button>
 <mat-menu #menu="matMenu" class="time-selector-menu">
-  <div (click)="$event.stopPropagation()">
+  <div (click)="$event.stopPropagation()" class="menu-container">
     <div>
       <input [(ngModel)]="keywordSearchValue" placeholder="Search" style="width: 110px; margin-bottom: 12px" />
     </div>
@@ -26,8 +26,10 @@
             class="checkbox"
             (change)="onKeywordToggle(item.key, $event)"
           />
-          <span class="color-square" [style.background-color]="item.value.color"></span>
-          <span>{{ item.key }}</span>
+          <div style="display: flex; align-items: center; margin-top: 3px">
+            <span class="color-square" [style.background-color]="item.value.color"></span>
+            <span>{{ item.key }}</span>
+          </div>
         </div>
       </ng-container>
     </ng-container>

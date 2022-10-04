@@ -301,7 +301,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             data: totalData,
             value: (x, v) => Math.trunc(v),
             // stroke: '#E24D42',
-            fill: 'rgba(143,161,210,0.38)',
+            fill: (self: uPlot) => UPlotUtils.gradientFill(self, '#8FA1D2'),
             // fill: 'rgba(255,212,166,0.64)',
             // points: {show: false},
             // drawStyle: 1,
@@ -381,7 +381,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           // scale: 'mb',
           value: (self, x) => TimeSeriesUtils.formatAxisValue(x) + '/h',
           stroke: color,
-          fill: color + '20',
+          fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
         };
       });
       this.byStatusSettings = {
@@ -464,7 +464,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
               data: totalThroughput,
               value: (x, v) => Math.trunc(v) + ' total',
               // stroke: '#E24D42',
-              fill: 'rgba(143,161,210,0.38)',
+              fill: (self: uPlot) => UPlotUtils.gradientFill(self, '#8394C9'),
               // fill: 'rgba(255,212,166,0.64)',
               // points: {show: false},
               // drawStyle: 1,

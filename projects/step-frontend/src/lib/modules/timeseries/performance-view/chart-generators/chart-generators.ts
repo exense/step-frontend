@@ -61,7 +61,7 @@ export class ChartGenerators {
           label: 'Hits/h',
           data: countValues,
           value: (x, v) => Math.trunc(v),
-          fill: 'rgba(143,161,210,0.38)',
+          fill: (self: uPlot) => UPlotUtils.gradientFill(self, '#8394C9'),
           paths: this.barsFunction({ size: [0.9, 100] }),
           points: { show: false },
         },
