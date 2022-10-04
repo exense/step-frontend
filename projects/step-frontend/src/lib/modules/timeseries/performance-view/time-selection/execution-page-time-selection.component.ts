@@ -78,7 +78,10 @@ export class ExecutionPageTimeSelectionComponent implements OnInit, OnDestroy {
       start: startTime,
       end: endTime, // to current time if it's not ended
       numberOfBuckets: Math.trunc(
-        Math.min(TimeSeriesConfig.MAX_BUCKETS_IN_CHART, (endTime - startTime) / TimeSeriesConfig.RESOLUTION / 2)
+        Math.min(
+          TimeSeriesConfig.MAX_BUCKETS_IN_CHART,
+          (endTime - startTime) / this.timeSeriesService.getResolution() / 2
+        )
       ),
     };
     this.timeSeriesService.fetchBuckets(request).subscribe((response) => {

@@ -193,7 +193,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     return {
       start: settings.startTime,
       end: settings.endTime,
-      intervalSize: 2500,
       numberOfBuckets: numberOfBuckets,
       params: {
         ...settings.contextualFilters,
@@ -511,7 +510,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
    */
   calculateIdealNumberOfBuckets(startTime: number, endTime: number): number {
     return Math.trunc(
-      Math.min(TimeSeriesConfig.MAX_BUCKETS_IN_CHART, (endTime - startTime) / TimeSeriesConfig.RESOLUTION / 2)
+      Math.min(
+        TimeSeriesConfig.MAX_BUCKETS_IN_CHART,
+        (endTime - startTime) / this.timeSeriesService.getResolution() / 2
+      )
     );
   }
 

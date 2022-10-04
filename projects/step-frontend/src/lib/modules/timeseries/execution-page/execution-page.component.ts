@@ -22,6 +22,8 @@ import { delay, map } from 'rxjs';
   styleUrls: ['./execution-page.component.scss'],
 })
 export class ExecutionPageComponent implements OnInit, OnDestroy {
+  private readonly RUNNING_EXECUTION_END_TIME_BUFFER = 5000; // if the exec is running, we don't grab the last 5 seconds
+
   @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
 
   @Input() executionId!: string;
@@ -69,7 +71,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   init() {
     this.executionService.getExecutionById(this.executionId).subscribe((execution) => {
-      let startTime = execution.startTime! - (execution.startTime! % TimeSeriesConfig.RESOLUTION);
+      let startTime = execution.startTime! - (execution.startTime! % this.timeSeriesService.getResolution());
       // let now = new Date().getTime();
       let endTime = undefined;
       if (execution.endTime) {
@@ -137,7 +139,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         // the end time is updated already.
       } else {
         this.performanceViewSettings!.endTime =
-          now - (this.intervalShouldBeCanceled ? 0 : TimeSeriesConfig.RESOLUTION * 5); // if the execution is not ended, we don't fetch until the end.
+          now - (this.intervalShouldBeCanceled ? 0 : this.RUNNING_EXECUTION_END_TIME_BUFFER); // if the execution is not ended, we don't fetch until the end.
       }
 
       // this.findRequest.start = lastEnd - ((lastEnd - this.executionStart) % this.findRequest.intervalSize);
