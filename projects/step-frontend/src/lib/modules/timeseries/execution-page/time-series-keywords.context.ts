@@ -78,7 +78,7 @@ export class TimeSeriesKeywordsContext {
     this.keywordToggleSubject.next(currentSelection);
   }
 
-  private emitAllSelectionChange() {
+  private emitAllSelectionChange(): void {
     this.selectAllSubject.next(this.allKeywordsSelected);
   }
 

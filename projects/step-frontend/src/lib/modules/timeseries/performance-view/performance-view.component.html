@@ -10,7 +10,7 @@
     >
     </step-execution-time-selection>
     <div class="w-100 dashboard-container">
-      <div class="container chart">
+      <div class="chart-container chart">
         <step-chart-skeleton *ngIf="!chartsSettings[TsChartType.OVERVIEW]"></step-chart-skeleton>
         <step-timeseries-chart
           #summaryChart
@@ -23,7 +23,7 @@
         </step-timeseries-chart>
       </div>
 
-      <div class="container chart">
+      <div class="chart-container chart">
         <step-chart-skeleton *ngIf="!byStatusSettings"></step-chart-skeleton>
         <step-timeseries-chart
           #byStatusChart
@@ -37,8 +37,16 @@
       </div>
 
       <div class="charts-section">
-        <div class="container chart">
-          <div class="measurements-toggle" *ngIf="throughputChartSettings">
+        <div class="chart-container chart">
+          <div class="settings-container" *ngIf="responseTypeByKeywordsSettings">
+            <button mat-icon-button matTooltip="Change Metrics" [matMenuTriggerFor]="menu">
+              <step-icon name="bar-chart-2"></step-icon>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item *ngFor="let metric of responseTimeMetrics" (click)="switchChartMetric(metric)">
+                  {{ metric.label }}
+                </button>
+              </mat-menu>
+            </button>
             <step-measurements-picker
               *ngIf="settings.contextId"
               [contextId]="settings.contextId"
@@ -54,18 +62,10 @@
             (onZoomReset)="onZoomReset()"
           >
           </step-timeseries-chart>
-          <div class="chart-footer-actions" *ngIf="responseTypeByKeywordsSettings">
-            <button mat-button [matMenuTriggerFor]="menu">Metric ({{ selectedMetric.label }})</button>
-            <mat-menu #menu="matMenu">
-              <button mat-menu-item *ngFor="let metric of responseTimeMetrics" (click)="switchChartMetric(metric)">
-                {{ metric.label }}
-              </button>
-            </mat-menu>
-          </div>
         </div>
 
-        <div class="container chart">
-          <div class="measurements-toggle" *ngIf="throughputChartSettings">
+        <div class="chart-container chart">
+          <div class="settings-container" *ngIf="throughputChartSettings">
             <step-measurements-picker
               *ngIf="settings.contextId"
               [contextId]="settings.contextId"
@@ -83,7 +83,7 @@
           </step-timeseries-chart>
         </div>
 
-        <div class="container" style="width: 100%">
+        <div class="chart-container" style="width: 100%">
           <step-timeseries-table
             #tableChart
             *ngIf="executionContext"
@@ -93,7 +93,7 @@
         </div>
       </div>
 
-      <div class="container chart" *ngIf="includeThreadGroupChart">
+      <div class="chart-container chart" *ngIf="includeThreadGroupChart">
         <step-chart-skeleton *ngIf="!threadGroupSettings"></step-chart-skeleton>
         <step-timeseries-chart
           *ngIf="threadGroupSettings"

@@ -9,6 +9,23 @@
   //width: 100px !important;
 }
 
+::ng-deep {
+  .u-legend {
+    font-size: 13px;
+    display: flex;
+    justify-content: space-around;
+
+    .u-series {
+      margin-right: 8px;
+      white-space: nowrap;
+
+      .u-marker:empty {
+        display: none;
+      }
+    }
+  }
+}
+
 .ranger {
   .u-grip-l,
   .u-grip-r {

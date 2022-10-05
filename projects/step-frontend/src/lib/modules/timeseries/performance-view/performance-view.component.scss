@@ -10,18 +10,19 @@
   flex-wrap: wrap;
   justify-content: space-between;
 
-  .container {
+  .chart-container {
     //width: 50%;
     //flex-grow: 1;
     background: #ffffff;
     margin: 8px 4px;
     border-radius: 4px;
     box-shadow: 1px 1px 9px #cdcdcd;
+    padding-top: 4px;
   }
 
   .chart {
     height: 360px;
-    width: calc(50% - 24px);
+    width: calc(50% - 12px);
     position: relative;
   }
 }
@@ -31,7 +32,7 @@
 }
 
 .chart-footer-actions {
-  margin-left: 20px;
+  margin-left: 6px;
 
   span {
     margin-right: 20px;
@@ -87,11 +88,16 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  margin: 30px 0;
 
-  .measurements-toggle {
+  .settings-container {
     position: absolute;
-    right: 6px;
-    top: 6px;
+    right: 10px;
+    top: 10px;
     z-index: 10;
+
+    ::ng-deep button {
+      padding: 0 4px;
+    }
   }
 }

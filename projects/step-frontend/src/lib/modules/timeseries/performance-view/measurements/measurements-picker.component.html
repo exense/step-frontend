@@ -1,4 +1,9 @@
-<button mat-raised-button [matMenuTriggerFor]="menu">
+<button
+  mat-icon-button
+  [matTooltip]="'Keywords (' + activeKeywords + ' active)'"
+  [matMenuTriggerFor]="menu"
+  style="min-width: 20px"
+>
   <!--  Measurements {{ activeKeywords ? '(' + activeKeywords + ')' : '' }}-->
   <step-icon name="settings"></step-icon>
 </button>

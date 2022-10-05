@@ -29,7 +29,7 @@ import { TooltipPlugin } from './tooltip-plugin';
   styleUrls: ['./time-series-chart.component.scss'],
 })
 export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChanges {
-  private readonly HEADER_WITH_FOOTER_SIZE = 94;
+  private readonly HEADER_WITH_FOOTER_SIZE = 80;
   readonly WRAPPER_PADDING_PX = 12;
   readonly WRAPPER_PADDING = '12px';
 
@@ -54,6 +54,13 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   ngOnInit(): void {
     if (this.syncKey) {
       uPlot.sync(this.syncKey);
+    }
+  }
+
+  setTitle(title: string): void {
+    let titles = this.chartElement.nativeElement.getElementsByClassName('u-title');
+    if (titles.length) {
+      titles[0].innerHTML = title;
     }
   }
 

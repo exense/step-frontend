@@ -31,12 +31,23 @@ export class MeasurementsPickerComponent implements OnInit, OnDestroy {
       this.keywordsService.onKeywordsUpdated().subscribe((keywords) => {
         this.keywords = keywords;
         this.activeKeywords = 0;
+        let visibleKeywords = 0;
         Object.keys(keywords).forEach((key) => {
-          if (keywords[key].isVisible && keywords[key].isSelected) {
-            this.activeKeywords++;
+          let keyword = keywords[key];
+          if (keyword.isVisible) {
+            visibleKeywords++;
+            if (keyword.isSelected) {
+              this.activeKeywords++;
+            }
           }
         });
+        if (visibleKeywords === this.activeKeywords) {
+          this.allSeriesChecked = true;
+        }
       })
+    );
+    this.subscriptions.add(
+      this.keywordsService.onAllSelectionChanged().subscribe((allSelected) => (this.allSeriesChecked = allSelected))
     );
     this.subscriptions.add(
       this.keywordsService.onKeywordToggled().subscribe((selection) => {
@@ -57,11 +68,6 @@ export class MeasurementsPickerComponent implements OnInit, OnDestroy {
 
   onKeywordToggle(keyword: string, event: any) {
     this.keywordsService.toggleKeyword(keyword);
-    if (event.target.checked) {
-      this.activeKeywords++;
-    } else {
-      this.activeKeywords--;
-    }
   }
 
   valueAscOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => {

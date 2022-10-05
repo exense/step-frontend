@@ -105,9 +105,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   private keywordsService!: TimeSeriesKeywordsContext;
 
   responseTimeMetrics = [
-    { label: 'AVG', mapFunction: (b: Bucket) => b.sum / b.count },
-    { label: 'MIN', mapFunction: (b: Bucket) => b.min },
-    { label: 'MAX', mapFunction: (b: Bucket) => b.max },
+    { label: 'Avg', mapFunction: (b: Bucket) => b.sum / b.count },
+    { label: 'Min', mapFunction: (b: Bucket) => b.min },
+    { label: 'Max', mapFunction: (b: Bucket) => b.max },
     { label: 'Perc. 90', mapFunction: (b: Bucket) => b.pclValues[90] },
     { label: 'Perc. 99', mapFunction: (b: Bucket) => b.pclValues[99] },
   ];
@@ -490,7 +490,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
         };
 
         this.responseTypeByKeywordsSettings = {
-          title: 'Response Times',
+          title: TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${this.selectedMetric.label})`,
           xValues: timeLabels,
           showLegend: false,
           series: responseTimeSeries,
@@ -546,6 +546,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   switchChartMetric(metric: { label: string; mapFunction: (b: Bucket) => number }) {
+    this.responseTimeChart.setTitle(TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${metric.label})`);
     if (metric.label === this.selectedMetric.label) {
       // it is a real change
       return;
