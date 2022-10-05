@@ -16,6 +16,7 @@ import { ExecutionTabsComponent } from './components/execution-tabs/execution-ta
 import './components/execution-tabs/execution-tabs.component';
 import { CustomCellRegistryService, EntityRegistry } from '@exense/step-core';
 import { ExecutionItemsSubtabsComponent } from './components/execution-item-subtabs/execution-items-subtabs.component';
+import { ExecutionsTabsControlService } from './services/executions-tabs-control.service';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { ExecutionItemsSubtabsComponent } from './components/execution-item-subt
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule],
   exports: [ExecutionListComponent, ExecutionStepComponent, ExecutionTabsComponent, ExecutionItemsSubtabsComponent],
+  providers: [ExecutionsTabsControlService],
 })
 export class ExecutionModule {
   constructor(_entityRegistry: EntityRegistry, _cellsRegister: CustomCellRegistryService) {

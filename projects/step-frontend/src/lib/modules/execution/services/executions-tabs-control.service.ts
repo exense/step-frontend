@@ -14,9 +14,7 @@ export type ExecutionTabsCommand = {
   id: string;
 };
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class ExecutionsTabsControlService implements OnDestroy {
   private commandSubject$: Subject<ExecutionTabsCommand> = new Subject<ExecutionTabsCommand>();
   readonly command$ = this.commandSubject$.asObservable();
@@ -26,6 +24,7 @@ export class ExecutionsTabsControlService implements OnDestroy {
    * @param label
    */
   disableTab(executionId: string, id: string): void {
+    console.log('HELLO ');
     this.commandSubject$.next({
       command: ExecutionTabsCommandType.DISABLE,
       executionId: executionId,
