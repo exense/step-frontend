@@ -59,7 +59,7 @@ export class ExecutionItemsSubtabsComponent implements OnDestroy {
   }
 
   private findTabById(id: string): Tab | undefined {
-    return this.tabs.filter((tab) => tab.id === id)[0];
+    return this.tabs.find((tab) => tab.id === id);
   }
 
   private dashletToTab(dashlet: Dashlet): Tab {
