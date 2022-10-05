@@ -1,3 +1,4 @@
+<!--
 <ng-template #tabRender let-tab>
   <div class="tab-content">
     <step-execution-result
@@ -10,10 +11,5 @@
     <step-icon *ngIf="tab.id !== 'list'" (click)="closeTab.emit(tab.id); (false)" name="x"></step-icon>
   </div>
 </ng-template>
-<step-tabs
-  [tabs]="tabs"
-  [tabTemplate]="tabRender"
-  [activeTabId]="activeTabId"
-  (activeTabIdChange)="activeTabIdChange.emit($event)"
->
-</step-tabs>
+-->
+<step-tabs [tabs]="tabs" [activeTabId]="activeTabId" (activeTabIdChange)="activeTabIdChange.emit($event)"> </step-tabs>

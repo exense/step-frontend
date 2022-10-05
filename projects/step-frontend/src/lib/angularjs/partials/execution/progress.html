@@ -15,8 +15,8 @@
         <auto-refresh-commands ng-show="$stateExec!=='grafana'" autorefresh="autorefresh"/>
       </div>
       <div class="st-flex-column">
-        <step-execution-tabs [execution-id]="eid" [active-tab-id]="$stateExec" (active-tab-id-change)="onSelection($event)">
-        </step-execution-tabs>
+        <step-execution-items-subtabs [execution-id]="eid" [active-tab-id]="$stateExec" (active-tab-id-change)="onSelection($event)">
+        </step-execution-items-subtabs>
         <div class="tab-content">
           <div class="tab-pane" ng-repeat="entry in tabs" ng-class="{active: entry.id === $stateExec}" src="entry.template">
             <ng-include ng-if="includeTab(entry)" src="entry.template">
