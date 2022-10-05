@@ -1,4 +1,4 @@
-@import '../../../_common/styles/variables';
+@use 'projects/step-core/styles/core-variables' as var;
 
 @mixin flexCenter {
   display: flex;
@@ -39,9 +39,9 @@ section.content {
 
 .muted,
 .detail-label {
-  color: $muted;
+  color: var.$muted;
 }
 
 .detail {
-  color: $dark-gray;
+  color: var.$dark-gray;
 }

@@ -1,4 +1,4 @@
-@import '../../../_common/styles/mixins';
+@use 'projects/step-core/styles/core-mixins' as core;
 
 .plans-function-name-searchfield {
   width: 85%;
@@ -10,9 +10,9 @@ step-btn-group {
 }
 
 :host {
-  @include table-container;
+  @include core.table-container;
 }
 
 .header {
-  @include table-header;
+  @include core.table-header;
 }

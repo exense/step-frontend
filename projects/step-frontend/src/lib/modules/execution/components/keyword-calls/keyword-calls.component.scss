@@ -1,11 +1,9 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 
-@import '../../../_common/styles/mixins';
-
 @include core.table-space-between-columns;
 
 .header {
-  @include table-header;
+  @include core.table-header;
 }
 
 th,
