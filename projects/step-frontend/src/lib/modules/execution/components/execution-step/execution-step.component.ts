@@ -1,4 +1,13 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  AfterViewInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { ExecutionsPanelsService } from '../../services/executions-panels.service';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, Execution, ExecutionSummaryDto, Mutable, ReportNode, SelectionCollector } from '@exense/step-core';
@@ -6,6 +15,7 @@ import { ExecutionStepPanel } from '../../shared/execution-step-panel';
 import { ExecutionViewServices } from '../../../operations/shared/execution-view-services';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { KeywordParameters } from '../../shared/keyword-parameters';
+import { ExecutionsTabsControlService } from '../../services/executions-tabs-control.service';
 
 type FieldAccessor = Mutable<Pick<ExecutionStepComponent, 'keywordParameters$'>>;
 
@@ -16,7 +26,7 @@ const TYPE_LEAF_REPORT_NODES_TABLE_PARAMS = 'step.core.execution.LeafReportNodes
   templateUrl: './execution-step.component.html',
   styleUrls: ['./execution-step.component.scss'],
 })
-export class ExecutionStepComponent implements OnChanges, OnDestroy {
+export class ExecutionStepComponent implements OnChanges, OnDestroy, AfterViewInit {
   private terminator$ = new Subject<any>();
   private selectionTerminator$?: Subject<any>;
 
@@ -47,7 +57,10 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
   panelSteps?: ExecutionStepPanel;
   panelParameters?: ExecutionStepPanel;
 
-  constructor(public _panelService: ExecutionsPanelsService) {}
+  constructor(
+    public _panelService: ExecutionsPanelsService,
+    private _executionTabsControlService: ExecutionsTabsControlService
+  ) {}
 
   ngOnInit() {
     this._panelService
@@ -64,6 +77,17 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
       .subscribe((panel) => (this.panelParameters = panel));
   }
 
+  ngAfterViewInit() {
+    this.disablePerformanceTabIfTechnicalErrorsExist();
+  }
+
+  private disablePerformanceTabIfTechnicalErrorsExist() {
+    const technicalErrors = this.testCasesProgress?.distribution['TECHNICAL_ERROR']?.count;
+    if (!!technicalErrors && technicalErrors > 0) {
+      this._executionTabsControlService.disableTab(this.eId, 'viz');
+    }
+  }
+
   chooseTestcase(testCase: ReportNode): void {
     this.drilldownTestCase.emit(testCase.artefactID);
   }
@@ -77,6 +101,11 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    const ctestCasesProgress = changes['testCasesProgress'];
+    if (ctestCasesProgress?.currentValue !== ctestCasesProgress?.previousValue) {
+      this.disablePerformanceTabIfTechnicalErrorsExist();
+    }
+
     const cExecution = changes['execution'];
     if (!this.parameters?.length || cExecution?.currentValue !== cExecution?.previousValue) {
       this.parameters = cExecution?.currentValue?.parameters;
