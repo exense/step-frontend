@@ -24,7 +24,6 @@ export class ExecutionsTabsControlService implements OnDestroy {
    * @param label
    */
   disableTab(executionId: string, id: string): void {
-    console.log('HELLO ');
     this.commandSubject$.next({
       command: ExecutionTabsCommandType.DISABLE,
       executionId: executionId,
