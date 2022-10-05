@@ -11,13 +11,7 @@ import { TimeSeriesConfig } from './time-series.config';
   providedIn: 'root',
 })
 export class TimeSeriesService {
-  private readonly resolutionPeriod: number; // this is received from the backend
-
-  constructor(private http: HttpClient, private authService: AuthService) {
-    this.resolutionPeriod =
-      parseInt(authService.getConf()?.miscParams[TimeSeriesConfig.SERVICE_RESOLUTION_CONFIG_PROPERTY]!) ||
-      TimeSeriesConfig.DEFAULT_RESOLUTION;
-  }
+  constructor(private http: HttpClient) {}
 
   fetchBuckets(request: FindBucketsRequest): Observable<TimeSeriesChartResponse> {
     return this.http.post<TimeSeriesChartResponse>(`/rest/time-series/buckets`, request);
@@ -29,9 +23,5 @@ export class TimeSeriesService {
 
   rebuildTimeSeries(executionId: string): Observable<AsyncTaskStatusResource> {
     return this.http.post<AsyncTaskStatusResource>(`/rest/time-series/rebuild`, { executionId: executionId });
-  }
-
-  getResolution(): number {
-    return this.resolutionPeriod;
   }
 }

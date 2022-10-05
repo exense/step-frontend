@@ -71,7 +71,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   init() {
     this.executionService.getExecutionById(this.executionId).subscribe((execution) => {
-      let startTime = execution.startTime! - (execution.startTime! % this.timeSeriesService.getResolution());
+      let startTime = execution.startTime!;
       // let now = new Date().getTime();
       let endTime = undefined;
       if (execution.endTime) {

@@ -19,10 +19,10 @@ import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'step-execution-time-selection',
-  templateUrl: './execution-page-time-selection.component.html',
-  styleUrls: ['./execution-page-time-selection.component.scss'],
+  templateUrl: './performance-view-time-selection.component.html',
+  styleUrls: ['./performance-view-time-selection.component.scss'],
 })
-export class ExecutionPageTimeSelectionComponent implements OnInit, OnDestroy {
+export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy {
   // @Input() execution!: Execution;
   @Input() settings!: PerformanceViewSettings;
   @Input() timePicker: boolean = true;
@@ -73,16 +73,10 @@ export class ExecutionPageTimeSelectionComponent implements OnInit, OnDestroy {
     let startTime = this.settings.startTime!;
     let endTime = this.settings.endTime || new Date().getTime() - 5000; // minus 5 seconds
     let request: FindBucketsRequest = {
-      intervalSize: 0,
       params: this.settings.contextualFilters,
       start: startTime,
       end: endTime, // to current time if it's not ended
-      numberOfBuckets: Math.trunc(
-        Math.min(
-          TimeSeriesConfig.MAX_BUCKETS_IN_CHART,
-          (endTime - startTime) / this.timeSeriesService.getResolution() / 2
-        )
-      ),
+      numberOfBuckets: TimeSeriesConfig.MAX_BUCKETS_IN_CHART,
     };
     this.timeSeriesService.fetchBuckets(request).subscribe((response) => {
       this.timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
