@@ -33,11 +33,14 @@ angular
     '$scope',
     'stateStorage',
     'ViewRegistry',
-    function ($scope, stateStorage, ViewRegistry) {
+    'AuthService',
+    function ($scope, stateStorage, ViewRegistry, AuthService) {
       // push this scope to the state stack
       stateStorage.push($scope, 'admin', {});
 
       $scope.tabs = ViewRegistry.getDashlets('admin');
+
+      $scope.canViewAdmin = AuthService.hasRight('admin-ui-menu');
 
       // Select the "Users" tab per default
       if ($scope.$state == null) {
