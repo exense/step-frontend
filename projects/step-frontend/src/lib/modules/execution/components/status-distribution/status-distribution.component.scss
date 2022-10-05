@@ -1,10 +1,10 @@
 @use 'sass:map';
 @use 'projects/step-core/styles/core-mixins' as core;
-@import '../../../_common/styles/variables';
+@use 'projects/step-core/styles/core-variables' as var;
 
 @mixin bar($status) {
   .bar-#{$status} {
-    background: map-get($statuses, $status);
+    background: map-get(var.$statuses, $status);
     color: #fff;
   }
 }

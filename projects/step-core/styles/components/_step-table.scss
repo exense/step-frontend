@@ -1,0 +1,14 @@
+@mixin table-container {
+  position: relative;
+  display: block;
+}
+
+@mixin table-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 8px;
+
+  step-btn-group {
+    margin-left: 1rem;
+  }
+}

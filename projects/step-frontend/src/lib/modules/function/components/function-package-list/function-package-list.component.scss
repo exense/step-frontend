@@ -1,11 +1,11 @@
-@import '../../../_common/styles/mixins';
+@use 'projects/step-core/styles/core-mixins' as core;
 
 :host {
-  @include table-container;
+  @include core.table-container;
 }
 
 .header {
-  @include table-header;
+  @include core.table-header;
   padding: 0.8rem;
 }
 

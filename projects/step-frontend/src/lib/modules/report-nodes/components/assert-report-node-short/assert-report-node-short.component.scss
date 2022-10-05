@@ -1,4 +1,4 @@
-@import '../../../_common/styles/variables';
+@use 'projects/step-core/styles/core-variables' as var;
 
 :host {
   display: flex;
@@ -6,7 +6,7 @@
 }
 
 .text-node {
-  color: $dark-gray;
+  color: var.$dark-gray;
   font-size: 12px !important;
   overflow-wrap: anywhere;
   -ms-word-wrap: anywhere;

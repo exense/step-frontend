@@ -1,4 +1,4 @@
-@import '../../../_common/styles/mixins';
+@use 'projects/step-core/styles/core-mixins' as core;
 
 .artefact-info-icon {
   display: inline-block;
@@ -27,11 +27,11 @@
 }
 
 :host {
-  @include table-container;
+  @include core.table-container;
 }
 
 .header {
-  @include table-header;
+  @include core.table-header;
 }
 
 mat-icon {

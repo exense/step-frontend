@@ -1,4 +1,4 @@
-@import '../../../_common/styles/mixins.scss';
+@use 'projects/step-core/styles/core-mixins' as core;
 
 .token-group-checkboxes {
   padding: 8px;
@@ -32,7 +32,7 @@
 }
 
 .header {
-  @include table-header;
+  @include core.table-header;
   justify-content: space-between;
 
   .import-export button {
