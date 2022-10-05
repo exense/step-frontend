@@ -1224,6 +1224,3 @@ function StaticPresets() {
     configs: [],
   };
 }
-
-// This variable is required to redefine the variable from viz.js
-var productionFile = 'scripts.js';
