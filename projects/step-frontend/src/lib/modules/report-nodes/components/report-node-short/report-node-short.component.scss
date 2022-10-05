@@ -30,7 +30,9 @@ section.content {
 }
 
 .detail-container {
-  @include flexCenter;
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px;
 }
 
 .wordbreak {
@@ -40,6 +42,7 @@ section.content {
 .muted,
 .detail-label {
   color: var.$muted;
+  white-space: nowrap;
 }
 
 .detail {
