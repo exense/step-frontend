@@ -26,7 +26,12 @@ export class ExecutionTabsComponent {
     private _viewRegistryService: ViewRegistryService,
     private _executionTabsControlService: ExecutionsTabsControlService
   ) {
-    this.tabs = this._viewRegistryService.getDashlets('executionTab').map<Tab>((dashlet) => this.dashletToTab(dashlet));
+    this.tabs = this._viewRegistryService
+      .getDashlets('executionTab')
+      .filter(function (dashlet) {
+        return dashlet.isEnabledFct ? dashlet.isEnabledFct() : false;
+      })
+      .map<Tab>((dashlet) => this.dashletToTab(dashlet));
     this.subscription = this._executionTabsControlService.controlSubject$.subscribe((command: ExecutionTabsCommand) => {
       this.handleExecutionTabsCommand(command);
     });
