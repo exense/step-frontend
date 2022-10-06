@@ -1,9 +1,11 @@
 <div ng-controller="AdminCtrl">
-  <step-tabs [tabs]="tabs" [tab-mode]="'tabs'" [active-tab-id]="$state" (active-tab-id-change)="onSelection($event)">
-  </step-tabs>
-  <div class="tab-content">
-    <div class="tab-pane" ng-repeat="entry in tabs" ng-class="{active: entry.id === $state}">
-      <ng-include ng-if="entry.id === $state" src="entry.template"></ng-include>
+  <div ng-if="canViewAdmin">
+    <step-tabs [tabs]="tabs" [tab-mode]="'tabs'" [active-tab-id]="$state" (active-tab-id-change)="onSelection($event)">
+    </step-tabs>
+    <div class="tab-content">
+      <div class="tab-pane" ng-repeat="entry in tabs" ng-class="{active: entry.id === $state}">
+        <ng-include ng-if="entry.id === $state" src="entry.template"></ng-include>
+      </div>
     </div>
   </div>
 </div>

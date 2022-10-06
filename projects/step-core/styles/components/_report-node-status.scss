@@ -1,0 +1,14 @@
+@use '../core-variables' as var;
+
+@mixin reportNodeStatus($status, $color) {
+  .step-node-status-#{$status} {
+    background: $color;
+    color: $color;
+  }
+}
+
+@mixin reportNodeStatuses {
+  @each $status, $color in var.$statuses {
+    @include reportNodeStatus($status, $color);
+  }
+}
