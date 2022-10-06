@@ -6,7 +6,7 @@
 
     <script src="/app/scripts.js?v=${project.version}"></script>
     <script>
-      var productionFile = 'scripts.js?v=${project.version}';
+      var productionFile = 'scripts.js?v=' + encodeURIComponent('${project.version}');
     </script>
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="stylesheet" type="text/css" href="/app/styles.css" />
