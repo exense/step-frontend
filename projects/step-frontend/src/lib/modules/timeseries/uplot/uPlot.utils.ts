@@ -22,6 +22,19 @@ export class UPlotUtils {
   }
 
   /**
+   * This method will create a gradient from the strokeColor to almost a transparent version of the stroke.
+   * @param uPlot
+   * @param strokeColor
+   */
+  static gradientFill(uPlot: uPlot, strokeColor: string) {
+    let canvasHeight = uPlot.ctx.canvas.height;
+    let gradient = uPlot.ctx.createLinearGradient(0, 0, 0, canvasHeight);
+    gradient.addColorStop(0, strokeColor + '80');
+    gradient.addColorStop(1, strokeColor + '08');
+    return gradient;
+  }
+
+  /**
    * This method find the closest point in the chart (left-right) that is not null.
    * If the hovered point is not null, it is returned.
    * @param self
