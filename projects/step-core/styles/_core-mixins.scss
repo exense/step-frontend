@@ -1,5 +1,10 @@
 @use 'components/theme-config';
+@use 'components/report-node-status';
+@use 'components/step-table';
+
 @forward 'components/theme-config';
+@forward 'components/report-node-status';
+@forward 'components/step-table';
 
 @mixin table-space-between-columns {
   mat-form-field,

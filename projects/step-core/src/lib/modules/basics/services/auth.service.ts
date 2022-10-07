@@ -78,6 +78,7 @@ export class AuthService implements OnDestroy {
         return session;
       }
     } catch (err) {
+      this._$rootScope.context = { userID: 'anonymous', role: 'public' };
       return err;
     }
   }
@@ -85,12 +86,13 @@ export class AuthService implements OnDestroy {
   async login(credentials: CredentialsDto): Promise<unknown> {
     (await firstValueFrom(this._http.post('rest/access/login', credentials))) as Observable<{ token: string }>;
     await this.getSession();
+
     const context = this.getContext();
     if (context && !context.otp) {
-      this._$rootScope.broadcast('step.login.succeeded');
       if (this._$location.path().indexOf('login') !== -1) {
         this.gotoDefaultPage();
       }
+      this._$rootScope.broadcast('step.login.succeeded');
     }
     return undefined;
   }

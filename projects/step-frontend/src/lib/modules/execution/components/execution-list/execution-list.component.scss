@@ -1,4 +1,4 @@
-@import '../../../_common/styles/mixins';
+@use 'projects/step-core/styles/core-mixins' as core;
 
 :host {
   position: relative;
@@ -7,7 +7,7 @@
 }
 
 .header {
-  @include table-header;
+  @include core.table-header;
 }
 
 .result {

@@ -1,4 +1,4 @@
-@import '../../../_common/styles/variables';
+@use 'projects/step-core/styles/core-variables' as var;
 
 :host {
   display: flex;
@@ -12,7 +12,7 @@
   }
 }
 
-@each $status, $color in $statuses {
+@each $status, $color in var.$statuses {
   @include status-icon($status, $color);
 }
 
