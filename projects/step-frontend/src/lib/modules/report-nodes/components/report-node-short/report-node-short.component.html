@@ -53,7 +53,7 @@
 </div>
 <!-- Echo -->
 <div *ngIf="node?.resolvedArtefact?._class === 'Echo'">
-  <div *ngIf="node?.echo">
+  <div *ngIf="node?.echo" class="wordbreak">
     <span class="muted mat-small">Echo</span>
     <span class="m-left detail">{{ node!.echo }}</span>
   </div>
@@ -69,16 +69,16 @@
   <div>{{ node?.key }} = {{ node?.value }}</div>
 </div>
 <!-- Assertion Errors -->
-<div *ngIf="!showDetails && children && children.length > 0" class="detail-container">
-  <div class="detail-label">Errors</div>
+<div *ngIf="!showDetails && children && children.length > 0" class="detail-container wordbreak">
+  <div class="detail-label m-right">Errors</div>
   <div class="detail">
     <step-assert-report-node-short *ngFor="let child of children; trackBy: trackByReportNode" [node]="child">
     </step-assert-report-node-short>
   </div>
 </div>
 <!-- Errors -->
-<div *ngIf="node?.error" class="detail-container">
-  <div class="detail-label">Error</div>
+<div *ngIf="node?.error" class="detail-container wordbreak">
+  <div class="detail-label m-right">Error</div>
   <div class="detail m-left">
     {{ node?.error?.msg }}
     {{ node?.attachments && node!.attachments!.length > 0 ? '. Check the attachments for more details.' : '' }}

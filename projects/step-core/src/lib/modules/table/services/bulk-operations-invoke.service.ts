@@ -1,5 +1,5 @@
 import { Observable, of, switchMap } from 'rxjs';
-import { BulkOperation } from '../shared/bulk-operation.enum';
+import { BulkOperationType } from '../shared/bulk-operation-type.enum';
 import { TableRequestData } from '../../../client/table/models/table-request-data';
 import { BulkSelectionType } from '../../entities-selection/shared/bulk-selection-type.enum';
 import { BulkOperationParameters } from '../../../client/generated';
@@ -13,7 +13,7 @@ import {
 import { AsyncTaskStatus } from '../../../client/augmented/shared/async-task-status';
 
 export interface BulkOperationConfig<ID> {
-  operationType: BulkOperation;
+  operationType: BulkOperationType;
   selectionType: BulkSelectionType;
   ids?: ReadonlyArray<ID>;
   filterRequest?: TableRequestData;
@@ -68,13 +68,13 @@ export abstract class BulkOperationsInvokeService<ID> {
   invoke(config: BulkOperationConfig<ID>): Observable<AsyncOperationDialogResult | undefined> {
     let operation: ((params: BulkOperationParameters) => Observable<AsyncTaskStatus>) | undefined;
     switch (config.operationType) {
-      case BulkOperation.delete:
+      case BulkOperationType.delete:
         operation = !!this.invokeDelete ? (params) => this.invokeDelete!(params) : undefined;
         break;
-      case BulkOperation.duplicate:
+      case BulkOperationType.duplicate:
         operation = !!this.invokeDuplicate ? (params) => this.invokeDuplicate!(params) : undefined;
         break;
-      case BulkOperation.export:
+      case BulkOperationType.export:
         operation = !!this.invokeExport ? (params) => this.invokeExport!(params) : undefined;
         break;
     }

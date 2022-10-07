@@ -2,12 +2,12 @@ import { DOCUMENT } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, OnDestroy } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { ConfigDto, CredentialsDto, SessionDto } from '../domain';
+import { ConfigDto, CredentialsDto, SessionDto } from '../../../domain';
 import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
-import { AJS_LOCATION, AJS_PREFERENCES, AJS_ROOT_SCOPE, AJS_UIB_MODAL } from '../shared/angularjs-providers';
-import { AJS_MODULE } from '../shared/constants';
-import { a1Promise2Promise } from '../shared/utils';
-import { AdditionalRightRuleService } from './additional-right-rule.service';
+import { AJS_LOCATION, AJS_PREFERENCES, AJS_ROOT_SCOPE, AJS_UIB_MODAL } from '../../../shared/angularjs-providers';
+import { AJS_MODULE } from '../../../shared/constants';
+import { a1Promise2Promise } from '../../../shared/utils';
+import { AdditionalRightRuleService } from '../../../services/additional-right-rule.service';
 
 export interface AuthContext {
   userID: string;
@@ -78,6 +78,7 @@ export class AuthService implements OnDestroy {
         return session;
       }
     } catch (err) {
+      this._$rootScope.context = { userID: 'anonymous', role: 'public' };
       return err;
     }
   }
@@ -85,12 +86,13 @@ export class AuthService implements OnDestroy {
   async login(credentials: CredentialsDto): Promise<unknown> {
     (await firstValueFrom(this._http.post('rest/access/login', credentials))) as Observable<{ token: string }>;
     await this.getSession();
+
     const context = this.getContext();
     if (context && !context.otp) {
-      this._$rootScope.broadcast('step.login.succeeded');
       if (this._$location.path().indexOf('login') !== -1) {
         this.gotoDefaultPage();
       }
+      this._$rootScope.broadcast('step.login.succeeded');
     }
     return undefined;
   }

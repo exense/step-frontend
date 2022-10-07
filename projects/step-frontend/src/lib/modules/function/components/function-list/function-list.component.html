@@ -46,7 +46,7 @@
         [disabled]="!('kw-write' | hasRight | async)"
         (click)="addFunctionPackage()"
       >
-        New Keyword Package
+        Upload Package
       </button>
     </step-btn-group>
   </section>
@@ -72,7 +72,7 @@
         <button
           mat-icon-button
           matTooltip="Configure keyword"
-          [disabled]="!('kw-read' | hasRight | async)"
+          [disabled]="!('kw-write' | hasRight | async)"
           (click)="configureFunction(element.id)"
         >
           <step-icon name="edit-2"></step-icon>
@@ -80,7 +80,7 @@
         <button
           mat-icon-button
           matTooltip="Execute keyword"
-          [disabled]="!('kw-write' | hasRight | async)"
+          [disabled]="!('kw-execute' | hasRight | async)"
           (click)="executeFunction(element.id)"
         >
           <step-icon name="play"></step-icon>
@@ -88,7 +88,7 @@
         <button
           mat-icon-button
           matTooltip="Delete keyword"
-          [disabled]="!('kw-read' | hasRight | async)"
+          [disabled]="!('kw-delete' | hasRight | async)"
           (click)="deleteFunction(element.id, element.attributes.name)"
         >
           <step-icon name="x"></step-icon>

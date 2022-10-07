@@ -5,12 +5,11 @@
 		<!-- node.resolvedArtefact has been introduced with 3.6.0. We're checking it here for retrocompatibility. Remove this check has soon as possible -->
 		<span>{{getHeaderText()}}</span>
 		<span ng-if="getHeaderText()!=node.name" class="text-margin-left text-muted small">{{node.name}}</span>
-		<span ng-if="includeStatus" class="pull-right text-margin-left" style="margin-bottom:10px;" ><reportnode-status status="node.status" /></span>
+		<span ng-if="includeStatus" class="pull-right text-margin-left" style="margin-bottom:10px;" >
+      <step-status [status]="node.status"></step-status>
+    </span>
 		<span class="pull-right" style="margin-right:5px">
 			<div class="btn-group btn-group-menu">
-				<button type="button" class="btn btn-default btn-xs" uib-tooltip="Show this node in the tree view" tooltip-append-to-body="true" ng-click="executionViewServices.showNodeInTree(reportNodeId)">
-					<span class="icon-tree" />
-				</button>
 				<button ng-if="executionViewServices.getExecution()&&executionViewServices.getExecution().executionType=='TestSet'" type="button" class="btn btn-default btn-xs" uib-tooltip="Select the test case containing this node in the test case table" tooltip-append-to-body="true" ng-click="executionViewServices.showTestCase(reportNodeId)">
           <step-ajs-icon name="list"></step-ajs-icon>
 				</button>

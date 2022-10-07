@@ -1,10 +1,10 @@
-@import '../../../_common/styles/mixins';
+@use 'projects/step-core/styles/core-mixins' as core;
 
 :host {
   display: inline-block;
 }
 
-@include reportNodeStatuses;
+@include core.reportNodeStatuses;
 
 step-icon {
   background: none !important;

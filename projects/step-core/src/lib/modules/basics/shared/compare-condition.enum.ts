@@ -4,4 +4,11 @@ export enum CompareCondition {
   LOWER_THAN = 'Lt',
   LOWER_THAN_OR_EQUAL = 'Lte',
   EQUALS = 'Equals',
+  AND = 'And',
+  FALSE = 'False',
+  FULL_TEXT = 'FullText',
+  NOT = 'Not',
+  OR = 'Or',
+  REGEX = 'Regex',
+  TRUE = 'True',
 }

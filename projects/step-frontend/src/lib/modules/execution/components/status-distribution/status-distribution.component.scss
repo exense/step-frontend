@@ -1,11 +1,11 @@
 @use 'sass:map';
-@import '../../../_common/styles/variables';
+@use 'projects/step-core/styles/core-mixins' as core;
+@use 'projects/step-core/styles/core-variables' as var;
 
 @mixin bar($status) {
   .bar-#{$status} {
-    background: map-get($statuses, $status);
+    background: map-get(var.$statuses, $status);
     color: #fff;
-    text-align: center;
   }
 }
 
@@ -13,6 +13,7 @@ div.distribution {
   display: flex;
   width: 160px;
   box-shadow: inset rgba(0, 0, 0, 0.3) 0px 1px 3px 0px;
+  border-radius: 8px;
 
   &.in-progress {
     width: 200px;
@@ -23,6 +24,17 @@ div.distribution {
   @include bar('TECHNICAL_ERROR');
   @include bar('RUNNING');
   .bar-RUNNING {
-    min-width: 2em;
+    min-width: 5em;
+  }
+
+  & > div {
+    @include core.status-common;
+    justify-content: center;
+    &:first-child {
+      @include core.status-left-side;
+    }
+    &:last-child {
+      @include core.status-right-side;
+    }
   }
 }

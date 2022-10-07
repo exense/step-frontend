@@ -69,7 +69,12 @@ export class TimeseriesColorsPool {
 const colors = ['#c90e00', '#ffa845', '#009359', '#050c91', '#7baaff', '#ffd61f'];
 
 const statusColors: { [key: string]: string } = {
-  passed: '#009359',
-  failed: '#c71300',
+  technical_error: '#000000',
+  failed: '#d9534f',
+  interrupted: '#f9c038',
+  passed: '#5cb85c',
+  skipped: '#a0a0a0',
+  norun: '#a0a0a0',
+  running: '#337ab7',
   [TimeseriesColorsPool.NO_STATUS]: TimeseriesColorsPool.GREY_COLOR,
 };

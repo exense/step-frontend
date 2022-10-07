@@ -1,4 +1,9 @@
-@import '../../../_common/styles/variables';
+@use 'projects/step-core/styles/core-mixins' as core;
+@use 'projects/step-core/styles/core-variables' as var;
+
+.status {
+  @include core.status-shape();
+}
 
 @mixin status($status, $color) {
   .step-#{$status} {
@@ -7,6 +12,6 @@
   }
 }
 
-@each $status, $color in $statuses {
+@each $status, $color in var.$statuses {
   @include status($status, $color);
 }

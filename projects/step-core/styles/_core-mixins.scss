@@ -1,5 +1,10 @@
 @use 'components/theme-config';
+@use 'components/report-node-status';
+@use 'components/step-table';
+
 @forward 'components/theme-config';
+@forward 'components/report-node-status';
+@forward 'components/step-table';
 
 @mixin table-space-between-columns {
   mat-form-field,
@@ -7,4 +12,29 @@
     width: 100%;
     padding-right: 10px;
   }
+}
+
+@mixin status-common {
+  display: inline-flex;
+  align-items: center;
+  min-height: 16px;
+  padding: 3px 10px;
+  font-weight: normal;
+  justify-content: center;
+}
+
+@mixin status-left-side {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+@mixin status-right-side {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+@mixin status-shape {
+  @include status-common;
+  @include status-left-side;
+  @include status-right-side;
 }

@@ -1,22 +1,23 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 
-@import '../../../_common/styles/mixins';
-
 @include core.table-space-between-columns;
 
 .header {
-  @include table-header;
+  @include core.table-header;
 }
 
-.cell-execution-time,
-.cell-step,
-.cell-status {
-  vertical-align: top;
-  padding-top: 10px;
+th,
+td {
+  &.cell-execution-time,
+  &.cell-step,
+  &.cell-status {
+    vertical-align: top;
+  }
 }
 
-.cell-status {
-  padding-top: 20px;
+td.mat-cell.cell-status {
+  width: 80px;
+  padding-top: 10px !important;
 }
 
 .cell-execution-time {
@@ -25,8 +26,4 @@
     display: flex;
     align-items: center;
   }
-}
-
-.cell-status {
-  width: 80px;
 }

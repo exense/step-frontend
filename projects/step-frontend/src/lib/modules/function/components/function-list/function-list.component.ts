@@ -7,7 +7,7 @@ import {
   AJS_ROOT_SCOPE,
   AugmentedKeywordsService,
   AutoDeselectStrategy,
-  BulkOperation,
+  BulkOperationType,
   BulkOperationsInvokeService,
   Function as KeywordFunction,
   InteractivePlanExecutionService,
@@ -33,8 +33,10 @@ import { FunctionBulkOperationsInvokeService } from '../../services/function-bul
 })
 export class FunctionListComponent {
   readonly dataSource = this._functionApiService.createFilteredTableDataSource();
-  readonly availableBulkOperations = [BulkOperation.delete, BulkOperation.duplicate];
-
+  readonly availableBulkOperations = [
+    { operation: BulkOperationType.delete, permission: 'function-delete' },
+    { operation: BulkOperationType.duplicate, permission: 'function-write' },
+  ];
   constructor(
     private _functionApiService: AugmentedKeywordsService,
     private _interactivePlanExecutionApiService: InteractivePlanExecutionService,

@@ -6,7 +6,6 @@ import { UpgradeModule } from '@angular/upgrade/static';
 import { TooltipDirective } from './directives/tooltip.directive';
 import { CORE_INITIALIZER } from './core-initialiser';
 import { StepMaterialModule } from './modules/step-material/step-material.module';
-import { HasRightPipe } from './pipes/has-right.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { TableModule } from './modules/table/table.module';
@@ -18,19 +17,16 @@ import { StepGeneratedClientModule } from './client/generated';
 import { EntitiesSelectionModule } from './modules/entities-selection/entities-selection.module';
 import { CapsLockDirective } from './directives/caps-lock.directive';
 import { CustomRegistriesModule } from './modules/custom-registeries/custom-registries.module';
-import { ArrayFilterComponent } from './components/array-filter/array-filter.component';
-import { DateFilterComponent } from './components/date-filter/date-filter.component';
 import { TabsModule } from './modules/tabs/tabs.module';
+import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 
 @NgModule({
   declarations: [
     TooltipDirective,
-    HasRightPipe,
     MatchingAuthenticator,
     DashboardLinkPipe,
     CapsLockDirective,
-    ArrayFilterComponent,
-    DateFilterComponent,
+    TooltipImmediateCloseDirective,
   ],
   imports: [
     CommonModule,
@@ -56,7 +52,6 @@ import { TabsModule } from './modules/tabs/tabs.module';
     TooltipDirective,
     CapsLockDirective,
     StepMaterialModule,
-    HasRightPipe,
     MatchingAuthenticator,
     DashboardLinkPipe,
     TableModule,
@@ -65,9 +60,8 @@ import { TabsModule } from './modules/tabs/tabs.module';
     EntitiesSelectionModule,
     StepGeneratedClientModule,
     CustomRegistriesModule,
-    ArrayFilterComponent,
-    DateFilterComponent,
     TabsModule,
+    TooltipImmediateCloseDirective,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -96,7 +90,6 @@ export class StepCoreModule {}
 export * from './domain';
 export * from './shared';
 export * from './decorators/plugin';
-export * from './services/auth.service';
 export * from './services/dashboard.service';
 export * from './services/invoke-run.service';
 export * from './services/view-registry.service';
@@ -113,7 +106,7 @@ export { UibModalInstance, UibModalHelperService } from './services/uib-modal-he
 export * from './angularjs';
 export * from './directives/tooltip.directive';
 export * from './directives/caps-lock.directive';
-export * from './pipes/has-right.pipe';
+export * from './directives/tooltip-immediate-close.directive';
 export * from './pipes/matching-authenticator.pipe';
 export * from './pipes/dashboard-link.pipe';
 export * from './modules/step-material/step-material.module';
@@ -133,5 +126,3 @@ export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
 export { CancelablePromise, CancelError } from './client/generated/core/CancelablePromise';
 export { OpenAPI } from './client/generated/core/OpenAPI';
 export type { OpenAPIConfig } from './client/generated/core/OpenAPI';
-export { ArrayFilterComponent } from './components/array-filter/array-filter.component';
-export { DateFilterComponent } from './components/date-filter/date-filter.component';

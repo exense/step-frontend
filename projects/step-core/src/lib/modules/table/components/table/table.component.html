@@ -15,9 +15,7 @@
   >
     <th mat-header-cell *matHeaderCellDef>
       <ng-template #defaultSearchRender>
-        <step-input-group>
-          <input type="text" #searchField (change)="onSearch(searchCol.searchName!, searchField.value)" />
-        </step-input-group>
+        <step-input-filter (searchChange)="onSearch(searchCol.searchName!, $event)"> </step-input-filter>
       </ng-template>
       <ng-container *ngIf="searchCol.searchName">
         <ng-container *ngIf="!!searchCol.template; then searchCol.template!; else defaultSearchRender"> </ng-container>

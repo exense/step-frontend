@@ -1,13 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
   AugmentedParametersService,
   AutoDeselectStrategy,
-  BulkOperation,
+  BulkOperationType,
   BulkOperationsInvokeService,
+  FilterConditionFactoryService,
   Parameter,
   selectionCollectionProvider,
+  TableSearch,
 } from '@exense/step-core';
 import { ParameterDialogsService } from '../services/parameter-dialogs.service';
 import { ParametersBulkOperationsInvokeService } from '../services/parameters-bulk-operations-invoke.service';
@@ -25,13 +27,24 @@ import { ParametersBulkOperationsInvokeService } from '../services/parameters-bu
   ],
 })
 export class ParametersListComponent {
+  @ViewChild('table', { read: TableSearch })
+  private readonly tableSearch!: TableSearch;
+
   readonly dataSource = this._parametersService.dataSource;
-  readonly availableBulkOperations = [BulkOperation.delete, BulkOperation.duplicate];
+  readonly availableBulkOperations = [
+    { operation: BulkOperationType.delete, permission: 'param-delete' },
+    { operation: BulkOperationType.duplicate, permission: 'param-write' },
+  ];
 
   constructor(
     private _parametersService: AugmentedParametersService,
-    private _parameterDialogs: ParameterDialogsService
+    private _parameterDialogs: ParameterDialogsService,
+    private _filterConditionFactory: FilterConditionFactoryService
   ) {}
+
+  searchByScope(value: string): void {
+    this.tableSearch.onSearch('scope', this._filterConditionFactory.scopeFilterCondition(value));
+  }
 
   importParameter(): void {
     this._parameterDialogs.importParameter().subscribe(() => this.dataSource.reload());

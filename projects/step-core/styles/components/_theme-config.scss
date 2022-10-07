@@ -140,6 +140,11 @@ $light-primary-text: white;
 
   .mat-mini-fab {
     box-shadow: none !important;
+    width: 36px;
+    height: 36px;
+    .mat-button-wrapper {
+      padding: 0;
+    }
   }
 
   .invisible {
@@ -174,5 +179,9 @@ $light-primary-text: white;
   .jstree-icon.step-ajs-icon {
     @include step-icon.step-icon-size(18px);
     margin-top: -2px;
+  }
+
+  tbody .form-group {
+    margin-bottom: 15px;
   }
 }

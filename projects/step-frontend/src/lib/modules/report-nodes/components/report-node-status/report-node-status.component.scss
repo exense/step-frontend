@@ -1,9 +1,10 @@
-@import '../../../_common/styles/mixins';
-@import '../../../_common/styles/variables';
+@use 'projects/step-core/styles/core-mixins' as core;
+@use 'projects/step-core/styles/core-variables' as var;
 
-@include reportNodeStatuses;
+@include core.reportNodeStatuses;
 
 .status {
-  color: $white !important;
-  text-align: center;
+  color: var.$white !important;
+  @include core.status-shape();
+  width: 100%;
 }
