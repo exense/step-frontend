@@ -14,7 +14,6 @@ import { TimeSeriesConfig } from '../time-series.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
 import { Subscription } from 'rxjs';
 import { TimeSeriesUtils } from '../time-series-utils';
-import { ExecutionPageTimeSelectionComponent } from './time-selection/execution-page-time-selection.component';
 import { ExecutionContext } from '../execution-page/execution-context';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
@@ -27,6 +26,7 @@ import { ChartGenerators } from './chart-generators/chart-generators';
 import { TsChartType } from './ts-chart-type';
 import { BucketFilters } from '../model/bucket-filters';
 import { ExecutionFiltersComponent } from './filters/execution-filters.component';
+import { PerformanceViewTimeSelectionComponent } from './time-selection/performance-view-time-selection.component';
 
 declare const uPlot: any;
 
@@ -62,7 +62,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   @ViewChild('threadGroupChart') threadGroupChart!: TimeSeriesChartComponent;
   @ViewChild('tableChart') tableChart!: TimeseriesTableComponent;
 
-  @ViewChild(ExecutionPageTimeSelectionComponent) timeSelectionComponent!: ExecutionPageTimeSelectionComponent;
+  @ViewChild(PerformanceViewTimeSelectionComponent) timeSelectionComponent!: PerformanceViewTimeSelectionComponent;
 
   // @Input() executionId!: string;
   @Input() settings!: PerformanceViewSettings;
@@ -189,11 +189,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   prepareFindRequest(settings: PerformanceViewSettings, customFilters?: any): FindBucketsRequest {
-    const numberOfBuckets = this.calculateIdealNumberOfBuckets(settings.startTime, settings.endTime);
+    const numberOfBuckets = TimeSeriesConfig.MAX_BUCKETS_IN_CHART;
     return {
       start: settings.startTime,
       end: settings.endTime,
-      intervalSize: 2500,
       numberOfBuckets: numberOfBuckets,
       params: {
         ...settings.contextualFilters,
@@ -504,15 +503,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           ],
         };
       });
-  }
-
-  /**
-   * If the execution is very short (or just started), we don't want a big number of buckets.
-   */
-  calculateIdealNumberOfBuckets(startTime: number, endTime: number): number {
-    return Math.trunc(
-      Math.min(TimeSeriesConfig.MAX_BUCKETS_IN_CHART, (endTime - startTime) / TimeSeriesConfig.RESOLUTION / 2)
-    );
   }
 
   updateTable() {

@@ -3,7 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { FindBucketsRequest } from './find-buckets-request';
 import { TimeSeriesChartResponse } from './time-series-chart-response';
-import { AsyncTaskStatusResource, Execution } from '@exense/step-core';
+import { AsyncTaskStatusResource, AuthService, Execution } from '@exense/step-core';
+import { TimeSeriesConfig } from './time-series.config';
 
 // TODO provide it it TimeSeriesModule
 @Injectable({
