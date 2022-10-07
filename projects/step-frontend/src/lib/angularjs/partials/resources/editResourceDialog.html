@@ -26,7 +26,7 @@
 			<fieldset style="padding:0px;" ng-disabled="newResource.resourceType == null">
 				<label>Content</label>
 				<resource-input  st-type="newResource.resourceType" st-model="newResource.id" st-on-change="newResourceUpdate()"
-					upload-only="true"/>
+					upload-only="true" disable-server-path="true"/>
 			</fieldset>
 		</div>
 		<div class="form-group" ng-if="mode==='edit'">

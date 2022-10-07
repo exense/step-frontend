@@ -311,6 +311,7 @@ angular
         saveButton: '@?',
         saveButtonLabel: '@?',
         uploadOnly: '=?',
+        disableServerPath: '=?',
       },
       controller: function ($scope, $http, $timeout, Upload, ResourceDialogs) {
         // Defaults
