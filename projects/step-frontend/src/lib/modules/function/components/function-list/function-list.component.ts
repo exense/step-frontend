@@ -34,8 +34,8 @@ import { FunctionBulkOperationsInvokeService } from '../../services/function-bul
 export class FunctionListComponent {
   readonly dataSource = this._functionApiService.createFilteredTableDataSource();
   readonly availableBulkOperations = [
-    { operation: BulkOperationType.delete, permission: 'function-delete' },
-    { operation: BulkOperationType.duplicate, permission: 'function-write' },
+    { operation: BulkOperationType.delete, permission: 'kw-delete' },
+    { operation: BulkOperationType.duplicate, permission: 'kw-write' },
   ];
   constructor(
     private _functionApiService: AugmentedKeywordsService,
