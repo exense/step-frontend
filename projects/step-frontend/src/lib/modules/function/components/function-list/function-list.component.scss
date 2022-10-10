@@ -1,7 +1,7 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
 :host {
-  position: relative;
-  display: block;
-  background: white;
+  @include core.table-container;
 }
 
 .cell-actions {
@@ -14,8 +14,7 @@
 }
 
 .header {
-  display: flex;
-  justify-content: flex-end;
+  @include core.table-header;
 }
 
 .create-keyword-button-group button {

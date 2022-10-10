@@ -1,8 +1,10 @@
 <div id="OperationListCtrl" ng-controller="OperationListCtrl" class="panel panel-default">
-	<div class="toolbar">
-		<auto-refresh-commands autorefresh="autorefresh" />
-	</div>
-	<div class="panel-heading">Current operations</div>	
+	<div class="panel-heading with-toolbar">
+    Current operations
+    <div class="panel-toolbar">
+      <auto-refresh-commands autorefresh="autorefresh" />
+    </div>
+  </div>
 	<div class="panel-body">
 		<st-table data="operationList" handle="tableHandle" uid="'operationsList'" persist-state="true" use-spinner="true">
 			<st-columns>
@@ -36,8 +38,8 @@
 					<second-header><inputdropdown action="search" initial-value="initialValue"></inputdropdown></second-header>
 					<cell><operation operation="row.operation" execution-view-services="executionViewServices" show-only-details="true"/></cell>
 				</st-column>
-				
+
 			</st-columns>
-		</st-table>	
+		</st-table>
 	</div>
 </div>

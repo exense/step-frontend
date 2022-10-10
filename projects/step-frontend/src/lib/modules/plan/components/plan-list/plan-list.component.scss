@@ -1,7 +1,7 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
 :host {
-  position: relative;
-  display: block;
-  background: white;
+  @include core.table-container;
 }
 
 .cell-actions {
@@ -14,17 +14,11 @@
 }
 
 .header {
-  display: flex;
-  justify-content: flex-end;
-  padding: 8px;
+  @include core.table-header;
 
   .import-export button {
     padding: 0;
     min-width: 4rem;
-  }
-
-  step-btn-group {
-    margin-left: 1rem;
   }
 }
 

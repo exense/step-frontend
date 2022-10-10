@@ -1,9 +1,7 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 
 :host {
-  position: relative;
-  display: block;
-  background: white;
+  @include core.table-container;
 }
 
 .header {

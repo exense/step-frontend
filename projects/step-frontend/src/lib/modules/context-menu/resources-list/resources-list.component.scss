@@ -1,7 +1,11 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
 :host {
-  position: relative;
-  display: block;
-  background: white;
+  @include core.table-container;
+}
+
+.resource-link {
+  margin-left: 5px;
 }
 
 .cell-actions {
@@ -15,11 +19,5 @@
 }
 
 .header {
-  display: flex;
-  justify-content: flex-end;
-  padding: 8px;
-
-  step-btn-group {
-    margin-left: 1rem;
-  }
+  @include core.table-header;
 }
