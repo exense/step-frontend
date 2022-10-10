@@ -10,12 +10,12 @@ import { CommonModule } from '@angular/common';
 import { TimeseriesTableComponent } from './performance-view/table/timeseries-table.component';
 import { TimeRangePicker } from './time-selection/time-range-picker.component';
 import { ChartSkeletonComponent } from './chart/skeleton/chart-skeleton.component';
-import { ExecutionPageTimeSelectionComponent } from './performance-view/time-selection/execution-page-time-selection.component';
 import { ExecutionFiltersComponent } from './performance-view/filters/execution-filters.component';
 import { PerformanceViewComponent } from './performance-view/performance-view.component';
 import { ExecutionPageComponent } from './execution-page/execution-page.component';
 import { SyntheticMonitoringPageComponent } from './synthetic-monitoring/synthetic-monitoring-page.component';
 import { MeasurementsPickerComponent } from './performance-view/measurements/measurements-picker.component';
+import { PerformanceViewTimeSelectionComponent } from './performance-view/time-selection/performance-view-time-selection.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +26,7 @@ import { MeasurementsPickerComponent } from './performance-view/measurements/mea
     TimeseriesTableComponent,
     TimeRangePicker,
     ChartSkeletonComponent,
-    ExecutionPageTimeSelectionComponent,
+    PerformanceViewTimeSelectionComponent,
     ExecutionFiltersComponent,
     ExecutionPageComponent,
     SyntheticMonitoringPageComponent,

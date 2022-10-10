@@ -14,7 +14,6 @@ import { TimeSeriesConfig } from '../time-series.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
 import { Subscription } from 'rxjs';
 import { TimeSeriesUtils } from '../time-series-utils';
-import { ExecutionPageTimeSelectionComponent } from './time-selection/execution-page-time-selection.component';
 import { ExecutionContext } from '../execution-page/execution-context';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
@@ -27,6 +26,7 @@ import { ChartGenerators } from './chart-generators/chart-generators';
 import { TsChartType } from './ts-chart-type';
 import { BucketFilters } from '../model/bucket-filters';
 import { ExecutionFiltersComponent } from './filters/execution-filters.component';
+import { PerformanceViewTimeSelectionComponent } from './time-selection/performance-view-time-selection.component';
 
 declare const uPlot: any;
 
@@ -62,7 +62,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   @ViewChild('threadGroupChart') threadGroupChart!: TimeSeriesChartComponent;
   @ViewChild('tableChart') tableChart!: TimeseriesTableComponent;
 
-  @ViewChild(ExecutionPageTimeSelectionComponent) timeSelectionComponent!: ExecutionPageTimeSelectionComponent;
+  @ViewChild(PerformanceViewTimeSelectionComponent) timeSelectionComponent!: PerformanceViewTimeSelectionComponent;
 
   // @Input() executionId!: string;
   @Input() settings!: PerformanceViewSettings;
@@ -105,9 +105,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   private keywordsService!: TimeSeriesKeywordsContext;
 
   responseTimeMetrics = [
-    { label: 'AVG', mapFunction: (b: Bucket) => b.sum / b.count },
-    { label: 'MIN', mapFunction: (b: Bucket) => b.min },
-    { label: 'MAX', mapFunction: (b: Bucket) => b.max },
+    { label: 'Avg', mapFunction: (b: Bucket) => b.sum / b.count },
+    { label: 'Min', mapFunction: (b: Bucket) => b.min },
+    { label: 'Max', mapFunction: (b: Bucket) => b.max },
     { label: 'Perc. 90', mapFunction: (b: Bucket) => b.pclValues[90] },
     { label: 'Perc. 99', mapFunction: (b: Bucket) => b.pclValues[99] },
   ];
@@ -189,11 +189,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   prepareFindRequest(settings: PerformanceViewSettings, customFilters?: any): FindBucketsRequest {
-    const numberOfBuckets = this.calculateIdealNumberOfBuckets(settings.startTime, settings.endTime);
+    const numberOfBuckets = TimeSeriesConfig.MAX_BUCKETS_IN_CHART;
     return {
       start: settings.startTime,
       end: settings.endTime,
-      intervalSize: 2500,
       numberOfBuckets: numberOfBuckets,
       params: {
         ...settings.contextualFilters,
@@ -301,7 +300,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             data: totalData,
             value: (x, v) => Math.trunc(v),
             // stroke: '#E24D42',
-            fill: 'rgba(143,161,210,0.38)',
+            fill: (self: uPlot) => UPlotUtils.gradientFill(self, '#8FA1D2'),
             // fill: 'rgba(255,212,166,0.64)',
             // points: {show: false},
             // drawStyle: 1,
@@ -381,7 +380,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           // scale: 'mb',
           value: (self, x) => TimeSeriesUtils.formatAxisValue(x) + '/h',
           stroke: color,
-          fill: color + '20',
+          fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
         };
       });
       this.byStatusSettings = {
@@ -464,7 +463,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
               data: totalThroughput,
               value: (x, v) => Math.trunc(v) + ' total',
               // stroke: '#E24D42',
-              fill: 'rgba(143,161,210,0.38)',
+              fill: (self: uPlot) => UPlotUtils.gradientFill(self, '#8394C9'),
               // fill: 'rgba(255,212,166,0.64)',
               // points: {show: false},
               // drawStyle: 1,
@@ -490,7 +489,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
         };
 
         this.responseTypeByKeywordsSettings = {
-          title: 'Response Times',
+          title: TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${this.selectedMetric.label})`,
           xValues: timeLabels,
           showLegend: false,
           series: responseTimeSeries,
@@ -504,15 +503,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           ],
         };
       });
-  }
-
-  /**
-   * If the execution is very short (or just started), we don't want a big number of buckets.
-   */
-  calculateIdealNumberOfBuckets(startTime: number, endTime: number): number {
-    return Math.trunc(
-      Math.min(TimeSeriesConfig.MAX_BUCKETS_IN_CHART, (endTime - startTime) / TimeSeriesConfig.RESOLUTION / 2)
-    );
   }
 
   updateTable() {
@@ -546,6 +536,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   switchChartMetric(metric: { label: string; mapFunction: (b: Bucket) => number }) {
+    this.responseTimeChart.setTitle(TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${metric.label})`);
     if (metric.label === this.selectedMetric.label) {
       // it is a real change
       return;

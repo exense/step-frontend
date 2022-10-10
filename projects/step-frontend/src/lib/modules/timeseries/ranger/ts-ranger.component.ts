@@ -284,7 +284,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
           scale: 'y',
           points: { show: false },
           stroke: '#9fd6ff',
-          fill: () => {
+          fill: (self: uPlot, seriesIdx: number) => {
             let gradient = this.uplot.ctx.createLinearGradient(0, 0, 0, 100);
             gradient.addColorStop(0, '#2e6c7c');
             gradient.addColorStop(1, '#2e6c7c' + '07');
