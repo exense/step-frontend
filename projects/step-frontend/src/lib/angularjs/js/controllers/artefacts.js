@@ -57,6 +57,7 @@ angular
         $scope.save = function () {
           if (!$scope.readonly) {
             if ($scope.onSave) {
+              $scope.artefact.useDynamicName = $scope.artefact.dynamicName.dynamic;
               $scope.onSave({ artefact: $scope.artefact });
             }
           }
