@@ -36,7 +36,6 @@
 
 .header {
   @include core.table-header;
-  padding: 8px;
 
   .import-export button {
     padding: 0;

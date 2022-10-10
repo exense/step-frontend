@@ -18,6 +18,13 @@
     font-weight: bold;
   }
 
+  .panel-heading.with-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 53px;
+  }
+
   button.btn,
   input[type='text'].form-control {
     padding: 6px 12px;
@@ -80,7 +87,8 @@
 
 @mixin legacy-styles {
   #main #mainView > div {
-    &:not(#DashboardsController) {
+    // TODO find a solution how to ignore both divs selectors
+    &:not(.exclude-legacy-styles) {
       @include legacy-common-rules;
     }
   }
@@ -164,7 +172,7 @@
     }
   }
 
-  div.form-group .form-control {
+  div.form-group .form-control:not(.btn-switch) {
     background: #ffffff;
     border: 1px solid #d9d9d9;
     box-shadow: 0 1px 2px rgb(16 24 F40 / 5%);

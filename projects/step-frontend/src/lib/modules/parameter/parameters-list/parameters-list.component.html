@@ -68,7 +68,7 @@
     <td mat-cell *matCellDef="let element" class="cell-actions">
       <step-btn-group>
         <button
-          mat-stroked-button
+          mat-icon-button
           matTooltip="Edit Parameter"
           [disabled]="!('param-write' | hasRight | async)"
           (click)="editParameter(element)"
@@ -76,7 +76,7 @@
           <step-icon name="edit-2">edit</step-icon>
         </button>
         <button
-          mat-stroked-button
+          mat-icon-button
           matTooltip="Duplicate Parameter"
           [disabled]="!('param-write' | hasRight | async)"
           (click)="duplicateParameter(element)"
@@ -84,7 +84,7 @@
           <step-icon name="copy"></step-icon>
         </button>
         <button
-          mat-stroked-button
+          mat-icon-button
           matTooltip="Delete Parameter"
           [disabled]="!('param-delete' | hasRight | async)"
           (click)="deleteParameter(element.id, element.key)"

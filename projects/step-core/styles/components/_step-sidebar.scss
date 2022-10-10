@@ -67,7 +67,8 @@ $default-color: dc.default-colors();
     top: 70px;
     left: 56px;
     z-index: 2;
-    max-width: 130px;
+    max-width: 120px;
+    min-width: 120px;
   }
   .tenant-selector-when-sidebar-closed {
     display: none;
