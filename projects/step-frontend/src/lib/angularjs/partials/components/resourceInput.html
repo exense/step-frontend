@@ -78,9 +78,9 @@
       class="form-control"
       ng-model="stagingModel.value"
       ng-blur="blurStagingField()"
-      uib-tooltip="Drag and drop your file here or enter the path to a file accessible from the controller"
+      uib-tooltip="{{disableServerPath ? 'Drag and drop your file here' : 'Drag and drop your file here or enter the path to a file accessible from the controller'}}"
       tooltip-append-to-body="true"
-      readonly="uploadOnly"
+      ng-readonly="disableServerPath"
     />
     <div class="input-group-btn">
       <button
