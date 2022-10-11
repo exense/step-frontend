@@ -14,7 +14,7 @@ import { TimeSeriesService } from '../time-series.service';
 import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
-import { delay, map } from 'rxjs';
+import { delay, forkJoin, map, Subject, take, timer } from 'rxjs';
 
 @Component({
   selector: 'step-execution-performance',
@@ -28,10 +28,11 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   @Input() executionId!: string;
 
+  dashboardUpdateCompleteSubject = new Subject<void>();
+
   executionInProgress = false;
   refreshEnabled = false;
   performanceViewSettings: PerformanceViewSettings | undefined;
-  intervalExecution: any;
   intervalShouldBeCanceled = false;
 
   executionHasToBeBuilt = false;
@@ -69,6 +70,14 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  onPerformanceViewInitComplete() {
+    this.dashboardUpdateCompleteSubject.next();
+  }
+
+  onPerformanceViewUpdateComplete() {
+    this.dashboardUpdateCompleteSubject.next();
+  }
+
   init() {
     this.executionService.getExecutionById(this.executionId).subscribe((execution) => {
       let startTime = execution.startTime!;
@@ -88,7 +97,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         contextualFilters: { eId: this.executionId },
       };
       if (this.executionInProgress) {
-        this.startRefreshInterval(this.selectedRefreshInterval.value);
+        this.triggerNextUpdate(this.selectedRefreshInterval.value);
         this.refreshEnabled = true;
       }
     });
@@ -121,47 +130,38 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         return;
       }
       this.refreshEnabled = true;
-      clearInterval(this.intervalExecution);
-      this.startRefreshInterval(newInterval.value);
+      this.triggerNextUpdate(newInterval.value);
     } else {
       // we need to stop it
       this.refreshEnabled = false;
-      clearInterval(this.intervalExecution);
     }
     this.selectedRefreshInterval = newInterval;
   }
 
-  startRefreshInterval(interval: number) {
-    this.intervalExecution = setInterval(() => {
+  triggerNextUpdate(delay: number) {
+    forkJoin([timer(delay), this.dashboardUpdateCompleteSubject.pipe(take(1))]).subscribe(() => {
       let now = new Date().getTime();
-      if (this.intervalShouldBeCanceled) {
-        clearTimeout(this.intervalExecution);
-        // the end time is updated already.
-      } else {
+      if (!this.intervalShouldBeCanceled) {
         this.performanceViewSettings!.endTime =
           now - (this.intervalShouldBeCanceled ? 0 : this.RUNNING_EXECUTION_END_TIME_BUFFER); // if the execution is not ended, we don't fetch until the end.
       }
 
-      // this.findRequest.start = lastEnd - ((lastEnd - this.executionStart) % this.findRequest.intervalSize);
-      //   this.findRequest.end = now;
       const timeSelection = this.performanceView.getTimeRangeSelection();
       if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
         let from = now - timeSelection.relativeSelection.timeInMs;
         timeSelection.absoluteSelection = { from: from, to: now };
       }
-      //   this.findRequest.numberOfBuckets = this.calculateIdealNumberOfBuckets(
-      //     this.findRequest.start,
-      //     this.findRequest.end
-      //   );
-      this.performanceView.reconstructAllCharts();
       this.executionService.getExecutionById(this.executionId).subscribe((details) => {
         if (details.endTime) {
           this.performanceViewSettings!.endTime = details.endTime;
           this.intervalShouldBeCanceled = true;
           this.executionInProgress = false;
+        } else {
+          this.triggerNextUpdate(this.selectedRefreshInterval.value);
         }
+        this.performanceView.updateAllCharts();
       });
-    }, interval);
+    });
   }
 
   navigateToRtmDashboard() {
@@ -170,9 +170,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.contextsFactory.destroyContext(this.executionId);
-    if (this.intervalExecution) {
-      clearInterval(this.intervalExecution);
-    }
   }
 }
 

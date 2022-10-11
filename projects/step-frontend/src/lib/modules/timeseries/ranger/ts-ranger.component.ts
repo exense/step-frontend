@@ -50,6 +50,8 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
 
   @Output('onZoomReset') onZoomReset = new EventEmitter<TSTimeRange>();
 
+  @Output('onChartLoaded') onChartLoaded = new EventEmitter<void>();
+
   uplot!: any;
   previousRange: TSTimeRange | undefined;
 
@@ -344,6 +346,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       [this.settings.xValues, ...this.settings.series.map((s) => s.data)],
       this.chartElement.nativeElement
     );
+    this.onChartLoaded.emit();
   }
 
   emitSelectionToLinkedCharts() {

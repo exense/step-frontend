@@ -1,10 +1,9 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, BucketAttributes, Execution, ExecutionsService } from '@exense/step-core';
 import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
 import { TimeSeriesService } from '../time-series.service';
 import { FindBucketsRequest } from '../find-buckets-request';
-import { TimeseriesColorsPool } from '../util/timeseries-colors-pool';
 import { TimeSeriesChartComponent } from '../chart/time-series-chart.component';
 import { KeyValue } from '@angular/common';
 import { TSTimeRange } from '../chart/model/ts-time-range';
@@ -12,11 +11,10 @@ import { TSRangerComponent } from '../ranger/ts-ranger.component';
 import { UPlotUtils } from '../uplot/uPlot.utils';
 import { TimeSeriesConfig } from '../time-series.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
-import { Subscription } from 'rxjs';
+import { forkJoin, Observable, Subject, Subscription, take } from 'rxjs';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { ExecutionContext } from '../execution-page/execution-context';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
-import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { KeywordSelection, TimeSeriesKeywordsContext } from '../execution-page/time-series-keywords.context';
 import { Bucket } from '../bucket';
 import { TimeSeriesChartResponse } from '../time-series-chart-response';
@@ -24,7 +22,6 @@ import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.servi
 import { PerformanceViewSettings } from './performance-view-settings';
 import { ChartGenerators } from './chart-generators/chart-generators';
 import { TsChartType } from './ts-chart-type';
-import { BucketFilters } from '../model/bucket-filters';
 import { ExecutionFiltersComponent } from './filters/execution-filters.component';
 import { PerformanceViewTimeSelectionComponent } from './time-selection/performance-view-time-selection.component';
 
@@ -68,6 +65,12 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   @Input() settings!: PerformanceViewSettings;
   @Input() includeThreadGroupChart = true;
   @Input() includeTimeRangePicker = true;
+
+  @Output() onInitializationComplete: EventEmitter<void> = new EventEmitter<void>();
+  @Output() onUpdateComplete: EventEmitter<void> = new EventEmitter<void>();
+
+  tableInitializedSubject: Subject<void> = new Subject();
+  rangerLoadedSubject: Subject<void> = new Subject();
 
   barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
   stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
@@ -114,6 +117,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   selectedMetric = this.responseTimeMetrics[0];
 
   executionContext!: ExecutionContext;
+
+  initializationTasks: Observable<any>[] = [];
+  updateTasks: Observable<any>[] = [];
 
   valueAscOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => {
     return a.key.localeCompare(b.key);
@@ -202,6 +208,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     };
   }
 
+  onTableInitializationFinished() {
+    this.tableInitializedSubject.next();
+  }
+
   createAllCharts() {
     this.createSummaryChart(this.findRequest);
     // this.tableChart.init(this.findRequest);
@@ -210,30 +220,38 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     if (this.includeThreadGroupChart) {
       this.createThreadGroupsChart(this.findRequest);
     }
-  }
+    this.initializationTasks.push(this.tableInitializedSubject); // we wait also for the table
+    this.initializationTasks.push(this.rangerLoadedSubject);
 
-  // we assume the settings input has been changed
-  reconstructAllCharts() {
-    this.findRequest = this.prepareFindRequest(this.settings); // we don't want to lose active filters
-    this.updateAllCharts();
-  }
-
-  mergeRequestWithActiveFilters() {
-    this.deleteObjectProperties(this.findRequest.params, this.filtersComponent.getAllFilterAttributes()); // we clean the request first
-    Object.assign(this.findRequest.params, this.executionContext.getActiveFilters());
+    forkJoin(this.initializationTasks.map((obs) => obs.pipe(take(1)))).subscribe((allCompleted) =>
+      this.onInitializationComplete.emit()
+    );
   }
 
   updateAllCharts() {
+    this.updateTasks = [];
+    this.findRequest = this.prepareFindRequest(this.settings); // we don't want to lose active filters
     this.timeSelectionComponent.refreshRanger();
     this.mergeRequestWithActiveFilters();
     // we clone the object so the find request is not polluted with the filters (we can't clean it back)
-    this.createSummaryChart(this.findRequest, true);
+    this.createSummaryChart(this.findRequest);
     this.updateTable();
     this.createByStatusChart(this.findRequest);
     this.createByKeywordsCharts(this.findRequest);
     if (this.includeThreadGroupChart) {
       this.createThreadGroupsChart(this.findRequest);
     }
+
+    this.updateTasks.push(this.tableInitializedSubject); // we wait also for the table
+    this.updateTasks.push(this.rangerLoadedSubject);
+    forkJoin(this.updateTasks.map((obs) => obs.pipe(take(1)))).subscribe((allCompleted) =>
+      this.onUpdateComplete.emit()
+    );
+  }
+
+  mergeRequestWithActiveFilters() {
+    this.deleteObjectProperties(this.findRequest.params, this.filtersComponent.getAllFilterAttributes()); // we clean the request first
+    Object.assign(this.findRequest.params, this.executionContext.getActiveFilters());
   }
 
   onKeywordToggle(keyword: string, event: any) {
@@ -245,6 +263,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   createThreadGroupsChart(request: FindBucketsRequest, isUpdate = false) {
+    let threadGroupChartCompleteNotifier = new Subject<void>();
+    this.initializationTasks.push(threadGroupChartCompleteNotifier);
+    this.updateTasks.push(threadGroupChartCompleteNotifier);
+
     let dimensionKey = 'name';
     let updatedParams: { [key: string]: string } = {
       ...request.params,
@@ -324,6 +346,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           },
         ],
       };
+      threadGroupChartCompleteNotifier.next();
     });
   }
 
@@ -338,9 +361,16 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.chartsSettings[type] = ChartGenerators.generateChart(type, request, response);
   }
 
-  createSummaryChart(request: FindBucketsRequest, isUpdate = false) {
+  /**
+   * This method is used for both creating or updating the chart
+   */
+  createSummaryChart(request: FindBucketsRequest) {
+    let summaryChartCompleteNotifier = new Subject<void>();
+    this.initializationTasks.push(summaryChartCompleteNotifier);
+    this.updateTasks.push(summaryChartCompleteNotifier);
     this.timeSeriesService.fetchBuckets(request).subscribe((response) => {
       this.createChart(TsChartType.OVERVIEW, request, response);
+      summaryChartCompleteNotifier.next();
     });
   }
 
@@ -360,6 +390,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   createByStatusChart(request: FindBucketsRequest) {
+    let byStatusChartCompleteNotifier = new Subject<void>();
+    this.initializationTasks.push(byStatusChartCompleteNotifier);
+    this.updateTasks.push(byStatusChartCompleteNotifier);
+
     let stausAttribute = 'rnStatus';
     this.timeSeriesService.fetchBuckets({ ...request, groupDimensions: [stausAttribute] }).subscribe((response) => {
       if (response.matrixKeys.length === 0 && this.byStatusChart) {
@@ -396,10 +430,15 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           },
         ],
       };
+      byStatusChartCompleteNotifier.next(); // the task is completed
     });
   }
 
   createByKeywordsCharts(request: FindBucketsRequest) {
+    let byKeywordsChartCompleteNotifier = new Subject<void>();
+    this.initializationTasks.push(byKeywordsChartCompleteNotifier);
+    this.updateTasks.push(byKeywordsChartCompleteNotifier);
+
     let groupDimensions = this.executionContext.getGroupDimensions();
     this.timeSeriesService
       .fetchBuckets({ ...request, groupDimensions: groupDimensions, percentiles: [90, 99] })
@@ -502,6 +541,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             },
           ],
         };
+        byKeywordsChartCompleteNotifier.next();
       });
   }
 

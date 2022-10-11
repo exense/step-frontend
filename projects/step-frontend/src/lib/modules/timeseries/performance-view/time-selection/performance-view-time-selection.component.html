@@ -6,6 +6,7 @@
       [settings]="rangerSettings"
       [syncKey]="settings.contextId"
       [selection]="selection.absoluteSelection"
+      (onChartLoaded)="onRangerLoaded.emit()"
       (onRangeChange)="onRangerSelectionChange($event)"
       (onZoomReset)="onRangerZoomReset($event)"
     >

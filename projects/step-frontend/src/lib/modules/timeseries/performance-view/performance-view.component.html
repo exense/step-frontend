@@ -4,6 +4,7 @@
     <step-execution-time-selection
       [timePicker]="includeTimeRangePicker"
       (onRangeReset)="handleRangeReset($event)"
+      (onRangerLoaded)="rangerLoadedSubject.next()"
       #timeSelection
       *ngIf="executionContext"
       [settings]="settings"
@@ -87,6 +88,7 @@
           <step-timeseries-table
             #tableChart
             *ngIf="executionContext"
+            (onInitializationComplete)="onTableInitializationFinished()"
             [findRequest]="findRequest"
             [executionContext]="executionContext"
           ></step-timeseries-table>

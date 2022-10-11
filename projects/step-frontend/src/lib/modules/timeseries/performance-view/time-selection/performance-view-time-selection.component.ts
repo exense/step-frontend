@@ -28,6 +28,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   @Input() timePicker: boolean = true;
 
   @Output('onRangeChange') onRangeChange = new EventEmitter<TSTimeRange>();
+  @Output('onRangerLoaded') onRangerLoaded = new EventEmitter<void>();
   @Output('onRangeReset') onRangeReset = new EventEmitter<TSTimeRange>();
 
   rangerSettings: TSRangerSettings | undefined;

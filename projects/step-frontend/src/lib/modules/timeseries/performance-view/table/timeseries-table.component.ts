@@ -29,6 +29,8 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   private keywordsService!: TimeSeriesKeywordsContext;
   @Input() executionContext!: ExecutionContext;
 
+  @Output() onInitializationComplete: EventEmitter<void> = new EventEmitter();
+
   subscriptions: Subscription = new Subscription();
 
   // @Output('onKeywordsFetched') onKeywordsFetched = new EventEmitter<string[]>();
@@ -116,6 +118,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         );
         keywordsCallback(keywords);
         this.tableIsLoading = false;
+        this.onInitializationComplete.emit();
       });
   }
 
