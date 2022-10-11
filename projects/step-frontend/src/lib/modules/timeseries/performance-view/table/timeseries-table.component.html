@@ -71,6 +71,14 @@
       </ng-container>
     </td>
   </ng-container>
+  <ng-container matColumnDef="tph">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Tph</th>
+    <td mat-cell *matCellDef="let element">
+      <ng-container *ngIf="response">
+        {{ element.attributes.tph }}
+      </ng-container>
+    </td>
+  </ng-container>
   <!--            <mat-row *matRowDef="let row; columns: tableColumns"-->
   <!--                     [class.display-none]="!keywords[row.attributes.name].isSelected"></mat-row>-->
 </step-table>
