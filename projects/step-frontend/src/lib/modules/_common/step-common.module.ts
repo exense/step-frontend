@@ -7,6 +7,7 @@ import { ExecutionLinkComponent } from './components/execution-link/execution-li
 import { JsonViewerDirective } from './directives/json-viewer.directive';
 import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
 import { MenuFilterPipe } from './pipes/menu-filter.pipe';
+import { IsUsedByListComponent } from './components/is-used-by-list/is-used-by-list.component';
 
 @NgModule({
   declarations: [
@@ -14,6 +15,7 @@ import { MenuFilterPipe } from './pipes/menu-filter.pipe';
     LoginComponent,
     SidebarComponent,
     ExecutionLinkComponent,
+    IsUsedByListComponent,
     JsonViewerDirective,
     IsEmptyJsonPipe,
     MenuFilterPipe,
@@ -24,6 +26,7 @@ import { MenuFilterPipe } from './pipes/menu-filter.pipe';
     LoginComponent,
     SidebarComponent,
     ExecutionLinkComponent,
+    IsUsedByListComponent,
     JsonViewerDirective,
     IsEmptyJsonPipe,
     MenuFilterPipe,

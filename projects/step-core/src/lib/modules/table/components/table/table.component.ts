@@ -67,6 +67,7 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
   @Input() inProgress?: boolean;
   tableDataSource?: TableDataSource<T>;
   @Input() pageSizeOptions: ReadonlyArray<number> = [10, 25, 50, 100];
+  @Input() pageSizeInputDisabled?: boolean;
   @Input() set filter(value: string | undefined) {
     if (value === this.filter) {
       return;

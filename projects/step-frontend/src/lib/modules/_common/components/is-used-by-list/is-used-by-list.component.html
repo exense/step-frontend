@@ -1,0 +1,28 @@
+<div class="modal-header">
+  <h3 class="modal-title">{{ title }}</h3>
+</div>
+
+<step-table
+  *ngIf="!emptyResults"
+  [pageSizeInputDisabled]="true"
+  [dataSource]="searchableReferences$"
+  matSort
+  [matSortDisableClear]="true"
+  [inProgress]="inProgress"
+>
+  <ng-container matColumnDef="name" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Used by</th>
+    <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+    <!--    <step-function-link [context]="{type:'', id:id, title:title}"></step-function-link>-->
+  </ng-container>
+  <ng-container matColumnDef="type" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+    <td mat-cell *matCellDef="let element">{{ element.type }}</td>
+  </ng-container>
+  <ng-container matColumnDef="project" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Project</th>
+    <td mat-cell *matCellDef="let element">{{ projectIdToDtoMap[element.attributes?.project]?.attributes?.name }}</td>
+  </ng-container>
+</step-table>
+
+<p *ngIf="emptyResults" class="notification-text-not-used">Component is not used by other components.</p>
