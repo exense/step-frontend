@@ -1,4 +1,15 @@
 <div class="panel-body">
+
+  <step-execution-errors
+    [(selected-error-distribution-toggle)]="selectedErrorDistirbutionToggle"
+    [count-by-error-msg]="countByErrorMsg"
+    [count-by-error-code]="countByErrorCode"
+    [error-distribution]="errorDistribution"
+    (search-step-by-error)="searchStepByError($event)"
+  >
+  </step-execution-errors>
+
+<!--
   <div class="row">
     <span>Group by: </span><span><select
           ng-model="selectedErrorDistirbutionToggle"
@@ -69,4 +80,5 @@
       </st-columns>
     </st-table>
   </div>
+-->
 </div>
