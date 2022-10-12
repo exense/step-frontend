@@ -1,42 +1,5 @@
-<step-is-used-by-list (onClose)="close($event)" [title]="title" [type]="type" [id]="id"></step-is-used-by-list>
+<step-is-used-by-list (onClose)="close()" [title]="title" [type]="type" [id]="id"></step-is-used-by-list>
 
-<!--<div class="modal-body">-->
-<!--	<div class="section">-->
-<!--		<div class="section-content section-highlight">-->
-<!--			<div ng-if="!result" class="lds-ring"><div></div><div></div><div></div><div></div></div>-->
-<!--			<st-table ng-if="result && result.length > 0" data="result" uid="'usedByList'">-->
-<!--				<st-columns>-->
-<!--					<st-column name="usedBy">-->
-<!--						<header>Used by</header>-->
-<!--						<second-header>-->
-<!--							<inputdropdown action="search" initial-value="initialValue"></inputdropdown>-->
-<!--						</second-header>-->
-<!--						<cell>-->
-<!--							<span ng-if="row.type == 'KEYWORD'"> <function-link ng-click="close()" function_="row" entity-tenant="row.tenantName" st-options="stOptions" /></span>-->
-<!--							<span ng-if="row.type == 'PLAN'"> <plan-link ng-click="close()" entity-tenant="row.tenantName" entity-id="row.id" description="row.name" st-options="stOptions"/></span>-->
-<!--							<span ng-if="row.type != 'PLAN' && row.type != 'KEYWORD'">{{row.name}}</span>-->
-<!--						</cell>-->
-<!--					</st-column>-->
-<!--					<st-column name="type">-->
-<!--						<header>Type</header>-->
-<!--						<second-header>-->
-<!--							<inputdropdown action="search" initial-value="initialValue"></inputdropdown>-->
-<!--						</second-header>-->
-<!--						<cell><span>{{row.type}}</span></cell>-->
-<!--					</st-column>-->
-<!--					<st-column name="project">-->
-<!--						<header>Project</header>-->
-<!--						<second-header>-->
-<!--							<inputdropdown action="search" initial-value="initialValue"></inputdropdown>-->
-<!--						</second-header>-->
-<!--						<cell><span ng-if="hasProject">{{row.tenantName}}</span></cell>-->
-<!--					</st-column>-->
-<!--				</st-columns>-->
-<!--			</st-table>-->
-<!--			<p ng-if="result && result.length == 0">Component is not used by other components.</p>-->
-<!--		</div>-->
-<!--	</div>-->
-<!--</div>-->
 <div class="modal-footer">
 	<button class="btn btn-primary" type="button" ng-click="close()">Close</button>
 </div>

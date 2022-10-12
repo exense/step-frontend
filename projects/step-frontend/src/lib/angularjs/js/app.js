@@ -1045,7 +1045,7 @@ angular
               var resolved = EntityScopeResolver.getScope(e);
               if (resolved) {
                 e.tenantName = resolved.tenantName;
-                e.showLink = $rootScope.tenant.name === '[All]'; // todo: hab ich das schon abgebildet?
+                e.showLink = $rootScope.tenant.name === '[All]';
               } else if ($rootScope.tenant) {
                 e.tenantName = $rootScope.tenant.name;
               } else {

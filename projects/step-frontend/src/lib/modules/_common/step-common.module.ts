@@ -9,6 +9,7 @@ import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
 import { MenuFilterPipe } from './pipes/menu-filter.pipe';
 import { IsUsedByListComponent } from './components/is-used-by-list/is-used-by-list.component';
 import { PlanLinkComponent } from './components/plan-link/plan-link.component';
+import { FunctionLinkComponent } from './components/function-link/function-link.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { PlanLinkComponent } from './components/plan-link/plan-link.component';
     ExecutionLinkComponent,
     IsUsedByListComponent,
     PlanLinkComponent,
+    FunctionLinkComponent,
     JsonViewerDirective,
     IsEmptyJsonPipe,
     MenuFilterPipe,
@@ -30,6 +32,7 @@ import { PlanLinkComponent } from './components/plan-link/plan-link.component';
     ExecutionLinkComponent,
     IsUsedByListComponent,
     PlanLinkComponent,
+    FunctionLinkComponent,
     JsonViewerDirective,
     IsEmptyJsonPipe,
     MenuFilterPipe,

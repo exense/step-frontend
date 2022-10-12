@@ -16,8 +16,14 @@
       <step-plan-link
         *ngIf="element.type === 'PLAN'"
         (click)="closeDialog()"
-        [context]="{ _class: '', id: element.id, attributes: { name: element.name } }"
+        [context]="{ id: element.id, attributes: { name: element.name }, _class: '' }"
       ></step-plan-link>
+      <step-function-link
+        *ngIf="element.type === 'FUNCTION'"
+        (click)="closeDialog()"
+        [context]="{ id: element.id, attributes: { name: element.name }, type: '' }"
+      ></step-function-link>
+      <span *ngIf="element.type != 'PLAN' && element.type != 'KEYWORD'">{{ element.name }}</span>
     </td>
   </ng-container>
   <ng-container matColumnDef="type" stepSearchCol>

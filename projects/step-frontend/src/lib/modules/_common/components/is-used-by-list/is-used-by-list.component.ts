@@ -44,24 +44,23 @@ export class IsUsedByListComponent {
       if (!this.emptyResults) {
         const firstResultHasProject = !!result[0].attributes!['project'];
         if (firstResultHasProject && Object.keys(this.projectIdToDtoMap).length === 0) {
-          this._augmentedAdminService
-            .getAllProjects()
-            .pipe(
-              map((projectDtos: Array<ProjectDto>) => {
-                return projectDtos.reduce(function (map: { [id: string]: ProjectDto }, dto) {
-                  map[dto.id] = dto;
-                  return map;
-                }, {});
-              })
-            )
-            .subscribe((projectIdToDto) => {
-              this.projectIdToDtoMap = projectIdToDto;
-            });
+          this.projects$.subscribe((projectIdToDto) => {
+            this.projectIdToDtoMap = projectIdToDto;
+          });
         }
       }
     }),
     tap(() => ((this as InProgress).inProgress = false)),
     shareReplay(1)
+  );
+
+  private projects$ = this._augmentedAdminService.getAllProjects().pipe(
+    map((projectDtos: Array<ProjectDto>) => {
+      return projectDtos.reduce(function (map: { [id: string]: ProjectDto }, dto) {
+        map[dto.id] = dto;
+        return map;
+      }, {});
+    })
   );
 
   readonly searchableReferences$ = new TableLocalDataSource(this.references$, {
