@@ -15,8 +15,6 @@ import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import { ExecutionTabsComponent } from './components/execution-tabs/execution-tabs.component';
 import './components/execution-tabs/execution-tabs.component';
 import { CustomCellRegistryService, EntityRegistry } from '@exense/step-core';
-import { PlanIconComponent } from '../plan/components/plan-icon/plan-icon.component';
-import { PlanLinkComponent } from '../plan/components/plan-link/plan-link.component';
 
 @NgModule({
   declarations: [

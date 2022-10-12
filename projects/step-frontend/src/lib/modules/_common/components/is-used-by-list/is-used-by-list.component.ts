@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import {
   AJS_MODULE,
   AugmentedAdminService,
@@ -23,6 +23,8 @@ export class IsUsedByListComponent {
   @Input() type!: string;
   @Input() id!: string;
 
+  @Output() onClose = new EventEmitter<any>();
+
   readonly inProgress: boolean = false;
 
   projectIdToDtoMap: { [id: string]: ProjectDto } = {};
@@ -37,7 +39,27 @@ export class IsUsedByListComponent {
         searchValue: this.id,
       })
     ),
-    tap((result) => (this.emptyResults = result.length === 0)),
+    tap((result) => {
+      this.emptyResults = result.length === 0;
+      if (!this.emptyResults) {
+        const firstResultHasProject = !!result[0].attributes!['project'];
+        if (firstResultHasProject && Object.keys(this.projectIdToDtoMap).length === 0) {
+          this._augmentedAdminService
+            .getAllProjects()
+            .pipe(
+              map((projectDtos: Array<ProjectDto>) => {
+                return projectDtos.reduce(function (map: { [id: string]: ProjectDto }, dto) {
+                  map[dto.id] = dto;
+                  return map;
+                }, {});
+              })
+            )
+            .subscribe((projectIdToDto) => {
+              this.projectIdToDtoMap = projectIdToDto;
+            });
+        }
+      }
+    }),
     tap(() => ((this as InProgress).inProgress = false)),
     shareReplay(1)
   );
@@ -57,21 +79,11 @@ export class IsUsedByListComponent {
     },
   });
 
-  constructor(private _referencesService: ReferencesService, private _augmentedAdminService: AugmentedAdminService) {
-    this._augmentedAdminService
-      .getAllProjects()
-      .pipe(
-        map((projectDtos: Array<ProjectDto>) => {
-          return projectDtos.reduce(function (map: { [id: string]: ProjectDto }, dto) {
-            map[dto.id] = dto;
-            return map;
-          }, {});
-        })
-      )
-      .subscribe((projectIdToDto) => {
-        this.projectIdToDtoMap = projectIdToDto;
-      });
+  closeDialog(): void {
+    this.onClose.emit({});
   }
+
+  constructor(private _referencesService: ReferencesService, private _augmentedAdminService: AugmentedAdminService) {}
 }
 
 getAngularJSGlobal()

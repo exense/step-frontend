@@ -12,8 +12,13 @@
 >
   <ng-container matColumnDef="name" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Used by</th>
-    <td mat-cell *matCellDef="let element">{{ element.name }}</td>
-    <!--    <step-function-link [context]="{type:'', id:id, title:title}"></step-function-link>-->
+    <td mat-cell *matCellDef="let element">
+      <step-plan-link
+        *ngIf="element.type === 'PLAN'"
+        (click)="closeDialog()"
+        [context]="{ _class: '', id: element.id, attributes: { name: element.name } }"
+      ></step-plan-link>
+    </td>
   </ng-container>
   <ng-container matColumnDef="type" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
