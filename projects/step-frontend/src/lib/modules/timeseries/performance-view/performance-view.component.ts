@@ -11,7 +11,7 @@ import { TSRangerComponent } from '../ranger/ts-ranger.component';
 import { UPlotUtils } from '../uplot/uPlot.utils';
 import { TimeSeriesConfig } from '../time-series.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
-import { forkJoin, Observable, Subject, Subscription, take } from 'rxjs';
+import { first, forkJoin, Observable, Subject, Subscription, take } from 'rxjs';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { ExecutionContext } from '../execution-page/execution-context';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
@@ -223,7 +223,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.initializationTasks.push(this.tableInitializedSubject); // we wait also for the table
     this.initializationTasks.push(this.rangerLoadedSubject);
 
-    forkJoin(this.initializationTasks.map((obs) => obs.pipe(take(1)))).subscribe((allCompleted) =>
+    forkJoin(this.initializationTasks.map((obs) => obs.pipe(first()))).subscribe((allCompleted) =>
       this.onInitializationComplete.emit()
     );
   }
@@ -244,7 +244,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
     this.updateTasks.push(this.tableInitializedSubject); // we wait also for the table
     this.updateTasks.push(this.rangerLoadedSubject);
-    forkJoin(this.updateTasks.map((obs) => obs.pipe(take(1)))).subscribe((allCompleted) =>
+    forkJoin(this.updateTasks.map((obs) => obs.pipe(first()))).subscribe((allCompleted) =>
       this.onUpdateComplete.emit()
     );
   }

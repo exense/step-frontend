@@ -14,7 +14,7 @@ import { TimeSeriesService } from '../time-series.service';
 import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
-import { delay, forkJoin, map, Subject, take, timer } from 'rxjs';
+import { first, forkJoin, Subject, timer } from 'rxjs';
 
 @Component({
   selector: 'step-execution-performance',
@@ -139,7 +139,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   triggerNextUpdate(delay: number) {
-    forkJoin([timer(delay), this.dashboardUpdateCompleteSubject.pipe(take(1))]).subscribe(() => {
+    forkJoin([timer(delay), this.dashboardUpdateCompleteSubject.pipe(first())]).subscribe(() => {
       let now = new Date().getTime();
       if (!this.intervalShouldBeCanceled) {
         this.performanceViewSettings!.endTime =
