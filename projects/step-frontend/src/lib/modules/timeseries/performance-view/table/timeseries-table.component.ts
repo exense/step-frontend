@@ -17,7 +17,7 @@ import { Subscription } from 'rxjs';
 })
 export class TimeseriesTableComponent implements OnInit, OnDestroy {
   // TODO use a dynamic list for percentiles
-  tableColumns = ['name', 'count', 'sum', 'avg', 'min', 'max', 'pcl_90', 'pcl_90', 'pcl_99', 'tps'];
+  tableColumns = ['name', 'count', 'sum', 'avg', 'min', 'max', 'pcl_90', 'pcl_90', 'pcl_99', 'tps', 'tph'];
   tableDataSource: TableDataSource<Bucket> | undefined;
   bucketsByKeywords: { [key: string]: Bucket } = {};
   tableIsLoading = true;
@@ -106,6 +106,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
               bucket.attributes.color = this.keywordsService.getColor(seriesKey);
               bucket.attributes.avg = (bucket.sum / bucket.count).toFixed(0);
               bucket.attributes.tps = Math.trunc(bucket.count / ((response.end - response.start) / 1000));
+              bucket.attributes.tph = Math.trunc((bucket.count / ((response.end - response.start) / 1000)) * 3600);
               let keywordSelection = this.keywordsService.getKeywordSelection(seriesKey);
               bucket.attributes.isSelected = keywordSelection ? keywordSelection.isSelected : true; // true because it has not been loaded yet
               // this.keywords[attributes[dimensionKey]] = { color: color, isSelected: true };
