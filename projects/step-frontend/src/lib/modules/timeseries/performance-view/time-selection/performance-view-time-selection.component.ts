@@ -15,7 +15,8 @@ import { TSRangerSettings } from '../../ranger/ts-ranger-settings';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
 import { Execution } from '@exense/step-core';
 import { PerformanceViewSettings } from '../performance-view-settings';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription, tap } from 'rxjs';
+import { TimeSeriesChartResponse } from '../../time-series-chart-response';
 
 @Component({
   selector: 'step-execution-time-selection',
@@ -27,9 +28,9 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   @Input() settings!: PerformanceViewSettings;
   @Input() timePicker: boolean = true;
 
-  @Output('onRangeChange') onRangeChange = new EventEmitter<TSTimeRange>();
-  @Output('onRangerLoaded') onRangerLoaded = new EventEmitter<void>();
-  @Output('onRangeReset') onRangeReset = new EventEmitter<TSTimeRange>();
+  @Output() onRangeChange = new EventEmitter<TSTimeRange>();
+  @Output() onRangerLoaded = new EventEmitter<void>();
+  @Output() onRangeReset = new EventEmitter<TSTimeRange>();
 
   rangerSettings: TSRangerSettings | undefined;
   @ViewChild(TSRangerComponent) rangerComponent!: TSRangerComponent;
@@ -56,21 +57,18 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
         this.selection = range;
       })
     );
-    this.createRanger();
+    this.createRanger().subscribe(() => this.onRangerLoaded.next());
   }
 
   getActiveSelection(): ExecutionTimeSelection {
     return this.selection;
   }
 
-  refreshRanger() {
-    this.createRanger();
-    // this.timeSeriesService.fetchBuckets(this.r).subscribe((response) => {
-    //
-    // });
+  refreshRanger(): Observable<TimeSeriesChartResponse> {
+    return this.createRanger();
   }
 
-  createRanger() {
+  createRanger(): Observable<TimeSeriesChartResponse> {
     let startTime = this.settings.startTime!;
     let endTime = this.settings.endTime || new Date().getTime() - 5000; // minus 5 seconds
     let request: FindBucketsRequest = {
@@ -79,31 +77,30 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
       end: endTime, // to current time if it's not ended
       numberOfBuckets: TimeSeriesConfig.MAX_BUCKETS_IN_CHART,
     };
-    this.timeSeriesService.fetchBuckets(request).subscribe((response) => {
-      this.timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-      let avgData: (number | null)[] = [];
-      if (response.matrix[0]) {
-        avgData = response.matrix[0].map((b) => (b ? b.sum / b.count : null));
-      }
+    return this.timeSeriesService.fetchBuckets(request).pipe(
+      tap((response) => {
+        this.timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
+        let avgData: (number | null)[] = [];
+        if (response.matrix[0]) {
+          avgData = response.matrix[0].map((b) => (b ? b.sum / b.count : null));
+        }
 
-      let timeRange = this.prepareSelectForRanger(this.executionService.getActiveSelection());
-      this.rangerSettings = {
-        xValues: this.timeLabels,
-        selection: timeRange,
-        series: [
-          {
-            id: 'avg',
-            label: 'Response Time',
-            data: avgData,
-            // value: (self, x) => Math.trunc(x) + ' ms',
-            stroke: 'red',
-          },
-        ],
-      };
-      // if (this.ranger) {
-      //   this.ranger.redrawChart();
-      // }
-    });
+        let timeRange = this.prepareSelectForRanger(this.executionService.getActiveSelection());
+        this.rangerSettings = {
+          xValues: this.timeLabels,
+          selection: timeRange,
+          series: [
+            {
+              id: 'avg',
+              label: 'Response Time',
+              data: avgData,
+              // value: (self, x) => Math.trunc(x) + ' ms',
+              stroke: 'red',
+            },
+          ],
+        };
+      })
+    );
   }
 
   prepareSelectForRanger(selection: ExecutionTimeSelection): TSTimeRange | undefined {

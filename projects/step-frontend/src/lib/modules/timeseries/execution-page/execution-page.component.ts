@@ -14,7 +14,7 @@ import { TimeSeriesService } from '../time-series.service';
 import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
-import { first, forkJoin, Subject, timer } from 'rxjs';
+import { forkJoin, Observable, of, Subject, Subscription, switchMap, tap, timer } from 'rxjs';
 
 @Component({
   selector: 'step-execution-performance',
@@ -28,15 +28,16 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   @Input() executionId!: string;
 
-  dashboardUpdateCompleteSubject = new Subject<void>();
+  private dashboardInitComplete$ = new Subject<void>();
 
   executionInProgress = false;
-  refreshEnabled = false;
   performanceViewSettings: PerformanceViewSettings | undefined;
   intervalShouldBeCanceled = false;
 
   executionHasToBeBuilt = false;
   migrationInProgress = false;
+
+  updatingSubscription = new Subscription();
 
   // this is just for running executions
   refreshIntervals: RefreshInterval[] = [
@@ -71,11 +72,12 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   onPerformanceViewInitComplete() {
-    this.dashboardUpdateCompleteSubject.next();
+    this.dashboardInitComplete$.next();
+    this.dashboardInitComplete$.complete();
   }
 
   onPerformanceViewUpdateComplete() {
-    this.dashboardUpdateCompleteSubject.next();
+    // this.dashboardInitComplete.next();
   }
 
   init() {
@@ -97,8 +99,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         contextualFilters: { eId: this.executionId },
       };
       if (this.executionInProgress) {
-        this.triggerNextUpdate(this.selectedRefreshInterval.value);
-        this.refreshEnabled = true;
+        this.triggerNextUpdate(this.selectedRefreshInterval.value, this.dashboardInitComplete$);
       }
     });
   }
@@ -125,43 +126,48 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   changeRefreshInterval(newInterval: RefreshInterval) {
-    if (newInterval.value) {
-      if (this.selectedRefreshInterval.value === newInterval.value) {
-        return;
-      }
-      this.refreshEnabled = true;
-      this.triggerNextUpdate(newInterval.value);
-    } else {
-      // we need to stop it
-      this.refreshEnabled = false;
-    }
+    const oldInterval = this.selectedRefreshInterval;
     this.selectedRefreshInterval = newInterval;
+    if (oldInterval.value === newInterval.value) {
+      return;
+    }
+    if (newInterval.value) {
+      this.updatingSubscription.unsubscribe();
+      this.triggerNextUpdate(newInterval.value, of(undefined));
+    }
   }
 
-  triggerNextUpdate(delay: number) {
-    forkJoin([timer(delay), this.dashboardUpdateCompleteSubject.pipe(first())]).subscribe(() => {
-      let now = new Date().getTime();
-      if (!this.intervalShouldBeCanceled) {
-        this.performanceViewSettings!.endTime =
-          now - (this.intervalShouldBeCanceled ? 0 : this.RUNNING_EXECUTION_END_TIME_BUFFER); // if the execution is not ended, we don't fetch until the end.
-      }
-
-      const timeSelection = this.performanceView.getTimeRangeSelection();
-      if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
-        let from = now - timeSelection.relativeSelection.timeInMs;
-        timeSelection.absoluteSelection = { from: from, to: now };
-      }
-      this.executionService.getExecutionById(this.executionId).subscribe((details) => {
+  triggerNextUpdate(delay: number, observableToWaitFor: Observable<unknown>) {
+    this.updatingSubscription = forkJoin([timer(delay), observableToWaitFor])
+      .pipe(
+        tap(() => {
+          const now = new Date().getTime();
+          if (this.executionInProgress) {
+            this.performanceViewSettings!.endTime =
+              now - (this.intervalShouldBeCanceled ? 0 : this.RUNNING_EXECUTION_END_TIME_BUFFER); // if the execution is not ended, we don't fetch until the end.
+          }
+          const timeSelection = this.performanceView.getTimeRangeSelection();
+          if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
+            let from = now - timeSelection.relativeSelection.timeInMs;
+            timeSelection.absoluteSelection = { from: from, to: now };
+          }
+        }),
+        switchMap(() => {
+          return this.executionService.getExecutionById(this.executionId);
+        })
+      )
+      .subscribe((details) => {
         if (details.endTime) {
           this.performanceViewSettings!.endTime = details.endTime;
           this.intervalShouldBeCanceled = true;
           this.executionInProgress = false;
+          this.performanceView.updateAllCharts().subscribe(() => {}); // don't re-trigger refresh
         } else {
-          this.triggerNextUpdate(this.selectedRefreshInterval.value);
+          if (this.selectedRefreshInterval.value) {
+            this.triggerNextUpdate(this.selectedRefreshInterval.value, this.performanceView.updateAllCharts()); // recursive call
+          }
         }
-        this.performanceView.updateAllCharts();
       });
-    });
   }
 
   navigateToRtmDashboard() {
@@ -170,6 +176,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.contextsFactory.destroyContext(this.executionId);
+    this.dashboardInitComplete$.complete();
+    this.updatingSubscription.unsubscribe();
   }
 }
 

@@ -4,7 +4,7 @@
     <step-execution-time-selection
       [timePicker]="includeTimeRangePicker"
       (onRangeReset)="handleRangeReset($event)"
-      (onRangerLoaded)="rangerLoadedSubject.next()"
+      (onRangerLoaded)="onRangerLoaded()"
       #timeSelection
       *ngIf="executionContext"
       [settings]="settings"
