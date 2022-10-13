@@ -1,13 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import {
-  AJS_MODULE,
-  AsyncTasksService,
-  AsyncTaskStatusResource,
-  DashboardService,
-  ExecutionsService,
-  pollAsyncTask,
-} from '@exense/step-core';
-import { TimeSeriesConfig } from '../time-series.config';
+import { AJS_MODULE, AsyncTasksService, DashboardService, ExecutionsService, pollAsyncTask } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PerformanceViewSettings } from '../performance-view/performance-view-settings';
 import { TimeSeriesService } from '../time-series.service';
@@ -82,16 +74,13 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   init() {
     this.executionService.getExecutionById(this.executionId).subscribe((execution) => {
-      let startTime = execution.startTime!;
-      // let now = new Date().getTime();
-      let endTime = undefined;
-      if (execution.endTime) {
-        // execution is over
-        endTime = execution.endTime; // + (TimeSeriesConfig.RESOLUTION - (execution.endTime % TimeSeriesConfig.RESOLUTION)); // not sure if needed
-      } else {
+      const startTime = execution.startTime!;
+      const endTime = execution.endTime ? execution.endTime : new Date().getTime();
+
+      if (!execution.endTime) {
         this.executionInProgress = true;
-        endTime = new Date().getTime();
       }
+
       this.performanceViewSettings = {
         contextId: this.executionId,
         startTime: startTime,
@@ -109,8 +98,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     this.timeSeriesService
       .rebuildTimeSeries(this.executionId)
       .pipe(pollAsyncTask(this._asyncTaskService))
-      .subscribe(
-        (task) => {
+      .subscribe({
+        next: (task) => {
           if (task.ready) {
             this.migrationInProgress = false;
             this.executionHasToBeBuilt = false;
@@ -119,10 +108,10 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
             console.error('The task is not finished yet');
           }
         },
-        (error) => {
+        error: (error) => {
           console.error(error);
-        }
-      );
+        },
+      });
   }
 
   changeRefreshInterval(newInterval: RefreshInterval) {
@@ -148,7 +137,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
           }
           const timeSelection = this.performanceView.getTimeRangeSelection();
           if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
-            let from = now - timeSelection.relativeSelection.timeInMs;
+            const from = now - timeSelection.relativeSelection.timeInMs;
             timeSelection.absoluteSelection = { from: from, to: now };
           }
         }),

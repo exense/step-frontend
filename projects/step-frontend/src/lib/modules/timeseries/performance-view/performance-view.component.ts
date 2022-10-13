@@ -37,7 +37,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   private readonly METRIC_TYPE_RESPONSE_TIME = 'response-time'; // this is for normal measurements
   private readonly METRIC_TYPE_SAMPLER = 'sampler'; // this is for thread groups measurements
 
-  private RESOLUTION_MS = 1000;
   private CHART_LEGEND_SIZE = 65;
 
   summaryChartSettings: TSChartSettings | undefined;
