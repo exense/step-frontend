@@ -10,7 +10,13 @@
 
   <button mat-raised-button class="interactive-btn" (click)="navigateToRtmDashboard()">Interactive Session</button>
 
-  <step-performance-view *ngIf="performanceViewSettings" [settings]="performanceViewSettings"></step-performance-view>
+  <step-performance-view
+    *ngIf="performanceViewSettings"
+    [settings]="performanceViewSettings"
+    (onInitializationComplete)="onPerformanceViewInitComplete()"
+    (onUpdateComplete)="onPerformanceViewUpdateComplete()"
+  >
+  </step-performance-view>
 </ng-container>
 <div *ngIf="executionHasToBeBuilt" class="info-container">
   <div class="content">

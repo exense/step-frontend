@@ -1,20 +1,12 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import {
-  AJS_MODULE,
-  AsyncTasksService,
-  AsyncTaskStatusResource,
-  DashboardService,
-  ExecutionsService,
-  pollAsyncTask,
-} from '@exense/step-core';
-import { TimeSeriesConfig } from '../time-series.config';
+import { AJS_MODULE, AsyncTasksService, DashboardService, ExecutionsService, pollAsyncTask } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PerformanceViewSettings } from '../performance-view/performance-view-settings';
 import { TimeSeriesService } from '../time-series.service';
 import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
-import { delay, map } from 'rxjs';
+import { forkJoin, Observable, of, Subject, Subscription, switchMap, tap, timer } from 'rxjs';
 
 @Component({
   selector: 'step-execution-performance',
@@ -28,14 +20,16 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   @Input() executionId!: string;
 
+  private dashboardInitComplete$ = new Subject<void>();
+
   executionInProgress = false;
-  refreshEnabled = false;
   performanceViewSettings: PerformanceViewSettings | undefined;
-  intervalExecution: any;
   intervalShouldBeCanceled = false;
 
   executionHasToBeBuilt = false;
   migrationInProgress = false;
+
+  updatingSubscription = new Subscription();
 
   // this is just for running executions
   refreshIntervals: RefreshInterval[] = [
@@ -69,18 +63,24 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  onPerformanceViewInitComplete() {
+    this.dashboardInitComplete$.next();
+    this.dashboardInitComplete$.complete();
+  }
+
+  onPerformanceViewUpdateComplete() {
+    // this.dashboardInitComplete.next();
+  }
+
   init() {
     this.executionService.getExecutionById(this.executionId).subscribe((execution) => {
-      let startTime = execution.startTime!;
-      // let now = new Date().getTime();
-      let endTime = undefined;
-      if (execution.endTime) {
-        // execution is over
-        endTime = execution.endTime; // + (TimeSeriesConfig.RESOLUTION - (execution.endTime % TimeSeriesConfig.RESOLUTION)); // not sure if needed
-      } else {
+      const startTime = execution.startTime!;
+      const endTime = execution.endTime ? execution.endTime : new Date().getTime();
+
+      if (!execution.endTime) {
         this.executionInProgress = true;
-        endTime = new Date().getTime();
       }
+
       this.performanceViewSettings = {
         contextId: this.executionId,
         startTime: startTime,
@@ -88,8 +88,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         contextualFilters: { eId: this.executionId },
       };
       if (this.executionInProgress) {
-        this.startRefreshInterval(this.selectedRefreshInterval.value);
-        this.refreshEnabled = true;
+        this.triggerNextUpdate(this.selectedRefreshInterval.value, this.dashboardInitComplete$);
       }
     });
   }
@@ -99,8 +98,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     this.timeSeriesService
       .rebuildTimeSeries(this.executionId)
       .pipe(pollAsyncTask(this._asyncTaskService))
-      .subscribe(
-        (task) => {
+      .subscribe({
+        next: (task) => {
           if (task.ready) {
             this.migrationInProgress = false;
             this.executionHasToBeBuilt = false;
@@ -109,59 +108,55 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
             console.error('The task is not finished yet');
           }
         },
-        (error) => {
+        error: (error) => {
           console.error(error);
-        }
-      );
+        },
+      });
   }
 
   changeRefreshInterval(newInterval: RefreshInterval) {
-    if (newInterval.value) {
-      if (this.selectedRefreshInterval.value === newInterval.value) {
-        return;
-      }
-      this.refreshEnabled = true;
-      clearInterval(this.intervalExecution);
-      this.startRefreshInterval(newInterval.value);
-    } else {
-      // we need to stop it
-      this.refreshEnabled = false;
-      clearInterval(this.intervalExecution);
-    }
+    const oldInterval = this.selectedRefreshInterval;
     this.selectedRefreshInterval = newInterval;
+    if (oldInterval.value === newInterval.value) {
+      return;
+    }
+    if (newInterval.value) {
+      this.updatingSubscription.unsubscribe();
+      this.triggerNextUpdate(newInterval.value, of(undefined));
+    }
   }
 
-  startRefreshInterval(interval: number) {
-    this.intervalExecution = setInterval(() => {
-      let now = new Date().getTime();
-      if (this.intervalShouldBeCanceled) {
-        clearTimeout(this.intervalExecution);
-        // the end time is updated already.
-      } else {
-        this.performanceViewSettings!.endTime =
-          now - (this.intervalShouldBeCanceled ? 0 : this.RUNNING_EXECUTION_END_TIME_BUFFER); // if the execution is not ended, we don't fetch until the end.
-      }
-
-      // this.findRequest.start = lastEnd - ((lastEnd - this.executionStart) % this.findRequest.intervalSize);
-      //   this.findRequest.end = now;
-      const timeSelection = this.performanceView.getTimeRangeSelection();
-      if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
-        let from = now - timeSelection.relativeSelection.timeInMs;
-        timeSelection.absoluteSelection = { from: from, to: now };
-      }
-      //   this.findRequest.numberOfBuckets = this.calculateIdealNumberOfBuckets(
-      //     this.findRequest.start,
-      //     this.findRequest.end
-      //   );
-      this.performanceView.reconstructAllCharts();
-      this.executionService.getExecutionById(this.executionId).subscribe((details) => {
+  triggerNextUpdate(delay: number, observableToWaitFor: Observable<unknown>) {
+    this.updatingSubscription = forkJoin([timer(delay), observableToWaitFor])
+      .pipe(
+        tap(() => {
+          const now = new Date().getTime();
+          if (this.executionInProgress) {
+            this.performanceViewSettings!.endTime =
+              now - (this.intervalShouldBeCanceled ? 0 : this.RUNNING_EXECUTION_END_TIME_BUFFER); // if the execution is not ended, we don't fetch until the end.
+          }
+          const timeSelection = this.performanceView.getTimeRangeSelection();
+          if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
+            const from = now - timeSelection.relativeSelection.timeInMs;
+            timeSelection.absoluteSelection = { from: from, to: now };
+          }
+        }),
+        switchMap(() => {
+          return this.executionService.getExecutionById(this.executionId);
+        })
+      )
+      .subscribe((details) => {
         if (details.endTime) {
           this.performanceViewSettings!.endTime = details.endTime;
           this.intervalShouldBeCanceled = true;
           this.executionInProgress = false;
+          this.performanceView.updateAllCharts().subscribe(() => {}); // don't re-trigger refresh
+        } else {
+          if (this.selectedRefreshInterval.value) {
+            this.triggerNextUpdate(this.selectedRefreshInterval.value, this.performanceView.updateAllCharts()); // recursive call
+          }
         }
       });
-    }, interval);
   }
 
   navigateToRtmDashboard() {
@@ -170,9 +165,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.contextsFactory.destroyContext(this.executionId);
-    if (this.intervalExecution) {
-      clearInterval(this.intervalExecution);
-    }
+    this.dashboardInitComplete$.complete();
+    this.updatingSubscription.unsubscribe();
   }
 }
 

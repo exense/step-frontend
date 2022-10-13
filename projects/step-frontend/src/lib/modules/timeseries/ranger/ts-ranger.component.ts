@@ -46,9 +46,11 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
    * 1. when a synced chart or this chart is zooming
    * 2. when the grips are moved
    */
-  @Output('onRangeChange') onRangeChange = new EventEmitter<TSTimeRange>();
+  @Output() onRangeChange = new EventEmitter<TSTimeRange>();
 
-  @Output('onZoomReset') onZoomReset = new EventEmitter<TSTimeRange>();
+  @Output() onZoomReset = new EventEmitter<TSTimeRange>();
+
+  @Output() onChartLoaded = new EventEmitter<void>();
 
   uplot!: any;
   previousRange: TSTimeRange | undefined;
@@ -344,6 +346,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       [this.settings.xValues, ...this.settings.series.map((s) => s.data)],
       this.chartElement.nativeElement
     );
+    this.onChartLoaded.emit();
   }
 
   emitSelectionToLinkedCharts() {

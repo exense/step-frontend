@@ -8,7 +8,7 @@ import { TimeSeriesKeywordsContext } from '../../execution-page/time-series-keyw
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
 import { BucketAttributes, TableDataSource, TableLocalDataSource, TableLocalDataSourceConfig } from '@exense/step-core';
 import { ExecutionContext } from '../../execution-page/execution-context';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription, tap } from 'rxjs';
 
 @Component({
   selector: 'step-timeseries-table',
@@ -29,6 +29,8 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   private keywordsService!: TimeSeriesKeywordsContext;
   @Input() executionContext!: ExecutionContext;
 
+  @Output() onInitializationComplete = new EventEmitter<void>();
+
   subscriptions: Subscription = new Subscription();
 
   // @Output('onKeywordsFetched') onKeywordsFetched = new EventEmitter<string[]>();
@@ -37,7 +39,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   sortByNameAttributeFn = (a: Bucket, b: Bucket) =>
     a.attributes.name.toLowerCase() > b.attributes.name.toLowerCase() ? 1 : -1;
 
-  constructor(private timeSeriesService: TimeSeriesService, private executionsPageService: TimeSeriesContextsFactory) {}
+  constructor(private timeSeriesService: TimeSeriesService) {}
 
   ngOnInit(): void {
     if (!this.executionContext) {
@@ -58,35 +60,40 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         if (!this.findRequest) {
           return;
         }
-        this.fetchBuckets(true);
+        this.fetchBucketsAndUpdateKeywords(true);
       })
     );
-    this.fetchBuckets();
+    this.fetchBucketsAndUpdateKeywords().subscribe(() => {
+      this.onInitializationComplete.emit();
+    });
   }
 
-  fetchBuckets(autoSelectAll = false) {
-    this.getBuckets(this.findRequest, (keywords) => this.keywordsService.setKeywords(keywords, autoSelectAll));
+  fetchBucketsAndUpdateKeywords(autoSelectAll = false): Observable<TimeSeriesChartResponse> {
+    return this.getBuckets(this.findRequest, (keywords) => this.keywordsService.setKeywords(keywords, autoSelectAll));
   }
 
   onKeywordToggle(keyword: string, event: any) {
     this.keywordsService.toggleKeyword(keyword);
   }
 
-  refresh(request: FindBucketsRequest) {
+  refresh(request: FindBucketsRequest): Observable<TimeSeriesChartResponse> {
     this.findRequest = request;
-    this.fetchBuckets();
+    return this.fetchBucketsAndUpdateKeywords();
   }
 
-  private getBuckets(request: FindBucketsRequest, keywordsCallback: (series: string[]) => void) {
+  private getBuckets(
+    request: FindBucketsRequest,
+    keywordsCallback: (series: string[]) => void
+  ): Observable<TimeSeriesChartResponse> {
     let groupDimensions = this.executionContext.getGroupDimensions();
-    this.timeSeriesService
-      .fetchBuckets({
-        ...request,
-        groupDimensions: groupDimensions,
-        numberOfBuckets: 1,
-        percentiles: [80, 90, 99],
-      })
-      .subscribe((response) => {
+    let fetchRequest = {
+      ...request,
+      groupDimensions: groupDimensions,
+      numberOfBuckets: 1,
+      percentiles: [80, 90, 99],
+    };
+    return this.timeSeriesService.fetchBuckets(fetchRequest).pipe(
+      tap((response) => {
         this.response = response;
         let keywords: string[] = [];
         this.tableDataSource = new TableLocalDataSource(
@@ -117,7 +124,8 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         );
         keywordsCallback(keywords);
         this.tableIsLoading = false;
-      });
+      })
+    );
   }
 
   getSeriesKey(attributes: BucketAttributes, groupDimensions: string[]) {
@@ -167,6 +175,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         pcl_90: (b1: Bucket, b2: Bucket) => b1.pclValues[90] - b2.pclValues[90],
         pcl_99: (b1: Bucket, b2: Bucket) => b1.pclValues[99] - b2.pclValues[99],
         tps: (b1: Bucket, b2: Bucket) => b1.attributes.tps - b2.attributes.tps,
+        tph: (b1: Bucket, b2: Bucket) => b1.attributes.tph - b2.attributes.tph,
       },
     };
   }
