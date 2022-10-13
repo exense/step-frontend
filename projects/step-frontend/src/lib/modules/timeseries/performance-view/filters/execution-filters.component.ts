@@ -15,7 +15,7 @@ export class ExecutionFiltersComponent implements OnInit {
 
   filterItems: FilterItem[] = [
     { label: 'Type', attributeName: 'type', options: ['keyword', 'custom'] },
-    { label: 'Status', attributeName: 'rnStatus', options: ['FAILED', 'PASSED'] },
+    { label: 'Status', attributeName: 'rnStatus', options: ['PASSED','FAILED','TECHNICAL_ERROR','INTERRUPTED'] },
   ];
 
   groupingOptions = [
