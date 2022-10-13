@@ -405,6 +405,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             value: (self, x) => TimeSeriesUtils.formatAxisValue(x) + '/h',
             stroke: color,
             fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
+            points: { show: false }
           };
         });
         this.byStatusSettings = {
