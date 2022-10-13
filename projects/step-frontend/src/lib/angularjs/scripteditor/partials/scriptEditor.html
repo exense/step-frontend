@@ -2,13 +2,13 @@
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="panel panel-default">
-				<div class="panel-heading">
+				<div class="panel-heading with-toolbar">
 					Script Editor - Keyword: {{function_.attributes.name}}
-					<div class="pull-right">
-						<div class="btn-group">
-							<button ng-click="execute()" popover-placement="bottom" popover-trigger="'outsideClick'" type="submit" class="btn btn-default btn-xs btn-run" title="Execute this plan"><step-ajs-icon name="play" aria-hidden="true"></step-ajs-icon></button>
-				  		</div>
-				  	</div>
+					<div class="panel-toolbar">
+						<button ng-click="execute()" popover-placement="bottom" popover-trigger="'outsideClick'" type="submit" class="btn btn-default btn-xs btn-run" title="Execute this plan">
+             <step-ajs-icon name="play" aria-hidden="true"></step-ajs-icon>
+           </button>
+				  </div>
 				</div>
 				<div class="panel-body">
 					<div class="form-group">
