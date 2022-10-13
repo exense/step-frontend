@@ -14,6 +14,6 @@ export interface TSChartSettings {
 }
 
 export interface TSChartSeries extends Series {
-  data: (number | null)[];
+  data: (number | null | undefined)[];
   id: string;
 }

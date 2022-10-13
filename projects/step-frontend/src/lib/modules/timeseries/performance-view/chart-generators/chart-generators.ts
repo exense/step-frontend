@@ -31,12 +31,12 @@ export class ChartGenerators {
 
   static createSummaryChartSettings(request: FindBucketsRequest, response: TimeSeriesChartResponse): TSChartSettings {
     let xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-    let avgValues: (number | null)[] = [];
+    let avgValues: (number | null | undefined)[] = [];
     let countValues: (number | null)[] = [];
     if (response.matrixKeys.length !== 0) {
       response.matrix[0].forEach((bucket) => {
-        avgValues.push(bucket ? Math.trunc(bucket.sum / bucket.count) : null);
-        countValues.push(bucket?.throughputPerHour);
+        avgValues.push(bucket ? Math.trunc(bucket.sum / bucket.count) : undefined);
+        countValues.push(bucket ? bucket.throughputPerHour : 0);
       });
     }
 
