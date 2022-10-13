@@ -167,7 +167,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.executionContext.onFiltersChange().subscribe((filters) => {
-        this.updateAllCharts();
+        this.updateAllCharts().subscribe();
       })
     );
     this.subscriptions.add(
