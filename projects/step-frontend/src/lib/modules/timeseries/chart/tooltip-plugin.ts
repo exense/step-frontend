@@ -97,8 +97,10 @@ export class TooltipPlugin {
             }
           }
           if (yPoints.length === 0) {
-            overlay.style.display = 'none';
+            overlay.style.zIndex = '-1';
             return; // there is no data to show
+          } else {
+            overlay.style.zIndex = '1000';
           }
           overlay.innerHTML = '';
           yPoints.forEach((point) => {

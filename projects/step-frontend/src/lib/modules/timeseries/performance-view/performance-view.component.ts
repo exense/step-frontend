@@ -416,6 +416,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           axes: [
             {
               size: this.CHART_LEGEND_SIZE,
+              label: 'Total',
+              labelSize: 24,
+              stroke: '#bfcbec',
+              scale: 'total',
               values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
             },
           ],
