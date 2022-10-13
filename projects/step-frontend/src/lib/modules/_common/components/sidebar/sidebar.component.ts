@@ -49,6 +49,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.openMainMenuBasedOnActualView();
+    this.openEssentialMainMenus();
   }
 
   ngOnDestroy(): void {
@@ -63,6 +64,15 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
         this.openMainMenu(initiallyExpandedMainMenuKey);
       }
     }
+  }
+
+  private openEssentialMainMenus(): void {
+    const essentialMenuWeightThreshold = 20;
+    this._viewRegistryService.getMainMenuAll().forEach((menu: MenuEntry) => {
+      if (menu.weight && menu.weight <= essentialMenuWeightThreshold) {
+        this.openMainMenu(menu.viewId);
+      }
+    });
   }
 
   private openMainMenu(mainMenuKey: string): void {
