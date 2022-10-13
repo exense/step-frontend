@@ -1,9 +1,10 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, Inject } from '@angular/core';
+import { IRootScopeService } from 'angular';
 import {
   AJS_MODULE,
+  AJS_ROOT_SCOPE,
   AugmentedAdminService,
   Mutable,
-  ProjectDto,
   ReferencesService,
   TableLocalDataSource,
 } from '@exense/step-core';
@@ -27,7 +28,8 @@ export class IsUsedByListComponent {
 
   readonly inProgress: boolean = false;
 
-  projectIdToDtoMap: { [id: string]: ProjectDto } = {};
+  projectIdToProjectNameMap: { [id: string]: string } = {};
+  currentProjectName: string = '';
   emptyResults: boolean = false;
 
   private _findReferencesRequest$ = new BehaviorSubject<unknown>({});
@@ -39,42 +41,23 @@ export class IsUsedByListComponent {
         searchValue: this.id,
       })
     ),
-    tap((result) => {
-      this.emptyResults = result.length === 0;
-      if (!this.emptyResults) {
-        const firstResultHasProject = !!result[0].attributes!['project'];
-        if (firstResultHasProject && Object.keys(this.projectIdToDtoMap).length === 0) {
-          this.projects$.subscribe((projectIdToDto) => {
-            this.projectIdToDtoMap = projectIdToDto;
-          });
-        }
-      }
-    }),
+    tap((result) => (this.emptyResults = result.length === 0)),
     tap(() => ((this as InProgress).inProgress = false)),
     shareReplay(1)
-  );
-
-  private projects$ = this._augmentedAdminService.getAllProjects().pipe(
-    map((projectDtos: Array<ProjectDto>) => {
-      return projectDtos.reduce(function (map: { [id: string]: ProjectDto }, dto) {
-        map[dto.id] = dto;
-        return map;
-      }, {});
-    })
   );
 
   readonly searchableReferences$ = new TableLocalDataSource(this.references$, {
     searchPredicates: {
       project: (element, searchValue) =>
-        this.projectIdToDtoMap[element.attributes!['project']!.toLowerCase()].attributes.name.includes(
-          searchValue.toLowerCase()
-        ),
+        this.projectIdToProjectNameMap[element.attributes!['project']]
+          .toLowerCase()
+          .includes(searchValue.toLowerCase()),
     },
     sortPredicates: {
       project: (elementA, elementB) =>
-        this.projectIdToDtoMap[elementB.attributes!['project']!.toLowerCase()].attributes.name.localeCompare(
-          this.projectIdToDtoMap[elementB.attributes!['project']!.toLowerCase()].attributes.name
-        ),
+        this.projectIdToProjectNameMap[elementB.attributes!['project']]
+          .toLowerCase()
+          .localeCompare(this.projectIdToProjectNameMap[elementB.attributes!['project']].toLowerCase()),
     },
   });
 
@@ -82,7 +65,26 @@ export class IsUsedByListComponent {
     this.onClose.emit({});
   }
 
-  constructor(private _referencesService: ReferencesService, private _augmentedAdminService: AugmentedAdminService) {}
+  constructor(
+    private _referencesService: ReferencesService,
+    private _augmentedAdminService: AugmentedAdminService,
+    @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService
+  ) {
+    this.initTenants();
+  }
+
+  /**
+   * Relevant for EE: Reads available projects and currently selected
+   * @private
+   */
+  private initTenants() {
+    this.currentProjectName = (this._$rootScope as any).tenant?.name;
+    const tenants: Array<any> = (this._$rootScope as any).tenants;
+    this.projectIdToProjectNameMap = tenants?.reduce(function (map: { [id: string]: string }, dto) {
+      map[dto.projectId] = dto.name;
+      return map;
+    }, {});
+  }
 }
 
 getAngularJSGlobal()

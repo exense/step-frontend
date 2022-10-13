@@ -32,7 +32,9 @@
   </ng-container>
   <ng-container matColumnDef="project" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Project</th>
-    <td mat-cell *matCellDef="let element">{{ projectIdToDtoMap[element.attributes?.project]?.attributes?.name }}</td>
+    <td mat-cell *matCellDef="let element">
+      <span *ngIf="currentProjectName === '[All]'">{{ projectIdToProjectNameMap[element.attributes?.project] }}</span>
+    </td>
   </ng-container>
 </step-table>
 
