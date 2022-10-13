@@ -175,6 +175,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
         this.groupDimensions = groupDimensions;
         this.mergeRequestWithActiveFilters();
         this.createByKeywordsCharts({ ...this.findRequest, groupDimensions: groupDimensions });
+        this.updateAllCharts().subscribe();
       })
     );
 
@@ -399,7 +400,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           return {
             id: status,
             label: status,
-            data: series.map((b) => (b ? b.throughputPerHour : null)),
+            data: series.map((b) => b ? b.throughputPerHour : 0),
             // scale: 'mb',
             value: (self, x) => TimeSeriesUtils.formatAxisValue(x) + '/h',
             stroke: color,
@@ -448,7 +449,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           let throughputSeries: TSChartSeries[] = [];
           response.matrixKeys.map((key, i) => {
             key = this.getSeriesKey(key, groupDimensions);
-            let responseTimeData: (number | null)[] = [];
+            let responseTimeData: (number | null | undefined)[] = [];
             let color = this.keywordsService.getColor(key);
             let countData = response.matrix[i].map((b, j) => {
               let bucketValue = b?.throughputPerHour;
@@ -460,9 +461,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
               if (b) {
                 responseTimeData.push(this.selectedMetric.mapFunction(b));
               } else {
-                responseTimeData.push(null);
+                responseTimeData.push(undefined);
               }
-              return bucketValue;
+              return bucketValue ? bucketValue : 0;
             });
             let keywordSelection = this.keywordsService.getKeywordSelection(key);
             let series = {
