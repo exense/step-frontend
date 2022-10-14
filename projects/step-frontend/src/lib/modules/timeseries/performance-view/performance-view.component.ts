@@ -86,6 +86,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   executionStart: number = 0;
   executionInProgress = false;
   refreshEnabled = false;
+  chartsAreLoading = false;
 
   // this is just for running executions
   refreshIntervals: RefreshInterval[] = [
@@ -232,6 +233,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   updateAllCharts(): Observable<unknown> {
+    this.chartsAreLoading = true;
     this.findRequest = this.prepareFindRequest(this.settings); // we don't want to lose active filters
     this.mergeRequestWithActiveFilters();
 
@@ -246,7 +248,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       charts$.push(this.createThreadGroupsChart(this.findRequest));
     }
 
-    return forkJoin(charts$);
+    return forkJoin(charts$).pipe(tap(() => (this.chartsAreLoading = false)));
   }
 
   mergeRequestWithActiveFilters() {
@@ -400,12 +402,12 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           return {
             id: status,
             label: status,
-            data: series.map((b) => b ? b.throughputPerHour : 0),
+            data: series.map((b) => (b ? b.throughputPerHour : 0)),
             // scale: 'mb',
             value: (self, x) => TimeSeriesUtils.formatAxisValue(x) + '/h',
             stroke: color,
             fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
-            points: { show: false }
+            points: { show: false },
           };
         });
         this.byStatusSettings = {
