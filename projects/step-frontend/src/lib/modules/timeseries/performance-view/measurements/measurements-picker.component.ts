@@ -2,7 +2,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
 import { KeywordSelection, TimeSeriesKeywordsContext } from '../../execution-page/time-series-keywords.context';
 import { KeyValue } from '@angular/common';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'step-measurements-picker',
@@ -18,7 +18,7 @@ export class MeasurementsPickerComponent implements OnInit, OnDestroy {
   allSeriesChecked: boolean = true;
   activeKeywords = 0;
 
-  subscriptions: Subscription = new Subscription();
+  subscriptionsTerminator$ = new Subject<void>();
 
   constructor(private executionPageService: TimeSeriesContextsFactory) {}
 
@@ -27,8 +27,10 @@ export class MeasurementsPickerComponent implements OnInit, OnDestroy {
       throw new Error('Context Id input must be present');
     }
     this.keywordsService = this.executionPageService.getContext(this.contextId).getKeywordsContext();
-    this.subscriptions.add(
-      this.keywordsService.onKeywordsUpdated().subscribe((keywords) => {
+    this.keywordsService
+      .onKeywordsUpdated()
+      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .subscribe((keywords) => {
         this.keywords = keywords;
         this.activeKeywords = 0;
         let visibleKeywords = 0;
@@ -44,13 +46,15 @@ export class MeasurementsPickerComponent implements OnInit, OnDestroy {
         if (visibleKeywords === this.activeKeywords) {
           this.allSeriesChecked = true;
         }
-      })
-    );
-    this.subscriptions.add(
-      this.keywordsService.onAllSelectionChanged().subscribe((allSelected) => (this.allSeriesChecked = allSelected))
-    );
-    this.subscriptions.add(
-      this.keywordsService.onKeywordToggled().subscribe((selection) => {
+      });
+    this.keywordsService
+      .onAllSelectionChanged()
+      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .subscribe((allSelected) => (this.allSeriesChecked = allSelected));
+    this.keywordsService
+      .onKeywordToggled()
+      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .subscribe((selection) => {
         let isSelected = this.keywords[selection.id].isSelected;
         if (isSelected) {
           this.activeKeywords++;
@@ -58,8 +62,7 @@ export class MeasurementsPickerComponent implements OnInit, OnDestroy {
           this.allSeriesChecked = false;
           this.activeKeywords--;
         }
-      })
-    );
+      });
   }
 
   onAllSeriesCheckboxClick(event: any) {
@@ -75,8 +78,6 @@ export class MeasurementsPickerComponent implements OnInit, OnDestroy {
   };
 
   ngOnDestroy(): void {
-    if (this.subscriptions) {
-      this.subscriptions.unsubscribe();
-    }
+    this.subscriptionsTerminator$.next();
   }
 }

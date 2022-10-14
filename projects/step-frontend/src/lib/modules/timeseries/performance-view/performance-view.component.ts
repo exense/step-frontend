@@ -11,7 +11,7 @@ import { TSRangerComponent } from '../ranger/ts-ranger.component';
 import { UPlotUtils } from '../uplot/uPlot.utils';
 import { TimeSeriesConfig } from '../time-series.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
-import { first, forkJoin, Observable, of, Subject, Subscription, take, tap } from 'rxjs';
+import { first, forkJoin, Observable, of, Subject, Subscription, take, takeUntil, tap } from 'rxjs';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { ExecutionContext } from '../execution-page/execution-context';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
@@ -99,7 +99,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   selectedRefreshInterval: RefreshInterval = this.refreshIntervals[0];
   timeSelection!: ExecutionTimeSelection;
 
-  subscriptions: Subscription = new Subscription();
+  subscriptionsTerminator$ = new Subject<void>();
   intervalShouldBeCanceled = false;
 
   allSeriesChecked: boolean = true;
@@ -140,44 +140,50 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     }
     this.findRequest = this.prepareFindRequest(this.settings);
     this.initContext();
-    this.subscriptions.add(
-      this.keywordsService.onAllSelectionChanged().subscribe((selected) => {
+    this.keywordsService
+      .onAllSelectionChanged()
+      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .subscribe((selected) => {
         this.allSeriesChecked = selected;
-      })
-    );
-    this.subscriptions.add(
-      this.keywordsService.onKeywordToggled().subscribe((selection) => {
+      });
+    this.keywordsService
+      .onKeywordToggled()
+      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .subscribe((selection) => {
         this.throughputChart.setSeriesVisibility(selection.id, selection.isSelected);
         this.responseTimeChart.setSeriesVisibility(selection.id, selection.isSelected);
         this.keywords[selection.id] = selection;
-      })
-    );
-    this.subscriptions.add(
-      this.keywordsService.onKeywordsUpdated().subscribe((keywords) => {
+      });
+    this.keywordsService
+      .onKeywordsUpdated()
+      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .subscribe((keywords) => {
         this.keywords = keywords;
-      })
-    );
-    this.subscriptions.add(
-      this.executionContext.onActiveSelectionChange().subscribe((newRange) => {
+      });
+    this.executionContext
+      .onActiveSelectionChange()
+      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .subscribe((newRange) => {
         this.timeSelection = newRange;
         this.updateTable();
         // the event is handled from the parent, so no action needed here.
-      })
-    );
+      });
 
-    this.subscriptions.add(
-      this.executionContext.onFiltersChange().subscribe((filters) => {
+    this.executionContext
+      .onFiltersChange()
+      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .subscribe((filters) => {
         this.updateAllCharts().subscribe();
-      })
-    );
-    this.subscriptions.add(
-      this.executionContext.onGroupingChange().subscribe((groupDimensions: string[]) => {
+      });
+    this.executionContext
+      .onGroupingChange()
+      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .subscribe((groupDimensions: string[]) => {
         this.groupDimensions = groupDimensions;
         this.mergeRequestWithActiveFilters();
         this.createByKeywordsCharts({ ...this.findRequest, groupDimensions: groupDimensions });
         this.updateAllCharts().subscribe();
-      })
-    );
+      });
 
     this.createAllCharts();
   }
@@ -228,7 +234,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       charts$.push(this.createThreadGroupsChart(this.findRequest));
     }
 
-    forkJoin(charts$).subscribe((allCompleted) => this.onInitializationComplete.emit());
+    forkJoin(charts$)
+      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .subscribe((allCompleted) => this.onInitializationComplete.emit());
   }
 
   updateAllCharts(): Observable<unknown> {
@@ -400,12 +408,12 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           return {
             id: status,
             label: status,
-            data: series.map((b) => b ? b.throughputPerHour : 0),
+            data: series.map((b) => (b ? b.throughputPerHour : 0)),
             // scale: 'mb',
             value: (self, x) => TimeSeriesUtils.formatAxisValue(x) + '/h',
             stroke: color,
             fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
-            points: { show: false }
+            points: { show: false },
           };
         });
         this.byStatusSettings = {
@@ -591,9 +599,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.subscriptions) {
-      this.subscriptions.unsubscribe();
-    }
+    this.subscriptionsTerminator$.next();
     this.tableInitialized$.complete();
     this.rangerLoaded$.complete();
   }
