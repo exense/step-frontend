@@ -8,7 +8,7 @@ import { TimeSeriesKeywordsContext } from '../../execution-page/time-series-keyw
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
 import { BucketAttributes, TableDataSource, TableLocalDataSource, TableLocalDataSourceConfig } from '@exense/step-core';
 import { ExecutionContext } from '../../execution-page/execution-context';
-import { Observable, Subscription, tap } from 'rxjs';
+import { Observable, Subject, Subscription, tap } from 'rxjs';
 
 @Component({
   selector: 'step-timeseries-table',
@@ -18,7 +18,9 @@ import { Observable, Subscription, tap } from 'rxjs';
 export class TimeseriesTableComponent implements OnInit, OnDestroy {
   // TODO use a dynamic list for percentiles
   tableColumns = ['name', 'count', 'sum', 'avg', 'min', 'max', 'pcl_90', 'pcl_90', 'pcl_99', 'tps', 'tph'];
+  tableData$ = new Subject<Bucket[]>();
   tableDataSource: TableDataSource<Bucket> | undefined;
+
   bucketsByKeywords: { [key: string]: Bucket } = {};
   tableIsLoading = true;
   dimensionKey = 'name';
@@ -48,6 +50,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     if (!this.findRequest) {
       throw new Error('FindRequest input is mandatory');
     }
+    this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
     this.keywordsService = this.executionContext.getKeywordsContext();
     this.subscriptions.add(
       this.keywordsService.onKeywordToggled().subscribe((selection) => {
@@ -96,32 +99,30 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
       tap((response) => {
         this.response = response;
         let keywords: string[] = [];
-        this.tableDataSource = new TableLocalDataSource(
-          response.matrix
-            .map((series, i) => {
-              if (series.length != 1) {
-                // we should have just one bucket
-                throw new Error('Something went wrong');
-              }
-              let seriesAttributes = response.matrixKeys[i];
-              let bucket = series[0];
-              bucket.attributes = seriesAttributes;
-              let seriesKey = this.getSeriesKey(seriesAttributes, groupDimensions);
-              bucket.attributes._id = seriesKey;
-              bucket.attributes.color = this.keywordsService.getColor(seriesKey);
-              bucket.attributes.avg = (bucket.sum / bucket.count).toFixed(0);
-              bucket.attributes.tps = Math.trunc(bucket.count / ((response.end - response.start) / 1000));
-              bucket.attributes.tph = Math.trunc((bucket.count / ((response.end - response.start) / 1000)) * 3600);
-              let keywordSelection = this.keywordsService.getKeywordSelection(seriesKey);
-              bucket.attributes.isSelected = keywordSelection ? keywordSelection.isSelected : true; // true because it has not been loaded yet
-              // this.keywords[attributes[dimensionKey]] = { color: color, isSelected: true };
-              keywords.push(seriesKey);
-              this.bucketsByKeywords[seriesKey] = bucket;
-              return bucket;
-            })
-            .sort(this.sortByNameAttributeFn),
-          this.getDatasourceConfig()
-        );
+        let tableBuckets = response.matrix
+          .map((series, i) => {
+            if (series.length != 1) {
+              // we should have just one bucket
+              throw new Error('Something went wrong');
+            }
+            let seriesAttributes = response.matrixKeys[i];
+            let bucket = series[0];
+            bucket.attributes = seriesAttributes;
+            let seriesKey = this.getSeriesKey(seriesAttributes, groupDimensions);
+            bucket.attributes._id = seriesKey;
+            bucket.attributes.color = this.keywordsService.getColor(seriesKey);
+            bucket.attributes.avg = (bucket.sum / bucket.count).toFixed(0);
+            bucket.attributes.tps = Math.trunc(bucket.count / ((response.end - response.start) / 1000));
+            bucket.attributes.tph = Math.trunc((bucket.count / ((response.end - response.start) / 1000)) * 3600);
+            let keywordSelection = this.keywordsService.getKeywordSelection(seriesKey);
+            bucket.attributes.isSelected = keywordSelection ? keywordSelection.isSelected : true; // true because it has not been loaded yet
+            // this.keywords[attributes[dimensionKey]] = { color: color, isSelected: true };
+            keywords.push(seriesKey);
+            this.bucketsByKeywords[seriesKey] = bucket;
+            return bucket;
+          })
+          .sort(this.sortByNameAttributeFn);
+        this.tableData$.next(tableBuckets);
         keywordsCallback(keywords);
         this.tableIsLoading = false;
       })
@@ -188,5 +189,6 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     if (this.subscriptions) {
       this.subscriptions.unsubscribe();
     }
+    this.tableData$.complete();
   }
 }
