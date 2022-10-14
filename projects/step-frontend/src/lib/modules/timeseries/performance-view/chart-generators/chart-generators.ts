@@ -45,6 +45,7 @@ export class ChartGenerators {
       showLegend: true,
       xValues: xLabels,
       yScaleUnit: 'ms',
+      zScaleTooltipLabel: 'Hits/h',
       series: [
         {
           id: 'avg',

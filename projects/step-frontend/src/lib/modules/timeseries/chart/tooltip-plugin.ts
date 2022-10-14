@@ -1,6 +1,7 @@
 //@ts-ignore
 import uPlot = require('uplot');
 import { PlacementFunction } from './placement-function';
+import { set } from 'husky';
 
 interface TooltipRowEntry {
   value: number;
@@ -15,10 +16,15 @@ interface Anchor {
   right?: number;
 }
 
+interface TooltipPluginSettings {
+  yScaleUnit?: string; // string to append on the y axis values
+  zAxisLabel?: string;
+}
+
 export class TooltipPlugin {
   static readonly SUMMARY_BARS_COLOR = '#97a7d7';
 
-  public static getInstance(yScaleUnit?: string): uPlot.Plugin {
+  public static getInstance(settings: TooltipPluginSettings): uPlot.Plugin {
     let over: any;
     let bound: any;
     let bLeft: any;
@@ -79,7 +85,7 @@ export class TooltipPlugin {
               continue;
             }
             if (series.scale === 'total' && bucketValue) {
-              summaryRow = { value: bucketValue, color: this.SUMMARY_BARS_COLOR, name: 'Total' };
+              summaryRow = { value: bucketValue, color: this.SUMMARY_BARS_COLOR, name: settings.zAxisLabel || 'Total' };
             }
           }
           yPoints.sort((a, b) => (a.value - b.value) * -1);
@@ -107,7 +113,7 @@ export class TooltipPlugin {
           }
           overlay.innerHTML = '';
           yPoints.forEach((point) => {
-            let rowElement = this.createRowElement(point, yScaleUnit);
+            let rowElement = this.createRowElement(point, settings.yScaleUnit);
             overlay.appendChild(rowElement);
           });
           if (yPoints.length < allSeriesLength) {
@@ -161,8 +167,6 @@ export class TooltipPlugin {
     rowElement.appendChild(content);
     return rowElement;
   }
-
-  private static createSummaryRow() {}
 
   private static getClosestIndex(num: number, arr: TooltipRowEntry[]): number {
     let curr = arr[0];

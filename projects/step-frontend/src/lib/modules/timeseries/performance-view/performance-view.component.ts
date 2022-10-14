@@ -400,12 +400,12 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           return {
             id: status,
             label: status,
-            data: series.map((b) => b ? b.throughputPerHour : 0),
+            data: series.map((b) => (b ? b.throughputPerHour : 0)),
             // scale: 'mb',
             value: (self, x) => TimeSeriesUtils.formatAxisValue(x) + '/h',
             stroke: color,
             fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
-            points: { show: false }
+            points: { show: false },
           };
         });
         this.byStatusSettings = {
@@ -486,6 +486,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             title: 'Throughput',
             xValues: timeLabels,
             showLegend: false,
+            zScaleTooltipLabel: 'Total Hits/h',
             series: [
               {
                 scale: 'total',
