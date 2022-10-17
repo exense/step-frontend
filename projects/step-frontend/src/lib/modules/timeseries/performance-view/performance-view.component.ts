@@ -488,6 +488,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             title: 'Throughput',
             xValues: timeLabels,
             showLegend: false,
+            zScaleTooltipLabel: 'Total Hits/h',
             series: [
               {
                 scale: 'total',

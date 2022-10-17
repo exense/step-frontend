@@ -11,6 +11,7 @@ export interface TSChartSettings {
   axes?: Axis[];
   showLegend?: boolean; // show legend behind the chart
   yScaleUnit?: string; // the unit which will be displayed along with the Y axis.
+  zScaleTooltipLabel?: string;
 }
 
 export interface TSChartSeries extends Series {
