@@ -1,7 +1,7 @@
 //@ts-ignore
 import uPlot = require('uplot');
 import { PlacementFunction } from './placement-function';
-import { set } from 'husky';
+import { TimeSeriesConfig } from '../time-series.config';
 
 interface TooltipRowEntry {
   value: number;
@@ -22,8 +22,6 @@ interface TooltipPluginSettings {
 }
 
 export class TooltipPlugin {
-  static readonly SUMMARY_BARS_COLOR = '#97a7d7';
-
   public static getInstance(settings: TooltipPluginSettings): uPlot.Plugin {
     let over: any;
     let bound: any;
@@ -85,7 +83,11 @@ export class TooltipPlugin {
               continue;
             }
             if (series.scale === 'total' && bucketValue) {
-              summaryRow = { value: bucketValue, color: this.SUMMARY_BARS_COLOR, name: settings.zAxisLabel || 'Total' };
+              summaryRow = {
+                value: bucketValue,
+                color: TimeSeriesConfig.SUMMARY_BARS_COLOR,
+                name: settings.zAxisLabel || 'Total',
+              };
             }
           }
           yPoints.sort((a, b) => (a.value - b.value) * -1);
