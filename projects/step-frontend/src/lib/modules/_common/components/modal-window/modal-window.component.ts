@@ -9,10 +9,7 @@ import { ModalWindowService } from './modal-window.service';
   styleUrls: ['./modal-window.component.scss'],
 })
 export class ModalWindowComponent {
-  @ViewChild('customButtons', { read: ViewContainerRef, static: true }) container?: ViewContainerRef;
-
   @Input() title: string = '';
-  @Input() componentName: string = '';
 
   constructor(public modalWindowService: ModalWindowService) {}
 }
