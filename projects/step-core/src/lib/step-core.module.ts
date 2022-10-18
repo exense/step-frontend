@@ -19,6 +19,7 @@ import { CapsLockDirective } from './directives/caps-lock.directive';
 import { CustomRegistriesModule } from './modules/custom-registeries/custom-registries.module';
 import { TabsModule } from './modules/tabs/tabs.module';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
+import { TreeModule } from './modules/tree/tree.module';
 
 @NgModule({
   declarations: [
@@ -42,6 +43,7 @@ import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-c
     StepGeneratedClientModule,
     CustomRegistriesModule,
     TabsModule,
+    TreeModule,
   ],
   exports: [
     CommonModule,
@@ -62,6 +64,7 @@ import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-c
     CustomRegistriesModule,
     TabsModule,
     TooltipImmediateCloseDirective,
+    TreeModule,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -100,7 +103,6 @@ export * from './services/view-state.service';
 export * from './services/context.service';
 export * from './services/plugin-info-registry.service';
 export * from './services/additional-right-rule.service';
-export * from './services/artefact-types.service';
 export * from './services/report-node-commons.service';
 export { UibModalInstance, UibModalHelperService } from './services/uib-modal-helper.service';
 export * from './angularjs';
@@ -120,6 +122,7 @@ export * from './modules/custom-registeries/custom-registries.module';
 export * from './modules/async-operations/async-operations.module';
 export * from './modules/tabs/tabs.module';
 export * from './modules/step-icons/step-icons.module';
+export * from './modules/tree/tree.module';
 
 export { ApiError } from './client/generated/core/ApiError';
 export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
