@@ -10,6 +10,7 @@ import { MenuFilterPipe } from './pipes/menu-filter.pipe';
 import { IsUsedByListComponent } from './components/is-used-by-list/is-used-by-list.component';
 import { PlanLinkComponent } from './components/plan-link/plan-link.component';
 import { FunctionLinkComponent } from './components/function-link/function-link.component';
+import { ModalWindowComponent } from './components/modal-window/modal-window.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { FunctionLinkComponent } from './components/function-link/function-link.
     IsUsedByListComponent,
     PlanLinkComponent,
     FunctionLinkComponent,
+    ModalWindowComponent,
     JsonViewerDirective,
     IsEmptyJsonPipe,
     MenuFilterPipe,
@@ -33,6 +35,7 @@ import { FunctionLinkComponent } from './components/function-link/function-link.
     IsUsedByListComponent,
     PlanLinkComponent,
     FunctionLinkComponent,
+    ModalWindowComponent,
     JsonViewerDirective,
     IsEmptyJsonPipe,
     MenuFilterPipe,

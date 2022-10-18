@@ -20,9 +20,9 @@ type InProgress = Mutable<Pick<IsUsedByListComponent, 'inProgress'>>;
   styleUrls: ['./is-used-by-list.component.scss'],
 })
 export class IsUsedByListComponent {
-  @Input() title!: string;
-  @Input() type!: string;
-  @Input() id!: string;
+  @Input() title: string = '';
+  @Input() type: string = '';
+  @Input() id: string = '';
 
   @Output() onClose = new EventEmitter<any>();
 
@@ -34,15 +34,15 @@ export class IsUsedByListComponent {
 
   private _findReferencesRequest$ = new BehaviorSubject<unknown>({});
   readonly references$ = this._findReferencesRequest$.pipe(
-    tap(() => ((this as InProgress).inProgress = true)),
+    // tap(() => ((this as InProgress).inProgress = true)),
     switchMap(() =>
       this._referencesService.findReferences({
         searchType: this.type as SearchType,
         searchValue: this.id,
       })
     ),
-    tap((result) => (this.emptyResults = result.length === 0)),
-    tap(() => ((this as InProgress).inProgress = false)),
+    // tap((result) => (this.emptyResults = result.length === 0)),
+    // tap(() => ((this as InProgress).inProgress = false)),
     shareReplay(1)
   );
 

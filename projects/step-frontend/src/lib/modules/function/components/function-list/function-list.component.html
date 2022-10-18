@@ -57,14 +57,14 @@
       <step-entity-selection-di [entity]="element"></step-entity-selection-di>
     </td>
   </ng-container>
-  <step-custom-columns screen="functionTable"> </step-custom-columns>
+  <step-custom-columns screen="functionTable"></step-custom-columns>
   <ng-container matColumnDef="type" stepSearchCol #searchState="SearchCol">
     <step-function-type-filter *stepSearchCellDef (selectedItemsChange)="searchState.search($event, true)">
     </step-function-type-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
     <td mat-cell *matCellDef="let element">{{ element.type | functionTypeLabel }}</td>
   </ng-container>
-  <step-custom-columns screen="functionTableExtensions" [isSearchDisabled]="false"> </step-custom-columns>
+  <step-custom-columns screen="functionTableExtensions" [isSearchDisabled]="false"></step-custom-columns>
   <ng-container matColumnDef="actions">
     <th mat-header-cell *matHeaderCellDef>Actions</th>
     <td mat-cell *matCellDef="let element" class="cell-actions">
@@ -121,10 +121,22 @@
       Export Keyword
     </button>
 
+    <ng-template #modalWindowTemplate>
+      <step-modal-window [title]="'Keyword ' + element.attributes.name + ' is used by'">
+        <div step-modal-window-body>
+          <step-is-used-by-list
+            [title]="element.attributes.name"
+            [id]="element.id"
+            [type]="'KEYWORD_ID'"
+          ></step-is-used-by-list>
+        </div>
+      </step-modal-window>
+    </ng-template>
+
     <button
       mat-menu-item
       [disabled]="!('kw-read' | hasRight | async)"
-      (click)="lookUp(element.id, element.attributes.name)"
+      (click)="_modalWindowService.openModal(modalWindowTemplate)"
     >
       <step-icon name="search"></step-icon>
       Find usages

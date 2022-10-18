@@ -14,6 +14,7 @@ import { PlanDialogsService } from '../../services/plan-dialogs.service';
 import { noop } from 'rxjs';
 import { ILocationService } from 'angular';
 import { PlansBulkOperationsInvokeService } from '../../services/plans-bulk-operations-invoke.service';
+import { ModalWindowService } from '../../../_common/components/modal-window/modal-window.service';
 
 @Component({
   selector: 'step-plan-list',
@@ -35,6 +36,7 @@ export class PlanListComponent {
   ];
   constructor(
     readonly _plansApiService: AugmentedPlansService,
+    readonly _modalWindowService: ModalWindowService,
     private _planDialogs: PlanDialogsService,
     @Inject(AJS_LOCATION) private _location: ILocationService
   ) {}
@@ -73,10 +75,6 @@ export class PlanListComponent {
 
   exportPlan(id: string, name: string): void {
     this._planDialogs.exportPlan(id, name).subscribe(noop);
-  }
-
-  lookUp(id: string, name: string): void {
-    this._planDialogs.lookUp(id, name).subscribe(noop);
   }
 }
 
