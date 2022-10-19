@@ -20,6 +20,14 @@
       }
     }
 
+    .separator {
+      height: 1px;
+      width: 100%;
+      background: #666666;
+      margin: 4px 0;
+      opacity: 0.2;
+    }
+
     .dots {
       font-size: 18px;
     }

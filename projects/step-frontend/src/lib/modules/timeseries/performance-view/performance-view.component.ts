@@ -86,6 +86,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   executionStart: number = 0;
   executionInProgress = false;
   refreshEnabled = false;
+  chartsAreLoading = false;
 
   // this is just for running executions
   refreshIntervals: RefreshInterval[] = [
@@ -240,6 +241,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   updateAllCharts(): Observable<unknown> {
+    this.chartsAreLoading = true;
     this.findRequest = this.prepareFindRequest(this.settings); // we don't want to lose active filters
     this.mergeRequestWithActiveFilters();
 
@@ -254,7 +256,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       charts$.push(this.createThreadGroupsChart(this.findRequest));
     }
 
-    return forkJoin(charts$);
+    return forkJoin(charts$).pipe(tap(() => (this.chartsAreLoading = false)));
   }
 
   mergeRequestWithActiveFilters() {
@@ -494,6 +496,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             title: 'Throughput',
             xValues: timeLabels,
             showLegend: false,
+            zScaleTooltipLabel: 'Total Hits/h',
             series: [
               {
                 scale: 'total',
