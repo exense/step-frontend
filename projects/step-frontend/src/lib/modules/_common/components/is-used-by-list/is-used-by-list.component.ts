@@ -9,7 +9,7 @@ import {
   TableLocalDataSource,
 } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { BehaviorSubject, switchMap, shareReplay, tap, pipe, map } from 'rxjs';
+import { BehaviorSubject, switchMap, shareReplay, tap, pipe, map, startWith } from 'rxjs';
 
 type SearchType = 'PLAN_ID' | 'PLAN_NAME' | 'KEYWORD_ID' | 'KEYWORD_NAME' | 'RESOURCE_ID' | 'RESOURCE_NAME';
 type InProgress = Mutable<Pick<IsUsedByListComponent, 'inProgress'>>;
@@ -30,20 +30,23 @@ export class IsUsedByListComponent {
 
   projectIdToProjectNameMap: { [id: string]: string } = {};
   currentProjectName: string = '';
-  emptyResults: boolean = false;
 
   private _findReferencesRequest$ = new BehaviorSubject<unknown>({});
   readonly references$ = this._findReferencesRequest$.pipe(
-    // tap(() => ((this as InProgress).inProgress = true)),
+    tap(() => ((this as InProgress).inProgress = true)),
     switchMap(() =>
       this._referencesService.findReferences({
         searchType: this.type as SearchType,
         searchValue: this.id,
       })
     ),
-    // tap((result) => (this.emptyResults = result.length === 0)),
-    // tap(() => ((this as InProgress).inProgress = false)),
+    tap(() => ((this as InProgress).inProgress = false)),
     shareReplay(1)
+  );
+
+  readonly emptyResults$ = this.references$.pipe(
+    map((result) => result.length === 0),
+    startWith(false)
   );
 
   readonly searchableReferences$ = new TableLocalDataSource(this.references$, {

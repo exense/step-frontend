@@ -1,5 +1,5 @@
 <step-table
-  *ngIf="!emptyResults"
+  *ngIf="!(emptyResults$ | async)"
   [pageSizeInputDisabled]="true"
   [dataSource]="searchableReferences$"
   matSort
@@ -34,4 +34,4 @@
   </ng-container>
 </step-table>
 
-<p *ngIf="emptyResults" class="notification-text-not-used">Component is not used by other components.</p>
+<p *ngIf="emptyResults$ | async" class="notification-text-not-used">Component is not used by other components.</p>
