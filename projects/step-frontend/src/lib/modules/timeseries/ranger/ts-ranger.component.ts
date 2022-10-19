@@ -97,12 +97,8 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
 
   selectRange(fromTimestamp?: number, toTimestamp?: number) {
     let select = this.transformRangeToSelect({ from: fromTimestamp, to: toTimestamp });
-    this.uplot.setSelect(select, false);
+    // this.uplot.setSelect(select, false);
     this.emitSelectionToLinkedCharts();
-
-    // if (emitChangeEvent) {
-    //   this.onRangeChange.emit({ start: fromTimestamp, end: toTimestamp });
-    // }
   }
 
   transformRangeToSelect(range?: TSTimeRange): uPlot.Select | undefined {
@@ -114,15 +110,15 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     let left, width;
     let height = this.uplot.bbox.height / devicePixelRatio;
     if (!fromTimestamp) {
-      left = Math.round(this.uplot.valToPos(this.start, 'x'));
+      left = this.uplot.valToPos(this.start, 'x');
     } else {
       left = this.uplot.valToPos(fromTimestamp, 'x');
     }
     left = Math.max(left, 0); // in case it is negative
     if (!toTimestamp) {
-      width = Math.round(this.uplot.valToPos(this.end, 'x')) - left;
+      width = this.uplot.valToPos(this.end, 'x') - left;
     } else {
-      width = Math.round(this.uplot.valToPos(toTimestamp, 'x')) - left;
+      width = this.uplot.valToPos(toTimestamp, 'x') - left;
     }
     // by some reasons, sometimes relative selection get out of the canvas
     if (left + width > this.uplot.bbox.width) {
@@ -355,27 +351,27 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       min: this.uplot.posToVal(this.uplot.select.left, 'x'),
       max: this.uplot.posToVal(this.uplot.select.left + this.uplot.select.width, 'x'),
     };
-    // this.uplot.setSelect(minMax);
 
     linkedCharts.forEach((chart: any) => {
       if (chart === this.uplot) {
         // TODO find a better way to avoid this
         return;
       }
-      // minMax.min = this.uplot.min
-      // minMax.max = this.uplot.posToVal(newLft + newWid, 'x');
       chart.setScale('x', minMax);
     });
   }
 
   emitRangeEventIfChanged() {
     let u = this.uplot;
+    console.log(u.select);
     // we could use just postToVal, but it's better to have an exact value from the X data
     let min = u.data[0][u.valToIdx(u.posToVal(u.select.left, 'x'))];
     let max = u.data[0][u.valToIdx(u.posToVal(u.select.left + u.select.width, 'x'))];
+    console.log('converted range: ', min, max);
     if (min != this.previousRange?.from || max !== this.previousRange?.to) {
       let currentRange = { from: min, to: max };
       this.previousRange = currentRange;
+      console.log(currentRange);
       this.onRangeChange.next(currentRange);
     }
   }

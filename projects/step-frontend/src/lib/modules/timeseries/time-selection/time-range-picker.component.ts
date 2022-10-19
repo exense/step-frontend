@@ -4,6 +4,7 @@ import { RelativeTimeSelection } from './model/relative-time-selection';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { TimeRangePickerSelection } from './time-range-picker-selection';
 import { RangeSelectionType } from './model/range-selection-type';
+import { ExecutionTimeSelection } from './model/execution-time-selection';
 
 @Component({
   selector: 'step-time-range-picker',
@@ -83,17 +84,44 @@ export class TimeRangePicker implements OnInit {
     this.closeMenu();
   }
 
-  selectRelativeInterval(option: RelativeTimeSelection) {
-    this.resetCustomDates();
+  onRelativeSelectionSelected(option: RelativeTimeSelection) {
     this.emitSelectionChange({ type: RangeSelectionType.RELATIVE, relativeSelection: option });
   }
 
+  /**
+   * This method should be called from the exterior.
+   */
   selectFullRange() {
     this.resetCustomDates();
+    this.activeSelection = { type: RangeSelectionType.FULL };
+  }
+
+  /**
+   * This method reacts to the component html selection change, and should NOT be used from exterior
+   */
+  onFullRangeSelect() {
     this.emitSelectionChange({ type: RangeSelectionType.FULL });
   }
 
-  setAbsoluteSelection(from?: number, to?: number) {
+  /**
+   * This should be called from the exterior.
+   * @param selection
+   */
+  setSelection(selection: ExecutionTimeSelection) {
+    this.activeSelection = selection;
+    if (selection.type === RangeSelectionType.ABSOLUTE) {
+      this.setAbsoluteSelection(selection);
+    } else if (selection.type === RangeSelectionType.RELATIVE) {
+      this.resetCustomDates();
+    } else {
+      // it is full
+      this.resetCustomDates();
+    }
+  }
+
+  private setAbsoluteSelection(selection: ExecutionTimeSelection) {
+    let from = selection.absoluteSelection!.from;
+    let to = selection.absoluteSelection!.to;
     this.resetCustomDates();
     if (from) {
       let date = new Date(from);
@@ -103,7 +131,6 @@ export class TimeRangePicker implements OnInit {
       let date = new Date(to);
       this.toDateString = `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
     }
-    this.emitSelectionChange({ type: RangeSelectionType.ABSOLUTE, absoluteSelection: { from, to } });
   }
 
   emitSelectionChange(selection: TimeRangePickerSelection) {

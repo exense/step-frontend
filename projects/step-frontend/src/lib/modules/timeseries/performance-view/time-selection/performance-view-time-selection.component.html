@@ -5,7 +5,7 @@
       *ngIf="rangerSettings"
       [settings]="rangerSettings"
       [syncKey]="settings.contextId"
-      [selection]="selection.absoluteSelection"
+      [selection]="currentSelection.absoluteSelection"
       (onChartLoaded)="onRangerLoaded.emit()"
       (onRangeChange)="onRangerSelectionChange($event)"
       (onZoomReset)="onRangerZoomReset($event)"

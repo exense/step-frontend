@@ -13,7 +13,7 @@ import { TimeSeriesConfig } from '../time-series.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
 import { first, forkJoin, Observable, of, Subject, Subscription, take, tap } from 'rxjs';
 import { TimeSeriesUtils } from '../time-series-utils';
-import { ExecutionContext } from '../execution-page/execution-context';
+import { TimeSeriesContext } from '../execution-page/time-series-context';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
 import { KeywordSelection, TimeSeriesKeywordsContext } from '../execution-page/time-series-keywords.context';
 import { Bucket } from '../bucket';
@@ -115,7 +115,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   ];
   selectedMetric = this.responseTimeMetrics[0];
 
-  executionContext!: ExecutionContext;
+  executionContext!: TimeSeriesContext;
 
   initializationTasks: Observable<any>[] = [];
   updateTasks: Observable<any>[] = [];
@@ -158,7 +158,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       })
     );
     this.subscriptions.add(
-      this.executionContext.onActiveSelectionChange().subscribe((newRange) => {
+      this.executionContext.timeSelectionState.onActiveSelectionChange().subscribe((newRange) => {
         this.timeSelection = newRange;
         this.updateTable();
         // the event is handled from the parent, so no action needed here.
@@ -259,7 +259,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   onZoomReset() {
-    this.timeSelectionComponent.resetZoom();
+    this.executionContext.timeSelectionState.resetZoom();
+    // this.timeSelectionComponent.resetZoom();
   }
 
   createThreadGroupsChart(request: FindBucketsRequest, isUpdate = false): Observable<TimeSeriesChartResponse> {
@@ -400,12 +401,12 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           return {
             id: status,
             label: status,
-            data: series.map((b) => b ? b.throughputPerHour : 0),
+            data: series.map((b) => (b ? b.throughputPerHour : 0)),
             // scale: 'mb',
             value: (self, x) => TimeSeriesUtils.formatAxisValue(x) + '/h',
             stroke: color,
             fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
-            points: { show: false }
+            points: { show: false },
           };
         });
         this.byStatusSettings = {
@@ -541,7 +542,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     if (!this.tableChart) {
       throw 'Table does not exist yet';
     }
-    let newRange = this.executionContext.getActiveSelection().absoluteSelection;
+    let newRange = this.executionContext.timeSelectionState.getActiveSelection().absoluteSelection;
+    console.log('for table:', newRange);
     if (!newRange) {
       // we have a full selection
       return this.tableChart.refresh(this.findRequest); // refresh the table

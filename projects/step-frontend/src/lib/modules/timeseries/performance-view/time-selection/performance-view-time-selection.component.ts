@@ -3,20 +3,19 @@ import { ExecutionTimeSelection } from '../../time-selection/model/execution-tim
 import { FindBucketsRequest } from '../../find-buckets-request';
 import { TimeSeriesService } from '../../time-series.service';
 import { TimeSeriesUtils } from '../../time-series-utils';
-import { TSChartSettings } from '../../chart/model/ts-chart-settings';
 import { TSRangerComponent } from '../../ranger/ts-ranger.component';
 import { TSTimeRange } from '../../chart/model/ts-time-range';
 import { TimeRangePicker } from '../../time-selection/time-range-picker.component';
-import { ExecutionContext } from '../../execution-page/execution-context';
+import { TimeSeriesContext } from '../../execution-page/time-series-context';
 import { RangeSelectionType } from '../../time-selection/model/range-selection-type';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
 import { TimeSeriesConfig } from '../../time-series.config';
 import { TSRangerSettings } from '../../ranger/ts-ranger-settings';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
-import { Execution } from '@exense/step-core';
 import { PerformanceViewSettings } from '../performance-view-settings';
 import { Observable, Subscription, tap } from 'rxjs';
 import { TimeSeriesChartResponse } from '../../time-series-chart-response';
+import { TimeSelectionState } from '../../time-selection.state';
 
 @Component({
   selector: 'step-execution-time-selection',
@@ -40,9 +39,10 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   subscriptions: Subscription = new Subscription();
 
-  selection!: ExecutionTimeSelection;
+  currentSelection!: ExecutionTimeSelection;
 
-  private executionService!: ExecutionContext;
+  private executionService!: TimeSeriesContext;
+  private timeSelectionState!: TimeSelectionState;
 
   constructor(private timeSeriesService: TimeSeriesService, private executionsPageService: TimeSeriesContextsFactory) {}
 
@@ -51,17 +51,23 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
       throw new Error('Settings input is required');
     }
     this.executionService = this.executionsPageService.getContext(this.settings.contextId);
-    this.selection = this.executionService.getActiveSelection();
-    this.subscriptions.add(
-      this.executionService.onActiveSelectionChange().subscribe((range) => {
-        this.selection = range;
-      })
-    );
+    this.timeSelectionState = this.executionService.timeSelectionState;
+    this.currentSelection = this.timeSelectionState.getActiveSelection();
     this.createRanger().subscribe(() => this.onRangerLoaded.next());
+    this.timeSelectionState.onZoomReset().subscribe((reset) => {
+      this.rangerComponent.resetSelect();
+      this.timeRangePicker?.selectFullRange();
+    });
+    this.timeSelectionState.onActiveSelectionChange().subscribe((selection) => {
+      console.log('SELECTION:', selection);
+      this.currentSelection = selection;
+      this.rangerComponent.selectRange(selection.absoluteSelection?.from, selection.absoluteSelection?.to);
+      this.timeRangePicker?.setSelection(selection);
+    });
   }
 
   getActiveSelection(): ExecutionTimeSelection {
-    return this.selection;
+    return this.currentSelection;
   }
 
   refreshRanger(): Observable<TimeSeriesChartResponse> {
@@ -85,7 +91,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
           avgData = response.matrix[0].map((b) => (b ? b.sum / b.count : null));
         }
 
-        let timeRange = this.prepareSelectForRanger(this.executionService.getActiveSelection());
+        let timeRange = this.prepareSelectForRanger(this.executionService.timeSelectionState.getActiveSelection());
         this.rangerSettings = {
           xValues: this.timeLabels,
           selection: timeRange,
@@ -112,18 +118,6 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
     }
   }
 
-  resetZoom() {
-    if (!this.rangerSettings) {
-      return;
-    }
-    // this.onRangeReset.emit({
-    //   start: this.rangerSettings.xValues[0],
-    //   end: this.rangerSettings.xValues[this.rangerSettings.xValues.length - 1],
-    // });
-    this.rangerComponent.resetSelect(false);
-    this.timeRangePicker?.selectFullRange();
-  }
-
   handleTimePickerSelectionChange(timeSelection: TimeRangePickerSelection) {
     let selectionToEmit: ExecutionTimeSelection = { type: timeSelection.type };
     if (timeSelection.type === RangeSelectionType.FULL) {
@@ -138,22 +132,22 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
       selectionToEmit.absoluteSelection = timeSelection.absoluteSelection;
       this.rangerComponent.selectRange(timeSelection.absoluteSelection.from, timeSelection.absoluteSelection.to);
     }
-    this.executionService.setActiveSelection(selectionToEmit);
+    this.executionService.timeSelectionState.setActiveSelection(selectionToEmit);
     this.onRangeChange.emit(selectionToEmit.absoluteSelection);
   }
 
   onRangerSelectionChange(event: TSTimeRange) {
+    // check for full range selection
     if (this.timeLabels[0] === event.from && this.timeLabels[this.timeLabels.length - 1] === event.to) {
-      this.timeRangePicker?.selectFullRange();
+      this.timeSelectionState.resetZoom();
     } else {
-      this.timeRangePicker?.setAbsoluteSelection(event.from, event.to);
+      this.timeSelectionState.setActiveSelection({ type: RangeSelectionType.ABSOLUTE, absoluteSelection: event });
     }
-
-    this.onRangeChange.emit(event);
+    // the linked charts are automatically updated by the uplot sync feature. if that will be replaced, the charts must subscribe to the state change
   }
 
   onRangerZoomReset(event: TSTimeRange) {
-    this.timeRangePicker?.selectFullRange();
+    this.timeSelectionState.resetZoom();
   }
 
   ngOnDestroy(): void {
