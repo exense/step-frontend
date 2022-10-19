@@ -38,7 +38,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   timeLabels: number[] = [];
 
-  subscriptionsTerminator$ = new Subject<void>();
+  terminator$ = new Subject<void>();
 
   selection!: ExecutionTimeSelection;
 
@@ -54,7 +54,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
     this.selection = this.executionService.getActiveSelection();
     this.executionService
       .onActiveSelectionChange()
-      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .pipe(takeUntil(this.terminator$))
       .subscribe((range) => {
         this.selection = range;
       });
@@ -158,6 +158,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   }
 
   ngOnDestroy(): void {
-    this.subscriptionsTerminator$.next();
+    this.terminator$.next();
+    this.terminator$.complete();
   }
 }

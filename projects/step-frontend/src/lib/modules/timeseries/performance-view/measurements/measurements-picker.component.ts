@@ -18,7 +18,7 @@ export class MeasurementsPickerComponent implements OnInit, OnDestroy {
   allSeriesChecked: boolean = true;
   activeKeywords = 0;
 
-  subscriptionsTerminator$ = new Subject<void>();
+  terminator$ = new Subject<void>();
 
   constructor(private executionPageService: TimeSeriesContextsFactory) {}
 
@@ -29,7 +29,7 @@ export class MeasurementsPickerComponent implements OnInit, OnDestroy {
     this.keywordsService = this.executionPageService.getContext(this.contextId).getKeywordsContext();
     this.keywordsService
       .onKeywordsUpdated()
-      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .pipe(takeUntil(this.terminator$))
       .subscribe((keywords) => {
         this.keywords = keywords;
         this.activeKeywords = 0;
@@ -49,11 +49,11 @@ export class MeasurementsPickerComponent implements OnInit, OnDestroy {
       });
     this.keywordsService
       .onAllSelectionChanged()
-      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .pipe(takeUntil(this.terminator$))
       .subscribe((allSelected) => (this.allSeriesChecked = allSelected));
     this.keywordsService
       .onKeywordToggled()
-      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .pipe(takeUntil(this.terminator$))
       .subscribe((selection) => {
         let isSelected = this.keywords[selection.id].isSelected;
         if (isSelected) {
@@ -78,6 +78,7 @@ export class MeasurementsPickerComponent implements OnInit, OnDestroy {
   };
 
   ngOnDestroy(): void {
-    this.subscriptionsTerminator$.next();
+    this.terminator$.next();
+    this.terminator$.complete();
   }
 }
