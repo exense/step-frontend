@@ -15,6 +15,7 @@ import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import { ExecutionTabsComponent } from './components/execution-tabs/execution-tabs.component';
 import './components/execution-tabs/execution-tabs.component';
 import { CustomCellRegistryService, EntityRegistry } from '@exense/step-core';
+import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 
 @NgModule({
   declarations: [
@@ -26,9 +27,10 @@ import { CustomCellRegistryService, EntityRegistry } from '@exense/step-core';
     PanelIdPipe,
     KeywordCallsComponent,
     ExecutionTabsComponent,
+    ExecutionErrorsComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule],
-  exports: [ExecutionListComponent, ExecutionStepComponent, ExecutionTabsComponent],
+  exports: [ExecutionListComponent, ExecutionStepComponent, ExecutionTabsComponent, ExecutionErrorsComponent],
 })
 export class ExecutionModule {
   constructor(_entityRegistry: EntityRegistry, _cellsRegister: CustomCellRegistryService) {
