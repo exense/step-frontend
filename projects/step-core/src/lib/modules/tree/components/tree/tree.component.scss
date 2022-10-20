@@ -3,6 +3,7 @@
 .tree-node {
   display: flex;
   align-items: center;
+  user-select: none;
 
   .node-content {
     padding: 2px 4px 2px 1px;
@@ -12,10 +13,10 @@
   &.tree-node-selected .node-content {
     background: var.$light-blue;
   }
-}
 
-.tree-node:not(.cdk-drag-disabled) .drag-handle {
-  cursor: move;
+  &:not(.cdk-drag-disabled) .drag-handle {
+    cursor: move;
+  }
 }
 
 .drag-placeholder {

@@ -1,13 +1,19 @@
-<cdk-tree [dataSource]="dataSource" [treeControl]="treeControl" cdkDropList (cdkDropListDropped)="drop($event)">
+<cdk-tree
+  [dataSource]="_treeState.dataSource"
+  [treeControl]="_treeState.treeControl"
+  cdkDropList
+  (cdkDropListDropped)="_treeState.handleDrop($event)"
+>
   <cdk-tree-node
     *cdkTreeNodeDef="let node"
     cdkTreeNodePadding
-    [cdkTreeNodePaddingIndent]="paddingIdent"
+    [cdkTreeNodePaddingIndent]="_treeState.paddingIdent"
     class="tree-node"
     cdkDrag
-    [cdkDragDisabled]="node.id === rootNode?.id || dragDisabled"
-    [class.tree-node-selected]="node.id === selectedNodeId"
-    (click)="selectNode(node)"
+    [cdkDragDisabled]="dragDisabled || (node.id | isRootNode | async)"
+    [class.tree-node-selected]="node.id | isNodeSelected | async"
+    (cdkDragStarted)="_treeState.handleDragStart(node)"
+    (click)="_treeState.selectNode(node, $event)"
   >
     <button mat-button mat-icon-button disabled></button>
     <div class="node-content" (contextmenu)="openContextMenu($event, node.id)">
@@ -15,26 +21,28 @@
       {{ node?.name }}
     </div>
     <div class="drag-placeholder" *cdkDragPlaceholder></div>
+    <step-tree-drag-preview *cdkDragPreview> </step-tree-drag-preview>
   </cdk-tree-node>
   <cdk-tree-node
     *cdkTreeNodeDef="let node; when: hasChild"
     cdkTreeNodePadding
-    [cdkTreeNodePaddingIndent]="paddingIdent"
+    [cdkTreeNodePaddingIndent]="_treeState.paddingIdent"
     class="tree-node"
-    [class.expanded]="treeControl.isExpanded(node)"
+    [class.expanded]="_treeState.treeControl.isExpanded(node)"
     cdkDrag
-    [cdkDragDisabled]="node.id === rootNode?.id || dragDisabled"
-    [class.tree-node-selected]="node.id === selectedNodeId"
-    (click)="selectNode(node)"
+    [cdkDragDisabled]="dragDisabled || (node.id | isRootNode | async)"
+    [class.tree-node-selected]="node.id | isNodeSelected | async"
+    (cdkDragStarted)="_treeState.handleDragStart(node)"
+    (click)="_treeState.selectNode(node, $event)"
   >
-    <button mat-button mat-icon-button cdkTreeNodeToggle (click)="expansionModel.toggle(node.id)">
+    <button mat-button mat-icon-button cdkTreeNodeToggle (click)="_treeState.expansionModel.toggle(node.id)">
       <ng-template #expanded>
         <step-icon name="chevron-down"> </step-icon>
       </ng-template>
       <ng-template #notExpanded>
         <step-icon name="chevron-right"> </step-icon>
       </ng-template>
-      <ng-container *ngIf="treeControl.isExpanded(node); then expanded; else notExpanded"> </ng-container>
+      <ng-container *ngIf="_treeState.treeControl.isExpanded(node); then expanded; else notExpanded"> </ng-container>
     </button>
     <div class="node-content" (contextmenu)="openContextMenu($event, node.id)">
       <step-icon [name]="node._class | artefactIcon" cdkDragHandle class="drag-handle"></step-icon>
@@ -45,6 +53,7 @@
       {{ node?.name }}
     </ng-container>
     <div class="drag-placeholder" *cdkDragPlaceholder></div>
+    <step-tree-drag-preview *cdkDragPreview> </step-tree-drag-preview>
   </cdk-tree-node>
 </cdk-tree>
 <div
