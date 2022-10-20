@@ -15,7 +15,7 @@ import { TSRangerSettings } from '../../ranger/ts-ranger-settings';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
 import { Execution } from '@exense/step-core';
 import { PerformanceViewSettings } from '../performance-view-settings';
-import { Observable, Subscription, tap } from 'rxjs';
+import { Observable, Subject, Subscription, takeUntil, tap } from 'rxjs';
 import { TimeSeriesChartResponse } from '../../time-series-chart-response';
 
 @Component({
@@ -38,7 +38,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   timeLabels: number[] = [];
 
-  subscriptions: Subscription = new Subscription();
+  terminator$ = new Subject<void>();
 
   selection!: ExecutionTimeSelection;
 
@@ -52,11 +52,12 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
     }
     this.executionService = this.executionsPageService.getContext(this.settings.contextId);
     this.selection = this.executionService.getActiveSelection();
-    this.subscriptions.add(
-      this.executionService.onActiveSelectionChange().subscribe((range) => {
+    this.executionService
+      .onActiveSelectionChange()
+      .pipe(takeUntil(this.terminator$))
+      .subscribe((range) => {
         this.selection = range;
-      })
-    );
+      });
     this.createRanger().subscribe(() => this.onRangerLoaded.next());
   }
 
@@ -157,8 +158,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   }
 
   ngOnDestroy(): void {
-    if (this.subscriptions) {
-      this.subscriptions.unsubscribe();
-    }
+    this.terminator$.next();
+    this.terminator$.complete();
   }
 }
