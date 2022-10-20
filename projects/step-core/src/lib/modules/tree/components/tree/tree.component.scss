@@ -1,0 +1,30 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+.tree-node {
+  display: flex;
+  align-items: center;
+  user-select: none;
+
+  .node-content {
+    padding: 2px 4px 2px 1px;
+    cursor: pointer;
+  }
+
+  &.tree-node-selected .node-content {
+    background: var.$light-blue;
+  }
+
+  &:not(.cdk-drag-disabled) .drag-handle {
+    cursor: move;
+  }
+}
+
+.drag-placeholder {
+  height: 40px;
+  background: var.$light-gray;
+}
+
+.node-context-menu-trigger {
+  visibility: hidden;
+  position: fixed;
+}
