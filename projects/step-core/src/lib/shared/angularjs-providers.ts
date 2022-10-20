@@ -1,5 +1,5 @@
 import { InjectionToken } from '@angular/core';
-import { angularJsProviderOptions } from './angularjs-provider-options';
+import { angularJsProviderOptions } from '../modules/basics/step-basics.module';
 import { ILocationService, IRootScopeService, ITemplateCacheService } from 'angular';
 
 export const AJS_ROOT_SCOPE = new InjectionToken<IRootScopeService>(

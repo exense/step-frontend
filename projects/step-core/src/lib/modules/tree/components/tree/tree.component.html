@@ -1,0 +1,77 @@
+<cdk-tree
+  [dataSource]="_treeState.dataSource"
+  [treeControl]="_treeState.treeControl"
+  cdkDropList
+  (cdkDropListDropped)="_treeState.handleDrop($event)"
+>
+  <cdk-tree-node
+    *cdkTreeNodeDef="let node"
+    cdkTreeNodePadding
+    [cdkTreeNodePaddingIndent]="_treeState.paddingIdent"
+    class="tree-node"
+    cdkDrag
+    [cdkDragDisabled]="dragDisabled || (node.id | isRootNode | async)"
+    [class.tree-node-selected]="node.id | isNodeSelected | async"
+    (cdkDragStarted)="_treeState.handleDragStart(node)"
+    (click)="_treeState.selectNode(node, $event)"
+  >
+    <button mat-button mat-icon-button disabled></button>
+    <div class="node-content" (contextmenu)="openContextMenu($event, node.id)">
+      <step-icon [name]="node._class | artefactIcon" cdkDragHandle class="drag-handle"></step-icon>
+      {{ node?.name }}
+    </div>
+    <div class="drag-placeholder" *cdkDragPlaceholder></div>
+    <step-tree-drag-preview *cdkDragPreview> </step-tree-drag-preview>
+  </cdk-tree-node>
+  <cdk-tree-node
+    *cdkTreeNodeDef="let node; when: hasChild"
+    cdkTreeNodePadding
+    [cdkTreeNodePaddingIndent]="_treeState.paddingIdent"
+    class="tree-node"
+    [class.expanded]="_treeState.treeControl.isExpanded(node)"
+    cdkDrag
+    [cdkDragDisabled]="dragDisabled || (node.id | isRootNode | async)"
+    [class.tree-node-selected]="node.id | isNodeSelected | async"
+    (cdkDragStarted)="_treeState.handleDragStart(node)"
+    (click)="_treeState.selectNode(node, $event)"
+  >
+    <button mat-button mat-icon-button cdkTreeNodeToggle (click)="_treeState.expansionModel.toggle(node.id)">
+      <ng-template #expanded>
+        <step-icon name="chevron-down"> </step-icon>
+      </ng-template>
+      <ng-template #notExpanded>
+        <step-icon name="chevron-right"> </step-icon>
+      </ng-template>
+      <ng-container *ngIf="_treeState.treeControl.isExpanded(node); then expanded; else notExpanded"> </ng-container>
+    </button>
+    <div class="node-content" (contextmenu)="openContextMenu($event, node.id)">
+      <step-icon [name]="node._class | artefactIcon" cdkDragHandle class="drag-handle"></step-icon>
+      {{ node?.name }}
+    </div>
+    <ng-container *cdkDragPreview>
+      <step-icon [name]="node._class | artefactIcon"></step-icon>
+      {{ node?.name }}
+    </ng-container>
+    <div class="drag-placeholder" *cdkDragPlaceholder></div>
+    <step-tree-drag-preview *cdkDragPreview> </step-tree-drag-preview>
+  </cdk-tree-node>
+</cdk-tree>
+<div
+  #nodeContextMenuTrigger
+  class="node-context-menu-trigger"
+  [style.left.px]="contextMenuPosition.x"
+  [style.top.px]="contextMenuPosition.y"
+  [matMenuTriggerFor]="nodeContextMenu"
+></div>
+<mat-menu #nodeContextMenu="matMenu">
+  <ng-template matMenuContent let-node="node">
+    <button
+      *ngFor="let action of actions; trackBy: trackByAction"
+      mat-menu-item
+      [disabled]="action.disabled"
+      (click)="handleContextAction(action, node)"
+    >
+      {{ action.label }}
+    </button>
+  </ng-template>
+</mat-menu>
