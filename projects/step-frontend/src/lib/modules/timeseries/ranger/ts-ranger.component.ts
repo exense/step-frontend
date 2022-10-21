@@ -97,7 +97,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
 
   selectRange(fromTimestamp?: number, toTimestamp?: number) {
     let select = this.transformRangeToSelect({ from: fromTimestamp, to: toTimestamp });
-    // this.uplot.setSelect(select, false);
+    this.uplot.setSelect(select, false);
     this.emitSelectionToLinkedCharts();
   }
 
@@ -255,13 +255,15 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
           key: this.syncKey,
         },
         bind: {
+          // this is not trigger when dblclick is fired on synced charts, but just on the ranger
           dblclick: (self: uPlot, b, handler: MouseListener) => {
             return (e: any) => {
               let hasSelection = this.uplot.select.width > 0;
               handler(e);
               if (hasSelection) {
                 // has selection
-                this.resetSelect(true);
+                this.onZoomReset.emit();
+                // this.resetSelect(true);
               }
               return null;
             };
@@ -363,15 +365,14 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
 
   emitRangeEventIfChanged() {
     let u = this.uplot;
-    console.log(u.select);
-    // we could use just postToVal, but it's better to have an exact value from the X data
-    let min = u.data[0][u.valToIdx(u.posToVal(u.select.left, 'x'))];
-    let max = u.data[0][u.valToIdx(u.posToVal(u.select.left + u.select.width, 'x'))];
-    console.log('converted range: ', min, max);
+    // keep these lines below if it's better to have an exact value from the X data
+    // let min = u.data[0][u.valToIdx(u.posToVal(u.select.left, 'x'))];
+    // let max = u.data[0][u.valToIdx(u.posToVal(u.select.left + u.select.width, 'x'))];
+    let min = u.posToVal(u.select.left, 'x');
+    let max = u.posToVal(u.select.left + u.select.width, 'x');
     if (min != this.previousRange?.from || max !== this.previousRange?.to) {
       let currentRange = { from: min, to: max };
       this.previousRange = currentRange;
-      console.log(currentRange);
       this.onRangeChange.next(currentRange);
     }
   }

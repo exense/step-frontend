@@ -18,7 +18,7 @@ export class TimeRangePicker implements OnInit {
   @Input() initialSelectionIndex: number | undefined;
   @Input() includeFullRangeOption: boolean = true;
 
-  @Output('selectionChange') onSelectionChange = new EventEmitter<TimeRangePickerSelection>();
+  @Output() onSelectionChange = new EventEmitter<TimeRangePickerSelection>();
 
   _30_MINUTES = 30 * 60 * 1000; // in ms
 
@@ -73,7 +73,10 @@ export class TimeRangePicker implements OnInit {
       this.toDateString = undefined;
     }
     if (!from && !to) {
-      this.emitSelectionChange({ type: RangeSelectionType.FULL });
+      if (this.includeFullRangeOption) {
+        this.emitSelectionChange({ type: RangeSelectionType.FULL });
+      }
+      // else do nothing. maybe show an error
     } else {
       let newSelection = {
         type: RangeSelectionType.ABSOLUTE,

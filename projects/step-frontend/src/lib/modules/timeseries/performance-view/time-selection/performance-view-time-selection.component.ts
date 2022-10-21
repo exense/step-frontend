@@ -13,7 +13,7 @@ import { TimeSeriesConfig } from '../../time-series.config';
 import { TSRangerSettings } from '../../ranger/ts-ranger-settings';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
 import { PerformanceViewSettings } from '../performance-view-settings';
-import { Observable, Subscription, tap } from 'rxjs';
+import { Observable, Subject, Subscription, takeUntil, tap } from 'rxjs';
 import { TimeSeriesChartResponse } from '../../time-series-chart-response';
 import { TimeSelectionState } from '../../time-selection.state';
 
@@ -29,7 +29,6 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   @Output() onRangeChange = new EventEmitter<TSTimeRange>();
   @Output() onRangerLoaded = new EventEmitter<void>();
-  @Output() onRangeReset = new EventEmitter<TSTimeRange>();
 
   rangerSettings: TSRangerSettings | undefined;
   @ViewChild(TSRangerComponent) rangerComponent!: TSRangerComponent;
@@ -37,12 +36,11 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   timeLabels: number[] = [];
 
-  subscriptions: Subscription = new Subscription();
-
   currentSelection!: ExecutionTimeSelection;
 
   private executionService!: TimeSeriesContext;
   private timeSelectionState!: TimeSelectionState;
+  private terminator$ = new Subject<void>();
 
   constructor(private timeSeriesService: TimeSeriesService, private executionsPageService: TimeSeriesContextsFactory) {}
 
@@ -54,16 +52,21 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
     this.timeSelectionState = this.executionService.timeSelectionState;
     this.currentSelection = this.timeSelectionState.getActiveSelection();
     this.createRanger().subscribe(() => this.onRangerLoaded.next());
-    this.timeSelectionState.onZoomReset().subscribe((reset) => {
-      this.rangerComponent.resetSelect();
-      this.timeRangePicker?.selectFullRange();
-    });
-    this.timeSelectionState.onActiveSelectionChange().subscribe((selection) => {
-      console.log('SELECTION:', selection);
-      this.currentSelection = selection;
-      this.rangerComponent.selectRange(selection.absoluteSelection?.from, selection.absoluteSelection?.to);
-      this.timeRangePicker?.setSelection(selection);
-    });
+    this.timeSelectionState
+      .onZoomReset()
+      .pipe(takeUntil(this.terminator$))
+      .subscribe((reset) => {
+        this.rangerComponent.resetSelect();
+        this.timeRangePicker?.selectFullRange();
+      });
+    this.timeSelectionState
+      .onActiveSelectionChange()
+      .pipe(takeUntil(this.terminator$))
+      .subscribe((selection) => {
+        this.currentSelection = selection;
+        this.rangerComponent.selectRange(selection.absoluteSelection?.from, selection.absoluteSelection?.to);
+        this.timeRangePicker?.setSelection(selection);
+      });
   }
 
   getActiveSelection(): ExecutionTimeSelection {
@@ -121,19 +124,20 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   handleTimePickerSelectionChange(timeSelection: TimeRangePickerSelection) {
     let selectionToEmit: ExecutionTimeSelection = { type: timeSelection.type };
     if (timeSelection.type === RangeSelectionType.FULL) {
-      this.rangerComponent.resetSelect(false);
+      this.timeSelectionState.resetZoom();
+      return;
+      // this.rangerComponent.resetSelect(false);
     } else if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
       let endTime = this.settings.endTime || new Date().getTime();
       let from = endTime - timeSelection.relativeSelection.timeInMs;
       selectionToEmit.relativeSelection = timeSelection.relativeSelection;
       selectionToEmit.absoluteSelection = { from, to: endTime };
-      this.rangerComponent.selectRange(from, endTime);
+      // this.rangerComponent.selectRange(from, endTime);
     } else if (timeSelection.type === RangeSelectionType.ABSOLUTE && timeSelection.absoluteSelection) {
       selectionToEmit.absoluteSelection = timeSelection.absoluteSelection;
-      this.rangerComponent.selectRange(timeSelection.absoluteSelection.from, timeSelection.absoluteSelection.to);
+      // this.rangerComponent.selectRange(timeSelection.absoluteSelection.from, timeSelection.absoluteSelection.to);
     }
-    this.executionService.timeSelectionState.setActiveSelection(selectionToEmit);
-    this.onRangeChange.emit(selectionToEmit.absoluteSelection);
+    this.timeSelectionState.setActiveSelection(selectionToEmit);
   }
 
   onRangerSelectionChange(event: TSTimeRange) {
@@ -151,8 +155,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   }
 
   ngOnDestroy(): void {
-    if (this.subscriptions) {
-      this.subscriptions.unsubscribe();
-    }
+    this.terminator$.next();
+    this.terminator$.complete();
   }
 }

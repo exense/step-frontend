@@ -2,13 +2,11 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { Bucket } from '../../bucket';
 import { TimeSeriesService } from '../../time-series.service';
 import { FindBucketsRequest } from '../../find-buckets-request';
-import { TimeseriesColorsPool } from '../../util/timeseries-colors-pool';
 import { TimeSeriesChartResponse } from '../../time-series-chart-response';
 import { TimeSeriesKeywordsContext } from '../../execution-page/time-series-keywords.context';
-import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
 import { BucketAttributes, TableDataSource, TableLocalDataSource, TableLocalDataSourceConfig } from '@exense/step-core';
-import { ExecutionContext } from '../../execution-page/execution-context';
-import { Observable, Subject, Subscription, tap } from 'rxjs';
+import { Observable, Subject, Subscription, takeUntil, tap } from 'rxjs';
+import { TimeSeriesContext } from '../../execution-page/time-series-context';
 
 @Component({
   selector: 'step-timeseries-table',
@@ -29,11 +27,11 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   groupDimensions: string[] = [];
 
   private keywordsService!: TimeSeriesKeywordsContext;
-  @Input() executionContext!: ExecutionContext;
+  @Input() executionContext!: TimeSeriesContext;
 
   @Output() onInitializationComplete = new EventEmitter<void>();
 
-  subscriptions: Subscription = new Subscription();
+  private terminator$ = new Subject<void>();
 
   // @Output('onKeywordsFetched') onKeywordsFetched = new EventEmitter<string[]>();
   // @Output('onKeywordToggled') onKeywordToggled = new EventEmitter<string>();
@@ -52,20 +50,22 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     }
     this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
     this.keywordsService = this.executionContext.getKeywordsContext();
-    this.subscriptions.add(
-      this.keywordsService.onKeywordToggled().subscribe((selection) => {
+    this.keywordsService
+      .onKeywordToggled()
+      .pipe(takeUntil(this.terminator$))
+      .subscribe((selection) => {
         this.bucketsByKeywords[selection.id].attributes.isSelected = selection.isSelected;
-      })
-    );
-    this.subscriptions.add(
-      this.executionContext.onGroupingChange().subscribe((groupDimensions) => {
+      });
+    this.executionContext
+      .onGroupingChange()
+      .pipe(takeUntil(this.terminator$))
+      .subscribe((groupDimensions) => {
         this.groupDimensions = groupDimensions;
         if (!this.findRequest) {
           return;
         }
         this.fetchBucketsAndUpdateKeywords(true);
-      })
-    );
+      });
     this.fetchBucketsAndUpdateKeywords().subscribe(() => {
       this.onInitializationComplete.emit();
     });
@@ -186,9 +186,8 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.subscriptions) {
-      this.subscriptions.unsubscribe();
-    }
     this.tableData$.complete();
+    this.terminator$.next();
+    this.terminator$.complete();
   }
 }

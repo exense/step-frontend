@@ -9,6 +9,7 @@ export class TimeSelectionState {
   activeTimeSelection: ExecutionTimeSelection = { type: RangeSelectionType.FULL };
 
   resetZoom() {
+    this.activeTimeSelection = { type: RangeSelectionType.FULL };
     this.zoomReset$.next();
   }
 

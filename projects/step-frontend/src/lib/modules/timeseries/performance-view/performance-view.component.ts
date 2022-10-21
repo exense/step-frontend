@@ -11,7 +11,7 @@ import { TSRangerComponent } from '../ranger/ts-ranger.component';
 import { UPlotUtils } from '../uplot/uPlot.utils';
 import { TimeSeriesConfig } from '../time-series.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
-import { first, forkJoin, Observable, of, Subject, Subscription, take, tap } from 'rxjs';
+import { first, forkJoin, Observable, of, Subject, Subscription, take, takeUntil, tap } from 'rxjs';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { TimeSeriesContext } from '../execution-page/time-series-context';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
@@ -70,6 +70,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   private tableInitialized$ = new Subject<void>();
   private rangerLoaded$ = new Subject<void>();
+  chartsAreLoading = false;
 
   barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
   stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
@@ -99,7 +100,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   selectedRefreshInterval: RefreshInterval = this.refreshIntervals[0];
   timeSelection!: ExecutionTimeSelection;
 
-  subscriptions: Subscription = new Subscription();
+  subscriptionsTerminator$ = new Subject<void>();
   intervalShouldBeCanceled = false;
 
   allSeriesChecked: boolean = true;
@@ -140,44 +141,54 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     }
     this.findRequest = this.prepareFindRequest(this.settings);
     this.initContext();
-    this.subscriptions.add(
-      this.keywordsService.onAllSelectionChanged().subscribe((selected) => {
+    this.keywordsService
+      .onAllSelectionChanged()
+      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .subscribe((selected) => {
         this.allSeriesChecked = selected;
-      })
-    );
-    this.subscriptions.add(
-      this.keywordsService.onKeywordToggled().subscribe((selection) => {
+      });
+    this.keywordsService
+      .onKeywordToggled()
+      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .subscribe((selection) => {
         this.throughputChart.setSeriesVisibility(selection.id, selection.isSelected);
         this.responseTimeChart.setSeriesVisibility(selection.id, selection.isSelected);
         this.keywords[selection.id] = selection;
-      })
-    );
-    this.subscriptions.add(
-      this.keywordsService.onKeywordsUpdated().subscribe((keywords) => {
+      });
+    this.keywordsService
+      .onKeywordsUpdated()
+      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .subscribe((keywords) => {
         this.keywords = keywords;
-      })
-    );
-    this.subscriptions.add(
-      this.executionContext.timeSelectionState.onActiveSelectionChange().subscribe((newRange) => {
+      });
+    this.executionContext.timeSelectionState
+      .onActiveSelectionChange()
+      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .subscribe((newRange) => {
         this.timeSelection = newRange;
-        this.updateTable();
+        this.updateTable().subscribe();
         // the event is handled from the parent, so no action needed here.
-      })
-    );
+      });
+    this.executionContext.timeSelectionState
+      .onZoomReset()
+      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .subscribe(() => this.handleZoomReset());
 
-    this.subscriptions.add(
-      this.executionContext.onFiltersChange().subscribe((filters) => {
+    this.executionContext
+      .onFiltersChange()
+      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .subscribe((filters) => {
         this.updateAllCharts().subscribe();
-      })
-    );
-    this.subscriptions.add(
-      this.executionContext.onGroupingChange().subscribe((groupDimensions: string[]) => {
+      });
+    this.executionContext
+      .onGroupingChange()
+      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .subscribe((groupDimensions: string[]) => {
         this.groupDimensions = groupDimensions;
         this.mergeRequestWithActiveFilters();
         this.createByKeywordsCharts({ ...this.findRequest, groupDimensions: groupDimensions });
         this.updateAllCharts().subscribe();
-      })
-    );
+      });
 
     this.createAllCharts();
   }
@@ -228,10 +239,13 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       charts$.push(this.createThreadGroupsChart(this.findRequest));
     }
 
-    forkJoin(charts$).subscribe((allCompleted) => this.onInitializationComplete.emit());
+    forkJoin(charts$)
+      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .subscribe((allCompleted) => this.onInitializationComplete.emit());
   }
 
   updateAllCharts(): Observable<unknown> {
+    this.chartsAreLoading = true;
     this.findRequest = this.prepareFindRequest(this.settings); // we don't want to lose active filters
     this.mergeRequestWithActiveFilters();
 
@@ -246,7 +260,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       charts$.push(this.createThreadGroupsChart(this.findRequest));
     }
 
-    return forkJoin(charts$);
+    return forkJoin(charts$).pipe(tap(() => (this.chartsAreLoading = false)));
   }
 
   mergeRequestWithActiveFilters() {
@@ -487,6 +501,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             title: 'Throughput',
             xValues: timeLabels,
             showLegend: false,
+            zScaleTooltipLabel: 'Total Hits/h',
             series: [
               {
                 scale: 'total',
@@ -543,7 +558,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       throw 'Table does not exist yet';
     }
     let newRange = this.executionContext.timeSelectionState.getActiveSelection().absoluteSelection;
-    console.log('for table:', newRange);
     if (!newRange) {
       // we have a full selection
       return this.tableChart.refresh(this.findRequest); // refresh the table
@@ -559,13 +573,14 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     return this.tableChart.refresh(clonedRequest); // refresh the table
   }
 
-  handleRangeReset(newRange: TSTimeRange) {
-    this.responseTimeChart.resetZoom();
-    this.byStatusChart.resetZoom();
-    this.byStatusChart.resetZoom();
-    this.summaryChart.resetZoom();
-    this.throughputChart.resetZoom();
-    this.updateTable();
+  handleZoomReset() {
+    // TODO uncomment these when the uplot sync feature is removed
+    // this.responseTimeChart.resetZoom();
+    // this.byStatusChart.resetZoom();
+    // this.byStatusChart.resetZoom();
+    // this.summaryChart.resetZoom();
+    // this.throughputChart.resetZoom();
+    this.updateTable().subscribe();
   }
 
   switchChartMetric(metric: { label: string; mapFunction: (b: Bucket) => number }) {
@@ -593,9 +608,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.subscriptions) {
-      this.subscriptions.unsubscribe();
-    }
+    this.subscriptionsTerminator$.next();
     this.tableInitialized$.complete();
     this.rangerLoaded$.complete();
   }
