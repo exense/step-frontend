@@ -23,7 +23,6 @@ import { TimeSelectionState } from '../../time-selection.state';
   styleUrls: ['./performance-view-time-selection.component.scss'],
 })
 export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy {
-  // @Input() execution!: Execution;
   @Input() settings!: PerformanceViewSettings;
   @Input() timePicker: boolean = true;
 
@@ -126,16 +125,13 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
     if (timeSelection.type === RangeSelectionType.FULL) {
       this.timeSelectionState.resetZoom();
       return;
-      // this.rangerComponent.resetSelect(false);
     } else if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
       let endTime = this.settings.endTime || new Date().getTime();
       let from = endTime - timeSelection.relativeSelection.timeInMs;
       selectionToEmit.relativeSelection = timeSelection.relativeSelection;
       selectionToEmit.absoluteSelection = { from, to: endTime };
-      // this.rangerComponent.selectRange(from, endTime);
     } else if (timeSelection.type === RangeSelectionType.ABSOLUTE && timeSelection.absoluteSelection) {
       selectionToEmit.absoluteSelection = timeSelection.absoluteSelection;
-      // this.rangerComponent.selectRange(timeSelection.absoluteSelection.from, timeSelection.absoluteSelection.to);
     }
     this.timeSelectionState.setActiveSelection(selectionToEmit);
   }

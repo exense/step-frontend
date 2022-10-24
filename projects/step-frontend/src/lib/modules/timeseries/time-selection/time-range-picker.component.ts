@@ -31,9 +31,6 @@ export class TimeRangePicker implements OnInit {
     { label: 'Last 3 hours', timeInMs: this._30_MINUTES * 6 },
   ];
 
-  // from: Date | undefined; // used for mat picker
-  // to: Date | undefined; // used for mat picker
-
   fromDateString: string | undefined; // used for formatting the date together with time
   toDateString: string | undefined;
 

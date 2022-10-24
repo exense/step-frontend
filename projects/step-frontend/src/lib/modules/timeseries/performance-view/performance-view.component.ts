@@ -280,7 +280,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   onZoomReset() {
     this.executionContext.timeSelectionState.resetZoom();
-    // this.timeSelectionComponent.resetZoom();
   }
 
   createThreadGroupsChart(request: FindBucketsRequest, isUpdate = false): Observable<TimeSeriesChartResponse> {
@@ -339,11 +338,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
               label: 'Total',
               data: totalData,
               value: (x, v) => Math.trunc(v),
-              // stroke: '#E24D42',
               fill: (self: uPlot) => UPlotUtils.gradientFill(self, '#8FA1D2'),
-              // fill: 'rgba(255,212,166,0.64)',
-              // points: {show: false},
-              // drawStyle: 1,
               paths: this.stepped({ align: 1 }),
               points: { show: false },
             },
@@ -515,11 +510,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
                 id: 'secondary',
                 data: totalThroughput,
                 value: (x, v) => Math.trunc(v) + ' total',
-                // stroke: '#E24D42',
                 fill: (self: uPlot) => UPlotUtils.gradientFill(self, '#8394C9'),
-                // fill: 'rgba(255,212,166,0.64)',
-                // points: {show: false},
-                // drawStyle: 1,
                 paths: this.barsFunction({ size: [0.9, 100] }),
                 points: { show: false },
               },
@@ -580,12 +571,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   handleZoomReset() {
-    // TODO uncomment these when the uplot sync feature is removed
-    // this.responseTimeChart.resetZoom();
-    // this.byStatusChart.resetZoom();
-    // this.byStatusChart.resetZoom();
-    // this.summaryChart.resetZoom();
-    // this.throughputChart.resetZoom();
+    // the charts will reset because they are linked to the ranger.
     this.updateTable().subscribe();
   }
 

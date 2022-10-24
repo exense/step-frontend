@@ -33,9 +33,6 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
 
   private terminator$ = new Subject<void>();
 
-  // @Output('onKeywordsFetched') onKeywordsFetched = new EventEmitter<string[]>();
-  // @Output('onKeywordToggled') onKeywordToggled = new EventEmitter<string>();
-
   sortByNameAttributeFn = (a: Bucket, b: Bucket) =>
     a.attributes.name.toLowerCase() > b.attributes.name.toLowerCase() ? 1 : -1;
 
@@ -116,7 +113,6 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
             bucket.attributes.tph = Math.trunc((bucket.count / ((response.end - response.start) / 1000)) * 3600);
             let keywordSelection = this.keywordsService.getKeywordSelection(seriesKey);
             bucket.attributes.isSelected = keywordSelection ? keywordSelection.isSelected : true; // true because it has not been loaded yet
-            // this.keywords[attributes[dimensionKey]] = { color: color, isSelected: true };
             keywords.push(seriesKey);
             this.bucketsByKeywords[seriesKey] = bucket;
             return bucket;
