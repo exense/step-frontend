@@ -108,7 +108,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   private keywordsService!: TimeSeriesKeywordsContext;
 
   responseTimeMetrics = [
-    { label: 'Avg', mapFunction: (b: Bucket) => b.sum / b.count },
+    { label: 'Avg', mapFunction: (b: Bucket) => Math.round(b.sum / b.count) },
     { label: 'Min', mapFunction: (b: Bucket) => b.min },
     { label: 'Max', mapFunction: (b: Bucket) => b.max },
     { label: 'Perc. 90', mapFunction: (b: Bucket) => b.pclValues[90] },
