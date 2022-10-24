@@ -11,7 +11,7 @@ import { TSRangerComponent } from '../ranger/ts-ranger.component';
 import { UPlotUtils } from '../uplot/uPlot.utils';
 import { TimeSeriesConfig } from '../time-series.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
-import { first, forkJoin, Observable, of, Subject, Subscription, take, takeUntil, tap } from 'rxjs';
+import { first, forkJoin, Observable, of, Subject, Subscription, switchMap, take, takeUntil, tap } from 'rxjs';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { TimeSeriesContext } from '../execution-page/time-series-context';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
@@ -100,7 +100,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   selectedRefreshInterval: RefreshInterval = this.refreshIntervals[0];
   timeSelection!: ExecutionTimeSelection;
 
-  subscriptionsTerminator$ = new Subject<void>();
+  terminator$ = new Subject<void>();
   intervalShouldBeCanceled = false;
 
   allSeriesChecked: boolean = true;
@@ -143,13 +143,13 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.initContext();
     this.keywordsService
       .onAllSelectionChanged()
-      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .pipe(takeUntil(this.terminator$))
       .subscribe((selected) => {
         this.allSeriesChecked = selected;
       });
     this.keywordsService
       .onKeywordToggled()
-      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .pipe(takeUntil(this.terminator$))
       .subscribe((selection) => {
         this.throughputChart.setSeriesVisibility(selection.id, selection.isSelected);
         this.responseTimeChart.setSeriesVisibility(selection.id, selection.isSelected);
@@ -157,38 +157,41 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       });
     this.keywordsService
       .onKeywordsUpdated()
-      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .pipe(takeUntil(this.terminator$))
       .subscribe((keywords) => {
         this.keywords = keywords;
       });
     this.executionContext.timeSelectionState
       .onActiveSelectionChange()
-      .pipe(takeUntil(this.subscriptionsTerminator$))
-      .subscribe((newRange) => {
-        this.timeSelection = newRange;
-        this.updateTable().subscribe();
-        // the event is handled from the parent, so no action needed here.
-      });
+      .pipe(
+        tap((newRange) => (this.timeSelection = newRange)),
+        switchMap(() => this.updateTable()),
+        takeUntil(this.terminator$)
+      )
+      .subscribe();
     this.executionContext.timeSelectionState
       .onZoomReset()
-      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .pipe(takeUntil(this.terminator$))
       .subscribe(() => this.handleZoomReset());
 
     this.executionContext
       .onFiltersChange()
-      .pipe(takeUntil(this.subscriptionsTerminator$))
-      .subscribe((filters) => {
-        this.updateAllCharts().subscribe();
-      });
+      .pipe(
+        switchMap(() => this.updateAllCharts()),
+        takeUntil(this.terminator$)
+      )
+      .subscribe();
     this.executionContext
       .onGroupingChange()
-      .pipe(takeUntil(this.subscriptionsTerminator$))
-      .subscribe((groupDimensions: string[]) => {
-        this.groupDimensions = groupDimensions;
-        this.mergeRequestWithActiveFilters();
-        this.createByKeywordsCharts({ ...this.findRequest, groupDimensions: groupDimensions });
-        this.updateAllCharts().subscribe();
-      });
+      .pipe(
+        tap((groupDimensions: string[]) => {
+          this.groupDimensions = groupDimensions;
+          this.mergeRequestWithActiveFilters();
+        }),
+        switchMap(() => this.updateAllCharts()),
+        takeUntil(this.terminator$)
+      )
+      .subscribe();
 
     this.createAllCharts();
   }
@@ -240,7 +243,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     }
 
     forkJoin(charts$)
-      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .pipe(takeUntil(this.terminator$))
       .subscribe((allCompleted) => this.onInitializationComplete.emit());
   }
 
@@ -608,7 +611,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscriptionsTerminator$.next();
+    this.terminator$.next();
     this.tableInitialized$.complete();
     this.rangerLoaded$.complete();
   }
