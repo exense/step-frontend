@@ -1,6 +1,5 @@
 <step-table
   *ngIf="!(emptyResults$ | async)"
-  [pageSizeInputDisabled]="true"
   [dataSource]="searchableReferences$"
   matSort
   [matSortDisableClear]="true"
