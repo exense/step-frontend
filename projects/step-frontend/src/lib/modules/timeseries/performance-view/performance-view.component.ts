@@ -177,7 +177,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.executionContext
       .onFiltersChange()
       .pipe(
+        tap(() => (this.chartsAreLoading = true)),
         switchMap(() => this.updateAllCharts()),
+        tap(() => (this.chartsAreLoading = false)),
         takeUntil(this.terminator$)
       )
       .subscribe();
@@ -188,7 +190,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           this.groupDimensions = groupDimensions;
           this.mergeRequestWithActiveFilters();
         }),
+        tap(() => (this.chartsAreLoading = true)),
         switchMap(() => this.updateAllCharts()),
+        tap(() => (this.chartsAreLoading = false)),
         takeUntil(this.terminator$)
       )
       .subscribe();
@@ -248,7 +252,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   updateAllCharts(): Observable<unknown> {
-    this.chartsAreLoading = true;
     this.findRequest = this.prepareFindRequest(this.settings); // we don't want to lose active filters
     this.mergeRequestWithActiveFilters();
 
@@ -263,7 +266,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       charts$.push(this.createThreadGroupsChart(this.findRequest));
     }
 
-    return forkJoin(charts$).pipe(tap(() => (this.chartsAreLoading = false)));
+    return forkJoin(charts$);
   }
 
   mergeRequestWithActiveFilters() {
