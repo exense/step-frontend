@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { INJECTOR } from './angularjs-provider-options';
+import { INJECTOR } from '../modules/basics/step-basics.module';
 
 @Injectable({
   providedIn: 'root',
