@@ -1,0 +1,36 @@
+<step-table
+  *ngIf="!(emptyResults$ | async)"
+  [dataSource]="searchableReferences$"
+  matSort
+  [matSortDisableClear]="true"
+  [inProgress]="inProgress"
+>
+  <ng-container matColumnDef="name" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Used by</th>
+    <td mat-cell *matCellDef="let element">
+      <step-plan-link
+        *ngIf="element.type === 'PLAN'"
+        (click)="closeDialog()"
+        [context]="{ id: element.id, attributes: { name: element.name }, _class: '' }"
+      ></step-plan-link>
+      <step-function-link
+        *ngIf="element.type === 'FUNCTION'"
+        (click)="closeDialog()"
+        [context]="{ id: element.id, attributes: { name: element.name }, type: '' }"
+      ></step-function-link>
+      <span *ngIf="element.type != 'PLAN' && element.type != 'KEYWORD'">{{ element.name }}</span>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="type" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+    <td mat-cell *matCellDef="let element">{{ element.type }}</td>
+  </ng-container>
+  <ng-container matColumnDef="project" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Project</th>
+    <td mat-cell *matCellDef="let element">
+      <span *ngIf="currentProjectName === '[All]'">{{ projectIdToProjectNameMap[element.attributes?.project] }}</span>
+    </td>
+  </ng-container>
+</step-table>
+
+<p *ngIf="emptyResults$ | async" class="notification-text-not-used">Component is not used by other components.</p>

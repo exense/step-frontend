@@ -12,8 +12,6 @@ import { catchError, map, of, switchMap, tap, Observable } from 'rxjs';
 import { ILocationService } from 'angular';
 import { ExportDialogsService } from '../../_common/services/export-dialogs.service';
 import { ImportDialogsService } from '../../_common/services/import-dialogs.service';
-import { IsUsedByDialogsService } from '../../_common/services/is-used-by-dialogs.service';
-import { IsUsedByType } from '../../_common/shared/is-used-by-type.enum';
 
 @Injectable({
   providedIn: 'root',
@@ -26,7 +24,6 @@ export class FunctionDialogsService {
     private _dialogs: DialogsService,
     private _exportDialogs: ExportDialogsService,
     private _importDialogs: ImportDialogsService,
-    private _isUsedByDialogs: IsUsedByDialogsService,
     private _httpClient: HttpClient,
     private _uibModalHelper: UibModalHelperService,
     @Inject(AJS_FUNCTION_DIALOGS_CONFIG) public _functionDialogsConfig: any,
@@ -66,10 +63,6 @@ export class FunctionDialogsService {
         isDeleteConfirmed ? this._functionApiService.deleteFunction(id).pipe(map((_) => true)) : of(false)
       )
     );
-  }
-
-  openLookUpFunctionDialog(id: string, name: string): Observable<any> {
-    return this._isUsedByDialogs.displayDialog(`Keyword "${name}" is used by`, IsUsedByType.KEYWORD_ID, id);
   }
 
   openExportFunctionDialog(id: string, name: string): Observable<any> {

@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, TemplateRef } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_FUNCTION_TYPE_REGISTRY,
@@ -13,11 +13,11 @@ import {
   InteractivePlanExecutionService,
   selectionCollectionProvider,
 } from '@exense/step-core';
-import { noop } from 'rxjs';
 import { ILocationService, IRootScopeService } from 'angular';
 import { FunctionDialogsService } from '../../services/function-dialogs.service';
 import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
 import { FunctionBulkOperationsInvokeService } from '../../services/function-bulk-operations-invoke.service';
+import { ModalWindowService } from '../../../_common/components/modal-window/modal-window.service';
 
 @Component({
   selector: 'step-function-list',
@@ -42,6 +42,7 @@ export class FunctionListComponent {
     private _interactivePlanExecutionApiService: InteractivePlanExecutionService,
     private _functionDialogs: FunctionDialogsService,
     private _functionPackageDialogs: FunctionPackageActionsService,
+    readonly _modalWindowService: ModalWindowService,
     @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService,
     @Inject(AJS_LOCATION) private _location: ILocationService,
     @Inject(AJS_FUNCTION_TYPE_REGISTRY) private _functionTypeRegistry: any
@@ -91,10 +92,6 @@ export class FunctionListComponent {
 
   importFunctions(): void {
     this._functionDialogs.openImportFunctionDialog().subscribe((_) => this.dataSource.reload());
-  }
-
-  lookUp(id: string, name: string): void {
-    this._functionDialogs.openLookUpFunctionDialog(id, name).subscribe(noop);
   }
 
   configureFunction(id: string): void {
