@@ -3,4 +3,6 @@ export class TimeSeriesConfig {
 
   public static readonly RESPONSE_TIME_CHART_TITLE = 'Response Times';
   static readonly SUMMARY_BARS_COLOR = '#97a7d7';
+  static readonly STATUS_ATTRIBUTE = 'rnStatus';
+  static readonly CHART_LEGEND_SIZE = 65;
 }

@@ -1,0 +1,28 @@
+<button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu" style="min-width: 20px">
+  <step-icon name="settings"></step-icon>
+</button>
+<mat-menu #settingsMenu="matMenu">
+  <button mat-menu-item [matMenuTriggerFor]="metricsMenu">Metric</button>
+  <button mat-menu-item [matMenuTriggerFor]="invertebrates">Measurements</button>
+</mat-menu>
+
+<mat-menu #metricsMenu="matMenu">
+  <button
+    *ngFor="let metric of metrics"
+    (click)="selectMetric(metric)"
+    mat-menu-item
+    [class.selected]="metric.label === selectedMetric.label"
+  >
+    {{ metric.label }}
+  </button>
+</mat-menu>
+
+<mat-menu #invertebrates="matMenu">
+  <button mat-menu-item>Insects</button>
+  <button mat-menu-item>Molluscs</button>
+  <button mat-menu-item>Crustaceans</button>
+  <button mat-menu-item>Corals</button>
+  <button mat-menu-item>Arachnids</button>
+  <button mat-menu-item>Velvet worms</button>
+  <button mat-menu-item>Horseshoe crabs</button>
+</mat-menu>

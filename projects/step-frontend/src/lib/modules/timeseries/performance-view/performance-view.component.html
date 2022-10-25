@@ -28,11 +28,11 @@
       </div>
 
       <div class="chart-container chart">
-        <step-chart-skeleton *ngIf="!byStatusSettings"></step-chart-skeleton>
+        <step-chart-skeleton *ngIf="!chartsSettings[TsChartType.BY_STATUS]"></step-chart-skeleton>
         <step-timeseries-chart
           #byStatusChart
-          *ngIf="byStatusSettings"
-          [settings]="byStatusSettings"
+          *ngIf="chartsSettings[TsChartType.BY_STATUS]"
+          [settings]="chartsSettings[TsChartType.BY_STATUS]"
           [selection]="timeSelection?.absoluteSelection"
           [syncKey]="settings.contextId"
           (onZoomReset)="onZoomReset()"
@@ -70,10 +70,12 @@
 
         <div class="chart-container chart">
           <div class="settings-container" *ngIf="throughputChartSettings">
-            <step-measurements-picker
-              *ngIf="settings.contextId"
-              [contextId]="settings.contextId"
-            ></step-measurements-picker>
+            <step-throughput-chart-settings (onMetricChanged)="switchThroughputMetric($event)">
+            </step-throughput-chart-settings>
+            <!--            <step-measurements-picker-->
+            <!--              *ngIf="settings.contextId"-->
+            <!--              [contextId]="settings.contextId"-->
+            <!--            ></step-measurements-picker>-->
           </div>
           <step-chart-skeleton *ngIf="!throughputChartSettings"></step-chart-skeleton>
           <step-timeseries-chart
@@ -99,11 +101,11 @@
       </div>
 
       <div class="chart-container chart" *ngIf="includeThreadGroupChart">
-        <step-chart-skeleton *ngIf="!threadGroupSettings"></step-chart-skeleton>
+        <step-chart-skeleton *ngIf="!chartsSettings[TsChartType.THREAD_GROUP]"></step-chart-skeleton>
         <step-timeseries-chart
-          *ngIf="threadGroupSettings"
+          *ngIf="chartsSettings[TsChartType.THREAD_GROUP]"
           #threadGroupChart
-          [settings]="threadGroupSettings"
+          [settings]="chartsSettings[TsChartType.THREAD_GROUP]"
           [selection]="timeSelection?.absoluteSelection"
           [syncKey]="settings.contextId"
           (onZoomReset)="onZoomReset()"

@@ -14,10 +14,14 @@ export class TimeSeriesKeywordsContext {
   private keywordToggleSubject = new Subject<KeywordSelection>();
   private selectAllSubject = new BehaviorSubject<boolean>(true);
 
-  private colorsPool: TimeseriesColorsPool;
+  private readonly colorsPool: TimeseriesColorsPool;
 
   constructor(colorsPool: TimeseriesColorsPool) {
     this.colorsPool = colorsPool;
+  }
+
+  getColorsPool() {
+    return this.colorsPool;
   }
 
   getColor(keyword: string): string {
