@@ -16,7 +16,6 @@ import { ExecutionPageComponent } from './execution-page/execution-page.componen
 import { SyntheticMonitoringPageComponent } from './synthetic-monitoring/synthetic-monitoring-page.component';
 import { MeasurementsPickerComponent } from './performance-view/measurements/measurements-picker.component';
 import { PerformanceViewTimeSelectionComponent } from './performance-view/time-selection/performance-view-time-selection.component';
-import { ThroughputSettingsComponent } from './performance-view/settings/throughput/throughput-settings.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +31,6 @@ import { ThroughputSettingsComponent } from './performance-view/settings/through
     ExecutionPageComponent,
     SyntheticMonitoringPageComponent,
     MeasurementsPickerComponent,
-    ThroughputSettingsComponent,
   ],
   exports: [PerformanceViewComponent],
   imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule],

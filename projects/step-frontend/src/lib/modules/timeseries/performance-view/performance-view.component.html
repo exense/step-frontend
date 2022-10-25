@@ -42,7 +42,7 @@
 
       <div class="charts-section">
         <div class="chart-container chart">
-          <div class="settings-container" *ngIf="responseTypeByKeywordsSettings">
+          <div class="settings-container" *ngIf="chartsSettings[TsChartType.RESPONSE_TIME]">
             <button mat-icon-button matTooltip="Change Metrics" [matMenuTriggerFor]="menu">
               <step-icon name="bar-chart-2"></step-icon>
               <mat-menu #menu="matMenu">
@@ -51,16 +51,12 @@
                 </button>
               </mat-menu>
             </button>
-            <step-measurements-picker
-              *ngIf="settings.contextId"
-              [contextId]="settings.contextId"
-            ></step-measurements-picker>
           </div>
-          <step-chart-skeleton *ngIf="!responseTypeByKeywordsSettings"></step-chart-skeleton>
+          <step-chart-skeleton *ngIf="!chartsSettings[TsChartType.RESPONSE_TIME]"></step-chart-skeleton>
           <step-timeseries-chart
             #responseTimeChart
-            *ngIf="responseTypeByKeywordsSettings"
-            [settings]="responseTypeByKeywordsSettings"
+            *ngIf="chartsSettings[TsChartType.RESPONSE_TIME]"
+            [settings]="chartsSettings[TsChartType.RESPONSE_TIME]"
             [selection]="timeSelection?.absoluteSelection"
             [syncKey]="settings.contextId"
             (onZoomReset)="onZoomReset()"
@@ -69,19 +65,42 @@
         </div>
 
         <div class="chart-container chart">
-          <div class="settings-container" *ngIf="throughputChartSettings">
-            <step-throughput-chart-settings (onMetricChanged)="switchThroughputMetric($event)">
-            </step-throughput-chart-settings>
+          <div class="settings-container" *ngIf="chartsSettings[TsChartType.THROUGHPUT]">
+            <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu" style="min-width: 20px">
+              <step-icon name="settings"></step-icon>
+            </button>
+            <mat-menu #settingsMenu="matMenu">
+              <button mat-menu-item [matMenuTriggerFor]="metricsMenu">Metric</button>
+              <button mat-menu-item [matMenuTriggerFor]="keywordsMenu">Keywords</button>
+            </mat-menu>
+
+            <mat-menu #metricsMenu="matMenu">
+              <button
+                *ngFor="let metric of throughputMetrics"
+                (click)="switchThroughputMetric(metric)"
+                mat-menu-item
+                [class.selected-menu-item]="metric.label === selectedThroughputMetric.label"
+              >
+                {{ metric.label }}
+              </button>
+            </mat-menu>
+
+            <mat-menu #keywordsMenu="matMenu">
+              <step-measurements-picker
+                *ngIf="settings.contextId"
+                [contextId]="settings.contextId"
+              ></step-measurements-picker>
+            </mat-menu>
             <!--            <step-measurements-picker-->
             <!--              *ngIf="settings.contextId"-->
             <!--              [contextId]="settings.contextId"-->
             <!--            ></step-measurements-picker>-->
           </div>
-          <step-chart-skeleton *ngIf="!throughputChartSettings"></step-chart-skeleton>
+          <step-chart-skeleton *ngIf="!chartsSettings[TsChartType.THROUGHPUT]"></step-chart-skeleton>
           <step-timeseries-chart
-            *ngIf="throughputChartSettings"
+            *ngIf="chartsSettings[TsChartType.THROUGHPUT]"
             #throughputChart
-            [settings]="throughputChartSettings"
+            [settings]="chartsSettings[TsChartType.THROUGHPUT]"
             [selection]="timeSelection?.absoluteSelection"
             [syncKey]="settings.contextId"
             (onZoomReset)="onZoomReset()"
