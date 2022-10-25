@@ -3,7 +3,6 @@
     <step-execution-filters *ngIf="executionContext" [executionContext]="executionContext"></step-execution-filters>
     <step-execution-time-selection
       [timePicker]="includeTimeRangePicker"
-      (onRangeReset)="handleRangeReset($event)"
       (onRangerLoaded)="onRangerLoaded()"
       #timeSelection
       *ngIf="executionContext"

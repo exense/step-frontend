@@ -11,9 +11,9 @@ import { TSRangerComponent } from '../ranger/ts-ranger.component';
 import { UPlotUtils } from '../uplot/uPlot.utils';
 import { TimeSeriesConfig } from '../time-series.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
-import { first, forkJoin, Observable, of, Subject, Subscription, take, takeUntil, tap } from 'rxjs';
+import { first, forkJoin, Observable, of, Subject, Subscription, switchMap, take, takeUntil, tap } from 'rxjs';
 import { TimeSeriesUtils } from '../time-series-utils';
-import { ExecutionContext } from '../execution-page/execution-context';
+import { TimeSeriesContext } from '../execution-page/time-series-context';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
 import { KeywordSelection, TimeSeriesKeywordsContext } from '../execution-page/time-series-keywords.context';
 import { Bucket } from '../bucket';
@@ -70,6 +70,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   private tableInitialized$ = new Subject<void>();
   private rangerLoaded$ = new Subject<void>();
+  chartsAreLoading = false;
 
   barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
   stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
@@ -86,7 +87,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   executionStart: number = 0;
   executionInProgress = false;
   refreshEnabled = false;
-  chartsAreLoading = false;
 
   // this is just for running executions
   refreshIntervals: RefreshInterval[] = [
@@ -100,7 +100,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   selectedRefreshInterval: RefreshInterval = this.refreshIntervals[0];
   timeSelection!: ExecutionTimeSelection;
 
-  subscriptionsTerminator$ = new Subject<void>();
+  terminator$ = new Subject<void>();
   intervalShouldBeCanceled = false;
 
   allSeriesChecked: boolean = true;
@@ -116,7 +116,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   ];
   selectedMetric = this.responseTimeMetrics[0];
 
-  executionContext!: ExecutionContext;
+  executionContext!: TimeSeriesContext;
 
   initializationTasks: Observable<any>[] = [];
   updateTasks: Observable<any>[] = [];
@@ -143,13 +143,13 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.initContext();
     this.keywordsService
       .onAllSelectionChanged()
-      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .pipe(takeUntil(this.terminator$))
       .subscribe((selected) => {
         this.allSeriesChecked = selected;
       });
     this.keywordsService
       .onKeywordToggled()
-      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .pipe(takeUntil(this.terminator$))
       .subscribe((selection) => {
         this.throughputChart.setSeriesVisibility(selection.id, selection.isSelected);
         this.responseTimeChart.setSeriesVisibility(selection.id, selection.isSelected);
@@ -157,34 +157,45 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       });
     this.keywordsService
       .onKeywordsUpdated()
-      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .pipe(takeUntil(this.terminator$))
       .subscribe((keywords) => {
         this.keywords = keywords;
       });
-    this.executionContext
+    this.executionContext.timeSelectionState
       .onActiveSelectionChange()
-      .pipe(takeUntil(this.subscriptionsTerminator$))
-      .subscribe((newRange) => {
-        this.timeSelection = newRange;
-        this.updateTable();
-        // the event is handled from the parent, so no action needed here.
-      });
+      .pipe(
+        tap((newRange) => (this.timeSelection = newRange)),
+        switchMap(() => this.updateTable()),
+        takeUntil(this.terminator$)
+      )
+      .subscribe();
+    this.executionContext.timeSelectionState
+      .onZoomReset()
+      .pipe(takeUntil(this.terminator$))
+      .subscribe(() => this.handleZoomReset());
 
     this.executionContext
       .onFiltersChange()
-      .pipe(takeUntil(this.subscriptionsTerminator$))
-      .subscribe((filters) => {
-        this.updateAllCharts().subscribe();
-      });
+      .pipe(
+        tap(() => (this.chartsAreLoading = true)),
+        switchMap(() => this.updateAllCharts()),
+        tap(() => (this.chartsAreLoading = false)),
+        takeUntil(this.terminator$)
+      )
+      .subscribe();
     this.executionContext
       .onGroupingChange()
-      .pipe(takeUntil(this.subscriptionsTerminator$))
-      .subscribe((groupDimensions: string[]) => {
-        this.groupDimensions = groupDimensions;
-        this.mergeRequestWithActiveFilters();
-        this.createByKeywordsCharts({ ...this.findRequest, groupDimensions: groupDimensions });
-        this.updateAllCharts().subscribe();
-      });
+      .pipe(
+        tap((groupDimensions: string[]) => {
+          this.groupDimensions = groupDimensions;
+          this.mergeRequestWithActiveFilters();
+        }),
+        tap(() => (this.chartsAreLoading = true)),
+        switchMap(() => this.updateAllCharts()),
+        tap(() => (this.chartsAreLoading = false)),
+        takeUntil(this.terminator$)
+      )
+      .subscribe();
 
     this.createAllCharts();
   }
@@ -236,12 +247,11 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     }
 
     forkJoin(charts$)
-      .pipe(takeUntil(this.subscriptionsTerminator$))
+      .pipe(takeUntil(this.terminator$))
       .subscribe((allCompleted) => this.onInitializationComplete.emit());
   }
 
   updateAllCharts(): Observable<unknown> {
-    this.chartsAreLoading = true;
     this.findRequest = this.prepareFindRequest(this.settings); // we don't want to lose active filters
     this.mergeRequestWithActiveFilters();
 
@@ -256,7 +266,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       charts$.push(this.createThreadGroupsChart(this.findRequest));
     }
 
-    return forkJoin(charts$).pipe(tap(() => (this.chartsAreLoading = false)));
+    return forkJoin(charts$);
   }
 
   mergeRequestWithActiveFilters() {
@@ -269,7 +279,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   onZoomReset() {
-    this.timeSelectionComponent.resetZoom();
+    this.executionContext.timeSelectionState.resetZoom();
   }
 
   createThreadGroupsChart(request: FindBucketsRequest, isUpdate = false): Observable<TimeSeriesChartResponse> {
@@ -328,11 +338,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
               label: 'Total',
               data: totalData,
               value: (x, v) => Math.trunc(v),
-              // stroke: '#E24D42',
               fill: (self: uPlot) => UPlotUtils.gradientFill(self, '#8FA1D2'),
-              // fill: 'rgba(255,212,166,0.64)',
-              // points: {show: false},
-              // drawStyle: 1,
               paths: this.stepped({ align: 1 }),
               points: { show: false },
             },
@@ -504,11 +510,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
                 id: 'secondary',
                 data: totalThroughput,
                 value: (x, v) => Math.trunc(v) + ' total',
-                // stroke: '#E24D42',
                 fill: (self: uPlot) => UPlotUtils.gradientFill(self, '#8394C9'),
-                // fill: 'rgba(255,212,166,0.64)',
-                // points: {show: false},
-                // drawStyle: 1,
                 paths: this.barsFunction({ size: [0.9, 100] }),
                 points: { show: false },
               },
@@ -552,7 +554,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     if (!this.tableChart) {
       throw 'Table does not exist yet';
     }
-    let newRange = this.executionContext.getActiveSelection().absoluteSelection;
+    let newRange = this.executionContext.timeSelectionState.getActiveSelection().absoluteSelection;
     if (!newRange) {
       // we have a full selection
       return this.tableChart.refresh(this.findRequest); // refresh the table
@@ -568,13 +570,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     return this.tableChart.refresh(clonedRequest); // refresh the table
   }
 
-  handleRangeReset(newRange: TSTimeRange) {
-    this.responseTimeChart.resetZoom();
-    this.byStatusChart.resetZoom();
-    this.byStatusChart.resetZoom();
-    this.summaryChart.resetZoom();
-    this.throughputChart.resetZoom();
-    this.updateTable();
+  handleZoomReset() {
+    // the charts will reset because they are linked to the ranger.
+    this.updateTable().subscribe();
   }
 
   switchChartMetric(metric: { label: string; mapFunction: (b: Bucket) => number }) {
@@ -602,7 +600,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscriptionsTerminator$.next();
+    this.terminator$.next();
     this.tableInitialized$.complete();
     this.rangerLoaded$.complete();
   }

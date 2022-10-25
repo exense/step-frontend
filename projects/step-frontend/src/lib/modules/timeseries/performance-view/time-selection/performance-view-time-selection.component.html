@@ -5,7 +5,7 @@
       *ngIf="rangerSettings"
       [settings]="rangerSettings"
       [syncKey]="settings.contextId"
-      [selection]="selection.absoluteSelection"
+      [selection]="currentSelection.absoluteSelection"
       (onChartLoaded)="onRangerLoaded.emit()"
       (onRangeChange)="onRangerSelectionChange($event)"
       (onZoomReset)="onRangerZoomReset($event)"
@@ -13,6 +13,6 @@
     </step-ts-ranger>
   </div>
   <div class="time-picker-container" *ngIf="timePicker">
-    <step-time-range-picker (selectionChange)="handleTimePickerSelectionChange($event)"></step-time-range-picker>
+    <step-time-range-picker (onSelectionChange)="handleTimePickerSelectionChange($event)"></step-time-range-picker>
   </div>
 </div>
