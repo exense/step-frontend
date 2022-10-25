@@ -6,7 +6,7 @@ import { PlanFunctionListComponent } from './components/plan-function-list/plan-
 import { PlanArtefactListComponent } from './components/plan-artefact-list/plan-artefact-list.component';
 import { CustomCellRegistryService, EntityRegistry } from '@exense/step-core';
 import { PlanIconComponent } from './components/plan-icon/plan-icon.component';
-import { PlanLinkComponent } from './components/plan-link/plan-link.component';
+import { PlanLinkComponent } from '../_common/components/plan-link/plan-link.component';
 
 @NgModule({
   declarations: [
@@ -15,7 +15,6 @@ import { PlanLinkComponent } from './components/plan-link/plan-link.component';
     PlanFunctionListComponent,
     PlanArtefactListComponent,
     PlanIconComponent,
-    PlanLinkComponent,
   ],
   imports: [StepCommonModule],
   exports: [PlanListComponent, PlanOtherplanListComponent, PlanFunctionListComponent, PlanArtefactListComponent],

@@ -11,7 +11,7 @@ import { StepCommonModule } from '../_common/step-common.module';
 import { FunctionPackageLinkComponent } from './components/function-package-link/function-package-link.component';
 import { FunctionPackageListComponent } from './components/function-package-list/function-package-list.component';
 import { FunctionIconComponent } from './components/function-icon/function-icon.component';
-import { FunctionLinkComponent } from './components/function-link/function-link.component';
+import { FunctionLinkComponent } from '../_common/components/function-link/function-link.component';
 import { FunctionTypeLabelPipe } from './pipes/function-type-label.pipe';
 import { FunctionTypeFilterComponent } from './components/function-type-filter/function-type-filter.component';
 import { FunctionPackageSearchComponent } from './components/function-package-search/function-package-search.component';
@@ -22,7 +22,6 @@ import { FunctionPackageSearchComponent } from './components/function-package-se
     FunctionPackageLinkComponent,
     FunctionPackageListComponent,
     FunctionIconComponent,
-    FunctionLinkComponent,
     FunctionTypeLabelPipe,
     FunctionTypeFilterComponent,
     FunctionPackageSearchComponent,

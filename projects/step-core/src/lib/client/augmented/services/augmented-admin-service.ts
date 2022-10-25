@@ -25,6 +25,13 @@ export class AugmentedAdminService extends AdminService {
     super(httpRequest);
   }
 
+  getAllProjects(): Observable<Array<ProjectDto>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/tenants/projects',
+    });
+  }
+
   getProject(id: string): Observable<ProjectDto> {
     return this.httpRequest.request({
       method: 'GET',
