@@ -17,6 +17,7 @@ import './components/execution-tabs/execution-tabs.component';
 import { CustomCellRegistryService, EntityRegistry } from '@exense/step-core';
 import { PlanIconComponent } from '../plan/components/plan-icon/plan-icon.component';
 import { PlanLinkComponent } from '../plan/components/plan-link/plan-link.component';
+import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { PlanLinkComponent } from '../plan/components/plan-link/plan-link.compon
     PanelIdPipe,
     KeywordCallsComponent,
     ExecutionTabsComponent,
+    RepositoryPlanTestcaseListComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule],
   exports: [ExecutionListComponent, ExecutionStepComponent, ExecutionTabsComponent],
