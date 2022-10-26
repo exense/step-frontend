@@ -8,6 +8,12 @@
   .node-content {
     padding: 2px 4px 2px 1px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+
+    step-icon {
+      margin-right: 6px;
+    }
   }
 
   &.tree-node-selected .node-content {
@@ -16,6 +22,10 @@
 
   &:not(.cdk-drag-disabled) .drag-handle {
     cursor: move;
+  }
+
+  &.skipped {
+    color: var.$muted;
   }
 }
 

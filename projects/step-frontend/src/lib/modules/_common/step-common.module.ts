@@ -7,6 +7,9 @@ import { ExecutionLinkComponent } from './components/execution-link/execution-li
 import { JsonViewerDirective } from './directives/json-viewer.directive';
 import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
 import { MenuFilterPipe } from './pipes/menu-filter.pipe';
+import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
+import { CustomFormDirective } from './directives/custom-form.directive';
+import { PlanExecutionDirective } from './directives/plan-execution.directive';
 
 @NgModule({
   declarations: [
@@ -17,6 +20,9 @@ import { MenuFilterPipe } from './pipes/menu-filter.pipe';
     JsonViewerDirective,
     IsEmptyJsonPipe,
     MenuFilterPipe,
+    ArtefactDetailsDirective,
+    CustomFormDirective,
+    PlanExecutionDirective,
   ],
   exports: [
     AutorefreshToggleComponent,
@@ -27,6 +33,9 @@ import { MenuFilterPipe } from './pipes/menu-filter.pipe';
     JsonViewerDirective,
     IsEmptyJsonPipe,
     MenuFilterPipe,
+    ArtefactDetailsDirective,
+    CustomFormDirective,
+    PlanExecutionDirective,
   ],
   imports: [StepCoreModule],
 })

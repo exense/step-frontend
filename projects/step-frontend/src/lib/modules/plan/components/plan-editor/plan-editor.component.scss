@@ -1,0 +1,23 @@
+step-plan-editor {
+  .editor-header {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+span.mat-menu-item.plan-execution-menu {
+  height: auto;
+  font-size: inherit;
+  line-height: initial;
+  font-weight: initial;
+
+  &:hover:not([disabled]) {
+    background: transparent;
+  }
+
+  step-plan-execution {
+    width: 250px;
+    display: block;
+    padding: 5px;
+  }
+}

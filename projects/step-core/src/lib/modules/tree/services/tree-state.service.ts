@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, map, Observable, combineLatest } from 'rxjs';
+import { BehaviorSubject, map, Observable, combineLatest, Subject } from 'rxjs';
 import { AbstractArtefact } from '../../../client/generated';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { ArtefactFlatNode } from '../shared/artefact-flat-node';
@@ -16,6 +16,12 @@ export class TreeStateService implements OnDestroy {
 
   private rootNode$ = new BehaviorSubject<AbstractArtefact | undefined>(undefined);
   private selectedNodeIds$ = new BehaviorSubject<string[]>([]);
+
+  private editNodeIdInternal$ = new BehaviorSubject<string | undefined>(undefined);
+  readonly editNodeId$ = this.editNodeIdInternal$.asObservable();
+
+  private treeUpdateInternal$ = new Subject<AbstractArtefact>();
+  readonly treeUpdate$ = this.treeUpdateInternal$.asObservable();
 
   readonly selectedArtefact$ = this.selectedNodeIds$.pipe(map((nodeIds) => this.findNodeById(nodeIds[0])));
 
@@ -40,6 +46,7 @@ export class TreeStateService implements OnDestroy {
         level,
         expandable: (node.children?.length ?? -1) > 0,
         parentId: node.parentId,
+        isSkipped: !!node.skipNode?.value,
       } as ArtefactFlatNode),
     (node) => node.level,
     (node) => node.expandable,
@@ -56,9 +63,13 @@ export class TreeStateService implements OnDestroy {
 
   readonly expansionModel = new SelectionModel<string>(true);
 
-  init(rootNode: AbstractArtefact, selectedNodeIds: string[]): void {
+  init(rootNode: AbstractArtefact, selectedNodeIds?: string[]): void {
     this.rootNode$.next(rootNode);
-    this.selectedNodeIds$.next(selectedNodeIds);
+    if (selectedNodeIds) {
+      this.selectedNodeIds$.next(selectedNodeIds);
+    } else {
+      this.selectedNodeIds$.next([...this.selectedNodeIds$.value]);
+    }
     this.updateData([rootNode]);
     this.expandAll();
   }
@@ -69,6 +80,51 @@ export class TreeStateService implements OnDestroy {
 
   isRoot(nodeId: string): Observable<boolean> {
     return this.rootNode$.pipe(map((rootNode) => rootNode?.id === nodeId));
+  }
+
+  selectNodeById(nodeId: string): void {
+    this.selectedNodeIds$.next([nodeId]);
+  }
+
+  editSelectedNode(): void {
+    const nodeId = this.selectedNodeIds$.value[0];
+    this.editNodeIdInternal$.next(nodeId);
+  }
+
+  updateEditNodeName(name: string): void {
+    const editNodeId = this.editNodeIdInternal$.value;
+    if (!editNodeId) {
+      return;
+    }
+    const node = this.findNodeById(editNodeId);
+    if (node) {
+      node.attributes = node.attributes || {};
+      node.attributes['name'] = name;
+      if (this.selectedNodeIds$.value.includes(editNodeId)) {
+        this.selectedNodeIds$.next([editNodeId]);
+      }
+      this.updateData([this.rootNode$.value!]);
+      this.rootNode$.next(this.rootNode$.value);
+      this.treeUpdateInternal$.next(this.rootNode$.value!);
+    }
+    this.cancelEdit();
+  }
+
+  cancelEdit(): void {
+    this.editNodeIdInternal$.next(undefined);
+  }
+
+  toggleSkip(): void {
+    const nodeId = this.selectedNodeIds$.value[0];
+    const node = this.findNodeById(nodeId);
+    if (!node) {
+      return;
+    }
+    node.skipNode = node.skipNode || {};
+    node.skipNode.value = !node.skipNode.value;
+    this.updateData([this.rootNode$.value!]);
+    this.rootNode$.next(this.rootNode$.value);
+    this.treeUpdateInternal$.next(this.rootNode$.value!);
   }
 
   selectNode(node: ArtefactFlatNode, $event?: MouseEvent): void {
@@ -178,6 +234,7 @@ export class TreeStateService implements OnDestroy {
 
     this.updateData([this.rootNode$.value!]);
     this.rootNode$.next(this.rootNode$.value);
+    this.treeUpdateInternal$.next(this.rootNode$.value!);
   }
 
   handleDragStart(node: ArtefactFlatNode): void {
@@ -207,7 +264,7 @@ export class TreeStateService implements OnDestroy {
         hasChange = true;
       }
 
-      if (direction === 'down' && childIndex < children.length - 2) {
+      if (direction === 'down' && childIndex < children.length - 1) {
         const sibling = children[childIndex + 1];
         children[childIndex + 1] = children[childIndex];
         children[childIndex] = sibling;
@@ -218,7 +275,31 @@ export class TreeStateService implements OnDestroy {
     if (hasChange) {
       this.updateData([this.rootNode$.value!]);
       this.rootNode$.next(this.rootNode$.value);
+      this.treeUpdateInternal$.next(this.rootNode$.value!);
     }
+  }
+
+  addChildrenToSelectedNode(...children: AbstractArtefact[]): void {
+    const parent = this.findNodeById(this.selectedNodeIds$.value[0]);
+    if (!parent) {
+      return;
+    }
+
+    parent.children = parent.children || [];
+    parent.children.push(...children);
+
+    this.updateData([this.rootNode$.value!]);
+    this.rootNode$.next(this.rootNode$.value);
+    this.treeUpdateInternal$.next(this.rootNode$.value!);
+
+    if (!this.expansionModel.isSelected(parent.id!)) {
+      this.expansionModel.toggle(parent.id!);
+      const parentFlat = this.treeControl.dataNodes.find((node) => node.id === parent.id!);
+      this.treeControl.expand(parentFlat!);
+    }
+
+    const lastChild = children[children.length - 1];
+    this.selectedNodeIds$.next([lastChild.id!]);
   }
 
   removeSelectedNodes(): void {
@@ -229,11 +310,20 @@ export class TreeStateService implements OnDestroy {
 
     parentChildRelations.forEach(({ parentId, nodeId }) => {
       const parent = this.findNodeById(parentId)!;
-      parent.children = parent.children!.filter((child) => child.id !== nodeId);
+      if (parent) {
+        parent.children = parent.children!.filter((child) => child.id !== nodeId);
+      }
     });
 
     this.updateData([this.rootNode$.value!]);
     this.rootNode$.next(this.rootNode$.value);
+    this.treeUpdateInternal$.next(this.rootNode$.value!);
+
+    const parents = parentChildRelations
+      .map(({ parentId }) => this.findNodeById(parentId))
+      .filter((parent) => !!parent);
+    const lastParent = parents[parents.length - 1];
+    this.selectedNodeIds$.next([lastParent!.id!]);
   }
 
   findNodeById(id?: string, parent?: AbstractArtefact): AbstractArtefact | undefined {
@@ -277,6 +367,14 @@ export class TreeStateService implements OnDestroy {
     });
   }
 
+  getSelectedArtefacts(): AbstractArtefact[] {
+    const ids = this.selectedNodeIds$.value;
+
+    const result = ids.map((id) => this.findNodeById(id)).filter((x) => !!x) as AbstractArtefact[];
+
+    return result;
+  }
+
   private getParentChildRelationsForSelectedNodes(): { nodeId: string; parentId: string }[] {
     const selectedNodeIds = this.selectedNodeIds$.value.filter((nodeId) => nodeId !== this.rootNode$.value?.id);
 
@@ -314,5 +412,7 @@ export class TreeStateService implements OnDestroy {
   ngOnDestroy(): void {
     this.rootNode$.complete();
     this.selectedNodeIds$.complete();
+    this.treeUpdateInternal$.complete();
+    this.editNodeIdInternal$.complete();
   }
 }

@@ -1,0 +1,71 @@
+<as-split direction="horizontal">
+  <as-split-area [size]="30">
+    <div>
+      <step-btn-group>
+        <button
+          type="button"
+          mat-icon-button
+          (click)="_planHandle?.moveUp()"
+          matTooltip="Move selected node upward (ctrl+up)"
+          matTooltipPosition="below"
+        >
+          <step-icon name="chevron-up" aria-hidden="true"></step-icon>
+        </button>
+        <button
+          type="button"
+          mat-icon-button
+          (click)="_planHandle?.moveDown()"
+          matTooltip="Move selected node downward (ctrl+down)"
+          matTooltipPosition="below"
+        >
+          <step-icon name="chevron-down" aria-hidden="true"></step-icon>
+        </button>
+      </step-btn-group>
+      <step-btn-group>
+        <button
+          type="button"
+          mat-flat-button
+          (click)="_planHandle?.copy()"
+          matTooltip="Copy selected node (ctrl+c)"
+          matTooltipPosition="below"
+        >
+          Copy
+        </button>
+        <button
+          type="button"
+          mat-flat-button
+          (click)="_planHandle?.paste()"
+          matTooltip="Paste selected node (ctrl+v)"
+          matTooltipPosition="below"
+        >
+          Paste
+        </button>
+      </step-btn-group>
+      <step-btn-group>
+        <button
+          type="button"
+          mat-flat-button
+          (click)="_planHandle?.delete()"
+          matTooltip="Delete selected node (del)"
+          matTooltipPosition="below"
+        >
+          Delete
+        </button>
+      </step-btn-group>
+      <!--
+      <step-btn-group>
+        <button type="button" mat-flat-button color="primary">
+            Run interactively
+        </button>
+      </step-btn-group>
+-->
+    </div>
+    <step-tree (treeContextAction)="proceedAction($event.actionId, $event.node)"> </step-tree>
+  </as-split-area>
+  <as-split-area [size]="70">
+    <ng-container *ngIf="_planHandle?.selectedArtefact$ | async as selectedArtefact">
+      <step-artefact-details [artefact]="selectedArtefact" (onSave)="_planHandle?.handlePlanChange()">
+      </step-artefact-details>
+    </ng-container>
+  </as-split-area>
+</as-split>

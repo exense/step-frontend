@@ -9,16 +9,35 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { IsNodeSelectedPipe } from './pipes/is-node-selected.pipe';
 import { TreeDragPreviewComponent } from './components/tree-drag-preview/tree-drag-preview.component';
 import { IsRootNodePipe } from './pipes/is-root-node.pipe';
+import { TreeNodeActionsPipe } from './pipes/tree-node-actions.pipe';
+import { TreeNodeNameComponent } from './components/tree-node-name/tree-node-name.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
-  declarations: [TreeComponent, IsNodeSelectedPipe, TreeDragPreviewComponent, IsRootNodePipe],
-  imports: [CommonModule, StepBasicsModule, StepIconsModule, StepMaterialModule, CdkTreeModule, DragDropModule],
+  declarations: [
+    TreeComponent,
+    IsNodeSelectedPipe,
+    TreeDragPreviewComponent,
+    IsRootNodePipe,
+    TreeNodeActionsPipe,
+    TreeNodeNameComponent,
+  ],
+  imports: [
+    CommonModule,
+    StepBasicsModule,
+    StepIconsModule,
+    StepMaterialModule,
+    CdkTreeModule,
+    DragDropModule,
+    ReactiveFormsModule,
+  ],
   exports: [TreeComponent],
 })
 export class TreeModule {}
 
 export * from './components/tree/tree.component';
 export * from './services/tree-state.service';
+export * from './services/tree-actions.service';
 export * from './shared/abstract-artefact-with-parent-id';
 export * from './shared/artefact-flat-node';
 export * from './shared/tree-action';

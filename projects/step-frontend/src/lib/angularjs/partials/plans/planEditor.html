@@ -1,4 +1,9 @@
 <div id="PlanEditorCtrl" ng-controller="PlanEditorCtrl" class="container-fluid st-flex-column">
+<!--
+  <div>
+    <step-plan-editor [plan-id]="planId"></step-plan-editor>
+  </div>
+-->
 	<div ng-if="isInteractiveSessionActive()" class="alert alert-info" role="alert">Welcome to the interactive mode. In this mode you can select tree nodes and run them directly by clicking the button 'Run interactively'</div>
 	<div class="st-flex-row">
 		<div class="flex sectionResizable sectionViewPlanEditor" resizable r-directions="['right']" r-flex="true">
