@@ -1,0 +1,51 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
+.header {
+  @include core.table-header;
+}
+
+:host {
+  @include core.table-container;
+}
+
+.status {
+  @include core.status-shape();
+  cursor: pointer;
+  min-width: 50px;
+}
+
+.status-RUNNING {
+  background: #337ab7;
+  color: white;
+}
+
+.status-SKIPPED {
+  background: #a0a0a0;
+  color: white;
+}
+
+.status-NORUN {
+  background: #a0a0a0;
+  color: white;
+}
+
+.status-PASSED {
+  background: #5cb85c;
+  color: black;
+}
+
+.status-FAILED {
+  background: #d9534f;
+  color: white;
+}
+
+.status-TECHNICAL_ERROR {
+  background: black;
+  color: white;
+}
+
+.status-INTERRUPTED {
+  background: #f9c038;
+  color: black;
+}
