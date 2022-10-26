@@ -42,8 +42,15 @@ angular
     '$http',
     '$location',
     'stateStorage',
-    function ($rootScope, $scope, $http, $location, $stateStorage) {
+    'selectionCollectorFactoryService',
+    'AutoDeselectStrategy',
+    function ($rootScope, $scope, $http, $location, $stateStorage, selectionCollectorFactoryService, AutoDeselectStrategy) {
       $stateStorage.push($scope, 'repository', {});
+
+      $scope.selectionCollector = selectionCollectorFactoryService.create('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER);
+      $scope.$on('$destroy', function(){
+        $scope.selectionCollector.destroy();
+      });
 
       if ($location.search().user) {
         $rootScope.context.userID = $location.search().user;
