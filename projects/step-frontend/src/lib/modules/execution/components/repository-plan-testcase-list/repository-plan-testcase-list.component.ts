@@ -1,17 +1,14 @@
-import { Component, Input } from '@angular/core';
+import { Component, forwardRef, Input } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
-  AutoDeselectStrategy,
-  BulkOperationType,
   BulkOperationsInvokeService,
-  ExecutiontTaskParameters,
-  selectionCollectionProvider,
   ControllerService,
   Mutable,
   TestSetStatusOverview,
-  TableLocalDataSource,
   TestRunStatus,
+  SelectionCollector,
+  SelectionCollectorContainer,
 } from '@exense/step-core';
 import { ScheduledTaskLogicService } from '../../../scheduler/services/scheduled-task-logic.service';
 import { BehaviorSubject, map, of, shareReplay, switchMap, tap } from 'rxjs';
@@ -24,15 +21,24 @@ type InProgress = Mutable<Pick<ScheduledTaskLogicService, 'inProgress'>>;
   templateUrl: './repository-plan-testcase-list.component.html',
   styleUrls: ['./repository-plan-testcase-list.component.scss'],
   providers: [
-    selectionCollectionProvider<string, TestRunStatus>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    {
+      provide: SelectionCollectorContainer,
+      useExisting: forwardRef(() => RepositoryPlanTestcaseListComponent),
+    },
+    {
+      provide: SelectionCollector,
+      useFactory: (container: SelectionCollectorContainer<string, TestRunStatus>) => container.selectionCollector,
+      deps: [SelectionCollectorContainer],
+    },
     {
       provide: BulkOperationsInvokeService,
       useClass: ScheduledTaskBulkOperationsInvokeService,
     },
   ],
 })
-export class RepositoryPlanTestcaseListComponent {
+export class RepositoryPlanTestcaseListComponent implements SelectionCollectorContainer<string, TestRunStatus> {
   @Input() planId: string = '';
+  @Input() selectionCollector!: SelectionCollector<string, TestRunStatus>;
 
   readonly inProgress: boolean = false;
 
