@@ -1,11 +1,14 @@
 <step-table
-  [dataSource]="repositoryReport$"
+  [dataSource]="searchableRepositoryReport$"
   [inProgress]="inProgress"
   matSort
   [matSortDisableClear]="true"
   (onReload)="loadTable()"
 >
-  <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-new'"> </step-bulk-operations>
+  <step-bulk-operations
+    *stepAdditionalHeader="'btngroup-bulk-new'"
+    [selectionType]="bulkSelectionTypeAll"
+  ></step-bulk-operations>
 
   <ng-container matColumnDef="bulkSelection">
     <th mat-header-cell *matHeaderCellDef class="bulk-selection-cell"></th>
@@ -17,12 +20,17 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
     <td mat-cell *matCellDef="let element">{{ element.testplanName }}</td>
   </ng-container>
-  <ng-container matColumnDef="status" stepSearchCol>
+
+  <ng-container matColumnDef="status" stepSearchCol #searchStatus="SearchCol">
+    <step-array-filter
+      *stepSearchCellDef
+      [items]="(statusItems$ | async)!"
+      (selectedItemsChange)="searchStatus.search($event, true)"
+    >
+    </step-array-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
     <td mat-cell *matCellDef="let element">
-      <div class="status" [class]="'status-' + element.status">
-        {{ element.status }}
-      </div>
+      <step-status [status]="element?.status"></step-status>
     </td>
   </ng-container>
 </step-table>
