@@ -9,10 +9,13 @@ import {
   TestRunStatus,
   SelectionCollector,
   SelectionCollectorContainer,
+  BulkSelectionType,
+  TableLocalDataSource,
 } from '@exense/step-core';
 import { ScheduledTaskLogicService } from '../../../scheduler/services/scheduled-task-logic.service';
-import { BehaviorSubject, map, of, shareReplay, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, map, of, Observable, shareReplay, switchMap, tap } from 'rxjs';
 import { ScheduledTaskBulkOperationsInvokeService } from '../../../scheduler/services/scheduled-task-bulk-operations-invoke.service';
+import { REPORT_NODE_STATUS } from '../../../_common/shared/status.enum';
 
 type InProgress = Mutable<Pick<ScheduledTaskLogicService, 'inProgress'>>;
 
@@ -37,24 +40,43 @@ type InProgress = Mutable<Pick<ScheduledTaskLogicService, 'inProgress'>>;
   ],
 })
 export class RepositoryPlanTestcaseListComponent implements SelectionCollectorContainer<string, TestRunStatus> {
-  @Input() planId: string = '';
+  @Input() planId: any;
   @Input() selectionCollector!: SelectionCollector<string, TestRunStatus>;
 
+  readonly bulkSelectionTypeAll = BulkSelectionType.All;
   readonly inProgress: boolean = false;
 
-  private repositoryReportRequest$ = new BehaviorSubject<any>({});
-  readonly repositoryReport$ = this.repositoryReportRequest$.pipe(
+  statusItems$: Observable<any> = of(REPORT_NODE_STATUS);
+
+  private repositoryReportRequest$ = new BehaviorSubject<TestRunStatus>({});
+  private repositoryReport$ = this.repositoryReportRequest$.pipe(
     tap((_) => ((this as InProgress).inProgress = true)),
     switchMap((_) =>
       this._controllerService.getReport({
         repositoryID: 'local',
-        repositoryParameters: { planid: '63591bf8f7811970af84bc86' },
+        repositoryParameters: { planid: this.planId },
       })
     ),
     map((testSetStatusOverview: TestSetStatusOverview) => testSetStatusOverview.runs!),
+    tap(
+      (testRunStatusList: Array<TestRunStatus>) =>
+        (this.statusItems$ = of(
+          testRunStatusList
+            .map((testRunStatus) => testRunStatus.status)
+            .filter((value, index, self) => self.indexOf(value) === index)
+        ))
+    ),
     tap((_) => ((this as InProgress).inProgress = false)),
     shareReplay(1)
   );
+
+  readonly searchableRepositoryReport$ = new TableLocalDataSource(this.repositoryReport$, {
+    searchPredicates: {
+      status: (element, searchValue) => {
+        return searchValue.toLowerCase().includes(element!.status!.toLowerCase());
+      },
+    },
+  });
 
   constructor(public readonly _controllerService: ControllerService) {}
 
