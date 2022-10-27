@@ -6,6 +6,7 @@
           type="button"
           mat-icon-button
           (click)="_planHandle?.moveUp()"
+          [disabled]="!('plan-write' | hasRight | async)"
           matTooltip="Move selected node upward (ctrl+up)"
           matTooltipPosition="below"
         >
@@ -15,6 +16,7 @@
           type="button"
           mat-icon-button
           (click)="_planHandle?.moveDown()"
+          [disabled]="!('plan-write' | hasRight | async)"
           matTooltip="Move selected node downward (ctrl+down)"
           matTooltipPosition="below"
         >
@@ -26,6 +28,7 @@
           type="button"
           mat-flat-button
           (click)="_planHandle?.copy()"
+          [disabled]="!('plan-write' | hasRight | async)"
           matTooltip="Copy selected node (ctrl+c)"
           matTooltipPosition="below"
         >
@@ -35,6 +38,7 @@
           type="button"
           mat-flat-button
           (click)="_planHandle?.paste()"
+          [disabled]="!('plan-write' | hasRight | async)"
           matTooltip="Paste selected node (ctrl+v)"
           matTooltipPosition="below"
         >
@@ -46,19 +50,26 @@
           type="button"
           mat-flat-button
           (click)="_planHandle?.delete()"
+          [disabled]="!('plan-delete' | hasRight | async)"
           matTooltip="Delete selected node (del)"
           matTooltipPosition="below"
         >
           Delete
         </button>
       </step-btn-group>
-      <!--
-      <step-btn-group>
-        <button type="button" mat-flat-button color="primary">
-            Run interactively
+      <step-btn-group *ngIf="_planHandle?.isInteractiveSessionActive$ | async">
+        <button
+          type="button"
+          mat-flat-button
+          color="primary"
+          (click)="_planHandle?.execute()"
+          [disabled]="!('interactive' | hasRight | async)"
+          matTooltip="Executes the selected node in the interactive session (ctrl+enter)"
+          matTooltipPosition="below"
+        >
+          Run interactively
         </button>
       </step-btn-group>
--->
     </div>
     <step-tree (treeContextAction)="proceedAction($event.actionId, $event.node)"> </step-tree>
   </as-split-area>

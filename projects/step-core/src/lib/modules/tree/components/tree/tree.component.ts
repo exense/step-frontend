@@ -1,13 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  HostListener,
-  Input,
-  Optional,
-  Output,
-  TrackByFunction,
-  ViewChild,
-} from '@angular/core';
+import { Component, EventEmitter, Input, Optional, Output, TrackByFunction, ViewChild } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { AbstractArtefact } from '../../../../client/generated';
 import { TreeAction } from '../../shared/tree-action';

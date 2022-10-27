@@ -10,6 +10,7 @@ import { PlanLinkComponent } from './components/plan-link/plan-link.component';
 import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { PlanEditorComponent } from './components/plan-editor/plan-editor.component';
 import { PlanEditorKeyHandlerDirective } from './directives/plan-editor-key-handler.directive';
+import { ExecutionModule } from '../execution/execution.module';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,7 @@ import { PlanEditorKeyHandlerDirective } from './directives/plan-editor-key-hand
     PlanEditorComponent,
     PlanEditorKeyHandlerDirective,
   ],
-  imports: [StepCommonModule],
+  imports: [StepCommonModule, ExecutionModule],
   exports: [PlanListComponent, PlanOtherplanListComponent, PlanFunctionListComponent, PlanArtefactListComponent],
 })
 export class PlanModule {

@@ -29,8 +29,9 @@ import { filter, map, merge, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { PlanHandleService } from '../../services/plan-handle.service';
 import { ExportDialogsService } from '../../../_common/services/export-dialogs.service';
 import { ILocationService } from 'angular';
+import { InteractiveSessionService } from '../../services/interactive-session.service';
 
-type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef'>>;
+type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef' | 'componentTabs'>>;
 
 @Component({
   selector: 'step-plan-editor',
@@ -40,6 +41,7 @@ type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef'>>;
   providers: [
     TreeStateService,
     PlanHistoryService,
+    InteractiveSessionService,
     {
       provide: PlanHandleService,
       useExisting: forwardRef(() => PlanEditorComponent),
@@ -67,13 +69,16 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
 
   readonly selectedArtefact$ = this._treeState.selectedArtefact$;
 
+  readonly isInteractiveSessionActive$ = this._interactiveSession.isActive$;
+
   readonly repositoryObjectRef?: RepositoryObjectReference;
 
   constructor(
-    private _planApi: PlansService,
-    private _keywordCallsApi: KeywordsService,
     private _treeState: TreeStateService,
     private _planHistory: PlanHistoryService,
+    public _interactiveSession: InteractiveSessionService,
+    private _planApi: PlansService,
+    private _keywordCallsApi: KeywordsService,
     private _screenTemplates: ScreensService,
     private _authService: AuthService,
     private _exportDialogs: ExportDialogsService,
@@ -82,33 +87,9 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
   ) {}
 
   ngOnInit(): void {
-    const planUpdateByTree$ = this._treeState.treeUpdate$.pipe(
-      map(() => this.plan),
-      filter((plan) => !!plan),
-      tap((plan) => this._planHistory.addToHistory(plan!))
-    );
-
-    const planUpdateByEditor$ = this.planChange$.pipe(
-      tap((plan) => {
-        this._treeState.init(plan.root!);
-        this._planHistory.addToHistory(plan);
-        this.plan = plan;
-      })
-    );
-
-    const planUpdatedByHistory$ = this._planHistory.planChange$.pipe(
-      tap((plan) => {
-        this._treeState.init(plan.root!);
-        this.plan = plan;
-      })
-    );
-
-    merge(planUpdateByTree$, planUpdateByEditor$, planUpdatedByHistory$)
-      .pipe(
-        switchMap((plan) => this._planApi.savePlan(plan)),
-        takeUntil(this.terminator$)
-      )
-      .subscribe();
+    this._interactiveSession.init();
+    this.initPlanUpdate();
+    this.initConsoleTabToggle();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -359,6 +340,24 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
     });
   }
 
+  startInteractive(): void {
+    this._interactiveSession.startInteractive(this.repositoryObjectRef!).subscribe();
+  }
+
+  stopInteractive(): void {
+    this._interactiveSession.stopInteractive().subscribe(() => (this.selectedTab = 'controls'));
+  }
+
+  resetInteractive(): void {
+    this._interactiveSession.resetInteractive().subscribe(() => (this.selectedTab = 'controls'));
+  }
+
+  execute(): void {
+    const artefactIds = this._treeState.getSelectedArtefacts().map((artefact) => artefact.id!);
+
+    this._interactiveSession.execute(this.planId!, artefactIds).subscribe();
+  }
+
   private loadPlan(planId: string): void {
     if (!planId) {
       return;
@@ -371,6 +370,55 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
       }
       this._planHistory.init(plan);
     });
+  }
+
+  private initPlanUpdate(): void {
+    const planUpdateByTree$ = this._treeState.treeUpdate$.pipe(
+      map(() => this.plan),
+      filter((plan) => !!plan),
+      tap((plan) => this._planHistory.addToHistory(plan!))
+    );
+
+    const planUpdateByEditor$ = this.planChange$.pipe(
+      tap((plan) => {
+        this._treeState.init(plan.root!);
+        this._planHistory.addToHistory(plan);
+        this.plan = plan;
+      })
+    );
+
+    const planUpdatedByHistory$ = this._planHistory.planChange$.pipe(
+      tap((plan) => {
+        this._treeState.init(plan.root!);
+        this.plan = plan;
+      })
+    );
+
+    merge(planUpdateByTree$, planUpdateByEditor$, planUpdatedByHistory$)
+      .pipe(
+        switchMap((plan) => this._planApi.savePlan(plan)),
+        takeUntil(this.terminator$)
+      )
+      .subscribe();
+  }
+
+  private initConsoleTabToggle(): void {
+    this._interactiveSession.isActive$
+      .pipe(
+        filter((shouldConsoleExists) => {
+          const hasConsole = this.componentTabs.some((tab) => tab.id === 'console');
+          return hasConsole !== shouldConsoleExists;
+        }),
+        map((shouldConsoleExists) => {
+          return shouldConsoleExists
+            ? [...this.componentTabs, { id: 'console', label: 'Console' }]
+            : this.componentTabs.filter((tab) => tab.id !== 'console');
+        }),
+        takeUntil(this.terminator$)
+      )
+      .subscribe((tabs) => {
+        (this as FieldAccessor).componentTabs = tabs;
+      });
   }
 }
 

@@ -1,4 +1,8 @@
 <div stepPlanEditorKeyHandler>
+  <mat-card *ngIf="_interactiveSession.isActive$ | async">
+    Welcome to the interactive mode. In this mode you can select tree nodes and run them directly by clicking the button
+    'Run interactively'
+  </mat-card>
   <as-split direction="horizontal">
     <as-split-area [size]="75">
       <mat-card>
@@ -37,9 +41,35 @@
             </button>
             <button type="button" mat-flat-button (click)="clonePlan()">Clone</button>
             <button type="button" mat-flat-button (click)="exportPlan()">Export</button>
+            <button
+              type="button"
+              mat-flat-button
+              [disabled]="_interactiveSession.isActive$ | async"
+              (click)="startInteractive()"
+            >
+              Start interactive session
+            </button>
+            <ng-container *ngIf="_interactiveSession.isActive$ | async">
+              <button type="button" mat-flat-button (click)="resetInteractive()">Reset</button>
+              <button type="button" mat-flat-button (click)="stopInteractive()">Stop</button>
+              <button type="button" mat-flat-button [matMenuTriggerFor]="executionParametersMenu">
+                Session parameters
+              </button>
+            </ng-container>
             <button type="button" mat-icon-button color="primary" [matMenuTriggerFor]="executionMenu">
               <step-icon name="play"></step-icon>
             </button>
+            <mat-menu #executionParametersMenu="matMenu">
+              <span
+                class="plan-execution-menu"
+                mat-menu-item
+                [disableRipple]="true"
+                (click)="$event.stopImmediatePropagation()"
+              >
+                <step-custom-form [stModel]="_interactiveSession.executionParameters" stScreen="executionParameters">
+                </step-custom-form>
+              </span>
+            </mat-menu>
             <mat-menu #executionMenu="matMenu">
               <span
                 class="plan-execution-menu"
@@ -82,7 +112,8 @@
             </step-plan-function-list>
             <step-plan-otherplan-list *ngSwitchCase="'other'" (onSelection)="addPlan($event)">
             </step-plan-otherplan-list>
-            <div *ngSwitchCase="'console'"></div>
+            <step-keyword-calls *ngSwitchCase="'console'" [keywordParameters$]="_interactiveSession.keywordParameters$">
+            </step-keyword-calls>
           </div>
         </mat-card-content>
       </mat-card>

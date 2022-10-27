@@ -5,6 +5,7 @@ export abstract class PlanHandleService {
   abstract hasUndo$: Observable<boolean>;
   abstract hasRedo$: Observable<boolean>;
   abstract selectedArtefact$: Observable<AbstractArtefact | undefined>;
+  abstract isInteractiveSessionActive$: Observable<boolean>;
   abstract handlePlanChange(): void;
   abstract moveUp(node?: AbstractArtefact): void;
   abstract moveDown(node?: AbstractArtefact): void;
@@ -16,4 +17,5 @@ export abstract class PlanHandleService {
   abstract paste(node?: AbstractArtefact): void;
   abstract rename(node?: AbstractArtefact): void;
   abstract toggleSkip(node?: AbstractArtefact): void;
+  abstract execute(): void;
 }
