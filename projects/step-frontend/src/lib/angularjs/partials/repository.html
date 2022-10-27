@@ -29,7 +29,7 @@
 			<div class="col-md-4">
 				<div class="panel panel-default">
 					<div class="panel-body">
-						<execution-commands description="artefactInfo.name" artefact="repoRef" isolate-execution="isolateExecution" included-testcases="functions.getIncludedTestcases()" />
+						<execution-commands description="artefactInfo.name" artefact="repoRef" isolate-execution="isolateExecution" included-testcases="{by: trackTestcasesBy, list: selectionCollector.selected}" />
 					</div>
 				</div>
 			</div>
@@ -37,36 +37,8 @@
 
 		<div class="row">&nbsp;</div>
 
-    <step-repository-plan-testcase-list [selection-collector]="selectionCollector"></step-repository-plan-testcase-list>
-<!--		<div ng-if="artefactInfo.type=='TestSet'" ng-controller="TestSetOverviewCtrl">
-			<div>
-        <div ng-show="!testCases" class="row"><div class="col-md-6"><step-ajs-icon name="refresh-cw" class="icon-refresh-animate"></step-ajs-icon> Loading...</div></div>
-				<div ng-show="testCases">
-					<st-table data="testCases" handle="tableHandle" uid="'testCaseList'" persist-state="true" selection-attribute="trackTestcasesBy" default-selection="'all'" multiple-selection="true">
-						<st-actions>
-							<st-selection-actions />
-						</st-actions>
-						<st-columns>
-							<st-column name="testplanName">
-								<header>Name</header>
-								<second-header><inputdropdown action="search" initial-value="initialValue"></inputdropdown></second-header>
-								<cell>{{row.testplanName}}</cell>
-							</st-column>
+    <step-repository-plan-testcase-list ng-if="artefactInfo.type=='TestSet'" [selection-collector]="selectionCollector" [plan-id]="repoRef.repositoryParameters.planid"></step-repository-plan-testcase-list>
 
-
-							<st-column name="status" width="'80px'">
-								<header>Status</header>
-								<second-header><inputdropdown options="statusOptions" action="search" initial-value="initialValue" ></inputdropdown></second-header>
-								<cell><div class="text-center reportNodeStatus status-{{row.status}}">{{row.status}}</div></cell>
-							</st-column>
-
-
-							<st-selection-column />
-						</st-columns>
-					</st-table>
-				</div>
-			</div>
-		</div>-->
 	</div>
 </div>
 </div>
