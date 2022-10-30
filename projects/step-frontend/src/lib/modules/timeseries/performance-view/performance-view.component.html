@@ -43,14 +43,31 @@
       <div class="charts-section">
         <div class="chart-container chart">
           <div class="settings-container" *ngIf="chartsSettings[TsChartType.RESPONSE_TIME]">
-            <button mat-icon-button matTooltip="Change Metrics" [matMenuTriggerFor]="menu">
-              <step-icon name="bar-chart-2"></step-icon>
-              <mat-menu #menu="matMenu">
-                <button mat-menu-item *ngFor="let metric of responseTimeMetrics" (click)="switchChartMetric(metric)">
-                  {{ metric.label }}
-                </button>
-              </mat-menu>
+            <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu" style="min-width: 20px">
+              <step-icon name="settings"></step-icon>
             </button>
+            <mat-menu #settingsMenu="matMenu">
+              <button mat-menu-item [matMenuTriggerFor]="metricsMenu">Metric</button>
+              <button mat-menu-item [matMenuTriggerFor]="keywordsMenu">Keywords</button>
+            </mat-menu>
+
+            <mat-menu #metricsMenu="matMenu">
+              <button
+                *ngFor="let metric of responseTimeMetrics"
+                (click)="switchResponseTimeMetric(metric)"
+                mat-menu-item
+                [class.selected-menu-item]="metric.label === selectedThroughputMetric.label"
+              >
+                {{ metric.label }}
+              </button>
+            </mat-menu>
+
+            <mat-menu #keywordsMenu="matMenu">
+              <step-measurements-picker
+                *ngIf="settings.contextId"
+                [contextId]="settings.contextId"
+              ></step-measurements-picker>
+            </mat-menu>
           </div>
           <step-chart-skeleton *ngIf="!chartsSettings[TsChartType.RESPONSE_TIME]"></step-chart-skeleton>
           <step-timeseries-chart
@@ -91,10 +108,6 @@
                 [contextId]="settings.contextId"
               ></step-measurements-picker>
             </mat-menu>
-            <!--            <step-measurements-picker-->
-            <!--              *ngIf="settings.contextId"-->
-            <!--              [contextId]="settings.contextId"-->
-            <!--            ></step-measurements-picker>-->
           </div>
           <step-chart-skeleton *ngIf="!chartsSettings[TsChartType.THROUGHPUT]"></step-chart-skeleton>
           <step-timeseries-chart

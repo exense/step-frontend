@@ -111,9 +111,21 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   selectedResponseTimeMetric = this.responseTimeMetrics[0];
 
   throughputMetrics: ThroughputMetric[] = [
-    { label: ThroughputMetricType.TPH, mapFunction: (b: Bucket) => (b ? b.throughputPerHour : 0) },
-    { label: ThroughputMetricType.TPM, mapFunction: (b: Bucket) => (b ? b.throughputPerHour / 60 : 0) },
-    { label: ThroughputMetricType.TPS, mapFunction: (b: Bucket) => (b ? b.throughputPerHour / 60 / 60 : 0) },
+    {
+      label: ThroughputMetricType.TPH,
+      mapFunction: (b: Bucket) => (b ? b.throughputPerHour : 0),
+      labelFunction: (value: number) => `${TimeSeriesUtils.formatNumericValue(value)}/h`,
+    },
+    {
+      label: ThroughputMetricType.TPM,
+      mapFunction: (b: Bucket) => (b ? b.throughputPerHour / 60 : 0),
+      labelFunction: (value: number) => `${TimeSeriesUtils.formatNumericValue(value)}/m`,
+    },
+    {
+      label: ThroughputMetricType.TPS,
+      mapFunction: (b: Bucket) => (b ? b.throughputPerHour / 60 / 60 : 0),
+      labelFunction: (value: number) => `${TimeSeriesUtils.formatNumericValue(value)}/s`,
+    },
   ];
   selectedThroughputMetric = this.throughputMetrics[0];
 
@@ -365,8 +377,11 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             const responseTimeData: (number | null | undefined)[] = [];
             const color = this.keywordsService.getColor(key);
             const totalThroughputData = response.matrix[i].map((b, j) => {
+              if (totalThroughput[j] == null) {
+                totalThroughput[j] = 0;
+              }
               let throughputValue = this.selectedThroughputMetric.mapFunction(b);
-              totalThroughput[j] = throughputValue;
+              totalThroughput[j] += throughputValue;
               if (b) {
                 // from the same iteration we calculate also the response time data
                 responseTimeData.push(this.selectedResponseTimeMetric.mapFunction(b));
@@ -390,6 +405,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             responseTimeSeries.push({ ...series, data: responseTimeData });
             return series;
           });
+          console.log(throughputSeries.map((s) => s.data));
+          console.log(totalThroughput);
           this.createResponseTimesChart(timeLabels, responseTimeSeries);
           this.createThroughputChart(timeLabels, throughputSeries, totalThroughput);
         })
@@ -402,6 +419,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       xValues: timeLabels,
       showLegend: false,
       zScaleTooltipLabel: 'Total Hits/h',
+      tooltipOptions: {
+        enabled: true,
+      },
       series: [
         {
           scale: 'total',
@@ -419,13 +439,13 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
         {
           scale: 'y',
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-          values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
+          values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatNumericValue(v) + '/h'),
         },
         {
           side: 1,
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
           scale: 'total',
-          values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
+          values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatNumericValue(v) + '/h'),
           grid: { show: false },
         },
       ],
@@ -439,6 +459,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       showLegend: false,
       series: series,
       yScaleUnit: 'ms',
+      tooltipOptions: {
+        enabled: true,
+      },
       axes: [
         {
           scale: 'y',
@@ -474,7 +497,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.updateTable().subscribe();
   }
 
-  switchChartMetric(metric: { label: string; mapFunction: (b: Bucket) => number }) {
+  switchResponseTimeMetric(metric: { label: string; mapFunction: (b: Bucket) => number }) {
     this.responseTimeChart.setTitle(TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${metric.label})`);
     if (metric.label === this.selectedResponseTimeMetric.label) {
       // it is not a real change
@@ -492,11 +515,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   switchThroughputMetric(metric: ThroughputMetric) {
-    let f = (u: any, vals: any, space: any) => vals.map((v: number) => 'test');
+    let f = (u: any, vals: any) => vals.map((v: number) => metric.labelFunction(v));
+    this.throughputChart.uplot.axes[1].values = f;
     this.throughputChart.uplot.axes[2].values = f;
-    // this.threadGroupChart.uplot.redraw(true, true);
-    // this.threadGroupChart.uplot.axes[2].values();
-    console.log(this.threadGroupChart.uplot.axes);
     if (metric.label === this.selectedResponseTimeMetric.label) {
       // it is not a real change
       return;
@@ -506,9 +527,18 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     }
     this.selectedThroughputMetric = metric;
     let data = this.throughputChart.getData();
+    let totalData = new Array(data[0].length);
     this.byKeywordsChartResponseCache.matrix.map((bucketArray, i) => {
-      data[i + 1] = bucketArray.map((b) => this.selectedThroughputMetric.mapFunction(b));
+      bucketArray.forEach((b, j) => {
+        if (totalData[j] == null) {
+          totalData[j] = 0;
+        }
+        let value = this.selectedThroughputMetric.mapFunction(b);
+        totalData[j] += value;
+        data[i + 1][j] = value;
+      });
     });
+    data[data.length - 1] = totalData;
     this.throughputChart.setData(data, false);
   }
 
@@ -538,6 +568,7 @@ interface RefreshInterval {
 interface ThroughputMetric {
   label: ThroughputMetricType;
   mapFunction: (b: Bucket) => number;
+  labelFunction: (value: number) => string;
 }
 
 getAngularJSGlobal()

@@ -51,6 +51,9 @@ export class ChartGenerators {
       xValues: xLabels,
       yScaleUnit: 'ms',
       zScaleTooltipLabel: 'Hits/h',
+      tooltipOptions: {
+        enabled: true,
+      },
       series: [
         {
           id: 'avg',
@@ -82,7 +85,8 @@ export class ChartGenerators {
           side: 1,
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
           scale: 'total',
-          values: (u: any, vals: any, space: any) => vals.map((v: number) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
+          values: (u: any, vals: any, space: any) =>
+            vals.map((v: number) => TimeSeriesUtils.formatNumericValue(v) + '/h'),
           grid: { show: false },
         },
       ],

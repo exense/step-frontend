@@ -2,6 +2,7 @@
 import uPlot = require('uplot');
 import { PlacementFunction } from './placement-function';
 import { TimeSeriesConfig } from '../time-series.config';
+import { TsTooltipOptions } from './model/ts-tooltip-options';
 
 interface TooltipRowEntry {
   value: number;
@@ -16,13 +17,8 @@ interface Anchor {
   right?: number;
 }
 
-interface TooltipPluginSettings {
-  yScaleUnit?: string; // string to append on the y axis values
-  zAxisLabel?: string;
-}
-
 export class TooltipPlugin {
-  public static getInstance(settings: TooltipPluginSettings): uPlot.Plugin {
+  public static getInstance(optionsGetter: () => TsTooltipOptions): uPlot.Plugin {
     let over: any;
     let bound: any;
     let bLeft: any;
@@ -64,6 +60,7 @@ export class TooltipPlugin {
           syncBounds();
         },
         setCursor: (u: uPlot) => {
+          const settings = optionsGetter();
           const { left, top, idx } = u.cursor;
           if (!top || top < 0 || !idx || !left) {
             // some weird uPlot behaviour. it happens to be -10 many times
@@ -82,7 +79,7 @@ export class TooltipPlugin {
               }
               continue;
             }
-            if (series.scale === 'total' && bucketValue) {
+            if (series.scale === 'total' && bucketValue != null) {
               summaryRow = {
                 value: bucketValue,
                 color: TimeSeriesConfig.SUMMARY_BARS_COLOR,
@@ -115,7 +112,7 @@ export class TooltipPlugin {
           }
           overlay.innerHTML = '';
           yPoints.forEach((point) => {
-            let rowElement = this.createRowElement(point, settings.yScaleUnit);
+            let rowElement = this.createRowElement(point, settings.yAxisUnit);
             overlay.appendChild(rowElement);
           });
           if (yPoints.length < allSeriesLength) {

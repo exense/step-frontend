@@ -48,6 +48,9 @@ export class ThreadGroupChartGenerator {
       cursor: {
         dataIdx: UPlotUtils.closestNotEmptyPointFunction,
       },
+      tooltipOptions: {
+        enabled: true,
+      },
       series: [
         {
           id: 'total',
