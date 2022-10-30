@@ -27,7 +27,7 @@ export class ChartGenerators {
       case TsChartType.BY_STATUS:
         return ByStatusChartGenerator.createChart(request, response, colorsPool);
       case TsChartType.THREAD_GROUP:
-        return ThreadGroupChartGenerator.createChart(request, response);
+        return ThreadGroupChartGenerator.createChart(request, response, colorsPool!);
       case TsChartType.RESPONSE_TIME:
       case TsChartType.THROUGHPUT:
         throw 'Not implemented exception';

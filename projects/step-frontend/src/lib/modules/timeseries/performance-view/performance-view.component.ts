@@ -302,7 +302,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     };
     this.deleteObjectProperties(updatedParams, this.filtersComponent?.getAllFilterAttributes()); // we remove all custom filters
     return this.timeSeriesService
-      .fetchBuckets({ ...request, params: updatedParams })
+      .fetchBuckets({ ...request, params: updatedParams, groupDimensions: ['name'] })
       .pipe(tap((response) => this.createChart(TsChartType.THREAD_GROUP, request, response)));
   }
 

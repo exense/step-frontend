@@ -5,13 +5,21 @@ import { TimeSeriesUtils } from '../../time-series-utils';
 import { UPlotUtils } from '../../uplot/uPlot.utils';
 import { ChartGenerators } from './chart-generators';
 import { TimeSeriesConfig } from '../../time-series.config';
+import { TimeseriesColorsPool } from '../../util/timeseries-colors-pool';
 
 declare const uPlot: any;
 
 export class ThreadGroupChartGenerator {
   static readonly DIMENSION_KEY = 'name';
 
-  static createChart(request: FindBucketsRequest, response: TimeSeriesChartResponse): TSChartSettings {
+  static createChart(
+    request: FindBucketsRequest,
+    response: TimeSeriesChartResponse,
+    colorsPool: TimeseriesColorsPool
+  ): TSChartSettings {
+    if (!colorsPool) {
+      throw 'Colors pool is mandatory';
+    }
     let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     let totalData: number[] = response.matrix[0] ? Array(response.matrix[0].length) : [];
     let dynamicSeries = response.matrixKeys.map((key, i) => {
@@ -29,13 +37,14 @@ export class ThreadGroupChartGenerator {
         }
         return bucketValue;
       });
+      let useRandomColors = response.matrixKeys.length > 1;
       return {
         scale: 'y',
         label: key,
         id: key,
         data: filledData,
         value: (x, v) => Math.trunc(v),
-        stroke: '#024981',
+        stroke: useRandomColors ? colorsPool.getColor(key) : '#024981',
         width: 2,
         paths: ChartGenerators.stepped({ align: 1 }),
         points: { show: false },
