@@ -89,7 +89,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
         this.timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
         let avgData: (number | null)[] = [];
         if (response.matrix[0]) {
-          avgData = response.matrix[0].map((b) => (b ? b.sum / b.count : null));
+          avgData = response.matrix[0].map((b) => (b ? Math.round(b.sum / b.count) : null));
         }
 
         const timeRange = this.prepareSelectForRanger(this.executionService.timeSelectionState.getActiveSelection());

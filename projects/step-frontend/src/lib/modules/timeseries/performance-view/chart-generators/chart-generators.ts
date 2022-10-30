@@ -40,7 +40,7 @@ export class ChartGenerators {
     let countValues: (number | null)[] = [];
     if (response.matrixKeys.length !== 0) {
       response.matrix[0].forEach((bucket) => {
-        avgValues.push(bucket ? Math.trunc(bucket.sum / bucket.count) : undefined);
+        avgValues.push(bucket ? Math.round(bucket.sum / bucket.count) : undefined);
         countValues.push(bucket ? bucket.throughputPerHour : 0);
       });
     }
