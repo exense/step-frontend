@@ -405,8 +405,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             responseTimeSeries.push({ ...series, data: responseTimeData });
             return series;
           });
-          console.log(throughputSeries.map((s) => s.data));
-          console.log(totalThroughput);
           this.createResponseTimesChart(timeLabels, responseTimeSeries);
           this.createThroughputChart(timeLabels, throughputSeries, totalThroughput);
         })
