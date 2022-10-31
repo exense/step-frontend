@@ -12,8 +12,8 @@ import {
   FunctionPackage,
   Mutable,
 } from '@exense/step-core';
-import { noop } from 'rxjs';
 import { ILocationService, IRootScopeService } from 'angular';
+import { ModalWindowService } from '../../../_common/components/modal-window/modal-window.service';
 
 type FieldAccessor = Mutable<Pick<GenericFunctionListComponent, 'dataSource'>>;
 
@@ -36,7 +36,8 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
     private _augmentedKeywordsService: AugmentedKeywordsService,
     @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService,
     @Inject(AJS_LOCATION) private _location: ILocationService,
-    @Inject(AJS_FUNCTION_TYPE_REGISTRY) private _functionTypeRegistry: any
+    @Inject(AJS_FUNCTION_TYPE_REGISTRY) private _functionTypeRegistry: any,
+    public _modalWindowService: ModalWindowService
   ) {}
 
   ngOnInit(): void {
@@ -75,10 +76,6 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
         this.dataSource?.reload();
       }
     });
-  }
-
-  lookUp(id: string, name: string): void {
-    this._genericFunctionDialogService.openLookupDialog(id, name).subscribe(noop);
   }
 
   configureFunction(id: string) {

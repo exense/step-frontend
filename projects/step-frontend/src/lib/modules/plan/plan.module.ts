@@ -6,7 +6,7 @@ import { PlanFunctionListComponent } from './components/plan-function-list/plan-
 import { PlanArtefactListComponent } from './components/plan-artefact-list/plan-artefact-list.component';
 import { CustomCellRegistryService, EntityRegistry, PlanTypeRegistryService } from '@exense/step-core';
 import { PlanIconComponent } from './components/plan-icon/plan-icon.component';
-import { PlanLinkComponent } from './components/plan-link/plan-link.component';
+import { PlanLinkComponent } from '../_common/components/plan-link/plan-link.component';
 import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { PlanEditorComponent } from './components/plan-editor/plan-editor.component';
 import { PlanEditorKeyHandlerDirective } from './directives/plan-editor-key-handler.directive';

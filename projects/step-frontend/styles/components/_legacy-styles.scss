@@ -188,5 +188,18 @@
 
   #NotificationSubscriptionListCtrl {
     padding: 10px;
+
+    st-actions button.btn-success {
+      margin-right: 24px;
+      background-color: #0082cb !important;
+      border-color: #0082cb !important;
+    }
+  }
+
+  #EventBrokerMonitorCtrl {
+    button.btn-success {
+      background-color: #0082cb !important;
+      border-color: #0082cb !important;
+    }
   }
 }

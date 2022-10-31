@@ -1,4 +1,4 @@
-import { Component, Inject, Optional } from '@angular/core';
+import { Component, Inject, Optional, Input } from '@angular/core';
 import { AJS_LOCATION, CustomColumnOptions, CustomComponent, Plan } from '@exense/step-core';
 import { ILocationService } from 'angular';
 import { map, of } from 'rxjs';
@@ -6,10 +6,10 @@ import { map, of } from 'rxjs';
 @Component({
   selector: 'step-plan-link',
   templateUrl: './plan-link.component.html',
-  styleUrls: ['./plank-link.component.scss'],
+  styleUrls: ['./plan-link.component.scss'],
 })
 export class PlanLinkComponent implements CustomComponent {
-  context?: Plan;
+  @Input() context?: Plan;
 
   readonly noLink$ = (this._customColumnOptions?.options$ || of([])).pipe(
     map((options) => options.includes('noEditorLink'))

@@ -7,6 +7,10 @@ import { ExecutionLinkComponent } from './components/execution-link/execution-li
 import { JsonViewerDirective } from './directives/json-viewer.directive';
 import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
 import { MenuFilterPipe } from './pipes/menu-filter.pipe';
+import { IsUsedByListComponent } from './components/is-used-by-list/is-used-by-list.component';
+import { PlanLinkComponent } from './components/plan-link/plan-link.component';
+import { FunctionLinkComponent } from './components/function-link/function-link.component';
+import { ModalWindowComponent } from './components/modal-window/modal-window.component';
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { CustomFormDirective } from './directives/custom-form.directive';
 import { PlanExecutionDirective } from './directives/plan-execution.directive';
@@ -17,6 +21,10 @@ import { PlanExecutionDirective } from './directives/plan-execution.directive';
     LoginComponent,
     SidebarComponent,
     ExecutionLinkComponent,
+    IsUsedByListComponent,
+    PlanLinkComponent,
+    FunctionLinkComponent,
+    ModalWindowComponent,
     JsonViewerDirective,
     IsEmptyJsonPipe,
     MenuFilterPipe,
@@ -30,6 +38,10 @@ import { PlanExecutionDirective } from './directives/plan-execution.directive';
     LoginComponent,
     SidebarComponent,
     ExecutionLinkComponent,
+    IsUsedByListComponent,
+    PlanLinkComponent,
+    FunctionLinkComponent,
+    ModalWindowComponent,
     JsonViewerDirective,
     IsEmptyJsonPipe,
     MenuFilterPipe,
