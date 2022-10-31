@@ -12,20 +12,18 @@
     />
     <span>All keywords</span>
   </div>
-  <ng-container *ngFor="let item of keywords | keyvalue: valueAscOrder">
-    <ng-container *ngIf="!keywordSearchValue || item.key.toLowerCase().indexOf(keywordSearchValue) >= 0">
-      <div class="color-cell" *ngIf="item.value.isVisible">
-        <input
-          type="checkbox"
-          [ngModel]="item.value.isSelected"
-          class="checkbox"
-          (change)="onKeywordToggle(item.key, $event)"
-        />
-        <div style="display: flex; align-items: center; margin-top: 3px">
-          <span class="color-square" [style.background-color]="item.value.color"></span>
-          <span>{{ item.key }}</span>
-        </div>
+  <ng-container *ngFor="let item of keywords | measurementsProcessor: keywordSearchValue">
+    <div class="color-cell" *ngIf="item.value.isVisible">
+      <input
+        type="checkbox"
+        [ngModel]="item.value.isSelected"
+        class="checkbox"
+        (change)="onKeywordToggle(item.key, $event)"
+      />
+      <div style="display: flex; align-items: center; margin-top: 3px">
+        <span class="color-square" [style.background-color]="item.value.color"></span>
+        <span>{{ item.key }}</span>
       </div>
-    </ng-container>
+    </div>
   </ng-container>
 </div>
