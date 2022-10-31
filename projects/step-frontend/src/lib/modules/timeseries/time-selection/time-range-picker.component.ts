@@ -152,9 +152,9 @@ export class TimeRangePicker implements OnInit {
   formatInputDate(date: Date) {
     let isoFullDate = date.toISOString();
     let isoDate = isoFullDate.substring(0, isoFullDate.indexOf('T'));
-    let hours = this.formatTimeValue(date.getHours());
-    let minutes = this.formatTimeValue(date.getMinutes());
-    let seconds = this.formatTimeValue(date.getSeconds());
+    let hours = String(date.getHours()).padStart(2, '0');
+    let minutes = String(date.getMinutes()).padStart(2, '0');
+    let seconds = String(date.getSeconds()).padStart(2, '0');
     let isoTime = `${hours}:${minutes}:${seconds}`;
     return `${isoDate} ${isoTime}`;
   }
