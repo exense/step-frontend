@@ -50,7 +50,7 @@ export class PlanTreeComponent implements OnInit, OnDestroy, CustomComponent, Tr
           .map((action) => {
             let disabled = false;
             if (action.id === PlanTreeAction.open) {
-              disabled = !((node as any)?.original?.planId || (node as any)?.original?.callFunctionId);
+              disabled = !['CallPlan', 'CallKeyword'].includes(node._class);
             }
             return { ...action, disabled };
           })
@@ -94,6 +94,7 @@ export class PlanTreeComponent implements OnInit, OnDestroy, CustomComponent, Tr
         this._planHandle?.delete(node);
         break;
       case PlanTreeAction.open:
+        this._planHandle?.openArtefact(node);
         break;
       case PlanTreeAction.disable:
       case PlanTreeAction.enable:

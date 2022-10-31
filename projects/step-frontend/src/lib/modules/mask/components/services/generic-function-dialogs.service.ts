@@ -33,7 +33,7 @@ export class GenericFunctionDialogService {
   }
 
   openEditMaskDialog(id: string): void {
-    this._functionDialogs.openFunctionEditor(id, this.config);
+    this._functionDialogs.openFunctionEditor(id, this.config).subscribe();
   }
 
   openLookupDialog(id: string, name: string): Observable<any> {

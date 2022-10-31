@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
 @mixin common-styles {
   .w-100 {
     width: 100%;
@@ -5,6 +7,10 @@
 
   .container-fluid {
     padding: 0;
+  }
+
+  .full-height-block {
+    @include core.full-height-block;
   }
 
   #step-main-scrollable-content {

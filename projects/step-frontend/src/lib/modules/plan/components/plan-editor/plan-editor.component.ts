@@ -7,6 +7,7 @@ import {
   OnDestroy,
   OnInit,
   SimpleChanges,
+  ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import {
@@ -14,22 +15,28 @@ import {
   AJS_LOCATION,
   AJS_MODULE,
   AuthService,
+  CallFunction,
   DialogsService,
   KeywordsService,
+  LinkProcessorService,
   Mutable,
   Plan,
   PlansService,
   RepositoryObjectReference,
   ScreensService,
   TreeStateService,
+  Function as KeywordCall,
 } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PlanHistoryService } from '../../services/plan-history.service';
-import { filter, map, merge, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { catchError, filter, from, map, merge, Observable, of, Subject, switchMap, takeUntil, tap, timer } from 'rxjs';
 import { PlanHandleService } from '../../services/plan-handle.service';
 import { ExportDialogsService } from '../../../_common/services/export-dialogs.service';
 import { ILocationService } from 'angular';
 import { InteractiveSessionService } from '../../services/interactive-session.service';
+import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
+import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
+import { DOCUMENT } from '@angular/common';
 
 type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef' | 'componentTabs'>>;
 
@@ -53,6 +60,9 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
   private planChange$ = new Subject<Plan>();
   private artefactsClipboard: AbstractArtefact[] = [];
 
+  @ViewChild('keywordCalls', { read: KeywordCallsComponent, static: false })
+  private keywords?: KeywordCallsComponent;
+
   @Input() planId?: string;
   plan?: Plan;
 
@@ -74,16 +84,19 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
   readonly repositoryObjectRef?: RepositoryObjectReference;
 
   constructor(
+    public _interactiveSession: InteractiveSessionService,
     private _treeState: TreeStateService,
     private _planHistory: PlanHistoryService,
-    public _interactiveSession: InteractiveSessionService,
     private _planApi: PlansService,
     private _keywordCallsApi: KeywordsService,
     private _screenTemplates: ScreensService,
     private _authService: AuthService,
     private _exportDialogs: ExportDialogsService,
     private _dialogsService: DialogsService,
-    @Inject(AJS_LOCATION) private _location: ILocationService
+    private _linkProcessor: LinkProcessorService,
+    private _functionDialogs: FunctionDialogsService,
+    @Inject(AJS_LOCATION) private _location: ILocationService,
+    @Inject(DOCUMENT) private _document: Document
   ) {}
 
   ngOnInit(): void {
@@ -352,10 +365,75 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
     this._interactiveSession.resetInteractive().subscribe(() => (this.selectedTab = 'controls'));
   }
 
+  openArtefact(node?: AbstractArtefact): void {
+    if (node) {
+      this._treeState.selectNodeById(node.id!);
+    }
+
+    const artefact = this._treeState.getSelectedArtefacts()[0];
+    const isPlan = artefact._class === 'CallPlan';
+    const isKeyword = artefact._class === 'CallKeyword';
+
+    const NO_DATA = 'NO_DATA';
+
+    if (isPlan) {
+      this._planApi
+        .lookupPlan(this.planId!, artefact!.id!)
+        .pipe(
+          map((plan) => plan || NO_DATA),
+          catchError((err) => {
+            console.error(err);
+            return of(undefined);
+          }),
+          switchMap((plan) => {
+            if (!plan) {
+              this._dialogsService.showErrorMsg('The related plan was not found');
+              return of(undefined);
+            }
+
+            if (plan.toString() === NO_DATA) {
+              this._dialogsService.showErrorMsg('No editor configured for this plan type');
+              return of(undefined);
+            }
+
+            return this.openPlan(plan as Plan);
+          })
+        )
+        .subscribe();
+    } else if (isKeyword) {
+      const keyword = artefact as CallFunction;
+      this._keywordCallsApi
+        .lookupCallFunction(keyword)
+        .pipe(
+          map((keyword) => keyword || NO_DATA),
+          catchError((err) => {
+            console.error(err);
+            return of(undefined);
+          }),
+          switchMap((keyword) => {
+            if (!keyword) {
+              this._dialogsService.showErrorMsg('The related keyword was not found');
+              return of('');
+            }
+            if (keyword.toString() === NO_DATA) {
+              this._dialogsService.showErrorMsg('No editor configured for this function type');
+              return of('');
+            }
+            return this.openFunctionEditor(keyword as KeywordCall);
+          })
+        )
+        .subscribe();
+    }
+  }
+
   execute(): void {
     const artefactIds = this._treeState.getSelectedArtefacts().map((artefact) => artefact.id!);
 
-    this._interactiveSession.execute(this.planId!, artefactIds).subscribe();
+    this._interactiveSession.execute(this.planId!, artefactIds).subscribe(() => {
+      if (this.keywords) {
+        this.keywords.leafReportsDataSource.reload();
+      }
+    });
   }
 
   private loadPlan(planId: string): void {
@@ -419,6 +497,41 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
       .subscribe((tabs) => {
         (this as FieldAccessor).componentTabs = tabs;
       });
+  }
+
+  private openPlan(plan: Plan): Observable<unknown> {
+    const planId = plan!.id!;
+    const project = plan!.attributes!['project'];
+    return from(this._linkProcessor.process(project)).pipe(
+      catchError((errorMessage) => {
+        this._dialogsService.showErrorMsg(errorMessage);
+        return of(undefined);
+      }),
+      tap((isSuccess) => {
+        if (isSuccess) {
+          // for some reason location change isn't enough for reopen editor
+          // that's why the document reload was added
+          // It should gone, after the route will be refactored
+          this._location.path(`/root/plans/editor/${planId}`);
+          setTimeout(() => {
+            this._document.location.reload();
+          }, 100);
+        }
+      })
+    );
+  }
+
+  private openFunctionEditor(keyword: KeywordCall): Observable<unknown> {
+    const keywordId = keyword!.id!;
+    const project = keyword!.attributes!['project'];
+    return this._functionDialogs.openFunctionEditor(keywordId).pipe(
+      switchMap((isSuccess) => {
+        if (isSuccess) {
+          return from(this._linkProcessor.process(project)).pipe(map(() => isSuccess));
+        }
+        return of(undefined);
+      })
+    );
   }
 }
 

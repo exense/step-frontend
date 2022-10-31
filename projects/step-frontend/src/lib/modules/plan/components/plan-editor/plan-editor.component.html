@@ -5,7 +5,7 @@
   </mat-card>
   <as-split direction="horizontal">
     <as-split-area [size]="75">
-      <mat-card>
+      <mat-card class="editor-card">
         <mat-card-title class="editor-header">
           {{ plan?.root?._class || '' }} - {{plan?.attributes?.['name']}}
           <step-btn-group>
@@ -112,7 +112,11 @@
             </step-plan-function-list>
             <step-plan-otherplan-list *ngSwitchCase="'other'" (onSelection)="addPlan($event)">
             </step-plan-otherplan-list>
-            <step-keyword-calls *ngSwitchCase="'console'" [keywordParameters$]="_interactiveSession.keywordParameters$">
+            <step-keyword-calls
+              *ngSwitchCase="'console'"
+              #keywordCalls
+              [keywordParameters$]="_interactiveSession.keywordParameters$"
+            >
             </step-keyword-calls>
           </div>
         </mat-card-content>

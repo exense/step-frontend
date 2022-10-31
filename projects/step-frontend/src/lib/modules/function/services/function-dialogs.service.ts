@@ -84,7 +84,7 @@ export class FunctionDialogsService {
     return this._importDialogs.displayImportDialog('Keyword import', 'functions');
   }
 
-  openFunctionEditor(id: string, dialogConfig?: any) {
+  openFunctionEditor(id: string, dialogConfig?: any): Observable<any> {
     dialogConfig = dialogConfig ? dialogConfig : this.defaultDialogConfig;
     const httpOptions: Object = {
       headers: new HttpHeaders({
@@ -92,16 +92,18 @@ export class FunctionDialogsService {
       }),
       responseType: 'text',
     };
-    return this._httpClient
-      .get<string>(`rest/${dialogConfig.serviceRoot}/${id}/editor`, httpOptions)
-      .subscribe((path) => {
+    return this._httpClient.get<string>(`rest/${dialogConfig.serviceRoot}/${id}/editor`, httpOptions).pipe(
+      map((path) => {
         console.log('path', path);
         if (path) {
           this._location.path(path);
+          return true;
         } else {
           this._dialogs.showErrorMsg('No editor configured for this function type');
+          return undefined;
         }
-      });
+      })
+    );
   }
 
   selectFunction(): Observable<any> {

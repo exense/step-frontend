@@ -1,7 +1,26 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
 step-plan-editor {
   .editor-header {
     display: flex;
     justify-content: space-between;
+  }
+
+  & > div {
+    height: 100%;
+  }
+
+  mat-card.editor-card {
+    @include core.full-height-block;
+
+    mat-card-content {
+      display: block;
+      height: calc(100% - 69px);
+    }
+  }
+
+  .as-split-gutter {
+    background: transparent !important;
   }
 }
 

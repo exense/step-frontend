@@ -17,5 +17,6 @@ export abstract class PlanHandleService {
   abstract paste(node?: AbstractArtefact): void;
   abstract rename(node?: AbstractArtefact): void;
   abstract toggleSkip(node?: AbstractArtefact): void;
+  abstract openArtefact(node?: AbstractArtefact): void;
   abstract execute(): void;
 }
