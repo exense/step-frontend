@@ -5,10 +5,16 @@
   [matSortDisableClear]="true"
   (onReload)="loadTable()"
 >
-  <step-bulk-operations
-    *stepAdditionalHeader="'btngroup-bulk-new'"
-    [selectionType]="bulkSelectionTypeAll"
-  ></step-bulk-operations>
+  <div *stepAdditionalHeader class="repository-selection">
+    <mat-checkbox
+      color="primary"
+      [checked]="!!(isSomeItemsSelected$ | async)"
+      [indeterminate]="!!(isIntermediateSelected$ | async)"
+      (click)="handleCheckboxChange($event)"
+    >
+    </mat-checkbox>
+    <step-bulk-selection-label [selectionCollector]="selectionCollector"> </step-bulk-selection-label>
+  </div>
 
   <ng-container matColumnDef="bulkSelection">
     <th mat-header-cell *matHeaderCellDef class="bulk-selection-cell"></th>

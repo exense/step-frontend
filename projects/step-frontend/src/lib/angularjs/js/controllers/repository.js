@@ -47,7 +47,7 @@ angular
     function ($rootScope, $scope, $http, $location, $stateStorage, selectionCollectorFactoryService, AutoDeselectStrategy) {
       $stateStorage.push($scope, 'repository', {});
 
-      $scope.selectionCollector = selectionCollectorFactoryService.create('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER);
+      $scope.selectionCollector = selectionCollectorFactoryService.create('id', AutoDeselectStrategy.KEEP_SELECTION);
       $scope.$on('$destroy', function(){
         $scope.selectionCollector.destroy();
       });

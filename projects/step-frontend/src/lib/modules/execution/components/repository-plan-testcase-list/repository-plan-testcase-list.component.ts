@@ -1,23 +1,23 @@
-import { Component, forwardRef, Input } from '@angular/core';
+import { Component, forwardRef, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
-  BulkOperationsInvokeService,
   ControllerService,
   Mutable,
-  TestSetStatusOverview,
   TestRunStatus,
   SelectionCollector,
   SelectionCollectorContainer,
-  BulkSelectionType,
   TableLocalDataSource,
 } from '@exense/step-core';
-import { ScheduledTaskLogicService } from '../../../scheduler/services/scheduled-task-logic.service';
-import { BehaviorSubject, map, of, Observable, shareReplay, switchMap, tap } from 'rxjs';
-import { ScheduledTaskBulkOperationsInvokeService } from '../../../scheduler/services/scheduled-task-bulk-operations-invoke.service';
-import { REPORT_NODE_STATUS } from '../../../_common/shared/status.enum';
+import { BehaviorSubject, map, of, shareReplay, switchMap, tap, Subject, takeUntil, combineLatest, first } from 'rxjs';
+import { Status } from '../../../_common/step-common.module';
 
-type InProgress = Mutable<Pick<ScheduledTaskLogicService, 'inProgress'>>;
+type InProgress = Mutable<Pick<RepositoryPlanTestcaseListComponent, 'inProgress'>>;
+type FlagsAccessor = Mutable<
+  Pick<RepositoryPlanTestcaseListComponent, 'isIntermediateSelected$' | 'isSomeItemsSelected$'>
+>;
+
+const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === index;
 
 @Component({
   selector: 'repository-plan-testcase-list',
@@ -33,41 +33,41 @@ type InProgress = Mutable<Pick<ScheduledTaskLogicService, 'inProgress'>>;
       useFactory: (container: SelectionCollectorContainer<string, TestRunStatus>) => container.selectionCollector,
       deps: [SelectionCollectorContainer],
     },
-    {
-      provide: BulkOperationsInvokeService,
-      useClass: ScheduledTaskBulkOperationsInvokeService,
-    },
   ],
 })
-export class RepositoryPlanTestcaseListComponent implements SelectionCollectorContainer<string, TestRunStatus> {
-  @Input() planId: any;
+export class RepositoryPlanTestcaseListComponent
+  implements SelectionCollectorContainer<string, TestRunStatus>, OnChanges, OnDestroy
+{
+  private collectorTerminator$?: Subject<unknown>;
+  private planId$ = new BehaviorSubject<string | undefined>(undefined);
+
+  private repositoryReport$ = this.planId$.pipe(
+    tap(() => ((this as InProgress).inProgress = true)),
+    switchMap((planId) => {
+      if (!planId) {
+        return of(undefined);
+      }
+      return this._controllerService.getReport({
+        repositoryID: 'local',
+        repositoryParameters: { planid: this.planId! },
+      });
+    }),
+    map((testSetStatusOverview) => testSetStatusOverview?.runs || []),
+    tap(() => ((this as InProgress).inProgress = false)),
+    tap(() => this.selectionCollector.clear()),
+    shareReplay(1)
+  );
+
+  @Input() planId?: string;
   @Input() selectionCollector!: SelectionCollector<string, TestRunStatus>;
 
-  readonly bulkSelectionTypeAll = BulkSelectionType.All;
   readonly inProgress: boolean = false;
 
-  statusItems$: Observable<any> = of(REPORT_NODE_STATUS);
+  readonly isIntermediateSelected$ = of(false);
+  readonly isSomeItemsSelected$ = of(false);
 
-  private repositoryReportRequest$ = new BehaviorSubject<TestRunStatus>({});
-  private repositoryReport$ = this.repositoryReportRequest$.pipe(
-    tap((_) => ((this as InProgress).inProgress = true)),
-    switchMap((_) =>
-      this._controllerService.getReport({
-        repositoryID: 'local',
-        repositoryParameters: { planid: this.planId },
-      })
-    ),
-    map((testSetStatusOverview: TestSetStatusOverview) => testSetStatusOverview.runs!),
-    tap(
-      (testRunStatusList: Array<TestRunStatus>) =>
-        (this.statusItems$ = of(
-          testRunStatusList
-            .map((testRunStatus) => testRunStatus.status)
-            .filter((value, index, self) => self.indexOf(value) === index)
-        ))
-    ),
-    tap((_) => ((this as InProgress).inProgress = false)),
-    shareReplay(1)
+  readonly statusItems$ = this.repositoryReport$.pipe(
+    map((testRunStatusList) => testRunStatusList.map((testRunStatus) => testRunStatus.status as Status).filter(unique))
   );
 
   readonly searchableRepositoryReport$ = new TableLocalDataSource(this.repositoryReport$, {
@@ -80,8 +80,70 @@ export class RepositoryPlanTestcaseListComponent implements SelectionCollectorCo
 
   constructor(public readonly _controllerService: ControllerService) {}
 
+  ngOnChanges(changes: SimpleChanges): void {
+    const cPlanId = changes['planId'];
+    if (cPlanId?.previousValue !== cPlanId?.currentValue || cPlanId?.firstChange) {
+      this.planId$.next(cPlanId?.currentValue);
+    }
+
+    const cSelectionCollector = changes['selectionCollector'];
+    if (cSelectionCollector?.previousValue !== cSelectionCollector?.currentValue || cSelectionCollector?.firstChange) {
+      this.setupCollectorChanges(cSelectionCollector?.currentValue);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.planId$.complete();
+    this.terminate();
+  }
+
   loadTable(): void {
-    this.repositoryReportRequest$.next({});
+    this.planId$.next(this.planId$.value);
+  }
+
+  handleCheckboxChange($event: Event): void {
+    $event.preventDefault();
+    if (this.selectionCollector.length > 0) {
+      // If something was selected, clear selection
+      this.selectionCollector.clear();
+      return;
+    }
+
+    // Otherwise select all items, which are exists
+    this.repositoryReport$.pipe(first()).subscribe((testRunStatuses) => {
+      this.selectionCollector.select(...testRunStatuses);
+    });
+  }
+
+  private setupCollectorChanges(collector?: SelectionCollector<string, TestRunStatus>): void {
+    this.terminate();
+    const flagAccessor = this as FlagsAccessor;
+    if (!collector) {
+      flagAccessor.isIntermediateSelected$ = of(false);
+      flagAccessor.isSomeItemsSelected$ = of(false);
+      return;
+    }
+
+    this.collectorTerminator$ = new Subject<unknown>();
+
+    flagAccessor.isSomeItemsSelected$ = collector.length$.pipe(
+      map((length) => length > 0),
+      takeUntil(this.collectorTerminator$)
+    );
+
+    const itemsLength$ = this.repositoryReport$.pipe(map((items) => items.length));
+    flagAccessor.isIntermediateSelected$ = combineLatest([collector.length$, itemsLength$]).pipe(
+      map(([length, itemsLength]) => length > 0 && itemsLength > 0 && length !== itemsLength),
+      takeUntil(this.collectorTerminator$)
+    );
+  }
+
+  private terminate(): void {
+    if (!this.collectorTerminator$) {
+      return;
+    }
+    this.collectorTerminator$.next({});
+    this.collectorTerminator$.complete();
   }
 }
 
