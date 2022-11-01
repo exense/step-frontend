@@ -12,7 +12,7 @@ const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === 
 
 @Injectable()
 export class TreeStateService implements OnDestroy {
-  readonly paddingIdent = 30;
+  readonly paddingIdent = 15;
 
   private rootNode$ = new BehaviorSubject<AbstractArtefact | undefined>(undefined);
   private selectedNodeIds$ = new BehaviorSubject<string[]>([]);
