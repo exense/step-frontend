@@ -5,6 +5,7 @@ import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { TimeRangePickerSelection } from './time-range-picker-selection';
 import { RangeSelectionType } from './model/range-selection-type';
 import { ExecutionTimeSelection } from './model/execution-time-selection';
+import { min } from 'rxjs';
 
 @Component({
   selector: 'step-time-range-picker',
@@ -124,12 +125,10 @@ export class TimeRangePicker implements OnInit {
     let to = selection.absoluteSelection!.to;
     this.resetCustomDates();
     if (from) {
-      let date = new Date(from);
-      this.fromDateString = `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+      this.fromDateString = this.formatInputDate(new Date(from));
     }
     if (to) {
-      let date = new Date(to);
-      this.toDateString = `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+      this.toDateString = this.formatInputDate(new Date(to));
     }
   }
 
@@ -140,12 +139,32 @@ export class TimeRangePicker implements OnInit {
 
   setFromDate(event: MatDatepickerInputEvent<any>) {
     let date = new Date(event.value.ts);
-    this.fromDateString = `${date.toLocaleDateString()} 00:00:00`;
+    date.setHours(0);
+    this.fromDateString = this.formatInputDate(date);
   }
 
   setToDate(event: MatDatepickerInputEvent<any>) {
     let date = new Date(event.value.ts);
-    this.toDateString = `${date.toLocaleDateString()} 00:00:00`;
+    date.setHours(0);
+    this.toDateString = this.formatInputDate(date);
+  }
+
+  formatInputDate(date: Date) {
+    let isoFullDate = date.toISOString();
+    let isoDate = isoFullDate.substring(0, isoFullDate.indexOf('T'));
+    let hours = String(date.getHours()).padStart(2, '0');
+    let minutes = String(date.getMinutes()).padStart(2, '0');
+    let seconds = String(date.getSeconds()).padStart(2, '0');
+    let isoTime = `${hours}:${minutes}:${seconds}`;
+    return `${isoDate} ${isoTime}`;
+  }
+
+  formatTimeValue(value: number) {
+    if (value < 10) {
+      return '0' + value;
+    } else {
+      return value;
+    }
   }
 
   resetCustomDates() {
