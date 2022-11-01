@@ -8,3 +8,12 @@
 :host {
   @include core.table-container;
 }
+
+.repository-selection {
+  display: flex;
+  align-items: flex-end;
+
+  mat-checkbox {
+    margin-right: 1rem;
+  }
+}
