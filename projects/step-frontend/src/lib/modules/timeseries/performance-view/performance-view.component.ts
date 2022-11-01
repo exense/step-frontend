@@ -222,7 +222,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   private initContext() {
     this.executionContext = this.contextFactory.getContext(this.settings.contextId);
-    this.keywordsService = this.executionContext.getKeywordsContext();
+    this.keywordsService = this.executionContext.keywordsContext;
   }
 
   prepareFindRequest(settings: PerformanceViewSettings, customFilters?: any): FindBucketsRequest {
@@ -318,7 +318,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       type,
       request,
       response,
-      this.executionContext.getKeywordsContext().getColorsPool()
+      this.executionContext.keywordsContext.colorsPool
     );
   }
 

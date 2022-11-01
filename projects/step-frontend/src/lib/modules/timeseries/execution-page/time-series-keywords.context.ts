@@ -16,10 +16,6 @@ export class TimeSeriesKeywordsContext {
 
   constructor(public readonly colorsPool: TimeseriesColorsPool) {}
 
-  getColorsPool() {
-    return this.colorsPool;
-  }
-
   getColor(keyword: string): string {
     return this.colorsPool.getColor(keyword);
   }

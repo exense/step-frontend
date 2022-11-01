@@ -26,7 +26,7 @@ export class MeasurementsPickerComponent implements OnInit, OnDestroy {
     if (!this.contextId) {
       throw new Error('Context Id input must be present');
     }
-    this.keywordsService = this.executionPageService.getContext(this.contextId).getKeywordsContext();
+    this.keywordsService = this.executionPageService.getContext(this.contextId).keywordsContext;
     this.keywordsService
       .onKeywordsUpdated()
       .pipe(takeUntil(this.terminator$))
