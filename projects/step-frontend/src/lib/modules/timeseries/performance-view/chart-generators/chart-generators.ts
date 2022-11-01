@@ -55,6 +55,7 @@ export class ChartGenerators {
           value: (x, v) => Math.trunc(v) + ' ms',
           width: 2,
           stroke: 'rgba(255,109,18,0.59)',
+          legendName: 'Average Response Time',
         },
         {
           id: 'count',

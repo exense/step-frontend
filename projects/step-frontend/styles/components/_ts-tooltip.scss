@@ -12,6 +12,7 @@
       display: flex;
       align-items: center;
       flex-direction: row;
+      white-space: nowrap;
 
       .color {
         width: 20px;
