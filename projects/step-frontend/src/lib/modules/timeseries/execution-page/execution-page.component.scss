@@ -2,10 +2,12 @@
   position: relative;
 }
 
-.interactive-btn {
+.right-section-buttons {
   position: absolute;
   top: 24px;
   right: 2px;
+  display: flex;
+  align-items: center;
 }
 
 .info-container {
