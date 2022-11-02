@@ -20,7 +20,7 @@ export class TimeSeriesContext {
   private readonly filtersChangeSubject: Subject<BucketFilters> = new Subject();
   private readonly groupingChangeSubject: Subject<string[]> = new Subject();
 
-  private readonly keywordsContext: TimeSeriesKeywordsContext;
+  public readonly keywordsContext: TimeSeriesKeywordsContext;
   private readonly colorsPool: TimeseriesColorsPool;
   readonly timeSelectionState: TimeSelectionState;
 
@@ -29,10 +29,6 @@ export class TimeSeriesContext {
     this.colorsPool = new TimeseriesColorsPool();
     this.keywordsContext = new TimeSeriesKeywordsContext(this.colorsPool);
     this.timeSelectionState = new TimeSelectionState();
-  }
-
-  getKeywordsContext(): TimeSeriesKeywordsContext {
-    return this.keywordsContext;
   }
 
   setExecution(execution: Execution) {

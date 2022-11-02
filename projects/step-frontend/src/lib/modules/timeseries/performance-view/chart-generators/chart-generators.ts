@@ -4,28 +4,33 @@ import { UPlotUtils } from '../../uplot/uPlot.utils';
 import { TimeSeriesChartResponse } from '../../time-series-chart-response';
 import { TSChartSettings } from '../../chart/model/ts-chart-settings';
 import { TsChartType } from '../ts-chart-type';
+import { ThreadGroupChartGenerator } from './thread-group-chart-generator';
+import { ByStatusChartGenerator } from './by-status-chart-generator';
+import { TimeseriesColorsPool } from '../../util/timeseries-colors-pool';
+import { TimeSeriesConfig } from '../../time-series.config';
 
 declare const uPlot: any;
 
 export class ChartGenerators {
-  private static readonly CHART_LEGEND_SIZE = 65;
-
-  private static readonly barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
-  private static readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
+  static readonly barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
+  static readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
 
   static generateChart(
     type: TsChartType,
     request: FindBucketsRequest,
-    response: TimeSeriesChartResponse
+    response: TimeSeriesChartResponse,
+    colorsPool?: TimeseriesColorsPool
   ): TSChartSettings {
     switch (type) {
       case TsChartType.OVERVIEW:
         return this.createSummaryChartSettings(request, response);
       case TsChartType.BY_STATUS:
+        return ByStatusChartGenerator.createChart(request, response, colorsPool);
+      case TsChartType.THREAD_GROUP:
+        return ThreadGroupChartGenerator.createChart(request, response, colorsPool!);
       case TsChartType.RESPONSE_TIME:
       case TsChartType.THROUGHPUT:
-      case TsChartType.THREAD_GROUP:
-        throw 'Not implemented';
+        throw 'Not implemented exception';
     }
   }
 
@@ -46,6 +51,9 @@ export class ChartGenerators {
       xValues: xLabels,
       yScaleUnit: 'ms',
       zScaleTooltipLabel: 'Hits/h',
+      tooltipOptions: {
+        enabled: true,
+      },
       series: [
         {
           id: 'avg',
@@ -70,14 +78,15 @@ export class ChartGenerators {
       axes: [
         {
           scale: 'y',
-          size: this.CHART_LEGEND_SIZE,
+          size: TimeSeriesConfig.CHART_LEGEND_SIZE,
           values: (u, vals, space) => vals.map((v: number) => UPlotUtils.formatMilliseconds(v)),
         },
         {
           side: 1,
-          size: this.CHART_LEGEND_SIZE,
+          size: TimeSeriesConfig.CHART_LEGEND_SIZE,
           scale: 'total',
-          values: (u: any, vals: any, space: any) => vals.map((v: number) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
+          values: (u: any, vals: any, space: any) =>
+            vals.map((v: number) => TimeSeriesUtils.formatNumericValue(v) + '/h'),
           grid: { show: false },
         },
       ],
