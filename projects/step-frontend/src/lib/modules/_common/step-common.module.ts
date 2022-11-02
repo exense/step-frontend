@@ -13,6 +13,9 @@ import { IsUsedByListComponent } from './components/is-used-by-list/is-used-by-l
 import { PlanLinkComponent } from './components/plan-link/plan-link.component';
 import { FunctionLinkComponent } from './components/function-link/function-link.component';
 import { ModalWindowComponent } from './components/modal-window/modal-window.component';
+import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
+import { CustomFormDirective } from './directives/custom-form.directive';
+import { PlanExecutionDirective } from './directives/plan-execution.directive';
 
 
 @NgModule({
@@ -28,6 +31,9 @@ import { ModalWindowComponent } from './components/modal-window/modal-window.com
     JsonViewerDirective,
     IsEmptyJsonPipe,
     MenuFilterPipe,
+    ArtefactDetailsDirective,
+    CustomFormDirective,
+    PlanExecutionDirective,
   ],
   exports: [
     AutorefreshToggleComponent,
@@ -42,6 +48,9 @@ import { ModalWindowComponent } from './components/modal-window/modal-window.com
     JsonViewerDirective,
     IsEmptyJsonPipe,
     MenuFilterPipe,
+    ArtefactDetailsDirective,
+    CustomFormDirective,
+    PlanExecutionDirective,
   ],
   imports: [StepCoreModule],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],

@@ -20,6 +20,7 @@ import { CustomRegistriesModule } from './modules/custom-registeries/custom-regi
 import { TabsModule } from './modules/tabs/tabs.module';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 import { TreeModule } from './modules/tree/tree.module';
+import { AngularSplitModule } from 'angular-split';
 
 @NgModule({
   declarations: [
@@ -44,6 +45,7 @@ import { TreeModule } from './modules/tree/tree.module';
     CustomRegistriesModule,
     TabsModule,
     TreeModule,
+    AngularSplitModule,
   ],
   exports: [
     CommonModule,
@@ -65,6 +67,7 @@ import { TreeModule } from './modules/tree/tree.module';
     TabsModule,
     TooltipImmediateCloseDirective,
     TreeModule,
+    AngularSplitModule,
   ],
   providers: [
     CORE_INITIALIZER,

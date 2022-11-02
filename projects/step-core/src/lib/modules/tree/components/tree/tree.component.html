@@ -9,6 +9,7 @@
     cdkTreeNodePadding
     [cdkTreeNodePaddingIndent]="_treeState.paddingIdent"
     class="tree-node"
+    [class.skipped]="node.isSkipped"
     cdkDrag
     [cdkDragDisabled]="dragDisabled || (node.id | isRootNode | async)"
     [class.tree-node-selected]="node.id | isNodeSelected | async"
@@ -16,9 +17,9 @@
     (click)="_treeState.selectNode(node, $event)"
   >
     <button mat-button mat-icon-button disabled></button>
-    <div class="node-content" (contextmenu)="openContextMenu($event, node.id)">
-      <step-icon [name]="node._class | artefactIcon" cdkDragHandle class="drag-handle"></step-icon>
-      {{ node?.name }}
+    <div class="node-content" (contextmenu)="openContextMenu($event, node.id)" cdkDragHandle>
+      <step-icon [name]="node._class | artefactIcon"></step-icon>
+      <step-tree-node-name [node]="node"></step-tree-node-name>
     </div>
     <div class="drag-placeholder" *cdkDragPlaceholder></div>
     <step-tree-drag-preview *cdkDragPreview> </step-tree-drag-preview>
@@ -29,6 +30,7 @@
     [cdkTreeNodePaddingIndent]="_treeState.paddingIdent"
     class="tree-node"
     [class.expanded]="_treeState.treeControl.isExpanded(node)"
+    [class.skipped]="node.isSkipped"
     cdkDrag
     [cdkDragDisabled]="dragDisabled || (node.id | isRootNode | async)"
     [class.tree-node-selected]="node.id | isNodeSelected | async"
@@ -44,14 +46,10 @@
       </ng-template>
       <ng-container *ngIf="_treeState.treeControl.isExpanded(node); then expanded; else notExpanded"> </ng-container>
     </button>
-    <div class="node-content" (contextmenu)="openContextMenu($event, node.id)">
-      <step-icon [name]="node._class | artefactIcon" cdkDragHandle class="drag-handle"></step-icon>
-      {{ node?.name }}
-    </div>
-    <ng-container *cdkDragPreview>
+    <div class="node-content" (contextmenu)="openContextMenu($event, node.id)" cdkDragHandle>
       <step-icon [name]="node._class | artefactIcon"></step-icon>
-      {{ node?.name }}
-    </ng-container>
+      <step-tree-node-name [node]="node"></step-tree-node-name>
+    </div>
     <div class="drag-placeholder" *cdkDragPlaceholder></div>
     <step-tree-drag-preview *cdkDragPreview> </step-tree-drag-preview>
   </cdk-tree-node>
@@ -66,7 +64,7 @@
 <mat-menu #nodeContextMenu="matMenu">
   <ng-template matMenuContent let-node="node">
     <button
-      *ngFor="let action of actions; trackBy: trackByAction"
+      *ngFor="let action of node | treeNodeActions | async; trackBy: trackByAction"
       mat-menu-item
       [disabled]="action.disabled"
       (click)="handleContextAction(action, node)"

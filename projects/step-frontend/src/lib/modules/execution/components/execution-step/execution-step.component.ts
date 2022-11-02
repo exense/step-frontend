@@ -6,10 +6,9 @@ import { ExecutionStepPanel } from '../../shared/execution-step-panel';
 import { ExecutionViewServices } from '../../../operations/shared/execution-view-services';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { KeywordParameters } from '../../shared/keyword-parameters';
+import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
 
 type FieldAccessor = Mutable<Pick<ExecutionStepComponent, 'keywordParameters$'>>;
-
-const TYPE_LEAF_REPORT_NODES_TABLE_PARAMS = 'step.core.execution.LeafReportNodesTableParameters';
 
 @Component({
   selector: 'step-execution-step',

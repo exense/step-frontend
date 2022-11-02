@@ -32,10 +32,19 @@ import { RepositoryPlanTestcaseListComponent } from './components/repository-pla
     ExecutionErrorsComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule],
-  exports: [ExecutionListComponent, ExecutionStepComponent, ExecutionTabsComponent, ExecutionErrorsComponent],
+  exports: [
+    ExecutionListComponent,
+    ExecutionStepComponent,
+    ExecutionTabsComponent,
+    ExecutionErrorsComponent,
+    KeywordCallsComponent,
+  ],
 })
 export class ExecutionModule {
   constructor(_entityRegistry: EntityRegistry, _cellsRegister: CustomCellRegistryService) {
     _entityRegistry.register('executions', 'Execution', undefined, '/partials/executions/executionSelectionTable.html');
   }
 }
+
+export { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from './shared/type-leaf-report-nodes-table-params';
+export { KeywordParameters } from './shared/keyword-parameters';

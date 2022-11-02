@@ -57,7 +57,7 @@ export class FunctionListComponent {
   }
 
   editFunction(id: string): void {
-    this._functionDialogs.openFunctionEditor(id);
+    this._functionDialogs.openFunctionEditor(id).subscribe();
   }
 
   executeFunction(id: string): void {
