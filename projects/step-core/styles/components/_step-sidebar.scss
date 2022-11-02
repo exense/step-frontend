@@ -222,7 +222,7 @@ $default-color: dc.default-colors();
 
     div#sidebar-categories-tabs {
       $helpSupportHeight: map.get($config, help-and-support-height);
-      margin-bottom: calc(#{$helpSupportHeight} + 10px);
+      margin-bottom: calc(#{$helpSupportHeight} + 16px);
 
       .sidebar-collapsable-tab:first-child label {
         border-radius: 8px 8px 0 0;
@@ -403,9 +403,12 @@ $default-color: dc.default-colors();
         width: map.get($config, width-closed);
       }
 
+      #sidebar-categories-tabs {
+        margin-bottom: 16px;
+      }
+
       #sidebar-bottom {
-        width: map.get($config, width-closed);
-        font-size: medium;
+        display: none;
       }
 
       .sidebar-collapsable-tab > label {
