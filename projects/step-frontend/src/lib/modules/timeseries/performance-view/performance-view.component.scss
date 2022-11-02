@@ -2,6 +2,11 @@
   height: 100%;
 }
 
+#progress-bar {
+  height: 12px;
+  opacity: 0.2;
+}
+
 .dashboard-container {
   max-width: 100%;
   //max-width: 100%;
@@ -100,4 +105,8 @@
       padding: 0 4px;
     }
   }
+}
+
+.selected-menu-item {
+  background: rgba(0, 0, 0, 0.04);
 }

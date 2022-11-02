@@ -46,7 +46,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
       throw new Error('FindRequest input is mandatory');
     }
     this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
-    this.keywordsService = this.executionContext.getKeywordsContext();
+    this.keywordsService = this.executionContext.keywordsContext;
     this.keywordsService
       .onKeywordToggled()
       .pipe(takeUntil(this.terminator$))

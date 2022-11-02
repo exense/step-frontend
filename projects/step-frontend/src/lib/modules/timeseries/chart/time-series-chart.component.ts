@@ -139,12 +139,9 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         },
         // y: {auto: true},
       },
-      plugins: [
-        TooltipPlugin.getInstance({
-          yScaleUnit: this.settings.yScaleUnit,
-          zAxisLabel: this.settings.zScaleTooltipLabel,
-        }),
-      ],
+      plugins: this.settings.tooltipOptions.enabled
+        ? [TooltipPlugin.getInstance(() => this.settings.tooltipOptions)]
+        : [],
       axes: [{}, ...(settings.axes || [])],
       series: [
         {

@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { StepCoreModule } from '@exense/step-core';
+import { AuthService, StepCoreModule } from '@exense/step-core';
 import { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
 import { LoginComponent } from './components/login/login.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
@@ -7,6 +7,8 @@ import { ExecutionLinkComponent } from './components/execution-link/execution-li
 import { JsonViewerDirective } from './directives/json-viewer.directive';
 import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
 import { MenuFilterPipe } from './pipes/menu-filter.pipe';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
 
 @NgModule({
   declarations: [
@@ -29,6 +31,7 @@ import { MenuFilterPipe } from './pipes/menu-filter.pipe';
     MenuFilterPipe,
   ],
   imports: [StepCoreModule],
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
 })
 export class StepCommonModule {}
 

@@ -26,7 +26,6 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   @Input() settings!: PerformanceViewSettings;
   @Input() timePicker: boolean = true;
 
-  @Output() onRangeChange = new EventEmitter<TSTimeRange>();
   @Output() onRangerLoaded = new EventEmitter<void>();
 
   rangerSettings: TSRangerSettings | undefined;
@@ -77,9 +76,9 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   }
 
   createRanger(): Observable<TimeSeriesChartResponse> {
-    let startTime = this.settings.startTime!;
-    let endTime = this.settings.endTime || new Date().getTime() - 5000; // minus 5 seconds
-    let request: FindBucketsRequest = {
+    const startTime = this.settings.startTime!;
+    const endTime = this.settings.endTime || new Date().getTime() - 5000; // minus 5 seconds
+    const request: FindBucketsRequest = {
       params: this.settings.contextualFilters,
       start: startTime,
       end: endTime, // to current time if it's not ended
@@ -93,7 +92,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
           avgData = response.matrix[0].map((b) => (b ? Math.round(b.sum / b.count) : null));
         }
 
-        let timeRange = this.prepareSelectForRanger(this.executionService.timeSelectionState.getActiveSelection());
+        const timeRange = this.prepareSelectForRanger(this.executionService.timeSelectionState.getActiveSelection());
         this.rangerSettings = {
           xValues: this.timeLabels,
           selection: timeRange,
