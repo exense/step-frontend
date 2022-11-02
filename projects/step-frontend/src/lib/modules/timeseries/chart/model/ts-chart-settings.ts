@@ -17,5 +17,5 @@ export interface TSChartSettings {
 export interface TSChartSeries extends Series {
   id: string;
   data: (number | null | undefined)[];
-  legendName?: string; // id is used if not specified.
+  legendName: string;
 }

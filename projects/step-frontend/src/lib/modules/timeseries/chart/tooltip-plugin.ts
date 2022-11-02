@@ -164,7 +164,7 @@ export class TooltipPlugin {
     let date = new Date(timestamp);
     let div = document.createElement('div');
     div.textContent = date.toLocaleString();
-    div.style.cssText = 'text-align: left; opacity: 0.5; font-size: 12px; white-space: nowrap';
+    div.classList.add('timestamp');
     return div;
   }
 

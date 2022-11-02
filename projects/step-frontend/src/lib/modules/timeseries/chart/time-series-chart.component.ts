@@ -113,8 +113,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         this.seriesIndexesByIds[series.id] = i + 1; // because the first series is the time
       }
       if (series.stroke) {
-        console.log(series.stroke, series.id);
-        this.legendSettings.items.push({ color: series.stroke as string, label: series.legendName || series.id });
+        this.legendSettings.items.push({ color: series.stroke as string, label: series.legendName });
       }
     });
     let noData = true;

@@ -60,6 +60,7 @@ export class ChartGenerators {
         {
           id: 'count',
           scale: 'total',
+          legendName: 'Hits/h',
           label: 'Hits/h',
           data: countValues,
           value: (x, v) => Math.trunc(v),

@@ -66,9 +66,8 @@
   display: flex;
   justify-content: space-between;
   flex-direction: row;
-  padding: 0 16px;
+  padding: 10px 16px 0;
   border-top: 1px solid #e9e9e9;
-  padding-top: 10px;
   height: 20px;
   align-items: center;
   font-size: 13px;
@@ -128,4 +127,9 @@
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(41, 62, 80, 0.4);
   }
+}
+
+.total-value-icon {
+  color: #c9d4dd;
+  stroke-width: 4px;
 }

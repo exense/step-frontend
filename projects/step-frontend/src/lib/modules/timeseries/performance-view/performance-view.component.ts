@@ -316,6 +316,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             scale: 'y',
             label: key,
             id: key,
+            legendName: key,
             data: filledData,
             value: (x, v) => Math.trunc(v),
             stroke: '#024981',
@@ -336,6 +337,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
               id: 'total',
               scale: 'total',
               label: 'Total',
+              legendName: 'Total',
               data: totalData,
               value: (x, v) => Math.trunc(v),
               fill: (self: uPlot) => UPlotUtils.gradientFill(self, '#8FA1D2'),
@@ -416,6 +418,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           return {
             id: status,
             label: status,
+            legendName: status,
             data: series.map((b) => (b ? b.throughputPerHour : 0)),
             // scale: 'mb',
             value: (self, x) => TimeSeriesUtils.formatAxisValue(x) + '/h',
@@ -487,6 +490,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
               scale: 'y',
               show: keywordSelection ? keywordSelection.isSelected : true,
               label: key,
+              legendName: key,
               id: key,
               data: [], // will override it
               value: (x, v) => Math.trunc(v),
@@ -507,6 +511,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
               {
                 scale: 'total',
                 label: 'Total',
+                legendName: 'Total',
                 id: 'secondary',
                 data: totalThroughput,
                 value: (x, v) => Math.trunc(v) + ' total',

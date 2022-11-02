@@ -104,6 +104,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
               data: avgData,
               // value: (self, x) => Math.trunc(x) + ' ms',
               stroke: 'red',
+              legendName: 'Ranger',
             },
           ],
         };
