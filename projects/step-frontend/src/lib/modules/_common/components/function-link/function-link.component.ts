@@ -26,6 +26,6 @@ export class FunctionLinkComponent implements CustomComponent {
     if (!id) {
       return;
     }
-    this._functionDialogs.openFunctionEditor(id);
+    this._functionDialogs.openFunctionEditor(id).subscribe();
   }
 }

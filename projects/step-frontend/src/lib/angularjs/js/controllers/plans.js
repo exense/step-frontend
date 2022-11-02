@@ -98,15 +98,18 @@ angular
   })
 
   .controller(
-    'createPlanCtrl',
-    function ($scope, $uibModalInstance, $location, $http, AuthService, ScreenTemplates, PlanTypeRegistry) {
+    'createPlanCtrl', [
+      '$scope', '$uibModalInstance', '$location', '$http', 'AuthService', 'planTypeRegistryService',
+    function ($scope, $uibModalInstance, $location, $http, AuthService, planTypeRegistryService) {
       $scope.AuthService = AuthService;
 
       $scope.template = 'TestCase';
       $scope.plan = { attributes: {} };
 
-      $scope.planTypes = PlanTypeRegistry.getPlanTypes();
-      $scope.planType = PlanTypeRegistry.getPlanType('step.core.plans.Plan');
+      $scope.planTypes = planTypeRegistryService.getItemInfos();
+      $scope.planType = $scope.planTypes.find(function (planType){
+        return planType.type === 'step.core.plans.Plan';
+      });
 
       $http.get('rest/plans/artefact/templates').then(function (response) {
         $scope.artefactTypes = response.data;
@@ -132,7 +135,7 @@ angular
         $uibModalInstance.dismiss('cancel');
       };
     }
-  )
+  ])
 
   .directive('planLink', function () {
     return {
