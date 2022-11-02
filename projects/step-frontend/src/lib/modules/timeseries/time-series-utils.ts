@@ -10,7 +10,7 @@ export class TimeSeriesUtils {
     return result;
   }
 
-  static formatNumericValue(num: number): string {
+  static formatAxisValue(num: number): string {
     const lookup = [
       { value: 1, symbol: '' },
       { value: 1e3, symbol: 'k' },

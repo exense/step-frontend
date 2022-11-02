@@ -1,10 +1,8 @@
-import { tap } from 'rxjs';
 import { TimeSeriesUtils } from '../../time-series-utils';
 import { TSChartSeries, TSChartSettings } from '../../chart/model/ts-chart-settings';
 import { UPlotUtils } from '../../uplot/uPlot.utils';
 import { FindBucketsRequest } from '../../find-buckets-request';
 import { TimeSeriesChartResponse } from '../../time-series-chart-response';
-import { ChartGenerators } from './chart-generators';
 import { TimeseriesColorsPool } from '../../util/timeseries-colors-pool';
 import { TimeSeriesConfig } from '../../time-series.config';
 
@@ -30,9 +28,10 @@ export class ByStatusChartGenerator {
       return {
         id: status,
         label: status,
+        legendName: status,
         data: series.map((b) => (b ? b.throughputPerHour : 0)),
         // scale: 'mb',
-        value: (self, x) => TimeSeriesUtils.formatNumericValue(x) + '/h',
+        value: (self, x) => TimeSeriesUtils.formatAxisValue(x) + '/h',
         stroke: color,
         fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
         points: { show: false },
@@ -54,7 +53,7 @@ export class ByStatusChartGenerator {
           labelSize: 24,
           stroke: '#bfcbec',
           scale: 'total',
-          values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatNumericValue(v) + '/h'),
+          values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
         },
       ],
     };
