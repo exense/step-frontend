@@ -26,10 +26,6 @@
     background: var.$light-blue;
   }
 
-  &:not(.cdk-drag-disabled) .drag-handle {
-    cursor: move;
-  }
-
   &.skipped {
     color: var.$muted;
   }

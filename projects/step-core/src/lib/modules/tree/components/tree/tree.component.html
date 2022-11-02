@@ -17,8 +17,8 @@
     (click)="_treeState.selectNode(node, $event)"
   >
     <button mat-button mat-icon-button disabled></button>
-    <div class="node-content" (contextmenu)="openContextMenu($event, node.id)">
-      <step-icon [name]="node._class | artefactIcon" cdkDragHandle class="drag-handle"></step-icon>
+    <div class="node-content" (contextmenu)="openContextMenu($event, node.id)" cdkDragHandle>
+      <step-icon [name]="node._class | artefactIcon"></step-icon>
       <step-tree-node-name [node]="node"></step-tree-node-name>
     </div>
     <div class="drag-placeholder" *cdkDragPlaceholder></div>
@@ -46,14 +46,10 @@
       </ng-template>
       <ng-container *ngIf="_treeState.treeControl.isExpanded(node); then expanded; else notExpanded"> </ng-container>
     </button>
-    <div class="node-content" (contextmenu)="openContextMenu($event, node.id)">
-      <step-icon [name]="node._class | artefactIcon" cdkDragHandle class="drag-handle"></step-icon>
+    <div class="node-content" (contextmenu)="openContextMenu($event, node.id)" cdkDragHandle>
+      <step-icon [name]="node._class | artefactIcon"></step-icon>
       <step-tree-node-name [node]="node"></step-tree-node-name>
     </div>
-    <ng-container *cdkDragPreview>
-      <step-icon [name]="node._class | artefactIcon"></step-icon>
-      {{ node?.name }}
-    </ng-container>
     <div class="drag-placeholder" *cdkDragPlaceholder></div>
     <step-tree-drag-preview *cdkDragPreview> </step-tree-drag-preview>
   </cdk-tree-node>

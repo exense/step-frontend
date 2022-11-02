@@ -1,4 +1,2 @@
-<div *ngFor="let node of _treeState.selectedNodes$ | async; trackBy: trackByNode">
-  <step-icon [name]="node._class | artefactIcon"></step-icon>
-  {{ node?.name }}
-</div>
+<step-icon [name]="(canInsert$ | async) ? 'check' : 'x'"></step-icon>
+{{ label$ | async }}
