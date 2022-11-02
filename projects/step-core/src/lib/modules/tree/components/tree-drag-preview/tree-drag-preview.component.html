@@ -1,2 +1,4 @@
-<step-icon [name]="(canInsert$ | async) ? 'check' : 'x'"></step-icon>
+<ng-container *ngIf="icon$ | async as iconName">
+  <step-icon [name]="iconName"></step-icon>
+</ng-container>
 {{ label$ | async }}

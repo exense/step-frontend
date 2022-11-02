@@ -1,29 +1,47 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { TreeStateService } from '../../services/tree-state.service';
 import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
-import { combineLatest, debounceTime, first, map, merge, Observable, of, startWith } from 'rxjs';
-import { InsertPositionData } from '../../shared/insert-position-data';
+import { combineLatest, debounceTime, first, map, merge, of, startWith, Subject, takeUntil } from 'rxjs';
 import { Mutable } from '../../../../shared';
+import { ArtefactTypesService } from '../../../basics/step-basics.module';
+import { DOCUMENT } from '@angular/common';
 
-type FieldAccessor = Mutable<Pick<TreeDragPreviewComponent, 'canInsert$' | 'label$'>>;
+type FieldAccessor = Mutable<Pick<TreeDragPreviewComponent, 'label$' | 'icon$'>>;
+
+const CURSOR_GRABBING = 'grabbing';
+const CURSOR_NOT_ALLOWED = 'not-allowed';
 
 @Component({
   selector: 'step-tree-drag-preview',
   templateUrl: './tree-drag-preview.component.html',
   styleUrls: ['./tree-drag-preview.component.scss'],
 })
-export class TreeDragPreviewComponent implements OnInit {
-  constructor(private _treeState: TreeStateService, private _drag: CdkDrag, private _dropList: CdkDropList) {}
+export class TreeDragPreviewComponent implements OnInit, OnDestroy {
+  private terminator$ = new Subject<unknown>();
 
-  readonly canInsert$ = of(false);
   readonly label$ = of('');
+  readonly icon$ = of('');
+
+  constructor(
+    @Inject(DOCUMENT) private _document: Document,
+    private _artefactTypes: ArtefactTypesService,
+    private _treeState: TreeStateService,
+    private _drag: CdkDrag,
+    private _dropList: CdkDropList
+  ) {}
 
   ngOnInit(): void {
-    this.setupInsertFlag();
-    this.setupLabel();
+    this.setupCursor();
+    this.setupLabelAndIcon();
   }
 
-  private setupInsertFlag(): void {
+  ngOnDestroy(): void {
+    this.terminator$.next({});
+    this.terminator$.complete();
+    this._document.body.style.cursor = '';
+  }
+
+  private setupCursor(): void {
     const distance$ = this._drag.moved.pipe(
       debounceTime(100),
       map(({ distance }) => distance),
@@ -46,26 +64,36 @@ export class TreeDragPreviewComponent implements OnInit {
       this._dropList.sorted.pipe(map(({ currentIndex, previousIndex }) => ({ currentIndex, previousIndex })))
     );
 
-    const sortPosition$: Observable<InsertPositionData> = combineLatest([distance$, indexes$]).pipe(
-      map(([distance, indexes]) => ({ distance, ...indexes }))
-    );
-
-    (this as FieldAccessor).canInsert$ = sortPosition$.pipe(
-      map((position) => this._treeState.canInsertSelectedNodesAt(position))
-    );
+    combineLatest([distance$, indexes$])
+      .pipe(
+        map(([distance, indexes]) => ({ distance, ...indexes })),
+        map((position) => this._treeState.canInsertSelectedNodesAt(position)),
+        takeUntil(this.terminator$)
+      )
+      .subscribe((canInsert) => {
+        this._document.body.style.cursor = canInsert ? CURSOR_GRABBING : CURSOR_NOT_ALLOWED;
+      });
   }
 
-  private setupLabel(): void {
-    (this as FieldAccessor).label$ = this._treeState.selectedNodes$.pipe(
+  private setupLabelAndIcon(): void {
+    const labelAndIcon$ = this._treeState.selectedNodes$.pipe(
       map((nodes) => {
+        let label = '';
+        let icon = '';
+
         if (nodes.length === 1) {
-          return nodes[0].name;
+          label = nodes[0].name;
+          icon = this._artefactTypes.getIconNg2(nodes[0]._class);
+        } else if (nodes.length > 1) {
+          label = `(${nodes.length}) items`;
+          icon = 'list';
         }
-        if (nodes.length > 1) {
-          return `(${nodes.length}) items`;
-        }
-        return '';
+
+        return { label, icon };
       })
     );
+
+    (this as FieldAccessor).label$ = labelAndIcon$.pipe(map((x) => x.label));
+    (this as FieldAccessor).icon$ = labelAndIcon$.pipe(map((x) => x.icon));
   }
 }
