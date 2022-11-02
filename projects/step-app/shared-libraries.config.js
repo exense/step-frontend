@@ -40,5 +40,6 @@ module.exports = {
   '@angular/material-luxon-adapter': libraryConfig(),
   '@angular/cdk/overlay': libraryConfig(),
   '@angular/cdk/portal': libraryConfig(),
-  '@exense/step-core': libraryConfig({ requiredVersion: '0.1.2' }),
+  'angular-split': libraryConfig(),
+  '@exense/step-core': libraryConfig({ requiredVersion: '0.2.0' }),
 };
