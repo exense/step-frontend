@@ -64,6 +64,7 @@ export class TimeRangePicker implements OnInit {
       // the date is invalid
       this.fromDateString = undefined;
     }
+    console.log(from);
     if (this.toDateString && this.isValidDate(this.toDateString)) {
       to = new Date(this.toDateString).getTime();
     } else {
@@ -138,20 +139,21 @@ export class TimeRangePicker implements OnInit {
   }
 
   setFromDate(event: MatDatepickerInputEvent<any>) {
-    let date = new Date(event.value.ts);
-    date.setHours(0);
-    this.fromDateString = this.formatInputDate(date);
+    let utcDate = new Date(event.value.ts); // this is 00:00:00 in GMT
+    let localDate = new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), 0, 0, 0);
+    this.fromDateString = this.formatInputDate(localDate);
   }
 
   setToDate(event: MatDatepickerInputEvent<any>) {
-    let date = new Date(event.value.ts);
-    date.setHours(0);
-    this.toDateString = this.formatInputDate(date);
+    let utcDate = new Date(event.value.ts);
+    let localDate = new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), 0, 0, 0);
+    this.toDateString = this.formatInputDate(localDate);
   }
 
   formatInputDate(date: Date) {
-    let isoFullDate = date.toISOString();
-    let isoDate = isoFullDate.substring(0, isoFullDate.indexOf('T'));
+    let month = String(date.getMonth() + 1).padStart(2, '0');
+    let day = String(date.getDate()).padStart(2, '0');
+    let isoDate = `${date.getFullYear()}-${month}-${day}`;
     let hours = String(date.getHours()).padStart(2, '0');
     let minutes = String(date.getMinutes()).padStart(2, '0');
     let seconds = String(date.getSeconds()).padStart(2, '0');
