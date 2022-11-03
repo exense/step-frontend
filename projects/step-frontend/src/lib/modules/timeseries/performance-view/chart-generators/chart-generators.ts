@@ -63,10 +63,12 @@ export class ChartGenerators {
           value: (x, v) => Math.trunc(v) + ' ms',
           width: 2,
           stroke: 'rgba(255,109,18,0.59)',
+          legendName: 'Average Response Time',
         },
         {
           id: 'count',
           scale: 'total',
+          legendName: 'Hits/h',
           label: 'Hits/h',
           data: countValues,
           value: (x, v) => Math.trunc(v),
@@ -85,8 +87,7 @@ export class ChartGenerators {
           side: 1,
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
           scale: 'total',
-          values: (u: any, vals: any, space: any) =>
-            vals.map((v: number) => TimeSeriesUtils.formatNumericValue(v) + '/h'),
+          values: (u: any, vals: any, space: any) => vals.map((v: number) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
           grid: { show: false },
         },
       ],

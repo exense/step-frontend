@@ -131,11 +131,14 @@ export class TooltipPlugin {
           }
           if (summaryRow) {
             let summaryElement = this.createRowElement(summaryRow);
-            let separator = document.createElement('div');
-            separator.classList.add('separator');
-            overlay.appendChild(separator);
+
+            overlay.appendChild(this.createSeparator());
             overlay.appendChild(summaryElement);
           }
+
+          let timestamp = u.posToVal(left, 'x');
+          overlay.appendChild(this.createSeparator());
+          overlay.appendChild(this.createTimestampItem(timestamp));
 
           // overlay.appendChild(dots);
           // the feature will display the closest value for the y scale only, and just one value for the second scale (if present)
@@ -146,6 +149,20 @@ export class TooltipPlugin {
         },
       },
     };
+  }
+
+  private static createSeparator() {
+    let separator = document.createElement('div');
+    separator.classList.add('separator');
+    return separator;
+  }
+
+  private static createTimestampItem(timestamp: number) {
+    let date = new Date(timestamp);
+    let div = document.createElement('div');
+    div.textContent = date.toLocaleString();
+    div.classList.add('timestamp');
+    return div;
   }
 
   private static createRowElement(point: TooltipRowEntry, yScaleUnit?: string) {

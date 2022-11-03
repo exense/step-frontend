@@ -8,7 +8,7 @@ export interface TSChartSettings {
   series: TSChartSeries[];
   scales?: Scale[];
   autoResize?: boolean; // autoresize on window size change
-  axes?: Axis[];
+  axes: Axis[];
   showLegend?: boolean; // show legend behind the chart
   yScaleUnit?: string; // the unit which will be displayed along with the Y axis.
   zScaleTooltipLabel?: string;
@@ -16,6 +16,7 @@ export interface TSChartSettings {
 }
 
 export interface TSChartSeries extends Series {
-  data: (number | null | undefined)[];
   id: string;
+  data: (number | null | undefined)[];
+  legendName: string;
 }

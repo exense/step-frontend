@@ -1,16 +1,17 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, BucketAttributes, Execution } from '@exense/step-core';
+import { AJS_MODULE, BucketAttributes, Execution, ExecutionsService } from '@exense/step-core';
 import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
 import { TimeSeriesService } from '../time-series.service';
 import { FindBucketsRequest } from '../find-buckets-request';
 import { TimeSeriesChartComponent } from '../chart/time-series-chart.component';
 import { KeyValue } from '@angular/common';
+import { TSTimeRange } from '../chart/model/ts-time-range';
 import { TSRangerComponent } from '../ranger/ts-ranger.component';
 import { UPlotUtils } from '../uplot/uPlot.utils';
 import { TimeSeriesConfig } from '../time-series.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
-import { first, forkJoin, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { first, forkJoin, Observable, of, Subject, Subscription, switchMap, take, takeUntil, tap } from 'rxjs';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { TimeSeriesContext } from '../execution-page/time-series-context';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
@@ -36,6 +37,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   private readonly METRIC_TYPE_KEY = 'metricType';
   private readonly METRIC_TYPE_RESPONSE_TIME = 'response-time'; // this is for normal measurements
   private readonly METRIC_TYPE_SAMPLER = 'sampler'; // this is for thread groups measurements
+
+  private CHART_LEGEND_SIZE = 65;
 
   rangerSettings: TSChartSettings | undefined;
 
@@ -91,7 +94,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     { label: 'Off', value: 0 },
   ];
   selectedRefreshInterval: RefreshInterval = this.refreshIntervals[0];
-  selectedResponseTimesMetric: any;
   timeSelection!: ExecutionTimeSelection;
 
   terminator$ = new Subject<void>();
@@ -114,17 +116,17 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     {
       label: ThroughputMetricType.TPH,
       mapFunction: (b: Bucket) => (b ? b.throughputPerHour : 0),
-      labelFunction: (value: number) => `${TimeSeriesUtils.formatNumericValue(value)}/h`,
+      labelFunction: (value: number) => `${TimeSeriesUtils.formatAxisValue(value)}/h`,
     },
     {
       label: ThroughputMetricType.TPM,
       mapFunction: (b: Bucket) => (b ? b.throughputPerHour / 60 : 0),
-      labelFunction: (value: number) => `${TimeSeriesUtils.formatNumericValue(value)}/m`,
+      labelFunction: (value: number) => `${TimeSeriesUtils.formatAxisValue(value)}/m`,
     },
     {
       label: ThroughputMetricType.TPS,
       mapFunction: (b: Bucket) => (b ? b.throughputPerHour / 60 / 60 : 0),
-      labelFunction: (value: number) => `${TimeSeriesUtils.formatNumericValue(value)}/s`,
+      labelFunction: (value: number) => `${TimeSeriesUtils.formatAxisValue(value)}/s`,
     },
   ];
   selectedThroughputMetric = this.throughputMetrics[0];
@@ -368,106 +370,98 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
               return;
             }
           }
-          const timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-          const totalThroughput: number[] = response.matrix[0] ? Array(response.matrix[0]?.length) : [];
-          const responseTimeSeries: TSChartSeries[] = [];
-          const throughputSeries: TSChartSeries[] = [];
+          let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
+          let totalThroughput: number[] = response.matrix[0] ? Array(response.matrix[0]?.length) : [];
+          let responseTimeSeries: TSChartSeries[] = [];
+          let throughputSeries: TSChartSeries[] = [];
           response.matrixKeys.map((key, i) => {
             key = this.getSeriesKey(key, groupDimensions);
-            const responseTimeData: (number | null | undefined)[] = [];
-            const color = this.keywordsService.getColor(key);
-            const totalThroughputData = response.matrix[i].map((b, j) => {
-              if (totalThroughput[j] == null) {
-                totalThroughput[j] = 0;
+            let responseTimeData: (number | null | undefined)[] = [];
+            let color = this.keywordsService.getColor(key);
+            let countData = response.matrix[i].map((b, j) => {
+              let bucketValue = b?.throughputPerHour;
+              if (totalThroughput[j] == undefined) {
+                totalThroughput[j] = bucketValue;
+              } else if (bucketValue) {
+                totalThroughput[j] += bucketValue;
               }
-              let throughputValue = this.selectedThroughputMetric.mapFunction(b);
-              totalThroughput[j] += throughputValue;
               if (b) {
-                // from the same iteration we calculate also the response time data
                 responseTimeData.push(this.selectedResponseTimeMetric.mapFunction(b));
               } else {
                 responseTimeData.push(undefined);
               }
-              return throughputValue;
+              return bucketValue ? bucketValue : 0;
             });
             let keywordSelection = this.keywordsService.getKeywordSelection(key);
             let series = {
               scale: 'y',
               show: keywordSelection ? keywordSelection.isSelected : true,
               label: key,
+              legendName: key,
               id: key,
               data: [], // will override it
               value: (x, v) => Math.trunc(v),
               stroke: color,
               points: { show: false },
             } as TSChartSeries;
-            throughputSeries.push({ ...series, data: totalThroughputData });
+            throughputSeries.push({ ...series, data: countData });
             responseTimeSeries.push({ ...series, data: responseTimeData });
             return series;
           });
-          this.createResponseTimesChart(timeLabels, responseTimeSeries);
-          this.createThroughputChart(timeLabels, throughputSeries, totalThroughput);
+
+          this.chartsSettings[TsChartType.THROUGHPUT] = {
+            title: 'Throughput',
+            xValues: timeLabels,
+            showLegend: false,
+            tooltipOptions: { enabled: true },
+            zScaleTooltipLabel: 'Total Hits/h',
+            series: [
+              {
+                scale: 'total',
+                label: 'Total',
+                legendName: 'Total',
+                id: 'secondary',
+                data: totalThroughput,
+                value: (x, v) => Math.trunc(v) + ' total',
+                fill: (self: uPlot) => UPlotUtils.gradientFill(self, '#8394C9'),
+                paths: this.barsFunction({ size: [0.9, 100] }),
+                points: { show: false },
+              },
+              ...throughputSeries,
+            ],
+            axes: [
+              {
+                scale: 'y',
+                size: this.CHART_LEGEND_SIZE,
+                values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
+              },
+              {
+                side: 1,
+                size: this.CHART_LEGEND_SIZE,
+                scale: 'total',
+                values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
+                grid: { show: false },
+              },
+            ],
+          };
+
+          this.chartsSettings[TsChartType.RESPONSE_TIME] = {
+            title: TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${this.selectedResponseTimeMetric.label})`,
+            xValues: timeLabels,
+            showLegend: false,
+            series: responseTimeSeries,
+            yScaleUnit: 'ms',
+            tooltipOptions: { enabled: true },
+            axes: [
+              {
+                scale: 'y',
+                size: this.CHART_LEGEND_SIZE,
+                values: (u, vals, space) => vals.map((v) => UPlotUtils.formatMilliseconds(v)),
+              },
+            ],
+          };
         })
       );
-  }
-
-  createThroughputChart(timeLabels: number[], series: any[], totalData: number[]) {
-    this.chartsSettings[TsChartType.THROUGHPUT] = {
-      title: 'Throughput',
-      xValues: timeLabels,
-      showLegend: false,
-      zScaleTooltipLabel: 'Total Hits/h',
-      tooltipOptions: {
-        enabled: true,
-      },
-      series: [
-        {
-          scale: 'total',
-          label: 'Total',
-          id: 'secondary',
-          data: totalData,
-          value: (x, v) => Math.trunc(v) + ' total',
-          fill: (self: uPlot) => UPlotUtils.gradientFill(self, '#8394C9'),
-          paths: this.barsFunction({ size: [0.9, 100] }),
-          points: { show: false },
-        },
-        ...series,
-      ],
-      axes: [
-        {
-          scale: 'y',
-          size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-          values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatNumericValue(v) + '/h'),
-        },
-        {
-          side: 1,
-          size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-          scale: 'total',
-          values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatNumericValue(v) + '/h'),
-          grid: { show: false },
-        },
-      ],
-    };
-  }
-
-  createResponseTimesChart(timeLabels: number[], series: any[]) {
-    this.chartsSettings[TsChartType.RESPONSE_TIME] = {
-      title: TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${this.selectedResponseTimeMetric.label})`,
-      xValues: timeLabels,
-      showLegend: false,
-      series: series,
-      yScaleUnit: 'ms',
-      tooltipOptions: {
-        enabled: true,
-      },
-      axes: [
-        {
-          scale: 'y',
-          size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-          values: (u, vals, space) => vals.map((v) => UPlotUtils.formatMilliseconds(v)),
-        },
-      ],
-    };
   }
 
   updateTable(): Observable<TimeSeriesChartResponse> {
@@ -498,7 +492,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   switchResponseTimeMetric(metric: { label: string; mapFunction: (b: Bucket) => number }) {
     this.responseTimeChart.setTitle(TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${metric.label})`);
     if (metric.label === this.selectedResponseTimeMetric.label) {
-      // it is not a real change
+      // it is a real change
       return;
     }
     if (!this.byKeywordsChartResponseCache) {

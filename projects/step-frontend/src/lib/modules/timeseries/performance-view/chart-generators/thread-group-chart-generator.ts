@@ -39,9 +39,10 @@ export class ThreadGroupChartGenerator {
       });
       let useRandomColors = response.matrixKeys.length > 1;
       return {
+        id: key,
         scale: 'y',
         label: key,
-        id: key,
+        legendName: key,
         data: filledData,
         value: (x, v) => Math.trunc(v),
         stroke: useRandomColors ? colorsPool.getColor(key) : '#024981',
@@ -65,6 +66,7 @@ export class ThreadGroupChartGenerator {
           id: 'total',
           scale: 'total',
           label: 'Total',
+          legendName: 'Total',
           data: totalData,
           value: (x, v) => Math.trunc(v),
           fill: (self: uPlot) => UPlotUtils.gradientFill(self, '#8FA1D2'),
