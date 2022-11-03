@@ -10,8 +10,6 @@ export interface TSChartSettings {
   autoResize?: boolean; // autoresize on window size change
   axes: Axis[];
   showLegend?: boolean; // show legend behind the chart
-  yScaleUnit?: string; // the unit which will be displayed along with the Y axis.
-  zScaleTooltipLabel?: string;
   tooltipOptions: TsTooltipOptions;
 }
 

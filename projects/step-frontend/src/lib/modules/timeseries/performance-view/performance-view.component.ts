@@ -117,16 +117,19 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       label: ThroughputMetricType.TPH,
       mapFunction: (b: Bucket) => (b ? b.throughputPerHour : 0),
       labelFunction: (value: number) => `${TimeSeriesUtils.formatAxisValue(value)}/h`,
+      tooltipZAxisLabel: 'Total Hits/h',
     },
     {
       label: ThroughputMetricType.TPM,
       mapFunction: (b: Bucket) => (b ? b.throughputPerHour / 60 : 0),
       labelFunction: (value: number) => `${TimeSeriesUtils.formatAxisValue(value)}/m`,
+      tooltipZAxisLabel: 'Total Hits/m',
     },
     {
       label: ThroughputMetricType.TPS,
       mapFunction: (b: Bucket) => (b ? b.throughputPerHour / 60 / 60 : 0),
       labelFunction: (value: number) => `${TimeSeriesUtils.formatAxisValue(value)}/s`,
+      tooltipZAxisLabel: 'Total Hits/s',
     },
   ];
   selectedThroughputMetric = this.throughputMetrics[0];
@@ -413,8 +416,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             title: 'Throughput',
             xValues: timeLabels,
             showLegend: false,
-            tooltipOptions: { enabled: true },
-            zScaleTooltipLabel: 'Total Hits/h',
+            tooltipOptions: {
+              enabled: true,
+              zAxisLabel: this.selectedThroughputMetric.tooltipZAxisLabel,
+            },
             series: [
               {
                 scale: 'total',
@@ -450,8 +455,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             xValues: timeLabels,
             showLegend: false,
             series: responseTimeSeries,
-            yScaleUnit: 'ms',
-            tooltipOptions: { enabled: true },
+            tooltipOptions: {
+              enabled: true,
+              yAxisUnit: 'ms',
+            },
             axes: [
               {
                 scale: 'y',
@@ -508,6 +515,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   switchThroughputMetric(metric: ThroughputMetric) {
     let f = (u: any, vals: any) => vals.map((v: number) => metric.labelFunction(v));
+    this.throughputChart.settings.tooltipOptions.zAxisLabel = metric.tooltipZAxisLabel;
     this.throughputChart.uplot.axes[1].values = f;
     this.throughputChart.uplot.axes[2].values = f;
     if (metric.label === this.selectedResponseTimeMetric.label) {
@@ -561,6 +569,7 @@ interface ThroughputMetric {
   label: ThroughputMetricType;
   mapFunction: (b: Bucket) => number;
   labelFunction: (value: number) => string;
+  tooltipZAxisLabel: string;
 }
 
 getAngularJSGlobal()
