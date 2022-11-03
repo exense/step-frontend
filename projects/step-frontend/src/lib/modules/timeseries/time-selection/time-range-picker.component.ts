@@ -64,7 +64,6 @@ export class TimeRangePicker implements OnInit {
       // the date is invalid
       this.fromDateString = undefined;
     }
-    console.log(from);
     if (this.toDateString && this.isValidDate(this.toDateString)) {
       to = new Date(this.toDateString).getTime();
     } else {
