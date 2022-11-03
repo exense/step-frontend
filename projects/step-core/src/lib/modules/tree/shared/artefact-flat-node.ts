@@ -4,4 +4,5 @@ export interface ArtefactFlatNode extends Pick<AbstractArtefactWithParentId, 'id
   name: string;
   expandable: boolean;
   level: number;
+  isSkipped: boolean;
 }
