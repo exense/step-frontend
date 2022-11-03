@@ -42,7 +42,6 @@ export class ByStatusChartGenerator {
       showLegend: true,
       xValues: xLabels,
       series: series,
-      yScaleUnit: '/ h',
       tooltipOptions: {
         enabled: true,
       },
