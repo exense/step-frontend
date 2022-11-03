@@ -74,6 +74,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
    * @param settings
    */
   createChart(settings: TSChartSettings): void {
+    this.legendSettings.items = [];
     let getSize = () => {
       return {
         width: this.element.nativeElement.parentElement.offsetWidth - 24,
