@@ -28,7 +28,9 @@ export class ThreadGroupChartGenerator {
         let bucketValue = b?.max;
         if (bucketValue == null && j > 0) {
           // we try to keep a constant line
-          bucketValue = response.matrix[i][j - 1]?.max;
+          let previousBucket = response.matrix[i][j - 1];
+          bucketValue = previousBucket?.max;
+          response.matrix[i][j] = previousBucket;
         }
         if (totalData[j] === undefined) {
           totalData[j] = bucketValue;
