@@ -30,7 +30,7 @@ export class UPlotUtils {
     let canvasHeight = uPlot.ctx.canvas.height;
     let gradient = uPlot.ctx.createLinearGradient(0, 0, 0, canvasHeight);
     gradient.addColorStop(0, strokeColor + '80');
-    gradient.addColorStop(1, strokeColor + '08');
+    gradient.addColorStop(1, strokeColor + '10');
     return gradient;
   }
 

@@ -69,7 +69,7 @@ export class ThreadGroupChartGenerator {
           legendName: 'Total',
           data: totalData,
           value: (x, v) => Math.trunc(v),
-          fill: (self: uPlot) => UPlotUtils.gradientFill(self, '#8FA1D2'),
+          fill: (self: uPlot) => UPlotUtils.gradientFill(self, TimeSeriesConfig.TOTAL_BARS_COLOR),
           paths: ChartGenerators.stepped({ align: 1 }),
           points: { show: false },
         },

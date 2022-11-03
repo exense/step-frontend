@@ -423,7 +423,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
                 id: 'secondary',
                 data: totalThroughput,
                 value: (x, v) => Math.trunc(v) + ' total',
-                fill: (self: uPlot) => UPlotUtils.gradientFill(self, '#8394C9'),
+                fill: (self: uPlot) => UPlotUtils.gradientFill(self, TimeSeriesConfig.TOTAL_BARS_COLOR),
                 paths: this.barsFunction({ size: [0.9, 100] }),
                 points: { show: false },
               },
