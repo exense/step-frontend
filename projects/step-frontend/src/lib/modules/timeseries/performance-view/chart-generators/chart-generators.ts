@@ -49,10 +49,10 @@ export class ChartGenerators {
       title: 'Performance Overview',
       showLegend: true,
       xValues: xLabels,
-      yScaleUnit: 'ms',
-      zScaleTooltipLabel: 'Hits/h',
       tooltipOptions: {
         enabled: true,
+        yAxisUnit: 'ms',
+        zAxisLabel: 'Hits/h',
       },
       series: [
         {
