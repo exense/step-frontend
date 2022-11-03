@@ -26,16 +26,11 @@ export class ThreadGroupChartGenerator {
       key = key[this.DIMENSION_KEY]; // get just the name
       let filledData = response.matrix[i].map((b, j) => {
         let bucketValue = b?.max;
-        if (bucketValue == null) {
-          if (j == 0) {
-            // it is the first element
-            bucketValue = 0;
-          } else {
-            // we try to keep a constant line
-            let previousBucket = response.matrix[i][j - 1];
-            bucketValue = previousBucket?.max;
-            response.matrix[i][j] = previousBucket;
-          }
+        if (bucketValue == null && j > 0) {
+          // we try to keep a constant line
+          let previousBucket = response.matrix[i][j - 1];
+          bucketValue = previousBucket?.max;
+          response.matrix[i][j] = previousBucket;
         }
         if (totalData[j] === undefined) {
           totalData[j] = bucketValue;
