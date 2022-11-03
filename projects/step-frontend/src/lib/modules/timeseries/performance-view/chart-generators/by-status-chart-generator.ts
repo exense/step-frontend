@@ -39,19 +39,16 @@ export class ByStatusChartGenerator {
     });
     return {
       title: 'Statuses',
-      showLegend: true,
       xValues: xLabels,
       series: series,
       tooltipOptions: {
         enabled: true,
+        yAxisUnit: '/ h',
       },
       axes: [
         {
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-          label: 'Total',
-          labelSize: 24,
-          stroke: '#bfcbec',
-          scale: 'total',
+          scale: 'y',
           values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
         },
       ],

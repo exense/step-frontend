@@ -47,7 +47,6 @@ export class ChartGenerators {
 
     return {
       title: 'Performance Overview',
-      showLegend: true,
       xValues: xLabels,
       tooltipOptions: {
         enabled: true,
