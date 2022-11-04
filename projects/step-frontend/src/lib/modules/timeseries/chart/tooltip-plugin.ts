@@ -23,6 +23,7 @@ export class TooltipPlugin {
     let bound: any;
     let bLeft: any;
     let bTop: any;
+    let isVisible = false;
 
     function syncBounds(): void {
       let bbox = over.getBoundingClientRect();
@@ -47,10 +48,12 @@ export class TooltipPlugin {
 
           over.onmouseenter = () => {
             overlay.style.display = 'block';
+            isVisible = true;
           };
 
           over.onmouseleave = () => {
             overlay.style.display = 'none';
+            isVisible = false;
           };
         },
         destroy: (u: uPlot) => {
@@ -60,6 +63,10 @@ export class TooltipPlugin {
           syncBounds();
         },
         setCursor: (u: uPlot) => {
+          // this is called for all linked charts
+          if (!isVisible) {
+            return;
+          }
           const settings = optionsGetter();
           const { left, top, idx } = u.cursor;
           if (!top || top < 0 || !idx || !left) {
@@ -82,7 +89,7 @@ export class TooltipPlugin {
             if (series.scale === 'total' && bucketValue != null) {
               summaryRow = {
                 value: bucketValue,
-                color: TimeSeriesConfig.SUMMARY_BARS_COLOR,
+                color: TimeSeriesConfig.TOTAL_BARS_COLOR,
                 name: settings.zAxisLabel || 'Total',
               };
             }

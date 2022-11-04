@@ -47,7 +47,6 @@ export class ChartGenerators {
 
     return {
       title: 'Performance Overview',
-      showLegend: true,
       xValues: xLabels,
       tooltipOptions: {
         enabled: true,
@@ -72,7 +71,7 @@ export class ChartGenerators {
           label: 'Hits/h',
           data: countValues,
           value: (x, v) => Math.trunc(v),
-          fill: (self: uPlot) => UPlotUtils.gradientFill(self, '#8394C9'),
+          fill: (self: uPlot) => UPlotUtils.gradientFill(self, TimeSeriesConfig.TOTAL_BARS_COLOR),
           paths: this.barsFunction({ size: [0.9, 100] }),
           points: { show: false },
         },

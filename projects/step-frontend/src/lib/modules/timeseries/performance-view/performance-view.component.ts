@@ -418,7 +418,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           this.chartsSettings[TsChartType.THROUGHPUT] = {
             title: 'Throughput',
             xValues: timeLabels,
-            showLegend: false,
             tooltipOptions: {
               enabled: true,
               zAxisLabel: this.selectedThroughputMetric.tooltipZAxisLabel,
@@ -432,7 +431,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
                 id: 'secondary',
                 data: totalThroughput,
                 value: (x, v) => Math.trunc(v) + ' total',
-                fill: (self: uPlot) => UPlotUtils.gradientFill(self, '#8394C9'),
+                fill: (self: uPlot) => UPlotUtils.gradientFill(self, TimeSeriesConfig.TOTAL_BARS_COLOR),
                 paths: this.barsFunction({ size: [0.9, 100] }),
                 points: { show: false },
               },
@@ -457,7 +456,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           this.chartsSettings[TsChartType.RESPONSE_TIME] = {
             title: TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${this.selectedResponseTimeMetric.label})`,
             xValues: timeLabels,
-            showLegend: false,
             series: responseTimeSeries,
             tooltipOptions: {
               enabled: true,

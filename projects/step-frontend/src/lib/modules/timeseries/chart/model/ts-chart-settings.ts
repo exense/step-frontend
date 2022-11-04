@@ -9,7 +9,6 @@ export interface TSChartSettings {
   scales?: Scale[];
   autoResize?: boolean; // autoresize on window size change
   axes: Axis[];
-  showLegend?: boolean; // show legend behind the chart
   tooltipOptions: TsTooltipOptions;
 }
 
