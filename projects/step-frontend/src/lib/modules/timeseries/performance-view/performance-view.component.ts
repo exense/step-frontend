@@ -118,18 +118,21 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       mapFunction: (b: Bucket) => (b ? b.throughputPerHour : 0),
       labelFunction: (value: number) => `${TimeSeriesUtils.formatAxisValue(value)}/h`,
       tooltipZAxisLabel: 'Total Hits/h',
+      seriesUnit: '/ h',
     },
     {
       label: ThroughputMetricType.TPM,
       mapFunction: (b: Bucket) => (b ? b.throughputPerHour / 60 : 0),
       labelFunction: (value: number) => `${TimeSeriesUtils.formatAxisValue(value)}/m`,
       tooltipZAxisLabel: 'Total Hits/m',
+      seriesUnit: '/ m',
     },
     {
       label: ThroughputMetricType.TPS,
       mapFunction: (b: Bucket) => (b ? b.throughputPerHour / 60 / 60 : 0),
       labelFunction: (value: number) => `${TimeSeriesUtils.formatAxisValue(value)}/s`,
       tooltipZAxisLabel: 'Total Hits/s',
+      seriesUnit: '/ s',
     },
   ];
   selectedThroughputMetric = this.throughputMetrics[0];
@@ -419,6 +422,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             tooltipOptions: {
               enabled: true,
               zAxisLabel: this.selectedThroughputMetric.tooltipZAxisLabel,
+              yAxisUnit: this.selectedThroughputMetric.seriesUnit,
             },
             series: [
               {
@@ -516,6 +520,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   switchThroughputMetric(metric: ThroughputMetric) {
     let f = (u: any, vals: any) => vals.map((v: number) => metric.labelFunction(v));
     this.throughputChart.settings.tooltipOptions.zAxisLabel = metric.tooltipZAxisLabel;
+    this.throughputChart.settings.tooltipOptions.yAxisUnit = metric.seriesUnit;
     this.throughputChart.uplot.axes[1].values = f;
     this.throughputChart.uplot.axes[2].values = f;
     if (metric.label === this.selectedResponseTimeMetric.label) {
@@ -569,6 +574,7 @@ interface ThroughputMetric {
   label: ThroughputMetricType;
   mapFunction: (b: Bucket) => number;
   labelFunction: (value: number) => string;
+  seriesUnit: string;
   tooltipZAxisLabel: string;
 }
 
