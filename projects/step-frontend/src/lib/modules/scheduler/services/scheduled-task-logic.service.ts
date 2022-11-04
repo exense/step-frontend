@@ -6,7 +6,7 @@ import {
   Mutable,
   TableLocalDataSource,
 } from '@exense/step-core';
-import { BehaviorSubject, first, shareReplay, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, first, Observable, shareReplay, switchMap, tap } from 'rxjs';
 import { ScheduledTaskDialogsService } from '@exense/step-core';
 import { Location } from '@angular/common';
 
@@ -60,6 +60,10 @@ export class ScheduledTaskLogicService implements OnDestroy {
 
   loadTable(): void {
     this.scheduledTaskRequest$.next({});
+  }
+
+  isSchedulerEnabled(): Observable<boolean> {
+    return this._schedulerService.isSchedulerEnabled();
   }
 
   executeParameter(scheduledTask: ExecutiontTaskParameters) {

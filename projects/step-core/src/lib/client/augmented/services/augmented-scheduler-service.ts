@@ -7,6 +7,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { SchedulerService } from '../../generated';
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
+import { map } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedSchedulerService extends SchedulerService {
@@ -25,5 +26,9 @@ export class AugmentedSchedulerService extends SchedulerService {
   public override executeTask(id: string): Observable<string> {
     //@ts-ignore
     return this._httpClient.post<any>('rest/scheduler/task/' + id + '/execute', null, { responseType: 'text' });
+  }
+
+  public isSchedulerEnabled(): Observable<boolean> {
+    return this._httpClient.get<any>('rest/settings/scheduler_enabled').pipe(map((isEnabled) => isEnabled === 'true'));
   }
 }
