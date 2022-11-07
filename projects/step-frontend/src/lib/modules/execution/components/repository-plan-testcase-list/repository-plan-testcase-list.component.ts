@@ -136,6 +136,11 @@ export class RepositoryPlanTestcaseListComponent
       map(([length, itemsLength]) => length > 0 && itemsLength > 0 && length !== itemsLength),
       takeUntil(this.collectorTerminator$)
     );
+
+    // Select all items by default, when new selectionCollector is assigned
+    this.repositoryReport$.pipe(first()).subscribe((items) => {
+      collector.select(...items);
+    });
   }
 
   private terminate(): void {
