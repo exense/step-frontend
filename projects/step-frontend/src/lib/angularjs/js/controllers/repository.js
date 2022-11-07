@@ -42,8 +42,17 @@ angular
     '$http',
     '$location',
     'stateStorage',
-    function ($rootScope, $scope, $http, $location, $stateStorage) {
+    'selectionCollectorFactoryService',
+    'AutoDeselectStrategy',
+    function ($rootScope, $scope, $http, $location, $stateStorage, selectionCollectorFactoryService, AutoDeselectStrategy) {
       $stateStorage.push($scope, 'repository', {});
+
+      $scope.selectionCollector = selectionCollectorFactoryService.create('id', AutoDeselectStrategy.KEEP_SELECTION);
+      $scope.$on('$destroy', function(){
+        $scope.selectionCollector.destroy();
+      });
+
+      $scope.trackTestcasesBy = $location.search().repositoryId == 'local' ? 'id' : 'testplanName';
 
       if ($location.search().user) {
         $rootScope.context.userID = $location.search().user;
@@ -72,53 +81,3 @@ angular
       }
     },
   ])
-
-  .controller('TestSetOverviewCtrl', [
-    '$scope',
-    '$http',
-    '$location',
-    'stateStorage',
-    function ($scope, $http, $location, $stateStorage) {
-      $scope.tableHandle = {};
-
-      $scope.repoRef = {
-        repositoryID: $location.search().repositoryId,
-        repositoryParameters: _.omit($location.search(), 'repositoryId'),
-      };
-      $scope.trackTestcasesBy = $scope.repoRef.repositoryID == 'local' ? 'id' : 'testplanName';
-      $http.post('rest/controller/repository/report', $scope.repoRef).then(function (response) {
-        var data = response.data;
-        $scope.testCases = data.runs;
-        $scope.statusOptions = _.map(
-          _.uniq(
-            _.map(data.runs, function (e) {
-              return e.status;
-            })
-          ),
-          function (e) {
-            return { text: e };
-          }
-        );
-      });
-      $scope.functions.getIncludedTestcases = function () {
-        var table = $scope.tableHandle;
-        var selectionMode = table.getSelectionMode();
-        if (selectionMode == 'all' || table.areAllSelected()) {
-          return null;
-        } else if (selectionMode == 'custom' || selectionMode == 'none') {
-          var trackBy = $scope.trackTestcasesBy == 'id' ? 'id' : 'name';
-          var includedTestCases = { by: trackBy };
-          var result = [];
-          if (table.getRows != null) {
-            _.each(table.getRows(true), function (value) {
-              result.push(trackBy == 'id' ? value.id : value.testplanName);
-            });
-          }
-          includedTestCases.list = result;
-          return includedTestCases;
-        } else {
-          throw 'Unsupported selection mode: ' + selectionMode;
-        }
-      };
-    },
-  ]);

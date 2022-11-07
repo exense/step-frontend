@@ -16,6 +16,7 @@ import { ExecutionTabsComponent } from './components/execution-tabs/execution-ta
 import './components/execution-tabs/execution-tabs.component';
 import { CustomCellRegistryService, EntityRegistry } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
+import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { ExecutionErrorsComponent } from './components/execution-errors/executio
     PanelIdPipe,
     KeywordCallsComponent,
     ExecutionTabsComponent,
+    RepositoryPlanTestcaseListComponent,
     ExecutionErrorsComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule],
