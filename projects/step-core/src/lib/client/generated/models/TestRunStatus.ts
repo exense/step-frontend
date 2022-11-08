@@ -5,5 +5,5 @@
 export type TestRunStatus = {
   id?: string;
   testplanName?: string;
-  status?: 'TECHNICAL_ERROR' | 'FAILED' | 'PASSED' | 'INTERRUPTED' | 'SKIPPED' | 'NORUN' | 'RUNNING';
+  status?: 'TECHNICAL_ERROR' | 'FAILED' | 'INTERRUPTED' | 'PASSED' | 'SKIPPED' | 'NORUN' | 'RUNNING';
 };
