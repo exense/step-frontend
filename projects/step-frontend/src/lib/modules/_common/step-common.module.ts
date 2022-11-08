@@ -14,6 +14,7 @@ import { ModalWindowComponent } from './components/modal-window/modal-window.com
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { CustomFormDirective } from './directives/custom-form.directive';
 import { PlanExecutionDirective } from './directives/plan-execution.directive';
+import { VersionsDialogComponent } from './components/versions-dialog/versions-dialog.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { PlanExecutionDirective } from './directives/plan-execution.directive';
     ArtefactDetailsDirective,
     CustomFormDirective,
     PlanExecutionDirective,
+    VersionsDialogComponent,
   ],
   exports: [
     AutorefreshToggleComponent,

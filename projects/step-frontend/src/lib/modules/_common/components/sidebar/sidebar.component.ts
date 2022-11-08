@@ -1,14 +1,16 @@
+import { DOCUMENT, Location } from '@angular/common';
 import {
   AfterViewInit,
   Component,
   ElementRef,
   Inject,
-  Input,
   OnDestroy,
   QueryList,
+  ViewChild,
   ViewChildren,
   ViewEncapsulation,
 } from '@angular/core';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_LOCATION,
@@ -18,8 +20,9 @@ import {
   ViewRegistryService,
   ViewStateService,
 } from '@exense/step-core';
-import { DOCUMENT, Location } from '@angular/common';
 import { ILocationService } from 'angular';
+import { VersionsDialogData } from '../../shared/versions-dialog-data.interface';
+import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
 
 @Component({
   selector: 'step-sidebar',
@@ -28,6 +31,9 @@ import { ILocationService } from 'angular';
   encapsulation: ViewEncapsulation.None,
 })
 export class SidebarComponent implements AfterViewInit, OnDestroy {
+  @ViewChild('versionFEOS') versionFEOS?: ElementRef<HTMLElement>;
+  @ViewChild('versionFEEE') versionFEEE?: ElementRef<HTMLElement>;
+
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
 
   sideBarOpen: boolean = true;
@@ -40,7 +46,8 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
     public _viewRegistryService: ViewRegistryService,
     public _viewStateService: ViewStateService,
     public _location: Location,
-    @Inject(AJS_LOCATION) private _ajsLocation: ILocationService
+    @Inject(AJS_LOCATION) private _ajsLocation: ILocationService,
+    private _matDialog: MatDialog
   ) {
     this.locationStateSubscription = this._location.subscribe((popState: any) => {
       this.openMainMenuBasedOnActualView();
@@ -114,6 +121,17 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
         .querySelector('step-tenant-selection-downgraded')!
         .classList.remove('tenant-selector-when-sidebar-closed');
     }
+  }
+
+  showVersionsDialog(): void {
+    const config: MatDialogConfig<VersionsDialogData> = {
+      data: {
+        versionFEOS: this.versionFEOS?.nativeElement.textContent,
+        versionFEEE: this.versionFEEE?.nativeElement.textContent,
+      },
+    };
+
+    const dialogRef = this._matDialog.open(VersionsDialogComponent, config);
   }
 }
 
