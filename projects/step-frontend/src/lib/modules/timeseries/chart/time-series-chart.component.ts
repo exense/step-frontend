@@ -39,7 +39,8 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   @Input() syncKey: string | undefined; // all the charts with the same syncKey in the app will be synced
   @Input() selection: TSTimeRange | undefined;
 
-  @Output('onZoomReset') onZoomReset = new EventEmitter();
+  @Output() onZoomReset = new EventEmitter();
+  @Output() onZoomChange = new EventEmitter();
 
   uplot!: uPlot;
 
@@ -52,6 +53,19 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   legendSettings: LegendSettings = { items: [] };
 
   constructor(@Self() private element: ElementRef) {}
+
+  setBlur(blur: boolean) {
+    let foundElements = this.chartElement.nativeElement.getElementsByClassName('u-over');
+    let overlay = foundElements[0];
+    if (!overlay) {
+      return;
+    }
+    if (blur) {
+      overlay.style.backdropFilter = 'blur(2px)';
+    } else {
+      overlay.style.removeProperty('backdrop-filter');
+    }
+  }
 
   ngOnInit(): void {
     if (this.syncKey) {
@@ -168,7 +182,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
             });
           },
         ],
-        // setSelect: [ () => console.log('select')],
+        setSelect: [(uplot) => {}],
         // setScale: [ (x: any) => console.log(this.isZoomed())]
       },
     };

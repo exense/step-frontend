@@ -12,7 +12,7 @@ import { TimeRangePickerSelection } from '../../time-selection/time-range-picker
 import { TimeSeriesConfig } from '../../time-series.config';
 import { TSRangerSettings } from '../../ranger/ts-ranger-settings';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
-import { PerformanceViewSettings } from '../performance-view-settings';
+import { PerformanceViewSettings } from '../model/performance-view-settings';
 import { Observable, Subject, Subscription, takeUntil, tap } from 'rxjs';
 import { TimeSeriesChartResponse } from '../../time-series-chart-response';
 import { TimeSelectionState } from '../../time-selection.state';
