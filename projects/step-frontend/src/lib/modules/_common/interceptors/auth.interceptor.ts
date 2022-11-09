@@ -9,7 +9,7 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private _authService: AuthService) {}
 
   private handleAuthError(err: HttpErrorResponse): Observable<any> {
-    if (err.status === 401 || err.status === 403) {
+    if (err.status === 401) {
       // when checking for session auth error is expected
       if (this._authService.isAuthenticated()) {
         this._authService.goToLoginPage();
