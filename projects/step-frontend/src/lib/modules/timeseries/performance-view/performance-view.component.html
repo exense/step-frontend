@@ -22,7 +22,7 @@
           [settings]="currentChartsSettings[TsChartType.OVERVIEW]"
           [syncKey]="settings.contextId"
           [selection]="timeSelection?.absoluteSelection"
-          (onZoomReset)="onZoomReset()"
+          (onZoomReset)="onChartsZoomReset()"
         >
         </step-timeseries-chart>
       </div>
@@ -35,7 +35,7 @@
           [settings]="currentChartsSettings[TsChartType.BY_STATUS]"
           [selection]="timeSelection?.absoluteSelection"
           [syncKey]="settings.contextId"
-          (onZoomReset)="onZoomReset()"
+          (onZoomReset)="onChartsZoomReset()"
         >
         </step-timeseries-chart>
       </div>
@@ -76,7 +76,7 @@
             [settings]="currentChartsSettings[TsChartType.RESPONSE_TIME]"
             [selection]="timeSelection?.absoluteSelection"
             [syncKey]="settings.contextId"
-            (onZoomReset)="onZoomReset()"
+            (onZoomReset)="onChartsZoomReset()"
           >
           </step-timeseries-chart>
         </div>
@@ -116,7 +116,7 @@
             [settings]="currentChartsSettings[TsChartType.THROUGHPUT]"
             [selection]="timeSelection?.absoluteSelection"
             [syncKey]="settings.contextId"
-            (onZoomReset)="onZoomReset()"
+            (onZoomReset)="onChartsZoomReset()"
           >
           </step-timeseries-chart>
         </div>
@@ -140,7 +140,7 @@
           [settings]="currentChartsSettings[TsChartType.THREAD_GROUP]"
           [selection]="timeSelection?.absoluteSelection"
           [syncKey]="settings.contextId"
-          (onZoomReset)="onZoomReset()"
+          (onZoomReset)="onChartsZoomReset()"
         >
         </step-timeseries-chart>
       </div>

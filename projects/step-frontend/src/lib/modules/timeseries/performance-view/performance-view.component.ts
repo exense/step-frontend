@@ -25,6 +25,8 @@ import { ExecutionFiltersComponent } from './filters/execution-filters.component
 import { PerformanceViewTimeSelectionComponent } from './time-selection/performance-view-time-selection.component';
 import { ThroughputMetric } from './model/throughput-metric';
 import { PerformanceViewConfig } from './performance-view.config';
+import { RangeSelectionType } from '../time-selection/model/range-selection-type';
+import { TSTimeRange } from '../chart/model/ts-time-range';
 
 declare const uPlot: any;
 
@@ -39,9 +41,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   private readonly METRIC_TYPE_SAMPLER = 'sampler'; // this is for thread groups measurements
 
   private CHART_LEGEND_SIZE = 65;
-
-  // TODO this is not gonna work if we allow the initial view to display just a part of the execution
-  fullTimeSeriesSettingsCache: { [key: string]: TSChartSettings } = {}; // this is reused on zoom reset, without requesting everytime.
 
   rangerSettings: TSChartSettings | undefined;
 
@@ -165,10 +164,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
         takeUntil(this.terminator$)
       )
       .subscribe();
-    this.executionContext.timeSelectionState
-      .onZoomReset()
-      .pipe(takeUntil(this.terminator$))
-      .subscribe(() => this.handleZoomReset());
+    // this.executionContext.timeSelectionState
+    //   .onZoomReset()
+    //   .pipe(takeUntil(this.terminator$))
+    //   .subscribe(() => this.handleZoomReset());
 
     this.executionContext
       .onFiltersChange()
@@ -184,7 +183,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .pipe(
         tap((groupDimensions: string[]) => {
           this.groupDimensions = groupDimensions;
-          this.mergeRequestWithActiveFilters();
+          this.mergeRequestWithActiveFilters(this.findRequest);
         }),
         tap(() => (this.chartsAreLoading = true)),
         switchMap(() => this.updateAllCharts()),
@@ -201,15 +200,17 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   handleZoomChange(range: ExecutionTimeSelection): Observable<any> {
+    console.log('ZOOM CHANGE');
     this.getAllCharts().forEach((chart) => {
       chart?.setBlur(true);
     });
-    this.createAllCharts({
+    this.findRequest = {
       ...this.findRequest,
       start: range.absoluteSelection!.from!,
       end: range.absoluteSelection!.to!,
-    });
-    return this.updateTable();
+    };
+    this.createAllCharts(this.findRequest);
+    return this.updateTable(this.findRequest);
   }
 
   deleteObjectProperties(object: any, keys: string[]) {
@@ -263,15 +264,39 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .subscribe((allCompleted) => this.onInitializationComplete.emit());
   }
 
+  calculateTimeIntervalForCurrentSelection(settings: PerformanceViewSettings): { start: number; end: number } {
+    let start = settings.startTime;
+    let end = settings.endTime;
+    let activeTimeSelection = this.executionContext.timeSelectionState.activeTimeSelection;
+    switch (activeTimeSelection.type) {
+      case RangeSelectionType.FULL:
+        // do nothing
+        break;
+      case RangeSelectionType.ABSOLUTE:
+        start = activeTimeSelection.absoluteSelection!.from || settings.startTime;
+        end = activeTimeSelection.absoluteSelection!.to || settings.endTime;
+        break;
+      case RangeSelectionType.RELATIVE:
+        let now = new Date().getTime();
+        end = now;
+        start = now - activeTimeSelection.relativeSelection!.timeInMs;
+        break;
+    }
+    return { start: start, end: end };
+  }
+
   updateAllCharts(): Observable<unknown> {
     this.findRequest = this.prepareFindRequest(this.settings); // we don't want to lose active filters
-    this.mergeRequestWithActiveFilters();
+    this.mergeRequestWithActiveFilters(this.findRequest);
+    let timeRange = this.calculateTimeIntervalForCurrentSelection(this.settings);
+    this.findRequest.start = timeRange.start;
+    this.findRequest.end = timeRange.end;
 
     const charts$ = [
       this.createSummaryChart(this.findRequest),
       this.createByStatusChart(this.findRequest),
       this.createByKeywordsCharts(this.findRequest),
-      this.updateTable(),
+      this.updateTable(this.findRequest),
       this.timeSelectionComponent.refreshRanger(),
     ];
     if (this.includeThreadGroupChart) {
@@ -281,17 +306,17 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     return forkJoin(charts$);
   }
 
-  mergeRequestWithActiveFilters() {
-    this.deleteObjectProperties(this.findRequest.params, this.filtersComponent.getAllFilterAttributes()); // we clean the request first
-    Object.assign(this.findRequest.params, this.executionContext.getActiveFilters());
+  mergeRequestWithActiveFilters(request: FindBucketsRequest) {
+    this.deleteObjectProperties(request.params, this.filtersComponent.getAllFilterAttributes()); // we clean the request first
+    Object.assign(request.params, this.executionContext.getActiveFilters());
   }
 
   onKeywordToggle(keyword: string, event: any) {
     this.keywordsService.toggleKeyword(keyword);
   }
 
-  onZoomReset() {
-    this.executionContext.timeSelectionState.resetZoom();
+  onChartsZoomReset() {
+    this.executionContext.timeSelectionState.resetZoom({ from: this.settings.startTime, to: this.settings.endTime });
   }
 
   createThreadGroupsChart(request: FindBucketsRequest, isUpdate = false): Observable<TimeSeriesChartResponse> {
@@ -319,10 +344,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       response,
       this.executionContext.keywordsContext.colorsPool
     );
-    if (!this.fullTimeSeriesSettingsCache[type]) {
-      // it is the first request
-      this.fullTimeSeriesSettingsCache[type] = this.currentChartsSettings[type];
-    }
   }
 
   /**
@@ -463,51 +484,36 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
               },
             ],
           };
-          if (!this.fullTimeSeriesSettingsCache[TsChartType.RESPONSE_TIME]) {
-            this.fullTimeSeriesSettingsCache[TsChartType.RESPONSE_TIME] =
-              this.currentChartsSettings[TsChartType.RESPONSE_TIME];
-          }
-          if (!this.fullTimeSeriesSettingsCache[TsChartType.THROUGHPUT]) {
-            this.fullTimeSeriesSettingsCache[TsChartType.THROUGHPUT] =
-              this.currentChartsSettings[TsChartType.THROUGHPUT];
-          }
         })
       );
   }
 
-  updateTable(): Observable<TimeSeriesChartResponse> {
+  updateTable(request: FindBucketsRequest): Observable<TimeSeriesChartResponse> {
     if (!this.tableChart) {
       throw 'Table does not exist yet';
     }
-    let newRange = this.executionContext.timeSelectionState.getActiveSelection().absoluteSelection;
-    if (!newRange) {
-      // we have a full selection
-      return this.tableChart.refresh(this.findRequest); // refresh the table
-    }
-    // we make a clone in order to not pollute the global request, since we change from and to params
-    let clonedRequest = JSON.parse(JSON.stringify(this.findRequest));
-    if (newRange.from) {
-      clonedRequest.start = Math.trunc(newRange.from);
-    }
-    if (newRange.to) {
-      clonedRequest.end = Math.trunc(newRange.to);
-    }
-    return this.tableChart.refresh(clonedRequest); // refresh the table
+    // let newRange = this.executionContext.timeSelectionState.getActiveSelection().absoluteSelection;
+    // if (!newRange) {
+    //   // we have a full selection
+    //   return this.tableChart.refresh(this.findRequest); // refresh the table
+    // }
+    // // we make a clone in order to not pollute the global request, since we change from and to params
+    // let clonedRequest = JSON.parse(JSON.stringify(this.findRequest));
+    // if (newRange.from) {
+    //   clonedRequest.start = Math.trunc(newRange.from);
+    // }
+    // if (newRange.to) {
+    //   clonedRequest.end = Math.trunc(newRange.to);
+    // }
+    return this.tableChart.refresh(request); // refresh the table
   }
 
   handleZoomReset() {
     // the charts will reset because they are linked to the ranger.
-    const chartsToRefresh = [
-      TsChartType.OVERVIEW,
-      TsChartType.THROUGHPUT,
-      TsChartType.BY_STATUS,
-      TsChartType.RESPONSE_TIME,
-      TsChartType.THREAD_GROUP,
-    ];
-    for (let chart in chartsToRefresh) {
-      this.currentChartsSettings[chart] = this.fullTimeSeriesSettingsCache[chart];
-    }
-    this.updateTable().subscribe();
+    this.findRequest = this.prepareFindRequest(this.settings);
+    // console.log(new Date(this.findRequest.start));
+    this.createAllCharts(this.findRequest);
+    this.updateTable(this.findRequest).subscribe();
   }
 
   switchResponseTimeMetric(metric: { label: string; mapFunction: (b: Bucket) => number }) {

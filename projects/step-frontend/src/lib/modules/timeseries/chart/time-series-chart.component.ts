@@ -30,14 +30,13 @@ import { TooltipPlugin } from './tooltip-plugin';
 })
 export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChanges {
   private readonly HEADER_WITH_FOOTER_SIZE = 80;
-  readonly WRAPPER_PADDING_PX = 12;
   readonly WRAPPER_PADDING = '12px';
 
   @ViewChild('chart') private chartElement!: ElementRef;
 
   @Input() settings!: TSChartSettings;
   @Input() syncKey: string | undefined; // all the charts with the same syncKey in the app will be synced
-  @Input() selection: TSTimeRange | undefined;
+  @Input() selection: TSTimeRange | undefined; // deprecated after the refresh -on-zoom feature.
 
   @Output() onZoomReset = new EventEmitter();
   @Output() onZoomChange = new EventEmitter();
@@ -149,8 +148,8 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       scales: {
         x: {
           time: true,
-          min: this.selection?.from,
-          max: this.selection?.to,
+          // min: this.selection?.from,
+          // max: this.selection?.to,
         },
         // y: {auto: true},
       },

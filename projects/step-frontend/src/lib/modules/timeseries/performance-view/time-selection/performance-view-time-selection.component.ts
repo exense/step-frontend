@@ -123,7 +123,9 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   handleTimePickerSelectionChange(timeSelection: TimeRangePickerSelection) {
     let selectionToEmit: ExecutionTimeSelection = { type: timeSelection.type };
     if (timeSelection.type === RangeSelectionType.FULL) {
-      this.timeSelectionState.resetZoom();
+      let range = { from: this.settings.startTime, to: this.settings.endTime };
+      selectionToEmit.absoluteSelection = range;
+      this.timeSelectionState.resetZoom(range);
       return;
     } else if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
       let endTime = this.settings.endTime || new Date().getTime();
@@ -139,7 +141,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   onRangerSelectionChange(event: TSTimeRange) {
     // check for full range selection
     if (this.timeLabels[0] === event.from && this.timeLabels[this.timeLabels.length - 1] === event.to) {
-      this.timeSelectionState.resetZoom();
+      this.timeSelectionState.resetZoom(event);
     } else {
       this.timeSelectionState.setActiveSelection({ type: RangeSelectionType.ABSOLUTE, absoluteSelection: event });
     }
@@ -147,7 +149,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   }
 
   onRangerZoomReset(event: TSTimeRange) {
-    this.timeSelectionState.resetZoom();
+    this.timeSelectionState.resetZoom(event);
   }
 
   ngOnDestroy(): void {
