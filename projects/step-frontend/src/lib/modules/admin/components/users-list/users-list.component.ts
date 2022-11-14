@@ -1,8 +1,10 @@
 import { Component, OnDestroy } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, AuthService, ContextService, Mutable, AdminService, User } from '@exense/step-core';
-import { BehaviorSubject, switchMap, of, noop, shareReplay, tap } from 'rxjs';
+import { AdminService, AJS_MODULE, AuthService, ContextService, Mutable, User } from '@exense/step-core';
+import { BehaviorSubject, noop, of, shareReplay, switchMap, tap } from 'rxjs';
 import { UserDialogsService } from '../../services/user-dialogs.service';
+import { EditUserDialogComponent } from '../edit-user-dialog/edit-user-dialog.component';
 
 type InProgress = Mutable<Pick<UsersListComponent, 'inProgress'>>;
 
@@ -29,6 +31,7 @@ export class UsersListComponent implements OnDestroy {
     private _adminApiService: AdminService,
     private _userDialogs: UserDialogsService,
     private _auth: AuthService,
+    private _matDialog: MatDialog,
     context: ContextService
   ) {
     this.currentUserName = context.userName;
@@ -52,14 +55,18 @@ export class UsersListComponent implements OnDestroy {
 
   addUser(): void {
     const isDefaultAuthenticator = this._auth.getConf()?.authenticatorName === 'DefaultAuthenticator';
-    this._userDialogs
-      .editUser()
+
+    const dialogRef = this._matDialog.open(EditUserDialogComponent);
+
+    dialogRef
+      .afterClosed()
       .pipe(
-        switchMap(({ user, result }) => {
-          if (result === 'save' && isDefaultAuthenticator) {
-            return this._userDialogs.resetPassword(user);
+        switchMap((user?: Partial<User>) => {
+          if (!user || !isDefaultAuthenticator) {
+            return of();
           }
-          return of(undefined);
+
+          return this._userDialogs.resetPassword(user);
         })
       )
       .subscribe((_) => this.loadTable());
@@ -68,7 +75,17 @@ export class UsersListComponent implements OnDestroy {
   editUser(username: string): void {
     this._adminApiService
       .getUser(username)
-      .pipe(switchMap((user) => this._userDialogs.editUser(user)))
+      .pipe(
+        switchMap((user) => {
+          const dialogRef = this._matDialog.open(EditUserDialogComponent, {
+            data: {
+              user,
+            },
+          });
+
+          return dialogRef.afterClosed();
+        })
+      )
       .subscribe(() => this.loadTable());
   }
 
