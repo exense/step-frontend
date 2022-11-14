@@ -6,11 +6,10 @@ import {
   Inject,
   OnDestroy,
   QueryList,
-  ViewChild,
   ViewChildren,
   ViewEncapsulation,
 } from '@angular/core';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_LOCATION,
@@ -21,7 +20,6 @@ import {
   ViewStateService,
 } from '@exense/step-core';
 import { ILocationService } from 'angular';
-import { VersionsDialogData } from '../../shared/versions-dialog-data.interface';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
 
 @Component({
@@ -31,9 +29,6 @@ import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.comp
   encapsulation: ViewEncapsulation.None,
 })
 export class SidebarComponent implements AfterViewInit, OnDestroy {
-  @ViewChild('versionFEOS') versionFEOS?: ElementRef<HTMLElement>;
-  @ViewChild('versionFEEE') versionFEEE?: ElementRef<HTMLElement>;
-
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
 
   sideBarOpen: boolean = true;
@@ -124,14 +119,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   }
 
   showVersionsDialog(): void {
-    const config: MatDialogConfig<VersionsDialogData> = {
-      data: {
-        versionFEOS: this.versionFEOS?.nativeElement.textContent,
-        versionFEEE: this.versionFEEE?.nativeElement.textContent,
-      },
-    };
-
-    const dialogRef = this._matDialog.open(VersionsDialogComponent, config);
+    const dialogRef = this._matDialog.open(VersionsDialogComponent);
   }
 }
 

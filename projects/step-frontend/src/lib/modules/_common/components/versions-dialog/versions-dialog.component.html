@@ -11,10 +11,8 @@
       <div class="list-item">
         <div class="flex-1">STEP</div>
         <div class="flex-1">
-          <ng-container *ngIf="versionFEOS">{{ versionFEOS }}</ng-container>
-          <ng-container *ngIf="versionFEEE">{{ versionFEEE }}</ng-container>
-          <!-- fallback -->
-          <ng-container *ngIf="!versionFEOS && !versionFEEE">N/A</ng-container>
+          <span style="display: none" id="frontend-os">{{ '${project.versionFEOS}' }}</span>
+          <span style="display: none" id="frontend-ee">{{ '${project.versionFEEE}' }}</span>
         </div>
       </div>
     </ng-container>

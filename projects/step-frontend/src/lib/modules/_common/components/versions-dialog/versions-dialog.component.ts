@@ -1,8 +1,6 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component } from '@angular/core';
 import { ControllerService, KeyValuePair, Tab } from '@exense/step-core';
 import { map, Observable, shareReplay } from 'rxjs';
-import { VersionsDialogData } from '../../shared/versions-dialog-data.interface';
 
 enum VersionDialogTabs {
   FE = 'FE',
@@ -14,7 +12,7 @@ enum VersionDialogTabs {
   templateUrl: './versions-dialog.component.html',
   styleUrls: ['./versions-dialog.component.scss'],
 })
-export class VersionsDialogComponent implements OnInit {
+export class VersionsDialogComponent {
   readonly tabs: Tab[] = [
     {
       id: VersionDialogTabs.FE,
@@ -53,18 +51,5 @@ export class VersionsDialogComponent implements OnInit {
     shareReplay(1)
   );
 
-  constructor(
-    private _controllerService: ControllerService,
-    @Inject(MAT_DIALOG_DATA) public _data: VersionsDialogData
-  ) {}
-
-  ngOnInit(): void {
-    if (this._data.versionFEOS && !this._data.versionFEOS.startsWith('${')) {
-      this.versionFEOS = this._data.versionFEOS;
-    }
-
-    if (this._data.versionFEEE && !this._data.versionFEEE.startsWith('${')) {
-      this.versionFEEE = this._data.versionFEEE;
-    }
-  }
+  constructor(private _controllerService: ControllerService) {}
 }
