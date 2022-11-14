@@ -208,6 +208,16 @@ angular
     };
   })
 
+  .service('pathHelper', ['$timeout', '$location', function ($timeout, $location) {
+    this.fixList = function () {
+      $timeout(function() {
+        if (!$location.path().endsWith('list')) {
+          const newPath = $location.path() + '/list';
+          $location.path(newPath);
+        }
+      }, 100);
+    };
+  }])
   .service('stateStorage', function ($localStorage, $rootScope, $location, $timeout, $cookies, AuthService) {
     $rootScope.$$statepath = [];
 
