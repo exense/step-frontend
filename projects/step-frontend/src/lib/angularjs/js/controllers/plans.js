@@ -51,10 +51,16 @@ angular
     return api;
   })
 
-  .controller('PlansCtrl', function ($rootScope, $scope, stateStorage) {
+  .controller('PlansCtrl', function ($rootScope, $scope, $timeout, $location, stateStorage) {
     stateStorage.push($scope, 'plans', {});
     if ($scope.$state == null) {
-      $scope.$state = 'list';
+       $scope.$state = 'list';
+       $timeout(function() {
+          if (!$location.path().endsWith('list')) {
+            const newPath = $location.path() + '/list';
+            $location.path(newPath);
+          }
+       }, 100);
     }
 
     $scope.$watch('$state', function () {
