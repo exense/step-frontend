@@ -1,8 +1,23 @@
-<ng-template #link>
+<ng-template #descriptionTemplate>
+  {{ (context?.attributes)!['name'] }}
+</ng-template>
+
+<ng-template #iconTemplate>
+  <step-icon name="file" matTooltip="Go to plan" matTooltipPosition="below"></step-icon>
+</ng-template>
+
+<ng-template #contentTemplate>
+  <ng-container *ngIf="!iconOnly; else iconTemplate">
+    <ng-container *ngTemplateOutlet="descriptionTemplate"></ng-container>
+  </ng-container>
+</ng-template>
+
+<ng-template #linkTemplate>
   <a href="#" (click)="editPlan(); (false)">
-    {{ (context?.attributes)!['name'] }}
+    <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
   </a>
 </ng-template>
-<ng-container *ngIf="noLink$ | async; else link">
-  {{ (context?.attributes)!['name'] }}
+
+<ng-container *ngIf="noLink$ | async; else linkTemplate">
+  <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
 </ng-container>
