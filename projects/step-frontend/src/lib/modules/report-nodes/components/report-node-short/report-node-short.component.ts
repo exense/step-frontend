@@ -30,6 +30,7 @@ export class ReportNodeShortComponent implements OnChanges {
   @Input() includeStatus: boolean = false;
   @Input() showDetails: boolean = false;
   @Input() showFooter: boolean = false;
+  @Input() isShowNodeInTreeVisible: boolean = true;
   @Input() isShowTestCaseVisible: boolean = false;
 
   @Output() showNodeInTree = new EventEmitter<string>();
