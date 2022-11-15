@@ -21,6 +21,7 @@ import { TabsModule } from './modules/tabs/tabs.module';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 import { TreeModule } from './modules/tree/tree.module';
 import { AngularSplitModule } from 'angular-split';
+import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { AngularSplitModule } from 'angular-split';
     DashboardLinkPipe,
     CapsLockDirective,
     TooltipImmediateCloseDirective,
+    ReportNodeStatusComponent,
   ],
   imports: [
     CommonModule,
@@ -68,6 +70,7 @@ import { AngularSplitModule } from 'angular-split';
     TooltipImmediateCloseDirective,
     TreeModule,
     AngularSplitModule,
+    ReportNodeStatusComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -132,3 +135,4 @@ export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
 export { CancelablePromise, CancelError } from './client/generated/core/CancelablePromise';
 export { OpenAPI } from './client/generated/core/OpenAPI';
 export type { OpenAPIConfig } from './client/generated/core/OpenAPI';
+export * from './components/report-node-status/report-node-status.component';
