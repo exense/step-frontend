@@ -9,12 +9,10 @@ import { MenuFilterPipe } from './pipes/menu-filter.pipe';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { IsUsedByListComponent } from './components/is-used-by-list/is-used-by-list.component';
-import { PlanLinkComponent } from './components/plan-link/plan-link.component';
 
 import { FunctionLinkComponent } from './components/function-link/function-link.component';
 import { LoginComponent } from './components/login/login.component';
 import { ModalWindowComponent } from './components/modal-window/modal-window.component';
-import { PlanNameComponent } from './components/plan-name/plan-name.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { CustomFormDirective } from './directives/custom-form.directive';
@@ -28,7 +26,6 @@ import { PlanExecutionDirective } from './directives/plan-execution.directive';
     SidebarComponent,
     ExecutionLinkComponent,
     IsUsedByListComponent,
-    PlanLinkComponent,
     FunctionLinkComponent,
     ModalWindowComponent,
     JsonViewerDirective,
@@ -37,7 +34,6 @@ import { PlanExecutionDirective } from './directives/plan-execution.directive';
     ArtefactDetailsDirective,
     CustomFormDirective,
     PlanExecutionDirective,
-    PlanNameComponent,
   ],
   exports: [
     AutorefreshToggleComponent,
@@ -46,7 +42,6 @@ import { PlanExecutionDirective } from './directives/plan-execution.directive';
     SidebarComponent,
     ExecutionLinkComponent,
     IsUsedByListComponent,
-    PlanLinkComponent,
     FunctionLinkComponent,
     ModalWindowComponent,
     JsonViewerDirective,
@@ -55,7 +50,6 @@ import { PlanExecutionDirective } from './directives/plan-execution.directive';
     ArtefactDetailsDirective,
     CustomFormDirective,
     PlanExecutionDirective,
-    PlanNameComponent,
   ],
   imports: [StepCoreModule],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
