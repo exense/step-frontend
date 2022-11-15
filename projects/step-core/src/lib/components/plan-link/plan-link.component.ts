@@ -1,7 +1,8 @@
 import { Component, Inject, Input, Optional } from '@angular/core';
-import { AJS_LOCATION, CustomColumnOptions, CustomComponent, Plan } from '@exense/step-core';
 import { ILocationService } from 'angular';
 import { map, of } from 'rxjs';
+import { AJS_LOCATION } from '../../shared';
+import { CustomColumnOptions, CustomComponent, Plan } from '../../step-core.module';
 
 @Component({
   selector: 'step-plan-link',
