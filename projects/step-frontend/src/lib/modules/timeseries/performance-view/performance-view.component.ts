@@ -44,7 +44,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   rangerSettings: TSChartSettings | undefined;
 
-  // key: TsChartType
+  // key: TsChartType. here we keep all chart settings (by TsChartType
   currentChartsSettings: { [key: string]: TSChartSettings } = {};
 
   @ViewChild(ExecutionFiltersComponent) filtersComponent!: ExecutionFiltersComponent;
@@ -58,7 +58,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   @ViewChild(PerformanceViewTimeSelectionComponent) timeSelectionComponent!: PerformanceViewTimeSelectionComponent;
 
-  // @Input() executionId!: string;
   @Input() settings!: PerformanceViewSettings;
   @Input() includeThreadGroupChart = true;
   @Input() includeTimeRangePicker = true;
@@ -69,9 +68,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   private tableInitialized$ = new Subject<void>();
   private rangerLoaded$ = new Subject<void>();
   chartsAreLoading = false;
-
-  barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
-  stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
 
   keywords: { [key: string]: KeywordSelection } = {};
   keywordSearchValue: string = '';
@@ -164,16 +160,12 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
         takeUntil(this.terminator$)
       )
       .subscribe();
-    // this.executionContext.timeSelectionState
-    //   .onZoomReset()
-    //   .pipe(takeUntil(this.terminator$))
-    //   .subscribe(() => this.handleZoomReset());
 
     this.executionContext
       .onFiltersChange()
       .pipe(
         tap(() => (this.chartsAreLoading = true)),
-        switchMap(() => this.updateAllCharts()),
+        switchMap(() => this.updateAllCharts(true)),
         tap(() => (this.chartsAreLoading = false)),
         takeUntil(this.terminator$)
       )
@@ -186,7 +178,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           this.mergeRequestWithActiveFilters(this.findRequest);
         }),
         tap(() => (this.chartsAreLoading = true)),
-        switchMap(() => this.updateAllCharts()),
+        switchMap(() => this.updateAllCharts(true)),
         tap(() => (this.chartsAreLoading = false)),
         takeUntil(this.terminator$)
       )
@@ -195,12 +187,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.createAllCharts(this.findRequest);
   }
 
-  getAllCharts() {
-    return [this.summaryChart, this.byStatusChart, this.responseTimeChart, this.throughputChart, this.threadGroupChart];
-  }
-
   handleZoomChange(range: ExecutionTimeSelection): Observable<any> {
-    console.log('ZOOM CHANGE');
     this.getAllCharts().forEach((chart) => {
       chart?.setBlur(true);
     });
@@ -209,8 +196,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       start: range.absoluteSelection!.from!,
       end: range.absoluteSelection!.to!,
     };
-    this.createAllCharts(this.findRequest);
-    return this.updateTable(this.findRequest);
+    // return this.updateAllCharts();
+    return this.updateAllCharts(true);
   }
 
   deleteObjectProperties(object: any, keys: string[]) {
@@ -285,22 +272,38 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     return { start: start, end: end };
   }
 
-  updateAllCharts(): Observable<unknown> {
+  /**
+   * This method is called while refreshing.
+   * force = true -> The charts ar forced to refresh, even if the time interval was the same (because of filters/grouping change).
+   */
+  updateAllCharts(force = false): Observable<unknown> {
+    let previousTimeRange: TSTimeRange = { from: this.findRequest.start, to: this.findRequest.end };
     this.findRequest = this.prepareFindRequest(this.settings); // we don't want to lose active filters
     this.mergeRequestWithActiveFilters(this.findRequest);
     let timeRange = this.calculateTimeIntervalForCurrentSelection(this.settings);
     this.findRequest.start = timeRange.start;
     this.findRequest.end = timeRange.end;
 
-    const charts$ = [
-      this.createSummaryChart(this.findRequest),
-      this.createByStatusChart(this.findRequest),
-      this.createByKeywordsCharts(this.findRequest),
-      this.updateTable(this.findRequest),
-      this.timeSelectionComponent.refreshRanger(),
-    ];
-    if (this.includeThreadGroupChart) {
-      charts$.push(this.createThreadGroupsChart(this.findRequest));
+    let timeSelectionDidChange = !(
+      previousTimeRange &&
+      previousTimeRange.from === timeRange.start &&
+      previousTimeRange.to === timeRange.end
+    );
+
+    const charts$ = [this.timeSelectionComponent.refreshRanger()];
+
+    if (force || timeSelectionDidChange) {
+      charts$.push(
+        ...[
+          this.createSummaryChart(this.findRequest),
+          this.createByStatusChart(this.findRequest),
+          this.createByKeywordsCharts(this.findRequest),
+          this.updateTable(this.findRequest),
+        ]
+      );
+      if (this.includeThreadGroupChart) {
+        charts$.push(this.createThreadGroupsChart(this.findRequest));
+      }
     }
 
     return forkJoin(charts$);
@@ -447,7 +450,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
                 data: totalThroughput,
                 value: (x, v) => Math.trunc(v) + ' total',
                 fill: (self: uPlot) => UPlotUtils.gradientFill(self, TimeSeriesConfig.TOTAL_BARS_COLOR),
-                paths: this.barsFunction({ size: [0.9, 100] }),
+                paths: ChartGenerators.barsFunction({ size: [0.9, 100] }),
                 points: { show: false },
               },
               ...throughputSeries,
@@ -492,28 +495,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     if (!this.tableChart) {
       throw 'Table does not exist yet';
     }
-    // let newRange = this.executionContext.timeSelectionState.getActiveSelection().absoluteSelection;
-    // if (!newRange) {
-    //   // we have a full selection
-    //   return this.tableChart.refresh(this.findRequest); // refresh the table
-    // }
-    // // we make a clone in order to not pollute the global request, since we change from and to params
-    // let clonedRequest = JSON.parse(JSON.stringify(this.findRequest));
-    // if (newRange.from) {
-    //   clonedRequest.start = Math.trunc(newRange.from);
-    // }
-    // if (newRange.to) {
-    //   clonedRequest.end = Math.trunc(newRange.to);
-    // }
     return this.tableChart.refresh(request); // refresh the table
-  }
-
-  handleZoomReset() {
-    // the charts will reset because they are linked to the ranger.
-    this.findRequest = this.prepareFindRequest(this.settings);
-    // console.log(new Date(this.findRequest.start));
-    this.createAllCharts(this.findRequest);
-    this.updateTable(this.findRequest).subscribe();
   }
 
   switchResponseTimeMetric(metric: { label: string; mapFunction: (b: Bucket) => number }) {
@@ -567,6 +549,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .map((field) => attributes[field])
       .filter((f) => !!f)
       .join(' | ');
+  }
+
+  getAllCharts() {
+    return [this.summaryChart, this.byStatusChart, this.responseTimeChart, this.throughputChart, this.threadGroupChart];
   }
 
   ngOnDestroy(): void {
