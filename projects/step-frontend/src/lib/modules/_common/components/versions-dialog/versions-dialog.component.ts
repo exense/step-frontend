@@ -25,8 +25,6 @@ export class VersionsDialogComponent {
   ];
   readonly VersionDialogTabs = VersionDialogTabs;
 
-  versionFEOS?: string;
-  versionFEEE?: string;
   activeTabId: string = VersionDialogTabs.FE;
   versions$: Observable<KeyValuePair<string, string>[]> = this._controllerService.getLibVersions().pipe(
     map((versions) => {
