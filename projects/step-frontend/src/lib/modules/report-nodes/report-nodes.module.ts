@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { ReportNodeIconComponent } from './components/report-node-icon/report-node-icon.component';
-import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
 import { AttachmentsComponent } from './components/attachments/attachments.component';
 import { AttachmentUrlPipe } from './pipes/attachment-url.pipe';
 import { AssertReportNodeShortComponent } from './components/assert-report-node-short/assert-report-node-short.component';
@@ -16,7 +15,6 @@ import { ReportNodeShortComponent } from './components/report-node-short/report-
 @NgModule({
   declarations: [
     ReportNodeIconComponent,
-    ReportNodeStatusComponent,
     AttachmentsComponent,
     AttachmentUrlPipe,
     AssertReportNodeShortComponent,
@@ -29,6 +27,6 @@ import { ReportNodeShortComponent } from './components/report-node-short/report-
     ReportNodeShortComponent,
   ],
   imports: [StepCommonModule],
-  exports: [ReportNodeShortComponent, ReportNodeStatusComponent, ReportNodeIconComponent],
+  exports: [ReportNodeShortComponent, ReportNodeIconComponent],
 })
 export class ReportNodesModule {}

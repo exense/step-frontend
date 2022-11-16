@@ -7,7 +7,7 @@ import {
   StepCoreModule,
 } from '@exense/step-core';
 import { FunctionListComponent } from './components/function-list/function-list.component';
-import { StepCommonModule } from '../_common/step-common.module';
+import { FunctionLinkDialogService, StepCommonModule } from '../_common/step-common.module';
 import { FunctionPackageLinkComponent } from './components/function-package-link/function-package-link.component';
 import { FunctionPackageListComponent } from './components/function-package-list/function-package-list.component';
 import { FunctionIconComponent } from './components/function-icon/function-icon.component';
@@ -15,6 +15,7 @@ import { FunctionLinkComponent } from '../_common/components/function-link/funct
 import { FunctionTypeLabelPipe } from './pipes/function-type-label.pipe';
 import { FunctionTypeFilterComponent } from './components/function-type-filter/function-type-filter.component';
 import { FunctionPackageSearchComponent } from './components/function-package-search/function-package-search.component';
+import { FunctionDialogsService } from './services/function-dialogs.service';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,12 @@ import { FunctionPackageSearchComponent } from './components/function-package-se
   ],
   imports: [StepCommonModule, StepCoreModule, StepBasicsModule],
   exports: [FunctionListComponent],
+  providers: [
+    {
+      provide: FunctionLinkDialogService,
+      useExisting: FunctionDialogsService,
+    },
+  ],
 })
 export class FunctionModule {
   constructor(

@@ -40,7 +40,7 @@ export class ResourcesListComponent {
   }
 
   searchResource(resource: Resource): void {
-    this._resourceDialogs.searchResource(resource).subscribe();
+    this._resourceDialogs.searchResource(resource);
   }
 }
 

@@ -15,6 +15,8 @@ import { ArtefactDetailsDirective } from './directives/artefact-details.directiv
 import { CustomFormDirective } from './directives/custom-form.directive';
 import { PlanExecutionDirective } from './directives/plan-execution.directive';
 import { VersionsDialogComponent } from './components/versions-dialog/versions-dialog.component';
+import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
+
 
 @NgModule({
   declarations: [
@@ -33,6 +35,7 @@ import { VersionsDialogComponent } from './components/versions-dialog/versions-d
     CustomFormDirective,
     PlanExecutionDirective,
     VersionsDialogComponent,
+    IsUsedByModalComponent,
   ],
   exports: [
     AutorefreshToggleComponent,
@@ -40,7 +43,6 @@ import { VersionsDialogComponent } from './components/versions-dialog/versions-d
     LoginComponent,
     SidebarComponent,
     ExecutionLinkComponent,
-    IsUsedByListComponent,
     PlanLinkComponent,
     FunctionLinkComponent,
     ModalWindowComponent,
@@ -50,9 +52,13 @@ import { VersionsDialogComponent } from './components/versions-dialog/versions-d
     ArtefactDetailsDirective,
     CustomFormDirective,
     PlanExecutionDirective,
+    IsUsedByModalComponent,
   ],
   imports: [StepCoreModule],
 })
 export class StepCommonModule {}
 
 export * from './shared/status.enum';
+export * from './shared/is-used-by-search-type';
+export * from './services/is-used-by-dialog.service';
+export * from './components/function-link/function-link-dialog.service';
