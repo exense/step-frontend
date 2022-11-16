@@ -8,7 +8,7 @@ import { TimeRangePicker } from '../time-selection/time-range-picker.component';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
-import { forkJoin, Observable, Subject, switchMap, tap, timer } from 'rxjs';
+import { forkJoin, Observable, Subject, Subscription, switchMap, tap, timer } from 'rxjs';
 
 @Component({
   selector: 'step-synthetic-monitoring',
@@ -33,6 +33,9 @@ export class SyntheticMonitoringPageComponent implements OnInit {
     { label: 'Last Month', timeInMs: this.ONE_HOUR_MS * 24 * 31 },
   ];
 
+  refreshSubscription: Subscription | undefined;
+  refreshShouldStop = false;
+
   constructor(private changeDetector: ChangeDetectorRef, private dashboardService: DashboardService) {}
 
   calculateRange(selection: RelativeTimeSelection): TSTimeRange {
@@ -47,7 +50,7 @@ export class SyntheticMonitoringPageComponent implements OnInit {
     }
     let range = this.calculateRange(this.timeRangeOptions[0]);
     this.performanceViewSettings = this.createViewSettings(range);
-    // this.triggerNextUpdate(this.REFRESH_TIME_MS, this.dashboardInitComplete$);
+    this.triggerNextUpdate(this.REFRESH_TIME_MS, this.dashboardInitComplete$);
   }
 
   createViewSettings(timeRange: TSTimeRange) {
@@ -65,6 +68,7 @@ export class SyntheticMonitoringPageComponent implements OnInit {
       case RangeSelectionType.FULL:
         throw new Error('Full range not available');
       case RangeSelectionType.ABSOLUTE:
+        this.refreshSubscription?.unsubscribe();
         newInterval = selection.absoluteSelection!;
         break;
       case RangeSelectionType.RELATIVE:
@@ -87,20 +91,15 @@ export class SyntheticMonitoringPageComponent implements OnInit {
   }
 
   triggerNextUpdate(delay: number, observableToWaitFor: Observable<unknown>) {
-    let updatingSubscription = forkJoin([timer(delay), observableToWaitFor]).pipe(
-      tap(() => {
-        const now = new Date().getTime();
-        // if (this.executionInProgress) {
-        //   this.performanceViewSettings!.endTime =
-        //     now - (this.intervalShouldBeCanceled ? 0 : this.RUNNING_EXECUTION_END_TIME_BUFFER); // if the execution is not ended, we don't fetch until the end.
-        // }
-        const timeSelection = this.performanceView.getTimeRangeSelection();
-        if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
-          const from = now - timeSelection.relativeSelection.timeInMs;
-          timeSelection.absoluteSelection = { from: from, to: now };
-        }
-      })
-    );
+    this.refreshSubscription = forkJoin([timer(delay), observableToWaitFor]).subscribe(() => {
+      const activeSelection = this.rangePicker.getActiveSelection();
+      let now = new Date().getTime();
+      let newInterval = { from: now - activeSelection.relativeSelection!.timeInMs, to: now };
+      this.performanceViewSettings!.startTime = newInterval.from;
+      this.performanceViewSettings!.endTime = newInterval.to;
+      let refresh$ = this.performanceView.updateAllCharts(true);
+      this.triggerNextUpdate(this.REFRESH_TIME_MS, refresh$);
+    });
   }
 
   navigateToRtmDashboard() {
