@@ -23,6 +23,7 @@ import { TreeModule } from './modules/tree/tree.module';
 import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
+import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     TooltipImmediateCloseDirective,
     PlanLinkComponent,
     PlanNamePipe,
+    ReportNodeStatusComponent,
   ],
   imports: [
     CommonModule,
@@ -74,6 +76,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     AngularSplitModule,
     PlanLinkComponent,
     PlanNamePipe,
+    ReportNodeStatusComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -139,3 +142,4 @@ export { UibModalHelperService, UibModalInstance } from './services/uib-modal-he
 export * from './services/view-registry.service';
 export * from './services/view-state.service';
 export * from './shared';
+export * from './components/report-node-status/report-node-status.component';
