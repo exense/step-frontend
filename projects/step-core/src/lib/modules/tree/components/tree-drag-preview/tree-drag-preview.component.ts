@@ -3,8 +3,8 @@ import { TreeStateService } from '../../services/tree-state.service';
 import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
 import { combineLatest, debounceTime, first, map, merge, of, startWith, Subject, takeUntil } from 'rxjs';
 import { Mutable } from '../../../../shared';
-import { ArtefactTypesService } from '../../../basics/step-basics.module';
 import { DOCUMENT } from '@angular/common';
+import { TreeNode } from '../../shared/tree-node';
 
 type FieldAccessor = Mutable<Pick<TreeDragPreviewComponent, 'label$' | 'icon$'>>;
 
@@ -24,8 +24,7 @@ export class TreeDragPreviewComponent implements OnInit, OnDestroy {
 
   constructor(
     @Inject(DOCUMENT) private _document: Document,
-    private _artefactTypes: ArtefactTypesService,
-    private _treeState: TreeStateService,
+    private _treeState: TreeStateService<any, TreeNode>,
     private _drag: CdkDrag,
     private _dropList: CdkDropList
   ) {}
@@ -83,7 +82,7 @@ export class TreeDragPreviewComponent implements OnInit, OnDestroy {
 
         if (nodes.length === 1) {
           label = nodes[0].name;
-          icon = this._artefactTypes.getIconNg2(nodes[0]._class);
+          icon = nodes[0].icon;
         } else if (nodes.length > 1) {
           label = `(${nodes.length}) items`;
           icon = 'list';
