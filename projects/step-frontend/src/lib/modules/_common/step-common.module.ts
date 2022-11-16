@@ -17,6 +17,7 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { CustomFormDirective } from './directives/custom-form.directive';
 import { PlanExecutionDirective } from './directives/plan-execution.directive';
+import { VersionsDialogComponent } from './components/versions-dialog/versions-dialog.component';
 import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 
 
@@ -35,6 +36,7 @@ import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by
     ArtefactDetailsDirective,
     CustomFormDirective,
     PlanExecutionDirective,
+    VersionsDialogComponent,
     IsUsedByModalComponent,
   ],
   exports: [
