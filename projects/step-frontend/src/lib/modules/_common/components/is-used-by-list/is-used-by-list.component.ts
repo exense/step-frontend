@@ -1,17 +1,15 @@
-import { Component, Input, Output, EventEmitter, Inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, Inject, OnDestroy } from '@angular/core';
 import { IRootScopeService } from 'angular';
 import {
-  AJS_MODULE,
   AJS_ROOT_SCOPE,
   AugmentedAdminService,
   Mutable,
   ReferencesService,
   TableLocalDataSource,
 } from '@exense/step-core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { BehaviorSubject, switchMap, shareReplay, tap, pipe, map, startWith } from 'rxjs';
+import { BehaviorSubject, switchMap, shareReplay, tap, map, startWith } from 'rxjs';
+import { IsUsedBySearchType } from '../../shared/is-used-by-search-type';
 
-type SearchType = 'PLAN_ID' | 'PLAN_NAME' | 'KEYWORD_ID' | 'KEYWORD_NAME' | 'RESOURCE_ID' | 'RESOURCE_NAME';
 type InProgress = Mutable<Pick<IsUsedByListComponent, 'inProgress'>>;
 
 @Component({
@@ -19,9 +17,8 @@ type InProgress = Mutable<Pick<IsUsedByListComponent, 'inProgress'>>;
   templateUrl: './is-used-by-list.component.html',
   styleUrls: ['./is-used-by-list.component.scss'],
 })
-export class IsUsedByListComponent {
-  @Input() title: string = '';
-  @Input() type: string = '';
+export class IsUsedByListComponent implements OnDestroy {
+  @Input() type?: IsUsedBySearchType;
   @Input() id: string = '';
 
   @Output() onClose = new EventEmitter<any>();
@@ -36,7 +33,7 @@ export class IsUsedByListComponent {
     tap(() => ((this as InProgress).inProgress = true)),
     switchMap(() =>
       this._referencesService.findReferences({
-        searchType: this.type as SearchType,
+        searchType: this.type,
         searchValue: this.id,
       })
     ),
@@ -76,6 +73,10 @@ export class IsUsedByListComponent {
     this.initTenants();
   }
 
+  ngOnDestroy(): void {
+    this._findReferencesRequest$.complete();
+  }
+
   /**
    * Relevant for EE: Reads available projects and currently selected
    * @private
@@ -89,7 +90,3 @@ export class IsUsedByListComponent {
     }, {});
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepIsUsedByList', downgradeComponent({ component: IsUsedByListComponent }));
