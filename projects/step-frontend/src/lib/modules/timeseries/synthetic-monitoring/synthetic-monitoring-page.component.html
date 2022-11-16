@@ -12,6 +12,7 @@
 
   <step-performance-view
     *ngIf="performanceViewSettings"
+    (onInitializationComplete)="dashboardInitComplete$.next(true)"
     [settings]="performanceViewSettings"
     [includeThreadGroupChart]="false"
     [includeTimeRangePicker]="false"

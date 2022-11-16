@@ -8,6 +8,7 @@ import { TimeRangePicker } from '../time-selection/time-range-picker.component';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
+import { forkJoin, Observable, Subject, switchMap, tap, timer } from 'rxjs';
 
 @Component({
   selector: 'step-synthetic-monitoring',
@@ -16,12 +17,14 @@ import { PerformanceViewComponent } from '../performance-view/performance-view.c
 })
 export class SyntheticMonitoringPageComponent implements OnInit {
   readonly ONE_HOUR_MS = 3600 * 1000;
+  private REFRESH_TIME_MS = 5000;
 
   @ViewChild(TimeRangePicker) rangePicker!: TimeRangePicker;
   @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
   @Input() taskId: string = window.location.href.split('?')[0].substring(window.location.href.lastIndexOf('/') + 1);
 
   performanceViewSettings: PerformanceViewSettings | undefined;
+  readonly dashboardInitComplete$ = new Subject<boolean>();
 
   timeRangeOptions: RelativeTimeSelection[] = [
     { label: 'Last Hour', timeInMs: this.ONE_HOUR_MS },
@@ -32,18 +35,22 @@ export class SyntheticMonitoringPageComponent implements OnInit {
 
   constructor(private changeDetector: ChangeDetectorRef, private dashboardService: DashboardService) {}
 
+  calculateRange(selection: RelativeTimeSelection): TSTimeRange {
+    let now = new Date().getTime();
+    let start = now - selection.timeInMs;
+    return { from: start, to: now };
+  }
+
   ngOnInit(): void {
     if (!this.taskId) {
       throw new Error('ExecutionId parameter is not present');
     }
-    let timeRange = this.calculateRangeInterval({
-      type: RangeSelectionType.RELATIVE,
-      relativeSelection: this.timeRangeOptions[0],
-    });
-    this.performanceViewSettings = this.getViewSettings(timeRange);
+    let range = this.calculateRange(this.timeRangeOptions[0]);
+    this.performanceViewSettings = this.createViewSettings(range);
+    // this.triggerNextUpdate(this.REFRESH_TIME_MS, this.dashboardInitComplete$);
   }
 
-  getViewSettings(timeRange: TSTimeRange) {
+  createViewSettings(timeRange: TSTimeRange) {
     return {
       contextId: this.taskId,
       contextualFilters: { taskId: this.taskId },
@@ -52,20 +59,19 @@ export class SyntheticMonitoringPageComponent implements OnInit {
     };
   }
 
-  calculateRangeInterval(pickerSelection: TimeRangePickerSelection): TSTimeRange {
-    const now = new Date().getTime();
-    switch (pickerSelection.type) {
+  onTimeRangeChange(selection: TimeRangePickerSelection) {
+    let newInterval;
+    switch (selection.type) {
       case RangeSelectionType.FULL:
         throw new Error('Full range not available');
       case RangeSelectionType.ABSOLUTE:
-        return pickerSelection.absoluteSelection!;
+        newInterval = selection.absoluteSelection!;
+        break;
       case RangeSelectionType.RELATIVE:
-        return { from: now - pickerSelection.relativeSelection!.timeInMs, to: now };
+        const now = new Date().getTime();
+        newInterval = { from: now - selection.relativeSelection!.timeInMs, to: now };
     }
-  }
 
-  onTimeRangeChange(selection: TimeRangePickerSelection) {
-    let newInterval = this.calculateRangeInterval(selection);
     if (!newInterval.from) {
       // we can't do anything since we don't know the start of the view.
       return;
@@ -76,8 +82,25 @@ export class SyntheticMonitoringPageComponent implements OnInit {
     }
     this.performanceViewSettings = undefined;
     this.changeDetector.detectChanges();
-    this.performanceViewSettings = this.getViewSettings(newInterval);
+    this.performanceViewSettings = this.createViewSettings(newInterval);
     this.changeDetector.detectChanges();
+  }
+
+  triggerNextUpdate(delay: number, observableToWaitFor: Observable<unknown>) {
+    let updatingSubscription = forkJoin([timer(delay), observableToWaitFor]).pipe(
+      tap(() => {
+        const now = new Date().getTime();
+        // if (this.executionInProgress) {
+        //   this.performanceViewSettings!.endTime =
+        //     now - (this.intervalShouldBeCanceled ? 0 : this.RUNNING_EXECUTION_END_TIME_BUFFER); // if the execution is not ended, we don't fetch until the end.
+        // }
+        const timeSelection = this.performanceView.getTimeRangeSelection();
+        if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
+          const from = now - timeSelection.relativeSelection.timeInMs;
+          timeSelection.absoluteSelection = { from: from, to: now };
+        }
+      })
+    );
   }
 
   navigateToRtmDashboard() {

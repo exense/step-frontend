@@ -62,7 +62,7 @@
   }
 }
 
-.chart-legend {
+.ts-chart-legend {
   display: flex;
   justify-content: space-between;
   flex-direction: row;
@@ -71,10 +71,13 @@
   height: 20px;
   align-items: center;
   font-size: 13px;
+  flex-grow: 1;
+  max-width: 100%;
 
   .left-section {
     display: flex;
     overflow: hidden;
+    max-width: 100%;
 
     &:hover {
       overflow: auto;
@@ -82,9 +85,9 @@
   }
 
   .item {
-    margin-right: 12px;
+    //margin-right: 12px;
     display: flex;
-    align-items: center;
+    //align-items: center;
 
     .color-square {
       display: inline-block;
@@ -95,9 +98,9 @@
   }
 
   .item-label {
-    margin-left: 4px;
+    margin-left: 24px;
     display: inline-block;
-    color: #6e6e6e;
+    //color: #6e6e6e;
   }
 
   .aggregate-section {
