@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { ReportNode } from '@exense/step-core';
+import { ReportNode } from '../../client/generated';
 
 type Status = ReportNode['status'];
 

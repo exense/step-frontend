@@ -6,9 +6,9 @@ import {
   a1Promise2Observable,
   DialogsService,
   ResourcesService,
-  IsUsedByDialogsService,
 } from '@exense/step-core';
 import { Observable, switchMap, of, catchError, map } from 'rxjs';
+import { IsUsedByDialogService } from '../../_common/step-common.module';
 
 @Injectable({
   providedIn: 'root',
@@ -21,7 +21,7 @@ export class ResourceDialogsService {
     private _uibModalHelper: UibModalHelperService,
     private _dialogs: DialogsService,
     private _resourcesService: ResourcesService,
-    private _isUsedByDialogs: IsUsedByDialogsService
+    private _isUsedByDialogs: IsUsedByDialogService
   ) {}
 
   editResource(resource?: Partial<Resource>): Observable<{ resource?: Partial<Resource>; result: string }> {
@@ -48,9 +48,7 @@ export class ResourceDialogsService {
     );
   }
 
-  searchResource(resource: Resource): Observable<any> {
-    return a1Promise2Observable(
-      this._isUsedByDialogs.displayDialog(resource.resourceName || '', this.RESOURCE_SEARCH_TYPE, resource.id!)
-    );
+  searchResource(resource: Resource): void {
+    this._isUsedByDialogs.displayDialog(resource.resourceName || '', this.RESOURCE_SEARCH_TYPE, resource.id!);
   }
 }

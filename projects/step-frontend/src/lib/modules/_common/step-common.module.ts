@@ -14,6 +14,9 @@ import { ModalWindowComponent } from './components/modal-window/modal-window.com
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { CustomFormDirective } from './directives/custom-form.directive';
 import { PlanExecutionDirective } from './directives/plan-execution.directive';
+import { VersionsDialogComponent } from './components/versions-dialog/versions-dialog.component';
+import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
+
 
 @NgModule({
   declarations: [
@@ -31,6 +34,8 @@ import { PlanExecutionDirective } from './directives/plan-execution.directive';
     ArtefactDetailsDirective,
     CustomFormDirective,
     PlanExecutionDirective,
+    VersionsDialogComponent,
+    IsUsedByModalComponent,
   ],
   exports: [
     AutorefreshToggleComponent,
@@ -38,7 +43,6 @@ import { PlanExecutionDirective } from './directives/plan-execution.directive';
     LoginComponent,
     SidebarComponent,
     ExecutionLinkComponent,
-    IsUsedByListComponent,
     PlanLinkComponent,
     FunctionLinkComponent,
     ModalWindowComponent,
@@ -48,9 +52,13 @@ import { PlanExecutionDirective } from './directives/plan-execution.directive';
     ArtefactDetailsDirective,
     CustomFormDirective,
     PlanExecutionDirective,
+    IsUsedByModalComponent,
   ],
   imports: [StepCoreModule],
 })
 export class StepCommonModule {}
 
 export * from './shared/status.enum';
+export * from './shared/is-used-by-search-type';
+export * from './services/is-used-by-dialog.service';
+export * from './components/function-link/function-link-dialog.service';

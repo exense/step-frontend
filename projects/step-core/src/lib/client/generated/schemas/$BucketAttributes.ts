@@ -4,6 +4,6 @@
 export const $BucketAttributes = {
   type: 'dictionary',
   contains: {
-    properties: {},
+    type: 'string',
   },
 } as const;
