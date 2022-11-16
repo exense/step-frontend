@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { a1Promise2Observable, DialogsService, AugmentedKeywordsService } from '@exense/step-core';
 import { Observable, catchError, map, of, switchMap, tap } from 'rxjs';
 import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
+import { IsUsedByDialogService } from '../../../_common/services/is-used-by-dialog.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +13,7 @@ export class GenericFunctionDialogService {
   constructor(
     private _functionDialogs: FunctionDialogsService,
     private _dialogs: DialogsService,
+    private _isUsedByDialogs: IsUsedByDialogService,
     private _augmentedKeywordsService: AugmentedKeywordsService
   ) {}
 
@@ -31,6 +33,10 @@ export class GenericFunctionDialogService {
 
   openEditMaskDialog(id: string): void {
     this._functionDialogs.openFunctionEditor(id, this.config).subscribe();
+  }
+
+  openLookupDialog(id: string, name: string): void {
+    this._isUsedByDialogs.displayDialog(`Keyword "${name}" is used by`, 'KEYWORD_ID', id);
   }
 
   openConfigDialog(id: string): Observable<any> {

@@ -17,6 +17,7 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { CustomFormDirective } from './directives/custom-form.directive';
 import { PlanExecutionDirective } from './directives/plan-execution.directive';
+import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 
 
 @NgModule({
@@ -34,6 +35,7 @@ import { PlanExecutionDirective } from './directives/plan-execution.directive';
     ArtefactDetailsDirective,
     CustomFormDirective,
     PlanExecutionDirective,
+    IsUsedByModalComponent,
   ],
   exports: [
     AutorefreshToggleComponent,
@@ -50,6 +52,7 @@ import { PlanExecutionDirective } from './directives/plan-execution.directive';
     ArtefactDetailsDirective,
     CustomFormDirective,
     PlanExecutionDirective,
+    IsUsedByModalComponent,
   ],
   imports: [StepCoreModule],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
@@ -57,3 +60,5 @@ import { PlanExecutionDirective } from './directives/plan-execution.directive';
 export class StepCommonModule {}
 
 export * from './shared/status.enum';
+export * from './shared/is-used-by-search-type';
+export * from './services/is-used-by-dialog.service';
