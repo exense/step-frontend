@@ -100,21 +100,10 @@
       <step-icon name="upload"></step-icon>
       Export plan
     </button>
-    <ng-template #modalWindowTemplate>
-      <step-modal-window [title]="'Keyword ' + element.attributes.name + ' is used by'">
-        <div step-modal-window-body>
-          <step-is-used-by-list
-            [title]="element.attributes.name"
-            [id]="element.id"
-            [type]="'PLAN_ID'"
-          ></step-is-used-by-list>
-        </div>
-      </step-modal-window>
-    </ng-template>
     <button
       mat-menu-item
       [disabled]="!('plan-read' | hasRight | async)"
-      (click)="_modalWindowService.openModal(modalWindowTemplate)"
+      (click)="lookUp(element.id, element.attributes.name)"
     >
       <step-icon name="search"></step-icon>
       Find usages
