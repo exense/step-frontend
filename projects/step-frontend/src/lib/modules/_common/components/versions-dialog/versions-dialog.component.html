@@ -8,17 +8,17 @@
         <strong class="flex-1">Version</strong>
       </div>
 
-      <div class="list-item" id="frontend-os">
+      <div class="list-item" *ngIf="'${project.versionFEOS}' | containsVersion">
         <div class="flex-1">Step base</div>
         <div class="flex-1">
-          <span style="display: none">{{ '${project.versionFEOS}' }}</span>
+          <span>{{ '${project.versionFEOS}' }}</span>
         </div>
       </div>
 
-      <div class="list-item" id="frontend-ee">
+      <div class="list-item" *ngIf="'${project.versionFEEE}' | containsVersion">
         <div class="flex-1">Step enterprise</div>
         <div class="flex-1">
-          <span style="display: none">{{ '${project.versionFEEE}' }}</span>
+          <span>{{ '${project.versionFEEE}' }}</span>
         </div>
       </div>
     </ng-container>
