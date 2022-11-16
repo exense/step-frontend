@@ -58,3 +58,4 @@ export class StepCommonModule {}
 export * from './shared/status.enum';
 export * from './shared/is-used-by-search-type';
 export * from './services/is-used-by-dialog.service';
+export * from './components/function-link/function-link-dialog.service';
