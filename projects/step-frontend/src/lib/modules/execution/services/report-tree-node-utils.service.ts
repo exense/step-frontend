@@ -1,0 +1,78 @@
+import { Inject, Injectable } from '@angular/core';
+import { ArtefactTypesService, ControllerService, ReportNode, TreeNode, TreeNodeUtilsService } from '@exense/step-core';
+import { EXECUTION_TREE_PAGE_LIMIT, EXECUTION_TREE_PAGING, ExecutionTreePaging } from './execution-tree-paging';
+import { ReportTreeNode } from '../shared/report-tree-node';
+import { map, Observable, tap } from 'rxjs';
+import { ReportNodeWithChildren } from '../shared/report-node-with-children';
+
+@Injectable()
+export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNodeWithChildren, ReportTreeNode> {
+  private readonly hasChildrenFlags: Record<string, boolean> = {};
+
+  constructor(
+    @Inject(EXECUTION_TREE_PAGING) private _paging: ExecutionTreePaging,
+    private _artefactTypes: ArtefactTypesService,
+    private _controllerService: ControllerService
+  ) {}
+
+  convertItem(item: ReportNodeWithChildren, parentId: string | undefined): ReportTreeNode {
+    const id = item.id!;
+    const artefact = item.resolvedArtefact!;
+    const name = artefact.attributes?.['name'] || '';
+    const isSkipped = false;
+    const icon = this._artefactTypes.getIconNg2(artefact._class);
+    const expandable = this.hasChildren(id);
+    const children = (item?.children || []).map((child) => this.convertItem(child, id));
+    const iconClassName = `step-node-status-${item.status}`;
+    return {
+      id,
+      name,
+      isSkipped,
+      icon,
+      expandable,
+      children,
+      parentId,
+      iconClassName,
+      originalNode: item,
+    };
+  }
+
+  updateChildren(
+    root: ReportNodeWithChildren,
+    nodeId: string,
+    children: ReportTreeNode[],
+    updateType: 'append' | 'replace'
+  ): void {}
+
+  updateNodeData(
+    root: ReportNodeWithChildren,
+    nodeId: string,
+    data: Partial<Pick<TreeNode, 'name' | 'isSkipped'>>
+  ): boolean {
+    return false;
+  }
+
+  hasChildren(parentArtefactId: string): boolean {
+    if (this.hasChildrenFlags[parentArtefactId] === undefined) {
+      return true;
+    }
+    return this.hasChildrenFlags[parentArtefactId];
+  }
+
+  loadChildren(node: ReportTreeNode): Observable<unknown> {
+    const nodeId = node.id;
+    return this.loadNodes(nodeId).pipe(
+      tap((children) => {
+        node.originalNode.children = children;
+      }),
+      map((children) => children.length)
+    );
+  }
+
+  loadNodes(nodeId: string): Observable<ReportNode[]> {
+    const skip = this._paging[nodeId]?.skip || 0;
+    return this._controllerService
+      .getReportNodeChildren(nodeId, skip, EXECUTION_TREE_PAGE_LIMIT)
+      .pipe(tap((nodes) => (this.hasChildrenFlags[nodeId] = nodes.length > 0)));
+  }
+}
