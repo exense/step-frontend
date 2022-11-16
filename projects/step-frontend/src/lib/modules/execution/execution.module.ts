@@ -15,8 +15,9 @@ import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import { ExecutionTabsComponent } from './components/execution-tabs/execution-tabs.component';
 import './components/execution-tabs/execution-tabs.component';
 import { CustomCellRegistryService, EntityRegistry } from '@exense/step-core';
-import { PlanIconComponent } from '../plan/components/plan-icon/plan-icon.component';
-import { PlanLinkComponent } from '../plan/components/plan-link/plan-link.component';
+import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
+import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
+import { ExecutionTreeComponent } from './components/execution-tree/execution-tree.component';
 
 @NgModule({
   declarations: [
@@ -28,12 +29,25 @@ import { PlanLinkComponent } from '../plan/components/plan-link/plan-link.compon
     PanelIdPipe,
     KeywordCallsComponent,
     ExecutionTabsComponent,
+    RepositoryPlanTestcaseListComponent,
+    ExecutionErrorsComponent,
+    ExecutionTreeComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule],
-  exports: [ExecutionListComponent, ExecutionStepComponent, ExecutionTabsComponent],
+  exports: [
+    ExecutionListComponent,
+    ExecutionStepComponent,
+    ExecutionTabsComponent,
+    ExecutionErrorsComponent,
+    KeywordCallsComponent,
+    ExecutionTreeComponent,
+  ],
 })
 export class ExecutionModule {
   constructor(_entityRegistry: EntityRegistry, _cellsRegister: CustomCellRegistryService) {
     _entityRegistry.register('executions', 'Execution', undefined, '/partials/executions/executionSelectionTable.html');
   }
 }
+
+export { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from './shared/type-leaf-report-nodes-table-params';
+export { KeywordParameters } from './shared/keyword-parameters';

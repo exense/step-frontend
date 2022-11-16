@@ -52,7 +52,8 @@
     "tslib": "2.3.0",
     "uplot": "^1.6.21",
     "uuid": "8.3.2",
-    "zone.js": "0.11.4"
+    "zone.js": "0.11.4",
+    "angular-split": "13.1.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "13.1.2",

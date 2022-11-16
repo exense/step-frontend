@@ -16,7 +16,7 @@ import {
   TrackByFunction,
   ViewChild,
 } from '@angular/core';
-import { BehaviorSubject, combineLatest, Observable, of, startWith, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, of, startWith, Subject, takeUntil, timer } from 'rxjs';
 import { TableDataSource } from '../../shared/table-data-source';
 import { MatColumnDef, MatTable } from '@angular/material/table';
 import { MatSort, Sort } from '@angular/material/sort';
@@ -67,6 +67,7 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
   @Input() inProgress?: boolean;
   tableDataSource?: TableDataSource<T>;
   @Input() pageSizeOptions: ReadonlyArray<number> = [10, 25, 50, 100];
+  @Input() pageSizeInputDisabled?: boolean;
   @Input() set filter(value: string | undefined) {
     if (value === this.filter) {
       return;
@@ -291,7 +292,9 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     const customCols = this.columns?.filter((col) => col.isCustom) || [];
 
     if (!customCols?.length) {
-      setup();
+      // Invoke setup in next CD cycle to prevent
+      // ExpressionChangedAfterItHasBeenCheckedError
+      setTimeout(() => setup());
     } else {
       this.hasCustom = true;
       const ready$ = combineLatest(customCols.map((col) => col.ready$));
