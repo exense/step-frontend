@@ -28,6 +28,7 @@ export class EntitiesSelectionModule {}
 
 export * from './services/selection-collector/selection-collector';
 export * from './services/selection-collector/selection-collector-factory.service';
+export * from './services/selection-collector/selection-collector-container';
 export * from './services/selection-collector.provider';
 export * from './components/entity-selection/entity-selection.component';
 export * from './components/entity-selection/entity-selection-di.component';
