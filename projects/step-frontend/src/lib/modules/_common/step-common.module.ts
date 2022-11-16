@@ -5,6 +5,7 @@ import { ExecutionLinkComponent } from './components/execution-link/execution-li
 
 import { JsonViewerDirective } from './directives/json-viewer.directive';
 import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
+import { ContainsVersionPipe } from './pipes/contains-version.pipe';
 import { MenuFilterPipe } from './pipes/menu-filter.pipe';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
@@ -20,7 +21,6 @@ import { PlanExecutionDirective } from './directives/plan-execution.directive';
 import { VersionsDialogComponent } from './components/versions-dialog/versions-dialog.component';
 import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 
-
 @NgModule({
   declarations: [
     AutorefreshToggleComponent,
@@ -32,6 +32,7 @@ import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by
     ModalWindowComponent,
     JsonViewerDirective,
     IsEmptyJsonPipe,
+    ContainsVersionPipe,
     MenuFilterPipe,
     ArtefactDetailsDirective,
     CustomFormDirective,
@@ -50,6 +51,7 @@ import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by
     ModalWindowComponent,
     JsonViewerDirective,
     IsEmptyJsonPipe,
+    ContainsVersionPipe,
     MenuFilterPipe,
     ArtefactDetailsDirective,
     CustomFormDirective,
