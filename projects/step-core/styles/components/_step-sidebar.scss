@@ -371,6 +371,7 @@ $default-color: dc.default-colors();
     .version {
       max-height: 16px;
       overflow: hidden;
+      cursor: pointer;
     }
 
     #collapsable-sidebar-toggle-checkbox:not(:checked) ~ .sidebar {

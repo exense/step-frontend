@@ -1,14 +1,15 @@
+import { DOCUMENT, Location } from '@angular/common';
 import {
   AfterViewInit,
   Component,
   ElementRef,
   Inject,
-  Input,
   OnDestroy,
   QueryList,
   ViewChildren,
   ViewEncapsulation,
 } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_LOCATION,
@@ -18,8 +19,8 @@ import {
   ViewRegistryService,
   ViewStateService,
 } from '@exense/step-core';
-import { DOCUMENT, Location } from '@angular/common';
 import { ILocationService } from 'angular';
+import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
 
 @Component({
   selector: 'step-sidebar',
@@ -40,7 +41,8 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
     public _viewRegistryService: ViewRegistryService,
     public _viewStateService: ViewStateService,
     public _location: Location,
-    @Inject(AJS_LOCATION) private _ajsLocation: ILocationService
+    @Inject(AJS_LOCATION) private _ajsLocation: ILocationService,
+    private _matDialog: MatDialog
   ) {
     this.locationStateSubscription = this._location.subscribe((popState: any) => {
       this.openMainMenuBasedOnActualView();
@@ -114,6 +116,10 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
         .querySelector('step-tenant-selection-downgraded')!
         .classList.remove('tenant-selector-when-sidebar-closed');
     }
+  }
+
+  showVersionsDialog(): void {
+    const dialogRef = this._matDialog.open(VersionsDialogComponent);
   }
 }
 
