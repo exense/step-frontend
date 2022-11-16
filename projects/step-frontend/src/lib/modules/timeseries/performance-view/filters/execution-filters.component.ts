@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
-import { ExecutionContext } from '../../execution-page/execution-context';
+import { TimeSeriesContext } from '../../execution-page/time-series-context';
 import { BucketFilters } from '../../model/bucket-filters';
 import { KeywordSelection, TimeSeriesKeywordsContext } from '../../execution-page/time-series-keywords.context';
 import { KeyValue } from '@angular/common';
@@ -15,7 +15,7 @@ export class ExecutionFiltersComponent implements OnInit {
 
   filterItems: FilterItem[] = [
     { label: 'Type', attributeName: 'type', options: ['keyword', 'custom'] },
-    { label: 'Status', attributeName: 'rnStatus', options: ['FAILED', 'PASSED'] },
+    { label: 'Status', attributeName: 'rnStatus', options: ['PASSED', 'FAILED', 'TECHNICAL_ERROR', 'INTERRUPTED'] },
   ];
 
   groupingOptions = [
@@ -24,7 +24,7 @@ export class ExecutionFiltersComponent implements OnInit {
   ];
   groupingAttributes = this.groupingOptions[0].attributes;
 
-  @Input() executionContext!: ExecutionContext;
+  @Input() executionContext!: TimeSeriesContext;
   private keywordsService!: TimeSeriesKeywordsContext;
   keywords: { [key: string]: KeywordSelection } = {};
 

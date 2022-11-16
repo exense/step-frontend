@@ -66,6 +66,14 @@ export class SyntheticMonitoringPageComponent implements OnInit {
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
     let newInterval = this.calculateRangeInterval(selection);
+    if (!newInterval.from) {
+      // we can't do anything since we don't know the start of the view.
+      return;
+    }
+    if (!newInterval.to) {
+      // if it's not specified, just show everything until now
+      newInterval.to = new Date().getTime();
+    }
     this.performanceViewSettings = undefined;
     this.changeDetector.detectChanges();
     this.performanceViewSettings = this.getViewSettings(newInterval);

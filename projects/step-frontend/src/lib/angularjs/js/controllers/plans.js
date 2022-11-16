@@ -51,10 +51,12 @@ angular
     return api;
   })
 
-  .controller('PlansCtrl', function ($rootScope, $scope, stateStorage) {
+  .controller('PlansCtrl', ['$rootScope', '$scope', 'stateStorage', 'pathHelper',
+    function ($rootScope, $scope, stateStorage, pathHelper) {
     stateStorage.push($scope, 'plans', {});
     if ($scope.$state == null) {
-      $scope.$state = 'list';
+       $scope.$state = 'list';
+       pathHelper.fixList();
     }
 
     $scope.$watch('$state', function () {
@@ -62,7 +64,7 @@ angular
         $scope.selectView = $scope.$state;
       }
     });
-  })
+  }])
 
   .factory('PlanDialogs', function ($uibModal, $http, Dialogs) {
     var dialogs = {};

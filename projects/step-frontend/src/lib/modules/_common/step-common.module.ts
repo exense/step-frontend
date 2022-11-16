@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { StepCoreModule } from '@exense/step-core';
+import { AuthService, StepCoreModule } from '@exense/step-core';
 import { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
 import { LoginComponent } from './components/login/login.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
@@ -17,6 +17,9 @@ import { CustomFormDirective } from './directives/custom-form.directive';
 import { PlanExecutionDirective } from './directives/plan-execution.directive';
 import { VersionsDialogComponent } from './components/versions-dialog/versions-dialog.component';
 import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
+
 
 @NgModule({
   declarations: [
@@ -57,6 +60,7 @@ import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by
     IsUsedByModalComponent,
   ],
   imports: [StepCoreModule],
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
 })
 export class StepCommonModule {}
 

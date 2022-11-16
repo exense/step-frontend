@@ -259,7 +259,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
 
   exportAsCSV(fields: string[], params?: TableParameters): void {
     const request = new TableRequestInternal({
-      ...(this._request$.value || {}),
+      ...(this._request$.value?.request || {}),
       params,
     });
 

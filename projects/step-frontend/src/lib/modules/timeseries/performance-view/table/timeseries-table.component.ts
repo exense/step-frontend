@@ -2,13 +2,11 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { Bucket } from '../../bucket';
 import { TimeSeriesService } from '../../time-series.service';
 import { FindBucketsRequest } from '../../find-buckets-request';
-import { TimeseriesColorsPool } from '../../util/timeseries-colors-pool';
 import { TimeSeriesChartResponse } from '../../time-series-chart-response';
 import { TimeSeriesKeywordsContext } from '../../execution-page/time-series-keywords.context';
-import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
 import { BucketAttributes, TableDataSource, TableLocalDataSource, TableLocalDataSourceConfig } from '@exense/step-core';
-import { ExecutionContext } from '../../execution-page/execution-context';
-import { Subscription } from 'rxjs';
+import { Observable, Subject, Subscription, takeUntil, tap } from 'rxjs';
+import { TimeSeriesContext } from '../../execution-page/time-series-context';
 
 @Component({
   selector: 'step-timeseries-table',
@@ -17,8 +15,10 @@ import { Subscription } from 'rxjs';
 })
 export class TimeseriesTableComponent implements OnInit, OnDestroy {
   // TODO use a dynamic list for percentiles
-  tableColumns = ['name', 'count', 'sum', 'avg', 'min', 'max', 'pcl_90', 'pcl_90', 'pcl_99', 'tps'];
+  tableColumns = ['name', 'count', 'sum', 'avg', 'min', 'max', 'pcl_90', 'pcl_90', 'pcl_99', 'tps', 'tph'];
+  tableData$ = new Subject<Bucket[]>();
   tableDataSource: TableDataSource<Bucket> | undefined;
+
   bucketsByKeywords: { [key: string]: Bucket } = {};
   tableIsLoading = true;
   dimensionKey = 'name';
@@ -27,17 +27,16 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   groupDimensions: string[] = [];
 
   private keywordsService!: TimeSeriesKeywordsContext;
-  @Input() executionContext!: ExecutionContext;
+  @Input() executionContext!: TimeSeriesContext;
 
-  subscriptions: Subscription = new Subscription();
+  @Output() onInitializationComplete = new EventEmitter<void>();
 
-  // @Output('onKeywordsFetched') onKeywordsFetched = new EventEmitter<string[]>();
-  // @Output('onKeywordToggled') onKeywordToggled = new EventEmitter<string>();
+  private terminator$ = new Subject<void>();
 
   sortByNameAttributeFn = (a: Bucket, b: Bucket) =>
     a.attributes.name.toLowerCase() > b.attributes.name.toLowerCase() ? 1 : -1;
 
-  constructor(private timeSeriesService: TimeSeriesService, private executionsPageService: TimeSeriesContextsFactory) {}
+  constructor(private timeSeriesService: TimeSeriesService) {}
 
   ngOnInit(): void {
     if (!this.executionContext) {
@@ -46,77 +45,84 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     if (!this.findRequest) {
       throw new Error('FindRequest input is mandatory');
     }
-    this.keywordsService = this.executionContext.getKeywordsContext();
-    this.subscriptions.add(
-      this.keywordsService.onKeywordToggled().subscribe((selection) => {
+    this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
+    this.keywordsService = this.executionContext.keywordsContext;
+    this.keywordsService
+      .onKeywordToggled()
+      .pipe(takeUntil(this.terminator$))
+      .subscribe((selection) => {
         this.bucketsByKeywords[selection.id].attributes.isSelected = selection.isSelected;
-      })
-    );
-    this.subscriptions.add(
-      this.executionContext.onGroupingChange().subscribe((groupDimensions) => {
+      });
+    this.executionContext
+      .onGroupingChange()
+      .pipe(takeUntil(this.terminator$))
+      .subscribe((groupDimensions) => {
         this.groupDimensions = groupDimensions;
         if (!this.findRequest) {
           return;
         }
-        this.fetchBuckets(true);
-      })
-    );
-    this.fetchBuckets();
+        this.fetchBucketsAndUpdateKeywords(true);
+      });
+    this.fetchBucketsAndUpdateKeywords().subscribe(() => {
+      this.onInitializationComplete.emit();
+    });
   }
 
-  fetchBuckets(autoSelectAll = false) {
-    this.getBuckets(this.findRequest, (keywords) => this.keywordsService.setKeywords(keywords, autoSelectAll));
+  fetchBucketsAndUpdateKeywords(autoSelectAll = false): Observable<TimeSeriesChartResponse> {
+    return this.getBuckets(this.findRequest, (keywords) => this.keywordsService.setKeywords(keywords, autoSelectAll));
   }
 
   onKeywordToggle(keyword: string, event: any) {
     this.keywordsService.toggleKeyword(keyword);
   }
 
-  refresh(request: FindBucketsRequest) {
+  refresh(request: FindBucketsRequest): Observable<TimeSeriesChartResponse> {
     this.findRequest = request;
-    this.fetchBuckets();
+    return this.fetchBucketsAndUpdateKeywords();
   }
 
-  private getBuckets(request: FindBucketsRequest, keywordsCallback: (series: string[]) => void) {
+  private getBuckets(
+    request: FindBucketsRequest,
+    keywordsCallback: (series: string[]) => void
+  ): Observable<TimeSeriesChartResponse> {
     let groupDimensions = this.executionContext.getGroupDimensions();
-    this.timeSeriesService
-      .fetchBuckets({
-        ...request,
-        groupDimensions: groupDimensions,
-        numberOfBuckets: 1,
-        percentiles: [80, 90, 99],
-      })
-      .subscribe((response) => {
+    let fetchRequest = {
+      ...request,
+      groupDimensions: groupDimensions,
+      numberOfBuckets: 1,
+      percentiles: [80, 90, 99],
+    };
+    return this.timeSeriesService.fetchBuckets(fetchRequest).pipe(
+      tap((response) => {
         this.response = response;
         let keywords: string[] = [];
-        this.tableDataSource = new TableLocalDataSource(
-          response.matrix
-            .map((series, i) => {
-              if (series.length != 1) {
-                // we should have just one bucket
-                throw new Error('Something went wrong');
-              }
-              let seriesAttributes = response.matrixKeys[i];
-              let bucket = series[0];
-              bucket.attributes = seriesAttributes;
-              let seriesKey = this.getSeriesKey(seriesAttributes, groupDimensions);
-              bucket.attributes._id = seriesKey;
-              bucket.attributes.color = this.keywordsService.getColor(seriesKey);
-              bucket.attributes.avg = (bucket.sum / bucket.count).toFixed(0);
-              bucket.attributes.tps = Math.trunc(bucket.count / ((response.end - response.start) / 1000));
-              let keywordSelection = this.keywordsService.getKeywordSelection(seriesKey);
-              bucket.attributes.isSelected = keywordSelection ? keywordSelection.isSelected : true; // true because it has not been loaded yet
-              // this.keywords[attributes[dimensionKey]] = { color: color, isSelected: true };
-              keywords.push(seriesKey);
-              this.bucketsByKeywords[seriesKey] = bucket;
-              return bucket;
-            })
-            .sort(this.sortByNameAttributeFn),
-          this.getDatasourceConfig()
-        );
+        let tableBuckets = response.matrix
+          .map((series, i) => {
+            if (series.length != 1) {
+              // we should have just one bucket
+              throw new Error('Something went wrong');
+            }
+            let seriesAttributes = response.matrixKeys[i];
+            let bucket = series[0];
+            bucket.attributes = seriesAttributes;
+            let seriesKey = this.getSeriesKey(seriesAttributes, groupDimensions);
+            bucket.attributes._id = seriesKey;
+            bucket.attributes.color = this.keywordsService.getColor(seriesKey);
+            bucket.attributes.avg = (bucket.sum / bucket.count).toFixed(0);
+            bucket.attributes.tps = Math.trunc(bucket.count / ((response.end - response.start) / 1000));
+            bucket.attributes.tph = Math.trunc((bucket.count / ((response.end - response.start) / 1000)) * 3600);
+            let keywordSelection = this.keywordsService.getKeywordSelection(seriesKey);
+            bucket.attributes.isSelected = keywordSelection ? keywordSelection.isSelected : true; // true because it has not been loaded yet
+            keywords.push(seriesKey);
+            this.bucketsByKeywords[seriesKey] = bucket;
+            return bucket;
+          })
+          .sort(this.sortByNameAttributeFn);
+        this.tableData$.next(tableBuckets);
         keywordsCallback(keywords);
         this.tableIsLoading = false;
-      });
+      })
+    );
   }
 
   getSeriesKey(attributes: BucketAttributes, groupDimensions: string[]) {
@@ -166,6 +172,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         pcl_90: (b1: Bucket, b2: Bucket) => b1.pclValues[90] - b2.pclValues[90],
         pcl_99: (b1: Bucket, b2: Bucket) => b1.pclValues[99] - b2.pclValues[99],
         tps: (b1: Bucket, b2: Bucket) => b1.attributes.tps - b2.attributes.tps,
+        tph: (b1: Bucket, b2: Bucket) => b1.attributes.tph - b2.attributes.tph,
       },
     };
   }
@@ -175,8 +182,8 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.subscriptions) {
-      this.subscriptions.unsubscribe();
-    }
+    this.tableData$.complete();
+    this.terminator$.next();
+    this.terminator$.complete();
   }
 }

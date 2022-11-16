@@ -46,9 +46,11 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
    * 1. when a synced chart or this chart is zooming
    * 2. when the grips are moved
    */
-  @Output('onRangeChange') onRangeChange = new EventEmitter<TSTimeRange>();
+  @Output() onRangeChange = new EventEmitter<TSTimeRange>();
 
-  @Output('onZoomReset') onZoomReset = new EventEmitter<TSTimeRange>();
+  @Output() onZoomReset = new EventEmitter<TSTimeRange>();
+
+  @Output() onChartLoaded = new EventEmitter<void>();
 
   uplot!: any;
   previousRange: TSTimeRange | undefined;
@@ -97,10 +99,6 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     let select = this.transformRangeToSelect({ from: fromTimestamp, to: toTimestamp });
     this.uplot.setSelect(select, false);
     this.emitSelectionToLinkedCharts();
-
-    // if (emitChangeEvent) {
-    //   this.onRangeChange.emit({ start: fromTimestamp, end: toTimestamp });
-    // }
   }
 
   transformRangeToSelect(range?: TSTimeRange): uPlot.Select | undefined {
@@ -112,15 +110,15 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     let left, width;
     let height = this.uplot.bbox.height / devicePixelRatio;
     if (!fromTimestamp) {
-      left = Math.round(this.uplot.valToPos(this.start, 'x'));
+      left = this.uplot.valToPos(this.start, 'x');
     } else {
       left = this.uplot.valToPos(fromTimestamp, 'x');
     }
     left = Math.max(left, 0); // in case it is negative
     if (!toTimestamp) {
-      width = Math.round(this.uplot.valToPos(this.end, 'x')) - left;
+      width = this.uplot.valToPos(this.end, 'x') - left;
     } else {
-      width = Math.round(this.uplot.valToPos(toTimestamp, 'x')) - left;
+      width = this.uplot.valToPos(toTimestamp, 'x') - left;
     }
     // by some reasons, sometimes relative selection get out of the canvas
     if (left + width > this.uplot.bbox.width) {
@@ -257,13 +255,15 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
           key: this.syncKey,
         },
         bind: {
+          // this is not trigger when dblclick is fired on synced charts, but just on the ranger
           dblclick: (self: uPlot, b, handler: MouseListener) => {
             return (e: any) => {
               let hasSelection = this.uplot.select.width > 0;
               handler(e);
               if (hasSelection) {
                 // has selection
-                this.resetSelect(true);
+                this.onZoomReset.emit();
+                // this.resetSelect(true);
               }
               return null;
             };
@@ -344,6 +344,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       [this.settings.xValues, ...this.settings.series.map((s) => s.data)],
       this.chartElement.nativeElement
     );
+    this.onChartLoaded.emit();
   }
 
   emitSelectionToLinkedCharts() {
@@ -352,24 +353,23 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       min: this.uplot.posToVal(this.uplot.select.left, 'x'),
       max: this.uplot.posToVal(this.uplot.select.left + this.uplot.select.width, 'x'),
     };
-    // this.uplot.setSelect(minMax);
 
     linkedCharts.forEach((chart: any) => {
       if (chart === this.uplot) {
         // TODO find a better way to avoid this
         return;
       }
-      // minMax.min = this.uplot.min
-      // minMax.max = this.uplot.posToVal(newLft + newWid, 'x');
       chart.setScale('x', minMax);
     });
   }
 
   emitRangeEventIfChanged() {
     let u = this.uplot;
-    // we could use just postToVal, but it's better to have an exact value from the X data
-    let min = u.data[0][u.valToIdx(u.posToVal(u.select.left, 'x'))];
-    let max = u.data[0][u.valToIdx(u.posToVal(u.select.left + u.select.width, 'x'))];
+    // keep these lines below if it's better to have an exact value from the X data
+    // let min = u.data[0][u.valToIdx(u.posToVal(u.select.left, 'x'))];
+    // let max = u.data[0][u.valToIdx(u.posToVal(u.select.left + u.select.width, 'x'))];
+    let min = u.posToVal(u.select.left, 'x');
+    let max = u.posToVal(u.select.left + u.select.width, 'x');
     if (min != this.previousRange?.from || max !== this.previousRange?.to) {
       let currentRange = { from: min, to: max };
       this.previousRange = currentRange;

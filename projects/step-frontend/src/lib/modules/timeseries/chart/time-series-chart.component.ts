@@ -49,6 +49,8 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   emptyChart = false; // meaning the chart is already created, but it has no data
 
+  legendSettings: LegendSettings = { items: [] };
+
   constructor(@Self() private element: ElementRef) {}
 
   ngOnInit(): void {
@@ -72,6 +74,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
    * @param settings
    */
   createChart(settings: TSChartSettings): void {
+    this.legendSettings.items = [];
     let getSize = () => {
       return {
         width: this.element.nativeElement.parentElement.offsetWidth - 24,
@@ -103,9 +106,15 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       };
     }
 
+    if (settings.axes.length > 1) {
+      this.legendSettings.zAxisLabel = this.settings.tooltipOptions.zAxisLabel || 'Total';
+    }
     settings.series.forEach((series, i) => {
       if (series.id) {
         this.seriesIndexesByIds[series.id] = i + 1; // because the first series is the time
+      }
+      if (series.stroke) {
+        this.legendSettings.items.push({ color: series.stroke as string, label: series.legendName });
       }
     });
     let noData = true;
@@ -121,7 +130,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       title: settings.title,
       ms: 1, // if not specified it's going to be in seconds
       ...getSize(),
-      legend: { show: this.emptyChart ? false : settings.showLegend },
+      legend: { show: false },
       cursor: cursorOpts,
       scales: {
         x: {
@@ -131,7 +140,9 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         },
         // y: {auto: true},
       },
-      plugins: [TooltipPlugin.getInstance(this.settings.yScaleUnit)],
+      plugins: this.settings.tooltipOptions.enabled
+        ? [TooltipPlugin.getInstance(() => this.settings.tooltipOptions)]
+        : [],
       axes: [{}, ...(settings.axes || [])],
       series: [
         {
@@ -315,4 +326,14 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     let timestampSeries = this.uplot.data[0];
     return timestampSeries[timestampSeries.length - 1];
   }
+}
+
+interface LegendSettings {
+  items: LegendItem[];
+  zAxisLabel?: string;
+}
+
+interface LegendItem {
+  label: string;
+  color: string;
 }

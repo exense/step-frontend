@@ -26,6 +26,10 @@
       cursor: pointer;
       padding: 4px 14px;
 
+      &.active {
+        background: #f6f6f6;
+      }
+
       &:hover {
         background: #f1f1f1;
       }

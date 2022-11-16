@@ -5,33 +5,30 @@ import { TimeSeriesKeywordsContext } from './time-series-keywords.context';
 import { TimeseriesColorsPool } from '../util/timeseries-colors-pool';
 import { Execution } from '@exense/step-core';
 import { BucketFilters } from '../model/bucket-filters';
+import { TimeSelectionState } from '../time-selection.state';
 
 /**
  * This class is responsible for managing the state of an execution tab. Here we store time selection, colors, filters, etc.
  */
-export class ExecutionContext {
+export class TimeSeriesContext {
   executionId!: string;
 
-  activeTimeSelection: ExecutionTimeSelection = { type: RangeSelectionType.FULL };
   activeExecution: Execution | undefined;
   activeFilters: { [key: string]: any } = {};
   activeGroupings: string[] = ['name']; // group dimensions
 
-  private readonly activeSelectionChange: Subject<ExecutionTimeSelection> = new Subject<ExecutionTimeSelection>();
   private readonly filtersChangeSubject: Subject<BucketFilters> = new Subject();
   private readonly groupingChangeSubject: Subject<string[]> = new Subject();
 
-  private readonly keywordsContext: TimeSeriesKeywordsContext;
+  public readonly keywordsContext: TimeSeriesKeywordsContext;
   private readonly colorsPool: TimeseriesColorsPool;
+  readonly timeSelectionState: TimeSelectionState;
 
   constructor(executionId: string) {
     this.executionId = executionId;
     this.colorsPool = new TimeseriesColorsPool();
     this.keywordsContext = new TimeSeriesKeywordsContext(this.colorsPool);
-  }
-
-  getKeywordsContext(): TimeSeriesKeywordsContext {
-    return this.keywordsContext;
+    this.timeSelectionState = new TimeSelectionState();
   }
 
   setExecution(execution: Execution) {
@@ -43,19 +40,6 @@ export class ExecutionContext {
       throw new Error('Execution was not set yet');
     }
     return this.activeExecution;
-  }
-
-  setActiveSelection(selection: ExecutionTimeSelection) {
-    this.activeTimeSelection = selection;
-    this.activeSelectionChange.next(selection);
-  }
-
-  getActiveSelection(): ExecutionTimeSelection {
-    return this.activeTimeSelection;
-  }
-
-  onActiveSelectionChange(): Observable<ExecutionTimeSelection> {
-    return this.activeSelectionChange.asObservable();
   }
 
   onGroupingChange(): Observable<string[]> {
