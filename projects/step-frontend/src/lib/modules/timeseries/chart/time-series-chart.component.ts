@@ -120,7 +120,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     }
 
     if (settings.axes.length > 1) {
-      this.legendSettings.zAxisLabel = 'Total';
+      this.legendSettings.zAxisLabel = this.settings.tooltipOptions.zAxisLabel || 'Total';
     }
     settings.series.forEach((series, i) => {
       if (series.id) {
