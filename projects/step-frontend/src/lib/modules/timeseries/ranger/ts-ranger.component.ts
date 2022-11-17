@@ -330,7 +330,6 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
         setScale: [
           (uRanger: uPlot) => {
             // this.onRangeChange.next(this.getCurrentRange());
-            // this is triggered when the synced charts are zooming
             // zoom(uRanger.select.left, uRanger.select.width);
           },
         ],

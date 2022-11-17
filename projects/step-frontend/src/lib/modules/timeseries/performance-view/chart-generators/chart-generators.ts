@@ -3,7 +3,7 @@ import { TimeSeriesUtils } from '../../time-series-utils';
 import { UPlotUtils } from '../../uplot/uPlot.utils';
 import { TimeSeriesChartResponse } from '../../time-series-chart-response';
 import { TSChartSettings } from '../../chart/model/ts-chart-settings';
-import { TsChartType } from '../ts-chart-type';
+import { TsChartType } from '../model/ts-chart-type';
 import { ThreadGroupChartGenerator } from './thread-group-chart-generator';
 import { ByStatusChartGenerator } from './by-status-chart-generator';
 import { TimeseriesColorsPool } from '../../util/timeseries-colors-pool';
