@@ -16,6 +16,7 @@ import { ExecutionPageComponent } from './execution-page/execution-page.componen
 import { SyntheticMonitoringPageComponent } from './synthetic-monitoring/synthetic-monitoring-page.component';
 import { MeasurementsPickerComponent } from './performance-view/measurements/measurements-picker.component';
 import { PerformanceViewTimeSelectionComponent } from './performance-view/time-selection/performance-view-time-selection.component';
+import { MeasurementsFilterPipe } from './performance-view/measurements/measurements-filter.pipe';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { PerformanceViewTimeSelectionComponent } from './performance-view/time-s
     ExecutionPageComponent,
     SyntheticMonitoringPageComponent,
     MeasurementsPickerComponent,
+    MeasurementsFilterPipe,
   ],
   exports: [PerformanceViewComponent],
   imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule],

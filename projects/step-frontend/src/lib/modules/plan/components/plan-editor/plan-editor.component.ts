@@ -26,6 +26,7 @@ import {
   ScreensService,
   TreeStateService,
   Function as KeywordCall,
+  TreeNodeUtilsService,
 } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PlanHistoryService } from '../../services/plan-history.service';
@@ -37,6 +38,8 @@ import { InteractiveSessionService } from '../../services/interactive-session.se
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
 import { DOCUMENT } from '@angular/common';
+import { ArtefactTreeNodeUtilsService } from '../../services/artefact-tree-node-utils.service';
+import { ArtefactTreeNode } from '../../shared/artefact-tree-node';
 
 type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef' | 'componentTabs'>>;
 
@@ -46,6 +49,11 @@ type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef' | '
   styleUrls: ['./plan-editor.component.scss'],
   encapsulation: ViewEncapsulation.None,
   providers: [
+    ArtefactTreeNodeUtilsService,
+    {
+      provide: TreeNodeUtilsService,
+      useExisting: ArtefactTreeNodeUtilsService,
+    },
     TreeStateService,
     PlanHistoryService,
     InteractiveSessionService,
@@ -77,7 +85,7 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
   readonly hasUndo$ = this._planHistory.hasUndo$;
   readonly hasRedo$ = this._planHistory.hasRedo$;
 
-  readonly selectedArtefact$ = this._treeState.selectedArtefact$;
+  readonly selectedArtefact$ = this._treeState.selectedNode$.pipe(map((node) => node?.originalArtefact));
 
   readonly isInteractiveSessionActive$ = this._interactiveSession.isActive$;
 
@@ -85,7 +93,7 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
 
   constructor(
     public _interactiveSession: InteractiveSessionService,
-    private _treeState: TreeStateService,
+    private _treeState: TreeStateService<AbstractArtefact, ArtefactTreeNode>,
     private _planHistory: PlanHistoryService,
     private _planApi: PlansService,
     private _keywordCallsApi: KeywordsService,
@@ -168,7 +176,7 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
     if (node) {
       this._treeState.selectNodeById(node.id!);
     }
-    this.artefactsClipboard = this._treeState.getSelectedArtefacts();
+    this.artefactsClipboard = this._treeState.getSelectedNodes().map(({ originalArtefact }) => originalArtefact);
   }
 
   paste(node?: AbstractArtefact): void {
@@ -370,7 +378,7 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
       this._treeState.selectNodeById(node.id!);
     }
 
-    const artefact = this._treeState.getSelectedArtefacts()[0];
+    const artefact = this._treeState.getSelectedNodes()[0]?.originalArtefact;
     const isPlan = artefact._class === 'CallPlan';
     const isKeyword = artefact._class === 'CallKeyword';
 
@@ -427,7 +435,7 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
   }
 
   execute(): void {
-    const artefactIds = this._treeState.getSelectedArtefacts().map((artefact) => artefact.id!);
+    const artefactIds = this._treeState.getSelectedNodes().map((node) => node.id!);
 
     this._interactiveSession.execute(this.planId!, artefactIds).subscribe(() => {
       if (this.keywords) {

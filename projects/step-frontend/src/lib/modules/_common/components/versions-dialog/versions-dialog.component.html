@@ -1,0 +1,48 @@
+<step-tabs [tabs]="tabs" [(activeTabId)]="activeTabId"> </step-tabs>
+
+<div class="tab-content">
+  <ng-container [ngSwitch]="activeTabId">
+    <ng-container *ngSwitchCase="VersionDialogTabs.FE">
+      <div class="list-item">
+        <strong class="flex-1">Package</strong>
+        <strong class="flex-1">Version</strong>
+      </div>
+
+      <div class="list-item" *ngIf="'${project.versionFEOS}' | containsVersion">
+        <div class="flex-1">Step base</div>
+        <div class="flex-1">
+          <span>{{ '${project.versionFEOS}' }}</span>
+        </div>
+      </div>
+
+      <div class="list-item" *ngIf="'${project.versionFEEE}' | containsVersion">
+        <div class="flex-1">Step enterprise</div>
+        <div class="flex-1">
+          <span>{{ '${project.versionFEEE}' }}</span>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="VersionDialogTabs.BE">
+      <div class="list-item">
+        <strong class="flex-1">Package</strong>
+        <strong class="flex-1">Version</strong>
+      </div>
+
+      <ng-container *ngFor="let version of versions$ | async">
+        <div *ngIf="version.value" class="list-item">
+          <div class="flex-1">
+            {{ version.key }}
+          </div>
+          <div class="flex-1">
+            {{ version.value }}
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+  </ng-container>
+</div>
+
+<div mat-dialog-actions class="actions" align="end">
+  <button type="button" mat-flat-button color="primary" mat-dialog-close>Ok</button>
+</div>

@@ -1,42 +1,29 @@
-<button
-  mat-icon-button
-  [matTooltip]="'Keywords (' + activeKeywords + ' active)'"
-  [matMenuTriggerFor]="menu"
-  style="min-width: 20px"
->
-  <!--  Measurements {{ activeKeywords ? '(' + activeKeywords + ')' : '' }}-->
-  <step-icon name="settings"></step-icon>
-</button>
-<mat-menu #menu="matMenu" class="time-selector-menu">
-  <div (click)="$event.stopPropagation()" class="menu-container">
-    <div>
-      <input [(ngModel)]="keywordSearchValue" placeholder="Search" style="width: 110px; margin-bottom: 12px" />
-    </div>
-    <div>
+<div (click)="$event.stopPropagation()" class="menu-container">
+  <div>
+    <input [(ngModel)]="keywordSearchValue" placeholder="Search" style="width: 110px; margin-bottom: 12px" />
+  </div>
+  <div>
+    <input
+      type="checkbox"
+      class="checkbox"
+      [(ngModel)]="allSeriesChecked"
+      (change)="onAllSeriesCheckboxClick($event)"
+      style="display: inline"
+    />
+    <span>All keywords</span>
+  </div>
+  <ng-container *ngFor="let item of keywords | measurementsProcessor: keywordSearchValue">
+    <div class="color-cell" *ngIf="item.value.isVisible">
       <input
         type="checkbox"
+        [ngModel]="item.value.isSelected"
         class="checkbox"
-        [(ngModel)]="allSeriesChecked"
-        (change)="onAllSeriesCheckboxClick($event)"
-        style="display: inline"
+        (change)="onKeywordToggle(item.key, $event)"
       />
-      <span>All keywords</span>
+      <div style="display: flex; align-items: center; margin-top: 3px">
+        <span class="color-square" [style.background-color]="item.value.color"></span>
+        <span>{{ item.key }}</span>
+      </div>
     </div>
-    <ng-container *ngFor="let item of keywords | keyvalue: valueAscOrder">
-      <ng-container *ngIf="!keywordSearchValue || item.key.toLowerCase().indexOf(keywordSearchValue) >= 0">
-        <div class="color-cell" *ngIf="item.value.isVisible">
-          <input
-            type="checkbox"
-            [ngModel]="item.value.isSelected"
-            class="checkbox"
-            (change)="onKeywordToggle(item.key, $event)"
-          />
-          <div style="display: flex; align-items: center; margin-top: 3px">
-            <span class="color-square" [style.background-color]="item.value.color"></span>
-            <span>{{ item.key }}</span>
-          </div>
-        </div>
-      </ng-container>
-    </ng-container>
-  </div>
-</mat-menu>
+  </ng-container>
+</div>
