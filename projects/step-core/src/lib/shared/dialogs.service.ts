@@ -1,6 +1,6 @@
 import { IPromise, IScope } from 'angular';
 import { Injectable } from '@angular/core';
-import { INJECTOR } from './angularjs-provider-options';
+import { INJECTOR } from '../modules/basics/step-basics.module';
 
 @Injectable({
   providedIn: 'root',
@@ -17,9 +17,9 @@ export abstract class DialogsService {
   abstract enterValue(
     title: string,
     message: string,
-    size: number,
+    size: string,
     template: string,
-    functionOnSuccess: (value: unknown) => void
+    functionOnSuccess: (value: string) => void
   ): void;
   abstract selectEntityOfType(entityName: string, singleSelection: boolean, id?: string): IPromise<unknown>;
   abstract selectEntityType(excludeArray: string[], id: string): IPromise<unknown>;

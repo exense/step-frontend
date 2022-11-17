@@ -1,0 +1,6 @@
+<ng-container *ngIf="!isEditMode">
+  {{ node?.name }}
+</ng-container>
+<step-input-group [class.hidden]="!isEditMode">
+  <input type="text" #inputElement (blur)="submitNameChange()" (keydown.enter)="submitNameChange()" />
+</step-input-group>

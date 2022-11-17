@@ -4,7 +4,7 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
-import type { WebPlugin } from '../models/WebPlugin';
+import type { AbstractWebPlugin } from '../models/AbstractWebPlugin';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
@@ -13,10 +13,10 @@ export class PrivateApplicationService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 
   /**
-   * @returns WebPlugin default response
+   * @returns AbstractWebPlugin default response
    * @throws ApiError
    */
-  public getWebPlugins(): Observable<Array<WebPlugin>> {
+  public getWebPlugins(): Observable<Array<AbstractWebPlugin>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/app/plugins',

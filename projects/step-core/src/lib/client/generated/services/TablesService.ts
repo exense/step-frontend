@@ -4,11 +4,11 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
+import type { AbstractWebPlugin } from '../models/AbstractWebPlugin';
 import type { AsyncTaskStatusResource } from '../models/AsyncTaskStatusResource';
 import type { TableExportRequest } from '../models/TableExportRequest';
 import type { TableRequest } from '../models/TableRequest';
 import type { TableResponseObject } from '../models/TableResponseObject';
-import type { WebPlugin } from '../models/WebPlugin';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
@@ -35,10 +35,10 @@ export class TablesService {
   }
 
   /**
-   * @returns WebPlugin default response
+   * @returns AbstractWebPlugin default response
    * @throws ApiError
    */
-  public getWebPlugins1(): Observable<Array<WebPlugin>> {
+  public getWebPlugins1(): Observable<Array<AbstractWebPlugin>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/table/plugins',

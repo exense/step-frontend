@@ -7,6 +7,10 @@ import { RangeSelectionType } from './model/range-selection-type';
 import { ExecutionTimeSelection } from './model/execution-time-selection';
 import { min } from 'rxjs';
 
+/**
+ * When dealing with relative/full selection, this component should not know anything about dates, therefore no date calculations are needed.
+ * This is in order to keep this component as simple as possible.
+ */
 @Component({
   selector: 'step-time-range-picker',
   templateUrl: './time-range-picker.component.html',

@@ -21,4 +21,5 @@ export class SelectionCollectorFactoryService {
 
 getAngularJSGlobal()
   .module(AJS_MODULE)
+  .constant('AutoDeselectStrategy', AutoDeselectStrategy)
   .service('selectionCollectorFactoryService', downgradeInjectable(SelectionCollectorFactoryService));

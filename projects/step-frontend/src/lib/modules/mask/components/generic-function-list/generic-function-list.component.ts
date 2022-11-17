@@ -12,7 +12,6 @@ import {
   FunctionPackage,
   Mutable,
 } from '@exense/step-core';
-import { noop } from 'rxjs';
 import { ILocationService, IRootScopeService } from 'angular';
 
 type FieldAccessor = Mutable<Pick<GenericFunctionListComponent, 'dataSource'>>;
@@ -78,7 +77,7 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
   }
 
   lookUp(id: string, name: string): void {
-    this._genericFunctionDialogService.openLookupDialog(id, name).subscribe(noop);
+    this._genericFunctionDialogService.openLookupDialog(id, name);
   }
 
   configureFunction(id: string) {

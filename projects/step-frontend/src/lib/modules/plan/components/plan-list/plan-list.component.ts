@@ -76,7 +76,7 @@ export class PlanListComponent {
   }
 
   lookUp(id: string, name: string): void {
-    this._planDialogs.lookUp(id, name).subscribe(noop);
+    this._planDialogs.lookUp(id, name);
   }
 }
 

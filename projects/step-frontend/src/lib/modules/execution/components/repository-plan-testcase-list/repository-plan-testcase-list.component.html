@@ -1,0 +1,42 @@
+<step-table
+  [dataSource]="searchableRepositoryReport$"
+  [inProgress]="inProgress"
+  matSort
+  [matSortDisableClear]="true"
+  (onReload)="loadTable()"
+>
+  <div *stepAdditionalHeader class="repository-selection">
+    <mat-checkbox
+      color="primary"
+      [checked]="!!(isSomeItemsSelected$ | async)"
+      [indeterminate]="!!(isIntermediateSelected$ | async)"
+      (click)="handleCheckboxChange($event)"
+    >
+    </mat-checkbox>
+    <step-bulk-selection-label [selectionCollector]="selectionCollector"> </step-bulk-selection-label>
+  </div>
+
+  <ng-container matColumnDef="bulkSelection">
+    <th mat-header-cell *matHeaderCellDef class="bulk-selection-cell"></th>
+    <td mat-cell *matCellDef="let element">
+      <step-entity-selection-di [entity]="element"></step-entity-selection-di>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="testplanName" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+    <td mat-cell *matCellDef="let element">{{ element.testplanName }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="status" stepSearchCol #searchStatus="SearchCol">
+    <step-array-filter
+      *stepSearchCellDef
+      [items]="(statusItems$ | async)!"
+      (selectedItemsChange)="searchStatus.search($event, true)"
+    >
+    </step-array-filter>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+    <td mat-cell *matCellDef="let element">
+      <step-status [status]="element?.status"></step-status>
+    </td>
+  </ng-container>
+</step-table>

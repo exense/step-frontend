@@ -30,7 +30,7 @@ var tecAdminControllers = angular.module('tecAdminControllers', [
   'viz-dashboard-manager',
 ]);
 
-tecAdminControllers.run(function (ViewRegistry, EntityRegistry, AuthService) {
+tecAdminControllers.run(function (ViewRegistry) {
   ViewRegistry.registerDashletAdvanced(
     'executionTab',
     'Execution steps',
@@ -776,10 +776,6 @@ tecAdminControllers.directive('executionViz', [
   'stateStorage',
   '$uibModal',
   '$timeout',
-  'AuthService',
-  'schedulerServices',
-  'executionServices',
-  'ngCopy',
   function (
     $rootScope,
     $http,
@@ -788,10 +784,6 @@ tecAdminControllers.directive('executionViz', [
     $stateStorage,
     $uibModal,
     $timeout,
-    AuthService,
-    schedulerServices,
-    executionServices,
-    ngCopy
   ) {
     return {
       restrict: 'E',

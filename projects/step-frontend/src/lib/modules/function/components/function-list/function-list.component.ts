@@ -13,7 +13,6 @@ import {
   InteractivePlanExecutionService,
   selectionCollectionProvider,
 } from '@exense/step-core';
-import { noop } from 'rxjs';
 import { ILocationService, IRootScopeService } from 'angular';
 import { FunctionDialogsService } from '../../services/function-dialogs.service';
 import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
@@ -56,7 +55,7 @@ export class FunctionListComponent {
   }
 
   editFunction(id: string): void {
-    this._functionDialogs.openFunctionEditor(id);
+    this._functionDialogs.openFunctionEditor(id).subscribe();
   }
 
   executeFunction(id: string): void {
@@ -94,7 +93,7 @@ export class FunctionListComponent {
   }
 
   lookUp(id: string, name: string): void {
-    this._functionDialogs.openLookUpFunctionDialog(id, name).subscribe(noop);
+    this._functionDialogs.openLookUpFunctionDialog(id, name);
   }
 
   configureFunction(id: string): void {

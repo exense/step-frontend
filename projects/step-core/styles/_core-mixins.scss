@@ -38,3 +38,8 @@
   @include status-left-side;
   @include status-right-side;
 }
+
+@mixin full-height-block {
+  display: block;
+  height: 100%;
+}

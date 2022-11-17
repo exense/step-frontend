@@ -12,8 +12,7 @@ import { catchError, map, of, switchMap, tap, Observable } from 'rxjs';
 import { ILocationService } from 'angular';
 import { ExportDialogsService } from '../../_common/services/export-dialogs.service';
 import { ImportDialogsService } from '../../_common/services/import-dialogs.service';
-import { IsUsedByDialogsService } from '../../_common/services/is-used-by-dialogs.service';
-import { IsUsedByType } from '../../_common/shared/is-used-by-type.enum';
+import { IsUsedByDialogService } from '../../_common/services/is-used-by-dialog.service';
 
 @Injectable({
   providedIn: 'root',
@@ -26,9 +25,9 @@ export class FunctionDialogsService {
     private _dialogs: DialogsService,
     private _exportDialogs: ExportDialogsService,
     private _importDialogs: ImportDialogsService,
-    private _isUsedByDialogs: IsUsedByDialogsService,
     private _httpClient: HttpClient,
     private _uibModalHelper: UibModalHelperService,
+    private _isUsedByDialog: IsUsedByDialogService,
     @Inject(AJS_FUNCTION_DIALOGS_CONFIG) public _functionDialogsConfig: any,
     @Inject(AJS_LOCATION) private _location: ILocationService
   ) {}
@@ -68,8 +67,8 @@ export class FunctionDialogsService {
     );
   }
 
-  openLookUpFunctionDialog(id: string, name: string): Observable<any> {
-    return this._isUsedByDialogs.displayDialog(`Keyword "${name}" is used by`, IsUsedByType.KEYWORD_ID, id);
+  openLookUpFunctionDialog(id: string, name: string): void {
+    this._isUsedByDialog.displayDialog(`Keyword "${name}" is used by`, 'KEYWORD_ID', id);
   }
 
   openExportFunctionDialog(id: string, name: string): Observable<any> {
@@ -84,7 +83,7 @@ export class FunctionDialogsService {
     return this._importDialogs.displayImportDialog('Keyword import', 'functions');
   }
 
-  openFunctionEditor(id: string, dialogConfig?: any) {
+  openFunctionEditor(id: string, dialogConfig?: any): Observable<any> {
     dialogConfig = dialogConfig ? dialogConfig : this.defaultDialogConfig;
     const httpOptions: Object = {
       headers: new HttpHeaders({
@@ -92,16 +91,18 @@ export class FunctionDialogsService {
       }),
       responseType: 'text',
     };
-    return this._httpClient
-      .get<string>(`rest/${dialogConfig.serviceRoot}/${id}/editor`, httpOptions)
-      .subscribe((path) => {
+    return this._httpClient.get<string>(`rest/${dialogConfig.serviceRoot}/${id}/editor`, httpOptions).pipe(
+      map((path) => {
         console.log('path', path);
         if (path) {
           this._location.path(path);
+          return true;
         } else {
           this._dialogs.showErrorMsg('No editor configured for this function type');
+          return undefined;
         }
-      });
+      })
+    );
   }
 
   selectFunction(): Observable<any> {

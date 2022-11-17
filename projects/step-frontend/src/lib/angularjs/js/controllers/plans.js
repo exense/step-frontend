@@ -66,49 +66,19 @@ angular
     });
   }])
 
-  .factory('PlanDialogs', function ($uibModal, $http, Dialogs) {
-    var dialogs = {};
-
-    dialogs.createPlan = function (callback) {
-      var modalInstance = $uibModal.open({
-        backdrop: 'static',
-        templateUrl: 'partials/plans/createPlanDialog.html',
-        controller: 'createPlanCtrl',
-        resolve: {},
-      });
-
-      modalInstance.result.then(function (plan) {
-        if (callback) {
-          callback(plan);
-        }
-      });
-    };
-
-    dialogs.selectPlan = function (callback) {
-      Dialogs.selectEntityOfType('plans', true).then(function (result) {
-        var id = result.item;
-        $http.get('rest/plans/' + id).then(function (response) {
-          var plan = response.data;
-          if (callback) {
-            callback(plan);
-          }
-        });
-      });
-    };
-
-    return dialogs;
-  })
-
   .controller(
-    'createPlanCtrl',
-    function ($scope, $uibModalInstance, $location, $http, AuthService, ScreenTemplates, PlanTypeRegistry) {
+    'createPlanCtrl', [
+      '$scope', '$uibModalInstance', '$location', '$http', 'AuthService', 'planTypeRegistryService',
+    function ($scope, $uibModalInstance, $location, $http, AuthService, planTypeRegistryService) {
       $scope.AuthService = AuthService;
 
       $scope.template = 'TestCase';
       $scope.plan = { attributes: {} };
 
-      $scope.planTypes = PlanTypeRegistry.getPlanTypes();
-      $scope.planType = PlanTypeRegistry.getPlanType('step.core.plans.Plan');
+      $scope.planTypes = planTypeRegistryService.getItemInfos();
+      $scope.planType = $scope.planTypes.find(function (planType){
+        return planType.type === 'step.core.plans.Plan';
+      });
 
       $http.get('rest/plans/artefact/templates').then(function (response) {
         $scope.artefactTypes = response.data;
@@ -134,7 +104,7 @@ angular
         $uibModalInstance.dismiss('cancel');
       };
     }
-  )
+  ])
 
   .directive('planLink', function () {
     return {
