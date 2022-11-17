@@ -76,6 +76,34 @@ angular
     };
   })
 
+    .factory('schedulerServices', function ($http, $location, $uibModal) {
+    var factory = {};
+
+    factory.schedule = function (executionParams) {
+      var modalInstance = $uibModal.open({
+        backdrop: 'static',
+        templateUrl: 'partials/scheduler/newSchedulerTaskDialog.html',
+        controller: 'newTaskModalCtrl',
+        resolve: {
+          executionParams: function () {
+            return executionParams;
+          },
+        },
+      });
+
+      modalInstance.result.then(
+        function (taskParams) {
+          $http.post('rest/scheduler/task', taskParams).then(function () {
+            $location.path('/root/scheduler/');
+          });
+        },
+        function () {}
+      );
+    };
+
+    return factory;
+  })
+
   .controller('SchedulerConfigurationCtrl', function ($scope, $http, AuthService) {
     $scope.authService = AuthService;
     $scope.model = {};
