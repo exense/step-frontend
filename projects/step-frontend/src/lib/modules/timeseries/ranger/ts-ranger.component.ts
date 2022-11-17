@@ -208,12 +208,6 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       this.uplot.setSelect(lftWid, false);
     };
 
-    let zoom = (newLft: number, newWid: number) => {
-      // minMax.min = this.uplot.posToVal(newLft, 'x');
-      // minMax.max = this.uplot.posToVal(newLft + newWid, 'x');
-      // uZoomed.setScale('x', minMax);
-    };
-
     let update = (newLft: number, newWid: number) => {
       let newRgt = newLft + newWid;
       let maxRgt = this.uplot.bbox.width / devicePixelRatio;
@@ -223,9 +217,13 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
         // zoom(newLft, newWid);
       }
     };
+    let isFullSelection = false;
     let select;
-    if (this.settings.selection) {
+    if (this.settings.selection && this.uplot) {
+      // it is an update of selection
       select = this.transformRangeToSelect(this.settings.selection);
+    } else {
+      isFullSelection = true;
     }
     let rangerOpts: uPlot.Options = {
       ...this.getSize(),
@@ -299,7 +297,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
             let left = 0;
             let width = Math.round(uRanger.valToPos(this.end, 'x')) - left;
             let height = uRanger.bbox.height / devicePixelRatio;
-            if (!this.settings.selection) {
+            if (isFullSelection) {
               // we deal with full selection
               uRanger.setSelect({ left, width, height, top: 0 }, false);
             }

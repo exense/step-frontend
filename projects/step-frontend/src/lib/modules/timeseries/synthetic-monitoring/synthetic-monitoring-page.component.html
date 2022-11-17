@@ -2,7 +2,7 @@
   <step-time-range-picker
     #rangePicker
     [customRelativeOptions]="timeRangeOptions"
-    [initialSelectionIndex]="0"
+    [initialSelectionIndex]="2"
     [includeFullRangeOption]="false"
     (onSelectionChange)="onTimeRangeChange($event)"
   >
@@ -12,7 +12,8 @@
 
   <step-performance-view
     *ngIf="performanceViewSettings"
-    (onInitializationComplete)="dashboardInitComplete$.next(true)"
+    (onInitializationComplete)="onDashboardInit()"
+    (onZoomChange)="onZoomChange($event)"
     [settings]="performanceViewSettings"
     [includeThreadGroupChart]="false"
     [includeTimeRangePicker]="false"

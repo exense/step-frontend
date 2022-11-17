@@ -150,10 +150,13 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
           this.performanceViewSettings!.endTime = details.endTime;
           this.intervalShouldBeCanceled = true;
           this.executionInProgress = false;
-          this.performanceView.updateAllCharts().subscribe(() => {}); // don't re-trigger refresh
+          this.performanceView.refreshAllCharts(false, true).subscribe(() => {}); // don't re-trigger refresh
         } else {
           if (this.selectedRefreshInterval.value) {
-            this.triggerNextUpdate(this.selectedRefreshInterval.value, this.performanceView.updateAllCharts()); // recursive call
+            this.triggerNextUpdate(
+              this.selectedRefreshInterval.value,
+              this.performanceView.refreshAllCharts(false, true)
+            ); // recursive call
           }
         }
       });

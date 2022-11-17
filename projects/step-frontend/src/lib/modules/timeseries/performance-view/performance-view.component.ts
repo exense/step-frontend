@@ -23,10 +23,10 @@ import { ChartGenerators } from './chart-generators/chart-generators';
 import { TsChartType } from './model/ts-chart-type';
 import { ExecutionFiltersComponent } from './filters/execution-filters.component';
 import { PerformanceViewTimeSelectionComponent } from './time-selection/performance-view-time-selection.component';
-import { ThroughputMetric } from './model/throughput-metric';
-import { PerformanceViewConfig } from './performance-view.config';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { TSTimeRange } from '../chart/model/ts-time-range';
+import { ThroughputMetric } from './model/throughput-metric';
+import { PerformanceViewConfig } from './performance-view.config';
 
 declare const uPlot: any;
 
@@ -64,6 +64,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   @Output() onInitializationComplete: EventEmitter<void> = new EventEmitter<void>();
   @Output() onUpdateComplete: EventEmitter<void> = new EventEmitter<void>();
+  @Output() onZoomChange: EventEmitter<ExecutionTimeSelection> = new EventEmitter<ExecutionTimeSelection>();
 
   private tableInitialized$ = new Subject<void>();
   private rangerLoaded$ = new Subject<void>();
@@ -165,7 +166,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .onFiltersChange()
       .pipe(
         tap(() => (this.chartsAreLoading = true)),
-        switchMap(() => this.updateAllCharts(true)),
+        switchMap(() => this.refreshAllCharts(true)),
         tap(() => (this.chartsAreLoading = false)),
         takeUntil(this.terminator$)
       )
@@ -178,7 +179,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           this.mergeRequestWithActiveFilters(this.findRequest);
         }),
         tap(() => (this.chartsAreLoading = true)),
-        switchMap(() => this.updateAllCharts(true)),
+        switchMap(() => this.refreshAllCharts(true)),
         tap(() => (this.chartsAreLoading = false)),
         takeUntil(this.terminator$)
       )
@@ -188,6 +189,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   handleZoomChange(range: ExecutionTimeSelection): Observable<any> {
+    this.onZoomChange.next(range);
     this.getAllCharts().forEach((chart) => {
       chart?.setBlur(true);
     });
@@ -196,8 +198,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       start: range.absoluteSelection!.from!,
       end: range.absoluteSelection!.to!,
     };
-    // return this.updateAllCharts();
-    return this.updateAllCharts(true);
+    console.log(range);
+    return this.refreshAllCharts(true, false);
   }
 
   deleteObjectProperties(object: any, keys: string[]) {
@@ -254,6 +256,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   calculateTimeIntervalForCurrentSelection(settings: PerformanceViewSettings): { start: number; end: number } {
     let start = settings.startTime;
     let end = settings.endTime;
+    console.log(start, end);
     let activeTimeSelection = this.executionContext.timeSelectionState.activeTimeSelection;
     switch (activeTimeSelection.type) {
       case RangeSelectionType.FULL:
@@ -264,19 +267,17 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
         end = activeTimeSelection.absoluteSelection!.to || settings.endTime;
         break;
       case RangeSelectionType.RELATIVE:
-        let now = new Date().getTime();
-        end = now;
-        start = now - activeTimeSelection.relativeSelection!.timeInMs;
+        start = end - activeTimeSelection.relativeSelection!.timeInMs;
         break;
     }
     return { start: start, end: end };
   }
 
   /**
-   * This method is called while refreshing.
+   * This method is called while live refreshing.
    * force = true -> The charts ar forced to refresh, even if the time interval was the same (because of filters/grouping change).
    */
-  updateAllCharts(force = false): Observable<unknown> {
+  refreshAllCharts(force = false, updateRanger = true): Observable<unknown> {
     let previousTimeRange: TSTimeRange = { from: this.findRequest.start, to: this.findRequest.end };
     this.findRequest = this.prepareFindRequest(this.settings); // we don't want to lose active filters
     this.mergeRequestWithActiveFilters(this.findRequest);
@@ -290,7 +291,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       previousTimeRange.to === timeRange.end
     );
 
-    const charts$ = [this.timeSelectionComponent.refreshRanger()];
+    const charts$ = updateRanger ? [this.timeSelectionComponent.refreshRanger()] : [];
 
     if (force || timeSelectionDidChange) {
       charts$.push(

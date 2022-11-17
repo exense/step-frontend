@@ -9,6 +9,7 @@ import { TSTimeRange } from '../chart/model/ts-time-range';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
 import { forkJoin, Observable, Subject, Subscription, switchMap, tap, timer } from 'rxjs';
+import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
 
 @Component({
   selector: 'step-synthetic-monitoring',
@@ -24,9 +25,10 @@ export class SyntheticMonitoringPageComponent implements OnInit {
   @Input() taskId: string = window.location.href.split('?')[0].substring(window.location.href.lastIndexOf('/') + 1);
 
   performanceViewSettings: PerformanceViewSettings | undefined;
-  readonly dashboardInitComplete$ = new Subject<boolean>();
+  readonly dashboardInitComplete$ = new Subject<void>();
 
   timeRangeOptions: RelativeTimeSelection[] = [
+    { label: 'Last 15 Minutes', timeInMs: this.ONE_HOUR_MS / 4 },
     { label: 'Last Hour', timeInMs: this.ONE_HOUR_MS },
     { label: 'Last Day', timeInMs: this.ONE_HOUR_MS * 24 },
     { label: 'Last Week', timeInMs: this.ONE_HOUR_MS * 24 * 7 },
@@ -34,9 +36,13 @@ export class SyntheticMonitoringPageComponent implements OnInit {
   ];
 
   refreshSubscription: Subscription | undefined;
-  refreshShouldStop = false;
 
   constructor(private changeDetector: ChangeDetectorRef, private dashboardService: DashboardService) {}
+
+  onDashboardInit() {
+    this.dashboardInitComplete$.next();
+    this.dashboardInitComplete$.complete();
+  }
 
   calculateRange(selection: RelativeTimeSelection): TSTimeRange {
     let now = new Date().getTime();
@@ -48,7 +54,7 @@ export class SyntheticMonitoringPageComponent implements OnInit {
     if (!this.taskId) {
       throw new Error('ExecutionId parameter is not present');
     }
-    let range = this.calculateRange(this.timeRangeOptions[0]);
+    let range = this.calculateRange(this.timeRangeOptions[2]);
     this.performanceViewSettings = this.createViewSettings(range);
     this.triggerNextUpdate(this.REFRESH_TIME_MS, this.dashboardInitComplete$);
   }
@@ -60,6 +66,11 @@ export class SyntheticMonitoringPageComponent implements OnInit {
       startTime: timeRange.from!,
       endTime: timeRange.to!,
     };
+  }
+
+  onZoomChange(selection: ExecutionTimeSelection) {
+    this.refreshSubscription?.unsubscribe();
+    this.rangePicker.setSelection(selection);
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
@@ -97,7 +108,7 @@ export class SyntheticMonitoringPageComponent implements OnInit {
       let newInterval = { from: now - activeSelection.relativeSelection!.timeInMs, to: now };
       this.performanceViewSettings!.startTime = newInterval.from;
       this.performanceViewSettings!.endTime = newInterval.to;
-      let refresh$ = this.performanceView.updateAllCharts(true);
+      let refresh$ = this.performanceView.refreshAllCharts(true, false);
       this.triggerNextUpdate(this.REFRESH_TIME_MS, refresh$);
     });
   }
@@ -106,6 +117,7 @@ export class SyntheticMonitoringPageComponent implements OnInit {
     window.open(this.dashboardService.getRtmDashboardLink(this.taskId));
   }
 }
+
 getAngularJSGlobal()
   .module(AJS_MODULE)
   .directive('stepSyntheticMonitoring', downgradeComponent({ component: SyntheticMonitoringPageComponent }));

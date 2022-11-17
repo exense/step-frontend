@@ -1,7 +1,7 @@
 <div class="chart-wrapper" [style.padding]="WRAPPER_PADDING">
   <div #chart></div>
   <div class="no-data-tag" *ngIf="emptyChart">No data...</div>
-  <div class="ts-chart-legend" style="width: 300px">
+  <div class="ts-chart-legend">
     <div class="left-section">
       <div class="item" *ngFor="let item of legendSettings.items">
         <div class="color-square" [style.background]="item.color"></div>
