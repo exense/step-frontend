@@ -9,8 +9,7 @@ import {
 import { Observable, catchError, map, noop, of, switchMap, tap } from 'rxjs';
 import { ExportDialogsService } from '../../_common/services/export-dialogs.service';
 import { ImportDialogsService } from '../../_common/services/import-dialogs.service';
-import { IsUsedByDialogsService } from '../../_common/services/is-used-by-dialogs.service';
-import { IsUsedByType } from '../../_common/shared/is-used-by-type.enum';
+import { IsUsedByDialogService } from '../../_common/services/is-used-by-dialog.service';
 
 @Injectable({
   providedIn: 'root',
@@ -22,7 +21,7 @@ export class PlanDialogsService {
     private _dialogs: DialogsService,
     private _exportDialogs: ExportDialogsService,
     private _importDialogs: ImportDialogsService,
-    private _isUsedByDialogs: IsUsedByDialogsService
+    private _isUsedByDialogs: IsUsedByDialogService
   ) {}
 
   createPlan(): Observable<any> {
@@ -77,7 +76,7 @@ export class PlanDialogsService {
     return this._exportDialogs.displayExportDialog('Plans export', `plans/${id}`, `${name}.sta`);
   }
 
-  lookUp(id: string, name: string): Observable<any> {
-    return this._isUsedByDialogs.displayDialog(`Plan "${name}" is used by`, IsUsedByType.PLAN_ID, id);
+  lookUp(id: string, name: string): void {
+    this._isUsedByDialogs.displayDialog(`Plan "${name}" is used by`, 'PLAN_ID', id);
   }
 }

@@ -13,8 +13,7 @@ import { AsyncOperationCloseStatus } from '../../../async-operations/async-opera
   styleUrls: ['./bulk-operations.component.scss'],
 })
 export class BulkOperationsComponent<KEY, ENTITY> {
-  selectionType: BulkSelectionType = BulkSelectionType.None;
-
+  @Input() selectionType: BulkSelectionType = BulkSelectionType.None;
   @Input() availableOperations: BulkOperation[] = [];
 
   readonly isOperationsDisabled$ = (this._selectionCollector?.selected$ || of([])).pipe(

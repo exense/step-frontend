@@ -1,0 +1,5 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
+:host {
+  @include core.full-height-block;
+}

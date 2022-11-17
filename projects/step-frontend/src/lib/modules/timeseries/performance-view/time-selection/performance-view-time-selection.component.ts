@@ -12,7 +12,7 @@ import { TimeRangePickerSelection } from '../../time-selection/time-range-picker
 import { TimeSeriesConfig } from '../../time-series.config';
 import { TSRangerSettings } from '../../ranger/ts-ranger-settings';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
-import { PerformanceViewSettings } from '../performance-view-settings';
+import { PerformanceViewSettings } from '../model/performance-view-settings';
 import { Observable, Subject, Subscription, takeUntil, tap } from 'rxjs';
 import { TimeSeriesChartResponse } from '../../time-series-chart-response';
 import { TimeSelectionState } from '../../time-selection.state';
@@ -123,7 +123,9 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   handleTimePickerSelectionChange(timeSelection: TimeRangePickerSelection) {
     let selectionToEmit: ExecutionTimeSelection = { type: timeSelection.type };
     if (timeSelection.type === RangeSelectionType.FULL) {
-      this.timeSelectionState.resetZoom();
+      let range = { from: this.settings.startTime, to: this.settings.endTime };
+      selectionToEmit.absoluteSelection = range;
+      this.timeSelectionState.resetZoom(range);
       return;
     } else if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
       let endTime = this.settings.endTime || new Date().getTime();
@@ -139,7 +141,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   onRangerSelectionChange(event: TSTimeRange) {
     // check for full range selection
     if (this.timeLabels[0] === event.from && this.timeLabels[this.timeLabels.length - 1] === event.to) {
-      this.timeSelectionState.resetZoom();
+      this.timeSelectionState.resetZoom(event);
     } else {
       this.timeSelectionState.setActiveSelection({ type: RangeSelectionType.ABSOLUTE, absoluteSelection: event });
     }
@@ -147,7 +149,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   }
 
   onRangerZoomReset(event: TSTimeRange) {
-    this.timeSelectionState.resetZoom();
+    this.timeSelectionState.resetZoom(event);
   }
 
   ngOnDestroy(): void {

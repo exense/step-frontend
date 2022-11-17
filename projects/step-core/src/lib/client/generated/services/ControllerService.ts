@@ -32,6 +32,17 @@ export class ControllerService {
   }
 
   /**
+   * @returns string default response
+   * @throws ApiError
+   */
+  public getLibVersions(): Observable<Record<string, string>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/controller/lib/versions',
+    });
+  }
+
+  /**
    * @param requestBody
    * @returns TestSetStatusOverview default response
    * @throws ApiError

@@ -34,7 +34,8 @@
     "tslib": "2.3.0",
     "zone.js": "0.11.4",
     "@exense/visualization": "0.6.9",
-    "@types/luxon": "2.3.2"
+    "@types/luxon": "2.3.2",
+    "angular-split": "13.1.0"
   },
   "dependencies": {
     "tslib": "2.3.0"
