@@ -27,7 +27,7 @@ export class PerformanceViewConfig {
     },
     {
       label: ThroughputMetricType.TPS,
-      mapFunction: (b: Bucket) => (b ? b.throughputPerHour / 60 / 60 : 0),
+      mapFunction: (b: Bucket) => (b ? b.throughputPerHour / (60 * 60) : 0),
       labelFunction: (value: number) => `${TimeSeriesUtils.formatAxisValue(value)}/s`,
       tooltipZAxisLabel: 'Total Hits/s',
     },
