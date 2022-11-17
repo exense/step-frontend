@@ -66,39 +66,6 @@ angular
     });
   }])
 
-  .factory('PlanDialogs', function ($uibModal, $http, Dialogs) {
-    var dialogs = {};
-
-    dialogs.createPlan = function (callback) {
-      var modalInstance = $uibModal.open({
-        backdrop: 'static',
-        templateUrl: 'partials/plans/createPlanDialog.html',
-        controller: 'createPlanCtrl',
-        resolve: {},
-      });
-
-      modalInstance.result.then(function (plan) {
-        if (callback) {
-          callback(plan);
-        }
-      });
-    };
-
-    dialogs.selectPlan = function (callback) {
-      Dialogs.selectEntityOfType('plans', true).then(function (result) {
-        var id = result.item;
-        $http.get('rest/plans/' + id).then(function (response) {
-          var plan = response.data;
-          if (callback) {
-            callback(plan);
-          }
-        });
-      });
-    };
-
-    return dialogs;
-  })
-
   .controller(
     'createPlanCtrl', [
       '$scope', '$uibModalInstance', '$location', '$http', 'AuthService', 'planTypeRegistryService',

@@ -1,6 +1,7 @@
 import { Observable, Subject } from 'rxjs';
 import { ExecutionTimeSelection } from './time-selection/model/execution-time-selection';
 import { RangeSelectionType } from './time-selection/model/range-selection-type';
+import { TSTimeRange } from './chart/model/ts-time-range';
 
 export class TimeSelectionState {
   private readonly zoomReset$ = new Subject<void>();
@@ -8,8 +9,9 @@ export class TimeSelectionState {
 
   activeTimeSelection: ExecutionTimeSelection = { type: RangeSelectionType.FULL };
 
-  resetZoom() {
-    this.activeTimeSelection = { type: RangeSelectionType.FULL };
+  resetZoom(range: TSTimeRange) {
+    this.activeTimeSelection = { type: RangeSelectionType.FULL, absoluteSelection: range };
+    this.activeSelectionChange$.next(this.activeTimeSelection);
     this.zoomReset$.next();
   }
 

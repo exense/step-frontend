@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AJS_MODULE, AsyncTasksService, DashboardService, ExecutionsService, pollAsyncTask } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { PerformanceViewSettings } from '../performance-view/performance-view-settings';
+import { PerformanceViewSettings } from '../performance-view/model/performance-view-settings';
 import { TimeSeriesService } from '../time-series.service';
 import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
