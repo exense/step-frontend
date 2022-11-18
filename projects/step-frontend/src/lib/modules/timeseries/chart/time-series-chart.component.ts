@@ -101,10 +101,9 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       bind: {
         dblclick: (self: uPlot, target: HTMLElement, handler: MouseListener) => {
           return (e: any) => {
-            if (UPlotUtils.isZoomed(this.uplot)) {
-              this.onZoomReset.emit(true);
-              handler(e);
-            }
+            console.log('DBL CLICK');
+            this.onZoomReset.emit(true);
+            handler(e);
             return null;
           };
         },
@@ -168,20 +167,21 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         ...settings.series,
       ],
       hooks: {
-        init: [
-          (u: any) => {
-            u.root.addEventListener('click', (e: any) => {
-              let hoveredSeriesIdx = u.cursor.idxs.findIndex((v: number) => v != null);
-
-              if (hoveredSeriesIdx != -1) {
-                let hoveredDataIdx = u.cursor.idxs[hoveredSeriesIdx];
-                let seriesOpts = u.series[hoveredSeriesIdx];
-                let facetsData = u.data[hoveredSeriesIdx];
-              }
-            });
-          },
-        ],
-        setSelect: [(uplot) => {}],
+        // init: [
+        //   (u: any) => {
+        // u.root.addEventListener('click', (e: any) => {
+        // let hoveredSeriesIdx = u.cursor.idxs.findIndex((v: number) => v != null);
+        //
+        // if (hoveredSeriesIdx != -1) {
+        //   let hoveredDataIdx = u.cursor.idxs[hoveredSeriesIdx];
+        //   let seriesOpts = u.series[hoveredSeriesIdx];
+        //   let facetsData = u.data[hoveredSeriesIdx];
+        // }
+        // });
+        //   },
+        // ],
+        // setSelect: [(uplot) => {
+        // }],
         // setScale: [ (x: any) => console.log(this.isZoomed())]
       },
     };

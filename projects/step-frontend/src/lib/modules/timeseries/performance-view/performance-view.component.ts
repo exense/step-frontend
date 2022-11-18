@@ -10,7 +10,7 @@ import { TSRangerComponent } from '../ranger/ts-ranger.component';
 import { UPlotUtils } from '../uplot/uPlot.utils';
 import { TimeSeriesConfig } from '../time-series.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
-import { first, forkJoin, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { first, forkJoin, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { TimeSeriesContext } from '../execution-page/time-series-context';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
@@ -189,6 +189,14 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   handleZoomChange(range: ExecutionTimeSelection): Observable<any> {
+    console.log('Old zoom: ', this.findRequest);
+    console.log('New zoom: ', range.absoluteSelection);
+    if (
+      this.findRequest.start === range.absoluteSelection?.from &&
+      this.findRequest.end === range.absoluteSelection?.to
+    ) {
+      return of(undefined);
+    }
     this.onZoomChange.next(range);
     this.getAllCharts().forEach((chart) => {
       chart?.setBlur(true);
@@ -198,7 +206,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       start: range.absoluteSelection!.from!,
       end: range.absoluteSelection!.to!,
     };
-    console.log(range);
     return this.refreshAllCharts(true, false);
   }
 
@@ -256,7 +263,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   calculateTimeIntervalForCurrentSelection(settings: PerformanceViewSettings): { start: number; end: number } {
     let start = settings.startTime;
     let end = settings.endTime;
-    console.log(start, end);
     let activeTimeSelection = this.executionContext.timeSelectionState.activeTimeSelection;
     switch (activeTimeSelection.type) {
       case RangeSelectionType.FULL:
@@ -278,33 +284,24 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
    * force = true -> The charts ar forced to refresh, even if the time interval was the same (because of filters/grouping change).
    */
   refreshAllCharts(force = false, updateRanger = true): Observable<unknown> {
-    let previousTimeRange: TSTimeRange = { from: this.findRequest.start, to: this.findRequest.end };
     this.findRequest = this.prepareFindRequest(this.settings); // we don't want to lose active filters
     this.mergeRequestWithActiveFilters(this.findRequest);
-    let timeRange = this.calculateTimeIntervalForCurrentSelection(this.settings);
-    this.findRequest.start = timeRange.start;
-    this.findRequest.end = timeRange.end;
-
-    let timeSelectionDidChange = !(
-      previousTimeRange &&
-      previousTimeRange.from === timeRange.start &&
-      previousTimeRange.to === timeRange.end
-    );
+    let fullTimeRange = this.calculateTimeIntervalForCurrentSelection(this.settings);
+    this.findRequest.start = fullTimeRange.start;
+    this.findRequest.end = fullTimeRange.end;
 
     const charts$ = updateRanger ? [this.timeSelectionComponent.refreshRanger()] : [];
 
-    if (force || timeSelectionDidChange) {
-      charts$.push(
-        ...[
-          this.createSummaryChart(this.findRequest),
-          this.createByStatusChart(this.findRequest),
-          this.createByKeywordsCharts(this.findRequest),
-          this.updateTable(this.findRequest),
-        ]
-      );
-      if (this.includeThreadGroupChart) {
-        charts$.push(this.createThreadGroupsChart(this.findRequest));
-      }
+    charts$.push(
+      ...[
+        this.createSummaryChart(this.findRequest),
+        this.createByStatusChart(this.findRequest),
+        this.createByKeywordsCharts(this.findRequest),
+        this.updateTable(this.findRequest),
+      ]
+    );
+    if (this.includeThreadGroupChart) {
+      charts$.push(this.createThreadGroupsChart(this.findRequest));
     }
 
     return forkJoin(charts$);
@@ -320,7 +317,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   onChartsZoomReset() {
-    this.executionContext.timeSelectionState.resetZoom({ from: this.settings.startTime, to: this.settings.endTime });
+    this.timeSelectionComponent.resetZoom();
   }
 
   createThreadGroupsChart(request: FindBucketsRequest, isUpdate = false): Observable<TimeSeriesChartResponse> {

@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AJS_MODULE, DashboardService } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PerformanceViewSettings } from '../performance-view/model/performance-view-settings';
@@ -8,7 +8,7 @@ import { TimeRangePicker } from '../time-selection/time-range-picker.component';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
-import { forkJoin, Observable, Subject, Subscription, switchMap, tap, timer } from 'rxjs';
+import { forkJoin, Observable, Subject, Subscription, timer } from 'rxjs';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
 
 @Component({
@@ -69,8 +69,13 @@ export class SyntheticMonitoringPageComponent implements OnInit {
   }
 
   onZoomChange(selection: ExecutionTimeSelection) {
+    if (selection.type === RangeSelectionType.FULL) {
+      // synthetic monitoring does not support full type
+      selection.type = RangeSelectionType.ABSOLUTE;
+    }
     this.refreshSubscription?.unsubscribe();
     this.rangePicker.setSelection(selection);
+    console.log(selection);
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {

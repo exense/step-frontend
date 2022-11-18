@@ -13,7 +13,7 @@ import { TimeSeriesConfig } from '../../time-series.config';
 import { TSRangerSettings } from '../../ranger/ts-ranger-settings';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
 import { PerformanceViewSettings } from '../model/performance-view-settings';
-import { Observable, Subject, Subscription, takeUntil, tap } from 'rxjs';
+import { Observable, Subject, takeUntil, tap } from 'rxjs';
 import { TimeSeriesChartResponse } from '../../time-series-chart-response';
 import { TimeSelectionState } from '../../time-selection.state';
 
@@ -123,7 +123,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   handleTimePickerSelectionChange(timeSelection: TimeRangePickerSelection) {
     let selectionToEmit: ExecutionTimeSelection = { type: timeSelection.type };
     if (timeSelection.type === RangeSelectionType.FULL) {
-      let range = { from: this.settings.startTime, to: this.settings.endTime };
+      let range = { from: this.rangerSettings!.xValues[0], to: this.rangerSettings!.xValues.slice(-1)[0] };
       selectionToEmit.absoluteSelection = range;
       this.timeSelectionState.resetZoom(range);
       return;
@@ -150,6 +150,13 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   onRangerZoomReset(event: TSTimeRange) {
     this.timeSelectionState.resetZoom(event);
+  }
+
+  resetZoom() {
+    let selectionToEmit: ExecutionTimeSelection = { type: RangeSelectionType.FULL };
+    let range = { from: this.rangerSettings!.xValues[0], to: this.rangerSettings!.xValues.slice(-1)[0] };
+    selectionToEmit.absoluteSelection = range;
+    this.timeSelectionState.resetZoom(range);
   }
 
   ngOnDestroy(): void {

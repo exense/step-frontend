@@ -10,8 +10,17 @@ export class TimeSelectionState {
   activeTimeSelection: ExecutionTimeSelection = { type: RangeSelectionType.FULL };
 
   resetZoom(range: TSTimeRange) {
+    if (
+      this.activeTimeSelection.type === RangeSelectionType.FULL &&
+      this.activeTimeSelection.absoluteSelection?.from === range.from &&
+      this.activeTimeSelection.absoluteSelection?.to === range.to
+    ) {
+      // nothing changed
+      return;
+    }
     this.activeTimeSelection = { type: RangeSelectionType.FULL, absoluteSelection: range };
     this.activeSelectionChange$.next(this.activeTimeSelection);
+    console.log('Emiting change event: ', this.activeTimeSelection);
     this.zoomReset$.next();
   }
 
@@ -20,6 +29,9 @@ export class TimeSelectionState {
   }
 
   setActiveSelection(selection: ExecutionTimeSelection) {
+    if (this.activeTimeSelection.absoluteSelection === selection.absoluteSelection) {
+      return;
+    }
     this.activeTimeSelection = selection;
     this.activeSelectionChange$.next(selection);
   }
