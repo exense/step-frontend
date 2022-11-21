@@ -66,6 +66,24 @@ angular
     });
   }])
 
+  .factory('PlanDialogs', function ($uibModal, $http, Dialogs) {
+    var dialogs = {};
+
+    dialogs.selectPlan = function (callback) {
+      Dialogs.selectEntityOfType('plans', true).then(function (result) {
+        var id = result.item;
+        $http.get('rest/plans/' + id).then(function (response) {
+          var plan = response.data;
+          if (callback) {
+            callback(plan);
+          }
+        });
+      });
+    };
+
+    return dialogs;
+  })
+
   .controller(
     'createPlanCtrl', [
       '$scope', '$uibModalInstance', '$location', '$http', 'AuthService', 'planTypeRegistryService',
