@@ -286,6 +286,13 @@ export class ArtefactService {
       form: 'partials/artefacts/export.html',
       description: '',
     });
+    this.register('Failure', {
+      icon: 'glyphicon-thumbs-down',
+      iconNg2: 'thumbs-down',
+      form: '',
+      description: '',
+      isSelectable: false,
+    });
   }
 }
 
