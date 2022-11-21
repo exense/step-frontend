@@ -29,68 +29,6 @@ angular
     );
   })
 
-  .factory('SchedulerTaskDialogs', function ($rootScope, $uibModal, $http, Dialogs) {
-    function openModal(task) {
-      var modalInstance = $uibModal.open({
-        backdrop: 'static',
-        templateUrl: 'partials/scheduler/editSchedulerTaskDialog.html',
-        controller: 'editSchedulerTaskModalCtrl',
-        resolve: {
-          task: function () {
-            return task;
-          },
-        },
-      });
-      return modalInstance.result;
-    }
-
-    var dialogs = {};
-
-    dialogs.editSchedulerTask = function (id, callback) {
-      $http.get('rest/scheduler/task/' + id).then(function (response) {
-        openModal(response.data).then(function () {
-          if (callback) {
-            callback();
-          }
-        });
-      });
-    };
-
-    dialogs.addSchedulerTask = function (callback) {
-      $http.get('rest/scheduler/task/new').then(function (response) {
-        response.data.executionsParameters.userID = $rootScope.context.userID;
-        openModal(response.data).then(function () {
-          if (callback) {
-            callback();
-          }
-        });
-      });
-    };
-    return dialogs;
-  })
-
-  .controller('newTaskModalCtrl', function ($scope, $uibModalInstance, executionParams) {
-    $scope.name = executionParams.description;
-
-    $scope.ok = function () {
-      var taskParams = {
-        name: $scope.name,
-        cronExpression: $scope.cron,
-        executionsParameters: executionParams,
-        attributes: { name: $scope.name },
-      };
-      $uibModalInstance.close(taskParams);
-    };
-
-    $scope.applyPreset = function (preset) {
-      $scope.cron = preset;
-    };
-
-    $scope.cancel = function () {
-      $uibModalInstance.dismiss('cancel');
-    };
-  })
-
   .controller('editSchedulerTaskModalCtrl', function ($scope, $uibModalInstance, $http, $location, task, PlanDialogs) {
     $scope.task = task;
 
@@ -137,7 +75,8 @@ angular
       });
     };
   })
-  .factory('schedulerServices', function ($http, $location, $uibModal) {
+
+    .factory('schedulerServices', function ($http, $location, $uibModal) {
     var factory = {};
 
     factory.schedule = function (executionParams) {
@@ -184,23 +123,5 @@ angular
 
     $scope.save = function () {
       $http.post('rest/settings/scheduler_execution_username', $scope.executionUser);
-    };
-  })
-
-  .directive('schedulerTaskLink', function () {
-    return {
-      restrict: 'E',
-      scope: {
-        schedulerTask: '=',
-      },
-      templateUrl: 'partials/scheduler/schedulerTaskLink.html',
-      controller: function ($scope, AuthService, SchedulerTaskDialogs) {
-        $scope.authService = AuthService;
-        $scope.editSchedulerTask = function () {
-          var elScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
-          var callback = elScope ? elScope.loadTable : null;
-          SchedulerTaskDialogs.editSchedulerTask($scope.schedulerTask.id, callback);
-        };
-      },
     };
   });

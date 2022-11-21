@@ -2,4 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type BucketAttributes = Record<string, any>;
+export type BucketAttributes = Record<string, string>;

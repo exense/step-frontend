@@ -144,20 +144,12 @@ export class ViewRegistryService {
     });
   }
 
-  registerMenuEntryOptional(
-    isEnabledFct: () => boolean,
-    label: string,
-    viewId: string,
-    icon: string,
-    weight?: number,
-    parentMenu?: string,
-    right?: string
-  ): void {
-    this.registeredMenuEntries.push({ label, viewId, parentMenu, icon, weight, right, isEnabledFct });
-  }
-
   getMainMenuKey(subMenuKey: string): string | undefined {
     return this.registeredMenuEntries.find((entry: MenuEntry) => entry.viewId === subMenuKey)?.parentMenu;
+  }
+
+  getMainMenuAll(): MenuEntry[] {
+    return this.registeredMenuEntries.filter((entry: MenuEntry) => !entry.parentMenu);
   }
 
   getDashlets(path: string) {

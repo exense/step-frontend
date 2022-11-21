@@ -38,6 +38,9 @@ export class TreeModule {}
 export * from './components/tree/tree.component';
 export * from './services/tree-state.service';
 export * from './services/tree-actions.service';
+export * from './services/tree-node-utils.service';
+export * from './shared/tree-node';
+export * from './shared/tree-flat-node';
 export * from './shared/abstract-artefact-with-parent-id';
 export * from './shared/artefact-flat-node';
 export * from './shared/tree-action';

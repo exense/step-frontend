@@ -22,6 +22,7 @@ import { TabsModule } from './modules/tabs/tabs.module';
 import { TreeModule } from './modules/tree/tree.module';
 import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
+import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
 
 @NgModule({
@@ -31,6 +32,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     DashboardLinkPipe,
     CapsLockDirective,
     TooltipImmediateCloseDirective,
+    ReportNodeStatusComponent,
     PlanLinkComponent,
     PlanNamePipe,
   ],
@@ -72,6 +74,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     TooltipImmediateCloseDirective,
     TreeModule,
     AngularSplitModule,
+    ReportNodeStatusComponent,
     PlanLinkComponent,
     PlanNamePipe,
   ],
@@ -129,6 +132,7 @@ export { PlanNamePipe } from './pipes/plan-name.pipe';
 export * from './services/additional-right-rule.service';
 export * from './services/context.service';
 export * from './services/dashboard.service';
+export * from './components/report-node-status/report-node-status.component';
 export * from './services/deferred-link-processor.service';
 export * from './services/invoke-run.service';
 export * from './services/link-processor.service';

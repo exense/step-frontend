@@ -1,0 +1,21 @@
+.tab-content {
+  height: 60vh;
+  width: 60vw;
+  overflow: auto;
+
+  .list-item {
+    display: flex;
+    padding-bottom: 8px;
+
+    &:first-child {
+      position: sticky;
+      top: 0;
+      background: white;
+      padding-top: 10px;
+    }
+
+    .flex-1 {
+      flex: 1;
+    }
+  }
+}

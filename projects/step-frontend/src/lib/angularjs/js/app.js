@@ -208,6 +208,16 @@ angular
     };
   })
 
+  .service('pathHelper', ['$timeout', '$location', function ($timeout, $location) {
+    this.fixList = function () {
+      $timeout(function() {
+        if (!$location.path().endsWith('list')) {
+          const newPath = $location.path() + '/list';
+          $location.path(newPath);
+        }
+      }, 100);
+    };
+  }])
   .service('stateStorage', function ($localStorage, $rootScope, $location, $timeout, $cookies, AuthService) {
     $rootScope.$$statepath = [];
 
@@ -462,6 +472,8 @@ angular
   })
 
   .service('authInterceptor', function ($q, $rootScope) {
+    // this interceptor is replaced for ng2+ modules with:
+    // step-frontend/projects/step-frontend/src/lib/modules/_common/interceptors/auth.interceptor.ts
     var service = this;
     service.responseError = function (response) {
       if (response.status == 401) {

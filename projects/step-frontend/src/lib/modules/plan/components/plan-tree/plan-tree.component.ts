@@ -3,6 +3,7 @@ import { AbstractArtefact, CustomComponent, TreeAction, TreeActionsService } fro
 import { map, Observable, of, Subject } from 'rxjs';
 import { PlanHandleService } from '../../services/plan-handle.service';
 import { PlanTreeAction } from '../../shared/plan-tree-action.enum';
+import { ArtefactTreeNode } from '../../shared/artefact-tree-node';
 
 @Component({
   selector: 'step-plan-tree',
@@ -41,8 +42,8 @@ export class PlanTreeComponent implements OnInit, OnDestroy, CustomComponent, Tr
     this.terminator$.complete();
   }
 
-  getActionsForNode(node: AbstractArtefact): Observable<TreeAction[]> {
-    const isSkipped = node?.skipNode?.value;
+  getActionsForNode(node: ArtefactTreeNode): Observable<TreeAction[]> {
+    const isSkipped = node.isSkipped;
 
     return of(this.actions).pipe(
       map((actions) =>
@@ -50,7 +51,7 @@ export class PlanTreeComponent implements OnInit, OnDestroy, CustomComponent, Tr
           .map((action) => {
             let disabled = false;
             if (action.id === PlanTreeAction.open) {
-              disabled = !['CallPlan', 'CallKeyword'].includes(node._class);
+              disabled = !['CallPlan', 'CallKeyword'].includes(node.originalArtefact._class);
             }
             return { ...action, disabled };
           })
@@ -69,7 +70,7 @@ export class PlanTreeComponent implements OnInit, OnDestroy, CustomComponent, Tr
     );
   }
 
-  hasActionsForNode(node: AbstractArtefact): boolean {
+  hasActionsForNode(node: ArtefactTreeNode): boolean {
     return true;
   }
 

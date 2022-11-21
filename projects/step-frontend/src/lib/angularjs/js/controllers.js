@@ -30,7 +30,7 @@ var tecAdminControllers = angular.module('tecAdminControllers', [
   'viz-dashboard-manager',
 ]);
 
-tecAdminControllers.run(function (ViewRegistry, EntityRegistry, AuthService) {
+tecAdminControllers.run(function (ViewRegistry) {
   ViewRegistry.registerDashletAdvanced(
     'executionTab',
     'Execution steps',
@@ -591,10 +591,12 @@ tecAdminControllers.controller('ExecutionTabsCtrl', [
   '$scope',
   '$http',
   'stateStorage',
-  function ($scope, $http, $stateStorag) {
+  'pathHelper',
+  function ($scope, $http, $stateStorag, pathHelper) {
     $stateStorag.push($scope, 'executions', { tabs: [{ id: 'list', title: 'Execution list', type: 'list' }] });
     if ($scope.$state == null) {
       $scope.$state = 'list';
+      pathHelper.fixList();
     }
 
     $scope.isTabActive = function (id) {
@@ -774,10 +776,6 @@ tecAdminControllers.directive('executionViz', [
   'stateStorage',
   '$uibModal',
   '$timeout',
-  'AuthService',
-  'schedulerServices',
-  'executionServices',
-  'ngCopy',
   function (
     $rootScope,
     $http,
@@ -786,10 +784,6 @@ tecAdminControllers.directive('executionViz', [
     $stateStorage,
     $uibModal,
     $timeout,
-    AuthService,
-    schedulerServices,
-    executionServices,
-    ngCopy
   ) {
     return {
       restrict: 'E',

@@ -4,7 +4,7 @@
 
 export type BucketResponse = {
   begin?: number;
-  attributes?: Record<string, any>;
+  attributes?: Record<string, string>;
   count?: number;
   sum?: number;
   min?: number;

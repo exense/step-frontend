@@ -1,7 +1,7 @@
 import { Component, Optional, Input } from '@angular/core';
 import { CustomColumnOptions, CustomComponent } from '@exense/step-core';
 import { Function as KeywordFunction } from '@exense/step-core';
-import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
+import { FunctionLinkDialogService } from './function-link-dialog.service';
 import { map, of } from 'rxjs';
 
 @Component({
@@ -17,15 +17,15 @@ export class FunctionLinkComponent implements CustomComponent {
   );
 
   constructor(
-    private _functionDialogs: FunctionDialogsService,
+    @Optional() private _functionLinkDialogService?: FunctionLinkDialogService,
     @Optional() private _customColumnOptions?: CustomColumnOptions
   ) {}
 
   editFunction(): void {
     const id = this.context?.id;
-    if (!id) {
+    if (!id || !this._functionLinkDialogService) {
       return;
     }
-    this._functionDialogs.openFunctionEditor(id).subscribe();
+    this._functionLinkDialogService.openFunctionEditor(id).subscribe();
   }
 }

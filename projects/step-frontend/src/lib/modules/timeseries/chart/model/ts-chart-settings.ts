@@ -1,5 +1,5 @@
-import uPlot from '../../uplot/uPlot';
 import { Axis, Cursor, Scale, Series } from 'uplot';
+import { TsTooltipOptions } from './ts-tooltip-options';
 
 export interface TSChartSettings {
   title: string;
@@ -8,12 +8,12 @@ export interface TSChartSettings {
   series: TSChartSeries[];
   scales?: Scale[];
   autoResize?: boolean; // autoresize on window size change
-  axes?: Axis[];
-  showLegend?: boolean; // show legend behind the chart
-  yScaleUnit?: string; // the unit which will be displayed along with the Y axis.
+  axes: Axis[];
+  tooltipOptions: TsTooltipOptions;
 }
 
 export interface TSChartSeries extends Series {
-  data: (number | null)[];
   id: string;
+  data: (number | null | undefined)[];
+  legendName: string;
 }

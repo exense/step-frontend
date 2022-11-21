@@ -37,12 +37,20 @@
           <div class="title">Relative time ranges</div>
           <div
             *ngFor="let rangeOption of customRelativeOptions || defaultRelativeOptions"
-            (click)="selectRelativeInterval(rangeOption)"
+            (click)="onRelativeSelectionSelected(rangeOption)"
             class="time-option"
+            [class.active]="rangeOption.timeInMs === activeSelection.relativeSelection?.timeInMs"
           >
             {{ rangeOption.label }}
           </div>
-          <div *ngIf="includeFullRangeOption" (click)="selectFullRange()" class="time-option">Full Range</div>
+          <div
+            *ngIf="includeFullRangeOption"
+            (click)="onFullRangeSelect()"
+            class="time-option"
+            [class.active]="activeSelection.type === RangeSelectionType.FULL"
+          >
+            Full Range
+          </div>
         </div>
       </div>
       <div class="timezone-container">

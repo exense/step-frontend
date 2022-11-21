@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AJS_MODULE, DashboardService } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { PerformanceViewSettings } from '../performance-view/performance-view-settings';
+import { PerformanceViewSettings } from '../performance-view/model/performance-view-settings';
 import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
 import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
 import { TimeRangePicker } from '../time-selection/time-range-picker.component';
@@ -66,6 +66,14 @@ export class SyntheticMonitoringPageComponent implements OnInit {
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
     let newInterval = this.calculateRangeInterval(selection);
+    if (!newInterval.from) {
+      // we can't do anything since we don't know the start of the view.
+      return;
+    }
+    if (!newInterval.to) {
+      // if it's not specified, just show everything until now
+      newInterval.to = new Date().getTime();
+    }
     this.performanceViewSettings = undefined;
     this.changeDetector.detectChanges();
     this.performanceViewSettings = this.getViewSettings(newInterval);

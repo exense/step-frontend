@@ -12,12 +12,28 @@
       display: flex;
       align-items: center;
       flex-direction: row;
+      white-space: nowrap;
 
       .color {
         width: 20px;
         height: 10px;
         margin-right: 8px;
       }
+    }
+
+    .separator {
+      height: 1px;
+      width: 100%;
+      background: #666666;
+      margin: 4px 0;
+      opacity: 0.2;
+    }
+
+    .timestamp {
+      text-align: left;
+      opacity: 0.5;
+      font-size: 12px;
+      white-space: nowrap;
     }
 
     .dots {

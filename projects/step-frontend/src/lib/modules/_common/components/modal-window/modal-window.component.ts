@@ -1,7 +1,5 @@
-import { Component, Input, ViewChild, ViewContainerRef } from '@angular/core';
-import { AJS_MODULE } from '@exense/step-core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { ModalWindowService } from './modal-window.service';
+import { Component, Input } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'step-modal-window',
@@ -11,9 +9,5 @@ import { ModalWindowService } from './modal-window.service';
 export class ModalWindowComponent {
   @Input() title: string = '';
 
-  constructor(public modalWindowService: ModalWindowService) {}
+  constructor(public _dialogRef: MatDialogRef<unknown>) {}
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepModalWindow', downgradeComponent({ component: ModalWindowComponent }));
