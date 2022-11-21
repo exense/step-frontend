@@ -7,9 +7,7 @@
 </ng-template>
 
 <ng-template #contentTemplate>
-  <ng-container *ngIf="!iconOnly; else iconTemplate">
-    <ng-container *ngTemplateOutlet="descriptionTemplate"></ng-container>
-  </ng-container>
+  <ng-container *ngIf="iconOnly; then iconTemplate; else descriptionTemplate"></ng-container>
 </ng-template>
 
 <ng-template #linkTemplate>
@@ -18,6 +16,4 @@
   </a>
 </ng-template>
 
-<ng-container *ngIf="noLink$ | async; else linkTemplate">
-  <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
-</ng-container>
+<ng-container *ngIf="noLink$ | async; then contentTemplate; else linkTemplate"></ng-container>

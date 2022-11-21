@@ -1,8 +1,10 @@
 import { Component, Inject, Input, Optional } from '@angular/core';
 import { ILocationService } from 'angular';
 import { map, of } from 'rxjs';
+import { Plan } from '../../client/step-client-module';
+import { CustomComponent } from '../../modules/custom-registeries/custom-registries.module';
+import { CustomColumnOptions } from '../../modules/table/table.module';
 import { AJS_LOCATION } from '../../shared';
-import { CustomColumnOptions, CustomComponent, Plan } from '../../step-core.module';
 
 @Component({
   selector: 'step-plan-link',
