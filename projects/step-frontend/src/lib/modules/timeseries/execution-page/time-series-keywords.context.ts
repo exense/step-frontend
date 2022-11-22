@@ -14,11 +14,7 @@ export class TimeSeriesKeywordsContext {
   private keywordToggleSubject = new Subject<KeywordSelection>();
   private selectAllSubject = new BehaviorSubject<boolean>(true);
 
-  private colorsPool: TimeseriesColorsPool;
-
-  constructor(colorsPool: TimeseriesColorsPool) {
-    this.colorsPool = colorsPool;
-  }
+  constructor(public readonly colorsPool: TimeseriesColorsPool) {}
 
   getColor(keyword: string): string {
     return this.colorsPool.getColor(keyword);

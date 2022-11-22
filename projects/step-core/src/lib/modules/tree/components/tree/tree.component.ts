@@ -1,10 +1,20 @@
-import { Component, EventEmitter, Input, Optional, Output, TrackByFunction, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Optional,
+  Output,
+  TrackByFunction,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { AbstractArtefact } from '../../../../client/generated';
 import { TreeAction } from '../../shared/tree-action';
 import { ArtefactFlatNode } from '../../shared/artefact-flat-node';
 import { TreeStateService } from '../../services/tree-state.service';
 import { TreeActionsService } from '../../services/tree-actions.service';
+import { TreeNode } from '../../shared/tree-node';
 
 @Component({
   selector: 'step-tree',
@@ -24,7 +34,10 @@ export class TreeComponent {
 
   @Output() treeContextAction = new EventEmitter<{ actionId: string; node?: AbstractArtefact }>();
 
-  constructor(public _treeState: TreeStateService, @Optional() private _treeActions?: TreeActionsService) {}
+  constructor(
+    public _treeState: TreeStateService<any, TreeNode>,
+    @Optional() private _treeActions?: TreeActionsService
+  ) {}
 
   openContextMenu(event: MouseEvent, nodeId: string): void {
     const node = this._treeState.findNodeById(nodeId);

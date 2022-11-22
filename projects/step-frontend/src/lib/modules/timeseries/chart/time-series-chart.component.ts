@@ -30,16 +30,16 @@ import { TooltipPlugin } from './tooltip-plugin';
 })
 export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChanges {
   private readonly HEADER_WITH_FOOTER_SIZE = 80;
-  readonly WRAPPER_PADDING_PX = 12;
   readonly WRAPPER_PADDING = '12px';
 
   @ViewChild('chart') private chartElement!: ElementRef;
 
   @Input() settings!: TSChartSettings;
   @Input() syncKey: string | undefined; // all the charts with the same syncKey in the app will be synced
-  @Input() selection: TSTimeRange | undefined;
+  @Input() selection: TSTimeRange | undefined; // deprecated after the refresh -on-zoom feature.
 
-  @Output('onZoomReset') onZoomReset = new EventEmitter();
+  @Output() onZoomReset = new EventEmitter();
+  @Output() onZoomChange = new EventEmitter();
 
   uplot!: uPlot;
 
@@ -49,7 +49,22 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   emptyChart = false; // meaning the chart is already created, but it has no data
 
+  legendSettings: LegendSettings = { items: [] };
+
   constructor(@Self() private element: ElementRef) {}
+
+  setBlur(blur: boolean) {
+    let foundElements = this.chartElement.nativeElement.getElementsByClassName('u-over');
+    let overlay = foundElements[0];
+    if (!overlay) {
+      return;
+    }
+    if (blur) {
+      overlay.style.backdropFilter = 'blur(2px)';
+    } else {
+      overlay.style.removeProperty('backdrop-filter');
+    }
+  }
 
   ngOnInit(): void {
     if (this.syncKey) {
@@ -72,6 +87,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
    * @param settings
    */
   createChart(settings: TSChartSettings): void {
+    this.legendSettings.items = [];
     let getSize = () => {
       return {
         width: this.element.nativeElement.parentElement.offsetWidth - 24,
@@ -103,9 +119,15 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       };
     }
 
+    if (settings.axes.length > 1) {
+      this.legendSettings.zAxisLabel = this.settings.tooltipOptions.zAxisLabel || 'Total';
+    }
     settings.series.forEach((series, i) => {
       if (series.id) {
         this.seriesIndexesByIds[series.id] = i + 1; // because the first series is the time
+      }
+      if (series.stroke) {
+        this.legendSettings.items.push({ color: series.stroke as string, label: series.legendName });
       }
     });
     let noData = true;
@@ -121,17 +143,19 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       title: settings.title,
       ms: 1, // if not specified it's going to be in seconds
       ...getSize(),
-      legend: { show: this.emptyChart ? false : settings.showLegend },
+      legend: { show: false },
       cursor: cursorOpts,
       scales: {
         x: {
           time: true,
-          min: this.selection?.from,
-          max: this.selection?.to,
+          // min: this.selection?.from,
+          // max: this.selection?.to,
         },
         // y: {auto: true},
       },
-      plugins: [TooltipPlugin.getInstance(this.settings.yScaleUnit)],
+      plugins: this.settings.tooltipOptions.enabled
+        ? [TooltipPlugin.getInstance(() => this.settings.tooltipOptions)]
+        : [],
       axes: [{}, ...(settings.axes || [])],
       series: [
         {
@@ -157,7 +181,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
             });
           },
         ],
-        // setSelect: [ () => console.log('select')],
+        setSelect: [(uplot) => {}],
         // setScale: [ (x: any) => console.log(this.isZoomed())]
       },
     };
@@ -315,4 +339,14 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     let timestampSeries = this.uplot.data[0];
     return timestampSeries[timestampSeries.length - 1];
   }
+}
+
+interface LegendSettings {
+  items: LegendItem[];
+  zAxisLabel?: string;
+}
+
+interface LegendItem {
+  label: string;
+  color: string;
 }

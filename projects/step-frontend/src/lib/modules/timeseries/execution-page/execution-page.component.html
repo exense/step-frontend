@@ -1,16 +1,25 @@
 <ng-container *ngIf="!executionHasToBeBuilt">
-  <div *ngIf="executionInProgress">
-    <button mat-raised-button [matMenuTriggerFor]="refreshMenu">Refresh ({{ selectedRefreshInterval.label }})</button>
-    <mat-menu #refreshMenu="matMenu">
-      <button mat-menu-item *ngFor="let interval of refreshIntervals" (click)="changeRefreshInterval(interval)">
-        {{ interval.label }}
+  <div class="right-section-buttons">
+    <div *ngIf="executionInProgress">
+      <button style="margin-right: 8px" mat-raised-button [matMenuTriggerFor]="refreshMenu">
+        Refresh ({{ selectedRefreshInterval.label }})
       </button>
-    </mat-menu>
+      <mat-menu #refreshMenu="matMenu">
+        <button mat-menu-item *ngFor="let interval of refreshIntervals" (click)="changeRefreshInterval(interval)">
+          {{ interval.label }}
+        </button>
+      </mat-menu>
+    </div>
+    <button mat-raised-button (click)="navigateToRtmDashboard()">Interactive Session</button>
   </div>
 
-  <button mat-raised-button class="interactive-btn" (click)="navigateToRtmDashboard()">Interactive Session</button>
-
-  <step-performance-view *ngIf="performanceViewSettings" [settings]="performanceViewSettings"></step-performance-view>
+  <step-performance-view
+    *ngIf="performanceViewSettings"
+    [settings]="performanceViewSettings"
+    (onInitializationComplete)="onPerformanceViewInitComplete()"
+    (onUpdateComplete)="onPerformanceViewUpdateComplete()"
+  >
+  </step-performance-view>
 </ng-container>
 <div *ngIf="executionHasToBeBuilt" class="info-container">
   <div class="content">

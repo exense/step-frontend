@@ -1,0 +1,12 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
+step-execution-tree {
+  display: block;
+  height: 75vh;
+  max-height: 75vh;
+
+  @include core.reportNodeStatuses;
+  step-icon {
+    background: transparent !important;
+  }
+}

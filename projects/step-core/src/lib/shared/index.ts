@@ -2,7 +2,6 @@ export * from './angularjs-providers';
 export * from './constants';
 export * from './utils';
 export * from './dialogs.service';
-export * from './is-used-by-dialogs.service';
 export * from './mutable';
 export * from './additional-right-rule';
 export * from './plugin-on-init';

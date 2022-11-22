@@ -3,7 +3,12 @@
     <div class="filter-item" *ngFor="let item of filterItems">
       <mat-form-field class="filter-item step-view" floatLabel="always">
         <mat-label>{{ item.label }}</mat-label>
-        <mat-select [(ngModel)]="item.selectedValue" (ngModelChange)="applyParams()" class="label-margin">
+        <mat-select
+          [(ngModel)]="item.selectedValue"
+          (ngModelChange)="applyParams()"
+          class="label-margin"
+          placeholder="All"
+        >
           <mat-option [value]="undefined">All</mat-option>
           <mat-option *ngFor="let option of item.options" [value]="option">
             {{ option }}

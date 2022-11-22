@@ -1,6 +1,8 @@
 //@ts-ignore
 import uPlot = require('uplot');
 import { PlacementFunction } from './placement-function';
+import { TimeSeriesConfig } from '../time-series.config';
+import { TsTooltipOptions } from './model/ts-tooltip-options';
 
 interface TooltipRowEntry {
   value: number;
@@ -16,11 +18,12 @@ interface Anchor {
 }
 
 export class TooltipPlugin {
-  public static getInstance(yScaleUnit?: string): uPlot.Plugin {
+  public static getInstance(optionsGetter: () => TsTooltipOptions): uPlot.Plugin {
     let over: any;
     let bound: any;
     let bLeft: any;
     let bTop: any;
+    let isVisible = false;
 
     function syncBounds(): void {
       let bbox = over.getBoundingClientRect();
@@ -45,10 +48,12 @@ export class TooltipPlugin {
 
           over.onmouseenter = () => {
             overlay.style.display = 'block';
+            isVisible = true;
           };
 
           over.onmouseleave = () => {
             overlay.style.display = 'none';
+            isVisible = false;
           };
         },
         destroy: (u: uPlot) => {
@@ -58,6 +63,11 @@ export class TooltipPlugin {
           syncBounds();
         },
         setCursor: (u: uPlot) => {
+          // this is called for all linked charts
+          if (!isVisible) {
+            return;
+          }
+          const settings = optionsGetter();
           const { left, top, idx } = u.cursor;
           if (!top || top < 0 || !idx || !left) {
             // some weird uPlot behaviour. it happens to be -10 many times
@@ -65,18 +75,23 @@ export class TooltipPlugin {
           }
           let hoveredValue = u.posToVal(top, 'y');
           let yPoints: TooltipRowEntry[] = [];
+          let summaryRow: TooltipRowEntry | undefined;
           for (let i = 1; i < u.series.length; i++) {
             let series = u.series[i];
+            let bucketValue = u.data[i][idx];
             if (series.scale === 'y' && series.show) {
-              let value = u.data[i][idx];
-              if (value != undefined) {
+              if (bucketValue != undefined) {
                 // @ts-ignore
-                yPoints.push({ value: value, name: series.label, color: series._stroke });
+                yPoints.push({ value: bucketValue, name: series.label, color: series._stroke });
               }
               continue;
             }
-            if (series.scale === 'total') {
-              // TODO add this secondary axis somewhere
+            if (series.scale === 'total' && bucketValue != null) {
+              summaryRow = {
+                value: bucketValue,
+                color: TimeSeriesConfig.TOTAL_BARS_COLOR,
+                name: settings.zAxisLabel || 'Total',
+              };
             }
           }
           yPoints.sort((a, b) => (a.value - b.value) * -1);
@@ -97,26 +112,14 @@ export class TooltipPlugin {
             }
           }
           if (yPoints.length === 0) {
-            overlay.style.display = 'none';
+            overlay.style.zIndex = '-1';
             return; // there is no data to show
+          } else {
+            overlay.style.zIndex = '1000';
           }
           overlay.innerHTML = '';
           yPoints.forEach((point) => {
-            var rowElement = document.createElement('div');
-            rowElement.classList.add('tooltip-row');
-            let content = document.createElement('div');
-            let textContent = `${point.name} : ${Math.trunc(point.value)} `;
-            if (yScaleUnit) {
-              textContent += yScaleUnit;
-            }
-            content.textContent = textContent;
-            if (point.color) {
-              let colorDiv = document.createElement('div');
-              colorDiv.classList.add('color');
-              colorDiv.style.backgroundColor = point.color;
-              rowElement.appendChild(colorDiv);
-            }
-            rowElement.appendChild(content);
+            let rowElement = this.createRowElement(point, settings.yAxisUnit);
             overlay.appendChild(rowElement);
           });
           if (yPoints.length < allSeriesLength) {
@@ -133,6 +136,16 @@ export class TooltipPlugin {
               overlay.appendChild(dots);
             }
           }
+          if (summaryRow) {
+            let summaryElement = this.createRowElement(summaryRow);
+
+            overlay.appendChild(this.createSeparator());
+            overlay.appendChild(summaryElement);
+          }
+
+          let timestamp = u.posToVal(left, 'x');
+          overlay.appendChild(this.createSeparator());
+          overlay.appendChild(this.createTimestampItem(timestamp));
 
           // overlay.appendChild(dots);
           // the feature will display the closest value for the y scale only, and just one value for the second scale (if present)
@@ -143,6 +156,39 @@ export class TooltipPlugin {
         },
       },
     };
+  }
+
+  private static createSeparator() {
+    let separator = document.createElement('div');
+    separator.classList.add('separator');
+    return separator;
+  }
+
+  private static createTimestampItem(timestamp: number) {
+    let date = new Date(timestamp);
+    let div = document.createElement('div');
+    div.textContent = date.toLocaleString();
+    div.classList.add('timestamp');
+    return div;
+  }
+
+  private static createRowElement(point: TooltipRowEntry, yScaleUnit?: string) {
+    var rowElement = document.createElement('div');
+    rowElement.classList.add('tooltip-row');
+    let content = document.createElement('div');
+    let textContent = `${point.name} : ${Math.trunc(point.value)} `;
+    if (yScaleUnit) {
+      textContent += yScaleUnit;
+    }
+    content.textContent = textContent;
+    if (point.color) {
+      let colorDiv = document.createElement('div');
+      colorDiv.classList.add('color');
+      colorDiv.style.backgroundColor = point.color;
+      rowElement.appendChild(colorDiv);
+    }
+    rowElement.appendChild(content);
+    return rowElement;
   }
 
   private static getClosestIndex(num: number, arr: TooltipRowEntry[]): number {
