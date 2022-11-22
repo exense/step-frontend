@@ -46,7 +46,7 @@
         [disabled]="!('kw-write' | hasRight | async)"
         (click)="addFunctionPackage()"
       >
-        Upload Package
+        Upload package
       </button>
     </step-btn-group>
   </section>
@@ -104,12 +104,12 @@
   <ng-template matMenuContent let-element="element">
     <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="editFunction(element.id)">
       <step-icon name="edit-2"></step-icon>
-      Edit Keyword
+      Edit keyword
     </button>
 
     <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="duplicateFunction(element.id)">
       <step-icon name="copy"></step-icon>
-      Duplicate Keyword
+      Duplicate keyword
     </button>
 
     <button
@@ -118,7 +118,7 @@
       (click)="exportFunction(element.id, element.attributes.name)"
     >
       <step-icon name="upload"></step-icon>
-      Export Keyword
+      Export keyword
     </button>
 
     <button
