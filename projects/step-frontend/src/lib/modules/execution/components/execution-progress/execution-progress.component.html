@@ -1,0 +1,52 @@
+<section>
+  <!--Error while importing-->
+</section>
+<section *ngIf="execution">
+  <as-split direction="horizontal">
+    <as-split-area [size]="75">
+      <div class="tab-panel">
+        <step-tabs [tabs]="tabs" [activeTabId]="activeTabId" (activeTabIdChange)="selectTab($event)"> </step-tabs>
+        <step-btn-group>
+          <step-autorefresh-toggle
+            [(disabled)]="autoRefreshDisabled"
+            [interval]="autoRefreshInterval"
+            [autoIncreaseTo]="autoRefreshIncreasedTo"
+            (refresh)="refresh()"
+          >
+          </step-autorefresh-toggle>
+        </step-btn-group>
+      </div>
+      <div class="tab-content">
+        <div class="tab-pane" *ngFor="let tab of tabs" [class.active]="tab.id === activeTabId">
+          <step-dashlet *ngIf="tab | includeTab: activeTabId" [itemKey]="tab.template"> </step-dashlet>
+        </div>
+      </div>
+    </as-split-area>
+    <as-split-area [size]="25">
+      <mat-accordion multi>
+        <mat-expansion-panel [expanded]="true" togglePosition="before">
+          <mat-expansion-panel-header>
+            <mat-panel-title></mat-panel-title>
+          </mat-expansion-panel-header>
+          <ng-container *ngIf="execution">
+            <step-execution-commands
+              [description]="execution.description"
+              [repositoryObjectRef]="execution!.executionParameters!.repositoryObject"
+              [includedTestcases]="includedTestcases$ | async"
+              [execution]="execution"
+              (onExecute)="close.emit(eId)"
+            >
+            </step-execution-commands>
+          </ng-container>
+        </mat-expansion-panel>
+
+        <step-panel-execution-details> </step-panel-execution-details>
+
+        <!--todo custom panels-->
+        <step-panel-operations> </step-panel-operations>
+
+        <!--todo charts-->
+      </mat-accordion>
+    </as-split-area>
+  </as-split>
+</section>

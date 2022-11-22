@@ -1,0 +1,15 @@
+<step-execution-step
+  [eId]="state.eId!"
+  [testCasesProgress]="state.testCasesProgress"
+  [progress]="state.progress"
+  [execution]="state.execution"
+  [testCases]="state.testCases"
+  [testCasesSelection]="_testCasesSelection"
+  [showTestCaseCurrentOperation]="state.showTestCaseCurrentOperation"
+  [executionViewServices]="state"
+  (drilldownTestCase)="state.drillDownTestCase($event)"
+>
+</step-execution-step>
+<!--
+[executionViewServices]="executionViewServices"
+-->

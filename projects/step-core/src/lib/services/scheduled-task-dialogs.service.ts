@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { map, Observable, switchMap, catchError, of } from 'rxjs';
 import { UibModalHelperService } from './uib-modal-helper.service';
 import { a1Promise2Observable, DialogsService } from '../shared';
-import { ExecutiontTaskParameters, SchedulerService } from '../client/generated';
+import { ExecutionParameters, ExecutiontTaskParameters, SchedulerService } from '../client/generated';
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +15,22 @@ export class ScheduledTaskDialogsService {
     private _dialogs: DialogsService,
     private _schedulerService: SchedulerService
   ) {}
+
+  newScheduledTask(executionParams: ExecutionParameters): Observable<any> {
+    const modalInstance = this._uibModalHelper.open({
+      backdrop: 'static',
+      templateUrl: 'partials/scheduler/newSchedulerTaskDialog.html',
+      controller: 'newTaskModalCtrl',
+      resolve: {
+        executionParams: function () {
+          return executionParams;
+        },
+      },
+    });
+
+    const taskParams$ = a1Promise2Observable(modalInstance.result) as Observable<ExecutiontTaskParameters>;
+    return taskParams$.pipe(switchMap((taskParams) => this._schedulerService.saveExecutionTask(taskParams)));
+  }
 
   editScheduledTask(
     scheduledTask?: Partial<ExecutiontTaskParameters>

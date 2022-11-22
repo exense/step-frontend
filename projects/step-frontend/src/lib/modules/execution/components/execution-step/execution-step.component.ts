@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
-import { ExecutionsPanelsService } from '../../services/executions-panels.service';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, Execution, ExecutionSummaryDto, Mutable, ReportNode, SelectionCollector } from '@exense/step-core';
-import { ExecutionStepPanel } from '../../shared/execution-step-panel';
 import { ExecutionViewServices } from '../../../operations/shared/execution-view-services';
-import { map, Observable, Subject, takeUntil } from 'rxjs';
+import { map, Observable, Subject, takeUntil, tap } from 'rxjs';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
+import { Panels } from '../../shared/panels.enum';
+import { SingleExecutionPanelsService } from '../../services/single-execution-panels.service';
 
 type FieldAccessor = Mutable<Pick<ExecutionStepComponent, 'keywordParameters$'>>;
 
@@ -16,7 +16,6 @@ type FieldAccessor = Mutable<Pick<ExecutionStepComponent, 'keywordParameters$'>>
   styleUrls: ['./execution-step.component.scss'],
 })
 export class ExecutionStepComponent implements OnChanges, OnDestroy {
-  private terminator$ = new Subject<any>();
   private selectionTerminator$?: Subject<any>;
 
   readonly keywordParameters$?: Observable<KeywordParameters>;
@@ -38,30 +37,9 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
 
   parameters: { key: string; value: string }[] = [];
 
-  readonly ID_TEST_CASES = 'testCases';
-  readonly ID_STEPS = 'steps';
-  readonly ID_PARAMETERS = 'parameters';
+  readonly Panels = Panels;
 
-  panelTestCases?: ExecutionStepPanel;
-  panelSteps?: ExecutionStepPanel;
-  panelParameters?: ExecutionStepPanel;
-
-  constructor(public _panelService: ExecutionsPanelsService) {}
-
-  ngOnInit() {
-    this._panelService
-      .observePanel(this.ID_TEST_CASES, this.eId)
-      .pipe(takeUntil(this.terminator$))
-      .subscribe((panel) => (this.panelTestCases = panel));
-    this._panelService
-      .observePanel(this.ID_STEPS, this.eId)
-      .pipe(takeUntil(this.terminator$))
-      .subscribe((panel) => (this.panelSteps = panel));
-    this._panelService
-      .observePanel(this.ID_PARAMETERS, this.eId)
-      .pipe(takeUntil(this.terminator$))
-      .subscribe((panel) => (this.panelParameters = panel));
-  }
+  constructor(private panelService: SingleExecutionPanelsService) {}
 
   chooseTestcase(testCase: ReportNode): void {
     this.drilldownTestCase.emit(testCase.artefactID);
@@ -102,8 +80,6 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
 
   ngOnDestroy(): void {
     this.terminateSelectionChanges();
-    this.terminator$.next({});
-    this.terminator$.complete();
   }
 
   private terminateSelectionChanges(): void {
@@ -131,7 +107,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
       map((testcases) => ({
         type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
         eid,
-        testcases: this.panelTestCases?.enabled ? testcases : undefined,
+        testcases: this.panelService.isPanelEnabled(Panels.testCases) ? testcases : undefined,
       })),
       takeUntil(this.selectionTerminator$)
     );

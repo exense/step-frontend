@@ -1,0 +1,16 @@
+<ng-container *ngIf="panel$ | async as panel">
+  <mat-expansion-panel
+    *ngIf="panel.enabled"
+    [attr.id]="_state.eId! | panelId: panelType!"
+    [(expanded)]="panel.show"
+    togglePosition="before"
+  >
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        {{ panel.label }}
+      </mat-panel-title>
+      <ng-content select="[titleAddon]"></ng-content>
+    </mat-expansion-panel-header>
+    <ng-content></ng-content>
+  </mat-expansion-panel>
+</ng-container>

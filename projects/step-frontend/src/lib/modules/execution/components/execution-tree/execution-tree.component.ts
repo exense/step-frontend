@@ -15,7 +15,6 @@ import {
   TreeAction,
   TreeActionsService,
   TreeNode,
-  TreeNodeUtilsService,
   TreeStateService,
 } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
@@ -34,20 +33,10 @@ import { Observable, of } from 'rxjs';
   templateUrl: './execution-tree.component.html',
   styleUrls: ['./execution-tree.component.scss'],
   providers: [
-    ReportTreeNodeUtilsService,
-    {
-      provide: EXECUTION_TREE_PAGING,
-      useValue: {},
-    },
-    {
-      provide: TreeNodeUtilsService,
-      useExisting: ReportTreeNodeUtilsService,
-    },
     {
       provide: TreeActionsService,
       useExisting: forwardRef(() => ExecutionTreeComponent),
     },
-    TreeStateService,
   ],
   encapsulation: ViewEncapsulation.None,
 })
