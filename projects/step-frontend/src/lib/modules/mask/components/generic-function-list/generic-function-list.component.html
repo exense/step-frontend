@@ -67,12 +67,12 @@
     <ng-template matMenuContent let-element="element">
       <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="editFunction(element.id)">
         <step-icon name="edit-2"></step-icon>
-        Edit Keyword
+        Edit mask
       </button>
 
       <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="duplicateFunction(element.id)">
         <step-icon name="copy"></step-icon>
-        Duplicate Keyword
+        Duplicate mask
       </button>
       <button
         mat-menu-item
