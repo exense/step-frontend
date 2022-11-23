@@ -10,9 +10,9 @@ import { EditUserDialogData } from '../../types/edit-user-dialog-data.interface'
   styleUrls: ['./edit-user-dialog.component.scss'],
 })
 export class EditUserDialogComponent implements OnInit {
-  readonly formGroup = this._formBuilder.group({
-    username: [null, [Validators.required]],
-    role: [null, [Validators.required]],
+  readonly formGroup = this._formBuilder.nonNullable.group({
+    username: ['', [Validators.required]],
+    role: ['', [Validators.required]],
   });
   readonly isNew = !this._data;
 
@@ -67,8 +67,8 @@ export class EditUserDialogComponent implements OnInit {
       });
     } else {
       this.formGroup.setValue({
-        username: this._data.user.username,
-        role: this._data.user.role,
+        username: this._data.user.username || '',
+        role: this._data.user.role || '',
       });
     }
   }
