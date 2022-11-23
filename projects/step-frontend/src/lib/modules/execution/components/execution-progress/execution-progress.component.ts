@@ -1,4 +1,14 @@
-import { Component, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  forwardRef,
+  Inject,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import {
   AJS_MODULE,
   AugmentedExecutionsService,
@@ -28,8 +38,11 @@ import { Panels } from '../../shared/panels.enum';
 import { ReportTreeNode } from '../../shared/report-tree-node';
 import { ReportTreeNodeUtilsService } from '../../services/report-tree-node-utils.service';
 import { EXECUTION_TREE_PAGING } from '../../services/execution-tree-paging';
+import { DOCUMENT } from '@angular/common';
 
 const R_ERROR_KEY = /\\\\u([\d\w]{4})/gi;
+
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 
 @Component({
   selector: 'step-execution-progress',
@@ -62,6 +75,7 @@ export class ExecutionProgressComponent implements OnInit, OnChanges, ExecutionS
   execution?: Execution;
   testCases?: ReportNode[];
   showTestCaseCurrentOperation: boolean = true;
+  keywordSearch?: string;
 
   progress?: ExecutionSummaryDto;
   testCasesProgress?: ExecutionSummaryDto;
@@ -98,6 +112,7 @@ export class ExecutionProgressComponent implements OnInit, OnChanges, ExecutionS
   @Output() close = new EventEmitter<string>();
 
   constructor(
+    @Inject(DOCUMENT) private _document: Document,
     private _executionService: AugmentedExecutionsService,
     private _controllerService: ControllerService,
     private _viewService: PrivateViewPluginService,
@@ -117,9 +132,12 @@ export class ExecutionProgressComponent implements OnInit, OnChanges, ExecutionS
           nodes.shift();
           return nodes.map((node) => node.id!);
         }),
-        switchMap((path) => this._executionTreeState.expandPath(path))
+        switchMap((path) => {
+          const finalNodeId = path[path.length - 1];
+          return this._executionTreeState.expandPath(path).pipe(map(() => finalNodeId));
+        })
       )
-      .subscribe();
+      .subscribe((nodeId) => this._executionTreeState.selectNodeById(nodeId));
   }
 
   showTestCase(nodeId: string): void {
@@ -142,7 +160,7 @@ export class ExecutionProgressComponent implements OnInit, OnChanges, ExecutionS
       )
       .subscribe(() => {
         this.selectTab('steps');
-        // todo implement scrollto
+        this.scrollToPanel(Panels.testCases);
       });
   }
 
@@ -185,11 +203,12 @@ export class ExecutionProgressComponent implements OnInit, OnChanges, ExecutionS
     this._testCasesSelection.clear();
     this._testCasesSelection.selectById(id);
     this._executionPanels.enablePanel(Panels.steps, true);
-    //todo scroll to
+    this.scrollToPanel(Panels.steps);
   }
 
   searchStepByError(error: string): void {
-    //todo
+    this.selectTab('steps');
+    this.keywordSearch = escapeRegExp(error);
   }
 
   selectTab(tabId: string): void {
@@ -315,6 +334,14 @@ export class ExecutionProgressComponent implements OnInit, OnChanges, ExecutionS
       this.autoRefreshDisabled = false;
       this.autoRefreshInterval = 100;
       this.autoRefreshIncreasedTo = 5000;
+    }
+  }
+
+  private scrollToPanel(panel: Panels): void {
+    const panelId = this._executionPanels.getPanelId(panel);
+    const element = this._document.querySelector(`#${panelId}`);
+    if (element) {
+      element.scrollIntoView();
     }
   }
 }

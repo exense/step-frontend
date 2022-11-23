@@ -1,15 +1,13 @@
 <step-execution-step
-  [eId]="state.eId!"
-  [testCasesProgress]="state.testCasesProgress"
-  [progress]="state.progress"
-  [execution]="state.execution"
-  [testCases]="state.testCases"
+  [eId]="_state.eId!"
+  [testCasesProgress]="_state.testCasesProgress"
+  [progress]="_state.progress"
+  [execution]="_state.execution"
+  [testCases]="_state.testCases"
+  [keywordSearch]="_state.keywordSearch"
   [testCasesSelection]="_testCasesSelection"
-  [showTestCaseCurrentOperation]="state.showTestCaseCurrentOperation"
-  [executionViewServices]="state"
-  (drilldownTestCase)="state.drillDownTestCase($event)"
+  [showTestCaseCurrentOperation]="_state.showTestCaseCurrentOperation"
+  [executionViewServices]="_state"
+  (drilldownTestCase)="_state.drillDownTestCase($event)"
 >
 </step-execution-step>
-<!--
-[executionViewServices]="executionViewServices"
--->

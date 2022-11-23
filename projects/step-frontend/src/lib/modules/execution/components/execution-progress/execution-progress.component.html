@@ -1,5 +1,11 @@
-<section>
-  <!--Error while importing-->
+<section *ngIf="execution?.importResult && !execution!.importResult!.successful">
+  <div class="alert alert-danger" role="alert">
+    <step-icon name="help-circle" aria-hidden="true"></step-icon>
+    Error while importing plan:
+    <ul>
+      <li *ngFor="let error of execution?.importResult?.errors">{{ error }}</li>
+    </ul>
+  </div>
 </section>
 <section *ngIf="execution">
   <as-split direction="horizontal">

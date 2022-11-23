@@ -1,7 +1,7 @@
 <ng-container *ngIf="panel$ | async as panel">
   <mat-expansion-panel
     *ngIf="panel.enabled"
-    [attr.id]="_state.eId! | panelId: panelType!"
+    [attr.id]="panelType | panelId"
     [(expanded)]="panel.show"
     togglePosition="before"
   >

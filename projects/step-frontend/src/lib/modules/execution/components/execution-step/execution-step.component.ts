@@ -26,6 +26,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
   @Input() execution?: Execution;
   @Input() executionViewServices?: ExecutionViewServices;
   @Input() showTestCaseCurrentOperation?: boolean;
+  @Input() keywordSearch?: string;
 
   @Input() testCases?: ReportNode[];
 

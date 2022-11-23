@@ -52,7 +52,7 @@
   <step-panel [panelType]="Panels.steps">
     <ng-container titleAddon>
       <step-status-distribution
-        *ngIf="execution!.status != 'ENDED' && progress!.countForecast > 0"
+        *ngIf="execution!.status != 'ENDED' && progress && progress!.countForecast > 0"
         class="progress-distribution"
         [summary]="progress"
         [isProgress]="true"
@@ -63,6 +63,7 @@
     <step-keyword-calls
       [execution]="execution"
       [keywordParameters$]="keywordParameters$"
+      [keywordSearch]="keywordSearch"
       (showNodeInTree)="handleShowNodeInTree($event)"
       (showTestCase)="handleShowTestCase($event)"
     >

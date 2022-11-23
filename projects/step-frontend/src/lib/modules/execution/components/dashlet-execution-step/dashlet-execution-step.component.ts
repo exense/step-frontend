@@ -11,7 +11,7 @@ export class DashletExecutionStepComponent implements CustomComponent {
   context?: any;
 
   constructor(
-    public state: ExecutionStateService,
+    public _state: ExecutionStateService,
     public _testCasesSelection: SelectionCollector<string, ReportNode>
   ) {}
 }
