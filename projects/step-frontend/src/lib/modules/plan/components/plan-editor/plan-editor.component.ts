@@ -27,6 +27,7 @@ import {
   TreeStateService,
   Function as KeywordCall,
   TreeNodeUtilsService,
+  InsertPotentialParentStateService,
 } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PlanHistoryService } from '../../services/plan-history.service';
@@ -55,6 +56,7 @@ type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef' | '
       useExisting: ArtefactTreeNodeUtilsService,
     },
     TreeStateService,
+    InsertPotentialParentStateService,
     PlanHistoryService,
     InteractiveSessionService,
     {

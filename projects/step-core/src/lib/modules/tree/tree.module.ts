@@ -12,6 +12,7 @@ import { IsRootNodePipe } from './pipes/is-root-node.pipe';
 import { TreeNodeActionsPipe } from './pipes/tree-node-actions.pipe';
 import { TreeNodeNameComponent } from './components/tree-node-name/tree-node-name.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { IsNodePotentialParentPipe } from './pipes/is-node-potential-parent.pipe';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     IsRootNodePipe,
     TreeNodeActionsPipe,
     TreeNodeNameComponent,
+    IsNodePotentialParentPipe,
   ],
   imports: [
     CommonModule,
@@ -39,6 +41,7 @@ export * from './components/tree/tree.component';
 export * from './services/tree-state.service';
 export * from './services/tree-actions.service';
 export * from './services/tree-node-utils.service';
+export * from './services/insert-potential-parent-state.service';
 export * from './shared/tree-node';
 export * from './shared/tree-flat-node';
 export * from './shared/abstract-artefact-with-parent-id';

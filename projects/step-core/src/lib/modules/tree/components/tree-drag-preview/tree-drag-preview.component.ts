@@ -1,10 +1,11 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit, Optional } from '@angular/core';
 import { TreeStateService } from '../../services/tree-state.service';
 import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
 import { combineLatest, debounceTime, first, map, merge, of, startWith, Subject, takeUntil } from 'rxjs';
 import { Mutable } from '../../../../shared';
 import { DOCUMENT } from '@angular/common';
 import { TreeNode } from '../../shared/tree-node';
+import { InsertPotentialParentStateService } from '../../services/insert-potential-parent-state.service';
 
 type FieldAccessor = Mutable<Pick<TreeDragPreviewComponent, 'label$' | 'icon$'>>;
 
@@ -26,11 +27,12 @@ export class TreeDragPreviewComponent implements OnInit, OnDestroy {
     @Inject(DOCUMENT) private _document: Document,
     private _treeState: TreeStateService<any, TreeNode>,
     private _drag: CdkDrag,
-    private _dropList: CdkDropList
+    private _dropList: CdkDropList,
+    @Optional() private _insertPotentialParentState?: InsertPotentialParentStateService
   ) {}
 
   ngOnInit(): void {
-    this.setupCursor();
+    this.setupPotentialInsertLogic();
     this.setupLabelAndIcon();
   }
 
@@ -38,9 +40,12 @@ export class TreeDragPreviewComponent implements OnInit, OnDestroy {
     this.terminator$.next({});
     this.terminator$.complete();
     this._document.body.style.cursor = '';
+    if (this._insertPotentialParentState) {
+      this._insertPotentialParentState.updatePotentialParentId(undefined);
+    }
   }
 
-  private setupCursor(): void {
+  private setupPotentialInsertLogic(): void {
     const distance$ = this._drag.moved.pipe(
       debounceTime(100),
       map(({ distance }) => distance),
@@ -58,19 +63,27 @@ export class TreeDragPreviewComponent implements OnInit, OnDestroy {
       })
     );
 
+    const currentIndex$ = this._dropList.sorted.pipe(map((sorted) => sorted.currentIndex));
+
     const indexes$ = merge(
       initialIndex$,
-      this._dropList.sorted.pipe(map(({ currentIndex, previousIndex }) => ({ currentIndex, previousIndex })))
+      combineLatest([initialIndex$, currentIndex$]).pipe(
+        map(([{ previousIndex }, currentIndex]) => ({ previousIndex, currentIndex }))
+      )
     );
 
     combineLatest([distance$, indexes$])
       .pipe(
         map(([distance, indexes]) => ({ distance, ...indexes })),
-        map((position) => this._treeState.canInsertSelectedNodesAt(position)),
+        map((position) => this._treeState.getPotentialParentToInsertAtPosition(position)),
         takeUntil(this.terminator$)
       )
-      .subscribe((canInsert) => {
+      .subscribe((potentialParentToInsert) => {
+        const canInsert = !!potentialParentToInsert;
         this._document.body.style.cursor = canInsert ? CURSOR_GRABBING : CURSOR_NOT_ALLOWED;
+        if (this._insertPotentialParentState) {
+          this._insertPotentialParentState.updatePotentialParentId(potentialParentToInsert?.id);
+        }
       });
   }
 

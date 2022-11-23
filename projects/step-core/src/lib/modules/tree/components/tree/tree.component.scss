@@ -26,6 +26,12 @@
     background: var.$light-blue;
   }
 
+  &.potential-parent .node-content {
+    font-weight: bold;
+    font-size: 14px;
+    text-decoration: underline;
+  }
+
   &.skipped {
     color: var.$muted;
   }

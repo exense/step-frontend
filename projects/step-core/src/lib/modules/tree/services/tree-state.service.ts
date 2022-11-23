@@ -168,7 +168,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     return index;
   }
 
-  canInsertSelectedNodesAt(insertPositionData: InsertPositionData): boolean {
+  getPotentialParentToInsertAtPosition(insertPositionData: InsertPositionData): TreeNode | undefined {
     const artefacts = this.selectedNodeIds$.value
       .filter(
         (nodeId) => nodeId !== this.rootNode$.value?.id && !!this.treeControl.dataNodes.find((n) => n.id === nodeId)
@@ -177,15 +177,19 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       .filter((x) => !!x) as N[];
 
     if (artefacts.length === 0) {
-      return false;
+      return undefined;
     }
 
     const { parent } = this.determineNewParentToInsert(insertPositionData, false);
     if (!parent) {
-      return false;
+      return undefined;
     }
 
-    return this.isPossibleToInsert(parent.id, ...artefacts);
+    if (!this.isPossibleToInsert(parent.id, ...artefacts)) {
+      return undefined;
+    }
+
+    return parent;
   }
 
   handleDrop(insertPositionData: InsertPositionData): void {
@@ -487,14 +491,14 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   ): {
     parent?: N;
     siblingId?: string;
-    isLevelDown: boolean;
+    isLevelDown?: boolean;
   } {
     const visibleNodes = this.getVisibleNodes().map(
       (node) => this.treeControl.dataNodes.find((flatNode) => flatNode.id === node.id)!
     );
 
     if (currentIndex === previousIndex) {
-      currentIndex--;
+      return {};
     }
 
     const current = visibleNodes[currentIndex];
@@ -504,7 +508,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     let isLevelDown = false;
     const siblingId = current?.id;
 
-    if (distance.x >= this.paddingIdent) {
+    if (distance.x >= this.paddingIdent && currentIndex > previousIndex) {
       // level down
       currentParentId = current!.id;
       isLevelDown = true;

@@ -13,6 +13,7 @@
     cdkDrag
     [cdkDragDisabled]="dragDisabled || (node.id | isRootNode | async)"
     [class.tree-node-selected]="node.id | isNodeSelected | async"
+    [class.potential-parent]="node.id | isNodePotentialParent | async"
     (cdkDragStarted)="_treeState.handleDragStart(node)"
     (click)="_treeState.selectNode(node, $event)"
   >
@@ -34,6 +35,7 @@
     cdkDrag
     [cdkDragDisabled]="dragDisabled || (node.id | isRootNode | async)"
     [class.tree-node-selected]="node.id | isNodeSelected | async"
+    [class.potential-parent]="node.id | isNodePotentialParent | async"
     (cdkDragStarted)="_treeState.handleDragStart(node)"
     (click)="_treeState.selectNode(node, $event)"
   >
