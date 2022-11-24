@@ -1,8 +1,7 @@
 <div class="page-container">
   <div class="view-content">
-    <step-execution-filters *ngIf="executionContext" [executionContext]="executionContext"></step-execution-filters>
+    <!--    <step-execution-filters *ngIf="executionContext" [executionContext]="executionContext"></step-execution-filters>-->
     <step-execution-time-selection
-      [timePicker]="includeTimeRangePicker"
       (onRangerLoaded)="onRangerLoaded()"
       #timeSelection
       *ngIf="executionContext"

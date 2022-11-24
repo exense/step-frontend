@@ -13,6 +13,13 @@
     <button mat-raised-button (click)="navigateToRtmDashboard()">Interactive Session</button>
   </div>
 
+  <step-time-range-picker
+    #rangePicker
+    [customRelativeOptions]="timeRangeOptions"
+    (onSelectionChange)="onTimeRangeChange($event)"
+  >
+  </step-time-range-picker>
+
   <step-performance-view
     *ngIf="performanceViewSettings"
     [settings]="performanceViewSettings"

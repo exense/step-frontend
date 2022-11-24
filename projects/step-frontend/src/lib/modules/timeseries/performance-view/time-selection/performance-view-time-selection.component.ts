@@ -24,13 +24,11 @@ import { TimeSelectionState } from '../../time-selection.state';
 })
 export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy {
   @Input() settings!: PerformanceViewSettings;
-  @Input() timePicker: boolean = true;
 
   @Output() onRangerLoaded = new EventEmitter<void>();
 
   rangerSettings: TSRangerSettings | undefined;
   @ViewChild(TSRangerComponent) rangerComponent!: TSRangerComponent;
-  @ViewChild(TimeRangePicker) timeRangePicker: TimeRangePicker | undefined;
 
   timeLabels: number[] = [];
 
@@ -55,16 +53,20 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
       .pipe(takeUntil(this.terminator$))
       .subscribe((reset) => {
         this.rangerComponent.resetSelect();
-        this.timeRangePicker?.selectFullRange();
       });
     this.timeSelectionState
       .onActiveSelectionChange()
       .pipe(takeUntil(this.terminator$))
       .subscribe((selection) => {
         this.currentSelection = selection;
-        this.rangerComponent.selectRange(selection.absoluteSelection?.from, selection.absoluteSelection?.to);
-        this.timeRangePicker?.setSelection(selection);
+        this.rangerComponent.selectRange(selection.absoluteSelection!.from, selection.absoluteSelection!.to);
       });
+  }
+
+  updateFullTimeRange(range: TSTimeRange) {
+    this.settings!.startTime = range.from!;
+    this.settings!.endTime = range.to!;
+    this.createRanger().subscribe();
   }
 
   getActiveSelection(): ExecutionTimeSelection {
@@ -72,10 +74,11 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   }
 
   refreshRanger(): Observable<TimeSeriesChartResponse> {
-    return this.createRanger();
+    const selection = this.prepareSelectForRanger(this.executionService.timeSelectionState.getActiveSelection());
+    return this.createRanger(selection);
   }
 
-  createRanger(): Observable<TimeSeriesChartResponse> {
+  createRanger(selection?: TSTimeRange): Observable<TimeSeriesChartResponse> {
     const startTime = this.settings.startTime!;
     const endTime = this.settings.endTime || new Date().getTime() - 5000; // minus 5 seconds
     const request: FindBucketsRequest = {
@@ -92,10 +95,9 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
           avgData = response.matrix[0].map((b) => (b ? Math.round(b.sum / b.count) : null));
         }
 
-        const timeRange = this.prepareSelectForRanger(this.executionService.timeSelectionState.getActiveSelection());
         this.rangerSettings = {
           xValues: this.timeLabels,
-          selection: timeRange,
+          selection: selection,
           series: [
             {
               id: 'avg',
@@ -149,7 +151,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   }
 
   onRangerZoomReset(event: TSTimeRange) {
-    this.timeSelectionState.resetZoom(event);
+    this.timeSelectionState.resetZoom({ from: this.settings.startTime, to: this.settings.endTime });
   }
 
   resetZoom() {

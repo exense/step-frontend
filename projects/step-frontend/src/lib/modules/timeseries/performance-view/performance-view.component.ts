@@ -188,9 +188,17 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.createAllCharts(this.findRequest);
   }
 
+  updateFullRange(range: TSTimeRange): void {
+    this.timeSelectionComponent.updateFullTimeRange(range);
+    this.settings!.startTime = range.from!;
+    this.settings!.endTime = range.to!;
+    this.findRequest.start = range.from!;
+    this.findRequest.end = range.to!;
+    this.createAllCharts(this.findRequest);
+  }
+
   handleZoomChange(range: ExecutionTimeSelection): Observable<any> {
-    console.log('Old zoom: ', this.findRequest);
-    console.log('New zoom: ', range.absoluteSelection);
+    console.log('ZOOM CHANGE');
     if (
       this.findRequest.start === range.absoluteSelection?.from &&
       this.findRequest.end === range.absoluteSelection?.to
@@ -308,7 +316,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   mergeRequestWithActiveFilters(request: FindBucketsRequest) {
-    this.deleteObjectProperties(request.params, this.filtersComponent.getAllFilterAttributes()); // we clean the request first
+    this.deleteObjectProperties(request.params, this.filtersComponent?.getAllFilterAttributes()); // we clean the request first
     Object.assign(request.params, this.executionContext.getActiveFilters());
   }
 

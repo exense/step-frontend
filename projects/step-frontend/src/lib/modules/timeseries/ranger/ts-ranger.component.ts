@@ -95,7 +95,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     }
   }
 
-  selectRange(fromTimestamp?: number, toTimestamp?: number) {
+  selectRange(fromTimestamp: number, toTimestamp: number) {
     let select = this.transformRangeToSelect({ from: fromTimestamp, to: toTimestamp });
     this.uplot.setSelect(select, false);
     this.emitSelectionToLinkedCharts();

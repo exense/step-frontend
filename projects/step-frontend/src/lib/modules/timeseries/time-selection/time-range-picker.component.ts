@@ -60,8 +60,8 @@ export class TimeRangePicker implements OnInit {
   }
 
   applyAbsoluteInterval() {
-    let from = undefined;
-    let to = undefined;
+    let from = 0;
+    let to = 0;
     if (this.fromDateString && this.isValidDate(this.fromDateString)) {
       from = new Date(this.fromDateString).getTime();
     } else {

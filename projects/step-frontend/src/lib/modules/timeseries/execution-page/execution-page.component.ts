@@ -1,5 +1,12 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AJS_MODULE, AsyncTasksService, DashboardService, ExecutionsService, pollAsyncTask } from '@exense/step-core';
+import {
+  AJS_MODULE,
+  AsyncTasksService,
+  DashboardService,
+  Execution,
+  ExecutionsService,
+  pollAsyncTask,
+} from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PerformanceViewSettings } from '../performance-view/model/performance-view-settings';
 import { TimeSeriesService } from '../time-series.service';
@@ -7,6 +14,9 @@ import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.servi
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
 import { forkJoin, Observable, of, Subject, Subscription, switchMap, tap, timer } from 'rxjs';
+import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
+import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
+import { TSTimeRange } from '../chart/model/ts-time-range';
 
 @Component({
   selector: 'step-execution-performance',
@@ -14,11 +24,14 @@ import { forkJoin, Observable, of, Subject, Subscription, switchMap, tap, timer 
   styleUrls: ['./execution-page.component.scss'],
 })
 export class ExecutionPageComponent implements OnInit, OnDestroy {
+  readonly ONE_HOUR_MS = 3600 * 1000;
   private readonly RUNNING_EXECUTION_END_TIME_BUFFER = 5000; // if the exec is running, we don't grab the last 5 seconds
 
   @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
 
   @Input() executionId!: string;
+
+  private execution: Execution | undefined;
 
   private dashboardInitComplete$ = new Subject<void>();
 
@@ -39,6 +52,12 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     { label: '5 Min', value: 5 * 60 * 1000 },
     { label: '30 Min', value: 30 * 60 * 1000 },
     { label: 'Off', value: 0 },
+  ];
+  timeRangeOptions: RelativeTimeSelection[] = [
+    { label: 'Last 1 Minute', timeInMs: this.ONE_HOUR_MS / 60 },
+    { label: 'Last 5 Minutes', timeInMs: this.ONE_HOUR_MS / 12 },
+    { label: 'Last 30 Minutes', timeInMs: this.ONE_HOUR_MS / 2 },
+    { label: 'Last Hour', timeInMs: this.ONE_HOUR_MS },
   ];
   selectedRefreshInterval: RefreshInterval = this.refreshIntervals[0];
 
@@ -63,6 +82,31 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  onTimeRangeChange(selection: TimeRangePickerSelection) {
+    if (this.executionInProgress) {
+    } else {
+      this.onEndedExecutionTimeRangeChange(selection);
+    }
+  }
+
+  onEndedExecutionTimeRangeChange(selection: TimeRangePickerSelection) {
+    let execution = this.execution!;
+    let newInterval: TSTimeRange;
+    switch (selection.type) {
+      case RangeSelectionType.FULL:
+        newInterval = { from: execution.startTime!, to: execution.endTime! };
+        break;
+      case RangeSelectionType.ABSOLUTE:
+        newInterval = selection.absoluteSelection!;
+        break;
+      case RangeSelectionType.RELATIVE:
+        const end = execution.endTime!;
+        let from = Math.max(execution.startTime!, end - selection.relativeSelection!.timeInMs);
+        newInterval = { from: from, to: end };
+    }
+    this.performanceView.updateFullRange(newInterval);
+  }
+
   onPerformanceViewInitComplete() {
     this.dashboardInitComplete$.next();
     this.dashboardInitComplete$.complete();
@@ -74,6 +118,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   init() {
     this.executionService.getExecutionById(this.executionId).subscribe((execution) => {
+      this.execution = execution;
       const startTime = execution.startTime!;
       const endTime = execution.endTime ? execution.endTime : new Date().getTime();
 
