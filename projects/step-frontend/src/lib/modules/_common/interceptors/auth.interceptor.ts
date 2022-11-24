@@ -14,7 +14,7 @@ export class AuthInterceptor implements HttpInterceptor {
       if (this._authService.isAuthenticated()) {
         this._authService.goToLoginPage();
       }
-      return of(err.message);
+      return throwError(err);
     }
     return throwError(err);
   }

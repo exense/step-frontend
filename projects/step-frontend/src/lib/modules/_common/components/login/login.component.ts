@@ -30,10 +30,9 @@ export class LoginComponent {
   }
 
   login() {
-    this._auth.login(this.credentials).then(
-      function (user) {},
-      (e) => (this.error = e.error)
-    );
+    this._auth.login(this.credentials).subscribe({
+      error: (e) => (this.error = e.error),
+    });
   }
 }
 
