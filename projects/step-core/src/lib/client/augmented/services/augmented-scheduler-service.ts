@@ -7,8 +7,6 @@ import { HttpClient } from '@angular/common/http';
 
 import { SchedulerService } from '../../generated';
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
-import { map } from 'rxjs/operators';
-import { tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedSchedulerService extends SchedulerService {
@@ -30,6 +28,6 @@ export class AugmentedSchedulerService extends SchedulerService {
   }
 
   public isSchedulerEnabled(): Observable<boolean> {
-    return this._httpClient.get<any>('rest/settings/scheduler_enabled');
+    return this._httpClient.get<boolean>('rest/settings/scheduler_enabled');
   }
 }
