@@ -60,7 +60,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   @Input() settings!: PerformanceViewSettings;
   @Input() includeThreadGroupChart = true;
-  @Input() includeTimeRangePicker = true;
 
   @Output() onInitializationComplete: EventEmitter<void> = new EventEmitter<void>();
   @Output() onUpdateComplete: EventEmitter<void> = new EventEmitter<void>();
@@ -188,17 +187,16 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.createAllCharts(this.findRequest);
   }
 
-  updateFullRange(range: TSTimeRange): void {
+  updateFullRange(range: TSTimeRange): Observable<unknown> {
     this.timeSelectionComponent.updateFullTimeRange(range);
     this.settings!.startTime = range.from!;
     this.settings!.endTime = range.to!;
     this.findRequest.start = range.from!;
     this.findRequest.end = range.to!;
-    this.createAllCharts(this.findRequest);
+    return this.refreshAllCharts();
   }
 
   handleZoomChange(range: ExecutionTimeSelection): Observable<any> {
-    console.log('ZOOM CHANGE');
     if (
       this.findRequest.start === range.absoluteSelection?.from &&
       this.findRequest.end === range.absoluteSelection?.to
@@ -225,7 +223,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   private initContext() {
-    this.executionContext = this.contextFactory.getContext(this.settings.contextId);
+    this.executionContext = this.contextFactory.createContext(this.settings.contextId, {
+      from: this.settings.startTime,
+      to: this.settings.endTime,
+    });
     this.keywordsService = this.executionContext.keywordsContext;
   }
 

@@ -66,7 +66,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   updateFullTimeRange(range: TSTimeRange) {
     this.settings!.startTime = range.from!;
     this.settings!.endTime = range.to!;
-    this.createRanger().subscribe();
+    // this.createRanger().subscribe();
   }
 
   getActiveSelection(): ExecutionTimeSelection {

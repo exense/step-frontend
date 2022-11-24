@@ -6,6 +6,7 @@ import { TimeseriesColorsPool } from '../util/timeseries-colors-pool';
 import { Execution } from '@exense/step-core';
 import { BucketFilters } from '../model/bucket-filters';
 import { TimeSelectionState } from '../time-selection.state';
+import { TSTimeRange } from '../chart/model/ts-time-range';
 
 /**
  * This class is responsible for managing the state of an execution tab. Here we store time selection, colors, filters, etc.
@@ -13,9 +14,14 @@ import { TimeSelectionState } from '../time-selection.state';
 export class TimeSeriesContext {
   executionId!: string;
 
+  fullTimeRange: TSTimeRange; // this represents the entire time-series interval. usually this is displayed entirely in the time-ranger
+  selectedTimeRange: TSTimeRange; // this is the zooming selection.
+
   activeExecution: Execution | undefined;
   activeFilters: { [key: string]: any } = {};
   activeGroupings: string[] = ['name']; // group dimensions
+
+  private readonly selectedTimeRange$: Subject<TSTimeRange> = new Subject<TSTimeRange>();
 
   private readonly filtersChangeSubject: Subject<BucketFilters> = new Subject();
   private readonly groupingChangeSubject: Subject<string[]> = new Subject();
@@ -24,11 +30,21 @@ export class TimeSeriesContext {
   private readonly colorsPool: TimeseriesColorsPool;
   readonly timeSelectionState: TimeSelectionState;
 
-  constructor(executionId: string) {
+  constructor(executionId: string, timeRange: TSTimeRange) {
     this.executionId = executionId;
+    this.fullTimeRange = timeRange;
+    this.selectedTimeRange = timeRange;
     this.colorsPool = new TimeseriesColorsPool();
     this.keywordsContext = new TimeSeriesKeywordsContext(this.colorsPool);
     this.timeSelectionState = new TimeSelectionState();
+  }
+
+  onSelectedTimeRangeChange(): Observable<TSTimeRange> {
+    return this.selectedTimeRange$.asObservable();
+  }
+
+  getSelectedTimeRange(): TSTimeRange {
+    return this.selectedTimeRange;
   }
 
   setExecution(execution: Execution) {

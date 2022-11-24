@@ -8,7 +8,7 @@ import { TimeRangePicker } from '../time-selection/time-range-picker.component';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
-import { forkJoin, Observable, Subject, Subscription, timer } from 'rxjs';
+import { forkJoin, Observable, of, Subject, Subscription, timer } from 'rxjs';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
 
 @Component({
@@ -18,22 +18,35 @@ import { ExecutionTimeSelection } from '../time-selection/model/execution-time-s
 })
 export class SyntheticMonitoringPageComponent implements OnInit {
   readonly ONE_HOUR_MS = 3600 * 1000;
-  private REFRESH_TIME_MS = 5000;
 
   @ViewChild(TimeRangePicker) rangePicker!: TimeRangePicker;
   @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
   @Input() taskId: string = window.location.href.split('?')[0].substring(window.location.href.lastIndexOf('/') + 1);
 
+  refreshEnabled = true;
+
   performanceViewSettings: PerformanceViewSettings | undefined;
   readonly dashboardInitComplete$ = new Subject<void>();
 
   timeRangeOptions: RelativeTimeSelection[] = [
+    { label: 'Last Minute', timeInMs: this.ONE_HOUR_MS / 60 },
     { label: 'Last 15 Minutes', timeInMs: this.ONE_HOUR_MS / 4 },
     { label: 'Last Hour', timeInMs: this.ONE_HOUR_MS },
     { label: 'Last Day', timeInMs: this.ONE_HOUR_MS * 24 },
     { label: 'Last Week', timeInMs: this.ONE_HOUR_MS * 24 * 7 },
     { label: 'Last Month', timeInMs: this.ONE_HOUR_MS * 24 * 31 },
   ];
+
+  // this is just for running executions
+  refreshIntervals = [
+    { label: '5 Sec', value: 5000 },
+    { label: '30 Sec', value: 30 * 1000 },
+    { label: '1 Min', value: 60 * 1000 },
+    { label: '5 Min', value: 5 * 60 * 1000 },
+    { label: '30 Min', value: 30 * 60 * 1000 },
+    { label: 'Off', value: 0 },
+  ];
+  selectedRefreshInterval = this.refreshIntervals[0];
 
   refreshSubscription: Subscription | undefined;
 
@@ -42,6 +55,18 @@ export class SyntheticMonitoringPageComponent implements OnInit {
   onDashboardInit() {
     this.dashboardInitComplete$.next();
     this.dashboardInitComplete$.complete();
+  }
+
+  changeRefreshInterval(newInterval: { label: string; value: number }) {
+    const oldInterval = this.selectedRefreshInterval;
+    this.selectedRefreshInterval = newInterval;
+    if (oldInterval.value === newInterval.value) {
+      return;
+    }
+    this.refreshSubscription?.unsubscribe();
+    if (newInterval.value) {
+      this.triggerNextUpdate(0, of(undefined));
+    }
   }
 
   calculateRange(selection: RelativeTimeSelection): TSTimeRange {
@@ -54,9 +79,11 @@ export class SyntheticMonitoringPageComponent implements OnInit {
     if (!this.taskId) {
       throw new Error('ExecutionId parameter is not present');
     }
-    let range = this.calculateRange(this.timeRangeOptions[2]);
+    let range = this.calculateRange(this.timeRangeOptions[0]);
     this.performanceViewSettings = this.createViewSettings(range);
-    this.triggerNextUpdate(this.REFRESH_TIME_MS, this.dashboardInitComplete$);
+    if (this.refreshEnabled) {
+      this.triggerNextUpdate(this.selectedRefreshInterval.value, this.dashboardInitComplete$);
+    }
   }
 
   createViewSettings(timeRange: TSTimeRange) {
@@ -66,16 +93,6 @@ export class SyntheticMonitoringPageComponent implements OnInit {
       startTime: timeRange.from!,
       endTime: timeRange.to!,
     };
-  }
-
-  onZoomChange(selection: ExecutionTimeSelection) {
-    if (selection.type === RangeSelectionType.FULL) {
-      // synthetic monitoring does not support full type
-      selection.type = RangeSelectionType.ABSOLUTE;
-    }
-    this.refreshSubscription?.unsubscribe();
-    this.rangePicker.setSelection(selection);
-    console.log(selection);
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
@@ -91,30 +108,19 @@ export class SyntheticMonitoringPageComponent implements OnInit {
         const now = new Date().getTime();
         newInterval = { from: now - selection.relativeSelection!.timeInMs, to: now };
     }
-
-    if (!newInterval.from) {
-      // we can't do anything since we don't know the start of the view.
-      return;
-    }
-    if (!newInterval.to) {
-      // if it's not specified, just show everything until now
-      newInterval.to = new Date().getTime();
-    }
-    this.performanceViewSettings = undefined;
-    this.changeDetector.detectChanges();
-    this.performanceViewSettings = this.createViewSettings(newInterval);
-    this.changeDetector.detectChanges();
+    this.performanceView.updateFullRange(newInterval);
   }
 
-  triggerNextUpdate(delay: number, observableToWaitFor: Observable<unknown>) {
+  triggerNextUpdate(delay: number, observableToWaitFor: Observable<unknown>): void {
     this.refreshSubscription = forkJoin([timer(delay), observableToWaitFor]).subscribe(() => {
       const activeSelection = this.rangePicker.getActiveSelection();
       let now = new Date().getTime();
       let newInterval = { from: now - activeSelection.relativeSelection!.timeInMs, to: now };
       this.performanceViewSettings!.startTime = newInterval.from;
       this.performanceViewSettings!.endTime = newInterval.to;
-      let refresh$ = this.performanceView.refreshAllCharts(true, false);
-      this.triggerNextUpdate(this.REFRESH_TIME_MS, refresh$);
+      let refresh$ = this.performanceView.updateFullRange(newInterval);
+      // let refresh$ = this.performanceView.refreshAllCharts(true, false);
+      this.triggerNextUpdate(this.selectedRefreshInterval.value, refresh$);
     });
   }
 
