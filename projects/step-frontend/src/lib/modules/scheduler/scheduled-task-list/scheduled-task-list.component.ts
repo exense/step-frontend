@@ -29,7 +29,14 @@ export class ScheduledTaskListComponent {
     { operation: BulkOperationType.delete, permission: 'task-delete' },
     { operation: BulkOperationType.duplicate, permission: 'task-write' },
   ];
+  isSchedulerEnabled: boolean = false;
   constructor(public readonly _logic: ScheduledTaskLogicService) {}
+
+  ngOnInit(): void {
+    this._logic.isSchedulerEnabled().subscribe((data) => {
+      this.isSchedulerEnabled = data;
+    });
+  }
 }
 
 getAngularJSGlobal()
