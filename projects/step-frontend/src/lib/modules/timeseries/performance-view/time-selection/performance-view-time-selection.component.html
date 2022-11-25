@@ -5,10 +5,9 @@
       *ngIf="rangerSettings"
       [settings]="rangerSettings"
       [syncKey]="settings.contextId"
-      [selection]="currentSelection.absoluteSelection"
       (onChartLoaded)="onRangerLoaded.emit()"
       (onRangeChange)="onRangerSelectionChange($event)"
-      (onZoomReset)="onRangerZoomReset($event)"
+      (onZoomReset)="onRangerZoomReset()"
     >
     </step-ts-ranger>
   </div>

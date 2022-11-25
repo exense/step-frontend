@@ -1,34 +1,32 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
-import { RangeSelectionType } from '../time-selection/model/range-selection-type';
-import { TimeSeriesKeywordsContext } from './time-series-keywords.context';
-import { TimeseriesColorsPool } from '../util/timeseries-colors-pool';
+import { ExecutionTimeSelection } from './time-selection/model/execution-time-selection';
+import { RangeSelectionType } from './time-selection/model/range-selection-type';
+import { TimeSeriesKeywordsContext } from './execution-page/time-series-keywords.context';
+import { TimeseriesColorsPool } from './util/timeseries-colors-pool';
 import { Execution } from '@exense/step-core';
-import { BucketFilters } from '../model/bucket-filters';
-import { TimeSelectionState } from '../time-selection.state';
-import { TSTimeRange } from '../chart/model/ts-time-range';
+import { BucketFilters } from './model/bucket-filters';
+import { TimeSelectionState } from './time-selection.state';
+import { TSTimeRange } from './chart/model/ts-time-range';
 
 /**
  * This class is responsible for managing the state of an execution tab. Here we store time selection, colors, filters, etc.
  */
 export class TimeSeriesContext {
   executionId!: string;
+  activeExecution: Execution | undefined;
 
   fullTimeRange: TSTimeRange; // this represents the entire time-series interval. usually this is displayed entirely in the time-ranger
   selectedTimeRange: TSTimeRange; // this is the zooming selection.
-
-  activeExecution: Execution | undefined;
-  activeFilters: { [key: string]: any } = {};
-  activeGroupings: string[] = ['name']; // group dimensions
-
   private readonly selectedTimeRange$: Subject<TSTimeRange> = new Subject<TSTimeRange>();
 
-  private readonly filtersChangeSubject: Subject<BucketFilters> = new Subject();
+  activeGroupings: string[] = ['name']; // group dimensions
   private readonly groupingChangeSubject: Subject<string[]> = new Subject();
+
+  activeFilters: { [key: string]: any } = {};
+  private readonly filtersChangeSubject: Subject<BucketFilters> = new Subject();
 
   public readonly keywordsContext: TimeSeriesKeywordsContext;
   private readonly colorsPool: TimeseriesColorsPool;
-  readonly timeSelectionState: TimeSelectionState;
 
   constructor(executionId: string, timeRange: TSTimeRange) {
     this.executionId = executionId;
@@ -36,15 +34,36 @@ export class TimeSeriesContext {
     this.selectedTimeRange = timeRange;
     this.colorsPool = new TimeseriesColorsPool();
     this.keywordsContext = new TimeSeriesKeywordsContext(this.colorsPool);
-    this.timeSelectionState = new TimeSelectionState();
+  }
+
+  updateFullRange(range: TSTimeRange) {
+    this.fullTimeRange = range;
+    this.selectedTimeRange = range;
   }
 
   onSelectedTimeRangeChange(): Observable<TSTimeRange> {
     return this.selectedTimeRange$.asObservable();
   }
 
+  isFullRangeSelected() {
+    return JSON.stringify(this.selectedTimeRange) === JSON.stringify(this.fullTimeRange);
+  }
+
   getSelectedTimeRange(): TSTimeRange {
     return this.selectedTimeRange;
+  }
+
+  setSelectedTimeRange(range: TSTimeRange) {
+    this.selectedTimeRange = range;
+    this.selectedTimeRange$.next(range);
+  }
+
+  resetZoom() {
+    if (JSON.stringify(this.selectedTimeRange) === JSON.stringify(this.fullTimeRange)) {
+      return;
+    }
+    this.selectedTimeRange = this.fullTimeRange;
+    this.selectedTimeRange$.next(this.selectedTimeRange);
   }
 
   setExecution(execution: Execution) {

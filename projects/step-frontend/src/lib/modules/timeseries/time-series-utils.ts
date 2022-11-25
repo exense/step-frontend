@@ -1,6 +1,5 @@
 export class TimeSeriesUtils {
   static createTimeLabels(start: number, end: number, interval: number): number[] {
-    console.log('TIME LABELS: ', start);
     let intervals = Math.ceil((end - start) / interval);
     const result = Array(intervals);
     for (let i = 0; i < intervals; i++) {

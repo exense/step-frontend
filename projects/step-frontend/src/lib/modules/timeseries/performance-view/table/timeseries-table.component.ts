@@ -6,7 +6,7 @@ import { TimeSeriesChartResponse } from '../../time-series-chart-response';
 import { TimeSeriesKeywordsContext } from '../../execution-page/time-series-keywords.context';
 import { BucketAttributes, TableDataSource, TableLocalDataSource, TableLocalDataSourceConfig } from '@exense/step-core';
 import { Observable, Subject, Subscription, takeUntil, tap } from 'rxjs';
-import { TimeSeriesContext } from '../../execution-page/time-series-context';
+import { TimeSeriesContext } from '../../time-series-context';
 
 @Component({
   selector: 'step-timeseries-table',

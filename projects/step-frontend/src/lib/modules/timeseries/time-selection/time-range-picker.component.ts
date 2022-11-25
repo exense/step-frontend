@@ -5,7 +5,6 @@ import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { TimeRangePickerSelection } from './time-range-picker-selection';
 import { RangeSelectionType } from './model/range-selection-type';
 import { ExecutionTimeSelection } from './model/execution-time-selection';
-import { min } from 'rxjs';
 
 /**
  * When dealing with relative/full selection, this component should not know anything about dates, therefore no date calculations are needed.
@@ -90,6 +89,12 @@ export class TimeRangePicker implements OnInit {
   }
 
   onRelativeSelectionSelected(option: RelativeTimeSelection) {
+    if (
+      this.activeSelection.type === RangeSelectionType.RELATIVE &&
+      this.activeSelection.relativeSelection!.timeInMs === option.timeInMs
+    ) {
+      return;
+    }
     this.emitSelectionChange({ type: RangeSelectionType.RELATIVE, relativeSelection: option });
   }
 

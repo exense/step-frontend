@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { TimeSeriesContext } from './execution-page/time-series-context';
+import { TimeSeriesContext } from './time-series-context';
 import { TSTimeRange } from './chart/model/ts-time-range';
 
 /**

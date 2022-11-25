@@ -10,6 +10,8 @@ import { RangeSelectionType } from '../time-selection/model/range-selection-type
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
 import { forkJoin, Observable, of, Subject, Subscription, timer } from 'rxjs';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
+import { TimeSeriesContext } from '../time-series-context';
+import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
 
 @Component({
   selector: 'step-synthetic-monitoring',
@@ -23,9 +25,11 @@ export class SyntheticMonitoringPageComponent implements OnInit {
   @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
   @Input() taskId: string = window.location.href.split('?')[0].substring(window.location.href.lastIndexOf('/') + 1);
 
+  context!: TimeSeriesContext;
+
   refreshEnabled = true;
 
-  performanceViewSettings: PerformanceViewSettings | undefined;
+  performanceViewSettings!: PerformanceViewSettings;
   readonly dashboardInitComplete$ = new Subject<void>();
 
   timeRangeOptions: RelativeTimeSelection[] = [
@@ -50,7 +54,23 @@ export class SyntheticMonitoringPageComponent implements OnInit {
 
   refreshSubscription: Subscription | undefined;
 
-  constructor(private changeDetector: ChangeDetectorRef, private dashboardService: DashboardService) {}
+  constructor(
+    private changeDetector: ChangeDetectorRef,
+    private dashboardService: DashboardService,
+    private contextFactory: TimeSeriesContextsFactory
+  ) {}
+
+  ngOnInit(): void {
+    if (!this.taskId) {
+      throw new Error('ExecutionId parameter is not present');
+    }
+    let range = this.calculateRange(this.timeRangeOptions[0]);
+    this.context = this.contextFactory.createContext(this.taskId, range);
+    this.performanceViewSettings = this.createViewSettings(range);
+    if (this.refreshEnabled) {
+      this.triggerNextUpdate(this.selectedRefreshInterval.value, this.dashboardInitComplete$);
+    }
+  }
 
   onDashboardInit() {
     this.dashboardInitComplete$.next();
@@ -65,7 +85,10 @@ export class SyntheticMonitoringPageComponent implements OnInit {
     }
     this.refreshSubscription?.unsubscribe();
     if (newInterval.value) {
-      this.triggerNextUpdate(0, of(undefined));
+      this.refreshEnabled = true;
+      this.triggerNextUpdate(newInterval.value, of(undefined));
+    } else {
+      this.refreshEnabled = false;
     }
   }
 
@@ -75,40 +98,34 @@ export class SyntheticMonitoringPageComponent implements OnInit {
     return { from: start, to: now };
   }
 
-  ngOnInit(): void {
-    if (!this.taskId) {
-      throw new Error('ExecutionId parameter is not present');
-    }
-    let range = this.calculateRange(this.timeRangeOptions[0]);
-    this.performanceViewSettings = this.createViewSettings(range);
-    if (this.refreshEnabled) {
-      this.triggerNextUpdate(this.selectedRefreshInterval.value, this.dashboardInitComplete$);
-    }
-  }
-
-  createViewSettings(timeRange: TSTimeRange) {
+  createViewSettings(timeRange: TSTimeRange): PerformanceViewSettings {
     return {
       contextId: this.taskId,
       contextualFilters: { taskId: this.taskId },
-      startTime: timeRange.from!,
-      endTime: timeRange.to!,
+      timeRange: timeRange,
     };
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
+    this.refreshSubscription?.unsubscribe();
     let newInterval;
     switch (selection.type) {
       case RangeSelectionType.FULL:
         throw new Error('Full range not available');
       case RangeSelectionType.ABSOLUTE:
-        this.refreshSubscription?.unsubscribe();
         newInterval = selection.absoluteSelection!;
         break;
       case RangeSelectionType.RELATIVE:
         const now = new Date().getTime();
         newInterval = { from: now - selection.relativeSelection!.timeInMs, to: now };
     }
-    this.performanceView.updateFullRange(newInterval);
+    this.context.updateFullRange(newInterval);
+    let update$ = this.performanceView.updateFullRange(newInterval);
+    if (this.refreshEnabled) {
+      this.triggerNextUpdate(this.selectedRefreshInterval.value, update$);
+    } else {
+      update$.subscribe();
+    }
   }
 
   triggerNextUpdate(delay: number, observableToWaitFor: Observable<unknown>): void {
@@ -116,8 +133,7 @@ export class SyntheticMonitoringPageComponent implements OnInit {
       const activeSelection = this.rangePicker.getActiveSelection();
       let now = new Date().getTime();
       let newInterval = { from: now - activeSelection.relativeSelection!.timeInMs, to: now };
-      this.performanceViewSettings!.startTime = newInterval.from;
-      this.performanceViewSettings!.endTime = newInterval.to;
+      this.performanceViewSettings.timeRange = newInterval;
       let refresh$ = this.performanceView.updateFullRange(newInterval);
       // let refresh$ = this.performanceView.refreshAllCharts(true, false);
       this.triggerNextUpdate(this.selectedRefreshInterval.value, refresh$);

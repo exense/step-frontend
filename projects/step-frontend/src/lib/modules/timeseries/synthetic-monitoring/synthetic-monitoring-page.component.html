@@ -8,7 +8,7 @@
   >
   </step-time-range-picker>
 
-  <div *ngIf="refreshEnabled">
+  <div>
     <button style="margin-right: 8px" mat-raised-button [matMenuTriggerFor]="refreshMenu">
       Refresh ({{ selectedRefreshInterval.label }})
     </button>
@@ -24,6 +24,7 @@
   <step-performance-view
     *ngIf="performanceViewSettings"
     (onInitializationComplete)="onDashboardInit()"
+    [context]="context"
     [settings]="performanceViewSettings"
     [includeThreadGroupChart]="false"
   >

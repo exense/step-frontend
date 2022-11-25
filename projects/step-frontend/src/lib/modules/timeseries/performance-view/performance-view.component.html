@@ -1,10 +1,9 @@
 <div class="page-container">
   <div class="view-content">
-    <step-execution-filters *ngIf="executionContext" [executionContext]="executionContext"></step-execution-filters>
     <step-execution-time-selection
       (onRangerLoaded)="onRangerLoaded()"
       #timeSelection
-      *ngIf="executionContext"
+      *ngIf="context"
       [settings]="settings"
     >
     </step-execution-time-selection>
@@ -20,7 +19,6 @@
           *ngIf="currentChartsSettings[TsChartType.OVERVIEW]"
           [settings]="currentChartsSettings[TsChartType.OVERVIEW]"
           [syncKey]="settings.contextId"
-          [selection]="timeSelection?.absoluteSelection"
           (onZoomReset)="onChartsZoomReset()"
         >
         </step-timeseries-chart>
@@ -32,7 +30,6 @@
           #byStatusChart
           *ngIf="currentChartsSettings[TsChartType.BY_STATUS]"
           [settings]="currentChartsSettings[TsChartType.BY_STATUS]"
-          [selection]="timeSelection?.absoluteSelection"
           [syncKey]="settings.contextId"
           (onZoomReset)="onChartsZoomReset()"
         >
@@ -73,7 +70,6 @@
             #responseTimeChart
             *ngIf="currentChartsSettings[TsChartType.RESPONSE_TIME]"
             [settings]="currentChartsSettings[TsChartType.RESPONSE_TIME]"
-            [selection]="timeSelection?.absoluteSelection"
             [syncKey]="settings.contextId"
             (onZoomReset)="onChartsZoomReset()"
           >
@@ -113,7 +109,6 @@
             *ngIf="currentChartsSettings[TsChartType.THROUGHPUT]"
             #throughputChart
             [settings]="currentChartsSettings[TsChartType.THROUGHPUT]"
-            [selection]="timeSelection?.absoluteSelection"
             [syncKey]="settings.contextId"
             (onZoomReset)="onChartsZoomReset()"
           >
@@ -123,21 +118,20 @@
         <div class="chart-container" style="width: 100%">
           <step-timeseries-table
             #tableChart
-            *ngIf="executionContext"
+            *ngIf="context"
             (onInitializationComplete)="onTableInitializationFinished()"
             [findRequest]="findRequest"
-            [executionContext]="executionContext"
+            [executionContext]="context"
           ></step-timeseries-table>
         </div>
       </div>
 
-      <div class="chart-container chart" *ngIf="includeThreadGroupChart">
+      <div class="chart-container chart" *ngIf="settings?.includeThreadGroupChart">
         <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.THREAD_GROUP]"></step-chart-skeleton>
         <step-timeseries-chart
           *ngIf="currentChartsSettings[TsChartType.THREAD_GROUP]"
           #threadGroupChart
           [settings]="currentChartsSettings[TsChartType.THREAD_GROUP]"
-          [selection]="timeSelection?.absoluteSelection"
           [syncKey]="settings.contextId"
           (onZoomReset)="onChartsZoomReset()"
         >

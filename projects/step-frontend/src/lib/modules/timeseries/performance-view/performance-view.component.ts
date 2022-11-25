@@ -12,7 +12,7 @@ import { TimeSeriesConfig } from '../time-series.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
 import { first, forkJoin, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { TimeSeriesUtils } from '../time-series-utils';
-import { TimeSeriesContext } from '../execution-page/time-series-context';
+import { TimeSeriesContext } from '../time-series-context';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
 import { KeywordSelection, TimeSeriesKeywordsContext } from '../execution-page/time-series-keywords.context';
 import { Bucket } from '../bucket';
@@ -58,12 +58,12 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   @ViewChild(PerformanceViewTimeSelectionComponent) timeSelectionComponent!: PerformanceViewTimeSelectionComponent;
 
+  @Input() context!: TimeSeriesContext;
   @Input() settings!: PerformanceViewSettings;
   @Input() includeThreadGroupChart = true;
 
   @Output() onInitializationComplete: EventEmitter<void> = new EventEmitter<void>();
   @Output() onUpdateComplete: EventEmitter<void> = new EventEmitter<void>();
-  @Output() onZoomChange: EventEmitter<ExecutionTimeSelection> = new EventEmitter<ExecutionTimeSelection>();
 
   private tableInitialized$ = new Subject<void>();
   private rangerLoaded$ = new Subject<void>();
@@ -92,7 +92,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     { label: 'Off', value: 0 },
   ];
   selectedRefreshInterval: RefreshInterval = this.refreshIntervals[0];
-  timeSelection!: ExecutionTimeSelection;
 
   terminator$ = new Subject<void>();
   intervalShouldBeCanceled = false;
@@ -107,8 +106,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   throughputMetrics = PerformanceViewConfig.throughputMetrics;
   selectedThroughputMetric = this.throughputMetrics[0];
 
-  executionContext!: TimeSeriesContext;
-
   initializationTasks: Observable<any>[] = [];
   updateTasks: Observable<any>[] = [];
 
@@ -116,19 +113,18 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     return a.key.localeCompare(b.key);
   };
 
-  constructor(private timeSeriesService: TimeSeriesService, private contextFactory: TimeSeriesContextsFactory) {}
+  constructor(private timeSeriesService: TimeSeriesService) {}
 
   onAllSeriesCheckboxClick(event: any) {
     this.keywordsService.toggleSelectAll();
   }
 
-  getTimeRangeSelection() {
-    return this.timeSelectionComponent.getActiveSelection();
-  }
-
   ngOnInit(): void {
     if (!this.settings) {
       throw new Error('Settings input is not specified!');
+    }
+    if (!this.context) {
+      throw new Error('Context not provided!');
     }
     this.findRequest = this.prepareFindRequest(this.settings);
     this.initContext();
@@ -152,16 +148,15 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .subscribe((keywords) => {
         this.keywords = keywords;
       });
-    this.executionContext.timeSelectionState
-      .onActiveSelectionChange()
+    this.context
+      .onSelectedTimeRangeChange()
       .pipe(
-        tap((newRange) => (this.timeSelection = newRange)),
         switchMap((newRange) => this.handleZoomChange(newRange)),
         takeUntil(this.terminator$)
       )
       .subscribe();
 
-    this.executionContext
+    this.context
       .onFiltersChange()
       .pipe(
         tap(() => (this.chartsAreLoading = true)),
@@ -170,7 +165,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
         takeUntil(this.terminator$)
       )
       .subscribe();
-    this.executionContext
+    this.context
       .onGroupingChange()
       .pipe(
         tap((groupDimensions: string[]) => {
@@ -189,28 +184,23 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   updateFullRange(range: TSTimeRange): Observable<unknown> {
     this.timeSelectionComponent.updateFullTimeRange(range);
-    this.settings!.startTime = range.from!;
-    this.settings!.endTime = range.to!;
-    this.findRequest.start = range.from!;
-    this.findRequest.end = range.to!;
+    this.settings.timeRange = range;
+    this.findRequest.start = range.from;
+    this.findRequest.end = range.to;
     return this.refreshAllCharts();
   }
 
-  handleZoomChange(range: ExecutionTimeSelection): Observable<any> {
-    if (
-      this.findRequest.start === range.absoluteSelection?.from &&
-      this.findRequest.end === range.absoluteSelection?.to
-    ) {
+  handleZoomChange(range: TSTimeRange): Observable<any> {
+    if (this.findRequest.start === range.from && this.findRequest.end === range.to) {
       return of(undefined);
     }
-    this.onZoomChange.next(range);
     this.getAllCharts().forEach((chart) => {
       chart?.setBlur(true);
     });
     this.findRequest = {
       ...this.findRequest,
-      start: range.absoluteSelection!.from!,
-      end: range.absoluteSelection!.to!,
+      start: range.from,
+      end: range.to,
     };
     return this.refreshAllCharts(true, false);
   }
@@ -223,18 +213,14 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   private initContext() {
-    this.executionContext = this.contextFactory.createContext(this.settings.contextId, {
-      from: this.settings.startTime,
-      to: this.settings.endTime,
-    });
-    this.keywordsService = this.executionContext.keywordsContext;
+    this.keywordsService = this.context.keywordsContext;
   }
 
   prepareFindRequest(settings: PerformanceViewSettings, customFilters?: any): FindBucketsRequest {
     const numberOfBuckets = TimeSeriesConfig.MAX_BUCKETS_IN_CHART;
     return {
-      start: settings.startTime,
-      end: settings.endTime,
+      start: settings.timeRange.from,
+      end: settings.timeRange.to,
       numberOfBuckets: numberOfBuckets,
       params: {
         ...settings.contextualFilters,
@@ -269,24 +255,24 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .subscribe((allCompleted) => this.onInitializationComplete.emit());
   }
 
-  calculateTimeIntervalForCurrentSelection(settings: PerformanceViewSettings): { start: number; end: number } {
-    let start = settings.startTime;
-    let end = settings.endTime;
-    let activeTimeSelection = this.executionContext.timeSelectionState.activeTimeSelection;
-    switch (activeTimeSelection.type) {
-      case RangeSelectionType.FULL:
-        // do nothing
-        break;
-      case RangeSelectionType.ABSOLUTE:
-        start = activeTimeSelection.absoluteSelection!.from || settings.startTime;
-        end = activeTimeSelection.absoluteSelection!.to || settings.endTime;
-        break;
-      case RangeSelectionType.RELATIVE:
-        start = end - activeTimeSelection.relativeSelection!.timeInMs;
-        break;
-    }
-    return { start: start, end: end };
-  }
+  // calculateTimeIntervalForCurrentSelection(settings: PerformanceViewSettings): { start: number; end: number } {
+  //   let start = settings.startTime;
+  //   let end = settings.endTime;
+  //   let activeTimeSelection = this.executionContext.activeTimeSelection;
+  //   switch (activeTimeSelection.type) {
+  //     case RangeSelectionType.FULL:
+  //       // do nothing
+  //       break;
+  //     case RangeSelectionType.ABSOLUTE:
+  //       start = activeTimeSelection.absoluteSelection!.from || settings.startTime;
+  //       end = activeTimeSelection.absoluteSelection!.to || settings.endTime;
+  //       break;
+  //     case RangeSelectionType.RELATIVE:
+  //       start = end - activeTimeSelection.relativeSelection!.timeInMs;
+  //       break;
+  //   }
+  //   return { start: start, end: end };
+  // }
 
   /**
    * This method is called while live refreshing.
@@ -295,9 +281,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   refreshAllCharts(force = false, updateRanger = true): Observable<unknown> {
     this.findRequest = this.prepareFindRequest(this.settings); // we don't want to lose active filters
     this.mergeRequestWithActiveFilters(this.findRequest);
-    let fullTimeRange = this.calculateTimeIntervalForCurrentSelection(this.settings);
-    this.findRequest.start = fullTimeRange.start;
-    this.findRequest.end = fullTimeRange.end;
+    let fullTimeRange = this.context.getSelectedTimeRange();
+    this.findRequest.start = fullTimeRange.from;
+    this.findRequest.end = fullTimeRange.to;
 
     const charts$ = updateRanger ? [this.timeSelectionComponent.refreshRanger()] : [];
 
@@ -318,7 +304,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   mergeRequestWithActiveFilters(request: FindBucketsRequest) {
     this.deleteObjectProperties(request.params, this.filtersComponent?.getAllFilterAttributes()); // we clean the request first
-    Object.assign(request.params, this.executionContext.getActiveFilters());
+    Object.assign(request.params, this.context.getActiveFilters());
   }
 
   onKeywordToggle(keyword: string, event: any) {
@@ -326,7 +312,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   onChartsZoomReset() {
-    this.timeSelectionComponent.resetZoom();
+    this.context.resetZoom();
   }
 
   createThreadGroupsChart(request: FindBucketsRequest, isUpdate = false): Observable<TimeSeriesChartResponse> {
@@ -352,7 +338,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       type,
       request,
       response,
-      this.executionContext.keywordsContext.colorsPool
+      this.context.keywordsContext.colorsPool
     );
   }
 
@@ -388,7 +374,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   createByKeywordsCharts(request: FindBucketsRequest): Observable<TimeSeriesChartResponse> {
-    let groupDimensions = this.executionContext.getGroupDimensions();
+    let groupDimensions = this.context.getGroupDimensions();
     return this.timeSeriesService
       .fetchBuckets({ ...request, groupDimensions: groupDimensions, percentiles: [90, 99] })
       .pipe(

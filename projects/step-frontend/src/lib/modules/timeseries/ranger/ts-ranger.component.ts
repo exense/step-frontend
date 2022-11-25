@@ -39,7 +39,6 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
 
   @Input() settings!: TSRangerSettings;
   @Input() syncKey!: string;
-  @Input() selection?: TSTimeRange;
 
   /**
    * This should emit the following events only:
@@ -95,13 +94,13 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     }
   }
 
-  selectRange(fromTimestamp: number, toTimestamp: number) {
-    let select = this.transformRangeToSelect({ from: fromTimestamp, to: toTimestamp });
+  selectRange(range: TSTimeRange) {
+    let select = this.transformRangeToSelect(range);
     this.uplot.setSelect(select, false);
     this.emitSelectionToLinkedCharts();
   }
 
-  transformRangeToSelect(range?: TSTimeRange): uPlot.Select | undefined {
+  transformRangeToSelect(range: TSTimeRange): uPlot.Select | undefined {
     if (!range) {
       return undefined;
     }
@@ -109,17 +108,9 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     let toTimestamp = range.to;
     let left, width;
     let height = this.uplot.bbox.height / devicePixelRatio;
-    if (!fromTimestamp) {
-      left = this.uplot.valToPos(this.start, 'x');
-    } else {
-      left = this.uplot.valToPos(fromTimestamp, 'x');
-    }
+    left = this.uplot.valToPos(fromTimestamp, 'x');
     left = Math.max(left, 0); // in case it is negative
-    if (!toTimestamp) {
-      width = this.uplot.valToPos(this.end, 'x') - left;
-    } else {
-      width = this.uplot.valToPos(toTimestamp, 'x') - left;
-    }
+    width = this.uplot.valToPos(toTimestamp, 'x') - left;
     // by some reasons, sometimes relative selection get out of the canvas
     if (left + width > this.uplot.bbox.width) {
       width = this.uplot.bbox.width - left;
@@ -372,7 +363,6 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     let min = u.posToVal(u.select.left, 'x');
     let max = u.posToVal(u.select.left + u.select.width, 'x');
     if (min != this.previousRange?.from || max !== this.previousRange?.to) {
-      console.log(min, max, this.uplot);
       let currentRange = { from: min, to: max };
       this.previousRange = currentRange;
       this.onRangeChange.next(currentRange);

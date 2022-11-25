@@ -30,8 +30,9 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
 
   @Input() executionId!: string;
-
   private execution: Execution | undefined;
+
+  timeRangeSelection: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
 
   private dashboardInitComplete$ = new Subject<void>();
 
@@ -83,6 +84,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
+    this.timeRangeSelection = selection;
     if (this.executionInProgress) {
     } else {
       this.onEndedExecutionTimeRangeChange(selection);
@@ -128,9 +130,9 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
       this.performanceViewSettings = {
         contextId: this.executionId,
-        startTime: startTime,
-        endTime: endTime,
+        timeRange: { from: startTime, to: endTime },
         contextualFilters: { eId: this.executionId },
+        includeThreadGroupChart: true,
       };
       if (this.executionInProgress) {
         this.triggerNextUpdate(this.selectedRefreshInterval.value, this.dashboardInitComplete$);
@@ -177,10 +179,10 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         tap(() => {
           const now = new Date().getTime();
           if (this.executionInProgress) {
-            this.performanceViewSettings!.endTime =
+            this.performanceViewSettings!.timeRange.to =
               now - (this.intervalShouldBeCanceled ? 0 : this.RUNNING_EXECUTION_END_TIME_BUFFER); // if the execution is not ended, we don't fetch until the end.
           }
-          const timeSelection = this.performanceView.getTimeRangeSelection();
+          const timeSelection = this.timeRangeSelection;
           if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
             const from = now - timeSelection.relativeSelection.timeInMs;
             timeSelection.absoluteSelection = { from: from, to: now };
@@ -192,7 +194,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       )
       .subscribe((details) => {
         if (details.endTime) {
-          this.performanceViewSettings!.endTime = details.endTime;
+          this.performanceViewSettings!.timeRange.to = details.endTime;
           this.intervalShouldBeCanceled = true;
           this.executionInProgress = false;
           this.performanceView.refreshAllCharts(false, true).subscribe(() => {}); // don't re-trigger refresh

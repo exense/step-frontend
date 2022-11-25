@@ -36,7 +36,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   @Input() settings!: TSChartSettings;
   @Input() syncKey: string | undefined; // all the charts with the same syncKey in the app will be synced
-  @Input() selection: TSTimeRange | undefined; // deprecated after the refresh -on-zoom feature.
 
   @Output() onZoomReset = new EventEmitter();
   @Output() onZoomChange = new EventEmitter();
