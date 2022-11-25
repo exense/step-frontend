@@ -64,6 +64,14 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
           this.rangerComponent.selectRange(selection);
         }
       });
+    this.tsContext
+      .onFullRangeChange()
+      .pipe(takeUntil(this.terminator$))
+      .subscribe((range) => {
+        console.log('FULL RANGE CHANGED');
+        this.settings.timeRange = range;
+        this.createRanger(this.tsContext.getSelectedTimeRange()).subscribe();
+      });
   }
 
   updateFullTimeRange(range: TSTimeRange) {

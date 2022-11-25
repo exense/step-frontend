@@ -17,6 +17,7 @@ import { forkJoin, Observable, of, Subject, Subscription, switchMap, tap, timer 
 import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
 import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
 import { TSTimeRange } from '../chart/model/ts-time-range';
+import { TimeSeriesContext } from '../time-series-context';
 
 @Component({
   selector: 'step-execution-performance',
@@ -31,6 +32,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   @Input() executionId!: string;
   private execution: Execution | undefined;
+  context!: TimeSeriesContext;
 
   timeRangeSelection: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
 
@@ -67,7 +69,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     private contextsFactory: TimeSeriesContextsFactory,
     private executionService: ExecutionsService,
     private dashboardService: DashboardService,
-    private _asyncTaskService: AsyncTasksService
+    private _asyncTaskService: AsyncTasksService,
+    private contextFactory: TimeSeriesContextsFactory
   ) {}
 
   ngOnInit(): void {
@@ -86,6 +89,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   onTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
     if (this.executionInProgress) {
+      console.log('execution is in progress');
     } else {
       this.onEndedExecutionTimeRangeChange(selection);
     }
@@ -106,7 +110,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         let from = Math.max(execution.startTime!, end - selection.relativeSelection!.timeInMs);
         newInterval = { from: from, to: end };
     }
-    this.performanceView.updateFullRange(newInterval);
+    this.context.updateFullRange(newInterval);
+    // this.performanceView.updateFullRange(newInterval);
   }
 
   onPerformanceViewInitComplete() {
@@ -123,7 +128,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       this.execution = execution;
       const startTime = execution.startTime!;
       const endTime = execution.endTime ? execution.endTime : new Date().getTime();
-
+      this.context = this.contextFactory.createContext(execution.id!, { from: startTime, to: endTime });
       if (!execution.endTime) {
         this.executionInProgress = true;
       }

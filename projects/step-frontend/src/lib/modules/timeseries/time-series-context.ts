@@ -7,6 +7,7 @@ import { Execution } from '@exense/step-core';
 import { BucketFilters } from './model/bucket-filters';
 import { TimeSelectionState } from './time-selection.state';
 import { TSTimeRange } from './chart/model/ts-time-range';
+import { TimeSeriesUtils } from './time-series-utils';
 
 /**
  * This class is responsible for managing the state of an execution tab. Here we store time selection, colors, filters, etc.
@@ -15,9 +16,10 @@ export class TimeSeriesContext {
   executionId!: string;
   activeExecution: Execution | undefined;
 
-  fullTimeRange: TSTimeRange; // this represents the entire time-series interval. usually this is displayed entirely in the time-ranger
-  selectedTimeRange: TSTimeRange; // this is the zooming selection.
-  private readonly selectedTimeRange$: Subject<TSTimeRange> = new Subject<TSTimeRange>();
+  private fullTimeRange: TSTimeRange; // this represents the entire time-series interval. usually this is displayed entirely in the time-ranger
+  private readonly fullTimeRangeChange$: Subject<TSTimeRange> = new Subject<TSTimeRange>();
+  private selectedTimeRange: TSTimeRange; // this is the zooming selection.
+  private readonly selectedTimeRangeChange$: Subject<TSTimeRange> = new Subject<TSTimeRange>();
 
   activeGroupings: string[] = ['name']; // group dimensions
   private readonly groupingChangeSubject: Subject<string[]> = new Subject();
@@ -38,11 +40,23 @@ export class TimeSeriesContext {
 
   updateFullRange(range: TSTimeRange) {
     this.fullTimeRange = range;
-    this.selectedTimeRange = range;
+    this.fullTimeRangeChange$.next(range);
+    if (!TimeSeriesUtils.intervalIsInside(range, this.selectedTimeRange)) {
+      // we need to make the selected time range smaller
+      let newSelectedRange: TSTimeRange = {
+        from: Math.max(range.from, this.selectedTimeRange.from),
+        to: Math.min(range.to, this.selectedTimeRange.to),
+      };
+      this.setSelectedTimeRange(newSelectedRange);
+    }
+  }
+
+  onFullRangeChange(): Observable<TSTimeRange> {
+    return this.fullTimeRangeChange$.asObservable();
   }
 
   onSelectedTimeRangeChange(): Observable<TSTimeRange> {
-    return this.selectedTimeRange$.asObservable();
+    return this.selectedTimeRangeChange$.asObservable();
   }
 
   isFullRangeSelected() {
@@ -55,7 +69,7 @@ export class TimeSeriesContext {
 
   setSelectedTimeRange(range: TSTimeRange) {
     this.selectedTimeRange = range;
-    this.selectedTimeRange$.next(range);
+    this.selectedTimeRangeChange$.next(range);
   }
 
   resetZoom() {
@@ -63,7 +77,7 @@ export class TimeSeriesContext {
       return;
     }
     this.selectedTimeRange = this.fullTimeRange;
-    this.selectedTimeRange$.next(this.selectedTimeRange);
+    this.selectedTimeRangeChange$.next(this.selectedTimeRange);
   }
 
   setExecution(execution: Execution) {

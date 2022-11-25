@@ -22,6 +22,7 @@
 
   <step-performance-view
     *ngIf="performanceViewSettings"
+    [context]="context"
     [settings]="performanceViewSettings"
     (onInitializationComplete)="onPerformanceViewInitComplete()"
     (onUpdateComplete)="onPerformanceViewUpdateComplete()"

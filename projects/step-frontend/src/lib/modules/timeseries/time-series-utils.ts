@@ -1,3 +1,5 @@
+import { TSTimeRange } from './chart/model/ts-time-range';
+
 export class TimeSeriesUtils {
   static createTimeLabels(start: number, end: number, interval: number): number[] {
     let intervals = Math.ceil((end - start) / interval);
@@ -25,5 +27,9 @@ export class TimeSeriesUtils {
         return num >= item.value;
       });
     return item ? (num / item.value).toFixed(2).replace(rx, '$1') + item.symbol : '0';
+  }
+
+  static intervalIsInside(bigInterval: TSTimeRange, smallInterval: TSTimeRange) {
+    return !(bigInterval.from > smallInterval.from || bigInterval.to < smallInterval.to);
   }
 }
