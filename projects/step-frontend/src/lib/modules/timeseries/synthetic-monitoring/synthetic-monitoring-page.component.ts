@@ -77,20 +77,7 @@ export class SyntheticMonitoringPageComponent implements OnInit {
     this.dashboardInitComplete$.complete();
   }
 
-  changeRefreshInterval(newInterval: { label: string; value: number }) {
-    const oldInterval = this.selectedRefreshInterval;
-    this.selectedRefreshInterval = newInterval;
-    if (oldInterval.value === newInterval.value) {
-      return;
-    }
-    this.refreshSubscription?.unsubscribe();
-    if (newInterval.value) {
-      this.refreshEnabled = true;
-      this.triggerNextUpdate(newInterval.value, of(undefined));
-    } else {
-      this.refreshEnabled = false;
-    }
-  }
+  changeRefreshInterval(newInterval: { label: string; value: number }) {}
 
   calculateRange(selection: RelativeTimeSelection): TSTimeRange {
     let now = new Date().getTime();
@@ -119,6 +106,7 @@ export class SyntheticMonitoringPageComponent implements OnInit {
         const now = new Date().getTime();
         newInterval = { from: now - selection.relativeSelection!.timeInMs, to: now };
     }
+    this.context.updateSelectedRange(newInterval, false);
     this.context.updateFullRange(newInterval);
     let update$ = this.performanceView.updateFullRange(newInterval);
     if (this.refreshEnabled) {
