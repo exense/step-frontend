@@ -41,13 +41,12 @@ export class TimeSeriesContext {
   updateFullRange(range: TSTimeRange) {
     this.fullTimeRange = range;
     this.fullTimeRangeChange$.next(range);
-    if (!TimeSeriesUtils.intervalIsInside(range, this.selectedTimeRange)) {
-      // we need to make the selected time range smaller
-      let newSelectedRange: TSTimeRange = {
-        from: Math.max(range.from, this.selectedTimeRange.from),
-        to: Math.min(range.to, this.selectedTimeRange.to),
-      };
-      this.setSelectedTimeRange(newSelectedRange);
+  }
+
+  updateSelectedRange(range: TSTimeRange, emitEvent = true) {
+    this.selectedTimeRange = range;
+    if (emitEvent) {
+      this.selectedTimeRangeChange$.next(range);
     }
   }
 

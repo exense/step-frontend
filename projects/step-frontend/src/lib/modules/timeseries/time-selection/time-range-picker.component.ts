@@ -83,7 +83,9 @@ export class TimeRangePicker implements OnInit {
         type: RangeSelectionType.ABSOLUTE,
         absoluteSelection: { from: from, to: to },
       };
-      this.emitSelectionChange(newSelection);
+      if (from !== this.activeSelection.absoluteSelection?.from || to !== this.activeSelection.absoluteSelection?.to) {
+        this.emitSelectionChange(newSelection);
+      }
     }
     this.closeMenu();
   }
@@ -109,7 +111,10 @@ export class TimeRangePicker implements OnInit {
   /**
    * This method reacts to the component html selection change, and should NOT be used from exterior
    */
-  onFullRangeSelect() {
+  onFullRangeSelect(): void {
+    if (this.activeSelection.type === RangeSelectionType.FULL) {
+      return; // nothing changed
+    }
     this.emitSelectionChange({ type: RangeSelectionType.FULL });
   }
 

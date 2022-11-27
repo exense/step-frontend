@@ -97,20 +97,22 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   onEndedExecutionTimeRangeChange(selection: TimeRangePickerSelection) {
     let execution = this.execution!;
-    let newInterval: TSTimeRange;
+    let newFullRange: TSTimeRange;
     switch (selection.type) {
       case RangeSelectionType.FULL:
-        newInterval = { from: execution.startTime!, to: execution.endTime! };
+        newFullRange = { from: execution.startTime!, to: execution.endTime! };
         break;
       case RangeSelectionType.ABSOLUTE:
-        newInterval = selection.absoluteSelection!;
+        newFullRange = selection.absoluteSelection!;
         break;
       case RangeSelectionType.RELATIVE:
         const end = execution.endTime!;
         let from = Math.max(execution.startTime!, end - selection.relativeSelection!.timeInMs);
-        newInterval = { from: from, to: end };
+        newFullRange = { from: from, to: end };
+        console.log(newFullRange);
     }
-    this.context.updateFullRange(newInterval);
+    this.context.updateSelectedRange(newFullRange, false);
+    this.context.updateFullRange(newFullRange);
     // this.performanceView.updateFullRange(newInterval);
   }
 

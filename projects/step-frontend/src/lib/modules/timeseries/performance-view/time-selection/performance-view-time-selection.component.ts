@@ -56,8 +56,6 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
       .onSelectedTimeRangeChange()
       .pipe(takeUntil(this.terminator$))
       .subscribe((selection) => {
-        // this.currentSelection = selection;
-        console.log('ZOOM CHANGE', selection);
         if (this.tsContext.isFullRangeSelected()) {
           this.rangerComponent.resetSelect();
         } else {
@@ -68,9 +66,8 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
       .onFullRangeChange()
       .pipe(takeUntil(this.terminator$))
       .subscribe((range) => {
-        console.log('FULL RANGE CHANGED');
         this.settings.timeRange = range;
-        this.createRanger(this.tsContext.getSelectedTimeRange()).subscribe();
+        this.createRanger().subscribe();
       });
   }
 
