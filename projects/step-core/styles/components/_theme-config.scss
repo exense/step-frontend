@@ -185,4 +185,8 @@ $light-primary-text: white;
   tbody .form-group {
     margin-bottom: 15px;
   }
+
+  .cdk-overlay-container {
+    z-index: 1050;
+  }
 }
