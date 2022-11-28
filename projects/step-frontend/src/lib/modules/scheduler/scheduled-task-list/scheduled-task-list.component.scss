@@ -12,6 +12,11 @@
   @include core.status-shape();
   cursor: pointer;
   min-width: 50px;
+  border: none;
+
+  &[disabled] {
+    background-color: grey !important;
+  }
 }
 
 .status-on {
