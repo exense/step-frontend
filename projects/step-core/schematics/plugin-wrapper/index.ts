@@ -121,7 +121,7 @@ export default function createPlugin(options: Schema): Rule {
     const angularJsonChanges = moveAngularJsonChangesToWorkspace(names);
     const workspaceConfigs = addAdditionalWorkspaceConfigs(names);
     const packageJsonFile = modifyPackageJson(names);
-    const proxyConfig = modifyProxyConfig(names, options.port);
+    const proxyConfig = modifyProxyConfig(names, options.port.toString());
 
     return chain([pluginToSubtree, angularJsonChanges, workspaceConfigs, packageJsonFile, proxyConfig]);
   };
