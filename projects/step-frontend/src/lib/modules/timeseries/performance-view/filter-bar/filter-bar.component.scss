@@ -1,0 +1,24 @@
+.filter-bar-container {
+  width: 100%;
+  background: #f6f6f6;
+  padding: 8px 4px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  flex-grow: 1;
+  justify-content: flex-start;
+
+  .add-filter {
+  }
+
+  .filter-container {
+    display: flex;
+    flex-direction: row;
+    overflow: auto;
+    align-items: center;
+    flex-grow: 1;
+  }
+
+  .grouping {
+  }
+}

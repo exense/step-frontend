@@ -8,6 +8,7 @@ import { BucketFilters } from './model/bucket-filters';
 import { TimeSelectionState } from './time-selection.state';
 import { TSTimeRange } from './chart/model/ts-time-range';
 import { TimeSeriesUtils } from './time-series-utils';
+import { TsFilterItem } from './performance-view/filter-bar/model/ts-filter-item';
 
 /**
  * This class is responsible for managing the state of an execution tab. Here we store time selection, colors, filters, etc.
@@ -27,6 +28,9 @@ export class TimeSeriesContext {
   activeFilters: { [key: string]: any } = {};
   private readonly filtersChangeSubject: Subject<BucketFilters> = new Subject();
 
+  activeFilter: TsFilterItem[] = [];
+  private readonly activeFilter$: Subject<TsFilterItem[]> = new Subject();
+
   public readonly keywordsContext: TimeSeriesKeywordsContext;
   private readonly colorsPool: TimeseriesColorsPool;
 
@@ -36,6 +40,15 @@ export class TimeSeriesContext {
     this.selectedTimeRange = timeRange;
     this.colorsPool = new TimeseriesColorsPool();
     this.keywordsContext = new TimeSeriesKeywordsContext(this.colorsPool);
+  }
+
+  onActiveFilterChange(): Observable<TsFilterItem[]> {
+    return this.activeFilter$.asObservable();
+  }
+
+  updateFilter(items: TsFilterItem[]) {
+    this.activeFilter = items;
+    this.activeFilter$.next(this.activeFilter);
   }
 
   updateFullRange(range: TSTimeRange, emitEvent = true) {

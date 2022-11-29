@@ -13,6 +13,10 @@
     <button mat-raised-button (click)="navigateToRtmDashboard()">Interactive Session</button>
   </div>
 
+  <div style="width: 100%; background: #e8e8e8">
+    <step-ts-filter-bar> </step-ts-filter-bar>
+  </div>
+
   <step-time-range-picker
     #rangePicker
     [customRelativeOptions]="timeRangeOptions"

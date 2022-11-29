@@ -1,0 +1,19 @@
+<div class="filter-bar-container">
+  <div class="add-filter">
+    <button type="button" mat-raised-button color="primary" [matMenuTriggerFor]="menu">Add Filter</button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item *ngFor="let option of defaultFilterOptions" (click)="addFilterItem(option)">
+        <span>{{ option.label }}</span>
+      </button>
+      <button mat-menu-item>
+        <span>Other</span>
+      </button>
+      <button mat-menu-item>
+        <span>OQL</span>
+      </button>
+    </mat-menu>
+  </div>
+  <div class="filter-container">
+    <step-ts-filter-bar-item *ngFor="let item of items" [item]="item"> </step-ts-filter-bar-item>
+  </div>
+</div>

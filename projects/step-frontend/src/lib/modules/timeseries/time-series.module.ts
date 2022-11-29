@@ -17,6 +17,8 @@ import { SyntheticMonitoringPageComponent } from './synthetic-monitoring/synthet
 import { MeasurementsPickerComponent } from './performance-view/measurements/measurements-picker.component';
 import { PerformanceViewTimeSelectionComponent } from './performance-view/time-selection/performance-view-time-selection.component';
 import { MeasurementsFilterPipe } from './performance-view/measurements/measurements-filter.pipe';
+import { FilterBarComponent } from './performance-view/filter-bar/filter-bar.component';
+import { FilterBarItemComponent } from './performance-view/filter-bar/item/filter-bar-item.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +35,8 @@ import { MeasurementsFilterPipe } from './performance-view/measurements/measurem
     SyntheticMonitoringPageComponent,
     MeasurementsPickerComponent,
     MeasurementsFilterPipe,
+    FilterBarComponent,
+    FilterBarItemComponent,
   ],
   exports: [PerformanceViewComponent],
   imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule],

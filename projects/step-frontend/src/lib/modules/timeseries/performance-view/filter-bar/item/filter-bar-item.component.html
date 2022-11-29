@@ -1,0 +1,31 @@
+<div class="item-container" [matMenuTriggerFor]="menu">
+  <div class="filter-label">{{ item.label }}</div>
+  <div class="filter-value">
+    {{ formattedValue || '-' }}
+  </div>
+  <div (click)="removeItem($event)" class="remove-btn">
+    <step-icon class="remove-btn" name="x"></step-icon>
+  </div>
+</div>
+<mat-menu #menu="matMenu" [ngSwitch]="item.type">
+  <div class="menu-container" (click)="$event.stopPropagation()">
+    <div *ngSwitchCase="FilterBarType.TEXT">
+      <mat-form-field floatLabel="never">
+        <mat-label>Search Value</mat-label>
+        <input type="text" matInput />
+      </mat-form-field>
+      <div *ngFor="let option of item.textValues">
+        <mat-checkbox
+          color="primary"
+          [checked]="option.isSelected"
+          (change)="handleTextValueChange(option, $event.checked)"
+        >
+          {{ option.value }}
+        </mat-checkbox>
+      </div>
+    </div>
+    <div *ngSwitchCase="FilterBarType.FREE_TEXT"></div>
+    <div *ngSwitchCase="FilterBarType.NUMERIC"></div>
+    <div *ngSwitchCase="FilterBarType.DATE"></div>
+  </div>
+</mat-menu>
