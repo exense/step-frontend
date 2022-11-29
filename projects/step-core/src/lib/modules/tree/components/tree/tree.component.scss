@@ -1,45 +1,5 @@
-@use 'projects/step-core/styles/core-variables' as var;
-
-.tree-node {
+cdk-tree-node {
   display: flex;
-  align-items: center;
-  user-select: none;
-
-  .node-content {
-    padding: 2px 4px 2px 1px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-
-    step-icon {
-      margin-right: 6px;
-    }
-  }
-
-  .mat-icon-button {
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
-  }
-
-  &.tree-node-selected .node-content {
-    background: var.$light-blue;
-  }
-
-  &.potential-parent .node-content {
-    font-weight: bold;
-    font-size: 14px;
-    text-decoration: underline;
-  }
-
-  &.skipped {
-    color: var.$muted;
-  }
-}
-
-.drag-placeholder {
-  height: 40px;
-  background: var.$light-gray;
 }
 
 .node-context-menu-trigger {

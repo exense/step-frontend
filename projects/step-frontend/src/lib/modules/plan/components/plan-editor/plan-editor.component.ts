@@ -27,7 +27,6 @@ import {
   TreeStateService,
   Function as KeywordCall,
   TreeNodeUtilsService,
-  InsertPotentialParentStateService,
 } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PlanHistoryService } from '../../services/plan-history.service';
@@ -56,7 +55,6 @@ type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef' | '
       useExisting: ArtefactTreeNodeUtilsService,
     },
     TreeStateService,
-    InsertPotentialParentStateService,
     PlanHistoryService,
     InteractiveSessionService,
     {
@@ -469,7 +467,7 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
 
     const planUpdateByEditor$ = this.planChange$.pipe(
       tap((plan) => {
-        this._treeState.init(plan.root!);
+        this._treeState.init(plan.root!, undefined, false);
         this._planHistory.addToHistory(plan);
         this.plan = plan;
       })
@@ -477,7 +475,7 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
 
     const planUpdatedByHistory$ = this._planHistory.planChange$.pipe(
       tap((plan) => {
-        this._treeState.init(plan.root!);
+        this._treeState.init(plan.root!, undefined, false);
         this.plan = plan;
       })
     );

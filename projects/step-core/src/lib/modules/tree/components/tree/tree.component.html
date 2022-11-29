@@ -1,60 +1,47 @@
-<cdk-tree
-  [dataSource]="_treeState.dataSource"
-  [treeControl]="_treeState.treeControl"
-  cdkDropList
-  (cdkDropListDropped)="_treeState.handleDrop($event)"
->
-  <cdk-tree-node
-    *cdkTreeNodeDef="let node"
-    cdkTreeNodePadding
-    [cdkTreeNodePaddingIndent]="_treeState.paddingIdent"
-    class="tree-node"
-    [class.skipped]="node.isSkipped"
-    cdkDrag
-    [cdkDragDisabled]="dragDisabled || (node.id | isRootNode | async)"
-    [class.tree-node-selected]="node.id | isNodeSelected | async"
-    [class.potential-parent]="node.id | isNodePotentialParent | async"
-    (cdkDragStarted)="_treeState.handleDragStart(node)"
-    (click)="_treeState.selectNode(node, $event)"
-  >
-    <button mat-button mat-icon-button disabled></button>
-    <div class="node-content" (contextmenu)="openContextMenu($event, node.id)" cdkDragHandle>
-      <step-icon [name]="node.icon" [class]="node.iconClassName"></step-icon>
-      <step-tree-node-name [node]="node"></step-tree-node-name>
-    </div>
-    <div class="drag-placeholder" *cdkDragPlaceholder></div>
-    <step-tree-drag-preview *cdkDragPreview> </step-tree-drag-preview>
-  </cdk-tree-node>
-  <cdk-tree-node
-    *cdkTreeNodeDef="let node; when: hasChild"
-    cdkTreeNodePadding
-    [cdkTreeNodePaddingIndent]="_treeState.paddingIdent"
-    class="tree-node"
-    [class.expanded]="_treeState.treeControl.isExpanded(node)"
-    [class.skipped]="node.isSkipped"
-    cdkDrag
-    [cdkDragDisabled]="dragDisabled || (node.id | isRootNode | async)"
-    [class.tree-node-selected]="node.id | isNodeSelected | async"
-    [class.potential-parent]="node.id | isNodePotentialParent | async"
-    (cdkDragStarted)="_treeState.handleDragStart(node)"
-    (click)="_treeState.selectNode(node, $event)"
-  >
-    <button mat-button mat-icon-button cdkTreeNodeToggle (click)="_treeState.toggleNode(node.id)">
-      <ng-template #expanded>
-        <step-icon name="chevron-down"> </step-icon>
-      </ng-template>
-      <ng-template #notExpanded>
-        <step-icon name="chevron-right"> </step-icon>
-      </ng-template>
-      <ng-container *ngIf="_treeState.treeControl.isExpanded(node); then expanded; else notExpanded"> </ng-container>
-    </button>
-    <div class="node-content" (contextmenu)="openContextMenu($event, node.id)" cdkDragHandle>
-      <step-icon [name]="node.icon" [class]="node.iconClassName"> </step-icon>
-      <step-tree-node-name [node]="node"></step-tree-node-name>
-    </div>
-    <div class="drag-placeholder" *cdkDragPlaceholder></div>
-    <step-tree-drag-preview *cdkDragPreview> </step-tree-drag-preview>
-  </cdk-tree-node>
+<cdk-tree [dataSource]="_treeState.dataSource" [treeControl]="_treeState.treeControl" cdkDropListGroup>
+  <ng-container>
+    <cdk-tree-node
+      *cdkTreeNodeDef="let node"
+      cdkTreeNodePadding
+      [cdkTreeNodePaddingIndent]="paddingIdent"
+      cdkDropList
+      cdkDropListSortingDisabled="true"
+      [cdkDropListData]="node.id"
+      (cdkDropListDropped)="_treeDragDrop.handleDrop()"
+      (click)="_treeState.selectNode(node, $event)"
+    >
+      <step-tree-node
+        [node]="node"
+        [canToggle]="false"
+        [treeContainer]="_treeContainer"
+        [dragDisabled]="dragDisabled"
+        (contextMenu)="openContextMenu($event)"
+      >
+      </step-tree-node>
+    </cdk-tree-node>
+  </ng-container>
+  <ng-container>
+    <cdk-tree-node
+      *cdkTreeNodeDef="let node; when: hasChild"
+      cdkTreeNodePadding
+      [cdkTreeNodePaddingIndent]="paddingIdent"
+      [class.expanded]="_treeState.treeControl.isExpanded(node)"
+      cdkDropList
+      cdkDropListSortingDisabled="true"
+      (cdkDropListDropped)="_treeDragDrop.handleDrop()"
+      [cdkDropListData]="node.id"
+      (click)="_treeState.selectNode(node, $event)"
+    >
+      <step-tree-node
+        [node]="node"
+        [canToggle]="true"
+        [treeContainer]="_treeContainer"
+        [dragDisabled]="dragDisabled"
+        (contextMenu)="openContextMenu($event)"
+      >
+      </step-tree-node>
+    </cdk-tree-node>
+  </ng-container>
 </cdk-tree>
 <div
   #nodeContextMenuTrigger
