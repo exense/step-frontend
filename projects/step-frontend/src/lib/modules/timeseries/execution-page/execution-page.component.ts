@@ -18,6 +18,7 @@ import { RelativeTimeSelection } from '../time-selection/model/relative-time-sel
 import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { TimeSeriesContext } from '../time-series-context';
+import { TimeSeriesUtils } from '../time-series-utils';
 
 @Component({
   selector: 'step-execution-performance',
@@ -174,8 +175,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     if (oldInterval.value === newInterval.value) {
       return;
     }
+    this.updatingSubscription.unsubscribe();
     if (newInterval.value) {
-      this.updatingSubscription.unsubscribe();
       this.triggerNextUpdate(newInterval.value, of(undefined));
     }
   }
@@ -184,34 +185,58 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     this.updatingSubscription = forkJoin([timer(delay), observableToWaitFor])
       .pipe(
         tap(() => {
-          const now = new Date().getTime();
-          if (this.executionInProgress) {
-            this.performanceViewSettings!.timeRange.to =
-              now - (this.intervalShouldBeCanceled ? 0 : this.RUNNING_EXECUTION_END_TIME_BUFFER); // if the execution is not ended, we don't fetch until the end.
-          }
-          const timeSelection = this.timeRangeSelection;
-          if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
-            const from = now - timeSelection.relativeSelection.timeInMs;
-            timeSelection.absoluteSelection = { from: from, to: now };
-          }
+          // const now = new Date().getTime();
+          // if (this.executionInProgress) {
+          // let newFullRange = {
+          //   to: now - (this.intervalShouldBeCanceled ? 0 : this.RUNNING_EXECUTION_END_TIME_BUFFER)}; // if the execution is not ended, we don't fetch until the end.
+          //
+          //
+          // }
+          // const timeSelection = this.timeRangeSelection;
+          // if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
+          //   const from = now - timeSelection.relativeSelection.timeInMs;
+          //   timeSelection.absoluteSelection = { from: from, to: now };
+          // }
         }),
         switchMap(() => {
           return this.executionService.getExecutionById(this.executionId);
         })
       )
       .subscribe((details) => {
+        let now = new Date().getTime();
+        let isFullRangeSelected = this.context.isFullRangeSelected();
+        console.log('IS FULL RANGE: ', isFullRangeSelected);
+        let oldSelection = this.context.getSelectedTimeRange();
+        let newFullRange: TSTimeRange;
+        switch (this.timeRangeSelection.type) {
+          case RangeSelectionType.FULL:
+            newFullRange = { from: details.startTime!, to: details.endTime || now - 5000 };
+            break;
+          case RangeSelectionType.ABSOLUTE:
+            newFullRange = this.timeRangeSelection.absoluteSelection!;
+            break;
+          case RangeSelectionType.RELATIVE:
+            let end = details.endTime || now;
+            newFullRange = { from: end - this.timeRangeSelection.relativeSelection!.timeInMs!, to: end };
+            break;
+        }
+        // when the selection is 0, it will switch to full selection automatically
+        let newSelection = isFullRangeSelected
+          ? newFullRange
+          : TimeSeriesUtils.cropInterval(newFullRange, oldSelection) || newFullRange;
+
+        let updateDashboard$ = this.performanceView.updateDashboard({
+          updateRanger: true,
+          updateCharts: true,
+          fullTimeRange: newFullRange,
+          selection: newSelection,
+        });
         if (details.endTime) {
-          this.performanceViewSettings!.timeRange.to = details.endTime;
           this.intervalShouldBeCanceled = true;
           this.executionInProgress = false;
-          this.performanceView.refreshAllCharts(false, true).subscribe(() => {}); // don't re-trigger refresh
         } else {
-          if (this.selectedRefreshInterval.value) {
-            this.triggerNextUpdate(
-              this.selectedRefreshInterval.value,
-              this.performanceView.refreshAllCharts(false, true)
-            ); // recursive call
-          }
+          // the execution is not done yet
+          this.triggerNextUpdate(this.selectedRefreshInterval.value, updateDashboard$); // recursive call
         }
       });
   }

@@ -27,6 +27,7 @@ import { RangeSelectionType } from '../time-selection/model/range-selection-type
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { ThroughputMetric } from './model/throughput-metric';
 import { PerformanceViewConfig } from './performance-view.config';
+import { UpdatePerformanceViewRequest } from './model/update-performance-view-request';
 
 declare const uPlot: any;
 
@@ -182,12 +183,30 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.createAllCharts(this.findRequest);
   }
 
-  updateFullRange(range: TSTimeRange): Observable<unknown> {
+  /**
+   * This method will reconstruct all charts.
+   * @param range
+   */
+  updateFullRange(range: TSTimeRange): void {
+    this.context.updateFullRange(range, false);
     this.timeSelectionComponent.updateFullTimeRange(range);
     this.settings.timeRange = range;
     this.findRequest.start = range.from;
     this.findRequest.end = range.to;
-    return this.refreshAllCharts();
+  }
+
+  updateDashboard(request: UpdatePerformanceViewRequest): Observable<any> {
+    // let's assume the complete interval and selections are set.
+    this.context.updateFullRange(request.fullTimeRange, false);
+    this.context.updateSelectedRange(request.selection, false);
+    let updates$ = [];
+    if (request.updateRanger) {
+      updates$.push(this.timeSelectionComponent.refreshRanger());
+    }
+    // if (request.updateCharts) {
+    //   updates$.push(this.refreshAllCharts());
+    // }
+    return forkJoin(updates$);
   }
 
   handleZoomChange(range: TSTimeRange): Observable<any> {

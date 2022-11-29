@@ -44,14 +44,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
       throw new Error('Settings input is required');
     }
     this.tsContext = this.executionsPageService.getContext(this.settings.contextId);
-    // this.currentSelection = this.timeSelectionState.getActiveSelection();
-    this.createRanger().subscribe(() => this.onRangerLoaded.next());
-    // this.timeSelectionState
-    //   .onZoomReset()
-    //   .pipe(takeUntil(this.terminator$))
-    //   .subscribe((reset) => {
-    //     this.rangerComponent.resetSelect();
-    //   });
+    this.createRanger(this.tsContext.getFullTimeRange()).subscribe(() => this.onRangerLoaded.next());
     this.tsContext
       .onSelectedTimeRangeChange()
       .pipe(takeUntil(this.terminator$))
@@ -67,7 +60,11 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
       .pipe(takeUntil(this.terminator$))
       .subscribe((range) => {
         this.settings.timeRange = range;
-        this.createRanger().subscribe();
+        let customSelection = undefined;
+        if (!this.tsContext.isFullRangeSelected()) {
+          customSelection = this.tsContext.getSelectedTimeRange();
+        }
+        this.createRanger(this.tsContext.getFullTimeRange(), customSelection).subscribe();
       });
   }
 
@@ -78,16 +75,19 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   refreshRanger(): Observable<TimeSeriesChartResponse> {
     const selection = this.tsContext.getSelectedTimeRange();
-    return this.createRanger(selection);
+    return this.createRanger(
+      this.tsContext.getFullTimeRange(),
+      this.tsContext.isFullRangeSelected() ? undefined : selection
+    );
   }
 
-  createRanger(selection?: TSTimeRange): Observable<TimeSeriesChartResponse> {
-    const startTime = this.settings.timeRange.from;
-    const endTime = this.settings.timeRange.to || new Date().getTime() - 5000; // minus 5 seconds
+  createRanger(fullTimeRange: TSTimeRange, selection?: TSTimeRange): Observable<TimeSeriesChartResponse> {
+    // const startTime = this.settings.timeRange.from;
+    // const endTime = this.settings.timeRange.to || new Date().getTime() - 5000; // minus 5 seconds
     const request: FindBucketsRequest = {
       params: this.settings.contextualFilters,
-      start: startTime,
-      end: endTime, // to current time if it's not ended
+      start: fullTimeRange.from,
+      end: fullTimeRange.to, // to current time if it's not ended
       numberOfBuckets: TimeSeriesConfig.MAX_BUCKETS_IN_CHART,
     };
     return this.timeSeriesService.fetchBuckets(request).pipe(
@@ -118,7 +118,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   onRangerSelectionChange(event: TSTimeRange) {
     // check for full range selection
-    this.tsContext.setSelectedTimeRange(event);
+    this.tsContext.updateSelectedRange(event);
     // if (this.timeLabels[0] === event.from && this.timeLabels[this.timeLabels.length - 1] === event.to) {
     //
     // }

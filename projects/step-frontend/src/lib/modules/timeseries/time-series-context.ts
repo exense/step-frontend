@@ -38,9 +38,11 @@ export class TimeSeriesContext {
     this.keywordsContext = new TimeSeriesKeywordsContext(this.colorsPool);
   }
 
-  updateFullRange(range: TSTimeRange) {
+  updateFullRange(range: TSTimeRange, emitEvent = true) {
     this.fullTimeRange = range;
-    this.fullTimeRangeChange$.next(range);
+    if (emitEvent) {
+      this.fullTimeRangeChange$.next(range);
+    }
   }
 
   updateSelectedRange(range: TSTimeRange, emitEvent = true) {
@@ -64,11 +66,6 @@ export class TimeSeriesContext {
 
   getSelectedTimeRange(): TSTimeRange {
     return this.selectedTimeRange;
-  }
-
-  setSelectedTimeRange(range: TSTimeRange) {
-    this.selectedTimeRange = range;
-    this.selectedTimeRangeChange$.next(range);
   }
 
   resetZoom() {
@@ -114,5 +111,9 @@ export class TimeSeriesContext {
 
   getActiveFilters(): BucketFilters {
     return this.activeFilters;
+  }
+
+  getFullTimeRange(): TSTimeRange {
+    return this.fullTimeRange;
   }
 }

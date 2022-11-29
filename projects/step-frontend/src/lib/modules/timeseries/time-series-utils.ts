@@ -29,7 +29,23 @@ export class TimeSeriesUtils {
     return item ? (num / item.value).toFixed(2).replace(rx, '$1') + item.symbol : '0';
   }
 
-  static intervalIsInside(bigInterval: TSTimeRange, smallInterval: TSTimeRange) {
+  static intervalIsInside(bigInterval: TSTimeRange, smallInterval: TSTimeRange): boolean {
     return !(bigInterval.from > smallInterval.from || bigInterval.to < smallInterval.to);
+  }
+
+  /**
+   * If the intervals do not overlap, this method will return indefined.
+   * @param boundaries
+   * @param interval
+   */
+  static cropInterval(boundaries: TSTimeRange, interval: TSTimeRange): TSTimeRange | undefined {
+    if (!this.intervalsOverlap(boundaries, interval)) {
+      return undefined;
+    }
+    return { from: Math.max(boundaries.from, interval.from), to: Math.min(boundaries.to, interval.to) };
+  }
+
+  static intervalsOverlap(range1: TSTimeRange, range2: TSTimeRange) {
+    return range1.from <= range2.to && range2.from <= range1.to;
   }
 }

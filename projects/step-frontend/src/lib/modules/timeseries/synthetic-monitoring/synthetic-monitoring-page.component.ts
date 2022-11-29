@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AJS_MODULE, DashboardService } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PerformanceViewSettings } from '../performance-view/model/performance-view-settings';
@@ -18,8 +18,10 @@ import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.servi
   templateUrl: './synthetic-monitoring-page.component.html',
   styleUrls: ['./synthetic-monitoring-page.component.scss'],
 })
-export class SyntheticMonitoringPageComponent implements OnInit {
+export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
   readonly ONE_HOUR_MS = 3600 * 1000;
+
+  terminator$ = new Subject<void>();
 
   @ViewChild(TimeRangePicker) rangePicker!: TimeRangePicker;
   @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
@@ -60,6 +62,10 @@ export class SyntheticMonitoringPageComponent implements OnInit {
     private contextFactory: TimeSeriesContextsFactory
   ) {}
 
+  ngOnDestroy(): void {
+    throw new Error('Method not implemented.');
+  }
+
   ngOnInit(): void {
     if (!this.taskId) {
       throw new Error('ExecutionId parameter is not present');
@@ -77,7 +83,19 @@ export class SyntheticMonitoringPageComponent implements OnInit {
     this.dashboardInitComplete$.complete();
   }
 
-  changeRefreshInterval(newInterval: { label: string; value: number }) {}
+  changeRefreshInterval(newInterval: { label: string; value: number }) {
+    if (newInterval.value === this.selectedRefreshInterval.value) {
+      return;
+    }
+    this.refreshSubscription?.unsubscribe();
+    this.selectedRefreshInterval = newInterval;
+    if (newInterval.value) {
+      this.refreshEnabled = true;
+      this.triggerNextUpdate(newInterval.value, of(null));
+    } else {
+      this.refreshEnabled = false;
+    }
+  }
 
   calculateRange(selection: RelativeTimeSelection): TSTimeRange {
     let now = new Date().getTime();
@@ -106,9 +124,10 @@ export class SyntheticMonitoringPageComponent implements OnInit {
         const now = new Date().getTime();
         newInterval = { from: now - selection.relativeSelection!.timeInMs, to: now };
     }
+    let shouldRefreshCharts = this.context.isFullRangeSelected();
     this.context.updateSelectedRange(newInterval, false);
     this.context.updateFullRange(newInterval);
-    let update$ = this.performanceView.updateFullRange(newInterval);
+    let update$ = shouldRefreshCharts ? this.performanceView.refreshAllCharts() : of(null);
     if (this.refreshEnabled) {
       this.triggerNextUpdate(this.selectedRefreshInterval.value, update$);
     } else {
@@ -121,12 +140,30 @@ export class SyntheticMonitoringPageComponent implements OnInit {
       const activeSelection = this.rangePicker.getActiveSelection();
       let now = new Date().getTime();
       let newInterval = { from: now - activeSelection.relativeSelection!.timeInMs, to: now };
+      let newSelection: TSTimeRange;
+      let isFullRangeSelected = this.context.isFullRangeSelected();
+      let shouldRefreshCharts = isFullRangeSelected;
+      if (isFullRangeSelected) {
+        console.log('IS FULL RANGE');
+        newSelection = newInterval;
+      } else {
+        newSelection = {
+          from: Math.max(newInterval.from, this.context.getSelectedTimeRange().from),
+          to: Math.min(newInterval.to, this.context.getSelectedTimeRange().to),
+        };
+      }
+      if (newSelection.to - newSelection.from < 0) {
+        newSelection = newInterval;
+      }
       this.performanceViewSettings.timeRange = newInterval;
-      let refresh$ = this.performanceView.updateFullRange(newInterval);
-      // let refresh$ = this.performanceView.refreshAllCharts(true, false);
+      this.context.updateSelectedRange(newSelection, false);
+      this.context.updateFullRange(newInterval);
+      let refresh$ = shouldRefreshCharts ? this.performanceView.refreshAllCharts() : of(null);
       this.triggerNextUpdate(this.selectedRefreshInterval.value, refresh$);
     });
   }
+
+  calculateNewSelectionRange(fullTimeRange: TSTimeRange) {}
 
   navigateToRtmDashboard() {
     window.open(this.dashboardService.getRtmDashboardLink(this.taskId));
