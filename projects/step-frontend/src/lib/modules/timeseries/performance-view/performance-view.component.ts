@@ -274,25 +274,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .subscribe((allCompleted) => this.onInitializationComplete.emit());
   }
 
-  // calculateTimeIntervalForCurrentSelection(settings: PerformanceViewSettings): { start: number; end: number } {
-  //   let start = settings.startTime;
-  //   let end = settings.endTime;
-  //   let activeTimeSelection = this.executionContext.activeTimeSelection;
-  //   switch (activeTimeSelection.type) {
-  //     case RangeSelectionType.FULL:
-  //       // do nothing
-  //       break;
-  //     case RangeSelectionType.ABSOLUTE:
-  //       start = activeTimeSelection.absoluteSelection!.from || settings.startTime;
-  //       end = activeTimeSelection.absoluteSelection!.to || settings.endTime;
-  //       break;
-  //     case RangeSelectionType.RELATIVE:
-  //       start = end - activeTimeSelection.relativeSelection!.timeInMs;
-  //       break;
-  //   }
-  //   return { start: start, end: end };
-  // }
-
   /**
    * This method is called while live refreshing.
    * force = true -> The charts ar forced to refresh, even if the time interval was the same (because of filters/grouping change).
