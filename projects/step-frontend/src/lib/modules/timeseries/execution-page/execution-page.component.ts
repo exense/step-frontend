@@ -13,7 +13,7 @@ import { TimeSeriesService } from '../time-series.service';
 import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
-import { forkJoin, Observable, of, Subject, Subscription, switchMap, tap, timer } from 'rxjs';
+import { forkJoin, Observable, of, Subject, Subscription, switchMap, takeUntil, tap, timer } from 'rxjs';
 import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
 import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
 import { TSTimeRange } from '../chart/model/ts-time-range';
@@ -27,7 +27,8 @@ import { TimeSeriesUtils } from '../time-series-utils';
 })
 export class ExecutionPageComponent implements OnInit, OnDestroy {
   readonly ONE_HOUR_MS = 3600 * 1000;
-  private readonly RUNNING_EXECUTION_END_TIME_BUFFER = 5000; // if the exec is running, we don't grab the last 5 seconds
+
+  terminator$ = new Subject<void>();
 
   @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
 
@@ -90,7 +91,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   onTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
     if (this.executionInProgress) {
-      console.log('execution is in progress');
     } else {
       this.onEndedExecutionTimeRangeChange(selection);
     }
@@ -110,7 +110,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         const end = execution.endTime!;
         let from = Math.max(execution.startTime!, end - selection.relativeSelection!.timeInMs);
         newFullRange = { from: from, to: end };
-        console.log(newFullRange);
     }
     this.context.updateSelectedRange(newFullRange, false);
     this.context.updateFullRange(newFullRange);
@@ -175,29 +174,18 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     if (oldInterval.value === newInterval.value) {
       return;
     }
-    this.updatingSubscription.unsubscribe();
+    // this.updatingSubscription.unsubscribe();
+    this.terminator$.next();
     if (newInterval.value) {
-      this.triggerNextUpdate(newInterval.value, of(undefined));
+      let delay = oldInterval.value === 0 ? 0 : newInterval.value;
+      this.triggerNextUpdate(delay, of(undefined));
     }
   }
 
   triggerNextUpdate(delay: number, observableToWaitFor: Observable<unknown>) {
     this.updatingSubscription = forkJoin([timer(delay), observableToWaitFor])
       .pipe(
-        tap(() => {
-          // const now = new Date().getTime();
-          // if (this.executionInProgress) {
-          // let newFullRange = {
-          //   to: now - (this.intervalShouldBeCanceled ? 0 : this.RUNNING_EXECUTION_END_TIME_BUFFER)}; // if the execution is not ended, we don't fetch until the end.
-          //
-          //
-          // }
-          // const timeSelection = this.timeRangeSelection;
-          // if (timeSelection.type === RangeSelectionType.RELATIVE && timeSelection.relativeSelection) {
-          //   const from = now - timeSelection.relativeSelection.timeInMs;
-          //   timeSelection.absoluteSelection = { from: from, to: now };
-          // }
-        }),
+        takeUntil(this.terminator$),
         switchMap(() => {
           return this.executionService.getExecutionById(this.executionId);
         })
@@ -205,7 +193,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       .subscribe((details) => {
         let now = new Date().getTime();
         let isFullRangeSelected = this.context.isFullRangeSelected();
-        console.log('IS FULL RANGE: ', isFullRangeSelected);
         let oldSelection = this.context.getSelectedTimeRange();
         let newFullRange: TSTimeRange;
         switch (this.timeRangeSelection.type) {
@@ -227,7 +214,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
         let updateDashboard$ = this.performanceView.updateDashboard({
           updateRanger: true,
-          updateCharts: true,
+          updateCharts: JSON.stringify(newSelection) !== JSON.stringify(oldSelection),
           fullTimeRange: newFullRange,
           selection: newSelection,
         });
@@ -248,7 +235,9 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.contextsFactory.destroyContext(this.executionId);
     this.dashboardInitComplete$.complete();
-    this.updatingSubscription.unsubscribe();
+    // this.updatingSubscription.unsubscribe();
+    this.terminator$.next();
+    this.terminator$.complete();
   }
 }
 

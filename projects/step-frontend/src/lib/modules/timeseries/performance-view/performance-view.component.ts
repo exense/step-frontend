@@ -203,9 +203,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     if (request.updateRanger) {
       updates$.push(this.timeSelectionComponent.refreshRanger());
     }
-    // if (request.updateCharts) {
-    //   updates$.push(this.refreshAllCharts());
-    // }
+    if (request.updateCharts) {
+      updates$.push(this.refreshAllCharts());
+    }
     return forkJoin(updates$);
   }
 
@@ -221,7 +221,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       start: range.from,
       end: range.to,
     };
-    return this.refreshAllCharts(true, false);
+    return this.refreshAllCharts(true);
   }
 
   deleteObjectProperties(object: any, keys: string[]) {
@@ -297,23 +297,19 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
    * This method is called while live refreshing.
    * force = true -> The charts ar forced to refresh, even if the time interval was the same (because of filters/grouping change).
    */
-  refreshAllCharts(force = false, updateRanger = true): Observable<unknown> {
+  refreshAllCharts(force = false): Observable<unknown> {
     this.findRequest = this.prepareFindRequest(this.settings); // we don't want to lose active filters
     this.mergeRequestWithActiveFilters(this.findRequest);
     let fullTimeRange = this.context.getSelectedTimeRange();
     this.findRequest.start = fullTimeRange.from;
     this.findRequest.end = fullTimeRange.to;
 
-    const charts$ = updateRanger ? [this.timeSelectionComponent.refreshRanger()] : [];
-
-    charts$.push(
-      ...[
-        this.createSummaryChart(this.findRequest),
-        this.createByStatusChart(this.findRequest),
-        this.createByKeywordsCharts(this.findRequest),
-        this.updateTable(this.findRequest),
-      ]
-    );
+    const charts$ = [
+      this.createSummaryChart(this.findRequest),
+      this.createByStatusChart(this.findRequest),
+      this.createByKeywordsCharts(this.findRequest),
+      this.updateTable(this.findRequest),
+    ];
     if (this.includeThreadGroupChart) {
       charts$.push(this.createThreadGroupsChart(this.findRequest));
     }

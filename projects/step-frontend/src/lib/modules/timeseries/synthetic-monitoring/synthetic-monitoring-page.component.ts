@@ -8,7 +8,7 @@ import { TimeRangePicker } from '../time-selection/time-range-picker.component';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
-import { forkJoin, Observable, of, Subject, Subscription, timer } from 'rxjs';
+import { forkJoin, Observable, of, Subject, Subscription, takeUntil, timer } from 'rxjs';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
 import { TimeSeriesContext } from '../time-series-context';
 import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
@@ -62,10 +62,6 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
     private contextFactory: TimeSeriesContextsFactory
   ) {}
 
-  ngOnDestroy(): void {
-    throw new Error('Method not implemented.');
-  }
-
   ngOnInit(): void {
     if (!this.taskId) {
       throw new Error('ExecutionId parameter is not present');
@@ -87,7 +83,7 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
     if (newInterval.value === this.selectedRefreshInterval.value) {
       return;
     }
-    this.refreshSubscription?.unsubscribe();
+    this.terminator$.next();
     this.selectedRefreshInterval = newInterval;
     if (newInterval.value) {
       this.refreshEnabled = true;
@@ -112,7 +108,7 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
-    this.refreshSubscription?.unsubscribe();
+    this.terminator$.next();
     let newInterval;
     switch (selection.type) {
       case RangeSelectionType.FULL:
@@ -136,37 +132,41 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
   }
 
   triggerNextUpdate(delay: number, observableToWaitFor: Observable<unknown>): void {
-    this.refreshSubscription = forkJoin([timer(delay), observableToWaitFor]).subscribe(() => {
-      const activeSelection = this.rangePicker.getActiveSelection();
-      let now = new Date().getTime();
-      let newInterval = { from: now - activeSelection.relativeSelection!.timeInMs, to: now };
-      let newSelection: TSTimeRange;
-      let isFullRangeSelected = this.context.isFullRangeSelected();
-      let shouldRefreshCharts = isFullRangeSelected;
-      if (isFullRangeSelected) {
-        console.log('IS FULL RANGE');
-        newSelection = newInterval;
-      } else {
-        newSelection = {
-          from: Math.max(newInterval.from, this.context.getSelectedTimeRange().from),
-          to: Math.min(newInterval.to, this.context.getSelectedTimeRange().to),
-        };
-      }
-      if (newSelection.to - newSelection.from < 0) {
-        newSelection = newInterval;
-      }
-      this.performanceViewSettings.timeRange = newInterval;
-      this.context.updateSelectedRange(newSelection, false);
-      this.context.updateFullRange(newInterval);
-      let refresh$ = shouldRefreshCharts ? this.performanceView.refreshAllCharts() : of(null);
-      this.triggerNextUpdate(this.selectedRefreshInterval.value, refresh$);
-    });
+    this.refreshSubscription = forkJoin([timer(delay), observableToWaitFor])
+      .pipe(takeUntil(this.terminator$))
+      .subscribe(() => {
+        const activeSelection = this.rangePicker.getActiveSelection();
+        let now = new Date().getTime();
+        let newInterval = { from: now - activeSelection.relativeSelection!.timeInMs, to: now };
+        let newSelection: TSTimeRange;
+        let isFullRangeSelected = this.context.isFullRangeSelected();
+        let shouldRefreshCharts = isFullRangeSelected;
+        if (isFullRangeSelected) {
+          newSelection = newInterval;
+        } else {
+          newSelection = {
+            from: Math.max(newInterval.from, this.context.getSelectedTimeRange().from),
+            to: Math.min(newInterval.to, this.context.getSelectedTimeRange().to),
+          };
+        }
+        if (newSelection.to - newSelection.from < 0) {
+          newSelection = newInterval;
+        }
+        this.performanceViewSettings.timeRange = newInterval;
+        this.context.updateSelectedRange(newSelection, false);
+        this.context.updateFullRange(newInterval);
+        let refresh$ = shouldRefreshCharts ? this.performanceView.refreshAllCharts() : of(null);
+        this.triggerNextUpdate(this.selectedRefreshInterval.value, refresh$);
+      });
   }
-
-  calculateNewSelectionRange(fullTimeRange: TSTimeRange) {}
 
   navigateToRtmDashboard() {
     window.open(this.dashboardService.getRtmDashboardLink(this.taskId));
+  }
+
+  ngOnDestroy(): void {
+    this.terminator$.next();
+    this.terminator$.complete();
   }
 }
 

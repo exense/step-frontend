@@ -100,7 +100,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       bind: {
         dblclick: (self: uPlot, target: HTMLElement, handler: MouseListener) => {
           return (e: any) => {
-            console.log('DBL CLICK');
             this.onZoomReset.emit(true);
             handler(e);
             return null;

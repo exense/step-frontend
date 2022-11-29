@@ -20,7 +20,6 @@ export class TimeSelectionState {
     }
     this.activeTimeSelection = { type: RangeSelectionType.FULL, absoluteSelection: range };
     this.activeSelectionChange$.next(this.activeTimeSelection);
-    console.log('Emiting change event: ', this.activeTimeSelection);
     this.zoomReset$.next();
   }
 
