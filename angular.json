@@ -193,6 +193,5 @@
         }
       }
     }
-  },
-  "defaultProject": "@exense/step-app"
+  }
 }

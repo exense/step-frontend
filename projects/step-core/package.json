@@ -1,6 +1,6 @@
 {
   "name": "@exense/step-core",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "schematics": "./schematics/collection.json",
   "scripts": {
     "build": "tsc -p tsconfig.schematcis.json",
@@ -17,22 +17,22 @@
     }
   },
   "peerDependencies": {
-    "@angular-architects/module-federation": "14.0.1",
-    "@angular/common": "13.1.1",
-    "@angular/core": "13.1.1",
-    "@angular/forms": "13.1.1",
-    "@angular/upgrade": "13.1.1",
-    "@angular-devkit/schematics": "13.2.5",
-    "@angular/material": "13.3.2",
-    "@angular/material-luxon-adapter": "13.3.2",
+    "@angular-architects/module-federation": "14.2.0",
+    "@angular/common": "14.2.8",
+    "@angular/core": "14.2.8",
+    "@angular/forms": "14.2.8",
+    "@angular/upgrade": "14.2.8",
+    "@angular-devkit/schematics": "14.2.7",
+    "@angular/material": "14.2.6",
+    "@angular/material-luxon-adapter": "14.2.6",
     "@types/luxon": "2.3.2",
-    "@angular/cdk": "13.3.2",
-    "@schematics/angular": "13.1.2",
+    "@angular/cdk": "14.2.6",
+    "@schematics/angular": "14.2.7",
     "@types/angular": "1.7.4",
     "@types/uuid": "8.3.4",
     "uuid": "8.3.2",
-    "rxjs": "^7.4.0",
-    "angular-split": "13.1.0"
+    "rxjs": "7.4.0",
+    "angular-split": "14.1.0"
   },
   "dependencies": {
     "tslib": "2.3.0"
