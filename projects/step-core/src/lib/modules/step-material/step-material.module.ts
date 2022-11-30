@@ -29,6 +29,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { BtnGroupComponent } from './components/btn-group/btn-group.component';
 import { MatLuxonDateModule } from '@angular/material-luxon-adapter';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
 import { ThemeComponent } from './components/theme/theme.component';
 import { StepIconsModule } from '../step-icons/step-icons.module';
@@ -63,12 +64,13 @@ import { StepIconsModule } from '../step-icons/step-icons.module';
     MatButtonModule,
     MatTooltipModule,
     MatLuxonDateModule,
+    MatSnackBarModule,
     OverlayModule,
     PortalModule,
     BtnGroupComponent,
     MatCardModule,
     ThemeComponent,
-    StepIconsModule
+    StepIconsModule,
   ],
 })
 export class StepMaterialModule {}
