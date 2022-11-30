@@ -26,4 +26,8 @@ export class AugmentedSchedulerService extends SchedulerService {
     //@ts-ignore
     return this._httpClient.post<any>('rest/scheduler/task/' + id + '/execute', null, { responseType: 'text' });
   }
+
+  public isSchedulerEnabled(): Observable<boolean> {
+    return this._httpClient.get<boolean>('rest/settings/scheduler_enabled');
+  }
 }
