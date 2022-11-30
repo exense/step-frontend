@@ -1,19 +1,19 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, map, Observable, combineLatest, Subject, of, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, of, Subject, tap } from 'rxjs';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
-import { SelectionModel } from '@angular/cdk/collections';
-import { InsertPositionData } from '../shared/insert-position-data';
 import { TreeNodeUtilsService } from './tree-node-utils.service';
 import { TreeNode } from '../shared/tree-node';
 import { TreeFlatNode } from '../shared/tree-flat-node';
 import { catchError, switchMap } from 'rxjs/operators';
+import { DropType } from '../shared/drop-type.enum';
 
 const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === index;
 
 @Injectable()
 export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
-  readonly paddingIdent = 15;
+  private nodesAccessCache = new Map<string, N>();
+
   readonly treeControl = new FlatTreeControl<TreeFlatNode>(
     (node) => node.level,
     (node) => node.expandable
@@ -27,7 +27,6 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     (node) => node.children || []
   );
   readonly dataSource = new MatTreeFlatDataSource<TreeNode, TreeFlatNode>(this.treeControl, this.treeFlattener);
-  readonly expansionModel = new SelectionModel<string>(true);
 
   private originalRoot?: T;
   private rootNode$ = new BehaviorSubject<N | undefined>(undefined);
@@ -53,6 +52,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   init(root: T, selectedNodeIds?: string[], expandAllByDefault: boolean = true): void {
     this.originalRoot = root;
     const rootNode = this._treeNodeUtils.convertItem(root);
+    this.nodesAccessCache.clear();
     this.rootNode$.next(rootNode);
     if (selectedNodeIds) {
       this.selectedNodeIds$.next(selectedNodeIds);
@@ -114,8 +114,12 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     }
   }
 
-  selectNode(node: N, $event?: MouseEvent): void {
+  selectNode(node: N, $event?: MouseEvent, preventIfAlreadySelected: boolean = false): void {
     const selectedNodeIds = this.selectedNodeIds$.value;
+
+    if (preventIfAlreadySelected && selectedNodeIds.includes(node.id!)) {
+      return;
+    }
 
     if ($event?.ctrlKey) {
       if (selectedNodeIds.includes(node.id!)) {
@@ -159,16 +163,66 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     }
   }
 
-  getFirstSelectedNodeIndex(): number {
-    const nodeIds = this.selectedNodeIds$.value.filter((nodeId) => nodeId !== this.rootNode$.value?.id);
-    if (nodeIds.length === 0) {
-      return -1;
+  insertSelectedNodesTo(nodeId: string, dropType: DropType): void {
+    const selectedNodeIds = this.selectedNodeIds$.value.filter((nodeId) => nodeId !== this.rootNode$.value?.id);
+    if (selectedNodeIds.length === 0) {
+      return;
     }
-    const index = this.treeControl.dataNodes.findIndex((node) => node.id === nodeIds[0]);
-    return index;
+
+    type InsideInsertStrategy = 'append' | 'prepend';
+    let insideInsertStrategy: InsideInsertStrategy = 'append';
+
+    let parentId = nodeId;
+
+    if (dropType === DropType.after && this.isNodeExpanded(parentId)) {
+      const parent = this.findNodeById(parentId);
+      if ((parent?.children || []).length > 0) {
+        // drop after for expanded node with children interpret like drop inside, as first children
+        dropType = DropType.inside;
+        insideInsertStrategy = 'prepend';
+      }
+    }
+
+    if (dropType !== DropType.inside) {
+      const node = this.findNodeById(parentId);
+      if (!node?.parentId) {
+        return;
+      }
+      parentId = node?.parentId;
+    }
+
+    const parent = this.findNodeById(parentId);
+    if (!parent) {
+      return;
+    }
+
+    const nodesToAdd = selectedNodeIds.map((nodeId) => this.findNodeById(nodeId)).filter((x) => !!x);
+
+    const children = ([...parent.children!] as N[]).filter((child) => !selectedNodeIds.includes(child.id));
+
+    if (dropType === DropType.inside) {
+      if (insideInsertStrategy === 'append') {
+        children.push(...(nodesToAdd as N[]));
+      } else {
+        children.unshift(...(nodesToAdd as N[]));
+      }
+    } else {
+      const siblingIndex = children.findIndex((child) => child.id === nodeId)!;
+      let start: number;
+      if (dropType === DropType.before) {
+        start = siblingIndex;
+      } else if (dropType === DropType.after) {
+        start = siblingIndex + 1;
+      }
+      children.splice(start!, 0, ...(nodesToAdd as N[]));
+    }
+
+    this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, children, 'replace');
+
+    this.refresh();
   }
 
-  canInsertSelectedNodesAt(insertPositionData: InsertPositionData): boolean {
+  canInsertTo(nodeId: string, checkParent: boolean): boolean {
     const artefacts = this.selectedNodeIds$.value
       .filter(
         (nodeId) => nodeId !== this.rootNode$.value?.id && !!this.treeControl.dataNodes.find((n) => n.id === nodeId)
@@ -180,55 +234,16 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       return false;
     }
 
-    const { parent } = this.determineNewParentToInsert(insertPositionData, false);
-    if (!parent) {
-      return false;
-    }
-
-    return this.isPossibleToInsert(parent.id, ...artefacts);
-  }
-
-  handleDrop(insertPositionData: InsertPositionData): void {
-    const selectedNodeIds = this.selectedNodeIds$.value.filter((nodeId) => nodeId !== this.rootNode$.value?.id);
-    const flatNodesToMove = selectedNodeIds.map((nodeId) => this.treeControl.dataNodes.find((n) => n.id === nodeId));
-
-    if (flatNodesToMove.length === 0) {
-      return;
-    }
-
-    const { parent: currentParent, siblingId, isLevelDown } = this.determineNewParentToInsert(insertPositionData);
-
-    if (!currentParent) {
-      return;
-    }
-
-    const nodes = flatNodesToMove.map((n) => this.findNodeById(n!.id!)).filter((x) => !!x) as N[];
-
-    if (!this.isPossibleToInsert(currentParent.id, ...nodes)) {
-      return;
-    }
-
-    let siblingIndex = 0;
-    if (!isLevelDown) {
-      siblingIndex = currentParent.children!.findIndex((sibling) => sibling.id === siblingId);
-      if (siblingIndex < 0) {
-        siblingIndex = 0;
+    let parentIdToCheck = nodeId;
+    if (checkParent) {
+      const node = this.findNodeById(parentIdToCheck);
+      if (!node?.parentId) {
+        return false;
       }
+      parentIdToCheck = node?.parentId;
     }
 
-    const nodeIds = nodes.map((n) => n.id);
-    const children = [...currentParent.children!].filter((child) => !nodeIds.includes(child.id));
-    children.splice(siblingIndex, 0, ...nodes);
-    this._treeNodeUtils.updateChildren(this.originalRoot!, currentParent.id, children as N[], 'replace');
-
-    this.refresh();
-  }
-
-  handleDragStart(node: N): void {
-    if (this.selectedNodeIds$.value.includes(node.id!)) {
-      return;
-    }
-    this.selectNode(node);
+    return this.isPossibleToInsert(parentIdToCheck, ...artefacts);
   }
 
   moveSelectedNodes(direction: 'up' | 'down'): void {
@@ -286,10 +301,8 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
     this.refresh();
 
-    if (!this.expansionModel.isSelected(parentId)) {
-      this.expansionModel.toggle(parentId);
-      const parentFlat = this.treeControl.dataNodes.find((node) => node.id === parentId);
-      this.treeControl.expand(parentFlat!);
+    if (!this.isNodeExpanded(parentId)) {
+      this.expandNodeInternal(parentId);
     }
 
     const lastChild = newNodes[newNodes.length - 1];
@@ -319,14 +332,19 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     this.selectedNodeIds$.next([lastParent!.id!]);
   }
 
-  findNodeById(id?: string, parent?: N): N | undefined {
+  findNodeById(id?: string, parent?: N, useCache: boolean = true): N | undefined {
     if (!id) {
       return undefined;
+    }
+
+    if (useCache && this.nodesAccessCache.has(id)) {
+      return this.nodesAccessCache.get(id);
     }
 
     parent = parent || this.rootNode$.value;
 
     if (parent?.id === id) {
+      this.nodesAccessCache.set(id, parent);
       return parent;
     }
 
@@ -334,76 +352,57 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       return undefined;
     }
 
-    let result = parent.children!.find((child) => child.id === id);
+    let result = parent.children!.find((child) => child.id === id) as N;
     if (result) {
-      return result as N;
+      this.nodesAccessCache.set(id, result);
+      return result;
     }
 
-    result = parent.children!.map((child) => this.findNodeById(id, child as N)).find((res) => !!res);
+    result = parent.children!.map((child) => this.findNodeById(id, child as N)).find((res) => !!res) as N;
 
-    return result as N;
+    if (result) {
+      this.nodesAccessCache.set(id, result);
+    }
+
+    return result;
   }
 
   toggleNode(nodeId: string): void {
     const checkChildren = !!this._treeNodeUtils.hasChildren && !!this._treeNodeUtils.loadChildren;
 
-    if (checkChildren && this._treeNodeUtils.hasChildren!(nodeId) && !this.expansionModel.isSelected(nodeId)) {
+    if (checkChildren && this._treeNodeUtils.hasChildren!(nodeId) && !this.isNodeExpanded(nodeId)) {
       const node = this.findNodeById(nodeId)!;
       if ((node.children || []).length === 0) {
         this._treeNodeUtils.loadChildren!(node).subscribe(() => {
-          this.expansionModel.toggle(nodeId);
           this.refresh();
+          this.toggleNodeInternal(nodeId);
         });
+      } else {
+        this.toggleNodeInternal(nodeId);
       }
     } else {
-      this.expansionModel.toggle(nodeId);
+      this.toggleNodeInternal(nodeId);
     }
   }
 
-  expandPath(path: string[]): Observable<boolean> {
-    const checkChildren = !!this._treeNodeUtils.hasChildren && !!this._treeNodeUtils.loadChildren;
+  expandNode(nodeId: string): Observable<boolean>;
+  expandNode(path: string[]): Observable<boolean>;
+  expandNode(nodeIdOrPath: string | string[]): Observable<boolean> {
+    if (nodeIdOrPath instanceof Array) {
+      const path = nodeIdOrPath;
+      return this.expandPath(path);
+    }
 
-    const expandChild = (nodeId: string) => {
-      if (this.expansionModel.isSelected(nodeId)) {
-        return of(true);
-      }
+    const nodeId = nodeIdOrPath;
 
-      if (checkChildren && this._treeNodeUtils.hasChildren!(nodeId)) {
-        const node = this.findNodeById(nodeId);
-        if (!node) {
-          return of(false);
-        }
-        if ((node.children || []).length > 0) {
-          return of(true);
-        }
+    const path = [nodeId];
+    let node = this.findNodeById(nodeId);
+    while (!!node?.parentId) {
+      path.unshift(node.parentId);
+      node = this.findNodeById(node.parentId);
+    }
 
-        return this._treeNodeUtils.loadChildren!(node).pipe(
-          tap(() => {
-            this.expansionModel.toggle(nodeId);
-            this.refresh();
-          }),
-          map(() => true),
-          catchError(() => of(false))
-        );
-      }
-
-      this.expansionModel.toggle(nodeId);
-      return of(true);
-    };
-
-    const [first, ...other] = path;
-    const result$ = other.reduce(($res, pathItem) => {
-      return $res.pipe(
-        switchMap((result) => {
-          if (!result) {
-            return of(result);
-          }
-          return expandChild(pathItem);
-        })
-      );
-    }, expandChild(first));
-
-    return result$;
+    return this.expandPath(path);
   }
 
   reloadChildrenForNode(nodeId: string): void {
@@ -417,16 +416,12 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   }
 
   expandAll(): void {
-    const ids = this.treeControl.dataNodes.map((node) => node.id!);
-    this.expansionModel.select(...ids);
     this.treeControl.dataNodes.forEach((node) => {
       this.treeControl.expand(node);
     });
   }
 
   collapseAll(): void {
-    const ids = this.treeControl.dataNodes.map((node) => node.id!);
-    this.expansionModel.deselect(...ids);
     this.treeControl.dataNodes.forEach((node) => {
       this.treeControl.collapse(node);
     });
@@ -441,6 +436,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.nodesAccessCache.clear();
     this.rootNode$.complete();
     this.selectedNodeIds$.complete();
     this.treeUpdateInternal$.complete();
@@ -468,67 +464,27 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       }
     };
     this.dataSource.data.forEach((node) => {
-      addExpandedChildren(node as N, this.expansionModel.selected);
+      addExpandedChildren(
+        node as N,
+        this.treeControl.expansionModel.selected.map((node) => node.id)
+      );
     });
     return result;
   }
 
   private updateData(nodes: N[]): void {
+    const expandedNodes = (this.treeControl.dataNodes || [])
+      .filter((node) => this.treeControl.isExpanded(node))
+      .map((node) => node.id);
+    this.treeControl.expansionModel.clear();
     this.dataSource.data = nodes;
-    this.expansionModel.selected.forEach((id) => {
-      const node = this.treeControl.dataNodes.find((node) => node.id === id);
-      this.treeControl.expand(node!);
-    });
-  }
-
-  private determineNewParentToInsert(
-    { currentIndex, previousIndex, distance }: InsertPositionData,
-    preventCycleParentChoice: boolean = true
-  ): {
-    parent?: N;
-    siblingId?: string;
-    isLevelDown: boolean;
-  } {
-    const visibleNodes = this.getVisibleNodes().map(
-      (node) => this.treeControl.dataNodes.find((flatNode) => flatNode.id === node.id)!
-    );
-
-    if (currentIndex === previousIndex) {
-      currentIndex--;
-    }
-
-    const current = visibleNodes[currentIndex];
-
-    let currentParentId = current?.parentId;
-
-    let isLevelDown = false;
-    const siblingId = current?.id;
-
-    if (distance.x >= this.paddingIdent) {
-      // level down
-      currentParentId = current!.id;
-      isLevelDown = true;
-    }
-
-    if (preventCycleParentChoice) {
-      const selectedNodeIds = this.selectedNodeIds$.value.filter((nodeId) => nodeId !== this.rootNode$.value?.id);
-
-      while (selectedNodeIds.includes(currentParentId!)) {
-        const node = this.treeControl.dataNodes.find((n) => n.id === currentParentId);
-        currentParentId = node?.parentId;
-        isLevelDown = false;
-      }
-    }
-
-    const parent = this.findNodeById(currentParentId);
-
-    return { parent, isLevelDown, siblingId };
+    expandedNodes.forEach((id) => this.expandNodeInternal(id));
   }
 
   private isPossibleToInsert(newParentId: string, ...itemsToInsert: N[]): boolean {
     // If new parent is a child of itemsToInsert, prevent the insert
     const newParentFoundIn = itemsToInsert
-      .map((item) => !!this.findNodeById(newParentId!, item))
+      .map((item) => !!this.findNodeById(newParentId!, item, false))
       .filter((isFound) => isFound);
 
     // Allow the insertion, if new parent doesn't exist in items to insert
@@ -537,8 +493,80 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
   private refresh(): void {
     const root = this._treeNodeUtils.convertItem(this.originalRoot!);
+    this.nodesAccessCache.clear();
     this.updateData([root]);
     this.rootNode$.next(root);
     this.treeUpdateInternal$.next(this.originalRoot!);
+  }
+
+  private expandPath(path: string[]): Observable<boolean> {
+    const checkChildren = !!this._treeNodeUtils.hasChildren && !!this._treeNodeUtils.loadChildren;
+
+    const expandChild = (nodeId: string) => {
+      if (this.isNodeExpanded(nodeId)) {
+        return of(true);
+      }
+
+      if (checkChildren && this._treeNodeUtils.hasChildren!(nodeId)) {
+        const node = this.findNodeById(nodeId);
+        if (!node) {
+          return of(false);
+        }
+        if ((node.children || []).length > 0) {
+          return of(true);
+        }
+
+        return this._treeNodeUtils.loadChildren!(node).pipe(
+          tap(() => {
+            this.refresh();
+            this.toggleNodeInternal(nodeId);
+          }),
+          map(() => true),
+          catchError(() => of(false))
+        );
+      }
+
+      this.expandNodeInternal(nodeId);
+      return of(true);
+    };
+
+    const [first, ...other] = path;
+    const result$ = other.reduce(($res, pathItem) => {
+      return $res.pipe(
+        switchMap((result) => {
+          if (!result) {
+            return of(result);
+          }
+          return expandChild(pathItem);
+        })
+      );
+    }, expandChild(first));
+
+    return result$;
+  }
+
+  private isNodeExpanded(nodeId: string): boolean {
+    return this.treeControl.expansionModel.selected.map((node) => node.id).includes(nodeId);
+  }
+
+  private expandNodeInternal(nodeId: string): void {
+    const node = this.treeControl.dataNodes.find((node) => node.id === nodeId);
+    if (node) {
+      this.treeControl.expand(node);
+    }
+  }
+
+  private collapseNodeInternal(nodeId: string): void {
+    const node = this.treeControl.dataNodes.find((node) => node.id === nodeId);
+    if (node) {
+      this.treeControl.collapse(node);
+    }
+  }
+
+  private toggleNodeInternal(nodeId: string): void {
+    const node = this.treeControl.dataNodes.find((node) => node.id === nodeId);
+    if (node) {
+      this.treeControl.toggle(node);
+    }
   }
 }

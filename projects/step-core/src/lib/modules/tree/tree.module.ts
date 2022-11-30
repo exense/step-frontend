@@ -12,6 +12,8 @@ import { IsRootNodePipe } from './pipes/is-root-node.pipe';
 import { TreeNodeActionsPipe } from './pipes/tree-node-actions.pipe';
 import { TreeNodeNameComponent } from './components/tree-node-name/tree-node-name.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { TreeDragPlaceholderComponent } from './components/tree-drag-placeholder/tree-drag-placeholder.component';
+import { TreeNodeComponent } from './components/tree-node/tree-node.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +23,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     IsRootNodePipe,
     TreeNodeActionsPipe,
     TreeNodeNameComponent,
+    TreeDragPlaceholderComponent,
+    TreeNodeComponent,
   ],
   imports: [
     CommonModule,
