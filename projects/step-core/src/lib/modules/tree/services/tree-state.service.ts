@@ -12,6 +12,8 @@ const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === 
 
 @Injectable()
 export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
+  private nodesAccessCache = new Map<string, N>();
+
   readonly treeControl = new FlatTreeControl<TreeFlatNode>(
     (node) => node.level,
     (node) => node.expandable
@@ -50,6 +52,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   init(root: T, selectedNodeIds?: string[], expandAllByDefault: boolean = true): void {
     this.originalRoot = root;
     const rootNode = this._treeNodeUtils.convertItem(root);
+    this.nodesAccessCache.clear();
     this.rootNode$.next(rootNode);
     if (selectedNodeIds) {
       this.selectedNodeIds$.next(selectedNodeIds);
@@ -166,7 +169,20 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       return;
     }
 
+    type InsideInsertStrategy = 'append' | 'prepend';
+    let insideInsertStrategy: InsideInsertStrategy = 'append';
+
     let parentId = nodeId;
+
+    if (dropType === DropType.after && this.isNodeExpanded(parentId)) {
+      const parent = this.findNodeById(parentId);
+      if ((parent?.children || []).length > 0) {
+        // drop after for expanded node with children interpret like drop inside, as first children
+        dropType = DropType.inside;
+        insideInsertStrategy = 'prepend';
+      }
+    }
+
     if (dropType !== DropType.inside) {
       const node = this.findNodeById(parentId);
       if (!node?.parentId) {
@@ -179,12 +195,17 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     if (!parent) {
       return;
     }
+
     const nodesToAdd = selectedNodeIds.map((nodeId) => this.findNodeById(nodeId)).filter((x) => !!x);
 
     const children = ([...parent.children!] as N[]).filter((child) => !selectedNodeIds.includes(child.id));
 
     if (dropType === DropType.inside) {
-      children.push(...(nodesToAdd as N[]));
+      if (insideInsertStrategy === 'append') {
+        children.push(...(nodesToAdd as N[]));
+      } else {
+        children.unshift(...(nodesToAdd as N[]));
+      }
     } else {
       const siblingIndex = children.findIndex((child) => child.id === nodeId)!;
       let start: number;
@@ -311,14 +332,19 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     this.selectedNodeIds$.next([lastParent!.id!]);
   }
 
-  findNodeById(id?: string, parent?: N): N | undefined {
+  findNodeById(id?: string, parent?: N, useCache: boolean = true): N | undefined {
     if (!id) {
       return undefined;
+    }
+
+    if (useCache && this.nodesAccessCache.has(id)) {
+      return this.nodesAccessCache.get(id);
     }
 
     parent = parent || this.rootNode$.value;
 
     if (parent?.id === id) {
+      this.nodesAccessCache.set(id, parent);
       return parent;
     }
 
@@ -326,14 +352,19 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       return undefined;
     }
 
-    let result = parent.children!.find((child) => child.id === id);
+    let result = parent.children!.find((child) => child.id === id) as N;
     if (result) {
-      return result as N;
+      this.nodesAccessCache.set(id, result);
+      return result;
     }
 
-    result = parent.children!.map((child) => this.findNodeById(id, child as N)).find((res) => !!res);
+    result = parent.children!.map((child) => this.findNodeById(id, child as N)).find((res) => !!res) as N;
 
-    return result as N;
+    if (result) {
+      this.nodesAccessCache.set(id, result);
+    }
+
+    return result;
   }
 
   toggleNode(nodeId: string): void {
@@ -405,6 +436,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.nodesAccessCache.clear();
     this.rootNode$.complete();
     this.selectedNodeIds$.complete();
     this.treeUpdateInternal$.complete();
@@ -452,7 +484,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   private isPossibleToInsert(newParentId: string, ...itemsToInsert: N[]): boolean {
     // If new parent is a child of itemsToInsert, prevent the insert
     const newParentFoundIn = itemsToInsert
-      .map((item) => !!this.findNodeById(newParentId!, item))
+      .map((item) => !!this.findNodeById(newParentId!, item, false))
       .filter((isFound) => isFound);
 
     // Allow the insertion, if new parent doesn't exist in items to insert
@@ -461,6 +493,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
   private refresh(): void {
     const root = this._treeNodeUtils.convertItem(this.originalRoot!);
+    this.nodesAccessCache.clear();
     this.updateData([root]);
     this.rootNode$.next(root);
     this.treeUpdateInternal$.next(this.originalRoot!);
