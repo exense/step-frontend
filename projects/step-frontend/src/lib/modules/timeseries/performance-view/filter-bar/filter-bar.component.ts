@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { TsFilterItem, FilterBarItemType } from './model/ts-filter-item';
 import { TimeSeriesContext } from '../../time-series-context';
 
@@ -9,6 +9,7 @@ import { TimeSeriesContext } from '../../time-series-context';
 })
 export class FilterBarComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
+  @Output() onFiltersChange = new EventEmitter<TsFilterItem[]>();
 
   items: TsFilterItem[] = [];
   defaultFilterOptions: TsFilterItem[] = [
@@ -32,17 +33,22 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     }
   }
 
+  handleFilterChange(item: TsFilterItem) {
+    this.onFiltersChange.emit(this.items);
+  }
+
   addFilterItem(item: TsFilterItem) {
     let filterExists = this.items.find((i) => i.attributeName === item.attributeName);
-    console.log(filterExists);
     if (filterExists) {
       return;
     } else {
-      this.items.push(item);
+      this.items.push(JSON.parse(JSON.stringify(item))); // make a clone
     }
   }
 
-  removeFilterItem(index: number) {}
+  removeFilterItem(index: number) {
+    this.items.splice(index, 1);
+  }
 
   ngOnDestroy(): void {}
 }

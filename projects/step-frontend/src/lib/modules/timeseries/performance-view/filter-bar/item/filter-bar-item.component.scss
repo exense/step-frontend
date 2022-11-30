@@ -27,8 +27,11 @@
     top: 0;
     font-size: 4px;
     border-radius: 50%;
-    width: 4px;
-    height: 4px;
+    width: 14px;
+    height: 14px;
+    min-width: 14px;
+    min-height: 14px;
+    padding: 2px;
 
     &:hover {
       background: #ebebeb;

@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { TsFilterItem, FilterBarItemType } from '../model/ts-filter-item';
 
 @Component({
@@ -8,6 +8,9 @@ import { TsFilterItem, FilterBarItemType } from '../model/ts-filter-item';
 })
 export class FilterBarItemComponent implements OnInit, OnDestroy {
   @Input() item!: TsFilterItem;
+  @Output() onRemoveItem: EventEmitter<any> = new EventEmitter<any>();
+  @Output() onFilterChange: EventEmitter<TsFilterItem> = new EventEmitter<TsFilterItem>();
+
   formattedValue = '';
 
   ngOnInit(): void {
@@ -26,6 +29,7 @@ export class FilterBarItemComponent implements OnInit, OnDestroy {
 
   removeItem($event: any) {
     $event.stopPropagation();
+    this.onRemoveItem.emit();
   }
 
   get FilterBarType() {

@@ -14,6 +14,12 @@
     </mat-menu>
   </div>
   <div class="filter-container">
-    <step-ts-filter-bar-item *ngFor="let item of items" [item]="item"> </step-ts-filter-bar-item>
+    <step-ts-filter-bar-item
+      *ngFor="let item of items; let i = index"
+      [item]="item"
+      (onRemoveItem)="removeFilterItem(i)"
+      (onFilterChange)="handleFilterChange($event)"
+    >
+    </step-ts-filter-bar-item>
   </div>
 </div>

@@ -108,6 +108,11 @@ export class TimeSeriesContext {
     return this.filtersChangeSubject.asObservable();
   }
 
+  updateActiveFilters(items: TsFilterItem[]) {
+    this.activeFilter = items;
+    this.activeFilter$.next(this.activeFilter);
+  }
+
   updateFilters(filters: BucketFilters): void {
     this.activeFilters = filters;
     this.filtersChangeSubject.next(filters);

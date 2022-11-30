@@ -19,6 +19,7 @@ import { TimeRangePickerSelection } from '../time-selection/time-range-picker-se
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { TimeSeriesContext } from '../time-series-context';
 import { TimeSeriesUtils } from '../time-series-utils';
+import { TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
 
 @Component({
   selector: 'step-execution-performance',
@@ -86,6 +87,10 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         this.executionHasToBeBuilt = true;
       }
     });
+  }
+
+  handleFiltersChange(filters: TsFilterItem[]): void {
+    console.log('FILTERS CHANGE!', filters);
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {

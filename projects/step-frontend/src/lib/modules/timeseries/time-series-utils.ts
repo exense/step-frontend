@@ -1,4 +1,5 @@
 import { TSTimeRange } from './chart/model/ts-time-range';
+import { FilterBarItemType, TsFilterItem } from './performance-view/filter-bar/model/ts-filter-item';
 
 export class TimeSeriesUtils {
   static createTimeLabels(start: number, end: number, interval: number): number[] {
@@ -47,5 +48,32 @@ export class TimeSeriesUtils {
 
   static intervalsOverlap(range1: TSTimeRange, range2: TSTimeRange) {
     return range1.from <= range2.to && range2.from <= range1.to;
+  }
+
+  static filtersToOQL(items: TsFilterItem[]) {
+    if (items.length === 0) {
+      return undefined;
+    }
+    let andFilters: (string | undefined)[] = items.map((item) => {
+      let clause;
+      switch (item.type) {
+        case FilterBarItemType.TEXT:
+          clause = item.textValues
+            ?.filter((f) => f.isSelected)
+            .map((f) => `${item.attributeName} = ${f.value}`)
+            .join(' or ');
+          break;
+        case FilterBarItemType.FREE_TEXT:
+          clause = `${item.attributeName} ~ ^.*${item.textValue}.*$`;
+          break;
+        case FilterBarItemType.NUMERIC:
+          break;
+        case FilterBarItemType.DATE:
+          break;
+      }
+      return clause ? `(${clause})` : undefined;
+    });
+
+    return andFilters.filter((f) => f).join(' and ');
   }
 }
