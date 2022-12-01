@@ -1,6 +1,8 @@
 # step Frontend (step FE)
 
-step FE is part of step and requires step BE (https://github.com/exense/step) in order to be used. Learn more about step in our official documentation on https://step.exense.ch/knowledgebase
+step FE is part of step and requires step BE (https://github.com/exense/step) in order to be used.
+
+Learn more about step in our official documentation on https://step.exense.ch/knowledgebase and download the full step distribution at [step-distribution/releases](https://github.com/exense/step-distribution/releases)
 
 For support, our enterprise version or our no-maintenance-required SaaS solution check out our website: http://step.exense.ch
 
