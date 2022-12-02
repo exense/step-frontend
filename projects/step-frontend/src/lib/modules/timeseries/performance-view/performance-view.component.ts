@@ -28,6 +28,8 @@ import { TSTimeRange } from '../chart/model/ts-time-range';
 import { ThroughputMetric } from './model/throughput-metric';
 import { PerformanceViewConfig } from './performance-view.config';
 import { UpdatePerformanceViewRequest } from './model/update-performance-view-request';
+import { FilterUtils } from '../util/filter-utils';
+import { Filter } from '../../../../../../step-core/src/lib/modules/step-icons/icons';
 
 declare const uPlot: any;
 
@@ -161,7 +163,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .onFiltersChange()
       .pipe(
         tap(() => (this.chartsAreLoading = true)),
-        switchMap(() => this.refreshAllCharts(true)),
+        switchMap(() => this.refreshAllCharts()),
         tap(() => (this.chartsAreLoading = false)),
         takeUntil(this.terminator$)
       )
@@ -171,10 +173,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .pipe(
         tap((groupDimensions: string[]) => {
           this.groupDimensions = groupDimensions;
-          this.mergeRequestWithActiveFilters(this.findRequest);
+          this.findRequest.oqlFilter = FilterUtils.filtersToOQL(this.context.getActiveFilter());
         }),
         tap(() => (this.chartsAreLoading = true)),
-        switchMap(() => this.refreshAllCharts(true)),
+        switchMap(() => this.refreshAllCharts()),
         tap(() => (this.chartsAreLoading = false)),
         takeUntil(this.terminator$)
       )
@@ -221,7 +223,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       start: range.from,
       end: range.to,
     };
-    return this.refreshAllCharts(true);
+    return this.refreshAllCharts();
   }
 
   deleteObjectProperties(object: any, keys: string[]) {
@@ -274,13 +276,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .subscribe((allCompleted) => this.onInitializationComplete.emit());
   }
 
-  /**
-   * This method is called while live refreshing.
-   * force = true -> The charts ar forced to refresh, even if the time interval was the same (because of filters/grouping change).
-   */
-  refreshAllCharts(force = false): Observable<unknown> {
+  refreshAllCharts(): Observable<unknown> {
     this.findRequest = this.prepareFindRequest(this.settings); // we don't want to lose active filters
-    this.mergeRequestWithActiveFilters(this.findRequest);
+    this.findRequest.oqlFilter = FilterUtils.filtersToOQL(this.context.getActiveFilter());
     let fullTimeRange = this.context.getSelectedTimeRange();
     this.findRequest.start = fullTimeRange.from;
     this.findRequest.end = fullTimeRange.to;
@@ -296,11 +294,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     }
 
     return forkJoin(charts$);
-  }
-
-  mergeRequestWithActiveFilters(request: FindBucketsRequest) {
-    this.deleteObjectProperties(request.params, this.filtersComponent?.getAllFilterAttributes()); // we clean the request first
-    Object.assign(request.params, this.context.getActiveFilters());
   }
 
   onKeywordToggle(keyword: string, event: any) {

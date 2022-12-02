@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { TsFilterItem, FilterBarItemType } from '../model/ts-filter-item';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'step-ts-filter-bar-item',
@@ -19,13 +20,16 @@ export class FilterBarItemComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleTextValueChange(option: { value: string; isSelected?: boolean }, checked: boolean) {
+  handleTextOptionClick(option: { value: string; isSelected?: boolean }, checked: boolean) {
     option.isSelected = checked;
     this.formattedValue = this.item
       .textValues!.filter((v) => v.isSelected)
       .map((v) => v.value)
       .join(', ');
+    this.onFilterChange.emit(this.item);
   }
+
+  applyChanges() {}
 
   removeItem($event: any) {
     $event.stopPropagation();

@@ -18,7 +18,7 @@
         <mat-checkbox
           color="primary"
           [checked]="option.isSelected"
-          (change)="handleTextValueChange(option, $event.checked)"
+          (change)="handleTextOptionClick(option, $event.checked)"
         >
           {{ option.value }}
         </mat-checkbox>

@@ -1,6 +1,7 @@
 export interface FindBucketsRequest {
   start: number;
   end: number;
+  oqlFilter?: string;
   params: { [key: string]: string };
   groupDimensions?: string[];
   numberOfBuckets?: number;

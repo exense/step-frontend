@@ -131,6 +131,10 @@ export class TimeSeriesContext {
     return this.activeFilters;
   }
 
+  getActiveFilter(): TsFilterItem[] {
+    return this.activeFilter;
+  }
+
   getFullTimeRange(): TSTimeRange {
     return this.fullTimeRange;
   }

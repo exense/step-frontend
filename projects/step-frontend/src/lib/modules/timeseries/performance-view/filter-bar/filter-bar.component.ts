@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { TsFilterItem, FilterBarItemType } from './model/ts-filter-item';
 import { TimeSeriesContext } from '../../time-series-context';
+import { debounce, debounceTime, Subject } from 'rxjs';
+import { FilterUtils } from '../../util/filter-utils';
 
 @Component({
   selector: 'step-ts-filter-bar',
@@ -8,8 +10,10 @@ import { TimeSeriesContext } from '../../time-series-context';
   styleUrls: ['./filter-bar.component.scss'],
 })
 export class FilterBarComponent implements OnInit, OnDestroy {
+  readonly EMIT_DEBOUNCE_TIME = 300;
   @Input() context!: TimeSeriesContext;
   @Output() onFiltersChange = new EventEmitter<TsFilterItem[]>();
+  emitFilterChange$ = new Subject<void>();
 
   items: TsFilterItem[] = [];
   defaultFilterOptions: TsFilterItem[] = [
@@ -31,10 +35,13 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     if (!this.context) {
       throw new Error('Context input is mandatory');
     }
+    this.emitFilterChange$.pipe(debounceTime(this.EMIT_DEBOUNCE_TIME)).subscribe(() => {
+      this.onFiltersChange.emit(this.items.filter(FilterUtils.filterItemIsValid)); // we ignore empty filters
+    });
   }
 
   handleFilterChange(item: TsFilterItem) {
-    this.onFiltersChange.emit(this.items);
+    this.emitFilterChange$.next();
   }
 
   addFilterItem(item: TsFilterItem) {
@@ -47,7 +54,11 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   }
 
   removeFilterItem(index: number) {
+    let itemToDelete = this.items[index];
     this.items.splice(index, 1);
+    if (FilterUtils.filterItemIsValid(itemToDelete)) {
+      this.emitFilterChange$.next();
+    }
   }
 
   ngOnDestroy(): void {}

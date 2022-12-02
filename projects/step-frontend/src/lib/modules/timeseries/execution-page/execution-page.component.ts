@@ -48,7 +48,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   executionHasToBeBuilt = false;
   migrationInProgress = false;
 
-  updatingSubscription = new Subscription();
+  updateSubscription = new Subscription();
 
   // this is just for running executions
   refreshIntervals: RefreshInterval[] = [
@@ -90,7 +90,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   handleFiltersChange(filters: TsFilterItem[]): void {
-    console.log('FILTERS CHANGE!', filters);
+    this.context.updateActiveFilters(filters);
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
@@ -136,6 +136,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       const startTime = execution.startTime!;
       const endTime = execution.endTime ? execution.endTime : new Date().getTime();
       this.context = this.contextFactory.createContext(execution.id!, { from: startTime, to: endTime });
+      this.subscribeForFiltersChange();
       if (!execution.endTime) {
         this.executionInProgress = true;
       }
@@ -150,6 +151,17 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         this.triggerNextUpdate(this.selectedRefreshInterval.value, this.dashboardInitComplete$);
       }
     });
+  }
+
+  subscribeForFiltersChange(): void {
+    this.context
+      .onActiveFilterChange()
+      .pipe(takeUntil(this.terminator$))
+      .subscribe((filters) => {
+        console.log('FILTER CHANGED');
+        this.updateSubscription?.unsubscribe();
+        this.triggerNextUpdate(0, of(null), true); // refresh immediately
+      });
   }
 
   rebuildTimeSeries() {
@@ -187,15 +199,28 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  triggerNextUpdate(delay: number, observableToWaitFor: Observable<unknown>) {
-    this.updatingSubscription = forkJoin([timer(delay), observableToWaitFor])
+  /**
+   *
+   * @param delay
+   * @param observableToWaitFor
+   * @param forceUpdate - if true, no matter the zoom selection, all the charts will be updated.
+   */
+  triggerNextUpdate(delay: number, observableToWaitFor: Observable<unknown>, forceUpdate = false) {
+    this.updateSubscription = forkJoin([timer(delay), observableToWaitFor])
       .pipe(
         takeUntil(this.terminator$),
         switchMap(() => {
-          return this.executionService.getExecutionById(this.executionId);
+          if (!this.executionInProgress && this.execution) {
+            // it is ended
+            return of(this.execution);
+          } else {
+            // we fetch new data about the execution to see if it ended
+            return this.executionService.getExecutionById(this.executionId);
+          }
         })
       )
       .subscribe((details) => {
+        this.execution = details;
         let now = new Date().getTime();
         let isFullRangeSelected = this.context.isFullRangeSelected();
         let oldSelection = this.context.getSelectedTimeRange();
@@ -219,13 +244,14 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
         let updateDashboard$ = this.performanceView.updateDashboard({
           updateRanger: true,
-          updateCharts: JSON.stringify(newSelection) !== JSON.stringify(oldSelection),
+          updateCharts: forceUpdate || JSON.stringify(newSelection) !== JSON.stringify(oldSelection),
           fullTimeRange: newFullRange,
           selection: newSelection,
         });
         if (details.endTime) {
           this.intervalShouldBeCanceled = true;
           this.executionInProgress = false;
+          updateDashboard$.subscribe();
         } else {
           // the execution is not done yet
           this.triggerNextUpdate(this.selectedRefreshInterval.value, updateDashboard$); // recursive call
