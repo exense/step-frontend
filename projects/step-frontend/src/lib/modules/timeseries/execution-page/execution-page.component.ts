@@ -185,10 +185,10 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   triggerNextUpdate(delay: number, observableToWaitFor: Observable<unknown>) {
     this.updatingSubscription = forkJoin([timer(delay), observableToWaitFor])
       .pipe(
-        takeUntil(this.terminator$),
         switchMap(() => {
           return this.executionService.getExecutionById(this.executionId);
-        })
+        }),
+        takeUntil(this.terminator$)
       )
       .subscribe((details) => {
         const now = new Date().getTime();
