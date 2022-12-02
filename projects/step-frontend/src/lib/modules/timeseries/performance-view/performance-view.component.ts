@@ -281,7 +281,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   refreshAllCharts(force = false): Observable<unknown> {
     this.findRequest = this.prepareFindRequest(this.settings); // we don't want to lose active filters
     this.mergeRequestWithActiveFilters(this.findRequest);
-    let fullTimeRange = this.context.getSelectedTimeRange();
+    const fullTimeRange = this.context.getSelectedTimeRange();
     this.findRequest.start = fullTimeRange.from;
     this.findRequest.end = fullTimeRange.to;
 
@@ -370,7 +370,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   createByKeywordsCharts(request: FindBucketsRequest): Observable<TimeSeriesChartResponse> {
-    let groupDimensions = this.context.getGroupDimensions();
+    const groupDimensions = this.context.getGroupDimensions();
     return this.timeSeriesService
       .fetchBuckets({ ...request, groupDimensions: groupDimensions, percentiles: [90, 99] })
       .pipe(
@@ -384,16 +384,16 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
               return;
             }
           }
-          let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-          let totalThroughput: number[] = response.matrix[0] ? Array(response.matrix[0]?.length) : [];
-          let responseTimeSeries: TSChartSeries[] = [];
-          let throughputSeries: TSChartSeries[] = [];
+          const timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
+          const totalThroughput: number[] = response.matrix[0] ? Array(response.matrix[0]?.length) : [];
+          const responseTimeSeries: TSChartSeries[] = [];
+          const throughputSeries: TSChartSeries[] = [];
           response.matrixKeys.map((key, i) => {
             key = this.getSeriesKey(key, groupDimensions);
-            let responseTimeData: (number | null | undefined)[] = [];
-            let color = this.keywordsService.getColor(key);
-            let countData = response.matrix[i].map((b, j) => {
-              let bucketValue = b?.throughputPerHour;
+            const responseTimeData: (number | null | undefined)[] = [];
+            const color = this.keywordsService.getColor(key);
+            const countData = response.matrix[i].map((b, j) => {
+              const bucketValue = b?.throughputPerHour;
               if (totalThroughput[j] == undefined) {
                 totalThroughput[j] = bucketValue;
               } else if (bucketValue) {
@@ -406,8 +406,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
               }
               return bucketValue ? bucketValue : 0;
             });
-            let keywordSelection = this.keywordsService.getKeywordSelection(key);
-            let series = {
+            const keywordSelection = this.keywordsService.getKeywordSelection(key);
+            const series = {
               scale: 'y',
               show: keywordSelection ? keywordSelection.isSelected : true,
               label: key,
@@ -497,7 +497,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       return;
     }
     this.selectedResponseTimeMetric = metric;
-    let data = this.responseTimeChart.getData();
+    const data = this.responseTimeChart.getData();
     this.byKeywordsChartResponseCache.matrix.map((bucketArray, i) => {
       data[i + 1] = bucketArray.map((b) => this.selectedResponseTimeMetric.mapFunction(b));
     });
@@ -505,7 +505,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   switchThroughputMetric(metric: ThroughputMetric) {
-    let f = (u: any, vals: any) => vals.map((v: number) => metric.labelFunction(v));
+    const f = (u: any, vals: any) => vals.map((v: number) => metric.labelFunction(v));
     this.throughputChart.settings.tooltipOptions.zAxisLabel = metric.tooltipZAxisLabel;
     this.throughputChart.uplot.axes[1].values = f;
     this.throughputChart.uplot.axes[2].values = f;
@@ -517,14 +517,14 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       return;
     }
     this.selectedThroughputMetric = metric;
-    let data = this.throughputChart.getData();
-    let totalData = new Array(data[0].length);
+    const data = this.throughputChart.getData();
+    const totalData = new Array(data[0].length);
     this.byKeywordsChartResponseCache.matrix.map((bucketArray, i) => {
       bucketArray.forEach((b, j) => {
         if (totalData[j] == null) {
           totalData[j] = 0;
         }
-        let value = this.selectedThroughputMetric.mapFunction(b);
+        const value = this.selectedThroughputMetric.mapFunction(b);
         totalData[j] += value;
         data[i + 1][j] = value;
       });

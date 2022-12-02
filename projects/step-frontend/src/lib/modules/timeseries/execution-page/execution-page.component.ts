@@ -33,7 +33,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
 
   @Input() executionId!: string;
-  private execution: Execution | undefined;
+  private execution!: Execution;
   context!: TimeSeriesContext;
 
   timeRangeSelection: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
@@ -97,7 +97,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   onEndedExecutionTimeRangeChange(selection: TimeRangePickerSelection) {
-    let execution = this.execution!;
+    const execution = this.execution;
     let newFullRange: TSTimeRange;
     switch (selection.type) {
       case RangeSelectionType.FULL:
@@ -108,7 +108,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         break;
       case RangeSelectionType.RELATIVE:
         const end = execution.endTime!;
-        let from = Math.max(execution.startTime!, end - selection.relativeSelection!.timeInMs);
+        const from = Math.max(execution.startTime!, end - selection.relativeSelection!.timeInMs);
         newFullRange = { from: from, to: end };
     }
     this.context.updateSelectedRange(newFullRange, false);
@@ -177,7 +177,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     // this.updatingSubscription.unsubscribe();
     this.terminator$.next();
     if (newInterval.value) {
-      let delay = oldInterval.value === 0 ? 0 : newInterval.value;
+      const delay = oldInterval.value === 0 ? 0 : newInterval.value;
       this.triggerNextUpdate(delay, of(undefined));
     }
   }
@@ -191,9 +191,9 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe((details) => {
-        let now = new Date().getTime();
-        let isFullRangeSelected = this.context.isFullRangeSelected();
-        let oldSelection = this.context.getSelectedTimeRange();
+        const now = new Date().getTime();
+        const isFullRangeSelected = this.context.isFullRangeSelected();
+        const oldSelection = this.context.getSelectedTimeRange();
         let newFullRange: TSTimeRange;
         switch (this.timeRangeSelection.type) {
           case RangeSelectionType.FULL:
@@ -203,16 +203,16 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
             newFullRange = this.timeRangeSelection.absoluteSelection!;
             break;
           case RangeSelectionType.RELATIVE:
-            let end = details.endTime || now;
+            const end = details.endTime || now;
             newFullRange = { from: end - this.timeRangeSelection.relativeSelection!.timeInMs!, to: end };
             break;
         }
         // when the selection is 0, it will switch to full selection automatically
-        let newSelection = isFullRangeSelected
+        const newSelection = isFullRangeSelected
           ? newFullRange
           : TimeSeriesUtils.cropInterval(newFullRange, oldSelection) || newFullRange;
 
-        let updateDashboard$ = this.performanceView.updateDashboard({
+        const updateDashboard$ = this.performanceView.updateDashboard({
           updateRanger: true,
           updateCharts: JSON.stringify(newSelection) !== JSON.stringify(oldSelection),
           fullTimeRange: newFullRange,

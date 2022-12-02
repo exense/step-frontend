@@ -66,7 +66,7 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
     if (!this.taskId) {
       throw new Error('ExecutionId parameter is not present');
     }
-    let range = this.calculateRange(this.timeRangeOptions[0]);
+    const range = this.calculateRange(this.timeRangeOptions[0]);
     this.context = this.contextFactory.createContext(this.taskId, range);
     this.performanceViewSettings = this.createViewSettings(range);
     if (this.refreshEnabled) {
@@ -94,8 +94,8 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
   }
 
   calculateRange(selection: RelativeTimeSelection): TSTimeRange {
-    let now = new Date().getTime();
-    let start = now - selection.timeInMs;
+    const now = new Date().getTime();
+    const start = now - selection.timeInMs;
     return { from: start, to: now };
   }
 
@@ -120,10 +120,10 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
         const now = new Date().getTime();
         newInterval = { from: now - selection.relativeSelection!.timeInMs, to: now };
     }
-    let shouldRefreshCharts = this.context.isFullRangeSelected();
+    const shouldRefreshCharts = this.context.isFullRangeSelected();
     this.context.updateSelectedRange(newInterval, false);
     this.context.updateFullRange(newInterval);
-    let update$ = shouldRefreshCharts ? this.performanceView.refreshAllCharts() : of(null);
+    const update$ = shouldRefreshCharts ? this.performanceView.refreshAllCharts() : of(null);
     if (this.refreshEnabled) {
       this.triggerNextUpdate(this.selectedRefreshInterval.value, update$);
     } else {
@@ -136,11 +136,11 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.terminator$))
       .subscribe(() => {
         const activeSelection = this.rangePicker.getActiveSelection();
-        let now = new Date().getTime();
-        let newInterval = { from: now - activeSelection.relativeSelection!.timeInMs, to: now };
+        const now = new Date().getTime();
+        const newInterval = { from: now - activeSelection.relativeSelection!.timeInMs, to: now };
         let newSelection: TSTimeRange;
-        let isFullRangeSelected = this.context.isFullRangeSelected();
-        let shouldRefreshCharts = isFullRangeSelected;
+        const isFullRangeSelected = this.context.isFullRangeSelected();
+        const shouldRefreshCharts = isFullRangeSelected;
         if (isFullRangeSelected) {
           newSelection = newInterval;
         } else {
@@ -155,7 +155,7 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
         this.performanceViewSettings.timeRange = newInterval;
         this.context.updateSelectedRange(newSelection, false);
         this.context.updateFullRange(newInterval);
-        let refresh$ = shouldRefreshCharts ? this.performanceView.refreshAllCharts() : of(null);
+        const refresh$ = shouldRefreshCharts ? this.performanceView.refreshAllCharts() : of(null);
         this.triggerNextUpdate(this.selectedRefreshInterval.value, refresh$);
       });
   }

@@ -85,8 +85,8 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     request: FindBucketsRequest,
     keywordsCallback: (series: string[]) => void
   ): Observable<TimeSeriesChartResponse> {
-    let groupDimensions = this.executionContext.getGroupDimensions();
-    let fetchRequest = {
+    const groupDimensions = this.executionContext.getGroupDimensions();
+    const fetchRequest = {
       ...request,
       groupDimensions: groupDimensions,
       numberOfBuckets: 1,
@@ -95,23 +95,23 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     return this.timeSeriesService.fetchBuckets(fetchRequest).pipe(
       tap((response) => {
         this.response = response;
-        let keywords: string[] = [];
-        let tableBuckets = response.matrix
+        const keywords: string[] = [];
+        const tableBuckets = response.matrix
           .map((series, i) => {
             if (series.length != 1) {
               // we should have just one bucket
               throw new Error('Something went wrong');
             }
-            let seriesAttributes = response.matrixKeys[i];
-            let bucket = series[0];
+            const seriesAttributes = response.matrixKeys[i];
+            const bucket = series[0];
             bucket.attributes = seriesAttributes;
-            let seriesKey = this.getSeriesKey(seriesAttributes, groupDimensions);
+            const seriesKey = this.getSeriesKey(seriesAttributes, groupDimensions);
             bucket.attributes._id = seriesKey;
             bucket.attributes.color = this.keywordsService.getColor(seriesKey);
             bucket.attributes.avg = (bucket.sum / bucket.count).toFixed(0);
             bucket.attributes.tps = Math.trunc(bucket.count / ((response.end - response.start) / 1000));
             bucket.attributes.tph = Math.trunc((bucket.count / ((response.end - response.start) / 1000)) * 3600);
-            let keywordSelection = this.keywordsService.getKeywordSelection(seriesKey);
+            const keywordSelection = this.keywordsService.getKeywordSelection(seriesKey);
             bucket.attributes.isSelected = keywordSelection ? keywordSelection.isSelected : true; // true because it has not been loaded yet
             keywords.push(seriesKey);
             this.bucketsByKeywords[seriesKey] = bucket;
@@ -140,8 +140,8 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
               // we should have just one bucket
               throw new Error('Something went wrong');
             }
-            let bucket = series[0];
-            let keywordName = response.matrixKeys[i][this.dimensionKey];
+            const bucket = series[0];
+            const keywordName = response.matrixKeys[i][this.dimensionKey];
             let existingBucketForKeyword = this.bucketsByKeywords[keywordName];
             if (existingBucketForKeyword) {
               // we need to accumulate them

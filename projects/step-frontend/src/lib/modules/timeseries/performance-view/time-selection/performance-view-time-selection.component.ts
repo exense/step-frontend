@@ -32,8 +32,6 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   timeLabels: number[] = [];
 
-  // currentSelection!: ExecutionTimeSelection;
-
   private tsContext!: TimeSeriesContext;
   private terminator$ = new Subject<void>();
 
@@ -70,7 +68,6 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   updateFullTimeRange(range: TSTimeRange) {
     this.settings.timeRange = range;
-    // this.createRanger().subscribe();
   }
 
   refreshRanger(): Observable<TimeSeriesChartResponse> {
@@ -82,8 +79,6 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   }
 
   createRanger(fullTimeRange: TSTimeRange, selection?: TSTimeRange): Observable<TimeSeriesChartResponse> {
-    // const startTime = this.settings.timeRange.from;
-    // const endTime = this.settings.timeRange.to || new Date().getTime() - 5000; // minus 5 seconds
     const request: FindBucketsRequest = {
       params: this.settings.contextualFilters,
       start: fullTimeRange.from,
@@ -119,21 +114,11 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   onRangerSelectionChange(event: TSTimeRange) {
     // check for full range selection
     this.tsContext.updateSelectedRange(event);
-    // if (this.timeLabels[0] === event.from && this.timeLabels[this.timeLabels.length - 1] === event.to) {
-    //
-    // }
     // the linked charts are automatically updated by the uplot sync feature. if that will be replaced, the charts must subscribe to the state change
   }
 
   onRangerZoomReset() {
     this.tsContext.resetZoom();
-  }
-
-  resetZoom() {
-    // let selectionToEmit: ExecutionTimeSelection = { type: RangeSelectionType.FULL };
-    // let range = { from: this.rangerSettings!.xValues[0], to: this.rangerSettings!.xValues.slice(-1)[0] };
-    // selectionToEmit.absoluteSelection = range;
-    // this.timeSelectionState.resetZoom(range);
   }
 
   ngOnDestroy(): void {
