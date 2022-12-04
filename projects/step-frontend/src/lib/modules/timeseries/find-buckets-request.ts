@@ -1,8 +1,8 @@
 export interface FindBucketsRequest {
-  start: number;
-  end: number;
+  start?: number; // TODO deprecated
+  end?: number; // TODO deprecated
   oqlFilter?: string;
-  params: { [key: string]: string };
+  params?: { [key: string]: string }; // TODO deprecated
   groupDimensions?: string[];
   numberOfBuckets?: number;
   intervalSize?: number; // in ms

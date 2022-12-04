@@ -68,6 +68,35 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     });
   }
 
+  updateData(response: TimeSeriesChartResponse) {
+    this.response = response;
+    let keywords: string[] = [];
+    let tableBuckets = response.matrix
+      .map((series, i) => {
+        if (series.length != 1) {
+          // we should have just one bucket
+          throw new Error('Something went wrong');
+        }
+        let seriesAttributes = response.matrixKeys[i];
+        let bucket = series[0];
+        bucket.attributes = seriesAttributes;
+        let seriesKey = this.getSeriesKey(seriesAttributes, this.executionContext.getGroupDimensions());
+        bucket.attributes._id = seriesKey;
+        bucket.attributes.color = this.keywordsService.getColor(seriesKey);
+        bucket.attributes.avg = (bucket.sum / bucket.count).toFixed(0);
+        bucket.attributes.tps = Math.trunc(bucket.count / ((response.end - response.start) / 1000));
+        bucket.attributes.tph = Math.trunc((bucket.count / ((response.end - response.start) / 1000)) * 3600);
+        let keywordSelection = this.keywordsService.getKeywordSelection(seriesKey);
+        bucket.attributes.isSelected = keywordSelection ? keywordSelection.isSelected : true; // true because it has not been loaded yet
+        keywords.push(seriesKey);
+        this.bucketsByKeywords[seriesKey] = bucket;
+        return bucket;
+      })
+      .sort(this.sortByNameAttributeFn);
+    this.tableData$.next(tableBuckets);
+    this.tableIsLoading = false;
+  }
+
   fetchBucketsAndUpdateKeywords(autoSelectAll = false): Observable<TimeSeriesChartResponse> {
     return this.getBuckets(this.findRequest, (keywords) => this.keywordsService.setKeywords(keywords, autoSelectAll));
   }
@@ -130,34 +159,34 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   }
 
   // for live streaming
-  accumulateData(request: FindBucketsRequest) {
-    this.timeSeriesService
-      .fetchBuckets({ ...request, groupDimensions: [this.dimensionKey], numberOfBuckets: 1 })
-      .subscribe((response: TimeSeriesChartResponse) => {
-        response.matrix
-          .map((series, i) => {
-            if (series.length != 1) {
-              // we should have just one bucket
-              throw new Error('Something went wrong');
-            }
-            let bucket = series[0];
-            let keywordName = response.matrixKeys[i][this.dimensionKey];
-            let existingBucketForKeyword = this.bucketsByKeywords[keywordName];
-            if (existingBucketForKeyword) {
-              // we need to accumulate them
-              existingBucketForKeyword.sum += bucket.sum;
-              existingBucketForKeyword.count += bucket.count;
-              existingBucketForKeyword.min = Math.min(existingBucketForKeyword.min, bucket.min);
-              existingBucketForKeyword.max = Math.min(existingBucketForKeyword.max, bucket.max);
-              // TODO update percentiles
-            } else {
-              this.bucketsByKeywords[keywordName] = bucket;
-            }
-            return existingBucketForKeyword;
-          })
-          .sort(this.sortByNameAttributeFn);
-      });
-  }
+  // accumulateData(request: FindBucketsRequest) {
+  //   this.timeSeriesService
+  //     .fetchBuckets({ ...request, groupDimensions: [this.dimensionKey], numberOfBuckets: 1 })
+  //     .subscribe((response: TimeSeriesChartResponse) => {
+  //       response.matrix
+  //         .map((series, i) => {
+  //           if (series.length != 1) {
+  //             // we should have just one bucket
+  //             throw new Error('Something went wrong');
+  //           }
+  //           let bucket = series[0];
+  //           let keywordName = response.matrixKeys[i][this.dimensionKey];
+  //           let existingBucketForKeyword = this.bucketsByKeywords[keywordName];
+  //           if (existingBucketForKeyword) {
+  //             // we need to accumulate them
+  //             existingBucketForKeyword.sum += bucket.sum;
+  //             existingBucketForKeyword.count += bucket.count;
+  //             existingBucketForKeyword.min = Math.min(existingBucketForKeyword.min, bucket.min);
+  //             existingBucketForKeyword.max = Math.min(existingBucketForKeyword.max, bucket.max);
+  //             // TODO update percentiles
+  //           } else {
+  //             this.bucketsByKeywords[keywordName] = bucket;
+  //           }
+  //           return existingBucketForKeyword;
+  //         })
+  //         .sort(this.sortByNameAttributeFn);
+  //     });
+  // }
 
   getDatasourceConfig(): TableLocalDataSourceConfig<Bucket> {
     return {

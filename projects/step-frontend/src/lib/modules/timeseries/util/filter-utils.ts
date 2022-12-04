@@ -12,7 +12,7 @@ export class FilterUtils {
     let clause = Object.keys(object)
       .map((key) => {})
       .join(' and ');
-    return;
+    return `(${clause})`;
   }
 
   static filtersToOQL(items: TsFilterItem[]) {

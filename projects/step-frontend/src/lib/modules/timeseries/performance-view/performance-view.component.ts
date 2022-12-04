@@ -13,23 +13,21 @@ import { TimeseriesTableComponent } from './table/timeseries-table.component';
 import { first, forkJoin, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { TimeSeriesContext } from '../time-series-context';
-import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
 import { KeywordSelection, TimeSeriesKeywordsContext } from '../execution-page/time-series-keywords.context';
 import { Bucket } from '../bucket';
 import { TimeSeriesChartResponse } from '../time-series-chart-response';
-import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
 import { PerformanceViewSettings } from './model/performance-view-settings';
 import { ChartGenerators } from './chart-generators/chart-generators';
 import { TsChartType } from './model/ts-chart-type';
 import { ExecutionFiltersComponent } from './filters/execution-filters.component';
 import { PerformanceViewTimeSelectionComponent } from './time-selection/performance-view-time-selection.component';
-import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { ThroughputMetric } from './model/throughput-metric';
 import { PerformanceViewConfig } from './performance-view.config';
 import { UpdatePerformanceViewRequest } from './model/update-performance-view-request';
 import { FilterUtils } from '../util/filter-utils';
-import { Filter } from '../../../../../../step-core/src/lib/modules/step-icons/icons';
+import { FindBucketsRequestBuilder } from '../util/find-buckets-request-builder';
+import { set } from 'husky';
 
 declare const uPlot: any;
 
@@ -77,7 +75,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   byKeywordsChartResponseCache?: TimeSeriesChartResponse; // for caching
 
-  findRequest!: FindBucketsRequest;
+  // findRequest!: FindBucketsRequest;
+  findRequestBuilder: FindBucketsRequestBuilder = new FindBucketsRequestBuilder();
   groupDimensions: string[] = [];
 
   execution: Execution | undefined;
@@ -129,7 +128,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     if (!this.context) {
       throw new Error('Context not provided!');
     }
-    this.findRequest = this.prepareFindRequest(this.settings);
+    // this.findRequest = this.prepareFindRequest(this.settings);
+    this.findRequestBuilder = this.prepareFindRequestBuilder(this.settings);
     this.initContext();
     this.keywordsService
       .onAllSelectionChanged()
@@ -173,7 +173,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .pipe(
         tap((groupDimensions: string[]) => {
           this.groupDimensions = groupDimensions;
-          this.findRequest.oqlFilter = FilterUtils.filtersToOQL(this.context.getActiveFilter());
+          // this.findRequest.oqlFilter = FilterUtils.filtersToOQL(this.context.getActiveFilter());
         }),
         tap(() => (this.chartsAreLoading = true)),
         switchMap(() => this.refreshAllCharts()),
@@ -182,7 +182,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       )
       .subscribe();
 
-    this.createAllCharts(this.findRequest);
+    this.createAllCharts();
   }
 
   /**
@@ -193,8 +193,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.context.updateFullRange(range, false);
     this.timeSelectionComponent.updateFullTimeRange(range);
     this.settings.timeRange = range;
-    this.findRequest.start = range.from;
-    this.findRequest.end = range.to;
+    this.findRequestBuilder.withRange(range);
   }
 
   updateDashboard(request: UpdatePerformanceViewRequest): Observable<any> {
@@ -212,17 +211,13 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   handleZoomChange(range: TSTimeRange): Observable<any> {
-    if (this.findRequest.start === range.from && this.findRequest.end === range.to) {
+    if (TimeSeriesUtils.intervalsEqual(this.findRequestBuilder.getRange(), range)) {
       return of(undefined);
     }
     this.getAllCharts().forEach((chart) => {
       chart?.setBlur(true);
     });
-    this.findRequest = {
-      ...this.findRequest,
-      start: range.from,
-      end: range.to,
-    };
+    this.findRequestBuilder.withRange(range);
     return this.refreshAllCharts();
   }
 
@@ -237,19 +232,37 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.keywordsService = this.context.keywordsContext;
   }
 
-  prepareFindRequest(settings: PerformanceViewSettings, customFilters?: any): FindBucketsRequest {
+  prepareFindRequestBuilder(settings: PerformanceViewSettings, customFilters?: any): FindBucketsRequestBuilder {
     const numberOfBuckets = TimeSeriesConfig.MAX_BUCKETS_IN_CHART;
-    return {
-      start: settings.timeRange.from,
-      end: settings.timeRange.to,
-      numberOfBuckets: numberOfBuckets,
-      params: {
-        ...settings.contextualFilters,
-        [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_RESPONSE_TIME,
-        ...customFilters,
-      },
-    };
+    // return {
+    //   start: settings.timeRange.from,
+    //   end: settings.timeRange.to,
+    //   numberOfBuckets: numberOfBuckets,
+    //   params: {
+    //     ...settings.contextualFilters,
+    //     [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_RESPONSE_TIME,
+    //     ...customFilters,
+    //   },
+    return new FindBucketsRequestBuilder().withRange(settings.timeRange).withBaseFilters({
+      ...settings.contextualFilters,
+      ...customFilters,
+      [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_RESPONSE_TIME,
+    });
   }
+
+  // prepareFindRequest(settings: PerformanceViewSettings, customFilters?: any): FindBucketsRequest {
+  //   const numberOfBuckets = TimeSeriesConfig.MAX_BUCKETS_IN_CHART;
+  //   return {
+  //     start: settings.timeRange.from,
+  //     end: settings.timeRange.to,
+  //     numberOfBuckets: numberOfBuckets,
+  //     params: {
+  //       ...settings.contextualFilters,
+  //       [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_RESPONSE_TIME,
+  //       ...customFilters,
+  //     },
+  //   };
+  // }
 
   onTableInitializationFinished() {
     this.tableInitialized$.next();
@@ -259,16 +272,16 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.rangerLoaded$.next();
   }
 
-  createAllCharts(findRequest: FindBucketsRequest) {
+  createAllCharts() {
     const charts$ = [
-      this.createSummaryChart(findRequest),
-      this.createByStatusChart(findRequest),
-      this.createByKeywordsCharts(findRequest),
+      this.createSummaryChart(),
+      this.createByStatusChart(),
+      this.createByKeywordsCharts(),
       this.tableInitialized$.pipe(first()), // the table will render automatically once this.findRequest is set.
       this.rangerLoaded$.pipe(first()),
     ];
     if (this.includeThreadGroupChart) {
-      charts$.push(this.createThreadGroupsChart(findRequest));
+      charts$.push(this.createThreadGroupsChart());
     }
 
     forkJoin(charts$)
@@ -277,20 +290,18 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   refreshAllCharts(): Observable<unknown> {
-    this.findRequest = this.prepareFindRequest(this.settings); // we don't want to lose active filters
-    this.findRequest.oqlFilter = FilterUtils.filtersToOQL(this.context.getActiveFilter());
+    this.findRequestBuilder = this.prepareFindRequestBuilder(this.settings); // we don't want to lose active filters
     let fullTimeRange = this.context.getSelectedTimeRange();
-    this.findRequest.start = fullTimeRange.from;
-    this.findRequest.end = fullTimeRange.to;
+    this.findRequestBuilder.withRange(fullTimeRange);
 
     const charts$ = [
-      this.createSummaryChart(this.findRequest),
-      this.createByStatusChart(this.findRequest),
-      this.createByKeywordsCharts(this.findRequest),
-      this.updateTable(this.findRequest),
+      this.createSummaryChart(),
+      this.createByStatusChart(),
+      this.createByKeywordsCharts(),
+      this.updateTable(),
     ];
     if (this.includeThreadGroupChart) {
-      charts$.push(this.createThreadGroupsChart(this.findRequest));
+      charts$.push(this.createThreadGroupsChart());
     }
 
     return forkJoin(charts$);
@@ -304,14 +315,15 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.context.resetZoom();
   }
 
-  createThreadGroupsChart(request: FindBucketsRequest, isUpdate = false): Observable<TimeSeriesChartResponse> {
-    let updatedParams: { [key: string]: string } = {
-      ...request.params,
-      [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_SAMPLER,
-    };
-    this.deleteObjectProperties(updatedParams, this.filtersComponent?.getAllFilterAttributes()); // we remove all custom filters
+  createThreadGroupsChart(): Observable<TimeSeriesChartResponse> {
+    let request = this.findRequestBuilder
+      .clone()
+      .addAttribute(this.METRIC_TYPE_KEY, this.METRIC_TYPE_SAMPLER)
+      .withCustomFilters([])
+      .withGroupDimensions(['name'])
+      .build();
     return this.timeSeriesService
-      .fetchBuckets({ ...request, params: updatedParams, groupDimensions: ['name'] })
+      .fetchBuckets(request)
       .pipe(tap((response) => this.createChart(TsChartType.THREAD_GROUP, request, response)));
   }
 
@@ -334,7 +346,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   /**
    * This method is used for both creating or updating the chart
    */
-  createSummaryChart(request: FindBucketsRequest): Observable<TimeSeriesChartResponse> {
+  createSummaryChart(): Observable<TimeSeriesChartResponse> {
+    let request = this.findRequestBuilder.build();
     return this.timeSeriesService
       .fetchBuckets(request)
       .pipe(tap((response) => this.createChart(TsChartType.OVERVIEW, request, response)));
@@ -355,129 +368,133 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     }
   }
 
-  createByStatusChart(request: FindBucketsRequest): Observable<TimeSeriesChartResponse> {
-    request = { ...request, groupDimensions: [TimeSeriesConfig.STATUS_ATTRIBUTE] };
+  createByStatusChart(): Observable<TimeSeriesChartResponse> {
+    let request = this.findRequestBuilder.clone().build();
+    // request = { ...request, groupDimensions: [TimeSeriesConfig.STATUS_ATTRIBUTE] };
     return this.timeSeriesService
       .fetchBuckets(request)
       .pipe(tap((response) => this.createChart(TsChartType.BY_STATUS, request, response)));
   }
 
-  createByKeywordsCharts(request: FindBucketsRequest): Observable<TimeSeriesChartResponse> {
+  createByKeywordsCharts(): Observable<TimeSeriesChartResponse> {
     let groupDimensions = this.context.getGroupDimensions();
-    return this.timeSeriesService
-      .fetchBuckets({ ...request, groupDimensions: groupDimensions, percentiles: [90, 99] })
-      .pipe(
-        tap((response) => {
-          this.byKeywordsChartResponseCache = response;
-          if (response.matrixKeys.length === 0) {
-            // empty data
-            if (this.responseTimeChart) {
-              this.responseTimeChart?.clear();
-              this.throughputChart?.clear();
-              return;
-            }
+    let findRequest = this.findRequestBuilder
+      .clone()
+      .withGroupDimensions(groupDimensions)
+      .withPercentiles([90, 99])
+      .build();
+    return this.timeSeriesService.fetchBuckets(findRequest).pipe(
+      tap((response) => {
+        this.byKeywordsChartResponseCache = response;
+        if (response.matrixKeys.length === 0) {
+          // empty data
+          if (this.responseTimeChart) {
+            this.responseTimeChart?.clear();
+            this.throughputChart?.clear();
+            return;
           }
-          let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-          let totalThroughput: number[] = response.matrix[0] ? Array(response.matrix[0]?.length) : [];
-          let responseTimeSeries: TSChartSeries[] = [];
-          let throughputSeries: TSChartSeries[] = [];
-          response.matrixKeys.map((key, i) => {
-            key = this.getSeriesKey(key, groupDimensions);
-            let responseTimeData: (number | null | undefined)[] = [];
-            let color = this.keywordsService.getColor(key);
-            let countData = response.matrix[i].map((b, j) => {
-              let bucketValue = b?.throughputPerHour;
-              if (totalThroughput[j] == undefined) {
-                totalThroughput[j] = bucketValue;
-              } else if (bucketValue) {
-                totalThroughput[j] += bucketValue;
-              }
-              if (b) {
-                responseTimeData.push(this.selectedResponseTimeMetric.mapFunction(b));
-              } else {
-                responseTimeData.push(undefined);
-              }
-              return bucketValue ? bucketValue : 0;
-            });
-            let keywordSelection = this.keywordsService.getKeywordSelection(key);
-            let series = {
-              scale: 'y',
-              show: keywordSelection ? keywordSelection.isSelected : true,
-              label: key,
-              legendName: key,
-              id: key,
-              data: [], // will override it
-              value: (x, v) => Math.trunc(v),
-              stroke: color,
-              points: { show: false },
-            } as TSChartSeries;
-            throughputSeries.push({ ...series, data: countData });
-            responseTimeSeries.push({ ...series, data: responseTimeData });
-            return series;
+        }
+        let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
+        let totalThroughput: number[] = response.matrix[0] ? Array(response.matrix[0]?.length) : [];
+        let responseTimeSeries: TSChartSeries[] = [];
+        let throughputSeries: TSChartSeries[] = [];
+        response.matrixKeys.map((key, i) => {
+          key = this.getSeriesKey(key, groupDimensions);
+          let responseTimeData: (number | null | undefined)[] = [];
+          let color = this.keywordsService.getColor(key);
+          let countData = response.matrix[i].map((b, j) => {
+            let bucketValue = b?.throughputPerHour;
+            if (totalThroughput[j] == undefined) {
+              totalThroughput[j] = bucketValue;
+            } else if (bucketValue) {
+              totalThroughput[j] += bucketValue;
+            }
+            if (b) {
+              responseTimeData.push(this.selectedResponseTimeMetric.mapFunction(b));
+            } else {
+              responseTimeData.push(undefined);
+            }
+            return bucketValue ? bucketValue : 0;
           });
+          let keywordSelection = this.keywordsService.getKeywordSelection(key);
+          let series = {
+            scale: 'y',
+            show: keywordSelection ? keywordSelection.isSelected : true,
+            label: key,
+            legendName: key,
+            id: key,
+            data: [], // will override it
+            value: (x, v) => Math.trunc(v),
+            stroke: color,
+            points: { show: false },
+          } as TSChartSeries;
+          throughputSeries.push({ ...series, data: countData });
+          responseTimeSeries.push({ ...series, data: responseTimeData });
+          return series;
+        });
 
-          this.currentChartsSettings[TsChartType.THROUGHPUT] = {
-            title: 'Throughput',
-            xValues: timeLabels,
-            tooltipOptions: {
-              enabled: true,
-              zAxisLabel: this.selectedThroughputMetric.tooltipZAxisLabel,
+        this.currentChartsSettings[TsChartType.THROUGHPUT] = {
+          title: 'Throughput',
+          xValues: timeLabels,
+          tooltipOptions: {
+            enabled: true,
+            zAxisLabel: this.selectedThroughputMetric.tooltipZAxisLabel,
+          },
+          series: [
+            {
+              scale: 'total',
+              label: 'Total',
+              legendName: 'Total',
+              id: 'secondary',
+              data: totalThroughput,
+              value: (x, v) => Math.trunc(v) + ' total',
+              fill: (self: uPlot) => UPlotUtils.gradientFill(self, TimeSeriesConfig.TOTAL_BARS_COLOR),
+              paths: ChartGenerators.barsFunction({ size: [0.9, 100] }),
+              points: { show: false },
             },
-            series: [
-              {
-                scale: 'total',
-                label: 'Total',
-                legendName: 'Total',
-                id: 'secondary',
-                data: totalThroughput,
-                value: (x, v) => Math.trunc(v) + ' total',
-                fill: (self: uPlot) => UPlotUtils.gradientFill(self, TimeSeriesConfig.TOTAL_BARS_COLOR),
-                paths: ChartGenerators.barsFunction({ size: [0.9, 100] }),
-                points: { show: false },
-              },
-              ...throughputSeries,
-            ],
-            axes: [
-              {
-                scale: 'y',
-                size: this.CHART_LEGEND_SIZE,
-                values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
-              },
-              {
-                side: 1,
-                size: this.CHART_LEGEND_SIZE,
-                scale: 'total',
-                values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
-                grid: { show: false },
-              },
-            ],
-          };
+            ...throughputSeries,
+          ],
+          axes: [
+            {
+              scale: 'y',
+              size: this.CHART_LEGEND_SIZE,
+              values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
+            },
+            {
+              side: 1,
+              size: this.CHART_LEGEND_SIZE,
+              scale: 'total',
+              values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
+              grid: { show: false },
+            },
+          ],
+        };
 
-          this.currentChartsSettings[TsChartType.RESPONSE_TIME] = {
-            title: TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${this.selectedResponseTimeMetric.label})`,
-            xValues: timeLabels,
-            series: responseTimeSeries,
-            tooltipOptions: {
-              enabled: true,
-              yAxisUnit: 'ms',
+        this.currentChartsSettings[TsChartType.RESPONSE_TIME] = {
+          title: TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${this.selectedResponseTimeMetric.label})`,
+          xValues: timeLabels,
+          series: responseTimeSeries,
+          tooltipOptions: {
+            enabled: true,
+            yAxisUnit: 'ms',
+          },
+          axes: [
+            {
+              scale: 'y',
+              size: this.CHART_LEGEND_SIZE,
+              values: (u, vals, space) => vals.map((v) => UPlotUtils.formatMilliseconds(v)),
             },
-            axes: [
-              {
-                scale: 'y',
-                size: this.CHART_LEGEND_SIZE,
-                values: (u, vals, space) => vals.map((v) => UPlotUtils.formatMilliseconds(v)),
-              },
-            ],
-          };
-        })
-      );
+          ],
+        };
+      })
+    );
   }
 
-  updateTable(request: FindBucketsRequest): Observable<TimeSeriesChartResponse> {
+  updateTable(): Observable<TimeSeriesChartResponse> {
     if (!this.tableChart) {
       throw 'Table does not exist yet';
     }
-    return this.tableChart.refresh(request); // refresh the table
+    return this.tableChart.refresh(this.findRequestBuilder.build()); // refresh the table
   }
 
   switchResponseTimeMetric(metric: { label: string; mapFunction: (b: Bucket) => number }) {

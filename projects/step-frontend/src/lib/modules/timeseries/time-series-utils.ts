@@ -49,4 +49,8 @@ export class TimeSeriesUtils {
   static intervalsOverlap(range1: TSTimeRange, range2: TSTimeRange) {
     return range1.from <= range2.to && range2.from <= range1.to;
   }
+
+  static intervalsEqual(range1?: TSTimeRange, range2?: TSTimeRange) {
+    return range1 && range2 && range1.from === range2.from && range1.to === range2.to;
+  }
 }
