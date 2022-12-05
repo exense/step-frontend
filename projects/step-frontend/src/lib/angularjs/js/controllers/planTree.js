@@ -398,6 +398,10 @@ angular
 
               var icon = artefactTypes.getIconNg2(artefact._class);
 
+              if (artefact.dynamicName) {
+                artefact.dynamicName.dynamic = artefact.useDynamicName;
+              }
+
               var node = {
                 id: artefact.id,
                 children: children,
