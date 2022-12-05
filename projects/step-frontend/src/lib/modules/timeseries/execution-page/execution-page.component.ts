@@ -67,6 +67,12 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   ];
   selectedRefreshInterval: RefreshInterval = this.refreshIntervals[0];
 
+  groupingOptions = [
+    { label: 'Name', attributes: ['name'] },
+    { label: 'Name & Status', attributes: ['name', 'rnStatus'] },
+  ];
+  groupingAttributes = this.groupingOptions[0].attributes;
+
   constructor(
     private timeSeriesService: TimeSeriesService,
     private contextsFactory: TimeSeriesContextsFactory,
@@ -91,6 +97,10 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   handleFiltersChange(filters: TsFilterItem[]): void {
     this.context.updateActiveFilters(filters);
+  }
+
+  emitGroupDimensions(): void {
+    this.context.updateGrouping(this.groupingAttributes);
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
@@ -160,7 +170,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       .subscribe((filters) => {
         console.log('FILTER CHANGED');
         this.updateSubscription?.unsubscribe();
-        this.triggerNextUpdate(0, of(null), true); // refresh immediately
+        this.triggerNextUpdate(0, of(null), true, true); // refresh immediately
       });
   }
 
@@ -205,7 +215,12 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
    * @param observableToWaitFor
    * @param forceUpdate - if true, no matter the zoom selection, all the charts will be updated.
    */
-  triggerNextUpdate(delay: number, observableToWaitFor: Observable<unknown>, forceUpdate = false) {
+  triggerNextUpdate(
+    delay: number,
+    observableToWaitFor: Observable<unknown>,
+    forceUpdate = false,
+    showLoadingBar = false
+  ) {
     this.updateSubscription = forkJoin([timer(delay), observableToWaitFor])
       .pipe(
         takeUntil(this.terminator$),
@@ -247,6 +262,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
           updateCharts: forceUpdate || JSON.stringify(newSelection) !== JSON.stringify(oldSelection),
           fullTimeRange: newFullRange,
           selection: newSelection,
+          showLoadingBar: showLoadingBar,
         });
         if (details.endTime) {
           this.intervalShouldBeCanceled = true;

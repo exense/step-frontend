@@ -6,4 +6,5 @@ export interface UpdatePerformanceViewRequest {
 
   fullTimeRange: TSTimeRange;
   selection: TSTimeRange;
+  showLoadingBar?: boolean;
 }

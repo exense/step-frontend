@@ -12,6 +12,7 @@ import { forkJoin, Observable, of, Subject, Subscription, takeUntil, timer } fro
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
 import { TimeSeriesContext } from '../time-series-context';
 import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
+import { TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
 
 @Component({
   selector: 'step-synthetic-monitoring',
@@ -72,6 +73,10 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
     if (this.refreshEnabled) {
       this.triggerNextUpdate(this.selectedRefreshInterval.value, this.dashboardInitComplete$);
     }
+  }
+
+  handleFiltersChange(filters: TsFilterItem[]): void {
+    this.context.updateActiveFilters(filters);
   }
 
   onDashboardInit() {

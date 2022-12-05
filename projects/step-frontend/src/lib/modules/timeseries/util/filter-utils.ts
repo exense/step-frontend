@@ -5,17 +5,20 @@ export class FilterUtils {
     return item.textValue || item.textValues?.some((v) => v.isSelected) || item.min || item.max;
   }
 
-  static objectToOQL(object: { [key: string]: string }) {
+  static objectToOQL(object: { [key: string]: string }, attributesPrefix?: string) {
     if (!object || Object.keys(object).length === 0) {
       return undefined;
     }
     let clause = Object.keys(object)
-      .map((key) => {})
+      .map((key) => {
+        const attribute = attributesPrefix ? `${attributesPrefix}.${key}` : key;
+        return `${attribute} = ${object[key]}`;
+      })
       .join(' and ');
     return `(${clause})`;
   }
 
-  static filtersToOQL(items: TsFilterItem[]) {
+  static filtersToOQL(items: TsFilterItem[], attributesPrefix?: string) {
     if (!items || items.length === 0) {
       return undefined;
     }
@@ -25,11 +28,15 @@ export class FilterUtils {
         case FilterBarItemType.TEXT:
           clause = item.textValues
             ?.filter((f) => f.isSelected)
-            .map((f) => `attributes.${item.attributeName} = ${f.value}`)
+            .map((f) => {
+              const attribute = attributesPrefix ? `${attributesPrefix}.${item.attributeName}` : item.attributeName;
+              return `${attribute} = ${f.value}`;
+            })
             .join(' or ');
           break;
         case FilterBarItemType.FREE_TEXT:
-          clause = `attributes.${item.attributeName} ~ ^.*${item.textValue}.*$`; // TODO make attributes customizable if needed in other places
+          const attribute = attributesPrefix ? `${attributesPrefix}.${item.attributeName}` : item.attributeName;
+          clause = `${attribute} ~ ^.*${item.textValue}.*$`;
           break;
         case FilterBarItemType.NUMERIC:
           break;

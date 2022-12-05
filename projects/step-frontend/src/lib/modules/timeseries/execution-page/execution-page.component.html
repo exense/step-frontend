@@ -13,12 +13,24 @@
     <button mat-raised-button (click)="navigateToRtmDashboard()">Interactive Session</button>
   </div>
 
-  <div style="width: 100%; background: #e8e8e8">
-    <step-ts-filter-bar
-      *ngIf="context"
-      [context]="context"
-      (onFiltersChange)="handleFiltersChange($event)"
-    ></step-ts-filter-bar>
+  <div class="filter-bar-container">
+    <div>
+      <step-ts-filter-bar
+        *ngIf="context"
+        [context]="context"
+        (onFiltersChange)="handleFiltersChange($event)"
+      ></step-ts-filter-bar>
+    </div>
+    <div>
+      <mat-form-field class="filter-item step-view" floatLabel="always">
+        <mat-label>Grouping</mat-label>
+        <mat-select [(ngModel)]="groupingAttributes" (ngModelChange)="emitGroupDimensions()" class="label-margin">
+          <mat-option *ngFor="let option of groupingOptions" [value]="option.attributes">
+            {{ option.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
   </div>
 
   <step-time-range-picker

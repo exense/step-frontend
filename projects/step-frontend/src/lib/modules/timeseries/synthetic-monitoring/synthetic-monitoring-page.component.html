@@ -21,6 +21,14 @@
 
   <button mat-raised-button class="interactive-btn" (click)="navigateToRtmDashboard()">Interactive Session</button>
 
+  <div style="width: 100%; background: #e8e8e8">
+    <step-ts-filter-bar
+      *ngIf="context"
+      [context]="context"
+      (onFiltersChange)="handleFiltersChange($event)"
+    ></step-ts-filter-bar>
+  </div>
+
   <step-performance-view
     *ngIf="performanceViewSettings"
     (onInitializationComplete)="onDashboardInit()"

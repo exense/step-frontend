@@ -8,7 +8,6 @@ import { TimeSeriesChartComponent } from '../chart/time-series-chart.component';
 import { KeyValue } from '@angular/common';
 import { TSRangerComponent } from '../ranger/ts-ranger.component';
 import { UPlotUtils } from '../uplot/uPlot.utils';
-import { TimeSeriesConfig } from '../time-series.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
 import { first, forkJoin, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { TimeSeriesUtils } from '../time-series-utils';
@@ -25,9 +24,8 @@ import { TSTimeRange } from '../chart/model/ts-time-range';
 import { ThroughputMetric } from './model/throughput-metric';
 import { PerformanceViewConfig } from './performance-view.config';
 import { UpdatePerformanceViewRequest } from './model/update-performance-view-request';
-import { FilterUtils } from '../util/filter-utils';
 import { FindBucketsRequestBuilder } from '../util/find-buckets-request-builder';
-import { set } from 'husky';
+import { TimeSeriesConfig } from '../time-series.config';
 
 declare const uPlot: any;
 
@@ -66,7 +64,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   @Output() onInitializationComplete: EventEmitter<void> = new EventEmitter<void>();
   @Output() onUpdateComplete: EventEmitter<void> = new EventEmitter<void>();
 
-  private tableInitialized$ = new Subject<void>();
   private rangerLoaded$ = new Subject<void>();
   chartsAreLoading = false;
 
@@ -85,14 +82,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   refreshEnabled = false;
 
   // this is just for running executions
-  refreshIntervals: RefreshInterval[] = [
-    { label: '5 Sec', value: 5000 },
-    { label: '30 Sec', value: 30 * 1000 },
-    { label: '1 Min', value: 60 * 1000 },
-    { label: '5 Min', value: 5 * 60 * 1000 },
-    { label: '30 Min', value: 30 * 60 * 1000 },
-    { label: 'Off', value: 0 },
-  ];
+  refreshIntervals: RefreshInterval[] = TimeSeriesConfig.AUTO_REFRESH_INTERVALS;
   selectedRefreshInterval: RefreshInterval = this.refreshIntervals[0];
 
   terminator$ = new Subject<void>();
@@ -128,7 +118,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     if (!this.context) {
       throw new Error('Context not provided!');
     }
-    // this.findRequest = this.prepareFindRequest(this.settings);
     this.findRequestBuilder = this.prepareFindRequestBuilder(this.settings);
     this.initContext();
     this.keywordsService
@@ -159,15 +148,15 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       )
       .subscribe();
 
-    this.context
-      .onFiltersChange()
-      .pipe(
-        tap(() => (this.chartsAreLoading = true)),
-        switchMap(() => this.refreshAllCharts()),
-        tap(() => (this.chartsAreLoading = false)),
-        takeUntil(this.terminator$)
-      )
-      .subscribe();
+    // this.context
+    //   .onFiltersChange()
+    //   .pipe(
+    //     tap(() => (this.chartsAreLoading = true)),
+    //     switchMap(() => this.refreshAllCharts()),
+    //     tap(() => (this.chartsAreLoading = false)),
+    //     takeUntil(this.terminator$)
+    //   )
+    //   .subscribe();
     this.context
       .onGroupingChange()
       .pipe(
@@ -201,13 +190,16 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.context.updateFullRange(request.fullTimeRange, false);
     this.context.updateSelectedRange(request.selection, false);
     let updates$ = [];
+    if (request.showLoadingBar) {
+      this.chartsAreLoading = true;
+    }
     if (request.updateRanger) {
       updates$.push(this.timeSelectionComponent.refreshRanger());
     }
     if (request.updateCharts) {
       updates$.push(this.refreshAllCharts());
     }
-    return forkJoin(updates$);
+    return forkJoin(updates$).pipe(tap(() => (this.chartsAreLoading = false)));
   }
 
   handleZoomChange(range: TSTimeRange): Observable<any> {
@@ -243,11 +235,14 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     //     [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_RESPONSE_TIME,
     //     ...customFilters,
     //   },
-    return new FindBucketsRequestBuilder().withRange(settings.timeRange).withBaseFilters({
-      ...settings.contextualFilters,
-      ...customFilters,
-      [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_RESPONSE_TIME,
-    });
+    return new FindBucketsRequestBuilder()
+      .withRange(settings.timeRange)
+      .withBaseFilters({
+        ...settings.contextualFilters,
+        ...customFilters,
+        [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_RESPONSE_TIME,
+      })
+      .withCustomFilters(this.context.getActiveFilter());
   }
 
   // prepareFindRequest(settings: PerformanceViewSettings, customFilters?: any): FindBucketsRequest {
@@ -264,10 +259,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   //   };
   // }
 
-  onTableInitializationFinished() {
-    this.tableInitialized$.next();
-  }
-
   onRangerLoaded() {
     this.rangerLoaded$.next();
   }
@@ -277,7 +268,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       this.createSummaryChart(),
       this.createByStatusChart(),
       this.createByKeywordsCharts(),
-      this.tableInitialized$.pipe(first()), // the table will render automatically once this.findRequest is set.
+      this.createTableChart(),
+      // this.tableInitialized$.pipe(first()), // the table will render automatically once this.findRequest is set.
       this.rangerLoaded$.pipe(first()),
     ];
     if (this.includeThreadGroupChart) {
@@ -298,7 +290,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       this.createSummaryChart(),
       this.createByStatusChart(),
       this.createByKeywordsCharts(),
-      this.updateTable(),
+      this.createTableChart(),
     ];
     if (this.includeThreadGroupChart) {
       charts$.push(this.createThreadGroupsChart());
@@ -369,11 +361,26 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   createByStatusChart(): Observable<TimeSeriesChartResponse> {
-    let request = this.findRequestBuilder.clone().build();
+    let request = this.findRequestBuilder.clone().withGroupDimensions([TimeSeriesConfig.STATUS_ATTRIBUTE]).build();
     // request = { ...request, groupDimensions: [TimeSeriesConfig.STATUS_ATTRIBUTE] };
     return this.timeSeriesService
       .fetchBuckets(request)
       .pipe(tap((response) => this.createChart(TsChartType.BY_STATUS, request, response)));
+  }
+
+  createTableChart(): Observable<TimeSeriesChartResponse> {
+    let findRequest = this.findRequestBuilder
+      .clone()
+      .withNumberOfBuckets(1)
+      .withGroupDimensions(this.context.getGroupDimensions())
+      .withPercentiles([80, 90, 99])
+      .build();
+
+    return this.timeSeriesService.fetchBuckets(findRequest).pipe(
+      tap((response) => {
+        this.tableChart.updateData(response);
+      })
+    );
   }
 
   createByKeywordsCharts(): Observable<TimeSeriesChartResponse> {
@@ -490,13 +497,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     );
   }
 
-  updateTable(): Observable<TimeSeriesChartResponse> {
-    if (!this.tableChart) {
-      throw 'Table does not exist yet';
-    }
-    return this.tableChart.refresh(this.findRequestBuilder.build()); // refresh the table
-  }
-
   switchResponseTimeMetric(metric: { label: string; mapFunction: (b: Bucket) => number }) {
     this.responseTimeChart.setTitle(TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${metric.label})`);
     if (metric.label === this.selectedResponseTimeMetric.label) {
@@ -556,7 +556,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.terminator$.next();
-    this.tableInitialized$.complete();
     this.rangerLoaded$.complete();
   }
 
@@ -565,7 +564,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 }
 
-interface RefreshInterval {
+export interface RefreshInterval {
   label: string;
   value: number; // 0 if it's off
 }

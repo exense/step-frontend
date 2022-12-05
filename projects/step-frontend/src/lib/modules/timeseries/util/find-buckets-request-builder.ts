@@ -12,19 +12,26 @@ export class FindBucketsRequestBuilder {
   private range?: TSTimeRange;
   private groupDimensions?: string[];
   private percentiles?: number[];
+  private numberOfBuckets?: number;
 
   constructor(builder?: FindBucketsRequestBuilder) {
     if (builder) {
       this.customFilters = JSON.parse(JSON.stringify(builder.customFilters));
       this.baseFilters = JSON.parse(JSON.stringify(builder.baseFilters));
       this.range = JSON.parse(JSON.stringify(builder.range));
-      this.groupDimensions = JSON.parse(JSON.stringify(builder.groupDimensions));
-      this.percentiles = JSON.parse(JSON.stringify(builder.percentiles));
+      this.groupDimensions = builder.groupDimensions ? JSON.parse(JSON.stringify(builder.groupDimensions)) : [];
+      this.percentiles = builder.percentiles ? JSON.parse(JSON.stringify(builder.percentiles)) : [];
+      this.numberOfBuckets = builder.numberOfBuckets;
     }
   }
 
   clone(): FindBucketsRequestBuilder {
     return new FindBucketsRequestBuilder(this);
+  }
+
+  withNumberOfBuckets(numberOfBuckets: number) {
+    this.numberOfBuckets = numberOfBuckets;
+    return this;
   }
 
   withPercentiles(percentiles: number[]) {
@@ -62,21 +69,22 @@ export class FindBucketsRequestBuilder {
   }
 
   build(): FindBucketsRequest {
-    const rangeOql = this.range
-      ? new OQLBuilder().open(' and ').gt('begin', this.range.from).lt('begin', this.range.to).build()
-      : undefined;
+    // const rangeOql = this.range
+    //   ? new OQLBuilder().open(' and ').gt('begin', this.range.from).lt('begin', this.range.to).build()
+    //   : undefined;
     const oql = new OQLBuilder()
       .open(' and ')
       // .append(rangeOql)
-      .append(FilterUtils.objectToOQL(this.baseFilters))
-      .append(FilterUtils.filtersToOQL(this.customFilters))
+      .append(FilterUtils.objectToOQL(this.baseFilters, this.attributesPrefix))
+      .append(FilterUtils.filtersToOQL(this.customFilters, this.attributesPrefix))
       .build();
     return {
-      start: this.range.from,
-      end: this.range.to,
+      start: this.range!.from,
+      end: this.range!.to,
       oqlFilter: oql,
       percentiles: this.percentiles,
       groupDimensions: this.groupDimensions,
+      numberOfBuckets: this.numberOfBuckets,
     };
   }
 }

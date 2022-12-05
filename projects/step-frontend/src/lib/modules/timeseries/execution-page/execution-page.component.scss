@@ -2,6 +2,13 @@
   position: relative;
 }
 
+.filter-bar-container {
+  width: 100%;
+  background: #e8e8e8;
+  display: flex;
+  justify-content: space-between;
+}
+
 .right-section-buttons {
   position: absolute;
   top: 60px;
