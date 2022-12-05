@@ -155,7 +155,7 @@ export class ExecutionTreeComponent implements OnChanges, TreeActionsService, On
     }
     handle.expandPath = (nodes: ReportNode[]) => {
       const path = nodes.map((node) => node.id!);
-      this._treeState.expandPath(path).subscribe();
+      this._treeState.expandNode(path).subscribe();
     };
   }
 

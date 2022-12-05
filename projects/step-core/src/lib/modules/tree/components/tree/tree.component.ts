@@ -1,12 +1,12 @@
 import {
   Component,
+  ElementRef,
   EventEmitter,
   Input,
   Optional,
   Output,
   TrackByFunction,
   ViewChild,
-  ViewEncapsulation,
 } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { AbstractArtefact } from '../../../../client/generated';
@@ -15,13 +15,17 @@ import { ArtefactFlatNode } from '../../shared/artefact-flat-node';
 import { TreeStateService } from '../../services/tree-state.service';
 import { TreeActionsService } from '../../services/tree-actions.service';
 import { TreeNode } from '../../shared/tree-node';
+import { TreeDragDropService } from '../../services/tree-drag-drop.service';
 
 @Component({
   selector: 'step-tree',
   templateUrl: './tree.component.html',
   styleUrls: ['./tree.component.scss'],
+  providers: [TreeDragDropService],
 })
 export class TreeComponent {
+  readonly paddingIdent = 15;
+
   readonly trackByAction: TrackByFunction<TreeAction> = (index, item) => item.id;
 
   readonly contextMenuPosition = { x: 0, y: 0 };
@@ -36,10 +40,12 @@ export class TreeComponent {
 
   constructor(
     public _treeState: TreeStateService<any, TreeNode>,
+    public _treeDragDrop: TreeDragDropService,
+    public _treeContainer: ElementRef<HTMLElement>,
     @Optional() private _treeActions?: TreeActionsService
   ) {}
 
-  openContextMenu(event: MouseEvent, nodeId: string): void {
+  openContextMenu({ event, nodeId }: { event: MouseEvent; nodeId: string }): void {
     const node = this._treeState.findNodeById(nodeId);
     if (!node) {
       return;

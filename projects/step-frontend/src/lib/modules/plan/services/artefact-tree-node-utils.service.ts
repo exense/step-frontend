@@ -32,12 +32,26 @@ export class ArtefactTreeNodeUtilsService implements TreeNodeUtilsService<Abstra
     children: ArtefactTreeNode[],
     updateType: 'append' | 'replace'
   ): void {
-    children.forEach((child) => {
-      const parent = child.parentId ? this.findArtefactById(root, child.parentId) : undefined;
-      if (parent?.children) {
-        parent.children = parent.children.filter((artefact) => child.originalArtefact !== artefact);
-      }
-    });
+    //Remove children for their previous parents
+    children
+      .map((child) => {
+        // First find all parent - children chains
+        const parent = child.parentId ? this.findArtefactById(root, child.parentId) : undefined;
+        if (!parent?.children) {
+          return undefined;
+        }
+        return { parent, child };
+      })
+      .forEach((chain) => {
+        if (!chain) {
+          return;
+        }
+        const { parent, child } = chain;
+        // Remove children after all chains were found to avoid side effects, when children wil be lost
+        parent!.children = parent!.children!.filter(
+          (artefact: AbstractArtefact) => child.originalArtefact !== artefact
+        );
+      });
 
     const newParent = this.findArtefactById(root, nodeId);
     if (!newParent) {
