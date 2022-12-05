@@ -122,11 +122,14 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     tap((x) => {
       this._inProgress$.next(!x.hideProgress);
     }),
-    switchMap((x) => this._rest.requestTable<T>(this._tableId, x.request)),
-    catchError((err) => {
-      console.error(err);
-      return of(null);
-    }),
+    switchMap((x) =>
+      this._rest.requestTable<T>(this._tableId, x.request).pipe(
+        catchError((err) => {
+          console.error(err);
+          return of(null);
+        })
+      )
+    ),
     tap((_) => this._inProgress$.next(false)),
     startWith(null),
     shareReplay(1),
