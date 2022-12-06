@@ -242,7 +242,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
         ...customFilters,
         [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_RESPONSE_TIME,
       })
-      .withCustomFilters(this.context.getActiveFilter());
+      .withCustomFilters(this.context.getActiveFilter())
+      .withNumberOfBuckets(TimeSeriesConfig.MAX_BUCKETS_IN_CHART);
   }
 
   // prepareFindRequest(settings: PerformanceViewSettings, customFilters?: any): FindBucketsRequest {
