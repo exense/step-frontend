@@ -63,7 +63,7 @@ angular
       if ($location.search().repositoryId) {
         $scope.repoRef = {
           repositoryID: $location.search().repositoryId,
-          repositoryParameters: _.omit($location.search(), 'repositoryId'),
+          repositoryParameters: _.omit($location.search(), 'repositoryId', 'tenant'),
         };
         $scope.loading = true;
         $http.post('rest/controller/repository/artefact/info', $scope.repoRef).then(
