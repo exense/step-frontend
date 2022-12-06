@@ -448,14 +448,23 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
     if (!planId) {
       return;
     }
-    this._planApi.getPlanById(planId).subscribe((plan) => {
-      this.plan = plan;
-      const root = plan.root;
-      if (root) {
-        this._treeState.init(root, [root.id!]);
-      }
-      this._planHistory.init(plan);
-    });
+    this._planApi
+      .getPlanById(planId)
+      .pipe(
+        tap((plan) => {
+          if (plan.root) {
+            this.synchronizeDynamicName(plan.root);
+          }
+        })
+      )
+      .subscribe((plan) => {
+        this.plan = plan;
+        const root = plan.root;
+        if (root) {
+          this._treeState.init(root, [root.id!]);
+        }
+        this._planHistory.init(plan);
+      });
   }
 
   private initPlanUpdate(): void {
@@ -540,6 +549,13 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
         return of(undefined);
       })
     );
+  }
+
+  private synchronizeDynamicName(artefact: AbstractArtefact): void {
+    if (artefact.dynamicName) {
+      artefact.dynamicName.dynamic = artefact.useDynamicName;
+    }
+    (artefact.children || []).forEach((child) => this.synchronizeDynamicName(child));
   }
 }
 
