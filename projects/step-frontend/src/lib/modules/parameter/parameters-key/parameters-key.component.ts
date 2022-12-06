@@ -1,7 +1,6 @@
 import { Component, Optional } from '@angular/core';
-import { CustomColumnOptions, CustomComponent, Parameter } from '@exense/step-core';
+import { CustomColumnOptions, CustomComponent, Parameter, TableReload } from '@exense/step-core';
 import { map, of } from 'rxjs';
-import { PlanDialogsService } from '../../plan/services/plan-dialogs.service';
 import { ParameterDialogsService } from '../services/parameter-dialogs.service';
 
 @Component({
@@ -18,13 +17,18 @@ export class ParametersKeyComponent implements CustomComponent {
 
   constructor(
     private _parameterDialogs: ParameterDialogsService,
-    @Optional() private _customColumnOptions?: CustomColumnOptions
+    @Optional() private _customColumnOptions?: CustomColumnOptions,
+    @Optional() private _tableReload?: TableReload
   ) {}
 
   editParameter(): void {
     if (!this.context) {
       return;
     }
-    this._parameterDialogs.editParameter(this.context);
+    this._parameterDialogs.editParameter(this.context).subscribe(() => {
+      if (this._tableReload) {
+        this._tableReload.reload();
+      }
+    });
   }
 }
