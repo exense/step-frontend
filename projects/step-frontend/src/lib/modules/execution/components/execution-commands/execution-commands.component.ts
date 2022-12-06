@@ -14,6 +14,7 @@ import {
   AJS_MODULE,
   AJS_ROOT_SCOPE,
   ArtefactFilter,
+  AugmentedExecutionsService,
   AugmentedScreenService,
   Execution,
   ExecutionParameters,
@@ -42,7 +43,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges, OnDestroy 
   isExecutionIsolated: boolean = false;
 
   constructor(
-    private _executionService: ExecutionsService,
+    private _executionService: AugmentedExecutionsService,
     private _screenTemplates: AugmentedScreenService,
     private _scheduledTaskDialogs: ScheduledTaskDialogsService,
     @Inject(AJS_ROOT_SCOPE) private _rootScope$: IRootScopeService,
@@ -150,6 +151,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges, OnDestroy 
       description,
       mode,
       repositoryObject,
+      exports: [],
       isolatedExecution,
       artefactFilter,
       customParameters: this.executionParameters,

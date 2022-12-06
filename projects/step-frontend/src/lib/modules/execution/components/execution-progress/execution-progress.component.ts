@@ -134,7 +134,7 @@ export class ExecutionProgressComponent implements OnInit, OnChanges, ExecutionS
         }),
         switchMap((path) => {
           const finalNodeId = path[path.length - 1];
-          return this._executionTreeState.expandPath(path).pipe(map(() => finalNodeId));
+          return this._executionTreeState.expandNode(path).pipe(map(() => finalNodeId));
         })
       )
       .subscribe((nodeId) => this._executionTreeState.selectNodeById(nodeId));
