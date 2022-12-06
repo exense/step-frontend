@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { TimeSeriesContext } from './execution-page/time-series-context';
+import { TimeSeriesContext } from './time-series-context';
+import { TSTimeRange } from './chart/model/ts-time-range';
 
 /**
  * This is a singleton which handles all contexts for the execution tabs.
@@ -12,6 +13,12 @@ export class TimeSeriesContextsFactory {
   // key is the executionId
   private executionsContexts: { [key: string]: TimeSeriesContext } = {};
 
+  createContext(id: string, fullTimeRange: TSTimeRange) {
+    let context = new TimeSeriesContext(id, fullTimeRange);
+    this.executionsContexts[id] = context;
+    return context;
+  }
+
   /**
    * The method will create a new context if it doesn't exist yet.
    */
@@ -19,12 +26,7 @@ export class TimeSeriesContextsFactory {
     if (!contextId) {
       throw new Error('Context id must be specified!');
     }
-    let context = this.executionsContexts[contextId];
-    if (!context) {
-      context = new TimeSeriesContext(contextId);
-      this.executionsContexts[contextId] = context;
-    }
-    return context;
+    return this.executionsContexts[contextId];
   }
 
   destroyContext(executionId: string) {

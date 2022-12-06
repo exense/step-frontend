@@ -1,4 +1,4 @@
 export interface TSTimeRange {
-  from?: number; // timestamp
-  to?: number; // timestamp
+  from: number; // timestamp
+  to: number; // timestamp
 }
