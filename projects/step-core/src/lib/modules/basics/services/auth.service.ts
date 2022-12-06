@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, OnDestroy } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { ConfigDto, CredentialsDto, SessionDto } from '../../../domain';
-import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable, tap } from 'rxjs';
 import { AJS_LOCATION, AJS_PREFERENCES, AJS_ROOT_SCOPE, AJS_UIB_MODAL } from '../../../shared/angularjs-providers';
 import { AJS_MODULE } from '../../../shared/constants';
 import { a1Promise2Promise } from '../../../shared/utils';
@@ -83,18 +83,19 @@ export class AuthService implements OnDestroy {
     }
   }
 
-  async login(credentials: CredentialsDto): Promise<unknown> {
-    (await firstValueFrom(this._http.post('rest/access/login', credentials))) as Observable<{ token: string }>;
-    await this.getSession();
-
-    const context = this.getContext();
-    if (context && !context.otp) {
-      if (this._$location.path().indexOf('login') !== -1) {
-        this.gotoDefaultPage();
-      }
-      this._$rootScope.broadcast('step.login.succeeded');
-    }
-    return undefined;
+  login(credentials: CredentialsDto): Observable<unknown> {
+    return this._http.post('rest/access/login', credentials).pipe(
+      tap(() => this.getSession()),
+      tap(() => {
+        const context = this.getContext();
+        if (context && !context.otp) {
+          if (this._$location.path().indexOf('login') !== -1) {
+            this.gotoDefaultPage();
+          }
+          this._$rootScope.broadcast('step.login.succeeded');
+        }
+      })
+    );
   }
 
   async logout(): Promise<unknown> {
