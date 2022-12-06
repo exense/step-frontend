@@ -39,7 +39,20 @@
   }
 }
 
+.attribute-type {
+  position: absolute;
+  opacity: 0.3;
+  top: 9px;
+  right: 9px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
 .menu-container {
   padding: 12px;
   height: auto;
+}
+
+button {
+  background: #293e50 !important;
 }

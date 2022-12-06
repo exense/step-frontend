@@ -20,13 +20,13 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     {
       label: 'Status',
       attributeName: 'rnStatus',
-      type: FilterBarItemType.TEXT,
+      type: FilterBarItemType.OPTIONS,
       textValues: [{ value: 'PASSED' }, { value: 'FAILED' }, { value: 'TECHNICAL_ERROR' }, { value: 'INTERRUPTED' }],
     },
     {
       label: 'Type',
       attributeName: 'type',
-      type: FilterBarItemType.TEXT,
+      type: FilterBarItemType.OPTIONS,
       textValues: [{ value: 'keyword' }, { value: 'custom' }],
     },
   ];
@@ -53,12 +53,24 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     }
   }
 
+  addCustomFilter(type: FilterBarItemType) {
+    this.items.push({
+      attributeName: '',
+      type: type,
+      label: '',
+    });
+  }
+
   removeFilterItem(index: number) {
     let itemToDelete = this.items[index];
     this.items.splice(index, 1);
     if (FilterUtils.filterItemIsValid(itemToDelete)) {
       this.emitFilterChange$.next();
     }
+  }
+
+  get FilterBarItemType() {
+    return FilterBarItemType;
   }
 
   ngOnDestroy(): void {}

@@ -10,7 +10,7 @@ export interface TsFilterItem {
 }
 
 export enum FilterBarItemType {
-  TEXT = 'TEXT', // this is a text with suggestions
+  OPTIONS = 'OPTIONS', // this is a text with suggestions
   FREE_TEXT = 'FREE_TEXT', // used for custom attributes we don't know the values
   NUMERIC = 'NUMERIC',
   DATE = 'DATE',

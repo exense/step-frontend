@@ -71,7 +71,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     { label: 'Name', attributes: ['name'] },
     { label: 'Name & Status', attributes: ['name', 'rnStatus'] },
   ];
-  groupingAttributes = this.groupingOptions[0].attributes;
+  selectedGrouping = this.groupingOptions[0];
 
   constructor(
     private timeSeriesService: TimeSeriesService,
@@ -100,7 +100,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   emitGroupDimensions(): void {
-    this.context.updateGrouping(this.groupingAttributes);
+    this.context.updateGrouping(this.selectedGrouping.attributes);
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {

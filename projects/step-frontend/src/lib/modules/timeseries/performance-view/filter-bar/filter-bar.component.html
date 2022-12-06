@@ -5,12 +5,17 @@
       <button mat-menu-item *ngFor="let option of defaultFilterOptions" (click)="addFilterItem(option)">
         <span>{{ option.label }}</span>
       </button>
-      <button mat-menu-item>
+      <button mat-menu-item [matMenuTriggerFor]="typesMenu">
         <span>Other</span>
       </button>
       <button mat-menu-item>
         <span>OQL</span>
       </button>
+    </mat-menu>
+    <mat-menu #typesMenu="matMenu">
+      <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.FREE_TEXT)">Text Filter</button>
+      <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.NUMERIC)">Numeric Filter</button>
+      <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.DATE)">Date Filter</button>
     </mat-menu>
   </div>
   <div class="filter-container">

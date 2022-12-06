@@ -2,7 +2,10 @@ import { FilterBarItemType, TsFilterItem } from '../performance-view/filter-bar/
 
 export class FilterUtils {
   static filterItemIsValid(item: TsFilterItem) {
-    return item.textValue || item.textValues?.some((v) => v.isSelected) || item.min || item.max;
+    console.log(item);
+    return (
+      item.textValue || item.textValues?.some((v) => v.isSelected) || item.min != undefined || item.max != undefined
+    );
   }
 
   static objectToOQL(object: { [key: string]: string }, attributesPrefix?: string) {
@@ -25,7 +28,7 @@ export class FilterUtils {
     let andFilters: (string | undefined)[] = items.map((item) => {
       let clause;
       switch (item.type) {
-        case FilterBarItemType.TEXT:
+        case FilterBarItemType.OPTIONS:
           clause = item.textValues
             ?.filter((f) => f.isSelected)
             .map((f) => {
@@ -36,11 +39,13 @@ export class FilterUtils {
           break;
         case FilterBarItemType.FREE_TEXT:
           const attribute = attributesPrefix ? `${attributesPrefix}.${item.attributeName}` : item.attributeName;
-          clause = `${attribute} ~ ^.*${item.textValue}.*$`;
+          clause = `${attribute} ~ "^.*${item.textValue}.*$"`;
           break;
         case FilterBarItemType.NUMERIC:
+          // TODO implement me
           break;
         case FilterBarItemType.DATE:
+          // TODO implement me
           break;
       }
       return clause ? `(${clause})` : undefined;

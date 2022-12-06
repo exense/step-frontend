@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { TsFilterItem, FilterBarItemType } from '../model/ts-filter-item';
 import { Subject } from 'rxjs';
+import { MatMenuTrigger } from '@angular/material/menu';
 
 @Component({
   selector: 'step-ts-filter-bar-item',
@@ -8,11 +9,13 @@ import { Subject } from 'rxjs';
   styleUrls: ['./filter-bar-item.component.scss'],
 })
 export class FilterBarItemComponent implements OnInit, OnDestroy {
+  @ViewChild('matTrigger') matTrigger!: MatMenuTrigger;
+
   @Input() item!: TsFilterItem;
   @Output() onRemoveItem: EventEmitter<any> = new EventEmitter<any>();
   @Output() onFilterChange: EventEmitter<TsFilterItem> = new EventEmitter<TsFilterItem>();
 
-  formattedValue = '';
+  formattedValue? = '';
 
   ngOnInit(): void {
     if (!this.item) {
@@ -29,7 +32,30 @@ export class FilterBarItemComponent implements OnInit, OnDestroy {
     this.onFilterChange.emit(this.item);
   }
 
-  applyChanges() {}
+  applyChanges() {
+    this.item.label = this.item.attributeName;
+    switch (this.item.type) {
+      case FilterBarItemType.FREE_TEXT:
+        this.formattedValue = this.item.textValue;
+        break;
+      case FilterBarItemType.NUMERIC:
+        if (this.item.min != undefined && this.item.max != undefined) {
+          this.formattedValue = `${this.item.min} - ${this.item.max}`;
+        } else if (this.item.min != undefined) {
+          this.formattedValue = `> ${this.item.min}`;
+        } else if (this.item.max != undefined) {
+          this.formattedValue = `< ${this.item.max}`;
+        } else {
+          // both are undefined
+          this.formattedValue = '';
+        }
+        break;
+      case FilterBarItemType.DATE:
+        break;
+    }
+    this.onFilterChange.emit(this.item);
+    this.matTrigger.closeMenu();
+  }
 
   removeItem($event: any) {
     $event.stopPropagation();

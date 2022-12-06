@@ -1,5 +1,5 @@
-<div class="item-container" [matMenuTriggerFor]="menu">
-  <div class="filter-label">{{ item.label }}</div>
+<div class="item-container" [matMenuTriggerFor]="menu" #matTrigger="matMenuTrigger">
+  <div class="filter-label">{{ item.label || 'Not Specified' }}</div>
   <div class="filter-value">
     {{ formattedValue || '-' }}
   </div>
@@ -9,7 +9,7 @@
 </div>
 <mat-menu #menu="matMenu" [ngSwitch]="item.type">
   <div class="menu-container" (click)="$event.stopPropagation()">
-    <div *ngSwitchCase="FilterBarType.TEXT">
+    <div *ngSwitchCase="FilterBarType.OPTIONS">
       <mat-form-field floatLabel="never">
         <mat-label>Search Value</mat-label>
         <input type="text" matInput />
@@ -24,8 +24,55 @@
         </mat-checkbox>
       </div>
     </div>
-    <div *ngSwitchCase="FilterBarType.FREE_TEXT"></div>
-    <div *ngSwitchCase="FilterBarType.NUMERIC"></div>
-    <div *ngSwitchCase="FilterBarType.DATE"></div>
+    <div *ngSwitchCase="FilterBarType.FREE_TEXT">
+      <div class="attribute-type">TEXT</div>
+      <mat-form-field class="w-100" autocomplete="off">
+        <mat-label>Attribute name</mat-label>
+        <input type="text" matInput [(ngModel)]="item.attributeName" autocomplete="off" />
+      </mat-form-field>
+      <mat-form-field class="w-100">
+        <mat-label>Search value</mat-label>
+        <input type="text" matInput [(ngModel)]="item.textValue" autocomplete="off" />
+      </mat-form-field>
+      <div>
+        <button mat-raised-button color="primary" class="w-100" (click)="applyChanges()">Apply</button>
+      </div>
+    </div>
+    <div *ngSwitchCase="FilterBarType.NUMERIC">
+      <div class="attribute-type">NUMERIC</div>
+      <mat-form-field class="w-100">
+        <mat-label>Attribute name</mat-label>
+        <input type="text" matInput [(ngModel)]="item.attributeName" autocomplete="off" />
+      </mat-form-field>
+      <mat-form-field class="w-100">
+        <mat-label>Min</mat-label>
+        <input type="number" matInput [(ngModel)]="item.min" />
+      </mat-form-field>
+      <mat-form-field class="w-100">
+        <mat-label>Max</mat-label>
+        <input type="number" matInput [(ngModel)]="item.max" />
+      </mat-form-field>
+      <div>
+        <button mat-raised-button color="primary" class="w-100" (click)="applyChanges()">Apply</button>
+      </div>
+    </div>
+    <div *ngSwitchCase="FilterBarType.DATE">
+      <div class="attribute-type">DATE</div>
+      <mat-form-field class="w-100">
+        <mat-label>Attribute name</mat-label>
+        <input type="text" matInput [(ngModel)]="item.attributeName" />
+      </mat-form-field>
+      <mat-form-field class="w-100">
+        <mat-label>From</mat-label>
+        <input type="number" matInput [(ngModel)]="item.min" />
+      </mat-form-field>
+      <mat-form-field class="w-100">
+        <mat-label>To</mat-label>
+        <input type="number" matInput [(ngModel)]="item.max" />
+      </mat-form-field>
+      <div>
+        <button mat-raised-button color="primary" class="w-100" (click)="applyChanges()">Apply</button>
+      </div>
+    </div>
   </div>
 </mat-menu>
