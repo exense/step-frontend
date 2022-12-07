@@ -20,6 +20,7 @@ import { TSTimeRange } from '../chart/model/ts-time-range';
 import { TimeSeriesContext } from '../time-series-context';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
+import { TimeSeriesConfig } from '../time-series.config';
 
 @Component({
   selector: 'step-execution-performance',
@@ -67,10 +68,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   ];
   selectedRefreshInterval: RefreshInterval = this.refreshIntervals[0];
 
-  groupingOptions = [
-    { label: 'Name', attributes: ['name'] },
-    { label: 'Name & Status', attributes: ['name', 'rnStatus'] },
-  ];
+  groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS;
   selectedGrouping = this.groupingOptions[0];
 
   constructor(
@@ -168,7 +166,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       .onActiveFilterChange()
       .pipe(takeUntil(this.terminator$))
       .subscribe((filters) => {
-        console.log('FILTER CHANGED');
         this.updateSubscription?.unsubscribe();
         this.triggerNextUpdate(0, of(null), true, true); // refresh immediately
       });

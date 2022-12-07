@@ -36,7 +36,6 @@ export class OQLBuilder {
   }
 
   build(): string {
-    console.log(this.clauses);
     return this.clauses.join(this.separator);
   }
 }

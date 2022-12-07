@@ -39,7 +39,7 @@ export class FilterUtils {
           break;
         case FilterBarItemType.FREE_TEXT:
           const attribute = attributesPrefix ? `${attributesPrefix}.${item.attributeName}` : item.attributeName;
-          clause = `${attribute} ~ "^.*${item.textValue}.*$"`;
+          clause = `${attribute} ~ ".*${item.textValue}.*"`;
           break;
         case FilterBarItemType.NUMERIC:
           // TODO implement me

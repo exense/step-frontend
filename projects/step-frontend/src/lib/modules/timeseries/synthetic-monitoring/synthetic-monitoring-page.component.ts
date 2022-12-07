@@ -9,10 +9,11 @@ import { TSTimeRange } from '../chart/model/ts-time-range';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
 import { forkJoin, Observable, of, Subject, Subscription, takeUntil, timer } from 'rxjs';
-import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
 import { TimeSeriesContext } from '../time-series-context';
 import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
 import { TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
+import { TimeSeriesConfig } from '../time-series.config';
+import { TimeSeriesUtils } from '../time-series-utils';
 
 @Component({
   selector: 'step-synthetic-monitoring',
@@ -29,7 +30,6 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
   @Input() taskId: string = window.location.href.split('?')[0].substring(window.location.href.lastIndexOf('/') + 1);
 
   context!: TimeSeriesContext;
-
   refreshEnabled = true;
 
   performanceViewSettings!: PerformanceViewSettings;
@@ -43,6 +43,10 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
     { label: 'Last Week', timeInMs: this.ONE_HOUR_MS * 24 * 7 },
     { label: 'Last Month', timeInMs: this.ONE_HOUR_MS * 24 * 31 },
   ];
+  timeRangeSelection: TimeRangePickerSelection = {
+    type: RangeSelectionType.RELATIVE,
+    relativeSelection: this.timeRangeOptions[0],
+  };
 
   // this is just for running executions
   refreshIntervals = [
@@ -57,6 +61,9 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
 
   refreshSubscription: Subscription | undefined;
 
+  groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS;
+  selectedGrouping = this.groupingOptions[0];
+
   constructor(
     private changeDetector: ChangeDetectorRef,
     private dashboardService: DashboardService,
@@ -70,13 +77,28 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
     let range = this.calculateRange(this.timeRangeOptions[0]);
     this.context = this.contextFactory.createContext(this.taskId, range);
     this.performanceViewSettings = this.createViewSettings(range);
+    this.subscribeForFiltersChange();
     if (this.refreshEnabled) {
       this.triggerNextUpdate(this.selectedRefreshInterval.value, this.dashboardInitComplete$);
     }
   }
 
+  subscribeForFiltersChange(): void {
+    this.context
+      .onActiveFilterChange()
+      .pipe(takeUntil(this.terminator$))
+      .subscribe((filters) => {
+        this.refreshSubscription?.unsubscribe();
+        this.triggerNextUpdate(0, of(null), true, true); // refresh immediately
+      });
+  }
+
   handleFiltersChange(filters: TsFilterItem[]): void {
     this.context.updateActiveFilters(filters);
+  }
+
+  emitGroupDimensions(): void {
+    this.context.updateGrouping(this.selectedGrouping.attributes);
   }
 
   onDashboardInit() {
@@ -113,6 +135,7 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
+    this.timeRangeSelection = selection;
     this.terminator$.next();
     let newInterval;
     switch (selection.type) {
@@ -136,32 +159,44 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  triggerNextUpdate(delay: number, observableToWaitFor: Observable<unknown>): void {
+  triggerNextUpdate(
+    delay: number,
+    observableToWaitFor: Observable<unknown>,
+    forceUpdate = false,
+    showLoadingBar = false
+  ): void {
     this.refreshSubscription = forkJoin([timer(delay), observableToWaitFor])
       .pipe(takeUntil(this.terminator$))
       .subscribe(() => {
-        const activeSelection = this.rangePicker.getActiveSelection();
         let now = new Date().getTime();
-        let newInterval = { from: now - activeSelection.relativeSelection!.timeInMs, to: now };
-        let newSelection: TSTimeRange;
         let isFullRangeSelected = this.context.isFullRangeSelected();
-        let shouldRefreshCharts = isFullRangeSelected;
-        if (isFullRangeSelected) {
-          newSelection = newInterval;
-        } else {
-          newSelection = {
-            from: Math.max(newInterval.from, this.context.getSelectedTimeRange().from),
-            to: Math.min(newInterval.to, this.context.getSelectedTimeRange().to),
-          };
+        let oldSelection = this.context.getSelectedTimeRange();
+        let newFullRange: TSTimeRange;
+        switch (this.timeRangeSelection.type) {
+          case RangeSelectionType.FULL:
+            throw new Error('Full range selection is not supported');
+          case RangeSelectionType.ABSOLUTE:
+            newFullRange = this.timeRangeSelection.absoluteSelection!;
+            break;
+          case RangeSelectionType.RELATIVE:
+            let end = now;
+            newFullRange = { from: end - this.timeRangeSelection.relativeSelection!.timeInMs!, to: end };
+            break;
         }
-        if (newSelection.to - newSelection.from < 0) {
-          newSelection = newInterval;
-        }
-        this.performanceViewSettings.timeRange = newInterval;
-        this.context.updateSelectedRange(newSelection, false);
-        this.context.updateFullRange(newInterval);
-        let refresh$ = shouldRefreshCharts ? this.performanceView.refreshAllCharts() : of(null);
-        this.triggerNextUpdate(this.selectedRefreshInterval.value, refresh$);
+        // when the selection is 0, it will switch to full selection automatically
+        let newSelection = isFullRangeSelected
+          ? newFullRange
+          : TimeSeriesUtils.cropInterval(newFullRange, oldSelection) || newFullRange;
+
+        let updateDashboard$ = this.performanceView.updateDashboard({
+          updateRanger: true,
+          updateCharts: forceUpdate || JSON.stringify(newSelection) !== JSON.stringify(oldSelection),
+          fullTimeRange: newFullRange,
+          selection: newSelection,
+          showLoadingBar: showLoadingBar,
+        });
+        // the execution is not done yet
+        this.triggerNextUpdate(this.selectedRefreshInterval.value, updateDashboard$); // recursive call
       });
   }
 

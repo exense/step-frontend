@@ -16,4 +16,9 @@ export class TimeSeriesConfig {
     { label: '30 Min', value: 30 * 60 * 1000 },
     { label: 'Off', value: 0 },
   ];
+
+  static readonly DEFAULT_GROUPING_OPTIONS = [
+    { label: 'Name', attributes: ['name'] },
+    { label: 'Name & Status', attributes: ['name', 'rnStatus'] },
+  ];
 }
