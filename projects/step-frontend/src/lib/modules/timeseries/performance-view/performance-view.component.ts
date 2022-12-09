@@ -189,6 +189,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     // let's assume the complete interval and selections are set.
     this.context.updateFullRange(request.fullTimeRange, false);
     this.context.updateSelectedRange(request.selection, false);
+    console.log(request);
     let updates$ = [];
     if (request.showLoadingBar) {
       this.chartsAreLoading = true;

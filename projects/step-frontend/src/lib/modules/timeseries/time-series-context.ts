@@ -83,7 +83,8 @@ export class TimeSeriesContext {
 
   resetZoom() {
     if (JSON.stringify(this.selectedTimeRange) === JSON.stringify(this.fullTimeRange)) {
-      return;
+      console.log('nothing changed');
+      // return; // this is causing some issues in the ranger. it's selection get 0 width, so better keep it like this for now.
     }
     this.selectedTimeRange = this.fullTimeRange;
     this.selectedTimeRangeChange$.next(this.selectedTimeRange);

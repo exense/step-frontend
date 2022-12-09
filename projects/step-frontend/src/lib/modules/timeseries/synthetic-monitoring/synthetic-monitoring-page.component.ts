@@ -8,7 +8,7 @@ import { TimeRangePicker } from '../time-selection/time-range-picker.component';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
-import { forkJoin, Observable, of, Subject, Subscription, takeUntil, timer } from 'rxjs';
+import { forkJoin, Observable, of, Subject, Subscription, takeUntil, tap, timer } from 'rxjs';
 import { TimeSeriesContext } from '../time-series-context';
 import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
 import { TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
@@ -89,11 +89,13 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.terminator$))
       .subscribe((filters) => {
         this.refreshSubscription?.unsubscribe();
+        console.log('FILTER CHANGE');
         this.triggerNextUpdate(0, of(null), true, true); // refresh immediately
       });
   }
 
   handleFiltersChange(filters: TsFilterItem[]): void {
+    console.log('received filter');
     this.context.updateActiveFilters(filters);
   }
 
@@ -110,7 +112,7 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
     if (newInterval.value === this.selectedRefreshInterval.value) {
       return;
     }
-    this.terminator$.next();
+    this.refreshSubscription?.unsubscribe();
     this.selectedRefreshInterval = newInterval;
     if (newInterval.value) {
       this.refreshEnabled = true;
@@ -136,7 +138,7 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
-    this.terminator$.next();
+    this.refreshSubscription?.unsubscribe();
     let newInterval;
     switch (selection.type) {
       case RangeSelectionType.FULL:
@@ -196,7 +198,12 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
           showLoadingBar: showLoadingBar,
         });
         // the execution is not done yet
-        this.triggerNextUpdate(this.selectedRefreshInterval.value, updateDashboard$); // recursive call
+        if (this.selectedRefreshInterval.value) {
+          // refresh is on
+          this.triggerNextUpdate(this.selectedRefreshInterval.value, updateDashboard$); // recursive call
+        } else {
+          updateDashboard$.subscribe();
+        }
       });
   }
 

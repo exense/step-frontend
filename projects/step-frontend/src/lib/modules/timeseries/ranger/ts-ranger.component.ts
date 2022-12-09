@@ -353,7 +353,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
 
   emitRangeEventIfChanged() {
     let u = this.uplot;
-    if (u.select.width < 2) {
+    if (u.select.width < 1) {
       // this is the bug from uplot. See https://github.com/leeoniya/uPlot/issues/766
       return;
     }

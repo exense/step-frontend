@@ -103,30 +103,31 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
-    if (this.executionInProgress) {
-    } else {
-      this.onEndedExecutionTimeRangeChange(selection);
-    }
-  }
-
-  onEndedExecutionTimeRangeChange(selection: TimeRangePickerSelection) {
-    let execution = this.execution!;
-    let newFullRange: TSTimeRange;
-    switch (selection.type) {
-      case RangeSelectionType.FULL:
-        newFullRange = { from: execution.startTime!, to: execution.endTime! };
-        break;
-      case RangeSelectionType.ABSOLUTE:
-        newFullRange = selection.absoluteSelection!;
-        break;
-      case RangeSelectionType.RELATIVE:
-        const end = execution.endTime!;
-        let from = Math.max(execution.startTime!, end - selection.relativeSelection!.timeInMs);
-        newFullRange = { from: from, to: end };
-    }
-    this.context.updateSelectedRange(newFullRange, false);
-    this.context.updateFullRange(newFullRange);
-    // this.performanceView.updateFullRange(newInterval);
+    this.terminator$.next();
+    this.triggerNextUpdate(0, of(null), true, true, true);
+    // if (this.executionInProgress) {
+    // }
+    // let newFullRange: TSTimeRange;
+    // switch (selection.type) {
+    //   case RangeSelectionType.FULL:
+    //     newFullRange = { from: this.execution.startTime!, to: this.execution.endTime! };
+    //     break;
+    //   case RangeSelectionType.ABSOLUTE:
+    //     newFullRange = selection.absoluteSelection!;
+    //     break;
+    //   case RangeSelectionType.RELATIVE:
+    //     const end = this.execution.endTime!;
+    //     let from = Math.max(this.execution.startTime!, end - selection.relativeSelection!.timeInMs);
+    //     newFullRange = { from: from, to: end };
+    // }
+    // this.performanceView.updateDashboard({
+    //   updateRanger: true,
+    //   updateCharts: true,
+    //   showLoadingBar: true,
+    //   fullTimeRange: newFullRange,
+    //   selection: newFullRange
+    //
+    // })
   }
 
   onPerformanceViewInitComplete() {
@@ -211,13 +212,16 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
    * @param delay
    * @param observableToWaitFor
    * @param forceUpdate - if true, no matter the zoom selection, all the charts will be updated.
+   * @param showLoadingBar
+   * @param resetSelection
    */
   triggerNextUpdate(
     delay: number,
     observableToWaitFor: Observable<unknown>,
     forceUpdate = false,
-    showLoadingBar = false
-  ) {
+    showLoadingBar = false,
+    resetSelection = false
+  ): void {
     this.updateSubscription = forkJoin([timer(delay), observableToWaitFor])
       .pipe(
         takeUntil(this.terminator$),
@@ -250,9 +254,10 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
             break;
         }
         // when the selection is 0, it will switch to full selection automatically
-        let newSelection = isFullRangeSelected
-          ? newFullRange
-          : TimeSeriesUtils.cropInterval(newFullRange, oldSelection) || newFullRange;
+        let newSelection =
+          isFullRangeSelected || resetSelection
+            ? newFullRange
+            : TimeSeriesUtils.cropInterval(newFullRange, oldSelection) || newFullRange;
 
         let updateDashboard$ = this.performanceView.updateDashboard({
           updateRanger: true,
