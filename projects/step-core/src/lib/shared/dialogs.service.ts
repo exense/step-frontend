@@ -1,6 +1,16 @@
 import { IPromise, IScope } from 'angular';
 import { Injectable } from '@angular/core';
 import { INJECTOR } from './angularjs-provider-options';
+import { TableFilter } from '../client/generated';
+
+export interface SelectEntityTypeResult {
+  entity: { entityName?: string; displayName?: string };
+  selectAll?: boolean;
+  assignAll?: boolean;
+  item?: any;
+  array?: string[];
+  filters?: TableFilter[];
+}
 
 @Injectable({
   providedIn: 'root',
@@ -21,8 +31,12 @@ export abstract class DialogsService {
     template: string,
     functionOnSuccess: (value: unknown) => void
   ): void;
-  abstract selectEntityOfType(entityName: string, singleSelection: boolean, id?: string): IPromise<unknown>;
-  abstract selectEntityType(excludeArray: string[], id: string): IPromise<unknown>;
+  abstract selectEntityOfType(
+    entityName: string,
+    singleSelection: boolean,
+    id?: string
+  ): IPromise<SelectEntityTypeResult>;
+  abstract selectEntityType(excludeArray: string[], id: string): IPromise<SelectEntityTypeResult>;
   abstract selectEntityTypeForEntities(excludeArray: string[], callback: Function, arg: unknown): void;
   abstract showEntityInAnotherProject(newProjectName?: string): IPromise<unknown>;
   abstract showAssignmentWarning(msg: string): IPromise<unknown>;

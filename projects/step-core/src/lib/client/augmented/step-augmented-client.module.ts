@@ -25,3 +25,4 @@ export { AugmentedScreenService } from './services/augmented-screen.service';
 export { AugmentedAdminService } from './services/augmented-admin-service';
 export { pollAsyncTask } from './rxjs-operators/poll-async-task';
 export { AsyncTaskStatus } from './shared/async-task-status';
+export { AssignEntityParameters } from './shared/assign-entity-parameters';
