@@ -1,5 +1,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
-export type BucketAttributes = Record<string, string>;
+export const $AbstractWebPlugin = {
+  properties: {},
+} as const;
