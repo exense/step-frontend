@@ -4,6 +4,7 @@
 export { StepGeneratedClientModule } from './StepGeneratedClientModule';
 
 export type { AbstractArtefact } from './models/AbstractArtefact';
+export type { AbstractWebPlugin } from './models/AbstractWebPlugin';
 export type { AccessConfiguration } from './models/AccessConfiguration';
 export type { AgentListEntry } from './models/AgentListEntry';
 export type { AgentRef } from './models/AgentRef';
@@ -88,6 +89,7 @@ export type { ScreenInput } from './models/ScreenInput';
 export type { SearchOrder } from './models/SearchOrder';
 export type { SessionResponse } from './models/SessionResponse';
 export type { Sort } from './models/Sort';
+export type { Status } from './models/Status';
 export type { TableExportRequest } from './models/TableExportRequest';
 export type { TableFilter } from './models/TableFilter';
 export type { TableParameters } from './models/TableParameters';
@@ -110,9 +112,9 @@ export type { True } from './models/True';
 export type { User } from './models/User';
 export type { Version } from './models/Version';
 export type { ViewModel } from './models/ViewModel';
-export type { WebPlugin } from './models/WebPlugin';
 
 export { $AbstractArtefact } from './schemas/$AbstractArtefact';
+export { $AbstractWebPlugin } from './schemas/$AbstractWebPlugin';
 export { $AccessConfiguration } from './schemas/$AccessConfiguration';
 export { $AgentListEntry } from './schemas/$AgentListEntry';
 export { $AgentRef } from './schemas/$AgentRef';
@@ -197,6 +199,7 @@ export { $ScreenInput } from './schemas/$ScreenInput';
 export { $SearchOrder } from './schemas/$SearchOrder';
 export { $SessionResponse } from './schemas/$SessionResponse';
 export { $Sort } from './schemas/$Sort';
+export { $Status } from './schemas/$Status';
 export { $TableExportRequest } from './schemas/$TableExportRequest';
 export { $TableFilter } from './schemas/$TableFilter';
 export { $TableParameters } from './schemas/$TableParameters';
@@ -219,7 +222,6 @@ export { $True } from './schemas/$True';
 export { $User } from './schemas/$User';
 export { $Version } from './schemas/$Version';
 export { $ViewModel } from './schemas/$ViewModel';
-export { $WebPlugin } from './schemas/$WebPlugin';
 
 export { AccessService } from './services/AccessService';
 export { AdminService } from './services/AdminService';

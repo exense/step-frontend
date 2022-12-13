@@ -20,7 +20,7 @@ export class TimeSeriesService {
    * @returns TimeSeriesAPIResponse default response
    * @throws ApiError
    */
-  public getBucketsNew(requestBody?: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
+  public getBuckets(requestBody?: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/time-series/buckets',
@@ -41,6 +41,22 @@ export class TimeSeriesService {
       url: '/time-series/rebuild',
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Check if the time-series was created for a specific execution
+   * @param executionId
+   * @returns boolean default response
+   * @throws ApiError
+   */
+  public checkTimeSeries(executionId: string): Observable<boolean> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/time-series/execution/{executionId}/exists',
+      path: {
+        executionId: executionId,
+      },
     });
   }
 }

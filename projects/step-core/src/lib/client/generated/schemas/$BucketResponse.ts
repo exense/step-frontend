@@ -10,7 +10,7 @@ export const $BucketResponse = {
     attributes: {
       type: 'dictionary',
       contains: {
-        properties: {},
+        type: 'string',
       },
     },
     count: {
