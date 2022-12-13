@@ -58,8 +58,8 @@ export class TableLegacyUtilsService {
         .map((legacyCol) => {
           const field = legacyCol.name;
           const value = legacyCol.search?.value || '';
-          const isRegex = !!legacyCol?.search?.regex;
-          return { field, value, isRegex };
+          const regex = !!legacyCol?.search?.regex;
+          return { field, value, regex };
         })
         .filter((col) => !!col.value);
     }
