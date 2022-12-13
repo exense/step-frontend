@@ -364,6 +364,8 @@ angular
               }
             }
 
+            var lastServerSideRequest = null;
+
             if (serverSide) {
               var query = 'rest/table/' + scope.collection;
               var loadRequestCount = 0;
@@ -378,7 +380,8 @@ angular
                   if (scope.serverSideParameters) {
                     data.params = scope.serverSideParameters;
                   }
-                  return JSON.stringify(tableLegacyUtils.transformRequestLegacy2New(data));
+                  lastServerSideRequest = tableLegacyUtils.transformRequestLegacy2New(data);
+                  return JSON.stringify(lastServerSideRequest);
                 },
                 dataSrc: function (data) {
                   const result = tableLegacyUtils.transformResponseNew2Legacy(data, tableOptions.columns.length);
@@ -432,6 +435,7 @@ angular
             if (!scope.handle) {
               scope.handle = {};
             }
+            scope.handle.getLastServerSideRequest = function() {return lastServerSideRequest;};
             scope.handle.reload = function (showSpin) {
               scope.showSpin = showSpin;
               scope.isExternalReload = true;

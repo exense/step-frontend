@@ -922,7 +922,7 @@ angular
       };
 
       $scope.proceedFiltered = function () {
-        $uibModalInstance.close({entity: entityType, filterQuery: $scope.selectEntityHandle.getFilter()});
+        $uibModalInstance.close({entity: entityType, filters: $scope.selectEntityHandle.getFilters()});
       };
 
       $scope.cancel = function () {
@@ -959,27 +959,9 @@ angular
             return $scope.tableHandle.getSelectedIds();
           };
 
-          $scope.handle.getFilter = function () {
-            const searchQuery = {};
-            for (const i in $scope.tableHandle.columns()[0]) {
-              let oAjaxData = $scope.tableHandle.columns(i).context[0].oAjaxData;
-
-              let column = oAjaxData.columns[i];
-              let order = oAjaxData.order[0];
-
-              searchQuery['columns[' + i + '][data]'] = column.data;
-              searchQuery['columns[' + i + '][name]'] = column.name;
-              searchQuery['columns[' + i + '][searchable]'] = column.searchable || true;
-              searchQuery['columns[' + i + '][orderable]'] = column.orderable || true;
-              searchQuery['columns[' + i + '][search][value]'] = column.search.value;
-              searchQuery['columns[' + i + '][search][regex]'] = column.search.regex;
-              searchQuery['order[0][column]'] = (order && order.column) || 0;
-              searchQuery['order[0][dir]'] = (order && order.dir) || 'asc';
-              searchQuery['draw'] = (oAjaxData && oAjaxData.draw) || 1;
-              searchQuery['start'] = (oAjaxData && oAjaxData.start) || 0;
-              searchQuery['length'] = (oAjaxData && oAjaxData.length) || 10;
-            }
-            return searchQuery;
+          $scope.handle.getFilters = function () {
+            const lastRequest = $scope.tableHandle.getLastServerSideRequest();
+            return lastRequest?.filters || undefined;
           };
         }
       },
