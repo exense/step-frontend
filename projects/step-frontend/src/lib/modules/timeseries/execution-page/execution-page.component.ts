@@ -103,31 +103,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
-    this.terminator$.next();
+    this.updateSubscription?.unsubscribe();
     this.triggerNextUpdate(0, of(null), true, true, true);
-    // if (this.executionInProgress) {
-    // }
-    // let newFullRange: TSTimeRange;
-    // switch (selection.type) {
-    //   case RangeSelectionType.FULL:
-    //     newFullRange = { from: this.execution.startTime!, to: this.execution.endTime! };
-    //     break;
-    //   case RangeSelectionType.ABSOLUTE:
-    //     newFullRange = selection.absoluteSelection!;
-    //     break;
-    //   case RangeSelectionType.RELATIVE:
-    //     const end = this.execution.endTime!;
-    //     let from = Math.max(this.execution.startTime!, end - selection.relativeSelection!.timeInMs);
-    //     newFullRange = { from: from, to: end };
-    // }
-    // this.performanceView.updateDashboard({
-    //   updateRanger: true,
-    //   updateCharts: true,
-    //   showLoadingBar: true,
-    //   fullTimeRange: newFullRange,
-    //   selection: newFullRange
-    //
-    // })
   }
 
   onPerformanceViewInitComplete() {
@@ -272,7 +249,11 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
           updateDashboard$.subscribe();
         } else {
           // the execution is not done yet
-          this.triggerNextUpdate(this.selectedRefreshInterval.value, updateDashboard$); // recursive call
+          if (this.selectedRefreshInterval.value) {
+            this.triggerNextUpdate(this.selectedRefreshInterval.value, updateDashboard$); // recursive call
+          } else {
+            updateDashboard$.subscribe();
+          }
         }
       });
   }

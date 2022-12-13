@@ -139,33 +139,15 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
   onTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
     this.refreshSubscription?.unsubscribe();
-    let newInterval;
-    switch (selection.type) {
-      case RangeSelectionType.FULL:
-        throw new Error('Full range not available');
-      case RangeSelectionType.ABSOLUTE:
-        newInterval = selection.absoluteSelection!;
-        break;
-      case RangeSelectionType.RELATIVE:
-        const now = new Date().getTime();
-        newInterval = { from: now - selection.relativeSelection!.timeInMs, to: now };
-    }
-    let shouldRefreshCharts = this.context.isFullRangeSelected();
-    this.context.updateSelectedRange(newInterval, false);
-    this.context.updateFullRange(newInterval);
-    let update$ = shouldRefreshCharts ? this.performanceView.refreshAllCharts() : of(null);
-    if (this.refreshEnabled) {
-      this.triggerNextUpdate(this.selectedRefreshInterval.value, update$);
-    } else {
-      update$.subscribe();
-    }
+    this.triggerNextUpdate(0, of(null), true, true, true);
   }
 
   triggerNextUpdate(
     delay: number,
     observableToWaitFor: Observable<unknown>,
     forceUpdate = false,
-    showLoadingBar = false
+    showLoadingBar = false,
+    resetSelection = false
   ): void {
     this.refreshSubscription = forkJoin([timer(delay), observableToWaitFor])
       .pipe(takeUntil(this.terminator$))
@@ -186,9 +168,10 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
             break;
         }
         // when the selection is 0, it will switch to full selection automatically
-        let newSelection = isFullRangeSelected
-          ? newFullRange
-          : TimeSeriesUtils.cropInterval(newFullRange, oldSelection) || newFullRange;
+        let newSelection =
+          isFullRangeSelected || resetSelection
+            ? newFullRange
+            : TimeSeriesUtils.cropInterval(newFullRange, oldSelection) || newFullRange;
 
         let updateDashboard$ = this.performanceView.updateDashboard({
           updateRanger: true,
