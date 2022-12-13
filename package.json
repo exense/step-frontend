@@ -28,6 +28,7 @@
     "push": "npm publish projects/step-core/ && npm publish dist/step-frontend/*.tgz",
     "openapi:generate:nhy": "./generate-openapi-client.sh https://stepos-nhy.exense.ch/rest/private-openapi.json",
     "openapi:generate:master": "./generate-openapi-client.sh https://stepos-master.exense.ch/rest/private-openapi.json",
+    "openapi:branch": "generate-openapi-client.sh https://stepos-sed-1227-support-o.exense.ch/rest/private-openapi.json",
     "icons:generate": "node generate-icons.js"
   },
   "private": false,

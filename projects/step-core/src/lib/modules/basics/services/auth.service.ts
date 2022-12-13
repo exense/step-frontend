@@ -2,12 +2,13 @@ import { DOCUMENT } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, OnDestroy } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { ConfigDto, CredentialsDto, SessionDto } from '../../../domain';
+import { CredentialsDto, SessionDto } from '../../../domain';
 import { BehaviorSubject, firstValueFrom, Observable, tap } from 'rxjs';
 import { AJS_LOCATION, AJS_PREFERENCES, AJS_ROOT_SCOPE, AJS_UIB_MODAL } from '../../../shared/angularjs-providers';
 import { AJS_MODULE } from '../../../shared/constants';
 import { a1Promise2Promise } from '../../../shared/utils';
 import { AdditionalRightRuleService } from '../../../services/additional-right-rule.service';
+import { ApplicationConfiguration, PrivateApplicationService } from '../../../client/generated';
 
 export interface AuthContext {
   userID: string;
@@ -28,14 +29,15 @@ export class AuthService implements OnDestroy {
     @Inject(DOCUMENT) private _document: Document,
     @Inject(AJS_PREFERENCES) private _preferences: any,
     @Inject(AJS_UIB_MODAL) private _$uibModal: any,
-    private _additionalRightRules: AdditionalRightRuleService
+    private _additionalRightRules: AdditionalRightRuleService,
+    private _privateApplicationApi: PrivateApplicationService
   ) {}
 
   private _triggerRightCheck$ = new BehaviorSubject<unknown>(undefined);
 
   readonly triggerRightCheck$ = this._triggerRightCheck$.asObservable();
 
-  private _serviceContext: { conf?: ConfigDto } = {};
+  private _serviceContext: { conf?: ApplicationConfiguration } = {};
 
   private _context$ = new BehaviorSubject<AuthContext | undefined>(undefined);
 
@@ -60,14 +62,17 @@ export class AuthService implements OnDestroy {
   }
 
   async init(): Promise<unknown> {
-    this._serviceContext.conf = await firstValueFrom(this._http.get('rest/access/conf') as Observable<ConfigDto>);
-    this._document.title = this._serviceContext.conf.title;
+    this._serviceContext.conf = await firstValueFrom(this._privateApplicationApi.getApplicationConfiguration());
+    this.checkOidc();
+    if (this._serviceContext.conf.title) {
+      this._document.title = this._serviceContext.conf.title;
+    }
     return this._serviceContext?.conf?.debug || false;
   }
 
   async getSession(): Promise<SessionDto | unknown> {
     try {
-      const session = await firstValueFrom(this._http.get('rest/access/session') as Observable<SessionDto>);
+      const session = await firstValueFrom(this._privateApplicationApi.getCurrentSession() as Observable<SessionDto>);
       if (session.otp) {
         await this.showPasswordChangeDialog(true);
         session.otp = false;
@@ -136,13 +141,13 @@ export class AuthService implements OnDestroy {
       : false;
   }
 
-  getConf(): ConfigDto | undefined {
+  getConf(): ApplicationConfiguration | undefined {
     return this._serviceContext.conf;
   }
 
   debug(): boolean {
     const conf = this._serviceContext.conf;
-    return conf ? conf.debug : false;
+    return conf?.debug || false;
   }
 
   showPasswordChangeDialog(otp: boolean): Promise<unknown> {
@@ -167,6 +172,21 @@ export class AuthService implements OnDestroy {
   ngOnDestroy(): void {
     this._context$.complete();
     this._triggerRightCheck$.complete();
+  }
+
+  private checkOidc(): void {
+    const conf = this.getConf();
+    const startOidcEndpoint = conf?.miscParams?.['startOidcEndPoint'] || undefined;
+    if (!startOidcEndpoint || !conf?.noLoginMask || !conf.authentication) {
+      return;
+    }
+    const currentLocation = window.location.href;
+    const redirectUrl = `${startOidcEndpoint}?redirect_uri=${encodeURIComponent(currentLocation)}`;
+    console.log('REDIRECT TO', redirectUrl);
+    setTimeout(() => {
+      debugger;
+      window.location.assign(redirectUrl);
+    }, 10000);
   }
 }
 

@@ -57,7 +57,7 @@ export class EditUserDialogComponent implements OnInit {
       return;
     }
 
-    this.roles = conf.roles;
+    this.roles = conf.roles || [];
   }
 
   private initFormGroup(): void {
@@ -70,6 +70,10 @@ export class EditUserDialogComponent implements OnInit {
         username: this._data.user.username || '',
         role: this._data.user.role || '',
       });
+    }
+
+    if (!this._authService.getConf()?.roleManagement) {
+      this.formGroup.controls.role.disable();
     }
   }
 }

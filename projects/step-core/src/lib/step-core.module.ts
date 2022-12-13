@@ -131,7 +131,6 @@ export * from './pipes/dashboard-link.pipe';
 export * from './pipes/matching-authenticator.pipe';
 export { PlanNamePipe } from './pipes/plan-name.pipe';
 export * from './services/additional-right-rule.service';
-export * from './services/context.service';
 export * from './services/dashboard.service';
 export * from './services/deferred-link-processor.service';
 export * from './services/invoke-run.service';

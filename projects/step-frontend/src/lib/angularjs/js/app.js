@@ -367,6 +367,8 @@ angular
     var maintenanceMessage;
     var toggleMaintenanceMessage;
 
+/*
+    // TODO MOVE THIS PART TO EE
     function loadMaintenanceMessage() {
       $http.get('rest/admin/maintenance/message').then(function (res) {
         maintenanceMessage = res.data;
@@ -379,6 +381,7 @@ angular
     loadMaintenanceMessage();
 
     $interval(loadMaintenanceMessage, 10000);
+*/
 
     service.getMaintenanceMessage = function () {
       return maintenanceMessage;
