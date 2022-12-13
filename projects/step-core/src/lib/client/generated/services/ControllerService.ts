@@ -8,6 +8,7 @@ import type { ArtefactInfo } from '../models/ArtefactInfo';
 import type { Plan } from '../models/Plan';
 import type { ReportNode } from '../models/ReportNode';
 import type { RepositoryObjectReference } from '../models/RepositoryObjectReference';
+import type { Status } from '../models/Status';
 import type { TestSetStatusOverview } from '../models/TestSetStatusOverview';
 import type { Version } from '../models/Version';
 
@@ -28,6 +29,17 @@ export class ControllerService {
       url: '/controller/repository/artefact/info',
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * @returns Status default response
+   * @throws ApiError
+   */
+  public getControllerStatus(): Observable<Status> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/controller/status',
     });
   }
 

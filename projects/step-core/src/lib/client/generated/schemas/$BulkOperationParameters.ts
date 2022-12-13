@@ -15,8 +15,11 @@ export const $BulkOperationParameters = {
         type: 'string',
       },
     },
-    filter: {
-      type: 'TableFilter',
+    filters: {
+      type: 'array',
+      contains: {
+        type: 'TableFilter',
+      },
     },
   },
 } as const;

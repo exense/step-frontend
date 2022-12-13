@@ -8,5 +8,5 @@ export type BulkOperationParameters = {
   preview?: boolean;
   targetType?: 'ALL' | 'LIST' | 'FILTER';
   ids?: Array<string>;
-  filter?: TableFilter;
+  filters?: Array<TableFilter>;
 };
