@@ -25,6 +25,8 @@ const kvPairArrayToPreferences = (values?: KeyValuePair<string, string>[]): Pref
   styleUrls: ['./my-account.component.scss'],
 })
 export class MyAccountComponent implements OnInit, OnChanges {
+  readonly canChangePassword = !!this._authService.getConf()?.passwordManagement;
+
   constructor(private _adminApiService: AdminService, private _authService: AuthService) {}
 
   @Input() error?: string;

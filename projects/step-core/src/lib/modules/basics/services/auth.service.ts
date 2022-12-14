@@ -3,20 +3,20 @@ import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, OnDestroy } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { CredentialsDto, SessionDto } from '../../../domain';
-import { BehaviorSubject, firstValueFrom, Observable, tap } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 import { AJS_LOCATION, AJS_PREFERENCES, AJS_ROOT_SCOPE, AJS_UIB_MODAL } from '../../../shared/angularjs-providers';
 import { AJS_MODULE } from '../../../shared/constants';
-import { a1Promise2Promise } from '../../../shared/utils';
+import { a1Promise2Observable } from '../../../shared/utils';
 import { AdditionalRightRuleService } from '../../../services/additional-right-rule.service';
 import { ApplicationConfiguration, PrivateApplicationService } from '../../../client/generated';
+import { Mutable } from '../../../shared';
+import { AuthContext } from '../shared/auth-context.interface';
 
-export interface AuthContext {
-  userID: string;
-  rights: string[];
-  role: string;
-  otp: boolean;
-  session: any;
-}
+type FieldAccessor = Mutable<Pick<AuthService, 'isOidc'>>;
+
+const OIDC_ENDPOINT_PARAM = 'startOidcEndPoint';
+
+const ANONYMOUS = 'anonymous';
 
 @Injectable({
   providedIn: 'root',
@@ -43,7 +43,9 @@ export class AuthService implements OnDestroy {
 
   readonly context$ = this._context$.asObservable();
 
-  private setContext(session: SessionDto): void {
+  readonly isOidc: boolean = false;
+
+  private setContextFromSession(session: SessionDto): void {
     const context: AuthContext = {
       userID: session.username,
       rights: session.role.rights,
@@ -51,46 +53,23 @@ export class AuthService implements OnDestroy {
       otp: session.otp,
       session: {},
     };
-    this._$rootScope.context = context;
-    this._context$.next(context);
+    this.setContext(context);
     this.triggerRightCheck();
     this._preferences.load();
+  }
+
+  private setContext(context: AuthContext) {
+    this._$rootScope.context = context;
+    this._context$.next(context);
   }
 
   getContext(): AuthContext {
     return this._context$.value as AuthContext;
   }
 
-  async init(): Promise<unknown> {
-    this._serviceContext.conf = await firstValueFrom(this._privateApplicationApi.getApplicationConfiguration());
-    this.checkOidc();
-    if (this._serviceContext.conf.title) {
-      this._document.title = this._serviceContext.conf.title;
-    }
-    return this._serviceContext?.conf?.debug || false;
-  }
-
-  async getSession(): Promise<SessionDto | unknown> {
-    try {
-      const session = await firstValueFrom(this._privateApplicationApi.getCurrentSession() as Observable<SessionDto>);
-      if (session.otp) {
-        await this.showPasswordChangeDialog(true);
-        session.otp = false;
-        this.setContext(session);
-        return session;
-      } else {
-        this.setContext(session);
-        return session;
-      }
-    } catch (err) {
-      this._$rootScope.context = { userID: 'anonymous', role: 'public' };
-      return err;
-    }
-  }
-
   login(credentials: CredentialsDto): Observable<unknown> {
     return this._http.post('rest/access/login', credentials).pipe(
-      tap(() => this.getSession()),
+      switchMap(() => this.getSession()),
       tap(() => {
         const context = this.getContext();
         if (context && !context.otp) {
@@ -103,14 +82,21 @@ export class AuthService implements OnDestroy {
     );
   }
 
-  async logout(): Promise<unknown> {
-    await firstValueFrom(this._http.post('rest/access/logout', {}));
-    this._$rootScope.context = { userID: 'anonymous' };
-    this.gotoDefaultPage();
-    return undefined;
+  logout(): void {
+    this._http
+      .post('rest/access/logout', {})
+      .pipe(map(() => ({ userID: ANONYMOUS } as AuthContext)))
+      .subscribe((context) => {
+        this.setContext(context);
+        this.gotoDefaultPage();
+      });
   }
 
   goToLoginPage(): any {
+    if (this.isOidc) {
+      this.redirectToOidc();
+      return;
+    }
     return this._$location.path('/root/login');
   }
 
@@ -123,7 +109,8 @@ export class AuthService implements OnDestroy {
   }
 
   isAuthenticated(): boolean {
-    return !!this._$rootScope.context?.userID && this._$rootScope.context?.userID !== 'anonymous';
+    const context = this.getContext();
+    return !!context?.userID && context?.userID !== ANONYMOUS;
   }
 
   isExtLoginAuth(): boolean {
@@ -150,7 +137,7 @@ export class AuthService implements OnDestroy {
     return conf?.debug || false;
   }
 
-  showPasswordChangeDialog(otp: boolean): Promise<unknown> {
+  showPasswordChangeDialog(otp: boolean): Observable<unknown> {
     const modalInstance = this._$uibModal.open({
       backdrop: 'static',
       animation: false,
@@ -162,7 +149,7 @@ export class AuthService implements OnDestroy {
         },
       },
     });
-    return a1Promise2Promise(modalInstance.result);
+    return a1Promise2Observable(modalInstance.result);
   }
 
   triggerRightCheck(): void {
@@ -174,19 +161,48 @@ export class AuthService implements OnDestroy {
     this._triggerRightCheck$.complete();
   }
 
-  private checkOidc(): void {
+  initialize(): Observable<boolean> {
+    return this._privateApplicationApi.getApplicationConfiguration().pipe(
+      tap((conf) => {
+        this._serviceContext.conf = conf;
+        if (conf.title) {
+          this._document.title = conf.title;
+        }
+        const startOidcEndpoint = conf?.miscParams?.[OIDC_ENDPOINT_PARAM] || undefined;
+        (this as FieldAccessor).isOidc = !!startOidcEndpoint && !!conf?.noLoginMask && !!conf.authentication;
+      }),
+      switchMap(() => this.getSession()),
+      map(() => this._serviceContext?.conf?.debug || false)
+    );
+  }
+
+  private redirectToOidc(): void {
     const conf = this.getConf();
-    const startOidcEndpoint = conf?.miscParams?.['startOidcEndPoint'] || undefined;
-    if (!startOidcEndpoint || !conf?.noLoginMask || !conf.authentication) {
-      return;
-    }
-    const currentLocation = window.location.href;
-    const redirectUrl = `${startOidcEndpoint}?redirect_uri=${encodeURIComponent(currentLocation)}`;
-    console.log('REDIRECT TO', redirectUrl);
-    setTimeout(() => {
-      debugger;
-      window.location.assign(redirectUrl);
-    }, 10000);
+    const startOidcEndpoint = conf!.miscParams![OIDC_ENDPOINT_PARAM];
+    const location = this._document.defaultView!.location;
+    const redirectUrl = `${startOidcEndpoint}?redirect_uri=${encodeURIComponent(location.href)}`;
+    location.assign(redirectUrl);
+  }
+
+  private getSession(): Observable<SessionDto | unknown> {
+    return (this._privateApplicationApi.getCurrentSession() as Observable<SessionDto>).pipe(
+      switchMap((session) => {
+        if (!session.otp) {
+          return of(session);
+        }
+        return this.showPasswordChangeDialog(true).pipe(
+          map(() => {
+            session.otp = true;
+            return session;
+          })
+        );
+      }),
+      tap((session) => this.setContextFromSession(session)),
+      catchError((err) => {
+        this.setContext({ userID: ANONYMOUS, role: 'public' });
+        return of(err);
+      })
+    );
   }
 }
 

@@ -63,15 +63,6 @@ angular
     },
   ])
 
-  .run(function (ViewRegistry) {
-    ViewRegistry.registerDashlet(
-      'admin/controller',
-      'Maintenance',
-      'partials/maintenanceConfiguration.html',
-      'maintenance'
-    );
-  })
-
   .controller('ControllerSettingsCtrl', function ($scope, $http, stateStorage, ViewRegistry) {
     $scope.configurationItems = ViewRegistry.getDashlets('admin/controller');
 
@@ -111,38 +102,6 @@ angular
     $scope.setCurrentConfigurationItem = function (item) {
       $scope.$state = item.id;
       $scope.currentConfigurationItem = item;
-    };
-  })
-
-  .controller('MaintenanceSettingsCtrl', function ($scope, $http, ViewRegistry, MaintenanceService) {
-    $scope.maintenanceMessage;
-
-    $scope.toggle = {};
-    $scope.toggle.switch = false;
-
-    $http.get('rest/admin/maintenance/message').then(function (res) {
-      $scope.maintenanceMessage = res.data;
-    });
-
-    $http.get('rest/admin/maintenance/message/toggle').then(function (res) {
-      $scope.toggle.switch = res.data === 'true';
-    });
-
-    $scope.saveMaintenanceMessage = function () {
-      $http.post('rest/admin/maintenance/message', $scope.maintenanceMessage).then(function () {
-        MaintenanceService.reloadMaintenanceMessage();
-      });
-    };
-
-    $scope.upateToggle = function () {
-      $http.post('rest/admin/maintenance/message/toggle', $scope.toggle.switch).then(function () {
-        MaintenanceService.reloadMaintenanceMessage();
-      });
-    };
-
-    $scope.switchToggle = function () {
-      $scope.toggle.switch = !$scope.toggle.switch;
-      $scope.upateToggle();
     };
   })
 

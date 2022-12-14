@@ -8,13 +8,17 @@
       <span class="text-grey">Username </span>
       <span>{{ user.username }}</span>
       <div class="pull-right">
-        <a class="btn btn-success" (click)="changePwd()">Change password</a>
+        <button type="button" class="btn btn-success" (click)="changePwd()" [disabled]="!canChangePassword">
+          Change password
+        </button>
       </div>
     </div>
     <div class="panel-body">
       <label for="generate-key" class="text-grey generate-key">Api key </label>
       <div class="pull-right">
-        <a class="btn btn-success" id="generate-key" (click)="invokeShowGenerateApiKeyDialog()">Generate new Key</a>
+        <button type="button" class="btn btn-success" id="generate-key" (click)="invokeShowGenerateApiKeyDialog()">
+          Generate new Key
+        </button>
       </div>
     </div>
   </div>

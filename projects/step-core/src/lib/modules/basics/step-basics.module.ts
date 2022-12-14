@@ -48,3 +48,4 @@ export * from './pipes/artefact-icon.pipe';
 export * from './services/auth.service';
 export * from './services/artefact-types.service';
 export * from './shared/angularjs-provider-options';
+export * from './shared/auth-context.interface';

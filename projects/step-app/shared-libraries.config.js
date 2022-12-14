@@ -38,6 +38,7 @@ module.exports = {
   '@angular/material/button': libraryConfig(),
   '@angular/material/card': libraryConfig(),
   '@angular/material-luxon-adapter': libraryConfig(),
+  '@angular/material/form-field': libraryConfig(),
   '@angular/cdk/overlay': libraryConfig(),
   '@angular/cdk/portal': libraryConfig(),
   'angular-split': libraryConfig(),

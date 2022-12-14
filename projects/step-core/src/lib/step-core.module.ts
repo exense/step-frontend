@@ -103,7 +103,6 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
 export class StepCoreModule {}
 
 export * from './angularjs';
-export { ApiError } from './client/generated/core/ApiError';
 export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
 export { CancelablePromise, CancelError } from './client/generated/core/CancelablePromise';
 export { OpenAPI } from './client/generated/core/OpenAPI';

@@ -92,23 +92,20 @@ var tecAdminApp = angular
       $http,
       stateStorage,
       AuthService,
-      MaintenanceService,
       ViewRegistry,
       ViewState
     ) {
       stateStorage.push($scope, 'root', {});
 
       $scope.isInitialized = false;
-      AuthService.init().then(function () {
-        AuthService.getSession().then(() => {
-          $scope.isInitialized = true;
+      AuthService.initialize().subscribe(() => {
+         $scope.isInitialized = true;
 
-          $scope.logo = 'images/logotopleft.png';
-          if (!$location.path()) {
-            AuthService.gotoDefaultPage();
-          }
-          $scope.$apply();
-        });
+         $scope.logo = 'images/logotopleft.png';
+         if (!$location.path()) {
+           AuthService.gotoDefaultPage();
+         }
+         $scope.$apply();
       });
 
       $scope.$watch(function () {
@@ -143,8 +140,9 @@ var tecAdminApp = angular
       };
 
       $scope.authService = AuthService;
-      $scope.maintenanceService = MaintenanceService;
       $scope.viewRegistry = ViewRegistry;
+
+      $scope.adminAlerts = ViewRegistry.getDashlets('admin/alerts');
 
       function handleKeys(e) {
         if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
@@ -359,47 +357,6 @@ angular
         this.localStore[k] = model;
       }
     };
-  })
-
-  .factory('MaintenanceService', function ($http, $rootScope, Preferences, $sce, $interval) {
-    var service = {};
-
-    var maintenanceMessage;
-    var toggleMaintenanceMessage;
-
-/*
-    // TODO MOVE THIS PART TO EE
-    function loadMaintenanceMessage() {
-      $http.get('rest/admin/maintenance/message').then(function (res) {
-        maintenanceMessage = res.data;
-      });
-      $http.get('rest/admin/maintenance/message/toggle').then(function (res) {
-        toggleMaintenanceMessage = res.data;
-      });
-    }
-
-    loadMaintenanceMessage();
-
-    $interval(loadMaintenanceMessage, 10000);
-*/
-
-    service.getMaintenanceMessage = function () {
-      return maintenanceMessage;
-    };
-
-    service.displayMaintenanceMessage = function () {
-      return maintenanceMessage && toggleMaintenanceMessage;
-    };
-
-    service.reloadMaintenanceMessage = function () {
-      loadMaintenanceMessage();
-    };
-
-    service.trustAsHtml = function (html) {
-      return $sce.trustAsHtml(html);
-    };
-
-    return service;
   })
 
   .controller('ChangePasswordModalCtrl', function ($scope, $rootScope, $uibModalInstance, $http, $location, otp) {
