@@ -2,7 +2,7 @@ import { Observable, of, switchMap } from 'rxjs';
 import { BulkOperationType } from '../shared/bulk-operation-type.enum';
 import { TableRequestData } from '../../../client/table/models/table-request-data';
 import { BulkSelectionType } from '../../entities-selection/shared/bulk-selection-type.enum';
-import { BulkOperationParameters } from '../../../client/generated';
+import { TableBulkOperationRequest, TableParameters } from '../../../client/generated';
 import { TableFilter } from './table-filter';
 import {
   AsyncOperationCloseStatus,
@@ -23,14 +23,15 @@ export interface BulkOperationConfig<ID> {
 export abstract class BulkOperationsInvokeService<ID> {
   protected constructor(protected _asyncOperationService: AsyncOperationService) {}
 
-  protected abstract invokeDelete?(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatus>;
-  protected abstract invokeDuplicate?(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatus>;
-  protected abstract invokeExport?(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatus>;
+  protected abstract invokeDelete?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
+  protected abstract invokeDuplicate?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
+  protected abstract invokeExport?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
 
-  protected transformConfig(config: BulkOperationConfig<ID>, isPreview: boolean): BulkOperationParameters {
-    let targetType: BulkOperationParameters['targetType'] = 'LIST';
+  protected transformConfig(config: BulkOperationConfig<ID>, isPreview: boolean): TableBulkOperationRequest {
+    let targetType: TableBulkOperationRequest['targetType'] = 'LIST';
     let ids: string[] | undefined = undefined;
     let filters: TableFilter[] | undefined = undefined;
+    let tableParameters: TableParameters | undefined = undefined;
 
     switch (config.selectionType) {
       case BulkSelectionType.All:
@@ -39,6 +40,7 @@ export abstract class BulkOperationsInvokeService<ID> {
       case BulkSelectionType.Filtered:
         targetType = 'FILTER';
         filters = config.filterRequest?.filters as TableFilter[] | undefined;
+        tableParameters = config.filterRequest?.tableParameters;
         break;
       case BulkSelectionType.None:
         ids = [];
@@ -62,11 +64,11 @@ export abstract class BulkOperationsInvokeService<ID> {
       targetType = 'ALL';
     }
 
-    return { targetType, ids, filters, preview: isPreview };
+    return { targetType, ids, filters, tableParameters, preview: isPreview };
   }
 
   invoke(config: BulkOperationConfig<ID>): Observable<AsyncOperationDialogResult | undefined> {
-    let operation: ((params: BulkOperationParameters) => Observable<AsyncTaskStatus>) | undefined;
+    let operation: ((params: TableBulkOperationRequest) => Observable<AsyncTaskStatus>) | undefined;
     switch (config.operationType) {
       case BulkOperationType.delete:
         operation = !!this.invokeDelete ? (params) => this.invokeDelete!(params) : undefined;
