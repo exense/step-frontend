@@ -118,14 +118,18 @@ export class AuthService implements OnDestroy {
   }
 
   hasRight(right: string): boolean {
+    const conf = this.getConf();
+    if (!!conf && !conf.authentication) {
+      return true;
+    }
+
     const additionalRulesCheckResult = this._additionalRightRules.checkRight(right);
     if (!additionalRulesCheckResult) {
       return false;
     }
 
-    return this._$rootScope.context && this._$rootScope.context.rights
-      ? this._$rootScope.context.rights.indexOf(right) !== -1
-      : false;
+    const context = this._context$.value;
+    return !!context?.rights ? context.rights.indexOf(right) !== -1 : false;
   }
 
   getConf(): ApplicationConfiguration | undefined {
