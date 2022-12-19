@@ -5,7 +5,6 @@ import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { TimeRangePickerSelection } from './time-range-picker-selection';
 import { RangeSelectionType } from './model/range-selection-type';
 import { ExecutionTimeSelection } from './model/execution-time-selection';
-import { min } from 'rxjs';
 
 /**
  * When dealing with relative/full selection, this component should not know anything about dates, therefore no date calculations are needed.
@@ -60,8 +59,8 @@ export class TimeRangePicker implements OnInit {
   }
 
   applyAbsoluteInterval() {
-    let from = undefined;
-    let to = undefined;
+    let from = 0;
+    let to = 0;
     if (this.fromDateString && this.isValidDate(this.fromDateString)) {
       from = new Date(this.fromDateString).getTime();
     } else {
@@ -80,16 +79,24 @@ export class TimeRangePicker implements OnInit {
       }
       // else do nothing. maybe show an error
     } else {
-      let newSelection = {
+      const newSelection = {
         type: RangeSelectionType.ABSOLUTE,
         absoluteSelection: { from: from, to: to },
       };
-      this.emitSelectionChange(newSelection);
+      if (from !== this.activeSelection.absoluteSelection?.from || to !== this.activeSelection.absoluteSelection?.to) {
+        this.emitSelectionChange(newSelection);
+      }
     }
     this.closeMenu();
   }
 
   onRelativeSelectionSelected(option: RelativeTimeSelection) {
+    if (
+      this.activeSelection.type === RangeSelectionType.RELATIVE &&
+      this.activeSelection.relativeSelection!.timeInMs === option.timeInMs
+    ) {
+      return;
+    }
     this.emitSelectionChange({ type: RangeSelectionType.RELATIVE, relativeSelection: option });
   }
 
@@ -104,7 +111,10 @@ export class TimeRangePicker implements OnInit {
   /**
    * This method reacts to the component html selection change, and should NOT be used from exterior
    */
-  onFullRangeSelect() {
+  onFullRangeSelect(): void {
+    if (this.activeSelection.type === RangeSelectionType.FULL) {
+      return; // nothing changed
+    }
     this.emitSelectionChange({ type: RangeSelectionType.FULL });
   }
 
@@ -125,8 +135,8 @@ export class TimeRangePicker implements OnInit {
   }
 
   private setAbsoluteSelection(selection: ExecutionTimeSelection) {
-    let from = selection.absoluteSelection!.from;
-    let to = selection.absoluteSelection!.to;
+    const from = selection.absoluteSelection!.from;
+    const to = selection.absoluteSelection!.to;
     this.resetCustomDates();
     if (from) {
       this.fromDateString = this.formatInputDate(new Date(from));
@@ -142,25 +152,25 @@ export class TimeRangePicker implements OnInit {
   }
 
   setFromDate(event: MatDatepickerInputEvent<any>) {
-    let utcDate = new Date(event.value.ts); // this is 00:00:00 in GMT
-    let localDate = new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), 0, 0, 0);
+    const utcDate = new Date(event.value.ts); // this is 00:00:00 in GMT
+    const localDate = new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), 0, 0, 0);
     this.fromDateString = this.formatInputDate(localDate);
   }
 
   setToDate(event: MatDatepickerInputEvent<any>) {
-    let utcDate = new Date(event.value.ts);
-    let localDate = new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), 0, 0, 0);
+    const utcDate = new Date(event.value.ts);
+    const localDate = new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), 0, 0, 0);
     this.toDateString = this.formatInputDate(localDate);
   }
 
   formatInputDate(date: Date) {
-    let month = String(date.getMonth() + 1).padStart(2, '0');
-    let day = String(date.getDate()).padStart(2, '0');
-    let isoDate = `${date.getFullYear()}-${month}-${day}`;
-    let hours = String(date.getHours()).padStart(2, '0');
-    let minutes = String(date.getMinutes()).padStart(2, '0');
-    let seconds = String(date.getSeconds()).padStart(2, '0');
-    let isoTime = `${hours}:${minutes}:${seconds}`;
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const isoDate = `${date.getFullYear()}-${month}-${day}`;
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    const isoTime = `${hours}:${minutes}:${seconds}`;
     return `${isoDate} ${isoTime}`;
   }
 
@@ -182,7 +192,7 @@ export class TimeRangePicker implements OnInit {
   }
 
   isValidDate(stringValue: string): boolean {
-    let dateObject = new Date(stringValue);
+    const dateObject = new Date(stringValue);
     // @ts-ignore
     return dateObject !== 'Invalid Date' && !isNaN(dateObject); // from mozilla+chrome and IE8
   }
