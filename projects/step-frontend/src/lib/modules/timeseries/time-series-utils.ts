@@ -53,4 +53,18 @@ export class TimeSeriesUtils {
   static intervalsEqual(range1?: TSTimeRange, range2?: TSTimeRange) {
     return range1 && range2 && range1.from === range2.from && range1.to === range2.to;
   }
+
+  static formatInputDate(date: Date, includeTime = true): string {
+    if (!date) {
+      return '';
+    }
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const isoDate = `${date.getFullYear()}-${month}-${day}`;
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    const isoTime = `${hours}:${minutes}:${seconds}`;
+    return `${isoDate} ${includeTime ? isoTime : ''}`;
+  }
 }

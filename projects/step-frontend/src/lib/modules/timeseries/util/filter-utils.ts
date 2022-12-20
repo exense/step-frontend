@@ -2,7 +2,6 @@ import { FilterBarItemType, TsFilterItem } from '../performance-view/filter-bar/
 
 export class FilterUtils {
   static filterItemIsValid(item: TsFilterItem) {
-    console.log(item);
     return (
       item.textValue || item.textValues?.some((v) => v.isSelected) || item.min != undefined || item.max != undefined
     );
@@ -27,6 +26,7 @@ export class FilterUtils {
     }
     let andFilters: (string | undefined)[] = items.map((item) => {
       let clause;
+      const attributeName = attributesPrefix ? `${attributesPrefix}.${item.attributeName}` : item.attributeName;
       switch (item.type) {
         case FilterBarItemType.OPTIONS:
           clause = item.textValues
@@ -38,14 +38,18 @@ export class FilterUtils {
             .join(' or ');
           break;
         case FilterBarItemType.FREE_TEXT:
-          const attribute = attributesPrefix ? `${attributesPrefix}.${item.attributeName}` : item.attributeName;
-          clause = `${attribute} ~ ".*${item.textValue}.*"`;
+          clause = `${attributeName} ~ ".*${item.textValue}.*"`;
           break;
         case FilterBarItemType.NUMERIC:
-          // TODO implement me
-          break;
         case FilterBarItemType.DATE:
-          // TODO implement me
+          let clauses = [];
+          if (item.min != null) {
+            clauses.push(`${attributeName} >= ${item.min}`);
+          }
+          if (item.max != null) {
+            clauses.push(`${attributeName} < ${item.max}`);
+          }
+          clause = '(' + clauses.join(' and ') + ')';
           break;
       }
       return clause ? `(${clause})` : undefined;

@@ -3,6 +3,7 @@ import { TSTimeRange } from '../chart/model/ts-time-range';
 import { FindBucketsRequest } from '../find-buckets-request';
 import { OQLBuilder } from './oql-builder';
 import { FilterUtils } from './filter-utils';
+import { TimeSeriesConfig } from '../time-series.config';
 
 export class FindBucketsRequestBuilder {
   readonly attributesPrefix = 'attributes';
@@ -69,12 +70,8 @@ export class FindBucketsRequestBuilder {
   }
 
   build(): FindBucketsRequest {
-    // const rangeOql = this.range
-    //   ? new OQLBuilder().open(' and ').gt('begin', this.range.from).lt('begin', this.range.to).build()
-    //   : undefined;
     const oql = new OQLBuilder()
       .open(' and ')
-      // .append(rangeOql)
       .append(FilterUtils.objectToOQL(this.baseFilters, this.attributesPrefix))
       .append(FilterUtils.filtersToOQL(this.customFilters, this.attributesPrefix))
       .build();

@@ -26,11 +26,11 @@ export class OQLBuilder {
   }
 
   lt(attribute: string, value: number) {
-    this.append(`(${attribute} <= ${value})`);
+    this.append(`(${attribute} < ${value})`);
     return this;
   }
 
-  gt(attribute: string, value: number) {
+  gte(attribute: string, value: number) {
     this.append(`(${attribute} >= ${value})`);
     return this;
   }

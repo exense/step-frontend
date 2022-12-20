@@ -62,14 +62,12 @@
         <mat-label>Attribute name</mat-label>
         <input type="text" matInput [(ngModel)]="item.attributeName" />
       </mat-form-field>
-      <mat-form-field class="w-100">
-        <mat-label>From</mat-label>
-        <input type="number" matInput [(ngModel)]="item.min" />
-      </mat-form-field>
-      <mat-form-field class="w-100">
-        <mat-label>To</mat-label>
-        <input type="number" matInput [(ngModel)]="item.max" />
-      </mat-form-field>
+      <div class="w-100">
+        <step-date-filter label="From" (dateChanged)="onMinDateChanged($event)"></step-date-filter>
+      </div>
+      <div class="w-100">
+        <step-date-filter label="To" (dateChanged)="onMaxDateChanged($event)"></step-date-filter>
+      </div>
       <div>
         <button mat-raised-button color="primary" class="w-100" (click)="applyChanges()">Apply</button>
       </div>

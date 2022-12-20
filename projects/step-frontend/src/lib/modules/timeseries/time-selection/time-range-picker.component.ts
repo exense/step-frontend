@@ -5,6 +5,7 @@ import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { TimeRangePickerSelection } from './time-range-picker-selection';
 import { RangeSelectionType } from './model/range-selection-type';
 import { ExecutionTimeSelection } from './model/execution-time-selection';
+import { TimeSeriesUtils } from '../time-series-utils';
 
 /**
  * When dealing with relative/full selection, this component should not know anything about dates, therefore no date calculations are needed.
@@ -139,10 +140,10 @@ export class TimeRangePicker implements OnInit {
     const to = selection.absoluteSelection!.to;
     this.resetCustomDates();
     if (from) {
-      this.fromDateString = this.formatInputDate(new Date(from));
+      this.fromDateString = TimeSeriesUtils.formatInputDate(new Date(from));
     }
     if (to) {
-      this.toDateString = this.formatInputDate(new Date(to));
+      this.toDateString = TimeSeriesUtils.formatInputDate(new Date(to));
     }
   }
 
@@ -154,24 +155,13 @@ export class TimeRangePicker implements OnInit {
   setFromDate(event: MatDatepickerInputEvent<any>) {
     const utcDate = new Date(event.value.ts); // this is 00:00:00 in GMT
     const localDate = new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), 0, 0, 0);
-    this.fromDateString = this.formatInputDate(localDate);
+    this.fromDateString = TimeSeriesUtils.formatInputDate(localDate);
   }
 
   setToDate(event: MatDatepickerInputEvent<any>) {
     const utcDate = new Date(event.value.ts);
     const localDate = new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), 0, 0, 0);
-    this.toDateString = this.formatInputDate(localDate);
-  }
-
-  formatInputDate(date: Date) {
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const isoDate = `${date.getFullYear()}-${month}-${day}`;
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
-    const isoTime = `${hours}:${minutes}:${seconds}`;
-    return `${isoDate} ${isoTime}`;
+    this.toDateString = TimeSeriesUtils.formatInputDate(localDate);
   }
 
   formatTimeValue(value: number) {

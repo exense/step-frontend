@@ -1,4 +1,5 @@
 <step-input-group>
+  <label *ngIf="label">{{ label }}</label>
   <input type="text" [matDatepicker]="picker" #dateInput [formControl]="dateControl" />
   <div class="step-input-addon">
     <step-icon name="calendar" (click)="picker.open()"></step-icon>

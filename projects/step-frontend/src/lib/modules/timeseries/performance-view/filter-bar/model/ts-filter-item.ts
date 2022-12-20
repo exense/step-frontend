@@ -3,8 +3,8 @@ export interface TsFilterItem {
   attributeName: string;
   type: FilterBarItemType;
 
-  min?: string; // for numbers an dates
-  max?: string; // for numbers an dates
+  min?: number; // for numbers an dates
+  max?: number; // for numbers an dates
   textValue?: string; // for free text
   textValues?: { value: string; isSelected?: boolean }[]; // for text with suggestions
 }

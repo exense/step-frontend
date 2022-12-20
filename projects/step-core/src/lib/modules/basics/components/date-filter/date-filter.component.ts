@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { DateTime } from 'luxon';
 import { AbstractControl, FormBuilder, FormControl, ValidatorFn } from '@angular/forms';
 import { debounceTime, map, Subject, takeUntil } from 'rxjs';
@@ -10,6 +10,8 @@ import { debounceTime, map, Subject, takeUntil } from 'rxjs';
 })
 export class DateFilterComponent implements OnInit, OnDestroy {
   private terminator$ = new Subject<unknown>();
+
+  @Input() label?: string;
 
   @Output() dateChanged = new EventEmitter<DateTime | undefined>();
 

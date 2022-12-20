@@ -19,6 +19,7 @@ import { PerformanceViewTimeSelectionComponent } from './performance-view/time-s
 import { MeasurementsFilterPipe } from './performance-view/measurements/measurements-filter.pipe';
 import { FilterBarComponent } from './performance-view/filter-bar/filter-bar.component';
 import { FilterBarItemComponent } from './performance-view/filter-bar/item/filter-bar-item.component';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,6 @@ import { FilterBarItemComponent } from './performance-view/filter-bar/item/filte
     FilterBarItemComponent,
   ],
   exports: [PerformanceViewComponent],
-  imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule],
+  imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule, MatDatepickerModule],
 })
 export class TimeSeriesModule {}

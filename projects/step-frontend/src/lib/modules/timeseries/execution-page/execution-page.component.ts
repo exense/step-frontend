@@ -21,6 +21,7 @@ import { TimeSeriesContext } from '../time-series-context';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
 import { TimeSeriesConfig } from '../time-series.config';
+import { MatMenuTrigger } from '@angular/material/menu';
 
 @Component({
   selector: 'step-execution-performance',
@@ -32,6 +33,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   terminator$ = new Subject<void>();
 
+  @ViewChild('matTrigger') matTrigger!: MatMenuTrigger;
   @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
 
   @Input() executionId!: string;
@@ -68,6 +70,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   ];
   selectedRefreshInterval: RefreshInterval = this.refreshIntervals[0];
 
+  customGroupingString = '';
   groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS;
   selectedGrouping = this.groupingOptions[0];
 
@@ -95,6 +98,15 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   handleFiltersChange(filters: TsFilterItem[]): void {
     this.context.updateActiveFilters(filters);
+  }
+
+  applyCustomGrouping() {
+    if (this.customGroupingString) {
+      let dimensions = this.customGroupingString.split(',').map((x) => x.trim());
+      this.selectedGrouping = { label: dimensions.join(', '), attributes: dimensions };
+      this.emitGroupDimensions();
+      this.matTrigger.closeMenu();
+    }
   }
 
   emitGroupDimensions(): void {
