@@ -9,3 +9,5 @@ import { CurrentOperationsComponent } from './components/current-operations/curr
   exports: [CurrentOperationsComponent, OperationComponent],
 })
 export class OperationsModule {}
+
+export * from './shared/execution-view-services';

@@ -22,7 +22,7 @@ export abstract class BaseItemComponent<T extends CustomRegistryItem> implements
 
   ngOnChanges(changes: SimpleChanges): void {
     const cItemKey = changes['itemKey'];
-    if (cItemKey?.previousValue != cItemKey?.currentValue && cItemKey?.firstChange) {
+    if (cItemKey?.previousValue !== cItemKey?.currentValue || cItemKey?.firstChange) {
       this.onKeyUpdate(cItemKey?.currentValue);
     }
   }

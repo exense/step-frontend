@@ -29,12 +29,20 @@
         </div>
       </div>
       <div class="panel-body" ng-if="tab.type=='progress'">
+<!--
         <execution-progress
           eid="tab.id"
           title-update="updateTabTitle"
           close-tab="closeTab(tab.id)"
           active="isTabActive(tab.id)"
         />
+-->
+        <step-execution-progress
+          [e-id]="tab.id"
+          [is-active]="isTabActive(tab.id)"
+          (title-update)="updateTabTitle($event.eId, $event.execution)"
+          (close)="closeTab(tab.id)">
+        </step-execution-progress>
       </div>
     </div>
   </div>
