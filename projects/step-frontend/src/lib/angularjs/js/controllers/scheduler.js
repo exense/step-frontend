@@ -29,6 +29,28 @@ angular
     );
   })
 
+  .controller('newTaskModalCtrl', function ($scope, $uibModalInstance, executionParams) {
+    $scope.name = executionParams.description;
+
+    $scope.ok = function () {
+      var taskParams = {
+        name: $scope.name,
+        cronExpression: $scope.cron,
+        executionsParameters: executionParams,
+        attributes: { name: $scope.name },
+      };
+      $uibModalInstance.close(taskParams);
+    };
+
+    $scope.applyPreset = function (preset) {
+      $scope.cron = preset;
+    };
+
+    $scope.cancel = function () {
+      $uibModalInstance.dismiss('cancel');
+    };
+  })
+
   .controller('editSchedulerTaskModalCtrl', function ($scope, $uibModalInstance, $http, $location, task, PlanDialogs) {
     $scope.task = task;
 
