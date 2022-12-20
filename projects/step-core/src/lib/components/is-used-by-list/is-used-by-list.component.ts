@@ -1,14 +1,9 @@
-import { Component, Input, Output, EventEmitter, Inject, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, OnDestroy, Output } from '@angular/core';
 import { IRootScopeService } from 'angular';
-import {
-  AJS_ROOT_SCOPE,
-  AugmentedAdminService,
-  Mutable,
-  ReferencesService,
-  TableLocalDataSource,
-} from '@exense/step-core';
-import { BehaviorSubject, switchMap, shareReplay, tap, map, startWith } from 'rxjs';
-import { IsUsedBySearchType } from '../../shared/is-used-by-search-type';
+import { BehaviorSubject, map, shareReplay, startWith, switchMap, tap } from 'rxjs';
+import { AugmentedAdminService, ReferencesService } from '../../client/step-client-module';
+import { TableLocalDataSource } from '../../modules/table/table.module';
+import { AJS_ROOT_SCOPE, IsUsedBySearchType, Mutable } from '../../shared';
 
 type InProgress = Mutable<Pick<IsUsedByListComponent, 'inProgress'>>;
 

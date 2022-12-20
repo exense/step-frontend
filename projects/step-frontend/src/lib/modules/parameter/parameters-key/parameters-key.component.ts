@@ -1,7 +1,6 @@
 import { Component, Optional } from '@angular/core';
 import { CustomColumnOptions, CustomComponent, Parameter } from '@exense/step-core';
 import { map, of } from 'rxjs';
-import { PlanDialogsService } from '../../plan/services/plan-dialogs.service';
 import { ParameterDialogsService } from '../services/parameter-dialogs.service';
 
 @Component({

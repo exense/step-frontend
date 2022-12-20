@@ -1,3 +1,4 @@
+import { DOCUMENT } from '@angular/common';
 import {
   Component,
   forwardRef,
@@ -10,6 +11,7 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
+import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AbstractArtefact,
   AJS_LOCATION,
@@ -17,6 +19,8 @@ import {
   AuthService,
   CallFunction,
   DialogsService,
+  ExportDialogsService,
+  Function as KeywordCall,
   KeywordsService,
   LinkProcessorService,
   Mutable,
@@ -24,21 +28,17 @@ import {
   PlansService,
   RepositoryObjectReference,
   ScreensService,
-  TreeStateService,
-  Function as KeywordCall,
   TreeNodeUtilsService,
+  TreeStateService,
 } from '@exense/step-core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { PlanHistoryService } from '../../services/plan-history.service';
-import { catchError, filter, from, map, merge, Observable, of, Subject, switchMap, takeUntil, tap, timer } from 'rxjs';
-import { PlanHandleService } from '../../services/plan-handle.service';
-import { ExportDialogsService } from '../../../_common/services/export-dialogs.service';
 import { ILocationService } from 'angular';
-import { InteractiveSessionService } from '../../services/interactive-session.service';
+import { catchError, filter, from, map, merge, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
-import { DOCUMENT } from '@angular/common';
 import { ArtefactTreeNodeUtilsService } from '../../services/artefact-tree-node-utils.service';
+import { InteractiveSessionService } from '../../services/interactive-session.service';
+import { PlanHandleService } from '../../services/plan-handle.service';
+import { PlanHistoryService } from '../../services/plan-history.service';
 import { ArtefactTreeNode } from '../../shared/artefact-tree-node';
 
 type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef' | 'componentTabs'>>;

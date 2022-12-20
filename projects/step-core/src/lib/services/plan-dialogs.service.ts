@@ -3,13 +3,13 @@ import {
   a1Promise2Observable,
   AugmentedPlansService,
   DialogsService,
+  IsUsedByDialogService,
   Plan,
   UibModalHelperService,
 } from '@exense/step-core';
-import { Observable, catchError, map, noop, of, switchMap, tap } from 'rxjs';
-import { ExportDialogsService } from '../../_common/services/export-dialogs.service';
-import { ImportDialogsService } from '../../_common/services/import-dialogs.service';
-import { IsUsedByDialogService } from '../../_common/services/is-used-by-dialog.service';
+import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
+import { ExportDialogsService } from './export-dialogs.service';
+import { ImportDialogsService } from './import-dialogs.service';
 
 @Injectable({
   providedIn: 'root',
@@ -34,7 +34,7 @@ export class PlanDialogsService {
     return a1Promise2Observable(modalInstance.result);
   }
 
-  selectPlan(): Observable<any> {
+  selectPlan(): Observable<Plan> {
     const selectedEntity$ = a1Promise2Observable<any>(this._dialogs.selectEntityOfType('plans', true));
     const plan$ = selectedEntity$.pipe(
       map((result) => result.item),

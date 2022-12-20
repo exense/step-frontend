@@ -1,8 +1,12 @@
 import { Injectable } from '@angular/core';
-import { a1Promise2Observable, DialogsService, AugmentedKeywordsService } from '@exense/step-core';
-import { Observable, catchError, map, of, switchMap, tap } from 'rxjs';
+import {
+  a1Promise2Observable,
+  AugmentedKeywordsService,
+  DialogsService,
+  IsUsedByDialogService,
+} from '@exense/step-core';
+import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
-import { IsUsedByDialogService } from '../../../_common/services/is-used-by-dialog.service';
 
 @Injectable({
   providedIn: 'root',

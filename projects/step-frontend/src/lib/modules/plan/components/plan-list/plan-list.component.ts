@@ -5,14 +5,14 @@ import {
   AJS_MODULE,
   AugmentedPlansService,
   AutoDeselectStrategy,
-  BulkOperationType,
   BulkOperationsInvokeService,
+  BulkOperationType,
   Plan,
+  PlanDialogsService,
   selectionCollectionProvider,
 } from '@exense/step-core';
-import { PlanDialogsService } from '../../services/plan-dialogs.service';
-import { noop } from 'rxjs';
 import { ILocationService } from 'angular';
+import { noop } from 'rxjs';
 import { PlansBulkOperationsInvokeService } from '../../services/plans-bulk-operations-invoke.service';
 
 @Component({

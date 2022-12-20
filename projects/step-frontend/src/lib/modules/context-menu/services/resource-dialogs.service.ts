@@ -1,14 +1,14 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import {
-  Resource,
-  UibModalHelperService,
   a1Promise2Observable,
   DialogsService,
+  IsUsedByDialogService,
+  Resource,
   ResourcesService,
+  UibModalHelperService,
 } from '@exense/step-core';
-import { Observable, switchMap, of, catchError, map } from 'rxjs';
-import { IsUsedByDialogService } from '../../_common/step-common.module';
+import { catchError, map, Observable, of, switchMap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
