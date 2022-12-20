@@ -10,9 +10,9 @@ import { TSRangerComponent } from '../ranger/ts-ranger.component';
 import { UPlotUtils } from '../uplot/uPlot.utils';
 import { TimeSeriesConfig } from '../time-series.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
-import { first, forkJoin, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { first, forkJoin, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { TimeSeriesUtils } from '../time-series-utils';
-import { TimeSeriesContext } from '../execution-page/time-series-context';
+import { TimeSeriesContext } from '../time-series-context';
 import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
 import { KeywordSelection, TimeSeriesKeywordsContext } from '../execution-page/time-series-keywords.context';
 import { Bucket } from '../bucket';
@@ -23,10 +23,11 @@ import { ChartGenerators } from './chart-generators/chart-generators';
 import { TsChartType } from './model/ts-chart-type';
 import { ExecutionFiltersComponent } from './filters/execution-filters.component';
 import { PerformanceViewTimeSelectionComponent } from './time-selection/performance-view-time-selection.component';
-import { ThroughputMetric } from './model/throughput-metric';
-import { PerformanceViewConfig } from './performance-view.config';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { TSTimeRange } from '../chart/model/ts-time-range';
+import { ThroughputMetric } from './model/throughput-metric';
+import { PerformanceViewConfig } from './performance-view.config';
+import { UpdatePerformanceViewRequest } from './model/update-performance-view-request';
 
 declare const uPlot: any;
 
@@ -58,9 +59,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   @ViewChild(PerformanceViewTimeSelectionComponent) timeSelectionComponent!: PerformanceViewTimeSelectionComponent;
 
+  @Input() context!: TimeSeriesContext;
   @Input() settings!: PerformanceViewSettings;
   @Input() includeThreadGroupChart = true;
-  @Input() includeTimeRangePicker = true;
 
   @Output() onInitializationComplete: EventEmitter<void> = new EventEmitter<void>();
   @Output() onUpdateComplete: EventEmitter<void> = new EventEmitter<void>();
@@ -92,7 +93,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     { label: 'Off', value: 0 },
   ];
   selectedRefreshInterval: RefreshInterval = this.refreshIntervals[0];
-  timeSelection!: ExecutionTimeSelection;
 
   terminator$ = new Subject<void>();
   intervalShouldBeCanceled = false;
@@ -107,8 +107,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   throughputMetrics = PerformanceViewConfig.throughputMetrics;
   selectedThroughputMetric = this.throughputMetrics[0];
 
-  executionContext!: TimeSeriesContext;
-
   initializationTasks: Observable<any>[] = [];
   updateTasks: Observable<any>[] = [];
 
@@ -116,19 +114,18 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     return a.key.localeCompare(b.key);
   };
 
-  constructor(private timeSeriesService: TimeSeriesService, private contextFactory: TimeSeriesContextsFactory) {}
+  constructor(private timeSeriesService: TimeSeriesService) {}
 
   onAllSeriesCheckboxClick(event: any) {
     this.keywordsService.toggleSelectAll();
   }
 
-  getTimeRangeSelection() {
-    return this.timeSelectionComponent.getActiveSelection();
-  }
-
   ngOnInit(): void {
     if (!this.settings) {
       throw new Error('Settings input is not specified!');
+    }
+    if (!this.context) {
+      throw new Error('Context not provided!');
     }
     this.findRequest = this.prepareFindRequest(this.settings);
     this.initContext();
@@ -152,25 +149,24 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .subscribe((keywords) => {
         this.keywords = keywords;
       });
-    this.executionContext.timeSelectionState
-      .onActiveSelectionChange()
+    this.context
+      .onSelectedTimeRangeChange()
       .pipe(
-        tap((newRange) => (this.timeSelection = newRange)),
         switchMap((newRange) => this.handleZoomChange(newRange)),
         takeUntil(this.terminator$)
       )
       .subscribe();
 
-    this.executionContext
+    this.context
       .onFiltersChange()
       .pipe(
         tap(() => (this.chartsAreLoading = true)),
-        switchMap(() => this.updateAllCharts(true)),
+        switchMap(() => this.refreshAllCharts(true)),
         tap(() => (this.chartsAreLoading = false)),
         takeUntil(this.terminator$)
       )
       .subscribe();
-    this.executionContext
+    this.context
       .onGroupingChange()
       .pipe(
         tap((groupDimensions: string[]) => {
@@ -178,7 +174,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           this.mergeRequestWithActiveFilters(this.findRequest);
         }),
         tap(() => (this.chartsAreLoading = true)),
-        switchMap(() => this.updateAllCharts(true)),
+        switchMap(() => this.refreshAllCharts(true)),
         tap(() => (this.chartsAreLoading = false)),
         takeUntil(this.terminator$)
       )
@@ -187,17 +183,45 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.createAllCharts(this.findRequest);
   }
 
-  handleZoomChange(range: ExecutionTimeSelection): Observable<any> {
+  /**
+   * This method will reconstruct all charts.
+   * @param range
+   */
+  updateFullRange(range: TSTimeRange): void {
+    this.context.updateFullRange(range, false);
+    this.timeSelectionComponent.updateFullTimeRange(range);
+    this.settings.timeRange = range;
+    this.findRequest.start = range.from;
+    this.findRequest.end = range.to;
+  }
+
+  updateDashboard(request: UpdatePerformanceViewRequest): Observable<any> {
+    // let's assume the complete interval and selections are set.
+    this.context.updateFullRange(request.fullTimeRange, false);
+    this.context.updateSelectedRange(request.selection, false);
+    let updates$ = [];
+    if (request.updateRanger) {
+      updates$.push(this.timeSelectionComponent.refreshRanger());
+    }
+    if (request.updateCharts) {
+      updates$.push(this.refreshAllCharts());
+    }
+    return forkJoin(updates$);
+  }
+
+  handleZoomChange(range: TSTimeRange): Observable<any> {
+    if (this.findRequest.start === range.from && this.findRequest.end === range.to) {
+      return of(undefined);
+    }
     this.getAllCharts().forEach((chart) => {
       chart?.setBlur(true);
     });
     this.findRequest = {
       ...this.findRequest,
-      start: range.absoluteSelection!.from!,
-      end: range.absoluteSelection!.to!,
+      start: range.from,
+      end: range.to,
     };
-    // return this.updateAllCharts();
-    return this.updateAllCharts(true);
+    return this.refreshAllCharts(true);
   }
 
   deleteObjectProperties(object: any, keys: string[]) {
@@ -208,15 +232,14 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   private initContext() {
-    this.executionContext = this.contextFactory.getContext(this.settings.contextId);
-    this.keywordsService = this.executionContext.keywordsContext;
+    this.keywordsService = this.context.keywordsContext;
   }
 
   prepareFindRequest(settings: PerformanceViewSettings, customFilters?: any): FindBucketsRequest {
     const numberOfBuckets = TimeSeriesConfig.MAX_BUCKETS_IN_CHART;
     return {
-      start: settings.startTime,
-      end: settings.endTime,
+      start: settings.timeRange.from,
+      end: settings.timeRange.to,
       numberOfBuckets: numberOfBuckets,
       params: {
         ...settings.contextualFilters,
@@ -251,67 +274,33 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .subscribe((allCompleted) => this.onInitializationComplete.emit());
   }
 
-  calculateTimeIntervalForCurrentSelection(settings: PerformanceViewSettings): { start: number; end: number } {
-    let start = settings.startTime;
-    let end = settings.endTime;
-    let activeTimeSelection = this.executionContext.timeSelectionState.activeTimeSelection;
-    switch (activeTimeSelection.type) {
-      case RangeSelectionType.FULL:
-        // do nothing
-        break;
-      case RangeSelectionType.ABSOLUTE:
-        start = activeTimeSelection.absoluteSelection!.from || settings.startTime;
-        end = activeTimeSelection.absoluteSelection!.to || settings.endTime;
-        break;
-      case RangeSelectionType.RELATIVE:
-        let now = new Date().getTime();
-        end = now;
-        start = now - activeTimeSelection.relativeSelection!.timeInMs;
-        break;
-    }
-    return { start: start, end: end };
-  }
-
   /**
-   * This method is called while refreshing.
+   * This method is called while live refreshing.
    * force = true -> The charts ar forced to refresh, even if the time interval was the same (because of filters/grouping change).
    */
-  updateAllCharts(force = false): Observable<unknown> {
-    let previousTimeRange: TSTimeRange = { from: this.findRequest.start, to: this.findRequest.end };
+  refreshAllCharts(force = false): Observable<unknown> {
     this.findRequest = this.prepareFindRequest(this.settings); // we don't want to lose active filters
     this.mergeRequestWithActiveFilters(this.findRequest);
-    let timeRange = this.calculateTimeIntervalForCurrentSelection(this.settings);
-    this.findRequest.start = timeRange.start;
-    this.findRequest.end = timeRange.end;
+    const fullTimeRange = this.context.getSelectedTimeRange();
+    this.findRequest.start = fullTimeRange.from;
+    this.findRequest.end = fullTimeRange.to;
 
-    let timeSelectionDidChange = !(
-      previousTimeRange &&
-      previousTimeRange.from === timeRange.start &&
-      previousTimeRange.to === timeRange.end
-    );
-
-    const charts$ = [this.timeSelectionComponent.refreshRanger()];
-
-    if (force || timeSelectionDidChange) {
-      charts$.push(
-        ...[
-          this.createSummaryChart(this.findRequest),
-          this.createByStatusChart(this.findRequest),
-          this.createByKeywordsCharts(this.findRequest),
-          this.updateTable(this.findRequest),
-        ]
-      );
-      if (this.includeThreadGroupChart) {
-        charts$.push(this.createThreadGroupsChart(this.findRequest));
-      }
+    const charts$ = [
+      this.createSummaryChart(this.findRequest),
+      this.createByStatusChart(this.findRequest),
+      this.createByKeywordsCharts(this.findRequest),
+      this.updateTable(this.findRequest),
+    ];
+    if (this.includeThreadGroupChart) {
+      charts$.push(this.createThreadGroupsChart(this.findRequest));
     }
 
     return forkJoin(charts$);
   }
 
   mergeRequestWithActiveFilters(request: FindBucketsRequest) {
-    this.deleteObjectProperties(request.params, this.filtersComponent.getAllFilterAttributes()); // we clean the request first
-    Object.assign(request.params, this.executionContext.getActiveFilters());
+    this.deleteObjectProperties(request.params, this.filtersComponent?.getAllFilterAttributes()); // we clean the request first
+    Object.assign(request.params, this.context.getActiveFilters());
   }
 
   onKeywordToggle(keyword: string, event: any) {
@@ -319,7 +308,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   onChartsZoomReset() {
-    this.executionContext.timeSelectionState.resetZoom({ from: this.settings.startTime, to: this.settings.endTime });
+    this.context.resetZoom();
   }
 
   createThreadGroupsChart(request: FindBucketsRequest, isUpdate = false): Observable<TimeSeriesChartResponse> {
@@ -345,7 +334,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       type,
       request,
       response,
-      this.executionContext.keywordsContext.colorsPool
+      this.context.keywordsContext.colorsPool
     );
   }
 
@@ -381,7 +370,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   createByKeywordsCharts(request: FindBucketsRequest): Observable<TimeSeriesChartResponse> {
-    let groupDimensions = this.executionContext.getGroupDimensions();
+    const groupDimensions = this.context.getGroupDimensions();
     return this.timeSeriesService
       .fetchBuckets({ ...request, groupDimensions: groupDimensions, percentiles: [90, 99] })
       .pipe(
@@ -395,16 +384,16 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
               return;
             }
           }
-          let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-          let totalThroughput: number[] = response.matrix[0] ? Array(response.matrix[0]?.length) : [];
-          let responseTimeSeries: TSChartSeries[] = [];
-          let throughputSeries: TSChartSeries[] = [];
+          const timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
+          const totalThroughput: number[] = response.matrix[0] ? Array(response.matrix[0]?.length) : [];
+          const responseTimeSeries: TSChartSeries[] = [];
+          const throughputSeries: TSChartSeries[] = [];
           response.matrixKeys.map((key, i) => {
             key = this.getSeriesKey(key, groupDimensions);
-            let responseTimeData: (number | null | undefined)[] = [];
-            let color = this.keywordsService.getColor(key);
-            let countData = response.matrix[i].map((b, j) => {
-              let bucketValue = b?.throughputPerHour;
+            const responseTimeData: (number | null | undefined)[] = [];
+            const color = this.keywordsService.getColor(key);
+            const countData = response.matrix[i].map((b, j) => {
+              const bucketValue = b?.throughputPerHour;
               if (totalThroughput[j] == undefined) {
                 totalThroughput[j] = bucketValue;
               } else if (bucketValue) {
@@ -417,8 +406,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
               }
               return bucketValue ? bucketValue : 0;
             });
-            let keywordSelection = this.keywordsService.getKeywordSelection(key);
-            let series = {
+            const keywordSelection = this.keywordsService.getKeywordSelection(key);
+            const series = {
               scale: 'y',
               show: keywordSelection ? keywordSelection.isSelected : true,
               label: key,
@@ -508,7 +497,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       return;
     }
     this.selectedResponseTimeMetric = metric;
-    let data = this.responseTimeChart.getData();
+    const data = this.responseTimeChart.getData();
     this.byKeywordsChartResponseCache.matrix.map((bucketArray, i) => {
       data[i + 1] = bucketArray.map((b) => this.selectedResponseTimeMetric.mapFunction(b));
     });
@@ -516,7 +505,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   switchThroughputMetric(metric: ThroughputMetric) {
-    let f = (u: any, vals: any) => vals.map((v: number) => metric.labelFunction(v));
+    const f = (u: any, vals: any) => vals.map((v: number) => metric.labelFunction(v));
     this.throughputChart.settings.tooltipOptions.zAxisLabel = metric.tooltipZAxisLabel;
     this.throughputChart.uplot.axes[1].values = f;
     this.throughputChart.uplot.axes[2].values = f;
@@ -528,14 +517,14 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       return;
     }
     this.selectedThroughputMetric = metric;
-    let data = this.throughputChart.getData();
-    let totalData = new Array(data[0].length);
+    const data = this.throughputChart.getData();
+    const totalData = new Array(data[0].length);
     this.byKeywordsChartResponseCache.matrix.map((bucketArray, i) => {
       bucketArray.forEach((b, j) => {
         if (totalData[j] == null) {
           totalData[j] = 0;
         }
-        let value = this.selectedThroughputMetric.mapFunction(b);
+        const value = this.selectedThroughputMetric.mapFunction(b);
         totalData[j] += value;
         data[i + 1][j] = value;
       });

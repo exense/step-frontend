@@ -30,7 +30,7 @@ export abstract class BulkOperationsInvokeService<ID> {
   protected transformConfig(config: BulkOperationConfig<ID>, isPreview: boolean): BulkOperationParameters {
     let targetType: BulkOperationParameters['targetType'] = 'LIST';
     let ids: string[] | undefined = undefined;
-    let filter: TableFilter | undefined = undefined;
+    let filters: TableFilter[] | undefined = undefined;
 
     switch (config.selectionType) {
       case BulkSelectionType.All:
@@ -38,7 +38,7 @@ export abstract class BulkOperationsInvokeService<ID> {
         break;
       case BulkSelectionType.Filtered:
         targetType = 'FILTER';
-        filter = config.filterRequest?.filters?.[0] as TableFilter;
+        filters = config.filterRequest?.filters as TableFilter[] | undefined;
         break;
       case BulkSelectionType.None:
         ids = [];
@@ -58,11 +58,11 @@ export abstract class BulkOperationsInvokeService<ID> {
 
     // If filter type is selected and at the same time there is no filter provided by table
     // it is equal to all selection
-    if (targetType === 'FILTER' && !filter) {
+    if (targetType === 'FILTER' && !filters) {
       targetType = 'ALL';
     }
 
-    return { targetType, ids, filter, preview: isPreview };
+    return { targetType, ids, filters, preview: isPreview };
   }
 
   invoke(config: BulkOperationConfig<ID>): Observable<AsyncOperationDialogResult | undefined> {

@@ -49,9 +49,10 @@ export class CustomItemRenderComponent implements OnChanges, AfterViewInit {
       return;
     }
 
+    this.container.clear();
+
     if (!component) {
       this.componentRef = undefined;
-      this.container.clear();
       return;
     }
 

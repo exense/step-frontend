@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
-import { TimeSeriesContext } from '../../execution-page/time-series-context';
+import { TimeSeriesContext } from '../../time-series-context';
 import { BucketFilters } from '../../model/bucket-filters';
 import { KeywordSelection, TimeSeriesKeywordsContext } from '../../execution-page/time-series-keywords.context';
 import { KeyValue } from '@angular/common';

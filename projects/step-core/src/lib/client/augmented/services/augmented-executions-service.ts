@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import { ExecutionsService } from '../../generated';
+import { ExecutionParameters, ExecutionsService } from '../../generated';
 import { TableApiWrapperService } from '../../table/services/table-api-wrapper.service';
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
 import { TableRemoteDataSource } from '../../../modules/table/shared/table-remote-data-source';
+import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedExecutionsService extends ExecutionsService {
@@ -17,11 +19,18 @@ export class AugmentedExecutionsService extends ExecutionsService {
     result: 'result',
   });
 
-  constructor(override httpRequest: BaseHttpRequest, private _tableRest: TableApiWrapperService) {
+  constructor(
+    httpRequest: BaseHttpRequest,
+    private _tableRest: TableApiWrapperService,
+    private _httpClient: HttpClient
+  ) {
     super(httpRequest);
   }
 
   getExecutionsTableDataSource(): TableRemoteDataSource<any> {
     return this.dataSource;
+  }
+  override execute(requestBody?: ExecutionParameters): Observable<string> {
+    return this._httpClient.post('/rest/executions/start', requestBody, { responseType: 'text' });
   }
 }

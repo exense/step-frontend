@@ -1,0 +1,47 @@
+<mat-card>
+  <mat-card-title> Repository plan </mat-card-title>
+  <mat-card-content *ngIf="reload">
+    <ng-container *ngIf="error">
+      <div class="alert alert-danger" role="alert">
+        <step-icon name="alert-circle" aria-hidden="true"></step-icon>
+        <span class="sr-only">Error:</span>
+        {{ error }}
+      </div>
+    </ng-container>
+    <ng-container *ngIf="loading">
+      <step-icon name="refresh-cw" class="icon-refresh-animate"></step-icon>
+    </ng-container>
+    <ng-container *ngIf="artefact && repoRef">
+      <div class="artefact-info">
+        <section>
+          <h4>{{ artefact.name }}</h4>
+          <div>
+            <div>
+              <span>Type</span>&nbsp;
+              <span>{{ artefact.type }}</span>
+            </div>
+            <div>
+              <span>Repository</span>&nbsp;
+              <span>{{ repoRef.repositoryID }}</span>
+            </div>
+          </div>
+        </section>
+        <mat-card>
+          <mat-card-content>
+            <step-execution-commands
+              [description]="artefact.name"
+              [repositoryObjectRef]="repoRef"
+              [isolateExecution]="isolateExecution"
+              [includedTestcases]="includeTestcases$ | async"
+            >
+            </step-execution-commands>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <ng-container *ngIf="artefact.type === 'TestSet'">
+        <step-repository-plan-testcase-list [planId]="repoRef.repositoryParameters!['planid']">
+        </step-repository-plan-testcase-list>
+      </ng-container>
+    </ng-container>
+  </mat-card-content>
+</mat-card>

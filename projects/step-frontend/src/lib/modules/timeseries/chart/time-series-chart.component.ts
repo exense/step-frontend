@@ -36,7 +36,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   @Input() settings!: TSChartSettings;
   @Input() syncKey: string | undefined; // all the charts with the same syncKey in the app will be synced
-  @Input() selection: TSTimeRange | undefined; // deprecated after the refresh -on-zoom feature.
 
   @Output() onZoomReset = new EventEmitter();
   @Output() onZoomChange = new EventEmitter();
@@ -101,10 +100,8 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       bind: {
         dblclick: (self: uPlot, target: HTMLElement, handler: MouseListener) => {
           return (e: any) => {
-            if (UPlotUtils.isZoomed(this.uplot)) {
-              this.onZoomReset.emit(true);
-              handler(e);
-            }
+            this.onZoomReset.emit(true);
+            handler(e);
             return null;
           };
         },
@@ -167,23 +164,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         },
         ...settings.series,
       ],
-      hooks: {
-        init: [
-          (u: any) => {
-            u.root.addEventListener('click', (e: any) => {
-              let hoveredSeriesIdx = u.cursor.idxs.findIndex((v: number) => v != null);
-
-              if (hoveredSeriesIdx != -1) {
-                let hoveredDataIdx = u.cursor.idxs[hoveredSeriesIdx];
-                let seriesOpts = u.series[hoveredSeriesIdx];
-                let facetsData = u.data[hoveredSeriesIdx];
-              }
-            });
-          },
-        ],
-        setSelect: [(uplot) => {}],
-        // setScale: [ (x: any) => console.log(this.isZoomed())]
-      },
+      hooks: {},
     };
 
     let data: AlignedData = [settings.xValues, ...settings.series.map((s) => s.data)];
@@ -253,20 +234,20 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
    * Switches the state of the specified series.
    */
   toggleSeries(id: string): void {
-    let index = this.seriesIndexesByIds[id];
+    const index = this.seriesIndexesByIds[id];
     if (index == undefined) return;
-    let currentState = this.uplot.series[index].show;
+    const currentState = this.uplot.series[index].show;
     this.uplot.setSeries(index, { show: !currentState });
   }
 
   setSeriesVisibility(id: string, visible: boolean) {
-    let index = this.seriesIndexesByIds[id];
+    const index = this.seriesIndexesByIds[id];
     if (index == undefined) return;
     this.uplot.setSeries(index, { show: visible });
   }
 
   addSeries(series: TSChartSeries): void {
-    let existingSeries = this.seriesIndexesByIds[series.id];
+    const existingSeries = this.seriesIndexesByIds[series.id];
     if (existingSeries) {
       throw new Error('Series already exists with id ' + series.id);
     }
@@ -286,7 +267,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   }
 
   addDataBySeries(data: number[], seriesKey: string): void {
-    let index = this.seriesIndexesByIds[seriesKey];
+    const index = this.seriesIndexesByIds[seriesKey];
     if (index === undefined) {
       throw new Error('Series id not found: ' + seriesKey);
     } else {
@@ -295,7 +276,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   }
 
   addDataBySeriesIndex(data: number[], seriesIndex: number): void {
-    let existingData = this.uplot.data[seriesIndex] as number[];
+    const existingData = this.uplot.data[seriesIndex] as number[];
     this.uplot.data[seriesIndex] = [...existingData, ...data];
   }
 
@@ -312,7 +293,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
    */
   updateFullData(series: TSChartSeries[]): void {
     this.seriesIndexesByIds = {};
-    let data: AlignedData = [this.settings.xValues, ...series.map((s) => s.data)];
+    const data: AlignedData = [this.settings.xValues, ...series.map((s) => s.data)];
     this.uplot.batch(() => {
       this.removeAllSeries();
       this.uplot.addSeries({
@@ -324,7 +305,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   }
 
   private removeAllSeries() {
-    let seriesLength = this.uplot.series.length;
+    const seriesLength = this.uplot.series.length;
     for (let i = 1; i < seriesLength; i++) {
       this.uplot.delSeries(1); // we clean everything
     }
@@ -336,7 +317,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   }
 
   getLastTimestamp(): number {
-    let timestampSeries = this.uplot.data[0];
+    const timestampSeries = this.uplot.data[0];
     return timestampSeries[timestampSeries.length - 1];
   }
 }

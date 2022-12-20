@@ -1,0 +1,63 @@
+<step-custom-form [stModel]="executionParameters" stScreen="executionParameters"> </step-custom-form>
+<div class="main-container" role="toolbar" aria-label="...">
+  <div class="sub-container">
+    <step-input-group>
+      <button
+        type="button"
+        mat-icon-button
+        [disabled]="!('plan-execute' | hasRight | async)"
+        aria-label="Left Align"
+        matTooltip="Simulate execution"
+        (click)="execute(true)"
+      >
+        <step-icon name="check" aria-hidden="true"></step-icon>
+      </button>
+      <button
+        type="button"
+        mat-icon-button
+        [disabled]="!('plan-execute' | hasRight | async)"
+        aria-label="Left Align"
+        matTooltip="Execute"
+        (click)="execute(false)"
+      >
+        <step-icon name="play" aria-hidden="true"></step-icon>
+      </button>
+      <button
+        type="button"
+        mat-icon-button
+        [disabled]="!('plan-execute' | hasRight | async)"
+        aria-label="Left Align"
+        matTooltip="Schedule"
+        (click)="schedule()"
+      >
+        <step-icon name="clock" aria-hidden="true"></step-icon>
+      </button>
+    </step-input-group>
+    <step-input-group *ngIf="execution && execution.status !== 'ENDED'">
+      <button type="button" mat-icon-button aria-label="Left Align" [disabled]="!('plan-execute' | hasRight | async)">
+        <step-icon name="pause" aria-hidden="true"></step-icon>
+      </button>
+      <button
+        type="button"
+        mat-icon-button
+        aria-label="Left Align"
+        [disabled]="!('plan-execute' | hasRight | async)"
+        (click)="stop()"
+      >
+        <step-icon name="square" aria-hidden="true"></step-icon>
+      </button>
+    </step-input-group>
+  </div>
+  <step-input-group>
+    <button
+      type="button"
+      mat-icon-button
+      aria-label="Left Align"
+      [disabled]="!('plan-execute' | hasRight | async)"
+      matTooltip="Copy start request as curl command to clipboard"
+      (click)="copyExecutionServiceAsCurlToClipboard()"
+    >
+      <step-icon name="link" aria-hidden="true"></step-icon>
+    </button>
+  </step-input-group>
+</div>

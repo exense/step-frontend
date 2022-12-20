@@ -11,6 +11,7 @@ import { CustomFormDirective } from './directives/custom-form.directive';
 import { JsonViewerDirective } from './directives/json-viewer.directive';
 import { PlanExecutionDirective } from './directives/plan-execution.directive';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { HttpErrorInterceptor } from './interceptors/http-error.interceptor';
 import { ContainsVersionPipe } from './pipes/contains-version.pipe';
 import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
 import { MenuFilterPipe } from './pipes/menu-filter.pipe';
@@ -49,6 +50,11 @@ import { MenuFilterPipe } from './pipes/menu-filter.pipe';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpErrorInterceptor,
       multi: true,
     },
   ],

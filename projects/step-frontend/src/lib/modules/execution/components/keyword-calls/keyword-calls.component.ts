@@ -23,6 +23,7 @@ type FieldsAccessor = Mutable<Pick<KeywordCallsComponent, 'showFooter'>>;
 })
 export class KeywordCallsComponent implements OnInit {
   @Input() execution?: Execution;
+  @Input() keywordSearch?: string;
   @Input() keywordParameters$?: Observable<KeywordParameters>;
   @Output() showNodeInTree = new EventEmitter<string>();
   @Output() showTestCase = new EventEmitter<string>();

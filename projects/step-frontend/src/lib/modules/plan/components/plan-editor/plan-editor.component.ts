@@ -1,4 +1,3 @@
-import { DOCUMENT } from '@angular/common';
 import {
   Component,
   forwardRef,
@@ -11,7 +10,6 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AbstractArtefact,
   AJS_LOCATION,
@@ -19,26 +17,28 @@ import {
   AuthService,
   CallFunction,
   DialogsService,
-  ExportDialogsService,
-  Function as KeywordCall,
   KeywordsService,
   LinkProcessorService,
   Mutable,
   Plan,
   PlansService,
   RepositoryObjectReference,
-  ScreensService,
-  TreeNodeUtilsService,
   TreeStateService,
+  Function as KeywordCall,
+  TreeNodeUtilsService,
+  AugmentedScreenService,
 } from '@exense/step-core';
-import { ILocationService } from 'angular';
+import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
+import { PlanHistoryService } from '../../services/plan-history.service';
 import { catchError, filter, from, map, merge, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { PlanHandleService } from '../../services/plan-handle.service';
+import { ExportDialogsService } from '../../../_common/services/export-dialogs.service';
+import { ILocationService } from 'angular';
+import { InteractiveSessionService } from '../../services/interactive-session.service';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
+import { DOCUMENT } from '@angular/common';
 import { ArtefactTreeNodeUtilsService } from '../../services/artefact-tree-node-utils.service';
-import { InteractiveSessionService } from '../../services/interactive-session.service';
-import { PlanHandleService } from '../../services/plan-handle.service';
-import { PlanHistoryService } from '../../services/plan-history.service';
 import { ArtefactTreeNode } from '../../shared/artefact-tree-node';
 
 type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef' | 'componentTabs'>>;
@@ -97,7 +97,7 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
     private _planHistory: PlanHistoryService,
     private _planApi: PlansService,
     private _keywordCallsApi: KeywordsService,
-    private _screenTemplates: ScreensService,
+    private _screenTemplates: AugmentedScreenService,
     private _authService: AuthService,
     private _exportDialogs: ExportDialogsService,
     private _dialogsService: DialogsService,
@@ -235,7 +235,7 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
           );
         }),
         switchMap(({ artefact, keyword }) => {
-          const inputs$ = this._screenTemplates.getScreenInputsByScreenId('functionTable');
+          const inputs$ = this._screenTemplates.getInputsForScreenPost('functionTable');
           return inputs$.pipe(
             map((inputs) => {
               const functionAttributes = inputs.reduce((res, input) => {
@@ -448,14 +448,23 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
     if (!planId) {
       return;
     }
-    this._planApi.getPlanById(planId).subscribe((plan) => {
-      this.plan = plan;
-      const root = plan.root;
-      if (root) {
-        this._treeState.init(root, [root.id!]);
-      }
-      this._planHistory.init(plan);
-    });
+    this._planApi
+      .getPlanById(planId)
+      .pipe(
+        tap((plan) => {
+          if (plan.root) {
+            this.synchronizeDynamicName(plan.root);
+          }
+        })
+      )
+      .subscribe((plan) => {
+        this.plan = plan;
+        const root = plan.root;
+        if (root) {
+          this._treeState.init(root, [root.id!]);
+        }
+        this._planHistory.init(plan);
+      });
   }
 
   private initPlanUpdate(): void {
@@ -467,7 +476,7 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
 
     const planUpdateByEditor$ = this.planChange$.pipe(
       tap((plan) => {
-        this._treeState.init(plan.root!);
+        this._treeState.init(plan.root!, undefined, false);
         this._planHistory.addToHistory(plan);
         this.plan = plan;
       })
@@ -475,7 +484,7 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
 
     const planUpdatedByHistory$ = this._planHistory.planChange$.pipe(
       tap((plan) => {
-        this._treeState.init(plan.root!);
+        this._treeState.init(plan.root!, undefined, false);
         this.plan = plan;
       })
     );
@@ -540,6 +549,13 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
         return of(undefined);
       })
     );
+  }
+
+  private synchronizeDynamicName(artefact: AbstractArtefact): void {
+    if (artefact.dynamicName) {
+      artefact.dynamicName.dynamic = artefact.useDynamicName;
+    }
+    (artefact.children || []).forEach((child) => this.synchronizeDynamicName(child));
   }
 }
 
