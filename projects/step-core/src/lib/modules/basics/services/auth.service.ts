@@ -41,7 +41,7 @@ export class AuthService implements OnDestroy {
 
   readonly context$ = this._context$.asObservable();
 
-  private setContext(session: SessionDto): void {
+  private setContextFromSession(session: SessionDto): void {
     const context: AuthContext = {
       userID: session.username,
       rights: session.role.rights,
@@ -49,10 +49,14 @@ export class AuthService implements OnDestroy {
       otp: session.otp,
       session: {},
     };
-    this._$rootScope.context = context;
-    this._context$.next(context);
+    this.setContext(context);
     this.triggerRightCheck();
     this._preferences.load();
+  }
+
+  private setContext(context: AuthContext) {
+    this._$rootScope.context = context;
+    this._context$.next(context);
   }
 
   getContext(): AuthContext {
@@ -71,16 +75,21 @@ export class AuthService implements OnDestroy {
       if (session.otp) {
         await this.showPasswordChangeDialog(true);
         session.otp = false;
-        this.setContext(session);
+        this.setContextFromSession(session);
         return session;
       } else {
-        this.setContext(session);
+        this.setContextFromSession(session);
         return session;
       }
     } catch (err) {
       this._$rootScope.context = { userID: 'anonymous', role: 'public' };
       return err;
     }
+  }
+
+  updateContext(info: Partial<AuthContext>): void {
+    const context = { ...this.getContext(), ...info };
+    this.setContext(context);
   }
 
   login(credentials: CredentialsDto): Observable<unknown> {

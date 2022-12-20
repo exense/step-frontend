@@ -1,14 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Inject,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, EventEmitter, Inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import {
   AJS_LOCATION,
   AJS_MODULE,
@@ -18,24 +8,24 @@ import {
   AugmentedScreenService,
   Execution,
   ExecutionParameters,
-  ExecutionsService,
   RepositoryObjectReference,
   ScheduledTaskDialogsService,
 } from '@exense/step-core';
 import { ILocationService, IRootScopeService } from 'angular';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { DOCUMENT } from '@angular/common';
+import { IncludeTestcases } from '../../shared/include-testcases.interface';
 
 @Component({
   selector: 'step-execution-commands',
   templateUrl: './execution-commands.component.html',
   styleUrls: ['./execution-commands.component.scss'],
 })
-export class ExecutionCommandsComponent implements OnInit, OnChanges, OnDestroy {
+export class ExecutionCommandsComponent implements OnInit, OnChanges {
   @Input() description?: string;
   @Input() repositoryObjectRef?: RepositoryObjectReference;
   @Input() isolateExecution?: boolean;
-  @Input() includedTestcases?: { by: 'id' | 'name'; list: string[] } | null;
+  @Input() includedTestcases?: IncludeTestcases | null;
   @Input() execution?: Execution;
   @Output() onExecute = new EventEmitter<unknown>();
 
@@ -51,7 +41,11 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges, OnDestroy 
     @Inject(DOCUMENT) private _document: Document
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if (!this.executionParameters) {
+      this.loadDefaultExecutionParameters();
+    }
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     let execution: Execution | undefined | null = null;
@@ -76,8 +70,6 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges, OnDestroy 
       this.setupIsolateExecution(execution!, isolateExecution!);
     }
   }
-
-  ngOnDestroy(): void {}
 
   execute(simulate: boolean): void {
     const executionParams = this.buildExecutionParams(simulate);
@@ -115,6 +107,10 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges, OnDestroy 
       this.executionParameters = { ...parameters };
       return;
     }
+    this.loadDefaultExecutionParameters();
+  }
+
+  private loadDefaultExecutionParameters(): void {
     this._screenTemplates.getDefaultParametersByScreenId('executionParameters').subscribe((parameters) => {
       this.executionParameters = parameters;
     });

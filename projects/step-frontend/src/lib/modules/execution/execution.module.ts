@@ -34,6 +34,7 @@ import { DashletExecutionErrorsComponent } from './components/dashlet-execution-
 import { PanelExecutionDetailsComponent } from './components/panel-execution-details/panel-execution-details.component';
 import { PanelComponent } from './components/panel/panel.component';
 import { PanelOperationsComponent } from './components/panel-operations/panel-operations.component';
+import { RepositoryComponent } from './components/repository/repository.component';
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import { PanelOperationsComponent } from './components/panel-operations/panel-op
     RepositoryPlanTestcaseListComponent,
     ExecutionErrorsComponent,
     ExecutionTreeComponent,
+    RepositoryComponent,
     ExecutionCommandsComponent,
     ExecutionProgressComponent,
     DashletExecutionStepComponent,
@@ -69,6 +71,7 @@ import { PanelOperationsComponent } from './components/panel-operations/panel-op
     ExecutionTreeComponent,
     ExecutionCommandsComponent,
     ExecutionProgressComponent,
+    RepositoryComponent,
   ],
 })
 export class ExecutionModule {

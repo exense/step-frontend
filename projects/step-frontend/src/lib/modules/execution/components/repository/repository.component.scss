@@ -1,0 +1,14 @@
+.artefact-info {
+  margin-top: 1rem;
+  display: flex;
+
+  section {
+    width: 60%;
+    flex-grow: 1;
+    font-size: 14px;
+  }
+
+  mat-card {
+    flex-grow: 1;
+  }
+}
