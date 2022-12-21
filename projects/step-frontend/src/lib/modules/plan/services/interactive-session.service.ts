@@ -28,29 +28,7 @@ export class InteractiveSessionService implements OnDestroy {
 
   init(): void {
     this._screenTemplates
-      .getScreenInputsByScreenId('executionParameters')
-      .pipe(
-        map((inputs) =>
-          inputs
-            .map((x) => x.input)
-            .filter((x) => !!x)
-            .reduce((res, input) => {
-              const defaultValue = input?.defaultValue;
-              const options = input?.options;
-
-              let value = '';
-
-              if (defaultValue) {
-                value = defaultValue;
-              } else if (!!options?.length) {
-                value = options[0].value!;
-              }
-
-              res[input!.id!] = value;
-              return res;
-            }, {} as Record<string, any>)
-        )
-      )
+      .getDefaultParametersByScreenId('executionParameters')
       .subscribe((data) => (this.executionParameters = data));
   }
 

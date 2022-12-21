@@ -5,4 +5,5 @@ export enum CustomRegistryType {
   functionPackageType = 'functionPackageType',
   customCell = 'customCell',
   customSearchCell = 'customSearchCell',
+  dashlet = 'dashlet', // this is a temporary type, while we have to use an old router
 }

@@ -1,7 +1,9 @@
-export interface ExecutionSummaryDto {
+import { ViewModel } from '../../generated';
+
+export interface ExecutionSummaryDto extends ViewModel {
+  customFields?: Record<string, any>;
   count: number;
   countForecast: number;
-  customFields: unknown;
   distribution: {
     [status: string]: {
       status: string;

@@ -67,6 +67,11 @@ export class AuthService implements OnDestroy {
     return this._context$.value as AuthContext;
   }
 
+  updateContext(info: Partial<AuthContext>): void {
+    const context = { ...this.getContext(), ...info };
+    this.setContext(context);
+  }
+
   login(credentials: CredentialsDto): Observable<unknown> {
     return this._http.post('rest/access/login', credentials).pipe(
       switchMap(() => this.getSession()),

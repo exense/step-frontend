@@ -34,7 +34,7 @@ import { MeasurementsFilterPipe } from './performance-view/measurements/measurem
     MeasurementsPickerComponent,
     MeasurementsFilterPipe,
   ],
-  exports: [PerformanceViewComponent],
+  exports: [PerformanceViewComponent, ExecutionPageComponent],
   imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule],
 })
 export class TimeSeriesModule {}
