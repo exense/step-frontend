@@ -12,6 +12,7 @@ export class DateFilterComponent implements OnInit, OnDestroy {
   private terminator$ = new Subject<unknown>();
 
   @Input() label?: string;
+  @Input() readonlyInput = false;
 
   @Output() dateChanged = new EventEmitter<DateTime | undefined>();
 

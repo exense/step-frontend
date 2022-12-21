@@ -33,9 +33,15 @@
         </button>
         <div mat-menu-item [matMenuTriggerFor]="customGroupingMenu">Other</div>
         <mat-menu #customGroupingMenu="matMenu">
-          <div (click)="$event.stopPropagation()">
+          <div (click)="$event.stopPropagation()" style="padding: 12px">
             <mat-form-field class="w-100">
-              <input type="text" matInput autocomplete="off" [(ngModel)]="customGroupingString" />
+              <input
+                type="text"
+                matInput
+                autocomplete="off"
+                placeholder="Fields (comma separated)"
+                [(ngModel)]="customGroupingString"
+              />
             </mat-form-field>
             <div>
               <button mat-raised-button color="primary" class="w-100" (click)="applyCustomGrouping()">Apply</button>
