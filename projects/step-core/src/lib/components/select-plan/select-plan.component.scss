@@ -1,19 +1,17 @@
-.enterprise-theme {
-  step-select-plan {
-    display: flex;
-    gap: 8px;
-    padding-bottom: 1.25em;
+step-select-plan {
+  display: flex;
+  gap: 8px;
+  padding-bottom: 1.25em;
 
-    .mat-form-field {
-      flex: 1;
-      pointer-events: none;
+  .mat-form-field {
+    flex: 1;
+    pointer-events: none;
 
-      &.mat-form-field-appearance-legacy .mat-form-field-wrapper {
-        padding-bottom: 0;
+    &.mat-form-field-appearance-legacy .mat-form-field-wrapper {
+      padding-bottom: 0;
 
-        .mat-form-field-underline {
-          bottom: 0;
-        }
+      .mat-form-field-underline {
+        bottom: 0;
       }
     }
   }
