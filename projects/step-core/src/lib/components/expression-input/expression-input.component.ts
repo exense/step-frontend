@@ -1,5 +1,5 @@
-import { Component, EventEmitter, forwardRef, Input, Output, ViewEncapsulation } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
+import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { DialogsService } from '../../shared';
 
 type OnChange = (expression: string) => void;
@@ -10,19 +10,12 @@ type OnTouch = () => void;
   templateUrl: './expression-input.component.html',
   styleUrls: ['./expression-input.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => ExpressionInputComponent),
-      multi: true,
-    },
-  ],
 })
 export class ExpressionInputComponent implements ControlValueAccessor {
   @Input() label?: string;
   @Input() tooltip?: string;
-  @Input() invalid: boolean = false;
-  @Input() required: boolean = false;
+  @Input() isParentInvalid: boolean = false;
+  @Input() showRequiredAsterisk: boolean = false;
 
   @Output() toggleConstantValue = new EventEmitter<void>();
 
@@ -31,7 +24,9 @@ export class ExpressionInputComponent implements ControlValueAccessor {
 
   expression: string = '';
 
-  constructor(private _dialogsService: DialogsService) {}
+  constructor(private _dialogsService: DialogsService, public _ngControl: NgControl) {
+    this._ngControl.valueAccessor = this;
+  }
 
   writeValue(expression: string | null): void {
     this.expression = expression || '';

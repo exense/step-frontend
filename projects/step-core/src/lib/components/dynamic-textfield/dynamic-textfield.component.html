@@ -2,20 +2,20 @@
   *ngIf="dynamic; else constantValueTemplate"
   [label]="label"
   [tooltip]="tooltip"
-  [invalid]="invalid"
-  [required]="required"
+  [isParentInvalid]="!!_ngControl.invalid"
+  [showRequiredAsterisk]="showRequiredAsterisk"
   [ngModel]="expression"
   (ngModelChange)="onExpressionChange($event)"
   (toggleConstantValue)="toggleDynamicExpression(false)"
 ></step-expression-input>
 
 <ng-template #constantValueTemplate>
-  <mat-form-field floatLabel="always" [class.mat-form-field-invalid]="invalid">
+  <mat-form-field floatLabel="always" [class.mat-form-field-invalid]="!!_ngControl.invalid">
     <mat-label *ngIf="label">{{ label }}</mat-label>
     <input
       type="text"
       matInput
-      [required]="required"
+      [required]="showRequiredAsterisk"
       [ngModel]="value"
       (ngModelChange)="onValueChange($event)"
       (blur)="onBlur()"

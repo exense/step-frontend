@@ -14,7 +14,7 @@ export class FunctionLinkComponent implements CustomComponent {
   @Input() context?: KeywordFunction;
 
   readonly noLink$ = (this._customColumnOptions?.options$ || of([])).pipe(
-    map((options: any) => options.includes('noEditorLink'))
+    map((options) => options.includes('noEditorLink'))
   );
 
   constructor(

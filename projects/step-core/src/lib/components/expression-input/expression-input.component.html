@@ -1,9 +1,9 @@
-<mat-form-field floatLabel="always" [class.mat-form-field-invalid]="invalid">
+<mat-form-field floatLabel="always" [class.mat-form-field-invalid]="!!_ngControl.invalid || isParentInvalid">
   <mat-label *ngIf="label">{{ label }}</mat-label>
   <input
     type="text"
     matInput
-    [required]="required"
+    [required]="showRequiredAsterisk"
     [ngModel]="expression"
     (ngModelChange)="onExpressionChange($event)"
     (blur)="onBlur()"

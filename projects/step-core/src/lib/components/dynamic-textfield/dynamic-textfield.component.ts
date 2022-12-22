@@ -1,5 +1,5 @@
-import { Component, forwardRef, Input, ViewEncapsulation } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { NgControl } from '@angular/forms';
 import { DynamicValueString } from '../../client/step-client-module';
 import { DialogsService } from '../../shared';
 
@@ -11,19 +11,11 @@ type OnTouch = () => void;
   templateUrl: './dynamic-textfield.component.html',
   styleUrls: ['./dynamic-textfield.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => DynamicTextfieldComponent),
-      multi: true,
-    },
-  ],
 })
 export class DynamicTextfieldComponent {
   @Input() label?: string;
   @Input() tooltip?: string;
-  @Input() invalid: boolean = false;
-  @Input() required: boolean = false;
+  @Input() showRequiredAsterisk: boolean = false;
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;
@@ -32,7 +24,9 @@ export class DynamicTextfieldComponent {
   dynamic: boolean = false;
   expression: string = '';
 
-  constructor(private _dialogsService: DialogsService) {}
+  constructor(private _dialogsService: DialogsService, public _ngControl: NgControl) {
+    this._ngControl.valueAccessor = this;
+  }
 
   writeValue(dynamicValueString: DynamicValueString | null): void {
     this.value = dynamicValueString?.value || '';
