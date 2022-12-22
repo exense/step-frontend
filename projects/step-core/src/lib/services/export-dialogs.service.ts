@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { a1Promise2Observable, UibModalHelperService } from '@exense/step-core';
 import { Observable } from 'rxjs';
+import { UibModalHelperService } from './uib-modal-helper.service';
+import { a1Promise2Observable } from '../shared';
 
 @Injectable({
   providedIn: 'root',

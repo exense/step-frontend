@@ -1,15 +1,11 @@
 import { Injectable } from '@angular/core';
-import {
-  a1Promise2Observable,
-  AugmentedPlansService,
-  DialogsService,
-  IsUsedByDialogService,
-  Plan,
-  UibModalHelperService,
-} from '@exense/step-core';
 import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 import { ExportDialogsService } from './export-dialogs.service';
 import { ImportDialogsService } from './import-dialogs.service';
+import { AugmentedPlansService, Plan } from '../client/step-client-module';
+import { UibModalHelperService } from './uib-modal-helper.service';
+import { IsUsedByDialogService } from './is-used-by-dialog.service';
+import { a1Promise2Observable, DialogsService } from '../shared';
 
 @Injectable({
   providedIn: 'root',
