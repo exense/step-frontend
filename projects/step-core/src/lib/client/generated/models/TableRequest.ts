@@ -8,8 +8,8 @@ import type { TableParameters } from './TableParameters';
 
 export type TableRequest = {
   filters?: Array<TableFilter>;
+  tableParameters?: TableParameters;
   skip?: number;
   limit?: number;
   sort?: Sort;
-  tableParameters?: TableParameters;
 };

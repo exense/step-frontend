@@ -47,14 +47,6 @@ export class AugmentedAdminService extends AdminService {
     });
   }
 
-  assignFunctionsAndEntitiesToProject(id: string, data: AssignEntityParameters) {
-    return this.httpRequest.request({
-      method: 'POST',
-      url: '/tenants/project/' + id + '/entities',
-      body: data,
-    });
-  }
-
   getProjectMembers(projectId: string): Observable<Array<ProjectMemberDto>> {
     return this.httpRequest.request({
       method: 'GET',

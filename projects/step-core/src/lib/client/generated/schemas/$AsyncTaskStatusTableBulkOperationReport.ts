@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $AsyncTaskStatusBulkOperationReport = {
+export const $AsyncTaskStatusTableBulkOperationReport = {
   properties: {
     id: {
       type: 'string',
@@ -23,7 +23,7 @@ export const $AsyncTaskStatusBulkOperationReport = {
       type: 'string',
     },
     result: {
-      type: 'BulkOperationReport',
+      type: 'TableBulkOperationReport',
     },
   },
 } as const;

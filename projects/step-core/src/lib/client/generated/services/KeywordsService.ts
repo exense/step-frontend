@@ -4,13 +4,13 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
-import type { AsyncTaskStatusBulkOperationReport } from '../models/AsyncTaskStatusBulkOperationReport';
-import type { BulkOperationParameters } from '../models/BulkOperationParameters';
+import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTaskStatusTableBulkOperationReport';
 import type { CallFunction } from '../models/CallFunction';
 import type { Function } from '../models/Function';
 import type { FunctionInputJsonObject } from '../models/FunctionInputJsonObject';
 import type { GetTokenHandleParameter } from '../models/GetTokenHandleParameter';
 import type { OutputJsonObject } from '../models/OutputJsonObject';
+import type { TableBulkOperationRequest } from '../models/TableBulkOperationRequest';
 import type { TableRequest } from '../models/TableRequest';
 import type { TableResponseFunction } from '../models/TableResponseFunction';
 import type { TokenWrapper } from '../models/TokenWrapper';
@@ -24,10 +24,10 @@ export class KeywordsService {
   /**
    * Deletes the entities according to the provided parameters
    * @param requestBody
-   * @returns AsyncTaskStatusBulkOperationReport default response
+   * @returns AsyncTaskStatusTableBulkOperationReport default response
    * @throws ApiError
    */
-  public deleteFunctions(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusBulkOperationReport> {
+  public deleteFunctions(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/functions/bulk/delete',
@@ -97,10 +97,10 @@ export class KeywordsService {
   /**
    * Clones the entities according to the provided parameters
    * @param requestBody
-   * @returns AsyncTaskStatusBulkOperationReport default response
+   * @returns AsyncTaskStatusTableBulkOperationReport default response
    * @throws ApiError
    */
-  public cloneFunctions(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusBulkOperationReport> {
+  public cloneFunctions(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/functions/bulk/clone',
