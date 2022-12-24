@@ -1,72 +1,76 @@
 <ng-container *ngIf="!executionHasToBeBuilt">
-  <div class="right-section-buttons">
-    <div *ngIf="executionInProgress">
-      <button style="margin-right: 8px" mat-raised-button [matMenuTriggerFor]="refreshMenu">
-        Refresh ({{ selectedRefreshInterval.label }})
-      </button>
-      <mat-menu #refreshMenu="matMenu">
-        <button mat-menu-item *ngFor="let interval of refreshIntervals" (click)="changeRefreshInterval(interval)">
-          {{ interval.label }}
-        </button>
-      </mat-menu>
-    </div>
-    <button mat-raised-button (click)="navigateToRtmDashboard()">Interactive Session</button>
-  </div>
-
-  <div class="filter-bar-container">
-    <div>
-      <step-ts-filter-bar
-        *ngIf="context"
-        [context]="context"
-        (onFiltersChange)="handleFiltersChange($event)"
-      ></step-ts-filter-bar>
-    </div>
-    <div style="display: flex; align-items: center" [matMenuTriggerFor]="groupingMenu" #matTrigger="matMenuTrigger">
-      <button mat-button [matMenuTriggerFor]="groupingMenu">Grouping: {{ selectedGrouping.label }}</button>
-      <mat-menu #groupingMenu="matMenu">
-        <button
-          mat-menu-item
-          *ngFor="let grouping of groupingOptions"
-          (click)="selectedGrouping = grouping; emitGroupDimensions()"
-        >
-          {{ grouping.label }}
-        </button>
-        <div mat-menu-item [matMenuTriggerFor]="customGroupingMenu">Other</div>
-        <mat-menu #customGroupingMenu="matMenu">
-          <div (click)="$event.stopPropagation()" style="padding: 12px">
-            <mat-form-field class="w-100">
-              <input
-                type="text"
-                matInput
-                autocomplete="off"
-                placeholder="Fields (comma separated)"
-                [(ngModel)]="customGroupingString"
-              />
-            </mat-form-field>
-            <div>
-              <button mat-raised-button color="primary" class="w-100" (click)="applyCustomGrouping()">Apply</button>
-            </div>
-          </div>
-        </mat-menu>
-      </mat-menu>
-    </div>
-  </div>
-
-  <step-time-range-picker
-    #rangePicker
-    [customRelativeOptions]="timeRangeOptions"
-    (onSelectionChange)="onTimeRangeChange($event)"
-  >
+  <step-time-range-picker [customRelativeOptions]="timeRangeOptions" (onSelectionChange)="onTimeRangeChange($event)">
   </step-time-range-picker>
+  <step-timeseries-dashboard #dashboard *ngIf="dashboardSettings" [settings]="dashboardSettings">
+  </step-timeseries-dashboard>
+  <!--  <div class="right-section-buttons">-->
+  <!--    <div *ngIf="executionInProgress">-->
+  <!--      <button style="margin-right: 8px" mat-raised-button [matMenuTriggerFor]="refreshMenu">-->
+  <!--        Refresh ({{ selectedRefreshInterval.label }})-->
+  <!--      </button>-->
+  <!--      <mat-menu #refreshMenu="matMenu">-->
+  <!--        <button mat-menu-item *ngFor="let interval of refreshIntervals" (click)="changeRefreshInterval(interval)">-->
+  <!--          {{ interval.label }}-->
+  <!--        </button>-->
+  <!--      </mat-menu>-->
+  <!--    </div>-->
+  <!--    <button mat-raised-button (click)="navigateToRtmDashboard()">Interactive Session</button>-->
+  <!--  </div>-->
 
-  <step-performance-view
-    *ngIf="performanceViewSettings"
-    [context]="context"
-    [settings]="performanceViewSettings"
-    (onInitializationComplete)="onPerformanceViewInitComplete()"
-    (onUpdateComplete)="onPerformanceViewUpdateComplete()"
-  >
-  </step-performance-view>
+  <!--  <div class="filter-bar-container">-->
+  <!--    <div>-->
+  <!--      <step-ts-filter-bar-->
+  <!--        *ngIf="context"-->
+  <!--        [context]="context"-->
+  <!--        (onFiltersChange)="handleFiltersChange($event)"-->
+  <!--      ></step-ts-filter-bar>-->
+  <!--    </div>-->
+  <!--    <div style="display: flex; align-items: center" [matMenuTriggerFor]="groupingMenu" #matTrigger="matMenuTrigger">-->
+  <!--      <button mat-button [matMenuTriggerFor]="groupingMenu">Grouping: {{ selectedGrouping.label }}</button>-->
+  <!--      <mat-menu #groupingMenu="matMenu">-->
+  <!--        <button-->
+  <!--          mat-menu-item-->
+  <!--          *ngFor="let grouping of groupingOptions"-->
+  <!--          (click)="selectedGrouping = grouping; emitGroupDimensions()"-->
+  <!--        >-->
+  <!--          {{ grouping.label }}-->
+  <!--        </button>-->
+  <!--        <div mat-menu-item [matMenuTriggerFor]="customGroupingMenu">Other</div>-->
+  <!--        <mat-menu #customGroupingMenu="matMenu">-->
+  <!--          <div (click)="$event.stopPropagation()" style="padding: 12px">-->
+  <!--            <mat-form-field class="w-100">-->
+  <!--              <input-->
+  <!--                type="text"-->
+  <!--                matInput-->
+  <!--                autocomplete="off"-->
+  <!--                placeholder="Fields (comma separated)"-->
+  <!--                [(ngModel)]="customGroupingString"-->
+  <!--              />-->
+  <!--            </mat-form-field>-->
+  <!--            <div>-->
+  <!--              <button mat-raised-button color="primary" class="w-100" (click)="applyCustomGrouping()">Apply</button>-->
+  <!--            </div>-->
+  <!--          </div>-->
+  <!--        </mat-menu>-->
+  <!--      </mat-menu>-->
+  <!--    </div>-->
+  <!--  </div>-->
+
+  <!--  <step-time-range-picker-->
+  <!--    #rangePicker-->
+  <!--    [customRelativeOptions]="timeRangeOptions"-->
+  <!--    (onSelectionChange)="onTimeRangeChange($event)"-->
+  <!--  >-->
+  <!--  </step-time-range-picker>-->
+
+  <!--  <step-performance-view-->
+  <!--    *ngIf="performanceViewSettings"-->
+  <!--    [context]="context"-->
+  <!--    [settings]="performanceViewSettings"-->
+  <!--    (onInitializationComplete)="onPerformanceViewInitComplete()"-->
+  <!--    (onUpdateComplete)="onPerformanceViewUpdateComplete()"-->
+  <!--  >-->
+  <!--  </step-performance-view>-->
 </ng-container>
 <div *ngIf="executionHasToBeBuilt" class="info-container">
   <div class="content">

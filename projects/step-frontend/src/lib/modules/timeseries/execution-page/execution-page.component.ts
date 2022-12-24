@@ -13,7 +13,7 @@ import { TimeSeriesService } from '../time-series.service';
 import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
-import { forkJoin, Observable, of, Subject, Subscription, switchMap, takeUntil, tap, timer } from 'rxjs';
+import { forkJoin, map, Observable, of, Subject, Subscription, switchMap, takeUntil, tap, timer } from 'rxjs';
 import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
 import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
 import { TSTimeRange } from '../chart/model/ts-time-range';
@@ -22,6 +22,8 @@ import { TimeSeriesUtils } from '../time-series-utils';
 import { TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
 import { TimeSeriesConfig } from '../time-series.config';
 import { MatMenuTrigger } from '@angular/material/menu';
+import { TimeSeriesDashboardSettings } from '../dashboard/model/ts-dashboard-settings';
+import { TimeSeriesDashboardComponent } from '../dashboard/time-series-dashboard.component';
 
 @Component({
   selector: 'step-execution-performance',
@@ -33,6 +35,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   terminator$ = new Subject<void>();
 
+  @ViewChild('dashboard') dashboard!: TimeSeriesDashboardComponent;
   @ViewChild('matTrigger') matTrigger!: MatMenuTrigger;
   @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
 
@@ -52,6 +55,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   migrationInProgress = false;
 
   updateSubscription = new Subscription();
+
+  dashboardSettings: TimeSeriesDashboardSettings | undefined;
 
   // this is just for running executions
   refreshIntervals: RefreshInterval[] = [
@@ -114,9 +119,10 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
-    this.timeRangeSelection = selection;
-    this.updateSubscription?.unsubscribe();
-    this.triggerNextUpdate(0, of(null), true, true, true);
+    // this.timeRangeSelection = selection;
+    // this.updateSubscription?.unsubscribe();
+    // this.triggerNextUpdate(0, of(null), true, true, true);
+    this.dashboard.updateRange(selection);
   }
 
   onPerformanceViewInitComplete() {
@@ -133,21 +139,27 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       this.execution = execution;
       const startTime = execution.startTime!;
       const endTime = execution.endTime ? execution.endTime : new Date().getTime();
-      this.context = this.contextFactory.createContext(execution.id!, { from: startTime, to: endTime });
-      this.subscribeForFiltersChange();
+      // this.context = this.contextFactory.createContext(execution.id!, { from: startTime, to: endTime });
+      // this.subscribeForFiltersChange();
       if (!execution.endTime) {
         this.executionInProgress = true;
       }
 
-      this.performanceViewSettings = {
+      this.dashboardSettings = {
         contextId: this.executionId,
+        includeThreadGroupChart: true,
         timeRange: { from: startTime, to: endTime },
         contextualFilters: { eId: this.executionId },
-        includeThreadGroupChart: true,
       };
-      if (this.executionInProgress) {
-        this.triggerNextUpdate(this.selectedRefreshInterval.value, this.dashboardInitComplete$);
-      }
+      // this.performanceViewSettings = {
+      //   contextId: this.executionId,
+      //   timeRange: { from: startTime, to: endTime },
+      //   contextualFilters: { eId: this.executionId },
+      //   includeThreadGroupChart: true,
+      // };
+      // if (this.executionInProgress) {
+      //   this.triggerNextUpdate(this.selectedRefreshInterval.value, this.dashboardInitComplete$);
+      // }
     });
   }
 
@@ -248,25 +260,25 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
             ? newFullRange
             : TimeSeriesUtils.cropInterval(newFullRange, oldSelection) || newFullRange;
 
-        let updateDashboard$ = this.performanceView.updateDashboard({
-          updateRanger: true,
-          updateCharts: forceUpdate || JSON.stringify(newSelection) !== JSON.stringify(oldSelection),
-          fullTimeRange: newFullRange,
-          selection: newSelection,
-          showLoadingBar: showLoadingBar,
-        });
-        if (details.endTime) {
-          this.intervalShouldBeCanceled = true;
-          this.executionInProgress = false;
-          updateDashboard$.subscribe();
-        } else {
-          // the execution is not done yet
-          if (this.selectedRefreshInterval.value) {
-            this.triggerNextUpdate(this.selectedRefreshInterval.value, updateDashboard$); // recursive call
-          } else {
-            updateDashboard$.subscribe();
-          }
-        }
+        // let updateDashboard$ = this.performanceView.updateDashboard({
+        //   updateRanger: true,
+        //   updateCharts: forceUpdate || JSON.stringify(newSelection) !== JSON.stringify(oldSelection),
+        //   fullTimeRange: newFullRange,
+        //   selection: newSelection,
+        //   showLoadingBar: showLoadingBar,
+        // });
+        // if (details.endTime) {
+        //   this.intervalShouldBeCanceled = true;
+        //   this.executionInProgress = false;
+        //   updateDashboard$.subscribe();
+        // } else {
+        //   // the execution is not done yet
+        //   if (this.selectedRefreshInterval.value) {
+        //     this.triggerNextUpdate(this.selectedRefreshInterval.value, updateDashboard$); // recursive call
+        //   } else {
+        //     updateDashboard$.subscribe();
+        //   }
+        // }
       });
   }
 

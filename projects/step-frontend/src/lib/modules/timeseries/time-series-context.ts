@@ -17,6 +17,8 @@ export class TimeSeriesContext {
   executionId!: string;
   activeExecution: Execution | undefined;
 
+  inProgress$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
   private fullTimeRange: TSTimeRange; // this represents the entire time-series interval. usually this is displayed entirely in the time-ranger
   private readonly fullTimeRangeChange$: Subject<TSTimeRange> = new Subject<TSTimeRange>();
   private selectedTimeRange: TSTimeRange; // this is the zooming selection.
@@ -40,6 +42,14 @@ export class TimeSeriesContext {
     this.selectedTimeRange = timeRange;
     this.colorsPool = new TimeseriesColorsPool();
     this.keywordsContext = new TimeSeriesKeywordsContext(this.colorsPool);
+  }
+
+  setInProgress(inProgress: boolean) {
+    this.inProgress$.next(inProgress);
+  }
+
+  inProgressChange() {
+    return this.inProgress$.asObservable();
   }
 
   onActiveFilterChange(): Observable<TsFilterItem[]> {

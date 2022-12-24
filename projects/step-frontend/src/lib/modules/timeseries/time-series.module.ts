@@ -20,6 +20,8 @@ import { MeasurementsFilterPipe } from './performance-view/measurements/measurem
 import { FilterBarComponent } from './performance-view/filter-bar/filter-bar.component';
 import { FilterBarItemComponent } from './performance-view/filter-bar/item/filter-bar-item.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { TimeSeriesDashboardComponent } from './dashboard/time-series-dashboard.component';
+import { TsGroupingComponent } from './dashboard/grouping/ts-grouping.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +40,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     MeasurementsFilterPipe,
     FilterBarComponent,
     FilterBarItemComponent,
+    TimeSeriesDashboardComponent,
+    TsGroupingComponent,
   ],
   exports: [PerformanceViewComponent],
   imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule, MatDatepickerModule],

@@ -1,0 +1,15 @@
+<div>
+  <div class="filter-bar-container">
+    <div>
+      <step-ts-filter-bar
+        *ngIf="context"
+        [context]="context"
+        (onFiltersChange)="handleFiltersChange($event)"
+      ></step-ts-filter-bar>
+    </div>
+    <step-timeseries-grouping (onGroupingChange)="handleGroupingChange($event)"></step-timeseries-grouping>
+  </div>
+
+  <step-performance-view *ngIf="performanceViewSettings" [context]="context" [settings]="performanceViewSettings">
+  </step-performance-view>
+</div>

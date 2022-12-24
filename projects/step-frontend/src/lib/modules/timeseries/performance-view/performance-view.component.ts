@@ -185,11 +185,12 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.findRequestBuilder.withRange(range);
   }
 
+  /**
+   * This method will use the most recent context settings (like range, selection, filters, grouping)
+   * @param request
+   */
   updateDashboard(request: UpdatePerformanceViewRequest): Observable<any> {
     // let's assume the complete interval and selections are set.
-    this.context.updateFullRange(request.fullTimeRange, false);
-    this.context.updateSelectedRange(request.selection, false);
-    console.log(request);
     let updates$ = [];
     if (request.showLoadingBar) {
       this.chartsAreLoading = true;
@@ -200,7 +201,11 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     if (request.updateCharts) {
       updates$.push(this.refreshAllCharts());
     }
-    return forkJoin(updates$).pipe(tap(() => (this.chartsAreLoading = false)));
+    return forkJoin(updates$).pipe(
+      tap(() => {
+        this.chartsAreLoading = false;
+      })
+    );
   }
 
   handleZoomChange(range: TSTimeRange): Observable<any> {

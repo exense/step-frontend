@@ -14,6 +14,9 @@ export class TimeSeriesContextsFactory {
   private executionsContexts: { [key: string]: TimeSeriesContext } = {};
 
   createContext(id: string, fullTimeRange: TSTimeRange) {
+    if (this.executionsContexts[id]) {
+      throw new Error('Execution already exists for id: ' + id);
+    }
     let context = new TimeSeriesContext(id, fullTimeRange);
     this.executionsContexts[id] = context;
     return context;
