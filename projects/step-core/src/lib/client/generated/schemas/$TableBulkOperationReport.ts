@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $BulkOperationReport = {
+export const $TableBulkOperationReport = {
   properties: {
     count: {
       type: 'number',

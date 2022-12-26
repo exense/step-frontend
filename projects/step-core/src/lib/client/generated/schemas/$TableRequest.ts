@@ -9,6 +9,9 @@ export const $TableRequest = {
         type: 'TableFilter',
       },
     },
+    tableParameters: {
+      type: 'TableParameters',
+    },
     skip: {
       type: 'number',
       format: 'int32',
@@ -19,9 +22,6 @@ export const $TableRequest = {
     },
     sort: {
       type: 'Sort',
-    },
-    tableParameters: {
-      type: 'TableParameters',
     },
   },
 } as const;

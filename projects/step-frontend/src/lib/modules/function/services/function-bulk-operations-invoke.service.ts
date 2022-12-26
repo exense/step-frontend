@@ -3,7 +3,7 @@ import {
   AsyncOperationService,
   AsyncTaskStatus,
   AugmentedKeywordsService,
-  BulkOperationParameters,
+  TableBulkOperationRequest,
   BulkOperationsInvokeService,
 } from '@exense/step-core';
 import { Observable } from 'rxjs';
@@ -14,11 +14,11 @@ export class FunctionBulkOperationsInvokeService extends BulkOperationsInvokeSer
     super(_asyncOperationService);
   }
 
-  protected override invokeDelete(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatus> {
+  protected override invokeDelete(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus> {
     return this._api.deleteFunctions(requestBody);
   }
 
-  protected override invokeDuplicate(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatus> {
+  protected override invokeDuplicate(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus> {
     return this._api.cloneFunctions(requestBody);
   }
 
