@@ -5,10 +5,10 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import type { AbstractArtefact } from '../models/AbstractArtefact';
-import type { AsyncTaskStatusBulkOperationReport } from '../models/AsyncTaskStatusBulkOperationReport';
-import type { BulkOperationParameters } from '../models/BulkOperationParameters';
+import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTaskStatusTableBulkOperationReport';
 import type { Plan } from '../models/Plan';
 import type { PlanCompilationResult } from '../models/PlanCompilationResult';
+import type { TableBulkOperationRequest } from '../models/TableBulkOperationRequest';
 import type { TableRequest } from '../models/TableRequest';
 import type { TableResponsePlan } from '../models/TableResponsePlan';
 
@@ -21,10 +21,10 @@ export class PlansService {
   /**
    * Deletes the entities according to the provided parameters
    * @param requestBody
-   * @returns AsyncTaskStatusBulkOperationReport default response
+   * @returns AsyncTaskStatusTableBulkOperationReport default response
    * @throws ApiError
    */
-  public deletePlans(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusBulkOperationReport> {
+  public deletePlans(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/plans/bulk/delete',
@@ -82,10 +82,10 @@ export class PlansService {
   /**
    * Clones the entities according to the provided parameters
    * @param requestBody
-   * @returns AsyncTaskStatusBulkOperationReport default response
+   * @returns AsyncTaskStatusTableBulkOperationReport default response
    * @throws ApiError
    */
-  public clonePlans(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusBulkOperationReport> {
+  public clonePlans(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/plans/bulk/clone',

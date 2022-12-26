@@ -2,13 +2,13 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { BulkOperationReport } from './BulkOperationReport';
+import type { TableBulkOperationReport } from './TableBulkOperationReport';
 
-export type AsyncTaskStatusBulkOperationReport = {
+export type AsyncTaskStatusTableBulkOperationReport = {
   id?: string;
   ready?: boolean;
   progress?: number;
   warnings?: Array<string>;
   error?: string;
-  result?: BulkOperationReport;
+  result?: TableBulkOperationReport;
 };

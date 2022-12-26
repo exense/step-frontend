@@ -1,8 +1,17 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $BulkOperationParameters = {
+export const $TableBulkOperationRequest = {
   properties: {
+    filters: {
+      type: 'array',
+      contains: {
+        type: 'TableFilter',
+      },
+    },
+    tableParameters: {
+      type: 'TableParameters',
+    },
     preview: {
       type: 'boolean',
     },
@@ -13,12 +22,6 @@ export const $BulkOperationParameters = {
       type: 'array',
       contains: {
         type: 'string',
-      },
-    },
-    filters: {
-      type: 'array',
-      contains: {
-        type: 'TableFilter',
       },
     },
   },

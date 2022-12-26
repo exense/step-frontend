@@ -2,6 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type BulkOperationReport = {
+export type TableBulkOperationReport = {
   count?: number;
 };

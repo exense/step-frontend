@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {
   AsyncOperationService,
   AsyncTaskStatus,
-  BulkOperationParameters,
+  TableBulkOperationRequest,
   BulkOperationsInvokeService,
   PlansService,
 } from '@exense/step-core';
@@ -14,10 +14,10 @@ export class PlansBulkOperationsInvokeService extends BulkOperationsInvokeServic
     super(_asyncService);
   }
 
-  protected override invokeDelete(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatus> {
+  protected override invokeDelete(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus> {
     return this._plans.deletePlans(requestBody);
   }
-  protected override invokeDuplicate(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatus> {
+  protected override invokeDuplicate(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus> {
     return this._plans.clonePlans(requestBody);
   }
 
