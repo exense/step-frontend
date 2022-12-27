@@ -7,8 +7,15 @@ import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { UpgradeModule } from '@angular/upgrade/static';
 import { AngularSplitModule } from 'angular-split';
 import { StepGeneratedClientModule } from './client/generated';
+import { DynamicTextfieldComponent } from './components/dynamic-textfield/dynamic-textfield.component';
+import { ExpressionInputComponent } from './components/expression-input/expression-input.component';
+import { FunctionLinkComponent } from './components/function-link/function-link.component';
+import { IsUsedByListComponent } from './components/is-used-by-list/is-used-by-list.component';
+import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
+import { ModalWindowComponent } from './components/modal-window/modal-window.component';
 import { PlanLinkComponent } from './components/plan-link/plan-link.component';
 import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
+import { SelectPlanComponent } from './components/select-plan/select-plan.component';
 import { CORE_INITIALIZER } from './core-initialiser';
 import { CapsLockDirective } from './directives/caps-lock.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
@@ -35,6 +42,13 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     ReportNodeStatusComponent,
     PlanLinkComponent,
     PlanNamePipe,
+    ModalWindowComponent,
+    IsUsedByListComponent,
+    IsUsedByModalComponent,
+    FunctionLinkComponent,
+    ExpressionInputComponent,
+    DynamicTextfieldComponent,
+    SelectPlanComponent,
   ],
   imports: [
     CommonModule,
@@ -77,6 +91,10 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     ReportNodeStatusComponent,
     PlanLinkComponent,
     PlanNamePipe,
+    ModalWindowComponent,
+    IsUsedByModalComponent,
+    DynamicTextfieldComponent,
+    SelectPlanComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -110,8 +128,15 @@ export { OpenAPI } from './client/generated/core/OpenAPI';
 export type { OpenAPIConfig } from './client/generated/core/OpenAPI';
 export * from './client/generated/index';
 export * from './client/step-client-module';
+export { DynamicTextfieldComponent } from './components/dynamic-textfield/dynamic-textfield.component';
+export { ExpressionInputComponent } from './components/expression-input/expression-input.component';
+export { FunctionLinkDialogService } from './components/function-link/function-link-dialog.service';
+export { FunctionLinkComponent } from './components/function-link/function-link.component';
+export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
+export { ModalWindowComponent } from './components/modal-window/modal-window.component';
 export { PlanLinkComponent } from './components/plan-link/plan-link.component';
 export * from './components/report-node-status/report-node-status.component';
+export { SelectPlanComponent } from './components/select-plan/select-plan.component';
 export * from './decorators/plugin';
 export * from './directives/caps-lock.directive';
 export * from './directives/tooltip-immediate-close.directive';
@@ -134,8 +159,12 @@ export * from './services/additional-right-rule.service';
 export * from './services/context.service';
 export * from './services/dashboard.service';
 export * from './services/deferred-link-processor.service';
+export { ExportDialogsService } from './services/export-dialogs.service';
+export { ImportDialogsService } from './services/import-dialogs.service';
 export * from './services/invoke-run.service';
+export { IsUsedByDialogService } from './services/is-used-by-dialog.service';
 export * from './services/link-processor.service';
+export { PlanDialogsService } from './services/plan-dialogs.service';
 export * from './services/plugin-info-registry.service';
 export * from './services/report-node-commons.service';
 export * from './services/scheduled-task-dialogs.service';

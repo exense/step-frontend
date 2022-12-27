@@ -1,0 +1,46 @@
+<step-expression-input
+  *ngIf="dynamic; else constantValueTemplate"
+  [label]="label"
+  [tooltip]="tooltip"
+  [isParentInvalid]="!!_ngControl.invalid"
+  [showRequiredAsterisk]="showRequiredAsterisk"
+  [ngModel]="expression"
+  (ngModelChange)="onExpressionChange($event)"
+  (toggleConstantValue)="toggleDynamicExpression(false)"
+></step-expression-input>
+
+<ng-template #constantValueTemplate>
+  <mat-form-field floatLabel="always" [class.mat-form-field-invalid]="!!_ngControl.invalid">
+    <mat-label *ngIf="label">{{ label }}</mat-label>
+    <input
+      type="text"
+      matInput
+      [required]="showRequiredAsterisk"
+      [ngModel]="value"
+      (ngModelChange)="onValueChange($event)"
+      (blur)="onBlur()"
+    />
+  </mat-form-field>
+
+  <div *ngIf="tooltip" class="help">
+    <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below"></step-icon>
+  </div>
+
+  <div class="actions">
+    <button type="button" mat-stroked-button (click)="editConstantValue()">
+      <step-icon name="edit-2"></step-icon>
+    </button>
+
+    <div class="separator"></div>
+
+    <button
+      type="button"
+      mat-stroked-button
+      matTooltip="Use a dynamic expression to set this attribute"
+      matTooltipPosition="below"
+      (click)="toggleDynamicExpression(true)"
+    >
+      <step-icon name="zap"></step-icon>
+    </button>
+  </div>
+</ng-template>

@@ -1,3 +1,4 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import {
   a1Promise2Observable,
@@ -5,14 +6,13 @@ import {
   AJS_LOCATION,
   AugmentedKeywordsService,
   DialogsService,
+  ExportDialogsService,
+  ImportDialogsService,
+  IsUsedByDialogService,
   UibModalHelperService,
 } from '@exense/step-core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { catchError, map, of, switchMap, tap, Observable } from 'rxjs';
 import { ILocationService } from 'angular';
-import { ExportDialogsService } from '../../_common/services/export-dialogs.service';
-import { ImportDialogsService } from '../../_common/services/import-dialogs.service';
-import { IsUsedByDialogService } from '../../_common/services/is-used-by-dialog.service';
+import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
