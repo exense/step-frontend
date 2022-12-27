@@ -10,12 +10,12 @@ import {
 } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { AbstractArtefact } from '../../../../client/generated';
-import { TreeAction } from '../../shared/tree-action';
-import { ArtefactFlatNode } from '../../shared/artefact-flat-node';
-import { TreeStateService } from '../../services/tree-state.service';
 import { TreeActionsService } from '../../services/tree-actions.service';
-import { TreeNode } from '../../shared/tree-node';
 import { TreeDragDropService } from '../../services/tree-drag-drop.service';
+import { TreeStateService } from '../../services/tree-state.service';
+import { ArtefactFlatNode } from '../../shared/artefact-flat-node';
+import { TreeAction } from '../../shared/tree-action';
+import { TreeNode } from '../../shared/tree-node';
 
 @Component({
   selector: 'step-tree',
@@ -24,7 +24,8 @@ import { TreeDragDropService } from '../../services/tree-drag-drop.service';
   providers: [TreeDragDropService],
 })
 export class TreeComponent {
-  readonly paddingIdent = 15;
+  readonly paddingIdent = 24;
+  readonly paddingMultiplier = 8;
 
   readonly trackByAction: TrackByFunction<TreeAction> = (index, item) => item.id;
 

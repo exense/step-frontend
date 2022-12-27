@@ -9,4 +9,8 @@ step-execution-tree {
   step-icon {
     background: transparent !important;
   }
+
+  step-tree {
+    --active-node-color: #5cb85c;
+  }
 }

@@ -1,5 +1,19 @@
 cdk-tree-node {
   display: flex;
+  position: relative;
+
+  .node-line {
+    position: absolute;
+    top: 0;
+    left: calc(var(--level) * 24px + var(--level) * 8px + 11px);
+    background: #f2f4f7;
+    width: 1px;
+    height: 100%;
+  }
+
+  step-tree-node {
+    flex: 1;
+  }
 }
 
 .node-context-menu-trigger {

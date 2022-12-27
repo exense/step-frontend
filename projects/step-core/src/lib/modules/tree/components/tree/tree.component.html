@@ -4,13 +4,16 @@
       *cdkTreeNodeDef="let node"
       cdkTreeNodePadding
       [cdkTreeNodePaddingIndent]="paddingIdent"
+      [class.cdk-tree-node-selected]="node.id | isNodeSelected | async"
       cdkDropList
       cdkDropListSortingDisabled="true"
       [cdkDropListData]="node.id"
       (cdkDropListDropped)="_treeDragDrop.handleDrop()"
       (click)="_treeState.selectNode(node, $event)"
     >
+      <div *ngFor="let level of node.level | arrayOfSize" [style.--level]="level" class="node-line"></div>
       <step-tree-node
+        [style.padding-left.px]="node.level * paddingMultiplier"
         [node]="node"
         [canToggle]="false"
         [treeContainer]="_treeContainer"
@@ -25,6 +28,7 @@
       *cdkTreeNodeDef="let node; when: hasChild"
       cdkTreeNodePadding
       [cdkTreeNodePaddingIndent]="paddingIdent"
+      [class.cdk-tree-node-selected]="node.id | isNodeSelected | async"
       [class.expanded]="_treeState.treeControl.isExpanded(node)"
       cdkDropList
       cdkDropListSortingDisabled="true"
@@ -32,7 +36,9 @@
       [cdkDropListData]="node.id"
       (click)="_treeState.selectNode(node, $event)"
     >
+      <div *ngFor="let level of node.level | arrayOfSize" [style.--level]="level" class="node-line"></div>
       <step-tree-node
+        [style.padding-left.px]="node.level * paddingMultiplier"
         [node]="node"
         [canToggle]="true"
         [treeContainer]="_treeContainer"

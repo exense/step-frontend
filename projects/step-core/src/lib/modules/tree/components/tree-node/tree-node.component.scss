@@ -3,27 +3,54 @@
 .tree-node {
   display: flex;
   align-items: center;
+  gap: 8px;
   user-select: none;
 
   .node-content {
-    padding: 2px 4px 2px 1px;
-    cursor: pointer;
+    padding: 8px 0;
+    flex: 1;
     display: flex;
     align-items: center;
+    gap: 8px;
+    cursor: pointer;
 
-    step-icon {
-      margin-right: 6px;
+    .node-icon {
+      background: #f2f4f7;
+      border-radius: 50%;
+      padding: 6px;
+      border: 1px solid transparent;
+
+      step-icon {
+        width: 10px;
+        height: 10px;
+        min-width: 10px;
+        min-height: 10px;
+        display: flex;
+      }
     }
   }
 
   .mat-icon-button {
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    step-icon {
+      width: 12px;
+      height: 12px;
+      min-width: 12px;
+      min-height: 12px;
+      display: flex;
+      margin-top: 0;
+    }
   }
 
-  &.tree-node-selected .node-content {
-    background: var.$light-blue;
+  &.tree-node-selected .node-content .node-icon {
+    background: white;
+    border: 1px solid var(--active-node-color);
+    color: var(--active-node-color);
   }
 
   &.skipped {

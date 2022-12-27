@@ -3,3 +3,7 @@
 :host {
   @include core.full-height-block;
 }
+
+step-tree {
+  --active-node-color: #0082cb;
+}
