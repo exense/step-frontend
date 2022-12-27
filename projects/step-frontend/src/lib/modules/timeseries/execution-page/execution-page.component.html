@@ -1,19 +1,20 @@
 <ng-container *ngIf="!executionHasToBeBuilt">
+  <div *ngIf="executionInProgress">
+    <button style="margin-right: 8px" mat-raised-button [matMenuTriggerFor]="refreshMenu">
+      Refresh ({{ selectedRefreshInterval.label }})
+    </button>
+    <mat-menu #refreshMenu="matMenu">
+      <button mat-menu-item *ngFor="let interval of refreshIntervals" (click)="changeRefreshInterval(interval)">
+        {{ interval.label }}
+      </button>
+    </mat-menu>
+  </div>
+
   <step-time-range-picker [customRelativeOptions]="timeRangeOptions" (onSelectionChange)="onTimeRangeChange($event)">
   </step-time-range-picker>
   <step-timeseries-dashboard #dashboard *ngIf="dashboardSettings" [settings]="dashboardSettings">
   </step-timeseries-dashboard>
   <!--  <div class="right-section-buttons">-->
-  <!--    <div *ngIf="executionInProgress">-->
-  <!--      <button style="margin-right: 8px" mat-raised-button [matMenuTriggerFor]="refreshMenu">-->
-  <!--        Refresh ({{ selectedRefreshInterval.label }})-->
-  <!--      </button>-->
-  <!--      <mat-menu #refreshMenu="matMenu">-->
-  <!--        <button mat-menu-item *ngFor="let interval of refreshIntervals" (click)="changeRefreshInterval(interval)">-->
-  <!--          {{ interval.label }}-->
-  <!--        </button>-->
-  <!--      </mat-menu>-->
-  <!--    </div>-->
   <!--    <button mat-raised-button (click)="navigateToRtmDashboard()">Interactive Session</button>-->
   <!--  </div>-->
 

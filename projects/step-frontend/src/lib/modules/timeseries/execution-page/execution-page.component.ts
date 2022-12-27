@@ -78,6 +78,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   customGroupingString = '';
   groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS;
   selectedGrouping = this.groupingOptions[0];
+  refreshInterval: any;
 
   constructor(
     private timeSeriesService: TimeSeriesService,
@@ -139,15 +140,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     this.dashboard.updateRange(range);
   }
 
-  onPerformanceViewInitComplete() {
-    this.dashboardInitComplete$.next();
-    this.dashboardInitComplete$.complete();
-  }
-
-  onPerformanceViewUpdateComplete() {
-    // this.dashboardInitComplete.next();
-  }
-
   init() {
     this.executionService.getExecutionById(this.executionId).subscribe((execution) => {
       this.execution = execution;
@@ -165,26 +157,41 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         timeRange: { from: startTime, to: endTime },
         contextualFilters: { eId: this.executionId },
       };
-      // this.performanceViewSettings = {
-      //   contextId: this.executionId,
-      //   timeRange: { from: startTime, to: endTime },
-      //   contextualFilters: { eId: this.executionId },
-      //   includeThreadGroupChart: true,
-      // };
-      // if (this.executionInProgress) {
-      //   this.triggerNextUpdate(this.selectedRefreshInterval.value, this.dashboardInitComplete$);
-      // }
+      if (this.executionInProgress) {
+        this.startInterval();
+      }
     });
   }
 
-  subscribeForFiltersChange(): void {
-    // this.context
-    //   .onActiveFilterChange()
-    //   .pipe(takeUntil(this.terminator$))
-    //   .subscribe((filters) => {
-    //     this.updateSubscription?.unsubscribe();
-    //     this.triggerNextUpdate(0, of(null), true, true); // refresh immediately
-    //   });
+  startInterval() {
+    this.refreshInterval = setInterval(() => this.triggerRefresh(), this.selectedRefreshInterval.value);
+  }
+
+  triggerRefresh() {
+    let now = new Date().getTime();
+    let details = this.execution!;
+    let isFullRangeSelected = this.context.isFullRangeSelected();
+    let oldSelection = this.context.getSelectedTimeRange();
+    let newFullRange: TSTimeRange;
+    switch (this.timeRangeSelection.type) {
+      case RangeSelectionType.FULL:
+        newFullRange = { from: details.startTime!, to: details.endTime || now - 5000 };
+        break;
+      case RangeSelectionType.ABSOLUTE:
+        newFullRange = this.timeRangeSelection.absoluteSelection!;
+        break;
+      case RangeSelectionType.RELATIVE:
+        let end = details.endTime || now;
+        newFullRange = { from: end - this.timeRangeSelection.relativeSelection!.timeInMs!, to: end };
+        break;
+    }
+    // when the selection is 0, it will switch to full selection automatically
+    let newSelection = isFullRangeSelected
+      ? newFullRange
+      : TimeSeriesUtils.cropInterval(newFullRange, oldSelection) || newFullRange;
+
+    this.performanceView.updateFullRange(newFullRange, newSelection);
+    this.dashboard.refresh(newFullRange, newSelection);
   }
 
   rebuildTimeSeries() {
@@ -215,10 +222,11 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       return;
     }
     // this.updatingSubscription.unsubscribe();
-    this.terminator$.next();
+    // this.terminator$.next();
+    clearInterval(this.refreshInterval);
     if (newInterval.value) {
       let delay = oldInterval.value === 0 ? 0 : newInterval.value;
-      this.triggerNextUpdate(delay, of(undefined));
+      this.startInterval();
     }
   }
 
@@ -274,13 +282,16 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
             ? newFullRange
             : TimeSeriesUtils.cropInterval(newFullRange, oldSelection) || newFullRange;
 
-        // let updateDashboard$ = this.performanceView.updateDashboard({
-        //   updateRanger: true,
-        //   updateCharts: forceUpdate || JSON.stringify(newSelection) !== JSON.stringify(oldSelection),
-        //   fullTimeRange: newFullRange,
-        //   selection: newSelection,
-        //   showLoadingBar: showLoadingBar,
-        // });
+        this.performanceView.updateFullRange(newFullRange, newSelection);
+        this.updateSubscription = this.performanceView
+          .updateDashboard({
+            updateRanger: true,
+            updateCharts: forceUpdate || JSON.stringify(newSelection) !== JSON.stringify(oldSelection),
+            showLoadingBar: showLoadingBar,
+          })
+          .subscribe();
+        this.dashboard.refresh(newFullRange, newSelection);
+
         // if (details.endTime) {
         //   this.intervalShouldBeCanceled = true;
         //   this.executionInProgress = false;

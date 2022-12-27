@@ -174,13 +174,16 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   /**
    * This method will reconstruct all charts.
-   * @param range
+   * @param fullRange
    */
-  updateFullRange(range: TSTimeRange): void {
-    this.context.updateFullRange(range, false);
-    this.timeSelectionComponent.updateFullTimeRange(range);
-    this.settings.timeRange = range;
-    this.findRequestBuilder.withRange(range);
+  updateFullRange(fullRange: TSTimeRange, selection?: TSTimeRange): void {
+    this.context.updateFullRange(fullRange, false);
+    this.timeSelectionComponent.updateFullTimeRange(fullRange);
+    this.settings.timeRange = fullRange;
+    this.findRequestBuilder.withRange(fullRange);
+    if (selection) {
+      this.context.updateSelectedRange(selection, false);
+    }
   }
 
   /**

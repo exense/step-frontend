@@ -99,7 +99,11 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, AfterVie
    * This method has to make sure that it doesn't overlap another running update
    * @param range
    */
-  refresh(range: TSTimeRange): void {
+  refresh(range: TSTimeRange, selection?: TSTimeRange): void {
+    this.context.updateFullRange(range, false);
+    if (selection) {
+      this.context.updateSelectedRange(selection, false);
+    }
     this.refreshTrigger$.next(true);
   }
 
