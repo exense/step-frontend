@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { TimeSeriesContext } from './time-series-context';
 import { TSTimeRange } from './chart/model/ts-time-range';
+import { TimeSeriesContextParams } from './time-series-context-params';
 
 /**
  * This is a singleton which handles all contexts for the execution tabs.
@@ -10,14 +11,14 @@ import { TSTimeRange } from './chart/model/ts-time-range';
   providedIn: 'root',
 })
 export class TimeSeriesContextsFactory {
-  // key is the executionId
   private executionsContexts: { [key: string]: TimeSeriesContext } = {};
 
-  createContext(id: string, fullTimeRange: TSTimeRange) {
+  createContext(params: TimeSeriesContextParams) {
+    const id = params.id;
     if (this.executionsContexts[id]) {
       throw new Error('Execution already exists for id: ' + id);
     }
-    let context = new TimeSeriesContext(id, fullTimeRange);
+    let context = new TimeSeriesContext(params);
     this.executionsContexts[id] = context;
     return context;
   }

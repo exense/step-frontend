@@ -164,13 +164,13 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   subscribeForFiltersChange(): void {
-    this.context
-      .onActiveFilterChange()
-      .pipe(takeUntil(this.terminator$))
-      .subscribe((filters) => {
-        this.updateSubscription?.unsubscribe();
-        this.triggerNextUpdate(0, of(null), true, true); // refresh immediately
-      });
+    // this.context
+    //   .onActiveFilterChange()
+    //   .pipe(takeUntil(this.terminator$))
+    //   .subscribe((filters) => {
+    //     this.updateSubscription?.unsubscribe();
+    //     this.triggerNextUpdate(0, of(null), true, true); // refresh immediately
+    //   });
   }
 
   rebuildTimeSeries() {

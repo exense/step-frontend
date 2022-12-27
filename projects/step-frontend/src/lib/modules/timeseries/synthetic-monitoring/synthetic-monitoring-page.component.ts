@@ -75,7 +75,9 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
       throw new Error('ExecutionId parameter is not present');
     }
     let range = this.calculateRange(this.timeRangeOptions[0]);
-    this.context = this.contextFactory.createContext(this.taskId, range);
+    // this.context = this.contextFactory.createContext(this.taskId, range);
+    //@ts-ignore
+    this.context = undefined!;
     this.performanceViewSettings = this.createViewSettings(range);
     this.subscribeForFiltersChange();
     if (this.refreshEnabled) {
@@ -85,7 +87,7 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
 
   subscribeForFiltersChange(): void {
     this.context
-      .onActiveFilterChange()
+      .onFiltersChange()
       .pipe(takeUntil(this.terminator$))
       .subscribe((filters) => {
         this.refreshSubscription?.unsubscribe();
@@ -176,8 +178,8 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
         let updateDashboard$ = this.performanceView.updateDashboard({
           updateRanger: true,
           updateCharts: forceUpdate || JSON.stringify(newSelection) !== JSON.stringify(oldSelection),
-          fullTimeRange: newFullRange,
-          selection: newSelection,
+          // fullTimeRange: newFullRange,
+          // selection: newSelection,
           showLoadingBar: showLoadingBar,
         });
         // the execution is not done yet

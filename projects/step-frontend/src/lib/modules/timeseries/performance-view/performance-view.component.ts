@@ -18,7 +18,6 @@ import { TimeSeriesChartResponse } from '../time-series-chart-response';
 import { PerformanceViewSettings } from './model/performance-view-settings';
 import { ChartGenerators } from './chart-generators/chart-generators';
 import { TsChartType } from './model/ts-chart-type';
-import { ExecutionFiltersComponent } from './filters/execution-filters.component';
 import { PerformanceViewTimeSelectionComponent } from './time-selection/performance-view-time-selection.component';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { ThroughputMetric } from './model/throughput-metric';
@@ -46,7 +45,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   // key: TsChartType. here we keep all chart settings (by TsChartType
   currentChartsSettings: { [key: string]: TSChartSettings } = {};
 
-  @ViewChild(ExecutionFiltersComponent) filtersComponent!: ExecutionFiltersComponent;
   @ViewChild('ranger') ranger!: TSRangerComponent;
   @ViewChild('throughputChart') throughputChart!: TimeSeriesChartComponent;
   @ViewChild('summaryChart') summaryChart!: TimeSeriesChartComponent;
@@ -157,19 +155,19 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     //     takeUntil(this.terminator$)
     //   )
     //   .subscribe();
-    this.context
-      .onGroupingChange()
-      .pipe(
-        tap((groupDimensions: string[]) => {
-          this.groupDimensions = groupDimensions;
-          // this.findRequest.oqlFilter = FilterUtils.filtersToOQL(this.context.getActiveFilter());
-        }),
-        tap(() => (this.chartsAreLoading = true)),
-        switchMap(() => this.refreshAllCharts()),
-        tap(() => (this.chartsAreLoading = false)),
-        takeUntil(this.terminator$)
-      )
-      .subscribe();
+    // this.context
+    //   .onGroupingChange()
+    //   .pipe(
+    //     tap((groupDimensions: string[]) => {
+    //       this.groupDimensions = groupDimensions;
+    //       // this.findRequest.oqlFilter = FilterUtils.filtersToOQL(this.context.getActiveFilter());
+    //     }),
+    //     tap(() => (this.chartsAreLoading = true)),
+    //     switchMap(() => this.refreshAllCharts()),
+    //     tap(() => (this.chartsAreLoading = false)),
+    //     takeUntil(this.terminator$)
+    //   )
+    //   .subscribe();
 
     this.createAllCharts();
   }
@@ -191,6 +189,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
    */
   updateDashboard(request: UpdatePerformanceViewRequest): Observable<any> {
     // let's assume the complete interval and selections are set.
+    this.context.setInProgress(true);
     let updates$ = [];
     if (request.showLoadingBar) {
       this.chartsAreLoading = true;
@@ -204,6 +203,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     return forkJoin(updates$).pipe(
       tap(() => {
         this.chartsAreLoading = false;
+        this.context.setInProgress(false);
       })
     );
   }
@@ -231,24 +231,14 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   prepareFindRequestBuilder(settings: PerformanceViewSettings, customFilters?: any): FindBucketsRequestBuilder {
-    const numberOfBuckets = TimeSeriesConfig.MAX_BUCKETS_IN_CHART;
-    // return {
-    //   start: settings.timeRange.from,
-    //   end: settings.timeRange.to,
-    //   numberOfBuckets: numberOfBuckets,
-    //   params: {
-    //     ...settings.contextualFilters,
-    //     [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_RESPONSE_TIME,
-    //     ...customFilters,
-    //   },
     return new FindBucketsRequestBuilder()
       .withRange(settings.timeRange)
       .withBaseFilters({
-        ...settings.contextualFilters,
-        ...customFilters,
+        ...this.context.getBaseFilters(),
+        // ...customFilters,
         [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_RESPONSE_TIME,
       })
-      .withCustomFilters(this.context.getActiveFilter())
+      .withCustomFilters(this.context.getDynamicFilters())
       .withNumberOfBuckets(TimeSeriesConfig.MAX_BUCKETS_IN_CHART);
   }
 

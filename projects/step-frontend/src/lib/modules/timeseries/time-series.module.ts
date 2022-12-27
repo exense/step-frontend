@@ -10,7 +10,6 @@ import { CommonModule } from '@angular/common';
 import { TimeseriesTableComponent } from './performance-view/table/timeseries-table.component';
 import { TimeRangePicker } from './time-selection/time-range-picker.component';
 import { ChartSkeletonComponent } from './chart/skeleton/chart-skeleton.component';
-import { ExecutionFiltersComponent } from './performance-view/filters/execution-filters.component';
 import { PerformanceViewComponent } from './performance-view/performance-view.component';
 import { ExecutionPageComponent } from './execution-page/execution-page.component';
 import { SyntheticMonitoringPageComponent } from './synthetic-monitoring/synthetic-monitoring-page.component';
@@ -33,7 +32,6 @@ import { TsGroupingComponent } from './dashboard/grouping/ts-grouping.component'
     TimeRangePicker,
     ChartSkeletonComponent,
     PerformanceViewTimeSelectionComponent,
-    ExecutionFiltersComponent,
     ExecutionPageComponent,
     SyntheticMonitoringPageComponent,
     MeasurementsPickerComponent,

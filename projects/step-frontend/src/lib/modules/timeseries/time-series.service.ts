@@ -13,7 +13,6 @@ export class TimeSeriesService {
   constructor(private http: HttpClient) {}
 
   fetchBuckets(request: FindBucketsRequest): Observable<TimeSeriesChartResponse> {
-    console.log(request);
     return this.http.post<TimeSeriesChartResponse>(`/rest/time-series/buckets`, request);
   }
 
