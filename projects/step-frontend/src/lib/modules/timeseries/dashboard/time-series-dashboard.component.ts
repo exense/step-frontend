@@ -106,12 +106,13 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, AfterVie
   /**
    * This is a force refresh (instantly triggered)
    */
-  updateRange(selection: TimeRangePickerSelection) {
-    this.timeRangeSelection = selection;
+  updateRange(range: TSTimeRange) {
+    // console.log(selection);
+    // this.timeRangeSelection = selection;
     this.updateSubscription?.unsubscribe(); // end current execution
     this.queuedSubscription.unsubscribe();
-    this.context.updateFullRange(selection.absoluteSelection!, false);
-    this.context.updateSelectedRange(selection.absoluteSelection!, false);
+    this.context.updateFullRange(range, false);
+    this.context.updateSelectedRange(range, false);
     this.updateSubscription = this.performanceView
       .updateDashboard({
         updateRanger: true,

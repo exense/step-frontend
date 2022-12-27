@@ -13,7 +13,7 @@ import { TimeSeriesService } from '../time-series.service';
 import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
-import { forkJoin, map, Observable, of, Subject, Subscription, switchMap, takeUntil, tap, timer } from 'rxjs';
+import { forkJoin, Observable, of, Subject, Subscription, switchMap, takeUntil, timer } from 'rxjs';
 import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
 import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
 import { TSTimeRange } from '../chart/model/ts-time-range';
@@ -122,7 +122,21 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     // this.timeRangeSelection = selection;
     // this.updateSubscription?.unsubscribe();
     // this.triggerNextUpdate(0, of(null), true, true, true);
-    this.dashboard.updateRange(selection);
+    let start = this.execution!.startTime!;
+    const end = this.execution!.endTime! || new Date().getTime();
+    let range: TSTimeRange = { from: 0, to: 0 };
+    switch (selection.type) {
+      case RangeSelectionType.FULL:
+        range = { from: start, to: end };
+        break;
+      case RangeSelectionType.ABSOLUTE:
+        range = selection.absoluteSelection!;
+        break;
+      case RangeSelectionType.RELATIVE:
+        range = { from: end - selection.relativeSelection!.timeInMs, to: end };
+        break;
+    }
+    this.dashboard.updateRange(range);
   }
 
   onPerformanceViewInitComplete() {
