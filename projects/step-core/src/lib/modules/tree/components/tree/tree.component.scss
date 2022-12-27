@@ -5,9 +5,10 @@ cdk-tree-node {
   .node-line {
     position: absolute;
     top: 0;
+    // level * paddingIdent + level * paddingMultiplier + (24px - 2px) / 2
     left: calc(var(--level) * 24px + var(--level) * 8px + 11px);
     background: #f2f4f7;
-    width: 1px;
+    width: 2px;
     height: 100%;
   }
 
