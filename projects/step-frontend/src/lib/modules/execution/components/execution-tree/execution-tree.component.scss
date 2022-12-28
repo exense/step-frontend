@@ -1,4 +1,5 @@
 @use 'projects/step-core/styles/core-mixins' as core;
+@use 'projects/step-core/styles/core-variables' as var;
 
 step-execution-tree {
   display: block;
@@ -6,7 +7,10 @@ step-execution-tree {
   max-height: 60vh;
 
   @include core.reportNodeStatuses;
+
   step-icon {
     background: transparent !important;
   }
+
+  @include core.tree-node-selection(map-get(var.$statuses, 'PASSED'));
 }
