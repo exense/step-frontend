@@ -1,8 +1,9 @@
-import { Component, Optional, Input } from '@angular/core';
-import { CustomColumnOptions, CustomComponent } from '@exense/step-core';
-import { Function as KeywordFunction } from '@exense/step-core';
-import { FunctionLinkDialogService } from './function-link-dialog.service';
+import { Component, Input, Optional } from '@angular/core';
 import { map, of } from 'rxjs';
+import { Function as KeywordFunction } from '../../client/step-client-module';
+import { CustomComponent } from '../../modules/custom-registeries/custom-registries.module';
+import { CustomColumnOptions } from '../../modules/table/table.module';
+import { FunctionLinkDialogService } from './function-link-dialog.service';
 
 @Component({
   selector: 'step-function-link',

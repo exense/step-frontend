@@ -27,12 +27,12 @@ import {
   Function as KeywordCall,
   TreeNodeUtilsService,
   AugmentedScreenService,
+  ExportDialogsService,
 } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PlanHistoryService } from '../../services/plan-history.service';
 import { catchError, filter, from, map, merge, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { PlanHandleService } from '../../services/plan-handle.service';
-import { ExportDialogsService } from '../../../_common/services/export-dialogs.service';
 import { ILocationService } from 'angular';
 import { InteractiveSessionService } from '../../services/interactive-session.service';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
