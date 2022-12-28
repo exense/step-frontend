@@ -8,7 +8,7 @@ import { PluginInfoRegistryService } from '@exense/step-core';
 const OVERRIDE_PLUGINS = new Map<string, string>();
 
 // Ignore original multitenancy since it's become part of enterprise core
-const IGNORE_PLUGINS: ReadonlyArray<string> = ['multitenancy', 'monitoringdashboard'];
+const IGNORE_PLUGINS: ReadonlyArray<string> = ['multitenancy', 'monitoringdashboard', 'dualPlanEditor'];
 
 // For testing purposes only
 // Allows to add plugins, that don't returned from BE
@@ -87,6 +87,7 @@ const loadPlugins = (compiler: Compiler, injector: Injector, registry: PluginInf
     });
 
     microfrontend = microfrontend.filter((m) => !IGNORE_PLUGINS.includes(m.name));
+    console.log(microfrontend);
 
     await Promise.all([
       registerLegacyPlugins(legacy),
