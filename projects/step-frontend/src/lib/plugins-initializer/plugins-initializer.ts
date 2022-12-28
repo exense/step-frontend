@@ -87,7 +87,6 @@ const loadPlugins = (compiler: Compiler, injector: Injector, registry: PluginInf
     });
 
     microfrontend = microfrontend.filter((m) => !IGNORE_PLUGINS.includes(m.name));
-    console.log(microfrontend);
 
     await Promise.all([
       registerLegacyPlugins(legacy),
