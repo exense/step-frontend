@@ -6,6 +6,8 @@
 @use 'step-icon';
 @use 'step-inputs';
 @use 'step-login';
+@use 'step-dialogs';
+@use 'step-buttons';
 
 @forward 'step-sidebar' show step-define-sidebar-config;
 @forward 'step-header' show step-define-header-config;
@@ -135,6 +137,9 @@ $light-primary-text: white;
 
   @include step-login.login-page($step-login-config, $mat-primary-palette);
 
+  @include step-dialogs.dialogs();
+  @include step-buttons.buttons();
+
   color: $text-color;
   line-height: 16px;
 
@@ -145,10 +150,6 @@ $light-primary-text: white;
     .mat-button-wrapper {
       padding: 0;
     }
-  }
-
-  .invisible {
-    display: none;
   }
 
   @include step-icon.step-icon();

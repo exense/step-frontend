@@ -1,0 +1,44 @@
+@use 'sass:map';
+
+@function step-define-buttons-config(
+  $primary-color: #0082cb,
+  $primary-text-color: #293e50,
+  $border-color: #d0d5dd,
+  $error-color: #ff0000
+) {
+  $config: (
+    primary-color: $primary-color,
+    primary-text-color: $primary-text-color,
+    border-color: $border-color,
+    error-color: $error-color,
+  );
+
+  @return $config;
+}
+
+@mixin mat-stroked-button($config) {
+  $border-color: map.get($config, border-color);
+
+  .mat-stroked-button {
+    border-radius: 8px;
+
+    &:not(.mat-button-disabled) {
+      border-color: $border-color;
+    }
+  }
+}
+
+@mixin mat-flat-button($config) {
+  .mat-flat-button {
+    border-radius: 8px;
+  }
+}
+
+@mixin buttons($config: null) {
+  @if not $config {
+    $config: step-define-buttons-config();
+  }
+
+  @include mat-stroked-button($config);
+  @include mat-flat-button($config);
+}
