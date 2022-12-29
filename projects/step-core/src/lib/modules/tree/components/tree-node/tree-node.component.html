@@ -10,14 +10,13 @@
   (cdkDragEntered)="dragEnter($event)"
   (cdkDragEnded)="dragEnd()"
 >
-  <ng-template #noToggle>
-    <button mat-button mat-icon-button disabled></button>
-  </ng-template>
-  <button *ngIf="canToggle; else noToggle" mat-button mat-icon-button (click)="toggle()">
+  <button *ngIf="canToggle" mat-button mat-icon-button (click)="toggle()">
     <step-icon [name]="icon"></step-icon>
   </button>
   <div class="node-content" cdkDragHandle (contextmenu)="openContextMenu($event)">
-    <step-icon [name]="node.icon" [class]="node.iconClassName"> </step-icon>
+    <div class="node-icon">
+      <step-icon [name]="node.icon" [class]="node.iconClassName"> </step-icon>
+    </div>
     <step-tree-node-name [node]="node"></step-tree-node-name>
   </div>
   <step-tree-drag-placeholder *cdkDragPlaceholder [dropInfo]="dropInfo$ | async"> </step-tree-drag-placeholder>

@@ -8,6 +8,7 @@ import {
   OnInit,
   Output,
   SimpleChanges,
+  ViewEncapsulation,
 } from '@angular/core';
 import { TreeNode } from '../../shared/tree-node';
 import { TreeStateService } from '../../services/tree-state.service';
@@ -27,6 +28,7 @@ const ICON_COLLAPSED = 'chevron-right';
   selector: 'step-tree-node',
   templateUrl: './tree-node.component.html',
   styleUrls: ['./tree-node.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class TreeNodeComponent implements OnInit, OnChanges, OnDestroy {
   private terminator$ = new Subject<unknown>();
