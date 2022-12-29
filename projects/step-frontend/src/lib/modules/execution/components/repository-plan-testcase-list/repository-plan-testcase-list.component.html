@@ -10,7 +10,7 @@
       color="primary"
       [checked]="!!(isSomeItemsSelected$ | async)"
       [indeterminate]="!!(isIntermediateSelected$ | async)"
-      (click)="handleCheckboxChange($event)"
+      (click)="handleCheckboxChange(); (false)"
     >
     </mat-checkbox>
     <step-bulk-selection-label [selectionCollector]="_selectionCollector"> </step-bulk-selection-label>
