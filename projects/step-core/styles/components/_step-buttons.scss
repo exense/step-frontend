@@ -34,6 +34,12 @@
   }
 }
 
+@mixin mat-raised-button($config) {
+  .mat-raised-button {
+    border-radius: 8px;
+  }
+}
+
 @mixin buttons($config: null) {
   @if not $config {
     $config: step-define-buttons-config();
@@ -41,4 +47,5 @@
 
   @include mat-stroked-button($config);
   @include mat-flat-button($config);
+  @include mat-raised-button($config);
 }
