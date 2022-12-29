@@ -9,6 +9,5 @@ export * from './is-used-by-search-type';
 export * from './mutable';
 export * from './plugin-on-init';
 export * from './utils';
-export * from './artefact-tree-node';
 export * from './plan-tree-action.enum';
 export * from './plan-editor-strategy';

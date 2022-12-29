@@ -1,11 +1,8 @@
 import { Component, forwardRef, Input, Optional, ViewEncapsulation } from '@angular/core';
 import { map, Observable, of } from 'rxjs';
-import { ArtefactTreeNode } from '../../shared/artefact-tree-node';
 import { PlanTreeAction } from '../../shared/plan-tree-action.enum';
 import { PlanEditorService } from '../../services/plan-editor.service';
-import { TreeActionsService } from '../../modules/tree/services/tree-actions.service';
-import { TreeAction } from '../../modules/tree/shared/tree-action';
-import { TreeStateService } from '../../modules/tree/services/tree-state.service';
+import { TreeStateService, TreeAction, TreeActionsService, ArtefactTreeNode } from '../../modules/tree/tree.module';
 import { AbstractArtefact } from '../../client/generated';
 import { PlanInteractiveSessionService } from '../../services/plan-interactive-session.service';
 import { PlanArtefactResolverService } from '../../services/plan-artefact-resolver.service';

@@ -148,6 +148,7 @@ export * from './decorators/plugin';
 export * from './directives/caps-lock.directive';
 export * from './directives/tooltip-immediate-close.directive';
 export * from './directives/tooltip.directive';
+export * from './directives/artefact-details.directive';
 export * from './domain';
 export * from './modules/async-operations/async-operations.module';
 export * from './modules/basics/step-basics.module';
