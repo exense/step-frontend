@@ -81,8 +81,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, O
     this.planId$.next(this.planId$.value);
   }
 
-  handleCheckboxChange($event: Event): void {
-    $event.preventDefault();
+  handleCheckboxChange(): void {
     if (this._selectionCollector.length > 0) {
       // If something was selected, clear selection
       this._selectionCollector.clear();
