@@ -15,7 +15,7 @@ import { TimeSeriesContextParams } from './time-series-context-params';
  * This class is responsible for managing the state of an execution tab. Here we store time selection, colors, filters, etc.
  */
 export class TimeSeriesContext {
-  executionId!: string;
+  id!: string;
   activeExecution: Execution | undefined;
 
   inProgress$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -34,7 +34,7 @@ export class TimeSeriesContext {
   private readonly colorsPool: TimeseriesColorsPool;
 
   constructor(params: TimeSeriesContextParams) {
-    this.executionId = params.id;
+    this.id = params.id;
     this.fullTimeRange = params.timeRange;
     this.selectedTimeRange = params.timeRange;
     this.baseFilters = params.baseFilters;

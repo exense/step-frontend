@@ -1,17 +1,13 @@
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AJS_MODULE, DashboardService } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { PerformanceViewSettings } from '../performance-view/model/performance-view-settings';
 import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
 import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
 import { TimeRangePicker } from '../time-selection/time-range-picker.component';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
-import { PerformanceViewComponent } from '../performance-view/performance-view.component';
-import { forkJoin, interval, Observable, of, Subject, Subscription, takeUntil, tap, timer } from 'rxjs';
-import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
+import { Subject, Subscription, takeUntil, tap, timer } from 'rxjs';
 import { TimeSeriesConfig } from '../time-series.config';
-import { TimeSeriesUtils } from '../time-series-utils';
 import { TimeSeriesDashboardSettings } from '../dashboard/model/ts-dashboard-settings';
 import { TimeSeriesDashboardComponent } from '../dashboard/time-series-dashboard.component';
 
@@ -30,9 +26,6 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
   @Input() taskId: string = window.location.href.split('?')[0].substring(window.location.href.lastIndexOf('/') + 1);
 
   refreshEnabled = true;
-
-  performanceViewSettings!: PerformanceViewSettings;
-  readonly dashboardInitComplete$ = new Subject<void>();
 
   dashboardSettings: TimeSeriesDashboardSettings | undefined;
 
@@ -53,18 +46,12 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
   refreshIntervals = TimeSeriesConfig.AUTO_REFRESH_INTERVALS;
   selectedRefreshInterval = this.refreshIntervals[0];
 
-  refreshSubscription: Subscription | undefined;
-
   groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS;
   selectedGrouping = this.groupingOptions[0];
 
   stopInterval$ = new Subject();
 
-  constructor(
-    private changeDetector: ChangeDetectorRef,
-    private dashboardService: DashboardService,
-    private contextFactory: TimeSeriesContextsFactory
-  ) {}
+  constructor(private changeDetector: ChangeDetectorRef, private dashboardService: DashboardService) {}
 
   ngOnInit(): void {
     if (!this.taskId) {
@@ -74,7 +61,6 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
     let now = new Date().getTime();
     let start = now - selectedTimeRange.timeInMs;
     let range = { from: start, to: now };
-    // this.context = this.contextFactory.createContext(this.taskId, range);
     this.dashboardSettings = {
       contextId: this.taskId,
       includeThreadGroupChart: true,
@@ -88,34 +74,13 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
 
   startInterval(delay = 0) {
     this.stopInterval$.next(null); // make sure to stop it if it's still running
-    console.log('STARTING INTERVAL');
     timer(delay, this.selectedRefreshInterval.value)
-      .pipe(takeUntil(this.stopInterval$))
+      .pipe(takeUntil(this.stopInterval$), takeUntil(this.terminator$))
       .subscribe(() => this.triggerRefresh());
   }
 
   triggerRefresh() {
-    // let isFullRangeSelected = this.context.isFullRangeSelected();
-    // let oldSelection = this.context.getSelectedTimeRange();
-
     this.dashboard.refresh(this.calculateRange());
-  }
-
-  calculateRange(): TSTimeRange {
-    let now = new Date().getTime();
-    let newFullRange: TSTimeRange;
-    switch (this.timeRangeSelection.type) {
-      case RangeSelectionType.FULL:
-        throw new Error('Full range selection is not supported');
-      case RangeSelectionType.ABSOLUTE:
-        newFullRange = this.timeRangeSelection.absoluteSelection!;
-        break;
-      case RangeSelectionType.RELATIVE:
-        let end = now;
-        newFullRange = { from: end - this.timeRangeSelection.relativeSelection!.timeInMs!, to: end };
-        break;
-    }
-    return newFullRange;
   }
 
   changeRefreshInterval(newInterval: { label: string; value: number }) {
@@ -124,8 +89,6 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
     if (oldInterval.value === newInterval.value) {
       return;
     }
-    // this.updatingSubscription.unsubscribe();
-    // this.terminator$.next();
     this.stopInterval$.next(null);
     if (newInterval.value) {
       this.startInterval();
@@ -143,6 +106,23 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
 
   navigateToRtmDashboard() {
     window.open(this.dashboardService.getRtmDashboardLink(this.taskId));
+  }
+
+  calculateRange(): TSTimeRange {
+    let now = new Date().getTime();
+    let newFullRange: TSTimeRange;
+    switch (this.timeRangeSelection.type) {
+      case RangeSelectionType.FULL:
+        throw new Error('Full range selection is not supported');
+      case RangeSelectionType.ABSOLUTE:
+        newFullRange = this.timeRangeSelection.absoluteSelection!;
+        break;
+      case RangeSelectionType.RELATIVE:
+        let end = now;
+        newFullRange = { from: end - this.timeRangeSelection.relativeSelection!.timeInMs!, to: end };
+        break;
+    }
+    return newFullRange;
   }
 
   ngOnDestroy(): void {

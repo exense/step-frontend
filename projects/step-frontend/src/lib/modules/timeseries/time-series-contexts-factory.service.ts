@@ -33,7 +33,7 @@ export class TimeSeriesContextsFactory {
     return this.executionsContexts[contextId];
   }
 
-  destroyContext(executionId: string) {
-    delete this.executionsContexts[executionId];
+  destroyContext(id: string) {
+    delete this.executionsContexts[id];
   }
 }

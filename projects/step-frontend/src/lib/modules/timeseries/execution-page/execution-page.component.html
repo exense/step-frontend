@@ -10,8 +10,7 @@
     </mat-menu>
   </div>
 
-  <step-time-range-picker [customRelativeOptions]="timeRangeOptions" (onSelectionChange)="onTimeRangeChange($event)">
-  </step-time-range-picker>
+  <step-time-range-picker (onSelectionChange)="onTimeRangeChange($event)"> </step-time-range-picker>
   <step-timeseries-dashboard #dashboard *ngIf="dashboardSettings" [settings]="dashboardSettings">
   </step-timeseries-dashboard>
   <!--  <div class="right-section-buttons">-->
