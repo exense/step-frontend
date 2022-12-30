@@ -21,34 +21,6 @@
 
   <button mat-raised-button class="interactive-btn" (click)="navigateToRtmDashboard()">Interactive Session</button>
 
-  <div class="filter-bar-container">
-    <div>
-      <step-ts-filter-bar
-        *ngIf="context"
-        [context]="context"
-        (onFiltersChange)="handleFiltersChange($event)"
-      ></step-ts-filter-bar>
-    </div>
-    <div style="display: flex; align-items: center">
-      <button mat-button [matMenuTriggerFor]="groupingMenu">Grouping: {{ selectedGrouping.label }}</button>
-      <mat-menu #groupingMenu="matMenu">
-        <button
-          mat-menu-item
-          *ngFor="let grouping of groupingOptions"
-          (click)="selectedGrouping = grouping; emitGroupDimensions()"
-        >
-          {{ grouping.label }}
-        </button>
-      </mat-menu>
-    </div>
-  </div>
-
-  <step-performance-view
-    *ngIf="performanceViewSettings"
-    (onInitializationComplete)="onDashboardInit()"
-    [context]="context"
-    [settings]="performanceViewSettings"
-    [includeThreadGroupChart]="false"
-  >
-  </step-performance-view>
+  <step-timeseries-dashboard #dashboard *ngIf="dashboardSettings" [settings]="dashboardSettings">
+  </step-timeseries-dashboard>
 </div>

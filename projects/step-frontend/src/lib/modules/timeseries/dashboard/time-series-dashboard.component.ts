@@ -30,7 +30,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, AfterVie
   update$: Observable<any> | undefined;
   updateGate$: Subject<any> = new Subject<any>();
   queuedSubscription = new Subscription();
-  refreshTrigger$: Subject<any> = new Subject();
+  throttledRefreshTrigger$: Subject<any> = new Subject();
   terminator$ = new Subject();
 
   timeRangeOptions: RelativeTimeSelection[] = [
@@ -58,7 +58,8 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, AfterVie
     this.context = this.contextsFactory.createContext(contextParams);
     this.performanceViewSettings = this.settings;
     this.subscribeForContextChange();
-    this.refreshTrigger$
+    this.context.inProgressChange().subscribe((x) => console.log('Progress change:', x));
+    this.throttledRefreshTrigger$
       .pipe(
         throttle(() => this.context.inProgressChange().pipe(filter((x) => !x))),
         takeUntil(this.terminator$)
@@ -68,12 +69,12 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, AfterVie
       });
   }
 
-  private updateDashboard() {
+  private updateDashboard(showLoading = false) {
     this.updateSubscription = this.performanceView
       .updateDashboard({
         updateRanger: true,
         updateCharts: true,
-        showLoadingBar: true,
+        showLoadingBar: showLoading,
       })
       .subscribe();
   }
@@ -83,7 +84,8 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, AfterVie
       .pipe(takeUntil(this.terminator$))
       .subscribe(() => {
         this.updateSubscription?.unsubscribe();
-        this.updateDashboard();
+        // this.throttledRefreshTrigger$.next(null);
+        this.updateDashboard(true);
       });
   }
 
@@ -100,11 +102,15 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, AfterVie
    * @param range
    */
   refresh(range: TSTimeRange, selection?: TSTimeRange): void {
-    this.context.updateFullRange(range, false);
+    console.log('ASKED TO REFRESH');
     if (selection) {
       this.context.updateSelectedRange(selection, false);
+    } else if (this.context.isFullRangeSelected()) {
+      // need to keep full selection
+      this.context.updateSelectedRange(range, false);
     }
-    this.refreshTrigger$.next(true);
+    this.context.updateFullRange(range, false);
+    this.throttledRefreshTrigger$.next(true);
   }
 
   /**

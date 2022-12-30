@@ -75,7 +75,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   ];
   selectedRefreshInterval: RefreshInterval = this.refreshIntervals[0];
 
-  customGroupingString = '';
   groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS;
   selectedGrouping = this.groupingOptions[0];
   refreshInterval: any;
@@ -85,8 +84,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     private contextsFactory: TimeSeriesContextsFactory,
     private executionService: ExecutionsService,
     private dashboardService: DashboardService,
-    private _asyncTaskService: AsyncTasksService,
-    private contextFactory: TimeSeriesContextsFactory
+    private _asyncTaskService: AsyncTasksService
   ) {}
 
   ngOnInit(): void {
@@ -102,27 +100,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  handleFiltersChange(filters: TsFilterItem[]): void {
-    this.context.updateActiveFilters(filters);
-  }
-
-  applyCustomGrouping() {
-    if (this.customGroupingString) {
-      let dimensions = this.customGroupingString.split(',').map((x) => x.trim());
-      this.selectedGrouping = { label: dimensions.join(', '), attributes: dimensions };
-      this.emitGroupDimensions();
-      this.matTrigger.closeMenu();
-    }
-  }
-
-  emitGroupDimensions(): void {
-    this.context.updateGrouping(this.selectedGrouping.attributes);
-  }
-
   onTimeRangeChange(selection: TimeRangePickerSelection) {
-    // this.timeRangeSelection = selection;
-    // this.updateSubscription?.unsubscribe();
-    // this.triggerNextUpdate(0, of(null), true, true, true);
     let start = this.execution!.startTime!;
     const end = this.execution!.endTime! || new Date().getTime();
     let range: TSTimeRange = { from: 0, to: 0 };
@@ -150,7 +128,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       if (!execution.endTime) {
         this.executionInProgress = true;
       }
-
       this.dashboardSettings = {
         contextId: this.executionId,
         includeThreadGroupChart: true,
@@ -158,7 +135,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         contextualFilters: { eId: this.executionId },
       };
       if (this.executionInProgress) {
-        this.startInterval();
+        setTimeout(() => this.startInterval(), this.selectedRefreshInterval.value);
       }
     });
   }
@@ -167,15 +144,20 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     this.refreshInterval = setInterval(() => this.triggerRefresh(), this.selectedRefreshInterval.value);
   }
 
+  /**
+   * This will be the public method called from the outside of this component.
+   */
   triggerRefresh() {
     let now = new Date().getTime();
     let details = this.execution!;
-    let isFullRangeSelected = this.context.isFullRangeSelected();
-    let oldSelection = this.context.getSelectedTimeRange();
+    // let isFullRangeSelected = this.context.isFullRangeSelected();
+    // let oldSelection = this.context.getSelectedTimeRange();
+    let selection: TSTimeRange;
     let newFullRange: TSTimeRange;
     switch (this.timeRangeSelection.type) {
       case RangeSelectionType.FULL:
         newFullRange = { from: details.startTime!, to: details.endTime || now - 5000 };
+        selection = newFullRange;
         break;
       case RangeSelectionType.ABSOLUTE:
         newFullRange = this.timeRangeSelection.absoluteSelection!;
@@ -186,12 +168,12 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         break;
     }
     // when the selection is 0, it will switch to full selection automatically
-    let newSelection = isFullRangeSelected
-      ? newFullRange
-      : TimeSeriesUtils.cropInterval(newFullRange, oldSelection) || newFullRange;
+    // let newSelection = isFullRangeSelected
+    //   ? newFullRange
+    //   : TimeSeriesUtils.cropInterval(newFullRange, oldSelection) || newFullRange;
 
-    this.performanceView.updateFullRange(newFullRange, newSelection);
-    this.dashboard.refresh(newFullRange, newSelection);
+    // this.performanceView.updateFullRange(newFullRange);
+    this.dashboard.refresh(newFullRange);
   }
 
   rebuildTimeSeries() {

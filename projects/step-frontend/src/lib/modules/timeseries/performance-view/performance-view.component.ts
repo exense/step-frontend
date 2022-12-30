@@ -192,7 +192,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
    */
   updateDashboard(request: UpdatePerformanceViewRequest): Observable<any> {
     // let's assume the complete interval and selections are set.
-    this.context.setInProgress(true);
+    if (!this.context.inProgress$.getValue()) this.context.setInProgress(true);
     let updates$ = [];
     if (request.showLoadingBar) {
       this.chartsAreLoading = true;
