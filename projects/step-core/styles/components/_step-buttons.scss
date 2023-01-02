@@ -20,23 +20,9 @@
   $border-color: map.get($config, border-color);
 
   .mat-stroked-button {
-    border-radius: 8px;
-
     &:not(.mat-button-disabled) {
       border-color: $border-color;
     }
-  }
-}
-
-@mixin mat-flat-button($config) {
-  .mat-flat-button {
-    border-radius: 8px;
-  }
-}
-
-@mixin mat-raised-button($config) {
-  .mat-raised-button {
-    border-radius: 8px;
   }
 }
 
@@ -46,6 +32,4 @@
   }
 
   @include mat-stroked-button($config);
-  @include mat-flat-button($config);
-  @include mat-raised-button($config);
 }
