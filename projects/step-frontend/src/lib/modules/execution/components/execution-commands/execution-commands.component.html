@@ -1,7 +1,7 @@
 <step-custom-form [stModel]="executionParameters" stScreen="executionParameters"> </step-custom-form>
 <div class="main-container" role="toolbar" aria-label="...">
   <div class="sub-container">
-    <step-input-group>
+    <div class="flex">
       <button
         type="button"
         mat-icon-button
@@ -32,8 +32,8 @@
       >
         <step-icon name="clock" aria-hidden="true"></step-icon>
       </button>
-    </step-input-group>
-    <step-input-group *ngIf="execution && execution.status !== 'ENDED'">
+    </div>
+    <div class="flex" *ngIf="execution && execution.status !== 'ENDED'">
       <button type="button" mat-icon-button aria-label="Left Align" [disabled]="!('plan-execute' | hasRight | async)">
         <step-icon name="pause" aria-hidden="true"></step-icon>
       </button>
@@ -46,9 +46,9 @@
       >
         <step-icon name="square" aria-hidden="true"></step-icon>
       </button>
-    </step-input-group>
+    </div>
   </div>
-  <step-input-group>
+  <div class="flex">
     <button
       type="button"
       mat-icon-button
@@ -59,5 +59,5 @@
     >
       <step-icon name="link" aria-hidden="true"></step-icon>
     </button>
-  </step-input-group>
+  </div>
 </div>

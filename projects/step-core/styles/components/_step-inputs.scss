@@ -1,14 +1,14 @@
 @use 'sass:map';
 
 @function step-define-inputs-config(
-  $primary-text: #293e50,
   $primary-color: #0082cb,
+  $primary-text-color: #293e50,
   $border-color: #d0d5dd,
   $error-color: #ff0000
 ) {
   $config: (
-    primary-text: $primary-text,
     primary-color: $primary-color,
+    primary-text-color: $primary-text-color,
     border-color: $border-color,
     error-color: $error-color,
   );
@@ -16,182 +16,167 @@
   @return $config;
 }
 
-$border-radius: 8px;
-
-@mixin border-base {
-  border-top-style: solid;
-  border-bottom-style: solid;
-  border-top-width: 1px;
-  border-bottom-width: 1px;
-  border-left: none;
-  border-right: none;
-}
-
-@mixin left-border {
-  border-left-width: 1px;
-  border-left-style: solid;
-}
-
-@mixin left-border-round {
-  border-top-left-radius: $border-radius;
-  border-bottom-left-radius: $border-radius;
-}
-
-@mixin right-border {
-  border-right-width: 1px;
-  border-right-style: solid;
-}
-
-@mixin right-border-round {
-  border-top-right-radius: $border-radius;
-  border-bottom-right-radius: $border-radius;
-}
-
-@mixin input-group($config) {
-  $border-focus-color: map.get($config, primary-color);
+@mixin mat-form-field($config) {
+  $primary-color: map.get($config, primary-color);
+  $primary-text-color: map.get($config, primary-text-color);
   $border-color: map.get($config, border-color);
   $error-color: map.get($config, error-color);
 
-  step-input-group {
+  mat-form-field.step-view {
     display: block;
-    position: relative;
+    line-height: 1;
 
-    .step-input-label {
-      margin-bottom: 5px;
-      & > label {
-        font-weight: 500;
-      }
-    }
-
-    .step-input-group {
+    .mat-form-field-wrapper {
       display: flex;
+      padding-bottom: 0;
 
-      & > input {
-        flex-grow: 1;
-        @include border-base;
-        @include left-border;
-        @include left-border-round;
-        @include right-border;
-        border-color: $border-color;
-        font-weight: 400;
-        padding: 10px 14px;
-        line-height: 20px;
-        width: 100%;
-        min-width: 80px;
+      .mat-form-field-flex {
+        align-items: flex-end;
 
-        &:focus {
-          outline: none;
-          border-color: $border-focus-color;
+        .mat-form-field-infix {
+          padding: 0;
+          border-top: none;
+          display: flex;
+          flex-direction: column-reverse;
 
-          & + .step-input-addon {
-            border-color: $border-focus-color;
-            step-icon {
-              color: $border-focus-color;
+          mat-select,
+          .mat-input-element {
+            border: 1px solid $border-color;
+            border-radius: 8px;
+            font-weight: 400;
+            padding: 10px 14px;
+            line-height: 20px;
+            margin-top: 0;
+
+            .mat-select-trigger {
+              height: auto;
+            }
+          }
+
+          .mat-form-field-label-wrapper {
+            position: static;
+            padding-top: 0;
+            display: flex;
+            height: auto;
+
+            label {
+              position: static;
+              color: $primary-text-color;
+              font-weight: 500;
+              font-size: 14px;
+              line-height: 20px;
+              transform: none !important;
+              width: 100% !important;
             }
           }
         }
 
-        &:last-child {
-          @include right-border-round;
-        }
-
-        & + .step-input-addon {
-          @include border-base;
-          @include right-border;
-          @include right-border-round;
-          border-color: $border-color;
-          width: 52px;
+        .mat-form-field-suffix {
           height: 42px;
           display: flex;
-          justify-content: center;
           align-items: center;
+          border: 1px solid $border-color;
+          border-radius: 0 8px 8px 0;
+          padding: 0 8px;
         }
+      }
 
-        &.ng-invalid.ng-dirty {
-          border-color: $error-color;
-          & + .step-input-addon {
-            border-color: $error-color;
-            step-icon {
-              color: $error-color;
-            }
+      .mat-form-field-underline {
+        display: none;
+      }
+    }
+
+    &.mat-form-field-has-label {
+      .mat-form-field-infix {
+        gap: 4px;
+      }
+    }
+
+    &.with-suffix {
+      .mat-form-field-wrapper .mat-form-field-flex .mat-form-field-infix .mat-input-element {
+        border-right: 0;
+        border-radius: 8px 0 0 8px;
+      }
+    }
+
+    &.with-padding {
+      .mat-form-field-wrapper {
+        padding-bottom: 20px;
+      }
+    }
+
+    &.with-reduced-inner-padding {
+      .mat-form-field-wrapper .mat-form-field-flex {
+        .mat-form-field-infix {
+          mat-select,
+          .mat-input-element {
+            padding: 8px 14px;
+            line-height: 16px;
           }
         }
+
+        .mat-form-field-suffix {
+          height: 34px;
+        }
       }
     }
 
-    .step-input-other {
-      position: absolute;
-    }
-  }
+    &.mat-focused {
+      .mat-form-field-wrapper .mat-form-field-flex {
+        .mat-form-field-infix {
+          mat-select,
+          .mat-input-element {
+            border-color: $primary-color;
+          }
 
-  th {
-    step-input-group .step-input-group {
-      input {
-        line-height: 16px;
-        padding: 8px 14px;
-      }
-      .step-input-addon {
-        height: 34px;
-      }
-    }
-  }
-}
+          .mat-form-field-label-wrapper label {
+            color: $primary-color;
+          }
+        }
 
-@mixin material-hot-fix($config) {
-  $primary-text: map.get($config, primary-text);
-  $border-focus-color: map.get($config, primary-color);
-  $border-color: map.get($config, border-color);
-
-  mat-form-field.step-view {
-    .mat-form-field-wrapper {
-      padding-bottom: 0;
-    }
-
-    .mat-form-field-underline {
-      display: none;
-    }
-
-    .mat-form-field-infix {
-      padding: 0;
-      border: none;
-    }
-
-    mat-select {
-      @include border-base;
-      @include left-border;
-      @include left-border-round;
-      @include right-border;
-      @include right-border-round;
-      border-color: $border-color;
-      font-weight: 400;
-      padding: 10px 14px;
-      line-height: 20px;
-      &:focus {
-        border-color: $border-focus-color;
-      }
-
-      &.label-margin {
-        margin-top: 12px;
+        .mat-form-field-suffix {
+          color: $primary-color;
+          border: 1px solid $primary-color;
+        }
       }
     }
 
-    .mat-form-field-label-wrapper {
-      label {
-        color: $primary-text !important;
-        font-weight: 500;
-        font-size: 14px;
-        line-height: 20px;
-        transform: none !important;
-        position: absolute;
-        top: 0;
+    &.ng-invalid.ng-touched {
+      .mat-form-field-wrapper .mat-form-field-flex {
+        .mat-form-field-infix {
+          mat-select,
+          .mat-input-element {
+            border-color: $error-color;
+          }
+
+          .mat-form-field-label-wrapper label {
+            color: $error-color;
+          }
+        }
+
+        .mat-form-field-suffix {
+          color: $error-color;
+          border: 1px solid $error-color;
+        }
       }
     }
   }
 
   th {
-    mat-form-field.step-view mat-select {
-      line-height: 16px;
-      padding: 8px 14px;
+    mat-form-field.step-view {
+      .mat-form-field-wrapper .mat-form-field-flex {
+        .mat-form-field-infix {
+          mat-select,
+          .mat-input-element {
+            padding: 8px 14px;
+            line-height: 16px;
+          }
+        }
+
+        .mat-form-field-suffix {
+          height: 34px;
+        }
+      }
     }
   }
 }
@@ -201,6 +186,5 @@ $border-radius: 8px;
     $config: step-define-inputs-config();
   }
 
-  @include input-group($config);
-  @include material-hot-fix($config);
+  @include mat-form-field($config);
 }

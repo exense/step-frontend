@@ -1,0 +1,10 @@
+@mixin menu() {
+  .mat-menu-panel {
+    border-radius: 8px;
+
+    .mat-menu-content:not(:empty) {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+}

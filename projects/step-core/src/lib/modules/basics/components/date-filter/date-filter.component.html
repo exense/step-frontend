@@ -1,8 +1,6 @@
-<step-input-group>
-  <input type="text" [matDatepicker]="picker" #dateInput [formControl]="dateControl" />
-  <div class="step-input-addon">
-    <step-icon name="calendar" (click)="picker.open()"></step-icon>
-  </div>
+<mat-form-field class="step-view with-suffix">
+  <input type="text" matInput [matDatepicker]="picker" #dateInput [formControl]="dateControl" />
+  <step-icon name="calendar" (click)="picker.open()" matSuffix></step-icon>
   <mat-error *ngIf="dateControl.invalid">Invalid date</mat-error>
-</step-input-group>
+</mat-form-field>
 <mat-datepicker #picker></mat-datepicker>

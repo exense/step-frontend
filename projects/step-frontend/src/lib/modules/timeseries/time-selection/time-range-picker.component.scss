@@ -19,12 +19,12 @@
     width: 220px;
 
     .title {
-      padding: 14px;
+      padding: 12px;
     }
 
     .time-option {
       cursor: pointer;
-      padding: 4px 14px;
+      padding: 4px 12px;
 
       &.active {
         background: #f6f6f6;
@@ -41,8 +41,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 12px;
-  margin-top: 8px;
+  padding: 12px;
 
   .tz-label {
     margin-right: 12px;
@@ -59,10 +58,14 @@
 }
 
 .bottom-gap {
-  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 20px;
 }
 
 .hidden-input {
   visibility: hidden;
   height: 0;
+  padding: 0;
+  border: 0;
 }

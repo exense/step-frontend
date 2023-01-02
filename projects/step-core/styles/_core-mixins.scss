@@ -7,14 +7,6 @@
 @forward 'components/report-node-status';
 @forward 'components/step-table';
 
-@mixin table-space-between-columns {
-  mat-form-field,
-  step-input-group {
-    width: 100%;
-    padding-right: 10px;
-  }
-}
-
 @mixin status-common {
   display: inline-flex;
   align-items: center;

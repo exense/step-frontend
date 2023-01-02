@@ -1,6 +1,8 @@
-<mat-form-field floatLabel="always">
+<mat-form-field floatLabel="always" class="step-view with-padding">
   <mat-label>Plan</mat-label>
   <input type="text" matInput [formControl]="planNameControl" [tabIndex]="-1" />
 </mat-form-field>
 
-<button type="button" mat-stroked-button (click)="selectPlan()" [disabled]="disabled">Select</button>
+<div class="select-plan">
+  <button type="button" mat-stroked-button (click)="selectPlan()" [disabled]="disabled">Select</button>
+</div>
