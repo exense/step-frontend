@@ -74,10 +74,34 @@
         .mat-form-field-suffix {
           height: 42px;
           display: flex;
-          align-items: center;
           border: 1px solid $border-color;
           border-radius: 0 8px 8px 0;
-          padding: 0 8px;
+
+          .icon-suffix {
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+          }
+
+          .mat-stroked-button {
+            border: 0;
+            border-radius: 0;
+            padding: 0 8px;
+            min-width: auto;
+
+            step-icon {
+              display: flex;
+            }
+
+            &:last-child {
+              border-radius: 0 8px 8px 0;
+            }
+          }
+
+          .suffix-separator {
+            height: 100%;
+            border-right: 1px solid $border-color;
+          }
         }
       }
 
@@ -137,6 +161,14 @@
         .mat-form-field-suffix {
           color: $primary-color;
           border: 1px solid $primary-color;
+
+          .mat-stroked-button:not([color]) {
+            color: $primary-text-color;
+          }
+
+          .suffix-separator {
+            border-right: 1px solid $primary-color;
+          }
         }
       }
     }
@@ -157,6 +189,14 @@
         .mat-form-field-suffix {
           color: $error-color;
           border: 1px solid $error-color;
+
+          .mat-stroked-button:not([color]) {
+            color: $primary-text-color;
+          }
+
+          .suffix-separator {
+            border-right: 1px solid $error-color;
+          }
         }
       }
     }
