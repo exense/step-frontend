@@ -13,7 +13,9 @@
             <mat-form-field class="step-view with-suffix with-reduced-inner-padding">
               <mat-label>From</mat-label>
               <input type="text" matInput [(ngModel)]="fromDateString" />
-              <step-icon name="calendar" (click)="fromPicker.open()" matSuffix></step-icon>
+              <div class="icon-suffix" matSuffix>
+                <step-icon name="calendar" (click)="fromPicker.open()"></step-icon>
+              </div>
             </mat-form-field>
             <input class="hidden-input" [matDatepicker]="fromPicker" (dateChange)="setFromDate($event)" />
             <mat-datepicker #fromPicker disabled="false"></mat-datepicker>
@@ -22,7 +24,9 @@
             <mat-form-field class="step-view with-suffix with-reduced-inner-padding">
               <mat-label>To</mat-label>
               <input type="text" matInput [(ngModel)]="toDateString" />
-              <step-icon name="calendar" (click)="toPicker.open()" matSuffix></step-icon>
+              <div class="icon-suffix" matSuffix>
+                <step-icon name="calendar" (click)="toPicker.open()"></step-icon>
+              </div>
             </mat-form-field>
             <input class="hidden-input" [matDatepicker]="toPicker" (dateChange)="setToDate($event)" />
             <mat-datepicker #toPicker disabled="false"></mat-datepicker>

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Inject, Input, OnDestroy, Output } from '@angular/core';
-import { AJS_ROOT_SCOPE } from '@exense/step-core';
 import { IRootScopeService } from 'angular';
-import { Observable, interval, Subscription } from 'rxjs';
+import { interval, Observable, Subscription } from 'rxjs';
+import { AJS_ROOT_SCOPE } from '../../shared';
 
 interface AutorefreshPreset {
   label: string;

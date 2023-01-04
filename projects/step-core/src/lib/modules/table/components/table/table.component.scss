@@ -11,8 +11,8 @@
     width: auto !important;
   }
 
-  ::ng-deep tr > td.mat-cell:not(:first-of-type):not(.mat-column-actions),
-  ::ng-deep tr > th.mat-header-cell:not(:first-of-type):not(.mat-column-actions) {
+  ::ng-deep tr > td.mat-cell:not(:first-of-type):not(:last-of-type):not(.mat-column-actions),
+  ::ng-deep tr > th.mat-header-cell:not(:first-of-type):not(:last-of-type):not(.mat-column-actions) {
     padding: 8px;
   }
 
