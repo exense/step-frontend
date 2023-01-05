@@ -1,0 +1,18 @@
+step-select-plan {
+  display: flex;
+  gap: 8px;
+
+  mat-form-field {
+    flex: 1;
+    pointer-events: none;
+  }
+
+  .select-plan {
+    padding: 24px 0 20px;
+
+    button {
+      height: 42px;
+      border-radius: 8px;
+    }
+  }
+}

@@ -1,15 +1,15 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import {
-  Parameter,
-  UibModalHelperService,
   a1Promise2Observable,
   DialogsService,
+  ExportDialogsService,
+  ImportDialogsService,
+  Parameter,
   ParametersService,
+  UibModalHelperService,
 } from '@exense/step-core';
-import { Observable, switchMap, of, catchError, map } from 'rxjs';
-import { ImportDialogsService } from '../../_common/services/import-dialogs.service';
-import { ExportDialogsService } from '../../_common/services/export-dialogs.service';
+import { catchError, map, Observable, of, switchMap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',

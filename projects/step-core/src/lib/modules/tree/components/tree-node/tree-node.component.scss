@@ -1,32 +1,57 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
-.tree-node {
-  display: flex;
-  align-items: center;
-  user-select: none;
-
-  .node-content {
-    padding: 2px 4px 2px 1px;
-    cursor: pointer;
+step-tree-node {
+  .tree-node {
     display: flex;
     align-items: center;
+    gap: 8px;
+    user-select: none;
 
-    step-icon {
-      margin-right: 6px;
+    > .node-content {
+      padding: 8px 0;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+
+      > .node-icon {
+        background: var.$light-blue-gray;
+        border-radius: 50%;
+        padding: 6px;
+        border: 1px solid transparent;
+
+        > step-icon {
+          width: 10px;
+          height: 10px;
+          min-width: 10px;
+          min-height: 10px;
+          display: flex;
+        }
+      }
     }
-  }
 
-  .mat-icon-button {
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
-  }
+    > .mat-icon-button {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-  &.tree-node-selected .node-content {
-    background: var.$light-blue;
-  }
+      > .mat-button-wrapper {
+        > step-icon {
+          width: 12px;
+          height: 12px;
+          min-width: 12px;
+          min-height: 12px;
+          display: flex;
+          margin-top: 0;
+        }
+      }
+    }
 
-  &.skipped {
-    color: var.$muted;
+    &.skipped {
+      color: var.$muted;
+    }
   }
 }

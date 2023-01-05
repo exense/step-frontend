@@ -43,4 +43,5 @@ module.exports = {
   '@angular/cdk/portal': libraryConfig(),
   'angular-split': libraryConfig(),
   '@exense/step-core': libraryConfig({ requiredVersion: '0.2.0' }),
+  '@angular/material/form-field': libraryConfig(),
 };
