@@ -56,16 +56,6 @@ angular
     ViewRegistry.registerView('functionPackages', 'functionpackages/partials/functionPackageList.html');
     ViewRegistry.registerMenuEntry('Keyword packages', 'functionPackages', 'gift', 20,"automation-root");
     ViewRegistry.registerDashlet('/functions/actions', '', 'functionpackages/partials/functionPackageActions.html', '');
-    EntityRegistry.registerEntity(
-      'KeywordPackage',
-      'functionPackage',
-      'gift',
-      'functionPackage',
-      '/rest/functionpackages/',
-      '/rest/functionpackages/',
-      'st-table',
-      'functionpackages/partials/functionPackageSelectionTable.html'
-    );
   })
 
   .factory('FunctionPackagesDialogs', function ($rootScope, $uibModal, $http, Dialogs, $location) {
