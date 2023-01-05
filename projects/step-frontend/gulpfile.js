@@ -56,7 +56,6 @@ const SCRIPTS = [
   './src/lib/angularjs/js/controllers/admin.js',
   './src/lib/angularjs/js/controllers/dynamicForms.js',
   './src/lib/angularjs/js/controllers/components.js',
-  './src/lib/angularjs/js/controllers/operations.js',
   './src/lib/angularjs/js/datatable-ext-paginationinput.js',
   './src/lib/angularjs/js/viz-presets-commons.js',
   './src/lib/angularjs/js/viz-presets-ext.js',
