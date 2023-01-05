@@ -45,7 +45,7 @@ export class ResourceLabelComponent {
         });
       } else {
         this.absoluteFilepath = stModel;
-        this.fileName = this.absoluteFilepath!.replace(/^.*[\\\/]/, '');
+        this.fileName = this.absoluteFilepath?.replace(/^.*[\\\/]/, '');
       }
 
       this.isResource = isResource;
