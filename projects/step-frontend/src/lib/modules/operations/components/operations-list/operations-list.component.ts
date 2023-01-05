@@ -27,7 +27,7 @@ export class OperationsListComponent implements AfterViewInit, OnDestroy {
     searchPredicates: {
       tid: (element, searchValue) => {
         const value = this.getThreadId(element) || '';
-        return value.toLowerCase().includes(searchValue.toLowerCase());
+        return value.toString().toLowerCase().includes(searchValue.toLowerCase());
       },
       planName: (element, searchValue) => {
         const value = this.getPlanName(element) || '';
@@ -50,7 +50,7 @@ export class OperationsListComponent implements AfterViewInit, OnDestroy {
       tid: (a, b) => {
         const valueA = this.getThreadId(a) || '';
         const valueB = this.getThreadId(b) || '';
-        return valueA.localeCompare(valueB);
+        return valueA.toString().localeCompare(valueB.toString());
       },
       planName: (a, b) => {
         const valueA = this.getPlanName(a) || '';
@@ -91,11 +91,8 @@ export class OperationsListComponent implements AfterViewInit, OnDestroy {
     this.getOperations$.next();
   }
 
-  private getThreadId(operationDetails: OperationDetails): string | undefined {
-    const tid = operationDetails.operation?.tid;
-    const threadId = tid ?? '';
-
-    return `${threadId}`;
+  private getThreadId(operationDetails: OperationDetails): number | undefined {
+    return operationDetails.operation?.tid;
   }
 
   private getPlanName(operationDetails: OperationDetails): string | undefined {
