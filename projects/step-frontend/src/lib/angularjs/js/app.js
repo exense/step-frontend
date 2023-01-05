@@ -35,7 +35,6 @@ var tecAdminApp = angular
     'adminControllers',
     'screenConfigurationControllers',
     'dashboardsControllers',
-    'operationsControllers',
     'asyncTask',
   ])
 
