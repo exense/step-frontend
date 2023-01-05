@@ -148,6 +148,10 @@ $light-primary-text: white;
     padding-top: 8px;
   }
 
+  .cdk-overlay-container {
+    z-index: 1050;
+  }
+
   color: $text-color;
   line-height: 16px;
 
