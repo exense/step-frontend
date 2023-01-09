@@ -16,7 +16,13 @@
     <div class="panel-body">
       <label for="generate-key" class="text-grey generate-key">Api key </label>
       <div class="pull-right">
-        <button type="button" class="btn btn-success" id="generate-key" (click)="invokeShowGenerateApiKeyDialog()">
+        <button
+          type="button"
+          class="btn btn-success"
+          id="generate-key"
+          (click)="invokeShowGenerateApiKeyDialog()"
+          [disabled]="!canGenerateApiKey"
+        >
           Generate new Key
         </button>
       </div>

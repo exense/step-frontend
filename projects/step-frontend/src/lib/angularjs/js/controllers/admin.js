@@ -30,22 +30,47 @@ angular
   })
 
   .controller('AdminCtrl', [
+    '$rootScope',
     '$scope',
     'stateStorage',
     'ViewRegistry',
     'AuthService',
-    function ($scope, stateStorage, ViewRegistry, AuthService) {
+    function ($rootScope, $scope, stateStorage, ViewRegistry, AuthService) {
       // push this scope to the state stack
       stateStorage.push($scope, 'admin', {});
 
-      $scope.tabs = ViewRegistry.getDashlets('admin');
+      $scope.tabs = [];
 
-      $scope.canViewAdmin = AuthService.hasRight('admin-ui-menu');
+      function initTabs() {
 
-      // Select the "Users" tab per default
-      if ($scope.$state == null) {
-        $scope.$state = 'users';
+        const hasAuth = AuthService.getConf().authentication;
+
+        $scope.tabs = ViewRegistry.getDashlets('admin').filter((tab) => {
+          if (tab.id === 'users' && !hasAuth) {
+            return false;
+          }
+          return true;
+        });
+
+        $scope.canViewAdmin = AuthService.hasRight('admin-ui-menu');
+
+        // Select the "Users" tab per default
+        if ($scope.$state == null) {
+          $scope.$state = hasAuth ? 'users' : $scope.tabs[0].id;
+        }
       }
+
+      if ($rootScope.isInitialized) {
+        initTabs();
+      } else {
+        const unwatch = $rootScope.$watch('isInitialized', function(isInitialized){
+          if (isInitialized) {
+            initTabs();
+            unwatch();
+          }
+        });
+      }
+
 
       // Returns the item number of the active tab
       $scope.activeTab = function () {

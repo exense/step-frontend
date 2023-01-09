@@ -26,6 +26,7 @@ const kvPairArrayToPreferences = (values?: KeyValuePair<string, string>[]): Pref
 })
 export class MyAccountComponent implements OnInit, OnChanges {
   readonly canChangePassword = !!this._authService.getConf()?.passwordManagement;
+  readonly canGenerateApiKey = !!this._authService.getConf()?.authentication;
 
   constructor(private _adminApiService: AdminService, private _authService: AuthService) {}
 

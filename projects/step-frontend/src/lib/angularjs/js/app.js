@@ -97,9 +97,9 @@ var tecAdminApp = angular
     ) {
       stateStorage.push($scope, 'root', {});
 
-      $scope.isInitialized = false;
+      $rootScope.isInitialized = false;
       AuthService.initialize().subscribe(() => {
-         $scope.isInitialized = true;
+         $rootScope.isInitialized = true;
 
          $scope.logo = 'images/logotopleft.png';
          if (!$location.path()) {
