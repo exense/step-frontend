@@ -1,5 +1,21 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 cdk-tree-node {
   display: flex;
+  position: relative;
+
+  .node-line {
+    position: absolute;
+    top: 0;
+    // level * paddingIdent + level * paddingMultiplier + (24px - 2px) / 2
+    left: calc(var(--level) * 24px + var(--level) * 8px + 11px);
+    border-right: 1px solid var.$light-blue-gray;
+    height: 100%;
+  }
+
+  step-tree-node {
+    flex: 1;
+  }
 }
 
 .node-context-menu-trigger {

@@ -4,9 +4,9 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
-import type { AsyncTaskStatusBulkOperationReport } from '../models/AsyncTaskStatusBulkOperationReport';
-import type { BulkOperationParameters } from '../models/BulkOperationParameters';
+import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTaskStatusTableBulkOperationReport';
 import type { Parameter } from '../models/Parameter';
+import type { TableBulkOperationRequest } from '../models/TableBulkOperationRequest';
 import type { TableRequest } from '../models/TableRequest';
 import type { TableResponseParameter } from '../models/TableResponseParameter';
 
@@ -19,10 +19,12 @@ export class ParametersService {
   /**
    * Deletes the entities according to the provided parameters
    * @param requestBody
-   * @returns AsyncTaskStatusBulkOperationReport default response
+   * @returns AsyncTaskStatusTableBulkOperationReport default response
    * @throws ApiError
    */
-  public deleteParameters(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusBulkOperationReport> {
+  public deleteParameters(
+    requestBody?: TableBulkOperationRequest
+  ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/parameters/bulk/delete',
@@ -50,10 +52,10 @@ export class ParametersService {
   /**
    * Clones the entities according to the provided parameters
    * @param requestBody
-   * @returns AsyncTaskStatusBulkOperationReport default response
+   * @returns AsyncTaskStatusTableBulkOperationReport default response
    * @throws ApiError
    */
-  public cloneParameters(requestBody?: BulkOperationParameters): Observable<AsyncTaskStatusBulkOperationReport> {
+  public cloneParameters(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/parameters/bulk/clone',

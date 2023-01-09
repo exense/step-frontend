@@ -1,7 +1,7 @@
 import { Execution } from '@exense/step-core';
 
-export interface ExecutionViewServices {
-  showNodeInTree(nodeId: string): void;
-  showTestCase(nodeId: string): void;
-  getExecution(): Execution;
+export abstract class ExecutionViewServices {
+  abstract showNodeInTree(nodeId: string): void;
+  abstract showTestCase(nodeId: string): void;
+  abstract getExecution(): Execution;
 }

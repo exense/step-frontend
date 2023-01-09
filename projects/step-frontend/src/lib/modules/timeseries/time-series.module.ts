@@ -41,7 +41,7 @@ import { TsGroupingComponent } from './dashboard/grouping/ts-grouping.component'
     TimeSeriesDashboardComponent,
     TsGroupingComponent,
   ],
-  exports: [PerformanceViewComponent],
+  exports: [ExecutionPageComponent, SyntheticMonitoringPageComponent],
   imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule, MatDatepickerModule],
 })
 export class TimeSeriesModule {}

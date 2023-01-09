@@ -1,7 +1,3 @@
-@use 'projects/step-core/styles/core-mixins' as core;
-
-@include core.table-space-between-columns;
-
 :host {
   position: relative;
   display: block;
@@ -15,9 +11,16 @@
     width: auto !important;
   }
 
-  ::ng-deep tr > td.mat-cell:not(:first-of-type):not(.mat-column-actions),
-  ::ng-deep tr > th.mat-header-cell:not(:first-of-type):not(.mat-column-actions) {
+  ::ng-deep tr > td.mat-cell:not(:first-of-type):not(:last-of-type):not(.mat-column-actions),
+  ::ng-deep tr > th.mat-header-cell:not(:first-of-type):not(:last-of-type):not(.mat-column-actions) {
     padding: 8px;
+  }
+
+  ::ng-deep th.mat-header-cell:first-of-type,
+  ::ng-deep td.mat-cell:first-of-type,
+  ::ng-deep td.mat-footer-cell:first-of-type {
+    padding-top: 8px;
+    padding-bottom: 8px;
   }
 
   .spinner-container {

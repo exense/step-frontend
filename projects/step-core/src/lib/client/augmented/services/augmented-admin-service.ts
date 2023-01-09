@@ -7,6 +7,7 @@ import { TableRemoteDataSource } from '../../../modules/table/shared/table-remot
 import type { Observable } from 'rxjs';
 import { ProjectDto } from '../models/project-dto';
 import { ProjectMemberDto } from '../models/project-member-dto';
+import { AssignEntityParameters } from '../shared/assign-entity-parameters';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedAdminService extends AdminService {
@@ -43,14 +44,6 @@ export class AugmentedAdminService extends AdminService {
     return this.httpRequest.request({
       method: 'DELETE',
       url: '/tenants/project/' + id,
-    });
-  }
-
-  assignFunctionsAndEntitiesToProject(id: string, data: any) {
-    return this.httpRequest.request({
-      method: 'POST',
-      url: '/tenants/project/' + id + '/entities',
-      body: data,
     });
   }
 

@@ -6,6 +6,10 @@
 @use 'step-icon';
 @use 'step-inputs';
 @use 'step-login';
+@use 'step-dialogs';
+@use 'step-buttons';
+@use 'step-menu';
+@use 'step-datepicker';
 
 @forward 'step-sidebar' show step-define-sidebar-config;
 @forward 'step-header' show step-define-header-config;
@@ -135,6 +139,19 @@ $light-primary-text: white;
 
   @include step-login.login-page($step-login-config, $mat-primary-palette);
 
+  @include step-dialogs.dialogs();
+  @include step-buttons.buttons();
+  @include step-menu.menu();
+  @include step-datepicker.datepicker();
+
+  .cdk-overlay-pane {
+    padding-top: 8px;
+  }
+
+  &.modal-open .cdk-overlay-container {
+    z-index: 1050;
+  }
+
   color: $text-color;
   line-height: 16px;
 
@@ -145,10 +162,6 @@ $light-primary-text: white;
     .mat-button-wrapper {
       padding: 0;
     }
-  }
-
-  .invisible {
-    display: none;
   }
 
   @include step-icon.step-icon();
@@ -184,9 +197,5 @@ $light-primary-text: white;
 
   tbody .form-group {
     margin-bottom: 15px;
-  }
-
-  .cdk-overlay-container {
-    z-index: 1050;
   }
 }

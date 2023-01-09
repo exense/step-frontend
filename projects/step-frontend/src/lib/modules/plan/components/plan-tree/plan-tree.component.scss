@@ -1,5 +1,8 @@
 @use 'projects/step-core/styles/core-mixins' as core;
+@use 'projects/step-core/styles/core-variables' as var;
 
-:host {
+step-plan-tree {
   @include core.full-height-block;
+
+  @include core.tree-node-selection(var.$dark-blue);
 }

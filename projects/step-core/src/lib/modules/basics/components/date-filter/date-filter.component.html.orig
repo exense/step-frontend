@@ -1,0 +1,15 @@
+<<<<<<< HEAD
+<step-input-group>
+  <label *ngIf="label">{{ label }}</label>
+  <input type="text" [matDatepicker]="picker" #dateInput [formControl]="dateControl" [readonly]="readonlyInput" />
+  <div class="step-input-addon">
+=======
+<mat-form-field class="step-view with-suffix">
+  <input type="text" matInput [matDatepicker]="picker" #dateInput [formControl]="dateControl" />
+  <div class="icon-suffix" matSuffix>
+>>>>>>> master
+    <step-icon name="calendar" (click)="picker.open()"></step-icon>
+  </div>
+  <mat-error *ngIf="dateControl.invalid">Invalid date</mat-error>
+</mat-form-field>
+<mat-datepicker #picker></mat-datepicker>

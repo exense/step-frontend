@@ -1,14 +1,15 @@
-import { Component, forwardRef, OnDestroy, OnInit, Optional } from '@angular/core';
+import { Component, forwardRef, OnDestroy, OnInit, Optional, ViewEncapsulation } from '@angular/core';
 import { AbstractArtefact, CustomComponent, TreeAction, TreeActionsService } from '@exense/step-core';
 import { map, Observable, of, Subject } from 'rxjs';
 import { PlanHandleService } from '../../services/plan-handle.service';
-import { PlanTreeAction } from '../../shared/plan-tree-action.enum';
 import { ArtefactTreeNode } from '../../shared/artefact-tree-node';
+import { PlanTreeAction } from '../../shared/plan-tree-action.enum';
 
 @Component({
   selector: 'step-plan-tree',
   templateUrl: './plan-tree.component.html',
   styleUrls: ['./plan-tree.component.scss'],
+  encapsulation: ViewEncapsulation.None,
   providers: [
     {
       provide: TreeActionsService,

@@ -25,59 +25,10 @@ angular
     EntityRegistry.registerEntity('Repository', 'repository', 'database');
   })
 
-  // This controller is used to force reload of the following Controllers after location change. This is a trick but it works
-  .controller('RepositoryLoadCtrl', function ($scope, $location, $timeout) {
-    $scope.reload = true;
-    $scope.$on('$locationChangeSuccess', function (event) {
-      $scope.reload = false;
-      $timeout(function () {
-        $scope.reload = true;
-      });
-    });
-  })
-
   .controller('RepositoryCtrl', [
-    '$rootScope',
     '$scope',
-    '$http',
-    '$location',
     'stateStorage',
-    'selectionCollectorFactoryService',
-    'AutoDeselectStrategy',
-    function ($rootScope, $scope, $http, $location, $stateStorage, selectionCollectorFactoryService, AutoDeselectStrategy) {
+    function ($scope, $stateStorage) {
       $stateStorage.push($scope, 'repository', {});
-
-      $scope.selectionCollector = selectionCollectorFactoryService.create('id', AutoDeselectStrategy.KEEP_SELECTION);
-      $scope.$on('$destroy', function(){
-        $scope.selectionCollector.destroy();
-      });
-
-      $scope.trackTestcasesBy = $location.search().repositoryId == 'local' ? 'id' : 'testplanName';
-
-      if ($location.search().user) {
-        $rootScope.context.userID = $location.search().user;
-      }
-
-      $scope.isolateExecution = $location.search().isolate ? $location.search().isolate : false;
-
-      if ($location.search().repositoryId) {
-        $scope.repoRef = {
-          repositoryID: $location.search().repositoryId,
-          repositoryParameters: _.omit($location.search(), 'repositoryId', 'tenant'),
-        };
-        $scope.loading = true;
-        $http.post('rest/controller/repository/artefact/info', $scope.repoRef).then(
-          function (response) {
-            $scope.loading = false;
-            $scope.artefactInfo = response.data;
-          },
-          function errorCallback(response) {
-            $scope.loading = false;
-            $scope.error = response.data;
-          }
-        );
-
-        $scope.functions = {};
-      }
     },
-  ])
+  ]);
