@@ -58,7 +58,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, AfterVie
     this.context = this.contextsFactory.createContext(contextParams);
     this.performanceViewSettings = this.settings;
     this.subscribeForContextChange();
-    this.context.inProgressChange().subscribe((x) => console.log('Progress change:', x));
     this.throttledRefreshTrigger$
       .pipe(
         throttle(() => this.context.inProgressChange().pipe(filter((x) => !x))),
@@ -102,7 +101,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, AfterVie
    * @param range
    */
   refresh(range: TSTimeRange, selection?: TSTimeRange): void {
-    console.log('ASKED TO REFRESH');
     if (selection) {
       this.context.updateSelectedRange(selection, false);
     } else if (this.context.isFullRangeSelected()) {
