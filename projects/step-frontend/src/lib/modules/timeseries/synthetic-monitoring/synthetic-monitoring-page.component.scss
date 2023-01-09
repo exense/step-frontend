@@ -4,6 +4,11 @@
   top: 4px;
 }
 
+.header-buttons {
+  display: flex;
+  margin-bottom: 16px;
+}
+
 :host {
   padding: 0 19px;
   max-width: 100%;

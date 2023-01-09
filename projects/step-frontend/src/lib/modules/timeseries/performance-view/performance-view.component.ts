@@ -146,29 +146,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       )
       .subscribe();
 
-    // this.context
-    //   .onFiltersChange()
-    //   .pipe(
-    //     tap(() => (this.chartsAreLoading = true)),
-    //     switchMap(() => this.refreshAllCharts()),
-    //     tap(() => (this.chartsAreLoading = false)),
-    //     takeUntil(this.terminator$)
-    //   )
-    //   .subscribe();
-    // this.context
-    //   .onGroupingChange()
-    //   .pipe(
-    //     tap((groupDimensions: string[]) => {
-    //       this.groupDimensions = groupDimensions;
-    //       // this.findRequest.oqlFilter = FilterUtils.filtersToOQL(this.context.getActiveFilter());
-    //     }),
-    //     tap(() => (this.chartsAreLoading = true)),
-    //     switchMap(() => this.refreshAllCharts()),
-    //     tap(() => (this.chartsAreLoading = false)),
-    //     takeUntil(this.terminator$)
-    //   )
-    //   .subscribe();
-
     this.createAllCharts();
   }
 
@@ -245,20 +222,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .withNumberOfBuckets(TimeSeriesConfig.MAX_BUCKETS_IN_CHART);
   }
 
-  // prepareFindRequest(settings: PerformanceViewSettings, customFilters?: any): FindBucketsRequest {
-  //   const numberOfBuckets = TimeSeriesConfig.MAX_BUCKETS_IN_CHART;
-  //   return {
-  //     start: settings.timeRange.from,
-  //     end: settings.timeRange.to,
-  //     numberOfBuckets: numberOfBuckets,
-  //     params: {
-  //       ...settings.contextualFilters,
-  //       [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_RESPONSE_TIME,
-  //       ...customFilters,
-  //     },
-  //   };
-  // }
-
   onRangerLoaded() {
     this.rangerLoaded$.next();
   }
@@ -269,7 +232,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       this.createByStatusChart(),
       this.createByKeywordsCharts(),
       this.createTableChart(),
-      // this.tableInitialized$.pipe(first()), // the table will render automatically once this.findRequest is set.
       this.rangerLoaded$.pipe(first()),
     ];
     if (this.includeThreadGroupChart) {
@@ -362,7 +324,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   createByStatusChart(): Observable<TimeSeriesChartResponse> {
     let request = this.findRequestBuilder.clone().withGroupDimensions([TimeSeriesConfig.STATUS_ATTRIBUTE]).build();
-    // request = { ...request, groupDimensions: [TimeSeriesConfig.STATUS_ATTRIBUTE] };
     return this.timeSeriesService
       .fetchBuckets(request)
       .pipe(tap((response) => this.createChart(TsChartType.BY_STATUS, request, response)));

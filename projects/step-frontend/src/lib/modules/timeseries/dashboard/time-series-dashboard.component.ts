@@ -117,8 +117,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, AfterVie
    * This is a force refresh (instantly triggered)
    */
   updateRange(range: TSTimeRange) {
-    // console.log(selection);
-    // this.timeRangeSelection = selection;
     this.updateSubscription?.unsubscribe(); // end current execution
     this.queuedSubscription.unsubscribe();
     this.context.updateFullRange(range, false);
@@ -130,12 +128,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, AfterVie
         showLoadingBar: true,
       })
       .subscribe();
-  }
-
-  updateCharts() {
-    this.context.setInProgress(true);
-    // this.context.updateFullRange(request.fullTimeRange, false);
-    // this.context.updateSelectedRange(request.selection, false);
   }
 
   ngOnDestroy(): void {

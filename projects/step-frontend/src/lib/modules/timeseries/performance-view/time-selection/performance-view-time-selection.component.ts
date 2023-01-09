@@ -32,8 +32,6 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   timeLabels: number[] = [];
 
-  // currentSelection!: ExecutionTimeSelection;
-
   private tsContext!: TimeSeriesContext;
   private terminator$ = new Subject<void>();
 
@@ -70,7 +68,6 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   updateFullTimeRange(range: TSTimeRange) {
     this.settings.timeRange = range;
-    // this.createRanger().subscribe();
   }
 
   refreshRanger(): Observable<TimeSeriesChartResponse> {
@@ -82,8 +79,6 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   }
 
   createRanger(fullTimeRange: TSTimeRange, selection?: TSTimeRange): Observable<TimeSeriesChartResponse> {
-    // const startTime = this.settings.timeRange.from;
-    // const endTime = this.settings.timeRange.to || new Date().getTime() - 5000; // minus 5 seconds
     const request: FindBucketsRequest = {
       params: this.settings.contextualFilters,
       start: fullTimeRange.from,
