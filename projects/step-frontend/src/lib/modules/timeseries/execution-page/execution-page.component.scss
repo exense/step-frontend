@@ -1,10 +1,11 @@
 :host {
+  position: relative;
 }
 
 .header-buttons {
   position: absolute;
-  right: 80px;
-  top: 6px;
+  right: 48px;
+  top: -65px;
   display: flex;
   z-index: 100;
 }
