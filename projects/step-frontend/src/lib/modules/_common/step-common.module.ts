@@ -5,7 +5,6 @@ import { ExecutionLinkComponent } from './components/execution-link/execution-li
 import { LoginComponent } from './components/login/login.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { VersionsDialogComponent } from './components/versions-dialog/versions-dialog.component';
-import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { CustomFormDirective } from './directives/custom-form.directive';
 import { JsonViewerDirective } from './directives/json-viewer.directive';
 import { PlanExecutionDirective } from './directives/plan-execution.directive';
@@ -24,7 +23,6 @@ import { MenuFilterPipe } from './pipes/menu-filter.pipe';
     IsEmptyJsonPipe,
     ContainsVersionPipe,
     MenuFilterPipe,
-    ArtefactDetailsDirective,
     CustomFormDirective,
     PlanExecutionDirective,
     VersionsDialogComponent,
@@ -38,7 +36,6 @@ import { MenuFilterPipe } from './pipes/menu-filter.pipe';
     IsEmptyJsonPipe,
     ContainsVersionPipe,
     MenuFilterPipe,
-    ArtefactDetailsDirective,
     CustomFormDirective,
     PlanExecutionDirective,
   ],
