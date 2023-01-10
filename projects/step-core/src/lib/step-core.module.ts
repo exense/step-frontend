@@ -32,6 +32,8 @@ import { TreeModule } from './modules/tree/tree.module';
 import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
+import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
+import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 
 @NgModule({
   declarations: [
@@ -51,6 +53,8 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     DynamicTextfieldComponent,
     SelectPlanComponent,
     AutorefreshToggleComponent,
+    ArtefactDetailsDirective,
+    PlanTreeComponent,
   ],
   imports: [
     CommonModule,
@@ -97,6 +101,8 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     IsUsedByModalComponent,
     DynamicTextfieldComponent,
     SelectPlanComponent,
+    PlanTreeComponent,
+    ArtefactDetailsDirective,
     AutorefreshToggleComponent,
   ],
   providers: [
@@ -139,11 +145,13 @@ export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by
 export { ModalWindowComponent } from './components/modal-window/modal-window.component';
 export { PlanLinkComponent } from './components/plan-link/plan-link.component';
 export * from './components/report-node-status/report-node-status.component';
+export * from './components/plan-tree/plan-tree.component';
 export { SelectPlanComponent } from './components/select-plan/select-plan.component';
 export * from './decorators/plugin';
 export * from './directives/caps-lock.directive';
 export * from './directives/tooltip-immediate-close.directive';
 export * from './directives/tooltip.directive';
+export * from './directives/artefact-details.directive';
 export * from './domain';
 export * from './modules/async-operations/async-operations.module';
 export * from './modules/basics/step-basics.module';
@@ -173,4 +181,7 @@ export * from './services/scheduled-task-dialogs.service';
 export { UibModalHelperService, UibModalInstance } from './services/uib-modal-helper.service';
 export * from './services/view-registry.service';
 export * from './services/view-state.service';
+export * from './services/plan-editor.service';
+export * from './services/plan-interactive-session.service';
+export * from './services/plan-artefact-resolver.service';
 export * from './shared';

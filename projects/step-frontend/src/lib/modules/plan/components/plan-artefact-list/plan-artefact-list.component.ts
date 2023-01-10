@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Inject, Input, Output, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_LOCATION, AJS_MODULE } from '@exense/step-core';
 import { ILocationService } from 'angular';

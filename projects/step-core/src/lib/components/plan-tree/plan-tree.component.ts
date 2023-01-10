@@ -1,9 +1,11 @@
-import { Component, forwardRef, OnDestroy, OnInit, Optional, ViewEncapsulation } from '@angular/core';
-import { AbstractArtefact, CustomComponent, TreeAction, TreeActionsService } from '@exense/step-core';
-import { map, Observable, of, Subject } from 'rxjs';
-import { PlanHandleService } from '../../services/plan-handle.service';
-import { ArtefactTreeNode } from '../../shared/artefact-tree-node';
+import { Component, forwardRef, Input, Optional, ViewEncapsulation } from '@angular/core';
+import { map, Observable, of } from 'rxjs';
 import { PlanTreeAction } from '../../shared/plan-tree-action.enum';
+import { PlanEditorService } from '../../services/plan-editor.service';
+import { TreeStateService, TreeAction, TreeActionsService, ArtefactTreeNode } from '../../modules/tree/tree.module';
+import { AbstractArtefact } from '../../client/generated';
+import { PlanInteractiveSessionService } from '../../services/plan-interactive-session.service';
+import { PlanArtefactResolverService } from '../../services/plan-artefact-resolver.service';
 
 @Component({
   selector: 'step-plan-tree',
@@ -17,8 +19,9 @@ import { PlanTreeAction } from '../../shared/plan-tree-action.enum';
     },
   ],
 })
-export class PlanTreeComponent implements OnInit, OnDestroy, CustomComponent, TreeActionsService {
-  context?: any;
+export class PlanTreeComponent implements TreeActionsService {
+  readonly selectedArtefact$ = this._treeState.selectedNode$.pipe(map((node) => node?.originalArtefact));
+  @Input() isReadonly: boolean = false;
 
   private actions: TreeAction[] = [
     { id: PlanTreeAction.rename, label: 'Rename (F2)' },
@@ -32,16 +35,12 @@ export class PlanTreeComponent implements OnInit, OnDestroy, CustomComponent, Tr
     { id: PlanTreeAction.disable, label: 'Disable (Ctrl+e)' },
   ];
 
-  private terminator$ = new Subject<unknown>();
-
-  constructor(@Optional() public _planHandle?: PlanHandleService) {}
-
-  ngOnInit(): void {}
-
-  ngOnDestroy(): void {
-    this.terminator$.next({});
-    this.terminator$.complete();
-  }
+  constructor(
+    private _treeState: TreeStateService<AbstractArtefact, ArtefactTreeNode>,
+    public _planEditService: PlanEditorService,
+    @Optional() public _planInteractiveSession?: PlanInteractiveSessionService,
+    @Optional() private _planArtefactResolver?: PlanArtefactResolverService
+  ) {}
 
   getActionsForNode(node: ArtefactTreeNode): Observable<TreeAction[]> {
     const isSkipped = node.isSkipped;
@@ -51,7 +50,9 @@ export class PlanTreeComponent implements OnInit, OnDestroy, CustomComponent, Tr
         actions
           .map((action) => {
             let disabled = false;
-            if (action.id === PlanTreeAction.open) {
+            if (this.isReadonly) {
+              disabled = true;
+            } else if (action.id === PlanTreeAction.open) {
               disabled = !['CallPlan', 'CallKeyword'].includes(node.originalArtefact._class);
             }
             return { ...action, disabled };
@@ -78,29 +79,29 @@ export class PlanTreeComponent implements OnInit, OnDestroy, CustomComponent, Tr
   proceedAction(actionId: string, node?: AbstractArtefact): void {
     switch (actionId) {
       case PlanTreeAction.rename:
-        this._planHandle?.rename(node);
+        this._planEditService.rename(node);
         break;
       case PlanTreeAction.move_up:
-        this._planHandle?.moveUp(node);
+        this._planEditService.moveUp(node);
         break;
       case PlanTreeAction.move_down:
-        this._planHandle?.moveDown(node);
+        this._planEditService.moveDown(node);
         break;
       case PlanTreeAction.copy:
-        this._planHandle?.copy(node);
+        this._planEditService.copy(node);
         break;
       case PlanTreeAction.paste:
-        this._planHandle?.paste(node);
+        this._planEditService.paste(node);
         break;
       case PlanTreeAction.delete:
-        this._planHandle?.delete(node);
+        this._planEditService.delete(node);
         break;
       case PlanTreeAction.open:
-        this._planHandle?.openArtefact(node);
+        this._planArtefactResolver?.openArtefact(node);
         break;
       case PlanTreeAction.disable:
       case PlanTreeAction.enable:
-        this._planHandle?.toggleSkip(node);
+        this._planEditService?.toggleSkip(node);
         break;
       default:
         break;
