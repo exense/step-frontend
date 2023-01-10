@@ -107,6 +107,7 @@ angular
           $scope.parameter = response.data;
         });
       } else {
+        $scope.mode = 'edit';
         $http.get('rest/parameters/' + id).then(function (response) {
           $scope.parameter = response.data;
           if (!$scope.parameter.scope) {

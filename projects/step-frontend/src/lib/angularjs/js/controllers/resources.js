@@ -22,16 +22,6 @@ angular
   .run(function (ViewRegistry, EntityRegistry) {
     ViewRegistry.registerView('resources', 'partials/resources/resourceList.html');
     ViewRegistry.registerMenuEntry('Resources', 'resources', 'book',  50,"automation-root");
-    EntityRegistry.registerEntity(
-      'Resource',
-      'resources',
-      'book',
-      'resources',
-      'rest/resources/',
-      'rest/resources/',
-      'st-table',
-      '/partials/resources/resourceSelectionTable.html',
-    );
   })
   .factory('ResourceDialogs', function ($uibModal, $http, Dialogs) {
     function openModal(id) {

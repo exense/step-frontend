@@ -7,6 +7,7 @@ import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { UpgradeModule } from '@angular/upgrade/static';
 import { AngularSplitModule } from 'angular-split';
 import { StepGeneratedClientModule } from './client/generated';
+import { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
 import { DynamicTextfieldComponent } from './components/dynamic-textfield/dynamic-textfield.component';
 import { ExpressionInputComponent } from './components/expression-input/expression-input.component';
 import { FunctionLinkComponent } from './components/function-link/function-link.component';
@@ -51,6 +52,7 @@ import { ArtefactDetailsDirective } from './directives/artefact-details.directiv
     ExpressionInputComponent,
     DynamicTextfieldComponent,
     SelectPlanComponent,
+    AutorefreshToggleComponent,
     ArtefactDetailsDirective,
     PlanTreeComponent,
   ],
@@ -101,6 +103,7 @@ import { ArtefactDetailsDirective } from './directives/artefact-details.directiv
     SelectPlanComponent,
     PlanTreeComponent,
     ArtefactDetailsDirective,
+    AutorefreshToggleComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -134,6 +137,7 @@ export { OpenAPI } from './client/generated/core/OpenAPI';
 export type { OpenAPIConfig } from './client/generated/core/OpenAPI';
 export * from './client/generated/index';
 export * from './client/step-client-module';
+export { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
 export { DynamicTextfieldComponent } from './components/dynamic-textfield/dynamic-textfield.component';
 export { ExpressionInputComponent } from './components/expression-input/expression-input.component';
 export { FunctionLinkDialogService } from './components/function-link/function-link-dialog.service';

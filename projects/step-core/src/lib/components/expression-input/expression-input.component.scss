@@ -1,7 +1,7 @@
 step-expression-input {
   display: flex;
+  align-items: flex-end;
   gap: 8px;
-  padding-bottom: 1.25em;
 
   > .help {
     display: flex;
@@ -10,18 +10,11 @@ step-expression-input {
 
   > .mat-form-field {
     flex: 1;
-
-    &.mat-form-field-appearance-legacy .mat-form-field-wrapper {
-      padding-bottom: 0;
-
-      .mat-form-field-underline {
-        bottom: 0;
-      }
-    }
   }
 
   > .actions {
     display: flex;
+    height: 42px;
 
     .mat-stroked-button {
       .mat-button-wrapper {
@@ -35,12 +28,12 @@ step-expression-input {
 
       &:first-child {
         border-right: 0;
-        border-radius: 4px 0 0 4px;
+        border-radius: 8px 0 0 8px;
       }
 
       &:last-child {
         border-left: 0;
-        border-radius: 0 4px 4px 0;
+        border-radius: 0 8px 8px 0;
       }
     }
 

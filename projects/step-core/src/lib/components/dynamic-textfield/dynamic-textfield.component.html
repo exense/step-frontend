@@ -10,7 +10,7 @@
 ></step-expression-input>
 
 <ng-template #constantValueTemplate>
-  <mat-form-field floatLabel="always" [class.mat-form-field-invalid]="!!_ngControl.invalid">
+  <mat-form-field floatLabel="always" class="step-view" [class.ng-invalid]="!!_ngControl.invalid">
     <mat-label *ngIf="label">{{ label }}</mat-label>
     <input
       type="text"

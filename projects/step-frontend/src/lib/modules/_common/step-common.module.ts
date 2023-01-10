@@ -1,7 +1,6 @@
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { StepCoreModule } from '@exense/step-core';
-import { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
 import { ExecutionLinkComponent } from './components/execution-link/execution-link.component';
 import { LoginComponent } from './components/login/login.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
@@ -17,7 +16,6 @@ import { MenuFilterPipe } from './pipes/menu-filter.pipe';
 
 @NgModule({
   declarations: [
-    AutorefreshToggleComponent,
     LoginComponent,
     SidebarComponent,
     ExecutionLinkComponent,
@@ -30,7 +28,6 @@ import { MenuFilterPipe } from './pipes/menu-filter.pipe';
     VersionsDialogComponent,
   ],
   exports: [
-    AutorefreshToggleComponent,
     StepCoreModule,
     LoginComponent,
     SidebarComponent,

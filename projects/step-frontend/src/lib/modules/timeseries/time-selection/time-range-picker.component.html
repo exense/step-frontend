@@ -10,24 +10,24 @@
         <div class="left-section">
           <div class="title bottom-gap">Absolute time range</div>
           <div class="bottom-gap">
-            <step-input-group>
-              <label>From</label>
-              <input type="text" [(ngModel)]="fromDateString" />
-              <div class="step-input-addon">
+            <mat-form-field class="step-view with-suffix with-reduced-inner-padding">
+              <mat-label>From</mat-label>
+              <input type="text" matInput [(ngModel)]="fromDateString" />
+              <div class="icon-suffix" matSuffix>
                 <step-icon name="calendar" (click)="fromPicker.open()"></step-icon>
               </div>
-            </step-input-group>
+            </mat-form-field>
             <input class="hidden-input" [matDatepicker]="fromPicker" (dateChange)="setFromDate($event)" />
             <mat-datepicker #fromPicker disabled="false"></mat-datepicker>
           </div>
           <div class="bottom-gap">
-            <step-input-group>
-              <label>To</label>
-              <input type="text" [(ngModel)]="toDateString" />
-              <div class="step-input-addon">
+            <mat-form-field class="step-view with-suffix with-reduced-inner-padding">
+              <mat-label>To</mat-label>
+              <input type="text" matInput [(ngModel)]="toDateString" />
+              <div class="icon-suffix" matSuffix>
                 <step-icon name="calendar" (click)="toPicker.open()"></step-icon>
               </div>
-            </step-input-group>
+            </mat-form-field>
             <input class="hidden-input" [matDatepicker]="toPicker" (dateChange)="setToDate($event)" />
             <mat-datepicker #toPicker disabled="false"></mat-datepicker>
           </div>
