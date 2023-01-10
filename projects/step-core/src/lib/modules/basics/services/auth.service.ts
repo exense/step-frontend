@@ -1,8 +1,7 @@
 import { DOCUMENT } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, OnDestroy } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { CredentialsDto, SessionDto } from '../../../domain';
+import { SessionDto } from '../../../domain';
 import { BehaviorSubject, catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 import { AJS_LOCATION, AJS_PREFERENCES, AJS_ROOT_SCOPE, AJS_UIB_MODAL } from '../../../shared/angularjs-providers';
 import { AJS_MODULE } from '../../../shared/constants';
@@ -11,6 +10,7 @@ import { AdditionalRightRuleService } from '../../../services/additional-right-r
 import { ApplicationConfiguration, PrivateApplicationService } from '../../../client/generated';
 import { Mutable } from '../../../shared';
 import { AuthContext } from '../shared/auth-context.interface';
+import { LoginService } from './login.service';
 
 type FieldAccessor = Mutable<Pick<AuthService, 'isOidc'>>;
 
@@ -23,14 +23,14 @@ const ANONYMOUS = 'anonymous';
 })
 export class AuthService implements OnDestroy {
   constructor(
-    private _http: HttpClient,
     @Inject(AJS_ROOT_SCOPE) private _$rootScope: any,
     @Inject(AJS_LOCATION) private _$location: any,
     @Inject(DOCUMENT) private _document: Document,
     @Inject(AJS_PREFERENCES) private _preferences: any,
     @Inject(AJS_UIB_MODAL) private _$uibModal: any,
     private _additionalRightRules: AdditionalRightRuleService,
-    private _privateApplicationApi: PrivateApplicationService
+    private _privateApplicationApi: PrivateApplicationService,
+    private _loginService: LoginService
   ) {}
 
   private _triggerRightCheck$ = new BehaviorSubject<unknown>(undefined);
@@ -72,8 +72,8 @@ export class AuthService implements OnDestroy {
     this.setContext(context);
   }
 
-  login(credentials: CredentialsDto): Observable<unknown> {
-    return this._http.post('rest/access/login', credentials).pipe(
+  login(username: string, password: string): Observable<unknown> {
+    return this._loginService.login(username, password).pipe(
       switchMap(() => this.getSession()),
       tap(() => {
         const context = this.getContext();
@@ -88,8 +88,8 @@ export class AuthService implements OnDestroy {
   }
 
   logout(): void {
-    this._http
-      .post('rest/access/logout', {})
+    this._loginService
+      .logout()
       .pipe(map(() => ({ userID: ANONYMOUS } as AuthContext)))
       .subscribe((context) => {
         this.setContext(context);

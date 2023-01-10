@@ -32,6 +32,7 @@ import { TreeModule } from './modules/tree/tree.module';
 import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
+import { SettingBtnComponent } from './components/setting-btn/setting-btn.component';
 
 @NgModule({
   declarations: [
@@ -51,6 +52,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     DynamicTextfieldComponent,
     SelectPlanComponent,
     AutorefreshToggleComponent,
+    SettingBtnComponent,
   ],
   imports: [
     CommonModule,
@@ -98,6 +100,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     DynamicTextfieldComponent,
     SelectPlanComponent,
     AutorefreshToggleComponent,
+    SettingBtnComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -138,6 +141,7 @@ export { FunctionLinkComponent } from './components/function-link/function-link.
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 export { ModalWindowComponent } from './components/modal-window/modal-window.component';
 export { PlanLinkComponent } from './components/plan-link/plan-link.component';
+export { SettingBtnComponent } from './components/setting-btn/setting-btn.component';
 export * from './components/report-node-status/report-node-status.component';
 export { SelectPlanComponent } from './components/select-plan/select-plan.component';
 export * from './decorators/plugin';

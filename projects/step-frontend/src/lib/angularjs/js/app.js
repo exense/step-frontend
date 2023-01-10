@@ -32,7 +32,7 @@ var tecAdminApp = angular
     'executionsControllers',
     'parametersControllers',
     'resourcesControllers',
-    'adminControllers',
+    'settingControllers',
     'screenConfigurationControllers',
     'dashboardsControllers',
     'asyncTask',
