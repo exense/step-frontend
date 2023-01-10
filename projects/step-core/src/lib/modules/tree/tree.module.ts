@@ -50,3 +50,4 @@ export * from './shared/artefact-flat-node';
 export * from './shared/tree-action';
 export * from './shared/tree-flat-node';
 export * from './shared/tree-node';
+export * from './shared/artefact-tree-node';

@@ -33,6 +33,8 @@ import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
 import { SettingBtnComponent } from './components/setting-btn/setting-btn.component';
+import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
+import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 
 @NgModule({
   declarations: [
@@ -53,6 +55,8 @@ import { SettingBtnComponent } from './components/setting-btn/setting-btn.compon
     SelectPlanComponent,
     AutorefreshToggleComponent,
     SettingBtnComponent,
+    ArtefactDetailsDirective,
+    PlanTreeComponent,
   ],
   imports: [
     CommonModule,
@@ -99,6 +103,8 @@ import { SettingBtnComponent } from './components/setting-btn/setting-btn.compon
     IsUsedByModalComponent,
     DynamicTextfieldComponent,
     SelectPlanComponent,
+    PlanTreeComponent,
+    ArtefactDetailsDirective,
     AutorefreshToggleComponent,
     SettingBtnComponent,
   ],
@@ -143,11 +149,13 @@ export { ModalWindowComponent } from './components/modal-window/modal-window.com
 export { PlanLinkComponent } from './components/plan-link/plan-link.component';
 export { SettingBtnComponent } from './components/setting-btn/setting-btn.component';
 export * from './components/report-node-status/report-node-status.component';
+export * from './components/plan-tree/plan-tree.component';
 export { SelectPlanComponent } from './components/select-plan/select-plan.component';
 export * from './decorators/plugin';
 export * from './directives/caps-lock.directive';
 export * from './directives/tooltip-immediate-close.directive';
 export * from './directives/tooltip.directive';
+export * from './directives/artefact-details.directive';
 export * from './domain';
 export * from './modules/async-operations/async-operations.module';
 export * from './modules/basics/step-basics.module';
@@ -177,4 +185,7 @@ export * from './services/scheduled-task-dialogs.service';
 export { UibModalHelperService, UibModalInstance } from './services/uib-modal-helper.service';
 export * from './services/view-registry.service';
 export * from './services/view-state.service';
+export * from './services/plan-editor.service';
+export * from './services/plan-interactive-session.service';
+export * from './services/plan-artefact-resolver.service';
 export * from './shared';
