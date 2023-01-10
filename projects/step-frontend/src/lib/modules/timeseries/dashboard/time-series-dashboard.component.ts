@@ -17,7 +17,7 @@ import { TimeSeriesContextParams } from '../time-series-context-params';
   templateUrl: './time-series-dashboard.component.html',
   styleUrls: ['./time-series-dashboard.component.scss'],
 })
-export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, AfterViewInit {
+export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   readonly ONE_HOUR_MS = 3600 * 1000;
 
   @Input() settings!: TimeSeriesDashboardSettings;
@@ -27,8 +27,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, AfterVie
   context!: TimeSeriesContext;
   performanceViewSettings: PerformanceViewSettings | undefined;
   updateSubscription = new Subscription();
-  update$: Observable<any> | undefined;
-  updateGate$: Subject<any> = new Subject<any>();
   queuedSubscription = new Subscription();
   throttledRefreshTrigger$: Subject<any> = new Subject();
   terminator$ = new Subject();
@@ -41,8 +39,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, AfterVie
   ];
 
   constructor(private contextsFactory: TimeSeriesContextsFactory) {}
-
-  ngAfterViewInit(): void {}
 
   ngOnInit(): void {
     if (!this.settings) {
@@ -60,7 +56,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, AfterVie
     this.subscribeForContextChange();
     this.throttledRefreshTrigger$
       .pipe(
-        throttle(() => this.context.inProgressChange().pipe(filter((x) => !x))),
+        throttle(() => this.context.inProgressChange().pipe(filter((inProgress) => !inProgress))),
         takeUntil(this.terminator$)
       )
       .subscribe(() => {
@@ -83,7 +79,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, AfterVie
       .pipe(takeUntil(this.terminator$))
       .subscribe(() => {
         this.updateSubscription?.unsubscribe();
-        // this.throttledRefreshTrigger$.next(null);
         this.updateDashboard(true);
       });
   }

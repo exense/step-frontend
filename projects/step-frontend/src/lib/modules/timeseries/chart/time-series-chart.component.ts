@@ -10,12 +10,9 @@ import {
   Self,
   SimpleChanges,
   ViewChild,
-  ViewEncapsulation,
 } from '@angular/core';
 import { TSChartSeries, TSChartSettings } from './model/ts-chart-settings';
 import { UplotSyncService } from './uplot-sync-service';
-import { UPlotUtils } from '../uplot/uPlot.utils';
-import { TSTimeRange } from './model/ts-time-range';
 import { AlignedData } from 'uplot';
 import MouseListener = uPlot.Cursor.MouseListener;
 
@@ -164,24 +161,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         },
         ...settings.series,
       ],
-      hooks: {
-        // init: [
-        //   (u: any) => {
-        // u.root.addEventListener('click', (e: any) => {
-        // let hoveredSeriesIdx = u.cursor.idxs.findIndex((v: number) => v != null);
-        //
-        // if (hoveredSeriesIdx != -1) {
-        //   let hoveredDataIdx = u.cursor.idxs[hoveredSeriesIdx];
-        //   let seriesOpts = u.series[hoveredSeriesIdx];
-        //   let facetsData = u.data[hoveredSeriesIdx];
-        // }
-        // });
-        //   },
-        // ],
-        // setSelect: [(uplot) => {
-        // }],
-        // setScale: [ (x: any) => console.log(this.isZoomed())]
-      },
+      hooks: {},
     };
 
     let data: AlignedData = [settings.xValues, ...settings.series.map((s) => s.data)];
@@ -251,7 +231,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
    * Switches the state of the specified series.
    */
   toggleSeries(id: string): void {
-    let index = this.seriesIndexesByIds[id];
+    const index = this.seriesIndexesByIds[id];
     if (index == undefined) return;
     let currentState = this.uplot.series[index].show;
     this.uplot.setSeries(index, { show: !currentState });
