@@ -24,7 +24,7 @@ import { ThroughputMetric } from './model/throughput-metric';
 import { PerformanceViewConfig } from './performance-view.config';
 import { UpdatePerformanceViewRequest } from './model/update-performance-view-request';
 import { FindBucketsRequestBuilder } from '../util/find-buckets-request-builder';
-import { TimeSeriesConfig } from '../time-series.config';
+import { RefreshInterval, TimeSeriesConfig } from '../time-series.config';
 
 declare const uPlot: any;
 
@@ -523,11 +523,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   get TsChartType() {
     return TsChartType;
   }
-}
-
-export interface RefreshInterval {
-  label: string;
-  value: number; // 0 if it's off
 }
 
 getAngularJSGlobal()

@@ -1,4 +1,3 @@
-import { RefreshInterval } from './performance-view/performance-view.component';
 import { RelativeTimeSelection } from './time-selection/model/relative-time-selection';
 
 export class TimeSeriesConfig {
@@ -33,4 +32,9 @@ export class TimeSeriesConfig {
     { label: 'Last Week', timeInMs: this.ONE_HOUR_MS * 24 * 7 },
     { label: 'Last Month', timeInMs: this.ONE_HOUR_MS * 24 * 31 },
   ];
+}
+
+export interface RefreshInterval {
+  label: string;
+  value: number; // 0 if it's off
 }
