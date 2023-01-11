@@ -7,13 +7,15 @@
     <as-split-area [size]="75">
       <mat-card class="editor-card">
         <mat-card-title class="editor-header">
-          {{ plan?.root?._class || '' }} - {{plan?.attributes?.['name']}}
+          <ng-container *ngIf="_planEditService.plan$ | async as plan">
+            {{ plan?.root?._class || '' }} - {{plan?.attributes?.['name']}}
+          </ng-container>
           <step-btn-group>
             <button
               type="button"
               mat-flat-button
-              *ngIf="hasUndo$ | async"
-              (click)="discardAll()"
+              *ngIf="_planEditService.hasUndo$ | async"
+              (click)="_planEditService.discardAll()"
               matTooltip="revert all changes"
               matTooltipPosition="below"
             >
@@ -22,8 +24,8 @@
             <button
               type="button"
               mat-icon-button
-              [disabled]="!(hasUndo$ | async)"
-              (click)="undo()"
+              [disabled]="!(_planEditService.hasUndo$ | async)"
+              (click)="_planEditService.undo()"
               matTooltip="Undo (ctrl+z)"
               matTooltipPosition="below"
             >
@@ -32,8 +34,8 @@
             <button
               type="button"
               mat-icon-button
-              [disabled]="!(hasRedo$ | async)"
-              (click)="redo()"
+              [disabled]="!(_planEditService.hasRedo$ | async)"
+              (click)="_planEditService.redo()"
               matTooltip="Redo (ctrl+y)"
               matTooltipPosition="below"
             >
@@ -78,7 +80,7 @@
                 (click)="$event.stopImmediatePropagation()"
               >
                 <step-plan-execution
-                  [description]="plan?.attributes?.['name']"
+                  [description]="(_planEditService.plan$ | async)?.attributes?.['name']"
                   [repositoryObjectRef]="repositoryObjectRef"
                 >
                 </step-plan-execution>
@@ -86,16 +88,16 @@
             </mat-menu>
           </step-btn-group>
         </mat-card-title>
-        <mat-card-content *ngIf="plan">
+        <mat-card-content *ngIf="planClass">
           <step-custom-form
-            [stModel]="plan"
+            [stModel]="(_planEditService.plan$ | async)!"
             stScreen="planTable"
             [stInline]="true"
-            (stOnChange)="handlePlanChange()"
+            (stOnChange)="_planEditService.handlePlanChange()"
             [stDisabled]="!('plan-write' | hasRight | async)"
           >
           </step-custom-form>
-          <step-plan-type [itemKey]="plan._class"> </step-plan-type>
+          <step-plan-type [itemKey]="planClass"> </step-plan-type>
         </mat-card-content>
       </mat-card>
     </as-split-area>
