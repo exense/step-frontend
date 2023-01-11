@@ -1,0 +1,128 @@
+<step-upload-container (filesChange)="onFilesChange($event)">
+  <ng-container *ngIf="!isResource; else resourceTemplate">
+    <mat-form-field floatLabel="always" class="step-view with-suffix">
+      <mat-label *ngIf="label">
+        {{ label }}
+
+        <step-icon *ngIf="withHelpIcon" name="help-circle" [matTooltip]="helpIconTooltip || ''"></step-icon>
+      </mat-label>
+
+      <input
+        type="text"
+        matInput
+        [(ngModel)]="stModel"
+        [readonly]="disableServerPath"
+        [matTooltip]="
+          disableServerPath
+            ? 'Drag and drop your file here'
+            : 'Drag and drop your file here or enter the path to a file accessible from the controller'
+        "
+        (blur)="onBlur()"
+      />
+
+      <ng-container matSuffix>
+        <ng-container *ngIf="withSaveButton">
+          <button type="button" mat-stroked-button [disabled]="stModel === lastStModelValue" (click)="saveChanges()">
+            {{ saveButtonLabel }}
+          </button>
+
+          <div class="suffix-separator"></div>
+        </ng-container>
+
+        <button
+          type="button"
+          mat-stroked-button
+          matTooltip="Select an existing resource"
+          [disabled]="uploadOnly"
+          (click)="selectResource()"
+        >
+          <step-icon name="search"></step-icon>
+        </button>
+
+        <div class="suffix-separator"></div>
+
+        <button type="button" mat-stroked-button matTooltip="Select from file system" (click)="openFileChooser()">
+          <step-icon name="folder-plus"></step-icon>
+        </button>
+      </ng-container>
+    </mat-form-field>
+  </ng-container>
+
+  <ng-template #resourceTemplate>
+    <ng-container *ngIf="!resourceNotExisting">
+      <mat-form-field floatLabel="always" class="step-view with-suffix">
+        <mat-label *ngIf="label">
+          {{ label }}
+
+          <step-icon *ngIf="withHelpIcon" name="help-circle" [matTooltip]="helpIconTooltip || ''"></step-icon>
+        </mat-label>
+
+        <input
+          type="text"
+          readonly="readonly"
+          matInput
+          [ngModel]="resourceFilename"
+          matTooltip="Drag and drop your file here or enter the path to a file accessible from the controller"
+        />
+
+        <ng-container matSuffix>
+          <a href="rest/resources/{{ resourceId }}/content" mat-stroked-button matTooltip="Download this file">
+            <step-icon name="download"></step-icon>
+          </a>
+
+          <div class="suffix-separator"></div>
+
+          <button type="button" mat-stroked-button matTooltip="Select from file system" (click)="openFileChooser()">
+            <step-icon name="folder-plus"></step-icon>
+          </button>
+
+          <div class="suffix-separator"></div>
+
+          <button
+            type="button"
+            mat-stroked-button
+            matTooltip="Select an existing resource"
+            [disabled]="uploadOnly"
+            (click)="selectResource()"
+          >
+            <step-icon name="search"></step-icon>
+          </button>
+
+          <div class="suffix-separator"></div>
+
+          <button type="button" mat-stroked-button matTooltip="Clear" (click)="clear()">
+            <step-icon name="x"></step-icon>
+          </button>
+        </ng-container>
+      </mat-form-field>
+    </ng-container>
+
+    <ng-container *ngIf="resourceNotExisting">
+      <mat-form-field floatLabel="always" class="step-view with-suffix">
+        <mat-label *ngIf="label">
+          {{ label }}
+
+          <step-icon *ngIf="withHelpIcon" name="help-circle" [matTooltip]="helpIconTooltip || ''"></step-icon>
+        </mat-label>
+
+        <input
+          type="text"
+          readonly="readonly"
+          matInput
+          value="Error: the referenced resource doesn't exist anymore."
+          matTooltip="Drag and drop your file here or enter the path to a file accessible from the controller"
+        />
+
+        <ng-container matSuffix>
+          <button type="button" mat-stroked-button matTooltip="Clear" (click)="clear()">
+            <step-icon name="x"></step-icon>
+          </button>
+        </ng-container>
+      </mat-form-field>
+    </ng-container>
+  </ng-template>
+</step-upload-container>
+
+<input #fileInput type="file" (input)="onChooseFile()" />
+
+<step-progress-bar *ngIf="progress$" [progress$]="progress$"></step-progress-bar>

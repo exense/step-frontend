@@ -9,3 +9,5 @@ import { ResourcesListComponent } from './resources-list/resources-list.componen
   imports: [StepCoreModule, StepCommonModule],
 })
 export class ContextMenuModule {}
+
+export * from './services/resource-dialogs.service';
