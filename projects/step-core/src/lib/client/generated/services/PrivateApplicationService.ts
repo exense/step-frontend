@@ -19,7 +19,7 @@ export class PrivateApplicationService {
   public getWebPlugins(): Observable<Array<AbstractWebPlugin>> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/app/plugins',
+      url: 'app/plugins',
     });
   }
 }
