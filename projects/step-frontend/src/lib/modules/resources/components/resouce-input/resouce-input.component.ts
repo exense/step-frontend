@@ -42,6 +42,7 @@ export class ResourceInputComponent implements OnChanges, OnDestroy {
 
   isResource?: boolean;
   resourceId?: string;
+  downloadResourceUrl?: string;
   absoluteFilepath?: string;
   resourceNotExisting?: boolean;
   resourceFilename?: string;
@@ -151,14 +152,6 @@ export class ResourceInputComponent implements OnChanges, OnDestroy {
     });
   }
 
-  downloadResource(): void {
-    if (!this.resourceId) {
-      return;
-    }
-
-    this._augmentedResourcesService.downloadResource(this.resourceId);
-  }
-
   clear(): void {
     this.absoluteFilepath = '';
     this.setStModel('');
@@ -173,6 +166,7 @@ export class ResourceInputComponent implements OnChanges, OnDestroy {
       this.stModel = this.stModel || '';
       this.lastStModelValue = this.stModel;
       this.resourceId = this.stModel.replace('resource:', '');
+      this.downloadResourceUrl = this._augmentedResourcesService.getDownloadResourceUrl(this.resourceId);
       this.isResource =
         Boolean(this.stModel) && typeof this.stModel === 'string' && this.stModel.startsWith('resource:');
 

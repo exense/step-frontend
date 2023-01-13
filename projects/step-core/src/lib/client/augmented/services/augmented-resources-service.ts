@@ -97,8 +97,8 @@ export class AugmentedResourcesService extends ResourcesService {
     };
   }
 
-  downloadResource(resourceId: string): void {
-    window.location.href = `/rest/resources/${resourceId}/content`;
+  getDownloadResourceUrl(resourceId: string): string {
+    return `/rest/resources/${resourceId}/content`;
   }
 
   private calculateProgressPercentage(httpProgressEvent: HttpProgressEvent) {

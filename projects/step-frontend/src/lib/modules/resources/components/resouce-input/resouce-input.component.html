@@ -66,9 +66,9 @@
         />
 
         <ng-container matSuffix>
-          <button type="button" mat-stroked-button matTooltip="Download this file" (click)="downloadResource()">
+          <a [href]="downloadResourceUrl" mat-stroked-button matTooltip="Download this file">
             <step-icon name="download"></step-icon>
-          </button>
+          </a>
 
           <div class="suffix-separator"></div>
 
