@@ -97,6 +97,10 @@ export class AugmentedResourcesService extends ResourcesService {
     };
   }
 
+  downloadResource(resourceId: string): void {
+    window.location.href = `/rest/resources/${resourceId}/content`;
+  }
+
   private calculateProgressPercentage(httpProgressEvent: HttpProgressEvent) {
     return httpProgressEvent.total ? Math.round((100 * httpProgressEvent.loaded) / httpProgressEvent.total) : 0;
   }

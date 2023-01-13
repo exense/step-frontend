@@ -151,6 +151,14 @@ export class ResourceInputComponent implements OnChanges, OnDestroy {
     });
   }
 
+  downloadResource(): void {
+    if (!this.resourceId) {
+      return;
+    }
+
+    this._augmentedResourcesService.downloadResource(this.resourceId);
+  }
+
   clear(): void {
     this.absoluteFilepath = '';
     this.setStModel('');
