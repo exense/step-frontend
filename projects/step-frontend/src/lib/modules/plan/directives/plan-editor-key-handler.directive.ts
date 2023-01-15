@@ -1,6 +1,5 @@
 import { Directive, HostListener, Inject, Optional } from '@angular/core';
-import { PlanHandleService } from '../services/plan-handle.service';
-import { AuthService } from '@exense/step-core';
+import { AuthService, PlanEditorService, PlanInteractiveSessionService } from '@exense/step-core';
 import { DOCUMENT } from '@angular/common';
 
 @Directive({
@@ -10,7 +9,9 @@ export class PlanEditorKeyHandlerDirective {
   constructor(
     private _authService: AuthService,
     @Inject(DOCUMENT) private _document: Document,
-    @Optional() private _planHandle?: PlanHandleService
+
+    private _planEditorService: PlanEditorService,
+    @Optional() private _planInteractiveSession?: PlanInteractiveSessionService
   ) {}
 
   @HostListener('document:keydown', ['$event'])
@@ -18,62 +19,62 @@ export class PlanEditorKeyHandlerDirective {
     if (event.ctrlKey) {
       if (this.checkKey(event, false, 'z', 'plan-write')) {
         event.preventDefault();
-        this._planHandle?.undo();
+        this._planEditorService.undo();
         return;
       }
 
       if (this.checkKey(event, false, 'y', 'plan-write')) {
         event.preventDefault();
-        this._planHandle?.redo();
+        this._planEditorService.redo();
         return;
       }
 
       if (this.checkKey(event, true, ['Up', 'ArrowUp'], 'plan-write')) {
         event.preventDefault();
-        this._planHandle?.moveUp();
+        this._planEditorService.moveUp();
         return;
       }
 
       if (this.checkKey(event, true, ['Down', 'ArrowDown'], 'plan-write')) {
         event.preventDefault();
-        this._planHandle?.moveDown();
+        this._planEditorService.moveDown();
         return;
       }
 
       if (this.checkKey(event, true, 'c', 'plan-write')) {
         event.preventDefault();
-        this._planHandle?.copy();
+        this._planEditorService.copy();
         return;
       }
 
       if (this.checkKey(event, true, 'v', 'plan-write')) {
         event.preventDefault();
-        this._planHandle?.paste();
+        this._planEditorService.paste();
         return;
       }
 
       if (this.checkKey(event, true, 'e', 'plan-write')) {
         event.preventDefault();
-        this._planHandle?.toggleSkip();
+        this._planEditorService.toggleSkip();
         return;
       }
 
       if (this.checkKey(event, true, 'Enter', 'plan-interactive')) {
         event.preventDefault();
-        this._planHandle?.execute();
+        this._planInteractiveSession?.execute();
         return;
       }
     }
 
     if (this.checkKey(event, true, ['Del', 'Delete'], 'plan-delete')) {
       event.preventDefault();
-      this._planHandle?.delete();
+      this._planEditorService.delete();
       return;
     }
 
     if (this.checkKey(event, true, 'F2', 'plan-write')) {
       event.preventDefault();
-      this._planHandle?.rename();
+      this._planEditorService.rename();
       return;
     }
   }

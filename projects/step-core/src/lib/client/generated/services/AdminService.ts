@@ -13,6 +13,8 @@ import type { User } from '../models/User';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
+// TODO TEMPORARY RESTORED DON'T FORGET TO DELETE
+
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}

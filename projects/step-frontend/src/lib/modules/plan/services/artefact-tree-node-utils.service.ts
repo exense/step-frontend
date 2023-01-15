@@ -1,6 +1,11 @@
-import { AbstractArtefact, ArtefactTypesService, TreeNode, TreeNodeUtilsService } from '@exense/step-core';
+import {
+  AbstractArtefact,
+  ArtefactTreeNode,
+  ArtefactTypesService,
+  TreeNode,
+  TreeNodeUtilsService,
+} from '@exense/step-core';
 import { Injectable } from '@angular/core';
-import { ArtefactTreeNode } from '../shared/artefact-tree-node';
 
 @Injectable()
 export class ArtefactTreeNodeUtilsService implements TreeNodeUtilsService<AbstractArtefact, ArtefactTreeNode> {
