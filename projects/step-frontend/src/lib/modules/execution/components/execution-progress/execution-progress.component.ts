@@ -70,7 +70,6 @@ const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\
 export class ExecutionProgressComponent implements OnInit, OnChanges, ExecutionStateService {
   tabs: Dashlet[] = [];
   activeTab?: Dashlet;
-  activeTabId?: string;
 
   execution?: Execution;
   testCases?: ReportNode[];
@@ -108,6 +107,8 @@ export class ExecutionProgressComponent implements OnInit, OnChanges, ExecutionS
 
   @Input() eId?: string;
   @Input() isActive?: boolean;
+  @Input() activeTabId?: string;
+  @Output() activeTabIdChange = new EventEmitter<string>();
   @Output() titleUpdate = new EventEmitter<{ eId: string; execution: Execution }>();
   @Output() close = new EventEmitter<string>();
 
@@ -214,13 +215,22 @@ export class ExecutionProgressComponent implements OnInit, OnChanges, ExecutionS
   selectTab(tabId: string): void {
     this.activeTabId = tabId;
     this.activeTab = this.tabs.find((tab) => tab.id === tabId);
+    this.activeTabIdChange.emit(tabId);
   }
 
   private initTabs(): void {
     this.tabs = this._viewRegistry
       .getDashlets('executionTabMigrated')
       .filter((dashlet) => !!dashlet?.isEnabledFct && dashlet.isEnabledFct());
-    this.selectTab(this.tabs[0]?.id);
+    let tabToSelect = this.tabs[0]?.id;
+    if (this.activeTabId) {
+      let foundTab = this.tabs.find((tab) => tab.id === this.activeTabId);
+      if (foundTab) {
+        tabToSelect = foundTab.id;
+      }
+    }
+
+    this.selectTab(tabToSelect);
   }
 
   private determineDefaultSelection(): void {

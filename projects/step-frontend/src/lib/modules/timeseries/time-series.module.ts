@@ -12,7 +12,7 @@ import { TimeRangePicker } from './time-selection/time-range-picker.component';
 import { ChartSkeletonComponent } from './chart/skeleton/chart-skeleton.component';
 import { ExecutionFiltersComponent } from './performance-view/filters/execution-filters.component';
 import { PerformanceViewComponent } from './performance-view/performance-view.component';
-import { ExecutionPageComponent } from './execution-page/execution-page.component';
+import { TsExecutionPageComponent } from './execution-page/ts-execution-page.component';
 import { SyntheticMonitoringPageComponent } from './synthetic-monitoring/synthetic-monitoring-page.component';
 import { MeasurementsPickerComponent } from './performance-view/measurements/measurements-picker.component';
 import { PerformanceViewTimeSelectionComponent } from './performance-view/time-selection/performance-view-time-selection.component';
@@ -29,12 +29,12 @@ import { MeasurementsFilterPipe } from './performance-view/measurements/measurem
     ChartSkeletonComponent,
     PerformanceViewTimeSelectionComponent,
     ExecutionFiltersComponent,
-    ExecutionPageComponent,
+    TsExecutionPageComponent,
     SyntheticMonitoringPageComponent,
     MeasurementsPickerComponent,
     MeasurementsFilterPipe,
   ],
-  exports: [PerformanceViewComponent, ExecutionPageComponent],
+  exports: [PerformanceViewComponent, TsExecutionPageComponent],
   imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule],
 })
 export class TimeSeriesModule {}
