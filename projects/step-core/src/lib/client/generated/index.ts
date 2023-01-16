@@ -207,7 +207,6 @@ export { $User } from './schemas/$User';
 export { $Version } from './schemas/$Version';
 export { $ViewModel } from './schemas/$ViewModel';
 
-export { AdminService } from './services/AdminService';
 export { AsyncTasksService } from './services/AsyncTasksService';
 export { CollectionsService } from './services/CollectionsService';
 export { ControllerService } from './services/ControllerService';

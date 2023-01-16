@@ -11,30 +11,26 @@
   <div class="panel panel-default">
     <div class="panel-body">
       <div class="form-group form-group-sm">
-        <label>Package file (Jar file, DLL file, or maven snippet)</label>
-        <step-ajs-icon
-          name="help-circle"
-          uib-tooltip="Drag&drop your jar/DLL file containing keywords or copy-paste the maven snippet of the repository artifact"
-        ></step-ajs-icon>
-        <resource-input
-          st-type="'functions'"
-          st-bounded="true"
-          st-model="functionPackage.packageLocation"
-          st-on-change="loadPackagePreview()"
-          upload-only="true"
-        />
+        <step-resource-input
+          [label]="'Package file (Jar file, DLL file, or maven snippet)'"
+          [with-help-icon]="true"
+          [help-icon-tooltip]="'Drag&drop your jar/DLL file containing keywords or copy-paste the maven snippet of the repository artifact'"
+          [st-type]="'functions'"
+          [st-bounded]="true"
+          [upload-only]="true"
+          [(st-model)]="functionPackage.packageLocation"
+          (st-model-change)="loadPackagePreview()"
+        ></step-resource-input>
       </div>
       <div class="form-group form-group-sm">
-        <label>Package dependencies (Folder or Zip of Jars or DLLs/PDBs)</label>
-        <step-ajs-icon
-          name="help-circle"
-          uib-tooltip="Drag&drop your folder or zip containing Jars/DLLs/PDBs dependencies."
-        ></step-ajs-icon>
-        <resource-input
-          st-type="'functions'"
-          st-model="functionPackage.packageLibrariesLocation"
-          st-on-change="loadPackagePreview()"
-        />
+        <step-resource-input
+          [label]="'Package dependencies (Folder or Zip of Jars or DLLs/PDBs)'"
+          [with-help-icon]="true"
+          [help-icon-tooltip]="'Drag&drop your folder or zip containing Jars/DLLs/PDBs dependencies.'"
+          [st-type]="'functions'"
+          [(st-model)]="functionPackage.packageLibrariesLocation"
+          (st-model-change)="loadPackagePreview()"
+        ></step-resource-input>
       </div>
     </div>
   </div>

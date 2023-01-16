@@ -1,6 +1,6 @@
 import { Component, OnInit, Output, EventEmitter, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AuthService, AJS_MODULE, KeyValuePair, User, Preferences, AdminService } from '@exense/step-core';
+import { AuthService, AJS_MODULE, KeyValuePair, User, Preferences, UserService } from '@exense/step-core';
 
 const preferencesToKVPairArray = (preferences?: Preferences): KeyValuePair<string, string>[] => {
   const prefsObject = preferences?.preferences || {};
@@ -28,7 +28,7 @@ export class MyAccountComponent implements OnInit, OnChanges {
   readonly canChangePassword = !!this._authService.getConf()?.passwordManagement;
   readonly canGenerateApiKey = !!this._authService.getConf()?.authentication;
 
-  constructor(private _adminApiService: AdminService, private _authService: AuthService) {}
+  constructor(private _userApi: UserService, private _authService: AuthService) {}
 
   @Input() error?: string;
   @Output() errorChange: EventEmitter<string | undefined> = new EventEmitter<string | undefined>();
@@ -54,7 +54,7 @@ export class MyAccountComponent implements OnInit, OnChanges {
 
   savePreferences(): void {
     const preferences = kvPairArrayToPreferences(this.preferences);
-    this._adminApiService.putPreferences(preferences).subscribe({
+    this._userApi.putPreferences(preferences).subscribe({
       error: (err) => {
         this.error = 'Unable to save preferences. Please contact your administrator.';
         this.errorChange.emit(this.error);
@@ -63,7 +63,7 @@ export class MyAccountComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    this._adminApiService.getMyUser().subscribe((user) => {
+    this._userApi.getMyUser().subscribe((user) => {
       this.user = user || {};
       this.preferences = preferencesToKVPairArray(this.user?.preferences);
     });

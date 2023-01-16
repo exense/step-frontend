@@ -24,9 +24,14 @@
 		</div>
 		<div class="form-group" ng-if="mode==='new'">
 			<fieldset style="padding:0px;" ng-disabled="newResource.resourceType == null">
-				<label>Content</label>
-				<resource-input  st-type="newResource.resourceType" st-model="newResource.id" st-on-change="newResourceUpdate()"
-					upload-only="true" disable-server-path="true"/>
+				<step-resource-input
+					[label]="'Content'"
+					[st-type]="newResource.resourceType"
+					[upload-only]="true"
+					[disable-server-path]="true"
+					[(st-model)]="newResource.id"
+					(st-model-change)="newResourceUpdate()"
+				></step-resource-input>
 			</fieldset>
 		</div>
 		<div class="form-group" ng-if="mode==='edit'">

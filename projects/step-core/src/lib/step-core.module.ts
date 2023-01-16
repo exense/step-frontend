@@ -15,8 +15,10 @@ import { IsUsedByListComponent } from './components/is-used-by-list/is-used-by-l
 import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 import { ModalWindowComponent } from './components/modal-window/modal-window.component';
 import { PlanLinkComponent } from './components/plan-link/plan-link.component';
+import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
 import { SelectPlanComponent } from './components/select-plan/select-plan.component';
+import { UploadContainerComponent } from './components/upload-container/upload-container.component';
 import { CORE_INITIALIZER } from './core-initialiser';
 import { CapsLockDirective } from './directives/caps-lock.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
@@ -32,6 +34,7 @@ import { TreeModule } from './modules/tree/tree.module';
 import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
+import { SettingBtnComponent } from './components/setting-btn/setting-btn.component';
 import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 
@@ -53,6 +56,9 @@ import { ArtefactDetailsDirective } from './directives/artefact-details.directiv
     DynamicTextfieldComponent,
     SelectPlanComponent,
     AutorefreshToggleComponent,
+    SettingBtnComponent,
+    UploadContainerComponent,
+    ProgressBarComponent,
     ArtefactDetailsDirective,
     PlanTreeComponent,
   ],
@@ -104,6 +110,9 @@ import { ArtefactDetailsDirective } from './directives/artefact-details.directiv
     PlanTreeComponent,
     ArtefactDetailsDirective,
     AutorefreshToggleComponent,
+    SettingBtnComponent,
+    UploadContainerComponent,
+    ProgressBarComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -144,9 +153,12 @@ export { FunctionLinkComponent } from './components/function-link/function-link.
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 export { ModalWindowComponent } from './components/modal-window/modal-window.component';
 export { PlanLinkComponent } from './components/plan-link/plan-link.component';
+export { SettingBtnComponent } from './components/setting-btn/setting-btn.component';
+export { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 export * from './components/report-node-status/report-node-status.component';
 export * from './components/plan-tree/plan-tree.component';
 export { SelectPlanComponent } from './components/select-plan/select-plan.component';
+export { UploadContainerComponent } from './components/upload-container/upload-container.component';
 export * from './decorators/plugin';
 export * from './directives/caps-lock.directive';
 export * from './directives/tooltip-immediate-close.directive';
