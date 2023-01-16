@@ -1,11 +1,4 @@
 <div ng-if="!isDynamic()" class="form-group form-group-sm">
-  <label ng-if="label">{{label}}</label>
-  <step-ajs-icon
-    ng-if="tooltip"
-    name="help-circle"
-    uib-tooltip="{{tooltip}}"
-    tooltip-append-to-body="true"
-  ></step-ajs-icon>
   <button
     class="btn btn-default btn-xs pull-right"
     type="button"
@@ -14,6 +7,15 @@
   >
     <step-ajs-icon name="zap"></step-ajs-icon>
   </button>
-  <resource-input st-type="type" st-model="dynamicValue.value" st-directory="directory" st-on-change="onSave()" />
+
+  <step-resource-input
+    [label]="label"
+    [st-type]="type"
+    [st-directory]="directory"
+    [with-help-icon]="tooltip"
+    [help-icon-tooltip]="tooltip"
+    [(st-model)]="dynamicValue.value"
+    (st-model-change)="onSave()"
+  ></step-resource-input>
 </div>
 <expression-input />
