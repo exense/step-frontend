@@ -30,7 +30,8 @@ export class LoginComponent {
   }
 
   login() {
-    this._auth.login(this.credentials).subscribe({
+    const { username, password } = this.credentials;
+    this._auth.login(username, password).subscribe({
       error: (e) => (this.error = e.error),
     });
   }

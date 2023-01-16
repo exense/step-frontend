@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Inject, Input, OnDestroy, Output } from '@angular/core';
 import { IRootScopeService } from 'angular';
 import { BehaviorSubject, map, shareReplay, startWith, switchMap, tap } from 'rxjs';
-import { AugmentedAdminService, ReferencesService } from '../../client/step-client-module';
+import { ReferencesService } from '../../client/step-client-module';
 import { TableLocalDataSource } from '../../modules/table/table.module';
 import { AJS_ROOT_SCOPE, IsUsedBySearchType, Mutable } from '../../shared';
 
@@ -62,7 +62,6 @@ export class IsUsedByListComponent implements OnDestroy {
 
   constructor(
     private _referencesService: ReferencesService,
-    private _augmentedAdminService: AugmentedAdminService,
     @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService
   ) {
     this.initTenants();
