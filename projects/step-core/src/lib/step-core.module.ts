@@ -130,7 +130,6 @@ import { ArtefactDetailsDirective } from './directives/artefact-details.directiv
 export class StepCoreModule {}
 
 export * from './angularjs';
-export { ApiError } from './client/generated/core/ApiError';
 export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
 export { CancelablePromise, CancelError } from './client/generated/core/CancelablePromise';
 export { OpenAPI } from './client/generated/core/OpenAPI';
@@ -168,7 +167,6 @@ export * from './pipes/dashboard-link.pipe';
 export * from './pipes/matching-authenticator.pipe';
 export { PlanNamePipe } from './pipes/plan-name.pipe';
 export * from './services/additional-right-rule.service';
-export * from './services/context.service';
 export * from './services/dashboard.service';
 export * from './services/deferred-link-processor.service';
 export { ExportDialogsService } from './services/export-dialogs.service';
