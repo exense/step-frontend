@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $AccessConfiguration = {
+export const $ApplicationConfiguration = {
   properties: {
     authentication: {
       type: 'boolean',
@@ -16,6 +16,18 @@ export const $AccessConfiguration = {
       type: 'boolean',
     },
     noLoginMask: {
+      type: 'boolean',
+    },
+    passwordManagement: {
+      type: 'boolean',
+    },
+    userManagement: {
+      type: 'boolean',
+    },
+    roleManagement: {
+      type: 'boolean',
+    },
+    projectMembershipManagement: {
       type: 'boolean',
     },
     roles: {

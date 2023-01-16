@@ -6,7 +6,7 @@
       color="primary"
       matTooltip="Add user"
       matTooltipPosition="below"
-      [disabled]="!('user-write' | hasRight | async)"
+      [disabled]="!('user-write' | hasRight | async) || !canAddModifyUser"
       (click)="addUser()"
     >
       <step-icon name="plus"></step-icon>
@@ -30,7 +30,7 @@
           mat-icon-button
           matTooltip="Edit user"
           (click)="editUser(element.username)"
-          [disabled]="!('user-write' | hasRight | async)"
+          [disabled]="!('user-write' | hasRight | async) || !canAddModifyUser"
         >
           <step-icon name="edit-2"></step-icon>
         </button>
@@ -38,14 +38,16 @@
           mat-icon-button
           matTooltip="Reset user password"
           (click)="resetUserPassword(element)"
-          [disabled]="!('DefaultAuthenticator' | matchingAuthenticator) || !('user-write' | hasRight | async)"
+          [disabled]="
+            !('DefaultAuthenticator' | matchingAuthenticator) || !('user-write' | hasRight | async) || !canResetPassword
+          "
         >
           <step-icon name="lock"></step-icon>
         </button>
         <button
           mat-icon-button
           matTooltip="Delete user"
-          [disabled]="currentUserName === element.username || !('user-write' | hasRight | async)"
+          [disabled]="(currentUserName$ | async) === element.username || !('user-write' | hasRight | async)"
           (click)="removeUser(element.username)"
         >
           <step-icon name="trash-2">delete</step-icon>
