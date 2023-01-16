@@ -51,4 +51,49 @@ export class ResourceDialogsService {
   searchResource(resource: Resource): void {
     this._isUsedByDialogs.displayDialog(resource.resourceName || '', this.RESOURCE_SEARCH_TYPE, resource.id!);
   }
+
+  showSearchResourceDialog(type: string): Observable<string> {
+    const modalInstance = this._uibModalHelper.open({
+      backdrop: 'static',
+      templateUrl: 'partials/resources/searchResourceDialog.html',
+      controller: 'searchResourceCtrl',
+      resolve: {
+        type: () => {
+          return type;
+        },
+      },
+    });
+
+    return a1Promise2Observable(modalInstance.result) as Observable<string>;
+  }
+
+  showFileAlreadyExistsWarning(similarResources: Resource[]): Observable<string> {
+    const modalInstance = this._uibModalHelper.open({
+      backdrop: 'static',
+      templateUrl: 'partials/resources/fileAlreadyExistsWarning.html',
+      controller: 'fileAlreadyExistsWarningCtrl',
+      resolve: {
+        similarResources: () => {
+          return similarResources;
+        },
+      },
+    });
+
+    return a1Promise2Observable(modalInstance.result) as Observable<string>;
+  }
+
+  showUpdateResourceWarning(resource?: Resource): Observable<boolean> {
+    const modalInstance = this._uibModalHelper.open({
+      backdrop: 'static',
+      templateUrl: 'partials/resources/updateResourceWarning.html',
+      controller: 'updateResourceWarningCtrl',
+      resolve: {
+        resource: () => {
+          return resource;
+        },
+      },
+    });
+
+    return a1Promise2Observable(modalInstance.result) as Observable<boolean>;
+  }
 }
