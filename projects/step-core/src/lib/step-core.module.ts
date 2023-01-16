@@ -196,4 +196,5 @@ export * from './services/view-state.service';
 export * from './services/plan-editor.service';
 export * from './services/plan-interactive-session.service';
 export * from './services/plan-artefact-resolver.service';
+export * from './services/execution-close-handle.service';
 export * from './shared';

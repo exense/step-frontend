@@ -8,7 +8,7 @@ import { PluginInfoRegistryService } from '@exense/step-core';
 const OVERRIDE_PLUGINS = new Map<string, string>();
 
 // Ignore original multitenancy since it's become part of enterprise core
-const IGNORE_PLUGINS: ReadonlyArray<string> = ['multitenancy', 'monitoringdashboard', 'dualPlanEditor'];
+const IGNORE_PLUGINS: ReadonlyArray<string> = ['multitenancy', 'monitoringdashboard', 'dualPlanEditor', 'housekeeping'];
 
 // For testing purposes only
 // Allows to add plugins, that don't returned from BE

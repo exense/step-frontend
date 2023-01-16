@@ -49,6 +49,12 @@
         <step-panel-execution-details> </step-panel-execution-details>
 
         <!--todo custom panels-->
+        <ng-container *ngFor="let customPanel of _executionPanels.customPanels; trackBy: trackByItemInfo">
+          <step-panel [panelType]="customPanel.type">
+            <step-execution-custom-panel [itemKey]="customPanel.type" [context]="execution">
+            </step-execution-custom-panel>
+          </step-panel>
+        </ng-container>
         <step-panel-operations> </step-panel-operations>
 
         <!--todo charts-->
