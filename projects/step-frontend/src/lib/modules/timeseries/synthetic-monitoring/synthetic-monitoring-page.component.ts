@@ -10,6 +10,7 @@ import { Subject, Subscription, takeUntil, tap, timer } from 'rxjs';
 import { TimeSeriesConfig } from '../time-series.config';
 import { TimeSeriesDashboardSettings } from '../dashboard/model/ts-dashboard-settings';
 import { TimeSeriesDashboardComponent } from '../dashboard/time-series-dashboard.component';
+import { UrlUtils } from '../util/url-utils';
 
 @Component({
   selector: 'step-synthetic-monitoring',
@@ -54,11 +55,12 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
     let now = new Date().getTime();
     let start = now - selectedTimeRange.timeInMs;
     let range = { from: start, to: now };
+    let urlParams = UrlUtils.getURLParams(window.location.href);
     this.dashboardSettings = {
       contextId: this.taskId,
       includeThreadGroupChart: true,
       timeRange: range,
-      contextualFilters: { taskId: this.taskId },
+      contextualFilters: { ...urlParams, taskId: this.taskId },
     };
     if (this.refreshEnabled) {
       this.startInterval(this.selectedRefreshInterval.value);

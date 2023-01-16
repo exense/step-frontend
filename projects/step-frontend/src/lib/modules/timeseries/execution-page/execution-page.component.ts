@@ -13,15 +13,14 @@ import { TimeSeriesService } from '../time-series.service';
 import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
-import { delay, forkJoin, Observable, of, Subject, Subscription, switchMap, takeUntil, timer } from 'rxjs';
-import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
+import { Subject, Subscription, takeUntil, timer } from 'rxjs';
 import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
 import { TSTimeRange } from '../chart/model/ts-time-range';
-import { TimeSeriesContext } from '../time-series-context';
 import { TimeSeriesConfig } from '../time-series.config';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TimeSeriesDashboardSettings } from '../dashboard/model/ts-dashboard-settings';
 import { TimeSeriesDashboardComponent } from '../dashboard/time-series-dashboard.component';
+import { UrlUtils } from '../util/url-utils';
 
 @Component({
   selector: 'step-execution-performance',
@@ -103,11 +102,12 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       if (!execution.endTime) {
         this.executionInProgress = true;
       }
+      let urlParams = UrlUtils.getURLParams(window.location.href);
       this.dashboardSettings = {
         contextId: this.executionId,
         includeThreadGroupChart: true,
         timeRange: { from: startTime, to: endTime },
-        contextualFilters: { eId: this.executionId },
+        contextualFilters: { ...urlParams, eId: this.executionId },
       };
       if (this.executionInProgress) {
         setTimeout(() => this.startInterval(), this.selectedRefreshInterval.value);
