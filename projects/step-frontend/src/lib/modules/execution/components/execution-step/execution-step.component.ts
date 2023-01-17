@@ -1,12 +1,13 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, Execution, ExecutionSummaryDto, Mutable, ReportNode, SelectionCollector } from '@exense/step-core';
 import { ExecutionViewServices } from '../../../operations/shared/execution-view-services';
-import { map, Observable, Subject, takeUntil, tap } from 'rxjs';
+import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
 import { Panels } from '../../shared/panels.enum';
 import { SingleExecutionPanelsService } from '../../services/single-execution-panels.service';
+import { MatSort, Sort } from '@angular/material/sort';
 
 type FieldAccessor = Mutable<Pick<ExecutionStepComponent, 'keywordParameters$'>>;
 
@@ -34,6 +35,8 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
 
   @Output() drilldownTestCase = new EventEmitter<string>();
 
+  @ViewChild('testCaseSort') testCaseSort!: MatSort;
+
   showAllOperations: boolean = false;
 
   parameters: { key: string; value: string }[] = [];
@@ -41,6 +44,17 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
   readonly Panels = Panels;
 
   constructor(private panelService: SingleExecutionPanelsService) {}
+
+  handleTestCaseSort(sort: Sort): void {
+    if (sort.active === 'name' && sort.direction === '') {
+      // Reset to default sort
+      Promise.resolve().then(() => {
+        // To apply properly, the default sort needs to be run after the original sort will be applied
+        // that is why it is places in async operation
+        this.testCaseSort.sort({ id: '', start: '', disableClear: false });
+      });
+    }
+  }
 
   chooseTestcase(testCase: ReportNode): void {
     this.drilldownTestCase.emit(testCase.artefactID);
