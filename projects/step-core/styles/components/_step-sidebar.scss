@@ -196,9 +196,10 @@ $default-color: dc.default-colors();
       > .sidebar-home-and-settings-icon {
         right: map.get($config, elements-text-padding);
         margin-right: -10px;
-        padding-top: 18px;
         font-size: medium;
         cursor: pointer;
+        position: absolute;
+        padding: 18px 14px 14px 14px;
       }
     }
 
@@ -382,6 +383,7 @@ $default-color: dc.default-colors();
       // collapsed sidebar
       width: map.get($config, width-closed);
 
+      step-dashlet:not(.visible-when-collapsed),
       span:not(.visible-when-collapsed) {
         display: none;
       }

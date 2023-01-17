@@ -7,7 +7,10 @@
 	<div class="section">
 		<div class="section-content section-highlight">
 		<div class="form-group form-group-sm">
-			<resource-input st-type="'temp'" st-model="resourcePath" />
+			<step-resource-input      
+				[st-type]="'temp'"
+				[(st-model)]="resourcePath"
+			></step-resource-input>
 		</div>
 
 		<div class="panel panel-default">

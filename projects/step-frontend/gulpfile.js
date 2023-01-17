@@ -53,7 +53,7 @@ const SCRIPTS = [
   './src/lib/angularjs/js/controllers/reportNodes.js',
   './src/lib/angularjs/js/controllers/reportTree.js',
   './src/lib/angularjs/js/controllers/reportTable.js',
-  './src/lib/angularjs/js/controllers/admin.js',
+  './src/lib/angularjs/js/controllers/settings.js',
   './src/lib/angularjs/js/controllers/dynamicForms.js',
   './src/lib/angularjs/js/controllers/components.js',
   './src/lib/angularjs/js/datatable-ext-paginationinput.js',

@@ -1,0 +1,20 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  display: block;
+  position: relative;
+
+  mat-progress-bar {
+    height: 20px;
+    border-radius: 4px;
+  }
+
+  .progress-bar-percentage {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    color: var.$white;
+    align-items: center;
+    justify-content: center;
+  }
+}
