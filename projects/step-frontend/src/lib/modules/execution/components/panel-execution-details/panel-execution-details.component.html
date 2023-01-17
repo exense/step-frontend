@@ -1,39 +1,37 @@
 <step-panel [panelType]="Panels.executionDetails">
-  <step-status [status]="_state?.execution?.status" titleAddon> </step-status>
+  <step-status [status]="_state.execution?.status" titleAddon> </step-status>
   <ul class="list-unstyled">
     <li>
       <strong>Plan</strong>&nbsp;<span
-        ><a href="#/root/plans/editor/{{ _state.execution!.planId! }}">{{ _state!.execution!.description }}</a></span
+        ><a href="#/root/plans/editor/{{ _state.execution!.planId! }}">{{ _state.execution!.description }}</a></span
       >
     </li>
-    <ng-container *ngIf="_state?.execution?.executionParameters?.customParameters as execParams">
+    <ng-container *ngIf="_state.execution?.executionParameters?.customParameters as execParams">
       <li *ngFor="let item of execParams | keyvalue">
         <strong>{{ item.key }}</strong
         ><span>{{ item.value }}</span>
       </li>
     </ng-container>
     <li>
-      <strong>Mode</strong>&nbsp;<span>{{ _state?.execution?.executionParameters?.mode }}</span>
+      <strong>Mode</strong>&nbsp;<span>{{ _state.execution?.executionParameters?.mode }}</span>
     </li>
     <li>
-      <strong>User</strong>&nbsp;<span>{{ _state?.execution?.executionParameters?.userID }}</span>
+      <strong>User</strong>&nbsp;<span>{{ _state.execution?.executionParameters?.userID }}</span>
     </li>
     <li>
-      <strong>Start</strong>&nbsp;<span>{{ _state?.execution?.startTime | date: 'dd.MM.yyyy HH:mm:ss' }}</span>
+      <strong>Start</strong>&nbsp;<span>{{ _state.execution?.startTime | date: 'dd.MM.yyyy HH:mm:ss' }}</span>
     </li>
     <li>
-      <strong>End</strong>&nbsp;<span>{{ _state?.execution?.endTime | date: 'dd.MM.yyyy HH:mm:ss' }}</span>
+      <strong>End</strong>&nbsp;<span>{{ _state.execution?.endTime | date: 'dd.MM.yyyy HH:mm:ss' }}</span>
     </li>
     <li>
-      <strong>Execution ID</strong>&nbsp;<span>{{ _state?.execution?.id }}</span>
+      <strong>Execution ID</strong>&nbsp;<span>{{ _state.execution?.id }}</span>
     </li>
     <li>
       <strong>Origin</strong>&nbsp;<span
-        >Repository={{ _state?.execution?.executionParameters?.repositoryObject?.repositoryID }}</span
+        >Repository={{ _state.execution?.executionParameters?.repositoryObject?.repositoryID }}</span
       >
-      <ng-container
-        *ngIf="_state?.execution?.executionParameters?.repositoryObject?.repositoryParameters as repoParams"
-      >
+      <ng-container *ngIf="_state.execution?.executionParameters?.repositoryObject?.repositoryParameters as repoParams">
         <span *ngFor="let item of repoParams | keyvalue"> {{ item.key }}={{ item.value }} </span>
       </ng-container>
     </li>
