@@ -5,17 +5,27 @@
   },
   "version": 1,
   "newProjectRoot": "projects",
+  "schematics": {
+    "@schematics/angular:component": {
+      "style": "scss",
+      "skipTests": true
+    },
+    "@schematics/angular:directive": {
+      "skipTests": true
+    },
+    "@schematics/angular:service": {
+      "skipTests": true
+    },
+    "@schematics/angular:pipe": {
+      "skipTests": true
+    },
+    "@schematics/angular:application": {
+      "strict": true
+    }
+  },
   "projects": {
     "@exense/step-app": {
       "projectType": "application",
-      "schematics": {
-        "@schematics/angular:component": {
-          "style": "scss"
-        },
-        "@schematics/angular:application": {
-          "strict": true
-        }
-      },
       "root": "projects/step-app",
       "sourceRoot": "projects/step-app/src",
       "prefix": "app",
