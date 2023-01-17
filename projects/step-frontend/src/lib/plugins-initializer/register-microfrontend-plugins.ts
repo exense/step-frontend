@@ -21,7 +21,13 @@ export interface PluginCtx {
 const loadModule = async (definition: MicrofrontendPluginDefinition): Promise<PluginCtx | undefined> => {
   let result: PluginCtx | undefined = undefined;
   try {
-    const remoteEntry = definition.entryPoint.startsWith('/') ? definition.entryPoint : `/${definition.entryPoint}`;
+    let href = window.location.href;
+    if (href.includes('#')) {
+      href = href.substring(0, href.indexOf('#'));
+    } else {
+      href = '/';
+    }
+    const remoteEntry = definition.entryPoint.startsWith('/') ? definition.entryPoint : href + definition.entryPoint;
 
     const options: LoadRemoteModuleOptions = {
       type: 'module',

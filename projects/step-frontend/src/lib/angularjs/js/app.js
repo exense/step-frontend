@@ -100,7 +100,7 @@ var tecAdminApp = angular
       AuthService.initialize().subscribe(() => {
          $rootScope.isInitialized = true;
 
-         $scope.logo = 'images/logotopleft.png';
+         $scope.logo = '../../../images/logotopleft.png';
          if (!$location.path()) {
            AuthService.gotoDefaultPage();
          }
