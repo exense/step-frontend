@@ -11,8 +11,8 @@ import {
 } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, AugmentedResourcesService, ResourceUploadResponse } from '@exense/step-core';
-import { Observable, Subject, takeUntil } from 'rxjs';
-import { ResourceDialogsService } from '../../../context-menu/context-menu.module';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { ResourceDialogsService } from '../../services/resource-dialogs.service';
 
 const MAX_FILES = 1;
 
@@ -37,9 +37,6 @@ export class ResourceInputComponent implements OnChanges, OnDestroy {
   @Output() stModelChange = new EventEmitter<string>();
 
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
-
-  private readonly terminator$ = new Subject<void>();
-
   isResource?: boolean;
   resourceId?: string;
   downloadResourceUrl?: string;
@@ -49,6 +46,7 @@ export class ResourceInputComponent implements OnChanges, OnDestroy {
   progress$?: Observable<number>;
   response$?: Observable<ResourceUploadResponse>;
   lastStModelValue?: string;
+  private readonly terminator$ = new Subject<void>();
 
   constructor(
     private _augmentedResourcesService: AugmentedResourcesService,
@@ -142,14 +140,12 @@ export class ResourceInputComponent implements OnChanges, OnDestroy {
   }
 
   selectResource(): void {
-    this._resourceDialogsService.showSearchResourceDialog(this.stType).subscribe({
-      next: (resourceId) => {
+    this._resourceDialogsService
+      .showSearchResourceDialog(this.stType)
+      .pipe(filter((resourceId) => !!resourceId))
+      .subscribe((resourceId) => {
         this.setResourceIdToFieldValue(resourceId);
-      },
-      error: () => {
-        // Cancel
-      },
-    });
+      });
   }
 
   clear(): void {
