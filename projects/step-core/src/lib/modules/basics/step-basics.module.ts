@@ -9,6 +9,7 @@ import { InputFilterComponent } from './components/input-filter/input-filter.com
 import { ResourceLabelComponent } from './components/resource-label/resource-label.component';
 import { ArtefactIconPipe } from './pipes/artefact-icon.pipe';
 import { HasRightPipe } from './pipes/has-right.pipe';
+import { ZIndexDirective } from './directives/z-index.directive';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
@@ -20,6 +21,7 @@ import { HasRightPipe } from './pipes/has-right.pipe';
     HasRightPipe,
     HexadecimalInputFilterComponent,
     ArtefactIconPipe,
+    ZIndexDirective,
   ],
   exports: [
     ResourceLabelComponent,
@@ -29,6 +31,7 @@ import { HasRightPipe } from './pipes/has-right.pipe';
     HasRightPipe,
     HexadecimalInputFilterComponent,
     ArtefactIconPipe,
+    ZIndexDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -38,6 +41,7 @@ export * from './components/date-filter/date-filter.component';
 export * from './components/input-filter/hexadecimal-input-filter.component';
 export * from './components/input-filter/input-filter.component';
 export * from './components/resource-label/resource-label.component';
+export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
 export * from './pipes/has-right.pipe';
 export * from './services/artefact-types.service';

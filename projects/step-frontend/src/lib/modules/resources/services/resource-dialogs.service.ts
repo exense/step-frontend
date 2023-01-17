@@ -9,6 +9,8 @@ import {
   UibModalHelperService,
 } from '@exense/step-core';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { SearchResourceDialogComponent } from '../components/search-resource-dialog/search-resource-dialog.component';
 
 @Injectable({
   providedIn: 'root',
@@ -21,7 +23,8 @@ export class ResourceDialogsService {
     private _uibModalHelper: UibModalHelperService,
     private _dialogs: DialogsService,
     private _resourcesService: ResourcesService,
-    private _isUsedByDialogs: IsUsedByDialogService
+    private _isUsedByDialogs: IsUsedByDialogService,
+    private _matDialog: MatDialog
   ) {}
 
   editResource(resource?: Partial<Resource>): Observable<{ resource?: Partial<Resource>; result: string }> {
@@ -53,18 +56,8 @@ export class ResourceDialogsService {
   }
 
   showSearchResourceDialog(type: string): Observable<string> {
-    const modalInstance = this._uibModalHelper.open({
-      backdrop: 'static',
-      templateUrl: 'partials/resources/searchResourceDialog.html',
-      controller: 'searchResourceCtrl',
-      resolve: {
-        type: () => {
-          return type;
-        },
-      },
-    });
-
-    return a1Promise2Observable(modalInstance.result) as Observable<string>;
+    const dialogRef = this._matDialog.open(SearchResourceDialogComponent, { data: type });
+    return dialogRef.afterClosed() as Observable<string>;
   }
 
   showFileAlreadyExistsWarning(similarResources: Resource[]): Observable<string> {
