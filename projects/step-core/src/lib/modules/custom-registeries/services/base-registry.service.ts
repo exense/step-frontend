@@ -4,7 +4,7 @@ import { Type } from '@angular/core';
 import { CustomRegistryItem } from '../shared/custom-registry-item';
 import { CustomComponent } from '../shared/custom-component';
 
-type ItemInfo = Pick<CustomRegistryItem, 'type' | 'label'>;
+export type ItemInfo = Pick<CustomRegistryItem, 'type' | 'label'>;
 
 const convert = (item?: CustomRegistryItem): ItemInfo | undefined => {
   if (!item) {

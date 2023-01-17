@@ -1,6 +1,12 @@
 import { Injectable } from '@angular/core';
 import { ExecutionStepPanel } from '../shared/execution-step-panel';
-import { AJS_MODULE, Dashlet, Mutable, ViewRegistryService } from '@exense/step-core';
+import {
+  AJS_MODULE,
+  ExecutionCustomPanelRegistryService,
+  ItemInfo,
+  Mutable,
+  ViewRegistryService,
+} from '@exense/step-core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -28,17 +34,20 @@ export class ExecutionsPanelsService {
   private _isInitialized: boolean = false;
 
   readonly panels: Panel[] = [];
-  readonly customPanels: Dashlet[] = [];
+  readonly customPanels: ReadonlyArray<ItemInfo> = [];
 
-  constructor(private _viewRegistry: ViewRegistryService) {}
+  constructor(
+    private _viewRegistry: ViewRegistryService,
+    private _executionCustomPanels: ExecutionCustomPanelRegistryService
+  ) {}
 
   initialize(): void {
     if (this._isInitialized) {
       return;
     }
-    (this as FieldsAccessor).customPanels = this._viewRegistry.getDashlets('execution');
-    this.customPanels.forEach(({ id, label }) => {
-      this._defaultPanels[id] = { label, show: true, enabled: true };
+    (this as FieldsAccessor).customPanels = this._executionCustomPanels.getItemInfos();
+    this.customPanels.forEach(({ type, label }) => {
+      this._defaultPanels[type] = { label, show: true, enabled: true };
     });
   }
 
