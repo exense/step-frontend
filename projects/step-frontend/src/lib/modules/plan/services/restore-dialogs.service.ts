@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { DialogsService, ResourcesService, UibModalHelperService } from '@exense/step-core';
+import { DialogsService, PlansService, UibModalHelperService } from '@exense/step-core';
 import { Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { RestoreDialogComponent } from '../components/restore-dialog/restore-dialog.component';
@@ -15,16 +15,17 @@ export class RestoreDialogsService {
     private _httpClient: HttpClient,
     private _uibModalHelper: UibModalHelperService,
     private _dialogs: DialogsService,
-    private _restoreService: RestoreService,
+    private _plansService: PlansService,
     private _matDialog: MatDialog
   ) {}
 
-  restoreVersion(id: string): Observable<any> {
-    this._restoreService.restoreVersion(id);
+  restoreVersion(versionId: string) {
+    const planId = 'create me';
+    this._plansService.restorePlanVersion(planId, versionId);
   }
 
-  showRestoreDialog(type: string): Observable<string> {
-    const dialogRef = this._matDialog.open(RestoreDialogComponent, { data: type });
+  showRestoreDialog(id: string): Observable<string> {
+    const dialogRef = this._matDialog.open(RestoreDialogComponent);
     return dialogRef.afterClosed() as Observable<string>;
   }
 }

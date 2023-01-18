@@ -43,6 +43,7 @@ import { FunctionDialogsService } from '../../../function/services/function-dial
 import { DOCUMENT } from '@angular/common';
 import { ArtefactTreeNodeUtilsService } from '../../services/artefact-tree-node-utils.service';
 import { ResourceDialogsService } from '../../../resources/services/resource-dialogs.service';
+import { RestoreDialogsService } from '../../../_common/services/restore-dialogs.service';
 
 type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef' | 'componentTabs' | 'planClass'>>;
 
@@ -167,20 +168,8 @@ export class PlanEditorComponent
     if (!this.planId) {
       return;
     }
-    this._exportDialogs
-      .displayRestoreDialog(
-        'Restore version',
-        `plans/${this.planId}`,
-        `${this._planEditService.plan!.attributes!['name']}.sta`
-      )
-      .subscribe();
 
-    this._restoreDialogsService
-      .showSearchResourceDialog(this.stType)
-      .pipe(filter((resourceId) => !!resourceId))
-      .subscribe((resourceId) => {
-        this.setResourceIdToFieldValue(resourceId);
-      });
+    this._restoreDialogsService.showRestoreDialog(this.planId).subscribe();
   }
 
   clonePlan(): void {
