@@ -19,6 +19,8 @@
         [isActive]="tab.active"
         [activeTabId]="tab.subTab"
         (activeTabIdChange)="handleSubTabChange(tab.id, $event)"
+        (close)="handleTabClose($event)"
+        (titleUpdate)="handleTabTitleUpdate($event)"
       >
       </step-execution-progress>
     </div>

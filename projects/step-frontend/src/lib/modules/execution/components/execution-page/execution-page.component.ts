@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '@exense/step-core';
+import { AJS_MODULE, Execution } from '@exense/step-core';
 import { ExecutionTab } from '../../shared/execution-tab';
 
 @Component({
@@ -13,7 +13,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   tabs: ExecutionTab[] = [this.listTab];
   activeTab!: ExecutionTab;
 
-  locationChangeFunction = () => {
+  private locationChangeFunction = () => {
     let urlParts = this.getUrlParts();
     const executionId = urlParts[1];
     if (this.activeTab.id === executionId) {
@@ -74,6 +74,13 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     this.replaceUrlSubTab(subTab);
   }
 
+  handleTabTitleUpdate(event: { eId: string; execution: Execution }) {
+    let tab = this.tabs.find((tab) => tab.id === event.eId);
+    if (tab) {
+      tab.title = event.execution.description;
+    }
+  }
+
   replaceUrlSubTab(subTab: string): void {
     const url = window.location.href;
     let index = url.indexOf('executions');
@@ -97,19 +104,11 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     this.updateUrl();
   }
 
-  getUrlParts(): string[] {
+  private getUrlParts(): string[] {
     const url = window.location.href;
     // executions/12345/performance
     let relativePath = url.substring(url.indexOf('executions'));
     return relativePath.split('/');
-  }
-
-  getActiveScreen() {
-    const url = window.location.href;
-    // executions/12345/performance
-    let relativePath = url.substring(url.indexOf('/executions'));
-    let pathItems = relativePath.split('/');
-    return pathItems[3];
   }
 
   ngOnInit(): void {
