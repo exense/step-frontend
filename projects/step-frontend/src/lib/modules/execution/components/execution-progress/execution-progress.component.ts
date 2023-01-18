@@ -8,6 +8,7 @@ import {
   OnInit,
   Output,
   SimpleChanges,
+  TrackByFunction,
 } from '@angular/core';
 import {
   AJS_MODULE,
@@ -16,7 +17,9 @@ import {
   ControllerService,
   Dashlet,
   Execution,
+  ExecutionCloseHandleService,
   ExecutionSummaryDto,
+  ItemInfo,
   Operation,
   PrivateViewPluginService,
   ReportNode,
@@ -62,12 +65,20 @@ const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\
       provide: ExecutionStateService,
       useExisting: forwardRef(() => ExecutionProgressComponent),
     },
+    {
+      provide: ExecutionCloseHandleService,
+      useExisting: forwardRef(() => ExecutionProgressComponent),
+    },
     SingleExecutionPanelsService,
     selectionCollectionProvider('artefactID', AutoDeselectStrategy.KEEP_SELECTION),
     TreeStateService,
   ],
 })
-export class ExecutionProgressComponent implements OnInit, OnChanges, ExecutionStateService {
+export class ExecutionProgressComponent
+  implements OnInit, OnChanges, ExecutionStateService, ExecutionCloseHandleService
+{
+  readonly trackByItemInfo: TrackByFunction<ItemInfo> = (index, item) => item.type;
+
   tabs: Dashlet[] = [];
   activeTab?: Dashlet;
 
@@ -216,6 +227,10 @@ export class ExecutionProgressComponent implements OnInit, OnChanges, ExecutionS
     this.activeTabId = tabId;
     this.activeTab = this.tabs.find((tab) => tab.id === tabId);
     this.activeTabIdChange.emit(tabId);
+  }
+
+  closeExecution(): void {
+    this.close.emit(this.eId!);
   }
 
   private initTabs(): void {

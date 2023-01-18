@@ -2,19 +2,14 @@ import { HttpClient, HttpEventType, HttpProgressEvent, HttpResponse } from '@ang
 import { Injectable } from '@angular/core';
 import { filter, Observable, of, shareReplay, switchMap } from 'rxjs';
 import { TableRemoteDataSource } from '../../../modules/table/shared/table-remote-data-source';
-import { ResourcesService, ResourceUploadResponse } from '../../generated';
+import { Resource, ResourcesService, ResourceUploadResponse } from '../../generated';
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
 import { TableApiWrapperService } from '../../table/services/table-api-wrapper.service';
+import { TableDataSource } from '../../../modules/table/shared/table-data-source';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedResourcesService extends ResourcesService {
   private readonly RESOURCES_TABLE_ID = 'resources';
-
-  readonly dataSource = new TableRemoteDataSource(this.RESOURCES_TABLE_ID, this._tableRest, {
-    name: 'attributes.name',
-    resourceType: 'resourceType',
-    id: 'id',
-  });
 
   constructor(
     public _httpRequest: BaseHttpRequest,
@@ -22,6 +17,14 @@ export class AugmentedResourcesService extends ResourcesService {
     public _httpClient: HttpClient
   ) {
     super(_httpRequest);
+  }
+
+  createDatasource(): TableDataSource<Resource> {
+    return new TableRemoteDataSource(this.RESOURCES_TABLE_ID, this._tableRest, {
+      name: 'attributes.name',
+      resourceType: 'resourceType',
+      id: 'id',
+    });
   }
 
   /**
