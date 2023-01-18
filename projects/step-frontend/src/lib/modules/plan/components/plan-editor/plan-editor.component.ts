@@ -42,6 +42,7 @@ import { KeywordCallsComponent } from '../../../execution/components/keyword-cal
 import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
 import { DOCUMENT } from '@angular/common';
 import { ArtefactTreeNodeUtilsService } from '../../services/artefact-tree-node-utils.service';
+import { ResourceDialogsService } from '../../../resources/services/resource-dialogs.service';
 
 type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef' | 'componentTabs' | 'planClass'>>;
 
@@ -106,6 +107,7 @@ export class PlanEditorComponent
     private _linkProcessor: LinkProcessorService,
     private _functionDialogs: FunctionDialogsService,
     public _planEditService: PlanEditorService,
+    private _restoreDialogsService: RestoreDialogsService,
     @Inject(AJS_LOCATION) private _location: ILocationService,
     @Inject(DOCUMENT) private _document: Document
   ) {}
@@ -159,6 +161,26 @@ export class PlanEditorComponent
         `${this._planEditService.plan!.attributes!['name']}.sta`
       )
       .subscribe();
+  }
+
+  restoreVersion(): void {
+    if (!this.planId) {
+      return;
+    }
+    this._exportDialogs
+      .displayRestoreDialog(
+        'Restore version',
+        `plans/${this.planId}`,
+        `${this._planEditService.plan!.attributes!['name']}.sta`
+      )
+      .subscribe();
+
+    this._restoreDialogsService
+      .showSearchResourceDialog(this.stType)
+      .pipe(filter((resourceId) => !!resourceId))
+      .subscribe((resourceId) => {
+        this.setResourceIdToFieldValue(resourceId);
+      });
   }
 
   clonePlan(): void {
