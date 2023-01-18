@@ -71,7 +71,11 @@
         </button>
       </step-btn-group>
     </div>
-    <step-tree (treeContextAction)="proceedAction($event.actionId, $event.node)" [dragDisabled]="isReadonly">
+    <step-tree
+      (treeContextAction)="proceedAction($event.actionId, $event.node)"
+      (nodeDblClick)="handleDoubleClick($event.node, $event.event)"
+      [dragDisabled]="isReadonly"
+    >
     </step-tree>
   </as-split-area>
   <as-split-area [size]="70">
