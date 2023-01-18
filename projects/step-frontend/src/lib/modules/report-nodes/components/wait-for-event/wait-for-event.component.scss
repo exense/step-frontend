@@ -1,0 +1,8 @@
+@use 'projects/step-core/styles/core-mixins' as mixins;
+
+@include mixins.reportNodeTextMuted();
+@include mixins.reportNodeText();
+
+.m-left {
+  margin-left: 1rem;
+}

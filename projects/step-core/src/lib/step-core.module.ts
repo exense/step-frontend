@@ -188,7 +188,6 @@ export { IsUsedByDialogService } from './services/is-used-by-dialog.service';
 export * from './services/link-processor.service';
 export { PlanDialogsService } from './services/plan-dialogs.service';
 export * from './services/plugin-info-registry.service';
-export * from './services/report-node-commons.service';
 export * from './services/scheduled-task-dialogs.service';
 export { UibModalHelperService, UibModalInstance } from './services/uib-modal-helper.service';
 export * from './services/view-registry.service';

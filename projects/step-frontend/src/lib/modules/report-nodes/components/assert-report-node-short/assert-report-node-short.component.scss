@@ -1,16 +1,11 @@
-@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as mixins;
 
 :host {
   display: flex;
   align-items: center;
 }
 
-.text-node {
-  color: var.$dark-gray;
-  font-size: 12px !important;
-  overflow-wrap: anywhere;
-  -ms-word-wrap: anywhere;
-}
+@include mixins.textNode();
 
 .m-left {
   margin-left: 10px;
