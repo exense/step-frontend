@@ -78,6 +78,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     let tab = this.tabs.find((tab) => tab.id === event.eId);
     if (tab) {
       tab.title = event.execution.description;
+      tab.execution = event.execution;
     }
   }
 
