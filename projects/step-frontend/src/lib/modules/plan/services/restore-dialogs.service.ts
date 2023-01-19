@@ -24,8 +24,8 @@ export class RestoreDialogsService {
     this._plansService.restorePlanVersion(planId, versionId);
   }
 
-  showRestoreDialog(id: string): Observable<string> {
-    const dialogRef = this._matDialog.open(RestoreDialogComponent);
+  showRestoreDialog(planId: string, versionId: string): Observable<string> {
+    const dialogRef = this._matDialog.open(RestoreDialogComponent, { data: { id: planId, version: versionId } });
     return dialogRef.afterClosed() as Observable<string>;
   }
 }

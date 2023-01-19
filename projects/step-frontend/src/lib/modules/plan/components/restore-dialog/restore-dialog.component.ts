@@ -1,29 +1,60 @@
 import { Component, Inject } from '@angular/core';
-import { AugmentedResourcesService, Resource } from '@exense/step-core';
+import {
+  AugmentedResourcesService,
+  PlansService,
+  TableLocalDataSource,
+  History,
+  SearchColDirective,
+  FilterConditionFactoryService,
+} from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { DateTime } from 'luxon';
 
 @Component({
-  selector: 'step-search-resource-dialog',
-  templateUrl: './search-resource-dialog.component.html',
-  styleUrls: ['./search-resource-dialog.component.scss'],
+  selector: 'step-restore-dialog',
+  templateUrl: './restore-dialog.component.html',
+  styleUrls: ['./restore-dialog.component.scss'],
 })
 export class RestoreDialogComponent {
-  readonly dataSource = this._augmentedResourceService.createDatasource();
-  readonly filter: string;
+  readonly dataSource: TableLocalDataSource<History>;
 
   constructor(
     private _augmentedResourceService: AugmentedResourcesService,
     private _matDialogRef: MatDialogRef<RestoreDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) resourceType: string
+    private _plansService: PlansService,
+    private _filterConditionFactory: FilterConditionFactoryService,
+    @Inject(MAT_DIALOG_DATA) public plan: { id: string; version: string }
   ) {
-    this.filter = `resourceType=${resourceType}`;
+    this.dataSource = new TableLocalDataSource(this._plansService.getPlanHistory(plan.id), {
+      searchPredicates: {
+        updateTime: (element, searchValue) => {
+          console.log(element, searchValue);
+          return element.updateTime === Number(searchValue);
+        },
+      },
+      sortPredicates: {
+        updateTime: (a, b) => {
+          const valueA = a.updateTime || 0;
+          const valueB = b.updateTime || 0;
+          return valueA - valueB;
+        },
+      },
+    });
   }
 
-  select(resource: Resource): void {
-    this._matDialogRef.close(resource.id);
+  searchByDate(col: SearchColDirective, date?: DateTime): void {
+    const condition = this._filterConditionFactory.singleDateFilterCondition(date);
+    col.search(condition);
+  }
+
+  // FIXME: Add some throbber when loading
+  restore(history: History): void {
+    if (history.id) {
+      this._plansService.restorePlanVersion(this.plan.id, history.id).subscribe(() => this._matDialogRef.close(true));
+    }
   }
 
   cancel(): void {
-    this._matDialogRef.close();
+    this._matDialogRef.close(false);
   }
 }

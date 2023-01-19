@@ -42,8 +42,7 @@ import { KeywordCallsComponent } from '../../../execution/components/keyword-cal
 import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
 import { DOCUMENT } from '@angular/common';
 import { ArtefactTreeNodeUtilsService } from '../../services/artefact-tree-node-utils.service';
-import { ResourceDialogsService } from '../../../resources/services/resource-dialogs.service';
-import { RestoreDialogsService } from '../../../_common/services/restore-dialogs.service';
+import { RestoreDialogsService } from '../../services/restore-dialogs.service';
 
 type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef' | 'componentTabs' | 'planClass'>>;
 
@@ -169,7 +168,13 @@ export class PlanEditorComponent
       return;
     }
 
-    this._restoreDialogsService.showRestoreDialog(this.planId).subscribe();
+    this._restoreDialogsService
+      .showRestoreDialog(this.planId!, this._planEditService.plan!.customFields!['versionId'])
+      .subscribe((restoredVersion) => {
+        if (restoredVersion) {
+          this.loadPlan(this.planId!);
+        }
+      });
   }
 
   clonePlan(): void {
