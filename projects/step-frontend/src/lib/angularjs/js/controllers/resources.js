@@ -49,21 +49,6 @@ angular
       });
     };
 
-    dialogs.searchResource = function (type) {
-      var modalInstance = $uibModal.open({
-        backdrop: 'static',
-        templateUrl: 'partials/resources/searchResourceDialog.html',
-        controller: 'searchResourceCtrl',
-        resolve: {
-          type: function () {
-            return type;
-          },
-        },
-      });
-
-      return modalInstance.result;
-    };
-
     dialogs.showFileAlreadyExistsWarning = function (similarResources) {
       var modalInstance = $uibModal.open({
         backdrop: 'static',
@@ -161,18 +146,6 @@ angular
         $scope.mode = 'edit';
         loadResource($scope.newResource.id.replace('resource:', ''));
       }
-    };
-  })
-
-  .controller('searchResourceCtrl', function ($scope, $uibModalInstance, $http, AuthService, type) {
-    $scope.type = type;
-
-    $scope.selectResource = function (id) {
-      $uibModalInstance.close(id);
-    };
-
-    $scope.cancel = function () {
-      $uibModalInstance.dismiss('cancel');
     };
   })
 

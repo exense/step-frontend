@@ -27,21 +27,23 @@ import {
   Function as KeywordCall,
   TreeNodeUtilsService,
   AugmentedScreenService,
+  ArtefactTreeNode,
+  PlanEditorService,
+  PlanInteractiveSessionService,
+  PlanArtefactResolverService,
   ExportDialogsService,
 } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PlanHistoryService } from '../../services/plan-history.service';
-import { catchError, filter, from, map, merge, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
-import { PlanHandleService } from '../../services/plan-handle.service';
+import { catchError, filter, from, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { ILocationService } from 'angular';
 import { InteractiveSessionService } from '../../services/interactive-session.service';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
 import { DOCUMENT } from '@angular/common';
 import { ArtefactTreeNodeUtilsService } from '../../services/artefact-tree-node-utils.service';
-import { ArtefactTreeNode } from '../../shared/artefact-tree-node';
 
-type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef' | 'componentTabs'>>;
+type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef' | 'componentTabs' | 'planClass'>>;
 
 @Component({
   selector: 'step-plan-editor',
@@ -58,21 +60,24 @@ type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef' | '
     PlanHistoryService,
     InteractiveSessionService,
     {
-      provide: PlanHandleService,
+      provide: PlanInteractiveSessionService,
+      useExisting: forwardRef(() => PlanEditorComponent),
+    },
+    {
+      provide: PlanArtefactResolverService,
       useExisting: forwardRef(() => PlanEditorComponent),
     },
   ],
 })
-export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHandleService {
+export class PlanEditorComponent
+  implements OnInit, OnChanges, OnDestroy, PlanInteractiveSessionService, PlanArtefactResolverService
+{
   private terminator$ = new Subject<unknown>();
-  private planChange$ = new Subject<Plan>();
-  private artefactsClipboard: AbstractArtefact[] = [];
 
   @ViewChild('keywordCalls', { read: KeywordCallsComponent, static: false })
   private keywords?: KeywordCallsComponent;
 
   @Input() planId?: string;
-  plan?: Plan;
 
   readonly componentTabs = [
     { id: 'controls', label: 'Controls' },
@@ -82,14 +87,11 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
 
   selectedTab = 'controls';
 
-  readonly hasUndo$ = this._planHistory.hasUndo$;
-  readonly hasRedo$ = this._planHistory.hasRedo$;
-
-  readonly selectedArtefact$ = this._treeState.selectedNode$.pipe(map((node) => node?.originalArtefact));
-
   readonly isInteractiveSessionActive$ = this._interactiveSession.isActive$;
 
   readonly repositoryObjectRef?: RepositoryObjectReference;
+
+  readonly planClass?: string;
 
   constructor(
     public _interactiveSession: InteractiveSessionService,
@@ -103,13 +105,13 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
     private _dialogsService: DialogsService,
     private _linkProcessor: LinkProcessorService,
     private _functionDialogs: FunctionDialogsService,
+    public _planEditService: PlanEditorService,
     @Inject(AJS_LOCATION) private _location: ILocationService,
     @Inject(DOCUMENT) private _document: Document
   ) {}
 
   ngOnInit(): void {
     this._interactiveSession.init();
-    this.initPlanUpdate();
     this.initConsoleTabToggle();
   }
 
@@ -132,202 +134,18 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
   ngOnDestroy(): void {
     this.terminator$.next({});
     this.terminator$.complete();
-    this.planChange$.complete();
-  }
-
-  handlePlanChange(): void {
-    this.planChange$.next(this.plan!);
-  }
-
-  moveUp(node?: AbstractArtefact): void {
-    if (node) {
-      this._treeState.selectNodeById(node.id!);
-    }
-    this._treeState.moveSelectedNodes('up');
-  }
-
-  moveDown(node?: AbstractArtefact): void {
-    if (node) {
-      this._treeState.selectNodeById(node.id!);
-    }
-    this._treeState.moveSelectedNodes('down');
-  }
-
-  undo(): void {
-    this._planHistory.undo();
-  }
-
-  redo(): void {
-    this._planHistory.redo();
-  }
-
-  discardAll(): void {
-    this._planHistory.discardAll();
-  }
-
-  delete(node?: AbstractArtefact): void {
-    if (node) {
-      this._treeState.selectNodeById(node.id!);
-    }
-    this._treeState.removeSelectedNodes();
-  }
-
-  copy(node?: AbstractArtefact): void {
-    if (node) {
-      this._treeState.selectNodeById(node.id!);
-    }
-    this.artefactsClipboard = this._treeState.getSelectedNodes().map(({ originalArtefact }) => originalArtefact);
-  }
-
-  paste(node?: AbstractArtefact): void {
-    if (!this.artefactsClipboard?.length) {
-      return;
-    }
-    this._planApi.cloneArtefacts(this.artefactsClipboard).subscribe((children) => {
-      this.artefactsClipboard = [];
-      if (node) {
-        this._treeState.selectNodeById(node.id!);
-      }
-      this._treeState.addChildrenToSelectedNode(...children);
-    });
-  }
-
-  rename(node?: AbstractArtefact) {
-    if (node) {
-      this._treeState.selectNodeById(node.id!);
-    }
-    this._treeState.editSelectedNode();
-  }
-
-  toggleSkip(node?: AbstractArtefact) {
-    if (node) {
-      this._treeState.selectNodeById(node.id!);
-    }
-    this._treeState.toggleSkip();
   }
 
   addControl(artefactTypeId: string): void {
-    this._planApi
-      .getArtefactType(artefactTypeId)
-      .pipe(
-        map((artefact) => {
-          artefact!.dynamicName!.dynamic = artefact!.useDynamicName;
-          return artefact;
-        })
-      )
-      .subscribe((artefact) => {
-        this._treeState.addChildrenToSelectedNode(artefact);
-      });
+    this._planEditService.addControl(artefactTypeId);
   }
 
   addFunction(keywordId: string): void {
-    this._keywordCallsApi
-      .getFunctionById(keywordId)
-      .pipe(
-        switchMap((keyword) => {
-          const artefact$ = this._planApi.getArtefactType('CallKeyword');
-          return artefact$.pipe(
-            map((artefact) => {
-              artefact!.attributes!['name'] = keyword!.attributes!['name'];
-              artefact!.dynamicName!.dynamic = artefact.useDynamicName;
-              return { artefact, keyword };
-            })
-          );
-        }),
-        switchMap(({ artefact, keyword }) => {
-          const inputs$ = this._screenTemplates.getInputsForScreenPost('functionTable');
-          return inputs$.pipe(
-            map((inputs) => {
-              const functionAttributes = inputs.reduce((res, input) => {
-                const attributeId = (input?.id || '').replace('attributes.', '');
-                if (!attributeId || !keyword?.attributes?.[attributeId]) {
-                  return res;
-                }
-                const dynamic = false;
-                const value = keyword.attributes[attributeId];
-                res[attributeId] = { value, dynamic };
-                return res;
-              }, {} as Record<string, { value: string; dynamic: boolean }>);
-
-              (artefact as any)['function'] = { value: JSON.stringify(functionAttributes), dynamic: false };
-              return { artefact, keyword };
-            })
-          );
-        }),
-        map(({ artefact, keyword }) => {
-          if (this._authService.getConf()?.miscParams?.['enforceschemas'] !== 'true') {
-            return artefact;
-          }
-
-          if (!keyword?.schema?.['properties']) {
-            return artefact;
-          }
-
-          const targetObject = Object.entries(keyword.schema['properties']).reduce((res, [key, value]) => {
-            const type = (value as any).type;
-            const isDynamic = type === 'number' || type === 'integer' || type === 'boolean';
-            const defaultValue = (value as any).default;
-
-            if (defaultValue !== undefined) {
-              console.log('default:', defaultValue);
-              if (isDynamic) {
-                res[key] = { expression: defaultValue, dynamic: true };
-              } else {
-                res[key] = { value: defaultValue, dynamic: false };
-              }
-            } else if (type) {
-              if (isDynamic) {
-                res[key] = { expression: `<${type}>`, dynamic: true };
-              } else {
-                res[key] = { value: `<${type}>`, dynamic: false };
-              }
-            }
-            return res;
-          }, {} as Record<string, { expression?: string; value?: string; dynamic: boolean }>);
-
-          ((keyword?.schema?.['required'] || []) as string[]).forEach((prop) => {
-            if (targetObject?.[prop]?.value) {
-              targetObject[prop].value += ' (REQ)';
-            }
-            if (targetObject?.[prop]?.expression) {
-              targetObject[prop].expression += ' (REQ)';
-            }
-          });
-
-          (artefact as any)['argument'] = {
-            dynamic: false,
-            value: JSON.stringify(targetObject),
-            expression: null,
-            expressionType: null,
-          };
-
-          return artefact;
-        })
-      )
-      .subscribe((artefact) => {
-        this._treeState.addChildrenToSelectedNode(artefact);
-      });
+    this._planEditService.addFunction(keywordId);
   }
 
   addPlan(planId: string): void {
-    this._planApi
-      .getPlanById(planId)
-      .pipe(
-        switchMap((plan) => {
-          const artefact$ = this._planApi.getArtefactType('CallPlan');
-          return artefact$.pipe(
-            map((artefact) => {
-              artefact.attributes!['name'] = plan.attributes!['name'];
-              (artefact as any)['planId'] = planId;
-              artefact.dynamicName!.dynamic = artefact.useDynamicName;
-              return artefact;
-            })
-          );
-        })
-      )
-      .subscribe((artefact) => {
-        this._treeState.addChildrenToSelectedNode(artefact);
-      });
+    this._planEditService.addPlan(planId);
   }
 
   exportPlan(): void {
@@ -335,7 +153,11 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
       return;
     }
     this._exportDialogs
-      .displayExportDialog('Plans export', `plans/${this.planId}`, `${this.plan!.attributes!['name']}.sta`)
+      .displayExportDialog(
+        'Plans export',
+        `plans/${this.planId}`,
+        `${this._planEditService.plan!.attributes!['name']}.sta`
+      )
       .subscribe();
   }
 
@@ -343,7 +165,7 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
     if (!this.planId) {
       return;
     }
-    const name = this.plan!.attributes!['name'];
+    const name = this._planEditService.plan!.attributes!['name'];
     this._dialogsService.enterValue('Clone plan as', `${name}_Copy`, 'md', 'enterValueDialog', (value: string) => {
       this._planApi
         .clonePlan(this.planId!)
@@ -458,43 +280,9 @@ export class PlanEditorComponent implements OnInit, OnChanges, OnDestroy, PlanHa
         })
       )
       .subscribe((plan) => {
-        this.plan = plan;
-        const root = plan.root;
-        if (root) {
-          this._treeState.init(root, [root.id!]);
-        }
-        this._planHistory.init(plan);
+        (this as FieldAccessor).planClass = plan._class;
+        this._planEditService.init(plan);
       });
-  }
-
-  private initPlanUpdate(): void {
-    const planUpdateByTree$ = this._treeState.treeUpdate$.pipe(
-      map(() => this.plan),
-      filter((plan) => !!plan),
-      tap((plan) => this._planHistory.addToHistory(plan!))
-    );
-
-    const planUpdateByEditor$ = this.planChange$.pipe(
-      tap((plan) => {
-        this._treeState.init(plan.root!, undefined, false);
-        this._planHistory.addToHistory(plan);
-        this.plan = plan;
-      })
-    );
-
-    const planUpdatedByHistory$ = this._planHistory.planChange$.pipe(
-      tap((plan) => {
-        this._treeState.init(plan.root!, undefined, false);
-        this.plan = plan;
-      })
-    );
-
-    merge(planUpdateByTree$, planUpdateByEditor$, planUpdatedByHistory$)
-      .pipe(
-        switchMap((plan) => this._planApi.savePlan(plan)),
-        takeUntil(this.terminator$)
-      )
-      .subscribe();
   }
 
   private initConsoleTabToggle(): void {

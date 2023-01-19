@@ -15,8 +15,10 @@ import { IsUsedByListComponent } from './components/is-used-by-list/is-used-by-l
 import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 import { ModalWindowComponent } from './components/modal-window/modal-window.component';
 import { PlanLinkComponent } from './components/plan-link/plan-link.component';
+import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
 import { SelectPlanComponent } from './components/select-plan/select-plan.component';
+import { UploadContainerComponent } from './components/upload-container/upload-container.component';
 import { CORE_INITIALIZER } from './core-initialiser';
 import { CapsLockDirective } from './directives/caps-lock.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
@@ -32,6 +34,9 @@ import { TreeModule } from './modules/tree/tree.module';
 import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
+import { SettingBtnComponent } from './components/setting-btn/setting-btn.component';
+import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
+import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 
 @NgModule({
   declarations: [
@@ -51,6 +56,11 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     DynamicTextfieldComponent,
     SelectPlanComponent,
     AutorefreshToggleComponent,
+    SettingBtnComponent,
+    UploadContainerComponent,
+    ProgressBarComponent,
+    ArtefactDetailsDirective,
+    PlanTreeComponent,
   ],
   imports: [
     CommonModule,
@@ -97,7 +107,12 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     IsUsedByModalComponent,
     DynamicTextfieldComponent,
     SelectPlanComponent,
+    PlanTreeComponent,
+    ArtefactDetailsDirective,
     AutorefreshToggleComponent,
+    SettingBtnComponent,
+    UploadContainerComponent,
+    ProgressBarComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -124,7 +139,6 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
 export class StepCoreModule {}
 
 export * from './angularjs';
-export { ApiError } from './client/generated/core/ApiError';
 export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
 export { CancelablePromise, CancelError } from './client/generated/core/CancelablePromise';
 export { OpenAPI } from './client/generated/core/OpenAPI';
@@ -139,12 +153,17 @@ export { FunctionLinkComponent } from './components/function-link/function-link.
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 export { ModalWindowComponent } from './components/modal-window/modal-window.component';
 export { PlanLinkComponent } from './components/plan-link/plan-link.component';
+export { SettingBtnComponent } from './components/setting-btn/setting-btn.component';
+export { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 export * from './components/report-node-status/report-node-status.component';
+export * from './components/plan-tree/plan-tree.component';
 export { SelectPlanComponent } from './components/select-plan/select-plan.component';
+export { UploadContainerComponent } from './components/upload-container/upload-container.component';
 export * from './decorators/plugin';
 export * from './directives/caps-lock.directive';
 export * from './directives/tooltip-immediate-close.directive';
 export * from './directives/tooltip.directive';
+export * from './directives/artefact-details.directive';
 export * from './domain';
 export * from './modules/async-operations/async-operations.module';
 export * from './modules/basics/step-basics.module';
@@ -160,7 +179,6 @@ export * from './pipes/dashboard-link.pipe';
 export * from './pipes/matching-authenticator.pipe';
 export { PlanNamePipe } from './pipes/plan-name.pipe';
 export * from './services/additional-right-rule.service';
-export * from './services/context.service';
 export * from './services/dashboard.service';
 export * from './services/deferred-link-processor.service';
 export { ExportDialogsService } from './services/export-dialogs.service';
@@ -175,4 +193,8 @@ export * from './services/scheduled-task-dialogs.service';
 export { UibModalHelperService, UibModalInstance } from './services/uib-modal-helper.service';
 export * from './services/view-registry.service';
 export * from './services/view-state.service';
+export * from './services/plan-editor.service';
+export * from './services/plan-interactive-session.service';
+export * from './services/plan-artefact-resolver.service';
+export * from './services/execution-close-handle.service';
 export * from './shared';

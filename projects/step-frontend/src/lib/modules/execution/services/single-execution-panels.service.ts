@@ -2,16 +2,22 @@ import { Injectable } from '@angular/core';
 import { ExecutionsPanelsService } from './executions-panels.service';
 import { ExecutionStepPanel } from '../shared/execution-step-panel';
 import { Observable, of } from 'rxjs';
+import { ItemInfo, Mutable } from '@exense/step-core';
+
+type FieldAccessor = Mutable<Pick<SingleExecutionPanelsService, 'customPanels'>>;
 
 @Injectable()
 export class SingleExecutionPanelsService {
   private eid?: string;
+
+  readonly customPanels: ReadonlyArray<ItemInfo> = [];
 
   constructor(private _executionsPanelService: ExecutionsPanelsService) {}
 
   initialize(eid: string): void {
     this.eid = eid;
     this._executionsPanelService.initialize();
+    (this as FieldAccessor).customPanels = this._executionsPanelService.customPanels;
   }
 
   getPanel(viewId: string): ExecutionStepPanel | undefined {

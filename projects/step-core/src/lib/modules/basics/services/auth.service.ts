@@ -1,45 +1,49 @@
 import { DOCUMENT } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, OnDestroy } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { ConfigDto, CredentialsDto, SessionDto } from '../../../domain';
-import { BehaviorSubject, firstValueFrom, Observable, tap } from 'rxjs';
+import { SessionDto } from '../../../domain';
+import { BehaviorSubject, catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 import { AJS_LOCATION, AJS_PREFERENCES, AJS_ROOT_SCOPE, AJS_UIB_MODAL } from '../../../shared/angularjs-providers';
 import { AJS_MODULE } from '../../../shared/constants';
-import { a1Promise2Promise } from '../../../shared/utils';
+import { a1Promise2Observable } from '../../../shared/utils';
 import { AdditionalRightRuleService } from '../../../services/additional-right-rule.service';
+import { ApplicationConfiguration, PrivateApplicationService } from '../../../client/generated';
+import { Mutable } from '../../../shared';
+import { AuthContext } from '../shared/auth-context.interface';
+import { LoginService } from './login.service';
 
-export interface AuthContext {
-  userID: string;
-  rights: string[];
-  role: string;
-  otp: boolean;
-  session: any;
-}
+type FieldAccessor = Mutable<Pick<AuthService, 'isOidc'>>;
+
+const OIDC_ENDPOINT_PARAM = 'startOidcEndPoint';
+
+const ANONYMOUS = 'anonymous';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService implements OnDestroy {
   constructor(
-    private _http: HttpClient,
     @Inject(AJS_ROOT_SCOPE) private _$rootScope: any,
     @Inject(AJS_LOCATION) private _$location: any,
     @Inject(DOCUMENT) private _document: Document,
     @Inject(AJS_PREFERENCES) private _preferences: any,
     @Inject(AJS_UIB_MODAL) private _$uibModal: any,
-    private _additionalRightRules: AdditionalRightRuleService
+    private _additionalRightRules: AdditionalRightRuleService,
+    private _privateApplicationApi: PrivateApplicationService,
+    private _loginService: LoginService
   ) {}
 
   private _triggerRightCheck$ = new BehaviorSubject<unknown>(undefined);
 
   readonly triggerRightCheck$ = this._triggerRightCheck$.asObservable();
 
-  private _serviceContext: { conf?: ConfigDto } = {};
+  private _serviceContext: { conf?: ApplicationConfiguration } = {};
 
   private _context$ = new BehaviorSubject<AuthContext | undefined>(undefined);
 
   readonly context$ = this._context$.asObservable();
+
+  readonly isOidc: boolean = false;
 
   private setContextFromSession(session: SessionDto): void {
     const context: AuthContext = {
@@ -63,38 +67,14 @@ export class AuthService implements OnDestroy {
     return this._context$.value as AuthContext;
   }
 
-  async init(): Promise<unknown> {
-    this._serviceContext.conf = await firstValueFrom(this._http.get('rest/access/conf') as Observable<ConfigDto>);
-    this._document.title = this._serviceContext.conf.title;
-    return this._serviceContext?.conf?.debug || false;
-  }
-
-  async getSession(): Promise<SessionDto | unknown> {
-    try {
-      const session = await firstValueFrom(this._http.get('rest/access/session') as Observable<SessionDto>);
-      if (session.otp) {
-        await this.showPasswordChangeDialog(true);
-        session.otp = false;
-        this.setContextFromSession(session);
-        return session;
-      } else {
-        this.setContextFromSession(session);
-        return session;
-      }
-    } catch (err) {
-      this._$rootScope.context = { userID: 'anonymous', role: 'public' };
-      return err;
-    }
-  }
-
   updateContext(info: Partial<AuthContext>): void {
     const context = { ...this.getContext(), ...info };
     this.setContext(context);
   }
 
-  login(credentials: CredentialsDto): Observable<unknown> {
-    return this._http.post('rest/access/login', credentials).pipe(
-      tap(() => this.getSession()),
+  login(username: string, password: string): Observable<unknown> {
+    return this._loginService.login(username, password).pipe(
+      switchMap(() => this.getSession()),
       tap(() => {
         const context = this.getContext();
         if (context && !context.otp) {
@@ -107,14 +87,21 @@ export class AuthService implements OnDestroy {
     );
   }
 
-  async logout(): Promise<unknown> {
-    await firstValueFrom(this._http.post('rest/access/logout', {}));
-    this._$rootScope.context = { userID: 'anonymous' };
-    this.gotoDefaultPage();
-    return undefined;
+  logout(): void {
+    this._loginService
+      .logout()
+      .pipe(map(() => ({ userID: ANONYMOUS } as AuthContext)))
+      .subscribe((context) => {
+        this.setContext(context);
+        this.gotoDefaultPage();
+      });
   }
 
   goToLoginPage(): any {
+    if (this.isOidc) {
+      this.redirectToOidc();
+      return;
+    }
     return this._$location.path('/root/login');
   }
 
@@ -127,7 +114,8 @@ export class AuthService implements OnDestroy {
   }
 
   isAuthenticated(): boolean {
-    return !!this._$rootScope.context?.userID && this._$rootScope.context?.userID !== 'anonymous';
+    const context = this.getContext();
+    return !!context?.userID && context?.userID !== ANONYMOUS;
   }
 
   isExtLoginAuth(): boolean {
@@ -135,26 +123,30 @@ export class AuthService implements OnDestroy {
   }
 
   hasRight(right: string): boolean {
+    const conf = this.getConf();
+    if (!!conf && !conf.authentication) {
+      return true;
+    }
+
     const additionalRulesCheckResult = this._additionalRightRules.checkRight(right);
     if (!additionalRulesCheckResult) {
       return false;
     }
 
-    return this._$rootScope.context && this._$rootScope.context.rights
-      ? this._$rootScope.context.rights.indexOf(right) !== -1
-      : false;
+    const context = this._context$.value;
+    return !!context?.rights ? context.rights.indexOf(right) !== -1 : false;
   }
 
-  getConf(): ConfigDto | undefined {
+  getConf(): ApplicationConfiguration | undefined {
     return this._serviceContext.conf;
   }
 
   debug(): boolean {
     const conf = this._serviceContext.conf;
-    return conf ? conf.debug : false;
+    return conf?.debug || false;
   }
 
-  showPasswordChangeDialog(otp: boolean): Promise<unknown> {
+  showPasswordChangeDialog(otp: boolean): Observable<unknown> {
     const modalInstance = this._$uibModal.open({
       backdrop: 'static',
       animation: false,
@@ -166,7 +158,7 @@ export class AuthService implements OnDestroy {
         },
       },
     });
-    return a1Promise2Promise(modalInstance.result);
+    return a1Promise2Observable(modalInstance.result);
   }
 
   triggerRightCheck(): void {
@@ -176,6 +168,50 @@ export class AuthService implements OnDestroy {
   ngOnDestroy(): void {
     this._context$.complete();
     this._triggerRightCheck$.complete();
+  }
+
+  initialize(): Observable<boolean> {
+    return this._privateApplicationApi.getApplicationConfiguration().pipe(
+      tap((conf) => {
+        this._serviceContext.conf = conf;
+        if (conf.title) {
+          this._document.title = conf.title;
+        }
+        const startOidcEndpoint = conf?.miscParams?.[OIDC_ENDPOINT_PARAM] || undefined;
+        (this as FieldAccessor).isOidc = !!startOidcEndpoint && !!conf?.noLoginMask && !!conf.authentication;
+      }),
+      switchMap(() => this.getSession()),
+      map(() => this._serviceContext?.conf?.debug || false)
+    );
+  }
+
+  private redirectToOidc(): void {
+    const conf = this.getConf();
+    const startOidcEndpoint = conf!.miscParams![OIDC_ENDPOINT_PARAM];
+    const location = this._document.defaultView!.location;
+    const redirectUrl = `${startOidcEndpoint}?redirect_uri=${encodeURIComponent(location.href)}`;
+    location.assign(redirectUrl);
+  }
+
+  private getSession(): Observable<SessionDto | unknown> {
+    return (this._privateApplicationApi.getCurrentSession() as Observable<SessionDto>).pipe(
+      switchMap((session) => {
+        if (!session.otp) {
+          return of(session);
+        }
+        return this.showPasswordChangeDialog(true).pipe(
+          map(() => {
+            session.otp = true;
+            return session;
+          })
+        );
+      }),
+      tap((session) => this.setContextFromSession(session)),
+      catchError((err) => {
+        this.setContext({ userID: ANONYMOUS, role: 'public' });
+        return of(err);
+      })
+    );
   }
 }
 

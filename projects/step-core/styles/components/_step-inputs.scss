@@ -54,10 +54,13 @@
           }
 
           .mat-form-field-label-wrapper {
-            position: static;
             padding-top: 0;
             display: flex;
             height: auto;
+            pointer-events: all;
+            left: 0;
+            right: 0;
+            top: 0;
 
             label {
               position: static;
@@ -65,8 +68,23 @@
               font-weight: 500;
               font-size: 14px;
               line-height: 20px;
-              transform: none !important;
-              width: 100% !important;
+              transform: none;
+              width: 100%;
+              pointer-events: all;
+              padding-bottom: 0;
+
+              mat-label {
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+
+                step-icon {
+                  width: 16px;
+                  height: 16px;
+                  min-width: 16px;
+                  min-height: 16px;
+                }
+              }
             }
           }
         }
@@ -111,8 +129,14 @@
     }
 
     &.mat-form-field-has-label {
-      .mat-form-field-infix {
-        gap: 4px;
+      .mat-form-field-flex {
+        padding-top: 22px;
+        position: relative;
+
+        .mat-form-field-infix {
+          position: static;
+          gap: 4px;
+        }
       }
     }
 
@@ -162,7 +186,7 @@
           color: $primary-color;
           border: 1px solid $primary-color;
 
-          .mat-stroked-button:not([color]) {
+          .mat-stroked-button:not([color]):not([disabled]) {
             color: $primary-text-color;
           }
 
@@ -190,7 +214,7 @@
           color: $error-color;
           border: 1px solid $error-color;
 
-          .mat-stroked-button:not([color]) {
+          .mat-stroked-button:not([color]):not([disabled]) {
             color: $primary-text-color;
           }
 

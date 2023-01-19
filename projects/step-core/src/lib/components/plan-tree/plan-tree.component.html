@@ -1,0 +1,87 @@
+<as-split direction="horizontal">
+  <as-split-area [size]="30">
+    <div>
+      <step-btn-group *ngIf="!isReadonly">
+        <button
+          type="button"
+          mat-icon-button
+          (click)="_planEditService.moveUp()"
+          [disabled]="!('plan-write' | hasRight | async)"
+          matTooltip="Move selected node upward (ctrl+up)"
+          matTooltipPosition="below"
+        >
+          <step-icon name="chevron-up" aria-hidden="true"></step-icon>
+        </button>
+        <button
+          type="button"
+          mat-icon-button
+          (click)="_planEditService.moveDown()"
+          [disabled]="!('plan-write' | hasRight | async)"
+          matTooltip="Move selected node downward (ctrl+down)"
+          matTooltipPosition="below"
+        >
+          <step-icon name="chevron-down" aria-hidden="true"></step-icon>
+        </button>
+      </step-btn-group>
+      <step-btn-group *ngIf="!isReadonly">
+        <button
+          type="button"
+          mat-flat-button
+          (click)="_planEditService.copy()"
+          [disabled]="!('plan-write' | hasRight | async)"
+          matTooltip="Copy selected node (ctrl+c)"
+          matTooltipPosition="below"
+        >
+          Copy
+        </button>
+        <button
+          type="button"
+          mat-flat-button
+          (click)="_planEditService.paste()"
+          [disabled]="!('plan-write' | hasRight | async)"
+          matTooltip="Paste selected node (ctrl+v)"
+          matTooltipPosition="below"
+        >
+          Paste
+        </button>
+      </step-btn-group>
+      <step-btn-group *ngIf="!isReadonly">
+        <button
+          type="button"
+          mat-flat-button
+          (click)="_planEditService.delete()"
+          [disabled]="!('plan-delete' | hasRight | async)"
+          matTooltip="Delete selected node (del)"
+          matTooltipPosition="below"
+        >
+          Delete
+        </button>
+      </step-btn-group>
+      <step-btn-group *ngIf="_planInteractiveSession?.isInteractiveSessionActive$ | async">
+        <button
+          type="button"
+          mat-flat-button
+          color="primary"
+          (click)="_planInteractiveSession?.execute()"
+          [disabled]="!('interactive' | hasRight | async)"
+          matTooltip="Executes the selected node in the interactive session (ctrl+enter)"
+          matTooltipPosition="below"
+        >
+          Run interactively
+        </button>
+      </step-btn-group>
+    </div>
+    <step-tree (treeContextAction)="proceedAction($event.actionId, $event.node)" [dragDisabled]="isReadonly">
+    </step-tree>
+  </as-split-area>
+  <as-split-area [size]="70">
+    <ng-container *ngIf="selectedArtefact$ | async as selectedArtefact">
+      <step-artefact-details
+        [artefact]="selectedArtefact"
+        (onSave)="_planEditService.handlePlanChange()"
+        [readonly]="isReadonly"
+      >
+      </step-artefact-details>
+    </ng-container>
+  </as-split-area>
+</as-split>
