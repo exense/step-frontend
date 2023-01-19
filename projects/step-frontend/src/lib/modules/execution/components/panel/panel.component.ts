@@ -13,7 +13,7 @@ type FieldAccessor = Mutable<Pick<PanelComponent, 'panel$'>>;
   styleUrls: ['./panel.component.scss'],
 })
 export class PanelComponent implements OnChanges {
-  @Input() panelType?: Panels;
+  @Input() panelType?: Panels | string;
 
   readonly panel$: Observable<ExecutionStepPanel | undefined> = of(undefined);
 
@@ -26,7 +26,7 @@ export class PanelComponent implements OnChanges {
     }
   }
 
-  private observePanel(panelType?: Panels): void {
+  private observePanel(panelType?: Panels | string): void {
     (this as FieldAccessor).panel$ = !panelType ? of(undefined) : this._executionPanels.observePanel(panelType);
   }
 }
