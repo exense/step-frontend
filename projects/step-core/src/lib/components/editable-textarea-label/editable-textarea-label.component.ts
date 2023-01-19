@@ -24,10 +24,7 @@ export class EditableTextareaLabelComponent extends EditableComponent<string> {
 
   textareaRows = DEFAULT_TEXTAREA_ROWS;
 
-  constructor(
-    protected override elementRef: ElementRef<HTMLElement>,
-    protected override changeDetectorRef: ChangeDetectorRef
-  ) {
+  constructor(elementRef: ElementRef<HTMLElement>, changeDetectorRef: ChangeDetectorRef) {
     super(elementRef, changeDetectorRef);
   }
 

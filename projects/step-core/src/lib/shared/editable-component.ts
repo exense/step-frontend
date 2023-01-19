@@ -12,10 +12,10 @@ type OnTouch = () => void;
 
 // The @Component() decorator allows us to use decorators like @HostListener() in our base classes
 @Component({
-  // the template provided is irrelevant in our case
+  // The provided template in our case is irrelevant
   template: '',
 })
-export abstract class EditableComponent<T> implements ControlValueAccessor {
+export class EditableComponent<T> implements ControlValueAccessor {
   @Input() labelTemplate!: TemplateRef<{}>;
 
   protected readonly State = EditableComponentState;

@@ -17,10 +17,7 @@ import { EditableComponent } from '../../shared/editable-component';
 export class EditableLabelComponent extends EditableComponent<string> {
   @ViewChild('input') input?: ElementRef<HTMLElement>;
 
-  constructor(
-    protected override elementRef: ElementRef<HTMLElement>,
-    protected override changeDetectorRef: ChangeDetectorRef
-  ) {
+  constructor(elementRef: ElementRef<HTMLElement>, changeDetectorRef: ChangeDetectorRef) {
     super(elementRef, changeDetectorRef);
   }
 

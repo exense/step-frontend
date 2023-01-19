@@ -23,10 +23,7 @@ export class EditableDropdownLabelComponent<T> extends EditableComponent<T> {
 
   @ViewChild(MatSelect, { read: ElementRef }) matSelectElementRef?: ElementRef<HTMLElement>;
 
-  constructor(
-    protected override elementRef: ElementRef<HTMLElement>,
-    protected override changeDetectorRef: ChangeDetectorRef
-  ) {
+  constructor(elementRef: ElementRef<HTMLElement>, changeDetectorRef: ChangeDetectorRef) {
     super(elementRef, changeDetectorRef);
   }
 
