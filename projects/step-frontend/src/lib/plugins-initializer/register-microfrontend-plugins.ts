@@ -26,6 +26,10 @@ const loadModule = async (definition: MicrofrontendPluginDefinition): Promise<Pl
       href = href.substring(0, href.indexOf('#'));
     }
 
+    if (!href.endsWith('/')) {
+      href += '/';
+    }
+
     const remoteEntry = href + definition.entryPoint;
 
     const options: LoadRemoteModuleOptions = {
