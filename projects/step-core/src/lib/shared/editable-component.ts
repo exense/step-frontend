@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Input, TemplateRef } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, Input, TemplateRef } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
 import { isChildOf } from './utils';
 
@@ -23,13 +23,20 @@ export abstract class EditableComponent<T> implements ControlValueAccessor {
   protected onChange?: OnChange;
   protected onTouch?: OnTouch;
   protected focusedElement?: HTMLElement;
+  protected value?: T;
+  protected newValue?: T;
 
   protected state = EditableComponentState.READABLE;
   protected isDisabled = false;
 
-  protected constructor(protected elementRef: ElementRef<HTMLElement>) {}
+  protected constructor(
+    protected elementRef: ElementRef<HTMLElement>,
+    protected changeDetectorRef: ChangeDetectorRef
+  ) {}
 
-  abstract writeValue(value: T): void;
+  writeValue(value: T): void {
+    this.value = value;
+  }
 
   registerOnChange(onChange: OnChange): void {
     this.onChange = onChange;
@@ -80,7 +87,29 @@ export abstract class EditableComponent<T> implements ControlValueAccessor {
     this.onApply();
   }
 
-  protected abstract onCancel(): void;
+  protected onLabelClick(): void {
+    this.state = EditableComponentState.EDITABLE;
+    this.newValue = this.value;
+    this.changeDetectorRef.detectChanges();
+  }
 
-  protected abstract onApply(): void;
+  protected onCancel(): void {
+    this.state = EditableComponentState.READABLE;
+    delete this.newValue;
+  }
+
+  protected onApply(): void {
+    this.state = EditableComponentState.READABLE;
+    this.value = this.newValue;
+    this.onChange?.(this.newValue);
+  }
+
+  protected onValueChange(value: T): void {
+    this.newValue = value;
+  }
+
+  protected onBlur(): void {
+    this.onTouch?.();
+    delete this.focusedElement;
+  }
 }

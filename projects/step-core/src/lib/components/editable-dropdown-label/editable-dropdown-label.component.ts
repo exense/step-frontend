@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, ElementRef, forwardRef, Input, TemplateRef, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatSelect } from '@angular/material/select';
-import { EditableComponent, EditableComponentState } from '../../shared/editable-component';
+import { EditableComponent } from '../../shared/editable-component';
 
 @Component({
   selector: 'step-editable-dropdown-label',
@@ -23,38 +23,21 @@ export class EditableDropdownLabelComponent<T> extends EditableComponent<T> {
 
   @ViewChild(MatSelect, { read: ElementRef }) matSelectElementRef?: ElementRef<HTMLElement>;
 
-  value?: T;
-  newValue?: T;
-
-  constructor(protected override elementRef: ElementRef<HTMLElement>, private changeDetectorRef: ChangeDetectorRef) {
-    super(elementRef);
+  constructor(
+    protected override elementRef: ElementRef<HTMLElement>,
+    protected override changeDetectorRef: ChangeDetectorRef
+  ) {
+    super(elementRef, changeDetectorRef);
   }
 
-  override writeValue(value: T): void {
-    this.value = value;
-  }
-
-  protected override onCancel(): void {
-    this.state = EditableComponentState.READABLE;
-    delete this.newValue;
-  }
-
-  protected override onApply(): void {
-    this.state = EditableComponentState.READABLE;
-    this.value = this.newValue;
-    this.onChange?.(this.newValue);
-  }
-
-  onLabelClick(): void {
-    this.state = EditableComponentState.EDITABLE;
-    this.newValue = this.value;
-    this.changeDetectorRef.detectChanges();
-    this.matSelectElementRef!.nativeElement.click();
+  protected override onValueChange(value: T): void {
+    super.onValueChange(value);
     this.focusedElement = this.matSelectElementRef!.nativeElement;
   }
 
-  onValueChange(value: T): void {
-    this.newValue = value;
+  protected override onLabelClick(): void {
+    super.onLabelClick();
+    this.matSelectElementRef!.nativeElement.click();
     this.focusedElement = this.matSelectElementRef!.nativeElement;
   }
 
@@ -63,7 +46,6 @@ export class EditableDropdownLabelComponent<T> extends EditableComponent<T> {
       return;
     }
 
-    this.onTouch?.();
-    delete this.focusedElement;
+    super.onBlur();
   }
 }

@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { EditableComponent, EditableComponentState } from '../../shared/editable-component';
+import { EditableComponent } from '../../shared/editable-component';
 
 const DEFAULT_TEXTAREA_ROWS = 4;
 const LINE_HEIGHT = 18;
@@ -23,40 +23,24 @@ export class EditableTextareaLabelComponent extends EditableComponent<string> {
   @ViewChild('textarea') textarea?: ElementRef<HTMLElement>;
 
   textareaRows = DEFAULT_TEXTAREA_ROWS;
-  value = '';
-  newValue = '';
 
-  constructor(protected override elementRef: ElementRef<HTMLElement>, private changeDetectorRef: ChangeDetectorRef) {
-    super(elementRef);
-  }
-
-  override writeValue(value: string): void {
-    this.value = value;
+  constructor(
+    protected override elementRef: ElementRef<HTMLElement>,
+    protected override changeDetectorRef: ChangeDetectorRef
+  ) {
+    super(elementRef, changeDetectorRef);
   }
 
   protected override onCancel(): void {
-    this.state = EditableComponentState.READABLE;
-    this.newValue = '';
+    super.onCancel();
     this.recalculateTextareaRows();
   }
 
-  protected override onApply(): void {
-    this.state = EditableComponentState.READABLE;
-    this.value = this.newValue;
-    this.onChange?.(this.newValue);
-  }
-
-  onLabelClick(): void {
+  protected override onLabelClick(): void {
     this.recalculateTextareaRows();
-    this.state = EditableComponentState.EDITABLE;
-    this.newValue = this.value;
-    this.changeDetectorRef.detectChanges();
+    super.onLabelClick();
     this.textarea!.nativeElement.focus();
     this.focusedElement = this.textarea!.nativeElement;
-  }
-
-  onValueChange(value: string): void {
-    this.newValue = value;
   }
 
   onInput(): void {
@@ -65,11 +49,6 @@ export class EditableTextareaLabelComponent extends EditableComponent<string> {
       'height',
       `${this.textarea!.nativeElement.scrollHeight + 2 * BORDER_WIDTH}px`
     );
-  }
-
-  onBlur(): void {
-    this.onTouch?.();
-    delete this.focusedElement;
   }
 
   private recalculateTextareaRows(): void {
