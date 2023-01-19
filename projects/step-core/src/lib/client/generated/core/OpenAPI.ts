@@ -19,7 +19,7 @@ export type OpenAPIConfig = {
 };
 
 export const OpenAPI: OpenAPIConfig = {
-  BASE: '/rest',
+  BASE: 'rest',
   VERSION: '3.20.0',
   WITH_CREDENTIALS: false,
   CREDENTIALS: 'include',

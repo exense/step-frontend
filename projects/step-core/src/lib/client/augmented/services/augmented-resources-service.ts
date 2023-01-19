@@ -49,7 +49,7 @@ export class AugmentedResourcesService extends ResourcesService {
     formData.set('file', file);
 
     const stream$ = this._httpClient
-      .request('POST', `/rest/resources${resourceId ? `/${resourceId}` : ''}/content`, {
+      .request('POST', `rest/resources${resourceId ? `/${resourceId}` : ''}/content`, {
         body: formData,
         params: {
           type,
@@ -98,7 +98,7 @@ export class AugmentedResourcesService extends ResourcesService {
   }
 
   getDownloadResourceUrl(resourceId: string): string {
-    return `/rest/resources/${resourceId}/content`;
+    return `rest/resources/${resourceId}/content`;
   }
 
   private calculateProgressPercentage(httpProgressEvent: HttpProgressEvent) {
