@@ -10,6 +10,7 @@
       [cdkDropListData]="node.id"
       (cdkDropListDropped)="_treeDragDrop.handleDrop()"
       (click)="_treeState.selectNode(node, $event)"
+      (dblclick)="handleDblClick(node, $event)"
     >
       <div *ngFor="let level of node.level | arrayOfSize" [style.--level]="level" class="node-line"></div>
       <step-tree-node
@@ -35,6 +36,7 @@
       (cdkDropListDropped)="_treeDragDrop.handleDrop()"
       [cdkDropListData]="node.id"
       (click)="_treeState.selectNode(node, $event)"
+      (dblclick)="handleDblClick(node, $event)"
     >
       <div *ngFor="let level of node.level | arrayOfSize" [style.--level]="level" class="node-line"></div>
       <step-tree-node

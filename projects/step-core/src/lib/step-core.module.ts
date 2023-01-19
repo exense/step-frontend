@@ -37,6 +37,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
 import { SettingBtnComponent } from './components/setting-btn/setting-btn.component';
 import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
+import { SimpleLineChartDirective } from './directives/simple-line-chart.directive';
 
 @NgModule({
   declarations: [
@@ -61,6 +62,7 @@ import { ArtefactDetailsDirective } from './directives/artefact-details.directiv
     ProgressBarComponent,
     ArtefactDetailsDirective,
     PlanTreeComponent,
+    SimpleLineChartDirective,
   ],
   imports: [
     CommonModule,
@@ -113,6 +115,7 @@ import { ArtefactDetailsDirective } from './directives/artefact-details.directiv
     SettingBtnComponent,
     UploadContainerComponent,
     ProgressBarComponent,
+    SimpleLineChartDirective,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -164,6 +167,7 @@ export * from './directives/caps-lock.directive';
 export * from './directives/tooltip-immediate-close.directive';
 export * from './directives/tooltip.directive';
 export * from './directives/artefact-details.directive';
+export * from './directives/simple-line-chart.directive';
 export * from './domain';
 export * from './modules/async-operations/async-operations.module';
 export * from './modules/basics/step-basics.module';
@@ -196,4 +200,5 @@ export * from './services/view-state.service';
 export * from './services/plan-editor.service';
 export * from './services/plan-interactive-session.service';
 export * from './services/plan-artefact-resolver.service';
+export * from './services/execution-close-handle.service';
 export * from './shared';

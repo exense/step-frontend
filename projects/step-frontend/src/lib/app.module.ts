@@ -4,7 +4,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { UpgradeModule } from '@angular/upgrade/static';
 import { AJS_MODULE, StepCoreModule } from '@exense/step-core';
 import { AdminModule } from './modules/admin/admin.module';
-import { ContextMenuModule } from './modules/context-menu/context-menu.module';
 import { DefaultThemeModule } from './modules/default-theme/default-theme.module';
 import { ExecutionModule } from './modules/execution/execution.module';
 import { FunctionModule } from './modules/function/function.module';
@@ -29,7 +28,6 @@ import { PLUGINS_INITIALIZER } from './plugins-initializer/plugins-initializer';
     ExecutionModule,
     BrowserAnimationsModule,
     SchedulerModule,
-    ContextMenuModule,
     ParameterModule,
     GridModule,
     TimeSeriesModule,

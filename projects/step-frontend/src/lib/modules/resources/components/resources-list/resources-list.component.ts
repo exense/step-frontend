@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, Resource, AugmentedResourcesService } from '@exense/step-core';
-import { ResourceDialogsService } from '../services/resource-dialogs.service';
+import { ResourceDialogsService } from '../../services/resource-dialogs.service';
 import { DOCUMENT } from '@angular/common';
 
 @Component({
@@ -10,7 +10,7 @@ import { DOCUMENT } from '@angular/common';
   styleUrls: ['./resources-list.component.scss'],
 })
 export class ResourcesListComponent {
-  readonly dataSource = this._augmentedResourcesService.dataSource;
+  readonly dataSource = this._augmentedResourcesService.createDatasource();
 
   constructor(
     private _resourceDialogs: ResourceDialogsService,

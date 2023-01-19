@@ -53,7 +53,7 @@ export class PlanTreeComponent implements TreeActionsService {
             if (this.isReadonly) {
               disabled = true;
             } else if (action.id === PlanTreeAction.open) {
-              disabled = !['CallPlan', 'CallKeyword'].includes(node.originalArtefact._class);
+              disabled = !this.canOpenArtefact(node.originalArtefact);
             }
             return { ...action, disabled };
           })
@@ -76,35 +76,48 @@ export class PlanTreeComponent implements TreeActionsService {
     return true;
   }
 
-  proceedAction(actionId: string, node?: AbstractArtefact): void {
+  handleDoubleClick(node: ArtefactTreeNode, event: MouseEvent): void {
+    if (!this.canOpenArtefact(node.originalArtefact) || !this._planArtefactResolver) {
+      return;
+    }
+    event.preventDefault();
+    this._planArtefactResolver.openArtefact(node.originalArtefact);
+  }
+
+  proceedAction(actionId: string, node?: ArtefactTreeNode): void {
+    const artefact = node?.originalArtefact;
     switch (actionId) {
       case PlanTreeAction.rename:
-        this._planEditService.rename(node);
+        this._planEditService.rename(artefact);
         break;
       case PlanTreeAction.move_up:
-        this._planEditService.moveUp(node);
+        this._planEditService.moveUp(artefact);
         break;
       case PlanTreeAction.move_down:
-        this._planEditService.moveDown(node);
+        this._planEditService.moveDown(artefact);
         break;
       case PlanTreeAction.copy:
-        this._planEditService.copy(node);
+        this._planEditService.copy(artefact);
         break;
       case PlanTreeAction.paste:
-        this._planEditService.paste(node);
+        this._planEditService.paste(artefact);
         break;
       case PlanTreeAction.delete:
-        this._planEditService.delete(node);
+        this._planEditService.delete(artefact);
         break;
       case PlanTreeAction.open:
-        this._planArtefactResolver?.openArtefact(node);
+        this._planArtefactResolver?.openArtefact(artefact);
         break;
       case PlanTreeAction.disable:
       case PlanTreeAction.enable:
-        this._planEditService?.toggleSkip(node);
+        this._planEditService?.toggleSkip(artefact);
         break;
       default:
         break;
     }
+  }
+
+  private canOpenArtefact(artefact: AbstractArtefact): boolean {
+    return ['CallPlan', 'CallKeyword'].includes(artefact._class);
   }
 }
