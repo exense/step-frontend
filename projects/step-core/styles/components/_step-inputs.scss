@@ -47,6 +47,8 @@
             padding: 10px 14px;
             line-height: 20px;
             margin-top: 0;
+            margin-bottom: 0;
+            box-sizing: border-box;
 
             .mat-select-trigger {
               height: auto;
@@ -68,8 +70,8 @@
               font-weight: 500;
               font-size: 14px;
               line-height: 20px;
-              transform: none;
-              width: 100%;
+              width: 100% !important;
+              transform: none !important;
               pointer-events: all;
               padding-bottom: 0;
 
@@ -159,12 +161,12 @@
           mat-select,
           .mat-input-element {
             padding: 8px 14px;
-            line-height: 16px;
+            line-height: 18px;
           }
         }
 
         .mat-form-field-suffix {
-          height: 34px;
+          height: 36px;
         }
       }
     }
@@ -233,12 +235,12 @@
           mat-select,
           .mat-input-element {
             padding: 8px 14px;
-            line-height: 16px;
+            line-height: 18px;
           }
         }
 
         .mat-form-field-suffix {
-          height: 34px;
+          height: 36px;
         }
       }
     }
