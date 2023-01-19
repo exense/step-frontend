@@ -11,7 +11,6 @@ import { TimeseriesTableComponent } from './performance-view/table/timeseries-ta
 import { TimeRangePicker } from './time-selection/time-range-picker.component';
 import { ChartSkeletonComponent } from './chart/skeleton/chart-skeleton.component';
 import { PerformanceViewComponent } from './performance-view/performance-view.component';
-import { ExecutionPageComponent } from './execution-page/execution-page.component';
 import { SyntheticMonitoringPageComponent } from './synthetic-monitoring/synthetic-monitoring-page.component';
 import { MeasurementsPickerComponent } from './performance-view/measurements/measurements-picker.component';
 import { PerformanceViewTimeSelectionComponent } from './performance-view/time-selection/performance-view-time-selection.component';
@@ -21,6 +20,7 @@ import { FilterBarItemComponent } from './performance-view/filter-bar/item/filte
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { TimeSeriesDashboardComponent } from './dashboard/time-series-dashboard.component';
 import { TsGroupingComponent } from './dashboard/grouping/ts-grouping.component';
+import { ExecutionPageComponent } from './execution-page/ts-execution-page.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +32,7 @@ import { TsGroupingComponent } from './dashboard/grouping/ts-grouping.component'
     TimeRangePicker,
     ChartSkeletonComponent,
     PerformanceViewTimeSelectionComponent,
-    ExecutionPageComponent,
+    PerformanceViewComponent,
     SyntheticMonitoringPageComponent,
     MeasurementsPickerComponent,
     MeasurementsFilterPipe,
@@ -40,6 +40,7 @@ import { TsGroupingComponent } from './dashboard/grouping/ts-grouping.component'
     FilterBarItemComponent,
     TimeSeriesDashboardComponent,
     TsGroupingComponent,
+    ExecutionPageComponent,
   ],
   exports: [ExecutionPageComponent, SyntheticMonitoringPageComponent],
   imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule, MatDatepickerModule],

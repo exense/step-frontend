@@ -3,10 +3,12 @@
   <div class="no-data-tag" *ngIf="emptyChart">No data...</div>
   <div class="ts-chart-legend">
     <div class="left-section">
-      <div class="item" *ngFor="let item of legendSettings.items">
-        <div class="color-square" [style.background]="item.color"></div>
-        <div class="item-label">{{ item.label }}</div>
-      </div>
+      <ng-container *ngFor="let item of legendSettings.items">
+        <div class="item" *ngIf="item.isVisible">
+          <div class="color-square" [style.background]="item.color"></div>
+          <div class="item-label">{{ item.label }}</div>
+        </div>
+      </ng-container>
     </div>
     <div class="aggregate-section" *ngIf="legendSettings.zAxisLabel">
       <step-icon name="bar-chart-2" class="total-value-icon"></step-icon>

@@ -24,8 +24,8 @@ import { UrlUtils } from '../util/url-utils';
 
 @Component({
   selector: 'step-execution-performance',
-  templateUrl: './execution-page.component.html',
-  styleUrls: ['./execution-page.component.scss'],
+  templateUrl: './ts-execution-page.component.html',
+  styleUrls: ['./ts-execution-page.component.scss'],
 })
 export class ExecutionPageComponent implements OnInit, OnDestroy {
   terminator$ = new Subject<void>();
@@ -196,4 +196,4 @@ interface RefreshInterval {
 
 getAngularJSGlobal()
   .module(AJS_MODULE)
-  .directive('stepExecutionPage', downgradeComponent({ component: ExecutionPageComponent }));
+  .directive('stepExecutionPerformance', downgradeComponent({ component: ExecutionPageComponent }));

@@ -11,6 +11,8 @@ export class MeasurementsFilterPipe implements PipeTransform {
     if (searchValue) {
       array = array.filter((item) => item.key?.toLowerCase().indexOf(searchValue.toLowerCase()) >= 0);
     }
-    return array.sort((a, b) => a.key.localeCompare(b.key));
+    let x = array.sort((a, b) => a.key.localeCompare(b.key));
+    console.log(x);
+    return x;
   }
 }

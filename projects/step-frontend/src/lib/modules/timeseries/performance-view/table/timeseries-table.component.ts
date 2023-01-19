@@ -40,6 +40,9 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     }
     this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
     this.keywordsService = this.executionContext.keywordsContext;
+    this.keywordsService.onKeywordToggled().subscribe((selection) => {
+      this.bucketsByKeywords[selection.id].attributes.isSelected = selection.isSelected;
+    });
   }
 
   updateData(response: TimeSeriesChartResponse) {
