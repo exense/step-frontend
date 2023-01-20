@@ -91,18 +91,22 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.context.updateGrouping(dimensions);
   }
 
+  setRanges(fullRange: TSTimeRange, selection?: TSTimeRange) {
+    let isFullRangeSelected = this.context.isFullRangeSelected();
+    this.context.updateFullRange(fullRange, false);
+    if (selection) {
+      this.context.updateSelectedRange(selection, false);
+    } else if (isFullRangeSelected) {
+      this.context.updateSelectedRange(fullRange, false);
+    }
+  }
+
   /**
    * This method has to make sure that it doesn't overlap another running update
    * @param range
    */
   refresh(range: TSTimeRange, selection?: TSTimeRange): void {
-    if (selection) {
-      this.context.updateSelectedRange(selection, false);
-    } else if (this.context.isFullRangeSelected()) {
-      // need to keep full selection
-      this.context.updateSelectedRange(range, false);
-    }
-    this.context.updateFullRange(range, false);
+    this.setRanges(range, selection);
     this.throttledRefreshTrigger$.next(true);
   }
 

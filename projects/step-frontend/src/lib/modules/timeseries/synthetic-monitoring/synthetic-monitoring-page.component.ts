@@ -11,6 +11,7 @@ import { TimeSeriesConfig } from '../time-series.config';
 import { TimeSeriesDashboardSettings } from '../dashboard/model/ts-dashboard-settings';
 import { TimeSeriesDashboardComponent } from '../dashboard/time-series-dashboard.component';
 import { UrlUtils } from '../util/url-utils';
+import { FilterBarItemType } from '../performance-view/filter-bar/model/ts-filter-item';
 
 @Component({
   selector: 'step-synthetic-monitoring',
@@ -61,6 +62,51 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
       includeThreadGroupChart: true,
       timeRange: range,
       contextualFilters: { ...urlParams, taskId: this.taskId },
+      filterOptions: [
+        {
+          label: 'Status',
+          attributeName: 'rnStatus',
+          type: FilterBarItemType.OPTIONS,
+          textValues: [
+            { value: 'PASSED' },
+            { value: 'FAILED' },
+            { value: 'TECHNICAL_ERROR' },
+            { value: 'INTERRUPTED' },
+          ],
+          isLocked: true,
+        },
+        {
+          label: 'Type',
+          attributeName: 'type',
+          type: FilterBarItemType.OPTIONS,
+          textValues: [{ value: 'keyword' }, { value: 'custom' }],
+          isLocked: true,
+        },
+        {
+          label: 'Name',
+          attributeName: 'name',
+          type: FilterBarItemType.FREE_TEXT,
+          isLocked: true,
+        },
+        {
+          label: 'Execution Id',
+          attributeName: 'eId',
+          type: FilterBarItemType.FREE_TEXT,
+          isLocked: true,
+        },
+        {
+          label: 'Origin',
+          attributeName: 'origin',
+          type: FilterBarItemType.FREE_TEXT,
+          isLocked: true,
+        },
+        {
+          label: 'Plan Id',
+          attributeName: 'planId',
+          type: FilterBarItemType.FREE_TEXT,
+          isLocked: true,
+        },
+      ],
     };
     if (this.refreshEnabled) {
       this.startInterval(this.selectedRefreshInterval.value);

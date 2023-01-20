@@ -26,10 +26,13 @@
     </div>
     <div *ngSwitchCase="FilterBarType.FREE_TEXT">
       <div class="attribute-type">TEXT</div>
-      <mat-form-field class="w-100" autocomplete="off">
+      <mat-form-field class="w-100" autocomplete="off" *ngIf="!item.isLocked">
         <mat-label>Attribute name</mat-label>
         <input type="text" matInput [(ngModel)]="item.attributeName" autocomplete="off" />
       </mat-form-field>
+      <div *ngIf="item.isLocked">
+        {{ item.label }}
+      </div>
       <mat-form-field class="w-100">
         <mat-label>Search value</mat-label>
         <input type="text" matInput [(ngModel)]="item.textValue" autocomplete="off" />

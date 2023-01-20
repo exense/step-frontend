@@ -32,7 +32,6 @@ export class TimeSeriesKeywordsContext {
    * Just the specified keywords will be visible, but the other's selections will be saved
    */
   setKeywords(keywords: string[], selectAll = false): void {
-    console.log('setting keywords', keywords);
     Object.keys(this.keywords).forEach((keyword) => {
       this.keywords[keyword].isVisible = false;
     });
@@ -49,7 +48,6 @@ export class TimeSeriesKeywordsContext {
         this.keywords[keyword].isVisible = true;
       }
     });
-    console.log(this.keywords);
     this.keywordsChangeSubject.next(this.keywords);
   }
 

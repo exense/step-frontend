@@ -3,6 +3,7 @@
     <step-ts-filter-bar
       *ngIf="context"
       [context]="context"
+      [defaultFilterOptions]="settings.filterOptions"
       (onFiltersChange)="handleFiltersChange($event)"
     ></step-ts-filter-bar>
   </div>

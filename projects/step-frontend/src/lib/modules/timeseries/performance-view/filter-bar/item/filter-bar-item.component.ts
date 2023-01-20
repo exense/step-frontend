@@ -35,7 +35,9 @@ export class FilterBarItemComponent implements OnInit, OnDestroy {
   }
 
   applyChanges() {
-    this.item.label = this.item.attributeName;
+    if (!this.item.isLocked) {
+      this.item.label = this.item.attributeName;
+    }
     switch (this.item.type) {
       case FilterBarItemType.FREE_TEXT:
         this.formattedValue = this.item.textValue;

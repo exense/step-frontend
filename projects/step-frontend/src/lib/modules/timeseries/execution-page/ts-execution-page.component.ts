@@ -21,6 +21,7 @@ import { MatMenuTrigger } from '@angular/material/menu';
 import { TimeSeriesDashboardSettings } from '../dashboard/model/ts-dashboard-settings';
 import { TimeSeriesDashboardComponent } from '../dashboard/time-series-dashboard.component';
 import { UrlUtils } from '../util/url-utils';
+import { FilterBarItemType } from '../performance-view/filter-bar/model/ts-filter-item';
 
 @Component({
   selector: 'step-execution-performance',
@@ -35,11 +36,10 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
 
   @Input() executionId!: string;
-  private execution: Execution | undefined;
+  execution: Execution | undefined;
 
   timeRangeSelection: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
 
-  executionInProgress = false;
   performanceViewSettings: PerformanceViewSettings | undefined;
 
   executionHasToBeBuilt = false;
@@ -77,21 +77,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
-    let start = this.execution!.startTime!;
-    const end = this.execution!.endTime! || new Date().getTime();
-    let range: TSTimeRange = { from: 0, to: 0 };
-    switch (selection.type) {
-      case RangeSelectionType.FULL:
-        range = { from: start, to: end };
-        break;
-      case RangeSelectionType.ABSOLUTE:
-        range = selection.absoluteSelection!;
-        break;
-      case RangeSelectionType.RELATIVE:
-        range = { from: end - selection.relativeSelection!.timeInMs, to: end };
-        break;
-    }
-    this.dashboard.updateRange(range);
+    this.timeRangeSelection = selection;
+    this.dashboard.updateRange(this.calculateFullTimeRange());
   }
 
   init() {
@@ -99,18 +86,45 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       this.execution = execution;
       const startTime = execution.startTime!;
       const endTime = execution.endTime ? execution.endTime : new Date().getTime();
-      if (!execution.endTime) {
-        this.executionInProgress = true;
-      }
       let urlParams = UrlUtils.getURLParams(window.location.href);
       this.dashboardSettings = {
         contextId: this.executionId,
         includeThreadGroupChart: true,
         timeRange: { from: startTime, to: endTime },
         contextualFilters: { ...urlParams, eId: this.executionId },
+        filterOptions: [
+          {
+            label: 'Status',
+            attributeName: 'rnStatus',
+            type: FilterBarItemType.OPTIONS,
+            textValues: [
+              { value: 'PASSED' },
+              { value: 'FAILED' },
+              { value: 'TECHNICAL_ERROR' },
+              { value: 'INTERRUPTED' },
+            ],
+            isLocked: true,
+          },
+          {
+            label: 'Type',
+            attributeName: 'type',
+            type: FilterBarItemType.OPTIONS,
+            textValues: [{ value: 'keyword' }, { value: 'custom' }],
+            isLocked: true,
+          },
+          {
+            label: 'Name',
+            attributeName: 'name',
+            type: FilterBarItemType.FREE_TEXT,
+            isLocked: true,
+          },
+        ],
       };
-      if (this.executionInProgress) {
-        setTimeout(() => this.startInterval(), this.selectedRefreshInterval.value);
+      if (!execution.endTime) {
+        setTimeout(() => {
+          this.dashboard.setRanges(this.calculateFullTimeRange());
+          this.startInterval();
+        }, this.selectedRefreshInterval.value);
       }
     });
   }
@@ -122,10 +136,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
       .subscribe(() => this.triggerRefresh());
   }
 
-  /**
-   * This will be the public method called from the outside of this component.
-   */
-  triggerRefresh() {
+  calculateFullTimeRange(): TSTimeRange {
     let now = new Date().getTime();
     let details = this.execution!;
     let selection: TSTimeRange;
@@ -143,7 +154,20 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
         newFullRange = { from: end - this.timeRangeSelection.relativeSelection!.timeInMs!, to: end };
         break;
     }
-    this.dashboard.refresh(newFullRange);
+    return newFullRange;
+  }
+
+  /**
+   * This will be the public method called from the outside of this component.
+   */
+  triggerRefresh() {
+    this.executionService.getExecutionById(this.executionId).subscribe((execution) => {
+      this.execution = execution;
+      if (execution.endTime) {
+        this.stopInterval$.next(null);
+      }
+      this.dashboard.refresh(this.calculateFullTimeRange());
+    });
   }
 
   rebuildTimeSeries() {

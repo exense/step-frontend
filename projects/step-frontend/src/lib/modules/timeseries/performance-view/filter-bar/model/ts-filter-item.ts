@@ -2,6 +2,7 @@ export interface TsFilterItem {
   label: string;
   attributeName: string;
   type: FilterBarItemType;
+  isLocked?: boolean; // the attributeName can't be modified
 
   min?: number; // for numbers an dates
   max?: number; // for numbers an dates

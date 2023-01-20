@@ -16,20 +16,8 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   emitFilterChange$ = new Subject<void>();
 
   items: TsFilterItem[] = [];
-  defaultFilterOptions: TsFilterItem[] = [
-    {
-      label: 'Status',
-      attributeName: 'rnStatus',
-      type: FilterBarItemType.OPTIONS,
-      textValues: [{ value: 'PASSED' }, { value: 'FAILED' }, { value: 'TECHNICAL_ERROR' }, { value: 'INTERRUPTED' }],
-    },
-    {
-      label: 'Type',
-      attributeName: 'type',
-      type: FilterBarItemType.OPTIONS,
-      textValues: [{ value: 'keyword' }, { value: 'custom' }],
-    },
-  ];
+
+  @Input() defaultFilterOptions: TsFilterItem[] = [];
 
   ngOnInit(): void {
     if (!this.context) {
