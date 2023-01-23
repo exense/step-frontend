@@ -37,6 +37,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
 import { SettingBtnComponent } from './components/setting-btn/setting-btn.component';
 import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
+import { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 
 @NgModule({
   declarations: [
@@ -61,6 +62,7 @@ import { ArtefactDetailsDirective } from './directives/artefact-details.directiv
     ProgressBarComponent,
     ArtefactDetailsDirective,
     PlanTreeComponent,
+    RestoreDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -113,6 +115,7 @@ import { ArtefactDetailsDirective } from './directives/artefact-details.directiv
     SettingBtnComponent,
     UploadContainerComponent,
     ProgressBarComponent,
+    RestoreDialogComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -197,4 +200,5 @@ export * from './services/plan-editor.service';
 export * from './services/plan-interactive-session.service';
 export * from './services/plan-artefact-resolver.service';
 export * from './services/execution-close-handle.service';
+export * from './services/restore-dialogs.service';
 export * from './shared';

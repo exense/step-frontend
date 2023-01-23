@@ -85,6 +85,14 @@
         </button>
         <button
           mat-icon-button
+          matTooltip="Restore parameter"
+          [disabled]="!('param-write' | hasRight | async)"
+          (click)="restoreParameter(element)"
+        >
+          <step-icon name="bookmark"></step-icon>
+        </button>
+        <button
+          mat-icon-button
           matTooltip="Delete parameter"
           [disabled]="!('param-delete' | hasRight | async)"
           (click)="deleteParameter(element.id, element.key)"

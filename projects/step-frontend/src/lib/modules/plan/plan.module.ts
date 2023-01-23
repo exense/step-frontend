@@ -15,7 +15,6 @@ import { PlanListComponent } from './components/plan-list/plan-list.component';
 import { PlanOtherplanListComponent } from './components/plan-otherplan-list/plan-otherplan-list.component';
 import { PlanEditorKeyHandlerDirective } from './directives/plan-editor-key-handler.directive';
 import { PlanTreeEditorComponent } from './components/plan-tree-editor/plan-tree-editor.component';
-import { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 
 @NgModule({
   declarations: [
@@ -27,16 +26,9 @@ import { RestoreDialogComponent } from './components/restore-dialog/restore-dial
     PlanEditorComponent,
     PlanEditorKeyHandlerDirective,
     PlanTreeEditorComponent,
-    RestoreDialogComponent,
   ],
   imports: [StepCommonModule, ExecutionModule],
-  exports: [
-    PlanListComponent,
-    PlanOtherplanListComponent,
-    PlanFunctionListComponent,
-    PlanArtefactListComponent,
-    RestoreDialogComponent,
-  ],
+  exports: [PlanListComponent, PlanOtherplanListComponent, PlanFunctionListComponent, PlanArtefactListComponent],
 })
 export class PlanModule {
   constructor(

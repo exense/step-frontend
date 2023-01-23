@@ -32,6 +32,7 @@ import {
   PlanInteractiveSessionService,
   PlanArtefactResolverService,
   ExportDialogsService,
+  RestoreDialogsService,
 } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PlanHistoryService } from '../../services/plan-history.service';
@@ -42,7 +43,6 @@ import { KeywordCallsComponent } from '../../../execution/components/keyword-cal
 import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
 import { DOCUMENT } from '@angular/common';
 import { ArtefactTreeNodeUtilsService } from '../../services/artefact-tree-node-utils.service';
-import { RestoreDialogsService } from '../../services/restore-dialogs.service';
 
 type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef' | 'componentTabs' | 'planClass'>>;
 
@@ -168,13 +168,14 @@ export class PlanEditorComponent
       return;
     }
 
-    this._restoreDialogsService
-      .showRestoreDialog(this.planId!, this._planEditService.plan!.customFields!['versionId'])
-      .subscribe((restoredVersion) => {
-        if (restoredVersion) {
-          this.loadPlan(this.planId!);
-        }
-      });
+    const planVersion = this._planEditService.plan!.customFields!['versionId'];
+    const versionHistory = this._planApi.getPlanHistory(this.planId!);
+
+    this._restoreDialogsService.showRestoreDialog(planVersion, versionHistory).subscribe((restoreVersion) => {
+      if (restoreVersion) {
+        this._planApi.restorePlanVersion(this.planId!, restoreVersion).subscribe(() => this.loadPlan(this.planId!));
+      }
+    });
   }
 
   clonePlan(): void {

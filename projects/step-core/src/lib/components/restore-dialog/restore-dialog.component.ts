@@ -1,14 +1,12 @@
 import { Component, Inject } from '@angular/core';
-import {
-  AugmentedResourcesService,
-  PlansService,
-  TableLocalDataSource,
-  History,
-  SearchColDirective,
-  FilterConditionFactoryService,
-} from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
+import { Observable } from 'rxjs';
+import { History } from '../../client/generated';
+import { TableLocalDataSource } from '../../modules/table/shared/table-local-data-source';
+import { AugmentedResourcesService } from '../../client/augmented/services/augmented-resources-service';
+import { FilterConditionFactoryService } from '../../modules/table/services/filter-condition-factory.service';
+import { SearchColDirective } from '../../modules/table/directives/search-col.directive';
 
 @Component({
   selector: 'step-restore-dialog',
@@ -21,11 +19,10 @@ export class RestoreDialogComponent {
   constructor(
     private _augmentedResourceService: AugmentedResourcesService,
     private _matDialogRef: MatDialogRef<RestoreDialogComponent>,
-    private _plansService: PlansService,
     private _filterConditionFactory: FilterConditionFactoryService,
-    @Inject(MAT_DIALOG_DATA) public plan: { id: string; version: string }
+    @Inject(MAT_DIALOG_DATA) public plan: { version: string; history: Observable<History[]> }
   ) {
-    this.dataSource = new TableLocalDataSource(this._plansService.getPlanHistory(plan.id), {
+    this.dataSource = new TableLocalDataSource(plan.history, {
       searchPredicates: {
         updateTime: (element, searchValue) => {
           console.log(element, searchValue);
@@ -47,14 +44,13 @@ export class RestoreDialogComponent {
     col.search(condition);
   }
 
-  // FIXME: Add some throbber when loading
   restore(history: History): void {
     if (history.id) {
-      this._plansService.restorePlanVersion(this.plan.id, history.id).subscribe(() => this._matDialogRef.close(true));
+      this._matDialogRef.close(history.id);
     }
   }
 
   cancel(): void {
-    this._matDialogRef.close(false);
+    this._matDialogRef.close(undefined);
   }
 }
