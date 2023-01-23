@@ -38,6 +38,7 @@ import { SettingBtnComponent } from './components/setting-btn/setting-btn.compon
 import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
+import { SimpleLineChartDirective } from './directives/simple-line-chart.directive';
 
 @NgModule({
   declarations: [
@@ -63,6 +64,7 @@ import { RestoreDialogComponent } from './components/restore-dialog/restore-dial
     ArtefactDetailsDirective,
     PlanTreeComponent,
     RestoreDialogComponent,
+    SimpleLineChartDirective,
   ],
   imports: [
     CommonModule,
@@ -116,6 +118,7 @@ import { RestoreDialogComponent } from './components/restore-dialog/restore-dial
     UploadContainerComponent,
     ProgressBarComponent,
     RestoreDialogComponent,
+    SimpleLineChartDirective,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -167,6 +170,7 @@ export * from './directives/caps-lock.directive';
 export * from './directives/tooltip-immediate-close.directive';
 export * from './directives/tooltip.directive';
 export * from './directives/artefact-details.directive';
+export * from './directives/simple-line-chart.directive';
 export * from './domain';
 export * from './modules/async-operations/async-operations.module';
 export * from './modules/basics/step-basics.module';
