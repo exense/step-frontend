@@ -1,5 +1,10 @@
 import { Directive, HostListener, Inject, Optional } from '@angular/core';
-import { AuthService, PlanEditorService, PlanInteractiveSessionService } from '@exense/step-core';
+import {
+  AuthService,
+  PlanArtefactResolverService,
+  PlanEditorService,
+  PlanInteractiveSessionService,
+} from '@exense/step-core';
 import { DOCUMENT } from '@angular/common';
 
 @Directive({
@@ -11,7 +16,8 @@ export class PlanEditorKeyHandlerDirective {
     @Inject(DOCUMENT) private _document: Document,
 
     private _planEditorService: PlanEditorService,
-    @Optional() private _planInteractiveSession?: PlanInteractiveSessionService
+    @Optional() private _planInteractiveSession?: PlanInteractiveSessionService,
+    @Optional() private _planArtefactResolver?: PlanArtefactResolverService
   ) {}
 
   @HostListener('document:keydown', ['$event'])
@@ -62,6 +68,12 @@ export class PlanEditorKeyHandlerDirective {
       if (this.checkKey(event, true, 'Enter', 'plan-interactive')) {
         event.preventDefault();
         this._planInteractiveSession?.execute();
+        return;
+      }
+
+      if (this.checkKey(event, true, 'o') && this._planArtefactResolver) {
+        event.preventDefault();
+        this._planArtefactResolver.openArtefact();
         return;
       }
     }

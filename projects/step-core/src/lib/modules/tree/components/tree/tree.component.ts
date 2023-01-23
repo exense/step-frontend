@@ -9,7 +9,6 @@ import {
   ViewChild,
 } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
-import { AbstractArtefact } from '../../../../client/generated';
 import { TreeActionsService } from '../../services/tree-actions.service';
 import { TreeDragDropService } from '../../services/tree-drag-drop.service';
 import { TreeStateService } from '../../services/tree-state.service';
@@ -23,7 +22,7 @@ import { TreeNode } from '../../shared/tree-node';
   styleUrls: ['./tree.component.scss'],
   providers: [TreeDragDropService],
 })
-export class TreeComponent {
+export class TreeComponent<N extends TreeNode> {
   readonly paddingIdent = 24;
   readonly paddingMultiplier = 8;
 
@@ -37,10 +36,12 @@ export class TreeComponent {
 
   @Input() dragDisabled: boolean = false;
 
-  @Output() treeContextAction = new EventEmitter<{ actionId: string; node?: AbstractArtefact }>();
+  @Output() treeContextAction = new EventEmitter<{ actionId: string; node?: N }>();
+
+  @Output() nodeDblClick = new EventEmitter<{ node: N; event: MouseEvent }>();
 
   constructor(
-    public _treeState: TreeStateService<any, TreeNode>,
+    public _treeState: TreeStateService<any, N>,
     public _treeDragDrop: TreeDragDropService,
     public _treeContainer: ElementRef<HTMLElement>,
     @Optional() private _treeActions?: TreeActionsService
@@ -63,8 +64,12 @@ export class TreeComponent {
     this.contextMenuTrigger.openMenu();
   }
 
-  handleContextAction(action: TreeAction, node?: AbstractArtefact): void {
+  handleContextAction(action: TreeAction, node?: N): void {
     const actionId = action.id;
     this.treeContextAction.emit({ actionId, node });
+  }
+
+  handleDblClick(node: N, event: MouseEvent): void {
+    this.nodeDblClick.emit({ node, event });
   }
 }

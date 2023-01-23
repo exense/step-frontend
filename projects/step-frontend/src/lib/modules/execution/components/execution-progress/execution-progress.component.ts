@@ -11,6 +11,7 @@ import {
   TrackByFunction,
 } from '@angular/core';
 import {
+  a1Promise2Observable,
   AJS_MODULE,
   AugmentedExecutionsService,
   AutoDeselectStrategy,
@@ -42,6 +43,7 @@ import { ReportTreeNode } from '../../shared/report-tree-node';
 import { ReportTreeNodeUtilsService } from '../../services/report-tree-node-utils.service';
 import { EXECUTION_TREE_PAGING } from '../../services/execution-tree-paging';
 import { DOCUMENT } from '@angular/common';
+import { ViewFactoryService } from '../../services/view-factory.service';
 
 const R_ERROR_KEY = /\\\\u([\d\w]{4})/gi;
 
@@ -78,6 +80,8 @@ export class ExecutionProgressComponent
   implements OnInit, OnChanges, ExecutionStateService, ExecutionCloseHandleService
 {
   readonly trackByItemInfo: TrackByFunction<ItemInfo> = (index, item) => item.type;
+
+  readonly Panels = Panels;
 
   tabs: Dashlet[] = [];
   activeTab?: Dashlet;
@@ -123,6 +127,8 @@ export class ExecutionProgressComponent
   @Output() titleUpdate = new EventEmitter<{ eId: string; execution: Execution }>();
   @Output() close = new EventEmitter<string>();
 
+  throughputchart: any | { series: any[] } = {};
+
   constructor(
     @Inject(DOCUMENT) private _document: Document,
     private _executionService: AugmentedExecutionsService,
@@ -132,7 +138,8 @@ export class ExecutionProgressComponent
     private _viewRegistry: ViewRegistryService,
     private _executionTreeState: TreeStateService<ReportNode, ReportTreeNode>,
     public _executionPanels: SingleExecutionPanelsService,
-    public _testCasesSelection: SelectionCollector<string, ReportNode>
+    public _testCasesSelection: SelectionCollector<string, ReportNode>,
+    private _viewFactory: ViewFactoryService
   ) {}
 
   showNodeInTree(nodeId: string): void {
@@ -339,7 +346,9 @@ export class ExecutionProgressComponent
 
     this.selectedErrorDistributionToggle = ErrorDistributionStatus.message;
 
-    //todo charts
+    a1Promise2Observable(this._viewFactory.getReportNodeStatisticCharts(eId)).subscribe((charts) => {
+      this.throughputchart = charts.throughputchart;
+    });
 
     this._systemService.getCurrentOperations(eId).subscribe((operations) => {
       this.currentOperations = operations;
