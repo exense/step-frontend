@@ -11,8 +11,6 @@ import { forkJoin, from, map, switchMap } from 'rxjs';
 import { ILocationService } from 'angular';
 import { ReportNodeType } from '../../shared/report-node-type.enum';
 
-type FieldAccessor = Mutable<Pick<ReportNodeComponent, 'node' | 'children'>>;
-
 @Component({
   selector: 'step-report-node',
   templateUrl: './report-node.component.html',
@@ -26,8 +24,8 @@ export class ReportNodeComponent implements OnChanges {
 
   readonly ReportNodeType = ReportNodeType;
 
-  readonly node?: ReportNode;
-  readonly children: ReportNode[] = [];
+  protected node?: ReportNode;
+  protected children: ReportNode[] = [];
 
   hideSource: boolean = false;
 
@@ -78,11 +76,9 @@ export class ReportNodeComponent implements OnChanges {
   }
 
   private loadReportNode(id?: string): void {
-    const fieldAccessor = this as FieldAccessor;
-
     if (!id) {
-      fieldAccessor.node = undefined;
-      fieldAccessor.children = [];
+      this.node = undefined;
+      this.children = [];
       return;
     }
 
@@ -90,8 +86,8 @@ export class ReportNodeComponent implements OnChanges {
       node: this._api.getReportNode(id),
       children: this._api.getReportNodeChildren(id),
     }).subscribe(({ node, children }) => {
-      fieldAccessor.node = node;
-      fieldAccessor.children = children;
+      this.node = node;
+      this.children = children;
     });
   }
 }

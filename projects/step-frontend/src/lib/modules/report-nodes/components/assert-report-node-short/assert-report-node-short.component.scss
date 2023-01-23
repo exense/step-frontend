@@ -5,7 +5,7 @@
   align-items: center;
 }
 
-@include mixins.textNode();
+@include mixins.reportNodeText();
 
 .m-left {
   margin-left: 10px;
