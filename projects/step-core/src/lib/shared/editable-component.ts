@@ -1,6 +1,5 @@
 import { ChangeDetectorRef, Component, ElementRef, HostListener, Input, TemplateRef } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
-import { isChildOf } from './utils';
 
 export enum EditableComponentState {
   READABLE,
@@ -30,8 +29,9 @@ export class EditableComponent<T> implements ControlValueAccessor {
   protected isDisabled = false;
 
   protected constructor(
-    protected elementRef: ElementRef<HTMLElement>,
-    protected changeDetectorRef: ChangeDetectorRef
+    protected _elementRef: ElementRef<HTMLElement>,
+    protected _changeDetectorRef: ChangeDetectorRef,
+    protected _document: Document
   ) {}
 
   writeValue(value: T): void {
@@ -75,10 +75,7 @@ export class EditableComponent<T> implements ControlValueAccessor {
     }
 
     const target = event.target as HTMLElement;
-    const isChildOfHost = isChildOf({
-      parent: this.elementRef.nativeElement,
-      searchElement: target,
-    });
+    const isChildOfHost = this._elementRef.nativeElement.contains(target);
 
     if (isChildOfHost) {
       return;
@@ -90,7 +87,7 @@ export class EditableComponent<T> implements ControlValueAccessor {
   protected onLabelClick(): void {
     this.state = EditableComponentState.EDITABLE;
     this.newValue = this.value;
-    this.changeDetectorRef.detectChanges();
+    this._changeDetectorRef.detectChanges();
   }
 
   protected onCancel(): void {

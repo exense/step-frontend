@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 :host {
   position: relative;
 }
@@ -9,11 +11,10 @@
   border: 1px solid transparent;
 
   &:hover {
-    background: #f9fafb;
+    background: var.$gray-50;
   }
 }
 
 textarea.mat-input-element {
   resize: none;
-  overflow: hidden;
 }

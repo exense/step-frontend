@@ -1,4 +1,5 @@
-import { ChangeDetectorRef, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { ChangeDetectorRef, Component, ElementRef, forwardRef, Inject, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EditableComponent } from '../../shared/editable-component';
 
@@ -24,13 +25,16 @@ export class EditableTextareaLabelComponent extends EditableComponent<string> {
 
   textareaRows = DEFAULT_TEXTAREA_ROWS;
 
-  constructor(elementRef: ElementRef<HTMLElement>, changeDetectorRef: ChangeDetectorRef) {
-    super(elementRef, changeDetectorRef);
+  constructor(
+    _elementRef: ElementRef<HTMLElement>,
+    _changeDetectorRef: ChangeDetectorRef,
+    @Inject(DOCUMENT) _document: Document
+  ) {
+    super(_elementRef, _changeDetectorRef, _document);
   }
 
   protected override onCancel(): void {
     super.onCancel();
-    this.recalculateTextareaRows();
   }
 
   protected override onLabelClick(): void {
@@ -49,7 +53,7 @@ export class EditableTextareaLabelComponent extends EditableComponent<string> {
   }
 
   private recalculateTextareaRows(): void {
-    const { height } = this.elementRef.nativeElement.getBoundingClientRect();
+    const { height } = this._elementRef.nativeElement.getBoundingClientRect();
 
     this.textareaRows = (height - 2 * PADDING_TOP_BOTTOM) / LINE_HEIGHT;
   }

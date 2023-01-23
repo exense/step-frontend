@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 :host {
   position: relative;
 }
@@ -28,6 +30,6 @@
   }
 
   &:hover {
-    background: #f9fafb;
+    background: var.$gray-50;
   }
 }

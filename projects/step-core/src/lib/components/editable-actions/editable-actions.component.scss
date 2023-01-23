@@ -1,26 +1,29 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
 :host {
   display: flex;
   gap: 8px;
   position: absolute;
-  right: 0;
+  left: 0;
   top: calc(100% + 4px);
   z-index: 1;
 
-  button {
-    background: white;
-    width: 24px;
-    height: 24px;
-    line-height: 24px;
+  .mat-stroked-button {
+    background: var.$white;
+    border: 1px solid var.$gray-300;
+    border-radius: 8px;
+    min-width: 0;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var.$gray-500;
 
     step-icon {
+      @include core.step-icon-size(16px);
       display: flex;
-      width: 16px;
-      height: 16px;
-      min-width: 16px;
-      max-height: 16px;
       margin-top: 0;
     }
   }

@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 /* Design to align with new step layout */
 @mixin legacy-common-rules {
   .row {
@@ -130,7 +132,7 @@
       }
 
       .panel-default {
-        border: 1px solid #d0d5dd;
+        border: 1px solid var.$gray-300;
         border-radius: 8px;
       }
     }
