@@ -54,7 +54,7 @@
             [disabled]="!('mask-delete' | hasRight | async)"
             (click)="deleteFunction(element.id, element.attributes.name)"
           >
-            <step-icon name="x"></step-icon>
+            <step-icon name="trash-2"></step-icon>
           </button>
           <button mat-icon-button [matMenuTriggerFor]="menu" [matMenuTriggerData]="{ element: element }">
             <step-icon name="more-horizontal"></step-icon>
