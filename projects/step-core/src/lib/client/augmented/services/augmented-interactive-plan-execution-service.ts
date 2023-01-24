@@ -13,6 +13,6 @@ export class AugmentedInteractivePlanExecutionService extends InteractivePlanExe
   }
 
   override startInteractiveSession(requestBody?: ExecutionParameters): Observable<string> {
-    return this._httpClient.post('/rest/interactive/start', requestBody, { responseType: 'text' });
+    return this._httpClient.post('rest/interactive/start', requestBody, { responseType: 'text' });
   }
 }

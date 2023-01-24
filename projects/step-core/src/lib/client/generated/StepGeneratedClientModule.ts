@@ -15,7 +15,7 @@ import { OpenAPI } from './core/OpenAPI';
     {
       provide: OpenAPI,
       useValue: {
-        BASE: OpenAPI?.BASE ?? '/rest',
+        BASE: OpenAPI?.BASE ?? 'rest',
         VERSION: OpenAPI?.VERSION ?? '3.20.0',
         WITH_CREDENTIALS: OpenAPI?.WITH_CREDENTIALS ?? false,
         CREDENTIALS: OpenAPI?.CREDENTIALS ?? 'include',

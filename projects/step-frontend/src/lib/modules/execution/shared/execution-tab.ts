@@ -5,4 +5,5 @@ export interface ExecutionTab extends Tab {
   active?: boolean;
   type?: 'list' | 'progress';
   execution?: Execution;
+  subTab?: string;
 }

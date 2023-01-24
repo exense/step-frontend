@@ -6,6 +6,7 @@ import type { Observable } from 'rxjs';
 
 import type { AbstractArtefact } from '../models/AbstractArtefact';
 import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTaskStatusTableBulkOperationReport';
+import type { History } from '../models/History';
 import type { Plan } from '../models/Plan';
 import type { PlanCompilationResult } from '../models/PlanCompilationResult';
 import type { TableBulkOperationRequest } from '../models/TableBulkOperationRequest';
@@ -231,6 +232,22 @@ export class PlansService {
   }
 
   /**
+   * Retrieves entity's versioned
+   * @param id
+   * @returns History default response
+   * @throws ApiError
+   */
+  public getPlanHistory(id: string): Observable<Array<History>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/plans/{id}/history',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
    * Returns the first plan matching the given attributes.
    * @param requestBody
    * @returns Plan default response
@@ -308,6 +325,24 @@ export class PlansService {
       url: '/plans/table',
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Restore a version of this entity
+   * @param id
+   * @param versionId
+   * @returns Plan default response
+   * @throws ApiError
+   */
+  public restorePlanVersion(id: string, versionId: string): Observable<Plan> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/plans/{id}/restore/{versionId}',
+      path: {
+        id: id,
+        versionId: versionId,
+      },
     });
   }
 }

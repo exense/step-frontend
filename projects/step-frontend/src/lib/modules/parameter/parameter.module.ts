@@ -26,8 +26,8 @@ export class ParameterModule {
       'parameters',
       'list',
       'parameters',
-      '/rest/parameters/',
-      '/rest/parameters/',
+      'rest/parameters/',
+      'rest/parameters/',
       'st-table',
       '/partials/parameters/parameterSelectionTable.html'
     );
