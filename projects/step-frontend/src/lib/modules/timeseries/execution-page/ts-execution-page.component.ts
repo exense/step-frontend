@@ -22,10 +22,10 @@ import { TimeSeriesUtils } from '../time-series-utils';
 
 @Component({
   selector: 'step-execution-performance',
-  templateUrl: './execution-page.component.html',
-  styleUrls: ['./execution-page.component.scss'],
+  templateUrl: './ts-execution-page.component.html',
+  styleUrls: ['./ts-execution-page.component.scss'],
 })
-export class ExecutionPageComponent implements OnInit, OnDestroy {
+export class TsExecutionPageComponent implements OnInit, OnDestroy {
   readonly ONE_HOUR_MS = 3600 * 1000;
 
   terminator$ = new Subject<void>();
@@ -248,4 +248,4 @@ interface RefreshInterval {
 
 getAngularJSGlobal()
   .module(AJS_MODULE)
-  .directive('stepExecutionPage', downgradeComponent({ component: ExecutionPageComponent }));
+  .directive('stepPerformanceView', downgradeComponent({ component: TsExecutionPageComponent }));

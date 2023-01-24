@@ -35,6 +35,7 @@ import { PanelExecutionDetailsComponent } from './components/panel-execution-det
 import { PanelComponent } from './components/panel/panel.component';
 import { PanelOperationsComponent } from './components/panel-operations/panel-operations.component';
 import { RepositoryComponent } from './components/repository/repository.component';
+import { ExecutionPageComponent } from './components/execution-page/execution-page.component';
 
 @NgModule({
   declarations: [
@@ -60,6 +61,7 @@ import { RepositoryComponent } from './components/repository/repository.componen
     PanelExecutionDetailsComponent,
     PanelComponent,
     PanelOperationsComponent,
+    ExecutionPageComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [
@@ -72,6 +74,7 @@ import { RepositoryComponent } from './components/repository/repository.componen
     ExecutionCommandsComponent,
     ExecutionProgressComponent,
     RepositoryComponent,
+    ExecutionPageComponent,
   ],
 })
 export class ExecutionModule {

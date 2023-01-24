@@ -1,0 +1,28 @@
+<ng-container *ngIf="activeTab">
+  <step-execution-tabs
+    [tabs]="tabs"
+    [activeTabId]="activeTab.id"
+    (activeTabIdChange)="handleTabChange($event)"
+    (closeTab)="handleTabClose($event)"
+  >
+  </step-execution-tabs>
+
+  <div class="tab-pane" *ngFor="let tab of tabs" [class.active]="tab.id === activeTab.id">
+    <div *ngIf="tab.type === 'list'">
+      <div class="panel-body">
+        <step-execution-list></step-execution-list>
+      </div>
+    </div>
+    <div class="panel-body" *ngIf="tab.type === 'progress'">
+      <step-execution-progress
+        [eId]="tab.id"
+        [isActive]="tab.active"
+        [activeTabId]="tab.subTab"
+        (activeTabIdChange)="handleSubTabChange(tab.id, $event)"
+        (close)="handleTabClose($event)"
+        (titleUpdate)="handleTabTitleUpdate($event)"
+      >
+      </step-execution-progress>
+    </div>
+  </div>
+</ng-container>
