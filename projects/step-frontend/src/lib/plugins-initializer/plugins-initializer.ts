@@ -14,7 +14,7 @@ const IGNORE_PLUGINS: ReadonlyArray<string> = [
   'dualPlanEditor',
   'notifications',
   'planBrowser',
-  'housekeeping'
+  'housekeeping',
 ];
 
 // For testing purposes only

@@ -6,6 +6,7 @@
 @forward 'components/theme-config';
 @forward 'components/report-node-status';
 @forward 'components/step-table';
+@forward 'components/step-icon';
 
 @mixin status-common {
   display: inline-flex;

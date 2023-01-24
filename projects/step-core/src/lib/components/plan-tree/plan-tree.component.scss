@@ -4,5 +4,5 @@
 step-plan-tree {
   @include core.full-height-block;
 
-  @include core.tree-node-selection(var.$dark-blue);
+  @include core.tree-node-selection(var.$blue-600);
 }
