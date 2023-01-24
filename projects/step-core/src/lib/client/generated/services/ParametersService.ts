@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTaskStatusTableBulkOperationReport';
+import type { History } from '../models/History';
 import type { Parameter } from '../models/Parameter';
 import type { TableBulkOperationRequest } from '../models/TableBulkOperationRequest';
 import type { TableRequest } from '../models/TableRequest';
@@ -129,6 +130,22 @@ export class ParametersService {
   }
 
   /**
+   * Retrieves entity's versioned
+   * @param id
+   * @returns History default response
+   * @throws ApiError
+   */
+  public getParameterHistory(id: string): Observable<Array<History>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/parameters/{id}/history',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
    * @param requestBody
    * @returns Parameter default response
    * @throws ApiError
@@ -180,6 +197,24 @@ export class ParametersService {
       url: '/parameters/table',
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Restore a version of this entity
+   * @param id
+   * @param versionId
+   * @returns Parameter default response
+   * @throws ApiError
+   */
+  public restoreParameterVersion(id: string, versionId: string): Observable<Parameter> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/parameters/{id}/restore/{versionId}',
+      path: {
+        id: id,
+        versionId: versionId,
+      },
     });
   }
 }

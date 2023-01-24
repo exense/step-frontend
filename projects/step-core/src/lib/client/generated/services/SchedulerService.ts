@@ -6,6 +6,7 @@ import type { Observable } from 'rxjs';
 
 import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTaskStatusTableBulkOperationReport';
 import type { ExecutiontTaskParameters } from '../models/ExecutiontTaskParameters';
+import type { History } from '../models/History';
 import type { TableBulkOperationRequest } from '../models/TableBulkOperationRequest';
 import type { TableRequest } from '../models/TableRequest';
 import type { TableResponseExecutiontTaskParameters } from '../models/TableResponseExecutiontTaskParameters';
@@ -180,6 +181,22 @@ export class SchedulerService {
   }
 
   /**
+   * Retrieves entity's versioned
+   * @param id
+   * @returns History default response
+   * @throws ApiError
+   */
+  public getExecutionTaskHistory(id: string): Observable<Array<History>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/scheduler/task/{id}/history',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
    * Returns all the scheduled tasks.
    * @returns ExecutiontTaskParameters default response
    * @throws ApiError
@@ -218,6 +235,24 @@ export class SchedulerService {
       url: '/scheduler/task/table',
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Restore a version of this entity
+   * @param id
+   * @param versionId
+   * @returns ExecutiontTaskParameters default response
+   * @throws ApiError
+   */
+  public restoreExecutionTaskVersion(id: string, versionId: string): Observable<ExecutiontTaskParameters> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/scheduler/task/{id}/restore/{versionId}',
+      path: {
+        id: id,
+        versionId: versionId,
+      },
     });
   }
 }

@@ -31,6 +31,6 @@ export class AugmentedExecutionsService extends ExecutionsService {
     return this.dataSource;
   }
   override execute(requestBody?: ExecutionParameters): Observable<string> {
-    return this._httpClient.post('/rest/executions/start', requestBody, { responseType: 'text' });
+    return this._httpClient.post('rest/executions/start', requestBody, { responseType: 'text' });
   }
 }

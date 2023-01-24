@@ -73,7 +73,7 @@ export class ViewRegistryService {
     );
     this.registerMenuEntry(
       'REST API',
-      ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('/doc/rest/'),
+      ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('doc/rest/'),
       'compass',
       20,
       'support-root'
