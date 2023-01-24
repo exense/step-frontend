@@ -603,7 +603,7 @@ function RTMAggBaseQueryTmpl(metric, transform) {
   return new AsyncQuery(
     null,
     new Service( //service
-      '/rtm/rest/aggregate/get',
+      'rtm/rest/aggregate/get',
       'Post',
       '', //templated
       new Preproc(
@@ -618,7 +618,7 @@ function RTMAggBaseQueryTmpl(metric, transform) {
       )
     ),
     new Service( //callback
-      '/rtm/rest/aggregate/refresh',
+      'rtm/rest/aggregate/refresh',
       'Post',
       '{"streamedSessionId": "__streamedSessionId__"}',
       new Preproc(
@@ -875,7 +875,7 @@ var addLastMeasurementsTpl = function (
     return new SimpleQuery(
       'Raw',
       new Service(
-        '/rtm/rest/measurement/latest',
+        'rtm/rest/measurement/latest',
         'Post',
         '',
         new Preproc(
@@ -1018,7 +1018,7 @@ var addLastMeasurements = function (
     return new SimpleQuery(
       'Raw',
       new Service(
-        '/rtm/rest/measurement/latest',
+        'rtm/rest/measurement/latest',
         'Post',
         '{"selectors1": [{ "textFilters": ' +
           textFilters +

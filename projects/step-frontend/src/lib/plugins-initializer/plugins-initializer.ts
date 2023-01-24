@@ -28,7 +28,7 @@ export type PluginDefinition = LegacyPluginDefinition | MicrofrontendPluginDefin
 const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
   let result: PluginDefinition[] = [];
   try {
-    const pluginsResponse = await fetch('/rest/app/plugins');
+    const pluginsResponse = await fetch('rest/app/plugins');
 
     result = ((await pluginsResponse.json()) as PluginDefinition[]).map((plugin) => {
       console.log('received plugins', plugin);

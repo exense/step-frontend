@@ -69,7 +69,7 @@ $sidebar-config: core.step-define-sidebar-config(
   $elements-text-padding: 14px,
   $settings-divider-padding-right: 45px,
   $aligned-text-margin-left: 60px,
-  $logo-path: '/images/logotopleft.png'
+  $logo-path: '../../../images/logotopleft.png'
 );
 
 $header-config: core.step-define-header-config(
