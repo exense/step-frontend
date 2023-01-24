@@ -10,7 +10,6 @@ import {
   Parameter,
   selectionCollectionProvider,
   TableSearch,
-  Resource,
   RestoreDialogsService,
 } from '@exense/step-core';
 import { ParameterDialogsService } from '../services/parameter-dialogs.service';
@@ -71,9 +70,11 @@ export class ParametersListComponent {
 
   deleteParameter(id: string, label: string): void {
     this._parameterDialogs.deleteParameter(id, label).subscribe((result: boolean) => {
-      if (result) {
-        this.dataSource.reload();
+      if (!result) {
+        return;
       }
+
+      this.dataSource.reload();
     });
   }
   restoreParameter(parameter: Parameter) {
@@ -85,11 +86,13 @@ export class ParametersListComponent {
     const versionHistory = this._parametersService.getParameterHistory(parameter.id!);
 
     this._restoreDialogsService.showRestoreDialog(resourceVersion, versionHistory).subscribe((restoreVersion) => {
-      if (restoreVersion) {
-        this._parametersService
-          .restoreParameterVersion(parameter.id!, restoreVersion)
-          .subscribe(() => this.dataSource.reload());
+      if (!restoreVersion) {
+        return;
       }
+
+      this._parametersService
+        .restoreParameterVersion(parameter.id!, restoreVersion)
+        .subscribe(() => this.dataSource.reload());
     });
   }
 }
