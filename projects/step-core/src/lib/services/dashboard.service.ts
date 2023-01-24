@@ -16,15 +16,15 @@ export class DashboardService {
   ) {}
 
   getDashboardLink(taskId: string): string {
-    return '/#/root/dashboards/' + taskId;
+    return '#/root/dashboards/' + taskId;
   }
 
   getRtmDashboardLink(taskId: string): string {
-    return '/#/root/dashboards-rtm/__pp__RTMDashboard?__filter1__=text,taskId,' + taskId;
+    return '#/root/dashboards-rtm/__pp__RTMDashboard?__filter1__=text,taskId,' + taskId;
   }
 
   getRtmExecutionLink(executionId: string): string {
-    return `/#/root/dashboards-rtm/__pp__RTMDashboard?__filter1__=text,eId,${executionId}`;
+    return `#/root/dashboards-rtm/__pp__RTMDashboard?__filter1__=text,eId,${executionId}`;
   }
 }
 

@@ -98,7 +98,7 @@ angular
       };
 
       $scope.removeTokenErrors = function (id) {
-        $http.delete('/rest/grid/agent/' + id + '/tokens/errors').then(function () {
+        $http.delete('rest/grid/agent/' + id + '/tokens/errors').then(function () {
           $scope.loadTable();
         });
       };

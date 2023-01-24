@@ -12,6 +12,8 @@ npx openapi --input $SPEC_URL --output $GENERATED_CODE_LOCATION --client angular
 # make services global singletons and remove them from the module's provided-array
 sed -i "" -e "s/@Injectable()/@Injectable({providedIn:'root'})/g" $GENERATED_CODE_LOCATION/services/*Service.ts
 sed -i "" -e "/.*Service.*/d" $GENERATED_CODE_LOCATION/$CLIENT_MODULE_NAME.ts
+sed -i "" -e  "s#/rest#rest#g" $GENERATED_CODE_LOCATION/StepGeneratedClientModule.ts
 
 # run prettier
+npx prettier --write "$GENERATED_CODE_LOCATION/*"
 npx prettier --write "$GENERATED_CODE_LOCATION/**/*"
