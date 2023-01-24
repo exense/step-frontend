@@ -1,4 +1,4 @@
-<step-modal-window title="Restore plan" [stepZIndex]="1051">
+<step-modal-window title="Restore version" [stepZIndex]="1051">
   <div step-modal-window-body>
     <step-table [dataSource]="dataSource" matSort>
       <ng-container matColumnDef="updateTime" stepSearchCol #searchVersionTime="SearchCol">
@@ -15,8 +15,15 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element">
-          <button *ngIf="element.id !== dialogData.version" type="button" mat-icon-button (click)="restore(element)">
-            <step-icon name="download-cloud" aria-hidden="true"></step-icon>
+          <button
+            [disabled]="!(dialogData.permission | hasRight | async)"
+            [class]="element.id === dialogData.version ? 'active' : ''"
+            [matTooltip]="element.id === dialogData.version ? 'Current version' : 'Restore version'"
+            type="button"
+            mat-icon-button
+            (click)="restore(element)"
+          >
+            <step-icon name="check-circle" aria-hidden="true"></step-icon>
           </button>
         </td>
       </ng-container>

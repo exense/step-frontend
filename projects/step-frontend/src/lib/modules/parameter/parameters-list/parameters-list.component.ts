@@ -77,7 +77,7 @@ export class ParametersListComponent {
       this.dataSource.reload();
     });
   }
-  restoreParameter(parameter: Parameter) {
+  displayHistory(parameter: Parameter, permission: string) {
     if (!parameter.id) {
       return;
     }
@@ -85,15 +85,17 @@ export class ParametersListComponent {
     const resourceVersion = parameter.customFields!['versionId'];
     const versionHistory = this._parametersService.getParameterHistory(parameter.id!);
 
-    this._restoreDialogsService.showRestoreDialog(resourceVersion, versionHistory).subscribe((restoreVersion) => {
-      if (!restoreVersion) {
-        return;
-      }
+    this._restoreDialogsService
+      .showRestoreDialog(resourceVersion, versionHistory, permission)
+      .subscribe((restoreVersion) => {
+        if (!restoreVersion) {
+          return;
+        }
 
-      this._parametersService
-        .restoreParameterVersion(parameter.id!, restoreVersion)
-        .subscribe(() => this.dataSource.reload());
-    });
+        this._parametersService
+          .restoreParameterVersion(parameter.id!, restoreVersion)
+          .subscribe(() => this.dataSource.reload());
+      });
   }
 }
 

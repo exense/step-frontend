@@ -22,9 +22,9 @@ export class RestoreDialogsService {
     private _matDialog: MatDialog
   ) {}
 
-  showRestoreDialog(versionId: string, versionHistory: Observable<History[]>): Observable<string> {
+  showRestoreDialog(version: string, history: Observable<History[]>, permission: string): Observable<string> {
     const matDialogConfig: MatDialogConfig<RestoreDialogData> = {
-      data: { version: versionId, history: versionHistory },
+      data: { version, history, permission },
     };
     const dialogRef = this._matDialog.open(RestoreDialogComponent, matDialogConfig);
     return dialogRef.afterClosed() as Observable<string>;

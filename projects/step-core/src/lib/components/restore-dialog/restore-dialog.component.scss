@@ -7,3 +7,10 @@
     color: var.$dark-blue;
   }
 }
+
+button.active {
+  cursor: unset;
+  step-icon {
+    stroke: var.$dark-blue;
+  }
+}

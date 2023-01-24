@@ -163,7 +163,7 @@ export class PlanEditorComponent
       .subscribe();
   }
 
-  restoreVersion(): void {
+  displayHistory(permission: string): void {
     if (!this.planId) {
       return;
     }
@@ -171,11 +171,15 @@ export class PlanEditorComponent
     const planVersion = this._planEditService.plan!.customFields!['versionId'];
     const versionHistory = this._planApi.getPlanHistory(this.planId!);
 
-    this._restoreDialogsService.showRestoreDialog(planVersion, versionHistory).subscribe((restoreVersion) => {
-      if (restoreVersion) {
+    this._restoreDialogsService
+      .showRestoreDialog(planVersion, versionHistory, permission)
+      .subscribe((restoreVersion) => {
+        if (!restoreVersion) {
+          return;
+        }
+
         this._planApi.restorePlanVersion(this.planId!, restoreVersion).subscribe(() => this.loadPlan(this.planId!));
-      }
-    });
+      });
   }
 
   clonePlan(): void {
