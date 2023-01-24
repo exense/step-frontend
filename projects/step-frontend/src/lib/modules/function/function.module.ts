@@ -59,8 +59,8 @@ export class FunctionModule {
       'functionPackage',
       'gift',
       'functionPackage',
-      '/rest/functionpackages/',
-      '/rest/functionpackages/',
+      'rest/functionpackages/',
+      'rest/functionpackages/',
       'st-table',
       'functionpackages/partials/functionPackageSelectionTable.html'
     );
