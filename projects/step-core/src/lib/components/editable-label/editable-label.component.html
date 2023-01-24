@@ -13,7 +13,15 @@
 
   <ng-container *ngSwitchCase="State.EDITABLE">
     <mat-form-field class="step-view with-reduced-inner-padding">
-      <input #input type="text" matInput [ngModel]="value" (ngModelChange)="onValueChange($event)" (blur)="onBlur()" />
+      <input
+        #input
+        type="text"
+        class="border-primary"
+        matInput
+        [ngModel]="value"
+        (ngModelChange)="onValueChange($event)"
+        (blur)="onBlur()"
+      />
     </mat-form-field>
 
     <step-editable-actions (cancel)="onCancel()" (apply)="onApply()"></step-editable-actions>

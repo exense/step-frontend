@@ -57,7 +57,7 @@ export class EditableComponent<T> implements ControlValueAccessor {
 
   @HostListener('window:keydown.enter')
   protected onEnter(): void {
-    if (document.activeElement !== this.focusedElement) {
+    if (this._document.activeElement !== this.focusedElement) {
       return;
     }
 
@@ -66,7 +66,7 @@ export class EditableComponent<T> implements ControlValueAccessor {
 
   @HostListener('window:click', ['$event'])
   protected onWindowClick(event: Event): void {
-    if (document.activeElement === this.focusedElement) {
+    if (this._document.activeElement === this.focusedElement) {
       return;
     }
 

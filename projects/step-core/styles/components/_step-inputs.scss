@@ -53,6 +53,10 @@
             .mat-select-trigger {
               height: auto;
             }
+
+            &.border-primary {
+              border: 1px solid $primary-color;
+            }
           }
 
           .mat-form-field-label-wrapper {
