@@ -161,6 +161,7 @@ export { ModalWindowComponent } from './components/modal-window/modal-window.com
 export { PlanLinkComponent } from './components/plan-link/plan-link.component';
 export { SettingBtnComponent } from './components/setting-btn/setting-btn.component';
 export { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
+export { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 export * from './components/report-node-status/report-node-status.component';
 export * from './components/plan-tree/plan-tree.component';
 export { SelectPlanComponent } from './components/select-plan/select-plan.component';

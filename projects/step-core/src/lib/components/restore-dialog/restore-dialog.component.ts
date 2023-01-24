@@ -1,12 +1,12 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
-import { Observable } from 'rxjs';
 import { History } from '../../client/generated';
 import { TableLocalDataSource } from '../../modules/table/shared/table-local-data-source';
 import { AugmentedResourcesService } from '../../client/augmented/services/augmented-resources-service';
 import { FilterConditionFactoryService } from '../../modules/table/services/filter-condition-factory.service';
 import { SearchColDirective } from '../../modules/table/directives/search-col.directive';
+import { RestoreDialogData } from '../../modules/basics/shared/restore-dialog-data';
 
 @Component({
   selector: 'step-restore-dialog',
@@ -20,12 +20,11 @@ export class RestoreDialogComponent {
     private _augmentedResourceService: AugmentedResourcesService,
     private _matDialogRef: MatDialogRef<RestoreDialogComponent>,
     private _filterConditionFactory: FilterConditionFactoryService,
-    @Inject(MAT_DIALOG_DATA) public plan: { version: string; history: Observable<History[]> }
+    @Inject(MAT_DIALOG_DATA) public dialogData: RestoreDialogData
   ) {
-    this.dataSource = new TableLocalDataSource(plan.history, {
+    this.dataSource = new TableLocalDataSource(dialogData.history, {
       searchPredicates: {
         updateTime: (element, searchValue) => {
-          console.log(element, searchValue);
           return element.updateTime === Number(searchValue);
         },
       },
@@ -45,9 +44,11 @@ export class RestoreDialogComponent {
   }
 
   restore(history: History): void {
-    if (history.id) {
-      this._matDialogRef.close(history.id);
+    if (!history.id) {
+      return;
     }
+
+    this._matDialogRef.close(history.id);
   }
 
   cancel(): void {
