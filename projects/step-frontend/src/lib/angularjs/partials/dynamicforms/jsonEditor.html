@@ -36,7 +36,13 @@
   >
     <step-ajs-icon name="zap"></step-ajs-icon>
   </button>
+  <step-dynamic-field-editor [value]="dynamicValue.value"
+                             (value-change)="save($event)"
+                             [schema]="schema">
+  </step-dynamic-field-editor>
+<!--
   <json-editor model="dynamicValue.value" type="{{type}}" on-change="save(json)" />
+-->
 </div>
 <expression-input />
 

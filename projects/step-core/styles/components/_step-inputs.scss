@@ -16,6 +16,36 @@
   @return $config;
 }
 
+@mixin suffix-prefix($selectors...) {
+  $mat-form-field-container: '.mat-form-field-wrapper .mat-form-field-flex .mat-form-field-infix';
+
+  @for $i from 0 to length($selectors) {
+    $selector: nth($selectors, $i + 1);
+
+    &.with-suffix {
+      #{$mat-form-field-container} #{$selector} {
+        border-right: 0;
+        border-radius: 8px 0 0 8px;
+      }
+    }
+
+    &.with-prefix {
+      #{$mat-form-field-container} #{$selector} {
+        border-left: 0;
+        border-radius: 0 8px 8px 0;
+      }
+    }
+
+    &.with-prefix.with-suffix {
+      #{$mat-form-field-container} #{$selector} {
+        border-radius: 0;
+        border-left: 0;
+        border-right: 0;
+      }
+    }
+  }
+}
+
 @mixin mat-form-field($config) {
   $primary-color: map.get($config, primary-color);
   $primary-text-color: map.get($config, primary-text-color);
@@ -40,6 +70,7 @@
           flex-direction: column-reverse;
 
           mat-select,
+          mat-radio-group,
           .mat-input-element {
             border: 1px solid $border-color;
             border-radius: 8px;
@@ -57,6 +88,12 @@
             &.border-primary {
               border: 1px solid $primary-color;
             }
+          }
+
+          mat-radio-group {
+            line-height: 18px;
+            display: flex;
+            gap: 1rem;
           }
 
           .mat-form-field-label-wrapper {
@@ -95,6 +132,16 @@
           }
         }
 
+        .mat-form-field-prefix {
+          height: 42px;
+          min-width: 180px;
+          padding: 0 12px;
+          display: flex;
+          border: 1px solid $border-color;
+          border-radius: 8px 0 0 8px;
+          align-items: center;
+        }
+
         .mat-form-field-suffix {
           height: 42px;
           display: flex;
@@ -107,15 +154,13 @@
             padding: 0 8px;
           }
 
+          .mat-flat-button,
           .mat-stroked-button {
             border: 0;
             border-radius: 0;
             padding: 0 8px;
             min-width: auto;
-
-            step-icon {
-              display: flex;
-            }
+            line-height: 26px;
 
             &:last-child {
               border-radius: 0 8px 8px 0;
@@ -146,12 +191,7 @@
       }
     }
 
-    &.with-suffix {
-      .mat-form-field-wrapper .mat-form-field-flex .mat-form-field-infix .mat-input-element {
-        border-right: 0;
-        border-radius: 8px 0 0 8px;
-      }
-    }
+    @include suffix-prefix('.mat-input-element', 'mat-select', 'mat-radio-group');
 
     &.with-padding {
       .mat-form-field-wrapper {
@@ -188,6 +228,7 @@
           }
         }
 
+        .mat-form-field-prefix,
         .mat-form-field-suffix {
           color: $primary-color;
           border: 1px solid $primary-color;
@@ -214,6 +255,11 @@
           .mat-form-field-label-wrapper label {
             color: $error-color;
           }
+        }
+
+        .mat-form-field-prefix {
+          color: $error-color;
+          border: 1px solid $error-color;
         }
 
         .mat-form-field-suffix {

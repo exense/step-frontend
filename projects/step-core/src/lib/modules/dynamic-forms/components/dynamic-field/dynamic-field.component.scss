@@ -1,0 +1,24 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
+step-icon {
+  @include core.step-icon-size(16px);
+}
+
+button {
+  width: 40px;
+}
+
+.dynamic-field-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  color: var.$gray-500;
+
+  input[type='text'] {
+    border: none;
+    outline: none;
+    width: 79px;
+  }
+}

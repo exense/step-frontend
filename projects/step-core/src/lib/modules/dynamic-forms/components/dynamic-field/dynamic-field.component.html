@@ -1,0 +1,100 @@
+<ng-template #staticLabel>
+  <span>{{ label }}</span>
+</ng-template>
+<mat-form-field
+  floatLabel="always"
+  class="step-view with-suffix with-prefix"
+  [class.ng-invalid]="!!_ngControl?.invalid"
+>
+  <ng-container matPrefix>
+    <div class="dynamic-field-label">
+      <ng-container *ngIf="canEditLabel; else staticLabel">
+        <input type="text" (click)="fixLabelFocus($event)" [(ngModel)]="label" (blur)="labelChange.emit(label)" />
+      </ng-container>
+      <ng-container *ngIf="tooltip">
+        <step-icon name="help-circle" [matTooltip]="tooltip"></step-icon>
+      </ng-container>
+    </div>
+  </ng-container>
+  <ng-template #valueInput>
+    <ng-container [ngSwitch]="fieldType">
+      <ng-container *ngSwitchCase="DynamicFieldType.enum">
+        <mat-select [disabled]="isDisabled" [ngModel]="value" (ngModelChange)="valueChange($event)" (blur)="onTouch()">
+          <mat-option *ngIf="displayEnumExtraValue" [value]="value">
+            {{ value }}
+          </mat-option>
+          <mat-option *ngFor="let item of enumItems" [value]="item">
+            {{ item }}
+          </mat-option>
+        </mat-select>
+      </ng-container>
+      <ng-container *ngSwitchCase="DynamicFieldType.boolean">
+        <input matInput hidden />
+        <mat-radio-group
+          aria-label="Select an option"
+          color="primary"
+          [ngModel]="value"
+          (ngModelChange)="valueChange($event)"
+          (blur)="onTouch()"
+        >
+          <mat-radio-button value="true">True</mat-radio-button>
+          <mat-radio-button value="false">False</mat-radio-button>
+        </mat-radio-group>
+      </ng-container>
+      <ng-container *ngSwitchCase="DynamicFieldType.number">
+        <input
+          type="number"
+          matInput
+          [disabled]="isDisabled"
+          [ngModel]="value"
+          (ngModelChange)="valueChange($event)"
+          (blur)="onTouch()"
+        />
+      </ng-container>
+      <ng-container *ngSwitchDefault>
+        <input
+          type="text"
+          matInput
+          [disabled]="isDisabled"
+          [ngModel]="value"
+          (ngModelChange)="valueChange($event)"
+          (blur)="onTouch()"
+        />
+      </ng-container>
+    </ng-container>
+  </ng-template>
+  <ng-template #expressionInput>
+    <input
+      type="text"
+      matInput
+      [disabled]="isDisabled"
+      [ngModel]="expression"
+      (ngModelChange)="expressionChange($event)"
+      (blur)="onTouch()"
+    />
+  </ng-template>
+  <ng-container *ngIf="dynamic; then expressionInput; else valueInput"> </ng-container>
+  <ng-container matSuffix>
+    <ng-container *ngIf="fieldType === DynamicFieldType.string && !dynamic">
+      <button type="button" mat-stroked-button [disabled]="isDisabled" (click)="editStringValueInModal()">
+        <step-icon name="edit"></step-icon>
+      </button>
+      <div class="suffix-separator"></div>
+    </ng-container>
+    <button
+      type="button"
+      mat-flat-button
+      [disabled]="isDisabled"
+      [color]="dynamic ? 'primary' : undefined"
+      (click)="toggleDynamic()"
+    >
+      <step-icon name="zap"></step-icon>
+    </button>
+    <ng-container *ngIf="canRemove">
+      <div class="suffix-separator"></div>
+      <button type="button" mat-stroked-button [disabled]="isDisabled" (click)="remove.emit()">
+        <step-icon name="x"></step-icon>
+      </button>
+    </ng-container>
+  </ng-container>
+</mat-form-field>

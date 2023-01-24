@@ -24,11 +24,12 @@
         type="keyword"
         dynamic-value="artefact.function"
         on-save="save()"
+        update-keyword="onUpdateKeyword(keyword)"
       />
     </fieldset>
 
     <fieldset ng-disabled="readonly">
-      <dynamic-json-editor label="'Input'" dynamic-value="artefact.argument" on-save="save()" />
+      <dynamic-json-editor label="'Input'" dynamic-value="artefact.argument" on-save="save()" schema="keyword.schema" />
       <dynamic-textfield label="'Map output to'" dynamic-value="artefact.resultMap" on-save="save()" />
 
       <div class="panel panel-default">

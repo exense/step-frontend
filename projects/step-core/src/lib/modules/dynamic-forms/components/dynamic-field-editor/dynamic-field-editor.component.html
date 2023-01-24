@@ -1,0 +1,11 @@
+<step-dynamic-field-group [schema]="schema" [value]="internalValue" (valueChange)="handleChange($event)">
+</step-dynamic-field-group>
+<div class="toggle-bar" (click)="showJson = !showJson">
+  <div>
+    <step-icon name="code"></step-icon>
+    <span>Raw (JSON)</span>
+  </div>
+  <step-icon [name]="showJson ? 'chevron-up' : 'chevron-down'"></step-icon>
+</div>
+<step-json-raw-editor *ngIf="showJson" [ngModel]="internalValue" (ngModelChange)="handleChange($event)">
+</step-json-raw-editor>

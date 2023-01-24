@@ -142,6 +142,9 @@ dynamicForms
     };
   })
   .directive('dynamicJsonEditor', function () {
+    // TODO keyword load function relates to cases, when type is "keyword"
+    // Also the only case where it is met - is callFunction.html
+    // Keyword reload logic should be placed to parent directive/component
     return {
       restrict: 'E',
       scope: {
@@ -149,6 +152,8 @@ dynamicForms
         label: '=',
         type: '@',
         onSave: '&',
+        updateKeyword: '&',
+        schema: '='
       },
       controller: function ($scope, $attrs, $http, ScreenTemplates, EntityScopeResolver) {
         $scope.argumentAsTable = [];
@@ -270,6 +275,9 @@ dynamicForms
 
             $http.post('rest/functions/lookup', artefact).then(function (response) {
               if (response.data && response.data.attributes) {
+                if ($scope.updateKeyword) {
+                  $scope.updateKeyword({keyword: response.data});
+                }
                 const keyword = response.data.attributes;
                 keyword.displayNames = getDisplayNames($scope.argumentAsTable);
 

@@ -1,0 +1,39 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+hr {
+  flex: 1;
+}
+
+button.add-additional {
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+  line-height: 16px;
+
+  step-icon {
+    @include core.step-icon-size(16px);
+  }
+}
+
+.possible-fields-container {
+  background: #f9fafb;
+  border: solid 1px #d0d5dd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  gap: 8px;
+
+  button {
+    font-size: 12px;
+    line-height: 16px;
+    padding: 3px 4px;
+  }
+}
