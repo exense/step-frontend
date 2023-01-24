@@ -1,0 +1,17 @@
+<div class="relative">
+  <div class="header-buttons">
+    <step-time-range-picker
+      [initialSelectionIndex]="0"
+      [includeFullRangeOption]="false"
+      [customRelativeOptions]="timeRangeOptions"
+      (onSelectionChange)="onTimeRangeChange($event)"
+    >
+    </step-time-range-picker>
+  </div>
+
+  <step-timeseries-dashboard
+    #dashboard
+    *ngIf="dashboardSettings"
+    [settings]="dashboardSettings"
+  ></step-timeseries-dashboard>
+</div>

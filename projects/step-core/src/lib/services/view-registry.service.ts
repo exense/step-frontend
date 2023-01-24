@@ -57,6 +57,7 @@ export class ViewRegistryService {
     // Sub Menus Execute
     this.registerMenuEntry('Executions', 'executions', 'rotate-cw', 10, 'execute-root');
     this.registerMenuEntry('Scheduler', 'scheduler', 'clock', 20, 'execute-root');
+    this.registerMenuEntry('Analytics', 'analytics', 'bar-chart-2', 20, 'execute-root');
     // Sub Menus Status
     this.registerMenuEntry('Current Operations', 'operations', 'airplay', 10, 'status-root', 'operations-read');
     this.registerMenuEntry('Agents', 'gridagents', 'users', 20, 'status-root');

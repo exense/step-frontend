@@ -21,6 +21,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { TimeSeriesDashboardComponent } from './dashboard/time-series-dashboard.component';
 import { TsGroupingComponent } from './dashboard/grouping/ts-grouping.component';
 import { ExecutionPageComponent } from './execution-page/ts-execution-page.component';
+import { AnalyticsPageComponent } from './analytics/analytics-page.component';
 
 @NgModule({
   declarations: [
@@ -41,8 +42,9 @@ import { ExecutionPageComponent } from './execution-page/ts-execution-page.compo
     TimeSeriesDashboardComponent,
     TsGroupingComponent,
     ExecutionPageComponent,
+    AnalyticsPageComponent,
   ],
-  exports: [ExecutionPageComponent, SyntheticMonitoringPageComponent],
+  exports: [ExecutionPageComponent, SyntheticMonitoringPageComponent, AnalyticsPageComponent],
   imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule, MatDatepickerModule],
 })
 export class TimeSeriesModule {}
