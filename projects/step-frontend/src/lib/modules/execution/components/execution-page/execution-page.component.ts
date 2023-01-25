@@ -18,7 +18,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   private locationChangeFunction = () => {
     let urlParts = this.getUrlParts();
-    const executionId = urlParts[1];
+    const executionId = urlParts[2];
     if (this.activeTab.id === executionId) {
       // the tab didn't change, but just the subcontent
       return;
@@ -49,16 +49,14 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   createUrl(tab: ExecutionTab): string {
-    const url = this._location.path();
-    let index = url.indexOf('executions');
-    let urlItems = url.substring(index).split('/');
-    urlItems[1] = tab.id;
+    let urlItems = this.getUrlParts();
+    urlItems[2] = tab.id;
     if (tab.subTab) {
-      urlItems[2] = tab.subTab;
+      urlItems[3] = tab.subTab;
     } else {
-      urlItems.length = 2;
+      urlItems.length = 3;
     }
-    return 'root/' + urlItems.join('/');
+    return '/' + urlItems.join('/');
   }
 
   handleTabChange(tabId: string) {
@@ -85,14 +83,9 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   replaceUrlSubTab(subTab: string): void {
-    const url = window.location.href;
-    let startIndex = url.indexOf('executions');
     let urlItems = this.getUrlParts();
-    urlItems[2] = subTab;
-    let paramsIndex: number | undefined = url.indexOf('?');
-    paramsIndex = paramsIndex > 0 ? paramsIndex : undefined;
-    let newUrl = url.substring(0, startIndex) + urlItems.join('/') + (paramsIndex ? url.substring(paramsIndex) : '');
-    history.replaceState({}, '', newUrl);
+    urlItems[3] = subTab;
+    this._location.path(urlItems.join('/'));
   }
 
   handleTabClose(tabId: string) {
@@ -114,18 +107,16 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
    * @private
    */
   private getUrlParts(): string[] {
-    const url = window.location.href;
+    const url = this._location.path().substring(1); // remove first backslash
     // executions/12345/performance
-    let paramsIndex: number | undefined = url.indexOf('?');
-    paramsIndex = paramsIndex > 0 ? paramsIndex : undefined;
-    let relativePath = url.substring(url.indexOf('executions'), paramsIndex);
-    return relativePath.split('/');
+    let parts = url.split('/');
+    return parts;
   }
 
   ngOnInit(): void {
-    let urlParts = this.getUrlParts(); // [executions, id, subTab]
-    const taskId = urlParts[1];
-    const subTab = urlParts[2];
+    let urlParts = this.getUrlParts(); // [root, executions, id, subTab]
+    const taskId = urlParts[2];
+    const subTab = urlParts[3];
     if (taskId && taskId !== 'list') {
       let executionTab: ExecutionTab = {
         id: taskId,
