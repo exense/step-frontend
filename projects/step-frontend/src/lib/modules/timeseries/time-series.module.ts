@@ -20,8 +20,8 @@ import { FilterBarItemComponent } from './performance-view/filter-bar/item/filte
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { TimeSeriesDashboardComponent } from './dashboard/time-series-dashboard.component';
 import { TsGroupingComponent } from './dashboard/grouping/ts-grouping.component';
-import { ExecutionPageComponent } from './execution-page/ts-execution-page.component';
 import { AnalyticsPageComponent } from './analytics/analytics-page.component';
+import { ExecutionPerformanceComponent } from './execution-page/ts-execution-page.component';
 
 @NgModule({
   declarations: [
@@ -41,10 +41,11 @@ import { AnalyticsPageComponent } from './analytics/analytics-page.component';
     FilterBarItemComponent,
     TimeSeriesDashboardComponent,
     TsGroupingComponent,
-    ExecutionPageComponent,
+    PerformanceViewComponent,
     AnalyticsPageComponent,
+    ExecutionPerformanceComponent,
   ],
-  exports: [ExecutionPageComponent, SyntheticMonitoringPageComponent, AnalyticsPageComponent],
+  exports: [ExecutionPerformanceComponent, SyntheticMonitoringPageComponent, AnalyticsPageComponent],
   imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule, MatDatepickerModule],
 })
 export class TimeSeriesModule {}

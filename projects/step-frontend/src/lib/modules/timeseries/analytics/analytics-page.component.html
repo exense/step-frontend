@@ -7,6 +7,16 @@
       (onSelectionChange)="onTimeRangeChange($event)"
     >
     </step-time-range-picker>
+    <div style="margin-left: 12px">
+      <button style="margin-right: 8px" mat-raised-button [matMenuTriggerFor]="refreshMenu">
+        Refresh ({{ selectedRefreshInterval.label }})
+      </button>
+      <mat-menu #refreshMenu="matMenu">
+        <button mat-menu-item *ngFor="let interval of refreshIntervals" (click)="changeRefreshInterval(interval)">
+          {{ interval.label }}
+        </button>
+      </mat-menu>
+    </div>
   </div>
 
   <step-timeseries-dashboard

@@ -1,4 +1,6 @@
-export class UrlUtils {
+export class TsUtils {
+  static readonly PARAMS_TO_IGNORE = ['tenant'];
+
   static getURLParams(url: string): any {
     const paramsObject: any = {};
     let paramsStartIndex = url.indexOf('?');
@@ -15,6 +17,7 @@ export class UrlUtils {
         paramsObject[key] = value;
       }
     });
+    this.PARAMS_TO_IGNORE.forEach((param) => delete paramsObject[param]);
     return paramsObject;
   }
 }

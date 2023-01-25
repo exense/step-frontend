@@ -10,8 +10,8 @@ import { Subject, Subscription, takeUntil, tap, timer } from 'rxjs';
 import { TimeSeriesConfig } from '../time-series.config';
 import { TimeSeriesDashboardSettings } from '../dashboard/model/ts-dashboard-settings';
 import { TimeSeriesDashboardComponent } from '../dashboard/time-series-dashboard.component';
-import { UrlUtils } from '../util/url-utils';
 import { FilterBarItemType } from '../performance-view/filter-bar/model/ts-filter-item';
+import { TsUtils } from '../util/ts-utils';
 
 @Component({
   selector: 'step-synthetic-monitoring',
@@ -19,8 +19,6 @@ import { FilterBarItemType } from '../performance-view/filter-bar/model/ts-filte
   styleUrls: ['./synthetic-monitoring-page.component.scss'],
 })
 export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
-  readonly ONE_HOUR_MS = 3600 * 1000;
-
   terminator$ = new Subject<void>();
 
   @ViewChild('dashboard') dashboard!: TimeSeriesDashboardComponent;
@@ -56,7 +54,7 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
     let now = new Date().getTime();
     let start = now - selectedTimeRange.timeInMs;
     let range = { from: start, to: now };
-    let urlParams = UrlUtils.getURLParams(window.location.href);
+    let urlParams = TsUtils.getURLParams(window.location.href);
     this.dashboardSettings = {
       contextId: this.taskId,
       includeThreadGroupChart: true,
