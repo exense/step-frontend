@@ -13,14 +13,14 @@ export class TimeSeriesService {
   constructor(private http: HttpClient) {}
 
   fetchBuckets(request: FindBucketsRequest): Observable<TimeSeriesChartResponse> {
-    return this.http.post<TimeSeriesChartResponse>(`/rest/time-series/buckets`, request);
+    return this.http.post<TimeSeriesChartResponse>(`rest/time-series/buckets`, request);
   }
 
   timeSeriesIsBuilt(executionId: string): Observable<boolean> {
-    return this.http.get<boolean>(`/rest/time-series/execution/${executionId}/exists`);
+    return this.http.get<boolean>(`rest/time-series/execution/${executionId}/exists`);
   }
 
   rebuildTimeSeries(executionId: string): Observable<AsyncTaskStatusResource> {
-    return this.http.post<AsyncTaskStatusResource>(`/rest/time-series/rebuild`, { executionId: executionId });
+    return this.http.post<AsyncTaskStatusResource>(`rest/time-series/rebuild`, { executionId: executionId });
   }
 }

@@ -1,0 +1,30 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
+:host {
+  display: flex;
+  gap: 8px;
+  position: absolute;
+  left: 0;
+  top: calc(100% + 4px);
+  z-index: 1;
+
+  .mat-stroked-button {
+    background: var.$white;
+    border: 1px solid var.$blue-600;
+    border-radius: 8px;
+    min-width: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var.$blue-600;
+
+    step-icon {
+      @include core.step-icon-size(16px);
+      display: flex;
+      margin-top: 0;
+    }
+  }
+}
