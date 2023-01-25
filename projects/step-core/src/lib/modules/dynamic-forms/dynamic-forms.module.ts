@@ -30,3 +30,4 @@ export * from './components/expression-input/expression-input.component';
 export * from './components/dynamic-field/dynamic-field.component';
 export * from './components/dynamic-field-group-editor/dynamic-field-group-editor.component';
 export * from './components/dynamic-field-editor/dynamic-field-editor.component';
+export * from './shared/dynamic-fields-schema';

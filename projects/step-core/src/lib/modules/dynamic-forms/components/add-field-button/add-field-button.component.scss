@@ -20,6 +20,7 @@ button.add-additional {
 
   step-icon {
     @include core.step-icon-size(16px);
+    vertical-align: top;
   }
 }
 

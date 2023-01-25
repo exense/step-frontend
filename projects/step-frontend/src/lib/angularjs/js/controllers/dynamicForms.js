@@ -153,7 +153,8 @@ dynamicForms
         type: '@',
         onSave: '&',
         updateKeyword: '&',
-        schema: '='
+        schema: '=',
+        isDisabled: '='
       },
       controller: function ($scope, $attrs, $http, ScreenTemplates, EntityScopeResolver) {
         $scope.argumentAsTable = [];

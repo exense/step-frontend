@@ -9,7 +9,13 @@
   <ng-container matPrefix>
     <div class="dynamic-field-label">
       <ng-container *ngIf="canEditLabel; else staticLabel">
-        <input type="text" (click)="fixLabelFocus($event)" [(ngModel)]="label" (blur)="labelChange.emit(label)" />
+        <input
+          type="text"
+          [disabled]="isDisabled"
+          (click)="fixLabelFocus($event)"
+          [(ngModel)]="label"
+          (blur)="labelChange.emit(label)"
+        />
       </ng-container>
       <ng-container *ngIf="tooltip">
         <step-icon name="help-circle" [matTooltip]="tooltip"></step-icon>

@@ -29,7 +29,7 @@
     </fieldset>
 
     <fieldset ng-disabled="readonly">
-      <dynamic-json-editor label="'Input'" dynamic-value="artefact.argument" on-save="save()" schema="keyword.schema" />
+      <dynamic-json-editor label="'Input'" dynamic-value="artefact.argument" on-save="save()" schema="keyword.schema" is-disabled="readonly" />
       <dynamic-textfield label="'Map output to'" dynamic-value="artefact.resultMap" on-save="save()" />
 
       <div class="panel panel-default">

@@ -12,6 +12,7 @@ import { AJS_MODULE } from '../../../../shared';
 export class DynamicFieldEditorComponent implements OnChanges {
   protected showJson: boolean = false;
   protected internalValue?: DynamicFieldGroupValue;
+  @Input() isDisabled?: boolean;
   @Input() schema?: DynamicFieldsSchema;
   @Input() value?: string;
   @Output() valueChange = new EventEmitter<string | undefined>();

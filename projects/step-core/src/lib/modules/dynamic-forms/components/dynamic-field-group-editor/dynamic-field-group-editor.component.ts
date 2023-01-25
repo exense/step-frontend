@@ -33,6 +33,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
 
   private lastEmittedValue?: DynamicFieldGroupValue;
 
+  @Input() isDisabled?: boolean;
   @Input() schema?: DynamicFieldsSchema;
   @Input() value?: DynamicFieldGroupValue;
   @Output() valueChange = new EventEmitter<DynamicFieldGroupValue | undefined>();
@@ -71,6 +72,11 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
       this.buildForm(schema, value);
     } else if (value && value !== this.lastEmittedValue) {
       this.assignValueToForm(value);
+    }
+
+    const cIsDisabled = changes['isDisabled'];
+    if (cIsDisabled?.currentValue !== cIsDisabled?.previousValue || cIsDisabled?.firstChange) {
+      this.enableDisableForm(cIsDisabled?.currentValue);
     }
   }
 
@@ -142,6 +148,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
       .filter((field) => valueFields.includes(field))
       .forEach((field) => this.addFieldInternal(schema!, field, value, { isAdditional: true }));
 
+    this.enableDisableForm(this.isDisabled);
     this.setupFormBehavior();
   }
 
@@ -203,6 +210,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
       this.addFieldInternal(this.schema!, fieldKey, value, { isAdditional: true })
     );
 
+    this.enableDisableForm(this.isDisabled);
     this.setupFormBehavior();
   }
 
@@ -275,7 +283,15 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     }
   }
 
-  protected createTemporaryKey(): string {
+  private createTemporaryKey(): string {
     return `temp_${v4()}`;
+  }
+
+  private enableDisableForm(isDisabled?: boolean): void {
+    if (isDisabled && this.form.enabled) {
+      this.form.disable();
+    } else if (!isDisabled && this.form.disabled) {
+      this.form.enable();
+    }
   }
 }

@@ -1,5 +1,5 @@
 <ng-container [formGroup]="form">
-  <h4>Core inputs</h4>
+  <h4 *ngIf="coreInputs.length > 0">Core inputs</h4>
   <ng-container *ngFor="let field of coreInputs; trackBy: trackByField">
     <step-dynamic-field
       [formControl]="field.control"
@@ -28,5 +28,5 @@
     </step-dynamic-field>
   </ng-container>
 </ng-container>
-<step-add-field-button [possibleFields]="possibleFieldsToAdd" (addField)="addOptionalField($event)">
+<step-add-field-button *ngIf="!isDisabled" [possibleFields]="possibleFieldsToAdd" (addField)="addOptionalField($event)">
 </step-add-field-button>
