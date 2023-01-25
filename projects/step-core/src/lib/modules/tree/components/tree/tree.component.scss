@@ -9,7 +9,7 @@ cdk-tree-node {
     top: 0;
     // level * paddingIdent + level * paddingMultiplier + (24px - 2px) / 2
     left: calc(var(--level) * 24px + var(--level) * 8px + 11px);
-    border-right: 1px solid var.$light-blue-gray;
+    border-right: 1px solid var.$gray-100;
     height: 100%;
   }
 

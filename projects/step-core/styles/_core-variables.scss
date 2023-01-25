@@ -9,6 +9,21 @@ $light-white-gray: #ddd;
 $light-blue-gray: #f2f4f7;
 $dark-blue: #0082cb;
 
+//#region Gray
+$gray-50: #f9fafb;
+$gray-100: #f2f4f7;
+$gray-200: #eaecf0;
+$gray-300: #d0d5dd;
+$gray-400: #98a2b3;
+$gray-500: #667085;
+$gray-700: #344054;
+$gray-800: #1d2939;
+//#endregion
+
+//#region Blue
+$blue-600: #0082cb;
+//#endregion
+
 $statuses: (
   'UNKNOWN': #dadada,
   'ENDED': gray,

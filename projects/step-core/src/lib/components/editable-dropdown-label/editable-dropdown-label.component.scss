@@ -1,0 +1,35 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  position: relative;
+}
+
+.editable-dropdown-label {
+  line-height: 18px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+
+  .editable-dropdown-template {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .editable-dropdown-actions {
+    step-icon {
+      width: 16px;
+      height: 16px;
+      min-width: 16px;
+      min-height: 16px;
+    }
+  }
+
+  &:hover {
+    background: var.$gray-50;
+  }
+}
