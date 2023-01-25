@@ -14,6 +14,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   activeTab!: ExecutionTab;
 
   private locationChangeFunction = () => {
+    console.log('LOCATION CHANGE');
     let urlParts = this.getUrlParts();
     const executionId = urlParts[1];
     if (this.activeTab.id === executionId) {
@@ -44,19 +45,22 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     let url = this.createUrl(this.activeTab);
     // window.history.replaceState({}, '', url);
     location.href = url;
+    console.log('URL TO UPDATE:', url);
   }
 
   createUrl(tab: ExecutionTab): string {
     const url = window.location.href;
-    let index = url.indexOf('executions');
-    let urlItems = url.substring(index).split('/');
+    let startIndex = url.indexOf('executions');
+    let endIndex: number | undefined = url.indexOf('?');
+    endIndex = endIndex > 0 ? endIndex : undefined;
+    let urlItems = url.substring(startIndex, endIndex).split('/');
     urlItems[1] = tab.id;
     if (tab.subTab) {
       urlItems[2] = tab.subTab;
     } else {
       urlItems.length = 2;
     }
-    return url.substring(0, index) + urlItems.join('/');
+    return url.substring(0, startIndex) + urlItems.join('/') + (endIndex ? url.substring(endIndex) : '');
   }
 
   handleTabChange(tabId: string) {
@@ -84,10 +88,12 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   replaceUrlSubTab(subTab: string): void {
     const url = window.location.href;
-    let index = url.indexOf('executions');
-    let urlItems = url.substring(index).split('/');
+    let startIndex = url.indexOf('executions');
+    let urlItems = this.getUrlParts();
     urlItems[2] = subTab;
-    let newUrl = url.substring(0, index) + urlItems.join('/');
+    let paramsIndex: number | undefined = url.indexOf('?');
+    paramsIndex = paramsIndex > 0 ? paramsIndex : undefined;
+    let newUrl = url.substring(0, startIndex) + urlItems.join('/') + (paramsIndex ? url.substring(paramsIndex) : '');
     history.replaceState({}, '', newUrl);
   }
 
@@ -105,10 +111,17 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     this.updateUrl();
   }
 
+  /**
+   * This will return url parts, EXCLUDING params (?param=value&...)
+   * @private
+   */
   private getUrlParts(): string[] {
     const url = window.location.href;
     // executions/12345/performance
-    let relativePath = url.substring(url.indexOf('executions'));
+    let paramsIndex: number | undefined = url.indexOf('?');
+    paramsIndex = paramsIndex > 0 ? paramsIndex : undefined;
+    let relativePath = url.substring(url.indexOf('executions'), paramsIndex);
+    console.log(relativePath, url);
     return relativePath.split('/');
   }
 
