@@ -1,7 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, Execution } from '@exense/step-core';
+import { AJS_LOCATION, AJS_MODULE, Execution } from '@exense/step-core';
 import { ExecutionTab } from '../../shared/execution-tab';
+import { ILocationService } from 'angular';
 
 @Component({
   selector: 'step-execution-page',
@@ -12,6 +13,8 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   listTab: ExecutionTab = { label: 'Executions', type: 'list', id: 'list', title: 'Executions List' };
   tabs: ExecutionTab[] = [this.listTab];
   activeTab!: ExecutionTab;
+
+  constructor(@Inject(AJS_LOCATION) private _location: ILocationService) {}
 
   private locationChangeFunction = () => {
     let urlParts = this.getUrlParts();
@@ -42,23 +45,20 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   updateUrl() {
     let url = this.createUrl(this.activeTab);
-    // window.history.replaceState({}, '', url);
-    location.href = url;
+    this._location.path(url);
   }
 
   createUrl(tab: ExecutionTab): string {
-    const url = window.location.href;
-    let startIndex = url.indexOf('executions');
-    let endIndex: number | undefined = url.indexOf('?');
-    endIndex = endIndex > 0 ? endIndex : undefined;
-    let urlItems = url.substring(startIndex, endIndex).split('/');
+    const url = this._location.path();
+    let index = url.indexOf('executions');
+    let urlItems = url.substring(index).split('/');
     urlItems[1] = tab.id;
     if (tab.subTab) {
       urlItems[2] = tab.subTab;
     } else {
       urlItems.length = 2;
     }
-    return url.substring(0, startIndex) + urlItems.join('/') + (endIndex ? url.substring(endIndex) : '');
+    return 'root/' + urlItems.join('/');
   }
 
   handleTabChange(tabId: string) {
