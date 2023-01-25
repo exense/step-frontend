@@ -14,7 +14,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   activeTab!: ExecutionTab;
 
   private locationChangeFunction = () => {
-    console.log('LOCATION CHANGE');
     let urlParts = this.getUrlParts();
     const executionId = urlParts[1];
     if (this.activeTab.id === executionId) {
@@ -45,7 +44,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     let url = this.createUrl(this.activeTab);
     // window.history.replaceState({}, '', url);
     location.href = url;
-    console.log('URL TO UPDATE:', url);
   }
 
   createUrl(tab: ExecutionTab): string {
@@ -121,7 +119,6 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     let paramsIndex: number | undefined = url.indexOf('?');
     paramsIndex = paramsIndex > 0 ? paramsIndex : undefined;
     let relativePath = url.substring(url.indexOf('executions'), paramsIndex);
-    console.log(relativePath, url);
     return relativePath.split('/');
   }
 
