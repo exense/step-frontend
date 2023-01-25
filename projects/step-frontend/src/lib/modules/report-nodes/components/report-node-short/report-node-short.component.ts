@@ -1,11 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, TrackByFunction } from '@angular/core';
-import {
-  ArtefactTypesService,
-  ControllerService,
-  Mutable,
-  ReportNode,
-  ReportNodeCommonsService,
-} from '@exense/step-core';
+import { ArtefactTypesService, ControllerService, Mutable, ReportNode } from '@exense/step-core';
+import { ReportNodeCommonsService } from '../../services/report-node-commons.service';
+import { map, Observable, of } from 'rxjs';
 
 export interface ReportNodeAddon {
   functionAttributes?: Record<string, string>;
@@ -43,13 +39,13 @@ export class ReportNodeShortComponent implements OnChanges {
   readonly reportNodeId: string = '';
   readonly children?: ReportNode[];
 
-  readonly trackByReportNode: TrackByFunction<ReportNode> = (index, item) => item.id;
-
   constructor(
     private _artefactTypes: ArtefactTypesService,
     private _reportNodeCommons: ReportNodeCommonsService,
     private _controllerService: ControllerService
   ) {}
+
+  readonly trackByReportNode: TrackByFunction<ReportNode> = (index, item) => item.id;
 
   ngOnChanges(changes: SimpleChanges): void {
     const cNode = changes['node'];
@@ -58,10 +54,6 @@ export class ReportNodeShortComponent implements OnChanges {
       this.setupReportNodeId(cNode?.currentValue);
       this.loadChildren(cNode?.currentValue);
     }
-  }
-
-  toggleDetails(): void {
-    this.showDetails = !this.showDetails;
   }
 
   toggleInput(): void {
@@ -78,7 +70,9 @@ export class ReportNodeShortComponent implements OnChanges {
       return;
     }
     if (node!.resolvedArtefact!._class === 'CallKeyword') {
-      (this as FieldsAccessor).headerText = this.concatenate(node.functionAttributes);
+      this.concatenate(node.functionAttributes).subscribe((value) => {
+        (this as FieldsAccessor).headerText = value;
+      });
     } else {
       (this as FieldsAccessor).headerText = this._artefactTypes.getLabel(node!.resolvedArtefact!._class);
     }
@@ -104,21 +98,24 @@ export class ReportNodeShortComponent implements OnChanges {
     });
   }
 
-  private concatenate(attributesMap?: Record<string, string>): string {
+  private concatenate(attributesMap?: Record<string, string>): Observable<string> {
     if (!attributesMap) {
-      return '';
+      return of('');
     }
-    const functionAttributes = this._reportNodeCommons.getFunctionAttributes();
 
-    const result = functionAttributes
-      .map((key) => {
-        const realKey = key?.id?.replace('attributes.', '');
-        const attributeValue = !!realKey ? attributesMap[realKey] : undefined;
-        return attributeValue || '';
-      })
-      .filter((x) => !!x)
-      .join('.');
+    const result$ = this._reportNodeCommons.getFunctionAttributes().pipe(
+      map((attributes) =>
+        attributes
+          .map((attribute) => {
+            const realKey = attribute?.id?.replace('attributes.', '');
+            const attributeValue = !!realKey ? attributesMap[realKey] : undefined;
+            return attributeValue || '';
+          })
+          .filter((x) => !!x)
+          .join('.')
+      )
+    );
 
-    return result;
+    return result$;
   }
 }

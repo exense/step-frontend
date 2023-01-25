@@ -1,0 +1,35 @@
+<div *ngIf="node.loopCount">
+  <span class="report-node-text-muted">Number of polling</span
+  ><span class="report-node-text m-left">{{ node.loopCount }}</span>
+</div>
+<div *ngIf="node.waitDuration">
+  <span class="report-node-text-muted">Wait duration (ms)</span
+  ><span class="report-node-text m-left">{{ node.waitDuration }}</span>
+</div>
+<div *ngIf="node.criteriaEventId || node.criteriaGroup">
+  <span class="report-node-text-muted">Criteria</span>
+  <span *ngIf="!node.criteriaEventId && !node.criteriaGroup" class="report-node-text m-left">Not available</span>
+  <span *ngIf="node.criteriaEventId" class="report-node-text m-left"
+    ><strong>id=</strong>{{ node.criteriaEventId }}</span
+  >
+  <span *ngIf="!node.criteriaEventId && node.criteriaGroup" class="report-node-text m-left">
+    <strong>Group=</strong>{{ node.criteriaGroup }}<strong>, Name=</strong>{{ node.criteriaName }}
+  </span>
+</div>
+<div *ngIf="node.event">
+  <span class="report-node-text-muted">Event:</span>
+  <ul>
+    <li>
+      <span class="report-node-text">ID: {{ node.event.id }}</span>
+    </li>
+    <li>
+      <span class="report-node-text">Group: {{ node.event.group }}</span>
+    </li>
+    <li>
+      <span class="report-node-text">Name: {{ node.event.name }}</span>
+    </li>
+    <li>
+      <span class="report-node-text">Payload: {{ node.event.payload }}</span>
+    </li>
+  </ul>
+</div>

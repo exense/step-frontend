@@ -41,6 +41,7 @@ import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
 import { SimpleLineChartDirective } from './directives/simple-line-chart.directive';
 import { DynamicFormsModule } from './modules/dynamic-forms/dynamic-forms.module';
+import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 
 @NgModule({
   declarations: [
@@ -68,6 +69,7 @@ import { DynamicFormsModule } from './modules/dynamic-forms/dynamic-forms.module
     EditableLabelComponent,
     EditableTextareaLabelComponent,
     EditableDropdownLabelComponent,
+    IsChartEmptyPipe,
   ],
   imports: [
     CommonModule,
@@ -125,6 +127,7 @@ import { DynamicFormsModule } from './modules/dynamic-forms/dynamic-forms.module
     EditableTextareaLabelComponent,
     EditableDropdownLabelComponent,
     DynamicFormsModule,
+    IsChartEmptyPipe,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -192,6 +195,7 @@ export * from './modules/tree/tree.module';
 export * from './modules/dynamic-forms/dynamic-forms.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/matching-authenticator.pipe';
+export * from './pipes/is-chart-empty.pipe';
 export { PlanNamePipe } from './pipes/plan-name.pipe';
 export * from './services/additional-right-rule.service';
 export * from './services/dashboard.service';
@@ -206,7 +210,6 @@ export { PlanDialogsService } from './services/plan-dialogs.service';
 export * from './services/plan-editor.service';
 export * from './services/plan-interactive-session.service';
 export * from './services/plugin-info-registry.service';
-export * from './services/report-node-commons.service';
 export * from './services/scheduled-task-dialogs.service';
 export { UibModalHelperService, UibModalInstance } from './services/uib-modal-helper.service';
 export * from './services/view-registry.service';

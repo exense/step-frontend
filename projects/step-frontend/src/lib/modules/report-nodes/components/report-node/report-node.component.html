@@ -1,0 +1,31 @@
+<ng-container *ngIf="node">
+  <div *ngIf="node.resolvedArtefact?.customAttributes?.['source'] as artefactSource">
+    <div class="report-node-header report-node-link">
+      <a href="#" (click)="hideSource = !hideSource; (false)">Source</a>
+      <div *ngIf="!hideSource">{{ artefactSource }}</div>
+    </div>
+  </div>
+  <div class="node-details-container" [ngSwitch]="node._class">
+    <step-retry-if-fail *ngSwitchCase="ReportNodeType.RetryIfFailsReportNode" [node]="node"> </step-retry-if-fail>
+    <step-wait-for-event *ngSwitchCase="ReportNodeType.WaitForEventReportNode" [node]="node"> </step-wait-for-event>
+    <step-call-function-report-node
+      *ngSwitchCase="ReportNodeType.CallFunctionReportNode"
+      [node]="node"
+      [children]="children"
+    >
+    </step-call-function-report-node>
+    <ng-container *ngSwitchDefault> </ng-container>
+  </div>
+  <div class="report-node-header report-node-link">
+    <a href="#" (click)="toggleShowArtefact(); (false)">
+      <step-icon [name]="showArtefact ? 'chevron-down' : 'chevron-right'"></step-icon>
+      Plan node
+    </a>
+    (<a href="#" (click)="openPlan(); (false)">Show in plan</a>)
+  </div>
+  <mat-card *ngIf="showArtefact">
+    <mat-card-content>
+      <step-artefact-details [artefact]="node.resolvedArtefact" [readonly]="true"> </step-artefact-details>
+    </mat-card-content>
+  </mat-card>
+</ng-container>
