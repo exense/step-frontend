@@ -36,7 +36,7 @@ import {
 } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PlanHistoryService } from '../../services/plan-history.service';
-import { catchError, filter, from, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { catchError, filter, first, from, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { ILocationService } from 'angular';
 import { InteractiveSessionService } from '../../services/interactive-session.service';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
@@ -164,22 +164,27 @@ export class PlanEditorComponent
   }
 
   displayHistory(permission: string): void {
-    if (!this.planId) {
-      return;
-    }
+    this._planEditService.plan$.pipe(first()).subscribe((plan) => {
+      if (!plan || !plan.id) {
+        return;
+      }
 
-    const planVersion = this._planEditService.plan!.customFields!['versionId'];
-    const versionHistory = this._planApi.getPlanHistory(this.planId!);
+      console.log('plan name', plan.attributes!['name']);
+      console.log('plan versionId', plan.customFields!['versionId']);
 
-    this._restoreDialogsService
-      .showRestoreDialog(planVersion, versionHistory, permission)
-      .subscribe((restoreVersion) => {
-        if (!restoreVersion) {
-          return;
-        }
+      const planVersion = plan.customFields ? plan.customFields['versionId'] : undefined;
+      const versionHistory = this._planApi.getPlanHistory(plan.id!);
 
-        this._planApi.restorePlanVersion(this.planId!, restoreVersion).subscribe(() => this.loadPlan(this.planId!));
-      });
+      this._restoreDialogsService
+        .showRestoreDialog(planVersion, versionHistory, permission)
+        .subscribe((restoreVersion) => {
+          if (!restoreVersion) {
+            return;
+          }
+
+          this._planApi.restorePlanVersion(plan.id!, restoreVersion).subscribe(() => this.loadPlan(plan.id!));
+        });
+    });
   }
 
   clonePlan(): void {
