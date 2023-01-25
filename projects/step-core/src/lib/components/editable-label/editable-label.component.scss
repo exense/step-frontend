@@ -1,0 +1,19 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  position: relative;
+}
+
+.editable-label {
+  line-height: 18px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  border: 1px solid transparent;
+
+  &:hover {
+    background: var.$gray-50;
+  }
+}

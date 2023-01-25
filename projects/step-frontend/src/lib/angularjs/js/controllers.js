@@ -196,7 +196,7 @@ tecAdminControllers.directive('executionCommands', [
             '//' +
             location.hostname +
             (location.port ? ':' + location.port : '') +
-            '/rest/executions/start';
+            'rest/executions/start';
           var payload = buildExecutionParams(false);
           var cmd = 'curl -X POST ' + url + " -H 'Content-Type: application/json' -d '" + JSON.stringify(payload) + "'";
           ngCopy(cmd);
@@ -372,7 +372,7 @@ tecAdminControllers.directive('executionProgress', [
 
         $scope.executionViewServices = {
           showNodeInTree: function (nodeId) {
-            $http.get('/rest/controller/reportnode/' + nodeId + '/path').then(function (response) {
+            $http.get('rest/controller/reportnode/' + nodeId + '/path').then(function (response) {
               $scope.$stateExec = 'tree';
               var path = response.data;
               path.shift();
@@ -380,7 +380,7 @@ tecAdminControllers.directive('executionProgress', [
             });
           },
           showTestCase: function (nodeId) {
-            $http.get('/rest/controller/reportnode/' + nodeId + '/path').then(function (response) {
+            $http.get('rest/controller/reportnode/' + nodeId + '/path').then(function (response) {
               var path = response.data;
               _.each(path, function (node) {
                 if (node.resolvedArtefact && node.resolvedArtefact._class === 'TestCase') {

@@ -9,6 +9,8 @@ import type { CallFunction } from '../models/CallFunction';
 import type { Function } from '../models/Function';
 import type { FunctionInputJsonObject } from '../models/FunctionInputJsonObject';
 import type { GetTokenHandleParameter } from '../models/GetTokenHandleParameter';
+import type { History } from '../models/History';
+import type { JsonValue } from '../models/JsonValue';
 import type { OutputJsonObject } from '../models/OutputJsonObject';
 import type { TableBulkOperationRequest } from '../models/TableBulkOperationRequest';
 import type { TableRequest } from '../models/TableRequest';
@@ -204,6 +206,37 @@ export class KeywordsService {
   }
 
   /**
+   * @param id
+   * @returns JsonValue default response
+   * @throws ApiError
+   */
+  public getFunctionsInputsFromSchema(id: string): Observable<Record<string, JsonValue>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/functions/{id}/schema/inputs',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
+   * Retrieves entity's versioned
+   * @param id
+   * @returns History default response
+   * @throws ApiError
+   */
+  public getFunctionHistory(id: string): Observable<Array<History>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/functions/{id}/history',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
    * @param requestBody
    * @returns TokenWrapper default response
    * @throws ApiError
@@ -258,6 +291,24 @@ export class KeywordsService {
       url: '/functions/table',
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Restore a version of this entity
+   * @param id
+   * @param versionId
+   * @returns Function default response
+   * @throws ApiError
+   */
+  public restoreFunctionVersion(id: string, versionId: string): Observable<Function> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/functions/{id}/restore/{versionId}',
+      path: {
+        id: id,
+        versionId: versionId,
+      },
     });
   }
 
