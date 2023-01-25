@@ -1,12 +1,8 @@
 @use 'projects/step-core/styles/core-mixins' as mixins;
 
-:host {
-  display: flex;
-  align-items: center;
-}
-
+@include mixins.reportNodeTextMuted();
 @include mixins.reportNodeText();
 
 .m-left {
-  margin-left: 10px;
+  margin-left: 1rem;
 }
