@@ -42,6 +42,7 @@ import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
 import { SimpleLineChartDirective } from './directives/simple-line-chart.directive';
+import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 
 @NgModule({
   declarations: [
@@ -71,6 +72,7 @@ import { SimpleLineChartDirective } from './directives/simple-line-chart.directi
     EditableLabelComponent,
     EditableTextareaLabelComponent,
     EditableDropdownLabelComponent,
+    IsChartEmptyPipe,
   ],
   imports: [
     CommonModule,
@@ -127,6 +129,7 @@ import { SimpleLineChartDirective } from './directives/simple-line-chart.directi
     EditableLabelComponent,
     EditableTextareaLabelComponent,
     EditableDropdownLabelComponent,
+    IsChartEmptyPipe,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -195,6 +198,7 @@ export * from './modules/tabs/tabs.module';
 export * from './modules/tree/tree.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/matching-authenticator.pipe';
+export * from './pipes/is-chart-empty.pipe';
 export { PlanNamePipe } from './pipes/plan-name.pipe';
 export * from './services/additional-right-rule.service';
 export * from './services/dashboard.service';

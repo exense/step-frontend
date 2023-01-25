@@ -56,10 +56,7 @@
         </ng-container>
         <step-panel-operations> </step-panel-operations>
 
-        <step-panel
-          [panelType]="Panels.throughput"
-          *ngIf="throughputchart?.series && throughputchart.series.length > 0"
-        >
+        <step-panel [panelType]="Panels.throughput" *ngIf="!(throughputchart | isChartEmpty)">
           <step-simple-line-chart chartId="throughput-chart" [handle]="throughputchart"> </step-simple-line-chart>
         </step-panel>
       </mat-accordion>
