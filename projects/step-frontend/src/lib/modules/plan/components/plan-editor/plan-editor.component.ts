@@ -169,9 +169,6 @@ export class PlanEditorComponent
         return;
       }
 
-      console.log('plan name', plan.attributes!['name']);
-      console.log('plan versionId', plan.customFields!['versionId']);
-
       const planVersion = plan.customFields ? plan.customFields['versionId'] : undefined;
       const versionHistory = this._planApi.getPlanHistory(plan.id!);
 
