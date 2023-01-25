@@ -1,0 +1,14 @@
+<div *ngIf="node.tries">
+  <span class="report-node-text-muted">Number of tries</span>
+  <span class="report-node-text m-left">{{ node.tries }}</span>
+</div>
+<div *ngIf="(node.skipped && node.skipped > 0) || node.releasedToken">
+  <span class="report-node-text-muted">Advanced</span>
+  <ul>
+    <li *ngIf="node.skipped && node.skipped > 0">
+      <span class="report-node-text">Number of tries skipped from reporting</span>
+      <span class="report-node-text m-left">{{ node.skipped }}</span>
+    </li>
+    <li *ngIf="node.releasedToken"><span class="report-node-text">Agent tokens were released</span></li>
+  </ul>
+</div>
