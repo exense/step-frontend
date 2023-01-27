@@ -1,0 +1,29 @@
+<ng-container [ngSwitch]="state">
+  <ng-container *ngSwitchCase="State.READABLE">
+    <div class="editable-label" (click)="onLabelClick()">
+      <ng-container *ngIf="value; else label">
+        {{ value }}
+      </ng-container>
+
+      <ng-template #label>
+        <ng-container *ngTemplateOutlet="labelTemplate"></ng-container>
+      </ng-template>
+    </div>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="State.EDITABLE">
+    <mat-form-field class="step-view with-reduced-inner-padding">
+      <input
+        #input
+        type="text"
+        class="border-primary"
+        matInput
+        [ngModel]="value"
+        (ngModelChange)="onValueChange($event)"
+        (blur)="onBlur()"
+      />
+    </mat-form-field>
+
+    <step-editable-actions (cancel)="onCancel()" (apply)="onApply()"></step-editable-actions>
+  </ng-container>
+</ng-container>

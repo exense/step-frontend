@@ -9,8 +9,12 @@ import { AttachmentIsTextPipe } from './pipes/attachment-is-text.pipe';
 import { AttachmentShowLabelPipe } from './pipes/attachment-show-label.pipe';
 import { AttachmentPreviewComponent } from './components/attachment-preview/attachment-preview.component';
 import { AttachmentsPreviewComponent } from './components/attachments-preview/attachments-preview.component';
-import { ReportNodeDirective } from './directives/report-node.directive';
 import { ReportNodeShortComponent } from './components/report-node-short/report-node-short.component';
+import { ReportNodeComponent } from './components/report-node/report-node.component';
+import { RetryIfFailComponent } from './components/retry-if-fail/retry-if-fail.component';
+import { WaitForEventComponent } from './components/wait-for-event/wait-for-event.component';
+import { CallFunctionReportNodeComponent } from './components/call-function-report-node/call-function-report-node.component';
+import { CallFunctionReportNodeExternalLinkPipe } from './pipes/call-function-report-node-external-link.pipe';
 
 @NgModule({
   declarations: [
@@ -23,10 +27,14 @@ import { ReportNodeShortComponent } from './components/report-node-short/report-
     AttachmentShowLabelPipe,
     AttachmentPreviewComponent,
     AttachmentsPreviewComponent,
-    ReportNodeDirective,
     ReportNodeShortComponent,
+    ReportNodeComponent,
+    RetryIfFailComponent,
+    WaitForEventComponent,
+    CallFunctionReportNodeComponent,
+    CallFunctionReportNodeExternalLinkPipe,
   ],
   imports: [StepCommonModule],
-  exports: [ReportNodeShortComponent, ReportNodeIconComponent],
+  exports: [ReportNodeShortComponent, ReportNodeIconComponent, ReportNodeComponent],
 })
 export class ReportNodesModule {}

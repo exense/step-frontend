@@ -127,7 +127,7 @@ export class ExecutionProgressComponent
   @Output() titleUpdate = new EventEmitter<{ eId: string; execution: Execution }>();
   @Output() close = new EventEmitter<string>();
 
-  throughputchart: any | { series: any[] } = {};
+  throughputchart: any | { series: any[]; data: any[][] } = {};
 
   constructor(
     @Inject(DOCUMENT) private _document: Document,

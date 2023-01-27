@@ -1,0 +1,36 @@
+<ng-container [ngSwitch]="state">
+  <ng-container *ngSwitchCase="State.READABLE">
+    <div class="editable-dropdown-label" (click)="onLabelClick()">
+      <div class="editable-dropdown-template">
+        <ng-container *ngIf="value; else label">
+          <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: value }"></ng-container>
+        </ng-container>
+
+        <ng-template #label>
+          <ng-container *ngTemplateOutlet="labelTemplate"></ng-container>
+        </ng-template>
+      </div>
+
+      <div class="editable-dropdown-actions">
+        <step-icon name="chevron-down"></step-icon>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="State.EDITABLE">
+    <mat-form-field class="step-view with-reduced-inner-padding">
+      <mat-select
+        class="border-primary"
+        [ngModel]="value"
+        (ngModelChange)="onValueChange($event)"
+        (openedChange)="onOpenedChange($event)"
+      >
+        <mat-option *ngFor="let item of items" [value]="item">
+          <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: item }"></ng-container>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <step-editable-actions (cancel)="onCancel()" (apply)="onApply()"></step-editable-actions>
+  </ng-container>
+</ng-container>

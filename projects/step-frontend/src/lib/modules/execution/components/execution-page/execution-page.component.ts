@@ -1,7 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, Execution } from '@exense/step-core';
+import { AJS_LOCATION, AJS_MODULE, Execution } from '@exense/step-core';
 import { ExecutionTab } from '../../shared/execution-tab';
+import { ILocationService } from 'angular';
 
 @Component({
   selector: 'step-execution-page',
@@ -13,9 +14,11 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   tabs: ExecutionTab[] = [this.listTab];
   activeTab!: ExecutionTab;
 
+  constructor(@Inject(AJS_LOCATION) private _location: ILocationService) {}
+
   private locationChangeFunction = () => {
     let urlParts = this.getUrlParts();
-    const executionId = urlParts[1];
+    const executionId = urlParts[2];
     if (this.activeTab.id === executionId) {
       // the tab didn't change, but just the subcontent
       return;
@@ -42,21 +45,18 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   updateUrl() {
     let url = this.createUrl(this.activeTab);
-    // window.history.replaceState({}, '', url);
-    location.href = url;
+    this._location.path(url);
   }
 
   createUrl(tab: ExecutionTab): string {
-    const url = window.location.href;
-    let index = url.indexOf('executions');
-    let urlItems = url.substring(index).split('/');
-    urlItems[1] = tab.id;
+    let urlItems = this.getUrlParts();
+    urlItems[2] = tab.id;
     if (tab.subTab) {
-      urlItems[2] = tab.subTab;
+      urlItems[3] = tab.subTab;
     } else {
-      urlItems.length = 2;
+      urlItems.length = 3;
     }
-    return url.substring(0, index) + urlItems.join('/');
+    return '/' + urlItems.join('/');
   }
 
   handleTabChange(tabId: string) {
@@ -83,12 +83,9 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   replaceUrlSubTab(subTab: string): void {
-    const url = window.location.href;
-    let index = url.indexOf('executions');
-    let urlItems = url.substring(index).split('/');
-    urlItems[2] = subTab;
-    let newUrl = url.substring(0, index) + urlItems.join('/');
-    history.replaceState({}, '', newUrl);
+    let urlItems = this.getUrlParts();
+    urlItems[3] = subTab;
+    this._location.path(urlItems.join('/'));
   }
 
   handleTabClose(tabId: string) {
@@ -105,17 +102,21 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     this.updateUrl();
   }
 
+  /**
+   * This will return url parts, EXCLUDING params (?param=value&...)
+   * @private
+   */
   private getUrlParts(): string[] {
-    const url = window.location.href;
+    const url = this._location.path().substring(1); // remove first backslash
     // executions/12345/performance
-    let relativePath = url.substring(url.indexOf('executions'));
-    return relativePath.split('/');
+    let parts = url.split('/');
+    return parts;
   }
 
   ngOnInit(): void {
-    let urlParts = this.getUrlParts(); // [executions, id, subTab]
-    const taskId = urlParts[1];
-    const subTab = urlParts[2];
+    let urlParts = this.getUrlParts(); // [root, executions, id, subTab]
+    const taskId = urlParts[2];
+    const subTab = urlParts[3];
     if (taskId && taskId !== 'list') {
       let executionTab: ExecutionTab = {
         id: taskId,
