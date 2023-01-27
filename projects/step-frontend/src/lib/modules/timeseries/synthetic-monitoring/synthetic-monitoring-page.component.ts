@@ -13,6 +13,7 @@ import { TimeSeriesDashboardComponent } from '../dashboard/time-series-dashboard
 import { FilterBarItemType } from '../performance-view/filter-bar/model/ts-filter-item';
 import { TsUtils } from '../util/ts-utils';
 
+// @TODO deprecated. common analytics view is used instead
 @Component({
   selector: 'step-synthetic-monitoring',
   templateUrl: './synthetic-monitoring-page.component.html',

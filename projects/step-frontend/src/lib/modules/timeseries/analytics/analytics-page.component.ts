@@ -45,6 +45,11 @@ export class AnalyticsPageComponent implements OnInit {
     let start = now - selectedTimeRange.timeInMs;
     let range = { from: start, to: now };
     let urlParams = TsUtils.getURLParams(window.location.href);
+    if (urlParams.refresh === '1') {
+      this.refreshEnabled = true;
+      this.selectedRefreshInterval = this.refreshIntervals[0];
+    }
+    delete urlParams.refresh; // in case it exists
     this.dashboardSettings = {
       contextId: new Date().getTime().toString(),
       includeThreadGroupChart: true,
@@ -96,6 +101,9 @@ export class AnalyticsPageComponent implements OnInit {
         },
       ],
     };
+    if (this.refreshEnabled) {
+      this.startInterval(this.selectedRefreshInterval.value);
+    }
   }
 
   changeRefreshInterval(newInterval: { label: string; value: number }) {
