@@ -219,7 +219,11 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
         switchMap((plan) => this._planApi.savePlan(plan)),
         takeUntil(this.terminator$)
       )
-      .subscribe();
+      .subscribe((updatedPlan) => {
+        if (this.planInternal$.value) {
+          this.planInternal$.value.customFields = updatedPlan.customFields;
+        }
+      });
   }
 
   handlePlanChange(): void {

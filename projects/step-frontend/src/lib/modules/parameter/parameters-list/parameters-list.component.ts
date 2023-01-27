@@ -10,6 +10,7 @@ import {
   Parameter,
   selectionCollectionProvider,
   TableSearch,
+  RestoreDialogsService,
 } from '@exense/step-core';
 import { ParameterDialogsService } from '../services/parameter-dialogs.service';
 import { ParametersBulkOperationsInvokeService } from '../services/parameters-bulk-operations-invoke.service';
@@ -39,7 +40,8 @@ export class ParametersListComponent {
   constructor(
     private _parametersService: AugmentedParametersService,
     private _parameterDialogs: ParameterDialogsService,
-    private _filterConditionFactory: FilterConditionFactoryService
+    private _filterConditionFactory: FilterConditionFactoryService,
+    private _restoreDialogsService: RestoreDialogsService
   ) {}
 
   searchByScope(value: string): void {
@@ -68,10 +70,32 @@ export class ParametersListComponent {
 
   deleteParameter(id: string, label: string): void {
     this._parameterDialogs.deleteParameter(id, label).subscribe((result: boolean) => {
-      if (result) {
-        this.dataSource.reload();
+      if (!result) {
+        return;
       }
+
+      this.dataSource.reload();
     });
+  }
+  displayHistory(parameter: Parameter, permission: string) {
+    if (!parameter.id) {
+      return;
+    }
+
+    const resourceVersion = parameter.customFields ? parameter.customFields['versionId'] : undefined;
+    const versionHistory = this._parametersService.getParameterHistory(parameter.id!);
+
+    this._restoreDialogsService
+      .showRestoreDialog(resourceVersion, versionHistory, permission)
+      .subscribe((restoreVersion) => {
+        if (!restoreVersion) {
+          return;
+        }
+
+        this._parametersService
+          .restoreParameterVersion(parameter.id!, restoreVersion)
+          .subscribe(() => this.dataSource.reload());
+      });
   }
 }
 

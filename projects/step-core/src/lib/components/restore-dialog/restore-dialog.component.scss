@@ -1,0 +1,16 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+.cell-name {
+  width: 100%;
+
+  &.active {
+    color: var.$dark-blue;
+  }
+}
+
+button.active {
+  cursor: unset;
+  step-icon {
+    stroke: var.$dark-blue;
+  }
+}
