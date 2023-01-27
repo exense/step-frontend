@@ -163,25 +163,23 @@ export class PlanEditorComponent
       .subscribe();
   }
 
-  displayHistory(permission: string): void {
-    this._planEditService.plan$.pipe(first()).subscribe((plan) => {
-      if (!plan || !plan.id) {
-        return;
-      }
+  displayHistory(permission: string, plan: Plan): void {
+    if (!plan || !plan.id) {
+      return;
+    }
 
-      const planVersion = plan.customFields ? plan.customFields['versionId'] : undefined;
-      const versionHistory = this._planApi.getPlanHistory(plan.id!);
+    const planVersion = plan.customFields ? plan.customFields['versionId'] : undefined;
+    const versionHistory = this._planApi.getPlanHistory(plan.id!);
 
-      this._restoreDialogsService
-        .showRestoreDialog(planVersion, versionHistory, permission)
-        .subscribe((restoreVersion) => {
-          if (!restoreVersion) {
-            return;
-          }
+    this._restoreDialogsService
+      .showRestoreDialog(planVersion, versionHistory, permission)
+      .subscribe((restoreVersion) => {
+        if (!restoreVersion) {
+          return;
+        }
 
-          this._planApi.restorePlanVersion(plan.id!, restoreVersion).subscribe(() => this.loadPlan(plan.id!));
-        });
-    });
+        this._planApi.restorePlanVersion(plan.id!, restoreVersion).subscribe(() => this.loadPlan(plan.id!));
+      });
   }
 
   clonePlan(): void {
