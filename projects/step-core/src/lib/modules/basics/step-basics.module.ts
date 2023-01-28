@@ -55,3 +55,4 @@ export * from './shared/angularjs-provider-options';
 export * from './shared/auth-context.interface';
 export * from './shared/compare-condition.enum';
 export * from './shared/login-strategy';
+export * from './shared/restore-dialog-data';

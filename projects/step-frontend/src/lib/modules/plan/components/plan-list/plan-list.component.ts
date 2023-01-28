@@ -9,6 +9,7 @@ import {
   BulkOperationType,
   Plan,
   PlanDialogsService,
+  RestoreDialogsService,
   selectionCollectionProvider,
 } from '@exense/step-core';
 import { ILocationService } from 'angular';
@@ -36,6 +37,7 @@ export class PlanListComponent {
   constructor(
     readonly _plansApiService: AugmentedPlansService,
     private _planDialogs: PlanDialogsService,
+    private _restoreDialogsService: RestoreDialogsService,
     @Inject(AJS_LOCATION) private _location: ILocationService
   ) {}
 
@@ -77,6 +79,26 @@ export class PlanListComponent {
 
   lookUp(id: string, name: string): void {
     this._planDialogs.lookUp(id, name);
+  }
+
+  displayHistory(plan: Plan, permission: string): void {
+    if (!plan.id) {
+      return;
+    }
+
+    const id = plan.id!;
+    const planVersion = plan.customFields ? plan.customFields['versionId'] : undefined;
+    const versionHistory = this._plansApiService.getPlanHistory(id);
+
+    this._restoreDialogsService
+      .showRestoreDialog(planVersion, versionHistory, permission)
+      .subscribe((restoreVersion) => {
+        if (!restoreVersion) {
+          return;
+        }
+
+        this._plansApiService.restorePlanVersion(id, restoreVersion).subscribe(() => this.dataSource.reload());
+      });
   }
 }
 

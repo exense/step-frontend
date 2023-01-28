@@ -39,6 +39,10 @@ import { TreeModule } from './modules/tree/tree.module';
 import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
+import { SettingBtnComponent } from './components/setting-btn/setting-btn.component';
+import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
+import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
+import { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 import { SimpleLineChartDirective } from './directives/simple-line-chart.directive';
 import { DynamicFormsModule } from './modules/dynamic-forms/dynamic-forms.module';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
@@ -64,6 +68,7 @@ import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
     ProgressBarComponent,
     ArtefactDetailsDirective,
     PlanTreeComponent,
+    RestoreDialogComponent,
     SimpleLineChartDirective,
     EditableActionsComponent,
     EditableLabelComponent,
@@ -122,6 +127,7 @@ import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
     SettingBtnComponent,
     UploadContainerComponent,
     ProgressBarComponent,
+    RestoreDialogComponent,
     SimpleLineChartDirective,
     EditableLabelComponent,
     EditableTextareaLabelComponent,
@@ -171,6 +177,7 @@ export { ModalWindowComponent } from './components/modal-window/modal-window.com
 export { PlanLinkComponent } from './components/plan-link/plan-link.component';
 export * from './components/plan-tree/plan-tree.component';
 export { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
+export { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 export * from './components/report-node-status/report-node-status.component';
 export { SelectPlanComponent } from './components/select-plan/select-plan.component';
 export { SettingBtnComponent } from './components/setting-btn/setting-btn.component';
@@ -215,4 +222,5 @@ export { UibModalHelperService, UibModalInstance } from './services/uib-modal-he
 export * from './services/view-registry.service';
 export * from './services/view-state.service';
 export * from './services/execution-close-handle.service';
+export * from './services/restore-dialogs.service';
 export * from './shared';
