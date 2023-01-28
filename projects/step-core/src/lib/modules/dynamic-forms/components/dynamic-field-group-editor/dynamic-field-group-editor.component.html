@@ -28,5 +28,10 @@
     </step-dynamic-field>
   </ng-container>
 </ng-container>
-<step-add-field-button *ngIf="!isDisabled" [possibleFields]="possibleFieldsToAdd" (addField)="addOptionalField($event)">
+<step-add-field-button
+  *ngIf="!isDisabled"
+  [addLabel]="addFieldBtnLabel"
+  [possibleFields]="possibleFieldsToAdd"
+  (addField)="addOptionalField($event)"
+>
 </step-add-field-button>

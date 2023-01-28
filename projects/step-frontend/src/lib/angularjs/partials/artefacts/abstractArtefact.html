@@ -1,11 +1,11 @@
 <div ng-include="editor"></div>
 <div class="panel panel-default">
   <div class="panel-heading">
-    <a ng-click="showAttributes = !showAttributes">Step</a>
+    <a ng-click="showAttributes = !showAttributes">Properties</a>
   </div>
   <div class="panel-body" ng-show="showAttributes">
     <fieldset ng-disabled="readonly">
-      <div ng-if="!artefact.dynamicName.dynamic" class="form-group form-group-sm">
+      <div ng-if="!artefact.dynamicName.dynamic && !isKeyword" class="form-group form-group-sm">
         <label>Name</label>
         <button
           class="btn btn-default btn-xs pull-right"
@@ -19,12 +19,12 @@
         <input type="text" class="form-control" ng-blur="save()" ng-model="artefact.attributes.name" />
       </div>
       <dynamic-textfield
-        ng-if="artefact.dynamicName.dynamic"
+        ng-if="artefact.dynamicName.dynamic && !isKeyword"
         label="'Name'"
         on-save="save()"
         dynamic-value="artefact.dynamicName"
       />
-      <div class="form-group">
+      <div class="form-group" ng-if="!isKeyword">
         <label>Description</label>
         <textarea ng-blur="save()" ng-model="artefact.description" class="form-control" rows="5"></textarea>
       </div>

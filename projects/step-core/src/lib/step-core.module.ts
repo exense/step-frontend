@@ -43,6 +43,8 @@ import { RestoreDialogComponent } from './components/restore-dialog/restore-dial
 import { SimpleLineChartDirective } from './directives/simple-line-chart.directive';
 import { DynamicFormsModule } from './modules/dynamic-forms/dynamic-forms.module';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
+import { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
+import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 
 @NgModule({
   declarations: [
@@ -72,6 +74,8 @@ import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
     EditableTextareaLabelComponent,
     EditableDropdownLabelComponent,
     IsChartEmptyPipe,
+    KeywordNameComponent,
+    DynamicAttributePipe,
   ],
   imports: [
     CommonModule,
@@ -131,6 +135,8 @@ import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
     EditableDropdownLabelComponent,
     DynamicFormsModule,
     IsChartEmptyPipe,
+    KeywordNameComponent,
+    DynamicAttributePipe,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -170,6 +176,7 @@ export { EditableTextareaLabelComponent } from './components/editable-textarea-l
 export { FunctionLinkDialogService } from './components/function-link/function-link-dialog.service';
 export { FunctionLinkComponent } from './components/function-link/function-link.component';
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
+export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
 export { ModalWindowComponent } from './components/modal-window/modal-window.component';
 export { PlanLinkComponent } from './components/plan-link/plan-link.component';
 export * from './components/plan-tree/plan-tree.component';
@@ -200,6 +207,7 @@ export * from './modules/dynamic-forms/dynamic-forms.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/matching-authenticator.pipe';
 export * from './pipes/is-chart-empty.pipe';
+export * from './pipes/dynamic-attribute.pipe';
 export { PlanNamePipe } from './pipes/plan-name.pipe';
 export * from './services/additional-right-rule.service';
 export * from './services/dashboard.service';
