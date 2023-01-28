@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, Optional, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, Optional, Output, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { DynamicValueString } from '../../../../client/generated';
 import { noop } from 'rxjs';
@@ -18,6 +18,7 @@ const DEFAULT_VALUE: DynamicValueString = {
   selector: 'step-dynamic-field',
   templateUrl: './dynamic-field.component.html',
   styleUrls: ['./dynamic-field.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
   private onChange: OnChange = noop;

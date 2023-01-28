@@ -33,12 +33,15 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
 
   private lastEmittedValue?: DynamicFieldGroupValue;
 
+  @Input() primaryFieldsLabel = 'Core inputs';
+  @Input() optionalFieldsLabel = 'Optional inputs';
+
   @Input() isDisabled?: boolean;
   @Input() schema?: DynamicFieldsSchema;
   @Input() value?: DynamicFieldGroupValue;
   @Output() valueChange = new EventEmitter<DynamicFieldGroupValue | undefined>();
-  protected coreInputs: DynamicFieldMetaData[] = [];
-  protected optionalInputs: DynamicFieldMetaData[] = [];
+  protected primaryFields: DynamicFieldMetaData[] = [];
+  protected optionalFields: DynamicFieldMetaData[] = [];
   protected form = this.formBuilder.group({});
   protected possibleFieldsToAdd: string[] = [];
   readonly trackByField: TrackByFunction<DynamicFieldMetaData> = (index, item) => item.trackId;
@@ -85,7 +88,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
       return;
     }
     field.label = label;
-    const usedKeys = [...this.coreInputs, ...this.optionalInputs]
+    const usedKeys = [...this.primaryFields, ...this.optionalFields]
       .filter((input) => input !== field)
       .map((input) => input.key)
       .filter((key) => !key.startsWith('temp_'));
@@ -102,7 +105,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
   }
 
   protected removeField(field: DynamicFieldMetaData): void {
-    const fields = field.isRequired ? this.coreInputs : this.optionalInputs;
+    const fields = field.isRequired ? this.primaryFields : this.optionalFields;
     const index = fields.indexOf(field);
     if (index < 0) {
       return;
@@ -116,8 +119,8 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
 
   private destroyForm(): void {
     this.terminate();
-    this.coreInputs = [];
-    this.optionalInputs = [];
+    this.primaryFields = [];
+    this.optionalFields = [];
     const controlNames = Object.keys(this.form.controls);
     controlNames.forEach((controlName) => this.form.removeControl(controlName));
   }
@@ -186,14 +189,14 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     this.terminate();
 
     // assign required inputs
-    this.coreInputs.forEach((field) => {
+    this.primaryFields.forEach((field) => {
       const fieldValue = value[field.key] || { ...DEFAULT_FIELD_VALUE };
       field.control.setValue(fieldValue);
     });
 
     // add/remove optional inputs
     const fieldsToRemove: DynamicFieldMetaData[] = [];
-    this.optionalInputs.forEach((field) => {
+    this.optionalFields.forEach((field) => {
       const fieldValue = value[field.key];
       fieldValue ? field.control.setValue(fieldValue) : fieldsToRemove.push(field);
     });
@@ -206,7 +209,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
       .forEach((fieldKey) => this.addFieldInternal(this.schema!, fieldKey, value));
 
     // add new additional inputs
-    const formFieldKeys = [...this.coreInputs, ...this.optionalInputs].map((field) => field.key);
+    const formFieldKeys = [...this.primaryFields, ...this.optionalFields].map((field) => field.key);
     const newAdditionalInputs = Object.keys(value).filter((fieldKey) => !formFieldKeys.includes(fieldKey));
 
     newAdditionalInputs.filter((fieldKey) =>
@@ -277,9 +280,9 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     };
     this.form.addControl(meta.key, control);
     if (isRequired) {
-      this.coreInputs.push(meta);
+      this.primaryFields.push(meta);
     } else {
-      this.optionalInputs.push(meta);
+      this.optionalFields.push(meta);
     }
 
     if (!isRequired && !isAdditional) {

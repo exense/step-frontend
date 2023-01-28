@@ -6,6 +6,7 @@
   class="step-view with-suffix with-prefix"
   [class.ng-invalid]="!!_ngControl?.invalid"
   [class.step-force-focus]="forceFocus"
+  [class.editable-label]="canEditLabel"
 >
   <ng-container matPrefix>
     <div class="dynamic-field-label">
@@ -98,7 +99,15 @@
   <ng-container *ngIf="dynamic; then expressionInput; else valueInput"> </ng-container>
   <ng-container matSuffix>
     <ng-container *ngIf="fieldType === DynamicFieldType.string && !dynamic">
-      <button type="button" mat-stroked-button [disabled]="isDisabled" (click)="editStringValueInModal()" tabindex="-1">
+      <button
+        type="button"
+        mat-stroked-button
+        [tabindex]="tabIndex"
+        [disabled]="isDisabled"
+        (click)="editStringValueInModal()"
+        (focusin)="forceFocus = true"
+        (focusout)="forceFocus = false"
+      >
         <step-icon name="edit"></step-icon>
       </button>
       <div class="suffix-separator"></div>
@@ -108,14 +117,24 @@
       mat-flat-button
       [disabled]="isDisabled"
       [color]="dynamic ? 'primary' : undefined"
+      [tabindex]="tabIndex"
       (click)="toggleDynamic()"
-      tabindex="-1"
+      (focusin)="forceFocus = true"
+      (focusout)="forceFocus = false"
     >
       <step-icon name="zap"></step-icon>
     </button>
     <ng-container *ngIf="canRemove">
       <div class="suffix-separator"></div>
-      <button type="button" mat-stroked-button [disabled]="isDisabled" (click)="remove.emit()" tabindex="-1">
+      <button
+        type="button"
+        mat-stroked-button
+        [disabled]="isDisabled"
+        [tabindex]="tabIndex"
+        (click)="remove.emit()"
+        (focusin)="forceFocus = true"
+        (focusout)="forceFocus = false"
+      >
         <step-icon name="x"></step-icon>
       </button>
     </ng-container>

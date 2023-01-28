@@ -51,6 +51,7 @@
   $primary-text-color: map.get($config, primary-text-color);
   $border-color: map.get($config, border-color);
   $error-color: map.get($config, error-color);
+  $input-height: 42px;
 
   mat-form-field.step-view {
     display: block;
@@ -80,6 +81,7 @@
             margin-top: 0;
             margin-bottom: 0;
             box-sizing: border-box;
+            height: $input-height;
 
             .mat-select-trigger {
               height: auto;
@@ -133,7 +135,7 @@
         }
 
         .mat-form-field-prefix {
-          height: 42px;
+          height: $input-height;
           min-width: 180px;
           padding: 0 12px;
           display: flex;
@@ -143,7 +145,7 @@
         }
 
         .mat-form-field-suffix {
-          height: 42px;
+          height: $input-height;
           display: flex;
           border: 1px solid $border-color;
           border-radius: 0 8px 8px 0;
