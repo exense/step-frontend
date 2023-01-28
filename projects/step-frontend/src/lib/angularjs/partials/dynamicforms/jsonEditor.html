@@ -1,32 +1,4 @@
-<style>
-  .keyword {
-    display: flex;
-  }
-  .keyword h4.parameter {
-    margin: 4px 0 0 0;
-    padding-top: 2px;
-  }
-
-  .keyword h4.parameter i {
-    vertical-align: top;
-  }
-
-  .keyword h4.parameter:after {
-    content: '.';
-  }
-
-  .keyword h4.parameter:last-of-type:after {
-    content: '';
-  }
-
-  .keyword .error,
-  .keyword .parent {
-    padding-top: 2px;
-    margin: 5px 12px;
-  }
-</style>
-
-<div ng-if="!isDynamic() && type !== 'keyword'" class="form-group">
+<div ng-if="!isDynamic()" class="form-group">
   <button
     class="btn btn-default btn-xs pull-right"
     type="button"
@@ -44,38 +16,3 @@
   </step-dynamic-field-editor>
 </div>
 <expression-input />
-
-<div ng-if="!isDynamic() && type === 'keyword'" class="form-group">
-  <div class="keyword">
-    <h4 class="parameter" ng-repeat="displayName in keyword.displayNames" title="{{displayName.key}}">
-      {{displayName.value}}
-    </h4>
-    <h5 class="parent" ng-if="keyword.description">
-      <i
-        ng-if="keyword.iconCss"
-        style="display: inline-block"
-        uib-tooltip="{{keyword.iconTooltip}}"
-        ng-class="keyword.iconCss"
-      ></i>
-      {{keyword.description}}
-    </h5>
-    <h5 class="error" ng-if="keyword.error">
-      <i style="display: inline-block" uib-tooltip="{{keyword.error}}" ng-class="keyword.errorCss"></i>
-      {{keyword.error}}
-    </h5>
-    <div
-      class="btn btn-default btn-xs {{editKeyword.editing ? 'active' : ''}}"
-      ng-click="editKeyword.editing = !editKeyword.editing"
-      style="margin-left: auto; height: 22px"
-    >
-      <step-ajs-icon name="edit-2"></step-ajs-icon>
-    </div>
-  </div>
-  <label style="padding-top: 24px" ng-if="editKeyword.editing">Keyword selection parameters</label>
-  <json-editor
-    ng-if="editKeyword.editing"
-    model="editKeyword.value"
-    type="keyword"
-    on-change="editKeyword.save(json)"
-  />
-</div>
