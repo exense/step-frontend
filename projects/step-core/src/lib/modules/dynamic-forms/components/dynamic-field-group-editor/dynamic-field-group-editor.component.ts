@@ -35,6 +35,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
 
   @Input() primaryFieldsLabel = 'Core inputs';
   @Input() optionalFieldsLabel = 'Optional inputs';
+  @Input() addFieldBtnLabel = 'Add optional input';
 
   @Input() isDisabled?: boolean;
   @Input() schema?: DynamicFieldsSchema;
@@ -53,6 +54,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    let schemeChanged = false;
     let schema: DynamicFieldsSchema | undefined = undefined;
     let value: DynamicFieldGroupValue | undefined = undefined;
 
@@ -62,7 +64,8 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     if (cSchema?.currentValue !== cSchema?.previousValue || cSchema?.firstChange) {
       const schemaValue = cSchema?.currentValue;
       const schemaValueJson = !schemaValue ? '' : JSON.stringify(schemaValue);
-      if (schemaValueJson !== this.schemaJson) {
+      schemeChanged = schemaValueJson !== this.schemaJson;
+      if (schemeChanged) {
         schema = schemaValue;
       }
     }
@@ -71,7 +74,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
       value = cValue?.currentValue;
     }
 
-    if (schema) {
+    if (schemeChanged) {
       this.buildForm(schema, value);
     } else if (value && value !== this.lastEmittedValue) {
       this.assignValueToForm(value);
@@ -128,15 +131,12 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
   private buildForm(schema?: DynamicFieldsSchema, value?: DynamicFieldGroupValue): void {
     schema = schema || this.schema;
     value = value || this.value;
-    if (!schema) {
-      return;
-    }
-    this.schemaJson = JSON.stringify(schema);
+    this.schemaJson = schema ? JSON.stringify(schema) : '';
     this.destroyForm();
 
-    const allSchemaFields = Object.keys(schema!.properties || {});
+    const allSchemaFields = Object.keys(schema?.properties || {});
     const valueFields = Object.keys(value || {});
-    const requiredFields = schema.required || [];
+    const requiredFields = schema?.required || [];
     const nonRequiredFields = allSchemaFields.filter((field) => !requiredFields.includes(field));
     const additionalFields = valueFields.filter((field) => !allSchemaFields.includes(field));
 
