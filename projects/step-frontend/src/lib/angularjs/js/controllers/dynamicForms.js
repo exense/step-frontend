@@ -142,192 +142,23 @@ dynamicForms
     };
   })
   .directive('dynamicJsonEditor', function () {
-    // TODO keyword load function relates to cases, when type is "keyword"
-    // Also the only case where it is met - is callFunction.html
-    // Keyword reload logic should be placed to parent directive/component
     return {
       restrict: 'E',
       scope: {
         dynamicValue: '=',
         label: '=',
-        type: '@',
         onSave: '&',
-        updateKeyword: '&',
         schema: '=',
         isDisabled: '='
       },
-      controller: function ($scope, $attrs, $http, ScreenTemplates, EntityScopeResolver) {
-        $scope.argumentAsTable = [];
+      controller: function ($scope) {
         $scope.localModel = { json: '' };
-        $scope.sorting = [];
 
-        $scope.type = $attrs.type;
         initDynamicFormsCtrl($scope);
         $scope.save = function (json) {
           $scope.dynamicValue.value = json;
-
-          if ($scope.type === 'keyword') {
-            refresh({ value: json });
-          }
-
           $scope.onSave();
         };
-
-        function refresh(newVal) {
-          if (newVal !== undefined && newVal.value !== undefined) {
-            $scope.editKeyword.value = $scope.dynamicValue.value;
-            $scope.localModel.json = newVal.value;
-            updateEditors(false);
-            $scope.sortArgumentAsTable();
-
-            $scope.keyword = '';
-            keywordLookup().then((keyword) => {
-              $scope.keyword = keyword;
-              $scope.$apply();
-            });
-          }
-        }
-
-        if ($scope.type === 'keyword') {
-          $scope.editKeyword = { editing: false, dynamicValue: $scope.dynamicValue, save: $scope.save };
-          $scope.$watch('dynamicValue', refresh);
-
-          ScreenTemplates.getScreenInputsByScreenId('functionTable').then((inputs) => {
-            $scope.sorting = [];
-            for (const key in inputs) {
-              $scope.sorting.push(inputs[key].id.replace('attributes.', ''));
-            }
-
-            // sort desc
-            $scope.sorting.reverse();
-
-            $scope.sortArgumentAsTable();
-          });
-        }
-
-        $scope.sortArgumentAsTable = function () {
-          // go through sorting last -> first and put found element to the beginning so argumentAsTable is sorted asc
-          for (const sorting of $scope.sorting) {
-            if ($scope.containsKeyInTable(sorting)) {
-              const element = $scope.argumentAsTable.find(function (obj) {
-                return obj.key === sorting;
-              });
-              $scope.argumentAsTable = $scope.argumentAsTable.filter(function (obj) {
-                return obj.key !== sorting;
-              });
-              $scope.argumentAsTable.unshift(element);
-            }
-          }
-        };
-
-        $scope.containsKeyInTable = function (newKey) {
-          var result = false;
-          _.each($scope.argumentAsTable, function (entry) {
-            if (newKey === entry.key) {
-              result = true;
-            }
-          });
-          return result;
-        };
-
-        function updateEditors(validateJson) {
-          try {
-            $scope.argumentAsTable = _.map(JSON.parse($scope.localModel.json), function (val, key) {
-              if (_.isObject(val) && _.has(val, 'dynamic')) {
-                return { key: key, value: val };
-              } else {
-                // support the static json format without dynamic expressions
-                return { key: key, value: { value: val, dynamic: false } };
-              }
-            });
-            return true;
-          } catch (err) {
-            if (validateJson) {
-              Dialogs.showErrorMsg('Invalid JSON: ' + err);
-            }
-            return false;
-          }
-        }
-
-        function extractArtefact(scope, countOut) {
-          if (countOut === 0) {
-            return false;
-          }
-
-          if (scope.artefact) {
-            return scope.artefact;
-          }
-
-          return extractArtefact(scope.$parent, countOut - 1);
-        }
-
-        function keywordLookup() {
-          return new Promise((resolve, reject) => {
-            if ($scope.argumentAsTable.length === 0) {
-              resolve({
-                iconCss: 'ng-scope glyphicon glyphicon-search',
-                iconTooltip: 'Select a keyword',
-                displayName: 'Select a keyword',
-                description: 'No keyword',
-              });
-            }
-
-            const artefact = extractArtefact($scope, 10);
-
-            $http.post('rest/functions/lookup', artefact).then(function (response) {
-              if (response.data && response.data.attributes) {
-                if ($scope.updateKeyword) {
-                  $scope.updateKeyword({keyword: response.data});
-                }
-                const keyword = response.data.attributes;
-                keyword.displayNames = getDisplayNames($scope.argumentAsTable);
-
-                const entityScope = EntityScopeResolver.getScope(response.data);
-                if (entityScope) {
-                  // keyword belongs to scope
-                  keyword.iconCss = entityScope.cssClass;
-                  keyword.iconTooltip = entityScope.tooltip;
-                  keyword.description = entityScope.tenantName;
-                }
-
-                resolve(keyword);
-              } else {
-                if (checkIfDynamicParameter($scope.argumentAsTable)) {
-                  resolve({
-                    errorCss: 'ng-scope glyphicon glyphicon-flash',
-                    error: 'Dynamic keyword',
-                    displayNames: getDisplayNames($scope.argumentAsTable),
-                  });
-                } else {
-                  resolve({
-                    errorCss: 'ng-scope glyphicon glyphicon-exclamation-sign red',
-                    error: 'Keyword not found',
-                    displayNames: getDisplayNames($scope.argumentAsTable),
-                  });
-                }
-              }
-            });
-          });
-        }
-
-        function checkIfDynamicParameter(parameters) {
-          return parameters.find((param) => param.value && param.value.dynamic) !== undefined;
-        }
-
-        function getDisplayNames(parameters) {
-          return parameters.map((parameter) => ({
-            value:
-              parameter.value && parameter.value.dynamic
-                ? '[dynamic-parameter]'
-                : typeof parameter.value === 'object'
-                ? parameter.value.value
-                : parameter.value,
-            key:
-              parameter.value && parameter.value.dynamic
-                ? parameter.key + ' (expression: ' + parameter.value.expression + ')'
-                : parameter.key,
-          }));
-        }
       },
       templateUrl: 'partials/dynamicforms/jsonEditor.html',
     };
