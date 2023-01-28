@@ -41,7 +41,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
   protected optionalInputs: DynamicFieldMetaData[] = [];
   protected form = this.formBuilder.group({});
   protected possibleFieldsToAdd: string[] = [];
-  readonly trackByField: TrackByFunction<DynamicFieldMetaData> = (index, item) => item.key;
+  readonly trackByField: TrackByFunction<DynamicFieldMetaData> = (index, item) => item.trackId;
 
   constructor(private _fb: FormBuilder) {}
 
@@ -266,6 +266,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     }
 
     const meta: DynamicFieldMetaData = {
+      trackId: `track_${v4()}`,
       key: isAdditional && !field ? this.createTemporaryKey() : field,
       label: field,
       control,

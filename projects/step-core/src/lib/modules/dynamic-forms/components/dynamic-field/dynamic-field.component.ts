@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, Optional, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, Optional, Output } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { DynamicValueString } from '../../../../client/generated';
 import { noop } from 'rxjs';
