@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, Optional, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, Optional, Output, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { DynamicValueString } from '../../../../client/generated';
 import { noop } from 'rxjs';
@@ -35,8 +35,11 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
 
   protected displayEnumExtraValue: boolean = false;
 
+  protected forceFocus: boolean = false;
+
   readonly DynamicFieldType = DynamicFieldType;
 
+  @Input() tabIndex?: number;
   @Input() label?: string = '';
   @Output() labelChange = new EventEmitter<string>();
 
@@ -147,7 +150,7 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
         const valueTrimmed = value.trim().toLowerCase();
         return ['true', 'false'].includes(valueTrimmed) ? valueTrimmed : '';
       case DynamicFieldType.number:
-        const num = parseInt(value, 10);
+        const num = parseFloat(value);
         return isNaN(num) ? '' : num.toString();
       default:
         return value;

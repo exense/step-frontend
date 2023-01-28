@@ -3,13 +3,13 @@
   class="add-additional"
   type="button"
   mat-stroked-button
-  (click)="addField.emit()"
-  *ngIf="!possibleFields?.length"
+  (click)="addOptionalField($event)"
+  *ngIf="!possibleFields?.length || !showPossibleFields"
 >
   Add optional input
   <step-icon name="plus"></step-icon>
 </button>
-<div class="possible-fields-container" *ngIf="possibleFields?.length">
+<div class="possible-fields-container" *ngIf="possibleFields?.length && showPossibleFields">
   <button *ngFor="let field of possibleFields" type="button" mat-stroked-button (click)="addField.emit(field)">
     {{ field }}
   </button>

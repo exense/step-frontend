@@ -81,6 +81,9 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
   }
 
   protected updateLabel(field: DynamicFieldMetaData, label: string): void {
+    if (field.label === label) {
+      return;
+    }
     field.label = label;
     const usedKeys = [...this.coreInputs, ...this.optionalInputs]
       .filter((input) => input !== field)

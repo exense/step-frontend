@@ -5,6 +5,7 @@
   floatLabel="always"
   class="step-view with-suffix with-prefix"
   [class.ng-invalid]="!!_ngControl?.invalid"
+  [class.step-force-focus]="forceFocus"
 >
   <ng-container matPrefix>
     <div class="dynamic-field-label">
@@ -15,6 +16,9 @@
           (click)="fixLabelFocus($event)"
           [(ngModel)]="label"
           (blur)="labelChange.emit(label)"
+          [tabindex]="tabIndex"
+          (focusin)="forceFocus = true"
+          (focusout)="forceFocus = false"
         />
       </ng-container>
       <ng-container *ngIf="tooltip">
@@ -25,7 +29,13 @@
   <ng-template #valueInput>
     <ng-container [ngSwitch]="fieldType">
       <ng-container *ngSwitchCase="DynamicFieldType.enum">
-        <mat-select [disabled]="isDisabled" [ngModel]="value" (ngModelChange)="valueChange($event)" (blur)="onTouch()">
+        <mat-select
+          [disabled]="isDisabled"
+          [ngModel]="value"
+          (ngModelChange)="valueChange($event)"
+          (blur)="onTouch()"
+          [tabIndex]="tabIndex"
+        >
           <mat-option *ngIf="displayEnumExtraValue" [value]="value">
             {{ value }}
           </mat-option>
@@ -35,26 +45,30 @@
         </mat-select>
       </ng-container>
       <ng-container *ngSwitchCase="DynamicFieldType.boolean">
-        <input matInput hidden />
+        <input matInput hidden tabindex="-1" />
         <mat-radio-group
           aria-label="Select an option"
           color="primary"
           [ngModel]="value"
           (ngModelChange)="valueChange($event)"
           (blur)="onTouch()"
+          (focusin)="forceFocus = true"
+          (focusout)="forceFocus = false"
         >
-          <mat-radio-button value="true">True</mat-radio-button>
-          <mat-radio-button value="false">False</mat-radio-button>
+          <mat-radio-button value="true" [tabIndex]="tabIndex">True</mat-radio-button>
+          <mat-radio-button value="false" [tabIndex]="tabIndex">False</mat-radio-button>
         </mat-radio-group>
       </ng-container>
       <ng-container *ngSwitchCase="DynamicFieldType.number">
         <input
           type="number"
+          step="any"
           matInput
           [disabled]="isDisabled"
           [ngModel]="value"
           (ngModelChange)="valueChange($event)"
           (blur)="onTouch()"
+          [tabindex]="tabIndex"
         />
       </ng-container>
       <ng-container *ngSwitchDefault>
@@ -65,6 +79,7 @@
           [ngModel]="value"
           (ngModelChange)="valueChange($event)"
           (blur)="onTouch()"
+          [tabindex]="tabIndex"
         />
       </ng-container>
     </ng-container>
@@ -77,12 +92,13 @@
       [ngModel]="expression"
       (ngModelChange)="expressionChange($event)"
       (blur)="onTouch()"
+      [tabindex]="tabIndex"
     />
   </ng-template>
   <ng-container *ngIf="dynamic; then expressionInput; else valueInput"> </ng-container>
   <ng-container matSuffix>
     <ng-container *ngIf="fieldType === DynamicFieldType.string && !dynamic">
-      <button type="button" mat-stroked-button [disabled]="isDisabled" (click)="editStringValueInModal()">
+      <button type="button" mat-stroked-button [disabled]="isDisabled" (click)="editStringValueInModal()" tabindex="-1">
         <step-icon name="edit"></step-icon>
       </button>
       <div class="suffix-separator"></div>
@@ -93,12 +109,13 @@
       [disabled]="isDisabled"
       [color]="dynamic ? 'primary' : undefined"
       (click)="toggleDynamic()"
+      tabindex="-1"
     >
       <step-icon name="zap"></step-icon>
     </button>
     <ng-container *ngIf="canRemove">
       <div class="suffix-separator"></div>
-      <button type="button" mat-stroked-button [disabled]="isDisabled" (click)="remove.emit()">
+      <button type="button" mat-stroked-button [disabled]="isDisabled" (click)="remove.emit()" tabindex="-1">
         <step-icon name="x"></step-icon>
       </button>
     </ng-container>

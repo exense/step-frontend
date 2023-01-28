@@ -19,6 +19,13 @@ button {
   input[type='text'] {
     border: none;
     outline: none;
-    width: 79px;
+    width: auto;
+    font-weight: 400;
+    padding: 10px 0;
+    line-height: 20px;
+    margin-top: 0;
+    margin-bottom: 0;
+    box-sizing: border-box;
+    flex-grow: 1;
   }
 }

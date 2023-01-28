@@ -12,7 +12,6 @@
     >
     </step-dynamic-field>
   </ng-container>
-  <h4>Optional inputs</h4>
   <ng-container *ngFor="let field of optionalInputs; trackBy: trackByField">
     <step-dynamic-field
       [formControl]="field.control"

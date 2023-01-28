@@ -215,10 +215,12 @@
       }
     }
 
+    &.step-force-focus,
     &.mat-focused {
       .mat-form-field-wrapper .mat-form-field-flex {
         .mat-form-field-infix {
           mat-select,
+          mat-radio-group,
           .mat-input-element {
             border-color: $primary-color;
           }
