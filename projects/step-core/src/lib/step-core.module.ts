@@ -17,14 +17,11 @@ import { IsUsedByListComponent } from './components/is-used-by-list/is-used-by-l
 import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 import { ModalWindowComponent } from './components/modal-window/modal-window.component';
 import { PlanLinkComponent } from './components/plan-link/plan-link.component';
-import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
 import { SelectPlanComponent } from './components/select-plan/select-plan.component';
-import { SettingBtnComponent } from './components/setting-btn/setting-btn.component';
 import { UploadContainerComponent } from './components/upload-container/upload-container.component';
 import { CORE_INITIALIZER } from './core-initialiser';
-import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { CapsLockDirective } from './directives/caps-lock.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 import { TooltipDirective } from './directives/tooltip.directive';
