@@ -58,7 +58,6 @@ export class TimeRangePicker implements OnInit {
         if (this.activeSelection.type === RangeSelectionType.ABSOLUTE) {
           let from = this.activeSelection.absoluteSelection!.from!;
           let to = this.activeSelection.absoluteSelection!.to!;
-          console.log(this.activeSelection);
           this.fromDateString = TimeSeriesUtils.formatInputDate(new Date(from));
           this.toDateString = TimeSeriesUtils.formatInputDate(new Date(to));
         }
