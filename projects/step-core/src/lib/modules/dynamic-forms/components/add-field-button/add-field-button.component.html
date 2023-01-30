@@ -6,7 +6,7 @@
   (click)="addOptionalField($event)"
   *ngIf="!possibleFields?.length || !showPossibleFields"
 >
-  Add optional input
+  {{ addLabel }}
   <step-icon name="plus"></step-icon>
 </button>
 <div class="possible-fields-container" *ngIf="possibleFields?.length && showPossibleFields">

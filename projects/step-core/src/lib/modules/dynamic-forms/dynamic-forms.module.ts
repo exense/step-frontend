@@ -21,7 +21,13 @@ import { DynamicFieldEditorComponent } from './components/dynamic-field-editor/d
     DynamicFieldEditorComponent,
   ],
   imports: [CommonModule, FormsModule, StepBasicsModule, StepMaterialModule, StepIconsModule, ReactiveFormsModule],
-  exports: [DynamicTextfieldComponent, ExpressionInputComponent, DynamicFieldComponent, DynamicFieldEditorComponent],
+  exports: [
+    DynamicTextfieldComponent,
+    ExpressionInputComponent,
+    DynamicFieldComponent,
+    DynamicFieldEditorComponent,
+    DynamicFieldGroupEditorComponent,
+  ],
 })
 export class DynamicFormsModule {}
 
@@ -31,3 +37,4 @@ export * from './components/dynamic-field/dynamic-field.component';
 export * from './components/dynamic-field-group-editor/dynamic-field-group-editor.component';
 export * from './components/dynamic-field-editor/dynamic-field-editor.component';
 export * from './shared/dynamic-fields-schema';
+export * from './shared/dynamic-field-group-value';
