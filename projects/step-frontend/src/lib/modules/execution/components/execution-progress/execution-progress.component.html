@@ -40,7 +40,7 @@
               [repositoryObjectRef]="execution!.executionParameters!.repositoryObject"
               [includedTestcases]="includedTestcases$ | async"
               [execution]="execution"
-              (onExecute)="close.emit(eId)"
+              (onExecute)="closeExecution(false)"
             >
             </step-execution-commands>
           </ng-container>

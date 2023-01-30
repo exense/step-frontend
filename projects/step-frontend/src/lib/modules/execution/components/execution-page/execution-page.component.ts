@@ -88,11 +88,13 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     this._location.path(urlItems.join('/'));
   }
 
-  handleTabClose(tabId: string) {
+  handleTabClose(tabId: string, openList: boolean = true) {
     let indexToBeDeleted = this.tabs.findIndex((tab) => tab.id === tabId);
     this.tabs.splice(indexToBeDeleted, 1);
     // this.tabs = [...this.tabs];
-    this.switchTab(this.listTab);
+    if (openList) {
+      this.switchTab(this.listTab);
+    }
   }
 
   switchTab(tab: ExecutionTab) {
