@@ -8,12 +8,10 @@ import { UpgradeModule } from '@angular/upgrade/static';
 import { AngularSplitModule } from 'angular-split';
 import { StepGeneratedClientModule } from './client/generated';
 import { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
-import { DynamicTextfieldComponent } from './components/dynamic-textfield/dynamic-textfield.component';
 import { EditableActionsComponent } from './components/editable-actions/editable-actions.component';
 import { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';
 import { EditableLabelComponent } from './components/editable-label/editable-label.component';
 import { EditableTextareaLabelComponent } from './components/editable-textarea-label/editable-textarea-label.component';
-import { ExpressionInputComponent } from './components/expression-input/expression-input.component';
 import { FunctionLinkComponent } from './components/function-link/function-link.component';
 import { IsUsedByListComponent } from './components/is-used-by-list/is-used-by-list.component';
 import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
@@ -43,6 +41,7 @@ import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 import { SimpleLineChartDirective } from './directives/simple-line-chart.directive';
+import { DynamicFormsModule } from './modules/dynamic-forms/dynamic-forms.module';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 
 @NgModule({
@@ -59,8 +58,6 @@ import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
     IsUsedByListComponent,
     IsUsedByModalComponent,
     FunctionLinkComponent,
-    ExpressionInputComponent,
-    DynamicTextfieldComponent,
     SelectPlanComponent,
     AutorefreshToggleComponent,
     SettingBtnComponent,
@@ -92,6 +89,7 @@ import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
     TabsModule,
     TreeModule,
     AngularSplitModule,
+    DynamicFormsModule,
   ],
   exports: [
     CommonModule,
@@ -119,7 +117,6 @@ import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
     PlanNamePipe,
     ModalWindowComponent,
     IsUsedByModalComponent,
-    DynamicTextfieldComponent,
     SelectPlanComponent,
     PlanTreeComponent,
     ArtefactDetailsDirective,
@@ -132,6 +129,7 @@ import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
     EditableLabelComponent,
     EditableTextareaLabelComponent,
     EditableDropdownLabelComponent,
+    DynamicFormsModule,
     IsChartEmptyPipe,
   ],
   providers: [
@@ -166,11 +164,9 @@ export type { OpenAPIConfig } from './client/generated/core/OpenAPI';
 export * from './client/generated/index';
 export * from './client/step-client-module';
 export { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
-export { DynamicTextfieldComponent } from './components/dynamic-textfield/dynamic-textfield.component';
 export { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';
 export { EditableLabelComponent } from './components/editable-label/editable-label.component';
 export { EditableTextareaLabelComponent } from './components/editable-textarea-label/editable-textarea-label.component';
-export { ExpressionInputComponent } from './components/expression-input/expression-input.component';
 export { FunctionLinkDialogService } from './components/function-link/function-link-dialog.service';
 export { FunctionLinkComponent } from './components/function-link/function-link.component';
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
@@ -200,6 +196,7 @@ export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
 export * from './modules/tabs/tabs.module';
 export * from './modules/tree/tree.module';
+export * from './modules/dynamic-forms/dynamic-forms.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/matching-authenticator.pipe';
 export * from './pipes/is-chart-empty.pipe';

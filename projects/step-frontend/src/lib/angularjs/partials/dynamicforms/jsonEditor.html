@@ -27,7 +27,6 @@
 </style>
 
 <div ng-if="!isDynamic() && type !== 'keyword'" class="form-group">
-  <label>{{label}}</label>
   <button
     class="btn btn-default btn-xs pull-right"
     type="button"
@@ -36,7 +35,13 @@
   >
     <step-ajs-icon name="zap"></step-ajs-icon>
   </button>
-  <json-editor model="dynamicValue.value" type="{{type}}" on-change="save(json)" />
+  <br/>
+  <step-dynamic-field-editor
+    [value]="dynamicValue.value"
+    (value-change)="save($event)"
+    [schema]="schema"
+    [is-disabled]="isDisabled">
+  </step-dynamic-field-editor>
 </div>
 <expression-input />
 

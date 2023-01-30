@@ -1,10 +1,12 @@
-import { Component, forwardRef, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   AbstractArtefact,
   ArtefactTreeNode,
   AugmentedScreenService,
   AuthService,
   CustomComponent,
+  DynamicFieldsSchema,
+  DynamicValueString,
   KeywordsService,
   Plan,
   PlanEditorService,
@@ -100,40 +102,21 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
             return artefact;
           }
 
-          if (!keyword?.schema?.['properties']) {
+          const schema = keyword?.schema as unknown as DynamicFieldsSchema | undefined;
+          if (!schema?.properties) {
             return artefact;
           }
 
-          const targetObject = Object.entries(keyword.schema['properties']).reduce((res, [key, value]) => {
-            const type = (value as any).type;
-            const isDynamic = type === 'number' || type === 'integer' || type === 'boolean';
-            const defaultValue = (value as any).default;
-
-            if (defaultValue !== undefined) {
-              console.log('default:', defaultValue);
-              if (isDynamic) {
-                res[key] = { expression: defaultValue, dynamic: true };
-              } else {
-                res[key] = { value: defaultValue, dynamic: false };
-              }
-            } else if (type) {
-              if (isDynamic) {
-                res[key] = { expression: `<${type}>`, dynamic: true };
-              } else {
-                res[key] = { value: `<${type}>`, dynamic: false };
-              }
+          const targetObject = (schema?.required || []).reduce((res, field) => {
+            const property = schema?.properties[field];
+            if (!property) {
+              return res;
             }
+
+            const value = property.default ? property.default : '';
+            res[field] = { value, dynamic: false };
             return res;
-          }, {} as Record<string, { expression?: string; value?: string; dynamic: boolean }>);
-
-          ((keyword?.schema?.['required'] || []) as string[]).forEach((prop) => {
-            if (targetObject?.[prop]?.value) {
-              targetObject[prop].value += ' (REQ)';
-            }
-            if (targetObject?.[prop]?.expression) {
-              targetObject[prop].expression += ' (REQ)';
-            }
-          });
+          }, {} as Record<string, DynamicValueString>);
 
           (artefact as any)['argument'] = {
             dynamic: false,

@@ -104,6 +104,12 @@ angular
 
     $scope.ready = false;
 
+    $scope.keyword = undefined;
+
+    $scope.onUpdateKeyword = function(keyword) {
+      $scope.keyword = keyword;
+    }
+
     function loadFunction(id, callback) {
       $http({ url: 'rest/functions/' + id, method: 'GET' }).then(function (response) {
         $scope.targetFunction = response.data;

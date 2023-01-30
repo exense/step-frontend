@@ -1,7 +1,7 @@
 import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { NgControl } from '@angular/forms';
-import { DynamicValueString } from '../../client/step-client-module';
-import { DialogsService } from '../../shared';
+import { DynamicValueString } from '../../../../client/step-client-module';
+import { DialogsService } from '../../../../shared';
 
 type OnChange = (dynamicValueString: DynamicValueString) => void;
 type OnTouch = () => void;

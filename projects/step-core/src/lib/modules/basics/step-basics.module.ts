@@ -10,6 +10,7 @@ import { ResourceLabelComponent } from './components/resource-label/resource-lab
 import { ArtefactIconPipe } from './pipes/artefact-icon.pipe';
 import { HasRightPipe } from './pipes/has-right.pipe';
 import { ZIndexDirective } from './directives/z-index.directive';
+import { JsonRawEditorComponent } from './components/json-raw-editor/json-raw-editor.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
@@ -22,6 +23,7 @@ import { ZIndexDirective } from './directives/z-index.directive';
     HexadecimalInputFilterComponent,
     ArtefactIconPipe,
     ZIndexDirective,
+    JsonRawEditorComponent,
   ],
   exports: [
     ResourceLabelComponent,
@@ -32,6 +34,7 @@ import { ZIndexDirective } from './directives/z-index.directive';
     HexadecimalInputFilterComponent,
     ArtefactIconPipe,
     ZIndexDirective,
+    JsonRawEditorComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -41,6 +44,7 @@ export * from './components/date-filter/date-filter.component';
 export * from './components/input-filter/hexadecimal-input-filter.component';
 export * from './components/input-filter/input-filter.component';
 export * from './components/resource-label/resource-label.component';
+export * from './components/json-raw-editor/json-raw-editor.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
 export * from './pipes/has-right.pipe';
