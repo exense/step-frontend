@@ -22,6 +22,9 @@ const upperCamelize = (str: string) => {
 })
 export class IconProviderService {
   getIcon(key: string): string {
+    if (!key) {
+      return '';
+    }
     const iconName = upperCamelize(key);
     const svg = (allIcons as any)[iconName] || '';
     if (!svg) {

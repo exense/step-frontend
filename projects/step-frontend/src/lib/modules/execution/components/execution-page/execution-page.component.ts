@@ -33,7 +33,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
           active: true,
           label: executionId,
           type: 'progress',
-          title: executionId,
+          title: '',
         };
         this.tabs.push(executionTab);
         this.switchTab(executionTab);
