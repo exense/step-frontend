@@ -15,12 +15,10 @@
     <step-icon name="edit-2"></step-icon>
   </button>
 </div>
-<ng-container *ngIf="artefact?.function?.value | dynamicAttribute: 'name' as keywordName">
-  <div class="references-keyword" *ngIf="keywordName !== artefactName">
-    <label>References keyword:</label>
-    <span>{{ keywordName }}</span>
-  </div>
-</ng-container>
+<div class="references-keyword" *ngIf="referenceKeywordString && referenceKeywordString !== artefactName">
+  <label>References keyword:</label>
+  <span>{{ referenceKeywordString }}</span>
+</div>
 <step-dynamic-field-group
   *ngIf="isEditorMode && !isDisabled"
   primaryFieldsLabel="Selection parameter"

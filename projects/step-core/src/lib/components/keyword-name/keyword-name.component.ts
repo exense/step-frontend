@@ -9,6 +9,7 @@ import {
 import { AJS_MODULE } from '../../shared';
 import { EntityScopeResolver, Entity } from '../../modules/entity/entity.module';
 import { DynamicFieldsSchema, DynamicFieldGroupValue } from '../../modules/dynamic-forms/dynamic-forms.module';
+import { DynamicAttributePipe } from '../../pipes/dynamic-attribute.pipe';
 
 interface KeywordMeta {
   icon: string;
@@ -39,6 +40,7 @@ export class KeywordNameComponent implements OnChanges {
   readonly KEYWORD_ATTRIBUTES_SCHEMA = KEYWORD_ATTRIBUTES_SCHEMA;
   protected artefactName: string = '';
   protected artefactKeywordAttributes?: DynamicFieldGroupValue;
+  protected referenceKeywordString: string = '';
   protected keyword?: Keyword;
   protected isEditorMode: boolean = false;
   protected keywordMeta?: KeywordMeta;
@@ -78,6 +80,7 @@ export class KeywordNameComponent implements OnChanges {
       this.artefact!.function!.value = attributesString;
       this.loadArtefactKeyword(this.artefact);
     }
+    this.createReferenceKeywordString(this.artefactKeywordAttributes);
 
     this.onSave.emit();
   }
@@ -89,6 +92,8 @@ export class KeywordNameComponent implements OnChanges {
   private parseArtefactKeywordAttributes(artefact?: CallFunction): void {
     if (!artefact) {
       this.artefactKeywordAttributes = undefined;
+      this.createReferenceKeywordString(this.artefactKeywordAttributes);
+      return;
     }
     try {
       const attributesJson = artefact?.function?.value;
@@ -96,6 +101,24 @@ export class KeywordNameComponent implements OnChanges {
     } catch (err) {
       this.artefactKeywordAttributes = undefined;
     }
+    this.createReferenceKeywordString(this.artefactKeywordAttributes);
+  }
+
+  private createReferenceKeywordString(attributes?: DynamicFieldGroupValue): void {
+    if (!attributes) {
+      this.referenceKeywordString = '';
+      return;
+    }
+
+    const nameValue = DynamicAttributePipe.transform(attributes['name']) || '';
+    const namePart = nameValue ? `name=${nameValue}` : '';
+
+    const otherParts = Object.entries(attributes)
+      .filter(([key]) => key !== 'name')
+      .map(([key, attribute]) => `${key}=${DynamicAttributePipe.transform(attribute) || ''}`);
+
+    this.referenceKeywordString =
+      otherParts.length === 0 ? nameValue : [namePart, ...otherParts].filter((part) => !!part).join(', ');
   }
 
   private hasDynamicParameters(): boolean {

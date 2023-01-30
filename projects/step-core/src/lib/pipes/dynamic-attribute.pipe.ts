@@ -5,24 +5,11 @@ import { DynamicValueString } from '../client/step-client-module';
   name: 'dynamicAttribute',
 })
 export class DynamicAttributePipe implements PipeTransform {
-  transform(value: string | Record<string, DynamicValueString> | undefined, attributeName: string): string | undefined {
-    if (!value) {
-      return '';
-    }
-    if (typeof value === 'string') {
-      let parsedValue: Record<string, DynamicValueString>;
-      try {
-        parsedValue = JSON.parse(value);
-      } catch (e) {
-        return '';
-      }
-      return this.transform(parsedValue, attributeName);
-    }
-
-    return this.getAttribute(value[attributeName]);
+  transform(attribute?: DynamicValueString): string | undefined {
+    return DynamicAttributePipe.transform(attribute);
   }
 
-  private getAttribute(attribute?: DynamicValueString): string | undefined {
+  static transform(attribute?: DynamicValueString): string | undefined {
     if (!attribute) {
       return '';
     }

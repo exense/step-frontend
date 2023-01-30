@@ -27,13 +27,12 @@
     </fieldset>
 
     <fieldset ng-disabled="readonly">
-      <div class="form-group">
-        <label>Description</label>
-        <textarea ng-blur="save()"
-                  ng-model="artefact.description"
-                  class="form-control" rows="5">
-        </textarea>
-      </div>
+      <step-editable-textarea-label
+        label="Add text description"
+        [value]="artefact.description"
+        (value-change)="artefact.description = $event; save()"
+        [is-disabled]="readonly">
+      </step-editable-textarea-label>
       <dynamic-json-editor label="'Input'" dynamic-value="artefact.argument" on-save="save()" schema="keyword.schema" is-disabled="readonly" />
       <dynamic-textfield label="'Map output to'" dynamic-value="artefact.resultMap" on-save="save()" />
 
