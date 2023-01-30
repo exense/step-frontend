@@ -285,7 +285,8 @@ export class ExecutionProgressComponent
       this.onExecutionStatusUpdate(execution?.status);
       this.execution = execution;
       this.determineDefaultSelection();
-      const showTestCaseCurrentOperation = (execution.parameters as any as { key: string; value: string }[]).find(
+      const parameters: { key: string; value: string }[] = (execution.parameters as any) || [];
+      const showTestCaseCurrentOperation = parameters.find(
         (o) => o.key === 'step.executionView.testcases.current-operations'
       );
       this.showTestCaseCurrentOperation = showTestCaseCurrentOperation?.value.toLowerCase() === 'true';
