@@ -16,7 +16,7 @@ export class DashboardService {
   ) {}
 
   getDashboardLink(taskId: string): string {
-    return `#/root/analytics?taskId=${taskId}&refresh=1`;
+    return `#/root/analytics?taskId=${taskId}&refresh=1&tsParams=taskId,refresh`;
   }
 
   getRtmDashboardLink(taskId: string): string {

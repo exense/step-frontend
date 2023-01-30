@@ -25,6 +25,9 @@ export class TimeRangePicker implements OnInit {
 
   @Output() onSelectionChange = new EventEmitter<TimeRangePickerSelection>();
 
+  @Input() activeSelection!: TimeRangePickerSelection;
+  @Output() activeSelectionChange = new EventEmitter<TimeRangePickerSelection>();
+
   _30_MINUTES = 30 * 60 * 1000; // in ms
 
   defaultRelativeOptions: RelativeTimeSelection[] = [
@@ -39,8 +42,6 @@ export class TimeRangePicker implements OnInit {
   fromDateString: string | undefined; // used for formatting the date together with time
   toDateString: string | undefined;
 
-  activeSelection!: TimeRangePickerSelection;
-
   ngOnInit(): void {
     if (this.initialSelectionIndex != undefined) {
       this.activeSelection = {
@@ -48,13 +49,19 @@ export class TimeRangePicker implements OnInit {
         relativeSelection: (this.customRelativeOptions || this.defaultRelativeOptions)[this.initialSelectionIndex],
       };
     } else {
-      if (this.includeFullRangeOption) {
-        this.activeSelection = { type: RangeSelectionType.FULL };
-      } else {
+      if (!this.activeSelection) {
         this.activeSelection = {
           type: RangeSelectionType.RELATIVE,
           relativeSelection: (this.customRelativeOptions || this.defaultRelativeOptions)[0],
         };
+      } else {
+        if (this.activeSelection.type === RangeSelectionType.ABSOLUTE) {
+          let from = this.activeSelection.absoluteSelection!.from!;
+          let to = this.activeSelection.absoluteSelection!.to!;
+          console.log(this.activeSelection);
+          this.fromDateString = TimeSeriesUtils.formatInputDate(new Date(from));
+          this.toDateString = TimeSeriesUtils.formatInputDate(new Date(to));
+        }
       }
     }
   }

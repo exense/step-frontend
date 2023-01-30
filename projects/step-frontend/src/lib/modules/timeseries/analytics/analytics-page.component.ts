@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnChanges, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE } from '@exense/step-core';
 import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
@@ -25,10 +25,7 @@ export class AnalyticsPageComponent implements OnInit {
   refreshEnabled = false;
 
   timeRangeOptions: RelativeTimeSelection[] = TimeSeriesConfig.SYNTHETIC_MONITORING_TIME_OPTIONS;
-  timeRangeSelection: TimeRangePickerSelection = {
-    type: RangeSelectionType.RELATIVE,
-    relativeSelection: this.timeRangeOptions[0],
-  };
+  timeRangeSelection!: TimeRangePickerSelection;
 
   // this is just for running executions
   refreshIntervals = TimeSeriesConfig.AUTO_REFRESH_INTERVALS;
@@ -42,18 +39,31 @@ export class AnalyticsPageComponent implements OnInit {
   ngOnInit(): void {
     let selectedTimeRange = this.timeRangeOptions[0];
     let now = new Date().getTime();
-    let start = now - selectedTimeRange.timeInMs;
-    let range = { from: start, to: now };
+    let start;
+    let end;
     let urlParams = TsUtils.getURLParams(window.location.href);
     if (urlParams.refresh === '1') {
       this.refreshEnabled = true;
       this.selectedRefreshInterval = this.refreshIntervals[0];
     }
+    if (urlParams.start) {
+      start = parseInt(urlParams.start);
+      end = parseInt(urlParams.end) ? parseInt(urlParams.end) : now;
+      this.timeRangeSelection = { type: RangeSelectionType.ABSOLUTE, absoluteSelection: { from: start, to: end } };
+    } else {
+      start = now - selectedTimeRange.timeInMs;
+      end = now;
+      this.timeRangeSelection = { type: RangeSelectionType.RELATIVE, relativeSelection: this.timeRangeOptions[0] };
+    }
+
     delete urlParams.refresh; // in case it exists
+    delete urlParams.start;
+    delete urlParams.end;
+
     this.dashboardSettings = {
       contextId: new Date().getTime().toString(),
       includeThreadGroupChart: true,
-      timeRange: range,
+      timeRange: { from: start, to: end },
       contextualFilters: urlParams,
       filterOptions: [
         {

@@ -105,6 +105,15 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
         } else {
           this._ajsLocation.path('/root/' + viewId);
         }
+        const queryParams = this._ajsLocation.search();
+        if (queryParams['tsParams']) {
+          const clear = queryParams['tsParams'].split(',');
+          clear.forEach((value: string) => {
+            delete queryParams[value];
+          });
+          delete queryParams.tsParams;
+          this._ajsLocation.search(queryParams);
+        }
         break;
     }
   }

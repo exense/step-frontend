@@ -22,6 +22,7 @@ import { TimeSeriesDashboardSettings } from '../dashboard/model/ts-dashboard-set
 import { TimeSeriesDashboardComponent } from '../dashboard/time-series-dashboard.component';
 import { FilterBarItemType } from '../performance-view/filter-bar/model/ts-filter-item';
 import { TsUtils } from '../util/ts-utils';
+import { ILocationService } from 'angular';
 
 @Component({
   selector: 'step-execution-performance',

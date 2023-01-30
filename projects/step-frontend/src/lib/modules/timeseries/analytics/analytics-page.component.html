@@ -1,7 +1,7 @@
 <div class="relative">
   <div class="header-buttons">
     <step-time-range-picker
-      [initialSelectionIndex]="0"
+      [activeSelection]="timeRangeSelection"
       [includeFullRangeOption]="false"
       [customRelativeOptions]="timeRangeOptions"
       (onSelectionChange)="onTimeRangeChange($event)"
