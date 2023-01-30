@@ -10,11 +10,11 @@ import { DOCUMENT } from '@angular/common';
   styleUrls: ['./resources-list.component.scss'],
 })
 export class ResourcesListComponent {
-  readonly dataSource = this._augmentedResourcesService.createDatasource();
+  readonly dataSource = this._resourcesService.createDatasource();
 
   constructor(
     private _resourceDialogs: ResourceDialogsService,
-    private _augmentedResourcesService: AugmentedResourcesService,
+    private _resourcesService: AugmentedResourcesService,
     @Inject(DOCUMENT) private _document: Document
   ) {}
 

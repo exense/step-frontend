@@ -17,18 +17,23 @@
         </span>
       </div>
     </div>
-    <fieldset ng-disabled="readonly">
-      <dynamic-json-editor
-        ng-if="!artefact.functionId"
-        label="'Keyword'"
-        type="keyword"
-        dynamic-value="artefact.function"
-        on-save="save()"
-      />
+    <fieldset ng-if="!artefact.functionId">
+      <step-keyword-name
+        [artefact]="artefact"
+        [is-disabled]="readonly"
+        (on-save)="save()"
+        (keyword-update)="onUpdateKeyword($event)">
+      </step-keyword-name>
     </fieldset>
 
     <fieldset ng-disabled="readonly">
-      <dynamic-json-editor label="'Input'" dynamic-value="artefact.argument" on-save="save()" />
+      <step-editable-textarea-label
+        label="Add text description"
+        [value]="artefact.description"
+        (value-change)="artefact.description = $event; save()"
+        [is-disabled]="readonly">
+      </step-editable-textarea-label>
+      <dynamic-json-editor label="'Input'" dynamic-value="artefact.argument" on-save="save()" schema="keyword.schema" is-disabled="readonly" />
       <dynamic-textfield label="'Map output to'" dynamic-value="artefact.resultMap" on-save="save()" />
 
       <div class="panel panel-default">

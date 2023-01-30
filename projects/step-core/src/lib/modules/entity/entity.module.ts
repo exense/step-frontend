@@ -11,6 +11,7 @@ import { CustomRegistriesModule } from '../custom-registeries/custom-registries.
 })
 export class EntityModule {}
 
-export * from '../entity/components/entity-icon/entity-icon.component';
-export * from '../entity/services/entity-registry';
-export * from '../entity/services/entity-scope-resolver';
+export * from './components/entity-icon/entity-icon.component';
+export * from './services/entity-registry';
+export * from './services/entity-scope-resolver';
+export * from './types/entity';

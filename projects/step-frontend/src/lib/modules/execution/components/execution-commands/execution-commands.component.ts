@@ -74,9 +74,9 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
   execute(simulate: boolean): void {
     const executionParams = this.buildExecutionParams(simulate);
     this._executionService.execute(executionParams).subscribe((eId) => {
-      setTimeout(() => this.onExecute.emit({}));
       (this._location$ as any)['$$search'] = {};
       this._location$.path(`/root/executions/${eId}`);
+      this.onExecute.emit({});
     });
   }
 

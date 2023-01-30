@@ -22,6 +22,10 @@ step-plan-editor {
   .as-split-gutter {
     background: transparent !important;
   }
+
+  .history {
+    display: none;
+  }
 }
 
 span.mat-menu-item.plan-execution-menu {

@@ -44,13 +44,17 @@ angular
       controller: function ($scope, $location, artefactTypes, AuthService) {
         $scope.authService = AuthService;
         $scope.showAttributes = true;
+        $scope.isKeyword = false;
         $scope.$watch('artefact', function () {
           if ($scope.artefact) {
             var classname = $scope.artefact._class;
+            $scope.isKeyword = classname === 'CallKeyword';
             $scope.icon = artefactTypes.getIcon(classname);
             $scope.label = artefactTypes.getLabel(classname);
             $scope.editor = artefactTypes.getEditor(classname);
             $scope.description = artefactTypes.getDescription(classname);
+          } else {
+            $scope.isKeyword = false;
           }
         });
 
@@ -103,6 +107,12 @@ angular
     showTokenSelectionParameters = false;
 
     $scope.ready = false;
+
+    $scope.keyword = undefined;
+
+    $scope.onUpdateKeyword = function(keyword) {
+      $scope.keyword = keyword;
+    }
 
     function loadFunction(id, callback) {
       $http({ url: 'rest/functions/' + id, method: 'GET' }).then(function (response) {

@@ -32,10 +32,11 @@ import {
   PlanInteractiveSessionService,
   PlanArtefactResolverService,
   ExportDialogsService,
+  RestoreDialogsService,
 } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PlanHistoryService } from '../../services/plan-history.service';
-import { catchError, filter, from, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { catchError, filter, first, from, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { ILocationService } from 'angular';
 import { InteractiveSessionService } from '../../services/interactive-session.service';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
@@ -106,6 +107,7 @@ export class PlanEditorComponent
     private _linkProcessor: LinkProcessorService,
     private _functionDialogs: FunctionDialogsService,
     public _planEditService: PlanEditorService,
+    private _restoreDialogsService: RestoreDialogsService,
     @Inject(AJS_LOCATION) private _location: ILocationService,
     @Inject(DOCUMENT) private _document: Document
   ) {}
@@ -117,7 +119,7 @@ export class PlanEditorComponent
 
   ngOnChanges(changes: SimpleChanges): void {
     const cPlanId = changes['planId'];
-    if (cPlanId?.previousValue === cPlanId?.currentValue || cPlanId?.firstChange) {
+    if (cPlanId?.previousValue !== cPlanId?.currentValue || cPlanId?.firstChange) {
       const planId = cPlanId?.currentValue;
       this.loadPlan(planId);
       (this as FieldAccessor).repositoryObjectRef = !planId
@@ -159,6 +161,25 @@ export class PlanEditorComponent
         `${this._planEditService.plan!.attributes!['name']}.sta`
       )
       .subscribe();
+  }
+
+  displayHistory(permission: string, plan: Plan): void {
+    if (!plan || !plan.id) {
+      return;
+    }
+
+    const planVersion = plan.customFields ? plan.customFields['versionId'] : undefined;
+    const versionHistory = this._planApi.getPlanHistory(plan.id!);
+
+    this._restoreDialogsService
+      .showRestoreDialog(planVersion, versionHistory, permission)
+      .subscribe((restoreVersion) => {
+        if (!restoreVersion) {
+          return;
+        }
+
+        this._planApi.restorePlanVersion(plan.id!, restoreVersion).subscribe(() => this.loadPlan(plan.id!));
+      });
   }
 
   clonePlan(): void {
