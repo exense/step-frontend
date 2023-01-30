@@ -45,6 +45,7 @@ import { DynamicFormsModule } from './modules/dynamic-forms/dynamic-forms.module
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
 import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
+import { EditableTextareaLabelWrapperComponent } from './components/editable-textarea-label-wrapper/editable-textarea-label-wrapper.component';
 
 @NgModule({
   declarations: [
@@ -76,6 +77,7 @@ import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
     IsChartEmptyPipe,
     KeywordNameComponent,
     DynamicAttributePipe,
+    EditableTextareaLabelWrapperComponent,
   ],
   imports: [
     CommonModule,
@@ -137,6 +139,7 @@ import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
     IsChartEmptyPipe,
     KeywordNameComponent,
     DynamicAttributePipe,
+    EditableTextareaLabelWrapperComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -173,6 +176,7 @@ export { AutorefreshToggleComponent } from './components/autorefresh-toggle/auto
 export { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';
 export { EditableLabelComponent } from './components/editable-label/editable-label.component';
 export { EditableTextareaLabelComponent } from './components/editable-textarea-label/editable-textarea-label.component';
+export { EditableTextareaLabelWrapperComponent } from './components/editable-textarea-label-wrapper/editable-textarea-label-wrapper.component';
 export { FunctionLinkDialogService } from './components/function-link/function-link-dialog.service';
 export { FunctionLinkComponent } from './components/function-link/function-link.component';
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';

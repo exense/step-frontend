@@ -1,0 +1,10 @@
+<ng-template #labelTemplate>
+  {{ label }}
+</ng-template>
+<step-editable-textarea-label
+  [labelTemplate]="labelTemplate"
+  [ngModel]="value"
+  (ngModelChange)="valueChange.emit($event)"
+  [disabled]="isDisabled"
+>
+</step-editable-textarea-label>
