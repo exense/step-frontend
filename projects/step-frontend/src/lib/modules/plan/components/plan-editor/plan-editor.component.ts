@@ -119,7 +119,7 @@ export class PlanEditorComponent
 
   ngOnChanges(changes: SimpleChanges): void {
     const cPlanId = changes['planId'];
-    if (cPlanId?.previousValue === cPlanId?.currentValue || cPlanId?.firstChange) {
+    if (cPlanId?.previousValue !== cPlanId?.currentValue || cPlanId?.firstChange) {
       const planId = cPlanId?.currentValue;
       this.loadPlan(planId);
       (this as FieldAccessor).repositoryObjectRef = !planId
