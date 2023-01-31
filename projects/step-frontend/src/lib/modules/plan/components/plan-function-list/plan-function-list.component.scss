@@ -1,18 +1,12 @@
-@use 'projects/step-core/styles/core-mixins' as core;
-
-.plans-function-name-searchfield {
-  width: 85%;
+.function-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-step-btn-group {
-  float: right;
-  margin-left: 1rem;
-}
-
-:host {
-  @include core.table-container;
-}
-
-.header {
-  @include core.table-header;
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
 }

@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Component, EventEmitter, Inject, Output } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_LOCATION,

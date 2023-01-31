@@ -1,13 +1,20 @@
 @use 'projects/step-core/styles/core-mixins' as core;
+@use 'projects/step-core/styles/core-variables' as var;
 
 step-plan-editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  [stepPlanEditorKeyHandler] {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
   .editor-header {
     display: flex;
     justify-content: space-between;
-  }
-
-  & > div {
-    height: 100%;
   }
 
   mat-card.editor-card {
@@ -21,6 +28,12 @@ step-plan-editor {
 
   .as-split-gutter {
     background: transparent !important;
+    border-left: 1px solid var.$gray-200 !important;
+    border-right: 1px solid var.$gray-200 !important;
+  }
+
+  .as-split-area section {
+    padding: 24px;
   }
 }
 
@@ -38,5 +51,28 @@ span.mat-menu-item.plan-execution-menu {
     width: 250px;
     display: block;
     padding: 5px;
+  }
+}
+
+.actions-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var.$gray-200;
+  padding: 8px 24px 24px;
+
+  .editable-labels {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+.plan-type-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  step-icon {
+    @include core.step-icon-size(16px);
+    display: flex;
   }
 }

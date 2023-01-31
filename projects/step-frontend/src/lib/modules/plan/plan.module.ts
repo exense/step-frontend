@@ -15,6 +15,7 @@ import { PlanListComponent } from './components/plan-list/plan-list.component';
 import { PlanOtherplanListComponent } from './components/plan-otherplan-list/plan-otherplan-list.component';
 import { PlanEditorKeyHandlerDirective } from './directives/plan-editor-key-handler.directive';
 import { PlanTreeEditorComponent } from './components/plan-tree-editor/plan-tree-editor.component';
+import { PlanEditorActionsComponent } from './components/plan-editor-actions/plan-editor-actions.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { PlanTreeEditorComponent } from './components/plan-tree-editor/plan-tree
     PlanEditorComponent,
     PlanEditorKeyHandlerDirective,
     PlanTreeEditorComponent,
+    PlanEditorActionsComponent,
   ],
   imports: [StepCommonModule, ExecutionModule],
   exports: [PlanListComponent, PlanOtherplanListComponent, PlanFunctionListComponent, PlanArtefactListComponent],
@@ -39,6 +41,6 @@ export class PlanModule {
     _entityRegistry.register('plans', 'Plan', 'file', '/partials/plans/planSelectionTable.html');
     _cellsRegister.registerCell('planEntityIcon', PlanIconComponent);
     _cellsRegister.registerCell('planLink', PlanLinkComponent);
-    _planTypeRegistry.register('step.core.plans.Plan', 'Default', PlanTreeEditorComponent);
+    _planTypeRegistry.register('step.core.plans.Plan', 'Visual plan editor', PlanTreeEditorComponent);
   }
 }

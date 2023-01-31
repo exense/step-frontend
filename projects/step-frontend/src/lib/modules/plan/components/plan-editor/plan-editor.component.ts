@@ -1,3 +1,4 @@
+import { DOCUMENT } from '@angular/common';
 import {
   Component,
   forwardRef,
@@ -10,38 +11,39 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AbstractArtefact,
   AJS_LOCATION,
   AJS_MODULE,
+  ArtefactTreeNode,
+  AugmentedScreenService,
   AuthService,
   CallFunction,
   DialogsService,
+  ExportDialogsService,
+  Function as KeywordCall,
   KeywordsService,
   LinkProcessorService,
   Mutable,
   Plan,
-  PlansService,
-  RepositoryObjectReference,
-  TreeStateService,
-  Function as KeywordCall,
-  TreeNodeUtilsService,
-  AugmentedScreenService,
-  ArtefactTreeNode,
+  PlanArtefactResolverService,
   PlanEditorService,
   PlanInteractiveSessionService,
-  PlanArtefactResolverService,
-  ExportDialogsService,
+  PlansService,
+  RepositoryObjectReference,
+  TreeNodeUtilsService,
+  TreeStateService,
 } from '@exense/step-core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { PlanHistoryService } from '../../services/plan-history.service';
-import { catchError, filter, from, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { ILocationService } from 'angular';
-import { InteractiveSessionService } from '../../services/interactive-session.service';
+import { catchError, filter, from, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
-import { DOCUMENT } from '@angular/common';
 import { ArtefactTreeNodeUtilsService } from '../../services/artefact-tree-node-utils.service';
+import { ArtefactService } from '../../services/artefact.service';
+import { InteractiveSessionService } from '../../services/interactive-session.service';
+import { PlanHistoryService } from '../../services/plan-history.service';
 
 type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef' | 'componentTabs' | 'planClass'>>;
 
@@ -93,6 +95,16 @@ export class PlanEditorComponent
 
   readonly planClass?: string;
 
+  planTypes$ = this._planApi.getArtefactTemplates().pipe(
+    map((planTypes) => {
+      return planTypes.map((planType) => ({
+        planType,
+        icon: this._artefactService.getIconNg2(planType),
+      }));
+    })
+  );
+  planTypeControl = new FormControl<{ planType: string; icon: string } | null>(null);
+
   constructor(
     public _interactiveSession: InteractiveSessionService,
     private _treeState: TreeStateService<AbstractArtefact, ArtefactTreeNode>,
@@ -105,6 +117,7 @@ export class PlanEditorComponent
     private _dialogsService: DialogsService,
     private _linkProcessor: LinkProcessorService,
     private _functionDialogs: FunctionDialogsService,
+    private _artefactService: ArtefactService,
     public _planEditService: PlanEditorService,
     @Inject(AJS_LOCATION) private _location: ILocationService,
     @Inject(DOCUMENT) private _document: Document
@@ -113,6 +126,7 @@ export class PlanEditorComponent
   ngOnInit(): void {
     this._interactiveSession.init();
     this.initConsoleTabToggle();
+    this.initPlanTypeChanges();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -281,6 +295,10 @@ export class PlanEditorComponent
       )
       .subscribe((plan) => {
         (this as FieldAccessor).planClass = plan._class;
+        this.planTypeControl.setValue({
+          planType: plan.root!._class,
+          icon: this._artefactService.getIconNg2(plan.root!._class),
+        });
         this._planEditService.init(plan);
       });
   }
@@ -344,6 +362,27 @@ export class PlanEditorComponent
       artefact.dynamicName.dynamic = artefact.useDynamicName;
     }
     (artefact.children || []).forEach((child) => this.synchronizeDynamicName(child));
+  }
+
+  private initPlanTypeChanges(): void {
+    this.planTypeControl.valueChanges.pipe(takeUntil(this.terminator$)).subscribe((item) => {
+      if (!item || !this._planEditService.plan) {
+        return;
+      }
+
+      const plan = {
+        ...this._planEditService.plan,
+        root: {
+          ...this._planEditService.plan!.root,
+          _class: item.planType,
+        },
+      } as Plan;
+
+      this._planApi.savePlan(plan).subscribe((plan) => {
+        (this as FieldAccessor).planClass = plan._class;
+        this._planEditService.init(plan);
+      });
+    });
   }
 }
 

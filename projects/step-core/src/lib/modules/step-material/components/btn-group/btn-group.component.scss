@@ -1,0 +1,36 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-btn-group.with-borders {
+  display: inline-flex;
+  border-radius: 8px;
+  border: 1px solid var.$gray-300;
+
+  .mat-stroked-button {
+    border: 0;
+    border-radius: 0;
+    padding: 0 12px;
+    height: 36px;
+    line-height: 36px;
+    min-width: auto;
+
+    step-icon {
+      display: flex;
+    }
+
+    &:not(:last-of-type):first-of-type {
+      border-radius: 8px 0 0 8px;
+    }
+
+    &:not(:first-of-type):last-of-type {
+      border-radius: 0 8px 8px 0;
+    }
+
+    &:only-of-type {
+      border-radius: 8px;
+    }
+
+    &:not(:last-of-type) {
+      border-right: 1px solid var.$gray-300;
+    }
+  }
+}
