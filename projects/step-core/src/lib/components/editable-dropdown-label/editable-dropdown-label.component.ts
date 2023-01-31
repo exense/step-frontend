@@ -33,8 +33,6 @@ export class EditableDropdownLabelComponent<T> extends EditableComponent<T> {
 
   @ViewChild(MatSelect, { read: ElementRef }) matSelectElementRef?: ElementRef<HTMLElement>;
 
-  opened?: boolean;
-
   constructor(
     _elementRef: ElementRef<HTMLElement>,
     _changeDetectorRef: ChangeDetectorRef,
@@ -55,8 +53,6 @@ export class EditableDropdownLabelComponent<T> extends EditableComponent<T> {
   }
 
   onOpenedChange(opened: boolean): void {
-    this.opened = true;
-
     if (opened) {
       return;
     }

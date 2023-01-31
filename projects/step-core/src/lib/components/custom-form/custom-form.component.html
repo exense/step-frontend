@@ -2,7 +2,6 @@
   *ngFor="let input of inputs"
   [stInput]="input"
   [disabled]="stDisabled"
-  [matTooltip]="input.label || ''"
   [ngModel]="stModel | stepCustomFormInputModel: input"
   (ngModelChange)="onInputValueChange(input, $event)"
 ></step-custom-form-inputs>

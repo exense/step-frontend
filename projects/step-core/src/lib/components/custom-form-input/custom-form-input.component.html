@@ -4,6 +4,7 @@
   <ng-container *ngSwitchCase="InputType.TEXT">
     <step-editable-label
       [labelTemplate]="labelTemplate"
+      [tooltip]="input?.label || ''"
       [ngModel]="value"
       (ngModelChange)="onValueChange($event)"
       (stateChange)="onStateChange()"
@@ -17,6 +18,7 @@
       [labelTemplate]="labelTemplate"
       [items]="dropdownItems"
       [itemTemplate]="dropdownItemTemplate"
+      [tooltip]="input?.label || ''"
       [ngModel]="value"
       (ngModelChange)="onValueChange($event)"
       (stateChange)="onStateChange()"
@@ -30,6 +32,7 @@
       [labelTemplate]="labelTemplate"
       [items]="checkboxItems"
       [itemTemplate]="checkboxItemTemplate"
+      [tooltip]="input?.label || ''"
       [ngModel]="value"
       (ngModelChange)="onValueChange($event)"
       (stateChange)="onStateChange()"
