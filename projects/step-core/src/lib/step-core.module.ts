@@ -8,6 +8,8 @@ import { UpgradeModule } from '@angular/upgrade/static';
 import { AngularSplitModule } from 'angular-split';
 import { StepGeneratedClientModule } from './client/generated';
 import { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
+import { CustomFormInputComponent } from './components/custom-form-input/custom-form-input.component';
+import { CustomFormComponent } from './components/custom-form/custom-form.component';
 import { DynamicTextfieldComponent } from './components/dynamic-textfield/dynamic-textfield.component';
 import { EditableActionsComponent } from './components/editable-actions/editable-actions.component';
 import { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';
@@ -28,6 +30,7 @@ import { UploadContainerComponent } from './components/upload-container/upload-c
 import { CORE_INITIALIZER } from './core-initialiser';
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { CapsLockDirective } from './directives/caps-lock.directive';
+import { SimpleLineChartDirective } from './directives/simple-line-chart.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 import { TooltipDirective } from './directives/tooltip.directive';
 import { StepBasicsModule } from './modules/basics/step-basics.module';
@@ -38,11 +41,11 @@ import { StepMaterialModule } from './modules/step-material/step-material.module
 import { TableModule } from './modules/table/table.module';
 import { TabsModule } from './modules/tabs/tabs.module';
 import { TreeModule } from './modules/tree/tree.module';
+import { CustomFormInputModelPipe } from './pipes/custom-form-input-model.pipe';
 import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
+import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
-import { SimpleLineChartDirective } from './directives/simple-line-chart.directive';
-import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 
 @NgModule({
   declarations: [
@@ -73,6 +76,9 @@ import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
     EditableTextareaLabelComponent,
     EditableDropdownLabelComponent,
     IsChartEmptyPipe,
+    CustomFormComponent,
+    CustomFormInputComponent,
+    CustomFormInputModelPipe,
   ],
   imports: [
     CommonModule,
@@ -130,6 +136,8 @@ import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
     EditableTextareaLabelComponent,
     EditableDropdownLabelComponent,
     IsChartEmptyPipe,
+    CustomFormComponent,
+    CustomFormInputComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -163,6 +171,8 @@ export type { OpenAPIConfig } from './client/generated/core/OpenAPI';
 export * from './client/generated/index';
 export * from './client/step-client-module';
 export { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
+export { CustomFormInputComponent } from './components/custom-form-input/custom-form-input.component';
+export { CustomFormComponent } from './components/custom-form/custom-form.component';
 export { DynamicTextfieldComponent } from './components/dynamic-textfield/dynamic-textfield.component';
 export { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';
 export { EditableLabelComponent } from './components/editable-label/editable-label.component';
@@ -182,9 +192,9 @@ export { UploadContainerComponent } from './components/upload-container/upload-c
 export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';
+export * from './directives/simple-line-chart.directive';
 export * from './directives/tooltip-immediate-close.directive';
 export * from './directives/tooltip.directive';
-export * from './directives/simple-line-chart.directive';
 export * from './domain';
 export * from './modules/async-operations/async-operations.module';
 export * from './modules/basics/step-basics.module';
@@ -197,12 +207,13 @@ export * from './modules/table/table.module';
 export * from './modules/tabs/tabs.module';
 export * from './modules/tree/tree.module';
 export * from './pipes/dashboard-link.pipe';
-export * from './pipes/matching-authenticator.pipe';
 export * from './pipes/is-chart-empty.pipe';
+export * from './pipes/matching-authenticator.pipe';
 export { PlanNamePipe } from './pipes/plan-name.pipe';
 export * from './services/additional-right-rule.service';
 export * from './services/dashboard.service';
 export * from './services/deferred-link-processor.service';
+export * from './services/execution-close-handle.service';
 export { ExportDialogsService } from './services/export-dialogs.service';
 export { ImportDialogsService } from './services/import-dialogs.service';
 export * from './services/invoke-run.service';
@@ -217,5 +228,4 @@ export * from './services/scheduled-task-dialogs.service';
 export { UibModalHelperService, UibModalInstance } from './services/uib-modal-helper.service';
 export * from './services/view-registry.service';
 export * from './services/view-state.service';
-export * from './services/execution-close-handle.service';
 export * from './shared';

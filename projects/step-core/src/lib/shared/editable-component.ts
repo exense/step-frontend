@@ -1,4 +1,13 @@
-import { ChangeDetectorRef, Component, ElementRef, HostListener, Input, TemplateRef } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  Input,
+  Output,
+  TemplateRef,
+} from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
 
 export enum EditableComponentState {
@@ -16,6 +25,8 @@ type OnTouch = () => void;
 })
 export class EditableComponent<T> implements ControlValueAccessor {
   @Input() labelTemplate!: TemplateRef<{}>;
+
+  @Output() stateChange = new EventEmitter<EditableComponentState>();
 
   protected readonly State = EditableComponentState;
 
@@ -86,17 +97,20 @@ export class EditableComponent<T> implements ControlValueAccessor {
 
   protected onLabelClick(): void {
     this.state = EditableComponentState.EDITABLE;
+    this.stateChange.emit(this.state);
     this.newValue = this.value;
     this._changeDetectorRef.detectChanges();
   }
 
   protected onCancel(): void {
     this.state = EditableComponentState.READABLE;
+    this.stateChange.emit(this.state);
     delete this.newValue;
   }
 
   protected onApply(): void {
     this.state = EditableComponentState.READABLE;
+    this.stateChange.emit(this.state);
     this.value = this.newValue;
     this.onChange?.(this.newValue);
   }

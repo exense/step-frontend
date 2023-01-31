@@ -1,0 +1,38 @@
+<ng-template #labelTemplate>{{ input?.label }}</ng-template>
+
+<ng-container [ngSwitch]="input?.type">
+  <ng-container *ngSwitchCase="InputType.TEXT">
+    <step-editable-label
+      [labelTemplate]="labelTemplate"
+      [ngModel]="value"
+      (ngModelChange)="onValueChange($event)"
+      (stateChange)="onStateChange()"
+    ></step-editable-label>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="InputType.DROPDOWN">
+    <ng-template #dropdownItemTemplate let-item>{{ item }}</ng-template>
+
+    <step-editable-dropdown-label
+      [labelTemplate]="labelTemplate"
+      [items]="dropdownItems"
+      [itemTemplate]="dropdownItemTemplate"
+      [ngModel]="value"
+      (ngModelChange)="onValueChange($event)"
+      (stateChange)="onStateChange()"
+    ></step-editable-dropdown-label>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="InputType.CHECKBOX">
+    <ng-template #checkboxItemTemplate let-item>{{ item }}</ng-template>
+
+    <step-editable-dropdown-label
+      [labelTemplate]="labelTemplate"
+      [items]="checkboxItems"
+      [itemTemplate]="checkboxItemTemplate"
+      [ngModel]="value"
+      (ngModelChange)="onValueChange($event)"
+      (stateChange)="onStateChange()"
+    ></step-editable-dropdown-label>
+  </ng-container>
+</ng-container>
