@@ -10,26 +10,21 @@ import { StepGeneratedClientModule } from './client/generated';
 import { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
 import { CustomFormInputComponent } from './components/custom-form-input/custom-form-input.component';
 import { CustomFormComponent } from './components/custom-form/custom-form.component';
-import { DynamicTextfieldComponent } from './components/dynamic-textfield/dynamic-textfield.component';
 import { EditableActionsComponent } from './components/editable-actions/editable-actions.component';
 import { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';
 import { EditableLabelComponent } from './components/editable-label/editable-label.component';
 import { EditableTextareaLabelComponent } from './components/editable-textarea-label/editable-textarea-label.component';
-import { ExpressionInputComponent } from './components/expression-input/expression-input.component';
 import { FunctionLinkComponent } from './components/function-link/function-link.component';
 import { IsUsedByListComponent } from './components/is-used-by-list/is-used-by-list.component';
 import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 import { ModalWindowComponent } from './components/modal-window/modal-window.component';
 import { PlanLinkComponent } from './components/plan-link/plan-link.component';
 import { PlanTreeActionsComponent } from './components/plan-tree-actions/plan-tree-actions.component';
-import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
 import { SelectPlanComponent } from './components/select-plan/select-plan.component';
-import { SettingBtnComponent } from './components/setting-btn/setting-btn.component';
 import { UploadContainerComponent } from './components/upload-container/upload-container.component';
 import { CORE_INITIALIZER } from './core-initialiser';
-import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { CapsLockDirective } from './directives/caps-lock.directive';
 import { SimpleLineChartDirective } from './directives/simple-line-chart.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
@@ -47,6 +42,14 @@ import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
+import { SettingBtnComponent } from './components/setting-btn/setting-btn.component';
+import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
+import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
+import { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
+import { DynamicFormsModule } from './modules/dynamic-forms/dynamic-forms.module';
+import { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
+import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
+import { EditableTextareaLabelWrapperComponent } from './components/editable-textarea-label-wrapper/editable-textarea-label-wrapper.component';
 
 @NgModule({
   declarations: [
@@ -62,8 +65,6 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     IsUsedByListComponent,
     IsUsedByModalComponent,
     FunctionLinkComponent,
-    ExpressionInputComponent,
-    DynamicTextfieldComponent,
     SelectPlanComponent,
     AutorefreshToggleComponent,
     SettingBtnComponent,
@@ -71,12 +72,16 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     ProgressBarComponent,
     ArtefactDetailsDirective,
     PlanTreeComponent,
+    RestoreDialogComponent,
     SimpleLineChartDirective,
     EditableActionsComponent,
     EditableLabelComponent,
     EditableTextareaLabelComponent,
     EditableDropdownLabelComponent,
     IsChartEmptyPipe,
+    KeywordNameComponent,
+    DynamicAttributePipe,
+    EditableTextareaLabelWrapperComponent,
     PlanTreeActionsComponent,
     CustomFormComponent,
     CustomFormInputComponent,
@@ -98,6 +103,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     TabsModule,
     TreeModule,
     AngularSplitModule,
+    DynamicFormsModule,
   ],
   exports: [
     CommonModule,
@@ -125,7 +131,6 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     PlanNamePipe,
     ModalWindowComponent,
     IsUsedByModalComponent,
-    DynamicTextfieldComponent,
     SelectPlanComponent,
     PlanTreeComponent,
     ArtefactDetailsDirective,
@@ -133,13 +138,18 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     SettingBtnComponent,
     UploadContainerComponent,
     ProgressBarComponent,
+    RestoreDialogComponent,
     SimpleLineChartDirective,
     EditableLabelComponent,
     EditableTextareaLabelComponent,
     EditableDropdownLabelComponent,
+    DynamicFormsModule,
     IsChartEmptyPipe,
+    KeywordNameComponent,
+    DynamicAttributePipe,
     CustomFormComponent,
     CustomFormInputComponent,
+    EditableTextareaLabelWrapperComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -175,18 +185,19 @@ export * from './client/step-client-module';
 export { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
 export { CustomFormInputComponent } from './components/custom-form-input/custom-form-input.component';
 export { CustomFormComponent } from './components/custom-form/custom-form.component';
-export { DynamicTextfieldComponent } from './components/dynamic-textfield/dynamic-textfield.component';
 export { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';
 export { EditableLabelComponent } from './components/editable-label/editable-label.component';
 export { EditableTextareaLabelComponent } from './components/editable-textarea-label/editable-textarea-label.component';
-export { ExpressionInputComponent } from './components/expression-input/expression-input.component';
+export { EditableTextareaLabelWrapperComponent } from './components/editable-textarea-label-wrapper/editable-textarea-label-wrapper.component';
 export { FunctionLinkDialogService } from './components/function-link/function-link-dialog.service';
 export { FunctionLinkComponent } from './components/function-link/function-link.component';
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
+export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
 export { ModalWindowComponent } from './components/modal-window/modal-window.component';
 export { PlanLinkComponent } from './components/plan-link/plan-link.component';
 export * from './components/plan-tree/plan-tree.component';
 export { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
+export { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 export * from './components/report-node-status/report-node-status.component';
 export { SelectPlanComponent } from './components/select-plan/select-plan.component';
 export { SettingBtnComponent } from './components/setting-btn/setting-btn.component';
@@ -208,8 +219,10 @@ export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
 export * from './modules/tabs/tabs.module';
 export * from './modules/tree/tree.module';
+export * from './modules/dynamic-forms/dynamic-forms.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/is-chart-empty.pipe';
+export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/matching-authenticator.pipe';
 export { PlanNamePipe } from './pipes/plan-name.pipe';
 export * from './services/additional-right-rule.service';
@@ -230,4 +243,5 @@ export * from './services/scheduled-task-dialogs.service';
 export { UibModalHelperService, UibModalInstance } from './services/uib-modal-helper.service';
 export * from './services/view-registry.service';
 export * from './services/view-state.service';
+export * from './services/restore-dialogs.service';
 export * from './shared';

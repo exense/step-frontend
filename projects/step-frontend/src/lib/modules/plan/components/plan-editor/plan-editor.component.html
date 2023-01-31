@@ -22,6 +22,19 @@
           [itemTemplate]="itemTemplate"
           [formControl]="planTypeControl"
         ></step-editable-dropdown-label>
+
+        <ng-container *ngIf="_planEditService.plan$ | async as plan">
+          <button
+            type="button"
+            mat-icon-button
+            (click)="displayHistory('plan-write', plan)"
+            matTooltip="Display version history"
+            class="history"
+            matTooltipPosition="below"
+          >
+            <step-icon name="git-branch"></step-icon>
+          </button>
+        </ng-container>
       </ng-container>
 
       <step-custom-forms

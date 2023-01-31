@@ -125,7 +125,7 @@ export class ExecutionProgressComponent
   @Input() activeTabId?: string;
   @Output() activeTabIdChange = new EventEmitter<string>();
   @Output() titleUpdate = new EventEmitter<{ eId: string; execution: Execution }>();
-  @Output() close = new EventEmitter<string>();
+  @Output() close = new EventEmitter<{ eId: string; openList?: boolean }>();
 
   throughputchart: any | { series: any[]; data: any[][] } = {};
 
@@ -236,8 +236,9 @@ export class ExecutionProgressComponent
     this.activeTabIdChange.emit(tabId);
   }
 
-  closeExecution(): void {
-    this.close.emit(this.eId!);
+  closeExecution(openList: boolean = true): void {
+    const eId = this.eId!;
+    this.close.emit({ eId, openList });
   }
 
   private initTabs(): void {
@@ -285,7 +286,8 @@ export class ExecutionProgressComponent
       this.onExecutionStatusUpdate(execution?.status);
       this.execution = execution;
       this.determineDefaultSelection();
-      const showTestCaseCurrentOperation = (execution.parameters as any as { key: string; value: string }[]).find(
+      const parameters: { key: string; value: string }[] = (execution.parameters as any) || [];
+      const showTestCaseCurrentOperation = parameters.find(
         (o) => o.key === 'step.executionView.testcases.current-operations'
       );
       this.showTestCaseCurrentOperation = showTestCaseCurrentOperation?.value.toLowerCase() === 'true';

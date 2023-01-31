@@ -26,7 +26,6 @@ import {
   Function as KeywordCall,
   KeywordsService,
   LinkProcessorService,
-  Mutable,
   Plan,
   PlanArtefactResolverService,
   PlanEditorService,
@@ -35,6 +34,7 @@ import {
   RepositoryObjectReference,
   TreeNodeUtilsService,
   TreeStateService,
+  RestoreDialogsService,
 } from '@exense/step-core';
 import { ILocationService } from 'angular';
 import { catchError, filter, from, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
@@ -44,8 +44,6 @@ import { ArtefactTreeNodeUtilsService } from '../../services/artefact-tree-node-
 import { ArtefactService } from '../../services/artefact.service';
 import { InteractiveSessionService } from '../../services/interactive-session.service';
 import { PlanHistoryService } from '../../services/plan-history.service';
-
-type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef' | 'componentTabs' | 'planClass'>>;
 
 @Component({
   selector: 'step-plan-editor',
@@ -81,7 +79,7 @@ export class PlanEditorComponent
 
   @Input() planId?: string;
 
-  readonly componentTabs = [
+  protected componentTabs = [
     { id: 'controls', label: 'Controls' },
     { id: 'keywords', label: 'Keywords' },
     { id: 'other', label: 'Other Plans' },
@@ -91,9 +89,9 @@ export class PlanEditorComponent
 
   readonly isInteractiveSessionActive$ = this._interactiveSession.isActive$;
 
-  readonly repositoryObjectRef?: RepositoryObjectReference;
+  protected repositoryObjectRef?: RepositoryObjectReference;
 
-  readonly planClass?: string;
+  protected planClass?: string;
 
   planTypes$ = this._planApi.getArtefactTemplates().pipe(
     map((planTypes) => {
@@ -119,6 +117,7 @@ export class PlanEditorComponent
     private _functionDialogs: FunctionDialogsService,
     private _artefactService: ArtefactService,
     public _planEditService: PlanEditorService,
+    private _restoreDialogsService: RestoreDialogsService,
     @Inject(AJS_LOCATION) private _location: ILocationService,
     @Inject(DOCUMENT) private _document: Document
   ) {}
@@ -131,10 +130,10 @@ export class PlanEditorComponent
 
   ngOnChanges(changes: SimpleChanges): void {
     const cPlanId = changes['planId'];
-    if (cPlanId?.previousValue === cPlanId?.currentValue || cPlanId?.firstChange) {
+    if (cPlanId?.previousValue !== cPlanId?.currentValue || cPlanId?.firstChange) {
       const planId = cPlanId?.currentValue;
       this.loadPlan(planId);
-      (this as FieldAccessor).repositoryObjectRef = !planId
+      this.repositoryObjectRef = !planId
         ? undefined
         : {
             repositoryID: 'local',
@@ -173,6 +172,25 @@ export class PlanEditorComponent
         `${this._planEditService.plan!.attributes!['name']}.sta`
       )
       .subscribe();
+  }
+
+  displayHistory(permission: string, plan: Plan): void {
+    if (!plan || !plan.id) {
+      return;
+    }
+
+    const planVersion = plan.customFields ? plan.customFields['versionId'] : undefined;
+    const versionHistory = this._planApi.getPlanHistory(plan.id!);
+
+    this._restoreDialogsService
+      .showRestoreDialog(planVersion, versionHistory, permission)
+      .subscribe((restoreVersion) => {
+        if (!restoreVersion) {
+          return;
+        }
+
+        this._planApi.restorePlanVersion(plan.id!, restoreVersion).subscribe(() => this.loadPlan(plan.id!));
+      });
   }
 
   clonePlan(): void {
@@ -294,7 +312,7 @@ export class PlanEditorComponent
         })
       )
       .subscribe((plan) => {
-        (this as FieldAccessor).planClass = plan._class;
+        this.planClass = plan._class;
         this.planTypeControl.setValue({
           planType: plan.root!._class,
           icon: this._artefactService.getIconNg2(plan.root!._class),
@@ -304,21 +322,26 @@ export class PlanEditorComponent
   }
 
   private initConsoleTabToggle(): void {
+    const consoleTab = { id: 'console', label: 'Console' };
     this._interactiveSession.isActive$
       .pipe(
         filter((shouldConsoleExists) => {
-          const hasConsole = this.componentTabs.some((tab) => tab.id === 'console');
+          const hasConsole = this.componentTabs.some((tab) => tab.id === consoleTab.id);
           return hasConsole !== shouldConsoleExists;
         }),
-        map((shouldConsoleExists) => {
-          return shouldConsoleExists
-            ? [...this.componentTabs, { id: 'console', label: 'Console' }]
-            : this.componentTabs.filter((tab) => tab.id !== 'console');
+        map((withConsole) => {
+          const tabs = withConsole
+            ? [...this.componentTabs, { ...consoleTab }]
+            : this.componentTabs.filter((tab) => tab.id !== consoleTab.id);
+          return { tabs, withConsole };
         }),
         takeUntil(this.terminator$)
       )
-      .subscribe((tabs) => {
-        (this as FieldAccessor).componentTabs = tabs;
+      .subscribe(({ tabs, withConsole }) => {
+        this.componentTabs = tabs;
+        if (withConsole) {
+          this.selectedTab = consoleTab.id;
+        }
       });
   }
 

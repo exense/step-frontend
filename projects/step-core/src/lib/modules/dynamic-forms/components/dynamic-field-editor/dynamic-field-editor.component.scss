@@ -1,0 +1,20 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+.toggle-bar {
+  margin-top: 3.2rem;
+  background: var.$gray-50;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  justify-content: space-between;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+
+  & > div {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+}
