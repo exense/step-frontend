@@ -48,7 +48,7 @@
     <button type="button" mat-stroked-button [matMenuTriggerFor]="executionParametersMenu">Session parameters</button>
 
     <mat-menu #executionParametersMenu="matMenu">
-      <!-- <span
+      <span
         class="plan-execution-menu"
         mat-menu-item
         [disableRipple]="true"
@@ -56,7 +56,7 @@
       >
         <step-custom-form [stModel]="_interactiveSession.executionParameters" stScreen="executionParameters">
         </step-custom-form>
-      </span> -->
+      </span>
     </mat-menu>
   </ng-container>
 
@@ -65,8 +65,9 @@
   </button>
 
   <mat-menu #executionMenu="matMenu">
-    <!-- <span class="plan-execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()"> -->
-    <step-plan-execution [description]="description" [repositoryObjectRef]="repositoryObjectRef"> </step-plan-execution>
-    <!-- </span> -->
+    <span class="plan-execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
+      <step-plan-execution [description]="description" [repositoryObjectRef]="repositoryObjectRef">
+      </step-plan-execution>
+    </span>
   </mat-menu>
 </step-btn-group>

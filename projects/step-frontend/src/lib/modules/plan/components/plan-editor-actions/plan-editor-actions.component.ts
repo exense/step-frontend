@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RepositoryObjectReference } from '@exense/step-core';
+import { InteractiveSessionService } from '../../services/interactive-session.service';
 
 @Component({
   selector: 'step-plan-editor-actions',
@@ -21,4 +22,6 @@ export class PlanEditorActionsComponent {
   @Output() startInteractive = new EventEmitter<void>();
   @Output() reset = new EventEmitter<void>();
   @Output() stop = new EventEmitter<void>();
+
+  constructor(public _interactiveSession: InteractiveSessionService) {}
 }
