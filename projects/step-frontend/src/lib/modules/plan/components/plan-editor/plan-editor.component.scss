@@ -28,6 +28,12 @@ step-plan-editor {
 
   .as-split-gutter {
     background: transparent !important;
+    border-left: 1px solid var.$gray-200 !important;
+    border-right: 1px solid var.$gray-200 !important;
+  }
+
+  .as-split-area section {
+    padding: 24px;
   }
 
   .history {
