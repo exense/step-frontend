@@ -402,7 +402,7 @@ export class PlanEditorComponent
       } as Plan;
 
       this._planApi.savePlan(plan).subscribe((plan) => {
-        (this as FieldAccessor).planClass = plan._class;
+        this.planClass = plan._class;
         this._planEditService.init(plan);
       });
     });
