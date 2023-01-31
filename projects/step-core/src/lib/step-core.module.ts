@@ -236,7 +236,6 @@ export * from './pipes/dashboard-link.pipe';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/is-chart-empty.pipe';
 export * from './pipes/matching-authenticator.pipe';
-export * from './pipes/matching-authenticator.pipe';
 export { PlanNamePipe } from './pipes/plan-name.pipe';
 export * from './services/additional-right-rule.service';
 export * from './services/dashboard.service';
