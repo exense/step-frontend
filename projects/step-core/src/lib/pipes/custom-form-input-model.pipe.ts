@@ -4,6 +4,7 @@ import { getObjectFieldValue } from '../shared';
 
 @Pipe({
   name: 'stepCustomFormInputModel',
+  pure: false,
 })
 export class CustomFormInputModelPipe implements PipeTransform {
   transform(object: Record<string, unknown>, input: StInput): unknown {

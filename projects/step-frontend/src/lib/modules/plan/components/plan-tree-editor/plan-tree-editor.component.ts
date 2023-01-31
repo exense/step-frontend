@@ -210,9 +210,7 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
   }
 
   handlePlanChange(): void {
-    this.planChange$.next({
-      ...this.plan!,
-    });
+    this.planChange$.next(this.plan!);
   }
 
   moveUp(node?: AbstractArtefact): void {
