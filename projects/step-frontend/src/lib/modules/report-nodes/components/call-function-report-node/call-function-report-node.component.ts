@@ -20,7 +20,7 @@ export class CallFunctionReportNodeComponent implements OnChanges {
 
   execution: Execution;
 
-  constructor(private executionService: ExecutionStateService) {
+  constructor(executionService: ExecutionStateService) {
     this.execution = executionService.execution!;
   }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE } from '@exense/step-core';
 import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
@@ -17,7 +17,7 @@ import { Subject, takeUntil, timer } from 'rxjs';
   templateUrl: './analytics-page.component.html',
   styleUrls: ['./analytics-page.component.scss'],
 })
-export class AnalyticsPageComponent implements OnInit {
+export class AnalyticsPageComponent implements OnInit, OnDestroy {
   @ViewChild('dashboard') dashboard!: TimeSeriesDashboardComponent;
   dashboardSettings: TimeSeriesDashboardSettings | undefined;
 
@@ -159,6 +159,11 @@ export class AnalyticsPageComponent implements OnInit {
         break;
     }
     return newFullRange;
+  }
+
+  ngOnDestroy(): void {
+    this.terminator$.next();
+    this.terminator$.complete();
   }
 }
 
