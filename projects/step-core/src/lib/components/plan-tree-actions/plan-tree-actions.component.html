@@ -1,0 +1,71 @@
+<step-btn-group class="with-borders">
+  <ng-container *ngIf="!isReadonly">
+    <button
+      type="button"
+      mat-stroked-button
+      [disabled]="!('plan-write' | hasRight | async)"
+      matTooltip="Move selected node upward (Ctrl + ⬆️)"
+      matTooltipPosition="below"
+      (click)="moveUp.emit()"
+    >
+      <step-icon name="chevron-up" aria-hidden="true"></step-icon>
+    </button>
+
+    <button
+      type="button"
+      mat-stroked-button
+      [disabled]="!('plan-write' | hasRight | async)"
+      matTooltip="Move selected node downward (Ctrl + ⬇️)"
+      matTooltipPosition="below"
+      (click)="moveDown.emit()"
+    >
+      <step-icon name="chevron-down" aria-hidden="true"></step-icon>
+    </button>
+
+    <button
+      type="button"
+      mat-stroked-button
+      [disabled]="!('plan-write' | hasRight | async)"
+      matTooltip="Copy selected node (Ctrl + C)"
+      matTooltipPosition="below"
+      (click)="copy.emit()"
+    >
+      Copy
+    </button>
+
+    <button
+      type="button"
+      mat-stroked-button
+      [disabled]="!('plan-write' | hasRight | async)"
+      matTooltip="Paste selected node (Ctrl + V)"
+      matTooltipPosition="below"
+      (click)="paste.emit()"
+    >
+      Paste
+    </button>
+
+    <button
+      type="button"
+      mat-stroked-button
+      [disabled]="!('plan-delete' | hasRight | async)"
+      matTooltip="Delete selected node (Del)"
+      matTooltipPosition="below"
+      (click)="delete.emit()"
+    >
+      Delete
+    </button>
+  </ng-container>
+
+  <button
+    *ngIf="isInteractiveSessionActive"
+    type="button"
+    mat-stroked-button
+    color="primary"
+    [disabled]="!('interactive' | hasRight | async)"
+    matTooltip="Executes the selected node in the interactive session (Ctrl + Enter)"
+    matTooltipPosition="below"
+    (click)="runInteractively.emit()"
+  >
+    Run interactively
+  </button>
+</step-btn-group>

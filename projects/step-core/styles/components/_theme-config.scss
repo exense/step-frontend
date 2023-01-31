@@ -159,8 +159,17 @@ $light-primary-text: white;
     box-shadow: none !important;
     width: 36px;
     height: 36px;
-    .mat-button-wrapper {
-      padding: 0;
+  }
+
+  .mat-button-wrapper {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    step-icon {
+      display: flex;
+      margin-top: 0 !important;
     }
   }
 
