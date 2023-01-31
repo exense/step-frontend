@@ -1,4 +1,5 @@
-import { AfterViewInit, Directive, ElementRef, Input, OnDestroy } from '@angular/core';
+import { OverlayContainer } from '@angular/cdk/overlay';
+import { AfterViewInit, Directive, Input, OnDestroy } from '@angular/core';
 
 /**
  * In most cases legacy components are displayed over material overlay, but sometimes
@@ -13,11 +14,13 @@ export class ZIndexDirective implements AfterViewInit, OnDestroy {
   @Input('stepZIndex') zIndex?: number;
   private cdkOverlayContainer?: HTMLElement;
 
+  constructor(private _overlayContainer: OverlayContainer) {}
+
   ngAfterViewInit(): void {
     if (this.zIndex === undefined) {
       return;
     }
-    this.cdkOverlayContainer = document.querySelector<HTMLElement>('.cdk-overlay-container') || undefined;
+    this.cdkOverlayContainer = this._overlayContainer.getContainerElement() || undefined;
     if (!this.cdkOverlayContainer) {
       return;
     }

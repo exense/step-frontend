@@ -25,6 +25,7 @@ type OnTouch = () => void;
 })
 export class EditableComponent<T> implements ControlValueAccessor {
   @Input() labelTemplate!: TemplateRef<{}>;
+  @Input() tooltip: string = '';
 
   @Output() stateChange = new EventEmitter<EditableComponentState>();
 
