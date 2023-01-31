@@ -34,4 +34,8 @@ step-dynamic-field {
       flex-grow: 1;
     }
   }
+
+  mat-radio-button {
+    transform: scale(0.85);
+  }
 }
