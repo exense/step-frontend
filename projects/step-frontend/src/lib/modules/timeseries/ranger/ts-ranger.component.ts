@@ -84,12 +84,10 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    let settings = changes['settings'];
+    const settings = changes['settings'];
     if (settings && settings.previousValue) {
       // it's a real change
       this.init(settings.currentValue);
-      let end = this.settings.xValues[this.settings.xValues.length - 1];
-      let start = this.settings.xValues[0];
       this.createRanger();
     }
   }

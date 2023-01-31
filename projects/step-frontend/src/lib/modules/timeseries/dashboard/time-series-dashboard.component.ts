@@ -26,10 +26,9 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   timeRangeSelection: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
   context!: TimeSeriesContext;
   performanceViewSettings: PerformanceViewSettings | undefined;
-  updateSubscription = new Subscription();
-  queuedSubscription = new Subscription();
-  throttledRefreshTrigger$: Subject<any> = new Subject();
-  terminator$ = new Subject();
+  private updateSubscription = new Subscription();
+  private throttledRefreshTrigger$: Subject<any> = new Subject();
+  private terminator$ = new Subject();
 
   timeRangeOptions: RelativeTimeSelection[] = [
     { label: 'Last 1 Minute', timeInMs: this.ONE_HOUR_MS / 60 },
@@ -115,7 +114,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
    */
   updateRange(range: TSTimeRange) {
     this.updateSubscription?.unsubscribe(); // end current execution
-    this.queuedSubscription.unsubscribe();
     this.context.updateFullRange(range, false);
     this.context.updateSelectedRange(range, false);
     this.updateSubscription = this.performanceView
@@ -130,5 +128,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.terminator$.next(true);
     this.contextsFactory.destroyContext(this.context.id);
+    this.updateSubscription.unsubscribe();
   }
 }

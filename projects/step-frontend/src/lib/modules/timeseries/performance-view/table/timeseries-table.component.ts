@@ -84,36 +84,6 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     return groupDimensions.map((field) => attributes[field]).join(' | ');
   }
 
-  // for live streaming
-  // accumulateData(request: FindBucketsRequest) {
-  //   this.timeSeriesService
-  //     .fetchBuckets({ ...request, groupDimensions: [this.dimensionKey], numberOfBuckets: 1 })
-  //     .subscribe((response: TimeSeriesChartResponse) => {
-  //       response.matrix
-  //         .map((series, i) => {
-  //           if (series.length != 1) {
-  //             // we should have just one bucket
-  //             throw new Error('Something went wrong');
-  //           }
-  //           let bucket = series[0];
-  //           let keywordName = response.matrixKeys[i][this.dimensionKey];
-  //           let existingBucketForKeyword = this.bucketsByKeywords[keywordName];
-  //           if (existingBucketForKeyword) {
-  //             // we need to accumulate them
-  //             existingBucketForKeyword.sum += bucket.sum;
-  //             existingBucketForKeyword.count += bucket.count;
-  //             existingBucketForKeyword.min = Math.min(existingBucketForKeyword.min, bucket.min);
-  //             existingBucketForKeyword.max = Math.min(existingBucketForKeyword.max, bucket.max);
-  //             // TODO update percentiles
-  //           } else {
-  //             this.bucketsByKeywords[keywordName] = bucket;
-  //           }
-  //           return existingBucketForKeyword;
-  //         })
-  //         .sort(this.sortByNameAttributeFn);
-  //     });
-  // }
-
   getDatasourceConfig(): TableLocalDataSourceConfig<Bucket> {
     return {
       sortPredicates: {

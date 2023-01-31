@@ -58,7 +58,6 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy {
 
   constructor(
     private timeSeriesService: TimeSeriesService,
-    private contextsFactory: TimeSeriesContextsFactory,
     private executionService: ExecutionsService,
     private dashboardService: DashboardService,
     private _asyncTaskService: AsyncTasksService

@@ -13,7 +13,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   readonly EMIT_DEBOUNCE_TIME = 300;
   @Input() context!: TimeSeriesContext;
   @Output() onFiltersChange = new EventEmitter<TsFilterItem[]>();
-  emitFilterChange$ = new Subject<void>();
+  private emitFilterChange$ = new Subject<void>();
 
   items: TsFilterItem[] = [];
 
@@ -61,5 +61,8 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     return FilterBarItemType;
   }
 
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void {
+    this.emitFilterChange$.complete();
+    this.onFiltersChange.complete();
+  }
 }

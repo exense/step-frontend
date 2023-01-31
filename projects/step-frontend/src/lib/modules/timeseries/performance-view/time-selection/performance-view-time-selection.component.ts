@@ -5,17 +5,13 @@ import { TimeSeriesService } from '../../time-series.service';
 import { TimeSeriesUtils } from '../../time-series-utils';
 import { TSRangerComponent } from '../../ranger/ts-ranger.component';
 import { TSTimeRange } from '../../chart/model/ts-time-range';
-import { TimeRangePicker } from '../../time-selection/time-range-picker.component';
 import { TimeSeriesContext } from '../../time-series-context';
-import { RangeSelectionType } from '../../time-selection/model/range-selection-type';
-import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
 import { TimeSeriesConfig } from '../../time-series.config';
 import { TSRangerSettings } from '../../ranger/ts-ranger-settings';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
 import { PerformanceViewSettings } from '../model/performance-view-settings';
 import { Observable, Subject, takeUntil, tap } from 'rxjs';
 import { TimeSeriesChartResponse } from '../../time-series-chart-response';
-import { TimeSelectionState } from '../../time-selection.state';
 
 @Component({
   selector: 'step-execution-time-selection',
@@ -114,21 +110,11 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   onRangerSelectionChange(event: TSTimeRange) {
     // check for full range selection
     this.tsContext.updateSelectedRange(event);
-    // if (this.timeLabels[0] === event.from && this.timeLabels[this.timeLabels.length - 1] === event.to) {
-    //
-    // }
     // the linked charts are automatically updated by the uplot sync feature. if that will be replaced, the charts must subscribe to the state change
   }
 
   onRangerZoomReset() {
     this.tsContext.resetZoom();
-  }
-
-  resetZoom() {
-    // let selectionToEmit: ExecutionTimeSelection = { type: RangeSelectionType.FULL };
-    // let range = { from: this.rangerSettings!.xValues[0], to: this.rangerSettings!.xValues.slice(-1)[0] };
-    // selectionToEmit.absoluteSelection = range;
-    // this.timeSelectionState.resetZoom(range);
   }
 
   ngOnDestroy(): void {
