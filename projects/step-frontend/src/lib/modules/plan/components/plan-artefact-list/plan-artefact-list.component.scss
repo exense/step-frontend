@@ -1,42 +1,12 @@
-@use 'projects/step-core/styles/core-mixins' as core;
-
-.artefact-info-icon {
-  display: inline-block;
-  transform: scale(0.75);
-  position: absolute;
-  margin-left: -20px;
-  margin-top: 10px;
-  color: gray;
+.artefact-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.artefact-icon-label {
-  vertical-align: middle;
-}
-
-.artefact-icon {
-  display: inline-block;
-  margin-right: 5px;
-}
-
-.artefact-info-and-addbutton {
-  float: right;
-}
-
-.plan-artefact-name-searchfield {
-  width: 85%;
-}
-
-:host {
-  @include core.table-container;
-}
-
-.header {
-  @include core.table-header;
-}
-
-mat-icon {
-  transform: scale(0.8);
-}
-.artefact-icon-label {
-  padding-left: 15px;
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
 }

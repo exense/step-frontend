@@ -1,11 +1,11 @@
-import { Component, forwardRef, Input, Optional, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, forwardRef, Input, Optional, ViewChild, ViewEncapsulation } from '@angular/core';
 import { map, Observable, of } from 'rxjs';
-import { PlanTreeAction } from '../../shared/plan-tree-action.enum';
-import { PlanEditorService } from '../../services/plan-editor.service';
-import { TreeStateService, TreeAction, TreeActionsService, ArtefactTreeNode } from '../../modules/tree/tree.module';
 import { AbstractArtefact } from '../../client/generated';
-import { PlanInteractiveSessionService } from '../../services/plan-interactive-session.service';
+import { ArtefactTreeNode, TreeAction, TreeActionsService, TreeStateService } from '../../modules/tree/tree.module';
 import { PlanArtefactResolverService } from '../../services/plan-artefact-resolver.service';
+import { PlanEditorService } from '../../services/plan-editor.service';
+import { PlanInteractiveSessionService } from '../../services/plan-interactive-session.service';
+import { PlanTreeAction } from '../../shared/plan-tree-action.enum';
 
 @Component({
   selector: 'step-plan-tree',
@@ -23,16 +23,18 @@ export class PlanTreeComponent implements TreeActionsService {
   readonly selectedArtefact$ = this._treeState.selectedNode$.pipe(map((node) => node?.originalArtefact));
   @Input() isReadonly: boolean = false;
 
+  @ViewChild('area') splitAreaElementRef?: ElementRef<HTMLElement>;
+
   private actions: TreeAction[] = [
     { id: PlanTreeAction.rename, label: 'Rename (F2)' },
-    { id: PlanTreeAction.move_up, label: 'Move Up (Ctrl+Up)' },
-    { id: PlanTreeAction.move_down, label: 'Move Down (Ctrl+Down)' },
-    { id: PlanTreeAction.copy, label: 'Copy (Ctrl+c)' },
-    { id: PlanTreeAction.paste, label: 'Paste (Ctrl+v)' },
+    { id: PlanTreeAction.move_up, label: 'Move Up (Ctrl + ⬆️)' },
+    { id: PlanTreeAction.move_down, label: 'Move Down (Ctrl + ⬇️)' },
+    { id: PlanTreeAction.copy, label: 'Copy (Ctrl + C)' },
+    { id: PlanTreeAction.paste, label: 'Paste (Ctrl + V)' },
     { id: PlanTreeAction.delete, label: 'Delete (Del)' },
-    { id: PlanTreeAction.open, label: 'Open (Ctrl+o)' },
-    { id: PlanTreeAction.enable, label: 'Enable (Ctrl+e)' },
-    { id: PlanTreeAction.disable, label: 'Disable (Ctrl+e)' },
+    { id: PlanTreeAction.open, label: 'Open (Ctrl + O)' },
+    { id: PlanTreeAction.enable, label: 'Enable (Ctrl + E)' },
+    { id: PlanTreeAction.disable, label: 'Disable (Ctrl + E)' },
   ];
 
   constructor(
