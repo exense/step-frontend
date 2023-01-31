@@ -12,13 +12,12 @@ import { AfterViewInit, Directive, ElementRef, Input, OnDestroy } from '@angular
 export class ZIndexDirective implements AfterViewInit, OnDestroy {
   @Input('stepZIndex') zIndex?: number;
   private cdkOverlayContainer?: HTMLElement;
-  constructor(private _elRef: ElementRef<HTMLElement>) {}
 
   ngAfterViewInit(): void {
     if (this.zIndex === undefined) {
       return;
     }
-    this.cdkOverlayContainer = this._elRef.nativeElement.closest<HTMLElement>('.cdk-overlay-container') || undefined;
+    this.cdkOverlayContainer = document.querySelector<HTMLElement>('.cdk-overlay-container') || undefined;
     if (!this.cdkOverlayContainer) {
       return;
     }
