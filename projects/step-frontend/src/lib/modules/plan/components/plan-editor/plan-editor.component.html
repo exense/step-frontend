@@ -21,6 +21,7 @@
           [items]="planTypes"
           [itemTemplate]="itemTemplate"
           [formControl]="planTypeControl"
+          matTooltip="Plan type"
         ></step-editable-dropdown-label>
 
         <ng-container *ngIf="_planEditService.plan$ | async as plan">
