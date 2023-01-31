@@ -13,66 +13,54 @@ import { TimeSeriesService } from '../time-series.service';
 import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
-import { forkJoin, Observable, of, Subject, Subscription, switchMap, takeUntil, tap, timer } from 'rxjs';
-import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
+import { Subject, Subscription, takeUntil, timer } from 'rxjs';
 import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
 import { TSTimeRange } from '../chart/model/ts-time-range';
-import { TimeSeriesContext } from '../time-series-context';
-import { TimeSeriesUtils } from '../time-series-utils';
+import { TimeSeriesConfig } from '../time-series.config';
+import { MatMenuTrigger } from '@angular/material/menu';
+import { TimeSeriesDashboardSettings } from '../dashboard/model/ts-dashboard-settings';
+import { TimeSeriesDashboardComponent } from '../dashboard/time-series-dashboard.component';
+import { FilterBarItemType } from '../performance-view/filter-bar/model/ts-filter-item';
+import { TsUtils } from '../util/ts-utils';
+import { ILocationService } from 'angular';
 
 @Component({
   selector: 'step-execution-performance',
   templateUrl: './ts-execution-page.component.html',
   styleUrls: ['./ts-execution-page.component.scss'],
 })
-export class TsExecutionPageComponent implements OnInit, OnDestroy {
-  readonly ONE_HOUR_MS = 3600 * 1000;
-
+export class ExecutionPerformanceComponent implements OnInit, OnDestroy {
   terminator$ = new Subject<void>();
 
+  @ViewChild('dashboard') dashboard!: TimeSeriesDashboardComponent;
+  @ViewChild('matTrigger') matTrigger!: MatMenuTrigger;
   @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
 
   @Input() executionId!: string;
-  private execution!: Execution;
-  context!: TimeSeriesContext;
+  execution: Execution | undefined;
 
   timeRangeSelection: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
 
-  private dashboardInitComplete$ = new Subject<void>();
-
-  executionInProgress = false;
   performanceViewSettings: PerformanceViewSettings | undefined;
-  intervalShouldBeCanceled = false;
 
   executionHasToBeBuilt = false;
   migrationInProgress = false;
 
-  updatingSubscription = new Subscription();
+  updateSubscription = new Subscription();
+
+  dashboardSettings: TimeSeriesDashboardSettings | undefined;
+
+  stopInterval$ = new Subject();
 
   // this is just for running executions
-  refreshIntervals: RefreshInterval[] = [
-    { label: '5 Sec', value: 5000 },
-    { label: '30 Sec', value: 30 * 1000 },
-    { label: '1 Min', value: 60 * 1000 },
-    { label: '5 Min', value: 5 * 60 * 1000 },
-    { label: '30 Min', value: 30 * 60 * 1000 },
-    { label: 'Off', value: 0 },
-  ];
-  timeRangeOptions: RelativeTimeSelection[] = [
-    { label: 'Last 1 Minute', timeInMs: this.ONE_HOUR_MS / 60 },
-    { label: 'Last 5 Minutes', timeInMs: this.ONE_HOUR_MS / 12 },
-    { label: 'Last 30 Minutes', timeInMs: this.ONE_HOUR_MS / 2 },
-    { label: 'Last Hour', timeInMs: this.ONE_HOUR_MS },
-  ];
+  refreshIntervals: RefreshInterval[] = TimeSeriesConfig.AUTO_REFRESH_INTERVALS;
   selectedRefreshInterval: RefreshInterval = this.refreshIntervals[0];
 
   constructor(
     private timeSeriesService: TimeSeriesService,
-    private contextsFactory: TimeSeriesContextsFactory,
     private executionService: ExecutionsService,
     private dashboardService: DashboardService,
-    private _asyncTaskService: AsyncTasksService,
-    private contextFactory: TimeSeriesContextsFactory
+    private _asyncTaskService: AsyncTasksService
   ) {}
 
   ngOnInit(): void {
@@ -90,39 +78,7 @@ export class TsExecutionPageComponent implements OnInit, OnDestroy {
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
-    if (this.executionInProgress) {
-    } else {
-      this.onEndedExecutionTimeRangeChange(selection);
-    }
-  }
-
-  onEndedExecutionTimeRangeChange(selection: TimeRangePickerSelection) {
-    const execution = this.execution;
-    let newFullRange: TSTimeRange;
-    switch (selection.type) {
-      case RangeSelectionType.FULL:
-        newFullRange = { from: execution.startTime!, to: execution.endTime! };
-        break;
-      case RangeSelectionType.ABSOLUTE:
-        newFullRange = selection.absoluteSelection!;
-        break;
-      case RangeSelectionType.RELATIVE:
-        const end = execution.endTime!;
-        const from = Math.max(execution.startTime!, end - selection.relativeSelection!.timeInMs);
-        newFullRange = { from: from, to: end };
-    }
-    this.context.updateSelectedRange(newFullRange, false);
-    this.context.updateFullRange(newFullRange);
-    // this.performanceView.updateFullRange(newInterval);
-  }
-
-  onPerformanceViewInitComplete() {
-    this.dashboardInitComplete$.next();
-    this.dashboardInitComplete$.complete();
-  }
-
-  onPerformanceViewUpdateComplete() {
-    // this.dashboardInitComplete.next();
+    this.dashboard.updateRange(this.calculateFullTimeRange());
   }
 
   init() {
@@ -130,20 +86,87 @@ export class TsExecutionPageComponent implements OnInit, OnDestroy {
       this.execution = execution;
       const startTime = execution.startTime!;
       const endTime = execution.endTime ? execution.endTime : new Date().getTime();
-      this.context = this.contextFactory.createContext(execution.id!, { from: startTime, to: endTime });
-      if (!execution.endTime) {
-        this.executionInProgress = true;
-      }
-
-      this.performanceViewSettings = {
+      let urlParams = TsUtils.getURLParams(window.location.href);
+      this.dashboardSettings = {
         contextId: this.executionId,
-        timeRange: { from: startTime, to: endTime },
-        contextualFilters: { eId: this.executionId },
         includeThreadGroupChart: true,
+        timeRange: { from: startTime, to: endTime },
+        contextualFilters: { ...urlParams, eId: this.executionId },
+        filterOptions: [
+          {
+            label: 'Status',
+            attributeName: 'rnStatus',
+            type: FilterBarItemType.OPTIONS,
+            textValues: [
+              { value: 'PASSED' },
+              { value: 'FAILED' },
+              { value: 'TECHNICAL_ERROR' },
+              { value: 'INTERRUPTED' },
+            ],
+            isLocked: true,
+          },
+          {
+            label: 'Type',
+            attributeName: 'type',
+            type: FilterBarItemType.OPTIONS,
+            textValues: [{ value: 'keyword' }, { value: 'custom' }],
+            isLocked: true,
+          },
+          {
+            label: 'Name',
+            attributeName: 'name',
+            type: FilterBarItemType.FREE_TEXT,
+            isLocked: true,
+          },
+        ],
       };
-      if (this.executionInProgress) {
-        this.triggerNextUpdate(this.selectedRefreshInterval.value, this.dashboardInitComplete$);
+      if (!execution.endTime) {
+        setTimeout(() => {
+          this.dashboard.setRanges(this.calculateFullTimeRange());
+          this.startInterval();
+        }, this.selectedRefreshInterval.value);
       }
+    });
+  }
+
+  startInterval(delay = 0) {
+    this.stopInterval$.next(null); // make sure to stop it if it's still running
+    timer(delay, this.selectedRefreshInterval.value)
+      .pipe(takeUntil(this.stopInterval$), takeUntil(this.terminator$))
+      .subscribe(() => this.triggerRefresh());
+  }
+
+  calculateFullTimeRange(): TSTimeRange {
+    let now = new Date().getTime();
+    let details = this.execution!;
+    let selection: TSTimeRange;
+    let newFullRange: TSTimeRange;
+    switch (this.timeRangeSelection.type) {
+      case RangeSelectionType.FULL:
+        newFullRange = { from: details.startTime!, to: details.endTime || now - 5000 };
+        selection = newFullRange;
+        break;
+      case RangeSelectionType.ABSOLUTE:
+        newFullRange = this.timeRangeSelection.absoluteSelection!;
+        break;
+      case RangeSelectionType.RELATIVE:
+        let end = details.endTime || now;
+        newFullRange = { from: end - this.timeRangeSelection.relativeSelection!.timeInMs!, to: end };
+        break;
+    }
+    return newFullRange;
+  }
+
+  /**
+   * This will be the public method called from the outside of this component.
+   */
+  triggerRefresh() {
+    this.executionService.getExecutionById(this.executionId).subscribe((execution) => {
+      this.execution = execution;
+      if (execution.endTime) {
+        this.stopInterval$.next(null);
+      }
+      this.dashboard.refresh(this.calculateFullTimeRange());
     });
   }
 
@@ -151,7 +174,7 @@ export class TsExecutionPageComponent implements OnInit, OnDestroy {
     this.migrationInProgress = true;
     this.timeSeriesService
       .rebuildTimeSeries(this.executionId)
-      .pipe(pollAsyncTask(this._asyncTaskService))
+      .pipe(pollAsyncTask(this._asyncTaskService), takeUntil(this.terminator$))
       .subscribe({
         next: (task) => {
           if (task.ready) {
@@ -174,58 +197,10 @@ export class TsExecutionPageComponent implements OnInit, OnDestroy {
     if (oldInterval.value === newInterval.value) {
       return;
     }
-    // this.updatingSubscription.unsubscribe();
-    this.terminator$.next();
+    this.stopInterval$.next(null);
     if (newInterval.value) {
-      const delay = oldInterval.value === 0 ? 0 : newInterval.value;
-      this.triggerNextUpdate(delay, of(undefined));
+      this.startInterval();
     }
-  }
-
-  triggerNextUpdate(delay: number, observableToWaitFor: Observable<unknown>) {
-    this.updatingSubscription = forkJoin([timer(delay), observableToWaitFor])
-      .pipe(
-        switchMap(() => {
-          return this.executionService.getExecutionById(this.executionId);
-        }),
-        takeUntil(this.terminator$)
-      )
-      .subscribe((details) => {
-        const now = new Date().getTime();
-        const isFullRangeSelected = this.context.isFullRangeSelected();
-        const oldSelection = this.context.getSelectedTimeRange();
-        let newFullRange: TSTimeRange;
-        switch (this.timeRangeSelection.type) {
-          case RangeSelectionType.FULL:
-            newFullRange = { from: details.startTime!, to: details.endTime || now - 5000 };
-            break;
-          case RangeSelectionType.ABSOLUTE:
-            newFullRange = this.timeRangeSelection.absoluteSelection!;
-            break;
-          case RangeSelectionType.RELATIVE:
-            const end = details.endTime || now;
-            newFullRange = { from: end - this.timeRangeSelection.relativeSelection!.timeInMs!, to: end };
-            break;
-        }
-        // when the selection is 0, it will switch to full selection automatically
-        const newSelection = isFullRangeSelected
-          ? newFullRange
-          : TimeSeriesUtils.cropInterval(newFullRange, oldSelection) || newFullRange;
-
-        const updateDashboard$ = this.performanceView.updateDashboard({
-          updateRanger: true,
-          updateCharts: JSON.stringify(newSelection) !== JSON.stringify(oldSelection),
-          fullTimeRange: newFullRange,
-          selection: newSelection,
-        });
-        if (details.endTime) {
-          this.intervalShouldBeCanceled = true;
-          this.executionInProgress = false;
-        } else {
-          // the execution is not done yet
-          this.triggerNextUpdate(this.selectedRefreshInterval.value, updateDashboard$); // recursive call
-        }
-      });
   }
 
   navigateToRtmDashboard() {
@@ -233,9 +208,6 @@ export class TsExecutionPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.contextsFactory.destroyContext(this.executionId);
-    this.dashboardInitComplete$.complete();
-    // this.updatingSubscription.unsubscribe();
     this.terminator$.next();
     this.terminator$.complete();
   }
@@ -248,4 +220,4 @@ interface RefreshInterval {
 
 getAngularJSGlobal()
   .module(AJS_MODULE)
-  .directive('stepPerformanceView', downgradeComponent({ component: TsExecutionPageComponent }));
+  .directive('stepExecutionPerformance', downgradeComponent({ component: ExecutionPerformanceComponent }));

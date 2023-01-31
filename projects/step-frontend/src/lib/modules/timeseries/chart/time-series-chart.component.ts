@@ -10,12 +10,9 @@ import {
   Self,
   SimpleChanges,
   ViewChild,
-  ViewEncapsulation,
 } from '@angular/core';
 import { TSChartSeries, TSChartSettings } from './model/ts-chart-settings';
 import { UplotSyncService } from './uplot-sync-service';
-import { UPlotUtils } from '../uplot/uPlot.utils';
-import { TSTimeRange } from './model/ts-time-range';
 import { AlignedData } from 'uplot';
 import MouseListener = uPlot.Cursor.MouseListener;
 
@@ -78,10 +75,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     }
   }
 
-  resetZoom(): void {
-    this.uplot.setData(this.uplot.data, true);
-  }
-
   /**
    * @param settings
    */
@@ -124,9 +117,15 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         this.seriesIndexesByIds[series.id] = i + 1; // because the first series is the time
       }
       if (series.stroke) {
-        this.legendSettings.items.push({ color: series.stroke as string, label: series.legendName });
+        // aggregate series don't have stroke (e.g total)
+        this.legendSettings.items.push({
+          color: (series.stroke as string) || '#cccccc',
+          label: series.legendName,
+          isVisible: true,
+        });
       }
     });
+    this.sortLegend();
     let noData = true;
     for (let series of settings.series) {
       if (series.data.length > 0) {
@@ -197,12 +196,20 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     let index = this.seriesIndexesByIds[id];
     if (index == undefined) return;
     this.uplot.setSeries(index, { show: true });
+    let foundItem = this.legendSettings.items.find((item) => item.label === id);
+    if (foundItem) {
+      foundItem.isVisible = true;
+    }
   }
 
   hideSeries(id: string): void {
     let index = this.seriesIndexesByIds[id];
     if (index == undefined) return;
     this.uplot.setSeries(index, { show: false });
+    let foundItem = this.legendSettings.items.find((item) => item.label === id);
+    if (foundItem) {
+      foundItem.isVisible = false;
+    }
   }
 
   hideAllSeries(): void {
@@ -222,12 +229,19 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     return this.uplot.data;
   }
 
+  sortLegend() {
+    if (this.legendSettings) {
+      this.legendSettings.items = this.legendSettings.items.sort((a, b) => a.label.localeCompare(b.label));
+    }
+  }
+
   setAllSeries(visible: boolean): void {
     this.uplot.batch(() => {
       this.uplot.series.forEach((s, i) => {
         this.uplot.setSeries(i, { show: visible });
       });
     });
+    this.legendSettings.items.forEach((item) => (item.isVisible = visible));
   }
 
   /**
@@ -236,18 +250,26 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   toggleSeries(id: string): void {
     const index = this.seriesIndexesByIds[id];
     if (index == undefined) return;
-    const currentState = this.uplot.series[index].show;
-    this.uplot.setSeries(index, { show: !currentState });
+    let currentState = this.uplot.series[index].show;
+    if (currentState) {
+      this.hideSeries(id);
+    } else {
+      this.showSeries(id);
+    }
   }
 
   setSeriesVisibility(id: string, visible: boolean) {
-    const index = this.seriesIndexesByIds[id];
+    let index = this.seriesIndexesByIds[id];
     if (index == undefined) return;
-    this.uplot.setSeries(index, { show: visible });
+    if (visible) {
+      this.showSeries(id);
+    } else {
+      this.hideSeries(id);
+    }
   }
 
   addSeries(series: TSChartSeries): void {
-    const existingSeries = this.seriesIndexesByIds[series.id];
+    let existingSeries = this.seriesIndexesByIds[series.id];
     if (existingSeries) {
       throw new Error('Series already exists with id ' + series.id);
     }
@@ -267,7 +289,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   }
 
   addDataBySeries(data: number[], seriesKey: string): void {
-    const index = this.seriesIndexesByIds[seriesKey];
+    let index = this.seriesIndexesByIds[seriesKey];
     if (index === undefined) {
       throw new Error('Series id not found: ' + seriesKey);
     } else {
@@ -276,7 +298,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   }
 
   addDataBySeriesIndex(data: number[], seriesIndex: number): void {
-    const existingData = this.uplot.data[seriesIndex] as number[];
+    let existingData = this.uplot.data[seriesIndex] as number[];
     this.uplot.data[seriesIndex] = [...existingData, ...data];
   }
 
@@ -293,7 +315,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
    */
   updateFullData(series: TSChartSeries[]): void {
     this.seriesIndexesByIds = {};
-    const data: AlignedData = [this.settings.xValues, ...series.map((s) => s.data)];
+    let data: AlignedData = [this.settings.xValues, ...series.map((s) => s.data)];
     this.uplot.batch(() => {
       this.removeAllSeries();
       this.uplot.addSeries({
@@ -305,11 +327,12 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   }
 
   private removeAllSeries() {
-    const seriesLength = this.uplot.series.length;
+    let seriesLength = this.uplot.series.length;
     for (let i = 1; i < seriesLength; i++) {
       this.uplot.delSeries(1); // we clean everything
     }
     this.uplot.delSeries(0);
+    this.legendSettings.items = [];
   }
 
   redraw(): void {
@@ -317,7 +340,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   }
 
   getLastTimestamp(): number {
-    const timestampSeries = this.uplot.data[0];
+    let timestampSeries = this.uplot.data[0];
     return timestampSeries[timestampSeries.length - 1];
   }
 }
@@ -330,4 +353,5 @@ interface LegendSettings {
 interface LegendItem {
   label: string;
   color: string;
+  isVisible: boolean;
 }

@@ -2,9 +2,25 @@
   position: relative;
 }
 
+.header-buttons {
+  position: absolute;
+  right: 48px;
+  top: -65px;
+  display: flex;
+  z-index: 100;
+}
+
+.filter-bar-container {
+  width: 100%;
+  background: #f5f5f5;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 8px;
+}
+
 .right-section-buttons {
   position: absolute;
-  top: 24px;
+  top: 60px;
   right: 2px;
   display: flex;
   align-items: center;

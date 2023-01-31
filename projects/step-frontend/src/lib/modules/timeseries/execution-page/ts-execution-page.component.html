@@ -1,6 +1,7 @@
 <ng-container *ngIf="!executionHasToBeBuilt">
-  <div class="right-section-buttons">
-    <div *ngIf="executionInProgress">
+  <div class="header-buttons">
+    <step-time-range-picker (onSelectionChange)="onTimeRangeChange($event)"></step-time-range-picker>
+    <div *ngIf="execution && !execution.endTime">
       <button style="margin-right: 8px" mat-raised-button [matMenuTriggerFor]="refreshMenu">
         Refresh ({{ selectedRefreshInterval.label }})
       </button>
@@ -10,24 +11,9 @@
         </button>
       </mat-menu>
     </div>
-    <button mat-raised-button (click)="navigateToRtmDashboard()">Interactive Session</button>
   </div>
-
-  <step-time-range-picker
-    #rangePicker
-    [customRelativeOptions]="timeRangeOptions"
-    (onSelectionChange)="onTimeRangeChange($event)"
-  >
-  </step-time-range-picker>
-
-  <step-performance-view
-    *ngIf="performanceViewSettings"
-    [context]="context"
-    [settings]="performanceViewSettings"
-    (onInitializationComplete)="onPerformanceViewInitComplete()"
-    (onUpdateComplete)="onPerformanceViewUpdateComplete()"
-  >
-  </step-performance-view>
+  <step-timeseries-dashboard #dashboard *ngIf="dashboardSettings" [settings]="dashboardSettings">
+  </step-timeseries-dashboard>
 </ng-container>
 <div *ngIf="executionHasToBeBuilt" class="info-container">
   <div class="content">

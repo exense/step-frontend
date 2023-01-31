@@ -1,167 +1,168 @@
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AJS_MODULE, DashboardService } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { PerformanceViewSettings } from '../performance-view/model/performance-view-settings';
 import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
 import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
 import { TimeRangePicker } from '../time-selection/time-range-picker.component';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
-import { PerformanceViewComponent } from '../performance-view/performance-view.component';
-import { forkJoin, Observable, of, Subject, Subscription, takeUntil, timer } from 'rxjs';
-import { ExecutionTimeSelection } from '../time-selection/model/execution-time-selection';
-import { TimeSeriesContext } from '../time-series-context';
-import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
+import { Subject, Subscription, takeUntil, tap, timer } from 'rxjs';
+import { TimeSeriesConfig } from '../time-series.config';
+import { TimeSeriesDashboardSettings } from '../dashboard/model/ts-dashboard-settings';
+import { TimeSeriesDashboardComponent } from '../dashboard/time-series-dashboard.component';
+import { FilterBarItemType } from '../performance-view/filter-bar/model/ts-filter-item';
+import { TsUtils } from '../util/ts-utils';
 
+// @TODO deprecated. common analytics view is used instead
 @Component({
   selector: 'step-synthetic-monitoring',
   templateUrl: './synthetic-monitoring-page.component.html',
   styleUrls: ['./synthetic-monitoring-page.component.scss'],
 })
 export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
-  readonly ONE_HOUR_MS = 3600 * 1000;
-
   terminator$ = new Subject<void>();
 
+  @ViewChild('dashboard') dashboard!: TimeSeriesDashboardComponent;
   @ViewChild(TimeRangePicker) rangePicker!: TimeRangePicker;
-  @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
   @Input() taskId: string = window.location.href.split('?')[0].substring(window.location.href.lastIndexOf('/') + 1);
-
-  context!: TimeSeriesContext;
 
   refreshEnabled = true;
 
-  performanceViewSettings!: PerformanceViewSettings;
-  readonly dashboardInitComplete$ = new Subject<void>();
+  dashboardSettings: TimeSeriesDashboardSettings | undefined;
 
-  timeRangeOptions: RelativeTimeSelection[] = [
-    { label: 'Last Minute', timeInMs: this.ONE_HOUR_MS / 60 },
-    { label: 'Last 15 Minutes', timeInMs: this.ONE_HOUR_MS / 4 },
-    { label: 'Last Hour', timeInMs: this.ONE_HOUR_MS },
-    { label: 'Last Day', timeInMs: this.ONE_HOUR_MS * 24 },
-    { label: 'Last Week', timeInMs: this.ONE_HOUR_MS * 24 * 7 },
-    { label: 'Last Month', timeInMs: this.ONE_HOUR_MS * 24 * 31 },
-  ];
+  timeRangeOptions: RelativeTimeSelection[] = TimeSeriesConfig.SYNTHETIC_MONITORING_TIME_OPTIONS;
+  timeRangeSelection: TimeRangePickerSelection = {
+    type: RangeSelectionType.RELATIVE,
+    relativeSelection: this.timeRangeOptions[0],
+  };
 
   // this is just for running executions
-  refreshIntervals = [
-    { label: '5 Sec', value: 5000 },
-    { label: '30 Sec', value: 30 * 1000 },
-    { label: '1 Min', value: 60 * 1000 },
-    { label: '5 Min', value: 5 * 60 * 1000 },
-    { label: '30 Min', value: 30 * 60 * 1000 },
-    { label: 'Off', value: 0 },
-  ];
+  refreshIntervals = TimeSeriesConfig.AUTO_REFRESH_INTERVALS;
   selectedRefreshInterval = this.refreshIntervals[0];
 
-  refreshSubscription: Subscription | undefined;
+  groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS;
+  selectedGrouping = this.groupingOptions[0];
 
-  constructor(
-    private changeDetector: ChangeDetectorRef,
-    private dashboardService: DashboardService,
-    private contextFactory: TimeSeriesContextsFactory
-  ) {}
+  stopInterval$ = new Subject();
+
+  constructor(private changeDetector: ChangeDetectorRef, private dashboardService: DashboardService) {}
 
   ngOnInit(): void {
     if (!this.taskId) {
       throw new Error('ExecutionId parameter is not present');
     }
-    const range = this.calculateRange(this.timeRangeOptions[0]);
-    this.context = this.contextFactory.createContext(this.taskId, range);
-    this.performanceViewSettings = this.createViewSettings(range);
+    let selectedTimeRange = this.timeRangeOptions[0];
+    let now = new Date().getTime();
+    let start = now - selectedTimeRange.timeInMs;
+    let range = { from: start, to: now };
+    let urlParams = TsUtils.getURLParams(window.location.href);
+    this.dashboardSettings = {
+      contextId: this.taskId,
+      includeThreadGroupChart: true,
+      timeRange: range,
+      contextualFilters: { ...urlParams, taskId: this.taskId },
+      filterOptions: [
+        {
+          label: 'Status',
+          attributeName: 'rnStatus',
+          type: FilterBarItemType.OPTIONS,
+          textValues: [
+            { value: 'PASSED' },
+            { value: 'FAILED' },
+            { value: 'TECHNICAL_ERROR' },
+            { value: 'INTERRUPTED' },
+          ],
+          isLocked: true,
+        },
+        {
+          label: 'Type',
+          attributeName: 'type',
+          type: FilterBarItemType.OPTIONS,
+          textValues: [{ value: 'keyword' }, { value: 'custom' }],
+          isLocked: true,
+        },
+        {
+          label: 'Name',
+          attributeName: 'name',
+          type: FilterBarItemType.FREE_TEXT,
+          isLocked: true,
+        },
+        {
+          label: 'Execution Id',
+          attributeName: 'eId',
+          type: FilterBarItemType.FREE_TEXT,
+          isLocked: true,
+        },
+        {
+          label: 'Origin',
+          attributeName: 'origin',
+          type: FilterBarItemType.FREE_TEXT,
+          isLocked: true,
+        },
+        {
+          label: 'Plan Id',
+          attributeName: 'planId',
+          type: FilterBarItemType.FREE_TEXT,
+          isLocked: true,
+        },
+      ],
+    };
     if (this.refreshEnabled) {
-      this.triggerNextUpdate(this.selectedRefreshInterval.value, this.dashboardInitComplete$);
+      this.startInterval(this.selectedRefreshInterval.value);
     }
   }
 
-  onDashboardInit() {
-    this.dashboardInitComplete$.next();
-    this.dashboardInitComplete$.complete();
+  startInterval(delay = 0) {
+    this.stopInterval$.next(null); // make sure to stop it if it's still running
+    timer(delay, this.selectedRefreshInterval.value)
+      .pipe(takeUntil(this.stopInterval$), takeUntil(this.terminator$))
+      .subscribe(() => this.triggerRefresh());
+  }
+
+  triggerRefresh() {
+    this.dashboard.refresh(this.calculateRange());
   }
 
   changeRefreshInterval(newInterval: { label: string; value: number }) {
-    if (newInterval.value === this.selectedRefreshInterval.value) {
+    const oldInterval = this.selectedRefreshInterval;
+    this.selectedRefreshInterval = newInterval;
+    if (oldInterval.value === newInterval.value) {
       return;
     }
-    this.terminator$.next();
-    this.selectedRefreshInterval = newInterval;
+    this.stopInterval$.next(null);
     if (newInterval.value) {
-      this.refreshEnabled = true;
-      this.triggerNextUpdate(newInterval.value, of(null));
-    } else {
-      this.refreshEnabled = false;
+      this.startInterval();
     }
-  }
-
-  calculateRange(selection: RelativeTimeSelection): TSTimeRange {
-    const now = new Date().getTime();
-    const start = now - selection.timeInMs;
-    return { from: start, to: now };
-  }
-
-  createViewSettings(timeRange: TSTimeRange): PerformanceViewSettings {
-    return {
-      contextId: this.taskId,
-      contextualFilters: { taskId: this.taskId },
-      timeRange: timeRange,
-    };
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
-    this.terminator$.next();
-    let newInterval;
-    switch (selection.type) {
-      case RangeSelectionType.FULL:
-        throw new Error('Full range not available');
-      case RangeSelectionType.ABSOLUTE:
-        newInterval = selection.absoluteSelection!;
-        break;
-      case RangeSelectionType.RELATIVE:
-        const now = new Date().getTime();
-        newInterval = { from: now - selection.relativeSelection!.timeInMs, to: now };
+    this.timeRangeSelection = selection;
+    this.dashboard.updateRange(this.calculateRange()); // instant call
+    if (this.selectedRefreshInterval.value) {
+      // maybe it is stopped
+      this.startInterval(this.selectedRefreshInterval.value);
     }
-    const shouldRefreshCharts = this.context.isFullRangeSelected();
-    this.context.updateSelectedRange(newInterval, false);
-    this.context.updateFullRange(newInterval);
-    const update$ = shouldRefreshCharts ? this.performanceView.refreshAllCharts() : of(null);
-    if (this.refreshEnabled) {
-      this.triggerNextUpdate(this.selectedRefreshInterval.value, update$);
-    } else {
-      update$.subscribe();
-    }
-  }
-
-  triggerNextUpdate(delay: number, observableToWaitFor: Observable<unknown>): void {
-    this.refreshSubscription = forkJoin([timer(delay), observableToWaitFor])
-      .pipe(takeUntil(this.terminator$))
-      .subscribe(() => {
-        const activeSelection = this.rangePicker.getActiveSelection();
-        const now = new Date().getTime();
-        const newInterval = { from: now - activeSelection.relativeSelection!.timeInMs, to: now };
-        let newSelection: TSTimeRange;
-        const isFullRangeSelected = this.context.isFullRangeSelected();
-        const shouldRefreshCharts = isFullRangeSelected;
-        if (isFullRangeSelected) {
-          newSelection = newInterval;
-        } else {
-          newSelection = {
-            from: Math.max(newInterval.from, this.context.getSelectedTimeRange().from),
-            to: Math.min(newInterval.to, this.context.getSelectedTimeRange().to),
-          };
-        }
-        if (newSelection.to - newSelection.from < 0) {
-          newSelection = newInterval;
-        }
-        this.performanceViewSettings.timeRange = newInterval;
-        this.context.updateSelectedRange(newSelection, false);
-        this.context.updateFullRange(newInterval);
-        const refresh$ = shouldRefreshCharts ? this.performanceView.refreshAllCharts() : of(null);
-        this.triggerNextUpdate(this.selectedRefreshInterval.value, refresh$);
-      });
   }
 
   navigateToRtmDashboard() {
     window.open(this.dashboardService.getRtmDashboardLink(this.taskId));
+  }
+
+  calculateRange(): TSTimeRange {
+    let now = new Date().getTime();
+    let newFullRange: TSTimeRange;
+    switch (this.timeRangeSelection.type) {
+      case RangeSelectionType.FULL:
+        throw new Error('Full range selection is not supported');
+      case RangeSelectionType.ABSOLUTE:
+        newFullRange = this.timeRangeSelection.absoluteSelection!;
+        break;
+      case RangeSelectionType.RELATIVE:
+        let end = now;
+        newFullRange = { from: end - this.timeRangeSelection.relativeSelection!.timeInMs!, to: end };
+        break;
+    }
+    return newFullRange;
   }
 
   ngOnDestroy(): void {
