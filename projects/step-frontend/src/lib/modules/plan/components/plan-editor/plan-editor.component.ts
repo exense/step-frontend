@@ -19,7 +19,6 @@ import {
   DialogsService,
   KeywordsService,
   LinkProcessorService,
-  Mutable,
   Plan,
   PlansService,
   RepositoryObjectReference,
@@ -36,15 +35,13 @@ import {
 } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PlanHistoryService } from '../../services/plan-history.service';
-import { catchError, filter, first, from, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { catchError, filter, from, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { ILocationService } from 'angular';
 import { InteractiveSessionService } from '../../services/interactive-session.service';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
 import { DOCUMENT } from '@angular/common';
 import { ArtefactTreeNodeUtilsService } from '../../services/artefact-tree-node-utils.service';
-
-type FieldAccessor = Mutable<Pick<PlanEditorComponent, 'repositoryObjectRef' | 'componentTabs' | 'planClass'>>;
 
 @Component({
   selector: 'step-plan-editor',
@@ -80,7 +77,7 @@ export class PlanEditorComponent
 
   @Input() planId?: string;
 
-  readonly componentTabs = [
+  protected componentTabs = [
     { id: 'controls', label: 'Controls' },
     { id: 'keywords', label: 'Keywords' },
     { id: 'other', label: 'Other Plans' },
@@ -90,9 +87,9 @@ export class PlanEditorComponent
 
   readonly isInteractiveSessionActive$ = this._interactiveSession.isActive$;
 
-  readonly repositoryObjectRef?: RepositoryObjectReference;
+  protected repositoryObjectRef?: RepositoryObjectReference;
 
-  readonly planClass?: string;
+  protected planClass?: string;
 
   constructor(
     public _interactiveSession: InteractiveSessionService,
@@ -122,7 +119,7 @@ export class PlanEditorComponent
     if (cPlanId?.previousValue !== cPlanId?.currentValue || cPlanId?.firstChange) {
       const planId = cPlanId?.currentValue;
       this.loadPlan(planId);
-      (this as FieldAccessor).repositoryObjectRef = !planId
+      this.repositoryObjectRef = !planId
         ? undefined
         : {
             repositoryID: 'local',
@@ -301,27 +298,32 @@ export class PlanEditorComponent
         })
       )
       .subscribe((plan) => {
-        (this as FieldAccessor).planClass = plan._class;
+        this.planClass = plan._class;
         this._planEditService.init(plan);
       });
   }
 
   private initConsoleTabToggle(): void {
+    const consoleTab = { id: 'console', label: 'Console' };
     this._interactiveSession.isActive$
       .pipe(
         filter((shouldConsoleExists) => {
-          const hasConsole = this.componentTabs.some((tab) => tab.id === 'console');
+          const hasConsole = this.componentTabs.some((tab) => tab.id === consoleTab.id);
           return hasConsole !== shouldConsoleExists;
         }),
-        map((shouldConsoleExists) => {
-          return shouldConsoleExists
-            ? [...this.componentTabs, { id: 'console', label: 'Console' }]
-            : this.componentTabs.filter((tab) => tab.id !== 'console');
+        map((withConsole) => {
+          const tabs = withConsole
+            ? [...this.componentTabs, { ...consoleTab }]
+            : this.componentTabs.filter((tab) => tab.id !== consoleTab.id);
+          return { tabs, withConsole };
         }),
         takeUntil(this.terminator$)
       )
-      .subscribe((tabs) => {
-        (this as FieldAccessor).componentTabs = tabs;
+      .subscribe(({ tabs, withConsole }) => {
+        this.componentTabs = tabs;
+        if (withConsole) {
+          this.selectedTab = consoleTab.id;
+        }
       });
   }
 
