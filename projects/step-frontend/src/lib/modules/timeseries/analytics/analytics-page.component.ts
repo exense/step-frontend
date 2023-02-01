@@ -37,6 +37,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   stopInterval$ = new Subject();
 
   ngOnInit(): void {
+    let selectedTimeRange = this.timeRangeOptions[0];
     let now = new Date().getTime();
     let start;
     let end;
@@ -50,9 +51,9 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
       end = parseInt(urlParams.end) ? parseInt(urlParams.end) : now;
       this.timeRangeSelection = { type: RangeSelectionType.ABSOLUTE, absoluteSelection: { from: start, to: end } };
     } else {
-      this.timeRangeSelection = this.timeRangeOptions[0]; // relative selection
-      start = now - this.timeRangeSelection.relativeSelection!.timeInMs;
+      start = now - selectedTimeRange.relativeSelection!.timeInMs;
       end = now;
+      this.timeRangeSelection = this.timeRangeOptions[0];
     }
 
     delete urlParams.refresh; // in case it exists

@@ -1,0 +1,8 @@
+:host {
+  display: flex;
+  gap: 8px;
+
+  &:not(.inline) {
+    flex-direction: column;
+  }
+}

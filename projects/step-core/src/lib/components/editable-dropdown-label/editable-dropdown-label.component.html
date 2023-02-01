@@ -1,6 +1,6 @@
 <ng-container [ngSwitch]="state">
   <ng-container *ngSwitchCase="State.READABLE">
-    <div class="editable-dropdown-label" (click)="onLabelClick()">
+    <div class="editable-dropdown-label" [matTooltip]="tooltip" (click)="onLabelClick()">
       <div class="editable-dropdown-template">
         <ng-container *ngIf="value; else label">
           <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: value }"></ng-container>
@@ -25,9 +25,11 @@
         (ngModelChange)="onValueChange($event)"
         (openedChange)="onOpenedChange($event)"
       >
-        <mat-option *ngFor="let item of items" [value]="item">
-          <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: item }"></ng-container>
-        </mat-option>
+        <ng-container [stepZIndex]="1050">
+          <mat-option *ngFor="let item of items" [value]="item">
+            <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: item }"></ng-container>
+          </mat-option>
+        </ng-container>
       </mat-select>
     </mat-form-field>
 
