@@ -5,6 +5,7 @@
 export type FetchBucketsRequest = {
   start?: number;
   end?: number;
+  oqlFilter?: string;
   params?: Record<string, string>;
   groupDimensions?: Array<string>;
   numberOfBuckets?: number;

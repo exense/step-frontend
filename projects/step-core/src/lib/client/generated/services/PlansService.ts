@@ -232,22 +232,6 @@ export class PlansService {
   }
 
   /**
-   * Retrieves entity's versioned
-   * @param id
-   * @returns History default response
-   * @throws ApiError
-   */
-  public getPlanHistory(id: string): Observable<Array<History>> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/plans/{id}/history',
-      path: {
-        id: id,
-      },
-    });
-  }
-
-  /**
    * Returns the first plan matching the given attributes.
    * @param requestBody
    * @returns Plan default response
@@ -259,6 +243,22 @@ export class PlansService {
       url: '/plans/search',
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Retrieves the versions of the entity with the given id
+   * @param id
+   * @returns History default response
+   * @throws ApiError
+   */
+  public getPlanVersions(id: string): Observable<Array<History>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/plans/{id}/versions',
+      path: {
+        id: id,
+      },
     });
   }
 

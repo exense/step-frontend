@@ -221,22 +221,6 @@ export class KeywordsService {
   }
 
   /**
-   * Retrieves entity's versioned
-   * @param id
-   * @returns History default response
-   * @throws ApiError
-   */
-  public getFunctionHistory(id: string): Observable<Array<History>> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/functions/{id}/history',
-      path: {
-        id: id,
-      },
-    });
-  }
-
-  /**
    * @param requestBody
    * @returns TokenWrapper default response
    * @throws ApiError
@@ -247,6 +231,22 @@ export class KeywordsService {
       url: '/functions/executor/tokens/select',
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Retrieves the versions of the entity with the given id
+   * @param id
+   * @returns History default response
+   * @throws ApiError
+   */
+  public getFunctionVersions(id: string): Observable<Array<History>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/functions/{id}/versions',
+      path: {
+        id: id,
+      },
     });
   }
 

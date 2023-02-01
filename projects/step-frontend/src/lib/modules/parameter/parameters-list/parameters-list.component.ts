@@ -83,7 +83,7 @@ export class ParametersListComponent {
     }
 
     const resourceVersion = parameter.customFields ? parameter.customFields['versionId'] : undefined;
-    const versionHistory = this._parametersService.getParameterHistory(parameter.id!);
+    const versionHistory = this._parametersService.getParameterVersions(parameter.id!);
 
     this._restoreDialogsService
       .showRestoreDialog(resourceVersion, versionHistory, permission)
