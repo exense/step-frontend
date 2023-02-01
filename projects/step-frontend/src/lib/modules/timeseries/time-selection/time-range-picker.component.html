@@ -1,7 +1,7 @@
 <div>
   <button mat-raised-button [matMenuTriggerFor]="menu">
     {{ activeSelection.type === RangeSelectionType.FULL ? 'Full time range' : '' }}
-    {{ activeSelection.type === RangeSelectionType.RELATIVE ? activeSelection.relativeSelection?.label : '' }}
+    {{ activeSelection.type === RangeSelectionType.RELATIVE ? activeSelection.relativeSelection!.label : '' }}
     {{ activeSelection.type === RangeSelectionType.ABSOLUTE ? 'Custom Selection' : '' }}
   </button>
   <mat-menu #menu="matMenu" class="time-selector-menu">
@@ -36,12 +36,12 @@
         <div class="right-section" (click)="closeMenu()">
           <div class="title">Relative time ranges</div>
           <div
-            *ngFor="let rangeOption of customRelativeOptions || defaultRelativeOptions"
+            *ngFor="let rangeOption of selectOptions"
             (click)="onRelativeSelectionSelected(rangeOption)"
             class="time-option"
-            [class.active]="rangeOption.timeInMs === activeSelection.relativeSelection?.timeInMs"
+            [class.active]="rangeOption.relativeSelection?.timeInMs === activeSelection.relativeSelection?.timeInMs"
           >
-            {{ rangeOption.label }}
+            {{ rangeOption.relativeSelection?.label }}
           </div>
           <div
             *ngIf="includeFullRangeOption"
