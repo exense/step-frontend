@@ -1,3 +1,4 @@
+@charset "utf-8";
 html,
 body {
   height: 100%;
@@ -869,12 +870,12 @@ fieldset {
 }
 
 .password-hint li.valid:before {
-  content: '✔';
+  content: '\2713';
   margin-left: -20px;
   margin-right: 5px;
 }
 .password-hint li.invalid:before {
-  content: '✖';
+  content: '\2716';
   margin-left: -20px;
   margin-right: 5px;
 }
