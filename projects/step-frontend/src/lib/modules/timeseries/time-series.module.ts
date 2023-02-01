@@ -10,13 +10,18 @@ import { CommonModule } from '@angular/common';
 import { TimeseriesTableComponent } from './performance-view/table/timeseries-table.component';
 import { TimeRangePicker } from './time-selection/time-range-picker.component';
 import { ChartSkeletonComponent } from './chart/skeleton/chart-skeleton.component';
-import { ExecutionFiltersComponent } from './performance-view/filters/execution-filters.component';
 import { PerformanceViewComponent } from './performance-view/performance-view.component';
-import { TsExecutionPageComponent } from './execution-page/ts-execution-page.component';
 import { SyntheticMonitoringPageComponent } from './synthetic-monitoring/synthetic-monitoring-page.component';
 import { MeasurementsPickerComponent } from './performance-view/measurements/measurements-picker.component';
 import { PerformanceViewTimeSelectionComponent } from './performance-view/time-selection/performance-view-time-selection.component';
 import { MeasurementsFilterPipe } from './performance-view/measurements/measurements-filter.pipe';
+import { FilterBarComponent } from './performance-view/filter-bar/filter-bar.component';
+import { FilterBarItemComponent } from './performance-view/filter-bar/item/filter-bar-item.component';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { TimeSeriesDashboardComponent } from './dashboard/time-series-dashboard.component';
+import { TsGroupingComponent } from './dashboard/grouping/ts-grouping.component';
+import { AnalyticsPageComponent } from './analytics/analytics-page.component';
+import { ExecutionPerformanceComponent } from './execution-page/ts-execution-page.component';
 
 @NgModule({
   declarations: [
@@ -28,13 +33,19 @@ import { MeasurementsFilterPipe } from './performance-view/measurements/measurem
     TimeRangePicker,
     ChartSkeletonComponent,
     PerformanceViewTimeSelectionComponent,
-    ExecutionFiltersComponent,
-    TsExecutionPageComponent,
+    PerformanceViewComponent,
     SyntheticMonitoringPageComponent,
     MeasurementsPickerComponent,
     MeasurementsFilterPipe,
+    FilterBarComponent,
+    FilterBarItemComponent,
+    TimeSeriesDashboardComponent,
+    TsGroupingComponent,
+    PerformanceViewComponent,
+    AnalyticsPageComponent,
+    ExecutionPerformanceComponent,
   ],
-  exports: [PerformanceViewComponent, TsExecutionPageComponent],
-  imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule],
+  exports: [ExecutionPerformanceComponent, SyntheticMonitoringPageComponent, AnalyticsPageComponent],
+  imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule, MatDatepickerModule],
 })
 export class TimeSeriesModule {}

@@ -1,41 +1,70 @@
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { ExecutionTimeSelection } from './time-selection/model/execution-time-selection';
-import { RangeSelectionType } from './time-selection/model/range-selection-type';
+import { BehaviorSubject, Observable, skip, Subject } from 'rxjs';
 import { TimeSeriesKeywordsContext } from './execution-page/time-series-keywords.context';
 import { TimeseriesColorsPool } from './util/timeseries-colors-pool';
 import { Execution } from '@exense/step-core';
-import { BucketFilters } from './model/bucket-filters';
-import { TimeSelectionState } from './time-selection.state';
 import { TSTimeRange } from './chart/model/ts-time-range';
-import { TimeSeriesUtils } from './time-series-utils';
+import { TsFilterItem } from './performance-view/filter-bar/model/ts-filter-item';
+import { TimeSeriesContextParams } from './time-series-context-params';
 
 /**
  * This class is responsible for managing the state of an execution tab. Here we store time selection, colors, filters, etc.
  */
 export class TimeSeriesContext {
-  executionId!: string;
+  id!: string;
   activeExecution: Execution | undefined;
+
+  inProgress$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   private fullTimeRange: TSTimeRange; // this represents the entire time-series interval. usually this is displayed entirely in the time-ranger
   private readonly fullTimeRangeChange$: Subject<TSTimeRange> = new Subject<TSTimeRange>();
   private selectedTimeRange: TSTimeRange; // this is the zooming selection.
   private readonly selectedTimeRangeChange$: Subject<TSTimeRange> = new Subject<TSTimeRange>();
 
-  activeGroupings: string[] = ['name']; // group dimensions
-  private readonly groupingChangeSubject: Subject<string[]> = new Subject();
+  private readonly activeGroupings$: BehaviorSubject<string[]>;
 
-  activeFilters: { [key: string]: any } = {};
-  private readonly filtersChangeSubject: Subject<BucketFilters> = new Subject();
+  private readonly baseFilters: { [key: string]: any }; // these are usually the contextual filters (e.g execution id, task id, etc)
+  private readonly activeFilters$: BehaviorSubject<TsFilterItem[]>;
 
   public readonly keywordsContext: TimeSeriesKeywordsContext;
   private readonly colorsPool: TimeseriesColorsPool;
 
-  constructor(executionId: string, timeRange: TSTimeRange) {
-    this.executionId = executionId;
-    this.fullTimeRange = timeRange;
-    this.selectedTimeRange = timeRange;
+  constructor(params: TimeSeriesContextParams) {
+    this.id = params.id;
+    this.fullTimeRange = params.timeRange;
+    this.selectedTimeRange = params.timeRange;
+    this.baseFilters = params.baseFilters;
+    this.activeFilters$ = new BehaviorSubject(params.dynamicFilters || []);
+    this.activeGroupings$ = new BehaviorSubject(params.grouping);
     this.colorsPool = new TimeseriesColorsPool();
     this.keywordsContext = new TimeSeriesKeywordsContext(this.colorsPool);
+  }
+
+  destroy(): void {
+    this.inProgress$.complete();
+    this.fullTimeRangeChange$.complete();
+    this.selectedTimeRangeChange$.complete();
+    this.activeGroupings$.complete();
+    this.activeFilters$.complete();
+  }
+
+  setInProgress(inProgress: boolean) {
+    this.inProgress$.next(inProgress);
+  }
+
+  getBaseFilters(): { [key: string]: any } {
+    return this.baseFilters;
+  }
+
+  getDynamicFilters(): TsFilterItem[] {
+    return this.activeFilters$.getValue();
+  }
+
+  inProgressChange() {
+    return this.inProgress$.asObservable();
+  }
+
+  updateFilters(items: TsFilterItem[]) {
+    this.activeFilters$.next(items);
   }
 
   updateFullRange(range: TSTimeRange, emitEvent = true) {
@@ -70,7 +99,7 @@ export class TimeSeriesContext {
 
   resetZoom() {
     if (JSON.stringify(this.selectedTimeRange) === JSON.stringify(this.fullTimeRange)) {
-      return;
+      // return; // this is causing some issues in the ranger. it's selection get 0 width, so better keep it like this for now.
     }
     this.selectedTimeRange = this.fullTimeRange;
     this.selectedTimeRangeChange$.next(this.selectedTimeRange);
@@ -88,29 +117,23 @@ export class TimeSeriesContext {
   }
 
   onGroupingChange(): Observable<string[]> {
-    return this.groupingChangeSubject.asObservable();
+    return this.activeGroupings$.asObservable().pipe(skip(1));
   }
 
-  onFiltersChange(): Observable<BucketFilters> {
-    return this.filtersChangeSubject.asObservable();
+  onFiltersChange(): Observable<TsFilterItem[]> {
+    return this.activeFilters$.asObservable().pipe(skip(1));
   }
 
-  updateFilters(filters: BucketFilters): void {
-    this.activeFilters = filters;
-    this.filtersChangeSubject.next(filters);
+  updateActiveFilters(items: TsFilterItem[]) {
+    this.activeFilters$.next(items);
   }
 
   updateGrouping(grouping: string[]) {
-    this.activeGroupings = grouping;
-    this.groupingChangeSubject.next(grouping);
+    this.activeGroupings$.next(grouping);
   }
 
   getGroupDimensions(): string[] {
-    return this.activeGroupings;
-  }
-
-  getActiveFilters(): BucketFilters {
-    return this.activeFilters;
+    return this.activeGroupings$.getValue();
   }
 
   getFullTimeRange(): TSTimeRange {

@@ -5,6 +5,7 @@ import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { TimeRangePickerSelection } from './time-range-picker-selection';
 import { RangeSelectionType } from './model/range-selection-type';
 import { ExecutionTimeSelection } from './model/execution-time-selection';
+import { TimeSeriesUtils } from '../time-series-utils';
 
 /**
  * When dealing with relative/full selection, this component should not know anything about dates, therefore no date calculations are needed.
@@ -24,6 +25,9 @@ export class TimeRangePicker implements OnInit {
 
   @Output() onSelectionChange = new EventEmitter<TimeRangePickerSelection>();
 
+  @Input() activeSelection!: TimeRangePickerSelection;
+  @Output() activeSelectionChange = new EventEmitter<TimeRangePickerSelection>();
+
   _30_MINUTES = 30 * 60 * 1000; // in ms
 
   defaultRelativeOptions: RelativeTimeSelection[] = [
@@ -38,8 +42,6 @@ export class TimeRangePicker implements OnInit {
   fromDateString: string | undefined; // used for formatting the date together with time
   toDateString: string | undefined;
 
-  activeSelection!: TimeRangePickerSelection;
-
   ngOnInit(): void {
     if (this.initialSelectionIndex != undefined) {
       this.activeSelection = {
@@ -47,13 +49,18 @@ export class TimeRangePicker implements OnInit {
         relativeSelection: (this.customRelativeOptions || this.defaultRelativeOptions)[this.initialSelectionIndex],
       };
     } else {
-      if (this.includeFullRangeOption) {
-        this.activeSelection = { type: RangeSelectionType.FULL };
-      } else {
+      if (!this.activeSelection) {
         this.activeSelection = {
           type: RangeSelectionType.RELATIVE,
           relativeSelection: (this.customRelativeOptions || this.defaultRelativeOptions)[0],
         };
+      } else {
+        if (this.activeSelection.type === RangeSelectionType.ABSOLUTE) {
+          let from = this.activeSelection.absoluteSelection!.from!;
+          let to = this.activeSelection.absoluteSelection!.to!;
+          this.fromDateString = TimeSeriesUtils.formatInputDate(new Date(from));
+          this.toDateString = TimeSeriesUtils.formatInputDate(new Date(to));
+        }
       }
     }
   }
@@ -139,10 +146,10 @@ export class TimeRangePicker implements OnInit {
     const to = selection.absoluteSelection!.to;
     this.resetCustomDates();
     if (from) {
-      this.fromDateString = this.formatInputDate(new Date(from));
+      this.fromDateString = TimeSeriesUtils.formatInputDate(new Date(from));
     }
     if (to) {
-      this.toDateString = this.formatInputDate(new Date(to));
+      this.toDateString = TimeSeriesUtils.formatInputDate(new Date(to));
     }
   }
 
@@ -154,24 +161,13 @@ export class TimeRangePicker implements OnInit {
   setFromDate(event: MatDatepickerInputEvent<any>) {
     const utcDate = new Date(event.value.ts); // this is 00:00:00 in GMT
     const localDate = new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), 0, 0, 0);
-    this.fromDateString = this.formatInputDate(localDate);
+    this.fromDateString = TimeSeriesUtils.formatInputDate(localDate);
   }
 
   setToDate(event: MatDatepickerInputEvent<any>) {
     const utcDate = new Date(event.value.ts);
     const localDate = new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), 0, 0, 0);
-    this.toDateString = this.formatInputDate(localDate);
-  }
-
-  formatInputDate(date: Date) {
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const isoDate = `${date.getFullYear()}-${month}-${day}`;
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
-    const isoTime = `${hours}:${minutes}:${seconds}`;
-    return `${isoDate} ${isoTime}`;
+    this.toDateString = TimeSeriesUtils.formatInputDate(localDate);
   }
 
   formatTimeValue(value: number) {

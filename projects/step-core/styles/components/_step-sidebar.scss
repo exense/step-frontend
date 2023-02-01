@@ -55,6 +55,9 @@ $default-color: dc.default-colors();
   #main {
     transition: margin-left map.get($config, openclose-transition);
     margin-left: map.get($config, width-open);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
   }
 
   #main.main-when-sidebar-closed {

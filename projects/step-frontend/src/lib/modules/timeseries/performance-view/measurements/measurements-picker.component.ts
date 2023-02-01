@@ -46,11 +46,14 @@ export class MeasurementsPickerComponent implements OnInit, OnDestroy {
         if (visibleKeywords === this.activeKeywords) {
           this.allSeriesChecked = true;
         }
+        this.keywords = { ...this.keywords };
       });
     this.keywordsService
       .onAllSelectionChanged()
       .pipe(takeUntil(this.terminator$))
-      .subscribe((allSelected) => (this.allSeriesChecked = allSelected));
+      .subscribe((allSelected) => {
+        this.allSeriesChecked = allSelected;
+      });
     this.keywordsService
       .onKeywordToggled()
       .pipe(takeUntil(this.terminator$))

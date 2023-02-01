@@ -2,7 +2,13 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 step-plan-tree {
-  @include core.full-height-block;
-
   @include core.tree-node-selection(var.$blue-600);
+  display: flex;
+  height: 100%;
+
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
 }

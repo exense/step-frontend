@@ -1,0 +1,24 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  display: block;
+  flex-basis: 12px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  cursor: col-resize;
+  border-left: 1px solid var.$gray-200;
+  border-right: 1px solid var.$gray-200;
+
+  &.active {
+    border-left: 1px solid var.$blue-600;
+    border-right: 1px solid var.$blue-600;
+  }
+}
+
+.gutter-icon {
+  width: 100%;
+  height: 100%;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+}

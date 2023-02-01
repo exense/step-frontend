@@ -1,0 +1,73 @@
+<step-btn-group class="with-borders">
+  <button
+    *ngIf="hasUndo"
+    type="button"
+    mat-stroked-button
+    matTooltip="Revert all changes"
+    matTooltipPosition="below"
+    (click)="discardAll.emit()"
+  >
+    Discard All
+  </button>
+
+  <button
+    type="button"
+    mat-stroked-button
+    [disabled]="!hasUndo"
+    matTooltip="Undo (Ctrl + Z)"
+    matTooltipPosition="below"
+    (click)="undo.emit()"
+  >
+    <step-icon class="icon-flipped" name="rotate-cw"></step-icon>
+  </button>
+
+  <button
+    type="button"
+    mat-stroked-button
+    [disabled]="!hasRedo"
+    matTooltip="Redo (Ctrl + Y)"
+    matTooltipPosition="below"
+    (click)="redo.emit()"
+  >
+    <step-icon name="rotate-cw"></step-icon>
+  </button>
+
+  <button type="button" mat-stroked-button (click)="clone.emit()">Clone</button>
+
+  <button type="button" mat-stroked-button (click)="export.emit()">Export</button>
+
+  <button type="button" mat-stroked-button [disabled]="isInteractiveSessionActive" (click)="startInteractive.emit()">
+    Start interactive session
+  </button>
+
+  <ng-container *ngIf="isInteractiveSessionActive">
+    <button type="button" mat-stroked-button (click)="reset.emit()">Reset</button>
+
+    <button type="button" mat-stroked-button (click)="stop.emit()">Stop</button>
+
+    <button type="button" mat-stroked-button [matMenuTriggerFor]="executionParametersMenu">Session parameters</button>
+
+    <mat-menu #executionParametersMenu="matMenu">
+      <span
+        class="plan-execution-menu"
+        mat-menu-item
+        [disableRipple]="true"
+        (click)="$event.stopImmediatePropagation()"
+      >
+        <step-custom-form [stModel]="_interactiveSession.executionParameters" stScreen="executionParameters">
+        </step-custom-form>
+      </span>
+    </mat-menu>
+  </ng-container>
+
+  <button type="button" mat-stroked-button color="primary" [matMenuTriggerFor]="executionMenu">
+    <step-icon name="play-circle"></step-icon>
+  </button>
+
+  <mat-menu #executionMenu="matMenu">
+    <span class="plan-execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
+      <step-plan-execution [description]="description" [repositoryObjectRef]="repositoryObjectRef">
+      </step-plan-execution>
+    </span>
+  </mat-menu>
+</step-btn-group>

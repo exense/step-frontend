@@ -21,6 +21,7 @@ angular
 
   .run(function (ViewRegistry) {
     ViewRegistry.registerView('dashboards', 'partials/dashboards/dashboardsController.html');
+    ViewRegistry.registerView('analytics', 'partials/dashboards/analyticsController.html');
     ViewRegistry.registerView('dashboards-rtm', 'partials/dashboards/dashboardsControllerRtm.html');
   })
 
