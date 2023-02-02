@@ -102,6 +102,8 @@
       <button
         type="button"
         mat-stroked-button
+        matTooltip="Open texteditor"
+        matTooltipPosition="below"
         [tabindex]="tabIndex"
         [disabled]="isDisabled"
         (click)="editStringValueInModal()"
@@ -115,6 +117,8 @@
     <button
       type="button"
       mat-flat-button
+      matTooltip="Toggle dynamic field"
+      matTooltipPosition="below"
       [disabled]="isDisabled"
       [color]="dynamic ? 'primary' : undefined"
       [tabindex]="tabIndex"
@@ -129,6 +133,8 @@
       <button
         type="button"
         mat-stroked-button
+        matTooltip="Remove"
+        matTooltipPosition="below"
         [disabled]="isDisabled"
         [tabindex]="tabIndex"
         (click)="remove.emit()"

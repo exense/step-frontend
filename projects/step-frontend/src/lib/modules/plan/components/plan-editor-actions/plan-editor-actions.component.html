@@ -31,6 +31,16 @@
   >
     <step-icon name="rotate-cw"></step-icon>
   </button>
+  <button
+    type="button"
+    mat-stroked-button
+    (click)="displayHistory.emit()"
+    matTooltip="Display version history"
+    class="history"
+    matTooltipPosition="below"
+  >
+    <step-icon name="git-branch"></step-icon>
+  </button>
 
   <button type="button" mat-stroked-button (click)="clone.emit()">Clone</button>
 

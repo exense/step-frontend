@@ -23,19 +23,6 @@
           [formControl]="planTypeControl"
           matTooltip="Plan type"
         ></step-editable-dropdown-label>
-
-        <ng-container *ngIf="_planEditService.plan$ | async as plan">
-          <button
-            type="button"
-            mat-icon-button
-            (click)="displayHistory('plan-write', plan)"
-            matTooltip="Display version history"
-            class="history"
-            matTooltipPosition="below"
-          >
-            <step-icon name="git-branch"></step-icon>
-          </button>
-        </ng-container>
       </ng-container>
 
       <step-custom-forms
@@ -47,22 +34,24 @@
       >
       </step-custom-forms>
     </div>
-
-    <step-plan-editor-actions
-      [hasUndo]="_planEditService.hasUndo$ | async"
-      [hasRedo]="_planEditService.hasRedo$ | async"
-      [isInteractiveSessionActive]="_interactiveSession.isActive$ | async"
-      [description]="(_planEditService.plan$ | async)?.attributes?.['name']"
-      [repositoryObjectRef]="repositoryObjectRef"
-      (discardAll)="_planEditService.discardAll()"
-      (undo)="_planEditService.undo()"
-      (redo)="_planEditService.redo()"
-      (clone)="clonePlan()"
-      (export)="exportPlan()"
-      (startInteractive)="startInteractive()"
-      (reset)="resetInteractive()"
-      (stop)="stopInteractive()"
-    ></step-plan-editor-actions>
+    <ng-container *ngIf="_planEditService.plan$ | async as plan">
+      <step-plan-editor-actions
+        [hasUndo]="_planEditService.hasUndo$ | async"
+        [hasRedo]="_planEditService.hasRedo$ | async"
+        [isInteractiveSessionActive]="_interactiveSession.isActive$ | async"
+        [description]="(_planEditService.plan$ | async)?.attributes?.['name']"
+        [repositoryObjectRef]="repositoryObjectRef"
+        (discardAll)="_planEditService.discardAll()"
+        (undo)="_planEditService.undo()"
+        (redo)="_planEditService.redo()"
+        (displayHistory)="displayHistory('plan-write', plan)"
+        (clone)="clonePlan()"
+        (export)="exportPlan()"
+        (startInteractive)="startInteractive()"
+        (reset)="resetInteractive()"
+        (stop)="stopInteractive()"
+      ></step-plan-editor-actions>
+    </ng-container>
   </div>
 
   <step-split>
