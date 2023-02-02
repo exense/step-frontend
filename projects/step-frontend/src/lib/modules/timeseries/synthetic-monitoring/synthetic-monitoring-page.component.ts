@@ -30,11 +30,8 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
 
   dashboardSettings: TimeSeriesDashboardSettings | undefined;
 
-  timeRangeOptions: RelativeTimeSelection[] = TimeSeriesConfig.SYNTHETIC_MONITORING_TIME_OPTIONS;
-  timeRangeSelection: TimeRangePickerSelection = {
-    type: RangeSelectionType.RELATIVE,
-    relativeSelection: this.timeRangeOptions[0],
-  };
+  timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
+  timeRangeSelection: TimeRangePickerSelection = this.timeRangeOptions[0];
 
   // this is just for running executions
   refreshIntervals = TimeSeriesConfig.AUTO_REFRESH_INTERVALS;
@@ -53,7 +50,7 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
     }
     let selectedTimeRange = this.timeRangeOptions[0];
     let now = new Date().getTime();
-    let start = now - selectedTimeRange.timeInMs;
+    let start = now - selectedTimeRange.relativeSelection!.timeInMs;
     let range = { from: start, to: now };
     let urlParams = TsUtils.getURLParams(window.location.href);
     this.dashboardSettings = {

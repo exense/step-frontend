@@ -10,7 +10,6 @@ import {
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PerformanceViewSettings } from '../performance-view/model/performance-view-settings';
 import { TimeSeriesService } from '../time-series.service';
-import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
 import { Subject, Subscription, takeUntil, timer } from 'rxjs';
@@ -22,7 +21,7 @@ import { TimeSeriesDashboardSettings } from '../dashboard/model/ts-dashboard-set
 import { TimeSeriesDashboardComponent } from '../dashboard/time-series-dashboard.component';
 import { FilterBarItemType } from '../performance-view/filter-bar/model/ts-filter-item';
 import { TsUtils } from '../util/ts-utils';
-import { ILocationService } from 'angular';
+import { TimeRangePicker } from '../time-selection/time-range-picker.component';
 
 @Component({
   selector: 'step-execution-performance',
@@ -39,6 +38,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy {
   @Input() executionId!: string;
   execution: Execution | undefined;
 
+  timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.EXECUTION_PAGE_TIME_SELECTION_OPTIONS;
   timeRangeSelection: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
 
   performanceViewSettings: PerformanceViewSettings | undefined;
@@ -86,6 +86,9 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy {
       this.execution = execution;
       const startTime = execution.startTime!;
       const endTime = execution.endTime ? execution.endTime : new Date().getTime();
+      if (!execution.endTime) {
+        this.timeRangeSelection = this.timeRangeOptions[0];
+      }
       let urlParams = TsUtils.getURLParams(window.location.href);
       this.dashboardSettings = {
         contextId: this.executionId,
@@ -201,10 +204,6 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy {
     if (newInterval.value) {
       this.startInterval();
     }
-  }
-
-  navigateToRtmDashboard() {
-    window.open(this.dashboardService.getRtmExecutionLink(this.executionId));
   }
 
   ngOnDestroy(): void {
