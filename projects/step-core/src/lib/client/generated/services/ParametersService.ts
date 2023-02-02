@@ -130,22 +130,6 @@ export class ParametersService {
   }
 
   /**
-   * Retrieves entity's versioned
-   * @param id
-   * @returns History default response
-   * @throws ApiError
-   */
-  public getParameterHistory(id: string): Observable<Array<History>> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/parameters/{id}/history',
-      path: {
-        id: id,
-      },
-    });
-  }
-
-  /**
    * @param requestBody
    * @returns Parameter default response
    * @throws ApiError
@@ -156,6 +140,22 @@ export class ParametersService {
       url: '/parameters/search',
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Retrieves the versions of the entity with the given id
+   * @param id
+   * @returns History default response
+   * @throws ApiError
+   */
+  public getParameterVersions(id: string): Observable<Array<History>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/parameters/{id}/versions',
+      path: {
+        id: id,
+      },
     });
   }
 

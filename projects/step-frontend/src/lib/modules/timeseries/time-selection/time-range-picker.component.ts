@@ -19,7 +19,7 @@ import { TimeSeriesUtils } from '../time-series-utils';
 export class TimeRangePicker implements OnInit {
   @ViewChild(MatMenuTrigger) menuTrigger!: MatMenuTrigger;
 
-  @Input() customRelativeOptions: RelativeTimeSelection[] | undefined;
+  @Input() selectOptions!: TimeRangePickerSelection[];
   @Input() initialSelectionIndex: number | undefined;
   @Input() includeFullRangeOption: boolean = true;
 
@@ -30,30 +30,18 @@ export class TimeRangePicker implements OnInit {
 
   _30_MINUTES = 30 * 60 * 1000; // in ms
 
-  defaultRelativeOptions: RelativeTimeSelection[] = [
-    { label: 'Last 1 minute', timeInMs: this._30_MINUTES / 30 },
-    { label: 'Last 5 minutes', timeInMs: this._30_MINUTES / 6 },
-    { label: 'Last 15 minutes', timeInMs: this._30_MINUTES / 2 },
-    { label: 'Last 30 minutes', timeInMs: this._30_MINUTES },
-    { label: 'Last 1 hour', timeInMs: this._30_MINUTES * 2 },
-    { label: 'Last 3 hours', timeInMs: this._30_MINUTES * 6 },
-  ];
-
   fromDateString: string | undefined; // used for formatting the date together with time
   toDateString: string | undefined;
 
   ngOnInit(): void {
+    if (!this.selectOptions) {
+      throw new Error('Options param is mandatory');
+    }
     if (this.initialSelectionIndex != undefined) {
-      this.activeSelection = {
-        type: RangeSelectionType.RELATIVE,
-        relativeSelection: (this.customRelativeOptions || this.defaultRelativeOptions)[this.initialSelectionIndex],
-      };
+      this.activeSelection = this.selectOptions[0];
     } else {
       if (!this.activeSelection) {
-        this.activeSelection = {
-          type: RangeSelectionType.RELATIVE,
-          relativeSelection: (this.customRelativeOptions || this.defaultRelativeOptions)[0],
-        };
+        this.activeSelection = this.selectOptions[0];
       } else {
         if (this.activeSelection.type === RangeSelectionType.ABSOLUTE) {
           let from = this.activeSelection.absoluteSelection!.from!;
@@ -63,6 +51,10 @@ export class TimeRangePicker implements OnInit {
         }
       }
     }
+  }
+
+  getOptions(): TimeRangePickerSelection[] {
+    return this.selectOptions;
   }
 
   applyAbsoluteInterval() {
@@ -97,14 +89,14 @@ export class TimeRangePicker implements OnInit {
     this.closeMenu();
   }
 
-  onRelativeSelectionSelected(option: RelativeTimeSelection) {
+  onRelativeSelectionSelected(option: TimeRangePickerSelection) {
     if (
       this.activeSelection.type === RangeSelectionType.RELATIVE &&
-      this.activeSelection.relativeSelection!.timeInMs === option.timeInMs
+      this.activeSelection.relativeSelection!.timeInMs === option.relativeSelection!.timeInMs
     ) {
       return;
     }
-    this.emitSelectionChange({ type: RangeSelectionType.RELATIVE, relativeSelection: option });
+    this.emitSelectionChange(option);
   }
 
   /**

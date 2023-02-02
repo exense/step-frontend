@@ -88,7 +88,7 @@ export class PlanListComponent {
 
     const id = plan.id!;
     const planVersion = plan.customFields ? plan.customFields['versionId'] : undefined;
-    const versionHistory = this._plansApiService.getPlanHistory(id);
+    const versionHistory = this._plansApiService.getPlanVersions(id);
 
     this._restoreDialogsService
       .showRestoreDialog(planVersion, versionHistory, permission)

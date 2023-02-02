@@ -11,6 +11,9 @@ export const $FetchBucketsRequest = {
       type: 'number',
       format: 'int64',
     },
+    oqlFilter: {
+      type: 'string',
+    },
     params: {
       type: 'dictionary',
       contains: {

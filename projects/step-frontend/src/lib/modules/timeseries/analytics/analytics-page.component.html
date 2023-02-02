@@ -1,9 +1,10 @@
 <div class="relative">
   <div class="header-buttons">
     <step-time-range-picker
+      *ngIf="timeRangeSelection"
       [activeSelection]="timeRangeSelection"
       [includeFullRangeOption]="false"
-      [customRelativeOptions]="timeRangeOptions"
+      [selectOptions]="timeRangeOptions"
       (onSelectionChange)="onTimeRangeChange($event)"
     >
     </step-time-range-picker>
