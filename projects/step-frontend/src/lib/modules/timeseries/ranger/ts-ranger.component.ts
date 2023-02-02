@@ -144,6 +144,8 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       if (emitResetEvent) {
         this.onZoomReset.emit({ from: start, to: end });
       }
+      delete this.lastLeft;
+      delete this.lastWidth;
     }, 50);
   }
 
