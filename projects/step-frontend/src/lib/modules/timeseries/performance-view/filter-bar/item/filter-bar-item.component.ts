@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { DateTime } from 'luxon';
 import { TimeSeriesUtils } from '../../../time-series-utils';
@@ -17,6 +17,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
 
   @ViewChild('matTrigger') matTrigger!: MatMenuTrigger;
   @ViewChild(MatMenuTrigger) menuTrigger?: MatMenuTrigger;
+  @ViewChild('initialFocus') initialFocus?: ElementRef<HTMLElement>;
 
   readonly FilterBarType = FilterBarItemType;
 
@@ -84,8 +85,8 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
         break;
 
       case FilterBarItemType.DATE:
-        const min = filter.min ? TimeSeriesUtils.formatInputDate(new Date(filter.min), false) : undefined;
-        const max = filter.max ? TimeSeriesUtils.formatInputDate(new Date(filter.max), false) : undefined;
+        const min = filter.min ? TimeSeriesUtils.formatInputDate(new Date(filter.min), false) : '';
+        const max = filter.max ? TimeSeriesUtils.formatInputDate(new Date(filter.max), false) : '';
 
         let formattedDate = '';
 
@@ -93,7 +94,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
           formattedDate = `${min} to ${max}`;
         } else if (min) {
           formattedDate = `After ${min}`;
-        } else {
+        } else if (max) {
           formattedDate = `Before ${max}`;
         }
 

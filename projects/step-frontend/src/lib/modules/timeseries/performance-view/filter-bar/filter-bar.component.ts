@@ -133,5 +133,9 @@ export class FilterBarComponent implements OnInit, OnDestroy {
         this.filters.pop();
       }
     });
+
+    setTimeout(() => {
+      this.filterComponents!.last.initialFocus!.nativeElement.focus();
+    });
   }
 }

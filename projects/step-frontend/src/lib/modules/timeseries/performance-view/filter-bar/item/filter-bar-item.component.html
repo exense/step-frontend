@@ -27,12 +27,19 @@
     <div *ngSwitchCase="FilterBarType.FREE_TEXT">
       <mat-form-field *ngIf="!item.isLocked" class="w-100">
         <mat-label>Attribute name</mat-label>
-        <input type="text" matInput [(ngModel)]="item.attributeName" [readonly]="item.isLocked" autocomplete="off" />
+        <input
+          #initialFocus
+          type="text"
+          matInput
+          [(ngModel)]="item.attributeName"
+          [readonly]="item.isLocked"
+          autocomplete="off"
+        />
       </mat-form-field>
 
       <mat-form-field class="w-100">
         <mat-label>Search value</mat-label>
-        <input type="text" matInput [(ngModel)]="item.textValue" autocomplete="off" />
+        <input #initialFocus type="text" matInput [(ngModel)]="item.textValue" autocomplete="off" />
       </mat-form-field>
 
       <button mat-raised-button color="primary" class="w-100" (click)="applyChanges()">Apply</button>
@@ -41,7 +48,14 @@
     <div *ngSwitchCase="FilterBarType.NUMERIC">
       <mat-form-field *ngIf="!item.isLocked" class="w-100">
         <mat-label>Attribute name</mat-label>
-        <input type="text" matInput [(ngModel)]="item.attributeName" [readonly]="item.isLocked" autocomplete="off" />
+        <input
+          #initialFocus
+          type="text"
+          matInput
+          [(ngModel)]="item.attributeName"
+          [readonly]="item.isLocked"
+          autocomplete="off"
+        />
       </mat-form-field>
 
       <mat-form-field class="w-100">
@@ -60,7 +74,14 @@
     <div *ngSwitchCase="FilterBarType.DATE">
       <mat-form-field *ngIf="!item.isLocked" class="w-100">
         <mat-label>Attribute name</mat-label>
-        <input type="text" matInput [(ngModel)]="item.attributeName" [readonly]="item.isLocked" autocomplete="off" />
+        <input
+          #initialFocus
+          type="text"
+          matInput
+          [(ngModel)]="item.attributeName"
+          [readonly]="item.isLocked"
+          autocomplete="off"
+        />
       </mat-form-field>
 
       <div class="date-filters">
