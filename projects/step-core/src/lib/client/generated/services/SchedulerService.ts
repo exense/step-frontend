@@ -181,22 +181,6 @@ export class SchedulerService {
   }
 
   /**
-   * Retrieves entity's versioned
-   * @param id
-   * @returns History default response
-   * @throws ApiError
-   */
-  public getExecutionTaskHistory(id: string): Observable<Array<History>> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/scheduler/task/{id}/history',
-      path: {
-        id: id,
-      },
-    });
-  }
-
-  /**
    * Returns all the scheduled tasks.
    * @returns ExecutiontTaskParameters default response
    * @throws ApiError
@@ -220,6 +204,22 @@ export class SchedulerService {
       url: '/scheduler/task',
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Retrieves the versions of the entity with the given id
+   * @param id
+   * @returns History default response
+   * @throws ApiError
+   */
+  public getExecutionTaskVersions(id: string): Observable<Array<History>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/scheduler/task/{id}/versions',
+      path: {
+        id: id,
+      },
     });
   }
 
