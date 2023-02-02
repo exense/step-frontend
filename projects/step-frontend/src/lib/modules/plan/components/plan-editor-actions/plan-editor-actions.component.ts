@@ -17,6 +17,7 @@ export class PlanEditorActionsComponent {
   @Output() discardAll = new EventEmitter<void>();
   @Output() undo = new EventEmitter<void>();
   @Output() redo = new EventEmitter<void>();
+  @Output() displayHistory = new EventEmitter<void>();
   @Output() clone = new EventEmitter<void>();
   @Output() export = new EventEmitter<void>();
   @Output() startInteractive = new EventEmitter<void>();

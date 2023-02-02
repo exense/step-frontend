@@ -1,5 +1,11 @@
 <div class="main-name" [class.with-meta]="keywordMeta">
-  <step-editable-label [ngModel]="artefactName" (ngModelChange)="onArtefactNameChange($event)" [disabled]="isDisabled">
+  <step-editable-label
+    [ngModel]="artefactName"
+    matTooltip="Name"
+    matTooltipPosition="below"
+    (ngModelChange)="onArtefactNameChange($event)"
+    [disabled]="isDisabled"
+  >
   </step-editable-label>
   <div *ngIf="keywordMeta" class="keyword-meta" [class.keyword-meta-error]="keywordMeta.isError">
     <step-icon [name]="keywordMeta.icon"></step-icon>
@@ -8,6 +14,8 @@
   <button
     *ngIf="!isDisabled"
     type="button"
+    matTooltip="Edit selection parameters"
+    matTooltipPosition="below"
     mat-icon-button
     [color]="isEditorMode ? 'primary' : undefined"
     (click)="isEditorMode = !isEditorMode"
@@ -22,8 +30,7 @@
 <step-dynamic-field-group
   *ngIf="isEditorMode && !isDisabled"
   primaryFieldsLabel="Selection parameter"
-  optionalFieldsLabel="Optional selection parameter"
-  addFieldBtnLabel="Add additional selection parameter"
+  addFieldBtnLabel="Add selection parameter"
   [schema]="KEYWORD_ATTRIBUTES_SCHEMA"
   [value]="artefactKeywordAttributes"
   (valueChange)="updateKeywordAttributes($event)"
