@@ -9,5 +9,9 @@
   >
   </step-ts-filter-bar>
 
-  <step-performance-view [context]="context" [settings]="performanceViewSettings"></step-performance-view>
+  <step-performance-view
+    [context]="context"
+    [settings]="performanceViewSettings"
+    [timeSelection]="filterBar?.timeSelection"
+  ></step-performance-view>
 </ng-container>

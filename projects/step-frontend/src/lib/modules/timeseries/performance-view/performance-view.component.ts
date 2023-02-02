@@ -1,5 +1,5 @@
 import { KeyValue } from '@angular/common';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Optional, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, BucketAttributes, Execution } from '@exense/step-core';
 import { forkJoin, Observable, of, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
@@ -7,7 +7,6 @@ import { Bucket } from '../bucket';
 import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { TimeSeriesChartComponent } from '../chart/time-series-chart.component';
-import { TimeSeriesDashboardComponent } from '../dashboard/time-series-dashboard.component';
 import { KeywordSelection, TimeSeriesKeywordsContext } from '../execution-page/time-series-keywords.context';
 import { FindBucketsRequest } from '../find-buckets-request';
 import { TSRangerComponent } from '../ranger/ts-ranger.component';
@@ -25,6 +24,7 @@ import { TsChartType } from './model/ts-chart-type';
 import { UpdatePerformanceViewRequest } from './model/update-performance-view-request';
 import { PerformanceViewConfig } from './performance-view.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
+import { PerformanceViewTimeSelectionComponent } from './time-selection/performance-view-time-selection.component';
 
 declare const uPlot: any;
 
@@ -55,6 +55,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   @Input() context!: TimeSeriesContext;
   @Input() settings!: PerformanceViewSettings;
+  @Input() timeSelection?: PerformanceViewTimeSelectionComponent;
   @Input() includeThreadGroupChart = true;
 
   @Output() onInitializationComplete: EventEmitter<void> = new EventEmitter<void>();
@@ -100,10 +101,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     return a.key.localeCompare(b.key);
   };
 
-  constructor(
-    private timeSeriesService: TimeSeriesService,
-    @Optional() private _timeSeriesDashboard?: TimeSeriesDashboardComponent
-  ) {}
+  constructor(private timeSeriesService: TimeSeriesService) {}
 
   onAllSeriesCheckboxClick(event: any) {
     this.keywordsService.toggleSelectAll();
@@ -155,7 +153,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
    */
   updateFullRange(fullRange: TSTimeRange, selection?: TSTimeRange): void {
     this.context.updateFullRange(fullRange, false);
-    this._timeSeriesDashboard?.filterBar?.timeSelection?.updateFullTimeRange(fullRange);
+    this.timeSelection?.updateFullTimeRange(fullRange);
     this.settings.timeRange = fullRange;
     this.findRequestBuilder.withRange(fullRange);
     if (selection) {
@@ -175,11 +173,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       this.chartsAreLoading = true;
     }
     if (request.updateRanger) {
-      updates$.push(
-        ...(this._timeSeriesDashboard?.filterBar?.timeSelection
-          ? [this._timeSeriesDashboard.filterBar.timeSelection.refreshRanger()]
-          : [])
-      );
+      updates$.push(...(this.timeSelection ? [this.timeSelection.refreshRanger()] : []));
     }
     if (request.updateCharts) {
       updates$.push(this.refreshAllCharts());
@@ -232,9 +226,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       this.createByStatusChart(),
       this.createByKeywordsCharts(),
       this.createTableChart(),
-      ...(this._timeSeriesDashboard?.filterBar?.timeSelection
-        ? [this._timeSeriesDashboard.filterBar.timeSelection.onRangerLoaded.pipe(take(1))]
-        : []),
+      ...(this.timeSelection ? [this.timeSelection.onRangerLoaded.pipe(take(1))] : []),
     ];
     if (this.includeThreadGroupChart) {
       charts$.push(this.createThreadGroupsChart());
