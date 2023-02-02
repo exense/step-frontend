@@ -5,108 +5,43 @@
 #progress-bar {
   height: 12px;
   opacity: 0.2;
-}
 
-.dashboard-container {
-  max-width: 100%;
-  //max-width: 100%;
-  display: flex;
-  height: 100%;
-  flex-wrap: wrap;
-  justify-content: space-between;
-
-  .chart-container {
-    //width: 50%;
-    //flex-grow: 1;
-    background: #ffffff;
-    margin: 8px 4px;
+  mat-progress-bar {
     border-radius: 4px;
-    box-shadow: 1px 1px 9px #cdcdcd;
-    padding-top: 4px;
-  }
-
-  .chart {
-    height: 360px;
-    width: calc(50% - 12px);
-    position: relative;
   }
 }
 
-.pie-chart-container {
-  width: 300px;
-}
-
-.chart-footer-actions {
-  margin-left: 6px;
-
-  span {
-    margin-right: 20px;
-  }
-}
-
-.checkbox {
-  margin-right: 8px;
-}
-.display-none {
-  display: none;
-}
-
-.color-cell {
-  display: flex;
-  align-items: center;
-  font-size: 12px;
-
-  .color-square {
-    display: inline-block;
-    width: 24px;
-    height: 10px;
-    margin-right: 10px;
-  }
-}
-
-.page-container {
-  display: flex;
-  flex-direction: row;
-  padding-top: 20px;
-
-  .view-content {
-    flex-grow: 1;
-    max-width: 100%;
-    height: 100%;
-  }
-
-  .side-panel {
-    width: 160px;
-    box-shadow: -3px 0px 10px #bdbdbd;
-    height: calc(100% - 110px);
-    padding: 12px;
-    background: white;
-    //position: fixed;
-    right: 37px;
-  }
-}
-
-.charts-section {
-  width: 100%;
-  max-width: 100%;
-  //max-width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  margin: 30px 0;
-
-  .settings-container {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    z-index: 10;
-
-    ::ng-deep button {
-      padding: 0 4px;
-    }
-  }
+.chart {
+  height: 360px;
+  min-width: 484px;
+  flex: 1;
+  position: relative;
 }
 
 .selected-menu-item {
   background: rgba(0, 0, 0, 0.04);
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mat-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.charts-table {
+  width: 100%;
+  padding-top: 24px;
+}
+
+.chart-settings {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  z-index: 1;
 }

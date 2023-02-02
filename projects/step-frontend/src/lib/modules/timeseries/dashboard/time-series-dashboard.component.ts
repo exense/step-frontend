@@ -1,16 +1,17 @@
-import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
-import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
-import { TimeSeriesContext } from '../time-series-context';
-import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
-import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
-import { TimeSeriesDashboardSettings } from './model/ts-dashboard-settings';
-import { PerformanceViewSettings } from '../performance-view/model/performance-view-settings';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { filter, merge, Subject, Subscription, takeUntil, throttle } from 'rxjs';
 import { TSTimeRange } from '../chart/model/ts-time-range';
+import { FilterBarComponent } from '../performance-view/filter-bar/filter-bar.component';
+import { TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
+import { PerformanceViewSettings } from '../performance-view/model/performance-view-settings';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
-import { filter, Observable, of, Subject, Subscription, takeUntil, combineLatest, throttle, merge, skip } from 'rxjs';
+import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
+import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
+import { TimeSeriesContext } from '../time-series-context';
 import { TimeSeriesContextParams } from '../time-series-context-params';
+import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
+import { TimeSeriesDashboardSettings } from './model/ts-dashboard-settings';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -22,6 +23,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
 
   @Input() settings!: TimeSeriesDashboardSettings;
   @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
+  @ViewChild(FilterBarComponent) filterBar?: FilterBarComponent;
 
   timeRangeSelection: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
   context!: TimeSeriesContext;

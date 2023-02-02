@@ -1,16 +1,16 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { Bucket } from '../../bucket';
-import { TimeSeriesService } from '../../time-series.service';
-import { TimeSeriesChartResponse } from '../../time-series-chart-response';
-import { TimeSeriesKeywordsContext } from '../../execution-page/time-series-keywords.context';
+import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BucketAttributes, TableDataSource, TableLocalDataSource, TableLocalDataSourceConfig } from '@exense/step-core';
 import { Subject } from 'rxjs';
+import { Bucket } from '../../bucket';
+import { TimeSeriesKeywordsContext } from '../../execution-page/time-series-keywords.context';
+import { TimeSeriesChartResponse } from '../../time-series-chart-response';
 import { TimeSeriesContext } from '../../time-series-context';
 
 @Component({
   selector: 'step-timeseries-table',
   templateUrl: './timeseries-table.component.html',
   styleUrls: ['./timeseries-table.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class TimeseriesTableComponent implements OnInit, OnDestroy {
   // TODO use a dynamic list for percentiles
