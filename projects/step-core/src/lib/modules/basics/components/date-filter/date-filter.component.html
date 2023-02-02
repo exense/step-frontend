@@ -1,5 +1,5 @@
 <mat-form-field class="step-view with-suffix with-reduced-inner-padding">
-  <mat-label>{{ label }}</mat-label>
+  <mat-label *ngIf="label">{{ label }}</mat-label>
   <input type="text" matInput [matDatepicker]="picker" #dateInput [formControl]="dateControl" />
   <div class="icon-suffix" matSuffix>
     <step-icon name="calendar" (click)="picker.open()"></step-icon>
