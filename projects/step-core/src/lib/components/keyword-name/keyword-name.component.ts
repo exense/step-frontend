@@ -89,14 +89,18 @@ export class KeywordNameComponent implements OnChanges {
     this.artefactName = artefact?.attributes?.['name'] || '';
   }
 
-  private parseArtefactKeywordAttributes(artefact?: CallFunction): void {
+  private parseArtefactKeywordAttributes(artefact?: any): void {
     if (!artefact) {
       this.artefactKeywordAttributes = undefined;
       this.createReferenceKeywordString(this.artefactKeywordAttributes);
       return;
     }
+
     try {
-      const attributesJson = artefact?.function?.value;
+      let attributesJson = artefact?.function?.value;
+      if (typeof artefact?.function === 'string') {
+        attributesJson = artefact?.function;
+      }
       this.artefactKeywordAttributes = attributesJson ? JSON.parse(attributesJson) : undefined;
     } catch (err) {
       this.artefactKeywordAttributes = undefined;
