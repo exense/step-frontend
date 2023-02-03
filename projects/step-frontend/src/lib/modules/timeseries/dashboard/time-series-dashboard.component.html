@@ -2,6 +2,7 @@
   <step-ts-filter-bar
     *ngIf="context"
     [context]="context"
+    class="mat-card"
     [performanceViewSettings]="performanceViewSettings"
     [defaultFilterOptions]="settings.filterOptions"
     (onFiltersChange)="handleFiltersChange($event)"
