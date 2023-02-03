@@ -30,7 +30,7 @@
 </ng-container>
 <step-add-field-button
   *ngIf="!isDisabled"
-  [addLabel]="addFieldBtnLabel"
+  [addLabel]="addFieldBtnLabel || ''"
   [possibleFields]="possibleFieldsToAdd"
   (addField)="addOptionalField($event)"
 >
