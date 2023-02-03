@@ -1,23 +1,28 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { TsFilterItem, FilterBarItemType } from '../model/ts-filter-item';
-import { Subject } from 'rxjs';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { DateTime } from 'luxon';
 import { TimeSeriesUtils } from '../../../time-series-utils';
+import { FilterBarItemType, TsFilterItem } from '../model/ts-filter-item';
 
 @Component({
   selector: 'step-ts-filter-bar-item',
   templateUrl: './filter-bar-item.component.html',
   styleUrls: ['./filter-bar-item.component.scss'],
 })
-export class FilterBarItemComponent implements OnInit, OnDestroy {
-  @ViewChild('matTrigger') matTrigger!: MatMenuTrigger;
-
+export class FilterBarItemComponent implements OnInit, OnChanges {
   @Input() item!: TsFilterItem;
+
   @Output() onRemoveItem: EventEmitter<any> = new EventEmitter<any>();
   @Output() onFilterChange: EventEmitter<TsFilterItem> = new EventEmitter<TsFilterItem>();
 
+  @ViewChild('matTrigger') matTrigger!: MatMenuTrigger;
+  @ViewChild(MatMenuTrigger) menuTrigger?: MatMenuTrigger;
+  @ViewChild('initialFocus') initialFocus?: ElementRef<HTMLElement>;
+
+  readonly FilterBarType = FilterBarItemType;
+
   formattedValue? = '';
+  changesApplied = false;
 
   ngOnInit(): void {
     if (!this.item) {
@@ -25,74 +30,86 @@ export class FilterBarItemComponent implements OnInit, OnDestroy {
     }
   }
 
+  ngOnChanges(): void {
+    this.initFormattedValue(this.item);
+  }
+
   handleTextOptionClick(option: { value: string; isSelected?: boolean }, checked: boolean) {
     option.isSelected = checked;
-    this.formattedValue = this.item
-      .textValues!.filter((v) => v.isSelected)
-      .map((v) => v.value)
-      .join(', ');
+
+    this.initFormattedValue(this.item);
     this.onFilterChange.emit(this.item);
+    this.changesApplied = true;
   }
 
   applyChanges() {
     if (!this.item.isLocked) {
       this.item.label = this.item.attributeName;
     }
-    switch (this.item.type) {
-      case FilterBarItemType.FREE_TEXT:
-        this.formattedValue = this.item.textValue;
-        break;
-      case FilterBarItemType.NUMERIC:
-        if (this.item.min != undefined && this.item.max != undefined) {
-          this.formattedValue = `${this.item.min} - ${this.item.max}`;
-        } else if (this.item.min != undefined) {
-          this.formattedValue = `> ${this.item.min}`;
-        } else if (this.item.max != undefined) {
-          this.formattedValue = `< ${this.item.max}`;
-        } else {
-          // both are undefined
-          this.formattedValue = '';
-        }
-        break;
-      case FilterBarItemType.DATE:
-        break;
-    }
+
+    this.initFormattedValue(this.item);
     this.onFilterChange.emit(this.item);
+    this.changesApplied = true;
     this.matTrigger.closeMenu();
   }
 
   onMinDateChanged(date: DateTime | undefined) {
     this.item.min = date ? date.toMillis() : undefined;
-    this.formatDateRange();
+    this.initFormattedValue(this.item);
   }
 
   onMaxDateChanged(date: DateTime | undefined) {
     this.item.max = date ? date.toMillis() : undefined;
-    this.formatDateRange();
+    this.initFormattedValue(this.item);
   }
 
-  formatDateRange(): void {
-    const min = this.item.min ? TimeSeriesUtils.formatInputDate(new Date(this.item.min), false) : undefined;
-    const max = this.item.max ? TimeSeriesUtils.formatInputDate(new Date(this.item.max), false) : undefined;
-    let formattedDate;
-    if (min && max) {
-      formattedDate = `${min} to ${max}`;
-    } else if (min) {
-      formattedDate = `After ${min}`;
-    } else {
-      formattedDate = `Before ${max}`;
+  private initFormattedValue(filter: TsFilterItem): void {
+    switch (filter.type) {
+      case FilterBarItemType.FREE_TEXT:
+        this.formattedValue = this.item.textValue;
+
+        break;
+
+      case FilterBarItemType.NUMERIC:
+        if (filter.min != undefined && filter.max != undefined) {
+          this.formattedValue = `${filter.min} - ${filter.max}`;
+        } else if (filter.min != undefined) {
+          this.formattedValue = `> ${filter.min}`;
+        } else if (filter.max != undefined) {
+          this.formattedValue = `< ${filter.max}`;
+        } else {
+          // both are undefined
+          this.formattedValue = '';
+        }
+
+        break;
+
+      case FilterBarItemType.DATE:
+        const min = filter.min ? TimeSeriesUtils.formatInputDate(new Date(filter.min), false) : '';
+        const max = filter.max ? TimeSeriesUtils.formatInputDate(new Date(filter.max), false) : '';
+
+        let formattedDate = '';
+
+        if (min && max) {
+          formattedDate = `${min} to ${max}`;
+        } else if (min) {
+          formattedDate = `After ${min}`;
+        } else if (max) {
+          formattedDate = `Before ${max}`;
+        }
+
+        this.formattedValue = formattedDate;
+
+        break;
+
+      case FilterBarItemType.OPTIONS:
+        const selectedValues = filter.textValues
+          ? filter.textValues.filter((v) => v.isSelected).map((v) => v.value)
+          : [];
+
+        this.formattedValue = selectedValues.join(', ');
+
+        break;
     }
-    this.formattedValue = formattedDate;
   }
-
-  removeItem($event: any) {
-    $event.stopPropagation();
-    this.onRemoveItem.emit();
-  }
-
-  get FilterBarType() {
-    return FilterBarItemType;
-  }
-
-  ngOnDestroy(): void {}
 }

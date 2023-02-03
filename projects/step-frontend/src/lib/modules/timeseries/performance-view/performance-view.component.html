@@ -1,136 +1,131 @@
-<div class="page-container">
-  <div class="view-content">
-    <step-execution-time-selection
-      (onRangerLoaded)="onRangerLoaded()"
-      #timeSelection
-      *ngIf="context"
-      [settings]="settings"
-    >
-    </step-execution-time-selection>
-    <div id="progress-bar">
-      <mat-progress-bar *ngIf="chartsAreLoading" style="height: 12px" [mode]="'indeterminate'"></mat-progress-bar>
+<div id="progress-bar">
+  <mat-progress-bar *ngIf="chartsAreLoading" style="height: 12px" [mode]="'indeterminate'"></mat-progress-bar>
+</div>
+
+<div class="cards">
+  <mat-card>
+    <div class="chart">
+      <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.OVERVIEW]"></step-chart-skeleton>
+      <step-timeseries-chart
+        #summaryChart
+        *ngIf="currentChartsSettings[TsChartType.OVERVIEW]"
+        [settings]="currentChartsSettings[TsChartType.OVERVIEW]"
+        [syncKey]="settings.contextId"
+        (onZoomReset)="onChartsZoomReset()"
+      >
+      </step-timeseries-chart>
     </div>
 
-    <div class="w-100 dashboard-container">
-      <div class="chart-container chart">
-        <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.OVERVIEW]"></step-chart-skeleton>
-        <step-timeseries-chart
-          #summaryChart
-          *ngIf="currentChartsSettings[TsChartType.OVERVIEW]"
-          [settings]="currentChartsSettings[TsChartType.OVERVIEW]"
-          [syncKey]="settings.contextId"
-          (onZoomReset)="onChartsZoomReset()"
-        >
-        </step-timeseries-chart>
-      </div>
-
-      <div class="chart-container chart">
-        <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.BY_STATUS]"></step-chart-skeleton>
-        <step-timeseries-chart
-          #byStatusChart
-          *ngIf="currentChartsSettings[TsChartType.BY_STATUS]"
-          [settings]="currentChartsSettings[TsChartType.BY_STATUS]"
-          [syncKey]="settings.contextId"
-          (onZoomReset)="onChartsZoomReset()"
-        >
-        </step-timeseries-chart>
-      </div>
-
-      <div class="charts-section">
-        <div class="chart-container chart">
-          <div class="settings-container" *ngIf="currentChartsSettings[TsChartType.RESPONSE_TIME]">
-            <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu" style="min-width: 20px">
-              <step-icon name="settings"></step-icon>
-            </button>
-            <mat-menu #settingsMenu="matMenu">
-              <button mat-menu-item [matMenuTriggerFor]="metricsMenu">Metric</button>
-              <button mat-menu-item [matMenuTriggerFor]="keywordsMenu">Keywords</button>
-            </mat-menu>
-
-            <mat-menu #metricsMenu="matMenu">
-              <button
-                *ngFor="let metric of responseTimeMetrics"
-                (click)="switchResponseTimeMetric(metric)"
-                mat-menu-item
-                [class.selected-menu-item]="metric.label === selectedThroughputMetric.label"
-              >
-                {{ metric.label }}
-              </button>
-            </mat-menu>
-
-            <mat-menu #keywordsMenu="matMenu">
-              <step-measurements-picker
-                *ngIf="settings.contextId"
-                [contextId]="settings.contextId"
-              ></step-measurements-picker>
-            </mat-menu>
-          </div>
-          <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.RESPONSE_TIME]"></step-chart-skeleton>
-          <step-timeseries-chart
-            #responseTimeChart
-            *ngIf="currentChartsSettings[TsChartType.RESPONSE_TIME]"
-            [settings]="currentChartsSettings[TsChartType.RESPONSE_TIME]"
-            [syncKey]="settings.contextId"
-            (onZoomReset)="onChartsZoomReset()"
-          >
-          </step-timeseries-chart>
-        </div>
-
-        <div class="chart-container chart">
-          <div class="settings-container" *ngIf="currentChartsSettings[TsChartType.THROUGHPUT]">
-            <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu" style="min-width: 20px">
-              <step-icon name="settings"></step-icon>
-            </button>
-            <mat-menu #settingsMenu="matMenu">
-              <button mat-menu-item [matMenuTriggerFor]="metricsMenu">Metric</button>
-              <button mat-menu-item [matMenuTriggerFor]="keywordsMenu">Keywords</button>
-            </mat-menu>
-
-            <mat-menu #metricsMenu="matMenu">
-              <button
-                *ngFor="let metric of throughputMetrics"
-                (click)="switchThroughputMetric(metric)"
-                mat-menu-item
-                [class.selected-menu-item]="metric.label === selectedThroughputMetric.label"
-              >
-                {{ metric.label }}
-              </button>
-            </mat-menu>
-
-            <mat-menu #keywordsMenu="matMenu">
-              <step-measurements-picker
-                *ngIf="settings.contextId"
-                [contextId]="settings.contextId"
-              ></step-measurements-picker>
-            </mat-menu>
-          </div>
-          <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.THROUGHPUT]"></step-chart-skeleton>
-          <step-timeseries-chart
-            *ngIf="currentChartsSettings[TsChartType.THROUGHPUT]"
-            #throughputChart
-            [settings]="currentChartsSettings[TsChartType.THROUGHPUT]"
-            [syncKey]="settings.contextId"
-            (onZoomReset)="onChartsZoomReset()"
-          >
-          </step-timeseries-chart>
-        </div>
-
-        <div class="chart-container" style="width: 100%">
-          <step-timeseries-table #tableChart *ngIf="context" [executionContext]="context"></step-timeseries-table>
-        </div>
-      </div>
-
-      <div class="chart-container chart" *ngIf="settings?.includeThreadGroupChart">
-        <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.THREAD_GROUP]"></step-chart-skeleton>
-        <step-timeseries-chart
-          *ngIf="currentChartsSettings[TsChartType.THREAD_GROUP]"
-          #threadGroupChart
-          [settings]="currentChartsSettings[TsChartType.THREAD_GROUP]"
-          [syncKey]="settings.contextId"
-          (onZoomReset)="onChartsZoomReset()"
-        >
-        </step-timeseries-chart>
-      </div>
+    <div class="chart">
+      <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.BY_STATUS]"></step-chart-skeleton>
+      <step-timeseries-chart
+        #byStatusChart
+        *ngIf="currentChartsSettings[TsChartType.BY_STATUS]"
+        [settings]="currentChartsSettings[TsChartType.BY_STATUS]"
+        [syncKey]="settings.contextId"
+        (onZoomReset)="onChartsZoomReset()"
+      >
+      </step-timeseries-chart>
     </div>
-  </div>
+  </mat-card>
+
+  <mat-card>
+    <div class="chart">
+      <div class="chart-settings" *ngIf="currentChartsSettings[TsChartType.RESPONSE_TIME]">
+        <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
+          <step-icon name="settings"></step-icon>
+        </button>
+
+        <mat-menu #settingsMenu="matMenu">
+          <button mat-menu-item [matMenuTriggerFor]="metricsMenu">Metric</button>
+          <button mat-menu-item [matMenuTriggerFor]="keywordsMenu">Keywords</button>
+        </mat-menu>
+
+        <mat-menu #metricsMenu="matMenu">
+          <button
+            *ngFor="let metric of responseTimeMetrics"
+            (click)="switchResponseTimeMetric(metric)"
+            mat-menu-item
+            [class.selected-menu-item]="metric.label === selectedThroughputMetric.label"
+          >
+            {{ metric.label }}
+          </button>
+        </mat-menu>
+
+        <mat-menu #keywordsMenu="matMenu">
+          <step-measurements-picker
+            *ngIf="settings.contextId"
+            [contextId]="settings.contextId"
+          ></step-measurements-picker>
+        </mat-menu>
+      </div>
+
+      <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.RESPONSE_TIME]"></step-chart-skeleton>
+      <step-timeseries-chart
+        #responseTimeChart
+        *ngIf="currentChartsSettings[TsChartType.RESPONSE_TIME]"
+        [settings]="currentChartsSettings[TsChartType.RESPONSE_TIME]"
+        [syncKey]="settings.contextId"
+        (onZoomReset)="onChartsZoomReset()"
+      >
+      </step-timeseries-chart>
+    </div>
+
+    <div class="chart">
+      <div class="chart-settings" *ngIf="currentChartsSettings[TsChartType.THROUGHPUT]">
+        <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
+          <step-icon name="settings"></step-icon>
+        </button>
+        <mat-menu #settingsMenu="matMenu">
+          <button mat-menu-item [matMenuTriggerFor]="metricsMenu">Metric</button>
+          <button mat-menu-item [matMenuTriggerFor]="keywordsMenu">Keywords</button>
+        </mat-menu>
+
+        <mat-menu #metricsMenu="matMenu">
+          <button
+            *ngFor="let metric of throughputMetrics"
+            (click)="switchThroughputMetric(metric)"
+            mat-menu-item
+            [class.selected-menu-item]="metric.label === selectedThroughputMetric.label"
+          >
+            {{ metric.label }}
+          </button>
+        </mat-menu>
+
+        <mat-menu #keywordsMenu="matMenu">
+          <step-measurements-picker
+            *ngIf="settings.contextId"
+            [contextId]="settings.contextId"
+          ></step-measurements-picker>
+        </mat-menu>
+      </div>
+      <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.THROUGHPUT]"></step-chart-skeleton>
+      <step-timeseries-chart
+        *ngIf="currentChartsSettings[TsChartType.THROUGHPUT]"
+        #throughputChart
+        [settings]="currentChartsSettings[TsChartType.THROUGHPUT]"
+        [syncKey]="settings.contextId"
+        (onZoomReset)="onChartsZoomReset()"
+      >
+      </step-timeseries-chart>
+    </div>
+
+    <div class="charts-table">
+      <step-timeseries-table #tableChart *ngIf="context" [executionContext]="context"></step-timeseries-table>
+    </div>
+  </mat-card>
+
+  <mat-card *ngIf="settings?.includeThreadGroupChart">
+    <div class="chart">
+      <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.THREAD_GROUP]"></step-chart-skeleton>
+      <step-timeseries-chart
+        *ngIf="currentChartsSettings[TsChartType.THREAD_GROUP]"
+        #threadGroupChart
+        [settings]="currentChartsSettings[TsChartType.THREAD_GROUP]"
+        [syncKey]="settings.contextId"
+        (onZoomReset)="onChartsZoomReset()"
+      >
+      </step-timeseries-chart>
+    </div>
+  </mat-card>
 </div>

@@ -56,3 +56,20 @@
 button {
   background: #293e50 !important;
 }
+
+label {
+  padding-bottom: 1.25em;
+}
+
+.checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.date-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25em;
+  padding-bottom: 1.25em;
+}

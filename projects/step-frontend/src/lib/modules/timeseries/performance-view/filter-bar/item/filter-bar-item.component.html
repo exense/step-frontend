@@ -1,21 +1,20 @@
 <div class="item-container" [matMenuTriggerFor]="menu" #matTrigger="matMenuTrigger">
   <div class="filter-label">{{ item.label || 'Not Specified' }}</div>
-  <div class="filter-value">
-    {{ formattedValue || '-' }}
-  </div>
-  <div (click)="removeItem($event)" class="remove-btn">
+  <div class="filter-value">{{ formattedValue || '-' }}</div>
+
+  <div (click)="onRemoveItem.emit()" class="remove-btn">
     <step-icon class="remove-btn" name="x"></step-icon>
   </div>
 </div>
+
 <mat-menu #menu="matMenu" [ngSwitch]="item.type">
   <div class="menu-container" (click)="$event.stopPropagation()">
     <div *ngSwitchCase="FilterBarType.OPTIONS">
-      <mat-form-field floatLabel="never">
-        <mat-label>Search Value</mat-label>
-        <input type="text" matInput />
-      </mat-form-field>
-      <div *ngFor="let option of item.textValues">
+      <label>{{ item.label }}</label>
+
+      <div class="checkboxes">
         <mat-checkbox
+          *ngFor="let option of item.textValues"
           color="primary"
           [checked]="option.isSelected"
           (change)="handleTextOptionClick(option, $event.checked)"
@@ -24,56 +23,73 @@
         </mat-checkbox>
       </div>
     </div>
+
     <div *ngSwitchCase="FilterBarType.FREE_TEXT">
-      <div class="attribute-type">TEXT</div>
-      <mat-form-field class="w-100" autocomplete="off" *ngIf="!item.isLocked">
+      <mat-form-field *ngIf="!item.isLocked" class="w-100">
         <mat-label>Attribute name</mat-label>
-        <input type="text" matInput [(ngModel)]="item.attributeName" autocomplete="off" />
+        <input
+          #initialFocus
+          type="text"
+          matInput
+          [(ngModel)]="item.attributeName"
+          [readonly]="item.isLocked"
+          autocomplete="off"
+        />
       </mat-form-field>
-      <div *ngIf="item.isLocked">
-        {{ item.label }}
-      </div>
+
       <mat-form-field class="w-100">
         <mat-label>Search value</mat-label>
-        <input type="text" matInput [(ngModel)]="item.textValue" autocomplete="off" />
+        <input #initialFocus type="text" matInput [(ngModel)]="item.textValue" autocomplete="off" />
       </mat-form-field>
-      <div>
-        <button mat-raised-button color="primary" class="w-100" (click)="applyChanges()">Apply</button>
-      </div>
+
+      <button mat-raised-button color="primary" class="w-100" (click)="applyChanges()">Apply</button>
     </div>
+
     <div *ngSwitchCase="FilterBarType.NUMERIC">
-      <div class="attribute-type">NUMERIC</div>
-      <mat-form-field class="w-100">
+      <mat-form-field *ngIf="!item.isLocked" class="w-100">
         <mat-label>Attribute name</mat-label>
-        <input type="text" matInput [(ngModel)]="item.attributeName" autocomplete="off" />
+        <input
+          #initialFocus
+          type="text"
+          matInput
+          [(ngModel)]="item.attributeName"
+          [readonly]="item.isLocked"
+          autocomplete="off"
+        />
       </mat-form-field>
+
       <mat-form-field class="w-100">
         <mat-label>Min</mat-label>
         <input type="number" matInput [(ngModel)]="item.min" />
       </mat-form-field>
+
       <mat-form-field class="w-100">
         <mat-label>Max</mat-label>
         <input type="number" matInput [(ngModel)]="item.max" />
       </mat-form-field>
-      <div>
-        <button mat-raised-button color="primary" class="w-100" (click)="applyChanges()">Apply</button>
-      </div>
+
+      <button mat-raised-button color="primary" class="w-100" (click)="applyChanges()">Apply</button>
     </div>
+
     <div *ngSwitchCase="FilterBarType.DATE">
-      <div class="attribute-type">DATE</div>
-      <mat-form-field class="w-100">
+      <mat-form-field *ngIf="!item.isLocked" class="w-100">
         <mat-label>Attribute name</mat-label>
-        <input type="text" matInput [(ngModel)]="item.attributeName" />
+        <input
+          #initialFocus
+          type="text"
+          matInput
+          [(ngModel)]="item.attributeName"
+          [readonly]="item.isLocked"
+          autocomplete="off"
+        />
       </mat-form-field>
-      <div class="w-100">
+
+      <div class="date-filters">
         <step-date-filter label="From" (dateChanged)="onMinDateChanged($event)"></step-date-filter>
-      </div>
-      <div class="w-100" style="margin-bottom: 12px">
         <step-date-filter label="To" (dateChanged)="onMaxDateChanged($event)"></step-date-filter>
       </div>
-      <div>
-        <button mat-raised-button color="primary" class="w-100" (click)="applyChanges()">Apply</button>
-      </div>
+
+      <button mat-raised-button color="primary" class="w-100" (click)="applyChanges()">Apply</button>
     </div>
   </div>
 </mat-menu>

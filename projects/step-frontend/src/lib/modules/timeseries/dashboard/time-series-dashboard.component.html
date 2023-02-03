@@ -1,14 +1,17 @@
-<div class="filter-bar-container">
-  <div>
-    <step-ts-filter-bar
-      *ngIf="context"
-      [context]="context"
-      [defaultFilterOptions]="settings.filterOptions"
-      (onFiltersChange)="handleFiltersChange($event)"
-    ></step-ts-filter-bar>
-  </div>
-  <step-timeseries-grouping (onGroupingChange)="handleGroupingChange($event)"></step-timeseries-grouping>
-</div>
+<ng-container *ngIf="performanceViewSettings">
+  <step-ts-filter-bar
+    *ngIf="context"
+    [context]="context"
+    [performanceViewSettings]="performanceViewSettings"
+    [defaultFilterOptions]="settings.filterOptions"
+    (onFiltersChange)="handleFiltersChange($event)"
+    (onGroupingChange)="handleGroupingChange($event)"
+  >
+  </step-ts-filter-bar>
 
-<step-performance-view *ngIf="performanceViewSettings" [context]="context" [settings]="performanceViewSettings">
-</step-performance-view>
+  <step-performance-view
+    [context]="context"
+    [settings]="performanceViewSettings"
+    [timeSelection]="filterBar?.timeSelection"
+  ></step-performance-view>
+</ng-container>

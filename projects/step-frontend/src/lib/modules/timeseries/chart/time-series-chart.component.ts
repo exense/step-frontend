@@ -11,14 +11,14 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { TSChartSeries, TSChartSettings } from './model/ts-chart-settings';
-import { UplotSyncService } from './uplot-sync-service';
 import { AlignedData } from 'uplot';
+import { TSChartSeries, TSChartSettings } from './model/ts-chart-settings';
+import { TooltipPlugin } from './tooltip-plugin';
+import { UplotSyncService } from './uplot-sync-service';
 import MouseListener = uPlot.Cursor.MouseListener;
 
 //@ts-ignore
 import uPlot = require('uplot');
-import { TooltipPlugin } from './tooltip-plugin';
 
 @Component({
   selector: 'step-timeseries-chart',
@@ -46,6 +46,13 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   emptyChart = false; // meaning the chart is already created, but it has no data
 
   legendSettings: LegendSettings = { items: [] };
+
+  getSize = () => {
+    return {
+      width: this.element.nativeElement.parentElement.offsetWidth - 24,
+      height: this.element.nativeElement.parentElement.offsetHeight - this.HEADER_WITH_FOOTER_SIZE,
+    };
+  };
 
   constructor(@Self() private element: ElementRef) {}
 
@@ -80,12 +87,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
    */
   createChart(settings: TSChartSettings): void {
     this.legendSettings.items = [];
-    let getSize = () => {
-      return {
-        width: this.element.nativeElement.parentElement.offsetWidth - 24,
-        height: this.element.nativeElement.parentElement.offsetHeight - this.HEADER_WITH_FOOTER_SIZE,
-      };
-    };
 
     const cursorOpts: uPlot.Cursor = {
       lock: false,
@@ -138,7 +139,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     const opts: uPlot.Options = {
       title: settings.title,
       ms: 1, // if not specified it's going to be in seconds
-      ...getSize(),
+      ...this.getSize(),
       legend: { show: false },
       cursor: cursorOpts,
       scales: {
@@ -171,11 +172,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       this.uplot.destroy();
     }
     this.uplot = new uPlot(opts, data, this.chartElement.nativeElement);
-    if (settings.autoResize !== false) {
-      window.addEventListener('resize', (e) => {
-        this.uplot.setSize(getSize());
-      });
-    }
   }
 
   ngAfterViewInit(): void {
@@ -337,6 +333,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   redraw(): void {
     this.uplot.setData(this.uplot.data);
+    this.uplot.setSize(this.getSize());
   }
 
   getLastTimestamp(): number {
