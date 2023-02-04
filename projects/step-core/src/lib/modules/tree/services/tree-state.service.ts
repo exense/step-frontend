@@ -370,7 +370,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       return result;
     }
 
-    result = parent.children!.map((child) => this.findNodeById(id, child as N)).find((res) => !!res) as N;
+    result = parent.children!.map((child) => this.findNodeById(id, child as N, useCache)).find((res) => !!res) as N;
 
     if (result) {
       this.nodesAccessCache.set(id, result);
