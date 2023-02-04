@@ -5,6 +5,7 @@ import {
   AugmentedScreenService,
   AuthService,
   CustomComponent,
+  DialogsService,
   DynamicFieldsSchema,
   DynamicValueString,
   KeywordsService,
@@ -17,6 +18,9 @@ import {
 import { BehaviorSubject, filter, map, merge, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { PlanHistoryService } from '../../services/plan-history.service';
 import { ARTEFACTS_CLIPBOARD } from '../../services/artefacts-clipboard.token';
+
+const MESSAGE_ADD_AT_MULTIPLE_NODES =
+  'Adding elements is not supported when more then one node is selected in the tree';
 
 @Component({
   selector: 'step-plan-tree-editor',
@@ -46,10 +50,15 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
     private _authService: AuthService,
     private _keywordCallsApi: KeywordsService,
     private _screenTemplates: AugmentedScreenService,
-    private _planHistory: PlanHistoryService
+    private _planHistory: PlanHistoryService,
+    private _dialogs: DialogsService
   ) {}
 
   addControl(artefactTypeId: string): void {
+    if (this._treeState.isMultipleNodesSelected()) {
+      this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES);
+      return;
+    }
     this._planApi
       .getArtefactType(artefactTypeId)
       .pipe(
@@ -64,6 +73,10 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
   }
 
   addFunction(keywordId: string): void {
+    if (this._treeState.isMultipleNodesSelected()) {
+      this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES);
+      return;
+    }
     this._keywordCallsApi
       .getFunctionById(keywordId)
       .pipe(
@@ -134,6 +147,10 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
   }
 
   addPlan(planId: string): void {
+    if (this._treeState.isMultipleNodesSelected()) {
+      this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES);
+      return;
+    }
     this._planApi
       .getPlanById(planId)
       .pipe(
