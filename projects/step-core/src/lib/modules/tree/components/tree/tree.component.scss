@@ -1,5 +1,9 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
+:host {
+  padding-bottom: 40px;
+}
+
 cdk-tree-node {
   display: flex;
   position: relative;

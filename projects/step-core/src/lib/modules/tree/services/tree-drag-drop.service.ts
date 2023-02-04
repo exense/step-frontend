@@ -19,6 +19,8 @@ interface DropItem {
   height: number;
 }
 
+const DEFAULT_NODE_HEIGHT = 40;
+
 @Injectable()
 export class TreeDragDropService implements OnDestroy {
   private terminate$?: Subject<any>;
@@ -79,11 +81,19 @@ export class TreeDragDropService implements OnDestroy {
 
     this._dropInfo$ = combineLatest([this.dragItem$, this.dropItem$]).pipe(
       map(([drag, drop]) => {
-        if (!drag || !drop) {
+        if (!drag) {
           return undefined;
         }
-        const { nodeId: dropNodeId, height, y: dropY } = drop;
         const { y: dragY, nodeId: dragNodeId } = drag;
+        const node = this._treeState.findNodeById(dragNodeId);
+        if (!drop) {
+          const dropNodeId = node.parentId;
+          const dropType = DropType.out;
+          const height = DEFAULT_NODE_HEIGHT;
+          const canInsert = this._treeState.canInsertTo(dropNodeId, true);
+          return { dragNodeId, dropNodeId, height, dropType, canInsert };
+        }
+        let { nodeId: dropNodeId, height, y: dropY } = drop;
 
         const fourthPart = height / 4;
         const beforeEdge = dropY + fourthPart;
@@ -97,10 +107,13 @@ export class TreeDragDropService implements OnDestroy {
           dropType = DropType.inside;
         } else if (dragY >= afterEdge) {
           dropType = DropType.after;
+          if (dragY > dropY + height + fourthPart) {
+            dropType = DropType.out;
+            dropNodeId = node.parentId;
+          }
         }
 
         const canInsert = this._treeState.canInsertTo(dropNodeId, dropType !== DropType.inside);
-
         return { dragNodeId, dropNodeId, height, dropType, canInsert };
       })
     );
