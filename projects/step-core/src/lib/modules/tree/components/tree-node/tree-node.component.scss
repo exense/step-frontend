@@ -1,4 +1,5 @@
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
 
 step-tree-node {
   .tree-node {
@@ -22,36 +23,28 @@ step-tree-node {
         border: 1px solid transparent;
 
         > step-icon {
-          width: 10px;
-          height: 10px;
-          min-width: 10px;
-          min-height: 10px;
+          @include core.step-icon-size(10px);
           display: flex;
         }
       }
     }
 
+    > .no-toggle,
     > .mat-icon-button {
       width: 24px;
       height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      > .mat-button-wrapper {
-        > step-icon {
-          width: 12px;
-          height: 12px;
-          min-width: 12px;
-          min-height: 12px;
-          display: flex;
-          margin-top: 0;
-        }
-      }
     }
 
     &.skipped {
       color: var.$muted;
     }
+
+    &.tree-node-selected {
+      font-weight: 600;
+    }
+  }
+
+  step-icon.toggle-state {
+    @include core.step-icon-size(12px);
   }
 }

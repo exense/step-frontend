@@ -31,6 +31,8 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   private originalRoot?: T;
   private rootNode$ = new BehaviorSubject<N | undefined>(undefined);
 
+  private selectedInsertionParentId$ = new BehaviorSubject<string | undefined>(undefined);
+
   private selectedNodeIds$ = new BehaviorSubject<string[]>([]);
   readonly selectedNode$ = this.selectedNodeIds$.pipe(map((nodeIds) => this.findNodeById(nodeIds[0])));
 
@@ -54,6 +56,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     const rootNode = this._treeNodeUtils.convertItem(root);
     this.nodesAccessCache.clear();
     this.rootNode$.next(rootNode);
+    this.selectedInsertionParentId$.next(rootNode.id);
     if (selectedNodeIds) {
       this.selectedNodeIds$.next(selectedNodeIds);
     } else {
@@ -67,6 +70,10 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
   isNodeSelected(nodeId: string): Observable<boolean> {
     return this.selectedNodeIds$.pipe(map((nodes) => nodes.includes(nodeId)));
+  }
+
+  isNodeSelectedForInsert(nodeId: string): Observable<boolean> {
+    return this.selectedInsertionParentId$.pipe(map((id) => id === nodeId));
   }
 
   isRoot(nodeId: string): Observable<boolean> {
@@ -126,6 +133,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
         this.selectedNodeIds$.next(selectedNodeIds.filter((nodeId) => nodeId !== node.id));
       } else {
         this.selectedNodeIds$.next([...selectedNodeIds, node.id!].filter(unique));
+        this.selectedInsertionParentId$.next(node.id!);
       }
     } else if ($event?.shiftKey) {
       if (selectedNodeIds.includes(node.id!)) {
@@ -152,14 +160,17 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
         if (minDistanceIndex < 0) {
           this.selectedNodeIds$.next([node.id!]);
+          this.selectedInsertionParentId$.next(node.id!);
         } else {
           const [start, end] = [nodeIndex, minDistanceIndex].sort();
           const ids = visibleNodes.slice(start, end + 1).map((node) => node.id!);
           this.selectedNodeIds$.next([...selectedNodeIds, ...ids].filter(unique));
+          this.selectedInsertionParentId$.next(node.id!);
         }
       }
     } else {
       this.selectedNodeIds$.next([node.id!]);
+      this.selectedInsertionParentId$.next(node.id!);
     }
   }
 
@@ -218,7 +229,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     }
 
     this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, children, 'replace');
-
+    this.selectedInsertionParentId$.next(parentId);
     this.refresh();
   }
 
@@ -287,7 +298,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   }
 
   addChildrenToSelectedNode(...children: T[]): void {
-    const parentId = this.selectedNodeIds$.value[0];
+    const parentId = this.selectedInsertionParentId$.value;
     if (!parentId) {
       return;
     }
@@ -330,6 +341,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       .filter((parent) => !!parent);
     const lastParent = parents[parents.length - 1];
     this.selectedNodeIds$.next([lastParent!.id!]);
+    this.selectedInsertionParentId$.next(lastParent!.id!);
   }
 
   findNodeById(id?: string, parent?: N, useCache: boolean = true): N | undefined {
@@ -439,6 +451,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     this.nodesAccessCache.clear();
     this.rootNode$.complete();
     this.selectedNodeIds$.complete();
+    this.selectedInsertionParentId$.complete();
     this.treeUpdateInternal$.complete();
     this.editNodeIdInternal$.complete();
   }

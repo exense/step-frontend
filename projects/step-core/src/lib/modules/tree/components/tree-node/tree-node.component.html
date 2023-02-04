@@ -1,6 +1,7 @@
 <div
   class="tree-node"
   [class.tree-node-selected]="node.id | isNodeSelected | async"
+  [class.tree-node-selected-for-insert]="node.id | isNodeSelectedForInsert | async"
   [class.skipped]="node.isSkipped"
   cdkDrag
   [cdkDragBoundary]="treeContainer"
@@ -10,8 +11,11 @@
   (cdkDragEntered)="dragEnter($event)"
   (cdkDragEnded)="dragEnd()"
 >
-  <button *ngIf="canToggle" mat-button mat-icon-button (click)="toggle()">
-    <step-icon [name]="icon"></step-icon>
+  <ng-template #noToggle>
+    <div class="no-toggle"></div>
+  </ng-template>
+  <button *ngIf="canToggle; else noToggle" mat-button mat-icon-button (click)="toggle()">
+    <step-icon class="toggle-state" [name]="toggleStateIcon"></step-icon>
   </button>
   <div class="node-content" cdkDragHandle (contextmenu)="openContextMenu($event)">
     <div class="node-icon">
