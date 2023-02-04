@@ -1,15 +1,26 @@
 import {
   AbstractArtefact,
+  ArtefactRefreshNotificationService,
   ArtefactTreeNode,
   ArtefactTypesService,
   TreeNode,
   TreeNodeUtilsService,
 } from '@exense/step-core';
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
+import { Subject } from 'rxjs';
 
 @Injectable()
-export class ArtefactTreeNodeUtilsService implements TreeNodeUtilsService<AbstractArtefact, ArtefactTreeNode> {
+export class ArtefactTreeNodeUtilsService
+  implements OnDestroy, TreeNodeUtilsService<AbstractArtefact, ArtefactTreeNode>, ArtefactRefreshNotificationService
+{
+  private refreshArtefactInternal$ = new Subject<unknown>();
+  readonly refreshArtefact$ = this.refreshArtefactInternal$.asObservable();
+
   constructor(private _artefactTypes: ArtefactTypesService) {}
+
+  ngOnDestroy(): void {
+    this.refreshArtefactInternal$.complete();
+  }
 
   convertItem(originalArtefact: AbstractArtefact, parentId?: string): ArtefactTreeNode {
     const id = originalArtefact.id!;
@@ -88,6 +99,9 @@ export class ArtefactTreeNodeUtilsService implements TreeNodeUtilsService<Abstra
       isUpdated = true;
     }
 
+    if (isUpdated) {
+      this.refreshArtefactInternal$.next({});
+    }
     return isUpdated;
   }
 
