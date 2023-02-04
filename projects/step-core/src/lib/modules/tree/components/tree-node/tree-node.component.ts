@@ -17,12 +17,10 @@ import { TreeFlatNode } from '../../shared/tree-flat-node';
 import { CdkDragEnter, CdkDragStart } from '@angular/cdk/drag-drop';
 import { Observable, of, Subject, takeUntil } from 'rxjs';
 import { DropInfo } from '../../shared/drop-info';
-import { Mutable } from '../../../../shared';
-
-type FieldAccessor = Mutable<Pick<TreeNodeComponent, 'dropInfo$' | 'icon'>>;
 
 const ICON_EXPANDED = 'chevron-down';
 const ICON_COLLAPSED = 'chevron-right';
+const ICON_NO_TOGGLE = 'minus';
 
 @Component({
   selector: 'step-tree-node',
@@ -40,8 +38,8 @@ export class TreeNodeComponent implements OnInit, OnChanges, OnDestroy {
   @Input() treeContainer!: ElementRef<HTMLElement>;
   @Output() contextMenu = new EventEmitter<{ event: MouseEvent; nodeId: string }>();
 
-  readonly dropInfo$: Observable<DropInfo | undefined> = of(undefined);
-  readonly icon: string = ICON_COLLAPSED;
+  protected dropInfo$: Observable<DropInfo | undefined> = of(undefined);
+  protected toggleStateIcon: string = ICON_COLLAPSED;
 
   constructor(private _treeState: TreeStateService<any, TreeNode>, private _treeDragDrop: TreeDragDropService) {}
 
@@ -50,7 +48,7 @@ export class TreeNodeComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   dragStart(event: CdkDragStart<any>): void {
-    (this as FieldAccessor).dropInfo$ = this._treeDragDrop.onDragStart(event);
+    this.dropInfo$ = this._treeDragDrop.onDragStart(event);
     this._treeState.selectNode(this.node, undefined, true);
   }
 
@@ -70,7 +68,7 @@ export class TreeNodeComponent implements OnInit, OnChanges, OnDestroy {
   ngOnInit(): void {
     this._treeState.treeControl.expansionModel.changed
       .pipe(takeUntil(this.terminator$))
-      .subscribe(() => this.updateExpandedFlag());
+      .subscribe(() => this.updateToggleState());
   }
 
   ngOnDestroy(): void {
@@ -80,18 +78,36 @@ export class TreeNodeComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     const cNode = changes['node'];
-    if (cNode?.currentValue !== cNode?.previousValue && cNode?.firstChange) {
-      this.updateExpandedFlag(cNode?.currentValue);
+    const cCanToggle = changes['canToggle'];
+
+    let node: TreeFlatNode | undefined;
+    let canToggle: boolean | undefined;
+
+    if (cNode?.currentValue !== cNode?.previousValue || cNode?.firstChange) {
+      node = cNode?.currentValue;
     }
+
+    if (cCanToggle?.currentValue !== cCanToggle?.previousValue || cCanToggle?.firstChange) {
+      canToggle = cCanToggle?.currentValue;
+    }
+    this.updateToggleState(node, canToggle);
   }
 
-  private updateExpandedFlag(node?: TreeFlatNode): void {
+  private updateToggleState(node?: TreeFlatNode, canToggle?: boolean): void {
     node = node || this.node;
+    canToggle = canToggle !== undefined ? canToggle : this.canToggle;
+
+    if (!canToggle) {
+      this.isExpanded = false;
+      this.toggleStateIcon = ICON_NO_TOGGLE;
+      return;
+    }
+
     const isExpanded = node && this._treeState.treeControl.isExpanded(node);
     if (this.isExpanded === isExpanded) {
       return;
     }
     this.isExpanded = isExpanded;
-    (this as FieldAccessor).icon = isExpanded ? ICON_EXPANDED : ICON_COLLAPSED;
+    this.toggleStateIcon = isExpanded ? ICON_EXPANDED : ICON_COLLAPSED;
   }
 }

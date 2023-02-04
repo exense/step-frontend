@@ -10,8 +10,13 @@
   (cdkDragEntered)="dragEnter($event)"
   (cdkDragEnded)="dragEnd()"
 >
-  <button *ngIf="canToggle" mat-button mat-icon-button (click)="toggle()">
-    <step-icon [name]="icon"></step-icon>
+  <ng-template #noToggle>
+    <div class="no-toggle">
+      <step-icon class="toggle-state" [name]="toggleStateIcon"></step-icon>
+    </div>
+  </ng-template>
+  <button *ngIf="canToggle; else noToggle" mat-button mat-icon-button (click)="toggle()">
+    <step-icon class="toggle-state" [name]="toggleStateIcon"></step-icon>
   </button>
   <div class="node-content" cdkDragHandle (contextmenu)="openContextMenu($event)">
     <div class="node-icon">
