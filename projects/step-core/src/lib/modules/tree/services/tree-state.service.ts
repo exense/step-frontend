@@ -68,12 +68,23 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     }
   }
 
+  isMultipleNodesSelected(): boolean {
+    return this.selectedNodeIds$.value.length > 1;
+  }
+
   isNodeSelected(nodeId: string): Observable<boolean> {
     return this.selectedNodeIds$.pipe(map((nodes) => nodes.includes(nodeId)));
   }
 
   isNodeSelectedForInsert(nodeId: string): Observable<boolean> {
-    return this.selectedInsertionParentId$.pipe(map((id) => id === nodeId));
+    return combineLatest([this.selectedNodeIds$, this.selectedInsertionParentId$]).pipe(
+      map(([selectedNodes, selectedInsertionParentId]) => {
+        if (selectedNodes.length > 1) {
+          return false;
+        }
+        return selectedInsertionParentId === nodeId;
+      })
+    );
   }
 
   isRoot(nodeId: string): Observable<boolean> {
