@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import {
   AbstractArtefact,
   ArtefactTreeNode,
@@ -16,6 +16,7 @@ import {
 } from '@exense/step-core';
 import { BehaviorSubject, filter, map, merge, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { PlanHistoryService } from '../../services/plan-history.service';
+import { ARTEFACTS_CLIPBOARD } from '../../services/artefacts-clipboard.token';
 
 @Component({
   selector: 'step-plan-tree-editor',
@@ -37,9 +38,8 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
   readonly hasRedo$ = this._planHistory.hasRedo$;
   readonly hasUndo$ = this._planHistory.hasUndo$;
 
-  private artefactsClipboard: AbstractArtefact[] = [];
-
   constructor(
+    @Inject(ARTEFACTS_CLIPBOARD) private _artefactsClipboard: AbstractArtefact[],
     private _planEditor: PlanEditorService,
     private _planApi: PlansService,
     private _treeState: TreeStateService<AbstractArtefact, ArtefactTreeNode>,
@@ -237,14 +237,16 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
     if (node) {
       this._treeState.selectNodeById(node.id!);
     }
-    this.artefactsClipboard = this._treeState.getSelectedNodes().map(({ originalArtefact }) => originalArtefact);
+    const artefacts = this._treeState.getSelectedNodes().map(({ originalArtefact }) => originalArtefact);
+    const clipboardLength = this._artefactsClipboard.length;
+    this._artefactsClipboard.splice(0, clipboardLength, ...artefacts);
   }
 
   paste(node?: AbstractArtefact): void {
-    if (!this.artefactsClipboard?.length) {
+    if (!this._artefactsClipboard?.length) {
       return;
     }
-    this._planApi.cloneArtefacts(this.artefactsClipboard).subscribe((children) => {
+    this._planApi.cloneArtefacts(this._artefactsClipboard).subscribe((children) => {
       if (node) {
         this._treeState.selectNodeById(node.id!);
       }
