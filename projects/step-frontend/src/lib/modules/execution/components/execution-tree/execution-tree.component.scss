@@ -11,6 +11,4 @@ step-execution-tree {
   step-icon {
     background: transparent !important;
   }
-
-  @include core.tree-node-selection(map-get(var.$statuses, 'PASSED'));
 }

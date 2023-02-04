@@ -2,7 +2,7 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 step-plan-tree {
-  @include core.tree-node-selection(var.$blue-600);
+  @include core.tree-node-selected-for-insert(var.$blue-600);
   display: flex;
   height: 100%;
 
