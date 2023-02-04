@@ -245,7 +245,6 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
       return;
     }
     this._planApi.cloneArtefacts(this.artefactsClipboard).subscribe((children) => {
-      this.artefactsClipboard = [];
       if (node) {
         this._treeState.selectNodeById(node.id!);
       }
