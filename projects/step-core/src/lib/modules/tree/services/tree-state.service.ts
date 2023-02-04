@@ -265,25 +265,27 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
     let hasChange = false;
 
-    parentChildRelations.forEach(({ parentId, nodeId }) => {
+    parentChildRelations.forEach(({ parentId, nodeIds }) => {
       const parent = this.findNodeById(parentId);
       const children = (parent?.children || []) as N[];
-      const childIndex = children.findIndex((child) => child.id === nodeId);
       let hasLocalChange = false;
+      nodeIds.forEach((nodeId) => {
+        const childIndex = children.findIndex((child) => child.id === nodeId);
 
-      if (direction === 'up' && childIndex > 0) {
-        const sibling = children[childIndex - 1];
-        children[childIndex - 1] = children[childIndex];
-        children[childIndex] = sibling;
-        hasLocalChange = true;
-      }
+        if (direction === 'up' && childIndex > 0) {
+          const sibling = children[childIndex - 1];
+          children[childIndex - 1] = children[childIndex];
+          children[childIndex] = sibling;
+          hasLocalChange = true;
+        }
 
-      if (direction === 'down' && childIndex < children.length - 1) {
-        const sibling = children[childIndex + 1];
-        children[childIndex + 1] = children[childIndex];
-        children[childIndex] = sibling;
-        hasLocalChange = true;
-      }
+        if (direction === 'down' && childIndex < children.length - 1) {
+          const sibling = children[childIndex + 1];
+          children[childIndex + 1] = children[childIndex];
+          children[childIndex] = sibling;
+          hasLocalChange = true;
+        }
+      });
 
       if (hasLocalChange) {
         this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, children, 'replace');
@@ -326,10 +328,10 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       return;
     }
 
-    parentChildRelations.forEach(({ parentId, nodeId }) => {
+    parentChildRelations.forEach(({ parentId, nodeIds }) => {
       const parent = this.findNodeById(parentId)!;
       if (parent) {
-        const children = parent.children!.filter((child) => child.id !== nodeId) as N[];
+        const children = parent.children!.filter((child) => !nodeIds.includes(child.id)) as N[];
         this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, children, 'replace');
       }
     });
@@ -456,16 +458,21 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     this.editNodeIdInternal$.complete();
   }
 
-  private getParentChildRelationsForSelectedNodes(): { nodeId: string; parentId: string }[] {
+  private getParentChildRelationsForSelectedNodes(): { nodeIds: string[]; parentId: string }[] {
     const selectedNodeIds = this.selectedNodeIds$.value.filter((nodeId) => nodeId !== this.rootNode$.value?.id);
 
-    const result = selectedNodeIds.map((nodeId) => {
+    const relationDictionary = selectedNodeIds.reduce((result, nodeId) => {
       const flatNode = this.treeControl.dataNodes.find((n) => n.id === nodeId);
       const parentId = flatNode!.parentId!;
-      return { nodeId, parentId };
-    });
+      if (!result[parentId]) {
+        result[parentId] = [nodeId];
+      } else {
+        result[parentId].push(nodeId);
+      }
+      return result;
+    }, {} as Record<string, string[]>);
 
-    return result;
+    return Object.entries(relationDictionary).map(([parentId, nodeIds]) => ({ parentId, nodeIds }));
   }
 
   private getVisibleNodes(): N[] {
