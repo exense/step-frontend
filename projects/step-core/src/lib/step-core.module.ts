@@ -36,9 +36,13 @@ import { CORE_INITIALIZER } from './core-initialiser';
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { CapsLockDirective } from './directives/caps-lock.directive';
 import { ElementResizeDirective } from './directives/element-resize.directive';
+import { FocusableDirective } from './directives/focusable.directive';
+import { FocusablesDirective } from './directives/focusables.directive';
+import { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 import { SimpleLineChartDirective } from './directives/simple-line-chart.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 import { TooltipDirective } from './directives/tooltip.directive';
+import { TrapFocusDirective } from './directives/trap-focus.directive';
 import { StepBasicsModule } from './modules/basics/step-basics.module';
 import { CustomRegistriesModule } from './modules/custom-registeries/custom-registries.module';
 import { DynamicFormsModule } from './modules/dynamic-forms/dynamic-forms.module';
@@ -94,6 +98,10 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     SplitAreaComponent,
     SplitGutterComponent,
     ElementResizeDirective,
+    TrapFocusDirective,
+    FocusableDirective,
+    FocusablesDirective,
+    RecursiveTabIndexDirective,
   ],
   imports: [
     CommonModule,
@@ -162,6 +170,10 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     SplitAreaComponent,
     SplitGutterComponent,
     ElementResizeDirective,
+    TrapFocusDirective,
+    FocusableDirective,
+    FocusablesDirective,
+    RecursiveTabIndexDirective,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -221,9 +233,13 @@ export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
+export { FocusableDirective } from './directives/focusable.directive';
+export { FocusablesDirective } from './directives/focusables.directive';
+export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 export * from './directives/simple-line-chart.directive';
 export * from './directives/tooltip-immediate-close.directive';
 export * from './directives/tooltip.directive';
+export { TrapFocusDirective } from './directives/trap-focus.directive';
 export * from './domain';
 export * from './modules/async-operations/async-operations.module';
 export * from './modules/basics/step-basics.module';

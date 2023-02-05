@@ -46,6 +46,39 @@
   }
 }
 
+@mixin focused($config) {
+  $primary-color: map.get($config, primary-color);
+  $primary-text-color: map.get($config, primary-text-color);
+
+  .mat-form-field-wrapper .mat-form-field-flex {
+    .mat-form-field-infix {
+      mat-select,
+      mat-radio-group,
+      .mat-input-element {
+        border-color: $primary-color;
+      }
+
+      .mat-form-field-label-wrapper label {
+        color: $primary-color;
+      }
+    }
+
+    .mat-form-field-prefix,
+    .mat-form-field-suffix {
+      color: $primary-color;
+      border: 1px solid $primary-color;
+
+      .mat-stroked-button:not([color]):not([disabled]) {
+        color: $primary-text-color;
+      }
+
+      .suffix-separator {
+        border-right: 1px solid $primary-color;
+      }
+    }
+  }
+}
+
 @mixin mat-form-field($config) {
   $primary-color: map.get($config, primary-color);
   $primary-text-color: map.get($config, primary-text-color);
@@ -226,33 +259,7 @@
 
     &.step-force-focus,
     &.mat-focused {
-      .mat-form-field-wrapper .mat-form-field-flex {
-        .mat-form-field-infix {
-          mat-select,
-          mat-radio-group,
-          .mat-input-element {
-            border-color: $primary-color;
-          }
-
-          .mat-form-field-label-wrapper label {
-            color: $primary-color;
-          }
-        }
-
-        .mat-form-field-prefix,
-        .mat-form-field-suffix {
-          color: $primary-color;
-          border: 1px solid $primary-color;
-
-          .mat-stroked-button:not([color]):not([disabled]) {
-            color: $primary-text-color;
-          }
-
-          .suffix-separator {
-            border-right: 1px solid $primary-color;
-          }
-        }
-      }
+      @include focused($config);
     }
 
     &.ng-invalid.ng-touched {
@@ -307,6 +314,15 @@
           height: $input-reduced-height;
         }
       }
+    }
+  }
+
+  step-date-filter:focus,
+  step-date-filter:focus-within {
+    outline: none;
+
+    mat-form-field.step-view {
+      @include focused($config);
     }
   }
 }
