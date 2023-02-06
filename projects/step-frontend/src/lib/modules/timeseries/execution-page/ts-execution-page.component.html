@@ -1,5 +1,6 @@
 <ng-container *ngIf="!executionHasToBeBuilt">
   <div class="header-buttons">
+    <button mat-raised-button class="interactive-btn" (click)="navigateToRtmDashboard()">Interactive Session</button>
     <step-time-range-picker
       *ngIf="timeRangeSelection"
       (onSelectionChange)="onTimeRangeChange($event)"

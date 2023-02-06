@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '@exense/step-core';
+import { AJS_MODULE, DashboardService } from '@exense/step-core';
 import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
 import { TimeSeriesConfig } from '../time-series.config';
 import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
@@ -36,6 +36,10 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
 
   stopInterval$ = new Subject();
 
+  contextualParams: any = {};
+
+  constructor(private dashboardService: DashboardService) {}
+
   ngOnInit(): void {
     let selectedTimeRange = this.timeRangeOptions[0];
     let now = new Date().getTime();
@@ -59,6 +63,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     delete urlParams.refresh; // in case it exists
     delete urlParams.start;
     delete urlParams.end;
+    this.contextualParams = urlParams;
 
     this.dashboardSettings = {
       contextId: new Date().getTime().toString(),
@@ -114,6 +119,10 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     if (this.refreshEnabled) {
       this.startInterval(this.selectedRefreshInterval.value);
     }
+  }
+
+  navigateToRtmDashboard() {
+    window.open(this.dashboardService.getRtmDashboardLinkWithFilter(this.contextualParams));
   }
 
   changeRefreshInterval(newInterval: { label: string; value: number }) {

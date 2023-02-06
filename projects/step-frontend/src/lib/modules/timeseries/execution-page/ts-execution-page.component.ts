@@ -81,6 +81,10 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy {
     this.dashboard.updateRange(this.calculateFullTimeRange());
   }
 
+  navigateToRtmDashboard(): void {
+    window.open(this.dashboardService.getRtmExecutionLink(this.executionId));
+  }
+
   init() {
     this.executionService.getExecutionById(this.executionId).subscribe((execution) => {
       this.execution = execution;
