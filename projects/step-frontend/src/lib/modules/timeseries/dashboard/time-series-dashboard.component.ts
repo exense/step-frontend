@@ -112,7 +112,8 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * This is a force refresh (instantly triggered)
+   * This is a force refresh (instantly triggered).
+   * The selection will be set to full selection.
    */
   updateRange(range: TSTimeRange) {
     this.updateSubscription?.unsubscribe(); // end current execution
