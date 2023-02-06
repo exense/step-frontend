@@ -15,6 +15,7 @@ import { ArrayOfSizePipe } from './pipes/array-of-size.pipe';
 import { IsNodeSelectedPipe } from './pipes/is-node-selected.pipe';
 import { IsRootNodePipe } from './pipes/is-root-node.pipe';
 import { TreeNodeActionsPipe } from './pipes/tree-node-actions.pipe';
+import { IsNodeSelectedForInsertPipe } from './pipes/is-node-selected-for-insert.pipe';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { TreeNodeActionsPipe } from './pipes/tree-node-actions.pipe';
     TreeDragPlaceholderComponent,
     TreeNodeComponent,
     ArrayOfSizePipe,
+    IsNodeSelectedForInsertPipe,
   ],
   imports: [
     CommonModule,

@@ -35,6 +35,7 @@ import {
   TreeNodeUtilsService,
   TreeStateService,
   RestoreDialogsService,
+  ArtefactRefreshNotificationService,
 } from '@exense/step-core';
 import { ILocationService } from 'angular';
 import { catchError, filter, from, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
@@ -54,6 +55,10 @@ import { PlanHistoryService } from '../../services/plan-history.service';
     ArtefactTreeNodeUtilsService,
     {
       provide: TreeNodeUtilsService,
+      useExisting: ArtefactTreeNodeUtilsService,
+    },
+    {
+      provide: ArtefactRefreshNotificationService,
       useExisting: ArtefactTreeNodeUtilsService,
     },
     TreeStateService,

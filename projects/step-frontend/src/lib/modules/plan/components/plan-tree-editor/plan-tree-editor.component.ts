@@ -1,10 +1,11 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import {
   AbstractArtefact,
   ArtefactTreeNode,
   AugmentedScreenService,
   AuthService,
   CustomComponent,
+  DialogsService,
   DynamicFieldsSchema,
   DynamicValueString,
   KeywordsService,
@@ -16,6 +17,10 @@ import {
 } from '@exense/step-core';
 import { BehaviorSubject, filter, map, merge, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { PlanHistoryService } from '../../services/plan-history.service';
+import { ARTEFACTS_CLIPBOARD } from '../../services/artefacts-clipboard.token';
+
+const MESSAGE_ADD_AT_MULTIPLE_NODES =
+  'Adding elements is not supported when more then one node is selected in the tree';
 
 @Component({
   selector: 'step-plan-tree-editor',
@@ -37,19 +42,23 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
   readonly hasRedo$ = this._planHistory.hasRedo$;
   readonly hasUndo$ = this._planHistory.hasUndo$;
 
-  private artefactsClipboard: AbstractArtefact[] = [];
-
   constructor(
+    @Inject(ARTEFACTS_CLIPBOARD) private _artefactsClipboard: AbstractArtefact[],
     private _planEditor: PlanEditorService,
     private _planApi: PlansService,
     private _treeState: TreeStateService<AbstractArtefact, ArtefactTreeNode>,
     private _authService: AuthService,
     private _keywordCallsApi: KeywordsService,
     private _screenTemplates: AugmentedScreenService,
-    private _planHistory: PlanHistoryService
+    private _planHistory: PlanHistoryService,
+    private _dialogs: DialogsService
   ) {}
 
   addControl(artefactTypeId: string): void {
+    if (this._treeState.isMultipleNodesSelected()) {
+      this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES);
+      return;
+    }
     this._planApi
       .getArtefactType(artefactTypeId)
       .pipe(
@@ -64,6 +73,10 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
   }
 
   addFunction(keywordId: string): void {
+    if (this._treeState.isMultipleNodesSelected()) {
+      this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES);
+      return;
+    }
     this._keywordCallsApi
       .getFunctionById(keywordId)
       .pipe(
@@ -134,6 +147,10 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
   }
 
   addPlan(planId: string): void {
+    if (this._treeState.isMultipleNodesSelected()) {
+      this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES);
+      return;
+    }
     this._planApi
       .getPlanById(planId)
       .pipe(
@@ -237,15 +254,16 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
     if (node) {
       this._treeState.selectNodeById(node.id!);
     }
-    this.artefactsClipboard = this._treeState.getSelectedNodes().map(({ originalArtefact }) => originalArtefact);
+    const artefacts = this._treeState.getSelectedNodes().map(({ originalArtefact }) => originalArtefact);
+    const clipboardLength = this._artefactsClipboard.length;
+    this._artefactsClipboard.splice(0, clipboardLength, ...artefacts);
   }
 
   paste(node?: AbstractArtefact): void {
-    if (!this.artefactsClipboard?.length) {
+    if (!this._artefactsClipboard?.length) {
       return;
     }
-    this._planApi.cloneArtefacts(this.artefactsClipboard).subscribe((children) => {
-      this.artefactsClipboard = [];
+    this._planApi.cloneArtefacts(this._artefactsClipboard).subscribe((children) => {
       if (node) {
         this._treeState.selectNodeById(node.id!);
       }
