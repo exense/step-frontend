@@ -12,8 +12,8 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { TSRangerSettings } from './ts-ranger-settings';
 import { TSTimeRange } from '../chart/model/ts-time-range';
+import { TSRangerSettings } from './ts-ranger-settings';
 
 //@ts-ignore
 import uPlot = require('uplot');
@@ -56,15 +56,18 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
 
   start!: number;
   end!: number;
+  lastLeft?: number;
+  lastWidth?: number;
+  lastHostWidth?: number;
 
   getSize = () => {
     return {
-      width: this.element.nativeElement.parentElement.offsetWidth,
+      width: this.element.nativeElement.getBoundingClientRect().width,
       height: this.CHART_HEIGHT,
     };
   };
 
-  constructor(@Self() private element: ElementRef) {}
+  constructor(@Self() private element: ElementRef<HTMLElement>) {}
 
   ngOnInit(): void {
     if (this.syncKey) {
@@ -74,13 +77,9 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     this.init(this.settings);
   }
 
-  init(settings: TSRangerSettings) {
-    this.start = settings.xValues[0];
-    this.end = settings.xValues[this.settings.xValues.length - 1];
-  }
-
   ngAfterViewInit(): void {
     this.createRanger();
+    this.lastHostWidth = this.element.nativeElement.getBoundingClientRect().width;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -90,6 +89,19 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       this.init(settings.currentValue);
       this.createRanger();
     }
+  }
+
+  private get scaleFactor(): number {
+    if (this.lastHostWidth === undefined) {
+      return 1;
+    }
+
+    return this.element.nativeElement.getBoundingClientRect().width / this.lastHostWidth;
+  }
+
+  init(settings: TSRangerSettings) {
+    this.start = settings.xValues[0];
+    this.end = settings.xValues[this.settings.xValues.length - 1];
   }
 
   selectRange(range: TSTimeRange) {
@@ -132,6 +144,8 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       if (emitResetEvent) {
         this.onZoomReset.emit({ from: start, to: end });
       }
+      delete this.lastLeft;
+      delete this.lastWidth;
     }, 50);
   }
 
@@ -192,19 +206,34 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     };
 
     let setSelect = (newLft: number, newWid: number) => {
+      const maxWidth = this.uplot.bbox.width / devicePixelRatio;
+
+      if (newLft + newWid > maxWidth) {
+        newLft = maxWidth - newWid;
+      }
+
       lftWid.left = newLft;
       lftWid.width = newWid;
+
+      this.lastLeft = newLft;
+      this.lastWidth = newWid;
+      this.lastHostWidth = this.element.nativeElement.getBoundingClientRect().width;
+
       this.uplot.setSelect(lftWid, false);
     };
 
     let update = (newLft: number, newWid: number) => {
-      let newRgt = newLft + newWid;
-      let maxRgt = this.uplot.bbox.width / devicePixelRatio;
+      const maxWidth = this.uplot.bbox.width / devicePixelRatio;
 
-      if (newLft >= 0 && newRgt <= maxRgt) {
-        setSelect(newLft, newWid);
-        // zoom(newLft, newWid);
+      if (newLft < 0) {
+        newLft = 0;
       }
+
+      if (newWid > maxWidth) {
+        newWid = maxWidth;
+      }
+
+      setSelect(newLft, newWid);
     };
     let isFullSelection = false;
     let select;
@@ -283,9 +312,14 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       hooks: {
         ready: [
           (uRanger: uPlot) => {
-            let left = 0;
-            let width = Math.round(uRanger.valToPos(this.end, 'x')) - left;
+            let left = this.lastLeft !== undefined ? this.lastLeft * this.scaleFactor : 0;
+            let width =
+              this.lastWidth !== undefined
+                ? this.lastWidth * this.scaleFactor
+                : Math.round(uRanger.valToPos(this.end, 'x')) - left;
+
             let height = uRanger.bbox.height / devicePixelRatio;
+
             if (isFullSelection) {
               // we deal with full selection
               uRanger.setSelect({ left, width, height, top: 0 }, false);

@@ -1,30 +1,30 @@
+import { KeyValue } from '@angular/common';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, BucketAttributes, Execution } from '@exense/step-core';
-import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
-import { TimeSeriesService } from '../time-series.service';
-import { FindBucketsRequest } from '../find-buckets-request';
-import { TimeSeriesChartComponent } from '../chart/time-series-chart.component';
-import { KeyValue } from '@angular/common';
-import { TSRangerComponent } from '../ranger/ts-ranger.component';
-import { UPlotUtils } from '../uplot/uPlot.utils';
-import { TimeseriesTableComponent } from './table/timeseries-table.component';
-import { first, forkJoin, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
-import { TimeSeriesUtils } from '../time-series-utils';
-import { TimeSeriesContext } from '../time-series-context';
-import { KeywordSelection, TimeSeriesKeywordsContext } from '../execution-page/time-series-keywords.context';
+import { forkJoin, Observable, of, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { Bucket } from '../bucket';
-import { TimeSeriesChartResponse } from '../time-series-chart-response';
-import { PerformanceViewSettings } from './model/performance-view-settings';
-import { ChartGenerators } from './chart-generators/chart-generators';
-import { TsChartType } from './model/ts-chart-type';
-import { PerformanceViewTimeSelectionComponent } from './time-selection/performance-view-time-selection.component';
+import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
 import { TSTimeRange } from '../chart/model/ts-time-range';
-import { ThroughputMetric } from './model/throughput-metric';
-import { PerformanceViewConfig } from './performance-view.config';
-import { UpdatePerformanceViewRequest } from './model/update-performance-view-request';
-import { FindBucketsRequestBuilder } from '../util/find-buckets-request-builder';
+import { TimeSeriesChartComponent } from '../chart/time-series-chart.component';
+import { KeywordSelection, TimeSeriesKeywordsContext } from '../execution-page/time-series-keywords.context';
+import { FindBucketsRequest } from '../find-buckets-request';
+import { TSRangerComponent } from '../ranger/ts-ranger.component';
+import { TimeSeriesChartResponse } from '../time-series-chart-response';
+import { TimeSeriesContext } from '../time-series-context';
+import { TimeSeriesUtils } from '../time-series-utils';
 import { RefreshInterval, TimeSeriesConfig } from '../time-series.config';
+import { TimeSeriesService } from '../time-series.service';
+import { UPlotUtils } from '../uplot/uPlot.utils';
+import { FindBucketsRequestBuilder } from '../util/find-buckets-request-builder';
+import { ChartGenerators } from './chart-generators/chart-generators';
+import { PerformanceViewSettings } from './model/performance-view-settings';
+import { ThroughputMetric } from './model/throughput-metric';
+import { TsChartType } from './model/ts-chart-type';
+import { UpdatePerformanceViewRequest } from './model/update-performance-view-request';
+import { PerformanceViewConfig } from './performance-view.config';
+import { TimeseriesTableComponent } from './table/timeseries-table.component';
+import { PerformanceViewTimeSelectionComponent } from './time-selection/performance-view-time-selection.component';
 
 declare const uPlot: any;
 
@@ -53,16 +53,14 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   @ViewChild('threadGroupChart') threadGroupChart!: TimeSeriesChartComponent;
   @ViewChild('tableChart') tableChart!: TimeseriesTableComponent;
 
-  @ViewChild(PerformanceViewTimeSelectionComponent) timeSelectionComponent!: PerformanceViewTimeSelectionComponent;
-
   @Input() context!: TimeSeriesContext;
   @Input() settings!: PerformanceViewSettings;
+  @Input() timeSelection?: PerformanceViewTimeSelectionComponent;
   @Input() includeThreadGroupChart = true;
 
   @Output() onInitializationComplete: EventEmitter<void> = new EventEmitter<void>();
   @Output() onUpdateComplete: EventEmitter<void> = new EventEmitter<void>();
 
-  private rangerLoaded$ = new Subject<void>();
   chartsAreLoading = false;
 
   keywords: { [key: string]: KeywordSelection } = {};
@@ -155,7 +153,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
    */
   updateFullRange(fullRange: TSTimeRange, selection?: TSTimeRange): void {
     this.context.updateFullRange(fullRange, false);
-    this.timeSelectionComponent.updateFullTimeRange(fullRange);
+    this.timeSelection?.updateFullTimeRange(fullRange);
     this.settings.timeRange = fullRange;
     this.findRequestBuilder.withRange(fullRange);
     if (selection) {
@@ -175,7 +173,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       this.chartsAreLoading = true;
     }
     if (request.updateRanger) {
-      updates$.push(this.timeSelectionComponent.refreshRanger());
+      updates$.push(...(this.timeSelection ? [this.timeSelection.refreshRanger()] : []));
     }
     if (request.updateCharts) {
       updates$.push(this.refreshAllCharts());
@@ -222,17 +220,13 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .withNumberOfBuckets(TimeSeriesConfig.MAX_BUCKETS_IN_CHART);
   }
 
-  onRangerLoaded() {
-    this.rangerLoaded$.next();
-  }
-
   createAllCharts() {
     const charts$ = [
       this.createSummaryChart(),
       this.createByStatusChart(),
       this.createByKeywordsCharts(),
       this.createTableChart(),
-      this.rangerLoaded$.pipe(first()),
+      ...(this.timeSelection ? [this.timeSelection.onRangerLoaded.pipe(take(1))] : []),
     ];
     if (this.includeThreadGroupChart) {
       charts$.push(this.createThreadGroupsChart());
@@ -517,7 +511,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.terminator$.next();
-    this.rangerLoaded$.complete();
+    this.terminator$.complete();
   }
 
   get TsChartType() {

@@ -1,4 +1,14 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Optional,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AbstractArtefact,
@@ -10,6 +20,8 @@ import { AJS_MODULE } from '../../shared';
 import { EntityScopeResolver, Entity } from '../../modules/entity/entity.module';
 import { DynamicFieldsSchema, DynamicFieldGroupValue } from '../../modules/dynamic-forms/dynamic-forms.module';
 import { DynamicAttributePipe } from '../../pipes/dynamic-attribute.pipe';
+import { ArtefactRefreshNotificationService } from '../../services/artefact-refresh-notification.service';
+import { Subject, takeUntil } from 'rxjs';
 
 interface KeywordMeta {
   icon: string;
@@ -30,7 +42,9 @@ const KEYWORD_ATTRIBUTES_SCHEMA: DynamicFieldsSchema = {
   templateUrl: './keyword-name.component.html',
   styleUrls: ['./keyword-name.component.scss'],
 })
-export class KeywordNameComponent implements OnChanges {
+export class KeywordNameComponent implements OnChanges, OnInit, OnDestroy {
+  private terminator$ = new Subject<unknown>();
+
   @Input() isDisabled: boolean = false;
   @Input() artefact?: CallFunction;
 
@@ -45,7 +59,20 @@ export class KeywordNameComponent implements OnChanges {
   protected isEditorMode: boolean = false;
   protected keywordMeta?: KeywordMeta;
 
-  constructor(private _keywordApi: AugmentedKeywordsService, private _entityScopeResolver: EntityScopeResolver) {}
+  constructor(
+    private _keywordApi: AugmentedKeywordsService,
+    private _entityScopeResolver: EntityScopeResolver,
+    @Optional() private _artefactRefreshNotification: ArtefactRefreshNotificationService
+  ) {}
+
+  ngOnInit(): void {
+    this.setupArtefactExternalRefresh();
+  }
+
+  ngOnDestroy(): void {
+    this.terminator$.next({});
+    this.terminator$.complete();
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     const cArtefact = changes['artefact'];
@@ -194,6 +221,15 @@ export class KeywordNameComponent implements OnChanges {
           }
         : undefined;
     });
+  }
+
+  private setupArtefactExternalRefresh(): void {
+    if (!this._artefactRefreshNotification) {
+      return;
+    }
+    this._artefactRefreshNotification.refreshArtefact$
+      .pipe(takeUntil(this.terminator$))
+      .subscribe(() => this.initArtefactName(this.artefact));
   }
 }
 

@@ -35,6 +35,7 @@ import { UploadContainerComponent } from './components/upload-container/upload-c
 import { CORE_INITIALIZER } from './core-initialiser';
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { CapsLockDirective } from './directives/caps-lock.directive';
+import { ElementResizeDirective } from './directives/element-resize.directive';
 import { SimpleLineChartDirective } from './directives/simple-line-chart.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 import { TooltipDirective } from './directives/tooltip.directive';
@@ -92,6 +93,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     SplitComponent,
     SplitAreaComponent,
     SplitGutterComponent,
+    ElementResizeDirective,
   ],
   imports: [
     CommonModule,
@@ -159,6 +161,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     SplitComponent,
     SplitAreaComponent,
     SplitGutterComponent,
+    ElementResizeDirective,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -217,6 +220,7 @@ export { UploadContainerComponent } from './components/upload-container/upload-c
 export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';
+export { ElementResizeDirective } from './directives/element-resize.directive';
 export * from './directives/simple-line-chart.directive';
 export * from './directives/tooltip-immediate-close.directive';
 export * from './directives/tooltip.directive';
@@ -256,4 +260,5 @@ export * from './services/scheduled-task-dialogs.service';
 export { UibModalHelperService, UibModalInstance } from './services/uib-modal-helper.service';
 export * from './services/view-registry.service';
 export * from './services/view-state.service';
+export * from './services/artefact-refresh-notification.service';
 export * from './shared';

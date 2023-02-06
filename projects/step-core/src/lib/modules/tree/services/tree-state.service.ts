@@ -31,6 +31,8 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   private originalRoot?: T;
   private rootNode$ = new BehaviorSubject<N | undefined>(undefined);
 
+  private selectedInsertionParentId$ = new BehaviorSubject<string | undefined>(undefined);
+
   private selectedNodeIds$ = new BehaviorSubject<string[]>([]);
   readonly selectedNode$ = this.selectedNodeIds$.pipe(map((nodeIds) => this.findNodeById(nodeIds[0])));
 
@@ -54,6 +56,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     const rootNode = this._treeNodeUtils.convertItem(root);
     this.nodesAccessCache.clear();
     this.rootNode$.next(rootNode);
+    this.selectedInsertionParentId$.next(rootNode.id);
     if (selectedNodeIds) {
       this.selectedNodeIds$.next(selectedNodeIds);
     } else {
@@ -65,8 +68,23 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     }
   }
 
+  isMultipleNodesSelected(): boolean {
+    return this.selectedNodeIds$.value.length > 1;
+  }
+
   isNodeSelected(nodeId: string): Observable<boolean> {
     return this.selectedNodeIds$.pipe(map((nodes) => nodes.includes(nodeId)));
+  }
+
+  isNodeSelectedForInsert(nodeId: string): Observable<boolean> {
+    return combineLatest([this.selectedNodeIds$, this.selectedInsertionParentId$]).pipe(
+      map(([selectedNodes, selectedInsertionParentId]) => {
+        if (selectedNodes.length > 1) {
+          return false;
+        }
+        return selectedInsertionParentId === nodeId;
+      })
+    );
   }
 
   isRoot(nodeId: string): Observable<boolean> {
@@ -126,6 +144,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
         this.selectedNodeIds$.next(selectedNodeIds.filter((nodeId) => nodeId !== node.id));
       } else {
         this.selectedNodeIds$.next([...selectedNodeIds, node.id!].filter(unique));
+        this.selectedInsertionParentId$.next(node.id!);
       }
     } else if ($event?.shiftKey) {
       if (selectedNodeIds.includes(node.id!)) {
@@ -152,14 +171,17 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
         if (minDistanceIndex < 0) {
           this.selectedNodeIds$.next([node.id!]);
+          this.selectedInsertionParentId$.next(node.id!);
         } else {
           const [start, end] = [nodeIndex, minDistanceIndex].sort();
           const ids = visibleNodes.slice(start, end + 1).map((node) => node.id!);
           this.selectedNodeIds$.next([...selectedNodeIds, ...ids].filter(unique));
+          this.selectedInsertionParentId$.next(node.id!);
         }
       }
     } else {
       this.selectedNodeIds$.next([node.id!]);
+      this.selectedInsertionParentId$.next(node.id!);
     }
   }
 
@@ -176,8 +198,10 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
     if (dropType === DropType.after && this.isNodeExpanded(parentId)) {
       const parent = this.findNodeById(parentId);
-      if ((parent?.children || []).length > 0) {
-        // drop after for expanded node with children interpret like drop inside, as first children
+      // drop after for expanded node with children interpret like drop inside, as first children
+      // but don't count dragging children
+      const parentChildren = (parent?.children || []).filter((child) => !selectedNodeIds.includes(child.id));
+      if (parentChildren.length > 0) {
         dropType = DropType.inside;
         insideInsertStrategy = 'prepend';
       }
@@ -206,7 +230,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       } else {
         children.unshift(...(nodesToAdd as N[]));
       }
-    } else {
+    } else if (dropType === DropType.after || dropType === DropType.before) {
       const siblingIndex = children.findIndex((child) => child.id === nodeId)!;
       let start: number;
       if (dropType === DropType.before) {
@@ -215,10 +239,12 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
         start = siblingIndex + 1;
       }
       children.splice(start!, 0, ...(nodesToAdd as N[]));
+    } else {
+      children.push(...(nodesToAdd as N[]));
     }
 
     this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, children, 'replace');
-
+    this.selectedInsertionParentId$.next(parentId);
     this.refresh();
   }
 
@@ -254,25 +280,27 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
     let hasChange = false;
 
-    parentChildRelations.forEach(({ parentId, nodeId }) => {
+    parentChildRelations.forEach(({ parentId, nodeIds }) => {
       const parent = this.findNodeById(parentId);
       const children = (parent?.children || []) as N[];
-      const childIndex = children.findIndex((child) => child.id === nodeId);
       let hasLocalChange = false;
+      nodeIds.forEach((nodeId) => {
+        const childIndex = children.findIndex((child) => child.id === nodeId);
 
-      if (direction === 'up' && childIndex > 0) {
-        const sibling = children[childIndex - 1];
-        children[childIndex - 1] = children[childIndex];
-        children[childIndex] = sibling;
-        hasLocalChange = true;
-      }
+        if (direction === 'up' && childIndex > 0) {
+          const sibling = children[childIndex - 1];
+          children[childIndex - 1] = children[childIndex];
+          children[childIndex] = sibling;
+          hasLocalChange = true;
+        }
 
-      if (direction === 'down' && childIndex < children.length - 1) {
-        const sibling = children[childIndex + 1];
-        children[childIndex + 1] = children[childIndex];
-        children[childIndex] = sibling;
-        hasLocalChange = true;
-      }
+        if (direction === 'down' && childIndex < children.length - 1) {
+          const sibling = children[childIndex + 1];
+          children[childIndex + 1] = children[childIndex];
+          children[childIndex] = sibling;
+          hasLocalChange = true;
+        }
+      });
 
       if (hasLocalChange) {
         this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, children, 'replace');
@@ -287,7 +315,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   }
 
   addChildrenToSelectedNode(...children: T[]): void {
-    const parentId = this.selectedNodeIds$.value[0];
+    const parentId = this.selectedInsertionParentId$.value;
     if (!parentId) {
       return;
     }
@@ -315,10 +343,10 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       return;
     }
 
-    parentChildRelations.forEach(({ parentId, nodeId }) => {
+    parentChildRelations.forEach(({ parentId, nodeIds }) => {
       const parent = this.findNodeById(parentId)!;
       if (parent) {
-        const children = parent.children!.filter((child) => child.id !== nodeId) as N[];
+        const children = parent.children!.filter((child) => !nodeIds.includes(child.id)) as N[];
         this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, children, 'replace');
       }
     });
@@ -330,6 +358,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       .filter((parent) => !!parent);
     const lastParent = parents[parents.length - 1];
     this.selectedNodeIds$.next([lastParent!.id!]);
+    this.selectedInsertionParentId$.next(lastParent!.id!);
   }
 
   findNodeById(id?: string, parent?: N, useCache: boolean = true): N | undefined {
@@ -358,7 +387,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       return result;
     }
 
-    result = parent.children!.map((child) => this.findNodeById(id, child as N)).find((res) => !!res) as N;
+    result = parent.children!.map((child) => this.findNodeById(id, child as N, useCache)).find((res) => !!res) as N;
 
     if (result) {
       this.nodesAccessCache.set(id, result);
@@ -439,20 +468,26 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     this.nodesAccessCache.clear();
     this.rootNode$.complete();
     this.selectedNodeIds$.complete();
+    this.selectedInsertionParentId$.complete();
     this.treeUpdateInternal$.complete();
     this.editNodeIdInternal$.complete();
   }
 
-  private getParentChildRelationsForSelectedNodes(): { nodeId: string; parentId: string }[] {
+  private getParentChildRelationsForSelectedNodes(): { nodeIds: string[]; parentId: string }[] {
     const selectedNodeIds = this.selectedNodeIds$.value.filter((nodeId) => nodeId !== this.rootNode$.value?.id);
 
-    const result = selectedNodeIds.map((nodeId) => {
+    const relationDictionary = selectedNodeIds.reduce((result, nodeId) => {
       const flatNode = this.treeControl.dataNodes.find((n) => n.id === nodeId);
       const parentId = flatNode!.parentId!;
-      return { nodeId, parentId };
-    });
+      if (!result[parentId]) {
+        result[parentId] = [nodeId];
+      } else {
+        result[parentId].push(nodeId);
+      }
+      return result;
+    }, {} as Record<string, string[]>);
 
-    return result;
+    return Object.entries(relationDictionary).map(([parentId, nodeIds]) => ({ parentId, nodeIds }));
   }
 
   private getVisibleNodes(): N[] {
