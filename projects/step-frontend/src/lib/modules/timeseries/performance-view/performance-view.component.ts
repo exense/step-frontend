@@ -364,8 +364,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           key = this.getSeriesKey(key, groupDimensions);
           let responseTimeData: (number | null | undefined)[] = [];
           let color = this.keywordsService.getColor(key);
-          let countData = response.matrix[i].map((b, j) => {
-            let bucketValue = b?.throughputPerHour;
+          let throughputData = response.matrix[i].map((b, j) => {
+            let bucketValue = this.selectedThroughputMetric.mapFunction(b);
             if (totalThroughput[j] == undefined) {
               totalThroughput[j] = bucketValue;
             } else if (bucketValue) {
@@ -390,7 +390,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             stroke: color,
             points: { show: false },
           } as TSChartSeries;
-          throughputSeries.push({ ...series, data: countData });
+          throughputSeries.push({ ...series, data: throughputData });
           responseTimeSeries.push({ ...series, data: responseTimeData });
           return series;
         });
@@ -420,13 +420,13 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             {
               scale: 'y',
               size: this.CHART_LEGEND_SIZE,
-              values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
+              values: (u, vals, space) => vals.map((v) => this.selectedThroughputMetric.labelFunction(v)),
             },
             {
               side: 1,
               size: this.CHART_LEGEND_SIZE,
               scale: 'total',
-              values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
+              values: (u, vals, space) => vals.map((v) => this.selectedThroughputMetric.labelFunction(v)),
               grid: { show: false },
             },
           ],
@@ -452,7 +452,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     );
   }
 
-  switchResponseTimeMetric(metric: { label: string; mapFunction: (b: Bucket) => number }) {
+  switchResponseTimeMetric(metric: { label: string; mapFunction: (b: Bucket) => number | null }) {
     this.responseTimeChart.setTitle(TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${metric.label})`);
     if (metric.label === this.selectedResponseTimeMetric.label) {
       // it is a real change

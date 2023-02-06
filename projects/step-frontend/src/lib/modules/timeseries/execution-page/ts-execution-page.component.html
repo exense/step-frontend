@@ -4,7 +4,7 @@
       *ngIf="timeRangeSelection"
       (onSelectionChange)="onTimeRangeChange($event)"
       [selectOptions]="timeRangeOptions"
-      [includeFullRangeOption]="!!execution?.endTime"
+      [includeFullRangeOption]="true"
       [activeSelection]="timeRangeSelection"
     >
     </step-time-range-picker>

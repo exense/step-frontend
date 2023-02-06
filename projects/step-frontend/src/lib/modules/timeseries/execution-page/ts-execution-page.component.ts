@@ -86,9 +86,6 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy {
       this.execution = execution;
       const startTime = execution.startTime!;
       const endTime = execution.endTime ? execution.endTime : new Date().getTime();
-      if (!execution.endTime) {
-        this.timeRangeSelection = this.timeRangeOptions[0];
-      }
       let urlParams = TsUtils.getURLParams(window.location.href);
       this.dashboardSettings = {
         contextId: this.executionId,
