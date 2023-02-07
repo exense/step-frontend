@@ -1,5 +1,6 @@
 <ng-container [formGroup]="form">
   <h5 *ngIf="primaryFields.length > 0">{{ primaryFieldsLabel }}</h5>
+  <p *ngIf="primaryFieldsDescription" class="description">{{ primaryFieldsDescription }}</p>
   <ng-container *ngFor="let field of primaryFields; trackBy: trackByField">
     <step-dynamic-field
       [formControl]="field.control"
@@ -13,6 +14,7 @@
     </step-dynamic-field>
   </ng-container>
   <h5 *ngIf="optionalFields.length > 0">{{ optionalFieldsLabel }}</h5>
+  <p *ngIf="optionalFieldsDescription" class="description">{{ optionalFieldsDescription }}</p>
   <ng-container *ngFor="let field of optionalFields; trackBy: trackByField">
     <step-dynamic-field
       [formControl]="field.control"
