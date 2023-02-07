@@ -86,6 +86,8 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     const settings = changes['settings'];
     if (settings && settings.previousValue) {
       // it's a real change
+      delete this.lastLeft;
+      delete this.lastWidth;
       this.init(settings.currentValue);
       this.createRanger();
     }
