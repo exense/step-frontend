@@ -1,8 +1,7 @@
 <div class="main-name" [class.with-meta]="keywordMeta">
   <step-editable-label
+    tooltip="Keyword name"
     [ngModel]="artefactName"
-    matTooltip="Keyword name"
-    matTooltipPosition="below"
     (ngModelChange)="onArtefactNameChange($event)"
     [disabled]="isDisabled"
   >
