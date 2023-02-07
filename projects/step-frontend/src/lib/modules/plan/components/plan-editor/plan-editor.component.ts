@@ -307,6 +307,7 @@ export class PlanEditorComponent
     if (!planId) {
       return;
     }
+
     this._planApi
       .getPlanById(planId)
       .pipe(
@@ -318,10 +319,13 @@ export class PlanEditorComponent
       )
       .subscribe((plan) => {
         this.planClass = plan._class;
-        this.planTypeControl.setValue({
-          planType: plan.root!._class,
-          icon: this._artefactService.getIconNg2(plan.root!._class),
-        });
+        this.planTypeControl.setValue(
+          {
+            planType: plan.root!._class,
+            icon: this._artefactService.getIconNg2(plan.root!._class),
+          },
+          { emitEvent: false }
+        );
         this._planEditService.init(plan);
       });
   }

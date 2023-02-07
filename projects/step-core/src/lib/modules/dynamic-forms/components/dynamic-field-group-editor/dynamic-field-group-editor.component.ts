@@ -35,6 +35,8 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
 
   @Input() primaryFieldsLabel?: string;
   @Input() optionalFieldsLabel?: string;
+  @Input() primaryFieldsDescription?: string;
+  @Input() optionalFieldsDescription?: string;
   @Input() addFieldBtnLabel?: string;
 
   @Input() isDisabled?: boolean;
