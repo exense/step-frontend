@@ -145,15 +145,15 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   }
 
   triggerRefresh() {
-    this.dashboard.refresh(this.calculateRange());
+    this.dashboard.refresh(this.calculateFullRange());
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
-    this.dashboard.updateRange(this.calculateRange()); // instant call
+    this.dashboard.updateRange(this.calculateFullRange()); // instant call
   }
 
-  calculateRange(): TSTimeRange {
+  calculateFullRange(): TSTimeRange {
     let now = new Date().getTime();
     let newFullRange: TSTimeRange;
     switch (this.timeRangeSelection.type) {

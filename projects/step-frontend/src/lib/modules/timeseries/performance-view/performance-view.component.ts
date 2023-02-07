@@ -82,6 +82,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   selectedRefreshInterval: RefreshInterval = this.refreshIntervals[0];
 
   terminator$ = new Subject<void>();
+  updateDashboardTerminator$ = new Subject<void>();
   intervalShouldBeCanceled = false;
 
   allSeriesChecked: boolean = true;
@@ -137,9 +138,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
         this.keywords = keywords;
       });
     this.context
-      .onSelectedTimeRangeChange()
+      .onTimeSelectionChange()
       .pipe(
-        switchMap((newRange) => this.handleZoomChange(newRange)),
+        switchMap((newRange) => this.handleSelectionChange(newRange)),
         takeUntil(this.terminator$)
       )
       .subscribe();
@@ -166,6 +167,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
    * @param request
    */
   updateDashboard(request: UpdatePerformanceViewRequest): Observable<any> {
+    console.log('UPDATE DASHBOARD CALLED');
+    this.updateDashboardTerminator$.next(); // to keep executions synchronous
     // let's assume the complete interval and selections are set.
     if (!this.context.inProgress$.getValue()) this.context.setInProgress(true);
     let updates$ = [];
@@ -179,6 +182,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       updates$.push(this.refreshAllCharts());
     }
     return forkJoin(updates$).pipe(
+      takeUntil(this.updateDashboardTerminator$),
       tap(() => {
         this.chartsAreLoading = false;
         this.context.setInProgress(false);
@@ -186,14 +190,15 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     );
   }
 
-  handleZoomChange(range: TSTimeRange): Observable<any> {
-    if (TimeSeriesUtils.intervalsEqual(this.findRequestBuilder.getRange(), range)) {
+  handleSelectionChange(selection: TSTimeRange): Observable<any> {
+    if (TimeSeriesUtils.intervalsEqual(this.findRequestBuilder.getRange(), selection)) {
+      // nothing happened
       return of(undefined);
     }
     this.getAllCharts().forEach((chart) => {
       chart?.setBlur(true);
     });
-    this.findRequestBuilder.withRange(range);
+    this.findRequestBuilder.withRange(selection);
     return this.refreshAllCharts();
   }
 
@@ -237,10 +242,11 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .subscribe((allCompleted) => this.onInitializationComplete.emit());
   }
 
-  refreshAllCharts(): Observable<unknown> {
+  private refreshAllCharts(): Observable<unknown> {
+    console.log('REFRESH ALL CHARTS CALLED');
     this.findRequestBuilder = this.prepareFindRequestBuilder(this.settings); // we don't want to lose active filters
-    let fullTimeRange = this.context.getSelectedTimeRange();
-    this.findRequestBuilder.withRange(fullTimeRange);
+    let timeSelection = this.context.getSelectedTimeRange();
+    this.findRequestBuilder.withRange(timeSelection);
 
     const charts$ = [
       this.createSummaryChart(),

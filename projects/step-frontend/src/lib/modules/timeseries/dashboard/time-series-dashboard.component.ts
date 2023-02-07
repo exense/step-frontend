@@ -66,10 +66,11 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   private updateDashboard(showLoading = false) {
+    this.updateSubscription?.unsubscribe();
     this.updateSubscription = this.performanceView
       .updateDashboard({
         updateRanger: true,
-        updateCharts: true,
+        updateCharts: false,
         showLoadingBar: showLoading,
       })
       .subscribe();
@@ -79,7 +80,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     merge(this.context.onFiltersChange(), this.context.onGroupingChange())
       .pipe(takeUntil(this.terminator$))
       .subscribe(() => {
-        this.updateSubscription?.unsubscribe();
         this.updateDashboard(true);
       });
   }
@@ -94,12 +94,21 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
 
   setRanges(fullRange: TSTimeRange, selection?: TSTimeRange) {
     let isFullRangeSelected = this.context.isFullRangeSelected();
+    let newSelection = selection || this.context.getSelectedTimeRange();
     this.context.updateFullRange(fullRange, false);
-    if (selection) {
-      this.context.updateSelectedRange(selection, false);
-    } else if (isFullRangeSelected) {
-      this.context.updateSelectedRange(fullRange, false);
+    if (isFullRangeSelected && !selection) {
+      newSelection = fullRange;
+    } else {
+      // we crop it
+      let newFrom = Math.max(fullRange.from, newSelection.from);
+      let newTo = Math.min(fullRange.to, newSelection.to);
+      if (newTo - newFrom < 3) {
+        newSelection = fullRange; // zoom reset when the interval is very small
+      } else {
+        newSelection = { from: newFrom, to: newTo };
+      }
     }
+    this.context.updateSelectedRange(newSelection, false);
   }
 
   /**
@@ -107,6 +116,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
    * @param range
    */
   refresh(range: TSTimeRange, selection?: TSTimeRange): void {
+    console.log(this.context.getSelectedTimeRange());
     this.setRanges(range, selection);
     this.throttledRefreshTrigger$.next(true);
   }
