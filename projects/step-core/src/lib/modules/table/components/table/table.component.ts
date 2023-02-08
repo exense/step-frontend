@@ -155,7 +155,7 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     this.page.firstPage();
 
     const initialPage: PageEvent = {
-      pageSize: this.pageSizeOptions[0] || 10,
+      pageSize: this.page.pageSize || this.pageSizeOptions[0],
       pageIndex: 0,
       length: 0,
     };
