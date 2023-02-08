@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '@exense/step-core';
+import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../../client/generated';
 import { AJS_MODULE } from '../../../../shared';
 import { DynamicFieldGroupValue } from '../../shared/dynamic-field-group-value';
 import { DynamicFieldsSchema } from '../../shared/dynamic-fields-schema';
