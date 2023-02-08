@@ -1,5 +1,12 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { ControllerService, Mutable, TestRunStatus, SelectionCollector, TableLocalDataSource } from '@exense/step-core';
+import {
+  ControllerService,
+  Mutable,
+  TestRunStatus,
+  SelectionCollector,
+  TableLocalDataSource,
+  RepositoryObjectReference,
+} from '@exense/step-core';
 import { BehaviorSubject, map, of, shareReplay, switchMap, tap, Subject, takeUntil, combineLatest, first } from 'rxjs';
 import { Status } from '../../../_common/step-common.module';
 
@@ -17,17 +24,21 @@ const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === 
 })
 export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, OnDestroy {
   private terminator$: Subject<unknown> = new Subject<unknown>();
-  private planId$ = new BehaviorSubject<string | undefined>(undefined);
+  private cRepoRef$ = new BehaviorSubject<RepositoryObjectReference | undefined>(undefined);
 
-  private repositoryReport$ = this.planId$.pipe(
+  private repositoryReport$ = this.cRepoRef$.pipe(
     tap(() => ((this as InProgress).inProgress = true)),
-    switchMap((planId) => {
-      if (!planId) {
+    switchMap((repoRef) => {
+      if (!repoRef) {
         return of(undefined);
+      }
+
+      if (!repoRef?.repositoryParameters?.['planid']) {
+        return this._controllerService.getReport(repoRef);
       }
       return this._controllerService.getReport({
         repositoryID: 'local',
-        repositoryParameters: { planid: this.planId! },
+        repositoryParameters: { planid: repoRef?.repositoryParameters?.['planid'] },
       });
     }),
     map((testSetStatusOverview) => testSetStatusOverview?.runs || []),
@@ -36,7 +47,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, O
     shareReplay(1)
   );
 
-  @Input() planId?: string;
+  @Input() repoRef?: RepositoryObjectReference;
 
   readonly inProgress: boolean = false;
 
@@ -65,20 +76,20 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, O
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const cPlanId = changes['planId'];
-    if (cPlanId?.previousValue !== cPlanId?.currentValue || cPlanId?.firstChange) {
-      this.planId$.next(cPlanId?.currentValue);
+    const cRepoRef = changes['repoRef'];
+    if (cRepoRef?.previousValue !== cRepoRef?.currentValue || cRepoRef?.firstChange) {
+      this.cRepoRef$.next(cRepoRef?.currentValue);
     }
   }
 
   ngOnDestroy(): void {
-    this.planId$.complete();
+    this.cRepoRef$.complete();
     this.terminator$.next({});
     this.terminator$.complete();
   }
 
   loadTable(): void {
-    this.planId$.next(this.planId$.value);
+    this.cRepoRef$.next(this.cRepoRef$.value);
   }
 
   handleCheckboxChange(): void {
