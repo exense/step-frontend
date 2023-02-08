@@ -112,6 +112,11 @@ export class EditableComponent<T> implements ControlValueAccessor {
   protected onApply(): void {
     this.state = EditableComponentState.READABLE;
     this.stateChange.emit(this.state);
+
+    if (this.newValue === this.value) {
+      return;
+    }
+
     this.value = this.newValue;
     this.onChange?.(this.newValue);
   }
