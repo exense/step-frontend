@@ -14,8 +14,10 @@
     <span class="visible-when-collapsed sidebar-home-button" (click)="navigateTo('home')">
       <step-icon name="home"></step-icon>
     </span>
-    <span class="sidebar-home-and-settings-divider">|</span>
-    <step-dashlet itemKey="settings-btn" class="sidebar-home-and-settings-icon"></step-dashlet>
+    <ng-container *ngIf="('settings-ui-menu' | hasRight | async) || ('admin-ui-menu' | hasRight | async)">
+      <span class="sidebar-home-and-settings-divider">|</span>
+      <step-dashlet itemKey="settings-btn" class="sidebar-home-and-settings-icon"></step-dashlet>
+    </ng-container>
   </div>
   <div id="sidebar-categories">
     <div id="sidebar-categories-tabs">
