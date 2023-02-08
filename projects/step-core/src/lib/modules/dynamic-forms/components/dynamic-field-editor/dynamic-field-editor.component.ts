@@ -1,8 +1,9 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { DynamicFieldsSchema } from '../../shared/dynamic-fields-schema';
-import { DynamicFieldGroupValue } from '../../shared/dynamic-field-group-value';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
+import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '@exense/step-core';
 import { AJS_MODULE } from '../../../../shared';
+import { DynamicFieldGroupValue } from '../../shared/dynamic-field-group-value';
+import { DynamicFieldsSchema } from '../../shared/dynamic-fields-schema';
 
 @Component({
   selector: 'step-dynamic-field-editor',
@@ -10,15 +11,18 @@ import { AJS_MODULE } from '../../../../shared';
   styleUrls: ['./dynamic-field-editor.component.scss'],
 })
 export class DynamicFieldEditorComponent implements OnChanges {
-  protected showJson: boolean = false;
-  protected internalValue?: DynamicFieldGroupValue;
   @Input() isDisabled?: boolean;
   @Input() schema?: DynamicFieldsSchema;
   @Input() value?: string;
+
   @Output() valueChange = new EventEmitter<string | undefined>();
+
+  protected showJson: boolean = false;
+  protected internalValue?: DynamicFieldGroupValue;
 
   ngOnChanges(changes: SimpleChanges): void {
     const cValue = changes['value'];
+
     if (cValue?.previousValue !== cValue?.currentValue || cValue?.firstChange) {
       this.parseValue(cValue?.currentValue);
     }
@@ -31,15 +35,42 @@ export class DynamicFieldEditorComponent implements OnChanges {
 
   private parseValue(value?: string): void {
     value = value || this.value;
+
     if (!value) {
       this.internalValue = undefined;
       return;
     }
-    let internalValue: DynamicFieldGroupValue | undefined = undefined;
+
     try {
-      internalValue = JSON.parse(value);
-    } catch (e) {}
-    this.internalValue = internalValue;
+      this.internalValue = JSON.parse(value);
+
+      if (!this.internalValue) {
+        return;
+      }
+
+      Object.keys(this.internalValue).forEach((key) => {
+        this.normalizeDynamicValue(this.internalValue![key]);
+      });
+    } catch (e) {
+      // do nothing
+    }
+  }
+
+  private normalizeDynamicValue<T extends DynamicValueString | DynamicValueBoolean | DynamicValueInteger>(
+    dynamicValue: T
+  ): void {
+    const isBoolean = (value: unknown) => typeof value === 'boolean' || value === 'true' || value === 'false';
+    const isNumber = (value: unknown) => typeof value === 'number' || !isNaN(Number(value));
+
+    const { value } = dynamicValue;
+    const valueIsBoolean = isBoolean(value);
+    const valueIsNumber = isNumber(value);
+
+    if (valueIsBoolean) {
+      dynamicValue.value = value === 'true' ? true : false;
+    } else if (valueIsNumber) {
+      dynamicValue.value = Number(value);
+    }
   }
 }
 
