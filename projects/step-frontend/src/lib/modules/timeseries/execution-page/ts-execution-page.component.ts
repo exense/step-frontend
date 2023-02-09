@@ -96,6 +96,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy {
         includeThreadGroupChart: true,
         timeRange: { from: startTime, to: endTime },
         contextualFilters: { ...urlParams, eId: this.executionId },
+        showContextualFilters: false,
         filterOptions: [
           {
             label: 'Status',

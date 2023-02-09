@@ -70,6 +70,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
       includeThreadGroupChart: true,
       timeRange: { from: start, to: end },
       contextualFilters: urlParams,
+      showContextualFilters: true,
       filterOptions: [
         {
           label: 'Status',

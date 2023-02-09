@@ -68,6 +68,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   refreshRanger(): Observable<TimeSeriesChartResponse> {
     const selection = this.tsContext.getSelectedTimeRange();
+    console.log('ranger selection:', selection);
     return this.createRanger(
       this.tsContext.getFullTimeRange(),
       this.tsContext.isFullRangeSelected() ? undefined : selection

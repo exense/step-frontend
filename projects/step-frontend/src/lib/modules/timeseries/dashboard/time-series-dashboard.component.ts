@@ -2,7 +2,7 @@ import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { filter, merge, Subject, Subscription, takeUntil, throttle } from 'rxjs';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { FilterBarComponent } from '../performance-view/filter-bar/filter-bar.component';
-import { TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
+import { FilterBarItemType, TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
 import { PerformanceViewSettings } from '../performance-view/model/performance-view-settings';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
@@ -39,11 +39,24 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     { label: 'Last Hour', timeInMs: this.ONE_HOUR_MS },
   ];
 
+  contextualFilterItems: TsFilterItem[] = [];
+
   constructor(private contextsFactory: TimeSeriesContextsFactory) {}
 
   ngOnInit(): void {
     if (!this.settings) {
       throw new Error('Settings input must be set');
+    }
+    if (this.settings.showContextualFilters) {
+      this.contextualFilterItems = Object.keys(this.settings.contextualFilters).map((key) => {
+        return {
+          label: key,
+          type: FilterBarItemType.FREE_TEXT,
+          attributeName: key,
+          textValue: this.settings.contextualFilters[key],
+          isLocked: false,
+        };
+      });
     }
     const contextParams: TimeSeriesContextParams = {
       id: this.settings.contextId,
@@ -70,7 +83,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.updateSubscription = this.performanceView
       .updateDashboard({
         updateRanger: true,
-        updateCharts: false,
+        updateCharts: true,
         showLoadingBar: showLoading,
       })
       .subscribe();
@@ -116,7 +129,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
    * @param range
    */
   refresh(range: TSTimeRange, selection?: TSTimeRange): void {
-    console.log(this.context.getSelectedTimeRange());
     this.setRanges(range, selection);
     this.throttledRefreshTrigger$.next(true);
   }

@@ -12,8 +12,8 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { TSTimeRange } from '../chart/model/ts-time-range';
 import { TSRangerSettings } from './ts-ranger-settings';
+import { TSTimeRange } from '../chart/model/ts-time-range';
 
 //@ts-ignore
 import uPlot = require('uplot');
@@ -56,18 +56,15 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
 
   start!: number;
   end!: number;
-  lastLeft?: number;
-  lastWidth?: number;
-  lastHostWidth?: number;
 
   getSize = () => {
     return {
-      width: this.element.nativeElement.getBoundingClientRect().width,
+      width: this.element.nativeElement.parentElement.offsetWidth,
       height: this.CHART_HEIGHT,
     };
   };
 
-  constructor(@Self() private element: ElementRef<HTMLElement>) {}
+  constructor(@Self() private element: ElementRef) {}
 
   ngOnInit(): void {
     if (this.syncKey) {
@@ -75,35 +72,43 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     }
 
     this.init(this.settings);
+    window.addEventListener('resize', (e) => {
+      this.resizeChart();
+    });
+  }
+
+  resizeChart() {
+    let chartPadding = 50; // this is the way uplot works
+    let fullWidth = this.uplot.width - chartPadding;
+    let leftSelect = this.uplot.select.left;
+    let width = this.uplot.select.width;
+    let rightSelect = leftSelect + width;
+    let leftPercent = (100 * leftSelect) / fullWidth;
+    let rightPercent = (100 * rightSelect) / fullWidth;
+    this.uplot.setSize(this.getSize());
+    let newChartWidth = this.uplot.width - chartPadding;
+
+    let newLeft = (leftPercent / 100) * newChartWidth;
+    let newRight = (rightPercent / 100) * newChartWidth;
+    this.uplot.setSelect({ left: newLeft, width: newRight - newLeft, top: 0 }, false);
+  }
+
+  init(settings: TSRangerSettings) {
+    this.start = settings.xValues[0];
+    this.end = settings.xValues[this.settings.xValues.length - 1];
   }
 
   ngAfterViewInit(): void {
     this.createRanger();
-    this.lastHostWidth = this.element.nativeElement.getBoundingClientRect().width;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     const settings = changes['settings'];
     if (settings && settings.previousValue) {
       // it's a real change
-      delete this.lastLeft;
-      delete this.lastWidth;
       this.init(settings.currentValue);
       this.createRanger();
     }
-  }
-
-  private get scaleFactor(): number {
-    if (this.lastHostWidth === undefined) {
-      return 1;
-    }
-
-    return this.element.nativeElement.getBoundingClientRect().width / this.lastHostWidth;
-  }
-
-  init(settings: TSRangerSettings) {
-    this.start = settings.xValues[0];
-    this.end = settings.xValues[this.settings.xValues.length - 1];
   }
 
   selectRange(range: TSTimeRange) {
@@ -112,10 +117,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     this.emitSelectionToLinkedCharts();
   }
 
-  transformRangeToSelect(range: TSTimeRange): uPlot.Select | undefined {
-    if (!range) {
-      return undefined;
-    }
+  transformRangeToSelect(range: TSTimeRange): uPlot.Select {
     let fromTimestamp = range.from;
     let toTimestamp = range.to;
     let left, width;
@@ -146,8 +148,6 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       if (emitResetEvent) {
         this.onZoomReset.emit({ from: start, to: end });
       }
-      delete this.lastLeft;
-      delete this.lastWidth;
     }, 50);
   }
 
@@ -208,48 +208,33 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     };
 
     let setSelect = (newLft: number, newWid: number) => {
-      const maxWidth = this.uplot.bbox.width / devicePixelRatio;
-
-      if (newLft + newWid > maxWidth) {
-        newLft = maxWidth - newWid;
-      }
-
       lftWid.left = newLft;
       lftWid.width = newWid;
-
-      this.lastLeft = newLft;
-      this.lastWidth = newWid;
-      this.lastHostWidth = this.element.nativeElement.getBoundingClientRect().width;
-
       this.uplot.setSelect(lftWid, false);
     };
 
     let update = (newLft: number, newWid: number) => {
-      const maxWidth = this.uplot.bbox.width / devicePixelRatio;
+      let newRgt = newLft + newWid;
+      let maxRgt = this.uplot.bbox.width / devicePixelRatio;
 
-      if (newLft < 0) {
-        newLft = 0;
+      if (newLft >= 0 && newRgt <= maxRgt) {
+        setSelect(newLft, newWid);
+        // zoom(newLft, newWid);
       }
-
-      if (newWid > maxWidth) {
-        newWid = maxWidth;
-      }
-
-      setSelect(newLft, newWid);
     };
     let isFullSelection = false;
     let select;
-    if (this.settings.selection && this.uplot) {
-      // it is an update of selection
-      select = this.transformRangeToSelect(this.settings.selection);
-    } else {
-      isFullSelection = true;
-    }
+    // if (this.settings.selection && this.uplot) {
+    //   // it is an update of selection
+    //   select = this.transformRangeToSelect(this.settings.selection);
+    // } else {
+    //   isFullSelection = true;
+    // }
     let rangerOpts: uPlot.Options = {
       ...this.getSize(),
       ms: 1, // if not specified it's going be in seconds
       // select: {left: 0, width: 300, height: 33},
-      select: select,
+      // select: select,
       axes: [
         {},
         {
@@ -314,17 +299,14 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       hooks: {
         ready: [
           (uRanger: uPlot) => {
-            let left = this.lastLeft !== undefined ? this.lastLeft * this.scaleFactor : 0;
-            let width =
-              this.lastWidth !== undefined
-                ? this.lastWidth * this.scaleFactor
-                : Math.round(uRanger.valToPos(this.end, 'x')) - left;
-
+            let left = 0;
+            let width = Math.round(uRanger.valToPos(this.end, 'x')) - left;
             let height = uRanger.bbox.height / devicePixelRatio;
-
-            if (isFullSelection) {
+            if (!this.settings.selection) {
               // we deal with full selection
               uRanger.setSelect({ left, width, height, top: 0 }, false);
+            } else {
+              uRanger.setSelect(this.transformRangeToSelect(this.settings.selection));
             }
             this.previousRange = { from: this.start, to: this.end };
             const sel = uRanger.root.querySelector('.u-select');
