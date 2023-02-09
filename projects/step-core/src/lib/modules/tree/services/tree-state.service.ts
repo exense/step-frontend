@@ -586,21 +586,21 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
   private expandNodeInternal(nodeId: string): void {
     const node = this.treeControl.dataNodes.find((node) => node.id === nodeId);
-    if (node) {
+    if (node?.children?.length) {
       this.treeControl.expand(node);
     }
   }
 
   private collapseNodeInternal(nodeId: string): void {
     const node = this.treeControl.dataNodes.find((node) => node.id === nodeId);
-    if (node) {
+    if (node?.children?.length) {
       this.treeControl.collapse(node);
     }
   }
 
   private toggleNodeInternal(nodeId: string): void {
     const node = this.treeControl.dataNodes.find((node) => node.id === nodeId);
-    if (node) {
+    if (node?.children?.length) {
       this.treeControl.toggle(node);
     }
   }
