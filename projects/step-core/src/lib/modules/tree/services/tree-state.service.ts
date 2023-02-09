@@ -597,7 +597,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
   private collapseNodeInternal(nodeId: string): void {
     const node = this.treeControl.dataNodes.find((node) => node.id === nodeId);
-    if (node?.children?.length) {
+    if (node) {
       this.treeControl.collapse(node);
     }
   }
