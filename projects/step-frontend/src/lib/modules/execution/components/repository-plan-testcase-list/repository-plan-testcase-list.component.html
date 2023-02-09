@@ -5,6 +5,8 @@
   [matSortDisableClear]="true"
   (onReload)="loadTable()"
 >
+  <step-bulk-operations *stepAdditionalHeader [(selectionType)]="selectionType"></step-bulk-operations>
+  <!--
   <div *stepAdditionalHeader class="repository-selection">
     <mat-checkbox
       color="primary"
@@ -15,6 +17,7 @@
     </mat-checkbox>
     <step-bulk-selection-label [selectionCollector]="_selectionCollector"> </step-bulk-selection-label>
   </div>
+-->
 
   <ng-container matColumnDef="bulkSelection">
     <th mat-header-cell *matHeaderCellDef class="bulk-selection-cell"></th>

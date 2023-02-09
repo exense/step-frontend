@@ -5,9 +5,9 @@ import {
   AJS_ROOT_SCOPE,
   ArtefactInfo,
   AuthService,
-  AutoDeselectStrategy,
   ControllerService,
   Mutable,
+  RegistrationStrategy,
   RepositoryObjectReference,
   selectionCollectionProvider,
   SelectionCollector,
@@ -29,7 +29,12 @@ type FieldAccessor = Mutable<
   selector: 'step-repository',
   templateUrl: './repository.component.html',
   styleUrls: ['./repository.component.scss'],
-  providers: [selectionCollectionProvider<string, TestRunStatus>('id', AutoDeselectStrategy.KEEP_SELECTION)],
+  providers: [
+    selectionCollectionProvider<string, TestRunStatus>({
+      selectionKeyProperty: 'id',
+      registrationStrategy: RegistrationStrategy.MANUAL,
+    }),
+  ],
 })
 export class RepositoryComponent implements OnInit, OnDestroy {
   private cancelRootScopeEvent: () => void = noop;

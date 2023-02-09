@@ -1,19 +1,21 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import {
+  BulkSelectionType,
   ControllerService,
-  Mutable,
-  TestRunStatus,
   SelectionCollector,
   TableLocalDataSource,
   RepositoryObjectReference,
+  TestRunStatus,
 } from '@exense/step-core';
 import { BehaviorSubject, map, of, shareReplay, switchMap, tap, Subject, takeUntil, combineLatest, first } from 'rxjs';
 import { Status } from '../../../_common/step-common.module';
 
+/*
 type InProgress = Mutable<Pick<RepositoryPlanTestcaseListComponent, 'inProgress'>>;
 type FlagsAccessor = Mutable<
   Pick<RepositoryPlanTestcaseListComponent, 'isIntermediateSelected$' | 'isSomeItemsSelected$'>
 >;
+*/
 
 const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === index;
 
@@ -23,11 +25,13 @@ const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === 
   styleUrls: ['./repository-plan-testcase-list.component.scss'],
 })
 export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, OnDestroy {
+  readonly BulkSelectionType = BulkSelectionType;
+
   private terminator$: Subject<unknown> = new Subject<unknown>();
   private cRepoRef$ = new BehaviorSubject<RepositoryObjectReference | undefined>(undefined);
 
   private repositoryReport$ = this.cRepoRef$.pipe(
-    tap(() => ((this as InProgress).inProgress = true)),
+    tap(() => (this.inProgress = true)),
     switchMap((repoRef) => {
       if (!repoRef) {
         return of(undefined);
@@ -42,17 +46,19 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, O
       });
     }),
     map((testSetStatusOverview) => testSetStatusOverview?.runs || []),
-    tap(() => ((this as InProgress).inProgress = false)),
+    tap(() => (this.inProgress = false)),
     tap(() => this._selectionCollector.clear()),
     shareReplay(1)
   );
 
   @Input() repoRef?: RepositoryObjectReference;
 
-  readonly inProgress: boolean = false;
+  selectionType: BulkSelectionType = BulkSelectionType.None;
 
-  readonly isIntermediateSelected$ = of(false);
-  readonly isSomeItemsSelected$ = of(false);
+  protected inProgress: boolean = false;
+
+  //readonly isIntermediateSelected$ = of(false);
+  //readonly isSomeItemsSelected$ = of(false);
 
   readonly statusItems$ = this.repositoryReport$.pipe(
     map((testRunStatusList) => testRunStatusList.map((testRunStatus) => testRunStatus.status as Status).filter(unique))
@@ -72,7 +78,10 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, O
   ) {}
 
   ngOnInit(): void {
-    this.setupCollectorChanges(this._selectionCollector);
+    this.repositoryReport$.pipe(first()).subscribe((items) => {
+      this._selectionCollector.registerPossibleSelectionManually(items);
+      this.selectionType = BulkSelectionType.All;
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -92,6 +101,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, O
     this.cRepoRef$.next(this.cRepoRef$.value);
   }
 
+  /*
   handleCheckboxChange(): void {
     if (this._selectionCollector.length > 0) {
       // If something was selected, clear selection
@@ -104,7 +114,9 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, O
       this._selectionCollector.select(...testRunStatuses);
     });
   }
+*/
 
+  /*
   private setupCollectorChanges(collector: SelectionCollector<string, TestRunStatus>): void {
     const flagAccessor = this as FlagsAccessor;
 
@@ -124,4 +136,5 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, O
       collector.select(...items);
     });
   }
+*/
 }

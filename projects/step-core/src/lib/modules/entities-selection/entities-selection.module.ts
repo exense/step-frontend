@@ -37,3 +37,4 @@ export * from './components/bulk-selection/bulk-selection-di.component';
 export * from './components/bulk-selection-label/bulk-selection-label.component';
 export * from './shared/auto-deselect-strategy.enum';
 export * from './shared/bulk-selection-type.enum';
+export * from './shared/registration.strategy';
