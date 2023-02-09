@@ -56,7 +56,11 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     const rootNode = this._treeNodeUtils.convertItem(root);
     this.nodesAccessCache.clear();
     this.rootNode$.next(rootNode);
-    this.selectedInsertionParentId$.next(rootNode.id);
+
+    if (!this.selectedInsertionParentId$.value) {
+      this.selectedInsertionParentId$.next(rootNode.id);
+    }
+
     if (selectedNodeIds) {
       this.selectedNodeIds$.next(selectedNodeIds);
     } else {
