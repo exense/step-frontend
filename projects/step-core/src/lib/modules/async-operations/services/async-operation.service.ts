@@ -15,7 +15,6 @@ export class AsyncOperationService {
     return this._dialog
       .open(AsyncOperationDialogComponent, {
         data: options,
-        width: '40rem',
         disableClose: true,
       })
       .afterClosed() as Observable<AsyncOperationDialogResult>;
