@@ -14,9 +14,9 @@
 }
 
 step-table {
-  th.mat-header-cell:first-of-type,
-  td.mat-cell:first-of-type,
-  td.mat-footer-cell:first-of-type {
+  th.mat-header-cell,
+  td.mat-cell,
+  td.mat-footer-cell {
     padding-top: 8px;
     padding-bottom: 8px;
   }
@@ -25,6 +25,16 @@ step-table {
     tr > td.mat-cell:not(:first-of-type):not(:last-of-type):not(.mat-column-actions),
     tr > th.mat-header-cell:not(:first-of-type):not(:last-of-type):not(.mat-column-actions) {
       padding: 8px;
+    }
+
+    tr > td.mat-cell:first-of-type:not(.mat-column-actions),
+    tr > th.mat-header-cell:first-of-type:not(.mat-column-actions) {
+      padding: 8px 8px 8px 24px;
+    }
+
+    tr > td.mat-cell:last-of-type:not(.mat-column-actions),
+    tr > th.mat-header-cell:last-of-type:not(.mat-column-actions) {
+      padding: 8px 24px 8px 8px;
     }
   }
 
