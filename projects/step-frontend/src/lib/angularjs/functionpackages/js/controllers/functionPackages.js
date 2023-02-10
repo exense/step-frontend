@@ -315,6 +315,7 @@ angular
 
       $scope.loadPackagePreview = function () {
         $scope.isLoading = true;
+        $scope.isFunctionPackageReady = false;
         // clean-up errors and existing list of functions
         $scope.previewError = null;
         $scope.addedFunctions = null;
@@ -338,8 +339,6 @@ angular
         $scope.previousPackageLibrariesLocation = $scope.functionPackage.packageLibrariesLocation;
 
         if ($scope.functionPackage.packageLocation) {
-          $scope.isFunctionPackageReady = false;
-          $scope.isLoading = true;
 
           $http.post('rest/functionpackages/preview', $scope.functionPackage).then(
             function (response) {
@@ -353,8 +352,6 @@ angular
                 } else {
                   $scope.previewError = 'No keywords were found!';
                 }
-              } else {
-                $scope.isFunctionPackageReady = false;
               }
 
               $scope.isLoading = false;
@@ -362,7 +359,6 @@ angular
             //on error:
             function (response) {
               $scope.isLoading = false;
-              $scope.isFunctionPackageReady = false;
               $scope.previewError = response.data;
             }
           );
