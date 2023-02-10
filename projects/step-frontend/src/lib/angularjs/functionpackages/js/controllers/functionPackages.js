@@ -315,6 +315,8 @@ angular
 
       $scope.loadPackagePreview = function () {
         $scope.isLoading = true;
+        $scope.previewError = null;
+        $scope.addedFunctions = null;
 
         // delete previous resources:
         if (
@@ -335,8 +337,6 @@ angular
         if ($scope.functionPackage.packageLocation) {
           $scope.isFunctionPackageReady = false;
           $scope.isLoading = true;
-          $scope.previewError = null;
-          $scope.addedFunctions = null;
 
           $http.post('rest/functionpackages/preview', $scope.functionPackage).then(
             function (response) {
