@@ -318,7 +318,7 @@ angular
 
         // delete previous resources:
         if (
-          $scope.previousPackageLocation != null &&
+          $scope.previousPackageLocation &&
           $scope.previousPackageLocation != $scope.initPackage &&
           $scope.previousPackageLocation != $scope.functionPackage.packageLocation
         ) {
