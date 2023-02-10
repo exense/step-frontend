@@ -315,9 +315,9 @@ angular
 
       $scope.loadPackagePreview = function () {
         $scope.isLoading = true;
+        // clean-up errors and existing list of functions
         $scope.previewError = null;
         $scope.addedFunctions = null;
-
         // delete previous resources:
         if (
           $scope.previousPackageLocation &&
@@ -333,6 +333,9 @@ angular
         ) {
           $scope.deleteResource($scope.previousPackageLibrariesLocation);
         }
+        // Save the new resource for future deletion:
+        $scope.previousPackageLocation = $scope.functionPackage.packageLocation;
+        $scope.previousPackageLibrariesLocation = $scope.functionPackage.packageLibrariesLocation;
 
         if ($scope.functionPackage.packageLocation) {
           $scope.isFunctionPackageReady = false;
@@ -355,9 +358,6 @@ angular
               }
 
               $scope.isLoading = false;
-              if ($scope.previousPackageLocation != $scope.functionPackage.packageLocation) {
-                $scope.previousPackageLocation = $scope.functionPackage.packageLocation;
-              }
             },
             //on error:
             function (response) {
@@ -369,8 +369,6 @@ angular
         } else {
           $scope.isLoading = false;
         }
-        // Save the resource of the library for future deletion:
-        $scope.previousPackageLibrariesLocation = $scope.functionPackage.packageLibrariesLocation;
       };
 
       $scope.deleteResource = function (id) {
