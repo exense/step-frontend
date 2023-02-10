@@ -1,11 +1,5 @@
 <div class="main-name" [class.with-meta]="keywordMeta">
-  <step-editable-label
-    [ngModel]="artefactName"
-    matTooltip="Name"
-    matTooltipPosition="below"
-    (ngModelChange)="onArtefactNameChange($event)"
-    [disabled]="isDisabled"
-  >
+  <step-editable-label [ngModel]="artefactName" (ngModelChange)="onArtefactNameChange($event)" [disabled]="isDisabled">
   </step-editable-label>
   <div *ngIf="keywordMeta" class="keyword-meta" [class.keyword-meta-error]="keywordMeta.isError">
     <step-icon [name]="keywordMeta.icon"></step-icon>
@@ -14,7 +8,7 @@
   <button
     *ngIf="!isDisabled"
     type="button"
-    matTooltip="Edit selection parameters"
+    matTooltip="Edit Keyword selection criteria"
     matTooltipPosition="below"
     mat-icon-button
     [color]="isEditorMode ? 'primary' : undefined"
@@ -29,8 +23,9 @@
 </div>
 <step-dynamic-field-group
   *ngIf="isEditorMode && !isDisabled"
-  primaryFieldsLabel="Selection parameter"
-  addFieldBtnLabel="Add selection parameter"
+  primaryFieldsLabel="Keyword selection criteria"
+  primaryFieldsDescription="The Keyword selection criteria are used to reference the Keyword. Besides the name any other attribute of the Keyword can be referenced."
+  addFieldBtnLabel="Add selection criteria"
   [schema]="KEYWORD_ATTRIBUTES_SCHEMA"
   [value]="artefactKeywordAttributes"
   (valueChange)="updateKeywordAttributes($event)"

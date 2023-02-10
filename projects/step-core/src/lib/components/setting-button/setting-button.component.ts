@@ -1,19 +1,24 @@
-import { Component, HostListener, Inject } from '@angular/core';
+import { Component, HostListener, Inject, OnInit } from '@angular/core';
 import { ILocationService } from 'angular';
 import { CustomComponent } from '../../modules/custom-registeries/custom-registries.module';
 import { AJS_LOCATION } from '../../shared';
+import { AuthService } from '../../step-core.module';
 
 @Component({
-  selector: 'step-setting-btn',
+  selector: 'step-settings-button',
   template: `<step-icon name="settings"></step-icon>`,
   styleUrls: [],
 })
-export class SettingBtnComponent implements CustomComponent {
+export class SettingButtonComponent implements CustomComponent, OnInit {
   context?: any;
 
   protected url: string = '/root/settings';
 
-  constructor(@Inject(AJS_LOCATION) private _ajsLocation: ILocationService) {}
+  constructor(protected _authService: AuthService, @Inject(AJS_LOCATION) private _ajsLocation: ILocationService) {}
+
+  ngOnInit(): void {
+    this.initUrl();
+  }
 
   @HostListener('click')
   openSettings(): void {
@@ -23,5 +28,9 @@ export class SettingBtnComponent implements CustomComponent {
     } else {
       this._ajsLocation.path(this.url);
     }
+  }
+
+  protected initUrl(): void {
+    this.url = '/root/settings';
   }
 }

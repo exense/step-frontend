@@ -19,6 +19,8 @@
     <th mat-header-cell *matHeaderCellDef></th>
     <td mat-cell *matCellDef="let element">
       <div class="actions">
+        <step-icon *ngIf="element.description" [matTooltip]="element.description" name="help-circle"></step-icon>
+
         <button mat-icon-button matTooltip="Add function" (click)="addFunction(element.id)">
           <step-icon name="plus-circle"></step-icon>
         </button>
