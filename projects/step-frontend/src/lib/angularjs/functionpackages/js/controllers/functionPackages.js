@@ -334,9 +334,6 @@ angular
         ) {
           $scope.deleteResource($scope.previousPackageLibrariesLocation);
         }
-        // Save the new resource for future deletion:
-        $scope.previousPackageLocation = $scope.functionPackage.packageLocation;
-        $scope.previousPackageLibrariesLocation = $scope.functionPackage.packageLibrariesLocation;
 
         if ($scope.functionPackage.packageLocation) {
 
@@ -365,6 +362,9 @@ angular
         } else {
           $scope.isLoading = false;
         }
+        // Save the new resource for future deletion:
+        $scope.previousPackageLocation = $scope.functionPackage.packageLocation;
+        $scope.previousPackageLibrariesLocation = $scope.functionPackage.packageLibrariesLocation;
       };
 
       $scope.deleteResource = function (id) {
