@@ -31,7 +31,18 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, O
       }
 
       if (!repoRef?.repositoryParameters?.['planid']) {
-        return this._controllerService.getReport(repoRef);
+        return this._controllerService.getReport(repoRef).pipe(
+          map((value) => {
+            if (value?.runs?.length! > 0) {
+              value.runs!.forEach((run) => {
+                if (!run.id) {
+                  run.id = run.testplanName;
+                }
+              });
+            }
+            return value;
+          })
+        );
       }
       return this._controllerService.getReport({
         repositoryID: 'local',

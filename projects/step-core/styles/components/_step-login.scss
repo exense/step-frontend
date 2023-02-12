@@ -127,8 +127,8 @@
 
     .step-mountain-background {
       $bg-path: map.get($config, login-bg-path);
-      background: url($bg-path) no-repeat no-repeat;
-      background-position: right;
+      background: url($bg-path) no-repeat no-repeat right;
+      background-size: cover;
     }
 
     .capslock-warning {

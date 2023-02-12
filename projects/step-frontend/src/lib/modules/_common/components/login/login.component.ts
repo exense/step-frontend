@@ -1,6 +1,6 @@
 import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, AuthService } from '@exense/step-core';
+import { AJS_MODULE, ApiError, AuthService } from '@exense/step-core';
 
 @Component({
   selector: 'step-login',
@@ -31,9 +31,14 @@ export class LoginComponent {
 
   login() {
     const { username, password } = this.credentials;
-    this._auth.login(username, password).subscribe({
-      error: (e) => (this.error = e.error),
-    });
+    this._auth
+      .login(username, password)
+      .pipe()
+      .subscribe({
+        error: (error: ApiError) => {
+          this.error = error.body || error;
+        },
+      });
   }
 }
 
