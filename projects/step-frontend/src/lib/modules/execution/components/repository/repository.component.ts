@@ -5,6 +5,7 @@ import {
   AJS_ROOT_SCOPE,
   ArtefactInfo,
   AuthService,
+  BulkSelectionType,
   ControllerService,
   Mutable,
   RegistrationStrategy,
@@ -14,7 +15,7 @@ import {
   TestRunStatus,
 } from '@exense/step-core';
 import { ILocationService, IRootScopeService } from 'angular';
-import { map, noop, Observable, of } from 'rxjs';
+import { map, noop, Observable, of, tap } from 'rxjs';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { IncludeTestcases } from '../../shared/include-testcases.interface';
 
@@ -51,6 +52,7 @@ export class RepositoryComponent implements OnInit, OnDestroy {
   readonly error?: Error;
 
   readonly includeTestcases$: Observable<IncludeTestcases | undefined> = of(undefined);
+  public testcaseSelectionType: BulkSelectionType = BulkSelectionType.None;
 
   constructor(
     @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService,
@@ -58,7 +60,7 @@ export class RepositoryComponent implements OnInit, OnDestroy {
     private _auth: AuthService,
     private _controllersApi: ControllerService,
 
-    private _selectionCollector: SelectionCollector<string, TestRunStatus>
+    protected _selectionCollector: SelectionCollector<string, TestRunStatus>
   ) {}
 
   ngOnInit(): void {
@@ -116,10 +118,16 @@ export class RepositoryComponent implements OnInit, OnDestroy {
     if (this.artefact!.type !== 'TestSet') {
       return;
     }
-    const by = this.repoRef!.repositoryID === 'local' ? 'id' : 'name';
+    const isBy = (): 'id' | 'name' | 'all' => {
+      let by = this.repoRef!.repositoryID === 'local' ? 'id' : 'name';
+
+      // @ts-ignore
+      return this.testcaseSelectionType === 'All' ? 'all' : by;
+    };
+
     (this as FieldAccessor).includeTestcases$ = this._selectionCollector.selected$.pipe(
       map((list) => list as string[]),
-      map((list) => ({ by, list }))
+      map((list) => ({ by: isBy(), list }))
     );
   }
 }

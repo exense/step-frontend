@@ -126,6 +126,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
     const mode = simulate ? 'SIMULATION' : 'RUN';
     const repositoryObject = this.repositoryObjectRef;
     const isolatedExecution = this.isExecutionIsolated;
+
     let artefactFilter: ArtefactFilter | undefined;
     if (this.includedTestcases) {
       if (this.includedTestcases.by === 'id') {
@@ -138,6 +139,8 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
           class: 'step.artefacts.filters.TestCaseFilter',
           includedNames: this.includedTestcases.list,
         };
+      } else if (this.includedTestcases.by === 'all') {
+        (artefactFilter as any) = undefined;
       } else {
         throw `Unsupported clause ${this.includedTestcases.by}`;
       }

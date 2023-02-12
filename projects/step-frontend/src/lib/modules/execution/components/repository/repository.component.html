@@ -39,7 +39,8 @@
         </mat-card>
       </div>
       <ng-container *ngIf="artefact.type === 'TestSet'">
-        <step-repository-plan-testcase-list [repoRef]="repoRef"> </step-repository-plan-testcase-list>
+        <step-repository-plan-testcase-list [(selectionType)]="testcaseSelectionType" [repoRef]="repoRef">
+        </step-repository-plan-testcase-list>
       </ng-container>
     </ng-container>
   </mat-card-content>
