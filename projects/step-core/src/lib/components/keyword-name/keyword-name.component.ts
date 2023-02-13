@@ -116,15 +116,24 @@ export class KeywordNameComponent implements OnChanges, OnInit, OnDestroy {
     this.artefactName = artefact?.attributes?.['name'] || '';
   }
 
-  private parseArtefactKeywordAttributes(artefact?: CallFunction): void {
+  private parseArtefactKeywordAttributes(artefact?: any): void {
     if (!artefact) {
       this.artefactKeywordAttributes = undefined;
       this.createReferenceKeywordString(this.artefactKeywordAttributes);
       return;
     }
+
     try {
-      const attributesJson = artefact?.function?.value;
+      let attributesJson = artefact?.function?.value;
+
       this.artefactKeywordAttributes = attributesJson ? JSON.parse(attributesJson) : undefined;
+      if (typeof this.artefactKeywordAttributes?.['name'] === 'string') {
+        this.artefactKeywordAttributes['name'] = {
+          value: this.artefactKeywordAttributes?.['name'],
+          dynamic: !!artefact?.function?.dynamic,
+          expression: artefact?.function?.expression || '',
+        };
+      }
     } catch (err) {
       this.artefactKeywordAttributes = undefined;
     }

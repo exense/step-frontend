@@ -27,7 +27,7 @@ import { ProgressBarComponent } from './components/progress-bar/progress-bar.com
 import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
 import { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 import { SelectPlanComponent } from './components/select-plan/select-plan.component';
-import { SettingBtnComponent } from './components/setting-btn/setting-btn.component';
+import { SettingButtonComponent } from './components/setting-button/setting-button.component';
 import { SplitAreaComponent } from './components/split-area/split-area.component';
 import { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 import { SplitComponent } from './components/split/split.component';
@@ -75,7 +75,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     FunctionLinkComponent,
     SelectPlanComponent,
     AutorefreshToggleComponent,
-    SettingBtnComponent,
+    SettingButtonComponent,
     UploadContainerComponent,
     ProgressBarComponent,
     ArtefactDetailsDirective,
@@ -151,7 +151,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     PlanTreeComponent,
     ArtefactDetailsDirective,
     AutorefreshToggleComponent,
-    SettingBtnComponent,
+    SettingButtonComponent,
     UploadContainerComponent,
     ProgressBarComponent,
     RestoreDialogComponent,
@@ -224,7 +224,7 @@ export { ProgressBarComponent } from './components/progress-bar/progress-bar.com
 export * from './components/report-node-status/report-node-status.component';
 export { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 export { SelectPlanComponent } from './components/select-plan/select-plan.component';
-export { SettingBtnComponent } from './components/setting-btn/setting-btn.component';
+export { SettingButtonComponent } from './components/setting-button/setting-button.component';
 export { SplitAreaComponent } from './components/split-area/split-area.component';
 export { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 export { SplitComponent } from './components/split/split.component';
