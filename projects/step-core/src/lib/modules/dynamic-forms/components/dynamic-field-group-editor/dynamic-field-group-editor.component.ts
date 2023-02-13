@@ -11,12 +11,12 @@ import {
 import { FormBuilder, NonNullableFormBuilder } from '@angular/forms';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { v4 } from 'uuid';
-import { DynamicFieldsSchema } from '../../shared/dynamic-fields-schema';
+import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../../client/generated';
+import { DynamicFieldGroupValue } from '../../shared/dynamic-field-group-value';
 import { DynamicFieldMetaData } from '../../shared/dynamic-field-meta-data';
 import { DynamicFieldType } from '../../shared/dynamic-field-type';
 import { DYNAMIC_FIELD_VALIDATOR } from '../../shared/dynamic-field-validator';
-import { DynamicValueString } from '../../../../client/generated';
-import { DynamicFieldGroupValue } from '../../shared/dynamic-field-group-value';
+import { DynamicFieldsSchema } from '../../shared/dynamic-fields-schema';
 
 const DEFAULT_FIELD_VALUE: DynamicValueString = { value: '', dynamic: false };
 
@@ -249,6 +249,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
             fieldType = DynamicFieldType.string;
             break;
           case 'number':
+          case 'integer':
             fieldType = DynamicFieldType.number;
             break;
           case 'boolean':
@@ -262,9 +263,14 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
       fieldType = DynamicFieldType.string;
     }
 
-    const fieldValue: DynamicValueString = value[field] || { ...DEFAULT_FIELD_VALUE };
+    const fieldValue: DynamicValueString | DynamicValueBoolean | DynamicValueInteger = value[field] || {
+      ...DEFAULT_FIELD_VALUE,
+    };
     const validator = isRequired ? DYNAMIC_FIELD_VALIDATOR : undefined;
-    const control = this.formBuilder.control<DynamicValueString>(fieldValue, validator);
+    const control = this.formBuilder.control<DynamicValueString | DynamicValueBoolean | DynamicValueInteger>(
+      fieldValue,
+      validator
+    );
 
     if (!fieldType) {
       throw new Error('Invalid schema');

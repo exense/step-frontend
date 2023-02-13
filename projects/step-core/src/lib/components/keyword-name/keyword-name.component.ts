@@ -154,7 +154,7 @@ export class KeywordNameComponent implements OnChanges, OnInit, OnDestroy {
       .map(([key, attribute]) => `${key}=${DynamicAttributePipe.transform(attribute) || ''}`);
 
     this.referenceKeywordString =
-      otherParts.length === 0 ? nameValue : [namePart, ...otherParts].filter((part) => !!part).join(', ');
+      otherParts.length === 0 ? nameValue.toString() : [namePart, ...otherParts].filter((part) => !!part).join(', ');
   }
 
   private hasDynamicParameters(): boolean {
