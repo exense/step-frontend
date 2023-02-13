@@ -1,3 +1,3 @@
-import { DynamicValueString } from '../../../client/step-client-module';
+import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../client/step-client-module';
 
-export type DynamicFieldGroupValue = Record<string, DynamicValueString>;
+export type DynamicFieldGroupValue = Record<string, DynamicValueString | DynamicValueBoolean | DynamicValueInteger>;

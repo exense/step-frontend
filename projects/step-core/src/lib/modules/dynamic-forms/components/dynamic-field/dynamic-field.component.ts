@@ -1,18 +1,14 @@
 import { Component, EventEmitter, Input, OnDestroy, Optional, Output, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
-import { DynamicValueString } from '../../../../client/generated';
 import { noop } from 'rxjs';
-import { DynamicFieldType } from '../../shared/dynamic-field-type';
+import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../../client/generated';
 import { DialogsService } from '../../../../shared';
+import { DynamicFieldType } from '../../shared/dynamic-field-type';
 
-type OnChange = (dynamicValueString?: DynamicValueString) => void;
+type DynamicValue = DynamicValueString | DynamicValueBoolean | DynamicValueInteger;
+
+type OnChange = (dynamicValue?: DynamicValue) => void;
 type OnTouch = () => void;
-
-const DEFAULT_VALUE: DynamicValueString = {
-  value: '',
-  expression: '',
-  dynamic: false,
-};
 
 @Component({
   selector: 'step-dynamic-field',
@@ -24,11 +20,11 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
   private onChange: OnChange = noop;
   protected onTouch: OnTouch = noop;
 
-  private internalValue: DynamicValueString = { ...DEFAULT_VALUE };
+  private internalValue?: DynamicValue;
 
   protected isDisabled = false;
 
-  protected value: string = '';
+  protected value: DynamicValue['value'];
 
   protected expression: string = '';
 
@@ -74,8 +70,8 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
     this.isDisabled = isDisabled;
   }
 
-  writeValue(value?: DynamicValueString): void {
-    this.internalValue = { ...DEFAULT_VALUE, ...(value || {}) };
+  writeValue(value?: DynamicValue): void {
+    this.internalValue = value;
     this.synchronizeInternalValueWithFields();
   }
 
@@ -85,8 +81,12 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
   }
 
   editStringValueInModal(): void {
-    this._dialogService.enterValue('Free text editor', this.value, 'lg', 'enterTextValueDialog', (value) =>
-      this.valueChange(value)
+    this._dialogService.enterValue(
+      'Free text editor',
+      this.value ? this.value.toString() : '',
+      'lg',
+      'enterTextValueDialog',
+      (value) => this.valueChange(value)
     );
   }
 
@@ -96,8 +96,7 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
     $event.stopImmediatePropagation();
   }
 
-  protected valueChange(value: string): void {
-    value = value.toString();
+  protected valueChange(value: DynamicValue['value']): void {
     this.value = value;
     this.internalValue = { ...this.internalValue, value };
     this.onChange(this.internalValue);
@@ -117,9 +116,9 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
     let value = '';
 
     if (dynamic) {
-      expression = this.value.toString();
+      expression = this.value ? this.value.toString() : '';
     } else {
-      value = this.parseValue(this.expression);
+      value = this.expression;
     }
 
     this.internalValue = { value, expression, dynamic };
@@ -128,9 +127,9 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
   }
 
   private synchronizeInternalValueWithFields(): void {
-    this.value = this.parseValue(this.internalValue.value || '');
-    this.expression = this.internalValue.expression || '';
-    this.dynamic = this.internalValue.dynamic || false;
+    this.value = this.internalValue?.value;
+    this.expression = this.internalValue?.expression || '';
+    this.dynamic = this.internalValue?.dynamic || false;
     this.determineEnumExtraValueFlag();
   }
 
@@ -139,22 +138,7 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
       this.displayEnumExtraValue = false;
       return;
     }
-    this.displayEnumExtraValue = !(this.enumItems || []).includes(this.value);
-  }
 
-  private parseValue(value: string): string {
-    if (!value) {
-      return '';
-    }
-    switch (this.fieldType) {
-      case DynamicFieldType.boolean:
-        const valueTrimmed = value.trim().toLowerCase();
-        return ['true', 'false'].includes(valueTrimmed) ? valueTrimmed : '';
-      case DynamicFieldType.number:
-        const num = parseFloat(value);
-        return isNaN(num) ? '' : num.toString();
-      default:
-        return value;
-    }
+    this.displayEnumExtraValue = !(this.enumItems || []).includes(this.value ? this.value.toString() : '');
   }
 }
