@@ -1,4 +1,4 @@
-import { Component, Input, Optional } from '@angular/core';
+import { Component, EventEmitter, Input, Optional, Output } from '@angular/core';
 import { BulkSelectionType, SelectionCollector } from '../../../entities-selection/entities-selection.module';
 import { TableFilter } from '../../services/table-filter';
 import { BulkOperationConfig, BulkOperationsInvokeService } from '../../services/bulk-operations-invoke.service';
@@ -14,6 +14,7 @@ import { AsyncOperationCloseStatus } from '../../../async-operations/async-opera
 })
 export class BulkOperationsComponent<KEY, ENTITY> {
   @Input() selectionType: BulkSelectionType = BulkSelectionType.None;
+  @Output() selectionTypeChange = new EventEmitter<BulkSelectionType>();
   @Input() availableOperations: BulkOperation[] = [];
 
   readonly isOperationsDisabled$ = (this._selectionCollector?.selected$ || of([])).pipe(
