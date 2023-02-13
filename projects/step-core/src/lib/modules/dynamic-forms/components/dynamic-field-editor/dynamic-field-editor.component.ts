@@ -30,6 +30,7 @@ export class DynamicFieldEditorComponent implements OnChanges {
 
   handleChange(value?: DynamicFieldGroupValue): void {
     this.internalValue = value;
+
     this.valueChange.emit(!value ? '' : JSON.stringify(value));
   }
 
@@ -43,33 +44,8 @@ export class DynamicFieldEditorComponent implements OnChanges {
 
     try {
       this.internalValue = JSON.parse(value);
-
-      if (!this.internalValue) {
-        return;
-      }
-
-      Object.keys(this.internalValue).forEach((key) => {
-        this.normalizeDynamicValue(this.internalValue![key]);
-      });
     } catch (e) {
       // do nothing
-    }
-  }
-
-  private normalizeDynamicValue<T extends DynamicValueString | DynamicValueBoolean | DynamicValueInteger>(
-    dynamicValue: T
-  ): void {
-    const isBoolean = (value: unknown) => typeof value === 'boolean' || value === 'true' || value === 'false';
-    const isNumber = (value: unknown) => typeof value === 'number' || !isNaN(Number(value));
-
-    const { value } = dynamicValue;
-    const valueIsBoolean = isBoolean(value);
-    const valueIsNumber = isNumber(value);
-
-    if (valueIsBoolean) {
-      dynamicValue.value = value === 'true' ? true : false;
-    } else if (valueIsNumber) {
-      dynamicValue.value = Number(value);
     }
   }
 }
