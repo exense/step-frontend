@@ -19,6 +19,7 @@ export abstract class SelectionCollector<KEY, ENTITY> {
   abstract deselectById(...ids: KEY[]): void;
   abstract clear(): void;
   abstract selectPossibleItems(): void;
+  abstract registerPossibleSelectionManually(items: ENTITY[]): void;
   abstract registerPossibleSelection(item: ENTITY): void;
   abstract unregisterPossibleSelection(item: ENTITY): void;
 

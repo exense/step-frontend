@@ -113,10 +113,10 @@ export class ExecutionProgressComponent
         const by = this.execution?.executionParameters?.repositoryObject?.repositoryID === 'local' ? 'id' : 'name';
 
         const list = testCases
-          .filter((testCase) => ids.includes(testCase.id!))
+          .filter((testCase) => ids.includes(testCase.id!) || ids.includes(testCase.artefactID!))
           .map(({ artefactID, name }) => (by === 'id' ? artefactID! : name!));
 
-        return { list, by };
+        return { by, list };
       })
     );
 
