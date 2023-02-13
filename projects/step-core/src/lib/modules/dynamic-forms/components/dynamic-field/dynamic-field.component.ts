@@ -96,10 +96,7 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
     $event.stopImmediatePropagation();
   }
 
-  protected valueChange(value: string): void {
-    console.log(value, typeof value);
-
-    //value = value.toString();
+  protected valueChange(value: DynamicValue['value']): void {
     this.value = value;
     this.internalValue = { ...this.internalValue, value };
     this.onChange(this.internalValue);
