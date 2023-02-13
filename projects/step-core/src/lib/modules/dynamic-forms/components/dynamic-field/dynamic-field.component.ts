@@ -127,7 +127,19 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
   }
 
   private synchronizeInternalValueWithFields(): void {
-    this.value = this.internalValue?.value;
+    let fallbackValue: string | number | boolean | undefined = undefined;
+
+    switch (this.fieldType) {
+      case DynamicFieldType.string:
+        fallbackValue = '';
+        break;
+
+      case DynamicFieldType.boolean:
+        fallbackValue = false;
+        break;
+    }
+
+    this.value = this.internalValue?.value || fallbackValue;
     this.expression = this.internalValue?.expression || '';
     this.dynamic = this.internalValue?.dynamic || false;
     this.determineEnumExtraValueFlag();
