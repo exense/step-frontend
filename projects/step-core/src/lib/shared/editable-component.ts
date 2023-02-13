@@ -48,6 +48,7 @@ export class EditableComponent<T> implements ControlValueAccessor {
 
   writeValue(value: T): void {
     this.value = value;
+    this.newValue = value;
   }
 
   registerOnChange(onChange: OnChange): void {

@@ -1,6 +1,7 @@
 <ng-template #staticLabel>
   <span>{{ label }}</span>
 </ng-template>
+
 <mat-form-field
   floatLabel="always"
   class="step-view with-suffix with-prefix"
@@ -22,11 +23,13 @@
           (focusout)="forceFocus = false"
         />
       </ng-container>
+
       <ng-container *ngIf="tooltip">
         <step-icon name="help-circle" [matTooltip]="tooltip"></step-icon>
       </ng-container>
     </div>
   </ng-container>
+
   <ng-template #valueInput>
     <ng-container [ngSwitch]="fieldType">
       <ng-container *ngSwitchCase="DynamicFieldType.enum">
@@ -40,13 +43,16 @@
           <mat-option *ngIf="displayEnumExtraValue" [value]="value">
             {{ value }}
           </mat-option>
+
           <mat-option *ngFor="let item of enumItems" [value]="item">
             {{ item }}
           </mat-option>
         </mat-select>
       </ng-container>
+
       <ng-container *ngSwitchCase="DynamicFieldType.boolean">
         <input matInput hidden tabindex="-1" />
+
         <mat-radio-group
           aria-label="Select an option"
           color="primary"
@@ -56,10 +62,11 @@
           (focusin)="forceFocus = true"
           (focusout)="forceFocus = false"
         >
-          <mat-radio-button value="true" [tabIndex]="tabIndex">True</mat-radio-button>
-          <mat-radio-button value="false" [tabIndex]="tabIndex">False</mat-radio-button>
+          <mat-radio-button [value]="true" [tabIndex]="tabIndex">True</mat-radio-button>
+          <mat-radio-button [value]="false" [tabIndex]="tabIndex">False</mat-radio-button>
         </mat-radio-group>
       </ng-container>
+
       <ng-container *ngSwitchCase="DynamicFieldType.number">
         <input
           type="number"
@@ -72,6 +79,7 @@
           [tabindex]="tabIndex"
         />
       </ng-container>
+
       <ng-container *ngSwitchDefault>
         <input
           type="text"
@@ -85,6 +93,7 @@
       </ng-container>
     </ng-container>
   </ng-template>
+
   <ng-template #expressionInput>
     <input
       type="text"
@@ -96,7 +105,9 @@
       [tabindex]="tabIndex"
     />
   </ng-template>
+
   <ng-container *ngIf="dynamic; then expressionInput; else valueInput"> </ng-container>
+
   <ng-container matSuffix>
     <ng-container *ngIf="fieldType === DynamicFieldType.string && !dynamic">
       <button
@@ -112,8 +123,10 @@
       >
         <step-icon name="edit"></step-icon>
       </button>
+
       <div class="suffix-separator"></div>
     </ng-container>
+
     <button
       type="button"
       mat-flat-button
@@ -128,8 +141,10 @@
     >
       <step-icon name="zap"></step-icon>
     </button>
+
     <ng-container *ngIf="canRemove">
       <div class="suffix-separator"></div>
+
       <button
         type="button"
         mat-stroked-button

@@ -332,7 +332,7 @@ angular
           $scope.deleteResource($scope.previousPackageLibrariesLocation);
         }
 
-        if ($scope.functionPackage.packageLocation) {
+        if ($scope.functionPackage.packageLocation != null) {
           $scope.isFunctionPackageReady = false;
           $scope.isLoading = true;
           $scope.previewError = null;

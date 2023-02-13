@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, Input } from '@angular/core';
 
 type SplitAreaSizeType = 'pixel' | 'percent' | 'flex';
 
@@ -45,6 +45,12 @@ export class SplitAreaComponent implements AfterViewInit {
 
   private get boundingClientRect(): DOMRect {
     return this._elementRef.nativeElement.getBoundingClientRect();
+  }
+
+  @HostListener('focusin')
+  onFocusIn(): void {
+    this._elementRef.nativeElement.scrollTop = 0;
+    this._elementRef.nativeElement.scrollLeft = 0;
   }
 
   setFlex({
