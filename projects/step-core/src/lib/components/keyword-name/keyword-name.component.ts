@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -62,6 +63,7 @@ export class KeywordNameComponent implements OnChanges, OnInit, OnDestroy {
   constructor(
     private _keywordApi: AugmentedKeywordsService,
     private _entityScopeResolver: EntityScopeResolver,
+    private _changeDetectorRef: ChangeDetectorRef,
     @Optional() private _artefactRefreshNotification: ArtefactRefreshNotificationService
   ) {}
 
@@ -113,6 +115,8 @@ export class KeywordNameComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   private initArtefactName(artefact?: CallFunction): void {
+    this.artefactName = '';
+    this._changeDetectorRef.detectChanges();
     this.artefactName = artefact?.attributes?.['name'] || '';
   }
 
