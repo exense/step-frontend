@@ -119,7 +119,7 @@ export class EditableComponent<T> implements ControlValueAccessor {
     }
 
     this.value = this.newValue;
-    this.onChange?.(this.newValue);
+    this.onChange?.(this.value);
   }
 
   protected onValueChange(value: T): void {

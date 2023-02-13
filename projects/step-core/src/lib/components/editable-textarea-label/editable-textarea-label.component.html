@@ -1,9 +1,7 @@
 <ng-container [ngSwitch]="state">
   <ng-container *ngSwitchCase="State.READABLE">
     <div class="editable-textarea-label" [matTooltip]="tooltip" (click)="onLabelClick()">
-      <ng-container *ngIf="value; else label">
-        {{ value }}
-      </ng-container>
+      <div *ngIf="value; else label" [innerHTML]="value"></div>
 
       <ng-template #label>
         <ng-container *ngTemplateOutlet="labelTemplate"></ng-container>

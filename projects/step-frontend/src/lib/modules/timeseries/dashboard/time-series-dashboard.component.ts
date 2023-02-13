@@ -2,7 +2,7 @@ import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { filter, merge, Subject, Subscription, takeUntil, throttle } from 'rxjs';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { FilterBarComponent } from '../performance-view/filter-bar/filter-bar.component';
-import { TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
+import { FilterBarItemType, TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
 import { PerformanceViewSettings } from '../performance-view/model/performance-view-settings';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
@@ -39,11 +39,24 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     { label: 'Last Hour', timeInMs: this.ONE_HOUR_MS },
   ];
 
+  contextualFilterItems: TsFilterItem[] = [];
+
   constructor(private contextsFactory: TimeSeriesContextsFactory) {}
 
   ngOnInit(): void {
     if (!this.settings) {
       throw new Error('Settings input must be set');
+    }
+    if (this.settings.showContextualFilters) {
+      this.contextualFilterItems = Object.keys(this.settings.contextualFilters).map((key) => {
+        return {
+          label: key,
+          type: FilterBarItemType.FREE_TEXT,
+          attributeName: key,
+          textValue: this.settings.contextualFilters[key],
+          isLocked: false,
+        };
+      });
     }
     const contextParams: TimeSeriesContextParams = {
       id: this.settings.contextId,
@@ -66,6 +79,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   private updateDashboard(showLoading = false) {
+    this.updateSubscription?.unsubscribe();
     this.updateSubscription = this.performanceView
       .updateDashboard({
         updateRanger: true,
@@ -79,7 +93,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     merge(this.context.onFiltersChange(), this.context.onGroupingChange())
       .pipe(takeUntil(this.terminator$))
       .subscribe(() => {
-        this.updateSubscription?.unsubscribe();
         this.updateDashboard(true);
       });
   }
@@ -94,12 +107,21 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
 
   setRanges(fullRange: TSTimeRange, selection?: TSTimeRange) {
     let isFullRangeSelected = this.context.isFullRangeSelected();
+    let newSelection = selection || this.context.getSelectedTimeRange();
     this.context.updateFullRange(fullRange, false);
-    if (selection) {
-      this.context.updateSelectedRange(selection, false);
-    } else if (isFullRangeSelected) {
-      this.context.updateSelectedRange(fullRange, false);
+    if (isFullRangeSelected && !selection) {
+      newSelection = fullRange;
+    } else {
+      // we crop it
+      let newFrom = Math.max(fullRange.from, newSelection.from);
+      let newTo = Math.min(fullRange.to, newSelection.to);
+      if (newTo - newFrom < 3) {
+        newSelection = fullRange; // zoom reset when the interval is very small
+      } else {
+        newSelection = { from: newFrom, to: newTo };
+      }
     }
+    this.context.updateSelectedRange(newSelection, false);
   }
 
   /**
@@ -112,7 +134,8 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * This is a force refresh (instantly triggered)
+   * This is a force refresh (instantly triggered).
+   * The selection will be set to full selection.
    */
   updateRange(range: TSTimeRange) {
     this.updateSubscription?.unsubscribe(); // end current execution

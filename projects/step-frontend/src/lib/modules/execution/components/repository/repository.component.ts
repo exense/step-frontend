@@ -5,9 +5,10 @@ import {
   AJS_ROOT_SCOPE,
   ArtefactInfo,
   AuthService,
-  AutoDeselectStrategy,
+  BulkSelectionType,
   ControllerService,
   Mutable,
+  RegistrationStrategy,
   RepositoryObjectReference,
   selectionCollectionProvider,
   SelectionCollector,
@@ -29,7 +30,12 @@ type FieldAccessor = Mutable<
   selector: 'step-repository',
   templateUrl: './repository.component.html',
   styleUrls: ['./repository.component.scss'],
-  providers: [selectionCollectionProvider<string, TestRunStatus>('id', AutoDeselectStrategy.KEEP_SELECTION)],
+  providers: [
+    selectionCollectionProvider<string, TestRunStatus>({
+      selectionKeyProperty: 'id',
+      registrationStrategy: RegistrationStrategy.MANUAL,
+    }),
+  ],
 })
 export class RepositoryComponent implements OnInit, OnDestroy {
   private cancelRootScopeEvent: () => void = noop;
@@ -46,6 +52,7 @@ export class RepositoryComponent implements OnInit, OnDestroy {
   readonly error?: Error;
 
   readonly includeTestcases$: Observable<IncludeTestcases | undefined> = of(undefined);
+  public testcaseSelectionType: BulkSelectionType = BulkSelectionType.None;
 
   constructor(
     @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService,
@@ -53,7 +60,7 @@ export class RepositoryComponent implements OnInit, OnDestroy {
     private _auth: AuthService,
     private _controllersApi: ControllerService,
 
-    private _selectionCollector: SelectionCollector<string, TestRunStatus>
+    protected _selectionCollector: SelectionCollector<string, TestRunStatus>
   ) {}
 
   ngOnInit(): void {
@@ -107,14 +114,20 @@ export class RepositoryComponent implements OnInit, OnDestroy {
     );
   }
 
-  private setupTestCases(): void {
+  protected setupTestCases(): void {
     if (this.artefact!.type !== 'TestSet') {
       return;
     }
-    const by = this.repoRef!.repositoryID === 'local' ? 'id' : 'name';
+    const isBy = (): 'id' | 'name' | 'all' => {
+      let by = this.repoRef!.repositoryID === 'local' ? 'id' : 'name';
+
+      // @ts-ignore
+      return this.testcaseSelectionType === 'All' ? 'all' : by;
+    };
+
     (this as FieldAccessor).includeTestcases$ = this._selectionCollector.selected$.pipe(
       map((list) => list as string[]),
-      map((list) => ({ by, list }))
+      map((list) => ({ by: isBy(), list }))
     );
   }
 }

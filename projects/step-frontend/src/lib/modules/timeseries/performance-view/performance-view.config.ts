@@ -5,11 +5,11 @@ import { TimeSeriesUtils } from '../time-series-utils';
 
 export class PerformanceViewConfig {
   public static responseTimeMetrics = [
-    { label: 'Avg', mapFunction: (b: Bucket) => Math.round(b.sum / b.count) },
-    { label: 'Min', mapFunction: (b: Bucket) => b.min },
-    { label: 'Max', mapFunction: (b: Bucket) => b.max },
-    { label: 'Perc. 90', mapFunction: (b: Bucket) => b.pclValues[90] },
-    { label: 'Perc. 99', mapFunction: (b: Bucket) => b.pclValues[99] },
+    { label: 'Avg', mapFunction: (b: Bucket) => (b ? Math.round(b.sum / b.count) : null) },
+    { label: 'Min', mapFunction: (b: Bucket) => b?.min },
+    { label: 'Max', mapFunction: (b: Bucket) => b?.max },
+    { label: 'Perc. 90', mapFunction: (b: Bucket) => b?.pclValues[90] },
+    { label: 'Perc. 99', mapFunction: (b: Bucket) => b?.pclValues[99] },
   ];
 
   public static throughputMetrics: ThroughputMetric[] = [
