@@ -39,7 +39,11 @@
         </mat-card>
       </div>
       <ng-container *ngIf="artefact.type === 'TestSet'">
-        <step-repository-plan-testcase-list [(selectionType)]="testcaseSelectionType" [repoRef]="repoRef">
+        <step-repository-plan-testcase-list
+          [(selectionType)]="testcaseSelectionType"
+          (selectionTypeChange)="setupTestCases()"
+          [repoRef]="repoRef"
+        >
         </step-repository-plan-testcase-list>
       </ng-container>
     </ng-container>

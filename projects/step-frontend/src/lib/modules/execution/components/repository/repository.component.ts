@@ -15,7 +15,7 @@ import {
   TestRunStatus,
 } from '@exense/step-core';
 import { ILocationService, IRootScopeService } from 'angular';
-import { map, noop, Observable, of, tap } from 'rxjs';
+import { map, noop, Observable, of } from 'rxjs';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { IncludeTestcases } from '../../shared/include-testcases.interface';
 
@@ -114,7 +114,7 @@ export class RepositoryComponent implements OnInit, OnDestroy {
     );
   }
 
-  private setupTestCases(): void {
+  protected setupTestCases(): void {
     if (this.artefact!.type !== 'TestSet') {
       return;
     }
