@@ -12,8 +12,8 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { TSTimeRange } from '../chart/model/ts-time-range';
 import { TSRangerSettings } from './ts-ranger-settings';
+import { TSTimeRange } from '../chart/model/ts-time-range';
 
 //@ts-ignore
 import uPlot = require('uplot');
@@ -56,18 +56,15 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
 
   start!: number;
   end!: number;
-  lastLeft?: number;
-  lastWidth?: number;
-  lastHostWidth?: number;
 
   getSize = () => {
     return {
-      width: this.element.nativeElement.getBoundingClientRect().width,
+      width: this.element.nativeElement.parentElement.offsetWidth,
       height: this.CHART_HEIGHT,
     };
   };
 
-  constructor(@Self() private element: ElementRef<HTMLElement>) {}
+  constructor(@Self() private element: ElementRef) {}
 
   ngOnInit(): void {
     if (this.syncKey) {
@@ -75,11 +72,34 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     }
 
     this.init(this.settings);
+    window.addEventListener('resize', (e) => {
+      this.resizeChart();
+    });
+  }
+
+  resizeChart() {
+    const chartPadding = 50; // this is the way uplot works
+    const fullWidth = this.uplot.width - chartPadding;
+    const leftSelect = this.uplot.select.left;
+    const width = this.uplot.select.width;
+    const rightSelect = leftSelect + width;
+    const leftPercent = (100 * leftSelect) / fullWidth;
+    const rightPercent = (100 * rightSelect) / fullWidth;
+    this.uplot.setSize(this.getSize());
+    let newChartWidth = this.uplot.width - chartPadding;
+
+    const newLeft = (leftPercent / 100) * newChartWidth;
+    const newRight = (rightPercent / 100) * newChartWidth;
+    this.uplot.setSelect({ left: newLeft, width: newRight - newLeft, top: 0 }, false);
+  }
+
+  init(settings: TSRangerSettings) {
+    this.start = settings.xValues[0];
+    this.end = settings.xValues[this.settings.xValues.length - 1];
   }
 
   ngAfterViewInit(): void {
     this.createRanger();
-    this.lastHostWidth = this.element.nativeElement.getBoundingClientRect().width;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -91,33 +111,17 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     }
   }
 
-  private get scaleFactor(): number {
-    if (this.lastHostWidth === undefined) {
-      return 1;
-    }
-
-    return this.element.nativeElement.getBoundingClientRect().width / this.lastHostWidth;
-  }
-
-  init(settings: TSRangerSettings) {
-    this.start = settings.xValues[0];
-    this.end = settings.xValues[this.settings.xValues.length - 1];
-  }
-
   selectRange(range: TSTimeRange) {
-    let select = this.transformRangeToSelect(range);
+    const select = this.transformRangeToSelect(range);
     this.uplot.setSelect(select, false);
     this.emitSelectionToLinkedCharts();
   }
 
-  transformRangeToSelect(range: TSTimeRange): uPlot.Select | undefined {
-    if (!range) {
-      return undefined;
-    }
-    let fromTimestamp = range.from;
-    let toTimestamp = range.to;
+  transformRangeToSelect(range: TSTimeRange): uPlot.Select {
+    const fromTimestamp = range.from;
+    const toTimestamp = range.to;
     let left, width;
-    let height = this.uplot.bbox.height / devicePixelRatio;
+    const height = this.uplot.bbox.height / devicePixelRatio;
     left = this.uplot.valToPos(fromTimestamp, 'x');
     left = Math.max(left, 0); // in case it is negative
     width = this.uplot.valToPos(toTimestamp, 'x') - left;
@@ -133,19 +137,17 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     // this is a 'hack'. when dblclick is triggered in another synced chart, it will remove the select for the ranger. this function is executed before that.
     // we have to wait the minimum amount of time so that sync event happens, and the selection is destroyed
     setTimeout(() => {
-      let left = 0;
-      let width = Math.round(this.uplot.valToPos(this.end, 'x')) - left;
-      let height = this.uplot.bbox.height / devicePixelRatio;
+      const left = 0;
+      const width = Math.round(this.uplot.valToPos(this.end, 'x')) - left;
+      const height = this.uplot.bbox.height / devicePixelRatio;
       this.uplot.setSelect({ left, width, height }, false); // this is just to change the highlight
-      let xData = this.uplot.data[0];
-      let start = xData[0];
-      let end = xData[xData.length - 1];
+      const xData = this.uplot.data[0];
+      const start = xData[0];
+      const end = xData[xData.length - 1];
       this.emitSelectionToLinkedCharts();
       if (emitResetEvent) {
         this.onZoomReset.emit({ from: start, to: end });
       }
-      delete this.lastLeft;
-      delete this.lastWidth;
     }, 50);
   }
 
@@ -158,21 +160,20 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     let lft0: number;
     let wid0: number;
     const lftWid: { left: number; width: number } = { left: 0, width: 0 };
-    const minMax = { min: null, max: null };
 
-    let placeDiv = function (par: any, cls: any) {
+    const placeDiv = function (par: any, cls: any) {
       let el = document.createElement('div');
       el.classList.add(cls);
       par.appendChild(el);
       return el;
     };
-    let on = function (ev: any, el: any, fn: any) {
+    const on = function (ev: any, el: any, fn: any) {
       el.addEventListener(ev, fn);
     };
-    let off = function (ev: any, el: any, fn: any) {
+    const off = function (ev: any, el: any, fn: any) {
       el.removeEventListener(ev, fn);
     };
-    let debounce = function (fn: any) {
+    const debounce = function (fn: any) {
       let raf: any;
       return (...args: any[]) => {
         if (raf) return;
@@ -183,7 +184,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
         });
       };
     };
-    let bindMove = (e: any, onMove: any) => {
+    const bindMove = (e: any, onMove: any) => {
       x0 = e.clientX;
       lft0 = this.uplot.select.left;
       wid0 = this.uplot.select.width;
@@ -205,49 +206,26 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       e.stopPropagation();
     };
 
-    let setSelect = (newLft: number, newWid: number) => {
-      const maxWidth = this.uplot.bbox.width / devicePixelRatio;
-
-      if (newLft + newWid > maxWidth) {
-        newLft = maxWidth - newWid;
-      }
-
+    const setSelect = (newLft: number, newWid: number) => {
       lftWid.left = newLft;
       lftWid.width = newWid;
-
-      this.lastLeft = newLft;
-      this.lastWidth = newWid;
-      this.lastHostWidth = this.element.nativeElement.getBoundingClientRect().width;
-
       this.uplot.setSelect(lftWid, false);
     };
 
-    let update = (newLft: number, newWid: number) => {
-      const maxWidth = this.uplot.bbox.width / devicePixelRatio;
+    const update = (newLft: number, newWid: number) => {
+      let newRgt = newLft + newWid;
+      let maxRgt = this.uplot.bbox.width / devicePixelRatio;
 
-      if (newLft < 0) {
-        newLft = 0;
+      if (newLft >= 0 && newRgt <= maxRgt) {
+        setSelect(newLft, newWid);
+        // zoom(newLft, newWid);
       }
-
-      if (newWid > maxWidth) {
-        newWid = maxWidth;
-      }
-
-      setSelect(newLft, newWid);
     };
-    let isFullSelection = false;
-    let select;
-    if (this.settings.selection && this.uplot) {
-      // it is an update of selection
-      select = this.transformRangeToSelect(this.settings.selection);
-    } else {
-      isFullSelection = true;
-    }
     let rangerOpts: uPlot.Options = {
       ...this.getSize(),
       ms: 1, // if not specified it's going be in seconds
       // select: {left: 0, width: 300, height: 33},
-      select: select,
+      // select: select,
       axes: [
         {},
         {
@@ -312,17 +290,14 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       hooks: {
         ready: [
           (uRanger: uPlot) => {
-            let left = this.lastLeft !== undefined ? this.lastLeft * this.scaleFactor : 0;
-            let width =
-              this.lastWidth !== undefined
-                ? this.lastWidth * this.scaleFactor
-                : Math.round(uRanger.valToPos(this.end, 'x')) - left;
-
-            let height = uRanger.bbox.height / devicePixelRatio;
-
-            if (isFullSelection) {
+            const left = 0;
+            const width = Math.round(uRanger.valToPos(this.end, 'x')) - left;
+            const height = uRanger.bbox.height / devicePixelRatio;
+            if (!this.settings.selection) {
               // we deal with full selection
               uRanger.setSelect({ left, width, height, top: 0 }, false);
+            } else {
+              uRanger.setSelect(this.transformRangeToSelect(this.settings.selection));
             }
             this.previousRange = { from: this.start, to: this.end };
             const sel = uRanger.root.querySelector('.u-select');
@@ -368,8 +343,8 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   emitSelectionToLinkedCharts() {
-    let linkedCharts = uPlot.sync(this.syncKey).plots;
-    let minMax: any = {
+    const linkedCharts = uPlot.sync(this.syncKey).plots;
+    const minMax: any = {
       min: this.uplot.posToVal(this.uplot.select.left, 'x'),
       max: this.uplot.posToVal(this.uplot.select.left + this.uplot.select.width, 'x'),
     };
@@ -384,7 +359,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   emitRangeEventIfChanged() {
-    let u = this.uplot;
+    const u = this.uplot;
     if (u.select.width < 1) {
       // this is the bug from uplot. See https://github.com/leeoniya/uPlot/issues/766
       return;
@@ -392,10 +367,10 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     // keep these lines below if it's better to have an exact value from the X data
     // let min = u.data[0][u.valToIdx(u.posToVal(u.select.left, 'x'))];
     // let max = u.data[0][u.valToIdx(u.posToVal(u.select.left + u.select.width, 'x'))];
-    let min = u.posToVal(u.select.left, 'x');
-    let max = u.posToVal(u.select.left + u.select.width, 'x');
+    const min = u.posToVal(u.select.left, 'x');
+    const max = u.posToVal(u.select.left + u.select.width, 'x');
     if (min != this.previousRange?.from || max !== this.previousRange?.to) {
-      let currentRange = { from: min, to: max };
+      const currentRange = { from: min, to: max };
       this.previousRange = currentRange;
       this.onRangeChange.next(currentRange);
     }
