@@ -353,7 +353,6 @@ angular
 
               $scope.isLoading = false;
               if ($scope.previousPackageLocation != $scope.functionPackage.packageLocation) {
-                $scope.previousPackageLocation = $scope.functionPackage.packageLocation;
               }
             },
             //on error:
@@ -367,6 +366,7 @@ angular
         }
         // Save the new resource for future deletion:
         $scope.previousPackageLibrariesLocation = $scope.functionPackage.packageLibrariesLocation;
+        $scope.previousPackageLocation = $scope.functionPackage.packageLocation;
       };
 
       $scope.deleteResource = function (id) {
