@@ -4,6 +4,7 @@ import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree'
 import { BehaviorSubject, combineLatest, map, Observable, of, Subject, tap } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { bfs } from '../../../shared';
+import { AbstractArtefact } from '../../../step-core.module';
 import { DropType } from '../shared/drop-type.enum';
 import { TreeFlatNode } from '../shared/tree-flat-node';
 import { TreeNode } from '../shared/tree-node';
@@ -335,13 +336,24 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
   addChildrenToSelectedNode(...children: T[]): void {
     const parentId = this.selectedInsertionParentId$.value;
+
     if (!parentId) {
       return;
     }
 
     const newNodes = children.map((child) => this._treeNodeUtils.convertItem(child));
+
     if (!this.isPossibleToInsert(parentId, ...newNodes)) {
       return;
+    }
+
+    const parent = this.findNodeById(parentId);
+
+    if (parent) {
+      newNodes.forEach((node) => {
+        node.isSkipped = parent.isSkipped;
+        (node as unknown as { originalArtefact: AbstractArtefact }).originalArtefact.skipNode!.value = parent.isSkipped;
+      });
     }
 
     this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, newNodes, 'append');

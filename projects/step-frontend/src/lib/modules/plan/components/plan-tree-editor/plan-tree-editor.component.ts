@@ -4,6 +4,7 @@ import {
   ArtefactTreeNode,
   AugmentedScreenService,
   AuthService,
+  bfs,
   CustomComponent,
   DialogsService,
   DynamicFieldsSchema,
@@ -15,9 +16,10 @@ import {
   PlansService,
   TreeStateService,
 } from '@exense/step-core';
-import { BehaviorSubject, filter, map, merge, Subject, switchMap, takeUntil, tap } from 'rxjs';
-import { PlanHistoryService } from '../../services/plan-history.service';
+import { BehaviorSubject, filter, map, merge, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
+import { ArtefactTreeNodeUtilsService } from '../../services/artefact-tree-node-utils.service';
 import { ARTEFACTS_CLIPBOARD } from '../../services/artefacts-clipboard.token';
+import { PlanHistoryService } from '../../services/plan-history.service';
 
 const MESSAGE_ADD_AT_MULTIPLE_NODES =
   'Adding elements is not supported when more then one node is selected in the tree';
@@ -51,7 +53,8 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
     private _keywordCallsApi: KeywordsService,
     private _screenTemplates: AugmentedScreenService,
     private _planHistory: PlanHistoryService,
-    private _dialogs: DialogsService
+    private _dialogs: DialogsService,
+    private _artefactTreeNodeUtilsService: ArtefactTreeNodeUtilsService
   ) {}
 
   addControl(artefactTypeId: string): void {
@@ -227,7 +230,22 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
   }
 
   handlePlanChange(): void {
-    this.planChange$.next(this.plan!);
+    this._treeState.selectedNode$.pipe(take(1)).subscribe((node) => {
+      if (node?.children) {
+        const children = bfs({
+          items: node!.children,
+          children: (item) => item.children || [],
+        });
+
+        children.forEach((child) => {
+          this._artefactTreeNodeUtilsService.updateNodeData(this.plan!.root!, child.id!, {
+            isSkipped: !node!.isSkipped,
+          });
+        });
+      }
+
+      this.planChange$.next(this.plan!);
+    });
   }
 
   moveUp(node?: AbstractArtefact): void {
