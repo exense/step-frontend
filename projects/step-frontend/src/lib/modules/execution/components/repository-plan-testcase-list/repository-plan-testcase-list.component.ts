@@ -104,7 +104,6 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, O
   }
 
   updateSelection($event: BulkSelectionType) {
-    console.log('event', $event);
     this.selectionType = $event;
     this.selectionTypeChange.emit($event);
   }

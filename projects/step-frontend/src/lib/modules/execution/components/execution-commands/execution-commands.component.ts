@@ -140,7 +140,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
           includedNames: this.includedTestcases.list,
         };
       } else if (this.includedTestcases.by === 'all') {
-        (artefactFilter as any) = undefined;
+        delete artefactFilter;
       } else {
         throw `Unsupported clause ${this.includedTestcases.by}`;
       }
