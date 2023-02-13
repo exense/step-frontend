@@ -81,20 +81,22 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy {
     this.dashboard.updateRange(this.calculateFullTimeRange());
   }
 
+  navigateToRtmDashboard(): void {
+    window.open(this.dashboardService.getRtmExecutionLink(this.executionId));
+  }
+
   init() {
     this.executionService.getExecutionById(this.executionId).subscribe((execution) => {
       this.execution = execution;
       const startTime = execution.startTime!;
       const endTime = execution.endTime ? execution.endTime : new Date().getTime();
-      if (!execution.endTime) {
-        this.timeRangeSelection = this.timeRangeOptions[0];
-      }
       let urlParams = TsUtils.getURLParams(window.location.href);
       this.dashboardSettings = {
         contextId: this.executionId,
         includeThreadGroupChart: true,
         timeRange: { from: startTime, to: endTime },
         contextualFilters: { ...urlParams, eId: this.executionId },
+        showContextualFilters: false,
         filterOptions: [
           {
             label: 'Status',
