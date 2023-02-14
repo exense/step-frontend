@@ -40,7 +40,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
     this.tsContext = this.executionsPageService.getContext(this.settings.contextId);
     this.createRanger(this.tsContext.getFullTimeRange()).subscribe(() => this.onRangerLoaded.next());
     this.tsContext
-      .onSelectedTimeRangeChange()
+      .onTimeSelectionChange()
       .pipe(takeUntil(this.terminator$))
       .subscribe((selection) => {
         if (this.tsContext.isFullRangeSelected()) {
@@ -68,6 +68,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   refreshRanger(): Observable<TimeSeriesChartResponse> {
     const selection = this.tsContext.getSelectedTimeRange();
+    console.log('ranger selection:', selection);
     return this.createRanger(
       this.tsContext.getFullTimeRange(),
       this.tsContext.isFullRangeSelected() ? undefined : selection

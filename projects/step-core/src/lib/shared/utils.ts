@@ -1,5 +1,6 @@
 import { IPromise } from 'angular';
 import { from, Observable } from 'rxjs';
+import { Collection } from './collection.interface';
 
 export const a1Promise2Promise = <T>(promise: IPromise<T>): Promise<T> =>
   Promise.resolve(promise as unknown as Promise<T>);
@@ -36,4 +37,43 @@ export const setObjectFieldValue = (object: Record<string, unknown>, fieldPath: 
 
     return (res as Record<string, unknown>)[fieldName];
   }, object);
+};
+
+/**
+ * The time complexity of a Breadth-First Search (BFS) algorithm is O(|V| + |E|),
+ * where |V| is the number of vertices and |E| is the number of edges in the graph being traversed.
+ * The reason for this is that in the worst-case scenario, BFS needs to visit all vertices and all edges.
+ */
+export const breadthFirstSearch = <T>({
+  items,
+  predicate = Boolean,
+  children,
+}: {
+  items: Collection<T>;
+  predicate?: (item: T) => boolean;
+  children: (item: T) => T[];
+}) => {
+  if (!items.length) {
+    return [];
+  }
+
+  const filtered: T[] = [];
+  const queue: T[] = [...items];
+  const visited = new Set<T>();
+
+  while (queue.length) {
+    const item = queue.shift() as T;
+
+    visited.add(item);
+
+    if (predicate(item)) {
+      filtered.push(item);
+    }
+
+    const nonVisitedChildren = children(item).filter((child) => !visited.has(child));
+
+    queue.push(...nonVisitedChildren);
+  }
+
+  return filtered;
 };

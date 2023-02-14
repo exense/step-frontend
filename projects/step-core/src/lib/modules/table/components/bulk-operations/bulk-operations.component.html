@@ -1,4 +1,9 @@
-<step-bulk-selection-di [(selectionType)]="selectionType" [showLabel]="false"> </step-bulk-selection-di>
+<step-bulk-selection-di
+  [(selectionType)]="selectionType"
+  (selectionTypeChange)="selectionTypeChange.emit(selectionType)"
+  [showLabel]="false"
+>
+</step-bulk-selection-di>
 <div>
   <ng-container *ngFor="let operation of availableOperations">
     <button

@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -62,6 +63,7 @@ export class KeywordNameComponent implements OnChanges, OnInit, OnDestroy {
   constructor(
     private _keywordApi: AugmentedKeywordsService,
     private _entityScopeResolver: EntityScopeResolver,
+    private _changeDetectorRef: ChangeDetectorRef,
     @Optional() private _artefactRefreshNotification: ArtefactRefreshNotificationService
   ) {}
 
@@ -113,6 +115,8 @@ export class KeywordNameComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   private initArtefactName(artefact?: CallFunction): void {
+    this.artefactName = '';
+    this._changeDetectorRef.detectChanges();
     this.artefactName = artefact?.attributes?.['name'] || '';
   }
 
@@ -154,7 +158,7 @@ export class KeywordNameComponent implements OnChanges, OnInit, OnDestroy {
       .map(([key, attribute]) => `${key}=${DynamicAttributePipe.transform(attribute) || ''}`);
 
     this.referenceKeywordString =
-      otherParts.length === 0 ? nameValue : [namePart, ...otherParts].filter((part) => !!part).join(', ');
+      otherParts.length === 0 ? nameValue.toString() : [namePart, ...otherParts].filter((part) => !!part).join(', ');
   }
 
   private hasDynamicParameters(): boolean {
