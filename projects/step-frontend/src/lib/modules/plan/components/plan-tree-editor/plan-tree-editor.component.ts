@@ -126,7 +126,7 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
               return res;
             }
 
-            const value = property.default ? property.default : '';
+            const value = property.default;
             res[field] = { value, dynamic: false };
             return res;
           }, {} as Record<string, DynamicValueString>);
