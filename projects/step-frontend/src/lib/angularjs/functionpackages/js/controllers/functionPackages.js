@@ -302,7 +302,7 @@ angular
 
       $scope.save = function () {
         console.log("save: \n\tpackageLocation: '"+$scope.functionPackage.packageLocation+"'\n\tpackageLibrariesLocation: '"+$scope.functionPackage.packageLibrariesLocation+"'");
-        console.log("\t\tinitPackage: '"+$scope.initPackage+"'\n\tinitLibraries: '"+$scope.initLibraries+"'");
+        console.log("\tinitPackage: '"+$scope.initPackage+"'\n\tinitLibraries: '"+$scope.initLibraries+"'");
 
         if ($scope.functionPackage.packageLocation) {
           $scope.isFunctionPackageReady = false;
@@ -315,15 +315,11 @@ angular
             $scope.isLoading = false;
           });
         }
-
-        // delete the initial resources if not used anymore:
-        cleanupResource($scope.initPackage);
-        cleanupResource($scope.initLibraries);
       };
 
       $scope.loadPackagePreview = function () {
         console.log("loadPackagePreview: \n\tpackageLocation: '"+$scope.functionPackage.packageLocation+"'\n\tpackageLibrariesLocation: '"+$scope.functionPackage.packageLibrariesLocation+"'");
-        console.log("\t\tinitPackage: '"+$scope.initPackage+"'\n\tinitLibraries: '"+$scope.initLibraries+"'");
+        console.log("\tinitPackage: '"+$scope.initPackage+"'\n\tinitLibraries: '"+$scope.initLibraries+"'");
 
         $scope.isLoading = true;
         $scope.isFunctionPackageReady = false;
@@ -378,7 +374,7 @@ angular
 
       $scope.cancel = function () {
         console.log("cancel: \n\tpackageLocation: '"+$scope.functionPackage.packageLocation+"'\n\tpackageLibrariesLocation: '"+$scope.functionPackage.packageLibrariesLocation+"'");
-        console.log("\t\tinitPackage: '"+$scope.initPackage+"'\n\tinitLibraries: '"+$scope.initLibraries+"'");
+        console.log("\tinitPackage: '"+$scope.initPackage+"'\n\tinitLibraries: '"+$scope.initLibraries+"'");
 
         // delete the resource if they are not from the initial resources
         if ($scope.functionPackage.packageLocation &&
