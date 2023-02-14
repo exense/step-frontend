@@ -107,80 +107,6 @@ angular
     return dialogs;
   })
 
-/*
-  .directive('functionPackageLink', function () {
-    return {
-      restrict: 'E',
-      scope: {
-        id: '=',
-      },
-      templateUrl: 'functionpackages/partials/functionPackageLink.html',
-      controller: function ($scope, $rootScope, $http, FunctionPackagesDialogs, Dialogs) {
-        $scope.isRefreshing = false;
-
-        $scope.$watch('id', function () {
-          if ($scope.id) {
-            loadFunctionPackage();
-          }
-        });
-
-        function loadFunctionPackage() {
-          $http.get('rest/functionpackages/' + $scope.id).then(function (response) {
-            var data = response.data;
-            $scope.functionPackage = data;
-          });
-        }
-
-        function reload() {
-          $rootScope.$broadcast('functions.collection.change', {});
-          loadFunctionPackage();
-        }
-
-        $scope.edit = function () {
-          $scope.isRefreshing = true;
-          FunctionPackagesDialogs.editFunctionPackage(
-            $scope.id,
-            function () {
-              reload();
-            },
-            function () {
-              $scope.isRefreshing = false;
-            }
-          );
-        };
-
-        $scope.refresh = function () {
-          $scope.isRefreshing = true;
-          $http
-            .post('rest/functionpackages/' + $scope.id + '/reload')
-            .then(function () {
-              reload();
-            })
-            .finally(function () {
-              $scope.isRefreshing = false;
-            });
-        };
-
-        $scope.delete = function () {
-          $scope.isRefreshing = true;
-          Dialogs.showDeleteWarning(1, 'Keyword Package "' + $scope.functionPackage.attributes.name + '"').then(
-            function () {
-              $http
-                .delete('rest/functionpackages/' + $scope.id)
-                .then(function () {
-                  reload();
-                })
-                .finally(function () {
-                  $scope.isRefreshing = false;
-                });
-            }
-          );
-        };
-      },
-    };
-  })
-*/
-
   .controller('FunctionPackageActionsCtrl', function ($scope, $rootScope, FunctionPackagesDialogs) {
     $scope.addFunctionPackage = function () {
       FunctionPackagesDialogs.addFunctionPackage(function () {
@@ -350,14 +276,17 @@ angular
                   $scope.previewError = 'No keywords were found!';
                 }
               }
+              $scope.isLoading = false;
             },
             //on error:
             function (response) {
+              $scope.isLoading = false;
               $scope.previewError = response.data;
             }
           );
+        } else {
+          $scope.isLoading = false;
         }
-        $scope.isLoading = false;
 
         // Save the new resource for future deletion:
         $scope.previousPackageLibrariesLocation = $scope.functionPackage.packageLibrariesLocation;
