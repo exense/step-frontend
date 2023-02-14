@@ -44,7 +44,7 @@ export const setObjectFieldValue = (object: Record<string, unknown>, fieldPath: 
  * where |V| is the number of vertices and |E| is the number of edges in the graph being traversed.
  * The reason for this is that in the worst-case scenario, BFS needs to visit all vertices and all edges.
  */
-export const bfs = <T>({
+export const breadthFirstSearch = <T>({
   items,
   predicate = Boolean,
   children,

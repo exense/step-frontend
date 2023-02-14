@@ -4,7 +4,7 @@ import {
   ArtefactTreeNode,
   AugmentedScreenService,
   AuthService,
-  bfs,
+  breadthFirstSearch,
   CustomComponent,
   DialogsService,
   DynamicFieldsSchema,
@@ -232,7 +232,7 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
   handlePlanChange(): void {
     this._treeState.selectedNode$.pipe(take(1)).subscribe((node) => {
       if (node?.children) {
-        const children = bfs({
+        const children = breadthFirstSearch({
           items: node!.children,
           children: (item) => item.children || [],
         });

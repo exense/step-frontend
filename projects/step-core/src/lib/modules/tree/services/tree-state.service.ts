@@ -3,8 +3,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { BehaviorSubject, combineLatest, map, Observable, of, Subject, tap } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
-import { bfs } from '../../../shared';
-import { AbstractArtefact } from '../../../step-core.module';
+import { breadthFirstSearch } from '../../../shared';
 import { DropType } from '../shared/drop-type.enum';
 import { TreeFlatNode } from '../shared/tree-flat-node';
 import { TreeNode } from '../shared/tree-node';
@@ -137,7 +136,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     const isUpdated = this._treeNodeUtils.updateNodeData(this.originalRoot!, nodeId, { isSkipped });
 
     if (node.children) {
-      const children = bfs({
+      const children = breadthFirstSearch({
         items: node.children,
         children: (child) => child.children || [],
       });
@@ -347,16 +346,15 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       return;
     }
 
+    this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, newNodes, 'append');
+
     const parent = this.findNodeById(parentId);
 
     if (parent) {
       newNodes.forEach((node) => {
-        node.isSkipped = parent.isSkipped;
-        (node as unknown as { originalArtefact: AbstractArtefact }).originalArtefact.skipNode!.value = parent.isSkipped;
+        this._treeNodeUtils.updateNodeData(this.originalRoot!, node.id, { isSkipped: parent.isSkipped });
       });
     }
-
-    this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, newNodes, 'append');
 
     this.refresh();
 
