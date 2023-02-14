@@ -289,10 +289,20 @@ angular
         }
       };
 
+      var cleanupResource = function (resource) {
+        // delete the initial resources if not used anymore:
+        if (resource &&
+            resource != $scope.functionPackage.packageLocation &&
+            resource != $scope.functionPackage.packageLibrariesLocation) {
+          $scope.deleteResource(resource);
+        }
+      };
+
       loadTokenSelectionCriteria(functionPackage);
 
       $scope.save = function () {
         console.log("save: \n\tpackageLocation: '"+$scope.functionPackage.packageLocation+"'\n\tpackageLibrariesLocation: '"+$scope.functionPackage.packageLibrariesLocation+"'");
+        console.log("\t\tinitPackage: '"+$scope.initPackage+"'\n\tinitLibraries: '"+$scope.initLibraries+"'");
 
         if ($scope.functionPackage.packageLocation) {
           $scope.isFunctionPackageReady = false;
@@ -306,41 +316,31 @@ angular
           });
         }
 
-        // delete the initial resources:
-        if ($scope.initPackage && $scope.initPackage != $scope.functionPackage.packageLocation) {
-          $scope.deleteResource($scope.initPackage);
-        }
-        if ($scope.initLibraries && $scope.initLibraries != $scope.functionPackage.packageLibrariesLocation) {
-          $scope.deleteResource($scope.initLibraries);
-        }
+        // delete the initial resources if not used anymore:
+        cleanupResource($scope.initPackage);
+        cleanupResource($scope.initLibraries);
       };
 
       $scope.loadPackagePreview = function () {
         console.log("loadPackagePreview: \n\tpackageLocation: '"+$scope.functionPackage.packageLocation+"'\n\tpackageLibrariesLocation: '"+$scope.functionPackage.packageLibrariesLocation+"'");
+        console.log("\t\tinitPackage: '"+$scope.initPackage+"'\n\tinitLibraries: '"+$scope.initLibraries+"'");
 
         $scope.isLoading = true;
         $scope.isFunctionPackageReady = false;
         // clean-up errors and existing list of functions
         $scope.previewError = null;
         $scope.addedFunctions = null;
-        // delete previous resources:
-        if (
-          $scope.previousPackageLocation &&
-          $scope.previousPackageLocation != $scope.initPackage &&
-          $scope.previousPackageLocation != $scope.functionPackage.packageLocation
-        ) {
-          $scope.deleteResource($scope.previousPackageLocation);
+        // delete previous resources if they are not the initial package resources:
+        if ($scope.previousPackageLocation != $scope.initPackage &&
+            $scope.previousPackageLocation != $scope.initLibraries) {
+          cleanupResource($scope.previousPackageLocation);
         }
-        if (
-          $scope.previousPackageLibrariesLocation &&
-          $scope.previousPackageLibrariesLocation != $scope.initLibraries &&
-          $scope.previousPackageLibrariesLocation != $scope.functionPackage.packageLibrariesLocation
-        ) {
-          $scope.deleteResource($scope.previousPackageLibrariesLocation);
+        if ($scope.previousPackageLibrariesLocation != $scope.initPackage &&
+            $scope.previousPackageLibrariesLocation != $scope.initLibraries) {
+          cleanupResource($scope.previousPackageLibrariesLocation);
         }
 
         if ($scope.functionPackage.packageLocation) {
-
           $http.post('rest/functionpackages/preview', $scope.functionPackage).then(
             function (response) {
               $scope.addedFunctions = response.data.functions;
@@ -354,18 +354,15 @@ angular
                   $scope.previewError = 'No keywords were found!';
                 }
               }
-
-              $scope.isLoading = false;
             },
             //on error:
             function (response) {
-              $scope.isLoading = false;
               $scope.previewError = response.data;
             }
           );
-        } else {
-          $scope.isLoading = false;
         }
+        $scope.isLoading = false;
+
         // Save the new resource for future deletion:
         $scope.previousPackageLibrariesLocation = $scope.functionPackage.packageLibrariesLocation;
         $scope.previousPackageLocation = $scope.functionPackage.packageLocation;
@@ -373,7 +370,7 @@ angular
 
       $scope.deleteResource = function (id) {
         resourceId = id.replace('resource:', '');
-        console.log("deleteResource: \n\tID: '"+id+"'\n\tresourceId: '"+resourceId+"'");
+        console.log("deleteResource: \n\tid: '"+id+"'\n\tresourceId: '"+resourceId+"'");
         if (resourceId != id) {
           $http.delete('rest/resources/' + resourceId);
         }
@@ -381,18 +378,17 @@ angular
 
       $scope.cancel = function () {
         console.log("cancel: \n\tpackageLocation: '"+$scope.functionPackage.packageLocation+"'\n\tpackageLibrariesLocation: '"+$scope.functionPackage.packageLibrariesLocation+"'");
+        console.log("\t\tinitPackage: '"+$scope.initPackage+"'\n\tinitLibraries: '"+$scope.initLibraries+"'");
 
-        if (
-          $scope.functionPackage.packageLocation &&
-          $scope.functionPackage.packageLocation != $scope.initPackage
-        ) {
+        // delete the resource if they are not from the initial resources
+        if ($scope.functionPackage.packageLocation &&
+            $scope.functionPackage.packageLocation != $scope.initPackage &&
+            $scope.functionPackage.packageLocation != $scope.initLibraries) {
           $scope.deleteResource($scope.functionPackage.packageLocation);
         }
-
-        if (
-          $scope.functionPackage.packageLibrariesLocation &&
-          $scope.functionPackage.packageLibrariesLocation != $scope.initLibraries
-        ) {
+        if ($scope.functionPackage.packageLibrariesLocation &&
+            $scope.functionPackage.packageLibrariesLocation != $scope.initPackage &&
+            $scope.functionPackage.packageLibrariesLocation != $scope.initLibraries) {
           $scope.deleteResource($scope.functionPackage.packageLibrariesLocation);
         }
 
