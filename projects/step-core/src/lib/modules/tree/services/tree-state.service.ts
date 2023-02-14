@@ -1,12 +1,13 @@
-import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, combineLatest, map, Observable, of, Subject, tap } from 'rxjs';
 import { FlatTreeControl } from '@angular/cdk/tree';
+import { Injectable, OnDestroy } from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
-import { TreeNodeUtilsService } from './tree-node-utils.service';
-import { TreeNode } from '../shared/tree-node';
-import { TreeFlatNode } from '../shared/tree-flat-node';
+import { BehaviorSubject, combineLatest, map, Observable, of, Subject, tap } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
+import { breadthFirstSearch } from '../../../shared';
 import { DropType } from '../shared/drop-type.enum';
+import { TreeFlatNode } from '../shared/tree-flat-node';
+import { TreeNode } from '../shared/tree-node';
+import { TreeNodeUtilsService } from './tree-node-utils.service';
 
 const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === index;
 
@@ -126,11 +127,25 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   toggleSkip(): void {
     const nodeId = this.selectedNodeIds$.value[0];
     const node = this.findNodeById(nodeId);
+
     if (!node) {
       return;
     }
+
     const isSkipped = !node.isSkipped;
     const isUpdated = this._treeNodeUtils.updateNodeData(this.originalRoot!, nodeId, { isSkipped });
+
+    if (node.children) {
+      const children = breadthFirstSearch({
+        items: node.children,
+        children: (child) => child.children || [],
+      });
+
+      children.forEach((child) => {
+        this._treeNodeUtils.updateNodeData(this.originalRoot!, child.id, { isSkipped });
+      });
+    }
+
     if (isUpdated) {
       this.refresh();
     }
@@ -320,16 +335,26 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
   addChildrenToSelectedNode(...children: T[]): void {
     const parentId = this.selectedInsertionParentId$.value;
+
     if (!parentId) {
       return;
     }
 
     const newNodes = children.map((child) => this._treeNodeUtils.convertItem(child));
+
     if (!this.isPossibleToInsert(parentId, ...newNodes)) {
       return;
     }
 
     this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, newNodes, 'append');
+
+    const parent = this.findNodeById(parentId);
+
+    if (parent) {
+      newNodes.forEach((node) => {
+        this._treeNodeUtils.updateNodeData(this.originalRoot!, node.id, { isSkipped: parent.isSkipped });
+      });
+    }
 
     this.refresh();
 
