@@ -292,6 +292,8 @@ angular
       loadTokenSelectionCriteria(functionPackage);
 
       $scope.save = function () {
+        console.log("save: \n\tpackageLocation: '"+$scope.functionPackage.packageLocation+"'\n\tpackageLibrariesLocation: '"+$scope.functionPackage.packageLibrariesLocation+"'");
+
         if ($scope.functionPackage.packageLocation) {
           $scope.isFunctionPackageReady = false;
           $scope.isLoading = true;
@@ -305,15 +307,17 @@ angular
         }
 
         // delete the initial resources:
-        if ($scope.initPackage != null && $scope.initPackage != $scope.functionPackage.packageLocation) {
+        if ($scope.initPackage && $scope.initPackage != $scope.functionPackage.packageLocation) {
           $scope.deleteResource($scope.initPackage);
         }
-        if ($scope.initLibraries != null && $scope.initLibraries != $scope.functionPackage.packageLibrariesLocation) {
+        if ($scope.initLibraries && $scope.initLibraries != $scope.functionPackage.packageLibrariesLocation) {
           $scope.deleteResource($scope.initLibraries);
         }
       };
 
       $scope.loadPackagePreview = function () {
+        console.log("loadPackagePreview: \n\tpackageLocation: '"+$scope.functionPackage.packageLocation+"'\n\tpackageLibrariesLocation: '"+$scope.functionPackage.packageLibrariesLocation+"'");
+
         $scope.isLoading = true;
         $scope.isFunctionPackageReady = false;
         // clean-up errors and existing list of functions
@@ -352,8 +356,6 @@ angular
               }
 
               $scope.isLoading = false;
-              if ($scope.previousPackageLocation != $scope.functionPackage.packageLocation) {
-              }
             },
             //on error:
             function (response) {
@@ -371,13 +373,19 @@ angular
 
       $scope.deleteResource = function (id) {
         resourceId = id.replace('resource:', '');
+        console.log("deleteResource: \n\tID: '"+id+"'\n\tresourceId: '"+resourceId+"'");
         if (resourceId != id) {
           $http.delete('rest/resources/' + resourceId);
         }
       };
 
       $scope.cancel = function () {
-        if ($scope.functionPackage.packageLocation && $scope.functionPackage.packageLocation != $scope.initPackage) {
+        console.log("cancel: \n\tpackageLocation: '"+$scope.functionPackage.packageLocation+"'\n\tpackageLibrariesLocation: '"+$scope.functionPackage.packageLibrariesLocation+"'");
+
+        if (
+          $scope.functionPackage.packageLocation &&
+          $scope.functionPackage.packageLocation != $scope.initPackage
+        ) {
           $scope.deleteResource($scope.functionPackage.packageLocation);
         }
 
