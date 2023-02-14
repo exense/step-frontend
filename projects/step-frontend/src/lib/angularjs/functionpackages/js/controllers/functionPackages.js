@@ -150,21 +150,10 @@ angular
       $scope.functionPackageTypeRegistry = FunctionPackageTypeRegistry;
 
       var newFunctionPackage = functionPackage == null;
-      if (!newFunctionPackage) {
-        // So we can cancel
-        $scope.initPackage = functionPackage.packageLocation;
-        $scope.initLibraries = functionPackage.packageLibrariesLocation;
-      } else {
-        // So we can cancel
-        $scope.initPackage = null;
-        $scope.initLibraries = null;
-      }
       //preset edited Id as reference package if edit mode
       if (packageId && functionPackage) {
         functionPackage.referencePackageId = packageId;
       }
-      // $scope.previousPackageLocation = $scope.initPackage;
-      // $scope.previousPackageLibrariesLocation = $scope.initLibraries;
 
       $scope.mode = newFunctionPackage ? 'add' : 'edit';
       $scope.showPreview = true;
@@ -218,9 +207,6 @@ angular
       loadTokenSelectionCriteria(functionPackage);
 
       $scope.save = function () {
-        console.log("save: \n\tpackageLocation: '"+$scope.functionPackage.packageLocation+"'\n\tpackageLibrariesLocation: '"+$scope.functionPackage.packageLibrariesLocation+"'");
-        console.log("\tinitPackage: '"+$scope.initPackage+"'\n\tinitLibraries: '"+$scope.initLibraries+"'");
-
         if ($scope.functionPackage.packageLocation) {
           $scope.isFunctionPackageReady = false;
           $scope.isLoading = true;
@@ -235,9 +221,6 @@ angular
       };
 
       $scope.loadPackagePreview = function () {
-        console.log("loadPackagePreview: \n\tpackageLocation: '"+$scope.functionPackage.packageLocation+"'\n\tpackageLibrariesLocation: '"+$scope.functionPackage.packageLibrariesLocation+"'");
-        console.log("\tinitPackage: '"+$scope.initPackage+"'\n\tinitLibraries: '"+$scope.initLibraries+"'");
-
         $scope.isLoading = true;
         $scope.isFunctionPackageReady = false;
         // clean-up errors and existing list of functions
@@ -273,16 +256,12 @@ angular
 
       $scope.deleteResource = function (id) {
         resourceId = id.replace('resource:', '');
-        console.log("deleteResource: \n\tid: '"+id+"'\n\tresourceId: '"+resourceId+"'");
         if (resourceId != id) {
           $http.delete('rest/resources/' + resourceId);
         }
       };
 
       $scope.cancel = function () {
-        console.log("cancel: \n\tpackageLocation: '"+$scope.functionPackage.packageLocation+"'\n\tpackageLibrariesLocation: '"+$scope.functionPackage.packageLibrariesLocation+"'");
-        console.log("\tinitPackage: '"+$scope.initPackage+"'\n\tinitLibraries: '"+$scope.initLibraries+"'");
-
         $uibModalInstance.dismiss('cancel');
       };
 
