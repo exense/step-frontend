@@ -215,15 +215,6 @@ angular
         }
       };
 
-      var cleanupResource = function (resource) {
-        // delete the initial resources if not used anymore:
-        if (resource &&
-            resource != $scope.functionPackage.packageLocation &&
-            resource != $scope.functionPackage.packageLibrariesLocation) {
-          $scope.deleteResource(resource);
-        }
-      };
-
       loadTokenSelectionCriteria(functionPackage);
 
       $scope.save = function () {
@@ -252,15 +243,6 @@ angular
         // clean-up errors and existing list of functions
         $scope.previewError = null;
         $scope.addedFunctions = null;
-        // delete previous resources if they are not the initial package resources:
-        if ($scope.previousPackageLocation != $scope.initPackage &&
-            $scope.previousPackageLocation != $scope.initLibraries) {
-          cleanupResource($scope.previousPackageLocation);
-        }
-        if ($scope.previousPackageLibrariesLocation != $scope.initPackage &&
-            $scope.previousPackageLibrariesLocation != $scope.initLibraries) {
-          cleanupResource($scope.previousPackageLibrariesLocation);
-        }
 
         if ($scope.functionPackage.packageLocation) {
           $http.post('rest/functionpackages/preview', $scope.functionPackage).then(
@@ -287,10 +269,6 @@ angular
         } else {
           $scope.isLoading = false;
         }
-
-        // Save the new resource for future deletion:
-        $scope.previousPackageLibrariesLocation = $scope.functionPackage.packageLibrariesLocation;
-        $scope.previousPackageLocation = $scope.functionPackage.packageLocation;
       };
 
       $scope.deleteResource = function (id) {
@@ -304,18 +282,6 @@ angular
       $scope.cancel = function () {
         console.log("cancel: \n\tpackageLocation: '"+$scope.functionPackage.packageLocation+"'\n\tpackageLibrariesLocation: '"+$scope.functionPackage.packageLibrariesLocation+"'");
         console.log("\tinitPackage: '"+$scope.initPackage+"'\n\tinitLibraries: '"+$scope.initLibraries+"'");
-
-        // delete the resource if they are not from the initial resources
-        if ($scope.functionPackage.packageLocation &&
-            $scope.functionPackage.packageLocation != $scope.initPackage &&
-            $scope.functionPackage.packageLocation != $scope.initLibraries) {
-          $scope.deleteResource($scope.functionPackage.packageLocation);
-        }
-        if ($scope.functionPackage.packageLibrariesLocation &&
-            $scope.functionPackage.packageLibrariesLocation != $scope.initPackage &&
-            $scope.functionPackage.packageLibrariesLocation != $scope.initLibraries) {
-          $scope.deleteResource($scope.functionPackage.packageLibrariesLocation);
-        }
 
         $uibModalInstance.dismiss('cancel');
       };
