@@ -33,7 +33,7 @@ export class DynamicFieldEditorComponent implements OnChanges {
 
     if (value) {
       Object.keys(value)
-        .filter((key) => value[key] === 'string')
+        .filter((key) => typeof value[key] === 'string')
         .forEach((key) => {
           value[key] = {
             value: value[key],
