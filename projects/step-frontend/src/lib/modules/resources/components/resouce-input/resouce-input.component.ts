@@ -33,10 +33,15 @@ export class ResourceInputComponent implements OnChanges, OnDestroy {
   @Input() label?: string;
   @Input() withHelpIcon?: boolean;
   @Input() helpIconTooltip?: string;
+  @Input() withDynamicSwitch?: boolean;
 
   @Output() stModelChange = new EventEmitter<string>();
+  @Output() dynamicSwitch = new EventEmitter<void>();
 
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
+
+  private readonly terminator$ = new Subject<void>();
+
   isResource?: boolean;
   resourceId?: string;
   downloadResourceUrl?: string;
@@ -46,7 +51,6 @@ export class ResourceInputComponent implements OnChanges, OnDestroy {
   progress$?: Observable<number>;
   response$?: Observable<ResourceUploadResponse>;
   lastStModelValue?: string;
-  private readonly terminator$ = new Subject<void>();
 
   constructor(
     private _augmentedResourcesService: AugmentedResourcesService,
@@ -142,7 +146,7 @@ export class ResourceInputComponent implements OnChanges, OnDestroy {
   selectResource(): void {
     this._resourceDialogsService
       .showSearchResourceDialog(this.stType)
-      .pipe(filter((resourceId) => !!resourceId))
+      .pipe(filter((resourceId) => Boolean(resourceId)))
       .subscribe((resourceId) => {
         this.setResourceIdToFieldValue(resourceId);
       });

@@ -27,6 +27,12 @@ angular
       'partials/scheduler/schedulerConfiguration.html',
       'scheduler'
     );
+    ViewRegistry.registerDashlet(
+      'settings',
+      'Scheduler',
+      'partials/scheduler/schedulerConfiguration.html',
+      'scheduler'
+    );
   })
 
   .controller('newTaskModalCtrl', function ($scope, $uibModalInstance, executionParams) {
