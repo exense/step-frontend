@@ -22,6 +22,7 @@ export abstract class SelectionCollector<KEY, ENTITY> {
   abstract registerPossibleSelectionManually(items: ENTITY[]): void;
   abstract registerPossibleSelection(item: ENTITY): void;
   abstract unregisterPossibleSelection(item: ENTITY): void;
+  abstract isSelectingPossible(): boolean;
 
   abstract destroy(): void;
 }
