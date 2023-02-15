@@ -126,7 +126,7 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
         takeUntil(this.terminator$)
       )
       .subscribe(() => {
-        if (this.selectionType !== BulkSelectionType.Individual) {
+        if (!selectionCollector?.isSelectingPossible() && this.selectionType !== BulkSelectionType.Individual) {
           this.changeType(BulkSelectionType.Individual);
         }
       });
