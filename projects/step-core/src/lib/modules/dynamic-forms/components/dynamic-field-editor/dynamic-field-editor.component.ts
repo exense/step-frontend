@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../../client/generated';
+import { DynamicValueString } from '../../../../client/generated';
 import { AJS_MODULE } from '../../../../shared';
 import { DynamicFieldGroupValue } from '../../shared/dynamic-field-group-value';
 import { DynamicFieldsSchema } from '../../shared/dynamic-fields-schema';
@@ -30,6 +30,17 @@ export class DynamicFieldEditorComponent implements OnChanges {
 
   handleChange(value?: DynamicFieldGroupValue): void {
     this.internalValue = value;
+
+    if (value) {
+      Object.keys(value)
+        .filter((key) => typeof value[key] === 'string')
+        .forEach((key) => {
+          value[key] = {
+            value: value[key],
+            dynamic: false,
+          } as DynamicValueString;
+        });
+    }
 
     this.valueChange.emit(!value ? '' : JSON.stringify(value));
   }
