@@ -33,7 +33,7 @@ export class ResourceInputComponent implements OnChanges, OnDestroy {
   @Input() label?: string;
   @Input() withHelpIcon?: boolean;
   @Input() helpIconTooltip?: string;
-  @Input() withDynamicSwitch?: boolean = true;
+  @Input() withDynamicSwitch?: boolean;
 
   @Output() stModelChange = new EventEmitter<string>();
   @Output() dynamicSwitch = new EventEmitter<void>();
