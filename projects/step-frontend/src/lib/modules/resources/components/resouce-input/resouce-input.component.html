@@ -1,3 +1,18 @@
+<ng-template #dynamicSwitchTemplate>
+  <ng-container *ngIf="withDynamicSwitch">
+    <div class="suffix-separator"></div>
+
+    <button
+      type="button"
+      mat-stroked-button
+      matTooltip="Use a dynamic expression to set this attribute"
+      (click)="dynamicSwitch.emit()"
+    >
+      <step-icon name="zap"></step-icon>
+    </button>
+  </ng-container>
+</ng-template>
+
 <step-upload-container (filesChange)="onFilesChange($event)">
   <ng-container *ngIf="!isResource; else resourceTemplate">
     <mat-form-field floatLabel="always" class="step-view with-suffix">
@@ -44,6 +59,8 @@
         <button type="button" mat-stroked-button matTooltip="Select from file system" (click)="openFileChooser()">
           <step-icon name="folder-plus"></step-icon>
         </button>
+
+        <ng-container *ngTemplateOutlet="dynamicSwitchTemplate"></ng-container>
       </ng-container>
     </mat-form-field>
   </ng-container>
@@ -93,6 +110,8 @@
           <button type="button" mat-stroked-button matTooltip="Clear" (click)="clear()">
             <step-icon name="x"></step-icon>
           </button>
+
+          <ng-container *ngTemplateOutlet="dynamicSwitchTemplate"></ng-container>
         </ng-container>
       </mat-form-field>
     </ng-container>
@@ -117,6 +136,8 @@
           <button type="button" mat-stroked-button matTooltip="Clear" (click)="clear()">
             <step-icon name="x"></step-icon>
           </button>
+
+          <ng-container *ngTemplateOutlet="dynamicSwitchTemplate"></ng-container>
         </ng-container>
       </mat-form-field>
     </ng-container>
