@@ -27,10 +27,11 @@ export class AutorefreshToggleComponent implements OnDestroy {
     { label: '1 minute', value: 60000 },
     { label: '5 minutes', value: 300000 },
   ];
+  selectedInterval: AutorefreshPreset = this.presets[0];
 
   @Input() autoIncreaseTo?: number;
 
-  private _disabled: boolean = false;
+  _disabled: boolean = false;
 
   get disabled(): boolean {
     return this._disabled;
@@ -62,6 +63,7 @@ export class AutorefreshToggleComponent implements OnDestroy {
     }
     this.stopTimer();
     this._interval = value;
+    this.selectedInterval = this.presets.find((p) => p.value === value) || { label: '', value: value };
     this.intervalChange.emit(value);
     this._$rootScope.$broadcast('globalsettings-refreshInterval', { new: value });
     this.startTimer();
@@ -78,9 +80,10 @@ export class AutorefreshToggleComponent implements OnDestroy {
     this.stopTimer();
   }
 
-  changeRefreshInterval(newInterval: number): void {
+  changeRefreshInterval(newInterval: AutorefreshPreset): void {
     this._isManuallyChanged = true;
-    this.interval = newInterval;
+    this.selectedInterval = newInterval;
+    this.interval = newInterval.value;
     this.disabled = this.interval <= 0;
   }
 

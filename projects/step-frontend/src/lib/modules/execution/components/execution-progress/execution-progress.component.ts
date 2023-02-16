@@ -100,6 +100,7 @@ export class ExecutionProgressComponent
   selectedErrorDistributionToggle = ErrorDistributionStatus.message;
 
   autoRefreshDisabled: boolean = true;
+  showAutoRefreshButton = false;
   autoRefreshInterval: number = 0;
   autoRefreshIncreasedTo: number = 0;
 
@@ -203,6 +204,7 @@ export class ExecutionProgressComponent
       }
     } else {
       this.autoRefreshDisabled = true;
+      this.showAutoRefreshButton = false;
       this.refreshOther();
       this.refreshTestCaseTable();
     }
@@ -363,10 +365,12 @@ export class ExecutionProgressComponent
     }
     if (status === 'ENDED') {
       this.refresh();
+      this.showAutoRefreshButton = false;
       this.autoRefreshDisabled = true;
       this.autoRefreshInterval = 0;
       this.autoRefreshIncreasedTo = 0;
     } else {
+      this.showAutoRefreshButton = true;
       this.autoRefreshDisabled = false;
       this.autoRefreshInterval = 100;
       this.autoRefreshIncreasedTo = 5000;
