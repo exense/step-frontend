@@ -10,7 +10,6 @@ export class ResourceInputBridgeService {
   readonly deleteLastUploadedResource$ = this.deleteLastUploadedResourceInternal$.asObservable();
 
   deleteLastUploadedResource(): void {
-    // TODO: this should be handled using @ViewChild(ResourceInputComponent) inside the import dialog once it's migrated
     this.deleteLastUploadedResourceInternal$.next();
   }
 }
