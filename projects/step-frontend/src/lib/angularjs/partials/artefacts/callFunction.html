@@ -33,7 +33,7 @@
         (value-change)="artefact.description = $event; save()"
         [is-disabled]="readonly">
       </step-editable-textarea-label>
-      <dynamic-json-editor label="'Input'" dynamic-value="artefact.argument" on-save="save()" schema="keyword.schema" is-disabled="readonly" />
+      <dynamic-json-editor label="'Input'" enforce-groovy-expression="true" dynamic-value="artefact.argument" on-save="save()" schema="keyword.schema" is-disabled="readonly" />
       <dynamic-textfield label="'Map output to'" dynamic-value="artefact.resultMap" on-save="save()" />
 
       <div class="panel panel-default">
