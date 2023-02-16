@@ -5,12 +5,18 @@ import {
   Input,
   OnChanges,
   OnDestroy,
+  OnInit,
   Output,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, AugmentedResourcesService, ResourceUploadResponse } from '@exense/step-core';
+import {
+  AJS_MODULE,
+  AugmentedResourcesService,
+  ResourceInputBridgeService,
+  ResourceUploadResponse,
+} from '@exense/step-core';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ResourceDialogsService } from '../../services/resource-dialogs.service';
 
@@ -21,7 +27,7 @@ const MAX_FILES = 1;
   templateUrl: './resouce-input.component.html',
   styleUrls: ['./resouce-input.component.scss'],
 })
-export class ResourceInputComponent implements OnChanges, OnDestroy {
+export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   @Input() stModel!: string;
   @Input() stBounded?: boolean;
   @Input() stDirectory?: boolean;
@@ -41,6 +47,7 @@ export class ResourceInputComponent implements OnChanges, OnDestroy {
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
 
   private readonly terminator$ = new Subject<void>();
+  private readonly uploadTerminator$ = new Subject<void>();
 
   isResource?: boolean;
   resourceId?: string;
@@ -51,11 +58,19 @@ export class ResourceInputComponent implements OnChanges, OnDestroy {
   progress$?: Observable<number>;
   response$?: Observable<ResourceUploadResponse>;
   lastStModelValue?: string;
+  lastUploadedResourceId?: string;
 
   constructor(
     private _augmentedResourcesService: AugmentedResourcesService,
-    private _resourceDialogsService: ResourceDialogsService
+    private _resourceDialogsService: ResourceDialogsService,
+    private _resourceInputBridgeService: ResourceInputBridgeService
   ) {}
+
+  ngOnInit(): void {
+    this._resourceInputBridgeService.deleteLastUploadedResource$.pipe(takeUntil(this.terminator$)).subscribe(() => {
+      this.deleteLastUploadedResource();
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     this.stModelChanges(changes);
@@ -64,6 +79,8 @@ export class ResourceInputComponent implements OnChanges, OnDestroy {
   ngOnDestroy(): void {
     this.terminator$.next();
     this.terminator$.complete();
+    this.uploadTerminator$.next();
+    this.uploadTerminator$.complete();
   }
 
   onBlur(): void {
@@ -155,6 +172,7 @@ export class ResourceInputComponent implements OnChanges, OnDestroy {
   clear(): void {
     this.absoluteFilepath = '';
     this.setStModel('');
+    this.deleteLastUploadedResource();
   }
 
   private stModelChanges(changes: SimpleChanges): void {
@@ -217,9 +235,9 @@ export class ResourceInputComponent implements OnChanges, OnDestroy {
 
     this.progress$ = progress$;
 
-    this.terminator$.next();
+    this.uploadTerminator$.next();
 
-    response$.pipe(takeUntil(this.terminator$)).subscribe((resourceUploadResponse) => {
+    response$.pipe(takeUntil(this.uploadTerminator$)).subscribe((resourceUploadResponse) => {
       delete this.progress$;
 
       const resourceId = resourceUploadResponse.resource!.id!;
@@ -228,6 +246,7 @@ export class ResourceInputComponent implements OnChanges, OnDestroy {
         // No similar resource found
         this.setResourceIdToFieldValue(resourceId);
         this.resourceFilename = resourceUploadResponse.resource!.resourceName;
+        this.lastUploadedResourceId = resourceId;
       } else {
         if (resourceUploadResponse.similarResources.length >= 1) {
           this._resourceDialogsService.showFileAlreadyExistsWarning(resourceUploadResponse.similarResources).subscribe({
@@ -240,6 +259,7 @@ export class ResourceInputComponent implements OnChanges, OnDestroy {
               } else {
                 // Creating a new resource
                 this.setResourceIdToFieldValue(resourceId);
+                this.lastUploadedResourceId = resourceId;
               }
             },
             error: () => {
@@ -248,6 +268,16 @@ export class ResourceInputComponent implements OnChanges, OnDestroy {
           });
         }
       }
+    });
+  }
+
+  private deleteLastUploadedResource(): void {
+    if (!this.lastUploadedResourceId) {
+      return;
+    }
+
+    this._augmentedResourcesService.deleteResource(this.lastUploadedResourceId).subscribe(() => {
+      delete this.lastUploadedResourceId;
     });
   }
 }

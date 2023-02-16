@@ -1,15 +1,16 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import {
   a1Promise2Observable,
   DialogsService,
   IsUsedByDialogService,
   Resource,
+  ResourceInputBridgeService,
   ResourcesService,
   UibModalHelperService,
 } from '@exense/step-core';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
-import { MatDialog } from '@angular/material/dialog';
 import { SearchResourceDialogComponent } from '../components/search-resource-dialog/search-resource-dialog.component';
 
 @Injectable({
@@ -24,10 +25,11 @@ export class ResourceDialogsService {
     private _dialogs: DialogsService,
     private _resourcesService: ResourcesService,
     private _isUsedByDialogs: IsUsedByDialogService,
-    private _matDialog: MatDialog
+    private _matDialog: MatDialog,
+    private _resourceInputBridgeService: ResourceInputBridgeService
   ) {}
 
-  editResource(resource?: Partial<Resource>): Observable<{ resource?: Partial<Resource>; result: string }> {
+  editResource(resource?: Partial<Resource>): Observable<{ resource?: Partial<Resource>; result: string } | boolean> {
     const modalInstance = this._uibModalHelper.open({
       backdrop: 'static',
       templateUrl: 'partials/resources/editResourceDialog.html',
@@ -40,7 +42,20 @@ export class ResourceDialogsService {
     });
 
     const result$ = a1Promise2Observable(modalInstance.result) as Observable<string>;
-    return result$.pipe(map((result) => ({ result, resource: resource })));
+
+    return result$.pipe(
+      map((result) => {
+        return {
+          result,
+          resource,
+        };
+      }),
+      catchError(() => {
+        this._resourceInputBridgeService.deleteLastUploadedResource();
+
+        return of(false);
+      })
+    );
   }
 
   deleteResource(id: string, label: string): Observable<any> {
