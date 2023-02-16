@@ -46,6 +46,8 @@ export class ExecutionTreeComponent implements OnChanges, TreeActionsService, On
   @Input() nodeId?: string;
   @Input() handle: any; // temporary solution, while the whole page is working in hybrid mode
 
+  static lastNodeId?: string;
+
   constructor(
     @Inject(EXECUTION_TREE_PAGING) private _paging: ExecutionTreePaging,
     private _treeState: TreeStateService<ReportNode, ReportTreeNode>,
@@ -55,7 +57,12 @@ export class ExecutionTreeComponent implements OnChanges, TreeActionsService, On
   ngOnChanges(changes: SimpleChanges): void {
     const cNodeId = changes['nodeId'];
     if (cNodeId?.previousValue !== cNodeId?.currentValue || cNodeId?.firstChange) {
-      this.loadTree(cNodeId!.currentValue);
+      const nodeId = cNodeId!.currentValue;
+
+      if (nodeId !== ExecutionTreeComponent.lastNodeId) {
+        this.loadTree(nodeId);
+        ExecutionTreeComponent.lastNodeId = nodeId;
+      }
     }
 
     const cHandle = changes['handle'];
