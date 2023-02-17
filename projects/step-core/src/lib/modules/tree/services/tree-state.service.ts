@@ -293,7 +293,8 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
   moveSelectedNodes(direction: 'up' | 'down'): void {
     const parentChildRelations = this.getParentChildRelationsForSelectedNodes();
-    if (parentChildRelations.length === 0) {
+
+    if (!parentChildRelations.length) {
       return;
     }
 
@@ -301,25 +302,38 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
     parentChildRelations.forEach(({ parentId, nodeIds }) => {
       const parent = this.findNodeById(parentId);
-      const children = (parent?.children || []) as N[];
+
+      if (!parent || !parent.children) {
+        return;
+      }
+
+      let children = parent.children as N[];
       let hasLocalChange = false;
-      nodeIds.forEach((nodeId) => {
-        const childIndex = children.findIndex((child) => child.id === nodeId);
 
-        if (direction === 'up' && childIndex > 0) {
-          const sibling = children[childIndex - 1];
-          children[childIndex - 1] = children[childIndex];
-          children[childIndex] = sibling;
-          hasLocalChange = true;
-        }
+      const nodesIndices = nodeIds
+        .map((nodeId) => {
+          const index = children.findIndex((child) => child.id === nodeId);
 
-        if (direction === 'down' && childIndex < children.length - 1) {
-          const sibling = children[childIndex + 1];
-          children[childIndex + 1] = children[childIndex];
-          children[childIndex] = sibling;
-          hasLocalChange = true;
-        }
-      });
+          return {
+            node: children[index],
+            index,
+          };
+        })
+        .sort((a, b) => a.index - b.index);
+
+      const nodes = nodesIndices.map((nodeIndex) => nodeIndex.node);
+      const before = children.filter((child, index) => index < nodesIndices[0].index);
+      const after = children.filter((child, index) => index > nodesIndices[nodesIndices.length - 1].index);
+
+      if (direction === 'up' && nodesIndices[0].index > 0) {
+        children = [...before.slice(0, before.length - 1), ...nodes, before[before.length - 1], ...after];
+        hasLocalChange = true;
+      }
+
+      if (direction === 'down' && nodesIndices[nodesIndices.length - 1].index < children.length - 1) {
+        children = [...before, after[0], ...nodes, ...after.slice(1)];
+        hasLocalChange = true;
+      }
 
       if (hasLocalChange) {
         this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, children, 'replace');
