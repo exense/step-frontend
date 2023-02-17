@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
+import { AugmentedPlansService, Plan } from '../client/step-client-module';
+import { a1Promise2Observable, DialogsService } from '../shared';
 import { ExportDialogsService } from './export-dialogs.service';
 import { ImportDialogsService } from './import-dialogs.service';
-import { AugmentedPlansService, Plan } from '../client/step-client-module';
-import { UibModalHelperService } from './uib-modal-helper.service';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
-import { a1Promise2Observable, DialogsService } from '../shared';
+import { ResourceInputBridgeService } from './resource-input-bridge.service';
+import { UibModalHelperService } from './uib-modal-helper.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +18,8 @@ export class PlanDialogsService {
     private _dialogs: DialogsService,
     private _exportDialogs: ExportDialogsService,
     private _importDialogs: ImportDialogsService,
-    private _isUsedByDialogs: IsUsedByDialogService
+    private _isUsedByDialogs: IsUsedByDialogService,
+    private _resourceInputBridgeService: ResourceInputBridgeService
   ) {}
 
   createPlan(): Observable<any> {
@@ -61,7 +63,13 @@ export class PlanDialogsService {
   }
 
   importPlans(): Observable<any> {
-    return this._importDialogs.displayImportDialog('Plans import', 'plans');
+    return this._importDialogs.displayImportDialog('Plans import', 'plans').pipe(
+      catchError(() => {
+        this._resourceInputBridgeService.deleteLastUploadedResource();
+
+        return of(false);
+      })
+    );
   }
 
   exportPlans(): Observable<any> {
