@@ -32,13 +32,13 @@ const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
 
     result = ((await pluginsResponse.json()) as PluginDefinition[]).map((plugin) => {
       console.log('received plugins', plugin);
-      // @ts-ignore
-      if (plugin['angularModules'] === ['stepEnterpriseCore']) {
-        // @ts-ignore
-        plugin['name'] = 'stepEnterpriseCore';
-        // @ts-ignore
-        plugin['entryPoint'] = plugin['scripts'][0];
+
+      //@ts-ignore
+      if (plugin['entryPoint']) {
+        //@ts-ignore
+        plugin['entryPoint'] += '?v=${project.version}';
       }
+
       const angularModules = (plugin as LegacyPluginDefinition)?.angularModules || [];
       const toOverride = angularModules.find((m) => OVERRIDE_PLUGINS.has(m));
       if (toOverride) {
