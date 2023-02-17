@@ -18,7 +18,7 @@ import { DynamicFieldType } from '../../shared/dynamic-field-type';
 import { DYNAMIC_FIELD_VALIDATOR } from '../../shared/dynamic-field-validator';
 import { DynamicFieldsSchema } from '../../shared/dynamic-fields-schema';
 
-const DEFAULT_FIELD_VALUE: DynamicValueString = { value: '', dynamic: false };
+const DEFAULT_FIELD_VALUE: DynamicValueString = { value: undefined, dynamic: false };
 
 @Component({
   selector: 'step-dynamic-field-group',
@@ -147,7 +147,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     // add required fields
     requiredFields.forEach((field) => this.addFieldInternal(schema!, field, value, { isRequired: true }));
 
-    // for non required and additional fields add only those, which are exists in value
+    // for non required and additional fields add only those, which exist in value
     nonRequiredFields
       .filter((field) => valueFields.includes(field))
       .forEach((field) => this.addFieldInternal(schema!, field, value));
@@ -235,7 +235,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     let enumItems: string[] = [];
 
     if (!isAdditional) {
-      const fieldDescription = schema!.properties[field];
+      const fieldDescription = schema.properties[field];
       if (!fieldDescription) {
         throw new Error('Invalid schema');
       }
@@ -266,6 +266,10 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     const fieldValue: DynamicValueString | DynamicValueBoolean | DynamicValueInteger = value[field] || {
       ...DEFAULT_FIELD_VALUE,
     };
+    if (fieldValue.value === undefined && value[field] === undefined && schema.properties?.[field]?.default) {
+      fieldValue.value = schema.properties[field].default;
+    }
+
     const validator = isRequired ? DYNAMIC_FIELD_VALIDATOR : undefined;
     const control = this.formBuilder.control<DynamicValueString | DynamicValueBoolean | DynamicValueInteger>(
       fieldValue,
