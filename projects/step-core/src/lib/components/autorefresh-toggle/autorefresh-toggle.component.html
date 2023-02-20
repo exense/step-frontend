@@ -1,8 +1,13 @@
-<button mat-icon-button [matMenuTriggerFor]="menu">
+<button mat-icon-button [matMenuTriggerFor]="menu" [matTooltip]="selectedInterval.label">
   <step-icon name="refresh-cw"></step-icon>
 </button>
 <mat-menu #menu="matMenu">
-  <button *ngFor="let p of presets" (click)="changeRefreshInterval(p.value)" mat-menu-item>
+  <button
+    *ngFor="let p of presets"
+    (click)="changeRefreshInterval(p)"
+    mat-menu-item
+    [class.active]="p.value === selectedInterval.value"
+  >
     {{ p.label }}
   </button>
 </mat-menu>

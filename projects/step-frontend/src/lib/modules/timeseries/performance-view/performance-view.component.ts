@@ -167,7 +167,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
    * @param request
    */
   updateDashboard(request: UpdatePerformanceViewRequest): Observable<any> {
-    console.log('UPDATE DASHBOARD CALLED');
     this.updateDashboardTerminator$.next(); // to keep executions synchronous
     // let's assume the complete interval and selections are set.
     if (!this.context.inProgress$.getValue()) this.context.setInProgress(true);
@@ -243,7 +242,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   private refreshAllCharts(): Observable<unknown> {
-    console.log('REFRESH ALL CHARTS CALLED');
     this.findRequestBuilder = this.prepareFindRequestBuilder(this.settings); // we don't want to lose active filters
     let timeSelection = this.context.getSelectedTimeRange();
     this.findRequestBuilder.withRange(timeSelection);
