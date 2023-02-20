@@ -145,8 +145,6 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
     };
   }
 
-  init() {}
-
   calculateFullTimeRange(details: Execution): TSTimeRange {
     let now = new Date().getTime();
     let selection: TSTimeRange;
@@ -177,7 +175,6 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
           if (task.ready) {
             this.migrationInProgress = false;
             this.executionHasToBeBuilt = false;
-            this.init();
           } else {
             console.error('The task is not finished yet');
           }
