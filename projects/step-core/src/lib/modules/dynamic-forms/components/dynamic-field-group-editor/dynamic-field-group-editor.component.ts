@@ -266,8 +266,8 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     const fieldValue: DynamicValueString | DynamicValueBoolean | DynamicValueInteger = value[field] || {
       ...DEFAULT_FIELD_VALUE,
     };
-    if (fieldValue.value === undefined && value[field] === undefined && schema.properties?.[field]?.default) {
-      fieldValue.value = schema.properties[field].default;
+    if (fieldValue.value === undefined && value[field] === undefined) {
+      fieldValue.value = schema.properties?.[field]?.default;
     }
 
     const validator = isRequired ? DYNAMIC_FIELD_VALIDATOR : undefined;
