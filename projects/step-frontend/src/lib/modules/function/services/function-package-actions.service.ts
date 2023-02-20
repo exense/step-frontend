@@ -1,15 +1,13 @@
-import { Inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import {
   a1Promise2Observable,
-  AJS_FUNCTION_DIALOGS_CONFIG,
-  AJS_LOCATION,
   DialogsService,
   FunctionPackage,
   KeywordPackagesService,
+  ResourceInputBridgeService,
   UibModalHelperService,
 } from '@exense/step-core';
 import { map, Observable, of, switchMap } from 'rxjs';
-import { ILocationService } from 'angular';
 import { catchError } from 'rxjs/operators';
 
 @Injectable({
@@ -20,11 +18,10 @@ export class FunctionPackageActionsService {
     private _uibModalHelper: UibModalHelperService,
     private _dialogs: DialogsService,
     private _api: KeywordPackagesService,
-    @Inject(AJS_FUNCTION_DIALOGS_CONFIG) private _functionDialogsConfig: any,
-    @Inject(AJS_LOCATION) private _location: ILocationService
+    private _resourceInputBridgeService: ResourceInputBridgeService
   ) {}
 
-  private openModal(functionPackage?: FunctionPackage, packageId?: string): Observable<any> {
+  private openModal<T>(functionPackage?: FunctionPackage, packageId?: string): Observable<T | boolean> {
     const modalInstance = this._uibModalHelper.open({
       backdrop: 'static',
       templateUrl: 'functionpackages/partials/functionPackageConfigurationDialog.html',
@@ -35,7 +32,13 @@ export class FunctionPackageActionsService {
       },
     });
 
-    return a1Promise2Observable(modalInstance.result);
+    return a1Promise2Observable<T | boolean>(modalInstance.result).pipe(
+      catchError(() => {
+        this._resourceInputBridgeService.deleteLastUploadedResource();
+
+        return of(false);
+      })
+    );
   }
 
   openAddFunctionPackageDialog(): Observable<any> {
