@@ -1,5 +1,5 @@
 <ng-template #staticLabel>
-  <span>{{ label }}</span>
+  <span [matTooltip]="label || ''">{{ label }}</span>
 </ng-template>
 
 <mat-form-field

@@ -21,6 +21,11 @@ step-dynamic-field {
     width: 100%;
     color: var.$gray-500;
 
+    span {
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
     input[type='text'] {
       border: none;
       outline: none;
