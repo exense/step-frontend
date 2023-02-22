@@ -230,22 +230,33 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
   }
 
   handlePlanChange(): void {
-    this._treeState.selectedNode$.pipe(take(1)).subscribe((node) => {
-      if (node?.children) {
-        const children = breadthFirstSearch({
-          items: node!.children,
-          children: (item) => item.children || [],
-        });
-
-        children.forEach((child) => {
-          this._artefactTreeNodeUtilsService.updateNodeData(this.plan!.root!, child.id!, {
-            isSkipped: !node!.isSkipped,
+    this._treeState.selectedNode$
+      .pipe(
+        take(1),
+        map((node) =>
+          breadthFirstSearch({
+            items: [this.plan!.root!],
+            children: (item) => item.children || [],
+            predicate: (item) => item.id === node?.id,
+          })
+        )
+      )
+      .subscribe(([node]) => {
+        if (node?.children) {
+          const children = breadthFirstSearch({
+            items: node!.children,
+            children: (item) => item.children || [],
           });
-        });
-      }
 
-      this.planChange$.next(this.plan!);
-    });
+          children.forEach((child) => {
+            this._artefactTreeNodeUtilsService.updateNodeData(this.plan!.root!, child.id!, {
+              isSkipped: node!.skipNode?.value,
+            });
+          });
+        }
+
+        this.planChange$.next(this.plan!);
+      });
   }
 
   moveUp(node?: AbstractArtefact): void {
