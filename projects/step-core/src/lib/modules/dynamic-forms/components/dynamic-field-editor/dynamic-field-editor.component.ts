@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { DynamicValueString } from '../../../../client/generated';
+import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../../client/generated';
 import { AJS_MODULE } from '../../../../shared';
 import { DynamicFieldGroupValue } from '../../shared/dynamic-field-group-value';
 import { DynamicFieldsSchema } from '../../shared/dynamic-fields-schema';
@@ -33,16 +33,36 @@ export class DynamicFieldEditorComponent implements OnChanges {
 
     if (value) {
       Object.keys(value)
-        .filter((key) => typeof value[key] === 'string')
+        .filter((key) => typeof value[key] !== 'object')
         .forEach((key) => {
-          value[key] = {
-            value: value[key],
-            dynamic: false,
-          } as DynamicValueString;
+          value[key] = this.convertToValueType(value[key]);
         });
     }
 
     this.valueChange.emit(!value ? '' : JSON.stringify(value));
+  }
+
+  private convertToValueType(value: any): DynamicValueInteger | DynamicValueBoolean | DynamicValueString {
+    if (typeof value !== 'string' && !this.schema?.properties) {
+      return {
+        expression: value.toString(),
+        dynamic: true,
+      } as DynamicValueString;
+    }
+
+    const dynamicValue = {
+      value: value,
+      dynamic: false,
+    };
+
+    switch (typeof value) {
+      case 'number':
+        return dynamicValue as DynamicValueInteger;
+      case 'boolean':
+        return dynamicValue as DynamicValueBoolean;
+      default:
+        return dynamicValue as DynamicValueString;
+    }
   }
 
   private parseValue(value?: string): void {
