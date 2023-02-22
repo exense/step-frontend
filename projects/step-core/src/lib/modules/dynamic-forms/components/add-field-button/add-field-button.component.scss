@@ -31,6 +31,7 @@ button.add-additional {
   padding: 10px 12px;
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 
   button {
     font-size: 12px;
