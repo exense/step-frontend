@@ -173,6 +173,12 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     this.absoluteFilepath = '';
     this.setStModel('');
     this.deleteLastUploadedResource();
+
+    if (!this.fileInput) {
+      return;
+    }
+
+    this.fileInput.nativeElement.value = '';
   }
 
   private stModelChanges(changes: SimpleChanges): void {
