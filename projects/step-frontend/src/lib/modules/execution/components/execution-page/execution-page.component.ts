@@ -17,6 +17,10 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   constructor(@Inject(AJS_LOCATION) private _location: ILocationService) {}
 
   private locationChangeFunction = () => {
+    if (!this._location.path().includes('executions')) {
+      return;
+    }
+
     let urlParts = this.getUrlParts();
     const executionId = urlParts[2];
     if (this.activeTab.id === executionId) {
