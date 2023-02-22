@@ -14,7 +14,8 @@ export class SingleDateFilterCondition extends FilterCondition {
       return [];
     }
 
-    const dateFrom = this.date.toUTC().set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+    const dateFrom = this.date.toLocal().set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+
     const dateTo = dateFrom.plus({ day: 1 });
 
     const filterFrom: TableCollectionFilter = {
