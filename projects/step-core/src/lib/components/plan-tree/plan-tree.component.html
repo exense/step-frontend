@@ -23,11 +23,7 @@
 
   <step-split-area sizeType="flex" size="1" padding="24px">
     <ng-container *ngIf="selectedArtefact$ | async as selectedArtefact">
-      <step-artefact-details
-        [artefact]="selectedArtefact"
-        [readonly]="isReadonly"
-        (onSave)="_planEditService.handlePlanChange()"
-      >
+      <step-artefact-details [artefact]="selectedArtefact" [readonly]="isReadonly" (onSave)="handlePlanChange()">
       </step-artefact-details>
     </ng-container>
   </step-split-area>
