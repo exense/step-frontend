@@ -31,7 +31,7 @@ export class SingleExecutionPanelsService {
     if (!this.eid) {
       return undefined;
     }
-    return this.eid + viewId;
+    return 'id-' + this.eid + viewId;
   }
 
   observePanel(viewId: string): Observable<ExecutionStepPanel | undefined> {

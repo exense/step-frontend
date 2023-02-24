@@ -224,6 +224,7 @@ export class ExecutionProgressComponent
     this._testCasesSelection.clear();
     this._testCasesSelection.selectById(id);
     this._executionPanels.enablePanel(Panels.steps, true);
+    this._executionPanels.setShowPanel(Panels.steps, true);
     this.scrollToPanel(Panels.steps);
   }
 
