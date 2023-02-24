@@ -181,6 +181,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     // TODO the lines below should be uncommented back while SED-1243 implementation
     // this._request$.complete();
     // this._inProgress$.complete();
+    // this._requestLock$.complete();
     // this._terminator$.next(undefined);
     // this._terminator$.complete();
   }
