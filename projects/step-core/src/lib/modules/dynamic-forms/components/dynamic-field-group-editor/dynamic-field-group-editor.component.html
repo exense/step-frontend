@@ -35,7 +35,7 @@
 </ng-container>
 
 <step-add-field-button
-  *ngIf="!isDisabled"
+  *ngIf="!isDisabled && (possibleFieldsToAdd.length > 0 || !schema?.properties)"
   [addLabel]="addFieldBtnLabel || ''"
   [possibleFields]="possibleFieldsToAdd"
   (addField)="addOptionalField($event)"
