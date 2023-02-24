@@ -122,4 +122,10 @@ export class PlanTreeComponent implements TreeActionsService {
   private canOpenArtefact(artefact: AbstractArtefact): boolean {
     return ['CallPlan', 'CallKeyword'].includes(artefact._class);
   }
+
+  handlePlanChange() {
+    // Timeout is needed to prevent update issue when clicking into the tree and leaving a property field that triggers
+    // a plan change
+    setTimeout(() => this._planEditService.handlePlanChange(), 200);
+  }
 }
