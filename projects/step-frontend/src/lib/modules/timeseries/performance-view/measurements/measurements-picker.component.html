@@ -10,7 +10,7 @@
       (change)="onAllSeriesCheckboxClick($event)"
       style="display: inline"
     />
-    <span>All keywords</span>
+    <span>All measurements</span>
   </div>
   <ng-container *ngFor="let item of keywords | measurementsProcessor: keywordSearchValue">
     <div class="color-cell" *ngIf="item.value.isVisible">
