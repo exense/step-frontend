@@ -30,7 +30,7 @@ export class ExecutionResultComponent implements OnChanges {
 
     if (cResult?.previousValue !== cResult?.currentValue || cResult?.firstChange) {
       result = cResult?.currentValue;
-      this.statusClass = result ? `step-icon-${result}` : '';
+      this.statusClass = result ? `.step-icon-${result}` : '';
     }
 
     if (result || status) {

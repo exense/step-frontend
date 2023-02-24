@@ -25,10 +25,11 @@ $blue-600: #0082cb;
 //#endregion
 
 $statuses: (
-  'UNKNOWN': #dadada,
+  'UNKNOW': #dadada,
   'ENDED': gray,
   'INITIALIZING': gray,
   'IMPORTING': orange,
+  'EXPORTING': orange,
   'RUNNING': #337ab7,
   'ABORTING': #d9534f,
   'SKIPPED': #a0a0a0,
@@ -36,7 +37,7 @@ $statuses: (
   'PASSED': #5cb85c,
   'FAILED': #d9534f,
   'TECHNICAL_ERROR': black,
-  'INTERRRUPTED': #f9c038,
+  'INTERRUPTED': #f9c038,
 );
 
 $tokenstates: (
