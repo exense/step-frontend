@@ -503,6 +503,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   getSeriesKey(attributes: BucketAttributes, groupDimensions: string[]) {
+    if (Object.keys(attributes).length === 0) {
+      return '<empty>';
+    }
     return groupDimensions
       .map((field) => attributes[field])
       .filter((f) => !!f)

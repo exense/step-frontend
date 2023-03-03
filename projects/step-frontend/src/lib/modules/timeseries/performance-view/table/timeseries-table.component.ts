@@ -59,7 +59,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         let bucket = series[0];
         bucket.attributes = seriesAttributes;
         let seriesKey = this.getSeriesKey(seriesAttributes, this.executionContext.getGroupDimensions());
-        bucket.attributes._id = seriesKey || '<empty>';
+        bucket.attributes._id = seriesKey;
         bucket.attributes.color = this.keywordsService.getColor(seriesKey);
         bucket.attributes.avg = (bucket.sum / bucket.count).toFixed(0);
         bucket.attributes.tps = Math.trunc(bucket.count / ((response.end - response.start) / 1000));
@@ -81,6 +81,9 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   }
 
   getSeriesKey(attributes: BucketAttributes, groupDimensions: string[]) {
+    if (Object.keys(attributes).length === 0) {
+      return '<empty>';
+    }
     return groupDimensions.map((field) => attributes[field]).join(' | ');
   }
 

@@ -11,13 +11,15 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core';
-import { debounceTime, Subject, take } from 'rxjs';
+import { debounceTime, Observable, Subject, take } from 'rxjs';
 import { TimeSeriesContext } from '../../time-series-context';
 import { FilterUtils } from '../../util/filter-utils';
 import { PerformanceViewSettings } from '../model/performance-view-settings';
 import { PerformanceViewTimeSelectionComponent } from '../time-selection/performance-view-time-selection.component';
 import { FilterBarItemComponent } from './item/filter-bar-item.component';
 import { FilterBarItemType, TsFilterItem } from './model/ts-filter-item';
+import { TimeSeriesService } from '../../time-series.service';
+import { OqlVerifyResponse } from '../../model/oql-verify-response';
 
 @Component({
   selector: 'step-ts-filter-bar',
@@ -46,7 +48,10 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   filters: TsFilterItem[] = [];
   moreFilters: TsFilterItem[] = [];
 
-  constructor(private _changeDetectorRef: ChangeDetectorRef) {}
+  rawMeasurementsModeActive = false;
+  showApplyButton = false;
+
+  constructor(private _changeDetectorRef: ChangeDetectorRef, private timeSeriesService: TimeSeriesService) {}
 
   ngOnInit(): void {
     if (!this.context) {
@@ -54,9 +59,55 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     }
     this.filters = this.activeFilters;
     this.emitFilterChange$.pipe(debounceTime(this.EMIT_DEBOUNCE_TIME)).subscribe(() => {
-      // we ignore empty filters
-      this.onFiltersChange.emit(this.filters.filter(FilterUtils.filterItemIsValid));
+      const filters = this.filters.filter(FilterUtils.filterItemIsValid);
+      if (filters.length) {
+        this.showApplyButton = true;
+        this.composeAndVerifyOql(filters).subscribe((response) => {
+          this.rawMeasurementsModeActive = response.hasUnknownFields;
+          this.showApplyButton = response.hasUnknownFields;
+          if (!this.rawMeasurementsModeActive) {
+            this.emitFiltersChange();
+          }
+        });
+      } else {
+        this.showApplyButton = false;
+        this.emitFiltersChange(); // immediate effect because there are no filters
+        this.composeAndVerifyOql(filters).subscribe((response) => {
+          this.rawMeasurementsModeActive = response.hasUnknownFields;
+        });
+      }
     });
+  }
+
+  composeAndVerifyOql(filters: TsFilterItem[]): Observable<OqlVerifyResponse> {
+    // we fake group dimensions as being filters, to verify altogether
+    let attributesPrefix = 'attributes';
+    this.context
+      .getGroupDimensions()
+      .forEach((dimension) =>
+        filters.push({
+          attributeName: dimension,
+          type: FilterBarItemType.FREE_TEXT,
+          textValue: 'group-dimension',
+          label: '',
+        })
+      );
+    const oql = FilterUtils.filtersToOQL(filters, attributesPrefix);
+    return this.timeSeriesService.verifyOql(oql);
+  }
+
+  handleGroupingChange(dimensions: string[]) {
+    this.onGroupingChange.emit(dimensions);
+    const filters = this.filters.filter(FilterUtils.filterItemIsValid);
+    this.composeAndVerifyOql(filters).subscribe((response) => {
+      this.rawMeasurementsModeActive = response.hasUnknownFields;
+    });
+  }
+
+  emitFiltersChange() {
+    this.showApplyButton = false;
+    const filters = this.filters.filter(FilterUtils.filterItemIsValid);
+    this.onFiltersChange.emit(filters);
   }
 
   ngOnDestroy(): void {

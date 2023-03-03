@@ -69,7 +69,6 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
   ) {}
 
   ngOnInit(): void {
-    console.log(this.executionId, this.execution);
     if (!this.executionId) {
       throw new Error('ExecutionId parameter is not present');
     }
@@ -99,6 +98,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
       // it is first change
       this.initDashboard(currentExecution);
       this.cd.detectChanges();
+      return;
     }
     // this.dashboard.setRanges(this.calculateFullTimeRange(currentExecution));
     this.dashboard.refresh(this.calculateFullTimeRange(this.execution!));

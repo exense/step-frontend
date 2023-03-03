@@ -9,6 +9,17 @@
   background: #293e50;
 }
 
+.warning-mark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: #fff2e2;
+  color: #ab793b;
+  padding: 4px 34px;
+  font-size: 12px;
+  border: 1px solid #ead5bd;
+}
+
 .filters {
   display: flex;
   gap: 12px;
@@ -31,4 +42,9 @@
   flex-wrap: wrap;
   gap: 16px;
   padding: 0 8px;
+}
+
+.apply-btn {
+  background-color: #fff2e2;
+  border: 1px solid #ebd9c2;
 }
