@@ -52,7 +52,7 @@ export class ViewRegistryService {
 
     // Sub Menus Automation
     this.registerMenuEntry('Keywords', 'functions', 'target', 10, 'automation-root');
-    this.registerMenuEntry('Plans', 'plans', 'file', 30, 'automation-root');
+    this.registerMenuEntry('Plans', 'plans/list', 'file', 30, 'automation-root');
     this.registerMenuEntry('Parameters', 'parameters', 'list', 40, 'automation-root');
     // Sub Menus Execute
     this.registerMenuEntry('Executions', 'executions', 'rotate-cw', 10, 'execute-root');

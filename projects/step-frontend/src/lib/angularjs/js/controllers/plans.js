@@ -51,20 +51,19 @@ angular
     return api;
   })
 
-  .controller('PlansCtrl', ['$rootScope', '$scope', 'stateStorage', 'pathHelper',
-    function ($rootScope, $scope, stateStorage, pathHelper) {
-    stateStorage.push($scope, 'plans', {});
-    if ($scope.$state == null) {
-       $scope.$state = 'list';
-       pathHelper.fixList();
-    }
+  .controller('PlansCtrl', [
+    '$scope',
+    'stateStorage',
+    function ($scope, stateStorage) {
+      stateStorage.push($scope, 'plans', {});
 
-    $scope.$watch('$state', function () {
-      if ($scope.$state != null) {
-        $scope.selectView = $scope.$state;
-      }
-    });
-  }])
+      $scope.$watch('$state', function () {
+        if ($scope.$state != null) {
+          $scope.selectView = $scope.$state;
+        }
+      });
+    },
+  ])
 
   .factory('PlanDialogs', function ($uibModal, $http, Dialogs) {
     var dialogs = {};
@@ -84,9 +83,13 @@ angular
     return dialogs;
   })
 
-  .controller(
-    'createPlanCtrl', [
-      '$scope', '$uibModalInstance', '$location', '$http', 'AuthService', 'planTypeRegistryService',
+  .controller('createPlanCtrl', [
+    '$scope',
+    '$uibModalInstance',
+    '$location',
+    '$http',
+    'AuthService',
+    'planTypeRegistryService',
     function ($scope, $uibModalInstance, $location, $http, AuthService, planTypeRegistryService) {
       $scope.AuthService = AuthService;
 
@@ -94,7 +97,7 @@ angular
       $scope.plan = { attributes: {} };
 
       $scope.planTypes = planTypeRegistryService.getItemInfos();
-      $scope.planType = $scope.planTypes.find(function (planType){
+      $scope.planType = $scope.planTypes.find(function (planType) {
         return planType.type === 'step.core.plans.Plan';
       });
 
@@ -121,7 +124,7 @@ angular
       $scope.cancel = function () {
         $uibModalInstance.dismiss('cancel');
       };
-    }
+    },
   ])
 
   .directive('planLink', function () {

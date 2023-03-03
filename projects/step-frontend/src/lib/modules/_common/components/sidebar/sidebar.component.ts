@@ -99,21 +99,22 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
         this._authService.gotoDefaultPage();
         break;
       default:
-        if (this._ajsLocation.path().includes('/root/' + viewId)) {
-          this._ajsLocation.path('/');
-          setTimeout(() => this._ajsLocation.path('/root/' + viewId));
-        } else {
-          this._ajsLocation.path('/root/' + viewId);
-        }
+        this._ajsLocation.path('/root/' + viewId);
+
         const queryParams = this._ajsLocation.search();
+
         if (queryParams['tsParams']) {
           const clear = queryParams['tsParams'].split(',');
+
           clear.forEach((value: string) => {
             delete queryParams[value];
           });
+
           delete queryParams.tsParams;
+
           this._ajsLocation.search(queryParams);
         }
+
         break;
     }
   }
