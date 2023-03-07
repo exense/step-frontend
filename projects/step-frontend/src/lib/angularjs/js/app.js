@@ -259,9 +259,6 @@ angular
         $scope.$$statepath.pop();
         $scope.$$statepath.push(ctrlID);
 
-        console.log('$scope', $scope);
-        console.log('ctrlID', ctrlID);
-
         var path = $location.path().substr(1).split('/');
         console.log('path', path);
 
