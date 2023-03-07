@@ -210,7 +210,7 @@ angular
       $timeout(function() {
         if (!$location.path().endsWith('list')) {
           const newPath = $location.path() + '/list';
-          $location.path(newPath);
+          $location.url(newPath).replace();
         }
       }, 100);
     };
@@ -259,7 +259,12 @@ angular
         $scope.$$statepath.pop();
         $scope.$$statepath.push(ctrlID);
 
+        console.log('$scope', $scope);
+        console.log('ctrlID', ctrlID);
+
         var path = $location.path().substr(1).split('/');
+        console.log('path', path);
+
         if (_.isEqual(path.slice(0, $scope.$$statepath.length), $scope.$$statepath)) {
           if (debug()) {
             console.log(
