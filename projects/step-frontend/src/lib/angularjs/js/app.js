@@ -260,7 +260,6 @@ angular
         $scope.$$statepath.push(ctrlID);
 
         var path = $location.path().substr(1).split('/');
-        console.log('path', path);
 
         if (_.isEqual(path.slice(0, $scope.$$statepath.length), $scope.$$statepath)) {
           if (debug()) {
