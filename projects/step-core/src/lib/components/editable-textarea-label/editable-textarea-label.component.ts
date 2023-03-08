@@ -34,6 +34,7 @@ export class EditableTextareaLabelComponent extends EditableComponent<string> {
   }
 
   protected override onCancel(): void {
+    this.value = this.serializeValue(this.value);
     super.onCancel();
   }
 
