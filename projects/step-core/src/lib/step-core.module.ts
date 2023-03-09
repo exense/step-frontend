@@ -32,6 +32,8 @@ import { SplitAreaComponent } from './components/split-area/split-area.component
 import { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 import { SplitComponent } from './components/split/split.component';
 import { UploadContainerComponent } from './components/upload-container/upload-container.component';
+import { ResourceInputComponent } from './components/resouce-input/resouce-input.component';
+import { SearchResourceDialogComponent } from './components/search-resource-dialog/search-resource-dialog.component';
 import { CORE_INITIALIZER } from './core-initialiser';
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { CapsLockDirective } from './directives/caps-lock.directive';
@@ -94,6 +96,8 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     SplitAreaComponent,
     SplitGutterComponent,
     ElementResizeDirective,
+    ResourceInputComponent,
+    SearchResourceDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -162,6 +166,8 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     SplitAreaComponent,
     SplitGutterComponent,
     ElementResizeDirective,
+    ResourceInputComponent,
+    SearchResourceDialogComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -217,6 +223,8 @@ export { SplitAreaComponent } from './components/split-area/split-area.component
 export { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 export { SplitComponent } from './components/split/split.component';
 export { UploadContainerComponent } from './components/upload-container/upload-container.component';
+export { ResourceInputComponent } from './components/resouce-input/resouce-input.component';
+export { SearchResourceDialogComponent } from './components/search-resource-dialog/search-resource-dialog.component';
 export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';

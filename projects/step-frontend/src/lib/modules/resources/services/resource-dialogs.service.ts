@@ -11,7 +11,7 @@ import {
   UibModalHelperService,
 } from '@exense/step-core';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
-import { SearchResourceDialogComponent } from '../components/search-resource-dialog/search-resource-dialog.component';
+import { SearchResourceDialogComponent } from '../../../../../../step-core/src/lib/components/search-resource-dialog/search-resource-dialog.component';
 
 @Injectable({
   providedIn: 'root',

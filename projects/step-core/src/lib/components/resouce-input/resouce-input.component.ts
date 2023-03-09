@@ -11,14 +11,12 @@ import {
   ViewChild,
 } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import {
-  AJS_MODULE,
-  AugmentedResourcesService,
-  ResourceInputBridgeService,
-  ResourceUploadResponse,
-} from '@exense/step-core';
+import { AJS_MODULE } from '../../shared';
+import { AugmentedResourcesService } from '../../client/augmented/services/augmented-resources-service';
+import { ResourceInputBridgeService } from '../../services/resource-input-bridge.service';
+import { ResourceUploadResponse } from '../../client/generated';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
-import { ResourceDialogsService } from '../../services/resource-dialogs.service';
+import { ResourceDialogsService } from '../../../../../step-frontend/src/lib/modules/resources/services/resource-dialogs.service';
 
 const MAX_FILES = 1;
 
