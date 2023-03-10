@@ -56,6 +56,7 @@ import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
+import { ResourceDialogsService } from './services/resource-dialogs.service';
 
 @NgModule({
   declarations: [
@@ -208,6 +209,7 @@ export { EditableLabelComponent } from './components/editable-label/editable-lab
 export { EditableTextareaLabelWrapperComponent } from './components/editable-textarea-label-wrapper/editable-textarea-label-wrapper.component';
 export { EditableTextareaLabelComponent } from './components/editable-textarea-label/editable-textarea-label.component';
 export { FunctionLinkDialogService } from './components/function-link/function-link-dialog.service';
+export { ResourceDialogsService } from './services/resource-dialogs.service';
 export { FunctionLinkComponent } from './components/function-link/function-link.component';
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
@@ -225,6 +227,7 @@ export { SplitComponent } from './components/split/split.component';
 export { UploadContainerComponent } from './components/upload-container/upload-container.component';
 export { ResourceInputComponent } from './components/resouce-input/resouce-input.component';
 export { SearchResourceDialogComponent } from './components/search-resource-dialog/search-resource-dialog.component';
+
 export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';
@@ -254,7 +257,7 @@ export * from './services/artefact-refresh-notification.service';
 export * from './services/dashboard.service';
 export * from './services/deferred-link-processor.service';
 export * from './services/execution-close-handle.service';
-export { ExportDialogsService } from './services/export-dialogs.service';
+export * from './services/export-dialogs.service';
 export { ImportDialogsService } from './services/import-dialogs.service';
 export * from './services/invoke-run.service';
 export { IsUsedByDialogService } from './services/is-used-by-dialog.service';
