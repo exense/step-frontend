@@ -1,4 +1,5 @@
 <step-table
+  *ngIf="_artefactService.availableArtefacts"
   class="paddingless"
   [dataSource]="_artefactService.availableArtefacts"
   matSort
