@@ -104,6 +104,21 @@ export class AugmentedResourcesService extends ResourcesService {
     return `rest/resources/${resourceId}/content`;
   }
 
+  downloadResource(resourceId: string, fileName: string) {
+    const url = this.getDownloadResourceUrl(resourceId);
+    fetch(url, { method: 'get' })
+      .then((res) => res.blob())
+      .then((res) => {
+        const aElement = document.createElement('a');
+        aElement.setAttribute('download', fileName);
+        const href = URL.createObjectURL(res);
+        aElement.href = href;
+        aElement.setAttribute('target', '_blank');
+        aElement.click();
+        URL.revokeObjectURL(href);
+      });
+  }
+
   private calculateProgressPercentage(httpProgressEvent: HttpProgressEvent) {
     return httpProgressEvent.total ? Math.round((100 * httpProgressEvent.loaded) / httpProgressEvent.total) : 0;
   }
