@@ -42,5 +42,11 @@ step-dynamic-field {
 
   mat-radio-button {
     transform: scale(0.85);
+
+    .mat-ripple-element {
+      // left and top are set inline dynamically, hence the usage of !important
+      left: 0 !important;
+      top: 0 !important;
+    }
   }
 }

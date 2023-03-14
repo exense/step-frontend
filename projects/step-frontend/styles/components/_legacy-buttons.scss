@@ -1,0 +1,214 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+@mixin btn($color, $background-color, $border-color) {
+  padding: 8px;
+  line-height: 16px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-weight: 500;
+  gap: 6px;
+  color: $color !important;
+  background-color: $background-color !important;
+  border-color: $border-color !important;
+  outline: none !important;
+  box-shadow: none !important;
+
+  step-ajs-icon {
+    display: flex !important;
+  }
+
+  &::after {
+    content: '';
+    display: block;
+    position: absolute;
+    inset: -1px;
+    border-radius: 8px;
+    opacity: 0;
+    transition: opacity 200ms cubic-bezier(0.35, 0, 0.25, 1), background-color 200ms cubic-bezier(0.35, 0, 0.25, 1);
+    background-color: var.$blue-700;
+  }
+
+  &:hover,
+  &.active:hover {
+    z-index: 0;
+    border-color: $border-color !important;
+    background-color: $background-color !important;
+
+    &::after {
+      opacity: var.$mat-hover-overlay-opacity;
+    }
+  }
+
+  &:focus::after {
+    opacity: var.$mat-focus-overlay-opacity;
+  }
+
+  &.disabled,
+  &:disabled,
+  &[disabled] {
+    opacity: 1;
+    color: var.$mat-disabled-color !important;
+
+    @if $background-color != var.$white {
+      border-color: var.$mat-disabled-background-color !important;
+      background-color: var.$mat-disabled-background-color !important;
+    }
+  }
+}
+
+@mixin btn-default {
+  .btn.btn-default {
+    @include btn(var.$blue-700, var.$white, var.$gray-300);
+
+    &.active {
+      @include btn(var.$white, var.$blue-600, var.$blue-600);
+    }
+  }
+}
+
+@mixin btn-primary {
+  .btn.btn-primary {
+    @include btn(var.$white, var.$blue-600, var.$blue-600);
+  }
+}
+
+@mixin btn-success {
+  .btn.btn-success {
+    @include btn(var.$white, var.$blue-600, var.$blue-600);
+  }
+}
+
+@mixin btn-warning {
+  .btn.btn-warning {
+    @include btn(var.$blue-700, var.$white, var.$gray-300);
+  }
+}
+
+@mixin btn-danger {
+  .btn.btn-danger {
+    @include btn(var.$white, var.$red-50, var.$red-50);
+  }
+}
+
+@mixin btn-group {
+  .btn-group {
+    .btn + .btn {
+      margin-left: 0;
+    }
+
+    > .btn:not(:first-of-type):not(:last-of-type) {
+      border-right-width: 0;
+      border-radius: 0;
+
+      &::after {
+        border-right-width: 0;
+        border-radius: 0;
+      }
+    }
+
+    > .btn:first-of-type:not(:last-of-type),
+    > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle):first-of-type {
+      border-right-width: 0;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+
+      &::after {
+        border-right-width: 0;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
+      }
+    }
+
+    > .btn:last-of-type:not(:first-of-type),
+    > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle):last-of-type {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+
+      &::after {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+      }
+    }
+
+    > .btn:first-child:not(:last-child):not(.dropdown-toggle):only-of-type,
+    > .btn:last-child:not(:first-child):not(.dropdown-toggle):only-of-type {
+      border-radius: 8px;
+    }
+  }
+}
+
+@mixin input-group-btn {
+  .input-group-btn {
+    .btn + .btn {
+      margin-left: 0;
+    }
+
+    > .btn:not(:first-of-type):not(:last-of-type) {
+      border-right-width: 0;
+      border-radius: 0;
+
+      &::after {
+        border-right-width: 0;
+        border-radius: 0;
+      }
+    }
+
+    > .btn:first-of-type:not(:last-of-type),
+    > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle):first-of-type {
+      border-right-width: 0;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+
+      &::after {
+        border-right-width: 0;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+    }
+
+    > .btn:last-of-type:not(:first-of-type),
+    > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle):last-of-type {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+
+      &::after {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+      }
+    }
+
+    > .btn:first-child:not(:last-child):not(.dropdown-toggle):only-of-type,
+    > .btn:last-child:not(:first-child):not(.dropdown-toggle):only-of-type {
+      border-radius: 8px;
+    }
+  }
+}
+
+@mixin legacy-buttons {
+  @include btn-default();
+  @include btn-primary();
+  @include btn-success();
+  @include btn-warning();
+  @include btn-danger();
+  @include btn-group();
+  @include input-group-btn();
+}
