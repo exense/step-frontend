@@ -2,6 +2,12 @@
 
 :host {
   @include core.table-container;
+
+  step-table {
+    ::ng-deep td.cdk-column-value {
+      line-break: anywhere;
+    }
+  }
 }
 
 .scope {

@@ -1,5 +1,5 @@
 export enum Status {
-  UNKNOWN = 'UNKNOWN',
+  UNKNOW = 'UNKNOW',
   ENDED = 'ENDED',
   INITIALIZING = 'INITIALIZING',
   IMPORTING = 'IMPORTING',
@@ -10,7 +10,7 @@ export enum Status {
   PASSED = 'PASSED',
   FAILED = 'FAILED',
   TECHNICAL_ERROR = 'TECHNICAL_ERROR',
-  INTERRRUPTED = 'INTERRRUPTED',
+  INTERRUPTED = 'INTERRUPTED',
   EXPORTING = 'EXPORTING',
 }
 
@@ -18,7 +18,7 @@ export const EXECUTION_RESULT: ReadonlyArray<Status> = [
   Status.TECHNICAL_ERROR,
   Status.FAILED,
   Status.PASSED,
-  Status.INTERRRUPTED,
+  Status.INTERRUPTED,
   Status.SKIPPED,
   Status.NORUN,
   Status.RUNNING,
@@ -37,7 +37,7 @@ export const REPORT_NODE_STATUS: ReadonlyArray<Status> = [
   Status.TECHNICAL_ERROR,
   Status.FAILED,
   Status.PASSED,
-  Status.INTERRRUPTED,
+  Status.INTERRUPTED,
   Status.SKIPPED,
   Status.NORUN,
   Status.RUNNING,

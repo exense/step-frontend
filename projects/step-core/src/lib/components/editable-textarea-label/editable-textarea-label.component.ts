@@ -1,7 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { ChangeDetectorRef, Component, ElementRef, forwardRef, Inject, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { EditableComponent } from '../../shared/editable-component';
+import { EditableComponent, EditableComponentState } from '../../shared/editable-component';
 
 const DEFAULT_TEXTAREA_ROWS = 4;
 const LINE_HEIGHT = 18;
@@ -34,14 +34,38 @@ export class EditableTextareaLabelComponent extends EditableComponent<string> {
   }
 
   protected override onCancel(): void {
+    this.value = this.serializeValue(this.value);
     super.onCancel();
   }
 
   protected override onLabelClick(): void {
     this.recalculateTextareaRows();
+    this.value = this.deserializeValue(this.value);
     super.onLabelClick();
     this.textarea!.nativeElement.focus();
     this.focusedElement = this.textarea!.nativeElement;
+  }
+
+  protected override onEnter(): void {
+    // do nothing
+  }
+
+  override writeValue(value: string): void {
+    this.value = this.serializeValue(value);
+    this.newValue = this.value;
+  }
+
+  protected override onApply(): void {
+    this.state = EditableComponentState.READABLE;
+    this.stateChange.emit(this.state);
+
+    if (this.newValue === this.value) {
+      this.value = this.serializeValue(this.value);
+      return;
+    }
+
+    this.value = this.serializeValue(this.newValue);
+    this.onChange?.(this.value);
   }
 
   onInput(): void {
@@ -56,5 +80,25 @@ export class EditableTextareaLabelComponent extends EditableComponent<string> {
     const { height } = this._elementRef.nativeElement.getBoundingClientRect();
 
     this.textareaRows = (height - 2 * PADDING_TOP_BOTTOM) / LINE_HEIGHT;
+  }
+
+  private deserializeValue(value?: string): string {
+    let deserializedValue = value ? value.replace(/<br \/>/g, '\n') : '';
+
+    if (deserializedValue.endsWith('\n')) {
+      deserializedValue = deserializedValue.replace(/\n$/g, '');
+    }
+
+    return deserializedValue;
+  }
+
+  private serializeValue(value?: string): string {
+    let serializedValue = value ? value.replace(/\n/g, '<br />') : '';
+
+    if (serializedValue.endsWith('<br />')) {
+      serializedValue += '<br />';
+    }
+
+    return serializedValue;
   }
 }

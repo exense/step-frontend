@@ -85,7 +85,7 @@ export class TimeSeriesContext {
     return this.fullTimeRangeChange$.asObservable();
   }
 
-  onSelectedTimeRangeChange(): Observable<TSTimeRange> {
+  onTimeSelectionChange(): Observable<TSTimeRange> {
     return this.selectedTimeRangeChange$.asObservable();
   }
 

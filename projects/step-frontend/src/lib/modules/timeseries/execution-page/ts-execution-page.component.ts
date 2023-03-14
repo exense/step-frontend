@@ -1,4 +1,13 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import {
   AJS_MODULE,
   AsyncTasksService,
@@ -28,7 +37,7 @@ import { TimeRangePicker } from '../time-selection/time-range-picker.component';
   templateUrl: './ts-execution-page.component.html',
   styleUrls: ['./ts-execution-page.component.scss'],
 })
-export class ExecutionPerformanceComponent implements OnInit, OnDestroy {
+export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChanges {
   terminator$ = new Subject<void>();
 
   @ViewChild('dashboard') dashboard!: TimeSeriesDashboardComponent;
@@ -36,6 +45,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy {
   @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
 
   @Input() executionId!: string;
+  @Input() executionInput: Execution | undefined;
   execution: Execution | undefined;
 
   timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.EXECUTION_PAGE_TIME_SELECTION_OPTIONS;
@@ -50,27 +60,21 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy {
 
   dashboardSettings: TimeSeriesDashboardSettings | undefined;
 
-  stopInterval$ = new Subject();
-
-  // this is just for running executions
-  refreshIntervals: RefreshInterval[] = TimeSeriesConfig.AUTO_REFRESH_INTERVALS;
-  selectedRefreshInterval: RefreshInterval = this.refreshIntervals[0];
-
   constructor(
     private timeSeriesService: TimeSeriesService,
     private executionService: ExecutionsService,
     private dashboardService: DashboardService,
-    private _asyncTaskService: AsyncTasksService
+    private _asyncTaskService: AsyncTasksService,
+    private cd: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    console.log(this.executionId, this.execution);
     if (!this.executionId) {
       throw new Error('ExecutionId parameter is not present');
     }
     this.timeSeriesService.timeSeriesIsBuilt(this.executionId).subscribe((exists) => {
-      if (exists) {
-        this.init();
-      } else {
+      if (!exists) {
         this.executionHasToBeBuilt = true;
       }
     });
@@ -78,70 +82,71 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy {
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
-    this.dashboard.updateRange(this.calculateFullTimeRange());
+    this.dashboard.updateRange(this.calculateFullTimeRange(this.execution!));
   }
 
-  init() {
-    this.executionService.getExecutionById(this.executionId).subscribe((execution) => {
-      this.execution = execution;
-      const startTime = execution.startTime!;
-      const endTime = execution.endTime ? execution.endTime : new Date().getTime();
-      if (!execution.endTime) {
-        this.timeRangeSelection = this.timeRangeOptions[0];
-      }
-      let urlParams = TsUtils.getURLParams(window.location.href);
-      this.dashboardSettings = {
-        contextId: this.executionId,
-        includeThreadGroupChart: true,
-        timeRange: { from: startTime, to: endTime },
-        contextualFilters: { ...urlParams, eId: this.executionId },
-        filterOptions: [
-          {
-            label: 'Status',
-            attributeName: 'rnStatus',
-            type: FilterBarItemType.OPTIONS,
-            textValues: [
-              { value: 'PASSED' },
-              { value: 'FAILED' },
-              { value: 'TECHNICAL_ERROR' },
-              { value: 'INTERRUPTED' },
-            ],
-            isLocked: true,
-          },
-          {
-            label: 'Type',
-            attributeName: 'type',
-            type: FilterBarItemType.OPTIONS,
-            textValues: [{ value: 'keyword' }, { value: 'custom' }],
-            isLocked: true,
-          },
-          {
-            label: 'Name',
-            attributeName: 'name',
-            type: FilterBarItemType.FREE_TEXT,
-            isLocked: true,
-          },
-        ],
-      };
-      if (!execution.endTime) {
-        setTimeout(() => {
-          this.dashboard.setRanges(this.calculateFullTimeRange());
-          this.startInterval();
-        }, this.selectedRefreshInterval.value);
-      }
-    });
+  navigateToRtmDashboard(): void {
+    window.open(this.dashboardService.getRtmExecutionLink(this.executionId));
   }
 
-  startInterval(delay = 0) {
-    this.stopInterval$.next(null); // make sure to stop it if it's still running
-    timer(delay, this.selectedRefreshInterval.value)
-      .pipe(takeUntil(this.stopInterval$), takeUntil(this.terminator$))
-      .subscribe(() => this.triggerRefresh());
+  ngOnChanges(changes: SimpleChanges): void {
+    let executionChange = changes['executionInput'];
+    if (!executionChange) {
+      return;
+    }
+    let currentExecution = executionChange.currentValue;
+    if (!this.execution && currentExecution) {
+      // it is first change
+      this.initDashboard(currentExecution);
+      this.cd.detectChanges();
+    }
+    // this.dashboard.setRanges(this.calculateFullTimeRange(currentExecution));
+    this.dashboard.refresh(this.calculateFullTimeRange(this.execution!));
   }
 
-  calculateFullTimeRange(): TSTimeRange {
+  initDashboard(execution: Execution) {
+    this.execution = execution;
+    const startTime = execution.startTime!;
+    const endTime = execution.endTime ? execution.endTime : new Date().getTime();
+    let urlParams = TsUtils.getURLParams(window.location.href);
+    this.dashboardSettings = {
+      contextId: this.executionId,
+      includeThreadGroupChart: true,
+      timeRange: { from: startTime, to: endTime },
+      contextualFilters: { ...urlParams, eId: this.executionId },
+      showContextualFilters: false,
+      filterOptions: [
+        {
+          label: 'Status',
+          attributeName: 'rnStatus',
+          type: FilterBarItemType.OPTIONS,
+          textValues: [
+            { value: 'PASSED' },
+            { value: 'FAILED' },
+            { value: 'TECHNICAL_ERROR' },
+            { value: 'INTERRUPTED' },
+          ],
+          isLocked: true,
+        },
+        {
+          label: 'Type',
+          attributeName: 'type',
+          type: FilterBarItemType.OPTIONS,
+          textValues: [{ value: 'keyword' }, { value: 'custom' }],
+          isLocked: true,
+        },
+        {
+          label: 'Name',
+          attributeName: 'name',
+          type: FilterBarItemType.FREE_TEXT,
+          isLocked: true,
+        },
+      ],
+    };
+  }
+
+  calculateFullTimeRange(details: Execution): TSTimeRange {
     let now = new Date().getTime();
-    let details = this.execution!;
     let selection: TSTimeRange;
     let newFullRange: TSTimeRange;
     switch (this.timeRangeSelection.type) {
@@ -160,19 +165,6 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy {
     return newFullRange;
   }
 
-  /**
-   * This will be the public method called from the outside of this component.
-   */
-  triggerRefresh() {
-    this.executionService.getExecutionById(this.executionId).subscribe((execution) => {
-      this.execution = execution;
-      if (execution.endTime) {
-        this.stopInterval$.next(null);
-      }
-      this.dashboard.refresh(this.calculateFullTimeRange());
-    });
-  }
-
   rebuildTimeSeries() {
     this.migrationInProgress = true;
     this.timeSeriesService
@@ -183,7 +175,6 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy {
           if (task.ready) {
             this.migrationInProgress = false;
             this.executionHasToBeBuilt = false;
-            this.init();
           } else {
             console.error('The task is not finished yet');
           }
@@ -194,27 +185,10 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy {
       });
   }
 
-  changeRefreshInterval(newInterval: RefreshInterval) {
-    const oldInterval = this.selectedRefreshInterval;
-    this.selectedRefreshInterval = newInterval;
-    if (oldInterval.value === newInterval.value) {
-      return;
-    }
-    this.stopInterval$.next(null);
-    if (newInterval.value) {
-      this.startInterval();
-    }
-  }
-
   ngOnDestroy(): void {
     this.terminator$.next();
     this.terminator$.complete();
   }
-}
-
-interface RefreshInterval {
-  label: string;
-  value: number; // 0 if it's off
 }
 
 getAngularJSGlobal()

@@ -1,12 +1,13 @@
-import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, combineLatest, map, Observable, of, Subject, tap } from 'rxjs';
 import { FlatTreeControl } from '@angular/cdk/tree';
+import { Injectable, OnDestroy } from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
-import { TreeNodeUtilsService } from './tree-node-utils.service';
-import { TreeNode } from '../shared/tree-node';
-import { TreeFlatNode } from '../shared/tree-flat-node';
+import { BehaviorSubject, combineLatest, map, Observable, of, Subject, tap } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
+import { breadthFirstSearch } from '../../../shared';
 import { DropType } from '../shared/drop-type.enum';
+import { TreeFlatNode } from '../shared/tree-flat-node';
+import { TreeNode } from '../shared/tree-node';
+import { TreeNodeUtilsService } from './tree-node-utils.service';
 
 const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === index;
 
@@ -126,11 +127,25 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   toggleSkip(): void {
     const nodeId = this.selectedNodeIds$.value[0];
     const node = this.findNodeById(nodeId);
+
     if (!node) {
       return;
     }
+
     const isSkipped = !node.isSkipped;
     const isUpdated = this._treeNodeUtils.updateNodeData(this.originalRoot!, nodeId, { isSkipped });
+
+    if (node.children) {
+      const children = breadthFirstSearch({
+        items: node.children,
+        children: (child) => child.children || [],
+      });
+
+      children.forEach((child) => {
+        this._treeNodeUtils.updateNodeData(this.originalRoot!, child.id, { isSkipped });
+      });
+    }
+
     if (isUpdated) {
       this.refresh();
     }
@@ -278,7 +293,8 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
   moveSelectedNodes(direction: 'up' | 'down'): void {
     const parentChildRelations = this.getParentChildRelationsForSelectedNodes();
-    if (parentChildRelations.length === 0) {
+
+    if (!parentChildRelations.length) {
       return;
     }
 
@@ -286,25 +302,38 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
     parentChildRelations.forEach(({ parentId, nodeIds }) => {
       const parent = this.findNodeById(parentId);
-      const children = (parent?.children || []) as N[];
+
+      if (!parent || !parent.children) {
+        return;
+      }
+
+      let children = parent.children as N[];
       let hasLocalChange = false;
-      nodeIds.forEach((nodeId) => {
-        const childIndex = children.findIndex((child) => child.id === nodeId);
 
-        if (direction === 'up' && childIndex > 0) {
-          const sibling = children[childIndex - 1];
-          children[childIndex - 1] = children[childIndex];
-          children[childIndex] = sibling;
-          hasLocalChange = true;
-        }
+      const nodesIndices = nodeIds
+        .map((nodeId) => {
+          const index = children.findIndex((child) => child.id === nodeId);
 
-        if (direction === 'down' && childIndex < children.length - 1) {
-          const sibling = children[childIndex + 1];
-          children[childIndex + 1] = children[childIndex];
-          children[childIndex] = sibling;
-          hasLocalChange = true;
-        }
-      });
+          return {
+            node: children[index],
+            index,
+          };
+        })
+        .sort((a, b) => a.index - b.index);
+
+      const nodes = nodesIndices.map((nodeIndex) => nodeIndex.node);
+      const before = children.filter((child, index) => index < nodesIndices[0].index);
+      const after = children.filter((child, index) => index > nodesIndices[nodesIndices.length - 1].index);
+
+      if (direction === 'up' && nodesIndices[0].index > 0) {
+        children = [...before.slice(0, before.length - 1), ...nodes, before[before.length - 1], ...after];
+        hasLocalChange = true;
+      }
+
+      if (direction === 'down' && nodesIndices[nodesIndices.length - 1].index < children.length - 1) {
+        children = [...before, after[0], ...nodes, ...after.slice(1)];
+        hasLocalChange = true;
+      }
 
       if (hasLocalChange) {
         this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, children, 'replace');
@@ -320,16 +349,26 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
   addChildrenToSelectedNode(...children: T[]): void {
     const parentId = this.selectedInsertionParentId$.value;
+
     if (!parentId) {
       return;
     }
 
     const newNodes = children.map((child) => this._treeNodeUtils.convertItem(child));
+
     if (!this.isPossibleToInsert(parentId, ...newNodes)) {
       return;
     }
 
     this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, newNodes, 'append');
+
+    const parent = this.findNodeById(parentId);
+
+    if (parent) {
+      newNodes.forEach((node) => {
+        this._treeNodeUtils.updateNodeData(this.originalRoot!, node.id, { isSkipped: parent.isSkipped });
+      });
+    }
 
     this.refresh();
 

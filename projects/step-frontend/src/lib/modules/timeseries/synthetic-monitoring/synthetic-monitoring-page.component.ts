@@ -54,6 +54,7 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
     let range = { from: start, to: now };
     let urlParams = TsUtils.getURLParams(window.location.href);
     this.dashboardSettings = {
+      showContextualFilters: false,
       contextId: this.taskId,
       includeThreadGroupChart: true,
       timeRange: range,

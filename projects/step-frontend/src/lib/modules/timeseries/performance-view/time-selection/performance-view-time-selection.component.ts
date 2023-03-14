@@ -40,7 +40,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
     this.tsContext = this.executionsPageService.getContext(this.settings.contextId);
     this.createRanger(this.tsContext.getFullTimeRange()).subscribe(() => this.onRangerLoaded.next());
     this.tsContext
-      .onSelectedTimeRangeChange()
+      .onTimeSelectionChange()
       .pipe(takeUntil(this.terminator$))
       .subscribe((selection) => {
         if (this.tsContext.isFullRangeSelected()) {

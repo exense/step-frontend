@@ -1,13 +1,4 @@
 <div ng-if="!isDynamic()" class="form-group form-group-sm">
-  <button
-    class="btn btn-default btn-xs pull-right"
-    type="button"
-    title="Use a dynamic expression to set this attribute"
-    ng-click="useDynamicExpression()"
-  >
-    <step-ajs-icon name="zap"></step-ajs-icon>
-  </button>
-
   <step-resource-input
     [label]="label"
     [st-type]="type"
@@ -16,6 +7,9 @@
     [help-icon-tooltip]="tooltip"
     [(st-model)]="dynamicValue.value"
     (st-model-change)="onSave()"
+    [with-dynamic-switch]="true"
+    (dynamic-switch)="useDynamicExpression()"
   ></step-resource-input>
 </div>
+
 <expression-input />

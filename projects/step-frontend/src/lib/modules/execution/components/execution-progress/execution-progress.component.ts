@@ -100,6 +100,7 @@ export class ExecutionProgressComponent
   selectedErrorDistributionToggle = ErrorDistributionStatus.message;
 
   autoRefreshDisabled: boolean = true;
+  showAutoRefreshButton = false;
   autoRefreshInterval: number = 0;
   autoRefreshIncreasedTo: number = 0;
 
@@ -113,10 +114,10 @@ export class ExecutionProgressComponent
         const by = this.execution?.executionParameters?.repositoryObject?.repositoryID === 'local' ? 'id' : 'name';
 
         const list = testCases
-          .filter((testCase) => ids.includes(testCase.id!))
+          .filter((testCase) => ids.includes(testCase.id!) || ids.includes(testCase.artefactID!))
           .map(({ artefactID, name }) => (by === 'id' ? artefactID! : name!));
 
-        return { list, by };
+        return { by, list };
       })
     );
 
@@ -203,6 +204,7 @@ export class ExecutionProgressComponent
       }
     } else {
       this.autoRefreshDisabled = true;
+      this.showAutoRefreshButton = false;
       this.refreshOther();
       this.refreshTestCaseTable();
     }
@@ -222,6 +224,7 @@ export class ExecutionProgressComponent
     this._testCasesSelection.clear();
     this._testCasesSelection.selectById(id);
     this._executionPanels.enablePanel(Panels.steps, true);
+    this._executionPanels.setShowPanel(Panels.steps, true);
     this.scrollToPanel(Panels.steps);
   }
 
@@ -363,10 +366,12 @@ export class ExecutionProgressComponent
     }
     if (status === 'ENDED') {
       this.refresh();
+      this.showAutoRefreshButton = false;
       this.autoRefreshDisabled = true;
       this.autoRefreshInterval = 0;
       this.autoRefreshIncreasedTo = 0;
     } else {
+      this.showAutoRefreshButton = true;
       this.autoRefreshDisabled = false;
       this.autoRefreshInterval = 100;
       this.autoRefreshIncreasedTo = 5000;

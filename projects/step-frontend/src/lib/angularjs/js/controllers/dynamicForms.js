@@ -28,7 +28,10 @@ function initDynamicFormsCtrl($scope) {
   };
   $scope.useConstantValue = function () {
     $scope.dynamicValue.dynamic = false;
-    $scope.dynamicValue.value = $scope.dynamicValue.expression;
+    $scope.dynamicValue.value = $scope.dynamicValue.expression ? $scope.dynamicValue.expression : '';
+    if ($scope.enforceGroovyExpression && $scope.dynamicValue.expression) {
+      $scope.dynamicValue.value = $scope.dynamicValue.expression.replace(/^"""/g, '').replace(/"""$/g, '');
+    }
     if ($scope.updateConstantValue) {
       $scope.updateConstantValue();
     }
@@ -39,7 +42,10 @@ function initDynamicFormsCtrl($scope) {
   $scope.useDynamicExpression = function () {
     if ($scope.dynamicValue) {
       $scope.dynamicValue.dynamic = true;
-      $scope.dynamicValue.expression = $scope.dynamicValue.value;
+      $scope.dynamicValue.expression = $scope.dynamicValue.value ? $scope.dynamicValue.value : '';
+      if ($scope.enforceGroovyExpression && $scope.dynamicValue.value) {
+        $scope.dynamicValue.expression = $scope.dynamicValue.value ? `"""${$scope.dynamicValue.value}"""` : '';
+      }
       delete $scope.dynamicValue.value;
       $scope.onSave();
     }
@@ -149,7 +155,8 @@ dynamicForms
         label: '=',
         onSave: '&',
         schema: '=',
-        isDisabled: '='
+        isDisabled: '=',
+        enforceGroovyExpression: '=?',
       },
       controller: function ($scope) {
         $scope.localModel = { json: '' };

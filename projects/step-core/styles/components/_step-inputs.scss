@@ -84,8 +84,6 @@
   $primary-text-color: map.get($config, primary-text-color);
   $border-color: map.get($config, border-color);
   $error-color: map.get($config, error-color);
-  $input-height: 42px;
-  $input-reduced-height: 36px;
 
   mat-form-field.step-view {
     display: block;
@@ -115,7 +113,6 @@
             margin-top: 0;
             margin-bottom: 0;
             box-sizing: border-box;
-            height: $input-height;
 
             .mat-select-trigger {
               height: auto;
@@ -169,8 +166,8 @@
         }
 
         .mat-form-field-prefix {
-          height: $input-height;
-          max-width: 180px;
+          height: 100%;
+          max-width: 200px;
           flex: 1;
           padding: 0 12px;
           display: flex;
@@ -180,7 +177,7 @@
         }
 
         .mat-form-field-suffix {
-          height: $input-height;
+          height: 100%;
           display: flex;
           border: 1px solid $border-color;
           border-radius: 0 8px 8px 0;
@@ -247,13 +244,7 @@
           .mat-input-element {
             padding: 8px 14px;
             line-height: 18px;
-            height: $input-reduced-height;
           }
-        }
-
-        .mat-form-field-prefix,
-        .mat-form-field-suffix {
-          height: $input-reduced-height;
         }
       }
     }
@@ -306,13 +297,7 @@
           .mat-input-element {
             padding: 8px 14px;
             line-height: 18px;
-            height: $input-reduced-height;
           }
-        }
-
-        .mat-form-field-prefix,
-        .mat-form-field-suffix {
-          height: $input-reduced-height;
         }
       }
     }

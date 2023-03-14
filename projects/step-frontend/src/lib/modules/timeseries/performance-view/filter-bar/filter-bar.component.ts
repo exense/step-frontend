@@ -28,6 +28,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
   @Input() performanceViewSettings!: PerformanceViewSettings;
   @Input() defaultFilterOptions: TsFilterItem[] = [];
+  @Input() activeFilters: TsFilterItem[] = [];
 
   @Output() onFiltersChange = new EventEmitter<TsFilterItem[]>();
   @Output() onGroupingChange = new EventEmitter<string[]>();
@@ -51,7 +52,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     if (!this.context) {
       throw new Error('Context input is mandatory');
     }
-
+    this.filters = this.activeFilters;
     this.emitFilterChange$.pipe(debounceTime(this.EMIT_DEBOUNCE_TIME)).subscribe(() => {
       // we ignore empty filters
       this.onFiltersChange.emit(this.filters.filter(FilterUtils.filterItemIsValid));
