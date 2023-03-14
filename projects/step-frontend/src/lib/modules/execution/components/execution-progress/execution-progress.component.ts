@@ -36,7 +36,7 @@ import { ExecutionErrorMessageItem } from '../../shared/execution-error-message-
 import { ExecutionErrorCodeItem } from '../../shared/execution-error-code-item';
 import { ErrorDistributionStatus } from '../../shared/error-distribution-status.enum';
 import { ExecutionStateService } from '../../services/execution-state.service';
-import { filter, map, Observable, switchMap, tap } from 'rxjs';
+import { filter, map, Observable, of, switchMap, tap } from 'rxjs';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { Panels } from '../../shared/panels.enum';
 import { ReportTreeNode } from '../../shared/report-tree-node';
@@ -140,7 +140,9 @@ export class ExecutionProgressComponent
     private _executionTreeState: TreeStateService<ReportNode, ReportTreeNode>,
     public _executionPanels: SingleExecutionPanelsService,
     public _testCasesSelection: SelectionCollector<string, ReportNode>,
-    private _viewFactory: ViewFactoryService
+    private _viewFactory: ViewFactoryService,
+    private _treeState: TreeStateService<ReportNode, ReportTreeNode>,
+    private _treeUtils: ReportTreeNodeUtilsService
   ) {}
 
   showNodeInTree(nodeId: string): void {
@@ -200,12 +202,14 @@ export class ExecutionProgressComponent
     if (!this.execution || this.execution.status !== 'ENDED') {
       if (this.isActive) {
         this.refreshOther();
+        this.refreshExecutionTree();
         this.refreshTestCaseTable();
       }
     } else {
       this.autoRefreshDisabled = true;
       this.showAutoRefreshButton = false;
       this.refreshOther();
+      this.refreshExecutionTree();
       this.refreshTestCaseTable();
     }
   }
@@ -215,6 +219,7 @@ export class ExecutionProgressComponent
     if (cEid?.previousValue !== cEid?.currentValue || cEid?.firstChange) {
       this._executionPanels.initialize(cEid?.currentValue);
       this.refreshExecution(cEid?.currentValue);
+      this.loadExecutionTree(cEid?.currentValue);
       this.refreshOther(cEid?.currentValue);
       this.refreshTestCaseTable(cEid?.currentValue);
     }
@@ -296,6 +301,41 @@ export class ExecutionProgressComponent
       this.showTestCaseCurrentOperation = showTestCaseCurrentOperation?.value.toLowerCase() === 'true';
       this.titleUpdate.emit({ eId: eId!, execution });
     });
+  }
+
+  private loadExecutionTree(eId?: string): void {
+    eId = eId || this.eId;
+    if (!eId) {
+      return;
+    }
+    this._treeUtils.loadNodes(eId).subscribe((nodes) => {
+      if (nodes[0]) {
+        this._treeState.init(nodes[0], undefined, false);
+      }
+    });
+  }
+
+  private refreshExecutionTree(): void {
+    if (!this.eId) {
+      return;
+    }
+    const expandedNodIds = this._treeState.getExpandedNodeIds();
+    this._treeUtils
+      .loadNodes(this.eId)
+      .pipe(
+        map((nodes) => nodes[0]),
+        switchMap((rootNode) => {
+          if (!rootNode) {
+            return of(rootNode);
+          }
+          return this._treeUtils.restoreTree(rootNode, expandedNodIds);
+        })
+      )
+      .subscribe((rootNode) => {
+        if (rootNode) {
+          this._treeState.init(rootNode, undefined, false);
+        }
+      });
   }
 
   private refreshTestCaseTable(eId?: string): void {

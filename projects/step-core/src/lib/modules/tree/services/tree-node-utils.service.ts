@@ -7,4 +7,5 @@ export abstract class TreeNodeUtilsService<T, N extends TreeNode> {
   abstract updateNodeData(root: T, nodeId: string, data: Partial<Pick<TreeNode, 'name' | 'isSkipped'>>): boolean;
   abstract hasChildren?(nodeId: string): boolean;
   abstract loadChildren?(node: N): Observable<unknown>;
+  abstract restoreTree?(root: T, nodeIdsToRestore: string[]): Observable<unknown>;
 }
