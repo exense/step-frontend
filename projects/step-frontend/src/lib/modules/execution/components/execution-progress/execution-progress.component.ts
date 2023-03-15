@@ -309,6 +309,11 @@ export class ExecutionProgressComponent
       return;
     }
     this._treeUtils.loadNodes(eId).subscribe((nodes) => {
+      // when the execution is not yet initialized we never receive a root node
+      if (nodes.length === 0 && this.execution?.status === 'RUNNING') {
+        setTimeout(() => this.loadExecutionTree(eId), 1000);
+      }
+
       if (nodes[0]) {
         this._treeState.init(nodes[0], undefined, false);
       }
