@@ -51,11 +51,10 @@ angular
     return api;
   })
 
-  .controller('PlansCtrl', ['$rootScope', '$scope', 'stateStorage', 'pathHelper',
-    function ($rootScope, $scope, stateStorage, pathHelper) {
+  .controller('PlansCtrl', ['$rootScope', '$scope', 'stateStorage', 'pathHelper', '$location',
+    function ($rootScope, $scope, stateStorage, pathHelper, $location) {
     stateStorage.push($scope, 'plans', {});
     if ($scope.$state == null) {
-       $scope.$state = 'list';
        pathHelper.fixList();
     }
 

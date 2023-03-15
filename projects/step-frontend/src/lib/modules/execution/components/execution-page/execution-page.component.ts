@@ -49,7 +49,12 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
 
   updateUrl() {
     let url = this.createUrl(this.activeTab);
-    this._location.path(url);
+    if (this.listTab.id === 'list') {
+      //FIXME: workarround for url rewrite /executions => /executions/list should be removed with Angular Routing
+      this._location.path(url).replace();
+    } else {
+      this._location.path(url);
+    }
   }
 
   createUrl(tab: ExecutionTab): string {

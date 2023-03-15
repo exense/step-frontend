@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { CustomComponent } from '@exense/step-core';
-import { ExecutionStateService } from '../../services/execution-state.service';
 import { Panels } from '../../shared/panels.enum';
 
 @Component({
@@ -11,6 +10,4 @@ import { Panels } from '../../shared/panels.enum';
 export class DashletExecutionTreeComponent implements CustomComponent {
   context?: any;
   readonly Panels = Panels;
-
-  constructor(public _state: ExecutionStateService) {}
 }

@@ -208,14 +208,14 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     // add possible new optional inputs
     [...this.possibleFieldsToAdd]
       .filter((fieldKey) => !!value[fieldKey])
-      .forEach((fieldKey) => this.addFieldInternal(this.schema!, fieldKey, value));
+      .forEach((fieldKey) => this.addFieldInternal(this.schema, fieldKey, value));
 
     // add new additional inputs
     const formFieldKeys = [...this.primaryFields, ...this.optionalFields].map((field) => field.key);
     const newAdditionalInputs = Object.keys(value).filter((fieldKey) => !formFieldKeys.includes(fieldKey));
 
     newAdditionalInputs.filter((fieldKey) =>
-      this.addFieldInternal(this.schema!, fieldKey, value, { isAdditional: true })
+      this.addFieldInternal(this.schema, fieldKey, value, { isAdditional: true })
     );
 
     this.enableDisableForm(this.isDisabled);
@@ -223,7 +223,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
   }
 
   private addFieldInternal(
-    schema: DynamicFieldsSchema,
+    schema: DynamicFieldsSchema | undefined,
     field: string,
     value: DynamicFieldGroupValue = {},
     config?: { isRequired?: boolean; isAdditional?: boolean }
@@ -235,7 +235,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     let enumItems: string[] = [];
 
     if (!isAdditional) {
-      const fieldDescription = schema.properties[field];
+      const fieldDescription = schema?.properties[field];
       if (!fieldDescription) {
         throw new Error('Invalid schema');
       }
@@ -267,7 +267,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
       ...DEFAULT_FIELD_VALUE,
     };
     if (fieldValue.value === undefined && value[field] === undefined) {
-      fieldValue.value = schema.properties?.[field]?.default;
+      fieldValue.value = schema?.properties?.[field]?.default;
     }
 
     const validator = isRequired ? DYNAMIC_FIELD_VALIDATOR : undefined;

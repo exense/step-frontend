@@ -101,7 +101,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
       default:
         if (this._ajsLocation.path().includes('/root/' + viewId)) {
           this._ajsLocation.path('/');
-          setTimeout(() => this._ajsLocation.path('/root/' + viewId));
+          setTimeout(() => this._ajsLocation.path('/root/' + viewId).replace());
         } else {
           this._ajsLocation.path('/root/' + viewId);
         }
