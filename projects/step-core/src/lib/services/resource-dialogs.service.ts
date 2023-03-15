@@ -1,15 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import {
-  a1Promise2Observable,
-  DialogsService,
-  IsUsedByDialogService,
-  Resource,
-  ResourceInputBridgeService,
-  ResourcesService,
-  UibModalHelperService,
-} from '@exense/step-core';
+import { a1Promise2Observable, DialogsService } from '../shared';
+import { ResourcesService } from '../client/generated';
+import { IsUsedByDialogService } from './is-used-by-dialog.service';
+import { UibModalHelperService } from './uib-modal-helper.service';
+import { ResourceInputBridgeService } from './resource-input-bridge.service';
+import { Resource } from '../client/generated';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
 import { SearchResourceDialogComponent } from '../components/search-resource-dialog/search-resource-dialog.component';
 
