@@ -1,0 +1,72 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+@mixin form-control {
+  background: var.$white;
+  border: 1px solid var.$gray-300;
+  border-radius: 8px;
+  box-shadow: none;
+  transition: none;
+  height: auto;
+  padding: 8px 14px;
+  font-size: 12px;
+  line-height: 18px;
+
+  &:not(:last-of-type) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: var.$blue-600;
+
+    ~ .input-group-btn .btn:not(.active) {
+      border-color: var.$blue-600;
+    }
+  }
+}
+
+@mixin select {
+  -webkit-appearance: none;
+  appearance: none;
+  background-size: 20px;
+  background-repeat: no-repeat;
+  background-position: calc(100% - 8px) center;
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAABmJLR0QA/wD/AP+gvaeTAAAAwklEQVRYhe3TsWoCQRCA4Q9MpQlInkQkMc8eiFiojeCbJNHWNEmhA5dVTj3Us5gPtrth/xtYUkoppZRqdM78/hkP+Gl4Xw9dbBrO1+pjgTmeGsx3McbS9kcv7gO/uzPF4xmzPUwq8+8Xr8MAn5VLTt1kbC7m1ni7RiD7kTP1kTeNC6dGHoobXTsuHItsNS6UkVPbyDJu1UZcGOKrEjPx/7V+46WtuFBu8i42VyojV3htteiAiLzLuDDcnZRSSimlBP4A/KNIh6zEVKMAAAAASUVORK5CYII=');
+}
+
+@mixin legacy-forms {
+  .form-control {
+    @include form-control();
+  }
+
+  select.form-control {
+    @include form-control();
+    @include select();
+  }
+
+  .form-group,
+  .form-group-sm {
+    .form-control {
+      @include form-control();
+    }
+
+    select.form-control {
+      @include form-control();
+      @include select();
+    }
+
+    label {
+      padding-bottom: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    input[type='radio'],
+    input[type='checkbox'] {
+      margin: 0;
+    }
+  }
+}

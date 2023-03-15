@@ -36,6 +36,13 @@ export class SplitAreaComponent implements AfterViewInit {
         });
 
         break;
+
+      default:
+        this.setFlex({
+          flexBasis: `${this.width}px`,
+        });
+
+        break;
     }
   }
 

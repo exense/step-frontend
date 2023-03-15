@@ -1,0 +1,11 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+@mixin notification-subscription-list-ctrl {
+  #NotificationSubscriptionListCtrl {
+    padding: 10px;
+
+    st-actions .btn.btn-success {
+      margin-right: 24px;
+    }
+  }
+}
