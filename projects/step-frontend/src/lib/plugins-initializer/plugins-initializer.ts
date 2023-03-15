@@ -11,6 +11,7 @@ const OVERRIDE_PLUGINS = new Map<string, string>();
 const IGNORE_PLUGINS: ReadonlyArray<string> = [
   'multitenancy',
   'monitoringdashboard',
+  'executionreport',
   'dualPlanEditor',
   'notifications',
   'planBrowser',
