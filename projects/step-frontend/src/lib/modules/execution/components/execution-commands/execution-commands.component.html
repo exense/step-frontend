@@ -17,7 +17,7 @@
         mat-icon-button
         [disabled]="!('plan-execute' | hasRight | async)"
         aria-label="Left Align"
-        matTooltip="Execute"
+        matTooltip="New execution"
         (click)="execute(false)"
       >
         <step-icon name="play" aria-hidden="true"></step-icon>
@@ -34,13 +34,11 @@
       </button>
     </div>
     <div class="flex" *ngIf="execution && execution.status !== 'ENDED'">
-      <button type="button" mat-icon-button aria-label="Left Align" [disabled]="!('plan-execute' | hasRight | async)">
-        <step-icon name="pause" aria-hidden="true"></step-icon>
-      </button>
       <button
         type="button"
         mat-icon-button
         aria-label="Left Align"
+        matTooltip="Stop"
         [disabled]="!('plan-execute' | hasRight | async)"
         (click)="stop()"
       >
