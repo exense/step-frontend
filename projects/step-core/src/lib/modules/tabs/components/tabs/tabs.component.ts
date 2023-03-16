@@ -8,20 +8,26 @@ import {
   SimpleChanges,
   TemplateRef,
   TrackByFunction,
+  ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { Tab } from '../../shared/tab';
 import { AJS_MODULE } from '../../../../shared';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
+import { MatTabNav } from '@angular/material/tabs';
 
 @Component({
   selector: 'step-tabs',
   templateUrl: './tabs.component.html',
   styleUrls: ['./tabs.component.scss'],
+  exportAs: 'StepTabs',
   encapsulation: ViewEncapsulation.None,
 })
 export class TabsComponent implements OnChanges {
   readonly trackByTab: TrackByFunction<Tab> = (index, item) => item.id;
+
+  @ViewChild(MatTabNav)
+  private tabBar!: MatTabNav;
 
   @Input() tabMode: 'buttons' | 'tabs' = 'buttons';
   @Input() disablePagination: boolean = false;
@@ -46,6 +52,10 @@ export class TabsComponent implements OnChanges {
   selectTab(tab: Tab): void {
     this.activeTabId = tab.id;
     this.activeTabIdChange.emit(tab.id);
+  }
+
+  updatePagination(): void {
+    this.tabBar.updatePagination();
   }
 }
 
