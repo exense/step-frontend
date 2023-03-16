@@ -5,21 +5,22 @@ import { UserService } from '../../../client/generated';
   providedIn: 'root',
 })
 export class ItemsPerPageService {
-  private defaultItemsPerPage: Array<number> = [10, 25, 50, 100];
+  readonly defaultItemsPerPage: Array<number> = [10, 25, 50, 100];
   private customItemsPerPage?: number | boolean;
 
   constructor(private _userService: UserService) {}
 
-  public getItemsPerPage(loadedUserPreferences: Function): any {
+  public getItemsPerPage(loadedUserPreferences: (itemsPerPage: number) => void): Array<number> {
     if (this.customItemsPerPage === undefined) {
       this._userService.getPreferences().subscribe((preferences) => {
-        if (preferences?.preferences?.['tables_itemsperpage']) {
-          this.customItemsPerPage = Number(preferences.preferences['tables_itemsperpage']);
-          loadedUserPreferences(Number(preferences.preferences['tables_itemsperpage']));
+        const tables_itemsperpage = preferences?.preferences?.['tables_itemsperpage'];
+        if (tables_itemsperpage) {
+          this.customItemsPerPage = Number(tables_itemsperpage);
+          loadedUserPreferences(Number(tables_itemsperpage));
         }
       });
     }
-    const itemsPerPage = this.defaultItemsPerPage;
+    const itemsPerPage = [...this.defaultItemsPerPage];
 
     if (
       this.customItemsPerPage &&
