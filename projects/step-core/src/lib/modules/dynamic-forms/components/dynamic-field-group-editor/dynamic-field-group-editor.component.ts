@@ -106,7 +106,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
 
   protected addOptionalField(fieldName?: string): void {
     const isAdditional = !fieldName;
-    this.addFieldInternal(this.schema!, fieldName || '', this.value, { isAdditional });
+    this.addFieldInternal(this.schema, fieldName || '', this.value, { isAdditional });
   }
 
   protected removeField(field: DynamicFieldMetaData): void {
@@ -150,11 +150,11 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     // for non required and additional fields add only those, which exist in value
     nonRequiredFields
       .filter((field) => valueFields.includes(field))
-      .forEach((field) => this.addFieldInternal(schema!, field, value));
+      .forEach((field) => this.addFieldInternal(schema, field, value));
 
     additionalFields
       .filter((field) => valueFields.includes(field))
-      .forEach((field) => this.addFieldInternal(schema!, field, value, { isAdditional: true }));
+      .forEach((field) => this.addFieldInternal(schema, field, value, { isAdditional: true }));
 
     this.enableDisableForm(this.isDisabled);
     this.setupFormBehavior();
