@@ -4,7 +4,7 @@
   $palette: null,
   $login-secondary-text-color: gray,
   $login-button-text-color: white,
-  $login-bg-path: '/images/log-in-mountains-background.jpg'
+  $login-bg-path: 'images/log-in-mountains-background.jpg'
 ) {
   $config: (
     login-button-bg-color: map.get($palette, 500),
@@ -127,7 +127,14 @@
 
     .step-mountain-background {
       $bg-path: map.get($config, login-bg-path);
-      background: url($bg-path) no-repeat no-repeat right;
+      /**
+      '^' sign is used to prevent file check during the build and pass url without '/'.
+      But this '^' feature probably will be removed in next versions of angular-cli.
+      Check the following links for details:
+      https://github.com/angular/angular-cli/issues/12797#issuecomment-598534241
+      https://github.com/angular/angular-cli/issues/18013#issuecomment-649373940
+      **/
+      background: url('^#{$bg-path}') no-repeat no-repeat right;
       background-size: cover;
     }
 
