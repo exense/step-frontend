@@ -78,7 +78,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
 
     if (schemeChanged) {
       this.buildForm(schema, value);
-    } else if (value && !this.isDeepEqual(value, this.lastFormValue)) {
+    } else if (value && !this.isFieldGroupValueEqual(value, this.lastFormValue)) {
       this.assignValueToForm(value);
     }
 
@@ -315,11 +315,11 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     }
   }
 
-  private isDeepEqual(valueA?: DynamicFieldGroupValue, valueB?: DynamicFieldGroupValue): boolean {
+  private isFieldGroupValueEqual(valueA?: DynamicFieldGroupValue, valueB?: DynamicFieldGroupValue): boolean {
     if (valueA === valueB) {
       return true;
     }
-    if ((valueA === undefined && valueB !== undefined) || (valueA !== undefined && valueB === undefined)) {
+    if (valueA === undefined || valueB === undefined) {
       return false;
     }
     const keysA = Object.keys(valueA || {});
