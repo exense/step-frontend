@@ -23,6 +23,19 @@ export interface BulkOperationConfig<ID> {
   withPreview: boolean;
 }
 
+const formatMessageWithDeleteWarning = (
+  strings: TemplateStringsArray,
+  operationType: BulkOperationType,
+  ...otherExpressions: string[]
+) => {
+  const firstPart = strings[0] + operationType;
+  let restPart = strings.slice(1).reduce((result, part, index) => result + part + (otherExpressions[index] ?? ''), '');
+  if (operationType === BulkOperationType.delete) {
+    restPart = `<strong class="danger-warning">${restPart}</strong>`;
+  }
+  return firstPart + restPart;
+};
+
 export abstract class BulkOperationsInvokeService<ID> {
   protected _sanitizer = inject(DomSanitizer);
   protected _titleCase = inject(TitleCasePipe);
@@ -160,14 +173,18 @@ export abstract class BulkOperationsInvokeService<ID> {
   ): (result?: AsyncTaskStatus) => SafeHtml {
     return (result) => {
       const count = result?.result?.count;
-      let operation = config.operationType.toString();
-      if (config.operationType === BulkOperationType.delete && config.selectionType === BulkSelectionType.All) {
-        operation = `<strong class="danger-warning">${config.operationType}</strong>`;
-      }
 
-      const message = count
-        ? `Do you want to ${operation} the ${count} selected item(s)?`
-        : `Do you want to ${operation} all selected items?`;
+      let message: string;
+      if (config.selectionType === BulkSelectionType.All) {
+        message = count
+          ? formatMessageWithDeleteWarning`Do you want to ${config.operationType} all ${count} selected item(s)`
+          : formatMessageWithDeleteWarning`Do you want to ${config.operationType} all selected items`;
+      } else {
+        message = count
+          ? `Do you want to ${config.operationType} the ${count} selected item(s)`
+          : `Do you want to ${config.operationType} all selected items`;
+      }
+      message = `${message}?`;
 
       return this._sanitizer.bypassSecurityTrustHtml(message);
     };
