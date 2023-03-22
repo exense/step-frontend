@@ -1,3 +1,6 @@
+$secondaryBtnBackground: #fff2e2;
+$secondaryBtnColor: #ab793b;
+
 :host {
   display: flex;
   flex-direction: column;
@@ -13,8 +16,8 @@
   position: absolute;
   left: 0;
   top: 0;
-  background-color: #fff2e2;
-  color: #ab793b;
+  background-color: $secondaryBtnBackground;
+  color: $secondaryBtnColor;
   padding: 4px 34px;
   font-size: 12px;
   border: 1px solid #ead5bd;
@@ -45,6 +48,6 @@
 }
 
 .apply-btn {
-  background-color: #fff2e2;
+  background-color: $secondaryBtnBackground;
   border: 1px solid #ebd9c2;
 }

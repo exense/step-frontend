@@ -48,23 +48,23 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   updateData(response: TimeSeriesChartResponse) {
     this.tableIsLoading = false;
     this.response = response;
-    let keywords: string[] = [];
-    let tableBuckets = response.matrix
+    const keywords: string[] = [];
+    const tableBuckets = response.matrix
       .map((series, i) => {
         if (series.length != 1) {
           // we should have just one bucket
           throw new Error('Something went wrong');
         }
-        let seriesAttributes = response.matrixKeys[i];
-        let bucket = series[0];
+        const seriesAttributes = response.matrixKeys[i];
+        const bucket = series[0];
         bucket.attributes = seriesAttributes;
-        let seriesKey = this.getSeriesKey(seriesAttributes, this.executionContext.getGroupDimensions());
+        const seriesKey = this.getSeriesKey(seriesAttributes, this.executionContext.getGroupDimensions());
         bucket.attributes._id = seriesKey;
         bucket.attributes.color = this.keywordsService.getColor(seriesKey);
         bucket.attributes.avg = (bucket.sum / bucket.count).toFixed(0);
         bucket.attributes.tps = Math.trunc(bucket.count / ((response.end - response.start) / 1000));
         bucket.attributes.tph = Math.trunc((bucket.count / ((response.end - response.start) / 1000)) * 3600);
-        let keywordSelection = this.keywordsService.getKeywordSelection(seriesKey);
+        const keywordSelection = this.keywordsService.getKeywordSelection(seriesKey);
         bucket.attributes.isSelected = keywordSelection ? keywordSelection.isSelected : true; // true because it has not been loaded yet
         keywords.push(seriesKey);
         this.bucketsByKeywords[seriesKey] = bucket;

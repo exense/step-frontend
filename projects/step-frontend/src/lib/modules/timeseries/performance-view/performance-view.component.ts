@@ -170,7 +170,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.updateDashboardTerminator$.next(); // to keep executions synchronous
     // let's assume the complete interval and selections are set.
     if (!this.context.inProgress$.getValue()) this.context.setInProgress(true);
-    let updates$ = [];
+    const updates$ = [];
     if (request.showLoadingBar) {
       this.chartsAreLoading = true;
     }
@@ -243,7 +243,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   private refreshAllCharts(): Observable<unknown> {
     this.findRequestBuilder = this.prepareFindRequestBuilder(this.settings); // we don't want to lose active filters
-    let timeSelection = this.context.getSelectedTimeRange();
+    const timeSelection = this.context.getSelectedTimeRange();
     this.findRequestBuilder.withRange(timeSelection);
 
     const charts$ = [
@@ -268,7 +268,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   createThreadGroupsChart(): Observable<TimeSeriesChartResponse> {
-    let request = this.findRequestBuilder
+    const request = this.findRequestBuilder
       .clone()
       .addAttribute(this.METRIC_TYPE_KEY, this.METRIC_TYPE_SAMPLER)
       .withCustomFilters([])
@@ -299,7 +299,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
    * This method is used for both creating or updating the chart
    */
   createSummaryChart(): Observable<TimeSeriesChartResponse> {
-    let request = this.findRequestBuilder.build();
+    const request = this.findRequestBuilder.build();
     return this.timeSeriesService
       .fetchBuckets(request)
       .pipe(tap((response) => this.createChart(TsChartType.OVERVIEW, request, response)));
@@ -321,14 +321,14 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   createByStatusChart(): Observable<TimeSeriesChartResponse> {
-    let request = this.findRequestBuilder.clone().withGroupDimensions([TimeSeriesConfig.STATUS_ATTRIBUTE]).build();
+    const request = this.findRequestBuilder.clone().withGroupDimensions([TimeSeriesConfig.STATUS_ATTRIBUTE]).build();
     return this.timeSeriesService
       .fetchBuckets(request)
       .pipe(tap((response) => this.createChart(TsChartType.BY_STATUS, request, response)));
   }
 
   createTableChart(): Observable<TimeSeriesChartResponse> {
-    let findRequest = this.findRequestBuilder
+    const findRequest = this.findRequestBuilder
       .clone()
       .withNumberOfBuckets(1)
       .withGroupDimensions(this.context.getGroupDimensions())
@@ -343,8 +343,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   createByKeywordsCharts(): Observable<TimeSeriesChartResponse> {
-    let groupDimensions = this.context.getGroupDimensions();
-    let findRequest = this.findRequestBuilder
+    const groupDimensions = this.context.getGroupDimensions();
+    const findRequest = this.findRequestBuilder
       .clone()
       .withGroupDimensions(groupDimensions)
       .withPercentiles([90, 99])
@@ -360,16 +360,16 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             return;
           }
         }
-        let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-        let totalThroughput: number[] = response.matrix[0] ? Array(response.matrix[0]?.length) : [];
-        let responseTimeSeries: TSChartSeries[] = [];
-        let throughputSeries: TSChartSeries[] = [];
+        const timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
+        const totalThroughput: number[] = response.matrix[0] ? Array(response.matrix[0]?.length) : [];
+        const responseTimeSeries: TSChartSeries[] = [];
+        const throughputSeries: TSChartSeries[] = [];
         response.matrixKeys.map((key, i) => {
           key = this.getSeriesKey(key, groupDimensions);
-          let responseTimeData: (number | null | undefined)[] = [];
-          let color = this.keywordsService.getColor(key);
-          let throughputData = response.matrix[i].map((b, j) => {
-            let bucketValue = this.selectedThroughputMetric.mapFunction(b);
+          const responseTimeData: (number | null | undefined)[] = [];
+          const color = this.keywordsService.getColor(key);
+          const throughputData = response.matrix[i].map((b, j) => {
+            const bucketValue = this.selectedThroughputMetric.mapFunction(b);
             if (totalThroughput[j] == undefined) {
               totalThroughput[j] = bucketValue;
             } else if (bucketValue) {
@@ -382,8 +382,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
             }
             return bucketValue ? bucketValue : 0;
           });
-          let keywordSelection = this.keywordsService.getKeywordSelection(key);
-          let series = {
+          const keywordSelection = this.keywordsService.getKeywordSelection(key);
+          const series = {
             scale: 'y',
             show: keywordSelection ? keywordSelection.isSelected : true,
             label: key,
@@ -466,7 +466,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       return;
     }
     this.selectedResponseTimeMetric = metric;
-    let data = this.responseTimeChart.getData();
+    const data = this.responseTimeChart.getData();
     this.byKeywordsChartResponseCache.matrix.map((bucketArray, i) => {
       data[i + 1] = bucketArray.map((b) => this.selectedResponseTimeMetric.mapFunction(b));
     });
@@ -474,7 +474,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   switchThroughputMetric(metric: ThroughputMetric) {
-    let f = (u: any, vals: any) => vals.map((v: number) => metric.labelFunction(v));
+    const f = (u: any, vals: any) => vals.map((v: number) => metric.labelFunction(v));
     this.throughputChart.settings.tooltipOptions.zAxisLabel = metric.tooltipZAxisLabel;
     this.throughputChart.uplot.axes[1].values = f;
     this.throughputChart.uplot.axes[2].values = f;
@@ -486,14 +486,14 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       return;
     }
     this.selectedThroughputMetric = metric;
-    let data = this.throughputChart.getData();
-    let totalData = new Array(data[0].length);
+    const data = this.throughputChart.getData();
+    const totalData = new Array(data[0].length);
     this.byKeywordsChartResponseCache.matrix.map((bucketArray, i) => {
       bucketArray.forEach((b, j) => {
         if (totalData[j] == null) {
           totalData[j] = 0;
         }
-        let value = this.selectedThroughputMetric.mapFunction(b);
+        const value = this.selectedThroughputMetric.mapFunction(b);
         totalData[j] += value;
         data[i + 1][j] = value;
       });
@@ -502,7 +502,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     this.throughputChart.setData(data, false);
   }
 
-  getSeriesKey(attributes: BucketAttributes, groupDimensions: string[]) {
+  getSeriesKey(attributes: BucketAttributes, groupDimensions: string[]): string {
     if (Object.keys(attributes).length === 0) {
       return '<empty>';
     }

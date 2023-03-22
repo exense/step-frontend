@@ -130,8 +130,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
    */
   refresh(range: TSTimeRange, selection?: TSTimeRange): void {
     this.setRanges(range, selection);
-    console.log('REFRESH");');
-    // this.throttledRefreshTrigger$.next(true);
   }
 
   /**

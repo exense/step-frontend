@@ -61,7 +61,6 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     this.emitFilterChange$.pipe(debounceTime(this.EMIT_DEBOUNCE_TIME)).subscribe(() => {
       const filters = this.filters.filter(FilterUtils.filterItemIsValid);
       if (filters.length) {
-        this.showApplyButton = true;
         this.composeAndVerifyOql(filters).subscribe((response) => {
           this.rawMeasurementsModeActive = response.hasUnknownFields;
           this.showApplyButton = response.hasUnknownFields;
@@ -82,16 +81,14 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   composeAndVerifyOql(filters: TsFilterItem[]): Observable<OqlVerifyResponse> {
     // we fake group dimensions as being filters, to verify altogether
     let attributesPrefix = 'attributes';
-    this.context
-      .getGroupDimensions()
-      .forEach((dimension) =>
-        filters.push({
-          attributeName: dimension,
-          type: FilterBarItemType.FREE_TEXT,
-          textValue: 'group-dimension',
-          label: '',
-        })
-      );
+    this.context.getGroupDimensions().forEach((dimension) =>
+      filters.push({
+        attributeName: dimension,
+        type: FilterBarItemType.FREE_TEXT,
+        textValue: 'group-dimension',
+        label: '',
+      })
+    );
     const oql = FilterUtils.filtersToOQL(filters, attributesPrefix);
     return this.timeSeriesService.verifyOql(oql);
   }
