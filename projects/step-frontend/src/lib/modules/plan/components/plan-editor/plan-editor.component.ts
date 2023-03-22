@@ -1,6 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import {
   Component,
+  ElementRef,
   forwardRef,
   Inject,
   Input,
@@ -17,6 +18,7 @@ import {
   AbstractArtefact,
   AJS_LOCATION,
   AJS_MODULE,
+  ArtefactRefreshNotificationService,
   ArtefactTreeNode,
   AugmentedScreenService,
   AuthService,
@@ -32,10 +34,10 @@ import {
   PlanInteractiveSessionService,
   PlansService,
   RepositoryObjectReference,
+  RestoreDialogsService,
+  SplitComponent,
   TreeNodeUtilsService,
   TreeStateService,
-  RestoreDialogsService,
-  ArtefactRefreshNotificationService,
 } from '@exense/step-core';
 import { ILocationService } from 'angular';
 import { catchError, filter, from, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
@@ -83,6 +85,8 @@ export class PlanEditorComponent
   private keywords?: KeywordCallsComponent;
 
   @Input() planId?: string;
+
+  @ViewChild(SplitComponent, { read: ElementRef }) splitElementRef?: ElementRef<HTMLElement>;
 
   protected componentTabs = [
     { id: 'controls', label: 'Controls' },

@@ -54,7 +54,9 @@
     </ng-container>
   </div>
 
-  <step-split>
+  <step-split
+    [style.max-height]="splitElementRef ? (splitElementRef.nativeElement | stepCalcViewportHeightMinusOffsetTop) : ''"
+  >
     <step-split-area sizeType="flex" size="1">
       <ng-container *ngIf="planClass">
         <step-plan-type [itemKey]="planClass"> </step-plan-type>

@@ -25,15 +25,15 @@ import { PlanTreeActionsComponent } from './components/plan-tree-actions/plan-tr
 import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
+import { ResourceInputComponent } from './components/resouce-input/resouce-input.component';
 import { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
+import { SearchResourceDialogComponent } from './components/search-resource-dialog/search-resource-dialog.component';
 import { SelectPlanComponent } from './components/select-plan/select-plan.component';
 import { SettingButtonComponent } from './components/setting-button/setting-button.component';
 import { SplitAreaComponent } from './components/split-area/split-area.component';
 import { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 import { SplitComponent } from './components/split/split.component';
 import { UploadContainerComponent } from './components/upload-container/upload-container.component';
-import { ResourceInputComponent } from './components/resouce-input/resouce-input.component';
-import { SearchResourceDialogComponent } from './components/search-resource-dialog/search-resource-dialog.component';
 import { CORE_INITIALIZER } from './core-initialiser';
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { CapsLockDirective } from './directives/caps-lock.directive';
@@ -50,13 +50,13 @@ import { StepMaterialModule } from './modules/step-material/step-material.module
 import { TableModule } from './modules/table/table.module';
 import { TabsModule } from './modules/tabs/tabs.module';
 import { TreeModule } from './modules/tree/tree.module';
+import { CalcViewportHeightMinusOffsetTopPipe } from './pipes/calc-viewport-height-minus-offset-top.pipe';
 import { CustomFormInputModelPipe } from './pipes/custom-form-input-model.pipe';
 import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
-import { ResourceDialogsService } from './services/resource-dialogs.service';
 
 @NgModule({
   declarations: [
@@ -99,6 +99,7 @@ import { ResourceDialogsService } from './services/resource-dialogs.service';
     ElementResizeDirective,
     ResourceInputComponent,
     SearchResourceDialogComponent,
+    CalcViewportHeightMinusOffsetTopPipe,
   ],
   imports: [
     CommonModule,
@@ -169,6 +170,7 @@ import { ResourceDialogsService } from './services/resource-dialogs.service';
     ElementResizeDirective,
     ResourceInputComponent,
     SearchResourceDialogComponent,
+    CalcViewportHeightMinusOffsetTopPipe,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -209,7 +211,6 @@ export { EditableLabelComponent } from './components/editable-label/editable-lab
 export { EditableTextareaLabelWrapperComponent } from './components/editable-textarea-label-wrapper/editable-textarea-label-wrapper.component';
 export { EditableTextareaLabelComponent } from './components/editable-textarea-label/editable-textarea-label.component';
 export { FunctionLinkDialogService } from './components/function-link/function-link-dialog.service';
-export { ResourceDialogsService } from './services/resource-dialogs.service';
 export { FunctionLinkComponent } from './components/function-link/function-link.component';
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
@@ -218,16 +219,15 @@ export { PlanLinkComponent } from './components/plan-link/plan-link.component';
 export * from './components/plan-tree/plan-tree.component';
 export { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 export * from './components/report-node-status/report-node-status.component';
+export { ResourceInputComponent } from './components/resouce-input/resouce-input.component';
 export { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
+export { SearchResourceDialogComponent } from './components/search-resource-dialog/search-resource-dialog.component';
 export { SelectPlanComponent } from './components/select-plan/select-plan.component';
 export { SettingButtonComponent } from './components/setting-button/setting-button.component';
 export { SplitAreaComponent } from './components/split-area/split-area.component';
 export { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 export { SplitComponent } from './components/split/split.component';
 export { UploadContainerComponent } from './components/upload-container/upload-container.component';
-export { ResourceInputComponent } from './components/resouce-input/resouce-input.component';
-export { SearchResourceDialogComponent } from './components/search-resource-dialog/search-resource-dialog.component';
-
 export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';
@@ -247,6 +247,7 @@ export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
 export * from './modules/tabs/tabs.module';
 export * from './modules/tree/tree.module';
+export { CalcViewportHeightMinusOffsetTopPipe } from './pipes/calc-viewport-height-minus-offset-top.pipe';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/is-chart-empty.pipe';
@@ -267,6 +268,7 @@ export { PlanDialogsService } from './services/plan-dialogs.service';
 export * from './services/plan-editor.service';
 export * from './services/plan-interactive-session.service';
 export * from './services/plugin-info-registry.service';
+export { ResourceDialogsService } from './services/resource-dialogs.service';
 export * from './services/resource-input-bridge.service';
 export * from './services/restore-dialogs.service';
 export * from './services/scheduled-task-dialogs.service';
