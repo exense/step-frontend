@@ -5,7 +5,6 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
-import { ApiRequestOptions } from '../core/ApiRequestOptions';
 
 @Injectable({ providedIn: 'root' })
 export class SettingsService {
@@ -32,8 +31,8 @@ export class SettingsService {
    * @returns any default response
    * @throws ApiError
    */
-  public saveSetting(id: string, requestBody?: any): Observable<any> {
-    const options: ApiRequestOptions = {
+  public saveSetting(id: string, requestBody?: string): Observable<any> {
+    return this.httpRequest.request({
       method: 'POST',
       url: '/settings/{id}',
       path: {
@@ -41,9 +40,7 @@ export class SettingsService {
       },
       body: requestBody,
       mediaType: 'application/json',
-    };
-
-    return this.httpRequest.request(options);
+    });
   }
 
   /**
