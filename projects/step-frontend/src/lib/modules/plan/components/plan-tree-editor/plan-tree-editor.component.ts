@@ -1,15 +1,17 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   AbstractArtefact,
   ArtefactTreeNode,
   AugmentedScreenService,
   AuthService,
   breadthFirstSearch,
+  COPIED_ARTEFACTS,
   CustomComponent,
   DialogsService,
   DynamicFieldsSchema,
   DynamicValueString,
   KeywordsService,
+  PersistenceService,
   Plan,
   PlanEditorService,
   PlanEditorStrategy,
@@ -18,7 +20,6 @@ import {
 } from '@exense/step-core';
 import { BehaviorSubject, filter, map, merge, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { ArtefactTreeNodeUtilsService } from '../../services/artefact-tree-node-utils.service';
-import { ARTEFACTS_CLIPBOARD } from '../../services/artefacts-clipboard.token';
 import { PlanHistoryService } from '../../services/plan-history.service';
 
 const MESSAGE_ADD_AT_MULTIPLE_NODES =
@@ -45,7 +46,6 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
   readonly hasUndo$ = this._planHistory.hasUndo$;
 
   constructor(
-    @Inject(ARTEFACTS_CLIPBOARD) private _artefactsClipboard: AbstractArtefact[],
     private _planEditor: PlanEditorService,
     private _planApi: PlansService,
     private _treeState: TreeStateService<AbstractArtefact, ArtefactTreeNode>,
@@ -54,6 +54,7 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
     private _screenTemplates: AugmentedScreenService,
     private _planHistory: PlanHistoryService,
     private _dialogs: DialogsService,
+    private _persistenceService: PersistenceService,
     private _artefactTreeNodeUtilsService: ArtefactTreeNodeUtilsService
   ) {}
 
@@ -283,20 +284,39 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
     if (node) {
       this._treeState.selectNodeById(node.id!);
     }
+
     const artefacts = this._treeState.getSelectedNodes().map(({ originalArtefact }) => originalArtefact);
-    const clipboardLength = this._artefactsClipboard.length;
-    this._artefactsClipboard.splice(0, clipboardLength, ...artefacts);
+
+    this._persistenceService.setItem(COPIED_ARTEFACTS, JSON.stringify(artefacts));
   }
 
   paste(node?: AbstractArtefact): void {
-    if (!this._artefactsClipboard?.length) {
+    const copiedArtefactsJSON = this._persistenceService.getItem(COPIED_ARTEFACTS);
+
+    if (!copiedArtefactsJSON) {
       return;
     }
-    this._planApi.cloneArtefacts(this._artefactsClipboard).subscribe((children) => {
+
+    const artefacts = JSON.parse(copiedArtefactsJSON);
+
+    if (!artefacts?.length) {
+      return;
+    }
+
+    this._planApi.cloneArtefacts(artefacts).subscribe((children) => {
       if (node) {
         this._treeState.selectNodeById(node.id!);
       }
+
       this._treeState.addChildrenToSelectedNode(...children);
+
+      const flatChildren = breadthFirstSearch({
+        items: children,
+        children: (item) => item.children || [],
+      });
+      const flatChildrenIds = flatChildren.map((child) => child.id!);
+
+      this._treeState.expandNodes(flatChildrenIds);
     });
   }
 
