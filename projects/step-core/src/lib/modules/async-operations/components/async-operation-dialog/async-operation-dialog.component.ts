@@ -8,6 +8,7 @@ import { catchError, switchMap } from 'rxjs/operators';
 import { map, of, timer } from 'rxjs';
 import { AsyncOperationDialogResult } from '../../shared/async-operation-dialog-result';
 import { AsyncOperationCloseStatus } from '../../shared/async-operation-close-status.enum';
+import { SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'step-async-operation-dialog',
@@ -20,8 +21,8 @@ export class AsyncOperationDialogComponent implements AfterViewInit {
   state: AsyncOperationDialogState = AsyncOperationDialogState.progress;
   progress: number = 0;
 
-  successMessage: string = '';
-  errorMessage: string = '';
+  successMessage: SafeHtml = '';
+  errorMessage: SafeHtml = '';
 
   error?: AsyncTaskStatus | Error;
   operationStatus?: AsyncTaskStatus;

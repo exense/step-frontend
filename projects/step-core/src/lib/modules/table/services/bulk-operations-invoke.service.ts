@@ -11,6 +11,9 @@ import {
   AsyncOperationService,
 } from '../../async-operations/async-operations.module';
 import { AsyncTaskStatus } from '../../../client/augmented/shared/async-task-status';
+import { inject } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { TitleCasePipe } from '@angular/common';
 
 export interface BulkOperationConfig<ID> {
   operationType: BulkOperationType;
@@ -20,8 +23,23 @@ export interface BulkOperationConfig<ID> {
   withPreview: boolean;
 }
 
+const formatMessageWithDeleteWarning = (
+  strings: TemplateStringsArray,
+  operationType: BulkOperationType,
+  ...otherExpressions: string[]
+) => {
+  const firstPart = strings[0] + operationType;
+  let restPart = strings.slice(1).reduce((result, part, index) => result + part + (otherExpressions[index] ?? ''), '');
+  if (operationType === BulkOperationType.delete) {
+    restPart = `<strong class="danger-warning">${restPart}</strong>`;
+  }
+  return firstPart + restPart;
+};
+
 export abstract class BulkOperationsInvokeService<ID> {
-  protected constructor(protected _asyncOperationService: AsyncOperationService) {}
+  protected _sanitizer = inject(DomSanitizer);
+  protected _titleCase = inject(TitleCasePipe);
+  protected _asyncOperationService = inject(AsyncOperationService);
 
   protected abstract invokeDelete?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
   protected abstract invokeDuplicate?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
@@ -115,8 +133,13 @@ export abstract class BulkOperationsInvokeService<ID> {
     );
   }
 
-  protected createPreviewTitle(config: BulkOperationConfig<ID>): string {
-    return `Confirm ${config.operationType}`;
+  protected createPreviewTitle(config: BulkOperationConfig<ID>): SafeHtml {
+    const operation = this._titleCase.transform(config.operationType);
+    let title = `Confirm ${operation}`;
+    if (config.operationType === BulkOperationType.delete && config.selectionType === BulkSelectionType.All) {
+      title = `<span class="danger-warning">${title}</span>`;
+    }
+    return this._sanitizer.bypassSecurityTrustHtml(title);
   }
 
   protected createPerformTitle(config: BulkOperationConfig<ID>): string {
@@ -135,21 +158,35 @@ export abstract class BulkOperationsInvokeService<ID> {
     };
   }
 
-  protected createSuccessMessageHandler(config: BulkOperationConfig<ID>): (result?: AsyncTaskStatus) => string {
+  protected createSuccessMessageHandler(config: BulkOperationConfig<ID>): (result?: AsyncTaskStatus) => SafeHtml {
     return (result) => {
       const count = result?.result?.count;
-      return count
+      const message = count
         ? `Bulk operation ${config.operationType} for ${count} item(s) completed`
         : `Bulk operation ${config.operationType} for selected items completed`;
+      return this._sanitizer.bypassSecurityTrustHtml(message);
     };
   }
 
-  protected createSuccessMessagePreviewHandler(config: BulkOperationConfig<ID>): (result?: AsyncTaskStatus) => string {
+  protected createSuccessMessagePreviewHandler(
+    config: BulkOperationConfig<ID>
+  ): (result?: AsyncTaskStatus) => SafeHtml {
     return (result) => {
       const count = result?.result?.count;
-      return count
-        ? `Do you want to ${config.operationType} the ${count} selected item(s)?`
-        : `Do you want to ${config.operationType} all selected items?`;
+
+      let message: string;
+      if (config.selectionType === BulkSelectionType.All) {
+        message = count
+          ? formatMessageWithDeleteWarning`Do you want to ${config.operationType} all ${count} selected item(s)`
+          : formatMessageWithDeleteWarning`Do you want to ${config.operationType} all selected items`;
+      } else {
+        message = count
+          ? `Do you want to ${config.operationType} the ${count} selected item(s)`
+          : `Do you want to ${config.operationType} all selected items`;
+      }
+      message = `${message}?`;
+
+      return this._sanitizer.bypassSecurityTrustHtml(message);
     };
   }
 }
