@@ -86,8 +86,6 @@ export class PlanEditorComponent
 
   @Input() planId?: string;
 
-  @ViewChild(SplitComponent, { read: ElementRef }) splitElementRef?: ElementRef<HTMLElement>;
-
   protected componentTabs = [
     { id: 'controls', label: 'Controls' },
     { id: 'keywords', label: 'Keywords' },

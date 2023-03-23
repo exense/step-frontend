@@ -38,6 +38,7 @@ import { CORE_INITIALIZER } from './core-initialiser';
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { CapsLockDirective } from './directives/caps-lock.directive';
 import { ElementResizeDirective } from './directives/element-resize.directive';
+import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 import { SimpleLineChartDirective } from './directives/simple-line-chart.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 import { TooltipDirective } from './directives/tooltip.directive';
@@ -50,7 +51,6 @@ import { StepMaterialModule } from './modules/step-material/step-material.module
 import { TableModule } from './modules/table/table.module';
 import { TabsModule } from './modules/tabs/tabs.module';
 import { TreeModule } from './modules/tree/tree.module';
-import { CalcViewportHeightMinusOffsetTopPipe } from './pipes/calc-viewport-height-minus-offset-top.pipe';
 import { CustomFormInputModelPipe } from './pipes/custom-form-input-model.pipe';
 import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
@@ -99,7 +99,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     ElementResizeDirective,
     ResourceInputComponent,
     SearchResourceDialogComponent,
-    CalcViewportHeightMinusOffsetTopPipe,
+    MaxHeightViewportHeightMinusOffsetTopDirective,
   ],
   imports: [
     CommonModule,
@@ -170,7 +170,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     ElementResizeDirective,
     ResourceInputComponent,
     SearchResourceDialogComponent,
-    CalcViewportHeightMinusOffsetTopPipe,
+    MaxHeightViewportHeightMinusOffsetTopDirective,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -232,6 +232,7 @@ export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
+export { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 export * from './directives/simple-line-chart.directive';
 export * from './directives/tooltip-immediate-close.directive';
 export * from './directives/tooltip.directive';
@@ -247,7 +248,6 @@ export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
 export * from './modules/tabs/tabs.module';
 export * from './modules/tree/tree.module';
-export { CalcViewportHeightMinusOffsetTopPipe } from './pipes/calc-viewport-height-minus-offset-top.pipe';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/is-chart-empty.pipe';
