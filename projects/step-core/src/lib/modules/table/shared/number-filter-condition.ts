@@ -8,8 +8,8 @@ export class NumberFilterCondition extends FilterCondition {
     super();
   }
   toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
-    const value = parseInt(this.searchValue || '');
-    if (isNaN(value)) {
+    const expectedValue = parseInt(this.searchValue || '');
+    if (isNaN(expectedValue)) {
       return [];
     }
 
@@ -17,7 +17,7 @@ export class NumberFilterCondition extends FilterCondition {
       collectionFilter: {
         type: CompareCondition.EQUALS,
         field,
-        value,
+        expectedValue,
       },
     };
     return [numberFilter];
