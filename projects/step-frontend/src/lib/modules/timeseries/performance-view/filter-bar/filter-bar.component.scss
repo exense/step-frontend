@@ -1,5 +1,4 @@
-$secondaryBtnBackground: #fff2e2;
-$secondaryBtnColor: #ab793b;
+@use 'projects/step-core/styles/core-variables' as var;
 
 :host {
   display: flex;
@@ -9,18 +8,18 @@ $secondaryBtnColor: #ab793b;
 }
 
 .mat-raised-button.mat-primary {
-  background: #293e50;
+  background: var.$gray-800;
 }
 
 .warning-mark {
   position: absolute;
   left: 0;
   top: 0;
-  background-color: $secondaryBtnBackground;
-  color: $secondaryBtnColor;
+  background-color: var.$warn-yellow-background;
+  color: var.$warn-yellow-color;
   padding: 4px 34px;
   font-size: 12px;
-  border: 1px solid #ead5bd;
+  border: 1px solid var.$warn-yellow-border;
 }
 
 .filters {
@@ -48,6 +47,7 @@ $secondaryBtnColor: #ab793b;
 }
 
 .apply-btn {
-  background-color: $secondaryBtnBackground;
-  border: 1px solid #ebd9c2;
+  background-color: var.$warn-yellow-background;
+  border: 1px solid var.$warn-yellow-border;
+  color: var.$warn-yellow-color;
 }
