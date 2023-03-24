@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, TitleCasePipe } from '@angular/common';
 import { StepMaterialModule } from '../step-material/step-material.module';
 import { TableComponent } from './components/table/table.component';
 import { SearchColDirective } from './directives/search-col.directive';
@@ -52,6 +52,7 @@ import { StepBasicsModule } from '../basics/step-basics.module';
     AdditionalHeaderDirective,
     BulkOperationsComponent,
   ],
+  providers: [TitleCasePipe],
 })
 export class TableModule {}
 

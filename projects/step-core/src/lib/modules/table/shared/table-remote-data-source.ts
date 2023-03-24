@@ -2,6 +2,8 @@ import { CollectionViewer } from '@angular/cdk/collections';
 import {
   BehaviorSubject,
   catchError,
+  debounceTime,
+  exhaustMap,
   filter,
   map,
   Observable,
@@ -9,7 +11,6 @@ import {
   shareReplay,
   startWith,
   Subject,
-  switchMap,
   takeUntil,
   tap,
 } from 'rxjs';
@@ -110,23 +111,20 @@ const convertTableRequest = (req: TableRequestInternal): TableRequestData => {
 export class TableRemoteDataSource<T> implements TableDataSource<T> {
   private _terminator$ = new Subject<any>();
   private _inProgress$ = new BehaviorSubject<boolean>(false);
-  private _requestLock$ = new BehaviorSubject<boolean>(false);
   readonly inProgress$ = this._inProgress$.asObservable();
   private _request$ = new BehaviorSubject<{ request: TableRequestInternal; hideProgress?: boolean } | undefined>(
     undefined
   );
   private _response$: Observable<TableResponseGeneric<T> | null> = this._request$.pipe(
-    filter((x) => !!x && !this._requestLock$.value),
-    tap(() => {
-      this._requestLock$.next(true);
-    }),
+    filter((x) => !!x),
+    debounceTime(500),
     map((x) => {
       return { request: convertTableRequest(x!.request), hideProgress: x?.hideProgress };
     }),
     tap((x) => {
       this._inProgress$.next(!x.hideProgress);
     }),
-    switchMap((x) =>
+    exhaustMap((x) =>
       this._rest.requestTable<T>(this._tableId, x.request).pipe(
         catchError((err) => {
           console.error(err);
@@ -135,7 +133,6 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
       )
     ),
     tap((_) => {
-      this._requestLock$.next(false);
       this._inProgress$.next(false);
     }),
     startWith(null),

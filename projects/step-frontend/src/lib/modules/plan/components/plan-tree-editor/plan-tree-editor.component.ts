@@ -187,11 +187,12 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
     this._planHistory.discardAll();
   }
 
-  init(plan: Plan) {
+  init(plan: Plan, selectedArtefactId?: string): void {
     this.planInternal$.next(plan);
     const root = plan.root;
     if (root) {
-      this._treeState.init(root, [root.id!]);
+      const selectedId = selectedArtefactId || root.id!;
+      this._treeState.init(root, [selectedId]);
     }
     this._planHistory.init(plan);
   }
