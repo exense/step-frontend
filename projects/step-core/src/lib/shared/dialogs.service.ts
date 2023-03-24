@@ -21,7 +21,7 @@ export abstract class DialogsService {
     template: string,
     functionOnSuccess: (value: string) => void
   ): void;
-  abstract selectEntityType(excludeArray: string[], id: string): IPromise<unknown>;
+  abstract selectEntityType<T>(excludeArray: string[], id: string): IPromise<T>;
   abstract showEntityInAnotherProject(newProjectName?: string): IPromise<unknown>;
   abstract showAssignmentWarning(msg: string): IPromise<unknown>;
 }
