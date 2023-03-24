@@ -4,6 +4,7 @@ import { FilterCondition } from '../shared/filter-condition';
 import { SingleDateFilterCondition } from '../shared/single-date-filter-condition';
 import { ScopeFilterCondition } from '../shared/scope-filter-condition';
 import { ReportNodeFilterCondition } from '../shared/report-node-filter-condition';
+import { NumberFilterCondition } from '../shared/number-filter-condition';
 
 @Injectable({
   providedIn: 'root',
@@ -19,5 +20,9 @@ export class FilterConditionFactoryService {
 
   reportNodeFilterCondition(value?: string, attributes?: string[]): FilterCondition {
     return new ReportNodeFilterCondition(value, attributes);
+  }
+
+  numberFilterCondition(value?: string): FilterCondition {
+    return new NumberFilterCondition(value);
   }
 }
