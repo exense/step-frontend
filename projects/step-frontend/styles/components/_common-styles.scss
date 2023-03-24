@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 @mixin common-styles {
   .w-100 {
     width: 100%;
@@ -15,5 +17,9 @@
   #step-main-scrollable-content {
     flex: 1;
     overflow: auto;
+  }
+
+  .danger-warning {
+    color: var.$red-50;
   }
 }

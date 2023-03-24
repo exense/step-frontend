@@ -1,6 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import {
   Component,
+  ElementRef,
   forwardRef,
   Inject,
   Input,
@@ -17,6 +18,7 @@ import {
   AbstractArtefact,
   AJS_LOCATION,
   AJS_MODULE,
+  ArtefactRefreshNotificationService,
   ArtefactTreeNode,
   AugmentedScreenService,
   AuthService,
@@ -32,10 +34,10 @@ import {
   PlanInteractiveSessionService,
   PlansService,
   RepositoryObjectReference,
+  RestoreDialogsService,
+  SplitComponent,
   TreeNodeUtilsService,
   TreeStateService,
-  RestoreDialogsService,
-  ArtefactRefreshNotificationService,
 } from '@exense/step-core';
 import { ILocationService } from 'angular';
 import { catchError, filter, from, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
@@ -77,27 +79,14 @@ import { PlanHistoryService } from '../../services/plan-history.service';
 export class PlanEditorComponent
   implements OnInit, OnChanges, OnDestroy, PlanInteractiveSessionService, PlanArtefactResolverService
 {
-  private terminator$ = new Subject<unknown>();
-
-  @ViewChild('keywordCalls', { read: KeywordCallsComponent, static: false })
-  private keywords?: KeywordCallsComponent;
+  private get artefactIdFromUrl(): string | undefined {
+    const { artefactId } = this._location.search() || {};
+    return artefactId;
+  }
 
   @Input() planId?: string;
-
-  protected componentTabs = [
-    { id: 'controls', label: 'Controls' },
-    { id: 'keywords', label: 'Keywords' },
-    { id: 'other', label: 'Other Plans' },
-  ];
-
   selectedTab = 'controls';
-
   readonly isInteractiveSessionActive$ = this._interactiveSession.isActive$;
-
-  protected repositoryObjectRef?: RepositoryObjectReference;
-
-  protected planClass?: string;
-
   planTypes$ = this._planApi.getArtefactTemplates().pipe(
     map((planTypes) => {
       return planTypes.map((planType) => ({
@@ -107,6 +96,17 @@ export class PlanEditorComponent
     })
   );
   planTypeControl = new FormControl<{ planType: string; icon: string } | null>(null);
+  protected componentTabs = [
+    { id: 'controls', label: 'Controls' },
+    { id: 'keywords', label: 'Keywords' },
+    { id: 'other', label: 'Other Plans' },
+  ];
+  protected repositoryObjectRef?: RepositoryObjectReference;
+
+  protected planClass?: string;
+  private terminator$ = new Subject<unknown>();
+  @ViewChild('keywordCalls', { read: KeywordCallsComponent, static: false })
+  private keywords?: KeywordCallsComponent;
 
   constructor(
     public _interactiveSession: InteractiveSessionService,
@@ -137,7 +137,7 @@ export class PlanEditorComponent
     const cPlanId = changes['planId'];
     if (cPlanId?.previousValue !== cPlanId?.currentValue || cPlanId?.firstChange) {
       const planId = cPlanId?.currentValue;
-      this.loadPlan(planId);
+      this.loadPlan(planId, true);
       this.repositoryObjectRef = !planId
         ? undefined
         : {
@@ -189,13 +189,11 @@ export class PlanEditorComponent
 
     this._restoreDialogsService
       .showRestoreDialog(planVersion, versionHistory, permission)
-      .subscribe((restoreVersion) => {
-        if (!restoreVersion) {
-          return;
-        }
-
-        this._planApi.restorePlanVersion(plan.id!, restoreVersion).subscribe(() => this.loadPlan(plan.id!));
-      });
+      .pipe(
+        filter((restoreVersion) => !!restoreVersion),
+        switchMap((restoreVersion) => this._planApi.restorePlanVersion(plan.id!, restoreVersion))
+      )
+      .subscribe(() => this.loadPlan(plan.id!));
   }
 
   clonePlan(): void {
@@ -303,7 +301,7 @@ export class PlanEditorComponent
     });
   }
 
-  private loadPlan(planId: string): void {
+  private loadPlan(planId: string, preselectArtefact?: boolean): void {
     if (!planId) {
       return;
     }
@@ -326,7 +324,8 @@ export class PlanEditorComponent
           },
           { emitEvent: false }
         );
-        this._planEditService.init(plan);
+        const artefactId = preselectArtefact ? this.artefactIdFromUrl : undefined;
+        this._planEditService.init(plan, artefactId);
       });
   }
 
@@ -397,24 +396,30 @@ export class PlanEditorComponent
   }
 
   private initPlanTypeChanges(): void {
-    this.planTypeControl.valueChanges.pipe(takeUntil(this.terminator$)).subscribe((item) => {
-      if (!item || !this._planEditService.plan) {
-        return;
-      }
-
-      const plan = {
-        ...this._planEditService.plan,
-        root: {
-          ...this._planEditService.plan!.root,
-          _class: item.planType,
-        },
-      } as Plan;
-
-      this._planApi.savePlan(plan).subscribe((plan) => {
+    this.planTypeControl.valueChanges
+      .pipe(
+        takeUntil(this.terminator$),
+        map((item) => {
+          const plan = this._planEditService.plan;
+          return { item, plan };
+        }),
+        filter(({ item, plan }) => !!item && !!plan),
+        map(
+          ({ item, plan }) =>
+            ({
+              ...plan,
+              root: {
+                ...plan!.root,
+                _class: item!.planType,
+              },
+            } as Plan)
+        ),
+        switchMap((plan) => this._planApi.savePlan(plan))
+      )
+      .subscribe((plan) => {
         this.planClass = plan._class;
         this._planEditService.init(plan);
       });
-    });
   }
 }
 
