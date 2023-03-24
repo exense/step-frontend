@@ -1,1 +1,1 @@
-export const COPIED_ARTEFACTS = 'copiedArtefacts';
+export const COPIED_ARTEFACTS = 'COPIED_ARTEFACTS';

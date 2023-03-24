@@ -5,29 +5,66 @@ import { STORAGE } from '../shared/storage.token';
   providedIn: 'root',
 })
 export class PersistenceService implements Storage {
-  constructor(@Inject(STORAGE) private storage: Storage) {}
+  private readonly persistenceTokenPrefix = 'PERSISTENCE_';
 
+  constructor(@Inject(STORAGE) private _storage: Storage) {
+    this.initBeforeUnloadListener();
+  }
+
+  /**
+   * @implements Storage
+   */
   get length(): number {
-    return this.storage.length;
+    return this._storage.length;
   }
 
   clear(): void {
-    this.storage.clear();
+    this._storage.clear();
   }
 
+  /**
+   * @implements Storage
+   */
   getItem(key: string): string | null {
-    return this.storage.getItem(key);
+    return this._storage.getItem(this.prefix(key));
   }
 
+  /**
+   * @implements Storage
+   */
   key(index: number): string | null {
-    return this.storage.key(index);
+    return this._storage.key(index);
   }
 
+  /**
+   * @implements Storage
+   */
   removeItem(key: string): void {
-    this.storage.removeItem(key);
+    this._storage.removeItem(this.prefix(key));
   }
 
+  /**
+   * @implements Storage
+   */
   setItem(key: string, value: string): void {
-    this.storage.setItem(key, value);
+    this._storage.setItem(this.prefix(key), value);
+  }
+
+  private prefix(key: string): string {
+    return `${this.persistenceTokenPrefix}${key}`;
+  }
+
+  private initBeforeUnloadListener(): void {
+    window.addEventListener('beforeunload', () => {
+      this.clearPersistenceTokens();
+    });
+  }
+
+  private clearPersistenceTokens(): void {
+    Object.keys(this._storage)
+      .filter((key) => key.startsWith(this.persistenceTokenPrefix))
+      .forEach((key) => {
+        this._storage.removeItem(key);
+      });
   }
 }
