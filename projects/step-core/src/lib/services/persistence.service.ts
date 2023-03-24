@@ -1,4 +1,5 @@
-import { Inject, Injectable } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Inject, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 import { STORAGE } from '../shared/storage.token';
 
 @Injectable({
@@ -7,7 +8,14 @@ import { STORAGE } from '../shared/storage.token';
 export class PersistenceService implements Storage {
   private readonly persistenceTokenPrefix = 'PERSISTENCE_';
 
-  constructor(@Inject(STORAGE) private _storage: Storage) {
+  private _renderer: Renderer2;
+
+  constructor(
+    @Inject(STORAGE) private _storage: Storage,
+    private rendererFactory: RendererFactory2,
+    @Inject(DOCUMENT) private _document: Document
+  ) {
+    this._renderer = this.rendererFactory.createRenderer(null, null);
     this.initBeforeUnloadListener();
   }
 
@@ -55,7 +63,7 @@ export class PersistenceService implements Storage {
   }
 
   private initBeforeUnloadListener(): void {
-    window.addEventListener('beforeunload', () => {
+    this._renderer.listen(this._document.defaultView, 'beforeunload', () => {
       this.clearPersistenceTokens();
     });
   }
