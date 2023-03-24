@@ -35,5 +35,5 @@ export abstract class PlanEditorStrategy {
 
   //abstract initPlanUpdate(): void;
 
-  abstract init(plan: Plan): void;
+  abstract init(plan: Plan, selectedArtefactId?: string): void;
 }
