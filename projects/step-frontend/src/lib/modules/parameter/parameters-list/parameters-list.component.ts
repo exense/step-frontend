@@ -48,6 +48,10 @@ export class ParametersListComponent {
     this.tableSearch.onSearch('scope', this._filterConditionFactory.scopeFilterCondition(value));
   }
 
+  searchByPriority(value: string): void {
+    this.tableSearch.onSearch('priority', this._filterConditionFactory.numberFilterCondition(value));
+  }
+
   importParameter(): void {
     this._parameterDialogs.importParameter().subscribe(() => this.dataSource.reload());
   }
