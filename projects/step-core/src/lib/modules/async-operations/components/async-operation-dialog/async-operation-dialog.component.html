@@ -1,9 +1,13 @@
-<h3 mat-dialog-title>{{ _dialogData.title | titlecase }}</h3>
+<h3 mat-dialog-title [innerHTML]="_dialogData.title"></h3>
 <div mat-dialog-content>
   <div class="content">
     <ng-container [ngSwitch]="state">
-      <ng-container *ngSwitchCase="AsyncOperationDialogState.success">{{ successMessage }}</ng-container>
-      <ng-container *ngSwitchCase="AsyncOperationDialogState.error">{{ errorMessage }}</ng-container>
+      <ng-container *ngSwitchCase="AsyncOperationDialogState.success">
+        <div [innerHTML]="successMessage"></div>
+      </ng-container>
+      <ng-container *ngSwitchCase="AsyncOperationDialogState.error">
+        <div [innerHTML]="errorMessage"></div>
+      </ng-container>
       <ng-container *ngSwitchCase="AsyncOperationDialogState.progress">
         <mat-progress-bar [value]="progress" color="primary" mode="buffer"> </mat-progress-bar>
       </ng-container>
