@@ -12,10 +12,10 @@ export class PersistenceService implements Storage {
 
   constructor(
     @Inject(STORAGE) private _storage: Storage,
-    private rendererFactory: RendererFactory2,
+    private _rendererFactory: RendererFactory2,
     @Inject(DOCUMENT) private _document: Document
   ) {
-    this._renderer = this.rendererFactory.createRenderer(null, null);
+    this._renderer = this._rendererFactory.createRenderer(null, null);
     this.initBeforeUnloadListener();
   }
 
@@ -26,6 +26,9 @@ export class PersistenceService implements Storage {
     return this._storage.length;
   }
 
+  /**
+   * @implements Storage
+   */
   clear(): void {
     this._storage.clear();
   }
