@@ -1,16 +1,8 @@
 import { IPromise, IScope } from 'angular';
 import { Injectable } from '@angular/core';
 import { INJECTOR } from '../modules/basics/step-basics.module';
-import { TableFilter } from '../client/generated';
+import { SelectEntityOfTypeResult } from '../modules/entity/entity.module';
 
-export interface SelectEntityTypeResult {
-  entity: { entityName?: string; displayName?: string };
-  selectAll?: boolean;
-  assignAll?: boolean;
-  item?: any;
-  array?: string[];
-  filters?: TableFilter[];
-}
 
 @Injectable({
   providedIn: 'root',
@@ -31,13 +23,7 @@ export abstract class DialogsService {
     template: string,
     functionOnSuccess: (value: string) => void
   ): void;
-  abstract selectEntityOfType(
-    entityName: string,
-    singleSelection: boolean,
-    id?: string
-  ): IPromise<SelectEntityTypeResult>;
-  abstract selectEntityType(excludeArray: string[], id: string): IPromise<SelectEntityTypeResult>;
-  abstract selectEntityTypeForEntities(excludeArray: string[], callback: Function, arg: unknown): void;
+  abstract selectEntityType(excludeArray: string[], id: string): IPromise<SelectEntityOfTypeResult>;
   abstract showEntityInAnotherProject(newProjectName?: string): IPromise<unknown>;
   abstract showAssignmentWarning(msg: string): IPromise<unknown>;
 }

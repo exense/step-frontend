@@ -1,8 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Type } from '@angular/core';
 import { EntityMeta } from '../types/entity-meta';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE } from '../../../shared';
-import { CustomRegistryService, CustomRegistryType } from '../../custom-registeries/custom-registries.module';
+import {
+  CustomComponent,
+  CustomRegistryService,
+  CustomRegistryType
+} from '../../custom-registeries/custom-registries.module';
 
 @Injectable({
   providedIn: 'root',
@@ -21,11 +25,23 @@ export class EntityRegistry {
     getUrl?: string,
     postUrl?: string,
     tableType?: string,
-    templateUrl?: string,
-    callback?: Function
+    templateUrlOrComponent?: string | Type<CustomComponent>,
+    callback?: Function,
   ): void {
     const type = entityName;
     const label = displayName;
+
+    let templateUrl: string | undefined = undefined;
+    let component: Type<CustomComponent> | undefined = undefined;
+
+    if (templateUrlOrComponent) {
+      if (typeof templateUrlOrComponent === 'string') {
+        templateUrl = templateUrlOrComponent;
+      } else {
+        component = templateUrlOrComponent;
+      }
+    }
+
     const entity: EntityMeta = {
       type,
       label,
@@ -38,6 +54,7 @@ export class EntityRegistry {
       templateUrl,
       callback,
       icon,
+      component
     };
     this._customRegistry.register(this.registryType, type, entity);
   }
@@ -49,8 +66,8 @@ export class EntityRegistry {
    * @param icon
    * @param templateUrl
    */
-  register(type: string, label: string, icon?: string, templateUrl?: string): void {
-    return this.registerEntity(label, type, icon, undefined, undefined, undefined, undefined, templateUrl);
+  register(type: string, label: string, icon?: string, templateUrlOrComponent?: string | Type<CustomComponent>): void {
+    return this.registerEntity(label, type, icon, undefined, undefined, undefined, undefined, templateUrlOrComponent);
   }
 
   getEntities(): ReadonlyArray<EntityMeta> {

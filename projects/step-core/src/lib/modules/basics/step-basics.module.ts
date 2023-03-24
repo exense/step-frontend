@@ -13,6 +13,7 @@ import { ZIndexDirective } from './directives/z-index.directive';
 import { JsonRawEditorComponent } from './components/json-raw-editor/json-raw-editor.component';
 import { ElementRefMapDirective } from './directives/element-ref-map.directive';
 import { WidthExpandersDirective } from './directives/width-expanders.directive';
+import { ModalWindowComponent } from './components/modal-window/modal-window.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
@@ -28,6 +29,7 @@ import { WidthExpandersDirective } from './directives/width-expanders.directive'
     JsonRawEditorComponent,
     ElementRefMapDirective,
     WidthExpandersDirective,
+    ModalWindowComponent,
   ],
   exports: [
     ResourceLabelComponent,
@@ -41,6 +43,7 @@ import { WidthExpandersDirective } from './directives/width-expanders.directive'
     JsonRawEditorComponent,
     ElementRefMapDirective,
     WidthExpandersDirective,
+    ModalWindowComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -51,16 +54,21 @@ export * from './components/input-filter/hexadecimal-input-filter.component';
 export * from './components/input-filter/input-filter.component';
 export * from './components/resource-label/resource-label.component';
 export * from './components/json-raw-editor/json-raw-editor.component';
+export * from './components/modal-window/modal-window.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
 export * from './pipes/has-right.pipe';
 export * from './services/artefact-types.service';
 export * from './services/login.service';
 export * from './services/auth.service';
+export * from './services/hybrid-injector-helper';
+export * from './services/project-management-helper.service';
 export * from './shared/angularjs-provider-options';
 export * from './shared/auth-context.interface';
 export * from './shared/compare-condition.enum';
 export * from './shared/login-strategy';
 export * from './shared/restore-dialog-data';
+export * from './shared/project-management-helper-strategy.interface';
+export * from './shared/project-info.interface';
 export * from './directives/element-ref-map.directive';
 export * from './directives/width-expanders.directive';

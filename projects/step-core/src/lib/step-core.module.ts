@@ -19,7 +19,6 @@ import { FunctionLinkComponent } from './components/function-link/function-link.
 import { IsUsedByListComponent } from './components/is-used-by-list/is-used-by-list.component';
 import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 import { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
-import { ModalWindowComponent } from './components/modal-window/modal-window.component';
 import { PlanLinkComponent } from './components/plan-link/plan-link.component';
 import { PlanTreeActionsComponent } from './components/plan-tree-actions/plan-tree-actions.component';
 import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
@@ -68,7 +67,6 @@ import { ResourceDialogsService } from './services/resource-dialogs.service';
     ReportNodeStatusComponent,
     PlanLinkComponent,
     PlanNamePipe,
-    ModalWindowComponent,
     IsUsedByListComponent,
     IsUsedByModalComponent,
     FunctionLinkComponent,
@@ -142,7 +140,6 @@ import { ResourceDialogsService } from './services/resource-dialogs.service';
     ReportNodeStatusComponent,
     PlanLinkComponent,
     PlanNamePipe,
-    ModalWindowComponent,
     IsUsedByModalComponent,
     SelectPlanComponent,
     PlanTreeComponent,
@@ -213,7 +210,6 @@ export { ResourceDialogsService } from './services/resource-dialogs.service';
 export { FunctionLinkComponent } from './components/function-link/function-link.component';
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
-export { ModalWindowComponent } from './components/modal-window/modal-window.component';
 export { PlanLinkComponent } from './components/plan-link/plan-link.component';
 export * from './components/plan-tree/plan-tree.component';
 export { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
