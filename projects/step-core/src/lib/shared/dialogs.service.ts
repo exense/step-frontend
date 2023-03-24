@@ -1,8 +1,6 @@
 import { IPromise, IScope } from 'angular';
 import { Injectable } from '@angular/core';
 import { INJECTOR } from '../modules/basics/step-basics.module';
-import { SelectEntityOfTypeResult } from '../modules/entity/entity.module';
-
 
 @Injectable({
   providedIn: 'root',
@@ -23,7 +21,7 @@ export abstract class DialogsService {
     template: string,
     functionOnSuccess: (value: string) => void
   ): void;
-  abstract selectEntityType(excludeArray: string[], id: string): IPromise<SelectEntityOfTypeResult>;
+  abstract selectEntityType(excludeArray: string[], id: string): IPromise<unknown>;
   abstract showEntityInAnotherProject(newProjectName?: string): IPromise<unknown>;
   abstract showAssignmentWarning(msg: string): IPromise<unknown>;
 }

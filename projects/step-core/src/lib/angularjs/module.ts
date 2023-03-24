@@ -9,7 +9,6 @@ import {
   SIMPLE_LINE_CHART_WRAPPER_DIRECTIVE,
   SimpleLineChartWrapper,
 } from './directives/simple-line-chart-wrapper.directive';
-import { EntityLegacyTableWrapper } from './directives/entity-legacy-table-wrapper.directive';
 
 export const STEP_CORE_JS = 'stepCoreJS';
 
@@ -18,5 +17,4 @@ getAngularJSGlobal()
   .directive(TOOLTIP_DIRECTIVE, [() => TooltipDirective])
   .directive(STEP_ICON_DIRECTIVE_NAME, STEP_ICON_DIRECTIVE)
   .directive(ARTEFACT_DETAILS_WRAPPER, [() => ArtefactDetailsWrapperDirective])
-  .directive(SIMPLE_LINE_CHART_WRAPPER_DIRECTIVE, [() => SimpleLineChartWrapper])
-  .directive('stEntityLegacyTableWrapper', [() => EntityLegacyTableWrapper]);
+  .directive(SIMPLE_LINE_CHART_WRAPPER_DIRECTIVE, [() => SimpleLineChartWrapper]);

@@ -17,6 +17,7 @@ export class EntityModule {}
 export * from './components/entity-icon/entity-icon.component';
 export * from './components/select-entity-of-type/select-entity-of-type.component';
 export * from './components/base-entity-selection-table/base-entity-selection-table.component';
+export * from './directives/entity-legacy-table-wrapper.directive';
 export * from './services/entity-registry';
 export * from './services/entity-scope-resolver';
 export * from './services/entity-dialogs.service';
