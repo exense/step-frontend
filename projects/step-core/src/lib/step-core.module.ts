@@ -272,6 +272,7 @@ export { ResourceDialogsService } from './services/resource-dialogs.service';
 export * from './services/resource-input-bridge.service';
 export * from './services/restore-dialogs.service';
 export * from './services/scheduled-task-dialogs.service';
+export * from './services/menu-items-override-config.service';
 export { UibModalHelperService, UibModalInstance } from './services/uib-modal-helper.service';
 export * from './services/view-registry.service';
 export * from './services/view-state.service';

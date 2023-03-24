@@ -9,12 +9,11 @@ export interface CustomView {
 }
 
 export interface MenuEntry {
-  label: string;
-  viewId: string;
-  parentMenu?: string;
+  id: string;
+  title: string;
   icon: string;
   weight?: number;
-  right?: string;
+  parentId?: string;
   isEnabledFct(): boolean;
 }
 
@@ -59,7 +58,7 @@ export class ViewRegistryService {
     this.registerMenuEntry('Scheduler', 'scheduler', 'clock', 20, 'execute-root');
     this.registerMenuEntry('Analytics', 'analytics', 'bar-chart-2', 20, 'execute-root');
     // Sub Menus Status
-    this.registerMenuEntry('Current Operations', 'operations', 'airplay', 10, 'status-root', 'operations-read');
+    this.registerMenuEntry('Current Operations', 'operations', 'airplay', 10, 'status-root');
     this.registerMenuEntry('Agents', 'gridagents', 'users', 20, 'status-root');
     this.registerMenuEntry('Agent tokens', 'gridtokens', 'circle', 30, 'status-root');
     this.registerMenuEntry('Token Groups', 'gridtokengroups', 'tag', 40, 'status-root');
@@ -123,35 +122,27 @@ export class ViewRegistryService {
     this.registeredViews[viewId] = { template: template, isPublicView: isPublicView, isStaticView: isStaticView };
   }
 
-  registerMenuEntry(
-    label: string,
-    viewId: string,
-    icon: string,
-    weight?: number,
-    parentMenu?: string,
-    right?: string
-  ): void {
-    if (!viewId || this.registeredMenuIds.includes(viewId)) {
+  registerMenuEntry(title: string, id: string, icon: string, weight?: number, parentId?: string): void {
+    if (!id || this.registeredMenuIds.includes(id)) {
       return;
     }
-    this.registeredMenuIds.push(viewId);
+    this.registeredMenuIds.push(id);
     this.registeredMenuEntries.push({
-      label,
-      viewId,
-      parentMenu,
+      title,
+      id,
+      parentId,
       icon,
       weight,
-      right,
       isEnabledFct: () => true,
     });
   }
 
-  getMainMenuKey(subMenuKey: string): string | undefined {
-    return this.registeredMenuEntries.find((entry: MenuEntry) => entry.viewId === subMenuKey)?.parentMenu;
+  getMainMenuKey(subMenuId: string): string | undefined {
+    return this.registeredMenuEntries.find((entry: MenuEntry) => entry.id === subMenuId)?.parentId;
   }
 
   getMainMenuAll(): MenuEntry[] {
-    return this.registeredMenuEntries.filter((entry: MenuEntry) => !entry.parentMenu);
+    return this.registeredMenuEntries.filter((entry: MenuEntry) => !entry.parentId);
   }
 
   getDashlets(path: string) {
