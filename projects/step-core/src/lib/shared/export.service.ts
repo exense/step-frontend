@@ -8,4 +8,5 @@ import { INJECTOR } from '../modules/basics/step-basics.module';
 })
 export abstract class ExportService {
   abstract get(url: string): void;
+  abstract poll(exportId: string): void;
 }

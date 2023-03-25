@@ -7,6 +7,7 @@ import { ParameterSelectionComponent } from './parameter-selection/parameter-sel
 import { ParametersIconComponent } from './parameters-icon/parameters-icon.component';
 import { ParametersKeyComponent } from './parameters-key/parameters-key.component';
 import { ParametersListComponent } from './parameters-list/parameters-list.component';
+import { ParameterLastModificationComponent } from './parameter-last-modification/parameter-last-modification.component';
 
 @NgModule({
   imports: [StepCoreModule, StepCommonModule],
@@ -17,6 +18,7 @@ import { ParametersListComponent } from './parameters-list/parameters-list.compo
     ParametersKeyComponent,
     ParameterScopeComponent,
     ParameterSelectionComponent,
+    ParameterLastModificationComponent,
   ],
 })
 export class ParameterModule {
@@ -32,6 +34,7 @@ export class ParameterModule {
       '/partials/parameters/parameterSelectionTable.html'
     );
 
+    _cellRegister.registerCell('parameterLastModification', ParameterLastModificationComponent);
     _cellRegister.registerCell('parameterEntityIcon', ParametersIconComponent);
     _cellRegister.registerCell('parameterKey', ParametersKeyComponent);
   }

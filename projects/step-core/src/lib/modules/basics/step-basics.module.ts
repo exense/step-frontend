@@ -11,6 +11,8 @@ import { ArtefactIconPipe } from './pipes/artefact-icon.pipe';
 import { HasRightPipe } from './pipes/has-right.pipe';
 import { ZIndexDirective } from './directives/z-index.directive';
 import { JsonRawEditorComponent } from './components/json-raw-editor/json-raw-editor.component';
+import { ElementRefMapDirective } from './directives/element-ref-map.directive';
+import { WidthExpandersDirective } from './directives/width-expanders.directive';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
@@ -24,6 +26,8 @@ import { JsonRawEditorComponent } from './components/json-raw-editor/json-raw-ed
     ArtefactIconPipe,
     ZIndexDirective,
     JsonRawEditorComponent,
+    ElementRefMapDirective,
+    WidthExpandersDirective,
   ],
   exports: [
     ResourceLabelComponent,
@@ -35,6 +39,8 @@ import { JsonRawEditorComponent } from './components/json-raw-editor/json-raw-ed
     ArtefactIconPipe,
     ZIndexDirective,
     JsonRawEditorComponent,
+    ElementRefMapDirective,
+    WidthExpandersDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -56,3 +62,5 @@ export * from './shared/auth-context.interface';
 export * from './shared/compare-condition.enum';
 export * from './shared/login-strategy';
 export * from './shared/restore-dialog-data';
+export * from './directives/element-ref-map.directive';
+export * from './directives/width-expanders.directive';

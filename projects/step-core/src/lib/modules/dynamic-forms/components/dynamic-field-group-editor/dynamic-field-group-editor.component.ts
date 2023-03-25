@@ -31,7 +31,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
   private readonly formBuilder: NonNullableFormBuilder = this._fb.nonNullable;
   private schemaJson: string = '';
 
-  private lastEmittedValue?: DynamicFieldGroupValue;
+  private lastFormValue?: DynamicFieldGroupValue;
 
   @Input() primaryFieldsLabel?: string;
   @Input() optionalFieldsLabel?: string;
@@ -78,7 +78,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
 
     if (schemeChanged) {
       this.buildForm(schema, value);
-    } else if (value && value !== this.lastEmittedValue) {
+    } else if (value && !this.isFieldGroupValueEqual(value, this.lastFormValue)) {
       this.assignValueToForm(value);
     }
 
@@ -106,7 +106,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
 
   protected addOptionalField(fieldName?: string): void {
     const isAdditional = !fieldName;
-    this.addFieldInternal(this.schema!, fieldName || '', this.value, { isAdditional });
+    this.addFieldInternal(this.schema, fieldName || '', this.value, { isAdditional });
   }
 
   protected removeField(field: DynamicFieldMetaData): void {
@@ -150,11 +150,11 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     // for non required and additional fields add only those, which exist in value
     nonRequiredFields
       .filter((field) => valueFields.includes(field))
-      .forEach((field) => this.addFieldInternal(schema!, field, value));
+      .forEach((field) => this.addFieldInternal(schema, field, value));
 
     additionalFields
       .filter((field) => valueFields.includes(field))
-      .forEach((field) => this.addFieldInternal(schema!, field, value, { isAdditional: true }));
+      .forEach((field) => this.addFieldInternal(schema, field, value, { isAdditional: true }));
 
     this.enableDisableForm(this.isDisabled);
     this.setupFormBehavior();
@@ -182,7 +182,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
             res[key] = formValue[key];
             return res;
           }, {} as DynamicFieldGroupValue);
-        this.lastEmittedValue = result;
+        this.lastFormValue = result;
         this.valueChange.emit(result);
       });
   }
@@ -208,22 +208,23 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     // add possible new optional inputs
     [...this.possibleFieldsToAdd]
       .filter((fieldKey) => !!value[fieldKey])
-      .forEach((fieldKey) => this.addFieldInternal(this.schema!, fieldKey, value));
+      .forEach((fieldKey) => this.addFieldInternal(this.schema, fieldKey, value));
 
     // add new additional inputs
     const formFieldKeys = [...this.primaryFields, ...this.optionalFields].map((field) => field.key);
     const newAdditionalInputs = Object.keys(value).filter((fieldKey) => !formFieldKeys.includes(fieldKey));
 
     newAdditionalInputs.filter((fieldKey) =>
-      this.addFieldInternal(this.schema!, fieldKey, value, { isAdditional: true })
+      this.addFieldInternal(this.schema, fieldKey, value, { isAdditional: true })
     );
 
     this.enableDisableForm(this.isDisabled);
+    this.lastFormValue = value;
     this.setupFormBehavior();
   }
 
   private addFieldInternal(
-    schema: DynamicFieldsSchema,
+    schema: DynamicFieldsSchema | undefined,
     field: string,
     value: DynamicFieldGroupValue = {},
     config?: { isRequired?: boolean; isAdditional?: boolean }
@@ -235,7 +236,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     let enumItems: string[] = [];
 
     if (!isAdditional) {
-      const fieldDescription = schema.properties[field];
+      const fieldDescription = schema?.properties[field];
       if (!fieldDescription) {
         throw new Error('Invalid schema');
       }
@@ -267,7 +268,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
       ...DEFAULT_FIELD_VALUE,
     };
     if (fieldValue.value === undefined && value[field] === undefined) {
-      fieldValue.value = schema.properties?.[field]?.default;
+      fieldValue.value = schema?.properties?.[field]?.default;
     }
 
     const validator = isRequired ? DYNAMIC_FIELD_VALIDATOR : undefined;
@@ -312,5 +313,38 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     } else if (!isDisabled && this.form.disabled) {
       this.form.enable();
     }
+  }
+
+  private isFieldGroupValueEqual(valueA?: DynamicFieldGroupValue, valueB?: DynamicFieldGroupValue): boolean {
+    if (valueA === valueB) {
+      return true;
+    }
+    if (valueA === undefined || valueB === undefined) {
+      return false;
+    }
+    const keysA = Object.keys(valueA || {});
+    const keysB = Object.keys(valueB || {});
+    if (keysA.length !== keysB.length) {
+      return false;
+    }
+    const keysEqual = keysA.every((key) => keysB.includes(key));
+    if (!keysEqual) {
+      return false;
+    }
+
+    for (let key of keysA) {
+      const fieldA = valueA?.[key];
+      const fieldB = valueB?.[key];
+      if (
+        fieldA?.dynamic !== fieldB?.dynamic ||
+        fieldA?.value !== fieldB?.value ||
+        fieldA?.expression !== fieldB?.expression ||
+        fieldA?.expressionType !== fieldB?.expression
+      ) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

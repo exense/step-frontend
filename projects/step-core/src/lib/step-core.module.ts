@@ -25,7 +25,9 @@ import { PlanTreeActionsComponent } from './components/plan-tree-actions/plan-tr
 import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
+import { ResourceInputComponent } from './components/resouce-input/resouce-input.component';
 import { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
+import { SearchResourceDialogComponent } from './components/search-resource-dialog/search-resource-dialog.component';
 import { SelectPlanComponent } from './components/select-plan/select-plan.component';
 import { SettingButtonComponent } from './components/setting-button/setting-button.component';
 import { SplitAreaComponent } from './components/split-area/split-area.component';
@@ -36,6 +38,7 @@ import { CORE_INITIALIZER } from './core-initialiser';
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { CapsLockDirective } from './directives/caps-lock.directive';
 import { ElementResizeDirective } from './directives/element-resize.directive';
+import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 import { FocusableDirective } from './directives/focusable.directive';
 import { FocusablesDirective } from './directives/focusables.directive';
 import { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
@@ -98,6 +101,9 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     SplitAreaComponent,
     SplitGutterComponent,
     ElementResizeDirective,
+    ResourceInputComponent,
+    SearchResourceDialogComponent,
+    MaxHeightViewportHeightMinusOffsetTopDirective,
     TrapFocusDirective,
     FocusableDirective,
     FocusablesDirective,
@@ -170,6 +176,9 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     SplitAreaComponent,
     SplitGutterComponent,
     ElementResizeDirective,
+    ResourceInputComponent,
+    SearchResourceDialogComponent,
+    MaxHeightViewportHeightMinusOffsetTopDirective,
     TrapFocusDirective,
     FocusableDirective,
     FocusablesDirective,
@@ -222,7 +231,9 @@ export { PlanLinkComponent } from './components/plan-link/plan-link.component';
 export * from './components/plan-tree/plan-tree.component';
 export { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 export * from './components/report-node-status/report-node-status.component';
+export { ResourceInputComponent } from './components/resouce-input/resouce-input.component';
 export { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
+export { SearchResourceDialogComponent } from './components/search-resource-dialog/search-resource-dialog.component';
 export { SelectPlanComponent } from './components/select-plan/select-plan.component';
 export { SettingButtonComponent } from './components/setting-button/setting-button.component';
 export { SplitAreaComponent } from './components/split-area/split-area.component';
@@ -233,6 +244,7 @@ export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
+export { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 export { FocusableDirective } from './directives/focusable.directive';
 export { FocusablesDirective } from './directives/focusables.directive';
 export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
@@ -262,7 +274,7 @@ export * from './services/artefact-refresh-notification.service';
 export * from './services/dashboard.service';
 export * from './services/deferred-link-processor.service';
 export * from './services/execution-close-handle.service';
-export { ExportDialogsService } from './services/export-dialogs.service';
+export * from './services/export-dialogs.service';
 export { ImportDialogsService } from './services/import-dialogs.service';
 export * from './services/invoke-run.service';
 export { IsUsedByDialogService } from './services/is-used-by-dialog.service';
@@ -272,6 +284,7 @@ export { PlanDialogsService } from './services/plan-dialogs.service';
 export * from './services/plan-editor.service';
 export * from './services/plan-interactive-session.service';
 export * from './services/plugin-info-registry.service';
+export { ResourceDialogsService } from './services/resource-dialogs.service';
 export * from './services/resource-input-bridge.service';
 export * from './services/restore-dialogs.service';
 export * from './services/scheduled-task-dialogs.service';

@@ -1,0 +1,30 @@
+@mixin quota-manager-ctrl {
+  #QuotaManagerCtrl {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    div.middle {
+      height: 100%;
+      width: fit-content;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+
+      > .above {
+        display: flex;
+        justify-content: flex-end;
+        flex-direction: row;
+        width: 100%;
+        margin-bottom: 8px;
+      }
+
+      > textarea {
+        font-size: 14px;
+        width: 500px;
+      }
+    }
+  }
+}

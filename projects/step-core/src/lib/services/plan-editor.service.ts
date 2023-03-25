@@ -10,6 +10,7 @@ type FieldAccessor = Mutable<Partial<Pick<PlanEditorService, 'hasRedo$' | 'hasUn
 })
 export class PlanEditorService implements PlanEditorStrategy {
   private planInit?: Plan;
+  private selectedArtefactIdInit?: string;
 
   private strategy?: PlanEditorStrategy;
 
@@ -29,8 +30,9 @@ export class PlanEditorService implements PlanEditorStrategy {
     (this as FieldAccessor).hasUndo$ = strategy.hasUndo$;
     (this as FieldAccessor).plan$ = strategy.plan$;
     if (this.planInit) {
-      this.strategy.init(this.planInit);
+      this.strategy.init(this.planInit, this.selectedArtefactIdInit);
       this.planInit = undefined;
+      this.selectedArtefactIdInit = undefined;
     }
   }
 
@@ -138,11 +140,12 @@ export class PlanEditorService implements PlanEditorStrategy {
     this.strategy.toggleSkip(node);
   }
 
-  init(plan: Plan): void {
+  init(plan: Plan, selectedArtefactId?: string): void {
     if (!this.strategy) {
       this.planInit = plan;
+      this.selectedArtefactIdInit = selectedArtefactId;
       return;
     }
-    this.strategy.init(plan);
+    this.strategy.init(plan, selectedArtefactId);
   }
 }

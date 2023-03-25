@@ -1,23 +1,12 @@
-import {
-  Component,
-  forwardRef,
-  Inject,
-  Input,
-  OnChanges,
-  OnDestroy,
-  SimpleChanges,
-  ViewEncapsulation,
-} from '@angular/core';
+import { Component, forwardRef, Inject, ViewEncapsulation } from '@angular/core';
 import {
   AbstractArtefact,
-  AJS_MODULE,
   ReportNode,
   TreeAction,
   TreeActionsService,
   TreeNode,
   TreeStateService,
 } from '@exense/step-core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   EXECUTION_TREE_PAGE_LIMIT,
   EXECUTION_TREE_PAGING,
@@ -40,41 +29,14 @@ import { Observable, of } from 'rxjs';
   ],
   encapsulation: ViewEncapsulation.None,
 })
-export class ExecutionTreeComponent implements OnChanges, TreeActionsService, OnDestroy {
+export class ExecutionTreeComponent implements TreeActionsService {
   readonly selectedNode$: Observable<ReportTreeNode | undefined> = this._treeState.selectedNode$;
-
-  @Input() nodeId?: string;
-  @Input() handle: any; // temporary solution, while the whole page is working in hybrid mode
-
-  static lastNodeId?: string;
 
   constructor(
     @Inject(EXECUTION_TREE_PAGING) private _paging: ExecutionTreePaging,
     private _treeState: TreeStateService<ReportNode, ReportTreeNode>,
     private _treeUtils: ReportTreeNodeUtilsService
   ) {}
-
-  ngOnChanges(changes: SimpleChanges): void {
-    const cNodeId = changes['nodeId'];
-    if (cNodeId?.previousValue !== cNodeId?.currentValue || cNodeId?.firstChange) {
-      const nodeId = cNodeId!.currentValue;
-
-      if (nodeId !== ExecutionTreeComponent.lastNodeId) {
-        this.loadTree(nodeId);
-        ExecutionTreeComponent.lastNodeId = nodeId;
-      }
-    }
-
-    const cHandle = changes['handle'];
-    if (cHandle?.previousValue !== cHandle?.currentValue || cHandle?.firstChange) {
-      this.destroyHandle(cHandle.previousValue);
-      this.setupHandle(cHandle.currentValue);
-    }
-  }
-
-  ngOnDestroy(): void {
-    this.destroyHandle(this.handle);
-  }
 
   handleContextAction(actionId: string, node?: AbstractArtefact): void {
     const nodeId = node?.id!;
@@ -89,14 +51,6 @@ export class ExecutionTreeComponent implements OnChanges, TreeActionsService, On
         return;
     }
     this._treeState.reloadChildrenForNode(nodeId);
-  }
-
-  private loadTree(nodeId: string): void {
-    this._treeUtils.loadNodes(nodeId).subscribe((nodes) => {
-      if (!!nodes[0]) {
-        this._treeState.init(nodes[0], [], false);
-      }
-    });
   }
 
   getActionsForNode(node: TreeNode): Observable<TreeAction[]> {
@@ -155,25 +109,4 @@ export class ExecutionTreeComponent implements OnChanges, TreeActionsService, On
         : '')
     );
   }
-
-  private setupHandle(handle: any): void {
-    if (!handle) {
-      return;
-    }
-    handle.expandPath = (nodes: ReportNode[]) => {
-      const path = nodes.map((node) => node.id!);
-      this._treeState.expandNode(path).subscribe();
-    };
-  }
-
-  private destroyHandle(handle: any): void {
-    if (!handle) {
-      return;
-    }
-    handle.expandPath = undefined;
-  }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepExecutionTree', downgradeComponent({ component: ExecutionTreeComponent }));

@@ -23,6 +23,21 @@ $gray-800: #1d2939;
 
 //#region Blue
 $blue-600: #0082cb;
+$blue-700: #293e50;
+//#endregion
+
+//#region Red
+$red-50: #d9534f;
+//#endregion
+
+//#region Material
+// :hover
+$mat-hover-overlay-opacity: 0.04;
+// :focus
+$mat-focus-overlay-opacity: 0.12;
+// :disabled
+$mat-disabled-color: rgba(0, 0, 0, 0.26);
+$mat-disabled-background-color: rgba(0, 0, 0, 0.12);
 //#endregion
 
 $statuses: (

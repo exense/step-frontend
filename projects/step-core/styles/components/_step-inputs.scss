@@ -108,8 +108,8 @@
             border: 1px solid $border-color;
             border-radius: 8px;
             font-weight: 400;
-            padding: 10px 14px;
-            line-height: 20px;
+            padding: 8px 14px;
+            line-height: 18px;
             margin-top: 0;
             margin-bottom: 0;
             box-sizing: border-box;
@@ -236,19 +236,6 @@
       }
     }
 
-    &.with-reduced-inner-padding {
-      .mat-form-field-wrapper .mat-form-field-flex {
-        .mat-form-field-infix {
-          mat-select,
-          mat-radio-group,
-          .mat-input-element {
-            padding: 8px 14px;
-            line-height: 18px;
-          }
-        }
-      }
-    }
-
     &.step-force-focus,
     &.mat-focused {
       @include focused($config);
@@ -282,21 +269,6 @@
 
           .suffix-separator {
             border-right: 1px solid $error-color;
-          }
-        }
-      }
-    }
-  }
-
-  th {
-    mat-form-field.step-view {
-      .mat-form-field-wrapper .mat-form-field-flex {
-        .mat-form-field-infix {
-          mat-select,
-          mat-radio-group,
-          .mat-input-element {
-            padding: 8px 14px;
-            line-height: 18px;
           }
         }
       }

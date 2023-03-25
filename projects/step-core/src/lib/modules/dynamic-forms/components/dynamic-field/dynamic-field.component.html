@@ -10,7 +10,7 @@
   [class.editable-label]="canEditLabel"
 >
   <ng-container matPrefix>
-    <div class="dynamic-field-label">
+    <div class="dynamic-field-label" stepElementRefMap [key]="elementRefMapKey">
       <ng-container *ngIf="canEditLabel; else staticLabel">
         <input
           type="text"

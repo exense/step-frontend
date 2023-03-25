@@ -1,5 +1,6 @@
 import { Component, Inject } from '@angular/core';
-import { AugmentedResourcesService, Resource } from '@exense/step-core';
+import { AugmentedResourcesService } from '../../client/augmented/services/augmented-resources-service';
+import { Resource } from '../../client/generated';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
