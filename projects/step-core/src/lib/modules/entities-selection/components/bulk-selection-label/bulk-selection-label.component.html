@@ -1,6 +1,17 @@
 <mat-label [ngSwitch]="selectionType">
   <ng-container *ngSwitchCase="BulkSelectionType.None"> No items selected </ng-container>
-  <ng-container *ngSwitchCase="BulkSelectionType.All"> All items selected </ng-container>
-  <ng-container *ngSwitchCase="BulkSelectionType.Filtered"> Filtered items selected </ng-container>
-  <ng-container *ngSwitchDefault> {{ selectionCollector?.length$ | async }} item(s) selected </ng-container>
+  <ng-container *ngSwitchCase="BulkSelectionType.All">
+    All items selected. <a href="#" (click)="clearSelection(); (false)">Clear selection</a>
+  </ng-container>
+  <ng-container *ngSwitchCase="BulkSelectionType.Filtered">
+    Filtered items selected. <a href="#" (click)="clearSelection(); (false)">Clear selection</a>
+  </ng-container>
+  <ng-container *ngSwitchDefault>
+    Selected {{ selectionCollector?.length$ | async }} element(s), do you want to select [<a
+      href="#"
+      (click)="selectAll(); (false)"
+      >all</a
+    >
+    | <a href="#" (click)="selectFiltered(); (false)">all filtered</a>] instead?
+  </ng-container>
 </mat-label>

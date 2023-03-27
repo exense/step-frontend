@@ -37,13 +37,6 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
   @Input() selectionType: BulkSelectionType = BulkSelectionType.None;
   @Output() selectionTypeChange = new EventEmitter<BulkSelectionType>();
 
-  readonly selectionTypes = [
-    BulkSelectionType.All,
-    BulkSelectionType.Visible,
-    BulkSelectionType.Filtered,
-    BulkSelectionType.None,
-  ];
-
   readonly isChecked: boolean = false;
   readonly isIntermediate: boolean = false;
 
