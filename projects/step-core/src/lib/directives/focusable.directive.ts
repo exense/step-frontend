@@ -1,6 +1,11 @@
 import { Directive, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 
+/**
+ * Documentation:
+ * https://exense.atlassian.net/wiki/spaces/DEVELOPMEN/pages/587399169/FocusableDirective
+ */
+
 @Directive({
   selector: '[stepFocusable]',
   host: {

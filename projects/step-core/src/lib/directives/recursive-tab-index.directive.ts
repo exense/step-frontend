@@ -1,6 +1,11 @@
 import { AfterViewInit, Directive, ElementRef, Input } from '@angular/core';
 import { breadthFirstSearch } from '../shared';
 
+/**
+ * Documentation:
+ * https://exense.atlassian.net/wiki/spaces/DEVELOPMEN/pages/587333633/RecursiveTabIndexDirective
+ */
+
 @Directive({
   selector: '[stepRecursiveTabIndex]',
 })

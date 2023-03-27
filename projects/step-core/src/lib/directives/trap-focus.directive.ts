@@ -2,6 +2,11 @@ import { AfterContentInit, ContentChildren, Directive, HostListener, OnDestroy, 
 import { combineLatest, startWith, Subject, takeUntil } from 'rxjs';
 import { FocusableDirective } from './focusable.directive';
 
+/**
+ * Documentation:
+ * https://exense.atlassian.net/wiki/spaces/DEVELOPMEN/pages/587235347/TrapFocusDirective
+ */
+
 @Directive({
   selector: '[stepTrapFocus]',
 })

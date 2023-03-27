@@ -2,6 +2,11 @@ import { AfterContentInit, ContentChildren, Directive, Input, OnDestroy, QueryLi
 import { Subject } from 'rxjs';
 import { FocusableDirective } from './focusable.directive';
 
+/**
+ * Documentation:
+ * https://exense.atlassian.net/wiki/spaces/DEVELOPMEN/pages/587038757/FocusablesDirective
+ */
+
 @Directive({
   selector: '[stepFocusables]',
   exportAs: 'stepFocusables',
