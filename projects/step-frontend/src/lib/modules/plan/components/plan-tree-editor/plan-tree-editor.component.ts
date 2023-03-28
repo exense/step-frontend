@@ -286,7 +286,23 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
       this._treeState.selectNodeById(node.id!);
     }
 
-    const artefacts = this._treeState.getSelectedNodes().map(({ originalArtefact }) => originalArtefact);
+    const artefacts: AbstractArtefact[] = [];
+    const selectedNodes = this._treeState.getSelectedNodes();
+    const visitedNodesIds = new Set<string>();
+
+    selectedNodes.forEach((node) => {
+      const flatChildren = breadthFirstSearch({
+        items: node.children || [],
+        children: (item) => item.children || [],
+        predicate: (item) => !visitedNodesIds.has(item.id),
+      });
+
+      flatChildren.forEach((node) => visitedNodesIds.add(node.id));
+
+      if (!visitedNodesIds.has(node.id)) {
+        artefacts.push(node.originalArtefact);
+      }
+    });
 
     this._persistenceService.setItem(COPIED_ARTEFACTS, JSON.stringify(artefacts));
   }
