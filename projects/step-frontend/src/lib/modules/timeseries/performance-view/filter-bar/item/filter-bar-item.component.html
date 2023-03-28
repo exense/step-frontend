@@ -1,16 +1,24 @@
-<div class="item-container" [matMenuTriggerFor]="menu" #matTrigger="matMenuTrigger">
-  <div class="filter-label">{{ item.label || 'Not Specified' }}</div>
-  <div class="filter-value">{{ formattedValue || '-' }}</div>
+<div
+  class="filter-item-container"
+  [class.active]="active"
+  [matMenuTriggerFor]="menu"
+  #matTrigger="matMenuTrigger"
+  (menuOpened)="onMenuOpen()"
+>
+  <div class="title">{{ item.label || 'New Filter' }}</div>
+  <div *ngIf="formattedValue" class="subtitle">{{ formattedValue }}</div>
 
-  <div (click)="onRemoveItem.emit()" class="remove-btn">
+  <div (click)="onRemoveItem.emit()" class="remove-btn" *ngIf="removable">
     <step-icon class="remove-btn" name="x"></step-icon>
   </div>
 </div>
 
-<mat-menu #menu="matMenu" [ngSwitch]="item.type">
+<mat-menu #menu="matMenu" [ngSwitch]="item.type" (close)="onMenuClose()">
   <div class="menu-container" (click)="$event.stopPropagation()">
     <div *ngSwitchCase="FilterBarType.OPTIONS">
-      <label>{{ item.label }}</label>
+      <div class="item-header">
+        {{ item.label }}
+      </div>
 
       <div class="checkboxes">
         <mat-checkbox

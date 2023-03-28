@@ -1,12 +1,35 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+@use 'projects/step-frontend/styles/common-mixins' as common-mixins;
+@include common-mixins.ts-filter-bar();
+
 :host {
   display: flex;
   flex-direction: column;
   gap: 16px;
   background: #f5f5f5;
+
+  ::ng-deep {
+    .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
+      line-height: 22px;
+      font-size: 12px;
+    }
+  }
 }
 
 .mat-raised-button.mat-primary {
-  background: #293e50;
+  background: var.$gray-800;
+}
+
+.warning-mark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: var.$warn-yellow-background;
+  color: var.$warn-yellow-color;
+  padding: 4px 34px;
+  font-size: 11px;
+  border: 1px solid var.$warn-yellow-border;
 }
 
 .filters {
@@ -20,10 +43,27 @@
   flex: 1;
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 8px;
   padding: 8px;
   height: 48px;
-  overflow: hidden;
+}
+
+.more-btn {
+  background: var.$gray-100;
+  color: var.$gray-500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px 0 12px;
+  cursor: pointer;
+  border-radius: 2px;
+  font-size: 12px;
+  flex-direction: row;
+  min-width: unset;
+
+  step-icon {
+    transform: scale(0.6);
+  }
 }
 
 .more-applied-filters {
@@ -31,4 +71,61 @@
   flex-wrap: wrap;
   gap: 16px;
   padding: 0 8px;
+}
+
+.apply-btn {
+  //background-color: var.$warn-yellow-background;
+  //border: 1px solid var.$warn-yellow-border;
+  //color: var.$warn-yellow-color;
+  color: #4b97de;
+  font-size: 12px;
+  line-height: 28px;
+  margin-right: 12px;
+  font-weight: bold;
+}
+
+.oql-container {
+  position: relative;
+
+  .oql-input {
+    flex-grow: 1;
+    padding-right: 28px;
+    background: var.$gray-50;
+    border: 1px solid var.$gray-200;
+    border-radius: 2px;
+    color: var.$gray-500;
+    font-size: 13px;
+    padding-left: 8px;
+
+    &:focus-visible {
+      outline: 0;
+    }
+  }
+
+  .invalid-input {
+    border: 1px solid #d70000;
+    color: #d70000;
+  }
+
+  .info-btn {
+    position: absolute;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 12px;
+    transform: scale(0.7);
+    opacity: 0.6;
+  }
+}
+
+.error-info {
+  position: absolute;
+  top: -15px;
+  right: 0;
+  color: white;
+  background: #d70000;
+  padding: 0 10px;
+  font-size: 12px;
 }

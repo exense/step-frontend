@@ -215,12 +215,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   prepareFindRequestBuilder(settings: PerformanceViewSettings, customFilters?: any): FindBucketsRequestBuilder {
     return new FindBucketsRequestBuilder()
       .withRange(settings.timeRange)
-      .withBaseFilters({
-        ...this.context.getBaseFilters(),
-        // ...customFilters,
-        [this.METRIC_TYPE_KEY]: this.METRIC_TYPE_RESPONSE_TIME,
-      })
-      .withCustomFilters(this.context.getDynamicFilters())
+      .addAttribute(this.METRIC_TYPE_KEY, this.METRIC_TYPE_RESPONSE_TIME)
+      .withFilteringSettings(this.context.getFilteringSettings())
       .withNumberOfBuckets(TimeSeriesConfig.MAX_BUCKETS_IN_CHART);
   }
 
@@ -271,8 +267,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     let request = this.findRequestBuilder
       .clone()
       .addAttribute(this.METRIC_TYPE_KEY, this.METRIC_TYPE_SAMPLER)
-      .withCustomFilters([])
       .withGroupDimensions(['name'])
+      .withFilteringSettings(this.context.getFilteringSettings())
       .build();
     return this.timeSeriesService
       .fetchBuckets(request)

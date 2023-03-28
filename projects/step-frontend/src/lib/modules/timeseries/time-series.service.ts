@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { FindBucketsRequest } from './find-buckets-request';
 import { TimeSeriesChartResponse } from './time-series-chart-response';
 import { AsyncTaskStatusResource, AuthService, Execution } from '@exense/step-core';
+import { OqlVerifyResponse } from './model/oql-verify-response';
 
 // TODO provide it it TimeSeriesModule
 @Injectable({
@@ -22,5 +23,9 @@ export class TimeSeriesService {
 
   rebuildTimeSeries(executionId: string): Observable<AsyncTaskStatusResource> {
     return this.http.post<AsyncTaskStatusResource>(`rest/time-series/rebuild`, { executionId: executionId });
+  }
+
+  verifyOql(oql: string): Observable<OqlVerifyResponse> {
+    return this.http.get<OqlVerifyResponse>(`rest/time-series/oql-verify?oql=${oql}`);
   }
 }

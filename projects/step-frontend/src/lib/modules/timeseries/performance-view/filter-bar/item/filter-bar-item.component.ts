@@ -1,8 +1,21 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostBinding,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { DateTime } from 'luxon';
 import { TimeSeriesUtils } from '../../../time-series-utils';
 import { FilterBarItemType, TsFilterItem } from '../model/ts-filter-item';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'step-ts-filter-bar-item',
@@ -11,6 +24,7 @@ import { FilterBarItemType, TsFilterItem } from '../model/ts-filter-item';
 })
 export class FilterBarItemComponent implements OnInit, OnChanges {
   @Input() item!: TsFilterItem;
+  @Input() removable?: boolean;
 
   @Output() onRemoveItem: EventEmitter<any> = new EventEmitter<any>();
   @Output() onFilterChange: EventEmitter<TsFilterItem> = new EventEmitter<TsFilterItem>();
@@ -24,10 +38,24 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
   formattedValue? = '';
   changesApplied = false;
 
+  active: boolean = false;
+
   ngOnInit(): void {
     if (!this.item) {
       throw new Error('Item input is mandatory');
     }
+  }
+
+  onMenuClose(): void {
+    this.active = false;
+  }
+
+  onMenuOpen() {
+    this.active = true;
+  }
+
+  openMenu() {
+    this.menuTrigger?.openMenu();
   }
 
   ngOnChanges(): void {

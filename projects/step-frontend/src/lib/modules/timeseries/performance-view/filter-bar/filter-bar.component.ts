@@ -11,13 +11,18 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core';
-import { debounceTime, Subject, take } from 'rxjs';
+import { debounceTime, Observable, Subject, take } from 'rxjs';
 import { TimeSeriesContext } from '../../time-series-context';
 import { FilterUtils } from '../../util/filter-utils';
 import { PerformanceViewSettings } from '../model/performance-view-settings';
 import { PerformanceViewTimeSelectionComponent } from '../time-selection/performance-view-time-selection.component';
 import { FilterBarItemComponent } from './item/filter-bar-item.component';
 import { FilterBarItemType, TsFilterItem } from './model/ts-filter-item';
+import { TimeSeriesService } from '../../time-series.service';
+import { OqlVerifyResponse } from '../../model/oql-verify-response';
+import { TimeSeriesConfig } from '../../time-series.config';
+import { TsFilteringMode } from '../../model/ts-filtering-mode';
+import { TsFilteringSettings } from '../../model/ts-filtering-settings';
 
 @Component({
   selector: 'step-ts-filter-bar',
@@ -28,9 +33,10 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
   @Input() performanceViewSettings!: PerformanceViewSettings;
   @Input() defaultFilterOptions: TsFilterItem[] = [];
-  @Input() activeFilters: TsFilterItem[] = [];
+  @Input() hiddenFilters: TsFilterItem[] = [];
 
   @Output() onFiltersChange = new EventEmitter<TsFilterItem[]>();
+  @Output() onFilterSettingsChange = new EventEmitter<TsFilteringSettings>();
   @Output() onGroupingChange = new EventEmitter<string[]>();
 
   @ViewChild(PerformanceViewTimeSelectionComponent) timeSelection?: PerformanceViewTimeSelectionComponent;
@@ -43,20 +49,133 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   readonly EMIT_DEBOUNCE_TIME = 300;
   readonly FilterBarItemType = FilterBarItemType;
 
-  filters: TsFilterItem[] = [];
-  moreFilters: TsFilterItem[] = [];
+  visibleFilters: TsFilterItem[] = [];
+  groupDimensions: string[] = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS[0].attributes;
 
-  constructor(private _changeDetectorRef: ChangeDetectorRef) {}
+  rawMeasurementsModeActive = false;
+
+  oqlModeActive = false;
+  oqlValue: string = '';
+  invalidOql = false;
+
+  constructor(private _changeDetectorRef: ChangeDetectorRef, private timeSeriesService: TimeSeriesService) {}
+
+  getFilters() {
+    return this.visibleFilters;
+  }
+
+  prepareVisibleFilters() {
+    const predefinedFiltersById = new Map<string, TsFilterItem>();
+    this.hiddenFilters?.forEach((item) => {
+      predefinedFiltersById.set(item.attributeName, item);
+    });
+    const combinedFilters = this.defaultFilterOptions.map((option) => {
+      return predefinedFiltersById.get(option.attributeName) || option;
+    });
+
+    this.visibleFilters = combinedFilters;
+  }
 
   ngOnInit(): void {
     if (!this.context) {
       throw new Error('Context input is mandatory');
     }
-    this.filters = this.activeFilters;
+    this.prepareVisibleFilters();
     this.emitFilterChange$.pipe(debounceTime(this.EMIT_DEBOUNCE_TIME)).subscribe(() => {
-      // we ignore empty filters
-      this.onFiltersChange.emit(this.filters.filter(FilterUtils.filterItemIsValid));
+      const filters = this.visibleFilters.filter(FilterUtils.filterItemIsValid);
+      if (filters.length) {
+        this.composeAndVerifyFullOql().subscribe((response) => {
+          this.rawMeasurementsModeActive = response.hasUnknownFields;
+          if (!this.rawMeasurementsModeActive) {
+            this.emitFiltersChange();
+          }
+        });
+      } else {
+        this.emitFiltersChange(); // immediate effect because there are no filters
+        this.composeAndVerifyFullOql().subscribe((response) => {
+          this.rawMeasurementsModeActive = response.hasUnknownFields;
+        });
+      }
     });
+  }
+
+  handleOqlChange(event: any) {
+    this.invalidOql = false;
+  }
+
+  toggleOQLMode() {
+    if (this.oqlModeActive) {
+      const contextualOql = FilterUtils.objectToOQL(this.performanceViewSettings.contextualFilters);
+      const customOql = FilterUtils.filtersToOQL(
+        this.getFilters().filter(FilterUtils.filterItemIsValid),
+        TimeSeriesConfig.ATTRIBUTES_PREFIX
+      );
+      this.oqlValue = customOql;
+    } else {
+      this.invalidOql = false;
+    }
+  }
+
+  disableOqlMode() {
+    this.oqlModeActive = false;
+  }
+
+  composeAndVerifyFullOql(): Observable<OqlVerifyResponse> {
+    // we fake group dimensions as being filters, to verify altogether
+    const filtersOql = this.oqlModeActive
+      ? this.oqlValue
+      : FilterUtils.filtersToOQL(
+          this.visibleFilters.filter(FilterUtils.filterItemIsValid),
+          TimeSeriesConfig.ATTRIBUTES_PREFIX
+        );
+    let groupingItems: TsFilterItem[] = this.groupDimensions.map((dimension) => ({
+      attributeName: dimension,
+      type: FilterBarItemType.FREE_TEXT,
+      textValue: 'group-dimension',
+      label: '',
+    }));
+    const groupingOql = FilterUtils.filtersToOQL(groupingItems, TimeSeriesConfig.ATTRIBUTES_PREFIX) || '';
+    const finalOql: string = filtersOql ? `(${groupingOql}) and ${filtersOql}` : groupingOql;
+    return this.timeSeriesService.verifyOql(finalOql);
+  }
+
+  handleGroupingChange(dimensions: string[]) {
+    this.groupDimensions = dimensions;
+    const filters = this.visibleFilters.filter(FilterUtils.filterItemIsValid);
+    this.composeAndVerifyFullOql().subscribe((response) => {
+      this.rawMeasurementsModeActive = response.hasUnknownFields;
+      // for grouping change, we will trigger refresh automatically. otherwise grouping and filters will change together
+      this.onGroupingChange.emit(dimensions);
+    });
+  }
+
+  emitFiltersChange() {
+    const settings: TsFilteringSettings = {
+      mode: this.oqlModeActive ? TsFilteringMode.OQL : TsFilteringMode.STANDARD,
+      baseFilters: this.context.getBaseFilters(),
+      filterItems: this.getFilters().filter(FilterUtils.filterItemIsValid),
+      oql: this.oqlValue,
+    };
+    this.onFilterSettingsChange.emit(settings);
+  }
+
+  manuallyApplyFilters() {
+    if (!this.oqlModeActive) {
+      this.emitFiltersChange();
+    } else {
+      // oql mode
+      let oql = this.oqlValue;
+      this.timeSeriesService.verifyOql(oql).subscribe((response) => {
+        this.invalidOql = !response.valid;
+        if (response.valid && response.hasUnknownFields) {
+        }
+        if (response.valid) {
+          this.emitFiltersChange();
+        } else {
+          this.invalidOql = true;
+        }
+      });
+    }
   }
 
   ngOnDestroy(): void {
@@ -69,13 +188,13 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   }
 
   addFilterItem(item: TsFilterItem) {
-    const filterIndex = this.filters.findIndex((i) => i.attributeName === item.attributeName);
+    const filterIndex = this.visibleFilters.findIndex((i) => i.attributeName === item.attributeName);
 
     if (filterIndex !== -1) {
       const index =
-        filterIndex < this.filters.length - this.moreFilters.length
+        filterIndex < this.visibleFilters.length - this.visibleFilters.length
           ? filterIndex
-          : filterIndex + this.moreFilters.length;
+          : filterIndex + this.visibleFilters.length;
 
       this.filterComponents!.toArray()[index].menuTrigger!.openMenu();
     } else {
@@ -88,50 +207,27 @@ export class FilterBarComponent implements OnInit, OnDestroy {
       attributeName: '',
       type: type,
       label: '',
+      removable: true,
     });
   }
 
   removeFilterItem(index: number) {
-    let itemToDelete = this.filters[index];
+    let itemToDelete = this.visibleFilters[index];
 
-    this.filters.splice(index, 1);
+    this.visibleFilters.splice(index, 1);
 
     if (FilterUtils.filterItemIsValid(itemToDelete)) {
       this.emitFilterChange$.next();
     }
   }
 
-  initMoreFilters(): void {
-    if (!this.appliedFilters) {
-      return;
-    }
-
-    const orderedTops = this.appliedFilters
-      .map((appliedFilter) => {
-        const { top } = appliedFilter.nativeElement.getBoundingClientRect();
-
-        return top;
-      })
-      .sort((a, b) => a - b);
-
-    const sameLevelFilters = this.appliedFilters.filter((appliedFilter) => {
-      const { top } = appliedFilter.nativeElement.getBoundingClientRect();
-
-      return top === orderedTops[0];
-    });
-
-    this.moreFilters = this.filters.slice(sameLevelFilters.length);
-  }
-
   private addFilter(item: TsFilterItem): void {
-    this.filters.push(item);
+    this.visibleFilters.push(item);
     this._changeDetectorRef.detectChanges();
-    this.initMoreFilters();
-    this._changeDetectorRef.detectChanges();
-    this.filterComponents!.last.menuTrigger!.openMenu();
+    this.filterComponents!.last.openMenu();
     this.filterComponents!.last.menuTrigger!.menuClosed.pipe(take(1)).subscribe(() => {
       if (!this.filterComponents!.last.changesApplied) {
-        this.filters.pop();
+        this.visibleFilters.pop();
       }
     });
 

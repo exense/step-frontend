@@ -22,7 +22,7 @@ export class FilterUtils {
 
   static filtersToOQL(items: TsFilterItem[], attributesPrefix?: string) {
     if (!items || items.length === 0) {
-      return undefined;
+      return '';
     }
     let andFilters: (string | undefined)[] = items.map((item) => {
       let clause;
