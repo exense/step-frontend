@@ -35,9 +35,11 @@
         (onFilterChange)="handleFilterChange()"
       >
       </step-ts-filter-bar-item>
-      <div class="more-btn filter-item-container" [matMenuTriggerFor]="typesMenu">
-        <span>More</span>
-        <step-icon name="plus"></step-icon>
+      <div class="more-btn-container" [matMenuTriggerFor]="typesMenu">
+        <div class="more-btn filter-item-container">
+          <span>More</span>
+          <step-icon name="plus"></step-icon>
+        </div>
       </div>
     </ng-container>
     <ng-container *ngIf="oqlModeActive">
