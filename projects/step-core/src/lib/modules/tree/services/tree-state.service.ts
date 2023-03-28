@@ -457,6 +457,10 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     }
   }
 
+  expandNodes(nodeIds: string[]): void {
+    nodeIds.forEach((id) => this.expandNodeInternal(id));
+  }
+
   expandNode(nodeId: string): Observable<boolean>;
   expandNode(path: string[]): Observable<boolean>;
   expandNode(nodeIdOrPath: string | string[]): Observable<boolean> {
