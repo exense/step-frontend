@@ -5,12 +5,15 @@ import { MenuEntry } from '@exense/step-core';
   name: 'menuFilter',
 })
 export class MenuFilterPipe implements PipeTransform {
-  transform(menuEntries: MenuEntry[], parentMenu: string): MenuEntry[] {
+  transform(menuEntries: MenuEntry[] | null | undefined, parentMenu: string): MenuEntry[] {
+    if (!menuEntries) {
+      return [];
+    }
     let filteredEntries;
     if (parentMenu === 'root') {
-      filteredEntries = menuEntries.filter((entry) => entry && !entry.parentMenu && entry.isEnabledFct());
+      filteredEntries = menuEntries.filter((entry) => entry && !entry.parentId && entry.isEnabledFct());
     } else {
-      filteredEntries = menuEntries.filter((entry) => entry?.parentMenu === parentMenu && entry.isEnabledFct());
+      filteredEntries = menuEntries.filter((entry) => entry?.parentId === parentMenu && entry.isEnabledFct());
     }
 
     const weightCompare = (a: MenuEntry, b: MenuEntry) => {

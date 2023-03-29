@@ -16,6 +16,7 @@ const IGNORE_PLUGINS: ReadonlyArray<string> = [
   'notifications',
   'planBrowser',
   'housekeeping',
+  'menuConfig',
 ];
 
 // For testing purposes only
