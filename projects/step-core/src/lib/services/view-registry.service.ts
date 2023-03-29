@@ -21,6 +21,7 @@ export interface Dashlet {
   label: string;
   template: string;
   id: string;
+  weight?: number;
   isEnabledFct?(): boolean;
 }
 
@@ -33,7 +34,7 @@ export class ViewRegistryService {
   registeredViews: { [key: string]: CustomView } = {};
   registeredMenuEntries: MenuEntry[] = [];
   registeredMenuIds: string[] = [];
-  registeredDashlets: { [key: string]: Dashlet[] } = {};
+  registeredDashlets: { [key: string]: Dashlet[] | undefined } = {};
 
   constructor() {
     this.registerStandardMenuEntries();
@@ -145,20 +146,35 @@ export class ViewRegistryService {
     return this.registeredMenuEntries.filter((entry: MenuEntry) => !entry.parentId);
   }
 
-  getDashlets(path: string) {
+  getDashlets(path: string): Dashlet[] {
     let dashlets = this.registeredDashlets[path];
+
     if (!dashlets) {
       dashlets = [];
       this.registeredDashlets[path] = dashlets;
     }
-    return dashlets;
+
+    // weightless dashlets should be last
+    const normalizeWeight = (weight?: number) => weight || Infinity;
+
+    return dashlets.sort((a, b) => normalizeWeight(a.weight) - normalizeWeight(b.weight));
   }
 
-  registerDashlet(path: string, label: string, template: string, id: string, before?: boolean): void {
+  registerDashlet(path: string, label: string, template: string, id: string, before?: boolean, weight?: number): void {
     if (before) {
-      this.getDashlets(path).unshift({ label: label, template: template, id: id });
+      this.getDashlets(path).unshift({
+        label,
+        template,
+        id,
+        weight,
+      });
     } else {
-      this.getDashlets(path).push({ label: label, template: template, id: id });
+      this.getDashlets(path).push({
+        label,
+        template,
+        id,
+        weight,
+      });
     }
   }
 

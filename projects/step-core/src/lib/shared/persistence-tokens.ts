@@ -1,0 +1,1 @@
+export const COPIED_ARTEFACTS = 'COPIED_ARTEFACTS';
