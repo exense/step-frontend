@@ -1,11 +1,13 @@
 import { DOCUMENT, Location } from '@angular/common';
 import {
-  AfterViewInit,
   Component,
   ElementRef,
+  inject,
   Inject,
   OnDestroy,
+  OnInit,
   QueryList,
+  TrackByFunction,
   ViewChildren,
   ViewEncapsulation,
 } from '@angular/core';
@@ -21,6 +23,8 @@ import {
 } from '@exense/step-core';
 import { ILocationService } from 'angular';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
+import { MENU_ITEMS } from '../../injectables/menu-items';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'step-sidebar',
@@ -28,12 +32,15 @@ import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.comp
   styleUrls: ['./sidebar.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class SidebarComponent implements AfterViewInit, OnDestroy {
+export class SidebarComponent implements OnInit, OnDestroy {
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
 
   sideBarOpen: boolean = true;
-
+  private terminator$ = new Subject<void>();
   private locationStateSubscription: any;
+  readonly _menuItems$ = inject(MENU_ITEMS).pipe(takeUntil(this.terminator$));
+
+  readonly trackByMenuEntry: TrackByFunction<MenuEntry> = (index, item) => item.id;
 
   constructor(
     @Inject(DOCUMENT) private _document: Document,
@@ -49,13 +56,21 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  ngAfterViewInit(): void {
-    this.openMainMenuBasedOnActualView();
-    this.openEssentialMainMenus();
+  ngOnInit(): void {
+    this._menuItems$.subscribe(() => {
+      setTimeout(() => {
+        // zero timout is used, to create a macrotasks
+        // that will be invoked after menu render
+        this.openMainMenuBasedOnActualView();
+        this.openEssentialMainMenus();
+      }, 0);
+    });
   }
 
   ngOnDestroy(): void {
     this.locationStateSubscription.unsubscribe();
+    this.terminator$.next();
+    this.terminator$.complete();
   }
 
   private openMainMenuBasedOnActualView(): void {
@@ -72,7 +87,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
     const essentialMenuWeightThreshold = 20;
     this._viewRegistryService.getMainMenuAll().forEach((menu: MenuEntry) => {
       if (menu.weight && menu.weight <= essentialMenuWeightThreshold) {
-        this.openMainMenu(menu.viewId);
+        this.openMainMenu(menu.id);
       }
     });
   }
@@ -82,10 +97,6 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
     if (checkbox) {
       checkbox.nativeElement.checked = true;
     }
-  }
-
-  public trackByFn(index: number, item: MenuEntry) {
-    return item.viewId;
   }
 
   public navigateTo(viewId: string): void {
