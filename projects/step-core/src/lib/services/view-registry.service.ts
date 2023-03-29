@@ -9,12 +9,11 @@ export interface CustomView {
 }
 
 export interface MenuEntry {
-  label: string;
-  viewId: string;
-  parentMenu?: string;
+  id: string;
+  title: string;
   icon: string;
   weight?: number;
-  right?: string;
+  parentId?: string;
   isEnabledFct(): boolean;
 }
 
@@ -22,6 +21,7 @@ export interface Dashlet {
   label: string;
   template: string;
   id: string;
+  weight?: number;
   isEnabledFct?(): boolean;
 }
 
@@ -34,7 +34,7 @@ export class ViewRegistryService {
   registeredViews: { [key: string]: CustomView } = {};
   registeredMenuEntries: MenuEntry[] = [];
   registeredMenuIds: string[] = [];
-  registeredDashlets: { [key: string]: Dashlet[] } = {};
+  registeredDashlets: { [key: string]: Dashlet[] | undefined } = {};
 
   constructor() {
     this.registerStandardMenuEntries();
@@ -59,7 +59,7 @@ export class ViewRegistryService {
     this.registerMenuEntry('Scheduler', 'scheduler', 'clock', 20, 'execute-root');
     this.registerMenuEntry('Analytics', 'analytics', 'bar-chart-2', 20, 'execute-root');
     // Sub Menus Status
-    this.registerMenuEntry('Current Operations', 'operations', 'airplay', 10, 'status-root', 'operations-read');
+    this.registerMenuEntry('Current Operations', 'operations', 'airplay', 10, 'status-root');
     this.registerMenuEntry('Agents', 'gridagents', 'users', 20, 'status-root');
     this.registerMenuEntry('Agent tokens', 'gridtokens', 'circle', 30, 'status-root');
     this.registerMenuEntry('Token Groups', 'gridtokengroups', 'tag', 40, 'status-root');
@@ -123,51 +123,58 @@ export class ViewRegistryService {
     this.registeredViews[viewId] = { template: template, isPublicView: isPublicView, isStaticView: isStaticView };
   }
 
-  registerMenuEntry(
-    label: string,
-    viewId: string,
-    icon: string,
-    weight?: number,
-    parentMenu?: string,
-    right?: string
-  ): void {
-    if (!viewId || this.registeredMenuIds.includes(viewId)) {
+  registerMenuEntry(title: string, id: string, icon: string, weight?: number, parentId?: string): void {
+    if (!id || this.registeredMenuIds.includes(id)) {
       return;
     }
-    this.registeredMenuIds.push(viewId);
+    this.registeredMenuIds.push(id);
     this.registeredMenuEntries.push({
-      label,
-      viewId,
-      parentMenu,
+      title,
+      id,
+      parentId,
       icon,
       weight,
-      right,
       isEnabledFct: () => true,
     });
   }
 
-  getMainMenuKey(subMenuKey: string): string | undefined {
-    return this.registeredMenuEntries.find((entry: MenuEntry) => entry.viewId === subMenuKey)?.parentMenu;
+  getMainMenuKey(subMenuId: string): string | undefined {
+    return this.registeredMenuEntries.find((entry: MenuEntry) => entry.id === subMenuId)?.parentId;
   }
 
   getMainMenuAll(): MenuEntry[] {
-    return this.registeredMenuEntries.filter((entry: MenuEntry) => !entry.parentMenu);
+    return this.registeredMenuEntries.filter((entry: MenuEntry) => !entry.parentId);
   }
 
-  getDashlets(path: string) {
+  getDashlets(path: string): Dashlet[] {
     let dashlets = this.registeredDashlets[path];
+
     if (!dashlets) {
       dashlets = [];
       this.registeredDashlets[path] = dashlets;
     }
-    return dashlets;
+
+    // weightless dashlets should be last
+    const normalizeWeight = (weight?: number) => weight || Infinity;
+
+    return dashlets.sort((a, b) => normalizeWeight(a.weight) - normalizeWeight(b.weight));
   }
 
-  registerDashlet(path: string, label: string, template: string, id: string, before?: boolean): void {
+  registerDashlet(path: string, label: string, template: string, id: string, before?: boolean, weight?: number): void {
     if (before) {
-      this.getDashlets(path).unshift({ label: label, template: template, id: id });
+      this.getDashlets(path).unshift({
+        label,
+        template,
+        id,
+        weight,
+      });
     } else {
-      this.getDashlets(path).push({ label: label, template: template, id: id });
+      this.getDashlets(path).push({
+        label,
+        template,
+        id,
+        weight,
+      });
     }
   }
 
