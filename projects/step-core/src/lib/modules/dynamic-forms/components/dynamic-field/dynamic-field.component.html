@@ -2,14 +2,12 @@
   <span [matTooltip]="label || ''">{{ label }}</span>
 </ng-template>
 
-<mat-form-field
-  floatLabel="always"
-  class="step-view with-suffix with-prefix"
+<step-form-field
   [class.ng-invalid]="!!_ngControl?.invalid"
   [class.step-force-focus]="forceFocus"
   [class.editable-label]="canEditLabel"
 >
-  <ng-container matPrefix>
+  <step-prefix>
     <div class="dynamic-field-label" stepElementRefMap [key]="elementRefMapKey">
       <ng-container *ngIf="canEditLabel; else staticLabel">
         <input
@@ -28,7 +26,7 @@
         <step-icon name="help-circle" [matTooltip]="tooltip"></step-icon>
       </ng-container>
     </div>
-  </ng-container>
+  </step-prefix>
 
   <ng-template #valueInput>
     <ng-container [ngSwitch]="fieldType">
@@ -51,8 +49,6 @@
       </ng-container>
 
       <ng-container *ngSwitchCase="DynamicFieldType.boolean">
-        <input matInput hidden tabindex="-1" />
-
         <mat-radio-group
           aria-label="Select an option"
           color="primary"
@@ -71,7 +67,6 @@
         <input
           type="number"
           step="any"
-          matInput
           [disabled]="isDisabled"
           [ngModel]="value"
           (ngModelChange)="valueChange($event)"
@@ -83,7 +78,6 @@
       <ng-container *ngSwitchDefault>
         <input
           type="text"
-          matInput
           [disabled]="isDisabled"
           [ngModel]="value"
           (ngModelChange)="valueChange($event)"
@@ -97,7 +91,6 @@
   <ng-template #expressionInput>
     <input
       type="text"
-      matInput
       [disabled]="isDisabled"
       [ngModel]="expression"
       (ngModelChange)="expressionChange($event)"
@@ -106,27 +99,24 @@
     />
   </ng-template>
 
-  <ng-container *ngIf="dynamic; then expressionInput; else valueInput"> </ng-container>
+  <ng-container *ngIf="dynamic; then expressionInput; else valueInput"></ng-container>
 
-  <ng-container matSuffix>
-    <ng-container *ngIf="fieldType === DynamicFieldType.string && !dynamic">
-      <button
-        type="button"
-        mat-stroked-button
-        matTooltip="Open texteditor"
-        matTooltipPosition="below"
-        [tabindex]="tabIndex"
-        [disabled]="isDisabled"
-        (click)="editStringValueInModal()"
-        (focusin)="forceFocus = true"
-        (focusout)="forceFocus = false"
-      >
-        <step-icon name="edit"></step-icon>
-      </button>
-
-      <div class="suffix-separator"></div>
-    </ng-container>
-
+  <step-suffix class="button-suffix" *ngIf="fieldType === DynamicFieldType.string && !dynamic">
+    <button
+      type="button"
+      mat-stroked-button
+      matTooltip="Open texteditor"
+      matTooltipPosition="below"
+      [tabindex]="tabIndex"
+      [disabled]="isDisabled"
+      (click)="editStringValueInModal()"
+      (focusin)="forceFocus = true"
+      (focusout)="forceFocus = false"
+    >
+      <step-icon name="edit"></step-icon>
+    </button>
+  </step-suffix>
+  <step-suffix class="button-suffix">
     <button
       type="button"
       mat-flat-button
@@ -141,23 +131,20 @@
     >
       <step-icon name="zap"></step-icon>
     </button>
-
-    <ng-container *ngIf="canRemove">
-      <div class="suffix-separator"></div>
-
-      <button
-        type="button"
-        mat-stroked-button
-        matTooltip="Remove"
-        matTooltipPosition="below"
-        [disabled]="isDisabled"
-        [tabindex]="tabIndex"
-        (click)="remove.emit()"
-        (focusin)="forceFocus = true"
-        (focusout)="forceFocus = false"
-      >
-        <step-icon name="x"></step-icon>
-      </button>
-    </ng-container>
-  </ng-container>
-</mat-form-field>
+  </step-suffix>
+  <step-suffix class="button-suffix" *ngIf="canRemove">
+    <button
+      type="button"
+      mat-stroked-button
+      matTooltip="Remove"
+      matTooltipPosition="below"
+      [disabled]="isDisabled"
+      [tabindex]="tabIndex"
+      (click)="remove.emit()"
+      (focusin)="forceFocus = true"
+      (focusout)="forceFocus = false"
+    >
+      <step-icon name="x"></step-icon>
+    </button>
+  </step-suffix>
+</step-form-field>

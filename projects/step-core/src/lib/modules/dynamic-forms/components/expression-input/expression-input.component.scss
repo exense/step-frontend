@@ -1,45 +1,5 @@
 step-expression-input {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-
-  > .help {
-    display: flex;
-    align-items: center;
-  }
-
-  > .mat-form-field {
-    flex: 1;
-  }
-
-  > .actions {
-    display: flex;
-    height: 42px;
-
-    .mat-stroked-button {
-      .mat-button-wrapper {
-        display: flex;
-        justify-content: center;
-
-        step-icon {
-          display: flex;
-        }
-      }
-
-      &:first-child {
-        border-right: 0;
-        border-radius: 8px 0 0 8px;
-      }
-
-      &:last-child {
-        border-left: 0;
-        border-radius: 0 8px 8px 0;
-      }
-    }
-
-    .separator {
-      width: 1px;
-      background: rgba(0, 0, 0, 0.12);
-    }
+  step-form-field.with-tooltip .form-field-content input {
+    border-right-style: none;
   }
 }

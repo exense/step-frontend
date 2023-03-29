@@ -32,6 +32,7 @@ export class EditableDropdownLabelComponent<T> extends EditableComponent<T> {
   }>;
 
   @ViewChild(MatSelect, { read: ElementRef }) matSelectElementRef?: ElementRef<HTMLElement>;
+  @ViewChild(MatSelect) matSelect?: MatSelect;
 
   constructor(
     _elementRef: ElementRef<HTMLElement>,
@@ -48,8 +49,9 @@ export class EditableDropdownLabelComponent<T> extends EditableComponent<T> {
 
   protected override onLabelClick(): void {
     super.onLabelClick();
-    this.matSelectElementRef!.nativeElement.click();
     this.focusedElement = this.matSelectElementRef!.nativeElement;
+    this.focusedElement.focus();
+    this.matSelect?.open();
   }
 
   onOpenedChange(opened: boolean): void {
