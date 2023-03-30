@@ -11,7 +11,7 @@ import { debounceTime, map, Subject, takeUntil } from 'rxjs';
   exportAs: 'stepDateFilter',
 })
 export class DateFilterComponent implements OnInit, OnDestroy {
-  private terminator$ = new Subject<unknown>();
+  private terminator$ = new Subject<void>();
 
   @Input() label?: string;
   @Input() readonlyInput = false;
@@ -39,7 +39,7 @@ export class DateFilterComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.terminator$.next(undefined);
+    this.terminator$.next();
     this.terminator$.complete();
   }
 
