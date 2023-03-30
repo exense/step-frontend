@@ -44,7 +44,7 @@ const KEYWORD_ATTRIBUTES_SCHEMA: DynamicFieldsSchema = {
   styleUrls: ['./keyword-name.component.scss'],
 })
 export class KeywordNameComponent implements OnChanges, OnInit, OnDestroy {
-  private terminator$ = new Subject<unknown>();
+  private terminator$ = new Subject<void>();
 
   @Input() isDisabled: boolean = false;
   @Input() artefact?: CallFunction;
@@ -72,7 +72,7 @@ export class KeywordNameComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.terminator$.next({});
+    this.terminator$.next();
     this.terminator$.complete();
   }
 

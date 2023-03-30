@@ -37,7 +37,7 @@ export interface TableLocalDataSourceConfig<T> {
 }
 
 export class TableLocalDataSource<T> implements TableDataSource<T> {
-  private _terminator$ = new Subject<any>();
+  private _terminator$ = new Subject<void>();
   private _source$: Observable<T[]>;
 
   private _request$ = new BehaviorSubject<Request>({});
@@ -194,7 +194,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
   }
 
   disconnect(collectionViewer: CollectionViewer): void {
-    this._terminator$.next(undefined);
+    this._terminator$.next();
     this._terminator$.complete();
     this._request$.complete();
   }
