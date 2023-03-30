@@ -23,7 +23,7 @@ const DEFAULT_NODE_HEIGHT = 40;
 
 @Injectable()
 export class TreeDragDropService implements OnDestroy {
-  private terminate$?: Subject<any>;
+  private terminate$?: Subject<void>;
 
   private dragItem$: Observable<DragItem | undefined> = of(undefined);
   private dropItem$ = new BehaviorSubject<DropItem | undefined>(undefined);
@@ -67,7 +67,7 @@ export class TreeDragDropService implements OnDestroy {
   }
 
   private setupStreams(drag: CdkDrag<any>): void {
-    this.terminate$ = new Subject();
+    this.terminate$ = new Subject<void>();
 
     this.dragItem$ = drag.moved.pipe(
       debounceTime(10),
@@ -125,7 +125,7 @@ export class TreeDragDropService implements OnDestroy {
     if (!this.terminate$) {
       return;
     }
-    this.terminate$.next({});
+    this.terminate$.next();
     this.terminate$.complete();
     this.terminate$ = undefined;
   }

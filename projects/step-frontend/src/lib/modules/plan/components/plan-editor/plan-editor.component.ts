@@ -104,7 +104,7 @@ export class PlanEditorComponent
   protected repositoryObjectRef?: RepositoryObjectReference;
 
   protected planClass?: string;
-  private terminator$ = new Subject<unknown>();
+  private terminator$ = new Subject<void>();
   @ViewChild('keywordCalls', { read: KeywordCallsComponent, static: false })
   private keywords?: KeywordCallsComponent;
 
@@ -150,7 +150,7 @@ export class PlanEditorComponent
   }
 
   ngOnDestroy(): void {
-    this.terminator$.next({});
+    this.terminator$.next();
     this.terminator$.complete();
   }
 
