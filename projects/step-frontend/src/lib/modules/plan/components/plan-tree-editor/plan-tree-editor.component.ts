@@ -32,7 +32,7 @@ const MESSAGE_ADD_AT_MULTIPLE_NODES =
 })
 export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrategy, OnInit, OnDestroy {
   context?: any;
-  private terminator$ = new Subject<unknown>();
+  private terminator$ = new Subject<void>();
   private planChange$ = new Subject<Plan>();
 
   private planInternal$ = new BehaviorSubject<Plan | undefined>(undefined);
@@ -286,7 +286,23 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
       this._treeState.selectNodeById(node.id!);
     }
 
-    const artefacts = this._treeState.getSelectedNodes().map(({ originalArtefact }) => originalArtefact);
+    const artefacts: AbstractArtefact[] = [];
+    const selectedNodes = this._treeState.getSelectedNodes();
+    const visitedNodesIds = new Set<string>();
+
+    selectedNodes.forEach((node) => {
+      const flatChildren = breadthFirstSearch({
+        items: node.children || [],
+        children: (item) => item.children || [],
+        predicate: (item) => !visitedNodesIds.has(item.id),
+      });
+
+      flatChildren.forEach((node) => visitedNodesIds.add(node.id));
+
+      if (!visitedNodesIds.has(node.id)) {
+        artefacts.push(node.originalArtefact);
+      }
+    });
 
     this._persistenceService.setItem(COPIED_ARTEFACTS, JSON.stringify(artefacts));
   }
@@ -344,7 +360,7 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
     this.planChange$.complete();
     this.planInternal$.complete();
     this._planEditor.removeStrategy();
-    this.terminator$.next({});
+    this.terminator$.next();
     this.terminator$.complete();
   }
 }

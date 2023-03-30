@@ -30,7 +30,7 @@ type FieldAccessor = Mutable<Pick<BulkSelectionComponent<any, any>, 'isChecked' 
   ],
 })
 export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy {
-  private terminator$?: Subject<unknown>;
+  private terminator$?: Subject<void>;
 
   @Input() selectionCollector?: SelectionCollector<KEY, ENTITY>;
   @Input() showLabel: boolean = true;
@@ -107,7 +107,7 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
     if (!selectionCollector) {
       return;
     }
-    this.terminator$ = new Subject<unknown>();
+    this.terminator$ = new Subject<void>();
 
     // update individual
     selectionCollector.selected$
@@ -141,7 +141,7 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
     if (!this.terminator$) {
       return;
     }
-    this.terminator$.next({});
+    this.terminator$.next();
     this.terminator$.complete();
     this.terminator$ = undefined;
   }

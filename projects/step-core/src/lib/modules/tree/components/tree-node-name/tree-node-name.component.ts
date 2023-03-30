@@ -9,7 +9,7 @@ import { TreeNode } from '../../shared/tree-node';
   styleUrls: ['./tree-node-name.component.scss'],
 })
 export class TreeNodeNameComponent implements AfterViewInit, OnDestroy {
-  private terminator$ = new Subject<unknown>();
+  private terminator$ = new Subject<void>();
 
   @Input() node?: TreeNode;
 
@@ -37,7 +37,7 @@ export class TreeNodeNameComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.terminator$.next({});
+    this.terminator$.next();
     this.terminator$.complete();
   }
 }
