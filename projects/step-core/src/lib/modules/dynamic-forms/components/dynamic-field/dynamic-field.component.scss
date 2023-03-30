@@ -2,10 +2,6 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 
 step-dynamic-field {
-  //.mat-button-wrapper step-icon {
-  //  @include core.step-icon-size(16px);
-  //}
-
   button {
     width: 40px;
   }
