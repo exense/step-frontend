@@ -20,7 +20,7 @@ const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === 
 export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, OnDestroy {
   readonly BulkSelectionType = BulkSelectionType;
 
-  private terminator$: Subject<unknown> = new Subject<unknown>();
+  private terminator$ = new Subject<void>();
   private cRepoRef$ = new BehaviorSubject<RepositoryObjectReference | undefined>(undefined);
 
   private repositoryReport$ = this.cRepoRef$.pipe(
@@ -95,7 +95,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, O
 
   ngOnDestroy(): void {
     this.cRepoRef$.complete();
-    this.terminator$.next({});
+    this.terminator$.next();
     this.terminator$.complete();
   }
 

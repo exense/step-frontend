@@ -22,7 +22,7 @@ const JSON_VALIDATOR: ValidatorFn = (control: AbstractControl) => {
   styleUrls: ['./json-raw-editor.component.scss'],
 })
 export class JsonRawEditorComponent implements ControlValueAccessor, OnInit, OnDestroy {
-  private terminator$ = new Subject<any>();
+  private terminator$ = new Subject<void>();
 
   private onChange: OnChange = noop;
 
@@ -92,7 +92,7 @@ export class JsonRawEditorComponent implements ControlValueAccessor, OnInit, OnD
   ngOnDestroy(): void {
     this.onChange = noop;
     this.onTouch = noop;
-    this.terminator$.next({});
+    this.terminator$.next();
     this.terminator$.complete();
   }
 

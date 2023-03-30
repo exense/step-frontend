@@ -117,8 +117,8 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
 
   readonly trackBySearchColumn: TrackByFunction<SearchColumn> = (index, item) => item.colName;
 
-  private terminator$ = new Subject();
-  private dataSourceTerminator$?: Subject<unknown>;
+  private terminator$ = new Subject<void>();
+  private dataSourceTerminator$?: Subject<void>;
   private search$ = new BehaviorSubject<{ [column: string]: SearchValue }>({});
   private filter$ = new BehaviorSubject<string | undefined>(undefined);
   private tableParams$ = new BehaviorSubject<TableParameters | undefined>(undefined);
@@ -131,14 +131,14 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
 
   private terminateDatasource(): void {
     if (this.dataSourceTerminator$) {
-      this.dataSourceTerminator$.next({});
+      this.dataSourceTerminator$.next();
       this.dataSourceTerminator$.complete();
     }
   }
 
   private setupDatasource(dataSource?: DataSource<T>): void {
     this.terminateDatasource();
-    this.dataSourceTerminator$ = new Subject<unknown>();
+    this.dataSourceTerminator$ = new Subject<void>();
 
     if (!dataSource) {
       return;
@@ -313,7 +313,7 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     this.search$.complete();
     this.filter$.complete();
     this.tableParams$.complete();
-    this.terminator$.next({});
+    this.terminator$.next();
     this.terminator$.complete();
   }
 
