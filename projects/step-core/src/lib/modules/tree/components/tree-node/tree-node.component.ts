@@ -28,7 +28,7 @@ const ICON_COLLAPSED = 'chevron-right';
   encapsulation: ViewEncapsulation.None,
 })
 export class TreeNodeComponent implements OnInit, OnChanges, OnDestroy {
-  private terminator$ = new Subject<unknown>();
+  private terminator$ = new Subject<void>();
   private isExpanded: boolean = false;
 
   @Input() canToggle: boolean = false;
@@ -71,7 +71,7 @@ export class TreeNodeComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.terminator$.next({});
+    this.terminator$.next();
     this.terminator$.complete();
   }
 

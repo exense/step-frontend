@@ -32,7 +32,7 @@ const MESSAGE_ADD_AT_MULTIPLE_NODES =
 })
 export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrategy, OnInit, OnDestroy {
   context?: any;
-  private terminator$ = new Subject<unknown>();
+  private terminator$ = new Subject<void>();
   private planChange$ = new Subject<Plan>();
 
   private planInternal$ = new BehaviorSubject<Plan | undefined>(undefined);
@@ -360,7 +360,7 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
     this.planChange$.complete();
     this.planInternal$.complete();
     this._planEditor.removeStrategy();
-    this.terminator$.next({});
+    this.terminator$.next();
     this.terminator$.complete();
   }
 }
