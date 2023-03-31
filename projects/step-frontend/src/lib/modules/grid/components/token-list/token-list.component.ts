@@ -1,36 +1,16 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import {
-  AJS_MODULE,
-  Mutable,
-  TableLocalDataSource,
-  GridService,
-  TokenWrapper,
-  AugmentedTokenWrapperOwner,
-} from '@exense/step-core';
-import { Observable, BehaviorSubject, switchMap, shareReplay, tap } from 'rxjs';
+import { AJS_MODULE, GridService, AugmentedTokenWrapperOwner, TableFetchLocalDataSource } from '@exense/step-core';
 import { FlatObjectStringFormatPipe } from '../../pipes/flat-object-format.pipe';
 import { TokenTypeComponent } from '../token-type/token-type.component';
-
-type InProgress = Mutable<Pick<TokenListComponent, 'inProgress'>>;
 
 @Component({
   selector: 'step-token-list',
   templateUrl: './token-list.component.html',
   styleUrls: ['./token-list.component.scss'],
 })
-export class TokenListComponent implements OnDestroy {
-  readonly inProgress: boolean = false;
-
-  private tokenRequestSubject$ = new BehaviorSubject<any>({});
-  readonly tokenRequest$: Observable<TokenWrapper[]> = this.tokenRequestSubject$.pipe(
-    tap((_) => ((this as InProgress).inProgress = true)),
-    switchMap((_) => this._gridService.getTokenAssociations()),
-    tap((_) => ((this as InProgress).inProgress = false)),
-    shareReplay(1)
-  );
-
-  readonly searchableToken$ = new TableLocalDataSource(this.tokenRequest$, {
+export class TokenListComponent {
+  readonly searchableToken = new TableFetchLocalDataSource(() => this._gridService.getTokenAssociations(), {
     searchPredicates: {
       id: (element, searchValue) => element.token!.id!.toLowerCase().includes(searchValue.toLowerCase()),
       type: (element, searchValue) =>
@@ -60,30 +40,26 @@ export class TokenListComponent implements OnDestroy {
 
   constructor(private _gridService: GridService) {}
 
-  public loadTable(): void {
-    this.tokenRequestSubject$.next({});
+  loadTable(): void {
+    this.searchableToken.reload();
   }
 
-  public pause(id: string): void {
+  pause(id: string): void {
     this._gridService.startTokenMaintenance(id).subscribe(() => {
       this.loadTable();
     });
   }
 
-  public play(id: string): void {
+  play(id: string): void {
     this._gridService.stopTokenMaintenance(id).subscribe(() => {
       this.loadTable();
     });
   }
 
-  public removeTokenErrors(id: string): void {
+  removeTokenErrors(id: string): void {
     this._gridService.removeAgentTokenErrors(id).subscribe(() => {
       this.loadTable();
     });
-  }
-
-  public ngOnDestroy(): void {
-    this.tokenRequestSubject$.complete();
   }
 }
 

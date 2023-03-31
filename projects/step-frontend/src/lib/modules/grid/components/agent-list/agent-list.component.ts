@@ -1,28 +1,15 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, Mutable, TableLocalDataSource, GridService, AgentListEntry } from '@exense/step-core';
-import { Observable, BehaviorSubject, switchMap, shareReplay, tap } from 'rxjs';
+import { AJS_MODULE, GridService, TableFetchLocalDataSource } from '@exense/step-core';
 import { TokenTypeComponent } from '../token-type/token-type.component';
-
-type InProgress = Mutable<Pick<AgentListComponent, 'inProgress'>>;
 
 @Component({
   selector: 'step-agent-list',
   templateUrl: './agent-list.component.html',
   styleUrls: ['./agent-list.component.scss'],
 })
-export class AgentListComponent implements OnDestroy {
-  readonly inProgress: boolean = false;
-
-  private agentRequestSubject$ = new BehaviorSubject<any>({});
-  readonly agentRequest$: Observable<AgentListEntry[]> = this.agentRequestSubject$.pipe(
-    tap((_) => ((this as InProgress).inProgress = true)),
-    switchMap((_) => this._gridService.getAgents(true.toString())),
-    tap((_) => ((this as InProgress).inProgress = false)),
-    shareReplay(1)
-  );
-
-  readonly searchableAgent$ = new TableLocalDataSource(this.agentRequest$, {
+export class AgentListComponent {
+  readonly searchableAgent = new TableFetchLocalDataSource(() => this._gridService.getAgents(true.toString()), {
     searchPredicates: {
       url: (element, searchValue) => element.agentRef!['agentUrl']!.toLowerCase().includes(searchValue.toLowerCase()),
       type: (element, searchValue) =>
@@ -41,30 +28,26 @@ export class AgentListComponent implements OnDestroy {
 
   constructor(private _gridService: GridService) {}
 
-  public loadTable(): void {
-    this.agentRequestSubject$.next({});
+  loadTable(): void {
+    this.searchableAgent.reload();
   }
 
-  public interrupt(id: string): void {
+  interrupt(id: string): void {
     this._gridService.interruptAgent(id).subscribe(() => {
       this.loadTable();
     });
   }
 
-  public resume(id: string): void {
+  resume(id: string): void {
     this._gridService.resumeAgent(id).subscribe(() => {
       this.loadTable();
     });
   }
 
-  public removeTokenErrors(id: string): void {
+  removeTokenErrors(id: string): void {
     this._gridService.removeAgentTokenErrors(id).subscribe(() => {
       this.loadTable();
     });
-  }
-
-  public ngOnDestroy(): void {
-    this.agentRequestSubject$.complete();
   }
 }
 
