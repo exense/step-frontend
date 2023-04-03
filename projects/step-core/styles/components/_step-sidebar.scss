@@ -20,7 +20,7 @@ $default-color: dc.default-colors();
   $elements-text-padding: 14px,
   $settings-divider-padding-right: 45px,
   $aligned-text-margin-left: 60px,
-  $logo-path: '/images/logotopleft.png'
+  $logo-path: 'images/logotopleft.png'
 ) {
   $config: (
     background-color: $background-color,
@@ -145,7 +145,14 @@ $default-color: dc.default-colors();
       height: 30px;
       margin-left: -12px;
       transform: scale(0.8);
-      background: url($logo-path) no-repeat no-repeat;
+      /**
+      '^' sign is used to prevent file check during the build and pass url without '/'.
+      But this '^' feature probably will be removed in next versions of angular-cli.
+      Check the following links for details:
+      https://github.com/angular/angular-cli/issues/12797#issuecomment-598534241
+      https://github.com/angular/angular-cli/issues/18013#issuecomment-649373940
+      **/
+      background: url('^#{$logo-path}') no-repeat no-repeat;
       background-size: contain;
     }
 

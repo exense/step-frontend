@@ -8,7 +8,7 @@ import { debounceTime, filter, merge, of, Subject, takeUntil } from 'rxjs';
   styleUrls: ['./input-filter.component.scss'],
 })
 export class InputFilterComponent implements OnInit, OnDestroy, OnChanges {
-  private terminator$ = new Subject<unknown>();
+  private terminator$ = new Subject<void>();
 
   readonly searchControl = this.createControl();
 
@@ -43,7 +43,7 @@ export class InputFilterComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnDestroy(): void {
-    this.terminator$.next({});
+    this.terminator$.next();
     this.terminator$.complete();
   }
 

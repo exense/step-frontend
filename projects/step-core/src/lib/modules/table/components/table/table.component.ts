@@ -32,6 +32,7 @@ import { AdditionalHeaderDirective } from '../../directives/additional-header.di
 import { TableFilter } from '../../services/table-filter';
 import { TableParameters } from '../../../../client/generated';
 import { TableReload } from '../../services/table-reload';
+import { ItemsPerPageService } from '../../services/items-per-page.service';
 
 export interface SearchColumn {
   colName: string;
@@ -66,7 +67,6 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
   @Input() dataSource?: DataSource<T>;
   @Input() inProgress?: boolean;
   tableDataSource?: TableDataSource<T>;
-  @Input() pageSizeOptions: ReadonlyArray<number> = [10, 25, 50, 100];
   @Input() pageSizeInputDisabled?: boolean;
   @Input() set filter(value: string | undefined) {
     if (value === this.filter) {
@@ -113,26 +113,32 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
 
   searchColumns: SearchColumn[] = [];
 
+  pageSizeOptions: Array<number>;
+
   readonly trackBySearchColumn: TrackByFunction<SearchColumn> = (index, item) => item.colName;
 
-  private terminator$ = new Subject();
-  private dataSourceTerminator$?: Subject<unknown>;
+  private terminator$ = new Subject<void>();
+  private dataSourceTerminator$?: Subject<void>;
   private search$ = new BehaviorSubject<{ [column: string]: SearchValue }>({});
   private filter$ = new BehaviorSubject<string | undefined>(undefined);
   private tableParams$ = new BehaviorSubject<TableParameters | undefined>(undefined);
 
-  constructor(@Optional() private _sort: MatSort) {}
+  constructor(@Optional() private _sort: MatSort, _itemsPerPageService: ItemsPerPageService) {
+    this.pageSizeOptions = _itemsPerPageService.getItemsPerPage((userPreferredItemsPerPage: number) =>
+      this.page._changePageSize(userPreferredItemsPerPage)
+    );
+  }
 
   private terminateDatasource(): void {
     if (this.dataSourceTerminator$) {
-      this.dataSourceTerminator$.next({});
+      this.dataSourceTerminator$.next();
       this.dataSourceTerminator$.complete();
     }
   }
 
   private setupDatasource(dataSource?: DataSource<T>): void {
     this.terminateDatasource();
-    this.dataSourceTerminator$ = new Subject<unknown>();
+    this.dataSourceTerminator$ = new Subject<void>();
 
     if (!dataSource) {
       return;
@@ -307,7 +313,7 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
     this.search$.complete();
     this.filter$.complete();
     this.tableParams$.complete();
-    this.terminator$.next({});
+    this.terminator$.next();
     this.terminator$.complete();
   }
 

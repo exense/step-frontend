@@ -52,6 +52,8 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
 
   @Input() enumItems?: string[] = [];
 
+  @Input() elementRefMapKey?: string;
+
   constructor(private _dialogService: DialogsService, @Optional() public _ngControl?: NgControl) {
     if (this._ngControl) {
       this._ngControl.valueAccessor = this;

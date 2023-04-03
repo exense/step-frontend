@@ -25,7 +25,9 @@ import { PlanTreeActionsComponent } from './components/plan-tree-actions/plan-tr
 import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
+import { ResourceInputComponent } from './components/resouce-input/resouce-input.component';
 import { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
+import { SearchResourceDialogComponent } from './components/search-resource-dialog/search-resource-dialog.component';
 import { SelectPlanComponent } from './components/select-plan/select-plan.component';
 import { SettingButtonComponent } from './components/setting-button/setting-button.component';
 import { SplitAreaComponent } from './components/split-area/split-area.component';
@@ -36,9 +38,14 @@ import { CORE_INITIALIZER } from './core-initialiser';
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { CapsLockDirective } from './directives/caps-lock.directive';
 import { ElementResizeDirective } from './directives/element-resize.directive';
+import { FocusableDirective } from './directives/focusable.directive';
+import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
+import { FocusablesDirective } from './directives/focusables.directive';
+import { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 import { SimpleLineChartDirective } from './directives/simple-line-chart.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 import { TooltipDirective } from './directives/tooltip.directive';
+import { TrapFocusDirective } from './directives/trap-focus.directive';
 import { StepBasicsModule } from './modules/basics/step-basics.module';
 import { CustomRegistriesModule } from './modules/custom-registeries/custom-registries.module';
 import { DynamicFormsModule } from './modules/dynamic-forms/dynamic-forms.module';
@@ -94,6 +101,13 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     SplitAreaComponent,
     SplitGutterComponent,
     ElementResizeDirective,
+    TrapFocusDirective,
+    FocusableDirective,
+    FocusablesDirective,
+    ResourceInputComponent,
+    SearchResourceDialogComponent,
+    MaxHeightViewportHeightMinusOffsetTopDirective,
+    RecursiveTabIndexDirective,
   ],
   imports: [
     CommonModule,
@@ -162,6 +176,13 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     SplitAreaComponent,
     SplitGutterComponent,
     ElementResizeDirective,
+    TrapFocusDirective,
+    FocusableDirective,
+    FocusablesDirective,
+    ResourceInputComponent,
+    SearchResourceDialogComponent,
+    MaxHeightViewportHeightMinusOffsetTopDirective,
+    RecursiveTabIndexDirective,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -210,7 +231,9 @@ export { PlanLinkComponent } from './components/plan-link/plan-link.component';
 export * from './components/plan-tree/plan-tree.component';
 export { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 export * from './components/report-node-status/report-node-status.component';
+export { ResourceInputComponent } from './components/resouce-input/resouce-input.component';
 export { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
+export { SearchResourceDialogComponent } from './components/search-resource-dialog/search-resource-dialog.component';
 export { SelectPlanComponent } from './components/select-plan/select-plan.component';
 export { SettingButtonComponent } from './components/setting-button/setting-button.component';
 export { SplitAreaComponent } from './components/split-area/split-area.component';
@@ -221,9 +244,14 @@ export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
+export { FocusableDirective } from './directives/focusable.directive';
+export { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
+export { FocusablesDirective } from './directives/focusables.directive';
+export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 export * from './directives/simple-line-chart.directive';
 export * from './directives/tooltip-immediate-close.directive';
 export * from './directives/tooltip.directive';
+export { TrapFocusDirective } from './directives/trap-focus.directive';
 export * from './domain';
 export * from './modules/async-operations/async-operations.module';
 export * from './modules/basics/step-basics.module';
@@ -246,7 +274,7 @@ export * from './services/artefact-refresh-notification.service';
 export * from './services/dashboard.service';
 export * from './services/deferred-link-processor.service';
 export * from './services/execution-close-handle.service';
-export { ExportDialogsService } from './services/export-dialogs.service';
+export * from './services/export-dialogs.service';
 export { ImportDialogsService } from './services/import-dialogs.service';
 export * from './services/invoke-run.service';
 export { IsUsedByDialogService } from './services/is-used-by-dialog.service';
@@ -256,10 +284,14 @@ export { PlanDialogsService } from './services/plan-dialogs.service';
 export * from './services/plan-editor.service';
 export * from './services/plan-interactive-session.service';
 export * from './services/plugin-info-registry.service';
+export { ResourceDialogsService } from './services/resource-dialogs.service';
 export * from './services/resource-input-bridge.service';
 export * from './services/restore-dialogs.service';
 export * from './services/scheduled-task-dialogs.service';
+export * from './services/menu-items-override-config.service';
 export { UibModalHelperService, UibModalInstance } from './services/uib-modal-helper.service';
 export * from './services/view-registry.service';
 export * from './services/view-state.service';
 export * from './shared';
+export * from './services/persistence.service';
+export * from './shared/persistence-tokens';

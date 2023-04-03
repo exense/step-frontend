@@ -1,0 +1,10 @@
+@mixin legacy-common-rules {
+  .row {
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  step-tabs.tab-mode-buttons nav {
+    border: none;
+  }
+}

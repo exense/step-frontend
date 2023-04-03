@@ -175,6 +175,15 @@ $light-primary-text: white;
 
   @include step-icon.step-icon();
 
+  step-dynamic-field,
+  step-dynamic-textfield,
+  step-expression-input,
+  step-resource-input {
+    .mat-button-wrapper {
+      @include step-icon.step-icon(16px);
+    }
+  }
+
   .btn-xs {
     @include step-icon.step-icon(12px);
     step-icon,

@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@angular/core';
 import { ArtefactTypesService, ControllerService, ReportNode, TreeNode, TreeNodeUtilsService } from '@exense/step-core';
 import { EXECUTION_TREE_PAGE_LIMIT, EXECUTION_TREE_PAGING, ExecutionTreePaging } from './execution-tree-paging';
 import { ReportTreeNode } from '../shared/report-tree-node';
-import { map, Observable, tap } from 'rxjs';
+import { forkJoin, map, Observable, tap } from 'rxjs';
 import { ReportNodeWithChildren } from '../shared/report-node-with-children';
 
 @Injectable()
@@ -66,6 +66,37 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
         node.originalNode.children = children;
       }),
       map((children) => children.length)
+    );
+  }
+
+  restoreTree(root: ReportNodeWithChildren, nodeIdsToRestore: string[]): Observable<ReportNodeWithChildren> {
+    const requests = nodeIdsToRestore.map((parentId) =>
+      this.loadNodes(parentId).pipe(map((nodes: ReportNodeWithChildren[]) => ({ parentId, nodes })))
+    );
+
+    return forkJoin(requests).pipe(
+      map((response) =>
+        response.reduce(
+          (result, item) => {
+            result.dictionary[item.parentId] = item.nodes;
+            result.allNodes = result.allNodes.concat(item.nodes);
+            return result;
+          },
+          {
+            dictionary: {} as Record<string, ReportNodeWithChildren[]>,
+            allNodes: [root],
+          }
+        )
+      ),
+      map(({ dictionary, allNodes }) => {
+        allNodes.forEach((node) => {
+          if (dictionary[node.id!]) {
+            node.children = dictionary[node.id!];
+          }
+        });
+
+        return root;
+      })
     );
   }
 

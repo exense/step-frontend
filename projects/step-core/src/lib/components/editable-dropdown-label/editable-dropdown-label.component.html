@@ -18,20 +18,15 @@
   </ng-container>
 
   <ng-container *ngSwitchCase="State.EDITABLE">
-    <mat-form-field class="step-view with-reduced-inner-padding">
-      <mat-select
-        class="border-primary"
-        [ngModel]="value"
-        (ngModelChange)="onValueChange($event)"
-        (openedChange)="onOpenedChange($event)"
-      >
+    <step-form-field>
+      <mat-select [ngModel]="value" (ngModelChange)="onValueChange($event)" (openedChange)="onOpenedChange($event)">
         <ng-container [stepZIndex]="1050">
           <mat-option *ngFor="let item of items" [value]="item">
             <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: item }"></ng-container>
           </mat-option>
         </ng-container>
       </mat-select>
-    </mat-form-field>
+    </step-form-field>
 
     <step-editable-actions (cancel)="onCancel()" (apply)="onApply()"></step-editable-actions>
   </ng-container>

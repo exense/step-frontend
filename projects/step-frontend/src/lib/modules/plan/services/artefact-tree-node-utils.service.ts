@@ -13,7 +13,7 @@ import { Subject } from 'rxjs';
 export class ArtefactTreeNodeUtilsService
   implements OnDestroy, TreeNodeUtilsService<AbstractArtefact, ArtefactTreeNode>, ArtefactRefreshNotificationService
 {
-  private refreshArtefactInternal$ = new Subject<unknown>();
+  private refreshArtefactInternal$ = new Subject<void>();
   readonly refreshArtefact$ = this.refreshArtefactInternal$.asObservable();
 
   constructor(private _artefactTypes: ArtefactTypesService) {}
@@ -100,7 +100,7 @@ export class ArtefactTreeNodeUtilsService
     }
 
     if (isUpdated) {
-      this.refreshArtefactInternal$.next({});
+      this.refreshArtefactInternal$.next();
     }
     return isUpdated;
   }

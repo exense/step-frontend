@@ -457,6 +457,10 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     }
   }
 
+  expandNodes(nodeIds: string[]): void {
+    nodeIds.forEach((id) => this.expandNodeInternal(id));
+  }
+
   expandNode(nodeId: string): Observable<boolean>;
   expandNode(path: string[]): Observable<boolean>;
   expandNode(nodeIdOrPath: string | string[]): Observable<boolean> {
@@ -507,6 +511,13 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     return result;
   }
 
+  getExpandedNodeIds(): string[] {
+    const expandedNodes = (this.treeControl.dataNodes || [])
+      .filter((node) => this.treeControl.isExpanded(node))
+      .map((node) => node.id);
+    return expandedNodes;
+  }
+
   ngOnDestroy(): void {
     this.nodesAccessCache.clear();
     this.rootNode$.complete();
@@ -551,9 +562,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   }
 
   private updateData(nodes: N[]): void {
-    const expandedNodes = (this.treeControl.dataNodes || [])
-      .filter((node) => this.treeControl.isExpanded(node))
-      .map((node) => node.id);
+    const expandedNodes = this.getExpandedNodeIds();
     this.treeControl.expansionModel.clear();
     this.dataSource.data = nodes;
     expandedNodes.forEach((id) => this.expandNodeInternal(id));

@@ -1,33 +1,23 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, Mutable, GridService, TokenGroupCapacity, TableLocalDataSource } from '@exense/step-core';
-import { Observable, BehaviorSubject, switchMap, shareReplay, tap } from 'rxjs';
+import { AJS_MODULE, GridService, TableFetchLocalDataSource } from '@exense/step-core';
 import { FlatObjectStringFormatPipe } from '../../pipes/flat-object-format.pipe';
-
-type InProgress = Mutable<Pick<TokenGroupListComponent, 'inProgress'>>;
 
 @Component({
   selector: 'step-token-group-list',
   templateUrl: './token-group-list.component.html',
   styleUrls: ['./token-group-list.component.scss'],
 })
-export class TokenGroupListComponent implements OnDestroy {
-  readonly inProgress: boolean = false;
-
-  private tokenGroupRequestSubject$ = new BehaviorSubject<any>({});
-  private tokenGroupRequest$: Observable<TokenGroupCapacity[]> = this.tokenGroupRequestSubject$.pipe(
-    tap((_) => ((this as InProgress).inProgress = true)),
-    switchMap((_) => this._gridService.getUsageByIdentity(this.getCheckedKeyList())),
-    tap((_) => ((this as InProgress).inProgress = false)),
-    shareReplay(1)
+export class TokenGroupListComponent {
+  readonly searchableTokenGroupRequest = new TableFetchLocalDataSource(
+    () => this._gridService.getUsageByIdentity(this.getCheckedKeyList()),
+    {
+      searchPredicates: {
+        key: (element, searchValue) =>
+          FlatObjectStringFormatPipe.format(element.key!).toLowerCase().includes(searchValue.toLowerCase()),
+      },
+    }
   );
-
-  readonly searchableTokenGroupRequest$ = new TableLocalDataSource(this.tokenGroupRequest$, {
-    searchPredicates: {
-      key: (element, searchValue) =>
-        FlatObjectStringFormatPipe.format(element.key!).toLowerCase().includes(searchValue.toLowerCase()),
-    },
-  });
 
   readonly checkedMap: { [key: string]: boolean } = {
     url: true,
@@ -41,9 +31,13 @@ export class TokenGroupListComponent implements OnDestroy {
 
   constructor(private _gridService: GridService) {}
 
-  public toggleCheckBox(key: string): void {
+  toggleCheckBox(key: string): void {
     this.checkedMap[key] = !this.checkedMap[key];
     this.loadTable();
+  }
+
+  loadTable(): void {
+    this.searchableTokenGroupRequest.reload();
   }
 
   private getCheckedKeyList(): string[] {
@@ -54,14 +48,6 @@ export class TokenGroupListComponent implements OnDestroy {
       }
     }
     return checkedKeyList;
-  }
-
-  public loadTable(): void {
-    this.tokenGroupRequestSubject$.next({});
-  }
-
-  public ngOnDestroy(): void {
-    this.tokenGroupRequestSubject$.complete();
   }
 }
 

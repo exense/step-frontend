@@ -10,18 +10,16 @@
   </ng-container>
 
   <ng-container *ngSwitchCase="State.EDITABLE">
-    <mat-form-field class="step-view with-reduced-inner-padding">
+    <step-form-field>
       <textarea
         #textarea
-        class="border-primary"
-        matInput
         [rows]="textareaRows"
         [ngModel]="value"
         (ngModelChange)="onValueChange($event)"
         (input)="onInput()"
         (blur)="onBlur()"
       ></textarea>
-    </mat-form-field>
+    </step-form-field>
 
     <step-editable-actions (cancel)="onCancel()" (apply)="onApply()"></step-editable-actions>
   </ng-container>
