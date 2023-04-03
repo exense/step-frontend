@@ -1,10 +1,4 @@
-<step-table
-  [dataSource]="_logic.searchableScheduledTask$"
-  [inProgress]="_logic.inProgress"
-  matSort
-  [matSortDisableClear]="true"
-  (onReload)="_logic.loadTable()"
->
+<step-table [dataSource]="_logic.searchableScheduledTask" matSort [matSortDisableClear]="true">
   <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-new'" [availableOperations]="availableBulkOperations">
   </step-bulk-operations>
   <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">

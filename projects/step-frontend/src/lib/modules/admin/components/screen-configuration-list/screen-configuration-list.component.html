@@ -24,7 +24,7 @@
     </button>
   </step-btn-group>
 </section>
-<step-table [dataSource]="searchableScreens$" matSort [matSortDisableClear]="true" [inProgress]="inProgress">
+<step-table [dataSource]="searchableScreens" matSort [matSortDisableClear]="true">
   <ng-container matColumnDef="label" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header disabled>Label</th>
     <td mat-cell *matCellDef="let element">
