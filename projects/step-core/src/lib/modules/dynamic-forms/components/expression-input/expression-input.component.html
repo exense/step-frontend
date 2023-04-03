@@ -1,34 +1,30 @@
-<mat-form-field floatLabel="always" class="step-view" [class.ng-invalid]="!!_ngControl.invalid || isParentInvalid">
-  <mat-label *ngIf="label">{{ label }}</mat-label>
+<step-form-field [class.ng-invalid]="!!_ngControl.invalid || isParentInvalid" [class.with-tooltip]="tooltip">
+  <step-label [attr.show-required-marker]="showRequiredAsterisk || null" *ngIf="label">{{ label }}</step-label>
   <input
     type="text"
-    matInput
     [required]="showRequiredAsterisk"
     [ngModel]="expression"
     (ngModelChange)="onExpressionChange($event)"
     (blur)="onBlur()"
   />
-</mat-form-field>
-
-<div *ngIf="tooltip" class="help">
-  <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below"></step-icon>
-</div>
-
-<div class="actions">
-  <button type="button" mat-stroked-button (click)="editDynamicExpression()">
-    <step-icon name="edit-2"></step-icon>
-  </button>
-
-  <div class="separator"></div>
-
-  <button
-    type="button"
-    mat-stroked-button
-    color="primary"
-    matTooltip="Use a constant value to set this attribute"
-    matTooltipPosition="below"
-    (click)="toggleConstantValue.emit()"
-  >
-    <step-icon name="zap"></step-icon>
-  </button>
-</div>
+  <step-suffix *ngIf="tooltip" class="icon-suffix">
+    <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below"></step-icon>
+  </step-suffix>
+  <step-suffix class="button-suffix">
+    <button type="button" mat-stroked-button (click)="editDynamicExpression()">
+      <step-icon name="edit-2"></step-icon>
+    </button>
+  </step-suffix>
+  <step-suffix class="button-suffix">
+    <button
+      type="button"
+      mat-stroked-button
+      color="primary"
+      matTooltip="Use a constant value to set this attribute"
+      matTooltipPosition="below"
+      (click)="toggleConstantValue.emit()"
+    >
+      <step-icon name="zap"></step-icon>
+    </button>
+  </step-suffix>
+</step-form-field>
