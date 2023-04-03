@@ -2,6 +2,10 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 
 step-dynamic-field {
+  step-prefix {
+    flex: 1;
+  }
+
   button {
     width: 40px;
   }
