@@ -14,6 +14,12 @@ import { JsonRawEditorComponent } from './components/json-raw-editor/json-raw-ed
 import { ElementRefMapDirective } from './directives/element-ref-map.directive';
 import { WidthExpandersDirective } from './directives/width-expanders.directive';
 import { ModalWindowComponent } from './components/modal-window/modal-window.component';
+import { FormFieldComponent } from './components/form-field/form-field.component';
+import { LabelDirective } from './directives/label.directive';
+import { PrefixDirective } from './directives/prefix.directive';
+import { SuffixDirective } from './directives/suffix.directive';
+import { HintDirective } from './directives/hint.directive';
+import { ErrorDirective } from './directives/error.directive';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
@@ -30,6 +36,12 @@ import { ModalWindowComponent } from './components/modal-window/modal-window.com
     ElementRefMapDirective,
     WidthExpandersDirective,
     ModalWindowComponent,
+    FormFieldComponent,
+    LabelDirective,
+    PrefixDirective,
+    SuffixDirective,
+    HintDirective,
+    ErrorDirective,
   ],
   exports: [
     ResourceLabelComponent,
@@ -44,6 +56,12 @@ import { ModalWindowComponent } from './components/modal-window/modal-window.com
     ElementRefMapDirective,
     WidthExpandersDirective,
     ModalWindowComponent,
+    FormFieldComponent,
+    LabelDirective,
+    PrefixDirective,
+    SuffixDirective,
+    HintDirective,
+    ErrorDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -55,6 +73,7 @@ export * from './components/input-filter/input-filter.component';
 export * from './components/resource-label/resource-label.component';
 export * from './components/json-raw-editor/json-raw-editor.component';
 export * from './components/modal-window/modal-window.component';
+export * from './components/form-field/form-field.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
 export * from './pipes/has-right.pipe';
@@ -72,3 +91,8 @@ export * from './shared/project-management-helper-strategy.interface';
 export * from './shared/project-info.interface';
 export * from './directives/element-ref-map.directive';
 export * from './directives/width-expanders.directive';
+export * from './directives/label.directive';
+export * from './directives/prefix.directive';
+export * from './directives/suffix.directive';
+export * from './directives/hint.directive';
+export * from './directives/error.directive';
