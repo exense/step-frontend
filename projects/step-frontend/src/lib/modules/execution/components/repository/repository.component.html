@@ -2,11 +2,11 @@
   <mat-card-title> Repository plan </mat-card-title>
   <mat-card-content *ngIf="reload">
     <ng-container *ngIf="error">
-      <div class="alert alert-danger" role="alert">
+      <step-alert type="danger" role="alert">
         <step-icon name="alert-circle" aria-hidden="true"></step-icon>
         <span class="sr-only">Error:</span>
         {{ error }}
-      </div>
+      </step-alert>
     </ng-container>
     <ng-container *ngIf="loading">
       <step-icon name="refresh-cw" class="icon-refresh-animate"></step-icon>

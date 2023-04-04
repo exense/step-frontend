@@ -1,0 +1,51 @@
+@use 'sass:map';
+@use '../core-variables' as var;
+
+@function step-define-alert-color($background, $border, $text) {
+  $result: (
+    background: $background,
+    border: $border,
+    text: $text,
+  );
+  @return $result;
+}
+
+@function step-define-alerts-config() {
+  $config: (
+    default: step-define-alert-color(var.$gray-50, var.$gray-100, var.$gray-700),
+    success: step-define-alert-color(var.$green-10, var.$green-15, var.$green-650),
+    info: step-define-alert-color(var.$blue-10, var.$blue-15, var.$blue-650),
+    danger: step-define-alert-color(var.$red-10, var.$red-15, var.$red-650),
+    warning: step-define-alert-color(var.$yellow-10, var.$yellow-15, var.$yellow-650),
+  );
+  @return $config;
+}
+
+@mixin step-alert-shape {
+  display: block;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 0.1rem solid transparent;
+  border-radius: 0.4rem;
+}
+
+@mixin step-alert-colors($colors) {
+  background-color: map.get($colors, background);
+  border-color: map.get($colors, border);
+  color: map.get($colors, text);
+}
+
+@mixin step-alert($config: null) {
+  @if not $config {
+    $config: step-define-alerts-config();
+  }
+
+  step-alert {
+    @include step-alert-shape;
+    @each $type, $colors in $config {
+      &[type='#{$type}'] {
+        @include step-alert-colors($colors);
+      }
+    }
+  }
+}
