@@ -12,7 +12,7 @@
   </ng-container>
 
   <ng-container *ngSwitchCase="State.EDITABLE">
-    <mat-form-field class="step-view">
+    <step-form-field>
       <input
         #input
         type="text"
@@ -22,7 +22,7 @@
         (ngModelChange)="onValueChange($event)"
         (blur)="onBlur()"
       />
-    </mat-form-field>
+    </step-form-field>
 
     <step-editable-actions (cancel)="onCancel()" (apply)="onApply()"></step-editable-actions>
   </ng-container>

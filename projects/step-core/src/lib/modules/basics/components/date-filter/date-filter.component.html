@@ -1,9 +1,8 @@
-<mat-form-field class="step-view with-suffix">
-  <mat-label *ngIf="label">{{ label }}</mat-label>
-  <input type="text" matInput [matDatepicker]="picker" #dateInput [formControl]="dateControl" />
-  <div class="icon-suffix" matSuffix>
+<step-form-field>
+  <step-label *ngIf="label">{{ label }}</step-label>
+  <input type="text" [matDatepicker]="picker" #dateInput [formControl]="dateControl" />
+  <step-suffix class="icon-suffix">
     <step-icon name="calendar" (click)="picker.open()"></step-icon>
-  </div>
-  <mat-error *ngIf="dateControl.invalid">Invalid date</mat-error>
-</mat-form-field>
+  </step-suffix>
+</step-form-field>
 <mat-datepicker #picker></mat-datepicker>
