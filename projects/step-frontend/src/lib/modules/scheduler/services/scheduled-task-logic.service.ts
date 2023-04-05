@@ -6,7 +6,7 @@ import {
   Mutable,
   TableLocalDataSource,
 } from '@exense/step-core';
-import { BehaviorSubject, first, Observable, shareReplay, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, shareReplay, switchMap, tap } from 'rxjs';
 import { ScheduledTaskDialogsService } from '@exense/step-core';
 import { Location } from '@angular/common';
 
@@ -32,7 +32,9 @@ export class ScheduledTaskLogicService implements OnDestroy {
       'attributes.name': (element, searchValue) =>
         element.attributes!['name'].toLowerCase().includes(searchValue.toLowerCase()),
       'executionsParameters.customParameters.env': (element, searchValue) =>
-        element.executionsParameters!.customParameters!['env'].toLowerCase().includes(searchValue.toLowerCase()),
+        (element.executionsParameters?.customParameters?.['env'] || '')
+          .toLowerCase()
+          .includes(searchValue.toLowerCase()),
       cronExpression: (element, searchValue) =>
         element.cronExpression!.toLowerCase().includes(searchValue.toLowerCase()),
       status: (element, searchValue) =>
