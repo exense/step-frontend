@@ -895,7 +895,3 @@ fieldset {
 .alert {
   white-space: pre-line;
 }
-
-step-date-filter mat-error {
-  display: none !important;
-}

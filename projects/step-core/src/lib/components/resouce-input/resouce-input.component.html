@@ -1,7 +1,5 @@
 <ng-template #dynamicSwitchTemplate>
-  <ng-container *ngIf="withDynamicSwitch">
-    <div class="suffix-separator"></div>
-
+  <step-suffix class="button-suffix" *ngIf="withDynamicSwitch">
     <button
       type="button"
       mat-stroked-button
@@ -10,21 +8,19 @@
     >
       <step-icon name="zap"></step-icon>
     </button>
-  </ng-container>
+  </step-suffix>
 </ng-template>
 
 <step-upload-container (filesChange)="onFilesChange($event)">
   <ng-container *ngIf="!isResource; else resourceTemplate">
-    <mat-form-field floatLabel="always" class="step-view with-suffix">
-      <mat-label *ngIf="label">
+    <step-form-field>
+      <step-label *ngIf="label">
         {{ label }}
-
         <step-icon *ngIf="withHelpIcon" name="help-circle" [matTooltip]="helpIconTooltip || ''"></step-icon>
-      </mat-label>
+      </step-label>
 
       <input
         type="text"
-        matInput
         [(ngModel)]="stModel"
         [readonly]="disableServerPath"
         [matTooltip]="
@@ -35,15 +31,12 @@
         (blur)="onBlur()"
       />
 
-      <ng-container matSuffix>
-        <ng-container *ngIf="withSaveButton">
-          <button type="button" mat-stroked-button [disabled]="stModel === lastStModelValue" (click)="saveChanges()">
-            {{ saveButtonLabel }}
-          </button>
-
-          <div class="suffix-separator"></div>
-        </ng-container>
-
+      <step-suffix class="button-suffix" *ngIf="withSaveButton">
+        <button type="button" mat-stroked-button [disabled]="stModel === lastStModelValue" (click)="saveChanges()">
+          {{ saveButtonLabel }}
+        </button>
+      </step-suffix>
+      <step-suffix class="button-suffix">
         <button
           type="button"
           mat-stroked-button
@@ -53,48 +46,45 @@
         >
           <step-icon name="search"></step-icon>
         </button>
-
-        <div class="suffix-separator"></div>
-
+      </step-suffix>
+      <step-suffix class="button-suffix">
         <button type="button" mat-stroked-button matTooltip="Select from file system" (click)="openFileChooser()">
           <step-icon name="folder-plus"></step-icon>
         </button>
-
+      </step-suffix>
+      <ng-container matSuffix>
         <ng-container *ngTemplateOutlet="dynamicSwitchTemplate"></ng-container>
       </ng-container>
-    </mat-form-field>
+    </step-form-field>
   </ng-container>
 
   <ng-template #resourceTemplate>
     <ng-container *ngIf="!resourceNotExisting">
-      <mat-form-field floatLabel="always" class="step-view with-suffix">
-        <mat-label *ngIf="label">
+      <step-form-field>
+        <step-label *ngIf="label">
           {{ label }}
 
           <step-icon *ngIf="withHelpIcon" name="help-circle" [matTooltip]="helpIconTooltip || ''"></step-icon>
-        </mat-label>
+        </step-label>
 
         <input
           type="text"
           readonly="readonly"
-          matInput
           [ngModel]="resourceFilename"
           matTooltip="Drag and drop your file here or enter the path to a file accessible from the controller"
         />
 
-        <ng-container matSuffix>
+        <step-suffix class="button-suffix">
           <a [href]="downloadResourceUrl" mat-stroked-button matTooltip="Download this file">
             <step-icon name="download"></step-icon>
           </a>
-
-          <div class="suffix-separator"></div>
-
+        </step-suffix>
+        <step-suffix class="button-suffix">
           <button type="button" mat-stroked-button matTooltip="Select from file system" (click)="openFileChooser()">
             <step-icon name="folder-plus"></step-icon>
           </button>
-
-          <div class="suffix-separator"></div>
-
+        </step-suffix>
+        <step-suffix class="button-suffix">
           <button
             type="button"
             mat-stroked-button
@@ -104,42 +94,38 @@
           >
             <step-icon name="search"></step-icon>
           </button>
-
-          <div class="suffix-separator"></div>
-
+        </step-suffix>
+        <step-suffix class="button-suffix">
           <button type="button" mat-stroked-button matTooltip="Clear" (click)="clear()">
             <step-icon name="x"></step-icon>
           </button>
-
-          <ng-container *ngTemplateOutlet="dynamicSwitchTemplate"></ng-container>
-        </ng-container>
-      </mat-form-field>
+        </step-suffix>
+        <ng-container *ngTemplateOutlet="dynamicSwitchTemplate"></ng-container>
+      </step-form-field>
     </ng-container>
 
     <ng-container *ngIf="resourceNotExisting">
-      <mat-form-field floatLabel="always" class="step-view with-suffix">
-        <mat-label *ngIf="label">
+      <step-form-field>
+        <step-label *ngIf="label">
           {{ label }}
 
           <step-icon *ngIf="withHelpIcon" name="help-circle" [matTooltip]="helpIconTooltip || ''"></step-icon>
-        </mat-label>
+        </step-label>
 
         <input
           type="text"
           readonly="readonly"
-          matInput
           value="Error: the referenced resource doesn't exist anymore."
           matTooltip="Drag and drop your file here or enter the path to a file accessible from the controller"
         />
 
-        <ng-container matSuffix>
+        <step-suffix class="button-suffix">
           <button type="button" mat-stroked-button matTooltip="Clear" (click)="clear()">
             <step-icon name="x"></step-icon>
           </button>
-
-          <ng-container *ngTemplateOutlet="dynamicSwitchTemplate"></ng-container>
-        </ng-container>
-      </mat-form-field>
+        </step-suffix>
+        <ng-container *ngTemplateOutlet="dynamicSwitchTemplate"></ng-container>
+      </step-form-field>
     </ng-container>
   </ng-template>
 </step-upload-container>

@@ -2,16 +2,16 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 
 step-dynamic-field {
-  .mat-button-wrapper step-icon {
-    @include core.step-icon-size(16px);
+  step-prefix {
+    flex: 1;
   }
 
   button {
     width: 40px;
   }
 
-  .editable-label .mat-form-field-prefix {
-    padding: 0 0 0 12px !important;
+  .editable-label {
+    padding: 0;
   }
 
   .dynamic-field-label {

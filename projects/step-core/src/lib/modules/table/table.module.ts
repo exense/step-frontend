@@ -82,6 +82,7 @@ export * from './directives/column.directive';
 export * from './shared/search-value';
 export * from './shared/table-remote-data-source';
 export * from './shared/table-local-data-source';
+export * from './shared/table-fetch-local-data-source';
 export * from './shared/table-data-source';
 export * from './services/table-search';
 export * from './services/table-reload';
