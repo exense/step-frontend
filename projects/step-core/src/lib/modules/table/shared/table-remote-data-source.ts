@@ -109,7 +109,7 @@ const convertTableRequest = (req: TableRequestInternal): TableRequestData => {
 };
 
 export class TableRemoteDataSource<T> implements TableDataSource<T> {
-  private _terminator$ = new Subject<any>();
+  private _terminator$ = new Subject<void>();
   private _inProgress$ = new BehaviorSubject<boolean>(false);
   readonly inProgress$ = this._inProgress$.asObservable();
   private _request$ = new BehaviorSubject<{ request: TableRequestInternal; hideProgress?: boolean } | undefined>(
@@ -179,7 +179,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     // this._request$.complete();
     // this._inProgress$.complete();
     // this._requestLock$.complete();
-    // this._terminator$.next(undefined);
+    // this._terminator$.next();
     // this._terminator$.complete();
   }
 

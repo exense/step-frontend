@@ -1,60 +1,50 @@
-import { Component, EventEmitter, Inject, Input, OnDestroy, Output } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { IRootScopeService } from 'angular';
-import { BehaviorSubject, map, shareReplay, startWith, switchMap, tap } from 'rxjs';
+import { map, startWith } from 'rxjs';
 import { ReferencesService } from '../../client/step-client-module';
-import { TableLocalDataSource } from '../../modules/table/table.module';
-import { AJS_ROOT_SCOPE, IsUsedBySearchType, Mutable } from '../../shared';
-
-type InProgress = Mutable<Pick<IsUsedByListComponent, 'inProgress'>>;
+import { TableFetchLocalDataSource } from '../../modules/table/table.module';
+import { AJS_ROOT_SCOPE, IsUsedBySearchType } from '../../shared';
 
 @Component({
   selector: 'step-is-used-by-list',
   templateUrl: './is-used-by-list.component.html',
   styleUrls: ['./is-used-by-list.component.scss'],
 })
-export class IsUsedByListComponent implements OnDestroy {
+export class IsUsedByListComponent {
   @Input() type?: IsUsedBySearchType;
   @Input() id: string = '';
 
   @Output() onClose = new EventEmitter<any>();
 
-  readonly inProgress: boolean = false;
-
   projectIdToProjectNameMap: { [id: string]: string } = {};
   currentProjectName: string = '';
 
-  private _findReferencesRequest$ = new BehaviorSubject<unknown>({});
-  readonly references$ = this._findReferencesRequest$.pipe(
-    tap(() => ((this as InProgress).inProgress = true)),
-    switchMap(() =>
+  readonly searchableReferences = new TableFetchLocalDataSource(
+    () =>
       this._referencesService.findReferences({
         searchType: this.type,
         searchValue: this.id,
-      })
-    ),
-    tap(() => ((this as InProgress).inProgress = false)),
-    shareReplay(1)
+      }),
+    {
+      searchPredicates: {
+        project: (element, searchValue) =>
+          this.projectIdToProjectNameMap[element.attributes!['project']]
+            .toLowerCase()
+            .includes(searchValue.toLowerCase()),
+      },
+      sortPredicates: {
+        project: (elementA, elementB) =>
+          this.projectIdToProjectNameMap[elementB.attributes!['project']]
+            .toLowerCase()
+            .localeCompare(this.projectIdToProjectNameMap[elementB.attributes!['project']].toLowerCase()),
+      },
+    }
   );
 
-  readonly emptyResults$ = this.references$.pipe(
-    map((result) => result.length === 0),
+  readonly emptyResults$ = this.searchableReferences.total$.pipe(
+    map((total) => total === 0),
     startWith(false)
   );
-
-  readonly searchableReferences$ = new TableLocalDataSource(this.references$, {
-    searchPredicates: {
-      project: (element, searchValue) =>
-        this.projectIdToProjectNameMap[element.attributes!['project']]
-          .toLowerCase()
-          .includes(searchValue.toLowerCase()),
-    },
-    sortPredicates: {
-      project: (elementA, elementB) =>
-        this.projectIdToProjectNameMap[elementB.attributes!['project']]
-          .toLowerCase()
-          .localeCompare(this.projectIdToProjectNameMap[elementB.attributes!['project']].toLowerCase()),
-    },
-  });
 
   closeDialog(): void {
     this.onClose.emit({});
@@ -65,10 +55,6 @@ export class IsUsedByListComponent implements OnDestroy {
     @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService
   ) {
     this.initTenants();
-  }
-
-  ngOnDestroy(): void {
-    this._findReferencesRequest$.complete();
   }
 
   /**

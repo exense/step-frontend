@@ -9,7 +9,7 @@ import { debounceTime, of, Subject, switchMap, takeUntil } from 'rxjs';
   styleUrls: ['./function-package-search.component.scss'],
 })
 export class FunctionPackageSearchComponent implements CustomComponent, AfterViewInit, OnDestroy {
-  private terminator$ = new Subject<unknown>();
+  private terminator$ = new Subject<void>();
 
   context?: ColInput;
 
@@ -51,7 +51,7 @@ export class FunctionPackageSearchComponent implements CustomComponent, AfterVie
   }
 
   ngOnDestroy() {
-    this.terminator$.next(undefined);
+    this.terminator$.next();
     this.terminator$.complete();
   }
 }
