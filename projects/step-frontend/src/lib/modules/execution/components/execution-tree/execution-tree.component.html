@@ -1,5 +1,5 @@
 <as-split direction="horizontal">
-  <as-split-area [size]="30">
+  <as-split-area [size]="30" class="tree-container">
     <step-tree (treeContextAction)="handleContextAction($event.actionId, $event.node)" [dragDisabled]="true">
     </step-tree>
   </as-split-area>
