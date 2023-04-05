@@ -1,5 +1,5 @@
-<mat-form-field class="step-view" floatLabel="always">
-  <mat-label>Group by</mat-label>&nbsp;
+<step-form-field>
+  <step-label>Group by</step-label>&nbsp;
   <mat-select
     [ngModel]="selectedErrorDistributionToggle"
     (ngModelChange)="selectedErrorDistributionToggleChange.emit($event)"
@@ -7,7 +7,7 @@
     <mat-option [value]="ErrorDistributionStatus.message">{{ ErrorDistributionStatus.message }}</mat-option>
     <mat-option [value]="ErrorDistributionStatus.code">{{ ErrorDistributionStatus.code }}</mat-option>
   </mat-select>
-</mat-form-field>
+</step-form-field>
 <ng-container *ngIf="selectedErrorDistributionToggle === ErrorDistributionStatus.message">
   <step-table [dataSource]="countByErrorMsgDataSource" matSort [matSortDisableClear]="true">
     <ng-container matColumnDef="errorMessage" stepSearchCol>

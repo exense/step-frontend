@@ -13,6 +13,12 @@ import { ZIndexDirective } from './directives/z-index.directive';
 import { JsonRawEditorComponent } from './components/json-raw-editor/json-raw-editor.component';
 import { ElementRefMapDirective } from './directives/element-ref-map.directive';
 import { WidthExpandersDirective } from './directives/width-expanders.directive';
+import { FormFieldComponent } from './components/form-field/form-field.component';
+import { LabelDirective } from './directives/label.directive';
+import { PrefixDirective } from './directives/prefix.directive';
+import { SuffixDirective } from './directives/suffix.directive';
+import { HintDirective } from './directives/hint.directive';
+import { ErrorDirective } from './directives/error.directive';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
@@ -28,6 +34,12 @@ import { WidthExpandersDirective } from './directives/width-expanders.directive'
     JsonRawEditorComponent,
     ElementRefMapDirective,
     WidthExpandersDirective,
+    FormFieldComponent,
+    LabelDirective,
+    PrefixDirective,
+    SuffixDirective,
+    HintDirective,
+    ErrorDirective,
   ],
   exports: [
     ResourceLabelComponent,
@@ -41,6 +53,12 @@ import { WidthExpandersDirective } from './directives/width-expanders.directive'
     JsonRawEditorComponent,
     ElementRefMapDirective,
     WidthExpandersDirective,
+    FormFieldComponent,
+    LabelDirective,
+    PrefixDirective,
+    SuffixDirective,
+    HintDirective,
+    ErrorDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -51,6 +69,7 @@ export * from './components/input-filter/hexadecimal-input-filter.component';
 export * from './components/input-filter/input-filter.component';
 export * from './components/resource-label/resource-label.component';
 export * from './components/json-raw-editor/json-raw-editor.component';
+export * from './components/form-field/form-field.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
 export * from './pipes/has-right.pipe';
@@ -64,3 +83,8 @@ export * from './shared/login-strategy';
 export * from './shared/restore-dialog-data';
 export * from './directives/element-ref-map.directive';
 export * from './directives/width-expanders.directive';
+export * from './directives/label.directive';
+export * from './directives/prefix.directive';
+export * from './directives/suffix.directive';
+export * from './directives/hint.directive';
+export * from './directives/error.directive';

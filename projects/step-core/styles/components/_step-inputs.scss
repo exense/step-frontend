@@ -16,272 +16,239 @@
   @return $config;
 }
 
-@mixin suffix-prefix($selectors...) {
-  $mat-form-field-container: '.mat-form-field-wrapper .mat-form-field-flex .mat-form-field-infix';
+$border-radius: 8px;
 
-  @for $i from 0 to length($selectors) {
-    $selector: nth($selectors, $i + 1);
-
-    &.with-suffix {
-      #{$mat-form-field-container} #{$selector} {
-        border-right: 0;
-        border-radius: 8px 0 0 8px;
-      }
-    }
-
-    &.with-prefix {
-      #{$mat-form-field-container} #{$selector} {
-        border-left: 0;
-        border-radius: 0 8px 8px 0;
-      }
-    }
-
-    &.with-prefix.with-suffix {
-      #{$mat-form-field-container} #{$selector} {
-        border-radius: 0;
-        border-left: 0;
-        border-right: 0;
-      }
-    }
-  }
+@mixin border-base {
+  border-top-style: solid;
+  border-bottom-style: solid;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
 }
 
-@mixin focused($config) {
-  $primary-color: map.get($config, primary-color);
-  $primary-text-color: map.get($config, primary-text-color);
-
-  .mat-form-field-wrapper .mat-form-field-flex {
-    .mat-form-field-infix {
-      mat-select,
-      mat-radio-group,
-      .mat-input-element {
-        border-color: $primary-color;
-      }
-
-      .mat-form-field-label-wrapper label {
-        color: $primary-color;
-      }
-    }
-
-    .mat-form-field-prefix,
-    .mat-form-field-suffix {
-      color: $primary-color;
-      border: 1px solid $primary-color;
-
-      .mat-stroked-button:not([color]):not([disabled]) {
-        color: $primary-text-color;
-      }
-
-      .suffix-separator {
-        border-right: 1px solid $primary-color;
-      }
-    }
-  }
+@mixin left-border {
+  border-left-width: 1px;
+  border-left-style: solid;
 }
 
-@mixin mat-form-field($config) {
+@mixin left-border-round {
+  border-top-left-radius: $border-radius;
+  border-bottom-left-radius: $border-radius;
+}
+
+@mixin right-border {
+  border-right-width: 1px;
+  border-right-style: solid;
+}
+
+@mixin right-border-round {
+  border-top-right-radius: $border-radius;
+  border-bottom-right-radius: $border-radius;
+}
+
+@mixin step-form-field($config) {
   $primary-color: map.get($config, primary-color);
   $primary-text-color: map.get($config, primary-text-color);
   $border-color: map.get($config, border-color);
   $error-color: map.get($config, error-color);
 
-  mat-form-field.step-view {
-    display: block;
+  step-form-field {
+    display: flex;
+    flex-direction: column;
     line-height: 1;
 
-    .mat-form-field-wrapper {
+    mat-select,
+    mat-radio-group,
+    input,
+    textarea {
+      border-color: $border-color;
+      font-weight: 400;
+      padding: 8px 14px;
+      line-height: 18px;
+      margin-top: 0;
+      margin-bottom: 0;
+      box-sizing: border-box;
+      outline: none;
+    }
+
+    mat-radio-group {
+      padding: 7px 14px 4px 14px;
       display: flex;
+      gap: 1rem;
+    }
+
+    & > label {
+      color: $primary-text-color;
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 20px;
+      pointer-events: all;
       padding-bottom: 0;
-
-      .mat-form-field-flex {
-        align-items: flex-end;
-
-        .mat-form-field-infix {
-          padding: 0;
-          border-top: none;
-          display: flex;
-          flex-direction: column-reverse;
-
-          mat-select,
-          mat-radio-group,
-          .mat-input-element {
-            border: 1px solid $border-color;
-            border-radius: 8px;
-            font-weight: 400;
-            padding: 8px 14px;
-            line-height: 18px;
-            margin-top: 0;
-            margin-bottom: 0;
-            box-sizing: border-box;
-
-            .mat-select-trigger {
-              height: auto;
-            }
-
-            &.border-primary {
-              border: 1px solid $primary-color;
-            }
-          }
-
-          mat-radio-group {
-            line-height: 18px;
-            display: flex;
-            gap: 1rem;
-          }
-
-          .mat-form-field-label-wrapper {
-            padding-top: 0;
-            display: flex;
-            height: auto;
-            pointer-events: all;
-            left: 0;
-            right: 0;
-            top: 0;
-
-            label {
-              position: static;
-              color: $primary-text-color;
-              font-weight: 500;
-              font-size: 14px;
-              line-height: 20px;
-              width: 100% !important;
-              transform: none !important;
-              pointer-events: all;
-              padding-bottom: 0;
-
-              mat-label {
-                display: inline-flex;
-                align-items: center;
-                gap: 4px;
-
-                step-icon {
-                  width: 16px;
-                  height: 16px;
-                  min-width: 16px;
-                  min-height: 16px;
-                }
-              }
-            }
-          }
-        }
-
-        .mat-form-field-prefix {
-          height: 100%;
-          max-width: 200px;
-          flex: 1;
-          padding: 0 12px;
-          display: flex;
-          border: 1px solid $border-color;
-          border-radius: 8px 0 0 8px;
-          align-items: center;
-        }
-
-        .mat-form-field-suffix {
-          height: 100%;
-          display: flex;
-          border: 1px solid $border-color;
-          border-radius: 0 8px 8px 0;
-
-          .icon-suffix {
-            display: flex;
-            align-items: center;
-            padding: 0 8px;
-          }
-
-          .mat-flat-button,
-          .mat-stroked-button {
-            border: 0;
-            border-radius: 0;
-            padding: 0 8px;
-            min-width: auto;
-
-            step-icon {
-              display: flex;
-            }
-
-            &:last-child {
-              border-radius: 0 8px 8px 0;
-            }
-          }
-
-          .suffix-separator {
-            height: 100%;
-            border-right: 1px solid $border-color;
-          }
-        }
-      }
-
-      .mat-form-field-underline {
+      &:empty {
         display: none;
       }
     }
 
-    &.mat-form-field-has-label {
-      .mat-form-field-flex {
-        padding-top: 22px;
-        position: relative;
-
-        .mat-form-field-infix {
-          position: static;
-          gap: 4px;
-        }
+    step-label {
+      &[show-required-marker]::after {
+        content: '*';
+        display: inline-block;
+        margin-left: 0.5rem;
       }
     }
 
-    @include suffix-prefix('.mat-input-element', 'mat-select', 'mat-radio-group');
-
-    &.with-padding {
-      .mat-form-field-wrapper {
-        padding-bottom: 20px;
-      }
-    }
-
-    &.step-force-focus,
-    &.mat-focused {
-      @include focused($config);
-    }
-
-    &.ng-invalid.ng-touched {
-      .mat-form-field-wrapper .mat-form-field-flex {
-        .mat-form-field-infix {
-          mat-select,
-          .mat-input-element {
-            border-color: $error-color;
-          }
-
-          .mat-form-field-label-wrapper label {
+    &:focus-within,
+    &.step-force-focus {
+      & > label {
+        color: $primary-color;
+        step-label {
+          &[show-required-marker]::after {
             color: $error-color;
           }
         }
-
-        .mat-form-field-prefix {
-          color: $error-color;
-          border: 1px solid $error-color;
+      }
+      & > .form-field-content {
+        mat-select,
+        mat-radio-group,
+        input,
+        textarea,
+        & > step-suffix,
+        & > step-prefix {
+          border-color: $primary-color;
         }
 
-        .mat-form-field-suffix {
-          color: $error-color;
-          border: 1px solid $error-color;
-
-          .mat-stroked-button:not([color]):not([disabled]) {
-            color: $primary-text-color;
-          }
-
-          .suffix-separator {
-            border-right: 1px solid $error-color;
+        & > step-suffix.icon-suffix,
+        & > step-prefix.icon-prefix {
+          step-icon {
+            color: $primary-color;
           }
         }
       }
     }
-  }
 
-  step-date-filter:focus,
-  step-date-filter:focus-within {
-    outline: none;
+    &.ng-invalid.ng-touched {
+      mat-select,
+      input,
+      textarea {
+        border-color: $error-color;
+      }
 
-    mat-form-field.step-view {
-      @include focused($config);
+      & > label {
+        color: $error-color;
+      }
+
+      & > .form-field-content {
+        & > step-suffix,
+        & > step-prefix {
+          border-color: $error-color;
+        }
+        & > step-suffix.icon-suffix,
+        & > step-prefix.icon-prefix {
+          step-icon {
+            color: $error-color;
+          }
+        }
+      }
     }
+
+    .form-field-content {
+      display: inline-flex;
+      width: 100%;
+
+      & > mat-select,
+      & > mat-radio-group,
+      & > input,
+      textarea {
+        @include border-base;
+        @include right-border;
+        @include left-border;
+        width: 180px;
+        flex: auto;
+      }
+
+      & > *:first-child {
+        @include left-border-round;
+      }
+      & > *:last-child {
+        @include right-border-round;
+      }
+
+      step-prefix,
+      step-suffix {
+        @include border-base;
+        border-color: $border-color;
+        border-radius: 0;
+        display: flex;
+        align-items: center;
+        max-width: 200px;
+        padding: 0 12px;
+      }
+
+      step-prefix {
+        border-right: none;
+        @include left-border;
+      }
+      step-suffix {
+        border-left: none;
+        @include right-border;
+      }
+
+      step-suffix.icon-suffix,
+      step-prefix.icon-prefix {
+        padding: 0 8px;
+      }
+
+      step-suffix.button-suffix,
+      step-prefix.button-prefix {
+        padding: 0;
+        & > button,
+        & > a {
+          border: none;
+          padding: 0 8px;
+          min-width: auto;
+          border-radius: 0;
+          height: 100%;
+          step-icon {
+            display: flex;
+          }
+        }
+      }
+
+      step-prefix.button-prefix:first-child {
+        & > button,
+        & > a {
+          @include left-border-round;
+        }
+      }
+      step-suffix.button-suffix:last-child {
+        & > button,
+        & > a {
+          @include right-border-round;
+        }
+      }
+    }
+
+    .form-field-error,
+    .form-field-hint {
+      font-size: 75%;
+      transform: translateY(1rem);
+      &:empty {
+        display: none;
+      }
+    }
+
+    .form-field-error {
+      color: $error-color;
+    }
+
+    .form-field-error:not(:empty) + .form-field-hint {
+      display: none;
+    }
+  }
+}
+
+@mixin step-form-field-vertical-layout {
+  step-form-field:not(:last-child) {
+    padding-bottom: 20px;
   }
 }
 
@@ -290,5 +257,5 @@
     $config: step-define-inputs-config();
   }
 
-  @include mat-form-field($config);
+  @include step-form-field($config);
 }

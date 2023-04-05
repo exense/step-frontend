@@ -3,7 +3,7 @@
     <step-autorefresh-toggle [interval]="5000" (refresh)="loadTable()"> </step-autorefresh-toggle>
   </step-btn-group>
 </section>
-<step-table [dataSource]="searchableAgent$" [inProgress]="inProgress" matSort [matSortDisableClear]="true">
+<step-table [dataSource]="searchableAgent" matSort [matSortDisableClear]="true">
   <ng-container matColumnDef="url" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Url</th>
     <td mat-cell *matCellDef="let element">
