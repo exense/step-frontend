@@ -4,7 +4,7 @@
     border-radius: 12px;
 
     .mat-dialog-content {
-      width: 572px;
+      min-width: 572px;
     }
 
     .without-children {
@@ -34,7 +34,6 @@
             display: flex;
             gap: 12px;
           }
-
         }
 
         .mat-flat-button,
