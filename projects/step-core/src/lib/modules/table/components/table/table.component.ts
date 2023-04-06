@@ -178,8 +178,8 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
 
     combineLatest([page$, sort$, this.search$, this.filter$, this.tableParams$])
       .pipe(takeUntil(this.dataSourceTerminator$))
-      .subscribe(([page, sort, search, filter, tableParams]) =>
-        tableDataSource.getTableData(page, sort, search, filter, tableParams)
+      .subscribe(([page, sort, search, filter, params]) =>
+        tableDataSource.getTableData({ page, sort, search, filter, params })
       );
 
     tableDataSource.forceNavigateToFirstPage$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe(() => {
@@ -274,7 +274,8 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
   }
 
   getTableFilterRequest(): TableRequestData | undefined {
-    return this.tableDataSource?.getFilterRequest(this.search$.value, this.filter$.value, this.tableParams$.value);
+    const [search, filter, params] = [this.search$.value, this.filter$.value, this.tableParams$.value];
+    return this.tableDataSource?.getFilterRequest({ search, filter, params });
   }
 
   reload(): void {

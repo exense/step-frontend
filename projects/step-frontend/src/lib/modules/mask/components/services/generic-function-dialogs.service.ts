@@ -21,11 +21,11 @@ export class GenericFunctionDialogService {
     private _augmentedKeywordsService: AugmentedKeywordsService
   ) {}
 
-  configure(title?: string, serviceroot?: string, filterclass?: string[]) {
+  configure(options?: { title?: string; serviceroot?: string; filterclass?: string[] }) {
     this.config = this._functionDialogs._functionDialogsConfig.getConfigObject(
-      title,
-      serviceroot,
-      filterclass,
+      options?.title,
+      options?.serviceroot,
+      options?.filterclass,
       true,
       'functionTable'
     );

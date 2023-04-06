@@ -1,4 +1,4 @@
-import { TableDataSource } from './table-data-source';
+import { TableDataSource, TableFilterOptions, TableGetDataOptions } from './table-data-source';
 import { CollectionViewer } from '@angular/cdk/collections';
 import {
   BehaviorSubject,
@@ -213,11 +213,11 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     this._request$.complete();
   }
 
-  getTableData(page?: PageEvent, sort?: Sort, search?: { [key: string]: SearchValue }): void {
+  getTableData(options?: TableGetDataOptions): void {
     const request = { ...this._request$.value };
-    request.page = page || request.page;
-    request.sort = sort || request.sort;
-    request.search = search || request.search;
+    request.page = options?.page || request.page;
+    request.sort = options?.sort || request.sort;
+    request.search = options?.search || request.search;
     this._request$.next(request);
   }
 
@@ -225,11 +225,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     this._request$.next(this._request$.value);
   }
 
-  getFilterRequest(
-    search?: { [p: string]: SearchValue },
-    filter?: string,
-    params?: TableParameters
-  ): TableRequestData | undefined {
+  getFilterRequest(options?: TableFilterOptions): TableRequestData | undefined {
     return undefined;
   }
 
