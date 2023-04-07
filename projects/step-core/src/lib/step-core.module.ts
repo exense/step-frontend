@@ -281,6 +281,7 @@ export { IsUsedByDialogService } from './services/is-used-by-dialog.service';
 export * from './services/link-processor.service';
 export * from './services/plan-artefact-resolver.service';
 export { PlanDialogsService } from './services/plan-dialogs.service';
+export * from './services/plan-by-id-cache.service';
 export * from './services/plan-editor.service';
 export * from './services/plan-interactive-session.service';
 export * from './services/plugin-info-registry.service';

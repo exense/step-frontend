@@ -5,11 +5,17 @@ import { SingleDateFilterCondition } from '../shared/single-date-filter-conditio
 import { ScopeFilterCondition } from '../shared/scope-filter-condition';
 import { ReportNodeFilterCondition } from '../shared/report-node-filter-condition';
 import { NumberFilterCondition } from '../shared/number-filter-condition';
+import { BasicFilterCondition } from '../shared/basic-filter-condition';
+import { TableRequestFilter } from '../../../client/step-client-module';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FilterConditionFactoryService {
+  basicFilterCondition(filters: TableRequestFilter[]): FilterCondition {
+    return new BasicFilterCondition(filters);
+  }
+
   singleDateFilterCondition(date?: DateTime): FilterCondition {
     return new SingleDateFilterCondition(date);
   }

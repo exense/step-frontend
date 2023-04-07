@@ -76,6 +76,7 @@ export * from './pipes/has-right.pipe';
 export * from './services/artefact-types.service';
 export * from './services/login.service';
 export * from './services/auth.service';
+export * from './services/item-by-id-cache.service';
 export * from './shared/angularjs-provider-options';
 export * from './shared/auth-context.interface';
 export * from './shared/compare-condition.enum';
