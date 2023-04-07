@@ -16,7 +16,7 @@ import {
   TableRemoteDataSource,
 } from '@exense/step-core';
 import { ILocationService, IRootScopeService } from 'angular';
-import { GenericFunctionBulkOperationsInvokeServiceService } from '../services/generic-function-bulk-operations-invoke.service.service';
+import { GenericFunctionBulkOperationsInvokeService } from '../services/generic-function-bulk-operations-invoke.service';
 
 @Component({
   selector: 'step-generic-function-list',
@@ -26,7 +26,7 @@ import { GenericFunctionBulkOperationsInvokeServiceService } from '../services/g
     selectionCollectionProvider<string, KeywordFunction>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {
       provide: BulkOperationsInvokeService,
-      useClass: GenericFunctionBulkOperationsInvokeServiceService,
+      useClass: GenericFunctionBulkOperationsInvokeService,
     },
   ],
 })

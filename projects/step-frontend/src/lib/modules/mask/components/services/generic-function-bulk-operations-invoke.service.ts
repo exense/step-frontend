@@ -8,7 +8,7 @@ import {
 import { Observable } from 'rxjs';
 
 @Injectable()
-export class GenericFunctionBulkOperationsInvokeServiceService extends BulkOperationsInvokeService<string> {
+export class GenericFunctionBulkOperationsInvokeService extends BulkOperationsInvokeService<string> {
   protected _api = inject(AugmentedKeywordsService);
 
   protected override invokeDelete?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus> {

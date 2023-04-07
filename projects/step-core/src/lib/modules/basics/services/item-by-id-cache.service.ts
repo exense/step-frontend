@@ -6,8 +6,9 @@ export abstract class ItemByIdCacheService<T> implements OnDestroy {
   private itemsCache = new Map<string, T>();
 
   getItem(id: string): Observable<T> {
-    if (this.itemsCache.has(id)) {
-      return of(this.itemsCache.get(id)!);
+    const item = this.itemsCache.get(id);
+    if (item) {
+      return of(item);
     }
     return this.loadItem(id).pipe(tap((item) => this.itemsCache.set(id, item)));
   }
