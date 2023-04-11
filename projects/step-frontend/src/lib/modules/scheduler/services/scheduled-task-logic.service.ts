@@ -16,19 +16,13 @@ export class ScheduledTaskLogicService {
 
   readonly searchableScheduledTask = new TableFetchLocalDataSource(
     () => this._schedulerService.getScheduledExecutions(),
-    {
-      searchPredicates: {
-        cronExpression: (element, searchValue) =>
-          element.cronExpression!.toLowerCase().includes(searchValue.toLowerCase()),
-        status: (element, searchValue) =>
-          element.active
-            ? this.STATUS_ACTIVE_STRING.toLowerCase().includes(searchValue.toLowerCase())
-            : this.STATUS_INACTIVE_STRING.toLowerCase().includes(searchValue.toLowerCase()),
-      },
-      sortPredicates: {
-        status: (elementA, elementB) => +elementB.active! - +elementA.active!,
-      },
-    }
+    TableFetchLocalDataSource.configBuilder<ExecutiontTaskParameters>()
+      .addSearchStringPredicate('cronExpression', (item) => item.cronExpression!)
+      .addSearchStringPredicate('status', (item) =>
+        item.active ? this.STATUS_ACTIVE_STRING : this.STATUS_INACTIVE_STRING
+      )
+      .addSortBooleanPredicate('status', (item) => item.active)
+      .build()
   );
 
   constructor(
