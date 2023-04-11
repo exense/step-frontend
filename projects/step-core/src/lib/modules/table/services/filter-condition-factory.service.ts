@@ -7,6 +7,7 @@ import { ReportNodeFilterCondition } from '../shared/report-node-filter-conditio
 import { NumberFilterCondition } from '../shared/number-filter-condition';
 import { BasicFilterCondition } from '../shared/basic-filter-condition';
 import { TableRequestFilter } from '../../../client/step-client-module';
+import { DynamicValueFilterCondition } from '../shared/dynamic-value-filter-condition';
 
 @Injectable({
   providedIn: 'root',
@@ -30,5 +31,9 @@ export class FilterConditionFactoryService {
 
   numberFilterCondition(value?: string): FilterCondition {
     return new NumberFilterCondition(value);
+  }
+
+  dynamicValueFilterCondition(value?: string): FilterCondition {
+    return new DynamicValueFilterCondition(value);
   }
 }
