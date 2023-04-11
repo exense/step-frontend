@@ -38,7 +38,7 @@ export class PlanModule {
     _cellsRegister: CustomCellRegistryService,
     _planTypeRegistry: PlanTypeRegistryService
   ) {
-    _entityRegistry.register('plans', 'Plan', 'file', '/partials/plans/planSelectionTable.html');
+    _entityRegistry.register('plans', 'Plan', { icon: 'file', templateUrl: '/partials/plans/planSelectionTable.html' });
     _cellsRegister.registerCell('planEntityIcon', PlanIconComponent);
     _cellsRegister.registerCell('planLink', PlanLinkComponent);
     _planTypeRegistry.register('step.core.plans.Plan', 'Visual plan editor', PlanTreeEditorComponent);

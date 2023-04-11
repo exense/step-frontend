@@ -84,7 +84,9 @@ export class ExecutionModule {
     _dashletRegistry: DashletRegistryService,
     _viewRegistry: ViewRegistryService
   ) {
-    _entityRegistry.register('executions', 'Execution', undefined, '/partials/executions/executionSelectionTable.html');
+    _entityRegistry.register('executions', 'Execution', {
+      templateUrl: '/partials/executions/executionSelectionTable.html',
+    });
     _dashletRegistry.registerDashlet('executionStep', DashletExecutionStepComponent);
     _dashletRegistry.registerDashlet('executionTree', DashletExecutionTreeComponent);
     _dashletRegistry.registerDashlet('executionViz', DashletExecutionVizComponent);
