@@ -5,7 +5,7 @@ import {
   ExecutiontTaskParameters,
   TableFetchLocalDataSource,
 } from '@exense/step-core';
-import { Observable, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, shareReplay, switchMap, tap } from 'rxjs';
 import { ScheduledTaskDialogsService } from '@exense/step-core';
 import { Location } from '@angular/common';
 
@@ -34,6 +34,20 @@ export class ScheduledTaskLogicService {
       .addSortBooleanPredicate('status', (item) => item.active)
       .build()
   );
+
+  readonly searchableScheduledTask$ = new TableLocalDataSource(this.scheduledTask$, {
+    searchPredicates: {
+      cronExpression: (element, searchValue) =>
+        element.cronExpression!.toLowerCase().includes(searchValue.toLowerCase()),
+      status: (element, searchValue) =>
+        element.active
+          ? this.STATUS_ACTIVE_STRING.toLowerCase().includes(searchValue.toLowerCase())
+          : this.STATUS_INACTIVE_STRING.toLowerCase().includes(searchValue.toLowerCase()),
+    },
+    sortPredicates: {
+      status: (elementA, elementB) => +elementB.active! - +elementA.active!,
+    },
+  });
 
   constructor(
     private _dashboardService: DashboardService,
