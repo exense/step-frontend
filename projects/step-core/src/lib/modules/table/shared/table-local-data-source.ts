@@ -20,6 +20,8 @@ import { TableRequestData } from '../../../client/table/models/table-request-dat
 import { TableParameters } from '../../../client/generated';
 import { FilterCondition } from './filter-condition';
 import { Mutable } from '../../../shared';
+import { TableLocalDataSourceConfig } from './table-local-data-source-config';
+import { TableLocalDataSourceConfigBuilder } from './table-local-data-source-config-builder';
 
 type FieldAccessor = Mutable<
   Pick<TableLocalDataSource<any>, 'total$' | 'data$' | 'allData$' | 'totalFiltered$' | 'forceNavigateToFirstPage$'>
@@ -31,17 +33,13 @@ interface Request {
   search?: { [key: string]: SearchValue };
 }
 
-export type SearchPredicate<T> = (item: T, searchValue: string) => boolean;
-export type SortPredicate<T> = (itemA: T, itemB: T) => number;
-
 const isSimpleType = (value: any) => ['string', 'number', 'boolean'].includes(typeof value);
 
-export interface TableLocalDataSourceConfig<T> {
-  searchPredicates?: { [columnName: string]: SearchPredicate<T> };
-  sortPredicates?: { [columnName: string]: SortPredicate<T> };
-}
-
 export class TableLocalDataSource<T> implements TableDataSource<T> {
+  static configBuilder<X>(): TableLocalDataSourceConfigBuilder<X> {
+    return new TableLocalDataSourceConfigBuilder();
+  }
+
   private _terminator$ = new Subject<void>();
   private _source$!: Observable<T[]>;
 

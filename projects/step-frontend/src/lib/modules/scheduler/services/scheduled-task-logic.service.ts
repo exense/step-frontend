@@ -16,29 +16,23 @@ export class ScheduledTaskLogicService {
 
   readonly searchableScheduledTask = new TableFetchLocalDataSource(
     () => this._schedulerService.getScheduledExecutions(),
-    {
-      searchPredicates: {
-        'attributes.name': (element, searchValue) =>
-          element.attributes!['name'].toLowerCase().includes(searchValue.toLowerCase()),
-        'executionsParameters.customParameters.env': (element, searchValue) =>
-          element.executionsParameters!.customParameters!['env'].toLowerCase().includes(searchValue.toLowerCase()),
-        cronExpression: (element, searchValue) =>
-          element.cronExpression!.toLowerCase().includes(searchValue.toLowerCase()),
-        status: (element, searchValue) =>
-          element.active
-            ? this.STATUS_ACTIVE_STRING.toLowerCase().includes(searchValue.toLowerCase())
-            : this.STATUS_INACTIVE_STRING.toLowerCase().includes(searchValue.toLowerCase()),
-      },
-      sortPredicates: {
-        'attributes.name': (elementA, elementB) =>
-          elementA.attributes!['name'].localeCompare(elementB.attributes!['name']),
-        'executionsParameters.customParameters.env': (elementA, elementB) =>
-          elementA.executionsParameters!.customParameters!['env'].localeCompare(
-            elementB.executionsParameters!.customParameters!['env']
-          ),
-        status: (elementA, elementB) => +elementB.active! - +elementA.active!,
-      },
-    }
+    TableFetchLocalDataSource.configBuilder<ExecutiontTaskParameters>()
+      .addSearchStringPredicate('attributes.name', (item) => item.attributes!['name'])
+      .addSearchStringPredicate(
+        'executionsParameters.customParameters.env',
+        (item) => item.executionsParameters!.customParameters!['env']
+      )
+      .addSearchStringPredicate('cronExpression', (item) => item.cronExpression!)
+      .addSearchStringPredicate('status', (item) =>
+        item.active ? this.STATUS_ACTIVE_STRING : this.STATUS_INACTIVE_STRING
+      )
+      .addSortStringPredicate('attributes.name', (item) => item.attributes!['name'])
+      .addSortStringPredicate(
+        'executionsParameters.customParameters.env',
+        (item) => item.executionsParameters!.customParameters!['env']
+      )
+      .addSortBooleanPredicate('status', (item) => item.active)
+      .build()
   );
 
   constructor(
