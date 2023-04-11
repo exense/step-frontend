@@ -19,12 +19,10 @@ import { ScheduledTaskListComponent } from './scheduled-task-list/scheduled-task
 })
 export class SchedulerModule {
   constructor(_entityRegistry: EntityRegistry, _cellRegistry: CustomCellRegistryService) {
-    _entityRegistry.register(
-      'tasks',
-      'Scheduler task',
-      'clock',
-      '/partials/scheduler/schedulerTaskSelectionTable.html'
-    );
+    _entityRegistry.register('tasks', 'Scheduler task', {
+      icon: 'clock',
+      templateUrl: '/partials/scheduler/schedulerTaskSelectionTable.html',
+    });
     _cellRegistry.registerCell('taskEntityIcon', SchedulerIconComponent);
     _cellRegistry.registerCell('schedulerTaskLink', SchedulerTaskLinkComponent);
   }
