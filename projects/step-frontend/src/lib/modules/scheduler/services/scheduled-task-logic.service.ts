@@ -6,7 +6,7 @@ import {
   Mutable,
   TableLocalDataSource,
 } from '@exense/step-core';
-import { BehaviorSubject, first, Observable, shareReplay, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, shareReplay, switchMap, tap } from 'rxjs';
 import { ScheduledTaskDialogsService } from '@exense/step-core';
 import { Location } from '@angular/common';
 
@@ -29,10 +29,6 @@ export class ScheduledTaskLogicService implements OnDestroy {
 
   readonly searchableScheduledTask$ = new TableLocalDataSource(this.scheduledTask$, {
     searchPredicates: {
-      'attributes.name': (element, searchValue) =>
-        element.attributes!['name'].toLowerCase().includes(searchValue.toLowerCase()),
-      'executionsParameters.customParameters.env': (element, searchValue) =>
-        element.executionsParameters!.customParameters!['env'].toLowerCase().includes(searchValue.toLowerCase()),
       cronExpression: (element, searchValue) =>
         element.cronExpression!.toLowerCase().includes(searchValue.toLowerCase()),
       status: (element, searchValue) =>
@@ -41,12 +37,6 @@ export class ScheduledTaskLogicService implements OnDestroy {
           : this.STATUS_INACTIVE_STRING.toLowerCase().includes(searchValue.toLowerCase()),
     },
     sortPredicates: {
-      'attributes.name': (elementA, elementB) =>
-        elementA.attributes!['name'].localeCompare(elementB.attributes!['name']),
-      'executionsParameters.customParameters.env': (elementA, elementB) =>
-        elementA.executionsParameters!.customParameters!['env'].localeCompare(
-          elementB.executionsParameters!.customParameters!['env']
-        ),
       status: (elementA, elementB) => +elementB.active! - +elementA.active!,
     },
   });
