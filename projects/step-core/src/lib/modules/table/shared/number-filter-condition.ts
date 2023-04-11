@@ -7,7 +7,12 @@ export class NumberFilterCondition extends FilterCondition {
   constructor(private searchValue?: string) {
     super();
   }
-  toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
+
+  override isEmpty(): boolean {
+    return !this.searchValue;
+  }
+
+  override toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
     const expectedValue = parseInt(this.searchValue || '');
     if (isNaN(expectedValue)) {
       return [];

@@ -1,7 +1,6 @@
 import {
   AfterViewInit,
   Component,
-  ContentChild,
   ContentChildren,
   EventEmitter,
   forwardRef,
@@ -16,7 +15,7 @@ import {
   TrackByFunction,
   ViewChild,
 } from '@angular/core';
-import { BehaviorSubject, combineLatest, Observable, of, startWith, Subject, takeUntil, timer } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, of, startWith, Subject, takeUntil } from 'rxjs';
 import { TableDataSource } from '../../shared/table-data-source';
 import { MatColumnDef, MatTable } from '@angular/material/table';
 import { MatSort, Sort } from '@angular/material/sort';
@@ -33,6 +32,8 @@ import { TableFilter } from '../../services/table-filter';
 import { TableParameters } from '../../../../client/generated';
 import { TableReload } from '../../services/table-reload';
 import { ItemsPerPageService } from '../../services/items-per-page.service';
+import { HasFilter } from '../../../entities-selection/services/has-filter';
+import { FilterCondition } from '../../shared/filter-condition';
 
 export interface SearchColumn {
   colName: string;
@@ -59,9 +60,15 @@ export type DataSource<T> = TableDataSource<T> | T[] | Observable<T[]>;
       provide: TableReload,
       useExisting: forwardRef(() => TableComponent),
     },
+    {
+      provide: HasFilter,
+      useExisting: forwardRef(() => TableComponent),
+    },
   ],
 })
-export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, TableSearch, TableFilter, TableReload {
+export class TableComponent<T>
+  implements AfterViewInit, OnChanges, OnDestroy, TableSearch, TableFilter, TableReload, HasFilter
+{
   @Output() onReload = new EventEmitter<unknown>();
   @Input() trackBy: TrackByFunction<T> = (index) => index;
   @Input() dataSource?: DataSource<T>;
@@ -122,6 +129,27 @@ export class TableComponent<T> implements AfterViewInit, OnChanges, OnDestroy, T
   private search$ = new BehaviorSubject<{ [column: string]: SearchValue }>({});
   private filter$ = new BehaviorSubject<string | undefined>(undefined);
   private tableParams$ = new BehaviorSubject<TableParameters | undefined>(undefined);
+
+  readonly hasFilter$ = this.search$.pipe(
+    map((search) => {
+      const values = Object.values(search);
+      if (values.length === 0) {
+        return false;
+      }
+
+      const hasFilter = values.some((searchValue) => {
+        if (searchValue instanceof FilterCondition) {
+          return !searchValue.isEmpty();
+        }
+        if (typeof searchValue === 'string') {
+          return !!searchValue;
+        }
+        return !!searchValue?.value;
+      });
+
+      return hasFilter;
+    })
+  );
 
   constructor(@Optional() private _sort: MatSort, _itemsPerPageService: ItemsPerPageService) {
     this.pageSizeOptions = _itemsPerPageService.getItemsPerPage((userPreferredItemsPerPage: number) =>
