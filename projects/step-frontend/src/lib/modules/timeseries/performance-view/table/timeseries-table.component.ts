@@ -88,21 +88,19 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   }
 
   getDatasourceConfig(): TableLocalDataSourceConfig<Bucket> {
-    return {
-      sortPredicates: {
-        name: (b1: Bucket, b2: Bucket) => b1.attributes!['name'].localeCompare(b2.attributes!['name']),
-        count: (b1: Bucket, b2: Bucket) => b1.count - b2.count,
-        sum: (b1: Bucket, b2: Bucket) => b1.sum - b2.sum,
-        avg: (b1: Bucket, b2: Bucket) => b1.attributes.avg - b2.attributes.avg,
-        min: (b1: Bucket, b2: Bucket) => b1.min - b2.min,
-        max: (b1: Bucket, b2: Bucket) => b1.max - b2.max,
-        pcl_80: (b1: Bucket, b2: Bucket) => b1.pclValues[80] - b2.pclValues[80],
-        pcl_90: (b1: Bucket, b2: Bucket) => b1.pclValues[90] - b2.pclValues[90],
-        pcl_99: (b1: Bucket, b2: Bucket) => b1.pclValues[99] - b2.pclValues[99],
-        tps: (b1: Bucket, b2: Bucket) => b1.attributes.tps - b2.attributes.tps,
-        tph: (b1: Bucket, b2: Bucket) => b1.attributes.tph - b2.attributes.tph,
-      },
-    };
+    return TableLocalDataSource.configBuilder<Bucket>()
+      .addSortStringPredicate('name', (item) => item.attributes!['name'])
+      .addSortNumberPredicate('count', (item) => item.count)
+      .addSortNumberPredicate('sum', (item) => item.sum)
+      .addSortNumberPredicate('avg', (item) => item.attributes.avg)
+      .addSortNumberPredicate('min', (item) => item.min)
+      .addSortNumberPredicate('max', (item) => item.max)
+      .addSortNumberPredicate('pcl_80', (item) => item.pclValues[80])
+      .addSortNumberPredicate('pcl_90', (item) => item.pclValues[90])
+      .addSortNumberPredicate('pcl_99', (item) => item.pclValues[99])
+      .addSortNumberPredicate('tps', (item) => item.attributes.tps)
+      .addSortNumberPredicate('tph', (item) => item.attributes.tph)
+      .build();
   }
 
   get Math() {

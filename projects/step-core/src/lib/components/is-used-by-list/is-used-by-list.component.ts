@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { IRootScopeService } from 'angular';
 import { map, startWith } from 'rxjs';
-import { ReferencesService } from '../../client/step-client-module';
+import { FindReferencesResponse, ReferencesService } from '../../client/step-client-module';
 import { TableFetchLocalDataSource } from '../../modules/table/table.module';
 import { AJS_ROOT_SCOPE, IsUsedBySearchType } from '../../shared';
 
@@ -25,20 +25,10 @@ export class IsUsedByListComponent {
         searchType: this.type,
         searchValue: this.id,
       }),
-    {
-      searchPredicates: {
-        project: (element, searchValue) =>
-          this.projectIdToProjectNameMap[element.attributes!['project']]
-            .toLowerCase()
-            .includes(searchValue.toLowerCase()),
-      },
-      sortPredicates: {
-        project: (elementA, elementB) =>
-          this.projectIdToProjectNameMap[elementB.attributes!['project']]
-            .toLowerCase()
-            .localeCompare(this.projectIdToProjectNameMap[elementB.attributes!['project']].toLowerCase()),
-      },
-    }
+    TableFetchLocalDataSource.configBuilder<FindReferencesResponse>()
+      .addSearchStringPredicate('project', (element) => this.projectIdToProjectNameMap[element.attributes!['project']])
+      .addSortStringPredicate('project', (element) => this.projectIdToProjectNameMap[element.attributes!['project']])
+      .build()
   );
 
   readonly emptyResults$ = this.searchableReferences.total$.pipe(
@@ -46,15 +36,15 @@ export class IsUsedByListComponent {
     startWith(false)
   );
 
-  closeDialog(): void {
-    this.onClose.emit({});
-  }
-
   constructor(
     private _referencesService: ReferencesService,
     @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService
   ) {
     this.initTenants();
+  }
+
+  closeDialog(): void {
+    this.onClose.emit({});
   }
 
   /**

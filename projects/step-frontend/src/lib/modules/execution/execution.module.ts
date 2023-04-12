@@ -36,6 +36,7 @@ import { PanelComponent } from './components/panel/panel.component';
 import { PanelOperationsComponent } from './components/panel-operations/panel-operations.component';
 import { RepositoryComponent } from './components/repository/repository.component';
 import { ExecutionPageComponent } from './components/execution-page/execution-page.component';
+import { ExecutionSelectionTableComponent } from './components/execution-selection-table/execution-selection-table.component';
 
 @NgModule({
   declarations: [
@@ -62,6 +63,7 @@ import { ExecutionPageComponent } from './components/execution-page/execution-pa
     PanelComponent,
     PanelOperationsComponent,
     ExecutionPageComponent,
+    ExecutionSelectionTableComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [
@@ -75,6 +77,7 @@ import { ExecutionPageComponent } from './components/execution-page/execution-pa
     ExecutionProgressComponent,
     RepositoryComponent,
     ExecutionPageComponent,
+    ExecutionSelectionTableComponent,
   ],
 })
 export class ExecutionModule {
@@ -84,7 +87,9 @@ export class ExecutionModule {
     _dashletRegistry: DashletRegistryService,
     _viewRegistry: ViewRegistryService
   ) {
-    _entityRegistry.register('executions', 'Execution', undefined, '/partials/executions/executionSelectionTable.html');
+    _entityRegistry.register('executions', 'Execution', {
+      component: ExecutionSelectionTableComponent,
+    });
     _dashletRegistry.registerDashlet('executionStep', DashletExecutionStepComponent);
     _dashletRegistry.registerDashlet('executionTree', DashletExecutionTreeComponent);
     _dashletRegistry.registerDashlet('executionViz', DashletExecutionVizComponent);

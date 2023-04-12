@@ -22,20 +22,13 @@ export class RestoreDialogComponent {
     private _filterConditionFactory: FilterConditionFactoryService,
     @Inject(MAT_DIALOG_DATA) public dialogData: RestoreDialogData
   ) {
-    this.dataSource = new TableLocalDataSource(dialogData.history, {
-      searchPredicates: {
-        updateTime: (element, searchValue) => {
-          return element.updateTime === Number(searchValue);
-        },
-      },
-      sortPredicates: {
-        updateTime: (a, b) => {
-          const valueA = a.updateTime || 0;
-          const valueB = b.updateTime || 0;
-          return valueA - valueB;
-        },
-      },
-    });
+    this.dataSource = new TableLocalDataSource(
+      dialogData.history,
+      TableLocalDataSource.configBuilder<History>()
+        .addSearchNumberPredicate('updateTime', (item) => item.updateTime)
+        .addSortNumberPredicate('updateTime', (item) => item.updateTime)
+        .build()
+    );
   }
 
   searchByDate(col: SearchColDirective, date?: DateTime): void {

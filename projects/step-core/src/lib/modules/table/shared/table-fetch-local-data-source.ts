@@ -1,6 +1,7 @@
-import { TableLocalDataSource, TableLocalDataSourceConfig } from './table-local-data-source';
+import { TableLocalDataSource } from './table-local-data-source';
 import { BehaviorSubject, map, Observable, switchMap, tap } from 'rxjs';
 import { CollectionViewer } from '@angular/cdk/collections';
+import { TableLocalDataSourceConfig } from './table-local-data-source-config';
 
 type ReloadOptions<R> = { hideProgress?: boolean; request?: R } | undefined;
 

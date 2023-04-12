@@ -754,29 +754,6 @@ angular
         );
     };
 
-    //Select entities knowing type
-    dialogs.selectEntityOfType = function (entityName, singleSelection, id) {
-      var entityType = EntityRegistry.getEntityByName(entityName);
-
-      var modalInstance = $uibModal.open({
-        backdrop: 'static',
-        templateUrl: 'partials/selection/selectEntityOfType.html',
-        controller: 'SelectSttableEntityCtrl',
-        resolve: {
-          entityType: function () {
-            return entityType;
-          },
-          singleSelection: function () {
-            return singleSelection;
-          },
-          targetId: function () {
-            return id;
-          },
-        },
-      });
-
-      return modalInstance.result;
-    };
 
     //Select entity type only
     dialogs.selectEntityType = function (excludeArray, id) {
@@ -795,19 +772,6 @@ angular
       });
 
       return modalInstance.result;
-    };
-
-    //Select Type and then entities immedately after
-    dialogs.selectEntityTypeForEntities = function (excludeArray, callback, arg) {
-      dialogs.selectEntityType(excludeArray, arg).then(function (result1) {
-        if (!result1.selectAll) {
-          dialogs.selectEntityOfType(result1.entity.entityName, false, arg).then(function (result2) {
-            callback(result2, arg);
-          });
-        } else {
-          callback({entity: result1.entity, assignAll: true}, arg);
-        }
-      });
     };
 
     return dialogs;
@@ -856,77 +820,6 @@ angular
       };
     }
   )
-
-  .controller(
-    'SelectSttableEntityCtrl',
-    function ($scope, $rootScope, $uibModalInstance, helpers, entityType, singleSelection, targetId) {
-      $scope.type = entityType.entityName;
-      $scope.multipleSelection = !singleSelection;
-      $scope.selectEntityHandle = {};
-
-      if (targetId) {
-        $scope.migrationTarget = helpers.getProjectById(targetId).name;
-        $scope.currentProject = $rootScope.tenant.name;
-      }
-
-      $scope.select = function (item) {
-        $uibModalInstance.close({entity: entityType, item: item});
-      };
-
-      $scope.proceed = function () {
-        var resultArray = [];
-        _.each($scope.selectEntityHandle.getSelection(), function (key) {
-          resultArray.push(key);
-        });
-        $uibModalInstance.close({entity: entityType, array: resultArray});
-      };
-
-      $scope.proceedFiltered = function () {
-        $uibModalInstance.close({entity: entityType, filters: $scope.selectEntityHandle.getFilters()});
-      };
-
-      $scope.cancel = function () {
-        $uibModalInstance.dismiss('cancel');
-      };
-    }
-  )
-
-  .directive('selectEntity', function () {
-    return {
-      restrict: 'E',
-      scope: {
-        type: '=',
-        multipleSelection: '=?',
-        onSelection: '=?',
-        handle: '=?',
-      },
-      template: '<ng-include src="templateUrl" />',
-      controller: function ($scope, EntityRegistry) {
-        var entityType = EntityRegistry.getEntityByName($scope.type);
-
-        $scope.tableHandle = {};
-
-        $scope.templateUrl = entityType.templateUrl;
-
-        $scope.notifySelection = function (selection) {
-          if ($scope.onSelection) {
-            $scope.onSelection(selection);
-          }
-        };
-
-        if ($scope.handle) {
-          $scope.handle.getSelection = function () {
-            return $scope.tableHandle.getSelectedIds();
-          };
-
-          $scope.handle.getFilters = function () {
-            const lastRequest = $scope.tableHandle.getLastServerSideRequest();
-            return lastRequest?.filters || undefined;
-          };
-        }
-      },
-    };
-  })
 
   .directive('autofocus', function ($timeout) {
     return {
