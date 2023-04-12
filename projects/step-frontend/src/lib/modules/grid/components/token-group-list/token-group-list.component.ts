@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, GridService, TableFetchLocalDataSource } from '@exense/step-core';
+import { AJS_MODULE, GridService, TableFetchLocalDataSource, TokenGroupCapacity } from '@exense/step-core';
 import { FlatObjectStringFormatPipe } from '../../pipes/flat-object-format.pipe';
 
 @Component({
@@ -11,12 +11,9 @@ import { FlatObjectStringFormatPipe } from '../../pipes/flat-object-format.pipe'
 export class TokenGroupListComponent {
   readonly searchableTokenGroupRequest = new TableFetchLocalDataSource(
     () => this._gridService.getUsageByIdentity(this.getCheckedKeyList()),
-    {
-      searchPredicates: {
-        key: (element, searchValue) =>
-          FlatObjectStringFormatPipe.format(element.key!).toLowerCase().includes(searchValue.toLowerCase()),
-      },
-    }
+    TableFetchLocalDataSource.configBuilder<TokenGroupCapacity>()
+      .addSearchStringPredicate('key', (item) => FlatObjectStringFormatPipe.format(item.key!))
+      .build()
   );
 
   readonly checkedMap: { [key: string]: boolean } = {

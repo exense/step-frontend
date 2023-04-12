@@ -1,6 +1,12 @@
 import { Component } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, GridService, AugmentedTokenWrapperOwner, TableFetchLocalDataSource } from '@exense/step-core';
+import {
+  AJS_MODULE,
+  GridService,
+  AugmentedTokenWrapperOwner,
+  TableFetchLocalDataSource,
+  TokenWrapper,
+} from '@exense/step-core';
 import { FlatObjectStringFormatPipe } from '../../pipes/flat-object-format.pipe';
 import { TokenTypeComponent } from '../token-type/token-type.component';
 
@@ -10,33 +16,27 @@ import { TokenTypeComponent } from '../token-type/token-type.component';
   styleUrls: ['./token-list.component.scss'],
 })
 export class TokenListComponent {
-  readonly searchableToken = new TableFetchLocalDataSource(() => this._gridService.getTokenAssociations(), {
-    searchPredicates: {
-      id: (element, searchValue) => element.token!.id!.toLowerCase().includes(searchValue.toLowerCase()),
-      type: (element, searchValue) =>
-        TokenTypeComponent.TYPE_LABEL_TRANSLATIONS[element.token!.attributes!['$agenttype']]!.toLowerCase().includes(
-          searchValue.toLowerCase()
-        ),
-      agent: (element, searchValue) => element.agent!.agentUrl!.toLowerCase().includes(searchValue.toLowerCase()),
-      attributes: (element, searchValue) =>
-        FlatObjectStringFormatPipe.format(element.token!.attributes!).includes(searchValue.toLowerCase()),
-      state: (element, searchValue) => searchValue.toUpperCase().includes(element.state!.toUpperCase()),
-      executionDescription: (element, searchValue) =>
-        (element.currentOwner as AugmentedTokenWrapperOwner)?.executionDescription.includes(searchValue.toLowerCase()),
-    },
-    sortPredicates: {
-      id: (elementA, elementB) => elementA.token!.id!.localeCompare(elementB.token!.id!),
-      type: (elementA, elementB) =>
-        TokenTypeComponent.TYPE_LABEL_TRANSLATIONS[elementA.token!.attributes!['$agenttype']]!.localeCompare(
-          TokenTypeComponent.TYPE_LABEL_TRANSLATIONS[elementB.token!.attributes!['$agenttype']]!
-        ),
-      agent: (elementA, elementB) => elementA.agent!.agentUrl!.localeCompare(elementB.agent!.agentUrl!),
-      executionDescription: (elementA, elementB) =>
-        (elementA.currentOwner as AugmentedTokenWrapperOwner)?.executionDescription.localeCompare(
-          (elementB.currentOwner as AugmentedTokenWrapperOwner)?.executionDescription
-        ),
-    },
-  });
+  readonly searchableToken = new TableFetchLocalDataSource(
+    () => this._gridService.getTokenAssociations(),
+    TableFetchLocalDataSource.configBuilder<TokenWrapper>()
+      .addSearchStringPredicate('id', (item) => item.token!.id!)
+      .addSearchStringPredicate('type', (item) => item.token!.attributes!['$agenttype'])
+      .addSearchStringPredicate('agent', (item) => item.agent!.agentUrl!)
+      .addSearchStringPredicate('attributes', (item) => FlatObjectStringFormatPipe.format(item.token!.attributes!))
+      .addSearchStringPredicate('state', (item) => item.state!)
+      .addSearchStringPredicate(
+        'executionDescription',
+        (item) => (item.currentOwner as AugmentedTokenWrapperOwner)?.executionDescription
+      )
+      .addSortStringPredicate('id', (item) => item.token!.id!)
+      .addSortStringPredicate('type', (item) => item.token!.attributes!['$agenttype'])
+      .addSortStringPredicate('agent', (item) => item.agent!.agentUrl!)
+      .addSortStringPredicate(
+        'executionDescription',
+        (item) => (item.currentOwner as AugmentedTokenWrapperOwner)?.executionDescription
+      )
+      .build()
+  );
 
   constructor(private _gridService: GridService) {}
 

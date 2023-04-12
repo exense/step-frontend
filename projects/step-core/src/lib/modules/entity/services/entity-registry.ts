@@ -46,10 +46,10 @@ export class EntityRegistry {
    * Shortcut for ng2+ invocation
    * @param type
    * @param label
-   * @param icon
-   * @param templateUrl
+   * @param options
    */
-  register(type: string, label: string, icon?: string, templateUrl?: string): void {
+  register(type: string, label: string, options: { icon?: string; templateUrl?: string } = {}): void {
+    const { icon, templateUrl } = options;
     return this.registerEntity(label, type, icon, undefined, undefined, undefined, undefined, templateUrl);
   }
 
