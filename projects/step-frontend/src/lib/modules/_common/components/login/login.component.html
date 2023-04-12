@@ -3,7 +3,7 @@
     <div class="step-login-logo">
       <img alt="" src="{{ logo }}" />
     </div>
-    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+    <step-alert type="danger" *ngIf="error">{{ error }}</step-alert>
 
     <p class="step-login-heading-text" [class.step-login-heading-text-additional-margin]="!loginDescriptionText">
       Log in
