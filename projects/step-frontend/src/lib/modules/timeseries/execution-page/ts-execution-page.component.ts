@@ -99,6 +99,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
       // it is first change
       this.initDashboard(currentExecution);
       this.cd.detectChanges();
+      return;
     }
     // this.dashboard.setRanges(this.calculateFullTimeRange(currentExecution));
     this.dashboard.refresh(this.calculateFullTimeRange(this.execution!));
