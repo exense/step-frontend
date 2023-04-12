@@ -25,13 +25,9 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges {
 
   readonly searchableRepositoryReport = new TableFetchLocalDataSource<TestRunStatus, RepositoryObjectReference>(
     (request) => this.getTestRuns(request),
-    {
-      searchPredicates: {
-        status: (element, searchValue) => {
-          return searchValue.toLowerCase().includes(element!.status!.toLowerCase());
-        },
-      },
-    }
+    TableFetchLocalDataSource.configBuilder<TestRunStatus>()
+      .addSortStringPredicate('status', (item) => item.status)
+      .build()
   );
 
   readonly statusItems$ = this.searchableRepositoryReport.allData$.pipe(
