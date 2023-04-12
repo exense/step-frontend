@@ -90,6 +90,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
 
   ngOnChanges(changes: SimpleChanges): void {
     let executionChange = changes['executionInput'];
+    console.log(changes);
     if (!executionChange) {
       return;
     }
@@ -100,7 +101,6 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
       this.cd.detectChanges();
       return;
     }
-    // this.dashboard.setRanges(this.calculateFullTimeRange(currentExecution));
     this.dashboard.refresh(this.calculateFullTimeRange(this.execution!));
   }
 

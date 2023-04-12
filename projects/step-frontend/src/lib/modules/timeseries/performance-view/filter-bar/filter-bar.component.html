@@ -2,7 +2,7 @@
   <button type="button" mat-raised-button color="primary" [matMenuTriggerFor]="menu">Add Filter</button>
 
   <div class="warning-mark" *ngIf="rawMeasurementsModeActive">
-    You are using custom filters which can make the dashboard be slower. Please be patient.
+    You use custom filters that refer to raw measurements, this may slow down the dashboard.
   </div>
 
   <mat-menu #menu="matMenu">
