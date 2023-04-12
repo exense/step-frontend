@@ -102,3 +102,5 @@ export * from './directives/suffix.directive';
 export * from './directives/hint.directive';
 export * from './directives/error.directive';
 export * from './directives/alert.directive';
+export * from './shared/repository-parameters.token';
+export * from './repository-parameters-initializer';

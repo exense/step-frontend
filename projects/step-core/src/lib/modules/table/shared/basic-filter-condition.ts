@@ -5,7 +5,11 @@ export class BasicFilterCondition extends FilterCondition {
   constructor(private filters: TableRequestFilter[]) {
     super();
   }
-  toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
+  override toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
     return this.filters;
+  }
+
+  override isEmpty(): boolean {
+    return !this.filters || this.filters.length === 0;
   }
 }

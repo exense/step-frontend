@@ -54,4 +54,8 @@ export class DynamicValueFilterCondition extends FilterCondition {
 
     return [filter];
   }
+
+  override isEmpty(): boolean {
+    return !this.searchValue;
+  }
 }

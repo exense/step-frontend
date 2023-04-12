@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable, Injector } from '@angular/core';
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -6,13 +6,22 @@ import { AuthService } from '@exense/step-core';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private _authService: AuthService) {}
+  private _injector = inject(Injector);
 
   private handleAuthError(error: HttpErrorResponse): Observable<any> {
     if (error.status === 401) {
+      /**
+       * AuthService injects lots of dependencies from angularJS
+       * Injecting it in the HttpInterceptor's constructor, prevent us to use HttpClient
+       * in APP_INITIALIZER providers, which run before angularJS part's boot
+       *
+       * Retrieving AuthService through the Injector in concrete place, where it is used,
+       * removes this restriction
+       * **/
+      const authService = this._injector.get(AuthService);
       // when checking for session auth error is expected
-      if (this._authService.isAuthenticated() || this._authService.isOidc) {
-        this._authService.goToLoginPage();
+      if (authService.isAuthenticated() || authService.isOidc) {
+        authService.goToLoginPage();
       }
     }
     return throwError(() => error);
