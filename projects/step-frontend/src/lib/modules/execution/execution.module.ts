@@ -88,7 +88,7 @@ export class ExecutionModule {
     _viewRegistry: ViewRegistryService
   ) {
     _entityRegistry.register('executions', 'Execution', {
-      templateUrlOrComponent: ExecutionSelectionTableComponent,
+      component: ExecutionSelectionTableComponent,
     });
     _dashletRegistry.registerDashlet('executionStep', DashletExecutionStepComponent);
     _dashletRegistry.registerDashlet('executionTree', DashletExecutionTreeComponent);

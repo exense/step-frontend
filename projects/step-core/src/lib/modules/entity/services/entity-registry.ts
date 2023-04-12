@@ -68,10 +68,10 @@ export class EntityRegistry {
   register(
     type: string,
     label: string,
-    options: { icon?: string; templateUrlOrComponent?: string | Type<CustomComponent> } = {}
+    options: { icon?: string; templateUrl?: string; component?: Type<CustomComponent> } = {}
   ): void {
-    const { icon, templateUrlOrComponent } = options;
-    return this.registerEntity(label, type, icon, undefined, undefined, undefined, undefined, templateUrlOrComponent);
+    const { icon, templateUrl, component } = options;
+    return this.registerEntity(label, type, icon, undefined, undefined, undefined, undefined, component || templateUrl);
   }
 
   getEntities(): ReadonlyArray<EntityMeta> {
