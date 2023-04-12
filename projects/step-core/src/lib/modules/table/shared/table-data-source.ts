@@ -6,23 +6,23 @@ import { SearchValue } from './search-value';
 import { TableRequestData } from '../../../client/table/step-table-client.module';
 import { TableParameters } from '../../../client/generated';
 
+export interface TableFilterOptions {
+  search?: { [key: string]: SearchValue };
+  filter?: string;
+  params?: TableParameters;
+}
+export interface TableGetDataOptions extends TableFilterOptions {
+  page?: PageEvent;
+  sort?: Sort;
+}
+
 export interface TableDataSource<T> extends DataSource<T> {
   readonly inProgress$: Observable<boolean>;
   readonly total$: Observable<number>;
   readonly totalFiltered$: Observable<number>;
   readonly forceNavigateToFirstPage$: Observable<unknown>;
-  getTableData(
-    page?: PageEvent,
-    sort?: Sort,
-    search?: { [key: string]: SearchValue },
-    filter?: string,
-    params?: TableParameters
-  ): void;
-  getFilterRequest(
-    search?: { [key: string]: SearchValue },
-    filter?: string,
-    params?: TableParameters
-  ): TableRequestData | undefined;
+  getTableData(options?: TableGetDataOptions): void;
+  getFilterRequest(options?: TableFilterOptions): TableRequestData | undefined;
   reload(reloadOptions?: { hideProgress: boolean }): void;
   exportAsCSV(fields: string[], params?: TableParameters): void;
 }

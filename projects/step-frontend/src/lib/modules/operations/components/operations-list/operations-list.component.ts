@@ -13,57 +13,18 @@ export class OperationsListComponent {
 
   readonly dataSource = new TableFetchLocalDataSource<OperationDetails>(
     () => this._systemService.getCurrentOperationsList(),
-    {
-      searchPredicates: {
-        tid: (element, searchValue) => {
-          const value = this.getThreadId(element) || '';
-          return value.toString().toLowerCase().includes(searchValue.toLowerCase());
-        },
-        planName: (element, searchValue) => {
-          const value = this.getPlanName(element) || '';
-          return value.toLowerCase().includes(searchValue.toLowerCase());
-        },
-        execution: (element, searchValue) => {
-          const value = this.getExecution(element) || '';
-          return value.toLowerCase().includes(searchValue.toLowerCase());
-        },
-        testcase: (element, searchValue) => {
-          const value = this.getTestcase(element) || '';
-          return value.toLowerCase().includes(searchValue.toLowerCase());
-        },
-        operation: (element, searchValue) => {
-          const value = this.getOperation(element) || '';
-          return value.toLowerCase().includes(searchValue.toLowerCase());
-        },
-      },
-      sortPredicates: {
-        tid: (a, b) => {
-          const valueA = this.getThreadId(a) || '';
-          const valueB = this.getThreadId(b) || '';
-          return valueA.toString().localeCompare(valueB.toString());
-        },
-        planName: (a, b) => {
-          const valueA = this.getPlanName(a) || '';
-          const valueB = this.getPlanName(b) || '';
-          return valueA.localeCompare(valueB);
-        },
-        execution: (a, b) => {
-          const valueA = this.getExecution(a) || '';
-          const valueB = this.getExecution(b) || '';
-          return valueA.localeCompare(valueB);
-        },
-        testcase: (a, b) => {
-          const valueA = this.getTestcase(a) || '';
-          const valueB = this.getTestcase(b) || '';
-          return valueA.localeCompare(valueB);
-        },
-        operation: (a, b) => {
-          const valueA = this.getOperation(a) || '';
-          const valueB = this.getOperation(b) || '';
-          return valueA.localeCompare(valueB);
-        },
-      },
-    }
+    TableFetchLocalDataSource.configBuilder<OperationDetails>()
+      .addSearchStringPredicate('tid', (item) => this.getThreadId(item)?.toString())
+      .addSearchStringPredicate('planName', (item) => this.getPlanName(item))
+      .addSearchStringPredicate('execution', (item) => this.getExecution(item))
+      .addSearchStringPredicate('testcase', (item) => this.getTestcase(item))
+      .addSearchStringPredicate('operation', (item) => this.getOperation(item))
+      .addSortStringPredicate('tid', (item) => this.getThreadId(item)?.toString())
+      .addSortStringPredicate('planName', (item) => this.getPlanName(item))
+      .addSortStringPredicate('execution', (item) => this.getExecution(item))
+      .addSortStringPredicate('testcase', (item) => this.getTestcase(item))
+      .addSortStringPredicate('operation', (item) => this.getOperation(item))
+      .build()
   );
 
   constructor(private _systemService: SystemService) {}

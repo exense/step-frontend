@@ -1,4 +1,9 @@
-<h1 mat-dialog-title>{{ title }}</h1>
+<h1 mat-dialog-title>
+  {{ title }}
+  <section #subtitle [class.without-chidlren]="!subtitle.children.length">
+    <ng-content select="[step-modal-window-subtitle]"></ng-content>
+  </section>
+</h1>
 
 <div mat-dialog-content>
   <ng-content select="[step-modal-window-body]"></ng-content>

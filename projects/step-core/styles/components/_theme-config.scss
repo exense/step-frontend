@@ -10,9 +10,11 @@
 @use 'step-buttons';
 @use 'step-menu';
 @use 'step-datepicker';
+@use 'step-alert';
 
 @forward 'step-sidebar' show step-define-sidebar-config;
 @forward 'step-header' show step-define-header-config;
+@forward 'step-alert' show step-define-alert-color, step-alert-colors;
 
 $dark-primary-text: #293e50;
 $light-primary-text: white;
@@ -143,6 +145,7 @@ $light-primary-text: white;
   @include step-buttons.buttons();
   @include step-menu.menu();
   @include step-datepicker.datepicker();
+  @include step-alert.step-alert();
 
   .cdk-overlay-pane {
     padding-top: 8px;

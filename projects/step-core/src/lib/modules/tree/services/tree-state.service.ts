@@ -404,16 +404,18 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     this.selectedInsertionParentId$.next(lastParent!.id!);
   }
 
-  findNodeById(id?: string, parent?: N, useCache: boolean = true): N | undefined {
+  findNodeById(id?: string, options?: { parent?: N; useCache?: boolean }): N | undefined {
     if (!id) {
       return undefined;
     }
+
+    const useCache = options?.useCache ?? true;
 
     if (useCache && this.nodesAccessCache.has(id)) {
       return this.nodesAccessCache.get(id);
     }
 
-    parent = parent || this.rootNode$.value;
+    const parent = options?.parent ?? this.rootNode$.value;
 
     if (parent?.id === id) {
       this.nodesAccessCache.set(id, parent);
@@ -430,7 +432,9 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       return result;
     }
 
-    result = parent.children!.map((child) => this.findNodeById(id, child as N, useCache)).find((res) => !!res) as N;
+    result = parent
+      .children!.map((child) => this.findNodeById(id, { parent: child as N, useCache }))
+      .find((res) => !!res) as N;
 
     if (result) {
       this.nodesAccessCache.set(id, result);
@@ -571,7 +575,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   private isPossibleToInsert(newParentId: string, ...itemsToInsert: N[]): boolean {
     // If new parent is a child of itemsToInsert, prevent the insert
     const newParentFoundIn = itemsToInsert
-      .map((item) => !!this.findNodeById(newParentId!, item, false))
+      .map((item) => !!this.findNodeById(newParentId!, { parent: item, useCache: false }))
       .filter((isFound) => isFound);
 
     // Allow the insertion, if new parent doesn't exist in items to insert
