@@ -5,4 +5,8 @@ step-plan-tree {
   @include core.tree-node-selected-for-insert(var.$blue-600);
   display: flex;
   height: 100%;
+
+  step-tree {
+    overflow: auto;
+  }
 }

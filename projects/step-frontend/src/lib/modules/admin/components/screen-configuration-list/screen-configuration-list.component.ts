@@ -1,15 +1,6 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import {
-  AJS_MODULE,
-  Input,
-  Option,
-  Mutable,
-  TableLocalDataSource,
-  ScreensService,
-  TableFetchLocalDataSource,
-} from '@exense/step-core';
-import { BehaviorSubject, switchMap, shareReplay, tap } from 'rxjs';
+import { AJS_MODULE, Input, Option, ScreensService, TableFetchLocalDataSource, ScreenInput } from '@exense/step-core';
 import { ScreenDialogsService } from '../../services/screen-dialogs.service';
 
 @Component({
@@ -25,17 +16,13 @@ export class ScreenConfigurationListComponent {
   readonly _screenChoicesRequest$ = this._screensService.getScreens();
   readonly searchableScreens = new TableFetchLocalDataSource(
     () => this._screensService.getScreenInputsByScreenId(this.currentlySelectedScreenChoice),
-    {
-      searchPredicates: {
-        label: (item, searchValue) => item.input!.label!.toLowerCase().includes(searchValue.toLowerCase()),
-        id: (item, searchValue) => item.input!.id!.toLowerCase().includes(searchValue.toLowerCase()),
-        type: (item, searchValue) => item.input!.type!.toLowerCase().includes(searchValue.toLowerCase()),
-        options: (item, searchValue) =>
-          this.optionsToString(item.input!.options).toLowerCase().includes(searchValue.toLowerCase()),
-        activationScript: (item, searchValue) =>
-          item.input!.activationExpression!.script!.toLowerCase().includes(searchValue.toLowerCase()),
-      },
-    }
+    TableFetchLocalDataSource.configBuilder<ScreenInput>()
+      .addSearchStringPredicate('label', (item) => item.input!.label!)
+      .addSearchStringPredicate('id', (item) => item.input!.id!)
+      .addSearchStringPredicate('type', (item) => item.input!.type!)
+      .addSearchStringPredicate('options', (item) => this.optionsToString(item.input!.options!))
+      .addSearchStringPredicate('activationScript', (item) => item.input!.activationExpression!.script!)
+      .build()
   );
 
   constructor(private _screensService: ScreensService, private _screenDialogs: ScreenDialogsService) {}

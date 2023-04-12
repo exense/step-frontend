@@ -474,11 +474,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   switchThroughputMetric(metric: ThroughputMetric) {
-    let f = (u: any, vals: any) => vals.map((v: number) => metric.labelFunction(v));
     this.throughputChart.settings.tooltipOptions.zAxisLabel = metric.tooltipZAxisLabel;
-    this.throughputChart.uplot.axes[1].values = f;
-    this.throughputChart.uplot.axes[2].values = f;
-    if (metric.label === this.selectedResponseTimeMetric.label) {
+    if (metric.label === this.selectedThroughputMetric.label) {
       // it is not a real change
       return;
     }
@@ -495,10 +492,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
         }
         let value = this.selectedThroughputMetric.mapFunction(b);
         totalData[j] += value;
-        data[i + 1][j] = value;
+        data[i + 2][j] = value;
       });
     });
-    data[data.length - 1] = totalData;
+    data[1] = totalData;
     this.throughputChart.setData(data, false);
   }
 
