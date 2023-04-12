@@ -53,6 +53,7 @@ export class SelectionCollectorImpl<KEY, ENTITY> implements SelectionCollector<K
   }
 
   clear(): void {
+    this.selectedPossible = false;
     this._selected$.next([]);
   }
 
