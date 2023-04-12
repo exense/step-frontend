@@ -9,7 +9,11 @@ export class SingleDateFilterCondition extends FilterCondition {
     super();
   }
 
-  toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
+  override isEmpty(): boolean {
+    return !this.date;
+  }
+
+  override toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
     if (!this.date) {
       return [];
     }
