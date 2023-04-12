@@ -65,7 +65,7 @@ export class FunctionModule {
       'rest/functionpackages/',
       'rest/functionpackages/',
       'st-table',
-      'functionpackages/partials/functionPackageSelectionTable.html'
+      FunctionPackageSelectionComponent
     );
   }
 }

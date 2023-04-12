@@ -57,7 +57,7 @@ angular
     };
   })
 
-  .controller('editSchedulerTaskModalCtrl', function ($scope, $uibModalInstance, $http, $location, task, PlanDialogs) {
+  .controller('editSchedulerTaskModalCtrl', function ($scope, $uibModalInstance, $http, $location, task, PlanDialogsService) {
     $scope.task = task;
 
     //Init customParameters if it doesn't exist yet
@@ -93,7 +93,7 @@ angular
     };
 
     $scope.selectPlan = function () {
-      PlanDialogs.selectPlan(function (plan) {
+      PlanDialogsService.selectPlan().subscribe(function (plan) {
         $scope.task.executionsParameters.repositoryObject.repositoryParameters.planid = plan.id;
         $scope.task.executionsParameters.description = plan.attributes.name;
         if (!$scope.task.attributes) {

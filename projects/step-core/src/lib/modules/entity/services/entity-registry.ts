@@ -1,8 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Type } from '@angular/core';
 import { EntityMeta } from '../types/entity-meta';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE } from '../../../shared';
-import { CustomRegistryService, CustomRegistryType } from '../../custom-registeries/custom-registries.module';
+import {
+  CustomComponent,
+  CustomRegistryService,
+  CustomRegistryType,
+} from '../../custom-registeries/custom-registries.module';
 
 @Injectable({
   providedIn: 'root',
@@ -21,11 +25,23 @@ export class EntityRegistry {
     getUrl?: string,
     postUrl?: string,
     tableType?: string,
-    templateUrl?: string,
+    templateUrlOrComponent?: string | Type<CustomComponent>,
     callback?: Function
   ): void {
     const type = entityName;
     const label = displayName;
+
+    let templateUrl: string | undefined = undefined;
+    let component: Type<CustomComponent> | undefined = undefined;
+
+    if (templateUrlOrComponent) {
+      if (typeof templateUrlOrComponent === 'string') {
+        templateUrl = templateUrlOrComponent;
+      } else {
+        component = templateUrlOrComponent;
+      }
+    }
+
     const entity: EntityMeta = {
       type,
       label,
@@ -38,6 +54,7 @@ export class EntityRegistry {
       templateUrl,
       callback,
       icon,
+      component,
     };
     this._customRegistry.register(this.registryType, type, entity);
   }
@@ -48,9 +65,13 @@ export class EntityRegistry {
    * @param label
    * @param options
    */
-  register(type: string, label: string, options: { icon?: string; templateUrl?: string } = {}): void {
-    const { icon, templateUrl } = options;
-    return this.registerEntity(label, type, icon, undefined, undefined, undefined, undefined, templateUrl);
+  register(
+    type: string,
+    label: string,
+    options: { icon?: string; templateUrl?: string; component?: Type<CustomComponent> } = {}
+  ): void {
+    const { icon, templateUrl, component } = options;
+    return this.registerEntity(label, type, icon, undefined, undefined, undefined, undefined, component || templateUrl);
   }
 
   getEntities(): ReadonlyArray<EntityMeta> {
