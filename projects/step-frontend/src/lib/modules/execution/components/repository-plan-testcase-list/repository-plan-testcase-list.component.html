@@ -1,10 +1,4 @@
-<step-table
-  [dataSource]="searchableRepositoryReport$"
-  [inProgress]="inProgress"
-  matSort
-  [matSortDisableClear]="true"
-  (onReload)="loadTable()"
->
+<step-table [dataSource]="searchableRepositoryReport" matSort [matSortDisableClear]="true">
   <step-bulk-operations
     *stepAdditionalHeader
     [(selectionType)]="selectionType"

@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 .item-container {
   cursor: pointer;
   padding: 0 14px;
@@ -53,8 +55,12 @@
   height: auto;
 }
 
-button {
-  background: #293e50 !important;
+.mat-raised-button.mat-primary {
+  background: var.$darkest-blue;
+
+  &:focus {
+    outline: 3px solid var.$dark-blue;
+  }
 }
 
 label {
@@ -72,4 +78,9 @@ label {
   flex-direction: column;
   gap: 1.25em;
   padding-bottom: 1.25em;
+}
+
+.mat-checkbox:focus-within {
+  outline: none;
+  color: var.$dark-blue;
 }

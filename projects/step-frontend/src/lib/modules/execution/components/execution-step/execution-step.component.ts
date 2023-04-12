@@ -17,7 +17,7 @@ type FieldAccessor = Mutable<Pick<ExecutionStepComponent, 'keywordParameters$'>>
   styleUrls: ['./execution-step.component.scss'],
 })
 export class ExecutionStepComponent implements OnChanges, OnDestroy {
-  private selectionTerminator$?: Subject<any>;
+  private selectionTerminator$?: Subject<void>;
 
   readonly keywordParameters$?: Observable<KeywordParameters>;
 
@@ -101,7 +101,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
     if (!this.selectionTerminator$) {
       return;
     }
-    this.selectionTerminator$.next({});
+    this.selectionTerminator$.next();
     this.selectionTerminator$.complete();
     this.selectionTerminator$ = undefined;
   }
@@ -116,7 +116,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
       return;
     }
 
-    this.selectionTerminator$ = new Subject<any>();
+    this.selectionTerminator$ = new Subject<void>();
 
     (this as FieldAccessor).keywordParameters$ = testCasesSelection!.selected$.pipe(
       map((testcases) => ({

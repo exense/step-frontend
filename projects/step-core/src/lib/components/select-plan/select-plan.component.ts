@@ -7,7 +7,6 @@ import { PlanDialogsService } from '../../services/plan-dialogs.service';
   selector: 'step-select-plan',
   templateUrl: './select-plan.component.html',
   styleUrls: ['./select-plan.component.scss'],
-  encapsulation: ViewEncapsulation.None,
 })
 export class SelectPlanComponent {
   @Input() planNameControl!: FormControl<string | null>;
