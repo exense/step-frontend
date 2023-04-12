@@ -1,7 +1,9 @@
-<step-table [dataSource]="dataSource" matSort matSortActive="attributes.name" [matSortDisableClear]="true">
-  <step-bulk-operations *stepAdditionalHeader></step-bulk-operations>
+<step-table #tableRef [dataSource]="dataSource" matSort matSortActive="attributes.name" [matSortDisableClear]="true">
+  <ng-container *stepAdditionalHeader>
+    <step-bulk-operations *ngIf="multipleSelection"></step-bulk-operations>
+  </ng-container>
 
-  <ng-container matColumnDef="bulkSelection">
+  <ng-container matColumnDef="bulkSelection" *ngIf="multipleSelection">
     <th mat-header-cell *matHeaderCellDef></th>
     <td mat-cell *matCellDef="let element">
       <step-entity-selection-di [entity]="element"></step-entity-selection-di>
@@ -24,6 +26,15 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Version</th>
     <td mat-cell *matCellDef="let element">
       <step-resource-label [stModel]="element.packageAttributes?.version"></step-resource-label>
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="singleSelect" *ngIf="!multipleSelection">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let element">
+      <button type="button" mat-icon-button (click)="handleSelect(element.id)">
+        <step-icon name="plus"></step-icon>
+      </button>
     </td>
   </ng-container>
 </step-table>

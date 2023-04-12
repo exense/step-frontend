@@ -77,5 +77,6 @@ export * from './shared/bulk-operation-type.enum';
 export * from './pipe/bulk-operation-label.pipe';
 export * from './pipe/bulk-operation-icon.pipe';
 export * from './shared/filter-condition';
+export * from './shared/legacy-table-handle.interface';
 export * from './shared/table-local-data-source-config';
 export * from './services/filter-condition-factory.service';
