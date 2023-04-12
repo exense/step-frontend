@@ -45,46 +45,47 @@ export class ViewRegistryService {
    */
   registerStandardMenuEntries() {
     // Main Menus
-    this.registerMenuEntry('Automation', 'automation-root', 'play', 10);
-    this.registerMenuEntry('Execute', 'execute-root', 'sun', 20);
-    this.registerMenuEntry('Status', 'status-root', 'check-square', 50);
-    this.registerMenuEntry('Support', 'support-root', 'life-buoy', 100);
+    this.registerMenuEntry('Automation', 'automation-root', 'play', { weight: 10 });
+    this.registerMenuEntry('Execute', 'execute-root', 'sun', { weight: 20 });
+    this.registerMenuEntry('Status', 'status-root', 'check-square', { weight: 50 });
+    this.registerMenuEntry('Support', 'support-root', 'life-buoy', { weight: 100 });
 
     // Sub Menus Automation
-    this.registerMenuEntry('Keywords', 'functions', 'target', 10, 'automation-root');
-    this.registerMenuEntry('Plans', 'plans', 'file', 30, 'automation-root');
-    this.registerMenuEntry('Parameters', 'parameters', 'list', 40, 'automation-root');
+    this.registerMenuEntry('Keywords', 'functions', 'target', { weight: 10, parentId: 'automation-root' });
+    this.registerMenuEntry('Plans', 'plans', 'file', { weight: 30, parentId: 'automation-root' });
+    this.registerMenuEntry('Parameters', 'parameters', 'list', { weight: 40, parentId: 'automation-root' });
     // Sub Menus Execute
-    this.registerMenuEntry('Executions', 'executions', 'rotate-cw', 10, 'execute-root');
-    this.registerMenuEntry('Scheduler', 'scheduler', 'clock', 20, 'execute-root');
-    this.registerMenuEntry('Analytics', 'analytics', 'bar-chart-2', 20, 'execute-root');
+    this.registerMenuEntry('Executions', 'executions', 'rotate-cw', { weight: 10, parentId: 'execute-root' });
+    this.registerMenuEntry('Scheduler', 'scheduler', 'clock', { weight: 20, parentId: 'execute-root' });
+    this.registerMenuEntry('Analytics', 'analytics', 'bar-chart-2', { weight: 20, parentId: 'execute-root' });
     // Sub Menus Status
-    this.registerMenuEntry('Current Operations', 'operations', 'airplay', 10, 'status-root');
-    this.registerMenuEntry('Agents', 'gridagents', 'users', 20, 'status-root');
-    this.registerMenuEntry('Agent tokens', 'gridtokens', 'circle', 30, 'status-root');
-    this.registerMenuEntry('Token Groups', 'gridtokengroups', 'tag', 40, 'status-root');
-    this.registerMenuEntry('Quota Manager', 'gridquotamanager', 'sidebar', 50, 'status-root');
+    this.registerMenuEntry('Current Operations', 'operations', 'airplay', { weight: 10, parentId: 'status-root' });
+    this.registerMenuEntry('Agents', 'gridagents', 'users', { weight: 20, parentId: 'status-root' });
+    this.registerMenuEntry('Agent tokens', 'gridtokens', 'circle', { weight: 30, parentId: 'status-root' });
+    this.registerMenuEntry('Token Groups', 'gridtokengroups', 'tag', { weight: 40, parentId: 'status-root' });
+    this.registerMenuEntry('Quota Manager', 'gridquotamanager', 'sidebar', { weight: 50, parentId: 'status-root' });
     // Sub Menus Support
     this.registerMenuEntry(
       'Documentation',
       ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('https://step.exense.ch/knowledgebase/'),
       'help-circle',
-      10,
-      'support-root'
+      {
+        weight: 10,
+        parentId: 'support-root',
+      }
     );
-    this.registerMenuEntry(
-      'REST API',
-      ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('doc/rest/'),
-      'compass',
-      20,
-      'support-root'
-    );
+    this.registerMenuEntry('REST API', ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('doc/rest/'), 'compass', {
+      weight: 20,
+      parentId: 'support-root',
+    });
     this.registerMenuEntry(
       'About',
       ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('https://step.exense.ch/'),
       'book-open',
-      30,
-      'support-root'
+      {
+        weight: 30,
+        parentId: 'support-root',
+      }
     );
   }
 
@@ -123,7 +124,7 @@ export class ViewRegistryService {
     this.registeredViews[viewId] = { template: template, isPublicView: isPublicView, isStaticView: isStaticView };
   }
 
-  registerMenuEntry(title: string, id: string, icon: string, weight?: number, parentId?: string): void {
+  registerMenuEntry(title: string, id: string, icon: string, options?: { weight?: number; parentId?: string }): void {
     if (!id || this.registeredMenuIds.includes(id)) {
       return;
     }
@@ -131,9 +132,9 @@ export class ViewRegistryService {
     this.registeredMenuEntries.push({
       title,
       id,
-      parentId,
+      parentId: options?.parentId,
       icon,
-      weight,
+      weight: options?.weight,
       isEnabledFct: () => true,
     });
   }

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, GridService, TableFetchLocalDataSource } from '@exense/step-core';
+import { AgentListEntry, AJS_MODULE, GridService, TableFetchLocalDataSource } from '@exense/step-core';
 import { TokenTypeComponent } from '../token-type/token-type.component';
 
 @Component({
@@ -9,22 +9,15 @@ import { TokenTypeComponent } from '../token-type/token-type.component';
   styleUrls: ['./agent-list.component.scss'],
 })
 export class AgentListComponent {
-  readonly searchableAgent = new TableFetchLocalDataSource(() => this._gridService.getAgents(true.toString()), {
-    searchPredicates: {
-      url: (element, searchValue) => element.agentRef!['agentUrl']!.toLowerCase().includes(searchValue.toLowerCase()),
-      type: (element, searchValue) =>
-        TokenTypeComponent.TYPE_LABEL_TRANSLATIONS[element.agentRef!.agentType!]!.toLowerCase().includes(
-          searchValue.toLowerCase()
-        ),
-    },
-    sortPredicates: {
-      url: (elementA, elementB) => elementA.agentRef!['agentUrl']!.localeCompare(elementB!.agentRef!['agentUrl']!),
-      type: (elementA, elementB) =>
-        TokenTypeComponent.TYPE_LABEL_TRANSLATIONS[elementA.agentRef!.agentType!]!.localeCompare(
-          TokenTypeComponent.TYPE_LABEL_TRANSLATIONS[elementB.agentRef!.agentType!]!
-        ),
-    },
-  });
+  readonly searchableAgent = new TableFetchLocalDataSource(
+    () => this._gridService.getAgents(true.toString()),
+    TableFetchLocalDataSource.configBuilder<AgentListEntry>()
+      .addSearchStringPredicate('url', (item) => item.agentRef!.agentUrl!)
+      .addSearchStringPredicate('type', (item) => TokenTypeComponent.TYPE_LABEL_TRANSLATIONS[item.agentRef!.agentType!])
+      .addSortStringPredicate('url', (item) => item.agentRef!.agentUrl!)
+      .addSortStringPredicate('type', (item) => TokenTypeComponent.TYPE_LABEL_TRANSLATIONS[item.agentRef!.agentType!])
+      .build()
+  );
 
   constructor(private _gridService: GridService) {}
 

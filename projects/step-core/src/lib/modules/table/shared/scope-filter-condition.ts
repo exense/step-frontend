@@ -7,7 +7,11 @@ export class ScopeFilterCondition extends FilterCondition {
     super();
   }
 
-  toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
+  override isEmpty(): boolean {
+    return !this.searchValue;
+  }
+
+  override toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
     if (!this.searchValue) {
       return [];
     }

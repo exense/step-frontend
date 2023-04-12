@@ -20,6 +20,7 @@ import { PrefixDirective } from './directives/prefix.directive';
 import { SuffixDirective } from './directives/suffix.directive';
 import { HintDirective } from './directives/hint.directive';
 import { ErrorDirective } from './directives/error.directive';
+import { AlertDirective } from './directives/alert.directive';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
@@ -42,6 +43,7 @@ import { ErrorDirective } from './directives/error.directive';
     SuffixDirective,
     HintDirective,
     ErrorDirective,
+    AlertDirective,
   ],
   exports: [
     ResourceLabelComponent,
@@ -62,6 +64,7 @@ import { ErrorDirective } from './directives/error.directive';
     SuffixDirective,
     HintDirective,
     ErrorDirective,
+    AlertDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -86,6 +89,7 @@ export * from './shared/angularjs-provider-options';
 export * from './shared/auth-context.interface';
 export * from './shared/compare-condition.enum';
 export * from './shared/login-strategy';
+export * from './shared/alert-type.enum';
 export * from './shared/restore-dialog-data';
 export * from './shared/project-management-helper-strategy.interface';
 export * from './shared/project-info.interface';
@@ -96,3 +100,4 @@ export * from './directives/prefix.directive';
 export * from './directives/suffix.directive';
 export * from './directives/hint.directive';
 export * from './directives/error.directive';
+export * from './directives/alert.directive';

@@ -77,7 +77,7 @@ import { ExecutionSelectionTableComponent } from './components/execution-selecti
     ExecutionProgressComponent,
     RepositoryComponent,
     ExecutionPageComponent,
-    ExecutionSelectionTableComponent
+    ExecutionSelectionTableComponent,
   ],
 })
 export class ExecutionModule {
@@ -87,7 +87,9 @@ export class ExecutionModule {
     _dashletRegistry: DashletRegistryService,
     _viewRegistry: ViewRegistryService
   ) {
-    _entityRegistry.register('executions', 'Execution', undefined, ExecutionSelectionTableComponent);
+    _entityRegistry.register('executions', 'Execution', {
+      templateUrlOrComponent: ExecutionSelectionTableComponent,
+    });
     _dashletRegistry.registerDashlet('executionStep', DashletExecutionStepComponent);
     _dashletRegistry.registerDashlet('executionTree', DashletExecutionTreeComponent);
     _dashletRegistry.registerDashlet('executionViz', DashletExecutionVizComponent);

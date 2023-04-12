@@ -5,7 +5,7 @@ import { AJS_MODULE } from '../../../shared';
 import {
   CustomComponent,
   CustomRegistryService,
-  CustomRegistryType
+  CustomRegistryType,
 } from '../../custom-registeries/custom-registries.module';
 
 @Injectable({
@@ -26,7 +26,7 @@ export class EntityRegistry {
     postUrl?: string,
     tableType?: string,
     templateUrlOrComponent?: string | Type<CustomComponent>,
-    callback?: Function,
+    callback?: Function
   ): void {
     const type = entityName;
     const label = displayName;
@@ -54,7 +54,7 @@ export class EntityRegistry {
       templateUrl,
       callback,
       icon,
-      component
+      component,
     };
     this._customRegistry.register(this.registryType, type, entity);
   }
@@ -63,10 +63,14 @@ export class EntityRegistry {
    * Shortcut for ng2+ invocation
    * @param type
    * @param label
-   * @param icon
-   * @param templateUrl
+   * @param options
    */
-  register(type: string, label: string, icon?: string, templateUrlOrComponent?: string | Type<CustomComponent>): void {
+  register(
+    type: string,
+    label: string,
+    options: { icon?: string; templateUrlOrComponent?: string | Type<CustomComponent> } = {}
+  ): void {
+    const { icon, templateUrlOrComponent } = options;
     return this.registerEntity(label, type, icon, undefined, undefined, undefined, undefined, templateUrlOrComponent);
   }
 

@@ -1,4 +1,4 @@
-import { TableDataSource } from './table-data-source';
+import { TableDataSource, TableFilterOptions, TableGetDataOptions } from './table-data-source';
 import { CollectionViewer } from '@angular/cdk/collections';
 import {
   BehaviorSubject,
@@ -20,6 +20,8 @@ import { TableRequestData } from '../../../client/table/models/table-request-dat
 import { TableParameters } from '../../../client/generated';
 import { FilterCondition } from './filter-condition';
 import { Mutable } from '../../../shared';
+import { TableLocalDataSourceConfig } from './table-local-data-source-config';
+import { TableLocalDataSourceConfigBuilder } from './table-local-data-source-config-builder';
 
 type FieldAccessor = Mutable<
   Pick<TableLocalDataSource<any>, 'total$' | 'data$' | 'allData$' | 'totalFiltered$' | 'forceNavigateToFirstPage$'>
@@ -31,17 +33,13 @@ interface Request {
   search?: { [key: string]: SearchValue };
 }
 
-export type SearchPredicate<T> = (item: T, searchValue: string) => boolean;
-export type SortPredicate<T> = (itemA: T, itemB: T) => number;
-
 const isSimpleType = (value: any) => ['string', 'number', 'boolean'].includes(typeof value);
 
-export interface TableLocalDataSourceConfig<T> {
-  searchPredicates?: { [columnName: string]: SearchPredicate<T> };
-  sortPredicates?: { [columnName: string]: SortPredicate<T> };
-}
-
 export class TableLocalDataSource<T> implements TableDataSource<T> {
+  static configBuilder<X>(): TableLocalDataSourceConfigBuilder<X> {
+    return new TableLocalDataSourceConfigBuilder();
+  }
+
   private _terminator$ = new Subject<void>();
   private _source$!: Observable<T[]>;
 
@@ -213,11 +211,11 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     this._request$.complete();
   }
 
-  getTableData(page?: PageEvent, sort?: Sort, search?: { [key: string]: SearchValue }): void {
+  getTableData(options?: TableGetDataOptions): void {
     const request = { ...this._request$.value };
-    request.page = page || request.page;
-    request.sort = sort || request.sort;
-    request.search = search || request.search;
+    request.page = options?.page || request.page;
+    request.sort = options?.sort || request.sort;
+    request.search = options?.search || request.search;
     this._request$.next(request);
   }
 
@@ -225,11 +223,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     this._request$.next(this._request$.value);
   }
 
-  getFilterRequest(
-    search?: { [p: string]: SearchValue },
-    filter?: string,
-    params?: TableParameters
-  ): TableRequestData | undefined {
+  getFilterRequest(options?: TableFilterOptions): TableRequestData | undefined {
     return undefined;
   }
 

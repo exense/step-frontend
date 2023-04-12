@@ -39,7 +39,11 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    this._genericFunctionDialogService.configure(this.title, this.serviceroot, this.filterclass);
+    this._genericFunctionDialogService.configure({
+      title: this.title,
+      serviceroot: this.serviceroot,
+      filterclass: this.filterclass,
+    });
   }
 
   ngAfterViewInit(): void {

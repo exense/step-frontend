@@ -14,8 +14,6 @@ import { Mutable } from '../../../../shared';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { MAT_CHECKBOX_DEFAULT_OPTIONS, MatCheckboxDefaultOptions } from '@angular/material/checkbox';
 
-type FieldAccessor = Mutable<Pick<BulkSelectionComponent<any, any>, 'isChecked' | 'isIntermediate'>>;
-
 @Component({
   selector: 'step-bulk-selection',
   templateUrl: './bulk-selection.component.html',
@@ -37,15 +35,8 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
   @Input() selectionType: BulkSelectionType = BulkSelectionType.None;
   @Output() selectionTypeChange = new EventEmitter<BulkSelectionType>();
 
-  readonly selectionTypes = [
-    BulkSelectionType.All,
-    BulkSelectionType.Visible,
-    BulkSelectionType.Filtered,
-    BulkSelectionType.None,
-  ];
-
-  readonly isChecked: boolean = false;
-  readonly isIntermediate: boolean = false;
+  protected isChecked: boolean = false;
+  protected isIntermediate: boolean = false;
 
   ngOnChanges(changes: SimpleChanges): void {
     const cSelectionCollector = changes['selectionCollector'];
@@ -67,7 +58,6 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
   }
 
   changeType(selectionType: BulkSelectionType): void {
-    const fieldAccessor = this as FieldAccessor;
     this.selectionType = selectionType;
     this.selectionTypeChange.emit(selectionType);
 
@@ -88,16 +78,16 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
 
     switch (selectionType) {
       case BulkSelectionType.All:
-        fieldAccessor.isChecked = true;
-        fieldAccessor.isIntermediate = false;
+        this.isChecked = true;
+        this.isIntermediate = false;
         break;
       case BulkSelectionType.None:
-        fieldAccessor.isChecked = false;
-        fieldAccessor.isIntermediate = false;
+        this.isChecked = false;
+        this.isIntermediate = false;
         break;
       default:
-        fieldAccessor.isChecked = false;
-        fieldAccessor.isIntermediate = !!this.selectionCollector?.length;
+        this.isChecked = false;
+        this.isIntermediate = !!this.selectionCollector?.length;
         break;
     }
   }
