@@ -12,7 +12,7 @@ export class ParametersFilterCondition extends FilterCondition {
   }
 
   override toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
-    if (!this.searchValue || this.availableParameters.length === 0) {
+    if (!this.searchValue || !this.availableParameters.length) {
       return [];
     }
 
