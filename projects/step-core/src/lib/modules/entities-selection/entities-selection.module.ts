@@ -30,6 +30,7 @@ export * from './services/selection-collector/selection-collector';
 export * from './services/selection-collector/selection-collector-factory.service';
 export * from './services/selection-collector/selection-collector-container';
 export * from './services/selection-collector.provider';
+export * from './services/has-filter';
 export * from './components/entity-selection/entity-selection.component';
 export * from './components/entity-selection/entity-selection-di.component';
 export * from './components/bulk-selection/bulk-selection.component';

@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 import { AugmentedPlansService, Plan } from '../client/step-client-module';
-import { a1Promise2Observable, DialogsService } from '../shared';
+import { a1Promise2Observable, AJS_MODULE, DialogsService } from '../shared';
 import { ExportDialogsService } from './export-dialogs.service';
 import { ImportDialogsService } from './import-dialogs.service';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
 import { ResourceInputBridgeService } from './resource-input-bridge.service';
 import { UibModalHelperService } from './uib-modal-helper.service';
+import { EntityDialogsService } from '../modules/entity/services/entity-dialogs.service';
+import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
@@ -16,6 +18,7 @@ export class PlanDialogsService {
     private _plansApiService: AugmentedPlansService,
     private _uibModalHelper: UibModalHelperService,
     private _dialogs: DialogsService,
+    private _entityDialogs: EntityDialogsService,
     private _exportDialogs: ExportDialogsService,
     private _importDialogs: ImportDialogsService,
     private _isUsedByDialogs: IsUsedByDialogService,
@@ -33,7 +36,7 @@ export class PlanDialogsService {
   }
 
   selectPlan(): Observable<Plan> {
-    const selectedEntity$ = a1Promise2Observable<any>(this._dialogs.selectEntityOfType('plans', true));
+    const selectedEntity$ = this._entityDialogs.selectEntityOfType('plans', true);
     const plan$ = selectedEntity$.pipe(
       map((result) => result.item),
       switchMap((id) => this._plansApiService.getPlanById(id))
@@ -42,13 +45,7 @@ export class PlanDialogsService {
   }
 
   duplicatePlan(id: string): Observable<any> {
-    return this._plansApiService.clonePlan(id).pipe(
-      map((clone: Plan) => {
-        clone['attributes']!['name']! += '_Copy';
-        return clone;
-      }),
-      switchMap((clone) => this._plansApiService.savePlan(clone))
-    );
+    return this._plansApiService.clonePlan(id).pipe(switchMap((clone) => this._plansApiService.savePlan(clone)));
   }
 
   deletePlan(id: string, name: string): Observable<any> {
@@ -84,3 +81,5 @@ export class PlanDialogsService {
     this._isUsedByDialogs.displayDialog(`Plan "${name}" is used by`, 'PLAN_ID', id);
   }
 }
+
+getAngularJSGlobal().module(AJS_MODULE).service('PlanDialogsService', downgradeInjectable(PlanDialogsService));

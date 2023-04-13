@@ -433,14 +433,14 @@ angular
       $uibModalInstance.dismiss('cancel');
     };
   })
-  .controller('CompositeFunctionFormCtrl', function ($scope, PlanDialogs, $location, $http) {
+  .controller('CompositeFunctionFormCtrl', function ($scope, PlanDialogsService, $location, $http) {
     $scope.gotoArtefact = function () {
       $scope.save(false);
       $location.path('/root/artefacteditor/' + $scope.function_.artefactId);
     };
 
     $scope.selectPlan = function () {
-      PlanDialogs.selectPlan(function (plan) {
+      PlanDialogsService.selectPlan().subscribe(function (plan) {
         $scope.function_.planId = plan.id;
       });
     };

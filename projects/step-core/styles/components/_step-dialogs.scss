@@ -4,7 +4,16 @@
     border-radius: 12px;
 
     .mat-dialog-content {
-      width: 572px;
+      min-width: 572px;
+    }
+
+    .without-children {
+      display: none;
+    }
+
+    [step-modal-window-subtitle] {
+      font-size: 1.5rem;
+      font-weight: normal;
     }
 
     .mat-dialog-actions {
@@ -24,10 +33,6 @@
             flex: 1;
             display: flex;
             gap: 12px;
-          }
-
-          &.without-children {
-            display: none;
           }
         }
 
