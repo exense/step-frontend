@@ -9,17 +9,18 @@ import { SelectEntityContext } from '../../types/select-entity-context.interface
 @Component({
   selector: 'step-select-entity-of-type',
   templateUrl: './select-entity-of-type.component.html',
-  styleUrls: ['./select-entity-of-type.component.scss']
+  styleUrls: ['./select-entity-of-type.component.scss'],
 })
 export class SelectEntityOfTypeComponent implements OnInit, OnDestroy {
-  private _projectManagementHelper = inject(ProjectManagementHelperService)
+  private _projectManagementHelper = inject(ProjectManagementHelperService);
   private _entityRegistry = inject(EntityRegistry);
-  private _matDialogRef = inject(MatDialogRef<SelectEntityOfTypeComponent, SelectEntityOfTypeResult | undefined>);
+  private _matDialogRef =
+    inject<MatDialogRef<SelectEntityOfTypeComponent, SelectEntityOfTypeResult | undefined>>(MatDialogRef);
   protected _dialogData = inject<SelectEntityOfTypeData>(MAT_DIALOG_DATA);
   protected entity = this._entityRegistry.getEntityByName(this._dialogData.entityName);
   protected selectEntityContext: SelectEntityContext = {
     multipleSelection: !this._dialogData.singleSelection,
-    handleSelect: (selectedId: string) => this.handleSelect(selectedId)
+    handleSelect: (selectedId: string) => this.handleSelect(selectedId),
   };
   protected migrationTarget: string = '';
   protected currentProject: string = '';
@@ -33,25 +34,25 @@ export class SelectEntityOfTypeComponent implements OnInit, OnDestroy {
   }
 
   proceed(): void {
-    const selectedIds = this.selectEntityContext?.getSelectedIds ?
-      this.selectEntityContext.getSelectedIds() : [];
+    const selectedIds = this.selectEntityContext?.getSelectedIds ? this.selectEntityContext.getSelectedIds() : [];
 
     const result: SelectEntityOfTypeResult = {
       entity: this.entity,
-      array: selectedIds as string[]
+      array: selectedIds as string[],
     };
     this._matDialogRef.close(result);
   }
 
   proceedFiltered(): void {
-    const tableRequest = this.selectEntityContext?.getLastServerSideRequest ?
-      this.selectEntityContext.getLastServerSideRequest() : undefined;
+    const tableRequest = this.selectEntityContext?.getLastServerSideRequest
+      ? this.selectEntityContext.getLastServerSideRequest()
+      : undefined;
 
     const filters = tableRequest?.filters;
 
     const result: SelectEntityOfTypeResult = {
       entity: this.entity,
-      filters
+      filters,
     };
 
     this._matDialogRef.close(result);
@@ -62,7 +63,7 @@ export class SelectEntityOfTypeComponent implements OnInit, OnDestroy {
   }
 
   protected setupTitle(): void {
-    const {targetId} = this._dialogData;
+    const { targetId } = this._dialogData;
     if (!targetId) {
       return;
     }
@@ -73,7 +74,7 @@ export class SelectEntityOfTypeComponent implements OnInit, OnDestroy {
   private handleSelect(selectedId: string): void {
     const result: SelectEntityOfTypeResult = {
       entity: this.entity,
-      item: selectedId
+      item: selectedId,
     };
     this._matDialogRef.close(result);
   }
