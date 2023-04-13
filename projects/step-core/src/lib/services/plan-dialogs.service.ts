@@ -42,13 +42,7 @@ export class PlanDialogsService {
   }
 
   duplicatePlan(id: string): Observable<any> {
-    return this._plansApiService.clonePlan(id).pipe(
-      map((clone: Plan) => {
-        clone['attributes']!['name']! += '_Copy';
-        return clone;
-      }),
-      switchMap((clone) => this._plansApiService.savePlan(clone))
-    );
+    return this._plansApiService.clonePlan(id).pipe(switchMap((clone) => this._plansApiService.savePlan(clone)));
   }
 
   deletePlan(id: string, name: string): Observable<any> {
