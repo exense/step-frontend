@@ -56,7 +56,8 @@
             "styles": ["projects/step-app/src/styles.scss", "node_modules/uplot/dist/uPlot.min.css"],
             "scripts": ["node_modules/uplot/dist/uPlot.iife.min.js"],
             "extraWebpackConfig": "projects/step-app/webpack.config.js",
-            "commonChunk": false
+            "commonChunk": false,
+            "allowedCommonJsDependencies": ["ace-builds"]
           },
           "configurations": {
             "local": {

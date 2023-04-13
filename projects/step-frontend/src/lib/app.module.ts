@@ -15,6 +15,7 @@ import { ResourcesModule } from './modules/resources/resources.module';
 import { SchedulerModule } from './modules/scheduler/scheduler.module';
 import { TimeSeriesModule } from './modules/timeseries/time-series.module';
 import { PLUGINS_INITIALIZER } from './plugins-initializer/plugins-initializer';
+import { ScriptEditorModule } from './modules/script-editor/script-editor.module';
 
 @NgModule({
   declarations: [],
@@ -34,6 +35,7 @@ import { PLUGINS_INITIALIZER } from './plugins-initializer/plugins-initializer';
     DefaultThemeModule,
     GenericFunctionModule,
     ResourcesModule,
+    ScriptEditorModule,
   ],
   providers: [PLUGINS_INITIALIZER],
 })

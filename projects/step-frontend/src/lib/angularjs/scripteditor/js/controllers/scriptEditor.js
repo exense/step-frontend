@@ -22,39 +22,7 @@ angular.module('scriptEditor',['step'])
   ViewRegistry.registerView('scripteditor','scripteditor/partials/scriptEditor.html');
 })
 
-.controller('ScriptEditorCtrl', function($scope, $http, $rootScope, $location, stateStorage, AuthService) {
+.controller('ScriptEditorCtrl', function($scope, stateStorage) {
       stateStorage.push($scope, 'scripteditor', {});
-
-      $scope.authService = AuthService;
-      $scope.functionid = $scope.$state;
-
-      var editor = ace.edit("editor");
-      editor.setTheme("ace/theme/chrome");
-      editor.getSession().setMode("ace/mode/javascript");
-
-      $http.get("rest/functions/"+$scope.functionid).then(function(response) {
-        $scope.function_=response.data;
-      })
-
-      $http.get("rest/scripteditor/function/"+$scope.functionid+"/file").then(function(response) {
-        editor.setValue(response.data);
-      })
-
-      $scope.save = function() {
-        return $http.post("rest/scripteditor/function/" + $scope.functionid + "/file",editor.getValue())
-      }
-
-      $scope.execute = function() {
-        $scope.save().then(function() {
-          $http.post("rest/interactive/functiontest/"+$scope.functionid+"/start").then(function(response) {
-            var result = response.data;
-            $rootScope.planEditorInitialState = {
-                interactive : true,
-                selectedNode : result.callFunctionId
-            }
-            $location.path('/root/plans/editor/' + result.planId);
-          });
-        })
-      }
 })
 //# sourceURL=scriptEditor.js

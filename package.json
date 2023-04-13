@@ -53,6 +53,7 @@
     "uplot": "^1.6.21",
     "uuid": "8.3.2",
     "zone.js": "0.11.4",
+    "ace-builds": "1.17.0",
     "angular-split": "14.1.0"
   },
   "devDependencies": {
