@@ -112,19 +112,6 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     );
   }
 
-  private getItemValue(item: T, field: string): string {
-    if (!item) {
-      return '';
-    }
-    const valueContainer = item as any;
-    if (valueContainer[field]) {
-      return valueContainer[field].toString();
-    }
-    const parts = field.split('.');
-    const result = parts.reduce((container, part) => container?.[part], valueContainer);
-    return result ? result.toString() : '';
-  }
-
   private applySearch(source: T[], search?: { [key: string]: SearchValue }): T[] {
     if (!search || Object.keys(search).length === 0) {
       return source;
@@ -151,7 +138,9 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
           columnPredicate = (item: T) => predicate(item, searchValue);
         } else {
           columnPredicate = (item: T) => {
-            const itemValue = isSimpleType(item) ? ((item as any) || '').toString() : this.getItemValue(item, column);
+            const itemValue = isSimpleType(item)
+              ? ((item as any) || '').toString()
+              : ((item || {})[column] || '').toString();
 
             return itemValue.trim().toLowerCase().includes(searchValue!);
           };
@@ -177,9 +166,13 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     }
 
     const defaultSortPredicate = (itemA: T, itemB: T) => {
-      const colValueA = isSimpleType(itemA) ? ((itemA as any) || '').toString() : this.getItemValue(itemA, sortBy);
+      const colValueA = isSimpleType(itemA)
+        ? ((itemA as any) || '').toString()
+        : ((itemA || {})[sortBy] || '').toString();
 
-      const colValueB = isSimpleType(itemB) ? ((itemB as any) || '').toString() : this.getItemValue(itemB, sortBy);
+      const colValueB = isSimpleType(itemB)
+        ? ((itemB as any) || '').toString()
+        : ((itemB || {})[sortBy] || '').toString();
 
       return colValueA.localeCompare(colValueB);
     };
