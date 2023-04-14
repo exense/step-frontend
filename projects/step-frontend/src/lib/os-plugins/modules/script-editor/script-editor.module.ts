@@ -15,3 +15,4 @@ export class ScriptEditorModule {
 }
 
 export * from './angularjs/script-editor.module';
+export * from './components/script-editor/script-editor.component';
