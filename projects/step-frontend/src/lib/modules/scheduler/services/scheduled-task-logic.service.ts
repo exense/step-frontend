@@ -17,19 +17,9 @@ export class ScheduledTaskLogicService {
   readonly searchableScheduledTask = new TableFetchLocalDataSource(
     () => this._schedulerService.getScheduledExecutions(),
     TableFetchLocalDataSource.configBuilder<ExecutiontTaskParameters>()
-      .addSearchStringPredicate('attributes.name', (item) => item.attributes!['name'])
-      .addSearchStringPredicate(
-        'executionsParameters.customParameters.env',
-        (item) => item.executionsParameters!.customParameters!['env']
-      )
       .addSearchStringPredicate('cronExpression', (item) => item.cronExpression!)
       .addSearchStringPredicate('status', (item) =>
         item.active ? this.STATUS_ACTIVE_STRING : this.STATUS_INACTIVE_STRING
-      )
-      .addSortStringPredicate('attributes.name', (item) => item.attributes!['name'])
-      .addSortStringPredicate(
-        'executionsParameters.customParameters.env',
-        (item) => item.executionsParameters!.customParameters!['env']
       )
       .addSortBooleanPredicate('status', (item) => item.active)
       .build()
