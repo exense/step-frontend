@@ -85,10 +85,6 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
     this.dashboard.updateRange(this.calculateFullTimeRange(this.execution!));
   }
 
-  navigateToRtmDashboard(): void {
-    window.open(this.dashboardService.getRtmExecutionLink(this.executionId));
-  }
-
   ngOnChanges(changes: SimpleChanges): void {
     let executionChange = changes['executionInput'];
     if (!executionChange) {

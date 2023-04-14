@@ -17,12 +17,11 @@
  * along with STEP.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 angular
-  .module('dashboardsControllers', ['tables', 'step', 'viz-session-manager'])
+  .module('dashboardsControllers', ['tables', 'step'])
 
   .run(function (ViewRegistry) {
     ViewRegistry.registerView('dashboards', 'partials/dashboards/dashboardsController.html');
     ViewRegistry.registerView('analytics', 'partials/dashboards/analyticsController.html');
-    ViewRegistry.registerView('dashboards-rtm', 'partials/dashboards/dashboardsControllerRtm.html');
   })
 
   .controller(
@@ -43,7 +42,6 @@ angular
       $element,
       $uibModal
     ) {
-      stateStorage.push($scope, 'dashboards-rtm', {});
       $scope.authService = AuthService;
       $scope.staticPresets = new StaticPresets();
       $scope.dashboardsendpoint = [];

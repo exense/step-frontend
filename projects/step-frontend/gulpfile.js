@@ -26,7 +26,6 @@ const SCRIPTS = [
   `${NODE_MODULES_PATH}/d3/d3.js`,
   `${NODE_MODULES_PATH}/nvd3/build/nv.d3.js`,
   `${NODE_MODULES_PATH}/angular-nvd3/dist/angular-nvd3.js`,
-  `${NODE_MODULES_PATH}/@exense/visualization/dist/viz.js`,
 
   './src/lib/angularjs/js/common.js',
   './src/lib/angularjs/js/app.js',
@@ -57,8 +56,6 @@ const SCRIPTS = [
   './src/lib/angularjs/js/controllers/dynamicForms.js',
   './src/lib/angularjs/js/controllers/components.js',
   './src/lib/angularjs/js/datatable-ext-paginationinput.js',
-  './src/lib/angularjs/js/viz-presets-commons.js',
-  './src/lib/angularjs/js/viz-presets-ext.js',
 ];
 
 const STYLES = [
@@ -69,7 +66,6 @@ const STYLES = [
   './src/lib/angularjs/bower_components/angular-resizable/angular-resizable.min.css',
   `${NODE_MODULES_PATH}/datatables.net-select-dt/css/select.dataTables.css`,
   `${NODE_MODULES_PATH}/nvd3/build/nv.d3.css`,
-  `${NODE_MODULES_PATH}/@exense/visualization/dist/viz.css`,
   './src/lib/angularjs/css/step.css',
   './src/lib/angularjs/css/step-variables.css',
   './src/lib/angularjs/js/chart.css',
@@ -98,8 +94,6 @@ const OTHER = [
   '!./src/lib/angularjs/*.json',
 ];
 
-const VIZ_TEMPLATES = [`${NODE_MODULES_PATH}/@exense/visualization/dist/templates/**/*`];
-
 const scripts = () =>
   src(SCRIPTS)
     .pipe(concat('scripts.js'))
@@ -118,6 +112,4 @@ const fonts = () => src(FONTS).pipe(dest(`${DESTINATION}/fonts`));
 
 const others = () => src(OTHER, { nodir: true }).pipe(dest(DESTINATION, { base: './src/lib/angularjs' }));
 
-const vizTemplates = () => src(VIZ_TEMPLATES).pipe(dest(`${DESTINATION}/app/templates`));
-
-exports.default = parallel(scripts, maps, styles, fonts, others, vizTemplates, images);
+exports.default = parallel(scripts, maps, styles, fonts, others, images);

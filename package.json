@@ -45,7 +45,6 @@
     "@angular/platform-browser-dynamic": "14.2.8",
     "@angular/router": "14.2.8",
     "@angular/upgrade": "14.2.8",
-    "@exense/visualization": "0.6.9",
     "@fontsource/roboto": "4.5.8",
     "feather-icons": "4.29.0",
     "rxjs": "7.4.0",
