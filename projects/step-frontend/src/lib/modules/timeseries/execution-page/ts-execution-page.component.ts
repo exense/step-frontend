@@ -15,10 +15,10 @@ import {
   Execution,
   ExecutionsService,
   pollAsyncTask,
+  TimeSeriesService,
 } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PerformanceViewSettings } from '../performance-view/model/performance-view-settings';
-import { TimeSeriesService } from '../time-series.service';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { PerformanceViewComponent } from '../performance-view/performance-view.component';
 import { Subject, Subscription, takeUntil, timer } from 'rxjs';
@@ -30,7 +30,6 @@ import { TimeSeriesDashboardSettings } from '../dashboard/model/ts-dashboard-set
 import { TimeSeriesDashboardComponent } from '../dashboard/time-series-dashboard.component';
 import { FilterBarItemType } from '../performance-view/filter-bar/model/ts-filter-item';
 import { TsUtils } from '../util/ts-utils';
-import { TimeRangePicker } from '../time-selection/time-range-picker.component';
 
 @Component({
   selector: 'step-execution-performance',
@@ -72,7 +71,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
     if (!this.executionId) {
       throw new Error('ExecutionId parameter is not present');
     }
-    this.timeSeriesService.timeSeriesIsBuilt(this.executionId).subscribe((exists) => {
+    this.timeSeriesService.checkTimeSeries(this.executionId).subscribe((exists) => {
       if (!exists) {
         this.executionHasToBeBuilt = true;
       }
@@ -167,7 +166,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
   rebuildTimeSeries() {
     this.migrationInProgress = true;
     this.timeSeriesService
-      .rebuildTimeSeries(this.executionId)
+      .rebuildTimeSeries({ executionId: this.executionId })
       .pipe(pollAsyncTask(this._asyncTaskService), takeUntil(this.terminator$))
       .subscribe({
         next: (task) => {

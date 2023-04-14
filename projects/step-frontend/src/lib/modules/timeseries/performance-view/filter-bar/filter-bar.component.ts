@@ -18,8 +18,7 @@ import { PerformanceViewSettings } from '../model/performance-view-settings';
 import { PerformanceViewTimeSelectionComponent } from '../time-selection/performance-view-time-selection.component';
 import { FilterBarItemComponent } from './item/filter-bar-item.component';
 import { FilterBarItemType, TsFilterItem } from './model/ts-filter-item';
-import { TimeSeriesService } from '../../time-series.service';
-import { OqlVerifyResponse } from '../../model/oql-verify-response';
+import { OQLVerifyResponse, TimeSeriesService } from '@exense/step-core';
 
 @Component({
   selector: 'step-ts-filter-bar',
@@ -78,7 +77,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     });
   }
 
-  composeAndVerifyOql(filters: TsFilterItem[]): Observable<OqlVerifyResponse> {
+  composeAndVerifyOql(filters: TsFilterItem[]): Observable<OQLVerifyResponse> {
     // we fake group dimensions as being filters, to verify altogether
     let attributesPrefix = 'attributes';
     this.context.getGroupDimensions().forEach((dimension) =>
