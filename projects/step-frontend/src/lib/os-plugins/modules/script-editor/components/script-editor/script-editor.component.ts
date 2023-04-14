@@ -12,8 +12,12 @@ import {
   KeywordsService,
   ScriptLanguage,
 } from '@exense/step-core';
-import * as ace from 'ace-builds';
 import { forkJoin, Observable, switchMap } from 'rxjs';
+import * as ace from 'ace-builds';
+import 'ace-builds/src-min-noconflict/theme-chrome.js';
+import 'ace-builds/src-min-noconflict/mode-javascript.js';
+import 'ace-builds/src-min-noconflict/mode-groovy.js';
+import 'ace-builds/src-min-noconflict/mode-java.js';
 
 @Component({
   selector: 'step-script-editor',

@@ -8,6 +8,7 @@ export * from './is-used-by-dialog-data';
 export * from './is-used-by-search-type';
 export * from './mutable';
 export * from './plugin-on-init';
+export * from './plugin-lazy-load';
 export * from './utils';
 export * from './plan-tree-action.enum';
 export * from './plan-editor-strategy';
