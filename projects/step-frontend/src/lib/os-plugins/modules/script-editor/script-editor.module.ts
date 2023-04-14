@@ -14,4 +14,4 @@ export class ScriptEditorModule {
   }
 }
 
-export * from './angularjs';
+export * from './angularjs/script-editor.module';
