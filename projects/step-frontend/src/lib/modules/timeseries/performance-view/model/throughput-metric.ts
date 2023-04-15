@@ -1,9 +1,9 @@
 import { ThroughputMetricType } from '../../model/throughput-metric-type';
-import { Bucket } from '../../bucket';
+import { BucketResponse } from '@exense/step-core';
 
 export interface ThroughputMetric {
   label: ThroughputMetricType;
-  mapFunction: (b: Bucket) => number;
+  mapFunction: (b: BucketResponse) => number;
   labelFunction: (value: number) => string;
   tooltipZAxisLabel: string;
 }
