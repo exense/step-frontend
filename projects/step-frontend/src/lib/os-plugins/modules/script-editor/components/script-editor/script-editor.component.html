@@ -1,0 +1,14 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title> Script Editor - Keyword: {{keyword?.attributes?.['name']}} </mat-card-title>
+    <button type="button" mat-icon-button (click)="execute()" matTooltip="Execute this plan" matTooltipPosition="below">
+      <step-icon name="play"></step-icon>
+    </button>
+  </mat-card-header>
+  <mat-card-content>
+    <div #editor class="editor"></div>
+  </mat-card-content>
+  <mat-card-actions>
+    <button *ngIf="'kw-write' | hasRight | async" type="button" mat-stroked-button (click)="save()">Save</button>
+  </mat-card-actions>
+</mat-card>
