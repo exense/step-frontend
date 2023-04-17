@@ -8,7 +8,7 @@
   </step-alert>
 </section>
 <section *ngIf="execution">
-  <as-split direction="horizontal">
+  <as-split [direction]="_isTouchDevice ? 'vertical' : 'horizontal'">
     <as-split-area [size]="75">
       <div class="tab-panel">
         <step-tabs [tabs]="tabs" [activeTabId]="activeTabId" (activeTabIdChange)="selectTab($event)"> </step-tabs>

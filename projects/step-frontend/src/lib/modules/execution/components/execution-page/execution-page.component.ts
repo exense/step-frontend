@@ -1,8 +1,7 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, inject, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_LOCATION, AJS_MODULE, Execution } from '@exense/step-core';
+import { AJS_LOCATION, AJS_MODULE, Execution, IS_TOUCH_DEVICE } from '@exense/step-core';
 import { ExecutionTab } from '../../shared/execution-tab';
-import { ILocationService } from 'angular';
 
 @Component({
   selector: 'step-execution-page',
@@ -10,11 +9,14 @@ import { ILocationService } from 'angular';
   styleUrls: ['./execution-page.component.scss'],
 })
 export class ExecutionPageComponent implements OnInit, OnDestroy {
+  private _location = inject(AJS_LOCATION);
+
+  @HostBinding('class.touchdevice')
+  readonly _isTouchDevice = inject(IS_TOUCH_DEVICE);
+
   listTab: ExecutionTab = { label: 'Executions', type: 'list', id: 'list', title: 'Executions List' };
   tabs: ExecutionTab[] = [this.listTab];
   activeTab!: ExecutionTab;
-
-  constructor(@Inject(AJS_LOCATION) private _location: ILocationService) {}
 
   private locationChangeFunction = () => {
     if (!this._location.path().includes('executions')) {

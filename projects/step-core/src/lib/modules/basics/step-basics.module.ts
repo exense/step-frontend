@@ -93,6 +93,7 @@ export * from './shared/alert-type.enum';
 export * from './shared/restore-dialog-data';
 export * from './shared/project-management-helper-strategy.interface';
 export * from './shared/project-info.interface';
+export * from './shared/is-touch-device.token';
 export * from './directives/element-ref-map.directive';
 export * from './directives/width-expanders.directive';
 export * from './directives/label.directive';

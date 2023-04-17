@@ -2,6 +2,8 @@ import {
   Component,
   EventEmitter,
   forwardRef,
+  HostBinding,
+  inject,
   Inject,
   Input,
   OnChanges,
@@ -20,6 +22,7 @@ import {
   Execution,
   ExecutionCloseHandleService,
   ExecutionSummaryDto,
+  IS_TOUCH_DEVICE,
   ItemInfo,
   Operation,
   PrivateViewPluginService,
@@ -129,6 +132,9 @@ export class ExecutionProgressComponent
   @Output() close = new EventEmitter<{ eId: string; openList?: boolean }>();
 
   throughputchart: any | { series: any[]; data: any[][] } = {};
+
+  @HostBinding('class.touchdevice')
+  readonly _isTouchDevice = inject(IS_TOUCH_DEVICE);
 
   constructor(
     @Inject(DOCUMENT) private _document: Document,

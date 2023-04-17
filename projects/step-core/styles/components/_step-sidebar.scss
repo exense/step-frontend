@@ -12,6 +12,7 @@ $default-color: dc.default-colors();
   $menu-text: map.get($default-color, main-header-hover-color),
   $width-open: 254px,
   $width-closed: 72px,
+  $width-closed-touch: 48px,
   $openclose-transition: 0.2s,
   $logo-and-burgermenu-height: 48px,
   $home-and-settings-height: 64px,
@@ -31,6 +32,7 @@ $default-color: dc.default-colors();
     menu-text: $menu-text,
     width-open: $width-open,
     width-closed: $width-closed,
+    width-closed-touch: $width-closed-touch,
     openclose-transition: $openclose-transition,
     logo-and-burgermenu-height: $logo-and-burgermenu-height,
     home-and-settings-height: $home-and-settings-height,
@@ -62,6 +64,10 @@ $default-color: dc.default-colors();
 
   #main.main-when-sidebar-closed {
     margin-left: map.get($config, width-closed);
+  }
+
+  #main.main-when-sidebar-closed-touch {
+    margin-left: map.get($config, width-closed-touch);
   }
 
   step-tenant-selection-downgraded {
@@ -98,10 +104,14 @@ $default-color: dc.default-colors();
       scrollbar-width: none; /* No Scrollbar: Firefox */
 
       > div {
-        padding: 0 $elements-text-padding 0 $elements-text-padding;
+        padding: 0 $elements-text-padding;
 
         display: flex;
         align-items: center;
+      }
+
+      &.sidebar-closed.touchdevice > div {
+        padding: 0 2px;
       }
 
       a {
@@ -127,11 +137,6 @@ $default-color: dc.default-colors();
 
     .sidebar::-webkit-scrollbar {
       display: none;
-    }
-
-    #collapsable-sidebar-toggle-checkbox {
-      display: none;
-      cursor: pointer;
     }
 
     .sidebar-logo-container {
@@ -385,11 +390,11 @@ $default-color: dc.default-colors();
       cursor: pointer;
     }
 
-    #collapsable-sidebar-toggle-checkbox:not(:checked) ~ .sidebar {
+    .sidebar:not(.sidebar-closed) {
       width: map.get($config, width-open);
     }
 
-    #collapsable-sidebar-toggle-checkbox:checked ~ .sidebar {
+    .sidebar.sidebar-closed {
       // collapsed sidebar
       width: map.get($config, width-closed);
 
@@ -432,11 +437,24 @@ $default-color: dc.default-colors();
       .sidebar-subtab {
         padding: 0 12px;
       }
-    }
 
-    #collapsable-sidebar-toggle-checkbox:checked ~ step-tenant-selection-downgraded {
-      width: map.get($config, width-closed);
-      visibility: hidden;
+      & ~ step-tenant-selection-downgraded {
+        width: map.get($config, width-closed);
+        visibility: hidden;
+      }
+
+      &.touchdevice {
+        width: map.get($config, width-closed-touch);
+        #sidebar-logo-and-burgermenu {
+          width: map.get($config, width-closed-touch);
+        }
+        #sidebar-home-and-settings {
+          width: map.get($config, width-closed-touch);
+        }
+        & ~ step-tenant-selection-downgraded {
+          width: map.get($config, width-closed-touch);
+        }
+      }
     }
   }
 }
