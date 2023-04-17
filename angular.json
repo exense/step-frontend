@@ -51,6 +51,11 @@
                 "glob": "**/*",
                 "input": "dist/step-frontend/src/lib/angularjs",
                 "output": "/"
+              },
+              {
+                "glob": "worker-javascript.js",
+                "input": "node_modules/ace-builds/src-min-noconflict",
+                "output": "/"
               }
             ],
             "styles": ["projects/step-app/src/styles.scss", "node_modules/uplot/dist/uPlot.min.css"],
