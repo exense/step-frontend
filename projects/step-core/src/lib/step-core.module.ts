@@ -8,7 +8,8 @@ import { UpgradeModule } from '@angular/upgrade/static';
 import { AngularSplitModule } from 'angular-split';
 import { StepGeneratedClientModule } from './client/generated';
 import { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
-import { CustomFormInputComponent } from './components/custom-form-input/custom-form-input.component';
+import { DynamicLabelCustomFormInputComponent } from './components/custom-form-input/dynamic-label-custom-form-input.component';
+import { StandardCustomFormInputComponent } from './components/custom-form-input/standard-custom-form-input.component';
 import { CustomFormComponent } from './components/custom-form/custom-form.component';
 import { EditableActionsComponent } from './components/editable-actions/editable-actions.component';
 import { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';
@@ -60,6 +61,7 @@ import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
+import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 
 @NgModule({
   declarations: [
@@ -93,7 +95,8 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     EditableTextareaLabelWrapperComponent,
     PlanTreeActionsComponent,
     CustomFormComponent,
-    CustomFormInputComponent,
+    DynamicLabelCustomFormInputComponent,
+    StandardCustomFormInputComponent,
     CustomFormInputModelPipe,
     SplitComponent,
     SplitAreaComponent,
@@ -106,6 +109,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     SearchResourceDialogComponent,
     MaxHeightViewportHeightMinusOffsetTopDirective,
     RecursiveTabIndexDirective,
+    PlanCreateDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -167,7 +171,8 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     KeywordNameComponent,
     DynamicAttributePipe,
     CustomFormComponent,
-    CustomFormInputComponent,
+    DynamicLabelCustomFormInputComponent,
+    StandardCustomFormInputComponent,
     EditableTextareaLabelWrapperComponent,
     SplitComponent,
     SplitAreaComponent,
@@ -180,6 +185,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     SearchResourceDialogComponent,
     MaxHeightViewportHeightMinusOffsetTopDirective,
     RecursiveTabIndexDirective,
+    PlanCreateDialogComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -214,7 +220,8 @@ export type { OpenAPIConfig } from './client/generated/core/OpenAPI';
 export * from './client/generated/index';
 export * from './client/step-client-module';
 export { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
-export { CustomFormInputComponent } from './components/custom-form-input/custom-form-input.component';
+export { DynamicLabelCustomFormInputComponent } from './components/custom-form-input/dynamic-label-custom-form-input.component';
+export { StandardCustomFormInputComponent } from './components/custom-form-input/standard-custom-form-input.component';
 export { CustomFormComponent } from './components/custom-form/custom-form.component';
 export { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';
 export { EditableLabelComponent } from './components/editable-label/editable-label.component';
@@ -237,6 +244,7 @@ export { SplitAreaComponent } from './components/split-area/split-area.component
 export { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 export { SplitComponent } from './components/split/split.component';
 export { UploadContainerComponent } from './components/upload-container/upload-container.component';
+export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';

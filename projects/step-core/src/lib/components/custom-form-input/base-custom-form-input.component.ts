@@ -1,31 +1,22 @@
-import { Component, forwardRef, HostBinding, Input, OnInit } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
+import { Component, HostBinding, inject, Input, OnInit } from '@angular/core';
+import { ControlValueAccessor } from '@angular/forms';
 import { Input as StInput, ScreensService } from '../../client/generated';
-import { AJS_MODULE } from '../../shared';
 
-enum InputType {
+export enum InputType {
   TEXT = 'TEXT',
   DROPDOWN = 'DROPDOWN',
   CHECKBOX = 'CHECKBOX',
 }
 
-type OnChange = (value?: string) => void;
-type OnTouch = () => void;
+export type OnChange = (value?: string) => void;
+export type OnTouch = () => void;
 
 @Component({
-  selector: 'step-custom-form-inputs',
-  templateUrl: './custom-form-input.component.html',
-  styleUrls: ['./custom-form-input.component.scss'],
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => CustomFormInputComponent),
-      multi: true,
-    },
-  ],
+  selector: '',
+  template: '',
+  styleUrls: [],
 })
-export class CustomFormInputComponent implements ControlValueAccessor, OnInit {
+export abstract class BaseCustomFormInputComponent implements ControlValueAccessor, OnInit {
   @Input() stScreen?: string;
   @Input() stInput?: StInput;
   @Input() stInputId?: string;
@@ -41,7 +32,7 @@ export class CustomFormInputComponent implements ControlValueAccessor, OnInit {
   dropdownItems: string[] = [];
   checkboxItems: string[] = ['true', 'false'];
 
-  constructor(private _screensService: ScreensService) {}
+  protected _screensService = inject(ScreensService);
 
   ngOnInit(): void {
     if (!this.stInput) {
@@ -78,7 +69,7 @@ export class CustomFormInputComponent implements ControlValueAccessor, OnInit {
     this.onChange?.(value);
   }
 
-  onStateChange(): void {
+  invokeTouch(): void {
     this.onTouch?.();
   }
 
@@ -96,7 +87,3 @@ export class CustomFormInputComponent implements ControlValueAccessor, OnInit {
       : [];
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepCustomFormInputs', downgradeComponent({ component: CustomFormInputComponent }));
