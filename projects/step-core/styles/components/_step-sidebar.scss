@@ -12,7 +12,7 @@ $default-color: dc.default-colors();
   $menu-text: map.get($default-color, main-header-hover-color),
   $width-open: 254px,
   $width-closed: 72px,
-  $width-closed-touch: 48px,
+  $width-closed-small-screen: 48px,
   $openclose-transition: 0.2s,
   $logo-and-burgermenu-height: 48px,
   $home-and-settings-height: 64px,
@@ -32,7 +32,7 @@ $default-color: dc.default-colors();
     menu-text: $menu-text,
     width-open: $width-open,
     width-closed: $width-closed,
-    width-closed-touch: $width-closed-touch,
+    width-closed-small-screen: $width-closed-small-screen,
     openclose-transition: $openclose-transition,
     logo-and-burgermenu-height: $logo-and-burgermenu-height,
     home-and-settings-height: $home-and-settings-height,
@@ -66,8 +66,8 @@ $default-color: dc.default-colors();
     margin-left: map.get($config, width-closed);
   }
 
-  #main.main-when-sidebar-closed-touch {
-    margin-left: map.get($config, width-closed-touch);
+  #main.main-when-sidebar-closed-small-screen {
+    margin-left: map.get($config, width-closed-small-screen);
   }
 
   step-tenant-selection-downgraded {
@@ -110,7 +110,7 @@ $default-color: dc.default-colors();
         align-items: center;
       }
 
-      &.sidebar-closed.touchdevice > div {
+      &.sidebar-closed.small-screen > div {
         padding: 0 2px;
       }
 
@@ -443,16 +443,16 @@ $default-color: dc.default-colors();
         visibility: hidden;
       }
 
-      &.touchdevice {
-        width: map.get($config, width-closed-touch);
+      &.small-screen {
+        width: map.get($config, width-closed-small-screen);
         #sidebar-logo-and-burgermenu {
-          width: map.get($config, width-closed-touch);
+          width: map.get($config, width-closed-small-screen);
         }
         #sidebar-home-and-settings {
-          width: map.get($config, width-closed-touch);
+          width: map.get($config, width-closed-small-screen);
         }
         & ~ step-tenant-selection-downgraded {
-          width: map.get($config, width-closed-touch);
+          width: map.get($config, width-closed-small-screen);
         }
       }
     }

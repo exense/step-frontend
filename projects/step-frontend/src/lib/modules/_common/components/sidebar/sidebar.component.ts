@@ -17,7 +17,7 @@ import {
   AJS_LOCATION,
   AJS_MODULE,
   AuthService,
-  IS_TOUCH_DEVICE,
+  IS_SMALL_SCREEN,
   MenuEntry,
   ViewRegistryService,
   ViewStateService,
@@ -42,8 +42,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   private _sideBarOpenState = inject(SidebarOpenStateService);
   readonly _menuItems$ = inject(MENU_ITEMS).pipe(takeUntil(this.terminator$));
+  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
-  readonly isTouchDevice = inject(IS_TOUCH_DEVICE);
   readonly isOpened$ = this._sideBarOpenState.isOpened$;
   readonly trackByMenuEntry: TrackByFunction<MenuEntry> = (index, item) => item.id;
 

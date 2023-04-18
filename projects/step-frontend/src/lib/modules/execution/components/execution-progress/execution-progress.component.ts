@@ -22,7 +22,7 @@ import {
   Execution,
   ExecutionCloseHandleService,
   ExecutionSummaryDto,
-  IS_TOUCH_DEVICE,
+  IS_SMALL_SCREEN,
   ItemInfo,
   Operation,
   PrivateViewPluginService,
@@ -82,6 +82,8 @@ const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\
 export class ExecutionProgressComponent
   implements OnInit, OnChanges, ExecutionStateService, ExecutionCloseHandleService
 {
+  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
+
   readonly trackByItemInfo: TrackByFunction<ItemInfo> = (index, item) => item.type;
 
   readonly Panels = Panels;
@@ -133,8 +135,8 @@ export class ExecutionProgressComponent
 
   throughputchart: any | { series: any[]; data: any[][] } = {};
 
-  @HostBinding('class.touchdevice')
-  readonly _isTouchDevice = inject(IS_TOUCH_DEVICE);
+  @HostBinding('class.small-screen')
+  protected isSmallScreen = false;
 
   constructor(
     @Inject(DOCUMENT) private _document: Document,

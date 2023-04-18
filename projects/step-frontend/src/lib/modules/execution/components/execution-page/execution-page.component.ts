@@ -1,6 +1,6 @@
-import { Component, HostBinding, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_LOCATION, AJS_MODULE, Execution, IS_TOUCH_DEVICE } from '@exense/step-core';
+import { AJS_LOCATION, AJS_MODULE, Execution, IS_SMALL_SCREEN } from '@exense/step-core';
 import { ExecutionTab } from '../../shared/execution-tab';
 
 @Component({
@@ -11,8 +11,7 @@ import { ExecutionTab } from '../../shared/execution-tab';
 export class ExecutionPageComponent implements OnInit, OnDestroy {
   private _location = inject(AJS_LOCATION);
 
-  @HostBinding('class.touchdevice')
-  readonly _isTouchDevice = inject(IS_TOUCH_DEVICE);
+  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
   listTab: ExecutionTab = { label: 'Executions', type: 'list', id: 'list', title: 'Executions List' };
   tabs: ExecutionTab[] = [this.listTab];

@@ -1,4 +1,4 @@
-<div class="sidebar" [class.sidebar-closed]="!(isOpened$ | async)" [class.touchdevice]="isTouchDevice">
+<div class="sidebar" [class.sidebar-closed]="!(isOpened$ | async)" [class.small-screen]="_isSmallScreen$ | async">
   <div id="sidebar-logo-and-burgermenu">
     <span class="visible-when-collapsed">
       <label (click)="toggleOpenClose()">

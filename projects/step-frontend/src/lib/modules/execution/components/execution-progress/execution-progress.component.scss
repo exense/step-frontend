@@ -1,9 +1,9 @@
-:host.touchdevice as-split {
-  height: 100vh;
-}
-
 as-split {
   height: calc(100vh - 134px);
+
+  &.small-screen {
+    height: 100vh;
+  }
 }
 
 as-split-area {
