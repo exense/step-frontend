@@ -1,6 +1,10 @@
 <div class="filters">
   <button type="button" mat-raised-button color="primary" [matMenuTriggerFor]="menu">Add Filter</button>
 
+  <div class="warning-mark" *ngIf="rawMeasurementsModeActive">
+    You use custom filters that refer to raw measurements, this may slow down the dashboard.
+  </div>
+
   <mat-menu #menu="matMenu">
     <button mat-menu-item *ngFor="let option of defaultFilterOptions" (click)="addFilterItem(option)">
       <span>{{ option.label }}</span>
@@ -30,9 +34,17 @@
       (onFilterChange)="handleFilterChange()"
     >
     </step-ts-filter-bar-item>
+    <button
+      class="apply-btn"
+      *ngIf="showApplyButton && rawMeasurementsModeActive && filters?.length"
+      mat-button
+      (click)="emitFiltersChange()"
+    >
+      Apply
+    </button>
   </div>
 
-  <step-timeseries-grouping (onGroupingChange)="onGroupingChange.emit($event)"></step-timeseries-grouping>
+  <step-timeseries-grouping (onGroupingChange)="handleGroupingChange($event)"></step-timeseries-grouping>
 </div>
 
 <div *ngIf="moreFilters.length" class="more-applied-filters">

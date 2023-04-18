@@ -2,9 +2,9 @@ import { TimeSeriesUtils } from '../../time-series-utils';
 import { TSChartSeries, TSChartSettings } from '../../chart/model/ts-chart-settings';
 import { UPlotUtils } from '../../uplot/uPlot.utils';
 import { FindBucketsRequest } from '../../find-buckets-request';
-import { TimeSeriesChartResponse } from '../../time-series-chart-response';
 import { TimeseriesColorsPool } from '../../util/timeseries-colors-pool';
 import { TimeSeriesConfig } from '../../time-series.config';
+import { TimeSeriesAPIResponse } from '@exense/step-core';
 
 declare const uPlot: any;
 
@@ -13,7 +13,7 @@ export class ByStatusChartGenerator {
 
   static createChart(
     request: FindBucketsRequest,
-    response: TimeSeriesChartResponse,
+    response: TimeSeriesAPIResponse,
     colorsPool?: TimeseriesColorsPool
   ): TSChartSettings {
     if (!colorsPool) {

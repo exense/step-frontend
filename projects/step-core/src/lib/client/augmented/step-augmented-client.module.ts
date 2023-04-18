@@ -21,6 +21,7 @@ export { AugmentedKeywordPackagesService } from './services/augmented-keyword-pa
 export { AugmentedKeywordsService } from './services/augmented-keywords-service';
 export { AugmentedScreenService } from './services/augmented-screen.service';
 export { AugmentedSettingsService } from './services/augmented-settings.service';
+export * from './services/augmented-keyword-editor.service';
 export { AugmentedInteractivePlanExecutionService } from './services/augmented-interactive-plan-execution-service';
 export { pollAsyncTask } from './rxjs-operators/poll-async-task';
 export { AsyncTaskStatus } from './shared/async-task-status';

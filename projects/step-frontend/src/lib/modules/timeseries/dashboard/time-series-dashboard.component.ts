@@ -125,7 +125,8 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * This method has to make sure that it doesn't overlap another running update
+   * This method has to make sure that it doesn't overlap another running update.
+   * Used for auto-refresh.
    * @param range
    */
   refresh(range: TSTimeRange, selection?: TSTimeRange): void {

@@ -1,13 +1,13 @@
 import { FindBucketsRequest } from '../../find-buckets-request';
 import { TimeSeriesUtils } from '../../time-series-utils';
 import { UPlotUtils } from '../../uplot/uPlot.utils';
-import { TimeSeriesChartResponse } from '../../time-series-chart-response';
 import { TSChartSettings } from '../../chart/model/ts-chart-settings';
 import { TsChartType } from '../model/ts-chart-type';
 import { ThreadGroupChartGenerator } from './thread-group-chart-generator';
 import { ByStatusChartGenerator } from './by-status-chart-generator';
 import { TimeseriesColorsPool } from '../../util/timeseries-colors-pool';
 import { TimeSeriesConfig } from '../../time-series.config';
+import { TimeSeriesAPIResponse } from '@exense/step-core';
 
 declare const uPlot: any;
 
@@ -18,7 +18,7 @@ export class ChartGenerators {
   static generateChart(
     type: TsChartType,
     request: FindBucketsRequest,
-    response: TimeSeriesChartResponse,
+    response: TimeSeriesAPIResponse,
     colorsPool?: TimeseriesColorsPool
   ): TSChartSettings {
     switch (type) {
@@ -34,7 +34,7 @@ export class ChartGenerators {
     }
   }
 
-  static createSummaryChartSettings(request: FindBucketsRequest, response: TimeSeriesChartResponse): TSChartSettings {
+  static createSummaryChartSettings(request: FindBucketsRequest, response: TimeSeriesAPIResponse): TSChartSettings {
     let xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     let avgValues: (number | null | undefined)[] = [];
     let countValues: (number | null)[] = [];
