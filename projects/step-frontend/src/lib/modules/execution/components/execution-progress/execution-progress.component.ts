@@ -2,7 +2,6 @@ import {
   Component,
   EventEmitter,
   forwardRef,
-  HostBinding,
   inject,
   Inject,
   Input,
@@ -134,9 +133,6 @@ export class ExecutionProgressComponent
   @Output() close = new EventEmitter<{ eId: string; openList?: boolean }>();
 
   throughputchart: any | { series: any[]; data: any[][] } = {};
-
-  @HostBinding('class.small-screen')
-  protected isSmallScreen = false;
 
   constructor(
     @Inject(DOCUMENT) private _document: Document,
