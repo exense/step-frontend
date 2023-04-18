@@ -20,9 +20,9 @@ export class FilterUtils {
     return `(${clause})`;
   }
 
-  static filtersToOQL(items: TsFilterItem[], attributesPrefix?: string) {
+  static filtersToOQL(items: TsFilterItem[], attributesPrefix?: string): string {
     if (!items || items.length === 0) {
-      return undefined;
+      return '';
     }
     let andFilters: (string | undefined)[] = items.map((item) => {
       let clause;

@@ -6,6 +6,7 @@ import type { Observable } from 'rxjs';
 
 import type { AsyncTaskStatusObject } from '../models/AsyncTaskStatusObject';
 import type { FetchBucketsRequest } from '../models/FetchBucketsRequest';
+import type { OQLVerifyResponse } from '../models/OQLVerifyResponse';
 import type { TimeSeriesAPIResponse } from '../models/TimeSeriesAPIResponse';
 import type { TimeSeriesRebuildRequest } from '../models/TimeSeriesRebuildRequest';
 
@@ -56,6 +57,21 @@ export class TimeSeriesService {
       url: '/time-series/execution/{executionId}/exists',
       path: {
         executionId: executionId,
+      },
+    });
+  }
+
+  /**
+   * @param oql
+   * @returns OQLVerifyResponse default response
+   * @throws ApiError
+   */
+  public verifyOql(oql: string): Observable<OQLVerifyResponse> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/time-series/oql-verify',
+      query: {
+        oql: oql,
       },
     });
   }

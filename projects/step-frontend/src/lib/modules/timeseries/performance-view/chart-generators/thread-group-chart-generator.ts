@@ -1,11 +1,11 @@
 import { FindBucketsRequest } from '../../find-buckets-request';
-import { TimeSeriesChartResponse } from '../../time-series-chart-response';
 import { TSChartSeries, TSChartSettings } from '../../chart/model/ts-chart-settings';
 import { TimeSeriesUtils } from '../../time-series-utils';
 import { UPlotUtils } from '../../uplot/uPlot.utils';
 import { ChartGenerators } from './chart-generators';
 import { TimeSeriesConfig } from '../../time-series.config';
 import { TimeseriesColorsPool } from '../../util/timeseries-colors-pool';
+import { TimeSeriesAPIResponse } from '@exense/step-core';
 
 declare const uPlot: any;
 
@@ -14,7 +14,7 @@ export class ThreadGroupChartGenerator {
 
   static createChart(
     request: FindBucketsRequest,
-    response: TimeSeriesChartResponse,
+    response: TimeSeriesAPIResponse,
     colorsPool: TimeseriesColorsPool
   ): TSChartSettings {
     if (!colorsPool) {
@@ -23,7 +23,7 @@ export class ThreadGroupChartGenerator {
     let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     let totalData: number[] = response.matrix[0] ? Array(response.matrix[0].length) : [];
     let dynamicSeries = response.matrixKeys.map((key, i) => {
-      key = key[this.DIMENSION_KEY]; // get just the name
+      const seriesKey: string = key[this.DIMENSION_KEY]; // get just the name
       let filledData = response.matrix[i].map((b, j) => {
         let bucketValue = b?.max;
         if (bucketValue == null && j > 0) {
@@ -41,13 +41,13 @@ export class ThreadGroupChartGenerator {
       });
       let useRandomColors = response.matrixKeys.length > 1;
       return {
-        id: key,
+        id: seriesKey,
         scale: 'y',
-        label: key,
-        legendName: key,
+        label: seriesKey,
+        legendName: seriesKey,
         data: filledData,
         value: (x, v) => Math.trunc(v),
-        stroke: useRandomColors ? colorsPool.getColor(key) : '#024981',
+        stroke: useRandomColors ? colorsPool.getColor(seriesKey) : '#024981',
         width: 2,
         paths: ChartGenerators.stepped({ align: 1 }),
         points: { show: false },

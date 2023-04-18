@@ -17,7 +17,7 @@ export const $FetchBucketsRequest = {
     params: {
       type: 'dictionary',
       contains: {
-        type: 'string',
+        properties: {},
       },
     },
     groupDimensions: {
@@ -28,7 +28,7 @@ export const $FetchBucketsRequest = {
     },
     numberOfBuckets: {
       type: 'number',
-      format: 'int64',
+      format: 'int32',
     },
     intervalSize: {
       type: 'number',
