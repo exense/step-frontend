@@ -6,20 +6,29 @@ import {
   AJS_LOCATION,
   AJS_MODULE,
   AJS_ROOT_SCOPE,
-  InteractivePlanExecutionService,
-  TableRemoteDataSource,
   AugmentedKeywordsService,
-  FunctionPackage,
-  Mutable,
+  AutoDeselectStrategy,
+  BulkOperationsInvokeService,
+  BulkOperationType,
+  Function as KeywordFunction,
+  InteractivePlanExecutionService,
+  selectionCollectionProvider,
+  TableRemoteDataSource,
 } from '@exense/step-core';
 import { ILocationService, IRootScopeService } from 'angular';
-
-type FieldAccessor = Mutable<Pick<GenericFunctionListComponent, 'dataSource'>>;
+import { GenericFunctionBulkOperationsInvokeService } from '../services/generic-function-bulk-operations-invoke.service';
 
 @Component({
   selector: 'step-generic-function-list',
   templateUrl: './generic-function-list.component.html',
   styleUrls: ['./generic-function-list.component.scss'],
+  providers: [
+    selectionCollectionProvider<string, KeywordFunction>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    {
+      provide: BulkOperationsInvokeService,
+      useClass: GenericFunctionBulkOperationsInvokeService,
+    },
+  ],
 })
 export class GenericFunctionListComponent implements OnInit, AfterViewInit {
   @Input() filter?: string[];
@@ -27,7 +36,12 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
   @Input() title?: string;
   @Input() serviceroot?: string;
 
-  readonly dataSource?: TableRemoteDataSource<FunctionPackage>;
+  protected dataSource?: TableRemoteDataSource<KeywordFunction>;
+
+  readonly availableBulkOperations = [
+    { operation: BulkOperationType.delete, permission: 'mask-delete' },
+    { operation: BulkOperationType.duplicate, permission: 'kw-write' },
+  ];
 
   constructor(
     private _interactivePlanExecutionService: InteractivePlanExecutionService,
@@ -47,7 +61,7 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    (this as FieldAccessor).dataSource = this._augmentedKeywordsService.createFilteredTableDataSource(this.filter);
+    this.dataSource = this._augmentedKeywordsService.createFilteredTableDataSource(this.filter);
   }
 
   addMask(): void {

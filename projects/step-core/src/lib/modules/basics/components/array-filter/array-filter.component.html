@@ -1,7 +1,7 @@
 <step-form-field>
   <mat-select multiple (selectionChange)="handleChange($event)">
-    <mat-option *ngFor="let item of items" [value]="item">
-      {{ item }}
+    <mat-option *ngFor="let item of displayItems; trackBy: trackByKeyValue" [value]="item.key">
+      {{ item.value }}
     </mat-option>
   </mat-select>
 </step-form-field>
