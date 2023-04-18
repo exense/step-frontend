@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, of, tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { PrivateApplicationService } from '../../../client/step-client-module';
 
 @Injectable({
@@ -15,13 +15,10 @@ export class RepositoryParametersStorageService {
   }
 
   loadParameters(): Observable<string[]> {
-    return of([]);
-    /*
     return this._api.getAllRepositoriesCanonicalParameters().pipe(
       tap((parameters) => {
         this.parametersInternal = parameters;
       })
     );
-*/
   }
 }
