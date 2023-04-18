@@ -104,3 +104,4 @@ export * from './directives/error.directive';
 export * from './directives/alert.directive';
 export * from './shared/repository-parameters.token';
 export * from './repository-parameters-initializer';
+export * from './shared/array-item-label-value-extractor';
