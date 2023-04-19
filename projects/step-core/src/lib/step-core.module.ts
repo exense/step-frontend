@@ -230,6 +230,7 @@ export { FunctionLinkComponent } from './components/function-link/function-link.
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 export { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
+export { PlanNameComponent } from './components/plan-name/plan-name.component';
 export { PlanLinkComponent } from './components/plan-link/plan-link.component';
 export * from './components/plan-tree/plan-tree.component';
 export { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
