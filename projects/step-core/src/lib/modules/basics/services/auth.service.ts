@@ -97,8 +97,8 @@ export class AuthService implements OnDestroy {
       });
   }
 
-  goToLoginPage(): any {
-    return this._$location.path('/root/login');
+  goToLoginPage(): void {
+   this._$location.path('/root/login');
   }
 
   checkOidc(): void {
@@ -174,7 +174,6 @@ export class AuthService implements OnDestroy {
   }
 
   initialize(): Observable<boolean> {
-    console.log('initialize session');
     return this._privateApplicationApi.getApplicationConfiguration().pipe(
       tap((conf) => {
         this._serviceContext.conf = conf;
