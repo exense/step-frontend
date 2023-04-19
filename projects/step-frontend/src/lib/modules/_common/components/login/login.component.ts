@@ -20,9 +20,10 @@ export class LoginComponent {
 
   readonly loginDescriptionText: string = '';
 
-  constructor(private _auth: AuthService) {}
+  constructor(public _auth: AuthService) {}
 
   ngOnInit() {
+    this._auth.checkOidc();
     if (this._auth.getConf()?.demo) {
       this.credentials.password = 'init';
       this.credentials.username = 'admin';

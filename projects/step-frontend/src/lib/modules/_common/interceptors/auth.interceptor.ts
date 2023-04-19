@@ -20,7 +20,7 @@ export class AuthInterceptor implements HttpInterceptor {
        * **/
       const authService = this._injector.get(AuthService);
       // when checking for session auth error is expected
-      if (authService.isAuthenticated() || authService.isOidc) {
+      if (authService.isAuthenticated()) {
         authService.goToLoginPage();
       }
     }
