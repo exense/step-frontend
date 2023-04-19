@@ -1,7 +1,9 @@
 import { Component, inject, TrackByFunction } from '@angular/core';
-import { AJS_LOCATION, AugmentedPlansService, ItemInfo, Plan, PlanTypeRegistryService } from '@exense/step-core';
 import { shareReplay, switchMap, tap } from 'rxjs';
 import { MatDialogRef } from '@angular/material/dialog';
+import { AJS_LOCATION } from '../../shared';
+import { AugmentedPlansService, Plan } from '../../client/step-client-module';
+import { ItemInfo, PlanTypeRegistryService } from '../../modules/custom-registeries/custom-registries.module';
 
 @Component({
   selector: 'step-plan-create-dialog',
