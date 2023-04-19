@@ -6,6 +6,7 @@ import type { Observable } from 'rxjs';
 
 import type { AbstractArtefact } from '../models/AbstractArtefact';
 import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTaskStatusTableBulkOperationReport';
+import type { CallPlan } from '../models/CallPlan';
 import type { History } from '../models/History';
 import type { Plan } from '../models/Plan';
 import type { PlanCompilationResult } from '../models/PlanCompilationResult';
@@ -259,6 +260,21 @@ export class PlansService {
       path: {
         id: id,
       },
+    });
+  }
+
+  /**
+   * Returns the plan referenced by the given CallPlan.
+   * @param requestBody
+   * @returns Plan default response
+   * @throws ApiError
+   */
+  public lookupCallPlan(requestBody?: CallPlan): Observable<Plan> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/plans/lookup',
+      body: requestBody,
+      mediaType: 'application/json',
     });
   }
 

@@ -11,13 +11,12 @@
       </span>
     </div>
   </div>
-  <fieldset ng-disabled="readonly">
-    <dynamic-json-editor
-      ng-if="!artefact.planId"
-      label="'Plan attributes'"
-      dynamic-value="artefact.selectionAttributes"
-      on-save="save()"
-    />
+  <fieldset ng-if="!artefact.planId">
+    <step-plan-name
+      [artefact]="artefact"
+      [is-disabled]="readonly"
+      (on-save)="save()">
+    </step-plan-name>
   </fieldset>
   <fieldset ng-disabled="readonly">
     <dynamic-json-editor label="'Input'" dynamic-value="artefact.input" on-save="save()" />

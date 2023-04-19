@@ -60,6 +60,8 @@ import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
+import { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
+import { PlanNameComponent } from './components/plan-name/plan-name.component';
 
 @NgModule({
   declarations: [
@@ -106,6 +108,8 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     SearchResourceDialogComponent,
     MaxHeightViewportHeightMinusOffsetTopDirective,
     RecursiveTabIndexDirective,
+    ReferenceArtefactNameComponent,
+    PlanNameComponent,
   ],
   imports: [
     CommonModule,
@@ -180,6 +184,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     SearchResourceDialogComponent,
     MaxHeightViewportHeightMinusOffsetTopDirective,
     RecursiveTabIndexDirective,
+    PlanNameComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -223,6 +228,7 @@ export { EditableTextareaLabelComponent } from './components/editable-textarea-l
 export { FunctionLinkDialogService } from './components/function-link/function-link-dialog.service';
 export { FunctionLinkComponent } from './components/function-link/function-link.component';
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
+export { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
 export { PlanLinkComponent } from './components/plan-link/plan-link.component';
 export * from './components/plan-tree/plan-tree.component';
