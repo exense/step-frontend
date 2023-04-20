@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, inject, Input, ViewEncapsulation } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, ApiError, AuthService } from '@exense/step-core';
 
@@ -19,10 +19,12 @@ export class LoginComponent {
   @Input() logo: string = 'images/logologin.png';
 
   readonly loginDescriptionText: string = '';
+  readonly _auth = inject(AuthService);
 
-  constructor(private _auth: AuthService) {}
+  constructor() {}
 
   ngOnInit() {
+    this._auth.checkOidc();
     if (this._auth.getConf()?.demo) {
       this.credentials.password = 'init';
       this.credentials.username = 'admin';
