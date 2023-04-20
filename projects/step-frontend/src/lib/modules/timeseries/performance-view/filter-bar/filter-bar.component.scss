@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 :host {
   display: flex;
   flex-direction: column;
@@ -6,7 +8,18 @@
 }
 
 .mat-raised-button.mat-primary {
-  background: #293e50;
+  background: var.$gray-800;
+}
+
+.warning-mark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: var.$yellow-15;
+  color: var.$yellow-650;
+  padding: 4px 34px;
+  font-size: 12px;
+  border: 1px solid var.$yellow-600;
 }
 
 .filters {
@@ -31,4 +44,10 @@
   flex-wrap: wrap;
   gap: 16px;
   padding: 0 8px;
+}
+
+.apply-btn {
+  background-color: var.$yellow-10;
+  border: 1px solid var.$yellow-600;
+  color: var.$yellow-650;
 }

@@ -14,6 +14,17 @@ export class PrivateApplicationService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 
   /**
+   * @returns string default response
+   * @throws ApiError
+   */
+  public getAllRepositoriesCanonicalParameters(): Observable<Array<string>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/app/repositories/parameters',
+    });
+  }
+
+  /**
    * @returns ApplicationConfiguration default response
    * @throws ApiError
    */

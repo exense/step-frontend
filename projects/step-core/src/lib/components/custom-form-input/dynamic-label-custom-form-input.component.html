@@ -7,7 +7,7 @@
       [tooltip]="input?.label || ''"
       [ngModel]="value"
       (ngModelChange)="onValueChange($event)"
-      (stateChange)="onStateChange()"
+      (stateChange)="invokeTouch()"
     ></step-editable-label>
   </ng-container>
 
@@ -21,7 +21,7 @@
       [tooltip]="input?.label || ''"
       [ngModel]="value"
       (ngModelChange)="onValueChange($event)"
-      (stateChange)="onStateChange()"
+      (stateChange)="invokeTouch()"
     ></step-editable-dropdown-label>
   </ng-container>
 
@@ -35,7 +35,7 @@
       [tooltip]="input?.label || ''"
       [ngModel]="value"
       (ngModelChange)="onValueChange($event)"
-      (stateChange)="onStateChange()"
+      (stateChange)="invokeTouch()"
     ></step-editable-dropdown-label>
   </ng-container>
 </ng-container>

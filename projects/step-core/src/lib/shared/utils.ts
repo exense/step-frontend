@@ -1,6 +1,8 @@
 import { IPromise } from 'angular';
 import { from, Observable } from 'rxjs';
 import { Collection } from './collection.interface';
+import { ScriptLanguage } from './script-language.enum';
+import { AceMode } from './ace-mode.enum';
 
 export const a1Promise2Promise = <T>(promise: IPromise<T>): Promise<T> =>
   Promise.resolve(promise as unknown as Promise<T>);
@@ -76,4 +78,8 @@ export const breadthFirstSearch = <T>({
   }
 
   return filtered;
+};
+
+export const convertScriptLanguageToAce = (scriptLanguage?: ScriptLanguage): AceMode | undefined => {
+  return !scriptLanguage ? undefined : (AceMode as any)[scriptLanguage];
 };
