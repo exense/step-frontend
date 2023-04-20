@@ -50,7 +50,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(
       tap((response: HttpEvent<any>) => {
-        return this.handleAsyncError(response);
+       this.handleAsyncError(response);
       }),
       catchError((error) => this.handleHttpError(error))
     );
