@@ -42,7 +42,12 @@ export class PlanListComponent {
   ) {}
 
   addPlan(): void {
-    this._planDialogs.createPlan().subscribe(() => this.dataSource.reload());
+    this._planDialogs.createPlan().subscribe((plan) => {
+      if (!plan) {
+        return;
+      }
+      this.dataSource.reload();
+    });
   }
 
   editPlan(id: string): void {

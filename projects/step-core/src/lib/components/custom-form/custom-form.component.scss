@@ -1,6 +1,6 @@
 :host {
   display: flex;
-  gap: 8px;
+  gap: 0.8rem;
 
   &:not(.inline) {
     flex-direction: column;

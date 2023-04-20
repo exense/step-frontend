@@ -9,6 +9,7 @@ import { AJS_MODULE, setObjectFieldValue } from '../../shared';
   styleUrls: ['./custom-form.component.scss'],
 })
 export class CustomFormComponent implements OnInit {
+  @Input() stEditableLabelMode = false;
   @Input() stScreen!: string;
   @Input() stModel!: Record<string, unknown>;
   @Input() stDisabled: boolean = false;
