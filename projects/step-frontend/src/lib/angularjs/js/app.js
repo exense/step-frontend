@@ -74,6 +74,7 @@ var tecAdminApp = angular
       $httpProvider.defaults.withCredentials = true;
       $httpProvider.interceptors.push('authInterceptor');
       $httpProvider.interceptors.push('genericErrorInterceptor');
+      $httpProvider.interceptors.push('httpRequestInterceptor');
     },
   ])
 
@@ -1011,6 +1012,34 @@ angular
       return $q.reject(response);
     };
   })
+  .factory('httpRequestInterceptor', [
+    'HttpInterceptorBridgeService',
+    function (HttpInterceptorBridgeService) {
+      return {
+        request: function (request) {
+          HttpInterceptorBridgeService.broadcast({
+            type: 'REQUEST',
+            request,
+          });
+          return request;
+        },
+        responseError: function (error) {
+          HttpInterceptorBridgeService.broadcast({
+            type: 'ERROR',
+            error,
+          });
+          return Promise.reject(error);
+        },
+        response: function (response) {
+          HttpInterceptorBridgeService.broadcast({
+            type: 'RESPONSE',
+            response,
+          });
+          return response;
+        },
+      };
+    },
+  ]);
 //The following functions are missing in IE11
 
 if (!String.prototype.endsWith) {
