@@ -478,7 +478,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   switchThroughputMetric(metric: ThroughputMetric) {
-    const f = (u: any, vals: any) => vals.map((v: number) => metric.labelFunction(v));
     this.throughputChart.settings.tooltipOptions.zAxisLabel = metric.tooltipZAxisLabel;
     if (metric.label === this.selectedThroughputMetric.label) {
       // it is not a real change
