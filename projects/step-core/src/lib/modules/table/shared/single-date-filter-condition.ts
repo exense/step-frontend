@@ -1,8 +1,7 @@
 import { FilterCondition } from './filter-condition';
-import { TableRequestFilter } from '../../../client/table/models/table-request-data';
+import { TableRequestFilter, TableCollectionFilter } from '../../../client/step-client-module';
 import { DateTime } from 'luxon';
 import { CompareCondition } from '../../basics/shared/compare-condition.enum';
-import { TableCollectionFilter } from '../../../client/table/models/table-collection-filter';
 
 export class SingleDateFilterCondition extends FilterCondition {
   constructor(private date?: DateTime) {

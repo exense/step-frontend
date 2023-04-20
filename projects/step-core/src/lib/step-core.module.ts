@@ -45,7 +45,7 @@ import { SimpleLineChartDirective } from './directives/simple-line-chart.directi
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 import { TooltipDirective } from './directives/tooltip.directive';
 import { TrapFocusDirective } from './directives/trap-focus.directive';
-import { StepBasicsModule } from './modules/basics/step-basics.module';
+import { REPOSITORY_PARAMETERS_INITIALIZER, StepBasicsModule } from './modules/basics/step-basics.module';
 import { CustomRegistriesModule } from './modules/custom-registeries/custom-registries.module';
 import { DynamicFormsModule } from './modules/dynamic-forms/dynamic-forms.module';
 import { EntitiesSelectionModule } from './modules/entities-selection/entities-selection.module';
@@ -183,6 +183,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
   ],
   providers: [
     CORE_INITIALIZER,
+    REPOSITORY_PARAMETERS_INITIALIZER,
     {
       provide: MAT_LUXON_DATE_ADAPTER_OPTIONS,
       useValue: { useUtc: true },
@@ -281,6 +282,7 @@ export * from './services/menu-items-override-config.service';
 export * from './services/persistence.service';
 export * from './services/plan-artefact-resolver.service';
 export { PlanDialogsService } from './services/plan-dialogs.service';
+export * from './services/plan-by-id-cache.service';
 export * from './services/plan-editor.service';
 export * from './services/plan-interactive-session.service';
 export * from './services/plugin-info-registry.service';

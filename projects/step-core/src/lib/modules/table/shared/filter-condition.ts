@@ -1,4 +1,4 @@
-import { TableRequestFilter } from '../../../client/table/models/table-request-data';
+import { TableRequestFilter } from '../../../client/step-client-module';
 
 export abstract class FilterCondition {
   abstract toRequestFilter(field: string): Array<TableRequestFilter | undefined>;
