@@ -22,11 +22,12 @@
   <span>{{ referenceKeywordString }}</span>
 </div>
 <step-dynamic-field-group
-  *ngIf="isEditorMode && !isDisabled"
+  *ngIf="isEditorMode && !isDisabled && schema"
   primaryFieldsLabel="Keyword selection criteria"
   primaryFieldsDescription="The Keyword selection criteria are used to reference the Keyword. Besides the name any other attribute of the Keyword can be referenced."
   addFieldBtnLabel="Add selection criteria"
-  [schema]="KEYWORD_ATTRIBUTES_SCHEMA"
+  [schema]="schema"
+  [allowNotSchemaFields]="true"
   [value]="artefactKeywordAttributes"
   (valueChange)="updateKeywordAttributes($event)"
 >
