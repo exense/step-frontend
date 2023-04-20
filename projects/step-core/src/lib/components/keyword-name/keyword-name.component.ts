@@ -16,13 +16,14 @@ import {
   AugmentedKeywordsService,
   CallFunction,
   Function as Keyword,
+  ScreensService,
 } from '../../client/step-client-module';
 import { AJS_MODULE } from '../../shared';
-import { EntityScopeResolver, Entity } from '../../modules/entity/entity.module';
-import { DynamicFieldsSchema, DynamicFieldGroupValue } from '../../modules/dynamic-forms/dynamic-forms.module';
+import { Entity, EntityScopeResolver } from '../../modules/entity/entity.module';
+import { DynamicFieldGroupValue, DynamicFieldsSchema } from '../../modules/dynamic-forms/dynamic-forms.module';
 import { DynamicAttributePipe } from '../../pipes/dynamic-attribute.pipe';
 import { ArtefactRefreshNotificationService } from '../../services/artefact-refresh-notification.service';
-import { Subject, takeUntil } from 'rxjs';
+import { map, Subject, takeUntil } from 'rxjs';
 
 interface KeywordMeta {
   icon: string;
@@ -30,13 +31,6 @@ interface KeywordMeta {
   description: string;
   isError?: boolean;
 }
-
-const KEYWORD_ATTRIBUTES_SCHEMA: DynamicFieldsSchema = {
-  properties: {
-    name: { type: 'string' },
-  },
-  required: ['name'],
-};
 
 @Component({
   selector: 'step-keyword-name',
@@ -52,15 +46,16 @@ export class KeywordNameComponent implements OnChanges, OnInit, OnDestroy {
   @Output() onSave = new EventEmitter<unknown>();
 
   @Output() keywordUpdate = new EventEmitter<Keyword | undefined>();
-  readonly KEYWORD_ATTRIBUTES_SCHEMA = KEYWORD_ATTRIBUTES_SCHEMA;
   protected artefactName: string = '';
   protected artefactKeywordAttributes?: DynamicFieldGroupValue;
   protected referenceKeywordString: string = '';
   protected keyword?: Keyword;
   protected isEditorMode: boolean = false;
   protected keywordMeta?: KeywordMeta;
+  protected schema?: DynamicFieldsSchema;
 
   constructor(
+    private _screenApi: ScreensService,
     private _keywordApi: AugmentedKeywordsService,
     private _entityScopeResolver: EntityScopeResolver,
     private _changeDetectorRef: ChangeDetectorRef,
@@ -69,6 +64,7 @@ export class KeywordNameComponent implements OnChanges, OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.setupArtefactExternalRefresh();
+    this.initSchema();
   }
 
   ngOnDestroy(): void {
@@ -129,14 +125,21 @@ export class KeywordNameComponent implements OnChanges, OnInit, OnDestroy {
 
     try {
       let attributesJson = artefact?.function?.value;
-
-      this.artefactKeywordAttributes = attributesJson ? JSON.parse(attributesJson) : undefined;
-      if (typeof this.artefactKeywordAttributes?.['name'] === 'string') {
-        this.artefactKeywordAttributes['name'] = {
-          value: this.artefactKeywordAttributes?.['name'],
-          dynamic: !!artefact?.function?.dynamic,
-          expression: artefact?.function?.expression || '',
-        };
+      if (!attributesJson) {
+        this.artefactKeywordAttributes = undefined;
+      } else {
+        const parsedAttributes = JSON.parse(attributesJson) as DynamicFieldGroupValue | Record<string, string>;
+        this.artefactKeywordAttributes = Object.entries(parsedAttributes).reduce((res, [key, value]) => {
+          res[key] =
+            typeof value === 'string'
+              ? {
+                  value,
+                  dynamic: !!artefact?.function?.dynamic,
+                  expression: artefact?.function?.expression ?? '',
+                }
+              : value;
+          return res;
+        }, {} as DynamicFieldGroupValue);
       }
     } catch (err) {
       this.artefactKeywordAttributes = undefined;
@@ -165,12 +168,11 @@ export class KeywordNameComponent implements OnChanges, OnInit, OnDestroy {
     return Object.values(this.artefactKeywordAttributes || {}).some((attribute) => attribute.dynamic);
   }
 
-  private isEmptyKeywordName(): boolean {
-    const nameAttribute = (this.artefactKeywordAttributes || {})['name'];
-    if (!nameAttribute) {
-      return true;
-    }
-    return nameAttribute.dynamic ? !nameAttribute.expression : !nameAttribute.value;
+  private isEmpty(): boolean {
+    return Object.values(this.artefactKeywordAttributes || {}).reduce((res, attribute) => {
+      const isEmpty = attribute.dynamic ? !attribute.expression : !attribute.value;
+      return res && isEmpty;
+    }, true);
   }
 
   private loadArtefactKeyword(artefact?: CallFunction): void {
@@ -190,7 +192,7 @@ export class KeywordNameComponent implements OnChanges, OnInit, OnDestroy {
       return;
     }
 
-    if (this.isEmptyKeywordName()) {
+    if (this.isEmpty()) {
       this.keyword = undefined;
       this.keywordUpdate.emit(undefined);
       this.keywordMeta = {
@@ -239,6 +241,38 @@ export class KeywordNameComponent implements OnChanges, OnInit, OnDestroy {
     this._artefactRefreshNotification.refreshArtefact$
       .pipe(takeUntil(this.terminator$))
       .subscribe(() => this.initArtefactName(this.artefact));
+  }
+
+  private initSchema(): void {
+    this._screenApi
+      .getInputsForScreenPost('functionTable')
+      .pipe(
+        map((inputs) =>
+          inputs
+            .filter((input) => input.id?.startsWith('attributes.'))
+            .reduce(
+              (res, input) => {
+                const name = input.id!.replace('attributes.', '');
+                switch (input.type) {
+                  case 'CHECKBOX':
+                    res.properties[name] = { type: 'boolean' };
+                    break;
+                  case 'DROPDOWN':
+                    res.properties[name] = {
+                      enum: input.options!.map((opt) => opt.value!),
+                    };
+                    break;
+                  default:
+                    res.properties[name] = { type: 'string' };
+                    break;
+                }
+                return res;
+              },
+              { properties: {} } as DynamicFieldsSchema
+            )
+        )
+      )
+      .subscribe((schema) => (this.schema = schema));
   }
 }
 
