@@ -29,6 +29,7 @@
         stScreen="planTable"
         [stDisabled]="!('plan-write' | hasRight | async)"
         [stInline]="true"
+        [stEditableLabelMode]="true"
         [stModel]="(_planEditService.plan$ | async)!"
         (stModelChange)="_planEditService.handlePlanChange()"
       >

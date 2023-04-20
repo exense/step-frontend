@@ -8,7 +8,8 @@ import { UpgradeModule } from '@angular/upgrade/static';
 import { AngularSplitModule } from 'angular-split';
 import { StepGeneratedClientModule } from './client/generated';
 import { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
-import { CustomFormInputComponent } from './components/custom-form-input/custom-form-input.component';
+import { DynamicLabelCustomFormInputComponent } from './components/custom-form-input/dynamic-label-custom-form-input.component';
+import { StandardCustomFormInputComponent } from './components/custom-form-input/standard-custom-form-input.component';
 import { CustomFormComponent } from './components/custom-form/custom-form.component';
 import { EditableActionsComponent } from './components/editable-actions/editable-actions.component';
 import { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';
@@ -38,8 +39,8 @@ import { ArtefactDetailsDirective } from './directives/artefact-details.directiv
 import { CapsLockDirective } from './directives/caps-lock.directive';
 import { ElementResizeDirective } from './directives/element-resize.directive';
 import { FocusableDirective } from './directives/focusable.directive';
-import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 import { FocusablesDirective } from './directives/focusables.directive';
+import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 import { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 import { SimpleLineChartDirective } from './directives/simple-line-chart.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
@@ -62,6 +63,7 @@ import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
 import { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 import { PlanNameComponent } from './components/plan-name/plan-name.component';
+import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 
 @NgModule({
   declarations: [
@@ -95,7 +97,8 @@ import { PlanNameComponent } from './components/plan-name/plan-name.component';
     EditableTextareaLabelWrapperComponent,
     PlanTreeActionsComponent,
     CustomFormComponent,
-    CustomFormInputComponent,
+    DynamicLabelCustomFormInputComponent,
+    StandardCustomFormInputComponent,
     CustomFormInputModelPipe,
     SplitComponent,
     SplitAreaComponent,
@@ -110,6 +113,7 @@ import { PlanNameComponent } from './components/plan-name/plan-name.component';
     RecursiveTabIndexDirective,
     ReferenceArtefactNameComponent,
     PlanNameComponent,
+    PlanCreateDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -171,7 +175,8 @@ import { PlanNameComponent } from './components/plan-name/plan-name.component';
     KeywordNameComponent,
     DynamicAttributePipe,
     CustomFormComponent,
-    CustomFormInputComponent,
+    DynamicLabelCustomFormInputComponent,
+    StandardCustomFormInputComponent,
     EditableTextareaLabelWrapperComponent,
     SplitComponent,
     SplitAreaComponent,
@@ -185,6 +190,7 @@ import { PlanNameComponent } from './components/plan-name/plan-name.component';
     MaxHeightViewportHeightMinusOffsetTopDirective,
     RecursiveTabIndexDirective,
     PlanNameComponent,
+    PlanCreateDialogComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -219,7 +225,8 @@ export type { OpenAPIConfig } from './client/generated/core/OpenAPI';
 export * from './client/generated/index';
 export * from './client/step-client-module';
 export { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
-export { CustomFormInputComponent } from './components/custom-form-input/custom-form-input.component';
+export { DynamicLabelCustomFormInputComponent } from './components/custom-form-input/dynamic-label-custom-form-input.component';
+export { StandardCustomFormInputComponent } from './components/custom-form-input/standard-custom-form-input.component';
 export { CustomFormComponent } from './components/custom-form/custom-form.component';
 export { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';
 export { EditableLabelComponent } from './components/editable-label/editable-label.component';
@@ -244,13 +251,14 @@ export { SplitAreaComponent } from './components/split-area/split-area.component
 export { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 export { SplitComponent } from './components/split/split.component';
 export { UploadContainerComponent } from './components/upload-container/upload-container.component';
+export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
 export { FocusableDirective } from './directives/focusable.directive';
-export { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 export { FocusablesDirective } from './directives/focusables.directive';
+export { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 export * from './directives/simple-line-chart.directive';
 export * from './directives/tooltip-immediate-close.directive';
@@ -279,10 +287,14 @@ export * from './services/dashboard.service';
 export * from './services/deferred-link-processor.service';
 export * from './services/execution-close-handle.service';
 export * from './services/export-dialogs.service';
+export * from './services/global-progress-spinner.service';
+export * from './services/http-interceptor-bridge.service';
 export { ImportDialogsService } from './services/import-dialogs.service';
 export * from './services/invoke-run.service';
 export { IsUsedByDialogService } from './services/is-used-by-dialog.service';
 export * from './services/link-processor.service';
+export * from './services/menu-items-override-config.service';
+export * from './services/persistence.service';
 export * from './services/plan-artefact-resolver.service';
 export { PlanDialogsService } from './services/plan-dialogs.service';
 export * from './services/plan-by-id-cache.service';
@@ -293,10 +305,8 @@ export { ResourceDialogsService } from './services/resource-dialogs.service';
 export * from './services/resource-input-bridge.service';
 export * from './services/restore-dialogs.service';
 export * from './services/scheduled-task-dialogs.service';
-export * from './services/menu-items-override-config.service';
 export { UibModalHelperService, UibModalInstance } from './services/uib-modal-helper.service';
 export * from './services/view-registry.service';
 export * from './services/view-state.service';
 export * from './shared';
-export * from './services/persistence.service';
 export * from './shared/persistence-tokens';
