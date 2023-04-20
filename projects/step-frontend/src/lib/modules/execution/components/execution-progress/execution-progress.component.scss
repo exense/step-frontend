@@ -1,9 +1,5 @@
 as-split {
   height: calc(100vh - 134px);
-
-  &.small-screen {
-    height: 100vh;
-  }
 }
 
 as-split-area {
@@ -14,4 +10,14 @@ as-split-area {
   display: flex;
   justify-content: space-between;
   margin-bottom: 1rem;
+}
+
+.small-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.small-screen {
+  width: fit-content;
 }
