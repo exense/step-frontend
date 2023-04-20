@@ -9,6 +9,7 @@ import {
   OnInit,
   Output,
   SimpleChanges,
+  ViewEncapsulation,
 } from '@angular/core';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { AbstractArtefact, CallFunction, DynamicValueString } from '../../client/step-client-module';
@@ -54,6 +55,7 @@ export abstract class ReferenceArtefactNameConfig<A extends Artefact, T = any> {
   selector: 'step-reference-artefact-name',
   templateUrl: './reference-artefact-name.component.html',
   styleUrls: ['./reference-artefact-name.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class ReferenceArtefactNameComponent<A extends Artefact, T = any> implements OnChanges, OnInit, OnDestroy {
   private _entityScopeResolver = inject(EntityScopeResolver);
