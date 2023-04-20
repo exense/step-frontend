@@ -1,7 +1,19 @@
-<step-custom-form-inputs
-  *ngFor="let input of inputs"
-  [stInput]="input"
-  [disabled]="stDisabled"
-  [ngModel]="stModel | stepCustomFormInputModel: input"
-  (ngModelChange)="onInputValueChange(input, $event)"
-></step-custom-form-inputs>
+<ng-container *ngIf="stEditableLabelMode; then editableLabels; else standardInputs"> </ng-container>
+<ng-template #editableLabels>
+  <step-dynamic-label-custom-form-inputs
+    *ngFor="let input of inputs"
+    [stInput]="input"
+    [disabled]="stDisabled"
+    [ngModel]="stModel | stepCustomFormInputModel: input"
+    (ngModelChange)="onInputValueChange(input, $event)"
+  ></step-dynamic-label-custom-form-inputs>
+</ng-template>
+<ng-template #standardInputs>
+  <step-standard-custom-form-inputs
+    *ngFor="let input of inputs"
+    [stInput]="input"
+    [disabled]="stDisabled"
+    [ngModel]="stModel | stepCustomFormInputModel: input"
+    (ngModelChange)="onInputValueChange(input, $event)"
+  ></step-standard-custom-form-inputs>
+</ng-template>

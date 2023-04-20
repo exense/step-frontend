@@ -1,0 +1,26 @@
+<step-modal-window title="New Plan">
+  <div step-modal-window-body>
+    <step-custom-forms [(stModel)]="plan" stScreen="planTable"> </step-custom-forms>
+    <step-form-field>
+      <step-label>Editor</step-label>
+      <mat-select [(ngModel)]="planType">
+        <mat-option *ngFor="let item of _planTypes; trackBy: trackByItemInfo" [value]="item.type">
+          {{ item.label }}
+        </mat-option>
+      </mat-select>
+    </step-form-field>
+    <step-form-field>
+      <step-label>Plan type</step-label>
+      <mat-select [(ngModel)]="template">
+        <mat-option *ngFor="let item of artefactTypes$ | async" [value]="item">
+          {{ item }}
+        </mat-option>
+      </mat-select>
+    </step-form-field>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
+    <button type="button" mat-flat-button color="primary" (click)="save(false)">Save</button>
+    <button type="button" mat-flat-button color="primary" (click)="save(true)">Save and edit</button>
+  </div>
+</step-modal-window>
