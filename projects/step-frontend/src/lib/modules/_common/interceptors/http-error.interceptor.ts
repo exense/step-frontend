@@ -21,9 +21,9 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       if (error.error) {
         this.showError(error.error);
       } else if (error.name && error.message) {
-        this._snackBar.open(error.name + ': ' + error.message, 'dismiss');
+        this.showError(error.name + ': ' + error.message);
       } else {
-        this._snackBar.open('Unknown HTTP error', 'dismiss');
+        this.showError('Unknown HTTP error');
       }
     }
     return throwError(() => error);
