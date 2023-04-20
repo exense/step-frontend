@@ -1,0 +1,25 @@
+.scope-item {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+
+  step-icon {
+    display: flex;
+  }
+}
+
+.param-scope {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  .scope-entity {
+    flex-grow: 2;
+  }
+}
+
+.last-modification {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+}

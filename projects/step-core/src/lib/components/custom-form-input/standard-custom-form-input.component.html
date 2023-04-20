@@ -19,4 +19,7 @@
       </mat-select>
     </ng-container>
   </ng-container>
+  <step-suffix class="icon-suffix" *ngIf="hint">
+    <step-icon name="help-circle" [matTooltip]="hint"></step-icon>
+  </step-suffix>
 </step-form-field>

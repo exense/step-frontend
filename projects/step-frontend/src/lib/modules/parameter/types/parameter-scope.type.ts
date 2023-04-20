@@ -1,1 +1,3 @@
-export type ParameterScope = 'GLOBAL' | 'FUNCTION' | 'APPLICATION';
+import { Parameter } from '@exense/step-core';
+
+export type ParameterScope = Parameter['scope'];

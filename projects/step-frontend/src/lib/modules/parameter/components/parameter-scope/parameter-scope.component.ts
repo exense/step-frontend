@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Parameter } from '@exense/step-core';
-import { ParameterScopeRendererService } from '../services/parameter-scope-renderer.service';
+import { ParameterScopeRendererService } from '../../services/parameter-scope-renderer.service';
 
 @Component({
   selector: 'step-parameter-scope',

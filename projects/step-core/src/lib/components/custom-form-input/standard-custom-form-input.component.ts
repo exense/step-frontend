@@ -1,4 +1,4 @@
-import { Component, forwardRef } from '@angular/core';
+import { Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { BaseCustomFormInputComponent } from './base-custom-form-input.component';
 
@@ -14,4 +14,6 @@ import { BaseCustomFormInputComponent } from './base-custom-form-input.component
     },
   ],
 })
-export class StandardCustomFormInputComponent extends BaseCustomFormInputComponent {}
+export class StandardCustomFormInputComponent extends BaseCustomFormInputComponent {
+  @Input() hint?: string;
+}
