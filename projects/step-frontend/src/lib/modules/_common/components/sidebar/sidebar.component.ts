@@ -17,6 +17,7 @@ import {
   AJS_LOCATION,
   AJS_MODULE,
   AuthService,
+  IS_SMALL_SCREEN,
   MenuEntry,
   ViewRegistryService,
   ViewStateService,
@@ -24,7 +25,8 @@ import {
 import { ILocationService } from 'angular';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
 import { MENU_ITEMS } from '../../injectables/menu-items';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, SubscriptionLike, takeUntil } from 'rxjs';
+import { SidebarOpenStateService } from '../../injectables/sidebar-open-state.service';
 
 @Component({
   selector: 'step-sidebar',
@@ -35,15 +37,17 @@ import { Subject, takeUntil } from 'rxjs';
 export class SidebarComponent implements OnInit, OnDestroy {
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
 
-  sideBarOpen: boolean = true;
   private terminator$ = new Subject<void>();
-  private locationStateSubscription: any;
-  readonly _menuItems$ = inject(MENU_ITEMS).pipe(takeUntil(this.terminator$));
+  private locationStateSubscription: SubscriptionLike;
 
+  private _sideBarOpenState = inject(SidebarOpenStateService);
+  readonly _menuItems$ = inject(MENU_ITEMS).pipe(takeUntil(this.terminator$));
+  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
+
+  readonly isOpened$ = this._sideBarOpenState.isOpened$;
   readonly trackByMenuEntry: TrackByFunction<MenuEntry> = (index, item) => item.id;
 
   constructor(
-    @Inject(DOCUMENT) private _document: Document,
     public _authService: AuthService,
     public _viewRegistryService: ViewRegistryService,
     public _viewStateService: ViewStateService,
@@ -129,23 +133,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * FIXME: communicate open/close state as output to parent component instead of selecting global dom element
-   */
   toggleOpenClose() {
-    if (this.sideBarOpen) {
-      this.sideBarOpen = false;
-      this._document.querySelector('#main')!.classList.add('main-when-sidebar-closed');
-      this._document
-        .querySelector('step-tenant-selection-downgraded')!
-        .classList.add('tenant-selector-when-sidebar-closed');
-    } else {
-      this.sideBarOpen = true;
-      this._document.querySelector('#main')!.classList.remove('main-when-sidebar-closed');
-      this._document
-        .querySelector('step-tenant-selection-downgraded')!
-        .classList.remove('tenant-selector-when-sidebar-closed');
-    }
+    this._sideBarOpenState.toggleIsOpened();
   }
 
   showVersionsDialog(): void {

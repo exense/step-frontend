@@ -1,8 +1,7 @@
-<input id="collapsable-sidebar-toggle-checkbox" type="checkbox" />
-<div class="sidebar">
+<div class="sidebar" [class.sidebar-closed]="!(isOpened$ | async)" [class.small-screen]="_isSmallScreen$ | async">
   <div id="sidebar-logo-and-burgermenu">
     <span class="visible-when-collapsed">
-      <label for="collapsable-sidebar-toggle-checkbox" (click)="toggleOpenClose()">
+      <label (click)="toggleOpenClose()">
         <step-icon name="menu"></step-icon>
       </label>
     </span>
