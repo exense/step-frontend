@@ -27,7 +27,7 @@
     "prepare": "husky install",
     "push": "npm publish projects/step-core/ && npm publish dist/step-frontend/*.tgz",
     "openapi:generate:nhy": "./generate-openapi-client.sh https://stepos-nhy.stepcloud-test.ch/rest/private-openapi.json",
-    "openapi:generate:master": "generate-openapi-client.sh https://stepos-master.stepcloud-test.ch/rest/private-openapi.json",
+    "openapi:generate:master": "./generate-openapi-client.sh https://stepos-master.stepcloud-test.ch/rest/private-openapi.json",
     "icons:generate": "node generate-icons.js"
   },
   "private": false,
