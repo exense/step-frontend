@@ -259,6 +259,8 @@ export * from './services/dashboard.service';
 export * from './services/deferred-link-processor.service';
 export * from './services/execution-close-handle.service';
 export * from './services/export-dialogs.service';
+export * from './services/global-progress-spinner.service';
+export * from './services/http-interceptor-bridge.service';
 export { ImportDialogsService } from './services/import-dialogs.service';
 export * from './services/invoke-run.service';
 export { IsUsedByDialogService } from './services/is-used-by-dialog.service';
