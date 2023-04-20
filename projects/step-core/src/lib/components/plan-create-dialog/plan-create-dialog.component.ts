@@ -23,7 +23,7 @@ export class PlanCreateDialogComponent {
   readonly _planTypes = inject(PlanTypeRegistryService).getItemInfos();
   protected planType = this._planTypes.find((planType) => planType.type === 'step.core.plans.Plan')?.type;
 
-  readonly artefactTypes$ = this._api.getArtefactTypes().pipe(shareReplay(1));
+  readonly artefactTypes$ = this._api.getArtefactTemplates().pipe(shareReplay(1));
 
   save(editAfterSave: boolean): void {
     this._api
