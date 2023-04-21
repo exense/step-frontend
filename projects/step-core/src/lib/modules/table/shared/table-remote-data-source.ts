@@ -182,6 +182,10 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   }
 
   private createInternalRequestObject({ params, filter, search }: TableFilterOptions = {}): TableRequestInternal {
+    if (this.typeFilter) {
+      search = { ...(search || {}), ...this.typeFilter };
+    }
+
     const tableRequest: TableRequestInternal = new TableRequestInternal({
       columns: Object.values(this._requestColumnsMap),
       searchBy: Object.entries(search || {}).map(([name, value]) => {
@@ -211,10 +215,6 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     }
 
     let { page, sort, search, params, filter } = (reqOrOptions || {}) as TableGetDataOptions;
-
-    if (this.typeFilter) {
-      search = { ...search, ...this.typeFilter };
-    }
 
     const tableRequest = this.createInternalRequestObject({ search, filter, params });
 

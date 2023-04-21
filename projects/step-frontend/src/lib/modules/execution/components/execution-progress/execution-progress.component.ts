@@ -2,6 +2,7 @@ import {
   Component,
   EventEmitter,
   forwardRef,
+  inject,
   Inject,
   Input,
   OnChanges,
@@ -20,6 +21,7 @@ import {
   Execution,
   ExecutionCloseHandleService,
   ExecutionSummaryDto,
+  IS_SMALL_SCREEN,
   ItemInfo,
   Operation,
   PrivateViewPluginService,
@@ -79,6 +81,8 @@ const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\
 export class ExecutionProgressComponent
   implements OnInit, OnChanges, ExecutionStateService, ExecutionCloseHandleService
 {
+  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
+
   readonly trackByItemInfo: TrackByFunction<ItemInfo> = (index, item) => item.type;
 
   readonly Panels = Panels;

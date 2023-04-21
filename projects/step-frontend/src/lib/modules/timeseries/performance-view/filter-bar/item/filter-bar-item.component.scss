@@ -1,5 +1,13 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
+:host {
+  background: var.$gray-100;
+  color: #293e50;
+  padding: 2px;
+  border-radius: 0px;
+  box-shadow: 0px 0px 9px -3px #818181;
+}
+
 .item-container {
   cursor: pointer;
   padding: 0 14px;
@@ -36,7 +44,7 @@
     padding: 2px;
 
     &:hover {
-      background: #ebebeb;
+      background: var.$gray-200;
     }
   }
 }
@@ -55,12 +63,8 @@
   height: auto;
 }
 
-.mat-raised-button.mat-primary {
-  background: var.$darkest-blue;
-
-  &:focus {
-    outline: 3px solid var.$dark-blue;
-  }
+button {
+  background: var.$dark-blue !important;
 }
 
 label {
@@ -78,9 +82,4 @@ label {
   flex-direction: column;
   gap: 1.25em;
   padding-bottom: 1.25em;
-}
-
-.mat-checkbox:focus-within {
-  outline: none;
-  color: var.$dark-blue;
 }

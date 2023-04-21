@@ -1,5 +1,5 @@
 import { FilterCondition } from './filter-condition';
-import { TableRequestFilter } from '../../../client/table/models/table-request-data';
+import { TableRequestFilter } from '../../../client/step-client-module';
 import { CompareCondition } from '../../basics/shared/compare-condition.enum';
 
 export class ScopeFilterCondition extends FilterCondition {

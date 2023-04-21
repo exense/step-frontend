@@ -1,5 +1,13 @@
 import { DOCUMENT } from '@angular/common';
-import { ChangeDetectorRef, Component, ElementRef, forwardRef, Inject, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  forwardRef,
+  Inject,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EditableComponent } from '../../shared/editable-component';
 
@@ -14,6 +22,7 @@ import { EditableComponent } from '../../shared/editable-component';
       multi: true,
     },
   ],
+  encapsulation: ViewEncapsulation.None,
 })
 export class EditableLabelComponent extends EditableComponent<string> {
   @ViewChild('input') input?: ElementRef<HTMLElement>;

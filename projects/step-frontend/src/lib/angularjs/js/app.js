@@ -74,6 +74,7 @@ var tecAdminApp = angular
       $httpProvider.defaults.withCredentials = true;
       $httpProvider.interceptors.push('authInterceptor');
       $httpProvider.interceptors.push('genericErrorInterceptor');
+      $httpProvider.interceptors.push('httpRequestInterceptor');
     },
   ])
 
@@ -879,21 +880,29 @@ angular
     };
   })
 
-  .service('genericErrorInterceptor', function ($q, $injector) {
-    var service = this;
+ .service('genericErrorInterceptor', function ($q, $injector) {
+    const service = this;
+
+    service.response = function (response) {
+      const Dialogs = $injector.get('Dialogs');
+
+      const responsePayload = response?.data;
+      if (responsePayload?.error) {
+        Dialogs.showErrorMsg(responsePayload.error);
+      }
+
+      return response || $q.when(response);
+    };
+
     service.responseError = function (response) {
-      Dialogs = $injector.get('Dialogs');
-      var responsePayload = response.data;
-      if (response.status != 200 && responsePayload && responsePayload.errorMessage) {
+      const Dialogs = $injector.get('Dialogs');
+      const responsePayload = response?.data;
+      if (response.status !== 200 && responsePayload?.errorMessage) {
         Dialogs.showErrorMsg(responsePayload.errorMessage);
       } else {
         // Legacy error handling
-        if (response.status == 500) {
-          if (
-            responsePayload &&
-            responsePayload.metaMessage &&
-            responsePayload.metaMessage.indexOf('org.rtm.stream.UnknownStreamException') >= 0
-          ) {
+        if (response.status === 500) {
+          if (responsePayload?.metaMessage?.includes('org.rtm.stream.UnknownStreamException')) {
             console.log('genericErrorInterceptor for rtm: ' + responsePayload.metaMessage);
           } else {
             Dialogs.showErrorMsg(responsePayload);
@@ -904,6 +913,34 @@ angular
       return $q.reject(response);
     };
   })
+  .factory('httpRequestInterceptor', [
+    'HttpInterceptorBridgeService',
+    function (HttpInterceptorBridgeService) {
+      return {
+        request: function (request) {
+          HttpInterceptorBridgeService.broadcast({
+            type: 'REQUEST',
+            request,
+          });
+          return request;
+        },
+        responseError: function (error) {
+          HttpInterceptorBridgeService.broadcast({
+            type: 'ERROR',
+            error,
+          });
+          return Promise.reject(error);
+        },
+        response: function (response) {
+          HttpInterceptorBridgeService.broadcast({
+            type: 'RESPONSE',
+            response,
+          });
+          return response;
+        },
+      };
+    },
+  ]);
 //The following functions are missing in IE11
 
 if (!String.prototype.endsWith) {

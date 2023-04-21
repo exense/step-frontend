@@ -1,33 +1,7 @@
-<div class="main-name" [class.with-meta]="keywordMeta">
-  <step-editable-label [ngModel]="artefactName" (ngModelChange)="onArtefactNameChange($event)" [disabled]="isDisabled">
-  </step-editable-label>
-  <div *ngIf="keywordMeta" class="keyword-meta" [class.keyword-meta-error]="keywordMeta.isError">
-    <step-icon [name]="keywordMeta.icon"></step-icon>
-    <span [matTooltip]="keywordMeta.tooltip || keywordMeta.description">{{ keywordMeta.description }}</span>
-  </div>
-  <button
-    *ngIf="!isDisabled"
-    type="button"
-    matTooltip="Edit Keyword selection criteria"
-    matTooltipPosition="below"
-    mat-icon-button
-    [color]="isEditorMode ? 'primary' : undefined"
-    (click)="isEditorMode = !isEditorMode"
-  >
-    <step-icon name="edit-2"></step-icon>
-  </button>
-</div>
-<div class="references-keyword" *ngIf="referenceKeywordString && referenceKeywordString !== artefactName">
-  <label>References keyword:</label>
-  <span>{{ referenceKeywordString }}</span>
-</div>
-<step-dynamic-field-group
-  *ngIf="isEditorMode && !isDisabled"
-  primaryFieldsLabel="Keyword selection criteria"
-  primaryFieldsDescription="The Keyword selection criteria are used to reference the Keyword. Besides the name any other attribute of the Keyword can be referenced."
-  addFieldBtnLabel="Add selection criteria"
-  [schema]="KEYWORD_ATTRIBUTES_SCHEMA"
-  [value]="artefactKeywordAttributes"
-  (valueChange)="updateKeywordAttributes($event)"
+<step-reference-artefact-name
+  [artefact]="artefact"
+  [isDisabled]="isDisabled"
+  (referenceUpdate)="keywordUpdate.emit($event)"
+  (onSave)="onSave.emit($event)"
 >
-</step-dynamic-field-group>
+</step-reference-artefact-name>

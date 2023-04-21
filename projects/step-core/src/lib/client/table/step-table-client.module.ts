@@ -10,5 +10,6 @@ export class StepTableClientModule {}
 export { TableApiWrapperService } from './services/table-api-wrapper.service';
 export { FieldSort } from './models/field-sort';
 export { SortDirection } from './models/sort-direction.enum';
-export { TableRequestData } from './models/table-request-data';
+export { TableRequestData, TableRequestFilter } from './models/table-request-data';
 export { TableResponseGeneric } from './models/table-response-generic';
+export { TableCollectionFilter } from './models/table-collection-filter';
