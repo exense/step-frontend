@@ -274,8 +274,10 @@ angular
           }
           // if the model isn't set and a default value has been specified,
           // then set the default value
-          if (model() == undefined && $scope.input.defaultValue) {
+          if (model() === undefined && $scope.input.defaultValue) {
             model($scope.input.defaultValue);
+          } else if (model() === undefined && $scope.input.type === 'CHECKBOX') {
+            model(false);
           }
           return model;
         };
