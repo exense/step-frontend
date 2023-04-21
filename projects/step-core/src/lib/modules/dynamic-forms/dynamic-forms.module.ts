@@ -38,3 +38,4 @@ export * from './components/dynamic-field-group-editor/dynamic-field-group-edito
 export * from './components/dynamic-field-editor/dynamic-field-editor.component';
 export * from './shared/dynamic-fields-schema';
 export * from './shared/dynamic-field-group-value';
+export * from './services/schemas-factory.service';
