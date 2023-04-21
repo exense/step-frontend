@@ -8,16 +8,8 @@ import {
   Function as Keyword,
 } from '../../client/step-client-module';
 import { AJS_MODULE } from '../../shared';
-import { DynamicFieldsSchema } from '../../modules/dynamic-forms/dynamic-forms.module';
 import { ReferenceArtefactNameConfig } from '../reference-artefact-name/reference-artefact-name.component';
 import { Observable } from 'rxjs';
-
-const KEYWORD_ATTRIBUTES_SCHEMA: DynamicFieldsSchema = {
-  properties: {
-    name: { type: 'string' },
-  },
-  required: ['name'],
-};
 
 const KEYWORD_CAPTIONS: ReferenceArtefactNameConfig<CallFunction, Keyword>['captions'] = {
   searchReference: 'Select a keyword',
@@ -54,7 +46,7 @@ export class KeywordNameComponent implements ReferenceArtefactNameConfig<CallFun
 
   readonly artefactClass = 'CallKeyword';
 
-  readonly referenceAttributesSchema = KEYWORD_ATTRIBUTES_SCHEMA;
+  readonly attributesScreenId = 'functionTable';
 
   readonly captions = KEYWORD_CAPTIONS;
 
