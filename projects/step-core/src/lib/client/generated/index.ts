@@ -235,7 +235,6 @@ export { PrivateViewPluginService } from './services/PrivateViewPluginService';
 export { QuotaManagerService } from './services/QuotaManagerService';
 export { ReferencesService } from './services/ReferencesService';
 export { ResourcesService } from './services/ResourcesService';
-export { RtmService } from './services/RtmService';
 export { SchedulerService } from './services/SchedulerService';
 export { ScreensService } from './services/ScreensService';
 export { SettingsService } from './services/SettingsService';
