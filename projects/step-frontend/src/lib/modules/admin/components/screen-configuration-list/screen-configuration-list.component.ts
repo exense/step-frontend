@@ -33,13 +33,19 @@ export class ScreenConfigurationListComponent {
   }
 
   addScreen(): void {
-    this._screenDialogs
-      .editScreen(undefined, undefined, this.currentlySelectedScreenChoice)
-      .subscribe((_) => this.loadTable());
+    this._screenDialogs.editScreen({ screenId: this.currentlySelectedScreenChoice }).subscribe((isSaved) => {
+      if (isSaved) {
+        this.loadTable();
+      }
+    });
   }
 
-  editScreen(screenInput: Input, screenDbId: string): void {
-    this._screenDialogs.editScreen(screenInput, screenDbId, undefined).subscribe((_) => this.loadTable());
+  editScreen(inputId: string): void {
+    this._screenDialogs.editScreen({ inputId }).subscribe((isSaved) => {
+      if (isSaved) {
+        this.loadTable();
+      }
+    });
   }
 
   moveScreen(dbId: string, offset: number): void {
