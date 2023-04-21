@@ -22,11 +22,12 @@
   <span>{{ referenceString }}</span>
 </div>
 <step-dynamic-field-group
-  *ngIf="isEditorMode && !isDisabled"
+  *ngIf="isEditorMode && !isDisabled && schema"
   [primaryFieldsLabel]="_artefactNameConfig.captions.selectionCriteria"
   [primaryFieldsDescription]="_artefactNameConfig.captions.selectionCriteriaDescription"
   [addFieldBtnLabel]="_artefactNameConfig.captions.addSelectionCriteriaLabel"
-  [schema]="_artefactNameConfig.referenceAttributesSchema"
+  [schema]="schema"
+  [allowNotSchemaFields]="true"
   [value]="artefactReferenceAttributes"
   (valueChange)="updateReferenceAttributes($event)"
 >
