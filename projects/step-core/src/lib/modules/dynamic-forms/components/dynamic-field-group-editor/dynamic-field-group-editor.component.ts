@@ -41,6 +41,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
 
   @Input() isDisabled?: boolean;
   @Input() schema?: DynamicFieldsSchema;
+  @Input() allowNotSchemaFields: boolean = false;
   @Input() value?: DynamicFieldGroupValue;
   @Output() valueChange = new EventEmitter<DynamicFieldGroupValue | undefined>();
   protected primaryFields: DynamicFieldMetaData[] = [];
