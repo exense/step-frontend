@@ -81,7 +81,10 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   }
 
   getSeriesKey(attributes: BucketAttributes, groupDimensions: string[]) {
-    return groupDimensions.map((field) => attributes[field]).join(' | ');
+    return groupDimensions
+      .map((field) => attributes[field])
+      .map((x) => (x ? x : '<empty>'))
+      .join(' | ');
   }
 
   getDatasourceConfig(): TableLocalDataSourceConfig<Bucket> {

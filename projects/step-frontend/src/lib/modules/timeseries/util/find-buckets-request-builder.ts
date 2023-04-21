@@ -83,7 +83,6 @@ export class FindBucketsRequestBuilder {
     if (!this.filteringSettings) {
       throw 'Filtering settings are mandatory';
     }
-    console.log(this);
     const oql =
       this.filteringSettings.mode === TsFilteringMode.OQL
         ? this.prepareOql(this.filteringSettings.oql)
@@ -105,7 +104,8 @@ export class FindBucketsRequestBuilder {
 
   private prepareOql(oql: string): string {
     if (Object.keys(this.customAttributes)) {
-      return `(${oql}) and ${FilterUtils.objectToOQL(this.customAttributes, this.attributesPrefix)}`;
+      let customAttributesOql = FilterUtils.objectToOQL(this.customAttributes, this.attributesPrefix);
+      return [oql, customAttributesOql].filter((x) => x).join(' and ');
     } else {
       return oql;
     }
