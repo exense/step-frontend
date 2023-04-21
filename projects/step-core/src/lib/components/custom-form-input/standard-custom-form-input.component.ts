@@ -15,5 +15,6 @@ import { BaseCustomFormInputComponent } from './base-custom-form-input.component
   ],
 })
 export class StandardCustomFormInputComponent extends BaseCustomFormInputComponent {
+  @Input() hideLabel?: boolean;
   @Input() hint?: string;
 }

@@ -3,7 +3,6 @@
     <ng-container *ngIf="parameter">
       <section class="param-scope">
         <step-form-field class="scope-field">
-          <step-label>Scope</step-label>
           <mat-select
             [ngClass]="selectedScope?.cssClass"
             [ngModel]="selectedScope"
@@ -24,10 +23,10 @@
           stInputId="attributes.application"
           [(ngModel)]="parameter.scopeEntity"
           hint="The name of the application this parameter is restricted to"
+          [hideLabel]="true"
         >
         </step-standard-custom-form-inputs>
         <step-form-field class="scope-entity" *ngIf="parameter.scope === 'FUNCTION'">
-          <step-label>&nbsp;</step-label>
           <input type="text" [(ngModel)]="parameter.scopeEntity" />
           <step-suffix class="icon-suffix">
             <step-icon name="help-circle" matTooltip="The name of the Keyword this parameter is restricted to">

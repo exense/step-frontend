@@ -1,5 +1,5 @@
 <step-form-field>
-  <step-label>{{ input?.label }}</step-label>
+  <step-label *ngIf="!hideLabel">{{ input?.label }}</step-label>
   <ng-container [ngSwitch]="input?.type">
     <ng-container *ngSwitchCase="InputType.TEXT">
       <input type="text" [ngModel]="value" (ngModelChange)="onValueChange($event)" (blur)="invokeTouch()" />

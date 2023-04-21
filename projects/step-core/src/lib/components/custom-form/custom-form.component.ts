@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Host, HostBinding, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { Input as StInput, ScreensService } from '../../client/generated';
 import { AJS_MODULE, setObjectFieldValue } from '../../shared';
@@ -9,7 +9,7 @@ import { AJS_MODULE, setObjectFieldValue } from '../../shared';
   styleUrls: ['./custom-form.component.scss'],
 })
 export class CustomFormComponent implements OnInit {
-  @Input() stEditableLabelMode = false;
+  @HostBinding('class.editable-label-mode') @Input() stEditableLabelMode = false;
   @Input() stScreen!: string;
   @Input() stModel!: Record<string, unknown>;
   @Input() stDisabled: boolean = false;
