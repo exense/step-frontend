@@ -61,6 +61,8 @@ import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
+import { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
+import { PlanNameComponent } from './components/plan-name/plan-name.component';
 import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 
 @NgModule({
@@ -109,6 +111,8 @@ import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-
     SearchResourceDialogComponent,
     MaxHeightViewportHeightMinusOffsetTopDirective,
     RecursiveTabIndexDirective,
+    ReferenceArtefactNameComponent,
+    PlanNameComponent,
     PlanCreateDialogComponent,
   ],
   imports: [
@@ -185,6 +189,7 @@ import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-
     SearchResourceDialogComponent,
     MaxHeightViewportHeightMinusOffsetTopDirective,
     RecursiveTabIndexDirective,
+    PlanNameComponent,
     PlanCreateDialogComponent,
   ],
   providers: [
@@ -230,7 +235,9 @@ export { EditableTextareaLabelComponent } from './components/editable-textarea-l
 export { FunctionLinkDialogService } from './components/function-link/function-link-dialog.service';
 export { FunctionLinkComponent } from './components/function-link/function-link.component';
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
+export { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
+export { PlanNameComponent } from './components/plan-name/plan-name.component';
 export { PlanLinkComponent } from './components/plan-link/plan-link.component';
 export * from './components/plan-tree/plan-tree.component';
 export { ProgressBarComponent } from './components/progress-bar/progress-bar.component';

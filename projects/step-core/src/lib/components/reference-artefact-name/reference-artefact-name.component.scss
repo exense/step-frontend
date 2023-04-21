@@ -1,0 +1,53 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'sass:map';
+
+step-reference-artefact-name {
+  step-editable-label {
+    font-size: 18px;
+    font-weight: 500;
+
+    & > .editable-label {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
+  .references {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .reference-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &.reference-meta-error {
+      step-icon {
+        color: map.get(var.$statuses, 'FAILED');
+      }
+    }
+  }
+
+  .main-name {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+
+    step-editable-label {
+      flex-grow: 1;
+    }
+
+    &.with-meta {
+      step-editable-label {
+        flex-grow: 0;
+      }
+
+      .reference-meta {
+        flex-grow: 1;
+      }
+    }
+  }
+}
