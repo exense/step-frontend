@@ -22,7 +22,7 @@ const SCRIPTS = [
   './src/lib/angularjs/bower_components/jquery-file-download/src/Scripts/jquery.fileDownload.js',
   './src/lib/angularjs/bower_components/ng-file-upload/ng-file-upload.js',
   './src/lib/angularjs/js/angular-resizable.js',
-  `${NODE_MODULES_PATH}/datatables.net-select/js/dataTables.select.js`,
+  './src/lib/angularjs/bower_components/datatables.net-select/js/dataTables.select.js',
 
   './src/lib/angularjs/js/common.js',
   './src/lib/angularjs/js/app.js',
@@ -61,7 +61,7 @@ const STYLES = [
   './src/lib/angularjs/bower_components/jstree/dist/themes/default/style.css',
   './src/lib/angularjs/bower_components/tachyons/css/tachyons.css',
   './src/lib/angularjs/bower_components/angular-resizable/angular-resizable.min.css',
-  `${NODE_MODULES_PATH}/datatables.net-select-dt/css/select.dataTables.css`,
+  './src/lib/angularjs/bower_components/datatables.net-select-dt/css/select.dataTables.css',
   './src/lib/angularjs/css/step.css',
   './src/lib/angularjs/css/step-variables.css',
   './src/lib/angularjs/js/chart.css',
