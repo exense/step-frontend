@@ -13,7 +13,11 @@ import {
 } from '@angular/core';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { AbstractArtefact, CallFunction, DynamicValueString } from '../../client/step-client-module';
-import { DynamicFieldGroupValue, DynamicFieldsSchema } from '../../modules/dynamic-forms/dynamic-forms.module';
+import {
+  DynamicFieldGroupValue,
+  DynamicFieldsSchema,
+  SchemasFactoryService,
+} from '../../modules/dynamic-forms/dynamic-forms.module';
 import { EntityScopeResolver } from '../../modules/entity/services/entity-scope-resolver';
 import { ArtefactRefreshNotificationService } from '../../services/artefact-refresh-notification.service';
 import { DynamicAttributePipe } from '../../pipes/dynamic-attribute.pipe';
@@ -46,7 +50,7 @@ export abstract class ReferenceArtefactNameConfig<A extends Artefact, T = any> {
     selectionCriteriaDescription: string;
     addSelectionCriteriaLabel: string;
   };
-  abstract readonly referenceAttributesSchema: DynamicFieldsSchema;
+  abstract readonly attributesScreenId?: string;
   abstract getSearchAttributes(artefact: A): DynamicValueString | undefined;
   abstract lookupReference(artefact: A): Observable<T>;
 }
@@ -58,6 +62,7 @@ export abstract class ReferenceArtefactNameConfig<A extends Artefact, T = any> {
   encapsulation: ViewEncapsulation.None,
 })
 export class ReferenceArtefactNameComponent<A extends Artefact, T = any> implements OnChanges, OnInit, OnDestroy {
+  private _schemaFactory = inject(SchemasFactoryService);
   private _entityScopeResolver = inject(EntityScopeResolver);
   private _changeDetectorRef = inject(ChangeDetectorRef);
   private _artefactRefreshNotification = inject(ArtefactRefreshNotificationService, { optional: true });
@@ -77,9 +82,11 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
   protected reference?: any;
   protected isEditorMode: boolean = false;
   protected referenceMeta?: ReferenceMeta;
+  protected schema?: DynamicFieldsSchema;
 
   ngOnInit(): void {
     this.setupArtefactExternalRefresh();
+    this.initSchema();
   }
 
   ngOnDestroy(): void {
@@ -141,14 +148,21 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
     try {
       const searchAttributes = this._artefactNameConfig.getSearchAttributes(artefact);
       let attributesJson = searchAttributes?.value;
-
-      this.artefactReferenceAttributes = attributesJson ? JSON.parse(attributesJson) : undefined;
-      if (typeof this.artefactReferenceAttributes?.['name'] === 'string') {
-        this.artefactReferenceAttributes['name'] = {
-          value: this.artefactReferenceAttributes?.['name'],
-          dynamic: !!searchAttributes?.dynamic,
-          expression: searchAttributes?.expression || '',
-        };
+      if (!attributesJson) {
+        this.artefactReferenceAttributes = undefined;
+      } else {
+        const parsedAttributes = JSON.parse(attributesJson) as DynamicFieldGroupValue | Record<string, string>;
+        this.artefactReferenceAttributes = Object.entries(parsedAttributes).reduce((res, [key, value]) => {
+          res[key] =
+            typeof value === 'string'
+              ? {
+                  value,
+                  dynamic: !!searchAttributes?.dynamic,
+                  expression: searchAttributes?.expression ?? '',
+                }
+              : value;
+          return res;
+        }, {} as DynamicFieldGroupValue);
       }
     } catch (err) {
       this.artefactReferenceAttributes = undefined;
@@ -177,12 +191,11 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
     return Object.values(this.artefactReferenceAttributes || {}).some((attribute) => attribute.dynamic);
   }
 
-  private isEmptyReferenceName(): boolean {
-    const nameAttribute = (this.artefactReferenceAttributes || {})['name'];
-    if (!nameAttribute) {
-      return true;
-    }
-    return nameAttribute.dynamic ? !nameAttribute.expression : !nameAttribute.value;
+  private isEmpty(): boolean {
+    return Object.values(this.artefactReferenceAttributes || {}).reduce((res, attribute) => {
+      const isEmpty = attribute.dynamic ? !attribute.expression : !attribute.value;
+      return res && isEmpty;
+    }, true);
   }
 
   private loadArtefactReference(artefact?: A): void {
@@ -202,7 +215,7 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
       return;
     }
 
-    if (this.isEmptyReferenceName()) {
+    if (this.isEmpty()) {
       this.reference = undefined;
       this.referenceUpdate.emit(undefined);
       this.referenceMeta = {
@@ -251,5 +264,13 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
     this._artefactRefreshNotification.refreshArtefact$
       .pipe(takeUntil(this.terminator$))
       .subscribe(() => this.initArtefactName(this.artefact));
+  }
+
+  private initSchema(): void {
+    const screenId = this._artefactNameConfig.attributesScreenId;
+    if (!screenId) {
+      return;
+    }
+    this._schemaFactory.buildAttributesSchemaForScreen(screenId).subscribe((schema) => (this.schema = schema));
   }
 }

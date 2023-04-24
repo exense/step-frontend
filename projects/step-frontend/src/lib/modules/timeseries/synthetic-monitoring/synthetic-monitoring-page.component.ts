@@ -142,10 +142,6 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  navigateToRtmDashboard() {
-    window.open(this.dashboardService.getRtmDashboardLink(this.taskId));
-  }
-
   calculateRange(): TSTimeRange {
     let now = new Date().getTime();
     let newFullRange: TSTimeRange;

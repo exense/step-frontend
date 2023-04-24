@@ -26,8 +26,7 @@ var tecAdminControllers = angular.module('tecAdminControllers', [
   'ui.bootstrap',
   'reportTree',
   'reportTable',
-  'schedulerControllers',
-  'viz-dashboard-manager',
+  'schedulerControllers'
 ]);
 
 tecAdminControllers.run(function (ViewRegistry) {
