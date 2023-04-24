@@ -12,7 +12,7 @@
   <div class="st-flex-row row" ng-if="execution">
     <div class="flex sectionResizable section-execution-left " resizable r-directions="['right']" r-flex="true">
       <div class="toolbar">
-        <auto-refresh-commands ng-show="$stateExec!=='grafana'" autorefresh="autorefresh"/>
+        <auto-refresh-commands autorefresh="autorefresh"/>
       </div>
       <div class="st-flex-column">
         <step-tabs [tabs]="tabs" [active-tab-id]="$stateExec" (active-tab-id-change)="onSelection($event)">
