@@ -249,4 +249,9 @@ $light-primary-text: white;
   .mat-tooltip {
     white-space: pre-line;
   }
+
+  label {
+    margin: 0;
+    padding: 0;
+  }
 }
