@@ -16,6 +16,8 @@ const SCRIPTS = [
   './src/lib/angularjs/bower_components/ngstorage/ngStorage.js',
   './src/lib/angularjs/bower_components/angular-cookies/angular-cookies.js',
   './src/lib/angularjs/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+  './src/lib/angularjs/bower_components/datatables.net/js/jquery.dataTables.js',
+  './src/lib/angularjs/bower_components/datatables.net-bs/js/dataTables.bootstrap.js',
   './src/lib/angularjs/bower_components/jstree/dist/jstree.js',
   './src/lib/angularjs/bower_components/jquery-file-download/src/Scripts/jquery.fileDownload.js',
   './src/lib/angularjs/bower_components/ng-file-upload/ng-file-upload.js',
