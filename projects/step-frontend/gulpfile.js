@@ -22,11 +22,7 @@ const SCRIPTS = [
   './src/lib/angularjs/bower_components/jquery-file-download/src/Scripts/jquery.fileDownload.js',
   './src/lib/angularjs/bower_components/ng-file-upload/ng-file-upload.js',
   './src/lib/angularjs/js/angular-resizable.js',
-  `${NODE_MODULES_PATH}/datatables.net-select/js/dataTables.select.js`,
-  `${NODE_MODULES_PATH}/d3/d3.js`,
-  `${NODE_MODULES_PATH}/nvd3/build/nv.d3.js`,
-  `${NODE_MODULES_PATH}/angular-nvd3/dist/angular-nvd3.js`,
-  `${NODE_MODULES_PATH}/@exense/visualization/dist/viz.js`,
+  './src/lib/angularjs/bower_components/datatables.net-select/js/dataTables.select.js',
 
   './src/lib/angularjs/js/common.js',
   './src/lib/angularjs/js/app.js',
@@ -57,28 +53,19 @@ const SCRIPTS = [
   './src/lib/angularjs/js/controllers/dynamicForms.js',
   './src/lib/angularjs/js/controllers/components.js',
   './src/lib/angularjs/js/datatable-ext-paginationinput.js',
-  './src/lib/angularjs/js/viz-presets-commons.js',
-  './src/lib/angularjs/js/viz-presets-ext.js',
 ];
 
 const STYLES = [
   './src/lib/angularjs/bower_components/bootstrap/dist/css/bootstrap.css',
-  './src/lib/angularjs/bower_components/datatables.net-bs/css/dataTables.bootstrap.css',
   './src/lib/angularjs/bower_components/jstree/dist/themes/default/style.css',
   './src/lib/angularjs/bower_components/tachyons/css/tachyons.css',
   './src/lib/angularjs/bower_components/angular-resizable/angular-resizable.min.css',
-  `${NODE_MODULES_PATH}/datatables.net-select-dt/css/select.dataTables.css`,
-  `${NODE_MODULES_PATH}/nvd3/build/nv.d3.css`,
-  `${NODE_MODULES_PATH}/@exense/visualization/dist/viz.css`,
   './src/lib/angularjs/css/step.css',
   './src/lib/angularjs/css/step-variables.css',
   './src/lib/angularjs/js/chart.css',
 ];
 
-const MAPS = [
-  './src/lib/angularjs/bower_components/bootstrap/dist/css/bootstrap.css.map',
-  `${NODE_MODULES_PATH}/nvd3/build/nv.d3.js.map`,
-];
+const MAPS = ['./src/lib/angularjs/bower_components/bootstrap/dist/css/bootstrap.css.map'];
 
 const FONTS = ['./src/lib/angularjs/bower_components/bootstrap/dist/fonts/**/*'];
 
@@ -98,8 +85,6 @@ const OTHER = [
   '!./src/lib/angularjs/*.json',
 ];
 
-const VIZ_TEMPLATES = [`${NODE_MODULES_PATH}/@exense/visualization/dist/templates/**/*`];
-
 const scripts = () =>
   src(SCRIPTS)
     .pipe(concat('scripts.js'))
@@ -118,6 +103,4 @@ const fonts = () => src(FONTS).pipe(dest(`${DESTINATION}/fonts`));
 
 const others = () => src(OTHER, { nodir: true }).pipe(dest(DESTINATION, { base: './src/lib/angularjs' }));
 
-const vizTemplates = () => src(VIZ_TEMPLATES).pipe(dest(`${DESTINATION}/app/templates`));
-
-exports.default = parallel(scripts, maps, styles, fonts, others, vizTemplates, images);
+exports.default = parallel(scripts, maps, styles, fonts, others, images);

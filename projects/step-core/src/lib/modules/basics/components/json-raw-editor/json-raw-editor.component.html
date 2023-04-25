@@ -1,3 +1,3 @@
-<mat-form-field class="step-view" [class.ng-invalid]="_ngControl?.invalid || rawValueFormControl.invalid">
-  <textarea matInput [formControl]="rawValueFormControl" (blur)="onBlur()"></textarea>
-</mat-form-field>
+<step-form-field [class.ng-invalid]="_ngControl?.invalid || rawValueFormControl.invalid">
+  <textarea [formControl]="rawValueFormControl" (blur)="onBlur()"></textarea>
+</step-form-field>

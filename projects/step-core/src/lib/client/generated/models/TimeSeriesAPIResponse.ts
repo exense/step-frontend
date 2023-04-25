@@ -6,9 +6,9 @@ import type { BucketAttributes } from './BucketAttributes';
 import type { BucketResponse } from './BucketResponse';
 
 export type TimeSeriesAPIResponse = {
-  start?: number;
-  interval?: number;
-  end?: number;
-  matrix?: Array<Array<BucketResponse>>;
-  matrixKeys?: Array<BucketAttributes>;
+  start: number;
+  interval: number;
+  end: number;
+  matrix: Array<Array<BucketResponse>>;
+  matrixKeys: Array<BucketAttributes>;
 };

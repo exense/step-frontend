@@ -51,12 +51,18 @@
                 "glob": "**/*",
                 "input": "dist/step-frontend/src/lib/angularjs",
                 "output": "/"
+              },
+              {
+                "glob": "worker-javascript.js",
+                "input": "node_modules/ace-builds/src-min-noconflict",
+                "output": "/"
               }
             ],
             "styles": ["projects/step-app/src/styles.scss", "node_modules/uplot/dist/uPlot.min.css"],
             "scripts": ["node_modules/uplot/dist/uPlot.iife.min.js"],
             "extraWebpackConfig": "projects/step-app/webpack.config.js",
-            "commonChunk": false
+            "commonChunk": false,
+            "allowedCommonJsDependencies": ["ace-builds"]
           },
           "configurations": {
             "local": {

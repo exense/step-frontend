@@ -122,10 +122,6 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  navigateToRtmDashboard() {
-    window.open(this.dashboardService.getRtmDashboardLinkWithFilter(this.contextualParams));
-  }
-
   changeRefreshInterval(newInterval: { label: string; value: number }) {
     const oldInterval = this.selectedRefreshInterval;
     this.selectedRefreshInterval = newInterval;

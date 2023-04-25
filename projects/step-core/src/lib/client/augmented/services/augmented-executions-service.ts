@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ExecutionParameters, ExecutionsService } from '../../generated';
+import { Execution, ExecutionParameters, ExecutionsService } from '../../generated';
 import { TableApiWrapperService } from '../../table/services/table-api-wrapper.service';
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
 import { TableRemoteDataSource } from '../../../modules/table/shared/table-remote-data-source';
@@ -10,7 +10,7 @@ import { HttpClient } from '@angular/common/http';
 export class AugmentedExecutionsService extends ExecutionsService {
   private readonly EXECUTIONS_TABLE_ID = 'executions';
 
-  private readonly dataSource = new TableRemoteDataSource(this.EXECUTIONS_TABLE_ID, this._tableRest, {
+  private readonly dataSource = new TableRemoteDataSource<Execution>(this.EXECUTIONS_TABLE_ID, this._tableRest, {
     description: 'description',
     startTime: 'startTime',
     endTime: 'endTime',
@@ -27,9 +27,18 @@ export class AugmentedExecutionsService extends ExecutionsService {
     super(httpRequest);
   }
 
-  getExecutionsTableDataSource(): TableRemoteDataSource<any> {
+  getExecutionsTableDataSource(): TableRemoteDataSource<Execution> {
     return this.dataSource;
   }
+
+  getExecutionsSelectionTableDataSource(): TableRemoteDataSource<Execution> {
+    return new TableRemoteDataSource(this.EXECUTIONS_TABLE_ID, this._tableRest, {
+      description: 'description',
+      startTime: 'startTime',
+      user: 'executionParameters.userID',
+    });
+  }
+
   override execute(requestBody?: ExecutionParameters): Observable<string> {
     return this._httpClient.post('rest/executions/start', requestBody, { responseType: 'text' });
   }

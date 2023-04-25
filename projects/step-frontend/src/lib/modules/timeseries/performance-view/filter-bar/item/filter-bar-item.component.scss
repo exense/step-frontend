@@ -1,67 +1,89 @@
 @use 'projects/step-core/styles/core-variables' as var;
-@use 'projects/step-frontend/styles/common-mixins' as common-mixins;
-@include common-mixins.ts-filter-bar();
 
-.filter-item-container {
-  .remove-btn {
-    cursor: pointer;
-    position: absolute;
-    right: 0;
-    top: 0;
-    font-size: 4px;
-    border-radius: 50%;
-    width: 14px;
-    height: 14px;
-    min-width: 14px;
-    min-height: 14px;
-    padding: 2px;
+:host {
+  background: var.$gray-100;
+  color: #293e50;
+  padding: 2px;
+  border-radius: 0px;
+  box-shadow: 0px 0px 9px -3px #818181;
+}
 
-    &:hover {
-      background: var.$gray-200;
+.item-container {
+  cursor: pointer;
+  padding: 0 14px;
+  max-width: 160px;
+  min-width: 84px;
+  position: relative;
+
+  .filter-label {
+    font-size: 14px;
+    opacity: 0.7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .filter-item-container {
+    .remove-btn {
+      cursor: pointer;
+      position: absolute;
+      right: 0;
+      top: 0;
+      font-size: 4px;
+      border-radius: 50%;
+      width: 14px;
+      height: 14px;
+      min-width: 14px;
+      min-height: 14px;
+      padding: 2px;
+
+      &:hover {
+        background: var.$gray-200;
+      }
     }
   }
-}
 
-.attribute-type {
-  position: absolute;
-  opacity: 0.3;
-  top: 9px;
-  right: 9px;
-  font-weight: bold;
-  font-size: 12px;
-}
+  .attribute-type {
+    position: absolute;
+    opacity: 0.3;
+    top: 9px;
+    right: 9px;
+    font-weight: bold;
+    font-size: 12px;
+  }
 
-.menu-container {
-  padding: 12px;
-  height: auto;
-}
+  .menu-container {
+    padding: 12px;
+    height: auto;
+  }
 
-button {
-  background: var.$dark-blue !important;
-}
+  button {
+    background: var.$dark-blue !important;
+  }
 
-label {
-  padding-bottom: 1.25em;
-}
+  label {
+    padding-bottom: 1.25em;
+  }
 
-.item-header {
-  width: 100%;
-  border-bottom: 1px solid var.$gray-200;
-  padding-bottom: 8px;
-  font-weight: bold;
-  margin-bottom: 12px;
-}
+  .item-header {
+    width: 100%;
+    border-bottom: 1px solid var.$gray-200;
+    padding-bottom: 8px;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
 
-.checkboxes {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  font-size: 12px;
-}
+  .checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 12px;
+  }
 
-.date-filters {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25em;
-  padding-bottom: 1.25em;
+  .date-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25em;
+    padding-bottom: 1.25em;
+  }
 }

@@ -29,6 +29,7 @@ import { ExecutionCustomPanelComponent } from './components/item-component/execu
     CustomSearchCellComponent,
     DashletComponent,
     ExecutionCustomPanelComponent,
+    CustomItemRenderComponent,
   ],
 })
 export class CustomRegistriesModule {}

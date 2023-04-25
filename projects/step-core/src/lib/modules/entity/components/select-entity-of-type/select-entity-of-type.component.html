@@ -1,0 +1,39 @@
+<step-modal-window title="Select entities" [stepZIndex]="1051">
+  <div step-modal-window-subtitle *ngIf="currentProject && migrationTarget">
+    <span
+      >Assign from <strong>{{ currentProject }}</strong> to <strong>{{ migrationTarget }}</strong></span
+    >
+  </div>
+  <div step-modal-window-body>
+    <ng-template #legacy>
+      <step-entity-legacy-table-wrapper [templateUrl]="entity.templateUrl" [context]="selectEntityContext">
+      </step-entity-legacy-table-wrapper>
+    </ng-template>
+    <ng-container *ngIf="entity.component; else legacy">
+      <step-custom-item-render [component]="entity.component" [context]="selectEntityContext">
+      </step-custom-item-render>
+    </ng-container>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>
+    <button
+      type="button"
+      mat-flat-button
+      color="primary"
+      matTooltip="Proceed with selected entities"
+      (click)="proceed()"
+    >
+      Proceed
+    </button>
+    <button
+      *ngIf="currentProject && migrationTarget"
+      type="button"
+      mat-flat-button
+      color="primary"
+      matTooltip="Proceed with all entities matching the current filter"
+      (click)="proceedFiltered()"
+    >
+      Proceed Filtered
+    </button>
+  </div>
+</step-modal-window>

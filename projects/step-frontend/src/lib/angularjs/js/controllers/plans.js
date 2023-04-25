@@ -65,63 +65,6 @@ angular
     });
   }])
 
-  .factory('PlanDialogs', function ($uibModal, $http, Dialogs) {
-    var dialogs = {};
-
-    dialogs.selectPlan = function (callback) {
-      Dialogs.selectEntityOfType('plans', true).then(function (result) {
-        var id = result.item;
-        $http.get('rest/plans/' + id).then(function (response) {
-          var plan = response.data;
-          if (callback) {
-            callback(plan);
-          }
-        });
-      });
-    };
-
-    return dialogs;
-  })
-
-  .controller(
-    'createPlanCtrl', [
-      '$scope', '$uibModalInstance', '$location', '$http', 'AuthService', 'planTypeRegistryService',
-    function ($scope, $uibModalInstance, $location, $http, AuthService, planTypeRegistryService) {
-      $scope.AuthService = AuthService;
-
-      $scope.template = 'TestCase';
-      $scope.plan = { attributes: {} };
-
-      $scope.planTypes = planTypeRegistryService.getItemInfos();
-      $scope.planType = $scope.planTypes.find(function (planType){
-        return planType.type === 'step.core.plans.Plan';
-      });
-
-      $http.get('rest/plans/artefact/templates').then(function (response) {
-        $scope.artefactTypes = response.data;
-      });
-
-      $scope.save = function (editAfterSave) {
-        $http.get('rest/plans?type=' + $scope.planType.type + '&template=' + $scope.template).then(function (response) {
-          var createdPlan = response.data;
-          createdPlan.attributes = $scope.plan.attributes;
-          if (createdPlan.root) {
-            createdPlan.root.attributes = createdPlan.attributes;
-          }
-          $http.post('rest/plans', createdPlan).then(function (response) {
-            $uibModalInstance.close(response.data);
-            if (editAfterSave) {
-              $location.path('/root/plans/editor/' + createdPlan.id);
-            }
-          });
-        });
-      };
-
-      $scope.cancel = function () {
-        $uibModalInstance.dismiss('cancel');
-      };
-    }
-  ])
 
   .directive('planLink', function () {
     return {

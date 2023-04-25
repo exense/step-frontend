@@ -1,8 +1,8 @@
 <div stepPlanEditorKeyHandler>
-  <div *ngIf="_interactiveSession.isActive$ | async" class="alert alert-info">
+  <step-alert type="info" *ngIf="_interactiveSession.isActive$ | async">
     Welcome to the interactive mode. In this mode you can select tree nodes and run them directly by clicking the
     &nbsp;'Run interactively' button
-  </div>
+  </step-alert>
 
   <div class="actions-header">
     <div class="editable-labels">
@@ -29,6 +29,7 @@
         stScreen="planTable"
         [stDisabled]="!('plan-write' | hasRight | async)"
         [stInline]="true"
+        [stEditableLabelMode]="true"
         [stModel]="(_planEditService.plan$ | async)!"
         (stModelChange)="_planEditService.handlePlanChange()"
       >

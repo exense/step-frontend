@@ -14,8 +14,6 @@ import { Mutable } from '../../../../shared';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { MAT_CHECKBOX_DEFAULT_OPTIONS, MatCheckboxDefaultOptions } from '@angular/material/checkbox';
 
-type FieldAccessor = Mutable<Pick<BulkSelectionComponent<any, any>, 'isChecked' | 'isIntermediate'>>;
-
 @Component({
   selector: 'step-bulk-selection',
   templateUrl: './bulk-selection.component.html',
@@ -30,22 +28,15 @@ type FieldAccessor = Mutable<Pick<BulkSelectionComponent<any, any>, 'isChecked' 
   ],
 })
 export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy {
-  private terminator$?: Subject<unknown>;
+  private terminator$?: Subject<void>;
 
   @Input() selectionCollector?: SelectionCollector<KEY, ENTITY>;
   @Input() showLabel: boolean = true;
   @Input() selectionType: BulkSelectionType = BulkSelectionType.None;
   @Output() selectionTypeChange = new EventEmitter<BulkSelectionType>();
 
-  readonly selectionTypes = [
-    BulkSelectionType.All,
-    BulkSelectionType.Visible,
-    BulkSelectionType.Filtered,
-    BulkSelectionType.None,
-  ];
-
-  readonly isChecked: boolean = false;
-  readonly isIntermediate: boolean = false;
+  protected isChecked: boolean = false;
+  protected isIntermediate: boolean = false;
 
   ngOnChanges(changes: SimpleChanges): void {
     const cSelectionCollector = changes['selectionCollector'];
@@ -67,7 +58,6 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
   }
 
   changeType(selectionType: BulkSelectionType): void {
-    const fieldAccessor = this as FieldAccessor;
     this.selectionType = selectionType;
     this.selectionTypeChange.emit(selectionType);
 
@@ -88,16 +78,16 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
 
     switch (selectionType) {
       case BulkSelectionType.All:
-        fieldAccessor.isChecked = true;
-        fieldAccessor.isIntermediate = false;
+        this.isChecked = true;
+        this.isIntermediate = false;
         break;
       case BulkSelectionType.None:
-        fieldAccessor.isChecked = false;
-        fieldAccessor.isIntermediate = false;
+        this.isChecked = false;
+        this.isIntermediate = false;
         break;
       default:
-        fieldAccessor.isChecked = false;
-        fieldAccessor.isIntermediate = !!this.selectionCollector?.length;
+        this.isChecked = false;
+        this.isIntermediate = !!this.selectionCollector?.length;
         break;
     }
   }
@@ -114,7 +104,7 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
     if (!selectionCollector) {
       return;
     }
-    this.terminator$ = new Subject<unknown>();
+    this.terminator$ = new Subject<void>();
 
     // update individual
     selectionCollector.selected$
@@ -148,7 +138,7 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
     if (!this.terminator$) {
       return;
     }
-    this.terminator$.next({});
+    this.terminator$.next();
     this.terminator$.complete();
     this.terminator$ = undefined;
   }

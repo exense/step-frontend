@@ -1,21 +1,10 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  EventEmitter,
-  HostBinding,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Output,
-  ViewChild,
-} from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { DateTime } from 'luxon';
 import { TimeSeriesUtils } from '../../../time-series-utils';
 import { FilterBarItemType, TsFilterItem } from '../model/ts-filter-item';
 import { Subscription } from 'rxjs';
+import {MatCheckbox} from '@angular/material/checkbox';
 
 @Component({
   selector: 'step-ts-filter-bar-item',
@@ -31,7 +20,6 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
 
   @ViewChild('matTrigger') matTrigger!: MatMenuTrigger;
   @ViewChild(MatMenuTrigger) menuTrigger?: MatMenuTrigger;
-  @ViewChild('initialFocus') initialFocus?: ElementRef<HTMLElement>;
 
   readonly FilterBarType = FilterBarItemType;
 
@@ -62,8 +50,14 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     this.initFormattedValue(this.item);
   }
 
-  handleTextOptionClick(option: { value: string; isSelected?: boolean }, checked: boolean) {
+  toggleOption(option: { value: string; isSelected?: boolean }, checked: boolean, checkbox?: MatCheckbox) {
     option.isSelected = checked;
+
+    if (checkbox) {
+      checkbox.ripple.launch({
+        centered: true,
+      });
+    }
 
     this.initFormattedValue(this.item);
     this.onFilterChange.emit(this.item);

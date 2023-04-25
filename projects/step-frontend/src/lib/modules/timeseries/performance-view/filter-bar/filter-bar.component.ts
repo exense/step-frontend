@@ -11,18 +11,18 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core';
-import { debounceTime, Observable, Subject, take } from 'rxjs';
+import {debounceTime, Observable, Subject, take} from 'rxjs';
 import { TimeSeriesContext } from '../../time-series-context';
 import { FilterUtils } from '../../util/filter-utils';
 import { PerformanceViewSettings } from '../model/performance-view-settings';
 import { PerformanceViewTimeSelectionComponent } from '../time-selection/performance-view-time-selection.component';
 import { FilterBarItemComponent } from './item/filter-bar-item.component';
 import { FilterBarItemType, TsFilterItem } from './model/ts-filter-item';
-import { TimeSeriesService } from '../../time-series.service';
-import { OqlVerifyResponse } from '../../model/oql-verify-response';
-import { TimeSeriesConfig } from '../../time-series.config';
-import { TsFilteringMode } from '../../model/ts-filtering-mode';
-import { TsFilteringSettings } from '../../model/ts-filtering-settings';
+import {TsFilteringSettings} from '../../model/ts-filtering-settings';
+import {TimeSeriesConfig} from '../../time-series.config';
+import {TimeSeriesService} from '@exense/step-core';
+import {OqlVerifyResponse} from '../../model/oql-verify-response';
+import {TsFilteringMode} from '../../model/ts-filtering-mode';
 
 @Component({
   selector: 'step-ts-filter-bar',
@@ -229,10 +229,6 @@ export class FilterBarComponent implements OnInit, OnDestroy {
       if (!this.filterComponents!.last.changesApplied) {
         this.visibleFilters.pop();
       }
-    });
-
-    setTimeout(() => {
-      this.filterComponents!.last.initialFocus!.nativeElement.focus();
     });
   }
 }

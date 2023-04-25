@@ -26,7 +26,7 @@ const DEFAULT_FIELD_VALUE: DynamicValueString = { value: undefined, dynamic: fal
   styleUrls: ['./dynamic-field-group-editor.component.scss'],
 })
 export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
-  private terminator$?: Subject<any>;
+  private terminator$?: Subject<void>;
 
   private readonly formBuilder: NonNullableFormBuilder = this._fb.nonNullable;
   private schemaJson: string = '';
@@ -41,6 +41,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
 
   @Input() isDisabled?: boolean;
   @Input() schema?: DynamicFieldsSchema;
+  @Input() allowNotSchemaFields: boolean = false;
   @Input() value?: DynamicFieldGroupValue;
   @Output() valueChange = new EventEmitter<DynamicFieldGroupValue | undefined>();
   protected primaryFields: DynamicFieldMetaData[] = [];
@@ -164,13 +165,13 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     if (!this.terminator$) {
       return;
     }
-    this.terminator$.next({});
+    this.terminator$.next();
     this.terminator$.complete();
     this.terminator$ = undefined;
   }
 
   private setupFormBehavior(): void {
-    this.terminator$ = new Subject<any>();
+    this.terminator$ = new Subject<void>();
 
     this.form.valueChanges
       .pipe(debounceTime(300), takeUntil(this.terminator$))

@@ -29,7 +29,9 @@ export class CustomItemRenderComponent implements OnChanges, AfterViewInit {
   constructor(private _componentFactoryResolver: ComponentFactoryResolver, private _injector: Injector) {}
 
   ngAfterViewInit(): void {
-    this.render(this.component);
+    // Rendering synchronously in `ngAfterViewInit` hook may cause `ExpressionChangedAfterItHasBeenCheckedError`
+    // for some components. `queueMicrotask` invoke render asynchronously
+    queueMicrotask(() => this.render(this.component));
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -63,7 +65,7 @@ export class CustomItemRenderComponent implements OnChanges, AfterViewInit {
     }
   }
 
-  private updateContext(context?: any) {
+  private updateContext(context?: any): void {
     if (!this.componentRef) {
       return;
     }
