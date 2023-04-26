@@ -3,8 +3,7 @@ import { MatMenuTrigger } from '@angular/material/menu';
 import { DateTime } from 'luxon';
 import { TimeSeriesUtils } from '../../../time-series-utils';
 import { FilterBarItemType, TsFilterItem } from '../model/ts-filter-item';
-import { Subscription } from 'rxjs';
-import {MatCheckbox} from '@angular/material/checkbox';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 @Component({
   selector: 'step-ts-filter-bar-item',

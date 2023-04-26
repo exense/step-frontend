@@ -1,4 +1,10 @@
-<div class="item-container" [matMenuTriggerFor]="menu" #matTrigger="matMenuTrigger">
+<div
+  class="filter-item-container"
+  [class.active]="active"
+  [matMenuTriggerFor]="menu"
+  #matTrigger="matMenuTrigger"
+  (menuOpened)="onMenuOpen(); focusables.scheduleRefocus()"
+>
   <div class="filter-label">{{ item.label || 'Not Specified' }}</div>
   <div class="filter-value">{{ formattedValue || '-' }}</div>
 
@@ -7,7 +13,7 @@
   </div>
 </div>
 
-<mat-menu #menu="matMenu" [ngSwitch]="item.type">
+<mat-menu #menu="matMenu" [ngSwitch]="item.type" (close)="onMenuClose()">
   <form
     class="menu-container"
     (click)="$event.stopPropagation()"

@@ -3,7 +3,7 @@
 @mixin ts-filter-bar {
   .filter-item-container {
     cursor: pointer;
-    padding: 0 14px;
+    padding: 0 8px;
     max-width: 160px;
     min-width: 84px;
     background: var.$gray-100;

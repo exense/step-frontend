@@ -45,6 +45,7 @@
     <ng-container *ngIf="oqlModeActive">
       <div class="flex flex-grow-1 relative oql-container">
         <input
+          [title]="oqlValue"
           [(ngModel)]="oqlValue"
           class="oql-input"
           (ngModelChange)="handleOqlChange($event)"
