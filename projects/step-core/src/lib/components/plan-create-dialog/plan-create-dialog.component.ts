@@ -1,4 +1,4 @@
-import { Component, inject, TrackByFunction } from '@angular/core';
+import { Component, HostListener, inject, TrackByFunction } from '@angular/core';
 import { shareReplay, switchMap, tap } from 'rxjs';
 import { MatDialogRef } from '@angular/material/dialog';
 import { AJS_LOCATION } from '../../shared';
@@ -25,7 +25,8 @@ export class PlanCreateDialogComponent {
 
   readonly artefactTypes$ = this._api.getArtefactTemplates().pipe(shareReplay(1));
 
-  save(editAfterSave: boolean): void {
+  @HostListener('keydown.enter')
+  save(editAfterSave?: boolean): void {
     this._api
       .newPlan(this.planType, this.template)
       .pipe(

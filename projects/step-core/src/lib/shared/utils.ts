@@ -31,13 +31,11 @@ export const setObjectFieldValue = (object: Record<string, unknown>, fieldPath: 
     if (typeof res !== 'object' || res === null || res === undefined) {
       return;
     }
+    const container = res as Record<string, unknown>;
 
-    if (index === pathParts.length - 1) {
-      (res as Record<string, unknown>)[fieldName] = value;
-      return;
-    }
+    container[fieldName] = index < pathParts.length - 1 ? container[fieldName] ?? {} : value;
 
-    return (res as Record<string, unknown>)[fieldName];
+    return container[fieldName];
   }, object);
 };
 
