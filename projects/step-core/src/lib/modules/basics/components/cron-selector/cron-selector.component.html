@@ -1,0 +1,16 @@
+<step-form-field>
+  <step-label *ngIf="label">{{ label }}</step-label>
+  <input [ngModel]="cronString" [formControl]="cronControl" />
+  <step-suffix class="button-suffix">
+    <button class="btn btn-primary preset-button" mat-button [matMenuTriggerFor]="menu">
+      Presets <span class="caret"></span>
+    </button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="applyPreset('0 0/1 * * * ?')">Every minute</button>
+      <button mat-menu-item (click)="applyPreset('0 0/5 * * * ?')">Every 5 minutes</button>
+      <button mat-menu-item (click)="applyPreset('0 0 0/1 * * ?')">Every hour</button>
+      <button mat-menu-item (click)="applyPreset('0 0 0/2 * * ?')">Every 2 hours</button>
+      <button mat-menu-item (click)="applyPreset('0 0 7 * * ?')">Every day at 07:00</button>
+    </mat-menu>
+  </step-suffix>
+</step-form-field>
