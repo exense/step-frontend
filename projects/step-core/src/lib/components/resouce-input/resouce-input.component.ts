@@ -26,7 +26,7 @@ const MAX_FILES = 1;
   styleUrls: ['./resouce-input.component.scss'],
 })
 export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
-  @Input() stModel!: string;
+  @Input() stModel?: string;
   @Input() stBounded?: boolean;
   @Input() stDirectory?: boolean;
   @Input() stType!: string;
@@ -184,13 +184,12 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    if (changes['stModel'].currentValue !== changes['stModel'].previousValue || changes['stModel'].firstChange) {
+    if (changes['stModel']?.currentValue !== changes['stModel']?.previousValue || changes['stModel']?.firstChange) {
       this.stModel = this.stModel || '';
       this.lastStModelValue = this.stModel;
       this.resourceId = this.stModel.replace('resource:', '');
       this.downloadResourceUrl = this._augmentedResourcesService.getDownloadResourceUrl(this.resourceId);
-      this.isResource =
-        Boolean(this.stModel) && typeof this.stModel === 'string' && this.stModel.startsWith('resource:');
+      this.isResource = !!this.stModel && typeof this.stModel === 'string' && this.stModel.startsWith('resource:');
 
       if (this.isResource) {
         this.initResource(this.resourceId);
@@ -211,7 +210,10 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-  private setStModel(stModel: string) {
+  private setStModel(stModel: string = '') {
+    if (this.stModel === stModel) {
+      return;
+    }
     this.stModel = stModel;
     this.stModelChange.emit(stModel);
   }
