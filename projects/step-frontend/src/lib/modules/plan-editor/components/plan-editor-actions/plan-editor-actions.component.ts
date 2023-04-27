@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RepositoryObjectReference } from '@exense/step-core';
-import { InteractiveSessionService } from '../../services/interactive-session.service';
+import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 
 @Component({
   selector: 'step-plan-editor-actions',

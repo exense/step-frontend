@@ -1,7 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import {
   Component,
-  ElementRef,
   forwardRef,
   Inject,
   Input,
@@ -35,7 +34,6 @@ import {
   PlansService,
   RepositoryObjectReference,
   RestoreDialogsService,
-  SplitComponent,
   TreeNodeUtilsService,
   TreeStateService,
 } from '@exense/step-core';
@@ -43,10 +41,10 @@ import { ILocationService } from 'angular';
 import { catchError, filter, from, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
-import { ArtefactTreeNodeUtilsService } from '../../services/artefact-tree-node-utils.service';
-import { ArtefactService } from '../../services/artefact.service';
-import { InteractiveSessionService } from '../../services/interactive-session.service';
-import { PlanHistoryService } from '../../services/plan-history.service';
+import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
+import { ArtefactService } from '../../injectables/artefact.service';
+import { InteractiveSessionService } from '../../injectables/interactive-session.service';
+import { PlanHistoryService } from '../../injectables/plan-history.service';
 
 @Component({
   selector: 'step-plan-editor',

@@ -19,8 +19,7 @@ import {
   TreeStateService,
 } from '@exense/step-core';
 import { BehaviorSubject, filter, map, merge, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
-import { ArtefactTreeNodeUtilsService } from '../../services/artefact-tree-node-utils.service';
-import { PlanHistoryService } from '../../services/plan-history.service';
+import { ArtefactTreeNodeUtilsService, PlanHistoryService } from '../../../plan-editor/plan-editor.module';
 
 const MESSAGE_ADD_AT_MULTIPLE_NODES =
   'Adding elements is not supported when more then one node is selected in the tree';
