@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import {
   AbstractArtefact,
   ArtefactTreeNode,
@@ -19,7 +19,8 @@ import {
   TreeStateService,
 } from '@exense/step-core';
 import { BehaviorSubject, filter, map, merge, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
-import { ArtefactTreeNodeUtilsService, PlanHistoryService } from '../../../plan-editor/plan-editor.module';
+import { PlanHistoryService } from '../../injectables/plan-history.service';
+import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 
 const MESSAGE_ADD_AT_MULTIPLE_NODES =
   'Adding elements is not supported when more then one node is selected in the tree';
@@ -30,6 +31,17 @@ const MESSAGE_ADD_AT_MULTIPLE_NODES =
   styleUrls: ['./plan-common-tree-editor-form.component.scss'],
 })
 export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanEditorStrategy, OnInit, OnDestroy {
+  private _planEditor = inject(PlanEditorService);
+  private _planApi = inject(PlansService);
+  private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
+  private _authService = inject(AuthService);
+  private _keywordCallsApi = inject(KeywordsService);
+  private _screenTemplates = inject(AugmentedScreenService);
+  private _planHistory = inject(PlanHistoryService);
+  private _dialogs = inject(DialogsService);
+  private _persistenceService = inject(PersistenceService);
+  private _artefactTreeNodeUtilsService = inject(ArtefactTreeNodeUtilsService);
+
   context?: any;
   private terminator$ = new Subject<void>();
   private planChange$ = new Subject<Plan>();
@@ -43,19 +55,6 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
   readonly plan$ = this.planInternal$.asObservable();
   readonly hasRedo$ = this._planHistory.hasRedo$;
   readonly hasUndo$ = this._planHistory.hasUndo$;
-
-  constructor(
-    private _planEditor: PlanEditorService,
-    private _planApi: PlansService,
-    private _treeState: TreeStateService<AbstractArtefact, ArtefactTreeNode>,
-    private _authService: AuthService,
-    private _keywordCallsApi: KeywordsService,
-    private _screenTemplates: AugmentedScreenService,
-    private _planHistory: PlanHistoryService,
-    private _dialogs: DialogsService,
-    private _persistenceService: PersistenceService,
-    private _artefactTreeNodeUtilsService: ArtefactTreeNodeUtilsService
-  ) {}
 
   addControl(artefactTypeId: string): void {
     if (this._treeState.isMultipleNodesSelected()) {

@@ -19,9 +19,10 @@ import { FunctionPackageSelectionComponent } from './components/function-package
 import { FunctionTypeFilterComponent } from './components/function-type-filter/function-type-filter.component';
 import { FunctionTypeLabelPipe } from './pipes/function-type-label.pipe';
 import { FunctionDialogsService } from './services/function-dialogs.service';
+import { PlanEditorModule } from '../plan-editor/plan-editor.module';
 
 @NgModule({
-  imports: [StepCommonModule, StepCoreModule, StepBasicsModule],
+  imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule],
   declarations: [
     FunctionListComponent,
     FunctionPackageLinkComponent,
