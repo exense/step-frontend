@@ -12,8 +12,8 @@ import {
   TableSearch,
   RestoreDialogsService,
 } from '@exense/step-core';
-import { ParameterDialogsService } from '../services/parameter-dialogs.service';
-import { ParametersBulkOperationsInvokeService } from '../services/parameters-bulk-operations-invoke.service';
+import { ParameterDialogsService } from '../../services/parameter-dialogs.service';
+import { ParametersBulkOperationsInvokeService } from '../../services/parameters-bulk-operations-invoke.service';
 
 @Component({
   selector: 'step-parameters-list',
@@ -65,11 +65,19 @@ export class ParametersListComponent {
   }
 
   editParameter(parameter: Parameter): void {
-    this._parameterDialogs.editParameter(parameter).subscribe(() => this.dataSource.reload());
+    this._parameterDialogs.editParameter(parameter).subscribe((savedParameter) => {
+      if (savedParameter) {
+        this.dataSource.reload();
+      }
+    });
   }
 
   createParameter(): void {
-    this._parameterDialogs.editParameter().subscribe(() => this.dataSource.reload());
+    this._parameterDialogs.editParameter().subscribe((savedParameter) => {
+      if (savedParameter) {
+        this.dataSource.reload();
+      }
+    });
   }
 
   deleteParameter(id: string, label: string): void {

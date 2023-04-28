@@ -64,6 +64,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
 import { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 import { PlanNameComponent } from './components/plan-name/plan-name.component';
 import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
+import { InputModelFormatterDirective } from './directives/input-model-formatter.directive';
 
 @NgModule({
   declarations: [
@@ -114,6 +115,7 @@ import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-
     ReferenceArtefactNameComponent,
     PlanNameComponent,
     PlanCreateDialogComponent,
+    InputModelFormatterDirective,
   ],
   imports: [
     CommonModule,
@@ -191,6 +193,7 @@ import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-
     RecursiveTabIndexDirective,
     PlanNameComponent,
     PlanCreateDialogComponent,
+    InputModelFormatterDirective,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -263,6 +266,7 @@ export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.dir
 export * from './directives/simple-line-chart.directive';
 export * from './directives/tooltip-immediate-close.directive';
 export * from './directives/tooltip.directive';
+export * from './directives/input-model-formatter.directive';
 export { TrapFocusDirective } from './directives/trap-focus.directive';
 export * from './domain';
 export * from './modules/async-operations/async-operations.module';

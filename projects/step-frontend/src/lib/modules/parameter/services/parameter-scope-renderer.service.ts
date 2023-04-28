@@ -23,6 +23,8 @@ export class ParameterScopeRendererService {
         return 'target';
       case 'APPLICATION':
         return 'terminal';
+      default:
+        return undefined;
     }
   }
 
@@ -36,6 +38,8 @@ export class ParameterScopeRendererService {
         return 'parameter-scope-keyword';
       case 'APPLICATION':
         return 'parameter-scope-application';
+      default:
+        return undefined;
     }
   }
 
@@ -69,6 +73,8 @@ export class ParameterScopeRendererService {
         return 'Keyword';
       case 'APPLICATION':
         return 'Application';
+      default:
+        return undefined;
     }
   }
 }
