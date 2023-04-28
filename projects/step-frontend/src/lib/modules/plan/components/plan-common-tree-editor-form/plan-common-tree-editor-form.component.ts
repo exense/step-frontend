@@ -25,11 +25,11 @@ const MESSAGE_ADD_AT_MULTIPLE_NODES =
   'Adding elements is not supported when more then one node is selected in the tree';
 
 @Component({
-  selector: 'step-plan-tree-editor',
-  templateUrl: './plan-tree-editor.component.html',
-  styleUrls: ['./plan-tree-editor.component.scss'],
+  selector: 'step-plan-common-tree-editor-form',
+  templateUrl: './plan-common-tree-editor-form.component.html',
+  styleUrls: ['./plan-common-tree-editor-form.component.scss'],
 })
-export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrategy, OnInit, OnDestroy {
+export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanEditorStrategy, OnInit, OnDestroy {
   context?: any;
   private terminator$ = new Subject<void>();
   private planChange$ = new Subject<Plan>();

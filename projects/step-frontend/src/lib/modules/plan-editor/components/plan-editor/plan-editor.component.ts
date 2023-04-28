@@ -2,7 +2,7 @@ import { DOCUMENT } from '@angular/common';
 import {
   Component,
   forwardRef,
-  Inject,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -12,18 +12,13 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AbstractArtefact,
   AJS_LOCATION,
-  AJS_MODULE,
   ArtefactRefreshNotificationService,
   ArtefactTreeNode,
-  AugmentedScreenService,
-  AuthService,
   CallFunction,
   DialogsService,
-  ExportDialogsService,
   Function as KeywordCall,
   KeywordsService,
   LinkProcessorService,
@@ -37,7 +32,6 @@ import {
   TreeNodeUtilsService,
   TreeStateService,
 } from '@exense/step-core';
-import { ILocationService } from 'angular';
 import { catchError, filter, from, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
@@ -45,6 +39,7 @@ import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-no
 import { ArtefactService } from '../../injectables/artefact.service';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
+import { PlanEditorApiService } from '../../injectables/plan-editor-api.service';
 
 @Component({
   selector: 'step-plan-editor',
@@ -77,12 +72,26 @@ import { PlanHistoryService } from '../../injectables/plan-history.service';
 export class PlanEditorComponent
   implements OnInit, OnChanges, OnDestroy, PlanInteractiveSessionService, PlanArtefactResolverService
 {
+  readonly _interactiveSession = inject(InteractiveSessionService);
+  private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
+  private _planEditorApi = inject(PlanEditorApiService);
+  private _planApi = inject(PlansService);
+  private _keywordCallsApi = inject(KeywordsService);
+  private _dialogsService = inject(DialogsService);
+  private _linkProcessor = inject(LinkProcessorService);
+  private _functionDialogs = inject(FunctionDialogsService);
+  private _artefactService = inject(ArtefactService);
+  public _planEditService = inject(PlanEditorService);
+  private _restoreDialogsService = inject(RestoreDialogsService);
+  private _location = inject(AJS_LOCATION);
+  private _document = inject(DOCUMENT);
+
   private get artefactIdFromUrl(): string | undefined {
     const { artefactId } = this._location.search() || {};
     return artefactId;
   }
 
-  @Input() planId?: string;
+  @Input() id?: string;
   selectedTab = 'controls';
   readonly isInteractiveSessionActive$ = this._interactiveSession.isActive$;
   planTypes$ = this._planApi.getArtefactTemplates().pipe(
@@ -106,25 +115,6 @@ export class PlanEditorComponent
   @ViewChild('keywordCalls', { read: KeywordCallsComponent, static: false })
   private keywords?: KeywordCallsComponent;
 
-  constructor(
-    public _interactiveSession: InteractiveSessionService,
-    private _treeState: TreeStateService<AbstractArtefact, ArtefactTreeNode>,
-    private _planHistory: PlanHistoryService,
-    private _planApi: PlansService,
-    private _keywordCallsApi: KeywordsService,
-    private _screenTemplates: AugmentedScreenService,
-    private _authService: AuthService,
-    private _exportDialogs: ExportDialogsService,
-    private _dialogsService: DialogsService,
-    private _linkProcessor: LinkProcessorService,
-    private _functionDialogs: FunctionDialogsService,
-    private _artefactService: ArtefactService,
-    public _planEditService: PlanEditorService,
-    private _restoreDialogsService: RestoreDialogsService,
-    @Inject(AJS_LOCATION) private _location: ILocationService,
-    @Inject(DOCUMENT) private _document: Document
-  ) {}
-
   ngOnInit(): void {
     this._interactiveSession.init();
     this.initConsoleTabToggle();
@@ -132,18 +122,10 @@ export class PlanEditorComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const cPlanId = changes['planId'];
-    if (cPlanId?.previousValue !== cPlanId?.currentValue || cPlanId?.firstChange) {
-      const planId = cPlanId?.currentValue;
-      this.loadPlan(planId, true);
-      this.repositoryObjectRef = !planId
-        ? undefined
-        : {
-            repositoryID: 'local',
-            repositoryParameters: {
-              ['planid']: planId,
-            },
-          };
+    const cId = changes['id'];
+    if (cId?.previousValue !== cId?.currentValue || cId?.firstChange) {
+      this.loadPlan(cId?.currentValue, true);
+      this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference(cId?.currentValue);
     }
   }
 
@@ -165,16 +147,10 @@ export class PlanEditorComponent
   }
 
   exportPlan(): void {
-    if (!this.planId) {
+    if (!this.id) {
       return;
     }
-    this._exportDialogs
-      .displayExportDialog(
-        'Plans export',
-        `plans/${this.planId}`,
-        `${this._planEditService.plan!.attributes!['name']}.sta`
-      )
-      .subscribe();
+    this._planEditorApi.exportPlan(this.id, `${this._planEditService.plan!.attributes!['name']}.sta`).subscribe();
   }
 
   displayHistory(permission: string, plan: Plan): void {
@@ -183,35 +159,35 @@ export class PlanEditorComponent
     }
 
     const planVersion = plan.customFields ? plan.customFields['versionId'] : undefined;
-    const versionHistory = this._planApi.getPlanVersions(plan.id!);
+    const versionHistory = this._planEditorApi.getPlanHistory(plan.id!);
 
     this._restoreDialogsService
       .showRestoreDialog(planVersion, versionHistory, permission)
       .pipe(
         filter((restoreVersion) => !!restoreVersion),
-        switchMap((restoreVersion) => this._planApi.restorePlanVersion(plan.id!, restoreVersion))
+        switchMap((restoreVersion) => this._planEditorApi.restorePlanVersion(plan.id!, restoreVersion))
       )
       .subscribe(() => this.loadPlan(plan.id!));
   }
 
   clonePlan(): void {
-    if (!this.planId) {
+    if (!this.id) {
       return;
     }
     const name = this._planEditService.plan!.attributes!['name'];
     this._dialogsService.enterValue('Clone plan as', `${name}_Copy`, 'md', 'enterValueDialog', (value: string) => {
-      this._planApi
-        .clonePlan(this.planId!)
+      this._planEditorApi
+        .clonePlan(this.id!)
         .pipe(
           map((plan) => {
             plan!.attributes!['name'] = value;
             return plan;
           }),
-          switchMap((plan) => this._planApi.savePlan(plan)),
-          map((plan) => plan.id)
+          switchMap((plan) => this._planEditorApi.savePlan(plan)),
+          map(({ id }) => id)
         )
-        .subscribe((planId) => {
-          this._location.path(`/root/plans/editor/${planId}`);
+        .subscribe((id) => {
+          this._planEditorApi.navigateToPlan(id);
         });
     });
   }
@@ -240,8 +216,9 @@ export class PlanEditorComponent
     const NO_DATA = 'NO_DATA';
 
     if (isPlan) {
+      // TODO check
       this._planApi
-        .lookupPlan(this.planId!, artefact!.id!)
+        .lookupPlan(this.id!, artefact!.id!)
         .pipe(
           map((plan) => plan || NO_DATA),
           catchError((err) => {
@@ -292,20 +269,20 @@ export class PlanEditorComponent
   execute(): void {
     const artefactIds = this._treeState.getSelectedNodes().map((node) => node.id!);
 
-    this._interactiveSession.execute(this.planId!, artefactIds).subscribe(() => {
+    this._interactiveSession.execute(this.id!, artefactIds).subscribe(() => {
       if (this.keywords) {
         this.keywords.leafReportsDataSource.reload();
       }
     });
   }
 
-  private loadPlan(planId: string, preselectArtefact?: boolean): void {
-    if (!planId) {
+  private loadPlan(id: string, preselectArtefact?: boolean): void {
+    if (!id) {
       return;
     }
 
-    this._planApi
-      .getPlanById(planId)
+    this._planEditorApi
+      .loadPlan(id)
       .pipe(
         tap((plan) => {
           if (plan.root) {
@@ -364,6 +341,7 @@ export class PlanEditorComponent
           // for some reason location change isn't enough for reopen editor
           // that's why the document reload was added
           // It should gone, after the route will be refactored
+          // TODO Check
           this._location.path(`/root/plans/editor/${planId}`);
           setTimeout(() => {
             this._document.location.reload();
@@ -412,15 +390,11 @@ export class PlanEditorComponent
               },
             } as Plan)
         ),
-        switchMap((plan) => this._planApi.savePlan(plan))
+        switchMap((plan) => this._planEditorApi.savePlan(plan))
       )
-      .subscribe((plan) => {
+      .subscribe(({ plan }) => {
         this.planClass = plan._class;
         this._planEditService.init(plan);
       });
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepPlanEditor', downgradeComponent({ component: PlanEditorComponent }));

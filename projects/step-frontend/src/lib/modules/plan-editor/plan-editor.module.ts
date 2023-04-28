@@ -24,3 +24,4 @@ export * from './injectables/artefact.service';
 export * from './injectables/artefact-tree-node-utils.service';
 export * from './injectables/interactive-session.service';
 export * from './injectables/plan-history.service';
+export * from './injectables/plan-editor-api.service';

@@ -10,13 +10,20 @@ import { StepCommonModule } from '../_common/step-common.module';
 import { PlanIconComponent } from './components/plan-icon/plan-icon.component';
 import { PlanListComponent } from './components/plan-list/plan-list.component';
 import { PlanEditorKeyHandlerDirective } from './directives/plan-editor-key-handler.directive';
-import { PlanTreeEditorComponent } from './components/plan-tree-editor/plan-tree-editor.component';
+import { PlanCommonTreeEditorFormComponent } from './components/plan-common-tree-editor-form/plan-common-tree-editor-form.component';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
+import { PurePlanEditorComponent } from './components/pure-plan-editor/pure-plan-editor.component';
 
 @NgModule({
-  declarations: [PlanListComponent, PlanIconComponent, PlanEditorKeyHandlerDirective, PlanTreeEditorComponent],
+  declarations: [
+    PlanListComponent,
+    PlanIconComponent,
+    PlanEditorKeyHandlerDirective,
+    PlanCommonTreeEditorFormComponent,
+    PurePlanEditorComponent,
+  ],
   imports: [StepCommonModule, ExecutionModule, PlanEditorModule],
-  exports: [PlanEditorModule, PlanListComponent],
+  exports: [PlanEditorModule, PlanListComponent, PurePlanEditorComponent],
 })
 export class PlanModule {
   constructor(
@@ -27,6 +34,6 @@ export class PlanModule {
     _entityRegistry.register('plans', 'Plan', { icon: 'file', templateUrl: '/partials/plans/planSelectionTable.html' });
     _cellsRegister.registerCell('planEntityIcon', PlanIconComponent);
     _cellsRegister.registerCell('planLink', PlanLinkComponent);
-    _planTypeRegistry.register('step.core.plans.Plan', 'Visual plan editor', PlanTreeEditorComponent);
+    _planTypeRegistry.register('step.core.plans.Plan', 'Visual plan editor', PlanCommonTreeEditorFormComponent);
   }
 }
