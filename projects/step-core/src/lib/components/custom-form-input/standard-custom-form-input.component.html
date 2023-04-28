@@ -1,5 +1,5 @@
 <step-form-field>
-  <step-label>{{ input?.label }}</step-label>
+  <step-label *ngIf="!hideLabel">{{ input?.label }}</step-label>
   <ng-container [ngSwitch]="input?.type">
     <ng-container *ngSwitchCase="InputType.TEXT">
       <input type="text" [ngModel]="value" (ngModelChange)="onValueChange($event)" (blur)="invokeTouch()" />
@@ -19,4 +19,7 @@
       </mat-select>
     </ng-container>
   </ng-container>
+  <step-suffix class="icon-suffix" *ngIf="hint">
+    <step-icon name="help-circle" [matTooltip]="hint"></step-icon>
+  </step-suffix>
 </step-form-field>

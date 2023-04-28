@@ -3,10 +3,17 @@ import { DashletRegistryService, EntityRegistry, SettingButtonComponent, StepCor
 import { StepCommonModule } from '../_common/step-common.module';
 import { MyAccountComponent } from './components/my-account/my-account.component';
 import { ScreenConfigurationListComponent } from './components/screen-configuration-list/screen-configuration-list.component';
+import { ScreenInputEditDialogComponent } from './components/screen-input-edit-dialog/screen-input-edit-dialog.component';
+import { ScreenInputDropdownOptionsComponent } from './components/screen-input-dropdown-options/screen-input-dropdown-options.component';
 
 @NgModule({
-  declarations: [MyAccountComponent, ScreenConfigurationListComponent],
-  exports: [MyAccountComponent, ScreenConfigurationListComponent],
+  declarations: [
+    MyAccountComponent,
+    ScreenConfigurationListComponent,
+    ScreenInputEditDialogComponent,
+    ScreenInputDropdownOptionsComponent,
+  ],
+  exports: [MyAccountComponent, ScreenConfigurationListComponent, ScreenInputEditDialogComponent],
   imports: [StepCoreModule, StepCommonModule],
 })
 export class AdminModule {

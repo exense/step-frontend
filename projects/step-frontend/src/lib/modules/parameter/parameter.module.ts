@@ -1,13 +1,14 @@
 import { NgModule } from '@angular/core';
 import { CustomCellRegistryService, EntityRegistry, StepCoreModule } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
-import { ParameterScopeComponent } from './parameter-scope/parameter-scope.component';
-import './parameter-selection/parameter-selection.component';
-import { ParameterSelectionComponent } from './parameter-selection/parameter-selection.component';
-import { ParametersIconComponent } from './parameters-icon/parameters-icon.component';
-import { ParametersKeyComponent } from './parameters-key/parameters-key.component';
-import { ParametersListComponent } from './parameters-list/parameters-list.component';
-import { ParameterLastModificationComponent } from './parameter-last-modification/parameter-last-modification.component';
+import { ParameterScopeComponent } from './components/parameter-scope/parameter-scope.component';
+import './components/parameter-selection/parameter-selection.component';
+import { ParameterSelectionComponent } from './components/parameter-selection/parameter-selection.component';
+import { ParametersIconComponent } from './components/parameters-icon/parameters-icon.component';
+import { ParametersKeyComponent } from './components/parameters-key/parameters-key.component';
+import { ParametersListComponent } from './components/parameters-list/parameters-list.component';
+import { ParameterLastModificationComponent } from './components/parameter-last-modification/parameter-last-modification.component';
+import { ParameterEditDialogComponent } from './components/parameter-edit-dialog/parameter-edit-dialog.component';
 
 @NgModule({
   imports: [StepCoreModule, StepCommonModule],
@@ -19,6 +20,7 @@ import { ParameterLastModificationComponent } from './parameter-last-modificatio
     ParameterScopeComponent,
     ParameterSelectionComponent,
     ParameterLastModificationComponent,
+    ParameterEditDialogComponent,
   ],
 })
 export class ParameterModule {
