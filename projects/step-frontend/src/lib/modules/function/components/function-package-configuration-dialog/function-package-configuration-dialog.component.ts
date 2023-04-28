@@ -32,7 +32,7 @@ export class FunctionPackageConfigurationDialogComponent {
   protected criteria = this.createTokenSelectionCriteria();
 
   protected showRoutingOptions = false;
-  protected showCustomAttributes = false;
+  protected showCustomAttributes = true;
   protected isFunctionPackageReady = false;
   protected showPreview = true;
   protected isLoading = false;

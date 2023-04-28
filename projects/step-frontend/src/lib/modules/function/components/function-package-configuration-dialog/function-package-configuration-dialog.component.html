@@ -25,7 +25,7 @@
       >
       </step-resource-input>
     </mat-card>
-    <mat-expansion-panel [(expanded)]="showCustomAttributes">
+    <mat-expansion-panel [(expanded)]="showCustomAttributes" [class.hidden]="!customAttributesForm.inputs.length">
       <mat-expansion-panel-header>
         <mat-panel-title>
           <span>Custom attributes</span>
@@ -37,6 +37,7 @@
         </mat-panel-title>
       </mat-expansion-panel-header>
       <step-custom-forms
+        #customAttributesForm
         [stModel]="customAttributes"
         (stModelChange)="saveCustomAttributes($event)"
         stScreen="functionTable"
