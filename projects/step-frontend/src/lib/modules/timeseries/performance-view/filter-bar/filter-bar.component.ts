@@ -11,18 +11,18 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core';
-import {debounceTime, Observable, Subject, take} from 'rxjs';
+import { debounceTime, Observable, Subject, take } from 'rxjs';
 import { TimeSeriesContext } from '../../time-series-context';
 import { FilterUtils } from '../../util/filter-utils';
 import { PerformanceViewSettings } from '../model/performance-view-settings';
 import { PerformanceViewTimeSelectionComponent } from '../time-selection/performance-view-time-selection.component';
 import { FilterBarItemComponent } from './item/filter-bar-item.component';
 import { FilterBarItemType, TsFilterItem } from './model/ts-filter-item';
-import {TsFilteringSettings} from '../../model/ts-filtering-settings';
-import {TimeSeriesConfig} from '../../time-series.config';
-import {TimeSeriesService} from '@exense/step-core';
-import {OqlVerifyResponse} from '../../model/oql-verify-response';
-import {TsFilteringMode} from '../../model/ts-filtering-mode';
+import { TsFilteringSettings } from '../../model/ts-filtering-settings';
+import { TimeSeriesConfig } from '../../time-series.config';
+import { TimeSeriesService } from '@exense/step-core';
+import { OqlVerifyResponse } from '../../model/oql-verify-response';
+import { TsFilteringMode } from '../../model/ts-filtering-mode';
 
 @Component({
   selector: 'step-ts-filter-bar',
@@ -82,20 +82,12 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     }
     this.prepareVisibleFilters();
     this.emitFilterChange$.pipe(debounceTime(this.EMIT_DEBOUNCE_TIME)).subscribe(() => {
-      const filters = this.visibleFilters.filter(FilterUtils.filterItemIsValid);
-      if (filters.length) {
-        this.composeAndVerifyFullOql().subscribe((response) => {
-          this.rawMeasurementsModeActive = response.hasUnknownFields;
-          if (!this.rawMeasurementsModeActive) {
-            this.emitFiltersChange();
-          }
-        });
-      } else {
-        this.emitFiltersChange(); // immediate effect because there are no filters
-        this.composeAndVerifyFullOql().subscribe((response) => {
-          this.rawMeasurementsModeActive = response.hasUnknownFields;
-        });
-      }
+      this.composeAndVerifyFullOql(this.groupDimensions).subscribe((response) => {
+        this.rawMeasurementsModeActive = response.hasUnknownFields;
+        if (!this.rawMeasurementsModeActive) {
+          this.emitFiltersChange();
+        }
+      });
     });
   }
 
@@ -120,7 +112,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     this.oqlModeActive = false;
   }
 
-  composeAndVerifyFullOql(): Observable<OqlVerifyResponse> {
+  composeAndVerifyFullOql(groupDimensions: string[]): Observable<OqlVerifyResponse> {
     // we fake group dimensions as being filters, to verify altogether
     const filtersOql = this.oqlModeActive
       ? this.oqlValue
@@ -128,7 +120,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
           this.visibleFilters.filter(FilterUtils.filterItemIsValid),
           TimeSeriesConfig.ATTRIBUTES_PREFIX
         );
-    let groupingItems: TsFilterItem[] = this.groupDimensions.map((dimension) => ({
+    let groupingItems: TsFilterItem[] = groupDimensions.map((dimension) => ({
       attributeName: dimension,
       type: FilterBarItemType.FREE_TEXT,
       textValue: 'group-dimension',
@@ -141,11 +133,14 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   handleGroupingChange(dimensions: string[]) {
     this.groupDimensions = dimensions;
-    const filters = this.visibleFilters.filter(FilterUtils.filterItemIsValid);
-    this.composeAndVerifyFullOql().subscribe((response) => {
+    this.composeAndVerifyFullOql(dimensions).subscribe((response) => {
       this.rawMeasurementsModeActive = response.hasUnknownFields;
       // for grouping change, we will trigger refresh automatically. otherwise grouping and filters will change together
-      this.onGroupingChange.emit(dimensions);
+      if (!this.rawMeasurementsModeActive) {
+        this.onGroupingChange.emit(dimensions);
+      } else {
+        // wait for the manual apply
+      }
     });
   }
 
@@ -160,6 +155,9 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   }
 
   manuallyApplyFilters() {
+    if (this.haveNewGrouping()) {
+      this.onGroupingChange.emit(this.groupDimensions);
+    }
     if (!this.oqlModeActive) {
       this.emitFiltersChange();
     } else {
@@ -183,7 +181,8 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     this.onFiltersChange.complete();
   }
 
-  handleFilterChange() {
+  handleFilterChange(index: number, item: TsFilterItem) {
+    this.visibleFilters[index] = item;
     this.emitFilterChange$.next();
   }
 
@@ -230,5 +229,19 @@ export class FilterBarComponent implements OnInit, OnDestroy {
         this.visibleFilters.pop();
       }
     });
+  }
+
+  private haveNewGrouping() {
+    let contextGrouping = this.context.getGroupDimensions();
+    if (contextGrouping.length !== this.groupDimensions.length) {
+      return true;
+    } else {
+      for (let i = 0; i < this.groupDimensions.length; i++) {
+        if (this.groupDimensions[i] !== contextGrouping[i]) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }

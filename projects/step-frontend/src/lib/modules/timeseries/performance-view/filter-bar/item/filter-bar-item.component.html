@@ -5,7 +5,7 @@
   #matTrigger="matMenuTrigger"
   (menuOpened)="onMenuOpen(); focusables.scheduleRefocus()"
 >
-  <div class="filter-label">{{ item.label || 'Not Specified' }}</div>
+  <div class="filter-label">{{ item.label || 'Unspecified' }}</div>
   <div class="filter-value">{{ formattedValue || '-' }}</div>
 
   <div (click)="onRemoveItem.emit()" class="remove-btn" *ngIf="removable">
@@ -60,7 +60,7 @@
 
       <mat-form-field class="w-100">
         <mat-label>Search value</mat-label>
-        <input type="text" autocomplete="off" matInput name="textValue" [(ngModel)]="item.textValue" stepFocusable />
+        <input type="text" autocomplete="off" matInput name="textValue" [(ngModel)]="freeTextValue" stepFocusable />
       </mat-form-field>
 
       <button
@@ -93,12 +93,12 @@
 
       <mat-form-field class="w-100">
         <mat-label>Min</mat-label>
-        <input type="number" matInput name="min" [(ngModel)]="item.min" stepFocusable />
+        <input type="number" matInput name="min" [(ngModel)]="minValue" stepFocusable />
       </mat-form-field>
 
       <mat-form-field class="w-100">
         <mat-label>Max</mat-label>
-        <input type="number" matInput name="max" [(ngModel)]="item.max" stepFocusable />
+        <input type="number" matInput name="max" [(ngModel)]="maxValue" stepFocusable />
       </mat-form-field>
 
       <button

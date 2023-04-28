@@ -23,7 +23,7 @@
     <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.DATE)">Date Filter</button>
   </mat-menu>
 
-  <div class="applied-filters">
+  <div class="applied-filters" [style]="oqlModeActive ? 'overflow: unset' : ''">
     <step-timeseries-grouping (onGroupingChange)="handleGroupingChange($event)"></step-timeseries-grouping>
     <ng-container *ngIf="!oqlModeActive">
       <step-ts-filter-bar-item
@@ -32,7 +32,7 @@
         [item]="item"
         [removable]="item.removable"
         (onRemoveItem)="removeFilterItem(i)"
-        (onFilterChange)="handleFilterChange()"
+        (onFilterChange)="handleFilterChange(i, $event)"
       >
       </step-ts-filter-bar-item>
       <div class="more-btn-container" [matMenuTriggerFor]="typesMenu">

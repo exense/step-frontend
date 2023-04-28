@@ -9,11 +9,7 @@ export class PerformanceViewConfig {
     {
       label: 'Avg',
       mapFunction: (b: BucketResponse) => {
-        if (b.count <= 0) {
-          b.count = 1;
-        }
-        console.log(b.sum / b.count);
-        return b ? Math.round(b.sum / b.count) : undefined;
+        return b ? Math.round(b.sum / Math.max(b.count, 1)) : undefined;
       },
     },
     { label: 'Min', mapFunction: (b: BucketResponse) => b?.min },
