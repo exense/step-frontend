@@ -436,7 +436,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
           ],
         };
 
-        console.log(responseTimeSeries);
         this.currentChartsSettings[TsChartType.RESPONSE_TIME] = {
           title: TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${this.selectedResponseTimeMetric.label})`,
           xValues: timeLabels,

@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { ExecutionTimeSelection } from '../../time-selection/model/execution-time-selection';
 import { FindBucketsRequest } from '../../find-buckets-request';
 import { TimeSeriesUtils } from '../../time-series-utils';
 import { TSRangerComponent } from '../../ranger/ts-ranger.component';
@@ -11,7 +10,6 @@ import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.se
 import { PerformanceViewSettings } from '../model/performance-view-settings';
 import { Observable, Subject, takeUntil, tap } from 'rxjs';
 import { TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
-import { OQLBuilder } from '../../util/oql-builder';
 import { FilterUtils } from '../../util/filter-utils';
 
 @Component({
