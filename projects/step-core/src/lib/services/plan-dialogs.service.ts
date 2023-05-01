@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
-import { AugmentedPlansService, Plan } from '../client/step-client-module';
+import { AbstractArtefact, AugmentedPlansService, Plan } from '../client/step-client-module';
 import { a1Promise2Observable, AJS_MODULE, DialogsService } from '../shared';
 import { ExportDialogsService } from './export-dialogs.service';
 import { ImportDialogsService } from './import-dialogs.service';
@@ -11,6 +11,7 @@ import { EntityDialogsService } from '../modules/entity/services/entity-dialogs.
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { MatDialog } from '@angular/material/dialog';
 import { PlanCreateDialogComponent } from '../components/plan-create-dialog/plan-create-dialog.component';
+import { ThreadDistributionWizardDialogComponent } from '../components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 
 @Injectable({
   providedIn: 'root',
@@ -28,6 +29,10 @@ export class PlanDialogsService {
 
   createPlan(): Observable<any> {
     return this._matDialog.open(PlanCreateDialogComponent).afterClosed();
+  }
+
+  openThreadGroupDistributionWizard(artefact: AbstractArtefact): Observable<AbstractArtefact | undefined> {
+    return this._matDialog.open(ThreadDistributionWizardDialogComponent, { data: artefact }).afterClosed();
   }
 
   selectPlan(): Observable<Plan> {

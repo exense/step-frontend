@@ -97,6 +97,7 @@ export * from './shared/project-info.interface';
 export * from './shared/screen-width.token';
 export * from './shared/is-small-screen.token';
 export * from './shared/resize-observable';
+export * from './shared/time-unit.enum';
 export * from './directives/element-ref-map.directive';
 export * from './directives/width-expanders.directive';
 export * from './directives/label.directive';
