@@ -258,6 +258,7 @@ export { SplitGutterComponent } from './components/split-gutter/split-gutter.com
 export { SplitComponent } from './components/split/split.component';
 export { UploadContainerComponent } from './components/upload-container/upload-container.component';
 export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
+export * from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';
