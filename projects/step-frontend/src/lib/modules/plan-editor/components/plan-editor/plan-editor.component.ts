@@ -218,7 +218,6 @@ export class PlanEditorComponent
     const NO_DATA = 'NO_DATA';
 
     if (isPlan) {
-      // TODO check
       this._planApi
         .lookupPlan(this.id!, artefact!.id!)
         .pipe(
