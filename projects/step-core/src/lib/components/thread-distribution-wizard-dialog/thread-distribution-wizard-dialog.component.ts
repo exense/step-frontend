@@ -16,11 +16,11 @@ const calculateValues = (value: DistributionFormValue = {}) => {
 
   const { iterations, iterationsPerUnit, duration, durationUnit } = value;
   const realDuration = (duration ?? 0) * (durationUnit ?? 0);
-  if (!realDuration || !iterations) {
+  if (!realDuration || !iterationsPerUnit) {
     return { threadsNum, pacing, isCalculationValid };
   }
-  threadsNum = Math.ceil(iterationsPerUnit! / realDuration! / iterations!);
-  pacing = iterationsPerUnit! / (iterations! / threadsNum);
+  threadsNum = Math.ceil((iterations ?? 0) / (iterationsPerUnit! / realDuration!));
+  pacing = parseFloat((iterationsPerUnit! / (iterations! / threadsNum)).toFixed(2));
   isCalculationValid = pacing > realDuration;
   return { threadsNum, pacing, isCalculationValid };
 };
