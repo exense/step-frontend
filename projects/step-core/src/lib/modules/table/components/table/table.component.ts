@@ -14,6 +14,7 @@ import {
   TemplateRef,
   TrackByFunction,
   ViewChild,
+  ViewEncapsulation,
 } from '@angular/core';
 import { BehaviorSubject, combineLatest, map, Observable, of, startWith, Subject, takeUntil } from 'rxjs';
 import { TableDataSource } from '../../shared/table-data-source';
@@ -47,6 +48,7 @@ export type DataSource<T> = TableDataSource<T> | T[] | Observable<T[]>;
   selector: 'step-table',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
+  encapsulation: ViewEncapsulation.None,
   providers: [
     {
       provide: TableSearch,
