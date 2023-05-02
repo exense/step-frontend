@@ -37,6 +37,7 @@
     </div>
     <ng-container *ngIf="_planEditService.plan$ | async as plan">
       <step-plan-editor-actions
+        [showExecuteButton]="showExecuteButton"
         [hasUndo]="_planEditService.hasUndo$ | async"
         [hasRedo]="_planEditService.hasRedo$ | async"
         [isInteractiveSessionActive]="_interactiveSession.isActive$ | async"
