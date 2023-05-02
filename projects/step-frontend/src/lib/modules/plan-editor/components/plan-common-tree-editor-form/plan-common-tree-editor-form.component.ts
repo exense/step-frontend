@@ -21,6 +21,7 @@ import {
 import { BehaviorSubject, filter, map, merge, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
+import { PlanEditorApiService } from '../../injectables/plan-editor-api.service';
 
 const MESSAGE_ADD_AT_MULTIPLE_NODES =
   'Adding elements is not supported when more then one node is selected in the tree';
@@ -32,6 +33,7 @@ const MESSAGE_ADD_AT_MULTIPLE_NODES =
 })
 export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanEditorStrategy, OnInit, OnDestroy {
   private _planEditor = inject(PlanEditorService);
+  private _planEditorApi = inject(PlanEditorApiService);
   private _planApi = inject(PlansService);
   private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
   private _authService = inject(AuthService);
@@ -219,12 +221,12 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
 
     merge(planUpdateByTree$, planUpdateByEditor$, planUpdatedByHistory$)
       .pipe(
-        switchMap((plan) => this._planApi.savePlan(plan)),
+        switchMap((plan) => this._planEditorApi.savePlan(plan!)),
         takeUntil(this.terminator$)
       )
-      .subscribe((updatedPlan) => {
+      .subscribe(({ plan }) => {
         if (this.planInternal$.value) {
-          this.planInternal$.value.customFields = updatedPlan.customFields;
+          this.planInternal$.value.customFields = plan.customFields;
         }
       });
   }

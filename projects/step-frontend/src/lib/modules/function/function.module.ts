@@ -7,6 +7,7 @@ import {
   FunctionLinkDialogService,
   StepBasicsModule,
   StepCoreModule,
+  ViewRegistryService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { FunctionIconComponent } from './components/function-icon/function-icon.component';
@@ -20,6 +21,7 @@ import { FunctionTypeFilterComponent } from './components/function-type-filter/f
 import { FunctionTypeLabelPipe } from './pipes/function-type-label.pipe';
 import { FunctionDialogsService } from './services/function-dialogs.service';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
+import { CompositeFunctionEditorComponent } from './components/composite-function-editor/composite-function-editor.component';
 
 @NgModule({
   imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule],
@@ -32,6 +34,7 @@ import { PlanEditorModule } from '../plan-editor/plan-editor.module';
     FunctionTypeFilterComponent,
     FunctionPackageSearchComponent,
     FunctionPackageSelectionComponent,
+    CompositeFunctionEditorComponent,
   ],
   providers: [
     {
@@ -39,13 +42,14 @@ import { PlanEditorModule } from '../plan-editor/plan-editor.module';
       useExisting: FunctionDialogsService,
     },
   ],
-  exports: [FunctionListComponent, FunctionPackageSelectionComponent],
+  exports: [FunctionListComponent, FunctionPackageSelectionComponent, CompositeFunctionEditorComponent],
 })
 export class FunctionModule {
   constructor(
     _entityRegistry: EntityRegistry,
     _cellsRegistry: CustomCellRegistryService,
-    _searchCellsRegistry: CustomSearchCellRegistryService
+    _searchCellsRegistry: CustomSearchCellRegistryService,
+    _viewRegistry: ViewRegistryService
   ) {
     _entityRegistry.register('functions', 'Keyword', {
       icon: 'target',
@@ -68,5 +72,7 @@ export class FunctionModule {
       'st-table',
       FunctionPackageSelectionComponent
     );
+    _viewRegistry.registerView('functions', 'partials/functionList.html');
+    _viewRegistry.registerView('composites', 'partials/functions/compositeKeywordEditor.html');
   }
 }

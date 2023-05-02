@@ -31,8 +31,8 @@
 			<select ng-change="loadInitialFunction()" ng-model="function_.type" ng-options="option as functionTypeRegistry.getLabel(option) for option in getTypes()" class="form-control" />
 		</div>
 
-		<div class="panel panel-default" style="margin-top: 20px">
-			<div class="panel-body" ng-include="functionTypeRegistry.getForm(function_.type)" ></div>
+		<div class="panel panel-default" style="margin-top: 20px" ng-if="functionTypeRegistry.getForm(function_.type)">
+			<div class="panel-body" ng-include="functionTypeRegistry.getForm(function_.type)"></div>
 		</div>
 
 		<div class="panel panel-default" ng-show="!dialogConfig.lightForm">

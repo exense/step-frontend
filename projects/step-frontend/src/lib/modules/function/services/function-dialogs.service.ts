@@ -5,8 +5,10 @@ import {
   AJS_FUNCTION_DIALOGS_CONFIG,
   AJS_LOCATION,
   AugmentedKeywordsService,
-  DialogsService, EntityDialogsService,
+  DialogsService,
+  EntityDialogsService,
   ExportDialogsService,
+  FunctionLinkDialogService,
   ImportDialogsService,
   IsUsedByDialogService,
   UibModalHelperService,
@@ -17,7 +19,7 @@ import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
-export class FunctionDialogsService {
+export class FunctionDialogsService implements FunctionLinkDialogService {
   readonly defaultDialogConfig = this._functionDialogsConfig.getDefaultConfig();
 
   constructor(

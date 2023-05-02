@@ -92,6 +92,8 @@ export class PlanEditorComponent
   }
 
   @Input() id?: string;
+  @Input() showExecuteButton = true;
+
   selectedTab = 'controls';
   readonly isInteractiveSessionActive$ = this._interactiveSession.isActive$;
   planTypes$ = this._planApi.getArtefactTemplates().pipe(

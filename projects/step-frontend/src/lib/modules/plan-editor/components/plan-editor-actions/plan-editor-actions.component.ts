@@ -13,6 +13,7 @@ export class PlanEditorActionsComponent {
   @Input() isInteractiveSessionActive?: boolean | null;
   @Input() description?: string;
   @Input() repositoryObjectRef?: RepositoryObjectReference;
+  @Input() showExecuteButton?: boolean;
 
   @Output() discardAll = new EventEmitter<void>();
   @Output() undo = new EventEmitter<void>();
