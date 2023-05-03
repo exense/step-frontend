@@ -40,7 +40,7 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService {
     return this._keywordApi.cloneFunction(id).pipe(this.getPlan);
   }
 
-  createRepositoryObjectReference(id: string): RepositoryObjectReference | undefined {
+  createRepositoryObjectReference(id?: string): RepositoryObjectReference | undefined {
     return {
       repositoryID: 'local',
       repositoryParameters: {},

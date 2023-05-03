@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { PlanTypeRegistryService } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { ExecutionModule } from '../execution/execution.module';
-import { PlanEditorComponent } from './components/plan-editor/plan-editor.component';
+import { PlanEditorBaseComponent } from './components/plan-editor-base/plan-editor-base.component';
 import { PlanArtefactListComponent } from './components/plan-artefact-list/plan-artefact-list.component';
 import { PlanFunctionListComponent } from './components/plan-function-list/plan-function-list.component';
 import { PlanOtherplanListComponent } from './components/plan-otherplan-list/plan-otherplan-list.component';
@@ -11,7 +11,7 @@ import { PlanCommonTreeEditorFormComponent } from './components/plan-common-tree
 
 @NgModule({
   declarations: [
-    PlanEditorComponent,
+    PlanEditorBaseComponent,
     PlanArtefactListComponent,
     PlanFunctionListComponent,
     PlanOtherplanListComponent,
@@ -19,7 +19,7 @@ import { PlanCommonTreeEditorFormComponent } from './components/plan-common-tree
     PlanCommonTreeEditorFormComponent,
   ],
   imports: [StepCommonModule, ExecutionModule],
-  exports: [PlanEditorComponent, PlanCommonTreeEditorFormComponent],
+  exports: [PlanEditorBaseComponent, PlanCommonTreeEditorFormComponent],
 })
 export class PlanEditorModule {
   constructor(_planTypeRegistry: PlanTypeRegistryService) {

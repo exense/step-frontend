@@ -6,12 +6,12 @@ import { PlanIconComponent } from './components/plan-icon/plan-icon.component';
 import { PlanListComponent } from './components/plan-list/plan-list.component';
 import { PlanEditorKeyHandlerDirective } from './directives/plan-editor-key-handler.directive';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
-import { PurePlanEditorComponent } from './components/pure-plan-editor/pure-plan-editor.component';
+import { PlanEditorComponent } from './components/plan-editor/plan-editor.component';
 
 @NgModule({
-  declarations: [PlanListComponent, PlanIconComponent, PlanEditorKeyHandlerDirective, PurePlanEditorComponent],
+  declarations: [PlanListComponent, PlanIconComponent, PlanEditorKeyHandlerDirective, PlanEditorComponent],
   imports: [StepCommonModule, ExecutionModule, PlanEditorModule],
-  exports: [PlanEditorModule, PlanListComponent, PurePlanEditorComponent],
+  exports: [PlanEditorModule, PlanListComponent, PlanEditorComponent],
 })
 export class PlanModule {
   constructor(

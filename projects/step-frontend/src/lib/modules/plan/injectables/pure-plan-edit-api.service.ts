@@ -13,7 +13,7 @@ import {
 import { PlanEditorApiService } from '../../plan-editor/plan-editor.module';
 
 @Injectable()
-export class PurePlanEditApiServiceService implements PlanEditorApiService {
+export class PurePlanEditApiService implements PlanEditorApiService {
   private _$location = inject(AJS_LOCATION);
   private _planApi = inject(PlansService);
   private _interactiveApi = inject(AugmentedInteractivePlanExecutionService);
@@ -23,7 +23,7 @@ export class PurePlanEditApiServiceService implements PlanEditorApiService {
     return this._planApi.clonePlan(id);
   }
 
-  createRepositoryObjectReference(id: string): RepositoryObjectReference | undefined {
+  createRepositoryObjectReference(id?: string): RepositoryObjectReference | undefined {
     return !id
       ? undefined
       : {

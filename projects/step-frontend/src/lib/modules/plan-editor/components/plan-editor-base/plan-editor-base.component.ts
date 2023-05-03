@@ -42,9 +42,9 @@ import { PlanHistoryService } from '../../injectables/plan-history.service';
 import { PlanEditorApiService } from '../../injectables/plan-editor-api.service';
 
 @Component({
-  selector: 'step-plan-editor',
-  templateUrl: './plan-editor.component.html',
-  styleUrls: ['./plan-editor.component.scss'],
+  selector: 'step-plan-editor-base',
+  templateUrl: './plan-editor-base.component.html',
+  styleUrls: ['./plan-editor-base.component.scss'],
   encapsulation: ViewEncapsulation.None,
   providers: [
     ArtefactTreeNodeUtilsService,
@@ -61,15 +61,15 @@ import { PlanEditorApiService } from '../../injectables/plan-editor-api.service'
     InteractiveSessionService,
     {
       provide: PlanInteractiveSessionService,
-      useExisting: forwardRef(() => PlanEditorComponent),
+      useExisting: forwardRef(() => PlanEditorBaseComponent),
     },
     {
       provide: PlanArtefactResolverService,
-      useExisting: forwardRef(() => PlanEditorComponent),
+      useExisting: forwardRef(() => PlanEditorBaseComponent),
     },
   ],
 })
-export class PlanEditorComponent
+export class PlanEditorBaseComponent
   implements OnInit, OnChanges, OnDestroy, PlanInteractiveSessionService, PlanArtefactResolverService
 {
   readonly _interactiveSession = inject(InteractiveSessionService);
@@ -277,7 +277,7 @@ export class PlanEditorComponent
     });
   }
 
-  private loadPlan(id: string, preselectArtefact?: boolean): void {
+  private loadPlan(id?: string, preselectArtefact?: boolean): void {
     if (!id) {
       return;
     }
@@ -342,7 +342,6 @@ export class PlanEditorComponent
           // for some reason location change isn't enough for reopen editor
           // that's why the document reload was added
           // It should gone, after the route will be refactored
-          // TODO Check
           this._location.path(`/root/plans/editor/${planId}`);
           setTimeout(() => {
             this._document.location.reload();

@@ -10,7 +10,7 @@ export abstract class PlanEditorApiService {
   abstract getPlanHistory(id: string): Observable<History[]>;
   abstract restorePlanVersion(id: string, versionId: string): Observable<Plan>;
 
-  abstract createRepositoryObjectReference(id: string): RepositoryObjectReference | undefined;
+  abstract createRepositoryObjectReference(id?: string): RepositoryObjectReference | undefined;
   abstract executeArtefact(sessionId: string, id: string, artefactId: string): Observable<ReportNode>;
   abstract navigateToPlan(id: string): void;
 }
