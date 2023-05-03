@@ -42,6 +42,8 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       this._snackBar.open(error.errorName + ': ' + error.errorMessage, 'dismiss');
     } else if (error?.errorName || error?.errorMessage) {
       this._snackBar.open(error.errorName || error.errorMessage, 'dismiss');
+    } else if (error?.error && error?.text) {
+      this._snackBar.open(error.error + ': ' + error.text, 'dismiss');
     } else {
       this._snackBar.open(error, 'dismiss');
     }
