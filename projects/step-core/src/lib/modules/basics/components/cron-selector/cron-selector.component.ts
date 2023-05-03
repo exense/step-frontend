@@ -17,19 +17,17 @@ export class CronSelectorComponent implements OnDestroy {
 
   @Output() cronStringChange = new EventEmitter<string | undefined>();
 
-  readonly cronControl: FormControl;
-
-  constructor(formBuilder: FormBuilder) {
-    this.cronControl = formBuilder.control('');
-  }
-
   applyPreset(cronString: string) {
     this.cronString = cronString;
-    this.cronStringChange.emit(cronString);
+    this.valueChange();
   }
 
   ngOnDestroy(): void {
     this.terminator$.next();
     this.terminator$.complete();
+  }
+
+  valueChange() {
+    this.cronStringChange.emit(this.cronString);
   }
 }

@@ -1,6 +1,6 @@
 <step-form-field>
   <step-label *ngIf="label">{{ label }}</step-label>
-  <input [ngModel]="cronString" [formControl]="cronControl" />
+  <input [(ngModel)]="cronString" (change)="valueChange()" />
   <step-suffix class="button-suffix">
     <button class="btn btn-primary preset-button" mat-button [matMenuTriggerFor]="menu">
       Presets <span class="caret"></span>
