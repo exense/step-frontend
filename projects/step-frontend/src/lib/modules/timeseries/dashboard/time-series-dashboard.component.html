@@ -5,8 +5,9 @@
     class="mat-card"
     [performanceViewSettings]="performanceViewSettings"
     [defaultFilterOptions]="settings.filterOptions"
-    [activeFilters]="contextualFilterItems"
+    [hiddenFilters]="contextualFilterItems"
     (onFiltersChange)="handleFiltersChange($event)"
+    (onFilterSettingsChange)="handleFilteringChange($event)"
     (onGroupingChange)="handleGroupingChange($event)"
   >
   </step-ts-filter-bar>

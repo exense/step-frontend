@@ -1,10 +1,10 @@
 <step-table
- #tableRef
- [dataSource]="dataSource"
- matSort
- matSortActive="startTime"
- matSortDirection="desc"
- [matSortDisableClear]="true"
+  #tableRef
+  [dataSource]="dataSource"
+  matSort
+  matSortActive="startTime"
+  matSortDirection="desc"
+  [matSortDisableClear]="true"
 >
   <ng-container *stepAdditionalHeader>
     <step-bulk-operations *ngIf="multipleSelection"></step-bulk-operations>

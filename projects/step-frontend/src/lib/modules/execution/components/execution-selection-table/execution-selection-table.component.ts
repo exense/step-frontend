@@ -1,10 +1,16 @@
 import { Component, inject, ViewChild } from '@angular/core';
 import {
   AugmentedExecutionsService,
-  AutoDeselectStrategy, BaseEntitySelectionTableComponent,
+  AutoDeselectStrategy,
+  BaseEntitySelectionTableComponent,
   DateFormat,
-  Execution, FilterConditionFactoryService, FunctionPackage, SearchColDirective,
-  selectionCollectionProvider, SelectionCollector, TableComponent
+  Execution,
+  FilterConditionFactoryService,
+  FunctionPackage,
+  SearchColDirective,
+  selectionCollectionProvider,
+  SelectionCollector,
+  TableComponent,
 } from '@exense/step-core';
 import { DateTime } from 'luxon';
 
@@ -12,13 +18,13 @@ import { DateTime } from 'luxon';
   selector: 'step-execution-selection-table',
   templateUrl: './execution-selection-table.component.html',
   styleUrls: ['./execution-selection-table.component.scss'],
-  providers: [selectionCollectionProvider<string, Execution>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)]
+  providers: [selectionCollectionProvider<string, Execution>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
 })
 export class ExecutionSelectionTableComponent extends BaseEntitySelectionTableComponent {
   private _filterConditionFactory = inject(FilterConditionFactoryService);
   protected _selectionCollector = inject(SelectionCollector<string, Execution>);
 
-  @ViewChild('tableRef', {read: TableComponent})
+  @ViewChild('tableRef', { read: TableComponent })
   protected _tableRef?: TableComponent<FunctionPackage>;
   protected dataSource = inject(AugmentedExecutionsService).getExecutionsTableDataSource();
   readonly DateFormat = DateFormat;

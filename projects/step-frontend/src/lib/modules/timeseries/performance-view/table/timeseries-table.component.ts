@@ -4,8 +4,7 @@ import {
   BucketResponse,
   TableDataSource,
   TableLocalDataSource,
-  TableLocalDataSourceConfig,
-  TimeSeriesAPIResponse,
+  TableLocalDataSourceConfig, TimeSeriesAPIResponse
 } from '@exense/step-core';
 import { Subject } from 'rxjs';
 import { TimeSeriesKeywordsContext } from '../../execution-page/time-series-keywords.context';
@@ -89,7 +88,10 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     if (Object.keys(attributes).length === 0) {
       return '<empty>';
     }
-    return groupDimensions.map((field) => attributes[field]).join(' | ');
+    return groupDimensions
+      .map((field) => attributes[field])
+      .map((x) => (x ? x : '<empty>'))
+      .join(' | ');
   }
 
   getDatasourceConfig(): TableLocalDataSourceConfig<BucketResponse> {
