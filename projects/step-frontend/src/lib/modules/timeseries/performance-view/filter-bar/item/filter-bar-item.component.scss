@@ -1,22 +1,21 @@
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-frontend/styles/common-mixins' as common-mixins;
+@include common-mixins.ts-filter-bar();
 
 :host {
   background: var.$gray-100;
   color: #293e50;
   padding: 2px;
-  border-radius: 0px;
-  box-shadow: 0px 0px 9px -3px #818181;
+  border-radius: 4px;
 }
 
-.item-container {
-  cursor: pointer;
-  padding: 0 14px;
-  max-width: 160px;
-  min-width: 84px;
-  position: relative;
+.filter-item-container {
+  &.active {
+    background: #fff;
+  }
 
   .filter-label {
-    font-size: 14px;
+    font-size: 12px;
     opacity: 0.7;
     white-space: nowrap;
     overflow: hidden;
@@ -24,7 +23,7 @@
   }
 
   .filter-value {
-    font-size: 12px;
+    font-size: 11px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -71,10 +70,19 @@ label {
   padding-bottom: 1.25em;
 }
 
+.item-header {
+  width: 100%;
+  border-bottom: 1px solid var.$gray-200;
+  padding-bottom: 8px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
 .checkboxes {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px;
+  font-size: 12px;
 }
 
 .date-filters {

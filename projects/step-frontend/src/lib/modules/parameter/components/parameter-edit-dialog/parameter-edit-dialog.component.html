@@ -1,0 +1,50 @@
+<step-modal-window [title]="modalTitle">
+  <div step-modal-window-body>
+    <ng-container *ngIf="parameter">
+      <section class="param-scope">
+        <step-form-field class="scope-field">
+          <mat-select
+            [ngClass]="selectedScope?.cssClass"
+            [ngModel]="selectedScope"
+            (ngModelChange)="selectScope($event)"
+          >
+            <mat-option *ngFor="let item of scopeItems; trackBy: trackByScopeItem" [value]="item">
+              <div class="scope-item">
+                <step-icon [name]="item.icon" [ngClass]="item.spanCssClass"> </step-icon>
+                {{ item.label }}
+              </div>
+            </mat-option>
+          </mat-select>
+        </step-form-field>
+        <step-standard-custom-form-inputs
+          *ngIf="parameter.scope === 'APPLICATION'"
+          class="scope-entity"
+          stScreen="functionTable"
+          stInputId="attributes.application"
+          [(ngModel)]="parameter.scopeEntity"
+          hint="The name of the application this parameter is restricted to"
+          [hideLabel]="true"
+        >
+        </step-standard-custom-form-inputs>
+        <step-form-field class="scope-entity" *ngIf="parameter.scope === 'FUNCTION'">
+          <input type="text" [(ngModel)]="parameter.scopeEntity" />
+          <step-suffix class="icon-suffix">
+            <step-icon name="help-circle" matTooltip="The name of the Keyword this parameter is restricted to">
+            </step-icon>
+          </step-suffix>
+        </step-form-field>
+      </section>
+      <step-custom-forms [(stModel)]="parameter" stScreen="parameterDialog"> </step-custom-forms>
+      <section class="last-modification" *ngIf="parameter.lastModificationDate">
+        <label>Last modification</label>
+        <span
+          >{{ parameter.lastModificationDate | date: DateFormat.date }} by {{ parameter.lastModificationUser }}</span
+        >
+      </section>
+    </ng-container>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
+    <button type="button" mat-flat-button color="primary" (click)="save()">Save</button>
+  </div>
+</step-modal-window>

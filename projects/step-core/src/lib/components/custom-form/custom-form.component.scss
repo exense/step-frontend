@@ -1,6 +1,10 @@
 :host {
   display: flex;
-  gap: 0.8rem;
+  gap: 1.5rem;
+
+  &.editable-label-mode {
+    gap: 0.8rem;
+  }
 
   &:not(.inline) {
     flex-direction: column;

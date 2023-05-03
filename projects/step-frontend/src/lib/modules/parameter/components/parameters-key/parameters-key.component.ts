@@ -1,7 +1,7 @@
 import { Component, Optional } from '@angular/core';
 import { CustomColumnOptions, CustomComponent, Parameter, TableReload } from '@exense/step-core';
 import { map, of } from 'rxjs';
-import { ParameterDialogsService } from '../services/parameter-dialogs.service';
+import { ParameterDialogsService } from '../../services/parameter-dialogs.service';
 
 @Component({
   selector: 'step-parameters-key',
@@ -25,8 +25,8 @@ export class ParametersKeyComponent implements CustomComponent {
     if (!this.context) {
       return;
     }
-    this._parameterDialogs.editParameter(this.context).subscribe(() => {
-      if (this._tableReload) {
+    this._parameterDialogs.editParameter(this.context).subscribe((parameter) => {
+      if (this._tableReload && parameter) {
         this._tableReload.reload();
       }
     });

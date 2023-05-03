@@ -5,6 +5,8 @@ import { Execution } from '@exense/step-core';
 import { TSTimeRange } from './chart/model/ts-time-range';
 import { TsFilterItem } from './performance-view/filter-bar/model/ts-filter-item';
 import { TimeSeriesContextParams } from './time-series-context-params';
+import { TsFilteringMode } from './model/ts-filtering-mode';
+import { TsFilteringSettings } from './model/ts-filtering-settings';
 
 /**
  * This class is responsible for managing the state of an execution tab. Here we store time selection, colors, filters, etc.
@@ -12,6 +14,7 @@ import { TimeSeriesContextParams } from './time-series-context-params';
 export class TimeSeriesContext {
   id!: string;
   activeExecution: Execution | undefined;
+  filteringMode: TsFilteringMode = TsFilteringMode.STANDARD;
 
   inProgress$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
@@ -24,6 +27,7 @@ export class TimeSeriesContext {
 
   private readonly baseFilters: { [key: string]: any }; // these are usually the contextual filters (e.g execution id, task id, etc)
   private readonly activeFilters$: BehaviorSubject<TsFilterItem[]>;
+  private readonly filterSettings$: BehaviorSubject<TsFilteringSettings>;
 
   public readonly keywordsContext: TimeSeriesKeywordsContext;
   private readonly colorsPool: TimeseriesColorsPool;
@@ -34,6 +38,12 @@ export class TimeSeriesContext {
     this.selectedTimeRange = params.timeRange;
     this.baseFilters = params.baseFilters;
     this.activeFilters$ = new BehaviorSubject(params.dynamicFilters || []);
+    this.filterSettings$ = new BehaviorSubject<TsFilteringSettings>({
+      mode: TsFilteringMode.STANDARD,
+      oql: '',
+      baseFilters: params.baseFilters,
+      filterItems: params.dynamicFilters || [],
+    });
     this.activeGroupings$ = new BehaviorSubject(params.grouping);
     this.colorsPool = new TimeseriesColorsPool();
     this.keywordsContext = new TimeSeriesKeywordsContext(this.colorsPool);
@@ -45,6 +55,7 @@ export class TimeSeriesContext {
     this.selectedTimeRangeChange$.complete();
     this.activeGroupings$.complete();
     this.activeFilters$.complete();
+    this.filterSettings$.complete();
   }
 
   setInProgress(inProgress: boolean) {
@@ -52,7 +63,7 @@ export class TimeSeriesContext {
   }
 
   getBaseFilters(): { [key: string]: any } {
-    return this.baseFilters;
+    return this.getFilteringSettings().baseFilters;
   }
 
   getDynamicFilters(): TsFilterItem[] {
@@ -97,6 +108,18 @@ export class TimeSeriesContext {
     return this.selectedTimeRange;
   }
 
+  setFilteringMode(mode: TsFilteringMode): void {
+    this.filteringMode = mode;
+  }
+
+  setFilteringSettings(settings: TsFilteringSettings): void {
+    this.filterSettings$.next(settings);
+  }
+
+  getFilteringSettings(): TsFilteringSettings {
+    return this.filterSettings$.getValue();
+  }
+
   resetZoom() {
     if (JSON.stringify(this.selectedTimeRange) === JSON.stringify(this.fullTimeRange)) {
       // return; // this is causing some issues in the ranger. it's selection get 0 width, so better keep it like this for now.
@@ -124,7 +147,11 @@ export class TimeSeriesContext {
     return this.activeFilters$.asObservable().pipe(skip(1));
   }
 
-  updateActiveFilters(items: TsFilterItem[]) {
+  onFilteringChange(): Observable<TsFilteringSettings> {
+    return this.filterSettings$.asObservable().pipe(skip(1));
+  }
+
+  updateActiveFilters(items: TsFilterItem[]): void {
     this.activeFilters$.next(items);
   }
 

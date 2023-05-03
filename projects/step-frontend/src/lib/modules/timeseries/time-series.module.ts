@@ -22,6 +22,7 @@ import { TimeSeriesDashboardComponent } from './dashboard/time-series-dashboard.
 import { TsGroupingComponent } from './dashboard/grouping/ts-grouping.component';
 import { AnalyticsPageComponent } from './analytics/analytics-page.component';
 import { ExecutionPerformanceComponent } from './execution-page/ts-execution-page.component';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,14 @@ import { ExecutionPerformanceComponent } from './execution-page/ts-execution-pag
     ExecutionPerformanceComponent,
   ],
   exports: [ExecutionPerformanceComponent, SyntheticMonitoringPageComponent, AnalyticsPageComponent],
-  imports: [StepCoreModule, TableModule, FormsModule, MatTableModule, CommonModule, MatDatepickerModule],
+  imports: [
+    StepCoreModule,
+    TableModule,
+    FormsModule,
+    MatTableModule,
+    CommonModule,
+    MatDatepickerModule,
+    MatButtonToggleModule,
+  ],
 })
 export class TimeSeriesModule {}
