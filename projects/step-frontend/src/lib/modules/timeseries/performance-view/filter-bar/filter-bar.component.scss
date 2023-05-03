@@ -1,6 +1,6 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
-:host {
+step-ts-filter-bar {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -29,7 +29,7 @@
   .filters {
     display: flex;
     gap: 12px;
-    padding: 16px 20px 0;
+    padding: 12px;
     align-items: center;
   }
 
