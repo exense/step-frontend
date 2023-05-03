@@ -10,6 +10,7 @@ import {
   QueryList,
   ViewChild,
   ViewChildren,
+  ViewEncapsulation,
 } from '@angular/core';
 import { debounceTime, Observable, Subject, take } from 'rxjs';
 import { TimeSeriesContext } from '../../time-series-context';
@@ -28,6 +29,7 @@ import { TsFilteringMode } from '../../model/ts-filtering-mode';
   selector: 'step-ts-filter-bar',
   templateUrl: './filter-bar.component.html',
   styleUrls: ['./filter-bar.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class FilterBarComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
