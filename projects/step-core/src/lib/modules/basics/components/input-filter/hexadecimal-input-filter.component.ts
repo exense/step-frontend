@@ -10,11 +10,7 @@ const HEXADECIMAL_REGEXP = /^[0-9a-f]{24}$/;
   styleUrls: ['./input-filter.component.scss'],
 })
 export class HexadecimalInputFilterComponent extends InputFilterComponent {
-  constructor(formBuilder: FormBuilder) {
-    super(formBuilder);
-  }
-
-  protected override createControl(): FormControl {
-    return this.formBuilder.control('', Validators.pattern(HEXADECIMAL_REGEXP));
+  protected override createControl(fb: FormBuilder): FormControl<string> {
+    return fb.nonNullable.control('', Validators.pattern(HEXADECIMAL_REGEXP));
   }
 }

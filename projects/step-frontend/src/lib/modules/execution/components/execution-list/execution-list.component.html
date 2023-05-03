@@ -19,13 +19,23 @@
       <a href="#/root/executions/{{ element.id }}">{{ element?.description }}</a>
     </td>
   </ng-container>
-  <ng-container matColumnDef="startTime" stepSearchCol #searchStartTime="SearchCol">
-    <step-date-filter *stepSearchCellDef (dateChanged)="searchByDate(searchStartTime, $event)"></step-date-filter>
+  <ng-container matColumnDef="startTime" stepSearchCol>
+    <step-date-filter
+      *stepSearchCellDef
+      stepFilterConnect
+      [createConditionFn]="_filterConditionFactory.singleDateFilterCondition"
+    >
+    </step-date-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Start time</th>
     <td mat-cell *matCellDef="let element">{{ element?.startTime | date: DateFormat.date }}</td>
   </ng-container>
-  <ng-container matColumnDef="endTime" stepSearchCol #searchEndTime="SearchCol">
-    <step-date-filter *stepSearchCellDef (dateChanged)="searchByDate(searchEndTime, $event)"></step-date-filter>
+  <ng-container matColumnDef="endTime" stepSearchCol>
+    <step-date-filter
+      *stepSearchCellDef
+      stepFilterConnect
+      [createConditionFn]="_filterConditionFactory.singleDateFilterCondition"
+    >
+    </step-date-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>End time</th>
     <td mat-cell *matCellDef="let element">{{ element?.endTime | date: DateFormat.date }}</td>
   </ng-container>
@@ -34,24 +44,16 @@
     <td mat-cell *matCellDef="let element">{{ element?.executionParameters?.userID }}</td>
   </ng-container>
   <step-custom-columns screen="executionTable"> </step-custom-columns>
-  <ng-container matColumnDef="status" stepSearchCol #searchStatus="SearchCol">
-    <step-array-filter
-      *stepSearchCellDef
-      [items]="(statusItems$ | async)!"
-      (selectedItemsChange)="searchStatus.search($event, true)"
-    >
+  <ng-container matColumnDef="status" stepSearchCol>
+    <step-array-filter *stepSearchCellDef stepFilterConnect [useRegex]="true" [items]="(statusItems$ | async)!">
     </step-array-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
     <td mat-cell *matCellDef="let element">
       <step-status [status]="element?.status"></step-status>
     </td>
   </ng-container>
-  <ng-container matColumnDef="result" stepSearchCol #searchResult="SearchCol">
-    <step-array-filter
-      *stepSearchCellDef
-      [items]="(resultItems$ | async)!"
-      (selectedItemsChange)="searchResult.search($event, true)"
-    >
+  <ng-container matColumnDef="result" stepSearchCol>
+    <step-array-filter *stepSearchCellDef stepFilterConnect [useRegex]="true" [items]="(resultItems$ | async)!">
     </step-array-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Result</th>
     <td mat-cell *matCellDef="let element">

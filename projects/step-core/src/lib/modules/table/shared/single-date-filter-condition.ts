@@ -2,22 +2,25 @@ import { FilterCondition } from './filter-condition';
 import { TableRequestFilter, TableCollectionFilter } from '../../../client/step-client-module';
 import { DateTime } from 'luxon';
 import { CompareCondition } from '../../basics/shared/compare-condition.enum';
+import { FilterConditionType } from './filter-condition-type.enum';
 
-export class SingleDateFilterCondition extends FilterCondition {
-  constructor(private date?: DateTime) {
-    super();
+export class SingleDateFilterCondition extends FilterCondition<DateTime> {
+  readonly filterConditionType = FilterConditionType.SINGLE_DATE;
+
+  constructor(dateOrString?: DateTime | string) {
+    super(typeof dateOrString === 'string' ? DateTime.fromISO(dateOrString) : dateOrString);
   }
 
   override isEmpty(): boolean {
-    return !this.date;
+    return !this.sourceObject;
   }
 
   override toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
-    if (!this.date) {
+    if (!this.sourceObject) {
       return [];
     }
 
-    const dateFrom = this.date.toLocal().set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+    const dateFrom = this.sourceObject.toLocal().set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
 
     const dateTo = dateFrom.plus({ day: 1 });
 

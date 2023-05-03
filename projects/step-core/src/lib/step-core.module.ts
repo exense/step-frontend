@@ -298,7 +298,6 @@ export * from './services/invoke-run.service';
 export { IsUsedByDialogService } from './services/is-used-by-dialog.service';
 export * from './services/link-processor.service';
 export * from './services/menu-items-override-config.service';
-export * from './services/persistence.service';
 export * from './services/plan-artefact-resolver.service';
 export { PlanDialogsService } from './services/plan-dialogs.service';
 export * from './services/plan-by-id-cache.service';
@@ -313,4 +312,3 @@ export { UibModalHelperService, UibModalInstance } from './services/uib-modal-he
 export * from './services/view-registry.service';
 export * from './services/view-state.service';
 export * from './shared';
-export * from './shared/persistence-tokens';

@@ -132,7 +132,7 @@
       <div class="date-filters">
         <step-date-filter
           label="From"
-          (dateChanged)="onMinDateChanged($event)"
+          (filterChange)="onMinDateChanged($event)"
           #from="stepDateFilter"
           stepFocusable
           [defaultSpace]="false"
@@ -142,7 +142,7 @@
 
         <step-date-filter
           label="To"
-          (dateChanged)="onMaxDateChanged($event)"
+          (filterChange)="onMaxDateChanged($event)"
           #to="stepDateFilter"
           stepFocusable
           [defaultSpace]="false"

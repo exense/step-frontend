@@ -13,7 +13,8 @@ export class FunctionTypeFilterComponent extends ArrayFilterComponent implements
 
   functionTypes: { key: string; value: string }[] = [];
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     const keys = this._functionTypeRegistry.getTypes() as string[];
     this.functionTypes = keys.map((key) => {
       const value = this._functionTypeRegistry.getLabel(key);

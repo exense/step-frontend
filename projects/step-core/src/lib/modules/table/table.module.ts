@@ -18,6 +18,8 @@ import { AsyncOperationsModule } from '../async-operations/async-operations.modu
 import { BulkOperationLabelPipe } from './pipe/bulk-operation-label.pipe';
 import { CustomSearchCellComponentsPipe } from './pipe/custom-search-cell-components.pipe';
 import { StepBasicsModule } from '../basics/step-basics.module';
+import { SearchColMetaDirective } from './directives/search-col-meta.directive';
+import { FilterConnectDirective } from './directives/filter-connect.directive';
 
 @NgModule({
   imports: [
@@ -42,6 +44,8 @@ import { StepBasicsModule } from '../basics/step-basics.module';
     BulkOperationIconPipe,
     BulkOperationLabelPipe,
     CustomSearchCellComponentsPipe,
+    SearchColMetaDirective,
+    FilterConnectDirective,
   ],
   exports: [
     TableComponent,
@@ -51,6 +55,7 @@ import { StepBasicsModule } from '../basics/step-basics.module';
     ColumnDirective,
     AdditionalHeaderDirective,
     BulkOperationsComponent,
+    FilterConnectDirective,
   ],
   providers: [TitleCasePipe],
 })
@@ -69,6 +74,7 @@ export * from './services/table-reload';
 export * from './services/table-legacy-utils.service';
 export * from './directives/search-col.directive';
 export * from './directives/search-cell-def.directive';
+export * from './directives/filter-connect.directive';
 export * from './services/custom-column-options';
 export * from './directives/additional-header.directive';
 export * from './components/bulk-operations/bulk-operations.component';
@@ -79,4 +85,8 @@ export * from './pipe/bulk-operation-icon.pipe';
 export * from './shared/filter-condition';
 export * from './shared/legacy-table-handle.interface';
 export * from './shared/table-local-data-source-config';
+export * from './shared/search-column.interface';
 export * from './services/filter-condition-factory.service';
+export * from './shared/table-persistence-config';
+export * from './services/table-persistence-config.provider';
+export * from './shared/search-column-accessor';

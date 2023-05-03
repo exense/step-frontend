@@ -1,14 +1,17 @@
 import { FilterCondition } from './filter-condition';
 import { TableCollectionFilter, TableRequestFilter } from '../../../client/step-client-module';
 import { CompareCondition } from '../../basics/step-basics.module';
+import { FilterConditionType } from './filter-condition-type.enum';
 
-export class DynamicValueFilterCondition extends FilterCondition {
-  constructor(private searchValue?: string) {
-    super();
+export class DynamicValueFilterCondition extends FilterCondition<string> {
+  readonly filterConditionType = FilterConditionType.DYNAMIC_VALUE;
+
+  constructor(searchValue?: string) {
+    super(searchValue);
   }
 
   toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
-    if (!this.searchValue) {
+    if (!this.sourceObject) {
       return [];
     }
 
@@ -27,7 +30,7 @@ export class DynamicValueFilterCondition extends FilterCondition {
               {
                 type: CompareCondition.REGEX,
                 field: `${field}.value`,
-                expression: this.searchValue,
+                expression: this.sourceObject,
                 caseSensitive: false,
               },
             ],
@@ -43,7 +46,7 @@ export class DynamicValueFilterCondition extends FilterCondition {
               {
                 type: CompareCondition.REGEX,
                 field: `${field}.expression`,
-                expression: this.searchValue,
+                expression: this.sourceObject,
                 caseSensitive: false,
               },
             ],
@@ -56,6 +59,6 @@ export class DynamicValueFilterCondition extends FilterCondition {
   }
 
   override isEmpty(): boolean {
-    return !this.searchValue;
+    return !this.sourceObject;
   }
 }

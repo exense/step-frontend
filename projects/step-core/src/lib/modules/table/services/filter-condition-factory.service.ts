@@ -10,6 +10,8 @@ import { BasicFilterCondition } from '../shared/basic-filter-condition';
 import { TableRequestFilter } from '../../../client/step-client-module';
 import { DynamicValueFilterCondition } from '../shared/dynamic-value-filter-condition';
 import { ParametersFilterCondition } from '../shared/parameters-filter-condition';
+import { FilterConditionJson } from '../shared/filter-condition-json.interface';
+import { FilterConditionType } from '../shared/filter-condition-type.enum';
 
 @Injectable({
   providedIn: 'root',
@@ -43,5 +45,29 @@ export class FilterConditionFactoryService {
 
   parametersFilterCondition(value?: string): FilterCondition {
     return new ParametersFilterCondition(this._parameters, value);
+  }
+
+  create(filterCondition?: FilterConditionJson): FilterCondition | undefined {
+    switch (filterCondition?.filterConditionType) {
+      case FilterConditionType.BASIC:
+        return this.basicFilterCondition(filterCondition?.sourceObject?.filters);
+      case FilterConditionType.DYNAMIC_VALUE:
+        return this.dynamicValueFilterCondition(filterCondition?.sourceObject);
+      case FilterConditionType.NUM:
+        return this.numberFilterCondition(filterCondition?.sourceObject);
+      case FilterConditionType.PARAMETERS:
+        return this.parametersFilterCondition(filterCondition?.sourceObject?.searchValue);
+      case FilterConditionType.REPORT_NODE:
+        return this.reportNodeFilterCondition(
+          filterCondition?.sourceObject?.searchValue,
+          filterCondition?.sourceObject?.attributeValues
+        );
+      case FilterConditionType.SCOPE:
+        return this.scopeFilterCondition(filterCondition?.sourceObject);
+      case FilterConditionType.SINGLE_DATE:
+        return this.singleDateFilterCondition(filterCondition?.sourceObject);
+      default:
+        return undefined;
+    }
   }
 }

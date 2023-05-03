@@ -28,7 +28,7 @@
     <step-array-filter
       *stepSearchCellDef
       [items]="['functions', 'datasource']"
-      (selectedItemsChange)="searchResourceType.search($event, true)"
+      (filterChange)="searchResourceType.search($event, true)"
     >
     </step-array-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>

@@ -1,46 +1,45 @@
-import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, ValidatorFn } from '@angular/forms';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { DateTime } from 'luxon';
-import { debounceTime, map, Subject, takeUntil } from 'rxjs';
+import { debounceTime, map, Observable } from 'rxjs';
+import { BaseFilterComponent } from '../base-filter/base-filter.component';
 
 @Component({
   selector: 'step-date-filter',
   templateUrl: './date-filter.component.html',
   styleUrls: ['./date-filter.component.scss'],
+  providers: [
+    {
+      provide: BaseFilterComponent,
+      useExisting: forwardRef(() => DateFilterComponent),
+    },
+  ],
   exportAs: 'stepDateFilter',
 })
-export class DateFilterComponent implements OnInit, OnDestroy {
-  private terminator$ = new Subject<void>();
-
+export class DateFilterComponent extends BaseFilterComponent<DateTime | undefined, DateTime | null> {
   @Input() label?: string;
   @Input() readonlyInput = false;
   @Input() initialDate = false;
 
-  @Output() dateChanged = new EventEmitter<DateTime | undefined>();
-
   @ViewChild('dateInput') private dateInput?: ElementRef;
   @ViewChild(MatDatepicker) matDatepicker?: MatDatepicker<Date>;
 
-  readonly dateControl: FormControl;
-
-  constructor(formBuilder: FormBuilder) {
-    this.dateControl = formBuilder.control('', [this.createDateValidator()]);
+  protected override createControl(fb: FormBuilder): FormControl<DateTime | null> {
+    return fb.control<DateTime | null>(null, [this.createDateValidator()]);
   }
 
-  ngOnInit() {
-    this.dateControl.valueChanges
-      .pipe(
-        debounceTime(200),
-        map((value) => value || undefined),
-        takeUntil(this.terminator$)
-      )
-      .subscribe((date) => this.dateChanged.emit(date));
+  protected override createControlChangeStream(
+    control: FormControl<DateTime | null>
+  ): Observable<DateTime | undefined> {
+    return control.valueChanges.pipe(
+      debounceTime(200),
+      map((value) => value || undefined)
+    );
   }
 
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
+  protected override transformFilterValueToControlValue(value: DateTime | undefined): DateTime | null {
+    return value ?? null;
   }
 
   private createDateValidator(): ValidatorFn {

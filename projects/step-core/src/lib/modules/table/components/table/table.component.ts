@@ -11,7 +11,6 @@ import {
   Output,
   QueryList,
   SimpleChanges,
-  TemplateRef,
   TrackByFunction,
   ViewChild,
   ViewEncapsulation,
@@ -35,12 +34,8 @@ import { TableReload } from '../../services/table-reload';
 import { ItemsPerPageService } from '../../services/items-per-page.service';
 import { HasFilter } from '../../../entities-selection/services/has-filter';
 import { FilterCondition } from '../../shared/filter-condition';
-
-export interface SearchColumn {
-  colName: string;
-  searchName?: string;
-  template?: TemplateRef<any>;
-}
+import { SearchColumn } from '../../shared/search-column.interface';
+import { TablePersistenceStateService } from '../../services/table-persistence-state.service';
 
 export type DataSource<T> = TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -66,6 +61,7 @@ export type DataSource<T> = TableDataSource<T> | T[] | Observable<T[]>;
       provide: HasFilter,
       useExisting: forwardRef(() => TableComponent),
     },
+    TablePersistenceStateService,
   ],
 })
 export class TableComponent<T>
@@ -128,7 +124,7 @@ export class TableComponent<T>
 
   private terminator$ = new Subject<void>();
   private dataSourceTerminator$?: Subject<void>;
-  private search$ = new BehaviorSubject<{ [column: string]: SearchValue }>({});
+  private search$ = new BehaviorSubject<{ [column: string]: SearchValue }>(this._tableState.getSearch());
   private filter$ = new BehaviorSubject<string | undefined>(undefined);
   private tableParams$ = new BehaviorSubject<TableParameters | undefined>(undefined);
 
@@ -153,7 +149,11 @@ export class TableComponent<T>
     })
   );
 
-  constructor(@Optional() private _sort: MatSort, _itemsPerPageService: ItemsPerPageService) {
+  constructor(
+    @Optional() private _sort: MatSort,
+    _itemsPerPageService: ItemsPerPageService,
+    private _tableState: TablePersistenceStateService
+  ) {
     this.pageSizeOptions = _itemsPerPageService.getItemsPerPage((userPreferredItemsPerPage: number) =>
       this.page._changePageSize(userPreferredItemsPerPage)
     );
@@ -208,9 +208,10 @@ export class TableComponent<T>
 
     combineLatest([page$, sort$, this.search$, this.filter$, this.tableParams$])
       .pipe(takeUntil(this.dataSourceTerminator$))
-      .subscribe(([page, sort, search, filter, params]) =>
-        tableDataSource.getTableData({ page, sort, search, filter, params })
-      );
+      .subscribe(([page, sort, search, filter, params]) => {
+        this._tableState.saveSearch(search);
+        tableDataSource.getTableData({ page, sort, search, filter, params });
+      });
 
     tableDataSource.forceNavigateToFirstPage$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe(() => {
       // Unfortunately firstPage method invoking doesn't trigger page change event.
@@ -301,6 +302,10 @@ export class TableComponent<T>
       search[column] = searchValue;
     }
     this.search$.next(search);
+  }
+
+  getSearchValue(column: string): SearchValue | undefined {
+    return this.search$.value[column];
   }
 
   getTableFilterRequest(): TableRequestData | undefined {
