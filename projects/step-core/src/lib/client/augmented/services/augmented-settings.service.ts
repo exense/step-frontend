@@ -16,14 +16,14 @@ export class AugmentedSettingsService extends SettingsService {
     return this._http.get<T>(`/rest/settings/${id}`);
   }
 
+  getSettingAsText(id: string): Observable<string> {
+    return this._http.request('GET', `/rest/settings/${id}`, { responseType: 'text' });
+  }
+
   /*
     Enforcing application/json headers
    */
   override saveSetting<T>(id: string, requestBody?: any): Observable<any> {
-    if (typeof requestBody === 'string') {
-      // surrounding strings with quotes, so they can be sent as json
-      requestBody = `"${requestBody}"`;
-    }
     const headers = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
     return this._http.post<T>(`/rest/settings/${id}`, requestBody, { headers });
   }
