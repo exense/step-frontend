@@ -22,11 +22,11 @@
   position: absolute;
   left: 0;
   top: 0;
-  background-color: var.$warn-yellow-background;
-  color: var.$warn-yellow-color;
+  background-color: var.$yellow-10;
+  color: var.$yellow-600;
   padding: 4px 34px;
   font-size: 11px;
-  border: 1px solid var.$warn-yellow-border;
+  border: 1px solid var.$yellow-20;
 }
 
 .filters {
@@ -87,9 +87,6 @@
 }
 
 .apply-btn {
-  //background-color: var.$warn-yellow-background;
-  //border: 1px solid var.$warn-yellow-border;
-  //color: var.$warn-yellow-color;
   color: #4b97de;
   font-size: 12px;
   line-height: 28px;
