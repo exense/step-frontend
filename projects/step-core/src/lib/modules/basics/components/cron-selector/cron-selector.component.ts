@@ -9,25 +9,14 @@ import { DateTime } from 'luxon';
   styleUrls: ['./cron-selector.component.scss'],
   exportAs: 'stepCronSelector',
 })
-export class CronSelectorComponent implements OnDestroy {
-  private terminator$ = new Subject<void>();
-
+export class CronSelectorComponent {
   @Input() label?: string;
   @Input() cronString?: string;
 
   @Output() cronStringChange = new EventEmitter<string | undefined>();
 
-  applyPreset(cronString: string) {
-    this.cronString = cronString;
-    this.valueChange();
-  }
-
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
-  }
-
-  valueChange() {
-    this.cronStringChange.emit(this.cronString);
+  valueChange(value: string) {
+    this.cronString = value;
+    this.cronStringChange.emit(value);
   }
 }
