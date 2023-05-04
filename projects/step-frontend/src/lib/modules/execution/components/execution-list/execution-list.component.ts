@@ -4,6 +4,7 @@ import {
   AugmentedExecutionsService,
   DateFormat,
   FilterConditionFactoryService,
+  STORE_ALL,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
@@ -14,13 +15,7 @@ import { of } from 'rxjs';
   selector: 'step-execution-list',
   templateUrl: './execution-list.component.html',
   styleUrls: ['./execution-list.component.scss'],
-  providers: [
-    tablePersistenceConfigProvider('executionList', {
-      storeSearch: true,
-      storeSort: true,
-      storePagination: true,
-    }),
-  ],
+  providers: [tablePersistenceConfigProvider('executionList', STORE_ALL)],
 })
 export class ExecutionListComponent {
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);

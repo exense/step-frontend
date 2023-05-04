@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
@@ -11,6 +11,8 @@ import {
   selectionCollectionProvider,
   TableSearch,
   RestoreDialogsService,
+  tablePersistenceConfigProvider,
+  STORE_ALL,
 } from '@exense/step-core';
 import { ParameterDialogsService } from '../../services/parameter-dialogs.service';
 import { ParametersBulkOperationsInvokeService } from '../../services/parameters-bulk-operations-invoke.service';
@@ -20,6 +22,7 @@ import { ParametersBulkOperationsInvokeService } from '../../services/parameters
   templateUrl: './parameters-list.component.html',
   styleUrls: ['./parameters-list.component.scss'],
   providers: [
+    tablePersistenceConfigProvider('parametersList', STORE_ALL),
     selectionCollectionProvider<string, Parameter>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {
       provide: BulkOperationsInvokeService,
@@ -28,29 +31,16 @@ import { ParametersBulkOperationsInvokeService } from '../../services/parameters
   ],
 })
 export class ParametersListComponent {
-  @ViewChild('table', { read: TableSearch })
-  private readonly tableSearch!: TableSearch;
+  private _parametersService = inject(AugmentedParametersService);
+  private _parameterDialogs = inject(ParameterDialogsService);
+  private _restoreDialogsService = inject(RestoreDialogsService);
+  readonly _filterConditionFactory = inject(FilterConditionFactoryService);
 
   readonly dataSource = this._parametersService.dataSource;
   readonly availableBulkOperations = [
     { operation: BulkOperationType.delete, permission: 'param-delete' },
     { operation: BulkOperationType.duplicate, permission: 'param-write' },
   ];
-
-  constructor(
-    private _parametersService: AugmentedParametersService,
-    private _parameterDialogs: ParameterDialogsService,
-    private _filterConditionFactory: FilterConditionFactoryService,
-    private _restoreDialogsService: RestoreDialogsService
-  ) {}
-
-  searchByScope(value: string): void {
-    this.tableSearch.onSearch('scope', this._filterConditionFactory.scopeFilterCondition(value));
-  }
-
-  searchByPriority(value: string): void {
-    this.tableSearch.onSearch('priority', this._filterConditionFactory.numberFilterCondition(value));
-  }
 
   importParameter(): void {
     this._parameterDialogs.importParameter().subscribe(() => this.dataSource.reload());

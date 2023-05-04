@@ -11,6 +11,8 @@ import {
   PlanDialogsService,
   RestoreDialogsService,
   selectionCollectionProvider,
+  STORE_ALL,
+  tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { ILocationService } from 'angular';
 import { noop } from 'rxjs';
@@ -21,6 +23,7 @@ import { PlansBulkOperationsInvokeService } from '../../services/plans-bulk-oper
   templateUrl: './plan-list.component.html',
   styleUrls: ['./plan-list.component.scss'],
   providers: [
+    tablePersistenceConfigProvider('planList', STORE_ALL),
     selectionCollectionProvider<string, Plan>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {
       provide: BulkOperationsInvokeService,

@@ -1,12 +1,20 @@
 import { Component } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AgentListEntry, AJS_MODULE, GridService, TableFetchLocalDataSource } from '@exense/step-core';
+import {
+  AgentListEntry,
+  AJS_MODULE,
+  GridService,
+  STORE_ALL,
+  TableFetchLocalDataSource,
+  tablePersistenceConfigProvider,
+} from '@exense/step-core';
 import { TokenTypeComponent } from '../token-type/token-type.component';
 
 @Component({
   selector: 'step-agent-list',
   templateUrl: './agent-list.component.html',
   styleUrls: ['./agent-list.component.scss'],
+  providers: [tablePersistenceConfigProvider('agentList', STORE_ALL)],
 })
 export class AgentListComponent {
   readonly searchableAgent = new TableFetchLocalDataSource(

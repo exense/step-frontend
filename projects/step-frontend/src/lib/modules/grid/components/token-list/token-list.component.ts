@@ -6,14 +6,16 @@ import {
   AugmentedTokenWrapperOwner,
   TableFetchLocalDataSource,
   TokenWrapper,
+  tablePersistenceConfigProvider,
+  STORE_ALL,
 } from '@exense/step-core';
 import { FlatObjectStringFormatPipe } from '../../pipes/flat-object-format.pipe';
-import { TokenTypeComponent } from '../token-type/token-type.component';
 
 @Component({
   selector: 'step-token-list',
   templateUrl: './token-list.component.html',
   styleUrls: ['./token-list.component.scss'],
+  providers: [tablePersistenceConfigProvider('tokenList', STORE_ALL)],
 })
 export class TokenListComponent {
   readonly searchableToken = new TableFetchLocalDataSource(

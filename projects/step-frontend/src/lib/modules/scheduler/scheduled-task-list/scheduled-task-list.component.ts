@@ -7,6 +7,8 @@ import {
   BulkOperationsInvokeService,
   ExecutiontTaskParameters,
   selectionCollectionProvider,
+  tablePersistenceConfigProvider,
+  STORE_ALL,
 } from '@exense/step-core';
 import { ScheduledTaskLogicService } from '../services/scheduled-task-logic.service';
 import { ScheduledTaskBulkOperationsInvokeService } from '../services/scheduled-task-bulk-operations-invoke.service';
@@ -16,6 +18,7 @@ import { ScheduledTaskBulkOperationsInvokeService } from '../services/scheduled-
   templateUrl: './scheduled-task-list.component.html',
   styleUrls: ['./scheduled-task-list.component.scss'],
   providers: [
+    tablePersistenceConfigProvider('scheduledTaskList', STORE_ALL),
     ScheduledTaskLogicService,
     selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {

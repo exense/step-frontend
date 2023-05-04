@@ -12,7 +12,7 @@ export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit, O
   private terminator$ = new Subject<void>();
 
   private _searchCol = inject(SearchColumnAccessor, { optional: true });
-  private _filter = inject<BaseFilterComponent<T, CV>>(BaseFilterComponent, { self: true, optional: true });
+  private _filter = inject<BaseFilterComponent<T, CV>>(BaseFilterComponent, { optional: true });
 
   private get isConnected(): boolean {
     return !!this._searchCol && !!this._filter;
@@ -33,6 +33,7 @@ export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit, O
 
   private initializeValue(): void {
     if (!this.isConnected) {
+      console.warn('[stepFilterConnect] not connected');
       return;
     }
     const searchValue = this._searchCol!.getSearchValue();
@@ -44,6 +45,7 @@ export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit, O
 
   private setupFilterChanges(): void {
     if (!this.isConnected) {
+      console.warn('[stepFilterConnect] not connected');
       return;
     }
     this._filter!.filterChange.pipe(
