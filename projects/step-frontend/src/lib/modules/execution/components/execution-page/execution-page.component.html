@@ -9,11 +9,11 @@
 
   <div class="tab-pane" *ngFor="let tab of tabs" [class.active]="tab.id === activeTab.id">
     <div *ngIf="tab.type === 'list'">
-      <div class="panel-body">
+      <div class="panel-body" [class.small-screen]="_isSmallScreen$ | async">
         <step-execution-list></step-execution-list>
       </div>
     </div>
-    <div class="panel-body" *ngIf="tab.type === 'progress'">
+    <div class="panel-body" *ngIf="tab.type === 'progress'" [class.small-screen]="_isSmallScreen$ | async">
       <step-execution-progress
         [eId]="tab.id"
         [isActive]="tab.active"

@@ -12,6 +12,7 @@ import { TimeSeriesContext } from '../time-series-context';
 import { TimeSeriesContextParams } from '../time-series-context-params';
 import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
 import { TimeSeriesDashboardSettings } from './model/ts-dashboard-settings';
+import { TsFilteringSettings } from '../model/ts-filtering-settings';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -90,7 +91,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   subscribeForContextChange(): void {
-    merge(this.context.onFiltersChange(), this.context.onGroupingChange())
+    merge(this.context.onFilteringChange(), this.context.onGroupingChange())
       .pipe(takeUntil(this.terminator$))
       .subscribe(() => {
         this.updateDashboard(true);
@@ -99,6 +100,10 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
 
   handleFiltersChange(filters: TsFilterItem[]): void {
     this.context.updateActiveFilters(filters);
+  }
+
+  handleFilteringChange(settings: TsFilteringSettings): void {
+    this.context.setFilteringSettings(settings);
   }
 
   handleGroupingChange(dimensions: string[]) {
@@ -125,7 +130,8 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * This method has to make sure that it doesn't overlap another running update
+   * This method has to make sure that it doesn't overlap another running update.
+   * Used for auto-refresh.
    * @param range
    */
   refresh(range: TSTimeRange, selection?: TSTimeRange): void {

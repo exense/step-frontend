@@ -6,6 +6,10 @@ import { Plan } from '../step-core.module';
 })
 export class PlanNamePipe implements PipeTransform {
   transform(plan: Plan): string | undefined {
+    return PlanNamePipe.transform(plan);
+  }
+
+  static transform(plan: Plan): string | undefined {
     return plan.attributes?.['name'];
   }
 }

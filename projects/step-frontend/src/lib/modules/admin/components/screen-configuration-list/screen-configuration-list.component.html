@@ -1,5 +1,5 @@
 <section class="header">
-  <mat-form-field class="step-view">
+  <step-form-field>
     <mat-select [value]="currentlySelectedScreenChoice">
       <mat-option
         *ngFor="let screenChoice of _screenChoicesRequest$ | async"
@@ -9,7 +9,7 @@
         {{ screenChoice }}
       </mat-option>
     </mat-select>
-  </mat-form-field>
+  </step-form-field>
   <step-btn-group>
     <button
       type="button"
@@ -24,7 +24,7 @@
     </button>
   </step-btn-group>
 </section>
-<step-table [dataSource]="searchableScreens$" matSort [matSortDisableClear]="true" [inProgress]="inProgress">
+<step-table [dataSource]="searchableScreens" matSort [matSortDisableClear]="true">
   <ng-container matColumnDef="label" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header disabled>Label</th>
     <td mat-cell *matCellDef="let element">
@@ -57,7 +57,7 @@
         <button mat-icon-button matTooltip="Move Up" (click)="moveScreen(element.id, -1)">
           <step-icon name="chevron-up"></step-icon>
         </button>
-        <button mat-icon-button matTooltip="Edit" (click)="editScreen(element.input, element.id)">
+        <button mat-icon-button matTooltip="Edit" (click)="editScreen(element.id)">
           <step-icon name="edit-2"></step-icon>
         </button>
         <button mat-icon-button matTooltip="Delete Screen" (click)="removeScreen(element.id, element.input.label)">

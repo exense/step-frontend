@@ -18,21 +18,6 @@ export class DashboardService {
   getDashboardLink(taskId: string): string {
     return `#/root/analytics?taskId=${taskId}&refresh=1&tsParams=taskId,refresh`;
   }
-
-  getRtmDashboardLinkWithFilter(filter: any) {
-    let params = Object.keys(filter)
-      .map((key, i) => `__filter${i}__=text,${key},${filter[key]}`)
-      .join('&');
-    return '#/root/dashboards-rtm/__pp__RTMDashboard?' + params;
-  }
-
-  getRtmDashboardLink(taskId: string): string {
-    return '#/root/dashboards-rtm/__pp__RTMDashboard?__filter1__=text,taskId,' + taskId;
-  }
-
-  getRtmExecutionLink(executionId: string): string {
-    return `#/root/dashboards-rtm/__pp__RTMDashboard?__filter1__=text,eId,${executionId}`;
-  }
 }
 
 getAngularJSGlobal().module(AJS_MODULE).service('DashboardService', downgradeInjectable(DashboardService));

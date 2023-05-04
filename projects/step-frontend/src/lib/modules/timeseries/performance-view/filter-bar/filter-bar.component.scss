@@ -1,34 +1,140 @@
-:host {
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-ts-filter-bar {
   display: flex;
   flex-direction: column;
   gap: 16px;
   background: #f5f5f5;
-}
 
-.mat-raised-button.mat-primary {
-  background: #293e50;
-}
+  .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
+    line-height: 22px;
+    font-size: 12px;
+  }
 
-.filters {
-  display: flex;
-  gap: 12px;
-  padding: 16px 20px 0;
-  align-items: center;
-}
+  .mat-raised-button.mat-primary {
+    background: var.$gray-800;
+  }
 
-.applied-filters {
-  flex: 1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  padding: 8px;
-  height: 48px;
-  overflow: hidden;
-}
+  .warning-mark {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: var.$yellow-10;
+    color: var.$yellow-600;
+    padding: 4px 34px;
+    font-size: 11px;
+    border: 1px solid var.$yellow-20;
+  }
 
-.more-applied-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  padding: 0 8px;
+  .filters {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    align-items: center;
+  }
+
+  .applied-filters {
+    flex: 1;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 8px;
+    overflow: auto;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: var.$gray-100;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var.$gray-500;
+    }
+  }
+
+  .more-btn-container {
+    .more-btn {
+      border: 1px solid var.$gray-200;
+      color: var.$gray-500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 6px 0 12px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 12px;
+      flex-direction: row;
+      min-width: unset;
+      height: 100%;
+
+      step-icon {
+        transform: scale(0.6);
+      }
+    }
+  }
+
+  .more-applied-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 0 8px;
+  }
+
+  .apply-btn {
+    color: #4b97de;
+    font-size: 12px;
+    line-height: 28px;
+    margin-right: 12px;
+    font-weight: bold;
+  }
+
+  .oql-container {
+    position: relative;
+
+    .oql-input {
+      flex-grow: 1;
+      padding-right: 28px;
+      background: var.$gray-50;
+      border: 1px solid var.$gray-200;
+      border-radius: 2px;
+      color: var.$gray-500;
+      font-size: 13px;
+      padding-left: 8px;
+
+      &:focus-visible {
+        outline: 0;
+      }
+    }
+
+    .invalid-input {
+      border: 1px solid #d70000;
+      color: #d70000;
+    }
+
+    .info-btn {
+      position: absolute;
+      right: 0;
+      top: 3px;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      padding: 4px;
+      font-size: 12px;
+      transform: scale(0.7);
+      opacity: 0.6;
+    }
+  }
+
+  .error-info {
+    position: absolute;
+    top: -15px;
+    right: 0;
+    color: white;
+    background: #d70000;
+    padding: 0 10px;
+    font-size: 12px;
+  }
 }

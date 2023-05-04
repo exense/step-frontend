@@ -1,40 +1,24 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Input, UibModalHelperService, a1Promise2Observable, DialogsService, ScreensService } from '@exense/step-core';
+import { inject, Injectable } from '@angular/core';
+import { a1Promise2Observable, DialogsService, ScreensService } from '@exense/step-core';
 import { Observable, switchMap, of, catchError, map } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { ScreenInputEditDialogComponent } from '../components/screen-input-edit-dialog/screen-input-edit-dialog.component';
+import { ScreenInputEditDialogData } from '../shared/screen-input-edit-dialog-data.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ScreenDialogsService {
-  constructor(
-    private _httpClient: HttpClient,
-    private _uibModalHelper: UibModalHelperService,
-    private _dialogs: DialogsService,
-    private _screensService: ScreensService
-  ) {}
+  private _matDialog = inject(MatDialog);
+  private _dialogs = inject(DialogsService);
+  private _screensService = inject(ScreensService);
 
-  editScreen(
-    screen?: Partial<Input>,
-    screenDbId?: string,
-    screenChoice?: string
-  ): Observable<{ screen?: Partial<Input>; result: string }> {
-    const modalInstance = this._uibModalHelper.open({
-      backdrop: 'static',
-      templateUrl: 'partials/screenconfiguration/editScreenInputDialog.html',
-      controller: 'editScreenInputCtrl',
-      resolve: {
-        id: function () {
-          return screenDbId;
-        },
-        screenId: function () {
-          return screenChoice;
-        },
-      },
-    });
-
-    const result$ = a1Promise2Observable(modalInstance.result) as Observable<string>;
-    return result$.pipe(map((result) => ({ result, screen })));
+  editScreen(data: ScreenInputEditDialogData): Observable<boolean> {
+    return this._matDialog
+      .open(ScreenInputEditDialogComponent, {
+        data,
+      })
+      .afterClosed();
   }
 
   removeScreen(dbId: string, label: string): Observable<any> {

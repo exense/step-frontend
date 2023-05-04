@@ -1,9 +1,9 @@
-<div class="step-login-flex-child">
+<div class="step-login-flex-child" *ngIf="!_auth.isOidc">
   <div class="step-login-content">
     <div class="step-login-logo">
       <img alt="" src="{{ logo }}" />
     </div>
-    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+    <step-alert type="danger" *ngIf="error">{{ error }}</step-alert>
 
     <p class="step-login-heading-text" [class.step-login-heading-text-additional-margin]="!loginDescriptionText">
       Log in
@@ -44,9 +44,9 @@
     </form>
   </div>
 </div>
-<div class="step-login-flex-child step-mountain-background"></div>
+<div class="step-login-flex-child step-mountain-background" *ngIf="!_auth.isOidc"></div>
 
-<div class="step-login-version">
+<div class="step-login-version" *ngIf="!_auth.isOidc">
   <span class="version" title="{{ '${project.version}' }}"
     >{{ '${project.version}' }} © exense GmbH
     <span style="display: none" id="frontend-os">{{ '${project.versionFEOS}' }}</span>

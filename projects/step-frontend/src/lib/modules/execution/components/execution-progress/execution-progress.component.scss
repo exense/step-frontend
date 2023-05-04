@@ -11,3 +11,13 @@ as-split-area {
   justify-content: space-between;
   margin-bottom: 1rem;
 }
+
+.small-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.small-screen {
+  width: fit-content;
+}

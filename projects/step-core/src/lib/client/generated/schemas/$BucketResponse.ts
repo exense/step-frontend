@@ -5,28 +5,34 @@ export const $BucketResponse = {
   properties: {
     begin: {
       type: 'number',
+      isRequired: true,
       format: 'int64',
     },
     attributes: {
       type: 'dictionary',
       contains: {
-        type: 'string',
+        properties: {},
       },
+      isRequired: true,
     },
     count: {
       type: 'number',
+      isRequired: true,
       format: 'int64',
     },
     sum: {
       type: 'number',
+      isRequired: true,
       format: 'int64',
     },
     min: {
       type: 'number',
+      isRequired: true,
       format: 'int64',
     },
     max: {
       type: 'number',
+      isRequired: true,
       format: 'int64',
     },
     pclValues: {
@@ -38,6 +44,7 @@ export const $BucketResponse = {
     },
     throughputPerHour: {
       type: 'number',
+      isRequired: true,
       format: 'int64',
     },
   },

@@ -1,4 +1,4 @@
-import { TableDataSource } from './table-data-source';
+import { TableDataSource, TableFilterOptions, TableGetDataOptions } from './table-data-source';
 import { CollectionViewer } from '@angular/cdk/collections';
 import {
   BehaviorSubject,
@@ -19,6 +19,13 @@ import { SearchValue } from './search-value';
 import { TableRequestData } from '../../../client/table/models/table-request-data';
 import { TableParameters } from '../../../client/generated';
 import { FilterCondition } from './filter-condition';
+import { Mutable } from '../../../shared';
+import { TableLocalDataSourceConfig } from './table-local-data-source-config';
+import { TableLocalDataSourceConfigBuilder } from './table-local-data-source-config-builder';
+
+type FieldAccessor = Mutable<
+  Pick<TableLocalDataSource<any>, 'total$' | 'data$' | 'allData$' | 'totalFiltered$' | 'forceNavigateToFirstPage$'>
+>;
 
 interface Request {
   page?: PageEvent;
@@ -26,30 +33,31 @@ interface Request {
   search?: { [key: string]: SearchValue };
 }
 
-export type SearchPredicate<T> = (item: T, searchValue: string) => boolean;
-export type SortPredicate<T> = (itemA: T, itemB: T) => number;
-
 const isSimpleType = (value: any) => ['string', 'number', 'boolean'].includes(typeof value);
 
-export interface TableLocalDataSourceConfig<T> {
-  searchPredicates?: { [columnName: string]: SearchPredicate<T> };
-  sortPredicates?: { [columnName: string]: SortPredicate<T> };
-}
-
 export class TableLocalDataSource<T> implements TableDataSource<T> {
-  private _terminator$ = new Subject<any>();
-  private _source$: Observable<T[]>;
+  static configBuilder<X>(): TableLocalDataSourceConfigBuilder<X> {
+    return new TableLocalDataSourceConfigBuilder();
+  }
+
+  private _terminator$ = new Subject<void>();
+  private _source$!: Observable<T[]>;
 
   private _request$ = new BehaviorSubject<Request>({});
 
   readonly inProgress$: Observable<boolean> = of(false);
 
-  readonly total$: Observable<number>;
-  readonly data$: Observable<T[]>;
-  readonly totalFiltered$: Observable<number>;
-  readonly forceNavigateToFirstPage$: Observable<unknown>;
+  readonly total$!: Observable<number>;
+  readonly allData$!: Observable<T[]>;
+  readonly data$!: Observable<T[]>;
+  readonly totalFiltered$!: Observable<number>;
+  readonly forceNavigateToFirstPage$!: Observable<unknown>;
 
   constructor(source: T[] | Observable<T[]>, private _config: TableLocalDataSourceConfig<T> = {}) {
+    this.setupStreams(source, _config);
+  }
+
+  protected setupStreams(source: T[] | Observable<T[]>, config: TableLocalDataSourceConfig<T>): void {
     const source$ = source instanceof Array ? of(source) : source;
     this._source$ = source$.pipe(takeUntil(this._terminator$));
 
@@ -63,6 +71,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
             total,
             totalFiltered,
             data: [],
+            allData: [],
           };
         }
 
@@ -76,6 +85,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
 
         return {
           data,
+          allData: src,
           total,
           totalFiltered,
         };
@@ -83,10 +93,12 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
       shareReplay(1)
     );
 
-    this.total$ = requestResult$.pipe(map((r) => r.total));
-    this.totalFiltered$ = requestResult$.pipe(map((r) => r.totalFiltered));
-    this.data$ = requestResult$.pipe(map((r) => r.data));
-    this.forceNavigateToFirstPage$ = combineLatest([this.data$, this.totalFiltered$]).pipe(
+    const self = this as FieldAccessor;
+    self.total$ = requestResult$.pipe(map((r) => r.total));
+    self.totalFiltered$ = requestResult$.pipe(map((r) => r.totalFiltered));
+    self.data$ = requestResult$.pipe(map((r) => r.data));
+    self.allData$ = requestResult$.pipe(map((r) => r.allData));
+    self.forceNavigateToFirstPage$ = combineLatest([this.data$, this.totalFiltered$]).pipe(
       map(([data, totalFiltered]) => {
         const recordsInPage = (data || []).length;
         const recordsFiltered = totalFiltered || 0;
@@ -98,6 +110,19 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
       // but sum previous data maybe rendered
       switchMap(() => timer(100))
     );
+  }
+
+  private getItemValue(item: T, field: string): string {
+    if (!item) {
+      return '';
+    }
+    const valueContainer = item as any;
+    if (valueContainer[field]) {
+      return valueContainer[field].toString();
+    }
+    const parts = field.split('.');
+    const result = parts.reduce((container, part) => container?.[part], valueContainer);
+    return result ? result.toString() : '';
   }
 
   private applySearch(source: T[], search?: { [key: string]: SearchValue }): T[] {
@@ -126,9 +151,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
           columnPredicate = (item: T) => predicate(item, searchValue);
         } else {
           columnPredicate = (item: T) => {
-            const itemValue = isSimpleType(item)
-              ? ((item as any) || '').toString()
-              : ((item || {})[column] || '').toString();
+            const itemValue = isSimpleType(item) ? ((item as any) || '').toString() : this.getItemValue(item, column);
 
             return itemValue.trim().toLowerCase().includes(searchValue!);
           };
@@ -154,13 +177,9 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     }
 
     const defaultSortPredicate = (itemA: T, itemB: T) => {
-      const colValueA = isSimpleType(itemA)
-        ? ((itemA as any) || '').toString()
-        : ((itemA || {})[sortBy] || '').toString();
+      const colValueA = isSimpleType(itemA) ? ((itemA as any) || '').toString() : this.getItemValue(itemA, sortBy);
 
-      const colValueB = isSimpleType(itemB)
-        ? ((itemB as any) || '').toString()
-        : ((itemB || {})[sortBy] || '').toString();
+      const colValueB = isSimpleType(itemB) ? ((itemB as any) || '').toString() : this.getItemValue(itemB, sortBy);
 
       return colValueA.localeCompare(colValueB);
     };
@@ -194,28 +213,24 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
   }
 
   disconnect(collectionViewer: CollectionViewer): void {
-    this._terminator$.next(undefined);
+    this._terminator$.next();
     this._terminator$.complete();
     this._request$.complete();
   }
 
-  getTableData(page?: PageEvent, sort?: Sort, search?: { [key: string]: SearchValue }): void {
+  getTableData(options?: TableGetDataOptions): void {
     const request = { ...this._request$.value };
-    request.page = page || request.page;
-    request.sort = sort || request.sort;
-    request.search = search || request.search;
+    request.page = options?.page || request.page;
+    request.sort = options?.sort || request.sort;
+    request.search = options?.search || request.search;
     this._request$.next(request);
   }
 
-  reload(): void {
+  reload(reloadOptions?: { hideProgress: boolean }): void {
     this._request$.next(this._request$.value);
   }
 
-  getFilterRequest(
-    search?: { [p: string]: SearchValue },
-    filter?: string,
-    params?: TableParameters
-  ): TableRequestData | undefined {
+  getFilterRequest(options?: TableFilterOptions): TableRequestData | undefined {
     return undefined;
   }
 

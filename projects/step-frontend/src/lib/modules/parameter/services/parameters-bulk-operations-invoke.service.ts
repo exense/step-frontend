@@ -1,20 +1,17 @@
 import {
-  AsyncOperationService,
   AsyncTaskStatus,
   AugmentedParametersService,
   TableBulkOperationRequest,
   BulkOperationsInvokeService,
 } from '@exense/step-core';
 import { Observable } from 'rxjs';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
 @Injectable()
 export class ParametersBulkOperationsInvokeService extends BulkOperationsInvokeService<string> {
   protected override invokeExport = undefined;
 
-  constructor(_asyncService: AsyncOperationService, protected _api: AugmentedParametersService) {
-    super(_asyncService);
-  }
+  protected _api = inject(AugmentedParametersService);
 
   protected override invokeDelete(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus> {
     return this._api.deleteParameters(requestBody);

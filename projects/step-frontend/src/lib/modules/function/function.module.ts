@@ -46,7 +46,10 @@ export class FunctionModule {
     _cellsRegistry: CustomCellRegistryService,
     _searchCellsRegistry: CustomSearchCellRegistryService
   ) {
-    _entityRegistry.register('functions', 'Keyword', 'target', '/partials/functions/functionSelectionTable.html');
+    _entityRegistry.register('functions', 'Keyword', {
+      icon: 'target',
+      templateUrl: '/partials/functions/functionSelectionTable.html',
+    });
     _cellsRegistry.registerCell('functionEntityIcon', FunctionIconComponent);
     _cellsRegistry.registerCell('functionLink', FunctionLinkComponent);
     _cellsRegistry.registerCell('functionPackageLink', FunctionPackageLinkComponent);
@@ -62,7 +65,7 @@ export class FunctionModule {
       'rest/functionpackages/',
       'rest/functionpackages/',
       'st-table',
-      'functionpackages/partials/functionPackageSelectionTable.html'
+      FunctionPackageSelectionComponent
     );
   }
 }

@@ -1,7 +1,6 @@
 import { FilterCondition } from './filter-condition';
-import { TableRequestFilter } from '../../../client/table/models/table-request-data';
+import { TableRequestFilter, Regex } from '../../../client/step-client-module';
 import { CompareCondition } from '../../basics/shared/compare-condition.enum';
-import { Regex } from '../../../client/generated';
 
 const COMMON_SEARCH_FIELDS = ['input', 'output', 'error.msg', 'name'];
 
@@ -10,7 +9,11 @@ export class ReportNodeFilterCondition extends FilterCondition {
     super();
   }
 
-  toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
+  override isEmpty(): boolean {
+    return !this.searchValue;
+  }
+
+  override toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
     if (!this.searchValue) {
       return [];
     }

@@ -1,7 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { ExecutionTimeSelection } from '../../time-selection/model/execution-time-selection';
 import { FindBucketsRequest } from '../../find-buckets-request';
-import { TimeSeriesService } from '../../time-series.service';
 import { TimeSeriesUtils } from '../../time-series-utils';
 import { TSRangerComponent } from '../../ranger/ts-ranger.component';
 import { TSTimeRange } from '../../chart/model/ts-time-range';
@@ -11,7 +9,8 @@ import { TSRangerSettings } from '../../ranger/ts-ranger-settings';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
 import { PerformanceViewSettings } from '../model/performance-view-settings';
 import { Observable, Subject, takeUntil, tap } from 'rxjs';
-import { TimeSeriesChartResponse } from '../../time-series-chart-response';
+import { TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
+import { FilterUtils } from '../../util/filter-utils';
 
 @Component({
   selector: 'step-execution-time-selection',
@@ -66,7 +65,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
     this.settings.timeRange = range;
   }
 
-  refreshRanger(): Observable<TimeSeriesChartResponse> {
+  refreshRanger(): Observable<TimeSeriesAPIResponse> {
     const selection = this.tsContext.getSelectedTimeRange();
     return this.createRanger(
       this.tsContext.getFullTimeRange(),
@@ -74,14 +73,14 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
     );
   }
 
-  createRanger(fullTimeRange: TSTimeRange, selection?: TSTimeRange): Observable<TimeSeriesChartResponse> {
+  createRanger(fullTimeRange: TSTimeRange, selection?: TSTimeRange): Observable<TimeSeriesAPIResponse> {
     const request: FindBucketsRequest = {
-      params: this.settings.contextualFilters,
       start: fullTimeRange.from,
       end: fullTimeRange.to, // to current time if it's not ended
+      oqlFilter: FilterUtils.objectToOQL(this.settings.contextualFilters),
       numberOfBuckets: TimeSeriesConfig.MAX_BUCKETS_IN_CHART,
     };
-    return this.timeSeriesService.fetchBuckets(request).pipe(
+    return this.timeSeriesService.getBuckets(request).pipe(
       tap((response) => {
         this.timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
         let avgData: (number | null)[] = [];

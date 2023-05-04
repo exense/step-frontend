@@ -6,7 +6,7 @@
   </step-btn-group>
 </section>
 
-<step-table [dataSource]="dataSource" [inProgress]="inProgress" matSort [matSortDisableClear]="true">
+<step-table [dataSource]="dataSource" matSort [matSortDisableClear]="true">
   <ng-container matColumnDef="tid" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Thread ID</th>
     <td mat-cell *matCellDef="let element">{{ element.operation?.tid }}</td>

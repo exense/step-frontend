@@ -5,7 +5,7 @@ import {
   AJS_FUNCTION_DIALOGS_CONFIG,
   AJS_LOCATION,
   AugmentedKeywordsService,
-  DialogsService,
+  DialogsService, EntityDialogsService,
   ExportDialogsService,
   ImportDialogsService,
   IsUsedByDialogService,
@@ -28,6 +28,7 @@ export class FunctionDialogsService {
     private _httpClient: HttpClient,
     private _uibModalHelper: UibModalHelperService,
     private _isUsedByDialog: IsUsedByDialogService,
+    private _entityDialogs: EntityDialogsService,
     @Inject(AJS_FUNCTION_DIALOGS_CONFIG) public _functionDialogsConfig: any,
     @Inject(AJS_LOCATION) private _location: ILocationService
   ) {}
@@ -106,7 +107,7 @@ export class FunctionDialogsService {
   }
 
   selectFunction(): Observable<any> {
-    const selectedEntity$ = a1Promise2Observable<any>(this._dialogs.selectEntityOfType('function', true));
+    const selectedEntity$ = this._entityDialogs.selectEntityOfType('function', true);
     const function$ = selectedEntity$.pipe(
       map((result) => result.item),
       switchMap((id) => this._functionApiService.getFunctionById(id))

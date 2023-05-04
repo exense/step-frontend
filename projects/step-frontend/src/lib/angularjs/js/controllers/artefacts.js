@@ -70,7 +70,7 @@ angular
       templateUrl: 'partials/artefacts/abstractArtefact.html',
     };
   })
-  .controller('CallPlanCtrl', function ($scope, $location, $http, PlanDialogs, LinkProcessor, Dialogs) {
+  .controller('CallPlanCtrl', function ($scope, $location, $http, PlanDialogsService, LinkProcessor, Dialogs) {
     $scope.gotoPlan = () =>
       LinkProcessor.process($scope.planProject)
         .then(() => {
@@ -96,14 +96,14 @@ angular
     });
 
     $scope.selectPlan = function () {
-      PlanDialogs.selectPlan(function (plan) {
+      PlanDialogsService.selectPlan().subscribe(function (plan) {
         $scope.artefact.planId = plan.id;
         $scope.artefact.attributes.name = plan.attributes.name;
         $scope.save();
       });
     };
   })
-  .controller('CallFunctionCtrl', function ($scope, $uibModal, $location, $http, FunctionDialogs, Dialogs) {
+  .controller('CallFunctionCtrl', function ($scope, $uibModal, $location, $http, FunctionDialogs, EntityDialogsService) {
     showTokenSelectionParameters = false;
 
     $scope.ready = false;
@@ -148,7 +148,7 @@ angular
     };
 
     $scope.selectFunction = function () {
-      Dialogs.selectEntityOfType('functions', true).then(function (result) {
+      EntityDialogsService.selectEntityOfType('functions', true).subscribe(function (result) {
         var id = result.item;
         $scope.artefact.functionId = id;
         loadFunction(id, function () {

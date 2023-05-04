@@ -1,6 +1,8 @@
 import { IPromise } from 'angular';
 import { from, Observable } from 'rxjs';
 import { Collection } from './collection.interface';
+import { ScriptLanguage } from './script-language.enum';
+import { AceMode } from './ace-mode.enum';
 
 export const a1Promise2Promise = <T>(promise: IPromise<T>): Promise<T> =>
   Promise.resolve(promise as unknown as Promise<T>);
@@ -29,13 +31,11 @@ export const setObjectFieldValue = (object: Record<string, unknown>, fieldPath: 
     if (typeof res !== 'object' || res === null || res === undefined) {
       return;
     }
+    const container = res as Record<string, unknown>;
 
-    if (index === pathParts.length - 1) {
-      (res as Record<string, unknown>)[fieldName] = value;
-      return;
-    }
+    container[fieldName] = index < pathParts.length - 1 ? container[fieldName] ?? {} : value;
 
-    return (res as Record<string, unknown>)[fieldName];
+    return container[fieldName];
   }, object);
 };
 
@@ -76,4 +76,8 @@ export const breadthFirstSearch = <T>({
   }
 
   return filtered;
+};
+
+export const convertScriptLanguageToAce = (scriptLanguage?: ScriptLanguage): AceMode | undefined => {
+  return !scriptLanguage ? undefined : (AceMode as any)[scriptLanguage];
 };

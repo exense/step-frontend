@@ -3,8 +3,7 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
-
-  <section ng-if="isInitialized && (authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth()) && !isViewActive('login')">
+  <section ng-if="isInitialized && (authService.isAuthenticated() || !authService.getConf().authentication || isPublicView()) && !isViewActive('login')">
     <step-tenant-selection-downgraded></step-tenant-selection-downgraded>
     <step-sidebar></step-sidebar>
     <div id="main">
@@ -34,7 +33,7 @@
   </section>
 
   <div
-    ng-if="isInitialized && (!(authService.isAuthenticated() || isPublicView() || authService.isExtLoginAuth()) || isViewActive('login'))"
+    ng-if="isInitialized && (!(authService.isAuthenticated() || !authService.getConf().authentication || isPublicView()) || isViewActive('login'))"
     ng-include="'partials/loginForm.html'"
     class="st-flex-row"
   ></div>

@@ -1,5 +1,7 @@
 <div class="filters">
-  <button type="button" mat-raised-button color="primary" [matMenuTriggerFor]="menu">Add Filter</button>
+  <div class="warning-mark" *ngIf="rawMeasurementsModeActive">
+    You are using custom filters which may slow down the dashboard. Please be patient.
+  </div>
 
   <mat-menu #menu="matMenu">
     <button mat-menu-item *ngFor="let option of defaultFilterOptions" (click)="addFilterItem(option)">
@@ -21,28 +23,57 @@
     <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.DATE)">Date Filter</button>
   </mat-menu>
 
-  <div class="applied-filters" (stepElementResize)="initMoreFilters()">
-    <step-ts-filter-bar-item
-      *ngFor="let filters of filters; let i = index"
-      #appliedFilter
-      [item]="filters"
-      (onRemoveItem)="removeFilterItem(i)"
-      (onFilterChange)="handleFilterChange()"
+  <div class="applied-filters" [style]="oqlModeActive ? 'overflow: unset' : ''">
+    <step-timeseries-grouping (onGroupingChange)="handleGroupingChange($event)"></step-timeseries-grouping>
+    <ng-container *ngIf="!oqlModeActive">
+      <step-ts-filter-bar-item
+        *ngFor="let item of visibleFilters; let i = index"
+        #appliedFilter
+        [item]="item"
+        [removable]="item.removable"
+        (onRemoveItem)="removeFilterItem(i)"
+        (onFilterChange)="handleFilterChange(i, $event)"
+      >
+      </step-ts-filter-bar-item>
+      <div class="more-btn-container" [matMenuTriggerFor]="typesMenu">
+        <div class="more-btn filter-item-container">
+          <span>More</span>
+          <step-icon name="plus"></step-icon>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="oqlModeActive">
+      <div class="flex flex-grow-1 relative oql-container">
+        <input
+          [title]="oqlValue"
+          [(ngModel)]="oqlValue"
+          class="oql-input"
+          (ngModelChange)="handleOqlChange($event)"
+          [class.invalid-input]="invalidOql"
+        />
+        <step-icon
+          class="info-btn"
+          name="help-circle"
+          matTooltip="This is something very very advanced. Please be careful!"
+        ></step-icon>
+        <span *ngIf="invalidOql" class="error-info">Invalid OQL</span>
+      </div>
+      <button class="apply-btn" mat-button color="basic" (click)="manuallyApplyFilters()">Apply Filters</button>
+    </ng-container>
+    <button
+      class="apply-btn"
+      *ngIf="!oqlModeActive && rawMeasurementsModeActive"
+      mat-button
+      (click)="manuallyApplyFilters()"
     >
-    </step-ts-filter-bar-item>
+      Apply Filters
+    </button>
   </div>
 
-  <step-timeseries-grouping (onGroupingChange)="onGroupingChange.emit($event)"></step-timeseries-grouping>
-</div>
-
-<div *ngIf="moreFilters.length" class="more-applied-filters">
-  <step-ts-filter-bar-item
-    *ngFor="let filter of moreFilters; let i = index"
-    [item]="filter"
-    (onRemoveItem)="removeFilterItem(i)"
-    (onFilterChange)="handleFilterChange()"
-  >
-  </step-ts-filter-bar-item>
+  <mat-button-toggle-group [(ngModel)]="oqlModeActive" (change)="toggleOQLMode()">
+    <mat-button-toggle [value]="false"> Basic</mat-button-toggle>
+    <mat-button-toggle [value]="true"> OQL</mat-button-toggle>
+  </mat-button-toggle-group>
 </div>
 
 <step-execution-time-selection [settings]="performanceViewSettings"></step-execution-time-selection>

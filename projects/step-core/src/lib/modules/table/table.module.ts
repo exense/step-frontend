@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, TitleCasePipe } from '@angular/common';
 import { StepMaterialModule } from '../step-material/step-material.module';
 import { TableComponent } from './components/table/table.component';
 import { SearchColDirective } from './directives/search-col.directive';
@@ -52,6 +52,7 @@ import { StepBasicsModule } from '../basics/step-basics.module';
     AdditionalHeaderDirective,
     BulkOperationsComponent,
   ],
+  providers: [TitleCasePipe],
 })
 export class TableModule {}
 
@@ -61,6 +62,7 @@ export * from './directives/column.directive';
 export * from './shared/search-value';
 export * from './shared/table-remote-data-source';
 export * from './shared/table-local-data-source';
+export * from './shared/table-fetch-local-data-source';
 export * from './shared/table-data-source';
 export * from './services/table-search';
 export * from './services/table-reload';
@@ -75,4 +77,6 @@ export * from './shared/bulk-operation-type.enum';
 export * from './pipe/bulk-operation-label.pipe';
 export * from './pipe/bulk-operation-icon.pipe';
 export * from './shared/filter-condition';
+export * from './shared/legacy-table-handle.interface';
+export * from './shared/table-local-data-source-config';
 export * from './services/filter-condition-factory.service';

@@ -1,0 +1,34 @@
+<div class="main-name" [class.with-meta]="referenceMeta">
+  <step-editable-label [ngModel]="artefactName" (ngModelChange)="onArtefactNameChange($event)" [disabled]="isDisabled">
+  </step-editable-label>
+  <div *ngIf="referenceMeta" class="reference-meta" [class.reference-meta-error]="referenceMeta.isError">
+    <step-icon [name]="referenceMeta.icon"></step-icon>
+    <span [matTooltip]="referenceMeta.tooltip || referenceMeta.description">{{ referenceMeta.description }}</span>
+  </div>
+  <button
+    *ngIf="!isDisabled"
+    type="button"
+    [matTooltip]="_artefactNameConfig.captions.editSelectionCriteria"
+    matTooltipPosition="below"
+    mat-icon-button
+    [color]="isEditorMode ? 'primary' : undefined"
+    (click)="isEditorMode = !isEditorMode"
+  >
+    <step-icon name="edit-2"></step-icon>
+  </button>
+</div>
+<div class="references" *ngIf="referenceString && referenceString !== artefactName">
+  <label>{{ _artefactNameConfig.captions.referenceLabel }}:</label>
+  <span>{{ referenceString }}</span>
+</div>
+<step-dynamic-field-group
+  *ngIf="isEditorMode && !isDisabled && schema"
+  [primaryFieldsLabel]="_artefactNameConfig.captions.selectionCriteria"
+  [primaryFieldsDescription]="_artefactNameConfig.captions.selectionCriteriaDescription"
+  [addFieldBtnLabel]="_artefactNameConfig.captions.addSelectionCriteriaLabel"
+  [schema]="schema"
+  [allowNotSchemaFields]="true"
+  [value]="artefactReferenceAttributes"
+  (valueChange)="updateReferenceAttributes($event)"
+>
+</step-dynamic-field-group>

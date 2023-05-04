@@ -11,4 +11,8 @@ step-execution-tree {
   step-icon {
     background: transparent !important;
   }
+
+  .tree-container {
+    overflow: auto !important;
+  }
 }

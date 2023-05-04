@@ -8,6 +8,7 @@ export class TimeSeriesConfig {
 
   public static readonly RESPONSE_TIME_CHART_TITLE = 'Response Times';
   static readonly STATUS_ATTRIBUTE = 'rnStatus';
+  static readonly ATTRIBUTES_PREFIX = 'attributes';
   static readonly TIMESTAMP_ATTRIBUTE = 'begin';
   static readonly CHART_LEGEND_SIZE = 65;
   static readonly TOTAL_BARS_COLOR = '#7689c0';

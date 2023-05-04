@@ -26,12 +26,12 @@ const DEFAULT_FIELD_VALUE: DynamicValueString = { value: undefined, dynamic: fal
   styleUrls: ['./dynamic-field-group-editor.component.scss'],
 })
 export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
-  private terminator$?: Subject<any>;
+  private terminator$?: Subject<void>;
 
   private readonly formBuilder: NonNullableFormBuilder = this._fb.nonNullable;
   private schemaJson: string = '';
 
-  private lastEmittedValue?: DynamicFieldGroupValue;
+  private lastFormValue?: DynamicFieldGroupValue;
 
   @Input() primaryFieldsLabel?: string;
   @Input() optionalFieldsLabel?: string;
@@ -41,6 +41,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
 
   @Input() isDisabled?: boolean;
   @Input() schema?: DynamicFieldsSchema;
+  @Input() allowNotSchemaFields: boolean = false;
   @Input() value?: DynamicFieldGroupValue;
   @Output() valueChange = new EventEmitter<DynamicFieldGroupValue | undefined>();
   protected primaryFields: DynamicFieldMetaData[] = [];
@@ -78,7 +79,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
 
     if (schemeChanged) {
       this.buildForm(schema, value);
-    } else if (value && value !== this.lastEmittedValue) {
+    } else if (value && !this.isFieldGroupValueEqual(value, this.lastFormValue)) {
       this.assignValueToForm(value);
     }
 
@@ -164,13 +165,13 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     if (!this.terminator$) {
       return;
     }
-    this.terminator$.next({});
+    this.terminator$.next();
     this.terminator$.complete();
     this.terminator$ = undefined;
   }
 
   private setupFormBehavior(): void {
-    this.terminator$ = new Subject<any>();
+    this.terminator$ = new Subject<void>();
 
     this.form.valueChanges
       .pipe(debounceTime(300), takeUntil(this.terminator$))
@@ -182,7 +183,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
             res[key] = formValue[key];
             return res;
           }, {} as DynamicFieldGroupValue);
-        this.lastEmittedValue = result;
+        this.lastFormValue = result;
         this.valueChange.emit(result);
       });
   }
@@ -219,6 +220,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     );
 
     this.enableDisableForm(this.isDisabled);
+    this.lastFormValue = value;
     this.setupFormBehavior();
   }
 
@@ -312,5 +314,38 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     } else if (!isDisabled && this.form.disabled) {
       this.form.enable();
     }
+  }
+
+  private isFieldGroupValueEqual(valueA?: DynamicFieldGroupValue, valueB?: DynamicFieldGroupValue): boolean {
+    if (valueA === valueB) {
+      return true;
+    }
+    if (valueA === undefined || valueB === undefined) {
+      return false;
+    }
+    const keysA = Object.keys(valueA || {});
+    const keysB = Object.keys(valueB || {});
+    if (keysA.length !== keysB.length) {
+      return false;
+    }
+    const keysEqual = keysA.every((key) => keysB.includes(key));
+    if (!keysEqual) {
+      return false;
+    }
+
+    for (let key of keysA) {
+      const fieldA = valueA?.[key];
+      const fieldB = valueB?.[key];
+      if (
+        fieldA?.dynamic !== fieldB?.dynamic ||
+        fieldA?.value !== fieldB?.value ||
+        fieldA?.expression !== fieldB?.expression ||
+        fieldA?.expressionType !== fieldB?.expression
+      ) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

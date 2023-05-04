@@ -1,9 +1,10 @@
-import { APP_INITIALIZER, Compiler, FactoryProvider, Injector } from '@angular/core';
+import { APP_INITIALIZER, Compiler, FactoryProvider, inject, Injector } from '@angular/core';
 import { LegacyPluginDefinition } from './shared/legacy-plugin-definition';
 import { MicrofrontendPluginDefinition } from './shared/microfrontend-plugin-definition';
 import { registerLegacyPlugins } from './register-legacy-plugins';
 import { registerMicrofrontendPlugins } from './register-microfrontend-plugins';
 import { PluginInfoRegistryService } from '@exense/step-core';
+import { registerOsPlugins } from './register-os-plugins';
 
 const OVERRIDE_PLUGINS = new Map<string, string>();
 
@@ -16,6 +17,8 @@ const IGNORE_PLUGINS: ReadonlyArray<string> = [
   'notifications',
   'planBrowser',
   'housekeeping',
+  'menuConfig',
+  'scriptEditor',
 ];
 
 // For testing purposes only
@@ -61,7 +64,11 @@ const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
   return result;
 };
 
-const loadPlugins = (compiler: Compiler, injector: Injector, registry: PluginInfoRegistryService) => {
+const registerPlugins = () => {
+  const compiler = inject(Compiler);
+  const injector = inject(Injector);
+  const registry = inject(PluginInfoRegistryService);
+
   return async () => {
     const pluginDefinitions = await fetchDefinitions();
     if (pluginDefinitions.length === 0) {
@@ -99,13 +106,13 @@ const loadPlugins = (compiler: Compiler, injector: Injector, registry: PluginInf
     await Promise.all([
       registerLegacyPlugins(legacy),
       registerMicrofrontendPlugins(microfrontend, { compiler, injector }),
+      registerOsPlugins({ compiler, injector }),
     ]);
   };
 };
 
 export const PLUGINS_INITIALIZER: FactoryProvider = {
   provide: APP_INITIALIZER,
-  useFactory: loadPlugins,
-  deps: [Compiler, Injector, PluginInfoRegistryService],
+  useFactory: registerPlugins,
   multi: true,
 };

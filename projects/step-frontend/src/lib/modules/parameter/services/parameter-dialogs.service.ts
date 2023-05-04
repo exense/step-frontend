@@ -1,5 +1,4 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import {
   a1Promise2Observable,
   DialogsService,
@@ -7,23 +6,20 @@ import {
   ImportDialogsService,
   Parameter,
   ParametersService,
-  UibModalHelperService,
 } from '@exense/step-core';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { ParameterEditDialogComponent } from '../components/parameter-edit-dialog/parameter-edit-dialog.component';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ParameterDialogsService {
-  constructor(
-    private _httpClient: HttpClient,
-    private _uibModalHelper: UibModalHelperService,
-    private _dialogs: DialogsService,
-    private _parameterService: ParametersService,
-    private _importDialogs: ImportDialogsService,
-    private _exportDialogs: ExportDialogsService,
-    private _parametersService: ParametersService
-  ) {}
+  private _matDialog = inject(MatDialog);
+  private _dialogs = inject(DialogsService);
+  private _importDialogs = inject(ImportDialogsService);
+  private _exportDialogs = inject(ExportDialogsService);
+  private _parametersService = inject(ParametersService);
 
   importParameter(): Observable<any> {
     return this._importDialogs.displayImportDialog('Parameters import', 'parameters');
@@ -33,19 +29,12 @@ export class ParameterDialogsService {
     return this._exportDialogs.displayExportDialog('Parameters export', 'parameters', 'allParameters.sta');
   }
 
-  editParameter(parameter?: Partial<Parameter>): Observable<{ parameter?: Partial<Parameter>; result: string }> {
-    const modalInstance = this._uibModalHelper.open({
-      backdrop: 'static',
-      templateUrl: 'partials/parameters/editParameterDialog.html',
-      controller: 'editParameterCtrl',
-      resolve: {
-        id: function () {
-          return parameter?.id;
-        },
-      },
-    });
-    const result$ = a1Promise2Observable(modalInstance.result) as Observable<string>;
-    return result$.pipe(map((result) => ({ result, parameter: parameter })));
+  editParameter(parameter?: Partial<Parameter>): Observable<Parameter | undefined> {
+    return this._matDialog
+      .open(ParameterEditDialogComponent, {
+        data: parameter?.id,
+      })
+      .afterClosed();
   }
 
   deleteParameter(id: string, label: string): Observable<any> {

@@ -1,60 +1,51 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, Input, Option, Mutable, TableLocalDataSource, ScreensService } from '@exense/step-core';
-import { BehaviorSubject, switchMap, shareReplay, tap } from 'rxjs';
+import { AJS_MODULE, Input, Option, ScreensService, TableFetchLocalDataSource, ScreenInput } from '@exense/step-core';
 import { ScreenDialogsService } from '../../services/screen-dialogs.service';
-
-type InProgress = Mutable<Pick<ScreenConfigurationListComponent, 'inProgress'>>;
 
 @Component({
   selector: 'step-screen-configuration-list',
   templateUrl: './screen-configuration-list.component.html',
   styleUrls: ['./screen-configuration-list.component.scss'],
 })
-export class ScreenConfigurationListComponent implements OnDestroy {
+export class ScreenConfigurationListComponent {
   public readonly CURRENT_SCREEN_CHOICE_DEFAULT = 'executionParameters';
 
   public currentlySelectedScreenChoice: string = this.CURRENT_SCREEN_CHOICE_DEFAULT;
 
   readonly _screenChoicesRequest$ = this._screensService.getScreens();
-
-  private _screensRequest$ = new BehaviorSubject<unknown>({});
-  private screens$ = this._screensRequest$.pipe(
-    tap((_) => ((this as InProgress).inProgress = true)),
-    switchMap((_) => this._screensService.getScreenInputsByScreenId(this.currentlySelectedScreenChoice)),
-    tap((_) => ((this as InProgress).inProgress = false)),
-    shareReplay(1)
+  readonly searchableScreens = new TableFetchLocalDataSource(
+    () => this._screensService.getScreenInputsByScreenId(this.currentlySelectedScreenChoice),
+    TableFetchLocalDataSource.configBuilder<ScreenInput>()
+      .addSearchStringPredicate('label', (item) => item.input!.label!)
+      .addSearchStringPredicate('id', (item) => item.input!.id!)
+      .addSearchStringPredicate('type', (item) => item.input!.type!)
+      .addSearchStringPredicate('options', (item) => this.optionsToString(item.input!.options!))
+      .addSearchStringPredicate('activationScript', (item) => item.input!.activationExpression!.script!)
+      .build()
   );
-
-  readonly searchableScreens$ = new TableLocalDataSource(this.screens$, {
-    searchPredicates: {
-      label: (item, searchValue) => item.input!.label!.toLowerCase().includes(searchValue.toLowerCase()),
-      id: (item, searchValue) => item.input!.id!.toLowerCase().includes(searchValue.toLowerCase()),
-      type: (item, searchValue) => item.input!.type!.toLowerCase().includes(searchValue.toLowerCase()),
-      options: (item, searchValue) =>
-        this.optionsToString(item.input!.options).toLowerCase().includes(searchValue.toLowerCase()),
-      activationScript: (item, searchValue) =>
-        item.input!.activationExpression!.script!.toLowerCase().includes(searchValue.toLowerCase()),
-    },
-  });
-
-  readonly inProgress: boolean = false;
 
   constructor(private _screensService: ScreensService, private _screenDialogs: ScreenDialogsService) {}
 
-  public reloadTableForCurrentChoice(choice: string) {
+  reloadTableForCurrentChoice(choice: string) {
     this.currentlySelectedScreenChoice = choice;
     this.loadTable();
   }
 
   addScreen(): void {
-    this._screenDialogs
-      .editScreen(undefined, undefined, this.currentlySelectedScreenChoice)
-      .subscribe((_) => this.loadTable());
+    this._screenDialogs.editScreen({ screenId: this.currentlySelectedScreenChoice }).subscribe((isSaved) => {
+      if (isSaved) {
+        this.loadTable();
+      }
+    });
   }
 
-  editScreen(screenInput: Input, screenDbId: string): void {
-    this._screenDialogs.editScreen(screenInput, screenDbId, undefined).subscribe((_) => this.loadTable());
+  editScreen(inputId: string): void {
+    this._screenDialogs.editScreen({ inputId }).subscribe((isSaved) => {
+      if (isSaved) {
+        this.loadTable();
+      }
+    });
   }
 
   moveScreen(dbId: string, offset: number): void {
@@ -74,11 +65,7 @@ export class ScreenConfigurationListComponent implements OnDestroy {
   }
 
   private loadTable(): void {
-    this._screensRequest$.next({});
-  }
-
-  ngOnDestroy(): void {
-    this._screensRequest$.complete();
+    this.searchableScreens.reload();
   }
 }
 

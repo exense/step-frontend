@@ -1,8 +1,8 @@
 <div stepPlanEditorKeyHandler>
-  <div *ngIf="_interactiveSession.isActive$ | async" class="alert alert-info">
+  <step-alert type="info" *ngIf="_interactiveSession.isActive$ | async">
     Welcome to the interactive mode. In this mode you can select tree nodes and run them directly by clicking the
     &nbsp;'Run interactively' button
-  </div>
+  </step-alert>
 
   <div class="actions-header">
     <div class="editable-labels">
@@ -29,6 +29,7 @@
         stScreen="planTable"
         [stDisabled]="!('plan-write' | hasRight | async)"
         [stInline]="true"
+        [stEditableLabelMode]="true"
         [stModel]="(_planEditService.plan$ | async)!"
         (stModelChange)="_planEditService.handlePlanChange()"
       >
@@ -54,7 +55,7 @@
     </ng-container>
   </div>
 
-  <step-split>
+  <step-split stepMaxHeightViewportHeightMinusOffsetTop>
     <step-split-area sizeType="flex" size="1">
       <ng-container *ngIf="planClass">
         <step-plan-type [itemKey]="planClass"> </step-plan-type>
@@ -63,7 +64,7 @@
 
     <step-split-gutter></step-split-gutter>
 
-    <step-split-area padding="24px" (sizeUpdate)="rightTabs.updatePagination()">
+    <step-split-area (sizeUpdate)="rightTabs.updatePagination()">
       <step-tabs #rightTabs="StepTabs" [tabs]="componentTabs" [(activeTabId)]="selectedTab" [shrink]="true">
       </step-tabs>
       <div class="tab-content" [ngSwitch]="selectedTab">
