@@ -8,7 +8,10 @@ import { StepTableClientModule } from '../../client/table/step-table-client.modu
 import { CustomColumnsComponent } from './components/custom-columns/custom-columns.component';
 import { CustomCellValuePipe } from './pipe/custom-cell-value.pipe';
 import { ColumnDirective } from './directives/column.directive';
-import { CustomRegistriesModule } from '../custom-registeries/custom-registries.module';
+import {
+  CustomRegistriesModule,
+  CustomSearchCellRegistryService,
+} from '../custom-registeries/custom-registries.module';
 import { CustomCellComponentsPipe } from './pipe/custom-cell-components.pipe';
 import { AdditionalHeaderDirective } from './directives/additional-header.directive';
 import { BulkOperationsComponent } from './components/bulk-operations/bulk-operations.component';
@@ -18,6 +21,9 @@ import { AsyncOperationsModule } from '../async-operations/async-operations.modu
 import { BulkOperationLabelPipe } from './pipe/bulk-operation-label.pipe';
 import { CustomSearchCellComponentsPipe } from './pipe/custom-search-cell-components.pipe';
 import { StepBasicsModule } from '../basics/step-basics.module';
+import { CustomSearchDropdownComponent } from './components/custom-search-dropdown/custom-search-dropdown.component';
+import { CustomSearchCheckboxComponent } from './components/custom-search-dropdown/custom-search-checkbox.component';
+import { Input as ColInput } from '../../client/generated';
 
 @NgModule({
   imports: [
@@ -42,6 +48,8 @@ import { StepBasicsModule } from '../basics/step-basics.module';
     BulkOperationIconPipe,
     BulkOperationLabelPipe,
     CustomSearchCellComponentsPipe,
+    CustomSearchDropdownComponent,
+    CustomSearchCheckboxComponent,
   ],
   exports: [
     TableComponent,
@@ -51,13 +59,25 @@ import { StepBasicsModule } from '../basics/step-basics.module';
     ColumnDirective,
     AdditionalHeaderDirective,
     BulkOperationsComponent,
+    CustomSearchDropdownComponent,
+    CustomSearchCheckboxComponent,
   ],
   providers: [TitleCasePipe],
 })
-export class TableModule {}
+export class TableModule {
+  constructor(_searchCellRegistry: CustomSearchCellRegistryService) {
+    const typeDropDown: ColInput['type'] = 'DROPDOWN';
+    _searchCellRegistry.registerSearchCell(typeDropDown, CustomSearchDropdownComponent);
+
+    const typeCheckbox: ColInput['type'] = 'CHECKBOX';
+    _searchCellRegistry.registerSearchCell(typeCheckbox, CustomSearchCheckboxComponent);
+  }
+}
 
 export * from './components/table/table.component';
 export * from './components/custom-columns/custom-columns.component';
+export * from './components/custom-search-dropdown/custom-search-dropdown.component';
+export * from './components/custom-search-dropdown/custom-search-checkbox.component';
 export * from './directives/column.directive';
 export * from './shared/search-value';
 export * from './shared/table-remote-data-source';
@@ -80,3 +100,4 @@ export * from './shared/filter-condition';
 export * from './shared/legacy-table-handle.interface';
 export * from './shared/table-local-data-source-config';
 export * from './services/filter-condition-factory.service';
+//
