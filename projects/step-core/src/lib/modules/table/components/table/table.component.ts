@@ -188,28 +188,14 @@ export class TableComponent<T>
       this.initRequired = true;
       return;
     }
-    this.page.firstPage();
 
-    const initialPage: PageEvent = {
-      pageSize: this.page.pageSize || this.pageSizeOptions[0],
-      pageIndex: 0,
-      length: 0,
-    };
-
-    const initialSort: Sort | undefined = this._sort?.active
-      ? {
-          active: this._sort.active,
-          direction: this._sort.direction,
-        }
-      : undefined;
-
-    const page$ = this.page!.page.pipe(startWith(initialPage));
-    const sort$ = this._sort ? this._sort.sortChange.pipe(startWith(initialSort)) : of(undefined);
+    const page$ = this.setupPageStream();
+    const sort$ = this.setupSortStream();
 
     combineLatest([page$, sort$, this.search$, this.filter$, this.tableParams$])
       .pipe(takeUntil(this.dataSourceTerminator$))
       .subscribe(([page, sort, search, filter, params]) => {
-        this._tableState.saveSearch(search);
+        this._tableState.saveState(search, page, sort);
         tableDataSource.getTableData({ page, sort, search, filter, params });
       });
 
@@ -220,6 +206,48 @@ export class TableComponent<T>
       this.page!.firstPage();
       this.page!._changePageSize(this.page.pageSize);
     });
+  }
+
+  private setupSortStream(): Observable<Sort | undefined> {
+    if (!this._sort) {
+      return of(undefined);
+    }
+
+    let initialSort: Sort | undefined = undefined;
+
+    const sortState = this._tableState.getSort();
+
+    if (sortState) {
+      this._sort.active = sortState.active;
+      this._sort.direction = sortState.direction;
+      initialSort = sortState;
+    } else if (this._sort.active) {
+      const { active, direction } = this._sort;
+      initialSort = { active, direction };
+    }
+
+    return this._sort.sortChange.pipe(startWith(initialSort));
+  }
+
+  private setupPageStream(): Observable<PageEvent> {
+    let initialPage: PageEvent;
+
+    const statePage = this._tableState.getPage();
+    if (statePage) {
+      this.page.pageSize = statePage.pageSize;
+      this.page.pageIndex = statePage.pageIndex;
+      this.page.length = statePage.length;
+      initialPage = statePage;
+    } else {
+      this.page.firstPage();
+      initialPage = {
+        pageSize: this.page.pageSize || this.pageSizeOptions[0],
+        pageIndex: 0,
+        length: 0,
+      };
+    }
+
+    return this.page.page.pipe(startWith(initialPage));
   }
 
   private addCustomColumnsDefinitionsToRemoteDatasource(): void {

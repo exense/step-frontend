@@ -14,7 +14,13 @@ import { of } from 'rxjs';
   selector: 'step-execution-list',
   templateUrl: './execution-list.component.html',
   styleUrls: ['./execution-list.component.scss'],
-  providers: [tablePersistenceConfigProvider('executionList', { storeSearch: true })],
+  providers: [
+    tablePersistenceConfigProvider('executionList', {
+      storeSearch: true,
+      storeSort: true,
+      storePagination: true,
+    }),
+  ],
 })
 export class ExecutionListComponent {
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
