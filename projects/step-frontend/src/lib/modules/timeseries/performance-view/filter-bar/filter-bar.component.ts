@@ -21,9 +21,18 @@ import { FilterBarItemComponent } from './item/filter-bar-item.component';
 import { FilterBarItemType, TsFilterItem } from './model/ts-filter-item';
 import { TsFilteringSettings } from '../../model/ts-filtering-settings';
 import { TimeSeriesConfig } from '../../time-series.config';
-import { TimeSeriesService } from '@exense/step-core';
+import { TableApiWrapperService, TimeSeriesService } from '@exense/step-core';
 import { OqlVerifyResponse } from '../../model/oql-verify-response';
 import { TsFilteringMode } from '../../model/ts-filtering-mode';
+import { OQLBuilder } from '../../util/oql-builder';
+
+const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
+  if (field.startsWith('attributes.')) {
+    return field.replace('attributes.', '');
+  } else {
+    return field;
+  }
+};
 
 @Component({
   selector: 'step-ts-filter-bar',
@@ -50,6 +59,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   readonly EMIT_DEBOUNCE_TIME = 300;
   readonly FilterBarItemType = FilterBarItemType;
+  exportInProgress = false;
 
   visibleFilters: TsFilterItem[] = [];
   groupDimensions: string[] = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS[0].attributes;
@@ -60,10 +70,18 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   oqlValue: string = '';
   invalidOql = false;
 
-  constructor(private _changeDetectorRef: ChangeDetectorRef, private timeSeriesService: TimeSeriesService) {}
+  constructor(
+    private _changeDetectorRef: ChangeDetectorRef,
+    private timeSeriesService: TimeSeriesService,
+    private tableApiService: TableApiWrapperService
+  ) {}
 
-  getFilters() {
+  getFilters(): TsFilterItem[] {
     return this.visibleFilters;
+  }
+
+  getValidFilters(): TsFilterItem[] {
+    return this.getFilters().filter(FilterUtils.filterItemIsValid);
   }
 
   prepareVisibleFilters() {
@@ -100,10 +118,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   toggleOQLMode() {
     if (this.oqlModeActive) {
       const contextualOql = FilterUtils.objectToOQL(this.performanceViewSettings.contextualFilters);
-      const customOql = FilterUtils.filtersToOQL(
-        this.getFilters().filter(FilterUtils.filterItemIsValid),
-        TimeSeriesConfig.ATTRIBUTES_PREFIX
-      );
+      const customOql = FilterUtils.filtersToOQL(this.getValidFilters(), TimeSeriesConfig.ATTRIBUTES_PREFIX);
       this.oqlValue = customOql;
     } else {
       this.invalidOql = false;
@@ -245,5 +260,34 @@ export class FilterBarComponent implements OnInit, OnDestroy {
       }
     }
     return false;
+  }
+
+  exportRawData() {
+    if (this.exportInProgress) {
+      return;
+    }
+    let filteringSettings = this.context.getFilteringSettings();
+    let filtersOql =
+      filteringSettings.mode === TsFilteringMode.OQL
+        ? filteringSettings.oql.replace('attributes.', '')
+        : FilterUtils.filtersToOQL(this.getValidFilters(), undefined, ATTRIBUTES_REMOVAL_FUNCTION);
+    let contextualOql = FilterUtils.objectToOQL(
+      this.performanceViewSettings.contextualFilters,
+      undefined,
+      ATTRIBUTES_REMOVAL_FUNCTION
+    );
+    let selectedTimeRange = this.context.getSelectedTimeRange();
+    let oql = new OQLBuilder()
+      .open('and')
+      .append(`(begin < ${Math.trunc(selectedTimeRange.to)} and begin > ${Math.trunc(selectedTimeRange.from)})`)
+      .append(filtersOql)
+      .append(contextualOql)
+      .build();
+    this.exportInProgress = true;
+    this.timeSeriesService.getMeasurementsAttributes(oql).subscribe((fields) => {
+      this.tableApiService
+        .exportAsCSV('measurements', fields, { filters: [{ oql: oql }] })
+        .subscribe(() => (this.exportInProgress = false));
+    });
   }
 }

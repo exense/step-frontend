@@ -7,47 +7,57 @@ export class FilterUtils {
     );
   }
 
-  static objectToOQL(object: { [key: string]: string }, attributesPrefix?: string) {
+  static objectToOQL(
+    object: { [key: string]: string },
+    attributesPrefix?: string,
+    attributeProcessFn?: (x: string) => string
+  ) {
     if (!object || Object.keys(object).length === 0) {
       return undefined;
     }
     let clause = Object.keys(object)
       .map((key) => {
-        const attribute = attributesPrefix ? `${attributesPrefix}.${key}` : key;
+        const processedAttribute = attributeProcessFn ? attributeProcessFn(key) : key;
+        const attribute = attributesPrefix ? `${attributesPrefix}.${processedAttribute}` : processedAttribute;
         return `${attribute} = ${object[key]}`;
       })
       .join(' and ');
     return `(${clause})`;
   }
 
-  static filtersToOQL(items: TsFilterItem[], attributesPrefix?: string): string {
+  static filtersToOQL(
+    items: TsFilterItem[],
+    attributesPrefix?: string,
+    attributeProcessFn?: (x: string) => string
+  ): string {
     if (!items || items.length === 0) {
       return '';
     }
     let andFilters: (string | undefined)[] = items.map((item) => {
       let clause;
-      const attributeName = attributesPrefix ? `${attributesPrefix}.${item.attributeName}` : item.attributeName;
+      const processedAttribute = attributeProcessFn ? attributeProcessFn(item.attributeName) : item.attributeName;
+      const finalAttributeName = attributesPrefix ? `${attributesPrefix}.${processedAttribute}` : processedAttribute;
       switch (item.type) {
         case FilterBarItemType.OPTIONS:
           clause = item.textValues
             ?.filter((f) => f.isSelected)
             .map((f) => {
-              const attribute = attributesPrefix ? `${attributesPrefix}.${item.attributeName}` : item.attributeName;
+              const attribute = attributesPrefix ? `${attributesPrefix}.${finalAttributeName}` : finalAttributeName;
               return `${attribute} = ${f.value}`;
             })
             .join(' or ');
           break;
         case FilterBarItemType.FREE_TEXT:
-          clause = `${attributeName} ~ ".*${item.textValue}.*"`;
+          clause = `${finalAttributeName} ~ ".*${item.textValue}.*"`;
           break;
         case FilterBarItemType.NUMERIC:
         case FilterBarItemType.DATE:
           let clauses = [];
           if (item.min != null) {
-            clauses.push(`${attributeName} >= ${item.min}`);
+            clauses.push(`${finalAttributeName} >= ${item.min}`);
           }
           if (item.max != null) {
-            clauses.push(`${attributeName} < ${item.max}`);
+            clauses.push(`${finalAttributeName} < ${item.max}`);
           }
           clause = '(' + clauses.join(' and ') + ')';
           break;

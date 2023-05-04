@@ -11,10 +11,6 @@ step-ts-filter-bar {
     font-size: 12px;
   }
 
-  .mat-raised-button.mat-primary {
-    background: var.$gray-800;
-  }
-
   .warning-mark {
     position: absolute;
     left: 0;
@@ -83,12 +79,15 @@ step-ts-filter-bar {
     padding: 0 8px;
   }
 
+  /**
+  These got override by the theme scss file
+   */
   .apply-btn {
-    color: #4b97de;
-    font-size: 12px;
-    line-height: 28px;
-    margin-right: 12px;
-    font-weight: bold;
+    color: #4b97de !important;
+    font-size: 12px !important;
+    line-height: 28px !important;
+    margin-right: 12px !important;
+    font-weight: bold !important;
   }
 
   .oql-container {
@@ -136,5 +135,20 @@ step-ts-filter-bar {
     background: #d70000;
     padding: 0 10px;
     font-size: 12px;
+  }
+
+  .export-btn {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    padding: 0;
+    border: 1px solid white;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    opacity: 0.6;
+    transform: scale(0.8);
   }
 }
