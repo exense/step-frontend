@@ -16,9 +16,6 @@ import { SearchColumnAccessor } from '../shared/search-column-accessor';
 export class SearchColMetaDirective extends SearchColBase implements SearchColumnAccessor {
   @Input('stepSearchColMeta') meta?: SearchColumn;
 
-  @ContentChild(BaseFilterComponent, { static: false })
-  cFilter: any;
-
   get searchColumnName(): string {
     return this.meta?.searchName ?? '';
   }
