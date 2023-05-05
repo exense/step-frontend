@@ -260,7 +260,7 @@ $light-primary-text: white;
   Otherwise they will overflow the container.
    */
   .mat-chip-list-wrapper {
-    overflow: auto;
+    overflow-x: auto;
   }
 
   .mat-menu-panel.wide {
