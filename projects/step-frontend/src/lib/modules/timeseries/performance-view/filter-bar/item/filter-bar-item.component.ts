@@ -71,7 +71,6 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     if (!this.item.isLocked) {
       this.item.label = this.item.attributeName;
     }
-    console.log(this.item.attributeName);
     switch (this.item.type) {
       case FilterBarItemType.OPTIONS:
         break;
