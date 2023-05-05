@@ -2,7 +2,14 @@
   <div step-modal-window-body>
     <ng-container [formGroup]="wizardForm">
       <step-form-field>
-        <step-label>Target throughput</step-label>
+        <step-label
+          >Target throughput
+          <step-icon
+            name="help-circle"
+            matTooltip='"Target Throughput" is the expected number of iterations produced over time during the execution'
+          >
+          </step-icon
+        ></step-label>
         <input type="number" formControlName="iterations" placeholder="Iterations" />
         <step-suffix>per</step-suffix>
         <step-suffix>
@@ -12,16 +19,16 @@
             </mat-option>
           </mat-select>
         </step-suffix>
-        <step-suffix class="icon-suffix">
-          <step-icon
-            name="help-circle"
-            matTooltip='"Target Throughput" is the expected number of iterations produced over time during the execution'
-          >
-          </step-icon>
-        </step-suffix>
       </step-form-field>
       <step-form-field>
-        <step-label>Estimated iteration durations max</step-label>
+        <step-label
+          >Estimated iteration durations max
+          <step-icon
+            name="help-circle"
+            matTooltip="Provide the duration to execute one iteration under load, considering to keep sufficient margin. If the actual iteration time is higher during the exeuction, the target thoughput will not be reached"
+          >
+          </step-icon
+        ></step-label>
         <input type="number" formControlName="duration" placeholder="Duration" />
         <step-suffix>
           <mat-select formControlName="durationUnit">
@@ -29,13 +36,6 @@
               {{ unit.value }}
             </mat-option>
           </mat-select>
-        </step-suffix>
-        <step-suffix class="icon-suffix">
-          <step-icon
-            name="help-circle"
-            matTooltip="Provide the duration to execute one iteration under load, considering to keep sufficient margin. If the actual iteration time is higher during the exeuction, the target thoughput will not be reached"
-          >
-          </step-icon>
         </step-suffix>
         <step-error *ngIf="(isCalculationValid$ | async) === false">
           The pacing must be higher or equal than max iteration duration. Please change form's value.
