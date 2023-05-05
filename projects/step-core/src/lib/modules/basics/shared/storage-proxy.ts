@@ -29,7 +29,7 @@ export abstract class StorageProxy implements Storage {
     return `${this.storagePrefix}_${key}`;
   }
 
-  protected clearTokens(): void {
+  clearTokens(): void {
     Object.keys(this.storage)
       .filter((key) => key.startsWith(this.storagePrefix))
       .forEach((key) => {

@@ -61,7 +61,7 @@ export class TablePersistenceStateService {
     }
     const json = JSON.parse(jsonString);
     return Object.entries(json).reduce((res, [key, value]) => {
-      if ((value as FilterConditionJson).filterConditionType) {
+      if ((value as FilterConditionJson).filterConditionType !== undefined) {
         const filterCondition = this.filterConditionFactory.create(value as FilterConditionJson);
         if (filterCondition) {
           res[key] = filterCondition;

@@ -50,7 +50,7 @@ export class FilterConditionFactoryService {
   create(filterCondition?: FilterConditionJson): FilterCondition | undefined {
     switch (filterCondition?.filterConditionType) {
       case FilterConditionType.BASIC:
-        return this.basicFilterCondition(filterCondition?.sourceObject?.filters);
+        return this.basicFilterCondition(filterCondition?.sourceObject);
       case FilterConditionType.DYNAMIC_VALUE:
         return this.dynamicValueFilterCondition(filterCondition?.sourceObject);
       case FilterConditionType.NUM:
