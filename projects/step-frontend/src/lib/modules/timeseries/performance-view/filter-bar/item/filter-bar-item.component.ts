@@ -155,7 +155,6 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
   addSearchValue(text: string): void {
     const value = (text || '').trim();
 
-    // Add our fruit
     if (value) {
       this.freeTextValues.push(value);
     }
