@@ -2,6 +2,7 @@ export interface TsFilterItem {
   label: string;
   attributeName: string;
   type: FilterBarItemType;
+  isHidden?: boolean;
   isLocked?: boolean; // the attributeName can't be modified
   removable?: boolean;
 

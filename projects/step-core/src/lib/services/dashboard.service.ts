@@ -5,6 +5,8 @@ import { ViewRegistryService } from './view-registry.service';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE } from '../shared';
 
+const ONE_DAY_MS = 86400000;
+
 @Injectable({
   providedIn: 'root',
 })
@@ -16,7 +18,7 @@ export class DashboardService {
   ) {}
 
   getDashboardLink(taskId: string): string {
-    return `#/root/analytics?taskId=${taskId}&refresh=1&tsParams=taskId,refresh`;
+    return `#/root/analytics?taskId=${taskId}&refresh=1&relativeRange=${ONE_DAY_MS}&tsParams=taskId,refresh,relativeRange`;
   }
 }
 

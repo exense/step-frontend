@@ -107,7 +107,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
       contextId: this.executionId,
       includeThreadGroupChart: true,
       timeRange: { from: startTime, to: endTime },
-      contextualFilters: { ...urlParams, [`${TimeSeriesConfig.ATTRIBUTES_PREFIX}.eId`]: this.executionId },
+      contextualFilters: { ...urlParams, eId: this.executionId },
       showContextualFilters: false,
       filterOptions: [
         {
