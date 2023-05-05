@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { ExecutionTimeSelection } from '../../time-selection/model/execution-time-selection';
 import { FindBucketsRequest } from '../../find-buckets-request';
 import { TimeSeriesUtils } from '../../time-series-utils';
 import { TSRangerComponent } from '../../ranger/ts-ranger.component';
@@ -11,6 +10,7 @@ import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.se
 import { PerformanceViewSettings } from '../model/performance-view-settings';
 import { Observable, Subject, takeUntil, tap } from 'rxjs';
 import { TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
+import { FilterUtils } from '../../util/filter-utils';
 
 @Component({
   selector: 'step-execution-time-selection',
@@ -75,9 +75,9 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   createRanger(fullTimeRange: TSTimeRange, selection?: TSTimeRange): Observable<TimeSeriesAPIResponse> {
     const request: FindBucketsRequest = {
-      params: this.settings.contextualFilters,
       start: fullTimeRange.from,
       end: fullTimeRange.to, // to current time if it's not ended
+      oqlFilter: FilterUtils.objectToOQL(this.settings.contextualFilters),
       numberOfBuckets: TimeSeriesConfig.MAX_BUCKETS_IN_CHART,
     };
     return this.timeSeriesService.getBuckets(request).pipe(

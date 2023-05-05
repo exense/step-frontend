@@ -1,3 +1,23 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+@use 'projects/step-frontend/styles/common-mixins' as common-mixins;
+@include common-mixins.ts-filter-bar();
+
+:host {
+  display: flex;
+}
+
+.filter-item-container {
+  background: var.$gray-700;
+  color: white;
+  padding-top: 2px;
+  padding-bottom: 2px;
+
+  .subtitle {
+    color: var.$gray-200;
+  }
+}
+
 .mat-raised-button.mat-primary {
-  background: #293e50;
+  background: var.$blue-700;
 }

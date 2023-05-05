@@ -6,7 +6,12 @@ import { ResponseTimeMetric } from './model/response-time-metric';
 
 export class PerformanceViewConfig {
   public static responseTimeMetrics: ResponseTimeMetric[] = [
-    { label: 'Avg', mapFunction: (b: BucketResponse) => (b ? Math.round(b.sum / b.count) : undefined) },
+    {
+      label: 'Avg',
+      mapFunction: (b: BucketResponse) => {
+        return b ? Math.round(b.sum / Math.max(b.count, 1)) : undefined;
+      },
+    },
     { label: 'Min', mapFunction: (b: BucketResponse) => b?.min },
     { label: 'Max', mapFunction: (b: BucketResponse) => b?.max },
     { label: 'Perc. 90', mapFunction: (b: BucketResponse) => b?.pclValues?.[90] },
