@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
@@ -7,7 +7,8 @@ import { MatDialogRef } from '@angular/material/dialog';
   styleUrls: ['./modal-window.component.scss'],
 })
 export class ModalWindowComponent {
-  @Input() title: string = '';
+  readonly _dialogRef = inject(MatDialogRef);
 
-  constructor(public _dialogRef: MatDialogRef<unknown>) {}
+  @Input() showSpinner = false;
+  @Input() title = '';
 }
