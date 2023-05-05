@@ -1,51 +1,35 @@
-import { Injectable } from '@angular/core';
-import {
-  a1Promise2Observable,
-  DialogsService,
-  FunctionPackage,
-  KeywordPackagesService,
-  ResourceInputBridgeService,
-  UibModalHelperService,
-} from '@exense/step-core';
+import { inject, Injectable } from '@angular/core';
+import { a1Promise2Observable, DialogsService, FunctionPackage, KeywordPackagesService } from '@exense/step-core';
 import { map, Observable, of, switchMap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { MatDialog } from '@angular/material/dialog';
+import { FunctionPackageConfigurationDialogComponent } from '../components/function-package-configuration-dialog/function-package-configuration-dialog.component';
+import { FunctionPackageConfigurationDialogData } from '../types/function-package-configuration-dialog-data.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FunctionPackageActionsService {
-  constructor(
-    private _uibModalHelper: UibModalHelperService,
-    private _dialogs: DialogsService,
-    private _api: KeywordPackagesService,
-    private _resourceInputBridgeService: ResourceInputBridgeService
-  ) {}
+  private _matDialog = inject(MatDialog);
+  private _dialogs = inject(DialogsService);
+  private _api = inject(KeywordPackagesService);
 
-  private openModal<T>(functionPackage?: FunctionPackage, packageId?: string): Observable<T | boolean> {
-    const modalInstance = this._uibModalHelper.open({
-      backdrop: 'static',
-      templateUrl: 'functionpackages/partials/functionPackageConfigurationDialog.html',
-      controller: 'newFunctionPackageModalCtrl',
-      resolve: {
-        packageId: () => packageId,
-        function_: () => functionPackage,
-      },
-    });
-
-    return a1Promise2Observable<T | boolean>(modalInstance.result).pipe(
-      catchError(() => {
-        this._resourceInputBridgeService.deleteLastUploadedResource();
-
-        return of(false);
+  private openModal(functionPackage?: FunctionPackage, packageId?: string): Observable<FunctionPackage | boolean> {
+    return this._matDialog
+      .open(FunctionPackageConfigurationDialogComponent, {
+        data: {
+          packageId,
+          functionPackage,
+        } as FunctionPackageConfigurationDialogData,
       })
-    );
+      .afterClosed();
   }
 
-  openAddFunctionPackageDialog(): Observable<any> {
+  openAddFunctionPackageDialog(): Observable<FunctionPackage | boolean> {
     return this.openModal();
   }
 
-  editFunctionPackage(id: string): Observable<any> {
+  editFunctionPackage(id: string): Observable<FunctionPackage | boolean> {
     return this._api.getFunctionPackage(id).pipe(switchMap((response) => this.openModal(response, id)));
   }
 

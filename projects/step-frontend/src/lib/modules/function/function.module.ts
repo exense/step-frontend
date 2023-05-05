@@ -19,6 +19,7 @@ import { FunctionPackageSelectionComponent } from './components/function-package
 import { FunctionTypeFilterComponent } from './components/function-type-filter/function-type-filter.component';
 import { FunctionTypeLabelPipe } from './pipes/function-type-label.pipe';
 import { FunctionDialogsService } from './services/function-dialogs.service';
+import { FunctionPackageConfigurationDialogComponent } from './components/function-package-configuration-dialog/function-package-configuration-dialog.component';
 
 @NgModule({
   imports: [StepCommonModule, StepCoreModule, StepBasicsModule],
@@ -31,6 +32,7 @@ import { FunctionDialogsService } from './services/function-dialogs.service';
     FunctionTypeFilterComponent,
     FunctionPackageSearchComponent,
     FunctionPackageSelectionComponent,
+    FunctionPackageConfigurationDialogComponent,
   ],
   providers: [
     {
@@ -38,7 +40,7 @@ import { FunctionDialogsService } from './services/function-dialogs.service';
       useExisting: FunctionDialogsService,
     },
   ],
-  exports: [FunctionListComponent, FunctionPackageSelectionComponent],
+  exports: [FunctionListComponent, FunctionPackageSelectionComponent, FunctionPackageConfigurationDialogComponent],
 })
 export class FunctionModule {
   constructor(

@@ -22,11 +22,19 @@ export class FunctionPackageListComponent {
   isRefreshing: boolean = false;
 
   add(): void {
-    this._actions.openAddFunctionPackageDialog().subscribe(() => this.dataSource.reload());
+    this._actions.openAddFunctionPackageDialog().subscribe((result) => {
+      if (result) {
+        this.dataSource.reload();
+      }
+    });
   }
 
   edit(id: string): void {
-    this._actions.editFunctionPackage(id).subscribe(() => this.dataSource.reload());
+    this._actions.editFunctionPackage(id).subscribe((result) => {
+      if (result) {
+        this.dataSource.reload();
+      }
+    });
   }
 
   refresh(id: string): void {
