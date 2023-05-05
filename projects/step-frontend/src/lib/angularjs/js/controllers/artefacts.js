@@ -70,7 +70,7 @@ angular
         $scope.openDistributionWizard = function () {
           PlanDialogsService
             .openThreadGroupDistributionWizard($scope.artefact)
-            .subscribe();
+            .subscribe(() => $scope.save());
         };
       }],
       templateUrl: 'partials/artefacts/abstractArtefact.html',

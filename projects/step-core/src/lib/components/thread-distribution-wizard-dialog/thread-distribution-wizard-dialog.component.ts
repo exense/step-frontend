@@ -9,20 +9,37 @@ import { debounceTime, map, shareReplay, startWith } from 'rxjs';
 type DistributionForm = ThreadDistributionWizardDialogComponent['wizardForm'];
 type DistributionFormValue = DistributionForm['value'];
 
-const calculateValues = (value: DistributionFormValue = {}) => {
+const calculateValues = (value: DistributionFormValue = {}, durationUnits?: KeyValue<TimeUnit, string>[]) => {
   let threadsNum = 0;
   let pacing = 0;
   let isCalculationValid: boolean | undefined = undefined;
+  let unit = '';
 
   const { iterations, iterationsPerUnit, duration, durationUnit } = value;
+
+  if (durationUnits) {
+    unit = durationUnits.find((item) => item.key === durationUnit)?.value ?? '';
+  }
+
   const realDuration = (duration ?? 0) * (durationUnit ?? 0);
   if (!realDuration || !iterationsPerUnit) {
-    return { threadsNum, pacing, isCalculationValid };
+    const pacingMs = 0;
+    let pacingDisplay = pacingMs.toString();
+    if (unit) {
+      pacingDisplay = `${pacingDisplay} ${unit}`;
+    }
+    return { threadsNum, pacing, isCalculationValid, pacingMs, pacingDisplay };
   }
   threadsNum = Math.ceil((iterations ?? 0) / (iterationsPerUnit! / realDuration!));
-  pacing = parseFloat((iterationsPerUnit! / (iterations! / threadsNum)).toFixed(2));
-  isCalculationValid = pacing > realDuration;
-  return { threadsNum, pacing, isCalculationValid };
+  pacing = iterationsPerUnit! / (iterations! / threadsNum);
+  isCalculationValid = pacing >= realDuration;
+
+  const pacingMs = pacing * 1000;
+  let pacingDisplay = Math.round(pacing / durationUnit!).toString();
+  if (unit) {
+    pacingDisplay = `${pacingDisplay} ${unit}`;
+  }
+  return { threadsNum, pacing, pacingMs, pacingDisplay, isCalculationValid };
 };
 
 @Component({
@@ -59,7 +76,7 @@ export class ThreadDistributionWizardDialogComponent {
   readonly calculationResult$ = this.wizardForm.valueChanges.pipe(
     startWith(this.wizardForm.value),
     debounceTime(300),
-    map((value) => calculateValues(value)),
+    map((value) => calculateValues(value, this.durationUnits)),
     shareReplay(1)
   );
 
@@ -92,9 +109,9 @@ export class ThreadDistributionWizardDialogComponent {
     }
 
     if (pacing?.dynamic) {
-      pacing.expression = calculatedParams.pacing.toString();
+      pacing.expression = calculatedParams.pacingMs.toString();
     } else {
-      pacing.value = calculatedParams.pacing.toString();
+      pacing.value = calculatedParams.pacingMs.toString();
     }
 
     this._matDialogRef.close(artefact);
