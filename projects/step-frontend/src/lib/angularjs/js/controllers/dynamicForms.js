@@ -156,6 +156,10 @@ dynamicForms
         onSave: '&',
         schema: '=',
         isDisabled: '=',
+        jsonFieldsLabel: '=?',
+        primaryFieldsLabel: '=?',
+        optionalFieldsLabel: '=?',
+        addFieldBtnLabel: '=?',
         enforceGroovyExpression: '=?',
       },
       controller: function ($scope) {
