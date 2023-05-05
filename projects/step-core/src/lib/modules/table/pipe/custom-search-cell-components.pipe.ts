@@ -2,6 +2,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { Input as ColInput } from '../../../client/generated';
 import { CustomSearchCellRegistryService } from '../../custom-registeries/services/custom-search-cell-registry.service';
 
+const RENDER_COL_TYPES: Array<ColInput['type']> = ['DROPDOWN', 'CHECKBOX'];
+
 @Pipe({
   name: 'customSearchCellComponent',
 })
@@ -10,6 +12,12 @@ export class CustomSearchCellComponentsPipe implements PipeTransform {
 
   transform(col: ColInput): string | undefined {
     const componentKeys = this._customSearchCells.filterKeys(col?.searchMapperService ? [col.searchMapperService] : []);
-    return componentKeys.length === 0 ? undefined : componentKeys[0];
+    if (componentKeys.length > 0) {
+      return componentKeys[0];
+    }
+    if (RENDER_COL_TYPES.includes(col.type)) {
+      return col.type;
+    }
+    return undefined;
   }
 }

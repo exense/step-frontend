@@ -98,7 +98,7 @@ export class AuthService implements OnDestroy {
   }
 
   goToLoginPage(): void {
-   this._$location.path('/root/login');
+    this._$location.path('/root/login');
   }
 
   checkOidc(): void {

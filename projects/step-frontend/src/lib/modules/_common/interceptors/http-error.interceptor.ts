@@ -42,6 +42,8 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       this._snackBar.open(error.errorName + ': ' + error.errorMessage, 'dismiss');
     } else if (error?.errorName || error?.errorMessage) {
       this._snackBar.open(error.errorName || error.errorMessage, 'dismiss');
+    } else if (error?.error && error?.text) {
+      this._snackBar.open(error.error + ': ' + error.text, 'dismiss');
     } else {
       this._snackBar.open(error, 'dismiss');
     }
@@ -50,7 +52,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(
       tap((response: HttpEvent<any>) => {
-       this.handleAsyncError(response);
+        this.handleAsyncError(response);
       }),
       catchError((error) => this.handleHttpError(error))
     );
