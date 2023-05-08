@@ -884,6 +884,10 @@ fieldset {
   margin-top: 0 !important;
 }
 
+.mb-10 {
+  margin-bottom: 10px !important;
+}
+
 .on-hover {
   display: none;
 }

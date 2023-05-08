@@ -32,7 +32,7 @@ angular
     );
   })
 
-  .directive('artefactDetails', function ($http, $timeout, $interval, stateStorage, $filter, $location) {
+  .directive('artefactDetails', function () {
     return {
       restrict: 'E',
       scope: {
@@ -41,7 +41,7 @@ angular
         readonly: '=',
         handle: '=',
       },
-      controller: function ($scope, $location, artefactTypes, AuthService) {
+      controller: ['$scope', '$location', 'artefactTypes', 'AuthService', 'PlanDialogsService', function ($scope, $location, artefactTypes, AuthService, PlanDialogsService) {
         $scope.authService = AuthService;
         $scope.showAttributes = true;
         $scope.isKeyword = false;
@@ -66,7 +66,13 @@ angular
             }
           }
         };
-      },
+
+        $scope.openDistributionWizard = function () {
+          PlanDialogsService
+            .openThreadGroupDistributionWizard($scope.artefact)
+            .subscribe(() => $scope.save());
+        };
+      }],
       templateUrl: 'partials/artefacts/abstractArtefact.html',
     };
   })

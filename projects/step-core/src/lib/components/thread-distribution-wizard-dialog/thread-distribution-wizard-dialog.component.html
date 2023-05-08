@@ -1,0 +1,62 @@
+<step-modal-window title="Load Distribution Wizard">
+  <div step-modal-window-body>
+    <ng-container [formGroup]="wizardForm">
+      <step-form-field>
+        <step-label
+          >Target throughput
+          <step-icon
+            name="help-circle"
+            matTooltip='"Target Throughput" is the expected number of iterations produced over time during the execution'
+          >
+          </step-icon
+        ></step-label>
+        <input type="number" formControlName="iterations" placeholder="Iterations" />
+        <step-suffix>per</step-suffix>
+        <step-suffix>
+          <mat-select formControlName="iterationsPerUnit">
+            <mat-option *ngFor="let unit of iterationUnits; trackBy: trackByUnit" [value]="unit.key">
+              {{ unit.value }}
+            </mat-option>
+          </mat-select>
+        </step-suffix>
+      </step-form-field>
+      <step-form-field>
+        <step-label
+          >Estimated iteration durations max
+          <step-icon
+            name="help-circle"
+            matTooltip="Provide the duration to execute one iteration under load, considering to keep sufficient margin. If the actual iteration time is higher during the exeuction, the target thoughput will not be reached"
+          >
+          </step-icon
+        ></step-label>
+        <input type="number" formControlName="duration" placeholder="Duration" />
+        <step-suffix>
+          <mat-select formControlName="durationUnit">
+            <mat-option *ngFor="let unit of durationUnits; trackBy: trackByUnit" [value]="unit.key">
+              {{ unit.value }}
+            </mat-option>
+          </mat-select>
+        </step-suffix>
+        <step-error *ngIf="(isCalculationValid$ | async) === false">
+          The pacing must be higher or equal than max iteration duration. Please change form's value.
+        </step-error>
+      </step-form-field>
+    </ng-container>
+    <section class="calculation-results" *ngIf="calculationResult$ | async as params">
+      <div>Threads: {{ params.threadsNum }}</div>
+      <div>Pacing: {{ params.pacingDisplay }}</div>
+    </section>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
+    <button
+      type="button"
+      mat-flat-button
+      color="primary"
+      [disabled]="wizardForm.invalid || !(isCalculationValid$ | async)"
+      (click)="applyCalculatedParams()"
+    >
+      Apply calculated params
+    </button>
+  </div>
+</step-modal-window>
