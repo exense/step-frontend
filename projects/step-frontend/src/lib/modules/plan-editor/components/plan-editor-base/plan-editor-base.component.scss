@@ -1,0 +1,106 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-plan-editor-base {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  [stepPlanEditorKeyHandler] {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .editor-header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  mat-card.editor-card {
+    @include core.full-height-block;
+
+    mat-card-content {
+      display: block;
+      height: calc(100% - 69px);
+    }
+  }
+
+  .as-split-gutter {
+    background: transparent !important;
+    border-left: 1px solid var.$gray-200 !important;
+    border-right: 1px solid var.$gray-200 !important;
+  }
+
+  .as-split-area section {
+    padding: 24px;
+  }
+
+  .history {
+    display: none;
+  }
+
+  step-plan-tree-actions {
+    display: block;
+    min-height: 42px;
+    padding: 24px 24px 16px 24px;
+    box-sizing: content-box;
+  }
+
+  step-tree cdk-tree {
+    display: block;
+    padding-left: 24px;
+
+    .node-content[cdkDragHandle] {
+      padding: 8px 24px 8px 0;
+    }
+  }
+
+  step-tabs {
+    padding: 24px 24px 0;
+  }
+
+  .tab-content {
+    padding: 0 24px;
+  }
+}
+
+span.mat-menu-item.plan-execution-menu {
+  height: auto;
+  font-size: inherit;
+  line-height: initial;
+  font-weight: initial;
+
+  &:hover:not([disabled]) {
+    background: transparent;
+  }
+
+  step-plan-execution {
+    width: 250px;
+    display: block;
+    padding: 5px;
+  }
+}
+
+.actions-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var.$gray-200;
+  padding: 8px 24px 24px;
+
+  .editable-labels {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+.plan-type-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  step-icon {
+    @include core.step-icon-size(16px);
+    display: flex;
+  }
+}

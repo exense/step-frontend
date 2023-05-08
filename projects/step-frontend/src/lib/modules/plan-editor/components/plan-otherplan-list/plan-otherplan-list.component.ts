@@ -1,7 +1,6 @@
-import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Inject, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_LOCATION, AJS_MODULE, AugmentedPlansService, Plan } from '@exense/step-core';
+import { AJS_LOCATION, AugmentedPlansService } from '@exense/step-core';
 import { ILocationService } from 'angular';
 
 @Component({
@@ -24,7 +23,3 @@ export class PlanOtherplanListComponent {
     this.onSelection.emit(id);
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepPlanOtherplanList', downgradeComponent({ component: PlanOtherplanListComponent }));

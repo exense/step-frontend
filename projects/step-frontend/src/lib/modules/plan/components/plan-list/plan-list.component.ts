@@ -14,7 +14,7 @@ import {
 } from '@exense/step-core';
 import { ILocationService } from 'angular';
 import { noop } from 'rxjs';
-import { PlansBulkOperationsInvokeService } from '../../services/plans-bulk-operations-invoke.service';
+import { PlansBulkOperationsInvokeService } from '../../injectables/plans-bulk-operations-invoke.service';
 
 @Component({
   selector: 'step-plan-list',

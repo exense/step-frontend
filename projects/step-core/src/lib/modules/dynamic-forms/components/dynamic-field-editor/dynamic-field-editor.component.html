@@ -1,7 +1,7 @@
 <step-dynamic-field-group
-  primaryFieldsLabel="Inputs (required)"
-  optionalFieldsLabel="Inputs (optional)"
-  addFieldBtnLabel="Add input"
+  [primaryFieldsLabel]="primaryFieldsLabel ?? 'Inputs (required)'"
+  [optionalFieldsLabel]="optionalFieldsLabel ?? 'Inputs (optional)'"
+  [addFieldBtnLabel]="addFieldBtnLabel ?? 'Add input'"
   [schema]="schema"
   [value]="internalValue"
   (valueChange)="handleChange($event)"
@@ -11,7 +11,7 @@
 <div class="toggle-bar" (click)="showJson = !showJson">
   <div>
     <step-icon name="code"></step-icon>
-    <span>Input (raw JSON)</span>
+    <span>{{ jsonFieldsLabel ?? 'Input (raw JSON)' }}</span>
   </div>
   <step-icon [name]="showJson ? 'chevron-up' : 'chevron-down'"></step-icon>
 </div>

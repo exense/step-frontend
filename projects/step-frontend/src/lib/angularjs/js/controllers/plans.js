@@ -19,10 +19,6 @@
 angular
   .module('plans', ['tables', 'step', 'screenConfigurationControllers'])
 
-  .run(function (ViewRegistry, EntityRegistry) {
-    ViewRegistry.registerView('plans', 'partials/plans/plans.html');
-  })
-
   .factory('PlanTypeRegistry', function () {
     var api = {};
 
