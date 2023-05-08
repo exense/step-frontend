@@ -70,7 +70,13 @@
     </mat-menu>
   </ng-container>
 
-  <button type="button" mat-stroked-button color="primary" [matMenuTriggerFor]="executionMenu">
+  <button
+    *ngIf="showExecuteButton"
+    type="button"
+    mat-stroked-button
+    color="primary"
+    [matMenuTriggerFor]="executionMenu"
+  >
     <step-icon name="play-circle"></step-icon>
   </button>
 

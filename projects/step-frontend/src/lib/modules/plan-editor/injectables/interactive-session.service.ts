@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import {
   AugmentedInteractivePlanExecutionService,
   AugmentedScreenService,
@@ -7,6 +7,7 @@ import {
 } from '@exense/step-core';
 import { BehaviorSubject, map, Observable, of, switchMap, tap } from 'rxjs';
 import { KeywordParameters, TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../execution/execution.module';
+import { PlanEditorApiService } from './plan-editor-api.service';
 
 @Injectable()
 export class InteractiveSessionService implements OnDestroy {
@@ -21,10 +22,9 @@ export class InteractiveSessionService implements OnDestroy {
     map((eid) => ({ eid, type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS }))
   );
 
-  constructor(
-    private _screenTemplates: AugmentedScreenService,
-    private _interactiveApi: AugmentedInteractivePlanExecutionService
-  ) {}
+  private _screenTemplates = inject(AugmentedScreenService);
+  private _interactiveApi = inject(AugmentedInteractivePlanExecutionService);
+  private _planEditorApi = inject(PlanEditorApiService);
 
   init(): void {
     this._screenTemplates
@@ -77,7 +77,7 @@ export class InteractiveSessionService implements OnDestroy {
     }
 
     const [artefactId, ...restArtefacts] = selectedArtefactsIds;
-    return this._interactiveApi
+    return this._planEditorApi
       .executeArtefact(sessionId, planId, artefactId)
       .pipe(switchMap(() => this.execute(planId, restArtefacts)));
   }
