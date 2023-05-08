@@ -51,7 +51,11 @@ export class FunctionListComponent {
   }
 
   addFunctionPackage(): void {
-    this._functionPackageDialogs.openAddFunctionPackageDialog().subscribe(() => this.dataSource.reload());
+    this._functionPackageDialogs.openAddFunctionPackageDialog().subscribe((result) => {
+      if (result) {
+        this.dataSource.reload();
+      }
+    });
   }
 
   editFunction(id: string): void {

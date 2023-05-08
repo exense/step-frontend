@@ -22,6 +22,7 @@ import { FunctionTypeLabelPipe } from './pipes/function-type-label.pipe';
 import { FunctionDialogsService } from './services/function-dialogs.service';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
 import { CompositeFunctionEditorComponent } from './components/composite-function-editor/composite-function-editor.component';
+import { FunctionPackageConfigurationDialogComponent } from './components/function-package-configuration-dialog/function-package-configuration-dialog.component';
 
 @NgModule({
   imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule],
@@ -35,6 +36,7 @@ import { CompositeFunctionEditorComponent } from './components/composite-functio
     FunctionPackageSearchComponent,
     FunctionPackageSelectionComponent,
     CompositeFunctionEditorComponent,
+    FunctionPackageConfigurationDialogComponent,
   ],
   providers: [
     {
@@ -42,7 +44,7 @@ import { CompositeFunctionEditorComponent } from './components/composite-functio
       useExisting: FunctionDialogsService,
     },
   ],
-  exports: [FunctionListComponent, FunctionPackageSelectionComponent, CompositeFunctionEditorComponent],
+  exports: [FunctionListComponent, FunctionPackageSelectionComponent, CompositeFunctionEditorComponent, FunctionPackageConfigurationDialogComponent],
 })
 export class FunctionModule {
   constructor(

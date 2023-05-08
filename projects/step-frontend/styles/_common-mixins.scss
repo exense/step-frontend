@@ -1,7 +1,9 @@
 @use 'components/ts-tooltip';
 @use 'components/common-styles';
 @use 'components/legacy-styles';
+@use 'components/ts-filter-bar';
 
 @forward 'components/ts-tooltip';
 @forward 'components/common-styles';
 @forward 'components/legacy-styles' show legacy-styles;
+@forward 'components/ts-filter-bar';
