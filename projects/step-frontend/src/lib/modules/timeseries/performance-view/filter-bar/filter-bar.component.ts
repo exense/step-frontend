@@ -12,7 +12,7 @@ import {
   ViewChildren,
   ViewEncapsulation,
 } from '@angular/core';
-import { debounceTime, Observable, Subject, take } from 'rxjs';
+import { debounceTime, Observable, Subject, switchMap, take, tap } from 'rxjs';
 import { TimeSeriesContext } from '../../time-series-context';
 import { FilterUtils } from '../../util/filter-utils';
 import { PerformanceViewSettings } from '../model/performance-view-settings';
@@ -284,10 +284,12 @@ export class FilterBarComponent implements OnInit, OnDestroy {
       .append(contextualOql)
       .build();
     this.exportInProgress = true;
-    this.timeSeriesService.getMeasurementsAttributes(oql).subscribe((fields) => {
-      this.tableApiService
-        .exportAsCSV('measurements', fields, { filters: [{ oql: oql }] })
-        .subscribe(() => (this.exportInProgress = false));
-    });
+    this.timeSeriesService
+      .getMeasurementsAttributes(oql)
+      .pipe(
+        switchMap((fields) => this.tableApiService.exportAsCSV('measurements', fields, { filters: [{ oql: oql }] })),
+        tap(() => (this.exportInProgress = false))
+      )
+      .subscribe();
   }
 }
