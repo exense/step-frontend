@@ -29,7 +29,10 @@ export class FilterUtils {
     }
     let andFilters: (string | undefined)[] = items.map((item) => {
       let clause;
-      const attributeName = attributesPrefix ? `${attributesPrefix}.${item.attributeName}` : item.attributeName;
+      let attributeName = attributesPrefix ? `${attributesPrefix}.${item.attributeName}` : item.attributeName;
+      if (attributeName.includes(' ')) {
+        attributeName = `"${attributeName}"`;
+      }
       switch (item.type) {
         case FilterBarItemType.OPTIONS:
           clause = item.textValues

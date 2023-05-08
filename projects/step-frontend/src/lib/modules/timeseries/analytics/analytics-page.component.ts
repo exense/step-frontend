@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, DashboardService } from '@exense/step-core';
-import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
 import { TimeSeriesConfig } from '../time-series.config';
 import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
 import { TimeSeriesDashboardComponent } from '../dashboard/time-series-dashboard.component';
@@ -10,7 +9,7 @@ import { TSTimeRange } from '../chart/model/ts-time-range';
 import { TimeSeriesDashboardSettings } from '../dashboard/model/ts-dashboard-settings';
 import { TsUtils } from '../util/ts-utils';
 import { FilterBarItemType } from '../performance-view/filter-bar/model/ts-filter-item';
-import { Subject, takeUntil, timer } from 'rxjs';
+import { range, Subject, takeUntil, timer } from 'rxjs';
 
 @Component({
   selector: 'step-analytics-page',
@@ -41,7 +40,6 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   constructor(private dashboardService: DashboardService) {}
 
   ngOnInit(): void {
-    let selectedTimeRange = this.timeRangeOptions[0];
     let now = new Date().getTime();
     let start;
     let end;
@@ -50,20 +48,26 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
       this.refreshEnabled = true;
       this.selectedRefreshInterval = this.refreshIntervals[0];
     }
+    // if start is present, an absolute selection will be set. otherwise we check for relativeRange in url
     if (urlParams.start) {
       start = parseInt(urlParams.start);
       end = parseInt(urlParams.end) ? parseInt(urlParams.end) : now;
       this.timeRangeSelection = { type: RangeSelectionType.ABSOLUTE, absoluteSelection: { from: start, to: end } };
     } else {
-      start = now - selectedTimeRange.relativeSelection!.timeInMs;
+      if (urlParams.relativeRange && !isNaN(urlParams.relativeRange)) {
+        const range = Number(urlParams.relativeRange);
+        this.timeRangeSelection = this.getClosestRangeOption(range);
+      } else {
+        this.timeRangeSelection = this.timeRangeOptions[0];
+      }
+      start = now - this.timeRangeSelection.relativeSelection!.timeInMs;
       end = now;
-      this.timeRangeSelection = this.timeRangeOptions[0];
     }
 
     delete urlParams.refresh; // in case it exists
+    delete urlParams.relativeRange; // in case it exists
     delete urlParams.start;
     delete urlParams.end;
-    this.contextualParams = urlParams;
 
     this.dashboardSettings = {
       contextId: new Date().getTime().toString(),
@@ -165,6 +169,27 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
         break;
     }
     return newFullRange;
+  }
+
+  /**
+   * This method will return the first option that is smaller or equal to the specified range
+   * @param rangeMs
+   */
+  getClosestRangeOption(rangeMs: number): TimeRangePickerSelection {
+    let lastRelativeOption: TimeRangePickerSelection = this.timeRangeOptions[0];
+    for (let i = 0; i < this.timeRangeOptions.length; i++) {
+      const currentOption = this.timeRangeOptions[i];
+      if (currentOption.type === RangeSelectionType.RELATIVE) {
+        if (currentOption.relativeSelection!.timeInMs === rangeMs) {
+          return currentOption;
+        }
+        if (currentOption.relativeSelection!.timeInMs > rangeMs) {
+          return lastRelativeOption || currentOption;
+        }
+        lastRelativeOption = currentOption;
+      }
+    }
+    return lastRelativeOption;
   }
 
   ngOnDestroy(): void {

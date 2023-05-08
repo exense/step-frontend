@@ -26,15 +26,16 @@
   <div class="applied-filters" [style]="oqlModeActive ? 'overflow: unset' : ''">
     <step-timeseries-grouping (onGroupingChange)="handleGroupingChange($event)"></step-timeseries-grouping>
     <ng-container *ngIf="!oqlModeActive">
-      <step-ts-filter-bar-item
-        *ngFor="let item of visibleFilters; let i = index"
-        #appliedFilter
-        [item]="item"
-        [removable]="item.removable"
-        (onRemoveItem)="removeFilterItem(i)"
-        (onFilterChange)="handleFilterChange(i, $event)"
-      >
-      </step-ts-filter-bar-item>
+      <ng-container *ngFor="let item of filterItems; let i = index">
+        <step-ts-filter-bar-item
+          #appliedFilter
+          [item]="item"
+          [removable]="item.removable"
+          (onRemoveItem)="removeFilterItem(i)"
+          (onFilterChange)="handleFilterChange(i, $event)"
+        >
+        </step-ts-filter-bar-item>
+      </ng-container>
       <div class="more-btn-container" [matMenuTriggerFor]="typesMenu">
         <div class="more-btn filter-item-container">
           <span>More</span>
