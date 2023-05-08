@@ -27,7 +27,7 @@ export class FilterUtils {
     let andFilters: (string | undefined)[] = items.map((item) => {
       let clause;
       let attributeName = attributesPrefix ? `${attributesPrefix}.${item.attributeName}` : item.attributeName;
-      if (attributeName.includes('')) {
+      if (attributeName.includes(' ')) {
         attributeName = `"${attributeName}"`;
       }
       switch (item.type) {

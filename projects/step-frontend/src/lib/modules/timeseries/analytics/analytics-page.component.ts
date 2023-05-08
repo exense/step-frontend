@@ -63,7 +63,6 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
       start = now - this.timeRangeSelection.relativeSelection!.timeInMs;
       end = now;
     }
-    console.log(end - start);
 
     delete urlParams.refresh; // in case it exists
     delete urlParams.relativeRange; // in case it exists

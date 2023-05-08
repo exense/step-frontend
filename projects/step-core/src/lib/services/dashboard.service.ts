@@ -5,7 +5,7 @@ import { ViewRegistryService } from './view-registry.service';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE } from '../shared';
 
-const ONE_DAY_MS = 86400000;
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 @Injectable({
   providedIn: 'root',
