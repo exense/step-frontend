@@ -82,12 +82,11 @@ step-ts-filter-bar {
   /**
   These got override by the theme scss file
    */
-  .apply-btn {
-    color: #4b97de !important;
-    font-size: 12px !important;
-    line-height: 28px !important;
-    margin-right: 12px !important;
-    font-weight: bold !important;
+  .applied-filters button.apply-btn {
+    font-size: 12px;
+    line-height: 28px;
+    margin-right: 12px;
+    font-weight: bold;
   }
 
   .oql-container {

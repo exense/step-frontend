@@ -58,10 +58,11 @@
         ></step-icon>
         <span *ngIf="invalidOql" class="error-info">Invalid OQL</span>
       </div>
-      <button class="apply-btn" mat-button color="basic" (click)="manuallyApplyFilters()">Apply Filters</button>
+      <button class="apply-btn" mat-button color="primary" (click)="manuallyApplyFilters()">Apply Filters</button>
     </ng-container>
     <button
       class="apply-btn"
+      color="primary"
       *ngIf="!oqlModeActive && rawMeasurementsModeActive"
       mat-button
       (click)="manuallyApplyFilters()"
