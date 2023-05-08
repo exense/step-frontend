@@ -42,8 +42,7 @@ export class FilterUtils {
           clause = item.textValues
             ?.filter((f) => f.isSelected)
             .map((f) => {
-              const attribute = attributesPrefix ? `${attributesPrefix}.${finalAttributeName}` : finalAttributeName;
-              return `${attribute} = ${f.value}`;
+              return `${finalAttributeName} = ${f.value}`;
             })
             .join(' or ');
           break;
