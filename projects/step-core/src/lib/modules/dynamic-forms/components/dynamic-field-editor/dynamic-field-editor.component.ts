@@ -15,6 +15,11 @@ export class DynamicFieldEditorComponent implements OnChanges {
   @Input() schema?: DynamicFieldsSchema;
   @Input() value?: string;
 
+  @Input() primaryFieldsLabel?: string;
+  @Input() optionalFieldsLabel?: string;
+  @Input() addFieldBtnLabel?: string;
+  @Input() jsonFieldsLabel?: string;
+
   @Output() valueChange = new EventEmitter<string | undefined>();
 
   protected showJson: boolean = false;
@@ -22,7 +27,6 @@ export class DynamicFieldEditorComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     const cValue = changes['value'];
-
     if (cValue?.previousValue !== cValue?.currentValue || cValue?.firstChange) {
       this.parseValue(cValue?.currentValue);
     }

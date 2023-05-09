@@ -3,7 +3,10 @@ import { FilterBarItemType, TsFilterItem } from '../performance-view/filter-bar/
 export class FilterUtils {
   static filterItemIsValid(item: TsFilterItem) {
     return (
-      item.textValue || item.textValues?.some((v) => v.isSelected) || item.min != undefined || item.max != undefined
+      item.freeTextValues?.length ||
+      item.textValues?.some((v) => v.isSelected) ||
+      item.min != undefined ||
+      item.max != undefined
     );
   }
 
@@ -36,7 +39,10 @@ export class FilterUtils {
     let andFilters: (string | undefined)[] = items.map((item) => {
       let clause;
       const processedAttribute = attributeProcessFn ? attributeProcessFn(item.attributeName) : item.attributeName;
-      const finalAttributeName = attributesPrefix ? `${attributesPrefix}.${processedAttribute}` : processedAttribute;
+      let finalAttributeName = attributesPrefix ? `${attributesPrefix}.${processedAttribute}` : processedAttribute;
+      if (finalAttributeName.includes(' ')) {
+        finalAttributeName = `"${finalAttributeName}"`;
+      }
       switch (item.type) {
         case FilterBarItemType.OPTIONS:
           clause = item.textValues

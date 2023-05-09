@@ -1,13 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Inject, Output } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import {
-  AJS_LOCATION,
-  AJS_MODULE,
-  AugmentedKeywordsService,
-  FunctionPackage,
-  TableRemoteDataSource,
-} from '@exense/step-core';
+import { AJS_LOCATION, AugmentedKeywordsService, FunctionPackage, TableRemoteDataSource } from '@exense/step-core';
 import { ILocationService } from 'angular';
 
 @Component({
@@ -31,7 +24,3 @@ export class PlanFunctionListComponent {
     this.onSelection.emit(id);
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepPlanFunctionList', downgradeComponent({ component: PlanFunctionListComponent }));
