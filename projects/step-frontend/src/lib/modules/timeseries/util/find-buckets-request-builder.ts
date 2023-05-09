@@ -91,7 +91,7 @@ export class FindBucketsRequestBuilder {
 
   private combineOqlWithFilters(oql: string, filterItems: TsFilterItem[]): string {
     oql = oql.trim();
-    let filtersOql = FilterUtils.filtersToOQL(filterItems, this.attributesPrefix);
+    const filtersOql = FilterUtils.filtersToOQL(filterItems, this.attributesPrefix);
     return [oql, filtersOql].filter((x) => x).join(' and ');
   }
 }

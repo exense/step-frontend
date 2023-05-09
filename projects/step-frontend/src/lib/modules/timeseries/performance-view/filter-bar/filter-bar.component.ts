@@ -72,8 +72,8 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   constructor(
     private _changeDetectorRef: ChangeDetectorRef,
-    private timeSeriesService: TimeSeriesService,
-    private tableApiService: TableApiWrapperService
+    private _timeSeriesService: TimeSeriesService,
+    private _tableApiService: TableApiWrapperService
   ) {}
 
   getFilters(): TsFilterItem[] {
@@ -139,7 +139,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     }));
     const groupingOql = FilterUtils.filtersToOQL(groupingItems, TimeSeriesConfig.ATTRIBUTES_PREFIX);
     const finalOql = `${groupingOql} and (${filtersOql})`;
-    return this.timeSeriesService.verifyOql(finalOql);
+    return this._timeSeriesService.verifyOql(finalOql);
   }
 
   handleGroupingChange(dimensions: string[]) {
@@ -172,8 +172,8 @@ export class FilterBarComponent implements OnInit, OnDestroy {
       this.emitFiltersChange();
     } else {
       // oql mode
-      let oql = this.oqlValue;
-      this.timeSeriesService.verifyOql(oql).subscribe((response) => {
+      const oql = this.oqlValue;
+      this._timeSeriesService.verifyOql(oql).subscribe((response) => {
         this.invalidOql = !response.valid;
         if (response.valid && response.hasUnknownFields) {
         }
@@ -221,7 +221,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   }
 
   removeFilterItem(index: number) {
-    let itemToDelete = this.filterItems[index];
+    const itemToDelete = this.filterItems[index];
 
     this.filterItems.splice(index, 1);
 
@@ -242,7 +242,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   }
 
   private haveNewGrouping() {
-    let contextGrouping = this.context.getGroupDimensions();
+    const contextGrouping = this.context.getGroupDimensions();
     if (contextGrouping.length !== this.groupDimensions.length) {
       return true;
     } else {
@@ -259,28 +259,28 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     if (this.exportInProgress) {
       return;
     }
-    let filteringSettings = this.context.getFilteringSettings();
-    let filtersOql =
+    const filteringSettings = this.context.getFilteringSettings();
+    const filtersOql =
       filteringSettings.mode === TsFilteringMode.OQL
         ? filteringSettings.oql.replace('attributes.', '')
         : FilterUtils.filtersToOQL(this.getValidFilters(), undefined, ATTRIBUTES_REMOVAL_FUNCTION);
-    let contextualOql = FilterUtils.objectToOQL(
+    const contextualOql = FilterUtils.objectToOQL(
       this.performanceViewSettings.contextualFilters,
       undefined,
       ATTRIBUTES_REMOVAL_FUNCTION
     );
-    let selectedTimeRange = this.context.getSelectedTimeRange();
-    let oql = new OQLBuilder()
+    const selectedTimeRange = this.context.getSelectedTimeRange();
+    const oql = new OQLBuilder()
       .open('and')
       .append(`(begin < ${Math.trunc(selectedTimeRange.to)} and begin > ${Math.trunc(selectedTimeRange.from)})`)
       .append(filtersOql)
       .append(contextualOql)
       .build();
     this.exportInProgress = true;
-    this.timeSeriesService
+    this._timeSeriesService
       .getMeasurementsAttributes(oql)
       .pipe(
-        switchMap((fields) => this.tableApiService.exportAsCSV('measurements', fields, { filters: [{ oql: oql }] })),
+        switchMap((fields) => this._tableApiService.exportAsCSV('measurements', fields, { filters: [{ oql: oql }] })),
         tap(() => (this.exportInProgress = false))
       )
       .subscribe();

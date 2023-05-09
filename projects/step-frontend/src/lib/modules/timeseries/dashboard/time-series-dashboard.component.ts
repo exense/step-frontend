@@ -111,15 +111,15 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   setRanges(fullRange: TSTimeRange, selection?: TSTimeRange) {
-    let isFullRangeSelected = this.context.isFullRangeSelected();
+    const isFullRangeSelected = this.context.isFullRangeSelected();
     let newSelection = selection || this.context.getSelectedTimeRange();
     this.context.updateFullRange(fullRange, false);
     if (isFullRangeSelected && !selection) {
       newSelection = fullRange;
     } else {
       // we crop it
-      let newFrom = Math.max(fullRange.from, newSelection.from);
-      let newTo = Math.min(fullRange.to, newSelection.to);
+      const newFrom = Math.max(fullRange.from, newSelection.from);
+      const newTo = Math.min(fullRange.to, newSelection.to);
       if (newTo - newFrom < 3) {
         newSelection = fullRange; // zoom reset when the interval is very small
       } else {

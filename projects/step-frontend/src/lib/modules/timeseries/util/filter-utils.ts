@@ -31,7 +31,7 @@ export class FilterUtils {
   static filtersToOQL(
     items: TsFilterItem[],
     attributesPrefix?: string,
-    attributeProcessFn?: (x: string) => string
+    attributeProcessFn?: (attribute: string) => string
   ): string {
     if (!items || items.length === 0) {
       return '';
