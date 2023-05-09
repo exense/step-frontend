@@ -55,14 +55,14 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
         label: key,
         type: FilterBarItemType.FREE_TEXT,
         attributeName: key,
-        textValue: this.settings.contextualFilters[key],
+        freeTextValues: [this.settings.contextualFilters[key]],
         isLocked: false,
+        exactMatch: true,
       };
     });
     const contextParams: TimeSeriesContextParams = {
       id: this.settings.contextId,
       timeRange: this.settings.timeRange,
-      baseFilters: {},
       dynamicFilters: this.contextualFilterItems,
       grouping: ['name'],
     };

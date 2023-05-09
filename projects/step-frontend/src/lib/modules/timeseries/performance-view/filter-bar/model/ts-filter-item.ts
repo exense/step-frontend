@@ -10,6 +10,7 @@ export interface TsFilterItem {
   max?: number; // for numbers an dates
   freeTextValues?: string[]; // for free text, using regex search
   textValues?: { value: string; isSelected?: boolean }[]; // for text with suggestions, using exact match
+  exactMatch?: boolean;
 }
 
 export enum FilterBarItemType {

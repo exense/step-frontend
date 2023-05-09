@@ -109,9 +109,10 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   toggleOQLMode() {
     if (this.oqlModeActive) {
-      const contextualOql = FilterUtils.objectToOQL(this.performanceViewSettings.contextualFilters);
-      const customOql = FilterUtils.filtersToOQL(this.getValidFilters(), TimeSeriesConfig.ATTRIBUTES_PREFIX);
-      this.oqlValue = customOql;
+      this.oqlValue = FilterUtils.filtersToOQL(
+        this.getValidFilters().filter((item) => !item.isHidden),
+        TimeSeriesConfig.ATTRIBUTES_PREFIX
+      );
     } else {
       this.invalidOql = false;
     }
@@ -132,11 +133,12 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     let groupingItems: TsFilterItem[] = groupDimensions.map((dimension) => ({
       attributeName: dimension,
       type: FilterBarItemType.FREE_TEXT,
-      textValue: 'group-dimension',
+      freeTextValues: ['fake-group-dimension'],
+      exactMatch: true,
       label: '',
     }));
-    const groupingOql = FilterUtils.filtersToOQL(groupingItems, TimeSeriesConfig.ATTRIBUTES_PREFIX) || '';
-    const finalOql: string = filtersOql ? `(${groupingOql}) and ${filtersOql}` : groupingOql;
+    const groupingOql = FilterUtils.filtersToOQL(groupingItems, TimeSeriesConfig.ATTRIBUTES_PREFIX);
+    const finalOql = `${groupingOql} and (${filtersOql})`;
     return this.timeSeriesService.verifyOql(finalOql);
   }
 
@@ -156,8 +158,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   emitFiltersChange() {
     const settings: TsFilteringSettings = {
       mode: this.oqlModeActive ? TsFilteringMode.OQL : TsFilteringMode.STANDARD,
-      baseFilters: this.context.getBaseFilters(),
-      filterItems: this.getFilters().filter(FilterUtils.filterItemIsValid),
+      filterItems: this.getValidFilters(),
       oql: this.oqlValue,
     };
     this.onFilterSettingsChange.emit(settings);

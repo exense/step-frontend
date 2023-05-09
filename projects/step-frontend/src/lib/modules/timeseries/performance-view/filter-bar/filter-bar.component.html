@@ -28,6 +28,7 @@
     <ng-container *ngIf="!oqlModeActive">
       <ng-container *ngFor="let item of filterItems; let i = index">
         <step-ts-filter-bar-item
+          *ngIf="!item.isHidden"
           #appliedFilter
           [item]="item"
           [removable]="item.removable"

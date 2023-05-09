@@ -1,9 +1,9 @@
 import { FilterBarItemType, TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
 
 export class FilterUtils {
-  static filterItemIsValid(item: TsFilterItem) {
+  static filterItemIsValid(item: TsFilterItem): boolean {
     return (
-      item.freeTextValues?.length ||
+      (item.freeTextValues && item.freeTextValues.length > 0) ||
       item.textValues?.some((v) => v.isSelected) ||
       item.min != undefined ||
       item.max != undefined
@@ -53,7 +53,13 @@ export class FilterUtils {
             .join(' or ');
           break;
         case FilterBarItemType.FREE_TEXT:
-          clause = `${finalAttributeName} ~ ".*${item.textValue}.*"`;
+          clause = item.freeTextValues
+            ?.map((value) => {
+              let regexMatch = `${finalAttributeName} ~ ".*${value}.*"`;
+              const equalityMatch = `${finalAttributeName} = ${value}`;
+              return item.exactMatch ? equalityMatch : regexMatch; // we need exact match for indexes efficiency
+            })
+            .join(' OR ');
           break;
         case FilterBarItemType.NUMERIC:
         case FilterBarItemType.DATE:
