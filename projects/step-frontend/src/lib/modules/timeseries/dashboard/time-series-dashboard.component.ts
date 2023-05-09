@@ -48,22 +48,22 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     if (!this.settings) {
       throw new Error('Settings input must be set');
     }
-    if (this.settings.showContextualFilters) {
-      this.contextualFilterItems = Object.keys(this.settings.contextualFilters).map((key) => {
-        return {
-          label: key,
-          type: FilterBarItemType.FREE_TEXT,
-          attributeName: key,
-          textValue: this.settings.contextualFilters[key],
-          isLocked: false,
-        };
-      });
-    }
+    this.contextualFilterItems = Object.keys(this.settings.contextualFilters).map((key) => {
+      return {
+        isHidden: !this.settings.showContextualFilters,
+        removable: true,
+        label: key,
+        type: FilterBarItemType.FREE_TEXT,
+        attributeName: key,
+        textValue: this.settings.contextualFilters[key],
+        isLocked: false,
+      };
+    });
     const contextParams: TimeSeriesContextParams = {
       id: this.settings.contextId,
       timeRange: this.settings.timeRange,
-      baseFilters: this.settings.contextualFilters,
-      dynamicFilters: [],
+      baseFilters: {},
+      dynamicFilters: this.contextualFilterItems,
       grouping: ['name'],
     };
     this.context = this.contextsFactory.createContext(contextParams);

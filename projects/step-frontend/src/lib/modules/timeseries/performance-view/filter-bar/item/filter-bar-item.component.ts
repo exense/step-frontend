@@ -4,6 +4,8 @@ import { DateTime } from 'luxon';
 import { TimeSeriesUtils } from '../../../time-series-utils';
 import { FilterBarItemType, TsFilterItem } from '../model/ts-filter-item';
 import { MatCheckbox } from '@angular/material/checkbox';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { MatChipInputEvent } from '@angular/material/chips';
 
 @Component({
   selector: 'step-ts-filter-bar-item',
@@ -22,7 +24,9 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
 
   readonly FilterBarType = FilterBarItemType;
 
-  freeTextValue = '';
+  freeTextValues: string[] = [];
+  chipInputValue = '';
+  readonly separatorKeysCodes = [ENTER, COMMA] as const;
   minValue?: number; // for numbers or dates
   maxValue?: number; // for numbers or dates
 
@@ -68,6 +72,9 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
   }
 
   applyChanges() {
+    if (this.chipInputValue) {
+      this.addSearchValue(this.chipInputValue);
+    }
     if (!this.item.isLocked) {
       this.item.label = this.item.attributeName;
     }
@@ -75,7 +82,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
       case FilterBarItemType.OPTIONS:
         break;
       case FilterBarItemType.FREE_TEXT:
-        this.item.textValue = this.freeTextValue;
+        this.item.freeTextValues = this.freeTextValues;
         break;
       case FilterBarItemType.NUMERIC:
       case FilterBarItemType.DATE:
@@ -103,10 +110,8 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     let formattedValue: string | undefined = '';
     switch (filter.type) {
       case FilterBarItemType.FREE_TEXT:
-        formattedValue = this.item.textValue;
-
+        formattedValue = this.item.freeTextValues?.join(', ');
         break;
-
       case FilterBarItemType.NUMERIC:
         if (filter.min != undefined && filter.max != undefined) {
           formattedValue = `${filter.min} - ${filter.max}`;
@@ -145,5 +150,17 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
         break;
     }
     return formattedValue;
+  }
+
+  addSearchValue(text: string): void {
+    const value = (text || '').trim();
+
+    if (value) {
+      this.freeTextValues.push(value);
+    }
+
+    // Clear the input value
+    // event.chipInput!.clear();
+    this.chipInputValue = '';
   }
 }

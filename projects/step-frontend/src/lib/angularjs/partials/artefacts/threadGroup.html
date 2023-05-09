@@ -6,6 +6,9 @@
           <a ng-click="hideLoadDistribution = !hideLoadDistribution">Load distribution parameters</a>
         </div>
         <div class="panel-body" ng-show="!hideLoadDistribution">
+          <button type="button" class="btn btn-primary mb-10" ng-click="openDistributionWizard()">
+             Calculation Wizard
+          </button>
           <dynamic-textfield
             label="'Number of threads'"
             tooltip="'Specifies the number of threads to be started.'"

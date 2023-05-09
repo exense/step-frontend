@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import {
   AbstractArtefact,
   ArtefactTreeNode,
@@ -19,18 +19,31 @@ import {
   TreeStateService,
 } from '@exense/step-core';
 import { BehaviorSubject, filter, map, merge, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
-import { ArtefactTreeNodeUtilsService } from '../../services/artefact-tree-node-utils.service';
-import { PlanHistoryService } from '../../services/plan-history.service';
+import { PlanHistoryService } from '../../injectables/plan-history.service';
+import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
+import { PlanEditorApiService } from '../../injectables/plan-editor-api.service';
 
 const MESSAGE_ADD_AT_MULTIPLE_NODES =
   'Adding elements is not supported when more then one node is selected in the tree';
 
 @Component({
-  selector: 'step-plan-tree-editor',
-  templateUrl: './plan-tree-editor.component.html',
-  styleUrls: ['./plan-tree-editor.component.scss'],
+  selector: 'step-plan-common-tree-editor-form',
+  templateUrl: './plan-common-tree-editor-form.component.html',
+  styleUrls: ['./plan-common-tree-editor-form.component.scss'],
 })
-export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrategy, OnInit, OnDestroy {
+export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanEditorStrategy, OnInit, OnDestroy {
+  private _planEditor = inject(PlanEditorService);
+  private _planEditorApi = inject(PlanEditorApiService);
+  private _planApi = inject(PlansService);
+  private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
+  private _authService = inject(AuthService);
+  private _keywordCallsApi = inject(KeywordsService);
+  private _screenTemplates = inject(AugmentedScreenService);
+  private _planHistory = inject(PlanHistoryService);
+  private _dialogs = inject(DialogsService);
+  private _persistenceService = inject(PersistenceService);
+  private _artefactTreeNodeUtilsService = inject(ArtefactTreeNodeUtilsService);
+
   context?: any;
   private terminator$ = new Subject<void>();
   private planChange$ = new Subject<Plan>();
@@ -44,19 +57,6 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
   readonly plan$ = this.planInternal$.asObservable();
   readonly hasRedo$ = this._planHistory.hasRedo$;
   readonly hasUndo$ = this._planHistory.hasUndo$;
-
-  constructor(
-    private _planEditor: PlanEditorService,
-    private _planApi: PlansService,
-    private _treeState: TreeStateService<AbstractArtefact, ArtefactTreeNode>,
-    private _authService: AuthService,
-    private _keywordCallsApi: KeywordsService,
-    private _screenTemplates: AugmentedScreenService,
-    private _planHistory: PlanHistoryService,
-    private _dialogs: DialogsService,
-    private _persistenceService: PersistenceService,
-    private _artefactTreeNodeUtilsService: ArtefactTreeNodeUtilsService
-  ) {}
 
   addControl(artefactTypeId: string): void {
     if (this._treeState.isMultipleNodesSelected()) {
@@ -221,12 +221,12 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
 
     merge(planUpdateByTree$, planUpdateByEditor$, planUpdatedByHistory$)
       .pipe(
-        switchMap((plan) => this._planApi.savePlan(plan)),
+        switchMap((plan) => this._planEditorApi.savePlan(plan!)),
         takeUntil(this.terminator$)
       )
-      .subscribe((updatedPlan) => {
+      .subscribe(({ plan }) => {
         if (this.planInternal$.value) {
-          this.planInternal$.value.customFields = updatedPlan.customFields;
+          this.planInternal$.value.customFields = plan.customFields;
         }
       });
   }

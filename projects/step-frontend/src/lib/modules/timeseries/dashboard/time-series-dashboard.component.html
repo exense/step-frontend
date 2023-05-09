@@ -5,7 +5,7 @@
     class="mat-card"
     [performanceViewSettings]="performanceViewSettings"
     [defaultFilterOptions]="settings.filterOptions"
-    [hiddenFilters]="contextualFilterItems"
+    [initialFilters]="contextualFilterItems"
     (onFiltersChange)="handleFiltersChange($event)"
     (onFilterSettingsChange)="handleFilteringChange($event)"
     (onGroupingChange)="handleGroupingChange($event)"

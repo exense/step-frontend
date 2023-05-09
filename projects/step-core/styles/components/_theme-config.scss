@@ -254,4 +254,17 @@ $light-primary-text: white;
     margin: 0;
     padding: 0;
   }
+
+  /**
+  This will create a nice scrollbar inside the form field when the chips content are very long.
+  Otherwise they will overflow the container.
+   */
+  .mat-chip-list-wrapper {
+    overflow-x: auto;
+  }
+
+  .mat-menu-panel.wide {
+    max-width: 380px;
+    width: 380px;
+  }
 }

@@ -47,7 +47,13 @@
             on-save="save()"
             tooltip="'Defines if the Keyword has to be executed on an agent or locally on the controller.'"
           />
-          <dynamic-json-editor label="'Agent token selectors'" dynamic-value="artefact.token" on-save="save()" />
+          <dynamic-json-editor label="'Agent token selectors'"
+                               dynamic-value="artefact.token"
+                               on-save="save()"
+                               json-fields-label="'Selection criteria (raw JSON)'"
+                               primary-fields-label="'Selection criteria (required)'"
+                               optional-fields-label="'Selection criteria (optional)'"
+                               add-field-btn-label="'Add selection criteria'"/>
         </div>
       </div>
     </fieldset>

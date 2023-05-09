@@ -62,10 +62,6 @@
   height: auto;
 }
 
-button {
-  background: var.$dark-blue !important;
-}
-
 label {
   padding-bottom: 1.25em;
 }
@@ -90,4 +86,8 @@ label {
   flex-direction: column;
   gap: 1.25em;
   padding-bottom: 1.25em;
+}
+
+.submit-btn {
+  margin-top: 12px;
 }

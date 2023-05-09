@@ -13,7 +13,12 @@
   </div>
 </div>
 
-<mat-menu #menu="matMenu" [ngSwitch]="item.type" (close)="onMenuClose()">
+<mat-menu
+  #menu="matMenu"
+  [ngSwitch]="item.type"
+  (close)="onMenuClose()"
+  [class]="item.type === 'FREE_TEXT' ? 'wide' : ''"
+>
   <form
     class="menu-container"
     (click)="$event.stopPropagation()"
@@ -58,14 +63,30 @@
         />
       </mat-form-field>
 
-      <mat-form-field class="w-100">
-        <mat-label>Search value</mat-label>
-        <input type="text" autocomplete="off" matInput name="textValue" [(ngModel)]="freeTextValue" stepFocusable />
+      <mat-form-field class="w-100" appearance="fill">
+        <mat-label>Search values</mat-label>
+        <mat-chip-list #chipList aria-label="Enter values">
+          <mat-chip *ngFor="let value of freeTextValues; let i = index" (removed)="freeTextValues.splice(i, 1)">
+            {{ value }}
+            <button matChipRemove [attr.aria-label]="'remove'">
+              <step-icon name="x"></step-icon>
+            </button>
+          </mat-chip>
+          <input
+            matChipInput
+            [(ngModel)]="chipInputValue"
+            [ngModelOptions]="{ standalone: true }"
+            [matChipInputFor]="chipList"
+            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+            (matChipInputTokenEnd)="addSearchValue($event.value || '')"
+          />
+        </mat-chip-list>
+        <mat-hint>Use "Enter" to add values</mat-hint>
       </mat-form-field>
 
       <button
         type="submit"
-        class="w-100"
+        class="w-100 submit-btn"
         (click)="applyChanges()"
         mat-raised-button
         color="primary"
