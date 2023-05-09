@@ -150,19 +150,22 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     filter((forceNavigate) => forceNavigate === true)
   );
 
-  private typeFilter?: { [key: string]: SearchValue };
+  private filters: { [key: string]: SearchValue } = {};
 
   constructor(
     private _tableId: string,
     private _rest: TableApiWrapperService,
     private _requestColumnsMap: { [key: string]: string },
-    private _typeFilter?: string[]
+    private _filters?: { [key: string]: string[] }
   ) {
-    if (_typeFilter) {
-      if (_typeFilter.length === 1) {
-        this.typeFilter = { type: _typeFilter[0] };
-      } else {
-        this.typeFilter = { type: { value: `(${_typeFilter.join('|')})`, regex: true } };
+    if (_filters) {
+      for (const key in _filters) {
+        const filter = _filters[key];
+        if (filter.length === 1) {
+          this.filters[key] = filter[0];
+        } else {
+          this.filters[key] = { value: `(${filter.join('|')})`, regex: true };
+        }
       }
     }
   }
@@ -182,8 +185,8 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   }
 
   private createInternalRequestObject({ params, filter, search }: TableFilterOptions = {}): TableRequestInternal {
-    if (this.typeFilter) {
-      search = { ...(search || {}), ...this.typeFilter };
+    if (Object.keys(this.filters).length > 0) {
+      search = { ...(search || {}), ...this.filters };
     }
 
     const tableRequest: TableRequestInternal = new TableRequestInternal({
