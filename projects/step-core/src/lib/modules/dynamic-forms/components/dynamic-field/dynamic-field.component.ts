@@ -100,7 +100,11 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
 
   protected valueChange(value: DynamicValue['value'], type?: DynamicFieldType): void {
     if ((type === DynamicFieldType.array || type === DynamicFieldType.object) && typeof value === 'string') {
-      value = JSON.parse(value);
+      try {
+        value = JSON.parse(value);
+      } catch (e) {
+        // we don't show the error since they may happen for in-between states when typing an object
+      }
     }
 
     this.value = value;
