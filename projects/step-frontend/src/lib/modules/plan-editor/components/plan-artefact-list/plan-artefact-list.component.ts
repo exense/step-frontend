@@ -1,8 +1,7 @@
 import { Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_LOCATION, AJS_MODULE } from '@exense/step-core';
+import { AJS_LOCATION } from '@exense/step-core';
 import { ILocationService } from 'angular';
-import { ArtefactService } from '../../services/artefact.service';
+import { ArtefactService } from '../../injectables/artefact.service';
 
 @Component({
   selector: 'step-plan-artefact-list',
@@ -22,7 +21,3 @@ export class PlanArtefactListComponent implements OnInit {
     this.onSelection.emit(id);
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepPlanArtefactList', downgradeComponent({ component: PlanArtefactListComponent }));

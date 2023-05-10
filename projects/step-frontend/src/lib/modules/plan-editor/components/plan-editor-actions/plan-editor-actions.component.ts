@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RepositoryObjectReference } from '@exense/step-core';
-import { InteractiveSessionService } from '../../services/interactive-session.service';
+import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 
 @Component({
   selector: 'step-plan-editor-actions',
@@ -13,6 +13,7 @@ export class PlanEditorActionsComponent {
   @Input() isInteractiveSessionActive?: boolean | null;
   @Input() description?: string;
   @Input() repositoryObjectRef?: RepositoryObjectReference;
+  @Input() showExecuteButton?: boolean;
 
   @Output() discardAll = new EventEmitter<void>();
   @Output() undo = new EventEmitter<void>();

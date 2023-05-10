@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AJS_MODULE, AuthService, PlansService } from '@exense/step-core';
+import { AJS_MODULE, PlansService } from '@exense/step-core';
 import { map } from 'rxjs';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 

@@ -262,6 +262,6 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     delete tableRequest.skip;
     delete tableRequest.limit;
 
-    this._rest.exportAsCSV(this._tableId, fields, tableRequest);
+    this._rest.exportAsCSV(this._tableId, fields, tableRequest).subscribe();
   }
 }

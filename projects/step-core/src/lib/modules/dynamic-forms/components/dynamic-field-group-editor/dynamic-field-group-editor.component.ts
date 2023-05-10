@@ -257,6 +257,12 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
           case 'boolean':
             fieldType = DynamicFieldType.boolean;
             break;
+          case 'array':
+            fieldType = DynamicFieldType.array;
+            break;
+          case 'object':
+            fieldType = DynamicFieldType.object;
+            break;
           default:
             break;
         }

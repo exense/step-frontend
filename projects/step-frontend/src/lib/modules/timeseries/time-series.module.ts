@@ -23,6 +23,9 @@ import { TsGroupingComponent } from './dashboard/grouping/ts-grouping.component'
 import { AnalyticsPageComponent } from './analytics/analytics-page.component';
 import { ExecutionPerformanceComponent } from './execution-page/ts-execution-page.component';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @NgModule({
   declarations: [
@@ -55,6 +58,9 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
     CommonModule,
     MatDatepickerModule,
     MatButtonToggleModule,
+    MatChipsModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
 })
 export class TimeSeriesModule {}

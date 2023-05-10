@@ -48,22 +48,22 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     if (!this.settings) {
       throw new Error('Settings input must be set');
     }
-    if (this.settings.showContextualFilters) {
-      this.contextualFilterItems = Object.keys(this.settings.contextualFilters).map((key) => {
-        return {
-          label: key,
-          type: FilterBarItemType.FREE_TEXT,
-          attributeName: key,
-          textValue: this.settings.contextualFilters[key],
-          isLocked: false,
-        };
-      });
-    }
+    this.contextualFilterItems = Object.keys(this.settings.contextualFilters).map((key) => {
+      return {
+        isHidden: !this.settings.showContextualFilters,
+        removable: true,
+        label: key,
+        type: FilterBarItemType.FREE_TEXT,
+        attributeName: key,
+        freeTextValues: [this.settings.contextualFilters[key]],
+        isLocked: false,
+        exactMatch: true,
+      };
+    });
     const contextParams: TimeSeriesContextParams = {
       id: this.settings.contextId,
       timeRange: this.settings.timeRange,
-      baseFilters: this.settings.contextualFilters,
-      dynamicFilters: [],
+      dynamicFilters: this.contextualFilterItems,
       grouping: ['name'],
     };
     this.context = this.contextsFactory.createContext(contextParams);
@@ -111,15 +111,15 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   setRanges(fullRange: TSTimeRange, selection?: TSTimeRange) {
-    let isFullRangeSelected = this.context.isFullRangeSelected();
+    const isFullRangeSelected = this.context.isFullRangeSelected();
     let newSelection = selection || this.context.getSelectedTimeRange();
     this.context.updateFullRange(fullRange, false);
     if (isFullRangeSelected && !selection) {
       newSelection = fullRange;
     } else {
       // we crop it
-      let newFrom = Math.max(fullRange.from, newSelection.from);
-      let newTo = Math.min(fullRange.to, newSelection.to);
+      const newFrom = Math.max(fullRange.from, newSelection.from);
+      const newTo = Math.min(fullRange.to, newSelection.to);
       if (newTo - newFrom < 3) {
         newSelection = fullRange; // zoom reset when the interval is very small
       } else {

@@ -75,12 +75,34 @@
         />
       </ng-container>
 
+      <ng-container *ngSwitchCase="DynamicFieldType.object">
+        <input
+          type="text"
+          [disabled]="isDisabled"
+          [ngModel]="value | json"
+          (ngModelChange)="valueChange($event, fieldType)"
+          (blur)="onTouch()"
+          [tabindex]="tabIndex"
+        />
+      </ng-container>
+
+      <ng-container *ngSwitchCase="DynamicFieldType.array">
+        <input
+          type="text"
+          [disabled]="isDisabled"
+          [ngModel]="value | json"
+          (ngModelChange)="valueChange($event, fieldType)"
+          (blur)="onTouch()"
+          [tabindex]="tabIndex"
+        />
+      </ng-container>
+
       <ng-container *ngSwitchDefault>
         <input
           type="text"
           [disabled]="isDisabled"
           [ngModel]="value"
-          (ngModelChange)="valueChange($event)"
+          (ngModelChange)="valueChange($event, fieldType)"
           (blur)="onTouch()"
           [tabindex]="tabIndex"
         />

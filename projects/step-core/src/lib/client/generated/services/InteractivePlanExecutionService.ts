@@ -34,6 +34,25 @@ export class InteractivePlanExecutionService {
   }
 
   /**
+   * @param id
+   * @param functionid
+   * @param artefactid
+   * @returns ReportNode default response
+   * @throws ApiError
+   */
+  public executeCompositeFunction(id: string, functionid: string, artefactid: string): Observable<ReportNode> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/interactive/{id}/executefunction/{functionid}/{artefactid}',
+      path: {
+        id: id,
+        functionid: functionid,
+        artefactid: artefactid,
+      },
+    });
+  }
+
+  /**
    * @param keywordid
    * @returns FunctionTestingSession default response
    * @throws ApiError

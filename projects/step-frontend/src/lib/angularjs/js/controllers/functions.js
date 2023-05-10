@@ -19,14 +19,30 @@
 angular
   .module('functionsControllers', ['step'])
 
-  .run(function (FunctionTypeRegistry, ViewRegistry, EntityRegistry) {
-    ViewRegistry.registerView('functions', 'partials/functionList.html');
+  .run(function (FunctionTypeRegistry) {
     FunctionTypeRegistry.register(
       'step.plugins.functions.types.CompositeFunction',
       'Composite',
-      'partials/functions/forms/composite.html'
+      null
     );
   })
+
+  .controller('Composites', ['stateStorage', '$scope', function(stateStorage, $scope) {
+    stateStorage.push($scope, 'composites', {});
+  }])
+  .controller('CompositeKeywordEditorCtrl', ['stateStorage', '$scope', function (stateStorage, $scope) {
+    stateStorage.push($scope, 'editor', {});
+
+    $scope.$watch('$state', function () {
+      if ($scope.$state != null) {
+        loadKeyword($scope.$state);
+      }
+    });
+
+    function loadKeyword(id) {
+      $scope.keywordId = id;
+    }
+  }])
 
   .factory('FunctionTypeRegistry', function () {
     var registry = {};
@@ -431,18 +447,6 @@ angular
 
     $scope.cancel = function () {
       $uibModalInstance.dismiss('cancel');
-    };
-  })
-  .controller('CompositeFunctionFormCtrl', function ($scope, PlanDialogsService, $location, $http) {
-    $scope.gotoArtefact = function () {
-      $scope.save(false);
-      $location.path('/root/artefacteditor/' + $scope.function_.artefactId);
-    };
-
-    $scope.selectPlan = function () {
-      PlanDialogsService.selectPlan().subscribe(function (plan) {
-        $scope.function_.planId = plan.id;
-      });
     };
   })
 

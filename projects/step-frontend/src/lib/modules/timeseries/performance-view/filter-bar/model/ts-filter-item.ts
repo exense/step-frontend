@@ -2,13 +2,15 @@ export interface TsFilterItem {
   label: string;
   attributeName: string;
   type: FilterBarItemType;
+  isHidden?: boolean;
   isLocked?: boolean; // the attributeName can't be modified
   removable?: boolean;
 
   min?: number; // for numbers an dates
   max?: number; // for numbers an dates
-  textValue?: string; // for free text
-  textValues?: { value: string; isSelected?: boolean }[]; // for text with suggestions
+  freeTextValues?: string[]; // for free text, using regex search
+  textValues?: { value: string; isSelected?: boolean }[]; // for text with suggestions, using exact match
+  exactMatch?: boolean;
 }
 
 export enum FilterBarItemType {

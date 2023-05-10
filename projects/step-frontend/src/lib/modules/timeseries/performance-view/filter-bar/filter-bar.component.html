@@ -26,15 +26,17 @@
   <div class="applied-filters" [style]="oqlModeActive ? 'overflow: unset' : ''">
     <step-timeseries-grouping (onGroupingChange)="handleGroupingChange($event)"></step-timeseries-grouping>
     <ng-container *ngIf="!oqlModeActive">
-      <step-ts-filter-bar-item
-        *ngFor="let item of visibleFilters; let i = index"
-        #appliedFilter
-        [item]="item"
-        [removable]="item.removable"
-        (onRemoveItem)="removeFilterItem(i)"
-        (onFilterChange)="handleFilterChange(i, $event)"
-      >
-      </step-ts-filter-bar-item>
+      <ng-container *ngFor="let item of filterItems; let i = index">
+        <step-ts-filter-bar-item
+          *ngIf="!item.isHidden"
+          #appliedFilter
+          [item]="item"
+          [removable]="item.removable"
+          (onRemoveItem)="removeFilterItem(i)"
+          (onFilterChange)="handleFilterChange(i, $event)"
+        >
+        </step-ts-filter-bar-item>
+      </ng-container>
       <div class="more-btn-container" [matMenuTriggerFor]="typesMenu">
         <div class="more-btn filter-item-container">
           <span>More</span>
@@ -58,10 +60,11 @@
         ></step-icon>
         <span *ngIf="invalidOql" class="error-info">Invalid OQL</span>
       </div>
-      <button class="apply-btn" mat-button color="basic" (click)="manuallyApplyFilters()">Apply Filters</button>
+      <button class="apply-btn" mat-button color="primary" (click)="manuallyApplyFilters()">Apply Filters</button>
     </ng-container>
     <button
       class="apply-btn"
+      color="primary"
       *ngIf="!oqlModeActive && rawMeasurementsModeActive"
       mat-button
       (click)="manuallyApplyFilters()"
@@ -77,3 +80,8 @@
 </div>
 
 <step-execution-time-selection [settings]="performanceViewSettings"></step-execution-time-selection>
+
+<div class="export-btn" (click)="exportRawData()">
+  <span matTooltip="Download CSV" *ngIf="!exportInProgress"><step-icon name="download"></step-icon></span>
+  <mat-spinner *ngIf="exportInProgress" [diameter]="16"></mat-spinner>
+</div>

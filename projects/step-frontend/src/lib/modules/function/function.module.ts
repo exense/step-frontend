@@ -7,6 +7,7 @@ import {
   FunctionLinkDialogService,
   StepBasicsModule,
   StepCoreModule,
+  ViewRegistryService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { FunctionIconComponent } from './components/function-icon/function-icon.component';
@@ -19,10 +20,12 @@ import { FunctionPackageSelectionComponent } from './components/function-package
 import { FunctionTypeFilterComponent } from './components/function-type-filter/function-type-filter.component';
 import { FunctionTypeLabelPipe } from './pipes/function-type-label.pipe';
 import { FunctionDialogsService } from './services/function-dialogs.service';
+import { PlanEditorModule } from '../plan-editor/plan-editor.module';
+import { CompositeFunctionEditorComponent } from './components/composite-function-editor/composite-function-editor.component';
 import { FunctionPackageConfigurationDialogComponent } from './components/function-package-configuration-dialog/function-package-configuration-dialog.component';
 
 @NgModule({
-  imports: [StepCommonModule, StepCoreModule, StepBasicsModule],
+  imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule],
   declarations: [
     FunctionListComponent,
     FunctionPackageLinkComponent,
@@ -32,6 +35,7 @@ import { FunctionPackageConfigurationDialogComponent } from './components/functi
     FunctionTypeFilterComponent,
     FunctionPackageSearchComponent,
     FunctionPackageSelectionComponent,
+    CompositeFunctionEditorComponent,
     FunctionPackageConfigurationDialogComponent,
   ],
   providers: [
@@ -40,13 +44,19 @@ import { FunctionPackageConfigurationDialogComponent } from './components/functi
       useExisting: FunctionDialogsService,
     },
   ],
-  exports: [FunctionListComponent, FunctionPackageSelectionComponent, FunctionPackageConfigurationDialogComponent],
+  exports: [
+    FunctionListComponent,
+    FunctionPackageSelectionComponent,
+    CompositeFunctionEditorComponent,
+    FunctionPackageConfigurationDialogComponent,
+  ],
 })
 export class FunctionModule {
   constructor(
     _entityRegistry: EntityRegistry,
     _cellsRegistry: CustomCellRegistryService,
-    _searchCellsRegistry: CustomSearchCellRegistryService
+    _searchCellsRegistry: CustomSearchCellRegistryService,
+    _viewRegistry: ViewRegistryService
   ) {
     _entityRegistry.register('functions', 'Keyword', {
       icon: 'target',
@@ -69,5 +79,7 @@ export class FunctionModule {
       'st-table',
       FunctionPackageSelectionComponent
     );
+    _viewRegistry.registerView('functions', 'partials/functionList.html');
+    _viewRegistry.registerView('composites', 'partials/functions/compositeKeywordEditor.html');
   }
 }

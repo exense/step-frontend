@@ -107,7 +107,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
       contextId: this.executionId,
       includeThreadGroupChart: true,
       timeRange: { from: startTime, to: endTime },
-      contextualFilters: { ...urlParams, [`${TimeSeriesConfig.ATTRIBUTES_PREFIX}.eId`]: this.executionId },
+      contextualFilters: { ...urlParams, eId: this.executionId },
       showContextualFilters: false,
       filterOptions: [
         {
@@ -140,7 +140,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
   }
 
   calculateFullTimeRange(details: Execution): TSTimeRange {
-    let now = new Date().getTime();
+    const now = new Date().getTime();
     let selection: TSTimeRange;
     let newFullRange: TSTimeRange;
     switch (this.timeRangeSelection.type) {
@@ -152,7 +152,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
         newFullRange = this.timeRangeSelection.absoluteSelection!;
         break;
       case RangeSelectionType.RELATIVE:
-        let end = details.endTime || now;
+        const end = details.endTime || now;
         newFullRange = { from: end - this.timeRangeSelection.relativeSelection!.timeInMs!, to: end };
         break;
     }
