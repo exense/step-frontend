@@ -33,8 +33,11 @@ $default-color: dc.default-colors();
       height: 32px;
     }
 
-    .app-header-nav a {
-      color: map.get($config, main-text-color);
+    .app-header-nav > li {
+      > div a,
+      > a {
+        color: map.get($config, main-text-color);
+      }
     }
 
     #session-dropdown {
