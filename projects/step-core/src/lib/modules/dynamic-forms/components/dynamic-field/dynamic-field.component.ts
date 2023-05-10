@@ -104,6 +104,7 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
         value = JSON.parse(value);
       } catch (e) {
         // we don't show the error since they may happen for in-between states when typing an object
+        return;
       }
     }
 
