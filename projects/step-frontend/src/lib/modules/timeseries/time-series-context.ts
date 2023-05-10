@@ -25,7 +25,6 @@ export class TimeSeriesContext {
 
   private readonly activeGroupings$: BehaviorSubject<string[]>;
 
-  private readonly baseFilters: { [key: string]: any }; // these are usually the contextual filters (e.g execution id, task id, etc)
   private readonly activeFilters$: BehaviorSubject<TsFilterItem[]>;
   private readonly filterSettings$: BehaviorSubject<TsFilteringSettings>;
 
@@ -36,12 +35,10 @@ export class TimeSeriesContext {
     this.id = params.id;
     this.fullTimeRange = params.timeRange;
     this.selectedTimeRange = params.timeRange;
-    this.baseFilters = params.baseFilters;
     this.activeFilters$ = new BehaviorSubject(params.dynamicFilters || []);
     this.filterSettings$ = new BehaviorSubject<TsFilteringSettings>({
       mode: TsFilteringMode.STANDARD,
       oql: '',
-      baseFilters: params.baseFilters,
       filterItems: params.dynamicFilters || [],
     });
     this.activeGroupings$ = new BehaviorSubject(params.grouping);
@@ -60,10 +57,6 @@ export class TimeSeriesContext {
 
   setInProgress(inProgress: boolean) {
     this.inProgress$.next(inProgress);
-  }
-
-  getBaseFilters(): { [key: string]: any } {
-    return this.getFilteringSettings().baseFilters;
   }
 
   getDynamicFilters(): TsFilterItem[] {
