@@ -17,6 +17,12 @@ export class FindBucketsRequestBuilder {
   private numberOfBuckets?: number;
   private filteringSettings?: TsFilteringSettings;
 
+  /**
+   * While skipping, only the 'hidden' filters will be included in the request, together with the custom attributes.
+   * Custom filters or oql will be not included. Used for thread group chart
+   */
+  private skipCustomFilters = false;
+
   constructor(builder?: FindBucketsRequestBuilder) {
     if (builder) {
       this.customFilters = JSON.parse(JSON.stringify(builder.customFilters));
@@ -63,6 +69,11 @@ export class FindBucketsRequestBuilder {
     return this;
   }
 
+  withSkipCustomFilters(skip: boolean): FindBucketsRequestBuilder {
+    this.skipCustomFilters = skip;
+    return this;
+  }
+
   getRange(): TSTimeRange | undefined {
     return this.range;
   }
@@ -71,14 +82,36 @@ export class FindBucketsRequestBuilder {
     if (!this.filteringSettings) {
       throw 'Filtering settings are mandatory';
     }
-    const filterItems = this.filteringSettings.filterItems.filter(FilterUtils.filterItemIsValid);
-    const oql =
-      this.filteringSettings.mode === TsFilteringMode.OQL
-        ? this.combineOqlWithFilters(
-            this.filteringSettings.oql,
-            filterItems.filter((item) => item.isHidden)
-          )
-        : FilterUtils.filtersToOQL(filterItems, this.attributesPrefix);
+    let customAttributesOql = '';
+    const hiddenFilters = this.filteringSettings.filterItems
+      .filter(FilterUtils.filterItemIsValid)
+      .filter((item) => item.isHidden);
+    const customFilters = this.filteringSettings.filterItems
+      .filter(FilterUtils.filterItemIsValid)
+      .filter((item) => !item.isHidden);
+    const filterItems = this.filteringSettings.filterItems.filter(
+      (item) => FilterUtils.filterItemIsValid(item) && !(this.skipCustomFilters && !item.isHidden)
+    );
+
+    if (Object.keys(this.customAttributes).length > 0) {
+      customAttributesOql = FilterUtils.objectToOQL(this.customAttributes, this.attributesPrefix);
+    }
+    const isOqlMode = this.filteringSettings.mode === TsFilteringMode.OQL;
+
+    // oql is skipped while custom filters have to be skipped
+    const oql = new OQLBuilder()
+      .open('and')
+      .append(customAttributesOql)
+      .append(FilterUtils.filtersToOQL(hiddenFilters, this.attributesPrefix)) // always include hidden filters
+      .append(
+        !this.skipCustomFilters
+          ? isOqlMode
+            ? this.filteringSettings.oql
+            : FilterUtils.filtersToOQL(customFilters, this.attributesPrefix)
+          : ''
+      )
+      .build();
+
     return {
       start: this.range!.from,
       end: this.range!.to,

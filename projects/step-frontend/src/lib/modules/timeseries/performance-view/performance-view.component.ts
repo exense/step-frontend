@@ -38,10 +38,6 @@ declare const uPlot: any;
   styleUrls: ['./performance-view.component.scss'],
 })
 export class PerformanceViewComponent implements OnInit, OnDestroy {
-  private readonly METRIC_TYPE_KEY = 'metricType';
-  private readonly METRIC_TYPE_RESPONSE_TIME = 'response-time'; // this is for normal measurements
-  private readonly METRIC_TYPE_SAMPLER = 'sampler'; // this is for thread groups measurements
-
   private CHART_LEGEND_SIZE = 65;
 
   rangerSettings: TSChartSettings | undefined;
@@ -219,7 +215,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   prepareFindRequestBuilder(settings: PerformanceViewSettings, customFilters?: any): FindBucketsRequestBuilder {
     return new FindBucketsRequestBuilder()
       .withRange(settings.timeRange)
-      .addAttribute(this.METRIC_TYPE_KEY, this.METRIC_TYPE_RESPONSE_TIME)
+      .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
       .withFilteringSettings(this.context.getFilteringSettings())
       .withNumberOfBuckets(TimeSeriesConfig.MAX_BUCKETS_IN_CHART);
   }
@@ -270,9 +266,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   createThreadGroupsChart(): Observable<TimeSeriesAPIResponse> {
     const request = this.findRequestBuilder
       .clone()
-      .addAttribute(this.METRIC_TYPE_KEY, this.METRIC_TYPE_SAMPLER)
+      .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_SAMPLER)
       .withGroupDimensions(['name'])
       .withFilteringSettings(this.context.getFilteringSettings())
+      .withSkipCustomFilters(true)
       .build();
     return this.timeSeriesService
       .getBuckets(request)
