@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
 import { TableRequestData } from '../models/table-request-data';
 import { TableResponseGeneric } from '../models/table-response-generic';
-import { map, Observable } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 import { AsyncTasksService, AsyncTaskStatusResource, TablesService } from '../../generated';
 import { pollAsyncTask } from '../../augmented/rxjs-operators/poll-async-task';
 import { DOCUMENT } from '@angular/common';
@@ -25,8 +25,8 @@ export class TableApiWrapperService {
     return this._tables.createExport(tableId, { tableRequest, fields });
   }
 
-  exportAsCSV(tableId: string, fields: string[], tableRequest: TableRequestData = {}): void {
-    this.exportTable(tableId, tableRequest, fields)
+  exportAsCSV(tableId: string, fields: string[], tableRequest: TableRequestData = {}): Observable<string> {
+    return this.exportTable(tableId, tableRequest, fields)
       .pipe(
         pollAsyncTask(this._asyncTaskService),
         map((status: AsyncTaskStatusResource) => {
@@ -36,9 +36,11 @@ export class TableApiWrapperService {
           return status.result.id;
         })
       )
-      .subscribe((attachmentId) => {
-        this.downloadDatasource(attachmentId);
-      });
+      .pipe(
+        tap((attachmentId) => {
+          this.downloadDatasource(attachmentId);
+        })
+      );
   }
 
   private downloadDatasource(id: string): void {

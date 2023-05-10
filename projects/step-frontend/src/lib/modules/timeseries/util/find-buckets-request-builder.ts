@@ -10,7 +10,6 @@ export class FindBucketsRequestBuilder {
   readonly attributesPrefix = 'attributes';
 
   private customAttributes: { [key: string]: any } = {};
-  private baseFilters: { [key: string]: any } = {};
   private customFilters: TsFilterItem[] = [];
   private range?: TSTimeRange;
   private groupDimensions?: string[];
@@ -21,7 +20,6 @@ export class FindBucketsRequestBuilder {
   constructor(builder?: FindBucketsRequestBuilder) {
     if (builder) {
       this.customFilters = JSON.parse(JSON.stringify(builder.customFilters));
-      this.baseFilters = JSON.parse(JSON.stringify(builder.baseFilters));
       this.range = JSON.parse(JSON.stringify(builder.range));
       this.groupDimensions = builder.groupDimensions ? JSON.parse(JSON.stringify(builder.groupDimensions)) : [];
       this.percentiles = builder.percentiles ? JSON.parse(JSON.stringify(builder.percentiles)) : [];
@@ -55,20 +53,10 @@ export class FindBucketsRequestBuilder {
     return this;
   }
 
-  withBaseFilters(attributes: { [key: string]: string }): FindBucketsRequestBuilder {
-    this.baseFilters = attributes;
-    return this;
-  }
-
   addAttribute(key: string, value: string): FindBucketsRequestBuilder {
     this.customAttributes[key] = value;
     return this;
   }
-
-  // withCustomFilters(filters: TsFilterItem[]): FindBucketsRequestBuilder {
-  //   this.customFilters = filters;
-  //   return this;
-  // }
 
   withRange(range: TSTimeRange): FindBucketsRequestBuilder {
     this.range = range;
@@ -83,15 +71,14 @@ export class FindBucketsRequestBuilder {
     if (!this.filteringSettings) {
       throw 'Filtering settings are mandatory';
     }
+    const filterItems = this.filteringSettings.filterItems.filter(FilterUtils.filterItemIsValid);
     const oql =
       this.filteringSettings.mode === TsFilteringMode.OQL
-        ? this.prepareOql(this.filteringSettings.oql)
-        : new OQLBuilder()
-            .open(' and ')
-            .append(FilterUtils.objectToOQL(this.filteringSettings.baseFilters))
-            .append(FilterUtils.objectToOQL(this.customAttributes, this.attributesPrefix))
-            .append(FilterUtils.filtersToOQL(this.filteringSettings.filterItems, this.attributesPrefix))
-            .build();
+        ? this.combineOqlWithFilters(
+            this.filteringSettings.oql,
+            filterItems.filter((item) => item.isHidden)
+          )
+        : FilterUtils.filtersToOQL(filterItems, this.attributesPrefix);
     return {
       start: this.range!.from,
       end: this.range!.to,
@@ -102,12 +89,9 @@ export class FindBucketsRequestBuilder {
     };
   }
 
-  private prepareOql(oql: string): string {
-    if (Object.keys(this.customAttributes)) {
-      let customAttributesOql = FilterUtils.objectToOQL(this.customAttributes, this.attributesPrefix);
-      return [oql, customAttributesOql].filter((x) => x).join(' and ');
-    } else {
-      return oql;
-    }
+  private combineOqlWithFilters(oql: string, filterItems: TsFilterItem[]): string {
+    oql = oql.trim();
+    const filtersOql = FilterUtils.filtersToOQL(filterItems, this.attributesPrefix);
+    return [oql, filtersOql].filter((x) => x).join(' and ');
   }
 }

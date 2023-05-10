@@ -44,7 +44,12 @@ import { FunctionPackageConfigurationDialogComponent } from './components/functi
       useExisting: FunctionDialogsService,
     },
   ],
-  exports: [FunctionListComponent, FunctionPackageSelectionComponent, CompositeFunctionEditorComponent, FunctionPackageConfigurationDialogComponent],
+  exports: [
+    FunctionListComponent,
+    FunctionPackageSelectionComponent,
+    CompositeFunctionEditorComponent,
+    FunctionPackageConfigurationDialogComponent,
+  ],
 })
 export class FunctionModule {
   constructor(

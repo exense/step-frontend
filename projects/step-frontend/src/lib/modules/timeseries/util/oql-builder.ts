@@ -2,7 +2,7 @@ import { FilterUtils } from './filter-utils';
 
 export class OQLBuilder {
   clauses: string[] = [];
-  separator: string = ' and ';
+  separator: string = 'and';
   isOpen = true;
 
   open(separator: string): OQLBuilder {
@@ -36,6 +36,6 @@ export class OQLBuilder {
   }
 
   build(): string {
-    return this.clauses.join(this.separator);
+    return this.clauses.join(' ' + this.separator + ' ');
   }
 }
