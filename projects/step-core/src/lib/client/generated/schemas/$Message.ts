@@ -37,6 +37,9 @@ export const $Message = {
     statesByUser: {
       type: 'string',
     },
+    stateForCurrentUser: {
+      type: 'Enum',
+    },
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',

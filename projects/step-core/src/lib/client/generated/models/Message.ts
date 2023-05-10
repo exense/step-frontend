@@ -13,5 +13,6 @@ export type Message = {
   sticky?: boolean;
   timestamp?: number;
   statesByUser?: string;
+  stateForCurrentUser?: 'DISMISSED' | 'READ' | 'UNREAD';
   id?: string;
 };
