@@ -160,7 +160,6 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     }
 
     // Clear the input value
-    // event.chipInput!.clear();
     this.chipInputValue = '';
   }
 }

@@ -5,9 +5,5 @@ export interface TimeSeriesContextParams {
   id: string;
   timeRange: TSTimeRange;
   grouping: string[];
-  /**
-   * @deprecated
-   */
-  baseFilters?: any;
   dynamicFilters?: TsFilterItem[];
 }

@@ -31,6 +31,21 @@ export class TimeSeriesService {
   }
 
   /**
+   * @param filter
+   * @returns string default response
+   * @throws ApiError
+   */
+  public getMeasurementsAttributes(filter?: string): Observable<Array<string>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/time-series/measurements-fields',
+      query: {
+        filter: filter,
+      },
+    });
+  }
+
+  /**
    * Rebuild a time series based on the provided request
    * @param requestBody
    * @returns AsyncTaskStatusObject default response
