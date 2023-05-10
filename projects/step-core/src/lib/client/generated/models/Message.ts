@@ -12,6 +12,6 @@ export type Message = {
   topicKey?: string;
   sticky?: boolean;
   timestamp?: number;
-  userStates?: Record<string, 'DISMISSED' | 'READ' | 'UNREAD'>;
+  statesByUser?: string;
   id?: string;
 };

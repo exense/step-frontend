@@ -34,11 +34,8 @@ export const $Message = {
       type: 'number',
       format: 'int64',
     },
-    userStates: {
-      type: 'dictionary',
-      contains: {
-        type: 'Enum',
-      },
+    statesByUser: {
+      type: 'string',
     },
     id: {
       type: 'string',
