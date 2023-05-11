@@ -34,12 +34,12 @@ export class ExecutionResultComponent implements OnChanges {
     }
 
     if (result || status) {
-      this.icon = this.restreiveIcon(status, result);
-      this.displayResult = this.retreiveResult(status, result);
+      this.icon = this.retrieveIcon(status, result);
+      this.displayResult = this.retrieveResult(status, result);
     }
   }
 
-  private retreiveResult(status?: Status, result?: Result): string {
+  private retrieveResult(status?: Status, result?: Result): string {
     status = status || this.status;
     result = result || this.result;
 
@@ -54,7 +54,7 @@ export class ExecutionResultComponent implements OnChanges {
     return result || 'UNKNOW';
   }
 
-  private restreiveIcon(status?: Status, result?: Result): string {
+  private retrieveIcon(status?: Status, result?: Result): string {
     status = status || this.status;
     result = result || this.result;
 
