@@ -161,6 +161,10 @@ dynamicForms
       controller: function ($scope) {
         $scope.localModel = { json: '' };
 
+        if ($scope.dynamicValue.value === null) {
+          $scope.dynamicValue.value = '{}';
+        }
+        
         initDynamicFormsCtrl($scope);
         $scope.save = function (json) {
           $scope.dynamicValue.value = json;
