@@ -1,37 +1,30 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   AJS_MODULE,
   AugmentedExecutionsService,
   DateFormat,
   FilterConditionFactoryService,
-  SearchColDirective,
+  STORE_ALL,
+  tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { EXECUTION_RESULT, EXECUTION_STATUS } from '../../../_common/shared/status.enum';
 import { of } from 'rxjs';
-import { DateTime } from 'luxon';
 
 @Component({
   selector: 'step-execution-list',
   templateUrl: './execution-list.component.html',
   styleUrls: ['./execution-list.component.scss'],
+  providers: [tablePersistenceConfigProvider('executionList', STORE_ALL)],
 })
 export class ExecutionListComponent {
+  readonly _filterConditionFactory = inject(FilterConditionFactoryService);
+  readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
   readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
 
   readonly DateFormat = DateFormat;
   readonly resultItems$ = of(EXECUTION_RESULT);
   readonly statusItems$ = of(EXECUTION_STATUS);
-
-  constructor(
-    private _filterConditionFactory: FilterConditionFactoryService,
-    public _augmentedExecutionsService: AugmentedExecutionsService
-  ) {}
-
-  searchByDate(col: SearchColDirective, date?: DateTime): void {
-    const condition = this._filterConditionFactory.singleDateFilterCondition(date);
-    col.search(condition);
-  }
 }
 
 getAngularJSGlobal()

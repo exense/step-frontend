@@ -155,8 +155,8 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   constructor(
     private _tableId: string,
     private _rest: TableApiWrapperService,
-    private _requestColumnsMap: { [key: string]: string },
-    private _filters?: { [key: string]: string[] }
+    private _requestColumnsMap: Record<string, string>,
+    private _filters?: Record<string, string[]>
   ) {
     if (_filters) {
       for (const key in _filters) {
@@ -192,7 +192,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     const tableRequest: TableRequestInternal = new TableRequestInternal({
       columns: Object.values(this._requestColumnsMap),
       searchBy: Object.entries(search || {}).map(([name, value]) => {
-        const column = this._requestColumnsMap[name];
+        const column = this._requestColumnsMap[name] ?? name;
         return { column, value };
       }),
     });
