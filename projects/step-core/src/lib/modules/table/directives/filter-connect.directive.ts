@@ -55,12 +55,14 @@ export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit, O
   }
 
   private convertToSearchValue(value: T): SearchValue {
+    console.warn('this is called', this.useRegex);
+
     if (this.createConditionFn) {
       return this.createConditionFn(value);
     }
 
-    if (this.useRegex) {
-      return { value: value as string, regex: true };
+    if (this.useRegex !== undefined) {
+      return { value: value as string, regex: this.useRegex };
     }
 
     return value as string;
