@@ -5,10 +5,6 @@
   @include core.status-shape();
 }
 
-.fullWidth {
-  width: 100%;
-}
-
 @mixin status($status, $color) {
   .step-#{$status} {
     background: $color;

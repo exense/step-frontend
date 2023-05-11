@@ -22,7 +22,6 @@ export class StatusComponent implements OnChanges {
   private container!: ElementRef;
 
   @Input() status?: string;
-  @Input() showFullWidth: boolean = false;
 
   constructor(private _renderer: Renderer2) {}
 
