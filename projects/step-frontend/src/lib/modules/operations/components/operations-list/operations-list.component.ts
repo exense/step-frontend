@@ -1,12 +1,20 @@
 import { Component, Input } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, OperationDetails, SystemService, TableFetchLocalDataSource } from '@exense/step-core';
+import {
+  AJS_MODULE,
+  OperationDetails,
+  STORE_ALL,
+  SystemService,
+  TableFetchLocalDataSource,
+  tablePersistenceConfigProvider,
+} from '@exense/step-core';
 import { ExecutionViewServices } from '../../operations.module';
 
 @Component({
   selector: 'step-operations-list',
   templateUrl: './operations-list.component.html',
   styleUrls: ['./operations-list.component.scss'],
+  providers: [tablePersistenceConfigProvider('operationList', STORE_ALL)],
 })
 export class OperationsListComponent {
   @Input() executionViewServices?: ExecutionViewServices;

@@ -20,7 +20,7 @@
     <step-array-filter
       *stepSearchCellDef
       [items]="(statusItems$ | async)!"
-      (selectedItemsChange)="searchStatus.search($event, true)"
+      (filterChange)="searchStatus.search($event, true)"
     >
     </step-array-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>

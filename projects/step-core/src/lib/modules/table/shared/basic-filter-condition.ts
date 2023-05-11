@@ -1,15 +1,18 @@
 import { FilterCondition } from './filter-condition';
 import { TableRequestFilter } from '../../../client/step-client-module';
+import { FilterConditionType } from './filter-condition-type.enum';
 
-export class BasicFilterCondition extends FilterCondition {
-  constructor(private filters?: TableRequestFilter[]) {
-    super();
+export class BasicFilterCondition extends FilterCondition<TableRequestFilter[] | undefined> {
+  readonly filterConditionType = FilterConditionType.BASIC;
+
+  constructor(filters?: TableRequestFilter[]) {
+    super(filters);
   }
   override toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
-    return this.filters || [];
+    return this.sourceObject || [];
   }
 
   override isEmpty(): boolean {
-    return !!this.filters?.length;
+    return !!this.sourceObject?.length;
   }
 }

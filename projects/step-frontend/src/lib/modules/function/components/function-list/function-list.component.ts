@@ -12,6 +12,8 @@ import {
   Function as KeywordFunction,
   InteractivePlanExecutionService,
   selectionCollectionProvider,
+  tablePersistenceConfigProvider,
+  STORE_ALL,
 } from '@exense/step-core';
 import { ILocationService, IRootScopeService } from 'angular';
 import { FunctionDialogsService } from '../../services/function-dialogs.service';
@@ -23,6 +25,7 @@ import { FunctionBulkOperationsInvokeService } from '../../services/function-bul
   templateUrl: './function-list.component.html',
   styleUrls: ['./function-list.component.scss'],
   providers: [
+    tablePersistenceConfigProvider('functionList', STORE_ALL),
     selectionCollectionProvider<string, KeywordFunction>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {
       provide: BulkOperationsInvokeService,

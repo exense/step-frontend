@@ -17,7 +17,7 @@ export class AugmentedKeywordsService extends KeywordsService {
         type: 'type',
         actions: '',
       },
-      filter
+      filter ? { type: filter } : undefined
     );
   }
 

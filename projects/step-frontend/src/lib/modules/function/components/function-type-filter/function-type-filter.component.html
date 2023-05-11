@@ -1,5 +1,5 @@
 <step-form-field>
-  <mat-select multiple (selectionChange)="handleChange($event)">
+  <mat-select multiple [formControl]="filterControl">
     <mat-option *ngFor="let item of functionTypes" [value]="item.key">
       {{ item.value }}
     </mat-option>

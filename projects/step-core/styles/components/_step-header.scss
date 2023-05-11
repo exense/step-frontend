@@ -33,8 +33,14 @@ $default-color: dc.default-colors();
       height: 32px;
     }
 
+    .app-header-nav > li {
+      > div a,
+      > a {
+        color: map.get($config, main-text-color);
+      }
+    }
+
     #session-dropdown {
-      color: map.get($config, main-text-color);
       user-select: none;
       background: none !important;
     }
@@ -53,10 +59,8 @@ $default-color: dc.default-colors();
     .app-header-nav {
       margin: 6px 20px;
       list-style-type: none;
-
-      li {
-        float: right;
-      }
+      display: flex;
+      gap: 1rem;
     }
 
     &::after {

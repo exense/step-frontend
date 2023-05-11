@@ -1,5 +1,10 @@
-import { Component } from '@angular/core';
-import { AJS_MODULE, AugmentedKeywordPackagesService, FunctionPackage, TableRemoteDataSource } from '@exense/step-core';
+import { Component, inject } from '@angular/core';
+import {
+  AJS_MODULE,
+  AugmentedKeywordPackagesService,
+  STORE_ALL,
+  tablePersistenceConfigProvider,
+} from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
 
@@ -7,15 +12,14 @@ import { FunctionPackageActionsService } from '../../services/function-package-a
   selector: 'step-function-package-list',
   templateUrl: './function-package-list.component.html',
   styleUrls: ['./function-package-list.component.scss'],
+  providers: [tablePersistenceConfigProvider('functionPackageList', STORE_ALL)],
 })
 export class FunctionPackageListComponent {
-  readonly dataSource: TableRemoteDataSource<FunctionPackage>;
+  private _augApi = inject(AugmentedKeywordPackagesService);
+  private _actions = inject(FunctionPackageActionsService);
+  readonly dataSource = this._augApi.dataSource;
 
   isRefreshing: boolean = false;
-
-  constructor(private _augApi: AugmentedKeywordPackagesService, private _actions: FunctionPackageActionsService) {
-    this.dataSource = _augApi.dataSource;
-  }
 
   add(): void {
     this._actions.openAddFunctionPackageDialog().subscribe((result) => {
