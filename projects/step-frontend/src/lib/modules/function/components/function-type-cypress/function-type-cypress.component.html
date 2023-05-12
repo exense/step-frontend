@@ -1,0 +1,21 @@
+<ng-container *ngIf="context as formGroup">
+  <step-dynamic-textfield
+    label="Command"
+    tooltip='The cypress command associated with this Keyword. For instance: cy.visit("https://step.exense.ch")'
+    [formControl]="formGroup.controls.command"
+  ></step-dynamic-textfield>
+
+  <step-dynamic-resource-input
+    label="Cypress Project"
+    type="functions"
+    [directory]="false"
+    tooltip="[Optional] Upload a Zip of your Cypress project. The command below will be executed within the context of this project and thus have access to project settings and custom commands."
+    [formControl]="formGroup.controls.cypressProject"
+  ></step-dynamic-resource-input>
+
+  <step-dynamic-textfield
+    label="Base URL"
+    tooltip="[Optional] Define the base url of your test. Specifying a baseUrl matching the first call to cy.visit() avoids unnecessary reloads of the cypress runner window."
+    [formControl]="formGroup.controls.baseUrl"
+  ></step-dynamic-textfield>
+</ng-container>

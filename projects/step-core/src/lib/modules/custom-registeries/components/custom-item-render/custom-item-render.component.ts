@@ -1,9 +1,7 @@
 import {
   AfterViewInit,
   Component,
-  ComponentFactoryResolver,
   ComponentRef,
-  Injector,
   Input,
   OnChanges,
   SimpleChanges,
@@ -26,8 +24,6 @@ export class CustomItemRenderComponent implements OnChanges, AfterViewInit {
 
   private componentRef?: ComponentRef<CustomComponent>;
 
-  constructor(private _componentFactoryResolver: ComponentFactoryResolver, private _injector: Injector) {}
-
   ngAfterViewInit(): void {
     // Rendering synchronously in `ngAfterViewInit` hook may cause `ExpressionChangedAfterItHasBeenCheckedError`
     // for some components. `queueMicrotask` invoke render asynchronously
@@ -36,11 +32,13 @@ export class CustomItemRenderComponent implements OnChanges, AfterViewInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     const cComponent = changes['component'];
+
     if (cComponent?.previousValue !== cComponent?.currentValue) {
       this.render(cComponent?.currentValue);
     }
 
     const cContext = changes['context'];
+
     if (cContext?.previousValue !== cContext?.currentValue) {
       this.updateContext(cContext?.currentValue);
     }
@@ -58,8 +56,8 @@ export class CustomItemRenderComponent implements OnChanges, AfterViewInit {
       return;
     }
 
-    const componentFactory = this._componentFactoryResolver.resolveComponentFactory(component);
-    this.componentRef = this.container.createComponent(componentFactory, undefined, this._injector);
+    this.componentRef = this.container.createComponent(component);
+
     if (this.context) {
       this.updateContext(this.context);
     }
@@ -69,6 +67,7 @@ export class CustomItemRenderComponent implements OnChanges, AfterViewInit {
     if (!this.componentRef) {
       return;
     }
+
     this.componentRef.instance.context = context;
     this.componentRef.changeDetectorRef.markForCheck();
   }

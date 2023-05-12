@@ -1,0 +1,8 @@
+<ng-container *ngIf="context as formGroup">
+  <step-dynamic-resource-input
+    label="SikuliX script (jar export)"
+    type="functions"
+    tooltip="Upload the SikuliX script that you exported as a jar."
+    [formControl]="formGroup.controls.sikulixProjectJar"
+  ></step-dynamic-resource-input
+></ng-container>

@@ -11,12 +11,12 @@ import {
   ViewChild,
 } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '../../shared';
-import { AugmentedResourcesService } from '../../client/augmented/services/augmented-resources-service';
-import { ResourceInputBridgeService } from '../../services/resource-input-bridge.service';
-import { ResourceUploadResponse } from '../../client/generated';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { AugmentedResourcesService } from '../../client/augmented/services/augmented-resources-service';
+import { ResourceUploadResponse } from '../../client/generated';
 import { ResourceDialogsService } from '../../services/resource-dialogs.service';
+import { ResourceInputBridgeService } from '../../services/resource-input-bridge.service';
+import { AJS_MODULE } from '../../shared';
 
 const MAX_FILES = 1;
 
@@ -41,6 +41,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
 
   @Output() stModelChange = new EventEmitter<string>();
   @Output() dynamicSwitch = new EventEmitter<void>();
+  @Output() blur = new EventEmitter<void>();
 
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
 
@@ -87,6 +88,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     this.setStModel(this.stModel);
+    this.blur.emit();
   }
 
   saveChanges(): void {
@@ -161,7 +163,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   selectResource(): void {
     this._resourceDialogsService
       .showSearchResourceDialog(this.stType)
-      .pipe(filter((resourceId) => Boolean(resourceId)))
+      .pipe(filter((resourceId) => !!resourceId))
       .subscribe((resourceId) => {
         this.setResourceIdToFieldValue(resourceId);
       });
@@ -214,6 +216,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     if (this.stModel === stModel) {
       return;
     }
+
     this.stModel = stModel;
     this.stModelChange.emit(stModel);
   }
@@ -234,7 +237,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
       queryParams: {
         type: this.stType,
         duplicateCheck: !this.stBounded,
-        directory: Boolean(this.stDirectory),
+        directory: !!this.stDirectory,
       },
       resourceId,
     });

@@ -1,0 +1,13 @@
+<ng-container *ngIf="context as formGroup">
+  <step-dynamic-resource-input
+    label="Dependencies Libraries"
+    type="functions"
+    [formControl]="formGroup.controls.librariesFile"
+  ></step-dynamic-resource-input>
+
+  <step-dynamic-resource-input
+    label="DLL Library"
+    type="functions"
+    [formControl]="formGroup.controls.dllFile"
+  ></step-dynamic-resource-input>
+</ng-container>

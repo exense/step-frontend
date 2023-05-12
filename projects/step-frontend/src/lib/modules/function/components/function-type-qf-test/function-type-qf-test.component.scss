@@ -1,0 +1,5 @@
+@use '../../function.scss' as function;
+
+:host {
+  @include function.function-type-form;
+}

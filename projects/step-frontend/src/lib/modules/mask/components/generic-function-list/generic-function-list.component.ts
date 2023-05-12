@@ -1,6 +1,5 @@
 import { AfterViewInit, Component, Inject, Input, OnInit } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { GenericFunctionDialogService } from '../services/generic-function-dialogs.service';
 import {
   AJS_FUNCTION_TYPE_REGISTRY,
   AJS_LOCATION,
@@ -19,6 +18,7 @@ import {
 } from '@exense/step-core';
 import { ILocationService, IRootScopeService } from 'angular';
 import { GenericFunctionBulkOperationsInvokeService } from '../services/generic-function-bulk-operations-invoke.service';
+import { GenericFunctionDialogService } from '../services/generic-function-dialogs.service';
 
 @Component({
   selector: 'step-generic-function-list',
@@ -35,9 +35,9 @@ import { GenericFunctionBulkOperationsInvokeService } from '../services/generic-
 })
 export class GenericFunctionListComponent implements OnInit, AfterViewInit {
   @Input() filter?: string[];
-  @Input() filterclass?: string[];
+  @Input() filterClass?: string[];
   @Input() title?: string;
-  @Input() serviceroot?: string;
+  @Input() serviceRoot?: string;
 
   protected dataSource?: TableRemoteDataSource<KeywordFunction>;
 
@@ -57,9 +57,9 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this._genericFunctionDialogService.configure({
-      title: this.title,
-      serviceroot: this.serviceroot,
-      filterclass: this.filterclass,
+      title: this.title ?? '',
+      serviceRoot: this.serviceRoot ?? '',
+      filterClass: this.filterClass ?? [],
     });
   }
 

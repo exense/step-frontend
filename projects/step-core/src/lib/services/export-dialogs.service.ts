@@ -1,15 +1,15 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { UibModalHelperService } from './uib-modal-helper.service';
+import { inject, Injectable } from '@angular/core';
+import { catchError, Observable, of } from 'rxjs';
 import { a1Promise2Observable } from '../shared';
+import { UibModalHelperService } from './uib-modal-helper.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ExportDialogsService {
-  constructor(private _uibModalHelper: UibModalHelperService) {}
+  private _uibModalHelper = inject(UibModalHelperService);
 
-  displayExportDialog<T>(title: string, path: string, filename: string): Observable<T> {
+  displayExportDialog(title: string, path: string, filename: string): Observable<boolean | void> {
     const modalInstance = this._uibModalHelper.open({
       backdrop: 'static',
       templateUrl: 'partials/exportDialog.html',
@@ -23,6 +23,6 @@ export class ExportDialogsService {
       },
     });
 
-    return a1Promise2Observable(modalInstance);
+    return a1Promise2Observable<void>(modalInstance.result).pipe(catchError(() => of(false)));
   }
 }

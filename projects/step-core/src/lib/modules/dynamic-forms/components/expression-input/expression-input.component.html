@@ -2,7 +2,7 @@
   <step-label [attr.show-required-marker]="showRequiredAsterisk || null" *ngIf="label">{{ label }}</step-label>
   <input
     type="text"
-    [required]="showRequiredAsterisk"
+    [required]="!!showRequiredAsterisk"
     [ngModel]="expression"
     (ngModelChange)="onExpressionChange($event)"
     (blur)="onBlur()"

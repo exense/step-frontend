@@ -14,10 +14,11 @@ type OnTouch = () => void;
 export class ExpressionInputComponent implements ControlValueAccessor {
   @Input() label?: string;
   @Input() tooltip?: string;
-  @Input() isParentInvalid: boolean = false;
-  @Input() showRequiredAsterisk: boolean = false;
+  @Input() isParentInvalid?: boolean;
+  @Input() showRequiredAsterisk?: boolean;
 
   @Output() toggleConstantValue = new EventEmitter<void>();
+  @Output() blur = new EventEmitter<void>();
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;

@@ -1,8 +1,10 @@
 import { IPromise } from 'angular';
 import { from, Observable } from 'rxjs';
+import { KeyValuePair } from '../domain';
+import { DynamicValueInteger, DynamicValueString } from '../step-core.module';
+import { AceMode } from './ace-mode.enum';
 import { Collection } from './collection.interface';
 import { ScriptLanguage } from './script-language.enum';
-import { AceMode } from './ace-mode.enum';
 
 export const a1Promise2Promise = <T>(promise: IPromise<T>): Promise<T> =>
   Promise.resolve(promise as unknown as Promise<T>);
@@ -81,3 +83,37 @@ export const breadthFirstSearch = <T>({
 export const convertScriptLanguageToAce = (scriptLanguage?: ScriptLanguage): AceMode | undefined => {
   return !scriptLanguage ? undefined : (AceMode as any)[scriptLanguage];
 };
+
+export const toKeyValuePairs = <T>(object: Record<string, T>): KeyValuePair<string, T>[] =>
+  Object.entries(object).map(([key, value]) => ({
+    key,
+    value,
+  }));
+
+export const toRecord = <T>(keyValuePairs: KeyValuePair<string, T>[]): Record<string, T> =>
+  keyValuePairs.reduce(
+    (acc, { key, value }) => ({
+      ...acc,
+      [key]: value,
+    }),
+    {}
+  );
+
+export const dynamicValueFactory = () => ({
+  createDynamicValueString(dynamicValueString?: Partial<DynamicValueString>): DynamicValueString {
+    return {
+      dynamic: dynamicValueString?.dynamic ?? false,
+      expression: dynamicValueString?.expression ?? '',
+      expressionType: dynamicValueString?.expressionType ?? '',
+      value: dynamicValueString?.value ?? '',
+    };
+  },
+  createDynamicValueInteger(dynamicValueInteger?: Partial<DynamicValueInteger>): DynamicValueInteger {
+    return {
+      dynamic: dynamicValueInteger?.dynamic ?? false,
+      expression: dynamicValueInteger?.expression ?? '',
+      expressionType: dynamicValueInteger?.expressionType ?? '',
+      value: dynamicValueInteger?.value ?? 0,
+    };
+  },
+});

@@ -1,17 +1,15 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
+import { catchError, map, Observable, of, switchMap } from 'rxjs';
 import { AbstractArtefact, AugmentedPlansService, Plan } from '../client/step-client-module';
+import { PlanCreateDialogComponent } from '../components/plan-create-dialog/plan-create-dialog.component';
+import { ThreadDistributionWizardDialogComponent } from '../components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
+import { EntityDialogsService } from '../modules/entity/services/entity-dialogs.service';
 import { a1Promise2Observable, AJS_MODULE, DialogsService } from '../shared';
 import { ExportDialogsService } from './export-dialogs.service';
 import { ImportDialogsService } from './import-dialogs.service';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
-import { ResourceInputBridgeService } from './resource-input-bridge.service';
-import { UibModalHelperService } from './uib-modal-helper.service';
-import { EntityDialogsService } from '../modules/entity/services/entity-dialogs.service';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { MatDialog } from '@angular/material/dialog';
-import { PlanCreateDialogComponent } from '../components/plan-create-dialog/plan-create-dialog.component';
-import { ThreadDistributionWizardDialogComponent } from '../components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 
 @Injectable({
   providedIn: 'root',
@@ -19,15 +17,13 @@ import { ThreadDistributionWizardDialogComponent } from '../components/thread-di
 export class PlanDialogsService {
   private _matDialog = inject(MatDialog);
   private _plansApiService = inject(AugmentedPlansService);
-  private _uibModalHelper = inject(UibModalHelperService);
   private _dialogs = inject(DialogsService);
   private _entityDialogs = inject(EntityDialogsService);
   private _exportDialogs = inject(ExportDialogsService);
   private _importDialogs = inject(ImportDialogsService);
   private _isUsedByDialogs = inject(IsUsedByDialogService);
-  private _resourceInputBridgeService = inject(ResourceInputBridgeService);
 
-  createPlan(): Observable<any> {
+  createPlan(): Observable<Plan | undefined> {
     return this._matDialog.open(PlanCreateDialogComponent).afterClosed();
   }
 
@@ -44,36 +40,29 @@ export class PlanDialogsService {
     return plan$;
   }
 
-  duplicatePlan(id: string): Observable<any> {
+  duplicatePlan(id: string): Observable<Plan> {
     return this._plansApiService.clonePlan(id).pipe(switchMap((clone) => this._plansApiService.savePlan(clone)));
   }
 
-  deletePlan(id: string, name: string): Observable<any> {
+  deletePlan(id: string, name: string): Observable<boolean> {
     return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Plan "${name}"`)).pipe(
-      map((_) => true),
-      catchError((_) => of(false)),
-      tap((isDeleteConfirmed) => console.log('IS DELETE CONFIRMED', isDeleteConfirmed)),
+      map(() => true),
+      catchError(() => of(false)),
       switchMap((isDeleteConfirmed) =>
-        isDeleteConfirmed ? this._plansApiService.deletePlan(id).pipe(map((_) => true)) : of(false)
+        isDeleteConfirmed ? this._plansApiService.deletePlan(id).pipe(map(() => true)) : of(false)
       )
     );
   }
 
-  importPlans(): Observable<any> {
-    return this._importDialogs.displayImportDialog('Plans import', 'plans').pipe(
-      catchError(() => {
-        this._resourceInputBridgeService.deleteLastUploadedResource();
-
-        return of(false);
-      })
-    );
+  importPlans(): Observable<boolean | string[]> {
+    return this._importDialogs.displayImportDialog('Plans import', 'plans');
   }
 
-  exportPlans(): Observable<any> {
+  exportPlans(): Observable<boolean | void> {
     return this._exportDialogs.displayExportDialog('Plans export', 'plans', 'allPlans.sta');
   }
 
-  exportPlan(id: string, name: string): Observable<any> {
+  exportPlan(id: string, name: string): Observable<boolean | void> {
     return this._exportDialogs.displayExportDialog('Plans export', `plans/${id}`, `${name}.sta`);
   }
 

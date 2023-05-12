@@ -15,6 +15,7 @@ export class CustomFormComponent implements OnInit {
   @Input() stDisabled: boolean = false;
   @HostBinding('class.inline') @Input() stInline: boolean = false;
   @Input() stExcludeFields: string[] = [];
+  @Input() required: boolean = false;
 
   @Output() stModelChange = new EventEmitter<Record<string, unknown>>();
 

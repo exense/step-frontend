@@ -1,0 +1,18 @@
+<ng-container *ngIf="context as formGroup">
+  <step-dynamic-textfield
+    label="Class path libraries (Directory with Jar files)"
+    tooltip="Specify a file accessible to the controller. This file will be transferred automatically to the agents."
+    [formControl]="formGroup.controls.classpathDirectory"
+  ></step-dynamic-textfield>
+
+  <step-dynamic-textfield
+    label="Features directory"
+    tooltip="Specify a file accessible to the controller. This file will be transferred automatically to the agents."
+    [formControl]="formGroup.controls.featureDirectory"
+  ></step-dynamic-textfield>
+
+  <step-dynamic-textfield
+    label="Cucumber options"
+    [formControl]="formGroup.controls.cucumberOptions"
+  ></step-dynamic-textfield>
+</ng-container>

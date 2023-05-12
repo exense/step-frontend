@@ -1,0 +1,7 @@
+<ng-container *ngIf="context as formGroup">
+  <step-dynamic-resource-input
+    label="JMeter Testplan"
+    type="functions"
+    [formControl]="formGroup.controls.jmeterTestplan"
+  ></step-dynamic-resource-input>
+</ng-container>

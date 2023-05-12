@@ -1,0 +1,7 @@
+<ng-container *ngIf="context as formGroup">
+  <step-dynamic-textfield
+    label="Scenario file"
+    tooltip="Leave empty if you want to use the graphical editor to generate your test scenario."
+    [formControl]="formGroup.controls.scenarioFile"
+  ></step-dynamic-textfield>
+</ng-container>

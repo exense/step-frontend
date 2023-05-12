@@ -4,6 +4,7 @@
     *ngFor="let input of inputs"
     [stInput]="input"
     [disabled]="stDisabled"
+    [required]="required"
     [ngModel]="stModel | stepCustomFormInputModel: input"
     (ngModelChange)="onInputValueChange(input, $event)"
   ></step-dynamic-label-custom-form-inputs>
@@ -13,6 +14,7 @@
     *ngFor="let input of inputs"
     [stInput]="input"
     [disabled]="stDisabled"
+    [required]="required"
     [ngModel]="stModel | stepCustomFormInputModel: input"
     (ngModelChange)="onInputValueChange(input, $event)"
   ></step-standard-custom-form-inputs>

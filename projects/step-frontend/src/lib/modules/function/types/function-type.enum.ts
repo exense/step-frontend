@@ -1,0 +1,16 @@
+export enum FunctionType {
+  COMPOSITE = 'step.plugins.functions.types.CompositeFunction',
+  QF_TEST = 'step.plugins.qftest.QFTestFunction',
+  SCRIPT = 'step.plugins.java.GeneralScriptFunction',
+  DOTNET = 'step.plugins.dotnet.DotNetFunction',
+  ASTRA = 'step.plugins.astra.AstraFunction',
+  JMETER = 'step.plugins.jmeter.JMeterFunction',
+  CYPRESS = 'step.plugins.cypress.CypressFunction',
+  ORYON = 'step.plugins.oryon.OryonFunction',
+  SOAP_UI = 'step.plugins.soapui.SoapUIFunction',
+  NODE_JS = 'step.plugins.node.NodeFunction',
+  PDF_TEST = 'step.plugins.pdftest.PdfTestFunction',
+  IMAGE_COMPARE = 'step.plugins.compare.image.ImageCompareFunction',
+  CUCUMBER = 'step.plugins.cucumber.CucumberFunction',
+  SIKULIX = 'step.plugins.sikulix.SikulixFunction',
+}
