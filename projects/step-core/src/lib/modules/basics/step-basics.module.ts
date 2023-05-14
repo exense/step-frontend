@@ -72,6 +72,7 @@ import { AlertDirective } from './directives/alert.directive';
 })
 export class StepBasicsModule {}
 
+export * from './components/base-filter/base-filter.component';
 export * from './components/array-filter/array-filter.component';
 export * from './components/date-filter/date-filter.component';
 export * from './components/input-filter/hexadecimal-input-filter.component';
@@ -113,3 +114,6 @@ export * from './directives/alert.directive';
 export * from './shared/repository-parameters.token';
 export * from './repository-parameters-initializer';
 export * from './shared/array-item-label-value-extractor';
+export * from './shared/storage-proxy';
+export * from './shared/storage.token';
+export * from './services/persistence.service';

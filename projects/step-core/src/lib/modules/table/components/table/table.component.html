@@ -17,7 +17,9 @@
     >
       <th mat-header-cell *matHeaderCellDef>
         <ng-template #defaultSearchRender>
-          <step-input-filter (searchChange)="onSearch(searchCol.searchName!, $event)"> </step-input-filter>
+          <ng-container *ngIf="searchCol" [stepSearchColMeta]="searchCol">
+            <step-input-filter stepFilterConnect> </step-input-filter>
+          </ng-container>
         </ng-template>
         <ng-container *ngIf="searchCol.searchName">
           <ng-container *ngIf="!!searchCol.template; then searchCol.template!; else defaultSearchRender">
@@ -39,7 +41,6 @@
     </tr>
   </table>
 </div>
-
 <mat-paginator
   [disabled]="pageSizeInputDisabled"
   [length]="tableDataSource?.totalFiltered$ | async"

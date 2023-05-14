@@ -1,12 +1,20 @@
 import { Component } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, GridService, TableFetchLocalDataSource, TokenGroupCapacity } from '@exense/step-core';
+import {
+  AJS_MODULE,
+  GridService,
+  STORE_ALL,
+  TableFetchLocalDataSource,
+  tablePersistenceConfigProvider,
+  TokenGroupCapacity,
+} from '@exense/step-core';
 import { FlatObjectStringFormatPipe } from '../../pipes/flat-object-format.pipe';
 
 @Component({
   selector: 'step-token-group-list',
   templateUrl: './token-group-list.component.html',
   styleUrls: ['./token-group-list.component.scss'],
+  providers: [tablePersistenceConfigProvider('tokenGroupList', STORE_ALL)],
 })
 export class TokenGroupListComponent {
   readonly searchableTokenGroupRequest = new TableFetchLocalDataSource(

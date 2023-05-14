@@ -2,7 +2,10 @@
   <div step-modal-window-body>
     <step-table [dataSource]="dataSource" matSort>
       <ng-container matColumnDef="updateTime" stepSearchCol #searchVersionTime="SearchCol">
-        <step-date-filter *stepSearchCellDef (dateChanged)="searchByDate(searchVersionTime, $event)"></step-date-filter>
+        <step-date-filter
+          *stepSearchCellDef
+          (filterChange)="searchByDate(searchVersionTime, $event)"
+        ></step-date-filter>
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Version timestamp</th>
         <td
           class="cell-name {{ element.id === dialogData.version ? 'active' : '' }}"

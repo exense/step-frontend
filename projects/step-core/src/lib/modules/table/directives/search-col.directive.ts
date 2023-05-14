@@ -1,15 +1,21 @@
-import { ContentChild, Directive, Input, Self } from '@angular/core';
+import { ContentChild, Directive, forwardRef, inject, Input } from '@angular/core';
 import { MatColumnDef } from '@angular/material/table';
 import { SearchCellDefDirective } from './search-cell-def.directive';
-import { TableSearch } from '../services/table-search';
-import { SearchValue } from '../shared/search-value';
+import { SearchColBase } from './search-col-base';
+import { SearchColumnAccessor } from '../shared/search-column-accessor';
 
 @Directive({
   selector: '[matColumnDef][stepSearchCol]',
   exportAs: 'SearchCol',
+  providers: [
+    {
+      provide: SearchColumnAccessor,
+      useExisting: forwardRef(() => SearchColDirective),
+    },
+  ],
 })
-export class SearchColDirective {
-  constructor(@Self() private _matColumnDef: MatColumnDef, private _tableSearch: TableSearch) {}
+export class SearchColDirective extends SearchColBase implements SearchColumnAccessor {
+  private _matColumnDef = inject(MatColumnDef, { self: true });
 
   @Input('stepSearchCol') searchCol?: string;
   @Input() isSearchDisabled?: boolean;
@@ -20,14 +26,4 @@ export class SearchColDirective {
 
   @ContentChild(SearchCellDefDirective)
   searchCell?: SearchCellDefDirective;
-
-  search(value: string, regex?: boolean): void;
-  search(searchValue: SearchValue): void;
-  search(value: SearchValue, regex?: boolean): void {
-    if (typeof value === 'string') {
-      this._tableSearch.onSearch(this.searchColumnName, value, regex);
-      return;
-    }
-    this._tableSearch.onSearch(this.searchColumnName, value);
-  }
 }
