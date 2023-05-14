@@ -72,6 +72,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     this.dashboardSettings = {
       contextId: new Date().getTime().toString(),
       includeThreadGroupChart: true,
+      disableThreadGroupOnOqlMode: true,
       timeRange: { from: start, to: end },
       contextualFilters: urlParams,
       showContextualFilters: true,

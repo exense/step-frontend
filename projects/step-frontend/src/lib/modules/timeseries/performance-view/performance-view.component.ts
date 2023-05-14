@@ -29,6 +29,7 @@ import { UpdatePerformanceViewRequest } from './model/update-performance-view-re
 import { PerformanceViewConfig } from './performance-view.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
 import { PerformanceViewTimeSelectionComponent } from './time-selection/performance-view-time-selection.component';
+import { TsFilteringMode } from '../model/ts-filtering-mode';
 
 declare const uPlot: any;
 
@@ -264,12 +265,21 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   createThreadGroupsChart(): Observable<TimeSeriesAPIResponse> {
+    const filteringSettings = this.context.getFilteringSettings();
+    if (filteringSettings.mode === TsFilteringMode.OQL && this.settings.disableThreadGroupOnOqlMode) {
+      const threadGroupChart = this.getChart(TsChartType.THREAD_GROUP);
+      threadGroupChart.setAsUnavailable();
+      let emptyResponse = { start: 0, end: 0, interval: 0, matrix: [], matrixKeys: [] };
+      return of(emptyResponse);
+    }
+
     const request = this.findRequestBuilder
       .clone()
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_SAMPLER)
       .withGroupDimensions(['name'])
-      .withFilteringSettings(this.context.getFilteringSettings())
-      .withSkipCustomFilters(true)
+      .withFilteringSettings(filteringSettings)
+      .withFilterAttributesMask(TimeSeriesConfig.THREAD_GROUP_FILTER_FIELDS)
+      .withSkipCustomOQL(true)
       .build();
     return this.timeSeriesService
       .getBuckets(request)

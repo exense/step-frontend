@@ -80,7 +80,9 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
       .withRange(fullTimeRange)
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
       .withFilteringSettings(this.tsContext.getFilteringSettings())
-      .withSkipCustomFilters(true)
+      .withNumberOfBuckets(TimeSeriesConfig.MAX_BUCKETS_IN_CHART)
+      .withFilterAttributesMask(TimeSeriesConfig.RANGER_FILTER_FIELDS)
+      .withSkipCustomOQL(true)
       .build();
     return this.timeSeriesService.getBuckets(request).pipe(
       tap((response) => {

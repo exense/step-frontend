@@ -18,10 +18,12 @@ export class FindBucketsRequestBuilder {
   private filteringSettings?: TsFilteringSettings;
 
   /**
-   * While skipping, only the 'hidden' filters will be included in the request, together with the custom attributes.
-   * Custom filters or oql will be not included. Used for thread group chart
+   * If present, only the that that are specified in the mask are preserved in the final filter. The other are removed.
+   * If empty, the final filter.will remain unchanged.
    */
-  private skipCustomFilters = false;
+  private filterAttributesMask?: string[];
+
+  private skipCustomOQL = false;
 
   constructor(builder?: FindBucketsRequestBuilder) {
     if (builder) {
@@ -69,8 +71,13 @@ export class FindBucketsRequestBuilder {
     return this;
   }
 
-  withSkipCustomFilters(skip: boolean): FindBucketsRequestBuilder {
-    this.skipCustomFilters = skip;
+  withSkipCustomOQL(value: boolean): FindBucketsRequestBuilder {
+    this.skipCustomOQL = value;
+    return this;
+  }
+
+  withFilterAttributesMask(attributes: string[]): FindBucketsRequestBuilder {
+    this.filterAttributesMask = attributes;
     return this;
   }
 
@@ -83,15 +90,13 @@ export class FindBucketsRequestBuilder {
       throw 'Filtering settings are mandatory';
     }
     let customAttributesOql = '';
-    const hiddenFilters = this.filteringSettings.filterItems
-      .filter(FilterUtils.filterItemIsValid)
-      .filter((item) => item.isHidden);
-    const customFilters = this.filteringSettings.filterItems
-      .filter(FilterUtils.filterItemIsValid)
-      .filter((item) => !item.isHidden);
-    const filterItems = this.filteringSettings.filterItems.filter(
-      (item) => FilterUtils.filterItemIsValid(item) && !(this.skipCustomFilters && !item.isHidden)
-    );
+    let filterItems = this.filteringSettings.filterItems;
+    if (this.filterAttributesMask && this.filterAttributesMask.length > 0) {
+      filterItems = filterItems.filter((item) => this.filterAttributesMask?.includes(item.attributeName));
+    }
+
+    const hiddenFilters = filterItems.filter(FilterUtils.filterItemIsValid).filter((item) => item.isHidden);
+    const customFilters = filterItems.filter(FilterUtils.filterItemIsValid).filter((item) => !item.isHidden);
 
     if (Object.keys(this.customAttributes).length > 0) {
       customAttributesOql = FilterUtils.objectToOQL(this.customAttributes, this.attributesPrefix);
@@ -104,11 +109,11 @@ export class FindBucketsRequestBuilder {
       .append(customAttributesOql)
       .append(FilterUtils.filtersToOQL(hiddenFilters, this.attributesPrefix)) // always include hidden filters
       .append(
-        !this.skipCustomFilters
-          ? isOqlMode
-            ? this.filteringSettings.oql
-            : FilterUtils.filtersToOQL(customFilters, this.attributesPrefix)
-          : ''
+        isOqlMode
+          ? this.skipCustomOQL
+            ? ''
+            : this.filteringSettings.oql
+          : FilterUtils.filtersToOQL(customFilters, this.attributesPrefix)
       )
       .build();
 
