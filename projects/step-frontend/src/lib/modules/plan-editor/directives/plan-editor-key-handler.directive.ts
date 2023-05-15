@@ -19,12 +19,10 @@ export class PlanEditorKeyHandlerDirective {
     @Optional() private _planInteractiveSession?: PlanInteractiveSessionService,
     @Optional() private _planArtefactResolver?: PlanArtefactResolverService
   ) {
-    console.log('PlanEditorKeyHandlerDirective');
   }
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
-    console.log(event);
     if (event.ctrlKey) {
       if (this.checkKey(event, false, 'z', 'plan-write')) {
         event.preventDefault();
