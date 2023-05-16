@@ -12,6 +12,11 @@ export class TimeSeriesConfig {
   static readonly TIMESTAMP_ATTRIBUTE = 'begin';
   static readonly CHART_LEGEND_SIZE = 65;
   static readonly TOTAL_BARS_COLOR = '#7689c0';
+  static readonly METRIC_TYPE_KEY = 'metricType';
+  static readonly METRIC_TYPE_RESPONSE_TIME = 'response-time'; // this is for normal measurements
+  static readonly METRIC_TYPE_SAMPLER = 'sampler'; // this is for thread groups measurements
+  static readonly THREAD_GROUP_FILTER_FIELDS = ['eId', 'planId', 'taskId'];
+  static readonly RANGER_FILTER_FIELDS = ['eId', 'planId', 'taskId'];
 
   static readonly AUTO_REFRESH_INTERVALS: RefreshInterval[] = [
     { label: '5 Sec', value: 5000 },
