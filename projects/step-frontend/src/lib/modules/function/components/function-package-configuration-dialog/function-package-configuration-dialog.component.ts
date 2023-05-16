@@ -5,7 +5,6 @@ import {
   AlertType,
   AugmentedKeywordPackagesService,
   Function as Keyword,
-  KeyValuePair,
   ResourceInputBridgeService,
 } from '@exense/step-core';
 import { catchError, iif, map, of, switchMap, tap } from 'rxjs';
@@ -41,7 +40,7 @@ export class FunctionPackageConfigurationDialogComponent {
 
   @HostBinding('keydown.enter')
   save(): void {
-    if (!this.functionPackage.packageLocation || !this.isFunctionPackageReady) {
+    if (!this._data?.functionPackage && (!this.functionPackage.packageLocation || !this.isFunctionPackageReady)) {
       return;
     }
 

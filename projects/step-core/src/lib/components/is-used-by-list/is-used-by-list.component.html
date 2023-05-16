@@ -8,7 +8,7 @@
         [context]="{ id: element.id, attributes: { name: element.name }, _class: '' }"
       ></step-plan-link>
       <step-function-link
-        *ngIf="element.type === 'FUNCTION'"
+        *ngIf="element.type === 'KEYWORD'"
         (click)="closeDialog()"
         [context]="{ id: element.id, attributes: { name: element.name }, type: '' }"
       ></step-function-link>
