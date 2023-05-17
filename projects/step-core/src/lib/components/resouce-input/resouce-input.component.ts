@@ -38,6 +38,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   @Input() withHelpIcon?: boolean;
   @Input() helpIconTooltip?: string;
   @Input() withDynamicSwitch?: boolean;
+  @Input() showRequiredAsterisk?: boolean;
 
   @Output() stModelChange = new EventEmitter<string>();
   @Output() dynamicSwitch = new EventEmitter<void>();
@@ -173,6 +174,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     this.absoluteFilepath = '';
     this.setStModel('');
     this.deleteLastUploadedResource();
+    this.blur.emit();
 
     if (!this.fileInput) {
       return;

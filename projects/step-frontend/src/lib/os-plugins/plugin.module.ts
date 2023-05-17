@@ -14,13 +14,15 @@ export class PluginModule extends PluginLazyLoad {
     super(osPluginModule);
   }
 
-  protected override getPluginsLazyLoadMeta(): Record<string, ImportMeta> {
+  protected override getPluginsLazyLoadMeta(): Record<string, ImportMeta[]> {
     return {
-      scriptEditor: () =>
-        import('./modules/script-editor/script-editor.module').then((m) => ({
-          Module: m.ScriptEditorModule,
-          ajsModuleName: m.scriptEditorModule.name,
-        })),
+      scriptEditor: [
+        () =>
+          import('./modules/script-editor/script-editor.module').then((m) => ({
+            Module: m.ScriptEditorModule,
+            ajsModuleName: m.scriptEditorModule.name,
+          })),
+      ],
     };
   }
 }

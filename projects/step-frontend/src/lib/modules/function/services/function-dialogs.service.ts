@@ -1,9 +1,11 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   a1Promise2Observable,
   AJS_LOCATION,
+  AJS_MODULE,
   AugmentedKeywordsService,
   DialogsService,
   EntityDialogsService,
@@ -131,3 +133,5 @@ export class FunctionDialogsService implements FunctionLinkDialogService {
     return function$;
   }
 }
+
+getAngularJSGlobal().module(AJS_MODULE).service('FunctionDialogs', downgradeInjectable(FunctionDialogsService));

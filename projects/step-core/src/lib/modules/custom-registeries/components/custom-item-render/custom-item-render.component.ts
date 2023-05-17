@@ -2,8 +2,10 @@ import {
   AfterViewInit,
   Component,
   ComponentRef,
+  EventEmitter,
   Input,
   OnChanges,
+  Output,
   SimpleChanges,
   Type,
   ViewChild,
@@ -19,6 +21,8 @@ import { CustomComponent } from '../../shared/custom-component';
 export class CustomItemRenderComponent implements OnChanges, AfterViewInit {
   @Input() component?: Type<CustomComponent>;
   @Input() context?: any;
+
+  @Output() renderComplete = new EventEmitter<void>();
 
   @ViewChild('container', { read: ViewContainerRef }) container!: ViewContainerRef;
 
@@ -61,6 +65,8 @@ export class CustomItemRenderComponent implements OnChanges, AfterViewInit {
     if (this.context) {
       this.updateContext(this.context);
     }
+
+    this.renderComplete.emit();
   }
 
   private updateContext(context?: any): void {
@@ -69,6 +75,6 @@ export class CustomItemRenderComponent implements OnChanges, AfterViewInit {
     }
 
     this.componentRef.instance.context = context;
-    this.componentRef.changeDetectorRef.markForCheck();
+    this.componentRef.changeDetectorRef.detectChanges();
   }
 }

@@ -7,6 +7,7 @@ import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { UpgradeModule } from '@angular/upgrade/static';
 import { AngularSplitModule } from 'angular-split';
 import { StepGeneratedClientModule } from './client/generated';
+import { AgentTokenSelectionCriteriaComponent } from './components/agent-token-selection-criteria/agent-token-selection-criteria.component';
 import { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
 import { DynamicLabelCustomFormInputComponent } from './components/custom-form-input/dynamic-label-custom-form-input.component';
 import { StandardCustomFormInputComponent } from './components/custom-form-input/standard-custom-form-input.component';
@@ -120,6 +121,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
     DynamicResourceInputComponent,
+    AgentTokenSelectionCriteriaComponent,
   ],
   imports: [
     CommonModule,
@@ -200,6 +202,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
     DynamicResourceInputComponent,
+    AgentTokenSelectionCriteriaComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -233,6 +236,7 @@ export { OpenAPI } from './client/generated/core/OpenAPI';
 export type { OpenAPIConfig } from './client/generated/core/OpenAPI';
 export * from './client/generated/index';
 export * from './client/step-client-module';
+export { AgentTokenSelectionCriteriaComponent } from './components/agent-token-selection-criteria/agent-token-selection-criteria.component';
 export { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
 export { DynamicLabelCustomFormInputComponent } from './components/custom-form-input/dynamic-label-custom-form-input.component';
 export { StandardCustomFormInputComponent } from './components/custom-form-input/standard-custom-form-input.component';

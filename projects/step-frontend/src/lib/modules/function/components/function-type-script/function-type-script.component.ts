@@ -1,23 +1,40 @@
 import { Component, inject } from '@angular/core';
-import { CustomComponent, ScriptLanguage } from '@exense/step-core';
+import { FormBuilder } from '@angular/forms';
 import {
+  FunctionScript,
+  FunctionTypeFormComponent,
+  FunctionTypeScriptForm,
+  functionTypeScriptFormCreate,
+  functionTypeScriptFormSetValueToForm,
+  functionTypeScriptFormSetValueToModel,
   FunctionTypeScriptOption,
   FUNCTION_TYPE_SCRIPT_OPTIONS,
-} from '../../services/function-type-script-options.token';
-import { FunctionTypeScriptForm } from '../../types/function-type-script.form';
+  higherOrderValidator,
+  ScriptLanguage,
+} from '@exense/step-core';
 
 @Component({
   selector: 'step-function-type-script',
   templateUrl: './function-type-script.component.html',
   styleUrls: ['./function-type-script.component.scss'],
 })
-export class FunctionTypeScriptComponent implements CustomComponent {
+export class FunctionTypeScriptComponent extends FunctionTypeFormComponent<FunctionTypeScriptForm> {
+  private _formBuilder = inject(FormBuilder);
+
+  protected readonly formGroup = functionTypeScriptFormCreate(this._formBuilder);
+  protected readonly formGroupValidator = higherOrderValidator(this.formGroup);
   protected readonly functionTypeScriptOptions = inject<FunctionTypeScriptOption[]>(FUNCTION_TYPE_SCRIPT_OPTIONS);
   protected readonly ScriptLanguage = ScriptLanguage;
 
-  context?: FunctionTypeScriptForm;
-
   protected get scriptLanguage(): ScriptLanguage | undefined {
-    return this.context?.controls.scriptLanguage.value.value;
+    return this.formGroup.controls.scriptLanguage.value;
+  }
+
+  protected override setValueToForm(): void {
+    functionTypeScriptFormSetValueToForm(this.formGroup, this.context!.stepFunction as FunctionScript);
+  }
+
+  protected override setValueToModel(): void {
+    functionTypeScriptFormSetValueToModel(this.formGroup, this.context!.stepFunction as FunctionScript);
   }
 }

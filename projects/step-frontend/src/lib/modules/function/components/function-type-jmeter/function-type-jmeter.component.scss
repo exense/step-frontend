@@ -1,5 +1,5 @@
-@use '../../function.scss' as function;
-
 :host {
-  @include function.function-type-form;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
 }

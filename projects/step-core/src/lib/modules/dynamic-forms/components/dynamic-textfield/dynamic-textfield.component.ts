@@ -1,7 +1,7 @@
 import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { DynamicValueString } from '../../../../client/step-client-module';
-import { DialogsService } from '../../../../shared';
+import { DialogsService, dynamicValueFactory } from '../../../../shared';
 
 type OnChange = (dynamicValueString: DynamicValueString) => void;
 type OnTouch = () => void;
@@ -77,7 +77,10 @@ export class DynamicTextfieldComponent {
   }
 
   private toDynamicValueString(): DynamicValueString {
+    const { createDynamicValueString } = dynamicValueFactory();
+
     return {
+      ...createDynamicValueString(),
       ...(this.value ? { value: this.value } : {}),
       ...(this.dynamic ? { dynamic: this.dynamic } : {}),
       ...(this.expression ? { expression: this.expression } : {}),

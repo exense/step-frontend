@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import {
@@ -8,26 +8,23 @@ import {
   AuthService,
   DialogsService,
   Function,
+  functionConfigurationDialogFormCreate,
+  functionConfigurationDialogFormSetValueToForm,
+  functionConfigurationDialogFormSetValueToModel,
+  FunctionType,
   FunctionTypeRegistryService,
   KeyValuePair,
 } from '@exense/step-core';
 import { ILocationService } from 'angular';
-import { of, Subject, switchMap, tap } from 'rxjs';
+import { of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { FunctionConfigurationDialogData } from '../../types/function-configuration-dialog-data.interface';
-import {
-  ConcreteFunction,
-  functionConfigurationDialogFormCreate,
-  functionConfigurationDialogFormSetValueToForm,
-  functionConfigurationDialogFormSetValueToModel,
-} from '../../types/function-configuration-dialog.form';
-import { FunctionType } from '../../types/function-type.enum';
 
 @Component({
   selector: 'step-function-configuration-dialog',
   templateUrl: './function-configuration-dialog.component.html',
   styleUrls: ['./function-configuration-dialog.component.scss'],
 })
-export class FunctionConfigurationDialogComponent implements OnInit {
+export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
   private _functionConfigurationDialogData = inject<FunctionConfigurationDialogData>(MAT_DIALOG_DATA);
   private _augmentedKeywordsService = inject(AugmentedKeywordsService);
   private _matDialogRef = inject<MatDialogRef<FunctionConfigurationDialogComponent, Function>>(MatDialogRef);
@@ -36,18 +33,22 @@ export class FunctionConfigurationDialogComponent implements OnInit {
   private _functionTypeRegistryService = inject(FunctionTypeRegistryService);
   private _formBuilder = inject(FormBuilder);
   private _authService = inject(AuthService);
+  private _changeDetectorRef = inject(ChangeDetectorRef);
 
   private readonly terminator$ = new Subject<void>();
+  private readonly setValueToFormInternal$ = new Subject<void>();
+  private readonly setValueToModelInternal$ = new Subject<void>();
 
   protected readonly lightForm = this._functionConfigurationDialogData.dialogConfig.lightForm;
   protected readonly schemaEnforced = this._authService.getConf()?.miscParams?.['enforceschemas'] === 'true';
   protected readonly formGroup = functionConfigurationDialogFormCreate(
     this._formBuilder,
     this.lightForm,
-    this.schemaEnforced,
-    this.terminator$
+    this.schemaEnforced
   );
   protected readonly functionTypeItemInfos = this._functionTypeRegistryService.getItemInfos();
+  protected readonly setValueToForm$ = this.setValueToFormInternal$.asObservable();
+  protected readonly setValueToModel$ = this.setValueToModelInternal$.asObservable();
   protected readonly AlertType = AlertType;
   protected readonly FunctionType = FunctionType;
 
@@ -60,13 +61,20 @@ export class FunctionConfigurationDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.initStepFunction();
+
+    this.formGroup.statusChanges.pipe(takeUntil(this.terminator$)).subscribe(() => {
+      this._changeDetectorRef.detectChanges();
+    });
   }
 
-  protected get contentless(): boolean {
-    return this.functionType === FunctionType.ASTRA;
+  ngOnDestroy(): void {
+    this.terminator$.next();
+    this.terminator$.complete();
+    this.setValueToFormInternal$.complete();
+    this.setValueToModelInternal$.complete();
   }
 
-  protected get functionType(): FunctionType {
+  protected get functionType(): string {
     return this.formGroup.controls.type.value;
   }
 
@@ -82,11 +90,18 @@ export class FunctionConfigurationDialogComponent implements OnInit {
     return this._functionConfigurationDialogData.dialogConfig.serviceRoot;
   }
 
+  protected onFunctionTypeRenderComplete(): void {
+    this.setValueToFormInternal$.next();
+    this.formGroup.updateValueAndValidity();
+  }
+
   protected save(edit?: boolean): void {
-    functionConfigurationDialogFormSetValueToModel(this.formGroup, this.stepFunction as ConcreteFunction);
+    functionConfigurationDialogFormSetValueToModel(this.formGroup, this.stepFunction!);
+
+    this.setValueToModelInternal$.next();
 
     this._augmentedKeywordsService
-      .saveFunction(this.stepFunction, this.serviceRoot)
+      .saveFunction(this.stepFunction!, this.serviceRoot)
       .pipe(
         switchMap((stepFunction) => {
           this._matDialogRef.close(stepFunction);
@@ -120,7 +135,7 @@ export class FunctionConfigurationDialogComponent implements OnInit {
     } else {
       this.stepFunction = this._functionConfigurationDialogData.stepFunction;
 
-      functionConfigurationDialogFormSetValueToForm(this.formGroup, this.stepFunction as ConcreteFunction);
+      functionConfigurationDialogFormSetValueToForm(this.formGroup, this.stepFunction);
     }
   }
 
@@ -147,7 +162,7 @@ export class FunctionConfigurationDialogComponent implements OnInit {
       .subscribe((stepFunction) => {
         this.stepFunction = stepFunction;
 
-        functionConfigurationDialogFormSetValueToForm(this.formGroup, stepFunction as ConcreteFunction);
+        functionConfigurationDialogFormSetValueToForm(this.formGroup, stepFunction);
       });
   }
 }

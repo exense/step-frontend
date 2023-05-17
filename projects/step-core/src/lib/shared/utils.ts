@@ -1,3 +1,4 @@
+import { AbstractControl, FormArray, FormControl, FormGroup } from '@angular/forms';
 import { IPromise } from 'angular';
 import { from, Observable } from 'rxjs';
 import { KeyValuePair } from '../domain';
@@ -98,6 +99,31 @@ export const toRecord = <T>(keyValuePairs: KeyValuePair<string, T>[]): Record<st
     }),
     {}
   );
+
+export const getFlatControls = (
+  abstractControl: AbstractControl,
+  predicate?: (item: AbstractControl) => boolean
+): AbstractControl[] => {
+  return breadthFirstSearch<AbstractControl>({
+    items: [abstractControl],
+    children: (control) => {
+      if (control instanceof FormGroup) {
+        return Object.values(control.controls);
+      }
+
+      if (control instanceof FormArray) {
+        return control.controls;
+      }
+
+      if (control instanceof FormControl) {
+        return [control];
+      }
+
+      return [];
+    },
+    predicate,
+  });
+};
 
 export const dynamicValueFactory = () => ({
   createDynamicValueString(dynamicValueString?: Partial<DynamicValueString>): DynamicValueString {

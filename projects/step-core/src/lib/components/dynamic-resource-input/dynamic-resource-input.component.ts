@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
+import { dynamicValueFactory } from '../../shared';
 import { DynamicValueString } from '../../step-core.module';
 
 type OnChange = (dynamicValueString: DynamicValueString) => void;
@@ -72,7 +73,10 @@ export class DynamicResourceInputComponent implements ControlValueAccessor {
   }
 
   private toDynamicValueString(): DynamicValueString {
+    const { createDynamicValueString } = dynamicValueFactory();
+
     return {
+      ...createDynamicValueString(),
       ...(this.value ? { value: this.value } : {}),
       ...(this.dynamic ? { dynamic: this.dynamic } : {}),
       ...(this.expression ? { expression: this.expression } : {}),

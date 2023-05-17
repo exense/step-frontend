@@ -9,7 +9,7 @@
         [stScreen]="customScreenTable"
         [required]="true"
         [stModel]="formGroup.value"
-        (stModelChange)="formGroup.patchValue($event)"
+        (stModelChange)="formGroup.patchValue($event, { emitEvent: false })"
       >
       </step-custom-forms>
 
@@ -36,9 +36,14 @@
       </step-form-field>
 
       <step-function-type
-        *ngIf="!contentless"
         [itemKey]="functionType"
-        [context]="formGroup | stepFunctionTypeForm: functionType"
+        [context]="{
+          formGroup: formGroup,
+          stepFunction: stepFunction,
+          setValueToForm$: setValueToForm$,
+          setValueToModel$: setValueToModel$
+        }"
+        (renderComplete)="onFunctionTypeRenderComplete()"
       ></step-function-type>
 
       <ng-container *ngIf="!lightForm">
