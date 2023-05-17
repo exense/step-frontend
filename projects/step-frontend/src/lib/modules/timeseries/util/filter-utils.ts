@@ -16,7 +16,7 @@ export class FilterUtils {
     attributeProcessFn?: (x: string) => string
   ) {
     if (!object || Object.keys(object).length === 0) {
-      return undefined;
+      return '';
     }
     let clause = Object.keys(object)
       .map((key) => {

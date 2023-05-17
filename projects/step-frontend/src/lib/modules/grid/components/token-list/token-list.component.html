@@ -32,7 +32,7 @@
     <step-array-filter
       *stepSearchCellDef
       [items]="['IN_USE', 'MAINTENANCE', 'ERROR', 'FREE']"
-      (selectedItemsChange)="searchState.search($event, true)"
+      (filterChange)="searchState.search($event, true)"
     ></step-array-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>State</th>
     <td mat-cell *matCellDef="let element">

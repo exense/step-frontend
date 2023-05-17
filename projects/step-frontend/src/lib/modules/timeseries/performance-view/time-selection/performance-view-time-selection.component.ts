@@ -11,6 +11,8 @@ import { PerformanceViewSettings } from '../model/performance-view-settings';
 import { Observable, Subject, takeUntil, tap } from 'rxjs';
 import { TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
 import { FilterUtils } from '../../util/filter-utils';
+import { FindBucketsRequestBuilder } from '../../util/find-buckets-request-builder';
+import { PerformanceViewComponent } from '../performance-view.component';
 
 @Component({
   selector: 'step-execution-time-selection',
@@ -74,12 +76,14 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   }
 
   createRanger(fullTimeRange: TSTimeRange, selection?: TSTimeRange): Observable<TimeSeriesAPIResponse> {
-    const request: FindBucketsRequest = {
-      start: fullTimeRange.from,
-      end: fullTimeRange.to, // to current time if it's not ended
-      oqlFilter: FilterUtils.objectToOQL(this.settings.contextualFilters),
-      numberOfBuckets: TimeSeriesConfig.MAX_BUCKETS_IN_CHART,
-    };
+    const request = new FindBucketsRequestBuilder()
+      .withRange(fullTimeRange)
+      .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
+      .withFilteringSettings(this.tsContext.getFilteringSettings())
+      .withNumberOfBuckets(TimeSeriesConfig.MAX_BUCKETS_IN_CHART)
+      .withFilterAttributesMask(TimeSeriesConfig.RANGER_FILTER_FIELDS)
+      .withSkipCustomOQL(true)
+      .build();
     return this.timeSeriesService.getBuckets(request).pipe(
       tap((response) => {
         this.timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);

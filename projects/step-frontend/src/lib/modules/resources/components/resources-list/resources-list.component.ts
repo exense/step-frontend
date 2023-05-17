@@ -1,21 +1,27 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, Resource, AugmentedResourcesService, ResourceDialogsService } from '@exense/step-core';
+import {
+  AJS_MODULE,
+  Resource,
+  AugmentedResourcesService,
+  ResourceDialogsService,
+  tablePersistenceConfigProvider,
+  STORE_ALL,
+} from '@exense/step-core';
 import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'step-resources-list',
   templateUrl: './resources-list.component.html',
   styleUrls: ['./resources-list.component.scss'],
+  providers: [tablePersistenceConfigProvider('resourceList', STORE_ALL)],
 })
 export class ResourcesListComponent {
-  readonly dataSource = this._resourcesService.createDatasource();
+  private _resourceDialogs = inject(ResourceDialogsService);
+  private _resourcesService = inject(AugmentedResourcesService);
+  private _document = inject(DOCUMENT);
 
-  constructor(
-    private _resourceDialogs: ResourceDialogsService,
-    private _resourcesService: AugmentedResourcesService,
-    @Inject(DOCUMENT) private _document: Document
-  ) {}
+  readonly dataSource = this._resourcesService.createDatasource();
 
   editResource(resource: Resource): void {
     this._resourceDialogs.editResource(resource).subscribe((_) => this.dataSource.reload());

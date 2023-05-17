@@ -43,7 +43,8 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   recreateOnInputChange = true; // the chart will be destroyed and recreated every time a setting or data is changed.
 
-  emptyChart = false; // meaning the chart is already created, but it has no data
+  chartIsEmpty = false; // meaning the chart is already created, but it has no data
+  chartIsUnavailable = false;
 
   legendSettings: LegendSettings = { items: [] };
 
@@ -87,6 +88,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
    */
   createChart(settings: TSChartSettings): void {
     this.legendSettings.items = [];
+    this.chartIsUnavailable = false;
 
     const cursorOpts: uPlot.Cursor = {
       lock: false,
@@ -135,7 +137,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         break;
       }
     }
-    this.emptyChart = noData;
+    this.chartIsEmpty = noData;
     const opts: uPlot.Options = {
       title: settings.title,
       ms: 1, // if not specified it's going to be in seconds
@@ -186,6 +188,11 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         this.createChart(this.settings);
       }
     }
+  }
+
+  setAsUnavailable(): void {
+    this.uplot.setData([]);
+    this.chartIsUnavailable = true;
   }
 
   showSeries(id: string): void {
@@ -300,7 +307,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   clear() {
     this.updateFullData([]);
-    this.emptyChart = true;
+    this.chartIsEmpty = true;
     this.uplot.axes[0].show = false;
     this.uplot.legend.show = false;
   }

@@ -1,7 +1,11 @@
 <div class="chart-wrapper" [style.padding]="WRAPPER_PADDING" (stepElementResize)="redraw()">
   <div #chart></div>
-  <div class="no-data-tag" *ngIf="emptyChart">No data...</div>
-  <div *ngIf="legendSettings.items.length || legendSettings.zAxisLabel" class="ts-chart-legend">
+  <div class="no-data-tag" *ngIf="chartIsEmpty">No data...</div>
+  <div class="no-data-tag" *ngIf="chartIsUnavailable">Chart is unavailable for current settings</div>
+  <div
+    *ngIf="!chartIsUnavailable && (legendSettings.items.length || legendSettings.zAxisLabel)"
+    class="ts-chart-legend"
+  >
     <div class="left-section">
       <ng-container *ngFor="let item of legendSettings.items">
         <div class="item" *ngIf="item.isVisible">

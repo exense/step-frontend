@@ -13,6 +13,8 @@ import {
   Function as KeywordFunction,
   InteractivePlanExecutionService,
   selectionCollectionProvider,
+  STORE_ALL,
+  tablePersistenceConfigProvider,
   TableRemoteDataSource,
 } from '@exense/step-core';
 import { ILocationService, IRootScopeService } from 'angular';
@@ -23,6 +25,7 @@ import { GenericFunctionBulkOperationsInvokeService } from '../services/generic-
   templateUrl: './generic-function-list.component.html',
   styleUrls: ['./generic-function-list.component.scss'],
   providers: [
+    tablePersistenceConfigProvider('genericFunctionList', STORE_ALL),
     selectionCollectionProvider<string, KeywordFunction>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {
       provide: BulkOperationsInvokeService,

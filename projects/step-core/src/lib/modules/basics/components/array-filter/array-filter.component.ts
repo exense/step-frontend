@@ -1,19 +1,25 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, TrackByFunction } from '@angular/core';
-import { MatSelectChange } from '@angular/material/select';
+import { Component, forwardRef, Input, OnChanges, SimpleChanges, TrackByFunction } from '@angular/core';
 import { ArrayItemLabelValueExtractor } from '../../shared/array-item-label-value-extractor';
 import { KeyValue } from '@angular/common';
+import { BaseFilterComponent } from '../base-filter/base-filter.component';
+import { FormBuilder, FormControl } from '@angular/forms';
+import { map, Observable } from 'rxjs';
 
 @Component({
   selector: 'step-array-filter',
   templateUrl: './array-filter.component.html',
   styleUrls: ['./array-filter.component.scss'],
+  providers: [
+    {
+      provide: BaseFilterComponent,
+      useExisting: forwardRef(() => ArrayFilterComponent),
+    },
+  ],
 })
-export class ArrayFilterComponent<T = unknown> implements OnChanges {
+export class ArrayFilterComponent<T = unknown> extends BaseFilterComponent<string, unknown[]> implements OnChanges {
   protected trackByKeyValue: TrackByFunction<KeyValue<unknown, string>> = (index, item) => item.key;
 
   protected displayItems: KeyValue<unknown, string>[] = [];
-
-  @Output() selectedItemsChange = new EventEmitter<string>();
 
   @Input() items: T[] | ReadonlyArray<T> = [];
 
@@ -39,16 +45,30 @@ export class ArrayFilterComponent<T = unknown> implements OnChanges {
     }
   }
 
-  handleChange(selection: MatSelectChange): void {
-    const values = selection.value as string[];
-    let value = '';
-    if (values.length === 1) {
-      value = values[0];
-    } else if (values.length > 1) {
-      value = values.join('|');
-      value = `(${value})`;
+  protected override createControl(fb: FormBuilder): FormControl<unknown[]> {
+    return fb.nonNullable.control([]);
+  }
+
+  protected override createControlChangeStream(control: FormControl<unknown[]>): Observable<string> {
+    return control.valueChanges.pipe(
+      map((values: unknown[]) => {
+        let value = '';
+        if (values.length === 1) {
+          value = `${values[0]}`;
+        } else if (values.length > 1) {
+          value = values.join('|');
+          value = `(${value})`;
+        }
+        return value;
+      })
+    );
+  }
+
+  protected override transformFilterValueToControlValue(value: string): unknown[] {
+    if (value.startsWith('(') && value.endsWith(')') && value.includes('|')) {
+      return value.substring(1, value.length - 1).split('|');
     }
-    this.selectedItemsChange.emit(value);
+    return [value];
   }
 
   private setupDisplayItems(

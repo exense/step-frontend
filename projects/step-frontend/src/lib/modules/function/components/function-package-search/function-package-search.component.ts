@@ -1,57 +1,79 @@
-import { AfterViewInit, Component, OnDestroy, Optional } from '@angular/core';
-import { CustomComponent, TableSearch, Input as ColInput, AugmentedKeywordPackagesService } from '@exense/step-core';
-import { FormBuilder } from '@angular/forms';
-import { debounceTime, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { Component, forwardRef, inject } from '@angular/core';
+import {
+  CustomComponent,
+  Input as ColInput,
+  AugmentedKeywordPackagesService,
+  BaseFilterComponent,
+  SearchValue,
+  FilterCondition,
+} from '@exense/step-core';
+import { FormBuilder, FormControl } from '@angular/forms';
+import { debounceTime, map, Observable, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'step-function-package-search',
   templateUrl: './function-package-search.component.html',
   styleUrls: ['./function-package-search.component.scss'],
+  providers: [
+    {
+      provide: BaseFilterComponent,
+      useExisting: forwardRef(() => FunctionPackageSearchComponent),
+    },
+  ],
 })
-export class FunctionPackageSearchComponent implements CustomComponent, AfterViewInit, OnDestroy {
-  private terminator$ = new Subject<void>();
+export class FunctionPackageSearchComponent
+  extends BaseFilterComponent<SearchValue, string>
+  implements CustomComponent
+{
+  private static searchValueCache = new Map<string, string>();
+
+  private _augKeywordPackages = inject(AugmentedKeywordPackagesService);
 
   context?: ColInput;
 
-  readonly searchControl = this._formBuilder.control('');
-
-  constructor(
-    private _formBuilder: FormBuilder,
-    private _augKeywordPackages: AugmentedKeywordPackagesService,
-    @Optional() private _tableSearch?: TableSearch
-  ) {}
-
-  ngAfterViewInit(): void {
-    this.searchControl.valueChanges
-      .pipe(
-        debounceTime(200),
-        switchMap((searchValue) => {
-          const searchPackageName = (searchValue || '').trim();
-          if (!searchPackageName) {
-            return of(undefined);
-          }
-
-          return this._augKeywordPackages.searchPackageIDsByName(searchPackageName);
-        }),
-        takeUntil(this.terminator$)
-      )
-      .subscribe((packageIds) => {
-        if (!this.context?.id || !this._tableSearch) {
-          return;
-        }
-        if (packageIds !== undefined && packageIds.length === 0) {
-          // Current case means, that no suitable package was found that satisfied the query.
-          // It means that final request should return result
-          this._tableSearch.onSearch(this.context.id, ' ', false);
-        } else {
-          const searchValue = packageIds === undefined ? '' : `(${packageIds.join('|')})`;
-          this._tableSearch.onSearch(this.context.id, searchValue);
-        }
-      });
+  protected createControl(fb: FormBuilder): FormControl<string> {
+    return fb.nonNullable.control('');
   }
 
-  ngOnDestroy() {
-    this.terminator$.next();
-    this.terminator$.complete();
+  protected createControlChangeStream(control: FormControl<string>): Observable<SearchValue> {
+    return control.valueChanges.pipe(
+      debounceTime(200),
+      switchMap((searchValue) => {
+        const searchPackageName = (searchValue || '').trim();
+        if (!searchPackageName) {
+          return of({ packageIds: undefined, searchPackageName });
+        }
+
+        return this._augKeywordPackages.searchPackageIDsByName(searchPackageName).pipe(
+          map((packageIds) => ({
+            packageIds,
+            searchPackageName,
+          }))
+        );
+      }),
+      map(({ packageIds, searchPackageName }) => {
+        const result: SearchValue =
+          packageIds !== undefined && packageIds.length === 0
+            ? {
+                value: ' ',
+                regex: false,
+              }
+            : {
+                value: packageIds === undefined ? '' : `(${packageIds.join('|')})`,
+                regex: true,
+              };
+        FunctionPackageSearchComponent.searchValueCache.set(result.value, searchPackageName);
+        return result;
+      })
+    );
+  }
+
+  protected override transformFilterValueToControlValue(value: SearchValue): string {
+    if (!value || value instanceof FilterCondition) {
+      return '';
+    }
+    const searchValue = typeof value === 'string' ? value : value.value;
+    const cachedValue = FunctionPackageSearchComponent.searchValueCache.get(searchValue);
+    return cachedValue ?? searchValue;
   }
 }

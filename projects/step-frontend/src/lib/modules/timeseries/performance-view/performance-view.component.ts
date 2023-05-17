@@ -29,6 +29,7 @@ import { UpdatePerformanceViewRequest } from './model/update-performance-view-re
 import { PerformanceViewConfig } from './performance-view.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
 import { PerformanceViewTimeSelectionComponent } from './time-selection/performance-view-time-selection.component';
+import { TsFilteringMode } from '../model/ts-filtering-mode';
 
 declare const uPlot: any;
 
@@ -38,10 +39,6 @@ declare const uPlot: any;
   styleUrls: ['./performance-view.component.scss'],
 })
 export class PerformanceViewComponent implements OnInit, OnDestroy {
-  private readonly METRIC_TYPE_KEY = 'metricType';
-  private readonly METRIC_TYPE_RESPONSE_TIME = 'response-time'; // this is for normal measurements
-  private readonly METRIC_TYPE_SAMPLER = 'sampler'; // this is for thread groups measurements
-
   private CHART_LEGEND_SIZE = 65;
 
   rangerSettings: TSChartSettings | undefined;
@@ -219,7 +216,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   prepareFindRequestBuilder(settings: PerformanceViewSettings, customFilters?: any): FindBucketsRequestBuilder {
     return new FindBucketsRequestBuilder()
       .withRange(settings.timeRange)
-      .addAttribute(this.METRIC_TYPE_KEY, this.METRIC_TYPE_RESPONSE_TIME)
+      .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
       .withFilteringSettings(this.context.getFilteringSettings())
       .withNumberOfBuckets(TimeSeriesConfig.MAX_BUCKETS_IN_CHART);
   }
@@ -268,11 +265,21 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   createThreadGroupsChart(): Observable<TimeSeriesAPIResponse> {
+    const filteringSettings = this.context.getFilteringSettings();
+    if (filteringSettings.mode === TsFilteringMode.OQL && this.settings.disableThreadGroupOnOqlMode) {
+      const threadGroupChart = this.getChart(TsChartType.THREAD_GROUP);
+      threadGroupChart.setAsUnavailable();
+      let emptyResponse = { start: 0, end: 0, interval: 0, matrix: [], matrixKeys: [] };
+      return of(emptyResponse);
+    }
+
     const request = this.findRequestBuilder
       .clone()
-      .addAttribute(this.METRIC_TYPE_KEY, this.METRIC_TYPE_SAMPLER)
+      .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_SAMPLER)
       .withGroupDimensions(['name'])
-      .withFilteringSettings(this.context.getFilteringSettings())
+      .withFilteringSettings(filteringSettings)
+      .withFilterAttributesMask(TimeSeriesConfig.THREAD_GROUP_FILTER_FIELDS)
+      .withSkipCustomOQL(true)
       .build();
     return this.timeSeriesService
       .getBuckets(request)
