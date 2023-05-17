@@ -100,7 +100,13 @@
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>
-    <button type="button" mat-flat-button color="primary" [disabled]="!isFunctionPackageReady" (click)="save()">
+    <button
+      type="button"
+      mat-flat-button
+      color="primary"
+      [disabled]="!isFunctionPackageReady && !_data?.functionPackage"
+      (click)="save()"
+    >
       Save
     </button>
   </div>

@@ -6,6 +6,7 @@ export interface TimeSeriesDashboardSettings {
   contextualFilters: { [key: string]: string };
   showContextualFilters: boolean; // show in filter bar
   includeThreadGroupChart?: boolean;
+  disableThreadGroupOnOqlMode?: boolean;
   timeRange: TSTimeRange;
   filterOptions: TsFilterItem[];
   activeFilters?: TsFilterItem[];
