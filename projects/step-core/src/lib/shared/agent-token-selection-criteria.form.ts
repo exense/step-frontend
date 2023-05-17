@@ -1,5 +1,5 @@
 import { FormBuilder } from '@angular/forms';
-import { KeyValuePair } from '@exense/step-core';
+import { KeyValuePair } from '../domain';
 
 export type AgentTokenSelectionCriteriaForm = ReturnType<typeof agentTokenSelectionCriteriaFormCreate>;
 

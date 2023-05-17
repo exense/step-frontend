@@ -1,11 +1,9 @@
 import { FormBuilder, Validators } from '@angular/forms';
-import {
-  dynamicValueFactory,
-  DynamicValueString,
-  dynamicValueValidatorsFactory,
-  ScriptLanguage,
-} from '@exense/step-core';
+import { DynamicValueString } from '../client/generated';
+import { dynamicValueValidatorsFactory } from './dynamic-value-validators-factory';
 import { FunctionScript } from './function-script.interface';
+import { ScriptLanguage } from './script-language.enum';
+import { dynamicValueFactory } from './utils';
 
 export type FunctionTypeScriptForm = ReturnType<typeof functionTypeScriptFormCreate>;
 

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
+import { DynamicValueString } from '../../client/generated';
 import { dynamicValueFactory } from '../../shared';
-import { DynamicValueString } from '../../step-core.module';
 
 type OnChange = (dynamicValueString: DynamicValueString) => void;
 type OnTouch = () => void;

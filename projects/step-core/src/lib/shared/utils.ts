@@ -1,8 +1,8 @@
 import { AbstractControl, FormArray, FormControl, FormGroup } from '@angular/forms';
 import { IPromise } from 'angular';
 import { from, Observable } from 'rxjs';
+import { DynamicValueInteger, DynamicValueString } from '../client/generated';
 import { KeyValuePair } from '../domain';
-import { DynamicValueInteger, DynamicValueString } from '../step-core.module';
 import { AceMode } from './ace-mode.enum';
 import { Collection } from './collection.interface';
 import { ScriptLanguage } from './script-language.enum';

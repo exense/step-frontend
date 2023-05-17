@@ -1,8 +1,9 @@
 import { AbstractControl, FormBuilder, ValidationErrors, Validators } from '@angular/forms';
-import { dynamicValueFactory, DynamicValueInteger, KeyValuePair, toKeyValuePairs, toRecord } from '@exense/step-core';
-import { Function } from '../client/generated';
+import { DynamicValueInteger, Function } from '../client/generated';
+import { KeyValuePair } from '../domain';
 import { AgentTokenSelectionCriteriaForm } from './agent-token-selection-criteria.form';
 import { FunctionType } from './function-type.enum';
+import { dynamicValueFactory, toKeyValuePairs, toRecord } from './utils';
 
 export type FunctionConfigurationDialogForm = ReturnType<typeof functionConfigurationDialogFormCreate>;
 
@@ -65,7 +66,6 @@ export const functionConfigurationDialogFormCreate = (
     schema: formBuilder.nonNullable.control<string>(DEFAULT_SCHEMA_VALUE, [
       ...(!lightForm && schemaEnforced ? [schemaValidator] : []),
     ]),
-    htmlTemplate: formBuilder.nonNullable.control<string>('', []),
     type: formBuilder.nonNullable.control<string>(FunctionType.SCRIPT, [Validators.required]),
     callTimeout: formBuilder.nonNullable.control<DynamicValueInteger>(
       createDynamicValueInteger({ value: DEFAULT_CALL_TIMEOUT_MS }),
@@ -82,14 +82,12 @@ export const functionConfigurationDialogFormSetValueToForm = (
   form: FunctionConfigurationDialogForm,
   model: Function
 ): void => {
-  const { attributes, description, schema, htmlTemplate, type, callTimeout, executeLocally, tokenSelectionCriteria } =
-    model;
+  const { attributes, description, schema, type, callTimeout, executeLocally, tokenSelectionCriteria } = model;
 
   form.patchValue({
     attributes,
     description,
     schema: schema ? JSON.stringify(schema) : DEFAULT_SCHEMA_VALUE,
-    htmlTemplate,
     type,
     callTimeout,
     executeLocally,
@@ -101,8 +99,7 @@ export const functionConfigurationDialogFormSetValueToModel = (
   form: FunctionConfigurationDialogForm,
   model: Function
 ): void => {
-  const { attributes, description, schema, htmlTemplate, type, callTimeout, executeLocally, tokenSelectionCriteria } =
-    form.value;
+  const { attributes, description, schema, type, callTimeout, executeLocally, tokenSelectionCriteria } = form.value;
 
   model.attributes = {
     ...model.attributes,
@@ -110,7 +107,6 @@ export const functionConfigurationDialogFormSetValueToModel = (
   };
   model.description = description;
   model.schema = schema ? JSON.parse(schema) : {};
-  model.htmlTemplate = htmlTemplate;
   model.type = type!;
   model.callTimeout = callTimeout!;
   model.executeLocally = executeLocally!;

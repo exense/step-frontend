@@ -1,4 +1,4 @@
-import { DynamicValueString, Function } from '@exense/step-core';
+import { DynamicValueString, Function } from '../client/generated';
 
 export interface FunctionJMeter extends Function {
   jmeterTestplan: DynamicValueString;

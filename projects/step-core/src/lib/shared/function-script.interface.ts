@@ -1,4 +1,5 @@
-import { DynamicValueString, Function, FunctionScriptLanguage } from '@exense/step-core';
+import { DynamicValueString, Function } from '../client/generated';
+import { FunctionScriptLanguage } from './function-script-language.interface';
 
 export interface FunctionScript extends Function {
   scriptLanguage: FunctionScriptLanguage;

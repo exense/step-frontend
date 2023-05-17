@@ -1,5 +1,5 @@
 import { InjectionToken } from '@angular/core';
-import { ScriptLanguage } from '@exense/step-core';
+import { ScriptLanguage } from './script-language.enum';
 
 export interface FunctionTypeScriptOption {
   label: string;
