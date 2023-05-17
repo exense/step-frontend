@@ -1,13 +1,12 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
+  AugmentedSchedulerService,
   AutoDeselectStrategy,
   ExecutiontTaskParameters,
   selectionCollectionProvider,
   SelectionCollector,
-  TableApiWrapperService,
-  TableRemoteDataSource,
 } from '@exense/step-core';
 
 interface TableHandle {
@@ -25,16 +24,8 @@ interface TableHandle {
 export class SchedulerTaskSelectionComponent implements OnInit {
   @Input() tableHandle!: TableHandle;
 
-  readonly dataSource = new TableRemoteDataSource<ExecutiontTaskParameters>('tasks', this._tableApiWrapperService, {
-    'attributes.name': 'attributes.name',
-    'executionsParameters.customParameters.env': 'executionsParameters.customParameters.env',
-    cronExpression: 'cronExpression',
-  });
-
-  constructor(
-    private _tableApiWrapperService: TableApiWrapperService,
-    private _selectionCollector: SelectionCollector<string, ExecutiontTaskParameters>
-  ) {}
+  private _selectionCollector = inject<SelectionCollector<string, ExecutiontTaskParameters>>(SelectionCollector);
+  readonly _dataSource = inject(AugmentedSchedulerService).createSelectionDataSource();
 
   ngOnInit() {
     this.initTableHandle();

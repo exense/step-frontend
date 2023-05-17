@@ -4,7 +4,10 @@ import { StepMaterialModule } from '../step-material/step-material.module';
 import { TableComponent } from './components/table/table.component';
 import { SearchColDirective } from './directives/search-col.directive';
 import { SearchCellDefDirective } from './directives/search-cell-def.directive';
-import { StepTableClientModule } from '../../client/table/step-table-client.module';
+import {
+  StepTableClientModule,
+  TableRemoteDataSourceFactoryService,
+} from '../../client/table/step-table-client.module';
 import { CustomColumnsComponent } from './components/custom-columns/custom-columns.component';
 import { CustomCellValuePipe } from './pipe/custom-cell-value.pipe';
 import { ColumnDirective } from './directives/column.directive';
@@ -26,6 +29,7 @@ import { FilterConnectDirective } from './directives/filter-connect.directive';
 import { CustomSearchDropdownComponent } from './components/custom-search-dropdown/custom-search-dropdown.component';
 import { CustomSearchCheckboxComponent } from './components/custom-search-dropdown/custom-search-checkbox.component';
 import { Input as ColInput } from '../../client/generated';
+import { TableRemoteDataSourceFactoryImplService } from './services/table-remote-data-source-factory-impl.service';
 
 @NgModule({
   imports: [
@@ -67,7 +71,13 @@ import { Input as ColInput } from '../../client/generated';
     CustomSearchDropdownComponent,
     CustomSearchCheckboxComponent,
   ],
-  providers: [TitleCasePipe],
+  providers: [
+    TitleCasePipe,
+    {
+      provide: TableRemoteDataSourceFactoryService,
+      useExisting: TableRemoteDataSourceFactoryImplService,
+    },
+  ],
 })
 export class TableModule {
   constructor(_searchCellRegistry: CustomSearchCellRegistryService) {

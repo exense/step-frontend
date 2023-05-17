@@ -26,10 +26,9 @@ import { TableLocalDataSource } from '../../shared/table-local-data-source';
 import { TableSearch } from '../../services/table-search';
 import { SearchValue } from '../../shared/search-value';
 import { ColumnDirective } from '../../directives/column.directive';
-import { TableRequestData } from '../../../../client/table/models/table-request-data';
+import { TableRequestData, TableParameters, StepDataSource } from '../../../../client/step-client-module';
 import { AdditionalHeaderDirective } from '../../directives/additional-header.directive';
 import { TableFilter } from '../../services/table-filter';
-import { TableParameters } from '../../../../client/generated';
 import { TableReload } from '../../services/table-reload';
 import { ItemsPerPageService } from '../../services/items-per-page.service';
 import { HasFilter } from '../../../entities-selection/services/has-filter';
@@ -37,7 +36,7 @@ import { FilterCondition } from '../../shared/filter-condition';
 import { SearchColumn } from '../../shared/search-column.interface';
 import { TablePersistenceStateService } from '../../services/table-persistence-state.service';
 
-export type DataSource<T> = TableDataSource<T> | T[] | Observable<T[]>;
+export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
 @Component({
   selector: 'step-table',

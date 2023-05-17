@@ -1,29 +1,29 @@
 import { HttpClient, HttpEventType, HttpProgressEvent, HttpResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { filter, Observable, of, shareReplay, switchMap } from 'rxjs';
-import { TableRemoteDataSource } from '../../../modules/table/shared/table-remote-data-source';
 import { Resource, ResourcesService, ResourceUploadResponse } from '../../generated';
-import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
-import { TableApiWrapperService } from '../../table/services/table-api-wrapper.service';
-import { TableDataSource } from '../../../modules/table/shared/table-data-source';
+import { TableRemoteDataSourceFactoryService, StepDataSource } from '../../table/step-table-client.module';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedResourcesService extends ResourcesService {
   private readonly RESOURCES_TABLE_ID = 'resources';
 
-  constructor(
-    public _httpRequest: BaseHttpRequest,
-    public _tableRest: TableApiWrapperService,
-    public _httpClient: HttpClient
-  ) {
-    super(_httpRequest);
-  }
+  private _httpClient = inject(HttpClient);
+  private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
 
-  createDatasource(): TableDataSource<Resource> {
-    return new TableRemoteDataSource(this.RESOURCES_TABLE_ID, this._tableRest, {
+  createDataSource(): StepDataSource<Resource> {
+    return this._dataSourceFactory.createDataSource(this.RESOURCES_TABLE_ID, {
       name: 'attributes.name',
       resourceType: 'resourceType',
       id: 'id',
+    });
+  }
+
+  createSelectionDataSource(): StepDataSource<Resource> {
+    return this._dataSourceFactory.createDataSource(this.RESOURCES_TABLE_ID, {
+      id: 'id',
+      resourceName: 'resourceName',
+      resourceType: 'resourceType',
     });
   }
 
