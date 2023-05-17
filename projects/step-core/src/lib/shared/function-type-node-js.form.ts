@@ -1,6 +1,5 @@
 import { FormBuilder } from '@angular/forms';
 import { DynamicValueString } from '../client/generated';
-import { dynamicValueValidatorsFactory } from './dynamic-value-validators-factory';
 import { FunctionNodeJS } from './function-node-js.interface';
 import { dynamicValueFactory } from './utils';
 
@@ -8,11 +7,8 @@ export type FunctionTypeNodeJSForm = ReturnType<typeof functionTypeNodeJSFormCre
 
 export const functionTypeNodeJSFormCreate = (formBuilder: FormBuilder) => {
   const { createDynamicValueString } = dynamicValueFactory();
-  const { dynamicValueStringValidators } = dynamicValueValidatorsFactory();
   const formGroup = formBuilder.nonNullable.group({
-    jsFile: formBuilder.nonNullable.control<DynamicValueString>(createDynamicValueString(), [
-      dynamicValueStringValidators.required,
-    ]),
+    jsFile: formBuilder.nonNullable.control<DynamicValueString>(createDynamicValueString(), []),
   });
 
   return formGroup;

@@ -1,4 +1,4 @@
-import { AbstractControl, FormBuilder, ValidationErrors, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ValidationErrors } from '@angular/forms';
 import { DynamicValueInteger, Function } from '../client/generated';
 import { KeyValuePair } from '../domain';
 import { AgentTokenSelectionCriteriaForm } from './agent-token-selection-criteria.form';
@@ -6,24 +6,6 @@ import { FunctionType } from './function-type.enum';
 import { dynamicValueFactory, toKeyValuePairs, toRecord } from './utils';
 
 export type FunctionConfigurationDialogForm = ReturnType<typeof functionConfigurationDialogFormCreate>;
-
-export const nameValidator = (attributesControl: AbstractControl<Record<string, string>>): ValidationErrors | null => {
-  const attributes = attributesControl.value;
-
-  if (!attributes) {
-    return {
-      required: true,
-    };
-  }
-
-  if (!attributes['name']) {
-    return {
-      required: true,
-    };
-  }
-
-  return null;
-};
 
 export const schemaValidator = (schemaControl: AbstractControl<string>): ValidationErrors | null => {
   const schema = schemaControl.value;
@@ -61,12 +43,12 @@ export const functionConfigurationDialogFormCreate = (
 ) => {
   const { createDynamicValueInteger } = dynamicValueFactory();
   const formGroup = formBuilder.nonNullable.group({
-    attributes: formBuilder.nonNullable.control<Record<string, string>>({ name: '' }, [nameValidator]),
+    attributes: formBuilder.nonNullable.control<Record<string, string>>({ name: '' }, []),
     description: formBuilder.nonNullable.control<string>('', []),
     schema: formBuilder.nonNullable.control<string>(DEFAULT_SCHEMA_VALUE, [
       ...(!lightForm && schemaEnforced ? [schemaValidator] : []),
     ]),
-    type: formBuilder.nonNullable.control<string>(FunctionType.SCRIPT, [Validators.required]),
+    type: formBuilder.nonNullable.control<string>(FunctionType.SCRIPT, []),
     callTimeout: formBuilder.nonNullable.control<DynamicValueInteger>(
       createDynamicValueInteger({ value: DEFAULT_CALL_TIMEOUT_MS }),
       []

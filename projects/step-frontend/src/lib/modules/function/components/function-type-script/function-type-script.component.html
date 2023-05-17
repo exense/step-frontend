@@ -1,5 +1,5 @@
 <step-form-field>
-  <step-label show-required-marker>Script language</step-label>
+  <step-label>Script language</step-label>
 
   <mat-select [formControl]="formGroup.controls.scriptLanguage">
     <mat-option
@@ -15,7 +15,6 @@
   label="Libraries"
   type="functions"
   tooltip="[Optional] Specify a single jar or a folder containing a list of jars. This file/folder will be transferred automatically to the agents."
-  [showRequiredAsterisk]="true"
   [formControl]="formGroup.controls.librariesFile"
 ></step-dynamic-resource-input>
 
@@ -25,7 +24,6 @@
       label="Jar file"
       type="functions"
       tooltip="The jar file containing the keyword definitions. This file will be transferred automatically to the agents."
-      [showRequiredAsterisk]="true"
       [formControl]="formGroup.controls.scriptFile"
     ></step-dynamic-resource-input>
   </ng-container>
@@ -35,7 +33,6 @@
       label="Script file"
       type="functions"
       tooltip="Leave empty if you wan\'t step to generate it for you otherwise specify a file accessible to the controller. This file will be transferred automatically to the agents."
-      [showRequiredAsterisk]="true"
       [formControl]="formGroup.controls.scriptFile"
     ></step-dynamic-resource-input>
   </ng-container>

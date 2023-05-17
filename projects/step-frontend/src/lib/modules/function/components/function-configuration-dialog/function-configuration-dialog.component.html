@@ -7,7 +7,6 @@
     <form [formGroup]="formGroup">
       <step-custom-forms
         [stScreen]="customScreenTable"
-        [required]="true"
         [stModel]="formGroup.value"
         (stModelChange)="formGroup.patchValue($event, { emitEvent: false })"
       >
@@ -27,7 +26,7 @@
       </step-form-field>
 
       <step-form-field>
-        <step-label show-required-marker>Type</step-label>
+        <step-label>Type</step-label>
         <mat-select [formControl]="formGroup.controls.type">
           <mat-option *ngFor="let itemInfo of functionTypeItemInfos" [value]="itemInfo.type">
             {{ itemInfo.label }}
