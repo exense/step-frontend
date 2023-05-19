@@ -1,4 +1,4 @@
-import { HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { TableRemoteDataSource } from '../../../modules/table/shared/table-remote-data-source';
@@ -8,6 +8,7 @@ import { TableApiWrapperService } from '../../table/services/table-api-wrapper.s
 @Injectable({ providedIn: 'root' })
 export class AugmentedKeywordsService extends KeywordsService {
   private _tableRest = inject(TableApiWrapperService);
+  private _httpClient = inject(HttpClient);
 
   createFilteredTableDataSource(filter?: string[]): TableRemoteDataSource<Function> {
     return new TableRemoteDataSource<Function>(
@@ -43,15 +44,8 @@ export class AugmentedKeywordsService extends KeywordsService {
   }
 
   override getFunctionEditor(id: string): Observable<string> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/functions/{id}/editor',
-      path: {
-        id: id,
-      },
-      headers: {
-        Accept: 'application/json, text/plain, */*',
-      },
+    return this._httpClient.request('GET', `/rest/functions/${id}/editor`, {
+      responseType: 'text',
     });
   }
 }
