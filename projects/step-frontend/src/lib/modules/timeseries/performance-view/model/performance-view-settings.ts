@@ -5,4 +5,5 @@ export interface PerformanceViewSettings {
   contextualFilters: { [key: string]: string };
   timeRange: TSTimeRange;
   includeThreadGroupChart?: boolean;
+  disableThreadGroupOnOqlMode?: boolean;
 }
