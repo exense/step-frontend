@@ -66,6 +66,7 @@ import { PlanNameComponent } from './components/plan-name/plan-name.component';
 import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 import { InputModelFormatterDirective } from './directives/input-model-formatter.directive';
 import { ThreadDistributionWizardDialogComponent } from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
+import { NewSchedulerTaskDialogComponent } from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 
 @NgModule({
   declarations: [
@@ -118,6 +119,7 @@ import { ThreadDistributionWizardDialogComponent } from './components/thread-dis
     PlanCreateDialogComponent,
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
+    NewSchedulerTaskDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -197,6 +199,7 @@ import { ThreadDistributionWizardDialogComponent } from './components/thread-dis
     PlanCreateDialogComponent,
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
+    NewSchedulerTaskDialogComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -259,6 +262,7 @@ export { SplitComponent } from './components/split/split.component';
 export { UploadContainerComponent } from './components/upload-container/upload-container.component';
 export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 export * from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
+export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';

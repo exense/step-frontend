@@ -1,35 +1,35 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
 import { map, Observable, switchMap, catchError, of } from 'rxjs';
 import { UibModalHelperService } from './uib-modal-helper.service';
 import { a1Promise2Observable, DialogsService } from '../shared';
 import { ExecutionParameters, ExecutiontTaskParameters, SchedulerService } from '../client/generated';
+import { MatDialog } from '@angular/material/dialog';
+import { NewSchedulerTaskDialogComponent } from '../components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ScheduledTaskDialogsService {
-  constructor(
-    private _httpClient: HttpClient,
-    private _uibModalHelper: UibModalHelperService,
-    private _dialogs: DialogsService,
-    private _schedulerService: SchedulerService
-  ) {}
+  private _matDialog = inject(MatDialog);
+  private _uibModalHelper = inject(UibModalHelperService);
+  private _dialogs = inject(DialogsService);
+  private _schedulerService = inject(SchedulerService);
 
-  newScheduledTask(executionParams: ExecutionParameters): Observable<any> {
-    const modalInstance = this._uibModalHelper.open({
-      backdrop: 'static',
-      templateUrl: 'partials/scheduler/newSchedulerTaskDialog.html',
-      controller: 'newTaskModalCtrl',
-      resolve: {
-        executionParams: function () {
-          return executionParams;
-        },
-      },
-    });
-
-    const taskParams$ = a1Promise2Observable(modalInstance.result) as Observable<ExecutiontTaskParameters>;
-    return taskParams$.pipe(switchMap((taskParams) => this._schedulerService.saveExecutionTask(taskParams)));
+  newScheduledTask(executionParams: ExecutionParameters): Observable<ExecutiontTaskParameters | undefined> {
+    return this._matDialog
+      .open<NewSchedulerTaskDialogComponent, ExecutionParameters, ExecutiontTaskParameters | undefined>(
+        NewSchedulerTaskDialogComponent,
+        { data: executionParams }
+      )
+      .afterClosed()
+      .pipe(
+        switchMap((result) => {
+          if (!result) {
+            return of(undefined);
+          }
+          return this._schedulerService.saveExecutionTask(result);
+        })
+      );
   }
 
   editScheduledTask(

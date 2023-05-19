@@ -91,6 +91,7 @@ export * from './services/auth.service';
 export * from './services/item-by-id-cache.service';
 export * from './services/hybrid-injector-helper';
 export * from './services/project-management-helper.service';
+export * from './services/cron-presets.token';
 export * from './shared/angularjs-provider-options';
 export * from './shared/auth-context.interface';
 export * from './shared/compare-condition.enum';

@@ -47,3 +47,9 @@
     color: $color;
   }
 }
+
+@mixin common-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
