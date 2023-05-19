@@ -20,7 +20,7 @@ export const pollAsyncTask = (
 
       const id = status.id;
       return timer(500).pipe(
-        switchMap((_) => asyncService.getAsyncTaskStatus(id)),
+        switchMap(() => asyncService.getAsyncTaskStatus(id)),
         pollAsyncTask(asyncService, progressHandler)
       );
     })
