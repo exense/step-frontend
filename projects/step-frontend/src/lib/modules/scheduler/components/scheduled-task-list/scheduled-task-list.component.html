@@ -75,7 +75,7 @@
           mat-icon-button
           matTooltip="Delete task"
           [disabled]="!('task-delete' | hasRight | async)"
-          (click)="_logic.deletePrameter(element)"
+          (click)="_logic.deleteParameter(element)"
         >
           <step-icon name="trash-2"></step-icon>
         </button>

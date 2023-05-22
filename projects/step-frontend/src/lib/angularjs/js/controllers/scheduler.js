@@ -35,54 +35,7 @@ angular
     );
   })
 
-  .controller('editSchedulerTaskModalCtrl', function ($scope, $uibModalInstance, $http, $location, task, PlanDialogsService) {
-    $scope.task = task;
-
-    //Init customParameters if it doesn't exist yet
-    if (!$scope.task.executionsParameters.customParameters) {
-      $scope.task.executionsParameters.customParameters = {};
-    }
-    $scope.executionsParameters = function (value) {
-      if (arguments.length) {
-        $scope.task.executionsParameters = JSON.parse(value);
-        return value;
-      } else {
-        return JSON.stringify($scope.task.executionsParameters);
-      }
-    };
-
-    $scope.save = function () {
-      $http.post('rest/scheduler/task', $scope.task).then(
-        function (response) {
-          $uibModalInstance.close(response.data);
-        },
-        function (error) {
-          $scope.error = 'Invalid CRON expression or server error.';
-        }
-      );
-    };
-
-    $scope.applyPreset = function (preset) {
-      $scope.task.cronExpression = preset;
-    };
-
-    $scope.cancel = function () {
-      $uibModalInstance.dismiss('cancel');
-    };
-
-    $scope.selectPlan = function () {
-      PlanDialogsService.selectPlan().subscribe(function (plan) {
-        $scope.task.executionsParameters.repositoryObject.repositoryParameters.planid = plan.id;
-        $scope.task.executionsParameters.description = plan.attributes.name;
-        if (!$scope.task.attributes) {
-          $scope.task.attributes = {};
-        }
-        //Do not overwrite task name, $scope.task.attributes.name = plan.attributes.name;
-      });
-    };
-  })
-
-    .factory('schedulerServices', function ($http, $location, $uibModal) {
+  .factory('schedulerServices', function ($http, $location, $uibModal) {
     var factory = {};
 
     factory.schedule = function (executionParams) {
