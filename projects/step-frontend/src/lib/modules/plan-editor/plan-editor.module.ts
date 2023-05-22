@@ -8,6 +8,7 @@ import { PlanFunctionListComponent } from './components/plan-function-list/plan-
 import { PlanOtherplanListComponent } from './components/plan-otherplan-list/plan-otherplan-list.component';
 import { PlanEditorActionsComponent } from './components/plan-editor-actions/plan-editor-actions.component';
 import { PlanCommonTreeEditorFormComponent } from './components/plan-common-tree-editor-form/plan-common-tree-editor-form.component';
+import { PlanEditorKeyHandlerDirective } from './directives/plan-editor-key-handler.directive';
 
 @NgModule({
   declarations: [
@@ -17,9 +18,10 @@ import { PlanCommonTreeEditorFormComponent } from './components/plan-common-tree
     PlanOtherplanListComponent,
     PlanEditorActionsComponent,
     PlanCommonTreeEditorFormComponent,
+    PlanEditorKeyHandlerDirective,
   ],
   imports: [StepCommonModule, ExecutionModule],
-  exports: [PlanEditorBaseComponent, PlanCommonTreeEditorFormComponent],
+  exports: [PlanEditorBaseComponent, PlanCommonTreeEditorFormComponent, PlanEditorKeyHandlerDirective],
 })
 export class PlanEditorModule {
   constructor(_planTypeRegistry: PlanTypeRegistryService) {
