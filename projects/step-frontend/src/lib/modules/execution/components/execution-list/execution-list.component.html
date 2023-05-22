@@ -52,13 +52,25 @@
       <step-status [status]="element?.status"></step-status>
     </td>
   </ng-container>
-  <ng-container matColumnDef="result" stepSearchCol>
-    <step-array-filter *stepSearchCellDef stepFilterConnect [useRegex]="true" [items]="(resultItems$ | async)!">
+  <ng-container matColumnDef="result" stepSearchCol #searchResult="SearchCol">
+    <step-array-filter
+      *stepSearchCellDef
+      stepFilterConnect
+      [useRegex]="true"
+      [items]="(resultItems$ | async)!">
     </step-array-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Result</th>
     <td mat-cell *matCellDef="let element">
       <div class="result">
-        <step-execution-result [result]="element.result" [status]="element.status"> </step-execution-result>
+        <step-report-node-status [status]="element.result"></step-report-node-status>
+      </div>
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="executionSummary">
+    <th mat-header-cell *matHeaderCellDef>Summary</th>
+    <td mat-cell *matCellDef="let element">
+      <div class="result">
         <step-status-distribution [summary]="element.executionSummary"> </step-status-distribution>
       </div>
     </td>

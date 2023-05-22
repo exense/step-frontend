@@ -80,9 +80,6 @@
       .mat-primary {
         .mat-tab-link.mat-tab-label-active {
           color: $primary-tabs-color;
-          step-icon {
-            color: $primary-tabs-color;
-          }
         }
       }
     }
@@ -104,9 +101,6 @@
     &.mat-primary {
       .mat-tab-link.mat-tab-label-active {
         color: $primary-tabs-color;
-        step-ajs-icon {
-          color: $primary-tabs-color;
-        }
       }
     }
 
