@@ -122,6 +122,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       if (series.stroke) {
         // aggregate series don't have stroke (e.g total)
         this.legendSettings.items.push({
+          seriesId: series.id,
           color: (series.stroke as string) || '#cccccc',
           label: series.legendName,
           isVisible: true,
@@ -355,6 +356,7 @@ interface LegendSettings {
 }
 
 interface LegendItem {
+  seriesId: string;
   label: string;
   color: string;
   isVisible: boolean;
