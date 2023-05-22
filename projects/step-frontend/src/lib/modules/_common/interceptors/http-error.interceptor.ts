@@ -19,7 +19,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     console.error('Network Error', error);
     if (error.status !== 401) {
       if (error.name && error.message) {
-        this.handleError(error.name + ': ' + error.message);
+        this.handleError(`${error.name}: ${error.message}`);
       } else if (error.error) {
         this.handleError(error.error);
       } else {
@@ -39,11 +39,11 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
   private handleError(error: any) {
     if (error?.errorName && error?.errorMessage) {
-      this.showError(error.errorName + ': ' + error.errorMessage);
+      this.showError(`${error.errorName}: ${error.errorMessage}`);
     } else if (error?.errorName || error?.errorMessage) {
       this.showError(error.errorName || error.errorMessage);
     } else if (error?.error && error?.text) {
-      this.showError(error.error + ': ' + error.text);
+      this.showError(`${error.error}: ${error.text}`);
     } else if (error?.error || error?.text) {
       this.showError(error.error || error.text);
     } else if (error?.name || error?.message) {
