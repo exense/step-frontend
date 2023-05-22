@@ -35,24 +35,30 @@
           name="user"
         />
       </step-form-field>
+      <mat-expansion-panel [(expanded)]="showParameters">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Advanced</mat-panel-title>
+        </mat-expansion-panel-header>
+        <section class="advanced-body">
+          <step-form-field>
+            <step-label>Parameters</step-label>
+            <textarea
+              rows="7"
+              [ngModel]="parametersRawValue"
+              (ngModelChange)="handleParametersRawValueChange($event)"
+              [ngModelOptions]="rawValueModelOptions"
+              name="parameters"
+              stepValidateJson
+              #parametersJson="ngModel"
+            >
+            </textarea>
+            <step-error *ngIf="parametersJson.invalid && parametersJson.touched">
+              This field's value should be in JSON format
+            </step-error>
+          </step-form-field>
+        </section>
+      </mat-expansion-panel>
     </form>
-    <mat-expansion-panel [(expanded)]="showParameters">
-      <mat-expansion-panel-header>
-        <mat-panel-title>Advanced</mat-panel-title>
-      </mat-expansion-panel-header>
-      <section class="advanced-body">
-        <step-form-field>
-          <step-label>Parameters</step-label>
-          <textarea
-            rows="7"
-            [ngModel]="parametersRawValue"
-            (ngModelChange)="handleParametersRawValueChange($event)"
-            [ngModelOptions]="rawValueModelOptions"
-          >
-          </textarea>
-        </step-form-field>
-      </section>
-    </mat-expansion-panel>
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
