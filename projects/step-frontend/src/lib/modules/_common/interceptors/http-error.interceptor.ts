@@ -46,8 +46,6 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       this.showError(`${error.error}: ${error.text}`);
     } else if (error?.error || error?.text) {
       this.showError(error.error || error.text);
-    } else if (error?.name || error?.message) {
-      this.showError(`${error?.name} ${error?.message}`);
     } else {
       this.showError(error);
     }
