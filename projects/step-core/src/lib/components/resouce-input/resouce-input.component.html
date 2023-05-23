@@ -21,7 +21,8 @@
 
       <input
         type="text"
-        [(ngModel)]="stModel"
+        [ngModel]="stModel"
+        (ngModelChange)="inputChange($event)"
         [readonly]="disableServerPath"
         [matTooltip]="
           disableServerPath
