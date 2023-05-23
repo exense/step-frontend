@@ -72,6 +72,10 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
+  inputChange(value: string) {
+    this.stModelChange.emit(value);
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     this.stModelChanges(changes);
   }

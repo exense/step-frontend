@@ -23,7 +23,8 @@
       <input
         type="text"
         [required]="!!showRequiredAsterisk"
-        [(ngModel)]="stModel"
+        [ngModel]="stModel"
+        (ngModelChange)="inputChange($event)"
         [readonly]="disableServerPath"
         [matTooltip]="
           disableServerPath
