@@ -47,7 +47,7 @@ export class ParametersListComponent {
   }
 
   exportParameter(): void {
-    this._parameterDialogs.exportParameter().subscribe(() => this.dataSource.reload());
+    this._parameterDialogs.exportParameter().subscribe();
   }
 
   duplicateParameter(parameter: Parameter): void {

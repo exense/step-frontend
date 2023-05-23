@@ -34,7 +34,6 @@ angular
       Dialogs,
       ResourceDialogs,
       ImportDialogs,
-      ExportDialogs,
       AuthService,
       $location,
       ViewRegistry,
