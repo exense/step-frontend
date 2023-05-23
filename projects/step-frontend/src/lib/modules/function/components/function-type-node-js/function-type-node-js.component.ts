@@ -22,10 +22,10 @@ export class FunctionTypeNodeJSComponent extends FunctionTypeFormComponent<Funct
   protected readonly formGroupValidator = higherOrderValidator(this.formGroup);
 
   protected override setValueToForm(): void {
-    functionTypeNodeJSFormSetValueToForm(this.formGroup, this.context!.stepFunction as FunctionNodeJS);
+    functionTypeNodeJSFormSetValueToForm(this.formGroup, this.context!.keyword as FunctionNodeJS);
   }
 
   protected override setValueToModel(): void {
-    functionTypeNodeJSFormSetValueToModel(this.formGroup, this.context!.stepFunction as FunctionNodeJS);
+    functionTypeNodeJSFormSetValueToModel(this.formGroup, this.context!.keyword as FunctionNodeJS);
   }
 }

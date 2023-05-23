@@ -1,17 +1,17 @@
 <step-modal-window [title]="modalTitle" [showSpinner]="isLoading">
   <div step-modal-window-body>
-    <step-alert *ngIf="stepFunction?.managed" [type]="AlertType.warning">
+    <step-alert *ngIf="keyword?.managed" [type]="AlertType.warning">
       This keyword is part of a keyword package. All changes made will be lost when the package is updated.
     </step-alert>
 
-    <form [formGroup]="formGroup">
-      <step-custom-forms
-        [stScreen]="customScreenTable"
-        [stModel]="formGroup.value"
-        (stModelChange)="formGroup.patchValue($event, { emitEvent: false })"
-      >
-      </step-custom-forms>
+    <step-custom-form-wrapper
+      [stScreen]="customScreenTable"
+      [ngModel]="formGroup.value"
+      (ngModelChange)="formGroup.patchValue($event, { emitEvent: false })"
+    >
+    </step-custom-form-wrapper>
 
+    <form [formGroup]="formGroup">
       <step-form-field>
         <step-label>Description</step-label>
         <textarea rows="3" [formControl]="formGroup.controls.description"></textarea>
@@ -38,7 +38,7 @@
         [itemKey]="functionType"
         [context]="{
           formGroup: formGroup,
-          stepFunction: stepFunction,
+          keyword: keyword,
           setValueToForm$: setValueToForm$,
           setValueToModel$: setValueToModel$
         }"
@@ -46,9 +46,6 @@
       ></step-function-type>
 
       <ng-container *ngIf="!lightForm">
-        <div></div>
-        <div></div>
-
         <mat-expansion-panel>
           <mat-expansion-panel-header>
             <mat-panel-title>Advanced</mat-panel-title>
@@ -58,8 +55,6 @@
             label="Call timeout (ms)"
             [formControl]="formGroup.controls.callTimeout"
           ></step-dynamic-textfield>
-
-          <div></div>
 
           <mat-checkbox color="primary" [formControl]="formGroup.controls.executeLocally">
             Execute on controller&nbsp;

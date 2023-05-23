@@ -22,10 +22,10 @@ export class FunctionTypeCompositeComponent extends FunctionTypeFormComponent<Fu
   protected readonly formGroupValidator = higherOrderValidator(this.formGroup);
 
   protected override setValueToForm(): void {
-    functionTypeCompositeFormSetValueToForm(this.formGroup, this.context!.stepFunction as FunctionComposite);
+    functionTypeCompositeFormSetValueToForm(this.formGroup, this.context!.keyword as FunctionComposite);
   }
 
   protected override setValueToModel(): void {
-    functionTypeCompositeFormSetValueToModel(this.formGroup, this.context!.stepFunction as FunctionComposite);
+    functionTypeCompositeFormSetValueToModel(this.formGroup, this.context!.keyword as FunctionComposite);
   }
 }

@@ -14,7 +14,7 @@
 <step-upload-container (filesChange)="onFilesChange($event)">
   <ng-container *ngIf="!isResource; else resourceTemplate">
     <step-form-field>
-      <step-label *ngIf="label" [attr.show-required-marker]="showRequiredAsterisk || null">
+      <step-label *ngIf="label" [attr.show-required-marker]="showRequiredMarker || null">
         <span>{{ label }}</span>
 
         <step-icon *ngIf="withHelpIcon" name="help-circle" [matTooltip]="helpIconTooltip || ''"></step-icon>
@@ -22,7 +22,7 @@
 
       <input
         type="text"
-        [required]="!!showRequiredAsterisk"
+        [required]="!!showRequiredMarker"
         [ngModel]="stModel"
         (ngModelChange)="inputChange($event)"
         [readonly]="disableServerPath"
@@ -64,7 +64,7 @@
   <ng-template #resourceTemplate>
     <ng-container *ngIf="!resourceNotExisting">
       <step-form-field>
-        <step-label *ngIf="label" [attr.show-required-marker]="showRequiredAsterisk || null">
+        <step-label *ngIf="label" [attr.show-required-marker]="showRequiredMarker || null">
           <span>{{ label }}</span>
 
           <step-icon *ngIf="withHelpIcon" name="help-circle" [matTooltip]="helpIconTooltip || ''"></step-icon>
@@ -72,7 +72,7 @@
 
         <input
           type="text"
-          [required]="!!showRequiredAsterisk"
+          [required]="!!showRequiredMarker"
           readonly="readonly"
           [ngModel]="resourceFilename"
           matTooltip="Drag and drop your file here or enter the path to a file accessible from the controller"
@@ -110,7 +110,7 @@
 
     <ng-container *ngIf="resourceNotExisting">
       <step-form-field>
-        <step-label *ngIf="label" [attr.show-required-marker]="showRequiredAsterisk || null">
+        <step-label *ngIf="label" [attr.show-required-marker]="showRequiredMarker || null">
           <span>{{ label }}</span>
 
           <step-icon *ngIf="withHelpIcon" name="help-circle" [matTooltip]="helpIconTooltip || ''"></step-icon>
@@ -118,7 +118,7 @@
 
         <input
           type="text"
-          [required]="!!showRequiredAsterisk"
+          [required]="!!showRequiredMarker"
           readonly="readonly"
           value="Error: the referenced resource doesn't exist anymore."
           matTooltip="Drag and drop your file here or enter the path to a file accessible from the controller"

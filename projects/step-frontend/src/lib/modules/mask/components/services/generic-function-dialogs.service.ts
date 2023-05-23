@@ -3,7 +3,7 @@ import {
   a1Promise2Observable,
   AugmentedKeywordsService,
   DialogsService,
-  Function,
+  Function as Keyword,
   IsUsedByDialogService,
 } from '@exense/step-core';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
@@ -33,7 +33,7 @@ export class GenericFunctionDialogService {
     );
   }
 
-  openAddMaskDialog(): Observable<Function | undefined> {
+  openAddMaskDialog(): Observable<Keyword | undefined> {
     return this._functionDialogs.openAddFunctionModal(this.config);
   }
 
@@ -45,7 +45,7 @@ export class GenericFunctionDialogService {
     this._isUsedByDialogs.displayDialog(`Keyword "${name}" is used by`, 'KEYWORD_ID', id);
   }
 
-  openConfigDialog(id: string): Observable<Function | undefined> {
+  openConfigDialog(id: string): Observable<Keyword | undefined> {
     return this._functionDialogs.configureFunction(id, this.config);
   }
 

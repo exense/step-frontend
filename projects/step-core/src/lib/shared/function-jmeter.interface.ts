@@ -1,5 +1,5 @@
-import { DynamicValueString, Function } from '../client/generated';
+import { DynamicValueString, Function as Keyword } from '../client/generated';
 
-export interface FunctionJMeter extends Function {
+export interface FunctionJMeter extends Keyword {
   jmeterTestplan: DynamicValueString;
 }

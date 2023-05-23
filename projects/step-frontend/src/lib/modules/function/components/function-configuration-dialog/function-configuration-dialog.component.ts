@@ -1,3 +1,4 @@
+import { KeyValue } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -7,13 +8,12 @@ import {
   AugmentedKeywordsService,
   AuthService,
   DialogsService,
-  Function,
+  Function as Keyword,
   functionConfigurationDialogFormCreate,
   functionConfigurationDialogFormSetValueToForm,
   functionConfigurationDialogFormSetValueToModel,
   FunctionType,
   FunctionTypeRegistryService,
-  KeyValuePair,
 } from '@exense/step-core';
 import { ILocationService } from 'angular';
 import { of, Subject, switchMap, takeUntil, tap } from 'rxjs';
@@ -27,7 +27,7 @@ import { FunctionConfigurationDialogData } from '../../types/function-configurat
 export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
   private _functionConfigurationDialogData = inject<FunctionConfigurationDialogData>(MAT_DIALOG_DATA);
   private _augmentedKeywordsService = inject(AugmentedKeywordsService);
-  private _matDialogRef = inject<MatDialogRef<FunctionConfigurationDialogComponent, Function>>(MatDialogRef);
+  private _matDialogRef = inject<MatDialogRef<FunctionConfigurationDialogComponent, Keyword>>(MatDialogRef);
   private _ajsLocation = inject<ILocationService>(AJS_LOCATION);
   private _dialogsService = inject(DialogsService);
   private _functionTypeRegistryService = inject(FunctionTypeRegistryService);
@@ -52,12 +52,12 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
   protected readonly AlertType = AlertType;
   protected readonly FunctionType = FunctionType;
 
-  protected stepFunction?: Function;
+  protected keyword?: Keyword;
   protected schemaJSON?: string;
 
-  protected modalTitle: string = !this._functionConfigurationDialogData.stepFunction ? 'New Keyword' : 'Edit Keyword';
+  protected modalTitle: string = !this._functionConfigurationDialogData.keyword ? 'New Keyword' : 'Edit Keyword';
   protected isLoading: boolean = false;
-  protected tokenSelectionCriteria: KeyValuePair<string, string>[] = [];
+  protected tokenSelectionCriteria: KeyValue<string, string>[] = [];
 
   ngOnInit(): void {
     this.initStepFunction();
@@ -96,21 +96,21 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
   }
 
   protected save(edit?: boolean): void {
-    functionConfigurationDialogFormSetValueToModel(this.formGroup, this.stepFunction!);
+    functionConfigurationDialogFormSetValueToModel(this.formGroup, this.keyword!);
 
     this.setValueToModelInternal$.next();
 
     this._augmentedKeywordsService
-      .saveFunction(this.stepFunction!, this.serviceRoot)
+      .saveFunction(this.keyword!, this.serviceRoot)
       .pipe(
-        switchMap((stepFunction) => {
-          this._matDialogRef.close(stepFunction);
+        switchMap((keyword) => {
+          this._matDialogRef.close(keyword);
 
           if (!edit) {
             return of();
           }
 
-          return this._augmentedKeywordsService.getFunctionEditor(stepFunction.id!);
+          return this._augmentedKeywordsService.getFunctionEditor(keyword.id!);
         }),
         tap((path) => {
           if (path) {
@@ -124,18 +124,18 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
   }
 
   private initStepFunction(): void {
-    if (!this._functionConfigurationDialogData.stepFunction) {
+    if (!this._functionConfigurationDialogData.keyword) {
       const { functionTypeFilters } = this._functionConfigurationDialogData.dialogConfig;
       const [type] = functionTypeFilters.length ? functionTypeFilters : [FunctionType.SCRIPT];
 
-      this.stepFunction = {
+      this.keyword = {
         type,
       };
-      this.fetchStepFunction(this.stepFunction.type);
+      this.fetchStepFunction(this.keyword.type);
     } else {
-      this.stepFunction = this._functionConfigurationDialogData.stepFunction;
+      this.keyword = this._functionConfigurationDialogData.keyword;
 
-      functionConfigurationDialogFormSetValueToForm(this.formGroup, this.stepFunction);
+      functionConfigurationDialogFormSetValueToForm(this.formGroup, this.keyword);
     }
   }
 
@@ -143,26 +143,26 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
     this._augmentedKeywordsService
       .newFunctionTypeConf(stepFunctionType, this.serviceRoot)
       .pipe(
-        tap((stepFunction) => {
-          if (!this.stepFunction) {
+        tap((keyword) => {
+          if (!this.keyword) {
             return;
           }
 
-          stepFunction.id = this.stepFunction.id;
+          keyword.id = this.keyword.id;
 
-          if (this.stepFunction.attributes) {
-            stepFunction.attributes = this.stepFunction.attributes;
+          if (this.keyword.attributes) {
+            keyword.attributes = this.keyword.attributes;
           }
 
-          if (this.stepFunction.schema) {
-            stepFunction.schema = this.stepFunction.schema;
+          if (this.keyword.schema) {
+            keyword.schema = this.keyword.schema;
           }
         })
       )
-      .subscribe((stepFunction) => {
-        this.stepFunction = stepFunction;
+      .subscribe((keyword) => {
+        this.keyword = keyword;
 
-        functionConfigurationDialogFormSetValueToForm(this.formGroup, stepFunction);
+        functionConfigurationDialogFormSetValueToForm(this.formGroup, keyword);
       });
   }
 }

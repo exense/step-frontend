@@ -1,5 +1,5 @@
-import { DynamicValueString, Function } from '../client/generated';
+import { DynamicValueString, Function as Keyword } from '../client/generated';
 
-export interface FunctionNodeJS extends Function {
+export interface FunctionNodeJS extends Keyword {
   jsFile: DynamicValueString;
 }

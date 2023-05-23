@@ -1,7 +1,7 @@
-import { Function } from '@exense/step-core';
+import { Function as Keyword } from '@exense/step-core';
 import { FunctionDialogsConfig } from './function-dialogs-config.interface';
 
 export interface FunctionConfigurationDialogData {
-  stepFunction?: Function;
+  keyword?: Keyword;
   dialogConfig: FunctionDialogsConfig;
 }

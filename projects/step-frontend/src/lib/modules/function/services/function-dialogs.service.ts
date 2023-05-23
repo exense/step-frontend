@@ -10,7 +10,7 @@ import {
   DialogsService,
   EntityDialogsService,
   ExportDialogsService,
-  Function,
+  Function as Keyword,
   FunctionLinkDialogService,
   ImportDialogsService,
   IsUsedByDialogService,
@@ -42,15 +42,15 @@ export class FunctionDialogsService implements FunctionLinkDialogService {
   private defaultDialogConfig = this._functionDialogsConfigFactoryService.getDefaultConfig();
 
   openModal({
-    stepFunction,
+    keyword,
     dialogConfig,
   }: {
-    stepFunction?: Function;
+    keyword?: Keyword;
     dialogConfig?: FunctionDialogsConfig;
-  }): Observable<Function | undefined> {
+  }): Observable<Keyword | undefined> {
     const matDialogConfig: MatDialogConfig<FunctionConfigurationDialogData> = {
       data: {
-        stepFunction,
+        keyword,
         dialogConfig: dialogConfig ?? this.defaultDialogConfig,
       },
     };
@@ -59,18 +59,18 @@ export class FunctionDialogsService implements FunctionLinkDialogService {
     return dialogRef.afterClosed();
   }
 
-  openAddFunctionModal(dialogConfig?: FunctionDialogsConfig): Observable<Function | undefined> {
+  openAddFunctionModal(dialogConfig?: FunctionDialogsConfig): Observable<Keyword | undefined> {
     return this.openModal({
       dialogConfig,
     });
   }
 
-  configureFunction(id: string, dialogConfig?: FunctionDialogsConfig): Observable<Function | undefined> {
+  configureFunction(id: string, dialogConfig?: FunctionDialogsConfig): Observable<Keyword | undefined> {
     dialogConfig = dialogConfig ? dialogConfig : this.defaultDialogConfig;
-    return this._httpClient.get<Function>(`rest/${dialogConfig.serviceRoot}/${id}`).pipe(
-      switchMap((stepFunction) =>
+    return this._httpClient.get<Keyword>(`rest/${dialogConfig.serviceRoot}/${id}`).pipe(
+      switchMap((keyword) =>
         this.openModal({
-          stepFunction,
+          keyword,
           dialogConfig,
         })
       )
@@ -124,7 +124,7 @@ export class FunctionDialogsService implements FunctionLinkDialogService {
     );
   }
 
-  selectFunction(): Observable<Function> {
+  selectFunction(): Observable<Keyword> {
     const selectedEntity$ = this._entityDialogs.selectEntityOfType('function', true);
     const function$ = selectedEntity$.pipe(
       map((result) => result.item),

@@ -16,7 +16,7 @@ export class DynamicResourceInputComponent implements ControlValueAccessor {
   @Input() type!: string;
   @Input() directory?: boolean;
   @Input() tooltip?: string;
-  @Input() showRequiredAsterisk?: boolean;
+  @Input() showRequiredMarker?: boolean;
 
   @Output() save = new EventEmitter<void>();
 

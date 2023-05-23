@@ -11,6 +11,7 @@ import { AgentTokenSelectionCriteriaComponent } from './components/agent-token-s
 import { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
 import { DynamicLabelCustomFormInputComponent } from './components/custom-form-input/dynamic-label-custom-form-input.component';
 import { StandardCustomFormInputComponent } from './components/custom-form-input/standard-custom-form-input.component';
+import { CustomFormWrapperComponent } from './components/custom-form-wrapper/custom-form-wrapper.component';
 import { CustomFormComponent } from './components/custom-form/custom-form.component';
 import { DynamicResourceInputComponent } from './components/dynamic-resource-input/dynamic-resource-input.component';
 import { EditableActionsComponent } from './components/editable-actions/editable-actions.component';
@@ -122,6 +123,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     ThreadDistributionWizardDialogComponent,
     DynamicResourceInputComponent,
     AgentTokenSelectionCriteriaComponent,
+    CustomFormWrapperComponent,
   ],
   imports: [
     CommonModule,
@@ -203,6 +205,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     ThreadDistributionWizardDialogComponent,
     DynamicResourceInputComponent,
     AgentTokenSelectionCriteriaComponent,
+    CustomFormWrapperComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -240,6 +243,7 @@ export { AgentTokenSelectionCriteriaComponent } from './components/agent-token-s
 export { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
 export { DynamicLabelCustomFormInputComponent } from './components/custom-form-input/dynamic-label-custom-form-input.component';
 export { StandardCustomFormInputComponent } from './components/custom-form-input/standard-custom-form-input.component';
+export { CustomFormWrapperComponent } from './components/custom-form-wrapper/custom-form-wrapper.component';
 export { CustomFormComponent } from './components/custom-form/custom-form.component';
 export { DynamicResourceInputComponent } from './components/dynamic-resource-input/dynamic-resource-input.component';
 export { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';

@@ -22,10 +22,10 @@ export class FunctionTypeJMeterComponent extends FunctionTypeFormComponent<Funct
   protected readonly formGroupValidator = higherOrderValidator(this.formGroup);
 
   protected override setValueToForm(): void {
-    functionTypeJMeterFormSetValueToForm(this.formGroup, this.context!.stepFunction as FunctionJMeter);
+    functionTypeJMeterFormSetValueToForm(this.formGroup, this.context!.keyword as FunctionJMeter);
   }
 
   protected override setValueToModel(): void {
-    functionTypeJMeterFormSetValueToModel(this.formGroup, this.context!.stepFunction as FunctionJMeter);
+    functionTypeJMeterFormSetValueToModel(this.formGroup, this.context!.keyword as FunctionJMeter);
   }
 }

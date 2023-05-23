@@ -1,5 +1,5 @@
 import { AbstractControl, FormBuilder, ValidationErrors } from '@angular/forms';
-import { DynamicValueInteger, Function } from '../client/generated';
+import { DynamicValueInteger, Function as Keyword } from '../client/generated';
 import { KeyValuePair } from '../domain';
 import { AgentTokenSelectionCriteriaForm } from './agent-token-selection-criteria.form';
 import { FunctionType } from './function-type.enum';
@@ -62,7 +62,7 @@ export const functionConfigurationDialogFormCreate = (
 
 export const functionConfigurationDialogFormSetValueToForm = (
   form: FunctionConfigurationDialogForm,
-  model: Function
+  model: Keyword
 ): void => {
   const { attributes, description, schema, type, callTimeout, executeLocally, tokenSelectionCriteria } = model;
 
@@ -79,7 +79,7 @@ export const functionConfigurationDialogFormSetValueToForm = (
 
 export const functionConfigurationDialogFormSetValueToModel = (
   form: FunctionConfigurationDialogForm,
-  model: Function
+  model: Keyword
 ): void => {
   const { attributes, description, schema, type, callTimeout, executeLocally, tokenSelectionCriteria } = form.value;
 

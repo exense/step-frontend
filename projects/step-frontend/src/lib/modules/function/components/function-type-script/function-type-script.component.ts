@@ -31,10 +31,10 @@ export class FunctionTypeScriptComponent extends FunctionTypeFormComponent<Funct
   }
 
   protected override setValueToForm(): void {
-    functionTypeScriptFormSetValueToForm(this.formGroup, this.context!.stepFunction as FunctionScript);
+    functionTypeScriptFormSetValueToForm(this.formGroup, this.context!.keyword as FunctionScript);
   }
 
   protected override setValueToModel(): void {
-    functionTypeScriptFormSetValueToModel(this.formGroup, this.context!.stepFunction as FunctionScript);
+    functionTypeScriptFormSetValueToModel(this.formGroup, this.context!.keyword as FunctionScript);
   }
 }

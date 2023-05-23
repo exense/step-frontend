@@ -7,6 +7,7 @@
     [required]="required"
     [ngModel]="stModel | stepCustomFormInputModel: input"
     (ngModelChange)="onInputValueChange(input, $event)"
+    (touch)="onCustomInputTouched()"
   ></step-dynamic-label-custom-form-inputs>
 </ng-template>
 <ng-template #standardInputs>
@@ -17,5 +18,6 @@
     [required]="required"
     [ngModel]="stModel | stepCustomFormInputModel: input"
     (ngModelChange)="onInputValueChange(input, $event)"
+    (touch)="onCustomInputTouched()"
   ></step-standard-custom-form-inputs>
 </ng-template>

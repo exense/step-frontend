@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Host, HostBinding, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { Input as StInput, ScreensService } from '../../client/generated';
 import { AJS_MODULE, setObjectFieldValue } from '../../shared';
@@ -18,6 +18,7 @@ export class CustomFormComponent implements OnInit {
   @Input() required: boolean = false;
 
   @Output() stModelChange = new EventEmitter<Record<string, unknown>>();
+  @Output() customInputTouch = new EventEmitter<void>();
 
   inputs: StInput[] = [];
 
@@ -29,11 +30,15 @@ export class CustomFormComponent implements OnInit {
     });
   }
 
-  onInputValueChange(input: StInput, value: string): void {
+  protected onInputValueChange(input: StInput, value: string): void {
     setObjectFieldValue(this.stModel, input.id!, value);
     this.stModelChange.emit({
       ...this.stModel,
     });
+  }
+
+  protected onCustomInputTouched(): void {
+    this.customInputTouch.emit();
   }
 }
 
