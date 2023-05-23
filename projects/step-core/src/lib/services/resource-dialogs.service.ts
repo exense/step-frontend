@@ -1,30 +1,27 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { a1Promise2Observable, DialogsService } from '../shared';
-import { ResourcesService } from '../client/generated';
-import { IsUsedByDialogService } from './is-used-by-dialog.service';
-import { UibModalHelperService } from './uib-modal-helper.service';
-import { ResourceInputBridgeService } from './resource-input-bridge.service';
-import { Resource } from '../client/generated';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
+import { Resource, ResourcesService } from '../client/generated';
 import { SearchResourceDialogComponent } from '../components/search-resource-dialog/search-resource-dialog.component';
+import { a1Promise2Observable, DialogsService } from '../shared';
+import { UpdateResourceWarningResultState } from '../shared/update-resource-warning-result-state.enum';
+import { UpdateResourceWarningDialogComponent } from '../step-core.module';
+import { IsUsedByDialogService } from './is-used-by-dialog.service';
+import { ResourceInputBridgeService } from './resource-input-bridge.service';
+import { UibModalHelperService } from './uib-modal-helper.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ResourceDialogsService {
-  readonly RESOURCE_SEARCH_TYPE = 'RESOURCE_ID';
+  private _matDialog = inject(MatDialog);
+  private _dialogs = inject(DialogsService);
+  private _resourcesService = inject(ResourcesService);
+  private _uibModalHelper = inject(UibModalHelperService);
+  private _isUsedByDialogs = inject(IsUsedByDialogService);
+  private _resourceInputBridgeService = inject(ResourceInputBridgeService);
 
-  constructor(
-    private _httpClient: HttpClient,
-    private _uibModalHelper: UibModalHelperService,
-    private _dialogs: DialogsService,
-    private _resourcesService: ResourcesService,
-    private _isUsedByDialogs: IsUsedByDialogService,
-    private _matDialog: MatDialog,
-    private _resourceInputBridgeService: ResourceInputBridgeService
-  ) {}
+  readonly RESOURCE_SEARCH_TYPE = 'RESOURCE_ID';
 
   editResource(resource?: Partial<Resource>): Observable<{ resource?: Partial<Resource>; result: string } | boolean> {
     const modalInstance = this._uibModalHelper.open({
@@ -87,18 +84,11 @@ export class ResourceDialogsService {
     return a1Promise2Observable(modalInstance.result) as Observable<string>;
   }
 
-  showUpdateResourceWarning(resource?: Resource): Observable<boolean> {
-    const modalInstance = this._uibModalHelper.open({
-      backdrop: 'static',
-      templateUrl: 'partials/resources/updateResourceWarning.html',
-      controller: 'updateResourceWarningCtrl',
-      resolve: {
-        resource: () => {
-          return resource;
-        },
-      },
-    });
-
-    return a1Promise2Observable(modalInstance.result) as Observable<boolean>;
+  showUpdateResourceWarning(): Observable<UpdateResourceWarningResultState | undefined> {
+    return this._matDialog
+      .open<UpdateResourceWarningDialogComponent, never, UpdateResourceWarningResultState | undefined>(
+        UpdateResourceWarningDialogComponent
+      )
+      .afterClosed();
   }
 }

@@ -17,6 +17,7 @@ import { ResourceInputBridgeService } from '../../services/resource-input-bridge
 import { ResourceUploadResponse } from '../../client/generated';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ResourceDialogsService } from '../../services/resource-dialogs.service';
+import { UpdateResourceWarningResultState } from '../../shared/update-resource-warning-result-state.enum';
 
 const MAX_FILES = 1;
 
@@ -102,24 +103,27 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
 
     if (this.isResource && !this.resourceNotExisting) {
       if (!this.stBounded) {
-        this._resourceDialogsService.showUpdateResourceWarning().subscribe({
-          next: (updateResource) => {
-            if (updateResource) {
+        this._resourceDialogsService.showUpdateResourceWarning().subscribe((resultState) => {
+          switch (resultState) {
+            case UpdateResourceWarningResultState.NEW_RESOURCE:
               // Updating resource
               this.uploadResource({
                 file,
                 resourceId: this.resourceId,
               });
-            } else {
+              break;
+
+            case UpdateResourceWarningResultState.UPDATE_RESOURCE:
               // Creating a new resource
               this.uploadResource({
                 file,
               });
-            }
-          },
-          error: () => {
-            // Cancel
-          },
+              break;
+
+            default:
+              // Cancel
+              break;
+          }
         });
       } else {
         // Update the current resource

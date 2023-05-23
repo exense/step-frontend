@@ -1,0 +1,34 @@
+<step-modal-window title="Update resource?">
+  <div step-modal-window-body>
+    <step-alert [type]="AlertType.warning">
+      You're about to update a resource which might be used by other objects
+    </step-alert>
+  </div>
+
+  <div step-modal-window-buttons>
+    <button
+      type="button"
+      mat-flat-button
+      color="primary"
+      (click)="_matDialogRef.close(UpdateResourceWarningResultState.UPDATE_RESOURCE)"
+    >
+      Update resource
+    </button>
+    <button
+      type="button"
+      mat-flat-button
+      color="primary"
+      (click)="_matDialogRef.close(UpdateResourceWarningResultState.NEW_RESOURCE)"
+    >
+      Create a new resource
+    </button>
+    <button
+      type="button"
+      mat-stroked-button
+      mat-dialog-close
+      (click)="_matDialogRef.close(UpdateResourceWarningResultState.CANCEL)"
+    >
+      Cancel
+    </button>
+  </div>
+</step-modal-window>

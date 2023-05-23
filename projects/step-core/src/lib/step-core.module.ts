@@ -20,10 +20,13 @@ import { FunctionLinkComponent } from './components/function-link/function-link.
 import { IsUsedByListComponent } from './components/is-used-by-list/is-used-by-list.component';
 import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 import { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
+import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 import { PlanLinkComponent } from './components/plan-link/plan-link.component';
+import { PlanNameComponent } from './components/plan-name/plan-name.component';
 import { PlanTreeActionsComponent } from './components/plan-tree-actions/plan-tree-actions.component';
 import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
+import { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
 import { ResourceInputComponent } from './components/resouce-input/resouce-input.component';
 import { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
@@ -33,6 +36,8 @@ import { SettingButtonComponent } from './components/setting-button/setting-butt
 import { SplitAreaComponent } from './components/split-area/split-area.component';
 import { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 import { SplitComponent } from './components/split/split.component';
+import { ThreadDistributionWizardDialogComponent } from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
+import { UpdateResourceWarningDialogComponent } from './components/update-resource-warning-dialog/update-resource-warning-dialog.component';
 import { UploadContainerComponent } from './components/upload-container/upload-container.component';
 import { CORE_INITIALIZER } from './core-initialiser';
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
@@ -40,6 +45,7 @@ import { CapsLockDirective } from './directives/caps-lock.directive';
 import { ElementResizeDirective } from './directives/element-resize.directive';
 import { FocusableDirective } from './directives/focusable.directive';
 import { FocusablesDirective } from './directives/focusables.directive';
+import { InputModelFormatterDirective } from './directives/input-model-formatter.directive';
 import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 import { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 import { SimpleLineChartDirective } from './directives/simple-line-chart.directive';
@@ -61,11 +67,6 @@ import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
-import { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
-import { PlanNameComponent } from './components/plan-name/plan-name.component';
-import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
-import { InputModelFormatterDirective } from './directives/input-model-formatter.directive';
-import { ThreadDistributionWizardDialogComponent } from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 
 @NgModule({
   declarations: [
@@ -118,6 +119,7 @@ import { ThreadDistributionWizardDialogComponent } from './components/thread-dis
     PlanCreateDialogComponent,
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
+    UpdateResourceWarningDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -197,6 +199,7 @@ import { ThreadDistributionWizardDialogComponent } from './components/thread-dis
     PlanCreateDialogComponent,
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
+    UpdateResourceWarningDialogComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -241,12 +244,13 @@ export { EditableTextareaLabelComponent } from './components/editable-textarea-l
 export { FunctionLinkDialogService } from './components/function-link/function-link-dialog.service';
 export { FunctionLinkComponent } from './components/function-link/function-link.component';
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
-export { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
-export { PlanNameComponent } from './components/plan-name/plan-name.component';
+export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 export { PlanLinkComponent } from './components/plan-link/plan-link.component';
+export { PlanNameComponent } from './components/plan-name/plan-name.component';
 export * from './components/plan-tree/plan-tree.component';
 export { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
+export { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 export * from './components/report-node-status/report-node-status.component';
 export { ResourceInputComponent } from './components/resouce-input/resouce-input.component';
 export { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
@@ -256,21 +260,21 @@ export { SettingButtonComponent } from './components/setting-button/setting-butt
 export { SplitAreaComponent } from './components/split-area/split-area.component';
 export { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 export { SplitComponent } from './components/split/split.component';
-export { UploadContainerComponent } from './components/upload-container/upload-container.component';
-export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 export * from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
+export { UpdateResourceWarningDialogComponent } from './components/update-resource-warning-dialog/update-resource-warning-dialog.component';
+export { UploadContainerComponent } from './components/upload-container/upload-container.component';
 export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
 export { FocusableDirective } from './directives/focusable.directive';
 export { FocusablesDirective } from './directives/focusables.directive';
+export * from './directives/input-model-formatter.directive';
 export { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 export * from './directives/simple-line-chart.directive';
 export * from './directives/tooltip-immediate-close.directive';
 export * from './directives/tooltip.directive';
-export * from './directives/input-model-formatter.directive';
 export { TrapFocusDirective } from './directives/trap-focus.directive';
 export * from './domain';
 export * from './modules/async-operations/async-operations.module';
@@ -303,8 +307,8 @@ export { IsUsedByDialogService } from './services/is-used-by-dialog.service';
 export * from './services/link-processor.service';
 export * from './services/menu-items-override-config.service';
 export * from './services/plan-artefact-resolver.service';
-export { PlanDialogsService } from './services/plan-dialogs.service';
 export * from './services/plan-by-id-cache.service';
+export { PlanDialogsService } from './services/plan-dialogs.service';
 export * from './services/plan-editor.service';
 export * from './services/plan-interactive-session.service';
 export * from './services/plugin-info-registry.service';
