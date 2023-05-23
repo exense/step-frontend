@@ -1,14 +1,4 @@
-import { DOCUMENT } from '@angular/common';
-import {
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  forwardRef,
-  Inject,
-  Input,
-  TemplateRef,
-  ViewChild,
-} from '@angular/core';
+import { Component, ElementRef, forwardRef, Input, TemplateRef, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatSelect } from '@angular/material/select';
 import { EditableComponent } from '../../shared/editable-component';
@@ -33,14 +23,6 @@ export class EditableDropdownLabelComponent<T> extends EditableComponent<T> {
 
   @ViewChild(MatSelect, { read: ElementRef }) matSelectElementRef?: ElementRef<HTMLElement>;
   @ViewChild(MatSelect) matSelect?: MatSelect;
-
-  constructor(
-    _elementRef: ElementRef<HTMLElement>,
-    _changeDetectorRef: ChangeDetectorRef,
-    @Inject(DOCUMENT) _document: Document
-  ) {
-    super(_elementRef, _changeDetectorRef, _document);
-  }
 
   protected override onValueChange(value: T): void {
     super.onValueChange(value);
