@@ -1,5 +1,4 @@
-import { DOCUMENT } from '@angular/common';
-import { ChangeDetectorRef, Component, ElementRef, forwardRef, Inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EditableComponent, EditableComponentState } from '../../shared/editable-component';
 
@@ -24,14 +23,6 @@ export class EditableTextareaLabelComponent extends EditableComponent<string> {
   @ViewChild('textarea') textarea?: ElementRef<HTMLElement>;
 
   textareaRows = DEFAULT_TEXTAREA_ROWS;
-
-  constructor(
-    _elementRef: ElementRef<HTMLElement>,
-    _changeDetectorRef: ChangeDetectorRef,
-    @Inject(DOCUMENT) _document: Document
-  ) {
-    super(_elementRef, _changeDetectorRef, _document);
-  }
 
   protected override onCancel(): void {
     this.value = this.serializeValue(this.value);

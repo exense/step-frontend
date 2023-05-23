@@ -418,7 +418,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
               scale: 'total',
               label: 'Total',
               legendName: 'Total',
-              id: 'secondary',
+              id: 'total',
               data: totalThroughput,
               value: (x, v) => Math.trunc(v) + ' total',
               fill: (self: uPlot) => UPlotUtils.gradientFill(self, TimeSeriesConfig.TOTAL_BARS_COLOR),
@@ -483,6 +483,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   switchThroughputMetric(metric: ThroughputMetric) {
     const f = (u: any, vals: any) => vals.map((v: number) => metric.labelFunction(v));
     this.throughputChart.settings.tooltipOptions.zAxisLabel = metric.tooltipZAxisLabel;
+    this.throughputChart.legendSettings.zAxisLabel = metric.tooltipZAxisLabel;
     if (metric.label === this.selectedThroughputMetric.label) {
       // it is not a real change
       return;
