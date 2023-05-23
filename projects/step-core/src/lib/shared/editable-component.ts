@@ -3,12 +3,15 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  HostBinding,
   HostListener,
+  inject,
   Input,
   Output,
   TemplateRef,
 } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
+import { DOCUMENT } from '@angular/common';
 
 export enum EditableComponentState {
   READABLE,
@@ -24,6 +27,10 @@ type OnTouch = () => void;
   template: '',
 })
 export class EditableComponent<T> implements ControlValueAccessor {
+  protected _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+  protected _changeDetectorRef = inject(ChangeDetectorRef);
+  protected _document = inject(DOCUMENT);
+
   @Input() labelTemplate!: TemplateRef<{}>;
   @Input() tooltip: string = '';
 
@@ -38,13 +45,9 @@ export class EditableComponent<T> implements ControlValueAccessor {
   protected newValue?: T;
 
   protected state = EditableComponentState.READABLE;
-  protected isDisabled = false;
 
-  protected constructor(
-    protected _elementRef: ElementRef<HTMLElement>,
-    protected _changeDetectorRef: ChangeDetectorRef,
-    protected _document: Document
-  ) {}
+  @HostBinding('class.disabled')
+  protected isDisabled = false;
 
   writeValue(value: T): void {
     this.value = value;
@@ -98,6 +101,9 @@ export class EditableComponent<T> implements ControlValueAccessor {
   }
 
   protected onLabelClick(): void {
+    if (this.isDisabled) {
+      return;
+    }
     this.state = EditableComponentState.EDITABLE;
     this.stateChange.emit(this.state);
     this.newValue = this.value;
