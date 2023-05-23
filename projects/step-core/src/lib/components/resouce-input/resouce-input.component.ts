@@ -259,11 +259,15 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
         this.lastUploadedResourceId = resourceId;
       } else {
         if (resourceUploadResponse.similarResources.length >= 1) {
-          this._resourceDialogsService.showFileAlreadyExistsWarning(resourceUploadResponse.similarResources).subscribe({
-            next: (existingResourceId) => {
-              if (existingResourceId) {
+          this._resourceDialogsService
+            .showFileAlreadyExistsWarning(resourceUploadResponse.similarResources)
+            .subscribe((result) => {
+              if (!result) {
+                return;
+              }
+              if (result.id) {
                 // Linking to an existing resource
-                this.setResourceIdToFieldValue(existingResourceId);
+                this.setResourceIdToFieldValue(result.id);
                 // Delete the previously uploaded resource
                 this._augmentedResourcesService.deleteResource(resourceId).subscribe();
               } else {
@@ -271,11 +275,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
                 this.setResourceIdToFieldValue(resourceId);
                 this.lastUploadedResourceId = resourceId;
               }
-            },
-            error: () => {
-              // Cancel
-            },
-          });
+            });
         }
       }
     });

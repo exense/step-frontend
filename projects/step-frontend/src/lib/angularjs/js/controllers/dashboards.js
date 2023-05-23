@@ -32,7 +32,6 @@ angular
       $http,
       stateStorage,
       Dialogs,
-      ResourceDialogs,
       ImportDialogs,
       ExportDialogs,
       AuthService,
