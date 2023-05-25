@@ -50,7 +50,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   getSize = () => {
     return {
-      width: this.element.nativeElement.parentElement.offsetWidth - 24,
+      width: this.element.nativeElement.parentElement.offsetWidth - 32,
       height: this.element.nativeElement.parentElement.offsetHeight - this.HEADER_WITH_FOOTER_SIZE,
     };
   };
