@@ -1,13 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
+import { catchError, map, Observable, of, switchMap } from 'rxjs';
 import { Resource, ResourcesService } from '../client/generated';
-import { ResourceConfigurationDialogData } from '../components/resource-configuration-dialog/resource-configuration-dialog-data.interface';
 import { SearchResourceDialogComponent } from '../components/search-resource-dialog/search-resource-dialog.component';
 import { a1Promise2Observable, DialogsService } from '../shared';
-import { ResourceConfigurationDialogComponent } from '../step-core.module';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
-import { ResourceInputBridgeService } from './resource-input-bridge.service';
 import { UibModalHelperService } from './uib-modal-helper.service';
 
 @Injectable({
@@ -19,31 +16,8 @@ export class ResourceDialogsService {
   private _resourcesService = inject(ResourcesService);
   private _isUsedByDialogs = inject(IsUsedByDialogService);
   private _matDialog = inject(MatDialog);
-  private _resourceInputBridgeService = inject(ResourceInputBridgeService);
 
   readonly RESOURCE_SEARCH_TYPE = 'RESOURCE_ID';
-
-  editResource(resource?: Resource): Observable<Resource | undefined> {
-    const matDialogRef = this._matDialog.open<
-      ResourceConfigurationDialogComponent,
-      ResourceConfigurationDialogData,
-      Resource | undefined
-    >(ResourceConfigurationDialogComponent, {
-      data: {
-        resource,
-      },
-    });
-
-    return matDialogRef.afterClosed().pipe(
-      tap((updatedResource) => {
-        if (updatedResource) {
-          return;
-        }
-
-        this._resourceInputBridgeService.deleteLastUploadedResource();
-      })
-    );
-  }
 
   deleteResource(id: string, label: string): Observable<boolean> {
     return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Resource "${label}"`)).pipe(

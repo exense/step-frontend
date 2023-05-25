@@ -256,6 +256,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
         // No similar resource found
         this.setResourceIdToFieldValue(resourceId);
         this.resourceFilename = resourceUploadResponse.resource!.resourceName;
+        this.deleteLastUploadedResource();
         this.lastUploadedResourceId = resourceId;
       } else {
         if (resourceUploadResponse.similarResources.length >= 1) {

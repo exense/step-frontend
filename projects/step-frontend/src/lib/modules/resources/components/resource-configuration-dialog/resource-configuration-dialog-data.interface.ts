@@ -1,4 +1,4 @@
-import { Resource } from '../../client/generated';
+import { Resource } from '@exense/step-core';
 
 export interface ResourceConfigurationDialogData {
   resource?: Resource;

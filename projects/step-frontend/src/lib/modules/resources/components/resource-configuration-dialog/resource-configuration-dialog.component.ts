@@ -2,7 +2,7 @@ import { KeyValue } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Resource, ResourcesService } from '../../client/generated';
+import { Resource, ResourcesService } from '@exense/step-core';
 import { PredefinedResourceType } from './predefined-resource-type.enum';
 import { PREDEFINED_RESOURCE_TYPES } from './predefined-resource-types.token';
 import { ResourceConfigurationDialogData } from './resource-configuration-dialog-data.interface';
