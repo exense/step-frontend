@@ -699,6 +699,12 @@ st-table table.dataTable tbody > tr {
   display: flex;
 }
 
+.st-flex-row-no-overflow {
+  flex: 1 1 auto;
+  overflow: hidden;
+  display: flex;
+}
+
 .st-flex-column {
   display: flex !important;
   flex-direction: column;
