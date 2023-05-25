@@ -1,14 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { FunctionTypeFormComponent, higherOrderValidator } from '@exense/step-core';
+import { FunctionNodeJS } from './function-node-js.interface';
 import {
-  FunctionNodeJS,
-  FunctionTypeFormComponent,
   FunctionTypeNodeJSForm,
   functionTypeNodeJSFormCreate,
   functionTypeNodeJSFormSetValueToForm,
   functionTypeNodeJSFormSetValueToModel,
-  higherOrderValidator,
-} from '@exense/step-core';
+} from './function-type-node-js.form';
 
 @Component({
   selector: 'step-function-type-node-js',

@@ -1,17 +1,19 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import {
-  FunctionScript,
   FunctionTypeFormComponent,
-  FunctionTypeScriptForm,
-  functionTypeScriptFormCreate,
-  functionTypeScriptFormSetValueToForm,
-  functionTypeScriptFormSetValueToModel,
   FunctionTypeScriptOption,
   FUNCTION_TYPE_SCRIPT_OPTIONS,
   higherOrderValidator,
   ScriptLanguage,
 } from '@exense/step-core';
+import { FunctionScript } from './function-script.interface';
+import {
+  FunctionTypeScriptForm,
+  functionTypeScriptFormCreate,
+  functionTypeScriptFormSetValueToForm,
+  functionTypeScriptFormSetValueToModel,
+} from './function-type-script.form';
 
 @Component({
   selector: 'step-function-type-script',

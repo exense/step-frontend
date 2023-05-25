@@ -1,6 +1,6 @@
+import { KeyValue } from '@angular/common';
 import { AbstractControl, FormBuilder, ValidationErrors } from '@angular/forms';
 import { DynamicValueInteger, Function as Keyword } from '../client/generated';
-import { KeyValuePair } from '../domain';
 import { AgentTokenSelectionCriteriaForm } from './agent-token-selection-criteria.form';
 import { FunctionType } from './function-type.enum';
 import { dynamicValueFactory, toKeyValuePairs, toRecord } from './utils';
@@ -93,6 +93,6 @@ export const functionConfigurationDialogFormSetValueToModel = (
   model.callTimeout = callTimeout!;
   model.executeLocally = executeLocally!;
   model.tokenSelectionCriteria = tokenSelectionCriteria
-    ? toRecord(tokenSelectionCriteria as KeyValuePair<string, string>[])
+    ? toRecord(tokenSelectionCriteria as KeyValue<string, string>[])
     : {};
 };

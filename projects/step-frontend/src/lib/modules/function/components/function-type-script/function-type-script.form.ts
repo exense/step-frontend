@@ -1,8 +1,6 @@
 import { FormBuilder } from '@angular/forms';
-import { DynamicValueString } from '../client/generated';
+import { dynamicValueFactory, DynamicValueString, ScriptLanguage } from '@exense/step-core';
 import { FunctionScript } from './function-script.interface';
-import { ScriptLanguage } from './script-language.enum';
-import { dynamicValueFactory } from './utils';
 
 export type FunctionTypeScriptForm = ReturnType<typeof functionTypeScriptFormCreate>;
 

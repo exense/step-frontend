@@ -1,7 +1,6 @@
 import { FormBuilder } from '@angular/forms';
-import { DynamicValueString } from '../client/generated';
+import { dynamicValueFactory, DynamicValueString } from '@exense/step-core';
 import { FunctionNodeJS } from './function-node-js.interface';
-import { dynamicValueFactory } from './utils';
 
 export type FunctionTypeNodeJSForm = ReturnType<typeof functionTypeNodeJSFormCreate>;
 

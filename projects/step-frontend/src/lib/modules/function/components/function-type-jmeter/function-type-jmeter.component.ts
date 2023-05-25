@@ -1,14 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { FunctionTypeFormComponent, higherOrderValidator } from '@exense/step-core';
+import { FunctionJMeter } from './function-jmeter.interface';
 import {
-  FunctionJMeter,
-  FunctionTypeFormComponent,
   FunctionTypeJMeterForm,
   functionTypeJMeterFormCreate,
   functionTypeJMeterFormSetValueToForm,
   functionTypeJMeterFormSetValueToModel,
-  higherOrderValidator,
-} from '@exense/step-core';
+} from './function-type-jmeter.form';
 
 @Component({
   selector: 'step-function-type-jmeter',
