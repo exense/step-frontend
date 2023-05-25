@@ -11,15 +11,21 @@ step-ts-filter-bar {
     font-size: 12px;
   }
 
+  .settings-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
   .warning-mark {
-    position: absolute;
-    left: 0;
-    top: 0;
     background-color: var.$yellow-10;
     color: var.$yellow-600;
-    padding: 4px 34px;
     font-size: 11px;
-    border: 1px solid var.$yellow-20;
+    padding: 4px 10px;
+    /* width: 100%; */
+    margin: 0 20px;
+    display: flex;
+    margin-top: 12px !important;
   }
 
   .filters {
@@ -27,6 +33,7 @@ step-ts-filter-bar {
     gap: 12px;
     padding: 12px;
     align-items: center;
+    height: 68px;
   }
 
   .applied-filters {
@@ -115,13 +122,13 @@ step-ts-filter-bar {
     .info-btn {
       position: absolute;
       right: 0;
-      top: 3px;
-      width: 30px;
-      height: 30px;
+      top: 0px;
+      width: 28px;
+      height: 28px;
       cursor: pointer;
       padding: 4px;
       font-size: 12px;
-      transform: scale(0.7);
+      transform: scale(0.8);
       opacity: 0.6;
     }
   }
@@ -149,5 +156,17 @@ step-ts-filter-bar {
     justify-content: center;
     opacity: 0.6;
     transform: scale(0.8);
+  }
+
+  .grouping-container {
+    margin-right: 6px;
+  }
+
+  .separator {
+    width: 2px;
+    height: 40px;
+    background: var.$gray-100;
+    display: inline-block;
+    margin: 0 22px;
   }
 }

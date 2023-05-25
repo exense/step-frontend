@@ -1,8 +1,7 @@
+<div class="warning-mark" *ngIf="rawMeasurementsModeActive">
+  You are using custom filters which may slow down the dashboard.
+</div>
 <div class="filters">
-  <div class="warning-mark" *ngIf="rawMeasurementsModeActive">
-    You are using custom filters which may slow down the dashboard.
-  </div>
-
   <mat-menu #menu="matMenu">
     <button mat-menu-item *ngFor="let option of defaultFilterOptions" (click)="addFilterItem(option)">
       <span>{{ option.label }}</span>
@@ -24,7 +23,6 @@
   </mat-menu>
 
   <div class="applied-filters" [style]="oqlModeActive ? 'overflow: unset' : ''">
-    <step-timeseries-grouping (onGroupingChange)="handleGroupingChange($event)"></step-timeseries-grouping>
     <ng-container *ngIf="!oqlModeActive">
       <ng-container *ngFor="let item of filterItems; let i = index">
         <step-ts-filter-bar-item
@@ -73,10 +71,16 @@
     </button>
   </div>
 
-  <mat-button-toggle-group [(ngModel)]="oqlModeActive" (change)="toggleOQLMode()">
-    <mat-button-toggle [value]="false"> Basic</mat-button-toggle>
-    <mat-button-toggle [value]="true"> OQL</mat-button-toggle>
-  </mat-button-toggle-group>
+  <div class="settings-section">
+    <mat-button-toggle-group [(ngModel)]="oqlModeActive" (change)="toggleOQLMode()">
+      <mat-button-toggle [value]="false"> Basic</mat-button-toggle>
+      <mat-button-toggle [value]="true"> OQL</mat-button-toggle>
+    </mat-button-toggle-group>
+    <div class="separator"></div>
+    <div class="grouping-container">
+      <step-timeseries-grouping (onGroupingChange)="handleGroupingChange($event)"></step-timeseries-grouping>
+    </div>
+  </div>
 </div>
 
 <step-execution-time-selection [settings]="performanceViewSettings"></step-execution-time-selection>
