@@ -68,7 +68,7 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
   }
 
   addMask(): void {
-    this._genericFunctionDialogService.openAddMaskDialog().subscribe((_) => this.dataSource?.reload());
+    this._genericFunctionDialogService.openAddMaskDialog().subscribe(() => this.dataSource?.reload());
   }
 
   editFunction(id: string): void {
@@ -86,7 +86,7 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
   }
 
   duplicateFunction(id: string): void {
-    this._augmentedKeywordsService.cloneFunction(id).subscribe((_) => this.dataSource?.reload());
+    this._augmentedKeywordsService.cloneFunction(id).subscribe(() => this.dataSource?.reload());
   }
 
   deleteFunction(id: string, name: string): void {
@@ -102,7 +102,7 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
   }
 
   configureFunction(id: string) {
-    this._genericFunctionDialogService.openConfigDialog(id).subscribe((_) => this.dataSource?.reload());
+    this._genericFunctionDialogService.openConfigDialog(id).subscribe(() => this.dataSource?.reload());
   }
 
   functionTypeLabel(type: string) {

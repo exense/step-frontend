@@ -47,9 +47,9 @@ export class ResourceDialogsService {
 
   deleteResource(id: string, label: string): Observable<any> {
     return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Resource "${label}"`)).pipe(
-      switchMap((_) => this._resourcesService.deleteResource(id)),
-      map((_) => true),
-      catchError((_) => of(false))
+      switchMap(() => this._resourcesService.deleteResource(id)),
+      map(() => true),
+      catchError(() => of(false))
     );
   }
 

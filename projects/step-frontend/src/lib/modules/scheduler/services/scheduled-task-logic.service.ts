@@ -80,13 +80,13 @@ export class ScheduledTaskLogicService {
     this._schedulerService
       .getExecutionTaskById(scheduledTask.id!)
       .pipe(switchMap((task) => this._scheduledTaskDialogs.editScheduledTask(task)))
-      .subscribe((_) => this.loadTable());
+      .subscribe(() => this.loadTable());
   }
 
   createParameter() {
     this._schedulerService
       .createExecutionTask()
       .pipe(switchMap((task) => this._scheduledTaskDialogs.editScheduledTask(task)))
-      .subscribe((_) => this.loadTable());
+      .subscribe(() => this.loadTable());
   }
 }
