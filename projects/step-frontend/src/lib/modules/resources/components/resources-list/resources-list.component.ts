@@ -1,14 +1,14 @@
+import { DOCUMENT } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
-  Resource,
   AugmentedResourcesService,
+  Resource,
   ResourceDialogsService,
-  tablePersistenceConfigProvider,
   STORE_ALL,
+  tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'step-resources-list',
@@ -24,18 +24,32 @@ export class ResourcesListComponent {
   readonly dataSource = this._resourcesService.createDatasource();
 
   editResource(resource: Resource): void {
-    this._resourceDialogs.editResource(resource).subscribe((_) => this.dataSource.reload());
+    this._resourceDialogs.editResource(resource).subscribe((updatedResource) => {
+      if (!updatedResource) {
+        return;
+      }
+
+      this.dataSource.reload();
+    });
   }
 
   createResource(): void {
-    this._resourceDialogs.editResource().subscribe((_) => this.dataSource.reload());
+    this._resourceDialogs.editResource().subscribe((updatedResource) => {
+      if (!updatedResource) {
+        return;
+      }
+
+      this.dataSource.reload();
+    });
   }
 
   deleteResource(id: string, label: string): void {
-    this._resourceDialogs.deleteResource(id, label).subscribe((result: boolean) => {
-      if (result) {
-        this.dataSource.reload();
+    this._resourceDialogs.deleteResource(id, label).subscribe((deletedResource: boolean) => {
+      if (!deletedResource) {
+        return;
       }
+
+      this.dataSource.reload();
     });
   }
 

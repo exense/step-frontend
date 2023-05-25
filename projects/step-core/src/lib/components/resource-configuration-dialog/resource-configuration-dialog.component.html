@@ -1,0 +1,30 @@
+<step-modal-window [title]="_resourceConfigurationDialogData.resource ? 'Edit Resource' : 'New Resource'">
+  <div step-modal-window-body>
+    <form [formGroup]="formGroup">
+      <step-form-field *ngIf="_resourceConfigurationDialogData.resource">
+        <step-label>Name</step-label>
+        <input type="text" [formControl]="formGroup.controls.name" />
+      </step-form-field>
+
+      <step-predefined-options-input
+        label="Resource type"
+        [formControl]="formGroup.controls.resourceType"
+        [predefinedOptions]="_predefinedResourceTypes"
+        predefinedOptionsLabel="Types"
+      ></step-predefined-options-input>
+
+      <step-resource-input
+        label="Content"
+        [stType]="resourceType"
+        [uploadOnly]="true"
+        [disableServerPath]="true"
+        [stModel]="content"
+        (stModelChange)="onContentChange($event)"
+      ></step-resource-input>
+    </form>
+  </div>
+
+  <div step-modal-window-buttons>
+    <button type="button" (click)="close()" mat-flat-button color="primary">Close</button>
+  </div>
+</step-modal-window>

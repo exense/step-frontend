@@ -198,7 +198,7 @@ dynamicForms
         tooltip: '=',
         onSave: '&',
       },
-      controller: function ($scope, $http, Upload, Dialogs, ResourceDialogs) {
+      controller: function ($scope, $http, Upload, Dialogs) {
         initDynamicFormsCtrl($scope);
       },
       templateUrl: 'partials/dynamicforms/dynamicResourceInput.html',

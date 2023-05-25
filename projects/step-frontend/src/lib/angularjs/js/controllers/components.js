@@ -306,7 +306,7 @@ angular
         stModel: '=',
         stFormat: '@?',
       },
-      controller: function ($scope, $http, $timeout, Upload, ResourceDialogs) {
+      controller: function ($scope, $http, $timeout, Upload) {
         $scope.resourceFilename = '';
         $scope.$watch('stModel', function (newValue) {
           if (newValue) {
