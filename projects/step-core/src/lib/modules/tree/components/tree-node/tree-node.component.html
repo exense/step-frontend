@@ -2,6 +2,7 @@
   class="tree-node"
   [class.tree-node-selected]="node.id | isNodeSelected | async"
   [class.tree-node-selected-for-insert]="node.id | isNodeSelectedForInsert | async"
+  [class.tree-node-hidden]="isHideRoot && (node.id | isRootNode | async)"
   [class.skipped]="node.isSkipped"
   cdkDrag
   [cdkDragBoundary]="treeContainer"

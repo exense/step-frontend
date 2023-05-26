@@ -314,7 +314,7 @@ export class ExecutionProgressComponent
     }
     this._treeUtils.loadNodes(eId).subscribe((nodes) => {
       if (nodes[0]) {
-        this._treeState.init(nodes[0], undefined, false);
+        this._treeState.init(nodes[0], { expandAllByDefault: false });
       }
     });
   }
@@ -337,7 +337,7 @@ export class ExecutionProgressComponent
       )
       .subscribe((rootNode) => {
         if (rootNode) {
-          this._treeState.init(rootNode, undefined, false);
+          this._treeState.init(rootNode, { expandAllByDefault: false });
         }
       });
   }

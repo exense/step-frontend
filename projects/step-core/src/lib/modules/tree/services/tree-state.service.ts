@@ -1,18 +1,27 @@
 import { FlatTreeControl } from '@angular/cdk/tree';
-import { Injectable, OnDestroy } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { BehaviorSubject, combineLatest, map, Observable, of, Subject, tap } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
-import { breadthFirstSearch } from '../../../shared';
+import { breadthFirstSearch, Mutable } from '../../../shared';
 import { DropType } from '../shared/drop-type.enum';
 import { TreeFlatNode } from '../shared/tree-flat-node';
 import { TreeNode } from '../shared/tree-node';
 import { TreeNodeUtilsService } from './tree-node-utils.service';
+import { TreeStateInitOptions } from '../shared/tree-state-init-options.interface';
+
+type FieldAccessor = Mutable<Pick<TreeStateService<any, any>, 'hideRoot'>>;
 
 const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === index;
 
+const DEFAULT_OPTIONS: TreeStateInitOptions = {
+  expandAllByDefault: true,
+};
+
 @Injectable()
 export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
+  private _treeNodeUtils = inject<TreeNodeUtilsService<T, N>>(TreeNodeUtilsService);
+
   private nodesAccessCache = new Map<string, N>();
 
   readonly treeControl = new FlatTreeControl<TreeFlatNode>(
@@ -50,9 +59,11 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   private treeUpdateInternal$ = new Subject<T>();
   readonly treeUpdate$ = this.treeUpdateInternal$.asObservable();
 
-  constructor(private _treeNodeUtils: TreeNodeUtilsService<T, N>) {}
+  readonly hideRoot: boolean = false;
 
-  init(root: T, selectedNodeIds?: string[], expandAllByDefault: boolean = true): void {
+  init(root: T, options: TreeStateInitOptions = {}): void {
+    const { selectedNodeIds, expandAllByDefault, hideRoot } = { ...DEFAULT_OPTIONS, ...options };
+    (this as FieldAccessor).hideRoot = !!hideRoot;
     this.originalRoot = root;
     const rootNode = this._treeNodeUtils.convertItem(root);
     this.nodesAccessCache.clear();
@@ -70,6 +81,8 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     this.updateData([rootNode]);
     if (expandAllByDefault) {
       this.expandAll();
+    } else if (hideRoot) {
+      this.expandNode(rootNode.id).subscribe();
     }
   }
 
