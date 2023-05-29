@@ -544,6 +544,18 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     this.editNodeIdInternal$.complete();
   }
 
+  getNodePath(node?: N): string[] {
+    if (!node) {
+      return [];
+    }
+    const result = [node.id];
+    while (!!node?.parentId) {
+      result.unshift(node.parentId);
+      node = this.findNodeById(node.parentId);
+    }
+    return result;
+  }
+
   private getParentChildRelationsForSelectedNodes(): { nodeIds: string[]; parentId: string }[] {
     const selectedNodeIds = this.selectedNodeIds$.value.filter((nodeId) => nodeId !== this.rootNode$.value?.id);
 
@@ -617,6 +629,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
           return of(false);
         }
         if ((node.children || []).length > 0) {
+          this.expandNodeInternal(node.id);
           return of(true);
         }
 
