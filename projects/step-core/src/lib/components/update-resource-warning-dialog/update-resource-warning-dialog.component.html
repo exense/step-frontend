@@ -14,6 +14,7 @@
     >
       Update resource
     </button>
+
     <button
       type="button"
       mat-flat-button
@@ -22,13 +23,7 @@
     >
       Create a new resource
     </button>
-    <button
-      type="button"
-      mat-stroked-button
-      mat-dialog-close
-      (click)="_matDialogRef.close(UpdateResourceWarningResultState.CANCEL)"
-    >
-      Cancel
-    </button>
+
+    <button type="button" mat-stroked-button mat-dialog-close (click)="_matDialogRef.close()">Cancel</button>
   </div>
 </step-modal-window>

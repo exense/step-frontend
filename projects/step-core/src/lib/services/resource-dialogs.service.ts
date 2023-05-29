@@ -86,7 +86,7 @@ export class ResourceDialogsService {
 
   showUpdateResourceWarning(): Observable<UpdateResourceWarningResultState | undefined> {
     return this._matDialog
-      .open<UpdateResourceWarningDialogComponent, never, UpdateResourceWarningResultState | undefined>(
+      .open<UpdateResourceWarningDialogComponent, null, UpdateResourceWarningResultState | undefined>(
         UpdateResourceWarningDialogComponent
       )
       .afterClosed();
