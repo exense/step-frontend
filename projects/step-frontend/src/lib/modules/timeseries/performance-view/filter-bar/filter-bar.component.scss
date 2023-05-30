@@ -17,15 +17,11 @@ step-ts-filter-bar {
     align-items: center;
   }
 
-  .warning-mark {
-    background-color: var.$yellow-10;
-    color: var.$yellow-600;
-    font-size: 11px;
-    padding: 4px 10px;
-    /* width: 100%; */
+  .warning {
     margin: 0 20px;
-    display: flex;
-    margin-top: 12px !important;
+    margin-top: 1rem !important;
+    font-size: 11px;
+    padding: 0.8rem;
   }
 
   .filters {
@@ -33,7 +29,7 @@ step-ts-filter-bar {
     gap: 12px;
     padding: 12px;
     align-items: center;
-    height: 68px;
+    height: 8rem;
   }
 
   .applied-filters {

@@ -27,7 +27,6 @@ import uPlot = require('uplot');
 })
 export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChanges {
   private readonly HEADER_WITH_FOOTER_SIZE = 48;
-  readonly WRAPPER_PADDING = '12px';
 
   @ViewChild('chart') private chartElement!: ElementRef;
 

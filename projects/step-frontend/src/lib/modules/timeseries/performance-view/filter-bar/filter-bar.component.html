@@ -1,6 +1,6 @@
-<div class="warning-mark" *ngIf="rawMeasurementsModeActive">
+<step-alert type="warning" class="warning" *ngIf="rawMeasurementsModeActive">
   You are using custom filters which may slow down the dashboard.
-</div>
+</step-alert>
 <div class="filters">
   <mat-menu #menu="matMenu">
     <button mat-menu-item *ngFor="let option of defaultFilterOptions" (click)="addFilterItem(option)">
