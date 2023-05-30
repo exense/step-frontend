@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, Mutable, GridService, TokenGroupCapacity, TableLocalDataSource } from '@exense/step-core';
-import { Observable, BehaviorSubject, switchMap, shareReplay, tap } from 'rxjs';
+import { Observable, BehaviorSubject, switchMap, shareReplay, tap, map } from 'rxjs';
 import { FlatObjectStringFormatPipe } from '../../pipes/flat-object-format.pipe';
 
 type InProgress = Mutable<Pick<TokenGroupListComponent, 'inProgress'>>;
@@ -29,15 +29,10 @@ export class TokenGroupListComponent implements OnDestroy {
     },
   });
 
-  readonly checkedMap: { [key: string]: boolean } = {
-    url: true,
-    tech: false,
-    $agentid: false,
-    $agenttype: false,
-    $tokenid: false,
-    type: false,
-  };
-  readonly checkedMapKeys = Object.keys(this.checkedMap);
+  readonly checkedMap: Record<string, boolean | undefined> = { url: true };
+  readonly checkedMapKeys$ = this._gridService
+    .getTokenAttributeKeys()
+    .pipe(map((attributeKeys) => Object.keys(this.checkedMap).concat(attributeKeys)));
 
   constructor(private _gridService: GridService) {}
 
