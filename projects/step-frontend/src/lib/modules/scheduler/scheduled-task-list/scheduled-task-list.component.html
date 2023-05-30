@@ -43,7 +43,7 @@
     <td mat-cell *matCellDef="let element">
       <button
         [ngClass]="{
-          status: true,
+          'status': true,
           'status-on': element.active,
           'status-off': !element.active,
           'scheduler-disabled': !isSchedulerEnabled
