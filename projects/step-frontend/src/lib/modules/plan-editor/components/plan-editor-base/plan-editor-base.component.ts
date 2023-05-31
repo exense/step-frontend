@@ -113,7 +113,6 @@ export class PlanEditorBaseComponent
   protected repositoryObjectRef?: RepositoryObjectReference;
 
   protected planClass?: string;
-  protected customFields?: Record<string, any>;
   private terminator$ = new Subject<void>();
   @ViewChild('keywordCalls', { read: KeywordCallsComponent, static: false })
   private keywords?: KeywordCallsComponent;
@@ -294,7 +293,6 @@ export class PlanEditorBaseComponent
       )
       .subscribe((plan) => {
         this.planClass = plan._class;
-        this.customFields = plan.customFields;
         this.planTypeControl.setValue(
           {
             planType: plan.root!._class,

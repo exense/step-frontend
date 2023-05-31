@@ -1,6 +1,3 @@
-<div *ngIf="customFields?.['functionPackageId']" class="alert alert-warning ng-scope" role="alert">
-  This composite belongs to a keyword package, all changes to it may be overridden by the package.
-</div>
 <div stepPlanEditorKeyHandler>
   <step-alert type="info" *ngIf="_interactiveSession.isActive$ | async">
     Welcome to the interactive mode. In this mode you can select tree nodes and run them directly by clicking the
