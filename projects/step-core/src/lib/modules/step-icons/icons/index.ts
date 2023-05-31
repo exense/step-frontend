@@ -200,6 +200,7 @@ export { Radio } from './svg/radio';
 export { RefreshCw } from './svg/refresh-cw';
 export { RefreshCcw } from './svg/refresh-ccw';
 export { Rewind } from './svg/rewind';
+export { Rocket } from './svg/rocket';
 export { RotateCw } from './svg/rotate-cw';
 export { RotateCcw } from './svg/rotate-ccw';
 export { Save } from './svg/save';

@@ -45,7 +45,7 @@ export class ViewRegistryService {
    */
   registerStandardMenuEntries() {
     // Main Menus
-    this.registerMenuEntry('Automation', 'automation-root', 'play', { weight: 10 });
+    this.registerMenuEntry('Design', 'automation-root', 'edit', { weight: 10 });
     this.registerMenuEntry('Execute', 'execute-root', 'sun', { weight: 20 });
     this.registerMenuEntry('Status', 'status-root', 'check-square', { weight: 50 });
     this.registerMenuEntry('Support', 'support-root', 'life-buoy', { weight: 100 });
@@ -55,7 +55,7 @@ export class ViewRegistryService {
     this.registerMenuEntry('Plans', 'plans', 'file', { weight: 30, parentId: 'automation-root' });
     this.registerMenuEntry('Parameters', 'parameters', 'list', { weight: 40, parentId: 'automation-root' });
     // Sub Menus Execute
-    this.registerMenuEntry('Executions', 'executions', 'rotate-cw', { weight: 10, parentId: 'execute-root' });
+    this.registerMenuEntry('Executions', 'executions', 'rocket', { weight: 10, parentId: 'execute-root' });
     this.registerMenuEntry('Scheduler', 'scheduler', 'clock', { weight: 20, parentId: 'execute-root' });
     this.registerMenuEntry('Analytics', 'analytics', 'bar-chart-2', { weight: 20, parentId: 'execute-root' });
     // Sub Menus Status
