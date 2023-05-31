@@ -25,10 +25,18 @@ export class CompositeFunctionEditorComponent {
   ngOnChanges(changes: SimpleChanges): void {
     const cId = changes['id'];
     if (cId?.previousValue !== cId?.currentValue || cId?.firstChange) {
-      this._functionApiService.getFunctionById(cId.currentValue).subscribe((keywordFunction) => {
+     this.loadKeyword(cId?.currentValue);
+    }
+  }
+  
+  private loadKeyword(id?: string): void {
+      if (!id) {
+         this.composite = undefined;
+         return;
+      }
+      this._functionApiService.getFunctionById(id).subscribe((keywordFunction) => {
         this.composite = keywordFunction;
       });
-    }
   }
 }
 
