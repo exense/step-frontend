@@ -48,9 +48,12 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
     <td mat-cell *matCellDef="let element">
       <button
-        class="status"
-        [disabled]="!isSchedulerEnabled"
-        [class]="element.active ? 'status-on' : 'status-off'"
+        [ngClass]="{
+          'status': true,
+          'status-on': element.active,
+          'status-off': !element.active,
+          'scheduler-disabled': !isSchedulerEnabled
+        }"
         (click)="_logic.switchActive(element)"
       >
         {{ element.active ? _logic.STATUS_ACTIVE_STRING : _logic.STATUS_INACTIVE_STRING }}
