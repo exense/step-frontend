@@ -8,6 +8,7 @@ import {
   tablePersistenceConfigProvider,
   TokenGroupCapacity,
 } from '@exense/step-core';
+import { map } from 'rxjs';
 import { FlatObjectStringFormatPipe } from '../../pipes/flat-object-format.pipe';
 
 @Component({
@@ -24,15 +25,10 @@ export class TokenGroupListComponent {
       .build()
   );
 
-  readonly checkedMap: { [key: string]: boolean } = {
-    url: true,
-    tech: false,
-    $agentid: false,
-    $agenttype: false,
-    $tokenid: false,
-    type: false,
-  };
-  readonly checkedMapKeys = Object.keys(this.checkedMap);
+  readonly checkedMap: Record<string, boolean | undefined> = { url: true };
+  readonly checkedMapKeys$ = this._gridService
+    .getTokenAttributeKeys()
+    .pipe(map((attributeKeys) => Object.keys(this.checkedMap).concat(attributeKeys)));
 
   constructor(private _gridService: GridService) {}
 
