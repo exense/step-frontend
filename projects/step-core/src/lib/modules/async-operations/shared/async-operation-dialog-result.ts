@@ -1,5 +1,5 @@
 import { AsyncOperationCloseStatus } from './async-operation-close-status.enum';
-import { AsyncTaskStatus } from '../../../client/augmented/shared/async-task-status';
+import { AsyncTaskStatus } from '../../../client/step-client-module';
 
 export interface AsyncOperationDialogResult {
   closeStatus: AsyncOperationCloseStatus;

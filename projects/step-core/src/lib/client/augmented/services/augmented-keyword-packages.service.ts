@@ -1,10 +1,12 @@
 import { FunctionPackage, KeywordPackagesService } from '../../generated';
-import { Injectable } from '@angular/core';
-import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
-import { TableApiWrapperService } from '../../table/services/table-api-wrapper.service';
-import { TableRemoteDataSource } from '../../../modules/table/shared/table-remote-data-source';
-import { map, Observable, of, tap } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { map, Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import {
+  StepDataSource,
+  TableRemoteDataSourceFactoryService,
+  TableApiWrapperService,
+} from '../../table/step-table-client.module';
 
 const FUNCTION_PACKAGE_TABLE_ID = 'functionPackage';
 
@@ -12,14 +14,23 @@ const FUNCTION_PACKAGE_TABLE_ID = 'functionPackage';
   providedIn: 'root',
 })
 export class AugmentedKeywordPackagesService extends KeywordPackagesService {
-  readonly dataSource = new TableRemoteDataSource<FunctionPackage>(FUNCTION_PACKAGE_TABLE_ID, this._tableRest, {
-    name: 'attributes.name',
-    version: 'packageAttributes.version',
-    actions: '',
-  });
+  private _tableRest = inject(TableApiWrapperService);
+  private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
 
-  constructor(httpRequest: BaseHttpRequest, private _tableRest: TableApiWrapperService) {
-    super(httpRequest);
+  createDataSource(): StepDataSource<FunctionPackage> {
+    return this._dataSourceFactory.createDataSource(FUNCTION_PACKAGE_TABLE_ID, {
+      name: 'attributes.name',
+      version: 'packageAttributes.version',
+      actions: '',
+    });
+  }
+
+  createSelectionDataSource(): StepDataSource<FunctionPackage> {
+    return this._dataSourceFactory.createDataSource(FUNCTION_PACKAGE_TABLE_ID, {
+      'attributes.name': 'attributes.name',
+      packageLocation: 'packageLocation',
+      'packageAttributes.version': 'packageAttributes.version',
+    });
   }
 
   searchPackageIDsByName(packageName: string): Observable<string[]> {

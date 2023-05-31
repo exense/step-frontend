@@ -1,12 +1,12 @@
 import { Component, inject, ViewChild } from '@angular/core';
 import {
+  AugmentedKeywordPackagesService,
   AutoDeselectStrategy,
   BaseEntitySelectionTableComponent,
   FunctionPackage,
   selectionCollectionProvider,
   SelectionCollector,
-  TableApiWrapperService, TableComponent,
-  TableRemoteDataSource,
+  TableComponent,
 } from '@exense/step-core';
 
 @Component({
@@ -16,18 +16,10 @@ import {
   providers: [selectionCollectionProvider<string, FunctionPackage>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
 })
 export class FunctionPackageSelectionComponent extends BaseEntitySelectionTableComponent {
+  protected _selectionCollector = inject<SelectionCollector<string, FunctionPackage>>(SelectionCollector);
 
-  private _api = inject(TableApiWrapperService);
-
-  protected _selectionCollector = inject(SelectionCollector<string, FunctionPackage>);
-
-  @ViewChild('tableRef', {read: TableComponent})
+  @ViewChild('tableRef', { read: TableComponent })
   protected _tableRef?: TableComponent<FunctionPackage>;
 
-  readonly dataSource = new TableRemoteDataSource<FunctionPackage>('functionPackage', this._api, {
-    'attributes.name': 'attributes.name',
-    packageLocation: 'packageLocation',
-    'packageAttributes.version': 'packageAttributes.version',
-  });
-
+  readonly _dataSource = inject(AugmentedKeywordPackagesService).createSelectionDataSource();
 }

@@ -18,7 +18,9 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   private handleHttpError(error: HttpErrorResponse): Observable<any> {
     console.error('Network Error', error);
     if (error.status !== 401) {
-      if (error.name && error.message) {
+      if (error.error?.errorMessage) {
+        this.handleError(error.error);
+      } else if (error.name && error.message) {
         this.handleError(`${error.name}: ${error.message}`);
       } else if (error.error) {
         this.handleError(error.error);
