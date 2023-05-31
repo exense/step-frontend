@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
@@ -18,6 +18,8 @@ import { FlatObjectStringFormatPipe } from '../../pipes/flat-object-format.pipe'
   providers: [tablePersistenceConfigProvider('tokenGroupList', STORE_ALL)],
 })
 export class TokenGroupListComponent {
+  private _gridService = inject(GridService);
+
   readonly searchableTokenGroupRequest = new TableFetchLocalDataSource(
     () => this._gridService.getUsageByIdentity(this.getCheckedKeyList()),
     TableFetchLocalDataSource.configBuilder<TokenGroupCapacity>()
@@ -29,8 +31,6 @@ export class TokenGroupListComponent {
   readonly checkedMapKeys$ = this._gridService
     .getTokenAttributeKeys()
     .pipe(map((attributeKeys) => Object.keys(this.checkedMap).concat(attributeKeys)));
-
-  constructor(private _gridService: GridService) {}
 
   toggleCheckBox(key: string): void {
     this.checkedMap[key] = !this.checkedMap[key];
