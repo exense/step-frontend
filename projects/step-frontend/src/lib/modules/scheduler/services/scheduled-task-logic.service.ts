@@ -1,6 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import {
   AugmentedSchedulerService,
+  AuthService,
   DashboardService,
   ExecutiontTaskParameters,
   Mutable,
@@ -45,7 +46,8 @@ export class ScheduledTaskLogicService implements OnDestroy {
     private _dashboardService: DashboardService,
     private _schedulerService: AugmentedSchedulerService,
     private _scheduledTaskDialogs: ScheduledTaskDialogsService,
-    public _location: Location
+    public _location: Location,
+    private _authService: AuthService
   ) {}
 
   loadTable(): void {
@@ -85,7 +87,11 @@ export class ScheduledTaskLogicService implements OnDestroy {
   }
 
   navToSettings() {
-    this._location.go('#/root/admin/controller/scheduler');
+    if (this._authService.hasRight('admin-ui-menu') && this._authService.isAuthenticated()) {
+      this._location.go('#/root/admin/controller/scheduler');
+    } else {
+      this._location.go('#/root/settings/scheduler');
+    }
   }
 
   deletePrameter(scheduledTask: ExecutiontTaskParameters): void {
