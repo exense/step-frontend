@@ -15,7 +15,18 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { BehaviorSubject, combineLatest, map, Observable, of, startWith, Subject, takeUntil } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  map,
+  Observable,
+  of,
+  startWith,
+  Subject,
+  takeUntil,
+  tap,
+  timestamp,
+} from 'rxjs';
 import { TableDataSource } from '../../shared/table-data-source';
 import { MatColumnDef, MatTable } from '@angular/material/table';
 import { MatSort, Sort } from '@angular/material/sort';
@@ -123,7 +134,7 @@ export class TableComponent<T>
 
   private terminator$ = new Subject<void>();
   private dataSourceTerminator$?: Subject<void>;
-  private search$ = new BehaviorSubject<{ [column: string]: SearchValue }>(this._tableState.getSearch());
+  private search$ = new BehaviorSubject<Record<string, SearchValue>>(this._tableState.getSearch());
   private filter$ = new BehaviorSubject<string | undefined>(undefined);
   private tableParams$ = new BehaviorSubject<TableParameters | undefined>(undefined);
 
@@ -188,12 +199,29 @@ export class TableComponent<T>
       return;
     }
 
-    const page$ = this.setupPageStream();
     const sort$ = this.setupSortStream();
+    const page$ = this.setupPageStream();
 
-    combineLatest([page$, sort$, this.search$, this.filter$, this.tableParams$])
+    const pageAndSearch$ = combineLatest({
+      pageWithTimeStamp: page$.pipe(timestamp()),
+      searchWithTimeStamp: this.search$.pipe(timestamp()),
+    }).pipe(
+      map(({ pageWithTimeStamp, searchWithTimeStamp }) => {
+        const search = searchWithTimeStamp.value;
+        let page = pageWithTimeStamp.value;
+        // Change has been triggered, by search. In that case reset page to first one
+        const isRestToFirstPage = searchWithTimeStamp.timestamp > pageWithTimeStamp.timestamp;
+        if (isRestToFirstPage) {
+          page = this.createPageInitialValue();
+          this.page!.firstPage();
+        }
+        return { page, search };
+      })
+    );
+
+    combineLatest([pageAndSearch$, sort$, this.filter$, this.tableParams$])
       .pipe(takeUntil(this.dataSourceTerminator$))
-      .subscribe(([page, sort, search, filter, params]) => {
+      .subscribe(([{ page, search }, sort, filter, params]) => {
         this._tableState.saveState(search, page, sort);
         tableDataSource.getTableData({ page, sort, search, filter, params });
       });
@@ -239,14 +267,18 @@ export class TableComponent<T>
       initialPage = statePage;
     } else {
       this.page.firstPage();
-      initialPage = {
-        pageSize: this.page.pageSize || this.pageSizeOptions[0],
-        pageIndex: 0,
-        length: 0,
-      };
+      initialPage = this.createPageInitialValue();
     }
 
     return this.page.page.pipe(startWith(initialPage));
+  }
+
+  private createPageInitialValue(): PageEvent {
+    return {
+      pageSize: this.page.pageSize || this.pageSizeOptions[0],
+      pageIndex: 0,
+      length: 0,
+    };
   }
 
   private addCustomColumnsDefinitionsToRemoteDatasource(): void {

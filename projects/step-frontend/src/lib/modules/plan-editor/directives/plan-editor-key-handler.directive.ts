@@ -18,7 +18,8 @@ export class PlanEditorKeyHandlerDirective {
     private _planEditorService: PlanEditorService,
     @Optional() private _planInteractiveSession?: PlanInteractiveSessionService,
     @Optional() private _planArtefactResolver?: PlanArtefactResolverService
-  ) {}
+  ) {
+  }
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
