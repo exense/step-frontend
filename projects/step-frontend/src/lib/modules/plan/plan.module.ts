@@ -4,12 +4,11 @@ import { ExecutionModule } from '../execution/execution.module';
 import { StepCommonModule } from '../_common/step-common.module';
 import { PlanIconComponent } from './components/plan-icon/plan-icon.component';
 import { PlanListComponent } from './components/plan-list/plan-list.component';
-import { PlanEditorKeyHandlerDirective } from './directives/plan-editor-key-handler.directive';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
 import { PlanEditorComponent } from './components/plan-editor/plan-editor.component';
 
 @NgModule({
-  declarations: [PlanListComponent, PlanIconComponent, PlanEditorKeyHandlerDirective, PlanEditorComponent],
+  declarations: [PlanListComponent, PlanIconComponent, PlanEditorComponent],
   imports: [StepCommonModule, ExecutionModule, PlanEditorModule],
   exports: [PlanEditorModule, PlanListComponent, PlanEditorComponent],
 })

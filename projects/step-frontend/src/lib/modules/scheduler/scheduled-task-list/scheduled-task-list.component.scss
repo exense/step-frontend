@@ -14,7 +14,7 @@
   min-width: 50px;
   border: none;
 
-  &[disabled] {
+  &.scheduler-disabled {
     background-color: grey !important;
   }
 }
