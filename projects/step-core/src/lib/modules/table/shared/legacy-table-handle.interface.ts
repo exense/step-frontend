@@ -1,4 +1,4 @@
-import { TableRequestData } from '../../../client/table/models/table-request-data';
+import { TableRequestData } from '../../../client/table/shared/table-request-data';
 
 export interface LegacyTableHandle {
   getSelectedIds?(): ReadonlyArray<string>;
