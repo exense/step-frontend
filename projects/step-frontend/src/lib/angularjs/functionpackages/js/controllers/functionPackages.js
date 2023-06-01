@@ -54,7 +54,7 @@ angular
 
   .run(function (FunctionTypeRegistry, ViewRegistry) {
     ViewRegistry.registerView('functionPackages', 'functionpackages/partials/functionPackageList.html');
-    ViewRegistry.registerMenuEntry('Keyword packages', 'functionPackages', 'gift', {weight: 20, parentId: "automation-root"});
+    ViewRegistry.registerMenuEntry('Keyword packages', 'functionPackages', 'package', {weight: 20, parentId: "automation-root"});
   })
 
 
