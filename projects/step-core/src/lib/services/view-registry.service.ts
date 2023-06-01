@@ -46,7 +46,7 @@ export class ViewRegistryService {
   registerStandardMenuEntries() {
     // Main Menus
     this.registerMenuEntry('Design', 'automation-root', 'edit', { weight: 10 });
-    this.registerMenuEntry('Reporting', 'execute-root', 'file-attachment-03', { weight: 20 });
+    this.registerMenuEntry('Reporting', 'execute-root', 'file-check-03', { weight: 20 });
     this.registerMenuEntry('Status', 'status-root', 'check-square', { weight: 50 });
     this.registerMenuEntry('Support', 'support-root', 'life-buoy', { weight: 100 });
 
