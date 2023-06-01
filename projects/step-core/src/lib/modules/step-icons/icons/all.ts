@@ -1,4 +1,5 @@
 import { Activity } from './svg/activity';
+import { ActivityHeart } from './svg/activity-heart';
 import { AlertCircle } from './svg/alert-circle';
 import { AlertTriangle } from './svg/alert-triangle';
 import { AlignJustify } from './svg/align-justify';
@@ -23,6 +24,7 @@ import { ArrowUpCircle } from './svg/arrow-up-circle';
 import { Award } from './svg/award';
 import { AtSign } from './svg/at-sign';
 import { ArrowUpLeft } from './svg/arrow-up-left';
+import { Azure } from './svg/azure';
 import { BatteryCharging } from './svg/battery-charging';
 import { BarChart } from './svg/bar-chart';
 import { BarChart2 } from './svg/bar-chart-2';
@@ -109,6 +111,7 @@ import { Filter } from './svg/filter';
 import { FolderPlus } from './svg/folder-plus';
 import { FolderMinus } from './svg/folder-minus';
 import { File } from './svg/file';
+import { FileAttachment03 } from './svg/file-attachment-03';
 import { Folder } from './svg/folder';
 import { Flag } from './svg/flag';
 import { Gift } from './svg/gift';
@@ -195,6 +198,7 @@ import { Phone } from './svg/phone';
 import { Power } from './svg/power';
 import { PlusSquare } from './svg/plus-square';
 import { Pocket } from './svg/pocket';
+import { PuzzlePiece01 } from './svg/puzzle-piece-01';
 import { Radio } from './svg/radio';
 import { RefreshCcw } from './svg/refresh-ccw';
 import { Repeat } from './svg/repeat';
@@ -204,6 +208,7 @@ import { RotateCcw } from './svg/rotate-ccw';
 import { Scissors } from './svg/scissors';
 import { Rewind } from './svg/rewind';
 import { Rocket } from './svg/rocket';
+import { Announcement02 } from './svg/announcement-02';
 import { Rss } from './svg/rss';
 import { Printer } from './svg/printer';
 import { Settings } from './svg/settings';
@@ -289,6 +294,7 @@ import { ZoomOut } from './svg/zoom-out';
 
 export const allIcons = {
   Activity,
+  ActivityHeart,
   AlignJustify,
   AlertCircle,
   AlertTriangle,
@@ -313,6 +319,7 @@ export const allIcons = {
   Award,
   AtSign,
   ArrowUpLeft,
+  Azure,
   BatteryCharging,
   BarChart,
   BarChart2,
@@ -390,6 +397,7 @@ export const allIcons = {
   EyeOff,
   FileMinus,
   ExternalLink,
+  FileAttachment03,
   FilePlus,
   FileText,
   FastForward,
@@ -485,6 +493,7 @@ export const allIcons = {
   Power,
   PlusSquare,
   Pocket,
+  PuzzlePiece01,
   Radio,
   RefreshCcw,
   Repeat,
@@ -495,6 +504,7 @@ export const allIcons = {
   Rss,
   Rewind,
   Rocket,
+  Announcement02,
   Settings,
   Printer,
   Search,
