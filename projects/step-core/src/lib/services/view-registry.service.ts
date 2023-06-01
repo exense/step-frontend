@@ -46,7 +46,7 @@ export class ViewRegistryService {
   registerStandardMenuEntries() {
     // Main Menus
     this.registerMenuEntry('Design', 'automation-root', 'edit', { weight: 10 });
-    this.registerMenuEntry('Reporting', 'execute-root', 'announcement-02', { weight: 20 });
+    this.registerMenuEntry('Reporting', 'execute-root', 'file-attachment-03', { weight: 20 });
     this.registerMenuEntry('Status', 'status-root', 'check-square', { weight: 50 });
     this.registerMenuEntry('Support', 'support-root', 'life-buoy', { weight: 100 });
 
@@ -58,7 +58,7 @@ export class ViewRegistryService {
 
     // Sub Menus Execute
     this.registerMenuEntry('Executions', 'executions', 'rocket', { weight: 10, parentId: 'execute-root' });
-    this.registerMenuEntry('Analytics', 'analytics', 'bar-chart-2', { weight: 20, parentId: 'execute-root' });
+    this.registerMenuEntry('Analytics', 'analytics', 'bar-chart-square-01', { weight: 20, parentId: 'execute-root' });
     // Sub Menus Status
     this.registerMenuEntry('Current Operations', 'operations', 'airplay', { weight: 10, parentId: 'status-root' });
     this.registerMenuEntry('Agents', 'gridagents', 'users', { weight: 20, parentId: 'status-root' });
@@ -69,7 +69,7 @@ export class ViewRegistryService {
     this.registerMenuEntry(
       'Documentation',
       ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('https://step.exense.ch/knowledgebase/'),
-      'help-circle',
+      'book-open',
       {
         weight: 10,
         parentId: 'support-root',
@@ -82,7 +82,7 @@ export class ViewRegistryService {
     this.registerMenuEntry(
       'About',
       ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('https://step.exense.ch/'),
-      'book-open',
+      'help-circle',
       {
         weight: 30,
         parentId: 'support-root',

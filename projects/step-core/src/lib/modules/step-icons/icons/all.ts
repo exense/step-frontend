@@ -28,6 +28,7 @@ import { Azure } from './svg/azure';
 import { BatteryCharging } from './svg/battery-charging';
 import { BarChart } from './svg/bar-chart';
 import { BarChart2 } from './svg/bar-chart-2';
+import { BarChartSquare01 } from './svg/bar-chart-square-01';
 import { ArrowUp } from './svg/arrow-up';
 import { Bluetooth } from './svg/bluetooth';
 import { Bell } from './svg/bell';
@@ -112,6 +113,7 @@ import { FolderPlus } from './svg/folder-plus';
 import { FolderMinus } from './svg/folder-minus';
 import { File } from './svg/file';
 import { FileAttachment03 } from './svg/file-attachment-03';
+import { FileCheck03 } from './svg/file-check-03';
 import { Folder } from './svg/folder';
 import { Flag } from './svg/flag';
 import { Gift } from './svg/gift';
@@ -180,6 +182,7 @@ import { PauseCircle } from './svg/pause-circle';
 import { Package } from './svg/package';
 import { PenTool } from './svg/pen-tool';
 import { Paperclip } from './svg/paperclip';
+import { Passcode } from './svg/passcode';
 import { Pause } from './svg/pause';
 import { PhoneForwarded } from './svg/phone-forwarded';
 import { PhoneMissed } from './svg/phone-missed';
@@ -323,6 +326,7 @@ export const allIcons = {
   BatteryCharging,
   BarChart,
   BarChart2,
+  BarChartSquare01,
   Bluetooth,
   ArrowUp,
   Bell,
@@ -395,6 +399,7 @@ export const allIcons = {
   Edit3,
   Facebook,
   EyeOff,
+  FileCheck03,
   FileMinus,
   ExternalLink,
   FileAttachment03,
@@ -482,6 +487,7 @@ export const allIcons = {
   PhoneIncoming,
   PhoneOff,
   Move,
+  Passcode,
   Percent,
   PhoneOutgoing,
   PlusCircle,
