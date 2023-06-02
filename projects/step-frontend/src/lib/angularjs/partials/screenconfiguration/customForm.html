@@ -1,7 +1,7 @@
 <form ng-class="{'form-inline': stInline}">
 	<div ng-repeat="input in attributes" class="form-group form-group-sm">
 		<label ng-class="{'label-normal': stInline}">{{input.label}}</label>
-		<step-ajs-circle ng-if="input.description" name="help-circle" uib-tooltip="{{input.description}}" tooltip-append-to-body="true"></step-ajs-circle>
+		<step-ajs-icon ng-if="input.description" name="help-circle" uib-tooltip="{{input.description}}" tooltip-append-to-body="true"></step-ajs-icon>
 		<st-custom-form-input autofocus="$first" st-input="input" st-bean="stModel" ng-disabled="stDisabled" ng-on-change="saveAttributes()"></st-custom-form-input>
 	</div>
 </form>
