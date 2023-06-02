@@ -23,13 +23,14 @@ import { BulkOperationIconPipe } from './pipe/bulk-operation-icon.pipe';
 import { AsyncOperationsModule } from '../async-operations/async-operations.module';
 import { BulkOperationLabelPipe } from './pipe/bulk-operation-label.pipe';
 import { CustomSearchCellComponentsPipe } from './pipe/custom-search-cell-components.pipe';
-import { StepBasicsModule } from '../basics/step-basics.module';
+import { LOGOUT_CLEANUP, StepBasicsModule } from '../basics/step-basics.module';
 import { SearchColMetaDirective } from './directives/search-col-meta.directive';
 import { FilterConnectDirective } from './directives/filter-connect.directive';
 import { CustomSearchDropdownComponent } from './components/custom-search-dropdown/custom-search-dropdown.component';
 import { CustomSearchCheckboxComponent } from './components/custom-search-dropdown/custom-search-checkbox.component';
 import { Input as ColInput } from '../../client/generated';
 import { TableRemoteDataSourceFactoryImplService } from './services/table-remote-data-source-factory-impl.service';
+import { TableStorageService } from './services/table-storage.service';
 
 @NgModule({
   imports: [
@@ -76,6 +77,11 @@ import { TableRemoteDataSourceFactoryImplService } from './services/table-remote
     {
       provide: TableRemoteDataSourceFactoryService,
       useExisting: TableRemoteDataSourceFactoryImplService,
+    },
+    {
+      provide: LOGOUT_CLEANUP,
+      useExisting: TableStorageService,
+      multi: true,
     },
   ],
 })
