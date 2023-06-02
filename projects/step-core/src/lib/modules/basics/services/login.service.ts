@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { LoginStrategy } from '../shared/login-strategy';
-import { Observable, throwError } from 'rxjs';
+import { Observable, tap, throwError } from 'rxjs';
+import { LOGOUT_CLEANUP } from '../shared/logout-cleanup.token';
 
 const DEFAULT_LOGIN_STRATEGY: LoginStrategy = {
   login: (username: string, password: string) => throwError(() => new Error('not supported')),
@@ -11,6 +12,8 @@ const DEFAULT_LOGIN_STRATEGY: LoginStrategy = {
   providedIn: 'root',
 })
 export class LoginService implements LoginStrategy {
+  private logoutCleanup = inject(LOGOUT_CLEANUP, { optional: true }) ?? [];
+
   private strategy = DEFAULT_LOGIN_STRATEGY;
 
   useStrategy(strategy: LoginStrategy): void {
@@ -22,6 +25,10 @@ export class LoginService implements LoginStrategy {
   }
 
   logout(): Observable<any> {
-    return this.strategy.logout();
+    return this.strategy.logout().pipe(tap(() => this.invokeLogoutCleanup()));
+  }
+
+  private invokeLogoutCleanup(): void {
+    this.logoutCleanup.forEach((item) => item.logoutCleanup());
   }
 }
