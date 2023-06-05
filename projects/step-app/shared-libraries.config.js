@@ -42,6 +42,6 @@ module.exports = {
   '@angular/cdk/overlay': libraryConfig(),
   '@angular/cdk/portal': libraryConfig(),
   'angular-split': libraryConfig(),
-  '@exense/step-core': libraryConfig({ requiredVersion: '0.2.0' }),
+  '@exense/step-core': libraryConfig({ requiredVersion: '3.22.0' }),
   '@angular/material/form-field': libraryConfig(),
 };
