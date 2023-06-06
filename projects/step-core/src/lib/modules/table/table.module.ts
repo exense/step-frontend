@@ -99,6 +99,7 @@ export * from './components/table/table.component';
 export * from './components/custom-columns/custom-columns.component';
 export * from './components/custom-search-dropdown/custom-search-dropdown.component';
 export * from './components/custom-search-dropdown/custom-search-checkbox.component';
+export * from './components/custom-columns/custom-columns-base.component';
 export * from './directives/column.directive';
 export * from './shared/search-value';
 export * from './shared/table-remote-data-source';
