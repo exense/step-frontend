@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
@@ -8,6 +8,7 @@ import {
   tablePersistenceConfigProvider,
   TokenGroupCapacity,
 } from '@exense/step-core';
+import { map } from 'rxjs';
 import { FlatObjectStringFormatPipe } from '../../pipes/flat-object-format.pipe';
 
 @Component({
@@ -17,6 +18,8 @@ import { FlatObjectStringFormatPipe } from '../../pipes/flat-object-format.pipe'
   providers: [tablePersistenceConfigProvider('tokenGroupList', STORE_ALL)],
 })
 export class TokenGroupListComponent {
+  private _gridService = inject(GridService);
+
   readonly searchableTokenGroupRequest = new TableFetchLocalDataSource(
     () => this._gridService.getUsageByIdentity(this.getCheckedKeyList()),
     TableFetchLocalDataSource.configBuilder<TokenGroupCapacity>()
@@ -24,17 +27,10 @@ export class TokenGroupListComponent {
       .build()
   );
 
-  readonly checkedMap: { [key: string]: boolean } = {
-    url: true,
-    tech: false,
-    $agentid: false,
-    $agenttype: false,
-    $tokenid: false,
-    type: false,
-  };
-  readonly checkedMapKeys = Object.keys(this.checkedMap);
-
-  constructor(private _gridService: GridService) {}
+  readonly checkedMap: Record<string, boolean | undefined> = { url: true };
+  readonly checkedMapKeys$ = this._gridService
+    .getTokenAttributeKeys()
+    .pipe(map((attributeKeys) => Object.keys(this.checkedMap).concat(attributeKeys)));
 
   toggleCheckBox(key: string): void {
     this.checkedMap[key] = !this.checkedMap[key];

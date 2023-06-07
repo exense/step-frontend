@@ -16,8 +16,7 @@ import {
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { SearchValue } from './search-value';
-import { TableRequestData } from '../../../client/table/models/table-request-data';
-import { TableParameters } from '../../../client/generated';
+import { TableRequestData, TableParameters } from '../../../client/step-client-module';
 import { FilterCondition } from './filter-condition';
 import { Mutable } from '../../../shared';
 import { TableLocalDataSourceConfig } from './table-local-data-source-config';

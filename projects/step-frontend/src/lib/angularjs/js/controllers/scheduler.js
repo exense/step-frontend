@@ -130,26 +130,4 @@ angular
     };
 
     return factory;
-  })
-
-  .controller('SchedulerConfigurationCtrl', function ($scope, $http, AuthService) {
-    $scope.authService = AuthService;
-    $scope.model = {};
-
-    $http.get('rest/settings/scheduler_enabled').then(function (response) {
-      $scope.model.schedulerEnabledToggle = response.data ? response.data == 'true' : false;
-    });
-
-    $http.get('rest/settings/scheduler_execution_username').then(function (response) {
-      $scope.executionUser = response.data ? response.data : '';
-    });
-
-    $scope.toggleSchedulerEnabled = function () {
-      $scope.model.schedulerEnabledToggle = !$scope.model.schedulerEnabledToggle;
-      $http.put('rest/scheduler/task/schedule?enabled=' + $scope.model.schedulerEnabledToggle.toString());
-    };
-
-    $scope.save = function () {
-      $http.post('rest/settings/scheduler_execution_username', $scope.executionUser);
-    };
   });
