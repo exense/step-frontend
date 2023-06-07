@@ -17,7 +17,7 @@ import { FunctionPackageActionsService } from '../../services/function-package-a
 export class FunctionPackageListComponent {
   private _augApi = inject(AugmentedKeywordPackagesService);
   private _actions = inject(FunctionPackageActionsService);
-  readonly dataSource = this._augApi.dataSource;
+  readonly dataSource = this._augApi.createDataSource();
 
   isRefreshing: boolean = false;
 

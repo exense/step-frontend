@@ -21,65 +21,7 @@ angular
 
   .run(function (ViewRegistry, EntityRegistry) {
     ViewRegistry.registerView('resources', 'partials/resources/resourceList.html');
-    ViewRegistry.registerMenuEntry('Resources', 'resources', 'book',  {weight: 50, parentId: "automation-root"});
-  })
-  .factory('ResourceDialogs', function ($uibModal, $http, Dialogs) {
-    function openModal(id) {
-      var modalInstance = $uibModal.open({
-        backdrop: 'static',
-        templateUrl: 'partials/resources/editResourceDialog.html',
-        controller: 'editResourceCtrl',
-        resolve: {
-          id: function () {
-            return id;
-          },
-        },
-      });
-
-      return modalInstance.result;
-    }
-
-    var dialogs = {};
-
-    dialogs.editResource = function (id, callback) {
-      openModal(id).then(function () {
-        if (callback) {
-          callback();
-        }
-      });
-    };
-
-    dialogs.showFileAlreadyExistsWarning = function (similarResources) {
-      var modalInstance = $uibModal.open({
-        backdrop: 'static',
-        templateUrl: 'partials/resources/fileAlreadyExistsWarning.html',
-        controller: 'fileAlreadyExistsWarningCtrl',
-        resolve: {
-          similarResources: function () {
-            return similarResources;
-          },
-        },
-      });
-
-      return modalInstance.result;
-    };
-
-    dialogs.showUpdateResourceWarning = function (resource) {
-      var modalInstance = $uibModal.open({
-        backdrop: 'static',
-        templateUrl: 'partials/resources/updateResourceWarning.html',
-        controller: 'updateResourceWarningCtrl',
-        resolve: {
-          resource: function () {
-            return resource;
-          },
-        },
-      });
-
-      return modalInstance.result;
-    };
-
-    return dialogs;
+    ViewRegistry.registerMenuEntry('Resources', 'resources', 'file-attachment-03',  {weight: 50, parentId: "automation-root"});
   })
 
   .controller('editResourceCtrl', function ($scope, $uibModalInstance, $http, AuthService, Upload, id) {
@@ -149,24 +91,6 @@ angular
     };
   })
 
-  .controller(
-    'fileAlreadyExistsWarningCtrl',
-    function ($scope, $uibModalInstance, $http, AuthService, similarResources) {
-      $scope.similarResources = similarResources;
-
-      $scope.selectResource = function (id) {
-        $uibModalInstance.close(id);
-      };
-
-      $scope.createNewResource = function () {
-        $uibModalInstance.close(null);
-      };
-
-      $scope.cancel = function () {
-        $uibModalInstance.dismiss('cancel');
-      };
-    }
-  )
 
   .controller('updateResourceWarningCtrl', function ($scope, $uibModalInstance, $http, AuthService, resource) {
     $scope.resource = resource;

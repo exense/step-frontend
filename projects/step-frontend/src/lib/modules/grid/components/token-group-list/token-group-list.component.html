@@ -1,7 +1,7 @@
 <section class="header">
   <div class="token-group-checkboxes">
     <span class="token-group-checkboxes-groupby">Group by:</span>
-    <span class="token-group-checkboxes-checkbox" *ngFor="let key of checkedMapKeys"
+    <span class="token-group-checkboxes-checkbox" *ngFor="let key of checkedMapKeys$ | async"
       ><input type="checkbox" [checked]="checkedMap[key]" (click)="toggleCheckBox(key)" />{{ key }}</span
     >
   </div>

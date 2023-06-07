@@ -1,13 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnInit, Output, ViewChild } from '@angular/core';
 import {
   Execution,
   Mutable,
-  ReportNode,
-  TableRemoteDataSource,
-  TableApiWrapperService,
   TableSearch,
   FilterConditionFactoryService,
   AugmentedScreenService,
+  AugmentedControllerService,
 } from '@exense/step-core';
 import { map, Observable, of } from 'rxjs';
 import { KeywordParameters } from '../../shared/keyword-parameters';
@@ -41,19 +39,13 @@ export class KeywordCallsComponent implements OnInit {
     'duration',
     'agentUrl',
   ];
-  readonly leafReportsDataSource = new TableRemoteDataSource<ReportNode>('leafReports', this._tableRest, {
-    executionTime: 'executionTime',
-    step: 'step',
-    status: 'status',
-  });
+
+  private _filterConditionFactory = inject(FilterConditionFactoryService);
+  private _screenApiService = inject(AugmentedScreenService);
+  readonly _leafReportsDataSource = inject(AugmentedControllerService).createDataSource();
+
   readonly rowDetailsVisibilityFlags: { [id: string]: boolean } = {};
   private functionColumnsIds: string[] = [];
-
-  constructor(
-    private _tableRest: TableApiWrapperService,
-    private _filterConditionFactory: FilterConditionFactoryService,
-    private _screenApiService: AugmentedScreenService
-  ) {}
 
   ngOnInit(): void {
     this._screenApiService

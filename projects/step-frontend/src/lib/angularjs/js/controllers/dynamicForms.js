@@ -168,7 +168,7 @@ dynamicForms
         if ($scope.dynamicValue.value === null) {
           $scope.dynamicValue.value = '{}';
         }
-        
+
         initDynamicFormsCtrl($scope);
         $scope.save = function (json) {
           $scope.dynamicValue.value = json;
@@ -198,7 +198,7 @@ dynamicForms
         tooltip: '=',
         onSave: '&',
       },
-      controller: function ($scope, $http, Upload, Dialogs, ResourceDialogs) {
+      controller: function ($scope) {
         initDynamicFormsCtrl($scope);
       },
       templateUrl: 'partials/dynamicforms/dynamicResourceInput.html',

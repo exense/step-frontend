@@ -117,3 +117,4 @@ export * from './shared/array-item-label-value-extractor';
 export * from './shared/storage-proxy';
 export * from './shared/storage.token';
 export * from './services/persistence.service';
+export * from './shared/logout-cleanup.token';

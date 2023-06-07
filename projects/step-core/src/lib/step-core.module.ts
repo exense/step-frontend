@@ -67,6 +67,12 @@ import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
+import { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
+import { PlanNameComponent } from './components/plan-name/plan-name.component';
+import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
+import { InputModelFormatterDirective } from './directives/input-model-formatter.directive';
+import { ThreadDistributionWizardDialogComponent } from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
+import { FileAlreadyExistingDialogComponent } from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 
 @NgModule({
   declarations: [
@@ -120,6 +126,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
     UpdateResourceWarningDialogComponent,
+    FileAlreadyExistingDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -200,6 +207,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
     UpdateResourceWarningDialogComponent,
+    FileAlreadyExistingDialogComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -263,6 +271,7 @@ export { SplitComponent } from './components/split/split.component';
 export * from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 export { UpdateResourceWarningDialogComponent } from './components/update-resource-warning-dialog/update-resource-warning-dialog.component';
 export { UploadContainerComponent } from './components/upload-container/upload-container.component';
+export * from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';

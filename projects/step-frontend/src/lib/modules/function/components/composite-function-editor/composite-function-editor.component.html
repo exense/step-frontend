@@ -1,1 +1,4 @@
+<div *ngIf="composite?.customFields?.['functionPackageId']" class="alert alert-warning ng-scope" role="alert">
+  This composite belongs to a keyword package, all changes to it may be overridden by the package.
+</div>
 <step-plan-editor-base stepPlanEditorKeyHandler [id]="id" [showExecuteButton]="false"> </step-plan-editor-base>

@@ -272,7 +272,7 @@ export class PlanEditorBaseComponent
 
     this._interactiveSession.execute(this.id!, artefactIds).subscribe(() => {
       if (this.keywords) {
-        this.keywords.leafReportsDataSource.reload();
+        this.keywords._leafReportsDataSource.reload();
       }
     });
   }
