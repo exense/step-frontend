@@ -59,7 +59,7 @@ export class FilterUtils {
               const equalityMatch = `${finalAttributeName} = ${value}`;
               return item.exactMatch ? equalityMatch : regexMatch; // we need exact match for indexes efficiency
             })
-            .join(' OR ');
+            .join(' or ');
           break;
         case FilterBarItemType.NUMERIC:
         case FilterBarItemType.DATE:

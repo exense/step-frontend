@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { AsyncTaskStatus } from '../../../client/augmented/shared/async-task-status';
+import { AsyncTaskStatus } from '../../../client/step-client-module';
 import { SafeHtml } from '@angular/platform-browser';
 
 export interface AsyncOperationDialogOptions {

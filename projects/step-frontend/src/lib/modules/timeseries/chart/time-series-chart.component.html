@@ -1,4 +1,4 @@
-<div class="chart-wrapper" [style.padding]="WRAPPER_PADDING" (stepElementResize)="redraw()">
+<div class="chart-wrapper" (stepElementResize)="redraw()">
   <div #chart></div>
   <div class="no-data-tag" *ngIf="chartIsEmpty">No data...</div>
   <div class="no-data-tag" *ngIf="chartIsUnavailable">Chart is unavailable for current settings</div>

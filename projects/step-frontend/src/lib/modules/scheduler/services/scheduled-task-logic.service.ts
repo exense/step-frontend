@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import {
   AugmentedSchedulerService,
+  AuthService,
   DashboardService,
   ExecutiontTaskParameters,
   ScheduledTaskDialogsService,
@@ -67,7 +68,11 @@ export class ScheduledTaskLogicService {
   }
 
   navToSettings() {
-    this._location.go('#/root/admin/controller/scheduler');
+    if (this._authService.hasRight('admin-ui-menu') && this._authService.isAuthenticated()) {
+      this._location.go('#/root/admin/controller/scheduler');
+    } else {
+      this._location.go('#/root/settings/scheduler');
+    }
   }
 
   deleteParameter(scheduledTask: ExecutiontTaskParameters): void {

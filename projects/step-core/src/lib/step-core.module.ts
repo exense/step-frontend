@@ -68,6 +68,7 @@ import { InputModelFormatterDirective } from './directives/input-model-formatter
 import { ThreadDistributionWizardDialogComponent } from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 import { NewSchedulerTaskDialogComponent } from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 import { EditSchedulerTaskDialogComponent } from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
+import { FileAlreadyExistingDialogComponent } from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 
 @NgModule({
   declarations: [
@@ -122,6 +123,7 @@ import { EditSchedulerTaskDialogComponent } from './components/edit-scheduler-ta
     ThreadDistributionWizardDialogComponent,
     NewSchedulerTaskDialogComponent,
     EditSchedulerTaskDialogComponent,
+    FileAlreadyExistingDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -203,6 +205,7 @@ import { EditSchedulerTaskDialogComponent } from './components/edit-scheduler-ta
     ThreadDistributionWizardDialogComponent,
     NewSchedulerTaskDialogComponent,
     EditSchedulerTaskDialogComponent,
+    FileAlreadyExistingDialogComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -267,6 +270,7 @@ export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-
 export * from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
+export * from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';

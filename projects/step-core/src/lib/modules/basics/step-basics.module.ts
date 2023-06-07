@@ -123,3 +123,4 @@ export * from './shared/storage-proxy';
 export * from './shared/storage.token';
 export * from './shared/json-validator';
 export * from './services/persistence.service';
+export * from './shared/logout-cleanup.token';

@@ -20,9 +20,9 @@ export class ThreadGroupChartGenerator {
     if (!colorsPool) {
       throw 'Colors pool is mandatory';
     }
-    let timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-    let totalData: number[] = response.matrix[0] ? Array(response.matrix[0].length) : [];
-    let dynamicSeries = response.matrixKeys.map((key, i) => {
+    const timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
+    const totalData: number[] = response.matrix[0] ? Array(response.matrix[0].length) : [];
+    const dynamicSeries = response.matrixKeys.map((key, i) => {
       const seriesKey: string = key[this.DIMENSION_KEY]; // get just the name
       let filledData = response.matrix[i].map((b, j) => {
         let bucketValue = b?.max;

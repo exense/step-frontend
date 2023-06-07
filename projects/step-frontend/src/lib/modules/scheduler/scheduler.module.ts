@@ -6,6 +6,8 @@ import { SchedulerTaskLinkComponent } from './components/scheduler-task-link/sch
 import './components/scheduler-task-selection/scheduler-task-selection.component';
 import { SchedulerTaskSelectionComponent } from './components/scheduler-task-selection/scheduler-task-selection.component';
 import { ScheduledTaskListComponent } from './components/scheduled-task-list/scheduled-task-list.component';
+import { SchedulerConfigurationComponent } from './components/scheduler-configuration/scheduler-configuration.component';
+import './components/scheduler-configuration/scheduler-configuration.component';
 
 @NgModule({
   imports: [StepCoreModule, StepCommonModule],
@@ -14,8 +16,9 @@ import { ScheduledTaskListComponent } from './components/scheduled-task-list/sch
     SchedulerIconComponent,
     SchedulerTaskLinkComponent,
     SchedulerTaskSelectionComponent,
+    SchedulerConfigurationComponent,
   ],
-  exports: [ScheduledTaskListComponent, SchedulerTaskSelectionComponent],
+  exports: [ScheduledTaskListComponent, SchedulerTaskSelectionComponent, SchedulerConfigurationComponent],
 })
 export class SchedulerModule {
   constructor(_entityRegistry: EntityRegistry, _cellRegistry: CustomCellRegistryService) {

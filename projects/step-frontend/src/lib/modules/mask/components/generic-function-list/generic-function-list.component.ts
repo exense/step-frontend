@@ -13,9 +13,9 @@ import {
   Function as KeywordFunction,
   InteractivePlanExecutionService,
   selectionCollectionProvider,
+  StepDataSource,
   STORE_ALL,
   tablePersistenceConfigProvider,
-  TableRemoteDataSource,
 } from '@exense/step-core';
 import { ILocationService, IRootScopeService } from 'angular';
 import { GenericFunctionBulkOperationsInvokeService } from '../services/generic-function-bulk-operations-invoke.service';
@@ -39,7 +39,7 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
   @Input() title?: string;
   @Input() serviceroot?: string;
 
-  protected dataSource?: TableRemoteDataSource<KeywordFunction>;
+  protected dataSource?: StepDataSource<KeywordFunction>;
 
   readonly availableBulkOperations = [
     { operation: BulkOperationType.delete, permission: 'mask-delete' },
