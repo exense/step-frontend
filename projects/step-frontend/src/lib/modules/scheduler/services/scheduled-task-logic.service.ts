@@ -15,6 +15,7 @@ export class ScheduledTaskLogicService {
   private _dashboardService = inject(DashboardService);
   private _schedulerService = inject(AugmentedSchedulerService);
   private _scheduledTaskDialogs = inject(ScheduledTaskDialogsService);
+  private _authService = inject(AuthService);
   readonly _location = inject(Location);
 
   readonly STATUS_ACTIVE_STRING = 'On';
