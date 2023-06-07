@@ -21,7 +21,7 @@ angular
 
   .run(function (ViewRegistry, EntityRegistry) {
     ViewRegistry.registerView('resources', 'partials/resources/resourceList.html');
-    ViewRegistry.registerMenuEntry('Resources', 'resources', 'book',  {weight: 50, parentId: "automation-root"});
+    ViewRegistry.registerMenuEntry('Resources', 'resources', 'file-attachment-03',  {weight: 50, parentId: "automation-root"});
   })
   .factory('ResourceDialogs', function ($uibModal, $http, Dialogs) {
     function openModal(id) {
