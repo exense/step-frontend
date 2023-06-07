@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import {
   AugmentedSchedulerService,
+  AuthService,
   DashboardService,
   ExecutiontTaskParameters,
   TableFetchLocalDataSource,
@@ -25,12 +26,11 @@ export class ScheduledTaskLogicService {
       .build()
   );
 
-  constructor(
-    private _dashboardService: DashboardService,
-    private _schedulerService: AugmentedSchedulerService,
-    private _scheduledTaskDialogs: ScheduledTaskDialogsService,
-    public _location: Location
-  ) {}
+  private _authService = inject(AuthService);
+  private _dashboardService = inject(DashboardService);
+  private _schedulerService = inject(AugmentedSchedulerService);
+  private _scheduledTaskDialogs = inject(ScheduledTaskDialogsService);
+  private _location = inject(Location);
 
   loadTable(): void {
     this.searchableScheduledTask.reload();
@@ -69,7 +69,11 @@ export class ScheduledTaskLogicService {
   }
 
   navToSettings() {
-    this._location.go('#/root/admin/controller/scheduler');
+    if (this._authService.hasRight('admin-ui-menu') && this._authService.isAuthenticated()) {
+      this._location.go('#/root/admin/controller/scheduler');
+    } else {
+      this._location.go('#/root/settings/scheduler');
+    }
   }
 
   deletePrameter(scheduledTask: ExecutiontTaskParameters): void {

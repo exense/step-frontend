@@ -16,14 +16,16 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   constructor(private _snackBar: MatSnackBar) {}
 
   private handleHttpError(error: HttpErrorResponse): Observable<any> {
-    console.error('network error', error);
+    console.error('Network Error', error);
     if (error.status !== 401) {
-      if (error.error) {
-        this.showError(error.error);
+      if (error.error?.errorMessage) {
+        this.handleError(error.error);
       } else if (error.name && error.message) {
-        this.showError(error.name + ': ' + error.message);
+        this.handleError(`${error.name}: ${error.message}`);
+      } else if (error.error) {
+        this.handleError(error.error);
       } else {
-        this.showError('Unknown HTTP error');
+        this.handleError('Unknown HTTP error');
       }
     }
     return throwError(() => error);
@@ -31,21 +33,31 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
   private handleAsyncError(response: HttpEvent<any>): HttpEvent<any> {
     if (response instanceof HttpResponse && response.body?.error) {
-      console.error(`Non HTTP Error: ${response.body.error}`);
-      this.showError(response.body?.error);
+      console.error('Non HTTP Error', response.body?.error);
+      this.handleError(response.body?.error);
     }
     return response;
   }
 
-  private showError(error: any) {
+  private handleError(error: any) {
     if (error?.errorName && error?.errorMessage) {
-      this._snackBar.open(error.errorName + ': ' + error.errorMessage, 'dismiss');
+      this.showError(`${error.errorName}: ${error.errorMessage}`);
     } else if (error?.errorName || error?.errorMessage) {
-      this._snackBar.open(error.errorName || error.errorMessage, 'dismiss');
+      this.showError(error.errorName || error.errorMessage);
     } else if (error?.error && error?.text) {
-      this._snackBar.open(error.error + ': ' + error.text, 'dismiss');
+      this.showError(`${error.error}: ${error.text}`);
+    } else if (error?.error || error?.text) {
+      this.showError(error.error || error.text);
     } else {
+      this.showError(error);
+    }
+  }
+
+  private showError(error: any) {
+    if (typeof error === 'string') {
       this._snackBar.open(error, 'dismiss');
+    } else {
+      console.error('Silent Error', error);
     }
   }
 

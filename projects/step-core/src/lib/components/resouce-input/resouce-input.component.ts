@@ -12,9 +12,8 @@ import {
 } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE } from '../../shared';
-import { AugmentedResourcesService } from '../../client/augmented/services/augmented-resources-service';
+import { AugmentedResourcesService, ResourceUploadResponse } from '../../client/step-client-module';
 import { ResourceInputBridgeService } from '../../services/resource-input-bridge.service';
-import { ResourceUploadResponse } from '../../client/generated';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ResourceDialogsService } from '../../services/resource-dialogs.service';
 
@@ -215,9 +214,6 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private setStModel(stModel: string = '') {
-    if (this.stModel === stModel) {
-      return;
-    }
     this.stModel = stModel;
     this.stModelChange.emit(stModel);
   }

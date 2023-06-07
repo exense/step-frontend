@@ -1,4 +1,4 @@
-<step-table #tableRef [dataSource]="dataSource" matSort matSortActive="attributes.name" [matSortDisableClear]="true">
+<step-table #tableRef [dataSource]="_dataSource" matSort matSortActive="attributes.name" [matSortDisableClear]="true">
   <ng-container *stepAdditionalHeader>
     <step-bulk-operations *ngIf="multipleSelection"></step-bulk-operations>
   </ng-container>

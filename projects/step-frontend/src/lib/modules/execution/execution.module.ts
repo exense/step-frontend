@@ -88,6 +88,7 @@ export class ExecutionModule {
     _viewRegistry: ViewRegistryService
   ) {
     _entityRegistry.register('executions', 'Execution', {
+      icon: 'rocket',
       component: ExecutionSelectionTableComponent,
     });
     _dashletRegistry.registerDashlet('executionStep', DashletExecutionStepComponent);
