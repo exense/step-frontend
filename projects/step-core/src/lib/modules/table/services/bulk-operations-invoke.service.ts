@@ -1,8 +1,12 @@
 import { Observable, of, switchMap } from 'rxjs';
 import { BulkOperationType } from '../shared/bulk-operation-type.enum';
-import { TableRequestData } from '../../../client/table/models/table-request-data';
+import {
+  TableRequestData,
+  TableBulkOperationRequest,
+  TableParameters,
+  AsyncTaskStatus,
+} from '../../../client/step-client-module';
 import { BulkSelectionType } from '../../entities-selection/shared/bulk-selection-type.enum';
-import { TableBulkOperationRequest, TableParameters } from '../../../client/generated';
 import { TableFilter } from './table-filter';
 import {
   AsyncOperationCloseStatus,
@@ -10,7 +14,6 @@ import {
   AsyncOperationDialogResult,
   AsyncOperationService,
 } from '../../async-operations/async-operations.module';
-import { AsyncTaskStatus } from '../../../client/augmented/shared/async-task-status';
 import { inject } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TitleCasePipe } from '@angular/common';

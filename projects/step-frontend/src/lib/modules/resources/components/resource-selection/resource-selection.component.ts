@@ -1,14 +1,13 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
+  AugmentedResourcesService,
   AutoDeselectStrategy,
   FunctionPackage,
   Resource,
   selectionCollectionProvider,
   SelectionCollector,
-  TableApiWrapperService,
-  TableRemoteDataSource,
 } from '@exense/step-core';
 
 interface TableHandle {
@@ -24,16 +23,8 @@ interface TableHandle {
 export class ResourceSelectionComponent implements OnInit {
   @Input() tableHandle!: TableHandle;
 
-  readonly dataSource = new TableRemoteDataSource<Resource>('resources', this._tableApiWrapperService, {
-    id: 'id',
-    resourceName: 'resourceName',
-    resourceType: 'resourceType',
-  });
-
-  constructor(
-    private _tableApiWrapperService: TableApiWrapperService,
-    private _selectionCollector: SelectionCollector<string, FunctionPackage>
-  ) {}
+  private _selectionCollector = inject<SelectionCollector<string, FunctionPackage>>(SelectionCollector);
+  readonly _dataSource = inject(AugmentedResourcesService).createSelectionDataSource();
 
   ngOnInit() {
     this.initTableHandle();

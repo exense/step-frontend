@@ -21,7 +21,7 @@ export class ResourcesListComponent {
   private _resourcesService = inject(AugmentedResourcesService);
   private _document = inject(DOCUMENT);
 
-  readonly dataSource = this._resourcesService.createDatasource();
+  readonly dataSource = this._resourcesService.createDataSource();
 
   editResource(resource: Resource): void {
     this._resourceDialogs.editResource(resource).subscribe((_) => this.dataSource.reload());

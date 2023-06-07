@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GridService, Plan } from '../../generated';
+import { GridService } from '../../generated';
 import type { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })

@@ -587,7 +587,6 @@ resource-input .input-group {
   position: absolute;
   top: 0;
   left: 0;
-  margin-top: -2px;
   display: block;
   height: 16px;
   width: 16px;
