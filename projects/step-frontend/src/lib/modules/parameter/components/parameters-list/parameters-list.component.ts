@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
@@ -9,7 +9,6 @@ import {
   FilterConditionFactoryService,
   Parameter,
   selectionCollectionProvider,
-  TableSearch,
   RestoreDialogsService,
   tablePersistenceConfigProvider,
   STORE_ALL,
@@ -36,7 +35,7 @@ export class ParametersListComponent {
   private _restoreDialogsService = inject(RestoreDialogsService);
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
 
-  readonly dataSource = this._parametersService.dataSource;
+  readonly dataSource = this._parametersService.createDataSource();
   readonly availableBulkOperations = [
     { operation: BulkOperationType.delete, permission: 'param-delete' },
     { operation: BulkOperationType.duplicate, permission: 'param-write' },

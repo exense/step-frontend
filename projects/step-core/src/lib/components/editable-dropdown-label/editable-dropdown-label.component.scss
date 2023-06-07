@@ -2,6 +2,9 @@
 
 :host {
   position: relative;
+  &.disabled .editable-dropdown-label {
+    background: var.$gray-50;
+  }
 }
 
 .editable-dropdown-label {

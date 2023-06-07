@@ -16,4 +16,8 @@ step-editable-label {
       background: var.$gray-50;
     }
   }
+
+  &.disabled .editable-label {
+    background: var.$gray-50;
+  }
 }

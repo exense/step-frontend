@@ -26,9 +26,9 @@
     "format:check": "prettier --config ./.prettierrc \"projects/{step-core/src/lib,step-frontend/src/lib,step-app/src}/!(angularjs)/**/*{.ts,.html,.scss}\"",
     "prepare": "husky install",
     "push": "npm publish projects/step-core/ && npm publish dist/step-frontend/*.tgz",
-    "openapi:generate:nhy": "./generate-openapi-client.sh https://stepos-nhy.stepcloud-test.ch/rest/private-openapi.json",
-    "openapi:generate:master": "./generate-openapi-client.sh https://stepos-master.stepcloud-test.ch/rest/private-openapi.json",
-    "icons:generate": "node generate-icons.js"
+    "icons:generate": "node generate-icons.js",
+    "openapi:generate:nhy": "node generate-openapi-client.js https://stepos-nhy.stepcloud-test.ch/rest/private-openapi.json",
+    "openapi:generate:master": "node generate-openapi-client.js https://stepos-master.stepcloud-test.ch/rest/private-openapi.json"
   },
   "private": false,
   "dependencies": {
@@ -82,6 +82,7 @@
     "openapi-typescript-codegen": "^0.23.0",
     "prettier": "2.5.1",
     "pretty-quick": "3.1.2",
-    "typescript": "4.8.4"
+    "typescript": "4.8.4",
+    "shelljs": "0.8.5"
   }
 }

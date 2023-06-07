@@ -53,3 +53,13 @@
   flex-direction: column;
   gap: 1.5rem;
 }
+
+@mixin mat-card-header-container($font-size: 1.5rem) {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  mat-card-title {
+    font-size: $font-size;
+    margin-bottom: 0;
+  }
+}

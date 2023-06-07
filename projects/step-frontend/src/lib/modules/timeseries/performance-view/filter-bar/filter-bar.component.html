@@ -1,8 +1,7 @@
+<step-alert type="warning" class="warning" *ngIf="rawMeasurementsModeActive">
+  You are using custom filters which may slow down the dashboard.
+</step-alert>
 <div class="filters">
-  <div class="warning-mark" *ngIf="rawMeasurementsModeActive">
-    You are using custom filters which may slow down the dashboard. Please be patient.
-  </div>
-
   <mat-menu #menu="matMenu">
     <button mat-menu-item *ngFor="let option of defaultFilterOptions" (click)="addFilterItem(option)">
       <span>{{ option.label }}</span>
@@ -24,7 +23,6 @@
   </mat-menu>
 
   <div class="applied-filters" [style]="oqlModeActive ? 'overflow: unset' : ''">
-    <step-timeseries-grouping (onGroupingChange)="handleGroupingChange($event)"></step-timeseries-grouping>
     <ng-container *ngIf="!oqlModeActive">
       <ng-container *ngFor="let item of filterItems; let i = index">
         <step-ts-filter-bar-item
@@ -56,7 +54,7 @@
         <step-icon
           class="info-btn"
           name="help-circle"
-          matTooltip="This is something very very advanced. Please be careful!"
+          matTooltip="Advanced Filtering with Object Query Language (OQL) lets you define custom, complex filters beyond the predefined options. Using OQL, you can query specific attributes, compare values, or combine conditions to refine your data. Consult our documentation for OQL syntax and usage guidance."
         ></step-icon>
         <span *ngIf="invalidOql" class="error-info">Invalid OQL</span>
       </div>
@@ -73,10 +71,16 @@
     </button>
   </div>
 
-  <mat-button-toggle-group [(ngModel)]="oqlModeActive" (change)="toggleOQLMode()">
-    <mat-button-toggle [value]="false"> Basic</mat-button-toggle>
-    <mat-button-toggle [value]="true"> OQL</mat-button-toggle>
-  </mat-button-toggle-group>
+  <div class="settings-section">
+    <mat-button-toggle-group [(ngModel)]="oqlModeActive" (change)="toggleOQLMode()">
+      <mat-button-toggle [value]="false"> Basic</mat-button-toggle>
+      <mat-button-toggle [value]="true"> OQL</mat-button-toggle>
+    </mat-button-toggle-group>
+    <div class="separator"></div>
+    <div class="grouping-container">
+      <step-timeseries-grouping (onGroupingChange)="handleGroupingChange($event)"></step-timeseries-grouping>
+    </div>
+  </div>
 </div>
 
 <step-execution-time-selection [settings]="performanceViewSettings"></step-execution-time-selection>

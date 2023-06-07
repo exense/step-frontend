@@ -26,8 +26,7 @@ import uPlot = require('uplot');
   styleUrls: ['./time-series-chart.component.scss'],
 })
 export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChanges {
-  private readonly HEADER_WITH_FOOTER_SIZE = 80;
-  readonly WRAPPER_PADDING = '12px';
+  private readonly HEADER_WITH_FOOTER_SIZE = 48;
 
   @ViewChild('chart') private chartElement!: ElementRef;
 
@@ -50,7 +49,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   getSize = () => {
     return {
-      width: this.element.nativeElement.parentElement.offsetWidth - 24,
+      width: this.element.nativeElement.parentElement.offsetWidth - 32,
       height: this.element.nativeElement.parentElement.offsetHeight - this.HEADER_WITH_FOOTER_SIZE,
     };
   };
@@ -122,6 +121,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       if (series.stroke) {
         // aggregate series don't have stroke (e.g total)
         this.legendSettings.items.push({
+          seriesId: series.id,
           color: (series.stroke as string) || '#cccccc',
           label: series.legendName,
           isVisible: true,
@@ -355,6 +355,7 @@ interface LegendSettings {
 }
 
 interface LegendItem {
+  seriesId: string;
   label: string;
   color: string;
   isVisible: boolean;
