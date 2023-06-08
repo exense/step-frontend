@@ -1,5 +1,5 @@
 import { IDirective, IScope } from 'angular';
-import { ArtefactContext } from '../../shared';
+import { ArtefactContext } from '../../shared/artefact-context';
 import { AbstractArtefact } from '../../client/generated';
 
 export const ARTEFACT_DETAILS_EDITOR_WRAPPER = 'stepArtefactDetailsEditorWrapper';
