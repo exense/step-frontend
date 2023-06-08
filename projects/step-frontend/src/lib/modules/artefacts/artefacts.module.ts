@@ -2,11 +2,12 @@ import { NgModule } from '@angular/core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { ArtefactService } from '@exense/step-core';
 import { EchoComponent } from './component/echo/echo.component';
+import { ThreadGroupComponent } from './component/thread-group/thread-group.component';
 
 @NgModule({
-  declarations: [EchoComponent],
+  declarations: [EchoComponent, ThreadGroupComponent],
   imports: [StepCommonModule],
-  exports: [EchoComponent],
+  exports: [EchoComponent, ThreadGroupComponent],
 })
 export class ArtefactsModule {
   constructor(private _artefactService: ArtefactService) {
@@ -141,7 +142,7 @@ export class ArtefactsModule {
     this._artefactService.register('ThreadGroup', {
       icon: 'glyphicon-resize-horizontal',
       iconNg2: 'code',
-      form: 'partials/artefacts/threadGroup.html',
+      component: ThreadGroupComponent,
       description: 'Starts multiple threads which will execute the node content in parallel',
     });
     this._artefactService.register('BeforeThread', {
