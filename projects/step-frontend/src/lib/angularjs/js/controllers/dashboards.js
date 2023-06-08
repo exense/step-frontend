@@ -33,7 +33,6 @@ angular
       stateStorage,
       Dialogs,
       ImportDialogs,
-      ExportDialogs,
       AuthService,
       $location,
       ViewRegistry,

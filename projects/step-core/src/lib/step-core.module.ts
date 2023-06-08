@@ -66,6 +66,7 @@ import { PlanNameComponent } from './components/plan-name/plan-name.component';
 import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 import { InputModelFormatterDirective } from './directives/input-model-formatter.directive';
 import { ThreadDistributionWizardDialogComponent } from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
+import { ExportDialogComponent } from './components/export-dialog/export-dialog.component';
 import { FileAlreadyExistingDialogComponent } from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 
 @NgModule({
@@ -119,6 +120,7 @@ import { FileAlreadyExistingDialogComponent } from './components/file-already-ex
     PlanCreateDialogComponent,
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
+    ExportDialogComponent,
     FileAlreadyExistingDialogComponent,
   ],
   imports: [
@@ -199,6 +201,7 @@ import { FileAlreadyExistingDialogComponent } from './components/file-already-ex
     PlanCreateDialogComponent,
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
+    ExportDialogComponent,
     FileAlreadyExistingDialogComponent,
   ],
   providers: [
@@ -261,6 +264,7 @@ export { SplitGutterComponent } from './components/split-gutter/split-gutter.com
 export { SplitComponent } from './components/split/split.component';
 export { UploadContainerComponent } from './components/upload-container/upload-container.component';
 export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
+export * from './components/export-dialog/export-dialog.component';
 export * from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 export * from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 export * from './decorators/plugin';

@@ -88,11 +88,11 @@ export class FunctionListComponent {
   }
 
   exportFunction(id: string, name: string): void {
-    this._functionDialogs.openExportFunctionDialog(id, name).subscribe((_) => this.dataSource.reload());
+    this._functionDialogs.openExportFunctionDialog(id, name).subscribe();
   }
 
   exportFunctions(): void {
-    this._functionDialogs.openExportAllFunctionsDialog().subscribe((_) => this.dataSource.reload());
+    this._functionDialogs.openExportAllFunctionsDialog().subscribe();
   }
 
   importFunctions(): void {
