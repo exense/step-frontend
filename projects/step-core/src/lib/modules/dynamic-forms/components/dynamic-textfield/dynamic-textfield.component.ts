@@ -1,5 +1,5 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
-import { NgControl } from '@angular/forms';
+import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
+import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { DynamicValueString } from '../../../../client/step-client-module';
 import { DialogsService } from '../../../../shared';
 
@@ -12,10 +12,11 @@ type OnTouch = () => void;
   styleUrls: ['./dynamic-textfield.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class DynamicTextfieldComponent {
+export class DynamicTextfieldComponent implements ControlValueAccessor {
   @Input() label?: string;
   @Input() tooltip?: string;
   @Input() showRequiredAsterisk: boolean = false;
+  @Output() blur = new EventEmitter<void>();
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;
@@ -23,6 +24,7 @@ export class DynamicTextfieldComponent {
   value: string = '';
   dynamic: boolean = false;
   expression: string = '';
+  isDisabled: boolean = false;
 
   constructor(private _dialogsService: DialogsService, public _ngControl: NgControl) {
     this._ngControl.valueAccessor = this;
@@ -42,6 +44,10 @@ export class DynamicTextfieldComponent {
     this.onTouch = onTouch;
   }
 
+  setDisabledState(isDisabled: boolean): void {
+    this.isDisabled = isDisabled;
+  }
+
   onValueChange(value: string): void {
     this.value = value;
     this.emitChanges();
@@ -49,6 +55,7 @@ export class DynamicTextfieldComponent {
 
   onBlur(): void {
     this.onTouch?.();
+    this.blur.emit();
   }
 
   editConstantValue(): void {

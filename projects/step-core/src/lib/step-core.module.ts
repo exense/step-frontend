@@ -35,7 +35,6 @@ import { SplitGutterComponent } from './components/split-gutter/split-gutter.com
 import { SplitComponent } from './components/split/split.component';
 import { UploadContainerComponent } from './components/upload-container/upload-container.component';
 import { CORE_INITIALIZER } from './core-initialiser';
-import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { CapsLockDirective } from './directives/caps-lock.directive';
 import { ElementResizeDirective } from './directives/element-resize.directive';
 import { FocusableDirective } from './directives/focusable.directive';
@@ -67,6 +66,8 @@ import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-
 import { InputModelFormatterDirective } from './directives/input-model-formatter.directive';
 import { ThreadDistributionWizardDialogComponent } from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 import { FileAlreadyExistingDialogComponent } from './components/file-already-existing-dialog/file-already-existing-dialog.component';
+import { ArtefactDetailsComponent } from './components/artefact-details/artefact-details.component';
+import { ArtefactDetailsWrapperDirective } from './directives/artefact-details-wrapper.directive';
 
 @NgModule({
   declarations: [
@@ -86,7 +87,6 @@ import { FileAlreadyExistingDialogComponent } from './components/file-already-ex
     SettingButtonComponent,
     UploadContainerComponent,
     ProgressBarComponent,
-    ArtefactDetailsDirective,
     PlanTreeComponent,
     RestoreDialogComponent,
     SimpleLineChartDirective,
@@ -120,6 +120,8 @@ import { FileAlreadyExistingDialogComponent } from './components/file-already-ex
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
     FileAlreadyExistingDialogComponent,
+    ArtefactDetailsComponent,
+    ArtefactDetailsWrapperDirective,
   ],
   imports: [
     CommonModule,
@@ -166,7 +168,6 @@ import { FileAlreadyExistingDialogComponent } from './components/file-already-ex
     IsUsedByModalComponent,
     SelectPlanComponent,
     PlanTreeComponent,
-    ArtefactDetailsDirective,
     AutorefreshToggleComponent,
     SettingButtonComponent,
     UploadContainerComponent,
@@ -200,6 +201,7 @@ import { FileAlreadyExistingDialogComponent } from './components/file-already-ex
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
     FileAlreadyExistingDialogComponent,
+    ArtefactDetailsComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -263,8 +265,8 @@ export { UploadContainerComponent } from './components/upload-container/upload-c
 export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 export * from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 export * from './components/file-already-existing-dialog/file-already-existing-dialog.component';
+export * from './components/artefact-details/artefact-details.component';
 export * from './decorators/plugin';
-export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
 export { FocusableDirective } from './directives/focusable.directive';
@@ -319,4 +321,5 @@ export * from './services/scheduled-task-dialogs.service';
 export { UibModalHelperService, UibModalInstance } from './services/uib-modal-helper.service';
 export * from './services/view-registry.service';
 export * from './services/view-state.service';
+export * from './services/artefact.service';
 export * from './shared';

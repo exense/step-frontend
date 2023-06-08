@@ -18,9 +18,12 @@ export class ExpressionInputComponent implements ControlValueAccessor {
   @Input() showRequiredAsterisk: boolean = false;
 
   @Output() toggleConstantValue = new EventEmitter<void>();
+  @Output() blur = new EventEmitter<void>();
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;
+
+  isDisabled: boolean = false;
 
   expression: string = '';
 
@@ -40,6 +43,10 @@ export class ExpressionInputComponent implements ControlValueAccessor {
     this.onTouch = onTouch;
   }
 
+  setDisabledState(isDisabled: boolean): void {
+    this.isDisabled = isDisabled;
+  }
+
   onExpressionChange(expression: string): void {
     this.expression = expression;
     this.onChange?.(expression);
@@ -47,6 +54,7 @@ export class ExpressionInputComponent implements ControlValueAccessor {
 
   onBlur(): void {
     this.onTouch?.();
+    this.blur.emit();
   }
 
   editDynamicExpression(): void {

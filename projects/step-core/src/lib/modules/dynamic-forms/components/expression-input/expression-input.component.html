@@ -5,13 +5,14 @@
     [required]="showRequiredAsterisk"
     [ngModel]="expression"
     (ngModelChange)="onExpressionChange($event)"
+    [disabled]="isDisabled"
     (blur)="onBlur()"
   />
   <step-suffix *ngIf="tooltip" class="icon-suffix">
     <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below"></step-icon>
   </step-suffix>
   <step-suffix class="button-suffix">
-    <button type="button" mat-stroked-button (click)="editDynamicExpression()">
+    <button type="button" mat-stroked-button [disabled]="isDisabled" (click)="editDynamicExpression()">
       <step-icon name="edit-2"></step-icon>
     </button>
   </step-suffix>
@@ -22,6 +23,7 @@
       color="primary"
       matTooltip="Use a constant value to set this attribute"
       matTooltipPosition="below"
+      [disabled]="isDisabled"
       (click)="toggleConstantValue.emit()"
     >
       <step-icon name="zap"></step-icon>

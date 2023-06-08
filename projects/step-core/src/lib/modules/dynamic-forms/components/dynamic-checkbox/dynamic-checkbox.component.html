@@ -5,30 +5,25 @@
   [isParentInvalid]="!!_ngControl.invalid"
   [showRequiredAsterisk]="showRequiredAsterisk"
   [ngModel]="expression"
-  (ngModelChange)="onExpressionChange($event)"
   [disabled]="isDisabled"
+  (ngModelChange)="onExpressionChange($event)"
   (toggleConstantValue)="toggleDynamicExpression(false)"
-  (blur)="onBlur()"
 ></step-expression-input>
-
 <ng-template #constantValueTemplate>
   <step-form-field [class.ng-invalid]="!!_ngControl.invalid" [class.with-tooltip]="tooltip">
     <step-label [attr.show-required-marker]="showRequiredAsterisk || null" *ngIf="label">{{ label }}</step-label>
-    <input
-      type="text"
-      [required]="showRequiredAsterisk"
-      [ngModel]="value"
-      (ngModelChange)="onValueChange($event)"
-      [disabled]="isDisabled"
-      (blur)="onBlur()"
-    />
+    <div class="step-checkbox-container">
+      <mat-checkbox
+        color="primary"
+        [ngModel]="value"
+        (ngModelChange)="onValueChange($event)"
+        [disabled]="isDisabled"
+        (blur)="onBlur()"
+      >
+      </mat-checkbox>
+    </div>
     <step-suffix *ngIf="tooltip" class="icon-suffix">
-      <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below"></step-icon>
-    </step-suffix>
-    <step-suffix class="button-suffix">
-      <button type="button" mat-stroked-button (click)="editConstantValue()" [disabled]="isDisabled">
-        <step-icon name="edit-2"></step-icon>
-      </button>
+      <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below"> </step-icon>
     </step-suffix>
     <step-suffix class="button-suffix">
       <button
@@ -36,8 +31,8 @@
         mat-stroked-button
         matTooltip="Use a dynamic expression to set this attribute"
         matTooltipPosition="below"
-        (click)="toggleDynamicExpression(true)"
         [disabled]="isDisabled"
+        (click)="toggleDynamicExpression(true)"
       >
         <step-icon name="zap"></step-icon>
       </button>
