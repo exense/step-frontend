@@ -1,0 +1,63 @@
+<step-modal-window [title]="title">
+  <div step-modal-window-body>
+    <ng-container *ngIf="isExporting">
+      <mat-progress-bar [value]="progress" color="primary" mode="buffer"></mat-progress-bar>
+    </ng-container>
+    <ng-container [formGroup]="exportForm">
+      <step-form-field>
+        <step-label>File name</step-label>
+        <input type="text" formControlName="filename" />
+      </step-form-field>
+      <mat-expansion-panel [(expanded)]="showOptions">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Advanced</mat-panel-title>
+        </mat-expansion-panel-header>
+        <section class="advanced-body">
+          <mat-checkbox color="primary" formControlName="recursively">
+            <span>Export all entities recursively</span>
+            &nbsp;
+            <step-icon
+              name="help-circle"
+              matTooltip="Defines if all referenced entities get exported as well (see details in the below notes)."
+            >
+            </step-icon>
+          </mat-checkbox>
+          <mat-checkbox color="primary" formControlName="parameters">
+            <span>Include an export of all parameters</span>
+            &nbsp;
+            <step-icon name="help-circle" matTooltip="Defines if all parameters should be exported as well.">
+            </step-icon>
+          </mat-checkbox>
+        </section>
+      </mat-expansion-panel>
+      <step-alert type="info">
+        <strong>Notes: </strong>Please consider following remarks and limitations:
+        <ul>
+          <li>Entities are exported recursively by default (see options)</li>
+          <li>Referenced entities from accessible 'global' projects will be exported too</li>
+          <li>
+            Indirect references cannot be resolved and therefore are not exported. This includes:
+            <ul>
+              <li>Any reference using dynamic expression</li>
+              <li>
+                Parameter references, choose the 'Include an export of all parameters' option when exporting plans if
+                required
+              </li>
+              <li>
+                File resources (dataset files, keyword libraries...) defined with a filesystem path are not included,
+                only step resources are
+              </li>
+            </ul>
+          </li>
+          <li>Password parameters are exported with obfuscated values</li>
+        </ul>
+      </step-alert>
+    </ng-container>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close [disabled]="exportForm.disabled">Close</button>
+    <button type="button" mat-flat-button color="primary" [disabled]="exportForm.disabled" (click)="save()">
+      Save
+    </button>
+  </div>
+</step-modal-window>
