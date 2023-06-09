@@ -175,7 +175,6 @@ angular
       FunctionDialogs,
       FunctionDialogsConfig,
       ImportDialogs,
-      ExportDialogs,
       $location,
       AuthService,
       FunctionTypeRegistry,
@@ -257,16 +256,6 @@ angular
         ImportDialogs.displayImportDialog('Keyword import', 'functions', true).then(function () {
           reload();
         });
-      };
-
-      $scope.exportFunction = function (id, name) {
-        ExportDialogs.displayExportDialog('Keywords export', 'functions/' + id, name + '.sta', true).then(
-          function () {}
-        );
-      };
-
-      $scope.exportFunctions = function () {
-        ExportDialogs.displayExportDialog('Keywords export', 'functions', 'allKeywords.sta', true).then(function () {});
       };
 
       $scope.lookUp = function (id, name) {
