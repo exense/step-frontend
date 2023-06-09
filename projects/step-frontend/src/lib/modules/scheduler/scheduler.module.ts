@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CustomCellRegistryService, EntityRegistry, StepCoreModule } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
-import { SchedulerIconComponent } from './components/scheduler-icon/scheduler-icon.component';
 import { SchedulerTaskLinkComponent } from './components/scheduler-task-link/scheduler-task-link.component';
 import './components/scheduler-task-selection/scheduler-task-selection.component';
 import { SchedulerTaskSelectionComponent } from './components/scheduler-task-selection/scheduler-task-selection.component';
@@ -13,7 +12,6 @@ import './components/scheduler-configuration/scheduler-configuration.component';
   imports: [StepCoreModule, StepCommonModule],
   declarations: [
     ScheduledTaskListComponent,
-    SchedulerIconComponent,
     SchedulerTaskLinkComponent,
     SchedulerTaskSelectionComponent,
     SchedulerConfigurationComponent,
@@ -26,7 +24,6 @@ export class SchedulerModule {
       icon: 'clock',
       templateUrl: '/partials/scheduler/schedulerTaskSelectionTable.html',
     });
-    _cellRegistry.registerCell('taskEntityIcon', SchedulerIconComponent);
     _cellRegistry.registerCell('schedulerTaskLink', SchedulerTaskLinkComponent);
   }
 }

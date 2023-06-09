@@ -10,7 +10,6 @@ import {
   ViewRegistryService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
-import { FunctionIconComponent } from './components/function-icon/function-icon.component';
 import { FunctionListComponent } from './components/function-list/function-list.component';
 import { FunctionPackageLinkComponent } from './components/function-package-link/function-package-link.component';
 import { FunctionPackageListComponent } from './components/function-package-list/function-package-list.component';
@@ -30,7 +29,6 @@ import { FunctionPackageConfigurationDialogComponent } from './components/functi
     FunctionListComponent,
     FunctionPackageLinkComponent,
     FunctionPackageListComponent,
-    FunctionIconComponent,
     FunctionTypeLabelPipe,
     FunctionTypeFilterComponent,
     FunctionPackageSearchComponent,
@@ -62,7 +60,6 @@ export class FunctionModule {
       icon: 'target',
       templateUrl: '/partials/functions/functionSelectionTable.html',
     });
-    _cellsRegistry.registerCell('functionEntityIcon', FunctionIconComponent);
     _cellsRegistry.registerCell('functionLink', FunctionLinkComponent);
     _cellsRegistry.registerCell('functionPackageLink', FunctionPackageLinkComponent);
     _searchCellsRegistry.registerSearchCell(
