@@ -1,7 +1,7 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
 div[step-modal-window-body] {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  @include core.common-dialog-content;
 }
 
 mat-select {
