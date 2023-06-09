@@ -67,6 +67,7 @@ import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-
 import { InputModelFormatterDirective } from './directives/input-model-formatter.directive';
 import { ThreadDistributionWizardDialogComponent } from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 import { NewSchedulerTaskDialogComponent } from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
+import { EditSchedulerTaskDialogComponent } from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 import { FileAlreadyExistingDialogComponent } from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 
 @NgModule({
@@ -121,6 +122,7 @@ import { FileAlreadyExistingDialogComponent } from './components/file-already-ex
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
     NewSchedulerTaskDialogComponent,
+    EditSchedulerTaskDialogComponent,
     FileAlreadyExistingDialogComponent,
   ],
   imports: [
@@ -202,6 +204,7 @@ import { FileAlreadyExistingDialogComponent } from './components/file-already-ex
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
     NewSchedulerTaskDialogComponent,
+    EditSchedulerTaskDialogComponent,
     FileAlreadyExistingDialogComponent,
   ],
   providers: [
@@ -266,6 +269,7 @@ export { UploadContainerComponent } from './components/upload-container/upload-c
 export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 export * from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
+export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 export * from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';

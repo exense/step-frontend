@@ -22,6 +22,7 @@ import { SuffixDirective } from './directives/suffix.directive';
 import { HintDirective } from './directives/hint.directive';
 import { ErrorDirective } from './directives/error.directive';
 import { AlertDirective } from './directives/alert.directive';
+import { ValidateJsonDirective } from './directives/validate-json.directive';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
@@ -46,6 +47,7 @@ import { AlertDirective } from './directives/alert.directive';
     HintDirective,
     ErrorDirective,
     AlertDirective,
+    ValidateJsonDirective,
   ],
   exports: [
     ResourceLabelComponent,
@@ -68,6 +70,7 @@ import { AlertDirective } from './directives/alert.directive';
     HintDirective,
     ErrorDirective,
     AlertDirective,
+    ValidateJsonDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -106,6 +109,7 @@ export * from './shared/resize-observable';
 export * from './shared/time-unit.enum';
 export * from './directives/element-ref-map.directive';
 export * from './directives/width-expanders.directive';
+export * from './directives/validate-json.directive';
 export * from './directives/label.directive';
 export * from './directives/prefix.directive';
 export * from './directives/suffix.directive';
@@ -117,5 +121,6 @@ export * from './repository-parameters-initializer';
 export * from './shared/array-item-label-value-extractor';
 export * from './shared/storage-proxy';
 export * from './shared/storage.token';
+export * from './shared/json-validator';
 export * from './services/persistence.service';
 export * from './shared/logout-cleanup.token';
