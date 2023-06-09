@@ -15,7 +15,6 @@ import {
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { ILocationService } from 'angular';
-import { noop } from 'rxjs';
 import { PlansBulkOperationsInvokeService } from '../../injectables/plans-bulk-operations-invoke.service';
 
 @Component({
@@ -78,11 +77,11 @@ export class PlanListComponent {
   }
 
   exportPlans(): void {
-    this._planDialogs.exportPlans().subscribe((_) => this.dataSource.reload());
+    this._planDialogs.exportPlans().subscribe();
   }
 
   exportPlan(id: string, name: string): void {
-    this._planDialogs.exportPlan(id, name).subscribe(noop);
+    this._planDialogs.exportPlan(id, name).subscribe();
   }
 
   lookUp(id: string, name: string): void {

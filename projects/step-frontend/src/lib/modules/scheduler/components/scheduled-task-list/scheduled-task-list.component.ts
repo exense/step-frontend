@@ -10,8 +10,8 @@ import {
   tablePersistenceConfigProvider,
   STORE_ALL,
 } from '@exense/step-core';
-import { ScheduledTaskLogicService } from '../services/scheduled-task-logic.service';
-import { ScheduledTaskBulkOperationsInvokeService } from '../services/scheduled-task-bulk-operations-invoke.service';
+import { ScheduledTaskLogicService } from '../../services/scheduled-task-logic.service';
+import { ScheduledTaskBulkOperationsInvokeService } from '../../services/scheduled-task-bulk-operations-invoke.service';
 
 @Component({
   selector: 'step-scheduled-task-list',

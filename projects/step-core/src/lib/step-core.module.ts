@@ -68,6 +68,10 @@ import { InputModelFormatterDirective } from './directives/input-model-formatter
 import { ThreadDistributionWizardDialogComponent } from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 import { EntityColumnComponent } from './components/entity-column/entity-column.component';
 import { EntityColumnContainerComponent } from './components/entity-column-container/entity-column-container.component';
+import { NewSchedulerTaskDialogComponent } from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
+import { EditSchedulerTaskDialogComponent } from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
+import { ExportDialogComponent } from './components/export-dialog/export-dialog.component';
+import { FileAlreadyExistingDialogComponent } from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 
 @NgModule({
   declarations: [
@@ -122,6 +126,10 @@ import { EntityColumnContainerComponent } from './components/entity-column-conta
     ThreadDistributionWizardDialogComponent,
     EntityColumnComponent,
     EntityColumnContainerComponent,
+    NewSchedulerTaskDialogComponent,
+    EditSchedulerTaskDialogComponent,
+    ExportDialogComponent,
+    FileAlreadyExistingDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -203,6 +211,10 @@ import { EntityColumnContainerComponent } from './components/entity-column-conta
     ThreadDistributionWizardDialogComponent,
     EntityColumnComponent,
     EntityColumnContainerComponent,
+    NewSchedulerTaskDialogComponent,
+    EditSchedulerTaskDialogComponent,
+    ExportDialogComponent,
+    FileAlreadyExistingDialogComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -264,9 +276,13 @@ export { SplitGutterComponent } from './components/split-gutter/split-gutter.com
 export { SplitComponent } from './components/split/split.component';
 export { UploadContainerComponent } from './components/upload-container/upload-container.component';
 export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
+export * from './components/export-dialog/export-dialog.component';
 export * from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 export * from './components/entity-column/entity-column.component';
 export * from './components/entity-column-container/entity-column-container.component';
+export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
+export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
+export * from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';

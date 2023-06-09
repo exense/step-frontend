@@ -15,4 +15,5 @@ export * from './plan-editor-strategy';
 export * from './ace-mode.enum';
 export * from './script-language.enum';
 export * from './persistence-tokens';
+export * from './export-dialog-data.interface';
 export * from './entity-column-container';
