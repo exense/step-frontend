@@ -326,4 +326,5 @@ export { UibModalHelperService, UibModalInstance } from './services/uib-modal-he
 export * from './services/view-registry.service';
 export * from './services/view-state.service';
 export * from './services/artefact.service';
+export * from './services/artefact-form-change-helper.service';
 export * from './shared';

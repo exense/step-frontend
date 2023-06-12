@@ -1,7 +1,4 @@
-<step-dynamic-textfield
-  label="Text"
-  [(ngModel)]="context.artefact!.text"
-  (blur)="context.save()"
-  [disabled]="context.readonly"
->
-</step-dynamic-textfield>
+<form #form="ngForm">
+  <step-dynamic-textfield label="Text" [(ngModel)]="context.artefact!.text" [disabled]="context.readonly" name="text">
+  </step-dynamic-textfield>
+</form>
