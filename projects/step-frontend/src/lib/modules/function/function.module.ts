@@ -66,16 +66,10 @@ export class FunctionModule {
       'rest/table/functionPackage/searchIdsBy/attributes.name',
       FunctionPackageSearchComponent
     );
-    _entityRegistry.registerEntity(
-      'KeywordPackage',
-      'functionPackage',
-      'gift',
-      'functionPackage',
-      'rest/functionpackages/',
-      'rest/functionpackages/',
-      'st-table',
-      FunctionPackageSelectionComponent
-    );
+    _entityRegistry.register('functionPackage', 'KeywordPackage', {
+      icon: 'gift',
+      component: FunctionPackageSelectionComponent,
+    });
     _viewRegistry.registerView('functions', 'partials/functionList.html');
     _viewRegistry.registerView('composites', 'partials/functions/compositeKeywordEditor.html');
   }

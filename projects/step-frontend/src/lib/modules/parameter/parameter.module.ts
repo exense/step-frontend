@@ -23,16 +23,10 @@ import { ParameterEditDialogComponent } from './components/parameter-edit-dialog
 })
 export class ParameterModule {
   constructor(_entityRegistry: EntityRegistry, _cellRegister: CustomCellRegistryService) {
-    _entityRegistry.registerEntity(
-      'Parameters',
-      'parameters',
-      'list',
-      'parameters',
-      'rest/parameters/',
-      'rest/parameters/',
-      'st-table',
-      '/partials/parameters/parameterSelectionTable.html'
-    );
+    _entityRegistry.register('parameters', 'Parameters', {
+      icon: 'list',
+      component: ParameterSelectionComponent,
+    });
 
     _cellRegister.registerCell('parameterLastModification', ParameterLastModificationComponent);
     _cellRegister.registerCell('parameterKey', ParametersKeyComponent);
