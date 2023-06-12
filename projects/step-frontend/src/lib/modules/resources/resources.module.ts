@@ -15,15 +15,9 @@ export class ResourcesModule {
   }
 
   private registerEntities(): void {
-    this._entityRegistry.registerEntity(
-      'Resource',
-      'resources',
-      'book',
-      'resources',
-      'rest/resources/',
-      'rest/resources/',
-      'st-table',
-      '/partials/resources/resourceSelectionTable.html'
-    );
+    this._entityRegistry.register('resources', 'Resource', {
+      icon: 'book',
+      component: ResourceSelectionComponent,
+    });
   }
 }
