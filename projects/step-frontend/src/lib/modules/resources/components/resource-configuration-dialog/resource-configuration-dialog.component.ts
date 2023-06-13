@@ -27,12 +27,12 @@ export class ResourceConfigurationDialogComponent implements OnInit {
   private _matDialogRef = inject<MatDialogRef<ResourceConfigurationDialogComponent, Resource>>(MatDialogRef);
   private _resourcesService = inject(ResourcesService);
 
-  private contentUpdated = false;
-
   protected _resourceConfigurationDialogData = inject<ResourceConfigurationDialogData>(MAT_DIALOG_DATA);
   protected _predefinedResourceTypes = inject<PredefinedResourceType[]>(PREDEFINED_RESOURCE_TYPES).map(toKeyValue);
 
   protected readonly formGroup = resourceConfigurationDialogFormCreate(this._formBuilder);
+
+  protected contentUpdated = false;
 
   ngOnInit(): void {
     if (!this._resourceConfigurationDialogData.resource) {

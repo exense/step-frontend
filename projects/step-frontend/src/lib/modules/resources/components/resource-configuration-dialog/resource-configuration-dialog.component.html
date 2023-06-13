@@ -25,6 +25,6 @@
   </div>
 
   <div step-modal-window-buttons>
-    <button type="button" (click)="close()" mat-flat-button color="primary">Close</button>
+    <button type="button" [disabled]="!contentUpdated" (click)="close()" mat-flat-button color="primary">Close</button>
   </div>
 </step-modal-window>
