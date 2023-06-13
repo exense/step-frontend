@@ -51,6 +51,10 @@ export class ResourceConfigurationDialogComponent implements OnInit {
   }
 
   protected onContentChange(resourceId: string): void {
+    if (!resourceId.startsWith('resource:')) {
+      return;
+    }
+
     this._resourcesService.getResource(resourceId.replace('resource:', '')).subscribe((resource) => {
       this._resourceConfigurationDialogData.resource = resource;
 
