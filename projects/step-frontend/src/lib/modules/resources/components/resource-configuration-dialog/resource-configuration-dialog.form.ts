@@ -1,5 +1,5 @@
 import { FormBuilder, Validators } from '@angular/forms';
-import { dynamicValueFactory, DynamicValueString, Resource } from '@exense/step-core';
+import { DynamicValueString, Resource, dynamicValueFactory } from '@exense/step-core';
 import { PredefinedResourceType } from './predefined-resource-type.enum';
 
 export type ResourceConfigurationDialogForm = ReturnType<typeof resourceConfigurationDialogFormCreate>;
@@ -7,10 +7,12 @@ export type ResourceConfigurationDialogForm = ReturnType<typeof resourceConfigur
 const { createDynamicValueString } = dynamicValueFactory();
 
 export const resourceConfigurationDialogFormCreate = (formBuilder: FormBuilder) => {
-  return formBuilder.nonNullable.group({
-    name: formBuilder.nonNullable.control<string>('', []),
-    resourceType: formBuilder.nonNullable.control<string>(PredefinedResourceType.ATTACHMENT, [Validators.required]),
-    content: formBuilder.nonNullable.control<DynamicValueString>(createDynamicValueString(), []),
+  const { nonNullable } = formBuilder;
+
+  return nonNullable.group({
+    name: nonNullable.control<string>('', []),
+    resourceType: nonNullable.control<string>(PredefinedResourceType.ATTACHMENT, [Validators.required]),
+    content: nonNullable.control<DynamicValueString>(createDynamicValueString(), []),
   });
 };
 

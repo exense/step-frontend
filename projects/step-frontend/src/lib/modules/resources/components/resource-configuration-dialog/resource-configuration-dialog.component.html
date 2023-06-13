@@ -15,10 +15,10 @@
 
       <step-resource-input
         label="Content"
-        [stType]="resourceType"
+        [stType]="formGroup.controls.resourceType.value"
         [uploadOnly]="true"
         [disableServerPath]="true"
-        [stModel]="content"
+        [stModel]="formGroup.controls.content.value.value"
         (stModelChange)="onContentChange($event)"
       ></step-resource-input>
     </form>

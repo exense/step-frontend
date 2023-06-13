@@ -1,7 +1,7 @@
 import { KeyValue } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Resource, ResourcesService } from '@exense/step-core';
 import { PredefinedResourceType } from './predefined-resource-type.enum';
 import { PREDEFINED_RESOURCE_TYPES } from './predefined-resource-types.token';
@@ -40,14 +40,6 @@ export class ResourceConfigurationDialogComponent implements OnInit {
     }
 
     resourceConfigurationDialogFormSetValueToForm(this.formGroup, this._resourceConfigurationDialogData.resource);
-  }
-
-  protected get resourceType(): string {
-    return this.formGroup.controls.resourceType.value;
-  }
-
-  protected get content(): string | undefined {
-    return this.formGroup.controls.content.value.value;
   }
 
   protected onContentChange(resourceId: string): void {

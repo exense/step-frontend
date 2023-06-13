@@ -16,8 +16,6 @@ export class PredefinedOptionsInputComponent implements ControlValueAccessor {
   @Input() predefinedOptions!: KeyValue<string, string>[];
   @Input() predefinedOptionsLabel!: string;
   @Input() showRequiredMarker?: boolean;
-  @Input() isParentInvalid?: boolean;
-  @Input() isParentTouched?: boolean;
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;
