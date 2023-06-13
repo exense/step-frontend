@@ -101,7 +101,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   navigateTo(viewId: string, $event: MouseEvent): void {
-    const isOpenInSeparateTab = $event.ctrlKey || $event.button === MIDDLE_BUTTON;
+    const isOpenInSeparateTab = $event.ctrlKey || $event.button === MIDDLE_BUTTON || $event.metaKey;
 
     switch (viewId) {
       case 'home':
