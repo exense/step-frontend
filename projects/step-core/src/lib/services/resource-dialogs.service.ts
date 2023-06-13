@@ -2,11 +2,11 @@ import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
 import { Resource, ResourcesService } from '../client/generated';
+import { FileAlreadyExistingDialogComponent } from '../components/file-already-existing-dialog/file-already-existing-dialog.component';
 import { SearchResourceDialogComponent } from '../components/search-resource-dialog/search-resource-dialog.component';
 import { a1Promise2Observable, DialogsService } from '../shared';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
 import { UibModalHelperService } from './uib-modal-helper.service';
-import { FileAlreadyExistingDialogComponent } from '../components/file-already-existing-dialog/file-already-existing-dialog.component';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +17,6 @@ export class ResourceDialogsService {
   private _resourcesService = inject(ResourcesService);
   private _isUsedByDialogs = inject(IsUsedByDialogService);
   private _matDialog = inject(MatDialog);
-  private _resourceInputBridgeService = inject(ResourceInputBridgeService);
 
   readonly RESOURCE_SEARCH_TYPE = 'RESOURCE_ID';
 
