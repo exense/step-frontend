@@ -10,7 +10,7 @@
     </span>
   </div>
   <div id="sidebar-home-and-settings">
-    <span class="visible-when-collapsed sidebar-home-button" (click)="navigateTo('home')">
+    <span class="visible-when-collapsed sidebar-home-button" (mouseup)="navigateTo('home', $event)">
       <step-icon name="home"></step-icon>
     </span>
     <ng-container *ngIf="('settings-ui-menu' | hasRight | async) || ('admin-ui-menu' | hasRight | async)">
@@ -40,7 +40,7 @@
             <div
               class="sidebar-subtab"
               [class.sidebar-highlighted-subtab]="_viewStateService.isViewActive(entry.id)"
-              (click)="navigateTo(entry.id)"
+              (mouseup)="navigateTo(entry.id, $event)"
             >
               <step-icon class="visible-when-collapsed" [name]="entry.icon"></step-icon>
               <span class="sidebar-aligned-subtext">{{ entry.title }}</span>
