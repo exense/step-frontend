@@ -69,12 +69,12 @@ export class PlanDialogsService {
     );
   }
 
-  exportPlans(): Observable<any> {
+  exportPlans(): Observable<boolean> {
     return this._exportDialogs.displayExportDialog('Plans export', 'plans', 'allPlans.sta');
   }
 
-  exportPlan(id: string, name: string): Observable<any> {
-    return this._exportDialogs.displayExportDialog('Plans export', `plans/${id}`, `${name}.sta`);
+  exportPlan(id: string, name: string): Observable<boolean> {
+    return this._exportDialogs.displayExportDialog('Plans export', `plans`, `${name}.sta`, id);
   }
 
   lookUp(id: string, name: string): void {
