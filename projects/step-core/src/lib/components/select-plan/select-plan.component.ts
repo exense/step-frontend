@@ -1,29 +1,62 @@
-import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { Plan } from '../../client/step-client-module';
+import { Component, inject, Input, OnDestroy } from '@angular/core';
+import { ControlValueAccessor, NgControl } from '@angular/forms';
+import { noop } from 'rxjs';
 import { PlanDialogsService } from '../../services/plan-dialogs.service';
+import { Plan } from '../../client/step-client-module';
+
+type OnChange = (value?: Plan) => void;
+type OnTouch = () => void;
 
 @Component({
   selector: 'step-select-plan',
   templateUrl: './select-plan.component.html',
   styleUrls: ['./select-plan.component.scss'],
 })
-export class SelectPlanComponent {
-  @Input() planNameControl!: FormControl<string | null>;
-  @Input() disabled?: boolean;
+export class SelectPlanComponent implements ControlValueAccessor, OnDestroy {
+  private _planDialogsService = inject(PlanDialogsService);
 
-  @Output() planSelected = new EventEmitter<Plan>();
+  @Input() showRequiredMarker?: boolean;
 
-  constructor(private _planDialogsService: PlanDialogsService) {}
+  private onChange: OnChange = noop;
+  private onTouch: OnTouch = noop;
+
+  protected isDisabled: boolean = false;
+  protected planValue?: Plan;
+
+  constructor(readonly _ngControl: NgControl) {
+    this._ngControl.valueAccessor = this;
+  }
+
+  ngOnDestroy(): void {
+    this.onChange = noop;
+    this.onTouch = noop;
+  }
 
   selectPlan(): void {
     this._planDialogsService.selectPlan().subscribe({
       next: (plan) => {
-        this.planSelected.emit(plan);
+        this.planValue = plan;
+        this.onChange(this.planValue);
       },
-      error: () => {
-        this.planNameControl.markAsTouched();
+      complete: () => {
+        this.onTouch();
       },
     });
+  }
+
+  registerOnChange(fn: OnChange): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: OnTouch): void {
+    this.onTouch = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.isDisabled = isDisabled;
+  }
+
+  writeValue(obj?: Plan): void {
+    this.planValue = obj;
   }
 }

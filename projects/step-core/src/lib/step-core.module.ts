@@ -65,6 +65,8 @@ import { PlanNameComponent } from './components/plan-name/plan-name.component';
 import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 import { InputModelFormatterDirective } from './directives/input-model-formatter.directive';
 import { ThreadDistributionWizardDialogComponent } from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
+import { NewSchedulerTaskDialogComponent } from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
+import { EditSchedulerTaskDialogComponent } from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 import { ExportDialogComponent } from './components/export-dialog/export-dialog.component';
 import { FileAlreadyExistingDialogComponent } from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 import { ArtefactDetailsComponent } from './components/artefact-details/artefact-details.component';
@@ -120,6 +122,8 @@ import { ArtefactDetailsWrapperDirective } from './directives/artefact-details-w
     PlanCreateDialogComponent,
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
+    NewSchedulerTaskDialogComponent,
+    EditSchedulerTaskDialogComponent,
     ExportDialogComponent,
     FileAlreadyExistingDialogComponent,
     ArtefactDetailsComponent,
@@ -202,6 +206,8 @@ import { ArtefactDetailsWrapperDirective } from './directives/artefact-details-w
     PlanCreateDialogComponent,
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
+    NewSchedulerTaskDialogComponent,
+    EditSchedulerTaskDialogComponent,
     ExportDialogComponent,
     FileAlreadyExistingDialogComponent,
     ArtefactDetailsComponent,
@@ -268,6 +274,8 @@ export { UploadContainerComponent } from './components/upload-container/upload-c
 export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 export * from './components/export-dialog/export-dialog.component';
 export * from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
+export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
+export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 export * from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 export * from './components/artefact-details/artefact-details.component';
 export * from './decorators/plugin';
