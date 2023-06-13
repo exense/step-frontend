@@ -1,0 +1,66 @@
+<step-modal-window [title]="isNew ? 'New task' : 'Edit task'">
+  <div step-modal-window-body>
+    <step-alert *ngIf="error" type="danger">
+      {{ error }}
+    </step-alert>
+    <form #formContainer="ngForm">
+      <step-form-field>
+        <step-label>Name</step-label>
+        <input type="text" placeholder="Name" required [(ngModel)]="_task.attributes!['name']" name="name" />
+      </step-form-field>
+      <step-select-plan required [ngModel]="plan" (ngModelChange)="handlePlanChange($event)" name="plan">
+      </step-select-plan>
+      <step-cron-selector
+        label="CRON Expression"
+        placeholder="CRON Expression"
+        required
+        [(ngModel)]="_task.cronExpression"
+        name="cron"
+      >
+      </step-cron-selector>
+      <step-custom-forms
+        [stModel]="_task.executionsParameters!.customParameters!"
+        (stModelChange)="handleCustomParametersChange($event)"
+        stScreen="executionParameters"
+      >
+      </step-custom-forms>
+      <step-form-field>
+        <step-label>User</step-label>
+        <input
+          type="text"
+          placeholder="User"
+          [ngModel]="_task.executionsParameters!.userID"
+          (ngModelChange)="handleUserIdChange($event)"
+          name="user"
+        />
+      </step-form-field>
+      <mat-expansion-panel [(expanded)]="showParameters">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Advanced</mat-panel-title>
+        </mat-expansion-panel-header>
+        <section class="advanced-body">
+          <step-form-field>
+            <step-label>Parameters</step-label>
+            <textarea
+              rows="7"
+              [ngModel]="parametersRawValue"
+              (ngModelChange)="handleParametersRawValueChange($event)"
+              [ngModelOptions]="rawValueModelOptions"
+              name="parameters"
+              stepValidateJson
+              #parametersJson="ngModel"
+            >
+            </textarea>
+            <step-error *ngIf="parametersJson.invalid && parametersJson.touched">
+              This field's value should be in JSON format
+            </step-error>
+          </step-form-field>
+        </section>
+      </mat-expansion-panel>
+    </form>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
+    <button type="button" mat-flat-button color="primary" (click)="save()">Save</button>
+  </div>
+</step-modal-window>

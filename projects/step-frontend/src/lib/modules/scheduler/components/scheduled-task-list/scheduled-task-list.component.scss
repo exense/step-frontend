@@ -1,0 +1,57 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
+.nav-to-plan-icon {
+  transform: scale(0.7);
+  margin-bottom: 6px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.status {
+  @include core.status-shape();
+  cursor: pointer;
+  min-width: 50px;
+  border: none;
+
+  &.scheduler-disabled {
+    background-color: grey !important;
+  }
+}
+
+.status-on {
+  background-color: var.$on;
+  color: var.$white;
+}
+
+.status-off {
+  background-color: var.$of;
+  color: var.$white;
+}
+
+.cell-actions {
+  width: 20rem;
+
+  button {
+    padding: 0;
+    min-width: 4rem;
+    min-height: 4rem;
+  }
+}
+
+.header {
+  @include core.table-header;
+
+  .import-export button {
+    padding: 0;
+    min-width: 4rem;
+  }
+}
+
+:host {
+  @include core.table-container;
+}
+
+.bulk-selection-cell {
+  width: 6rem;
+}

@@ -1,13 +1,12 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
+  AugmentedParametersService,
   AutoDeselectStrategy,
   Parameter,
   selectionCollectionProvider,
   SelectionCollector,
-  TableApiWrapperService,
-  TableRemoteDataSource,
 } from '@exense/step-core';
 
 interface TableHandle {
@@ -23,14 +22,8 @@ interface TableHandle {
 export class ParameterSelectionComponent implements OnInit, OnDestroy {
   @Input() tableHandle!: TableHandle;
 
-  readonly dataSource = new TableRemoteDataSource<Parameter>('parameters', this._tableApiWrapperService, {
-    scope: 'scope',
-  });
-
-  constructor(
-    private _tableApiWrapperService: TableApiWrapperService,
-    private _selectionCollector: SelectionCollector<string, Parameter>
-  ) {}
+  private _selectionCollector = inject<SelectionCollector<string, Parameter>>(SelectionCollector);
+  readonly _dataSource = inject(AugmentedParametersService).createSelectionDataSource();
 
   ngOnInit() {
     this.initTableHandle();

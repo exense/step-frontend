@@ -1,21 +1,18 @@
-import { Inject, Injectable } from '@angular/core';
-import { TableRequestData } from '../models/table-request-data';
-import { TableResponseGeneric } from '../models/table-response-generic';
+import { inject, Injectable } from '@angular/core';
+import { TableRequestData } from '../shared/table-request-data';
+import { TableResponseGeneric } from '../shared/table-response-generic';
 import { map, Observable, tap } from 'rxjs';
 import { AsyncTasksService, AsyncTaskStatusResource, TablesService } from '../../generated';
-import { pollAsyncTask } from '../../augmented/rxjs-operators/poll-async-task';
+import { pollAsyncTask, AsyncTaskStatus } from '../../async-task/async-task.module';
 import { DOCUMENT } from '@angular/common';
-import { AsyncTaskStatus } from '../../augmented/shared/async-task-status';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TableApiWrapperService {
-  constructor(
-    private _tables: TablesService,
-    private _asyncTaskService: AsyncTasksService,
-    @Inject(DOCUMENT) private _document: Document
-  ) {}
+  private _tables = inject(TablesService);
+  private _asyncTaskService = inject(AsyncTasksService);
+  private _document = inject(DOCUMENT);
 
   requestTable<T>(tableId: string, tableRequest: TableRequestData): Observable<TableResponseGeneric<T>> {
     return this._tables.request(tableId, tableRequest) as Observable<TableResponseGeneric<T>>;

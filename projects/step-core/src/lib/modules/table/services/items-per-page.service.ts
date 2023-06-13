@@ -22,14 +22,19 @@ export class ItemsPerPageService {
     }
     const itemsPerPage = [...this.defaultItemsPerPage];
 
-    if (
-      this.customItemsPerPage &&
-      typeof this.customItemsPerPage === 'number' &&
-      !itemsPerPage.includes(this.customItemsPerPage)
-    ) {
-      itemsPerPage.unshift(this.customItemsPerPage);
+    if (this.customItemsPerPage && typeof this.customItemsPerPage === 'number') {
+      this.prepandToArray(itemsPerPage, this.customItemsPerPage);
     }
 
     return itemsPerPage;
+  }
+
+  private prepandToArray(array: number[], value: number) {
+    if (array.includes(value)) {
+      /* The custom item needs to be the first item, even if already in the array */
+      const removeIndex = array.indexOf(value);
+      array.splice(removeIndex, 1);
+    }
+    array.unshift(value);
   }
 }
