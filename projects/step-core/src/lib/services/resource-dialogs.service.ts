@@ -9,6 +9,8 @@ import { UpdateResourceWarningDialogComponent } from '../step-core.module';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
 import { ResourceInputBridgeService } from './resource-input-bridge.service';
 import { UibModalHelperService } from './uib-modal-helper.service';
+import { catchError, map, Observable, of, switchMap } from 'rxjs';
+import { SearchResourceDialogComponent } from '../components/search-resource-dialog/search-resource-dialog.component';
 import { FileAlreadyExistingDialogComponent } from '../components/file-already-existing-dialog/file-already-existing-dialog.component';
 
 @Injectable({
