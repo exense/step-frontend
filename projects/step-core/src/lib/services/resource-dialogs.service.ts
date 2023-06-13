@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
 import { Resource, ResourcesService } from '../client/generated';
+import { FileAlreadyExistingDialogComponent } from '../components/file-already-existing-dialog/file-already-existing-dialog.component';
 import { SearchResourceDialogComponent } from '../components/search-resource-dialog/search-resource-dialog.component';
 import { a1Promise2Observable, DialogsService } from '../shared';
 import { UpdateResourceWarningResultState } from '../shared/update-resource-warning-result-state.enum';
@@ -9,9 +10,6 @@ import { UpdateResourceWarningDialogComponent } from '../step-core.module';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
 import { ResourceInputBridgeService } from './resource-input-bridge.service';
 import { UibModalHelperService } from './uib-modal-helper.service';
-import { catchError, map, Observable, of, switchMap } from 'rxjs';
-import { SearchResourceDialogComponent } from '../components/search-resource-dialog/search-resource-dialog.component';
-import { FileAlreadyExistingDialogComponent } from '../components/file-already-existing-dialog/file-already-existing-dialog.component';
 
 @Injectable({
   providedIn: 'root',
