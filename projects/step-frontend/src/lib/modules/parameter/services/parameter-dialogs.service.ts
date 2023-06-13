@@ -25,7 +25,7 @@ export class ParameterDialogsService {
     return this._importDialogs.displayImportDialog('Parameters import', 'parameters');
   }
 
-  exportParameter(): Observable<any> {
+  exportParameter(): Observable<boolean> {
     return this._exportDialogs.displayExportDialog('Parameters export', 'parameters', 'allParameters.sta');
   }
 

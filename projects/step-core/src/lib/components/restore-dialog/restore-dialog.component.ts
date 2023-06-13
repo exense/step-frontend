@@ -1,12 +1,13 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
-import { History } from '../../client/generated';
-import { TableLocalDataSource } from '../../modules/table/shared/table-local-data-source';
-import { AugmentedResourcesService } from '../../client/augmented/services/augmented-resources-service';
-import { FilterConditionFactoryService } from '../../modules/table/services/filter-condition-factory.service';
-import { SearchColDirective } from '../../modules/table/directives/search-col.directive';
-import { RestoreDialogData } from '../../modules/basics/shared/restore-dialog-data';
+import { History, AugmentedResourcesService } from '../../client/step-client-module';
+import {
+  FilterConditionFactoryService,
+  SearchColDirective,
+  TableLocalDataSource,
+} from '../../modules/table/table.module';
+import { RestoreDialogData } from '../../modules/basics/step-basics.module';
 
 @Component({
   selector: 'step-restore-dialog',

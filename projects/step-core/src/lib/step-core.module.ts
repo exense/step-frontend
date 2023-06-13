@@ -67,6 +67,10 @@ import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
+import { NewSchedulerTaskDialogComponent } from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
+import { EditSchedulerTaskDialogComponent } from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
+import { ExportDialogComponent } from './components/export-dialog/export-dialog.component';
+import { FileAlreadyExistingDialogComponent } from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 
 @NgModule({
   declarations: [
@@ -120,6 +124,10 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
     PredefinedOptionsInputComponent,
+    NewSchedulerTaskDialogComponent,
+    EditSchedulerTaskDialogComponent,
+    ExportDialogComponent,
+    FileAlreadyExistingDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -200,6 +208,10 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
     PredefinedOptionsInputComponent,
+    NewSchedulerTaskDialogComponent,
+    EditSchedulerTaskDialogComponent,
+    ExportDialogComponent,
+    FileAlreadyExistingDialogComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -261,8 +273,12 @@ export { SettingButtonComponent } from './components/setting-button/setting-butt
 export { SplitAreaComponent } from './components/split-area/split-area.component';
 export { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 export { SplitComponent } from './components/split/split.component';
+export * from './components/export-dialog/export-dialog.component';
 export * from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 export { UploadContainerComponent } from './components/upload-container/upload-container.component';
+export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
+export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
+export * from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';

@@ -28,7 +28,7 @@ export class ResourcesListComponent {
   private _document = inject(DOCUMENT);
   private _matDialog = inject(MatDialog);
 
-  readonly dataSource = this._resourcesService.createDatasource();
+  readonly dataSource = this._resourcesService.createDataSource();
 
   private openResourceConfigurationDialog(resource?: Resource): Observable<Resource | undefined> {
     const matDialogRef = this._matDialog.open<

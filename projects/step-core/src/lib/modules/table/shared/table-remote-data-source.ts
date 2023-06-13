@@ -19,11 +19,12 @@ import {
   TableRequestData,
   TableApiWrapperService,
   TableResponseGeneric,
-} from '../../../client/table/step-table-client.module';
+  TableRequestFilter,
+  OQLFilter,
+  TableParameters,
+} from '../../../client/step-client-module';
 import { TableDataSource, TableFilterOptions, TableGetDataOptions } from './table-data-source';
 import { SearchValue } from './search-value';
-import { OQLFilter, TableParameters } from '../../../client/generated';
-import { TableRequestFilter } from '../../../client/table/models/table-request-data';
 import { FilterCondition } from './filter-condition';
 
 export class TableRequestInternal {
@@ -175,13 +176,10 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   }
 
   disconnect(collectionViewer: CollectionViewer): void {
-    // While datasources exist in services, subjects completion don't allow to reuse them
-    // TODO the lines below should be uncommented back while SED-1243 implementation
-    // this._request$.complete();
-    // this._inProgress$.complete();
-    // this._requestLock$.complete();
-    // this._terminator$.next();
-    // this._terminator$.complete();
+    this._request$.complete();
+    this._inProgress$.complete();
+    this._terminator$.next();
+    this._terminator$.complete();
   }
 
   private createInternalRequestObject({ params, filter, search }: TableFilterOptions = {}): TableRequestInternal {

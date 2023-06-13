@@ -1,22 +1,62 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
-import { Subject } from 'rxjs';
-import { DateTime } from 'luxon';
+import { Component, inject, Input, OnDestroy, TrackByFunction } from '@angular/core';
+import { ControlValueAccessor, NgControl } from '@angular/forms';
+import { noop } from 'rxjs';
+import { KeyValue } from '@angular/common';
+import { CRON_PRESETS } from '../../services/cron-presets.token';
+
+type OnChange = (value: string) => void;
+type OnTouch = () => void;
 
 @Component({
   selector: 'step-cron-selector',
   templateUrl: './cron-selector.component.html',
   styleUrls: ['./cron-selector.component.scss'],
-  exportAs: 'stepCronSelector',
 })
-export class CronSelectorComponent {
+export class CronSelectorComponent implements ControlValueAccessor, OnDestroy {
+  readonly _cronPresets = inject(CRON_PRESETS);
+  readonly trackByKeyValue: TrackByFunction<KeyValue<string, string>> = (index, item) => item.key;
+
   @Input() label?: string;
-  @Input() cronString?: string;
+  @Input() placeholder?: string;
 
-  @Output() cronStringChange = new EventEmitter<string | undefined>();
+  private onChange: OnChange = noop;
+  private onTouch: OnTouch = noop;
 
-  valueChange(value: string) {
+  protected cronString?: string;
+  protected isDisabled: boolean = false;
+
+  constructor(readonly _ngControl: NgControl) {
+    this._ngControl.valueAccessor = this;
+  }
+
+  ngOnDestroy(): void {
+    this.onChange = noop;
+    this.onTouch = noop;
+  }
+
+  registerOnChange(fn: OnChange): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: OnTouch): void {
+    this.onTouch = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.isDisabled = isDisabled;
+  }
+
+  writeValue(value: string): void {
     this.cronString = value;
-    this.cronStringChange.emit(value);
+  }
+
+  valueChange(value: string): void {
+    this.cronString = value;
+    this.onTouch();
+    this.onChange(value);
+  }
+
+  handleBlur(): void {
+    this.onTouch();
   }
 }

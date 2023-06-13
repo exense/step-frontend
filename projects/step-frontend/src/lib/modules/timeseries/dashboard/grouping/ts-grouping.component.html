@@ -1,8 +1,5 @@
 <div mat-button [matMenuTriggerFor]="groupingMenu" #matTrigger="matMenuTrigger" class="filter-item-container">
-  <span class="title"> Grouping </span>
-  <span class="subtitle">
-    {{ selectedGrouping.label }}
-  </span>
+  <span class="grouping-title"> Grouping: {{ selectedGrouping.label }} </span>
 </div>
 <mat-menu #groupingMenu="matMenu">
   <button

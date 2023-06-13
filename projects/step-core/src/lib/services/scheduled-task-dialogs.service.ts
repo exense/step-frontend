@@ -1,55 +1,47 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
 import { map, Observable, switchMap, catchError, of } from 'rxjs';
-import { UibModalHelperService } from './uib-modal-helper.service';
-import { a1Promise2Observable, DialogsService } from '../shared';
+import { a1Promise2Observable, AJS_MODULE, DialogsService } from '../shared';
 import { ExecutionParameters, ExecutiontTaskParameters, SchedulerService } from '../client/generated';
+import { MatDialog } from '@angular/material/dialog';
+import { NewSchedulerTaskDialogComponent } from '../components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
+import { EditSchedulerTaskDialogComponent } from '../components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
+import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ScheduledTaskDialogsService {
-  constructor(
-    private _httpClient: HttpClient,
-    private _uibModalHelper: UibModalHelperService,
-    private _dialogs: DialogsService,
-    private _schedulerService: SchedulerService
-  ) {}
+  private _matDialog = inject(MatDialog);
+  private _dialogs = inject(DialogsService);
+  private _schedulerService = inject(SchedulerService);
 
-  newScheduledTask(executionParams: ExecutionParameters): Observable<any> {
-    const modalInstance = this._uibModalHelper.open({
-      backdrop: 'static',
-      templateUrl: 'partials/scheduler/newSchedulerTaskDialog.html',
-      controller: 'newTaskModalCtrl',
-      resolve: {
-        executionParams: function () {
-          return executionParams;
-        },
-      },
-    });
-
-    const taskParams$ = a1Promise2Observable(modalInstance.result) as Observable<ExecutiontTaskParameters>;
-    return taskParams$.pipe(switchMap((taskParams) => this._schedulerService.saveExecutionTask(taskParams)));
+  newScheduledTask(executionParams: ExecutionParameters): Observable<ExecutiontTaskParameters | undefined> {
+    return this._matDialog
+      .open<NewSchedulerTaskDialogComponent, ExecutionParameters, ExecutiontTaskParameters | undefined>(
+        NewSchedulerTaskDialogComponent,
+        { data: executionParams }
+      )
+      .afterClosed()
+      .pipe(
+        switchMap((result) => {
+          if (!result) {
+            return of(undefined);
+          }
+          return this._schedulerService.saveExecutionTask(result);
+        })
+      );
   }
 
-  editScheduledTask(
-    scheduledTask?: Partial<ExecutiontTaskParameters>
-  ): Observable<{ scheduledTask?: Partial<ExecutiontTaskParameters>; result: string }> {
-    const modalInstance = this._uibModalHelper.open({
-      backdrop: 'static',
-      templateUrl: 'partials/scheduler/editSchedulerTaskDialog.html',
-      controller: 'editSchedulerTaskModalCtrl',
-      resolve: {
-        task: function (): any {
-          return scheduledTask;
-        },
-      },
-    });
-    const result$ = a1Promise2Observable(modalInstance.result) as Observable<string>;
-    return result$.pipe(map((result) => ({ result, scheduledTask: scheduledTask })));
+  editScheduledTask(scheduledTask: ExecutiontTaskParameters): Observable<ExecutiontTaskParameters | undefined> {
+    return this._matDialog
+      .open<EditSchedulerTaskDialogComponent, ExecutiontTaskParameters, ExecutiontTaskParameters | undefined>(
+        EditSchedulerTaskDialogComponent,
+        { data: scheduledTask, disableClose: true }
+      )
+      .afterClosed();
   }
 
-  removeScheduledTask(task: ExecutiontTaskParameters): Observable<any> {
+  removeScheduledTask(task: ExecutiontTaskParameters): Observable<boolean> {
     const paramName: string = task.attributes!['name']!;
     return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Task "${paramName}"`)).pipe(
       switchMap(() => this._schedulerService.deleteExecutionTask(task.id!)),
@@ -58,3 +50,7 @@ export class ScheduledTaskDialogsService {
     );
   }
 }
+
+getAngularJSGlobal()
+  .module(AJS_MODULE)
+  .service('ScheduledTaskDialogsService', downgradeInjectable(ScheduledTaskDialogsService));

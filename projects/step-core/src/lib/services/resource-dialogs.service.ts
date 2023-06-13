@@ -6,6 +6,7 @@ import { SearchResourceDialogComponent } from '../components/search-resource-dia
 import { a1Promise2Observable, DialogsService } from '../shared';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
 import { UibModalHelperService } from './uib-modal-helper.service';
+import { FileAlreadyExistingDialogComponent } from '../components/file-already-existing-dialog/file-already-existing-dialog.component';
 
 @Injectable({
   providedIn: 'root',
@@ -16,6 +17,7 @@ export class ResourceDialogsService {
   private _resourcesService = inject(ResourcesService);
   private _isUsedByDialogs = inject(IsUsedByDialogService);
   private _matDialog = inject(MatDialog);
+  private _resourceInputBridgeService = inject(ResourceInputBridgeService);
 
   readonly RESOURCE_SEARCH_TYPE = 'RESOURCE_ID';
 
@@ -36,19 +38,12 @@ export class ResourceDialogsService {
     return dialogRef.afterClosed() as Observable<string>;
   }
 
-  showFileAlreadyExistsWarning(similarResources: Resource[]): Observable<string> {
-    const modalInstance = this._uibModalHelper.open({
-      backdrop: 'static',
-      templateUrl: 'partials/resources/fileAlreadyExistsWarning.html',
-      controller: 'fileAlreadyExistsWarningCtrl',
-      resolve: {
-        similarResources: () => {
-          return similarResources;
-        },
-      },
-    });
-
-    return a1Promise2Observable(modalInstance.result) as Observable<string>;
+  showFileAlreadyExistsWarning(similarResources: Resource[]): Observable<{ id?: string } | undefined> {
+    return this._matDialog
+      .open<FileAlreadyExistingDialogComponent, Resource[], { id?: string }>(FileAlreadyExistingDialogComponent, {
+        data: similarResources,
+      })
+      .afterClosed();
   }
 
   showUpdateResourceWarning(resource?: Resource): Observable<boolean> {

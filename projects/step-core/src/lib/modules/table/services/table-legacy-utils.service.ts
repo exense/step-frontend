@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE } from '../../../shared';
-import { TableRequestData } from '../../../client/table/models/table-request-data';
-import { SortDirection } from '../../../client/table/models/sort-direction.enum';
-import { FieldSort } from '../../../client/table/models/field-sort';
-import { TableResponseGeneric } from '../../../client/table/models/table-response-generic';
-import { OQLFilter, TableParameters } from '../../../client/generated';
+import {
+  TableRequestData,
+  SortDirection,
+  FieldSort,
+  TableResponseGeneric,
+  OQLFilter,
+  TableParameters,
+} from '../../../client/step-client-module';
 
 export interface LegacyColumnOrder {
   column: number;

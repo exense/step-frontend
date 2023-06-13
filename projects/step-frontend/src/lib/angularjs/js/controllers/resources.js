@@ -21,27 +21,9 @@ angular
 
   .run(function (ViewRegistry, EntityRegistry) {
     ViewRegistry.registerView('resources', 'partials/resources/resourceList.html');
-    ViewRegistry.registerMenuEntry('Resources', 'resources', 'book', { weight: 50, parentId: 'automation-root' });
+    ViewRegistry.registerMenuEntry('Resources', 'resources', 'file-attachment-03',  {weight: 50, parentId: "automation-root"});
   })
 
-  .controller(
-    'fileAlreadyExistsWarningCtrl',
-    function ($scope, $uibModalInstance, $http, AuthService, similarResources) {
-      $scope.similarResources = similarResources;
-
-      $scope.selectResource = function (id) {
-        $uibModalInstance.close(id);
-      };
-
-      $scope.createNewResource = function () {
-        $uibModalInstance.close(null);
-      };
-
-      $scope.cancel = function () {
-        $uibModalInstance.dismiss('cancel');
-      };
-    }
-  )
 
   .controller('updateResourceWarningCtrl', function ($scope, $uibModalInstance, $http, AuthService, resource) {
     $scope.resource = resource;
