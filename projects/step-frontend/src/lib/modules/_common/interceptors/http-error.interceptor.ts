@@ -54,10 +54,11 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   }
 
   private showError(error: any) {
-    if (typeof error === 'string') {
-      this._snackBar.open(error, 'dismiss');
-    } else {
+    /* Filtering out ": 0 Unknown Error" which is not helpful and confuses users */
+    if (typeof error !== 'string' || error.endsWith(': 0 Unknown Error')) {
       console.error('Silent Error', error);
+    } else {
+      this._snackBar.open(error, 'dismiss');
     }
   }
 

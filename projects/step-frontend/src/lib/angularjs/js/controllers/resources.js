@@ -84,7 +84,7 @@ angular
 
   .controller('editResourceCtrl', function ($scope, $uibModalInstance, $http, AuthService, Upload, id) {
     function loadResource(id) {
-      $http.get('rest/resources/' + id).then(function (response) {
+      return $http.get('rest/resources/' + id).then(function (response) {
         $scope.resource = response.data;
       });
     }
@@ -99,6 +99,7 @@ angular
     }
 
     $scope.uploading = false;
+    $scope.canSave = false;
 
     $scope.upload = function (file) {
       if (file) {
@@ -109,7 +110,8 @@ angular
         }).then(
           function (resp) {
             // Reload resource to get the updated resourceName
-            loadResource(id);
+            loadResource(id)
+              .then(() => $scope.canSave = true);
             $scope.uploading = false;
           },
           function (resp) {
@@ -128,6 +130,9 @@ angular
     };
 
     $scope.save = function () {
+      if (!$scope.canSave) {
+        return;
+      }
       $http.post('rest/resources', $scope.resource).then(function (response) {
         $uibModalInstance.close();
       });
@@ -144,7 +149,8 @@ angular
     $scope.newResourceUpdate = function () {
       if ($scope.newResource.id) {
         $scope.mode = 'edit';
-        loadResource($scope.newResource.id.replace('resource:', ''));
+        loadResource($scope.newResource.id.replace('resource:', ''))
+          .then(() => $scope.canSave = true);
       }
     };
   })
