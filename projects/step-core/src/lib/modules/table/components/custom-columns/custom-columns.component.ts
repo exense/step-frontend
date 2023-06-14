@@ -1,22 +1,20 @@
 import {
   Component,
-  EventEmitter,
   forwardRef,
   Input,
   OnChanges,
   OnDestroy,
-  Output,
   QueryList,
   SimpleChanges,
   TrackByFunction,
   ViewChildren,
 } from '@angular/core';
-import { AugmentedScreenService } from '../../../../client/augmented/step-augmented-client.module';
-import { Input as ColInput } from '../../../../client/generated';
-import { BehaviorSubject, map } from 'rxjs';
+import { AugmentedScreenService, Input as ColInput } from '../../../../client/step-client-module';
+import { BehaviorSubject, map, Subject } from 'rxjs';
 import { MatColumnDef } from '@angular/material/table';
 import { SearchColDirective } from '../../directives/search-col.directive';
 import { CustomColumnOptions } from '../../services/custom-column-options';
+import { CustomColumnsBaseComponent } from './custom-columns-base.component';
 
 @Component({
   selector: 'step-custom-columns',
@@ -27,10 +25,15 @@ import { CustomColumnOptions } from '../../services/custom-column-options';
       provide: CustomColumnOptions,
       useExisting: forwardRef(() => CustomColumnsComponent),
     },
+    {
+      provide: CustomColumnsBaseComponent,
+      useExisting: forwardRef(() => CustomColumnsComponent),
+    },
   ],
 })
-export class CustomColumnsComponent implements OnChanges, OnDestroy, CustomColumnOptions {
+export class CustomColumnsComponent implements OnChanges, OnDestroy, CustomColumnOptions, CustomColumnsBaseComponent {
   private readonly sbjOptions$ = new BehaviorSubject<string[]>([]);
+  private columnsReadyInternal$ = new Subject<boolean>();
   readonly options$ = this.sbjOptions$.asObservable();
 
   @Input() screen!: string;
@@ -38,7 +41,7 @@ export class CustomColumnsComponent implements OnChanges, OnDestroy, CustomColum
   @Input() isSearchDisabled?: boolean;
   @Input() options?: string | string[];
 
-  @Output() columnsReady = new EventEmitter<unknown>();
+  readonly columnsReady$ = this.columnsReadyInternal$.asObservable();
 
   columns: ColInput[] = [];
 
@@ -76,6 +79,7 @@ export class CustomColumnsComponent implements OnChanges, OnDestroy, CustomColum
 
   ngOnDestroy(): void {
     this.sbjOptions$.complete();
+    this.columnsReadyInternal$.complete();
   }
 
   private updateOptions(value?: string | string[]): void {
@@ -111,7 +115,7 @@ export class CustomColumnsComponent implements OnChanges, OnDestroy, CustomColum
         // timeout required to make sure that event is emitted
         // on next cd cycle, so we can be sure then column's rendering completed
         setTimeout(() => {
-          this.columnsReady.emit({});
+          this.columnsReadyInternal$.next(true);
         });
       });
   }

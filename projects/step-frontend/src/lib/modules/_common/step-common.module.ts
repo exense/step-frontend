@@ -1,6 +1,6 @@
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { StepCoreModule } from '@exense/step-core';
+import { DashletRegistryService, EntityColumnComponent, StepCoreModule } from '@exense/step-core';
 import { ExecutionLinkComponent } from './components/execution-link/execution-link.component';
 import { LoginComponent } from './components/login/login.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
@@ -59,6 +59,10 @@ import { MenuFilterPipe } from './pipes/menu-filter.pipe';
     },
   ],
 })
-export class StepCommonModule {}
+export class StepCommonModule {
+  constructor(dashletRegistryService: DashletRegistryService) {
+    dashletRegistryService.registerDashlet('entityColumn', EntityColumnComponent);
+  }
+}
 
 export * from './shared/status.enum';
