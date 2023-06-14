@@ -34,6 +34,7 @@
           name="dynamicName"
           [disabled]="readonly"
           [(ngModel)]="artefact.dynamicName"
+          (ngModelChange)="syncName($event)"
         >
         </step-dynamic-textfield>
       </ng-template>

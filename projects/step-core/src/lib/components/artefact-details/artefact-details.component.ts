@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { ArtefactService, ArtefactType } from '../../services/artefact.service';
 import { ArtefactContext } from '../../shared';
-import { AbstractArtefact } from '../../client/step-client-module';
+import { AbstractArtefact, DynamicValueString } from '../../client/step-client-module';
 import { NgForm } from '@angular/forms';
 import { ArtefactFormChangeHelperService } from '../../services/artefact-form-change-helper.service';
 
@@ -55,15 +55,6 @@ export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, Aft
     }
   }
 
-  private determineArtefactMetaData(classname?: string): void {
-    if (!classname) {
-      this.isKeyword = false;
-      return;
-    }
-    this.isKeyword = classname === 'CallKeyword';
-    this.artefactMeta = this._artefactsService.getArtefactType(classname);
-  }
-
   save(): void {
     if (this.readonly) {
       return;
@@ -73,7 +64,24 @@ export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, Aft
   }
 
   protected switchToDynamicName(): void {
+    this.artefact!.dynamicName!.expression = this.artefact!.attributes!['name'];
     this.artefact!.dynamicName!.dynamic = true;
     this.save();
+  }
+
+  protected syncName(dynamicValue: DynamicValueString): void {
+    if (dynamicValue.dynamic) {
+      return;
+    }
+    this.artefact!.attributes!['name'] = dynamicValue.value ?? '';
+  }
+
+  private determineArtefactMetaData(classname?: string): void {
+    if (!classname) {
+      this.isKeyword = false;
+      return;
+    }
+    this.isKeyword = classname === 'CallKeyword';
+    this.artefactMeta = this._artefactsService.getArtefactType(classname);
   }
 }
