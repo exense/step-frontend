@@ -4,7 +4,8 @@ import {
   BucketResponse,
   TableDataSource,
   TableLocalDataSource,
-  TableLocalDataSourceConfig, TimeSeriesAPIResponse
+  TableLocalDataSourceConfig,
+  TimeSeriesAPIResponse,
 } from '@exense/step-core';
 import { Subject } from 'rxjs';
 import { TimeSeriesKeywordsContext } from '../../execution-page/time-series-keywords.context';
@@ -28,6 +29,8 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   response: TimeSeriesAPIResponse | undefined;
   groupDimensions: string[] = [];
 
+  allSeriesChecked: boolean = true;
+
   private keywordsService!: TimeSeriesKeywordsContext;
   @Input() executionContext!: TimeSeriesContext;
 
@@ -46,6 +49,9 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     this.keywordsService = this.executionContext.keywordsContext;
     this.keywordsService.onKeywordToggled().subscribe((selection) => {
       this.bucketsByKeywords[selection.id].attributes!['isSelected'] = selection.isSelected;
+      if (!selection.isSelected) {
+        this.allSeriesChecked = false;
+      }
     });
   }
 
@@ -82,6 +88,10 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
 
   onKeywordToggle(keyword: string, event: any) {
     this.keywordsService.toggleKeyword(keyword);
+  }
+
+  onAllSeriesCheckboxClick(event: any) {
+    this.keywordsService.toggleSelectAll();
   }
 
   getSeriesKey(attributes: BucketAttributes, groupDimensions: string[]) {
