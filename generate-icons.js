@@ -2,7 +2,11 @@ const fs = require('fs/promises');
 
 const STRING_CAMELIZE_REGEXP = /(-|_|\.|\s)+(.)?/g;
 
-const iconsSvgFolders = ['node_modules/feather-icons/dist/icons', '../node_modules/feather-icons/dist/icons'];
+const iconsSvgFolders = [
+  'node_modules/feather-icons/dist/icons',
+  '../node_modules/feather-icons/dist/icons',
+  'custom-icons',
+];
 
 const prefixPath = 'projects/step-core/src/lib/modules/step-icons';
 const iconsDestFolder = `${prefixPath}/icons/svg`;
@@ -55,7 +59,16 @@ const run = async () => {
     const exportName = upperCamelize(iconName);
 
     const markup = await fs.readFile(`${folder}/${file}`, { encoding: 'utf-8' });
-    const payload = String(markup).match(/^<svg[^>]+?>(.+)<\/svg>$/);
+    const payload = String(markup)
+      .trim()
+      .match(/^<svg[^>]+?>(.+)<\/svg>$/);
+
+    if (!payload) {
+      console.log('FAILED TO EXTRACT SVG FROM:', `${folder}/${file}`);
+      console.log('MARKUP', markup.trim());
+      console.log('---------------------------------');
+      return;
+    }
 
     const output = iconTemplate
       .replace(/__EXPORT_NAME__/g, exportName)
