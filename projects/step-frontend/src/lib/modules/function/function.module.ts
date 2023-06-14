@@ -67,7 +67,7 @@ export class FunctionModule {
       FunctionPackageSearchComponent
     );
     _entityRegistry.register('functionPackage', 'KeywordPackage', {
-      icon: 'gift',
+      icon: 'package',
       component: FunctionPackageSelectionComponent,
     });
     _viewRegistry.registerView('functions', 'partials/functionList.html');
