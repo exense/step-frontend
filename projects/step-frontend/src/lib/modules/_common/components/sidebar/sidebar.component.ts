@@ -3,10 +3,12 @@ import {
   Component,
   ElementRef,
   inject,
+  NgZone,
   OnDestroy,
   OnInit,
   QueryList,
   TrackByFunction,
+  ViewChild,
   ViewChildren,
   ViewEncapsulation,
 } from '@angular/core';
@@ -36,10 +38,12 @@ const MIDDLE_BUTTON = 1;
 export class SidebarComponent implements OnInit, OnDestroy {
   private _navigator = inject(NavigatorService);
   private _viewRegistryService = inject(ViewRegistryService);
+  private _zone = inject(NgZone);
   public _viewStateService = inject(ViewStateService);
   private _matDialog = inject(MatDialog);
 
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
+  @ViewChild('tabs') tabs?: ElementRef<HTMLElement>;
 
   private terminator$ = new Subject<void>();
   private locationStateSubscription: SubscriptionLike;
@@ -119,6 +123,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   showVersionsDialog(): void {
     const dialogRef = this._matDialog.open(VersionsDialogComponent);
+  }
+
+  handleScroll($event: Event): void {
+    this._zone.runOutsideAngular(() => {
+      const scrollTop = ($event.target as HTMLElement).scrollTop;
+      this.tabs!.nativeElement.setAttribute('style', `--scrollOffset: -${scrollTop}px`);
+    });
   }
 }
 
