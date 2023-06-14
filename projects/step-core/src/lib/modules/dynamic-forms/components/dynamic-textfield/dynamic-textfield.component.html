@@ -14,14 +14,26 @@
 <ng-template #constantValueTemplate>
   <step-form-field [class.ng-invalid]="!!_ngControl.invalid" [class.with-tooltip]="tooltip">
     <step-label [attr.show-required-marker]="showRequiredAsterisk || null" *ngIf="label">{{ label }}</step-label>
-    <input
-      [type]="isNumber ? 'number' : 'text'"
-      [required]="showRequiredAsterisk"
-      [ngModel]="value"
-      (ngModelChange)="onValueChange($event)"
-      [disabled]="isDisabled"
-      (blur)="onBlur()"
-    />
+    <ng-template #numberField>
+      <input
+        type="number"
+        [ngModel]="value"
+        (ngModelChange)="onValueChange($event)"
+        [disabled]="isDisabled"
+        (blur)="onBlur()"
+        (keydown)="preventNumberInvalidChars($event)"
+      />
+    </ng-template>
+    <ng-template #textField>
+      <input
+        type="text"
+        [ngModel]="value"
+        (ngModelChange)="onValueChange($event)"
+        [disabled]="isDisabled"
+        (blur)="onBlur()"
+      />
+    </ng-template>
+    <ng-container *ngIf="isNumber; then numberField; else textField"> </ng-container>
     <step-suffix *ngIf="tooltip" class="icon-suffix">
       <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below"></step-icon>
     </step-suffix>

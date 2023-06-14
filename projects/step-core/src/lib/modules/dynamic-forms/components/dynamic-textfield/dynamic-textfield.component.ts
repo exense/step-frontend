@@ -54,6 +54,13 @@ export class DynamicTextfieldComponent implements ControlValueAccessor {
     this.emitChanges();
   }
 
+  preventNumberInvalidChars(event: KeyboardEvent): void {
+    const numberInputInvalidCharts = ['+', '-', 'e'];
+    if (numberInputInvalidCharts.includes(event.key)) {
+      event.preventDefault();
+    }
+  }
+
   onBlur(): void {
     this.onTouch?.();
     this.blur.emit();
