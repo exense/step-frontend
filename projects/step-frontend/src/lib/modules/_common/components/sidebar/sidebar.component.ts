@@ -1,9 +1,8 @@
-import { DOCUMENT, Location } from '@angular/common';
+import { Location } from '@angular/common';
 import {
   Component,
   ElementRef,
   inject,
-  Inject,
   OnDestroy,
   OnInit,
   QueryList,
@@ -14,19 +13,19 @@ import {
 import { MatDialog } from '@angular/material/dialog';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  AJS_LOCATION,
   AJS_MODULE,
-  AuthService,
   IS_SMALL_SCREEN,
   MenuEntry,
+  NavigatorService,
   ViewRegistryService,
   ViewStateService,
 } from '@exense/step-core';
-import { ILocationService } from 'angular';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
 import { MENU_ITEMS } from '../../injectables/menu-items';
 import { Subject, SubscriptionLike, takeUntil } from 'rxjs';
 import { SidebarOpenStateService } from '../../injectables/sidebar-open-state.service';
+
+const MIDDLE_BUTTON = 1;
 
 @Component({
   selector: 'step-sidebar',
@@ -35,6 +34,11 @@ import { SidebarOpenStateService } from '../../injectables/sidebar-open-state.se
   encapsulation: ViewEncapsulation.None,
 })
 export class SidebarComponent implements OnInit, OnDestroy {
+  private _navigator = inject(NavigatorService);
+  private _viewRegistryService = inject(ViewRegistryService);
+  public _viewStateService = inject(ViewStateService);
+  private _matDialog = inject(MatDialog);
+
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
 
   private terminator$ = new Subject<void>();
@@ -47,14 +51,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   readonly isOpened$ = this._sideBarOpenState.isOpened$;
   readonly trackByMenuEntry: TrackByFunction<MenuEntry> = (index, item) => item.id;
 
-  constructor(
-    public _authService: AuthService,
-    public _viewRegistryService: ViewRegistryService,
-    public _viewStateService: ViewStateService,
-    public _location: Location,
-    @Inject(AJS_LOCATION) private _ajsLocation: ILocationService,
-    private _matDialog: MatDialog
-  ) {
+  constructor(private _location: Location) {
     this.locationStateSubscription = this._location.subscribe((popState: any) => {
       this.openMainMenuBasedOnActualView();
     });
@@ -103,32 +100,15 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
   }
 
-  public navigateTo(viewId: string): void {
-    if (viewId.startsWith(ViewRegistryService.VIEW_ID_LINK_PREFIX)) {
-      const link = viewId.split('link:')[1];
-      window.open(link, '_blank');
-      return;
-    }
+  navigateTo(viewId: string, $event: MouseEvent): void {
+    const isOpenInSeparateTab = $event.ctrlKey || $event.button === MIDDLE_BUTTON || $event.metaKey;
+
     switch (viewId) {
       case 'home':
-        this._authService.gotoDefaultPage();
+        this._navigator.navigateToHome(isOpenInSeparateTab);
         break;
       default:
-        if (this._ajsLocation.path().includes('/root/' + viewId)) {
-          this._ajsLocation.path('/');
-          setTimeout(() => this._ajsLocation.path('/root/' + viewId).replace());
-        } else {
-          this._ajsLocation.path('/root/' + viewId);
-        }
-        const queryParams = this._ajsLocation.search();
-        if (queryParams['tsParams']) {
-          const clear = queryParams['tsParams'].split(',');
-          clear.forEach((value: string) => {
-            delete queryParams[value];
-          });
-          delete queryParams.tsParams;
-          this._ajsLocation.search(queryParams);
-        }
+        this._navigator.navigate(viewId, isOpenInSeparateTab);
         break;
     }
   }
