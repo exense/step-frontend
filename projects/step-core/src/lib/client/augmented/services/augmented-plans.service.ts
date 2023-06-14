@@ -16,8 +16,6 @@ export class AugmentedPlansService extends PlansService {
   }
 
   createSelectionDataSource(): StepDataSource<Plan> {
-    return this._dataSourceFactory.createDataSource(this.PLANS_TABLE_ID, {
-      scope: 'scope',
-    });
+    return this._dataSourceFactory.createDataSource(this.PLANS_TABLE_ID, { name: 'attributes.name' });
   }
 }
