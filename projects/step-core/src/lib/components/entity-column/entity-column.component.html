@@ -1,0 +1,6 @@
+<ng-container matColumnDef="entityIcon">
+  <th mat-header-cell *matHeaderCellDef></th>
+  <td mat-cell *matCellDef="let element">
+    <entity-icon [entity]="element" [entityName]="context"> </entity-icon>
+  </td>
+</ng-container>

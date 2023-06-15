@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { EntityRegistry } from '../../services/entity-registry';
 import { ProjectManagementHelperService } from '../../../basics/step-basics.module';
@@ -21,6 +21,7 @@ export class SelectEntityOfTypeComponent implements OnInit, OnDestroy {
   protected selectEntityContext: SelectEntityContext = {
     multipleSelection: !this._dialogData.singleSelection,
     handleSelect: (selectedId: string) => this.handleSelect(selectedId),
+    getSourceId: () => this._dialogData.sourceId,
   };
   protected migrationTarget: string = '';
   protected currentProject: string = '';

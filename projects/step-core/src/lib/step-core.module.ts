@@ -67,6 +67,8 @@ import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
+import { EntityColumnComponent } from './components/entity-column/entity-column.component';
+import { EntityColumnContainerComponent } from './components/entity-column-container/entity-column-container.component';
 import { NewSchedulerTaskDialogComponent } from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 import { EditSchedulerTaskDialogComponent } from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 import { ExportDialogComponent } from './components/export-dialog/export-dialog.component';
@@ -124,6 +126,8 @@ import { FileAlreadyExistingDialogComponent } from './components/file-already-ex
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
     PredefinedOptionsInputComponent,
+    EntityColumnComponent,
+    EntityColumnContainerComponent,
     NewSchedulerTaskDialogComponent,
     EditSchedulerTaskDialogComponent,
     ExportDialogComponent,
@@ -208,6 +212,8 @@ import { FileAlreadyExistingDialogComponent } from './components/file-already-ex
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
     PredefinedOptionsInputComponent,
+    EntityColumnComponent,
+    EntityColumnContainerComponent,
     NewSchedulerTaskDialogComponent,
     EditSchedulerTaskDialogComponent,
     ExportDialogComponent,
@@ -276,6 +282,8 @@ export { SplitComponent } from './components/split/split.component';
 export * from './components/export-dialog/export-dialog.component';
 export * from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 export { UploadContainerComponent } from './components/upload-container/upload-container.component';
+export * from './components/entity-column/entity-column.component';
+export * from './components/entity-column-container/entity-column-container.component';
 export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 export * from './components/file-already-existing-dialog/file-already-existing-dialog.component';
