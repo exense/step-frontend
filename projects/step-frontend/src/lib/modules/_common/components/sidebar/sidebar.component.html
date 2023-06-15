@@ -2,7 +2,6 @@
   class="sidebar"
   [class.sidebar-closed]="!(isOpened$ | async)"
   [class.small-screen]="_isSmallScreen$ | async"
-  #sidebar
   (scroll)="handleScroll($event)"
 >
   <div id="sidebar-logo-and-burgermenu">
@@ -35,6 +34,7 @@
           [name]="mainMenuEntry.id"
           id="collapsable-tab-{{ mainMenuEntry.title }}"
           type="checkbox"
+          (change)="toggleMenuItem(mainMenuCheckBox)"
         />
         <label for="collapsable-tab-{{ mainMenuEntry.title }}">
           <step-icon class="visible-when-collapsed" [name]="mainMenuEntry.icon"></step-icon>
