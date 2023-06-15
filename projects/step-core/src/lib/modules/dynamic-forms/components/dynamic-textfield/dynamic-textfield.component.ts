@@ -27,6 +27,8 @@ export class DynamicTextfieldComponent implements ControlValueAccessor {
   expression: string = '';
   isDisabled: boolean = false;
 
+  readonly numberInputInvalidChars = ['+', '-', 'e'];
+
   constructor(private _dialogsService: DialogsService, public _ngControl: NgControl) {
     this._ngControl.valueAccessor = this;
   }
@@ -52,13 +54,6 @@ export class DynamicTextfieldComponent implements ControlValueAccessor {
   onValueChange(value: string | number): void {
     this.value = value;
     this.emitChanges();
-  }
-
-  preventNumberInvalidChars(event: KeyboardEvent): void {
-    const numberInputInvalidCharts = ['+', '-', 'e'];
-    if (numberInputInvalidCharts.includes(event.key)) {
-      event.preventDefault();
-    }
   }
 
   onBlur(): void {

@@ -21,7 +21,7 @@
         (ngModelChange)="onValueChange($event)"
         [disabled]="isDisabled"
         (blur)="onBlur()"
-        (keydown)="preventNumberInvalidChars($event)"
+        [stepPreventChars]="numberInputInvalidChars"
       />
     </ng-template>
     <ng-template #textField>
