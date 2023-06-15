@@ -97,7 +97,7 @@
 <ng-container *ngIf="showFooter">
   <hr />
   <div>
-    <span class="muted mat-small">Start: {{ node?.executionTime | date: 'dd.MM.yyyy HH:mm:ss:sss' }}</span>
+    <span class="muted mat-small">Start: {{ node?.executionTime | date: 'dd.MM.yyyy HH:mm:ss:SSS' }}</span>
     <span class="muted mat-small"> | Duration (ms): {{ node?.duration }}</span>
     <span class="muted mat-small" *ngIf="node?.resolvedArtefact?._class === 'CallKeyword'">
       | Agent: {{ node?.agentUrl }}
