@@ -1,12 +1,14 @@
 import { Location } from '@angular/common';
 import {
+  AfterViewInit,
   Component,
   ElementRef,
   inject,
+  NgZone,
   OnDestroy,
-  OnInit,
   QueryList,
   TrackByFunction,
+  ViewChild,
   ViewChildren,
   ViewEncapsulation,
 } from '@angular/core';
@@ -23,7 +25,7 @@ import {
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
 import { MENU_ITEMS } from '../../injectables/menu-items';
 import { Subject, SubscriptionLike, takeUntil } from 'rxjs';
-import { SidebarOpenStateService } from '../../injectables/sidebar-open-state.service';
+import { SidebarStateService } from '../../injectables/sidebar-state.service';
 
 const MIDDLE_BUTTON = 1;
 
@@ -33,22 +35,24 @@ const MIDDLE_BUTTON = 1;
   styleUrls: ['./sidebar.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class SidebarComponent implements OnInit, OnDestroy {
+export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _navigator = inject(NavigatorService);
   private _viewRegistryService = inject(ViewRegistryService);
+  private _zone = inject(NgZone);
   public _viewStateService = inject(ViewStateService);
   private _matDialog = inject(MatDialog);
 
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
+  @ViewChild('tabs') tabs?: ElementRef<HTMLElement>;
 
   private terminator$ = new Subject<void>();
   private locationStateSubscription: SubscriptionLike;
 
-  private _sideBarOpenState = inject(SidebarOpenStateService);
+  private _sideBarState = inject(SidebarStateService);
   readonly _menuItems$ = inject(MENU_ITEMS).pipe(takeUntil(this.terminator$));
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
-  readonly isOpened$ = this._sideBarOpenState.isOpened$;
+  readonly isOpened$ = this._sideBarState.isOpened$;
   readonly trackByMenuEntry: TrackByFunction<MenuEntry> = (index, item) => item.id;
 
   constructor(private _location: Location) {
@@ -57,13 +61,18 @@ export class SidebarComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
+    this._sideBarState.initialize();
     this._menuItems$.subscribe(() => {
       setTimeout(() => {
         // zero timout is used, to create a macrotasks
         // that will be invoked after menu render
-        this.openMainMenuBasedOnActualView();
-        this.openEssentialMainMenus();
+        if (this._sideBarState.openedMenuItems) {
+          this.initializeMainMenuItemsFromState();
+        } else {
+          this.openMainMenuBasedOnActualView();
+          this.openEssentialMainMenus();
+        }
       }, 0);
     });
   }
@@ -93,11 +102,22 @@ export class SidebarComponent implements OnInit, OnDestroy {
     });
   }
 
-  private openMainMenu(mainMenuKey: string): void {
+  private initializeMainMenuItemsFromState(): void {
+    Object.entries(this._sideBarState.openedMenuItems || {}).forEach(([mainMenuKey, isOpened]) =>
+      this.openMainMenu(mainMenuKey, isOpened)
+    );
+  }
+
+  private openMainMenu(mainMenuKey: string, isOpened: boolean = true): void {
     const checkbox = this.mainMenuCheckBoxes?.find((item) => item.nativeElement.getAttribute('name') === mainMenuKey);
     if (checkbox) {
-      checkbox.nativeElement.checked = true;
+      checkbox.nativeElement.checked = isOpened;
     }
+    this._sideBarState.setMenuItemState(mainMenuKey, isOpened);
+  }
+
+  toggleMenuItem(item: HTMLInputElement): void {
+    this._sideBarState.setMenuItemState(item.getAttribute('name')!, item.checked);
   }
 
   navigateTo(viewId: string, $event: MouseEvent): void {
@@ -114,11 +134,18 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   toggleOpenClose() {
-    this._sideBarOpenState.toggleIsOpened();
+    this._sideBarState.toggleIsOpened();
   }
 
   showVersionsDialog(): void {
-    const dialogRef = this._matDialog.open(VersionsDialogComponent);
+    this._matDialog.open(VersionsDialogComponent);
+  }
+
+  handleScroll($event: Event): void {
+    this._zone.runOutsideAngular(() => {
+      const scrollTop = ($event.target as HTMLElement).scrollTop;
+      this.tabs!.nativeElement.setAttribute('style', `--scrollOffset: -${scrollTop}px`);
+    });
   }
 }
 
