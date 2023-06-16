@@ -98,7 +98,6 @@ export class ReportNodeShortComponent implements OnChanges {
     });
   }
 
-  readonly testTime = 1685958450857;
 
   private concatenate(attributesMap?: Record<string, string>): Observable<string> {
     if (!attributesMap) {
