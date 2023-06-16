@@ -62,7 +62,7 @@
             "scripts": ["node_modules/uplot/dist/uPlot.iife.min.js"],
             "extraWebpackConfig": "projects/step-app/webpack.config.js",
             "commonChunk": false,
-            "allowedCommonJsDependencies": ["ace-builds"]
+            "allowedCommonJsDependencies": ["ace-builds", "luxon"]
           },
           "configurations": {
             "local": {

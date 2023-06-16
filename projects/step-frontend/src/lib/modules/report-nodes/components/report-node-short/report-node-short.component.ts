@@ -98,6 +98,7 @@ export class ReportNodeShortComponent implements OnChanges {
     });
   }
 
+
   private concatenate(attributesMap?: Record<string, string>): Observable<string> {
     if (!attributesMap) {
       return of('');
