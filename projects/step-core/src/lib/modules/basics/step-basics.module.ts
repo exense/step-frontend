@@ -123,4 +123,7 @@ export * from './shared/storage-proxy';
 export * from './shared/storage.token';
 export * from './shared/json-validator';
 export * from './services/persistence.service';
+export * from './services/default-page.token';
+export * from './services/view-id-link-prefix.token';
+export * from './services/navigator.service';
 export * from './shared/logout-cleanup.token';

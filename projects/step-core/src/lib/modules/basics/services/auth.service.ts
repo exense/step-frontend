@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { Inject, Injectable, OnDestroy } from '@angular/core';
+import { inject, Inject, Injectable, OnDestroy } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { SessionDto } from '../../../domain';
 import { BehaviorSubject, catchError, map, Observable, of, switchMap, tap } from 'rxjs';
@@ -11,6 +11,8 @@ import { ApplicationConfiguration, PrivateApplicationService } from '../../../cl
 import { Mutable } from '../../../shared';
 import { AuthContext } from '../shared/auth-context.interface';
 import { LoginService } from './login.service';
+import { AppConfigContainerService } from './app-config-container.service';
+import { NavigatorService } from './navigator.service';
 
 type FieldAccessor = Mutable<Pick<AuthService, 'isOidc'>>;
 
@@ -22,22 +24,20 @@ const ANONYMOUS = 'anonymous';
   providedIn: 'root',
 })
 export class AuthService implements OnDestroy {
-  constructor(
-    @Inject(AJS_ROOT_SCOPE) private _$rootScope: any,
-    @Inject(AJS_LOCATION) private _$location: any,
-    @Inject(DOCUMENT) private _document: Document,
-    @Inject(AJS_PREFERENCES) private _preferences: any,
-    @Inject(AJS_UIB_MODAL) private _$uibModal: any,
-    private _additionalRightRules: AdditionalRightRuleService,
-    private _privateApplicationApi: PrivateApplicationService,
-    private _loginService: LoginService
-  ) {}
+  private _$rootScope = inject(AJS_ROOT_SCOPE);
+  private _$location = inject(AJS_LOCATION);
+  private _document = inject(DOCUMENT);
+  private _preferences = inject(AJS_PREFERENCES);
+  private _$uibModal = inject(AJS_UIB_MODAL);
+  private _additionalRightRules = inject(AdditionalRightRuleService);
+  private _privateApplicationApi = inject(PrivateApplicationService);
+  private _loginService = inject(LoginService);
+  private _serviceContext = inject(AppConfigContainerService);
+  private _navigator = inject(NavigatorService);
 
   private _triggerRightCheck$ = new BehaviorSubject<unknown>(undefined);
 
   readonly triggerRightCheck$ = this._triggerRightCheck$.asObservable();
-
-  private _serviceContext: { conf?: ApplicationConfiguration } = {};
 
   private _context$ = new BehaviorSubject<AuthContext | undefined>(undefined);
 
@@ -59,7 +59,7 @@ export class AuthService implements OnDestroy {
   }
 
   private setContext(context: AuthContext) {
-    this._$rootScope.context = context;
+    (this._$rootScope as any).context = context;
     this._context$.next(context);
   }
 
@@ -79,9 +79,9 @@ export class AuthService implements OnDestroy {
         const context = this.getContext();
         if (context && !context.otp) {
           if (this._$location.path().indexOf('login') !== -1) {
-            this.gotoDefaultPage();
+            this._navigator.navigateToHome();
           }
-          this._$rootScope.broadcast('step.login.succeeded');
+          (this._$rootScope as any).broadcast('step.login.succeeded');
         }
       })
     );
@@ -93,26 +93,18 @@ export class AuthService implements OnDestroy {
       .pipe(map(() => ({ userID: ANONYMOUS } as AuthContext)))
       .subscribe((context) => {
         this.setContext(context);
-        this.gotoDefaultPage();
+        this._navigator.navigateToHome();
       });
   }
 
   goToLoginPage(): void {
-    this._$location.path('/root/login');
+    this._navigator.navigate('login');
   }
 
   checkOidc(): void {
     if (this.isOidc) {
       this.redirectToOidc();
       return;
-    }
-  }
-
-  gotoDefaultPage(): void {
-    if (this._serviceContext.conf && this._serviceContext.conf.defaultUrl) {
-      this._$location.path(this._serviceContext.conf.defaultUrl);
-    } else {
-      this._$location.path('/root/plans/list');
     }
   }
 
@@ -176,7 +168,7 @@ export class AuthService implements OnDestroy {
   initialize(): Observable<boolean> {
     return this._privateApplicationApi.getApplicationConfiguration().pipe(
       tap((conf) => {
-        this._serviceContext.conf = conf;
+        this._serviceContext.setConfiguration(conf);
         if (conf.title) {
           this._document.title = conf.title;
         }
