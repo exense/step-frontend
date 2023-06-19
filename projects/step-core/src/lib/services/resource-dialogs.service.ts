@@ -2,7 +2,10 @@ import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
 import { Resource, ResourcesService } from '../client/generated';
-import { FileAlreadyExistingDialogComponent } from '../components/file-already-existing-dialog/file-already-existing-dialog.component';
+import {
+  FileAlreadyExistingDialogComponent,
+  FileAlreadyExistingDialogData,
+} from '../components/file-already-existing-dialog/file-already-existing-dialog.component';
 import { SearchResourceDialogComponent } from '../components/search-resource-dialog/search-resource-dialog.component';
 import { a1Promise2Observable, DialogsService } from '../shared';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
@@ -37,11 +40,16 @@ export class ResourceDialogsService {
     return dialogRef.afterClosed() as Observable<string>;
   }
 
-  showFileAlreadyExistsWarning(similarResources: Resource[]): Observable<{ id?: string } | undefined> {
+  showFileAlreadyExistsWarning(similarResources: Resource[]): Observable<string | undefined> {
     return this._matDialog
-      .open<FileAlreadyExistingDialogComponent, Resource[], { id?: string }>(FileAlreadyExistingDialogComponent, {
-        data: similarResources,
-      })
+      .open<FileAlreadyExistingDialogComponent, FileAlreadyExistingDialogData, string | undefined>(
+        FileAlreadyExistingDialogComponent,
+        {
+          data: {
+            similarResources,
+          },
+        }
+      )
       .afterClosed();
   }
 
