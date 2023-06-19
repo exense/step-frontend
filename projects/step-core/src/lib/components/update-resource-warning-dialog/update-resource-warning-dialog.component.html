@@ -8,22 +8,22 @@
   <div step-modal-window-buttons>
     <button
       type="button"
+      (click)="_matDialogRef.close(UpdateResourceWarningResultState.UPDATE_RESOURCE)"
       mat-flat-button
       color="primary"
-      (click)="_matDialogRef.close(UpdateResourceWarningResultState.UPDATE_RESOURCE)"
     >
       Update resource
     </button>
 
     <button
       type="button"
+      (click)="_matDialogRef.close(UpdateResourceWarningResultState.NEW_RESOURCE)"
       mat-flat-button
       color="primary"
-      (click)="_matDialogRef.close(UpdateResourceWarningResultState.NEW_RESOURCE)"
     >
       Create a new resource
     </button>
 
-    <button type="button" mat-stroked-button mat-dialog-close (click)="_matDialogRef.close()">Cancel</button>
+    <button type="button" (click)="_matDialogRef.close()" mat-stroked-button>Cancel</button>
   </div>
 </step-modal-window>
