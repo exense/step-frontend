@@ -1,9 +1,10 @@
-import { Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, forwardRef, inject, Input, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, ValidatorFn } from '@angular/forms';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { DateTime } from 'luxon';
-import { debounceTime, map, Observable } from 'rxjs';
+import { debounceTime, map, merge, Observable, switchMap, take, takeUntil, timer } from 'rxjs';
 import { BaseFilterComponent } from '../base-filter/base-filter.component';
+import { ChildFocusStateService } from '../../services/child-focus-state.service';
 
 @Component({
   selector: 'step-date-filter',
@@ -17,13 +18,22 @@ import { BaseFilterComponent } from '../base-filter/base-filter.component';
   ],
   exportAs: 'stepDateFilter',
 })
-export class DateFilterComponent extends BaseFilterComponent<DateTime | undefined, DateTime | null> {
+export class DateFilterComponent
+  extends BaseFilterComponent<DateTime | undefined, DateTime | null>
+  implements AfterViewInit
+{
+  private _childFocusState = inject(ChildFocusStateService, { optional: true });
+
   @Input() label?: string;
   @Input() readonlyInput = false;
   @Input() initialDate = false;
 
   @ViewChild('dateInput') private dateInput?: ElementRef;
   @ViewChild(MatDatepicker) matDatepicker?: MatDatepicker<Date>;
+
+  ngAfterViewInit(): void {
+    this.setupDatePickerFocusState();
+  }
 
   protected override createControl(fb: FormBuilder): FormControl<DateTime | null> {
     return fb.control<DateTime | null>(null, [this.createDateValidator()]);
@@ -52,5 +62,17 @@ export class DateFilterComponent extends BaseFilterComponent<DateTime | undefine
       }
       return null;
     };
+  }
+
+  private setupDatePickerFocusState(): void {
+    if (!this._childFocusState) {
+      return;
+    }
+    merge(this.matDatepicker!.openedStream, this.matDatepicker!.closedStream)
+      .pipe(
+        map(() => this.matDatepicker!.opened),
+        takeUntil(this.terminator$)
+      )
+      .subscribe((isOpened) => this._childFocusState!.setFocusState(isOpened));
   }
 }

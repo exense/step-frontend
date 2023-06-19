@@ -1,0 +1,120 @@
+@mixin animation($type, $time) {
+  -webkit-transition: $type $time ease;
+  transition: $type $time ease;
+}
+
+@mixin opacity-animation($time: 0.3s) {
+  @include animation(opacity, $time);
+}
+
+th[step-header-cell] {
+  .cell-content {
+    white-space: nowrap;
+
+    &.pointer {
+      cursor: pointer;
+    }
+
+    &.hidden {
+      display: none;
+    }
+  }
+
+  .step-header-cell,
+  .additional-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .additional-controls {
+    flex-grow: 1;
+  }
+
+  .sort {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+
+    step-icon {
+      opacity: 0;
+      @include opacity-animation;
+
+      &.visible {
+        opacity: 1;
+      }
+    }
+
+    step-icon:first-child {
+      height: 1rem;
+      min-height: 1rem;
+    }
+  }
+
+  .search-container {
+    position: relative;
+    width: 100%;
+    min-width: 2.4rem;
+    min-height: 2.4rem;
+    @include animation(width, 0.5s);
+
+    .filter-icon {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      opacity: 0;
+      z-index: -1;
+      @include opacity-animation(1s);
+    }
+
+    .search-control {
+      opacity: 1;
+      @include opacity-animation(1s);
+    }
+
+    &.no-value {
+      width: 0%;
+
+      .filter-icon {
+        opacity: 1;
+      }
+
+      .search-control {
+        opacity: 0;
+        step-form-field {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .step-header-cell:hover,
+  .step-header-cell.child-in-focus {
+    .sort.no-value step-icon {
+      opacity: 1;
+    }
+  }
+
+  .step-header-cell.child-in-focus .additional-controls,
+  .step-header-cell.filter-force-visible .additional-controls,
+  .additional-controls:hover {
+    .search-container.no-value {
+      width: 100%;
+
+      .filter-icon {
+        opacity: 0;
+      }
+
+      .search-control {
+        opacity: 1;
+        step-form-field {
+          display: initial;
+        }
+      }
+    }
+  }
+}

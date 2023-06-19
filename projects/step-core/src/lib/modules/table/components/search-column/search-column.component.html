@@ -1,0 +1,14 @@
+<div class="step-search-column-container">
+  <div class="step-search-column">
+    <step-icon name="filter"></step-icon>
+    <ng-content></ng-content>
+    <div class="filter-container" (click)="handleClick($event)">
+      <ng-template #defaultSearchRendered>
+        <step-input-filter stepFilterConnect></step-input-filter>
+      </ng-template>
+      <ng-container *ngIf="!!searchCell; else defaultSearchRendered">
+        <ng-container *ngTemplateOutlet="searchCell.template"> </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</div>

@@ -40,6 +40,7 @@ export class CustomColumnsComponent implements OnChanges, OnDestroy, CustomColum
   @Input() excludeFields?: string[];
   @Input() isSearchDisabled?: boolean;
   @Input() options?: string | string[];
+  @Input() isFiltersInSeparateRow: boolean = true;
 
   readonly columnsReady$ = this.columnsReadyInternal$.asObservable();
 

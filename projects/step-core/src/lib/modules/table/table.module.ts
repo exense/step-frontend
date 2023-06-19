@@ -31,6 +31,10 @@ import { CustomSearchCheckboxComponent } from './components/custom-search-dropdo
 import { Input as ColInput } from '../../client/generated';
 import { TableRemoteDataSourceFactoryImplService } from './services/table-remote-data-source-factory-impl.service';
 import { TableStorageService } from './services/table-storage.service';
+import { SearchColumnComponent } from './components/search-column/search-column.component';
+import { HeaderCellComponent } from './components/header-cell/header-cell.component';
+import { SortHeaderDirective } from './directives/sort-header.directive';
+import { SearchHeaderDirective } from './directives/search-header.directive';
 
 @NgModule({
   imports: [
@@ -59,6 +63,10 @@ import { TableStorageService } from './services/table-storage.service';
     FilterConnectDirective,
     CustomSearchDropdownComponent,
     CustomSearchCheckboxComponent,
+    SearchColumnComponent,
+    HeaderCellComponent,
+    SortHeaderDirective,
+    SearchHeaderDirective,
   ],
   exports: [
     TableComponent,
@@ -71,6 +79,10 @@ import { TableStorageService } from './services/table-storage.service';
     FilterConnectDirective,
     CustomSearchDropdownComponent,
     CustomSearchCheckboxComponent,
+    SearchColumnComponent,
+    HeaderCellComponent,
+    SortHeaderDirective,
+    SearchHeaderDirective,
   ],
   providers: [
     TitleCasePipe,
@@ -100,6 +112,7 @@ export * from './components/custom-columns/custom-columns.component';
 export * from './components/custom-search-dropdown/custom-search-dropdown.component';
 export * from './components/custom-search-dropdown/custom-search-checkbox.component';
 export * from './components/custom-columns/custom-columns-base.component';
+export * from './components/search-column/search-column.component';
 export * from './directives/column.directive';
 export * from './shared/search-value';
 export * from './shared/table-remote-data-source';
@@ -128,3 +141,6 @@ export * from './shared/table-persistence-config';
 export * from './services/table-persistence-config.provider';
 export * from './services/table-storage.service';
 export * from './shared/search-column-accessor';
+export * from './components/header-cell/header-cell.component';
+export * from './directives/sort-header.directive';
+export * from './directives/search-header.directive';

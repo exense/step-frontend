@@ -1,0 +1,42 @@
+<div
+  class="step-header-cell"
+  (click)="_sortHeader?.toggleSort()"
+  [class.child-in-focus]="isInFocus"
+  [class.filter-force-visible]="_searchHeader?.isFilterAlwaysVisible"
+>
+  <div
+    #cellContent
+    class="cell-content"
+    [class.pointer]="_sortHeader?.hasSort"
+    [class.hidden]="cellContent.children.length === 0 && !cellContent.innerText"
+  >
+    <ng-content></ng-content>
+  </div>
+  <div class="additional-controls">
+    <ng-container *ngIf="_searchHeader && !_searchHeader.isSearchDisabled">
+      <div
+        class="search-container"
+        [class.no-value]="!_searchHeader.hasSearchValue"
+        (click)="$event.stopImmediatePropagation()"
+      >
+        <div class="filter-icon">
+          <step-icon name="filter"></step-icon>
+        </div>
+        <div class="search-control">
+          <ng-template #defaultSearchRenderer>
+            <step-input-filter stepFilterConnect></step-input-filter>
+          </ng-template>
+          <ng-container *ngIf="!!_searchHeader?.searchCell; else defaultSearchRenderer">
+            <ng-container *ngTemplateOutlet="_searchHeader!.searchCell!.template"> </ng-container>
+          </ng-container>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="_sortHeader?.hasSort">
+      <div class="sort" [class.no-value]="!(_sortHeader!.sortState$! | async)">
+        <step-icon name="chevron-up" [class.visible]="(_sortHeader!.sortState$! | async) === 'asc'"> </step-icon>
+        <step-icon name="chevron-down" [class.visible]="(_sortHeader!.sortState$! | async) === 'desc'"> </step-icon>
+      </div>
+    </ng-container>
+  </div>
+</div>

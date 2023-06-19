@@ -1,9 +1,21 @@
-import { Component, forwardRef, Input, OnChanges, SimpleChanges, TrackByFunction } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  forwardRef,
+  inject,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  TrackByFunction,
+  ViewChild,
+} from '@angular/core';
 import { ArrayItemLabelValueExtractor } from '../../shared/array-item-label-value-extractor';
 import { KeyValue } from '@angular/common';
 import { BaseFilterComponent } from '../base-filter/base-filter.component';
 import { FormBuilder, FormControl } from '@angular/forms';
-import { map, Observable } from 'rxjs';
+import { map, Observable, takeUntil } from 'rxjs';
+import { MatSelect } from '@angular/material/select';
+import { ChildFocusStateService } from '../../services/child-focus-state.service';
 
 @Component({
   selector: 'step-array-filter',
@@ -16,7 +28,11 @@ import { map, Observable } from 'rxjs';
     },
   ],
 })
-export class ArrayFilterComponent<T = unknown> extends BaseFilterComponent<string, unknown[]> implements OnChanges {
+export class ArrayFilterComponent<T = unknown>
+  extends BaseFilterComponent<string, unknown[]>
+  implements OnChanges, AfterViewInit
+{
+  private _childFocusState = inject(ChildFocusStateService, { optional: true });
   protected trackByKeyValue: TrackByFunction<KeyValue<unknown, string>> = (index, item) => item.key;
 
   protected displayItems: KeyValue<unknown, string>[] = [];
@@ -24,6 +40,12 @@ export class ArrayFilterComponent<T = unknown> extends BaseFilterComponent<strin
   @Input() items: T[] | ReadonlyArray<T> = [];
 
   @Input() extractor?: ArrayItemLabelValueExtractor<T, unknown>;
+
+  @ViewChild(MatSelect) matSelect?: MatSelect;
+
+  ngAfterViewInit(): void {
+    this.setupMatSelectFocusState();
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     const cItems = changes['items'];
@@ -83,5 +105,15 @@ export class ArrayFilterComponent<T = unknown> extends BaseFilterComponent<strin
       const value = extractor ? extractor.getLabel(item) : item?.toString() ?? '';
       return { key, value };
     });
+  }
+
+  private setupMatSelectFocusState(): void {
+    if (!this._childFocusState) {
+      return;
+    }
+
+    this.matSelect!.openedChange.pipe(takeUntil(this.terminator$)).subscribe((isOpened) =>
+      this._childFocusState!.setFocusState(isOpened)
+    );
   }
 }

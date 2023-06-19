@@ -127,3 +127,4 @@ export * from './services/default-page.token';
 export * from './services/view-id-link-prefix.token';
 export * from './services/navigator.service';
 export * from './shared/logout-cleanup.token';
+export * from './services/child-focus-state.service';
