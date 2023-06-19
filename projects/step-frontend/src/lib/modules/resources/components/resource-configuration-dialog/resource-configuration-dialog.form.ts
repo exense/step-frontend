@@ -29,14 +29,12 @@ export const resourceConfigurationDialogFormSetValueToForm = (
         value: attributes['name'],
       }),
     });
-    form.controls.name.disable();
   }
 
   if (resourceType) {
     form.patchValue({
       resourceType,
     });
-    form.controls.resourceType.disable();
   }
 };
 

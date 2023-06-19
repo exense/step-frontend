@@ -42,7 +42,7 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
     // Disable automatic closing, switch to manual
     this._matDialogRef.disableClose = true;
 
-    this.initFormValue();
+    this.setFormValue(this._resourceConfigurationDialogData.resource);
     this.initBackdropClosing();
   }
 
@@ -58,8 +58,7 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
 
     this._resourcesService.getResource(resourceId.replace('resource:', '')).subscribe((resource) => {
       this._resourceConfigurationDialogData.resource = resource;
-
-      resourceConfigurationDialogFormSetValueToForm(this.formGroup, resource);
+      this.setFormValue(resource);
     });
   }
 
@@ -89,12 +88,15 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
     });
   }
 
-  private initFormValue(): void {
-    if (!this._resourceConfigurationDialogData.resource) {
+  private setFormValue(resource?: Resource): void {
+    if (!resource) {
       return;
     }
 
-    resourceConfigurationDialogFormSetValueToForm(this.formGroup, this._resourceConfigurationDialogData.resource);
+    resourceConfigurationDialogFormSetValueToForm(this.formGroup, resource);
+
+    this.formGroup.controls.name.disable();
+    this.formGroup.controls.resourceType.disable();
   }
 
   private initBackdropClosing(): void {
