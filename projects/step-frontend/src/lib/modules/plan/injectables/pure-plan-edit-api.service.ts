@@ -38,8 +38,8 @@ export class PurePlanEditApiService implements PlanEditorApiService {
     return this._interactiveApi.executeArtefact(sessionId, id, artefactId);
   }
 
-  exportPlan(id: string, fileName: string): Observable<boolean | void> {
-    return this._exportDialogs.displayExportDialog('Plans export', `plans/${id}`, fileName);
+  exportPlan(id: string, fileName: string): Observable<boolean> {
+    return this._exportDialogs.displayExportDialog('Plans export', `plans`, fileName, id);
   }
 
   getPlanHistory(id: string): Observable<History[]> {

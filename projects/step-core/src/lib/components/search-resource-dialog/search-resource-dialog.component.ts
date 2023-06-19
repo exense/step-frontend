@@ -1,6 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { AugmentedResourcesService } from '../../client/augmented/services/augmented-resources-service';
-import { Resource } from '../../client/generated';
+import { AugmentedResourcesService, Resource } from '../../client/step-client-module';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
@@ -9,7 +8,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   styleUrls: ['./search-resource-dialog.component.scss'],
 })
 export class SearchResourceDialogComponent {
-  readonly dataSource = this._augmentedResourceService.createDatasource();
+  readonly dataSource = this._augmentedResourceService.createDataSource();
   readonly filter: string;
 
   constructor(

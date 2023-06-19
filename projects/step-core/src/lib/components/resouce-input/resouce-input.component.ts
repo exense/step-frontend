@@ -12,8 +12,7 @@ import {
 } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
-import { AugmentedResourcesService } from '../../client/augmented/services/augmented-resources-service';
-import { ResourceUploadResponse } from '../../client/generated';
+import { AugmentedResourcesService, ResourceUploadResponse } from '../../client/step-client-module';
 import { ResourceDialogsService } from '../../services/resource-dialogs.service';
 import { ResourceInputBridgeService } from '../../services/resource-input-bridge.service';
 import { AJS_MODULE } from '../../shared';
@@ -219,10 +218,6 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private setStModel(stModel: string = '') {
-    if (this.stModel === stModel) {
-      return;
-    }
-
     this.stModel = stModel;
     this.stModelChange.emit(stModel);
   }
@@ -264,11 +259,15 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
         this.lastUploadedResourceId = resourceId;
       } else {
         if (resourceUploadResponse.similarResources.length >= 1) {
-          this._resourceDialogsService.showFileAlreadyExistsWarning(resourceUploadResponse.similarResources).subscribe({
-            next: (existingResourceId) => {
-              if (existingResourceId) {
+          this._resourceDialogsService
+            .showFileAlreadyExistsWarning(resourceUploadResponse.similarResources)
+            .subscribe((result) => {
+              if (!result) {
+                return;
+              }
+              if (result.id) {
                 // Linking to an existing resource
-                this.setResourceIdToFieldValue(existingResourceId);
+                this.setResourceIdToFieldValue(result.id);
                 // Delete the previously uploaded resource
                 this._augmentedResourcesService.deleteResource(resourceId).subscribe();
               } else {
@@ -276,11 +275,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
                 this.setResourceIdToFieldValue(resourceId);
                 this.lastUploadedResourceId = resourceId;
               }
-            },
-            error: () => {
-              // Cancel
-            },
-          });
+            });
         }
       }
     });

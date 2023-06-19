@@ -1,4 +1,4 @@
-<step-table [dataSource]="dataSource" matSort matSortActive="attributes.name" [matSortDisableClear]="true">
+<step-table #tableRef [dataSource]="_dataSource" matSort matSortActive="attributes.name" [matSortDisableClear]="true">
   <step-bulk-operations *stepAdditionalHeader></step-bulk-operations>
 
   <ng-container matColumnDef="bulkSelection">
@@ -7,6 +7,8 @@
       <step-entity-selection-di [entity]="element"></step-entity-selection-di>
     </td>
   </ng-container>
+
+  <step-entity-column-container entityName="tasks"></step-entity-column-container>
 
   <ng-container matColumnDef="attributes.name" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>

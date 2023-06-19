@@ -91,11 +91,11 @@ export class FunctionDialogsService implements FunctionLinkDialogService {
     this._isUsedByDialog.displayDialog(`Keyword "${name}" is used by`, 'KEYWORD_ID', id);
   }
 
-  openExportFunctionDialog(id: string, name: string): Observable<boolean | void> {
-    return this._exportDialogs.displayExportDialog('Keyword export', 'functions/' + id, name + '.sta');
+  openExportFunctionDialog(id: string, name: string): Observable<boolean> {
+    return this._exportDialogs.displayExportDialog('Keyword export', 'functions', `${name}.sta`, id);
   }
 
-  openExportAllFunctionsDialog(): Observable<boolean | void> {
+  openExportAllFunctionsDialog(): Observable<boolean> {
     return this._exportDialogs.displayExportDialog('Keyword export', 'functions', 'allKeywords.sta');
   }
 

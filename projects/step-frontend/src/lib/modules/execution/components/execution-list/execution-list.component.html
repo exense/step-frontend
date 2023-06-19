@@ -11,10 +11,10 @@
   matSortDirection="desc"
   [matSortDisableClear]="true"
 >
+  <step-entity-column-container entityName="executions"> </step-entity-column-container>
   <ng-container matColumnDef="description" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
     <td mat-cell *matCellDef="let element" class="description-cell">
-      <entity-icon entityName="executions" [entity]="element"></entity-icon>
       <step-report-node-icon [node]="element.rootReportNode"></step-report-node-icon>
       <a href="#/root/executions/{{ element.id }}">{{ element?.description }}</a>
     </td>

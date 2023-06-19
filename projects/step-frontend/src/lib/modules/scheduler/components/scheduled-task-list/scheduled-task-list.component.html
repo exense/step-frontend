@@ -1,0 +1,97 @@
+<step-table [dataSource]="_logic.searchableScheduledTask" matSort [matSortDisableClear]="true">
+  <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-new'" [availableOperations]="availableBulkOperations">
+  </step-bulk-operations>
+  <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
+    <step-btn-group>
+      <button
+        type="button"
+        mat-mini-fab
+        color="primary"
+        matTooltip="New task"
+        matTooltipPosition="below"
+        [disabled]="!('task-write' | hasRight | async)"
+        (click)="_logic.createParameter()"
+      >
+        <step-icon name="plus"></step-icon>
+      </button>
+    </step-btn-group>
+
+    <button
+      type="button"
+      mat-icon-button
+      matTooltip="Configure scheduler"
+      matTooltipPosition="below"
+      [disabled]="!('scheduler-manage' | hasRight | async)"
+      (click)="_logic.navToSettings()"
+    >
+      <step-icon name="settings"></step-icon>
+    </button>
+  </section>
+  <ng-container matColumnDef="bulkSelection">
+    <th mat-header-cell *matHeaderCellDef class="bulk-selection-cell"></th>
+    <td mat-cell *matCellDef="let element">
+      <step-entity-selection-di [entity]="element"></step-entity-selection-di>
+    </td>
+  </ng-container>
+  <step-entity-column-container entityName="tasks"></step-entity-column-container>
+  <step-custom-columns screen="schedulerTable"> </step-custom-columns>
+  <ng-container matColumnDef="cronExpression" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>CronExpression</th>
+    <td mat-cell *matCellDef="let element">{{ element.cronExpression }}</td>
+  </ng-container>
+  <ng-container matColumnDef="status" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+    <td mat-cell *matCellDef="let element">
+      <button
+        [ngClass]="{
+          status: true,
+          'status-on': element.active,
+          'status-off': !element.active,
+          'scheduler-disabled': !isSchedulerEnabled
+        }"
+        (click)="_logic.switchActive(element)"
+      >
+        {{ element.active ? _logic.STATUS_ACTIVE_STRING : _logic.STATUS_INACTIVE_STRING }}
+      </button>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef>Actions</th>
+    <td mat-cell *matCellDef="let element" class="cell-actions">
+      <step-btn-group>
+        <button
+          mat-icon-button
+          matTooltip="Execute task"
+          [disabled]="!('plan-execute' | hasRight | async)"
+          (click)="_logic.executeParameter(element)"
+        >
+          <step-icon name="play"></step-icon>
+        </button>
+        <button
+          mat-icon-button
+          matTooltip="Edit task"
+          [disabled]="!('task-write' | hasRight | async)"
+          (click)="_logic.editParameter(element)"
+        >
+          <step-icon name="edit-2"></step-icon>
+        </button>
+        <button
+          mat-icon-button
+          matTooltip="Delete task"
+          [disabled]="!('task-delete' | hasRight | async)"
+          (click)="_logic.deleteParameter(element)"
+        >
+          <step-icon name="trash-2"></step-icon>
+        </button>
+        <button
+          mat-icon-button
+          matTooltip="Analyze performance"
+          [disabled]="!('execution-read' | hasRight | async)"
+          (click)="_logic.navToStats(element)"
+        >
+          <step-icon name="trending-up"></step-icon>
+        </button>
+      </step-btn-group>
+    </td>
+  </ng-container>
+</step-table>

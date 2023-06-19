@@ -1,8 +1,8 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
 div[step-modal-window-body],
 mat-card {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  @include core.common-dialog-content;
 }
 
 div[step-modal-window-body] {

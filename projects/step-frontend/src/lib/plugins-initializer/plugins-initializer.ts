@@ -19,6 +19,7 @@ const IGNORE_PLUGINS: ReadonlyArray<string> = [
   'housekeeping',
   'menuConfig',
   'scriptEditor',
+  'eventbrokermonitor',
 ];
 
 // For testing purposes only

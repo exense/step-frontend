@@ -15,7 +15,6 @@ import { PlanEditorModule } from '../plan-editor/plan-editor.module';
 import { StepCommonModule } from '../_common/step-common.module';
 import { CompositeFunctionEditorComponent } from './components/composite-function-editor/composite-function-editor.component';
 import { FunctionConfigurationDialogComponent } from './components/function-configuration-dialog/function-configuration-dialog.component';
-import { FunctionIconComponent } from './components/function-icon/function-icon.component';
 import { FunctionListComponent } from './components/function-list/function-list.component';
 import { FunctionPackageConfigurationDialogComponent } from './components/function-package-configuration-dialog/function-package-configuration-dialog.component';
 import { FunctionPackageLinkComponent } from './components/function-package-link/function-package-link.component';

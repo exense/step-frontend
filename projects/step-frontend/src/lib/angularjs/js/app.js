@@ -84,79 +84,90 @@ var tecAdminApp = angular
 
   .controller(
     'AppController',
-    function (
-      $rootScope,
-      $scope,
-      $location,
-      $http,
-      stateStorage,
-      AuthService,
-      ViewRegistry,
-      ViewState
-    ) {
-      stateStorage.push($scope, 'root', {});
+    [
+      '$rootScope',
+      '$scope',
+      '$location',
+      '$http',
+      'stateStorage',
+      'AuthService',
+      'ViewRegistry',
+      'ViewState',
+      'navigatorService',
+      function (
+        $rootScope,
+        $scope,
+        $location,
+        $http,
+        stateStorage,
+        AuthService,
+        ViewRegistry,
+        ViewState,
+        navigatorService
+      ) {
+        stateStorage.push($scope, 'root', {});
 
-      $rootScope.isInitialized = false;
-      AuthService.initialize().subscribe(() => {
-         $rootScope.isInitialized = true;
+        $rootScope.isInitialized = false;
+        AuthService.initialize().subscribe(() => {
+          $rootScope.isInitialized = true;
 
-         $scope.logo = '../../../images/logotopleft.png';
-         if (!$location.path()) {
-           AuthService.gotoDefaultPage();
-         }
-         $scope.$apply();
-      });
+          $scope.logo = '../../../images/logotopleft.png';
+          if (!$location.path()) {
+            navigatorService.navigateToHome();
+          }
+          $scope.$apply();
+        });
 
-      $scope.$watch(function () {
-        $scope.isAllTenant = $location.search().tenant === '[All]';
-        $scope.isNoTenant = $location.search().tenant === '[None]';
-      });
+        $scope.$watch(function () {
+          $scope.isAllTenant = $location.search().tenant === '[All]';
+          $scope.isNoTenant = $location.search().tenant === '[None]';
+        });
 
-      $scope.$watch('$state', function (newValue) {
-        ViewState.setView(newValue);
-      });
+        $scope.$watch('$state', function (newValue) {
+          ViewState.setView(newValue);
+        });
 
-      $scope.setView = function (view) {
-        ViewState.setView(view);
-        $scope.$state = view;
-        stateStorage.store($scope, {lastview: view});
-      };
+        $scope.setView = function (view) {
+          ViewState.setView(view);
+          $scope.$state = view;
+          stateStorage.store($scope, {lastview: view});
+        };
 
-      $scope.isViewActive = function (view) {
-        return ViewState.isViewActive(view);
-      };
+        $scope.isViewActive = function (view) {
+          return ViewState.isViewActive(view);
+        };
 
-      $scope.getViewTemplate = function () {
-        return ViewState.viewTemplate;
-      };
+        $scope.getViewTemplate = function () {
+          return ViewState.viewTemplate;
+        };
 
-      $scope.isPublicView = function () {
-        return ViewState.isPublicView;
-      };
+        $scope.isPublicView = function () {
+          return ViewState.isPublicView;
+        };
 
-      $scope.isStaticView = function () {
-        return ViewState.isStaticView;
-      };
+        $scope.isStaticView = function () {
+          return ViewState.isStaticView;
+        };
 
-      $scope.authService = AuthService;
-      $scope.viewRegistry = ViewRegistry;
+        $scope.authService = AuthService;
+        $scope.viewRegistry = ViewRegistry;
 
-      $scope.adminAlerts = ViewRegistry.getDashlets('admin/alerts');
+        $scope.adminAlerts = ViewRegistry.getDashlets('admin/alerts');
 
-      function handleKeys(e) {
-        if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
-          $rootScope.$broadcast('undo-requested');
-        } else if (e.key === 'y' && (e.ctrlKey || e.metaKey)) {
-          $rootScope.$broadcast('redo-requested');
+        function handleKeys(e) {
+          if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+            $rootScope.$broadcast('undo-requested');
+          } else if (e.key === 'y' && (e.ctrlKey || e.metaKey)) {
+            $rootScope.$broadcast('redo-requested');
+          }
         }
-      }
 
-      document.body.addEventListener('keydown', handleKeys);
-      $scope.$on('$destroy', function () {
-        document.body.removeEventListener('keydown', handleKeys);
-      });
+        document.body.addEventListener('keydown', handleKeys);
+        $scope.$on('$destroy', function () {
+          document.body.removeEventListener('keydown', handleKeys);
+        });
 
-    }
+      }]
   )
 
   .directive('rootContent', function () {
@@ -207,7 +218,7 @@ angular
 
   .service('pathHelper', ['$timeout', '$location', function ($timeout, $location) {
     this.fixList = function () {
-      $timeout(function() {
+      $timeout(function () {
         if (!$location.path().endsWith('list')) {
           const newPath = $location.path() + '/list';
           $location.url(newPath).replace();
@@ -497,78 +508,6 @@ angular
               Dialogs.showListOfMsgs(response.data);
             }
           });
-        } else {
-          Dialogs.showErrorMsg('Upload not completed.');
-        }
-      };
-
-      $scope.cancel = function () {
-        $uibModalInstance.dismiss('cancel');
-      };
-    }
-  )
-
-  .factory('ExportDialogs', function ($rootScope, $uibModal, EntityRegistry, $sce) {
-    var dialogs = {};
-
-    dialogs.displayExportDialog = function (title, path, filename) {
-      var modalInstance = $uibModal.open({
-        backdrop: 'static',
-        templateUrl: 'partials/exportDialog.html',
-        controller: 'exportModalCtrl',
-        resolve: {
-          title: function () {
-            return title;
-          },
-          path: function () {
-            return path;
-          },
-          filename: function () {
-            return filename;
-          },
-          recursively: function () {
-            return true;
-          },
-          parameters: function () {
-            return false;
-          },
-        },
-      });
-      return modalInstance.result;
-    };
-
-    return dialogs;
-  })
-
-  .controller(
-    'exportModalCtrl',
-    function (
-      $scope,
-      $http,
-      $uibModalInstance,
-      Upload,
-      Dialogs,
-      ExportService,
-      title,
-      path,
-      filename,
-      recursively,
-      parameters
-    ) {
-      $scope.title = title;
-      $scope.path = path;
-      $scope.filename = filename;
-      $scope.recursively = recursively;
-      $scope.parameters = parameters;
-
-      $scope.save = function () {
-        $scope.exporting = true;
-        if ($scope.filename) {
-          urlParams = '?recursively=' + $scope.recursively + '&filename=' + $scope.filename;
-          if ($scope.parameters) {
-            urlParams += '&additionalEntities=parameters';
-          }
-          ExportService.get("rest/export/" + $scope.path + urlParams, () => $uibModalInstance.close());
         } else {
           Dialogs.showErrorMsg('Upload not completed.');
         }
@@ -879,7 +818,7 @@ angular
     };
   })
 
- .service('genericErrorInterceptor', function ($q, $injector) {
+  .service('genericErrorInterceptor', function ($q, $injector) {
     const service = this;
 
     service.response = function (response) {

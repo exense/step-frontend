@@ -1,18 +1,13 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
+import { Component, inject, ViewChild } from '@angular/core';
 import {
-  AJS_MODULE,
+  AugmentedSchedulerService,
   AutoDeselectStrategy,
+  BaseEntitySelectionTableComponent,
   ExecutiontTaskParameters,
   selectionCollectionProvider,
   SelectionCollector,
-  TableApiWrapperService,
-  TableRemoteDataSource,
+  TableComponent,
 } from '@exense/step-core';
-
-interface TableHandle {
-  getSelectedIds?(): readonly string[];
-}
 
 @Component({
   selector: 'step-scheduler-task-selection',
@@ -22,42 +17,9 @@ interface TableHandle {
     selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
 })
-export class SchedulerTaskSelectionComponent implements OnInit {
-  @Input() tableHandle!: TableHandle;
-
-  readonly dataSource = new TableRemoteDataSource<ExecutiontTaskParameters>('tasks', this._tableApiWrapperService, {
-    'attributes.name': 'attributes.name',
-    'executionsParameters.customParameters.env': 'executionsParameters.customParameters.env',
-    cronExpression: 'cronExpression',
-  });
-
-  constructor(
-    private _tableApiWrapperService: TableApiWrapperService,
-    private _selectionCollector: SelectionCollector<string, ExecutiontTaskParameters>
-  ) {}
-
-  ngOnInit() {
-    this.initTableHandle();
-  }
-
-  ngOnDestroy(): void {
-    this.cleanTableHandleUp();
-  }
-
-  private initTableHandle(): void {
-    this.tableHandle.getSelectedIds = () => this._selectionCollector.selected;
-  }
-
-  private cleanTableHandleUp(): void {
-    delete this.tableHandle.getSelectedIds;
-  }
+export class SchedulerTaskSelectionComponent extends BaseEntitySelectionTableComponent {
+  @ViewChild('tableRef', { read: TableComponent })
+  protected _tableRef?: TableComponent<ExecutiontTaskParameters>;
+  protected _selectionCollector = inject<SelectionCollector<string, ExecutiontTaskParameters>>(SelectionCollector);
+  readonly _dataSource = inject(AugmentedSchedulerService).createSelectionDataSource();
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive(
-    'stepSchedulerTaskSelection',
-    downgradeComponent({
-      component: SchedulerTaskSelectionComponent,
-    })
-  );

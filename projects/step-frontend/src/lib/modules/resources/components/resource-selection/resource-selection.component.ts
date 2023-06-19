@@ -1,19 +1,14 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
+import { Component, inject, ViewChild } from '@angular/core';
 import {
-  AJS_MODULE,
+  AugmentedResourcesService,
   AutoDeselectStrategy,
+  BaseEntitySelectionTableComponent,
   FunctionPackage,
   Resource,
   selectionCollectionProvider,
   SelectionCollector,
-  TableApiWrapperService,
-  TableRemoteDataSource,
+  TableComponent,
 } from '@exense/step-core';
-
-interface TableHandle {
-  getSelectedIds?(): readonly string[];
-}
 
 @Component({
   selector: 'step-resource-selection',
@@ -21,42 +16,9 @@ interface TableHandle {
   styleUrls: ['./resource-selection.component.scss'],
   providers: [selectionCollectionProvider<string, Resource>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
 })
-export class ResourceSelectionComponent implements OnInit {
-  @Input() tableHandle!: TableHandle;
-
-  readonly dataSource = new TableRemoteDataSource<Resource>('resources', this._tableApiWrapperService, {
-    id: 'id',
-    resourceName: 'resourceName',
-    resourceType: 'resourceType',
-  });
-
-  constructor(
-    private _tableApiWrapperService: TableApiWrapperService,
-    private _selectionCollector: SelectionCollector<string, FunctionPackage>
-  ) {}
-
-  ngOnInit() {
-    this.initTableHandle();
-  }
-
-  ngOnDestroy(): void {
-    this.cleanTableHandleUp();
-  }
-
-  private initTableHandle(): void {
-    this.tableHandle.getSelectedIds = () => this._selectionCollector.selected;
-  }
-
-  private cleanTableHandleUp(): void {
-    delete this.tableHandle.getSelectedIds;
-  }
+export class ResourceSelectionComponent extends BaseEntitySelectionTableComponent {
+  @ViewChild('tableRef', { read: TableComponent })
+  protected _tableRef?: TableComponent<Resource>;
+  protected _selectionCollector = inject<SelectionCollector<string, FunctionPackage>>(SelectionCollector);
+  readonly _dataSource = inject(AugmentedResourcesService).createSelectionDataSource();
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive(
-    'stepResourceSelection',
-    downgradeComponent({
-      component: ResourceSelectionComponent,
-    })
-  );

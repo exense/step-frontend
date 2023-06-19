@@ -149,11 +149,22 @@ $light-primary-text: white;
   @include step-alert.step-alert();
 
   .cdk-overlay-pane {
+    z-index: 1050;
     padding-top: 8px;
   }
 
+  .tooltip-inner {
+    background: rgba(97, 97, 97, 0.9);
+    margin: 14px;
+    max-width: 250px;
+    padding-left: 8px;
+    padding-right: 8px;
+    overflow: hidden;
+    text-align: unset;
+  }
+
   &.modal-open .cdk-overlay-container {
-    z-index: 1049;
+    z-index: 1050;
   }
 
   color: $text-color;
@@ -207,8 +218,9 @@ $light-primary-text: white;
     }
   }
 
-  label + step-ajs-icon {
-    @include step-icon.step-icon-size(16px);
+  label + step-ajs-icon,
+  step-label > step-icon {
+    @include step-icon.step-icon-size(18px);
     vertical-align: text-top;
   }
 

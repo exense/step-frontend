@@ -21,7 +21,7 @@
       display: flex;
       width: auto;
 
-      .btn:first-child {
+      .btn:first-child:not(.legacy-class-to-remove) {
         border-radius: 0 !important;
         border-right-width: 0 !important;
 

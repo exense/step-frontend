@@ -51,8 +51,8 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService {
     return this._interactiveApi.executeCompositeFunction(sessionId, id, artefactId);
   }
 
-  exportPlan(id: string, fileName: string): Observable<boolean | void> {
-    return this._exportDialogs.displayExportDialog('Composite Keyword export', `functions/${id}`, fileName);
+  exportPlan(id: string, fileName: string): Observable<boolean> {
+    return this._exportDialogs.displayExportDialog('Composite Keyword export', `functions`, fileName, id);
   }
 
   getPlanHistory(id: string): Observable<History[]> {

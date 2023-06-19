@@ -2,6 +2,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -28,6 +29,9 @@ const ICON_COLLAPSED = 'chevron-right';
   encapsulation: ViewEncapsulation.None,
 })
 export class TreeNodeComponent implements OnInit, OnChanges, OnDestroy {
+  private _treeState = inject<TreeStateService<any, TreeNode>>(TreeStateService);
+  private _treeDragDrop = inject(TreeDragDropService);
+
   private terminator$ = new Subject<void>();
   private isExpanded: boolean = false;
 
@@ -39,8 +43,7 @@ export class TreeNodeComponent implements OnInit, OnChanges, OnDestroy {
 
   protected dropInfo$: Observable<DropInfo | undefined> = of(undefined);
   protected toggleStateIcon: string = ICON_COLLAPSED;
-
-  constructor(private _treeState: TreeStateService<any, TreeNode>, private _treeDragDrop: TreeDragDropService) {}
+  readonly isHideRoot = this._treeState.hideRoot;
 
   toggle(): void {
     this._treeState.toggleNode(this.node.id);

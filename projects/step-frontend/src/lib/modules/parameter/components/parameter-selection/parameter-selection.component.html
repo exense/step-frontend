@@ -1,6 +1,6 @@
-<step-table [dataSource]="dataSource" matSort matSortActive="scope" [matSortDisableClear]="true">
+<step-table #tableRef [dataSource]="_dataSource" matSort matSortActive="scope" [matSortDisableClear]="true">
   <step-bulk-operations *stepAdditionalHeader></step-bulk-operations>
-
+  <step-entity-column-container entityName="parameters"></step-entity-column-container>
   <ng-container matColumnDef="bulkSelection">
     <th mat-header-cell *matHeaderCellDef></th>
     <td mat-cell *matCellDef="let element">

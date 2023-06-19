@@ -58,12 +58,12 @@ export class PlanDialogsService {
     return this._importDialogs.displayImportDialog('Plans import', 'plans');
   }
 
-  exportPlans(): Observable<boolean | void> {
+  exportPlans(): Observable<boolean> {
     return this._exportDialogs.displayExportDialog('Plans export', 'plans', 'allPlans.sta');
   }
 
-  exportPlan(id: string, name: string): Observable<boolean | void> {
-    return this._exportDialogs.displayExportDialog('Plans export', `plans/${id}`, `${name}.sta`);
+  exportPlan(id: string, name: string): Observable<boolean> {
+    return this._exportDialogs.displayExportDialog('Plans export', `plans`, `${name}.sta`, id);
   }
 
   lookUp(id: string, name: string): void {

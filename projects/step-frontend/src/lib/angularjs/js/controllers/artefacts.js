@@ -207,60 +207,6 @@ angular
       { name: 'MATCHES', label: 'matches' },
     ];
   })
-  .directive(
-    'customJsonEditor',
-    function ($http, $timeout, $interval, stateStorage, $filter, $location, $compile, Dialogs) {
-      return {
-        restrict: 'E',
-        scope: {
-          argsValue: '=',
-          compileHtml: '=',
-          onSave: '&',
-        },
-        controller: function ($scope, $location, $rootScope, AuthService) {
-          $scope.inputs = {};
-
-          $scope.getFunctionInputs = function (validateJson) {
-            try {
-              $scope.inputs = JSON.parse($scope.argsValue);
-              return true;
-            } catch (err) {
-              if (validateJson) {
-                Dialogs.showErrorMsg('Invalid JSON: ' + err);
-              }
-              return false;
-            }
-          };
-
-          $scope.save = function () {
-            $scope.argsValue = JSON.stringify($scope.inputs);
-            $timeout(function () {
-              $scope.onSave({ argsValue: $scope.argsValue });
-            });
-          };
-        },
-        link: function ($scope, element, attrs) {
-          $scope.$watch('compileHtml', function (newCompileHtml) {
-            if (newCompileHtml) {
-              var template = $compile('<div id="customTemplate">' + $scope.compileHtml + '</div>')($scope);
-              var el = $('#customTemplate');
-              if (el.length) {
-                el.replaceWith(template);
-              } else {
-                element.append(template);
-              }
-            }
-          });
-
-          $scope.$watch('argsValue', function (newArgs, oldArgs) {
-            if (newArgs) {
-              $scope.getFunctionInputs(false);
-            }
-          });
-        },
-      };
-    }
-  )
 
   .directive(
     'jsonEditor',
