@@ -1,10 +1,12 @@
 import { FormBuilder, FormControl } from '@angular/forms';
 import { Directive, EventEmitter, inject, OnDestroy, OnInit, Output } from '@angular/core';
 import { Observable, Subject, takeUntil } from 'rxjs';
+import { ChildFocusStateService } from '../../services/child-focus-state.service';
 
 @Directive({})
 export abstract class BaseFilterComponent<T, CV = T> implements OnInit, OnDestroy {
   protected _formBuilder = inject(FormBuilder);
+  protected _childFocusState = inject(ChildFocusStateService, { optional: true });
 
   readonly filterControl = this.createControl(this._formBuilder);
 

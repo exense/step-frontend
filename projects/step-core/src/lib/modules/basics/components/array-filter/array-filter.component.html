@@ -1,5 +1,10 @@
 <step-form-field>
-  <mat-select multiple [formControl]="filterControl">
+  <mat-select
+    multiple
+    [formControl]="filterControl"
+    (focus)="_childFocusState?.setFocusState(true)"
+    (blur)="_childFocusState?.setFocusState(false)"
+  >
     <mat-option *ngFor="let item of displayItems; trackBy: trackByKeyValue" [value]="item.key">
       {{ item.value }}
     </mat-option>

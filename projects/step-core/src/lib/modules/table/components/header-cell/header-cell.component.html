@@ -12,6 +12,12 @@
   >
     <ng-content></ng-content>
   </div>
+  <ng-container *ngIf="_sortHeader?.hasSort">
+    <div class="sort" [class.no-value]="!(_sortHeader!.sortState$! | async)">
+      <step-icon name="chevron-up" [class.visible]="(_sortHeader!.sortState$! | async) === 'asc'"> </step-icon>
+      <step-icon name="chevron-down" [class.visible]="(_sortHeader!.sortState$! | async) === 'desc'"> </step-icon>
+    </div>
+  </ng-container>
   <div class="additional-controls">
     <ng-container *ngIf="_searchHeader && !_searchHeader.isSearchDisabled">
       <div
@@ -30,12 +36,6 @@
             <ng-container *ngTemplateOutlet="_searchHeader!.searchCell!.template"> </ng-container>
           </ng-container>
         </div>
-      </div>
-    </ng-container>
-    <ng-container *ngIf="_sortHeader?.hasSort">
-      <div class="sort" [class.no-value]="!(_sortHeader!.sortState$! | async)">
-        <step-icon name="chevron-up" [class.visible]="(_sortHeader!.sortState$! | async) === 'asc'"> </step-icon>
-        <step-icon name="chevron-down" [class.visible]="(_sortHeader!.sortState$! | async) === 'desc'"> </step-icon>
       </div>
     </ng-container>
   </div>

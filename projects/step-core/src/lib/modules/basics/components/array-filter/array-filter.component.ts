@@ -2,7 +2,6 @@ import {
   AfterViewInit,
   Component,
   forwardRef,
-  inject,
   Input,
   OnChanges,
   SimpleChanges,
@@ -15,7 +14,6 @@ import { BaseFilterComponent } from '../base-filter/base-filter.component';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { map, Observable, takeUntil } from 'rxjs';
 import { MatSelect } from '@angular/material/select';
-import { ChildFocusStateService } from '../../services/child-focus-state.service';
 
 @Component({
   selector: 'step-array-filter',
@@ -32,7 +30,6 @@ export class ArrayFilterComponent<T = unknown>
   extends BaseFilterComponent<string, unknown[]>
   implements OnChanges, AfterViewInit
 {
-  private _childFocusState = inject(ChildFocusStateService, { optional: true });
   protected trackByKeyValue: TrackByFunction<KeyValue<unknown, string>> = (index, item) => item.key;
 
   protected displayItems: KeyValue<unknown, string>[] = [];

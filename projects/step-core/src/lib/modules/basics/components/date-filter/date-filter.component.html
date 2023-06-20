@@ -1,6 +1,13 @@
 <step-form-field>
   <step-label *ngIf="label">{{ label }}</step-label>
-  <input type="text" [matDatepicker]="picker" #dateInput [formControl]="filterControl" />
+  <input
+    type="text"
+    [matDatepicker]="picker"
+    #dateInput
+    [formControl]="filterControl"
+    (focus)="_childFocusState?.setFocusState(true)"
+    (blur)="_childFocusState?.setFocusState(false)"
+  />
   <step-suffix class="icon-suffix">
     <step-icon name="calendar" (click)="picker.open()"></step-icon>
   </step-suffix>

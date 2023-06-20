@@ -36,6 +36,10 @@ th[step-header-cell] {
     flex-direction: column;
     cursor: pointer;
 
+    &.no-value {
+      display: none;
+    }
+
     step-icon {
       opacity: 0;
       @include opacity-animation;
@@ -68,12 +72,12 @@ th[step-header-cell] {
       align-items: center;
       opacity: 0;
       z-index: -1;
-      @include opacity-animation(1s);
+      @include opacity-animation(0.5s);
     }
 
     .search-control {
       opacity: 1;
-      @include opacity-animation(1s);
+      @include opacity-animation(0.5s);
     }
 
     &.no-value {
@@ -92,10 +96,22 @@ th[step-header-cell] {
     }
   }
 
+  /*
   .step-header-cell:hover,
   .step-header-cell.child-in-focus {
     .sort.no-value step-icon {
       opacity: 1;
+    }
+  }
+  */
+
+  .cell-content:hover + .sort,
+  .sort:hover {
+    &.no-value {
+      display: flex;
+      step-icon {
+        opacity: 1;
+      }
     }
   }
 

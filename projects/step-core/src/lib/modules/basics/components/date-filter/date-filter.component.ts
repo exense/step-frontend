@@ -1,10 +1,9 @@
-import { AfterViewInit, Component, ElementRef, forwardRef, inject, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, ValidatorFn } from '@angular/forms';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { DateTime } from 'luxon';
-import { debounceTime, map, merge, Observable, switchMap, take, takeUntil, timer } from 'rxjs';
+import { debounceTime, map, merge, Observable, takeUntil } from 'rxjs';
 import { BaseFilterComponent } from '../base-filter/base-filter.component';
-import { ChildFocusStateService } from '../../services/child-focus-state.service';
 
 @Component({
   selector: 'step-date-filter',
@@ -22,8 +21,6 @@ export class DateFilterComponent
   extends BaseFilterComponent<DateTime | undefined, DateTime | null>
   implements AfterViewInit
 {
-  private _childFocusState = inject(ChildFocusStateService, { optional: true });
-
   @Input() label?: string;
   @Input() readonlyInput = false;
   @Input() initialDate = false;

@@ -1,3 +1,8 @@
 <step-form-field>
-  <input type="text" [formControl]="filterControl" />
+  <input
+    type="text"
+    [formControl]="filterControl"
+    (focus)="_childFocusState?.setFocusState(true)"
+    (blur)="_childFocusState?.setFocusState(false)"
+  />
 </step-form-field>
