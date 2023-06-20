@@ -1,8 +1,8 @@
 import { KeyValue } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Resource, ResourcesService } from '@exense/step-core';
+import { AugmentedResourcesService, Resource, ResourceInputComponent } from '@exense/step-core';
 import { Subject, takeUntil } from 'rxjs';
 import { PredefinedResourceType } from './predefined-resource-type.enum';
 import { PREDEFINED_RESOURCE_TYPES } from './predefined-resource-types.token';
@@ -24,9 +24,12 @@ const toKeyValue = (predefinedResourceType: PredefinedResourceType): KeyValue<st
   styleUrls: ['./resource-configuration-dialog.component.scss'],
 })
 export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
+  @ViewChild(ResourceInputComponent) resourceInput?: ResourceInputComponent;
+
   private _formBuilder = inject(FormBuilder);
   private _matDialogRef = inject<MatDialogRef<ResourceConfigurationDialogComponent, Resource>>(MatDialogRef);
-  private _resourcesService = inject(ResourcesService);
+  private _resourcesService = inject(AugmentedResourcesService);
+  private _changeDetectorRef = inject(ChangeDetectorRef);
 
   protected _resourceConfigurationDialogData = inject<ResourceConfigurationDialogData>(MAT_DIALOG_DATA);
   protected _predefinedResourceTypes = inject<PredefinedResourceType[]>(PREDEFINED_RESOURCE_TYPES).map(toKeyValue);
@@ -97,6 +100,18 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
 
     this.formGroup.controls.name.disable();
     this.formGroup.controls.resourceType.disable();
+
+    // Reflect the changes after updating the form
+    this._changeDetectorRef.detectChanges();
+
+    // Explicitly set resourceId
+    // - resourceId is the stModel with the "resource:" prefix stripped off,
+    // - however, in our case we are using the resource name for stModel (e.g. "dummy.csv"),
+    // - so the resourceId cannot be properly evaluated internally
+    this.resourceInput!.resourceId = resource.id!;
+
+    // Invoke initResource manually
+    this.resourceInput!.initResource(resource.id!);
   }
 
   private initBackdropClosing(): void {

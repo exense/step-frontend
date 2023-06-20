@@ -71,10 +71,6 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-  inputChange(value: string) {
-    this.stModelChange.emit(value);
-  }
-
   ngOnChanges(changes: SimpleChanges): void {
     this.stModelChanges(changes);
   }
@@ -84,6 +80,10 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     this.terminator$.complete();
     this.uploadTerminator$.next();
     this.uploadTerminator$.complete();
+  }
+
+  protected onStModelChange(value: string) {
+    this.stModelChange.emit(value);
   }
 
   protected onBlur(): void {
@@ -176,8 +176,10 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
 
   protected clear(): void {
     this.absoluteFilepath = '';
+    this.resourceFilename = '';
     this.setStModel('');
     this.deleteLastUploadedResource();
+    this.filesChange.emit();
 
     if (!this.fileInput) {
       return;
@@ -206,7 +208,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  private initResource(id: string): void {
+  initResource(id: string): void {
     this._augmentedResourcesService.getResource(id).subscribe((resource) => {
       if (resource) {
         this.resourceNotExisting = false;
