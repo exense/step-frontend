@@ -23,7 +23,7 @@ export class SchedulerModule {
       'tasks',
       'Scheduler task',
       'clock',
-      '/partials/scheduler/schedulerTaskSelectionTable.html'
+      'partials/scheduler/schedulerTaskSelectionTable.html'
     );
     _cellRegistry.registerCell('taskEntityIcon', SchedulerIconComponent);
     _cellRegistry.registerCell('schedulerTaskLink', SchedulerTaskLinkComponent);
