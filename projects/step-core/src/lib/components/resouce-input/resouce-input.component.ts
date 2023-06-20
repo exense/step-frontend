@@ -98,7 +98,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     this.setStModel(this.stModel);
   }
 
-  protected onFilesChange(files: File[]): void {
+  onFilesChange(files: File[]): void {
     if (files.length > MAX_FILES) {
       return;
     }

@@ -36,6 +36,8 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
 
   private readonly terminator$ = new Subject<void>();
 
+  private onFilesChangeRef?: (files: File[]) => void;
+
   protected readonly formGroup = resourceConfigurationDialogFormCreate(this._formBuilder);
 
   protected uploading = false;
@@ -91,6 +93,12 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
     });
   }
 
+  private onFilesChangeRefOverride(files: File[]): void {
+    this.resourceInput!.isResource = true;
+    this.onFilesChangeRef?.(files);
+    this.resourceInput!.isResource = false;
+  }
+
   private setFormValue(resource?: Resource): void {
     if (!resource) {
       return;
@@ -112,6 +120,17 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
 
     // Invoke initResource manually
     this.resourceInput!.initResource(resource.id!);
+
+    // Preserve the original onFilesChange
+    this.onFilesChangeRef = this.resourceInput!.onFilesChange.bind(this.resourceInput);
+
+    // Override onFilesChange
+    // - given the way the resource input is written,
+    // - it requires isResource to be false for the template
+    // - in order to render the same content as the old version,
+    // - and at the same time isResource needs to be true for
+    // - the onFilesChange handler to perform the proper action
+    this.resourceInput!.onFilesChange = this.onFilesChangeRefOverride.bind(this);
   }
 
   private initBackdropClosing(): void {
