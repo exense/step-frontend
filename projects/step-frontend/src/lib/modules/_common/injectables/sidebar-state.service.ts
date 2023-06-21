@@ -1,5 +1,5 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { IS_SMALL_SCREEN } from '@exense/step-core';
+import { IS_SMALL_SCREEN, LogoutCleanup, Mutable } from '@exense/step-core';
 import {
   BehaviorSubject,
   combineLatest,
@@ -11,30 +11,47 @@ import {
   takeUntil,
 } from 'rxjs';
 import { DOCUMENT } from '@angular/common';
+import { MenuStorageService } from './menu-storage.service';
 
 const MAIN_WHEN_SIDEBAR_CLOSED = 'main-when-sidebar-closed';
 const MAIN_WHEN_SIDEBAR_CLOSED_SMALL_SCREEN = 'main-when-sidebar-closed-small-screen';
 const TENANT_SELECTOR_WHEN_SIDEBAR_CLOSED = 'tenant-selector-when-sidebar-closed';
+const IS_MENU_OPENED = 'IS_MENU_OPENED';
+const OPENED_MENU_ITEMS = 'OPENED_MENU_ITEMS';
+
+type MutableOpenedMenuItems = Record<string, boolean>;
+type OpenedMenuItems = Readonly<Record<string, boolean>>;
+type FieldAccessor = Mutable<Pick<SidebarStateService, 'openedMenuItems'>>;
 
 @Injectable({
   providedIn: 'root',
 })
-export class SidebarOpenStateService implements OnDestroy {
+export class SidebarStateService implements OnDestroy, LogoutCleanup {
   private terminator$ = new Subject<void>();
 
+  private _menuStorage = inject(MenuStorageService);
   private _document = inject(DOCUMENT);
   private _isSmallScreen$ = inject(IS_SMALL_SCREEN).pipe(distinctUntilChanged(), takeUntil(this.terminator$));
 
-  private isOpenedInternal$ = new BehaviorSubject<boolean>(true);
+  private isOpenedInternal$ = new BehaviorSubject<boolean>(this.getIsOpenedInitialValue());
 
   readonly isOpened$ = this.isOpenedInternal$.asObservable().pipe(distinctUntilChanged());
+
+  readonly openedMenuItems = this.getOpenedMenuItemsInitialValue();
 
   get isOpened(): boolean {
     return this.isOpenedInternal$.value;
   }
 
-  constructor() {
-    this.setupInitialOpenState();
+  private set isOpened(value: boolean) {
+    if (value === this.isOpened) {
+      return;
+    }
+    this.isOpenedInternal$.next(value);
+    this._menuStorage.setItem(IS_MENU_OPENED, value.toString());
+  }
+
+  initialize() {
     this.setupSmallScreenChange();
     this.setupIsOpenedChange();
   }
@@ -46,13 +63,23 @@ export class SidebarOpenStateService implements OnDestroy {
   }
 
   toggleIsOpened(): void {
-    this.isOpenedInternal$.next(!this.isOpened);
+    this.isOpened = !this.isOpened;
   }
 
-  private setupInitialOpenState(): void {
-    this._isSmallScreen$.pipe(first()).subscribe((isSmallScreenInitial) => {
-      this.isOpenedInternal$.next(!isSmallScreenInitial);
-    });
+  logoutCleanup(): void {
+    (this as FieldAccessor).openedMenuItems = undefined;
+    this.isOpenedInternal$.next(true);
+  }
+
+  setMenuItemState(menuItem: string, isOpened: boolean): void {
+    if (!this.openedMenuItems) {
+      (this as FieldAccessor).openedMenuItems = {};
+    }
+    if (this.openedMenuItems![menuItem] === isOpened) {
+      return;
+    }
+    (this.openedMenuItems! as MutableOpenedMenuItems)[menuItem] = isOpened;
+    this._menuStorage.setItem(OPENED_MENU_ITEMS, JSON.stringify(this.openedMenuItems!));
   }
 
   private setupSmallScreenChange(): void {
@@ -63,7 +90,7 @@ export class SidebarOpenStateService implements OnDestroy {
       )
       .subscribe(() => {
         if (this.isOpened) {
-          this.isOpenedInternal$.next(false);
+          this.isOpened = false;
         }
       });
   }
@@ -91,5 +118,27 @@ export class SidebarOpenStateService implements OnDestroy {
         tenantSelection!.classList.remove(TENANT_SELECTOR_WHEN_SIDEBAR_CLOSED);
       }
     });
+  }
+
+  private getIsOpenedInitialValue(): boolean {
+    const stringValue = this._menuStorage.getItem(IS_MENU_OPENED);
+    if (!stringValue) {
+      return true;
+    }
+    return stringValue === 'true';
+  }
+
+  private getOpenedMenuItemsInitialValue(): OpenedMenuItems | undefined {
+    const stringValue = this._menuStorage.getItem(OPENED_MENU_ITEMS);
+    if (!stringValue) {
+      return undefined;
+    }
+    let result: OpenedMenuItems | undefined;
+    try {
+      result = JSON.parse(stringValue) as OpenedMenuItems;
+    } catch (e) {
+      result = undefined;
+    }
+    return result;
   }
 }

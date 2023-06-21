@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Function as KeywordFunction, KeywordsService } from '../../generated';
+import { Execution, Function as KeywordFunction, KeywordsService } from '../../generated';
 import { StepDataSource, TableRemoteDataSourceFactoryService } from '../../table/step-table-client.module';
 
 @Injectable({ providedIn: 'root' })
@@ -17,5 +17,9 @@ export class AugmentedKeywordsService extends KeywordsService {
       },
       filter ? { type: filter } : undefined
     );
+  }
+
+  getKeywordSelectionTableDataSource(): StepDataSource<Execution> {
+    return this._dataSourceFactory.createDataSource(this.FUNCTIONS_TABLE_ID, { name: 'attributes.name', type: 'type' });
   }
 }

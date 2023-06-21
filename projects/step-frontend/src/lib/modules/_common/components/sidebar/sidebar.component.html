@@ -1,4 +1,9 @@
-<div class="sidebar" [class.sidebar-closed]="!(isOpened$ | async)" [class.small-screen]="_isSmallScreen$ | async">
+<div
+  class="sidebar"
+  [class.sidebar-closed]="!(isOpened$ | async)"
+  [class.small-screen]="_isSmallScreen$ | async"
+  (scroll)="handleScroll($event)"
+>
   <div id="sidebar-logo-and-burgermenu">
     <span class="visible-when-collapsed">
       <label (click)="toggleOpenClose()">
@@ -19,7 +24,7 @@
     </ng-container>
   </div>
   <div id="sidebar-categories">
-    <div id="sidebar-categories-tabs">
+    <div id="sidebar-categories-tabs" #tabs>
       <div
         class="sidebar-collapsable-tab"
         *ngFor="let mainMenuEntry of _menuItems$ | async | menuFilter: 'root'; trackBy: trackByMenuEntry"
@@ -29,6 +34,7 @@
           [name]="mainMenuEntry.id"
           id="collapsable-tab-{{ mainMenuEntry.title }}"
           type="checkbox"
+          (change)="toggleMenuItem(mainMenuCheckBox)"
         />
         <label for="collapsable-tab-{{ mainMenuEntry.title }}">
           <step-icon class="visible-when-collapsed" [name]="mainMenuEntry.icon"></step-icon>
