@@ -11,11 +11,12 @@ import {
   ViewChild,
 } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '../../shared';
+import { Observable, Subject, filter, takeUntil } from 'rxjs';
 import { AugmentedResourcesService, ResourceUploadResponse } from '../../client/step-client-module';
-import { ResourceInputBridgeService } from '../../services/resource-input-bridge.service';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ResourceDialogsService } from '../../services/resource-dialogs.service';
+import { ResourceInputBridgeService } from '../../services/resource-input-bridge.service';
+import { AJS_MODULE } from '../../shared';
+import { UpdateResourceWarningResultState } from '../../shared/update-resource-warning-result-state.enum';
 
 const MAX_FILES = 1;
 
@@ -105,24 +106,27 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
 
     if (this.isResource && !this.resourceNotExisting) {
       if (!this.stBounded) {
-        this._resourceDialogsService.showUpdateResourceWarning().subscribe({
-          next: (updateResource) => {
-            if (updateResource) {
+        this._resourceDialogsService.showUpdateResourceWarning().subscribe((resultState) => {
+          switch (resultState) {
+            case UpdateResourceWarningResultState.NEW_RESOURCE:
+              // Creating a new resource
+              this.uploadResource({
+                file,
+              });
+              break;
+
+            case UpdateResourceWarningResultState.UPDATE_RESOURCE:
               // Updating resource
               this.uploadResource({
                 file,
                 resourceId: this.resourceId,
               });
-            } else {
-              // Creating a new resource
-              this.uploadResource({
-                file,
-              });
-            }
-          },
-          error: () => {
-            // Cancel
-          },
+              break;
+
+            default:
+              // Cancel
+              break;
+          }
         });
       } else {
         // Update the current resource
