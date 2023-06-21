@@ -22,6 +22,7 @@ import { FunctionDialogsService } from './services/function-dialogs.service';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
 import { CompositeFunctionEditorComponent } from './components/composite-function-editor/composite-function-editor.component';
 import { FunctionPackageConfigurationDialogComponent } from './components/function-package-configuration-dialog/function-package-configuration-dialog.component';
+import { FunctionSelectionTableComponent } from './components/function-selection-table/function-selection-table.component';
 
 @NgModule({
   imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule],
@@ -35,6 +36,7 @@ import { FunctionPackageConfigurationDialogComponent } from './components/functi
     FunctionPackageSelectionComponent,
     CompositeFunctionEditorComponent,
     FunctionPackageConfigurationDialogComponent,
+    FunctionSelectionTableComponent,
   ],
   providers: [
     {
@@ -47,6 +49,7 @@ import { FunctionPackageConfigurationDialogComponent } from './components/functi
     FunctionPackageSelectionComponent,
     CompositeFunctionEditorComponent,
     FunctionPackageConfigurationDialogComponent,
+    FunctionSelectionTableComponent,
   ],
 })
 export class FunctionModule {
@@ -58,7 +61,7 @@ export class FunctionModule {
   ) {
     _entityRegistry.register('functions', 'Keyword', {
       icon: 'target',
-      templateUrl: '/partials/functions/functionSelectionTable.html',
+      component: FunctionSelectionTableComponent,
     });
     _cellsRegistry.registerCell('functionLink', FunctionLinkComponent);
     _cellsRegistry.registerCell('functionPackageLink', FunctionPackageLinkComponent);
@@ -67,7 +70,7 @@ export class FunctionModule {
       FunctionPackageSearchComponent
     );
     _entityRegistry.register('functionPackage', 'KeywordPackage', {
-      icon: 'gift',
+      icon: 'package',
       component: FunctionPackageSelectionComponent,
     });
     _viewRegistry.registerView('functions', 'partials/functionList.html');
