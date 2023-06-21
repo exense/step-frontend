@@ -24,20 +24,27 @@ th[step-header-cell] {
   .additional-controls {
     display: flex;
     align-items: center;
-    gap: 1rem;
   }
 
   .additional-controls {
     flex-grow: 1;
   }
 
+  .cell-content + .additional-controls {
+    margin-left: 1rem;
+  }
+
   .sort {
     display: flex;
     flex-direction: column;
     cursor: pointer;
+    margin-left: 0;
+    padding: 0 1rem;
+
+    @include animation('margin-left', 0.1s);
 
     &.no-value {
-      display: none;
+      margin-left: -2.4rem;
     }
 
     step-icon {
@@ -89,26 +96,15 @@ th[step-header-cell] {
 
       .search-control {
         opacity: 0;
-        step-form-field {
-          display: none;
-        }
       }
     }
   }
-
-  /*
-  .step-header-cell:hover,
-  .step-header-cell.child-in-focus {
-    .sort.no-value step-icon {
-      opacity: 1;
-    }
-  }
-  */
 
   .cell-content:hover + .sort,
   .sort:hover {
     &.no-value {
       display: flex;
+      margin-left: 0;
       step-icon {
         opacity: 1;
       }
