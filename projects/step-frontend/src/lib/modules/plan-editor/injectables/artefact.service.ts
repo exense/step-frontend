@@ -60,6 +60,10 @@ export class ArtefactService {
     this.registry[typeName] = artefactType;
   }
 
+  getDefaultIconNg2(): string {
+    return 'circle';
+  }
+
   /* @deprecated legacy */
   getEditor(typeName: string) {
     return this.getType(typeName).form;

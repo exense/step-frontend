@@ -17,10 +17,10 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
 
   convertItem(item: ReportNodeWithChildren, parentId: string | undefined): ReportTreeNode {
     const id = item.id!;
-    const artefact = item.resolvedArtefact!;
-    const name = artefact.attributes?.['name'] || '';
+    const artefact = item.resolvedArtefact;
+    const name = artefact?.attributes?.['name'] || '';
     const isSkipped = false;
-    const icon = this._artefactTypes.getIconNg2(artefact._class);
+    const icon = artefact ? this._artefactTypes.getIconNg2(artefact._class) : this._artefactTypes.getDefaultIconNg2();
     const expandable = this.hasChildren(id);
     const children = (item?.children || []).map((child) => this.convertItem(child, id));
     const iconClassName = `step-node-status-${item.status}`;
