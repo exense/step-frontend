@@ -23,6 +23,7 @@ import { HintDirective } from './directives/hint.directive';
 import { ErrorDirective } from './directives/error.directive';
 import { AlertDirective } from './directives/alert.directive';
 import { ValidateJsonDirective } from './directives/validate-json.directive';
+import { ErrorsListComponent } from './components/errors-list/errors-list.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
@@ -48,6 +49,7 @@ import { ValidateJsonDirective } from './directives/validate-json.directive';
     ErrorDirective,
     AlertDirective,
     ValidateJsonDirective,
+    ErrorsListComponent,
   ],
   exports: [
     ResourceLabelComponent,
@@ -71,6 +73,7 @@ import { ValidateJsonDirective } from './directives/validate-json.directive';
     ErrorDirective,
     AlertDirective,
     ValidateJsonDirective,
+    ErrorsListComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -85,11 +88,12 @@ export * from './components/json-raw-editor/json-raw-editor.component';
 export * from './components/modal-window/modal-window.component';
 export * from './components/form-field/form-field.component';
 export * from './components/cron-selector/cron-selector.component';
+export * from './components/errors-list/errors-list.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
 export * from './pipes/has-right.pipe';
 export * from './services/artefact-types.service';
-export * from './services/login.service';
+export * from './services/credentials.service';
 export * from './services/auth.service';
 export * from './services/item-by-id-cache.service';
 export * from './services/hybrid-injector-helper';
@@ -98,7 +102,7 @@ export * from './services/cron-presets.token';
 export * from './shared/angularjs-provider-options';
 export * from './shared/auth-context.interface';
 export * from './shared/compare-condition.enum';
-export * from './shared/login-strategy';
+export * from './shared/credentials-strategy';
 export * from './shared/alert-type.enum';
 export * from './shared/restore-dialog-data';
 export * from './shared/project-management-helper-strategy.interface';

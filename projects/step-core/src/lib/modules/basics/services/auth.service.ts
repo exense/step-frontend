@@ -1,16 +1,15 @@
 import { DOCUMENT } from '@angular/common';
-import { inject, Inject, Injectable, OnDestroy } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { SessionDto } from '../../../domain';
 import { BehaviorSubject, catchError, map, Observable, of, switchMap, tap } from 'rxjs';
-import { AJS_LOCATION, AJS_PREFERENCES, AJS_ROOT_SCOPE, AJS_UIB_MODAL } from '../../../shared/angularjs-providers';
+import { AJS_LOCATION, AJS_PREFERENCES, AJS_ROOT_SCOPE } from '../../../shared/angularjs-providers';
 import { AJS_MODULE } from '../../../shared/constants';
-import { a1Promise2Observable } from '../../../shared/utils';
 import { AdditionalRightRuleService } from '../../../services/additional-right-rule.service';
 import { ApplicationConfiguration, PrivateApplicationService } from '../../../client/generated';
 import { Mutable } from '../../../shared';
 import { AuthContext } from '../shared/auth-context.interface';
-import { LoginService } from './login.service';
+import { CredentialsService } from './credentials.service';
 import { AppConfigContainerService } from './app-config-container.service';
 import { NavigatorService } from './navigator.service';
 
@@ -28,10 +27,9 @@ export class AuthService implements OnDestroy {
   private _$location = inject(AJS_LOCATION);
   private _document = inject(DOCUMENT);
   private _preferences = inject(AJS_PREFERENCES);
-  private _$uibModal = inject(AJS_UIB_MODAL);
   private _additionalRightRules = inject(AdditionalRightRuleService);
   private _privateApplicationApi = inject(PrivateApplicationService);
-  private _loginService = inject(LoginService);
+  private _credentialsService = inject(CredentialsService);
   private _serviceContext = inject(AppConfigContainerService);
   private _navigator = inject(NavigatorService);
 
@@ -73,7 +71,7 @@ export class AuthService implements OnDestroy {
   }
 
   login(username: string, password: string): Observable<unknown> {
-    return this._loginService.login(username, password).pipe(
+    return this._credentialsService.login(username, password).pipe(
       switchMap(() => this.getSession()),
       tap(() => {
         const context = this.getContext();
@@ -88,7 +86,7 @@ export class AuthService implements OnDestroy {
   }
 
   logout(): void {
-    this._loginService
+    this._credentialsService
       .logout()
       .pipe(map(() => ({ userID: ANONYMOUS } as AuthContext)))
       .subscribe((context) => {
@@ -141,21 +139,6 @@ export class AuthService implements OnDestroy {
     return conf?.debug || false;
   }
 
-  showPasswordChangeDialog(otp: boolean): Observable<unknown> {
-    const modalInstance = this._$uibModal.open({
-      backdrop: 'static',
-      animation: false,
-      templateUrl: 'partials/changePasswordForm.html',
-      controller: 'ChangePasswordModalCtrl',
-      resolve: {
-        otp: function () {
-          return otp;
-        },
-      },
-    });
-    return a1Promise2Observable(modalInstance.result);
-  }
-
   triggerRightCheck(): void {
     this._triggerRightCheck$.next(undefined);
   }
@@ -194,7 +177,7 @@ export class AuthService implements OnDestroy {
         if (!session.otp) {
           return of(session);
         }
-        return this.showPasswordChangeDialog(true).pipe(
+        return this._credentialsService.changePassword(true).pipe(
           map(() => {
             session.otp = true;
             return session;

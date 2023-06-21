@@ -371,50 +371,6 @@ angular
     };
   })
 
-  .controller('ChangePasswordModalCtrl', function ($scope, $rootScope, $uibModalInstance, $http, $location, otp) {
-    $scope.otp = otp;
-    $scope.model = {newPwd: ''};
-    $scope.repeatPwd = '';
-
-    $http.get('rest/admin/security/passwordpolicies').then(function ({data}) {
-      if (data.length > 0) {
-        $scope.passwordScheme = data.map((element) => {
-          return {rule: new RegExp('^(?=' + element.rule + ')'), description: element.description};
-        });
-      }
-    });
-
-    $scope.save = function () {
-      if ($scope.repeatPwd != $scope.model.newPwd) {
-        $scope.error = "Passwords don't match, please try again.";
-      } else {
-        $http.post('rest/admin/myaccount/changepwd', $scope.model).then(
-          function (response) {
-            console.log('changepwd returned response: ' + JSON.stringify(response));
-
-            if (response.data.status == 'KO') {
-              $scope.error = 'Password could not be changed: ' + response.data.message;
-            } else {
-              // all good. notify user that password was changed?
-              $uibModalInstance.close();
-            }
-          },
-          function () {
-            $scope.error = 'Unable to change password. Please contact your administrator.';
-          }
-        );
-      }
-    };
-
-    $scope.cancel = function () {
-      $uibModalInstance.close();
-    };
-
-    $scope.showCancel = function () {
-      return $scope.otp;
-    };
-  })
-
   .factory('Preferences', function ($http) {
     var service = {};
 
