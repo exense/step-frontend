@@ -103,8 +103,8 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
   loadNodes(nodeId: string): Observable<ReportNode[]> {
     const skip = this._paging[nodeId]?.skip || 0;
     return this._controllerService.getReportNodeChildren(nodeId, skip, EXECUTION_TREE_PAGE_LIMIT).pipe(
-      tap((nodes) => (this.hasChildrenFlags[nodeId] = nodes.length > 0)),
-      filter((reportNodes) => reportNodes && reportNodes.every((node) => node.resolvedArtefact !== null))
+      map((nodes) => nodes.filter((node) => node.resolvedArtefact !== null)),
+      tap((nodes) => (this.hasChildrenFlags[nodeId] = nodes.length > 0))
     );
   }
 }
