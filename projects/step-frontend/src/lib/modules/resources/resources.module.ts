@@ -23,7 +23,7 @@ export class ResourcesModule {
       'rest/resources/',
       'rest/resources/',
       'st-table',
-      '/partials/resources/resourceSelectionTable.html'
+      'partials/resources/resourceSelectionTable.html'
     );
   }
 }
