@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@angular/core';
 import { ArtefactTypesService, ControllerService, ReportNode, TreeNode, TreeNodeUtilsService } from '@exense/step-core';
 import { EXECUTION_TREE_PAGE_LIMIT, EXECUTION_TREE_PAGING, ExecutionTreePaging } from './execution-tree-paging';
 import { ReportTreeNode } from '../shared/report-tree-node';
-import { forkJoin, map, Observable, tap } from 'rxjs';
+import { filter, forkJoin, map, Observable, tap } from 'rxjs';
 import { ReportNodeWithChildren } from '../shared/report-node-with-children';
 
 @Injectable()
@@ -17,10 +17,10 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
 
   convertItem(item: ReportNodeWithChildren, parentId: string | undefined): ReportTreeNode {
     const id = item.id!;
-    const artefact = item.resolvedArtefact!;
-    const name = artefact.attributes?.['name'] || '';
+    const artefact = item.resolvedArtefact;
+    const name = artefact?.attributes?.['name'] || '';
     const isSkipped = false;
-    const icon = this._artefactTypes.getIconNg2(artefact._class);
+    const icon = artefact ? this._artefactTypes.getIconNg2(artefact._class) : this._artefactTypes.getDefaultIconNg2();
     const expandable = this.hasChildren(id);
     const children = (item?.children || []).map((child) => this.convertItem(child, id));
     const iconClassName = `step-node-status-${item.status}`;
@@ -102,8 +102,9 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
 
   loadNodes(nodeId: string): Observable<ReportNode[]> {
     const skip = this._paging[nodeId]?.skip || 0;
-    return this._controllerService
-      .getReportNodeChildren(nodeId, skip, EXECUTION_TREE_PAGE_LIMIT)
-      .pipe(tap((nodes) => (this.hasChildrenFlags[nodeId] = nodes.length > 0)));
+    return this._controllerService.getReportNodeChildren(nodeId, skip, EXECUTION_TREE_PAGE_LIMIT).pipe(
+      map((nodes) => nodes.filter((node) => node.resolvedArtefact !== null)),
+      tap((nodes) => (this.hasChildrenFlags[nodeId] = nodes.length > 0))
+    );
   }
 }
