@@ -18,7 +18,7 @@ export class PlanModule {
     _cellsRegister: CustomCellRegistryService,
     _viewRegistry: ViewRegistryService
   ) {
-    _entityRegistry.register('plans', 'Plan', { icon: 'file', templateUrl: '/partials/plans/planSelectionTable.html' });
+    _entityRegistry.register('plans', 'Plan', { icon: 'file', templateUrl: 'partials/plans/planSelectionTable.html' });
     _cellsRegister.registerCell('planEntityIcon', PlanIconComponent);
     _cellsRegister.registerCell('planLink', PlanLinkComponent);
     _viewRegistry.registerView('plans', 'partials/plans/plans.html');

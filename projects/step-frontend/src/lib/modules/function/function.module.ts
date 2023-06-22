@@ -60,7 +60,7 @@ export class FunctionModule {
   ) {
     _entityRegistry.register('functions', 'Keyword', {
       icon: 'target',
-      templateUrl: '/partials/functions/functionSelectionTable.html',
+      templateUrl: 'partials/functions/functionSelectionTable.html',
     });
     _cellsRegistry.registerCell('functionEntityIcon', FunctionIconComponent);
     _cellsRegistry.registerCell('functionLink', FunctionLinkComponent);
