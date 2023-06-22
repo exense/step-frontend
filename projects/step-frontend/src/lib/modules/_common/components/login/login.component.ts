@@ -39,7 +39,7 @@ export class LoginComponent {
       .pipe()
       .subscribe({
         error: (error: ApiError) => {
-          this.error = HttpErrorInterceptor.handleError(error);
+          this.error = HttpErrorInterceptor.formatError(error);
         },
       });
   }

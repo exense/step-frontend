@@ -23,13 +23,13 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
     let parsedError;
     if (error.error?.errorMessage) {
-      parsedError = HttpErrorInterceptor.handleError(error.error);
+      parsedError = HttpErrorInterceptor.formatError(error.error);
     } else if (error.name && error.message) {
-      parsedError = HttpErrorInterceptor.handleError(`${error.name}: ${error.message}`);
+      parsedError = HttpErrorInterceptor.formatError(`${error.name}: ${error.message}`);
     } else if (error.error) {
-      parsedError = HttpErrorInterceptor.handleError(error.error);
+      parsedError = HttpErrorInterceptor.formatError(error.error);
     } else {
-      parsedError = HttpErrorInterceptor.handleError('Unknown HTTP error');
+      parsedError = HttpErrorInterceptor.formatError('Unknown HTTP error');
     }
     this.showError(parsedError);
 
@@ -45,7 +45,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     return response;
   }
 
-  public static handleError(error: any) {
+  static formatError(error: any) {
     let parsedError;
     if (error?.errorName && error?.errorMessage) {
       parsedError = `${error.errorName}: ${error.errorMessage}`;
