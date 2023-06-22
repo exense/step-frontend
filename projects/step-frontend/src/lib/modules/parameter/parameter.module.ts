@@ -31,7 +31,7 @@ export class ParameterModule {
       'rest/parameters/',
       'rest/parameters/',
       'st-table',
-      '/partials/parameters/parameterSelectionTable.html'
+      'partials/parameters/parameterSelectionTable.html'
     );
 
     _cellRegister.registerCell('parameterLastModification', ParameterLastModificationComponent);

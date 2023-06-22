@@ -14,7 +14,7 @@ export class AugmentedSettingsService extends SettingsService {
   }
 
   override getSetting<T>(id: string): Observable<T> {
-    return this._http.get<T>(`/rest/settings/${id}`);
+    return this._http.get<T>(`rest/settings/${id}`);
   }
 
   /*
@@ -22,9 +22,9 @@ export class AugmentedSettingsService extends SettingsService {
    */
   override saveSetting(id: string, requestBody?: any): Observable<any> {
     if (id === 'housekeeping_enabled') {
-      return this._http.post<boolean>(`/rest/settings/${id}`, requestBody);
+      return this._http.post<boolean>(`rest/settings/${id}`, requestBody);
     } else {
-      return this._http.post<number>(`/rest/settings/${id}`, requestBody);
+      return this._http.post<number>(`rest/settings/${id}`, requestBody);
     }
   }
 }

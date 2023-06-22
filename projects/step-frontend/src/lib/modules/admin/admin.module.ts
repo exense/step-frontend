@@ -11,7 +11,7 @@ import { ScreenConfigurationListComponent } from './components/screen-configurat
 })
 export class AdminModule {
   constructor(_entityRegistry: EntityRegistry, _dashletRegistry: DashletRegistryService) {
-    _entityRegistry.register('users', 'User', 'user', '/partials/users/userSelectionTable.html');
+    _entityRegistry.register('users', 'User', 'user', 'partials/users/userSelectionTable.html');
     _dashletRegistry.registerDashlet('settings-button', SettingButtonComponent);
   }
 }
