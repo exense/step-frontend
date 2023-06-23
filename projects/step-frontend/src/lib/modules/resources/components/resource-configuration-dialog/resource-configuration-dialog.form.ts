@@ -20,13 +20,13 @@ export const resourceConfigurationDialogFormSetValueToForm = (
   form: ResourceConfigurationDialogForm,
   model: Resource
 ): void => {
-  const { attributes, resourceType } = model;
+  const { attributes, id, resourceType } = model;
 
   if (attributes?.['name']) {
     form.patchValue({
       name: attributes['name'],
       content: createDynamicValueString({
-        value: attributes['name'],
+        value: `resource:${id}`,
       }),
     });
   }
