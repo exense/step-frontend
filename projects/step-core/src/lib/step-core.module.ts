@@ -11,15 +11,21 @@ import { AutorefreshToggleComponent } from './components/autorefresh-toggle/auto
 import { DynamicLabelCustomFormInputComponent } from './components/custom-form-input/dynamic-label-custom-form-input.component';
 import { StandardCustomFormInputComponent } from './components/custom-form-input/standard-custom-form-input.component';
 import { CustomFormComponent } from './components/custom-form/custom-form.component';
+import { EditSchedulerTaskDialogComponent } from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 import { EditableActionsComponent } from './components/editable-actions/editable-actions.component';
 import { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';
 import { EditableLabelComponent } from './components/editable-label/editable-label.component';
 import { EditableTextareaLabelWrapperComponent } from './components/editable-textarea-label-wrapper/editable-textarea-label-wrapper.component';
 import { EditableTextareaLabelComponent } from './components/editable-textarea-label/editable-textarea-label.component';
+import { EntityColumnContainerComponent } from './components/entity-column-container/entity-column-container.component';
+import { EntityColumnComponent } from './components/entity-column/entity-column.component';
+import { ExportDialogComponent } from './components/export-dialog/export-dialog.component';
+import { FileAlreadyExistingDialogComponent } from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 import { FunctionLinkComponent } from './components/function-link/function-link.component';
 import { IsUsedByListComponent } from './components/is-used-by-list/is-used-by-list.component';
 import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 import { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
+import { NewSchedulerTaskDialogComponent } from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 import { PlanLinkComponent } from './components/plan-link/plan-link.component';
 import { PlanNameComponent } from './components/plan-name/plan-name.component';
@@ -30,6 +36,7 @@ import { ProgressBarComponent } from './components/progress-bar/progress-bar.com
 import { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
 import { ResourceInputComponent } from './components/resouce-input/resouce-input.component';
+import { ResourceConfigurationDialogComponent } from './components/resource-configuration-dialog/resource-configuration-dialog.component';
 import { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 import { SearchResourceDialogComponent } from './components/search-resource-dialog/search-resource-dialog.component';
 import { SelectPlanComponent } from './components/select-plan/select-plan.component';
@@ -68,12 +75,6 @@ import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
-import { EntityColumnComponent } from './components/entity-column/entity-column.component';
-import { EntityColumnContainerComponent } from './components/entity-column-container/entity-column-container.component';
-import { NewSchedulerTaskDialogComponent } from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
-import { EditSchedulerTaskDialogComponent } from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
-import { ExportDialogComponent } from './components/export-dialog/export-dialog.component';
-import { FileAlreadyExistingDialogComponent } from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 
 @NgModule({
   declarations: [
@@ -134,6 +135,7 @@ import { FileAlreadyExistingDialogComponent } from './components/file-already-ex
     EditSchedulerTaskDialogComponent,
     ExportDialogComponent,
     FileAlreadyExistingDialogComponent,
+    ResourceConfigurationDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -221,6 +223,7 @@ import { FileAlreadyExistingDialogComponent } from './components/file-already-ex
     EditSchedulerTaskDialogComponent,
     ExportDialogComponent,
     FileAlreadyExistingDialogComponent,
+    ResourceConfigurationDialogComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -249,7 +252,7 @@ export class StepCoreModule {}
 
 export * from './angularjs';
 export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
-export { CancelablePromise, CancelError } from './client/generated/core/CancelablePromise';
+export { CancelError, CancelablePromise } from './client/generated/core/CancelablePromise';
 export { OpenAPI } from './client/generated/core/OpenAPI';
 export type { OpenAPIConfig } from './client/generated/core/OpenAPI';
 export * from './client/generated/index';
@@ -258,14 +261,20 @@ export { AutorefreshToggleComponent } from './components/autorefresh-toggle/auto
 export { DynamicLabelCustomFormInputComponent } from './components/custom-form-input/dynamic-label-custom-form-input.component';
 export { StandardCustomFormInputComponent } from './components/custom-form-input/standard-custom-form-input.component';
 export { CustomFormComponent } from './components/custom-form/custom-form.component';
+export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 export { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';
 export { EditableLabelComponent } from './components/editable-label/editable-label.component';
 export { EditableTextareaLabelWrapperComponent } from './components/editable-textarea-label-wrapper/editable-textarea-label-wrapper.component';
 export { EditableTextareaLabelComponent } from './components/editable-textarea-label/editable-textarea-label.component';
+export * from './components/entity-column-container/entity-column-container.component';
+export * from './components/entity-column/entity-column.component';
+export * from './components/export-dialog/export-dialog.component';
+export * from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 export { FunctionLinkDialogService } from './components/function-link/function-link-dialog.service';
 export { FunctionLinkComponent } from './components/function-link/function-link.component';
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
+export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 export { PlanLinkComponent } from './components/plan-link/plan-link.component';
 export { PlanNameComponent } from './components/plan-name/plan-name.component';
@@ -282,16 +291,9 @@ export { SettingButtonComponent } from './components/setting-button/setting-butt
 export { SplitAreaComponent } from './components/split-area/split-area.component';
 export { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 export { SplitComponent } from './components/split/split.component';
-export * from './components/export-dialog/export-dialog.component';
 export * from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
-export { UploadContainerComponent } from './components/upload-container/upload-container.component';
 export { UpdateResourceWarningDialogComponent } from './components/update-resource-warning-dialog/update-resource-warning-dialog.component';
 export { UploadContainerComponent } from './components/upload-container/upload-container.component';
-export * from './components/entity-column/entity-column.component';
-export * from './components/entity-column-container/entity-column-container.component';
-export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
-export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
-export * from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 export * from './decorators/plugin';
 export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';
