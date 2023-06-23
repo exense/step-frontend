@@ -25,6 +25,9 @@ import { TableApiWrapperService, TimeSeriesService } from '@exense/step-core';
 import { OqlVerifyResponse } from '../../model/oql-verify-response';
 import { TsFilteringMode } from '../../model/ts-filtering-mode';
 import { OQLBuilder } from '../../util/oql-builder';
+import { MatDialog } from '@angular/material/dialog';
+import { TsDiscoverComponent } from '../../discover/ts-discover.component';
+import { DiscoverDialogData } from '../../discover/discover-dialog-data';
 
 const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
   if (field.startsWith('attributes.')) {
@@ -73,7 +76,8 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   constructor(
     private _changeDetectorRef: ChangeDetectorRef,
     private _timeSeriesService: TimeSeriesService,
-    private _tableApiService: TableApiWrapperService
+    private _tableApiService: TableApiWrapperService,
+    private _matDialog: MatDialog
   ) {}
 
   getFilters(): TsFilterItem[] {
@@ -259,6 +263,23 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     if (this.exportInProgress) {
       return;
     }
+    this.exportInProgress = true;
+    const oql = this.createRawMeasurementsFilter();
+    this._timeSeriesService
+      .getMeasurementsAttributes(oql)
+      .pipe(
+        switchMap((fields) => this._tableApiService.exportAsCSV('measurements', fields, { filters: [{ oql: oql }] })),
+        tap(() => (this.exportInProgress = false))
+      )
+      .subscribe();
+  }
+
+  openDiscovery() {
+    const data: DiscoverDialogData = { oqlFilter: this.createRawMeasurementsFilter() };
+    this._matDialog.open(TsDiscoverComponent, { data: data });
+  }
+
+  private createRawMeasurementsFilter() {
     const filteringSettings = this.context.getFilteringSettings();
     const filtersOql =
       filteringSettings.mode === TsFilteringMode.OQL
@@ -270,19 +291,11 @@ export class FilterBarComponent implements OnInit, OnDestroy {
       ATTRIBUTES_REMOVAL_FUNCTION
     );
     const selectedTimeRange = this.context.getSelectedTimeRange();
-    const oql = new OQLBuilder()
+    return new OQLBuilder()
       .open('and')
       .append(`(begin < ${Math.trunc(selectedTimeRange.to)} and begin > ${Math.trunc(selectedTimeRange.from)})`)
       .append(filtersOql)
       .append(contextualOql)
       .build();
-    this.exportInProgress = true;
-    this._timeSeriesService
-      .getMeasurementsAttributes(oql)
-      .pipe(
-        switchMap((fields) => this._tableApiService.exportAsCSV('measurements', fields, { filters: [{ oql: oql }] })),
-        tap(() => (this.exportInProgress = false))
-      )
-      .subscribe();
   }
 }
