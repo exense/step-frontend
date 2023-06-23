@@ -38,6 +38,7 @@ import { SplitAreaComponent } from './components/split-area/split-area.component
 import { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 import { SplitComponent } from './components/split/split.component';
 import { ThreadDistributionWizardDialogComponent } from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
+import { UpdateResourceWarningDialogComponent } from './components/update-resource-warning-dialog/update-resource-warning-dialog.component';
 import { UploadContainerComponent } from './components/upload-container/upload-container.component';
 import { CORE_INITIALIZER } from './core-initialiser';
 import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
@@ -126,6 +127,7 @@ import { FileAlreadyExistingDialogComponent } from './components/file-already-ex
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
     PredefinedOptionsInputComponent,
+    UpdateResourceWarningDialogComponent,
     EntityColumnComponent,
     EntityColumnContainerComponent,
     NewSchedulerTaskDialogComponent,
@@ -212,6 +214,7 @@ import { FileAlreadyExistingDialogComponent } from './components/file-already-ex
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
     PredefinedOptionsInputComponent,
+    UpdateResourceWarningDialogComponent,
     EntityColumnComponent,
     EntityColumnContainerComponent,
     NewSchedulerTaskDialogComponent,
@@ -281,6 +284,8 @@ export { SplitGutterComponent } from './components/split-gutter/split-gutter.com
 export { SplitComponent } from './components/split/split.component';
 export * from './components/export-dialog/export-dialog.component';
 export * from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
+export { UploadContainerComponent } from './components/upload-container/upload-container.component';
+export { UpdateResourceWarningDialogComponent } from './components/update-resource-warning-dialog/update-resource-warning-dialog.component';
 export { UploadContainerComponent } from './components/upload-container/upload-container.component';
 export * from './components/entity-column/entity-column.component';
 export * from './components/entity-column-container/entity-column-container.component';
