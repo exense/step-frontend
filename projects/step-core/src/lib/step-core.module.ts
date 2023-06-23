@@ -36,7 +36,6 @@ import { ProgressBarComponent } from './components/progress-bar/progress-bar.com
 import { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
 import { ResourceInputComponent } from './components/resouce-input/resouce-input.component';
-import { ResourceConfigurationDialogComponent } from './components/resource-configuration-dialog/resource-configuration-dialog.component';
 import { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 import { SearchResourceDialogComponent } from './components/search-resource-dialog/search-resource-dialog.component';
 import { SelectPlanComponent } from './components/select-plan/select-plan.component';
@@ -135,7 +134,6 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     EditSchedulerTaskDialogComponent,
     ExportDialogComponent,
     FileAlreadyExistingDialogComponent,
-    ResourceConfigurationDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -223,7 +221,6 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     EditSchedulerTaskDialogComponent,
     ExportDialogComponent,
     FileAlreadyExistingDialogComponent,
-    ResourceConfigurationDialogComponent,
   ],
   providers: [
     CORE_INITIALIZER,

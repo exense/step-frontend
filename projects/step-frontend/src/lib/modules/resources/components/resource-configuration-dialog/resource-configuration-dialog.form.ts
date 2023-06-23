@@ -1,6 +1,5 @@
 import { FormBuilder, Validators } from '@angular/forms';
-import { DynamicValueString, Resource } from '../../client/generated';
-import { dynamicValueFactory } from '../../shared';
+import { DynamicValueString, Resource, dynamicValueFactory } from '@exense/step-core';
 import { PredefinedResourceType } from './predefined-resource-type.enum';
 
 export type ResourceConfigurationDialogForm = ReturnType<typeof resourceConfigurationDialogFormCreate>;
