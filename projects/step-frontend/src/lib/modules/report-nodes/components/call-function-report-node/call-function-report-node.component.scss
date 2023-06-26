@@ -1,0 +1,14 @@
+@use 'projects/step-core/styles/core-mixins' as mixins;
+
+@include mixins.reportNodeHeader();
+@include mixins.reportNodeLink();
+
+.keyword-routing {
+  margin-bottom: 2rem;
+}
+
+.keyword-routing-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
