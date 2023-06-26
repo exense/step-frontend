@@ -49,7 +49,7 @@ export class ScreenConfigurationListComponent {
   }
 
   moveScreen(dbId: string, offset: number): void {
-    this._screensService.moveInput(dbId, offset).subscribe((_) => this.loadTable());
+    this._screensService.moveInput(dbId, offset).subscribe(() => this.loadTable());
   }
 
   removeScreen(dbId: string, label: string): void {

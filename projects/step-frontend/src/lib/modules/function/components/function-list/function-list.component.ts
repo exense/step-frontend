@@ -76,7 +76,7 @@ export class FunctionListComponent {
   }
 
   duplicateFunction(id: string): void {
-    this._functionApiService.cloneFunction(id).subscribe((_) => this.dataSource.reload());
+    this._functionApiService.cloneFunction(id).subscribe(() => this.dataSource.reload());
   }
 
   deleteFunction(id: string, name: string): void {
@@ -88,15 +88,15 @@ export class FunctionListComponent {
   }
 
   exportFunction(id: string, name: string): void {
-    this._functionDialogs.openExportFunctionDialog(id, name).subscribe();
+    this._functionDialogs.openExportFunctionDialog(id, name).subscribe(() => this.dataSource.reload());
   }
 
   exportFunctions(): void {
-    this._functionDialogs.openExportAllFunctionsDialog().subscribe();
+    this._functionDialogs.openExportAllFunctionsDialog().subscribe(() => this.dataSource.reload());
   }
 
   importFunctions(): void {
-    this._functionDialogs.openImportFunctionDialog().subscribe((_) => this.dataSource.reload());
+    this._functionDialogs.openImportFunctionDialog().subscribe(() => this.dataSource.reload());
   }
 
   lookUp(id: string, name: string): void {
@@ -104,7 +104,7 @@ export class FunctionListComponent {
   }
 
   configureFunction(id: string): void {
-    this._functionDialogs.configureFunction(id).subscribe((_) => this.dataSource.reload());
+    this._functionDialogs.configureFunction(id).subscribe(() => this.dataSource.reload());
   }
 }
 

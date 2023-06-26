@@ -41,6 +41,8 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
 
   @Output() stModelChange = new EventEmitter<string>();
   @Output() dynamicSwitch = new EventEmitter<void>();
+  @Output() filesChange = new EventEmitter<void>();
+  @Output() uploadComplete = new EventEmitter<void>();
 
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
 
@@ -70,10 +72,6 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-  inputChange(value: string) {
-    this.stModelChange.emit(value);
-  }
-
   ngOnChanges(changes: SimpleChanges): void {
     this.stModelChanges(changes);
   }
@@ -85,7 +83,11 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     this.uploadTerminator$.complete();
   }
 
-  onBlur(): void {
+  protected onStModelChange(value: string) {
+    this.stModelChange.emit(value);
+  }
+
+  protected onBlur(): void {
     if (this.withSaveButton) {
       return;
     }
@@ -93,7 +95,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     this.setStModel(this.stModel);
   }
 
-  saveChanges(): void {
+  protected saveChanges(): void {
     this.setStModel(this.stModel);
   }
 
@@ -141,9 +143,11 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
         file,
       });
     }
+
+    this.filesChange.emit();
   }
 
-  openFileChooser(): void {
+  protected openFileChooser(): void {
     if (!this.fileInput) {
       return;
     }
@@ -151,7 +155,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     this.fileInput.nativeElement.click();
   }
 
-  onChooseFile(): void {
+  protected onChooseFile(): void {
     if (!this.fileInput) {
       return;
     }
@@ -165,19 +169,21 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     this.onFilesChange(files);
   }
 
-  selectResource(): void {
+  protected selectResource(): void {
     this._resourceDialogsService
       .showSearchResourceDialog(this.stType)
-      .pipe(filter((resourceId) => Boolean(resourceId)))
+      .pipe(filter((resourceId) => !!resourceId))
       .subscribe((resourceId) => {
         this.setResourceIdToFieldValue(resourceId);
       });
   }
 
-  clear(): void {
+  protected clear(): void {
     this.absoluteFilepath = '';
+    this.resourceFilename = '';
     this.setStModel('');
     this.deleteLastUploadedResource();
+    this.filesChange.emit();
 
     if (!this.fileInput) {
       return;
@@ -191,7 +197,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    if (changes['stModel']?.currentValue !== changes['stModel']?.previousValue || changes['stModel']?.firstChange) {
+    if (changes['stModel'].currentValue !== changes['stModel'].previousValue || changes['stModel'].firstChange) {
       this.stModel = this.stModel || '';
       this.lastStModelValue = this.stModel;
       this.resourceId = this.stModel.replace('resource:', '');
@@ -206,7 +212,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  private initResource(id: string): void {
+  initResource(id: string): void {
     this._augmentedResourcesService.getResource(id).subscribe((resource) => {
       if (resource) {
         this.resourceNotExisting = false;
@@ -248,35 +254,33 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     this.uploadTerminator$.next();
 
     response$.pipe(takeUntil(this.uploadTerminator$)).subscribe((resourceUploadResponse) => {
+      this.uploadComplete.emit();
+
       delete this.progress$;
 
       const resourceId = resourceUploadResponse.resource!.id!;
 
-      if (!resourceUploadResponse.similarResources) {
+      if (!resourceUploadResponse.similarResources?.length) {
         // No similar resource found
         this.setResourceIdToFieldValue(resourceId);
         this.resourceFilename = resourceUploadResponse.resource!.resourceName;
+        this.deleteLastUploadedResource();
         this.lastUploadedResourceId = resourceId;
       } else {
-        if (resourceUploadResponse.similarResources.length >= 1) {
-          this._resourceDialogsService
-            .showFileAlreadyExistsWarning(resourceUploadResponse.similarResources)
-            .subscribe((result) => {
-              if (!result) {
-                return;
-              }
-              if (result.id) {
-                // Linking to an existing resource
-                this.setResourceIdToFieldValue(result.id);
-                // Delete the previously uploaded resource
-                this._augmentedResourcesService.deleteResource(resourceId).subscribe();
-              } else {
-                // Creating a new resource
-                this.setResourceIdToFieldValue(resourceId);
-                this.lastUploadedResourceId = resourceId;
-              }
-            });
-        }
+        this._resourceDialogsService
+          .showFileAlreadyExistsWarning(resourceUploadResponse.similarResources)
+          .subscribe((existingResourceId) => {
+            if (existingResourceId) {
+              // Linking to an existing resource
+              this.setResourceIdToFieldValue(existingResourceId);
+              // Delete the previously uploaded resource
+              this._augmentedResourcesService.deleteResource(resourceId).subscribe();
+            } else {
+              // Creating a new resource
+              this.setResourceIdToFieldValue(resourceId);
+              this.lastUploadedResourceId = resourceId;
+            }
+          });
       }
     });
   }

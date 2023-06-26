@@ -1,31 +1,40 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Resource } from '../../client/step-client-module';
 import { TableLocalDataSource } from '../../modules/table/table.module';
+
+export interface FileAlreadyExistingDialogData {
+  similarResources: Resource[];
+}
 
 @Component({
   selector: 'step-file-already-existing-dialog',
   templateUrl: './file-already-existing-dialog.component.html',
   styleUrls: ['./file-already-existing-dialog.component.scss'],
 })
-export class FileAlreadyExistingDialogComponent {
-  private _matDialogRef = inject<MatDialogRef<FileAlreadyExistingDialogComponent, { id?: string }>>(MatDialogRef);
+export class FileAlreadyExistingDialogComponent implements OnInit {
+  protected _matDialogRef = inject<MatDialogRef<FileAlreadyExistingDialogComponent, string | undefined>>(MatDialogRef);
 
-  private _similarResources = inject<Resource[]>(MAT_DIALOG_DATA);
+  private _matDialogData = inject<FileAlreadyExistingDialogData>(MAT_DIALOG_DATA);
 
-  readonly similarResourceDataSource = new TableLocalDataSource(
-    this._similarResources,
+  protected readonly similarResourceDataSource = new TableLocalDataSource(
+    this._matDialogData.similarResources,
     TableLocalDataSource.configBuilder<Resource>()
       .addSearchStringPredicate('resourceName', (item) => item.resourceName)
       .addSortStringPredicate('resourceName', (item) => item.resourceName)
       .build()
   );
 
-  selectResource({ id }: Resource): void {
-    this._matDialogRef.close({ id });
+  ngOnInit(): void {
+    // Disable automatic closing, switch to manual
+    this._matDialogRef.disableClose = true;
   }
 
-  createNewResource(): void {
-    this._matDialogRef.close({});
+  protected selectResource(resourceId: string): void {
+    this._matDialogRef.close(resourceId);
+  }
+
+  protected createNewResource(): void {
+    this._matDialogRef.close();
   }
 }
