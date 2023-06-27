@@ -1,0 +1,10 @@
+form,
+.panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.calc-wizard {
+  width: max-content;
+}

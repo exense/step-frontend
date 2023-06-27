@@ -1,6 +1,6 @@
 import { Component, inject, TrackByFunction } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { AbstractArtefact, DynamicValueString } from '../../client/generated';
+import { AbstractArtefact, DynamicValueInteger } from '../../client/generated';
 import { KeyValue } from '@angular/common';
 import { TimeUnit } from '../../modules/basics/step-basics.module';
 import { FormBuilder, Validators } from '@angular/forms';
@@ -94,24 +94,28 @@ export class ThreadDistributionWizardDialogComponent {
     }
 
     const artefact = this._artefact as {
-      users?: DynamicValueString;
-      pacing?: DynamicValueString;
+      users?: DynamicValueInteger;
+      pacing?: DynamicValueInteger;
     };
 
     artefact.users = artefact.users ?? {};
     artefact.pacing = artefact.pacing ?? {};
 
     const { users: threadsNum, pacing } = artefact;
-    if (threadsNum?.dynamic) {
-      threadsNum.expression = calculatedParams.threadsNum.toString();
+    if (artefact.users?.dynamic) {
+      const expression = calculatedParams.threadsNum.toString();
+      artefact.users = { ...artefact.users, expression };
     } else {
-      threadsNum.value = calculatedParams.threadsNum.toString();
+      const value = calculatedParams.threadsNum;
+      artefact.users = { ...artefact.users, value };
     }
 
-    if (pacing?.dynamic) {
-      pacing.expression = calculatedParams.pacingMs.toString();
+    if (artefact.pacing?.dynamic) {
+      const expression = calculatedParams.pacingMs.toString();
+      artefact.pacing = { ...artefact.pacing, expression };
     } else {
-      pacing.value = calculatedParams.pacingMs.toString();
+      const value = calculatedParams.pacingMs;
+      artefact.pacing = { ...artefact.pacing, value };
     }
 
     this._matDialogRef.close(artefact);
