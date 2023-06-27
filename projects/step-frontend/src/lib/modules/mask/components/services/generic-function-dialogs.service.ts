@@ -3,13 +3,13 @@ import {
   a1Promise2Observable,
   AugmentedKeywordsService,
   DialogsService,
-  Function as Keyword,
+  FunctionDialogsConfig,
   IsUsedByDialogService,
+  Function as Keyword,
 } from '@exense/step-core';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
 import { FunctionDialogsConfigFactoryService } from '../../../function/services/function-dialogs-config-factory.service';
 import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
-import { FunctionDialogsConfig } from '../../../function/types/function-dialogs-config.interface';
 
 @Injectable({
   providedIn: 'root',

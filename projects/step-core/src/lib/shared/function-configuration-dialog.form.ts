@@ -2,6 +2,7 @@ import { KeyValue } from '@angular/common';
 import { AbstractControl, FormBuilder, ValidationErrors } from '@angular/forms';
 import { DynamicValueInteger, Function as Keyword } from '../client/generated';
 import { AgentTokenSelectionCriteriaForm } from './agent-token-selection-criteria.form';
+import { FunctionConfigurationDialogData } from './function-configuration-dialog-data.interface';
 import { FunctionType } from './function-type.enum';
 import { dynamicValueFactory, toKeyValuePairs, toRecord } from './utils';
 
@@ -39,8 +40,13 @@ const DEFAULT_CALL_TIMEOUT_MS = 180000;
 export const functionConfigurationDialogFormCreate = (
   formBuilder: FormBuilder,
   lightForm: boolean,
-  schemaEnforced: boolean
+  schemaEnforced: boolean,
+  functionConfigurationDialogData: FunctionConfigurationDialogData
 ) => {
+  const {
+    dialogConfig: { functionTypeFilters },
+  } = functionConfigurationDialogData;
+  const [functionTypeFilter] = functionTypeFilters;
   const { createDynamicValueInteger } = dynamicValueFactory();
   const formGroup = formBuilder.nonNullable.group({
     attributes: formBuilder.nonNullable.control<Record<string, string>>({ name: '' }, []),
@@ -48,7 +54,10 @@ export const functionConfigurationDialogFormCreate = (
     schema: formBuilder.nonNullable.control<string>(DEFAULT_SCHEMA_VALUE, [
       ...(!lightForm && schemaEnforced ? [schemaValidator] : []),
     ]),
-    type: formBuilder.nonNullable.control<string>(FunctionType.SCRIPT, []),
+    type: formBuilder.nonNullable.control<string>(
+      functionTypeFilters.length ? functionTypeFilter : FunctionType.SCRIPT,
+      []
+    ),
     callTimeout: formBuilder.nonNullable.control<DynamicValueInteger>(
       createDynamicValueInteger({ value: DEFAULT_CALL_TIMEOUT_MS }),
       []

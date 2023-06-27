@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FunctionDialogsConfig } from '../types/function-dialogs-config.interface';
+import { FunctionDialogsConfig } from '@exense/step-core';
 
 @Injectable({
   providedIn: 'root',

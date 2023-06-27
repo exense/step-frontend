@@ -6,28 +6,28 @@
 
     <step-custom-form-wrapper
       [stScreen]="customScreenTable"
-      [ngModel]="formGroup.value"
-      (ngModelChange)="formGroup.patchValue($event, { emitEvent: false })"
+      [ngModel]="formGroup!.value"
+      (ngModelChange)="formGroup!.patchValue($event, { emitEvent: false })"
     >
     </step-custom-form-wrapper>
 
-    <form [formGroup]="formGroup">
+    <form [formGroup]="formGroup!">
       <step-form-field>
         <step-label>Description</step-label>
-        <textarea rows="3" [formControl]="formGroup.controls.description"></textarea>
+        <textarea rows="3" [formControl]="formGroup!.controls.description"></textarea>
       </step-form-field>
 
       <step-form-field *ngIf="!lightForm && schemaEnforced">
         <step-label show-required-marker>Schema</step-label>
-        <textarea rows="5" [formControl]="formGroup.controls.schema"></textarea>
-        <step-error *ngIf="formGroup.controls.schema.hasError('format')">
+        <textarea rows="5" [formControl]="formGroup!.controls.schema"></textarea>
+        <step-error *ngIf="formGroup!.controls.schema.hasError('format')">
           The schema must be in a JSON format
         </step-error>
       </step-form-field>
 
       <step-form-field>
         <step-label>Type</step-label>
-        <mat-select [formControl]="formGroup.controls.type">
+        <mat-select [formControl]="formGroup!.controls.type">
           <mat-option *ngFor="let itemInfo of functionTypeItemInfos" [value]="itemInfo.type">
             {{ itemInfo.label }}
           </mat-option>
@@ -53,10 +53,10 @@
 
           <step-dynamic-textfield
             label="Call timeout (ms)"
-            [formControl]="formGroup.controls.callTimeout"
+            [formControl]="formGroup!.controls.callTimeout"
           ></step-dynamic-textfield>
 
-          <mat-checkbox color="primary" [formControl]="formGroup.controls.executeLocally">
+          <mat-checkbox color="primary" [formControl]="formGroup!.controls.executeLocally">
             Execute on controller&nbsp;
             <step-icon
               name="help-circle"
@@ -66,7 +66,7 @@
 
           <ng-container *ngIf="!executeLocally">
             <step-agent-token-selection-criteria
-              [tokenSelectionCriteria]="formGroup.controls.tokenSelectionCriteria"
+              [tokenSelectionCriteria]="formGroup!.controls.tokenSelectionCriteria"
               tooltip="Defines additional selection criteria for the agent token on which the keyword should be executed"
             ></step-agent-token-selection-criteria>
           </ng-container>
@@ -76,11 +76,11 @@
   </div>
 
   <div step-modal-window-buttons>
-    <button type="button" [disabled]="formGroup.invalid" (click)="save(true)" mat-flat-button color="primary">
+    <button type="button" [disabled]="formGroup!.invalid" (click)="save(true)" mat-flat-button color="primary">
       Save and edit
     </button>
 
-    <button type="button" [disabled]="formGroup.invalid" (click)="save()" mat-flat-button color="primary">Save</button>
+    <button type="button" [disabled]="formGroup!.invalid" (click)="save()" mat-flat-button color="primary">Save</button>
 
     <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
   </div>

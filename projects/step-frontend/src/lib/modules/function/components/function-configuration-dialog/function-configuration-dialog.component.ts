@@ -1,23 +1,24 @@
 import { KeyValue } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
   AJS_LOCATION,
   AlertType,
   AugmentedKeywordsService,
   AuthService,
   DialogsService,
-  Function as Keyword,
+  FunctionConfigurationDialogData,
+  FunctionConfigurationDialogForm,
   functionConfigurationDialogFormCreate,
   functionConfigurationDialogFormSetValueToForm,
   functionConfigurationDialogFormSetValueToModel,
   FunctionType,
   FunctionTypeRegistryService,
+  Function as Keyword,
 } from '@exense/step-core';
 import { ILocationService } from 'angular';
 import { of, Subject, switchMap, takeUntil, tap } from 'rxjs';
-import { FunctionConfigurationDialogData } from '../../types/function-configuration-dialog-data.interface';
 
 @Component({
   selector: 'step-function-configuration-dialog',
@@ -41,12 +42,6 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
 
   protected readonly lightForm = this._functionConfigurationDialogData.dialogConfig.lightForm;
   protected readonly schemaEnforced = this._authService.getConf()?.miscParams?.['enforceschemas'] === 'true';
-  protected readonly formGroup = functionConfigurationDialogFormCreate(
-    this._formBuilder,
-    this.lightForm,
-    this.schemaEnforced
-  );
-  protected readonly functionTypeItemInfos = this._functionTypeRegistryService.getItemInfos();
   protected readonly setValueToForm$ = this.setValueToFormInternal$.asObservable();
   protected readonly setValueToModel$ = this.setValueToModelInternal$.asObservable();
   protected readonly AlertType = AlertType;
@@ -54,17 +49,34 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
 
   protected keyword?: Keyword;
   protected schemaJSON?: string;
+  protected formGroup?: FunctionConfigurationDialogForm;
 
+  protected functionTypeItemInfos = this._functionTypeRegistryService.getItemInfos();
   protected modalTitle: string = !this._functionConfigurationDialogData.keyword ? 'New Keyword' : 'Edit Keyword';
   protected isLoading: boolean = false;
   protected tokenSelectionCriteria: KeyValue<string, string>[] = [];
 
   ngOnInit(): void {
-    this.initStepFunction();
+    this.formGroup = functionConfigurationDialogFormCreate(
+      this._formBuilder,
+      this.lightForm,
+      this.schemaEnforced,
+      this._functionConfigurationDialogData
+    );
 
     this.formGroup.statusChanges.pipe(takeUntil(this.terminator$)).subscribe(() => {
       this._changeDetectorRef.detectChanges();
     });
+
+    const { functionTypeFilters } = this._functionConfigurationDialogData.dialogConfig;
+
+    if (functionTypeFilters) {
+      this.functionTypeItemInfos = this.functionTypeItemInfos.filter((functionTypeItemInfo) =>
+        this._functionConfigurationDialogData.dialogConfig.functionTypeFilters.includes(functionTypeItemInfo.type)
+      );
+    }
+
+    this.initStepFunction();
   }
 
   ngOnDestroy(): void {
@@ -75,7 +87,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
   }
 
   protected get functionType(): string {
-    return this.formGroup.controls.type.value;
+    return this.formGroup!.controls.type.value;
   }
 
   protected get customScreenTable(): string {
@@ -83,7 +95,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
   }
 
   protected get executeLocally(): boolean {
-    return this.formGroup.controls.executeLocally.value;
+    return this.formGroup!.controls.executeLocally.value;
   }
 
   private get serviceRoot(): string {
@@ -92,11 +104,11 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
 
   protected onFunctionTypeRenderComplete(): void {
     this.setValueToFormInternal$.next();
-    this.formGroup.updateValueAndValidity();
+    this.formGroup!.updateValueAndValidity();
   }
 
   protected save(edit?: boolean): void {
-    functionConfigurationDialogFormSetValueToModel(this.formGroup, this.keyword!);
+    functionConfigurationDialogFormSetValueToModel(this.formGroup!, this.keyword!);
 
     this.setValueToModelInternal$.next();
 
@@ -135,7 +147,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
     } else {
       this.keyword = this._functionConfigurationDialogData.keyword;
 
-      functionConfigurationDialogFormSetValueToForm(this.formGroup, this.keyword);
+      functionConfigurationDialogFormSetValueToForm(this.formGroup!, this.keyword);
     }
   }
 
@@ -162,7 +174,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
       .subscribe((keyword) => {
         this.keyword = keyword;
 
-        functionConfigurationDialogFormSetValueToForm(this.formGroup, keyword);
+        functionConfigurationDialogFormSetValueToForm(this.formGroup!, keyword);
       });
   }
 }

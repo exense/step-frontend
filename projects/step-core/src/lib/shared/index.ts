@@ -26,3 +26,5 @@ export * from './function-type-form-component';
 export * from './agent-token-selection-criteria.form';
 export * from './function-type.enum';
 export * from './function-type-form-component-context.interface';
+export * from './function-configuration-dialog-data.interface';
+export * from './function-dialogs-config.interface';

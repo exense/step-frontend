@@ -1,26 +1,26 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  a1Promise2Observable,
   AJS_LOCATION,
   AJS_MODULE,
   AugmentedKeywordsService,
   DialogsService,
   EntityDialogsService,
   ExportDialogsService,
-  Function as Keyword,
+  FunctionConfigurationDialogData,
+  FunctionDialogsConfig,
   FunctionLinkDialogService,
   ImportDialogsService,
   IsUsedByDialogService,
+  Function as Keyword,
   UibModalHelperService,
+  a1Promise2Observable,
 } from '@exense/step-core';
 import { ILocationService } from 'angular';
-import { catchError, map, Observable, of, switchMap } from 'rxjs';
+import { Observable, catchError, map, of, switchMap } from 'rxjs';
 import { FunctionConfigurationDialogComponent } from '../components/function-configuration-dialog/function-configuration-dialog.component';
-import { FunctionConfigurationDialogData } from '../types/function-configuration-dialog-data.interface';
-import { FunctionDialogsConfig } from '../types/function-dialogs-config.interface';
 import { FunctionDialogsConfigFactoryService } from './function-dialogs-config-factory.service';
 
 @Injectable({
