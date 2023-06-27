@@ -26,7 +26,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { TsDiscoverComponent } from './discover/ts-discover.component';
+import { DiscoverComponent } from './discover/discover.component';
 import { DiscoverAttributeStatsComponent } from './discover/attribute-stats/attribute-stats.component';
 
 @NgModule({
@@ -50,7 +50,7 @@ import { DiscoverAttributeStatsComponent } from './discover/attribute-stats/attr
     PerformanceViewComponent,
     AnalyticsPageComponent,
     ExecutionPerformanceComponent,
-    TsDiscoverComponent,
+    DiscoverComponent,
     DiscoverAttributeStatsComponent,
   ],
   exports: [ExecutionPerformanceComponent, SyntheticMonitoringPageComponent, AnalyticsPageComponent],

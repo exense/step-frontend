@@ -10,6 +10,5 @@ export class ModalWindowComponent {
   readonly _dialogRef = inject(MatDialogRef);
 
   @Input() showSpinner = false;
-  @Input() showActions = true;
   @Input() title = '';
 }

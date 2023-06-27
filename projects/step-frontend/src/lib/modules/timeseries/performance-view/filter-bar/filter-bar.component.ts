@@ -26,7 +26,7 @@ import { OqlVerifyResponse } from '../../model/oql-verify-response';
 import { TsFilteringMode } from '../../model/ts-filtering-mode';
 import { OQLBuilder } from '../../util/oql-builder';
 import { MatDialog } from '@angular/material/dialog';
-import { TsDiscoverComponent } from '../../discover/ts-discover.component';
+import { DiscoverComponent } from '../../discover/discover.component';
 import { DiscoverDialogData } from '../../discover/discover-dialog-data';
 
 const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
@@ -276,7 +276,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   openDiscovery() {
     const data: DiscoverDialogData = { oqlFilter: this.createRawMeasurementsFilter() };
-    this._matDialog.open(TsDiscoverComponent, { data: data });
+    this._matDialog.open(DiscoverComponent, { data: data });
   }
 
   private createRawMeasurementsFilter() {

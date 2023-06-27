@@ -1,21 +1,21 @@
 import { AfterViewInit, Component, inject, Inject, OnChanges, OnInit, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { DateFormat, MeasurementsStats, TimeSeriesService } from '@exense/step-core';
+import { DateFormat, Measurement, MeasurementsStats, TimeSeriesService } from '@exense/step-core';
 import { HttpClient } from '@angular/common/http';
 import { DiscoverDialogData } from './discover-dialog-data';
 import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'step-ts-discover',
-  templateUrl: './ts-discover.component.html',
-  styleUrls: ['./ts-discover.component.scss'],
+  templateUrl: './discover.component.html',
+  styleUrls: ['./discover.component.scss'],
 })
-export class TsDiscoverComponent implements OnInit {
+export class DiscoverComponent implements OnInit {
   readonly DateFormat = DateFormat;
-  readonly PAGE_SIZE = 20;
-  readonly _dialogRef = inject(MatDialogRef);
-  dataSource: MatTableDataSource<any> = new MatTableDataSource();
-  oqlFilter: string;
+  pageSize = 20;
+  pageSizeOptions = [20, 50, 100];
+  dataSource: MatTableDataSource<Measurement> = new MatTableDataSource();
+  private oqlFilter: string;
   skip = 0;
   hasMore = true;
   isLoading = true;
@@ -24,13 +24,12 @@ export class TsDiscoverComponent implements OnInit {
   visibleTableColumns: string[] = [];
   stats: MeasurementsStats | undefined;
   allSelected = true;
-  columnsSelection: { [key: string]: boolean } = {};
+  columnsSelection: Record<string, boolean> = {};
 
   constructor(
-    private _matDialogRef: MatDialogRef<TsDiscoverComponent>,
+    private _matDialogRef: MatDialogRef<DiscoverComponent>,
     @Inject(MAT_DIALOG_DATA) public _data: DiscoverDialogData,
-    private timeSeriesService: TimeSeriesService,
-    private http: HttpClient
+    private _timeSeriesService: TimeSeriesService
   ) {
     this.oqlFilter = _data.oqlFilter;
   }
@@ -42,16 +41,13 @@ export class TsDiscoverComponent implements OnInit {
 
   private fetchMeasurements() {
     this.isLoading = true;
-    const oql = this._data.oqlFilter;
-    this.http
-      .get<any[]>(`/rest/time-series/raw-measurements?filter=${oql}&limit=${this.PAGE_SIZE}&skip=${this.skip}`)
-      .subscribe((measurements) => {
-        this.dataSource.data = measurements;
-        this.isLoading = false;
-        if (measurements.length < this.PAGE_SIZE) {
-          this.hasMore = false;
-        }
-      });
+    this._timeSeriesService.discoverMeasurements(this.oqlFilter).subscribe((measurements) => {
+      this.dataSource.data = measurements;
+      this.isLoading = false;
+      if (measurements.length < this.pageSize) {
+        this.hasMore = false;
+      }
+    });
   }
 
   fetchNextPage(): void {
@@ -59,7 +55,7 @@ export class TsDiscoverComponent implements OnInit {
       return;
     }
     if (this.hasMore) {
-      this.skip += this.PAGE_SIZE;
+      this.skip += this.pageSize;
       this.fetchMeasurements();
     }
   }
@@ -75,7 +71,7 @@ export class TsDiscoverComponent implements OnInit {
     this.visibleTableColumns = this.selectVisibleColumns(this.columnsSelection);
   }
 
-  private selectVisibleColumns(columnsSelection: { [key: string]: boolean }) {
+  private selectVisibleColumns(columnsSelection: Record<string, boolean>) {
     return this.allColumns.filter((a) => columnsSelection[a]);
   }
 
@@ -84,13 +80,13 @@ export class TsDiscoverComponent implements OnInit {
       return;
     }
     if (this.skip > 0) {
-      this.skip = Math.max(0, this.skip - this.PAGE_SIZE);
+      this.skip = Math.max(0, this.skip - this.pageSize);
     }
     this.fetchMeasurements();
   }
 
   private fetchStats() {
-    this.timeSeriesService.getRawMeasurementsStats(this._data.oqlFilter).subscribe((stats) => {
+    this._timeSeriesService.getRawMeasurementsStats(this._data.oqlFilter).subscribe((stats) => {
       this.stats = stats;
       this.dynamicColumns = stats.attributes;
       this.allColumns = ['timestamp', ...this.dynamicColumns];
