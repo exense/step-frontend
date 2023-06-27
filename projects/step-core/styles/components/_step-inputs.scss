@@ -58,6 +58,7 @@ $border-radius: 8px;
 
     mat-select,
     mat-radio-group,
+    .step-checkbox-container,
     input,
     textarea {
       border-color: $border-color;
@@ -109,6 +110,7 @@ $border-radius: 8px;
       & > .form-field-content {
         mat-select,
         mat-radio-group,
+        .step-checkbox-container,
         input,
         textarea,
         & > step-suffix,
@@ -156,6 +158,7 @@ $border-radius: 8px;
 
       & > mat-select,
       & > mat-radio-group,
+      & > .step-checkbox-container,
       & > input,
       textarea {
         @include border-base;

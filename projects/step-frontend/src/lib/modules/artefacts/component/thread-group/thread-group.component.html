@@ -1,0 +1,100 @@
+<form #form="ngForm">
+  <mat-expansion-panel [(expanded)]="showLoadDistribution">
+    <mat-expansion-panel-header>
+      <mat-panel-title>Load distribution parameters</mat-panel-title>
+    </mat-expansion-panel-header>
+    <section class="panel-content">
+      <button type="button" class="calc-wizard" mat-flat-button color="primary" (click)="openDistributionWizard()">
+        Calculation wizard
+      </button>
+      <step-dynamic-textfield
+        label="Number of threads"
+        tooltip="Specifies the number of threads to be started."
+        name="threads"
+        [isNumber]="true"
+        [disabled]="context.readonly"
+        [(ngModel)]="context.artefact!.users"
+      ></step-dynamic-textfield>
+      <step-dynamic-textfield
+        label="Pacing (ms)"
+        tooltip="Specifies the amount of time between each iteration."
+        name="pacing"
+        [isNumber]="true"
+        [disabled]="context.readonly"
+        [(ngModel)]="context.artefact!.pacing"
+      ></step-dynamic-textfield>
+      <step-dynamic-textfield
+        label="Ramp-up (ms)"
+        tooltip="Specifies the amount of time that should be taken to start all the threads. If left empty the ramp-up duration will be equal to the pacing."
+        name="rampup"
+        [isNumber]="true"
+        [disabled]="context.readonly"
+        [(ngModel)]="context.artefact!.rampup"
+      ></step-dynamic-textfield>
+      <step-dynamic-textfield
+        label="Pack"
+        tooltip="Defines number of threads started together during the ramp-up (Optional, by default threads are started one by one)"
+        name="pack"
+        [isNumber]="true"
+        [disabled]="context.readonly"
+        [(ngModel)]="context.artefact!.pack"
+      ></step-dynamic-textfield>
+      <step-dynamic-textfield
+        label="Start offset (ms)"
+        tooltip="Specifies the duration to wait before the ramp-up starts."
+        name="startOffset"
+        [isNumber]="true"
+        [disabled]="context.readonly"
+        [(ngModel)]="context.artefact!.startOffset"
+      ></step-dynamic-textfield>
+    </section>
+  </mat-expansion-panel>
+  <mat-expansion-panel [(expanded)]="showDurationParameters">
+    <mat-expansion-panel-header>
+      <mat-panel-title>Duration parameters</mat-panel-title>
+    </mat-expansion-panel-header>
+    <section class="panel-content">
+      <step-dynamic-textfield
+        label="Number of iterations per thread"
+        tooltip="Specifies the number of iterations per thread. If left empty the execution will last until it reaches the specified maximum duration."
+        name="iterations"
+        [isNumber]="true"
+        [disabled]="context.readonly"
+        [(ngModel)]="context.artefact!.iterations"
+      ></step-dynamic-textfield>
+      <step-dynamic-textfield
+        label="Maximum duration (ms)"
+        tooltip="Specifies the maximum duration of each thread. A zero-value means unlimited."
+        name="maxDuration"
+        [isNumber]="true"
+        [disabled]="context.readonly"
+        [(ngModel)]="context.artefact!.maxDuration"
+      ></step-dynamic-textfield>
+    </section>
+  </mat-expansion-panel>
+  <mat-expansion-panel [(expanded)]="showHandles">
+    <mat-expansion-panel-header>
+      <mat-panel-title>Handles</mat-panel-title>
+    </mat-expansion-panel-header>
+    <section class="panel-content">
+      <step-dynamic-textfield
+        label="Local iterationId variable (handle)"
+        name="localItem"
+        [disabled]="context.readonly"
+        [(ngModel)]="context.artefact!.localItem"
+      ></step-dynamic-textfield>
+      <step-dynamic-textfield
+        label="UserId variable (handle)"
+        name="userItem"
+        [disabled]="context.readonly"
+        [(ngModel)]="context.artefact!.userItem"
+      ></step-dynamic-textfield>
+      <step-dynamic-textfield
+        label="Global counter variable (handle)"
+        name="item"
+        [disabled]="context.readonly"
+        [(ngModel)]="context.artefact!.item"
+      ></step-dynamic-textfield>
+    </section>
+  </mat-expansion-panel>
+</form>

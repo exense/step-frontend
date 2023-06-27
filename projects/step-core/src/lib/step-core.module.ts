@@ -47,7 +47,6 @@ import { ThreadDistributionWizardDialogComponent } from './components/thread-dis
 import { UpdateResourceWarningDialogComponent } from './components/update-resource-warning-dialog/update-resource-warning-dialog.component';
 import { UploadContainerComponent } from './components/upload-container/upload-container.component';
 import { CORE_INITIALIZER } from './core-initialiser';
-import { ArtefactDetailsDirective } from './directives/artefact-details.directive';
 import { CapsLockDirective } from './directives/caps-lock.directive';
 import { ElementResizeDirective } from './directives/element-resize.directive';
 import { FocusableDirective } from './directives/focusable.directive';
@@ -74,6 +73,8 @@ import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
+import { ArtefactDetailsComponent } from './components/artefact-details/artefact-details.component';
+import { ArtefactDetailsWrapperDirective } from './directives/artefact-details-wrapper.directive';
 
 @NgModule({
   declarations: [
@@ -93,7 +94,6 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     SettingButtonComponent,
     UploadContainerComponent,
     ProgressBarComponent,
-    ArtefactDetailsDirective,
     PlanTreeComponent,
     RestoreDialogComponent,
     SimpleLineChartDirective,
@@ -134,6 +134,8 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     EditSchedulerTaskDialogComponent,
     ExportDialogComponent,
     FileAlreadyExistingDialogComponent,
+    ArtefactDetailsComponent,
+    ArtefactDetailsWrapperDirective,
   ],
   imports: [
     CommonModule,
@@ -180,7 +182,6 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     IsUsedByModalComponent,
     SelectPlanComponent,
     PlanTreeComponent,
-    ArtefactDetailsDirective,
     AutorefreshToggleComponent,
     SettingButtonComponent,
     UploadContainerComponent,
@@ -221,6 +222,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
     EditSchedulerTaskDialogComponent,
     ExportDialogComponent,
     FileAlreadyExistingDialogComponent,
+    ArtefactDetailsComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -289,10 +291,15 @@ export { SplitAreaComponent } from './components/split-area/split-area.component
 export { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 export { SplitComponent } from './components/split/split.component';
 export * from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
+export * from './components/entity-column/entity-column.component';
+export * from './components/entity-column-container/entity-column-container.component';
+export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
+export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
+export * from './components/file-already-existing-dialog/file-already-existing-dialog.component';
+export * from './components/artefact-details/artefact-details.component';
 export { UpdateResourceWarningDialogComponent } from './components/update-resource-warning-dialog/update-resource-warning-dialog.component';
 export { UploadContainerComponent } from './components/upload-container/upload-container.component';
 export * from './decorators/plugin';
-export * from './directives/artefact-details.directive';
 export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
 export { FocusableDirective } from './directives/focusable.directive';
@@ -347,4 +354,6 @@ export * from './services/scheduled-task-dialogs.service';
 export { UibModalHelperService, UibModalInstance } from './services/uib-modal-helper.service';
 export * from './services/view-registry.service';
 export * from './services/view-state.service';
+export * from './services/artefact.service';
+export * from './services/artefact-form-change-helper.service';
 export * from './shared';
