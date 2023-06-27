@@ -73,8 +73,9 @@ export class CustomItemRenderComponent implements OnChanges, AfterViewInit {
     if (!this.componentRef) {
       return;
     }
-
+    const previousContext = this.componentRef.instance.context;
     this.componentRef.instance.context = context;
+    this.componentRef.instance.contextChange?.(previousContext, context);
     this.componentRef.changeDetectorRef.detectChanges();
   }
 }

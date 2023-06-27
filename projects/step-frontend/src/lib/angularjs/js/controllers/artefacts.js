@@ -32,50 +32,6 @@ angular
     );
   })
 
-  .directive('artefactDetails', function () {
-    return {
-      restrict: 'E',
-      scope: {
-        artefact: '=',
-        onSave: '&',
-        readonly: '=',
-        handle: '=',
-      },
-      controller: ['$scope', '$location', 'artefactTypes', 'AuthService', 'PlanDialogsService', function ($scope, $location, artefactTypes, AuthService, PlanDialogsService) {
-        $scope.authService = AuthService;
-        $scope.showAttributes = true;
-        $scope.isKeyword = false;
-        $scope.$watch('artefact', function () {
-          if ($scope.artefact) {
-            var classname = $scope.artefact._class;
-            $scope.isKeyword = classname === 'CallKeyword';
-            $scope.icon = artefactTypes.getIcon(classname);
-            $scope.label = artefactTypes.getLabel(classname);
-            $scope.editor = artefactTypes.getEditor(classname);
-            $scope.description = artefactTypes.getDescription(classname);
-          } else {
-            $scope.isKeyword = false;
-          }
-        });
-
-        $scope.save = function () {
-          if (!$scope.readonly) {
-            if ($scope.onSave) {
-              $scope.artefact.useDynamicName = $scope.artefact.dynamicName.dynamic;
-              $scope.onSave({ artefact: $scope.artefact });
-            }
-          }
-        };
-
-        $scope.openDistributionWizard = function () {
-          PlanDialogsService
-            .openThreadGroupDistributionWizard($scope.artefact)
-            .subscribe(() => $scope.save());
-        };
-      }],
-      templateUrl: 'partials/artefacts/abstractArtefact.html',
-    };
-  })
   .controller('CallPlanCtrl', function ($scope, $location, $http, PlanDialogsService, LinkProcessor, Dialogs) {
     $scope.gotoPlan = () =>
       LinkProcessor.process($scope.planProject)

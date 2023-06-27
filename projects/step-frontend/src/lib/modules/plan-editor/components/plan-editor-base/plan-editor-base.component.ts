@@ -31,12 +31,12 @@ import {
   RestoreDialogsService,
   TreeNodeUtilsService,
   TreeStateService,
+  ArtefactService,
 } from '@exense/step-core';
 import { catchError, filter, from, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
-import { ArtefactService } from '../../injectables/artefact.service';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
 import { PlanEditorApiService } from '../../injectables/plan-editor-api.service';
@@ -100,7 +100,7 @@ export class PlanEditorBaseComponent
     map((planTypes) => {
       return planTypes.map((planType) => ({
         planType,
-        icon: this._artefactService.getIconNg2(planType),
+        icon: this._artefactService.getIconNg2(planType)!,
       }));
     })
   );
@@ -296,7 +296,7 @@ export class PlanEditorBaseComponent
         this.planTypeControl.setValue(
           {
             planType: plan.root!._class,
-            icon: this._artefactService.getIconNg2(plan.root!._class),
+            icon: this._artefactService.getIconNg2(plan.root!._class)!,
           },
           { emitEvent: false }
         );

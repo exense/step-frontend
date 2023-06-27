@@ -8,44 +8,54 @@
   [showRequiredMarker]="showRequiredMarker"
   [ngModel]="expression"
   (ngModelChange)="onExpressionChange($event)"
+  [disabled]="isDisabled"
   (toggleConstantValue)="toggleDynamicExpression(false)"
+  (blur)="onBlur()"
 ></step-expression-input>
 
 <ng-template #constantValueTemplate>
   <step-form-field
-    [class.ng-invalid]="_ngControl.invalid"
+    [class.ng-invalid]="!!_ngControl.invalid"
     [class.ng-touched]="_ngControl.touched"
     [class.with-tooltip]="tooltip"
   >
-    <step-label *ngIf="label" [attr.show-required-marker]="showRequiredMarker || null">{{ label }}</step-label>
-
-    <input
-      type="text"
-      [required]="showRequiredMarker"
-      [disabled]="isDisabled"
-      [ngModel]="value"
-      (ngModelChange)="onValueChange($event)"
-      (blur)="onBlur()"
-    />
-
+    <step-label [attr.show-required-marker]="showRequiredAsterisk || null" *ngIf="label">{{ label }}</step-label>
+    <ng-template #numberField>
+      <input
+        type="number"
+        [ngModel]="value"
+        (ngModelChange)="onValueChange($event)"
+        [disabled]="isDisabled"
+        (blur)="onBlur()"
+        [stepPreventChars]="numberInputInvalidChars"
+      />
+    </ng-template>
+    <ng-template #textField>
+      <input
+        type="text"
+        [ngModel]="value"
+        (ngModelChange)="onValueChange($event)"
+        [disabled]="isDisabled"
+        (blur)="onBlur()"
+      />
+    </ng-template>
+    <ng-container *ngIf="isNumber; then numberField; else textField"> </ng-container>
     <step-suffix *ngIf="tooltip" class="icon-suffix">
       <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below"></step-icon>
     </step-suffix>
-
     <step-suffix class="button-suffix">
-      <button type="button" mat-stroked-button [disabled]="isDisabled" (click)="editConstantValue()">
+      <button type="button" mat-stroked-button (click)="editConstantValue()" [disabled]="isDisabled">
         <step-icon name="edit-2"></step-icon>
       </button>
     </step-suffix>
-
     <step-suffix class="button-suffix">
       <button
         type="button"
         mat-stroked-button
-        [disabled]="isDisabled"
         matTooltip="Use a dynamic expression to set this attribute"
         matTooltipPosition="below"
         (click)="toggleDynamicExpression(true)"
+        [disabled]="isDisabled"
       >
         <step-icon name="zap"></step-icon>
       </button>

@@ -18,6 +18,7 @@ export * from './persistence-tokens';
 export * from './export-dialog-data.interface';
 export * from './entity-column-container';
 export * from './function-script-language.interface';
+export * from './artefact-context';
 export * from './function-type-script-options.token';
 export * from './function-configuration-dialog.form';
 export * from './higher-order-validator';

@@ -23,6 +23,7 @@ import { HintDirective } from './directives/hint.directive';
 import { ErrorDirective } from './directives/error.directive';
 import { AlertDirective } from './directives/alert.directive';
 import { ValidateJsonDirective } from './directives/validate-json.directive';
+import { PreventCharsDirective } from './directives/prevent-chars.directive';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
@@ -48,6 +49,7 @@ import { ValidateJsonDirective } from './directives/validate-json.directive';
     ErrorDirective,
     AlertDirective,
     ValidateJsonDirective,
+    PreventCharsDirective,
   ],
   exports: [
     ResourceLabelComponent,
@@ -71,6 +73,7 @@ import { ValidateJsonDirective } from './directives/validate-json.directive';
     ErrorDirective,
     AlertDirective,
     ValidateJsonDirective,
+    PreventCharsDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -107,6 +110,7 @@ export * from './shared/screen-width.token';
 export * from './shared/is-small-screen.token';
 export * from './shared/resize-observable';
 export * from './shared/time-unit.enum';
+export * from './shared/generate-api-key-strategy';
 export * from './directives/element-ref-map.directive';
 export * from './directives/width-expanders.directive';
 export * from './directives/validate-json.directive';
@@ -116,6 +120,7 @@ export * from './directives/suffix.directive';
 export * from './directives/hint.directive';
 export * from './directives/error.directive';
 export * from './directives/alert.directive';
+export * from './directives/prevent-chars.directive';
 export * from './shared/repository-parameters.token';
 export * from './repository-parameters-initializer';
 export * from './shared/array-item-label-value-extractor';
@@ -126,4 +131,5 @@ export * from './services/persistence.service';
 export * from './services/default-page.token';
 export * from './services/view-id-link-prefix.token';
 export * from './services/navigator.service';
+export * from './services/generate-api-key.service';
 export * from './shared/logout-cleanup.token';

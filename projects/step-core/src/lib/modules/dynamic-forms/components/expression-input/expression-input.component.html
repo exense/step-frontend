@@ -11,6 +11,7 @@
     [disabled]="isDisabled || !!isParentDisabled"
     [ngModel]="expression"
     (ngModelChange)="onExpressionChange($event)"
+    [disabled]="isDisabled"
     (blur)="onBlur()"
   />
 
@@ -30,7 +31,13 @@
   </step-suffix>
 
   <step-suffix class="button-suffix">
+    <ng-template #disabledState>
+      <button type="button" mat-flat-button color="primary" [disabled]="true">
+        <step-icon name="zap"></step-icon>
+      </button>
+    </ng-template>
     <button
+      *ngIf="!isDisabled; else disabledState"
       type="button"
       mat-stroked-button
       [disabled]="isDisabled || !!isParentDisabled"

@@ -57,6 +57,7 @@ export class ExpressionInputComponent implements ControlValueAccessor {
 
   protected onBlur(): void {
     this.onTouch?.();
+    this.blur.emit();
   }
 
   protected editDynamicExpression(): void {
