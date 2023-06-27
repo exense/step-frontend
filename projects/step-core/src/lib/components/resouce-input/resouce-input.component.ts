@@ -46,6 +46,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   @Output() stModelChange = new EventEmitter<string>();
   @Output() dynamicSwitch = new EventEmitter<void>();
   @Output() filesChange = new EventEmitter<void>();
+  @Output() uploadComplete = new EventEmitter<void>();
 
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
 
@@ -262,6 +263,8 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     this.uploadTerminator$.next();
 
     response$.pipe(takeUntil(this.uploadTerminator$)).subscribe((resourceUploadResponse) => {
+      this.uploadComplete.emit();
+
       delete this.progress$;
 
       const resourceId = resourceUploadResponse.resource!.id!;
