@@ -6,6 +6,7 @@ import { KeyValuePair } from '../domain';
 import { AceMode } from './ace-mode.enum';
 import { Collection } from './collection.interface';
 import { ScriptLanguage } from './script-language.enum';
+import { DynamicValueInteger, DynamicValueString } from '../client/generated';
 
 export const a1Promise2Promise = <T>(promise: IPromise<T>): Promise<T> =>
   Promise.resolve(promise as unknown as Promise<T>);
@@ -84,6 +85,25 @@ export const breadthFirstSearch = <T>({
 export const convertScriptLanguageToAce = (scriptLanguage?: ScriptLanguage): AceMode | undefined => {
   return !scriptLanguage ? undefined : (AceMode as any)[scriptLanguage];
 };
+
+export const dynamicValueFactory = () => ({
+  createDynamicValueString(dynamicValueString?: Partial<DynamicValueString>): DynamicValueString {
+    return {
+      dynamic: dynamicValueString?.dynamic ?? false,
+      expression: dynamicValueString?.expression ?? '',
+      expressionType: dynamicValueString?.expressionType ?? '',
+      value: dynamicValueString?.value ?? '',
+    };
+  },
+  createDynamicValueInteger(dynamicValueInteger?: Partial<DynamicValueInteger>): DynamicValueInteger {
+    return {
+      dynamic: dynamicValueInteger?.dynamic ?? false,
+      expression: dynamicValueInteger?.expression ?? '',
+      expressionType: dynamicValueInteger?.expressionType ?? '',
+      value: dynamicValueInteger?.value ?? 0,
+    };
+  },
+});
 
 export const toKeyValuePairs = <T>(object: Record<string, T>): KeyValuePair<string, T>[] =>
   Object.entries(object).map(([key, value]) => ({

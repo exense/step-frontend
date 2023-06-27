@@ -30,6 +30,7 @@ import { FunctionTypeScriptComponent } from './components/function-type-script/f
 import { FunctionTypeLabelPipe } from './pipes/function-type-label.pipe';
 import './services/function-dialogs.service';
 import { FunctionDialogsService } from './services/function-dialogs.service';
+import { FunctionSelectionTableComponent } from './components/function-selection-table/function-selection-table.component';
 
 @NgModule({
   imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule],
@@ -45,6 +46,7 @@ import { FunctionDialogsService } from './services/function-dialogs.service';
     CompositeFunctionEditorComponent,
     FunctionPackageConfigurationDialogComponent,
     FunctionConfigurationDialogComponent,
+    FunctionSelectionTableComponent,
     FunctionTypeCompositeComponent,
     FunctionTypeScriptComponent,
     FunctionTypeJMeterComponent,
@@ -62,6 +64,7 @@ import { FunctionDialogsService } from './services/function-dialogs.service';
     CompositeFunctionEditorComponent,
     FunctionPackageConfigurationDialogComponent,
     FunctionConfigurationDialogComponent,
+    FunctionSelectionTableComponent,
   ],
 })
 export class FunctionModule {
@@ -82,7 +85,7 @@ export class FunctionModule {
   private registerEntities(): void {
     this._entityRegistry.register('functions', 'Keyword', {
       icon: 'target',
-      templateUrl: '/partials/functions/functionSelectionTable.html',
+      component: FunctionSelectionTableComponent,
     });
     this._entityRegistry.registerEntity(
       'KeywordPackage',

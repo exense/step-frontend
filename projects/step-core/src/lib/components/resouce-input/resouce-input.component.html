@@ -24,7 +24,7 @@
         type="text"
         [required]="!!showRequiredMarker"
         [ngModel]="stModel"
-        (ngModelChange)="inputChange($event)"
+        (ngModelChange)="onStModelChange($event)"
         [readonly]="disableServerPath"
         [matTooltip]="
           disableServerPath

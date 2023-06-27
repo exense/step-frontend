@@ -1,14 +1,29 @@
 import { Component, inject } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
-  Resource,
   AugmentedResourcesService,
+  Resource,
   ResourceDialogsService,
-  tablePersistenceConfigProvider,
+  ResourceInputBridgeService,
   STORE_ALL,
+  StepDataSource,
+  tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { DOCUMENT } from '@angular/common';
+import { Observable, switchMap, tap } from 'rxjs';
+import { ResourceConfigurationDialogData } from '../resource-configuration-dialog/resource-configuration-dialog-data.interface';
+import { ResourceConfigurationDialogComponent } from '../resource-configuration-dialog/resource-configuration-dialog.component';
+
+const updateDataSource = (dataSource: StepDataSource<Resource>) => {
+  return (mutatedResource?: Resource | boolean): void => {
+    if (!mutatedResource) {
+      return;
+    }
+
+    dataSource.reload();
+  };
+};
 
 @Component({
   selector: 'step-resources-list',
@@ -17,35 +32,54 @@ import { DOCUMENT } from '@angular/common';
   providers: [tablePersistenceConfigProvider('resourceList', STORE_ALL)],
 })
 export class ResourcesListComponent {
+  private _matDialog = inject(MatDialog);
   private _resourceDialogs = inject(ResourceDialogsService);
   private _resourcesService = inject(AugmentedResourcesService);
-  private _document = inject(DOCUMENT);
+  private _resourceInputBridgeService = inject(ResourceInputBridgeService);
 
   readonly dataSource = this._resourcesService.createDataSource();
 
-  editResource(resource: Resource): void {
-    this._resourceDialogs.editResource(resource).subscribe((_) => this.dataSource.reload());
+  protected editResource(resource: Resource): void {
+    this.openEditResourceDialog(resource).subscribe(updateDataSource(this.dataSource));
   }
 
-  createResource(): void {
-    this._resourceDialogs.editResource().subscribe((_) => this.dataSource.reload());
+  protected createResource(): void {
+    this.openEditResourceDialog().subscribe(updateDataSource(this.dataSource));
   }
 
-  deleteResource(id: string, label: string): void {
-    this._resourceDialogs.deleteResource(id, label).subscribe((result: boolean) => {
-      if (result) {
-        this.dataSource.reload();
-      }
-    });
+  protected deleteResource(id: string, label: string): void {
+    this._resourceDialogs.deleteResource(id, label).subscribe(updateDataSource(this.dataSource));
   }
 
-  downloadResource(id: string): void {
-    const url = `rest/resources/${id}/content`;
-    this._document.defaultView!.open(url, '_blank');
+  protected downloadResource(id: string): void {
+    this._resourceDialogs.downloadResource(id);
   }
 
-  searchResource(resource: Resource): void {
+  protected searchResource(resource: Resource): void {
     this._resourceDialogs.searchResource(resource);
+  }
+
+  private openEditResourceDialog(resource?: Resource): Observable<Resource | undefined> {
+    const matDialogRef = this._matDialog.open<
+      ResourceConfigurationDialogComponent,
+      ResourceConfigurationDialogData,
+      Resource | undefined
+    >(ResourceConfigurationDialogComponent, {
+      data: {
+        resource,
+      },
+    });
+
+    return matDialogRef.beforeClosed().pipe(
+      tap((updatedResource) => {
+        if (updatedResource) {
+          return;
+        }
+
+        this._resourceInputBridgeService.deleteLastUploadedResource();
+      }),
+      switchMap(() => matDialogRef.afterClosed())
+    );
   }
 }
 

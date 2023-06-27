@@ -101,7 +101,7 @@ export class AutorefreshToggleComponent implements OnDestroy {
     }
 
     this._interval$ = interval(this.interval);
-    this._intervalSubscription = this._interval$.subscribe((_) => {
+    this._intervalSubscription = this._interval$.subscribe(() => {
       this.refresh.emit();
 
       if (this.autoIncreaseTo && !this._isManuallyChanged && this._interval < this.autoIncreaseTo) {

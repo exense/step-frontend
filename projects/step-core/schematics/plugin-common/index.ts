@@ -31,7 +31,7 @@ async function getProjectRoot(host: Tree): Promise<string> {
 }
 
 function createPluginFiles({ names, projectRoot }: InnerOptions): Rule {
-  return (_) => {
+  return () => {
     const srcApp = join(normalize(projectRoot), names.folderName, 'src');
 
     const templateSource = apply(url('./files/src'), [
@@ -58,7 +58,7 @@ function makeMainAsync({ names, projectRoot }: InnerOptions): Rule {
 }
 
 function overrideConfigs({ names, projectRoot }: InnerOptions): Rule {
-  return (_) => {
+  return () => {
     const pluginRoot = join(normalize(projectRoot), names.folderName);
 
     const configSource = apply(url('./files/configs'), [
