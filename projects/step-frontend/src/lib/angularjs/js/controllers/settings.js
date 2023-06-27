@@ -44,28 +44,6 @@ angular
     };
   })
 
-  .service('GenerateApiKeyService', function () {
-
-    this.strategy = null;
-
-    this.useStrategy = function (strategy) {
-      this.strategy = strategy;
-    }
-
-    this.showGenerateApiKeyDialog = function () {
-      if (!this.strategy) {
-        return;
-      }
-      return this.strategy.showGenerateApiKeyDialog();
-    }
-  })
-
-  .controller('MyAccountCtrl', function ($scope, GenerateApiKeyService) {
+  .controller('MyAccountCtrl', function ($scope) {
     $scope.$state = 'myaccount';
-
-    $scope.token = '';
-
-    $scope.showGenerateApiKeyDialog = function () {
-      return GenerateApiKeyService.showGenerateApiKeyDialog();
-    };
   });
