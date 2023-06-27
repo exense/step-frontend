@@ -1,0 +1,29 @@
+<step-form-field [class.ng-invalid]="!!_ngControl?.invalid" [class.ng-touched]="!!_ngControl?.touched">
+  <step-label *ngIf="label" [attr.show-required-marker]="showRequiredMarker || null">{{ label }}</step-label>
+
+  <input
+    [ngModel]="value"
+    (ngModelChange)="onValueChange($event)"
+    [disabled]="isDisabled"
+    [placeholder]="placeholder"
+    (blur)="onBlur()"
+  />
+
+  <step-suffix class="button-suffix">
+    <button mat-stroked-button type="button" [disabled]="isDisabled" [matMenuTriggerFor]="menu">
+      <span>{{ predefinedOptionsLabel }}</span>
+      <step-icon name="chevron-down"></step-icon>
+    </button>
+  </step-suffix>
+</step-form-field>
+
+<mat-menu #menu="matMenu">
+  <button
+    type="button"
+    mat-menu-item
+    *ngFor="let predefinedOption of predefinedOptions; trackBy: predefinedOptionsTrackBy"
+    (click)="onValueChange(predefinedOption.key)"
+  >
+    {{ predefinedOption.value }}
+  </button>
+</mat-menu>

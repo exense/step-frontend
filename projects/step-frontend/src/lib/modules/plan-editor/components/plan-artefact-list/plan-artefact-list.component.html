@@ -1,7 +1,7 @@
 <step-table
-  *ngIf="_artefactService.availableArtefacts"
+  *ngIf="availableArtefacts$ | async as availableArtefacts"
   class="paddingless"
-  [dataSource]="_artefactService.availableArtefacts"
+  [dataSource]="availableArtefacts"
   matSort
   matSortActive="label"
   matSortDirection="asc"

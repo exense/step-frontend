@@ -61,7 +61,7 @@ export class PlanListComponent {
   }
 
   duplicatePlan(id: string): void {
-    this._planDialogs.duplicatePlan(id).subscribe((_) => this.dataSource.reload());
+    this._planDialogs.duplicatePlan(id).subscribe(() => this.dataSource.reload());
   }
 
   deletePlan(id: string, name: string): void {
@@ -73,11 +73,11 @@ export class PlanListComponent {
   }
 
   importPlans(): void {
-    this._planDialogs.importPlans().subscribe((_) => this.dataSource.reload());
+    this._planDialogs.importPlans().subscribe(() => this.dataSource.reload());
   }
 
   exportPlans(): void {
-    this._planDialogs.exportPlans().subscribe();
+    this._planDialogs.exportPlans().subscribe(() => this.dataSource.reload());
   }
 
   exportPlan(id: string, name: string): void {

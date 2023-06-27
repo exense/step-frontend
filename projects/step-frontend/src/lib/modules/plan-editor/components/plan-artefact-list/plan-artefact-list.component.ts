@@ -1,21 +1,15 @@
-import { Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
-import { AJS_LOCATION } from '@exense/step-core';
-import { ILocationService } from 'angular';
-import { ArtefactService } from '../../injectables/artefact.service';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { ArtefactService } from '@exense/step-core';
 
 @Component({
   selector: 'step-plan-artefact-list',
   templateUrl: './plan-artefact-list.component.html',
   styleUrls: ['./plan-artefact-list.component.scss'],
 })
-export class PlanArtefactListComponent implements OnInit {
+export class PlanArtefactListComponent {
+  readonly availableArtefacts$ = inject(ArtefactService).availableArtefacts$;
+
   @Output() onSelection = new EventEmitter<string>();
-
-  constructor(readonly _artefactService: ArtefactService, @Inject(AJS_LOCATION) private _location: ILocationService) {}
-
-  ngOnInit(): void {
-    this._artefactService.fetchAndProvideAvailableArtefacts(); // update available artifacts from the server
-  }
 
   addControl(id: string): void {
     this.onSelection.emit(id);

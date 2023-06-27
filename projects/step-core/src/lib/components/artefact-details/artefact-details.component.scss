@@ -1,0 +1,23 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+.non-keyword-data,
+.artefact-flags {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+mat-expansion-panel,
+.editor {
+  margin-bottom: 2rem;
+}
+
+textarea {
+  resize: none;
+}
+
+.footer {
+  color: var.$muted;
+  font-size: 85%;
+}
