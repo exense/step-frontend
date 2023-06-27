@@ -38,7 +38,6 @@ import { FunctionSelectionTableComponent } from './components/function-selection
     FunctionListComponent,
     FunctionPackageLinkComponent,
     FunctionPackageListComponent,
-    FunctionIconComponent,
     FunctionTypeLabelPipe,
     FunctionTypeFilterComponent,
     FunctionPackageSearchComponent,
