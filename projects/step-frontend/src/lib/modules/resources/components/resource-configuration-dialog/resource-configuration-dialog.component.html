@@ -1,4 +1,7 @@
-<step-modal-window [title]="_resourceConfigurationDialogData.resource ? 'Edit Resource' : 'New Resource'">
+<step-modal-window
+  [title]="_resourceConfigurationDialogData.resource ? 'Edit Resource' : 'New Resource'"
+  [showSpinner]="resourceInput?.initializingResource"
+>
   <div step-modal-window-body>
     <form [formGroup]="formGroup">
       <step-form-field *ngIf="_resourceConfigurationDialogData.resource">
@@ -17,12 +20,12 @@
         #resourceInput
         label="Content"
         [stType]="formGroup.controls.resourceType.value"
-        [uploadOnly]="true"
         [disableServerPath]="true"
+        [withClearButton]="false"
+        [withChooseExistingResourceButton]="false"
         [stModel]="formGroup.controls.content.value.value"
         (stModelChange)="onContentChange($event)"
         (filesChange)="onFilesChange()"
-        (uploadComplete)="onUploadComplete()"
       ></step-resource-input>
     </form>
   </div>

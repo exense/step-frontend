@@ -27,7 +27,7 @@
 				<step-resource-input
 					[label]="'Content'"
 					[st-type]="newResource.resourceType"
-					[upload-only]="true"
+					[with-choose-existing-resource-button]="false"
 					[disable-server-path]="true"
 					[(st-model)]="newResource.id"
 					(st-model-change)="newResourceUpdate()"

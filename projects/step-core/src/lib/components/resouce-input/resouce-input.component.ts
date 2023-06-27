@@ -12,7 +12,8 @@ import {
 } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { Observable, Subject, filter, takeUntil } from 'rxjs';
-import { AugmentedResourcesService, ResourceUploadResponse } from '../../client/step-client-module';
+import { AugmentedResourcesService } from '../../client/augmented/step-augmented-client.module';
+import { ResourceUploadResponse } from '../../client/generated';
 import { ResourceDialogsService } from '../../services/resource-dialogs.service';
 import { ResourceInputBridgeService } from '../../services/resource-input-bridge.service';
 import { AJS_MODULE } from '../../shared';
@@ -30,9 +31,12 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   @Input() stBounded?: boolean;
   @Input() stDirectory?: boolean;
   @Input() stType!: string;
-  @Input() withSaveButton?: boolean;
-  @Input() saveButtonLabel?: string = 'Save';
-  @Input() uploadOnly?: boolean;
+  @Input() withSaveButton: boolean = false;
+  @Input() saveButtonLabel: string = 'Save';
+  @Input() withDownloadButton: boolean = true;
+  @Input() withUploadResourceButton: boolean = true;
+  @Input() withChooseExistingResourceButton: boolean = true;
+  @Input() withClearButton: boolean = true;
   @Input() disableServerPath?: boolean;
   @Input() label?: string;
   @Input() withHelpIcon?: boolean;
@@ -49,6 +53,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   private readonly terminator$ = new Subject<void>();
   private readonly uploadTerminator$ = new Subject<void>();
 
+  initializingResource?: boolean;
   isResource?: boolean;
   resourceId?: string;
   downloadResourceUrl?: string;
@@ -213,6 +218,8 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   initResource(id: string): void {
+    this.initializingResource = true;
+
     this._augmentedResourcesService.getResource(id).subscribe((resource) => {
       if (resource) {
         this.resourceNotExisting = false;
@@ -220,6 +227,8 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
       } else {
         this.resourceNotExisting = true;
       }
+
+      this.initializingResource = false;
     });
   }
 
