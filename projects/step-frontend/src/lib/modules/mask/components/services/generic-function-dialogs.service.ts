@@ -49,11 +49,11 @@ export class GenericFunctionDialogService {
 
   openDeleteDialog(id: string, name: string): Observable<any> {
     return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Keyword "${name}"`)).pipe(
-      map((_) => true),
-      catchError((_) => of(false)),
+      map(() => true),
+      catchError(() => of(false)),
       tap((isDeleteConfirmed) => console.log('IS DELETE CONFIRMED', isDeleteConfirmed)),
       switchMap((isDeleteConfirmed) =>
-        isDeleteConfirmed ? this._augmentedKeywordsService.deleteFunction(id).pipe(map((_) => true)) : of(false)
+        isDeleteConfirmed ? this._augmentedKeywordsService.deleteFunction(id).pipe(map(() => true)) : of(false)
       )
     );
   }

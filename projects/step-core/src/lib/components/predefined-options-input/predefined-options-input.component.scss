@@ -1,0 +1,10 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
+button.mat-menu-item {
+  height: 3.6rem;
+  line-height: 1;
+}
+
+step-icon {
+  @include core.step-icon-size(1.8rem);
+}
