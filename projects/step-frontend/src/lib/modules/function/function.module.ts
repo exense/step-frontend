@@ -11,8 +11,8 @@ import {
   StepCoreModule,
   ViewRegistryService,
 } from '@exense/step-core';
-import { PlanEditorModule } from '../plan-editor/plan-editor.module';
 import { StepCommonModule } from '../_common/step-common.module';
+import { PlanEditorModule } from '../plan-editor/plan-editor.module';
 import { CompositeFunctionEditorComponent } from './components/composite-function-editor/composite-function-editor.component';
 import { FunctionConfigurationDialogComponent } from './components/function-configuration-dialog/function-configuration-dialog.component';
 import { FunctionListComponent } from './components/function-list/function-list.component';
@@ -22,6 +22,7 @@ import { FunctionPackageListComponent } from './components/function-package-list
 import { FunctionPackageSearchComponent } from './components/function-package-search/function-package-search.component';
 import './components/function-package-selection/function-package-selection.component';
 import { FunctionPackageSelectionComponent } from './components/function-package-selection/function-package-selection.component';
+import { FunctionSelectionTableComponent } from './components/function-selection-table/function-selection-table.component';
 import { FunctionTypeCompositeComponent } from './components/function-type-composite/function-type-composite.component';
 import { FunctionTypeFilterComponent } from './components/function-type-filter/function-type-filter.component';
 import { FunctionTypeJMeterComponent } from './components/function-type-jmeter/function-type-jmeter.component';
@@ -30,7 +31,6 @@ import { FunctionTypeScriptComponent } from './components/function-type-script/f
 import { FunctionTypeLabelPipe } from './pipes/function-type-label.pipe';
 import './services/function-dialogs.service';
 import { FunctionDialogsService } from './services/function-dialogs.service';
-import { FunctionSelectionTableComponent } from './components/function-selection-table/function-selection-table.component';
 
 @NgModule({
   imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule],
@@ -104,7 +104,6 @@ export class FunctionModule {
   }
 
   private registerCells(): void {
-    this._cellsRegistry.registerCell('functionEntityIcon', FunctionIconComponent);
     this._cellsRegistry.registerCell('functionLink', FunctionLinkComponent);
     this._cellsRegistry.registerCell('functionPackageLink', FunctionPackageLinkComponent);
   }
