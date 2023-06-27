@@ -23,9 +23,9 @@ export class ScreenDialogsService {
 
   removeScreen(dbId: string, label: string): Observable<any> {
     return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Screen "${label}"`)).pipe(
-      switchMap((_) => this._screensService.deleteInput(dbId)),
-      map((_) => true),
-      catchError((_) => of(false))
+      switchMap(() => this._screensService.deleteInput(dbId)),
+      map(() => true),
+      catchError(() => of(false))
     );
   }
 }

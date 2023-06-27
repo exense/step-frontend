@@ -35,9 +35,9 @@ export class FunctionPackageActionsService {
 
   deleteFunctionPackage(id: string, name: string): Observable<boolean> {
     return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Keyword Package "${name}"`)).pipe(
-      switchMap((_) => this._api.deleteFunctionPackage(id)),
-      map((_) => true),
-      catchError((_) => of(false))
+      switchMap(() => this._api.deleteFunctionPackage(id)),
+      map(() => true),
+      catchError(() => of(false))
     );
   }
 }

@@ -131,7 +131,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
         })
       )
     ),
-    tap((_) => {
+    tap(() => {
       this._inProgress$.next(false);
     }),
     startWith(null),

@@ -61,7 +61,7 @@ function moveAngularJsonChangesToWorkspace(names: Names): Rule {
 }
 
 function addAdditionalWorkspaceConfigs(names: Names): Rule {
-  return (_) => {
+  return () => {
     const wsRoot = normalize('.');
     const pluginRoot = join(wsRoot, STEP_EE_FRONTEND, 'plugins', names.folderName);
 
