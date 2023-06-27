@@ -35,6 +35,7 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
 
   protected readonly formGroup = resourceConfigurationDialogFormCreate(this._formBuilder);
 
+  protected loading = false;
   protected uploading = false;
   protected contentUpdated = false;
 
@@ -56,19 +57,19 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.loading = true;
+
     this._resourcesService.getResource(resourceId.replace('resource:', '')).subscribe((resource) => {
       this._resourceConfigurationDialogData.resource = resource;
       this.setFormValue(resource);
+      this.loading = false;
+      this.uploading = false;
+      this.contentUpdated = true;
     });
   }
 
   protected onFilesChange(): void {
     this.uploading = true;
-    this.contentUpdated = true;
-  }
-
-  protected onUploadComplete(): void {
-    this.uploading = false;
   }
 
   protected close(): void {
