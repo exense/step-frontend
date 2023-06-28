@@ -4,6 +4,7 @@ import { DateFormat, Measurement, MeasurementsStats, TimeSeriesService } from '@
 import { HttpClient } from '@angular/common/http';
 import { DiscoverDialogData } from './discover-dialog-data';
 import { MatTableDataSource } from '@angular/material/table';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'step-ts-discover',
@@ -12,7 +13,7 @@ import { MatTableDataSource } from '@angular/material/table';
 })
 export class DiscoverComponent implements OnInit {
   readonly DateFormat = DateFormat;
-  pageSize = 20;
+  pageSize = 50;
   pageSizeOptions = [20, 50, 100];
   dataSource: MatTableDataSource<Measurement> = new MatTableDataSource();
   private oqlFilter: string;
@@ -25,6 +26,9 @@ export class DiscoverComponent implements OnInit {
   stats: MeasurementsStats | undefined;
   allSelected = true;
   columnsSelection: Record<string, boolean> = {};
+
+  totalCount = 1000_000;
+  currentPage = 0;
 
   constructor(
     private _matDialogRef: MatDialogRef<DiscoverComponent>,
@@ -41,23 +45,22 @@ export class DiscoverComponent implements OnInit {
 
   private fetchMeasurements() {
     this.isLoading = true;
-    this._timeSeriesService.discoverMeasurements(this.oqlFilter).subscribe((measurements) => {
-      this.dataSource.data = measurements;
-      this.isLoading = false;
-      if (measurements.length < this.pageSize) {
-        this.hasMore = false;
-      }
-    });
+    this._timeSeriesService
+      .discoverMeasurements(this.oqlFilter, this.pageSize, this.currentPage * this.pageSize)
+      .subscribe((measurements) => {
+        this.dataSource.data = measurements;
+        this.isLoading = false;
+        if (measurements.length < this.pageSize) {
+          this.hasMore = false;
+          this.totalCount = this.currentPage * this.pageSize + measurements.length;
+        }
+      });
   }
 
-  fetchNextPage(): void {
-    if (this.isLoading) {
-      return;
-    }
-    if (this.hasMore) {
-      this.skip += this.pageSize;
-      this.fetchMeasurements();
-    }
+  handlePageChange(event: PageEvent): void {
+    this.currentPage = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.fetchMeasurements();
   }
 
   onAllColumnsToggle() {

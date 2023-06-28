@@ -28,6 +28,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { DiscoverComponent } from './discover/discover.component';
 import { DiscoverAttributeStatsComponent } from './discover/attribute-stats/attribute-stats.component';
+import { MatPaginatorIntl } from '@angular/material/paginator';
+import { NoTotalCountPaginator } from './discover/no-total-count-paginator';
 
 @NgModule({
   declarations: [
@@ -54,6 +56,7 @@ import { DiscoverAttributeStatsComponent } from './discover/attribute-stats/attr
     DiscoverAttributeStatsComponent,
   ],
   exports: [ExecutionPerformanceComponent, SyntheticMonitoringPageComponent, AnalyticsPageComponent],
+  providers: [{ provide: MatPaginatorIntl, useClass: NoTotalCountPaginator }],
   imports: [
     StepCoreModule,
     TableModule,

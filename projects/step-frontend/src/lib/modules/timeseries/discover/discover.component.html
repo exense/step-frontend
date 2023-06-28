@@ -63,20 +63,15 @@
     </div>
     <div class="paginator">
       <mat-spinner [diameter]="16" *ngIf="isLoading"></mat-spinner>
-      <step-icon
-        matTooltip="Previous Page"
-        (click)="fetchPreviousPage()"
-        class="button"
-        name="chevron-left"
-        [class.active]="skip > 0"
-      ></step-icon>
-      <step-icon
-        matTooltip="Next Page"
-        (click)="fetchNextPage()"
-        class="button"
-        name="chevron-right"
-        [class.active]="hasMore"
-      ></step-icon>
+      <mat-paginator
+        [length]="totalCount"
+        [pageIndex]="currentPage"
+        (page)="handlePageChange($event)"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[5, 10, 25, 100]"
+        aria-label="Select page"
+      >
+      </mat-paginator>
     </div>
   </div>
 </step-modal-window>
