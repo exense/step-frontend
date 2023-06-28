@@ -1,4 +1,12 @@
 <ng-container *ngIf="performanceViewSettings">
+  <step-timeseries-toolbar
+    *ngIf="context"
+    [context]="context"
+    [timeRangeOptions]="settings.timeRangeOptions"
+    [activeTimeRange]="settings.activeTimeRange"
+    (onCompareModeEnabled)="enableCompareMode()"
+  ></step-timeseries-toolbar>
+
   <step-ts-filter-bar
     *ngIf="context"
     [context]="context"

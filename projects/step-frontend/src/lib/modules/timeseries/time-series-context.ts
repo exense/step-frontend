@@ -7,6 +7,9 @@ import { TsFilterItem } from './performance-view/filter-bar/model/ts-filter-item
 import { TimeSeriesContextParams } from './time-series-context-params';
 import { TsFilteringMode } from './model/ts-filtering-mode';
 import { TsFilteringSettings } from './model/ts-filtering-settings';
+import { FilterUtils } from './util/filter-utils';
+import { TimeSeriesUtils } from './time-series-utils';
+import { OQLBuilder } from './util/oql-builder';
 
 /**
  * This class is responsible for managing the state of an execution tab. Here we store time selection, colors, filters, etc.
@@ -111,6 +114,26 @@ export class TimeSeriesContext {
 
   getFilteringSettings(): TsFilteringSettings {
     return this.filterSettings$.getValue();
+  }
+
+  buildActiveOQL(includeTimeRange = true, removeAttributesPrefix = false): string {
+    let filteringSettings = this.getFilteringSettings();
+    const filtersOql =
+      filteringSettings.mode === TsFilteringMode.OQL
+        ? removeAttributesPrefix
+          ? filteringSettings.oql.replace('attributes.', '')
+          : filteringSettings.oql
+        : FilterUtils.filtersToOQL(
+            filteringSettings.filterItems,
+            undefined,
+            TimeSeriesUtils.ATTRIBUTES_REMOVAL_FUNCTION
+          );
+    const selectedTimeRange = this.getSelectedTimeRange();
+    return new OQLBuilder()
+      .open('and')
+      .append(`(begin < ${Math.trunc(selectedTimeRange.to)} and begin > ${Math.trunc(selectedTimeRange.from)})`)
+      .append(filtersOql)
+      .build();
   }
 
   resetZoom() {

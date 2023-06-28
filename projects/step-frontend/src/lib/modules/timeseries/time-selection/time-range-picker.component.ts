@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
-import { RelativeTimeSelection } from './model/relative-time-selection';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { TimeRangePickerSelection } from './time-range-picker-selection';
 import { RangeSelectionType } from './model/range-selection-type';
@@ -90,6 +89,10 @@ export class TimeRangePicker implements OnInit {
   }
 
   onRelativeSelectionSelected(option: TimeRangePickerSelection) {
+    if (option.type === RangeSelectionType.FULL) {
+      this.onFullRangeSelect();
+      return;
+    }
     if (
       this.activeSelection.type === RangeSelectionType.RELATIVE &&
       this.activeSelection.relativeSelection!.timeInMs === option.relativeSelection!.timeInMs

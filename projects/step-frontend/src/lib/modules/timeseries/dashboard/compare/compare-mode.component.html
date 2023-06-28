@@ -1,0 +1,6 @@
+<div>
+  <button mat-raised-button [matMenuTriggerFor]="menu" (click)="onEnabledChange.emit(true)">
+    Compare Mode {{ enabled ? ' (on)' : '' }}
+  </button>
+  <mat-menu #menu="matMenu" class="time-selector-menu"> </mat-menu>
+</div>

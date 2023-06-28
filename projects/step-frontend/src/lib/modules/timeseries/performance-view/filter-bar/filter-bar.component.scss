@@ -139,30 +139,7 @@ step-ts-filter-bar {
     font-size: 12px;
   }
 
-  .export-btn {
-    position: absolute;
-    right: 4px;
-    top: 4px;
-    padding: 0;
-    border: 1px solid white;
-    border-radius: 4px;
-    font-size: 12px;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    opacity: 0.6;
-    transform: scale(0.8);
-  }
-
   .grouping-container {
     margin-right: 6px;
-  }
-
-  .separator {
-    width: 2px;
-    height: 40px;
-    background: var.$gray-100;
-    display: inline-block;
-    margin: 0 22px;
   }
 }

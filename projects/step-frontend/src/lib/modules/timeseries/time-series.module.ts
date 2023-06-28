@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { StepCoreModule } from '@exense/step-core';
 import { TimeSeriesChartComponent } from './chart/time-series-chart.component';
-import { ExecutionTabsComponent } from './execution-page/tabs/execution-tabs.component';
 import { TSRangerComponent } from './ranger/ts-ranger.component';
 import { TableModule } from '@exense/step-core';
 import { FormsModule } from '@angular/forms';
@@ -11,7 +10,6 @@ import { TimeseriesTableComponent } from './performance-view/table/timeseries-ta
 import { TimeRangePicker } from './time-selection/time-range-picker.component';
 import { ChartSkeletonComponent } from './chart/skeleton/chart-skeleton.component';
 import { PerformanceViewComponent } from './performance-view/performance-view.component';
-import { SyntheticMonitoringPageComponent } from './synthetic-monitoring/synthetic-monitoring-page.component';
 import { MeasurementsPickerComponent } from './performance-view/measurements/measurements-picker.component';
 import { PerformanceViewTimeSelectionComponent } from './performance-view/time-selection/performance-view-time-selection.component';
 import { MeasurementsFilterPipe } from './performance-view/measurements/measurements-filter.pipe';
@@ -26,30 +24,32 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { TsToolbarComponent } from './dashboard/toolbar/ts-toolbar.component';
+import { TsCompareModeComponent } from './dashboard/compare/compare-mode.component';
 
 @NgModule({
   declarations: [
     PerformanceViewComponent,
     TimeSeriesChartComponent,
-    ExecutionTabsComponent,
     TSRangerComponent,
     TimeseriesTableComponent,
     TimeRangePicker,
     ChartSkeletonComponent,
     PerformanceViewTimeSelectionComponent,
     PerformanceViewComponent,
-    SyntheticMonitoringPageComponent,
     MeasurementsPickerComponent,
     MeasurementsFilterPipe,
     FilterBarComponent,
     FilterBarItemComponent,
     TimeSeriesDashboardComponent,
     TsGroupingComponent,
+    TsToolbarComponent,
     PerformanceViewComponent,
     AnalyticsPageComponent,
     ExecutionPerformanceComponent,
+    TsCompareModeComponent,
   ],
-  exports: [ExecutionPerformanceComponent, SyntheticMonitoringPageComponent, AnalyticsPageComponent],
+  exports: [ExecutionPerformanceComponent, AnalyticsPageComponent],
   imports: [
     StepCoreModule,
     TableModule,

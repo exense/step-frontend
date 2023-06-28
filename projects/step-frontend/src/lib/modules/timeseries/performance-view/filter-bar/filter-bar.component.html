@@ -76,16 +76,7 @@
       <mat-button-toggle [value]="false"> Basic</mat-button-toggle>
       <mat-button-toggle [value]="true"> OQL</mat-button-toggle>
     </mat-button-toggle-group>
-    <div class="separator"></div>
-    <div class="grouping-container">
-      <step-timeseries-grouping (onGroupingChange)="handleGroupingChange($event)"></step-timeseries-grouping>
-    </div>
   </div>
 </div>
 
 <step-execution-time-selection [settings]="performanceViewSettings"></step-execution-time-selection>
-
-<div class="export-btn" (click)="exportRawData()">
-  <span matTooltip="Download CSV" *ngIf="!exportInProgress"><step-icon name="download"></step-icon></span>
-  <mat-spinner *ngIf="exportInProgress" [diameter]="16"></mat-spinner>
-</div>

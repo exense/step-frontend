@@ -47,7 +47,6 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
   @Input() executionInput: Execution | undefined;
   execution: Execution | undefined;
 
-  timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.EXECUTION_PAGE_TIME_SELECTION_OPTIONS;
   timeRangeSelection: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
 
   performanceViewSettings: PerformanceViewSettings | undefined;
@@ -83,6 +82,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
     this.dashboard.updateRange(this.calculateFullTimeRange(this.execution!));
   }
 
+  // auto-refresh goes through here
   ngOnChanges(changes: SimpleChanges): void {
     let executionChange = changes['executionInput'];
     if (!executionChange) {
@@ -93,9 +93,9 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
       // it is first change
       this.initDashboard(currentExecution);
       this.cd.detectChanges();
-      return;
+    } else {
+      this.dashboard.refresh(this.calculateFullTimeRange(this.execution!));
     }
-    this.dashboard.refresh(this.calculateFullTimeRange(this.execution!));
   }
 
   initDashboard(execution: Execution) {
@@ -103,10 +103,13 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
     const startTime = execution.startTime!;
     const endTime = execution.endTime ? execution.endTime : new Date().getTime();
     let urlParams = TsUtils.getURLParams(window.location.href);
+    const timeRangeOptions = TimeSeriesConfig.EXECUTION_PAGE_TIME_SELECTION_OPTIONS;
     this.dashboardSettings = {
       contextId: this.executionId,
       includeThreadGroupChart: true,
       timeRange: { from: startTime, to: endTime },
+      timeRangeOptions: timeRangeOptions,
+      activeTimeRange: timeRangeOptions[timeRangeOptions.length - 1],
       contextualFilters: { ...urlParams, eId: this.executionId },
       showContextualFilters: false,
       filterOptions: [

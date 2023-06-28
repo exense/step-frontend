@@ -1,13 +1,13 @@
 <div class="relative">
   <div class="header-buttons">
-    <step-time-range-picker
-      *ngIf="timeRangeSelection"
-      [activeSelection]="timeRangeSelection"
-      [includeFullRangeOption]="false"
-      [selectOptions]="timeRangeOptions"
-      (onSelectionChange)="onTimeRangeChange($event)"
-    >
-    </step-time-range-picker>
+    <!--    <step-time-range-picker-->
+    <!--      *ngIf="timeRangeSelection"-->
+    <!--      [activeSelection]="timeRangeSelection"-->
+    <!--      [includeFullRangeOption]="false"-->
+    <!--      [selectOptions]="timeRangeOptions"-->
+    <!--      (onSelectionChange)="onTimeRangeChange($event)"-->
+    <!--    >-->
+    <!--    </step-time-range-picker>-->
     <div style="margin-left: 12px">
       <button style="margin-right: 8px" mat-raised-button [matMenuTriggerFor]="refreshMenu">
         Refresh ({{ selectedRefreshInterval.label }})

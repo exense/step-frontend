@@ -76,6 +76,8 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
       timeRange: { from: start, to: end },
       contextualFilters: urlParams,
       showContextualFilters: true,
+      timeRangeOptions: TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS,
+      activeTimeRange: this.timeRangeSelection, // TODO handle url param
       filterOptions: [
         {
           label: 'Status',

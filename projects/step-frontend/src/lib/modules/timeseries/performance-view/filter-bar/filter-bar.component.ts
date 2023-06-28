@@ -24,15 +24,6 @@ import { TimeSeriesConfig } from '../../time-series.config';
 import { TableApiWrapperService, TimeSeriesService } from '@exense/step-core';
 import { OqlVerifyResponse } from '../../model/oql-verify-response';
 import { TsFilteringMode } from '../../model/ts-filtering-mode';
-import { OQLBuilder } from '../../util/oql-builder';
-
-const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
-  if (field.startsWith('attributes.')) {
-    return field.replace('attributes.', '');
-  } else {
-    return field;
-  }
-};
 
 @Component({
   selector: 'step-ts-filter-bar',
@@ -59,7 +50,6 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   readonly EMIT_DEBOUNCE_TIME = 300;
   readonly FilterBarItemType = FilterBarItemType;
-  exportInProgress = false;
 
   filterItems: TsFilterItem[] = [];
   groupDimensions: string[] = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS[0].attributes;
@@ -70,11 +60,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   oqlValue: string = '';
   invalidOql = false;
 
-  constructor(
-    private _changeDetectorRef: ChangeDetectorRef,
-    private _timeSeriesService: TimeSeriesService,
-    private _tableApiService: TableApiWrapperService
-  ) {}
+  constructor(private _changeDetectorRef: ChangeDetectorRef, private _timeSeriesService: TimeSeriesService) {}
 
   getFilters(): TsFilterItem[] {
     return this.filterItems;
@@ -253,36 +239,5 @@ export class FilterBarComponent implements OnInit, OnDestroy {
       }
     }
     return false;
-  }
-
-  exportRawData() {
-    if (this.exportInProgress) {
-      return;
-    }
-    const filteringSettings = this.context.getFilteringSettings();
-    const filtersOql =
-      filteringSettings.mode === TsFilteringMode.OQL
-        ? filteringSettings.oql.replace('attributes.', '')
-        : FilterUtils.filtersToOQL(this.getValidFilters(), undefined, ATTRIBUTES_REMOVAL_FUNCTION);
-    const contextualOql = FilterUtils.objectToOQL(
-      this.performanceViewSettings.contextualFilters,
-      undefined,
-      ATTRIBUTES_REMOVAL_FUNCTION
-    );
-    const selectedTimeRange = this.context.getSelectedTimeRange();
-    const oql = new OQLBuilder()
-      .open('and')
-      .append(`(begin < ${Math.trunc(selectedTimeRange.to)} and begin > ${Math.trunc(selectedTimeRange.from)})`)
-      .append(filtersOql)
-      .append(contextualOql)
-      .build();
-    this.exportInProgress = true;
-    this._timeSeriesService
-      .getMeasurementsAttributes(oql)
-      .pipe(
-        switchMap((fields) => this._tableApiService.exportAsCSV('measurements', fields, { filters: [{ oql: oql }] })),
-        tap(() => (this.exportInProgress = false))
-      )
-      .subscribe();
   }
 }

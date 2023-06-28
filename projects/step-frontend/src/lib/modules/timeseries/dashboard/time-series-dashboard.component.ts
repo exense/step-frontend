@@ -156,6 +156,10 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
+  enableCompareMode(): void {
+    this.context;
+  }
+
   ngOnDestroy(): void {
     this.terminator$.next(true);
     this.contextsFactory.destroyContext(this.context.id);

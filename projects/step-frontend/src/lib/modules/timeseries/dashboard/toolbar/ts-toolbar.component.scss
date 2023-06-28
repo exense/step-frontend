@@ -1,0 +1,13 @@
+.toolbar-container {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
+  .items-list {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+}

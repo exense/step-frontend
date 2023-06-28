@@ -67,4 +67,12 @@ export class TimeSeriesUtils {
     const isoTime = `${hours}:${minutes}:${seconds}`;
     return `${isoDate} ${includeTime ? isoTime : ''}`;
   }
+
+  static ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
+    if (field.startsWith('attributes.')) {
+      return field.replace('attributes.', '');
+    } else {
+      return field;
+    }
+  };
 }

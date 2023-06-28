@@ -1,0 +1,19 @@
+<div class="mat-card toolbar-container">
+  <div class="items-list">
+    <step-timeseries-grouping (onGroupingChange)="handleGroupingChange($event)"></step-timeseries-grouping>
+    <step-time-range-picker
+      (onSelectionChange)="handleTimeRangeChange($event)"
+      [selectOptions]="timeRangeOptions"
+      [activeSelection]="activeTimeRange"
+      [includeFullRangeOption]="false"
+    >
+    </step-time-range-picker>
+    <step-timeseries-compare-mode (onEnabledChange)="handleCompareModeChange($event)"></step-timeseries-compare-mode>
+  </div>
+  <div class="items-list">
+    <div class="export-btn" (click)="exportRawData()">
+      <span matTooltip="Download CSV" *ngIf="!exportInProgress"><step-icon name="download"></step-icon></span>
+      <mat-spinner *ngIf="exportInProgress" [diameter]="16"></mat-spinner>
+    </div>
+  </div>
+</div>

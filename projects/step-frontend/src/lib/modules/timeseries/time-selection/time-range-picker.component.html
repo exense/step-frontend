@@ -42,14 +42,7 @@
             [class.active]="rangeOption.relativeSelection?.timeInMs === activeSelection.relativeSelection?.timeInMs"
           >
             {{ rangeOption.relativeSelection?.label }}
-          </div>
-          <div
-            *ngIf="includeFullRangeOption"
-            (click)="onFullRangeSelect()"
-            class="time-option full-range"
-            [class.active]="activeSelection.type === RangeSelectionType.FULL"
-          >
-            Full Range
+            {{ rangeOption.type === RangeSelectionType.FULL ? 'Full Range' : '' }}
           </div>
         </div>
       </div>
