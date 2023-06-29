@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: row;
   height: calc(64vh - 40px);
+  max-width: 1095px;
 }
 
 .columns-container {
@@ -113,4 +114,8 @@ table {
   top: 0;
   right: 0;
   cursor: pointer;
+}
+
+.mat-dialog-content {
+  overflow-x: hidden;
 }

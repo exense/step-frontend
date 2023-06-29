@@ -99,4 +99,8 @@ export class DiscoverComponent implements OnInit {
       });
     });
   }
+
+  protected close() {
+    this._matDialogRef.close();
+  }
 }
