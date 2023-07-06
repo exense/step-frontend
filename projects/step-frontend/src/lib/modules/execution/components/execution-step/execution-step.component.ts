@@ -8,6 +8,7 @@ import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-repo
 import { Panels } from '../../shared/panels.enum';
 import { SingleExecutionPanelsService } from '../../services/single-execution-panels.service';
 import { MatSort, Sort } from '@angular/material/sort';
+import { REPORT_NODE_STATUS } from '../../../_common/shared/status.enum';
 
 type FieldAccessor = Mutable<Pick<ExecutionStepComponent, 'keywordParameters$'>>;
 
@@ -20,6 +21,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
   private selectionTerminator$?: Subject<void>;
 
   readonly keywordParameters$?: Observable<KeywordParameters>;
+  readonly statusOptions = REPORT_NODE_STATUS;
 
   @Input() eId: string = '';
   @Input() testCasesProgress?: ExecutionSummaryDto;

@@ -35,9 +35,15 @@
           </step-current-operations>
         </td>
       </ng-container>
-      <ng-container matColumnDef="status" stepSearchCol>
-        <th mat-header-cell *matHeaderCellDef>Status</th>
-        <td class="status" mat-cell *matCellDef="let element">
+      <ng-container matColumnDef="status" stepSearchCol #stepSearchColStatus="SearchCol">
+        <step-array-filter
+          *stepSearchCellDef
+          [items]="statusOptions"
+          (filterChange)="stepSearchColStatus.search($event, true)"
+        >
+        </step-array-filter>
+        <th mat-header-cell *matHeaderCellDef class="cell-status">Status</th>
+        <td class="status" mat-cell *matCellDef="let element" class="cell-status">
           <step-status [status]="element.status"></step-status>
         </td>
       </ng-container>
