@@ -1,6 +1,7 @@
 <div class="spinner-container" *ngIf="showSpinner">
   <mat-spinner></mat-spinner>
 </div>
+
 <h1 mat-dialog-title>
   {{ title }}
   <section #subtitle [class.without-chidlren]="!subtitle.children.length">

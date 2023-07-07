@@ -1,15 +1,19 @@
-import { inject, Injectable } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { catchError, map, Observable, of, switchMap } from 'rxjs';
+import { Observable, catchError, map, of, switchMap } from 'rxjs';
 import { Resource, ResourcesService } from '../client/generated';
-import { FileAlreadyExistingDialogComponent } from '../components/file-already-existing-dialog/file-already-existing-dialog.component';
+import {
+  FileAlreadyExistingDialogComponent,
+  FileAlreadyExistingDialogData,
+} from '../components/file-already-existing-dialog/file-already-existing-dialog.component';
 import { SearchResourceDialogComponent } from '../components/search-resource-dialog/search-resource-dialog.component';
-import { a1Promise2Observable, DialogsService } from '../shared';
+import { UpdateResourceWarningDialogComponent } from '../components/update-resource-warning-dialog/update-resource-warning-dialog.component';
+import { DialogsService, a1Promise2Observable } from '../shared';
 import { UpdateResourceWarningResultState } from '../shared/update-resource-warning-result-state.enum';
-import { UpdateResourceWarningDialogComponent } from '../step-core.module';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
-import { ResourceInputBridgeService } from './resource-input-bridge.service';
-import { UibModalHelperService } from './uib-modal-helper.service';
+
+const RESOURCE_SEARCH_TYPE = 'RESOURCE_ID';
 
 @Injectable({
   providedIn: 'root',
@@ -18,51 +22,19 @@ export class ResourceDialogsService {
   private _matDialog = inject(MatDialog);
   private _dialogs = inject(DialogsService);
   private _resourcesService = inject(ResourcesService);
-  private _uibModalHelper = inject(UibModalHelperService);
+  private _document = inject(DOCUMENT);
   private _isUsedByDialogs = inject(IsUsedByDialogService);
-  private _resourceInputBridgeService = inject(ResourceInputBridgeService);
 
-  readonly RESOURCE_SEARCH_TYPE = 'RESOURCE_ID';
-
-  editResource(resource?: Partial<Resource>): Observable<{ resource?: Partial<Resource>; result: string } | boolean> {
-    const modalInstance = this._uibModalHelper.open({
-      backdrop: 'static',
-      templateUrl: 'partials/resources/editResourceDialog.html',
-      controller: 'editResourceCtrl',
-      resolve: {
-        id: function () {
-          return resource?.id;
-        },
-      },
-    });
-
-    const result$ = a1Promise2Observable(modalInstance.result) as Observable<string>;
-
-    return result$.pipe(
-      map((result) => {
-        return {
-          result,
-          resource,
-        };
-      }),
-      catchError(() => {
-        this._resourceInputBridgeService.deleteLastUploadedResource();
-
-        return of(false);
-      })
-    );
-  }
-
-  deleteResource(id: string, label: string): Observable<any> {
+  deleteResource(id: string, label: string): Observable<boolean> {
     return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Resource "${label}"`)).pipe(
-      switchMap((_) => this._resourcesService.deleteResource(id)),
-      map((_) => true),
-      catchError((_) => of(false))
+      switchMap(() => this._resourcesService.deleteResource(id)),
+      map(() => true),
+      catchError(() => of(false))
     );
   }
 
   searchResource(resource: Resource): void {
-    this._isUsedByDialogs.displayDialog(resource.resourceName || '', this.RESOURCE_SEARCH_TYPE, resource.id!);
+    this._isUsedByDialogs.displayDialog(resource.resourceName || '', RESOURCE_SEARCH_TYPE, resource.id!);
   }
 
   showSearchResourceDialog(type: string): Observable<string> {
@@ -70,11 +42,21 @@ export class ResourceDialogsService {
     return dialogRef.afterClosed() as Observable<string>;
   }
 
-  showFileAlreadyExistsWarning(similarResources: Resource[]): Observable<{ id?: string } | undefined> {
+  downloadResource(id: string): void {
+    const url = `rest/resources/${id}/content`;
+    this._document.defaultView!.open(url, '_blank');
+  }
+
+  showFileAlreadyExistsWarning(similarResources: Resource[]): Observable<string | undefined> {
     return this._matDialog
-      .open<FileAlreadyExistingDialogComponent, Resource[], { id?: string }>(FileAlreadyExistingDialogComponent, {
-        data: similarResources,
-      })
+      .open<FileAlreadyExistingDialogComponent, FileAlreadyExistingDialogData, string | undefined>(
+        FileAlreadyExistingDialogComponent,
+        {
+          data: {
+            similarResources,
+          },
+        }
+      )
       .afterClosed();
   }
 

@@ -8,6 +8,7 @@ import {
   Preferences,
   UserService,
   CredentialsService,
+  GenerateApiKeyService,
 } from '@exense/step-core';
 
 const preferencesToKVPairArray = (preferences?: Preferences): KeyValuePair<string, string>[] => {
@@ -36,6 +37,7 @@ export class MyAccountComponent implements OnInit, OnChanges {
   private _userApi = inject(UserService);
   private _authService = inject(AuthService);
   private _credentialsService = inject(CredentialsService);
+  private _generateApiKey = inject(GenerateApiKeyService);
 
   readonly canChangePassword = !!this._authService.getConf()?.passwordManagement;
   readonly canGenerateApiKey = !!this._authService.getConf()?.authentication;
@@ -46,14 +48,12 @@ export class MyAccountComponent implements OnInit, OnChanges {
   user: Partial<User> = {};
   preferences: KeyValuePair<string, string>[] = [];
 
-  @Output() showGenerateApiKeyDialog: EventEmitter<any> = new EventEmitter<any>();
-
   changePwd(): void {
     this._credentialsService.changePassword(false);
   }
 
   invokeShowGenerateApiKeyDialog(): void {
-    this.showGenerateApiKeyDialog.emit({});
+    this._generateApiKey.showGenerateApiKeyDialog();
   }
 
   addPreference(): void {

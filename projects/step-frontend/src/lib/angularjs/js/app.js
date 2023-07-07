@@ -23,7 +23,6 @@ var tecAdminApp = angular
     'tecAdminControllers',
     'plans',
     'planEditor',
-    'planTree',
     'artefacts',
     'schedulerControllers',
     'gridControllers',
