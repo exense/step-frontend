@@ -69,12 +69,14 @@ export class ReportNodeShortComponent implements OnChanges {
       (this as FieldsAccessor).headerText = '';
       return;
     }
-    if (node!.resolvedArtefact!._class === 'CallKeyword') {
+    if (node!.resolvedArtefact?._class === 'CallKeyword') {
       this.concatenate(node.functionAttributes).subscribe((value) => {
         (this as FieldsAccessor).headerText = value;
       });
     } else {
-      (this as FieldsAccessor).headerText = this._artefactTypes.getLabel(node!.resolvedArtefact!._class);
+      (this as FieldsAccessor).headerText = node!.resolvedArtefact
+        ? this._artefactTypes.getLabel(node!.resolvedArtefact._class)
+        : '';
     }
   }
 

@@ -40,3 +40,16 @@
     </step-table>
   </div>
 </div>
+<section class="keyword-routing" *ngIf="node.agentUrl || node.tokenId">
+  <div class="report-node-header report-node-link">
+    <a href="#" (click)="hideRouting = !hideRouting; (false)">Keyword routing</a>
+  </div>
+  <div *ngIf="!hideRouting" class="keyword-routing-body">
+    <div *ngIf="node.agentUrl">
+      Agent: <span>{{ node.agentUrl }}</span>
+    </div>
+    <div *ngIf="node.tokenId">
+      Token ID: <span>{{ node.tokenId }}</span>
+    </div>
+  </div>
+</section>

@@ -16,6 +16,9 @@ import { SchedulerModule } from './modules/scheduler/scheduler.module';
 import { TimeSeriesModule } from './modules/timeseries/time-series.module';
 import { ArtefactsModule } from './modules/artefacts/artefacts.module';
 import { PLUGINS_INITIALIZER } from './plugins-initializer/plugins-initializer';
+import { Settings } from 'luxon';
+
+Settings.defaultLocale = 'en';
 
 @NgModule({
   declarations: [],
