@@ -59,7 +59,7 @@ export class PurePlanEditApiService implements PlanEditorApiService {
   savePlan(plan: Plan): Observable<{ id: string; plan: Plan; forceRefresh?: boolean }> {
     return this._planApi.savePlan(plan).pipe(
       map((response) => ({ id: response.id!, plan: response })),
-      catchError((e: any) => {
+      catchError(() => {
         this._globalProgressSpinnerService.hideSpinner();
         return this.loadPlan(plan.id!).pipe(
           map((restoredPlan) => {
