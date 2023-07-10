@@ -1,6 +1,14 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, Execution, ExecutionSummaryDto, Mutable, ReportNode, SelectionCollector } from '@exense/step-core';
+import {
+  AJS_MODULE,
+  Execution,
+  ExecutionSummaryDto,
+  Mutable,
+  ReportNode,
+  SelectionCollector,
+  TableLocalDataSource,
+} from '@exense/step-core';
 import { ExecutionViewServices } from '../../../operations/shared/execution-view-services';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { KeywordParameters } from '../../shared/keyword-parameters';
@@ -44,6 +52,8 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
   parameters: { key: string; value: string }[] = [];
 
   readonly Panels = Panels;
+
+  protected testCasesDataSource?: TableLocalDataSource<ReportNode>;
 
   constructor(private panelService: SingleExecutionPanelsService) {}
 
@@ -92,6 +102,11 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
 
     if (eid || testCasesSelection) {
       this.setupSelectionChanges(eid, testCasesSelection);
+    }
+
+    const cTestCases = changes['testCases'];
+    if (cTestCases?.previousValue !== cTestCases?.currentValue || cTestCases?.firstChange) {
+      this.setupTestCasesDataSource(cTestCases?.currentValue);
     }
   }
 
@@ -142,6 +157,15 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
       return;
     }
     this.executionViewServices.showTestCase(nodeId);
+  }
+
+  private setupTestCasesDataSource(testCases?: ReportNode[]): void {
+    this.testCasesDataSource = new TableLocalDataSource<ReportNode>(
+      testCases ?? [],
+      TableLocalDataSource.configBuilder<ReportNode>()
+        .addSearchStringRegexPredicate('status', (item) => item.status)
+        .build()
+    );
   }
 }
 
