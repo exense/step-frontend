@@ -27,6 +27,11 @@ step-table {
     }
   }
 
+  [mat-sort-header].cdk-keyboard-focused .mat-sort-header-container,
+  [mat-sort-header].cdk-program-focused .mat-sort-header-container {
+    border-bottom: none;
+  }
+
   ::ng-deep .mat-form-field-infix {
     width: auto !important;
   }

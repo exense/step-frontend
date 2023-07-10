@@ -18,7 +18,7 @@ import { ScreenInputDropdownOptionsComponent } from './components/screen-input-d
 })
 export class AdminModule {
   constructor(_entityRegistry: EntityRegistry, _dashletRegistry: DashletRegistryService) {
-    _entityRegistry.register('users', 'User', { icon: 'user', templateUrl: '/partials/users/userSelectionTable.html' });
+    _entityRegistry.register('users', 'User', { icon: 'user', templateUrl: 'partials/users/userSelectionTable.html' });
     _dashletRegistry.registerDashlet('settings-button', SettingButtonComponent);
   }
 }
