@@ -1,6 +1,26 @@
 import { SearchPredicate, SortPredicate } from './table-local-data-source-config';
 
 export class TableLocalDataSourcePredicatesFactory {
+  private static regexpCache = new Map<string, RegExp>();
+
+  private static getRegexp(searchValue: string): RegExp {
+    let result: RegExp;
+    if (this.regexpCache.has(searchValue)) {
+      result = this.regexpCache.get(searchValue)!;
+    } else {
+      result = new RegExp(searchValue, 'i');
+      this.regexpCache.set(searchValue, result);
+    }
+    return result;
+  }
+
+  createSearchStringRegexPredicate<T>(getField: (item: T) => string | undefined): SearchPredicate<T> {
+    return (item, searchValue) => {
+      const value = getField(item) || '';
+      const regexp = TableLocalDataSourcePredicatesFactory.getRegexp(searchValue);
+      return regexp.test(value);
+    };
+  }
   createSearchStringPredicate<T>(getField: (item: T) => string | undefined): SearchPredicate<T> {
     return (item, searchValue) => {
       const value = (getField(item) || '').toLowerCase();
