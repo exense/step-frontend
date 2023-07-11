@@ -7,7 +7,7 @@ import {
   Mutable,
   ReportNode,
 } from '@exense/step-core';
-import { forkJoin, from, map, switchMap } from 'rxjs';
+import { filter, forkJoin, from, map, switchMap, tap } from 'rxjs';
 import { ILocationService } from 'angular';
 import { ReportNodeType } from '../../shared/report-node-type.enum';
 
@@ -87,7 +87,7 @@ export class ReportNodeComponent implements OnChanges {
       children: this._api.getReportNodeChildren(id),
     }).subscribe(({ node, children }) => {
       this.node = node;
-      this.children = children;
+      this.children = children.filter((child) => child.resolvedArtefact !== null);
     });
   }
 }

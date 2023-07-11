@@ -1,22 +1,23 @@
 import { inject, Injectable } from '@angular/core';
-import { LoginStrategy } from '../shared/login-strategy';
+import { CredentialsStrategy } from '../shared/credentials-strategy';
 import { Observable, tap, throwError } from 'rxjs';
 import { LOGOUT_CLEANUP } from '../shared/logout-cleanup.token';
 
-const DEFAULT_LOGIN_STRATEGY: LoginStrategy = {
+const DEFAULT_CREDENTIALS_STRATEGY: CredentialsStrategy = {
   login: (username: string, password: string) => throwError(() => new Error('not supported')),
   logout: () => throwError(() => new Error('not supported')),
+  changePassword: (isCurrentPasswordOneTime?: boolean) => throwError(() => new Error('not supported')),
 };
 
 @Injectable({
   providedIn: 'root',
 })
-export class LoginService implements LoginStrategy {
+export class CredentialsService implements CredentialsStrategy {
   private logoutCleanup = inject(LOGOUT_CLEANUP, { optional: true }) ?? [];
 
-  private strategy = DEFAULT_LOGIN_STRATEGY;
+  private strategy = DEFAULT_CREDENTIALS_STRATEGY;
 
-  useStrategy(strategy: LoginStrategy): void {
+  useStrategy(strategy: CredentialsStrategy): void {
     this.strategy = strategy;
   }
 
@@ -26,6 +27,10 @@ export class LoginService implements LoginStrategy {
 
   logout(): Observable<any> {
     return this.strategy.logout().pipe(tap(() => this.invokeLogoutCleanup()));
+  }
+
+  changePassword(isCurrentPasswordOneTime?: boolean): Observable<any> {
+    return this.strategy.changePassword(isCurrentPasswordOneTime);
   }
 
   private invokeLogoutCleanup(): void {

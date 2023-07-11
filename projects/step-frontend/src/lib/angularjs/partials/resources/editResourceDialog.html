@@ -27,7 +27,7 @@
 				<step-resource-input
 					[label]="'Content'"
 					[st-type]="newResource.resourceType"
-					[upload-only]="true"
+					[with-choose-existing-resource-button]="false"
 					[disable-server-path]="true"
 					[(st-model)]="newResource.id"
 					(st-model-change)="newResourceUpdate()"
@@ -66,5 +66,5 @@
 </div>
 <div class="modal-footer">
   <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
-	<button class="btn btn-primary" type="button" ng-click="save()">Save</button>
+	<button class="btn btn-primary" type="button" ng-click="save()" ng-disabled="!canSave">Save</button>
 </div>
