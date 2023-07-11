@@ -1,4 +1,4 @@
-<step-modal-window [title]="modalTitle" [showSpinner]="isLoading">
+<step-modal-window [title]="modalTitle" [showSpinner]="isLoading" [stepZIndex]="1000">
   <div step-modal-window-body>
     <step-alert *ngIf="keyword?.managed" [type]="AlertType.warning">
       This keyword is part of a keyword package. All changes made will be lost when the package is updated.
@@ -27,7 +27,11 @@
 
       <step-form-field>
         <step-label>Type</step-label>
-        <mat-select [formControl]="formGroup!.controls.type">
+        <mat-select
+          [ngModel]="formGroup!.controls.type.value"
+          (ngModelChange)="fetchStepFunction($event)"
+          [ngModelOptions]="{ standalone: true }"
+        >
           <mat-option *ngFor="let itemInfo of functionTypeItemInfos" [value]="itemInfo.type">
             {{ itemInfo.label }}
           </mat-option>
@@ -76,12 +80,10 @@
   </div>
 
   <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
+    <button type="button" [disabled]="formGroup!.invalid" (click)="save()" mat-flat-button color="primary">Save</button>
     <button type="button" [disabled]="formGroup!.invalid" (click)="save(true)" mat-flat-button color="primary">
       Save and edit
     </button>
-
-    <button type="button" [disabled]="formGroup!.invalid" (click)="save()" mat-flat-button color="primary">Save</button>
-
-    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
   </div>
 </step-modal-window>

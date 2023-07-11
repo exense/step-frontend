@@ -25,22 +25,18 @@ export abstract class PluginLazyLoad implements PluginOnInit {
   pluginOnInit(): Promise<unknown> {
     const metaDictionary = this.getPluginsLazyLoadMeta();
     const registrations = Object.entries(metaDictionary)
-      .map(([pluginName, importMetas]) => {
-        return importMetas.map((importMeta) => {
-          const { load, isForceLoad } =
-            typeof importMeta === 'object' ? importMeta : { load: importMeta, isForceLoad: false };
-
-          return { pluginName, load, isForceLoad };
-        });
+      .map(([pluginName, importMeta]) => {
+        const { load, isForceLoad } =
+          typeof importMeta === 'object' ? importMeta : { load: importMeta, isForceLoad: false };
+        return { pluginName, load, isForceLoad };
       })
-      .flat()
       .filter(({ pluginName, isForceLoad }) => isForceLoad || this._pluginInfoRegistry.isRegistered(pluginName))
       .map(({ pluginName, load }) => this.registerPlugin(pluginName, load));
 
     return Promise.all(registrations);
   }
 
-  protected abstract getPluginsLazyLoadMeta(): Record<string, ImportMeta[]>;
+  protected abstract getPluginsLazyLoadMeta(): Record<string, ImportMeta>;
 
   private registerPlugin(pluginName: string, load: () => Promise<LazyLoadPluginMeta>): Promise<void> {
     console.log(`PLUGIN "${pluginName}" LAZYLOAD`);

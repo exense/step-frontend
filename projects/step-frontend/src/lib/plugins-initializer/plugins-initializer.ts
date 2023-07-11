@@ -20,6 +20,17 @@ const IGNORE_PLUGINS: ReadonlyArray<string> = [
   'menuConfig',
   'scriptEditor',
   'eventbrokermonitor',
+  'azureDevops',
+  'QFTestPlugin',
+  'soapUIPlugin',
+  'NodePlugin',
+  'jmeterPlugin',
+  'cypress',
+  'sikulix',
+  'DotNetPlugin',
+  'javaPlugin',
+  'oryonPlugin',
+  'compareEditor',
 ];
 
 // For testing purposes only

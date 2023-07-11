@@ -45,10 +45,8 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
   protected readonly setValueToForm$ = this.setValueToFormInternal$.asObservable();
   protected readonly setValueToModel$ = this.setValueToModelInternal$.asObservable();
   protected readonly AlertType = AlertType;
-  protected readonly FunctionType = FunctionType;
 
   protected keyword?: Keyword;
-  protected schemaJSON?: string;
   protected formGroup?: FunctionConfigurationDialogForm;
 
   protected functionTypeItemInfos = this._functionTypeRegistryService.getItemInfos();
@@ -70,7 +68,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
 
     const { functionTypeFilters } = this._functionConfigurationDialogData.dialogConfig;
 
-    if (functionTypeFilters) {
+    if (functionTypeFilters?.length) {
       this.functionTypeItemInfos = this.functionTypeItemInfos.filter((functionTypeItemInfo) =>
         this._functionConfigurationDialogData.dialogConfig.functionTypeFilters.includes(functionTypeItemInfo.type)
       );
@@ -151,7 +149,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
     }
   }
 
-  private fetchStepFunction(stepFunctionType: string): void {
+  protected fetchStepFunction(stepFunctionType: string): void {
     this._augmentedKeywordsService
       .newFunctionTypeConf(stepFunctionType, this.serviceRoot)
       .pipe(
