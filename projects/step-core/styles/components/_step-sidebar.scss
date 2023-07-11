@@ -221,11 +221,6 @@ $menu-sub-item-height: 3.2rem;
         padding: map.get($config, elements-text-padding);
       }
 
-      > .sidebar-home-and-settings-divider {
-        right: map.get($config, settings-divider-padding-right);
-        color: map.get($config, divider-color);
-      }
-
       > .sidebar-home-and-settings-icon {
         right: map.get($config, elements-text-padding);
         margin-right: -10px;
