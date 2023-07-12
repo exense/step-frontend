@@ -1,4 +1,10 @@
-<step-table [dataSource]="_dataSource" matSort matSortActive="scope" [matSortDisableClear]="true">
+<step-table
+  [dataSource]="_dataSource"
+  matSort
+  matSortActive="scope"
+  matSortDirection="asc"
+  [matSortDisableClear]="true"
+>
   <step-bulk-operations *stepAdditionalHeader></step-bulk-operations>
 
   <ng-container matColumnDef="bulkSelection">
