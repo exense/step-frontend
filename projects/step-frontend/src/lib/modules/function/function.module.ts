@@ -23,6 +23,8 @@ import { PlanEditorModule } from '../plan-editor/plan-editor.module';
 import { CompositeFunctionEditorComponent } from './components/composite-function-editor/composite-function-editor.component';
 import { FunctionPackageConfigurationDialogComponent } from './components/function-package-configuration-dialog/function-package-configuration-dialog.component';
 import { FunctionSelectionTableComponent } from './components/function-selection-table/function-selection-table.component';
+import { FunctionSchemaEditorComponent } from './components/function-schema-editor/function-schema-editor.component';
+import './components/function-schema-editor/function-schema-editor.component';
 
 @NgModule({
   imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule],
@@ -37,6 +39,7 @@ import { FunctionSelectionTableComponent } from './components/function-selection
     CompositeFunctionEditorComponent,
     FunctionPackageConfigurationDialogComponent,
     FunctionSelectionTableComponent,
+    FunctionSchemaEditorComponent,
   ],
   providers: [
     {
@@ -50,6 +53,7 @@ import { FunctionSelectionTableComponent } from './components/function-selection
     CompositeFunctionEditorComponent,
     FunctionPackageConfigurationDialogComponent,
     FunctionSelectionTableComponent,
+    FunctionSchemaEditorComponent,
   ],
 })
 export class FunctionModule {

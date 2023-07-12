@@ -12,9 +12,9 @@
 			<label>Description</label>
 			<textarea ng-model="function_.description" class="form-control"></textarea>
 		</div>
-		<div ng-show="!dialogConfig.lightForm && isSchemaEnforced === 'true';" class="form-group form-group-sm">
-			<label>Schema</label>
-			<textarea ng-model="schemaStr" class="form-control"></textarea>
+		<div ng-show="!dialogConfig.lightForm && isSchemaEnforced === 'true';" style="margin-bottom: 15px">
+      <step-function-schema-editor label="Schema" [(schema)]="function_.schema">
+      </step-function-schema-editor>
 		</div>
 		<div ng-if="!dialogConfig.lightForm && function_.htmlTemplate" class="form-group form-group-sm">
 			<label></label>

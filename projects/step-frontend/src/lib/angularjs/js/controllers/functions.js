@@ -352,7 +352,6 @@ angular
             loadTokenSelectionCriteria(initialFunction);
 
             $scope.function_ = initialFunction;
-            $scope.schemaStr = JSON.stringify($scope.function_.schema);
           });
       };
 
@@ -365,14 +364,10 @@ angular
         $scope.loadInitialFunction();
       } else {
         $scope.function_ = function_;
-        $scope.schemaStr = JSON.stringify($scope.function_.schema);
       }
 
       $scope.save = function (editAfterSave) {
-        var schemaJson;
         try {
-          schemaJson = JSON.parse($scope.schemaStr);
-          $scope.function_.schema = schemaJson;
 
           $http.post('rest/' + $scope.dialogConfig.serviceRoot + '', $scope.function_).then(function (response) {
             var function_ = response.data;
