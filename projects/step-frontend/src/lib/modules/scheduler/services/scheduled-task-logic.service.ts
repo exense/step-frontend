@@ -14,17 +14,7 @@ import { Location } from '@angular/common';
 export class ScheduledTaskLogicService {
   readonly STATUS_ACTIVE_STRING = 'On';
   readonly STATUS_INACTIVE_STRING = 'Off';
-
-  readonly searchableScheduledTask = new TableFetchLocalDataSource(
-    () => this._schedulerService.getScheduledExecutions(),
-    TableFetchLocalDataSource.configBuilder<ExecutiontTaskParameters>()
-      .addSearchStringPredicate('cronExpression', (item) => item.cronExpression!)
-      .addSearchStringPredicate('status', (item) =>
-        item.active ? this.STATUS_ACTIVE_STRING : this.STATUS_INACTIVE_STRING
-      )
-      .addSortBooleanPredicate('status', (item) => item.active)
-      .build()
-  );
+  readonly STATUS: ReadonlyArray<string> = [this.STATUS_ACTIVE_STRING, this.STATUS_INACTIVE_STRING];
 
   private _authService = inject(AuthService);
   private _dashboardService = inject(DashboardService);
@@ -32,8 +22,10 @@ export class ScheduledTaskLogicService {
   private _scheduledTaskDialogs = inject(ScheduledTaskDialogsService);
   private _location = inject(Location);
 
+  readonly dataSource = this._schedulerService.createSelectionDataSource();
+
   loadTable(): void {
-    this.searchableScheduledTask.reload();
+    this.dataSource.reload();
   }
 
   isSchedulerEnabled(): Observable<boolean> {
