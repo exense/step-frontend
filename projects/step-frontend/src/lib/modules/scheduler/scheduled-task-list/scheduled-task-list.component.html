@@ -1,4 +1,10 @@
-<step-table [dataSource]="_logic.dataSource" matSort matSortActive="attributes.name" [matSortDisableClear]="true">
+<step-table
+  [dataSource]="_logic.dataSource"
+  matSort
+  matSortActive="attributes.name"
+  matSortDirection="asc"
+  [matSortDisableClear]="true"
+>
   <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-new'" [availableOperations]="availableBulkOperations">
   </step-bulk-operations>
   <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
