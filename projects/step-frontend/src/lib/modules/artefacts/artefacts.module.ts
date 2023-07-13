@@ -4,12 +4,31 @@ import { ArtefactService } from '@exense/step-core';
 import { EchoComponent } from './component/echo/echo.component';
 import { ThreadGroupComponent } from './component/thread-group/thread-group.component';
 import { AssertComponent } from './component/assert/assert.component';
+import { ExportComponent } from './component/export/export.component';
+import { PlaceholderComponent } from './component/placeholder/placeholder.component';
+import { CheckComponent } from './component/check/check.component';
 import { RetryIfFailsComponent } from './component/retry-if-fails/retry-if-fails.component';
 
 @NgModule({
-  declarations: [EchoComponent, ThreadGroupComponent, AssertComponent, RetryIfFailsComponent],
+  declarations: [
+    EchoComponent,
+    ThreadGroupComponent,
+    AssertComponent,
+    PlaceholderComponent,
+    ExportComponent,
+    CheckComponent,
+    RetryIfFailsComponent,
+  ],
   imports: [StepCommonModule],
-  exports: [EchoComponent, ThreadGroupComponent, AssertComponent, RetryIfFailsComponent],
+  exports: [
+    EchoComponent,
+    ThreadGroupComponent,
+    AssertComponent,
+    PlaceholderComponent,
+    ExportComponent,
+    CheckComponent,
+    RetryIfFailsComponent,
+  ],
 })
 export class ArtefactsModule {
   constructor(private _artefactService: ArtefactService) {
@@ -187,7 +206,7 @@ export class ArtefactsModule {
     this._artefactService.register('Check', {
       icon: 'glyphicon-ok',
       iconNg2: 'check',
-      form: 'partials/artefacts/check.html',
+      component: CheckComponent,
       description:
         'Performs a custom assertion using groovy expressions. Useful for validating the output of the parent node. For standard assertions use the Control Assert instead',
     });
@@ -200,13 +219,13 @@ export class ArtefactsModule {
     this._artefactService.register('Placeholder', {
       icon: 'glyphicon-unchecked',
       iconNg2: 'square',
-      form: 'partials/artefacts/placeholder.html',
+      component: PlaceholderComponent,
       description: '',
     });
     this._artefactService.register('Export', {
       icon: 'glyphicon-export',
       iconNg2: 'upload',
-      form: 'partials/artefacts/export.html',
+      component: ExportComponent,
       description: '',
     });
     this._artefactService.register('Failure', {
