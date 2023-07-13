@@ -8,6 +8,7 @@ import { ExportComponent } from './component/export/export.component';
 import { PlaceholderComponent } from './component/placeholder/placeholder.component';
 import { CheckComponent } from './component/check/check.component';
 import { RetryIfFailsComponent } from './component/retry-if-fails/retry-if-fails.component';
+import { CaseComponent } from './component/case/case.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { RetryIfFailsComponent } from './component/retry-if-fails/retry-if-fails
     ExportComponent,
     CheckComponent,
     RetryIfFailsComponent,
+    CaseComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -28,6 +30,7 @@ import { RetryIfFailsComponent } from './component/retry-if-fails/retry-if-fails
     ExportComponent,
     CheckComponent,
     RetryIfFailsComponent,
+    CaseComponent,
   ],
 })
 export class ArtefactsModule {
@@ -194,7 +197,7 @@ export class ArtefactsModule {
     this._artefactService.register('Case', {
       icon: 'glyphicon-minus',
       iconNg2: 'minus',
-      form: 'partials/artefacts/case.html',
+      component: CaseComponent,
       description: 'Same as in any programming language, to use in combinaison with the "Switch" control',
     });
     this._artefactService.register('RetryIfFails', {
