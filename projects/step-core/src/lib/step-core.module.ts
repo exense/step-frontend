@@ -357,3 +357,4 @@ export * from './services/view-state.service';
 export * from './services/artefact.service';
 export * from './services/artefact-form-change-helper.service';
 export * from './shared';
+export * from './components/base-artefact/base-artefact.component';
