@@ -1,0 +1,39 @@
+<form #form="ngForm">
+  <step-dynamic-textfield
+    label="Output attribute"
+    [(ngModel)]="context.artefact!.actual"
+    [disabled]="context.readonly"
+    name="actual"
+    matTooltip="You can either use flat attributes of the output object or json path expressions."
+  >
+  </step-dynamic-textfield>
+  <step-form-field>
+    <step-label>Operator</step-label>
+    <mat-select [(ngModel)]="context.artefact!.operator" [disabled]="context.readonly" name="operator">
+      <mat-option *ngFor="let item of operatorTypes; trackBy: trackByOperatorType" [value]="item.key">
+        {{ item.value }}
+      </mat-option>
+    </mat-select>
+  </step-form-field>
+  <step-dynamic-textfield
+    label="Expected value"
+    [(ngModel)]="context.artefact!.expected"
+    [disabled]="context.readonly"
+    name="expected"
+  >
+  </step-dynamic-textfield>
+  <step-dynamic-checkbox
+    label="Negate the assertion"
+    [(ngModel)]="context.artefact!.doNegate"
+    [disabled]="context.readonly"
+    name="doNegate"
+  >
+  </step-dynamic-checkbox>
+  <step-dynamic-textfield
+    label="Custom error message"
+    [(ngModel)]="context.artefact!.customErrorMessage"
+    [disabled]="context.readonly"
+    name="customErrorMessage"
+  >
+  </step-dynamic-textfield>
+</form>

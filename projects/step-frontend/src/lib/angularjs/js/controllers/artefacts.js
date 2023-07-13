@@ -154,15 +154,6 @@ angular
       );
     };
   })
-  .controller('AssertCtrl', function ($scope, $uibModal, $location, $http, FunctionDialogs) {
-    $scope.operatorTypes = [
-      { name: 'EQUALS', label: 'equals' },
-      { name: 'BEGINS_WITH', label: 'begins with' },
-      { name: 'CONTAINS', label: 'contains' },
-      { name: 'ENDS_WITH', label: 'ends with' },
-      { name: 'MATCHES', label: 'matches' },
-    ];
-  })
 
   .directive(
     'jsonEditor',

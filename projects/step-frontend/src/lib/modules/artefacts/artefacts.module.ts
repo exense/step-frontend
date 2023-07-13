@@ -3,11 +3,12 @@ import { StepCommonModule } from '../_common/step-common.module';
 import { ArtefactService } from '@exense/step-core';
 import { EchoComponent } from './component/echo/echo.component';
 import { ThreadGroupComponent } from './component/thread-group/thread-group.component';
+import { AssertComponent } from './component/assert/assert.component';
 
 @NgModule({
-  declarations: [EchoComponent, ThreadGroupComponent],
+  declarations: [EchoComponent, ThreadGroupComponent, AssertComponent],
   imports: [StepCommonModule],
-  exports: [EchoComponent, ThreadGroupComponent],
+  exports: [EchoComponent, ThreadGroupComponent, AssertComponent],
 })
 export class ArtefactsModule {
   constructor(private _artefactService: ArtefactService) {
@@ -192,7 +193,7 @@ export class ArtefactsModule {
     this._artefactService.register('Assert', {
       icon: 'glyphicon-ok',
       iconNg2: 'check',
-      form: 'partials/artefacts/assert.html',
+      component: AssertComponent,
       description: 'Validates the output of a keyword execution.',
     });
     this._artefactService.register('Placeholder', {
