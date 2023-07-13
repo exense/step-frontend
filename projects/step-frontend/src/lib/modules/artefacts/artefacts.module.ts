@@ -11,6 +11,7 @@ import { RetryIfFailsComponent } from './component/retry-if-fails/retry-if-fails
 import { CaseComponent } from './component/case/case.component';
 import { SwitchComponent } from './component/switch/switch.component';
 import { SleepComponent } from './component/sleep/sleep.component';
+import { SetComponent } from './component/set/set.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { SleepComponent } from './component/sleep/sleep.component';
     CaseComponent,
     SwitchComponent,
     SleepComponent,
+    SetComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -37,6 +39,7 @@ import { SleepComponent } from './component/sleep/sleep.component';
     CaseComponent,
     SwitchComponent,
     SleepComponent,
+    SetComponent,
   ],
 })
 export class ArtefactsModule {
@@ -152,7 +155,7 @@ export class ArtefactsModule {
     });
     this._artefactService.register('Set', {
       icon: 'glyphicon-save',
-      form: 'partials/artefacts/set.html',
+      component: SetComponent,
       iconNg2: 'download',
       description: 'Sets a value to a variable, which can then be accessed throughout Plans and sub Plans',
     });

@@ -3,9 +3,7 @@
 
 .non-keyword-data,
 .artefact-flags {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  @include core.common-form-content;
   margin-bottom: 1rem;
 }
 
