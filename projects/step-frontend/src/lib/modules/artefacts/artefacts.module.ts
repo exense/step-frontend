@@ -6,11 +6,26 @@ import { ThreadGroupComponent } from './component/thread-group/thread-group.comp
 import { AssertComponent } from './component/assert/assert.component';
 import { ExportComponent } from './component/export/export.component';
 import { PlaceholderComponent } from './component/placeholder/placeholder.component';
+import { CheckComponent } from './component/check/check.component';
 
 @NgModule({
-  declarations: [EchoComponent, ThreadGroupComponent, AssertComponent, PlaceholderComponent, ExportComponent],
+  declarations: [
+    EchoComponent,
+    ThreadGroupComponent,
+    AssertComponent,
+    PlaceholderComponent,
+    ExportComponent,
+    CheckComponent,
+  ],
   imports: [StepCommonModule],
-  exports: [EchoComponent, ThreadGroupComponent, AssertComponent, PlaceholderComponent, ExportComponent],
+  exports: [
+    EchoComponent,
+    ThreadGroupComponent,
+    AssertComponent,
+    PlaceholderComponent,
+    ExportComponent,
+    CheckComponent,
+  ],
 })
 export class ArtefactsModule {
   constructor(private _artefactService: ArtefactService) {
@@ -188,7 +203,7 @@ export class ArtefactsModule {
     this._artefactService.register('Check', {
       icon: 'glyphicon-ok',
       iconNg2: 'check',
-      form: 'partials/artefacts/check.html',
+      component: CheckComponent,
       description:
         'Performs a custom assertion using groovy expressions. Useful for validating the output of the parent node. For standard assertions use the Control Assert instead',
     });
