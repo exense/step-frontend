@@ -1,4 +1,5 @@
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
 
 .non-keyword-data,
 .artefact-flags {
@@ -20,4 +21,10 @@ textarea {
 .footer {
   color: var.$muted;
   font-size: 85%;
+}
+
+.name-suffix {
+  step-icon {
+    @include core.step-icon-size(16px);
+  }
 }
