@@ -75,6 +75,7 @@ import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
 import { ArtefactDetailsComponent } from './components/artefact-details/artefact-details.component';
 import { ArtefactDetailsWrapperDirective } from './directives/artefact-details-wrapper.directive';
+import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 
 @NgModule({
   declarations: [
@@ -136,6 +137,7 @@ import { ArtefactDetailsWrapperDirective } from './directives/artefact-details-w
     FileAlreadyExistingDialogComponent,
     ArtefactDetailsComponent,
     ArtefactDetailsWrapperDirective,
+    WaitingArtefactsAdvancedComponent,
   ],
   imports: [
     CommonModule,
@@ -223,6 +225,7 @@ import { ArtefactDetailsWrapperDirective } from './directives/artefact-details-w
     ExportDialogComponent,
     FileAlreadyExistingDialogComponent,
     ArtefactDetailsComponent,
+    WaitingArtefactsAdvancedComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -358,3 +361,4 @@ export * from './services/artefact.service';
 export * from './services/artefact-form-change-helper.service';
 export * from './shared';
 export * from './components/base-artefact/base-artefact.component';
+export * from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';

@@ -10,6 +10,7 @@ import { CheckComponent } from './component/check/check.component';
 import { RetryIfFailsComponent } from './component/retry-if-fails/retry-if-fails.component';
 import { CaseComponent } from './component/case/case.component';
 import { SwitchComponent } from './component/switch/switch.component';
+import { SleepComponent } from './component/sleep/sleep.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { SwitchComponent } from './component/switch/switch.component';
     RetryIfFailsComponent,
     CaseComponent,
     SwitchComponent,
+    SleepComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -34,6 +36,7 @@ import { SwitchComponent } from './component/switch/switch.component';
     RetryIfFailsComponent,
     CaseComponent,
     SwitchComponent,
+    SleepComponent,
   ],
 })
 export class ArtefactsModule {
@@ -156,7 +159,7 @@ export class ArtefactsModule {
     this._artefactService.register('Sleep', {
       icon: 'glyphicon-hourglass',
       iconNg2: 'coffee',
-      form: 'partials/artefacts/sleep.html',
+      component: SleepComponent,
       description: 'Causes the thread to sleep',
     });
     this._artefactService.register('Script', {
