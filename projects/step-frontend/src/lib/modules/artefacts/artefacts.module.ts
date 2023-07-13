@@ -4,11 +4,12 @@ import { ArtefactService } from '@exense/step-core';
 import { EchoComponent } from './component/echo/echo.component';
 import { ThreadGroupComponent } from './component/thread-group/thread-group.component';
 import { AssertComponent } from './component/assert/assert.component';
+import { CheckComponent } from './component/check/check.component';
 
 @NgModule({
-  declarations: [EchoComponent, ThreadGroupComponent, AssertComponent],
+  declarations: [EchoComponent, ThreadGroupComponent, AssertComponent, CheckComponent],
   imports: [StepCommonModule],
-  exports: [EchoComponent, ThreadGroupComponent, AssertComponent],
+  exports: [EchoComponent, ThreadGroupComponent, AssertComponent, CheckComponent],
 })
 export class ArtefactsModule {
   constructor(private _artefactService: ArtefactService) {
@@ -186,7 +187,7 @@ export class ArtefactsModule {
     this._artefactService.register('Check', {
       icon: 'glyphicon-ok',
       iconNg2: 'check',
-      form: 'partials/artefacts/check.html',
+      component: CheckComponent,
       description:
         'Performs a custom assertion using groovy expressions. Useful for validating the output of the parent node. For standard assertions use the Control Assert instead',
     });
