@@ -3,11 +3,12 @@ import { StepCommonModule } from '../_common/step-common.module';
 import { ArtefactService } from '@exense/step-core';
 import { EchoComponent } from './component/echo/echo.component';
 import { ThreadGroupComponent } from './component/thread-group/thread-group.component';
+import { PlaceholderComponent } from './component/placeholder/placeholder.component';
 
 @NgModule({
-  declarations: [EchoComponent, ThreadGroupComponent],
+  declarations: [EchoComponent, ThreadGroupComponent, PlaceholderComponent],
   imports: [StepCommonModule],
-  exports: [EchoComponent, ThreadGroupComponent],
+  exports: [EchoComponent, ThreadGroupComponent, PlaceholderComponent],
 })
 export class ArtefactsModule {
   constructor(private _artefactService: ArtefactService) {
@@ -198,7 +199,7 @@ export class ArtefactsModule {
     this._artefactService.register('Placeholder', {
       icon: 'glyphicon-unchecked',
       iconNg2: 'square',
-      form: 'partials/artefacts/placeholder.html',
+      component: PlaceholderComponent,
       description: '',
     });
     this._artefactService.register('Export', {
