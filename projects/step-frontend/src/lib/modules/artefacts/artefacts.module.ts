@@ -4,11 +4,12 @@ import { ArtefactService } from '@exense/step-core';
 import { EchoComponent } from './component/echo/echo.component';
 import { ThreadGroupComponent } from './component/thread-group/thread-group.component';
 import { AssertComponent } from './component/assert/assert.component';
+import { RetryIfFailsComponent } from './component/retry-if-fails/retry-if-fails.component';
 
 @NgModule({
-  declarations: [EchoComponent, ThreadGroupComponent, AssertComponent],
+  declarations: [EchoComponent, ThreadGroupComponent, AssertComponent, RetryIfFailsComponent],
   imports: [StepCommonModule],
-  exports: [EchoComponent, ThreadGroupComponent, AssertComponent],
+  exports: [EchoComponent, ThreadGroupComponent, AssertComponent, RetryIfFailsComponent],
 })
 export class ArtefactsModule {
   constructor(private _artefactService: ArtefactService) {
@@ -180,7 +181,7 @@ export class ArtefactsModule {
     this._artefactService.register('RetryIfFails', {
       icon: 'glyphicon-retweet',
       iconNg2: 'repeat',
-      form: 'partials/artefacts/retryIfFails.html',
+      component: RetryIfFailsComponent,
       description: 'Retry mechanism with grace period',
     });
     this._artefactService.register('Check', {
