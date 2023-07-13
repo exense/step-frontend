@@ -4,11 +4,12 @@ import { ArtefactService } from '@exense/step-core';
 import { EchoComponent } from './component/echo/echo.component';
 import { ThreadGroupComponent } from './component/thread-group/thread-group.component';
 import { AssertComponent } from './component/assert/assert.component';
+import { SwitchComponent } from './component/switch/switch.component';
 
 @NgModule({
-  declarations: [EchoComponent, ThreadGroupComponent, AssertComponent],
+  declarations: [EchoComponent, ThreadGroupComponent, AssertComponent, SwitchComponent],
   imports: [StepCommonModule],
-  exports: [EchoComponent, ThreadGroupComponent, AssertComponent],
+  exports: [EchoComponent, ThreadGroupComponent, AssertComponent, SwitchComponent],
 })
 export class ArtefactsModule {
   constructor(private _artefactService: ArtefactService) {
@@ -168,7 +169,7 @@ export class ArtefactsModule {
     this._artefactService.register('Switch', {
       icon: 'glyphicon-option-vertical',
       iconNg2: 'more-vertical',
-      form: 'partials/artefacts/switch.html',
+      component: SwitchComponent,
       description: 'Same as in any programming language, to use in combinaison with the "Case" control',
     });
     this._artefactService.register('Case', {
