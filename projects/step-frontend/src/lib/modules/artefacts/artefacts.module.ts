@@ -4,11 +4,12 @@ import { ArtefactService } from '@exense/step-core';
 import { EchoComponent } from './component/echo/echo.component';
 import { ThreadGroupComponent } from './component/thread-group/thread-group.component';
 import { AssertComponent } from './component/assert/assert.component';
+import { ExportComponent } from './component/export/export.component';
 
 @NgModule({
-  declarations: [EchoComponent, ThreadGroupComponent, AssertComponent],
+  declarations: [EchoComponent, ThreadGroupComponent, AssertComponent, ExportComponent],
   imports: [StepCommonModule],
-  exports: [EchoComponent, ThreadGroupComponent, AssertComponent],
+  exports: [EchoComponent, ThreadGroupComponent, AssertComponent, ExportComponent],
 })
 export class ArtefactsModule {
   constructor(private _artefactService: ArtefactService) {
@@ -205,7 +206,7 @@ export class ArtefactsModule {
     this._artefactService.register('Export', {
       icon: 'glyphicon-export',
       iconNg2: 'upload',
-      form: 'partials/artefacts/export.html',
+      component: ExportComponent,
       description: '',
     });
     this._artefactService.register('Failure', {
