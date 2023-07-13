@@ -4,12 +4,34 @@ import { ArtefactService } from '@exense/step-core';
 import { EchoComponent } from './component/echo/echo.component';
 import { ThreadGroupComponent } from './component/thread-group/thread-group.component';
 import { AssertComponent } from './component/assert/assert.component';
+import { ExportComponent } from './component/export/export.component';
+import { PlaceholderComponent } from './component/placeholder/placeholder.component';
+import { CheckComponent } from './component/check/check.component';
+import { RetryIfFailsComponent } from './component/retry-if-fails/retry-if-fails.component';
 import { CaseComponent } from './component/case/case.component';
 
 @NgModule({
-  declarations: [EchoComponent, ThreadGroupComponent, AssertComponent, CaseComponent],
+  declarations: [
+    EchoComponent,
+    ThreadGroupComponent,
+    AssertComponent,
+    PlaceholderComponent,
+    ExportComponent,
+    CheckComponent,
+    RetryIfFailsComponent,
+    CaseComponent,
+  ],
   imports: [StepCommonModule],
-  exports: [EchoComponent, ThreadGroupComponent, AssertComponent, CaseComponent],
+  exports: [
+    EchoComponent,
+    ThreadGroupComponent,
+    AssertComponent,
+    PlaceholderComponent,
+    ExportComponent,
+    CheckComponent,
+    RetryIfFailsComponent,
+    CaseComponent,
+  ],
 })
 export class ArtefactsModule {
   constructor(private _artefactService: ArtefactService) {
@@ -181,13 +203,13 @@ export class ArtefactsModule {
     this._artefactService.register('RetryIfFails', {
       icon: 'glyphicon-retweet',
       iconNg2: 'repeat',
-      form: 'partials/artefacts/retryIfFails.html',
+      component: RetryIfFailsComponent,
       description: 'Retry mechanism with grace period',
     });
     this._artefactService.register('Check', {
       icon: 'glyphicon-ok',
       iconNg2: 'check',
-      form: 'partials/artefacts/check.html',
+      component: CheckComponent,
       description:
         'Performs a custom assertion using groovy expressions. Useful for validating the output of the parent node. For standard assertions use the Control Assert instead',
     });
@@ -200,13 +222,13 @@ export class ArtefactsModule {
     this._artefactService.register('Placeholder', {
       icon: 'glyphicon-unchecked',
       iconNg2: 'square',
-      form: 'partials/artefacts/placeholder.html',
+      component: PlaceholderComponent,
       description: '',
     });
     this._artefactService.register('Export', {
       icon: 'glyphicon-export',
       iconNg2: 'upload',
-      form: 'partials/artefacts/export.html',
+      component: ExportComponent,
       description: '',
     });
     this._artefactService.register('Failure', {
