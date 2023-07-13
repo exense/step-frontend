@@ -5,11 +5,12 @@ import { EchoComponent } from './component/echo/echo.component';
 import { ThreadGroupComponent } from './component/thread-group/thread-group.component';
 import { AssertComponent } from './component/assert/assert.component';
 import { ExportComponent } from './component/export/export.component';
+import { PlaceholderComponent } from './component/placeholder/placeholder.component';
 
 @NgModule({
-  declarations: [EchoComponent, ThreadGroupComponent, AssertComponent, ExportComponent],
+  declarations: [EchoComponent, ThreadGroupComponent, AssertComponent, PlaceholderComponent, ExportComponent],
   imports: [StepCommonModule],
-  exports: [EchoComponent, ThreadGroupComponent, AssertComponent, ExportComponent],
+  exports: [EchoComponent, ThreadGroupComponent, AssertComponent, PlaceholderComponent, ExportComponent],
 })
 export class ArtefactsModule {
   constructor(private _artefactService: ArtefactService) {
@@ -200,7 +201,7 @@ export class ArtefactsModule {
     this._artefactService.register('Placeholder', {
       icon: 'glyphicon-unchecked',
       iconNg2: 'square',
-      form: 'partials/artefacts/placeholder.html',
+      component: PlaceholderComponent,
       description: '',
     });
     this._artefactService.register('Export', {
