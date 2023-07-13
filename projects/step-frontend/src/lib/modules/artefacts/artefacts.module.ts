@@ -7,6 +7,7 @@ import { AssertComponent } from './component/assert/assert.component';
 import { ExportComponent } from './component/export/export.component';
 import { PlaceholderComponent } from './component/placeholder/placeholder.component';
 import { CheckComponent } from './component/check/check.component';
+import { RetryIfFailsComponent } from './component/retry-if-fails/retry-if-fails.component';
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { CheckComponent } from './component/check/check.component';
     PlaceholderComponent,
     ExportComponent,
     CheckComponent,
+    RetryIfFailsComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -25,6 +27,7 @@ import { CheckComponent } from './component/check/check.component';
     PlaceholderComponent,
     ExportComponent,
     CheckComponent,
+    RetryIfFailsComponent,
   ],
 })
 export class ArtefactsModule {
@@ -197,7 +200,7 @@ export class ArtefactsModule {
     this._artefactService.register('RetryIfFails', {
       icon: 'glyphicon-retweet',
       iconNg2: 'repeat',
-      form: 'partials/artefacts/retryIfFails.html',
+      component: RetryIfFailsComponent,
       description: 'Retry mechanism with grace period',
     });
     this._artefactService.register('Check', {
