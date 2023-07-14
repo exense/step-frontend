@@ -17,6 +17,8 @@ import { SequenceComponent } from './component/sequence/sequence.component';
 import { SynchronizedComponent } from './component/synchronized/synchronized.component';
 import { TestSetComponent } from './component/test-set/test-set.component';
 import { ForComponent } from './component/for/for.component';
+import { TestScenarioComponent } from './component/test-scenario/test-scenario.component';
+import { TestCaseComponent } from './component/test-case/test-case.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +38,8 @@ import { ForComponent } from './component/for/for.component';
     SynchronizedComponent,
     TestSetComponent,
     ForComponent,
+    TestScenarioComponent,
+    TestCaseComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -55,6 +59,8 @@ import { ForComponent } from './component/for/for.component';
     SynchronizedComponent,
     TestSetComponent,
     ForComponent,
+    TestScenarioComponent,
+    TestCaseComponent,
   ],
 })
 export class ArtefactsModule {
@@ -72,14 +78,14 @@ export class ArtefactsModule {
     this._artefactService.register('TestCase', {
       icon: 'glyphicon-list-alt',
       iconNg2: 'list',
-      form: 'partials/artefacts/testCase.html',
+      component: TestCaseComponent,
       description:
         'Specific container for a group of nodes, it will activate the top-level panel in the execution view for high-level test case execution monitoring',
     });
     this._artefactService.register('TestScenario', {
       icon: 'glyphicon-equalizer',
       iconNg2: 'bar-chart-2',
-      form: 'partials/artefacts/testScenario.html',
+      component: TestScenarioComponent,
       description: 'Usually used to parallelize the execution of multiple ThreadGroups or ‘sub’ plans',
     });
     this._artefactService.register('CallPlan', {
