@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
@@ -9,9 +9,14 @@ import {
   selectionCollectionProvider,
   tablePersistenceConfigProvider,
   STORE_ALL,
+  ArrayItemLabelValueExtractor,
+  FilterConditionFactoryService,
 } from '@exense/step-core';
 import { ScheduledTaskLogicService } from '../services/scheduled-task-logic.service';
 import { ScheduledTaskBulkOperationsInvokeService } from '../services/scheduled-task-bulk-operations-invoke.service';
+import { KeyValue } from '@angular/common';
+
+type StatusItem = KeyValue<string, string>;
 
 @Component({
   selector: 'step-scheduled-task-list',
@@ -34,6 +39,18 @@ export class ScheduledTaskListComponent {
   ];
   isSchedulerEnabled: boolean = false;
   constructor(public readonly _logic: ScheduledTaskLogicService) {}
+
+  readonly _filterConditionFactory = inject(FilterConditionFactoryService);
+
+  readonly statusItems: StatusItem[] = [
+    { key: true.toString(), value: this._logic.STATUS_ACTIVE_STRING },
+    { key: false.toString(), value: this._logic.STATUS_INACTIVE_STRING },
+  ];
+
+  readonly extractor: ArrayItemLabelValueExtractor<StatusItem> = {
+    getValue: (item) => item.key,
+    getLabel: (item) => item.value,
+  };
 
   ngOnInit(): void {
     this._logic.isSchedulerEnabled().subscribe((data) => {

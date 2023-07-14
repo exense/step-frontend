@@ -22,6 +22,7 @@ import { SuffixDirective } from './directives/suffix.directive';
 import { HintDirective } from './directives/hint.directive';
 import { ErrorDirective } from './directives/error.directive';
 import { AlertDirective } from './directives/alert.directive';
+import { SingleItemArrayFilterComponent } from './components/single-item-array-filter/single-item-array-filter.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
@@ -46,6 +47,7 @@ import { AlertDirective } from './directives/alert.directive';
     HintDirective,
     ErrorDirective,
     AlertDirective,
+    SingleItemArrayFilterComponent,
   ],
   exports: [
     ResourceLabelComponent,
@@ -68,12 +70,14 @@ import { AlertDirective } from './directives/alert.directive';
     HintDirective,
     ErrorDirective,
     AlertDirective,
+    SingleItemArrayFilterComponent,
   ],
 })
 export class StepBasicsModule {}
 
 export * from './components/base-filter/base-filter.component';
 export * from './components/array-filter/array-filter.component';
+export * from './components/single-item-array-filter/single-item-array-filter.component';
 export * from './components/date-filter/date-filter.component';
 export * from './components/input-filter/hexadecimal-input-filter.component';
 export * from './components/input-filter/input-filter.component';
