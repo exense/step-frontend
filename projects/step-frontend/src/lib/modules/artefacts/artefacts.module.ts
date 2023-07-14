@@ -14,6 +14,7 @@ import { SleepComponent } from './component/sleep/sleep.component';
 import { SetComponent } from './component/set/set.component';
 import { IfComponent } from './component/if/if.component';
 import { SequenceComponent } from './component/sequence/sequence.component';
+import { SynchronizedComponent } from './component/synchronized/synchronized.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { SequenceComponent } from './component/sequence/sequence.component';
     SetComponent,
     IfComponent,
     SequenceComponent,
+    SynchronizedComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -46,6 +48,7 @@ import { SequenceComponent } from './component/sequence/sequence.component';
     SetComponent,
     IfComponent,
     SequenceComponent,
+    SynchronizedComponent,
   ],
 })
 export class ArtefactsModule {
@@ -113,7 +116,7 @@ export class ArtefactsModule {
     this._artefactService.register('Synchronized', {
       icon: 'glyphicon-align-justify',
       iconNg2: 'align-justify',
-      form: 'partials/artefacts/synchronized.html',
+      component: SynchronizedComponent,
       description:
         'Guarantee thread safety within a test block by synchronizing all threads on the entire Test Execution',
     });
