@@ -12,6 +12,7 @@ import { CaseComponent } from './component/case/case.component';
 import { SwitchComponent } from './component/switch/switch.component';
 import { SleepComponent } from './component/sleep/sleep.component';
 import { SetComponent } from './component/set/set.component';
+import { IfComponent } from './component/if/if.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { SetComponent } from './component/set/set.component';
     SwitchComponent,
     SleepComponent,
     SetComponent,
+    IfComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -40,6 +42,7 @@ import { SetComponent } from './component/set/set.component';
     SwitchComponent,
     SleepComponent,
     SetComponent,
+    IfComponent,
   ],
 })
 export class ArtefactsModule {
@@ -144,7 +147,7 @@ export class ArtefactsModule {
     this._artefactService.register('If', {
       icon: 'glyphicon-unchecked',
       iconNg2: 'square',
-      form: 'partials/artefacts/if.html',
+      component: IfComponent,
       description: 'Only executes the child nodes if the condition is met',
     });
     this._artefactService.register('Session', {

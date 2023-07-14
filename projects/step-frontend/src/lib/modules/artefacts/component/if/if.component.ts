@@ -7,17 +7,17 @@ import {
 } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
 
-interface EchoArtefact extends AbstractArtefact {
-  text: DynamicValueString;
+interface IfArtefact extends AbstractArtefact {
+  condition: DynamicValueString;
 }
 
 @Component({
-  selector: 'step-echo',
-  templateUrl: './echo.component.html',
-  styleUrls: ['./echo.component.scss'],
+  selector: 'step-if',
+  templateUrl: './if.component.html',
+  styleUrls: ['./if.component.scss'],
   providers: [ArtefactFormChangeHelperService],
 })
-export class EchoComponent extends BaseArtefactComponent<EchoArtefact> {
+export class IfComponent extends BaseArtefactComponent<IfArtefact> {
   @ViewChild('form')
   protected form!: NgForm;
 }
