@@ -21,6 +21,7 @@ import { TestScenarioComponent } from './component/test-scenario/test-scenario.c
 import { TestCaseComponent } from './component/test-case/test-case.component';
 import { WhileComponent } from './component/while/while.component';
 import { SessionComponent } from './component/session/session.component';
+import { ReturnComponent } from './component/return/return.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +45,7 @@ import { SessionComponent } from './component/session/session.component';
     TestCaseComponent,
     WhileComponent,
     SessionComponent,
+    ReturnComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -67,6 +69,7 @@ import { SessionComponent } from './component/session/session.component';
     TestCaseComponent,
     WhileComponent,
     SessionComponent,
+    ReturnComponent,
   ],
 })
 export class ArtefactsModule {
@@ -159,7 +162,7 @@ export class ArtefactsModule {
     this._artefactService.register('Return', {
       icon: 'glyphicon-share-alt',
       iconNg2: 'corner-up-right',
-      form: 'partials/artefacts/return.html',
+      component: ReturnComponent,
       description: 'Used within a Composite Keyword, set the Composite output to the returned value(s)',
     });
     this._artefactService.register('Echo', {
