@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, Input, Option, ScreensService, TableFetchLocalDataSource, ScreenInput } from '@exense/step-core';
 import { ScreenDialogsService } from '../../services/screen-dialogs.service';
+import { RenderOptionsPipe } from '../../pipes/render-options.pipe';
 
 @Component({
   selector: 'step-screen-configuration-list',
@@ -20,12 +21,16 @@ export class ScreenConfigurationListComponent {
       .addSearchStringPredicate('label', (item) => item.input!.label!)
       .addSearchStringPredicate('id', (item) => item.input!.id!)
       .addSearchStringPredicate('type', (item) => item.input!.type!)
-      .addSearchStringPredicate('options', (item) => this.optionsToString(item.input!.options!))
+      .addSearchStringPredicate('options', (item) => this._renderOptions.transform(item.input!.options!))
       .addSearchStringPredicate('activationScript', (item) => item.input!.activationExpression!.script!)
       .build()
   );
 
-  constructor(private _screensService: ScreensService, private _screenDialogs: ScreenDialogsService) {}
+  constructor(
+    private _screensService: ScreensService,
+    private _screenDialogs: ScreenDialogsService,
+    private _renderOptions: RenderOptionsPipe
+  ) {}
 
   reloadTableForCurrentChoice(choice: string) {
     this.currentlySelectedScreenChoice = choice;
@@ -58,10 +63,6 @@ export class ScreenConfigurationListComponent {
         this.loadTable();
       }
     });
-  }
-
-  optionsToString(options?: Array<Option>): string {
-    return options ? options.map((option: Option) => option.value).toString() : '';
   }
 
   private loadTable(): void {
