@@ -16,6 +16,7 @@ import { IfComponent } from './component/if/if.component';
 import { SequenceComponent } from './component/sequence/sequence.component';
 import { SynchronizedComponent } from './component/synchronized/synchronized.component';
 import { TestSetComponent } from './component/test-set/test-set.component';
+import { ForComponent } from './component/for/for.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { TestSetComponent } from './component/test-set/test-set.component';
     SequenceComponent,
     SynchronizedComponent,
     TestSetComponent,
+    ForComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -52,6 +54,7 @@ import { TestSetComponent } from './component/test-set/test-set.component';
     SequenceComponent,
     SynchronizedComponent,
     TestSetComponent,
+    ForComponent,
   ],
 })
 export class ArtefactsModule {
@@ -95,7 +98,7 @@ export class ArtefactsModule {
     this._artefactService.register('For', {
       icon: 'glyphicon-th',
       iconNg2: 'cpu',
-      form: 'partials/artefacts/for.html',
+      component: ForComponent,
       description: 'Creates a For loop at execution time and iterates through its children',
     });
     this._artefactService.register('ForEach', {
