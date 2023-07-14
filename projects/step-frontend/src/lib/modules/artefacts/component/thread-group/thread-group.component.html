@@ -4,7 +4,14 @@
       <mat-panel-title>Load distribution parameters</mat-panel-title>
     </mat-expansion-panel-header>
     <section class="panel-content">
-      <button type="button" class="calc-wizard" mat-flat-button color="primary" (click)="openDistributionWizard()">
+      <button
+        *ngIf="!context.readonly"
+        type="button"
+        class="calc-wizard"
+        mat-flat-button
+        color="primary"
+        (click)="openDistributionWizard()"
+      >
         Calculation wizard
       </button>
       <step-dynamic-textfield

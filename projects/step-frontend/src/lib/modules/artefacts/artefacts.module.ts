@@ -13,6 +13,7 @@ import { SwitchComponent } from './component/switch/switch.component';
 import { SleepComponent } from './component/sleep/sleep.component';
 import { SetComponent } from './component/set/set.component';
 import { IfComponent } from './component/if/if.component';
+import { SequenceComponent } from './component/sequence/sequence.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { IfComponent } from './component/if/if.component';
     SleepComponent,
     SetComponent,
     IfComponent,
+    SequenceComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -43,6 +45,7 @@ import { IfComponent } from './component/if/if.component';
     SleepComponent,
     SetComponent,
     IfComponent,
+    SequenceComponent,
   ],
 })
 export class ArtefactsModule {
@@ -117,19 +120,19 @@ export class ArtefactsModule {
     this._artefactService.register('Sequence', {
       icon: 'glyphicon-align-justify',
       iconNg2: 'align-justify',
-      form: 'partials/artefacts/sequence.html',
+      component: SequenceComponent,
       description: 'Guarantees the ordering of the child nodes, as displayed in the tree.',
     });
     this._artefactService.register('BeforeSequence', {
       icon: 'glyphicon-arrow-up',
       iconNg2: 'arrow-up',
-      form: 'partials/artefacts/sequence.html',
+      component: SequenceComponent,
       description: '',
     });
     this._artefactService.register('AfterSequence', {
       icon: 'glyphicon-arrow-down',
       iconNg2: 'arrow-down',
-      form: 'partials/artefacts/sequence.html',
+      component: SequenceComponent,
       description: '',
     });
     this._artefactService.register('Return', {
@@ -184,19 +187,19 @@ export class ArtefactsModule {
     this._artefactService.register('BeforeThread', {
       icon: 'glyphicon-arrow-left',
       iconNg2: 'chevron-left',
-      form: 'partials/artefacts/sequence.html',
+      component: SequenceComponent,
       description: '',
     });
     this._artefactService.register('AfterThread', {
       icon: 'glyphicon-arrow-right',
       iconNg2: 'chevron-right',
-      form: 'partials/artefacts/sequence.html',
+      component: SequenceComponent,
       description: '',
     });
     this._artefactService.register('Thread', {
       icon: 'glyphicon-resize-horizontal',
       iconNg2: 'code',
-      form: 'partials/artefacts/threadGroup.html',
+      component: ThreadGroupComponent,
       description: '',
       isSelectable: false,
     });
