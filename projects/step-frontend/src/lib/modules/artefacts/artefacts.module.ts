@@ -19,6 +19,7 @@ import { TestSetComponent } from './component/test-set/test-set.component';
 import { ForComponent } from './component/for/for.component';
 import { TestScenarioComponent } from './component/test-scenario/test-scenario.component';
 import { TestCaseComponent } from './component/test-case/test-case.component';
+import { WhileComponent } from './component/while/while.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { TestCaseComponent } from './component/test-case/test-case.component';
     ForComponent,
     TestScenarioComponent,
     TestCaseComponent,
+    WhileComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -61,6 +63,7 @@ import { TestCaseComponent } from './component/test-case/test-case.component';
     ForComponent,
     TestScenarioComponent,
     TestCaseComponent,
+    WhileComponent,
   ],
 })
 export class ArtefactsModule {
@@ -116,7 +119,7 @@ export class ArtefactsModule {
     this._artefactService.register('While', {
       icon: 'glyphicon-repeat',
       iconNg2: 'rotate-cw',
-      form: 'partials/artefacts/while.html',
+      component: WhileComponent,
       description: 'Iterates over the node content until the given condition is not met',
     });
     this._artefactService.register('DataSet', {
