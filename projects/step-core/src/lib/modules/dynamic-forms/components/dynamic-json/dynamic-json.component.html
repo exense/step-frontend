@@ -1,0 +1,36 @@
+<step-expression-input
+  *ngIf="dynamic; else constantValueTemplate"
+  [label]="label"
+  [isParentInvalid]="!!_ngControl.invalid"
+  [showRequiredAsterisk]="showRequiredAsterisk"
+  [ngModel]="expression"
+  [disabled]="isDisabled"
+  (ngModelChange)="onExpressionChange($event)"
+  (toggleConstantValue)="toggleDynamicExpression(false)"
+></step-expression-input>
+<ng-template #constantValueTemplate>
+  <section class="button-content">
+    <button
+      type="button"
+      mat-stroked-button
+      matTooltip="Use a dynamic expression to set this attribute"
+      matTooltipPosition="below"
+      [disabled]="isDisabled"
+      (click)="toggleDynamicExpression(true)"
+    >
+      <step-icon name="zap"></step-icon>
+    </button>
+  </section>
+  <step-dynamic-field-editor
+    [value]="value"
+    (valueChange)="onValueChange($event)"
+    [schema]="schema"
+    [primaryFieldsLabel]="primaryFieldsDescription"
+    [optionalFieldsLabel]="optionalFieldsLabel"
+    [addFieldBtnLabel]="addFieldBtnLabel"
+    [jsonFieldsLabel]="jsonFieldsLabel"
+    [isDisabled]="isDisabled"
+    (blur)="onBlur()"
+  >
+  </step-dynamic-field-editor>
+</ng-template>

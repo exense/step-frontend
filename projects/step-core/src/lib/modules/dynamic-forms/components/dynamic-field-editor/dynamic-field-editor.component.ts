@@ -21,6 +21,7 @@ export class DynamicFieldEditorComponent implements OnChanges {
   @Input() jsonFieldsLabel?: string;
 
   @Output() valueChange = new EventEmitter<string | undefined>();
+  @Output() blur = new EventEmitter<void>();
 
   protected showJson: boolean = false;
   protected internalValue?: DynamicFieldGroupValue;

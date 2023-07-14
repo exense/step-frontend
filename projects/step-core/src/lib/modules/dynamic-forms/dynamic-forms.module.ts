@@ -11,6 +11,7 @@ import { DynamicFieldGroupEditorComponent } from './components/dynamic-field-gro
 import { AddFieldButtonComponent } from './components/add-field-button/add-field-button.component';
 import { DynamicFieldEditorComponent } from './components/dynamic-field-editor/dynamic-field-editor.component';
 import { DynamicCheckboxComponent } from './components/dynamic-checkbox/dynamic-checkbox.component';
+import { DynamicJsonComponent } from './components/dynamic-json/dynamic-json.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { DynamicCheckboxComponent } from './components/dynamic-checkbox/dynamic-
     AddFieldButtonComponent,
     DynamicFieldEditorComponent,
     DynamicCheckboxComponent,
+    DynamicJsonComponent,
   ],
   imports: [CommonModule, FormsModule, StepBasicsModule, StepMaterialModule, StepIconsModule, ReactiveFormsModule],
   exports: [
@@ -30,6 +32,7 @@ import { DynamicCheckboxComponent } from './components/dynamic-checkbox/dynamic-
     DynamicFieldEditorComponent,
     DynamicFieldGroupEditorComponent,
     DynamicCheckboxComponent,
+    DynamicJsonComponent,
   ],
 })
 export class DynamicFormsModule {}
@@ -40,6 +43,7 @@ export * from './components/dynamic-field/dynamic-field.component';
 export * from './components/dynamic-field-group-editor/dynamic-field-group-editor.component';
 export * from './components/dynamic-field-editor/dynamic-field-editor.component';
 export * from './components/dynamic-checkbox/dynamic-checkbox.component';
+export * from './components/dynamic-json/dynamic-json.component';
 export * from './shared/dynamic-fields-schema';
 export * from './shared/dynamic-field-group-value';
 export * from './services/schemas-factory.service';

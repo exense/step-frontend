@@ -20,6 +20,7 @@ import { ForComponent } from './component/for/for.component';
 import { TestScenarioComponent } from './component/test-scenario/test-scenario.component';
 import { TestCaseComponent } from './component/test-case/test-case.component';
 import { WhileComponent } from './component/while/while.component';
+import { SessionComponent } from './component/session/session.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +43,7 @@ import { WhileComponent } from './component/while/while.component';
     TestScenarioComponent,
     TestCaseComponent,
     WhileComponent,
+    SessionComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -64,6 +66,7 @@ import { WhileComponent } from './component/while/while.component';
     TestScenarioComponent,
     TestCaseComponent,
     WhileComponent,
+    SessionComponent,
   ],
 })
 export class ArtefactsModule {
@@ -174,7 +177,7 @@ export class ArtefactsModule {
     this._artefactService.register('Session', {
       icon: 'glyphicon-magnet',
       iconNg2: 'briefcase',
-      form: 'partials/artefacts/functionGroup.html',
+      component: SessionComponent,
       description: 'Guarantees that Keywords are executed within the the same Session i.e. Agent Token',
     });
     this._artefactService.register('Set', {
