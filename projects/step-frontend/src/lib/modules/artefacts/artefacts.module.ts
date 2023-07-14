@@ -15,6 +15,7 @@ import { SetComponent } from './component/set/set.component';
 import { IfComponent } from './component/if/if.component';
 import { SequenceComponent } from './component/sequence/sequence.component';
 import { SynchronizedComponent } from './component/synchronized/synchronized.component';
+import { TestSetComponent } from './component/test-set/test-set.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { SynchronizedComponent } from './component/synchronized/synchronized.com
     IfComponent,
     SequenceComponent,
     SynchronizedComponent,
+    TestSetComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -49,6 +51,7 @@ import { SynchronizedComponent } from './component/synchronized/synchronized.com
     IfComponent,
     SequenceComponent,
     SynchronizedComponent,
+    TestSetComponent,
   ],
 })
 export class ArtefactsModule {
@@ -60,7 +63,7 @@ export class ArtefactsModule {
     this._artefactService.register('TestSet', {
       icon: 'glyphicon-folder-close',
       iconNg2: 'folder',
-      form: 'partials/artefacts/testSet.html',
+      component: TestSetComponent,
       description: 'Used to group up TestCase’s as a single unit and executing them in parallel',
     });
     this._artefactService.register('TestCase', {
