@@ -119,26 +119,6 @@ angular
       });
     };
   })
-  .controller('DataSourceCtrl', function ($scope, $uibModal, $location, $http, FunctionDialogs) {
-    $scope.dataSourceTypes = [
-      { name: 'excel', label: 'Excel' },
-      { name: 'csv', label: 'CSV' },
-      { name: 'sql', label: 'SQL' },
-      { name: 'file', label: 'Flat file' },
-      { name: 'folder', label: 'Directory' },
-      { name: 'sequence', label: 'Integer sequence' },
-      { name: 'json-array', label: 'Json array' },
-      { name: 'json', label: 'Json String (Legacy)' },
-      { name: 'gsheet', label: 'Google Sheet v4' },
-    ];
-
-    $scope.loadInitialDataSourceConfiguration = function () {
-      $http.get('rest/datapool/types/' + $scope.artefact.dataSourceType).then(function (response) {
-        $scope.artefact.dataSource = response.data;
-        $scope.save();
-      });
-    };
-  })
   .controller('DefaultArtefactFormCtrl', function ($scope) {
     $scope.getEditableArtefactProperties = function () {
       return _.without(

@@ -1,0 +1,49 @@
+<form #form="ngForm">
+  <step-data-source-configuration [context]="context"> </step-data-source-configuration>
+  <step-dynamic-textfield
+    label="Number of threads"
+    tooltip="Number of threads to use in order to parallelize the loop"
+    [isNumber]="true"
+    [(ngModel)]="context.artefact!.threads"
+    [disabled]="context.readonly"
+    name="threads"
+  >
+  </step-dynamic-textfield>
+  <step-dynamic-textfield
+    label="Maximum number of failures"
+    tooltip="The number of failures before the loop is stopped. If empty, the loop will not stop due to failure"
+    [isNumber]="true"
+    [(ngModel)]="context.artefact!.maxFailedLoops"
+    [disabled]="context.readonly"
+    name="maxFailedLoops"
+  >
+  </step-dynamic-textfield>
+  <mat-expansion-panel [(expanded)]="showHandles">
+    <mat-expansion-panel-header>
+      <mat-panel-title>Handles</mat-panel-title>
+    </mat-expansion-panel-header>
+    <section class="panel-content">
+      <step-dynamic-textfield
+        label="Row handle"
+        [(ngModel)]="context.artefact!.item"
+        [disabled]="context.readonly"
+        name="item"
+      >
+      </step-dynamic-textfield>
+      <step-dynamic-textfield
+        label="UserId variable (handle)"
+        [(ngModel)]="context.artefact!.userItem"
+        [disabled]="context.readonly"
+        name="userItem"
+      >
+      </step-dynamic-textfield>
+      <step-dynamic-textfield
+        label="Global counter variable (handle)"
+        [(ngModel)]="context.artefact!.globalCounter"
+        [disabled]="context.readonly"
+        name="globalCounter"
+      >
+      </step-dynamic-textfield>
+    </section>
+  </mat-expansion-panel>
+</form>

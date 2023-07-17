@@ -22,6 +22,7 @@ import { SessionComponent } from './component/session/session.component';
 import { ReturnComponent } from './component/return/return.component';
 import { DataSourceConfigurationComponent } from './component/data-source-configuration/data-source-configuration.component';
 import { DataSetComponent } from './component/data-set/data-set.component';
+import { ForEachComponent } from './component/for-each/for-each.component';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ import { DataSetComponent } from './component/data-set/data-set.component';
     ReturnComponent,
     DataSourceConfigurationComponent,
     DataSetComponent,
+    ForEachComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -70,6 +72,7 @@ import { DataSetComponent } from './component/data-set/data-set.component';
     ReturnComponent,
     DataSourceConfigurationComponent,
     DataSetComponent,
+    ForEachComponent,
   ],
 })
 export class ArtefactsModule {
@@ -117,7 +120,7 @@ export class ArtefactsModule {
     this._artefactService.register('ForEach', {
       icon: 'glyphicon-th',
       iconNg2: 'cpu',
-      form: 'partials/artefacts/forEach.html',
+      component: ForEachComponent,
       description: 'Creates a ForEach loop based on a collection and iterates through the child nodes',
     });
     this._artefactService.register('While', {
