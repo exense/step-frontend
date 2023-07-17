@@ -205,7 +205,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
     const root = plan.root;
     if (root) {
       const selectedId = selectedArtefactId || root.id!;
-      this._treeState.init(root, [selectedId]);
+      this._treeState.init(root, { selectedNodeIds: [selectedId] });
     }
     this._planHistory.init(plan);
   }
@@ -219,7 +219,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
 
     const planUpdateByEditor$ = this.planChange$.pipe(
       tap((plan) => {
-        this._treeState.init(plan.root!, undefined, false);
+        this._treeState.init(plan.root!, { expandAllByDefault: false });
         this._planHistory.addToHistory(plan);
         this.planInternal$.next(plan);
       })
@@ -227,7 +227,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
 
     const planUpdatedByHistory$ = this._planHistory.planChange$.pipe(
       tap((plan) => {
-        this._treeState.init(plan.root!, undefined, false);
+        this._treeState.init(plan.root!, { expandAllByDefault: false });
         this.planInternal$.next(plan);
       })
     );

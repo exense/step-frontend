@@ -47,6 +47,20 @@ $default-color: dc.default-colors();
   @return $config;
 }
 
+@mixin overlay($color) {
+  content: ' ';
+  display: block;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  position: absolute;
+  background: $color;
+}
+
+$menu-item-height: 4.8rem;
+$menu-sub-item-height: 3.2rem;
+
 @mixin sidebar($config: null) {
   @if not $config {
     $config: step-define-sidebar-config();
@@ -60,6 +74,10 @@ $default-color: dc.default-colors();
     display: flex;
     flex-direction: column;
     height: 100vh;
+
+    #mainView {
+      z-index: 0;
+    }
   }
 
   #main.main-when-sidebar-closed {
@@ -240,8 +258,31 @@ $default-color: dc.default-colors();
       $helpSupportHeight: map.get($config, help-and-support-height);
       margin-bottom: calc(#{$helpSupportHeight} + 16px);
 
-      .sidebar-collapsable-tab:first-child label {
-        border-radius: 8px 8px 0 0;
+      .sidebar-collapsable-tab {
+        &:first-child {
+          & > label {
+            padding-top: 0.6rem;
+          }
+          &::before {
+            display: block;
+            content: ' ';
+            height: 0.8rem;
+            background-color: map.get($config, menu-color);
+            border-radius: 0.8rem 0.8rem 0 0;
+          }
+        }
+        &:last-child {
+          & > label {
+            padding-bottom: 0.6rem;
+          }
+          &::after {
+            display: block;
+            content: ' ';
+            height: 0.8rem;
+            background-color: map.get($config, menu-color);
+            border-radius: 0 0 0.8rem 0.8rem;
+          }
+        }
       }
     }
 
@@ -311,7 +352,7 @@ $default-color: dc.default-colors();
       .sidebar-subtab {
         display: flex;
         align-items: center;
-        height: 32px;
+        height: $menu-sub-item-height;
         padding: 0 14px 0 16px;
         cursor: pointer;
         color: map.get($config, menu-secondary);
@@ -346,11 +387,6 @@ $default-color: dc.default-colors();
 
     .sidebar-subtab:hover {
       background: map.get($config, selection-color);
-    }
-
-    #sidebar-categories-tabs > div:last-child {
-      border-radius: 0 0 8px 8px;
-      overflow: hidden;
     }
 
     span.sidebar-version {
@@ -420,7 +456,6 @@ $default-color: dc.default-colors();
       #sidebar-home-and-settings {
         width: map.get($config, width-closed);
       }
-
       #sidebar-categories-tabs {
         margin-bottom: 16px;
       }
@@ -438,6 +473,51 @@ $default-color: dc.default-colors();
         padding: 0 12px;
       }
 
+      // MENU ITEMS TOOLTIPS FOR SMALL SCREEN BEGIN
+      .sidebar-collapsable-tab > label:hover > .sidebar-aligned-text,
+      .sidebar-subtab:hover > .sidebar-aligned-subtext {
+        display: flex;
+        background: map.get($config, background-color);
+        position: fixed;
+        align-items: center;
+        border-top-right-radius: 0.8rem;
+        border-bottom-right-radius: 0.8rem;
+        align-self: start;
+        &::before {
+          @include overlay(map.get($config, menu-color));
+        }
+      }
+      .sidebar-collapsable-tab > label:hover {
+        display: flex;
+        align-items: center;
+        & > .sidebar-aligned-text {
+          left: 5rem;
+          padding-left: 1rem;
+          height: $menu-item-height;
+          min-width: 16.6rem;
+          margin: calc(var(--scrollOffset, 0rem) - 1.4rem) 0 0 0;
+          + span {
+            display: flex;
+            position: fixed;
+            left: 20rem;
+            height: $menu-item-height;
+            align-items: center;
+            align-self: start;
+            margin: calc(var(--scrollOffset, 0rem) - 1.4rem) 0 0 0;
+          }
+        }
+      }
+      .sidebar-subtab:hover > .sidebar-aligned-subtext {
+        height: $menu-sub-item-height;
+        min-width: 16rem;
+        left: 5.6rem;
+        margin: var(--scrollOffset, 0) 0 0 0;
+        &::after {
+          @include overlay(map.get($config, selection-color));
+        }
+      }
+      // MENU ITEMS TOOLTIPS FOR SMALL SCREEN END
+
       & ~ step-tenant-selection-downgraded {
         width: map.get($config, width-closed);
         visibility: hidden;
@@ -453,6 +533,12 @@ $default-color: dc.default-colors();
         }
         & ~ step-tenant-selection-downgraded {
           width: map.get($config, width-closed-small-screen);
+        }
+        .sidebar-subtab:hover > .sidebar-aligned-subtext {
+          left: 4.6rem;
+        }
+        .sidebar-collapsable-tab > label:hover > .sidebar-aligned-text {
+          left: 3.9rem;
         }
       }
     }

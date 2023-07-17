@@ -25,10 +25,11 @@
   </step-btn-group>
 </section>
 <step-table [dataSource]="searchableScreens" matSort [matSortDisableClear]="true">
+  <step-entity-column-container entityName="screenInputs"></step-entity-column-container>
   <ng-container matColumnDef="label" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header disabled>Label</th>
     <td mat-cell *matCellDef="let element">
-      <entity-icon [entity]="element" entity-name="'screenInputs'"></entity-icon>{{ element.input.label }}
+      {{ element.input.label }}
     </td>
   </ng-container>
   <ng-container matColumnDef="id" stepSearchCol>

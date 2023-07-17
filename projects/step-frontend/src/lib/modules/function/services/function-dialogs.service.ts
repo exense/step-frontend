@@ -61,11 +61,11 @@ export class FunctionDialogsService implements FunctionLinkDialogService {
 
   openDeleteFunctionDialog(id: string, name: string): Observable<any> {
     return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Keyword "${name}"`)).pipe(
-      map((_) => true),
-      catchError((_) => of(false)),
+      map(() => true),
+      catchError(() => of(false)),
       tap((isDeleteConfirmed) => console.log('IS DELETE CONFIRMED', isDeleteConfirmed)),
       switchMap((isDeleteConfirmed) =>
-        isDeleteConfirmed ? this._functionApiService.deleteFunction(id).pipe(map((_) => true)) : of(false)
+        isDeleteConfirmed ? this._functionApiService.deleteFunction(id).pipe(map(() => true)) : of(false)
       )
     );
   }
@@ -74,11 +74,11 @@ export class FunctionDialogsService implements FunctionLinkDialogService {
     this._isUsedByDialog.displayDialog(`Keyword "${name}" is used by`, 'KEYWORD_ID', id);
   }
 
-  openExportFunctionDialog(id: string, name: string): Observable<any> {
-    return this._exportDialogs.displayExportDialog('Keyword export', 'functions/' + id, name + '.sta');
+  openExportFunctionDialog(id: string, name: string): Observable<boolean> {
+    return this._exportDialogs.displayExportDialog('Keyword export', 'functions', `${name}.sta`, id);
   }
 
-  openExportAllFunctionsDialog(): Observable<any> {
+  openExportAllFunctionsDialog(): Observable<boolean> {
     return this._exportDialogs.displayExportDialog('Keyword export', 'functions', 'allKeywords.sta');
   }
 

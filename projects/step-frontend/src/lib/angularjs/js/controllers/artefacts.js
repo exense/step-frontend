@@ -32,50 +32,6 @@ angular
     );
   })
 
-  .directive('artefactDetails', function () {
-    return {
-      restrict: 'E',
-      scope: {
-        artefact: '=',
-        onSave: '&',
-        readonly: '=',
-        handle: '=',
-      },
-      controller: ['$scope', '$location', 'artefactTypes', 'AuthService', 'PlanDialogsService', function ($scope, $location, artefactTypes, AuthService, PlanDialogsService) {
-        $scope.authService = AuthService;
-        $scope.showAttributes = true;
-        $scope.isKeyword = false;
-        $scope.$watch('artefact', function () {
-          if ($scope.artefact) {
-            var classname = $scope.artefact._class;
-            $scope.isKeyword = classname === 'CallKeyword';
-            $scope.icon = artefactTypes.getIcon(classname);
-            $scope.label = artefactTypes.getLabel(classname);
-            $scope.editor = artefactTypes.getEditor(classname);
-            $scope.description = artefactTypes.getDescription(classname);
-          } else {
-            $scope.isKeyword = false;
-          }
-        });
-
-        $scope.save = function () {
-          if (!$scope.readonly) {
-            if ($scope.onSave) {
-              $scope.artefact.useDynamicName = $scope.artefact.dynamicName.dynamic;
-              $scope.onSave({ artefact: $scope.artefact });
-            }
-          }
-        };
-
-        $scope.openDistributionWizard = function () {
-          PlanDialogsService
-            .openThreadGroupDistributionWizard($scope.artefact)
-            .subscribe(() => $scope.save());
-        };
-      }],
-      templateUrl: 'partials/artefacts/abstractArtefact.html',
-    };
-  })
   .controller('CallPlanCtrl', function ($scope, $location, $http, PlanDialogsService, LinkProcessor, Dialogs) {
     $scope.gotoPlan = () =>
       LinkProcessor.process($scope.planProject)
@@ -207,60 +163,6 @@ angular
       { name: 'MATCHES', label: 'matches' },
     ];
   })
-  .directive(
-    'customJsonEditor',
-    function ($http, $timeout, $interval, stateStorage, $filter, $location, $compile, Dialogs) {
-      return {
-        restrict: 'E',
-        scope: {
-          argsValue: '=',
-          compileHtml: '=',
-          onSave: '&',
-        },
-        controller: function ($scope, $location, $rootScope, AuthService) {
-          $scope.inputs = {};
-
-          $scope.getFunctionInputs = function (validateJson) {
-            try {
-              $scope.inputs = JSON.parse($scope.argsValue);
-              return true;
-            } catch (err) {
-              if (validateJson) {
-                Dialogs.showErrorMsg('Invalid JSON: ' + err);
-              }
-              return false;
-            }
-          };
-
-          $scope.save = function () {
-            $scope.argsValue = JSON.stringify($scope.inputs);
-            $timeout(function () {
-              $scope.onSave({ argsValue: $scope.argsValue });
-            });
-          };
-        },
-        link: function ($scope, element, attrs) {
-          $scope.$watch('compileHtml', function (newCompileHtml) {
-            if (newCompileHtml) {
-              var template = $compile('<div id="customTemplate">' + $scope.compileHtml + '</div>')($scope);
-              var el = $('#customTemplate');
-              if (el.length) {
-                el.replaceWith(template);
-              } else {
-                element.append(template);
-              }
-            }
-          });
-
-          $scope.$watch('argsValue', function (newArgs, oldArgs) {
-            if (newArgs) {
-              $scope.getFunctionInputs(false);
-            }
-          });
-        },
-      };
-    }
-  )
 
   .directive(
     'jsonEditor',

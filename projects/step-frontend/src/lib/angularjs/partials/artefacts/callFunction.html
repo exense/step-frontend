@@ -1,5 +1,5 @@
 <div ng-controller="CallFunctionCtrl">
-  <div ng-if="!targetFunction.useCustomTemplate && ready">
+  <div ng-if="ready">
     <div class="form-group" ng-if="artefact.functionId">
       <label>Keyword</label>
       <div class="input-group">
@@ -58,10 +58,4 @@
       </div>
     </fieldset>
   </div>
-  <custom-json-editor
-    ng-if="targetFunction.useCustomTemplate && ready"
-    compile-html="targetFunction.htmlTemplate"
-    args-value="artefact.argument.value"
-    on-save="save()"
-  />
 </div>

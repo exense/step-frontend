@@ -4,23 +4,22 @@ import {
   AuthService,
   DashboardService,
   ExecutiontTaskParameters,
-  TableFetchLocalDataSource,
+  ScheduledTaskDialogsService,
 } from '@exense/step-core';
 import { Observable, switchMap } from 'rxjs';
-import { ScheduledTaskDialogsService } from '@exense/step-core';
 import { Location } from '@angular/common';
 
 @Injectable()
 export class ScheduledTaskLogicService {
-  readonly STATUS_ACTIVE_STRING = 'On';
-  readonly STATUS_INACTIVE_STRING = 'Off';
-  readonly STATUS: ReadonlyArray<string> = [this.STATUS_ACTIVE_STRING, this.STATUS_INACTIVE_STRING];
-
   private _authService = inject(AuthService);
   private _dashboardService = inject(DashboardService);
   private _schedulerService = inject(AugmentedSchedulerService);
   private _scheduledTaskDialogs = inject(ScheduledTaskDialogsService);
   private _location = inject(Location);
+
+  readonly STATUS_ACTIVE_STRING = 'On';
+  readonly STATUS_INACTIVE_STRING = 'Off';
+  readonly STATUS: ReadonlyArray<string> = [this.STATUS_ACTIVE_STRING, this.STATUS_INACTIVE_STRING];
 
   readonly dataSource = this._schedulerService.createSelectionDataSource();
 
@@ -68,21 +67,33 @@ export class ScheduledTaskLogicService {
     }
   }
 
-  deletePrameter(scheduledTask: ExecutiontTaskParameters): void {
-    this._scheduledTaskDialogs.removeScheduledTask(scheduledTask).subscribe(() => this.loadTable());
+  deleteParameter(scheduledTask: ExecutiontTaskParameters): void {
+    this._scheduledTaskDialogs.removeScheduledTask(scheduledTask).subscribe((result) => {
+      if (result) {
+        this.loadTable();
+      }
+    });
   }
 
   editParameter(scheduledTask: ExecutiontTaskParameters): void {
     this._schedulerService
       .getExecutionTaskById(scheduledTask.id!)
       .pipe(switchMap((task) => this._scheduledTaskDialogs.editScheduledTask(task)))
-      .subscribe((_) => this.loadTable());
+      .subscribe((result) => {
+        if (result) {
+          this.loadTable();
+        }
+      });
   }
 
   createParameter() {
     this._schedulerService
       .createExecutionTask()
       .pipe(switchMap((task) => this._scheduledTaskDialogs.editScheduledTask(task)))
-      .subscribe((_) => this.loadTable());
+      .subscribe((result) => {
+        if (result) {
+          this.loadTable();
+        }
+      });
   }
 }

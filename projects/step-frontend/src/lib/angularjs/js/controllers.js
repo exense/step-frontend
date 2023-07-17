@@ -116,9 +116,9 @@ tecAdminControllers.directive('executionCommands', [
   '$uibModal',
   '$timeout',
   'AuthService',
-  'schedulerServices',
   'executionServices',
   'ngCopy',
+  'ScheduledTaskDialogsService',
   function (
     $rootScope,
     $http,
@@ -127,9 +127,9 @@ tecAdminControllers.directive('executionCommands', [
     $uibModal,
     $timeout,
     AuthService,
-    schedulerServices,
     executionServices,
-    ngCopy
+    ngCopy,
+    ScheduledTaskDialogsService,
   ) {
     return {
       restrict: 'E',
@@ -220,7 +220,11 @@ tecAdminControllers.directive('executionCommands', [
 
         $scope.schedule = function () {
           var executionParams = buildExecutionParams(false);
-          schedulerServices.schedule(executionParams);
+          ScheduledTaskDialogsService.newScheduledTask(executionParams).subscribe((result) => {
+            if (result) {
+              $location.path('/root/scheduler');
+            }
+          });
         };
       },
     };

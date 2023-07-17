@@ -8,4 +8,5 @@ export enum CustomRegistryType {
   dashlet = 'dashlet', // this is a temporary type, while we have to use an old router
 
   executionCustomPanel = 'executionCustomPanel',
+  artefact = 'artefact',
 }

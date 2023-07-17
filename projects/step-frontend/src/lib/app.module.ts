@@ -14,6 +14,7 @@ import { PlanModule } from './modules/plan/plan.module';
 import { ResourcesModule } from './modules/resources/resources.module';
 import { SchedulerModule } from './modules/scheduler/scheduler.module';
 import { TimeSeriesModule } from './modules/timeseries/time-series.module';
+import { ArtefactsModule } from './modules/artefacts/artefacts.module';
 import { PLUGINS_INITIALIZER } from './plugins-initializer/plugins-initializer';
 import { Settings } from 'luxon';
 
@@ -36,6 +37,7 @@ Settings.defaultLocale = 'en';
     TimeSeriesModule,
     DefaultThemeModule,
     GenericFunctionModule,
+    ArtefactsModule,
     ResourcesModule,
   ],
   providers: [PLUGINS_INITIALIZER],

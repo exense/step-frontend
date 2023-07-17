@@ -1,9 +1,9 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
-import { NgControl } from '@angular/forms';
-import { DynamicValueString } from '../../../../client/step-client-module';
+import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
+import { ControlValueAccessor, NgControl } from '@angular/forms';
+import { DynamicValueInteger, DynamicValueString } from '../../../../client/step-client-module';
 import { DialogsService } from '../../../../shared';
 
-type OnChange = (dynamicValueString: DynamicValueString) => void;
+type OnChange = (dynamicValueString: DynamicValueString | DynamicValueInteger) => void;
 type OnTouch = () => void;
 
 @Component({
@@ -12,24 +12,29 @@ type OnTouch = () => void;
   styleUrls: ['./dynamic-textfield.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class DynamicTextfieldComponent {
+export class DynamicTextfieldComponent implements ControlValueAccessor {
   @Input() label?: string;
   @Input() tooltip?: string;
   @Input() showRequiredAsterisk: boolean = false;
+  @Input() isNumber: boolean = false;
+  @Output() blur = new EventEmitter<void>();
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;
 
-  value: string = '';
+  value: string | number = '';
   dynamic: boolean = false;
   expression: string = '';
+  isDisabled: boolean = false;
+
+  readonly numberInputInvalidChars = ['+', '-', 'e'];
 
   constructor(private _dialogsService: DialogsService, public _ngControl: NgControl) {
     this._ngControl.valueAccessor = this;
   }
 
-  writeValue(dynamicValueString: DynamicValueString | null): void {
-    this.value = dynamicValueString?.value || '';
+  writeValue(dynamicValueString: DynamicValueString | DynamicValueInteger | null): void {
+    this.value = dynamicValueString?.value ?? (this.isNumber ? 0 : '');
     this.dynamic = dynamicValueString?.dynamic || false;
     this.expression = dynamicValueString?.expression || '';
   }
@@ -42,28 +47,39 @@ export class DynamicTextfieldComponent {
     this.onTouch = onTouch;
   }
 
-  onValueChange(value: string): void {
+  setDisabledState(isDisabled: boolean): void {
+    this.isDisabled = isDisabled;
+  }
+
+  onValueChange(value: string | number): void {
     this.value = value;
     this.emitChanges();
   }
 
   onBlur(): void {
     this.onTouch?.();
+    this.blur.emit();
   }
 
   editConstantValue(): void {
-    this._dialogsService.enterValue('Free text editor', this.value, 'lg', 'enterTextValueDialog', (value) => {
-      this.value = value;
-      this.emitChanges();
-    });
+    this._dialogsService.enterValue(
+      'Free text editor',
+      this.value.toString(),
+      'lg',
+      'enterTextValueDialog',
+      (value) => {
+        this.value = this.parseValue(value);
+        this.emitChanges();
+      }
+    );
   }
 
   toggleDynamicExpression(dynamic: boolean): void {
     if (dynamic) {
-      this.expression = this.value;
+      this.expression = this.value.toString();
       this.value = '';
     } else {
-      this.value = this.expression;
+      this.value = this.parseValue(this.expression);
       this.expression = '';
     }
 
@@ -76,15 +92,25 @@ export class DynamicTextfieldComponent {
     this.emitChanges();
   }
 
-  private toDynamicValueString(): DynamicValueString {
+  private toDynamicValueString(): DynamicValueString | DynamicValueInteger {
     return {
       ...(this.value ? { value: this.value } : {}),
       ...(this.dynamic ? { dynamic: this.dynamic } : {}),
       ...(this.expression ? { expression: this.expression } : {}),
-    };
+    } as DynamicValueString | DynamicValueInteger;
   }
 
   private emitChanges(): void {
     this.onChange?.(this.toDynamicValueString());
+  }
+
+  private parseValue(value: string): string | number {
+    if (this.isNumber) {
+      let numValue = parseFloat(value);
+      numValue = isNaN(numValue) ? 0 : numValue;
+      return numValue;
+    } else {
+      return value;
+    }
   }
 }

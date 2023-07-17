@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE } from '../shared';
+import { VIEW_ID_LINK_PREFIX } from '../modules/basics/services/view-id-link-prefix.token';
 
 export interface CustomView {
   template: string;
@@ -29,7 +30,7 @@ export interface Dashlet {
   providedIn: 'root',
 })
 export class ViewRegistryService {
-  static readonly VIEW_ID_LINK_PREFIX: string = 'link:';
+  private _viewIdLinkPrefix = inject(VIEW_ID_LINK_PREFIX);
 
   registeredViews: { [key: string]: CustomView } = {};
   registeredMenuEntries: MenuEntry[] = [];
@@ -68,26 +69,21 @@ export class ViewRegistryService {
     // Sub Menus Support
     this.registerMenuEntry(
       'Documentation',
-      ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('https://step.exense.ch/knowledgebase/'),
+      this._viewIdLinkPrefix.concat('https://step.exense.ch/knowledgebase/'),
       'book-open',
       {
         weight: 10,
         parentId: 'support-root',
       }
     );
-    this.registerMenuEntry('REST API', ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('doc/rest/'), 'compass', {
+    this.registerMenuEntry('REST API', this._viewIdLinkPrefix.concat('doc/rest/'), 'compass', {
       weight: 20,
       parentId: 'support-root',
     });
-    this.registerMenuEntry(
-      'About',
-      ViewRegistryService.VIEW_ID_LINK_PREFIX.concat('https://step.exense.ch/'),
-      'help-circle',
-      {
-        weight: 30,
-        parentId: 'support-root',
-      }
-    );
+    this.registerMenuEntry('About', this._viewIdLinkPrefix.concat('https://step.exense.ch/'), 'help-circle', {
+      weight: 30,
+      parentId: 'support-root',
+    });
   }
 
   getCustomView(view: string): CustomView {

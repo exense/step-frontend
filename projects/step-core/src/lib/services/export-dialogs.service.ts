@@ -1,28 +1,27 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { UibModalHelperService } from './uib-modal-helper.service';
-import { a1Promise2Observable } from '../shared';
+import { inject, Injectable } from '@angular/core';
+import { map, Observable } from 'rxjs';
+import { ExportDialogData } from '../shared';
+import { MatDialog } from '@angular/material/dialog';
+import { ExportDialogComponent } from '../components/export-dialog/export-dialog.component';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ExportDialogsService {
-  constructor(private _uibModalHelper: UibModalHelperService) {}
+  private _madDialog = inject(MatDialog);
 
-  displayExportDialog<T>(title: string, path: string, filename: string): Observable<T> {
-    const modalInstance = this._uibModalHelper.open({
-      backdrop: 'static',
-      templateUrl: 'partials/exportDialog.html',
-      controller: 'exportModalCtrl',
-      resolve: {
-        title: () => title,
-        path: () => path,
-        filename: () => filename,
-        recursively: () => true,
-        parameters: () => false,
-      },
-    });
-
-    return a1Promise2Observable(modalInstance);
+  displayExportDialog(title: string, entity: string, filename: string, id?: string): Observable<boolean> {
+    return this._madDialog
+      .open<ExportDialogComponent, ExportDialogData, boolean>(ExportDialogComponent, {
+        data: {
+          title,
+          entity,
+          filename,
+          id,
+        },
+        disableClose: true,
+      })
+      .afterClosed()
+      .pipe(map((result) => !!result));
   }
 }
