@@ -12,11 +12,10 @@ import {
 } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { Observable, Subject, filter, takeUntil } from 'rxjs';
-import { AugmentedResourcesService } from '../../client/augmented/step-augmented-client.module';
-import { ResourceUploadResponse } from '../../client/generated';
+import { AugmentedResourcesService, ResourceUploadResponse } from '../../../../client/step-client-module';
 import { ResourceDialogsService } from '../../services/resource-dialogs.service';
 import { ResourceInputBridgeService } from '../../services/resource-input-bridge.service';
-import { AJS_MODULE } from '../../shared';
+import { AJS_MODULE } from '../../../../shared';
 import { UpdateResourceWarningResultState } from '../../shared/update-resource-warning-result-state.enum';
 
 const MAX_FILES = 1;
@@ -42,6 +41,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   @Input() withHelpIcon?: boolean;
   @Input() helpIconTooltip?: string;
   @Input() withDynamicSwitch?: boolean;
+  @Input() isDisabled: boolean = false;
 
   @Output() stModelChange = new EventEmitter<string>();
   @Output() dynamicSwitch = new EventEmitter<void>();

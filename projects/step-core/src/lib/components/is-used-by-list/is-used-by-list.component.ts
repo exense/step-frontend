@@ -3,7 +3,8 @@ import { IRootScopeService } from 'angular';
 import { map, startWith } from 'rxjs';
 import { FindReferencesResponse, ReferencesService } from '../../client/step-client-module';
 import { TableFetchLocalDataSource } from '../../modules/table/table.module';
-import { AJS_ROOT_SCOPE, IsUsedBySearchType } from '../../shared';
+import { AJS_ROOT_SCOPE } from '../../shared';
+import { IsUsedBySearchType } from '../../modules/basics/step-basics.module';
 
 @Component({
   selector: 'step-is-used-by-list',

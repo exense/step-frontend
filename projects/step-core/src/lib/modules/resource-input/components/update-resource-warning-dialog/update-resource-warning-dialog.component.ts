@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { AlertType } from '../../modules/basics/step-basics.module';
+import { AlertType } from '../../../../modules/basics/step-basics.module';
 import { UpdateResourceWarningResultState } from '../../shared/update-resource-warning-result-state.enum';
 
 @Component({

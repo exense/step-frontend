@@ -25,6 +25,8 @@ import { AlertDirective } from './directives/alert.directive';
 import { ValidateJsonDirective } from './directives/validate-json.directive';
 import { ErrorsListComponent } from './components/errors-list/errors-list.component';
 import { PreventCharsDirective } from './directives/prevent-chars.directive';
+import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
+import { UploadContainerComponent } from './components/upload-container/upload-container.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
@@ -52,6 +54,8 @@ import { PreventCharsDirective } from './directives/prevent-chars.directive';
     ValidateJsonDirective,
     ErrorsListComponent,
     PreventCharsDirective,
+    ProgressBarComponent,
+    UploadContainerComponent,
   ],
   exports: [
     ResourceLabelComponent,
@@ -77,6 +81,8 @@ import { PreventCharsDirective } from './directives/prevent-chars.directive';
     ValidateJsonDirective,
     ErrorsListComponent,
     PreventCharsDirective,
+    ProgressBarComponent,
+    UploadContainerComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -92,6 +98,8 @@ export * from './components/modal-window/modal-window.component';
 export * from './components/form-field/form-field.component';
 export * from './components/cron-selector/cron-selector.component';
 export * from './components/errors-list/errors-list.component';
+export * from './components/progress-bar/progress-bar.component';
+export * from './components/upload-container/upload-container.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
 export * from './pipes/has-right.pipe';
@@ -131,9 +139,12 @@ export * from './shared/array-item-label-value-extractor';
 export * from './shared/storage-proxy';
 export * from './shared/storage.token';
 export * from './shared/json-validator';
+export * from './shared/is-used-by-dialog-data';
+export * from './shared/is-used-by-search-type';
 export * from './services/persistence.service';
 export * from './services/default-page.token';
 export * from './services/view-id-link-prefix.token';
 export * from './services/navigator.service';
 export * from './services/generate-api-key.service';
 export * from './shared/logout-cleanup.token';
+export * from './services/is-used-by-dialog';

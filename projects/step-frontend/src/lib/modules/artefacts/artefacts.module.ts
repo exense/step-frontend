@@ -17,11 +17,11 @@ import { SequenceComponent } from './component/sequence/sequence.component';
 import { SynchronizedComponent } from './component/synchronized/synchronized.component';
 import { TestSetComponent } from './component/test-set/test-set.component';
 import { ForComponent } from './component/for/for.component';
-import { TestScenarioComponent } from './component/test-scenario/test-scenario.component';
-import { TestCaseComponent } from './component/test-case/test-case.component';
 import { WhileComponent } from './component/while/while.component';
 import { SessionComponent } from './component/session/session.component';
 import { ReturnComponent } from './component/return/return.component';
+import { DataSourceConfigurationComponent } from './component/data-source-configuration/data-source-configuration.component';
+import { DataSetComponent } from './component/data-set/data-set.component';
 
 @NgModule({
   declarations: [
@@ -41,11 +41,11 @@ import { ReturnComponent } from './component/return/return.component';
     SynchronizedComponent,
     TestSetComponent,
     ForComponent,
-    TestScenarioComponent,
-    TestCaseComponent,
     WhileComponent,
     SessionComponent,
     ReturnComponent,
+    DataSourceConfigurationComponent,
+    DataSetComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -65,11 +65,11 @@ import { ReturnComponent } from './component/return/return.component';
     SynchronizedComponent,
     TestSetComponent,
     ForComponent,
-    TestScenarioComponent,
-    TestCaseComponent,
     WhileComponent,
     SessionComponent,
     ReturnComponent,
+    DataSourceConfigurationComponent,
+    DataSetComponent,
   ],
 })
 export class ArtefactsModule {
@@ -87,14 +87,12 @@ export class ArtefactsModule {
     this._artefactService.register('TestCase', {
       icon: 'glyphicon-list-alt',
       iconNg2: 'list',
-      component: TestCaseComponent,
       description:
         'Specific container for a group of nodes, it will activate the top-level panel in the execution view for high-level test case execution monitoring',
     });
     this._artefactService.register('TestScenario', {
       icon: 'glyphicon-equalizer',
       iconNg2: 'bar-chart-2',
-      component: TestScenarioComponent,
       description: 'Usually used to parallelize the execution of multiple ThreadGroups or ‘sub’ plans',
     });
     this._artefactService.register('CallPlan', {
@@ -131,7 +129,7 @@ export class ArtefactsModule {
     this._artefactService.register('DataSet', {
       icon: 'glyphicon-th-large',
       iconNg2: 'grid',
-      form: 'partials/artefacts/dataSet.html',
+      component: DataSetComponent,
       description: 'Used to iterate over rows of data in a table',
     });
     this._artefactService.register('Synchronized', {

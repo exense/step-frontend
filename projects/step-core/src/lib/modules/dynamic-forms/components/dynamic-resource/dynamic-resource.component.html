@@ -1,0 +1,28 @@
+<step-expression-input
+  *ngIf="dynamic; else constantValueTemplate"
+  [label]="label"
+  [tooltip]="tooltip"
+  [isParentInvalid]="!!_ngControl.invalid"
+  [showRequiredAsterisk]="showRequiredAsterisk"
+  [ngModel]="expression"
+  (ngModelChange)="onExpressionChange($event)"
+  [disabled]="isDisabled"
+  (toggleConstantValue)="toggleDynamicExpression(false)"
+  (blur)="onBlur()"
+></step-expression-input>
+
+<ng-template #constantValueTemplate>
+  <step-resource-input
+    [label]="label"
+    [stType]="type"
+    [stDirectory]="directory"
+    [withHelpIcon]="!!tooltip"
+    [helpIconTooltip]="tooltip"
+    [withDynamicSwitch]="true"
+    [stModel]="value"
+    [isDisabled]="isDisabled"
+    (stModelChange)="onValueChange($event)"
+    (dynamicSwitch)="toggleDynamicExpression(true)"
+    (blur)="onBlur()"
+  ></step-resource-input>
+</ng-template>

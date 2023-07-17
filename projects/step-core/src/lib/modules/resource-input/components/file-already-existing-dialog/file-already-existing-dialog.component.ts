@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Resource } from '../../client/step-client-module';
-import { TableLocalDataSource } from '../../modules/table/table.module';
+import { Resource } from '../../../../client/step-client-module';
+import { TableLocalDataSource } from '../../../../modules/table/table.module';
 
 export interface FileAlreadyExistingDialogData {
   similarResources: Resource[];

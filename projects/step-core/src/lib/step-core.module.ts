@@ -20,7 +20,6 @@ import { EditableTextareaLabelComponent } from './components/editable-textarea-l
 import { EntityColumnContainerComponent } from './components/entity-column-container/entity-column-container.component';
 import { EntityColumnComponent } from './components/entity-column/entity-column.component';
 import { ExportDialogComponent } from './components/export-dialog/export-dialog.component';
-import { FileAlreadyExistingDialogComponent } from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 import { FunctionLinkComponent } from './components/function-link/function-link.component';
 import { IsUsedByListComponent } from './components/is-used-by-list/is-used-by-list.component';
 import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
@@ -32,20 +31,15 @@ import { PlanNameComponent } from './components/plan-name/plan-name.component';
 import { PlanTreeActionsComponent } from './components/plan-tree-actions/plan-tree-actions.component';
 import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { PredefinedOptionsInputComponent } from './components/predefined-options-input/predefined-options-input.component';
-import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 import { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
-import { ResourceInputComponent } from './components/resouce-input/resouce-input.component';
 import { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
-import { SearchResourceDialogComponent } from './components/search-resource-dialog/search-resource-dialog.component';
 import { SelectPlanComponent } from './components/select-plan/select-plan.component';
 import { SettingButtonComponent } from './components/setting-button/setting-button.component';
 import { SplitAreaComponent } from './components/split-area/split-area.component';
 import { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 import { SplitComponent } from './components/split/split.component';
 import { ThreadDistributionWizardDialogComponent } from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
-import { UpdateResourceWarningDialogComponent } from './components/update-resource-warning-dialog/update-resource-warning-dialog.component';
-import { UploadContainerComponent } from './components/upload-container/upload-container.component';
 import { CORE_INITIALIZER } from './core-initialiser';
 import { CapsLockDirective } from './directives/caps-lock.directive';
 import { ElementResizeDirective } from './directives/element-resize.directive';
@@ -58,7 +52,11 @@ import { SimpleLineChartDirective } from './directives/simple-line-chart.directi
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 import { TooltipDirective } from './directives/tooltip.directive';
 import { TrapFocusDirective } from './directives/trap-focus.directive';
-import { REPOSITORY_PARAMETERS_INITIALIZER, StepBasicsModule } from './modules/basics/step-basics.module';
+import {
+  IsUsedByDialog,
+  REPOSITORY_PARAMETERS_INITIALIZER,
+  StepBasicsModule,
+} from './modules/basics/step-basics.module';
 import { CustomRegistriesModule } from './modules/custom-registeries/custom-registries.module';
 import { DynamicFormsModule } from './modules/dynamic-forms/dynamic-forms.module';
 import { EntitiesSelectionModule } from './modules/entities-selection/entities-selection.module';
@@ -76,6 +74,8 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
 import { ArtefactDetailsComponent } from './components/artefact-details/artefact-details.component';
 import { ArtefactDetailsWrapperDirective } from './directives/artefact-details-wrapper.directive';
 import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
+import { ResourceInputModule } from './modules/resource-input/resource-input.module';
+import { IsUsedByDialogService } from './services/is-used-by-dialog.service';
 
 @NgModule({
   declarations: [
@@ -93,8 +93,6 @@ import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefact
     SelectPlanComponent,
     AutorefreshToggleComponent,
     SettingButtonComponent,
-    UploadContainerComponent,
-    ProgressBarComponent,
     PlanTreeComponent,
     RestoreDialogComponent,
     SimpleLineChartDirective,
@@ -118,8 +116,6 @@ import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefact
     TrapFocusDirective,
     FocusableDirective,
     FocusablesDirective,
-    ResourceInputComponent,
-    SearchResourceDialogComponent,
     MaxHeightViewportHeightMinusOffsetTopDirective,
     RecursiveTabIndexDirective,
     ReferenceArtefactNameComponent,
@@ -128,13 +124,11 @@ import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefact
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
     PredefinedOptionsInputComponent,
-    UpdateResourceWarningDialogComponent,
     EntityColumnComponent,
     EntityColumnContainerComponent,
     NewSchedulerTaskDialogComponent,
     EditSchedulerTaskDialogComponent,
     ExportDialogComponent,
-    FileAlreadyExistingDialogComponent,
     ArtefactDetailsComponent,
     ArtefactDetailsWrapperDirective,
     WaitingArtefactsAdvancedComponent,
@@ -156,6 +150,7 @@ import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefact
     TreeModule,
     AngularSplitModule,
     DynamicFormsModule,
+    ResourceInputModule,
   ],
   exports: [
     CommonModule,
@@ -186,8 +181,6 @@ import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefact
     PlanTreeComponent,
     AutorefreshToggleComponent,
     SettingButtonComponent,
-    UploadContainerComponent,
-    ProgressBarComponent,
     RestoreDialogComponent,
     SimpleLineChartDirective,
     EditableLabelComponent,
@@ -208,8 +201,6 @@ import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefact
     TrapFocusDirective,
     FocusableDirective,
     FocusablesDirective,
-    ResourceInputComponent,
-    SearchResourceDialogComponent,
     MaxHeightViewportHeightMinusOffsetTopDirective,
     RecursiveTabIndexDirective,
     PlanNameComponent,
@@ -217,15 +208,14 @@ import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefact
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
     PredefinedOptionsInputComponent,
-    UpdateResourceWarningDialogComponent,
     EntityColumnComponent,
     EntityColumnContainerComponent,
     NewSchedulerTaskDialogComponent,
     EditSchedulerTaskDialogComponent,
     ExportDialogComponent,
-    FileAlreadyExistingDialogComponent,
     ArtefactDetailsComponent,
     WaitingArtefactsAdvancedComponent,
+    ResourceInputModule,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -247,6 +237,10 @@ import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefact
           monthYearA11yLabel: 'MMMM yyyy',
         },
       },
+    },
+    {
+      provide: IsUsedByDialog,
+      useExisting: IsUsedByDialogService,
     },
   ],
 })
@@ -271,7 +265,6 @@ export { EditableTextareaLabelComponent } from './components/editable-textarea-l
 export * from './components/entity-column-container/entity-column-container.component';
 export * from './components/entity-column/entity-column.component';
 export * from './components/export-dialog/export-dialog.component';
-export * from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 export { FunctionLinkDialogService } from './components/function-link/function-link-dialog.service';
 export { FunctionLinkComponent } from './components/function-link/function-link.component';
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
@@ -282,12 +275,9 @@ export { PlanLinkComponent } from './components/plan-link/plan-link.component';
 export { PlanNameComponent } from './components/plan-name/plan-name.component';
 export * from './components/plan-tree/plan-tree.component';
 export { PredefinedOptionsInputComponent } from './components/predefined-options-input/predefined-options-input.component';
-export { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 export { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 export * from './components/report-node-status/report-node-status.component';
-export { ResourceInputComponent } from './components/resouce-input/resouce-input.component';
 export { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
-export { SearchResourceDialogComponent } from './components/search-resource-dialog/search-resource-dialog.component';
 export { SelectPlanComponent } from './components/select-plan/select-plan.component';
 export { SettingButtonComponent } from './components/setting-button/setting-button.component';
 export { SplitAreaComponent } from './components/split-area/split-area.component';
@@ -298,10 +288,6 @@ export * from './components/entity-column/entity-column.component';
 export * from './components/entity-column-container/entity-column-container.component';
 export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
-export * from './components/file-already-existing-dialog/file-already-existing-dialog.component';
-export * from './components/artefact-details/artefact-details.component';
-export { UpdateResourceWarningDialogComponent } from './components/update-resource-warning-dialog/update-resource-warning-dialog.component';
-export { UploadContainerComponent } from './components/upload-container/upload-container.component';
 export * from './decorators/plugin';
 export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
@@ -326,6 +312,7 @@ export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
 export * from './modules/tabs/tabs.module';
 export * from './modules/tree/tree.module';
+export * from './modules/resource-input/resource-input.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/is-chart-empty.pipe';
@@ -350,8 +337,6 @@ export { PlanDialogsService } from './services/plan-dialogs.service';
 export * from './services/plan-editor.service';
 export * from './services/plan-interactive-session.service';
 export * from './services/plugin-info-registry.service';
-export { ResourceDialogsService } from './services/resource-dialogs.service';
-export * from './services/resource-input-bridge.service';
 export * from './services/restore-dialogs.service';
 export * from './services/scheduled-task-dialogs.service';
 export { UibModalHelperService, UibModalInstance } from './services/uib-modal-helper.service';
