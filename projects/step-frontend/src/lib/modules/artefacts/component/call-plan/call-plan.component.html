@@ -1,0 +1,6 @@
+<form #form="ngForm">
+  <step-plan-name [artefact]="context.artefact" [isDisabled]="context.readonly" (onSave)="context.save()">
+  </step-plan-name>
+  <step-dynamic-json label="Input" [(ngModel)]="context.artefact!.input" [disabled]="context.readonly" name="input">
+  </step-dynamic-json>
+</form>

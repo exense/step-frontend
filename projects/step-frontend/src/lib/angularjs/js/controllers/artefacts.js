@@ -32,39 +32,6 @@ angular
     );
   })
 
-  .controller('CallPlanCtrl', function ($scope, $location, $http, PlanDialogsService, LinkProcessor, Dialogs) {
-    $scope.gotoPlan = () =>
-      LinkProcessor.process($scope.planProject)
-        .then(() => {
-          $location.path('/root/plans/editor/' + $scope.artefact.planId);
-        })
-        .catch((errorMessage) => {
-          if (errorMessage) {
-            Dialogs.showErrorMsg(errorMessage);
-          }
-        });
-
-    $scope.$watch('artefact.planId', function (planId) {
-      if (planId) {
-        $http.get('rest/plans/' + planId).then(function (response) {
-          if (response.data) {
-            $scope.planName = response.data.attributes.name;
-            $scope.planProject = response.data.attributes.project;
-          } else {
-            $scope.planName = '';
-          }
-        });
-      }
-    });
-
-    $scope.selectPlan = function () {
-      PlanDialogsService.selectPlan().subscribe(function (plan) {
-        $scope.artefact.planId = plan.id;
-        $scope.artefact.attributes.name = plan.attributes.name;
-        $scope.save();
-      });
-    };
-  })
   .controller('CallFunctionCtrl', function ($scope, $uibModal, $location, $http, FunctionDialogs, EntityDialogsService) {
     showTokenSelectionParameters = false;
 

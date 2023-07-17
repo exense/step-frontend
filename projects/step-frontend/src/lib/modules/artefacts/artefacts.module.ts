@@ -23,6 +23,7 @@ import { ReturnComponent } from './component/return/return.component';
 import { DataSourceConfigurationComponent } from './component/data-source-configuration/data-source-configuration.component';
 import { DataSetComponent } from './component/data-set/data-set.component';
 import { ForEachComponent } from './component/for-each/for-each.component';
+import { CallPlanComponent } from './component/call-plan/call-plan.component';
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import { ForEachComponent } from './component/for-each/for-each.component';
     DataSourceConfigurationComponent,
     DataSetComponent,
     ForEachComponent,
+    CallPlanComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -73,6 +75,7 @@ import { ForEachComponent } from './component/for-each/for-each.component';
     DataSourceConfigurationComponent,
     DataSetComponent,
     ForEachComponent,
+    CallPlanComponent,
   ],
 })
 export class ArtefactsModule {
@@ -101,7 +104,7 @@ export class ArtefactsModule {
     this._artefactService.register('CallPlan', {
       icon: 'glyphicon-new-window',
       iconNg2: 'external-link',
-      form: 'partials/artefacts/callPlan.html',
+      component: CallPlanComponent,
       description: 'Used to invoke a plan from within another plan',
     });
     this._artefactService.register('CallKeyword', {
@@ -274,7 +277,6 @@ export class ArtefactsModule {
     this._artefactService.register('Failure', {
       icon: 'glyphicon-thumbs-down',
       iconNg2: 'thumbs-down',
-      form: '',
       description: '',
       isSelectable: false,
     });
