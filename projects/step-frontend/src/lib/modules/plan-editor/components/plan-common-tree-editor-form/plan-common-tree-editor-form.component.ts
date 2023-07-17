@@ -18,7 +18,20 @@ import {
   PlansService,
   TreeStateService,
 } from '@exense/step-core';
-import { BehaviorSubject, filter, map, merge, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  catchError,
+  filter,
+  first,
+  map,
+  merge,
+  of,
+  Subject,
+  switchMap,
+  take,
+  takeUntil,
+  tap,
+} from 'rxjs';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { PlanEditorApiService } from '../../injectables/plan-editor-api.service';
@@ -224,7 +237,10 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
         switchMap((plan) => this._planEditorApi.savePlan(plan!)),
         takeUntil(this.terminator$)
       )
-      .subscribe(({ plan }) => {
+      .subscribe(({ plan, forceRefresh }) => {
+        if (forceRefresh) {
+          this._treeState.selectedNode$.pipe(first()).subscribe((node) => this.init(plan, node?.id));
+        }
         if (this.planInternal$.value) {
           this.planInternal$.value.customFields = plan.customFields;
         }

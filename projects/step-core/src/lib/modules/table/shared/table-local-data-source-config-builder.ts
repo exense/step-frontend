@@ -23,6 +23,11 @@ export class TableLocalDataSourceConfigBuilder<T> {
     return this.addCustomSearchPredicate(propertyName, predicate);
   }
 
+  addSearchStringRegexPredicate(propertyName: string, getField: (item: T) => string | undefined): this {
+    const predicate = this.predicatesFactory.createSearchStringRegexPredicate(getField);
+    return this.addCustomSearchPredicate(propertyName, predicate);
+  }
+
   addSearchNumberPredicate(propertyName: string, getField: (item: T) => number | undefined): this {
     const predicate = this.predicatesFactory.createSearchNumberPredicate(getField);
     return this.addCustomSearchPredicate(propertyName, predicate);
