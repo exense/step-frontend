@@ -347,3 +347,4 @@ export * from './services/artefact-form-change-helper.service';
 export * from './shared';
 export * from './components/base-artefact/base-artefact.component';
 export * from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
+export * from './components/artefact-details/artefact-details.component';
