@@ -1,4 +1,10 @@
-<step-table [dataSource]="_logic.searchableScheduledTask" matSort [matSortDisableClear]="true">
+<step-table
+  [dataSource]="_logic.dataSource"
+  matSort
+  matSortActive="attributes.name"
+  matSortDirection="asc"
+  [matSortDisableClear]="true"
+>
   <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-new'" [availableOperations]="availableBulkOperations">
   </step-bulk-operations>
   <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
@@ -34,12 +40,20 @@
     </td>
   </ng-container>
   <step-entity-column-container entityName="tasks"></step-entity-column-container>
-  <step-custom-columns screen="schedulerTable"> </step-custom-columns>
+  <step-custom-columns screen="schedulerTable" [isSearchDisabled]="false"></step-custom-columns>
   <ng-container matColumnDef="cronExpression" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>CronExpression</th>
     <td mat-cell *matCellDef="let element">{{ element.cronExpression }}</td>
   </ng-container>
-  <ng-container matColumnDef="status" stepSearchCol>
+  <ng-container matColumnDef="active" stepSearchCol>
+    <step-single-item-array-filter
+      *stepSearchCellDef
+      stepFilterConnect
+      [items]="statusItems"
+      [extractor]="extractor"
+      [createConditionFn]="_filterConditionFactory.booleanFilterCondition"
+    >
+    </step-single-item-array-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
     <td mat-cell *matCellDef="let element">
       <button
