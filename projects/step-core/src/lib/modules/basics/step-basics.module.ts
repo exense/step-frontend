@@ -25,6 +25,7 @@ import { AlertDirective } from './directives/alert.directive';
 import { ValidateJsonDirective } from './directives/validate-json.directive';
 import { ErrorsListComponent } from './components/errors-list/errors-list.component';
 import { PreventCharsDirective } from './directives/prevent-chars.directive';
+import { SingleItemArrayFilterComponent } from './components/single-item-array-filter/single-item-array-filter.component';
 import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 import { UploadContainerComponent } from './components/upload-container/upload-container.component';
 
@@ -54,6 +55,7 @@ import { UploadContainerComponent } from './components/upload-container/upload-c
     ValidateJsonDirective,
     ErrorsListComponent,
     PreventCharsDirective,
+    SingleItemArrayFilterComponent,
     ProgressBarComponent,
     UploadContainerComponent,
   ],
@@ -81,6 +83,7 @@ import { UploadContainerComponent } from './components/upload-container/upload-c
     ValidateJsonDirective,
     ErrorsListComponent,
     PreventCharsDirective,
+    SingleItemArrayFilterComponent,
     ProgressBarComponent,
     UploadContainerComponent,
   ],
@@ -89,6 +92,7 @@ export class StepBasicsModule {}
 
 export * from './components/base-filter/base-filter.component';
 export * from './components/array-filter/array-filter.component';
+export * from './components/single-item-array-filter/single-item-array-filter.component';
 export * from './components/date-filter/date-filter.component';
 export * from './components/input-filter/hexadecimal-input-filter.component';
 export * from './components/input-filter/input-filter.component';

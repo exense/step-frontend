@@ -25,7 +25,7 @@ export class TokenListComponent {
       .addSearchStringPredicate('type', (item) => item.token!.attributes!['$agenttype'])
       .addSearchStringPredicate('agent', (item) => item.agent!.agentUrl!)
       .addSearchStringPredicate('attributes', (item) => FlatObjectStringFormatPipe.format(item.token!.attributes!))
-      .addSearchStringPredicate('state', (item) => item.state!)
+      .addSearchStringRegexPredicate('state', (item) => item.state!)
       .addSearchStringPredicate(
         'executionDescription',
         (item) => (item.currentOwner as AugmentedTokenWrapperOwner)?.executionDescription
