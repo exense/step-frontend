@@ -26,6 +26,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { TsToolbarComponent } from './dashboard/toolbar/ts-toolbar.component';
 import { TsCompareModeComponent } from './dashboard/compare/compare-mode.component';
+import { TsComparePercentagePipe } from './dashboard/compare/ts-compare-percentage.pipe';
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import { TsCompareModeComponent } from './dashboard/compare/compare-mode.compone
     AnalyticsPageComponent,
     ExecutionPerformanceComponent,
     TsCompareModeComponent,
+    TsComparePercentagePipe,
   ],
   exports: [ExecutionPerformanceComponent, AnalyticsPageComponent],
   imports: [

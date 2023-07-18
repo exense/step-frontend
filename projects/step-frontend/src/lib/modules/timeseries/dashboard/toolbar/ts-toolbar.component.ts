@@ -17,6 +17,7 @@ export class TsToolbarComponent {
 
   @Output() onCompareModeEnabled = new EventEmitter<void>();
   @Output() onCompareModeDisabled = new EventEmitter<void>();
+  @Output() onTimeRangeChange = new EventEmitter<TimeRangePickerSelection>();
 
   exportInProgress = false;
 
@@ -27,8 +28,7 @@ export class TsToolbarComponent {
   }
 
   handleTimeRangeChange(selection: TimeRangePickerSelection) {
-    // this.timeRangeSelection = selection;
-    // this.dashboard.updateRange(this.calculateFullTimeRange(this.execution!));
+    this.onTimeRangeChange.next(selection);
   }
 
   handleCompareModeChange(enabled: boolean) {

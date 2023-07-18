@@ -10,6 +10,7 @@ import { TsFilteringSettings } from './model/ts-filtering-settings';
 import { FilterUtils } from './util/filter-utils';
 import { TimeSeriesUtils } from './time-series-utils';
 import { OQLBuilder } from './util/oql-builder';
+import { TsCompareModeSettings } from './dashboard/model/ts-compare-mode-settings';
 
 /**
  * This class is responsible for managing the state of an execution tab. Here we store time selection, colors, filters, etc.
@@ -18,6 +19,10 @@ export class TimeSeriesContext {
   id!: string;
   activeExecution: Execution | undefined;
   filteringMode: TsFilteringMode = TsFilteringMode.STANDARD;
+
+  compareModeChange$: BehaviorSubject<TsCompareModeSettings> = new BehaviorSubject<TsCompareModeSettings>({
+    enabled: false,
+  });
 
   inProgress$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
@@ -38,15 +43,26 @@ export class TimeSeriesContext {
     this.id = params.id;
     this.fullTimeRange = params.timeRange;
     this.selectedTimeRange = params.timeRange;
-    this.activeFilters$ = new BehaviorSubject(params.dynamicFilters || []);
+    this.activeFilters$ = new BehaviorSubject(params.filters || []);
     this.filterSettings$ = new BehaviorSubject<TsFilteringSettings>({
       mode: TsFilteringMode.STANDARD,
       oql: '',
-      filterItems: params.dynamicFilters || [],
+      filterItems: params.filters || [],
     });
     this.activeGroupings$ = new BehaviorSubject(params.grouping);
-    this.colorsPool = new TimeseriesColorsPool();
+    this.colorsPool = params.colorsPool || new TimeseriesColorsPool();
     this.keywordsContext = new TimeSeriesKeywordsContext(this.colorsPool);
+  }
+
+  clone(): TimeSeriesContext {
+    let newContextId = this.id + '-compare';
+    return new TimeSeriesContext({
+      id: newContextId,
+      timeRange: this.fullTimeRange,
+      grouping: this.activeGroupings$.getValue(),
+      filters: this.activeFilters$.getValue(),
+      colorsPool: this.colorsPool,
+    });
   }
 
   destroy(): void {
@@ -56,6 +72,18 @@ export class TimeSeriesContext {
     this.activeGroupings$.complete();
     this.activeFilters$.complete();
     this.filterSettings$.complete();
+  }
+
+  enableCompareMode(context: TimeSeriesContext) {
+    this.compareModeChange$.next({ enabled: true, context: context });
+  }
+
+  disableCompareMode() {
+    this.compareModeChange$.next({ enabled: false });
+  }
+
+  onCompareModeChange(): Observable<{ enabled: boolean; context?: TimeSeriesContext }> {
+    return this.compareModeChange$.asObservable();
   }
 
   setInProgress(inProgress: boolean) {

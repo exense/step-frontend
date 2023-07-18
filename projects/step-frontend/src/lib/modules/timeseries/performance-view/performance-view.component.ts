@@ -30,9 +30,13 @@ import { PerformanceViewConfig } from './performance-view.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
 import { PerformanceViewTimeSelectionComponent } from './time-selection/performance-view-time-selection.component';
 import { TsFilteringMode } from '../model/ts-filtering-mode';
+import { TsCompareModeSettings } from '../dashboard/model/ts-compare-mode-settings';
 
 declare const uPlot: any;
 
+/**
+ * This component is responsible for fetching the actual charts data from the backend
+ */
 @Component({
   selector: 'step-performance-view',
   templateUrl: './performance-view.component.html',
@@ -146,6 +150,13 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       )
       .subscribe();
 
+    this.context.compareModeChange$.subscribe((settings) => {
+      if (settings.enabled) {
+        this.enableCompareMode(settings.context!);
+      } else {
+        this.disableCompareMode();
+      }
+    });
     this.createAllCharts();
   }
 
@@ -348,6 +359,22 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       })
     );
   }
+
+  enableCompareMode(context: TimeSeriesContext): void {
+    const findRequest = new FindBucketsRequestBuilder()
+      .withRange(context.getFullTimeRange())
+      .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
+      .withFilteringSettings(context.getFilteringSettings())
+      .withNumberOfBuckets(1)
+      .withGroupDimensions(context.getGroupDimensions())
+      .withPercentiles([80, 90, 99])
+      .build();
+    this.timeSeriesService
+      .getBuckets(findRequest)
+      .subscribe((response) => this.tableChart.enableCompareMode(response, context));
+  }
+
+  disableCompareMode() {}
 
   createByKeywordsCharts(): Observable<TimeSeriesAPIResponse> {
     const groupDimensions = this.context.getGroupDimensions();

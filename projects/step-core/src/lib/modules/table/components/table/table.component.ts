@@ -83,12 +83,15 @@ export class TableComponent<T>
   @Input() inProgress?: boolean;
   tableDataSource?: TableDataSource<T>;
   @Input() pageSizeInputDisabled?: boolean;
+  @Input() visibleColumns: string[] | undefined;
+
   @Input() set filter(value: string | undefined) {
     if (value === this.filter) {
       return;
     }
     this.filter$.next(value);
   }
+
   get filter(): string | undefined {
     return this.filter$.value;
   }
@@ -99,6 +102,7 @@ export class TableComponent<T>
     }
     this.tableParams$.next(value);
   }
+
   get tableParams(): TableParameters | undefined {
     return this.tableParams$.value;
   }
@@ -346,8 +350,14 @@ export class TableComponent<T>
 
     allCollDef.forEach((col) => this._table!.addColumnDef(col));
 
+    const visibleColumnsMap = new Map<string, boolean>(); // save columns for low complexity access
+    if (this.visibleColumns) {
+      this.visibleColumns.forEach((col) => visibleColumnsMap.set(col, true));
+    }
     setTimeout(() => {
-      this.displayColumns = allCollDef.map((x) => x.name);
+      this.displayColumns = allCollDef
+        .map((x) => x.name)
+        .filter((colName) => (this.visibleColumns ? visibleColumnsMap.get(colName) : true));
     });
   }
 
@@ -416,6 +426,17 @@ export class TableComponent<T>
     const cDatasource = changes['dataSource'];
     if (cDatasource?.previousValue !== cDatasource?.currentValue) {
       this.setupDatasource(cDatasource.currentValue);
+    }
+    const visibleColumns = changes['visibleColumns'];
+    if (visibleColumns?.previousValue !== visibleColumns?.currentValue) {
+      if (visibleColumns.currentValue) {
+        const visibleColumnsMap = new Map<string, boolean>(); // save columns for low complexity access
+        visibleColumns.currentValue.forEach((col: string) => visibleColumnsMap.set(col, true));
+        this.displayColumns = this.allCollDef.map((x) => x.name).filter((colName) => visibleColumnsMap.get(colName));
+      } else {
+        // input has been removed. show all columns
+        this.displayColumns = this.allCollDef.map((x) => x.name);
+      }
     }
   }
 

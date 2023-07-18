@@ -1,14 +1,4 @@
 <ng-container *ngIf="!executionHasToBeBuilt">
-  <!--  <div class="header-buttons">-->
-  <!--    <step-time-range-picker-->
-  <!--      *ngIf="timeRangeSelection"-->
-  <!--      (onSelectionChange)="onTimeRangeChange($event)"-->
-  <!--      [selectOptions]="timeRangeOptions"-->
-  <!--      [includeFullRangeOption]="true"-->
-  <!--      [activeSelection]="timeRangeSelection"-->
-  <!--    >-->
-  <!--    </step-time-range-picker>-->
-  <!--  </div>-->
   <step-timeseries-dashboard #dashboard *ngIf="dashboardSettings" [settings]="dashboardSettings">
   </step-timeseries-dashboard>
 </ng-container>

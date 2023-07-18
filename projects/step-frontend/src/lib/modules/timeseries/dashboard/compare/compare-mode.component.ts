@@ -9,4 +9,9 @@ export class TsCompareModeComponent {
   @Output() onEnabledChange = new EventEmitter<boolean>();
 
   enabled = false;
+
+  toggleEnabled(): void {
+    this.enabled = !this.enabled;
+    this.onEnabledChange.emit(this.enabled);
+  }
 }

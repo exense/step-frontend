@@ -42,6 +42,9 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
 
   contextualFilterItems: TsFilterItem[] = [];
 
+  compareModeEnabled: boolean = false;
+  compareModeContext: TimeSeriesContext | undefined;
+
   constructor(private contextsFactory: TimeSeriesContextsFactory) {}
 
   ngOnInit(): void {
@@ -63,10 +66,14 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     const contextParams: TimeSeriesContextParams = {
       id: this.settings.contextId,
       timeRange: this.settings.timeRange,
-      dynamicFilters: this.contextualFilterItems,
+      filters: this.contextualFilterItems,
       grouping: ['name'],
     };
     this.context = this.contextsFactory.createContext(contextParams);
+    this.context.onCompareModeChange().subscribe(({ enabled, context }) => {
+      this.compareModeEnabled = enabled;
+      this.compareModeContext = context;
+    });
     this.performanceViewSettings = this.settings;
     this.subscribeForContextChange();
     this.throttledRefreshTrigger$
@@ -108,6 +115,11 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
 
   handleGroupingChange(dimensions: string[]) {
     this.context.updateGrouping(dimensions);
+  }
+
+  handleTimeRangeChange(selection: TimeRangePickerSelection) {
+    this.timeRangeSelection = selection;
+    // this.updateRange(this.calculateFullTimeRange(this.execution!));
   }
 
   setRanges(fullRange: TSTimeRange, selection?: TSTimeRange) {
@@ -157,7 +169,23 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   enableCompareMode(): void {
-    this.context;
+    let filters = Object.keys(this.settings.contextualFilters).map((key) => {
+      return {
+        attributeName: key,
+        isHidden: false,
+        exactMatch: true,
+        label: key,
+        type: FilterBarItemType.FREE_TEXT,
+        freeTextValues: [this.settings.contextualFilters[key]],
+      };
+    });
+    let compareContext: TimeSeriesContext = new TimeSeriesContext({
+      timeRange: { from: this.context.getFullTimeRange().from, to: this.context.getFullTimeRange().to },
+      id: new Date().getTime().toString(),
+      grouping: this.context.getGroupDimensions(),
+      filters: filters,
+    });
+    this.context.enableCompareMode(compareContext);
   }
 
   ngOnDestroy(): void {
