@@ -25,6 +25,7 @@ import { DataSetComponent } from './component/data-set/data-set.component';
 import { ForEachComponent } from './component/for-each/for-each.component';
 import { CallPlanComponent } from './component/call-plan/call-plan.component';
 import { CallKeywordComponent } from './component/call-keyword/call-keyword.component';
+import { ScriptComponent } from './component/script/script.component';
 
 @NgModule({
   declarations: [
@@ -52,6 +53,7 @@ import { CallKeywordComponent } from './component/call-keyword/call-keyword.comp
     ForEachComponent,
     CallPlanComponent,
     CallKeywordComponent,
+    ScriptComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -79,6 +81,7 @@ import { CallKeywordComponent } from './component/call-keyword/call-keyword.comp
     ForEachComponent,
     CallPlanComponent,
     CallKeywordComponent,
+    ScriptComponent,
   ],
 })
 export class ArtefactsModule {
@@ -205,7 +208,7 @@ export class ArtefactsModule {
     this._artefactService.register('Script', {
       icon: 'glyphicon-align-left',
       iconNg2: 'align-left',
-      form: 'partials/artefacts/script.html',
+      component: ScriptComponent,
       description:
         'Executes any arbitrary groovy code. The script context is local, which means that variable used in the script control cannot be accessed externally by other nodes',
     });

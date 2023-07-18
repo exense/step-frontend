@@ -67,28 +67,6 @@ function initDynamicFormsCtrl($scope) {
 }
 
 dynamicForms
-  .directive('dynamicCheckbox', function () {
-    return {
-      restrict: 'E',
-      scope: {
-        dynamicValue: '=',
-        label: '=',
-        tooltip: '=',
-        onSave: '&',
-      },
-      controller: function ($scope) {
-        initDynamicFormsCtrl($scope);
-        $scope.updateConstantValue = function () {
-          if ($scope.dynamicValue.value === 'false') {
-            $scope.dynamicValue.value = false;
-          } else if ($scope.dynamicValue.value === 'true') {
-            $scope.dynamicValue.value = true;
-          }
-        };
-      },
-      templateUrl: 'partials/dynamicforms/checkbox.html',
-    };
-  })
   .directive('dynamicTextfield', function () {
     return {
       restrict: 'E',
@@ -152,9 +130,6 @@ dynamicForms
       controller: function ($scope, $attrs) {},
       templateUrl: 'partials/dynamicforms/expressionInput.html',
     };
-  })
-  .controller('dynamicValueCtrl', function ($scope) {
-    initDynamicFormsCtrl($scope);
   })
   .directive('dynamicResourceInput', function () {
     return {

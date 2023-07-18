@@ -17,7 +17,7 @@
  * along with STEP.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 angular
-  .module('reportNodes', ['step', 'artefacts', 'screenConfigurationControllers'])
+  .module('reportNodes', ['step', 'screenConfigurationControllers'])
 
   .directive('reportNodeIcon', function () {
     return {
