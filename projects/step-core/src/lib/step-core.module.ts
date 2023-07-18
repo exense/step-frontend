@@ -15,7 +15,6 @@ import { EditSchedulerTaskDialogComponent } from './components/edit-scheduler-ta
 import { EditableActionsComponent } from './components/editable-actions/editable-actions.component';
 import { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';
 import { EditableLabelComponent } from './components/editable-label/editable-label.component';
-import { EditableTextareaLabelWrapperComponent } from './components/editable-textarea-label-wrapper/editable-textarea-label-wrapper.component';
 import { EditableTextareaLabelComponent } from './components/editable-textarea-label/editable-textarea-label.component';
 import { EntityColumnContainerComponent } from './components/entity-column-container/entity-column-container.component';
 import { EntityColumnComponent } from './components/entity-column/entity-column.component';
@@ -103,7 +102,6 @@ import { IsUsedByDialogService } from './services/is-used-by-dialog.service';
     IsChartEmptyPipe,
     KeywordNameComponent,
     DynamicAttributePipe,
-    EditableTextareaLabelWrapperComponent,
     PlanTreeActionsComponent,
     CustomFormComponent,
     DynamicLabelCustomFormInputComponent,
@@ -193,7 +191,6 @@ import { IsUsedByDialogService } from './services/is-used-by-dialog.service';
     CustomFormComponent,
     DynamicLabelCustomFormInputComponent,
     StandardCustomFormInputComponent,
-    EditableTextareaLabelWrapperComponent,
     SplitComponent,
     SplitAreaComponent,
     SplitGutterComponent,
@@ -260,7 +257,6 @@ export { CustomFormComponent } from './components/custom-form/custom-form.compon
 export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 export { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';
 export { EditableLabelComponent } from './components/editable-label/editable-label.component';
-export { EditableTextareaLabelWrapperComponent } from './components/editable-textarea-label-wrapper/editable-textarea-label-wrapper.component';
 export { EditableTextareaLabelComponent } from './components/editable-textarea-label/editable-textarea-label.component';
 export * from './components/entity-column-container/entity-column-container.component';
 export * from './components/entity-column/entity-column.component';

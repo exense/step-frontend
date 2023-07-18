@@ -15,6 +15,7 @@ export class DynamicJsonComponent extends DynamicValueBaseComponent<DynamicValue
   @Input() optionalFieldsLabel?: string;
   @Input() primaryFieldsDescription?: string;
   @Input() optionalFieldsDescription?: string;
+  @Input() enforceGroovyExpression?: boolean;
   @Input() addFieldBtnLabel?: string;
   @Input() jsonFieldsLabel?: string;
   @Input() schema?: DynamicFieldsSchema;
@@ -27,9 +28,17 @@ export class DynamicJsonComponent extends DynamicValueBaseComponent<DynamicValue
     return '{}';
   }
   protected override convertValueToExpression(value?: string): string {
-    return value ? value.toString() : '';
+    let result = value ? value.toString() : '';
+    if (this.enforceGroovyExpression && result) {
+      result = `"""${result}"""`;
+    }
+    return result;
   }
   protected override convertExpressionToValue(expression: string): string {
-    return expression;
+    let result = expression;
+    if (this.enforceGroovyExpression && result) {
+      result = result.replace(/^"""/g, '').replace(/"""$/g, '');
+    }
+    return result;
   }
 }

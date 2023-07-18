@@ -24,6 +24,7 @@ import { DataSourceConfigurationComponent } from './component/data-source-config
 import { DataSetComponent } from './component/data-set/data-set.component';
 import { ForEachComponent } from './component/for-each/for-each.component';
 import { CallPlanComponent } from './component/call-plan/call-plan.component';
+import { CallKeywordComponent } from './component/call-keyword/call-keyword.component';
 
 @NgModule({
   declarations: [
@@ -50,6 +51,7 @@ import { CallPlanComponent } from './component/call-plan/call-plan.component';
     DataSetComponent,
     ForEachComponent,
     CallPlanComponent,
+    CallKeywordComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -76,6 +78,7 @@ import { CallPlanComponent } from './component/call-plan/call-plan.component';
     DataSetComponent,
     ForEachComponent,
     CallPlanComponent,
+    CallKeywordComponent,
   ],
 })
 export class ArtefactsModule {
@@ -110,7 +113,7 @@ export class ArtefactsModule {
     this._artefactService.register('CallKeyword', {
       icon: 'glyphicon-record',
       iconNg2: 'target',
-      form: 'partials/artefacts/callFunction.html',
+      component: CallKeywordComponent,
       description:
         'Technical node used as part of keyword invocation. Can be used explicitly in order to call a keyword by reflection',
     });

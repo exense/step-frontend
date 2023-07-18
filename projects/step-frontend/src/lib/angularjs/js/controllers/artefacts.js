@@ -32,60 +32,6 @@ angular
     );
   })
 
-  .controller('CallFunctionCtrl', function ($scope, $uibModal, $location, $http, FunctionDialogs, EntityDialogsService) {
-    showTokenSelectionParameters = false;
-
-    $scope.ready = false;
-
-    $scope.keyword = undefined;
-
-    $scope.onUpdateKeyword = function(keyword) {
-      $scope.keyword = keyword;
-    }
-
-    function loadFunction(id, callback) {
-      $http({ url: 'rest/functions/' + id, method: 'GET' }).then(function (response) {
-        $scope.targetFunction = response.data;
-        $scope.ready = true;
-        if (callback) {
-          callback();
-        }
-      });
-    }
-
-    $scope.$watch('artefact.functionId', function (id) {
-      $scope.ready = false;
-      if (id != null) {
-        loadFunction(id);
-      } else {
-        $scope.targetFunction = {};
-        $scope.ready = true;
-      }
-    });
-
-    $scope.gotoFunction = function () {
-      FunctionDialogs.editFunction($scope.targetFunction.id);
-    };
-
-    $scope.openFunctionEditor = function (functionid) {
-      FunctionDialogs.openFunctionEditor($scope.targetFunction.id);
-    };
-
-    $scope.setArgument = function (json) {
-      $scope.artefact.argument = json;
-      $scope.save();
-    };
-
-    $scope.selectFunction = function () {
-      EntityDialogsService.selectEntityOfType('functions', true).subscribe(function (result) {
-        var id = result.item;
-        $scope.artefact.functionId = id;
-        loadFunction(id, function () {
-          $scope.save();
-        });
-      });
-    };
-  })
   .controller('DefaultArtefactFormCtrl', function ($scope) {
     $scope.getEditableArtefactProperties = function () {
       return _.without(

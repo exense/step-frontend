@@ -85,7 +85,3 @@ export class DynamicFieldEditorComponent implements OnChanges {
     }
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepDynamicFieldEditor', downgradeComponent({ component: DynamicFieldEditorComponent }));

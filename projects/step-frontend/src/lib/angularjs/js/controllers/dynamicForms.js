@@ -147,37 +147,6 @@ dynamicForms
       templateUrl: 'partials/dynamicforms/textfield.html',
     };
   })
-  .directive('dynamicJsonEditor', function () {
-    return {
-      restrict: 'E',
-      scope: {
-        dynamicValue: '=',
-        label: '=',
-        onSave: '&',
-        schema: '=',
-        isDisabled: '=',
-        jsonFieldsLabel: '=?',
-        primaryFieldsLabel: '=?',
-        optionalFieldsLabel: '=?',
-        addFieldBtnLabel: '=?',
-        enforceGroovyExpression: '=?',
-      },
-      controller: function ($scope) {
-        $scope.localModel = { json: '' };
-
-        if ($scope.dynamicValue.value === null) {
-          $scope.dynamicValue.value = '{}';
-        }
-
-        initDynamicFormsCtrl($scope);
-        $scope.save = function (json) {
-          $scope.dynamicValue.value = json;
-          $scope.onSave();
-        };
-      },
-      templateUrl: 'partials/dynamicforms/jsonEditor.html',
-    };
-  })
   .directive('expressionInput', function () {
     return {
       controller: function ($scope, $attrs) {},
