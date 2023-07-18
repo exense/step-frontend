@@ -19,19 +19,6 @@
 angular
   .module('artefacts', ['step'])
 
-  .run(function (ViewRegistry, EntityRegistry) {
-    EntityRegistry.registerEntity(
-      'Control',
-      'artefact',
-      'wifi',
-      'artefacts',
-      null,
-      null,
-      'st-table',
-      '/partials/artefacts/artefactSelectionTable.html'
-    );
-  })
-
   .controller('DefaultArtefactFormCtrl', function ($scope) {
     $scope.getEditableArtefactProperties = function () {
       return _.without(
@@ -289,23 +276,4 @@ angular
         },
       };
     }
-  )
-  .controller('ArtefactSelectionCtrl', function ($scope, $http, artefactTypes) {
-    $http.get('rest/plans/artefact/types').then(function (response) {
-      $scope.artefacts = _.filter(
-        _.map(response.data, function (e) {
-          return { name: e };
-        }),
-        function (artefact) {
-          return artefactTypes.isSelectable(artefact.name);
-        }
-      );
-    });
-    $scope.artefactIcon = function (class_) {
-      return 'glyphicon ' + artefactTypes.getIcon(class_);
-    };
-
-    $scope.artefactDescription = function (class_) {
-      return artefactTypes.getDescription(class_);
-    };
-  });
+  );
