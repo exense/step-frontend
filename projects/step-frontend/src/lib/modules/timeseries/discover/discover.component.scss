@@ -1,7 +1,7 @@
 .container {
   display: flex;
   flex-direction: row;
-  height: calc(64vh - 40px);
+  height: calc(65vh - 80px);
   max-width: 1095px;
 }
 
@@ -74,8 +74,6 @@ table {
   justify-content: flex-end;
   margin-top: 12px;
   align-items: center;
-  padding-right: 4px;
-  height: 30px;
 
   .button {
     margin-right: 6px;

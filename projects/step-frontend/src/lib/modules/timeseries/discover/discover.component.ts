@@ -100,7 +100,7 @@ export class DiscoverComponent implements OnInit {
     });
   }
 
-  protected close() {
+  close() {
     this._matDialogRef.close();
   }
 }
