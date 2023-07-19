@@ -145,7 +145,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
     } else {
       this.keyword = this._functionConfigurationDialogData.keyword;
 
-      functionConfigurationDialogFormSetValueToForm(this.formGroup!, this.keyword);
+      functionConfigurationDialogFormSetValueToForm(this.formGroup!, this.keyword, this._formBuilder);
     }
   }
 
@@ -172,7 +172,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
       .subscribe((keyword) => {
         this.keyword = keyword;
 
-        functionConfigurationDialogFormSetValueToForm(this.formGroup!, keyword);
+        functionConfigurationDialogFormSetValueToForm(this.formGroup!, keyword, this._formBuilder);
       });
   }
 }

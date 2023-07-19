@@ -1,7 +1,10 @@
 import { KeyValue } from '@angular/common';
 import { AbstractControl, FormBuilder, ValidationErrors } from '@angular/forms';
 import { DynamicValueInteger, Function as Keyword } from '../client/generated';
-import { AgentTokenSelectionCriteriaForm } from './agent-token-selection-criteria.form';
+import {
+  AgentTokenSelectionCriteriaForm,
+  agentTokenSelectionCriteriaFormCreate,
+} from './agent-token-selection-criteria.form';
 import { FunctionConfigurationDialogData } from './function-configuration-dialog-data.interface';
 import { FunctionType } from './function-type.enum';
 import { dynamicValueFactory, toKeyValuePairs, toRecord } from './utils';
@@ -71,7 +74,8 @@ export const functionConfigurationDialogFormCreate = (
 
 export const functionConfigurationDialogFormSetValueToForm = (
   form: FunctionConfigurationDialogForm,
-  model: Keyword
+  model: Keyword,
+  formBuilder: FormBuilder
 ): void => {
   const { attributes, description, schema, type, callTimeout, executeLocally, tokenSelectionCriteria } = model;
 
@@ -82,8 +86,21 @@ export const functionConfigurationDialogFormSetValueToForm = (
     type,
     callTimeout,
     executeLocally,
-    tokenSelectionCriteria: tokenSelectionCriteria ? toKeyValuePairs(tokenSelectionCriteria) : [],
   });
+
+  const tokens = toKeyValuePairs(tokenSelectionCriteria ?? {});
+  if (form.controls.tokenSelectionCriteria.length !== tokens.length) {
+    form.controls.tokenSelectionCriteria.clear({ emitEvent: false });
+    for (let i = 0; i < tokens.length; i++) {
+      form.controls.tokenSelectionCriteria.push(agentTokenSelectionCriteriaFormCreate(formBuilder), {
+        emitEvent: false,
+      });
+    }
+  }
+
+  if (tokens.length > 0) {
+    form.patchValue({ tokenSelectionCriteria: tokens });
+  }
 };
 
 export const functionConfigurationDialogFormSetValueToModel = (
