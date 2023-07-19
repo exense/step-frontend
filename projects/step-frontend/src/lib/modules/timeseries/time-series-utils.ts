@@ -1,5 +1,8 @@
 import { TSTimeRange } from './chart/model/ts-time-range';
 import { FilterBarItemType, TsFilterItem } from './performance-view/filter-bar/model/ts-filter-item';
+import { Execution } from '@exense/step-core';
+import { RangeSelectionType } from './time-selection/model/range-selection-type';
+import { TimeRangePickerSelection } from './time-selection/time-range-picker-selection';
 
 export class TimeSeriesUtils {
   static createTimeLabels(start: number, end: number, interval: number): number[] {
@@ -52,6 +55,26 @@ export class TimeSeriesUtils {
 
   static intervalsEqual(range1?: TSTimeRange, range2?: TSTimeRange) {
     return range1 && range2 && range1.from === range2.from && range1.to === range2.to;
+  }
+
+  static calculateFullTimeRange(execution: Execution, timeRangeSelection: TimeRangePickerSelection): TSTimeRange {
+    const now = new Date().getTime();
+    let selection: TSTimeRange;
+    let newFullRange: TSTimeRange;
+    switch (timeRangeSelection.type) {
+      case RangeSelectionType.FULL:
+        newFullRange = { from: execution.startTime!, to: execution.endTime || now - 5000 };
+        selection = newFullRange;
+        break;
+      case RangeSelectionType.ABSOLUTE:
+        newFullRange = timeRangeSelection.absoluteSelection!;
+        break;
+      case RangeSelectionType.RELATIVE:
+        const end = execution.endTime || now;
+        newFullRange = { from: end - timeRangeSelection.relativeSelection!.timeInMs!, to: end };
+        break;
+    }
+    return newFullRange;
   }
 
   static formatInputDate(date: Date, includeTime = true): string {

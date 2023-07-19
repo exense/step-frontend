@@ -30,6 +30,7 @@ import { TimeSeriesDashboardSettings } from '../dashboard/model/ts-dashboard-set
 import { TimeSeriesDashboardComponent } from '../dashboard/time-series-dashboard.component';
 import { FilterBarItemType } from '../performance-view/filter-bar/model/ts-filter-item';
 import { TsUtils } from '../util/ts-utils';
+import { TimeSeriesUtils } from '../time-series-utils';
 
 @Component({
   selector: 'step-execution-performance',
@@ -79,7 +80,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
-    this.dashboard.updateRange(this.calculateFullTimeRange(this.execution!));
+    this.dashboard.updateRange(TimeSeriesUtils.calculateFullTimeRange(this.execution!, this.timeRangeSelection));
   }
 
   // auto-refresh goes through here
@@ -94,7 +95,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
       this.initDashboard(currentExecution);
       this.cd.detectChanges();
     } else {
-      this.dashboard.refresh(this.calculateFullTimeRange(this.execution!));
+      this.dashboard.refresh(TimeSeriesUtils.calculateFullTimeRange(this.execution!, this.timeRangeSelection));
     }
   }
 
@@ -140,26 +141,6 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
         },
       ],
     };
-  }
-
-  calculateFullTimeRange(details: Execution): TSTimeRange {
-    const now = new Date().getTime();
-    let selection: TSTimeRange;
-    let newFullRange: TSTimeRange;
-    switch (this.timeRangeSelection.type) {
-      case RangeSelectionType.FULL:
-        newFullRange = { from: details.startTime!, to: details.endTime || now - 5000 };
-        selection = newFullRange;
-        break;
-      case RangeSelectionType.ABSOLUTE:
-        newFullRange = this.timeRangeSelection.absoluteSelection!;
-        break;
-      case RangeSelectionType.RELATIVE:
-        const end = details.endTime || now;
-        newFullRange = { from: end - this.timeRangeSelection.relativeSelection!.timeInMs!, to: end };
-        break;
-    }
-    return newFullRange;
   }
 
   rebuildTimeSeries() {

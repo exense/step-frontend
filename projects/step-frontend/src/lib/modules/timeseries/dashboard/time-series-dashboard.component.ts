@@ -13,6 +13,7 @@ import { TimeSeriesContextParams } from '../time-series-context-params';
 import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
 import { TimeSeriesDashboardSettings } from './model/ts-dashboard-settings';
 import { TsFilteringSettings } from '../model/ts-filtering-settings';
+import { TimeSeriesUtils } from '../time-series-utils';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -119,7 +120,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
 
   handleTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
-    // this.updateRange(this.calculateFullTimeRange(this.execution!));
+    this.updateRange(TimeSeriesUtils.calculateFullTimeRange(this.execution!, this.timeRangeSelection));
   }
 
   setRanges(fullRange: TSTimeRange, selection?: TSTimeRange) {

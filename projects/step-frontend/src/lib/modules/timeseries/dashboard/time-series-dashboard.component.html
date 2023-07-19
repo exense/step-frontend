@@ -4,6 +4,7 @@
     [context]="context"
     [timeRangeOptions]="settings.timeRangeOptions"
     [activeTimeRange]="settings.activeTimeRange"
+    (onTimeRangeChange)="handleTimeRangeChange($event)"
     (onCompareModeEnabled)="enableCompareMode()"
   ></step-timeseries-toolbar>
   <div style="display: flex; width: 100%">
