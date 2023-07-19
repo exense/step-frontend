@@ -20,7 +20,7 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
     const artefact = item.resolvedArtefact;
     const name = artefact?.attributes?.['name'] || '';
     const isSkipped = false;
-    const icon = this._artefactTypes.getArtefactType(artefact?._class)?.iconNg2 ?? this._artefactTypes.defaultIcon;
+    const icon = this._artefactTypes.getArtefactType(artefact?._class)?.icon ?? this._artefactTypes.defaultIcon;
     const expandable = this.hasChildren(id);
     const children = (item?.children || []).map((child) => this.convertItem(child, id));
     const iconClassName = `step-node-status-${item.status}`;

@@ -26,8 +26,7 @@ export class ArtefactTreeNodeUtilsService
     const id = originalArtefact.id!;
     const name = originalArtefact.attributes?.['name'] || '';
     const isSkipped = !!originalArtefact.skipNode?.value;
-    const icon =
-      this._artefactTypes.getArtefactType(originalArtefact?._class)?.iconNg2 ?? this._artefactTypes.defaultIcon;
+    const icon = this._artefactTypes.getArtefactType(originalArtefact?._class)?.icon ?? this._artefactTypes.defaultIcon;
     const expandable = (originalArtefact?.children?.length ?? -1) > 0;
     const children = (originalArtefact?.children || []).map((child) => this.convertItem(child, id));
 

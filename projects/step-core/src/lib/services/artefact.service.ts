@@ -8,8 +8,8 @@ import {
 } from '../modules/custom-registeries/custom-registries.module';
 
 export interface ArtefactType extends CustomRegistryItem {
-  iconNg2: string;
-  description: string;
+  icon: string;
+  description?: string;
   isSelectable?: boolean;
 }
 
@@ -37,6 +37,9 @@ export class ArtefactService {
     }
     if (!artefactType.label) {
       artefactType.label = typeName;
+    }
+    if (!artefactType.description) {
+      artefactType.description = '';
     }
     if (!('isSelectable' in artefactType)) {
       artefactType.isSelectable = true;

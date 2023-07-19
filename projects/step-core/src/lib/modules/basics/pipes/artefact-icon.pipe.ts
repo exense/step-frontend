@@ -8,6 +8,6 @@ export class ArtefactIconPipe implements PipeTransform {
   constructor(private _artefactTypes: ArtefactService) {}
 
   transform(artefactClass: string): string {
-    return this._artefactTypes.getArtefactType(artefactClass)?.iconNg2 ?? '';
+    return this._artefactTypes.getArtefactType(artefactClass)?.icon ?? '';
   }
 }

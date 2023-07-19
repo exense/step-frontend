@@ -33,7 +33,7 @@ export class ReportNodeIconComponent implements OnChanges {
     }
 
     const icon =
-      this._artefactTypes.getArtefactType(node.resolvedArtefact?._class)?.iconNg2 ?? this._artefactTypes.defaultIcon;
+      this._artefactTypes.getArtefactType(node.resolvedArtefact?._class)?.icon ?? this._artefactTypes.defaultIcon;
 
     fieldAccessor.statusClass = `step-node-status-${node.status}`;
     fieldAccessor.icon = icon;

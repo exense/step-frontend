@@ -91,167 +91,160 @@ export class ArtefactsModule {
 
   registerArtefacts(): void {
     this._artefactService.register('TestSet', {
-      iconNg2: 'folder',
+      icon: 'folder',
       component: TestSetComponent,
       description: 'Used to group up TestCase’s as a single unit and executing them in parallel',
     });
     this._artefactService.register('TestCase', {
-      iconNg2: 'list',
+      icon: 'list',
       description:
         'Specific container for a group of nodes, it will activate the top-level panel in the execution view for high-level test case execution monitoring',
     });
     this._artefactService.register('TestScenario', {
-      iconNg2: 'bar-chart-2',
+      icon: 'bar-chart-2',
       description: 'Usually used to parallelize the execution of multiple ThreadGroups or ‘sub’ plans',
     });
     this._artefactService.register('CallPlan', {
-      iconNg2: 'external-link',
+      icon: 'external-link',
       component: CallPlanComponent,
       description: 'Used to invoke a plan from within another plan',
     });
     this._artefactService.register('CallKeyword', {
-      iconNg2: 'target',
+      icon: 'target',
       component: CallKeywordComponent,
       description:
         'Technical node used as part of keyword invocation. Can be used explicitly in order to call a keyword by reflection',
     });
     this._artefactService.register('For', {
-      iconNg2: 'cpu',
+      icon: 'cpu',
       component: ForComponent,
       description: 'Creates a For loop at execution time and iterates through its children',
     });
     this._artefactService.register('ForEach', {
-      iconNg2: 'cpu',
+      icon: 'cpu',
       component: ForEachComponent,
       description: 'Creates a ForEach loop based on a collection and iterates through the child nodes',
     });
     this._artefactService.register('While', {
-      iconNg2: 'rotate-cw',
+      icon: 'rotate-cw',
       component: WhileComponent,
       description: 'Iterates over the node content until the given condition is not met',
     });
     this._artefactService.register('DataSet', {
-      iconNg2: 'grid',
+      icon: 'grid',
       component: DataSetComponent,
       description: 'Used to iterate over rows of data in a table',
     });
     this._artefactService.register('Synchronized', {
-      iconNg2: 'align-justify',
+      icon: 'align-justify',
       component: SynchronizedComponent,
       description:
         'Guarantee thread safety within a test block by synchronizing all threads on the entire Test Execution',
     });
     this._artefactService.register('Sequence', {
-      iconNg2: 'align-justify',
+      icon: 'align-justify',
       component: SequenceComponent,
       description: 'Guarantees the ordering of the child nodes, as displayed in the tree.',
     });
     this._artefactService.register('BeforeSequence', {
-      iconNg2: 'arrow-up',
+      icon: 'arrow-up',
       component: SequenceComponent,
-      description: '',
     });
     this._artefactService.register('AfterSequence', {
-      iconNg2: 'arrow-down',
+      icon: 'arrow-down',
       component: SequenceComponent,
-      description: '',
     });
     this._artefactService.register('Return', {
-      iconNg2: 'corner-up-right',
+      icon: 'corner-up-right',
       component: ReturnComponent,
       description: 'Used within a Composite Keyword, set the Composite output to the returned value(s)',
     });
     this._artefactService.register('Echo', {
-      iconNg2: 'zoom-in',
+      icon: 'zoom-in',
       component: EchoComponent,
       description: 'Used to print data in the report nodes of a plan, mostly for debugging or information purposes',
     });
     this._artefactService.register('If', {
-      iconNg2: 'square',
+      icon: 'square',
       component: IfComponent,
       description: 'Only executes the child nodes if the condition is met',
     });
     this._artefactService.register('Session', {
-      iconNg2: 'briefcase',
+      icon: 'briefcase',
       component: SessionComponent,
       description: 'Guarantees that Keywords are executed within the the same Session i.e. Agent Token',
     });
     this._artefactService.register('Set', {
       component: SetComponent,
-      iconNg2: 'download',
+      icon: 'download',
       description: 'Sets a value to a variable, which can then be accessed throughout Plans and sub Plans',
     });
     this._artefactService.register('Sleep', {
-      iconNg2: 'coffee',
+      icon: 'coffee',
       component: SleepComponent,
       description: 'Causes the thread to sleep',
     });
     this._artefactService.register('Script', {
-      iconNg2: 'align-left',
+      icon: 'align-left',
       component: ScriptComponent,
       description:
         'Executes any arbitrary groovy code. The script context is local, which means that variable used in the script control cannot be accessed externally by other nodes',
     });
     this._artefactService.register('ThreadGroup', {
-      iconNg2: 'code',
+      icon: 'code',
       component: ThreadGroupComponent,
       description: 'Starts multiple threads which will execute the node content in parallel',
     });
     this._artefactService.register('BeforeThread', {
-      iconNg2: 'chevron-left',
+      icon: 'chevron-left',
       component: SequenceComponent,
-      description: '',
     });
     this._artefactService.register('AfterThread', {
-      iconNg2: 'chevron-right',
+      icon: 'chevron-right',
       component: SequenceComponent,
-      description: '',
     });
     this._artefactService.register('Thread', {
-      iconNg2: 'code',
+      icon: 'code',
       component: ThreadGroupComponent,
-      description: '',
       isSelectable: false,
     });
     this._artefactService.register('Switch', {
-      iconNg2: 'more-vertical',
+      icon: 'more-vertical',
       component: SwitchComponent,
       description: 'Same as in any programming language, to use in combinaison with the "Case" control',
     });
     this._artefactService.register('Case', {
-      iconNg2: 'minus',
+      icon: 'minus',
       component: CaseComponent,
       description: 'Same as in any programming language, to use in combinaison with the "Switch" control',
     });
     this._artefactService.register('RetryIfFails', {
-      iconNg2: 'repeat',
+      icon: 'repeat',
       component: RetryIfFailsComponent,
       description: 'Retry mechanism with grace period',
     });
     this._artefactService.register('Check', {
-      iconNg2: 'check',
+      icon: 'check',
       component: CheckComponent,
       description:
         'Performs a custom assertion using groovy expressions. Useful for validating the output of the parent node. For standard assertions use the Control Assert instead',
     });
     this._artefactService.register('Assert', {
-      iconNg2: 'check',
+      icon: 'check',
       component: AssertComponent,
       description: 'Validates the output of a keyword execution.',
     });
     this._artefactService.register('Placeholder', {
-      iconNg2: 'square',
+      icon: 'square',
       component: PlaceholderComponent,
       description: '',
     });
     this._artefactService.register('Export', {
-      iconNg2: 'upload',
+      icon: 'upload',
       component: ExportComponent,
-      description: '',
     });
     this._artefactService.register('Failure', {
-      iconNg2: 'thumbs-down',
-      description: '',
+      icon: 'thumbs-down',
       isSelectable: false,
     });
   }
