@@ -71,7 +71,6 @@ import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
 import { ArtefactDetailsComponent } from './components/artefact-details/artefact-details.component';
-import { ArtefactDetailsWrapperDirective } from './directives/artefact-details-wrapper.directive';
 import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 import { ResourceInputModule } from './modules/resource-input/resource-input.module';
 import { IsUsedByDialogService } from './services/is-used-by-dialog.service';
@@ -128,7 +127,6 @@ import { IsUsedByDialogService } from './services/is-used-by-dialog.service';
     EditSchedulerTaskDialogComponent,
     ExportDialogComponent,
     ArtefactDetailsComponent,
-    ArtefactDetailsWrapperDirective,
     WaitingArtefactsAdvancedComponent,
   ],
   imports: [

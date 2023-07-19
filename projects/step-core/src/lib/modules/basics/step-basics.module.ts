@@ -107,7 +107,6 @@ export * from './components/upload-container/upload-container.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
 export * from './pipes/has-right.pipe';
-export * from './services/artefact-types.service';
 export * from './services/credentials.service';
 export * from './services/auth.service';
 export * from './services/item-by-id-cache.service';

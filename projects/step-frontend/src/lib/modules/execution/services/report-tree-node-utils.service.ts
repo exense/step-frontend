@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@angular/core';
-import { ArtefactTypesService, ControllerService, ReportNode, TreeNode, TreeNodeUtilsService } from '@exense/step-core';
+import { ArtefactService, ControllerService, ReportNode, TreeNode, TreeNodeUtilsService } from '@exense/step-core';
 import { EXECUTION_TREE_PAGE_LIMIT, EXECUTION_TREE_PAGING, ExecutionTreePaging } from './execution-tree-paging';
 import { ReportTreeNode } from '../shared/report-tree-node';
-import { filter, forkJoin, map, Observable, tap } from 'rxjs';
+import { forkJoin, map, Observable, tap } from 'rxjs';
 import { ReportNodeWithChildren } from '../shared/report-node-with-children';
 
 @Injectable()
@@ -11,7 +11,7 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
 
   constructor(
     @Inject(EXECUTION_TREE_PAGING) private _paging: ExecutionTreePaging,
-    private _artefactTypes: ArtefactTypesService,
+    private _artefactTypes: ArtefactService,
     private _controllerService: ControllerService
   ) {}
 
@@ -20,7 +20,7 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
     const artefact = item.resolvedArtefact;
     const name = artefact?.attributes?.['name'] || '';
     const isSkipped = false;
-    const icon = artefact ? this._artefactTypes.getIconNg2(artefact._class) : this._artefactTypes.getDefaultIconNg2();
+    const icon = this._artefactTypes.getArtefactType(artefact?._class)?.iconNg2 ?? this._artefactTypes.defaultIcon;
     const expandable = this.hasChildren(id);
     const children = (item?.children || []).map((child) => this.convertItem(child, id));
     const iconClassName = `step-node-status-${item.status}`;
