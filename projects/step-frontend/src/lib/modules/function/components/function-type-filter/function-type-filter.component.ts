@@ -14,7 +14,7 @@ import { AJS_FUNCTION_TYPE_REGISTRY, ArrayFilterComponent, BaseFilterComponent }
 })
 export class FunctionTypeFilterComponent
   extends ArrayFilterComponent
-  implements OnInit, BaseFilterComponent<string, unknown[]>
+  implements OnInit, BaseFilterComponent<string, unknown>
 {
   constructor(@Inject(AJS_FUNCTION_TYPE_REGISTRY) private _functionTypeRegistry: any) {
     super();

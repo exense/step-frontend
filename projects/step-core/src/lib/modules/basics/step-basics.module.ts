@@ -25,6 +25,7 @@ import { AlertDirective } from './directives/alert.directive';
 import { ValidateJsonDirective } from './directives/validate-json.directive';
 import { ErrorsListComponent } from './components/errors-list/errors-list.component';
 import { PreventCharsDirective } from './directives/prevent-chars.directive';
+import { SingleItemArrayFilterComponent } from './components/single-item-array-filter/single-item-array-filter.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
@@ -52,6 +53,7 @@ import { PreventCharsDirective } from './directives/prevent-chars.directive';
     ValidateJsonDirective,
     ErrorsListComponent,
     PreventCharsDirective,
+    SingleItemArrayFilterComponent,
   ],
   exports: [
     ResourceLabelComponent,
@@ -77,12 +79,14 @@ import { PreventCharsDirective } from './directives/prevent-chars.directive';
     ValidateJsonDirective,
     ErrorsListComponent,
     PreventCharsDirective,
+    SingleItemArrayFilterComponent,
   ],
 })
 export class StepBasicsModule {}
 
 export * from './components/base-filter/base-filter.component';
 export * from './components/array-filter/array-filter.component';
+export * from './components/single-item-array-filter/single-item-array-filter.component';
 export * from './components/date-filter/date-filter.component';
 export * from './components/input-filter/hexadecimal-input-filter.component';
 export * from './components/input-filter/input-filter.component';

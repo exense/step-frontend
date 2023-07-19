@@ -9,7 +9,7 @@
     <ng-container *ngIf="_state.execution?.executionParameters?.customParameters as execParams">
       <li *ngFor="let item of execParams | keyvalue">
         <strong>{{ item.key }}</strong
-        ><span>{{ item.value }}</span>
+        >&nbsp;<span>{{ item.value }}</span>
       </li>
     </ng-container>
     <li>
