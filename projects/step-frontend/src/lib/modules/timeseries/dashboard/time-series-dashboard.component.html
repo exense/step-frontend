@@ -6,6 +6,7 @@
     [activeTimeRange]="settings.activeTimeRange"
     (onTimeRangeChange)="handleTimeRangeChange($event)"
     (onCompareModeEnabled)="enableCompareMode()"
+    (onCompareModeDisabled)="disableCompareMode()"
   ></step-timeseries-toolbar>
   <div style="display: flex; width: 100%">
     <div [style]="compareModeEnabled ? { width: '50%' } : { width: '100%' }">
@@ -13,12 +14,8 @@
         *ngIf="context"
         [context]="context"
         class="mat-card"
-        [performanceViewSettings]="performanceViewSettings"
         [defaultFilterOptions]="settings.filterOptions"
         [initialFilters]="contextualFilterItems"
-        (onFiltersChange)="handleFiltersChange($event)"
-        (onFilterSettingsChange)="handleFilteringChange($event)"
-        (onGroupingChange)="handleGroupingChange($event)"
       >
       </step-ts-filter-bar>
     </div>
@@ -27,12 +24,8 @@
         *ngIf="compareModeContext"
         [context]="compareModeContext"
         class="mat-card"
-        [performanceViewSettings]="performanceViewSettings"
         [defaultFilterOptions]="settings.filterOptions"
-        [initialFilters]="contextualFilterItems"
-        (onFiltersChange)="handleFiltersChange($event)"
-        (onFilterSettingsChange)="handleFilteringChange($event)"
-        (onGroupingChange)="handleGroupingChange($event)"
+        [initialFilters]="compareModeContext.getFilteringSettings().filterItems"
       >
       </step-ts-filter-bar>
     </div>

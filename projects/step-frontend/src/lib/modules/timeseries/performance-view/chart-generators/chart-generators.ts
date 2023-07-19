@@ -23,6 +23,7 @@ export class ChartGenerators {
   ): TSChartSettings {
     switch (type) {
       case TsChartType.OVERVIEW:
+      case TsChartType.OVERVIEW_COMPARE:
         return this.createSummaryChartSettings(request, response);
       case TsChartType.BY_STATUS:
         return ByStatusChartGenerator.createChart(request, response, colorsPool);

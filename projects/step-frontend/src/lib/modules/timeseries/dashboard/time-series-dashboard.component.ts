@@ -110,17 +110,10 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.context.updateActiveFilters(filters);
   }
 
-  handleFilteringChange(settings: TsFilteringSettings): void {
-    this.context.setFilteringSettings(settings);
-  }
-
-  handleGroupingChange(dimensions: string[]) {
-    this.context.updateGrouping(dimensions);
-  }
-
   handleTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
-    this.updateRange(TimeSeriesUtils.calculateFullTimeRange(this.execution!, this.timeRangeSelection));
+    //TODO optional execution
+    this.updateRange(TimeSeriesUtils.calculateFullTimeRange(this.settings.execution!, this.timeRangeSelection));
   }
 
   setRanges(fullRange: TSTimeRange, selection?: TSTimeRange) {
@@ -167,6 +160,10 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
         showLoadingBar: true,
       })
       .subscribe();
+  }
+
+  disableCompareMode(): void {
+    this.context.disableCompareMode();
   }
 
   enableCompareMode(): void {

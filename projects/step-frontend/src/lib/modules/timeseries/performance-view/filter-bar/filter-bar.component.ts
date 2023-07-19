@@ -33,13 +33,8 @@ import { TsFilteringMode } from '../../model/ts-filtering-mode';
 })
 export class FilterBarComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
-  @Input() performanceViewSettings!: PerformanceViewSettings;
   @Input() defaultFilterOptions: TsFilterItem[] = [];
   @Input() initialFilters: TsFilterItem[] = [];
-
-  @Output() onFiltersChange = new EventEmitter<TsFilterItem[]>();
-  @Output() onFilterSettingsChange = new EventEmitter<TsFilteringSettings>();
-  @Output() onGroupingChange = new EventEmitter<string[]>();
 
   @ViewChild(PerformanceViewTimeSelectionComponent) timeSelection?: PerformanceViewTimeSelectionComponent;
 
@@ -134,7 +129,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
       this.rawMeasurementsModeActive = response.hasUnknownFields;
       // for grouping change, we will trigger refresh automatically. otherwise grouping and filters will change together
       if (!this.rawMeasurementsModeActive) {
-        this.onGroupingChange.emit(dimensions);
+        this.context.updateGrouping(dimensions);
       } else {
         // wait for the manual apply
       }
@@ -147,12 +142,12 @@ export class FilterBarComponent implements OnInit, OnDestroy {
       filterItems: this.getValidFilters(),
       oql: this.oqlValue,
     };
-    this.onFilterSettingsChange.emit(settings);
+    this.context.setFilteringSettings(settings);
   }
 
   manuallyApplyFilters() {
     if (this.haveNewGrouping()) {
-      this.onGroupingChange.emit(this.groupDimensions);
+      this.context.updateGrouping(this.groupDimensions);
     }
     if (!this.oqlModeActive) {
       this.emitFiltersChange();
@@ -170,11 +165,6 @@ export class FilterBarComponent implements OnInit, OnDestroy {
         }
       });
     }
-  }
-
-  ngOnDestroy(): void {
-    this.emitFilterChange$.complete();
-    this.onFiltersChange.complete();
   }
 
   handleFilterChange(index: number, item: TsFilterItem) {
@@ -239,5 +229,9 @@ export class FilterBarComponent implements OnInit, OnDestroy {
       }
     }
     return false;
+  }
+
+  ngOnDestroy(): void {
+    this.emitFilterChange$.complete();
   }
 }

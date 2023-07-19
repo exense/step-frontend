@@ -16,7 +16,31 @@
       </step-timeseries-chart>
     </div>
 
+    <div class="chart" *ngIf="compareModeEnabled && compareModeContext">
+      <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.OVERVIEW_COMPARE]"></step-chart-skeleton>
+      <step-timeseries-chart
+        #summaryCompareChart
+        *ngIf="compareChartsSettings[TsChartType.OVERVIEW_COMPARE]"
+        [settings]="compareChartsSettings[TsChartType.OVERVIEW_COMPARE]"
+        [syncKey]="compareModeContext!.id"
+        (onZoomReset)="onChartsZoomReset()"
+      >
+      </step-timeseries-chart>
+    </div>
+
     <div class="chart">
+      <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.BY_STATUS]"></step-chart-skeleton>
+      <step-timeseries-chart
+        #byStatusChart
+        *ngIf="currentChartsSettings[TsChartType.BY_STATUS]"
+        [settings]="currentChartsSettings[TsChartType.BY_STATUS]"
+        [syncKey]="settings.contextId"
+        (onZoomReset)="onChartsZoomReset()"
+      >
+      </step-timeseries-chart>
+    </div>
+
+    <div class="chart" *ngIf="compareModeEnabled">
       <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.BY_STATUS]"></step-chart-skeleton>
       <step-timeseries-chart
         #byStatusChart
@@ -31,6 +55,47 @@
 
   <mat-card>
     <div class="chart">
+      <div class="chart-settings" *ngIf="currentChartsSettings[TsChartType.RESPONSE_TIME]">
+        <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
+          <step-icon name="settings"></step-icon>
+        </button>
+
+        <mat-menu #settingsMenu="matMenu">
+          <button mat-menu-item [matMenuTriggerFor]="metricsMenu">Metric</button>
+          <button mat-menu-item [matMenuTriggerFor]="keywordsMenu">Measurements</button>
+        </mat-menu>
+
+        <mat-menu #metricsMenu="matMenu">
+          <button
+            *ngFor="let metric of responseTimeMetrics"
+            (click)="switchResponseTimeMetric(metric)"
+            mat-menu-item
+            [class.selected-menu-item]="metric.label === selectedThroughputMetric.label"
+          >
+            {{ metric.label }}
+          </button>
+        </mat-menu>
+
+        <mat-menu #keywordsMenu="matMenu">
+          <step-measurements-picker
+            *ngIf="settings.contextId"
+            [contextId]="settings.contextId"
+          ></step-measurements-picker>
+        </mat-menu>
+      </div>
+
+      <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.RESPONSE_TIME]"></step-chart-skeleton>
+      <step-timeseries-chart
+        #responseTimeChart
+        *ngIf="currentChartsSettings[TsChartType.RESPONSE_TIME]"
+        [settings]="currentChartsSettings[TsChartType.RESPONSE_TIME]"
+        [syncKey]="settings.contextId"
+        (onZoomReset)="onChartsZoomReset()"
+      >
+      </step-timeseries-chart>
+    </div>
+
+    <div class="chart" *ngIf="compareModeEnabled">
       <div class="chart-settings" *ngIf="currentChartsSettings[TsChartType.RESPONSE_TIME]">
         <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
           <step-icon name="settings"></step-icon>
@@ -110,6 +175,45 @@
       </step-timeseries-chart>
     </div>
 
+    <div class="chart" *ngIf="compareModeEnabled">
+      <div class="chart-settings" *ngIf="currentChartsSettings[TsChartType.THROUGHPUT]">
+        <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
+          <step-icon name="settings"></step-icon>
+        </button>
+        <mat-menu #settingsMenu="matMenu">
+          <button mat-menu-item [matMenuTriggerFor]="metricsMenu">Metric</button>
+          <button mat-menu-item [matMenuTriggerFor]="keywordsMenu">Measurements</button>
+        </mat-menu>
+
+        <mat-menu #metricsMenu="matMenu">
+          <button
+            *ngFor="let metric of throughputMetrics"
+            (click)="switchThroughputMetric(metric)"
+            mat-menu-item
+            [class.selected-menu-item]="metric.label === selectedThroughputMetric.label"
+          >
+            {{ metric.label }}
+          </button>
+        </mat-menu>
+
+        <mat-menu #keywordsMenu="matMenu">
+          <step-measurements-picker
+            *ngIf="settings.contextId"
+            [contextId]="settings.contextId"
+          ></step-measurements-picker>
+        </mat-menu>
+      </div>
+      <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.THROUGHPUT]"></step-chart-skeleton>
+      <step-timeseries-chart
+        *ngIf="currentChartsSettings[TsChartType.THROUGHPUT]"
+        #throughputChart
+        [settings]="currentChartsSettings[TsChartType.THROUGHPUT]"
+        [syncKey]="settings.contextId"
+        (onZoomReset)="onChartsZoomReset()"
+      >
+      </step-timeseries-chart>
+    </div>
+
     <div class="charts-table">
       <step-timeseries-table #tableChart *ngIf="context" [executionContext]="context"></step-timeseries-table>
     </div>
@@ -117,6 +221,18 @@
 
   <mat-card *ngIf="settings?.includeThreadGroupChart">
     <div class="chart">
+      <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.THREAD_GROUP]"></step-chart-skeleton>
+      <step-timeseries-chart
+        *ngIf="currentChartsSettings[TsChartType.THREAD_GROUP]"
+        #threadGroupChart
+        [settings]="currentChartsSettings[TsChartType.THREAD_GROUP]"
+        [syncKey]="settings.contextId"
+        (onZoomReset)="onChartsZoomReset()"
+      >
+      </step-timeseries-chart>
+    </div>
+
+    <div class="chart" *ngIf="compareModeEnabled">
       <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.THREAD_GROUP]"></step-chart-skeleton>
       <step-timeseries-chart
         *ngIf="currentChartsSettings[TsChartType.THREAD_GROUP]"

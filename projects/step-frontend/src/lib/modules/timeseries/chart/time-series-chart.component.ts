@@ -30,6 +30,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   @ViewChild('chart') private chartElement!: ElementRef;
 
+  @Input() title!: string;
   @Input() settings!: TSChartSettings;
   @Input() syncKey: string | undefined; // all the charts with the same syncKey in the app will be synced
 
@@ -139,7 +140,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     }
     this.chartIsEmpty = noData;
     const opts: uPlot.Options = {
-      title: settings.title,
+      title: this.title || settings.title,
       ms: 1, // if not specified it's going to be in seconds
       ...this.getSize(),
       legend: { show: false },

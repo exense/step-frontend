@@ -30,7 +30,6 @@ import { PerformanceViewConfig } from './performance-view.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
 import { PerformanceViewTimeSelectionComponent } from './time-selection/performance-view-time-selection.component';
 import { TsFilteringMode } from '../model/ts-filtering-mode';
-import { TsCompareModeSettings } from '../dashboard/model/ts-compare-mode-settings';
 
 declare const uPlot: any;
 
@@ -49,6 +48,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   // key: TsChartType. here we keep all chart settings (by TsChartType
   currentChartsSettings: { [key: string]: TSChartSettings } = {};
+  compareChartsSettings: { [key: string]: TSChartSettings } = {};
 
   @ViewChild('ranger') ranger!: TSRangerComponent;
   @ViewChild('throughputChart') throughputChart!: TimeSeriesChartComponent;
@@ -75,6 +75,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   // findRequest!: FindBucketsRequest;
   findRequestBuilder: FindBucketsRequestBuilder = new FindBucketsRequestBuilder();
+  compareRequestBuilder: FindBucketsRequestBuilder = new FindBucketsRequestBuilder();
   groupDimensions: string[] = [];
 
   execution: Execution | undefined;
@@ -102,6 +103,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   initializationTasks: Observable<any>[] = [];
   updateTasks: Observable<any>[] = [];
+
+  compareModeEnabled: boolean = false;
+  compareModeContext: TimeSeriesContext | undefined;
 
   valueAscOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => {
     return a.key.localeCompare(b.key);
@@ -222,6 +226,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   private initContext() {
     this.keywordsService = this.context.keywordsContext;
+    this.context.onCompareModeChange().subscribe(({ enabled, context }) => {
+      this.compareModeEnabled = enabled;
+      this.compareModeContext = context;
+    });
   }
 
   prepareFindRequestBuilder(settings: PerformanceViewSettings, customFilters?: any): FindBucketsRequestBuilder {
@@ -249,6 +257,14 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .subscribe((allCompleted) => this.onInitializationComplete.emit());
   }
 
+  createAllCompareCharts(context: TimeSeriesContext) {
+    const charts$ = [this.createSummaryCompareChart(), this.createTableCompareChart(context)];
+    if (this.includeThreadGroupChart) {
+    }
+
+    forkJoin(charts$).pipe(takeUntil(this.terminator$)).subscribe();
+  }
+
   private refreshAllCharts(): Observable<unknown> {
     this.findRequestBuilder = this.prepareFindRequestBuilder(this.settings); // we don't want to lose active filters
     const timeSelection = this.context.getSelectedTimeRange();
@@ -273,6 +289,10 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
   onChartsZoomReset() {
     this.context.resetZoom();
+  }
+
+  onCompareChartsZoomReset() {
+    this.compareModeContext?.resetZoom();
   }
 
   createThreadGroupsChart(): Observable<TimeSeriesAPIResponse> {
@@ -323,6 +343,13 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .pipe(tap((response) => this.createChart(TsChartType.OVERVIEW, request, response)));
   }
 
+  createSummaryCompareChart(): Observable<TimeSeriesAPIResponse> {
+    const request = this.compareRequestBuilder.build();
+    return this.timeSeriesService
+      .getBuckets(request)
+      .pipe(tap((response) => this.createChart(TsChartType.OVERVIEW_COMPARE, request, response)));
+  }
+
   getChart(chartType: TsChartType): TimeSeriesChartComponent {
     switch (chartType) {
       case TsChartType.OVERVIEW:
@@ -335,6 +362,8 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
         return this.throughputChart;
       case TsChartType.THREAD_GROUP:
         return this.threadGroupChart;
+      default:
+        throw new Error('Not Implemented');
     }
   }
 
@@ -361,6 +390,16 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   }
 
   enableCompareMode(context: TimeSeriesContext): void {
+    this.compareRequestBuilder = new FindBucketsRequestBuilder()
+      .withRange(context.getFullTimeRange())
+      .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
+      .withFilteringSettings(context.getFilteringSettings())
+      .withNumberOfBuckets(TimeSeriesConfig.MAX_BUCKETS_IN_CHART);
+
+    this.createTableCompareChart(context);
+  }
+
+  createTableCompareChart(context: TimeSeriesContext): Observable<TimeSeriesAPIResponse> {
     const findRequest = new FindBucketsRequestBuilder()
       .withRange(context.getFullTimeRange())
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
@@ -369,9 +408,9 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .withGroupDimensions(context.getGroupDimensions())
       .withPercentiles([80, 90, 99])
       .build();
-    this.timeSeriesService
+    return this.timeSeriesService
       .getBuckets(findRequest)
-      .subscribe((response) => this.tableChart.enableCompareMode(response, context));
+      .pipe(tap((response) => this.tableChart.enableCompareMode(response, context)));
   }
 
   disableCompareMode() {}

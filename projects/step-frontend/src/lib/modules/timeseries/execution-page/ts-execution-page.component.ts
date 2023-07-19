@@ -107,6 +107,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
     const timeRangeOptions = TimeSeriesConfig.EXECUTION_PAGE_TIME_SELECTION_OPTIONS;
     this.dashboardSettings = {
       contextId: this.executionId,
+      execution: execution,
       includeThreadGroupChart: true,
       timeRange: { from: startTime, to: endTime },
       timeRangeOptions: timeRangeOptions,
