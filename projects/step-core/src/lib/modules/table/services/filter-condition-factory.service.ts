@@ -12,6 +12,7 @@ import { DynamicValueFilterCondition } from '../shared/dynamic-value-filter-cond
 import { ParametersFilterCondition } from '../shared/parameters-filter-condition';
 import { FilterConditionJson } from '../shared/filter-condition-json.interface';
 import { FilterConditionType } from '../shared/filter-condition-type.enum';
+import { BooleanFilterCondition } from '../shared/boolean-filter-condition';
 
 @Injectable({
   providedIn: 'root',
@@ -37,6 +38,10 @@ export class FilterConditionFactoryService {
 
   numberFilterCondition(value?: string): FilterCondition {
     return new NumberFilterCondition(value);
+  }
+
+  booleanFilterCondition(value?: string): FilterCondition {
+    return new BooleanFilterCondition(value);
   }
 
   dynamicValueFilterCondition(value?: string): FilterCondition {

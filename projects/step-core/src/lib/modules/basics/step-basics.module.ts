@@ -25,6 +25,7 @@ import { AlertDirective } from './directives/alert.directive';
 import { ValidateJsonDirective } from './directives/validate-json.directive';
 import { ErrorsListComponent } from './components/errors-list/errors-list.component';
 import { PreventCharsDirective } from './directives/prevent-chars.directive';
+import { SingleItemArrayFilterComponent } from './components/single-item-array-filter/single-item-array-filter.component';
 import { JsonRawEditorFormattedComponent } from './components/json-raw-editor-formatted/json-raw-editor-formatted.component';
 import { LabelAddonDirective } from './directives/label-addon.directive';
 
@@ -56,6 +57,7 @@ import { LabelAddonDirective } from './directives/label-addon.directive';
     PreventCharsDirective,
     JsonRawEditorFormattedComponent,
     LabelAddonDirective,
+    SingleItemArrayFilterComponent,
   ],
   exports: [
     ResourceLabelComponent,
@@ -81,6 +83,7 @@ import { LabelAddonDirective } from './directives/label-addon.directive';
     ValidateJsonDirective,
     ErrorsListComponent,
     PreventCharsDirective,
+    SingleItemArrayFilterComponent,
     JsonRawEditorFormattedComponent,
     LabelAddonDirective,
   ],
@@ -89,6 +92,7 @@ export class StepBasicsModule {}
 
 export * from './components/base-filter/base-filter.component';
 export * from './components/array-filter/array-filter.component';
+export * from './components/single-item-array-filter/single-item-array-filter.component';
 export * from './components/date-filter/date-filter.component';
 export * from './components/input-filter/hexadecimal-input-filter.component';
 export * from './components/input-filter/input-filter.component';
