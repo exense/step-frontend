@@ -1,0 +1,10 @@
+<section class="wizard-container" *ngIf="isWizardVisible; else noWizard">
+  <step-wizard-steps [steps]="wizardExample" (finish)="finishWizard($event)"> </step-wizard-steps>
+</section>
+<ng-template #noWizard>
+  <button type="button" mat-button mat-flat-button color="primary" (click)="startWizard()">Start Wizard</button>
+</ng-template>
+<ng-container *ngIf="resultSteps">
+  <h4>Wizard Results</h4>
+  <pre>{{ resultSteps | json }}</pre>
+</ng-container>

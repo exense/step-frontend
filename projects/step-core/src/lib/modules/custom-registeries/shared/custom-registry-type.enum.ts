@@ -9,4 +9,5 @@ export enum CustomRegistryType {
 
   executionCustomPanel = 'executionCustomPanel',
   artefact = 'artefact',
+  wizardStep = 'wizardStep',
 }

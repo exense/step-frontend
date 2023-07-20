@@ -17,6 +17,7 @@ import { TimeSeriesModule } from './modules/timeseries/time-series.module';
 import { ArtefactsModule } from './modules/artefacts/artefacts.module';
 import { PLUGINS_INITIALIZER } from './plugins-initializer/plugins-initializer';
 import { Settings } from 'luxon';
+import { WizardsModule } from './modules/wizards/wizards.module';
 
 Settings.defaultLocale = 'en';
 
@@ -39,6 +40,7 @@ Settings.defaultLocale = 'en';
     GenericFunctionModule,
     ArtefactsModule,
     ResourcesModule,
+    WizardsModule,
   ],
   providers: [PLUGINS_INITIALIZER],
 })

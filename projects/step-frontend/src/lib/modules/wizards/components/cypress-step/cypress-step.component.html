@@ -1,0 +1,21 @@
+<ng-container *ngIf="context" [formGroup]="context">
+  <step-resource-input-wrapper
+    label="Cypress Project"
+    type="functions"
+    [directory]="false"
+    tooltip="A zip of your Cypress project"
+    formControlName="project"
+  >
+  </step-resource-input-wrapper>
+  <step-form-field>
+    <step-label>Spec file</step-label>
+    <input type="text" formControlName="spec" />
+    <step-suffix class="icon-suffix">
+      <step-icon
+        name="help-circle"
+        matTooltip='The filename of the Cypress spec to be executed. The file has to be located in the "e2e" folder of your project. For instance: todo.cy.js. No spec has to be set if you specify a command.'
+      >
+      </step-icon>
+    </step-suffix>
+  </step-form-field>
+</ng-container>
