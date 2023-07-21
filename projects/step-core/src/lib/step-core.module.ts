@@ -75,6 +75,7 @@ import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
 import { ArtefactDetailsComponent } from './components/artefact-details/artefact-details.component';
 import { ArtefactDetailsWrapperDirective } from './directives/artefact-details-wrapper.directive';
+import { ProjectNamePipe } from './pipes/project-name.pipe';
 
 @NgModule({
   declarations: [
@@ -136,6 +137,7 @@ import { ArtefactDetailsWrapperDirective } from './directives/artefact-details-w
     FileAlreadyExistingDialogComponent,
     ArtefactDetailsComponent,
     ArtefactDetailsWrapperDirective,
+    ProjectNamePipe,
   ],
   imports: [
     CommonModule,
@@ -223,6 +225,7 @@ import { ArtefactDetailsWrapperDirective } from './directives/artefact-details-w
     ExportDialogComponent,
     FileAlreadyExistingDialogComponent,
     ArtefactDetailsComponent,
+    ProjectNamePipe,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -326,6 +329,7 @@ export * from './modules/tree/tree.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/is-chart-empty.pipe';
+export * from './pipes/project-name.pipe';
 export * from './pipes/matching-authenticator.pipe';
 export { PlanNamePipe } from './pipes/plan-name.pipe';
 export * from './services/additional-right-rule.service';
