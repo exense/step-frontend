@@ -23,10 +23,6 @@ export class TsToolbarComponent {
 
   constructor(private _timeSeriesService: TimeSeriesService, private _tableApiService: TableApiWrapperService) {}
 
-  handleGroupingChange(dimensions: string[]) {
-    this.context.updateGrouping(dimensions);
-  }
-
   handleTimeRangeChange(selection: TimeRangePickerSelection) {
     this.onTimeRangeChange.next(selection);
   }

@@ -1,6 +1,7 @@
 .main-container {
   display: flex;
   justify-content: space-between;
+  max-width: 100%;
 }
 
 .ranger-skeleton {
@@ -39,7 +40,7 @@
 
 .ranger-container {
   flex-grow: 1;
-  width: 100%;
+  max-width: 100%;
 }
 
 .time-picker-container {

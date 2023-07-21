@@ -76,6 +76,7 @@
       <mat-button-toggle [value]="false"> Basic</mat-button-toggle>
       <mat-button-toggle [value]="true"> OQL</mat-button-toggle>
     </mat-button-toggle-group>
+    <step-timeseries-grouping (onGroupingChange)="handleGroupingChange($event)"></step-timeseries-grouping>
   </div>
 </div>
 

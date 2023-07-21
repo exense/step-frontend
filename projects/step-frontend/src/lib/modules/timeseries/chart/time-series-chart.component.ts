@@ -76,6 +76,10 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     }
   }
 
+  ngAfterViewInit(): void {
+    this.createChart(this.settings);
+  }
+
   setTitle(title: string): void {
     let titles = this.chartElement.nativeElement.getElementsByClassName('u-title');
     if (titles.length) {
@@ -175,10 +179,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       this.uplot.destroy();
     }
     this.uplot = new uPlot(opts, data, this.chartElement.nativeElement);
-  }
-
-  ngAfterViewInit(): void {
-    this.createChart(this.settings);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -292,15 +292,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     return !!this.seriesIndexesByIds[id];
   }
 
-  addDataBySeries(data: number[], seriesKey: string): void {
-    let index = this.seriesIndexesByIds[seriesKey];
-    if (index === undefined) {
-      throw new Error('Series id not found: ' + seriesKey);
-    } else {
-      this.addDataBySeriesIndex(data, index);
-    }
-  }
-
   addDataBySeriesIndex(data: number[], seriesIndex: number): void {
     let existingData = this.uplot.data[seriesIndex] as number[];
     this.uplot.data[seriesIndex] = [...existingData, ...data];
@@ -341,12 +332,11 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   redraw(): void {
     this.uplot.setData(this.uplot.data);
-    this.uplot.setSize(this.getSize());
+    this.resize();
   }
 
-  getLastTimestamp(): number {
-    let timestampSeries = this.uplot.data[0];
-    return timestampSeries[timestampSeries.length - 1];
+  resize() {
+    this.uplot.setSize(this.getSize());
   }
 }
 

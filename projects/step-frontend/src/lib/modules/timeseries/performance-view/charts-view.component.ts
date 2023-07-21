@@ -13,7 +13,7 @@ import { forkJoin, Observable, of, Subject, switchMap, take, takeUntil, tap } fr
 import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { TimeSeriesChartComponent } from '../chart/time-series-chart.component';
-import { KeywordSelection, TimeSeriesKeywordsContext } from '../execution-page/time-series-keywords.context';
+import { KeywordSelection, TimeSeriesKeywordsContext } from '../pages/execution-page/time-series-keywords.context';
 import { FindBucketsRequest } from '../find-buckets-request';
 import { TSRangerComponent } from '../ranger/ts-ranger.component';
 import { TimeSeriesContext } from '../time-series-context';
@@ -26,10 +26,10 @@ import { PerformanceViewSettings } from './model/performance-view-settings';
 import { ThroughputMetric } from './model/throughput-metric';
 import { TsChartType } from './model/ts-chart-type';
 import { UpdatePerformanceViewRequest } from './model/update-performance-view-request';
-import { PerformanceViewConfig } from './performance-view.config';
 import { TimeseriesTableComponent } from './table/timeseries-table.component';
 import { PerformanceViewTimeSelectionComponent } from './time-selection/performance-view-time-selection.component';
 import { TsFilteringMode } from '../model/ts-filtering-mode';
+import { ChartsViewConfig } from './charts-view.config';
 
 declare const uPlot: any;
 
@@ -37,11 +37,11 @@ declare const uPlot: any;
  * This component is responsible for fetching the actual charts data from the backend
  */
 @Component({
-  selector: 'step-performance-view',
-  templateUrl: './performance-view.component.html',
-  styleUrls: ['./performance-view.component.scss'],
+  selector: 'step-charts-view',
+  templateUrl: './charts-view.component.html',
+  styleUrls: ['./charts-view.component.scss'],
 })
-export class PerformanceViewComponent implements OnInit, OnDestroy {
+export class ChartsViewComponent implements OnInit, OnDestroy {
   private CHART_LEGEND_SIZE = 65;
 
   rangerSettings: TSChartSettings | undefined;
@@ -53,6 +53,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   @ViewChild('ranger') ranger!: TSRangerComponent;
   @ViewChild('throughputChart') throughputChart!: TimeSeriesChartComponent;
   @ViewChild('summaryChart') summaryChart!: TimeSeriesChartComponent;
+  @ViewChild('summaryCompareChart') summaryCompareChart: TimeSeriesChartComponent | undefined;
   @ViewChild('byStatusChart') byStatusChart!: TimeSeriesChartComponent;
   @ViewChild('responseTimeChart') responseTimeChart!: TimeSeriesChartComponent;
   @ViewChild('threadGroupChart') threadGroupChart!: TimeSeriesChartComponent;
@@ -67,6 +68,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   @Output() onUpdateComplete: EventEmitter<void> = new EventEmitter<void>();
 
   chartsAreLoading = false;
+  compareChartsAreLoading = false;
 
   keywords: { [key: string]: KeywordSelection } = {};
   keywordSearchValue: string = '';
@@ -88,17 +90,18 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
   selectedRefreshInterval: RefreshInterval = this.refreshIntervals[0];
 
   terminator$ = new Subject<void>();
-  updateDashboardTerminator$ = new Subject<void>();
+  updateBaseChartsTerminator$ = new Subject<void>();
+  updateCompareChartsTerminator$ = new Subject<void>();
   intervalShouldBeCanceled = false;
 
   allSeriesChecked: boolean = true;
 
   private keywordsService!: TimeSeriesKeywordsContext;
 
-  responseTimeMetrics = PerformanceViewConfig.responseTimeMetrics;
+  responseTimeMetrics = ChartsViewConfig.responseTimeMetrics;
   selectedResponseTimeMetric = this.responseTimeMetrics[0];
 
-  throughputMetrics = PerformanceViewConfig.throughputMetrics;
+  throughputMetrics = ChartsViewConfig.throughputMetrics;
   selectedThroughputMetric = this.throughputMetrics[0];
 
   initializationTasks: Observable<any>[] = [];
@@ -161,29 +164,16 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
         this.disableCompareMode();
       }
     });
-    this.createAllCharts();
-  }
 
-  /**
-   * This method will reconstruct all charts.
-   * @param fullRange
-   */
-  updateFullRange(fullRange: TSTimeRange, selection?: TSTimeRange): void {
-    this.context.updateFullRange(fullRange, false);
-    this.timeSelection?.updateFullTimeRange(fullRange);
-    this.settings.timeRange = fullRange;
-    this.findRequestBuilder.withRange(fullRange);
-    if (selection) {
-      this.context.updateSelectedRange(selection, false);
-    }
+    this.createAllBaseCharts();
   }
 
   /**
    * This method will use the most recent context settings (like range, selection, filters, grouping)
    * @param request
    */
-  updateDashboard(request: UpdatePerformanceViewRequest): Observable<any> {
-    this.updateDashboardTerminator$.next(); // to keep executions synchronous
+  updateBaseCharts(request: UpdatePerformanceViewRequest): Observable<any> {
+    this.updateBaseChartsTerminator$.next(); // to keep executions synchronous
     // let's assume the complete interval and selections are set.
     if (!this.context.inProgress$.getValue()) this.context.setInProgress(true);
     const updates$ = [];
@@ -197,7 +187,34 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       updates$.push(this.refreshAllCharts());
     }
     return forkJoin(updates$).pipe(
-      takeUntil(this.updateDashboardTerminator$),
+      takeUntil(this.updateBaseChartsTerminator$),
+      tap(() => {
+        this.chartsAreLoading = false;
+        this.context.setInProgress(false);
+      })
+    );
+  }
+
+  /**
+   * This method will use the most recent context settings (like range, selection, filters, grouping)
+   * @param request
+   */
+  updateCompareCharts(request: UpdatePerformanceViewRequest): Observable<any> {
+    this.updateBaseChartsTerminator$.next(); // to keep executions synchronous
+    // let's assume the complete interval and selections are set.
+    if (!this.compareModeContext?.inProgress$.getValue()) this.compareModeContext?.setInProgress(true);
+    const updates$ = [];
+    if (request.showLoadingBar) {
+      this.compareChartsAreLoading = true;
+    }
+    if (request.updateRanger) {
+      updates$.push(...(this.timeSelection ? [this.timeSelection.refreshRanger()] : []));
+    }
+    if (request.updateCharts) {
+      updates$.push(this.refreshAllCharts());
+    }
+    return forkJoin(updates$).pipe(
+      takeUntil(this.updateBaseChartsTerminator$),
       tap(() => {
         this.chartsAreLoading = false;
         this.context.setInProgress(false);
@@ -217,13 +234,6 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     return this.refreshAllCharts();
   }
 
-  deleteObjectProperties(object: any, keys: string[]) {
-    if (!keys) {
-      return;
-    }
-    keys.forEach((key) => delete object[key]);
-  }
-
   private initContext() {
     this.keywordsService = this.context.keywordsContext;
     this.context.onCompareModeChange().subscribe(({ enabled, context }) => {
@@ -232,7 +242,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     });
   }
 
-  prepareFindRequestBuilder(settings: PerformanceViewSettings, customFilters?: any): FindBucketsRequestBuilder {
+  prepareFindRequestBuilder(settings: PerformanceViewSettings): FindBucketsRequestBuilder {
     return new FindBucketsRequestBuilder()
       .withRange(settings.timeRange)
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
@@ -240,13 +250,13 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .withNumberOfBuckets(TimeSeriesConfig.MAX_BUCKETS_IN_CHART);
   }
 
-  createAllCharts() {
+  private createAllBaseCharts() {
     const charts$ = [
       this.createSummaryChart(),
       this.createByStatusChart(),
       this.createByKeywordsCharts(),
       this.createTableChart(),
-      ...(this.timeSelection ? [this.timeSelection.onRangerLoaded.pipe(take(1))] : []),
+      // ...(this.timeSelection ? [this.timeSelection.onRangerLoaded.pipe(take(1))] : []),
     ];
     if (this.includeThreadGroupChart) {
       charts$.push(this.createThreadGroupsChart());
@@ -299,7 +309,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     const filteringSettings = this.context.getFilteringSettings();
     if (filteringSettings.mode === TsFilteringMode.OQL && this.settings.disableThreadGroupOnOqlMode) {
       const threadGroupChart = this.getChart(TsChartType.THREAD_GROUP);
-      threadGroupChart.setAsUnavailable();
+      threadGroupChart?.setAsUnavailable();
       let emptyResponse = { start: 0, end: 0, interval: 0, matrix: [], matrixKeys: [] };
       return of(emptyResponse);
     }
@@ -333,6 +343,22 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     );
   }
 
+  createCompareChart(type: TsChartType, request: FindBucketsRequest, response: TimeSeriesAPIResponse) {
+    // all charts should be created and grouped via this principle in the end.
+    const existingChart = this.getCompareChart(type);
+    if (response.matrixKeys.length === 0 && existingChart) {
+      // empty data
+      existingChart.clear();
+      return;
+    }
+    this.compareChartsSettings[type] = ChartGenerators.generateChart(
+      type,
+      request,
+      response,
+      this.context.keywordsContext.colorsPool
+    );
+  }
+
   /**
    * This method is used for both creating or updating the chart
    */
@@ -347,7 +373,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
     const request = this.compareRequestBuilder.build();
     return this.timeSeriesService
       .getBuckets(request)
-      .pipe(tap((response) => this.createChart(TsChartType.OVERVIEW_COMPARE, request, response)));
+      .pipe(tap((response) => this.createCompareChart(TsChartType.OVERVIEW, request, response)));
   }
 
   getChart(chartType: TsChartType): TimeSeriesChartComponent {
@@ -362,6 +388,15 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
         return this.throughputChart;
       case TsChartType.THREAD_GROUP:
         return this.threadGroupChart;
+      default:
+        throw new Error('Not Implemented');
+    }
+  }
+
+  getCompareChart(chartType: TsChartType): TimeSeriesChartComponent | undefined {
+    switch (chartType) {
+      case TsChartType.OVERVIEW:
+        return this.summaryCompareChart;
       default:
         throw new Error('Not Implemented');
     }
@@ -396,7 +431,7 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
       .withFilteringSettings(context.getFilteringSettings())
       .withNumberOfBuckets(TimeSeriesConfig.MAX_BUCKETS_IN_CHART);
 
-    this.createTableCompareChart(context);
+    this.createAllCompareCharts(context);
   }
 
   createTableCompareChart(context: TimeSeriesContext): Observable<TimeSeriesAPIResponse> {
@@ -600,4 +635,4 @@ export class PerformanceViewComponent implements OnInit, OnDestroy {
 
 getAngularJSGlobal()
   .module(AJS_MODULE)
-  .directive('stepPerformanceView', downgradeComponent({ component: PerformanceViewComponent }));
+  .directive('stepPerformanceView', downgradeComponent({ component: ChartsViewComponent }));

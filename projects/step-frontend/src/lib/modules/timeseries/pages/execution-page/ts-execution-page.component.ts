@@ -18,19 +18,18 @@ import {
   TimeSeriesService,
 } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { PerformanceViewSettings } from '../performance-view/model/performance-view-settings';
-import { RangeSelectionType } from '../time-selection/model/range-selection-type';
-import { PerformanceViewComponent } from '../performance-view/performance-view.component';
+import { PerformanceViewSettings } from '../../performance-view/model/performance-view-settings';
+import { RangeSelectionType } from '../../time-selection/model/range-selection-type';
 import { Subject, Subscription, takeUntil, timer } from 'rxjs';
-import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
-import { TSTimeRange } from '../chart/model/ts-time-range';
-import { TimeSeriesConfig } from '../time-series.config';
+import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
+import { TimeSeriesConfig } from '../../time-series.config';
 import { MatMenuTrigger } from '@angular/material/menu';
-import { TimeSeriesDashboardSettings } from '../dashboard/model/ts-dashboard-settings';
-import { TimeSeriesDashboardComponent } from '../dashboard/time-series-dashboard.component';
-import { FilterBarItemType } from '../performance-view/filter-bar/model/ts-filter-item';
-import { TsUtils } from '../util/ts-utils';
-import { TimeSeriesUtils } from '../time-series-utils';
+import { TimeSeriesDashboardSettings } from '../../dashboard/model/ts-dashboard-settings';
+import { TimeSeriesDashboardComponent } from '../../dashboard/time-series-dashboard.component';
+import { FilterBarItemType } from '../../performance-view/filter-bar/model/ts-filter-item';
+import { TsUtils } from '../../util/ts-utils';
+import { TimeSeriesUtils } from '../../time-series-utils';
+import { ChartsViewComponent } from '../../performance-view/charts-view.component';
 
 @Component({
   selector: 'step-execution-performance',
@@ -42,7 +41,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
 
   @ViewChild('dashboard') dashboard!: TimeSeriesDashboardComponent;
   @ViewChild('matTrigger') matTrigger!: MatMenuTrigger;
-  @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
+  @ViewChild(ChartsViewComponent) performanceView!: ChartsViewComponent;
 
   @Input() executionId!: string;
   @Input() executionInput: Execution | undefined;

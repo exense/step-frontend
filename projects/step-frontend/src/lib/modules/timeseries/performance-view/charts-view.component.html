@@ -1,5 +1,10 @@
 <div id="progress-bar">
-  <mat-progress-bar *ngIf="chartsAreLoading" style="height: 12px" [mode]="'indeterminate'"></mat-progress-bar>
+  <div class="bar-container">
+    <mat-progress-bar *ngIf="chartsAreLoading" style="height: 12px" [mode]="'indeterminate'"></mat-progress-bar>
+  </div>
+  <div class="bar-container" *ngIf="compareModeEnabled">
+    <mat-progress-bar *ngIf="compareChartsAreLoading" style="height: 12px" [mode]="'indeterminate'"></mat-progress-bar>
+  </div>
 </div>
 
 <div class="cards">
@@ -8,6 +13,7 @@
       <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.OVERVIEW]"></step-chart-skeleton>
       <step-timeseries-chart
         #summaryChart
+        title="Performance Overview"
         *ngIf="currentChartsSettings[TsChartType.OVERVIEW]"
         [settings]="currentChartsSettings[TsChartType.OVERVIEW]"
         [syncKey]="settings.contextId"
@@ -17,13 +23,14 @@
     </div>
 
     <div class="chart" *ngIf="compareModeEnabled && compareModeContext">
-      <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.OVERVIEW_COMPARE]"></step-chart-skeleton>
+      <step-chart-skeleton *ngIf="!compareChartsSettings[TsChartType.OVERVIEW]"></step-chart-skeleton>
       <step-timeseries-chart
         #summaryCompareChart
-        *ngIf="compareChartsSettings[TsChartType.OVERVIEW_COMPARE]"
-        [settings]="compareChartsSettings[TsChartType.OVERVIEW_COMPARE]"
+        title="Performance Overview"
+        *ngIf="compareChartsSettings[TsChartType.OVERVIEW]"
+        [settings]="compareChartsSettings[TsChartType.OVERVIEW]"
         [syncKey]="compareModeContext!.id"
-        (onZoomReset)="onChartsZoomReset()"
+        (onZoomReset)="onCompareChartsZoomReset()"
       >
       </step-timeseries-chart>
     </div>
@@ -32,6 +39,7 @@
       <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.BY_STATUS]"></step-chart-skeleton>
       <step-timeseries-chart
         #byStatusChart
+        title="Statuses"
         *ngIf="currentChartsSettings[TsChartType.BY_STATUS]"
         [settings]="currentChartsSettings[TsChartType.BY_STATUS]"
         [syncKey]="settings.contextId"
@@ -44,6 +52,7 @@
       <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.BY_STATUS]"></step-chart-skeleton>
       <step-timeseries-chart
         #byStatusChart
+        title="Statuses"
         *ngIf="currentChartsSettings[TsChartType.BY_STATUS]"
         [settings]="currentChartsSettings[TsChartType.BY_STATUS]"
         [syncKey]="settings.contextId"

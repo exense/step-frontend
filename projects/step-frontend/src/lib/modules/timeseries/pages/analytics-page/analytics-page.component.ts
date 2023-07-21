@@ -1,14 +1,14 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, DashboardService } from '@exense/step-core';
-import { TimeSeriesConfig } from '../time-series.config';
-import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
-import { TimeSeriesDashboardComponent } from '../dashboard/time-series-dashboard.component';
-import { RangeSelectionType } from '../time-selection/model/range-selection-type';
-import { TSTimeRange } from '../chart/model/ts-time-range';
-import { TimeSeriesDashboardSettings } from '../dashboard/model/ts-dashboard-settings';
-import { TsUtils } from '../util/ts-utils';
-import { FilterBarItemType } from '../performance-view/filter-bar/model/ts-filter-item';
+import { TimeSeriesConfig } from '../../time-series.config';
+import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
+import { TimeSeriesDashboardComponent } from '../../dashboard/time-series-dashboard.component';
+import { RangeSelectionType } from '../../time-selection/model/range-selection-type';
+import { TSTimeRange } from '../../chart/model/ts-time-range';
+import { TimeSeriesDashboardSettings } from '../../dashboard/model/ts-dashboard-settings';
+import { TsUtils } from '../../util/ts-utils';
+import { FilterBarItemType } from '../../performance-view/filter-bar/model/ts-filter-item';
 import { range, Subject, takeUntil, timer } from 'rxjs';
 
 @Component({

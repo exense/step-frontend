@@ -10,9 +10,7 @@ import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.se
 import { PerformanceViewSettings } from '../model/performance-view-settings';
 import { Observable, Subject, takeUntil, tap } from 'rxjs';
 import { TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
-import { FilterUtils } from '../../util/filter-utils';
 import { FindBucketsRequestBuilder } from '../../util/find-buckets-request-builder';
-import { PerformanceViewComponent } from '../performance-view.component';
 
 @Component({
   selector: 'step-execution-time-selection',

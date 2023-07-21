@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
-import { KeywordSelection, TimeSeriesKeywordsContext } from '../../execution-page/time-series-keywords.context';
+import { KeywordSelection, TimeSeriesKeywordsContext } from '../../pages/execution-page/time-series-keywords.context';
 import { KeyValue } from '@angular/common';
 import { Subject, Subscription, takeUntil } from 'rxjs';
 

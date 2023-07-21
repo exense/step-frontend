@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, skip, Subject } from 'rxjs';
-import { TimeSeriesKeywordsContext } from './execution-page/time-series-keywords.context';
+import { TimeSeriesKeywordsContext } from './pages/execution-page/time-series-keywords.context';
 import { TimeseriesColorsPool } from './util/timeseries-colors-pool';
 import { Execution } from '@exense/step-core';
 import { TSTimeRange } from './chart/model/ts-time-range';

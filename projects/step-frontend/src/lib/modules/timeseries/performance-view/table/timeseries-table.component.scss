@@ -32,7 +32,7 @@ step-timeseries-table {
       color: var.$gray-500;
 
       &.compare {
-        color: #ff8f4b;
+        color: var.$orange;
       }
     }
 
@@ -51,7 +51,7 @@ step-timeseries-table {
 
   .compare-diff {
     font-size: 10px;
-    color: #ff8f4b;
+    color: var.$orange;
     opacity: 0.6;
     margin-left: 4px;
   }

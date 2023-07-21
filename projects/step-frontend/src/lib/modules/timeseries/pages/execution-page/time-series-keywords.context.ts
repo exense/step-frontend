@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { TimeseriesColorsPool } from '../util/timeseries-colors-pool';
+import { TimeseriesColorsPool } from '../../util/timeseries-colors-pool';
 
 /**
  * Every execution will have a list of custom keywords depending on the actual measurements that were found.

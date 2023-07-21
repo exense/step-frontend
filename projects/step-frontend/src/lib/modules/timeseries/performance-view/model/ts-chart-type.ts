@@ -1,6 +1,5 @@
 export enum TsChartType {
   OVERVIEW,
-  OVERVIEW_COMPARE,
   BY_STATUS,
   RESPONSE_TIME,
   THROUGHPUT,

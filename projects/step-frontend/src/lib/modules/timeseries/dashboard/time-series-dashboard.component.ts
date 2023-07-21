@@ -1,10 +1,9 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { filter, merge, Subject, Subscription, takeUntil, throttle } from 'rxjs';
+import { filter, forkJoin, merge, Subject, Subscription, takeUntil, throttle } from 'rxjs';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { FilterBarComponent } from '../performance-view/filter-bar/filter-bar.component';
 import { FilterBarItemType, TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
 import { PerformanceViewSettings } from '../performance-view/model/performance-view-settings';
-import { PerformanceViewComponent } from '../performance-view/performance-view.component';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
 import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
@@ -12,8 +11,8 @@ import { TimeSeriesContext } from '../time-series-context';
 import { TimeSeriesContextParams } from '../time-series-context-params';
 import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.service';
 import { TimeSeriesDashboardSettings } from './model/ts-dashboard-settings';
-import { TsFilteringSettings } from '../model/ts-filtering-settings';
 import { TimeSeriesUtils } from '../time-series-utils';
+import { ChartsViewComponent } from '../performance-view/charts-view.component';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -24,13 +23,15 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   readonly ONE_HOUR_MS = 3600 * 1000;
 
   @Input() settings!: TimeSeriesDashboardSettings;
-  @ViewChild(PerformanceViewComponent) performanceView!: PerformanceViewComponent;
+  @ViewChild(ChartsViewComponent) chartsView!: ChartsViewComponent;
   @ViewChild(FilterBarComponent) filterBar?: FilterBarComponent;
+  @ViewChild('compareFilterBar') compareFilterBar?: FilterBarComponent;
 
   timeRangeSelection: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
   context!: TimeSeriesContext;
   performanceViewSettings: PerformanceViewSettings | undefined;
-  private updateSubscription = new Subscription();
+  private updateBaseChartsSubscription = new Subscription();
+  private compareChartsSubscription = new Subscription();
   private throttledRefreshTrigger$: Subject<any> = new Subject();
   private terminator$ = new Subject();
 
@@ -71,38 +72,50 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       grouping: ['name'],
     };
     this.context = this.contextsFactory.createContext(contextParams);
-    this.context.onCompareModeChange().subscribe(({ enabled, context }) => {
-      this.compareModeEnabled = enabled;
-      this.compareModeContext = context;
-    });
+
     this.performanceViewSettings = this.settings;
     this.subscribeForContextChange();
-    this.throttledRefreshTrigger$
-      .pipe(
-        throttle(() => this.context.inProgressChange().pipe(filter((inProgress) => !inProgress))),
-        takeUntil(this.terminator$)
-      )
-      .subscribe(() => {
-        this.updateDashboard();
-      });
   }
 
-  private updateDashboard(showLoading = false) {
-    this.updateSubscription?.unsubscribe();
-    this.updateSubscription = this.performanceView
-      .updateDashboard({
-        updateRanger: true,
-        updateCharts: true,
-        showLoadingBar: showLoading,
-      })
-      .subscribe();
+  private updateBaseCharts(showLoading = false) {
+    this.updateBaseChartsSubscription?.unsubscribe();
+    let updateCharts$ = this.chartsView.updateBaseCharts({
+      updateRanger: true,
+      updateCharts: true,
+      showLoadingBar: showLoading,
+    });
+    let refreshRanger$ = this.filterBar?.timeSelection?.refreshRanger();
+    this.updateBaseChartsSubscription = forkJoin([updateCharts$, refreshRanger$]).subscribe();
+  }
+
+  private updateCompareCharts(showLoading = false) {
+    this.compareChartsSubscription?.unsubscribe();
+    let updateCharts$ = this.chartsView.updateBaseCharts({
+      updateRanger: true,
+      updateCharts: true,
+      showLoadingBar: showLoading,
+    });
+    let refreshRanger$ = this.compareFilterBar?.timeSelection?.refreshRanger();
+    this.compareChartsSubscription = forkJoin([updateCharts$, refreshRanger$]).subscribe();
   }
 
   subscribeForContextChange(): void {
     merge(this.context.onFilteringChange(), this.context.onGroupingChange())
       .pipe(takeUntil(this.terminator$))
       .subscribe(() => {
-        this.updateDashboard(true);
+        this.updateBaseCharts(true);
+      });
+    this.context.onCompareModeChange().subscribe(({ enabled, context }) => {
+      this.compareModeEnabled = enabled;
+      this.compareModeContext = context;
+    });
+    this.throttledRefreshTrigger$
+      .pipe(
+        throttle(() => this.context.inProgressChange().pipe(filter((inProgress) => !inProgress))),
+        takeUntil(this.terminator$)
+      )
+      .subscribe(() => {
+        this.updateBaseCharts();
       });
   }
 
@@ -142,6 +155,10 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
    */
   refresh(range: TSTimeRange, selection?: TSTimeRange): void {
     this.setRanges(range, selection);
+    if (this.compareModeEnabled) {
+      // don't do the update while in compare mode
+      return;
+    }
     this.throttledRefreshTrigger$.next(true);
   }
 
@@ -150,11 +167,11 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
    * The selection will be set to full selection.
    */
   updateRange(range: TSTimeRange) {
-    this.updateSubscription?.unsubscribe(); // end current execution
+    this.updateBaseChartsSubscription?.unsubscribe(); // end current execution
     this.context.updateFullRange(range, false);
     this.context.updateSelectedRange(range, false);
-    this.updateSubscription = this.performanceView
-      .updateDashboard({
+    this.updateBaseChartsSubscription = this.chartsView
+      .updateBaseCharts({
         updateRanger: true,
         updateCharts: true,
         showLoadingBar: true,
@@ -167,7 +184,24 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   enableCompareMode(): void {
-    let filters = Object.keys(this.settings.contextualFilters).map((key) => {
+    let filters = this.prepareFiltersForCompareMode();
+    let compareContext: TimeSeriesContext = new TimeSeriesContext({
+      timeRange: { from: this.context.getFullTimeRange().from, to: this.context.getFullTimeRange().to },
+      id: new Date().getTime().toString(),
+      grouping: this.context.getGroupDimensions(),
+      filters: filters,
+    });
+    this.compareChartsSubscription = merge(
+      compareContext.onFilteringChange(),
+      compareContext.onGroupingChange()
+    ).subscribe(() => {
+      this.updateCompareCharts(true);
+    });
+    this.context.enableCompareMode(compareContext);
+  }
+
+  private prepareFiltersForCompareMode(): TsFilterItem[] {
+    return Object.keys(this.settings.contextualFilters).map((key) => {
       return {
         attributeName: key,
         isHidden: false,
@@ -177,18 +211,11 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
         freeTextValues: [this.settings.contextualFilters[key]],
       };
     });
-    let compareContext: TimeSeriesContext = new TimeSeriesContext({
-      timeRange: { from: this.context.getFullTimeRange().from, to: this.context.getFullTimeRange().to },
-      id: new Date().getTime().toString(),
-      grouping: this.context.getGroupDimensions(),
-      filters: filters,
-    });
-    this.context.enableCompareMode(compareContext);
   }
 
   ngOnDestroy(): void {
     this.terminator$.next(true);
     this.contextsFactory.destroyContext(this.context.id);
-    this.updateSubscription.unsubscribe();
+    this.updateBaseChartsSubscription.unsubscribe();
   }
 }

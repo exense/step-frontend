@@ -9,7 +9,7 @@ import {
   TimeSeriesAPIResponse,
 } from '@exense/step-core';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { TimeSeriesKeywordsContext } from '../../execution-page/time-series-keywords.context';
+import { TimeSeriesKeywordsContext } from '../../pages/execution-page/time-series-keywords.context';
 import { TimeSeriesContext } from '../../time-series-context';
 
 interface TableEntry {
