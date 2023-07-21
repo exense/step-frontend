@@ -1,5 +1,5 @@
 <step-table *ngIf="!(emptyResults$ | async)" [dataSource]="searchableReferences" matSort [matSortDisableClear]="true">
-  <step-entity-column-container></step-entity-column-container>
+  <step-entity-column-container [entityName]="entityType"></step-entity-column-container>
   <ng-container matColumnDef="name" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Used by</th>
     <td mat-cell *matCellDef="let element">
