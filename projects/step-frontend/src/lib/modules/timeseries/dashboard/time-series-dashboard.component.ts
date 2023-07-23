@@ -90,7 +90,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
 
   private updateCompareCharts(showLoading = false) {
     this.compareChartsSubscription?.unsubscribe();
-    let updateCharts$ = this.chartsView.updateBaseCharts({
+    let updateCharts$ = this.chartsView.updateCompareCharts({
       updateRanger: true,
       updateCharts: true,
       showLoadingBar: showLoading,

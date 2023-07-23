@@ -51,12 +51,22 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   compareChartsSettings: { [key: string]: TSChartSettings } = {};
 
   @ViewChild('ranger') ranger!: TSRangerComponent;
-  @ViewChild('throughputChart') throughputChart!: TimeSeriesChartComponent;
+
   @ViewChild('summaryChart') summaryChart!: TimeSeriesChartComponent;
   @ViewChild('summaryCompareChart') summaryCompareChart: TimeSeriesChartComponent | undefined;
+
   @ViewChild('byStatusChart') byStatusChart!: TimeSeriesChartComponent;
+  @ViewChild('byStatusCompareChart') byStatusCompareChart!: TimeSeriesChartComponent | undefined;
+
   @ViewChild('responseTimeChart') responseTimeChart!: TimeSeriesChartComponent;
+  @ViewChild('responseTimeCompareChart') responseTimeCompareChart!: TimeSeriesChartComponent | undefined;
+
+  @ViewChild('throughputChart') throughputChart!: TimeSeriesChartComponent;
+  @ViewChild('throughputCompareChart') throughputCompareChart!: TimeSeriesChartComponent;
+
   @ViewChild('threadGroupChart') threadGroupChart!: TimeSeriesChartComponent;
+  @ViewChild('threadGroupCompareChart') threadGroupCompareChart!: TimeSeriesChartComponent | undefined;
+
   @ViewChild('tableChart') tableChart!: TimeseriesTableComponent;
 
   @Input() context!: TimeSeriesContext;
@@ -74,6 +84,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   keywordSearchValue: string = '';
 
   byKeywordsChartResponseCache?: TimeSeriesAPIResponse; // for caching
+  byKeywordsCompareChartResponseCache?: TimeSeriesAPIResponse; // for caching
 
   // findRequest!: FindBucketsRequest;
   findRequestBuilder: FindBucketsRequestBuilder = new FindBucketsRequestBuilder();
@@ -103,6 +114,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
 
   throughputMetrics = ChartsViewConfig.throughputMetrics;
   selectedThroughputMetric = this.throughputMetrics[0];
+  selectedCompareThroughputMetric = this.throughputMetrics[0];
 
   initializationTasks: Observable<any>[] = [];
   updateTasks: Observable<any>[] = [];
@@ -200,6 +212,9 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
    * @param request
    */
   updateCompareCharts(request: UpdatePerformanceViewRequest): Observable<any> {
+    if (!this.compareModeEnabled) {
+      return of(undefined);
+    }
     this.updateBaseChartsTerminator$.next(); // to keep executions synchronous
     // let's assume the complete interval and selections are set.
     if (!this.compareModeContext?.inProgress$.getValue()) this.compareModeContext?.setInProgress(true);
@@ -208,16 +223,16 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       this.compareChartsAreLoading = true;
     }
     if (request.updateRanger) {
-      updates$.push(...(this.timeSelection ? [this.timeSelection.refreshRanger()] : []));
+      // updates$.push(...(this.timeSelection ? [this.timeSelection.refreshRanger()] : []));
     }
     if (request.updateCharts) {
-      updates$.push(this.refreshAllCharts());
+      updates$.push(this.refreshAllCompareCharts());
     }
     return forkJoin(updates$).pipe(
-      takeUntil(this.updateBaseChartsTerminator$),
+      takeUntil(this.updateCompareChartsTerminator$),
       tap(() => {
-        this.chartsAreLoading = false;
-        this.context.setInProgress(false);
+        this.compareChartsAreLoading = false;
+        this.compareModeContext?.setInProgress(false);
       })
     );
   }
@@ -242,7 +257,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     });
   }
 
-  prepareFindRequestBuilder(settings: PerformanceViewSettings): FindBucketsRequestBuilder {
+  private prepareFindRequestBuilder(settings: PerformanceViewSettings): FindBucketsRequestBuilder {
     return new FindBucketsRequestBuilder()
       .withRange(settings.timeRange)
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
@@ -268,8 +283,14 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   }
 
   createAllCompareCharts(context: TimeSeriesContext) {
-    const charts$ = [this.createSummaryCompareChart(), this.createTableCompareChart(context)];
+    const charts$ = [
+      this.createSummaryChart(true),
+      this.createByStatusChart(true),
+      this.createByKeywordsCharts(true),
+      this.createTableCompareChart(context),
+    ];
     if (this.includeThreadGroupChart) {
+      charts$.push(this.createThreadGroupsChart(true));
     }
 
     forkJoin(charts$).pipe(takeUntil(this.terminator$)).subscribe();
@@ -293,6 +314,24 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     return forkJoin(charts$);
   }
 
+  private refreshAllCompareCharts(): Observable<unknown> {
+    this.compareRequestBuilder = this.createCompareRequest(this.compareModeContext!); // we don't want to lose active filters
+    const timeSelection = this.compareModeContext!.getSelectedTimeRange();
+    this.compareRequestBuilder.withRange(timeSelection);
+
+    const charts$ = [
+      this.createSummaryChart(true),
+      this.createByStatusChart(true),
+      this.createByKeywordsCharts(true),
+      // this.createTableChart(),
+    ];
+    if (this.includeThreadGroupChart) {
+      // charts$.push(this.createThreadGroupsChart());
+    }
+
+    return forkJoin(charts$);
+  }
+
   onKeywordToggle(keyword: string, event: any) {
     this.keywordsService.toggleKeyword(keyword);
   }
@@ -305,16 +344,21 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     this.compareModeContext?.resetZoom();
   }
 
-  createThreadGroupsChart(): Observable<TimeSeriesAPIResponse> {
-    const filteringSettings = this.context.getFilteringSettings();
+  createThreadGroupsChart(compareChart = false): Observable<TimeSeriesAPIResponse> {
+    const context = this.getContext(compareChart);
+    const filteringSettings = context.getFilteringSettings();
     if (filteringSettings.mode === TsFilteringMode.OQL && this.settings.disableThreadGroupOnOqlMode) {
-      const threadGroupChart = this.getChart(TsChartType.THREAD_GROUP);
+      const threadGroupChart = compareChart
+        ? this.getCompareChart(TsChartType.THREAD_GROUP)
+        : this.getChart(TsChartType.THREAD_GROUP);
       threadGroupChart?.setAsUnavailable();
       let emptyResponse = { start: 0, end: 0, interval: 0, matrix: [], matrixKeys: [] };
       return of(emptyResponse);
     }
 
-    const request = this.findRequestBuilder
+    const requestBuilder = compareChart ? this.compareRequestBuilder : this.findRequestBuilder;
+
+    const request = requestBuilder
       .clone()
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_SAMPLER)
       .withGroupDimensions(['name'])
@@ -324,56 +368,34 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       .build();
     return this.timeSeriesService
       .getBuckets(request)
-      .pipe(tap((response) => this.createChart(TsChartType.THREAD_GROUP, request, response)));
+      .pipe(tap((response) => this.createChart(TsChartType.THREAD_GROUP, request, response, compareChart)));
   }
 
-  createChart(type: TsChartType, request: FindBucketsRequest, response: TimeSeriesAPIResponse) {
+  createChart(type: TsChartType, request: FindBucketsRequest, response: TimeSeriesAPIResponse, compareChart = false) {
     // all charts should be created and grouped via this principle in the end.
-    const existingChart = this.getChart(type);
+    const existingChart = compareChart ? this.getCompareChart(type) : this.getChart(type);
     if (response.matrixKeys.length === 0 && existingChart) {
       // empty data
       existingChart.clear();
       return;
     }
-    this.currentChartsSettings[type] = ChartGenerators.generateChart(
-      type,
-      request,
-      response,
-      this.context.keywordsContext.colorsPool
-    );
-  }
-
-  createCompareChart(type: TsChartType, request: FindBucketsRequest, response: TimeSeriesAPIResponse) {
-    // all charts should be created and grouped via this principle in the end.
-    const existingChart = this.getCompareChart(type);
-    if (response.matrixKeys.length === 0 && existingChart) {
-      // empty data
-      existingChart.clear();
-      return;
+    const newChart = ChartGenerators.generateChart(type, request, response, this.context.keywordsContext.colorsPool);
+    if (compareChart) {
+      this.compareChartsSettings[type] = newChart;
+    } else {
+      this.currentChartsSettings[type] = newChart;
     }
-    this.compareChartsSettings[type] = ChartGenerators.generateChart(
-      type,
-      request,
-      response,
-      this.context.keywordsContext.colorsPool
-    );
   }
 
   /**
    * This method is used for both creating or updating the chart
    */
-  createSummaryChart(): Observable<TimeSeriesAPIResponse> {
-    const request = this.findRequestBuilder.build();
+  createSummaryChart(compareChart = false): Observable<TimeSeriesAPIResponse> {
+    const requestBuilder = this.getRequestBuilder(compareChart);
+    const request = requestBuilder.build();
     return this.timeSeriesService
       .getBuckets(request)
-      .pipe(tap((response) => this.createChart(TsChartType.OVERVIEW, request, response)));
-  }
-
-  createSummaryCompareChart(): Observable<TimeSeriesAPIResponse> {
-    const request = this.compareRequestBuilder.build();
-    return this.timeSeriesService
-      .getBuckets(request)
-      .pipe(tap((response) => this.createCompareChart(TsChartType.OVERVIEW, request, response)));
+      .pipe(tap((response) => this.createChart(TsChartType.OVERVIEW, request, response, compareChart)));
   }
 
   getChart(chartType: TsChartType): TimeSeriesChartComponent {
@@ -397,16 +419,31 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     switch (chartType) {
       case TsChartType.OVERVIEW:
         return this.summaryCompareChart;
+      case TsChartType.BY_STATUS:
+        return this.byStatusCompareChart;
+      case TsChartType.RESPONSE_TIME:
+        return this.responseTimeCompareChart;
+      case TsChartType.THROUGHPUT:
+        return this.throughputCompareChart;
+      case TsChartType.THREAD_GROUP:
+        return this.threadGroupCompareChart;
       default:
         throw new Error('Not Implemented');
     }
   }
 
-  createByStatusChart(): Observable<TimeSeriesAPIResponse> {
-    const request = this.findRequestBuilder.clone().withGroupDimensions([TimeSeriesConfig.STATUS_ATTRIBUTE]).build();
+  createByStatusChart(compareChart = false): Observable<TimeSeriesAPIResponse> {
+    const request = this.getRequestBuilder(compareChart)
+      .clone()
+      .withGroupDimensions([TimeSeriesConfig.STATUS_ATTRIBUTE])
+      .build();
     return this.timeSeriesService
       .getBuckets(request)
-      .pipe(tap((response) => this.createChart(TsChartType.BY_STATUS, request, response)));
+      .pipe(tap((response) => this.createChart(TsChartType.BY_STATUS, request, response, compareChart)));
+  }
+
+  private getRequestBuilder(compareMode = false): FindBucketsRequestBuilder {
+    return compareMode ? this.compareRequestBuilder : this.findRequestBuilder;
   }
 
   createTableChart(): Observable<TimeSeriesAPIResponse> {
@@ -425,13 +462,16 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   }
 
   enableCompareMode(context: TimeSeriesContext): void {
-    this.compareRequestBuilder = new FindBucketsRequestBuilder()
+    this.compareRequestBuilder = this.createCompareRequest(context);
+    this.createAllCompareCharts(context);
+  }
+
+  private createCompareRequest(context: TimeSeriesContext): FindBucketsRequestBuilder {
+    return new FindBucketsRequestBuilder()
       .withRange(context.getFullTimeRange())
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
       .withFilteringSettings(context.getFilteringSettings())
       .withNumberOfBuckets(TimeSeriesConfig.MAX_BUCKETS_IN_CHART);
-
-    this.createAllCompareCharts(context);
   }
 
   createTableCompareChart(context: TimeSeriesContext): Observable<TimeSeriesAPIResponse> {
@@ -450,9 +490,10 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
 
   disableCompareMode() {}
 
-  createByKeywordsCharts(): Observable<TimeSeriesAPIResponse> {
-    const groupDimensions = this.context.getGroupDimensions();
-    const findRequest = this.findRequestBuilder
+  createByKeywordsCharts(compareChart = false): Observable<TimeSeriesAPIResponse> {
+    const context = compareChart ? this.compareModeContext! : this.context;
+    const groupDimensions = context.getGroupDimensions();
+    const findRequest = this.getRequestBuilder(compareChart)
       .clone()
       .withGroupDimensions(groupDimensions)
       .withPercentiles([90, 99])
@@ -462,9 +503,14 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
         this.byKeywordsChartResponseCache = response;
         if (response.matrixKeys.length === 0) {
           // empty data
-          if (this.responseTimeChart) {
+          if (!this.compareModeEnabled && this.responseTimeChart) {
             this.responseTimeChart?.clear();
             this.throughputChart?.clear();
+            return;
+          }
+          if (this.compareModeEnabled && this.responseTimeCompareChart) {
+            this.responseTimeCompareChart?.clear();
+            this.throughputCompareChart?.clear();
             return;
           }
         }
@@ -507,7 +553,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
           return series;
         });
 
-        this.currentChartsSettings[TsChartType.THROUGHPUT] = {
+        const throughputChartSettings: TSChartSettings = {
           title: 'Throughput',
           xValues: timeLabels,
           tooltipOptions: {
@@ -543,8 +589,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
             },
           ],
         };
-
-        this.currentChartsSettings[TsChartType.RESPONSE_TIME] = {
+        const responseTimeSettings: TSChartSettings = {
           title: TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${this.selectedResponseTimeMetric.label})`,
           xValues: timeLabels,
           series: responseTimeSeries,
@@ -560,6 +605,14 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
             },
           ],
         };
+
+        if (compareChart) {
+          this.compareChartsSettings[TsChartType.RESPONSE_TIME] = responseTimeSettings;
+          this.compareChartsSettings[TsChartType.THROUGHPUT] = throughputChartSettings;
+        } else {
+          this.currentChartsSettings[TsChartType.RESPONSE_TIME] = responseTimeSettings;
+          this.currentChartsSettings[TsChartType.THROUGHPUT] = throughputChartSettings;
+        }
       })
     );
   }
@@ -617,6 +670,10 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       .map((field) => attributes[field])
       .filter((f) => !!f)
       .join(' | ');
+  }
+
+  private getContext(compareMode = false): TimeSeriesContext {
+    return compareMode ? this.compareModeContext! : this.context;
   }
 
   getAllCharts() {
