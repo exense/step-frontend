@@ -119,6 +119,9 @@ angular
             //handle cases were expression is not evaluated (like malformed expression)
             value = value.value ? value.value : value;
             value = value.expression ? value.expression : value;
+            if (value && typeof value === 'object') {
+              value = JSON.stringify(value);
+            }
             inlineStr += key + ' = ' + value + ' ¦ ';
           }
           if ($scope.maxChars && $scope.maxChars < inlineStr.length) {
@@ -148,7 +151,11 @@ angular
           } else if ($scope.format === 'kv') {
             var inlineStr = '';
             for (key in jsonObject) {
-              inlineStr += key + ' = ' + jsonObject[key] + '\n';
+              var value = jsonObject[key];
+              if (value && typeof value === 'object') {
+                value = JSON.stringify(value);
+              }
+              inlineStr += key + ' = ' + value + '\n';
             }
             return inlineStr;
           } else {
@@ -190,10 +197,21 @@ angular
       templateUrl: 'partials/components/jsonViewerKeyValue.html',
       controller: function ($scope, $http) {
         $scope.$watch('json', function () {
-          $scope.jsonObject = typeof $scope.json == 'string' ? JSON.parse($scope.json) : $scope.json;
-          if ($scope.jsonObject) {
-            $scope.keys = Object.keys($scope.jsonObject);
+          var tempJsonObject = typeof $scope.json === 'string' ? JSON.parse($scope.json) : { ...$scope.json };
+          if (!tempJsonObject) {
+            $scope.keys = [];
+            $scope.jsonObject = {};
+            return;
           }
+          $scope.jsonObject = Object.entries(tempJsonObject).reduce((res, [key, value]) => {
+            if (value && typeof value === 'object') {
+              res[key] = JSON.stringify(value);
+            } else {
+              res[key] = value;
+            }
+            return res;
+          }, {});
+          $scope.keys = Object.keys($scope.jsonObject);
         });
       },
     };
