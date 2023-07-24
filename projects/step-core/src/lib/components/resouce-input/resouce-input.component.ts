@@ -233,6 +233,9 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private setStModel(stModel: string = '') {
+    if (this.stModel === stModel) {
+      return;
+    }
     this.stModel = stModel;
     this.stModelChange.emit(stModel);
   }
