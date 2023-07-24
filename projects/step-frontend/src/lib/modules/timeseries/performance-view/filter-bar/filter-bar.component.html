@@ -3,7 +3,7 @@
 </step-alert>
 <div class="filters">
   <mat-menu #menu="matMenu">
-    <button mat-menu-item *ngFor="let option of defaultFilterOptions" (click)="addFilterItem(option)">
+    <button mat-menu-item *ngFor="let option of _defaultFilterOptions" (click)="addFilterItem(option)">
       <span>{{ option.label }}</span>
     </button>
 

@@ -33,8 +33,8 @@ import { TsFilteringMode } from '../../model/ts-filtering-mode';
 })
 export class FilterBarComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
-  @Input() defaultFilterOptions: TsFilterItem[] = [];
   @Input() initialFilters: TsFilterItem[] = [];
+  _defaultFilterOptions: TsFilterItem[] = [];
 
   @ViewChild(PerformanceViewTimeSelectionComponent) timeSelection?: PerformanceViewTimeSelectionComponent;
 
@@ -57,6 +57,11 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   constructor(private _changeDetectorRef: ChangeDetectorRef, private _timeSeriesService: TimeSeriesService) {}
 
+  // clone the array
+  @Input() set defaultFilterOptions(value: TsFilterItem[]) {
+    this._defaultFilterOptions = JSON.parse(JSON.stringify(value || []));
+  }
+
   getFilters(): TsFilterItem[] {
     return this.filterItems;
   }
@@ -66,7 +71,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   }
 
   prepareVisibleFilters() {
-    this.filterItems = (this.initialFilters || []).concat(this.defaultFilterOptions);
+    this.filterItems = (this.initialFilters || []).concat(this._defaultFilterOptions);
   }
 
   ngOnInit(): void {
@@ -170,6 +175,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   handleFilterChange(index: number, item: TsFilterItem) {
     this.filterItems[index] = item;
     this.emitFilterChange$.next();
+    console.log('EMIT');
   }
 
   addFilterItem(item: TsFilterItem) {

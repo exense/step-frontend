@@ -49,12 +49,12 @@
     </div>
 
     <div class="chart" *ngIf="compareModeEnabled">
-      <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.BY_STATUS]"></step-chart-skeleton>
+      <step-chart-skeleton *ngIf="!compareChartsSettings[TsChartType.BY_STATUS]"></step-chart-skeleton>
       <step-timeseries-chart
-        #byStatusChart
+        #byStatusCompareChart
         title="Statuses"
-        *ngIf="currentChartsSettings[TsChartType.BY_STATUS]"
-        [settings]="currentChartsSettings[TsChartType.BY_STATUS]"
+        *ngIf="compareChartsSettings[TsChartType.BY_STATUS]"
+        [settings]="compareChartsSettings[TsChartType.BY_STATUS]"
         [syncKey]="compareModeContext!.id"
         (onZoomReset)="onCompareChartsZoomReset()"
       >

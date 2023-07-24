@@ -34,6 +34,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   private compareChartsSubscription = new Subscription();
   private throttledRefreshTrigger$: Subject<any> = new Subject();
   private terminator$ = new Subject();
+  private compareTerminator$ = new Subject();
 
   timeRangeOptions: RelativeTimeSelection[] = [
     { label: 'Last 1 Minute', timeInMs: this.ONE_HOUR_MS / 60 },
@@ -181,6 +182,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
 
   disableCompareMode(): void {
     this.context.disableCompareMode();
+    this.compareTerminator$.next(true);
   }
 
   enableCompareMode(): void {
@@ -191,12 +193,13 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       grouping: this.context.getGroupDimensions(),
       filters: filters,
     });
-    this.compareChartsSubscription = merge(
-      compareContext.onFilteringChange(),
-      compareContext.onGroupingChange()
-    ).subscribe(() => {
-      this.updateCompareCharts(true);
-    });
+    compareContext.onFilteringChange().subscribe(() => console.log('NEW FILTER'));
+    merge(compareContext.onFilteringChange(), compareContext.onGroupingChange())
+      .pipe(takeUntil(this.compareTerminator$))
+      .subscribe(() => {
+        console.log('NEW FILTER');
+        this.updateCompareCharts(true);
+      });
     this.context.enableCompareMode(compareContext);
   }
 
@@ -215,6 +218,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.terminator$.next(true);
+    this.compareTerminator$.next(true);
     this.contextsFactory.destroyContext(this.context.id);
     this.updateBaseChartsSubscription.unsubscribe();
   }

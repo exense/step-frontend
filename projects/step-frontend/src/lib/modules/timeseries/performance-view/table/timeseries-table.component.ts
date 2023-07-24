@@ -49,14 +49,12 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   groupDimensions: string[] = [];
 
   compareModeEnabled = false;
+  compareContext: TimeSeriesContext | undefined;
 
   // private keywordsService!: TimeSeriesKeywordsContext;
   @Input() executionContext!: TimeSeriesContext;
 
   private terminator$ = new Subject<void>();
-
-  sortByNameAttributeFn = (a: BucketResponse, b: BucketResponse) =>
-    a.attributes['name']?.toLowerCase() > b.attributes['name']?.toLowerCase() ? 1 : -1;
 
   ngOnInit(): void {
     if (!this.executionContext) {
@@ -76,10 +74,19 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     this.tableIsLoading = false;
     this.baseResponse = response;
     let baseData = this.processResponse(response, this.executionContext);
-    let compareData: { keywords: string[]; buckets: Record<string, BucketResponse> } = { keywords: [], buckets: {} };
+    const compareData = this.compareModeEnabled
+      ? this.processResponse(this.compareResponse!, this.compareContext!)
+      : undefined;
     this.tableData$.next(this.mergeBaseAndCompareData(baseData, compareData));
     this.executionContext.keywordsContext.setKeywords(baseData.keywords, true);
     this.tableIsLoading = false;
+  }
+
+  updateCompareData(response: TimeSeriesAPIResponse, compareContext: TimeSeriesContext) {
+    this.tableIsLoading = false;
+    let baseData = this.processResponse(this.baseResponse!, this.executionContext);
+    let compareData = this.processResponse(response, compareContext);
+    this.tableData$.next(this.mergeBaseAndCompareData(baseData, compareData));
   }
 
   private mergeBaseAndCompareData(baseBuckets: ProcessedBuckets, compareBuckets?: ProcessedBuckets): TableEntry[] {
@@ -137,6 +144,8 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
 
   enableCompareMode(response: TimeSeriesAPIResponse, compareContext: TimeSeriesContext) {
     this.compareModeEnabled = true;
+    this.compareContext = compareContext;
+    this.compareResponse = response;
     let baseData = this.processResponse(this.baseResponse!, this.executionContext);
     let compareData = this.processResponse(response, compareContext);
     this.tableData$.next(this.mergeBaseAndCompareData(baseData, compareData));
@@ -144,6 +153,8 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
 
   disableCompareMode() {
     this.compareModeEnabled = false;
+    this.compareContext = undefined;
+    this.compareResponse = undefined;
   }
 
   onKeywordToggle(keyword: string, event: any) {
