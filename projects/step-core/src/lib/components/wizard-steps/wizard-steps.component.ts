@@ -9,7 +9,11 @@ import {
   TrackByFunction,
 } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { WizardStep, WizardStepMeta, WizardStepRegistryService } from '@exense/step-core';
+import {
+  WizardStep,
+  WizardStepMeta,
+  WizardStepRegistryService,
+} from '../../modules/custom-registeries/custom-registries.module';
 
 @Component({
   selector: 'step-wizard-steps',

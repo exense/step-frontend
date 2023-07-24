@@ -76,6 +76,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
 import { ArtefactDetailsComponent } from './components/artefact-details/artefact-details.component';
 import { ArtefactDetailsWrapperDirective } from './directives/artefact-details-wrapper.directive';
 import { ResourceInputWrapperComponent } from './components/resource-input-wrapper/resource-input-wrapper.component';
+import { WizardStepsComponent } from './components/wizard-steps/wizard-steps.component';
 
 @NgModule({
   declarations: [
@@ -138,6 +139,7 @@ import { ResourceInputWrapperComponent } from './components/resource-input-wrapp
     ArtefactDetailsComponent,
     ArtefactDetailsWrapperDirective,
     ResourceInputWrapperComponent,
+    WizardStepsComponent,
   ],
   imports: [
     CommonModule,
@@ -226,6 +228,7 @@ import { ResourceInputWrapperComponent } from './components/resource-input-wrapp
     FileAlreadyExistingDialogComponent,
     ArtefactDetailsComponent,
     ResourceInputWrapperComponent,
+    WizardStepsComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -301,6 +304,7 @@ export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialo
 export * from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 export * from './components/artefact-details/artefact-details.component';
 export * from './components/base-wizard-step/base-wizard-step.component';
+export * from './components/wizard-steps/wizard-steps.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export { UpdateResourceWarningDialogComponent } from './components/update-resource-warning-dialog/update-resource-warning-dialog.component';
 export { UploadContainerComponent } from './components/upload-container/upload-container.component';
