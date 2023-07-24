@@ -55,7 +55,7 @@ export class ArrayFilterComponent<T = unknown> extends BaseFilterComponent<strin
       map((values: unknown[]) => {
         let value = '';
         if (values.length === 1) {
-          value = `${values[0]}`;
+          value = `^${values[0]}$`;
         } else if (values.length > 1) {
           value = values.join('|');
           value = `(${value})`;
