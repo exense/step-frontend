@@ -33,9 +33,11 @@ export class AugmentedKeywordsService extends KeywordsService {
    */
   override newFunctionTypeConf(type: string, serviceRoot: string): Observable<KeywordFunction>;
   override newFunctionTypeConf(type: string, serviceRoot?: string): Observable<KeywordFunction> {
+    const root = serviceRoot ?? 'functions';
+
     return this.httpRequest.request({
       method: 'GET',
-      url: `/${serviceRoot}/types/${type}`,
+      url: `/${root}/types/${type}`,
     });
   }
 
@@ -45,9 +47,11 @@ export class AugmentedKeywordsService extends KeywordsService {
    */
   override saveFunction(requestBody?: KeywordFunction, serviceRoot?: string): Observable<KeywordFunction>;
   override saveFunction(requestBody?: KeywordFunction, serviceRoot?: string): Observable<KeywordFunction> {
+    const root = serviceRoot ?? 'functions';
+
     return this.httpRequest.request({
       method: 'POST',
-      url: `/${serviceRoot}`,
+      url: `/${root}`,
       body: requestBody,
       mediaType: 'application/json',
     });
