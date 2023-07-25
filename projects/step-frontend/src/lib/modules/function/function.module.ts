@@ -58,6 +58,7 @@ import { FunctionDialogsService } from './services/function-dialogs.service';
     },
   ],
   exports: [
+    FunctionTypeLabelPipe,
     FunctionListComponent,
     FunctionPackageSelectionComponent,
     CompositeFunctionEditorComponent,

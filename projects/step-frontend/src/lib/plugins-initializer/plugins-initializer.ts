@@ -31,6 +31,7 @@ const IGNORE_PLUGINS: ReadonlyArray<string> = [
   'javaPlugin',
   'oryonPlugin',
   'compareEditor',
+  'silkPerformer',
 ];
 
 // For testing purposes only
