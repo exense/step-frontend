@@ -16,7 +16,7 @@ import { map, Observable } from 'rxjs';
     },
   ],
 })
-export class ArrayFilterComponent<T = unknown> extends BaseFilterComponent<string, unknown[]> implements OnChanges {
+export class ArrayFilterComponent<T = unknown> extends BaseFilterComponent<string, unknown> implements OnChanges {
   protected trackByKeyValue: TrackByFunction<KeyValue<unknown, string>> = (index, item) => item.key;
 
   protected displayItems: KeyValue<unknown, string>[] = [];
@@ -45,18 +45,19 @@ export class ArrayFilterComponent<T = unknown> extends BaseFilterComponent<strin
     }
   }
 
-  protected override createControl(fb: FormBuilder): FormControl<unknown[]> {
+  protected override createControl(fb: FormBuilder): FormControl<unknown> {
     return fb.nonNullable.control([]);
   }
 
-  protected override createControlChangeStream(control: FormControl<unknown[]>): Observable<string> {
+  protected override createControlChangeStream(control: FormControl<unknown>): Observable<string> {
     return control.valueChanges.pipe(
+      map((value: unknown) => value as unknown[]),
       map((values: unknown[]) => {
         let value = '';
         if (values.length === 1) {
-          value = `${values[0]}`;
+          value = `^${values[0]}$`;
         } else if (values.length > 1) {
-          value = values.join('|');
+          value = values.map((value) => `^${value}$`).join('|');
           value = `(${value})`;
         }
         return value;
@@ -64,7 +65,7 @@ export class ArrayFilterComponent<T = unknown> extends BaseFilterComponent<strin
     );
   }
 
-  protected override transformFilterValueToControlValue(value: string): unknown[] {
+  protected override transformFilterValueToControlValue(value: string): unknown {
     if (value.startsWith('(') && value.endsWith(')') && value.includes('|')) {
       return value.substring(1, value.length - 1).split('|');
     }

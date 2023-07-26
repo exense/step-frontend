@@ -26,6 +26,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges {
   readonly searchableRepositoryReport = new TableFetchLocalDataSource<TestRunStatus, RepositoryObjectReference>(
     (request) => this.getTestRuns(request),
     TableFetchLocalDataSource.configBuilder<TestRunStatus>()
+      .addSearchStringRegexPredicate('status', (item) => item.status)
       .addSortStringPredicate('status', (item) => item.status)
       .build()
   );

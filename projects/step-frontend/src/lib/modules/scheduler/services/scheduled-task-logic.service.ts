@@ -5,35 +5,26 @@ import {
   DashboardService,
   ExecutiontTaskParameters,
   ScheduledTaskDialogsService,
-  TableFetchLocalDataSource,
 } from '@exense/step-core';
 import { Observable, switchMap } from 'rxjs';
 import { Location } from '@angular/common';
 
 @Injectable()
 export class ScheduledTaskLogicService {
+  private _authService = inject(AuthService);
   private _dashboardService = inject(DashboardService);
   private _schedulerService = inject(AugmentedSchedulerService);
   private _scheduledTaskDialogs = inject(ScheduledTaskDialogsService);
-  private _authService = inject(AuthService);
-  readonly _location = inject(Location);
+  private _location = inject(Location);
 
   readonly STATUS_ACTIVE_STRING = 'On';
   readonly STATUS_INACTIVE_STRING = 'Off';
+  readonly STATUS: ReadonlyArray<string> = [this.STATUS_ACTIVE_STRING, this.STATUS_INACTIVE_STRING];
 
-  readonly searchableScheduledTask = new TableFetchLocalDataSource(
-    () => this._schedulerService.getScheduledExecutions(),
-    TableFetchLocalDataSource.configBuilder<ExecutiontTaskParameters>()
-      .addSearchStringPredicate('cronExpression', (item) => item.cronExpression!)
-      .addSearchStringPredicate('status', (item) =>
-        item.active ? this.STATUS_ACTIVE_STRING : this.STATUS_INACTIVE_STRING
-      )
-      .addSortBooleanPredicate('status', (item) => item.active)
-      .build()
-  );
+  readonly dataSource = this._schedulerService.createSelectionDataSource();
 
   loadTable(): void {
-    this.searchableScheduledTask.reload();
+    this.dataSource.reload();
   }
 
   isSchedulerEnabled(): Observable<boolean> {
