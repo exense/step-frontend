@@ -186,8 +186,8 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   enableCompareMode(): void {
-    let filters = this.prepareFiltersForCompareMode();
-    let compareContext: TimeSeriesContext = new TimeSeriesContext({
+    const filters = this.prepareFiltersForCompareMode();
+    const compareContext = this.contextsFactory.createContext({
       timeRange: { from: this.context.getFullTimeRange().from, to: this.context.getFullTimeRange().to },
       id: new Date().getTime().toString(),
       grouping: this.context.getGroupDimensions(),

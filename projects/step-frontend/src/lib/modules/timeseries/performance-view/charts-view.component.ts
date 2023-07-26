@@ -30,6 +30,7 @@ import { TimeseriesTableComponent } from './table/timeseries-table.component';
 import { PerformanceViewTimeSelectionComponent } from './time-selection/performance-view-time-selection.component';
 import { TsFilteringMode } from '../model/ts-filtering-mode';
 import { ChartsViewConfig } from './charts-view.config';
+import { ResponseTimeMetric } from './model/response-time-metric';
 
 declare const uPlot: any;
 
@@ -112,6 +113,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
 
   responseTimeMetrics = ChartsViewConfig.responseTimeMetrics;
   selectedResponseTimeMetric = this.responseTimeMetrics[0];
+  selectedCompareResponseTimeMetric = this.responseTimeMetrics[0];
 
   throughputMetrics = ChartsViewConfig.throughputMetrics;
   selectedThroughputMetric = this.throughputMetrics[0];
@@ -183,7 +185,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
         switchMap((newRange) =>
           compareCharts ? this.handleCompareSelectionChange(newRange) : this.handleSelectionChange(newRange)
         ),
-        takeUntil(this.compareTerminator$)
+        takeUntil(compareCharts ? this.compareTerminator$ : this.terminator$)
       )
       .subscribe();
   }
@@ -519,6 +521,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   disableCompareMode() {
     this.compareModeContext = undefined;
     this.compareModeEnabled = false;
+    this.tableChart?.disableCompareMode();
     this.byKeywordsCompareChartResponseCache = undefined;
     this.selectedCompareThroughputMetric = this.throughputMetrics[0];
     this.compareTerminator$.next();
@@ -534,7 +537,12 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       .build();
     return this.timeSeriesService.getBuckets(findRequest).pipe(
       tap((response) => {
-        this.byKeywordsChartResponseCache = response;
+        // save the response for further metrics change
+        if (compareChart) {
+          this.byKeywordsCompareChartResponseCache = response;
+        } else {
+          this.byKeywordsChartResponseCache = response;
+        }
         if (response.matrixKeys.length === 0) {
           // empty data
           if (!this.compareModeEnabled && this.responseTimeChart) {
@@ -552,19 +560,25 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
         const totalThroughput: number[] = response.matrix[0] ? Array(response.matrix[0]?.length) : [];
         const responseTimeSeries: TSChartSeries[] = [];
         const throughputSeries: TSChartSeries[] = [];
+        const throughputMetric = this.compareModeEnabled
+          ? this.selectedCompareThroughputMetric
+          : this.selectedThroughputMetric;
+        const responseTimeMetric = this.compareModeEnabled
+          ? this.selectedCompareResponseTimeMetric
+          : this.selectedResponseTimeMetric;
         response.matrixKeys.map((key, i) => {
           const seriesKey = this.getSeriesKey(key, groupDimensions);
           const responseTimeData: (number | null | undefined)[] = [];
           const color = this.keywordsService.getColor(seriesKey);
           const throughputData = response.matrix[i].map((b, j) => {
-            const bucketValue = this.selectedThroughputMetric.mapFunction(b);
+            const bucketValue = throughputMetric.mapFunction(b);
             if (totalThroughput[j] == undefined) {
               totalThroughput[j] = bucketValue;
             } else if (bucketValue) {
               totalThroughput[j] += bucketValue;
             }
             if (b) {
-              responseTimeData.push(this.selectedResponseTimeMetric.mapFunction(b));
+              responseTimeData.push(responseTimeMetric.mapFunction(b));
             } else {
               responseTimeData.push(undefined);
             }
@@ -592,7 +606,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
           xValues: timeLabels,
           tooltipOptions: {
             enabled: true,
-            zAxisLabel: this.selectedThroughputMetric.tooltipZAxisLabel,
+            zAxisLabel: throughputMetric.tooltipZAxisLabel,
           },
           series: [
             {
@@ -612,19 +626,29 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
             {
               scale: 'y',
               size: this.CHART_LEGEND_SIZE,
-              values: (u, vals, space) => vals.map((v) => this.selectedThroughputMetric.labelFunction(v)),
+              values: (u, vals, space) =>
+                vals.map((v) =>
+                  this.compareModeEnabled
+                    ? this.selectedCompareThroughputMetric.labelFunction(v)
+                    : this.selectedThroughputMetric.labelFunction(v)
+                ),
             },
             {
               side: 1,
               size: this.CHART_LEGEND_SIZE,
               scale: 'total',
-              values: (u, vals, space) => vals.map((v) => this.selectedThroughputMetric.labelFunction(v)),
+              values: (u, vals, space) =>
+                vals.map((v) =>
+                  this.compareModeEnabled
+                    ? this.selectedCompareThroughputMetric.labelFunction(v)
+                    : this.selectedThroughputMetric.labelFunction(v)
+                ),
               grid: { show: false },
             },
           ],
         };
         const responseTimeSettings: TSChartSettings = {
-          title: TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${this.selectedResponseTimeMetric.label})`,
+          title: TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${responseTimeMetric.label})`,
           xValues: timeLabels,
           series: responseTimeSeries,
           tooltipOptions: {
@@ -651,49 +675,81 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     );
   }
 
-  switchResponseTimeMetric(metric: { label: string; mapFunction: (b: BucketResponse) => number | undefined }) {
-    this.responseTimeChart.setTitle(TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${metric.label})`);
-    if (metric.label === this.selectedResponseTimeMetric.label) {
-      // it is a real change
-      return;
-    }
-    if (!this.byKeywordsChartResponseCache) {
+  switchBaseChartResponseTimeMetric(metric: ResponseTimeMetric) {
+    const chart = this.responseTimeChart;
+    const responseCache = this.byKeywordsChartResponseCache;
+
+    if (metric.label === this.selectedResponseTimeMetric.label || !chart || !responseCache) {
       return;
     }
     this.selectedResponseTimeMetric = metric;
-    const data = this.responseTimeChart.getData();
-    this.byKeywordsChartResponseCache.matrix.map((bucketArray, i) => {
-      data[i + 1] = bucketArray.map((b) => this.selectedResponseTimeMetric.mapFunction(b));
-    });
-    this.responseTimeChart.setData(data, false);
+    this.switchResponseTimeMetric(chart, responseCache, this.selectedResponseTimeMetric);
   }
 
-  switchThroughputMetric(metric: ThroughputMetric) {
-    const f = (u: any, vals: any) => vals.map((v: number) => metric.labelFunction(v));
-    this.throughputChart.settings.tooltipOptions.zAxisLabel = metric.tooltipZAxisLabel;
-    this.throughputChart.legendSettings.zAxisLabel = metric.tooltipZAxisLabel;
-    if (metric.label === this.selectedThroughputMetric.label) {
-      // it is not a real change
+  switchCompareResponseTimeMetric(metric: ResponseTimeMetric) {
+    const chart = this.responseTimeCompareChart;
+    const responseCache = this.byKeywordsCompareChartResponseCache;
+    if (metric.label === this.selectedCompareResponseTimeMetric.label || !chart || !responseCache) {
       return;
     }
-    if (!this.byKeywordsChartResponseCache) {
-      return;
-    }
-    this.selectedThroughputMetric = metric;
-    const data = this.throughputChart.getData();
+    this.selectedCompareResponseTimeMetric = metric;
+    this.switchResponseTimeMetric(chart, responseCache, this.selectedCompareResponseTimeMetric);
+  }
+
+  private switchResponseTimeMetric(
+    chart: TimeSeriesChartComponent,
+    apiResponse: TimeSeriesAPIResponse,
+    metric: ResponseTimeMetric
+  ) {
+    chart.setTitle(TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${metric.label})`);
+    const data = chart.getData();
+    apiResponse.matrix.map((bucketArray, i) => {
+      data[i + 1] = bucketArray.map((b) => metric.mapFunction(b));
+    });
+    chart.setData(data, false);
+  }
+
+  private switchThroughputMetric(
+    chart: TimeSeriesChartComponent,
+    apiResponse: TimeSeriesAPIResponse,
+    metric: ThroughputMetric
+  ): void {
+    chart.settings.tooltipOptions.zAxisLabel = metric.tooltipZAxisLabel;
+    chart.legendSettings.zAxisLabel = metric.tooltipZAxisLabel;
+    const data = chart.getData();
     const totalData = new Array(data[0].length);
-    this.byKeywordsChartResponseCache.matrix.map((bucketArray, i) => {
+    apiResponse.matrix.map((bucketArray, i) => {
       bucketArray.forEach((b, j) => {
         if (totalData[j] == null) {
           totalData[j] = 0;
         }
-        const value = this.selectedThroughputMetric.mapFunction(b);
+        const value = metric.mapFunction(b);
         totalData[j] += value;
         data[i + 2][j] = value;
       });
     });
     data[1] = totalData;
-    this.throughputChart.setData(data, false);
+    chart.setData(data, false);
+  }
+
+  switchCompareThroughputMetric(metric: ThroughputMetric) {
+    if (
+      !this.throughputCompareChart ||
+      metric.label === this.selectedCompareThroughputMetric.label ||
+      !this.byKeywordsCompareChartResponseCache
+    ) {
+      return;
+    }
+    this.selectedCompareThroughputMetric = metric;
+    this.switchThroughputMetric(this.throughputCompareChart, this.byKeywordsCompareChartResponseCache, metric);
+  }
+
+  switchBaseThroughputMetric(metric: ThroughputMetric) {
+    if (metric.label === this.selectedThroughputMetric.label || !this.byKeywordsChartResponseCache) {
+      return;
+    }
+    this.selectedThroughputMetric = metric;
+    this.switchThroughputMetric(this.throughputChart, this.byKeywordsChartResponseCache, metric);
   }
 
   getSeriesKey(attributes: BucketAttributes, groupDimensions: string[]): string {
@@ -715,12 +771,20 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   }
 
   getAllCompareCharts() {
-    return [this.summaryChart, this.byStatusChart, this.responseTimeChart, this.throughputChart, this.threadGroupChart];
+    return [
+      this.summaryCompareChart,
+      this.byStatusCompareChart,
+      this.responseTimeCompareChart,
+      this.throughputCompareChart,
+      this.threadGroupCompareChart,
+    ];
   }
 
   ngOnDestroy(): void {
     this.terminator$.next();
     this.terminator$.complete();
+    this.compareTerminator$.next();
+    this.compareTerminator$.complete();
   }
 
   get TsChartType() {

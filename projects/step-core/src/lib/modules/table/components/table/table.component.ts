@@ -428,6 +428,10 @@ export class TableComponent<T>
       this.setupDatasource(cDatasource.currentValue);
     }
     const visibleColumns = changes['visibleColumns'];
+    console.log('changes');
+    if (visibleColumns) {
+      console.log('VISIBLE COLUMNS:', visibleColumns);
+    }
     if (visibleColumns?.previousValue !== visibleColumns?.currentValue) {
       if (visibleColumns.currentValue) {
         const visibleColumnsMap = new Map<string, boolean>(); // save columns for low complexity access

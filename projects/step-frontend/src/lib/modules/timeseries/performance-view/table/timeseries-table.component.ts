@@ -84,6 +84,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
 
   updateCompareData(response: TimeSeriesAPIResponse, compareContext: TimeSeriesContext) {
     this.tableIsLoading = false;
+    this.compareResponse = response;
     let baseData = this.processResponse(this.baseResponse!, this.executionContext);
     let compareData = this.processResponse(response, compareContext);
     this.tableData$.next(this.mergeBaseAndCompareData(baseData, compareData));

@@ -20,13 +20,13 @@ export class MeasurementsPickerComponent implements OnInit, OnDestroy {
 
   terminator$ = new Subject<void>();
 
-  constructor(private executionPageService: TimeSeriesContextsFactory) {}
+  constructor(private contextsFactory: TimeSeriesContextsFactory) {}
 
   ngOnInit(): void {
     if (!this.contextId) {
       throw new Error('Context Id input must be present');
     }
-    this.keywordsService = this.executionPageService.getContext(this.contextId).keywordsContext;
+    this.keywordsService = this.contextsFactory.getContext(this.contextId).keywordsContext;
     this.keywordsService
       .onKeywordsUpdated()
       .pipe(takeUntil(this.terminator$))
