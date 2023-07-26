@@ -1,0 +1,17 @@
+<div class="menu-container" (click)="$event.stopPropagation()">
+  <table *ngIf="attributeValues && attributeValues.length">
+    <thead>
+      <tr class="row">
+        <th>Value</th>
+        <th class="value">Usage</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let attr of attributeValues" class="row">
+        <td class="title" [title]="attr.name">{{ attr.name }}</td>
+        <td class="value">{{ attr.usagePercentage | number: '1.2-2' }}%</td>
+      </tr>
+    </tbody>
+  </table>
+  <div *ngIf="!attributeValues" class="no-info">Column info missing</div>
+</div>
