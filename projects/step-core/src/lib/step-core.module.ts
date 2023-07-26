@@ -75,6 +75,7 @@ import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
 import { ArtefactDetailsComponent } from './components/artefact-details/artefact-details.component';
 import { ArtefactDetailsWrapperDirective } from './directives/artefact-details-wrapper.directive';
+import { JsonViewerModule } from './modules/json-viewer/json-viewer.module';
 
 @NgModule({
   declarations: [
@@ -154,6 +155,7 @@ import { ArtefactDetailsWrapperDirective } from './directives/artefact-details-w
     TreeModule,
     AngularSplitModule,
     DynamicFormsModule,
+    JsonViewerModule,
   ],
   exports: [
     CommonModule,
@@ -164,6 +166,7 @@ import { ArtefactDetailsWrapperDirective } from './directives/artefact-details-w
     TooltipDirective,
     CapsLockDirective,
     StepMaterialModule,
+    JsonViewerModule,
     MatchingAuthenticator,
     DashboardLinkPipe,
     TableModule,
@@ -323,6 +326,7 @@ export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
 export * from './modules/tabs/tabs.module';
 export * from './modules/tree/tree.module';
+export * from './modules/json-viewer/json-viewer.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/is-chart-empty.pipe';

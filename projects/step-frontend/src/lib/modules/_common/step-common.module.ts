@@ -6,7 +6,6 @@ import { LoginComponent } from './components/login/login.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { VersionsDialogComponent } from './components/versions-dialog/versions-dialog.component';
 import { CustomFormDirective } from './directives/custom-form.directive';
-import { JsonViewerDirective } from './directives/json-viewer.directive';
 import { PlanExecutionDirective } from './directives/plan-execution.directive';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { HttpErrorInterceptor } from './interceptors/http-error.interceptor';
@@ -22,7 +21,6 @@ import { SidebarStateService } from './injectables/sidebar-state.service';
     LoginComponent,
     SidebarComponent,
     ExecutionLinkComponent,
-    JsonViewerDirective,
     IsEmptyJsonPipe,
     ContainsVersionPipe,
     MenuFilterPipe,
@@ -35,7 +33,6 @@ import { SidebarStateService } from './injectables/sidebar-state.service';
     LoginComponent,
     SidebarComponent,
     ExecutionLinkComponent,
-    JsonViewerDirective,
     IsEmptyJsonPipe,
     ContainsVersionPipe,
     MenuFilterPipe,
