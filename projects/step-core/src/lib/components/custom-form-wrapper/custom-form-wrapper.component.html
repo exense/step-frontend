@@ -1,0 +1,12 @@
+<step-custom-forms
+  [stEditableLabelMode]="stEditableLabelMode"
+  [stScreen]="stScreen"
+  [stDisabled]="isDisabled"
+  [stInline]="stInline"
+  [stExcludeFields]="stExcludeFields"
+  [required]="showRequiredMarker"
+  [stModel]="value"
+  (stModelChange)="onValueChange($event)"
+  (customInputTouch)="onCustomInputTouched()"
+>
+</step-custom-forms>

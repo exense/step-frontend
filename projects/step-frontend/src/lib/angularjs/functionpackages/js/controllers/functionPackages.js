@@ -52,7 +52,7 @@ angular
     FunctionPackageTypeRegistry.register('dotnet', '.NET DLL');
   })
 
-  .run(function (FunctionTypeRegistry, ViewRegistry) {
+  .run(function (ViewRegistry) {
     ViewRegistry.registerView('functionPackages', 'functionpackages/partials/functionPackageList.html');
     ViewRegistry.registerMenuEntry('Keyword packages', 'functionPackages', 'package', {weight: 20, parentId: "automation-root"});
   })

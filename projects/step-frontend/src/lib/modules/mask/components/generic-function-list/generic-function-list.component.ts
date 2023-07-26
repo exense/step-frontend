@@ -1,8 +1,6 @@
-import { AfterViewInit, Component, Inject, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, inject, Input, OnInit } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { GenericFunctionDialogService } from '../services/generic-function-dialogs.service';
 import {
-  AJS_FUNCTION_TYPE_REGISTRY,
   AJS_LOCATION,
   AJS_MODULE,
   AJS_ROOT_SCOPE,
@@ -17,8 +15,8 @@ import {
   STORE_ALL,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { ILocationService, IRootScopeService } from 'angular';
 import { GenericFunctionBulkOperationsInvokeService } from '../services/generic-function-bulk-operations-invoke.service';
+import { GenericFunctionDialogService } from '../services/generic-function-dialogs.service';
 
 @Component({
   selector: 'step-generic-function-list',
@@ -34,10 +32,16 @@ import { GenericFunctionBulkOperationsInvokeService } from '../services/generic-
   ],
 })
 export class GenericFunctionListComponent implements OnInit, AfterViewInit {
+  private _interactivePlanExecutionService = inject(InteractivePlanExecutionService);
+  private _genericFunctionDialogService = inject(GenericFunctionDialogService);
+  private _augmentedKeywordsService = inject(AugmentedKeywordsService);
+  private _$rootScope = inject(AJS_ROOT_SCOPE);
+  private _location = inject(AJS_LOCATION);
+
   @Input() filter?: string[];
-  @Input() filterclass?: string[];
+  @Input() filterClass?: string[];
   @Input() title?: string;
-  @Input() serviceroot?: string;
+  @Input() serviceRoot?: string;
 
   protected dataSource?: StepDataSource<KeywordFunction>;
 
@@ -46,20 +50,11 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
     { operation: BulkOperationType.duplicate, permission: 'kw-write' },
   ];
 
-  constructor(
-    private _interactivePlanExecutionService: InteractivePlanExecutionService,
-    private _genericFunctionDialogService: GenericFunctionDialogService,
-    private _augmentedKeywordsService: AugmentedKeywordsService,
-    @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService,
-    @Inject(AJS_LOCATION) private _location: ILocationService,
-    @Inject(AJS_FUNCTION_TYPE_REGISTRY) private _functionTypeRegistry: any
-  ) {}
-
   ngOnInit(): void {
     this._genericFunctionDialogService.configure({
-      title: this.title,
-      serviceroot: this.serviceroot,
-      filterclass: this.filterclass,
+      title: this.title ?? '',
+      serviceRoot: this.serviceRoot ?? '',
+      filterClass: this.filterClass ?? [],
     });
   }
 
@@ -103,10 +98,6 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
 
   configureFunction(id: string) {
     this._genericFunctionDialogService.openConfigDialog(id).subscribe(() => this.dataSource?.reload());
-  }
-
-  functionTypeLabel(type: string) {
-    return this._functionTypeRegistry.getLabel(type);
   }
 }
 

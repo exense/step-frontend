@@ -1,7 +1,6 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  AJS_FUNCTION_TYPE_REGISTRY,
   AJS_LOCATION,
   AJS_MODULE,
   AJS_ROOT_SCOPE,
@@ -15,7 +14,6 @@ import {
   tablePersistenceConfigProvider,
   STORE_ALL,
 } from '@exense/step-core';
-import { ILocationService, IRootScopeService } from 'angular';
 import { FunctionDialogsService } from '../../services/function-dialogs.service';
 import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
 import { FunctionBulkOperationsInvokeService } from '../../services/function-bulk-operations-invoke.service';
@@ -34,20 +32,18 @@ import { FunctionBulkOperationsInvokeService } from '../../services/function-bul
   ],
 })
 export class FunctionListComponent {
+  private _functionApiService = inject(AugmentedKeywordsService);
+  private _interactivePlanExecutionApiService = inject(InteractivePlanExecutionService);
+  private _functionDialogs = inject(FunctionDialogsService);
+  private _functionPackageDialogs = inject(FunctionPackageActionsService);
+  private _$rootScope = inject(AJS_ROOT_SCOPE);
+  private _location = inject(AJS_LOCATION);
+
   readonly dataSource = this._functionApiService.createFilteredTableDataSource();
   readonly availableBulkOperations = [
     { operation: BulkOperationType.delete, permission: 'kw-delete' },
     { operation: BulkOperationType.duplicate, permission: 'kw-write' },
   ];
-  constructor(
-    private _functionApiService: AugmentedKeywordsService,
-    private _interactivePlanExecutionApiService: InteractivePlanExecutionService,
-    private _functionDialogs: FunctionDialogsService,
-    private _functionPackageDialogs: FunctionPackageActionsService,
-    @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService,
-    @Inject(AJS_LOCATION) private _location: ILocationService,
-    @Inject(AJS_FUNCTION_TYPE_REGISTRY) private _functionTypeRegistry: any
-  ) {}
 
   addFunction(): void {
     this._functionDialogs.openAddFunctionModal().subscribe(() => this.dataSource.reload());
