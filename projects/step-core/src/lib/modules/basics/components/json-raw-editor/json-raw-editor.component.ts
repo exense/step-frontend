@@ -20,9 +20,15 @@ export class JsonRawEditorComponent implements ControlValueAccessor, OnInit, OnD
   protected internalValue?: any;
   protected internalJsonValue?: string;
 
-  protected rawValueFormControl = new FormControl('', jsonValidator);
+  protected rawValueFormControl = new FormControl('', (ctrl) => {
+    if (this.isAutoValidateJson) {
+      return jsonValidator(ctrl);
+    }
+    return null;
+  });
 
   @Input() label?: string;
+  @Input() isAutoValidateJson = true;
 
   constructor(@Optional() public _ngControl?: NgControl) {
     if (this._ngControl) {
@@ -50,7 +56,11 @@ export class JsonRawEditorComponent implements ControlValueAccessor, OnInit, OnD
         jsonValue = this.stringify(obj);
       }
     } catch (e) {
-      console.error(e);
+      if (this.isAutoValidateJson) {
+        console.error(e);
+      } else {
+        jsonValue = obj.toString();
+      }
     }
     this.internalJsonValue = jsonValue;
     this.rawValueFormControl.setValue(jsonValue);
@@ -71,7 +81,10 @@ export class JsonRawEditorComponent implements ControlValueAccessor, OnInit, OnD
         try {
           newValue = !value ? undefined : JSON.parse(value);
         } catch (e) {
-          return;
+          if (this.isAutoValidateJson) {
+            return;
+          }
+          newValue = value ?? undefined;
         }
 
         this.internalJsonValue = value || '';

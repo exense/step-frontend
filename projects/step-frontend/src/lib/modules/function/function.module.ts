@@ -31,8 +31,6 @@ import { FunctionTypeScriptComponent } from './components/function-type-script/f
 import { FunctionTypeLabelPipe } from './pipes/function-type-label.pipe';
 import './services/function-dialogs.service';
 import { FunctionDialogsService } from './services/function-dialogs.service';
-import { FunctionSchemaEditorComponent } from './components/function-schema-editor/function-schema-editor.component';
-import './components/function-schema-editor/function-schema-editor.component';
 
 @NgModule({
   imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule],
@@ -52,7 +50,6 @@ import './components/function-schema-editor/function-schema-editor.component';
     FunctionTypeScriptComponent,
     FunctionTypeJMeterComponent,
     FunctionTypeNodeJSComponent,
-    FunctionSchemaEditorComponent,
   ],
   providers: [
     {
@@ -68,7 +65,6 @@ import './components/function-schema-editor/function-schema-editor.component';
     FunctionPackageConfigurationDialogComponent,
     FunctionConfigurationDialogComponent,
     FunctionSelectionTableComponent,
-    FunctionSchemaEditorComponent,
   ],
 })
 export class FunctionModule {

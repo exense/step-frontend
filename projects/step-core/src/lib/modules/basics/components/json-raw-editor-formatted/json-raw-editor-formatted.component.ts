@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Optional, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, Optional, ViewChild } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { JsonRawEditorComponent } from '../json-raw-editor/json-raw-editor.component';
 
@@ -15,6 +15,9 @@ enum InitializeValueState {
 })
 export class JsonRawEditorFormattedComponent extends JsonRawEditorComponent implements AfterViewInit {
   private initializeValueState: InitializeValueState = InitializeValueState.UNKNOWN;
+
+  @Input() errorKeysDictionary?: Record<string, string>;
+  @Input() showRequiredMarker: boolean = false;
 
   @ViewChild('preElement', { static: true })
   private preElement?: ElementRef<HTMLPreElement>;

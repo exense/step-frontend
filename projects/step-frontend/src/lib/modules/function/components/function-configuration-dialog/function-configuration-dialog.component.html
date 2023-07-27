@@ -17,13 +17,19 @@
         <textarea rows="3" [formControl]="formGroup!.controls.description"></textarea>
       </step-form-field>
 
-      <step-form-field *ngIf="!lightForm && schemaEnforced">
-        <step-label show-required-marker>Schema</step-label>
-        <textarea rows="5" [formControl]="formGroup!.controls.schema"></textarea>
-        <step-error *ngIf="formGroup!.controls.schema.hasError('format')">
-          The schema must be in a JSON format
-        </step-error>
-      </step-form-field>
+      <ng-container *ngIf="!lightForm && schemaEnforced">
+        <step-json-raw-editor-formatted
+          label="Schema"
+          [showRequiredMarker]="true"
+          [formControl]="formGroup!.controls.schema"
+          [errorKeysDictionary]="schemaErrorsDictionary"
+          [isAutoValidateJson]="false"
+        >
+          <step-label-addon>
+            <step-add-field-schema-button> </step-add-field-schema-button>
+          </step-label-addon>
+        </step-json-raw-editor-formatted>
+      </ng-container>
 
       <step-form-field>
         <step-label>Type</step-label>
