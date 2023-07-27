@@ -1,7 +1,7 @@
 <step-form-field>
   <mat-select multiple [formControl]="filterControl">
-    <mat-option *ngFor="let item of functionTypes" [value]="item.key">
-      {{ item.value }}
+    <mat-option *ngFor="let item of _functionTypes; trackBy: trackByItemInfo" [value]="item.type">
+      {{ item.label }}
     </mat-option>
   </mat-select>
 </step-form-field>

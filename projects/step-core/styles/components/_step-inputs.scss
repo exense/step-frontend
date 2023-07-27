@@ -55,6 +55,7 @@ $border-radius: 8px;
     display: flex;
     flex-direction: column;
     line-height: 1;
+    gap: 0.4rem;
 
     mat-select,
     mat-radio-group,
@@ -93,7 +94,7 @@ $border-radius: 8px;
       &[show-required-marker]::after {
         content: '*';
         display: inline-block;
-        margin-left: 0.5rem;
+        margin-left: 0.4rem;
       }
     }
 
@@ -232,8 +233,8 @@ $border-radius: 8px;
 
     .form-field-error,
     .form-field-hint {
-      font-size: 75%;
-      transform: translateY(1rem);
+      font-size: 1.2rem;
+
       &:empty {
         display: none;
       }
