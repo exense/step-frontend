@@ -14,6 +14,8 @@ import { DynamicCheckboxComponent } from './components/dynamic-checkbox/dynamic-
 import { DynamicJsonComponent } from './components/dynamic-json/dynamic-json.component';
 import { ResourceInputModule } from '../resource-input/resource-input.module';
 import { DynamicResourceComponent } from './components/dynamic-resource/dynamic-resource.component';
+import { AddFieldSchemaButton } from './components/add-field-schema-button/add-field-schema-button.component';
+import { AddSchemaFieldDialogComponent } from './components/add-schema-field-dialog/add-schema-field-dialog.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +28,8 @@ import { DynamicResourceComponent } from './components/dynamic-resource/dynamic-
     DynamicCheckboxComponent,
     DynamicJsonComponent,
     DynamicResourceComponent,
+    AddFieldSchemaButton,
+    AddSchemaFieldDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -45,6 +49,7 @@ import { DynamicResourceComponent } from './components/dynamic-resource/dynamic-
     DynamicCheckboxComponent,
     DynamicJsonComponent,
     DynamicResourceComponent,
+    AddFieldSchemaButton,
   ],
 })
 export class DynamicFormsModule {}
@@ -57,6 +62,7 @@ export * from './components/dynamic-field-editor/dynamic-field-editor.component'
 export * from './components/dynamic-checkbox/dynamic-checkbox.component';
 export * from './components/dynamic-json/dynamic-json.component';
 export * from './components/dynamic-resource/dynamic-resource.component';
+export * from './components/add-field-schema-button/add-field-schema-button.component';
 export * from './shared/dynamic-fields-schema';
 export * from './shared/dynamic-field-group-value';
 export * from './services/schemas-factory.service';

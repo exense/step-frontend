@@ -1,0 +1,9 @@
+div[step-modal-window-body] {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-height: 35rem;
+  &.with-enum {
+    min-height: 40rem;
+  }
+}

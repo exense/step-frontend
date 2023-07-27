@@ -1,6 +1,6 @@
 import { Directive, forwardRef } from '@angular/core';
 import { AbstractControl, NG_VALIDATORS, ValidationErrors, Validator } from '@angular/forms';
-import { jsonValidator } from '../shared/json-validator';
+import { jsonValidator } from '../shared/validators/json-validator';
 
 @Directive({
   selector: '[stepValidateJson]',
