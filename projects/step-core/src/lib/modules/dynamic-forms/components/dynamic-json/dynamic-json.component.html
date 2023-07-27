@@ -2,7 +2,7 @@
   *ngIf="dynamic; else constantValueTemplate"
   [label]="label"
   [isParentInvalid]="!!_ngControl.invalid"
-  [showRequiredAsterisk]="showRequiredAsterisk"
+  [showRequiredMarker]="showRequiredMarker"
   [ngModel]="expression"
   [disabled]="isDisabled"
   (ngModelChange)="onExpressionChange($event)"

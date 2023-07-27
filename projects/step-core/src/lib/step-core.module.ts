@@ -13,7 +13,6 @@ import { DynamicLabelCustomFormInputComponent } from './components/custom-form-i
 import { StandardCustomFormInputComponent } from './components/custom-form-input/standard-custom-form-input.component';
 import { CustomFormWrapperComponent } from './components/custom-form-wrapper/custom-form-wrapper.component';
 import { CustomFormComponent } from './components/custom-form/custom-form.component';
-import { DynamicResourceInputComponent } from './components/dynamic-resource-input/dynamic-resource-input.component';
 import { EditSchedulerTaskDialogComponent } from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 import { EditableActionsComponent } from './components/editable-actions/editable-actions.component';
 import { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';
@@ -123,10 +122,8 @@ import { IsUsedByDialogService } from './services/is-used-by-dialog.service';
     PlanCreateDialogComponent,
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
-    DynamicResourceInputComponent,
     AgentTokenSelectionCriteriaComponent,
     PredefinedOptionsInputComponent,
-    UpdateResourceWarningDialogComponent,
     CustomFormWrapperComponent,
     EntityColumnComponent,
     EntityColumnContainerComponent,
@@ -209,10 +206,8 @@ import { IsUsedByDialogService } from './services/is-used-by-dialog.service';
     PlanCreateDialogComponent,
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
-    DynamicResourceInputComponent,
     AgentTokenSelectionCriteriaComponent,
     PredefinedOptionsInputComponent,
-    UpdateResourceWarningDialogComponent,
     CustomFormWrapperComponent,
     EntityColumnComponent,
     EntityColumnContainerComponent,
@@ -265,7 +260,6 @@ export { DynamicLabelCustomFormInputComponent } from './components/custom-form-i
 export { StandardCustomFormInputComponent } from './components/custom-form-input/standard-custom-form-input.component';
 export { CustomFormWrapperComponent } from './components/custom-form-wrapper/custom-form-wrapper.component';
 export { CustomFormComponent } from './components/custom-form/custom-form.component';
-export { DynamicResourceInputComponent } from './components/dynamic-resource-input/dynamic-resource-input.component';
 export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 export { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';
 export { EditableLabelComponent } from './components/editable-label/editable-label.component';

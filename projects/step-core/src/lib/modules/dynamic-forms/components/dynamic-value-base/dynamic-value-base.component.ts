@@ -19,7 +19,7 @@ export abstract class DynamicValueBaseComponent<D extends DynamicValueBase<T>, T
 {
   @Input() label?: string;
   @Input() tooltip?: string;
-  @Input() showRequiredAsterisk: boolean = false;
+  @Input() showRequiredMarker: boolean = false;
 
   @Output() blur = new EventEmitter<void>();
 
