@@ -45,6 +45,10 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
   protected readonly setValueToForm$ = this.setValueToFormInternal$.asObservable();
   protected readonly setValueToModel$ = this.setValueToModelInternal$.asObservable();
   protected readonly AlertType = AlertType;
+  protected readonly schemaErrorsDictionary: Record<string, string> = {
+    format: 'The schema must be in a JSON format',
+    required: 'This field is required',
+  };
 
   protected keyword?: Keyword;
   protected formGroup?: FunctionConfigurationDialogForm;

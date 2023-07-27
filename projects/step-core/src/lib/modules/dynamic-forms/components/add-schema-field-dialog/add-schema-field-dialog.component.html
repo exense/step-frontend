@@ -1,0 +1,51 @@
+<step-modal-window title="Add field to schema">
+  <div step-modal-window-body [formGroup]="fieldForm" [class.with-enum]="isEnum$ | async">
+    <step-form-field>
+      <step-label show-required-marker>Name</step-label>
+      <input type="text" formControlName="name" />
+    </step-form-field>
+    <step-form-field>
+      <step-label show-required-marker>Field type</step-label>
+      <mat-select formControlName="fieldType">
+        <mat-option [value]="undefined"></mat-option>
+        <mat-option *ngFor="let item of typeItems" [value]="item">
+          {{ item }}
+        </mat-option>
+      </mat-select>
+    </step-form-field>
+    <step-form-field>
+      <step-label>Is required</step-label>
+      <div class="step-checkbox-container">
+        <mat-checkbox formControlName="isRequired" color="primary"></mat-checkbox>
+      </div>
+    </step-form-field>
+    <step-form-field>
+      <step-label>Default value</step-label>
+      <input type="text" formControlName="defaultValue" />
+      <step-suffix class="icon-suffix" *ngIf="isArray$ | async">
+        <step-icon name="help-circle" matTooltip="Define coma separated string as default value"> </step-icon>
+      </step-suffix>
+      <step-error *ngIf="fieldForm.controls.defaultValue.touched && fieldForm.controls.defaultValue.errors">
+        <step-errors-list [errors]="fieldForm.controls.defaultValue.errors" [keysDictionary]="errorsDictionary">
+        </step-errors-list>
+      </step-error>
+    </step-form-field>
+    <ng-container *ngIf="isEnum$ | async">
+      <step-form-field>
+        <step-label>Enum items</step-label>
+        <input type="text" formControlName="enumItems" />
+        <step-suffix class="icon-suffix">
+          <step-icon name="help-circle" matTooltip="Define coma separated string as default value"> </step-icon>
+        </step-suffix>
+        <step-error *ngIf="fieldForm.controls.enumItems.touched && fieldForm.controls.enumItems.errors">
+          <step-errors-list [errors]="fieldForm.controls.enumItems.errors" [keysDictionary]="errorsDictionary">
+          </step-errors-list>
+        </step-error>
+      </step-form-field>
+    </ng-container>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-button mat-stroked-button matDialogClose>Cancel</button>
+    <button type="button" mat-button mat-flat-button color="primary" (click)="addField()">Add Field</button>
+  </div>
+</step-modal-window>

@@ -1,6 +1,6 @@
 import { KeyValue } from '@angular/common';
 import { AbstractControl, FormBuilder, ValidationErrors } from '@angular/forms';
-import { DynamicValueInteger, Function as Keyword } from '../client/generated';
+import { DynamicValueInteger, Function as Keyword, JsonValue } from '../client/generated';
 import {
   AgentTokenSelectionCriteriaForm,
   agentTokenSelectionCriteriaFormCreate,
@@ -11,7 +11,7 @@ import { dynamicValueFactory, toKeyValuePairs, toRecord } from './utils';
 
 export type FunctionConfigurationDialogForm = ReturnType<typeof functionConfigurationDialogFormCreate>;
 
-export const schemaValidator = (schemaControl: AbstractControl<string>): ValidationErrors | null => {
+export const schemaValidator = (schemaControl: AbstractControl<Record<string, JsonValue>>): ValidationErrors | null => {
   const schema = schemaControl.value;
 
   if (!schema) {
@@ -20,24 +20,16 @@ export const schemaValidator = (schemaControl: AbstractControl<string>): Validat
     };
   }
 
-  let schemaFormatValid = true;
-
-  try {
-    JSON.parse(schema);
-  } catch (error) {
-    schemaFormatValid = false;
+  if (typeof schema === 'object' && !(schema instanceof Array)) {
+    return null;
   }
 
-  if (!schemaFormatValid) {
-    return {
-      format: true,
-    };
-  }
-
-  return null;
+  return {
+    format: true,
+  };
 };
 
-const DEFAULT_SCHEMA_VALUE = '{}';
+const DEFAULT_SCHEMA_VALUE = {};
 const DEFAULT_CALL_TIMEOUT_MS = 180000;
 
 export const functionConfigurationDialogFormCreate = (
@@ -54,7 +46,7 @@ export const functionConfigurationDialogFormCreate = (
   const formGroup = formBuilder.nonNullable.group({
     attributes: formBuilder.nonNullable.control<Record<string, string>>({ name: '' }, []),
     description: formBuilder.nonNullable.control<string>('', []),
-    schema: formBuilder.nonNullable.control<string>(DEFAULT_SCHEMA_VALUE, [
+    schema: formBuilder.nonNullable.control<Record<string, JsonValue>>(DEFAULT_SCHEMA_VALUE, [
       ...(!lightForm && schemaEnforced ? [schemaValidator] : []),
     ]),
     type: formBuilder.nonNullable.control<string>(
@@ -82,7 +74,7 @@ export const functionConfigurationDialogFormSetValueToForm = (
   form.patchValue({
     attributes,
     description,
-    schema: schema ? JSON.stringify(schema) : DEFAULT_SCHEMA_VALUE,
+    schema: schema ?? DEFAULT_SCHEMA_VALUE,
     type,
     callTimeout,
     executeLocally,
@@ -114,7 +106,7 @@ export const functionConfigurationDialogFormSetValueToModel = (
     ...attributes,
   };
   model.description = description;
-  model.schema = schema ? JSON.parse(schema) : {};
+  model.schema = schema ?? {};
   model.type = type!;
   model.callTimeout = callTimeout!;
   model.executeLocally = executeLocally!;
