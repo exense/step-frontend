@@ -1,4 +1,5 @@
 const https = require('https');
+const http = require('http');
 const shell = require('shelljs');
 const openapi = require('openapi-typescript-codegen');
 
@@ -7,8 +8,9 @@ const GENERATED_CODE_LOCATION = './projects/step-core/src/lib/client/generated';
 const CLIENT_MODULE_NAME = 'StepGeneratedClientModule';
 
 function fetchSchema() {
+  const service = (SPEC_URL ?? '').toLowerCase().startsWith('https') ? https : http;
   return new Promise((resolve, reject) => {
-    https
+    service
       .get(SPEC_URL, (resp) => {
         let data = '';
         resp.on('data', (chunk) => {

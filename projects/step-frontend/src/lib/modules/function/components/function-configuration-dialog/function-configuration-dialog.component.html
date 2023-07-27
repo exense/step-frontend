@@ -1,0 +1,89 @@
+<step-modal-window [title]="modalTitle" [showSpinner]="isLoading" [stepZIndex]="1000">
+  <div step-modal-window-body>
+    <step-alert *ngIf="keyword?.managed" [type]="AlertType.warning">
+      This keyword is part of a keyword package. All changes made will be lost when the package is updated.
+    </step-alert>
+
+    <step-custom-form-wrapper
+      [stScreen]="customScreenTable"
+      [ngModel]="formGroup!.value"
+      (ngModelChange)="formGroup!.patchValue($event, { emitEvent: false })"
+    >
+    </step-custom-form-wrapper>
+
+    <form [formGroup]="formGroup!">
+      <step-form-field>
+        <step-label>Description</step-label>
+        <textarea rows="3" [formControl]="formGroup!.controls.description"></textarea>
+      </step-form-field>
+
+      <step-form-field *ngIf="!lightForm && schemaEnforced">
+        <step-label show-required-marker>Schema</step-label>
+        <textarea rows="5" [formControl]="formGroup!.controls.schema"></textarea>
+        <step-error *ngIf="formGroup!.controls.schema.hasError('format')">
+          The schema must be in a JSON format
+        </step-error>
+      </step-form-field>
+
+      <step-form-field>
+        <step-label>Type</step-label>
+        <mat-select
+          [ngModel]="formGroup!.controls.type.value"
+          (ngModelChange)="fetchStepFunction($event)"
+          [ngModelOptions]="{ standalone: true }"
+        >
+          <mat-option *ngFor="let itemInfo of functionTypeItemInfos" [value]="itemInfo.type">
+            {{ itemInfo.label }}
+          </mat-option>
+        </mat-select>
+      </step-form-field>
+
+      <step-function-type
+        [itemKey]="functionType"
+        [context]="{
+          formGroup: formGroup,
+          keyword: keyword,
+          setValueToForm$: setValueToForm$,
+          setValueToModel$: setValueToModel$
+        }"
+        (renderComplete)="onFunctionTypeRenderComplete()"
+      ></step-function-type>
+
+      <ng-container *ngIf="!lightForm">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>Advanced</mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <step-dynamic-textfield
+            label="Call timeout (ms)"
+            [formControl]="formGroup!.controls.callTimeout"
+          ></step-dynamic-textfield>
+
+          <mat-checkbox color="primary" [formControl]="formGroup!.controls.executeLocally">
+            Execute on controller&nbsp;
+            <step-icon
+              name="help-circle"
+              matTooltip="Defines if the Keyword has to be executed on an agent or locally on the controller. Please change this only if you really now what you're doing. In most of the cases the default setting doesn't have to be changed."
+            ></step-icon>
+          </mat-checkbox>
+
+          <ng-container *ngIf="!executeLocally">
+            <step-agent-token-selection-criteria
+              [tokenSelectionCriteria]="formGroup!.controls.tokenSelectionCriteria"
+              tooltip="Defines additional selection criteria for the agent token on which the keyword should be executed"
+            ></step-agent-token-selection-criteria>
+          </ng-container>
+        </mat-expansion-panel>
+      </ng-container>
+    </form>
+  </div>
+
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
+    <button type="button" [disabled]="formGroup!.invalid" (click)="save()" mat-flat-button color="primary">Save</button>
+    <button type="button" [disabled]="formGroup!.invalid" (click)="save(true)" mat-flat-button color="primary">
+      Save and edit
+    </button>
+  </div>
+</step-modal-window>

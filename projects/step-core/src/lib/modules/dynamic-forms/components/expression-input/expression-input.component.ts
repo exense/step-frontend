@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { DialogsService } from '../../../../shared';
 
-type OnChange = (expression: string) => void;
+type OnChange = (expression?: string) => void;
 type OnTouch = () => void;
 
 @Component({
@@ -14,25 +14,28 @@ type OnTouch = () => void;
 export class ExpressionInputComponent implements ControlValueAccessor {
   @Input() label?: string;
   @Input() tooltip?: string;
-  @Input() isParentInvalid: boolean = false;
-  @Input() showRequiredAsterisk: boolean = false;
+  @Input() isParentInvalid?: boolean;
+  @Input() isParentTouched?: boolean;
+  @Input() isParentDisabled?: boolean;
+  @Input() showRequiredMarker?: boolean;
 
   @Output() toggleConstantValue = new EventEmitter<void>();
   @Output() blur = new EventEmitter<void>();
 
+  private _dialogsService = inject(DialogsService);
+
   private onChange?: OnChange;
   private onTouch?: OnTouch;
 
-  isDisabled: boolean = false;
+  protected expression: string = '';
+  protected isDisabled: boolean = false;
 
-  expression: string = '';
-
-  constructor(private _dialogsService: DialogsService, public _ngControl: NgControl) {
+  constructor(readonly _ngControl: NgControl) {
     this._ngControl.valueAccessor = this;
   }
 
-  writeValue(expression: string | null): void {
-    this.expression = expression || '';
+  writeValue(expression?: string): void {
+    this.expression = expression ?? '';
   }
 
   registerOnChange(onChange: OnChange): void {
@@ -47,17 +50,17 @@ export class ExpressionInputComponent implements ControlValueAccessor {
     this.isDisabled = isDisabled;
   }
 
-  onExpressionChange(expression: string): void {
+  protected onExpressionChange(expression: string): void {
     this.expression = expression;
     this.onChange?.(expression);
   }
 
-  onBlur(): void {
+  protected onBlur(): void {
     this.onTouch?.();
     this.blur.emit();
   }
 
-  editDynamicExpression(): void {
+  protected editDynamicExpression(): void {
     this._dialogsService.enterValue('Free text editor', this.expression, 'lg', 'enterTextValueDialog', (expression) => {
       this.expression = expression;
       this.onChange?.(expression);

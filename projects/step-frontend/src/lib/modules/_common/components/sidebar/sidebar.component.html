@@ -19,7 +19,6 @@
       <step-icon name="home"></step-icon>
     </span>
     <ng-container *ngIf="('settings-ui-menu' | hasRight | async) || ('admin-ui-menu' | hasRight | async)">
-      <span class="sidebar-home-and-settings-divider">|</span>
       <step-dashlet itemKey="settings-button" class="sidebar-home-and-settings-icon"></step-dashlet>
     </ng-container>
   </div>

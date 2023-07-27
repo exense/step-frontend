@@ -5,7 +5,6 @@ import { ExecutionLinkComponent } from './components/execution-link/execution-li
 import { LoginComponent } from './components/login/login.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { VersionsDialogComponent } from './components/versions-dialog/versions-dialog.component';
-import { CustomFormDirective } from './directives/custom-form.directive';
 import { JsonViewerDirective } from './directives/json-viewer.directive';
 import { PlanExecutionDirective } from './directives/plan-execution.directive';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
@@ -26,7 +25,6 @@ import { SidebarStateService } from './injectables/sidebar-state.service';
     IsEmptyJsonPipe,
     ContainsVersionPipe,
     MenuFilterPipe,
-    CustomFormDirective,
     PlanExecutionDirective,
     VersionsDialogComponent,
   ],
@@ -39,7 +37,6 @@ import { SidebarStateService } from './injectables/sidebar-state.service';
     IsEmptyJsonPipe,
     ContainsVersionPipe,
     MenuFilterPipe,
-    CustomFormDirective,
     PlanExecutionDirective,
   ],
   imports: [StepCoreModule],

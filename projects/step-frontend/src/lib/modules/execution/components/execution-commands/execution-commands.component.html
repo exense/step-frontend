@@ -1,4 +1,6 @@
-<step-custom-form [stModel]="executionParameters" stScreen="executionParameters"> </step-custom-form>
+<step-custom-forms *ngIf="executionParameters" [stModel]="executionParameters" stScreen="executionParameters">
+</step-custom-forms>
+
 <div class="main-container" role="toolbar" aria-label="...">
   <div class="sub-container">
     <div class="flex">
