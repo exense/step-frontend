@@ -32,6 +32,7 @@ export class AutorefreshToggleComponent implements OnDestroy {
   @Input() autoIncreaseTo?: number;
 
   _disabled: boolean = false;
+  _lastInterval?: number;
 
   get disabled(): boolean {
     return this._disabled;
@@ -45,8 +46,12 @@ export class AutorefreshToggleComponent implements OnDestroy {
     this.disabledChange.emit(value);
     this._$rootScope.$broadcast('globalsettings-globalRefreshToggle', { new: !value });
     if (!value) {
+      if (this._lastInterval) {
+        this.interval = this._lastInterval;
+      }
       this.refresh.emit();
     } else {
+      this._lastInterval = this.interval;
       this.interval = 0;
     }
   }
@@ -67,6 +72,10 @@ export class AutorefreshToggleComponent implements OnDestroy {
     this.intervalChange.emit(value);
     this._$rootScope.$broadcast('globalsettings-refreshInterval', { new: value });
     this.startTimer();
+
+    if (value !== 0) {
+      this._lastInterval = undefined;
+    }
   }
 
   @Output() disabledChange = new EventEmitter<boolean>();

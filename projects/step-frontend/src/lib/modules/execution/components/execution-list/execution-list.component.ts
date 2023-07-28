@@ -5,6 +5,7 @@ import {
   AutoDeselectStrategy,
   BulkOperationsInvokeService,
   BulkOperationType,
+  BulkSelectionType,
   DateFormat,
   ExecutiontTaskParameters,
   FilterConditionFactoryService,
@@ -39,10 +40,14 @@ export class ExecutionListComponent {
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
   readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
   readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
-
   readonly DateFormat = DateFormat;
   readonly resultItems$ = of(EXECUTION_RESULT);
   readonly statusItems$ = of(EXECUTION_STATUS);
+  autoRefreshDisabled: boolean = false;
+
+  changeType(selectionType: BulkSelectionType): void {
+    this.autoRefreshDisabled = selectionType !== BulkSelectionType.None;
+  }
 }
 
 getAngularJSGlobal()
