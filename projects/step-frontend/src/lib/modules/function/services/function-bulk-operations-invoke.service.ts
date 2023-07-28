@@ -21,4 +21,6 @@ export class FunctionBulkOperationsInvokeService extends BulkOperationsInvokeSer
   }
 
   protected override invokeExport = undefined;
+  protected override invokeStart = undefined;
+  protected override invokeStop = undefined;
 }

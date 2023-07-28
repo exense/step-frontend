@@ -47,6 +47,8 @@ export abstract class BulkOperationsInvokeService<ID> {
   protected abstract invokeDelete?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
   protected abstract invokeDuplicate?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
   protected abstract invokeExport?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
+  protected abstract invokeStart?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
+  protected abstract invokeStop?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
 
   protected transformConfig(config: BulkOperationConfig<ID>, isPreview: boolean): TableBulkOperationRequest {
     let targetType: TableBulkOperationRequest['targetType'] = 'LIST';
@@ -99,6 +101,12 @@ export abstract class BulkOperationsInvokeService<ID> {
         break;
       case BulkOperationType.export:
         operation = !!this.invokeExport ? (params) => this.invokeExport!(params) : undefined;
+        break;
+      case BulkOperationType.start:
+        operation = !!this.invokeStart ? (params) => this.invokeStart!(params) : undefined;
+        break;
+      case BulkOperationType.stop:
+        operation = !!this.invokeStop ? (params) => this.invokeStop!(params) : undefined;
         break;
     }
 

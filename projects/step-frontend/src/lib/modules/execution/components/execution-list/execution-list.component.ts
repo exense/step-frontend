@@ -2,22 +2,40 @@ import { Component, inject } from '@angular/core';
 import {
   AJS_MODULE,
   AugmentedExecutionsService,
+  AutoDeselectStrategy,
+  BulkOperationsInvokeService,
+  BulkOperationType,
   DateFormat,
+  ExecutiontTaskParameters,
   FilterConditionFactoryService,
+  selectionCollectionProvider,
   STORE_ALL,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { EXECUTION_RESULT, EXECUTION_STATUS } from '../../../_common/shared/status.enum';
 import { of } from 'rxjs';
+import { ExecutionBulkOperationsInvokeService } from '../../services/execution-bulk-operations-invoke.service';
 
 @Component({
   selector: 'step-execution-list',
   templateUrl: './execution-list.component.html',
   styleUrls: ['./execution-list.component.scss'],
-  providers: [tablePersistenceConfigProvider('executionList', STORE_ALL)],
+  providers: [
+    tablePersistenceConfigProvider('executionList', STORE_ALL),
+    selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    {
+      provide: BulkOperationsInvokeService,
+      useClass: ExecutionBulkOperationsInvokeService,
+    },
+  ],
 })
 export class ExecutionListComponent {
+  readonly availableBulkOperations = [
+    { operation: BulkOperationType.delete, permission: 'execution-delete' },
+    { operation: BulkOperationType.start, permission: 'plan-execute' },
+    { operation: BulkOperationType.stop, permission: 'plan-execute' },
+  ];
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
   readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
   readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();

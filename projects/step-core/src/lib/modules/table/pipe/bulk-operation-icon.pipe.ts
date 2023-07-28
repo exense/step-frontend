@@ -13,6 +13,10 @@ export class BulkOperationIconPipe implements PipeTransform {
         return 'copy';
       case BulkOperationType.export:
         return 'upload';
+      case BulkOperationType.start:
+        return 'play-circle';
+      case BulkOperationType.stop:
+        return 'stop-circle';
       default:
         return '';
     }

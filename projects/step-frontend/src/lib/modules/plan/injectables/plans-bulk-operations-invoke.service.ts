@@ -20,4 +20,6 @@ export class PlansBulkOperationsInvokeService extends BulkOperationsInvokeServic
   }
 
   protected override invokeExport = undefined;
+  protected override invokeStart = undefined;
+  protected override invokeStop = undefined;
 }
