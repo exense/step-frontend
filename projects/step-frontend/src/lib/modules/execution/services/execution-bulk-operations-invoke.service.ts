@@ -18,15 +18,11 @@ export class ExecutionBulkOperationsInvokeService extends BulkOperationsInvokeSe
   }
 
   protected override invokeStart(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus> {
-    //FIXME: use new API
-    console.log('invokeStart', requestBody);
-    return this._api.deleteExecution('test');
+    return this._api.startEntityS(requestBody);
   }
 
   protected override invokeStop(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus> {
-    //FIXME: use new API
-    console.log('invokeStop', requestBody);
-    return this._api.deleteExecution('test');
+    return this._api.cloneEntityS1(requestBody);
   }
 
   protected override invokeExport = undefined;
