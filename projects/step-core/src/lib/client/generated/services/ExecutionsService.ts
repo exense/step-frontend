@@ -189,7 +189,7 @@ export class ExecutionsService {
    * @returns AsyncTaskStatusTableBulkOperationReport default response
    * @throws ApiError
    */
-  public startEntityS(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatusTableBulkOperationReport> {
+  public startExecutions(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/executions/bulk/start',
@@ -204,7 +204,7 @@ export class ExecutionsService {
    * @returns AsyncTaskStatusTableBulkOperationReport default response
    * @throws ApiError
    */
-  public cloneEntityS1(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatusTableBulkOperationReport> {
+  public stopExecutions(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/executions/bulk/stop',
