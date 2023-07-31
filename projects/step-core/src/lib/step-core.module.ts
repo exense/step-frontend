@@ -76,7 +76,7 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
 import { ArtefactDetailsComponent } from './components/artefact-details/artefact-details.component';
 import { ArtefactDetailsWrapperDirective } from './directives/artefact-details-wrapper.directive';
 import { ResourceInputWrapperComponent } from './components/resource-input-wrapper/resource-input-wrapper.component';
-import { WizardStepsComponent } from './components/wizard-steps/wizard-steps.component';
+import { WizardModule } from './modules/wizard/wizards.module';
 
 @NgModule({
   declarations: [
@@ -139,7 +139,6 @@ import { WizardStepsComponent } from './components/wizard-steps/wizard-steps.com
     ArtefactDetailsComponent,
     ArtefactDetailsWrapperDirective,
     ResourceInputWrapperComponent,
-    WizardStepsComponent,
   ],
   imports: [
     CommonModule,
@@ -158,6 +157,7 @@ import { WizardStepsComponent } from './components/wizard-steps/wizard-steps.com
     TreeModule,
     AngularSplitModule,
     DynamicFormsModule,
+    WizardModule,
   ],
   exports: [
     CommonModule,
@@ -180,6 +180,7 @@ import { WizardStepsComponent } from './components/wizard-steps/wizard-steps.com
     TooltipImmediateCloseDirective,
     TreeModule,
     AngularSplitModule,
+    WizardModule,
     ReportNodeStatusComponent,
     PlanLinkComponent,
     PlanNamePipe,
@@ -228,7 +229,6 @@ import { WizardStepsComponent } from './components/wizard-steps/wizard-steps.com
     FileAlreadyExistingDialogComponent,
     ArtefactDetailsComponent,
     ResourceInputWrapperComponent,
-    WizardStepsComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -304,7 +304,6 @@ export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialo
 export * from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 export * from './components/artefact-details/artefact-details.component';
 export * from './components/base-wizard-step/base-wizard-step.component';
-export * from './components/wizard-steps/wizard-steps.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export { UpdateResourceWarningDialogComponent } from './components/update-resource-warning-dialog/update-resource-warning-dialog.component';
 export { UploadContainerComponent } from './components/upload-container/upload-container.component';
@@ -332,6 +331,7 @@ export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
 export * from './modules/tabs/tabs.module';
 export * from './modules/tree/tree.module';
+export * from './modules/wizard/wizards.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/is-chart-empty.pipe';

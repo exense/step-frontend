@@ -20,6 +20,8 @@ const IGNORE_PLUGINS: ReadonlyArray<string> = [
   'menuConfig',
   'scriptEditor',
   'eventbrokermonitor',
+  'wizard',
+  'messages',
 ];
 
 // For testing purposes only

@@ -49,7 +49,7 @@ export * from './services/custom-registry.service';
 export * from './services/custom-cell-registry.service';
 export * from './services/custom-search-cell-registry.service';
 export * from './services/dashlet-registry.service';
-export * from './services/wizard-step-registry.service';
+export * from './services/wizard-registry.service';
 export * from './services/execution-custom-panel-registry.service';
 export { ItemInfo } from './services/base-registry.service';
 export * from './shared/custom-registry-item';

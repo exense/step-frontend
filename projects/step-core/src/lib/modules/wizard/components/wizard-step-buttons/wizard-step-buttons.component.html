@@ -1,0 +1,31 @@
+<button
+  *ngIf="!isFirst"
+  type="button"
+  mat-button
+  mat-raised-button
+  [disabled]="!!(stepBehavior?.disablePrevious$ | async)"
+  (click)="goPrevious()"
+>
+  Previous
+</button>
+<button
+  *ngIf="!isLast"
+  type="button"
+  mat-button
+  mat-raised-button
+  [disabled]="!!(stepBehavior?.disableNext$ | async)"
+  (click)="goNext()"
+>
+  Next
+</button>
+<button
+  *ngIf="isLast"
+  type="button"
+  mat-button
+  mat-flat-button
+  color="primary"
+  [disabled]="!!(stepBehavior?.disableNext$ | async)"
+  (click)="goFinish()"
+>
+  Finish
+</button>
