@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { AfterViewInit, Component, inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_LOCATION,
@@ -17,6 +17,7 @@ import {
 import { FunctionDialogsService } from '../../services/function-dialogs.service';
 import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
 import { FunctionBulkOperationsInvokeService } from '../../services/function-bulk-operations-invoke.service';
+import { set } from 'husky';
 
 @Component({
   selector: 'step-function-list',
@@ -31,7 +32,7 @@ import { FunctionBulkOperationsInvokeService } from '../../services/function-bul
     },
   ],
 })
-export class FunctionListComponent {
+export class FunctionListComponent implements AfterViewInit {
   private _functionApiService = inject(AugmentedKeywordsService);
   private _interactivePlanExecutionApiService = inject(InteractivePlanExecutionService);
   private _functionDialogs = inject(FunctionDialogsService);
@@ -44,6 +45,15 @@ export class FunctionListComponent {
     { operation: BulkOperationType.delete, permission: 'kw-delete' },
     { operation: BulkOperationType.duplicate, permission: 'kw-write' },
   ];
+  ngAfterViewInit(): void {
+    const { createNew } = this._location.search();
+    if (createNew !== undefined) {
+      this._location.search('createNew', null);
+      // Timeout to be sure, that navigation events has been completed
+      // Otherwise location change might auto close the modal
+      setTimeout(() => this.addFunction(), 500);
+    }
+  }
 
   addFunction(): void {
     this._functionDialogs.openAddFunctionModal().subscribe(() => this.dataSource.reload());

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { AfterViewInit, Component, inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
@@ -11,6 +11,7 @@ import {
   STORE_ALL,
   ArrayItemLabelValueExtractor,
   FilterConditionFactoryService,
+  AJS_LOCATION,
 } from '@exense/step-core';
 import { ScheduledTaskLogicService } from '../../services/scheduled-task-logic.service';
 import { ScheduledTaskBulkOperationsInvokeService } from '../../services/scheduled-task-bulk-operations-invoke.service';
@@ -32,13 +33,15 @@ type StatusItem = KeyValue<string, string>;
     },
   ],
 })
-export class ScheduledTaskListComponent {
+export class ScheduledTaskListComponent implements AfterViewInit {
+  private _location = inject(AJS_LOCATION);
+  public readonly _logic = inject(ScheduledTaskLogicService);
+
   readonly availableBulkOperations = [
     { operation: BulkOperationType.delete, permission: 'task-delete' },
     { operation: BulkOperationType.duplicate, permission: 'task-write' },
   ];
   isSchedulerEnabled: boolean = false;
-  constructor(public readonly _logic: ScheduledTaskLogicService) {}
 
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
 
@@ -56,6 +59,16 @@ export class ScheduledTaskListComponent {
     this._logic.isSchedulerEnabled().subscribe((data) => {
       this.isSchedulerEnabled = data;
     });
+  }
+
+  ngAfterViewInit(): void {
+    const { createNew } = this._location.search();
+    if (createNew !== undefined) {
+      this._location.search('createNew', null);
+      // Timeout to be sure, that navigation events has been completed
+      // Otherwise location change might auto close the modal
+      setTimeout(() => this._logic.createParameter(), 500);
+    }
   }
 }
 

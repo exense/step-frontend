@@ -18,7 +18,7 @@ import { WizardStepButtonsComponent } from './components/wizard-step-buttons/wiz
     FormsModule,
     ReactiveFormsModule,
   ],
-  exports: [WizardStepsComponent],
+  exports: [WizardStepsComponent, WizardStepButtonsComponent],
 })
 export class WizardModule {}
 
