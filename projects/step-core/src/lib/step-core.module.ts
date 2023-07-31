@@ -7,10 +7,13 @@ import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { UpgradeModule } from '@angular/upgrade/static';
 import { AngularSplitModule } from 'angular-split';
 import { StepGeneratedClientModule } from './client/generated';
+import { AgentTokenSelectionCriteriaComponent } from './components/agent-token-selection-criteria/agent-token-selection-criteria.component';
 import { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
 import { DynamicLabelCustomFormInputComponent } from './components/custom-form-input/dynamic-label-custom-form-input.component';
 import { StandardCustomFormInputComponent } from './components/custom-form-input/standard-custom-form-input.component';
+import { CustomFormWrapperComponent } from './components/custom-form-wrapper/custom-form-wrapper.component';
 import { CustomFormComponent } from './components/custom-form/custom-form.component';
+import { DynamicResourceInputComponent } from './components/dynamic-resource-input/dynamic-resource-input.component';
 import { EditSchedulerTaskDialogComponent } from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 import { EditableActionsComponent } from './components/editable-actions/editable-actions.component';
 import { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';
@@ -128,8 +131,11 @@ import { WizardModule } from './modules/wizard/wizards.module';
     PlanCreateDialogComponent,
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
+    DynamicResourceInputComponent,
+    AgentTokenSelectionCriteriaComponent,
     PredefinedOptionsInputComponent,
     UpdateResourceWarningDialogComponent,
+    CustomFormWrapperComponent,
     EntityColumnComponent,
     EntityColumnContainerComponent,
     NewSchedulerTaskDialogComponent,
@@ -219,8 +225,11 @@ import { WizardModule } from './modules/wizard/wizards.module';
     PlanCreateDialogComponent,
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
+    DynamicResourceInputComponent,
+    AgentTokenSelectionCriteriaComponent,
     PredefinedOptionsInputComponent,
     UpdateResourceWarningDialogComponent,
+    CustomFormWrapperComponent,
     EntityColumnComponent,
     EntityColumnContainerComponent,
     NewSchedulerTaskDialogComponent,
@@ -262,10 +271,13 @@ export { OpenAPI } from './client/generated/core/OpenAPI';
 export type { OpenAPIConfig } from './client/generated/core/OpenAPI';
 export * from './client/generated/index';
 export * from './client/step-client-module';
+export { AgentTokenSelectionCriteriaComponent } from './components/agent-token-selection-criteria/agent-token-selection-criteria.component';
 export { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
 export { DynamicLabelCustomFormInputComponent } from './components/custom-form-input/dynamic-label-custom-form-input.component';
 export { StandardCustomFormInputComponent } from './components/custom-form-input/standard-custom-form-input.component';
+export { CustomFormWrapperComponent } from './components/custom-form-wrapper/custom-form-wrapper.component';
 export { CustomFormComponent } from './components/custom-form/custom-form.component';
+export { DynamicResourceInputComponent } from './components/dynamic-resource-input/dynamic-resource-input.component';
 export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 export { EditableDropdownLabelComponent } from './components/editable-dropdown-label/editable-dropdown-label.component';
 export { EditableLabelComponent } from './components/editable-label/editable-label.component';

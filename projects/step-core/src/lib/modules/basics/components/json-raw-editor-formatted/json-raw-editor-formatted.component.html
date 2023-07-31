@@ -1,0 +1,22 @@
+<step-form-field
+  [class.ng-invalid]="_ngControl?.invalid || rawValueFormControl.invalid"
+  [class.ng-touched]="_ngControl?.touched"
+>
+  <step-label [attr.show-required-marker]="showRequiredMarker || null">
+    {{ label }}
+  </step-label>
+
+  <step-label-addon>
+    <ng-content select="step-label-addon"></ng-content>
+  </step-label-addon>
+  <pre
+    #preElement
+    [class.disabled]="rawValueFormControl.disabled"
+    [contentEditable]="rawValueFormControl.enabled"
+    (input)="handleInput(preElement)"
+    (blur)="onTouch()"
+  ></pre>
+  <step-error *ngIf="_ngControl?.touched && _ngControl?.errors">
+    <step-errors-list [errors]="_ngControl!.errors!" [keysDictionary]="errorKeysDictionary"> </step-errors-list>
+  </step-error>
+</step-form-field>

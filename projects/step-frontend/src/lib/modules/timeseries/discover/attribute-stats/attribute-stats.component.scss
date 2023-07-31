@@ -1,0 +1,41 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+.menu-container {
+  padding: 1rem;
+
+  table {
+    width: 100%;
+  }
+
+  thead tr {
+    background-color: var.$gray-100;
+  }
+
+  .row {
+    th {
+      padding: 0.7rem 0.5rem;
+    }
+
+    td {
+      padding: 0.4rem 0.5rem;
+      font-size: 1.2rem;
+    }
+
+    .title {
+      max-width: 28rem;
+      padding-right: 2rem;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .value {
+      text-align: center;
+    }
+  }
+}
+
+.no-info {
+  font-size: 1.2rem;
+  padding: 0.2rem;
+}

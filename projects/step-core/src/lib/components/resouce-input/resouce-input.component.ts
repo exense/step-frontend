@@ -42,11 +42,13 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   @Input() withHelpIcon?: boolean;
   @Input() helpIconTooltip?: string;
   @Input() withDynamicSwitch?: boolean;
+  @Input() showRequiredMarker?: boolean;
   @Input() isInvalid?: boolean;
   @Input() isTouched?: boolean;
 
   @Output() stModelChange = new EventEmitter<string>();
   @Output() dynamicSwitch = new EventEmitter<void>();
+  @Output() blur = new EventEmitter<void>();
   @Output() filesChange = new EventEmitter<void>();
   @Output() uploadComplete = new EventEmitter<void>();
 
@@ -100,6 +102,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     this.setStModel(this.stModel);
+    this.blur.emit();
   }
 
   protected saveChanges(): void {
@@ -190,6 +193,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     this.resourceFilename = '';
     this.setStModel('');
     this.deleteLastUploadedResource();
+    this.blur.emit();
     this.filesChange.emit();
 
     if (!this.fileInput) {
@@ -235,6 +239,9 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private setStModel(stModel: string = '') {
+    if (this.stModel === stModel) {
+      return;
+    }
     this.stModel = stModel;
     this.stModelChange.emit(stModel);
   }
@@ -255,7 +262,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
       queryParams: {
         type: this.stType,
         duplicateCheck: !this.stBounded,
-        directory: Boolean(this.stDirectory),
+        directory: !!this.stDirectory,
       },
       resourceId,
     });

@@ -97,7 +97,7 @@ angular
     });
 
     $scope.gotoFunction = function () {
-      FunctionDialogs.editFunction($scope.targetFunction.id);
+      FunctionDialogs.configureFunction($scope.targetFunction.id);
     };
 
     $scope.openFunctionEditor = function (functionid) {
@@ -119,7 +119,7 @@ angular
       });
     };
   })
-  .controller('DataSourceCtrl', function ($scope, $uibModal, $location, $http, FunctionDialogs) {
+  .controller('DataSourceCtrl', function ($scope, $uibModal, $location, $http) {
     $scope.dataSourceTypes = [
       { name: 'excel', label: 'Excel' },
       { name: 'csv', label: 'CSV' },
@@ -154,7 +154,7 @@ angular
       );
     };
   })
-  .controller('AssertCtrl', function ($scope, $uibModal, $location, $http, FunctionDialogs) {
+  .controller('AssertCtrl', function ($scope, $uibModal, $location, $http) {
     $scope.operatorTypes = [
       { name: 'EQUALS', label: 'equals' },
       { name: 'BEGINS_WITH', label: 'begins with' },

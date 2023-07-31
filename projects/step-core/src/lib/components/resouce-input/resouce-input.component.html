@@ -54,8 +54,8 @@
 <step-upload-container (filesChange)="onFilesChange($event)">
   <ng-container *ngIf="!isResource; else resourceTemplate">
     <step-form-field [class.ng-invalid]="isInvalid" [class.ng-touched]="isTouched">
-      <step-label *ngIf="label">
-        {{ label }}
+      <step-label *ngIf="label" [attr.show-required-marker]="showRequiredMarker || null">
+        <span>{{ label }}</span>
         <step-icon *ngIf="withHelpIcon" name="help-circle" [matTooltip]="helpIconTooltip || ''"></step-icon>
       </step-label>
 
@@ -82,8 +82,8 @@
   <ng-template #resourceTemplate>
     <ng-container *ngIf="!resourceNotExisting">
       <step-form-field [class.ng-invalid]="isInvalid" [class.ng-touched]="isTouched">
-        <step-label *ngIf="label">
-          {{ label }}
+        <step-label *ngIf="label" [attr.show-required-marker]="showRequiredMarker || null">
+          <span>{{ label }}</span>
           <step-icon *ngIf="withHelpIcon" name="help-circle" [matTooltip]="helpIconTooltip || ''"></step-icon>
         </step-label>
 
@@ -104,8 +104,8 @@
 
     <ng-container *ngIf="resourceNotExisting">
       <step-form-field [class.ng-invalid]="isInvalid" [class.ng-touched]="isTouched">
-        <step-label *ngIf="label">
-          {{ label }}
+        <step-label *ngIf="label" [attr.show-required-marker]="showRequiredMarker || null">
+          <span>{{ label }}</span>
           <step-icon *ngIf="withHelpIcon" name="help-circle" [matTooltip]="helpIconTooltip || ''"></step-icon>
         </step-label>
 

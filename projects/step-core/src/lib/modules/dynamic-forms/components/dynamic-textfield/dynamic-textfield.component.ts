@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
+import { Component, inject, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { DynamicValueInteger, DynamicValueString } from '../../../../client/step-client-module';
-import { DialogsService } from '../../../../shared';
+import { DialogsService, dynamicValueFactory } from '../../../../shared';
 
 type OnChange = (dynamicValueString: DynamicValueString | DynamicValueInteger) => void;
 type OnTouch = () => void;
@@ -15,21 +15,23 @@ type OnTouch = () => void;
 export class DynamicTextfieldComponent implements ControlValueAccessor {
   @Input() label?: string;
   @Input() tooltip?: string;
-  @Input() showRequiredAsterisk: boolean = false;
+  @Input() showRequiredMarker: boolean = false;
   @Input() isNumber: boolean = false;
   @Output() blur = new EventEmitter<void>();
+
+  private _dialogsService = inject(DialogsService);
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;
 
-  value: string | number = '';
-  dynamic: boolean = false;
-  expression: string = '';
-  isDisabled: boolean = false;
+  protected value: string | number = '';
+  protected dynamic: boolean = false;
+  protected expression: string = '';
+  protected isDisabled: boolean = false;
 
   readonly numberInputInvalidChars = ['+', '-', 'e'];
 
-  constructor(private _dialogsService: DialogsService, public _ngControl: NgControl) {
+  constructor(readonly _ngControl: NgControl) {
     this._ngControl.valueAccessor = this;
   }
 
@@ -56,12 +58,12 @@ export class DynamicTextfieldComponent implements ControlValueAccessor {
     this.emitChanges();
   }
 
-  onBlur(): void {
+  protected onBlur(): void {
     this.onTouch?.();
     this.blur.emit();
   }
 
-  editConstantValue(): void {
+  protected editConstantValue(): void {
     this._dialogsService.enterValue(
       'Free text editor',
       this.value.toString(),
@@ -74,7 +76,7 @@ export class DynamicTextfieldComponent implements ControlValueAccessor {
     );
   }
 
-  toggleDynamicExpression(dynamic: boolean): void {
+  protected toggleDynamicExpression(dynamic: boolean): void {
     if (dynamic) {
       this.expression = this.value.toString();
       this.value = '';
@@ -87,13 +89,16 @@ export class DynamicTextfieldComponent implements ControlValueAccessor {
     this.emitChanges();
   }
 
-  onExpressionChange(expression: string): void {
+  protected onExpressionChange(expression: string): void {
     this.expression = expression;
     this.emitChanges();
   }
 
   private toDynamicValueString(): DynamicValueString | DynamicValueInteger {
+    const { createDynamicValueString } = dynamicValueFactory();
+
     return {
+      ...createDynamicValueString(),
       ...(this.value ? { value: this.value } : {}),
       ...(this.dynamic ? { dynamic: this.dynamic } : {}),
       ...(this.expression ? { expression: this.expression } : {}),
