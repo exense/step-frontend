@@ -15,7 +15,7 @@ export class ExecutionBulkOperationsInvokeService extends BulkOperationsInvokeSe
     return this._api.deleteExecutions(requestBody);
   }
 
-  protected override invokeStart(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus> {
+  protected override invokeRestart(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus> {
     return this._api.startExecutions(requestBody);
   }
 

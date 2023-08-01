@@ -47,7 +47,7 @@ export abstract class BulkOperationsInvokeService<ID> {
   protected abstract invokeDelete?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
   protected abstract invokeDuplicate?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
   protected abstract invokeExport?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
-  protected abstract invokeStart?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
+  protected abstract invokeRestart?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
   protected abstract invokeStop?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
 
   protected transformConfig(config: BulkOperationConfig<ID>, isPreview: boolean): TableBulkOperationRequest {
@@ -102,8 +102,8 @@ export abstract class BulkOperationsInvokeService<ID> {
       case BulkOperationType.export:
         operation = !!this.invokeExport ? (params) => this.invokeExport!(params) : undefined;
         break;
-      case BulkOperationType.start:
-        operation = !!this.invokeStart ? (params) => this.invokeStart!(params) : undefined;
+      case BulkOperationType.restart:
+        operation = !!this.invokeRestart ? (params) => this.invokeRestart!(params) : undefined;
         break;
       case BulkOperationType.stop:
         operation = !!this.invokeStop ? (params) => this.invokeStop!(params) : undefined;

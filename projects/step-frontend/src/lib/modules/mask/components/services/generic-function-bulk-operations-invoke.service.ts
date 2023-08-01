@@ -20,6 +20,6 @@ export class GenericFunctionBulkOperationsInvokeService extends BulkOperationsIn
   }
 
   protected override invokeExport = undefined;
-  protected override invokeStart = undefined;
+  protected override invokeRestart = undefined;
   protected override invokeStop = undefined;
 }

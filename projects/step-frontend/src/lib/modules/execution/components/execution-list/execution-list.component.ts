@@ -34,7 +34,7 @@ import { ExecutionBulkOperationsInvokeService } from '../../services/execution-b
 export class ExecutionListComponent {
   readonly availableBulkOperations = [
     { operation: BulkOperationType.delete, permission: 'execution-delete' },
-    { operation: BulkOperationType.start, permission: 'plan-execute' },
+    { operation: BulkOperationType.restart, permission: 'plan-execute' },
     { operation: BulkOperationType.stop, permission: 'plan-execute' },
   ];
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);

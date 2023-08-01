@@ -2,6 +2,6 @@ export enum BulkOperationType {
   delete = 'delete',
   duplicate = 'duplicate',
   export = 'export',
-  start = 'start',
+  restart = 'restart',
   stop = 'stop',
 }
