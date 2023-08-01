@@ -1,3 +1,4 @@
+<button type="button" mat-button mat-raised-button (click)="closeWizard.emit()">Cancel</button>
 <button
   *ngIf="!isFirst"
   type="button"
@@ -12,7 +13,8 @@
   *ngIf="!isLast"
   type="button"
   mat-button
-  mat-raised-button
+  mat-flat-button
+  color="primary"
   [disabled]="!!(stepBehavior?.disableNext$ | async)"
   (click)="goNext()"
 >

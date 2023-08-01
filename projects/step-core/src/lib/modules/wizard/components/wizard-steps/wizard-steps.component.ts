@@ -49,6 +49,7 @@ export class WizardStepsComponent implements OnChanges, OnDestroy, WizardGlobalC
   @Input() initialModel: any = {};
 
   @Output() finish = new EventEmitter<void>();
+  @Output() close = new EventEmitter<void>();
 
   wizardForm?: FormGroup;
   model: any;
@@ -93,6 +94,10 @@ export class WizardStepsComponent implements OnChanges, OnDestroy, WizardGlobalC
 
   protected finishWizard(): void {
     this.finish.emit();
+  }
+
+  protected closeWizard(): void {
+    this.close.emit();
   }
 
   protected goNext(currentStepIndex: number): void {

@@ -238,6 +238,7 @@ import { WizardModule } from './modules/wizard/wizards.module';
     FileAlreadyExistingDialogComponent,
     ArtefactDetailsComponent,
     ResourceInputWrapperComponent,
+    FunctionLinkComponent,
   ],
   providers: [
     CORE_INITIALIZER,

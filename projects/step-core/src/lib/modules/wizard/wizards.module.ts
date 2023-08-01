@@ -7,9 +7,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { WizardLocalContextDirective } from './directives/wizard-local-context.directive';
 import { CommonModule } from '@angular/common';
 import { WizardStepButtonsComponent } from './components/wizard-step-buttons/wizard-step-buttons.component';
+import { WizardDialogComponent } from './components/wizard-dialog/wizard-dialog.component';
 
 @NgModule({
-  declarations: [WizardStepsComponent, WizardLocalContextDirective, WizardStepButtonsComponent],
+  declarations: [WizardStepsComponent, WizardLocalContextDirective, WizardStepButtonsComponent, WizardDialogComponent],
   imports: [
     CommonModule,
     StepBasicsModule,
@@ -18,16 +19,19 @@ import { WizardStepButtonsComponent } from './components/wizard-step-buttons/wiz
     FormsModule,
     ReactiveFormsModule,
   ],
-  exports: [WizardStepsComponent, WizardStepButtonsComponent],
+  exports: [WizardDialogComponent],
 })
 export class WizardModule {}
 
 export * from './components/wizard-steps/wizard-steps.component';
+export * from './components/wizard-step-buttons/wizard-step-buttons.component';
+export * from './components/wizard-dialog/wizard-dialog.component';
 export * from './injectables/wizard-global-context.token';
 export * from './injectables/wizard-step-local-context.token';
 export * from './injectables/wizard-step-behavior.service';
 export * from './injectables/wizard-step-form.service';
 export * from './injectables/wizard-step-registry.service';
+export * from './injectables/wizard-dialog.service';
 export * from './types/wizard-global-context.interface';
 export * from './types/wizard-step.interface';
 export * from './types/wizard-step-local-context.interface';

@@ -9,6 +9,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 export class ModalWindowComponent {
   @Input() showSpinner?: boolean;
   @Input() title = '';
+  @Input() hideButtonsSection = false;
 
   protected _dialogRef = inject(MatDialogRef);
 }

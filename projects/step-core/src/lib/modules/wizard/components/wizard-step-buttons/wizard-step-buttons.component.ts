@@ -17,6 +17,7 @@ export class WizardStepButtonsComponent implements AfterViewInit {
   @Output() next = new EventEmitter<void>();
   @Output() previous = new EventEmitter<void>();
   @Output() finish = new EventEmitter<void>();
+  @Output() closeWizard = new EventEmitter<void>();
 
   ngAfterViewInit(): void {
     this.stepBehavior = this._localContext.stepBehaviorService;
