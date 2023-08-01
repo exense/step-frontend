@@ -16,6 +16,10 @@
     height: 100%;
     font-size: 12px;
 
+    &.compact {
+      max-width: 100px;
+    }
+
     &.active {
       background: var.$gray-300;
       color: black;

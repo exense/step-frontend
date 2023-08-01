@@ -79,7 +79,9 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
-    this.dashboard.updateRange(TimeSeriesUtils.calculateFullTimeRange(this.execution!, this.timeRangeSelection));
+    this.dashboard.updateFullRange(
+      TimeSeriesUtils.convertExecutionAndSelectionToRange(this.execution!, this.timeRangeSelection)
+    );
   }
 
   // auto-refresh goes through here
@@ -94,7 +96,9 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
       this.initDashboard(currentExecution);
       this.cd.detectChanges();
     } else {
-      this.dashboard.refresh(TimeSeriesUtils.calculateFullTimeRange(this.execution!, this.timeRangeSelection));
+      this.dashboard.refresh(
+        TimeSeriesUtils.convertExecutionAndSelectionToRange(this.execution!, this.timeRangeSelection)
+      );
     }
   }
 

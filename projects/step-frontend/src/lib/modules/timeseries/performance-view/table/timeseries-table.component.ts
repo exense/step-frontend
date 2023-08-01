@@ -78,7 +78,6 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
       ? this.processResponse(this.compareResponse!, this.compareContext!)
       : undefined;
     this.tableData$.next(this.mergeBaseAndCompareData(baseData, compareData));
-    this.executionContext.keywordsContext.setKeywords(baseData.keywords, true);
     this.tableIsLoading = false;
   }
 
@@ -115,6 +114,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         tphDiff: this.percentageBetween(base?.attributes['tph'], compare?.attributes['tph']),
       };
     });
+    this.executionContext.keywordsContext.setKeywords(allKeywords, true);
     return entries;
   }
 
@@ -147,8 +147,9 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     this.compareModeEnabled = true;
     this.compareContext = compareContext;
     this.compareResponse = response;
-    let baseData = this.processResponse(this.baseResponse!, this.executionContext);
-    let compareData = this.processResponse(response, compareContext);
+    const baseData = this.processResponse(this.baseResponse!, this.executionContext);
+    const compareData = this.processResponse(response, compareContext);
+    console.log(compareData);
     this.tableData$.next(this.mergeBaseAndCompareData(baseData, compareData));
   }
 
@@ -158,8 +159,9 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     this.compareResponse = undefined;
   }
 
-  onKeywordToggle(keyword: string, event: any) {
-    this.executionContext.keywordsContext.toggleKeyword(keyword);
+  onKeywordToggle(entry: TableEntry) {
+    console.log('keyword toggle:', entry);
+    this.executionContext.keywordsContext.toggleKeyword(entry.name);
   }
 
   getSeriesKey(attributes: BucketAttributes, groupDimensions: string[]) {

@@ -57,7 +57,10 @@ export class TimeSeriesUtils {
     return range1 && range2 && range1.from === range2.from && range1.to === range2.to;
   }
 
-  static calculateFullTimeRange(execution: Execution, timeRangeSelection: TimeRangePickerSelection): TSTimeRange {
+  static convertExecutionAndSelectionToRange(
+    execution: Execution,
+    timeRangeSelection: TimeRangePickerSelection
+  ): TSTimeRange {
     const now = new Date().getTime();
     let selection: TSTimeRange;
     let newFullRange: TSTimeRange;
@@ -72,6 +75,23 @@ export class TimeSeriesUtils {
       case RangeSelectionType.RELATIVE:
         const end = execution.endTime || now;
         newFullRange = { from: end - timeRangeSelection.relativeSelection!.timeInMs!, to: end };
+        break;
+    }
+    return newFullRange;
+  }
+
+  static convertSelectionToRange(selection: TimeRangePickerSelection): TSTimeRange {
+    let now = new Date().getTime();
+    let newFullRange: TSTimeRange;
+    switch (selection.type) {
+      case RangeSelectionType.FULL:
+        throw new Error('Full range selection is not supported');
+      case RangeSelectionType.ABSOLUTE:
+        newFullRange = selection.absoluteSelection!;
+        break;
+      case RangeSelectionType.RELATIVE:
+        let end = now;
+        newFullRange = { from: end - selection.relativeSelection!.timeInMs!, to: end };
         break;
     }
     return newFullRange;

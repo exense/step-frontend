@@ -12,9 +12,9 @@
         <input
           style="margin: unset; margin-right: 6px"
           type="checkbox"
-          [(ngModel)]="element.base?.attributes.isSelected"
+          [(ngModel)]="element.base?.attributes.isSelected || element.compare?.attributes.isSelected"
           class="checkbox"
-          (change)="onKeywordToggle(element.base?.attributes[dimensionKey], $event)"
+          (change)="onKeywordToggle(element)"
         />
         <span class="color-square" [style.background-color]="element.color"></span>
         <span>{{ element.name }}</span>

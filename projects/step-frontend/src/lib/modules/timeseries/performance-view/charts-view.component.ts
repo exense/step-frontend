@@ -81,8 +81,13 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   chartsAreLoading = false;
   compareChartsAreLoading = false;
 
-  keywords: { [key: string]: KeywordSelection } = {};
-  keywordSearchValue: string = '';
+  baseKeywords: { [key: string]: KeywordSelection } = {};
+  baseKeywordSearchValue: string = '';
+  allBaseSeriesChecked: boolean = true;
+
+  compareKeywords: { [key: string]: KeywordSelection } = {};
+  compareKeywordSearchValue: string = '';
+  allCompareSeriesChecked: boolean = true;
 
   byKeywordsChartResponseCache?: TimeSeriesAPIResponse; // for caching
   byKeywordsCompareChartResponseCache?: TimeSeriesAPIResponse; // for caching
@@ -106,8 +111,6 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   updateBaseChartsTerminator$ = new Subject<void>();
   updateCompareChartsTerminator$ = new Subject<void>();
   intervalShouldBeCanceled = false;
-
-  allSeriesChecked: boolean = true;
 
   private keywordsService!: TimeSeriesKeywordsContext;
 
@@ -144,26 +147,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     }
     this.findRequestBuilder = this.prepareFindRequestBuilder(this.settings);
     this.initContext();
-    this.keywordsService
-      .onAllSelectionChanged()
-      .pipe(takeUntil(this.terminator$))
-      .subscribe((selected) => {
-        this.allSeriesChecked = selected;
-      });
-    this.keywordsService
-      .onKeywordToggled()
-      .pipe(takeUntil(this.terminator$))
-      .subscribe((selection) => {
-        this.throughputChart.setSeriesVisibility(selection.id, selection.isSelected);
-        this.responseTimeChart.setSeriesVisibility(selection.id, selection.isSelected);
-        this.keywords[selection.id] = selection;
-      });
-    this.keywordsService
-      .onKeywordsUpdated()
-      .pipe(takeUntil(this.terminator$))
-      .subscribe((keywords) => {
-        this.keywords = keywords;
-      });
+    this.subscribeForKeywordsChange();
     this.subscribeForTimeRangeChange();
 
     this.context.compareModeChange$.subscribe((settings) => {
@@ -175,6 +159,44 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     });
 
     this.createAllBaseCharts();
+  }
+
+  private subscribeForKeywordsChange(compareCharts = false): void {
+    const terminator = compareCharts ? this.compareTerminator$ : this.terminator$;
+    this.keywordsService
+      .onAllSelectionChanged()
+      .pipe(takeUntil(terminator))
+      .subscribe((selected) => {
+        if (compareCharts) {
+          this.allCompareSeriesChecked = selected;
+        } else {
+          this.allBaseSeriesChecked = selected;
+        }
+      });
+    this.keywordsService
+      .onKeywordToggled()
+      .pipe(takeUntil(terminator))
+      .subscribe((selection) => {
+        if (compareCharts) {
+          this.throughputCompareChart?.setSeriesVisibility(selection.id, selection.isSelected);
+          this.responseTimeCompareChart?.setSeriesVisibility(selection.id, selection.isSelected);
+          this.compareKeywords[selection.id] = selection;
+        } else {
+          this.throughputChart.setSeriesVisibility(selection.id, selection.isSelected);
+          this.responseTimeChart.setSeriesVisibility(selection.id, selection.isSelected);
+          this.baseKeywords[selection.id] = selection;
+        }
+      });
+    this.keywordsService
+      .onKeywordsUpdated()
+      .pipe(takeUntil(terminator))
+      .subscribe((keywords) => {
+        if (compareCharts) {
+          this.compareKeywords = keywords;
+        } else {
+          this.baseKeywords = keywords;
+        }
+      });
   }
 
   private subscribeForTimeRangeChange(compareCharts = false) {
@@ -488,6 +510,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     this.compareModeContext = context;
     this.compareRequestBuilder = this.createCompareRequest(context);
     this.subscribeForTimeRangeChange(true);
+    this.subscribeForKeywordsChange(true);
     this.createAllCompareCharts(context);
   }
 

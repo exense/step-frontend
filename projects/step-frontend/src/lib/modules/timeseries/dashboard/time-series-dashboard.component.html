@@ -2,9 +2,6 @@
   <step-timeseries-toolbar
     *ngIf="context"
     [context]="context"
-    [timeRangeOptions]="settings.timeRangeOptions"
-    [activeTimeRange]="settings.activeTimeRange"
-    (onTimeRangeChange)="handleTimeRangeChange($event)"
     (onCompareModeEnabled)="enableCompareMode()"
     (onCompareModeDisabled)="disableCompareMode()"
   ></step-timeseries-toolbar>
@@ -14,9 +11,12 @@
         <step-ts-filter-bar
           *ngIf="context"
           [context]="context"
-          class="mat-card"
           [defaultFilterOptions]="settings.filterOptions"
           [initialFilters]="contextualFilterItems"
+          (onTimeRangeChange)="handleTimeRangeChange($event)"
+          [timeRangeOptions]="settings.timeRangeOptions"
+          [activeTimeRange]="settings.activeTimeRange"
+          [compactView]="compareModeEnabled"
         >
         </step-ts-filter-bar>
         <div *ngIf="compareModeEnabled" class="stamp">BASE</div>
@@ -26,9 +26,12 @@
           #compareFilterBar
           *ngIf="compareModeContext"
           [context]="compareModeContext"
-          class="mat-card"
           [defaultFilterOptions]="settings.filterOptions"
           [initialFilters]="compareModeContext.getFilteringSettings().filterItems"
+          (onTimeRangeChange)="handleCompareTimeRangeChange($event)"
+          [timeRangeOptions]="compareModeTimeRangeOptions"
+          [activeTimeRange]="compareModeActiveRangeOption"
+          [compactView]="compareModeEnabled"
         >
         </step-ts-filter-bar>
         <div *ngIf="compareModeEnabled" class="stamp compare">COMPARE</div>

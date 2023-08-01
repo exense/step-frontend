@@ -3,7 +3,6 @@ import { TimeSeriesContext } from '../../time-series-context';
 import { switchMap, tap } from 'rxjs';
 import { TableApiWrapperService, TimeSeriesService } from '@exense/step-core';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
-import { TimeRangePicker } from '../../time-selection/time-range-picker.component';
 
 @Component({
   selector: 'step-timeseries-toolbar',
@@ -12,20 +11,13 @@ import { TimeRangePicker } from '../../time-selection/time-range-picker.componen
 })
 export class TsToolbarComponent {
   @Input() context!: TimeSeriesContext;
-  @Input() timeRangeOptions!: TimeRangePickerSelection[];
-  @Input() activeTimeRange!: TimeRangePickerSelection;
 
   @Output() onCompareModeEnabled = new EventEmitter<void>();
   @Output() onCompareModeDisabled = new EventEmitter<void>();
-  @Output() onTimeRangeChange = new EventEmitter<TimeRangePickerSelection>();
 
   exportInProgress = false;
 
   constructor(private _timeSeriesService: TimeSeriesService, private _tableApiService: TableApiWrapperService) {}
-
-  handleTimeRangeChange(selection: TimeRangePickerSelection) {
-    this.onTimeRangeChange.next(selection);
-  }
 
   handleCompareModeChange(enabled: boolean) {
     if (enabled) {
@@ -51,6 +43,4 @@ export class TsToolbarComponent {
       )
       .subscribe();
   }
-
-  getValidFilters() {}
 }

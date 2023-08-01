@@ -24,6 +24,8 @@ import { TimeSeriesConfig } from '../../time-series.config';
 import { TableApiWrapperService, TimeSeriesService } from '@exense/step-core';
 import { OqlVerifyResponse } from '../../model/oql-verify-response';
 import { TsFilteringMode } from '../../model/ts-filtering-mode';
+import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
+import { RelativeTimeSelection } from '../../time-selection/model/relative-time-selection';
 
 @Component({
   selector: 'step-ts-filter-bar',
@@ -32,9 +34,18 @@ import { TsFilteringMode } from '../../model/ts-filtering-mode';
   encapsulation: ViewEncapsulation.None,
 })
 export class FilterBarComponent implements OnInit, OnDestroy {
+  readonly ONE_HOUR_MS = 3600 * 1000;
+
   @Input() context!: TimeSeriesContext;
   @Input() initialFilters: TsFilterItem[] = [];
+  @Input() compactView = false;
+
+  @Input() timeRangeOptions!: TimeRangePickerSelection[];
+  @Input() activeTimeRange!: TimeRangePickerSelection;
+
   _defaultFilterOptions: TsFilterItem[] = [];
+
+  @Output() onTimeRangeChange = new EventEmitter<TimeRangePickerSelection>();
 
   @ViewChild(PerformanceViewTimeSelectionComponent) timeSelection?: PerformanceViewTimeSelectionComponent;
 
@@ -57,6 +68,21 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   constructor(private _changeDetectorRef: ChangeDetectorRef, private _timeSeriesService: TimeSeriesService) {}
 
+  ngOnInit(): void {
+    if (!this.context) {
+      throw new Error('Context input is mandatory');
+    }
+    this.prepareVisibleFilters();
+    this.emitFilterChange$.pipe(debounceTime(this.EMIT_DEBOUNCE_TIME)).subscribe(() => {
+      this.composeAndVerifyFullOql(this.groupDimensions).subscribe((response) => {
+        this.rawMeasurementsModeActive = response.hasUnknownFields;
+        if (!this.rawMeasurementsModeActive) {
+          this.emitFiltersChange();
+        }
+      });
+    });
+  }
+
   // clone the array
   @Input() set defaultFilterOptions(value: TsFilterItem[]) {
     this._defaultFilterOptions = JSON.parse(JSON.stringify(value || []));
@@ -74,21 +100,6 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     this.filterItems = (this.initialFilters || []).concat(this._defaultFilterOptions);
   }
 
-  ngOnInit(): void {
-    if (!this.context) {
-      throw new Error('Context input is mandatory');
-    }
-    this.prepareVisibleFilters();
-    this.emitFilterChange$.pipe(debounceTime(this.EMIT_DEBOUNCE_TIME)).subscribe(() => {
-      this.composeAndVerifyFullOql(this.groupDimensions).subscribe((response) => {
-        this.rawMeasurementsModeActive = response.hasUnknownFields;
-        if (!this.rawMeasurementsModeActive) {
-          this.emitFiltersChange();
-        }
-      });
-    });
-  }
-
   handleOqlChange(event: any) {
     this.invalidOql = false;
   }
@@ -102,6 +113,10 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     } else {
       this.invalidOql = false;
     }
+  }
+
+  handleTimeRangeChange(selection: TimeRangePickerSelection) {
+    this.onTimeRangeChange.next(selection);
   }
 
   disableOqlMode() {

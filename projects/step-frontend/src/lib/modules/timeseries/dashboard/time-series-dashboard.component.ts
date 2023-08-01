@@ -13,6 +13,7 @@ import { TimeSeriesContextsFactory } from '../time-series-contexts-factory.servi
 import { TimeSeriesDashboardSettings } from './model/ts-dashboard-settings';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { ChartsViewComponent } from '../performance-view/charts-view.component';
+import { TimeSeriesConfig } from '../time-series.config';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -47,6 +48,8 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
 
   compareModeEnabled: boolean = false;
   compareModeContext: TimeSeriesContext | undefined;
+  compareModeTimeRangeOptions = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
+  compareModeActiveRangeOption: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
 
   constructor(private contextsFactory: TimeSeriesContextsFactory) {}
 
@@ -106,10 +109,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.updateBaseCharts(true);
       });
-    this.context.onCompareModeChange().subscribe(({ enabled, context }) => {
-      this.compareModeEnabled = enabled;
-      this.compareModeContext = context;
-    });
     this.throttledRefreshTrigger$
       .pipe(
         throttle(() => this.context.inProgressChange().pipe(filter((inProgress) => !inProgress))),
@@ -118,6 +117,10 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.updateBaseCharts();
       });
+    this.context.onCompareModeChange().subscribe(({ enabled, context }) => {
+      this.compareModeEnabled = enabled;
+      this.compareModeContext = context;
+    });
   }
 
   handleFiltersChange(filters: TsFilterItem[]): void {
@@ -127,7 +130,14 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   handleTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
     //TODO optional execution
-    this.updateRange(TimeSeriesUtils.calculateFullTimeRange(this.settings.execution!, this.timeRangeSelection));
+    this.updateFullRange(
+      TimeSeriesUtils.convertExecutionAndSelectionToRange(this.settings.execution!, this.timeRangeSelection)
+    );
+  }
+
+  handleCompareTimeRangeChange(selection: TimeRangePickerSelection) {
+    this.compareModeActiveRangeOption = selection;
+    this.updateCompareChartsFullRange(TimeSeriesUtils.convertSelectionToRange(selection));
   }
 
   setRanges(fullRange: TSTimeRange, selection?: TSTimeRange) {
@@ -167,17 +177,31 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
    * This is a force refresh (instantly triggered).
    * The selection will be set to full selection.
    */
-  updateRange(range: TSTimeRange) {
+  updateFullRange(range: TSTimeRange): void {
     this.updateBaseChartsSubscription?.unsubscribe(); // end current execution
     this.context.updateFullRange(range, false);
     this.context.updateSelectedRange(range, false);
-    this.updateBaseChartsSubscription = this.chartsView
-      .updateBaseCharts({
-        updateRanger: true,
-        updateCharts: true,
-        showLoadingBar: true,
-      })
-      .subscribe();
+    console.log('range update');
+    const updateCharts$ = this.chartsView.updateBaseCharts({
+      updateRanger: true,
+      updateCharts: true,
+      showLoadingBar: true,
+    });
+    let refreshRanger$ = this.filterBar?.timeSelection?.refreshRanger();
+    this.updateBaseChartsSubscription = forkJoin([updateCharts$, refreshRanger$]).subscribe();
+  }
+
+  updateCompareChartsFullRange(range: TSTimeRange) {
+    this.compareChartsSubscription?.unsubscribe(); // end current execution
+    this.compareModeContext?.updateFullRange(range, false);
+    this.compareModeContext?.updateSelectedRange(range, false);
+    const updateCharts$ = this.chartsView.updateCompareCharts({
+      updateRanger: true,
+      updateCharts: true,
+      showLoadingBar: true,
+    });
+    let refreshRanger$ = this.compareFilterBar?.timeSelection?.refreshRanger();
+    this.compareChartsSubscription = forkJoin([updateCharts$, refreshRanger$]).subscribe();
   }
 
   disableCompareMode(): void {
@@ -187,12 +211,15 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
 
   enableCompareMode(): void {
     const filters = this.prepareFiltersForCompareMode();
+    const timeRange = { from: this.context.getFullTimeRange().from, to: this.context.getFullTimeRange().to };
     const compareContext = this.contextsFactory.createContext({
-      timeRange: { from: this.context.getFullTimeRange().from, to: this.context.getFullTimeRange().to },
+      timeRange: timeRange,
       id: new Date().getTime().toString(),
-      grouping: this.context.getGroupDimensions(),
+      grouping: ['name'], // the grouping component don't currently support a custom default value other than 'name'
       filters: filters,
+      keywordsContext: this.context.keywordsContext, // share the same keywords context and colors
     });
+    this.compareModeActiveRangeOption = { type: RangeSelectionType.ABSOLUTE, absoluteSelection: timeRange };
     compareContext.onFilteringChange().subscribe(() => console.log('NEW FILTER'));
     merge(compareContext.onFilteringChange(), compareContext.onGroupingChange())
       .pipe(takeUntil(this.compareTerminator$))

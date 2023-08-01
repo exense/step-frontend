@@ -51,18 +51,7 @@ export class TimeSeriesContext {
     });
     this.activeGroupings$ = new BehaviorSubject(params.grouping);
     this.colorsPool = params.colorsPool || new TimeseriesColorsPool();
-    this.keywordsContext = new TimeSeriesKeywordsContext(this.colorsPool);
-  }
-
-  clone(): TimeSeriesContext {
-    let newContextId = this.id + '-compare';
-    return new TimeSeriesContext({
-      id: newContextId,
-      timeRange: this.fullTimeRange,
-      grouping: this.activeGroupings$.getValue(),
-      filters: this.activeFilters$.getValue(),
-      colorsPool: this.colorsPool,
-    });
+    this.keywordsContext = params.keywordsContext || new TimeSeriesKeywordsContext(this.colorsPool);
   }
 
   destroy(): void {

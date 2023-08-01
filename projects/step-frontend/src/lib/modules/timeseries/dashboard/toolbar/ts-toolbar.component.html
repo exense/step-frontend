@@ -1,12 +1,5 @@
 <div class="mat-card toolbar-container">
   <div class="items-list">
-    <step-time-range-picker
-      (onSelectionChange)="handleTimeRangeChange($event)"
-      [selectOptions]="timeRangeOptions"
-      [activeSelection]="activeTimeRange"
-      [includeFullRangeOption]="false"
-    >
-    </step-time-range-picker>
     <step-timeseries-compare-mode (onEnabledChange)="handleCompareModeChange($event)"></step-timeseries-compare-mode>
   </div>
   <div class="items-list">

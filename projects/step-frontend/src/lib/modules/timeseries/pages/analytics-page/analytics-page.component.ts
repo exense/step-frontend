@@ -10,6 +10,7 @@ import { TimeSeriesDashboardSettings } from '../../dashboard/model/ts-dashboard-
 import { TsUtils } from '../../util/ts-utils';
 import { FilterBarItemType } from '../../performance-view/filter-bar/model/ts-filter-item';
 import { range, Subject, takeUntil, timer } from 'rxjs';
+import { TimeSeriesUtils } from '../../time-series-utils';
 
 @Component({
   selector: 'step-analytics-page',
@@ -149,29 +150,12 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   }
 
   triggerRefresh() {
-    this.dashboard.refresh(this.calculateFullRange());
+    this.dashboard.refresh(TimeSeriesUtils.convertSelectionToRange(this.timeRangeSelection));
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
-    this.dashboard.updateRange(this.calculateFullRange()); // instant call
-  }
-
-  calculateFullRange(): TSTimeRange {
-    let now = new Date().getTime();
-    let newFullRange: TSTimeRange;
-    switch (this.timeRangeSelection.type) {
-      case RangeSelectionType.FULL:
-        throw new Error('Full range selection is not supported');
-      case RangeSelectionType.ABSOLUTE:
-        newFullRange = this.timeRangeSelection.absoluteSelection!;
-        break;
-      case RangeSelectionType.RELATIVE:
-        let end = now;
-        newFullRange = { from: end - this.timeRangeSelection.relativeSelection!.timeInMs!, to: end };
-        break;
-    }
-    return newFullRange;
+    this.dashboard.updateFullRange(TimeSeriesUtils.convertSelectionToRange(selection)); // instant call
   }
 
   /**

@@ -1,6 +1,7 @@
 <div
   class="filter-item-container"
   [class.active]="active"
+  [class.compact]="compact"
   [matMenuTriggerFor]="menu"
   #matTrigger="matMenuTrigger"
   (menuOpened)="onMenuOpen(); focusables.scheduleRefocus()"

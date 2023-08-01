@@ -1,6 +1,29 @@
+<div class="time-container">
+  <div class="ranger-container" [class.compact]="compactView">
+    <step-execution-time-selection [context]="context"></step-execution-time-selection>
+  </div>
+  <div [class.compact-picker-container]="compactView">
+    <step-time-range-picker
+      (onSelectionChange)="handleTimeRangeChange($event)"
+      [selectOptions]="timeRangeOptions"
+      [activeSelection]="activeTimeRange"
+    >
+    </step-time-range-picker>
+  </div>
+</div>
+
 <step-alert type="warning" class="warning" *ngIf="rawMeasurementsModeActive">
   You are using custom filters which may slow down the dashboard.
 </step-alert>
+
+<div class="settings-section" *ngIf="compactView">
+  <mat-button-toggle-group [(ngModel)]="oqlModeActive" (change)="toggleOQLMode()">
+    <mat-button-toggle [value]="false"> Basic</mat-button-toggle>
+    <mat-button-toggle [value]="true"> OQL</mat-button-toggle>
+  </mat-button-toggle-group>
+  <step-timeseries-grouping (onGroupingChange)="handleGroupingChange($event)"></step-timeseries-grouping>
+</div>
+
 <div class="filters">
   <mat-menu #menu="matMenu">
     <button mat-menu-item *ngFor="let option of _defaultFilterOptions" (click)="addFilterItem(option)">
@@ -22,13 +45,18 @@
     <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.DATE)">Date Filter</button>
   </mat-menu>
 
-  <div class="applied-filters" [style]="oqlModeActive ? 'overflow: unset' : ''">
+  <div
+    class="filers-row"
+    [style]="oqlModeActive ? 'overflow: unset' : ''"
+    [style.flexWrap]="compactView ? 'wrap' : 'nowrap'"
+  >
     <ng-container *ngIf="!oqlModeActive">
       <ng-container *ngFor="let item of filterItems; let i = index">
         <step-ts-filter-bar-item
           *ngIf="!item.isHidden"
           #appliedFilter
           [item]="item"
+          [compact]="compactView"
           [removable]="item.removable"
           (onRemoveItem)="removeFilterItem(i)"
           (onFilterChange)="handleFilterChange(i, $event)"
@@ -71,7 +99,7 @@
     </button>
   </div>
 
-  <div class="settings-section">
+  <div class="settings-section" *ngIf="!compactView">
     <mat-button-toggle-group [(ngModel)]="oqlModeActive" (change)="toggleOQLMode()">
       <mat-button-toggle [value]="false"> Basic</mat-button-toggle>
       <mat-button-toggle [value]="true"> OQL</mat-button-toggle>
@@ -79,5 +107,3 @@
     <step-timeseries-grouping (onGroupingChange)="handleGroupingChange($event)"></step-timeseries-grouping>
   </div>
 </div>
-
-<step-execution-time-selection [context]="context"></step-execution-time-selection>
