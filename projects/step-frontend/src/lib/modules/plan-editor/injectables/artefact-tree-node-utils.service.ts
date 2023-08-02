@@ -98,7 +98,7 @@ export class ArtefactTreeNodeUtilsService
 
     let isUpdated = false;
     if (data.isSkipped !== undefined) {
-      itemToChange.skipNode!.value = data.isSkipped;
+      itemToChange.skipNode = { ...itemToChange.skipNode!, value: data.isSkipped };
       isUpdated = true;
     }
 
