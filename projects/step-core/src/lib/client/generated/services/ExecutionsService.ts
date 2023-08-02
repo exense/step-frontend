@@ -184,15 +184,17 @@ export class ExecutionsService {
   }
 
   /**
-   * Start multiple executions according to the provided parameters.
+   * Restart multiple executions according to the provided parameters.
    * @param requestBody
    * @returns AsyncTaskStatusTableBulkOperationReport default response
    * @throws ApiError
    */
-  public startExecutions(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatusTableBulkOperationReport> {
+  public restartExecutions(
+    requestBody?: TableBulkOperationRequest
+  ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/executions/bulk/start',
+      url: '/executions/bulk/restart',
       body: requestBody,
       mediaType: 'application/json',
     });
