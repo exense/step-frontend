@@ -13,11 +13,7 @@
   </step-bulk-operations>
   <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
     <step-btn-group>
-      <step-autorefresh-toggle
-        [(disabled)]="autoRefreshDisabled"
-        [interval]="5000"
-        (refresh)="dataSource.reload({ hideProgress: true })"
-      >
+      <step-autorefresh-toggle [(disabled)]="autoRefreshDisabled" [interval]="5000" (refresh)="refreshTable()">
       </step-autorefresh-toggle>
     </step-btn-group>
   </section>

@@ -47,6 +47,14 @@ export class ExecutionListComponent {
 
   changeType(selectionType: BulkSelectionType): void {
     this.autoRefreshDisabled = selectionType !== BulkSelectionType.None;
+
+    if (this.autoRefreshDisabled) {
+      this.dataSource.skipOngoingRequest();
+    }
+  }
+
+  refreshTable(): void {
+    this.dataSource.reload({ hideProgress: true });
   }
 }
 
