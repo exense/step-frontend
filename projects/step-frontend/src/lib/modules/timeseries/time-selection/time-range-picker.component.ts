@@ -21,6 +21,7 @@ export class TimeRangePicker implements OnInit {
   @Input() selectOptions!: TimeRangePickerSelection[];
   @Input() initialSelectionIndex: number | undefined;
   @Input() includeFullRangeOption: boolean = true;
+  @Input() compact = false;
 
   @Output() onSelectionChange = new EventEmitter<TimeRangePickerSelection>();
 

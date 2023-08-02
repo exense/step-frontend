@@ -3,27 +3,25 @@
 step-ts-filter-bar {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 12px;
+  padding: 16px;
 
   .time-container {
     display: flex;
     justify-content: space-between;
     flex-direction: row;
 
-    .ranger-container {
+    .ranger-section {
       width: calc(100% - 150px);
 
       &.compact {
-        width: 100%;
+        width: calc(100% - 40px);
       }
     }
   }
 
-  .compact-picker-container {
-    position: absolute;
-    top: 120px;
-    right: 10px;
+  .filters-section {
+    padding-top: 12px;
+    border-top: 1px solid var.$gray-200;
   }
 
   .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
@@ -35,11 +33,10 @@ step-ts-filter-bar {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
   }
 
   .warning {
-    margin: 0 20px;
-    margin-top: 1rem !important;
     font-size: 11px;
     padding: 0.8rem;
   }
@@ -55,9 +52,9 @@ step-ts-filter-bar {
     display: flex;
     flex-wrap: nowrap;
     gap: 8px;
-    padding: 8px;
     overflow: auto;
     margin-bottom: 4px;
+    margin-top: 8px;
 
     &::-webkit-scrollbar {
       width: 6px;
@@ -105,7 +102,7 @@ step-ts-filter-bar {
   /**
   These got override by the theme scss file
    */
-  .applied-filters button.apply-btn {
+  .filers-row button.apply-btn {
     font-size: 12px;
     line-height: 28px;
     margin-right: 12px;
