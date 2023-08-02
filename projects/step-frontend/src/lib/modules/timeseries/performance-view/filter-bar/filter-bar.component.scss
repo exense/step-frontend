@@ -9,6 +9,7 @@ step-ts-filter-bar {
     display: flex;
     justify-content: space-between;
     flex-direction: row;
+    margin-top: 12px;
 
     .ranger-section {
       width: calc(100% - 150px);
@@ -53,7 +54,6 @@ step-ts-filter-bar {
     flex-wrap: nowrap;
     gap: 8px;
     overflow: auto;
-    margin-bottom: 4px;
     margin-top: 8px;
 
     &::-webkit-scrollbar {
