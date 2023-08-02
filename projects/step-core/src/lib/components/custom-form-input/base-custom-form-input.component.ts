@@ -12,9 +12,7 @@ export type OnChange = (value?: string) => void;
 export type OnTouch = () => void;
 
 @Component({
-  selector: '',
   template: '',
-  styleUrls: [],
 })
 export abstract class BaseCustomFormInputComponent implements ControlValueAccessor, OnInit {
   @Input() stScreen?: string;
