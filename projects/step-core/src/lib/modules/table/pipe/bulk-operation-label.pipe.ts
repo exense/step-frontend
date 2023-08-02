@@ -13,6 +13,10 @@ export class BulkOperationLabelPipe implements PipeTransform {
         return 'Clone selected';
       case BulkOperationType.export:
         return 'Export selected';
+      case BulkOperationType.restart:
+        return 'Restart selected';
+      case BulkOperationType.stop:
+        return 'Stop selected';
       default:
         return '';
     }

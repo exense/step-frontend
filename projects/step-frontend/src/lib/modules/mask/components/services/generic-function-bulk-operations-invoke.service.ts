@@ -18,5 +18,8 @@ export class GenericFunctionBulkOperationsInvokeService extends BulkOperationsIn
   protected override invokeDuplicate?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus> {
     return this._api.cloneFunctions(requestBody);
   }
+
   protected override invokeExport = undefined;
+  protected override invokeRestart = undefined;
+  protected override invokeStop = undefined;
 }
