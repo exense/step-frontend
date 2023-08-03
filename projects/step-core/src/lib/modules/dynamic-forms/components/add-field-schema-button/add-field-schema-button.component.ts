@@ -11,7 +11,7 @@ import { FieldSchemaType } from '../../shared/field-schema-type.enum';
   templateUrl: './add-field-schema-button.component.html',
   styleUrls: ['./add-field-schema-button.component.scss'],
 })
-export class AddFieldSchemaButton {
+export class AddFieldSchemaButtonComponent {
   private _ngControl = inject(NgControl, { optional: true });
   private _matDialog = inject(MatDialog);
 

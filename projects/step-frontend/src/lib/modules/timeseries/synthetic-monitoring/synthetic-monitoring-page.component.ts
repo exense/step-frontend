@@ -3,7 +3,7 @@ import { AJS_MODULE, DashboardService } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
 import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
-import { TimeRangePicker } from '../time-selection/time-range-picker.component';
+import { TimeRangePickerComponent } from '../time-selection/time-range-picker.component';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { Subject, Subscription, takeUntil, tap, timer } from 'rxjs';
@@ -23,7 +23,7 @@ export class SyntheticMonitoringPageComponent implements OnInit, OnDestroy {
   terminator$ = new Subject<void>();
 
   @ViewChild('dashboard') dashboard!: TimeSeriesDashboardComponent;
-  @ViewChild(TimeRangePicker) rangePicker!: TimeRangePicker;
+  @ViewChild(TimeRangePickerComponent) rangePicker!: TimeRangePickerComponent;
   @Input() taskId: string = window.location.href.split('?')[0].substring(window.location.href.lastIndexOf('/') + 1);
 
   refreshEnabled = true;

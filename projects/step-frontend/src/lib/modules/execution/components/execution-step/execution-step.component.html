@@ -2,7 +2,7 @@
   <step-panel [panelType]="Panels.testCases">
     <ng-container titleAddon>
       <step-status-distribution
-        *ngIf="execution!.status != 'ENDED' && testCasesProgress && testCasesProgress.countForecast > 0"
+        *ngIf="execution!.status !== 'ENDED' && testCasesProgress && testCasesProgress.countForecast > 0"
         class="progress-distribution"
         [summary]="testCasesProgress"
         [isProgress]="true"
@@ -63,7 +63,7 @@
   <step-panel [panelType]="Panels.steps">
     <ng-container titleAddon>
       <step-status-distribution
-        *ngIf="execution!.status != 'ENDED' && progress && progress!.countForecast > 0"
+        *ngIf="execution!.status !== 'ENDED' && progress && progress!.countForecast > 0"
         class="progress-distribution"
         [summary]="progress"
         [isProgress]="true"
