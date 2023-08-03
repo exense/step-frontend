@@ -11,7 +11,7 @@ import { DynamicFieldGroupEditorComponent } from './components/dynamic-field-gro
 import { AddFieldButtonComponent } from './components/add-field-button/add-field-button.component';
 import { DynamicFieldEditorComponent } from './components/dynamic-field-editor/dynamic-field-editor.component';
 import { DynamicCheckboxComponent } from './components/dynamic-checkbox/dynamic-checkbox.component';
-import { AddFieldSchemaButton } from './components/add-field-schema-button/add-field-schema-button.component';
+import { AddFieldSchemaButtonComponent } from './components/add-field-schema-button/add-field-schema-button.component';
 import { AddSchemaFieldDialogComponent } from './components/add-schema-field-dialog/add-schema-field-dialog.component';
 
 @NgModule({
@@ -23,7 +23,7 @@ import { AddSchemaFieldDialogComponent } from './components/add-schema-field-dia
     AddFieldButtonComponent,
     DynamicFieldEditorComponent,
     DynamicCheckboxComponent,
-    AddFieldSchemaButton,
+    AddFieldSchemaButtonComponent,
     AddSchemaFieldDialogComponent,
   ],
   imports: [CommonModule, FormsModule, StepBasicsModule, StepMaterialModule, StepIconsModule, ReactiveFormsModule],
@@ -34,7 +34,7 @@ import { AddSchemaFieldDialogComponent } from './components/add-schema-field-dia
     DynamicFieldEditorComponent,
     DynamicFieldGroupEditorComponent,
     DynamicCheckboxComponent,
-    AddFieldSchemaButton,
+    AddFieldSchemaButtonComponent,
   ],
 })
 export class DynamicFormsModule {}

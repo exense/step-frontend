@@ -7,7 +7,7 @@ import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static'
 import { AJS_MODULE } from '../../../../shared';
 
 @Component({
-  selector: 'entity-icon',
+  selector: 'entity-icon', // eslint-disable-line @angular-eslint/component-selector
   templateUrl: './entity-icon.component.html',
   styleUrls: ['./entity-icon.component.scss'],
 })
