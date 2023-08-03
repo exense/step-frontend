@@ -111,10 +111,14 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   private _terminator$ = new Subject<void>();
   private _inProgress$ = new BehaviorSubject<boolean>(false);
   readonly inProgress$ = this._inProgress$.asObservable();
+  private isSkipOngoingRequest?: boolean;
   private _request$ = new BehaviorSubject<{ request: TableRequestInternal; hideProgress?: boolean } | undefined>(
     undefined
   );
   private _response$: Observable<TableResponseGeneric<T> | null> = this._request$.pipe(
+    tap((x) => {
+      this.isSkipOngoingRequest = false;
+    }),
     filter((x) => !!x),
     debounceTime(500),
     map((x) => {
@@ -136,6 +140,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     }),
     startWith(null),
     shareReplay(1),
+    filter(() => !this.isSkipOngoingRequest),
     takeUntil(this._terminator$)
   ) as Observable<TableResponseGeneric<T> | null>;
   readonly data$: Observable<T[]> = this._response$.pipe(map((r) => r?.data || []));
@@ -261,5 +266,9 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     delete tableRequest.limit;
 
     this._rest.exportAsCSV(this._tableId, fields, tableRequest).subscribe();
+  }
+
+  skipOngoingRequest(): void {
+    this.isSkipOngoingRequest = true;
   }
 }
