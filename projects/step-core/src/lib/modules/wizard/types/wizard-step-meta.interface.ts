@@ -1,5 +1,5 @@
 import { WizardStep } from './wizard-step.interface';
-import { EnvironmentInjector, Injector } from '@angular/core';
+import { EnvironmentInjector } from '@angular/core';
 
 export interface WizardStepMeta {
   step: WizardStep;

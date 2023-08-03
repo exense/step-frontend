@@ -11,5 +11,8 @@ step-wizard-steps {
 
   mat-step-header {
     pointer-events: none;
+    &.cdk-program-focused {
+      background-color: transparent !important;
+    }
   }
 }

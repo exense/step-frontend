@@ -316,7 +316,6 @@ export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.
 export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 export * from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 export * from './components/artefact-details/artefact-details.component';
-export * from './components/base-wizard-step/base-wizard-step.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export { UpdateResourceWarningDialogComponent } from './components/update-resource-warning-dialog/update-resource-warning-dialog.component';
 export { UploadContainerComponent } from './components/upload-container/upload-container.component';

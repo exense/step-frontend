@@ -28,6 +28,7 @@ import { PreventCharsDirective } from './directives/prevent-chars.directive';
 import { SingleItemArrayFilterComponent } from './components/single-item-array-filter/single-item-array-filter.component';
 import { JsonRawEditorFormattedComponent } from './components/json-raw-editor-formatted/json-raw-editor-formatted.component';
 import { LabelAddonDirective } from './directives/label-addon.directive';
+import { TimeInputComponent } from './components/time-input/time-input.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
@@ -58,6 +59,7 @@ import { LabelAddonDirective } from './directives/label-addon.directive';
     JsonRawEditorFormattedComponent,
     LabelAddonDirective,
     SingleItemArrayFilterComponent,
+    TimeInputComponent,
   ],
   exports: [
     ResourceLabelComponent,
@@ -86,6 +88,7 @@ import { LabelAddonDirective } from './directives/label-addon.directive';
     SingleItemArrayFilterComponent,
     JsonRawEditorFormattedComponent,
     LabelAddonDirective,
+    TimeInputComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -103,6 +106,7 @@ export * from './components/modal-window/modal-window.component';
 export * from './components/form-field/form-field.component';
 export * from './components/cron-selector/cron-selector.component';
 export * from './components/errors-list/errors-list.component';
+export * from './components/time-input/time-input.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
 export * from './pipes/has-right.pipe';

@@ -1,22 +1,19 @@
 <mat-stepper #stepper linear orientation="vertical">
   <ng-container *ngFor="let stepMeta of stepMetas; let i = index; trackBy: trackByStepMeta">
     <mat-step
-      [stepWizardLocalContext]="stepMeta"
-      #localContext="wizardLocalContext"
+      [stepWizardContextConnector]="stepMeta"
+      [index]="i"
+      [size]="stepMetas.length"
+      (next)="goNext(i)"
+      (previous)="goPrevious(i)"
+      (finish)="finishWizard()"
+      (closeWizard)="closeWizard()"
+      #contextConnector="wizardContextConnector"
       [label]="stepMeta.step.label"
-      [hasError]="!!localContext.stepForm?.invalid && !!localContext.stepForm?.touched"
+      [hasError]="!!contextConnector.stepForm?.invalid && !!contextConnector.stepForm?.touched"
       errorMessage="Some fields are invalid"
     >
       <step-custom-item-render [component]="stepMeta.step.component"> </step-custom-item-render>
-      <step-wizard-step-buttons
-        [isFirst]="i === 0"
-        [isLast]="i === stepMetas.length - 1"
-        (next)="goNext(i)"
-        (previous)="goPrevious(i)"
-        (finish)="finishWizard()"
-        (closeWizard)="closeWizard()"
-      >
-      </step-wizard-step-buttons>
     </mat-step>
   </ng-container>
   <ng-template matStepperIcon="edit">

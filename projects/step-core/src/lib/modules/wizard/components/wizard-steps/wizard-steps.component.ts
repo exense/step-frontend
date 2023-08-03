@@ -19,10 +19,14 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { WizardStepRegistryService } from '../../injectables/wizard-step-registry.service';
 import { WizardGlobalContext } from '../../types/wizard-global-context.interface';
-import { WIZARD_GLOBAL_CONTEXT } from '../../injectables/wizard-global-context.token';
 import { WizardStepMeta } from '../../types/wizard-step-meta.interface';
 import { MatStepper } from '@angular/material/stepper';
-import { StepperSelectionEvent } from '@angular/cdk/stepper';
+import { WIZARD_GLOBAL_CONTEXT } from '../../injectables/wizard-global-context.token';
+import { WIZARD_STEP_TYPE } from '../../injectables/wizard-step-type.token';
+import { WIZARD_STEP_FORM } from '../../injectables/wizard-step-form.token';
+import { WIZARD_STEP_FORM_CONFIG } from '../../injectables/wizard-step-form-config.token';
+import { WIZARD_STEP_BEHAVIOR_CONFIG } from '../../injectables/wizard-step-behavior-config.token';
+import { WizardStep } from '../../types/wizard-step.interface';
 
 @Component({
   selector: 'step-wizard-steps',
@@ -90,8 +94,6 @@ export class WizardStepsComponent implements OnChanges, OnDestroy, WizardGlobalC
       });
   }
 
-  handleChange(event: StepperSelectionEvent): void {}
-
   protected finishWizard(): void {
     this.finish.emit();
   }
@@ -144,17 +146,7 @@ export class WizardStepsComponent implements OnChanges, OnDestroy, WizardGlobalC
     const steps = stepTypes.map((stepType) => this._wizardsRegistry.getStep(stepType)).filter((item) => !!item);
 
     this.stepMetas = steps.map((step) => {
-      const providers: StaticProvider[] = [step?.formConfig, step?.behaviorConfig]
-        .filter((item) => !!item)
-        .map((item) => {
-          return { provide: item! };
-        });
-
-      const stepInjector = Injector.create({
-        providers,
-        parent: this._injector,
-      }) as EnvironmentInjector;
-
+      const stepInjector = this.createStepInjector(step);
       return { step, stepInjector };
     });
 
@@ -162,7 +154,7 @@ export class WizardStepsComponent implements OnChanges, OnDestroy, WizardGlobalC
       if (!step.formConfig) {
         return parentForm;
       }
-      const formConfig = stepInjector.get(step.formConfig);
+      const formConfig = stepInjector.get(WIZARD_STEP_FORM_CONFIG);
       const subForm = formConfig.createStepForm();
       formConfig.setModelToForm(this.model, subForm);
       if (formConfig.setupFormBehavior) {
@@ -175,5 +167,48 @@ export class WizardStepsComponent implements OnChanges, OnDestroy, WizardGlobalC
 
   private disposeSteps(): void {
     this.stepMetas.forEach((item) => item.stepInjector.destroy());
+  }
+
+  private createStepInjector(step: WizardStep): EnvironmentInjector {
+    const providers: StaticProvider[] = [];
+
+    providers.push({
+      provide: WIZARD_STEP_TYPE,
+      useValue: step.type,
+    });
+
+    if (step.formConfig) {
+      providers.push(
+        {
+          provide: step.formConfig,
+        },
+        {
+          provide: WIZARD_STEP_FORM_CONFIG,
+          useExisting: step.formConfig,
+        },
+        {
+          provide: WIZARD_STEP_FORM,
+          useFactory: (type: string, globalContext: WizardGlobalContext) => {
+            const result = globalContext.wizardForm?.controls[type] ?? undefined;
+            return result;
+          },
+          deps: [WIZARD_STEP_TYPE, WIZARD_GLOBAL_CONTEXT],
+        }
+      );
+    }
+
+    if (step.behaviorConfig) {
+      providers.push(
+        {
+          provide: step.behaviorConfig,
+        },
+        {
+          provide: WIZARD_STEP_BEHAVIOR_CONFIG,
+          useExisting: step.behaviorConfig,
+        }
+      );
+    }
+
+    return Injector.create({ providers, parent: this._injector }) as EnvironmentInjector;
   }
 }

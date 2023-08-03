@@ -1,9 +1,9 @@
 import { Type } from '@angular/core';
 import { CustomRegistryItem } from '../../custom-registeries/custom-registries.module';
-import { WizardStepFormService } from '../injectables/wizard-step-form.service';
-import { WizardStepBehaviorService } from '../injectables/wizard-step-behavior.service';
+import { WizardStepFormConfig } from './wizard-step-form-config.interface';
+import { WizardStepBehaviorConfig } from './wizard-step-behavior-config.interface';
 
 export interface WizardStep extends CustomRegistryItem {
-  formConfig?: Type<WizardStepFormService>;
-  behaviorConfig?: Type<WizardStepBehaviorService>;
+  formConfig?: Type<WizardStepFormConfig>;
+  behaviorConfig?: Type<WizardStepBehaviorConfig>;
 }
