@@ -40,6 +40,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     if (!this.item) {
       throw new Error('Item input is mandatory');
     }
+    this.freeTextValues = this.item.freeTextValues || [];
   }
 
   onMenuClose(): void {

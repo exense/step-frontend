@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { filter, forkJoin, merge, Subject, Subscription, takeUntil, throttle } from 'rxjs';
+import { filter, forkJoin, merge, Subject, Subscription, switchMap, takeUntil, tap, throttle } from 'rxjs';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { FilterBarComponent } from '../performance-view/filter-bar/filter-bar.component';
 import { FilterBarItemType, TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
@@ -14,6 +14,7 @@ import { TimeSeriesDashboardSettings } from './model/ts-dashboard-settings';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { ChartsViewComponent } from '../performance-view/charts-view.component';
 import { TimeSeriesConfig } from '../time-series.config';
+import { TableApiWrapperService, TimeSeriesService } from '@exense/step-core';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -51,7 +52,13 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   compareModeTimeRangeOptions = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   compareModeActiveRangeOption: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
 
-  constructor(private contextsFactory: TimeSeriesContextsFactory) {}
+  exportInProgress = false;
+
+  constructor(
+    private contextsFactory: TimeSeriesContextsFactory,
+    private _timeSeriesService: TimeSeriesService,
+    private _tableApiService: TableApiWrapperService
+  ) {}
 
   ngOnInit(): void {
     if (!this.settings) {
@@ -204,14 +211,14 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.compareChartsSubscription = forkJoin([updateCharts$, refreshRanger$]).subscribe();
   }
 
-  disableCompareMode(): void {
+  public disableCompareMode(): void {
     this.context.disableCompareMode();
     this.compareTerminator$.next(true);
   }
 
-  enableCompareMode(): void {
+  public enableCompareMode(): void {
     const filters = this.prepareFiltersForCompareMode();
-    const timeRange = { from: this.context.getFullTimeRange().from, to: this.context.getFullTimeRange().to };
+    const timeRange = JSON.parse(JSON.stringify(this.context.getFullTimeRange()));
     const compareContext = this.contextsFactory.createContext({
       timeRange: timeRange,
       id: new Date().getTime().toString(),
@@ -224,19 +231,36 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     merge(compareContext.onFilteringChange(), compareContext.onGroupingChange())
       .pipe(takeUntil(this.compareTerminator$))
       .subscribe(() => {
-        console.log('NEW FILTER');
         this.updateCompareCharts(true);
       });
     this.context.enableCompareMode(compareContext);
   }
 
+  public exportRawData() {
+    if (this.exportInProgress) {
+      return;
+    }
+    const filtersOql = this.context.buildActiveOQL(true, true);
+    this.exportInProgress = true;
+    this._timeSeriesService
+      .getMeasurementsAttributes(filtersOql)
+      .pipe(
+        switchMap((fields) =>
+          this._tableApiService.exportAsCSV('measurements', fields, { filters: [{ oql: filtersOql }] })
+        ),
+        tap(() => (this.exportInProgress = false))
+      )
+      .subscribe();
+  }
+
   private prepareFiltersForCompareMode(): TsFilterItem[] {
     return Object.keys(this.settings.contextualFilters).map((key) => {
+      const label = key === 'eId' ? 'Execution Id' : key;
       return {
         attributeName: key,
         isHidden: false,
         exactMatch: true,
-        label: key,
+        label: label,
         type: FilterBarItemType.FREE_TEXT,
         freeTextValues: [this.settings.contextualFilters[key]],
       };

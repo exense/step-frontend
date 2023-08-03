@@ -10,6 +10,7 @@
 <div class="cards">
   <mat-card>
     <div class="chart">
+      <div *ngIf="compareModeEnabled" class="stamp"></div>
       <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.OVERVIEW]"></step-chart-skeleton>
       <step-timeseries-chart
         #summaryChart
@@ -23,6 +24,7 @@
     </div>
 
     <div class="chart" *ngIf="compareModeEnabled && compareModeContext">
+      <div *ngIf="compareModeEnabled" class="stamp compare"></div>
       <step-chart-skeleton *ngIf="!compareChartsSettings[TsChartType.OVERVIEW]"></step-chart-skeleton>
       <step-timeseries-chart
         #summaryCompareChart
@@ -36,6 +38,7 @@
     </div>
 
     <div class="chart">
+      <div *ngIf="compareModeEnabled" class="stamp"></div>
       <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.BY_STATUS]"></step-chart-skeleton>
       <step-timeseries-chart
         #byStatusChart
@@ -49,6 +52,7 @@
     </div>
 
     <div class="chart" *ngIf="compareModeEnabled">
+      <div *ngIf="compareModeEnabled" class="stamp compare"></div>
       <step-chart-skeleton *ngIf="!compareChartsSettings[TsChartType.BY_STATUS]"></step-chart-skeleton>
       <step-timeseries-chart
         #byStatusCompareChart
@@ -64,6 +68,7 @@
 
   <mat-card>
     <div class="chart">
+      <div *ngIf="compareModeEnabled" class="stamp"></div>
       <div class="chart-settings" *ngIf="currentChartsSettings[TsChartType.RESPONSE_TIME]">
         <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
           <step-icon name="settings"></step-icon>
@@ -105,6 +110,7 @@
     </div>
 
     <div class="chart" *ngIf="compareModeEnabled">
+      <div *ngIf="compareModeEnabled" class="stamp compare"></div>
       <div class="chart-settings" *ngIf="compareChartsSettings[TsChartType.RESPONSE_TIME]">
         <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
           <step-icon name="settings"></step-icon>
@@ -146,6 +152,7 @@
     </div>
 
     <div class="chart">
+      <div *ngIf="compareModeEnabled" class="stamp"></div>
       <div class="chart-settings" *ngIf="currentChartsSettings[TsChartType.THROUGHPUT]">
         <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
           <step-icon name="settings"></step-icon>
@@ -185,6 +192,7 @@
     </div>
 
     <div class="chart" *ngIf="compareModeEnabled">
+      <div *ngIf="compareModeEnabled" class="stamp compare"></div>
       <div class="chart-settings" *ngIf="compareChartsSettings[TsChartType.THROUGHPUT]">
         <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
           <step-icon name="settings"></step-icon>
@@ -230,6 +238,7 @@
 
   <mat-card *ngIf="settings?.includeThreadGroupChart">
     <div class="chart">
+      <div *ngIf="compareModeEnabled" class="stamp"></div>
       <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.THREAD_GROUP]"></step-chart-skeleton>
       <step-timeseries-chart
         *ngIf="currentChartsSettings[TsChartType.THREAD_GROUP]"
@@ -242,6 +251,7 @@
     </div>
 
     <div class="chart" *ngIf="compareModeEnabled">
+      <div *ngIf="compareModeEnabled" class="stamp compare"></div>
       <step-chart-skeleton *ngIf="!compareChartsSettings[TsChartType.THREAD_GROUP]"></step-chart-skeleton>
       <step-timeseries-chart
         *ngIf="compareChartsSettings[TsChartType.THREAD_GROUP]"

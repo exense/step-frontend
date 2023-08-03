@@ -20,7 +20,7 @@ import {
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PerformanceViewSettings } from '../../performance-view/model/performance-view-settings';
 import { RangeSelectionType } from '../../time-selection/model/range-selection-type';
-import { Subject, Subscription, takeUntil, timer } from 'rxjs';
+import { Subject, Subscription, switchMap, takeUntil, tap, timer } from 'rxjs';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
 import { TimeSeriesConfig } from '../../time-series.config';
 import { MatMenuTrigger } from '@angular/material/menu';
@@ -46,6 +46,8 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
   @Input() executionId!: string;
   @Input() executionInput: Execution | undefined;
   execution: Execution | undefined;
+
+  compareModeEnabled = false;
 
   timeRangeSelection: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
 
@@ -165,6 +167,19 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
           console.error(error);
         },
       });
+  }
+
+  toggleCompareMode() {
+    this.compareModeEnabled = !this.compareModeEnabled;
+    if (this.compareModeEnabled) {
+      this.dashboard.enableCompareMode();
+    } else {
+      this.dashboard.disableCompareMode();
+    }
+  }
+
+  exportRawData() {
+    this.dashboard.exportRawData();
   }
 
   ngOnDestroy(): void {

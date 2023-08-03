@@ -16,11 +16,13 @@ export class TsToolbarComponent {
   @Output() onCompareModeDisabled = new EventEmitter<void>();
 
   exportInProgress = false;
+  compareModeEnabled = false;
 
   constructor(private _timeSeriesService: TimeSeriesService, private _tableApiService: TableApiWrapperService) {}
 
-  handleCompareModeChange(enabled: boolean) {
-    if (enabled) {
+  toggleCompareMode() {
+    this.compareModeEnabled = !this.compareModeEnabled;
+    if (this.compareModeEnabled) {
       this.onCompareModeEnabled.emit();
     } else {
       this.onCompareModeDisabled.emit();
