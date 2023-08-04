@@ -17,8 +17,8 @@
 
 .chart {
   height: 360px;
+  width: calc(50% - 12px);
   min-width: 484px;
-  flex: 1;
   position: relative;
 }
 

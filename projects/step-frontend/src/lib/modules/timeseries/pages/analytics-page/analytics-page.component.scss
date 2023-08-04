@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 :host {
   padding: 0 19px;
   max-width: 100%;
@@ -6,5 +8,11 @@
 
 .header-buttons {
   display: flex;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
+  flex-direction: row;
+  gap: 12px;
+}
+
+.orange {
+  color: var.$orange;
 }

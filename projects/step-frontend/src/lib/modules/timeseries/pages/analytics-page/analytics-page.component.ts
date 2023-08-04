@@ -38,6 +38,10 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
 
   contextualParams: any = {};
 
+  compareModeEnabled = false;
+  executionHasToBeBuilt = false;
+  migrationInProgress = false;
+
   constructor(private dashboardService: DashboardService) {}
 
   ngOnInit(): void {
@@ -150,12 +154,12 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   }
 
   triggerRefresh() {
-    this.dashboard.refresh(TimeSeriesUtils.convertSelectionToRange(this.timeRangeSelection));
+    this.dashboard.refresh(TimeSeriesUtils.convertSelectionToTimeRange(this.timeRangeSelection));
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
-    this.dashboard.updateFullRange(TimeSeriesUtils.convertSelectionToRange(selection)); // instant call
+    this.dashboard.updateFullRange(TimeSeriesUtils.convertSelectionToTimeRange(selection)); // instant call
   }
 
   /**
@@ -177,6 +181,19 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
       }
     }
     return lastRelativeOption;
+  }
+
+  toggleCompareMode() {
+    this.compareModeEnabled = !this.compareModeEnabled;
+    if (this.compareModeEnabled) {
+      this.dashboard.enableCompareMode();
+    } else {
+      this.dashboard.disableCompareMode();
+    }
+  }
+
+  exportRawData() {
+    this.dashboard.exportRawData();
   }
 
   ngOnDestroy(): void {

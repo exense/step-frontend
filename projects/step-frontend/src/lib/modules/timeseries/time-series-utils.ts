@@ -57,7 +57,7 @@ export class TimeSeriesUtils {
     return range1 && range2 && range1.from === range2.from && range1.to === range2.to;
   }
 
-  static convertExecutionAndSelectionToRange(
+  static convertExecutionAndSelectionToTimeRange(
     execution: Execution,
     timeRangeSelection: TimeRangePickerSelection
   ): TSTimeRange {
@@ -80,7 +80,7 @@ export class TimeSeriesUtils {
     return newFullRange;
   }
 
-  static convertSelectionToRange(selection: TimeRangePickerSelection): TSTimeRange {
+  static convertSelectionToTimeRange(selection: TimeRangePickerSelection): TSTimeRange {
     let now = new Date().getTime();
     let newFullRange: TSTimeRange;
     switch (selection.type) {

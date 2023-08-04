@@ -137,14 +137,21 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   handleTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
     //TODO optional execution
-    this.updateFullRange(
-      TimeSeriesUtils.convertExecutionAndSelectionToRange(this.settings.execution!, this.timeRangeSelection)
-    );
+    let newTimeRange: TSTimeRange;
+    if (this.settings.execution) {
+      newTimeRange = TimeSeriesUtils.convertExecutionAndSelectionToTimeRange(
+        this.settings.execution!,
+        this.timeRangeSelection
+      );
+    } else {
+      newTimeRange = TimeSeriesUtils.convertSelectionToTimeRange(selection);
+    }
+    this.updateFullRange(newTimeRange);
   }
 
   handleCompareTimeRangeChange(selection: TimeRangePickerSelection) {
     this.compareModeActiveRangeOption = selection;
-    this.updateCompareChartsFullRange(TimeSeriesUtils.convertSelectionToRange(selection));
+    this.updateCompareChartsFullRange(TimeSeriesUtils.convertSelectionToTimeRange(selection));
   }
 
   setRanges(fullRange: TSTimeRange, selection?: TSTimeRange) {
@@ -227,7 +234,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       keywordsContext: this.context.keywordsContext, // share the same keywords context and colors
     });
     this.compareModeActiveRangeOption = { type: RangeSelectionType.ABSOLUTE, absoluteSelection: timeRange };
-    compareContext.onFilteringChange().subscribe(() => console.log('NEW FILTER'));
     merge(compareContext.onFilteringChange(), compareContext.onGroupingChange())
       .pipe(takeUntil(this.compareTerminator$))
       .subscribe(() => {

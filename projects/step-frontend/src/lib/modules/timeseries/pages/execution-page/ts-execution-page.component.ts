@@ -47,12 +47,11 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
   @Input() executionInput: Execution | undefined;
   execution: Execution | undefined;
 
-  compareModeEnabled = false;
-
   timeRangeSelection: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
 
   performanceViewSettings: PerformanceViewSettings | undefined;
 
+  compareModeEnabled = false;
   executionHasToBeBuilt = false;
   migrationInProgress = false;
 
@@ -82,7 +81,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
   onTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
     this.dashboard.updateFullRange(
-      TimeSeriesUtils.convertExecutionAndSelectionToRange(this.execution!, this.timeRangeSelection)
+      TimeSeriesUtils.convertExecutionAndSelectionToTimeRange(this.execution!, this.timeRangeSelection)
     );
   }
 
@@ -99,7 +98,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
       this.cd.detectChanges();
     } else {
       this.dashboard.refresh(
-        TimeSeriesUtils.convertExecutionAndSelectionToRange(this.execution!, this.timeRangeSelection)
+        TimeSeriesUtils.convertExecutionAndSelectionToTimeRange(this.execution!, this.timeRangeSelection)
       );
     }
   }
