@@ -3,7 +3,6 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { BehaviorSubject, combineLatest, map, Observable, of, Subject, tap } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
-import { breadthFirstSearch } from '../../../shared';
 import { DropType } from '../shared/drop-type.enum';
 import { TreeFlatNode } from '../shared/tree-flat-node';
 import { TreeNode } from '../shared/tree-node';
@@ -134,18 +133,6 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
     const isSkipped = !node.isSkipped;
     const isUpdated = this._treeNodeUtils.updateNodeData(this.originalRoot!, nodeId, { isSkipped });
-
-    if (node.children) {
-      const children = breadthFirstSearch({
-        items: node.children,
-        children: (child) => child.children || [],
-      });
-
-      children.forEach((child) => {
-        this._treeNodeUtils.updateNodeData(this.originalRoot!, child.id, { isSkipped });
-      });
-    }
-
     if (isUpdated) {
       this.refresh();
     }
@@ -349,26 +336,16 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
   addChildrenToSelectedNode(...children: T[]): void {
     const parentId = this.selectedInsertionParentId$.value;
-
     if (!parentId) {
       return;
     }
 
     const newNodes = children.map((child) => this._treeNodeUtils.convertItem(child));
-
     if (!this.isPossibleToInsert(parentId, ...newNodes)) {
       return;
     }
 
     this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, newNodes, 'append');
-
-    const parent = this.findNodeById(parentId);
-
-    if (parent) {
-      newNodes.forEach((node) => {
-        this._treeNodeUtils.updateNodeData(this.originalRoot!, node.id, { isSkipped: parent.isSkipped });
-      });
-    }
 
     this.refresh();
 
