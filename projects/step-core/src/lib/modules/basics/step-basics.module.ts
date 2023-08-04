@@ -155,4 +155,5 @@ export * from './services/default-page.token';
 export * from './services/view-id-link-prefix.token';
 export * from './services/navigator.service';
 export * from './services/generate-api-key.service';
+export * from './services/app-config-container.service';
 export * from './shared/logout-cleanup.token';
