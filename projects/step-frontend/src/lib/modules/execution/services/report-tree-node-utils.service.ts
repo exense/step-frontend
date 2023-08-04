@@ -15,19 +15,25 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
     private _controllerService: ControllerService
   ) {}
 
-  convertItem(item: ReportNodeWithChildren, parentId: string | undefined): ReportTreeNode {
+  convertItem(
+    item: ReportNodeWithChildren,
+    params?: { parentId?: string; isParentVisuallySkipped?: boolean }
+  ): ReportTreeNode {
     const id = item.id!;
-    const artefact = item.resolvedArtefact!;
-    const name = artefact.attributes?.['name'] || '';
+    const { parentId } = params ?? {};
+    const artefact = item.resolvedArtefact;
+    const name = artefact?.attributes?.['name'] || '';
     const isSkipped = false;
+    const isVisuallySkipped = false;
     const icon = this._artefactTypes.getIconNg2(artefact._class);
     const expandable = this.hasChildren(id);
-    const children = (item?.children || []).map((child) => this.convertItem(child, id));
+    const children = (item?.children || []).map((child) => this.convertItem(child, { parentId: id }));
     const iconClassName = `step-node-status-${item.status}`;
     return {
       id,
       name,
       isSkipped,
+      isVisuallySkipped,
       icon,
       expandable,
       children,

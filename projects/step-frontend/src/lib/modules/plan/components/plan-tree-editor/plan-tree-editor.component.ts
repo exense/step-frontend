@@ -4,7 +4,6 @@ import {
   ArtefactTreeNode,
   AugmentedScreenService,
   AuthService,
-  breadthFirstSearch,
   CustomComponent,
   DialogsService,
   DynamicFieldsSchema,
@@ -16,7 +15,7 @@ import {
   PlansService,
   TreeStateService,
 } from '@exense/step-core';
-import { BehaviorSubject, filter, map, merge, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
+import { BehaviorSubject, filter, map, merge, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { ArtefactTreeNodeUtilsService } from '../../services/artefact-tree-node-utils.service';
 import { ARTEFACTS_CLIPBOARD } from '../../services/artefacts-clipboard.token';
 import { PlanHistoryService } from '../../services/plan-history.service';
@@ -231,33 +230,7 @@ export class PlanTreeEditorComponent implements CustomComponent, PlanEditorStrat
   }
 
   handlePlanChange(): void {
-    this._treeState.selectedNode$
-      .pipe(
-        take(1),
-        map((node) =>
-          breadthFirstSearch({
-            items: [this.plan!.root!],
-            children: (item) => item.children || [],
-            predicate: (item) => item.id === node?.id,
-          })
-        )
-      )
-      .subscribe(([node]) => {
-        if (node?.children) {
-          const children = breadthFirstSearch({
-            items: node!.children,
-            children: (item) => item.children || [],
-          });
-
-          children.forEach((child) => {
-            this._artefactTreeNodeUtilsService.updateNodeData(this.plan!.root!, child.id!, {
-              isSkipped: node!.skipNode?.value,
-            });
-          });
-        }
-
-        this.planChange$.next(this.plan!);
-      });
+    this.planChange$.next(this.plan!);
   }
 
   moveUp(node?: AbstractArtefact): void {

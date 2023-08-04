@@ -22,18 +22,26 @@ export class ArtefactTreeNodeUtilsService
     this.refreshArtefactInternal$.complete();
   }
 
-  convertItem(originalArtefact: AbstractArtefact, parentId?: string): ArtefactTreeNode {
+  convertItem(
+    originalArtefact: AbstractArtefact,
+    params?: { parentId?: string; isParentVisuallySkipped?: boolean }
+  ): ArtefactTreeNode {
     const id = originalArtefact.id!;
+    const { parentId, isParentVisuallySkipped } = params ?? {};
     const name = originalArtefact.attributes?.['name'] || '';
     const isSkipped = !!originalArtefact.skipNode?.value;
+    const isVisuallySkipped = isSkipped || isParentVisuallySkipped;
     const icon = this._artefactTypes.getIconNg2(originalArtefact._class);
     const expandable = (originalArtefact?.children?.length ?? -1) > 0;
-    const children = (originalArtefact?.children || []).map((child) => this.convertItem(child, id));
+    const children = (originalArtefact?.children || []).map((child) =>
+      this.convertItem(child, { parentId: id, isParentVisuallySkipped: isVisuallySkipped })
+    );
 
     return {
       id,
       name,
       isSkipped,
+      isVisuallySkipped,
       icon,
       expandable,
       children,
@@ -90,7 +98,7 @@ export class ArtefactTreeNodeUtilsService
 
     let isUpdated = false;
     if (data.isSkipped !== undefined) {
-      itemToChange.skipNode!.value = data.isSkipped;
+      itemToChange.skipNode = { ...itemToChange.skipNode!, value: data.isSkipped };
       isUpdated = true;
     }
 
