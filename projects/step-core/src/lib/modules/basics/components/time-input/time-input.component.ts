@@ -1,4 +1,14 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges, TrackByFunction, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  TrackByFunction,
+  ViewEncapsulation,
+} from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { TimeUnit } from '../../shared/time-unit.enum';
 import { KeyValue } from '@angular/common';
@@ -38,6 +48,8 @@ export class TimeInputComponent implements ControlValueAccessor, OnInit, OnChang
   ];
 
   @Input() measuresDictionary?: TimeUnitDictionary;
+  @Input() displayMeasure?: TimeUnit;
+  @Output() displayMeasureChange = new EventEmitter<TimeUnit | undefined>();
 
   @Input() modelMeasure = TimeUnit.MILLISECOND;
 
@@ -47,7 +59,6 @@ export class TimeInputComponent implements ControlValueAccessor, OnInit, OnChang
 
   protected isDisabled?: boolean;
   protected measureItems: KeyValue<TimeUnit, string>[] = [];
-  protected displayMeasure?: TimeUnit;
   protected displayValue: number = 0;
 
   protected readonly trackByMeasureItem: TrackByFunction<KeyValue<TimeUnit, string>> = (index, { key }) => key;
@@ -100,6 +111,11 @@ export class TimeInputComponent implements ControlValueAccessor, OnInit, OnChang
     if (cModelMeasure?.previousValue !== cModelMeasure?.currentValue || cModelMeasure?.firstChange) {
       this.displayValue = this.calculateDisplayValue(this.modelValue, cModelMeasure!.currentValue, this.displayMeasure);
     }
+
+    const cDisplayMeasure = changes['displayMeasure'];
+    if (cDisplayMeasure?.previousValue !== cDisplayMeasure?.currentValue || cDisplayMeasure?.firstChange) {
+      this.displayValue = this.calculateDisplayValue(this.modelValue, this.modelMeasure, cDisplayMeasure!.currentValue);
+    }
   }
 
   protected handleDisplayValueChange(value: number): void {
@@ -110,6 +126,7 @@ export class TimeInputComponent implements ControlValueAccessor, OnInit, OnChang
 
   protected handleDisplayMeasureChange(value: TimeUnit): void {
     this.displayMeasure = value;
+    this.displayMeasureChange.emit(value);
     this.modelValue = this.calculateModelValue(this.displayValue, this.modelMeasure, this.displayMeasure);
     this.onChange?.(this.modelValue);
   }
@@ -127,16 +144,12 @@ export class TimeInputComponent implements ControlValueAccessor, OnInit, OnChang
       return { key, value };
     });
 
-    if (!allowedMeasures) {
-      this.displayMeasure = undefined;
-      return;
-    }
-
     if (allowedMeasures.includes(this.displayMeasure!)) {
       return;
     }
 
     this.displayMeasure = allowedMeasures[0];
+    this.displayMeasureChange.emit(this.displayMeasure);
   }
 
   private calculateDisplayValue(modelValue: number, modelMeasure: TimeUnit, displayMeasure?: TimeUnit): number {
