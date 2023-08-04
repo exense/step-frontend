@@ -11,7 +11,7 @@ const loadScript = (fileName: string): Promise<unknown> =>
     const callbackError = (err: any) => reject(err);
     const script = document.createElement('script');
     script.setAttribute('type', 'text/javascript');
-    script.setAttribute('src', fileName + '?v=${project.version}');
+    script.setAttribute('src', fileName + '?v=3.22.2');
     //@ts-ignore
     script.onreadystatechange = callbackSuccess;
     script.onload = callbackSuccess;
