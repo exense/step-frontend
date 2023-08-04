@@ -20,7 +20,10 @@ export class AppConfigContainerService {
     this.defaultClientUrl = url;
   }
 
-  get defaultUrl(): string {
+  getDefaultUrl(forceClientUrl?: boolean): string {
+    if (forceClientUrl) {
+      return this.defaultClientUrl;
+    }
     return this.conf?.defaultUrl ?? this.defaultClientUrl;
   }
 }
