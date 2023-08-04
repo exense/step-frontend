@@ -6,7 +6,9 @@ import { KeyValue } from '@angular/common';
 type OnChange = (value: number) => void;
 type OnTouch = () => void;
 
-const DEFAULT_TIME_LABELS_DICTIONARY: Record<TimeUnit, string> = {
+export type TimeUnitDictionary = Partial<Record<TimeUnit, string>>;
+
+const DEFAULT_TIME_LABELS_DICTIONARY: TimeUnitDictionary = {
   [TimeUnit.MILLISECOND]: 'Millisecond(s)',
   [TimeUnit.SECOND]: 'Second(s)',
   [TimeUnit.MINUTE]: 'Minute(s)',
@@ -35,7 +37,7 @@ export class TimeInputComponent implements ControlValueAccessor, OnInit, OnChang
     TimeUnit.DAY,
   ];
 
-  @Input() measuresDictionary?: Record<TimeUnit, string>;
+  @Input() measuresDictionary?: TimeUnitDictionary;
 
   @Input() modelMeasure = TimeUnit.MILLISECOND;
 
@@ -116,12 +118,12 @@ export class TimeInputComponent implements ControlValueAccessor, OnInit, OnChang
     this.onTouch?.();
   }
 
-  private fillMeasureItems(allowedMeasures?: TimeUnit[], measuresDictionary?: Record<TimeUnit, string>): void {
+  private fillMeasureItems(allowedMeasures?: TimeUnit[], measuresDictionary?: TimeUnitDictionary): void {
     allowedMeasures = allowedMeasures ?? this.allowedMeasures ?? [];
     measuresDictionary = measuresDictionary ?? this.measuresDictionary ?? {};
 
     this.measureItems = allowedMeasures.map((key) => {
-      const value = measuresDictionary?.[key] ?? DEFAULT_TIME_LABELS_DICTIONARY[key];
+      const value = measuresDictionary?.[key] ?? DEFAULT_TIME_LABELS_DICTIONARY[key]!;
       return { key, value };
     });
 
