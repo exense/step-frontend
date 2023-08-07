@@ -1,6 +1,11 @@
-<label>
-  <ng-content select="step-label"> </ng-content>
-</label>
+<div class="label-container">
+  <label>
+    <ng-content select="step-label"> </ng-content>
+  </label>
+  <div class="label-addon">
+    <ng-content select="step-label-addon"></ng-content>
+  </div>
+</div>
 <div class="form-field-content">
   <ng-content></ng-content>
 </div>

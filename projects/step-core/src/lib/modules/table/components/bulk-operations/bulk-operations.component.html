@@ -9,6 +9,7 @@
     <button
       type="button"
       mat-icon-button
+      [class]="operation.operation"
       (click)="invoke(operation)"
       [matTooltip]="operation.operation | bulkOperationLabel"
       [disabled]="

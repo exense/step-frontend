@@ -1,3 +1,4 @@
 <step-form-field [class.ng-invalid]="_ngControl?.invalid || rawValueFormControl.invalid">
+  <step-label *ngIf="label">{{ label }}</step-label>
   <textarea [formControl]="rawValueFormControl" (blur)="onBlur()"></textarea>
 </step-form-field>

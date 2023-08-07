@@ -3,15 +3,17 @@
   [label]="label"
   [tooltip]="tooltip"
   [isParentInvalid]="!!_ngControl.invalid"
-  [showRequiredAsterisk]="showRequiredAsterisk"
+  [showRequiredMarker]="showRequiredMarker"
   [ngModel]="expression"
   [disabled]="isDisabled"
   (ngModelChange)="onExpressionChange($event)"
   (toggleConstantValue)="toggleDynamicExpression(false)"
 ></step-expression-input>
+
 <ng-template #constantValueTemplate>
   <step-form-field [class.ng-invalid]="!!_ngControl.invalid" [class.with-tooltip]="tooltip">
-    <step-label [attr.show-required-marker]="showRequiredAsterisk || null" *ngIf="label">{{ label }}</step-label>
+    <step-label [attr.show-required-marker]="showRequiredMarker || null" *ngIf="label">{{ label }}</step-label>
+
     <div class="step-checkbox-container">
       <mat-checkbox
         color="primary"
@@ -22,9 +24,11 @@
       >
       </mat-checkbox>
     </div>
+
     <step-suffix *ngIf="tooltip" class="icon-suffix">
       <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below"> </step-icon>
     </step-suffix>
+
     <step-suffix class="button-suffix">
       <button
         type="button"

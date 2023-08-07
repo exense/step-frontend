@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
 import { TimeseriesTableComponent } from './performance-view/table/timeseries-table.component';
-import { TimeRangePicker } from './time-selection/time-range-picker.component';
+import { TimeRangePickerComponent } from './time-selection/time-range-picker.component';
 import { ChartSkeletonComponent } from './chart/skeleton/chart-skeleton.component';
 import { PerformanceViewComponent } from './performance-view/performance-view.component';
 import { SyntheticMonitoringPageComponent } from './synthetic-monitoring/synthetic-monitoring-page.component';
@@ -26,6 +26,10 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { DiscoverComponent } from './discover/discover.component';
+import { DiscoverAttributeStatsComponent } from './discover/attribute-stats/attribute-stats.component';
+import { MatPaginatorIntl } from '@angular/material/paginator';
+import { NoTotalCountPaginator } from './discover/no-total-count-paginator';
 
 @NgModule({
   declarations: [
@@ -34,7 +38,7 @@ import { MatInputModule } from '@angular/material/input';
     ExecutionTabsComponent,
     TSRangerComponent,
     TimeseriesTableComponent,
-    TimeRangePicker,
+    TimeRangePickerComponent,
     ChartSkeletonComponent,
     PerformanceViewTimeSelectionComponent,
     PerformanceViewComponent,
@@ -48,8 +52,11 @@ import { MatInputModule } from '@angular/material/input';
     PerformanceViewComponent,
     AnalyticsPageComponent,
     ExecutionPerformanceComponent,
+    DiscoverComponent,
+    DiscoverAttributeStatsComponent,
   ],
   exports: [ExecutionPerformanceComponent, SyntheticMonitoringPageComponent, AnalyticsPageComponent],
+  providers: [{ provide: MatPaginatorIntl, useClass: NoTotalCountPaginator }],
   imports: [
     StepCoreModule,
     TableModule,

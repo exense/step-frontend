@@ -1,4 +1,4 @@
-import { Component, HostBinding, inject, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, HostBinding, inject, Input, OnInit, Output } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
 import { Input as StInput, ScreensService } from '../../client/generated';
 
@@ -12,14 +12,14 @@ export type OnChange = (value?: string) => void;
 export type OnTouch = () => void;
 
 @Component({
-  selector: '',
   template: '',
-  styleUrls: [],
 })
 export abstract class BaseCustomFormInputComponent implements ControlValueAccessor, OnInit {
   @Input() stScreen?: string;
   @Input() stInput?: StInput;
   @Input() stInputId?: string;
+
+  @Output() touch = new EventEmitter<void>();
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;
@@ -71,6 +71,7 @@ export abstract class BaseCustomFormInputComponent implements ControlValueAccess
 
   invokeTouch(): void {
     this.onTouch?.();
+    this.touch.emit();
   }
 
   private initDefaultValue(input: StInput): void {
