@@ -15,8 +15,8 @@ import {
   ImportDialogsService,
   IsUsedByDialogService,
   Function as Keyword,
-  UibModalHelperService,
   a1Promise2Observable,
+  MultipleProjectsService,
 } from '@exense/step-core';
 import { ILocationService } from 'angular';
 import { Observable, catchError, map, of, switchMap, tap } from 'rxjs';
@@ -27,15 +27,15 @@ import { FunctionDialogsConfigFactoryService } from './function-dialogs-config-f
   providedIn: 'root',
 })
 export class FunctionDialogsService implements FunctionLinkDialogService {
+  private _multipleProjectService = inject(MultipleProjectsService);
   private _functionApiService = inject(AugmentedKeywordsService);
   private _dialogs = inject(DialogsService);
   private _exportDialogs = inject(ExportDialogsService);
   private _importDialogs = inject(ImportDialogsService);
   private _httpClient = inject(HttpClient);
-  private _uibModalHelper = inject(UibModalHelperService);
   private _isUsedByDialog = inject(IsUsedByDialogService);
   private _entityDialogs = inject(EntityDialogsService);
-  private _location = inject<ILocationService>(AJS_LOCATION);
+  private _$location = inject<ILocationService>(AJS_LOCATION);
   private _functionDialogsConfigFactoryService = inject(FunctionDialogsConfigFactoryService);
   private _matDialog = inject(MatDialog);
 
@@ -120,15 +120,32 @@ export class FunctionDialogsService implements FunctionLinkDialogService {
     );
   }
 
-  openFunctionEditor(id: string, dialogConfig?: any): Observable<boolean | undefined> {
-    return this.getFunctionEditorPath(id, dialogConfig).pipe(
-      map((path) => {
-        if (path) {
-          this._location.path(path);
-          return true;
-        } else {
-          return undefined;
+  openFunctionEditor(keyword: Keyword, dialogConfig?: any): Observable<boolean | undefined> {
+    return this.getFunctionEditorPath(keyword.id!, dialogConfig).pipe(
+      tap((path) => {
+        if (!path) {
+          throw new Error('No path');
         }
+      }),
+      switchMap((editorPath) => {
+        if (this._multipleProjectService.isEntityBelongsToCurrentProject(keyword)) {
+          const continueEdit = true;
+          return of({ continueEdit, editorPath });
+        }
+
+        return this._multipleProjectService
+          .confirmEntityEditInASeparateProject(keyword, editorPath, 'keyword')
+          .pipe(map((continueEdit) => ({ continueEdit, editorPath })));
+      }),
+      map((result) => {
+        if (result.continueEdit) {
+          this._$location.path(result.editorPath);
+        }
+        return result.continueEdit;
+      }),
+      catchError((error) => {
+        console.error(error);
+        return of(undefined);
       })
     );
   }

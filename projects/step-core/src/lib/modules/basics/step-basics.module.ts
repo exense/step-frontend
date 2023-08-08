@@ -28,6 +28,7 @@ import { PreventCharsDirective } from './directives/prevent-chars.directive';
 import { SingleItemArrayFilterComponent } from './components/single-item-array-filter/single-item-array-filter.component';
 import { JsonRawEditorFormattedComponent } from './components/json-raw-editor-formatted/json-raw-editor-formatted.component';
 import { LabelAddonDirective } from './directives/label-addon.directive';
+import { ProjectSwitchDialogComponent } from './components/project-switch-dialog/project-switch-dialog.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
@@ -58,6 +59,7 @@ import { LabelAddonDirective } from './directives/label-addon.directive';
     JsonRawEditorFormattedComponent,
     LabelAddonDirective,
     SingleItemArrayFilterComponent,
+    ProjectSwitchDialogComponent,
   ],
   exports: [
     ResourceLabelComponent,
@@ -86,6 +88,7 @@ import { LabelAddonDirective } from './directives/label-addon.directive';
     SingleItemArrayFilterComponent,
     JsonRawEditorFormattedComponent,
     LabelAddonDirective,
+    ProjectSwitchDialogComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -99,6 +102,7 @@ export * from './components/input-filter/input-filter.component';
 export * from './components/resource-label/resource-label.component';
 export * from './components/json-raw-editor/json-raw-editor.component';
 export * from './components/json-raw-editor-formatted/json-raw-editor-formatted.component';
+export * from './components/project-switch-dialog/project-switch-dialog.component';
 export * from './components/modal-window/modal-window.component';
 export * from './components/form-field/form-field.component';
 export * from './components/cron-selector/cron-selector.component';
@@ -111,7 +115,6 @@ export * from './services/credentials.service';
 export * from './services/auth.service';
 export * from './services/item-by-id-cache.service';
 export * from './services/hybrid-injector-helper';
-export * from './services/project-management-helper.service';
 export * from './services/cron-presets.token';
 export * from './shared/angularjs-provider-options';
 export * from './shared/auth-context.interface';
@@ -119,8 +122,6 @@ export * from './shared/compare-condition.enum';
 export * from './shared/credentials-strategy';
 export * from './shared/alert-type.enum';
 export * from './shared/restore-dialog-data';
-export * from './shared/project-management-helper-strategy.interface';
-export * from './shared/project-info.interface';
 export * from './shared/screen-width.token';
 export * from './shared/is-small-screen.token';
 export * from './shared/resize-observable';
@@ -153,4 +154,5 @@ export * from './services/view-id-link-prefix.token';
 export * from './services/navigator.service';
 export * from './services/multiple-projects.service';
 export * from './services/generate-api-key.service';
+export * from './services/editor-resolver.service';
 export * from './shared/logout-cleanup.token';

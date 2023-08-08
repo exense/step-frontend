@@ -352,9 +352,8 @@ export class PlanEditorBaseComponent
   }
 
   private openFunctionEditor(keyword: KeywordCall): Observable<unknown> {
-    const keywordId = keyword!.id!;
     const project = keyword!.attributes!['project'];
-    return this._functionDialogs.openFunctionEditor(keywordId).pipe(
+    return this._functionDialogs.openFunctionEditor(keyword).pipe(
       switchMap((isSuccess) => {
         if (isSuccess) {
           return from(this._linkProcessor.process(project)).pipe(map(() => isSuccess));

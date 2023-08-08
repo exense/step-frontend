@@ -57,8 +57,8 @@ export class FunctionListComponent {
     });
   }
 
-  editFunction(id: string): void {
-    this._functionDialogs.openFunctionEditor(id).subscribe();
+  editFunction(keyword: KeywordFunction): void {
+    this._functionDialogs.openFunctionEditor(keyword).subscribe();
   }
 
   executeFunction(id: string): void {

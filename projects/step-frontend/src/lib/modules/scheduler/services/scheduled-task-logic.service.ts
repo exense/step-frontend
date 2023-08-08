@@ -3,11 +3,15 @@ import {
   AugmentedSchedulerService,
   AuthService,
   DashboardService,
+  EditorResolverService,
   ExecutiontTaskParameters,
+  MultipleProjectsService,
   ScheduledTaskDialogsService,
 } from '@exense/step-core';
-import { Observable, switchMap } from 'rxjs';
+import { first, Observable, pipe, switchMap, take, tap } from 'rxjs';
 import { Location } from '@angular/common';
+
+const TASK_ID = 'taskId';
 
 @Injectable()
 export class ScheduledTaskLogicService {
@@ -16,16 +20,22 @@ export class ScheduledTaskLogicService {
   private _schedulerService = inject(AugmentedSchedulerService);
   private _scheduledTaskDialogs = inject(ScheduledTaskDialogsService);
   private _location = inject(Location);
+  private _multipleProjectList = inject(MultipleProjectsService);
+  private _editorResolver = inject(EditorResolverService);
+
+  private updateDataSourceAfterChange = pipe(
+    tap((result?: ExecutiontTaskParameters | boolean) => {
+      if (result) {
+        this.dataSource.reload();
+      }
+    })
+  );
 
   readonly STATUS_ACTIVE_STRING = 'On';
   readonly STATUS_INACTIVE_STRING = 'Off';
   readonly STATUS: ReadonlyArray<string> = [this.STATUS_ACTIVE_STRING, this.STATUS_INACTIVE_STRING];
 
   readonly dataSource = this._schedulerService.createSelectionDataSource();
-
-  loadTable(): void {
-    this.dataSource.reload();
-  }
 
   isSchedulerEnabled(): Observable<boolean> {
     return this._schedulerService.isSchedulerEnabled();
@@ -45,9 +55,10 @@ export class ScheduledTaskLogicService {
           task.active
             ? this._schedulerService.enableExecutionTask(task.id!, false)
             : this._schedulerService.enableExecutionTask(task.id!, true)
-        )
+        ),
+        this.updateDataSourceAfterChange
       )
-      .subscribe(() => this.loadTable());
+      .subscribe();
   }
 
   navToStats(scheduledTask: ExecutiontTaskParameters) {
@@ -68,20 +79,22 @@ export class ScheduledTaskLogicService {
   }
 
   deleteParameter(scheduledTask: ExecutiontTaskParameters): void {
-    this._scheduledTaskDialogs.removeScheduledTask(scheduledTask).subscribe((result) => {
-      if (result) {
-        this.loadTable();
-      }
-    });
+    this._scheduledTaskDialogs.removeScheduledTask(scheduledTask).pipe(this.updateDataSourceAfterChange).subscribe();
   }
 
   editParameter(scheduledTask: ExecutiontTaskParameters): void {
-    this._schedulerService
-      .getExecutionTaskById(scheduledTask.id!)
-      .pipe(switchMap((task) => this._scheduledTaskDialogs.editScheduledTask(task)))
-      .subscribe((result) => {
-        if (result) {
-          this.loadTable();
+    if (this._multipleProjectList.isEntityBelongsToCurrentProject(scheduledTask)) {
+      this.editParameterInternal(scheduledTask.id!);
+      return;
+    }
+    const url = '/root/scheduler';
+    const editParams = { [TASK_ID]: scheduledTask.id! };
+
+    this._multipleProjectList
+      .confirmEntityEditInASeparateProject(scheduledTask, { url, search: editParams }, 'task')
+      .subscribe((continueEdit) => {
+        if (continueEdit) {
+          this.editParameterInternal(scheduledTask.id!);
         }
       });
   }
@@ -89,11 +102,27 @@ export class ScheduledTaskLogicService {
   createParameter() {
     this._schedulerService
       .createExecutionTask()
-      .pipe(switchMap((task) => this._scheduledTaskDialogs.editScheduledTask(task)))
-      .subscribe((result) => {
-        if (result) {
-          this.loadTable();
-        }
-      });
+      .pipe(
+        switchMap((task) => this._scheduledTaskDialogs.editScheduledTask(task)),
+        this.updateDataSourceAfterChange
+      )
+      .subscribe();
+  }
+
+  resolveEditLinkIfExists(): void {
+    this._editorResolver
+      .onEditEntity(TASK_ID)
+      .pipe(take(1))
+      .subscribe((taskId) => this.editParameterInternal(taskId));
+  }
+
+  private editParameterInternal(id: string): void {
+    this._schedulerService
+      .getExecutionTaskById(id)
+      .pipe(
+        switchMap((task) => this._scheduledTaskDialogs.editScheduledTask(task)),
+        this.updateDataSourceAfterChange
+      )
+      .subscribe();
   }
 }

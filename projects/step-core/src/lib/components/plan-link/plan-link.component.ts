@@ -3,9 +3,7 @@ import { map, of } from 'rxjs';
 import { Plan } from '../../client/step-client-module';
 import { CustomComponent } from '../../modules/custom-registeries/custom-registries.module';
 import { CustomColumnOptions } from '../../modules/table/table.module';
-import { a1Promise2Observable, AJS_LOCATION, DialogsService } from '../../shared';
-import { MultipleProjectsService } from '../../modules/basics/services/multiple-projects.service';
-import { catchError } from 'rxjs/operators';
+import { PlanDialogsService } from '../../services/plan-dialogs.service';
 
 @Component({
   selector: 'step-plan-link',
@@ -13,10 +11,8 @@ import { catchError } from 'rxjs/operators';
   styleUrls: ['./plan-link.component.scss'],
 })
 export class PlanLinkComponent implements CustomComponent {
-  private _location = inject(AJS_LOCATION);
   private _customColumnOptions = inject(CustomColumnOptions, { optional: true });
-  private _multipleProjects = inject(MultipleProjectsService);
-  private _dialogs = inject(DialogsService);
+  private _planDialogs = inject(PlanDialogsService);
 
   @Input() context?: Plan;
   @Input() iconOnly?: boolean;
@@ -30,29 +26,8 @@ export class PlanLinkComponent implements CustomComponent {
     if (!this.context) {
       return;
     }
-
-    const planUrl = `/root/plans/editor/${this.context!.id}`;
-
-    if (this._multipleProjects.isEntityBelongsToCurrentProject(this.context)) {
+    this._planDialogs.editPlan(this.context).subscribe((continueEdit) => {
       this.edit.emit();
-      this._location.path(planUrl);
-      return;
-    }
-
-    a1Promise2Observable(this._dialogs.showWarning('Selected plan belongs to another project, do you want to switch?'))
-      .pipe(
-        map(() => true),
-        catchError(() => of(false))
-      )
-      .subscribe((isSwitch) => {
-        if (!isSwitch) {
-          return;
-        }
-        const project = this._multipleProjects.getEntityProject(this.context!);
-        if (!project) {
-          return;
-        }
-        this._multipleProjects.switchToProject(project, planUrl);
-      });
+    });
   }
 }

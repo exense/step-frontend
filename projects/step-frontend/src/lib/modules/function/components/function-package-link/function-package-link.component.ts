@@ -75,12 +75,12 @@ export class FunctionPackageLinkComponent implements CustomComponent {
   }
 
   edit(): void {
-    if (!this.functionPackageId) {
+    if (!this.functionPackage) {
       return;
     }
     this.isRefreshing = true;
     this._functionPackageActionsService
-      .editFunctionPackage(this.functionPackageId)
+      .editFunctionPackage(this.functionPackage)
       .subscribe()
       .add(() => (this.isRefreshing = false));
   }

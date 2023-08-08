@@ -66,8 +66,8 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
     this._genericFunctionDialogService.openAddMaskDialog().subscribe(() => this.dataSource?.reload());
   }
 
-  editFunction(id: string): void {
-    this._genericFunctionDialogService.openEditMaskDialog(id);
+  editFunction(keyword: KeywordFunction): void {
+    this._genericFunctionDialogService.openEditMaskDialog(keyword);
   }
 
   executeFunction(id: string): void {

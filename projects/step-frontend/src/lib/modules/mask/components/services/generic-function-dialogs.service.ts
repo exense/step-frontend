@@ -37,8 +37,8 @@ export class GenericFunctionDialogService {
     return this._functionDialogs.openAddFunctionModal(this.config);
   }
 
-  openEditMaskDialog(id: string): void {
-    this._functionDialogs.openFunctionEditor(id, this.config).subscribe();
+  openEditMaskDialog(keyword: Keyword): void {
+    this._functionDialogs.openFunctionEditor(keyword, this.config).subscribe();
   }
 
   openLookupDialog(id: string, name: string): void {
