@@ -13,6 +13,8 @@ import { IsUsedByDialogService } from './is-used-by-dialog.service';
 import { MultipleProjectsService } from '../modules/basics/services/multiple-projects.service';
 import { PlanLinkDialogService } from '../components/plan-link/plan-link-dialog.service';
 
+const ARTEFACT_ID = 'artefactId';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -74,17 +76,25 @@ export class PlanDialogsService implements PlanLinkDialogService {
     this._isUsedByDialogs.displayDialog(`Plan "${name}" is used by`, 'PLAN_ID', id);
   }
 
-  editPlan(plan: Plan): Observable<boolean> {
+  editPlan(plan: Plan, artefactId?: string): Observable<boolean> {
     const planEditLink = `/root/plans/editor/${plan.id}`;
+
     if (this._multipleProjects.isEntityBelongsToCurrentProject(plan)) {
-      this._$location.path(planEditLink);
+      this.openPlanInternal(planEditLink, artefactId);
       return of(true);
     }
 
-    return this._multipleProjects.confirmEntityEditInASeparateProject(plan, planEditLink, 'plan').pipe(
+    const editLinkParams = !artefactId
+      ? planEditLink
+      : {
+          url: planEditLink,
+          search: { [ARTEFACT_ID]: artefactId },
+        };
+
+    return this._multipleProjects.confirmEntityEditInASeparateProject(plan, editLinkParams, 'plan').pipe(
       tap((continueEdit) => {
         if (continueEdit) {
-          this._$location.path(planEditLink);
+          this.openPlanInternal(planEditLink, artefactId);
         }
       })
     );
@@ -92,6 +102,13 @@ export class PlanDialogsService implements PlanLinkDialogService {
 
   executePlan(planId: string): void {
     this._$location.path(`/root/repository`).search({ repositoryId: 'local', planid: planId });
+  }
+
+  private openPlanInternal(planEditLink: string, artefactId?: string): void {
+    if (artefactId) {
+      this._$location.search(ARTEFACT_ID, artefactId);
+    }
+    this._$location.path(planEditLink);
   }
 }
 

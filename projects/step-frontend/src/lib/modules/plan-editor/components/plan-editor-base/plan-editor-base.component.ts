@@ -1,4 +1,3 @@
-import { DOCUMENT } from '@angular/common';
 import {
   Component,
   forwardRef,
@@ -21,7 +20,6 @@ import {
   DialogsService,
   Function as KeywordCall,
   KeywordsService,
-  LinkProcessorService,
   Plan,
   PlanArtefactResolverService,
   PlanEditorService,
@@ -32,8 +30,9 @@ import {
   TreeNodeUtilsService,
   TreeStateService,
   ArtefactService,
+  PlanLinkDialogService,
 } from '@exense/step-core';
-import { catchError, filter, from, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { catchError, filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
@@ -78,16 +77,15 @@ export class PlanEditorBaseComponent
   private _planApi = inject(PlansService);
   private _keywordCallsApi = inject(KeywordsService);
   private _dialogsService = inject(DialogsService);
-  private _linkProcessor = inject(LinkProcessorService);
   private _functionDialogs = inject(FunctionDialogsService);
+  private _planLinkDialogs = inject(PlanLinkDialogService, { optional: true });
   private _artefactService = inject(ArtefactService);
   public _planEditService = inject(PlanEditorService);
   private _restoreDialogsService = inject(RestoreDialogsService);
-  private _location = inject(AJS_LOCATION);
-  private _document = inject(DOCUMENT);
+  private _location$ = inject(AJS_LOCATION);
 
   private get artefactIdFromUrl(): string | undefined {
-    const { artefactId } = this._location.search() || {};
+    const { artefactId } = this._location$.search() || {};
     return artefactId;
   }
 
@@ -330,37 +328,14 @@ export class PlanEditorBaseComponent
   }
 
   private openPlan(plan: Plan): Observable<unknown> {
-    const planId = plan!.id!;
-    const project = plan!.attributes!['project'];
-    return from(this._linkProcessor.process(project)).pipe(
-      catchError((errorMessage) => {
-        this._dialogsService.showErrorMsg(errorMessage);
-        return of(undefined);
-      }),
-      tap((isSuccess) => {
-        if (isSuccess) {
-          // for some reason location change isn't enough for reopen editor
-          // that's why the document reload was added
-          // It should gone, after the route will be refactored
-          this._location.path(`/root/plans/editor/${planId}`);
-          setTimeout(() => {
-            this._document.location.reload();
-          }, 100);
-        }
-      })
-    );
+    if (!this._planLinkDialogs) {
+      return of(undefined);
+    }
+    return this._planLinkDialogs.editPlan(plan);
   }
 
   private openFunctionEditor(keyword: KeywordCall): Observable<unknown> {
-    const project = keyword!.attributes!['project'];
-    return this._functionDialogs.openFunctionEditor(keyword).pipe(
-      switchMap((isSuccess) => {
-        if (isSuccess) {
-          return from(this._linkProcessor.process(project)).pipe(map(() => isSuccess));
-        }
-        return of(undefined);
-      })
-    );
+    return this._functionDialogs.openFunctionEditor(keyword);
   }
 
   private synchronizeDynamicName(artefact: AbstractArtefact): void {
