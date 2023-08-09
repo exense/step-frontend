@@ -11,11 +11,12 @@ import { ExportDialogsService } from './export-dialogs.service';
 import { ImportDialogsService } from './import-dialogs.service';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
 import { MultipleProjectsService } from '../modules/basics/services/multiple-projects.service';
+import { PlanLinkDialogService } from '../components/plan-link/plan-link-dialog.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class PlanDialogsService {
+export class PlanDialogsService implements PlanLinkDialogService {
   private _matDialog = inject(MatDialog);
   private _plansApiService = inject(AugmentedPlansService);
   private _dialogs = inject(DialogsService);

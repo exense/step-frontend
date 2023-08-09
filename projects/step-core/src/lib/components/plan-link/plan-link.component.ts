@@ -3,7 +3,7 @@ import { map, of } from 'rxjs';
 import { Plan } from '../../client/step-client-module';
 import { CustomComponent } from '../../modules/custom-registeries/custom-registries.module';
 import { CustomColumnOptions } from '../../modules/table/table.module';
-import { PlanDialogsService } from '../../services/plan-dialogs.service';
+import { PlanLinkDialogService } from './plan-link-dialog.service';
 
 @Component({
   selector: 'step-plan-link',
@@ -12,7 +12,7 @@ import { PlanDialogsService } from '../../services/plan-dialogs.service';
 })
 export class PlanLinkComponent implements CustomComponent {
   private _customColumnOptions = inject(CustomColumnOptions, { optional: true });
-  private _planDialogs = inject(PlanDialogsService);
+  private _planDialogs = inject(PlanLinkDialogService, { optional: true });
 
   @Input() context?: Plan;
   @Input() iconOnly?: boolean;
@@ -23,11 +23,13 @@ export class PlanLinkComponent implements CustomComponent {
   );
 
   editPlan(): void {
-    if (!this.context) {
+    if (!this.context || !this._planDialogs) {
       return;
     }
     this._planDialogs.editPlan(this.context).subscribe((continueEdit) => {
-      this.edit.emit();
+      if (continueEdit) {
+        this.edit.emit();
+      }
     });
   }
 }

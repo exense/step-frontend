@@ -291,6 +291,7 @@ export { KeywordNameComponent } from './components/keyword-name/keyword-name.com
 export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 export { PlanLinkComponent } from './components/plan-link/plan-link.component';
+export { PlanLinkDialogService } from './components/plan-link/plan-link-dialog.service';
 export { PlanNameComponent } from './components/plan-name/plan-name.component';
 export * from './components/plan-tree/plan-tree.component';
 export { PredefinedOptionsInputComponent } from './components/predefined-options-input/predefined-options-input.component';
