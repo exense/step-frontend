@@ -9,7 +9,7 @@ import {
   TimeSeriesAPIResponse,
 } from '@exense/step-core';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { TimeSeriesKeywordsContext } from '../../pages/execution-page/time-series-keywords.context';
+import { KeywordSelection, TimeSeriesKeywordsContext } from '../../pages/execution-page/time-series-keywords.context';
 import { TimeSeriesContext } from '../../time-series-context';
 
 interface TableEntry {
@@ -39,9 +39,10 @@ interface TableEntry {
 export class TimeseriesTableComponent implements OnInit, OnDestroy {
   tableData$ = new BehaviorSubject<TableEntry[]>([]);
   tableDataSource: TableDataSource<TableEntry> | undefined;
+  private entriesByIds = new Map<string, TableEntry>();
+
   readonly BASE_COLUMNS = ['name', 'count', 'sum', 'avg', 'min', 'max', 'pcl_80', 'pcl_90', 'pcl_99', 'tps', 'tph'];
 
-  bucketsByKeywords: { [key: string]: BucketResponse } = {};
   tableIsLoading = true;
   dimensionKey = 'name';
   baseResponse: TimeSeriesAPIResponse | undefined; // in the context of compare mode, the main execution is the 'base' one
@@ -61,8 +62,24 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
       throw new Error('Execution context is mandatory');
     }
     this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
-    this.executionContext.keywordsContext.onKeywordToggled().subscribe((selection) => {
-      this.bucketsByKeywords[selection.id].attributes!['isSelected'] = selection.isSelected;
+    const keywordsContext = this.executionContext.keywordsContext;
+    keywordsContext.onKeywordToggled().subscribe((selection) => {
+      // this.bucketsByKeywords[selection.id].attributes!['isSelected'] = selection.isSelected;
+      const entries = this.tableData$.getValue();
+      entries.forEach((entry) => {
+        if (entry.name === selection.id) {
+          entry.isSelected = selection.isSelected;
+        }
+      });
+    });
+    keywordsContext.onKeywordsUpdated().subscribe((keywords) => {
+      Object.keys(keywords).forEach((keyword) => {
+        const selection: KeywordSelection = keywords[keyword];
+        const existingEntry = this.entriesByIds.get(selection.id);
+        if (existingEntry) {
+          existingEntry.isSelected = selection.isSelected;
+        }
+      });
     });
   }
 
@@ -77,16 +94,18 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     const compareData = this.compareModeEnabled
       ? this.processResponse(this.compareResponse!, this.compareContext!)
       : undefined;
-    this.tableData$.next(this.mergeBaseAndCompareData(baseData, compareData));
+    const mergedData = this.mergeBaseAndCompareData(baseData, compareData);
+    this.updateDataSourceAndKeywords(mergedData);
     this.tableIsLoading = false;
   }
 
   updateCompareData(response: TimeSeriesAPIResponse, compareContext: TimeSeriesContext) {
     this.tableIsLoading = false;
     this.compareResponse = response;
-    let baseData = this.processResponse(this.baseResponse!, this.executionContext);
-    let compareData = this.processResponse(response, compareContext);
-    this.tableData$.next(this.mergeBaseAndCompareData(baseData, compareData));
+    const baseData = this.processResponse(this.baseResponse!, this.executionContext);
+    const compareData = this.processResponse(response, compareContext);
+    const mergedData = this.mergeBaseAndCompareData(baseData, compareData);
+    this.updateDataSourceAndKeywords(mergedData);
   }
 
   private mergeBaseAndCompareData(baseBuckets: ProcessedBuckets, compareBuckets?: ProcessedBuckets): TableEntry[] {
@@ -114,7 +133,6 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         tphDiff: this.percentageBetween(base?.attributes['tph'], compare?.attributes['tph']),
       };
     });
-    this.executionContext.keywordsContext.setKeywords(allKeywords, true);
     return entries;
   }
 
@@ -149,8 +167,20 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     this.compareResponse = response;
     const baseData = this.processResponse(this.baseResponse!, this.executionContext);
     const compareData = this.processResponse(response, compareContext);
-    console.log(compareData);
-    this.tableData$.next(this.mergeBaseAndCompareData(baseData, compareData));
+    const mergedData = this.mergeBaseAndCompareData(baseData, compareData);
+    this.updateDataSourceAndKeywords(mergedData);
+  }
+
+  private updateDataSourceAndKeywords(data: TableEntry[], selectAllKeywords = false): void {
+    const keywords: string[] = [];
+    const entriesByIds = new Map<string, TableEntry>();
+    data.forEach((entry) => {
+      entriesByIds.set(entry.name, entry);
+      keywords.push(entry.name);
+    });
+    this.entriesByIds = entriesByIds; // for caching purpose
+    this.executionContext.keywordsContext.setKeywords(keywords, selectAllKeywords);
+    this.tableData$.next(data);
   }
 
   disableCompareMode() {
@@ -160,7 +190,6 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   }
 
   onKeywordToggle(entry: TableEntry) {
-    console.log('keyword toggle:', entry);
     this.executionContext.keywordsContext.toggleKeyword(entry.name);
   }
 

@@ -26,14 +26,14 @@ step-timeseries-table {
     white-space: nowrap;
 
     th .subtitle {
-      opacity: 0.6;
       font-size: 11px;
       font-weight: 400;
-      color: var.$gray-500;
+      color: var.$gray-400;
+    }
 
-      &.compare {
-        color: var.$orange;
-      }
+    .compare-value {
+      color: var.$orange !important;
+      opacity: 0.6;
     }
 
     th div {
@@ -46,12 +46,8 @@ step-timeseries-table {
     left: 0;
   }
 
-  .compare-column {
-  }
-
   .compare-diff {
     font-size: 10px;
-    color: var.$orange;
     opacity: 0.6;
     margin-left: 4px;
   }

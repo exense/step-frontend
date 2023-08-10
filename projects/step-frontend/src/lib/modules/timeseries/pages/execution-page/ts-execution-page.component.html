@@ -1,17 +1,15 @@
 <ng-container *ngIf="!executionHasToBeBuilt">
   <div class="header-buttons">
-    <button
-      class="menu-btn"
-      [matMenuTriggerFor]="menu"
-      mat-icon-button
-      aria-label="Example icon button with a vertical three dot icon"
-    >
-      <step-icon name="settings"></step-icon>
+    <button class="menu-btn" [matMenuTriggerFor]="menu" mat-button>
+      <div class="icon-container">
+        <step-icon name="settings"></step-icon>
+      </div>
+      <span>Settings</span>
     </button>
   </div>
   <mat-menu #menu="matMenu">
     <button mat-menu-item (click)="toggleCompareMode()">
-      <step-icon name="bar-chart-2"></step-icon>
+      <step-icon name="bar-chart-2" [class.active]="compareModeEnabled"></step-icon>
       {{ compareModeEnabled ? 'Disable Compare Mode' : 'Enable Compare Mode' }}
     </button>
     <button mat-menu-item (click)="exportRawData()">

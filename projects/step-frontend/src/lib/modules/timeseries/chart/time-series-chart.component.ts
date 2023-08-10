@@ -94,6 +94,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   createChart(settings: TSChartSettings): void {
     this.legendSettings.items = [];
     this.chartIsUnavailable = false;
+    this.seriesIndexesByIds = {};
 
     const cursorOpts: uPlot.Cursor = {
       lock: false,
@@ -130,7 +131,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
           seriesId: series.id,
           color: (series.stroke as string) || '#cccccc',
           label: series.legendName,
-          isVisible: true,
+          isVisible: !!series.show,
         });
       }
     });
@@ -208,6 +209,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   }
 
   hideSeries(id: string): void {
+    console.log('hiding', id, this.seriesIndexesByIds);
     let index = this.seriesIndexesByIds[id];
     if (index == undefined) return;
     this.uplot.setSeries(index, { show: false });
@@ -306,7 +308,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   }
 
   /**
-   * The complete chart data will be overriden
+   * The complete chart data will be updated
    * @param series
    */
   updateFullData(series: TSChartSeries[]): void {
@@ -317,7 +319,10 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       this.uplot.addSeries({
         label: 'Timestamp',
       });
-      series.forEach((s) => this.uplot.addSeries(s));
+      series.forEach((s, i) => {
+        this.uplot.addSeries(s);
+        this.seriesIndexesByIds[i] = i + 1;
+      });
       this.uplot.setData(data, true);
     });
   }

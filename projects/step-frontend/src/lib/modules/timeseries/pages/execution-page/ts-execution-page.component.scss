@@ -1,10 +1,12 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 :host {
   position: relative;
 }
 
 .header-buttons {
   position: absolute;
-  right: 48px;
+  right: 44px;
   top: -68px;
   display: flex;
   z-index: 100;
@@ -44,5 +46,15 @@
   }
 }
 
+.icon-container {
+  margin-right: 8px;
+}
+
 .menu-btn {
+  display: flex;
+  align-items: center;
+}
+
+.active {
+  color: var.$orange;
 }

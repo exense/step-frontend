@@ -29,7 +29,7 @@ export class TimeSeriesKeywordsContext {
   }
 
   /**
-   * Just the specified keywords will be visible, but the other's selections will be saved
+   * Just the specified keywords will be visible, but the other's selections will be saved and not visible
    */
   setKeywords(keywords: string[], selectAll = false): void {
     Object.keys(this.keywords).forEach((keyword) => {
@@ -41,7 +41,7 @@ export class TimeSeriesKeywordsContext {
         this.keywords[keyword] = {
           id: keyword,
           isVisible: true,
-          isSelected: this.allKeywordsSelected || selectAll,
+          isSelected: true,
           color: this.colorsPool.getColor(keyword),
         };
       } else {
