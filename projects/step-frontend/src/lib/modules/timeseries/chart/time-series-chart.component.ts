@@ -82,7 +82,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   setTitle(title: string): void {
     let titles = this.chartElement.nativeElement.getElementsByClassName('u-title');
-    console.log('SETTING TITLE', titles[0].innerHTML, title);
     if (titles.length) {
       titles[0].innerHTML = title;
     }
@@ -209,7 +208,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   }
 
   hideSeries(id: string): void {
-    console.log('hiding', id, this.seriesIndexesByIds);
     let index = this.seriesIndexesByIds[id];
     if (index == undefined) return;
     this.uplot.setSeries(index, { show: false });
