@@ -10,6 +10,7 @@ import { EntitiesSelectionModule } from '../entities-selection/entities-selectio
 import { FunctionTypeLabelPipe } from './pipes/function-type-label.pipe';
 import { FunctionSelectionTableComponent } from './components/function-selection-table/function-selection-table.component';
 import { EntityModule, EntityRegistry } from '../entity/entity.module';
+import { CustomRegistriesModule } from '../custom-registeries/custom-registries.module';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { EntityModule, EntityRegistry } from '../entity/entity.module';
     ReactiveFormsModule,
     StepBasicsModule,
     StepMaterialModule,
+    CustomRegistriesModule,
     TableModule,
     EntityModule,
     EntitiesSelectionModule,

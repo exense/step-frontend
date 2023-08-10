@@ -1,5 +1,5 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
-import { FunctionTypeRegistryService } from '@exense/step-core';
+import { FunctionTypeRegistryService } from '../../custom-registeries/custom-registries.module';
 
 @Pipe({
   name: 'functionTypeLabel',
