@@ -67,6 +67,7 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    this._functionActions.resolveConfigureLinkIfExits(this._injector, this.config);
     this.dataSource = this._augmentedKeywordsService.createFilteredTableDataSource(this.filter);
   }
 
@@ -114,6 +115,10 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
   }
 
   configureFunction(id: string) {
-    this._functionActions.configureFunction(this._injector, id, this.config).subscribe(() => this.dataSource?.reload());
+    this._functionActions.configureFunction(this._injector, id, this.config).subscribe((result) => {
+      if (result) {
+        this.dataSource?.reload();
+      }
+    });
   }
 }

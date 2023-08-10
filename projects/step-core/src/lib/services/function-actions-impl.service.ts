@@ -1,9 +1,9 @@
 import { Injectable, inject, Injector, EnvironmentInjector } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { ILocationService } from 'angular';
-import { Observable, catchError, map, of, switchMap, tap } from 'rxjs';
+import { Observable, catchError, map, of, switchMap, tap, take } from 'rxjs';
 import { AugmentedKeywordsService, Function as Keyword } from '../client/step-client-module';
-import { MultipleProjectsService } from '../modules/basics/step-basics.module';
+import { EditorResolverService, MultipleProjectsService } from '../modules/basics/step-basics.module';
 import { EntityDialogsService } from '../modules/entity/entity.module';
 import {
   FunctionActionsService,
@@ -17,10 +17,14 @@ import { ExportDialogsService } from './export-dialogs.service';
 import { ImportDialogsService } from './import-dialogs.service';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
 
+const CONFIGURER_KEYWORD_ID = 'configurerKeywordId';
+const ENTITY_TYPE = 'keyword';
+
 @Injectable({
   providedIn: 'root',
 })
 export class FunctionActionsImplService implements FunctionActionsService {
+  private _editorResolver = inject(EditorResolverService);
   private _multipleProjectService = inject(MultipleProjectsService);
   private _functionApiService = inject(AugmentedKeywordsService);
   private _dialogs = inject(DialogsService);
@@ -49,12 +53,28 @@ export class FunctionActionsImplService implements FunctionActionsService {
     dialogConfig?: FunctionDialogsConfig
   ): Observable<Keyword | undefined> {
     return this.getFunctionById(id).pipe(
-      switchMap((keyword) =>
-        this.openModal(parentInjector, {
-          keyword,
-          dialogConfig,
-        })
-      )
+      switchMap((keyword) => {
+        if (!keyword) {
+          return of({ keyword, continueEdit: false });
+        }
+
+        if (this._multipleProjectService.isEntityBelongsToCurrentProject(keyword)) {
+          return of({ keyword, continueEdit: true });
+        }
+
+        const url = this._$location.path();
+        const editParam = { [CONFIGURER_KEYWORD_ID]: id };
+
+        return this._multipleProjectService
+          .confirmEntityEditInASeparateProject(keyword, { url, search: editParam }, ENTITY_TYPE)
+          .pipe(map((continueEdit) => ({ keyword, continueEdit })));
+      }),
+      switchMap(({ continueEdit, keyword }) => {
+        if (continueEdit) {
+          return this.openModal(parentInjector, { keyword, dialogConfig });
+        }
+        return of(undefined);
+      })
     );
   }
 
@@ -99,7 +119,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
         }
 
         return this._multipleProjectService
-          .confirmEntityEditInASeparateProject(keyword, editorPath, 'keyword')
+          .confirmEntityEditInASeparateProject(keyword, editorPath, ENTITY_TYPE)
           .pipe(map((continueEdit) => ({ continueEdit, editorPath })));
       }),
       map((result) => {
@@ -124,6 +144,17 @@ export class FunctionActionsImplService implements FunctionActionsService {
     return function$;
   }
 
+  resolveConfigureLinkIfExits(parentInjector: Injector, dialogConfig?: FunctionDialogsConfig): void {
+    this._editorResolver
+      .onEditEntity(CONFIGURER_KEYWORD_ID)
+      .pipe(
+        take(1),
+        switchMap((keywordId) => (keywordId ? this.getFunctionById(keywordId) : of(undefined))),
+        switchMap((keyword) => (keyword ? this.openModal(parentInjector, { keyword, dialogConfig }) : of(undefined)))
+      )
+      .subscribe();
+  }
+
   protected newFunctionTypeConf(type: string): Observable<Keyword> {
     return this._functionApiService.newFunctionTypeConf(type);
   }
@@ -138,6 +169,21 @@ export class FunctionActionsImplService implements FunctionActionsService {
 
   protected getFunctionById(id: string): Observable<Keyword> {
     return this._functionApiService.getFunctionById(id);
+  }
+
+  private configureFunctionInternal(
+    parentInjector: Injector,
+    id: string,
+    dialogConfig?: FunctionDialogsConfig
+  ): Observable<Keyword | undefined> {
+    return this.getFunctionById(id).pipe(
+      switchMap((keyword) =>
+        this.openModal(parentInjector, {
+          keyword,
+          dialogConfig,
+        })
+      )
+    );
   }
 
   private openModal(

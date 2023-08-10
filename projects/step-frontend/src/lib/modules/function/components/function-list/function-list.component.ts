@@ -1,4 +1,4 @@
-import { Component, inject, Injector } from '@angular/core';
+import { AfterViewInit, Component, inject, Injector } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_LOCATION,
@@ -31,7 +31,7 @@ import { FunctionBulkOperationsInvokeService } from '../../services/function-bul
     },
   ],
 })
-export class FunctionListComponent {
+export class FunctionListComponent implements AfterViewInit {
   private _injector = inject(Injector);
   private _functionApiService = inject(AugmentedKeywordsService);
   private _interactivePlanExecutionApiService = inject(InteractivePlanExecutionService);
@@ -45,6 +45,10 @@ export class FunctionListComponent {
     { operation: BulkOperationType.delete, permission: 'kw-delete' },
     { operation: BulkOperationType.duplicate, permission: 'kw-write' },
   ];
+
+  ngAfterViewInit(): void {
+    this._functionActions.resolveConfigureLinkIfExits(this._injector);
+  }
 
   addFunction(): void {
     this._functionActions.openAddFunctionModal(this._injector).subscribe(() => this.dataSource.reload());
@@ -101,7 +105,11 @@ export class FunctionListComponent {
   }
 
   configureFunction(id: string): void {
-    this._functionActions.configureFunction(this._injector, id).subscribe(() => this.dataSource.reload());
+    this._functionActions.configureFunction(this._injector, id).subscribe((result) => {
+      if (result) {
+        this.dataSource.reload();
+      }
+    });
   }
 }
 
