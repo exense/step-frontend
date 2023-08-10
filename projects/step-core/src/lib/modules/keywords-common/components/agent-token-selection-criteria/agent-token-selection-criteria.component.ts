@@ -3,7 +3,7 @@ import { FormArray, FormBuilder } from '@angular/forms';
 import {
   AgentTokenSelectionCriteriaForm,
   agentTokenSelectionCriteriaFormCreate,
-} from '../../shared/agent-token-selection-criteria.form';
+} from '../../types/agent-token-selection-criteria.form';
 
 @Component({
   selector: 'step-agent-token-selection-criteria',

@@ -1,11 +1,11 @@
 import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { BulkOperationsInvokeService } from '../../table/table.module';
 import {
   AsyncTaskStatus,
   AugmentedKeywordsService,
-  BulkOperationsInvokeService,
   TableBulkOperationRequest,
-} from '@exense/step-core';
-import { Observable } from 'rxjs';
+} from '../../../client/step-client-module';
 
 @Injectable()
 export class GenericFunctionBulkOperationsInvokeService extends BulkOperationsInvokeService<string> {

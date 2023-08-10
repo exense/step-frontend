@@ -31,10 +31,10 @@ import {
   TreeStateService,
   ArtefactService,
   PlanLinkDialogService,
+  FunctionActionsService,
 } from '@exense/step-core';
 import { catchError, filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
-import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
@@ -77,7 +77,7 @@ export class PlanEditorBaseComponent
   private _planApi = inject(PlansService);
   private _keywordCallsApi = inject(KeywordsService);
   private _dialogsService = inject(DialogsService);
-  private _functionDialogs = inject(FunctionDialogsService);
+  private _functionActions = inject(FunctionActionsService);
   private _planLinkDialogs = inject(PlanLinkDialogService, { optional: true });
   private _artefactService = inject(ArtefactService);
   public _planEditService = inject(PlanEditorService);
@@ -335,7 +335,7 @@ export class PlanEditorBaseComponent
   }
 
   private openFunctionEditor(keyword: KeywordCall): Observable<unknown> {
-    return this._functionDialogs.openFunctionEditor(keyword);
+    return this._functionActions.openFunctionEditor(keyword);
   }
 
   private synchronizeDynamicName(artefact: AbstractArtefact): void {

@@ -1,13 +1,13 @@
 import { KeyValue } from '@angular/common';
 import { AbstractControl, FormBuilder, ValidationErrors } from '@angular/forms';
-import { DynamicValueInteger, Function as Keyword, JsonValue } from '../client/generated';
+import { DynamicValueInteger, Function as Keyword, JsonValue } from '../../../client/step-client-module';
 import {
   AgentTokenSelectionCriteriaForm,
   agentTokenSelectionCriteriaFormCreate,
 } from './agent-token-selection-criteria.form';
 import { FunctionConfigurationDialogData } from './function-configuration-dialog-data.interface';
 import { FunctionType } from './function-type.enum';
-import { dynamicValueFactory, toKeyValuePairs, toRecord } from './utils';
+import { dynamicValueFactory, toKeyValuePairs, toRecord } from '../../../shared/utils';
 
 export type FunctionConfigurationDialogForm = ReturnType<typeof functionConfigurationDialogFormCreate>;
 

@@ -1,5 +1,5 @@
 import { FormBuilder } from '@angular/forms';
-import { KeyValuePair } from '../domain';
+import { KeyValue } from '@angular/common';
 
 export type AgentTokenSelectionCriteriaForm = ReturnType<typeof agentTokenSelectionCriteriaFormCreate>;
 
@@ -14,7 +14,7 @@ export const agentTokenSelectionCriteriaFormCreate = (formBuilder: FormBuilder) 
 
 export const agentTokenSelectionCriteriaFormSetValueToForm = (
   form: AgentTokenSelectionCriteriaForm,
-  model: KeyValuePair<string, string>
+  model: KeyValue<string, string>
 ): void => {
   const { key, value } = model;
 
@@ -26,7 +26,7 @@ export const agentTokenSelectionCriteriaFormSetValueToForm = (
 
 export const agentTokenSelectionCriteriaFormSetValueToModel = (
   form: AgentTokenSelectionCriteriaForm,
-  model: KeyValuePair<string, string>
+  model: KeyValue<string, string>
 ): void => {
   const { key, value } = form.value;
 

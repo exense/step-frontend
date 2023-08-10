@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, ValidatorFn } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
-import { CustomComponent } from '../modules/custom-registeries/custom-registries.module';
-import { FunctionTypeFormComponentContext } from './function-type-form-component-context.interface';
+import { CustomComponent } from '../../../custom-registeries/custom-registries.module';
+import { FunctionTypeFormComponentContext } from '../../types/function-type-form-component-context.interface';
 
 @Component({
   template: '',

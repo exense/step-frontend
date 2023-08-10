@@ -1,22 +1,27 @@
-import { AfterViewInit, Component, inject, Input, OnInit } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
+import { AfterViewInit, Component, inject, Injector, Input, OnInit } from '@angular/core';
 import {
-  AJS_LOCATION,
-  AJS_MODULE,
-  AJS_ROOT_SCOPE,
   AugmentedKeywordsService,
-  AutoDeselectStrategy,
+  Function as Keyword,
+  InteractivePlanExecutionService,
+  StepDataSource,
+} from '../../client/step-client-module';
+import {
   BulkOperationsInvokeService,
   BulkOperationType,
-  Function as KeywordFunction,
-  InteractivePlanExecutionService,
-  selectionCollectionProvider,
-  StepDataSource,
   STORE_ALL,
   tablePersistenceConfigProvider,
-} from '@exense/step-core';
-import { GenericFunctionBulkOperationsInvokeService } from '../services/generic-function-bulk-operations-invoke.service';
-import { GenericFunctionDialogService } from '../services/generic-function-dialogs.service';
+} from '../../modules/table/table.module';
+import {
+  AutoDeselectStrategy,
+  selectionCollectionProvider,
+} from '../../modules/entities-selection/entities-selection.module';
+import {
+  FunctionActionsService,
+  FunctionDialogsConfig,
+  FunctionDialogsConfigFactoryService,
+  GenericFunctionBulkOperationsInvokeService,
+} from '../../modules/keywords-common/keywords-common.module';
+import { AJS_LOCATION, AJS_ROOT_SCOPE } from '../../shared';
 
 @Component({
   selector: 'step-generic-function-list',
@@ -24,7 +29,7 @@ import { GenericFunctionDialogService } from '../services/generic-function-dialo
   styleUrls: ['./generic-function-list.component.scss'],
   providers: [
     tablePersistenceConfigProvider('genericFunctionList', STORE_ALL),
-    selectionCollectionProvider<string, KeywordFunction>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {
       provide: BulkOperationsInvokeService,
       useClass: GenericFunctionBulkOperationsInvokeService,
@@ -32,8 +37,13 @@ import { GenericFunctionDialogService } from '../services/generic-function-dialo
   ],
 })
 export class GenericFunctionListComponent implements OnInit, AfterViewInit {
+  private _functionDialogsConfigFactoryService = inject(FunctionDialogsConfigFactoryService);
+  private _functionActions = inject(FunctionActionsService);
+
+  private config?: FunctionDialogsConfig;
+
+  private _injector = inject(Injector);
   private _interactivePlanExecutionService = inject(InteractivePlanExecutionService);
-  private _genericFunctionDialogService = inject(GenericFunctionDialogService);
   private _augmentedKeywordsService = inject(AugmentedKeywordsService);
   private _$rootScope = inject(AJS_ROOT_SCOPE);
   private _location = inject(AJS_LOCATION);
@@ -41,9 +51,8 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
   @Input() filter?: string[];
   @Input() filterClass?: string[];
   @Input() title?: string;
-  @Input() serviceRoot?: string;
 
-  protected dataSource?: StepDataSource<KeywordFunction>;
+  protected dataSource?: StepDataSource<Keyword>;
 
   readonly availableBulkOperations = [
     { operation: BulkOperationType.delete, permission: 'mask-delete' },
@@ -51,9 +60,8 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
   ];
 
   ngOnInit(): void {
-    this._genericFunctionDialogService.configure({
+    this.configure({
       title: this.title ?? '',
-      serviceRoot: this.serviceRoot ?? '',
       filterClass: this.filterClass ?? [],
     });
   }
@@ -62,12 +70,21 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
     this.dataSource = this._augmentedKeywordsService.createFilteredTableDataSource(this.filter);
   }
 
-  addMask(): void {
-    this._genericFunctionDialogService.openAddMaskDialog().subscribe(() => this.dataSource?.reload());
+  private configure(options?: { title?: string; filterClass?: string[] }): void {
+    this.config = this._functionDialogsConfigFactoryService.getConfigObject(
+      options?.title ?? '',
+      options?.filterClass ?? [],
+      true,
+      'functionTable'
+    );
   }
 
-  editFunction(keyword: KeywordFunction): void {
-    this._genericFunctionDialogService.openEditMaskDialog(keyword);
+  addMask(): void {
+    this._functionActions.openAddFunctionModal(this._injector, this.config).subscribe(() => this.dataSource?.reload());
+  }
+
+  editFunction(keyword: Keyword): void {
+    this._functionActions.openFunctionEditor(keyword).subscribe();
   }
 
   executeFunction(id: string): void {
@@ -85,7 +102,7 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
   }
 
   deleteFunction(id: string, name: string): void {
-    this._genericFunctionDialogService.openDeleteDialog(id, name).subscribe((result) => {
+    this._functionActions.openDeleteFunctionDialog(id, name).subscribe((result) => {
       if (result) {
         this.dataSource?.reload();
       }
@@ -93,14 +110,10 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
   }
 
   lookUp(id: string, name: string): void {
-    this._genericFunctionDialogService.openLookupDialog(id, name);
+    return this._functionActions.openLookUpFunctionDialog(id, name);
   }
 
   configureFunction(id: string) {
-    this._genericFunctionDialogService.openConfigDialog(id).subscribe(() => this.dataSource?.reload());
+    this._functionActions.configureFunction(this._injector, id, this.config).subscribe(() => this.dataSource?.reload());
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepGenericFunctionList', downgradeComponent({ component: GenericFunctionListComponent }));

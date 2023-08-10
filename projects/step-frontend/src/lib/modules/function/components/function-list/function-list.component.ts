@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Injector } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_LOCATION,
@@ -13,8 +13,8 @@ import {
   selectionCollectionProvider,
   tablePersistenceConfigProvider,
   STORE_ALL,
+  FunctionActionsService,
 } from '@exense/step-core';
-import { FunctionDialogsService } from '../../services/function-dialogs.service';
 import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
 import { FunctionBulkOperationsInvokeService } from '../../services/function-bulk-operations-invoke.service';
 
@@ -32,9 +32,10 @@ import { FunctionBulkOperationsInvokeService } from '../../services/function-bul
   ],
 })
 export class FunctionListComponent {
+  private _injector = inject(Injector);
   private _functionApiService = inject(AugmentedKeywordsService);
   private _interactivePlanExecutionApiService = inject(InteractivePlanExecutionService);
-  private _functionDialogs = inject(FunctionDialogsService);
+  private _functionActions = inject(FunctionActionsService);
   private _functionPackageDialogs = inject(FunctionPackageActionsService);
   private _$rootScope = inject(AJS_ROOT_SCOPE);
   private _location = inject(AJS_LOCATION);
@@ -46,7 +47,7 @@ export class FunctionListComponent {
   ];
 
   addFunction(): void {
-    this._functionDialogs.openAddFunctionModal().subscribe(() => this.dataSource.reload());
+    this._functionActions.openAddFunctionModal(this._injector).subscribe(() => this.dataSource.reload());
   }
 
   addFunctionPackage(): void {
@@ -58,7 +59,7 @@ export class FunctionListComponent {
   }
 
   editFunction(keyword: KeywordFunction): void {
-    this._functionDialogs.openFunctionEditor(keyword).subscribe();
+    this._functionActions.openFunctionEditor(keyword).subscribe();
   }
 
   executeFunction(id: string): void {
@@ -76,7 +77,7 @@ export class FunctionListComponent {
   }
 
   deleteFunction(id: string, name: string): void {
-    this._functionDialogs.openDeleteFunctionDialog(id, name).subscribe((result) => {
+    this._functionActions.openDeleteFunctionDialog(id, name).subscribe((result) => {
       if (result) {
         this.dataSource.reload();
       }
@@ -84,23 +85,23 @@ export class FunctionListComponent {
   }
 
   exportFunction(id: string, name: string): void {
-    this._functionDialogs.openExportFunctionDialog(id, name).subscribe(() => this.dataSource.reload());
+    this._functionActions.openExportFunctionDialog(id, name).subscribe(() => this.dataSource.reload());
   }
 
   exportFunctions(): void {
-    this._functionDialogs.openExportAllFunctionsDialog().subscribe(() => this.dataSource.reload());
+    this._functionActions.openExportAllFunctionsDialog().subscribe(() => this.dataSource.reload());
   }
 
   importFunctions(): void {
-    this._functionDialogs.openImportFunctionDialog().subscribe(() => this.dataSource.reload());
+    this._functionActions.openImportFunctionDialog().subscribe(() => this.dataSource.reload());
   }
 
   lookUp(id: string, name: string): void {
-    this._functionDialogs.openLookUpFunctionDialog(id, name);
+    this._functionActions.openLookUpFunctionDialog(id, name);
   }
 
   configureFunction(id: string): void {
-    this._functionDialogs.configureFunction(id).subscribe(() => this.dataSource.reload());
+    this._functionActions.configureFunction(this._injector, id).subscribe(() => this.dataSource.reload());
   }
 }
 

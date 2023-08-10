@@ -1,13 +1,13 @@
 import { Component, inject, ViewChild } from '@angular/core';
 import {
-  AugmentedKeywordsService,
   AutoDeselectStrategy,
-  BaseEntitySelectionTableComponent,
-  DateFormat,
   selectionCollectionProvider,
   SelectionCollector,
-  TableComponent,
-} from '@exense/step-core';
+} from '../../../entities-selection/entities-selection.module';
+import { BaseEntitySelectionTableComponent } from '../../../entity/entity.module';
+import { TableComponent } from '../../../table/table.module';
+import { AugmentedKeywordsService } from '../../../../client/step-client-module';
+import { DateFormat } from '../../../../shared';
 
 @Component({
   selector: 'step-function-selection-table',

@@ -1,9 +1,9 @@
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { map, of } from 'rxjs';
-import { Function as KeywordFunction } from '../../client/step-client-module';
-import { CustomComponent } from '../../modules/custom-registeries/custom-registries.module';
-import { CustomColumnOptions } from '../../modules/table/table.module';
-import { FunctionLinkDialogService } from './function-link-dialog.service';
+import { Function as KeywordFunction } from '../../../../client/step-client-module';
+import { CustomComponent } from '../../../custom-registeries/custom-registries.module';
+import { CustomColumnOptions } from '../../../table/table.module';
+import { FunctionActionsService } from '../../injectables/function-actions.service';
 
 @Component({
   selector: 'step-function-link',
@@ -11,7 +11,7 @@ import { FunctionLinkDialogService } from './function-link-dialog.service';
   styleUrls: ['./function-link.component.scss'],
 })
 export class FunctionLinkComponent implements CustomComponent {
-  private _functionLinkDialogService = inject(FunctionLinkDialogService, { optional: true });
+  private _functionActions = inject(FunctionActionsService, { optional: true });
   private _customColumnOptions = inject(CustomColumnOptions, { optional: true });
 
   @Input() context?: KeywordFunction;
@@ -22,10 +22,10 @@ export class FunctionLinkComponent implements CustomComponent {
   );
 
   editFunction(): void {
-    if (!this.context?.id || !this._functionLinkDialogService) {
+    if (!this.context?.id || !this._functionActions) {
       return;
     }
-    this._functionLinkDialogService.openFunctionEditor(this.context).subscribe((continueEdit) => {
+    this._functionActions.openFunctionEditor(this.context).subscribe((continueEdit) => {
       if (continueEdit) {
         this.edit.emit();
       }
