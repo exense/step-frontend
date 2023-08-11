@@ -9,7 +9,6 @@ import { inject, Injectable } from '@angular/core';
 
 @Injectable()
 export class ScheduledTaskBulkOperationsInvokeService extends BulkOperationsInvokeService<string> {
-  protected invokeExport = undefined;
   protected _api = inject(AugmentedSchedulerService);
 
   protected override invokeDelete(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus> {
@@ -19,4 +18,8 @@ export class ScheduledTaskBulkOperationsInvokeService extends BulkOperationsInvo
   protected override invokeDuplicate(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus> {
     return this._api.cloneExecutionTasks(requestBody);
   }
+
+  protected override invokeExport = undefined;
+  protected override invokeRestart = undefined;
+  protected override invokeStop = undefined;
 }

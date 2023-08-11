@@ -1,3 +1,17 @@
 .active {
   background-color: #eeeeee;
 }
+
+.refresh-off {
+  position: absolute;
+  top: 8px;
+  left: 20px;
+
+  span {
+    padding: 2px 4px;
+    font-size: 8pt;
+    background: var(--main-header-bg-color, #293e50);
+    color: white;
+    border-radius: 6px;
+  }
+}

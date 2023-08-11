@@ -12,7 +12,7 @@
         (click)="closeDialog()"
         [context]="{ id: element.id, attributes: { name: element.name }, type: '' }"
       ></step-function-link>
-      <span *ngIf="element.type != 'PLAN' && element.type != 'KEYWORD'">{{ element.name }}</span>
+      <span *ngIf="element.type !== 'PLAN' && element.type !== 'KEYWORD'">{{ element.name }}</span>
     </td>
   </ng-container>
   <ng-container matColumnDef="type" stepSearchCol>

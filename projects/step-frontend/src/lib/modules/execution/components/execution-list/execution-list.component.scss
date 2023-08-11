@@ -2,6 +2,10 @@
 
 :host {
   @include core.table-container;
+
+  step-bulk-operations ::ng-deep button.delete {
+    display: none;
+  }
 }
 
 .header {

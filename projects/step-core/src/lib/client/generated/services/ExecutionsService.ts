@@ -4,11 +4,13 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
+import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTaskStatusTableBulkOperationReport';
 import type { Execution } from '../models/Execution';
 import type { ExecutionParameters } from '../models/ExecutionParameters';
 import type { FindByCriteraParam } from '../models/FindByCriteraParam';
 import type { ReportNode } from '../models/ReportNode';
 import type { RepositoryObjectReference } from '../models/RepositoryObjectReference';
+import type { TableBulkOperationRequest } from '../models/TableBulkOperationRequest';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
@@ -178,6 +180,38 @@ export class ExecutionsService {
         class: _class,
         limit: limit,
       },
+    });
+  }
+
+  /**
+   * Restart multiple executions according to the provided parameters.
+   * @param requestBody
+   * @returns AsyncTaskStatusTableBulkOperationReport default response
+   * @throws ApiError
+   */
+  public restartExecutions(
+    requestBody?: TableBulkOperationRequest
+  ): Observable<AsyncTaskStatusTableBulkOperationReport> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/executions/bulk/restart',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Stop multiple executions according to the provided parameters.
+   * @param requestBody
+   * @returns AsyncTaskStatusTableBulkOperationReport default response
+   * @throws ApiError
+   */
+  public stopExecutions(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatusTableBulkOperationReport> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/executions/bulk/stop',
+      body: requestBody,
+      mediaType: 'application/json',
     });
   }
 }
