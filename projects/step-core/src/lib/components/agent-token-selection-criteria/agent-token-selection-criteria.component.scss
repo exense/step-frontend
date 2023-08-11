@@ -1,0 +1,40 @@
+@mixin stroked-icon-button {
+  border-radius: 0.8rem;
+  padding: 0.6rem;
+  min-width: 0;
+}
+
+.agent-token-selection-criteria {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+
+  .agent-token-selection-criteria-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .mat-stroked-button {
+      @include stroked-icon-button();
+    }
+  }
+
+  .agent-token-selection-criteria-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+
+    .agent-token-selection-criterion {
+      display: flex;
+      gap: 0.8rem;
+
+      step-form-field {
+        flex: 1;
+      }
+
+      .mat-stroked-button {
+        @include stroked-icon-button();
+      }
+    }
+  }
+}

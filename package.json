@@ -28,7 +28,11 @@
     "push": "npm publish projects/step-core/ && npm publish dist/step-frontend/*.tgz",
     "icons:generate": "node generate-icons.js",
     "openapi:generate:nhy": "node generate-openapi-client.js https://stepos-nhy.stepcloud-test.ch/rest/private-openapi.json",
-    "openapi:generate:master": "node generate-openapi-client.js https://stepos-master.stepcloud-test.ch/rest/private-openapi.json"
+    "openapi:generate:master": "node generate-openapi-client.js https://stepos-master.stepcloud-test.ch/rest/private-openapi.json",
+    "lint:core": "ng lint @exense/step-core",
+    "lint:step-frontend": "ng lint @exense/step-frontend",
+    "lint:app": "ng lint @exense/step-app",
+    "lint": "ng lint"
   },
   "private": false,
   "dependencies": {
@@ -53,11 +57,17 @@
     "uuid": "8.3.2",
     "zone.js": "0.11.4",
     "ace-builds": "1.17.0",
-    "angular-split": "14.1.0"
+    "angular-split": "14.1.0",
+    "luxon": "2.0.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "14.2.7",
     "@angular-devkit/schematics": "14.2.7",
+    "@angular-eslint/builder": "14.2.0",
+    "@angular-eslint/eslint-plugin": "14.2.0",
+    "@angular-eslint/eslint-plugin-template": "14.2.0",
+    "@angular-eslint/schematics": "14.2.0",
+    "@angular-eslint/template-parser": "14.2.0",
     "@angular/cli": "14.2.7",
     "@angular/compiler-cli": "14.2.8",
     "@schematics/angular": "14.2.7",
@@ -66,7 +76,10 @@
     "@types/luxon": "2.3.2",
     "@types/node": "12.11.1",
     "@types/uuid": "8.3.4",
+    "@typescript-eslint/eslint-plugin": "5.43.0",
+    "@typescript-eslint/parser": "5.43.0",
     "copyfiles": "2.4.1",
+    "eslint": "^8.27.0",
     "gulp": "4.0.2",
     "gulp-concat": "2.6.1",
     "husky": "7.0.4",
@@ -82,7 +95,7 @@
     "openapi-typescript-codegen": "^0.23.0",
     "prettier": "2.5.1",
     "pretty-quick": "3.1.2",
-    "typescript": "4.8.4",
-    "shelljs": "0.8.5"
+    "shelljs": "0.8.5",
+    "typescript": "4.8.4"
   }
 }

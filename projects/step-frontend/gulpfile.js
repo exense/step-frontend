@@ -46,7 +46,6 @@ const SCRIPTS = [
   './src/lib/angularjs/js/controllers/screenConfiguration.js',
   './src/lib/angularjs/js/controllers/repository.js',
   './src/lib/angularjs/js/controllers/reportNodes.js',
-  './src/lib/angularjs/js/controllers/reportTree.js',
   './src/lib/angularjs/js/controllers/reportTable.js',
   './src/lib/angularjs/js/controllers/settings.js',
   './src/lib/angularjs/js/controllers/dynamicForms.js',

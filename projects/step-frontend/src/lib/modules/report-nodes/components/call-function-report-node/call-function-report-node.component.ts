@@ -17,6 +17,7 @@ export class CallFunctionReportNodeComponent implements OnChanges {
   displayChildren: ReportNode[] = [];
 
   hideMeasures: boolean = false;
+  hideRouting: boolean = true;
 
   execution: Execution;
 

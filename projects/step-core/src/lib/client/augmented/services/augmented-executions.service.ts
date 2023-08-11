@@ -1,5 +1,11 @@
 import { inject, Injectable } from '@angular/core';
-import { Execution, ExecutionParameters, ExecutionsService } from '../../generated';
+import {
+  AsyncTaskStatusTableBulkOperationReport,
+  Execution,
+  ExecutionParameters,
+  ExecutionsService,
+  TableBulkOperationRequest,
+} from '../../generated';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { StepDataSource, TableRemoteDataSourceFactoryService } from '../../table/step-table-client.module';
@@ -32,5 +38,22 @@ export class AugmentedExecutionsService extends ExecutionsService {
 
   override execute(requestBody?: ExecutionParameters): Observable<string> {
     return this._httpClient.post('rest/executions/start', requestBody, { responseType: 'text' });
+  }
+
+  /**
+   * Delete multiple executions according to the provided parameters.
+   * @param requestBody
+   * @returns AsyncTaskStatusTableBulkOperationReport default response
+   * @throws ApiError
+   */
+  public deleteExecutions(
+    requestBody?: TableBulkOperationRequest
+  ): Observable<AsyncTaskStatusTableBulkOperationReport> {
+    return this.httpRequest.request({
+      method: 'DELETE',
+      url: '/housekeeping/executions/bulk',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
   }
 }

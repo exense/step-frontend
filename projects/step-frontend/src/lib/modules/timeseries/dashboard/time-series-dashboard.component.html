@@ -1,10 +1,4 @@
 <ng-container *ngIf="performanceViewSettings">
-  <step-timeseries-toolbar
-    *ngIf="context"
-    [context]="context"
-    (onCompareModeEnabled)="enableCompareMode()"
-    (onCompareModeDisabled)="disableCompareMode()"
-  ></step-timeseries-toolbar>
   <div>
     <div class="filter-bars-container" [style.gap]="compareModeEnabled ? '12px' : '0'">
       <div class="bar mat-card">

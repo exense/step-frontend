@@ -177,7 +177,9 @@ export class ExecutionProgressComponent
         filter((node) => !!node),
         tap((node) => {
           this._testCasesSelection.clear();
-          this._testCasesSelection.selectById(node!.resolvedArtefact!.id!);
+          if (node!.resolvedArtefact) {
+            this._testCasesSelection.selectById(node!.resolvedArtefact.id!);
+          }
         }),
         tap((node) => {
           this._executionPanels.enablePanel(Panels.testCases, true);

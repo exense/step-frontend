@@ -15,7 +15,7 @@ import { TimeSeriesUtils } from '../time-series-utils';
   templateUrl: './time-range-picker.component.html',
   styleUrls: ['./time-range-picker.component.scss'],
 })
-export class TimeRangePicker implements OnInit {
+export class TimeRangePickerComponent implements OnInit {
   @ViewChild(MatMenuTrigger) menuTrigger!: MatMenuTrigger;
 
   @Input() selectOptions!: TimeRangePickerSelection[];

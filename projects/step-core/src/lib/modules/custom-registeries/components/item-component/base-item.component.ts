@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges, Type } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, Type } from '@angular/core';
 import { CustomRegistryType } from '../../shared/custom-registry-type.enum';
 import { CustomRegistryItem } from '../../shared/custom-registry-item';
 import { Mutable } from '../../../../shared';
@@ -17,6 +17,8 @@ export abstract class BaseItemComponent<T extends CustomRegistryItem> implements
 
   @Input() itemKey?: string;
   @Input() context?: any;
+
+  @Output() renderComplete = new EventEmitter<void>();
 
   protected constructor(private _customRegistryService: CustomRegistryService) {}
 

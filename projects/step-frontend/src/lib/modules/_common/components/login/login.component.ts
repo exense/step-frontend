@@ -1,6 +1,7 @@
 import { Component, inject, Input, ViewEncapsulation } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, ApiError, AuthService } from '@exense/step-core';
+import { HttpErrorInterceptor } from '../../interceptors/http-error.interceptor';
 
 @Component({
   selector: 'step-login',
@@ -38,7 +39,7 @@ export class LoginComponent {
       .pipe()
       .subscribe({
         error: (error: ApiError) => {
-          this.error = error.body || error;
+          this.error = HttpErrorInterceptor.formatError(error.body || error);
         },
       });
   }

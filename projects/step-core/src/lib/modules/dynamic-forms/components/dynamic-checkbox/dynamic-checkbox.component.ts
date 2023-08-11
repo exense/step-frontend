@@ -14,7 +14,7 @@ type OnTouch = () => void;
 export class DynamicCheckboxComponent implements ControlValueAccessor {
   @Input() label?: string;
   @Input() tooltip?: string;
-  @Input() showRequiredAsterisk: boolean = false;
+  @Input() showRequiredMarker: boolean = false;
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;

@@ -6,4 +6,5 @@ export enum FilterConditionType {
   REPORT_NODE,
   SCOPE,
   SINGLE_DATE,
+  BOOLEAN,
 }

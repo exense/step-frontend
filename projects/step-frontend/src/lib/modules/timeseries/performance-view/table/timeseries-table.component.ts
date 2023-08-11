@@ -2,6 +2,7 @@ import { Component, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } fro
 import {
   BucketAttributes,
   BucketResponse,
+  KeywordsService,
   TableComponent,
   TableDataSource,
   TableLocalDataSource,
@@ -49,11 +50,13 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   compareResponse: TimeSeriesAPIResponse | undefined;
   groupDimensions: string[] = [];
 
+  allSeriesChecked: boolean = true;
   compareModeEnabled = false;
   compareContext: TimeSeriesContext | undefined;
 
   // private keywordsService!: TimeSeriesKeywordsContext;
   @Input() executionContext!: TimeSeriesContext;
+  keywordsService!: TimeSeriesKeywordsContext;
 
   private terminator$ = new Subject<void>();
 
@@ -62,6 +65,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
       throw new Error('Execution context is mandatory');
     }
     this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
+    this.keywordsService = this.executionContext.keywordsContext;
     const keywordsContext = this.executionContext.keywordsContext;
     keywordsContext.onKeywordToggled().subscribe((selection) => {
       // this.bucketsByKeywords[selection.id].attributes!['isSelected'] = selection.isSelected;
@@ -71,6 +75,9 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
           entry.isSelected = selection.isSelected;
         }
       });
+      if (!selection.isSelected) {
+        this.allSeriesChecked = false;
+      }
     });
     keywordsContext.onKeywordsUpdated().subscribe((keywords) => {
       Object.keys(keywords).forEach((keyword) => {
@@ -187,6 +194,10 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     this.compareModeEnabled = false;
     this.compareContext = undefined;
     this.compareResponse = undefined;
+  }
+
+  onAllSeriesCheckboxClick(event: any) {
+    this.keywordsService.toggleSelectAll();
   }
 
   onKeywordToggle(entry: TableEntry) {

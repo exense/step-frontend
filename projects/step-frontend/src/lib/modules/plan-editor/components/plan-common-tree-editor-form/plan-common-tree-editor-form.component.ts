@@ -18,7 +18,7 @@ import {
   PlansService,
   TreeStateService,
 } from '@exense/step-core';
-import { BehaviorSubject, filter, map, merge, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
+import { BehaviorSubject, filter, first, map, merge, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { PlanEditorApiService } from '../../injectables/plan-editor-api.service';
@@ -224,7 +224,10 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
         switchMap((plan) => this._planEditorApi.savePlan(plan!)),
         takeUntil(this.terminator$)
       )
-      .subscribe(({ plan }) => {
+      .subscribe(({ plan, forceRefresh }) => {
+        if (forceRefresh) {
+          this._treeState.selectedNode$.pipe(first()).subscribe((node) => this.init(plan, node?.id));
+        }
         if (this.planInternal$.value) {
           this.planInternal$.value.customFields = plan.customFields;
         }
@@ -232,33 +235,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
   }
 
   handlePlanChange(): void {
-    this._treeState.selectedNode$
-      .pipe(
-        take(1),
-        map((node) =>
-          breadthFirstSearch({
-            items: [this.plan!.root!],
-            children: (item) => item.children || [],
-            predicate: (item) => item.id === node?.id,
-          })
-        )
-      )
-      .subscribe(([node]) => {
-        if (node?.children) {
-          const children = breadthFirstSearch({
-            items: node!.children,
-            children: (item) => item.children || [],
-          });
-
-          children.forEach((child) => {
-            this._artefactTreeNodeUtilsService.updateNodeData(this.plan!.root!, child.id!, {
-              isSkipped: node!.skipNode?.value,
-            });
-          });
-        }
-
-        this.planChange$.next(this.plan!);
-      });
+    this.planChange$.next(this.plan!);
   }
 
   moveUp(node?: AbstractArtefact): void {

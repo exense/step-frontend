@@ -1,7 +1,7 @@
 export type DynamicFieldProperty = {
   type?: 'string' | 'number' | 'boolean' | 'integer' | 'array' | 'object';
   enum?: string[];
-  default?: string;
+  default?: any;
 };
 export interface DynamicFieldsSchema {
   properties: Record<string, DynamicFieldProperty>;

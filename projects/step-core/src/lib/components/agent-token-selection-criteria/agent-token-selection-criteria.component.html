@@ -1,0 +1,31 @@
+<div class="agent-token-selection-criteria">
+  <div class="agent-token-selection-criteria-header">
+    <label>
+      Agent token selection criteria&nbsp;
+      <step-icon name="help-circle" [matTooltip]="tooltip"></step-icon>
+    </label>
+
+    <button type="button" (click)="addCriterion()" mat-stroked-button>
+      <step-icon name="plus"></step-icon>
+    </button>
+  </div>
+
+  <div *ngIf="tokenSelectionCriteria.controls.length" class="agent-token-selection-criteria-body">
+    <div
+      *ngFor="let tokenSelectionCriterion of tokenSelectionCriteria.controls; let i = index"
+      class="agent-token-selection-criterion"
+    >
+      <step-form-field>
+        <input type="text" placeholder="Key" [formControl]="tokenSelectionCriterion.controls.key" />
+      </step-form-field>
+
+      <step-form-field>
+        <input type="text" placeholder="Value" [formControl]="tokenSelectionCriterion.controls.value" />
+      </step-form-field>
+
+      <button type="button" (click)="removeCriterion(i)" mat-stroked-button>
+        <step-icon name="trash-2"></step-icon>
+      </button>
+    </div>
+  </div>
+</div>

@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
 import { TimeseriesTableComponent } from './performance-view/table/timeseries-table.component';
-import { TimeRangePicker } from './time-selection/time-range-picker.component';
+import { TimeRangePickerComponent } from './time-selection/time-range-picker.component';
 import { ChartSkeletonComponent } from './chart/skeleton/chart-skeleton.component';
 import { MeasurementsPickerComponent } from './performance-view/measurements/measurements-picker.component';
 import { PerformanceViewTimeSelectionComponent } from './performance-view/time-selection/performance-view-time-selection.component';
@@ -23,6 +23,10 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { DiscoverComponent } from './discover/discover.component';
+import { DiscoverAttributeStatsComponent } from './discover/attribute-stats/attribute-stats.component';
+import { MatPaginatorIntl } from '@angular/material/paginator';
+import { NoTotalCountPaginator } from './discover/no-total-count-paginator';
 import { TsComparePercentagePipe } from './dashboard/compare/ts-compare-percentage.pipe';
 import { ChartsViewComponent } from './performance-view/charts-view.component';
 
@@ -32,7 +36,7 @@ import { ChartsViewComponent } from './performance-view/charts-view.component';
     TimeSeriesChartComponent,
     TSRangerComponent,
     TimeseriesTableComponent,
-    TimeRangePicker,
+    TimeRangePickerComponent,
     ChartSkeletonComponent,
     PerformanceViewTimeSelectionComponent,
     MeasurementsPickerComponent,
@@ -44,8 +48,11 @@ import { ChartsViewComponent } from './performance-view/charts-view.component';
     AnalyticsPageComponent,
     ExecutionPerformanceComponent,
     TsComparePercentagePipe,
+    DiscoverComponent,
+    DiscoverAttributeStatsComponent,
   ],
   exports: [ExecutionPerformanceComponent, AnalyticsPageComponent],
+  providers: [{ provide: MatPaginatorIntl, useClass: NoTotalCountPaginator }],
   imports: [
     StepCoreModule,
     TableModule,

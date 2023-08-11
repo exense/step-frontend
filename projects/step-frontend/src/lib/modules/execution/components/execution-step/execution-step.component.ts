@@ -1,6 +1,14 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, Execution, ExecutionSummaryDto, Mutable, ReportNode, SelectionCollector } from '@exense/step-core';
+import {
+  AJS_MODULE,
+  Execution,
+  ExecutionSummaryDto,
+  Mutable,
+  ReportNode,
+  SelectionCollector,
+  TableLocalDataSource,
+} from '@exense/step-core';
 import { ExecutionViewServices } from '../../../operations/shared/execution-view-services';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { KeywordParameters } from '../../shared/keyword-parameters';
@@ -8,6 +16,7 @@ import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-repo
 import { Panels } from '../../shared/panels.enum';
 import { SingleExecutionPanelsService } from '../../services/single-execution-panels.service';
 import { MatSort, Sort } from '@angular/material/sort';
+import { REPORT_NODE_STATUS } from '../../../_common/shared/status.enum';
 
 type FieldAccessor = Mutable<Pick<ExecutionStepComponent, 'keywordParameters$'>>;
 
@@ -20,6 +29,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
   private selectionTerminator$?: Subject<void>;
 
   readonly keywordParameters$?: Observable<KeywordParameters>;
+  readonly statusOptions = REPORT_NODE_STATUS;
 
   @Input() eId: string = '';
   @Input() testCasesProgress?: ExecutionSummaryDto;
@@ -42,6 +52,8 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
   parameters: { key: string; value: string }[] = [];
 
   readonly Panels = Panels;
+
+  protected testCasesDataSource?: TableLocalDataSource<ReportNode>;
 
   constructor(private panelService: SingleExecutionPanelsService) {}
 
@@ -90,6 +102,11 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
 
     if (eid || testCasesSelection) {
       this.setupSelectionChanges(eid, testCasesSelection);
+    }
+
+    const cTestCases = changes['testCases'];
+    if (cTestCases?.previousValue !== cTestCases?.currentValue || cTestCases?.firstChange) {
+      this.setupTestCasesDataSource(cTestCases?.currentValue);
     }
   }
 
@@ -140,6 +157,15 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
       return;
     }
     this.executionViewServices.showTestCase(nodeId);
+  }
+
+  private setupTestCasesDataSource(testCases?: ReportNode[]): void {
+    this.testCasesDataSource = new TableLocalDataSource<ReportNode>(
+      testCases ?? [],
+      TableLocalDataSource.configBuilder<ReportNode>()
+        .addSearchStringRegexPredicate('status', (item) => item.status)
+        .build()
+    );
   }
 }
 

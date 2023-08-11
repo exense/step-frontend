@@ -1,0 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+pre.disabled {
+  color: var.$gray-400;
+}

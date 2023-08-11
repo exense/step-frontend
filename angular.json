@@ -62,7 +62,7 @@
             "scripts": ["node_modules/uplot/dist/uPlot.iife.min.js"],
             "extraWebpackConfig": "projects/step-app/webpack.config.js",
             "commonChunk": false,
-            "allowedCommonJsDependencies": ["ace-builds"]
+            "allowedCommonJsDependencies": ["ace-builds", "luxon"]
           },
           "configurations": {
             "local": {
@@ -144,6 +144,12 @@
             "styles": ["src/styles.scss"],
             "scripts": []
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": ["projects/step-app/**/*.ts", "projects/step-app/**/*.html"]
+          }
         }
       }
     },
@@ -175,6 +181,12 @@
             "tsConfig": "projects/step-core/tsconfig.spec.json",
             "karmaConfig": "projects/step-core/karma.conf.js"
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": ["projects/step-core/**/*.ts", "projects/step-core/**/*.html"]
+          }
         }
       }
     },
@@ -205,6 +217,12 @@
             "main": "projects/step-frontend/src/test.ts",
             "tsConfig": "projects/step-frontend/tsconfig.spec.json",
             "karmaConfig": "projects/step-frontend/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": ["projects/step-frontend/**/*.ts", "projects/step-frontend/**/*.html"]
           }
         }
       }

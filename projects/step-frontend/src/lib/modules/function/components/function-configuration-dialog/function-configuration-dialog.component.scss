@@ -1,0 +1,15 @@
+div[step-modal-window-body] {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+
+  step-function-type {
+    padding-bottom: 1.6rem;
+  }
+}

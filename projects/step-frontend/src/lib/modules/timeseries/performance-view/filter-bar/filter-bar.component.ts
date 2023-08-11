@@ -26,6 +26,18 @@ import { OqlVerifyResponse } from '../../model/oql-verify-response';
 import { TsFilteringMode } from '../../model/ts-filtering-mode';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
 import { RelativeTimeSelection } from '../../time-selection/model/relative-time-selection';
+import { OQLBuilder } from '../../util/oql-builder';
+import { MatDialog } from '@angular/material/dialog';
+import { DiscoverComponent } from '../../discover/discover.component';
+import { DiscoverDialogData } from '../../discover/discover-dialog-data';
+
+const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
+  if (field.startsWith('attributes.')) {
+    return field.replace('attributes.', '');
+  } else {
+    return field;
+  }
+};
 
 @Component({
   selector: 'step-ts-filter-bar',
@@ -34,8 +46,6 @@ import { RelativeTimeSelection } from '../../time-selection/model/relative-time-
   encapsulation: ViewEncapsulation.None,
 })
 export class FilterBarComponent implements OnInit, OnDestroy {
-  readonly ONE_HOUR_MS = 3600 * 1000;
-
   @Input() context!: TimeSeriesContext;
   @Input() initialFilters: TsFilterItem[] = [];
   @Input() compactView = false;
@@ -66,7 +76,11 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   oqlValue: string = '';
   invalidOql = false;
 
-  constructor(private _changeDetectorRef: ChangeDetectorRef, private _timeSeriesService: TimeSeriesService) {}
+  constructor(
+    private _changeDetectorRef: ChangeDetectorRef,
+    private _timeSeriesService: TimeSeriesService,
+    private _matDialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
     if (!this.context) {
@@ -190,7 +204,6 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   handleFilterChange(index: number, item: TsFilterItem) {
     this.filterItems[index] = item;
     this.emitFilterChange$.next();
-    console.log('EMIT');
   }
 
   addFilterItem(item: TsFilterItem) {
@@ -250,6 +263,30 @@ export class FilterBarComponent implements OnInit, OnDestroy {
       }
     }
     return false;
+  }
+
+  openDiscovery() {
+    const data: DiscoverDialogData = { oqlFilter: this.createRawMeasurementsFilter() };
+    this._matDialog.open(DiscoverComponent, { data: data });
+  }
+
+  private createRawMeasurementsFilter() {
+    const filteringSettings = this.context.getFilteringSettings();
+    const filtersOql =
+      filteringSettings.mode === TsFilteringMode.OQL
+        ? filteringSettings.oql.replace('attributes.', '')
+        : FilterUtils.filtersToOQL(this.getValidFilters(), undefined, ATTRIBUTES_REMOVAL_FUNCTION);
+    // const contextualOql = FilterUtils.objectToOQL(
+    //   this.performanceViewSettings.contextualFilters,
+    //   undefined,
+    //   ATTRIBUTES_REMOVAL_FUNCTION
+    // );
+    const selectedTimeRange = this.context.getSelectedTimeRange();
+    return new OQLBuilder()
+      .open('and')
+      .append(`(begin < ${Math.trunc(selectedTimeRange.to)} and begin > ${Math.trunc(selectedTimeRange.from)})`)
+      .append(filtersOql)
+      .build();
   }
 
   ngOnDestroy(): void {
