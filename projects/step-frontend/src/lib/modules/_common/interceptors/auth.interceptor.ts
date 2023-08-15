@@ -21,7 +21,7 @@ export class AuthInterceptor implements HttpInterceptor {
       const authService = this._injector.get(AuthService);
       // when checking for session auth error is expected
       if (authService.isAuthenticated()) {
-        authService.goToLoginPage();
+        authService.performPostLogoutActions();
       }
     }
     return throwError(() => error);
