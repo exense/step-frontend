@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
 import { TimeseriesTableComponent } from './performance-view/table/timeseries-table.component';
-import { TimeRangePicker } from './time-selection/time-range-picker.component';
+import { TimeRangePickerComponent } from './time-selection/time-range-picker.component';
 import { ChartSkeletonComponent } from './chart/skeleton/chart-skeleton.component';
 import { PerformanceViewComponent } from './performance-view/performance-view.component';
 import { SyntheticMonitoringPageComponent } from './synthetic-monitoring/synthetic-monitoring-page.component';
@@ -38,7 +38,7 @@ import { NoTotalCountPaginator } from './discover/no-total-count-paginator';
     ExecutionTabsComponent,
     TSRangerComponent,
     TimeseriesTableComponent,
-    TimeRangePicker,
+    TimeRangePickerComponent,
     ChartSkeletonComponent,
     PerformanceViewTimeSelectionComponent,
     PerformanceViewComponent,

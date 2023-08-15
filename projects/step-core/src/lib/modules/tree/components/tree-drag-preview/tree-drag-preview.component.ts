@@ -14,7 +14,7 @@ const CURSOR_NOT_ALLOWED = 'not-allowed';
   templateUrl: './tree-drag-preview.component.html',
   styleUrls: ['./tree-drag-preview.component.scss'],
 })
-export class TreeDragPreviewComponent implements OnInit, OnDestroy {
+export class TreeDragPreviewComponent implements OnInit {
   readonly label$ = of('');
   readonly icon$ = of('');
 
@@ -23,8 +23,6 @@ export class TreeDragPreviewComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.setupLabelAndIcon();
   }
-
-  ngOnDestroy(): void {}
 
   private setupLabelAndIcon(): void {
     const labelAndIcon$ = this._treeState.selectedNodes$.pipe(
