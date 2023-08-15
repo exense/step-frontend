@@ -5,7 +5,6 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
   AJS_LOCATION,
   AlertType,
-  AugmentedKeywordsService,
   AuthService,
   DialogsService,
   FunctionConfigurationDialogData,
@@ -16,6 +15,7 @@ import {
   FunctionType,
   FunctionTypeRegistryService,
   Function as Keyword,
+  FunctionConfigurationApiService,
 } from '@exense/step-core';
 import { ILocationService } from 'angular';
 import { of, Subject, switchMap, takeUntil, tap } from 'rxjs';
@@ -27,7 +27,7 @@ import { of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 })
 export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
   private _functionConfigurationDialogData = inject<FunctionConfigurationDialogData>(MAT_DIALOG_DATA);
-  private _augmentedKeywordsService = inject(AugmentedKeywordsService);
+  private _api = inject(FunctionConfigurationApiService);
   private _matDialogRef = inject<MatDialogRef<FunctionConfigurationDialogComponent, Keyword>>(MatDialogRef);
   private _ajsLocation = inject<ILocationService>(AJS_LOCATION);
   private _dialogsService = inject(DialogsService);
@@ -100,10 +100,6 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
     return this.formGroup!.controls.executeLocally.value;
   }
 
-  private get serviceRoot(): string {
-    return this._functionConfigurationDialogData.dialogConfig.serviceRoot;
-  }
-
   protected onFunctionTypeRenderComplete(): void {
     this.setValueToFormInternal$.next();
     this.formGroup!.updateValueAndValidity();
@@ -114,8 +110,8 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
 
     this.setValueToModelInternal$.next();
 
-    this._augmentedKeywordsService
-      .saveFunction(this.keyword!, this.serviceRoot)
+    this._api
+      .saveFunction(this.keyword!)
       .pipe(
         switchMap((keyword) => {
           this._matDialogRef.close(keyword);
@@ -124,7 +120,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
             return of();
           }
 
-          return this._augmentedKeywordsService.getFunctionEditor(keyword.id!);
+          return this._api.getFunctionEditor(keyword.id!);
         }),
         tap((path) => {
           if (path) {
@@ -154,8 +150,8 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
   }
 
   protected fetchStepFunction(stepFunctionType: string): void {
-    this._augmentedKeywordsService
-      .newFunctionTypeConf(stepFunctionType, this.serviceRoot)
+    this._api
+      .newFunctionTypeConf(stepFunctionType)
       .pipe(
         tap((keyword) => {
           if (!this.keyword) {

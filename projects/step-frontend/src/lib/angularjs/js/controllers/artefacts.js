@@ -101,7 +101,7 @@ angular
     };
 
     $scope.openFunctionEditor = function (functionid) {
-      FunctionDialogs.openFunctionEditor($scope.targetFunction.id);
+      FunctionDialogs.openFunctionEditor($scope.targetFunction);
     };
 
     $scope.setArgument = function (json) {

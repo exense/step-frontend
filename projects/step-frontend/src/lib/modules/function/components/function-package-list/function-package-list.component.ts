@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { AfterViewInit, Component, inject } from '@angular/core';
 import {
   AJS_MODULE,
   AugmentedKeywordPackagesService,
+  FunctionPackage,
   STORE_ALL,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
@@ -14,12 +15,16 @@ import { FunctionPackageActionsService } from '../../services/function-package-a
   styleUrls: ['./function-package-list.component.scss'],
   providers: [tablePersistenceConfigProvider('functionPackageList', STORE_ALL)],
 })
-export class FunctionPackageListComponent {
+export class FunctionPackageListComponent implements AfterViewInit {
   private _augApi = inject(AugmentedKeywordPackagesService);
   private _actions = inject(FunctionPackageActionsService);
   readonly dataSource = this._augApi.createDataSource();
 
   isRefreshing: boolean = false;
+
+  ngAfterViewInit(): void {
+    this._actions.resolveEditLinkIfExists();
+  }
 
   add(): void {
     this._actions.openAddFunctionPackageDialog().subscribe((result) => {
@@ -29,8 +34,8 @@ export class FunctionPackageListComponent {
     });
   }
 
-  edit(id: string): void {
-    this._actions.editFunctionPackage(id).subscribe((result) => {
+  edit(functionPackage: FunctionPackage): void {
+    this._actions.editFunctionPackage(functionPackage).subscribe((result) => {
       if (result) {
         this.dataSource.reload();
       }

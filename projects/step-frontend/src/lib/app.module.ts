@@ -8,7 +8,6 @@ import { DefaultThemeModule } from './modules/default-theme/default-theme.module
 import { ExecutionModule } from './modules/execution/execution.module';
 import { FunctionModule } from './modules/function/function.module';
 import { GridModule } from './modules/grid/grid.module';
-import { GenericFunctionModule } from './modules/mask/generic-function.module';
 import { ParameterModule } from './modules/parameter/parameter.module';
 import { PlanModule } from './modules/plan/plan.module';
 import { ResourcesModule } from './modules/resources/resources.module';
@@ -36,7 +35,6 @@ Settings.defaultLocale = 'en';
     GridModule,
     TimeSeriesModule,
     DefaultThemeModule,
-    GenericFunctionModule,
     ArtefactsModule,
     ResourcesModule,
   ],

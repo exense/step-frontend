@@ -1,33 +1,48 @@
-import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
-import { IRootScopeService } from 'angular';
+import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { map, startWith } from 'rxjs';
 import { FindReferencesResponse, ReferencesService } from '../../client/step-client-module';
 import { TableFetchLocalDataSource } from '../../modules/table/table.module';
-import { AJS_ROOT_SCOPE, IsUsedBySearchType } from '../../shared';
+import { IsUsedBySearchType } from '../../shared';
+import { ProjectNamePipe } from '../../pipes/project-name.pipe';
+
+interface FindReferenceWithLinkContext extends FindReferencesResponse {
+  linkContext?: {
+    id: string;
+    attributes?: Record<string, string>;
+    _class?: string;
+    type?: string;
+  };
+}
 
 @Component({
   selector: 'step-is-used-by-list',
   templateUrl: './is-used-by-list.component.html',
   styleUrls: ['./is-used-by-list.component.scss'],
+  providers: [ProjectNamePipe],
 })
-export class IsUsedByListComponent {
+export class IsUsedByListComponent implements OnInit {
+  private _referencesService = inject(ReferencesService);
+  private _projectName = inject(ProjectNamePipe);
+
   @Input() type?: IsUsedBySearchType;
   @Input() id: string = '';
 
   @Output() onClose = new EventEmitter<any>();
 
-  projectIdToProjectNameMap: { [id: string]: string } = {};
   currentProjectName: string = '';
+  entityType: string = '';
 
   readonly searchableReferences = new TableFetchLocalDataSource(
     () =>
-      this._referencesService.findReferences({
-        searchType: this.type,
-        searchValue: this.id,
-      }),
+      this._referencesService
+        .findReferences({
+          searchType: this.type,
+          searchValue: this.id,
+        })
+        .pipe(map((result) => result.map((item) => this.createReferenceWithLinkContext(item)))),
     TableFetchLocalDataSource.configBuilder<FindReferencesResponse>()
-      .addSearchStringPredicate('project', (element) => this.projectIdToProjectNameMap[element.attributes!['project']])
-      .addSortStringPredicate('project', (element) => this.projectIdToProjectNameMap[element.attributes!['project']])
+      .addSearchStringPredicate('project', (element) => this._projectName.transform(element))
+      .addSortStringPredicate('project', (element) => this._projectName.transform(element))
       .build()
   );
 
@@ -36,27 +51,48 @@ export class IsUsedByListComponent {
     startWith(false)
   );
 
-  constructor(
-    private _referencesService: ReferencesService,
-    @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService
-  ) {
-    this.initTenants();
+  ngOnInit(): void {
+    this.determineEntityType();
   }
 
   closeDialog(): void {
     this.onClose.emit({});
   }
 
-  /**
-   * Relevant for EE: Reads available projects and currently selected
-   * @private
-   */
-  private initTenants() {
-    this.currentProjectName = (this._$rootScope as any).tenant?.name;
-    const tenants: Array<any> = (this._$rootScope as any).tenants;
-    this.projectIdToProjectNameMap = tenants?.reduce(function (map: { [id: string]: string }, dto) {
-      map[dto.projectId] = dto.name;
-      return map;
-    }, {});
+  private createReferenceWithLinkContext(ref: FindReferencesResponse): FindReferenceWithLinkContext {
+    let linkContext: FindReferenceWithLinkContext['linkContext'] | undefined = undefined;
+    if (ref.type === 'PLAN') {
+      linkContext = {
+        id: ref.id!,
+        attributes: ref.attributes,
+        _class: '',
+      };
+    } else if (ref.type === 'KEYWORD') {
+      linkContext = {
+        id: ref.id!,
+        attributes: ref.attributes,
+        type: '',
+      };
+    }
+    return { ...ref, linkContext };
+  }
+
+  private determineEntityType(): void {
+    switch (this.type) {
+      case 'PLAN_ID':
+      case 'PLAN_NAME':
+        this.entityType = 'plan';
+        break;
+      case 'KEYWORD_ID':
+      case 'KEYWORD_NAME':
+        this.entityType = 'functions';
+        break;
+      case 'RESOURCE_ID':
+      case 'RESOURCE_NAME':
+        this.entityType = 'resources';
+        break;
+      default:
+        break;
+    }
   }
 }
