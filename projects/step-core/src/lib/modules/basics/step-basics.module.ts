@@ -26,6 +26,8 @@ import { ValidateJsonDirective } from './directives/validate-json.directive';
 import { ErrorsListComponent } from './components/errors-list/errors-list.component';
 import { PreventCharsDirective } from './directives/prevent-chars.directive';
 import { SingleItemArrayFilterComponent } from './components/single-item-array-filter/single-item-array-filter.component';
+import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
+import { UploadContainerComponent } from './components/upload-container/upload-container.component';
 import { JsonRawEditorFormattedComponent } from './components/json-raw-editor-formatted/json-raw-editor-formatted.component';
 import { LabelAddonDirective } from './directives/label-addon.directive';
 import { ProjectSwitchDialogComponent } from './components/project-switch-dialog/project-switch-dialog.component';
@@ -59,6 +61,8 @@ import { ProjectSwitchDialogComponent } from './components/project-switch-dialog
     JsonRawEditorFormattedComponent,
     LabelAddonDirective,
     SingleItemArrayFilterComponent,
+    ProgressBarComponent,
+    UploadContainerComponent,
     ProjectSwitchDialogComponent,
   ],
   exports: [
@@ -86,6 +90,8 @@ import { ProjectSwitchDialogComponent } from './components/project-switch-dialog
     ErrorsListComponent,
     PreventCharsDirective,
     SingleItemArrayFilterComponent,
+    ProgressBarComponent,
+    UploadContainerComponent,
     JsonRawEditorFormattedComponent,
     LabelAddonDirective,
     ProjectSwitchDialogComponent,
@@ -107,10 +113,11 @@ export * from './components/modal-window/modal-window.component';
 export * from './components/form-field/form-field.component';
 export * from './components/cron-selector/cron-selector.component';
 export * from './components/errors-list/errors-list.component';
+export * from './components/progress-bar/progress-bar.component';
+export * from './components/upload-container/upload-container.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
 export * from './pipes/has-right.pipe';
-export * from './services/artefact-types.service';
 export * from './services/credentials.service';
 export * from './services/auth.service';
 export * from './services/item-by-id-cache.service';
@@ -148,6 +155,8 @@ export * from './shared/validators/json-validator';
 export * from './shared/validators/number-validator';
 export * from './shared/validators/boolean-validator';
 export * from './shared/validators/coma-split-array-validator';
+export * from './shared/is-used-by-dialog-data';
+export * from './shared/is-used-by-search-type';
 export * from './services/persistence.service';
 export * from './services/default-page.token';
 export * from './services/view-id-link-prefix.token';
@@ -156,3 +165,4 @@ export * from './services/multiple-projects.service';
 export * from './services/generate-api-key.service';
 export * from './services/editor-resolver.service';
 export * from './shared/logout-cleanup.token';
+export * from './services/is-used-by-dialog';

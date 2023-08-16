@@ -98,7 +98,7 @@ export class PlanEditorBaseComponent
     map((planTypes) => {
       return planTypes.map((planType) => ({
         planType,
-        icon: this._artefactService.getIconNg2(planType)!,
+        icon: this._artefactService.getArtefactType(planType)!.icon,
       }));
     })
   );
@@ -294,7 +294,7 @@ export class PlanEditorBaseComponent
         this.planTypeControl.setValue(
           {
             planType: plan.root!._class,
-            icon: this._artefactService.getIconNg2(plan.root!._class)!,
+            icon: this._artefactService.getArtefactType(plan.root!._class)!.icon,
           },
           { emitEvent: false }
         );

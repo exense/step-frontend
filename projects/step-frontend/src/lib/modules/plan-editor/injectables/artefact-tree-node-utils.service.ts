@@ -1,8 +1,8 @@
 import {
   AbstractArtefact,
   ArtefactRefreshNotificationService,
+  ArtefactService,
   ArtefactTreeNode,
-  ArtefactTypesService,
   TreeNode,
   TreeNodeUtilsService,
 } from '@exense/step-core';
@@ -16,7 +16,7 @@ export class ArtefactTreeNodeUtilsService
   private refreshArtefactInternal$ = new Subject<void>();
   readonly refreshArtefact$ = this.refreshArtefactInternal$.asObservable();
 
-  constructor(private _artefactTypes: ArtefactTypesService) {}
+  constructor(private _artefactTypes: ArtefactService) {}
 
   ngOnDestroy(): void {
     this.refreshArtefactInternal$.complete();
@@ -31,7 +31,7 @@ export class ArtefactTreeNodeUtilsService
     const name = originalArtefact.attributes?.['name'] || '';
     const isSkipped = !!originalArtefact.skipNode?.value;
     const isVisuallySkipped = isSkipped || isParentVisuallySkipped;
-    const icon = this._artefactTypes.getIconNg2(originalArtefact._class);
+    const icon = this._artefactTypes.getArtefactType(originalArtefact?._class)?.icon ?? this._artefactTypes.defaultIcon;
     const expandable = (originalArtefact?.children?.length ?? -1) > 0;
     const children = (originalArtefact?.children || []).map((child) =>
       this.convertItem(child, { parentId: id, isParentVisuallySkipped: isVisuallySkipped })

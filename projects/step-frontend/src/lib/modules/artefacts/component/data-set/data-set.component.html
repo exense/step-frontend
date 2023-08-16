@@ -1,0 +1,25 @@
+<form #form="ngForm">
+  <step-data-source-configuration [context]="context"> </step-data-source-configuration>
+  <step-dynamic-checkbox
+    *ngIf="context.artefact!.dataSource"
+    label="For write"
+    [(ngModel)]="context.artefact!.dataSource!.forWrite"
+    [disabled]="context.readonly"
+    name="forWrite"
+  >
+  </step-dynamic-checkbox>
+  <step-dynamic-textfield
+    label="Iterator handle"
+    [(ngModel)]="context.artefact!.item"
+    [disabled]="context.readonly"
+    name="item"
+  >
+  </step-dynamic-textfield>
+  <step-dynamic-checkbox
+    label="Reset at end"
+    [(ngModel)]="context.artefact!.resetAtEnd"
+    [disabled]="context.readonly"
+    name="resetAtEnd"
+  >
+  </step-dynamic-checkbox>
+</form>

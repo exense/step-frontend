@@ -58,7 +58,3 @@ export class KeywordNameComponent implements ReferenceArtefactNameConfig<CallFun
     return this._keywordApi.lookupCallFunction(artefact);
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepKeywordName', downgradeComponent({ component: KeywordNameComponent }));

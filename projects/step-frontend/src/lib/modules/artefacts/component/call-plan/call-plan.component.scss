@@ -1,0 +1,6 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
+:host,
+form {
+  @include core.common-form-content;
+}

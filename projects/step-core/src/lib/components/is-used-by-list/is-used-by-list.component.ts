@@ -2,8 +2,8 @@ import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular
 import { map, startWith } from 'rxjs';
 import { FindReferencesResponse, ReferencesService } from '../../client/step-client-module';
 import { TableFetchLocalDataSource } from '../../modules/table/table.module';
-import { IsUsedBySearchType } from '../../shared';
 import { ProjectNamePipe } from '../../pipes/project-name.pipe';
+import { IsUsedBySearchType } from '../../modules/basics/shared/is-used-by-search-type';
 
 interface FindReferenceWithLinkContext extends FindReferencesResponse {
   linkContext?: {

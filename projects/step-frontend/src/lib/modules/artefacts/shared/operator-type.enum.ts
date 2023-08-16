@@ -1,0 +1,7 @@
+export enum OperatorType {
+  EQUALS = 'EQUALS',
+  BEGINS_WITH = 'BEGINS_WITH',
+  CONTAINS = 'CONTAINS',
+  ENDS_WITH = 'ENDS_WITH',
+  MATCHES = 'MATCHES',
+}

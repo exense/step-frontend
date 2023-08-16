@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { ArtefactTypesService, Mutable, ReportNode } from '@exense/step-core';
+import { ArtefactService, Mutable, ReportNode } from '@exense/step-core';
 
 type FieldAccessor = Mutable<Pick<ReportNodeIconComponent, 'statusClass' | 'icon'>>;
 
@@ -14,7 +14,7 @@ export class ReportNodeIconComponent implements OnChanges {
 
   @Input() node?: ReportNode;
 
-  constructor(private _artefactTypes: ArtefactTypesService) {}
+  constructor(private _artefactTypes: ArtefactService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     const cNode = changes['node'];
@@ -32,9 +32,8 @@ export class ReportNodeIconComponent implements OnChanges {
       return;
     }
 
-    const icon = node.resolvedArtefact
-      ? this._artefactTypes.getIconNg2(node.resolvedArtefact._class)
-      : this._artefactTypes.getDefaultIconNg2();
+    const icon =
+      this._artefactTypes.getArtefactType(node.resolvedArtefact?._class)?.icon ?? this._artefactTypes.defaultIcon;
 
     fieldAccessor.statusClass = `step-node-status-${node.status}`;
     fieldAccessor.icon = icon;

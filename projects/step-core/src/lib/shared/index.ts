@@ -4,8 +4,6 @@ export * from './constants';
 export * from './date-format.enum';
 export * from './dialogs.service';
 export * from './export.service';
-export * from './is-used-by-dialog-data';
-export * from './is-used-by-search-type';
 export * from './mutable';
 export * from './plugin-on-init';
 export * from './plugin-lazy-load';
