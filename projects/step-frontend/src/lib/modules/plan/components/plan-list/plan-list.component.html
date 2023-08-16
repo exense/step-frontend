@@ -89,7 +89,7 @@
 </step-table>
 <mat-menu #menu="matMenu">
   <ng-template matMenuContent let-element="element">
-    <button mat-menu-item [disabled]="!('plan-write' | hasRight | async)" (click)="editPlan(element.id)">
+    <button mat-menu-item [disabled]="!('plan-write' | hasRight | async)" (click)="editPlan(element)">
       <step-icon name="edit-2"></step-icon>
       Edit plan
     </button>

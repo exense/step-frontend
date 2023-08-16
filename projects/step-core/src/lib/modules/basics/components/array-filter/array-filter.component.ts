@@ -66,10 +66,20 @@ export class ArrayFilterComponent<T = unknown> extends BaseFilterComponent<strin
   }
 
   protected override transformFilterValueToControlValue(value: string): unknown {
+    let result: string[];
+
     if (value.startsWith('(') && value.endsWith(')') && value.includes('|')) {
-      return value.substring(1, value.length - 1).split('|');
+      result = value.substring(1, value.length - 1).split('|');
+    } else {
+      result = [value];
     }
-    return [value];
+
+    return result.map((value) => {
+      if (value.startsWith('^') && value.endsWith('$')) {
+        return value.substring(1, value.length - 1);
+      }
+      return value;
+    });
   }
 
   private setupDisplayItems(

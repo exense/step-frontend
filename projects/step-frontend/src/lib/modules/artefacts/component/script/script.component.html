@@ -1,0 +1,6 @@
+<form #form="ngForm">
+  <step-form-field>
+    <step-label>Script</step-label>
+    <textarea [(ngModel)]="context.artefact!.script" [disabled]="context.readonly" name="script" rows="5"> </textarea>
+  </step-form-field>
+</form>

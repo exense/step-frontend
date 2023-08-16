@@ -1,0 +1,10 @@
+<form #form="ngForm">
+  <step-dynamic-textfield
+    label="Number of threads"
+    [isNumber]="true"
+    [(ngModel)]="context.artefact!.threads"
+    [disabled]="context.readonly"
+    name="threads"
+  >
+  </step-dynamic-textfield>
+</form>
