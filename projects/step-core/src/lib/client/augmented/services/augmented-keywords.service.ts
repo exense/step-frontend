@@ -27,36 +27,6 @@ export class AugmentedKeywordsService extends KeywordsService {
     return this._dataSourceFactory.createDataSource(FUNCTIONS_TABLE_ID, { name: 'attributes.name', type: 'type' });
   }
 
-  override newFunctionTypeConf(type: string): Observable<KeywordFunction>;
-  /**
-   * @deprecated
-   */
-  override newFunctionTypeConf(type: string, serviceRoot: string): Observable<KeywordFunction>;
-  override newFunctionTypeConf(type: string, serviceRoot?: string): Observable<KeywordFunction> {
-    const root = serviceRoot ?? 'functions';
-
-    return this.httpRequest.request({
-      method: 'GET',
-      url: `/${root}/types/${type}`,
-    });
-  }
-
-  override saveFunction(requestBody?: KeywordFunction): Observable<KeywordFunction>;
-  /**
-   * @deprecated
-   */
-  override saveFunction(requestBody?: KeywordFunction, serviceRoot?: string): Observable<KeywordFunction>;
-  override saveFunction(requestBody?: KeywordFunction, serviceRoot?: string): Observable<KeywordFunction> {
-    const root = serviceRoot ?? 'functions';
-
-    return this.httpRequest.request({
-      method: 'POST',
-      url: `/${root}`,
-      body: requestBody,
-      mediaType: 'application/json',
-    });
-  }
-
   override getFunctionEditor(id: string): Observable<string> {
     return this._httpClient.request('GET', `/rest/functions/${id}/editor`, {
       responseType: 'text',

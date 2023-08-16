@@ -7,7 +7,6 @@ import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { UpgradeModule } from '@angular/upgrade/static';
 import { AngularSplitModule } from 'angular-split';
 import { StepGeneratedClientModule } from './client/generated';
-import { AgentTokenSelectionCriteriaComponent } from './components/agent-token-selection-criteria/agent-token-selection-criteria.component';
 import { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
 import { DynamicLabelCustomFormInputComponent } from './components/custom-form-input/dynamic-label-custom-form-input.component';
 import { StandardCustomFormInputComponent } from './components/custom-form-input/standard-custom-form-input.component';
@@ -21,7 +20,6 @@ import { EditableTextareaLabelComponent } from './components/editable-textarea-l
 import { EntityColumnContainerComponent } from './components/entity-column-container/entity-column-container.component';
 import { EntityColumnComponent } from './components/entity-column/entity-column.component';
 import { ExportDialogComponent } from './components/export-dialog/export-dialog.component';
-import { FunctionLinkComponent } from './components/function-link/function-link.component';
 import { IsUsedByListComponent } from './components/is-used-by-list/is-used-by-list.component';
 import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 import { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
@@ -76,6 +74,10 @@ import { ArtefactDetailsComponent } from './components/artefact-details/artefact
 import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 import { ResourceInputModule } from './modules/resource-input/resource-input.module';
 import { IsUsedByDialogService } from './services/is-used-by-dialog.service';
+import { ProjectNamePipe } from './pipes/project-name.pipe';
+import { FunctionActionsService, KeywordsCommonModule } from './modules/keywords-common/keywords-common.module';
+import { FunctionActionsImplService } from './services/function-actions-impl.service';
+import { GenericFunctionListComponent } from './components/generic-function-list/generic-function-list.component';
 
 @NgModule({
   declarations: [
@@ -89,7 +91,6 @@ import { IsUsedByDialogService } from './services/is-used-by-dialog.service';
     PlanNamePipe,
     IsUsedByListComponent,
     IsUsedByModalComponent,
-    FunctionLinkComponent,
     SelectPlanComponent,
     AutorefreshToggleComponent,
     SettingButtonComponent,
@@ -122,7 +123,6 @@ import { IsUsedByDialogService } from './services/is-used-by-dialog.service';
     PlanCreateDialogComponent,
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
-    AgentTokenSelectionCriteriaComponent,
     PredefinedOptionsInputComponent,
     CustomFormWrapperComponent,
     EntityColumnComponent,
@@ -132,6 +132,8 @@ import { IsUsedByDialogService } from './services/is-used-by-dialog.service';
     ExportDialogComponent,
     ArtefactDetailsComponent,
     WaitingArtefactsAdvancedComponent,
+    ProjectNamePipe,
+    GenericFunctionListComponent,
   ],
   imports: [
     CommonModule,
@@ -151,6 +153,7 @@ import { IsUsedByDialogService } from './services/is-used-by-dialog.service';
     AngularSplitModule,
     DynamicFormsModule,
     ResourceInputModule,
+    KeywordsCommonModule,
   ],
   exports: [
     CommonModule,
@@ -206,7 +209,6 @@ import { IsUsedByDialogService } from './services/is-used-by-dialog.service';
     PlanCreateDialogComponent,
     InputModelFormatterDirective,
     ThreadDistributionWizardDialogComponent,
-    AgentTokenSelectionCriteriaComponent,
     PredefinedOptionsInputComponent,
     CustomFormWrapperComponent,
     EntityColumnComponent,
@@ -217,6 +219,9 @@ import { IsUsedByDialogService } from './services/is-used-by-dialog.service';
     ArtefactDetailsComponent,
     WaitingArtefactsAdvancedComponent,
     ResourceInputModule,
+    ProjectNamePipe,
+    KeywordsCommonModule,
+    GenericFunctionListComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -240,8 +245,8 @@ import { IsUsedByDialogService } from './services/is-used-by-dialog.service';
       },
     },
     {
-      provide: IsUsedByDialog,
-      useExisting: IsUsedByDialogService,
+      provide: FunctionActionsService,
+      useExisting: FunctionActionsImplService,
     },
   ],
 })
@@ -254,7 +259,6 @@ export { OpenAPI } from './client/generated/core/OpenAPI';
 export type { OpenAPIConfig } from './client/generated/core/OpenAPI';
 export * from './client/generated/index';
 export * from './client/step-client-module';
-export { AgentTokenSelectionCriteriaComponent } from './components/agent-token-selection-criteria/agent-token-selection-criteria.component';
 export { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
 export { DynamicLabelCustomFormInputComponent } from './components/custom-form-input/dynamic-label-custom-form-input.component';
 export { StandardCustomFormInputComponent } from './components/custom-form-input/standard-custom-form-input.component';
@@ -267,13 +271,12 @@ export { EditableTextareaLabelComponent } from './components/editable-textarea-l
 export * from './components/entity-column-container/entity-column-container.component';
 export * from './components/entity-column/entity-column.component';
 export * from './components/export-dialog/export-dialog.component';
-export { FunctionLinkDialogService } from './components/function-link/function-link-dialog.service';
-export { FunctionLinkComponent } from './components/function-link/function-link.component';
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
 export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 export { PlanLinkComponent } from './components/plan-link/plan-link.component';
+export { PlanLinkDialogService } from './components/plan-link/plan-link-dialog.service';
 export { PlanNameComponent } from './components/plan-name/plan-name.component';
 export * from './components/plan-tree/plan-tree.component';
 export { PredefinedOptionsInputComponent } from './components/predefined-options-input/predefined-options-input.component';
@@ -290,6 +293,8 @@ export * from './components/entity-column/entity-column.component';
 export * from './components/entity-column-container/entity-column-container.component';
 export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
+export * from './components/artefact-details/artefact-details.component';
+export * from './components/generic-function-list/generic-function-list.component';
 export * from './decorators/plugin';
 export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
@@ -315,9 +320,11 @@ export * from './modules/table/table.module';
 export * from './modules/tabs/tabs.module';
 export * from './modules/tree/tree.module';
 export * from './modules/resource-input/resource-input.module';
+export * from './modules/keywords-common/keywords-common.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/is-chart-empty.pipe';
+export * from './pipes/project-name.pipe';
 export * from './pipes/matching-authenticator.pipe';
 export { PlanNamePipe } from './pipes/plan-name.pipe';
 export * from './services/additional-right-rule.service';
@@ -328,6 +335,7 @@ export * from './services/execution-close-handle.service';
 export * from './services/export-dialogs.service';
 export * from './services/global-progress-spinner.service';
 export * from './services/http-interceptor-bridge.service';
+export * from './services/scheduler-actions.service';
 export { ImportDialogsService } from './services/import-dialogs.service';
 export * from './services/invoke-run.service';
 export { IsUsedByDialogService } from './services/is-used-by-dialog.service';
@@ -346,6 +354,7 @@ export * from './services/view-registry.service';
 export * from './services/view-state.service';
 export * from './services/artefact.service';
 export * from './services/artefact-form-change-helper.service';
+export * from './services/function-actions-impl.service';
 export * from './shared';
 export * from './components/base-artefact/base-artefact.component';
 export * from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';

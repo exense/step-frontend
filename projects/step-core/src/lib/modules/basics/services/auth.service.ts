@@ -86,13 +86,12 @@ export class AuthService implements OnDestroy {
   }
 
   logout(): void {
-    this._credentialsService
-      .logout()
-      .pipe(map(() => ({ userID: ANONYMOUS } as AuthContext)))
-      .subscribe((context) => {
-        this.setContext(context);
-        this._navigator.navigateToHome();
-      });
+    this._credentialsService.logout().subscribe(() => this.performPostLogoutActions());
+  }
+
+  performPostLogoutActions(): void {
+    this.setContext({ userID: ANONYMOUS });
+    this._navigator.navigateToHome();
   }
 
   goToLoginPage(): void {
