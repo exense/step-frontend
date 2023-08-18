@@ -85,7 +85,7 @@
           mat-icon-button
           matTooltip="Edit task"
           [disabled]="!('task-write' | hasRight | async)"
-          (click)="_logic.editParameter(element)"
+          (click)="_logic.editParameter(element).subscribe()"
         >
           <step-icon name="edit-2"></step-icon>
         </button>

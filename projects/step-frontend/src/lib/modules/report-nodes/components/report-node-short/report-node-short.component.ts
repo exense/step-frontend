@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, TrackByFunction } from '@angular/core';
-import { ArtefactTypesService, ControllerService, Mutable, ReportNode, ViewerFormat } from '@exense/step-core';
+import { ArtefactService, ArtefactTypesService, ControllerService, Mutable, ReportNode, ViewerFormat } from '@exense/step-core';
 import { ReportNodeCommonsService } from '../../services/report-node-commons.service';
 import { map, Observable, of } from 'rxjs';
 
@@ -41,7 +41,7 @@ export class ReportNodeShortComponent implements OnChanges {
   readonly ViewerFormat = ViewerFormat;
 
   constructor(
-    private _artefactTypes: ArtefactTypesService,
+    private _artefactTypes: ArtefactService,
     private _reportNodeCommons: ReportNodeCommonsService,
     private _controllerService: ControllerService
   ) {}
@@ -75,9 +75,8 @@ export class ReportNodeShortComponent implements OnChanges {
         (this as FieldsAccessor).headerText = value;
       });
     } else {
-      (this as FieldsAccessor).headerText = node!.resolvedArtefact
-        ? this._artefactTypes.getLabel(node!.resolvedArtefact._class)
-        : '';
+      (this as FieldsAccessor).headerText =
+        this._artefactTypes.getArtefactType(node!.resolvedArtefact?._class)?.label ?? '';
     }
   }
 

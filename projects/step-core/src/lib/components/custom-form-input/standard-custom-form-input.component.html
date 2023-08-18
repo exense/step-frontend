@@ -1,18 +1,34 @@
 <step-form-field>
-  <step-label *ngIf="!hideLabel">{{ input?.label }}</step-label>
+  <step-label *ngIf="!hideLabel" [attr.show-required-marker]="required || null">{{ input?.label }}</step-label>
   <ng-container [ngSwitch]="input?.type">
     <ng-container *ngSwitchCase="InputType.TEXT">
-      <input type="text" [ngModel]="value" (ngModelChange)="onValueChange($event)" (blur)="invokeTouch()" />
+      <input
+        type="text"
+        [required]="required"
+        [ngModel]="value"
+        (ngModelChange)="onValueChange($event)"
+        (blur)="invokeTouch()"
+      />
     </ng-container>
     <ng-container *ngSwitchCase="InputType.DROPDOWN">
-      <mat-select [ngModel]="value" (ngModelChange)="onValueChange($event)" (blur)="invokeTouch()">
+      <mat-select
+        [required]="required"
+        [ngModel]="value"
+        (ngModelChange)="onValueChange($event)"
+        (blur)="invokeTouch()"
+      >
         <mat-option *ngFor="let item of dropdownItems" [value]="item">
           {{ item }}
         </mat-option>
       </mat-select>
     </ng-container>
     <ng-container *ngSwitchCase="InputType.CHECKBOX">
-      <mat-select [ngModel]="value" (ngModelChange)="onValueChange($event)" (blur)="invokeTouch()">
+      <mat-select
+        [required]="required"
+        [ngModel]="value"
+        (ngModelChange)="onValueChange($event)"
+        (blur)="invokeTouch()"
+      >
         <mat-option *ngFor="let item of checkboxItems" [value]="item">
           {{ item }}
         </mat-option>

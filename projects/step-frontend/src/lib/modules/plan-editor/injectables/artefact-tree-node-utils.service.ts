@@ -1,8 +1,8 @@
 import {
   AbstractArtefact,
   ArtefactRefreshNotificationService,
+  ArtefactService,
   ArtefactTreeNode,
-  ArtefactTypesService,
   TreeNode,
   TreeNodeUtilsService,
 } from '@exense/step-core';
@@ -16,24 +16,32 @@ export class ArtefactTreeNodeUtilsService
   private refreshArtefactInternal$ = new Subject<void>();
   readonly refreshArtefact$ = this.refreshArtefactInternal$.asObservable();
 
-  constructor(private _artefactTypes: ArtefactTypesService) {}
+  constructor(private _artefactTypes: ArtefactService) {}
 
   ngOnDestroy(): void {
     this.refreshArtefactInternal$.complete();
   }
 
-  convertItem(originalArtefact: AbstractArtefact, parentId?: string): ArtefactTreeNode {
+  convertItem(
+    originalArtefact: AbstractArtefact,
+    params?: { parentId?: string; isParentVisuallySkipped?: boolean }
+  ): ArtefactTreeNode {
     const id = originalArtefact.id!;
+    const { parentId, isParentVisuallySkipped } = params ?? {};
     const name = originalArtefact.attributes?.['name'] || '';
     const isSkipped = !!originalArtefact.skipNode?.value;
-    const icon = this._artefactTypes.getIconNg2(originalArtefact._class);
+    const isVisuallySkipped = isSkipped || isParentVisuallySkipped;
+    const icon = this._artefactTypes.getArtefactType(originalArtefact?._class)?.icon ?? this._artefactTypes.defaultIcon;
     const expandable = (originalArtefact?.children?.length ?? -1) > 0;
-    const children = (originalArtefact?.children || []).map((child) => this.convertItem(child, id));
+    const children = (originalArtefact?.children || []).map((child) =>
+      this.convertItem(child, { parentId: id, isParentVisuallySkipped: isVisuallySkipped })
+    );
 
     return {
       id,
       name,
       isSkipped,
+      isVisuallySkipped,
       icon,
       expandable,
       children,
@@ -90,7 +98,7 @@ export class ArtefactTreeNodeUtilsService
 
     let isUpdated = false;
     if (data.isSkipped !== undefined) {
-      itemToChange.skipNode!.value = data.isSkipped;
+      itemToChange.skipNode = { ...itemToChange.skipNode!, value: data.isSkipped };
       isUpdated = true;
     }
 

@@ -5,9 +5,7 @@ import { SelectionCollector } from '../../../entities-selection/entities-selecti
 import { SelectEntityContext } from '../../types/select-entity-context.interface';
 
 @Component({
-  selector: '',
   template: '',
-  styleUrls: [],
 })
 export abstract class BaseEntitySelectionTableComponent implements AfterViewInit, CustomComponent, OnDestroy {
   private requireInitialSearch = false;

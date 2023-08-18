@@ -1,0 +1,17 @@
+<form #form="ngForm">
+  <mat-expansion-panel [(expanded)]="showAdvancedAttributes">
+    <mat-expansion-panel-header>
+      <mat-panel-title>Advanced</mat-panel-title>
+    </mat-expansion-panel-header>
+    <section class="panel-content">
+      <step-dynamic-checkbox
+        label="Release Tokens"
+        tooltip="Caution! When enabled this option releases all agent tokens before entering a waiting state. New Tokens will have to be reserved to continue the execution. This also means that the session context will be deleted, if any objects were stored in session, they will have to be recreated and stored again."
+        [(ngModel)]="context.artefact!.releaseTokens"
+        [disabled]="context.readonly"
+        name="releaseTokens"
+      >
+      </step-dynamic-checkbox>
+    </section>
+  </mat-expansion-panel>
+</form>

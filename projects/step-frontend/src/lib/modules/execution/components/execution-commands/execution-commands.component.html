@@ -1,4 +1,6 @@
-<step-custom-form [stModel]="executionParameters" stScreen="executionParameters"> </step-custom-form>
+<step-custom-forms *ngIf="executionParameters" [stModel]="executionParameters" stScreen="executionParameters">
+</step-custom-forms>
+
 <div class="main-container" role="toolbar" aria-label="...">
   <div class="sub-container">
     <div class="flex">
@@ -10,7 +12,7 @@
         matTooltip="Simulate execution"
         (click)="execute(true)"
       >
-        <step-icon name="check" aria-hidden="true"></step-icon>
+        <step-icon name="check-circle" aria-hidden="true"></step-icon>
       </button>
       <button
         type="button"
@@ -20,7 +22,7 @@
         matTooltip="New execution"
         (click)="execute(false)"
       >
-        <step-icon name="play" aria-hidden="true"></step-icon>
+        <step-icon name="play-circle" aria-hidden="true"></step-icon>
       </button>
       <button
         type="button"
@@ -42,7 +44,7 @@
         [disabled]="!('plan-execute' | hasRight | async)"
         (click)="stop()"
       >
-        <step-icon name="square" aria-hidden="true"></step-icon>
+        <step-icon name="stop-circle" aria-hidden="true"></step-icon>
       </button>
     </div>
   </div>

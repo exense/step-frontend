@@ -1,0 +1,59 @@
+<form #form="ngForm">
+  <step-keyword-name
+    [artefact]="context.artefact"
+    [isDisabled]="context.readonly"
+    (onSave)="context.save()"
+    (keywordUpdate)="onUpdateKeyword($event)"
+  >
+  </step-keyword-name>
+  <ng-template #labelTemplate> Add text description </ng-template>
+  <step-editable-textarea-label
+    [labelTemplate]="labelTemplate"
+    [(ngModel)]="context.artefact!.description"
+    [disabled]="context.readonly"
+    name="description"
+  >
+  </step-editable-textarea-label>
+  <step-dynamic-json
+    label="Input"
+    [(ngModel)]="context.artefact!.argument"
+    [disabled]="context.readonly"
+    [schema]="schema"
+    [enforceGroovyExpression]="true"
+    name="input"
+  >
+  </step-dynamic-json>
+  <step-dynamic-textfield
+    label="Map output to"
+    [(ngModel)]="context.artefact!.resultMap"
+    [disabled]="context.readonly"
+    name="resultMap"
+  >
+  </step-dynamic-textfield>
+  <mat-expansion-panel [(expanded)]="showTokenSelectionParameters">
+    <mat-expansion-panel-header>
+      <mat-panel-title>Keyword routing</mat-panel-title>
+    </mat-expansion-panel-header>
+    <section class="panel-content">
+      <step-dynamic-checkbox
+        label="Execute on agents"
+        tooltip="Defines if the Keyword has to be executed on an agent or locally on the controller."
+        [(ngModel)]="context.artefact!.remote"
+        [disabled]="context.readonly"
+        name="remote"
+      >
+      </step-dynamic-checkbox>
+      <step-dynamic-json
+        label="Agent token selectors"
+        jsonFieldsLabel="Selection criteria (raw JSON)"
+        primaryFieldsLabel="Selection criteria (required)"
+        optionalFieldsLabel="Selection criteria (optional)"
+        addFieldBtnLabel="Add selection criteria"
+        [(ngModel)]="context.artefact!.token"
+        [disabled]="context.readonly"
+        name="token"
+      >
+      </step-dynamic-json>
+    </section>
+  </mat-expansion-panel>
+</form>

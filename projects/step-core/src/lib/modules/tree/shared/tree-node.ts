@@ -6,5 +6,6 @@ export interface TreeNode {
   iconClassName?: string;
   expandable: boolean;
   isSkipped: boolean;
+  isVisuallySkipped?: boolean;
   children?: TreeNode[];
 }

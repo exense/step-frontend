@@ -1,13 +1,13 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { ArtefactTypesService } from '../services/artefact-types.service';
+import { ArtefactService } from '../../../services/artefact.service';
 
 @Pipe({
   name: 'artefactIcon',
 })
 export class ArtefactIconPipe implements PipeTransform {
-  constructor(private _artefactTypes: ArtefactTypesService) {}
+  constructor(private _artefactTypes: ArtefactService) {}
 
   transform(artefactClass: string): string {
-    return this._artefactTypes.getIconNg2(artefactClass);
+    return this._artefactTypes.getArtefactType(artefactClass)?.icon ?? '';
   }
 }

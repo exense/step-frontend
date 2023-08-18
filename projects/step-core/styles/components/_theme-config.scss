@@ -11,6 +11,7 @@
 @use 'step-menu';
 @use 'step-datepicker';
 @use 'step-alert';
+@use '../core-variables' as var;
 
 @forward 'step-sidebar' show step-define-sidebar-config;
 @forward 'step-header' show step-define-header-config;
@@ -191,6 +192,7 @@ $light-primary-text: white;
 
   step-dynamic-field,
   step-dynamic-textfield,
+  step-dynamic-checkbox,
   step-expression-input,
   step-resource-input {
     .mat-button-wrapper {
@@ -267,6 +269,48 @@ $light-primary-text: white;
     padding: 0;
   }
 
+  [step-modal-window-body] {
+    // a scrollbar sometimes appears due to an unknown reason, adding 1px padding-bottom seems to fix it
+    // TODO: investigate why is it happening
+    padding-bottom: 1px;
+  }
+
+  step-modal-window .mat-expansion-panel {
+    border: 1px solid var.$gray-300;
+    border-radius: 0.8rem;
+
+    .mat-expansion-panel-header {
+      padding: 0 1.6rem;
+      height: 4rem;
+
+      .mat-expansion-panel-header-title {
+        font-weight: 500;
+      }
+
+      &.mat-expanded {
+        border-bottom: 1px solid var.$gray-300;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+    }
+
+    .mat-expansion-panel-content {
+      font-size: 1.4rem;
+
+      .mat-expansion-panel-body {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        padding: 1.2rem 1.6rem;
+      }
+    }
+
+    &:not([class*='mat-elevation-z']) {
+      box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14),
+        0px 0px 0px 0px rgba(0, 0, 0, 0.12);
+    }
+  }
+
   /**
   This will create a nice scrollbar inside the form field when the chips content are very long.
   Otherwise they will overflow the container.
@@ -278,5 +322,14 @@ $light-primary-text: white;
   .mat-menu-panel.wide {
     max-width: 380px;
     width: 380px;
+  }
+
+  .mat-checkbox-label {
+    font-weight: 500;
+  }
+
+  .mat-checkbox-background,
+  .mat-checkbox-frame {
+    border-radius: 0.4rem;
   }
 }

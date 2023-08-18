@@ -1,20 +1,18 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { catchError, Observable, of } from 'rxjs';
 import { a1Promise2Observable } from '../shared';
-import { ResourceInputBridgeService } from './resource-input-bridge.service';
 import { UibModalHelperService } from './uib-modal-helper.service';
+import { ResourceInputBridgeService } from '../modules/resource-input/resource-input.module';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ImportDialogsService {
-  constructor(
-    private _uitModalHelper: UibModalHelperService,
-    private _resourceInputBridgeService: ResourceInputBridgeService
-  ) {}
+  private _uibModalHelper = inject(UibModalHelperService);
+  private _resourceInputBridgeService = inject(ResourceInputBridgeService);
 
-  displayImportDialog<T>(title: string, path: string): Observable<T | boolean> {
-    const modalInstance = this._uitModalHelper.open({
+  displayImportDialog(title: string, path: string): Observable<boolean | string[]> {
+    const modalInstance = this._uibModalHelper.open({
       backdrop: 'static',
       templateUrl: 'partials/importDialog.html',
       controller: 'importModalCtrl',
@@ -26,7 +24,7 @@ export class ImportDialogsService {
       },
     });
 
-    return a1Promise2Observable<T | boolean>(modalInstance.result).pipe(
+    return a1Promise2Observable<string[]>(modalInstance.result).pipe(
       catchError(() => {
         this._resourceInputBridgeService.deleteLastUploadedResource();
 
