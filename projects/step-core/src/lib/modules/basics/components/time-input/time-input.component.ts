@@ -53,6 +53,8 @@ export class TimeInputComponent implements ControlValueAccessor, OnInit, OnChang
 
   @Input() modelMeasure = TimeUnit.MILLISECOND;
 
+  @Input() reverseMeasureCalculation?: boolean;
+
   private onChange?: OnChange;
   private onTouch?: OnTouch;
   private modelValue: number = 0;
@@ -120,14 +122,24 @@ export class TimeInputComponent implements ControlValueAccessor, OnInit, OnChang
 
   protected handleDisplayValueChange(value: number): void {
     this.displayValue = value;
-    this.modelValue = this.calculateModelValue(this.displayValue, this.modelMeasure, this.displayMeasure);
+    this.modelValue = this.calculateModelValue(
+      this.displayValue,
+      this.modelMeasure,
+      this.displayMeasure,
+      this.reverseMeasureCalculation
+    );
     this.onChange?.(this.modelValue);
   }
 
   protected handleDisplayMeasureChange(value: TimeUnit): void {
     this.displayMeasure = value;
     this.displayMeasureChange.emit(value);
-    this.modelValue = this.calculateModelValue(this.displayValue, this.modelMeasure, this.displayMeasure);
+    this.modelValue = this.calculateModelValue(
+      this.displayValue,
+      this.modelMeasure,
+      this.displayMeasure,
+      this.reverseMeasureCalculation
+    );
     this.onChange?.(this.modelValue);
   }
 
@@ -160,11 +172,22 @@ export class TimeInputComponent implements ControlValueAccessor, OnInit, OnChang
     return Math.round(ms / displayMeasure);
   }
 
-  private calculateModelValue(displayValue: number, modelMeasure: TimeUnit, displayMeasure?: TimeUnit): number {
+  private calculateModelValue(
+    displayValue: number,
+    modelMeasure: TimeUnit,
+    displayMeasure?: TimeUnit,
+    reverseMeasureCalculation?: boolean
+  ): number {
     if (!displayMeasure) {
       return displayValue;
     }
-    const ms = displayValue * displayMeasure;
+    let ms = displayValue * displayMeasure;
+
+    if (reverseMeasureCalculation) {
+      ms = displayValue / displayMeasure;
+      return ms / modelMeasure;
+    }
+
     return Math.round(ms / modelMeasure);
   }
 }
