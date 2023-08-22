@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
@@ -29,27 +29,16 @@ import { pipe, tap } from 'rxjs';
     },
   ],
 })
-export class PlanListComponent implements AfterViewInit {
-  readonly _plansApiService = inject(AugmentedPlansService);
+export class PlanListComponent {
   private _planDialogs = inject(PlanDialogsService);
   private _restoreDialogsService = inject(RestoreDialogsService);
-  private _location = inject(AJS_LOCATION);
+  readonly _plansApiService = inject(AugmentedPlansService);
 
   readonly dataSource = this._plansApiService.getPlansTableDataSource();
   readonly availableBulkOperations = [
     { operation: BulkOperationType.delete, permission: 'plan-delete' },
     { operation: BulkOperationType.duplicate, permission: 'plan-write' },
   ];
-
-  ngAfterViewInit(): void {
-    const { createNew } = this._location.search();
-    if (createNew !== undefined) {
-      this._location.search('createNew', null);
-      // Timeout to be sure, that navigation events has been completed
-      // Otherwise location change might auto close the modal
-      setTimeout(() => this.addPlan(), 500);
-    }
-  }
 
   private updateDataSourceAfterChange = pipe(
     tap((changeResult?: Plan | boolean | string[]) => {
