@@ -45,15 +45,6 @@ export class FunctionListComponent implements AfterViewInit {
     { operation: BulkOperationType.delete, permission: 'kw-delete' },
     { operation: BulkOperationType.duplicate, permission: 'kw-write' },
   ];
-  ngAfterViewInit(): void {
-    const { createNew } = this._location.search();
-    if (createNew !== undefined) {
-      this._location.search('createNew', null);
-      // Timeout to be sure, that navigation events has been completed
-      // Otherwise location change might auto close the modal
-      setTimeout(() => this.addFunction(), 500);
-    }
-  }
 
   ngAfterViewInit(): void {
     this._functionActions.resolveConfigureLinkIfExits(this._injector);

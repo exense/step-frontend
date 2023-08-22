@@ -69,7 +69,6 @@ import { PlanNamePipe } from './pipes/plan-name.pipe';
 import { ArtefactDetailsComponent } from './components/artefact-details/artefact-details.component';
 import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 import { ResourceInputModule } from './modules/resource-input/resource-input.module';
-import { IsUsedByDialogService } from './services/is-used-by-dialog.service';
 import { ProjectNamePipe } from './pipes/project-name.pipe';
 import { FunctionActionsService, KeywordsCommonModule } from './modules/keywords-common/keywords-common.module';
 import { FunctionActionsImplService } from './services/function-actions-impl.service';
@@ -224,7 +223,6 @@ import { WizardModule } from './modules/wizard/wizards.module';
     KeywordsCommonModule,
     GenericFunctionListComponent,
     ResourceInputWrapperComponent,
-    FunctionLinkComponent,
   ],
   providers: [
     CORE_INITIALIZER,
