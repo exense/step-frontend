@@ -1,8 +1,8 @@
 import { KeyValue } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { AugmentedResourcesService, Resource } from '@exense/step-core';
+import { AugmentedResourcesService, Resource, ResourceInputComponent } from '@exense/step-core';
 import { Subject, takeUntil } from 'rxjs';
 import { PredefinedResourceType } from './predefined-resource-type.enum';
 import { PREDEFINED_RESOURCE_TYPES } from './predefined-resource-types.token';
@@ -35,6 +35,9 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
 
   protected readonly formGroup = resourceConfigurationDialogFormCreate(this._formBuilder);
 
+  @ViewChild('resourceInputControl', { static: false })
+  protected resourceInput?: ResourceInputComponent;
+
   protected loading = false;
   protected uploading = false;
   protected contentUpdated = false;
@@ -43,7 +46,8 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
     // Disable automatic closing, switch to manual
     this._matDialogRef.disableClose = true;
 
-    this.setFormValue(this._resourceConfigurationDialogData.resource);
+    const { resource, isReadonly } = this._resourceConfigurationDialogData;
+    this.setFormValue(resource, isReadonly);
     this.initBackdropClosing();
   }
 
@@ -89,7 +93,7 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
     });
   }
 
-  private setFormValue(resource?: Resource): void {
+  private setFormValue(resource?: Resource, isReadonly?: boolean): void {
     if (!resource) {
       return;
     }
@@ -98,6 +102,9 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
 
     this.formGroup.controls.name.disable();
     this.formGroup.controls.resourceType.disable();
+    if (isReadonly) {
+      this.formGroup.controls.content.disable();
+    }
   }
 
   private initBackdropClosing(): void {

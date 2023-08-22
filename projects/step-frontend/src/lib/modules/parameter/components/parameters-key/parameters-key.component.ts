@@ -1,7 +1,7 @@
-import { Component, Optional } from '@angular/core';
-import { CustomColumnOptions, CustomComponent, Parameter, TableReload } from '@exense/step-core';
+import { Component, inject } from '@angular/core';
+import { CustomColumnOptions, CustomComponent, Parameter } from '@exense/step-core';
 import { map, of } from 'rxjs';
-import { ParameterDialogsService } from '../../services/parameter-dialogs.service';
+import { ParameterListLogicService } from '../../services/parameter-list-logic.service';
 
 @Component({
   selector: 'step-parameters-key',
@@ -9,26 +9,19 @@ import { ParameterDialogsService } from '../../services/parameter-dialogs.servic
   styleUrls: ['./parameters-key.component.scss'],
 })
 export class ParametersKeyComponent implements CustomComponent {
+  private _logic = inject(ParameterListLogicService, { optional: true });
+  private _customColumnOptions = inject(CustomColumnOptions, { optional: true });
+
   readonly noLink$ = (this._customColumnOptions?.options$ || of([])).pipe(
     map((options) => options.includes('noEditorLink'))
   );
 
   context?: Parameter;
 
-  constructor(
-    private _parameterDialogs: ParameterDialogsService,
-    @Optional() private _customColumnOptions?: CustomColumnOptions,
-    @Optional() private _tableReload?: TableReload
-  ) {}
-
   editParameter(): void {
-    if (!this.context) {
+    if (!this.context || !this._logic) {
       return;
     }
-    this._parameterDialogs.editParameter(this.context).subscribe((parameter) => {
-      if (this._tableReload && parameter) {
-        this._tableReload.reload();
-      }
-    });
+    this._logic.editParameter(this.context);
   }
 }

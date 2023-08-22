@@ -62,13 +62,7 @@ export class ScheduledTaskListComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    const { createNew } = this._location.search();
-    if (createNew !== undefined) {
-      this._location.search('createNew', null);
-      // Timeout to be sure, that navigation events has been completed
-      // Otherwise location change might auto close the modal
-      setTimeout(() => this._logic.createParameter(), 500);
-    }
+    this._logic.resolveEditLinkIfExists();
   }
 }
 

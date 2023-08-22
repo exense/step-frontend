@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, Optional } from '@angular/core';
+import { Component, EventEmitter, Output, Input, OnDestroy, OnInit, Optional } from '@angular/core';
 import { ControlValueAccessor, FormControl, NgControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, noop, Subject, combineLatest, takeUntil } from 'rxjs';
 import { jsonValidator } from '../../shared/validators/json-validator';
@@ -11,6 +11,8 @@ type OnTouch = () => void;
   styleUrls: ['./json-raw-editor.component.scss'],
 })
 export class JsonRawEditorComponent implements ControlValueAccessor, OnInit, OnDestroy {
+  @Output() blur = new EventEmitter<void>();
+
   private terminator$ = new Subject<void>();
 
   private onChange: OnChange = noop;
@@ -104,6 +106,7 @@ export class JsonRawEditorComponent implements ControlValueAccessor, OnInit, OnD
     if (this.rawValueFormControl.invalid) {
       this.rawValueFormControl.setValue(this.internalJsonValue || '');
     }
+    this.blur.emit();
     this.onTouch();
   }
 
