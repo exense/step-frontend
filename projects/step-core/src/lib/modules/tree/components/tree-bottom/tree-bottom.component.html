@@ -1,0 +1,9 @@
+<div
+  *ngFor="let item of bottomInfo; trackBy: trackByFn"
+  class="bottom-drop-container"
+  [style.left.px]="item?.leftOffset"
+  cdkDropList
+  [cdkDropListData]="item?.nodeId"
+  (cdkDropListDropped)="handleDropAtBottom(item?.nodeId)"
+  cdkDropListAutoScrollDisabled="true"
+></div>

@@ -4,6 +4,7 @@ import { BehaviorSubject, combineLatest, debounceTime, map, Observable, of, Subj
 import { DropInfo } from '../shared/drop-info';
 import { TreeStateService } from './tree-state.service';
 import { DropType } from '../shared/drop-type.enum';
+import { LastVisibleNodeInfo } from '../shared/last-visible-node-info';
 
 interface DragItem {
   nodeId: string;
@@ -17,6 +18,7 @@ interface DropItem {
   y: number;
   width: number;
   height: number;
+  isTreeEnd: boolean;
 }
 
 const DEFAULT_NODE_HEIGHT = 40;
@@ -44,11 +46,13 @@ export class TreeDragDropService implements OnDestroy {
     this.terminate();
   }
 
-  onEnter(event: CdkDragEnter<any>): void {
-    const nodeId = event.container.data;
+  onEnter(event: CdkDragEnter<string | LastVisibleNodeInfo>): void {
+    const { data } = event.container;
+    const nodeId = typeof data === 'string' ? data : data.nodeId;
+    const isTreeEnd = !(typeof data === 'string');
     const rect = event.container.element.nativeElement.getBoundingClientRect();
     const { x, y, width, height } = rect;
-    this.dropItem$.next({ nodeId, x, y, width, height });
+    this.dropItem$.next({ nodeId, x, y, width, height, isTreeEnd });
   }
 
   handleDrop(): void {
@@ -57,30 +61,6 @@ export class TreeDragDropService implements OnDestroy {
     }
 
     const { dropNodeId, dropType } = this._lastDropInfo;
-    this.proceedDropInternal(dropNodeId, dropType);
-  }
-
-  handleDropLastElement(): void {
-    if (!this._lastDropInfo) {
-      return;
-    }
-
-    const { dropNodeId } = this._lastDropInfo;
-
-    const parentId = this._treeState.findNodeById(dropNodeId)?.parentId;
-    if (parentId) {
-      const isCanOut = parentId && !!this._treeState.findNodeById(parentId)?.parentId;
-      if (isCanOut) {
-        this.proceedDropInternal(parentId, DropType.out);
-      } else {
-        this.proceedDropInternal(parentId, DropType.inside);
-      }
-    } else {
-      this.proceedDropInternal(dropNodeId, DropType.inside);
-    }
-  }
-
-  private proceedDropInternal(dropNodeId: string, dropType: DropType): void {
     this._treeState.insertSelectedNodesTo(dropNodeId, dropType);
     if (dropType === DropType.inside) {
       setTimeout(() => {
@@ -116,8 +96,7 @@ export class TreeDragDropService implements OnDestroy {
           const canInsert = this._treeState.canInsertTo(dropNodeId, true);
           return { dragNodeId, dropNodeId, height, dropType, canInsert };
         }
-        let { nodeId: dropNodeId, height, y: dropY } = drop;
-        let dropNode = this._treeState.findNodeById(dropNodeId);
+        let { nodeId: dropNodeId, height, y: dropY, isTreeEnd } = drop;
 
         const fourthPart = height / 4;
         const beforeEdge = dropY + fourthPart;
@@ -131,24 +110,15 @@ export class TreeDragDropService implements OnDestroy {
           dropType = DropType.inside;
         } else if (dragY >= afterEdge) {
           dropType = DropType.after;
+          /*
           if (dragY > dropY + height + fourthPart) {
             dropType = DropType.out;
             dropNodeId = node.parentId;
           }
+*/
         }
 
-        console.log('DROP INFO', {
-          name: dropNode?.name ?? '',
-          dropType,
-          dragY,
-          dropY,
-          afterEdge,
-          beforeEdge,
-          height,
-          fourthPart,
-        });
-
-        const canInsert = this._treeState.canInsertTo(dropNodeId, dropType !== DropType.inside);
+        const canInsert = isTreeEnd || this._treeState.canInsertTo(dropNodeId, dropType !== DropType.inside);
         return { dragNodeId, dropNodeId, height, dropType, canInsert };
       })
     );

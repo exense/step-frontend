@@ -17,6 +17,7 @@ import { IsRootNodePipe } from './pipes/is-root-node.pipe';
 import { TreeNodeActionsPipe } from './pipes/tree-node-actions.pipe';
 import { IsNodeSelectedForInsertPipe } from './pipes/is-node-selected-for-insert.pipe';
 import { NodeElementRefDirective } from './directives/node-element-ref.directive';
+import { TreeBottomComponent } from './components/tree-bottom/tree-bottom.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { NodeElementRefDirective } from './directives/node-element-ref.directive
     ArrayOfSizePipe,
     IsNodeSelectedForInsertPipe,
     NodeElementRefDirective,
+    TreeBottomComponent,
   ],
   imports: [
     CommonModule,

@@ -13,15 +13,16 @@ import {
   ViewChildren,
 } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
+import { CdkTree } from '@angular/cdk/tree';
+import { Subject, switchMap, takeUntil, timer, combineLatest } from 'rxjs';
 import { TreeActionsService } from '../../services/tree-actions.service';
 import { TreeDragDropService } from '../../services/tree-drag-drop.service';
 import { TreeStateService } from '../../services/tree-state.service';
 import { TreeAction } from '../../shared/tree-action';
 import { TreeNode } from '../../shared/tree-node';
-import { CdkTree } from '@angular/cdk/tree';
 import { TreeFlatNode } from '../../shared/tree-flat-node';
-import { Subject, switchMap, takeUntil, timer, combineLatest } from 'rxjs';
 import { NodeElementRefDirective } from '../../directives/node-element-ref.directive';
+import { LastVisibleNodeInfo } from '../../shared/last-visible-node-info';
 
 @Component({
   selector: 'step-tree',
@@ -44,7 +45,7 @@ export class TreeComponent<N extends TreeNode> implements AfterViewInit, OnDestr
 
   readonly contextMenuPosition = { x: 0, y: 0 };
 
-  protected lastVisibleNode?: TreeFlatNode;
+  protected bottomInfo: LastVisibleNodeInfo[] = [];
 
   hasChild = (_: number, node: TreeFlatNode) => node.expandable;
 
@@ -60,13 +61,7 @@ export class TreeComponent<N extends TreeNode> implements AfterViewInit, OnDestr
   @Output() nodeDblClick = new EventEmitter<{ node: N; event: MouseEvent }>();
 
   ngAfterViewInit(): void {
-    this.determineLastVisibleNode();
-    combineLatest([this._treeState.treeUpdate$, this._treeState.expandModelChange$])
-      .pipe(
-        switchMap(() => timer(300)),
-        takeUntil(this.terminator$)
-      )
-      .subscribe(() => this.determineLastVisibleNode());
+    this.setupBottomInfoCalculation();
   }
 
   ngOnDestroy(): void {
@@ -100,10 +95,35 @@ export class TreeComponent<N extends TreeNode> implements AfterViewInit, OnDestr
     this.nodeDblClick.emit({ node, event });
   }
 
-  private determineLastVisibleNode(): void {
+  private setupBottomInfoCalculation(): void {
+    if (this.dragDisabled) {
+      return;
+    }
+    this.determineBottomInfo();
+    combineLatest([this._treeState.treeUpdate$, this._treeState.expandModelChange$])
+      .pipe(
+        switchMap(() => timer(300)),
+        takeUntil(this.terminator$)
+      )
+      .subscribe(() => this.determineBottomInfo());
+  }
+
+  private determineBottomInfo(): void {
     const size = this.treeElement.nativeElement.children.length;
     const lastElement = this.treeElement.nativeElement.children.item(size - 1);
-    const treeNode = this.visibleNodes.find((nodeRef) => nodeRef._element === lastElement);
-    this.lastVisibleNode = treeNode?.node;
+    const lastNode = this.visibleNodes.find((nodeRef) => nodeRef._element === lastElement);
+    if (!lastNode?.node) {
+      this.bottomInfo = [];
+      return;
+    }
+
+    const path = this._treeState.getNodePath(lastNode.node as unknown as N);
+    this.bottomInfo = path
+      .map((nodeId) => this.visibleNodes.find((ref) => ref.node.id === nodeId))
+      .map((ref) => {
+        const nodeId = ref?.node?.id ?? '';
+        const leftOffset = ref?.contentElement?.offsetLeft ?? 0;
+        return { nodeId, leftOffset };
+      });
   }
 }

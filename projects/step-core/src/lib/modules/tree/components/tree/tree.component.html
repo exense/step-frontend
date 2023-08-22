@@ -54,14 +54,7 @@
       </cdk-tree-node>
     </ng-container>
   </cdk-tree>
-  <div
-    *ngIf="!dragDisabled"
-    class="bottom-drop-container"
-    cdkDropList
-    cdkDropListAutoScrollDisabled="true"
-    [cdkDropListData]="lastVisibleNode?.id"
-    (cdkDropListDropped)="_treeDragDrop.handleDropLastElement()"
-  ></div>
+  <step-tree-bottom *ngIf="!dragDisabled" [bottomInfo]="bottomInfo"> </step-tree-bottom>
 </div>
 <div
   #nodeContextMenuTrigger

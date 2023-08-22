@@ -232,9 +232,12 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     if (dropType !== DropType.inside) {
       const node = this.findNodeById(parentId);
       if (!node?.parentId) {
-        return;
+        if (dropType !== DropType.out) {
+          return;
+        }
+      } else {
+        parentId = node?.parentId;
       }
-      parentId = node?.parentId;
     }
 
     const parent = this.findNodeById(parentId);
