@@ -1,4 +1,4 @@
-import { Component, inject, Input, ViewEncapsulation } from '@angular/core';
+import { Component, inject, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, ApiError, AuthService } from '@exense/step-core';
 import { HttpErrorInterceptor } from '../../interceptors/http-error.interceptor';
@@ -9,7 +9,7 @@ import { HttpErrorInterceptor } from '../../interceptors/http-error.interceptor'
   styleUrls: ['./login.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   credentials = {
     username: '',
     password: '',

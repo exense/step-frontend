@@ -6,6 +6,10 @@ import { TokenGroupCapacity } from '@exense/step-core';
 })
 export class CalcStatusSummaryProgressbarPercentPipe implements PipeTransform {
   transform(tokenGroup: TokenGroupCapacity, status: string): number {
-    return (tokenGroup.countByState![status] / tokenGroup.capacity!) * 100;
+    let result = 0;
+    if (tokenGroup.countByState![status]) {
+      result = (tokenGroup.countByState![status] / tokenGroup.capacity!) * 100;
+    }
+    return result;
   }
 }

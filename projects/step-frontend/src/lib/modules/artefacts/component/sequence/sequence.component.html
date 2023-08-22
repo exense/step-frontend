@@ -1,0 +1,25 @@
+<form #form="ngForm">
+  <step-dynamic-checkbox
+    label="Continue sequence execution on errors in child elements"
+    tooltip="Defines if the execution of this sequence should continue when on of the children node fails"
+    [(ngModel)]="context.artefact!.continueOnError"
+    [disabled]="context.readonly"
+    name="continueOnError"
+  >
+  </step-dynamic-checkbox>
+  <mat-expansion-panel [(expanded)]="showAdvanced">
+    <mat-expansion-panel-header>
+      <mat-panel-title>Advanced</mat-panel-title>
+    </mat-expansion-panel-header>
+    <section class="panel-content">
+      <step-dynamic-textfield
+        label="Pacing (ms)"
+        [isNumber]="true"
+        [(ngModel)]="context.artefact!.pacing"
+        [disabled]="context.readonly"
+        name="pacing"
+      >
+      </step-dynamic-textfield>
+    </section>
+  </mat-expansion-panel>
+</form>

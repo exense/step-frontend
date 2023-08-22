@@ -17,7 +17,8 @@
       ></step-predefined-options-input>
 
       <step-resource-input
-        #resourceInput
+        *ngIf="formGroup.controls.content.enabled; else readonlyContent"
+        #resourceInputControl
         label="Content"
         [stType]="formGroup.controls.resourceType.value"
         [disableServerPath]="true"
@@ -27,11 +28,17 @@
         (stModelChange)="onContentChange($event)"
         (filesChange)="onFilesChange()"
       ></step-resource-input>
+      <ng-template #readonlyContent>
+        <step-form-field>
+          <step-label>Content</step-label>
+          <input type="text" [disabled]="true" [value]="formGroup.controls.content.value.value" />
+        </step-form-field>
+      </ng-template>
     </form>
   </div>
 
   <div step-modal-window-buttons>
-    <button type="button" [disabled]="resourceInput?.progress$" (click)="close()" mat-flat-button color="primary">
+    <button type="button" [disabled]="!!resourceInput?.progress$" (click)="close()" mat-flat-button color="primary">
       Close
     </button>
   </div>
