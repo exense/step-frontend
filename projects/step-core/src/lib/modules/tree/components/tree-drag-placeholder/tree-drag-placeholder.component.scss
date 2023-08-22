@@ -25,11 +25,16 @@ step-tree-drag-placeholder {
     }
   }
 
-  &.drop-after + .tree-node {
+  &.drop-after + .tree-node,
+  &.drop-out + .tree-node {
     padding-bottom: $el-height;
     &::after {
       top: $el-height;
     }
+  }
+
+  &.drop-out + .tree-node::after {
+    left: 0;
   }
 
   &.no-insert + .tree-node {

@@ -17,6 +17,9 @@ export class TreeDragPlaceholderComponent implements OnChanges {
   @HostBinding('class.drop-after')
   isDropAfter: boolean = false;
 
+  @HostBinding('class.drop-out')
+  isDropOut: boolean = false;
+
   @HostBinding('class.no-insert')
   noInsert: boolean = false;
 
@@ -31,5 +34,6 @@ export class TreeDragPlaceholderComponent implements OnChanges {
     this.noInsert = dropInfo ? !dropInfo.canInsert : false;
     this.isDropBefore = dropInfo?.dropType === DropType.before;
     this.isDropAfter = dropInfo?.dropType === DropType.after;
+    this.isDropOut = dropInfo?.dropType === DropType.out;
   }
 }

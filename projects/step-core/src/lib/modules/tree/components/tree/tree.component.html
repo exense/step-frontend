@@ -1,56 +1,68 @@
-<cdk-tree [dataSource]="_treeState.dataSource" [treeControl]="_treeState.treeControl" cdkDropListGroup>
-  <ng-container>
-    <cdk-tree-node
-      *cdkTreeNodeDef="let node"
-      cdkTreeNodePadding
-      [cdkTreeNodePaddingIndent]="paddingIdent"
-      [class.cdk-tree-node-selected]="node.id | isNodeSelected | async"
-      cdkDropList
-      cdkDropListSortingDisabled="true"
-      [cdkDropListData]="node.id"
-      (cdkDropListDropped)="_treeDragDrop.handleDrop()"
-      (click)="_treeState.selectNode(node, $event)"
-      (dblclick)="handleDblClick(node, $event)"
-    >
-      <div *ngFor="let level of node.level | arrayOfSize" [style.--level]="level" class="node-line"></div>
-      <step-tree-node
-        [style.padding-left.px]="node.level * paddingMultiplier"
-        [node]="node"
-        [canToggle]="false"
-        [treeContainer]="_treeContainer"
-        [dragDisabled]="dragDisabled"
-        (contextMenu)="openContextMenu($event)"
+<div cdkDropListGroup>
+  <cdk-tree [dataSource]="_treeState.dataSource" [treeControl]="_treeState.treeControl">
+    <ng-container>
+      <cdk-tree-node
+        *cdkTreeNodeDef="let node"
+        [stepNodeElementRef]="node"
+        cdkTreeNodePadding
+        [cdkTreeNodePaddingIndent]="paddingIdent"
+        [class.cdk-tree-node-selected]="node.id | isNodeSelected | async"
+        cdkDropList
+        cdkDropListSortingDisabled="true"
+        [cdkDropListData]="node.id"
+        (cdkDropListDropped)="_treeDragDrop.handleDrop()"
+        (click)="_treeState.selectNode(node, $event)"
+        (dblclick)="handleDblClick(node, $event)"
       >
-      </step-tree-node>
-    </cdk-tree-node>
-  </ng-container>
-  <ng-container>
-    <cdk-tree-node
-      *cdkTreeNodeDef="let node; when: hasChild"
-      cdkTreeNodePadding
-      [cdkTreeNodePaddingIndent]="paddingIdent"
-      [class.cdk-tree-node-selected]="node.id | isNodeSelected | async"
-      [class.expanded]="_treeState.treeControl.isExpanded(node)"
-      cdkDropList
-      cdkDropListSortingDisabled="true"
-      (cdkDropListDropped)="_treeDragDrop.handleDrop()"
-      [cdkDropListData]="node.id"
-      (click)="_treeState.selectNode(node, $event)"
-      (dblclick)="handleDblClick(node, $event)"
-    >
-      <div *ngFor="let level of node.level | arrayOfSize" [style.--level]="level" class="node-line"></div>
-      <step-tree-node
-        [style.padding-left.px]="node.level * paddingMultiplier"
-        [node]="node"
-        [canToggle]="true"
-        [treeContainer]="_treeContainer"
-        [dragDisabled]="dragDisabled"
-        (contextMenu)="openContextMenu($event)"
+        <div *ngFor="let level of node.level | arrayOfSize" [style.--level]="level" class="node-line"></div>
+        <step-tree-node
+          [style.padding-left.px]="node.level * paddingMultiplier"
+          [node]="node"
+          [canToggle]="false"
+          [treeContainer]="_treeContainer"
+          [dragDisabled]="dragDisabled"
+          (contextMenu)="openContextMenu($event)"
+        >
+        </step-tree-node>
+      </cdk-tree-node>
+    </ng-container>
+    <ng-container>
+      <cdk-tree-node
+        *cdkTreeNodeDef="let node; when: hasChild"
+        [stepNodeElementRef]="node"
+        cdkTreeNodePadding
+        [cdkTreeNodePaddingIndent]="paddingIdent"
+        [class.cdk-tree-node-selected]="node.id | isNodeSelected | async"
+        [class.expanded]="_treeState.treeControl.isExpanded(node)"
+        cdkDropList
+        cdkDropListSortingDisabled="true"
+        (cdkDropListDropped)="_treeDragDrop.handleDrop()"
+        [cdkDropListData]="node.id"
+        (click)="_treeState.selectNode(node, $event)"
+        (dblclick)="handleDblClick(node, $event)"
       >
-      </step-tree-node>
-    </cdk-tree-node>
-  </ng-container>
-</cdk-tree>
+        <div *ngFor="let level of node.level | arrayOfSize" [style.--level]="level" class="node-line"></div>
+        <step-tree-node
+          [style.padding-left.px]="node.level * paddingMultiplier"
+          [node]="node"
+          [canToggle]="true"
+          [treeContainer]="_treeContainer"
+          [dragDisabled]="dragDisabled"
+          (contextMenu)="openContextMenu($event)"
+        >
+        </step-tree-node>
+      </cdk-tree-node>
+    </ng-container>
+  </cdk-tree>
+  <div
+    *ngIf="!dragDisabled"
+    class="bottom-drop-container"
+    cdkDropList
+    cdkDropListAutoScrollDisabled="true"
+    [cdkDropListData]="lastVisibleNode?.id"
+    (cdkDropListDropped)="_treeDragDrop.handleDropLastElement()"
+  ></div>
+</div>
 <div
   #nodeContextMenuTrigger
   class="node-context-menu-trigger"

@@ -24,7 +24,7 @@ export class ArtefactTreeNodeUtilsService
 
   convertItem(
     originalArtefact: AbstractArtefact,
-    params?: { parentId?: string; isParentVisuallySkipped?: boolean }
+    params?: { parentId?: string; isParentVisuallySkipped?: boolean; isLast?: boolean }
   ): ArtefactTreeNode {
     const id = originalArtefact.id!;
     const { parentId, isParentVisuallySkipped } = params ?? {};
@@ -33,8 +33,12 @@ export class ArtefactTreeNodeUtilsService
     const isVisuallySkipped = isSkipped || isParentVisuallySkipped;
     const icon = this._artefactTypes.getArtefactType(originalArtefact?._class)?.icon ?? this._artefactTypes.defaultIcon;
     const expandable = (originalArtefact?.children?.length ?? -1) > 0;
-    const children = (originalArtefact?.children || []).map((child) =>
-      this.convertItem(child, { parentId: id, isParentVisuallySkipped: isVisuallySkipped })
+    const children = (originalArtefact?.children || []).map((child, index, self) =>
+      this.convertItem(child, {
+        parentId: id,
+        isParentVisuallySkipped: isVisuallySkipped,
+        isLast: index === self.length - 1,
+      })
     );
 
     return {

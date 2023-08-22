@@ -59,6 +59,8 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   private treeUpdateInternal$ = new Subject<T>();
   readonly treeUpdate$ = this.treeUpdateInternal$.asObservable();
 
+  readonly expandModelChange$ = this.treeControl.expansionModel.changed.asObservable();
+
   readonly hideRoot: boolean = false;
 
   init(root: T, options: TreeStateInitOptions = {}): void {
