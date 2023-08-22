@@ -15,6 +15,7 @@ export abstract class ExecutionStateService extends ExecutionViewServices {
   abstract keywordSearch?: string;
   abstract drillDownTestCase(id: string): void;
   abstract searchStepByError(error: string): void;
+  abstract pauseAutoRefresh(): void;
   abstract currentOperations: Operation[];
   abstract countByErrorMsg: ExecutionErrorMessageItem[];
   abstract errorDistribution?: { errorCount: number; count: number };

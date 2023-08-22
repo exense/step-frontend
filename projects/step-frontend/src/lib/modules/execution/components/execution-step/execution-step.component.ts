@@ -10,7 +10,7 @@ import {
   TableLocalDataSource,
 } from '@exense/step-core';
 import { ExecutionViewServices } from '../../../operations/shared/execution-view-services';
-import { map, Observable, Subject, takeUntil } from 'rxjs';
+import { map, Observable, Subject, takeUntil, tap } from 'rxjs';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
 import { Panels } from '../../shared/panels.enum';
@@ -44,6 +44,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
   @Input() testCasesSelection?: SelectionCollector<string, ReportNode>;
 
   @Output() drilldownTestCase = new EventEmitter<string>();
+  @Output() pauseAutoRefresh = new EventEmitter<string>();
 
   @ViewChild('testCaseSort') testCaseSort!: MatSort;
 
@@ -135,7 +136,14 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
 
     this.selectionTerminator$ = new Subject<void>();
 
+    let selectedTestCasesCount = 0;
     (this as FieldAccessor).keywordParameters$ = testCasesSelection!.selected$.pipe(
+      tap((testcases) => {
+        if (testcases.length < selectedTestCasesCount) {
+          this.pauseAutoRefresh.emit();
+        }
+        selectedTestCasesCount = testcases.length;
+      }),
       map((testcases) => ({
         type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
         eid,

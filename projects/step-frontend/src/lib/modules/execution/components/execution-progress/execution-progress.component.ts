@@ -244,6 +244,10 @@ export class ExecutionProgressComponent
     this.keywordSearch = escapeRegExp(error);
   }
 
+  pauseAutoRefresh(): void {
+    this.autoRefreshDisabled = true;
+  }
+
   selectTab(tabId: string): void {
     this.activeTabId = tabId;
     this.activeTab = this.tabs.find((tab) => tab.id === tabId);
