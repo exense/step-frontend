@@ -19,6 +19,6 @@ export class TreeBottomComponent {
     if (!dropNodeId) {
       return;
     }
-    this._treeState.insertSelectedNodesTo(dropNodeId, DropType.out);
+    this._treeState.insertSelectedNodesTo(dropNodeId, DropType.after);
   }
 }

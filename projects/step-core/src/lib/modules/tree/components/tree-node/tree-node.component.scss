@@ -46,6 +46,10 @@ step-tree-node {
     &.tree-node-hidden {
       display: none;
     }
+
+    &.tree-node-ready-drop {
+      font-weight: 500;
+    }
   }
 
   step-icon.toggle-state {

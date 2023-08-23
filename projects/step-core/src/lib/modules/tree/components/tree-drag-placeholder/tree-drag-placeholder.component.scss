@@ -1,7 +1,7 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
-$el-height: 40px;
-$el-left: 30px;
+$el-height: 4rem;
+$el-left: 3rem;
 
 step-tree-drag-placeholder {
   & + .tree-node {
@@ -26,15 +26,15 @@ step-tree-drag-placeholder {
   }
 
   &.drop-after + .tree-node,
-  &.drop-out + .tree-node {
+  &.drop-after-switch-to-inside + .tree-node {
     padding-bottom: $el-height;
     &::after {
       top: $el-height;
     }
   }
 
-  &.drop-out + .tree-node::after {
-    left: 0;
+  &.drop-after-switch-to-inside + .tree-node::after {
+    left: calc($el-left * 2);
   }
 
   &.no-insert + .tree-node {

@@ -3,6 +3,7 @@
   [class.tree-node-selected]="node.id | isNodeSelected | async"
   [class.tree-node-selected-for-insert]="node.id | isNodeSelectedForInsert | async"
   [class.tree-node-hidden]="isHideRoot && (node.id | isRootNode | async)"
+  [class.tree-node-ready-drop]="node.id | isNodeReadyForDrop | async"
   [class.skipped]="node.isVisuallySkipped"
   cdkDrag
   [cdkDragBoundary]="treeContainer"

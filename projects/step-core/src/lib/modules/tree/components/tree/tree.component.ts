@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  forwardRef,
   inject,
   Input,
   OnDestroy,
@@ -23,14 +24,21 @@ import { TreeNode } from '../../shared/tree-node';
 import { TreeFlatNode } from '../../shared/tree-flat-node';
 import { NodeElementRefDirective } from '../../directives/node-element-ref.directive';
 import { LastVisibleNodeInfo } from '../../shared/last-visible-node-info';
+import { LastNodeContainerService } from '../../services/last-node-container.service';
 
 @Component({
   selector: 'step-tree',
   templateUrl: './tree.component.html',
   styleUrls: ['./tree.component.scss'],
-  providers: [TreeDragDropService],
+  providers: [
+    {
+      provide: LastNodeContainerService,
+      useValue: forwardRef(() => TreeComponent),
+    },
+    TreeDragDropService,
+  ],
 })
-export class TreeComponent<N extends TreeNode> implements AfterViewInit, OnDestroy {
+export class TreeComponent<N extends TreeNode> implements AfterViewInit, OnDestroy, LastNodeContainerService {
   private terminator$ = new Subject<void>();
 
   readonly paddingIdent = 24;
@@ -46,6 +54,7 @@ export class TreeComponent<N extends TreeNode> implements AfterViewInit, OnDestr
   readonly contextMenuPosition = { x: 0, y: 0 };
 
   protected bottomInfo: LastVisibleNodeInfo[] = [];
+  lastNode?: TreeFlatNode;
 
   hasChild = (_: number, node: TreeFlatNode) => node.expandable;
 
@@ -113,15 +122,18 @@ export class TreeComponent<N extends TreeNode> implements AfterViewInit, OnDestr
     const lastElement = this.treeElement.nativeElement.children.item(size - 1);
     const lastNode = this.visibleNodes.find((nodeRef) => nodeRef._element === lastElement);
     if (!lastNode?.node) {
+      this.lastNode = undefined;
       this.bottomInfo = [];
       return;
     }
+    this.lastNode = lastNode.node;
 
     const path = this._treeState.getNodePath(lastNode.node as unknown as N);
     this.bottomInfo = path
       .map((nodeId) => this.visibleNodes.find((ref) => ref.node.id === nodeId))
+      .filter((ref) => !!ref?.node?.parentId)
       .map((ref) => {
-        const nodeId = ref?.node?.id ?? '';
+        const nodeId = ref?.node?.parentId ?? '';
         const leftOffset = ref?.contentElement?.offsetLeft ?? 0;
         return { nodeId, leftOffset };
       });

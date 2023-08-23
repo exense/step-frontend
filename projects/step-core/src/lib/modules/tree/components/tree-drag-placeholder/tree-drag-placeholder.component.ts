@@ -17,11 +17,11 @@ export class TreeDragPlaceholderComponent implements OnChanges {
   @HostBinding('class.drop-after')
   isDropAfter: boolean = false;
 
-  @HostBinding('class.drop-out')
-  isDropOut: boolean = false;
-
   @HostBinding('class.no-insert')
   noInsert: boolean = false;
+
+  @HostBinding('class.drop-after-switch-to-inside')
+  isAfterSwitchToInside: boolean = false;
 
   ngOnChanges(changes: SimpleChanges): void {
     const cDropInfo = changes['dropInfo'];
@@ -32,8 +32,8 @@ export class TreeDragPlaceholderComponent implements OnChanges {
 
   private dropInfoChanged(dropInfo?: DropInfo): void {
     this.noInsert = dropInfo ? !dropInfo.canInsert : false;
+    this.isAfterSwitchToInside = dropInfo?.dropType === DropType.afterSwitchedToInside;
     this.isDropBefore = dropInfo?.dropType === DropType.before;
     this.isDropAfter = dropInfo?.dropType === DropType.after;
-    this.isDropOut = dropInfo?.dropType === DropType.out;
   }
 }

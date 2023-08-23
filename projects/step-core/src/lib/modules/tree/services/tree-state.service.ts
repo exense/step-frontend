@@ -207,37 +207,59 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     }
   }
 
-  insertSelectedNodesTo(nodeId: string, dropType: DropType): void {
+  determineInsertionNode(
+    nodeId: string,
+    dropType: DropType
+  ): { siblingId?: string; parentId: string; dropType: DropType } | undefined {
+    const selectedNodeIds = this.selectedNodeIds$.value.filter((nodeId) => nodeId !== this.rootNode$.value?.id);
+    if (selectedNodeIds.length === 0) {
+      return undefined;
+    }
+
+    const node = this.findNodeById(nodeId);
+    if (!node) {
+      return undefined;
+    }
+
+    // Drop inside in case of expanded node
+    if (dropType === DropType.after && this.isNodeExpanded(nodeId)) {
+      const parentChildren = (node?.children || []).filter((child) => !selectedNodeIds.includes(child.id));
+      if (parentChildren.length > 0) {
+        return {
+          siblingId: parentChildren[0].id,
+          parentId: nodeId,
+          dropType: DropType.afterSwitchedToInside,
+        };
+      } else {
+        return {
+          parentId: nodeId,
+          dropType: DropType.inside,
+        };
+      }
+    }
+
+    if (dropType === DropType.inside) {
+      return {
+        parentId: nodeId,
+        dropType: DropType.inside,
+      };
+    }
+
+    if (!node.parentId) {
+      return undefined;
+    }
+
+    return {
+      siblingId: nodeId,
+      parentId: node.parentId!,
+      dropType: dropType,
+    };
+  }
+
+  insertSelectedNodesTo(parentId: string, dropType: DropType, siblingId?: string): void {
     const selectedNodeIds = this.selectedNodeIds$.value.filter((nodeId) => nodeId !== this.rootNode$.value?.id);
     if (selectedNodeIds.length === 0) {
       return;
-    }
-
-    type InsideInsertStrategy = 'append' | 'prepend';
-    let insideInsertStrategy: InsideInsertStrategy = 'append';
-
-    let parentId = nodeId;
-
-    if (dropType === DropType.after && this.isNodeExpanded(parentId)) {
-      const parent = this.findNodeById(parentId);
-      // drop after for expanded node with children interpret like drop inside, as first children
-      // but don't count dragging children
-      const parentChildren = (parent?.children || []).filter((child) => !selectedNodeIds.includes(child.id));
-      if (parentChildren.length > 0) {
-        dropType = DropType.inside;
-        insideInsertStrategy = 'prepend';
-      }
-    }
-
-    if (dropType !== DropType.inside) {
-      const node = this.findNodeById(parentId);
-      if (!node?.parentId) {
-        if (dropType !== DropType.out) {
-          return;
-        }
-      } else {
-        parentId = node?.parentId;
-      }
     }
 
     const parent = this.findNodeById(parentId);
@@ -246,34 +268,31 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     }
 
     const nodesToAdd = selectedNodeIds.map((nodeId) => this.findNodeById(nodeId)).filter((x) => !!x);
-
     const children = ([...parent.children!] as N[]).filter((child) => !selectedNodeIds.includes(child.id));
+    const dType = [DropType.before, DropType.after].includes(dropType) ? dropType : DropType.before;
 
-    if (dropType === DropType.inside) {
-      if (insideInsertStrategy === 'append') {
-        children.push(...(nodesToAdd as N[]));
-      } else {
+    if (!siblingId) {
+      if (dType === DropType.before) {
         children.unshift(...(nodesToAdd as N[]));
+      } else {
+        children.push(...(nodesToAdd as N[]));
       }
-    } else if (dropType === DropType.after || dropType === DropType.before) {
-      const siblingIndex = children.findIndex((child) => child.id === nodeId)!;
+    } else {
+      const siblingIndex = children.findIndex((child) => child.id === siblingId)!;
       let start: number;
-      if (dropType === DropType.before) {
+      if (dType === DropType.before) {
         start = siblingIndex;
-      } else if (dropType === DropType.after) {
+      } else if (dType === DropType.after) {
         start = siblingIndex + 1;
       }
       children.splice(start!, 0, ...(nodesToAdd as N[]));
-    } else {
-      children.push(...(nodesToAdd as N[]));
     }
-
     this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, children, 'replace');
     this.selectedInsertionParentId$.next(parentId);
     this.refresh();
   }
 
-  canInsertTo(nodeId: string, checkParent: boolean): boolean {
+  canInsertTo(nodeId: string): boolean {
     const artefacts = this.selectedNodeIds$.value
       .filter(
         (nodeId) => nodeId !== this.rootNode$.value?.id && !!this.treeControl.dataNodes.find((n) => n.id === nodeId)
@@ -286,14 +305,6 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     }
 
     let parentIdToCheck = nodeId;
-    if (checkParent) {
-      const node = this.findNodeById(parentIdToCheck);
-      if (!node?.parentId) {
-        return false;
-      }
-      parentIdToCheck = node?.parentId;
-    }
-
     return this.isPossibleToInsert(parentIdToCheck, ...artefacts);
   }
 
