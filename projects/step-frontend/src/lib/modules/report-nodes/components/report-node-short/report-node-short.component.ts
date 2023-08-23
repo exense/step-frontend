@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, TrackByFunction } from '@angular/core';
-import { ArtefactService, ArtefactTypesService, ControllerService, Mutable, ReportNode, ViewerFormat } from '@exense/step-core';
+import { ArtefactService, ControllerService, Mutable, ReportNode, ViewerFormat } from '@exense/step-core';
 import { ReportNodeCommonsService } from '../../services/report-node-commons.service';
 import { map, Observable, of } from 'rxjs';
 
