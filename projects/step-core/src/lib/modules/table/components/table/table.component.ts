@@ -83,7 +83,7 @@ export class TableComponent<T>
   @Input() inProgress?: boolean;
   tableDataSource?: TableDataSource<T>;
   @Input() pageSizeInputDisabled?: boolean;
-  @Input() visibleColumns: string[] | undefined;
+  @Input() visibleColumns?: string[];
 
   @Input() set filter(value: string | undefined) {
     if (value === this.filter) {
@@ -350,14 +350,8 @@ export class TableComponent<T>
 
     allCollDef.forEach((col) => this._table!.addColumnDef(col));
 
-    const visibleColumnsMap = new Map<string, boolean>(); // save columns for low complexity access
-    if (this.visibleColumns) {
-      this.visibleColumns.forEach((col) => visibleColumnsMap.set(col, true));
-    }
     setTimeout(() => {
-      this.displayColumns = allCollDef
-        .map((x) => x.name)
-        .filter((colName) => (this.visibleColumns ? visibleColumnsMap.get(colName) : true));
+      this.displayColumns = this.determineDisplayColumns(this.visibleColumns);
     });
   }
 
@@ -429,15 +423,17 @@ export class TableComponent<T>
     }
     const visibleColumns = changes['visibleColumns'];
     if (visibleColumns?.previousValue !== visibleColumns?.currentValue) {
-      if (visibleColumns.currentValue) {
-        const visibleColumnsMap = new Map<string, boolean>(); // save columns for low complexity access
-        visibleColumns.currentValue.forEach((col: string) => visibleColumnsMap.set(col, true));
-        this.displayColumns = this.allCollDef.map((x) => x.name).filter((colName) => visibleColumnsMap.get(colName));
-      } else {
-        // input has been removed. show all columns
-        this.displayColumns = this.allCollDef.map((x) => x.name);
-      }
+      this.displayColumns = this.determineDisplayColumns(visibleColumns.currentValue);
     }
+  }
+
+  private determineDisplayColumns(visibleColumns?: string[]): string[] {
+    if (!visibleColumns) {
+      return this.allCollDef.map((x) => x.name);
+    }
+    const visibleColumnsMap = new Map<string, boolean>(); // save columns for low complexity access
+    visibleColumns?.forEach((col: string) => visibleColumnsMap.set(col, true));
+    return this.allCollDef.map((x) => x.name).filter((colName) => visibleColumnsMap.get(colName));
   }
 
   exportAsCSV(fields: string[]): void {
