@@ -51,11 +51,7 @@ import { SimpleLineChartDirective } from './directives/simple-line-chart.directi
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 import { TooltipDirective } from './directives/tooltip.directive';
 import { TrapFocusDirective } from './directives/trap-focus.directive';
-import {
-  IsUsedByDialog,
-  REPOSITORY_PARAMETERS_INITIALIZER,
-  StepBasicsModule,
-} from './modules/basics/step-basics.module';
+import { REPOSITORY_PARAMETERS_INITIALIZER, StepBasicsModule } from './modules/basics/step-basics.module';
 import { CustomRegistriesModule } from './modules/custom-registeries/custom-registries.module';
 import { DynamicFormsModule } from './modules/dynamic-forms/dynamic-forms.module';
 import { EntitiesSelectionModule } from './modules/entities-selection/entities-selection.module';

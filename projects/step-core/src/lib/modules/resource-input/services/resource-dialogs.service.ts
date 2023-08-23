@@ -11,8 +11,7 @@ import { SearchResourceDialogComponent } from '../components/search-resource-dia
 import { UpdateResourceWarningDialogComponent } from '../components/update-resource-warning-dialog/update-resource-warning-dialog.component';
 import { DialogsService, a1Promise2Observable } from '../../../shared';
 import { UpdateResourceWarningResultState } from '../shared/update-resource-warning-result-state.enum';
-import { IsUsedByDialog } from '../../basics/services/is-used-by-dialog';
-
+import { IsUsedByDialogService } from '../../../services/is-used-by-dialog.service';
 const RESOURCE_SEARCH_TYPE = 'RESOURCE_ID';
 
 @Injectable({
@@ -23,7 +22,7 @@ export class ResourceDialogsService {
   private _dialogs = inject(DialogsService);
   private _resourcesService = inject(ResourcesService);
   private _document = inject(DOCUMENT);
-  private _isUsedByDialogs = inject(IsUsedByDialog);
+  private _isUsedByDialogs = inject(IsUsedByDialogService);
 
   deleteResource(id: string, label: string): Observable<boolean> {
     return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Resource "${label}"`)).pipe(
