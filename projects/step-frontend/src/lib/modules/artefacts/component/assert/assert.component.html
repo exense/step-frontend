@@ -20,6 +20,7 @@
     [(ngModel)]="context.artefact!.expected"
     [disabled]="context.readonly"
     [isNumber]="!!(isNumberExpectedValue$ | async)"
+    [isNegativeNumberAllowed]="true"
     name="expected"
   >
   </step-dynamic-textfield>
