@@ -26,6 +26,30 @@
           Generate new Key
         </button>
       </div>
+      <table class="table api-token-table {{ canGenerateApiKey ? '' : 'disabled' }}">
+        <thead>
+          <tr>
+            <th>Label</th>
+            <th>Created</th>
+            <th>Valid until</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let token of tokens">
+            <td [matTooltip]="token.token">
+              {{ token.label || token.id }}
+            </td>
+            <td>
+              {{ token.creationTime | date }}
+            </td>
+            <td>
+              {{ token.expiryTime | date }}
+            </td>
+            <td><a (click)="revokeAPIToken(token.id)">revoke</a></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
   <div class="panel panel-default">

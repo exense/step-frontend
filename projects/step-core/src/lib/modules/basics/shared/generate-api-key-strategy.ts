@@ -1,3 +1,7 @@
+import { Observable } from 'rxjs';
+
 export interface GenerateApiKeyStrategy {
-  showGenerateApiKeyDialog(): void;
+  showGenerateApiKeyDialog(): Observable<any>;
+  getServiceAccountTokens(): Observable<Array<any>>;
+  revoke(id: string): Observable<any>;
 }

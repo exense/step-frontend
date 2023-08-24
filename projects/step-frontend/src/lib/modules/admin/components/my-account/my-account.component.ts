@@ -47,13 +47,14 @@ export class MyAccountComponent implements OnInit, OnChanges {
 
   user: Partial<User> = {};
   preferences: KeyValuePair<string, string>[] = [];
+  tokens: Array<any> = [];
 
   changePwd(): void {
     this._credentialsService.changePassword(false);
   }
 
   invokeShowGenerateApiKeyDialog(): void {
-    this._generateApiKey.showGenerateApiKeyDialog();
+    this._generateApiKey.showGenerateApiKeyDialog().subscribe(() => this.updateTokens());
   }
 
   addPreference(): void {
@@ -77,6 +78,7 @@ export class MyAccountComponent implements OnInit, OnChanges {
       this.user = user || {};
       this.preferences = preferencesToKVPairArray(this.user?.preferences);
     });
+    this.updateTokens();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -84,6 +86,16 @@ export class MyAccountComponent implements OnInit, OnChanges {
     if (errorChange?.currentValue !== errorChange?.previousValue) {
       this.errorChange.emit(errorChange?.currentValue);
     }
+  }
+
+  updateTokens(): void {
+    if (this.canGenerateApiKey) {
+      this._generateApiKey.getServiceAccountTokens().subscribe((tokens) => (this.tokens = tokens));
+    }
+  }
+
+  revokeAPIToken(id: string) {
+    this._generateApiKey.revoke(id).subscribe(() => this.updateTokens());
   }
 }
 
