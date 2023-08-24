@@ -15,7 +15,7 @@ import { TreeNode } from '../../shared/tree-node';
 import { TreeStateService } from '../../services/tree-state.service';
 import { TreeDragDropService } from '../../services/tree-drag-drop.service';
 import { TreeFlatNode } from '../../shared/tree-flat-node';
-import { CdkDragEnter, CdkDragExit, CdkDragStart } from '@angular/cdk/drag-drop';
+import { CdkDragEnter, CdkDragStart } from '@angular/cdk/drag-drop';
 import { Observable, of, Subject, takeUntil } from 'rxjs';
 import { DropInfo } from '../../shared/drop-info';
 
@@ -56,10 +56,6 @@ export class TreeNodeComponent implements OnInit, OnChanges, OnDestroy {
 
   dragEnter(event: CdkDragEnter<any>): void {
     this._treeDragDrop.onEnter(event);
-  }
-
-  dragExit(event: CdkDragExit<any>): void {
-    this._treeDragDrop.onExit(event);
   }
 
   dragEnd(): void {

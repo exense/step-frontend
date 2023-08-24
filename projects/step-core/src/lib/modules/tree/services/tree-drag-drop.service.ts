@@ -1,6 +1,16 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { CdkDrag, CdkDragEnter, CdkDragExit, CdkDragStart } from '@angular/cdk/drag-drop';
-import { BehaviorSubject, combineLatest, debounceTime, map, Observable, of, Subject, takeUntil } from 'rxjs';
+import { CdkDrag, CdkDragEnter, CdkDragStart } from '@angular/cdk/drag-drop';
+import {
+  BehaviorSubject,
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  Observable,
+  of,
+  Subject,
+  takeUntil,
+} from 'rxjs';
 import { DropInfo } from '../shared/drop-info';
 import { TreeStateService } from './tree-state.service';
 import { DropType } from '../shared/drop-type.enum';
@@ -42,7 +52,7 @@ export class TreeDragDropService implements OnDestroy {
   onDragStart(event: CdkDragStart<any>): Observable<DropInfo | undefined> {
     this.terminate();
     this.setupStreams(event.source);
-    return this.dropInfo$;
+    return this.dropInfo$.pipe(distinctUntilChanged());
   }
 
   onDragEnd(): void {
@@ -51,13 +61,11 @@ export class TreeDragDropService implements OnDestroy {
 
   onEnter(event: CdkDragEnter<string>): void {
     const nodeId = event.container.data;
+    let elementRef = event.container.element.nativeElement;
+    elementRef = elementRef.querySelector('.node-content') ?? elementRef;
     const rect = event.container.element.nativeElement.getBoundingClientRect();
     const { x, y, width, height } = rect;
     this.dropItem$.next({ nodeId, x, y, width, height });
-  }
-
-  onExit(event: CdkDragExit<any>): void {
-    this.dropItem$.next(undefined);
   }
 
   handleDrop(): void {
@@ -100,7 +108,7 @@ export class TreeDragDropService implements OnDestroy {
           const dropType = DropType.inside;
           return { dragNodeId, dropType, canInsert: false, parentNodeId: dropNodeId, siblingNodeId: node.id };
         }
-        let { nodeId: dropNodeId, height, y: dropY } = drop;
+        let { nodeId: dropNodeId, y: dropY, height } = drop;
 
         const fourthPart = height / 4;
         const beforeEdge = dropY + fourthPart;
