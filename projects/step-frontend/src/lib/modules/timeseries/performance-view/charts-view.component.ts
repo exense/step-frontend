@@ -219,7 +219,9 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   updateBaseCharts(request: UpdatePerformanceViewRequest): Observable<any> {
     this.updateBaseChartsTerminator$.next(); // to keep executions synchronous
     // let's assume the complete interval and selections are set.
-    if (!this.context.inProgress$.getValue()) this.context.setInProgress(true);
+    if (!this.context.inProgress$.getValue()) {
+      this.context.setInProgress(true);
+    }
     const updates$ = [];
     if (request.showLoadingBar) {
       this.chartsAreLoading = true;
@@ -342,6 +344,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
 
   private refreshAllCharts(): Observable<unknown> {
     this.findRequestBuilder = this.prepareFindRequestBuilder(this.settings); // we don't want to lose active filters
+
     const timeSelection = this.context.getSelectedTimeRange();
     this.findRequestBuilder.withRange(timeSelection);
 

@@ -20,7 +20,7 @@ export class SelectEntityOfTypeComponent implements OnInit, OnDestroy {
   protected entity = this._entityRegistry.getEntityByName(this._dialogData.entityName);
   protected selectEntityContext: SelectEntityContext = {
     multipleSelection: !this._dialogData.singleSelection,
-    handleSelect: (selectedId: string) => this.handleSelect(selectedId),
+    handleSelect: (item: any) => this.handleSelect(item),
     getSourceId: () => this._dialogData.sourceId,
   };
   protected migrationTarget: string = '';
@@ -72,10 +72,10 @@ export class SelectEntityOfTypeComponent implements OnInit, OnDestroy {
     this.currentProject = this._projectManagementHelper.getCurrentProject()?.name || '';
   }
 
-  private handleSelect(selectedId: string): void {
+  private handleSelect(item: any): void {
     const result: SelectEntityOfTypeResult = {
       entity: this.entity,
-      item: selectedId,
+      item: item,
     };
     this._matDialogRef.close(result);
   }

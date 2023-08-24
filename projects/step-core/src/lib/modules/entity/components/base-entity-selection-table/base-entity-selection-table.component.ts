@@ -33,11 +33,11 @@ export abstract class BaseEntitySelectionTableComponent implements AfterViewInit
     this.cleanupContext();
   }
 
-  handleSelect(id: string): void {
+  handleSelect(item: any): void {
     if (!this.contextInternal?.handleSelect) {
       return;
     }
-    this.contextInternal.handleSelect(id);
+    this.contextInternal.handleSelect(item);
   }
 
   private setupContext(): void {

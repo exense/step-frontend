@@ -5,8 +5,8 @@
         <step-ts-filter-bar
           *ngIf="context"
           [context]="context"
-          [defaultFilterOptions]="settings.filterOptions"
-          [initialFilters]="contextualFilterItems"
+          [filterOptions]="filterOptions"
+          [activeFilters]="filterItems"
           (onTimeRangeChange)="handleTimeRangeChange($event)"
           [timeRangeOptions]="settings.timeRangeOptions"
           [activeTimeRange]="settings.activeTimeRange"
@@ -20,15 +20,15 @@
           #compareFilterBar
           *ngIf="compareModeContext"
           [context]="compareModeContext"
-          [defaultFilterOptions]="settings.filterOptions"
-          [initialFilters]="compareModeContext.getFilteringSettings().filterItems"
+          [filterOptions]="compareModeFilterOptions"
+          [activeFilters]="compareModeFilterItems"
           (onTimeRangeChange)="handleCompareTimeRangeChange($event)"
           [timeRangeOptions]="compareModeTimeRangeOptions"
           [activeTimeRange]="compareModeActiveRangeOption"
           [compactView]="compareModeEnabled"
         >
         </step-ts-filter-bar>
-        <div *ngIf="compareModeEnabled" class="stamp compare">COMPARE</div>
+        <div *ngIf="compareModeEnabled" class="stamp compare">COMPARE {{ compareModeFilterOptions.length }}</div>
       </div>
     </div>
   </div>

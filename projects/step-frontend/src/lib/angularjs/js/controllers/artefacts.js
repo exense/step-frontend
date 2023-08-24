@@ -111,7 +111,7 @@ angular
 
     $scope.selectFunction = function () {
       EntityDialogsService.selectEntityOfType('functions', true).subscribe(function (result) {
-        var id = result.item;
+        var id = result.item.id;
         $scope.artefact.functionId = id;
         loadFunction(id, function () {
           $scope.save();

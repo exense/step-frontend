@@ -34,7 +34,7 @@ export class PlanDialogsService {
   selectPlan(): Observable<Plan> {
     const selectedEntity$ = this._entityDialogs.selectEntityOfType('plans', true);
     const plan$ = selectedEntity$.pipe(
-      map((result) => result.item),
+      map((result) => result.item.id),
       switchMap((id) => this._plansApiService.getPlanById(id))
     );
     return plan$;

@@ -45,10 +45,13 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     { label: 'Last Hour', timeInMs: this.ONE_HOUR_MS },
   ];
 
-  contextualFilterItems: TsFilterItem[] = [];
+  filterItems: TsFilterItem[] = [];
+  filterOptions: TsFilterItem[] = [];
 
   compareModeEnabled: boolean = false;
   compareModeContext: TimeSeriesContext | undefined;
+  compareModeFilterOptions: TsFilterItem[] = [];
+  compareModeFilterItems: TsFilterItem[] = [];
   compareModeTimeRangeOptions = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   compareModeActiveRangeOption: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
 
@@ -64,28 +67,75 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     if (!this.settings) {
       throw new Error('Settings input must be set');
     }
-    this.contextualFilterItems = Object.keys(this.settings.contextualFilters).map((key) => {
-      return {
-        isHidden: !this.settings.showContextualFilters,
-        removable: true,
-        label: key,
-        type: FilterBarItemType.FREE_TEXT,
-        attributeName: key,
-        freeTextValues: [this.settings.contextualFilters[key]],
-        isLocked: false,
-        exactMatch: true,
-      };
-    });
+    // combine contextual filters (from URL) with custom specified filters
+    this.filterItems = this.mergeContextualParamsWithActiveFilters(
+      this.settings.contextualFilters,
+      this.settings.activeFilters || []
+    );
+    this.filterOptions = this.prepareFilterOptions(this.filterItems, this.settings);
     const contextParams: TimeSeriesContextParams = {
       id: this.settings.contextId,
       timeRange: this.settings.timeRange,
-      filters: this.contextualFilterItems,
+      filters: this.filterItems,
       grouping: ['name'],
     };
     this.context = this.contextsFactory.createContext(contextParams);
 
     this.performanceViewSettings = this.settings;
     this.subscribeForContextChange();
+  }
+
+  private mergeContextualParamsWithActiveFilters(
+    contextualParams: Record<string, string>,
+    activeFilters: TsFilterItem[]
+  ) {
+    const contextualFilters = Object.keys(contextualParams).map((key) => {
+      return {
+        isHidden: !this.settings.showContextualFilters,
+        removable: true,
+        label: this.getFilterFieldLabel(key),
+        type: this.getFilterFieldType(key),
+        attributeName: key,
+        freeTextValues: [contextualParams[key]],
+        isLocked: false,
+        exactMatch: true,
+      } as TsFilterItem;
+    });
+    let notContextualFilters = activeFilters.filter((item) => !contextualParams[item.attributeName]);
+    return [...contextualFilters, ...notContextualFilters];
+  }
+
+  /**
+   * Attributes that are hidden (e.g executionId) should not appear in the add filters menu
+   * @param settings
+   * @private
+   */
+  private prepareFilterOptions(activeFilters: TsFilterItem[], settings: TimeSeriesDashboardSettings): TsFilterItem[] {
+    const hiddenFilters = activeFilters.filter((f) => f.isHidden).map((f) => f.attributeName) || [];
+    return settings.filterOptions.map((f) => {
+      if (hiddenFilters.includes(f.attributeName)) {
+        f.isHidden = true;
+      }
+      return f;
+    });
+  }
+
+  private getFilterFieldLabel(attribute: string): string {
+    switch (attribute) {
+      case 'eId':
+        return 'Execution';
+      default:
+        return attribute;
+    }
+  }
+
+  private getFilterFieldType(attribute: string): FilterBarItemType {
+    switch (attribute) {
+      case 'eId':
+        return FilterBarItemType.EXECUTION;
+      default:
+        return FilterBarItemType.FREE_TEXT;
+    }
   }
 
   private updateBaseCharts(showLoading = false) {
@@ -136,7 +186,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
 
   handleTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
-    //TODO optional execution
     let newTimeRange: TSTimeRange;
     if (this.settings.execution) {
       newTimeRange = TimeSeriesUtils.convertExecutionAndSelectionToTimeRange(
@@ -195,7 +244,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.updateBaseChartsSubscription?.unsubscribe(); // end current execution
     this.context.updateFullRange(range, false);
     this.context.updateSelectedRange(range, false);
-    console.log('range update');
     const updateCharts$ = this.chartsView.updateBaseCharts({
       updateRanger: true,
       updateCharts: true,
@@ -224,13 +272,15 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   public enableCompareMode(): void {
-    const filters = this.prepareFiltersForCompareMode();
+    console.log(this.filterOptions);
+    this.compareModeFilterOptions = this.filterOptions.map((i) => ({ ...i, isHidden: false }));
+    this.compareModeFilterItems = this.prepareFiltersForCompareMode();
     const timeRange = JSON.parse(JSON.stringify(this.context.getFullTimeRange()));
     const compareContext = this.contextsFactory.createContext({
       timeRange: timeRange,
       id: new Date().getTime().toString(),
       grouping: ['name'], // the grouping component don't currently support a custom default value other than 'name'
-      filters: filters,
+      filters: this.compareModeFilterOptions,
       keywordsContext: this.context.keywordsContext, // share the same keywords context and colors
     });
     this.compareModeActiveRangeOption = { type: RangeSelectionType.ABSOLUTE, absoluteSelection: timeRange };
@@ -242,7 +292,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.context.enableCompareMode(compareContext);
   }
 
-  public exportRawData() {
+  public exportRawData(): void {
     if (this.exportInProgress) {
       return;
     }
@@ -260,17 +310,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   private prepareFiltersForCompareMode(): TsFilterItem[] {
-    return Object.keys(this.settings.contextualFilters).map((key) => {
-      const label = key === 'eId' ? 'Execution Id' : key;
-      return {
-        attributeName: key,
-        isHidden: false,
-        exactMatch: true,
-        label: label,
-        type: FilterBarItemType.FREE_TEXT,
-        freeTextValues: [this.settings.contextualFilters[key]],
-      };
-    });
+    return this.filterItems.map((i) => ({ ...i, isHidden: false })); // clone the objects
   }
 
   ngOnDestroy(): void {

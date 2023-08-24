@@ -5,7 +5,7 @@ import { TimeSeriesUtils } from '../../../time-series-utils';
 import { FilterBarItemType, TsFilterItem } from '../model/ts-filter-item';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { MatChipInputEvent } from '@angular/material/chips';
+import { EntitySearchValue } from './entity-search-value';
 
 @Component({
   selector: 'step-ts-filter-bar-item',
@@ -26,6 +26,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
   readonly FilterBarType = FilterBarItemType;
 
   freeTextValues: string[] = [];
+
   chipInputValue = '';
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
   minValue?: number; // for numbers or dates
@@ -41,6 +42,10 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
       throw new Error('Item input is mandatory');
     }
     this.freeTextValues = this.item.freeTextValues || [];
+    if (this.item.type === FilterBarItemType.EXECUTION) {
+      this.item.searchEntities =
+        this.item.freeTextValues?.map((value) => ({ searchValue: value, entity: undefined })) || [];
+    }
   }
 
   onMenuClose(): void {
@@ -81,6 +86,9 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
       this.item.label = this.item.attributeName;
     }
     switch (this.item.type) {
+      case FilterBarItemType.EXECUTION:
+        this.item.freeTextValues = this.item.searchEntities.map((e) => e.searchValue);
+        break;
       case FilterBarItemType.OPTIONS:
         break;
       case FilterBarItemType.FREE_TEXT:
@@ -111,6 +119,10 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
   private getFormattedValue(filter: TsFilterItem): string | undefined {
     let formattedValue: string | undefined = '';
     switch (filter.type) {
+      case FilterBarItemType.EXECUTION:
+        const count = this.item.freeTextValues?.length;
+        formattedValue = count ? (count > 1 ? `${count} items` : `1 item`) : '-';
+        break;
       case FilterBarItemType.FREE_TEXT:
         formattedValue = this.item.freeTextValues?.join(', ');
         break;

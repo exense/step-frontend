@@ -128,7 +128,7 @@ export class FunctionDialogsService implements FunctionLinkDialogService {
     const selectedEntity$ = this._entityDialogs.selectEntityOfType('function', true);
     const function$ = selectedEntity$.pipe(
       map((result) => result.item),
-      switchMap((id) => this._functionApiService.getFunctionById(id))
+      switchMap((item) => this._functionApiService.getFunctionById(item.id))
     );
     return function$;
   }

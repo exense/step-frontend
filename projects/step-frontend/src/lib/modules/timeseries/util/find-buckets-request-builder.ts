@@ -126,10 +126,4 @@ export class FindBucketsRequestBuilder {
       numberOfBuckets: this.numberOfBuckets,
     };
   }
-
-  private combineOqlWithFilters(oql: string, filterItems: TsFilterItem[]): string {
-    oql = oql.trim();
-    const filtersOql = FilterUtils.filtersToOQL(filterItems, this.attributesPrefix);
-    return [oql, filtersOql].filter((x) => x).join(' and ');
-  }
 }

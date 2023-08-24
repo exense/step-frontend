@@ -27,25 +27,20 @@
   </div>
 
   <div class="filters">
-    <mat-menu #menu="matMenu">
-      <button mat-menu-item *ngFor="let option of _defaultFilterOptions" (click)="addFilterItem(option)">
-        <span>{{ option.label }}</span>
-      </button>
-
-      <button mat-menu-item [matMenuTriggerFor]="typesMenu">
-        <span>Other</span>
-      </button>
-
-      <button mat-menu-item disabled>
-        <span>OQL</span>
-      </button>
+    <mat-menu #addFilterMenu="matMenu">
+      <ng-container *ngFor="let option of filterOptions">
+        <button mat-menu-item *ngIf="!option.isHidden" (click)="addFilterItem(option)">
+          <span>{{ option.label }}</span>
+        </button>
+      </ng-container>
+      <button mat-menu-item [matMenuTriggerFor]="typesMenu">Other</button>
+      <button mat-menu-item (click)="openDiscovery()">Discover...</button>
     </mat-menu>
 
     <mat-menu #typesMenu="matMenu">
       <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.FREE_TEXT)">Text Filter</button>
       <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.NUMERIC)">Numeric Filter</button>
       <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.DATE)">Date Filter</button>
-      <button mat-menu-item (click)="openDiscovery()">Discover...</button>
     </mat-menu>
 
     <div
@@ -54,9 +49,9 @@
       [style.flexWrap]="compactView ? 'wrap' : 'nowrap'"
     >
       <ng-container *ngIf="!oqlModeActive">
-        <ng-container *ngFor="let item of filterItems; let i = index">
+        {{ activeFilters.length }}
+        <ng-container *ngFor="let item of activeFilters; let i = index">
           <step-ts-filter-bar-item
-            *ngIf="!item.isHidden"
             #appliedFilter
             [item]="item"
             [compact]="compactView"
@@ -66,7 +61,7 @@
           >
           </step-ts-filter-bar-item>
         </ng-container>
-        <div class="more-btn-container" [matMenuTriggerFor]="typesMenu">
+        <div class="more-btn-container" [matMenuTriggerFor]="addFilterMenu">
           <div class="more-btn filter-item-container">
             <span>More</span>
             <step-icon name="plus"></step-icon>

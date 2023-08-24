@@ -26,7 +26,7 @@ import { TimeSeriesConfig } from '../../time-series.config';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TimeSeriesDashboardSettings } from '../../dashboard/model/ts-dashboard-settings';
 import { TimeSeriesDashboardComponent } from '../../dashboard/time-series-dashboard.component';
-import { FilterBarItemType } from '../../performance-view/filter-bar/model/ts-filter-item';
+import { FilterBarItemType, TsFilterItem } from '../../performance-view/filter-bar/model/ts-filter-item';
 import { TsUtils } from '../../util/ts-utils';
 import { TimeSeriesUtils } from '../../time-series-utils';
 import { ChartsViewComponent } from '../../performance-view/charts-view.component';
@@ -109,6 +109,39 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
     const endTime = execution.endTime ? execution.endTime : new Date().getTime();
     let urlParams = TsUtils.getURLParams(window.location.href);
     const timeRangeOptions = TimeSeriesConfig.EXECUTION_PAGE_TIME_SELECTION_OPTIONS;
+    let pageFilters: TsFilterItem[] = [
+      {
+        label: 'Execution',
+        attributeName: 'eId',
+        type: FilterBarItemType.EXECUTION,
+        searchEntities: [],
+        removable: true,
+        isHidden: true,
+      },
+      {
+        label: 'Status',
+        attributeName: 'rnStatus',
+        type: FilterBarItemType.OPTIONS,
+        textValues: [{ value: 'PASSED' }, { value: 'FAILED' }, { value: 'TECHNICAL_ERROR' }, { value: 'INTERRUPTED' }],
+        isLocked: true,
+        searchEntities: [],
+      },
+      {
+        label: 'Type',
+        attributeName: 'type',
+        type: FilterBarItemType.OPTIONS,
+        textValues: [{ value: 'keyword' }, { value: 'custom' }],
+        isLocked: true,
+        searchEntities: [],
+      },
+      {
+        label: 'Name',
+        attributeName: 'name',
+        type: FilterBarItemType.FREE_TEXT,
+        isLocked: true,
+        searchEntities: [],
+      },
+    ];
     this.dashboardSettings = {
       contextId: this.executionId,
       execution: execution,
@@ -118,33 +151,8 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
       activeTimeRange: timeRangeOptions[timeRangeOptions.length - 1],
       contextualFilters: { ...urlParams, eId: this.executionId },
       showContextualFilters: false,
-      filterOptions: [
-        {
-          label: 'Status',
-          attributeName: 'rnStatus',
-          type: FilterBarItemType.OPTIONS,
-          textValues: [
-            { value: 'PASSED' },
-            { value: 'FAILED' },
-            { value: 'TECHNICAL_ERROR' },
-            { value: 'INTERRUPTED' },
-          ],
-          isLocked: true,
-        },
-        {
-          label: 'Type',
-          attributeName: 'type',
-          type: FilterBarItemType.OPTIONS,
-          textValues: [{ value: 'keyword' }, { value: 'custom' }],
-          isLocked: true,
-        },
-        {
-          label: 'Name',
-          attributeName: 'name',
-          type: FilterBarItemType.FREE_TEXT,
-          isLocked: true,
-        },
-      ],
+      activeFilters: pageFilters,
+      filterOptions: JSON.parse(JSON.stringify(pageFilters)),
     };
   }
 

@@ -12,24 +12,25 @@ import {
   ViewChildren,
   ViewEncapsulation,
 } from '@angular/core';
-import { debounceTime, Observable, Subject, switchMap, take, tap } from 'rxjs';
+import { debounceTime, Observable, Subject, take } from 'rxjs';
 import { TimeSeriesContext } from '../../time-series-context';
 import { FilterUtils } from '../../util/filter-utils';
-import { PerformanceViewSettings } from '../model/performance-view-settings';
 import { PerformanceViewTimeSelectionComponent } from '../time-selection/performance-view-time-selection.component';
 import { FilterBarItemComponent } from './item/filter-bar-item.component';
 import { FilterBarItemType, TsFilterItem } from './model/ts-filter-item';
 import { TsFilteringSettings } from '../../model/ts-filtering-settings';
 import { TimeSeriesConfig } from '../../time-series.config';
-import { TableApiWrapperService, TimeSeriesService } from '@exense/step-core';
+import { TimeSeriesService } from '@exense/step-core';
 import { OqlVerifyResponse } from '../../model/oql-verify-response';
 import { TsFilteringMode } from '../../model/ts-filtering-mode';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
-import { RelativeTimeSelection } from '../../time-selection/model/relative-time-selection';
 import { OQLBuilder } from '../../util/oql-builder';
 import { MatDialog } from '@angular/material/dialog';
 import { DiscoverComponent } from '../../discover/discover.component';
 import { DiscoverDialogData } from '../../discover/discover-dialog-data';
+import { TSTimeRange } from '../../chart/model/ts-time-range';
+import { RangeSelectionType } from '../../time-selection/model/range-selection-type';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
   if (field.startsWith('attributes.')) {
@@ -47,13 +48,13 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
 })
 export class FilterBarComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
-  @Input() initialFilters: TsFilterItem[] = [];
+  @Input() activeFilters: TsFilterItem[] = [];
   @Input() compactView = false;
 
   @Input() timeRangeOptions!: TimeRangePickerSelection[];
   @Input() activeTimeRange!: TimeRangePickerSelection;
 
-  _defaultFilterOptions: TsFilterItem[] = [];
+  @Input() filterOptions: TsFilterItem[] = [];
 
   @Output() onTimeRangeChange = new EventEmitter<TimeRangePickerSelection>();
 
@@ -67,7 +68,6 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   readonly EMIT_DEBOUNCE_TIME = 300;
   readonly FilterBarItemType = FilterBarItemType;
 
-  filterItems: TsFilterItem[] = [];
   groupDimensions: string[] = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS[0].attributes;
 
   rawMeasurementsModeActive = false;
@@ -79,14 +79,14 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   constructor(
     private _changeDetectorRef: ChangeDetectorRef,
     private _timeSeriesService: TimeSeriesService,
-    private _matDialog: MatDialog
+    private _matDialog: MatDialog,
+    private _snackbar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
     if (!this.context) {
       throw new Error('Context input is mandatory');
     }
-    this.prepareVisibleFilters();
     this.emitFilterChange$.pipe(debounceTime(this.EMIT_DEBOUNCE_TIME)).subscribe(() => {
       this.composeAndVerifyFullOql(this.groupDimensions).subscribe((response) => {
         this.rawMeasurementsModeActive = response.hasUnknownFields;
@@ -97,21 +97,8 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     });
   }
 
-  // clone the array
-  @Input() set defaultFilterOptions(value: TsFilterItem[]) {
-    this._defaultFilterOptions = JSON.parse(JSON.stringify(value || []));
-  }
-
-  getFilters(): TsFilterItem[] {
-    return this.filterItems;
-  }
-
   getValidFilters(): TsFilterItem[] {
-    return this.getFilters().filter(FilterUtils.filterItemIsValid);
-  }
-
-  prepareVisibleFilters() {
-    this.filterItems = (this.initialFilters || []).concat(this._defaultFilterOptions);
+    return this.activeFilters.filter(FilterUtils.filterItemIsValid);
   }
 
   handleOqlChange(event: any) {
@@ -142,7 +129,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     const filtersOql = this.oqlModeActive
       ? this.oqlValue
       : FilterUtils.filtersToOQL(
-          this.filterItems.filter(FilterUtils.filterItemIsValid),
+          this.activeFilters.filter(FilterUtils.filterItemIsValid),
           TimeSeriesConfig.ATTRIBUTES_PREFIX
         );
     let groupingItems: TsFilterItem[] = groupDimensions.map((dimension) => ({
@@ -151,6 +138,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
       freeTextValues: ['fake-group-dimension'],
       exactMatch: true,
       label: '',
+      searchEntities: [],
     }));
     const groupingOql = FilterUtils.filtersToOQL(groupingItems, TimeSeriesConfig.ATTRIBUTES_PREFIX);
     const finalOql = `${groupingOql} and (${filtersOql})`;
@@ -171,6 +159,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   }
 
   emitFiltersChange() {
+    console.log(this.activeFilters, this.getValidFilters());
     const settings: TsFilteringSettings = {
       mode: this.oqlModeActive ? TsFilteringMode.OQL : TsFilteringMode.STANDARD,
       filterItems: this.getValidFilters(),
@@ -202,18 +191,63 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   }
 
   handleFilterChange(index: number, item: TsFilterItem) {
-    this.filterItems[index] = item;
+    this.activeFilters[index] = item;
+    if (!item.attributeName) {
+      this.removeFilterItem(index);
+      return;
+    }
+    const existingItems = this.activeFilters.filter((i) => i.attributeName === item.attributeName);
+    if (existingItems.length > 1) {
+      // the filter is duplicated
+      this._snackbar.open('Filter not applied', 'dismiss');
+      this.removeFilterItem(index);
+      return;
+    }
+    if (item.type === FilterBarItemType.EXECUTION && item.updateTimeSelectionOnFilterChange) {
+      // calculate the new time range
+      const newRange = this.getExecutionsTimeRange(item);
+      this.activeTimeRange = { type: RangeSelectionType.ABSOLUTE, absoluteSelection: newRange };
+
+      this.onTimeRangeChange.next(this.activeTimeRange);
+    }
+
     this.emitFilterChange$.next();
   }
 
+  private getExecutionsTimeRange(item: TsFilterItem): TSTimeRange {
+    let allExecutionsAreKnown = true;
+    let min = Number.MAX_VALUE;
+    let max = 0;
+    item.searchEntities.forEach((entity) => {
+      let execution = entity.entity;
+      if (execution) {
+        if (min > execution.startTime) {
+          min = execution.startTime;
+        }
+        if (max < execution.endTime) {
+          max = execution.endTime;
+        }
+      } else {
+        allExecutionsAreKnown = false;
+      }
+    });
+    if (!allExecutionsAreKnown) {
+      // don't reduce the interval because we have execution with no info
+      let fullTimeRange = this.context.getFullTimeRange();
+      min = Math.min(fullTimeRange.from, min);
+      max = Math.max(fullTimeRange.to, max);
+    }
+    return { from: min, to: max };
+  }
+
   addFilterItem(item: TsFilterItem) {
-    const filterIndex = this.filterItems.findIndex((i) => i.attributeName === item.attributeName);
+    const filterIndex = this.activeFilters.findIndex((i) => i.attributeName === item.attributeName);
 
     if (filterIndex !== -1) {
       const index =
-        filterIndex < this.filterItems.length - this.filterItems.length
+        filterIndex < this.activeFilters.length - this.activeFilters.length
           ? filterIndex
-          : filterIndex + this.filterItems.length;
+          : filterIndex + this.activeFilters.length;
 
       this.filterComponents!.toArray()[index].menuTrigger!.openMenu();
     } else {
@@ -227,13 +261,14 @@ export class FilterBarComponent implements OnInit, OnDestroy {
       type: type,
       label: '',
       removable: true,
+      searchEntities: [],
     });
   }
 
   removeFilterItem(index: number) {
-    const itemToDelete = this.filterItems[index];
+    const itemToDelete = this.activeFilters[index];
 
-    this.filterItems.splice(index, 1);
+    this.activeFilters.splice(index, 1);
 
     if (FilterUtils.filterItemIsValid(itemToDelete)) {
       this.emitFilterChange$.next();
@@ -241,12 +276,12 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   }
 
   private addFilter(item: TsFilterItem): void {
-    this.filterItems.push(item);
+    this.activeFilters.push(item);
     this._changeDetectorRef.detectChanges();
     this.filterComponents!.last.openMenu();
     this.filterComponents!.last.menuTrigger!.menuClosed.pipe(take(1)).subscribe(() => {
-      if (!this.filterComponents!.last.changesApplied) {
-        this.filterItems.pop();
+      if (!item.attributeName) {
+        this.activeFilters.pop();
       }
     });
   }

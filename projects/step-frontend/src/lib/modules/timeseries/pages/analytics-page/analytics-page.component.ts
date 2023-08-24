@@ -74,6 +74,59 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     delete urlParams.start;
     delete urlParams.end;
 
+    let allFilters = [
+      {
+        label: 'Status',
+        attributeName: 'rnStatus',
+        type: FilterBarItemType.OPTIONS,
+        textValues: [{ value: 'PASSED' }, { value: 'FAILED' }, { value: 'TECHNICAL_ERROR' }, { value: 'INTERRUPTED' }],
+        isLocked: true,
+        searchEntities: [],
+      },
+      {
+        label: 'Type',
+        attributeName: 'type',
+        type: FilterBarItemType.OPTIONS,
+        textValues: [{ value: 'keyword' }, { value: 'custom' }],
+        isLocked: true,
+        searchEntities: [],
+      },
+      {
+        label: 'Name',
+        attributeName: 'name',
+        type: FilterBarItemType.FREE_TEXT,
+        isLocked: true,
+        searchEntities: [],
+      },
+      {
+        label: 'Execution',
+        attributeName: 'eId',
+        type: FilterBarItemType.EXECUTION,
+        isLocked: true,
+        searchEntities: [],
+      },
+      {
+        label: 'Origin',
+        attributeName: 'origin',
+        type: FilterBarItemType.FREE_TEXT,
+        isLocked: true,
+        searchEntities: [],
+      },
+      {
+        label: 'Task',
+        attributeName: 'taskId',
+        type: FilterBarItemType.TASK,
+        isLocked: true,
+        searchEntities: [],
+      },
+      {
+        label: 'Plan Id',
+        attributeName: 'planId',
+        type: FilterBarItemType.PLAN,
+        isLocked: true,
+        searchEntities: [],
+      },
+    ];
     this.dashboardSettings = {
       contextId: new Date().getTime().toString(),
       includeThreadGroupChart: true,
@@ -83,51 +136,8 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
       showContextualFilters: true,
       timeRangeOptions: TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS,
       activeTimeRange: this.timeRangeSelection, // TODO handle url param
-      filterOptions: [
-        {
-          label: 'Status',
-          attributeName: 'rnStatus',
-          type: FilterBarItemType.OPTIONS,
-          textValues: [
-            { value: 'PASSED' },
-            { value: 'FAILED' },
-            { value: 'TECHNICAL_ERROR' },
-            { value: 'INTERRUPTED' },
-          ],
-          isLocked: true,
-        },
-        {
-          label: 'Type',
-          attributeName: 'type',
-          type: FilterBarItemType.OPTIONS,
-          textValues: [{ value: 'keyword' }, { value: 'custom' }],
-          isLocked: true,
-        },
-        {
-          label: 'Name',
-          attributeName: 'name',
-          type: FilterBarItemType.FREE_TEXT,
-          isLocked: true,
-        },
-        {
-          label: 'Execution Id',
-          attributeName: 'eId',
-          type: FilterBarItemType.FREE_TEXT,
-          isLocked: true,
-        },
-        {
-          label: 'Origin',
-          attributeName: 'origin',
-          type: FilterBarItemType.FREE_TEXT,
-          isLocked: true,
-        },
-        {
-          label: 'Plan Id',
-          attributeName: 'planId',
-          type: FilterBarItemType.FREE_TEXT,
-          isLocked: true,
-        },
-      ],
+      filterOptions: allFilters,
+      activeFilters: allFilters,
     };
     if (this.refreshEnabled) {
       this.startInterval(this.selectedRefreshInterval.value);

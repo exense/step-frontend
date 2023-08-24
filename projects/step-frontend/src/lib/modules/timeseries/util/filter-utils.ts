@@ -53,6 +53,7 @@ export class FilterUtils {
             .join(' or ');
           break;
         case FilterBarItemType.FREE_TEXT:
+        case FilterBarItemType.EXECUTION:
           clause = item.freeTextValues
             ?.map((value) => {
               let regexMatch = `${finalAttributeName} ~ ".*${value}.*"`;
@@ -72,6 +73,8 @@ export class FilterUtils {
           }
           clause = '(' + clauses.join(' and ') + ')';
           break;
+        default:
+          throw new Error('Filter type not handled: ' + item.type);
       }
       return clause ? `(${clause})` : undefined;
     });
