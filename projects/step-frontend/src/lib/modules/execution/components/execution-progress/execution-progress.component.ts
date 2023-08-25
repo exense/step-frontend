@@ -51,6 +51,11 @@ const R_ERROR_KEY = /\\\\u([\d\w]{4})/gi;
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 
+interface RefreshParams {
+  eId?: string;
+  isUpdateSelection?: boolean;
+}
+
 @Component({
   selector: 'step-execution-progress',
   templateUrl: './execution-progress.component.html',
@@ -204,19 +209,19 @@ export class ExecutionProgressComponent
     if (this.autoRefreshDisabled) {
       return;
     }
-    this.refreshExecution();
+    this.refreshExecution({ isUpdateSelection: false });
     if (!this.execution || this.execution.status !== 'ENDED') {
       if (this.isActive) {
         this.refreshOther();
         this.refreshExecutionTree();
-        this.refreshTestCaseTable();
+        this.refreshTestCaseTable({ isUpdateSelection: false });
       }
     } else {
       this.autoRefreshDisabled = true;
       this.showAutoRefreshButton = false;
       this.refreshOther();
       this.refreshExecutionTree();
-      this.refreshTestCaseTable();
+      this.refreshTestCaseTable({ isUpdateSelection: false });
     }
   }
 
@@ -224,10 +229,10 @@ export class ExecutionProgressComponent
     const cEid = changes['eId'];
     if (cEid?.previousValue !== cEid?.currentValue || cEid?.firstChange) {
       this._executionPanels.initialize(cEid?.currentValue);
-      this.refreshExecution(cEid?.currentValue);
+      this.refreshExecution({ eId: cEid?.currentValue });
       this.loadExecutionTree(cEid?.currentValue);
       this.refreshOther(cEid?.currentValue);
-      this.refreshTestCaseTable(cEid?.currentValue);
+      this.refreshTestCaseTable({ eId: cEid?.currentValue });
     }
   }
 
@@ -291,15 +296,23 @@ export class ExecutionProgressComponent
     this._testCasesSelection.select(...selectedTestCases);
   }
 
-  private refreshExecution(eId?: string): void {
-    eId = eId || this.eId;
+  private prepareRefreshParams(params?: RefreshParams): RefreshParams {
+    const eId = params?.eId ?? this.eId;
+    const isUpdateSelection = params?.isUpdateSelection ?? true;
+    return { eId, isUpdateSelection };
+  }
+
+  private refreshExecution(params?: RefreshParams): void {
+    const { eId, isUpdateSelection } = this.prepareRefreshParams(params);
     if (!eId) {
       return;
     }
     this._executionService.getExecutionById(eId).subscribe((execution) => {
       this.onExecutionStatusUpdate(execution?.status);
       this.execution = execution;
-      this.determineDefaultSelection();
+      if (isUpdateSelection) {
+        this.determineDefaultSelection();
+      }
       const parameters: { key: string; value: string }[] = (execution.parameters as any) || [];
       const showTestCaseCurrentOperation = parameters.find(
         (o) => o.key === 'step.executionView.testcases.current-operations'
@@ -344,8 +357,8 @@ export class ExecutionProgressComponent
       });
   }
 
-  private refreshTestCaseTable(eId?: string): void {
-    eId = eId || this.eId;
+  private refreshTestCaseTable(params?: RefreshParams): void {
+    const { eId, isUpdateSelection } = this.prepareRefreshParams(params);
     if (!eId) {
       return;
     }
@@ -360,7 +373,9 @@ export class ExecutionProgressComponent
           this._executionPanels.enablePanel(Panels.testCases, true);
         }
         this.testCases = reportNodes;
-        this.determineDefaultSelection();
+        if (isUpdateSelection) {
+          this.determineDefaultSelection();
+        }
       });
   }
 
