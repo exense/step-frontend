@@ -5,7 +5,6 @@ import { ExecutionLinkComponent } from './components/execution-link/execution-li
 import { LoginComponent } from './components/login/login.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { VersionsDialogComponent } from './components/versions-dialog/versions-dialog.component';
-import { PlanExecutionDirective } from './directives/plan-execution.directive';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { HttpErrorInterceptor } from './interceptors/http-error.interceptor';
 import { LoadingInterceptor } from './interceptors/loading.interceptor';
@@ -23,7 +22,6 @@ import { SidebarStateService } from './injectables/sidebar-state.service';
     IsEmptyJsonPipe,
     ContainsVersionPipe,
     MenuFilterPipe,
-    PlanExecutionDirective,
     VersionsDialogComponent,
   ],
   exports: [
@@ -34,7 +32,6 @@ import { SidebarStateService } from './injectables/sidebar-state.service';
     IsEmptyJsonPipe,
     ContainsVersionPipe,
     MenuFilterPipe,
-    PlanExecutionDirective,
   ],
   imports: [StepCoreModule],
   providers: [
