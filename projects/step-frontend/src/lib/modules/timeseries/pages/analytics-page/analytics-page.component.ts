@@ -8,7 +8,7 @@ import { RangeSelectionType } from '../../time-selection/model/range-selection-t
 import { TSTimeRange } from '../../chart/model/ts-time-range';
 import { TimeSeriesDashboardSettings } from '../../dashboard/model/ts-dashboard-settings';
 import { TsUtils } from '../../util/ts-utils';
-import { FilterBarItemType } from '../../performance-view/filter-bar/model/ts-filter-item';
+import { FilterBarItemType, TsFilterItem } from '../../performance-view/filter-bar/model/ts-filter-item';
 import { range, Subject, takeUntil, timer } from 'rxjs';
 import { TimeSeriesUtils } from '../../time-series-utils';
 
@@ -74,7 +74,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     delete urlParams.start;
     delete urlParams.end;
 
-    let allFilters = [
+    const allFilters: TsFilterItem[] = [
       {
         label: 'Status',
         attributeName: 'rnStatus',
@@ -104,6 +104,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
         type: FilterBarItemType.EXECUTION,
         isLocked: true,
         searchEntities: [],
+        exactMatch: true,
       },
       {
         label: 'Origin',
@@ -118,6 +119,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
         type: FilterBarItemType.TASK,
         isLocked: true,
         searchEntities: [],
+        exactMatch: true,
       },
       {
         label: 'Plan Id',
@@ -125,6 +127,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
         type: FilterBarItemType.PLAN,
         isLocked: true,
         searchEntities: [],
+        exactMatch: true,
       },
     ];
     this.dashboardSettings = {

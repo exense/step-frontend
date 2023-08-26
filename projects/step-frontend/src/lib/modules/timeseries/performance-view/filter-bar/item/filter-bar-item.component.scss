@@ -72,7 +72,6 @@ label {
   border-bottom: 1px solid var.$gray-200;
   padding-bottom: 8px;
   font-weight: bold;
-  margin-bottom: 12px;
 }
 
 .checkboxes {
@@ -80,6 +79,7 @@ label {
   flex-direction: column;
   gap: 2px;
   font-size: 12px;
+  margin-top: 1.2rem;
 }
 
 .date-filters {

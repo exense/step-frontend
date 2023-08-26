@@ -2,17 +2,14 @@
   <div *ngFor="let value of values; let i = index" class="item-container">
     <div class="search-item">
       <step-report-node-icon *ngIf="value.entity" [node]="value.entity.rootReportNode"></step-report-node-icon>
-      {{ value.entity?.description || value.searchValue }}
+      {{ value.entity?.attributes?.name }}
       <button mat-icon-button title="Remove" class="remove-btn">
         <step-icon (click)="removeSearchValue(i)" name="x"></step-icon>
       </button>
     </div>
-    <div class="timestamp" *ngIf="value.entity">
-      {{ value.entity?.startTime | date: DateFormat.date }}
-    </div>
   </div>
-  <button class="add-btn" mat-flat-button (click)="showExecutionPicker()">
+  <button class="add-btn" mat-flat-button (click)="showPicker()">
     <step-icon name="plus"></step-icon>
-    Add execution
+    Add plan
   </button>
 </div>

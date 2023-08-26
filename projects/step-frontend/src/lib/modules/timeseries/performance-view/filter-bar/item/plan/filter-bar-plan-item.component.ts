@@ -13,22 +13,21 @@ export class FilterBarPlanItemComponent {
 
   constructor(private _entityDialogs: EntityDialogsService) {}
 
-  showExecutionPicker() {
-    this._entityDialogs.selectEntityOfType('executions', true).subscribe((result) => {
-      console.log(result);
-      this.addSearchExecution(result.item);
+  showPicker() {
+    this._entityDialogs.selectEntityOfType('plans', true).subscribe((result) => {
+      this.addSearchEntity(result.item);
     });
   }
 
-  addSearchExecution(execution: any) {
-    const executionId = execution.id;
+  addSearchEntity(entity: any) {
+    const id = entity.id;
     for (let i = 0; i < this.values.length; i++) {
-      if (this.values[i].searchValue === executionId) {
-        this.values[i].entity = execution;
+      if (this.values[i].searchValue === id) {
+        this.values[i].entity = entity;
         return;
       }
     }
-    this.values.push({ searchValue: executionId, entity: execution });
+    this.values.push({ searchValue: id, entity: entity });
   }
 
   removeSearchValue(index: number) {

@@ -5,7 +5,6 @@ import { TimeSeriesUtils } from '../../../time-series-utils';
 import { FilterBarItemType, TsFilterItem } from '../model/ts-filter-item';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { EntitySearchValue } from './entity-search-value';
 
 @Component({
   selector: 'step-ts-filter-bar-item',
@@ -79,6 +78,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
   }
 
   applyChanges() {
+    console.log(this.item.searchEntities);
     if (this.chipInputValue) {
       this.addSearchValue(this.chipInputValue);
     }
@@ -87,6 +87,8 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     }
     switch (this.item.type) {
       case FilterBarItemType.EXECUTION:
+      case FilterBarItemType.PLAN:
+      case FilterBarItemType.TASK:
         this.item.freeTextValues = this.item.searchEntities.map((e) => e.searchValue);
         break;
       case FilterBarItemType.OPTIONS:
@@ -99,6 +101,8 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
         this.item.min = this.minValue;
         this.item.max = this.maxValue;
         break;
+      default:
+        throw new Error('Unhandled item type: ' + this.item.type);
     }
     this.formattedValue = this.getFormattedValue(this.item);
     this.onFilterChange.emit(this.item);
@@ -116,10 +120,12 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     this.formattedValue = this.getFormattedValue(this.item);
   }
 
-  private getFormattedValue(filter: TsFilterItem): string | undefined {
+  private getFormattedValue(item: TsFilterItem): string | undefined {
     let formattedValue: string | undefined = '';
-    switch (filter.type) {
+    switch (item.type) {
       case FilterBarItemType.EXECUTION:
+      case FilterBarItemType.PLAN:
+      case FilterBarItemType.TASK:
         const count = this.item.freeTextValues?.length;
         formattedValue = count ? (count > 1 ? `${count} items` : `1 item`) : '-';
         break;
@@ -127,12 +133,12 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
         formattedValue = this.item.freeTextValues?.join(', ');
         break;
       case FilterBarItemType.NUMERIC:
-        if (filter.min != undefined && filter.max != undefined) {
-          formattedValue = `${filter.min} - ${filter.max}`;
-        } else if (filter.min != undefined) {
-          formattedValue = `> ${filter.min}`;
-        } else if (filter.max != undefined) {
-          formattedValue = `< ${filter.max}`;
+        if (item.min != undefined && item.max != undefined) {
+          formattedValue = `${item.min} - ${item.max}`;
+        } else if (item.min != undefined) {
+          formattedValue = `> ${item.min}`;
+        } else if (item.max != undefined) {
+          formattedValue = `< ${item.max}`;
         } else {
           // both are undefined
           formattedValue = '';
@@ -141,8 +147,8 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
         break;
 
       case FilterBarItemType.DATE:
-        const min = filter.min ? TimeSeriesUtils.formatInputDate(new Date(filter.min), false) : '';
-        const max = filter.max ? TimeSeriesUtils.formatInputDate(new Date(filter.max), false) : '';
+        const min = item.min ? TimeSeriesUtils.formatInputDate(new Date(item.min), false) : '';
+        const max = item.max ? TimeSeriesUtils.formatInputDate(new Date(item.max), false) : '';
 
         if (min && max) {
           formattedValue = `${min} to ${max}`;
@@ -155,13 +161,13 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
         break;
 
       case FilterBarItemType.OPTIONS:
-        const selectedValues = filter.textValues
-          ? filter.textValues.filter((v) => v.isSelected).map((v) => v.value)
-          : [];
+        const selectedValues = item.textValues ? item.textValues.filter((v) => v.isSelected).map((v) => v.value) : [];
 
         formattedValue = selectedValues.join(', ');
 
         break;
+      default:
+        throw new Error('Filter type not handled: ' + item.type);
     }
     return formattedValue;
   }

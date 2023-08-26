@@ -54,6 +54,8 @@ export class FilterUtils {
           break;
         case FilterBarItemType.FREE_TEXT:
         case FilterBarItemType.EXECUTION:
+        case FilterBarItemType.PLAN:
+        case FilterBarItemType.TASK:
           clause = item.freeTextValues
             ?.map((value) => {
               let regexMatch = `${finalAttributeName} ~ ".*${value}.*"`;

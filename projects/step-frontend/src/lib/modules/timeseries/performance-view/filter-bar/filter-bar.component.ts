@@ -159,7 +159,6 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   }
 
   emitFiltersChange() {
-    console.log(this.activeFilters, this.getValidFilters());
     const settings: TsFilteringSettings = {
       mode: this.oqlModeActive ? TsFilteringMode.OQL : TsFilteringMode.STANDARD,
       filterItems: this.getValidFilters(),

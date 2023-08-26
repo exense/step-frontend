@@ -136,15 +136,6 @@
       </div>
       <step-ts-filter-bar-task-item [values]="item.searchEntities"></step-ts-filter-bar-task-item>
 
-      <div class="apply-checkbox">
-        <mat-checkbox [(ngModel)]="item.updateTimeSelectionOnFilterChange" [ngModelOptions]="{ standalone: true }"
-          >Update time range
-        </mat-checkbox>
-        <step-icon
-          matTooltip="Enabling this, the chart time range selection will adjust to cover all your executions"
-          name="help-circle"
-        ></step-icon>
-      </div>
       <button
         type="submit"
         class="w-100 submit-btn"

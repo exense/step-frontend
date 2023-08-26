@@ -116,6 +116,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
         type: FilterBarItemType.EXECUTION,
         searchEntities: [],
         removable: true,
+        exactMatch: true,
         isHidden: true,
       },
       {
