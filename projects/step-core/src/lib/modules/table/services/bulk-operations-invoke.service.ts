@@ -21,7 +21,6 @@ import { EntityBulkOperationInfo } from '../../custom-registeries/custom-registr
 
 export interface BulkOperationConfig<ID> {
   operationInfo?: EntityBulkOperationInfo;
-  operationType?: BulkOperationType;
   selectionType: BulkSelectionType;
   ids?: ReadonlyArray<ID>;
   filterRequest?: TableRequestData;
@@ -48,12 +47,6 @@ export class BulkOperationsInvokeService<ID = string> {
   protected _sanitizer = inject(DomSanitizer);
   protected _titleCase = inject(TitleCasePipe);
   protected _asyncOperationService = inject(AsyncOperationService);
-
-  protected invokeDelete?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
-  protected invokeDuplicate?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
-  protected invokeExport?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
-  protected invokeRestart?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
-  protected invokeStop?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
 
   protected transformConfig(config: BulkOperationConfig<ID>, isPreview: boolean): TableBulkOperationRequest {
     let targetType: TableBulkOperationRequest['targetType'] = 'LIST';
@@ -96,27 +89,7 @@ export class BulkOperationsInvokeService<ID = string> {
   }
 
   invoke(config: BulkOperationConfig<ID>): Observable<AsyncOperationDialogResult | undefined> {
-    let operation: ((params: TableBulkOperationRequest) => Observable<AsyncTaskStatus>) | undefined;
-    switch (config?.operationType) {
-      case BulkOperationType.delete:
-        operation = !!this.invokeDelete ? (params) => this.invokeDelete!(params) : undefined;
-        break;
-      case BulkOperationType.duplicate:
-        operation = !!this.invokeDuplicate ? (params) => this.invokeDuplicate!(params) : undefined;
-        break;
-      case BulkOperationType.export:
-        operation = !!this.invokeExport ? (params) => this.invokeExport!(params) : undefined;
-        break;
-      case BulkOperationType.restart:
-        operation = !!this.invokeRestart ? (params) => this.invokeRestart!(params) : undefined;
-        break;
-      case BulkOperationType.stop:
-        operation = !!this.invokeStop ? (params) => this.invokeStop!(params) : undefined;
-        break;
-      default:
-        operation = config.operationInfo?.operation;
-        break;
-    }
+    const operation = config.operationInfo?.operation;
 
     if (!operation) {
       console.error(`Operation ${this.getOperationType(config)} not supported`);
@@ -212,6 +185,6 @@ export class BulkOperationsInvokeService<ID = string> {
   }
 
   private getOperationType(config: BulkOperationConfig<ID>): string {
-    return config?.operationType ?? config?.operationInfo?.type ?? '';
+    return config?.operationInfo?.type ?? '';
   }
 }

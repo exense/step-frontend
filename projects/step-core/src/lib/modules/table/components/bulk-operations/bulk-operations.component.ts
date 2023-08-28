@@ -37,30 +37,19 @@ export class BulkOperationsComponent<KEY, ENTITY> implements OnChanges {
 
   protected entityOperations: EntityBulkOperationInfo[] = [];
 
-  protected trackByLegacy: TrackByFunction<BulkOperation> = (_, item) => item.operation;
-  protected trackByNew: TrackByFunction<EntityBulkOperationInfo> = (_, item) => item.type;
+  protected trackByOperation: TrackByFunction<EntityBulkOperationInfo> = (_, item) => item.type;
 
   @Input() selectionType: BulkSelectionType = BulkSelectionType.None;
   @Output() selectionTypeChange = new EventEmitter<BulkSelectionType>();
 
-  /**
-   * @deprecated
-   * Still left to support legacy approach. Will be removed soon.
-   * **/
-  @Input('availableOperations') availableOperationsLegacy?: BulkOperation[];
   @Input() entity?: string;
 
   readonly isOperationsDisabled$ = (this._selectionCollector?.selected$ || of([])).pipe(
     map((selected) => selected.length === 0)
   );
 
-  invoke(operation: BulkOperation | EntityBulkOperationInfo): void {
-    const isLegacy = typeof operation.operation === 'string';
-    const operationLegacy = isLegacy ? (operation as BulkOperation) : undefined;
-    const operationNew = !isLegacy ? (operation as EntityBulkOperationInfo) : undefined;
-    const operationType = isLegacy ? operationLegacy!.operation : operationNew!.type;
-
-    if (!this.allowedOperations.includes(operationType)) {
+  invoke(operation: EntityBulkOperationInfo): void {
+    if (!this.allowedOperations.includes(operation.type)) {
       return;
     }
 
@@ -68,17 +57,11 @@ export class BulkOperationsComponent<KEY, ENTITY> implements OnChanges {
       return;
     }
 
-    const config: BulkOperationConfig<KEY> = isLegacy
-      ? {
-          selectionType: this.selectionType,
-          operationType: operationLegacy!.operation,
-          withPreview: true,
-        }
-      : {
-          selectionType: this.selectionType,
-          operationInfo: operationNew,
-          withPreview: true,
-        };
+    const config: BulkOperationConfig<KEY> = {
+      selectionType: this.selectionType,
+      operationInfo: operation,
+      withPreview: true,
+    };
 
     if (this.selectionType === BulkSelectionType.Filtered) {
       config.filterRequest = this._tableFilter?.getTableFilterRequest() || undefined;
@@ -101,37 +84,18 @@ export class BulkOperationsComponent<KEY, ENTITY> implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     const cEntity = changes['entity'];
-    const cAvailableOperations = changes['availableOperations'];
-
-    let entity: string | undefined;
-    let operations: BulkOperation[] | undefined;
 
     if (cEntity?.currentValue !== cEntity?.previousValue || cEntity?.firstChange) {
-      entity = cEntity?.currentValue;
-    }
-
-    if (
-      cAvailableOperations?.currentValue !== cAvailableOperations?.previousValue ||
-      cAvailableOperations?.firstChange
-    ) {
-      operations = cAvailableOperations.currentValue;
-    }
-
-    if (entity || operations) {
-      this.fillOperations(entity, operations);
+      this.fillOperations(cEntity?.currentValue);
     }
   }
 
-  private fillOperations(entity?: string, operations?: BulkOperation[]): void {
+  private fillOperations(entity?: string): void {
     entity = entity ?? this.entity;
-    operations = operations ?? this.availableOperationsLegacy;
 
     if (entity) {
       this.entityOperations = this._entityBulkOperationsRegistry.getEntityBulkOperations(entity);
       this.allowedOperations = this.entityOperations.map((item) => item.type);
-    } else if (operations) {
-      this.entityOperations = [];
-      this.allowedOperations = operations.map((item) => item.operation);
     } else {
       this.entityOperations = [];
       this.allowedOperations = [];

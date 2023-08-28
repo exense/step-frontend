@@ -37,6 +37,7 @@ import { PanelOperationsComponent } from './components/panel-operations/panel-op
 import { RepositoryComponent } from './components/repository/repository.component';
 import { ExecutionPageComponent } from './components/execution-page/execution-page.component';
 import { ExecutionSelectionTableComponent } from './components/execution-selection-table/execution-selection-table.component';
+import { ExecutionBulkOperationsRegisterService } from './services/execution-bulk-operations-register.service';
 
 @NgModule({
   declarations: [
@@ -85,12 +86,14 @@ export class ExecutionModule {
     _entityRegistry: EntityRegistry,
     _cellsRegister: CustomCellRegistryService,
     _dashletRegistry: DashletRegistryService,
-    _viewRegistry: ViewRegistryService
+    _viewRegistry: ViewRegistryService,
+    _bulkOperationsRegistry: ExecutionBulkOperationsRegisterService
   ) {
     _entityRegistry.register('executions', 'Execution', {
       icon: 'rocket',
       component: ExecutionSelectionTableComponent,
     });
+    _bulkOperationsRegistry.register();
     _dashletRegistry.registerDashlet('executionStep', DashletExecutionStepComponent);
     _dashletRegistry.registerDashlet('executionTree', DashletExecutionTreeComponent);
     _dashletRegistry.registerDashlet('executionViz', DashletExecutionVizComponent);

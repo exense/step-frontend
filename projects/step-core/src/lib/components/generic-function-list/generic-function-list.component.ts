@@ -5,11 +5,7 @@ import {
   InteractivePlanExecutionService,
   StepDataSource,
 } from '../../client/step-client-module';
-import {
-  BulkOperationsInvokeService,
-  STORE_ALL,
-  tablePersistenceConfigProvider,
-} from '../../modules/table/table.module';
+import { STORE_ALL, tablePersistenceConfigProvider } from '../../modules/table/table.module';
 import {
   AutoDeselectStrategy,
   selectionCollectionProvider,
@@ -18,10 +14,8 @@ import {
   FunctionActionsService,
   FunctionDialogsConfig,
   FunctionDialogsConfigFactoryService,
-  GenericFunctionBulkOperationsInvokeService,
 } from '../../modules/keywords-common/keywords-common.module';
 import { AJS_LOCATION, AJS_ROOT_SCOPE } from '../../shared';
-import { BulkOperationType } from '../../modules/basics/step-basics.module';
 
 @Component({
   selector: 'step-generic-function-list',
@@ -30,10 +24,6 @@ import { BulkOperationType } from '../../modules/basics/step-basics.module';
   providers: [
     tablePersistenceConfigProvider('genericFunctionList', STORE_ALL),
     selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
-    {
-      provide: BulkOperationsInvokeService,
-      useClass: GenericFunctionBulkOperationsInvokeService,
-    },
   ],
 })
 export class GenericFunctionListComponent implements OnInit, AfterViewInit {
@@ -48,16 +38,12 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
   private _$rootScope = inject(AJS_ROOT_SCOPE);
   private _location = inject(AJS_LOCATION);
 
+  @Input() entity?: string;
   @Input() filter?: string[];
   @Input() filterClass?: string[];
   @Input() title?: string;
 
   protected dataSource?: StepDataSource<Keyword>;
-
-  readonly availableBulkOperations = [
-    { operation: BulkOperationType.delete, permission: 'mask-delete' },
-    { operation: BulkOperationType.duplicate, permission: 'kw-write' },
-  ];
 
   ngOnInit(): void {
     this.configure({

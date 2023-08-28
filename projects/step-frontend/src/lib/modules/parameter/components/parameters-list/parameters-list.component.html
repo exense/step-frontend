@@ -1,7 +1,7 @@
 <step-table [dataSource]="_logic.dataSource" matSort [matSortDisableClear]="true">
   <step-bulk-operations
     *stepAdditionalHeader="'btngroup-bulk-import-create'"
-    [availableOperations]="availableBulkOperations"
+    entity="parameters"
   ></step-bulk-operations>
   <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
     <step-btn-group>

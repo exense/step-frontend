@@ -1,7 +1,8 @@
 <ng-container *ngIf="dataSource">
   <step-table [dataSource]="dataSource" matSort [matSortDisableClear]="true">
-    <step-bulk-operations *stepAdditionalHeader="'table-header'" [availableOperations]="availableBulkOperations">
-    </step-bulk-operations>
+    <ng-container *stepAdditionalHeader="'table-header'">
+      <step-bulk-operations *ngIf="entity" [entity]="entity"> </step-bulk-operations>
+    </ng-container>
     <section class="header" *stepAdditionalHeader="'table-header'">
       <step-btn-group>
         <button
