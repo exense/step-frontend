@@ -50,8 +50,6 @@ import { TableStorageService } from './services/table-storage.service';
     CustomCellComponentsPipe,
     AdditionalHeaderDirective,
     BulkOperationsComponent,
-    BulkOperationIconPipe,
-    BulkOperationLabelPipe,
     CustomSearchCellComponentsPipe,
     SearchColMetaDirective,
     FilterConnectDirective,
