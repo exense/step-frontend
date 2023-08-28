@@ -1,5 +1,6 @@
 export enum CustomRegistryType {
   entity = 'entity',
+  entityBulkOperations = 'entityBulkOperations',
   planType = 'planType',
   functionType = 'functionType',
   functionPackageType = 'functionPackageType',

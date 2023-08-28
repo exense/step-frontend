@@ -5,8 +5,7 @@
   matSortDirection="asc"
   [matSortDisableClear]="true"
 >
-  <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-new'" [availableOperations]="availableBulkOperations">
-  </step-bulk-operations>
+  <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-new'" entity="tasks"> </step-bulk-operations>
   <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
     <step-btn-group>
       <button

@@ -5,8 +5,9 @@
 >
 </step-bulk-selection-di>
 <div>
-  <ng-container *ngFor="let operation of availableOperations">
+  <ng-template #legacy>
     <button
+      *ngFor="let operation of availableOperationsLegacy!; trackBy: trackByLegacy"
       type="button"
       mat-icon-button
       [class]="operation.operation"
@@ -18,7 +19,23 @@
     >
       <step-icon [name]="operation.operation | bulkOperationIcon"></step-icon>
     </button>
-  </ng-container>
+  </ng-template>
+  <ng-template #new>
+    <button
+      *ngFor="let operation of entityOperations!; trackBy: trackByNew"
+      type="button"
+      mat-icon-button
+      [class]="operation.type"
+      (click)="invoke(operation)"
+      [matTooltip]="operation.label!"
+      [disabled]="
+        (operation.permission && !(operation.permission | hasRight | async)) || (isOperationsDisabled$ | async)
+      "
+    >
+      <step-icon [name]="operation.icon"></step-icon>
+    </button>
+  </ng-template>
+  <ng-container *ngIf="availableOperationsLegacy; then legacy; else new"> </ng-container>
 </div>
-<step-bulk-selection-label [(selectionType)]="selectionType" [selectionCollector]="_selectionCollector">
+<step-bulk-selection-label [(selectionType)]="selectionType" [selectionCollector]="_selectionCollector!">
 </step-bulk-selection-label>

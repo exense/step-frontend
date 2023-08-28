@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { BulkOperationType } from '../shared/bulk-operation-type.enum';
+import { BulkOperationType } from '../../basics/step-basics.module';
 
 @Pipe({
   name: 'bulkOperationIcon',

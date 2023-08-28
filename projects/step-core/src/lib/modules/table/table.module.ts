@@ -116,7 +116,6 @@ export * from './services/custom-column-options';
 export * from './directives/additional-header.directive';
 export * from './components/bulk-operations/bulk-operations.component';
 export * from './services/bulk-operations-invoke.service';
-export * from './shared/bulk-operation-type.enum';
 export * from './pipe/bulk-operation-label.pipe';
 export * from './pipe/bulk-operation-icon.pipe';
 export * from './shared/filter-condition';

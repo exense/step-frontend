@@ -1,5 +1,5 @@
 import { Observable, of, switchMap } from 'rxjs';
-import { BulkOperationType } from '../shared/bulk-operation-type.enum';
+import { BulkOperationType } from '../../basics/step-basics.module';
 import {
   TableRequestData,
   TableBulkOperationRequest,
@@ -14,12 +14,14 @@ import {
   AsyncOperationDialogResult,
   AsyncOperationService,
 } from '../../async-operations/async-operations.module';
-import { inject } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TitleCasePipe } from '@angular/common';
+import { EntityBulkOperationInfo } from '../../custom-registeries/custom-registries.module';
 
 export interface BulkOperationConfig<ID> {
-  operationType: BulkOperationType;
+  operationInfo?: EntityBulkOperationInfo;
+  operationType?: BulkOperationType;
   selectionType: BulkSelectionType;
   ids?: ReadonlyArray<ID>;
   filterRequest?: TableRequestData;
@@ -28,7 +30,7 @@ export interface BulkOperationConfig<ID> {
 
 const formatMessageWithDeleteWarning = (
   strings: TemplateStringsArray,
-  operationType: BulkOperationType,
+  operationType: BulkOperationType | string,
   ...otherExpressions: string[]
 ) => {
   const firstPart = strings[0] + operationType;
@@ -39,16 +41,19 @@ const formatMessageWithDeleteWarning = (
   return firstPart + restPart;
 };
 
-export abstract class BulkOperationsInvokeService<ID> {
+@Injectable({
+  providedIn: 'root',
+})
+export class BulkOperationsInvokeService<ID = string> {
   protected _sanitizer = inject(DomSanitizer);
   protected _titleCase = inject(TitleCasePipe);
   protected _asyncOperationService = inject(AsyncOperationService);
 
-  protected abstract invokeDelete?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
-  protected abstract invokeDuplicate?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
-  protected abstract invokeExport?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
-  protected abstract invokeRestart?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
-  protected abstract invokeStop?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
+  protected invokeDelete?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
+  protected invokeDuplicate?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
+  protected invokeExport?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
+  protected invokeRestart?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
+  protected invokeStop?(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatus>;
 
   protected transformConfig(config: BulkOperationConfig<ID>, isPreview: boolean): TableBulkOperationRequest {
     let targetType: TableBulkOperationRequest['targetType'] = 'LIST';
@@ -92,7 +97,7 @@ export abstract class BulkOperationsInvokeService<ID> {
 
   invoke(config: BulkOperationConfig<ID>): Observable<AsyncOperationDialogResult | undefined> {
     let operation: ((params: TableBulkOperationRequest) => Observable<AsyncTaskStatus>) | undefined;
-    switch (config.operationType) {
+    switch (config?.operationType) {
       case BulkOperationType.delete:
         operation = !!this.invokeDelete ? (params) => this.invokeDelete!(params) : undefined;
         break;
@@ -108,10 +113,13 @@ export abstract class BulkOperationsInvokeService<ID> {
       case BulkOperationType.stop:
         operation = !!this.invokeStop ? (params) => this.invokeStop!(params) : undefined;
         break;
+      default:
+        operation = config.operationInfo?.operation;
+        break;
     }
 
     if (!operation) {
-      console.error(`Operation ${config.operationType} not supported`);
+      console.error(`Operation ${this.getOperationType(config)} not supported`);
       return of(undefined);
     }
 
@@ -145,16 +153,17 @@ export abstract class BulkOperationsInvokeService<ID> {
   }
 
   protected createPreviewTitle(config: BulkOperationConfig<ID>): SafeHtml {
-    const operation = this._titleCase.transform(config.operationType);
+    const operationType = this.getOperationType(config);
+    const operation = this._titleCase.transform(operationType);
     let title = `Confirm ${operation}`;
-    if (config.operationType === BulkOperationType.delete && config.selectionType === BulkSelectionType.All) {
+    if (operationType === BulkOperationType.delete && config.selectionType === BulkSelectionType.All) {
       title = `<span class="danger-warning">${title}</span>`;
     }
     return this._sanitizer.bypassSecurityTrustHtml(title);
   }
 
   protected createPerformTitle(config: BulkOperationConfig<ID>): string {
-    return config.operationType;
+    return this._titleCase.transform(this.getOperationType(config));
   }
 
   protected createErrorMessageHandler(
@@ -165,7 +174,7 @@ export abstract class BulkOperationsInvokeService<ID> {
         return `Error: ${errorOrResult.error}`;
       }
 
-      return `An error occurred while ${config.operationType} operation`;
+      return `An error occurred while ${this.getOperationType(config)} operation`;
     };
   }
 
@@ -173,8 +182,8 @@ export abstract class BulkOperationsInvokeService<ID> {
     return (result) => {
       const count = result?.result?.count;
       const message = count
-        ? `Bulk operation ${config.operationType} for ${count} item(s) completed`
-        : `Bulk operation ${config.operationType} for selected items completed`;
+        ? `Bulk operation ${this.getOperationType(config)} for ${count} item(s) completed`
+        : `Bulk operation ${this.getOperationType(config)} for selected items completed`;
       return this._sanitizer.bypassSecurityTrustHtml(message);
     };
   }
@@ -184,20 +193,25 @@ export abstract class BulkOperationsInvokeService<ID> {
   ): (result?: AsyncTaskStatus) => SafeHtml {
     return (result) => {
       const count = result?.result?.count;
+      const operationType = this.getOperationType(config);
 
       let message: string;
       if (config.selectionType === BulkSelectionType.All) {
         message = count
-          ? formatMessageWithDeleteWarning`Do you want to ${config.operationType} all ${count} selected item(s)`
-          : formatMessageWithDeleteWarning`Do you want to ${config.operationType} all selected items`;
+          ? formatMessageWithDeleteWarning`Do you want to ${operationType} all ${count} selected item(s)`
+          : formatMessageWithDeleteWarning`Do you want to ${operationType} all selected items`;
       } else {
         message = count
-          ? `Do you want to ${config.operationType} the ${count} selected item(s)`
-          : `Do you want to ${config.operationType} all selected items`;
+          ? `Do you want to ${operationType} the ${count} selected item(s)`
+          : `Do you want to ${operationType} all selected items`;
       }
       message = `${message}?`;
 
       return this._sanitizer.bypassSecurityTrustHtml(message);
     };
+  }
+
+  private getOperationType(config: BulkOperationConfig<ID>): string {
+    return config?.operationType ?? config?.operationInfo?.type ?? '';
   }
 }

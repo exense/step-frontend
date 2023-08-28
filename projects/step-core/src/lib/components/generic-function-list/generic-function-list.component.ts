@@ -7,7 +7,6 @@ import {
 } from '../../client/step-client-module';
 import {
   BulkOperationsInvokeService,
-  BulkOperationType,
   STORE_ALL,
   tablePersistenceConfigProvider,
 } from '../../modules/table/table.module';
@@ -22,6 +21,7 @@ import {
   GenericFunctionBulkOperationsInvokeService,
 } from '../../modules/keywords-common/keywords-common.module';
 import { AJS_LOCATION, AJS_ROOT_SCOPE } from '../../shared';
+import { BulkOperationType } from '../../modules/basics/step-basics.module';
 
 @Component({
   selector: 'step-generic-function-list',
