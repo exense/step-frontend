@@ -12,9 +12,9 @@ import {
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
+  BulkSelectionType,
   Execution,
   ExecutionSummaryDto,
-  Mutable,
   ReportNode,
   SelectionCollector,
   TableLocalDataSource,
@@ -41,6 +41,8 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
 
   protected keywordParameters$?: Observable<KeywordParameters>;
   readonly statusOptions = REPORT_NODE_STATUS;
+
+  selectionType: BulkSelectionType = BulkSelectionType.None;
 
   @Input() eId: string = '';
   @Input() testCasesProgress?: ExecutionSummaryDto;
@@ -93,6 +95,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
     const cTestCases = changes['testCases'];
     if (cTestCases?.previousValue !== cTestCases?.currentValue || cTestCases?.firstChange) {
       this.setupTestCasesDataSource(cTestCases?.currentValue);
+      this.determineSelectionType(cTestCases?.currentValue);
     }
   }
 
@@ -123,6 +126,10 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
       })),
       takeUntil(this.selectionTerminator$)
     );
+
+    this._testCasesSelection!.selected$.pipe(takeUntil(this.selectionTerminator$)).subscribe((selected) =>
+      this.determineSelectionType(undefined, selected)
+    );
   }
 
   handleShowNodeInTree(nodeId: string): void {
@@ -146,6 +153,20 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
         .addSearchStringRegexPredicate('status', (item) => item.status)
         .build()
     );
+  }
+
+  private determineSelectionType(testCases?: ReportNode[], selected?: readonly string[]): void {
+    testCases = testCases ?? this.testCases ?? [];
+    selected = selected ?? this._testCasesSelection.selected ?? [];
+    if (testCases.length > 0 && testCases.length === selected.length) {
+      const isAllIncluded = testCases.reduce(
+        (result, testCase) => result && selected!.includes(testCase.artefactID!),
+        true
+      );
+      if (isAllIncluded) {
+        this.selectionType = BulkSelectionType.All;
+      }
+    }
   }
 }
 

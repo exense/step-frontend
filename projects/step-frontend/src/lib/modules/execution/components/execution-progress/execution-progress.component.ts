@@ -51,9 +51,15 @@ const R_ERROR_KEY = /\\\\u([\d\w]{4})/gi;
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 
+enum UpdateSelection {
+  ALL = 'all',
+  ONLY_NEW = 'onlyNew',
+  NONE = 'none',
+}
+
 interface RefreshParams {
   eId?: string;
-  isUpdateSelection?: boolean;
+  updateSelection?: UpdateSelection;
 }
 
 @Component({
@@ -209,19 +215,19 @@ export class ExecutionProgressComponent
     if (this.autoRefreshDisabled) {
       return;
     }
-    this.refreshExecution({ isUpdateSelection: false });
+    this.refreshExecution({ updateSelection: UpdateSelection.NONE });
     if (!this.execution || this.execution.status !== 'ENDED') {
       if (this.isActive) {
         this.refreshOther();
         this.refreshExecutionTree();
-        this.refreshTestCaseTable({ isUpdateSelection: false });
+        this.refreshTestCaseTable({ updateSelection: UpdateSelection.ONLY_NEW });
       }
     } else {
       this.autoRefreshDisabled = true;
       this.showAutoRefreshButton = false;
       this.refreshOther();
       this.refreshExecutionTree();
-      this.refreshTestCaseTable({ isUpdateSelection: false });
+      this.refreshTestCaseTable({ updateSelection: UpdateSelection.ONLY_NEW });
     }
   }
 
@@ -275,11 +281,12 @@ export class ExecutionProgressComponent
     this.selectTab(tabToSelect);
   }
 
-  private determineDefaultSelection(): void {
-    if (!this.testCases || !this.execution) {
+  private determineDefaultSelection(testCases?: ReportNode[]): void {
+    testCases = testCases ?? this.testCases;
+    if (!testCases || !this.execution) {
       return;
     }
-    const selectedTestCases = this.testCases.filter((value) => {
+    const selectedTestCases = testCases.filter((value) => {
       const artefactFilter = this.execution?.executionParameters?.artefactFilter;
       if (!artefactFilter) {
         return true;
@@ -298,19 +305,19 @@ export class ExecutionProgressComponent
 
   private prepareRefreshParams(params?: RefreshParams): RefreshParams {
     const eId = params?.eId ?? this.eId;
-    const isUpdateSelection = params?.isUpdateSelection ?? true;
-    return { eId, isUpdateSelection };
+    const updateSelection = params?.updateSelection ?? UpdateSelection.ALL;
+    return { eId, updateSelection };
   }
 
   private refreshExecution(params?: RefreshParams): void {
-    const { eId, isUpdateSelection } = this.prepareRefreshParams(params);
+    const { eId, updateSelection } = this.prepareRefreshParams(params);
     if (!eId) {
       return;
     }
     this._executionService.getExecutionById(eId).subscribe((execution) => {
       this.onExecutionStatusUpdate(execution?.status);
       this.execution = execution;
-      if (isUpdateSelection) {
+      if (updateSelection !== UpdateSelection.NONE) {
         this.determineDefaultSelection();
       }
       const parameters: { key: string; value: string }[] = (execution.parameters as any) || [];
@@ -358,7 +365,7 @@ export class ExecutionProgressComponent
   }
 
   private refreshTestCaseTable(params?: RefreshParams): void {
-    const { eId, isUpdateSelection } = this.prepareRefreshParams(params);
+    const { eId, updateSelection } = this.prepareRefreshParams(params);
     if (!eId) {
       return;
     }
@@ -372,9 +379,11 @@ export class ExecutionProgressComponent
           }
           this._executionPanels.enablePanel(Panels.testCases, true);
         }
+        const oldTestCasesIds = (this.testCases ?? []).map((testCase) => testCase.id);
+        const newTestCases = reportNodes.filter((testCase) => !oldTestCasesIds.includes(testCase.id));
         this.testCases = reportNodes;
-        if (isUpdateSelection) {
-          this.determineDefaultSelection();
+        if (updateSelection !== UpdateSelection.NONE) {
+          this.determineDefaultSelection(updateSelection === UpdateSelection.ONLY_NEW ? newTestCases : reportNodes);
         }
       });
   }
