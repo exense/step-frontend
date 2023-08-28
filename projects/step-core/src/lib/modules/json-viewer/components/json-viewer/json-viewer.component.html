@@ -1,0 +1,27 @@
+<ng-template #toggleLabel>
+  {{ isExtendedView ? 'collapse' : 'expand' }}
+</ng-template>
+<ng-template #inlineView>
+  <step-key-value-inline *ngIf="format === ViewFormat.KV" class="wrap-anywhere" [json]="json" [maxChars]="500">
+  </step-key-value-inline>
+  <step-pretty-print-inline *ngIf="format === ViewFormat.JSON" class="wrap-anywhere" [json]="json" [maxChars]="500">
+  </step-pretty-print-inline>
+  <a *ngIf="hasContent" class="toggle-link" href="#" (click)="toggleExtended(); (false)">
+    <ng-container *ngTemplateOutlet="toggleLabel"></ng-container>
+  </a>
+  <step-toolbox [(format)]="format" (copyClick)="copyToClipboard()"></step-toolbox>
+</ng-template>
+<ng-template #extendedView>
+  <step-key-value
+    *ngIf="format === ViewFormat.KV"
+    class="wrap-anywhere"
+    style="margin-bottom: 0"
+    [json]="json"
+  ></step-key-value>
+  <step-pretty-print *ngIf="format === ViewFormat.JSON" style="margin-bottom: 0" [json]="json"></step-pretty-print>
+  <a class="toggle-link" href="#" (click)="toggleExtended(); (false)">
+    <ng-container *ngTemplateOutlet="toggleLabel"></ng-container>
+  </a>
+  <step-toolbox [(format)]="format" (copyClick)="copyToClipboard()"> </step-toolbox>
+</ng-template>
+<ng-container *ngIf="isExtendedView; then extendedView; else inlineView"> </ng-container>

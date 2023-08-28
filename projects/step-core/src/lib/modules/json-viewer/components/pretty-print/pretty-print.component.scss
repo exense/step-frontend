@@ -1,0 +1,12 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-pretty-print {
+  pre {
+    white-space: pre-wrap;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: var.$white !important;
+    margin-bottom: 0;
+    border: none;
+    padding: 0;
+  }
+}

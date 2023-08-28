@@ -1,8 +1,11 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { DynamicValueInteger, DynamicValueString } from '../../../../client/step-client-module';
 import { DialogsService } from '../../../../shared';
 import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-base.component';
+
+const NUMBER_RESTRICTION_POSITIVE_ONLY = ['+', '-', 'e'];
+const NUMBER_RESTRICTION_WITH_NEGATIVE = ['+', 'e'];
 
 @Component({
   selector: 'step-dynamic-textfield',
@@ -10,17 +13,21 @@ import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-b
   styleUrls: ['./dynamic-textfield.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class DynamicTextfieldComponent extends DynamicValueBaseComponent<DynamicValueString | DynamicValueInteger> {
-  @Input() isNumber: boolean = false;
+export class DynamicTextfieldComponent
+  extends DynamicValueBaseComponent<DynamicValueString | DynamicValueInteger>
+  implements OnChanges
+{
+  @Input() isNumber = false;
+  @Input() isNegativeNumberAllowed = false;
 
-  readonly numberInputInvalidChars = ['+', '-', 'e'];
+  protected numberInputInvalidChars = NUMBER_RESTRICTION_POSITIVE_ONLY;
 
   constructor(private _dialogsService: DialogsService, _ngControl: NgControl) {
     super(_ngControl);
   }
 
   protected override defaultConstantValue(): string | number {
-    return this.isNumber ? 0 : '';
+    return '';
   }
   protected override convertValueToExpression(value?: string | number): string {
     if (value) {
@@ -30,6 +37,18 @@ export class DynamicTextfieldComponent extends DynamicValueBaseComponent<Dynamic
   }
   protected override convertExpressionToValue(expression: string): string | number {
     return this.parseValue(expression);
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const cIsNegativeNumberAllowed = changes['isNegativeNumberAllowed'];
+    if (
+      cIsNegativeNumberAllowed?.previousValue !== cIsNegativeNumberAllowed?.currentValue ||
+      cIsNegativeNumberAllowed?.firstChange
+    ) {
+      this.numberInputInvalidChars = cIsNegativeNumberAllowed?.currentValue
+        ? NUMBER_RESTRICTION_WITH_NEGATIVE
+        : NUMBER_RESTRICTION_POSITIVE_ONLY;
+    }
   }
 
   editConstantValue(): void {
