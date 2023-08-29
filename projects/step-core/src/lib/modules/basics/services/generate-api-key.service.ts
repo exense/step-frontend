@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GenerateApiKeyStrategy } from '../shared/generate-api-key-strategy';
 import { Observable } from 'rxjs';
+import { ApiToken } from '../shared/api-token.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -12,14 +13,14 @@ export class GenerateApiKeyService implements GenerateApiKeyStrategy {
     this.strategy = strategy;
   }
 
-  showGenerateApiKeyDialog(): Observable<any> {
+  showGenerateApiKeyDialog(): Observable<ApiToken> {
     if (!this.strategy) {
       console.error('GenerateApiKeyService', 'Missing ServiceAccount strategy');
     }
     return this.strategy!.showGenerateApiKeyDialog();
   }
 
-  getServiceAccountTokens(): Observable<Array<any>> {
+  getServiceAccountTokens(): Observable<Array<ApiToken>> {
     if (!this.strategy) {
       console.error('GenerateApiKeyService', 'Missing ServiceAccount strategy');
     }
