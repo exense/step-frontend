@@ -51,6 +51,17 @@ const R_ERROR_KEY = /\\\\u([\d\w]{4})/gi;
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 
+enum UpdateSelection {
+  ALL = 'all',
+  ONLY_NEW = 'onlyNew',
+  NONE = 'none',
+}
+
+interface RefreshParams {
+  eId?: string;
+  updateSelection?: UpdateSelection;
+}
+
 @Component({
   selector: 'step-execution-progress',
   templateUrl: './execution-progress.component.html',
@@ -204,19 +215,19 @@ export class ExecutionProgressComponent
     if (this.autoRefreshDisabled) {
       return;
     }
-    this.refreshExecution();
+    this.refreshExecution({ updateSelection: UpdateSelection.NONE });
     if (!this.execution || this.execution.status !== 'ENDED') {
       if (this.isActive) {
         this.refreshOther();
         this.refreshExecutionTree();
-        this.refreshTestCaseTable();
+        this.refreshTestCaseTable({ updateSelection: UpdateSelection.ONLY_NEW });
       }
     } else {
       this.autoRefreshDisabled = true;
       this.showAutoRefreshButton = false;
       this.refreshOther();
       this.refreshExecutionTree();
-      this.refreshTestCaseTable();
+      this.refreshTestCaseTable({ updateSelection: UpdateSelection.ONLY_NEW });
     }
   }
 
@@ -224,10 +235,10 @@ export class ExecutionProgressComponent
     const cEid = changes['eId'];
     if (cEid?.previousValue !== cEid?.currentValue || cEid?.firstChange) {
       this._executionPanels.initialize(cEid?.currentValue);
-      this.refreshExecution(cEid?.currentValue);
+      this.refreshExecution({ eId: cEid?.currentValue });
       this.loadExecutionTree(cEid?.currentValue);
       this.refreshOther(cEid?.currentValue);
-      this.refreshTestCaseTable(cEid?.currentValue);
+      this.refreshTestCaseTable({ eId: cEid?.currentValue });
     }
   }
 
@@ -270,11 +281,12 @@ export class ExecutionProgressComponent
     this.selectTab(tabToSelect);
   }
 
-  private determineDefaultSelection(): void {
-    if (!this.testCases || !this.execution) {
+  private determineDefaultSelection(testCases?: ReportNode[]): void {
+    testCases = testCases ?? this.testCases;
+    if (!testCases || !this.execution) {
       return;
     }
-    const selectedTestCases = this.testCases.filter((value) => {
+    const selectedTestCases = testCases.filter((value) => {
       const artefactFilter = this.execution?.executionParameters?.artefactFilter;
       if (!artefactFilter) {
         return true;
@@ -291,15 +303,23 @@ export class ExecutionProgressComponent
     this._testCasesSelection.select(...selectedTestCases);
   }
 
-  private refreshExecution(eId?: string): void {
-    eId = eId || this.eId;
+  private prepareRefreshParams(params?: RefreshParams): RefreshParams {
+    const eId = params?.eId ?? this.eId;
+    const updateSelection = params?.updateSelection ?? UpdateSelection.ALL;
+    return { eId, updateSelection };
+  }
+
+  private refreshExecution(params?: RefreshParams): void {
+    const { eId, updateSelection } = this.prepareRefreshParams(params);
     if (!eId) {
       return;
     }
     this._executionService.getExecutionById(eId).subscribe((execution) => {
       this.onExecutionStatusUpdate(execution?.status);
       this.execution = execution;
-      this.determineDefaultSelection();
+      if (updateSelection !== UpdateSelection.NONE) {
+        this.determineDefaultSelection();
+      }
       const parameters: { key: string; value: string }[] = (execution.parameters as any) || [];
       const showTestCaseCurrentOperation = parameters.find(
         (o) => o.key === 'step.executionView.testcases.current-operations'
@@ -344,8 +364,8 @@ export class ExecutionProgressComponent
       });
   }
 
-  private refreshTestCaseTable(eId?: string): void {
-    eId = eId || this.eId;
+  private refreshTestCaseTable(params?: RefreshParams): void {
+    const { eId, updateSelection } = this.prepareRefreshParams(params);
     if (!eId) {
       return;
     }
@@ -359,8 +379,12 @@ export class ExecutionProgressComponent
           }
           this._executionPanels.enablePanel(Panels.testCases, true);
         }
+        const oldTestCasesIds = (this.testCases ?? []).map((testCase) => testCase.id);
+        const newTestCases = reportNodes.filter((testCase) => !oldTestCasesIds.includes(testCase.id));
         this.testCases = reportNodes;
-        this.determineDefaultSelection();
+        if (updateSelection !== UpdateSelection.NONE) {
+          this.determineDefaultSelection(updateSelection === UpdateSelection.ONLY_NEW ? newTestCases : reportNodes);
+        }
       });
   }
 
