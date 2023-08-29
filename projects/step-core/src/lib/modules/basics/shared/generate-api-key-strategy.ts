@@ -1,7 +1,8 @@
 import { Observable } from 'rxjs';
+import { ApiToken } from './api-token.interface';
 
 export interface GenerateApiKeyStrategy {
-  showGenerateApiKeyDialog(): Observable<any>;
-  getServiceAccountTokens(): Observable<Array<any>>;
-  revoke(id: string): Observable<any>;
+  showGenerateApiKeyDialog(): Observable<ApiToken>;
+  getServiceAccountTokens(): Observable<Array<ApiToken>>;
+  revoke(id: string): Observable<void>;
 }

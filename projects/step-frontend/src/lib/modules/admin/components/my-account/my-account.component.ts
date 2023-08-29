@@ -1,4 +1,14 @@
-import { Component, OnInit, Output, EventEmitter, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Output,
+  EventEmitter,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  inject,
+  TrackByFunction,
+} from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AuthService,
@@ -10,6 +20,7 @@ import {
   CredentialsService,
   GenerateApiKeyService,
 } from '@exense/step-core';
+import { ApiToken } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/client/generated';
 
 const preferencesToKVPairArray = (preferences?: Preferences): KeyValuePair<string, string>[] => {
   const prefsObject = preferences?.preferences || {};
@@ -44,6 +55,8 @@ export class MyAccountComponent implements OnInit, OnChanges {
 
   @Input() error?: string;
   @Output() errorChange: EventEmitter<string | undefined> = new EventEmitter<string | undefined>();
+
+  readonly trackByToken: TrackByFunction<ApiToken> = (index, item) => item.id;
 
   user: Partial<User> = {};
   preferences: KeyValuePair<string, string>[] = [];
