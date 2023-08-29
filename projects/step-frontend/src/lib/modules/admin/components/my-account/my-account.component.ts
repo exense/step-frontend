@@ -19,8 +19,8 @@ import {
   UserService,
   CredentialsService,
   GenerateApiKeyService,
+  ApiToken,
 } from '@exense/step-core';
-import { ApiToken } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/client/generated';
 
 const preferencesToKVPairArray = (preferences?: Preferences): KeyValuePair<string, string>[] => {
   const prefsObject = preferences?.preferences || {};
