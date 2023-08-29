@@ -27,7 +27,7 @@ export class GenerateApiKeyService implements GenerateApiKeyStrategy {
     return this.strategy!.getServiceAccountTokens();
   }
 
-  revoke(id: string): Observable<any> {
+  revoke(id: string): Observable<void> {
     if (!this.strategy) {
       console.error('GenerateApiKeyService', 'Missing ServiceAccount strategy');
     }
