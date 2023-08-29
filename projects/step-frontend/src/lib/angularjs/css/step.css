@@ -360,29 +360,6 @@ div.progress {
   background: #ffbb00;
 }
 
-.json-key-value {
-  margin-right: 7px;
-  display: inline;
-  color: #555;
-}
-.json-key {
-  margin-right: 2px;
-  font-size: smaller;
-  font-weight: lighter;
-}
-.json-value {
-  color: #555;
-}
-
-.json-pre {
-  white-space: pre-wrap;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  background-color: white !important;
-  margin-bottom: 0px;
-  border: none;
-  padding: 0;
-}
-
 .btn-default.active {
   color: #fff;
   background-color: #337ab7;
@@ -627,11 +604,6 @@ resource-input .input-group {
   -ms-word-wrap: break-word;
 }
 
-.text-wrapping-anywhere {
-  overflow-wrap: anywhere;
-  -ms-word-wrap: anywhere;
-}
-
 tbody .form-group {
   margin-bottom: 0px;
 }
@@ -810,15 +782,6 @@ fieldset {
   color: #555 !important;
   font-size: 12px;
   font-style: italic;
-}
-
-.toolbox-link,
-.node-text a.toolbox-link {
-  margin-left: 10px;
-  font-size: 12px;
-  font-style: italic;
-  text-decoration: underline;
-  color: #337ab7;
 }
 
 .node-detail-row {

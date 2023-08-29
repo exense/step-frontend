@@ -67,6 +67,7 @@ import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
 import { ArtefactDetailsComponent } from './components/artefact-details/artefact-details.component';
+import { JsonViewerModule } from './modules/json-viewer/json-viewer.module';
 import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 import { ResourceInputModule } from './modules/resource-input/resource-input.module';
 import { IsUsedByDialogService } from './services/is-used-by-dialog.service';
@@ -148,6 +149,7 @@ import { GenericFunctionListComponent } from './components/generic-function-list
     TreeModule,
     AngularSplitModule,
     DynamicFormsModule,
+    JsonViewerModule,
     ResourceInputModule,
     KeywordsCommonModule,
   ],
@@ -160,6 +162,7 @@ import { GenericFunctionListComponent } from './components/generic-function-list
     TooltipDirective,
     CapsLockDirective,
     StepMaterialModule,
+    JsonViewerModule,
     MatchingAuthenticator,
     DashboardLinkPipe,
     TableModule,
@@ -315,6 +318,7 @@ export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
 export * from './modules/tabs/tabs.module';
 export * from './modules/tree/tree.module';
+export * from './modules/json-viewer/json-viewer.module';
 export * from './modules/resource-input/resource-input.module';
 export * from './modules/keywords-common/keywords-common.module';
 export * from './pipes/dashboard-link.pipe';
