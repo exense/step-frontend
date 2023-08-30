@@ -5,6 +5,10 @@
   max-width: 100%;
   display: flex;
 
+  &.compare-mode-enabled {
+    gap: 1.2rem;
+  }
+
   .bar {
     max-width: 100%;
     flex: 1;
@@ -13,6 +17,15 @@
     overflow: hidden;
     padding: 0; // to override mat-card padding
     position: relative;
+    flex-grow: 0;
+
+    &.collapsed {
+      flex-grow: 0;
+    }
+
+    &.grow {
+      flex-grow: 1;
+    }
   }
 
   .stamp {
