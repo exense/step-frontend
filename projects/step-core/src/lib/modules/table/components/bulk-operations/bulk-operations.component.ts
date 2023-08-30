@@ -8,17 +8,18 @@ import {
   SimpleChanges,
   TrackByFunction,
 } from '@angular/core';
-import { BulkSelectionType, SelectionCollector } from '../../../entities-selection/entities-selection.module';
+import {
+  BulkOperationConfig,
+  BulkOperationsInvokeService,
+  BulkSelectionType,
+  EntityBulkOperationsRegistryService,
+  SelectionCollector,
+  EntityBulkOperationInfo,
+} from '../../../entities-selection/entities-selection.module';
 import { TableFilter } from '../../services/table-filter';
-import { BulkOperationConfig, BulkOperationsInvokeService } from '../../services/bulk-operations-invoke.service';
-import { BulkOperation } from '../../types/bulk-operation';
 import { TableReload } from '../../services/table-reload';
 import { map, of } from 'rxjs';
 import { AsyncOperationCloseStatus } from '../../../async-operations/async-operations.module';
-import {
-  EntityBulkOperationInfo,
-  EntityBulkOperationsRegistryService,
-} from '../../../custom-registeries/custom-registries.module';
 import { BulkOperationType } from '../../../basics/shared/bulk-operation-type.enum';
 
 @Component({

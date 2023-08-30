@@ -10,12 +10,12 @@ export class PlansBulkOperationsRegisterService {
 
   register(): void {
     this._entityBulkOperationsRegister
-      .register('plan', {
+      .register('plans', {
         type: BulkOperationType.delete,
         permission: 'plan-delete',
         operation: (requestBody) => this._plans.deletePlans(requestBody),
       })
-      .register('plan', {
+      .register('plans', {
         type: BulkOperationType.duplicate,
         permission: 'plan-write',
         operation: (requestBody) => this._plans.clonePlans(requestBody),

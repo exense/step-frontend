@@ -1,31 +1,21 @@
+import { inject, Injectable } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Observable, of, switchMap } from 'rxjs';
-import { BulkOperationType } from '../../basics/step-basics.module';
-import {
-  TableRequestData,
-  TableBulkOperationRequest,
-  TableParameters,
-  AsyncTaskStatus,
-} from '../../../client/step-client-module';
-import { BulkSelectionType } from '../../entities-selection/shared/bulk-selection-type.enum';
+import { TitleCasePipe } from '@angular/common';
 import { TableFilter } from './table-filter';
+import { BulkOperationType } from '../../basics/step-basics.module';
 import {
   AsyncOperationCloseStatus,
   AsyncOperationDialogOptions,
   AsyncOperationDialogResult,
   AsyncOperationService,
 } from '../../async-operations/async-operations.module';
-import { inject, Injectable } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { TitleCasePipe } from '@angular/common';
-import { EntityBulkOperationInfo } from '../../custom-registeries/custom-registries.module';
-
-export interface BulkOperationConfig<ID> {
-  operationInfo?: EntityBulkOperationInfo;
-  selectionType: BulkSelectionType;
-  ids?: ReadonlyArray<ID>;
-  filterRequest?: TableRequestData;
-  withPreview: boolean;
-}
+import {
+  BulkOperationConfig,
+  BulkOperationPerformStrategy,
+  BulkSelectionType,
+} from '../../entities-selection/entities-selection.module';
+import { TableBulkOperationRequest, TableParameters, AsyncTaskStatus } from '../../../client/step-client-module';
 
 const formatMessageWithDeleteWarning = (
   strings: TemplateStringsArray,
@@ -43,12 +33,44 @@ const formatMessageWithDeleteWarning = (
 @Injectable({
   providedIn: 'root',
 })
-export class BulkOperationsInvokeService<ID = string> {
-  protected _sanitizer = inject(DomSanitizer);
-  protected _titleCase = inject(TitleCasePipe);
-  protected _asyncOperationService = inject(AsyncOperationService);
+export class BulkOperationPerformStrategyImplService<ID = string> implements BulkOperationPerformStrategy<ID> {
+  private _sanitizer = inject(DomSanitizer);
+  private _titleCase = inject(TitleCasePipe);
+  private _asyncOperationService = inject(AsyncOperationService);
 
-  protected transformConfig(config: BulkOperationConfig<ID>, isPreview: boolean): TableBulkOperationRequest {
+  invoke(config: BulkOperationConfig<ID>): Observable<AsyncOperationDialogResult> {
+    const operation = config.operationInfo.operation;
+
+    const optionsPerform: AsyncOperationDialogOptions = {
+      asyncOperation: () => operation!(this.transformConfig(config, false)),
+      title: this.createPerformTitle(config),
+      successMessage: this.createSuccessMessageHandler(config),
+      errorMessage: this.createErrorMessageHandler(config),
+    };
+
+    if (!config.withPreview) {
+      return this._asyncOperationService.performOperation(optionsPerform);
+    }
+
+    const optionsPreview: AsyncOperationDialogOptions = {
+      asyncOperation: () => operation!(this.transformConfig(config, true)),
+      title: this.createPreviewTitle(config),
+      showCloseButtonOnSuccess: true,
+      successMessage: this.createSuccessMessagePreviewHandler(config),
+      errorMessage: this.createErrorMessageHandler(config),
+    };
+
+    return this._asyncOperationService.performOperation(optionsPreview).pipe(
+      switchMap((result) => {
+        if (result.closeStatus !== AsyncOperationCloseStatus.success) {
+          return of(result);
+        }
+        return this._asyncOperationService.performOperation(optionsPerform);
+      })
+    );
+  }
+
+  private transformConfig(config: BulkOperationConfig<ID>, isPreview: boolean): TableBulkOperationRequest {
     let targetType: TableBulkOperationRequest['targetType'] = 'LIST';
     let ids: string[] | undefined = undefined;
     let filters: TableFilter[] | undefined = undefined;
@@ -88,45 +110,8 @@ export class BulkOperationsInvokeService<ID = string> {
     return { targetType, ids, filters, tableParameters, preview: isPreview };
   }
 
-  invoke(config: BulkOperationConfig<ID>): Observable<AsyncOperationDialogResult | undefined> {
-    const operation = config.operationInfo?.operation;
-
-    if (!operation) {
-      console.error(`Operation ${this.getOperationType(config)} not supported`);
-      return of(undefined);
-    }
-
-    const optionsPerform: AsyncOperationDialogOptions = {
-      asyncOperation: () => operation!(this.transformConfig(config, false)),
-      title: this.createPerformTitle(config),
-      successMessage: this.createSuccessMessageHandler(config),
-      errorMessage: this.createErrorMessageHandler(config),
-    };
-
-    if (!config.withPreview) {
-      return this._asyncOperationService.performOperation(optionsPerform);
-    }
-
-    const optionsPreview: AsyncOperationDialogOptions = {
-      asyncOperation: () => operation!(this.transformConfig(config, true)),
-      title: this.createPreviewTitle(config),
-      showCloseButtonOnSuccess: true,
-      successMessage: this.createSuccessMessagePreviewHandler(config),
-      errorMessage: this.createErrorMessageHandler(config),
-    };
-
-    return this._asyncOperationService.performOperation(optionsPreview).pipe(
-      switchMap((result) => {
-        if (result.closeStatus !== AsyncOperationCloseStatus.success) {
-          return of(result);
-        }
-        return this._asyncOperationService.performOperation(optionsPerform);
-      })
-    );
-  }
-
-  protected createPreviewTitle(config: BulkOperationConfig<ID>): SafeHtml {
-    const operationType = this.getOperationType(config);
+  private createPreviewTitle(config: BulkOperationConfig<ID>): SafeHtml {
+    const operationType = config.operationInfo.type;
     const operation = this._titleCase.transform(operationType);
     let title = `Confirm ${operation}`;
     if (operationType === BulkOperationType.delete && config.selectionType === BulkSelectionType.All) {
@@ -135,11 +120,11 @@ export class BulkOperationsInvokeService<ID = string> {
     return this._sanitizer.bypassSecurityTrustHtml(title);
   }
 
-  protected createPerformTitle(config: BulkOperationConfig<ID>): string {
-    return this._titleCase.transform(this.getOperationType(config));
+  private createPerformTitle(config: BulkOperationConfig<ID>): string {
+    return this._titleCase.transform(config.operationInfo.type);
   }
 
-  protected createErrorMessageHandler(
+  private createErrorMessageHandler(
     config: BulkOperationConfig<ID>
   ): (errorOrReulst: Error | AsyncTaskStatus) => string {
     return (errorOrResult) => {
@@ -147,26 +132,24 @@ export class BulkOperationsInvokeService<ID = string> {
         return `Error: ${errorOrResult.error}`;
       }
 
-      return `An error occurred while ${this.getOperationType(config)} operation`;
+      return `An error occurred while ${config.operationInfo.type} operation`;
     };
   }
 
-  protected createSuccessMessageHandler(config: BulkOperationConfig<ID>): (result?: AsyncTaskStatus) => SafeHtml {
+  private createSuccessMessageHandler(config: BulkOperationConfig<ID>): (result?: AsyncTaskStatus) => SafeHtml {
     return (result) => {
       const count = result?.result?.count;
       const message = count
-        ? `Bulk operation ${this.getOperationType(config)} for ${count} item(s) completed`
-        : `Bulk operation ${this.getOperationType(config)} for selected items completed`;
+        ? `Bulk operation ${config.operationInfo.type} for ${count} item(s) completed`
+        : `Bulk operation ${config.operationInfo.type} for selected items completed`;
       return this._sanitizer.bypassSecurityTrustHtml(message);
     };
   }
 
-  protected createSuccessMessagePreviewHandler(
-    config: BulkOperationConfig<ID>
-  ): (result?: AsyncTaskStatus) => SafeHtml {
+  private createSuccessMessagePreviewHandler(config: BulkOperationConfig<ID>): (result?: AsyncTaskStatus) => SafeHtml {
     return (result) => {
       const count = result?.result?.count;
-      const operationType = this.getOperationType(config);
+      const operationType = config.operationInfo.type;
 
       let message: string;
       if (config.selectionType === BulkSelectionType.All) {
@@ -182,9 +165,5 @@ export class BulkOperationsInvokeService<ID = string> {
 
       return this._sanitizer.bypassSecurityTrustHtml(message);
     };
-  }
-
-  private getOperationType(config: BulkOperationConfig<ID>): string {
-    return config?.operationInfo?.type ?? '';
   }
 }

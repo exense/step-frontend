@@ -22,5 +22,6 @@ export * from './services/entity-registry';
 export * from './services/entity-scope-resolver';
 export * from './services/entity-dialogs.service';
 export * from './types/entity';
+export * from './types/entity-meta';
 export * from './types/select-entity-of-type-result.interface';
 export * from './types/select-entity-context.interface';
