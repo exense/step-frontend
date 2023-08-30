@@ -49,6 +49,7 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
 export class FilterBarComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
   @Input() activeFilters: TsFilterItem[] = [];
+  @Input() activeGrouping = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS[0].attributes;
   @Input() compactView = false;
 
   @Input() timeRangeOptions!: TimeRangePickerSelection[];
@@ -68,8 +69,6 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   readonly EMIT_DEBOUNCE_TIME = 300;
   readonly FilterBarItemType = FilterBarItemType;
 
-  groupDimensions: string[] = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS[0].attributes;
-
   rawMeasurementsModeActive = false;
 
   oqlModeActive = false;
@@ -87,8 +86,11 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     if (!this.context) {
       throw new Error('Context input is mandatory');
     }
+    if (this.context.getGroupDimensions()) {
+      this.activeGrouping = this.context.getGroupDimensions();
+    }
     this.emitFilterChange$.pipe(debounceTime(this.EMIT_DEBOUNCE_TIME)).subscribe(() => {
-      this.composeAndVerifyFullOql(this.groupDimensions).subscribe((response) => {
+      this.composeAndVerifyFullOql(this.activeGrouping).subscribe((response) => {
         this.rawMeasurementsModeActive = response.hasUnknownFields;
         if (!this.rawMeasurementsModeActive) {
           this.emitFiltersChange();
@@ -146,7 +148,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   }
 
   handleGroupingChange(dimensions: string[]) {
-    this.groupDimensions = dimensions;
+    this.activeGrouping = dimensions;
     this.composeAndVerifyFullOql(dimensions).subscribe((response) => {
       this.rawMeasurementsModeActive = response.hasUnknownFields;
       // for grouping change, we will trigger refresh automatically. otherwise grouping and filters will change together
@@ -169,7 +171,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   manuallyApplyFilters() {
     if (this.haveNewGrouping()) {
-      this.context.updateGrouping(this.groupDimensions);
+      this.context.updateGrouping(this.activeGrouping);
     }
     if (!this.oqlModeActive) {
       this.emitFiltersChange();
@@ -287,11 +289,11 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   private haveNewGrouping() {
     const contextGrouping = this.context.getGroupDimensions();
-    if (contextGrouping.length !== this.groupDimensions.length) {
+    if (contextGrouping.length !== this.activeGrouping.length) {
       return true;
     } else {
-      for (let i = 0; i < this.groupDimensions.length; i++) {
-        if (this.groupDimensions[i] !== contextGrouping[i]) {
+      for (let i = 0; i < this.activeGrouping.length; i++) {
+        if (this.activeGrouping[i] !== contextGrouping[i]) {
           return true;
         }
       }

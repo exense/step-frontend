@@ -9,7 +9,7 @@
           [activeFilters]="filterItems"
           (onTimeRangeChange)="handleTimeRangeChange($event)"
           [timeRangeOptions]="settings.timeRangeOptions"
-          [activeTimeRange]="settings.activeTimeRange"
+          [activeTimeRange]="timeRangeSelection"
           [compactView]="compareModeEnabled"
         >
         </step-ts-filter-bar>

@@ -72,6 +72,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       this.settings.contextualFilters,
       this.settings.activeFilters || []
     );
+    this.timeRangeSelection = this.settings.activeTimeRange;
     this.filterOptions = this.prepareFilterOptions(this.filterItems, this.settings);
     const contextParams: TimeSeriesContextParams = {
       id: this.settings.contextId,
@@ -172,6 +173,9 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
         takeUntil(this.terminator$)
       )
       .subscribe(() => {
+        // let's calculate the new time range
+        let fullRange = this.calculateTimeRange(this.timeRangeSelection);
+        this.setRanges(fullRange);
         this.updateBaseCharts();
       });
     this.context.onCompareModeChange().subscribe(({ enabled, context }) => {
@@ -186,8 +190,14 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
 
   handleTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
+    let newTimeRange: TSTimeRange = this.calculateTimeRange(selection);
+    this.updateFullRange(newTimeRange);
+  }
+
+  private calculateTimeRange(selection: TimeRangePickerSelection): TSTimeRange {
     let newTimeRange: TSTimeRange;
     if (this.settings.execution) {
+      // we have an execution
       newTimeRange = TimeSeriesUtils.convertExecutionAndSelectionToTimeRange(
         this.settings.execution!,
         this.timeRangeSelection
@@ -195,7 +205,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     } else {
       newTimeRange = TimeSeriesUtils.convertSelectionToTimeRange(selection);
     }
-    this.updateFullRange(newTimeRange);
+    return newTimeRange;
   }
 
   handleCompareTimeRangeChange(selection: TimeRangePickerSelection) {
@@ -222,12 +232,21 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.context.updateSelectedRange(newSelection, false);
   }
 
+  refresh() {
+    if (this.compareModeEnabled) {
+      // don't do the update while in compare mode
+      return;
+    }
+    this.throttledRefreshTrigger$.next(true);
+  }
+
   /**
    * This method has to make sure that it doesn't overlap another running update.
    * Used for auto-refresh.
    * @param range
+   *  @Deprecated - the range is calculated inside the refresh
    */
-  refresh(range: TSTimeRange, selection?: TSTimeRange): void {
+  refreshWithNewRange(range: TSTimeRange, selection?: TSTimeRange): void {
     this.setRanges(range, selection);
     if (this.compareModeEnabled) {
       // don't do the update while in compare mode
@@ -272,14 +291,13 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   public enableCompareMode(): void {
-    console.log(this.filterOptions);
     this.compareModeFilterOptions = this.filterOptions.map((i) => ({ ...i, isHidden: false }));
     this.compareModeFilterItems = this.prepareFiltersForCompareMode();
     const timeRange = JSON.parse(JSON.stringify(this.context.getFullTimeRange()));
     const compareContext = this.contextsFactory.createContext({
       timeRange: timeRange,
       id: new Date().getTime().toString(),
-      grouping: ['name'], // the grouping component don't currently support a custom default value other than 'name'
+      grouping: this.context.getGroupDimensions(),
       filters: this.compareModeFilterOptions,
       keywordsContext: this.context.keywordsContext, // share the same keywords context and colors
     });

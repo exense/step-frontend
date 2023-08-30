@@ -143,9 +143,6 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
    * This method reacts to the component html selection change, and should NOT be used from exterior
    */
   onFullRangeSelect(): void {
-    if (this.activeSelection.type === RangeSelectionType.FULL) {
-      return; // nothing changed
-    }
     this.emitSelectionChange({ type: RangeSelectionType.FULL });
   }
 

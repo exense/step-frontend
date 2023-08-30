@@ -167,10 +167,13 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   }
 
   triggerRefresh() {
-    this.dashboard.refresh(TimeSeriesUtils.convertSelectionToTimeRange(this.timeRangeSelection));
+    console.log(this.timeRangeSelection);
+    // this.dashboard.refreshWithNewRange(TimeSeriesUtils.convertSelectionToTimeRange(this.timeRangeSelection));
+    this.dashboard.refresh();
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
+    console.log('time range change:', selection);
     this.timeRangeSelection = selection;
     this.dashboard.updateFullRange(TimeSeriesUtils.convertSelectionToTimeRange(selection)); // instant call
   }

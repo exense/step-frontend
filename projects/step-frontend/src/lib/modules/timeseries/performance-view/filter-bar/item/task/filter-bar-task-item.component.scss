@@ -11,10 +11,7 @@
   padding-left: 14px;
   display: flex;
   flex-direction: column;
-
-  &:not(:first-child) {
-    margin-top: 1rem;
-  }
+  width: 100%;
 
   .search-item {
     display: flex;

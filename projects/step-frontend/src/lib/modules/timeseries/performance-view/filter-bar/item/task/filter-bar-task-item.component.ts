@@ -16,7 +16,7 @@ export class FilterBarTaskItemComponent {
   showPicker() {
     this._entityDialogs.selectEntityOfType('tasks', true).subscribe((result) => {
       console.log(result);
-      // this.addSearchExecution(result.item);
+      this.addSearchExecution(result.item);
     });
   }
 

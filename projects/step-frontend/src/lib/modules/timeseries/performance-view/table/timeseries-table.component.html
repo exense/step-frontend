@@ -5,7 +5,7 @@
   class="ts-table"
   [visibleColumns]="compareModeEnabled ? undefined : BASE_COLUMNS"
 >
-  <ng-container matColumnDef="name">
+  <ng-container matColumnDef="name" sticky>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>
       <input
         type="checkbox"
