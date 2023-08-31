@@ -16,7 +16,7 @@ export class SchedulerTaskLinkComponent implements CustomComponent {
     if (!this._logic || !this.context) {
       return;
     }
-    this._logic.editParameter(this.context);
+    this._logic.editParameter(this.context).subscribe();
   }
 
   navToPlan(): void {

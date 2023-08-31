@@ -1,0 +1,22 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &.with-padding {
+    padding-bottom: 20px;
+  }
+}
+
+input[type='file'] {
+  display: none;
+}
+
+a {
+  display: flex;
+  align-items: center;
+}
+
+step-label step-icon {
+  margin-left: 0.4rem;
+}

@@ -1,12 +1,20 @@
-<step-table [dataSource]="_dataSource" matSort matSortActive="scope" [matSortDisableClear]="true">
+<step-table
+  [dataSource]="_dataSource"
+  matSort
+  matSortActive="scope"
+  matSortDirection="asc"
+  [matSortDisableClear]="true"
+>
   <step-bulk-operations *stepAdditionalHeader></step-bulk-operations>
 
-  <ng-container matColumnDef="bulkSelection">
+  <ng-container matColumnDef="bulkSelection" *ngIf="multipleSelection">
     <th mat-header-cell *matHeaderCellDef></th>
     <td mat-cell *matCellDef="let element">
       <step-entity-selection-di [entity]="element"></step-entity-selection-di>
     </td>
   </ng-container>
+
+  <step-entity-column-container entityName="parameters"></step-entity-column-container>
 
   <ng-container matColumnDef="scope" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Scope</th>
@@ -16,4 +24,13 @@
   </ng-container>
 
   <step-custom-columns screen="parameterTable" options="noEditorLink"> </step-custom-columns>
+
+  <ng-container matColumnDef="singleSelect" *ngIf="!multipleSelection">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let element">
+      <button type="button" mat-icon-button (click)="handleSelect(element.id)">
+        <step-icon name="plus"></step-icon>
+      </button>
+    </td>
+  </ng-container>
 </step-table>

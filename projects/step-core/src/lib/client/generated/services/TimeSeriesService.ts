@@ -6,6 +6,8 @@ import type { Observable } from 'rxjs';
 
 import type { AsyncTaskStatusObject } from '../models/AsyncTaskStatusObject';
 import type { FetchBucketsRequest } from '../models/FetchBucketsRequest';
+import type { Measurement } from '../models/Measurement';
+import type { MeasurementsStats } from '../models/MeasurementsStats';
 import type { OQLVerifyResponse } from '../models/OQLVerifyResponse';
 import type { TimeSeriesAPIResponse } from '../models/TimeSeriesAPIResponse';
 import type { TimeSeriesRebuildRequest } from '../models/TimeSeriesRebuildRequest';
@@ -15,6 +17,25 @@ import { BaseHttpRequest } from '../core/BaseHttpRequest';
 @Injectable({ providedIn: 'root' })
 export class TimeSeriesService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
+
+  /**
+   * @param filter
+   * @param limit
+   * @param skip
+   * @returns Measurement default response
+   * @throws ApiError
+   */
+  public discoverMeasurements(filter?: string, limit?: number, skip?: number): Observable<Array<Measurement>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/time-series/raw-measurements',
+      query: {
+        filter: filter,
+        limit: limit,
+        skip: skip,
+      },
+    });
+  }
 
   /**
    * @param requestBody
@@ -39,6 +60,21 @@ export class TimeSeriesService {
     return this.httpRequest.request({
       method: 'GET',
       url: '/time-series/measurements-fields',
+      query: {
+        filter: filter,
+      },
+    });
+  }
+
+  /**
+   * @param filter
+   * @returns MeasurementsStats default response
+   * @throws ApiError
+   */
+  public getRawMeasurementsStats(filter?: string): Observable<MeasurementsStats> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/time-series/raw-measurements/stats',
       query: {
         filter: filter,
       },

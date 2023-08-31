@@ -1,6 +1,24 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnChanges,
+  OnDestroy,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, Execution, ExecutionSummaryDto, Mutable, ReportNode, SelectionCollector } from '@exense/step-core';
+import {
+  AJS_MODULE,
+  BulkSelectionType,
+  Execution,
+  ExecutionSummaryDto,
+  ReportNode,
+  SelectionCollector,
+  TableLocalDataSource,
+} from '@exense/step-core';
 import { ExecutionViewServices } from '../../../operations/shared/execution-view-services';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { KeywordParameters } from '../../shared/keyword-parameters';
@@ -8,8 +26,7 @@ import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-repo
 import { Panels } from '../../shared/panels.enum';
 import { SingleExecutionPanelsService } from '../../services/single-execution-panels.service';
 import { MatSort, Sort } from '@angular/material/sort';
-
-type FieldAccessor = Mutable<Pick<ExecutionStepComponent, 'keywordParameters$'>>;
+import { REPORT_NODE_STATUS } from '../../../_common/shared/status.enum';
 
 @Component({
   selector: 'step-execution-step',
@@ -17,9 +34,15 @@ type FieldAccessor = Mutable<Pick<ExecutionStepComponent, 'keywordParameters$'>>
   styleUrls: ['./execution-step.component.scss'],
 })
 export class ExecutionStepComponent implements OnChanges, OnDestroy {
+  private panelService = inject(SingleExecutionPanelsService);
+  private _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
+
   private selectionTerminator$?: Subject<void>;
 
-  readonly keywordParameters$?: Observable<KeywordParameters>;
+  protected keywordParameters$?: Observable<KeywordParameters>;
+  readonly statusOptions = REPORT_NODE_STATUS;
+
+  selectionType: BulkSelectionType = BulkSelectionType.None;
 
   @Input() eId: string = '';
   @Input() testCasesProgress?: ExecutionSummaryDto;
@@ -31,8 +54,6 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
 
   @Input() testCases?: ReportNode[];
 
-  @Input() testCasesSelection?: SelectionCollector<string, ReportNode>;
-
   @Output() drilldownTestCase = new EventEmitter<string>();
 
   @ViewChild('testCaseSort') testCaseSort!: MatSort;
@@ -43,7 +64,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
 
   readonly Panels = Panels;
 
-  constructor(private panelService: SingleExecutionPanelsService) {}
+  protected testCasesDataSource?: TableLocalDataSource<ReportNode>;
 
   handleTestCaseSort(sort: Sort): void {
     if (sort.active === 'name' && sort.direction === '') {
@@ -60,14 +81,6 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
     this.drilldownTestCase.emit(testCase.artefactID);
   }
 
-  selectAllTestCases(): void {
-    this.testCasesSelection!.select(...this.testCases!);
-  }
-
-  unselectAllTestCases(): void {
-    this.testCasesSelection!.clear();
-  }
-
   ngOnChanges(changes: SimpleChanges): void {
     const cExecution = changes['execution'];
     if (!this.parameters?.length || cExecution?.currentValue !== cExecution?.previousValue) {
@@ -75,21 +88,14 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
     }
 
     const cEid = changes['eId'];
-    const cTestCasesSelection = changes['testCasesSelection'];
-
-    let eid: string | undefined;
-    let testCasesSelection: SelectionCollector<string, ReportNode> | undefined;
-
     if (cEid?.currentValue !== cEid?.previousValue || cEid?.firstChange) {
-      eid = cEid?.currentValue;
+      this.setupSelectionChanges(cEid?.currentValue);
     }
 
-    if (cTestCasesSelection?.currentValue !== cTestCasesSelection?.previousValue || cTestCasesSelection?.firstChange) {
-      testCasesSelection = cTestCasesSelection?.currentValue;
-    }
-
-    if (eid || testCasesSelection) {
-      this.setupSelectionChanges(eid, testCasesSelection);
+    const cTestCases = changes['testCases'];
+    if (cTestCases?.previousValue !== cTestCases?.currentValue || cTestCases?.firstChange) {
+      this.setupTestCasesDataSource(cTestCases?.currentValue);
+      this.determineSelectionType(cTestCases?.currentValue);
     }
   }
 
@@ -106,25 +112,23 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
     this.selectionTerminator$ = undefined;
   }
 
-  private setupSelectionChanges(eid?: string, testCasesSelection?: SelectionCollector<string, ReportNode>): void {
+  private setupSelectionChanges(eid?: string): void {
     eid = eid || this.eId;
-    testCasesSelection = testCasesSelection || this.testCasesSelection;
     this.terminateSelectionChanges();
-
-    if (!testCasesSelection) {
-      (this as FieldAccessor).keywordParameters$ = undefined;
-      return;
-    }
 
     this.selectionTerminator$ = new Subject<void>();
 
-    (this as FieldAccessor).keywordParameters$ = testCasesSelection!.selected$.pipe(
+    this.keywordParameters$ = this._testCasesSelection!.selected$.pipe(
       map((testcases) => ({
         type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
         eid,
         testcases: this.panelService.isPanelEnabled(Panels.testCases) ? testcases : undefined,
       })),
       takeUntil(this.selectionTerminator$)
+    );
+
+    this._testCasesSelection!.selected$.pipe(takeUntil(this.selectionTerminator$)).subscribe((selected) =>
+      this.determineSelectionType(undefined, selected)
     );
   }
 
@@ -140,6 +144,29 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
       return;
     }
     this.executionViewServices.showTestCase(nodeId);
+  }
+
+  private setupTestCasesDataSource(testCases?: ReportNode[]): void {
+    this.testCasesDataSource = new TableLocalDataSource<ReportNode>(
+      testCases ?? [],
+      TableLocalDataSource.configBuilder<ReportNode>()
+        .addSearchStringRegexPredicate('status', (item) => item.status)
+        .build()
+    );
+  }
+
+  private determineSelectionType(testCases?: ReportNode[], selected?: readonly string[]): void {
+    testCases = testCases ?? this.testCases ?? [];
+    selected = selected ?? this._testCasesSelection.selected ?? [];
+    if (testCases.length > 0 && testCases.length === selected.length) {
+      const isAllIncluded = testCases.reduce(
+        (result, testCase) => result && selected!.includes(testCase.artefactID!),
+        true
+      );
+      if (isAllIncluded) {
+        this.selectionType = BulkSelectionType.All;
+      }
+    }
   }
 }
 

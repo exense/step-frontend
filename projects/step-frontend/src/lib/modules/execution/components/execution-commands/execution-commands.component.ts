@@ -86,8 +86,10 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
 
   schedule(): void {
     const executionParams = this.buildExecutionParams(false);
-    this._scheduledTaskDialogs.newScheduledTask(executionParams).subscribe(() => {
-      this._location$.path('/root/scheduler/');
+    this._scheduledTaskDialogs.newScheduledTask(executionParams).subscribe((result) => {
+      if (result) {
+        this._location$.path('/root/scheduler/');
+      }
     });
   }
 

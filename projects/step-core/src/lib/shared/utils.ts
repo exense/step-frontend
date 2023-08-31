@@ -1,8 +1,11 @@
+import { AbstractControl, FormArray, FormControl, FormGroup } from '@angular/forms';
 import { IPromise } from 'angular';
-import { from, Observable } from 'rxjs';
+import { Observable, from } from 'rxjs';
+import { DynamicValueInteger, DynamicValueString } from '../client/generated';
+import { AceMode } from './ace-mode.enum';
 import { Collection } from './collection.interface';
 import { ScriptLanguage } from './script-language.enum';
-import { AceMode } from './ace-mode.enum';
+import { KeyValue } from '@angular/common';
 
 export const a1Promise2Promise = <T>(promise: IPromise<T>): Promise<T> =>
   Promise.resolve(promise as unknown as Promise<T>);
@@ -80,4 +83,63 @@ export const breadthFirstSearch = <T>({
 
 export const convertScriptLanguageToAce = (scriptLanguage?: ScriptLanguage): AceMode | undefined => {
   return !scriptLanguage ? undefined : (AceMode as any)[scriptLanguage];
+};
+
+export const dynamicValueFactory = () => ({
+  createDynamicValueString(dynamicValueString?: Partial<DynamicValueString>): DynamicValueString {
+    return {
+      dynamic: dynamicValueString?.dynamic ?? false,
+      expression: dynamicValueString?.expression ?? '',
+      expressionType: dynamicValueString?.expressionType ?? '',
+      value: dynamicValueString?.value ?? '',
+    };
+  },
+  createDynamicValueInteger(dynamicValueInteger?: Partial<DynamicValueInteger>): DynamicValueInteger {
+    return {
+      dynamic: dynamicValueInteger?.dynamic ?? false,
+      expression: dynamicValueInteger?.expression ?? '',
+      expressionType: dynamicValueInteger?.expressionType ?? '',
+      value: dynamicValueInteger?.value ?? 0,
+    };
+  },
+});
+
+export const toKeyValuePairs = <T>(object: Record<string, T>): KeyValue<string, T>[] =>
+  Object.entries(object).map(([key, value]) => ({
+    key,
+    value,
+  }));
+
+export const toRecord = <T>(keyValuePairs: KeyValue<string, T>[]): Record<string, T> =>
+  keyValuePairs.reduce(
+    (acc, { key, value }) => ({
+      ...acc,
+      [key]: value,
+    }),
+    {}
+  );
+
+export const getFlatControls = (
+  abstractControl: AbstractControl,
+  predicate?: (item: AbstractControl) => boolean
+): AbstractControl[] => {
+  return breadthFirstSearch<AbstractControl>({
+    items: [abstractControl],
+    children: (control) => {
+      if (control instanceof FormGroup) {
+        return Object.values(control.controls);
+      }
+
+      if (control instanceof FormArray) {
+        return control.controls;
+      }
+
+      if (control instanceof FormControl) {
+        return [control];
+      }
+
+      return [];
+    },
+    predicate,
+  });
 };

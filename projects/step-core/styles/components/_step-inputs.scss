@@ -55,10 +55,13 @@ $border-radius: 8px;
     display: flex;
     flex-direction: column;
     line-height: 1;
+    gap: 0.4rem;
 
     mat-select,
     mat-radio-group,
+    .step-checkbox-container,
     input,
+    pre,
     textarea {
       border-color: $border-color;
       font-weight: 400;
@@ -76,15 +79,21 @@ $border-radius: 8px;
       gap: 1rem;
     }
 
-    & > label {
-      color: $primary-text-color;
-      font-weight: 500;
-      font-size: 14px;
-      line-height: 20px;
-      pointer-events: all;
-      padding-bottom: 0;
-      &:empty {
+    & > .label-container {
+      display: flex;
+      justify-content: space-between;
+
+      & > .label-addon:empty {
         display: none;
+      }
+
+      & > label {
+        color: $primary-text-color;
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 20px;
+        pointer-events: all;
+        padding-bottom: 0;
       }
     }
 
@@ -92,13 +101,13 @@ $border-radius: 8px;
       &[show-required-marker]::after {
         content: '*';
         display: inline-block;
-        margin-left: 0.5rem;
+        margin-left: 0.4rem;
       }
     }
 
     &:focus-within,
     &.step-force-focus {
-      & > label {
+      & > .label-container > label {
         color: $primary-color;
         step-label {
           &[show-required-marker]::after {
@@ -109,7 +118,9 @@ $border-radius: 8px;
       & > .form-field-content {
         mat-select,
         mat-radio-group,
+        .step-checkbox-container,
         input,
+        pre,
         textarea,
         & > step-suffix,
         & > step-prefix {
@@ -128,11 +139,12 @@ $border-radius: 8px;
     &.ng-invalid.ng-touched {
       mat-select,
       input,
+      pre,
       textarea {
         border-color: $error-color;
       }
 
-      & > label {
+      & > .label-container > label {
         color: $error-color;
       }
 
@@ -156,7 +168,9 @@ $border-radius: 8px;
 
       & > mat-select,
       & > mat-radio-group,
+      & > .step-checkbox-container,
       & > input,
+      pre,
       textarea {
         @include border-base;
         @include right-border;
@@ -229,8 +243,8 @@ $border-radius: 8px;
 
     .form-field-error,
     .form-field-hint {
-      font-size: 75%;
-      transform: translateY(1rem);
+      font-size: 1.2rem;
+
       &:empty {
         display: none;
       }

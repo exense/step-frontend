@@ -1,7 +1,7 @@
 <step-table
-  *ngIf="_artefactService.availableArtefacts"
+  *ngIf="availableArtefacts$ | async as availableArtefacts"
   class="paddingless"
-  [dataSource]="_artefactService.availableArtefacts"
+  [dataSource]="availableArtefacts"
   matSort
   matSortActive="label"
   matSortDirection="asc"
@@ -11,7 +11,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
     <td mat-cell *matCellDef="let element">
       <div class="artefact-name">
-        <step-icon [name]="element.iconNg2"></step-icon>
+        <step-icon [name]="element.icon"></step-icon>
         <span>{{ element.label }}</span>
       </div>
     </td>

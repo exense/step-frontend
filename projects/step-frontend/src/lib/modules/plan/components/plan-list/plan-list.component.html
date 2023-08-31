@@ -46,6 +46,7 @@
       <step-entity-selection-di [entity]="element"></step-entity-selection-di>
     </td>
   </ng-container>
+  <step-entity-column-container entityName="plans"> </step-entity-column-container>
   <step-custom-columns screen="planTable" [isSearchDisabled]="false"></step-custom-columns>
   <ng-container matColumnDef="type" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
@@ -61,7 +62,7 @@
           [disabled]="!('plan-execute' | hasRight | async)"
           (click)="executePlan(element.id)"
         >
-          <step-icon name="play"></step-icon>
+          <step-icon name="play-circle"></step-icon>
         </button>
         <button
           mat-icon-button
@@ -88,7 +89,7 @@
 </step-table>
 <mat-menu #menu="matMenu">
   <ng-template matMenuContent let-element="element">
-    <button mat-menu-item [disabled]="!('plan-write' | hasRight | async)" (click)="editPlan(element.id)">
+    <button mat-menu-item [disabled]="!('plan-write' | hasRight | async)" (click)="editPlan(element)">
       <step-icon name="edit-2"></step-icon>
       Edit plan
     </button>

@@ -1,0 +1,16 @@
+<step-modal-window title="New task">
+  <div step-modal-window-body>
+    <ng-container [formGroup]="newSchedulerTaskForm">
+      <step-form-field>
+        <step-label>Description</step-label>
+        <input type="text" placeholder="Description" formControlName="name" />
+      </step-form-field>
+      <step-cron-selector label="CRON Expression" placeholder="CRON Expression" formControlName="cronExpression">
+      </step-cron-selector>
+    </ng-container>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
+    <button type="button" mat-flat-button color="primary" (click)="save()">Save</button>
+  </div>
+</step-modal-window>

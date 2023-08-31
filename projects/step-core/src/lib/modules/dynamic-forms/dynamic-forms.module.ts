@@ -10,6 +10,12 @@ import { DynamicFieldComponent } from './components/dynamic-field/dynamic-field.
 import { DynamicFieldGroupEditorComponent } from './components/dynamic-field-group-editor/dynamic-field-group-editor.component';
 import { AddFieldButtonComponent } from './components/add-field-button/add-field-button.component';
 import { DynamicFieldEditorComponent } from './components/dynamic-field-editor/dynamic-field-editor.component';
+import { DynamicCheckboxComponent } from './components/dynamic-checkbox/dynamic-checkbox.component';
+import { DynamicJsonComponent } from './components/dynamic-json/dynamic-json.component';
+import { ResourceInputModule } from '../resource-input/resource-input.module';
+import { DynamicResourceComponent } from './components/dynamic-resource/dynamic-resource.component';
+import { AddFieldSchemaButtonComponent } from './components/add-field-schema-button/add-field-schema-button.component';
+import { AddSchemaFieldDialogComponent } from './components/add-schema-field-dialog/add-schema-field-dialog.component';
 
 @NgModule({
   declarations: [
@@ -19,14 +25,31 @@ import { DynamicFieldEditorComponent } from './components/dynamic-field-editor/d
     DynamicFieldGroupEditorComponent,
     AddFieldButtonComponent,
     DynamicFieldEditorComponent,
+    DynamicCheckboxComponent,
+    DynamicJsonComponent,
+    DynamicResourceComponent,
+    AddFieldSchemaButtonComponent,
+    AddSchemaFieldDialogComponent,
   ],
-  imports: [CommonModule, FormsModule, StepBasicsModule, StepMaterialModule, StepIconsModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    StepBasicsModule,
+    StepMaterialModule,
+    StepIconsModule,
+    ReactiveFormsModule,
+    ResourceInputModule,
+  ],
   exports: [
     DynamicTextfieldComponent,
     ExpressionInputComponent,
     DynamicFieldComponent,
     DynamicFieldEditorComponent,
     DynamicFieldGroupEditorComponent,
+    DynamicCheckboxComponent,
+    AddFieldSchemaButtonComponent,
+    DynamicJsonComponent,
+    DynamicResourceComponent,
   ],
 })
 export class DynamicFormsModule {}
@@ -36,6 +59,10 @@ export * from './components/expression-input/expression-input.component';
 export * from './components/dynamic-field/dynamic-field.component';
 export * from './components/dynamic-field-group-editor/dynamic-field-group-editor.component';
 export * from './components/dynamic-field-editor/dynamic-field-editor.component';
+export * from './components/dynamic-checkbox/dynamic-checkbox.component';
+export * from './components/dynamic-json/dynamic-json.component';
+export * from './components/dynamic-resource/dynamic-resource.component';
+export * from './components/add-field-schema-button/add-field-schema-button.component';
 export * from './shared/dynamic-fields-schema';
 export * from './shared/dynamic-field-group-value';
 export * from './services/schemas-factory.service';

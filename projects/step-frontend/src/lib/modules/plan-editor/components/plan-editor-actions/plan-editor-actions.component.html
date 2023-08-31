@@ -64,8 +64,12 @@
         [disableRipple]="true"
         (click)="$event.stopImmediatePropagation()"
       >
-        <step-custom-form [stModel]="_interactiveSession.executionParameters" stScreen="executionParameters">
-        </step-custom-form>
+        <step-custom-forms
+          *ngIf="_interactiveSession.executionParameters"
+          [stModel]="_interactiveSession.executionParameters"
+          stScreen="executionParameters"
+        >
+        </step-custom-forms>
       </span>
     </mat-menu>
   </ng-container>
@@ -82,8 +86,8 @@
 
   <mat-menu #executionMenu="matMenu">
     <span class="plan-execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
-      <step-plan-execution [description]="description" [repositoryObjectRef]="repositoryObjectRef">
-      </step-plan-execution>
+      <step-execution-commands [description]="description" [repositoryObjectRef]="repositoryObjectRef">
+      </step-execution-commands>
     </span>
   </mat-menu>
 </step-btn-group>

@@ -236,4 +236,8 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
   exportAsCSV(fields: string[], params?: TableParameters): void {
     console.error(`TableLocalDataSource doesn't support export to CSV`);
   }
+
+  skipOngoingRequest(): void {
+    console.error(`TableLocalDataSource doesn't support skipping requests`);
+  }
 }

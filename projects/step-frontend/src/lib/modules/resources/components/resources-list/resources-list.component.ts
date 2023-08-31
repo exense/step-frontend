@@ -1,14 +1,22 @@
-import { Component, inject } from '@angular/core';
+import { AfterViewInit, Component, inject } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
-  Resource,
   AugmentedResourcesService,
+  EditorResolverService,
+  MultipleProjectsService,
+  Resource,
   ResourceDialogsService,
-  tablePersistenceConfigProvider,
+  ResourceInputBridgeService,
   STORE_ALL,
+  tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { DOCUMENT } from '@angular/common';
+import { Observable, of, pipe, switchMap, take, tap } from 'rxjs';
+import { ResourceConfigurationDialogData } from '../resource-configuration-dialog/resource-configuration-dialog-data.interface';
+import { ResourceConfigurationDialogComponent } from '../resource-configuration-dialog/resource-configuration-dialog.component';
+
+const RESOURCE_ID = 'resourceId';
 
 @Component({
   selector: 'step-resources-list',
@@ -16,36 +24,103 @@ import { DOCUMENT } from '@angular/common';
   styleUrls: ['./resources-list.component.scss'],
   providers: [tablePersistenceConfigProvider('resourceList', STORE_ALL)],
 })
-export class ResourcesListComponent {
+export class ResourcesListComponent implements AfterViewInit {
+  private _matDialog = inject(MatDialog);
+  private _multipleProjectService = inject(MultipleProjectsService);
+  private _editorResolver = inject(EditorResolverService);
   private _resourceDialogs = inject(ResourceDialogsService);
   private _resourcesService = inject(AugmentedResourcesService);
-  private _document = inject(DOCUMENT);
+  private _resourceInputBridgeService = inject(ResourceInputBridgeService);
+
+  private updateDataSourceAfterChange = pipe(
+    tap((mutatedResource?: Resource | boolean) => {
+      if (mutatedResource) {
+        this.dataSource.reload();
+      }
+    })
+  );
 
   readonly dataSource = this._resourcesService.createDataSource();
 
-  editResource(resource: Resource): void {
-    this._resourceDialogs.editResource(resource).subscribe((_) => this.dataSource.reload());
+  ngAfterViewInit(): void {
+    this._editorResolver
+      .onEditEntity(RESOURCE_ID)
+      .pipe(take(1))
+      .subscribe((resourceId) => this.editResourceInternal(resourceId));
   }
 
-  createResource(): void {
-    this._resourceDialogs.editResource().subscribe((_) => this.dataSource.reload());
+  protected editResource(resource: Resource): void {
+    if (this._multipleProjectService.isEntityBelongsToCurrentProject(resource)) {
+      this.openEditResourceDialog(resource).pipe(this.updateDataSourceAfterChange).subscribe();
+      return;
+    }
+
+    const url = '/root/resources';
+    const editParams = { [RESOURCE_ID]: resource.id };
+
+    this._multipleProjectService
+      .confirmEntityEditInASeparateProject(resource, { url, search: editParams }, 'resource')
+      .pipe(
+        switchMap((continueEdit) => {
+          if (continueEdit) {
+            // continue edit without project switch
+            return this.openEditResourceDialog(resource, true);
+          }
+          return of(false);
+        }),
+        this.updateDataSourceAfterChange
+      )
+      .subscribe();
   }
 
-  deleteResource(id: string, label: string): void {
-    this._resourceDialogs.deleteResource(id, label).subscribe((result: boolean) => {
-      if (result) {
-        this.dataSource.reload();
-      }
-    });
+  protected createResource(): void {
+    this.openEditResourceDialog().pipe(this.updateDataSourceAfterChange).subscribe();
   }
 
-  downloadResource(id: string): void {
-    const url = `rest/resources/${id}/content`;
-    this._document.defaultView!.open(url, '_blank');
+  protected deleteResource(id: string, label: string): void {
+    this._resourceDialogs.deleteResource(id, label).pipe(this.updateDataSourceAfterChange).subscribe();
   }
 
-  searchResource(resource: Resource): void {
+  protected downloadResource(id: string): void {
+    this._resourceDialogs.downloadResource(id);
+  }
+
+  protected searchResource(resource: Resource): void {
     this._resourceDialogs.searchResource(resource);
+  }
+
+  private openEditResourceDialog(resource?: Resource, isReadonly?: boolean): Observable<Resource | undefined> {
+    const matDialogRef = this._matDialog.open<
+      ResourceConfigurationDialogComponent,
+      ResourceConfigurationDialogData,
+      Resource | undefined
+    >(ResourceConfigurationDialogComponent, {
+      data: {
+        resource,
+        isReadonly,
+      },
+    });
+
+    return matDialogRef.beforeClosed().pipe(
+      tap((updatedResource) => {
+        if (updatedResource) {
+          return;
+        }
+
+        this._resourceInputBridgeService.deleteLastUploadedResource();
+      }),
+      switchMap(() => matDialogRef.afterClosed())
+    );
+  }
+
+  private editResourceInternal(resourceId: string): void {
+    this._resourcesService
+      .getResource(resourceId)
+      .pipe(
+        switchMap((resource) => this.openEditResourceDialog(resource)),
+        this.updateDataSourceAfterChange
+      )
+      .subscribe();
   }
 }
 

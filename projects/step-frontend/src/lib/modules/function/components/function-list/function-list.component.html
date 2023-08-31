@@ -57,6 +57,7 @@
       <step-entity-selection-di [entity]="element"></step-entity-selection-di>
     </td>
   </ng-container>
+  <step-entity-column-container entityName="functions"></step-entity-column-container>
   <step-custom-columns screen="functionTable"></step-custom-columns>
   <ng-container matColumnDef="type" stepSearchCol>
     <step-function-type-filter *stepSearchCellDef stepFilterConnect [useRegex]="true"> </step-function-type-filter>
@@ -101,7 +102,7 @@
 </step-table>
 <mat-menu #menu="matMenu">
   <ng-template matMenuContent let-element="element">
-    <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="editFunction(element.id)">
+    <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="editFunction(element)">
       <step-icon name="edit-2"></step-icon>
       Edit keyword
     </button>

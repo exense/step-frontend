@@ -1,6 +1,26 @@
-import { Component, OnInit, Output, EventEmitter, Input, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Output,
+  EventEmitter,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  inject,
+  TrackByFunction,
+} from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AuthService, AJS_MODULE, KeyValuePair, User, Preferences, UserService } from '@exense/step-core';
+import {
+  AuthService,
+  AJS_MODULE,
+  KeyValuePair,
+  User,
+  Preferences,
+  UserService,
+  CredentialsService,
+  GenerateApiKeyService,
+  ApiToken,
+} from '@exense/step-core';
 
 const preferencesToKVPairArray = (preferences?: Preferences): KeyValuePair<string, string>[] => {
   const prefsObject = preferences?.preferences || {};
@@ -25,25 +45,29 @@ const kvPairArrayToPreferences = (values?: KeyValuePair<string, string>[]): Pref
   styleUrls: ['./my-account.component.scss'],
 })
 export class MyAccountComponent implements OnInit, OnChanges {
+  private _userApi = inject(UserService);
+  private _authService = inject(AuthService);
+  private _credentialsService = inject(CredentialsService);
+  private _generateApiKey = inject(GenerateApiKeyService);
+
   readonly canChangePassword = !!this._authService.getConf()?.passwordManagement;
   readonly canGenerateApiKey = !!this._authService.getConf()?.authentication;
-
-  constructor(private _userApi: UserService, private _authService: AuthService) {}
 
   @Input() error?: string;
   @Output() errorChange: EventEmitter<string | undefined> = new EventEmitter<string | undefined>();
 
+  readonly trackByToken: TrackByFunction<ApiToken> = (index, item) => item.id;
+
   user: Partial<User> = {};
   preferences: KeyValuePair<string, string>[] = [];
-
-  @Output() showGenerateApiKeyDialog: EventEmitter<any> = new EventEmitter<any>();
+  tokens: Array<any> = [];
 
   changePwd(): void {
-    this._authService.showPasswordChangeDialog(false);
+    this._credentialsService.changePassword(false);
   }
 
   invokeShowGenerateApiKeyDialog(): void {
-    this.showGenerateApiKeyDialog.emit({});
+    this._generateApiKey.showGenerateApiKeyDialog().subscribe(() => this.updateTokens());
   }
 
   addPreference(): void {
@@ -67,6 +91,7 @@ export class MyAccountComponent implements OnInit, OnChanges {
       this.user = user || {};
       this.preferences = preferencesToKVPairArray(this.user?.preferences);
     });
+    this.updateTokens();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -74,6 +99,16 @@ export class MyAccountComponent implements OnInit, OnChanges {
     if (errorChange?.currentValue !== errorChange?.previousValue) {
       this.errorChange.emit(errorChange?.currentValue);
     }
+  }
+
+  updateTokens(): void {
+    if (this.canGenerateApiKey) {
+      this._generateApiKey.getServiceAccountTokens().subscribe((tokens) => (this.tokens = tokens));
+    }
+  }
+
+  revokeAPIToken(id: string) {
+    this._generateApiKey.revoke(id).subscribe(() => this.updateTokens());
   }
 }
 

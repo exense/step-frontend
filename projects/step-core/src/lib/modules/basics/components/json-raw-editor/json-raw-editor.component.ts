@@ -1,20 +1,9 @@
-import { Component, OnDestroy, OnInit, Optional } from '@angular/core';
-import { AbstractControl, ControlValueAccessor, FormControl, NgControl, ValidatorFn } from '@angular/forms';
+import { Component, EventEmitter, Output, Input, OnDestroy, OnInit, Optional } from '@angular/core';
+import { ControlValueAccessor, FormControl, NgControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, noop, Subject, combineLatest, takeUntil } from 'rxjs';
+import { jsonValidator } from '../../shared/validators/json-validator';
 type OnChange = (value?: any) => void;
 type OnTouch = () => void;
-
-const JSON_VALIDATOR: ValidatorFn = (control: AbstractControl) => {
-  try {
-    if (!control.value) {
-      return null;
-    }
-    JSON.parse(control.value);
-  } catch (e) {
-    return { jsonValidator: 'invalid' };
-  }
-  return null;
-};
 
 @Component({
   selector: 'step-json-raw-editor',
@@ -22,16 +11,26 @@ const JSON_VALIDATOR: ValidatorFn = (control: AbstractControl) => {
   styleUrls: ['./json-raw-editor.component.scss'],
 })
 export class JsonRawEditorComponent implements ControlValueAccessor, OnInit, OnDestroy {
+  @Output() blur = new EventEmitter<void>();
+
   private terminator$ = new Subject<void>();
 
   private onChange: OnChange = noop;
 
-  private onTouch: OnTouch = noop;
+  protected onTouch: OnTouch = noop;
 
-  private internalValue?: any;
-  private internalJsonValue?: string;
+  protected internalValue?: any;
+  protected internalJsonValue?: string;
 
-  protected rawValueFormControl = new FormControl('', JSON_VALIDATOR);
+  protected rawValueFormControl = new FormControl('', (ctrl) => {
+    if (this.isAutoValidateJson) {
+      return jsonValidator(ctrl);
+    }
+    return null;
+  });
+
+  @Input() label?: string;
+  @Input() isAutoValidateJson = true;
 
   constructor(@Optional() public _ngControl?: NgControl) {
     if (this._ngControl) {
@@ -56,10 +55,14 @@ export class JsonRawEditorComponent implements ControlValueAccessor, OnInit, OnD
     let jsonValue = '';
     try {
       if (obj) {
-        jsonValue = JSON.stringify(obj);
+        jsonValue = this.stringify(obj);
       }
     } catch (e) {
-      console.error(e);
+      if (this.isAutoValidateJson) {
+        console.error(e);
+      } else {
+        jsonValue = obj.toString();
+      }
     }
     this.internalJsonValue = jsonValue;
     this.rawValueFormControl.setValue(jsonValue);
@@ -80,7 +83,10 @@ export class JsonRawEditorComponent implements ControlValueAccessor, OnInit, OnD
         try {
           newValue = !value ? undefined : JSON.parse(value);
         } catch (e) {
-          return;
+          if (this.isAutoValidateJson) {
+            return;
+          }
+          newValue = value ?? undefined;
         }
 
         this.internalJsonValue = value || '';
@@ -100,6 +106,11 @@ export class JsonRawEditorComponent implements ControlValueAccessor, OnInit, OnD
     if (this.rawValueFormControl.invalid) {
       this.rawValueFormControl.setValue(this.internalJsonValue || '');
     }
+    this.blur.emit();
     this.onTouch();
+  }
+
+  protected stringify(value: any): string {
+    return JSON.stringify(value);
   }
 }

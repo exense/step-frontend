@@ -1,14 +1,6 @@
-import { Component, EventEmitter, Inject, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import {
-  AJS_LOCATION,
-  ControllerService,
-  DialogsService,
-  LinkProcessorService,
-  Mutable,
-  ReportNode,
-} from '@exense/step-core';
-import { forkJoin, from, map, switchMap } from 'rxjs';
-import { ILocationService } from 'angular';
+import { Component, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ControllerService, DialogsService, PlanLinkDialogService, ReportNode } from '@exense/step-core';
+import { catchError, forkJoin, of, switchMap } from 'rxjs';
 import { ReportNodeType } from '../../shared/report-node-type.enum';
 
 @Component({
@@ -17,6 +9,10 @@ import { ReportNodeType } from '../../shared/report-node-type.enum';
   styleUrls: ['./report-node.component.scss'],
 })
 export class ReportNodeComponent implements OnChanges {
+  private _api = inject(ControllerService);
+  private _dialogs = inject(DialogsService);
+  private _planLinkDialog = inject(PlanLinkDialogService, { optional: true });
+
   @Input() reportNodeId?: string;
 
   @Input() showArtefact: boolean = false;
@@ -28,13 +24,6 @@ export class ReportNodeComponent implements OnChanges {
   protected children: ReportNode[] = [];
 
   hideSource: boolean = false;
-
-  constructor(
-    private _api: ControllerService,
-    private _linkProcessor: LinkProcessorService,
-    private _dialogs: DialogsService,
-    @Inject(AJS_LOCATION) private _location$: ILocationService
-  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     const cReportNodeId = changes['reportNodeId'];
@@ -49,30 +38,22 @@ export class ReportNodeComponent implements OnChanges {
   }
 
   openPlan(): void {
-    if (!this.node) {
+    if (!this.node || !this._planLinkDialog) {
       return;
     }
     this._api
       .getReportNodeRootPlan(this.node!.id!)
       .pipe(
-        switchMap((plan) => {
-          const node = this.node;
-          return from(this._linkProcessor.process(plan?.attributes?.['project'])).pipe(map(() => ({ node, plan })));
+        switchMap((plan) => this._planLinkDialog!.editPlan(plan, this.node!.artefactID!)),
+        catchError((errorMessage) => {
+          if (errorMessage) {
+            console.error('reportNodes.openPlan', errorMessage);
+            this._dialogs.showErrorMsg(errorMessage);
+          }
+          return of(false);
         })
       )
-      .subscribe({
-        next: ({ node, plan }) => {
-          this._location$.search('artefactId', node!.artefactID!);
-          this._location$.path(`/root/plans/editor/${plan.id}`);
-        },
-        error: (errorMessage) => {
-          if (!errorMessage) {
-            return;
-          }
-          console.error('reportNodes.openPlan', errorMessage);
-          this._dialogs.showErrorMsg(errorMessage);
-        },
-      });
+      .subscribe();
   }
 
   private loadReportNode(id?: string): void {
@@ -87,7 +68,7 @@ export class ReportNodeComponent implements OnChanges {
       children: this._api.getReportNodeChildren(id),
     }).subscribe(({ node, children }) => {
       this.node = node;
-      this.children = children;
+      this.children = children.filter((child) => child.resolvedArtefact !== null);
     });
   }
 }

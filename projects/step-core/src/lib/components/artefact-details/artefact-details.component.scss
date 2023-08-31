@@ -1,0 +1,28 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
+.non-keyword-data,
+.artefact-flags {
+  @include core.common-form-content;
+  margin-bottom: 1rem;
+}
+
+mat-expansion-panel,
+.editor {
+  margin-bottom: 2rem;
+}
+
+textarea {
+  resize: none;
+}
+
+.footer {
+  color: var.$muted;
+  font-size: 85%;
+}
+
+.name-suffix {
+  step-icon {
+    @include core.step-icon-size(16px);
+  }
+}

@@ -1,6 +1,7 @@
-import { Component, inject, Input, ViewEncapsulation } from '@angular/core';
+import { Component, inject, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, ApiError, AuthService } from '@exense/step-core';
+import { HttpErrorInterceptor } from '../../interceptors/http-error.interceptor';
 
 @Component({
   selector: 'step-login',
@@ -8,7 +9,7 @@ import { AJS_MODULE, ApiError, AuthService } from '@exense/step-core';
   styleUrls: ['./login.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   credentials = {
     username: '',
     password: '',
@@ -38,7 +39,7 @@ export class LoginComponent {
       .pipe()
       .subscribe({
         error: (error: ApiError) => {
-          this.error = error.body || error;
+          this.error = HttpErrorInterceptor.formatError(error.body || error);
         },
       });
   }

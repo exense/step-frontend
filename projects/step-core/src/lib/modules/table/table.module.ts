@@ -30,6 +30,7 @@ import { CustomSearchDropdownComponent } from './components/custom-search-dropdo
 import { CustomSearchCheckboxComponent } from './components/custom-search-dropdown/custom-search-checkbox.component';
 import { Input as ColInput } from '../../client/generated';
 import { TableRemoteDataSourceFactoryImplService } from './services/table-remote-data-source-factory-impl.service';
+import { TableStorageService } from './services/table-storage.service';
 
 @NgModule({
   imports: [
@@ -77,6 +78,11 @@ import { TableRemoteDataSourceFactoryImplService } from './services/table-remote
       provide: TableRemoteDataSourceFactoryService,
       useExisting: TableRemoteDataSourceFactoryImplService,
     },
+    {
+      provide: LOGOUT_CLEANUP,
+      useExisting: TableStorageService,
+      multi: true,
+    },
   ],
 })
 export class TableModule {
@@ -93,6 +99,7 @@ export * from './components/table/table.component';
 export * from './components/custom-columns/custom-columns.component';
 export * from './components/custom-search-dropdown/custom-search-dropdown.component';
 export * from './components/custom-search-dropdown/custom-search-checkbox.component';
+export * from './components/custom-columns/custom-columns-base.component';
 export * from './directives/column.directive';
 export * from './shared/search-value';
 export * from './shared/table-remote-data-source';

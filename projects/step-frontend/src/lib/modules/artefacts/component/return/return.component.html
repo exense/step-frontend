@@ -1,0 +1,12 @@
+<form #form="ngForm">
+  <step-dynamic-json
+    label="Output"
+    optionalFieldsLabel="Output"
+    jsonFieldsLabel="Raw JSON"
+    addFieldBtnLabel="Add"
+    [(ngModel)]="context.artefact!.output"
+    [disabled]="context.readonly"
+    name="output"
+  >
+  </step-dynamic-json>
+</form>

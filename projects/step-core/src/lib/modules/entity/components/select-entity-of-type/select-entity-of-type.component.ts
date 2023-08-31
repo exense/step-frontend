@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { EntityRegistry } from '../../services/entity-registry';
-import { ProjectManagementHelperService } from '../../../basics/step-basics.module';
+import { MultipleProjectsService } from '../../../basics/step-basics.module';
 import { SelectEntityOfTypeData } from '../../types/select-entity-of-type-data.interface';
 import { SelectEntityOfTypeResult } from '../../types/select-entity-of-type-result.interface';
 import { SelectEntityContext } from '../../types/select-entity-context.interface';
@@ -12,7 +12,7 @@ import { SelectEntityContext } from '../../types/select-entity-context.interface
   styleUrls: ['./select-entity-of-type.component.scss'],
 })
 export class SelectEntityOfTypeComponent implements OnInit, OnDestroy {
-  private _projectManagementHelper = inject(ProjectManagementHelperService);
+  private _multipleProjects = inject(MultipleProjectsService);
   private _entityRegistry = inject(EntityRegistry);
   private _matDialogRef =
     inject<MatDialogRef<SelectEntityOfTypeComponent, SelectEntityOfTypeResult | undefined>>(MatDialogRef);
@@ -21,6 +21,7 @@ export class SelectEntityOfTypeComponent implements OnInit, OnDestroy {
   protected selectEntityContext: SelectEntityContext = {
     multipleSelection: !this._dialogData.singleSelection,
     handleSelect: (selectedId: string) => this.handleSelect(selectedId),
+    getSourceId: () => this._dialogData.sourceId,
   };
   protected migrationTarget: string = '';
   protected currentProject: string = '';
@@ -67,8 +68,8 @@ export class SelectEntityOfTypeComponent implements OnInit, OnDestroy {
     if (!targetId) {
       return;
     }
-    this.migrationTarget = this._projectManagementHelper.getProjectById(targetId)?.name || '';
-    this.currentProject = this._projectManagementHelper.getCurrentProject()?.name || '';
+    this.migrationTarget = this._multipleProjects.getProjectById(targetId)?.name || '';
+    this.currentProject = this._multipleProjects.currentProject()?.name || '';
   }
 
   private handleSelect(selectedId: string): void {

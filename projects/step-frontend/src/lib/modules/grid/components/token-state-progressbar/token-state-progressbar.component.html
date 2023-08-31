@@ -1,7 +1,7 @@
 <div
   class="progress"
-  matTooltip="Used: {{ tokenGroup.countByState!['IN_USE'] }}, In error: {{
-    tokenGroup.countByState!['ERROR']
+  matTooltip="Used: {{ tokenGroup.countByState!['IN_USE'] || 0 }}, In error: {{
+    tokenGroup.countByState!['ERROR'] || 0
   }}, Total: {{ tokenGroup.capacity }} "
 >
   <div

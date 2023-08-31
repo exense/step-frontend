@@ -1,0 +1,80 @@
+<step-modal-window title="Discover">
+  <div step-modal-window-body>
+    <div class="container">
+      <div class="columns-container">
+        <table mat-table [dataSource]="allColumns" *ngIf="stats">
+          <ng-container [matColumnDef]="'name'">
+            <th mat-header-cell *matHeaderCellDef>
+              <div class="flex-row">
+                <input [checked]="allSelected" type="checkbox" class="checkbox" (change)="onAllColumnsToggle()" />
+                <span>Columns</span>
+              </div>
+            </th>
+            <td mat-cell *matCellDef="let element">
+              <div class="flex justify-between">
+                <div class="flex-row">
+                  <input
+                    [checked]="columnsSelection[element]"
+                    (change)="onColumnToggle(element)"
+                    type="checkbox"
+                    class="checkbox"
+                  />
+                  <span>{{ element }}</span>
+                </div>
+                <step-icon
+                  matTooltip="See statistics"
+                  class="info-btn"
+                  name="help-circle"
+                  [matMenuTriggerFor]="menu"
+                ></step-icon>
+                <mat-menu #menu="matMenu">
+                  <step-discover-attribute-stats
+                    [attributeValues]="stats.values![element]"
+                  ></step-discover-attribute-stats>
+                  <div class="stats-note">
+                    <step-icon name="info" class="icon"></step-icon>
+                    <span>Statistics are based on a sample of {{ stats.count }} elements.</span>
+                  </div>
+                </mat-menu>
+              </div>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="['name']; sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['name']"></tr>
+        </table>
+      </div>
+
+      <div class="table-container">
+        <table mat-table [dataSource]="dataSource">
+          <ng-container [matColumnDef]="'timestamp'">
+            <th mat-header-cell *matHeaderCellDef>Timestamp</th>
+            <td mat-cell *matCellDef="let element">{{ element['begin'] | date: DateFormat.date }}</td>
+          </ng-container>
+          <ng-container *ngFor="let column of dynamicColumns">
+            <ng-container [matColumnDef]="column">
+              <th mat-header-cell *matHeaderCellDef>{{ column }}</th>
+              <td mat-cell *matCellDef="let element">{{ element[column] }}</td>
+            </ng-container>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="visibleTableColumns; sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: visibleTableColumns"></tr>
+        </table>
+      </div>
+    </div>
+    <div class="paginator">
+      <mat-spinner [diameter]="16" *ngIf="isLoading"></mat-spinner>
+      <mat-paginator
+        [length]="totalCount"
+        [pageIndex]="currentPage"
+        (page)="handlePageChange($event)"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[5, 10, 25, 100]"
+        aria-label="Select page"
+      >
+      </mat-paginator>
+    </div>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" (click)="close()" mat-stroked-button>Close</button>
+  </div>
+</step-modal-window>

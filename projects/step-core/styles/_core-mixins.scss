@@ -47,3 +47,23 @@
     color: $color;
   }
 }
+
+@mixin common-form-content($gap: 1rem) {
+  display: flex;
+  flex-direction: column;
+  gap: $gap;
+}
+
+@mixin common-dialog-content {
+  @include common-form-content(1.5rem);
+}
+
+@mixin mat-card-header-container($font-size: 1.5rem) {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  mat-card-title {
+    font-size: $font-size;
+    margin-bottom: 0;
+  }
+}

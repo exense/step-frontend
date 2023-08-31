@@ -25,23 +25,23 @@ export class ParameterDialogsService {
     return this._importDialogs.displayImportDialog('Parameters import', 'parameters');
   }
 
-  exportParameter(): Observable<any> {
+  exportParameter(): Observable<boolean> {
     return this._exportDialogs.displayExportDialog('Parameters export', 'parameters', 'allParameters.sta');
   }
 
-  editParameter(parameter?: Partial<Parameter>): Observable<Parameter | undefined> {
+  editParameter(parameterId?: string): Observable<Parameter | undefined> {
     return this._matDialog
       .open(ParameterEditDialogComponent, {
-        data: parameter?.id,
+        data: parameterId,
       })
       .afterClosed();
   }
 
   deleteParameter(id: string, label: string): Observable<any> {
     return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Parameter "${label}"`)).pipe(
-      switchMap((_) => this._parametersService.deleteParameter(id)),
-      map((_) => true),
-      catchError((_) => of(false))
+      switchMap(() => this._parametersService.deleteParameter(id)),
+      map(() => true),
+      catchError(() => of(false))
     );
   }
 }

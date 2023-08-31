@@ -1,0 +1,9 @@
+<form #form="ngForm">
+  <step-dynamic-textfield
+    label="Condition"
+    [(ngModel)]="context.artefact!.condition"
+    [disabled]="context.readonly"
+    name="condition"
+  >
+  </step-dynamic-textfield>
+</form>

@@ -20,10 +20,10 @@
       <button type="button" mat-flat-button color="primary" (click)="closeOk()">Ok</button>
     </ng-container>
     <ng-container *ngSwitchCase="AsyncOperationDialogState.success">
-      <button type="button" mat-flat-button color="primary" (click)="closeOk()">Ok</button>
       <button type="button" *ngIf="_dialogData.showCloseButtonOnSuccess" mat-flat-button (click)="cancel()">
         Cancel
       </button>
+      <button type="button" mat-flat-button color="primary" (click)="closeOk()">Ok</button>
     </ng-container>
     <ng-container *ngSwitchCase="AsyncOperationDialogState.progress"> </ng-container>
   </ng-container>

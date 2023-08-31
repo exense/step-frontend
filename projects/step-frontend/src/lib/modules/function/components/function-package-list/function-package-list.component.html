@@ -12,11 +12,11 @@
       </button>
     </step-btn-group>
   </section>
+  <step-entity-column-container entityName="functionPackage"></step-entity-column-container>
   <ng-container matColumnDef="name" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
     <td mat-cell *matCellDef="let element">
-      <entity-icon [entity]="element" entityName="functions"></entity-icon>
-      <a href="#" class="function-package-link" (click)="edit(element.id); (false)">
+      <a href="#" class="function-package-link" (click)="edit(element); (false)">
         {{ element.attributes.name }}
       </a>
     </td>
@@ -45,7 +45,7 @@
           mat-icon-button
           matTooltip="Edit package"
           [disabled]="isRefreshing || !('kw-write' | hasRight | async)"
-          (click)="edit(element.id)"
+          (click)="edit(element)"
         >
           <step-icon name="tool"></step-icon>
         </button>

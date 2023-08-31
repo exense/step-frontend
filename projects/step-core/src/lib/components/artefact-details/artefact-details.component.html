@@ -1,0 +1,71 @@
+<section class="editor" *ngIf="artefactMeta?.component as component">
+  <step-custom-item-render [component]="component" [context]="editorContext"> </step-custom-item-render>
+</section>
+<mat-expansion-panel *ngIf="artefact" [(expanded)]="showAttributes">
+  <mat-expansion-panel-header>
+    <mat-panel-title>Properties</mat-panel-title>
+  </mat-expansion-panel-header>
+  <form #form="ngForm">
+    <section class="non-keyword-data" *ngIf="!isKeyword">
+      <step-form-field *ngIf="!artefact!.dynamicName!.dynamic; else dynamicName">
+        <step-label>Name</step-label>
+        <input type="text" name="name" [(ngModel)]="artefact!.attributes!['name']" [disabled]="readonly" />
+        <step-suffix class="button-suffix name-suffix">
+          <button
+            type="button"
+            mat-stroked-button
+            matTooltip="Use an expression to replace dynamically the step name at execution time"
+            [disabled]="readonly"
+            (click)="switchToDynamicName()"
+          >
+            <step-icon name="zap"></step-icon>
+          </button>
+        </step-suffix>
+      </step-form-field>
+      <ng-template #dynamicName>
+        <step-dynamic-textfield
+          label="Name"
+          name="dynamicName"
+          [disabled]="readonly"
+          [(ngModel)]="artefact.dynamicName"
+          (ngModelChange)="syncName($event)"
+        >
+        </step-dynamic-textfield>
+      </ng-template>
+      <step-form-field>
+        <step-label>Description</step-label>
+        <textarea name="description" [disabled]="readonly" [(ngModel)]="artefact.description" rows="5"> </textarea>
+      </step-form-field>
+    </section>
+    <section class="artefact-flags">
+      <step-dynamic-checkbox
+        label="Instrument"
+        tooltip="Instrument this node to measure its execution time. A performance measurement will be created after each execution of this node."
+        name="instrumentNode"
+        [disabled]="readonly"
+        [(ngModel)]="artefact.instrumentNode"
+      >
+      </step-dynamic-checkbox>
+      <step-dynamic-checkbox
+        label="Skip node execution"
+        tooltip="Switch to disable or enable the execution of this node."
+        name="skipNode"
+        [disabled]="readonly"
+        [(ngModel)]="artefact.skipNode"
+      >
+      </step-dynamic-checkbox>
+      <step-dynamic-checkbox
+        label="Continue execution of parent element on error"
+        tooltip="Defines if the execution of the parent sequence should continue when this node fails. Per default the execution of the sequence will stop in case of any error"
+        name="continueParentNodeExecutionError"
+        [disabled]="readonly"
+        [(ngModel)]="artefact.continueParentNodeExecutionOnError"
+      >
+      </step-dynamic-checkbox>
+    </section>
+  </form>
+</mat-expansion-panel>
+<hr />
+<section class="footer">
+  <span>{{ artefactMeta?.label }}</span>
+</section>

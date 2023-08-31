@@ -3,7 +3,7 @@
 step-plan-type {
   @include core.full-height-block;
 
-  step-custom-item-render {
+  & > step-custom-item-render {
     @include core.full-height-block;
   }
 }

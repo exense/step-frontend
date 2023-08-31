@@ -67,28 +67,6 @@ function initDynamicFormsCtrl($scope) {
 }
 
 dynamicForms
-  .directive('dynamicCheckbox', function () {
-    return {
-      restrict: 'E',
-      scope: {
-        dynamicValue: '=',
-        label: '=',
-        tooltip: '=',
-        onSave: '&',
-      },
-      controller: function ($scope) {
-        initDynamicFormsCtrl($scope);
-        $scope.updateConstantValue = function () {
-          if ($scope.dynamicValue.value === 'false') {
-            $scope.dynamicValue.value = false;
-          } else if ($scope.dynamicValue.value === 'true') {
-            $scope.dynamicValue.value = true;
-          }
-        };
-      },
-      templateUrl: 'partials/dynamicforms/checkbox.html',
-    };
-  })
   .directive('dynamicTextfield', function () {
     return {
       restrict: 'E',
@@ -147,45 +125,11 @@ dynamicForms
       templateUrl: 'partials/dynamicforms/textfield.html',
     };
   })
-  .directive('dynamicJsonEditor', function () {
-    return {
-      restrict: 'E',
-      scope: {
-        dynamicValue: '=',
-        label: '=',
-        onSave: '&',
-        schema: '=',
-        isDisabled: '=',
-        jsonFieldsLabel: '=?',
-        primaryFieldsLabel: '=?',
-        optionalFieldsLabel: '=?',
-        addFieldBtnLabel: '=?',
-        enforceGroovyExpression: '=?',
-      },
-      controller: function ($scope) {
-        $scope.localModel = { json: '' };
-
-        if ($scope.dynamicValue.value === null) {
-          $scope.dynamicValue.value = '{}';
-        }
-        
-        initDynamicFormsCtrl($scope);
-        $scope.save = function (json) {
-          $scope.dynamicValue.value = json;
-          $scope.onSave();
-        };
-      },
-      templateUrl: 'partials/dynamicforms/jsonEditor.html',
-    };
-  })
   .directive('expressionInput', function () {
     return {
       controller: function ($scope, $attrs) {},
       templateUrl: 'partials/dynamicforms/expressionInput.html',
     };
-  })
-  .controller('dynamicValueCtrl', function ($scope) {
-    initDynamicFormsCtrl($scope);
   })
   .directive('dynamicResourceInput', function () {
     return {
@@ -198,7 +142,7 @@ dynamicForms
         tooltip: '=',
         onSave: '&',
       },
-      controller: function ($scope, $http, Upload, Dialogs, ResourceDialogs) {
+      controller: function ($scope) {
         initDynamicFormsCtrl($scope);
       },
       templateUrl: 'partials/dynamicforms/dynamicResourceInput.html',

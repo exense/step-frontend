@@ -1,43 +1,83 @@
 import { inject, Injectable } from '@angular/core';
-import { a1Promise2Observable, DialogsService, FunctionPackage, KeywordPackagesService } from '@exense/step-core';
-import { map, Observable, of, switchMap } from 'rxjs';
+import {
+  a1Promise2Observable,
+  DialogsService,
+  EditorResolverService,
+  FunctionPackage,
+  KeywordPackagesService,
+  MultipleProjectsService,
+} from '@exense/step-core';
+import { map, Observable, of, switchMap, take } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { FunctionPackageConfigurationDialogComponent } from '../components/function-package-configuration-dialog/function-package-configuration-dialog.component';
 import { FunctionPackageConfigurationDialogData } from '../types/function-package-configuration-dialog-data.interface';
 
+const FUNCTION_PACKAGE_ID = 'functionPackageId';
+
 @Injectable({
   providedIn: 'root',
 })
 export class FunctionPackageActionsService {
+  private _multipleProjects = inject(MultipleProjectsService);
+  private _editorResolver = inject(EditorResolverService);
   private _matDialog = inject(MatDialog);
   private _dialogs = inject(DialogsService);
   private _api = inject(KeywordPackagesService);
-
-  private openModal(functionPackage?: FunctionPackage, packageId?: string): Observable<FunctionPackage | boolean> {
-    return this._matDialog
-      .open(FunctionPackageConfigurationDialogComponent, {
-        data: {
-          packageId,
-          functionPackage,
-        } as FunctionPackageConfigurationDialogData,
-      })
-      .afterClosed();
-  }
 
   openAddFunctionPackageDialog(): Observable<FunctionPackage | boolean> {
     return this.openModal();
   }
 
-  editFunctionPackage(id: string): Observable<FunctionPackage | boolean> {
-    return this._api.getFunctionPackage(id).pipe(switchMap((response) => this.openModal(response, id)));
+  editFunctionPackage(functionPackage: FunctionPackage): Observable<FunctionPackage | boolean> {
+    if (this._multipleProjects.isEntityBelongsToCurrentProject(functionPackage)) {
+      return this.editFunctionPackageInternal(functionPackage.id!);
+    }
+
+    const url = `/root/functionPackages`;
+    const editParams = { [FUNCTION_PACKAGE_ID]: functionPackage.id! };
+
+    return this._multipleProjects
+      .confirmEntityEditInASeparateProject(functionPackage, { url, search: editParams }, 'keyword package')
+      .pipe(
+        switchMap((continueEdit) => {
+          if (continueEdit) {
+            return this.editFunctionPackageInternal(functionPackage.id!);
+          }
+          return of(continueEdit);
+        })
+      );
   }
 
   deleteFunctionPackage(id: string, name: string): Observable<boolean> {
     return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Keyword Package "${name}"`)).pipe(
-      switchMap((_) => this._api.deleteFunctionPackage(id)),
-      map((_) => true),
-      catchError((_) => of(false))
+      switchMap(() => this._api.deleteFunctionPackage(id)),
+      map(() => true),
+      catchError(() => of(false))
     );
+  }
+
+  resolveEditLinkIfExists(): void {
+    this._editorResolver
+      .onEditEntity(FUNCTION_PACKAGE_ID)
+      .pipe(
+        take(1),
+        switchMap((functionPackageId) => this.editFunctionPackageInternal(functionPackageId))
+      )
+      .subscribe();
+  }
+
+  private editFunctionPackageInternal(id: string): Observable<FunctionPackage | boolean> {
+    return this._api.getFunctionPackage(id).pipe(switchMap((response) => this.openModal(response)));
+  }
+
+  private openModal(functionPackage?: FunctionPackage): Observable<FunctionPackage | boolean> {
+    return this._matDialog
+      .open(FunctionPackageConfigurationDialogComponent, {
+        data: {
+          functionPackage,
+        } as FunctionPackageConfigurationDialogData,
+      })
+      .afterClosed();
   }
 }

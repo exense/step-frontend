@@ -1,0 +1,5 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
+form {
+  @include core.common-form-content;
+}

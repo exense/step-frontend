@@ -42,14 +42,14 @@
   </div>
   <div *ngIf="!(node?.input | isEmptyJson) && (!hideInput || !showDetails)" class="detail-container">
     <div *ngIf="!showDetails" class="detail-label m-right">Input</div>
-    <step-json-viewer class="detail" [json]="node!.input!" format="kv"></step-json-viewer>
+    <step-json-viewer class="detail" [json]="node!.input!" [format]="ViewerFormat.KV"></step-json-viewer>
   </div>
   <div *ngIf="showDetails">
     <a href="#" (click)="toggleOutput(); (false)">Output</a>
   </div>
   <div *ngIf="!(node?.output | isEmptyJson) && (!hideOutput || !showDetails)" class="detail-container">
     <div *ngIf="!showDetails" class="detail-label m-right">Output</div>
-    <step-json-viewer class="detail" [json]="node!.output!" format="kv"></step-json-viewer>
+    <step-json-viewer class="detail" [json]="node!.output!" [format]="ViewerFormat.KV"></step-json-viewer>
   </div>
 </div>
 <!-- Echo -->
@@ -97,7 +97,7 @@
 <ng-container *ngIf="showFooter">
   <hr />
   <div>
-    <span class="muted mat-small">Start: {{ node?.executionTime | date: 'dd.MM.yyyy HH:mm:ss:sss' }}</span>
+    <span class="muted mat-small">Start: {{ node?.executionTime | date: 'dd.MM.yyyy HH:mm:ss:SSS' }}</span>
     <span class="muted mat-small"> | Duration (ms): {{ node?.duration }}</span>
     <span class="muted mat-small" *ngIf="node?.resolvedArtefact?._class === 'CallKeyword'">
       | Agent: {{ node?.agentUrl }}

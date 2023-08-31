@@ -13,11 +13,11 @@ export class AugmentedSettingsService extends SettingsService {
   }
 
   override getSetting<T>(id: string): Observable<T> {
-    return this._http.get<T>(`/rest/settings/${id}`);
+    return this._http.get<T>(`rest/settings/${id}`);
   }
 
   getSettingAsText(id: string): Observable<string> {
-    return this._http.request('GET', `/rest/settings/${id}`, { responseType: 'text' });
+    return this._http.request('GET', `rest/settings/${id}`, { responseType: 'text' });
   }
 
   /*
@@ -25,6 +25,6 @@ export class AugmentedSettingsService extends SettingsService {
    */
   override saveSetting<T>(id: string, requestBody?: any): Observable<any> {
     const headers = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
-    return this._http.post<T>(`/rest/settings/${id}`, requestBody, { headers });
+    return this._http.post<T>(`rest/settings/${id}`, requestBody, { headers });
   }
 }
