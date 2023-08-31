@@ -1,6 +1,11 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 step-timeseries-table {
+  .actions-container {
+    margin-left: 12px;
+    text-align: right;
+  }
+
   .color-cell {
     display: flex;
     align-items: center;
