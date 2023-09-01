@@ -22,7 +22,9 @@ export class PlanEditorKeyHandlerDirective {
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
-    if (event.ctrlKey && event.shiftKey) {
+    const isCtrl = event.metaKey || event.ctrlKey;
+
+    if (isCtrl && event.shiftKey) {
       if (this.checkKey(event, true, ['Up', 'ArrowUp'], 'plan-write')) {
         event.preventDefault();
         this._planEditorService.moveInPrevSibling();
@@ -36,7 +38,7 @@ export class PlanEditorKeyHandlerDirective {
       }
     }
 
-    if (event.ctrlKey) {
+    if (isCtrl) {
       if (this.checkKey(event, false, 'z', 'plan-write')) {
         event.preventDefault();
         this._planEditorService.undo();
