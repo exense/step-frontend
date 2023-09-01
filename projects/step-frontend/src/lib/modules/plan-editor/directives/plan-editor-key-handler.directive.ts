@@ -57,6 +57,12 @@ export class PlanEditorKeyHandlerDirective {
         return;
       }
 
+      if (this.checkKey(event, true, ['Right', 'ArrowRight'], 'plan-write')) {
+        event.preventDefault();
+        this._planEditorService.moveInPrevSibling();
+        return;
+      }
+
       if (this.checkKey(event, true, ['Up', 'ArrowUp'], 'plan-write')) {
         event.preventDefault();
         this._planEditorService.moveUp();
