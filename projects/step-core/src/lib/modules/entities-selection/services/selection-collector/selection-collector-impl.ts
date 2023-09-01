@@ -129,6 +129,21 @@ export class SelectionCollectorImpl<KEY, ENTITY> implements SelectionCollector<K
     }
   }
 
+  /**
+   * Iterates over selected items, which are exists in collector.
+   * Check the predicate and returns the map with entity's id and predicate result.
+   * Method's result is approximate, because collector might not contain all information about every selected item
+   * **/
+  checkCurrentSelectionState(predicate: (item: ENTITY) => boolean): Map<KEY, boolean> {
+    return Array.from(this.possibleSelections)
+      .filter((entity) => this.isSelected(entity))
+      .reduce((result, entity) => {
+        const key = (entity as any)[this.selectionKeyProperty] as KEY;
+        result.set(key, predicate(entity));
+        return result;
+      }, new Map<KEY, boolean>());
+  }
+
   isSelectingPossible(): boolean {
     return this.selectedPossible;
   }

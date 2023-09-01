@@ -31,7 +31,6 @@ export * from './services/selection-collector/selection-collector-factory.servic
 export * from './services/selection-collector/selection-collector-container';
 export * from './services/selection-collector.provider';
 export * from './services/has-filter';
-export * from './services/bulk-operations-invoke.service';
 export * from './services/entity-bulk-operations-registry.service';
 export * from './components/entity-selection/entity-selection.component';
 export * from './components/entity-selection/entity-selection-di.component';

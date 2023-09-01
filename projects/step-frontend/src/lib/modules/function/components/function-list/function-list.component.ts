@@ -6,8 +6,6 @@ import {
   AJS_ROOT_SCOPE,
   AugmentedKeywordsService,
   AutoDeselectStrategy,
-  BulkOperationType,
-  BulkOperationsInvokeService,
   Function as KeywordFunction,
   InteractivePlanExecutionService,
   selectionCollectionProvider,

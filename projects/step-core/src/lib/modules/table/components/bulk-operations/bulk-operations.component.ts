@@ -2,6 +2,7 @@ import {
   Component,
   EventEmitter,
   inject,
+  Injector,
   Input,
   OnChanges,
   Output,
@@ -10,11 +11,11 @@ import {
 } from '@angular/core';
 import {
   BulkOperationConfig,
-  BulkOperationsInvokeService,
   BulkSelectionType,
   EntityBulkOperationsRegistryService,
   SelectionCollector,
   EntityBulkOperationInfo,
+  BulkOperationPerformStrategy,
 } from '../../../entities-selection/entities-selection.module';
 import { TableFilter } from '../../services/table-filter';
 import { TableReload } from '../../services/table-reload';
@@ -28,9 +29,9 @@ import { BulkOperationType } from '../../../basics/shared/bulk-operation-type.en
   styleUrls: ['./bulk-operations.component.scss'],
 })
 export class BulkOperationsComponent<KEY, ENTITY> implements OnChanges {
+  private _injector = inject(Injector);
   private _tableFilter = inject(TableFilter, { optional: true });
   private _tableReload = inject(TableReload, { optional: true });
-  private _bulkOperationsInvoke = inject<BulkOperationsInvokeService<KEY>>(BulkOperationsInvokeService);
   private _entityBulkOperationsRegistry = inject(EntityBulkOperationsRegistryService);
   readonly _selectionCollector = inject<SelectionCollector<KEY, ENTITY>>(SelectionCollector, { optional: true });
 
@@ -54,7 +55,7 @@ export class BulkOperationsComponent<KEY, ENTITY> implements OnChanges {
       return;
     }
 
-    if (!this._bulkOperationsInvoke || this.selectionType === BulkSelectionType.None) {
+    if (this.selectionType === BulkSelectionType.None) {
       return;
     }
 
@@ -72,7 +73,7 @@ export class BulkOperationsComponent<KEY, ENTITY> implements OnChanges {
       config.ids = this._selectionCollector?.selected || undefined;
     }
 
-    this._bulkOperationsInvoke.invoke(config).subscribe((result) => {
+    this.invokeOperation(config).subscribe((result) => {
       if (result?.closeStatus !== AsyncOperationCloseStatus.success) {
         return;
       }
@@ -101,5 +102,33 @@ export class BulkOperationsComponent<KEY, ENTITY> implements OnChanges {
       this.entityOperations = [];
       this.allowedOperations = [];
     }
+  }
+
+  private invokeOperation(config: BulkOperationConfig<KEY>) {
+    const operation = config.operationInfo?.operation;
+
+    if (!operation) {
+      console.error(`Operation ${config?.operationInfo?.type ?? ''} not supported`);
+      return of(undefined);
+    }
+
+    let _performStrategy: BulkOperationPerformStrategy<KEY>;
+
+    if (config.operationInfo?.performStrategy) {
+      const injector = Injector.create({
+        providers: [
+          {
+            provide: config.operationInfo.performStrategy,
+            useClass: config.operationInfo.performStrategy,
+          },
+        ],
+        parent: this._injector,
+      });
+      _performStrategy = injector.get<BulkOperationPerformStrategy<KEY>>(config.operationInfo.performStrategy);
+    } else {
+      _performStrategy = this._injector.get(BulkOperationPerformStrategy);
+    }
+
+    return _performStrategy.invoke(config);
   }
 }
