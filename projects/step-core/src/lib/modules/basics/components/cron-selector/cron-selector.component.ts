@@ -55,8 +55,4 @@ export class CronSelectorComponent implements ControlValueAccessor, OnDestroy {
     this.onTouch();
     this.onChange(value);
   }
-
-  handleBlur(): void {
-    this.onTouch();
-  }
 }
