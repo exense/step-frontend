@@ -4,11 +4,13 @@ import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static'
 import {
   AJS_MODULE,
   AugmentedResourcesService,
+  AutoDeselectStrategy,
   EditorResolverService,
   MultipleProjectsService,
   Resource,
   ResourceDialogsService,
   ResourceInputBridgeService,
+  selectionCollectionProvider,
   STORE_ALL,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
@@ -22,7 +24,10 @@ const RESOURCE_ID = 'resourceId';
   selector: 'step-resources-list',
   templateUrl: './resources-list.component.html',
   styleUrls: ['./resources-list.component.scss'],
-  providers: [tablePersistenceConfigProvider('resourceList', STORE_ALL)],
+  providers: [
+    tablePersistenceConfigProvider('resourceList', STORE_ALL),
+    selectionCollectionProvider<string, Resource>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+  ],
 })
 export class ResourcesListComponent implements AfterViewInit {
   private _matDialog = inject(MatDialog);
