@@ -166,9 +166,9 @@ export class PlanEditorBaseComponent
       .showRestoreDialog(planVersion, versionHistory, permission)
       .pipe(
         filter((restoreVersion) => !!restoreVersion),
-        switchMap((restoreVersion) => this._planEditorApi.restorePlanVersion(plan.id!, restoreVersion))
+        switchMap((restoreVersion) => this._planEditorApi.restorePlanVersion(this.id || plan.id!, restoreVersion))
       )
-      .subscribe(() => this.loadPlan(plan.id!));
+      .subscribe(() => this.loadPlan(this.id || plan.id!));
   }
 
   clonePlan(): void {
