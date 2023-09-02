@@ -310,12 +310,8 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    const requests: Observable<any>[] = [];
-    const cleanupIds = Array.from(this.uploadedResourceIds);
-
-    for (const id of cleanupIds) {
-      requests.push(this._augmentedResourcesService.deleteResource(id));
-    }
+    const cleanupIds = [...this.uploadedResourceIds];
+    const requests = cleanupIds.map((id) => this._augmentedResourcesService.deleteResource(id));
 
     forkJoin(requests).subscribe({
       next: (results) => {
