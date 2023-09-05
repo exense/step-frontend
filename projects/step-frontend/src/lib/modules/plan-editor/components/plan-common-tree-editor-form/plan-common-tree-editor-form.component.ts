@@ -18,7 +18,7 @@ import {
   PlansService,
   TreeStateService,
 } from '@exense/step-core';
-import { BehaviorSubject, filter, first, map, merge, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { BehaviorSubject, filter, first, map, merge, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { PlanEditorApiService } from '../../injectables/plan-editor-api.service';
@@ -57,6 +57,19 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
   readonly plan$ = this.planInternal$.asObservable();
   readonly hasRedo$ = this._planHistory.hasRedo$;
   readonly hasUndo$ = this._planHistory.hasUndo$;
+
+  ngOnInit(): void {
+    this.initPlanUpdate();
+    this._planEditor.useStrategy(this);
+  }
+
+  ngOnDestroy(): void {
+    this.planChange$.complete();
+    this.planInternal$.complete();
+    this._planEditor.removeStrategy();
+    this.terminator$.next();
+    this.terminator$.complete();
+  }
 
   addControl(artefactTypeId: string): void {
     if (this._treeState.isMultipleNodesSelected()) {
@@ -197,6 +210,135 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
     this._planHistory.init(plan);
   }
 
+  handlePlanChange(): void {
+    this.planChange$.next(this.plan!);
+  }
+
+  moveOut(node?: AbstractArtefact): void {
+    if (node) {
+      this._treeState.selectNodeById(node.id!);
+    }
+    this._treeState.moveSelectedNodesOut();
+  }
+
+  moveUp(node?: AbstractArtefact): void {
+    if (node) {
+      this._treeState.selectNodeById(node.id!);
+    }
+    this._treeState.moveSelectedNodes('up');
+  }
+
+  moveDown(node?: AbstractArtefact): void {
+    if (node) {
+      this._treeState.selectNodeById(node.id!);
+    }
+    this._treeState.moveSelectedNodes('down');
+  }
+
+  moveInNextSibling(node?: AbstractArtefact) {
+    if (node) {
+      this._treeState.selectNodeById(node.id!);
+    }
+    this._treeState.moveSelectedNodesIn('nextSibling');
+  }
+
+  moveInPrevSibling(node?: AbstractArtefact) {
+    if (node) {
+      this._treeState.selectNodeById(node.id!);
+    }
+    this._treeState.moveSelectedNodesIn('prevSibling');
+  }
+
+  delete(node?: AbstractArtefact): void {
+    if (node) {
+      this._treeState.selectNodeById(node.id!);
+    }
+    this._treeState.removeSelectedNodes();
+  }
+
+  copy(node?: AbstractArtefact): void {
+    if (node) {
+      this._treeState.selectNodeById(node.id!);
+    }
+
+    const artefacts = this.getNodesForCopy().map((node) => node.originalArtefact);
+    this._persistenceService.setItem(COPIED_ARTEFACTS, JSON.stringify(artefacts));
+  }
+
+  paste(node?: AbstractArtefact): void {
+    this.cloneArtefactsFromBuffer().subscribe((children) => {
+      if (!children) {
+        return;
+      }
+      if (node) {
+        this._treeState.selectNodeById(node.id!);
+      }
+
+      this._treeState.addChildrenToSelectedNode(...children);
+      this.expandChildren(children);
+    });
+  }
+
+  pasteAfter(node?: AbstractArtefact): void {
+    const selectedNode = node ? this._treeState.findNodeById(node.id) : this._treeState.getSelectedNodes()[0];
+
+    if (!selectedNode) {
+      return;
+    }
+
+    const parent = selectedNode?.parentId ? this._treeState.findNodeById(selectedNode.parentId) : undefined;
+    if (!parent) {
+      return;
+    }
+
+    const startIndex = parent.children!.indexOf(selectedNode) + 1;
+
+    this.cloneArtefactsFromBuffer().subscribe((children) => {
+      if (!children) {
+        return;
+      }
+      this._treeState.insertChildren(parent.id, children, startIndex);
+      this.expandChildren(children);
+    });
+  }
+
+  duplicate(node?: AbstractArtefact): void {
+    if (node) {
+      this._treeState.selectNodeById(node.id!);
+    }
+
+    const nodes = this.getNodesForCopy();
+    if (!nodes.length) {
+      return;
+    }
+
+    const parent = this._treeState.findNodeById(nodes[0].parentId);
+    if (!parent) {
+      return;
+    }
+    const indexes = nodes.map((node) => parent.children!.indexOf(node));
+    const insertIndex = Math.max(...indexes) + 1;
+
+    const artefacts = nodes.map((node) => node.originalArtefact);
+    this._planApi.cloneArtefacts(artefacts).subscribe((children) => {
+      this._treeState.insertChildren(parent.id, children, insertIndex);
+    });
+  }
+
+  rename(node?: AbstractArtefact) {
+    if (node) {
+      this._treeState.selectNodeById(node.id!);
+    }
+    this._treeState.editSelectedNode();
+  }
+
+  toggleSkip(node?: AbstractArtefact): void {
+    if (node) {
+      this._treeState.selectNodeById(node.id!);
+    }
+    this._treeState.toggleSkip();
+  }
+
   private initPlanUpdate(): void {
     const planUpdateByTree$ = this._treeState.treeUpdate$.pipe(
       map(() => this.plan),
@@ -234,57 +376,34 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
       });
   }
 
-  handlePlanChange(): void {
-    this.planChange$.next(this.plan!);
-  }
+  private cloneArtefactsFromBuffer(): Observable<AbstractArtefact[] | undefined> {
+    const copiedArtefactsJSON = this._persistenceService.getItem(COPIED_ARTEFACTS);
 
-  moveOut(node?: AbstractArtefact): void {
-    if (node) {
-      this._treeState.selectNodeById(node.id!);
-    }
-    this._treeState.moveSelectedNodesOut();
-  }
-
-  moveUp(node?: AbstractArtefact): void {
-    if (node) {
-      this._treeState.selectNodeById(node.id!);
-    }
-    this._treeState.moveSelectedNodes('up');
-  }
-  moveDown(node?: AbstractArtefact): void {
-    if (node) {
-      this._treeState.selectNodeById(node.id!);
-    }
-    this._treeState.moveSelectedNodes('down');
-  }
-
-  moveInNextSibling(node?: AbstractArtefact) {
-    if (node) {
-      this._treeState.selectNodeById(node.id!);
-    }
-    this._treeState.moveSelectedNodesIn('nextSibling');
-  }
-
-  moveInPrevSibling(node?: AbstractArtefact) {
-    if (node) {
-      this._treeState.selectNodeById(node.id!);
-    }
-    this._treeState.moveSelectedNodesIn('prevSibling');
-  }
-
-  delete(node?: AbstractArtefact): void {
-    if (node) {
-      this._treeState.selectNodeById(node.id!);
-    }
-    this._treeState.removeSelectedNodes();
-  }
-
-  copy(node?: AbstractArtefact): void {
-    if (node) {
-      this._treeState.selectNodeById(node.id!);
+    if (!copiedArtefactsJSON) {
+      return of(undefined);
     }
 
-    const artefacts: AbstractArtefact[] = [];
+    const artefacts = JSON.parse(copiedArtefactsJSON);
+
+    if (!artefacts?.length) {
+      return of(undefined);
+    }
+
+    return this._planApi.cloneArtefacts(artefacts);
+  }
+
+  private expandChildren(children: AbstractArtefact[]): void {
+    const flatChildren = breadthFirstSearch({
+      items: children,
+      children: (item) => item.children || [],
+    });
+    const flatChildrenIds = flatChildren.map((child) => child.id!);
+
+    this._treeState.expandNodes(flatChildrenIds);
+  }
+
+  private getNodesForCopy(): ArtefactTreeNode[] {
+    const result: ArtefactTreeNode[] = [];
     const selectedNodes = this._treeState.getSelectedNodes();
     const visitedNodesIds = new Set<string>();
 
@@ -298,67 +417,10 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
       flatChildren.forEach((node) => visitedNodesIds.add(node.id));
 
       if (!visitedNodesIds.has(node.id)) {
-        artefacts.push(node.originalArtefact);
+        result.push(node);
       }
     });
 
-    this._persistenceService.setItem(COPIED_ARTEFACTS, JSON.stringify(artefacts));
-  }
-
-  paste(node?: AbstractArtefact): void {
-    const copiedArtefactsJSON = this._persistenceService.getItem(COPIED_ARTEFACTS);
-
-    if (!copiedArtefactsJSON) {
-      return;
-    }
-
-    const artefacts = JSON.parse(copiedArtefactsJSON);
-
-    if (!artefacts?.length) {
-      return;
-    }
-
-    this._planApi.cloneArtefacts(artefacts).subscribe((children) => {
-      if (node) {
-        this._treeState.selectNodeById(node.id!);
-      }
-
-      this._treeState.addChildrenToSelectedNode(...children);
-
-      const flatChildren = breadthFirstSearch({
-        items: children,
-        children: (item) => item.children || [],
-      });
-      const flatChildrenIds = flatChildren.map((child) => child.id!);
-
-      this._treeState.expandNodes(flatChildrenIds);
-    });
-  }
-
-  rename(node?: AbstractArtefact) {
-    if (node) {
-      this._treeState.selectNodeById(node.id!);
-    }
-    this._treeState.editSelectedNode();
-  }
-
-  toggleSkip(node?: AbstractArtefact): void {
-    if (node) {
-      this._treeState.selectNodeById(node.id!);
-    }
-    this._treeState.toggleSkip();
-  }
-
-  ngOnInit(): void {
-    this.initPlanUpdate();
-    this._planEditor.useStrategy(this);
-  }
-
-  ngOnDestroy(): void {
-    this.planChange$.complete();
-    this.planInternal$.complete();
-    this._planEditor.removeStrategy();
-    this.terminator$.next();
-    this.terminator$.complete();
+    return result;
   }
 }

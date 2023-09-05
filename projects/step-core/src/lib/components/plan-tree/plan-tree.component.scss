@@ -8,5 +8,31 @@ step-plan-tree {
 
   step-tree {
     overflow: auto;
+    margin-top: 2rem;
+    padding-right: 6.5rem;
+  }
+
+  step-tree-node {
+    .node-content {
+      .node-name {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        button {
+          padding: 0 0.1rem;
+          min-width: 0;
+        }
+
+        button.actions-button {
+          display: none;
+        }
+      }
+    }
+
+    .node-content:hover .node-name button.actions-button,
+    &.context-menu-open .node-content .node-name button.actions-button {
+      display: block;
+    }
   }
 }

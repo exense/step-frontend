@@ -15,6 +15,7 @@
       <div *ngFor="let level of node.level | arrayOfSize" [style.--level]="level" class="node-line"></div>
       <step-tree-node
         [style.padding-left.px]="node.level * paddingMultiplier"
+        [class.context-menu-open]="node.id === openedMenuNodeId"
         [node]="node"
         [canToggle]="false"
         [treeContainer]="_treeContainer"
@@ -41,6 +42,7 @@
       <div *ngFor="let level of node.level | arrayOfSize" [style.--level]="level" class="node-line"></div>
       <step-tree-node
         [style.padding-left.px]="node.level * paddingMultiplier"
+        [class.context-menu-open]="node.id === openedMenuNodeId"
         [node]="node"
         [canToggle]="true"
         [treeContainer]="_treeContainer"
@@ -57,6 +59,7 @@
   [style.left.px]="contextMenuPosition.x"
   [style.top.px]="contextMenuPosition.y"
   [matMenuTriggerFor]="nodeContextMenu"
+  (menuClosed)="handleContextClose()"
 ></div>
 <mat-menu #nodeContextMenu="matMenu">
   <ng-template matMenuContent let-node="node">

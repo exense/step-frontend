@@ -1,21 +1,30 @@
 <step-split>
   <step-split-area>
-    <step-plan-tree-actions
-      [isReadonly]="isReadonly"
-      [isInteractiveSessionActive]="_planInteractiveSession?.isInteractiveSessionActive$ | async"
-      (moveUp)="_planEditService.moveUp()"
-      (moveDown)="_planEditService.moveDown()"
-      (copy)="_planEditService.copy()"
-      (paste)="_planEditService.paste()"
-      (delete)="_planEditService.delete()"
-      (runInteractively)="_planInteractiveSession?.execute()"
-    ></step-plan-tree-actions>
-
     <step-tree
       [dragDisabled]="isReadonly"
       (nodeDblClick)="handleDoubleClick($event.node, $event.event)"
       (treeContextAction)="proceedAction($event.actionId, $event.node)"
     >
+      <div class="node-name" *stepTreeNodeTemplate="let node">
+        <span>{{ node?.name }}</span>
+        <button
+          *ngIf="_planInteractiveSession?.isInteractiveSessionActive$ | async"
+          type="button"
+          mat-flat-button
+          (click)="_planInteractiveSession?.execute(node.id)"
+        >
+          <step-icon name="play"></step-icon>
+        </button>
+        <button
+          *ngIf="!isReadonly"
+          class="actions-button"
+          type="button"
+          mat-flat-button
+          (click)="openTreeMenu($event, node.id)"
+        >
+          <step-icon name="more-horizontal"></step-icon>
+        </button>
+      </div>
     </step-tree>
   </step-split-area>
 
