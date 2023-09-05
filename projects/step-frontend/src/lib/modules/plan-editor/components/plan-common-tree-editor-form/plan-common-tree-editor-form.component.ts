@@ -322,6 +322,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
     const artefacts = nodes.map((node) => node.originalArtefact);
     this._planApi.cloneArtefacts(artefacts).subscribe((children) => {
       this._treeState.insertChildren(parent.id, children, insertIndex);
+      this.expandChildren(children);
     });
   }
 
