@@ -1,4 +1,4 @@
-<step-table [dataSource]="dataSource" matSort [matSortDisableClear]="true">
+<step-table #table [dataSource]="dataSource" matSort [matSortDisableClear]="true">
   <step-bulk-operations *stepAdditionalHeader="'buttongroup-bulk-create'" entity="functionPackage">
   </step-bulk-operations>
   <section class="header" *stepAdditionalHeader="'buttongroup-bulk-create'">
@@ -66,7 +66,16 @@
         >
           <step-icon name="trash-2">delete</step-icon>
         </button>
+        <button
+          *ngIf="entityMenu.hasContent"
+          mat-icon-button
+          [matMenuTriggerFor]="entityMenu.menu!"
+          [matMenuTriggerData]="{ element: element }"
+        >
+          <step-icon name="more-horizontal"></step-icon>
+        </button>
       </step-btn-group>
     </td>
   </ng-container>
 </step-table>
+<step-entity-menu #entityMenu entity="functionPackage" (entityOperationSuccess)="table.reload()"> </step-entity-menu>
