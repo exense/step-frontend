@@ -15,7 +15,7 @@ import {
   EntityBulkOperationsRegistryService,
   SelectionCollector,
   EntityBulkOperationInfo,
-  BulkOperationPerformStrategy,
+  BulkOperationInvokerService,
 } from '../../../entities-selection/entities-selection.module';
 import { TableFilter } from '../../services/table-filter';
 import { TableReload } from '../../services/table-reload';
@@ -33,6 +33,7 @@ export class BulkOperationsComponent<KEY, ENTITY> implements OnChanges {
   private _tableFilter = inject(TableFilter, { optional: true });
   private _tableReload = inject(TableReload, { optional: true });
   private _entityBulkOperationsRegistry = inject(EntityBulkOperationsRegistryService);
+  private _bulkOperationInvoker = inject(BulkOperationInvokerService);
   readonly _selectionCollector = inject<SelectionCollector<KEY, ENTITY>>(SelectionCollector, { optional: true });
 
   private allowedOperations: (string | BulkOperationType)[] = [];
@@ -73,7 +74,7 @@ export class BulkOperationsComponent<KEY, ENTITY> implements OnChanges {
       config.ids = this._selectionCollector?.selected || undefined;
     }
 
-    this.invokeOperation(config).subscribe((result) => {
+    this._bulkOperationInvoker.invokeOperation(config, this._injector).subscribe((result) => {
       if (result?.closeStatus !== AsyncOperationCloseStatus.success) {
         return;
       }
@@ -102,33 +103,5 @@ export class BulkOperationsComponent<KEY, ENTITY> implements OnChanges {
       this.entityOperations = [];
       this.allowedOperations = [];
     }
-  }
-
-  private invokeOperation(config: BulkOperationConfig<KEY>) {
-    const operation = config.operationInfo?.operation;
-
-    if (!operation) {
-      console.error(`Operation ${config?.operationInfo?.type ?? ''} not supported`);
-      return of(undefined);
-    }
-
-    let _performStrategy: BulkOperationPerformStrategy<KEY>;
-
-    if (config.operationInfo?.performStrategy) {
-      const injector = Injector.create({
-        providers: [
-          {
-            provide: config.operationInfo.performStrategy,
-            useClass: config.operationInfo.performStrategy,
-          },
-        ],
-        parent: this._injector,
-      });
-      _performStrategy = injector.get<BulkOperationPerformStrategy<KEY>>(config.operationInfo.performStrategy);
-    } else {
-      _performStrategy = this._injector.get(BulkOperationPerformStrategy);
-    }
-
-    return _performStrategy.invoke(config);
   }
 }

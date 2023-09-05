@@ -7,6 +7,24 @@ import {
   EntityBulkOperationRegisterInfo,
 } from '../shared/entity-bulk-operation-info.interface';
 
+const convert = ({
+  operationType: type,
+  label,
+  entity,
+  icon,
+  operation,
+  permission,
+  performStrategy,
+}: EntityBulkOperation): EntityBulkOperationInfo => ({
+  type,
+  label,
+  entity,
+  icon,
+  operation,
+  permission,
+  performStrategy,
+});
+
 @Injectable({
   providedIn: 'root',
 })
@@ -49,14 +67,15 @@ export class EntityBulkOperationsRegistryService {
   getEntityBulkOperations(entity: string): EntityBulkOperationInfo[] {
     return (this._customRegistry.getRegisteredItems(this.registryType) as EntityBulkOperation[])
       .filter((item) => item.entity === entity)
-      .map(({ operationType: type, label, entity, icon, operation, permission, performStrategy }) => ({
-        type,
-        label,
-        entity,
-        icon,
-        operation,
-        permission,
-        performStrategy,
-      }));
+      .map(convert);
+  }
+
+  getEntityBulkOperation(entity: string, operationType: string): EntityBulkOperationInfo | undefined {
+    const type = `${entity}_${operationType}`;
+    const item = this._customRegistry.getRegisteredItem(this.registryType, type) as EntityBulkOperation;
+    if (!item) {
+      return undefined;
+    }
+    return convert(item);
   }
 }
