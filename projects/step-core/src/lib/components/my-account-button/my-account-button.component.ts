@@ -5,18 +5,18 @@ import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static'
 import { AJS_MODULE } from '../../shared';
 
 @Component({
-  selector: 'step-settings-button',
-  template: `<step-icon name="settings"></step-icon>`,
-  styleUrls: [],
+  selector: 'step-my-account-button',
+  template: `<step-icon name="settings"></step-icon> My account`,
+  styleUrls: ['./my-account-button.component.scss'],
 })
-export class SettingButtonComponent extends LinkButtonComponent {
+export class MyAccountButtonComponent extends LinkButtonComponent {
   private _specialLinks = inject(SpecialLinksService);
 
   protected override initUrl(): string {
-    return this._specialLinks.settings();
+    return this._specialLinks.myAccount();
   }
 }
 
 getAngularJSGlobal()
   .module(AJS_MODULE)
-  .directive('stepSettingsButton', downgradeComponent({ component: SettingButtonComponent }));
+  .directive('stepMyAccountButton', downgradeComponent({ component: MyAccountButtonComponent }));
