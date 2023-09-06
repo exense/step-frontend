@@ -1,0 +1,26 @@
+:host {
+  display: flex;
+  gap: 2rem;
+}
+
+.interactive-trigger {
+  visibility: hidden;
+}
+
+span.mat-menu-item.plan-execution-menu {
+  height: auto;
+  font-size: inherit;
+  line-height: initial;
+  font-weight: initial;
+
+  &:hover:not([disabled]) {
+    background: transparent;
+  }
+
+  .interactive-parameters,
+  step-execution-commands {
+    width: 25rem;
+    display: block;
+    padding: 0.5rem;
+  }
+}

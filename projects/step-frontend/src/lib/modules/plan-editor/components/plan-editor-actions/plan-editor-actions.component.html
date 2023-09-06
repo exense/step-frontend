@@ -3,7 +3,7 @@
     *ngIf="hasUndo"
     type="button"
     mat-stroked-button
-    matTooltip="Revert all changes"
+    [matTooltip]="tooltips.revertAll"
     matTooltipPosition="below"
     (click)="discardAll.emit()"
   >
@@ -14,7 +14,7 @@
     type="button"
     mat-stroked-button
     [disabled]="!hasUndo"
-    matTooltip="Undo (Ctrl + Z)"
+    [matTooltip]="tooltips.undo"
     matTooltipPosition="below"
     (click)="undo.emit()"
   >
@@ -25,7 +25,7 @@
     type="button"
     mat-stroked-button
     [disabled]="!hasRedo"
-    matTooltip="Redo (Ctrl + Y)"
+    [matTooltip]="tooltips.redo"
     matTooltipPosition="below"
     (click)="redo.emit()"
   >
@@ -35,44 +35,32 @@
     type="button"
     mat-stroked-button
     (click)="displayHistory.emit()"
-    matTooltip="Display version history"
+    [matTooltip]="tooltips.history"
     class="history"
     matTooltipPosition="below"
   >
     <step-icon name="git-branch"></step-icon>
   </button>
 
-  <button type="button" mat-stroked-button (click)="clone.emit()">Clone</button>
-
-  <button type="button" mat-stroked-button (click)="export.emit()">Export</button>
-
-  <button type="button" mat-stroked-button [disabled]="isInteractiveSessionActive" (click)="startInteractive.emit()">
-    Start interactive session
+  <button
+    type="button"
+    mat-stroked-button
+    (click)="clone.emit()"
+    [matTooltip]="tooltips.copy"
+    matTooltipPosition="below"
+  >
+    <step-icon name="copy"></step-icon>
   </button>
 
-  <ng-container *ngIf="isInteractiveSessionActive">
-    <button type="button" mat-stroked-button (click)="reset.emit()">Reset</button>
-
-    <button type="button" mat-stroked-button (click)="stop.emit()">Stop</button>
-
-    <button type="button" mat-stroked-button [matMenuTriggerFor]="executionParametersMenu">Session parameters</button>
-
-    <mat-menu #executionParametersMenu="matMenu">
-      <span
-        class="plan-execution-menu"
-        mat-menu-item
-        [disableRipple]="true"
-        (click)="$event.stopImmediatePropagation()"
-      >
-        <step-custom-forms
-          *ngIf="_interactiveSession.executionParameters"
-          [stModel]="_interactiveSession.executionParameters"
-          stScreen="executionParameters"
-        >
-        </step-custom-forms>
-      </span>
-    </mat-menu>
-  </ng-container>
+  <button
+    type="button"
+    mat-stroked-button
+    (click)="export.emit()"
+    [matTooltip]="tooltips.export"
+    matTooltipPosition="below"
+  >
+    <step-icon name="upload"></step-icon>
+  </button>
 
   <button
     *ngIf="showExecuteButton"
@@ -80,14 +68,62 @@
     mat-stroked-button
     color="primary"
     [matMenuTriggerFor]="executionMenu"
+    [matTooltip]="tooltips.start"
+    matTooltipPosition="below"
   >
     <step-icon name="play-circle"></step-icon>
   </button>
-
-  <mat-menu #executionMenu="matMenu">
-    <span class="plan-execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
-      <step-execution-commands [description]="description" [repositoryObjectRef]="repositoryObjectRef">
-      </step-execution-commands>
-    </span>
-  </mat-menu>
 </step-btn-group>
+<step-btn-group class="with-borders">
+  <button
+    *ngIf="isInteractiveSessionActive"
+    type="button"
+    mat-stroked-button
+    (click)="reset.emit()"
+    [matTooltip]="tooltips.resetInteractive"
+    matTooltipPosition="below"
+  >
+    <step-icon name="refresh-cw"></step-icon>
+  </button>
+
+  <button
+    type="button"
+    mat-stroked-button
+    [color]="isInteractiveSessionActive ? 'primary' : undefined"
+    (click)="toggleInteractiveSession()"
+    [matTooltip]="isInteractiveSessionActive ? tooltips.stopInteractive : tooltips.startInteractive"
+    matTooltipPosition="below"
+  >
+    <step-icon name="bug-01"></step-icon>
+  </button>
+  <span class="interactive-trigger" #interactiveSessionTrigger [matMenuTriggerFor]="interactiveSessionMenu"></span>
+</step-btn-group>
+<mat-menu #executionMenu="matMenu">
+  <span class="plan-execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
+    <step-execution-commands [description]="description" [repositoryObjectRef]="repositoryObjectRef">
+    </step-execution-commands>
+  </span>
+</mat-menu>
+<mat-menu #interactiveSessionMenu="matMenu">
+  <span class="plan-execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
+    <div class="interactive-parameters">
+      <step-custom-forms
+        *ngIf="_interactiveSession.executionParameters"
+        [stModel]="_interactiveSession.executionParameters"
+        stScreen="executionParameters"
+      >
+      </step-custom-forms>
+      <step-btn-group>
+        <button
+          type="button"
+          mat-icon-button
+          (click)="startInteractiveSession()"
+          [matTooltip]="tooltips.startInteractive"
+          matTooltipPosition="below"
+        >
+          <step-icon name="bug-01"></step-icon>
+        </button>
+      </step-btn-group>
+    </div>
+  </span>
+</mat-menu>
