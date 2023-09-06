@@ -79,7 +79,7 @@ export class FunctionModule {
     this._entityRegistry.registerEntity(
       'KeywordPackage',
       'functionPackage',
-      'gift',
+      'package',
       'functionPackage',
       'rest/functionpackages/',
       'rest/functionpackages/',
