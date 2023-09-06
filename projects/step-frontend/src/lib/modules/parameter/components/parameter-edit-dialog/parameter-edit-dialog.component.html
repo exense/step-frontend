@@ -35,6 +35,18 @@
         </step-form-field>
       </section>
       <step-custom-forms [(stModel)]="parameter" stScreen="parameterDialog"> </step-custom-forms>
+
+      <step-form-field class="protect-field">
+        <mat-checkbox color="primary" [(ngModel)]="parameter.protectedValue" [disabled]="protectedParameter">
+          <span>Protect parameter value</span>
+          &nbsp;
+          <step-icon
+            name="help-circle"
+            matTooltip="When a parameter is protected, its value will not show in the UI. This is usefull to safely store passwords."
+          ></step-icon>
+        </mat-checkbox>
+      </step-form-field>
+
       <section class="last-modification" *ngIf="parameter.lastModificationDate">
         <label>Last modification</label>
         <span
