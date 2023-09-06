@@ -26,7 +26,7 @@ export class ImportDialogsService {
 
     return a1Promise2Observable<string[]>(modalInstance.result).pipe(
       catchError(() => {
-        this._resourceInputBridgeService.deleteLastUploadedResource();
+        this._resourceInputBridgeService.deleteUploadedResource();
 
         return of(false);
       })
