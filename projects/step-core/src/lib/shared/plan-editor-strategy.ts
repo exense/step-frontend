@@ -20,8 +20,11 @@ export abstract class PlanEditorStrategy {
   abstract discardAll(): void;
 
   abstract handlePlanChange(): void;
+  abstract moveOut(node?: AbstractArtefact): void;
   abstract moveUp(node?: AbstractArtefact): void;
   abstract moveDown(node?: AbstractArtefact): void;
+  abstract moveInNextSibling(node?: AbstractArtefact): void;
+  abstract moveInPrevSibling(node?: AbstractArtefact): void;
 
   abstract delete(node?: AbstractArtefact): void;
 

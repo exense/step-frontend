@@ -26,15 +26,17 @@ export class PlanTreeComponent implements TreeActionsService {
   @ViewChild('area') splitAreaElementRef?: ElementRef<HTMLElement>;
 
   private actions: TreeAction[] = [
-    { id: PlanTreeAction.rename, label: 'Rename (F2)' },
-    { id: PlanTreeAction.move_up, label: 'Move Up (Ctrl + ⬆️)' },
-    { id: PlanTreeAction.move_down, label: 'Move Down (Ctrl + ⬇️)' },
-    { id: PlanTreeAction.copy, label: 'Copy (Ctrl + C)' },
-    { id: PlanTreeAction.paste, label: 'Paste (Ctrl + V)' },
-    { id: PlanTreeAction.delete, label: 'Delete (Del)' },
-    { id: PlanTreeAction.open, label: 'Open (Ctrl + O)' },
-    { id: PlanTreeAction.enable, label: 'Enable (Ctrl + E)' },
-    { id: PlanTreeAction.disable, label: 'Disable (Ctrl + E)' },
+    { id: PlanTreeAction.RENAME, label: 'Rename (F2)' },
+    { id: PlanTreeAction.MOVE_UP, label: 'Move Up (Ctrl + ⬆️)' },
+    { id: PlanTreeAction.MOVE_DOWN, label: 'Move Down (Ctrl + ⬇️)' },
+    { id: PlanTreeAction.MOVE_LEFT, label: 'Move Left (Ctrl + ⬅️)' },
+    { id: PlanTreeAction.MOVE_RIGHT, label: 'Move Right (Ctrl + ➡️)' },
+    { id: PlanTreeAction.COPY, label: 'Copy (Ctrl + C)' },
+    { id: PlanTreeAction.PASTE, label: 'Paste (Ctrl + V)' },
+    { id: PlanTreeAction.DELETE, label: 'Delete (Del)' },
+    { id: PlanTreeAction.OPEN, label: 'Open (Ctrl + O)' },
+    { id: PlanTreeAction.ENABLE, label: 'Enable (Ctrl + E)' },
+    { id: PlanTreeAction.DISABLE, label: 'Disable (Ctrl + E)' },
   ];
 
   constructor(
@@ -54,17 +56,17 @@ export class PlanTreeComponent implements TreeActionsService {
             let disabled = false;
             if (this.isReadonly) {
               disabled = true;
-            } else if (action.id === PlanTreeAction.open) {
+            } else if (action.id === PlanTreeAction.OPEN) {
               disabled = !this.canOpenArtefact(node.originalArtefact);
             }
             return { ...action, disabled };
           })
           .filter((action) => {
-            if (action.id === PlanTreeAction.disable && isSkipped) {
+            if (action.id === PlanTreeAction.DISABLE && isSkipped) {
               return false;
             }
 
-            if (action.id === PlanTreeAction.enable && !isSkipped) {
+            if (action.id === PlanTreeAction.ENABLE && !isSkipped) {
               return false;
             }
 
@@ -89,29 +91,35 @@ export class PlanTreeComponent implements TreeActionsService {
   proceedAction(actionId: string, node?: ArtefactTreeNode): void {
     const artefact = node?.originalArtefact;
     switch (actionId) {
-      case PlanTreeAction.rename:
+      case PlanTreeAction.RENAME:
         this._planEditService.rename(artefact);
         break;
-      case PlanTreeAction.move_up:
+      case PlanTreeAction.MOVE_UP:
         this._planEditService.moveUp(artefact);
         break;
-      case PlanTreeAction.move_down:
+      case PlanTreeAction.MOVE_DOWN:
         this._planEditService.moveDown(artefact);
         break;
-      case PlanTreeAction.copy:
+      case PlanTreeAction.MOVE_LEFT:
+        this._planEditService.moveOut(artefact);
+        break;
+      case PlanTreeAction.MOVE_RIGHT:
+        this._planEditService.moveInPrevSibling(artefact);
+        break;
+      case PlanTreeAction.COPY:
         this._planEditService.copy(artefact);
         break;
-      case PlanTreeAction.paste:
+      case PlanTreeAction.PASTE:
         this._planEditService.paste(artefact);
         break;
-      case PlanTreeAction.delete:
+      case PlanTreeAction.DELETE:
         this._planEditService.delete(artefact);
         break;
-      case PlanTreeAction.open:
+      case PlanTreeAction.OPEN:
         this._planArtefactResolver?.openArtefact(artefact);
         break;
-      case PlanTreeAction.disable:
-      case PlanTreeAction.enable:
+      case PlanTreeAction.DISABLE:
+      case PlanTreeAction.ENABLE:
         this._planEditService?.toggleSkip(artefact);
         break;
       default:
