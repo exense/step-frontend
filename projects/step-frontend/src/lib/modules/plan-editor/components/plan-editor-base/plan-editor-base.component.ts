@@ -201,7 +201,7 @@ export class PlanEditorBaseComponent
   }
 
   resetInteractive(): void {
-    this._interactiveSession.resetInteractive().subscribe(() => (this.selectedTab = 'controls'));
+    this._interactiveSession.resetInteractive().subscribe();
   }
 
   openArtefact(node?: AbstractArtefact): void {
