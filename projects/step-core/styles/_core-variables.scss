@@ -75,6 +75,8 @@ $statuses: (
   'FAILED': #d9534f,
   'TECHNICAL_ERROR': black,
   'INTERRUPTED': #f9c038,
+  'IMPORT_ERROR': #d9534f,
+  'VETOED': #cc0099,
 );
 
 $tokenstates: (
