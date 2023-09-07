@@ -1,6 +1,7 @@
 import {
   ChangeDetectorRef,
   Component,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -59,13 +60,9 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
 
   dashboardSettings: TimeSeriesDashboardSettings | undefined;
 
-  constructor(
-    private timeSeriesService: TimeSeriesService,
-    private executionService: ExecutionsService,
-    private dashboardService: DashboardService,
-    private _asyncTaskService: AsyncTasksService,
-    private cd: ChangeDetectorRef
-  ) {}
+  private timeSeriesService = inject(TimeSeriesService);
+  private _asyncTaskService = inject(AsyncTasksService);
+  private cd = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     if (!this.executionId) {

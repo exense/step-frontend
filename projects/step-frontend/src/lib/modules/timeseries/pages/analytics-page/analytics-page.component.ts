@@ -42,8 +42,6 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   executionHasToBeBuilt = false;
   migrationInProgress = false;
 
-  constructor(private dashboardService: DashboardService) {}
-
   ngOnInit(): void {
     let now = new Date().getTime();
     let start;

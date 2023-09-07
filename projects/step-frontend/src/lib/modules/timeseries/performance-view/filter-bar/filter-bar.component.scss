@@ -3,13 +3,13 @@
 step-ts-filter-bar {
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  padding: 1.6rem;
 
   .time-container {
     display: flex;
     justify-content: space-between;
     flex-direction: row;
-    margin-top: 12px;
+    margin-top: 1.2rem;
 
     .ranger-section {
       width: calc(100% - 150px);

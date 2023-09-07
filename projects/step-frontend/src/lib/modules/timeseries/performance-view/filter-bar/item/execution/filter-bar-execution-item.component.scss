@@ -8,7 +8,7 @@
 .item-container {
   background-color: var.$gray-100;
   border-radius: 6px;
-  padding-left: 14px;
+  padding-left: 1.4rem;
   display: flex;
   flex-direction: column;
   min-width: 200px;
@@ -29,16 +29,16 @@
 .timestamp {
   opacity: 0.6;
   font-size: 1.1rem;
-  margin-top: -4px;
-  padding-bottom: 8px;
-  padding-right: 12px;
+  margin-top: -0.4rem;
+  padding-bottom: 0.8rem;
+  padding-right: 1.2rem;
 }
 
 .add-btn {
   color: var.$dark-blue;
   padding: 0;
-  padding-right: 8px;
-  margin-top: 4px;
+  padding-right: 0.8rem;
+  margin-top: 0.4rem;
 }
 
 .remove-btn {

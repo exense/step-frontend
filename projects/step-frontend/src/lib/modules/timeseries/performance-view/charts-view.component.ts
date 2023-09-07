@@ -1,5 +1,5 @@
 import { KeyValue } from '@angular/common';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, BucketAttributes, Execution, TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
 import { forkJoin, Observable, of, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
@@ -125,7 +125,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     return a.key.localeCompare(b.key);
   };
 
-  constructor(private timeSeriesService: TimeSeriesService) {}
+  private timeSeriesService = inject(TimeSeriesService);
 
   onAllSeriesCheckboxClick(event: any) {
     this.keywordsService.toggleSelectAll();

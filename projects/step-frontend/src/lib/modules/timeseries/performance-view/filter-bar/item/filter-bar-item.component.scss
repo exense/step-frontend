@@ -5,7 +5,7 @@
 :host {
   background: var.$gray-100;
   color: #293e50;
-  padding: 2px;
+  padding: 0.2rem;
   border-radius: 4px;
 }
 
@@ -15,16 +15,16 @@
   }
 
   .filter-label {
-    font-size: 12px;
+    font-size: 1.2rem;
     opacity: 0.7;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding-right: 6px;
+    padding-right: 0.6rem;
   }
 
   .filter-value {
-    font-size: 11px;
+    font-size: 1.1rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -35,12 +35,12 @@
     position: absolute;
     right: 0;
     top: 0;
-    font-size: 4px;
+    font-size: 0.4rem;
     border-radius: 50%;
-    width: 14px;
-    height: 14px;
-    min-width: 14px;
-    min-height: 14px;
+    width: 1.4rem;
+    height: 1.4rem;
+    min-width: 1.4rem;
+    min-height: 1.4rem;
     padding: 2px;
 
     &:hover {
@@ -55,11 +55,11 @@
   top: 9px;
   right: 9px;
   font-weight: bold;
-  font-size: 12px;
+  font-size: 1.2rem;
 }
 
 .menu-container {
-  padding: 12px;
+  padding: 1.2rem;
   height: auto;
 }
 
@@ -78,7 +78,7 @@ label {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  font-size: 12px;
+  font-size: 1.2rem;
   margin-top: 1.2rem;
 }
 
@@ -90,14 +90,14 @@ label {
 }
 
 .submit-btn {
-  margin-top: 12px;
+  margin-top: 1.2rem;
 }
 
 .apply-checkbox {
-  margin-top: 24px;
-  margin-bottom: -4px;
+  margin-top: 2.4rem;
+  margin-bottom: -0.4rem;
   display: flex;
   justify-content: space-between;
   opacity: 0.8;
-  gap: 14px;
+  gap: 1.4rem;
 }

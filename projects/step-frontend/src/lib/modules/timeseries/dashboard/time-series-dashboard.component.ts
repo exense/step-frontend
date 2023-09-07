@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { filter, forkJoin, merge, Subject, Subscription, switchMap, takeUntil, tap, throttle } from 'rxjs';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { FilterBarComponent } from '../performance-view/filter-bar/filter-bar.component';
@@ -57,11 +57,9 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
 
   exportInProgress = false;
 
-  constructor(
-    private contextsFactory: TimeSeriesContextsFactory,
-    private _timeSeriesService: TimeSeriesService,
-    private _tableApiService: TableApiWrapperService
-  ) {}
+  private _contextsFactory = inject(TimeSeriesContextsFactory);
+  private _timeSeriesService = inject(TimeSeriesService);
+  private _tableApiService = inject(TableApiWrapperService);
 
   ngOnInit(): void {
     if (!this.settings) {
@@ -80,7 +78,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       filters: this.filterItems,
       grouping: ['name'],
     };
-    this.context = this.contextsFactory.createContext(contextParams);
+    this.context = this._contextsFactory.createContext(contextParams);
 
     this.performanceViewSettings = this.settings;
     this.subscribeForContextChange();
@@ -294,7 +292,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.compareModeFilterOptions = this.filterOptions.map((i) => ({ ...i, isHidden: false }));
     this.compareModeFilterItems = this.prepareFiltersForCompareMode();
     const timeRange = JSON.parse(JSON.stringify(this.context.getFullTimeRange()));
-    const compareContext = this.contextsFactory.createContext({
+    const compareContext = this._contextsFactory.createContext({
       timeRange: timeRange,
       id: new Date().getTime().toString(),
       grouping: this.context.getGroupDimensions(),
@@ -334,7 +332,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.terminator$.next(true);
     this.compareTerminator$.next(true);
-    this.contextsFactory.destroyContext(this.context.id);
+    this._contextsFactory.destroyContext(this.context.id);
     this.updateBaseChartsSubscription.unsubscribe();
   }
 }

@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  inject,
   Input,
   OnDestroy,
   OnInit,
@@ -75,12 +76,10 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   oqlValue: string = '';
   invalidOql = false;
 
-  constructor(
-    private _changeDetectorRef: ChangeDetectorRef,
-    private _timeSeriesService: TimeSeriesService,
-    private _matDialog: MatDialog,
-    private _snackbar: MatSnackBar
-  ) {}
+  private _changeDetectorRef = inject(ChangeDetectorRef);
+  private _timeSeriesService = inject(TimeSeriesService);
+  private _matDialog = inject(MatDialog);
+  private _snackbar = inject(MatSnackBar);
 
   ngOnInit(): void {
     if (!this.context) {
