@@ -13,6 +13,7 @@ span.mat-menu-item.plan-execution-menu {
   line-height: initial;
   font-weight: initial;
 
+  &.cdk-program-focused:not([disabled]),
   &:hover:not([disabled]) {
     background: transparent;
   }
@@ -22,5 +23,20 @@ span.mat-menu-item.plan-execution-menu {
     width: 25rem;
     display: block;
     padding: 0.5rem;
+  }
+
+  .interactive-parameters {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .interactive-button {
+    padding-left: 0;
+    .button-content {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
   }
 }

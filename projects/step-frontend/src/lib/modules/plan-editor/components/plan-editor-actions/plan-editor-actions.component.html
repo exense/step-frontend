@@ -3,7 +3,7 @@
     *ngIf="hasUndo"
     type="button"
     mat-stroked-button
-    [matTooltip]="tooltips.revertAll"
+    [matTooltip]="captions.revertAll"
     matTooltipPosition="below"
     (click)="discardAll.emit()"
   >
@@ -14,7 +14,7 @@
     type="button"
     mat-stroked-button
     [disabled]="!hasUndo"
-    [matTooltip]="tooltips.undo"
+    [matTooltip]="captions.undo"
     matTooltipPosition="below"
     (click)="undo.emit()"
   >
@@ -25,7 +25,7 @@
     type="button"
     mat-stroked-button
     [disabled]="!hasRedo"
-    [matTooltip]="tooltips.redo"
+    [matTooltip]="captions.redo"
     matTooltipPosition="below"
     (click)="redo.emit()"
   >
@@ -35,7 +35,7 @@
     type="button"
     mat-stroked-button
     (click)="displayHistory.emit()"
-    [matTooltip]="tooltips.history"
+    [matTooltip]="captions.history"
     class="history"
     matTooltipPosition="below"
   >
@@ -46,7 +46,7 @@
     type="button"
     mat-stroked-button
     (click)="clone.emit()"
-    [matTooltip]="tooltips.copy"
+    [matTooltip]="captions.copy"
     matTooltipPosition="below"
   >
     <step-icon name="copy"></step-icon>
@@ -56,7 +56,7 @@
     type="button"
     mat-stroked-button
     (click)="export.emit()"
-    [matTooltip]="tooltips.export"
+    [matTooltip]="captions.export"
     matTooltipPosition="below"
   >
     <step-icon name="upload"></step-icon>
@@ -68,7 +68,7 @@
     mat-stroked-button
     color="primary"
     [matMenuTriggerFor]="executionMenu"
-    [matTooltip]="tooltips.start"
+    [matTooltip]="captions.start"
     matTooltipPosition="below"
   >
     <step-icon name="play-circle"></step-icon>
@@ -80,7 +80,7 @@
     type="button"
     mat-stroked-button
     (click)="reset.emit()"
-    [matTooltip]="tooltips.resetInteractive"
+    [matTooltip]="captions.resetInteractive"
     matTooltipPosition="below"
   >
     <step-icon name="refresh-cw"></step-icon>
@@ -91,7 +91,7 @@
     mat-stroked-button
     [color]="isInteractiveSessionActive ? 'primary' : undefined"
     (click)="toggleInteractiveSession()"
-    [matTooltip]="isInteractiveSessionActive ? tooltips.stopInteractive : tooltips.startInteractive"
+    [matTooltip]="isInteractiveSessionActive ? captions.stopInteractive : captions.startInteractive"
     matTooltipPosition="below"
   >
     <step-icon name="bug-01"></step-icon>
@@ -116,12 +116,16 @@
       <step-btn-group>
         <button
           type="button"
-          mat-icon-button
+          class="interactive-button"
+          mat-button
           (click)="startInteractiveSession()"
-          [matTooltip]="tooltips.startInteractive"
+          [matTooltip]="captions.startInteractive"
           matTooltipPosition="below"
         >
-          <step-icon name="bug-01"></step-icon>
+          <div class="button-content">
+            <step-icon name="bug-01"></step-icon>
+            <span>{{ captions.startInteractiveShort }}</span>
+          </div>
         </button>
       </step-btn-group>
     </div>

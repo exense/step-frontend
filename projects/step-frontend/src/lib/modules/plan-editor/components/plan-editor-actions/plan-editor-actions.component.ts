@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output, ViewChild } from '@angular/core';
 import { RepositoryObjectReference } from '@exense/step-core';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 import { MatMenuTrigger } from '@angular/material/menu';
@@ -30,7 +30,7 @@ export class PlanEditorActionsComponent {
 
   @ViewChild('interactiveSessionTrigger', { read: MatMenuTrigger }) private interactiveSessionTrigger?: MatMenuTrigger;
 
-  protected readonly tooltips = {
+  protected readonly captions = {
     revertAll: 'Revert all changes',
     undo: 'Undo (Ctrl + Z)',
     redo: 'Redo (Ctrl + Y)',
@@ -39,6 +39,7 @@ export class PlanEditorActionsComponent {
     export: 'Export',
     start: 'Start execution',
     resetInteractive: 'Reset the session of the interactive mode',
+    startInteractiveShort: 'Start interactive session',
     startInteractive: 'Start an interactive session to debug this plan',
     stopInteractive: 'Stop interactive mode',
   };
