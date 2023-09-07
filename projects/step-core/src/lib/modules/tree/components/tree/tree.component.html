@@ -63,13 +63,16 @@
 ></div>
 <mat-menu #nodeContextMenu="matMenu">
   <ng-template matMenuContent let-node="node">
-    <button
-      *ngFor="let action of node | treeNodeActions | async; trackBy: trackByAction"
-      mat-menu-item
-      [disabled]="action.disabled"
-      (click)="handleContextAction(action, node)"
-    >
-      {{ action.label }}
-    </button>
+    <ng-container *ngFor="let action of node | treeNodeActions | async; trackBy: trackByAction">
+      <button
+        class="tree-action-item"
+        mat-menu-item
+        [disabled]="action.disabled"
+        (click)="handleContextAction(action, node)"
+      >
+        {{ action.label }}
+      </button>
+      <mat-divider *ngIf="action.hasSeparator"></mat-divider>
+    </ng-container>
   </ng-template>
 </mat-menu>

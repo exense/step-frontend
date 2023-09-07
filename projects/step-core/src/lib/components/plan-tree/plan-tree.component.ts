@@ -48,18 +48,18 @@ export class PlanTreeComponent implements TreeActionsService {
   @ViewChild(TreeComponent) tree?: TreeComponent<ArtefactTreeNode>;
 
   private actions: TreeAction[] = [
+    { id: PlanTreeAction.OPEN, label: 'Open (Ctrl + O)' },
     { id: PlanTreeAction.RENAME, label: 'Rename (F2)' },
+    { id: PlanTreeAction.ENABLE, label: 'Enable (Ctrl + E)', hasSeparator: true },
+    { id: PlanTreeAction.DISABLE, label: 'Disable (Ctrl + E)', hasSeparator: true },
+    { id: PlanTreeAction.COPY, label: 'Copy (Ctrl + C)' },
+    { id: PlanTreeAction.PASTE, label: 'Paste (Ctrl + V)' },
+    { id: PlanTreeAction.DUPLICATE, label: 'Duplicate (Ctrl + D)' },
+    { id: PlanTreeAction.DELETE, label: 'Delete (Del)', hasSeparator: true },
     { id: PlanTreeAction.MOVE_UP, label: 'Move Up (Ctrl + ⬆️)' },
     { id: PlanTreeAction.MOVE_DOWN, label: 'Move Down (Ctrl + ⬇️)' },
     { id: PlanTreeAction.MOVE_LEFT, label: 'Move Left (Ctrl + ⬅️)' },
     { id: PlanTreeAction.MOVE_RIGHT, label: 'Move Right (Ctrl + ➡️)' },
-    { id: PlanTreeAction.COPY, label: 'Copy (Ctrl + C)' },
-    { id: PlanTreeAction.PASTE, label: 'Paste (Ctrl + V)' },
-    { id: PlanTreeAction.DUPLICATE, label: 'Duplicate (Ctrl + D)' },
-    { id: PlanTreeAction.DELETE, label: 'Delete (Del)' },
-    { id: PlanTreeAction.OPEN, label: 'Open (Ctrl + O)' },
-    { id: PlanTreeAction.ENABLE, label: 'Enable (Ctrl + E)' },
-    { id: PlanTreeAction.DISABLE, label: 'Disable (Ctrl + E)' },
   ];
 
   getActionsForNode(node: ArtefactTreeNode): Observable<TreeAction[]> {

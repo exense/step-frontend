@@ -25,14 +25,14 @@ step-plan-tree {
         }
 
         button.actions-button {
-          display: none;
+          visibility: hidden;
         }
       }
     }
 
     .node-content:hover .node-name button.actions-button,
     &.context-menu-open .node-content .node-name button.actions-button {
-      display: block;
+      visibility: visible;
     }
   }
 }
