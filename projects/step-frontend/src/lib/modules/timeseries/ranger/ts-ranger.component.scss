@@ -1,19 +1,11 @@
 step-ts-ranger {
-  display: block;
-
   .chart-wrapper {
     width: 100%;
     max-width: 100%;
     max-height: 100%;
   }
 
-  .uplot {
-    display: block;
-  }
-
   .ranger {
-    width: 100%;
-
     .u-select {
       pointer-events: all;
       cursor: grabbing;

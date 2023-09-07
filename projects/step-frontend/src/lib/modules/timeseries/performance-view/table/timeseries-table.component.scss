@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 step-timeseries-table {
   .color-cell {
     display: flex;
@@ -22,11 +24,40 @@ step-timeseries-table {
 
   table {
     white-space: nowrap;
+
+    th .subtitle {
+      font-size: 11px;
+      font-weight: 400;
+      color: var.$gray-400;
+    }
+
+    .compare-value {
+      color: var.$orange !important;
+      opacity: 0.6;
+    }
+
+    th div {
+      text-align: left;
+    }
   }
 
   mat-paginator {
     position: sticky;
     left: 0;
+  }
+
+  .compare-diff {
+    font-size: 10px;
+    opacity: 0.6;
+    margin-left: 4px;
+  }
+
+  .right-separator {
+    border-right: 1px solid var.$gray-200;
+  }
+
+  .header-subtitle {
+    font-size: 12px;
   }
 
   .checkbox {

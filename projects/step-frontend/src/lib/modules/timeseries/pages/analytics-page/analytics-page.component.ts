@@ -1,15 +1,16 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, DashboardService } from '@exense/step-core';
-import { TimeSeriesConfig } from '../time-series.config';
-import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
-import { TimeSeriesDashboardComponent } from '../dashboard/time-series-dashboard.component';
-import { RangeSelectionType } from '../time-selection/model/range-selection-type';
-import { TSTimeRange } from '../chart/model/ts-time-range';
-import { TimeSeriesDashboardSettings } from '../dashboard/model/ts-dashboard-settings';
-import { TsUtils } from '../util/ts-utils';
-import { FilterBarItemType } from '../performance-view/filter-bar/model/ts-filter-item';
+import { TimeSeriesConfig } from '../../time-series.config';
+import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
+import { TimeSeriesDashboardComponent } from '../../dashboard/time-series-dashboard.component';
+import { RangeSelectionType } from '../../time-selection/model/range-selection-type';
+import { TSTimeRange } from '../../chart/model/ts-time-range';
+import { TimeSeriesDashboardSettings } from '../../dashboard/model/ts-dashboard-settings';
+import { TsUtils } from '../../util/ts-utils';
+import { FilterBarItemType } from '../../performance-view/filter-bar/model/ts-filter-item';
 import { range, Subject, takeUntil, timer } from 'rxjs';
+import { TimeSeriesUtils } from '../../time-series-utils';
 
 @Component({
   selector: 'step-analytics-page',
@@ -36,6 +37,10 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   stopInterval$ = new Subject();
 
   contextualParams: any = {};
+
+  compareModeEnabled = false;
+  executionHasToBeBuilt = false;
+  migrationInProgress = false;
 
   constructor(private dashboardService: DashboardService) {}
 
@@ -76,6 +81,8 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
       timeRange: { from: start, to: end },
       contextualFilters: urlParams,
       showContextualFilters: true,
+      timeRangeOptions: TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS,
+      activeTimeRange: this.timeRangeSelection, // TODO handle url param
       filterOptions: [
         {
           label: 'Status',
@@ -147,29 +154,12 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   }
 
   triggerRefresh() {
-    this.dashboard.refresh(this.calculateFullRange());
+    this.dashboard.refresh(TimeSeriesUtils.convertSelectionToTimeRange(this.timeRangeSelection));
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
-    this.dashboard.updateRange(this.calculateFullRange()); // instant call
-  }
-
-  calculateFullRange(): TSTimeRange {
-    let now = new Date().getTime();
-    let newFullRange: TSTimeRange;
-    switch (this.timeRangeSelection.type) {
-      case RangeSelectionType.FULL:
-        throw new Error('Full range selection is not supported');
-      case RangeSelectionType.ABSOLUTE:
-        newFullRange = this.timeRangeSelection.absoluteSelection!;
-        break;
-      case RangeSelectionType.RELATIVE:
-        let end = now;
-        newFullRange = { from: end - this.timeRangeSelection.relativeSelection!.timeInMs!, to: end };
-        break;
-    }
-    return newFullRange;
+    this.dashboard.updateFullRange(TimeSeriesUtils.convertSelectionToTimeRange(selection)); // instant call
   }
 
   /**
@@ -191,6 +181,19 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
       }
     }
     return lastRelativeOption;
+  }
+
+  toggleCompareMode() {
+    this.compareModeEnabled = !this.compareModeEnabled;
+    if (this.compareModeEnabled) {
+      this.dashboard.enableCompareMode();
+    } else {
+      this.dashboard.disableCompareMode();
+    }
+  }
+
+  exportRawData() {
+    this.dashboard.exportRawData();
   }
 
   ngOnDestroy(): void {

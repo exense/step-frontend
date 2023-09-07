@@ -10,9 +10,7 @@ import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.se
 import { PerformanceViewSettings } from '../model/performance-view-settings';
 import { Observable, Subject, takeUntil, tap } from 'rxjs';
 import { TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
-import { FilterUtils } from '../../util/filter-utils';
 import { FindBucketsRequestBuilder } from '../../util/find-buckets-request-builder';
-import { PerformanceViewComponent } from '../performance-view.component';
 
 @Component({
   selector: 'step-execution-time-selection',
@@ -20,7 +18,7 @@ import { PerformanceViewComponent } from '../performance-view.component';
   styleUrls: ['./performance-view-time-selection.component.scss'],
 })
 export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy {
-  @Input() settings!: PerformanceViewSettings;
+  @Input() context!: TimeSeriesContext;
 
   @Output() onRangerLoaded = new EventEmitter<void>();
 
@@ -29,49 +27,47 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   timeLabels: number[] = [];
 
-  private tsContext!: TimeSeriesContext;
   private terminator$ = new Subject<void>();
 
   constructor(private timeSeriesService: TimeSeriesService, private executionsPageService: TimeSeriesContextsFactory) {}
 
   ngOnInit(): void {
-    if (!this.settings) {
+    if (!this.context) {
       throw new Error('Settings input is required');
     }
-    this.tsContext = this.executionsPageService.getContext(this.settings.contextId);
-    this.createRanger(this.tsContext.getFullTimeRange()).subscribe(() => this.onRangerLoaded.next());
-    this.tsContext
+    this.createRanger(this.context.getFullTimeRange()).subscribe(() => this.onRangerLoaded.next());
+    this.context
       .onTimeSelectionChange()
       .pipe(takeUntil(this.terminator$))
       .subscribe((selection) => {
-        if (this.tsContext.isFullRangeSelected()) {
+        if (this.context.isFullRangeSelected()) {
           this.rangerComponent.resetSelect();
         } else {
           this.rangerComponent.selectRange(selection);
         }
       });
-    this.tsContext
+    this.context
       .onFullRangeChange()
       .pipe(takeUntil(this.terminator$))
       .subscribe((range) => {
-        this.settings.timeRange = range;
+        // this.settings.timeRange = range;
         let customSelection = undefined;
-        if (!this.tsContext.isFullRangeSelected()) {
-          customSelection = this.tsContext.getSelectedTimeRange();
+        if (!this.context.isFullRangeSelected()) {
+          customSelection = this.context.getSelectedTimeRange();
         }
-        this.createRanger(this.tsContext.getFullTimeRange(), customSelection).subscribe();
+        this.createRanger(this.context.getFullTimeRange(), customSelection).subscribe();
       });
   }
 
   updateFullTimeRange(range: TSTimeRange) {
-    this.settings.timeRange = range;
+    // this.settings.timeRange = range;
   }
 
   refreshRanger(): Observable<TimeSeriesAPIResponse> {
-    const selection = this.tsContext.getSelectedTimeRange();
+    const selection = this.context.getSelectedTimeRange();
     return this.createRanger(
-      this.tsContext.getFullTimeRange(),
-      this.tsContext.isFullRangeSelected() ? undefined : selection
+      this.context.getFullTimeRange(),
+      this.context.isFullRangeSelected() ? undefined : selection
     );
   }
 
@@ -79,7 +75,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
     const request = new FindBucketsRequestBuilder()
       .withRange(fullTimeRange)
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
-      .withFilteringSettings(this.tsContext.getFilteringSettings())
+      .withFilteringSettings(this.context.getFilteringSettings())
       .withNumberOfBuckets(TimeSeriesConfig.MAX_BUCKETS_IN_CHART)
       .withFilterAttributesMask(TimeSeriesConfig.RANGER_FILTER_FIELDS)
       .withSkipCustomOQL(true)
@@ -112,12 +108,12 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   onRangerSelectionChange(event: TSTimeRange) {
     // check for full range selection
-    this.tsContext.updateSelectedRange(event);
+    this.context.updateSelectedRange(event);
     // the linked charts are automatically updated by the uplot sync feature. if that will be replaced, the charts must subscribe to the state change
   }
 
   onRangerZoomReset() {
-    this.tsContext.resetZoom();
+    this.context.resetZoom();
   }
 
   ngOnDestroy(): void {

@@ -87,7 +87,7 @@ export class FindBucketsRequestBuilder {
 
   build(): FindBucketsRequest {
     if (!this.filteringSettings) {
-      throw 'Filtering settings are mandatory';
+      throw new Error('Filtering settings are mandatory');
     }
     let customAttributesOql = '';
     let filterItems = this.filteringSettings.filterItems;
