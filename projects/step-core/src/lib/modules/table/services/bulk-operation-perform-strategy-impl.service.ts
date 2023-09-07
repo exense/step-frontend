@@ -24,7 +24,7 @@ const formatMessageWithDeleteWarning = (
 ) => {
   const firstPart = strings[0] + operationType;
   let restPart = strings.slice(1).reduce((result, part, index) => result + part + (otherExpressions[index] ?? ''), '');
-  if (operationType === BulkOperationType.delete) {
+  if (operationType === BulkOperationType.DELETE) {
     restPart = `<strong class="danger-warning">${restPart}</strong>`;
   }
   return firstPart + restPart;
@@ -114,7 +114,7 @@ export class BulkOperationPerformStrategyImplService<ID = string> implements Bul
     const operationType = config.operationInfo.type;
     const operation = this._titleCase.transform(operationType);
     let title = `Confirm ${operation}`;
-    if (operationType === BulkOperationType.delete && config.selectionType === BulkSelectionType.All) {
+    if (operationType === BulkOperationType.DELETE && config.selectionType === BulkSelectionType.All) {
       title = `<span class="danger-warning">${title}</span>`;
     }
     return this._sanitizer.bypassSecurityTrustHtml(title);

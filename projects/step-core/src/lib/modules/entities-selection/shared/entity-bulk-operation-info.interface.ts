@@ -10,6 +10,7 @@ export interface EntityBulkOperation extends CustomRegistryItem {
   icon?: string;
   permission?: string;
   performStrategy?: Type<BulkOperationPerformStrategy>;
+  order?: number;
 }
 
 export type EntityBulkOperationRegisterInfo = Omit<

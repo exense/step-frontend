@@ -15,6 +15,7 @@ const convert = ({
   operation,
   permission,
   performStrategy,
+  order,
 }: EntityBulkOperation): EntityBulkOperationInfo => ({
   type,
   label,
@@ -23,6 +24,7 @@ const convert = ({
   operation,
   permission,
   performStrategy,
+  order,
 });
 
 @Injectable({
@@ -34,16 +36,16 @@ export class EntityBulkOperationsRegistryService {
   private readonly registryType = CustomRegistryType.entityBulkOperations;
 
   private knownOperations: Record<BulkOperationType | string, { label?: string; icon?: string }> = {
-    [BulkOperationType.delete]: { label: 'Delete selected', icon: 'trash-2' },
-    [BulkOperationType.duplicate]: { label: 'Clone selected', icon: 'copy' },
-    [BulkOperationType.export]: { label: 'Export selected', icon: 'upload' },
-    [BulkOperationType.restart]: { label: 'Restart selected', icon: 'play-circle' },
-    [BulkOperationType.stop]: { label: 'Stop selected', icon: 'stop-circle' },
+    [BulkOperationType.DELETE]: { label: 'Delete selected', icon: 'trash-2' },
+    [BulkOperationType.DUPLICATE]: { label: 'Clone selected', icon: 'copy' },
+    [BulkOperationType.EXPORT]: { label: 'Export selected', icon: 'upload' },
+    [BulkOperationType.RESTART]: { label: 'Restart selected', icon: 'play-circle' },
+    [BulkOperationType.STOP]: { label: 'Stop selected', icon: 'stop-circle' },
   };
 
   register(
     entity: string,
-    { type: operationType, label, icon, operation, performStrategy, permission }: EntityBulkOperationRegisterInfo
+    { type: operationType, label, icon, operation, performStrategy, permission, order }: EntityBulkOperationRegisterInfo
   ): this {
     const type = `${entity}_${operationType}`;
 
@@ -59,6 +61,7 @@ export class EntityBulkOperationsRegistryService {
       operation,
       permission,
       performStrategy,
+      order,
     };
     this._customRegistry.register(this.registryType, type, bulkOperation);
     return this;
@@ -67,7 +70,12 @@ export class EntityBulkOperationsRegistryService {
   getEntityBulkOperations(entity: string): EntityBulkOperationInfo[] {
     return (this._customRegistry.getRegisteredItems(this.registryType) as EntityBulkOperation[])
       .filter((item) => item.entity === entity)
-      .map(convert);
+      .map(convert)
+      .sort((a, b) => {
+        const orderA = a.order ?? Infinity;
+        const orderB = b.order ?? Infinity;
+        return orderA - orderB;
+      });
   }
 
   getEntityBulkOperation(entity: string, operationType: string): EntityBulkOperationInfo | undefined {

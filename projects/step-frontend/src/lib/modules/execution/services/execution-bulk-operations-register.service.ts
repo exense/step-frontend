@@ -11,17 +11,12 @@ export class ExecutionBulkOperationsRegisterService {
   register(): void {
     this._entityBulkOperationRegister
       .register('executions', {
-        type: BulkOperationType.delete,
-        permission: 'execution-delete',
-        operation: (requestBody) => this._api.deleteExecutions(requestBody),
-      })
-      .register('executions', {
-        type: BulkOperationType.restart,
+        type: BulkOperationType.RESTART,
         permission: 'plan-execute',
         operation: (requestBody) => this._api.restartExecutions(requestBody),
       })
       .register('executions', {
-        type: BulkOperationType.stop,
+        type: BulkOperationType.STOP,
         permission: 'plan-execute',
         operation: (requestBody) => this._api.stopExecutions(requestBody),
       });

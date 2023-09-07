@@ -38,6 +38,7 @@ import { RepositoryComponent } from './components/repository/repository.componen
 import { ExecutionPageComponent } from './components/execution-page/execution-page.component';
 import { ExecutionSelectionTableComponent } from './components/execution-selection-table/execution-selection-table.component';
 import { ExecutionBulkOperationsRegisterService } from './services/execution-bulk-operations-register.service';
+import { IsExecutionProgressPipe } from './pipes/is-execution-progress.pipe';
 
 @NgModule({
   declarations: [
@@ -65,6 +66,7 @@ import { ExecutionBulkOperationsRegisterService } from './services/execution-bul
     PanelOperationsComponent,
     ExecutionPageComponent,
     ExecutionSelectionTableComponent,
+    IsExecutionProgressPipe,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [

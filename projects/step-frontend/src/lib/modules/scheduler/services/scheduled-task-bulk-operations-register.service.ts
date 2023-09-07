@@ -11,12 +11,12 @@ export class ScheduledTaskBulkOperationsRegisterService {
   register(): void {
     this._entityBulkOperationsRegister
       .register('tasks', {
-        type: BulkOperationType.delete,
+        type: BulkOperationType.DELETE,
         permission: 'task-delete',
         operation: (requestBody) => this._api.deleteExecutionTasks(requestBody),
       })
       .register('tasks', {
-        type: BulkOperationType.duplicate,
+        type: BulkOperationType.DUPLICATE,
         permission: 'task-write',
         operation: (requestBody) => this._api.cloneExecutionTasks(requestBody),
       });

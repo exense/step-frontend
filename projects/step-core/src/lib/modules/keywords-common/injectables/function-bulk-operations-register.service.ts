@@ -13,12 +13,12 @@ export class FunctionBulkOperationsRegisterService {
   register(): void {
     this._registry
       .register('functions', {
-        type: BulkOperationType.duplicate,
+        type: BulkOperationType.DELETE,
         permission: 'kw-delete',
         operation: (requestBody) => this._api.deleteFunctions(requestBody),
       })
       .register('functions', {
-        type: BulkOperationType.duplicate,
+        type: BulkOperationType.DUPLICATE,
         permission: 'kw-write',
         operation: (requestBody) => this._api.cloneFunctions(requestBody),
       });

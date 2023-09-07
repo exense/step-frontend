@@ -11,12 +11,12 @@ export class ParametersBulkOperationsRegisterService {
   register(): void {
     this._entityBulkOperationRegister
       .register('parameters', {
-        type: BulkOperationType.delete,
+        type: BulkOperationType.DELETE,
         permission: 'param-delete',
         operation: (requestBody) => this._api.deleteParameters(requestBody),
       })
       .register('parameters', {
-        type: BulkOperationType.duplicate,
+        type: BulkOperationType.DUPLICATE,
         permission: 'param-write',
         operation: (requestBody) => this._api.cloneParameters(requestBody),
       });
