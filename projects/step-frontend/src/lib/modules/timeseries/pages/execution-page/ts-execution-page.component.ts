@@ -94,9 +94,6 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
       this.initDashboard(currentExecution);
       this.cd.detectChanges();
     } else {
-      // this.dashboard.refreshWithNewRange(
-      //   TimeSeriesUtils.convertExecutionAndSelectionToTimeRange(this.execution!, this.timeRangeSelection)
-      // );
       this.dashboard.refresh(); // the new execution is sent via input
     }
   }

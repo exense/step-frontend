@@ -78,7 +78,6 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
   }
 
   applyChanges() {
-    console.log(this.item.searchEntities);
     if (this.chipInputValue) {
       this.addSearchValue(this.chipInputValue);
     }

@@ -16,7 +16,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './time-range-picker.component.html',
   styleUrls: ['./time-range-picker.component.scss'],
 })
-export class TimeRangePickerComponent implements OnInit, OnChanges {
+export class TimeRangePickerComponent implements OnInit {
   @ViewChild(MatMenuTrigger) menuTrigger!: MatMenuTrigger;
 
   @Input() activeSelection!: TimeRangePickerSelection;
@@ -51,13 +51,6 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
           this.toDateString = TimeSeriesUtils.formatInputDate(new Date(to));
         }
       }
-    }
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    const selection = changes['activeSelection'];
-    if (selection) {
-      console.log('SELECTION CHANGED!');
     }
   }
 
