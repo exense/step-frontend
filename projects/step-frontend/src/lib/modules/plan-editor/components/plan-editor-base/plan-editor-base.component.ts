@@ -33,7 +33,7 @@ import {
   PlanLinkDialogService,
   FunctionActionsService,
 } from '@exense/step-core';
-import { catchError, filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
@@ -93,7 +93,10 @@ export class PlanEditorBaseComponent
   @Input() showExecuteButton = true;
 
   selectedTab = 'controls';
+
   readonly isInteractiveSessionActive$ = this._interactiveSession.isActive$;
+  readonly showInteractiveWarning$ = this.isInteractiveSessionActive$.pipe(debounceTime(300));
+
   planTypes$ = this._planApi.getArtefactTemplates().pipe(
     map((planTypes) => {
       return planTypes.map((planType) => ({
