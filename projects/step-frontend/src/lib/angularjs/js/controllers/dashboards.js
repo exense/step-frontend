@@ -20,7 +20,6 @@ angular
   .module('dashboardsControllers', ['tables', 'step'])
 
   .run(function (ViewRegistry) {
-    ViewRegistry.registerView('dashboards', 'partials/dashboards/dashboardsController.html');
     ViewRegistry.registerView('analytics', 'partials/dashboards/analyticsController.html');
   })
 

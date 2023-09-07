@@ -16,6 +16,10 @@
     height: 100%;
     font-size: 12px;
 
+    &.compact {
+      max-width: 100px;
+    }
+
     &.active {
       background: var.$gray-300;
       color: black;
@@ -34,7 +38,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       font-weight: 500;
-      color: #4b4b4b;
+      color: rgba(75, 75, 75, 0.63);
     }
   }
 }

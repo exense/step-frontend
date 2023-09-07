@@ -14,7 +14,7 @@ export class TimeseriesColorsPool {
   }
 
   /**
-   * @param key - If it is new, a new color will be assigned, otherwise a new color is generated.
+   * @param key - If it is not new, the existing value will be returned, otherwise a new color is generated.
    */
   assignColor(key: string): string {
     let color;

@@ -9,6 +9,7 @@
     border-right: 1px solid #d7d7d7;
     white-space: nowrap;
     padding: 12px;
+    width: 232px;
   }
 
   .title {
@@ -41,6 +42,12 @@
       }
     }
   }
+}
+
+.compact-btn {
+  height: 40px;
+  padding: 0 4px;
+  min-width: 40px;
 }
 
 .timezone-container {
