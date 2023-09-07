@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, skip, Subject } from 'rxjs';
-import { TimeSeriesKeywordsContext } from './execution-page/time-series-keywords.context';
+import { TimeSeriesKeywordsContext } from './pages/execution-page/time-series-keywords.context';
 import { TimeseriesColorsPool } from './util/timeseries-colors-pool';
 import { Execution } from '@exense/step-core';
 import { TSTimeRange } from './chart/model/ts-time-range';
@@ -7,6 +7,10 @@ import { TsFilterItem } from './performance-view/filter-bar/model/ts-filter-item
 import { TimeSeriesContextParams } from './time-series-context-params';
 import { TsFilteringMode } from './model/ts-filtering-mode';
 import { TsFilteringSettings } from './model/ts-filtering-settings';
+import { FilterUtils } from './util/filter-utils';
+import { TimeSeriesUtils } from './time-series-utils';
+import { OQLBuilder } from './util/oql-builder';
+import { TsCompareModeSettings } from './dashboard/model/ts-compare-mode-settings';
 
 /**
  * This class is responsible for managing the state of an execution tab. Here we store time selection, colors, filters, etc.
@@ -15,6 +19,10 @@ export class TimeSeriesContext {
   id!: string;
   activeExecution: Execution | undefined;
   filteringMode: TsFilteringMode = TsFilteringMode.STANDARD;
+
+  compareModeChange$: BehaviorSubject<TsCompareModeSettings> = new BehaviorSubject<TsCompareModeSettings>({
+    enabled: false,
+  });
 
   inProgress$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
@@ -35,15 +43,15 @@ export class TimeSeriesContext {
     this.id = params.id;
     this.fullTimeRange = params.timeRange;
     this.selectedTimeRange = params.timeRange;
-    this.activeFilters$ = new BehaviorSubject(params.dynamicFilters || []);
+    this.activeFilters$ = new BehaviorSubject(params.filters || []);
     this.filterSettings$ = new BehaviorSubject<TsFilteringSettings>({
       mode: TsFilteringMode.STANDARD,
       oql: '',
-      filterItems: params.dynamicFilters || [],
+      filterItems: params.filters || [],
     });
     this.activeGroupings$ = new BehaviorSubject(params.grouping);
-    this.colorsPool = new TimeseriesColorsPool();
-    this.keywordsContext = new TimeSeriesKeywordsContext(this.colorsPool);
+    this.colorsPool = params.colorsPool || new TimeseriesColorsPool();
+    this.keywordsContext = params.keywordsContext || new TimeSeriesKeywordsContext(this.colorsPool);
   }
 
   destroy(): void {
@@ -53,6 +61,18 @@ export class TimeSeriesContext {
     this.activeGroupings$.complete();
     this.activeFilters$.complete();
     this.filterSettings$.complete();
+  }
+
+  enableCompareMode(context: TimeSeriesContext) {
+    this.compareModeChange$.next({ enabled: true, context: context });
+  }
+
+  disableCompareMode() {
+    this.compareModeChange$.next({ enabled: false });
+  }
+
+  onCompareModeChange(): Observable<{ enabled: boolean; context?: TimeSeriesContext }> {
+    return this.compareModeChange$.asObservable();
   }
 
   setInProgress(inProgress: boolean) {
@@ -111,6 +131,26 @@ export class TimeSeriesContext {
 
   getFilteringSettings(): TsFilteringSettings {
     return this.filterSettings$.getValue();
+  }
+
+  buildActiveOQL(includeTimeRange = true, removeAttributesPrefix = false): string {
+    let filteringSettings = this.getFilteringSettings();
+    const filtersOql =
+      filteringSettings.mode === TsFilteringMode.OQL
+        ? removeAttributesPrefix
+          ? filteringSettings.oql.replace('attributes.', '')
+          : filteringSettings.oql
+        : FilterUtils.filtersToOQL(
+            filteringSettings.filterItems,
+            undefined,
+            TimeSeriesUtils.ATTRIBUTES_REMOVAL_FUNCTION
+          );
+    const selectedTimeRange = this.getSelectedTimeRange();
+    return new OQLBuilder()
+      .open('and')
+      .append(`(begin < ${Math.trunc(selectedTimeRange.to)} and begin > ${Math.trunc(selectedTimeRange.from)})`)
+      .append(filtersOql)
+      .build();
   }
 
   resetZoom() {

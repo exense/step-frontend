@@ -4,7 +4,7 @@ import { TimeSeriesUtils } from '../time-series-utils';
 import { BucketResponse } from '@exense/step-core';
 import { ResponseTimeMetric } from './model/response-time-metric';
 
-export class PerformanceViewConfig {
+export class ChartsViewConfig {
   public static responseTimeMetrics: ResponseTimeMetric[] = [
     {
       label: 'Avg',
