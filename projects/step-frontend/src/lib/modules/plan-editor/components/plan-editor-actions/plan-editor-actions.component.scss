@@ -28,15 +28,7 @@ span.mat-menu-item.plan-execution-menu {
   .interactive-parameters {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .interactive-button {
-    padding-left: 0;
-    .button-content {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-    }
+    gap: 1rem;
+    padding-bottom: 1rem;
   }
 }

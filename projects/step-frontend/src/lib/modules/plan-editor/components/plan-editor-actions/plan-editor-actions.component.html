@@ -116,16 +116,12 @@
       <step-btn-group>
         <button
           type="button"
-          class="interactive-button"
-          mat-button
+          mat-stroked-button
           (click)="startInteractiveSession()"
           [matTooltip]="captions.startInteractive"
           matTooltipPosition="below"
         >
-          <div class="button-content">
-            <step-icon name="bug-01"></step-icon>
-            <span>{{ captions.startInteractiveShort }}</span>
-          </div>
+          {{ captions.startInteractiveShort }}
         </button>
       </step-btn-group>
     </div>
