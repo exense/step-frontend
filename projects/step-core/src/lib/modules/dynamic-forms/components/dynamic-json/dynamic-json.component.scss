@@ -1,0 +1,19 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
+step-dynamic-json {
+  .button-content {
+    display: flex;
+    justify-content: flex-end;
+
+    button {
+      width: 3.2rem;
+      height: 3.2rem;
+      border-radius: 0.8rem;
+      min-width: auto;
+
+      step-icon {
+        @include core.step-icon-size(1.6rem);
+      }
+    }
+  }
+}

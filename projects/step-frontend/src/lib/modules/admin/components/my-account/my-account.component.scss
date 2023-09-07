@@ -6,3 +6,11 @@
 .generate-key {
   vertical-align: top;
 }
+
+.api-token-table {
+  margin-top: 3rem;
+
+  &.disabled {
+    opacity: 0.5;
+  }
+}

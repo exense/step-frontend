@@ -17,7 +17,7 @@ export class AugmentedSettingsService extends SettingsService {
   }
 
   getSettingAsText(id: string): Observable<string> {
-    return this._http.request('GET', `/rest/settings/${id}`, { responseType: 'text' });
+    return this._http.request('GET', `rest/settings/${id}`, { responseType: 'text' });
   }
 
   /*

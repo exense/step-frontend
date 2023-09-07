@@ -1,0 +1,18 @@
+<form #form="ngForm">
+  <step-dynamic-textfield
+    label="Lock name"
+    tooltip="The name of the lock. Leave empty if you want this lock to synchronize on this plan node."
+    [(ngModel)]="context.artefact!.lockName"
+    [disabled]="context.readonly"
+    name="lockName"
+  >
+  </step-dynamic-textfield>
+  <step-dynamic-checkbox
+    label="Global lock"
+    tooltip="Select this check-box if you want this lock to be global across all the executions."
+    [(ngModel)]="context.artefact!.globalLock"
+    [disabled]="context.readonly"
+    name="globalLock"
+  >
+  </step-dynamic-checkbox>
+</form>
