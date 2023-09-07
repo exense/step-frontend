@@ -22,7 +22,7 @@ import { RenderOptionsPipe } from './pipes/render-options.pipe';
 export class AdminModule {
   constructor(_entityRegistry: EntityRegistry, _viewRegistry: ViewRegistryService) {
     _entityRegistry.register('users', 'User', { icon: 'user', templateUrl: 'partials/users/userSelectionTable.html' });
-    _viewRegistry.registerDashlet('admin/controller', 'My Account', 'partials/myaccount.html', 'myaccount');
-    _viewRegistry.registerDashlet('settings', 'My Account', 'partials/myaccount.html', 'myaccount');
+    _viewRegistry.registerDashlet('admin/controller', 'My account', 'partials/myaccount.html', 'myaccount');
+    _viewRegistry.registerDashlet('settings', 'My account', 'partials/myaccount.html', 'myaccount');
   }
 }
