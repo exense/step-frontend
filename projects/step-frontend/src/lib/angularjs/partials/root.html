@@ -18,7 +18,9 @@
               <a id="session-dropdown" data-toggle="dropdown"><step-ajs-icon name="user"></step-ajs-icon> {{context.userID}}
                 [{{context.role}}]</a>
               <ul class="dropdown-menu" aria-labelledby="session-dropdown">
-                <li><a ng-click="setView('myaccount')"><step-ajs-icon name="settings"></step-ajs-icon> My account</a></li>
+                <li>
+                  <step-my-account-button></step-my-account-button>
+                </li>
                 <li ng-if="authService.getConf().authentication && authService.isAuthenticated()"><a
                   ng-click="authService.logout()"><step-ajs-icon name="power"></step-ajs-icon> Logout</a></li>
                 <li ng-if="authService.getConf().authentication && !authService.isAuthenticated()"><a
