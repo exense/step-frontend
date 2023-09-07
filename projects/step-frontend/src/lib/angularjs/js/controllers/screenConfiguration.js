@@ -24,13 +24,17 @@ angular
       'admin/controller',
       'Screens',
       'partials/screenconfiguration/screenConfiguration.html',
-      'screens'
+      'screens',
+      false,
+      1
     );
     ViewRegistry.registerDashlet(
       'settings',
       'Screens',
       'partials/screenconfiguration/screenConfiguration.html',
-      'screens'
+      'screens',
+      false,
+      1
     );
   })
   // FIXME: find solution to add EntityRegistry.registerEntity(Input
