@@ -15,6 +15,7 @@ import { MatChipInputEvent } from '@angular/material/chips';
 export class FilterBarItemComponent implements OnInit, OnChanges {
   @Input() item!: TsFilterItem;
   @Input() removable?: boolean;
+  @Input() compact = false;
 
   @Output() onRemoveItem: EventEmitter<any> = new EventEmitter<any>();
   @Output() onFilterChange: EventEmitter<TsFilterItem> = new EventEmitter<TsFilterItem>();
@@ -39,6 +40,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     if (!this.item) {
       throw new Error('Item input is mandatory');
     }
+    this.freeTextValues = this.item.freeTextValues || [];
   }
 
   onMenuClose(): void {

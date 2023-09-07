@@ -52,7 +52,7 @@ export class FunctionPackageConfigurationDialogComponent {
         }),
         switchMap((functionPackage) => this._api.saveFunctionPackage(functionPackage)),
         catchError(() => {
-          this._resourceInputBridgeService.deleteLastUploadedResource();
+          this._resourceInputBridgeService.deleteUploadedResource();
           return of(false);
         }),
         tap(() => (this.isLoading = false))
@@ -61,7 +61,7 @@ export class FunctionPackageConfigurationDialogComponent {
   }
 
   cancel(): void {
-    this._resourceInputBridgeService.deleteLastUploadedResource();
+    this._resourceInputBridgeService.deleteUploadedResource();
     this._matDialogRef.close(false);
   }
 

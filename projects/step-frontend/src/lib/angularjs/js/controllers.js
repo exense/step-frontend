@@ -24,7 +24,6 @@ var tecAdminControllers = angular.module('tecAdminControllers', [
   'step',
   'views',
   'ui.bootstrap',
-  'schedulerControllers'
 ]);
 
 tecAdminControllers.run(function (ViewRegistry) {

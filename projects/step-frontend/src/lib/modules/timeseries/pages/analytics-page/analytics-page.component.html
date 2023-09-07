@@ -1,0 +1,39 @@
+<div class="relative">
+  <div class="header-buttons">
+    <div>
+      <button mat-raised-button [matMenuTriggerFor]="refreshMenu">Refresh ({{ selectedRefreshInterval.label }})</button>
+      <mat-menu #refreshMenu="matMenu">
+        <button mat-menu-item *ngFor="let interval of refreshIntervals" (click)="changeRefreshInterval(interval)">
+          {{ interval.label }}
+        </button>
+      </mat-menu>
+    </div>
+    <div class="header-buttons">
+      <button class="menu-btn" [matMenuTriggerFor]="menu" mat-raised-button>
+        <div class="icon-container">
+          <step-icon name="settings"></step-icon>
+        </div>
+        <span>Settings</span>
+      </button>
+    </div>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="toggleCompareMode()">
+        <step-icon name="bar-chart-2" [class.active]="compareModeEnabled"></step-icon>
+        {{ compareModeEnabled ? 'Disable Compare Mode' : 'Enable Compare Mode' }}
+      </button>
+      <button mat-menu-item (click)="exportRawData()">
+        <step-icon name="download"></step-icon>
+        <span>Export Raw Measurements</span>
+      </button>
+    </mat-menu>
+  </div>
+  <step-alert type="warning" class="warning" *ngIf="compareModeEnabled && selectedRefreshInterval.value">
+    Refresh will not be triggered when compare mode is enabled.
+  </step-alert>
+
+  <step-timeseries-dashboard
+    #dashboard
+    *ngIf="dashboardSettings"
+    [settings]="dashboardSettings"
+  ></step-timeseries-dashboard>
+</div>

@@ -69,11 +69,11 @@ import { ArtefactDetailsComponent } from './components/artefact-details/artefact
 import { JsonViewerModule } from './modules/json-viewer/json-viewer.module';
 import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 import { ResourceInputModule } from './modules/resource-input/resource-input.module';
-import { IsUsedByDialogService } from './services/is-used-by-dialog.service';
 import { ProjectNamePipe } from './pipes/project-name.pipe';
 import { FunctionActionsService, KeywordsCommonModule } from './modules/keywords-common/keywords-common.module';
 import { FunctionActionsImplService } from './services/function-actions-impl.service';
 import { GenericFunctionListComponent } from './components/generic-function-list/generic-function-list.component';
+import { MyAccountButtonComponent } from './components/my-account-button/my-account-button.component';
 
 @NgModule({
   declarations: [
@@ -129,6 +129,7 @@ import { GenericFunctionListComponent } from './components/generic-function-list
     WaitingArtefactsAdvancedComponent,
     ProjectNamePipe,
     GenericFunctionListComponent,
+    MyAccountButtonComponent,
   ],
   imports: [
     CommonModule,
@@ -219,6 +220,7 @@ import { GenericFunctionListComponent } from './components/generic-function-list
     ProjectNamePipe,
     KeywordsCommonModule,
     GenericFunctionListComponent,
+    MyAccountButtonComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -281,7 +283,9 @@ export { ReferenceArtefactNameComponent } from './components/reference-artefact-
 export * from './components/report-node-status/report-node-status.component';
 export { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 export { SelectPlanComponent } from './components/select-plan/select-plan.component';
-export { SettingButtonComponent } from './components/setting-button/setting-button.component';
+export * from './components/setting-button/setting-button.component';
+export * from './components/link-button/link-button.component';
+export * from './components/my-account-button/my-account-button.component';
 export { SplitAreaComponent } from './components/split-area/split-area.component';
 export { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 export { SplitComponent } from './components/split/split.component';
@@ -358,3 +362,5 @@ export * from './modules/basics/shared/api-token.interface';
 export * from './components/base-artefact/base-artefact.component';
 export * from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 export * from './components/artefact-details/artefact-details.component';
+export * from './services/special-links.service';
+export * from './shared/special-links-strategy';

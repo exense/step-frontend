@@ -1,4 +1,3 @@
-import { RelativeTimeSelection } from './time-selection/model/relative-time-selection';
 import { TimeRangePickerSelection } from './time-selection/time-range-picker-selection';
 import { RangeSelectionType } from './time-selection/model/range-selection-type';
 
@@ -69,6 +68,7 @@ export class TimeSeriesConfig {
     },
     { type: RangeSelectionType.RELATIVE, relativeSelection: { label: 'Last 1 hour', timeInMs: this.ONE_HOUR_MS } },
     { type: RangeSelectionType.RELATIVE, relativeSelection: { label: 'Last 3 hours', timeInMs: this.ONE_HOUR_MS * 3 } },
+    { type: RangeSelectionType.FULL },
   ];
 }
 
