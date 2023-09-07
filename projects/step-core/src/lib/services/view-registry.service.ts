@@ -145,29 +145,26 @@ export class ViewRegistryService {
   }
 
   getDashlets(path: string): Dashlet[] {
-    let dashlets = this.registeredDashlets[path];
-
-    if (!dashlets) {
-      dashlets = [];
-      this.registeredDashlets[path] = dashlets;
-    }
+    const dashlets = this.getDashletsInternal(path);
 
     // weightless dashlets should be last
     const normalizeWeight = (weight?: number) => weight || Infinity;
 
-    return dashlets.sort((a, b) => normalizeWeight(a.weight) - normalizeWeight(b.weight));
+    const result = dashlets.sort((a, b) => normalizeWeight(a.weight) - normalizeWeight(b.weight));
+    return result;
   }
 
   registerDashlet(path: string, label: string, template: string, id: string, before?: boolean, weight?: number): void {
+    const dashlets = this.getDashletsInternal(path);
     if (before) {
-      this.getDashlets(path).unshift({
+      dashlets.unshift({
         label,
         template,
         id,
         weight,
       });
     } else {
-      this.getDashlets(path).push({
+      dashlets.push({
         label,
         template,
         id,
@@ -190,6 +187,17 @@ export class ViewRegistryService {
       id: id,
       isEnabledFct: isEnabledFct,
     });
+  }
+
+  private getDashletsInternal(path: string): Dashlet[] {
+    let dashlets = this.registeredDashlets[path];
+
+    if (!dashlets) {
+      dashlets = [];
+      this.registeredDashlets[path] = dashlets;
+    }
+
+    return dashlets;
   }
 }
 

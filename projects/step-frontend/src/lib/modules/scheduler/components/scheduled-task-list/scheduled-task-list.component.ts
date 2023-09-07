@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { AfterViewInit, Component, inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
@@ -32,7 +32,7 @@ type StatusItem = KeyValue<string, string>;
     },
   ],
 })
-export class ScheduledTaskListComponent {
+export class ScheduledTaskListComponent implements AfterViewInit {
   readonly availableBulkOperations = [
     { operation: BulkOperationType.delete, permission: 'task-delete' },
     { operation: BulkOperationType.duplicate, permission: 'task-write' },
@@ -56,6 +56,10 @@ export class ScheduledTaskListComponent {
     this._logic.isSchedulerEnabled().subscribe((data) => {
       this.isSchedulerEnabled = data;
     });
+  }
+
+  ngAfterViewInit(): void {
+    this._logic.resolveEditLinkIfExists();
   }
 }
 

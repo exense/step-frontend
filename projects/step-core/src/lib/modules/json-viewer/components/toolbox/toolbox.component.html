@@ -1,0 +1,17 @@
+<a
+  *ngIf="format !== ViewerFormat.KV"
+  href="#"
+  matTooltip="Toggle key/value format"
+  (click)="changeFormat(ViewerFormat.KV); (false)"
+  >K/V</a
+>
+<a
+  *ngIf="format !== ViewerFormat.JSON"
+  href="#"
+  matTooltip="Toggle json format"
+  (click)="changeFormat(ViewerFormat.JSON); (false)"
+  >JSON</a
+>
+<a href="#" matTooltip="Copy to clipboard" (click)="copy(); (false)">
+  <step-icon name="copy"></step-icon>
+</a>

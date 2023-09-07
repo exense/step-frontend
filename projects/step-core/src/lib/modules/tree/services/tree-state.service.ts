@@ -292,6 +292,133 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     return this.isPossibleToInsert(parentIdToCheck, ...artefacts);
   }
 
+  moveSelectedNodesIn(direction: 'prevSibling' | 'nextSibling'): void {
+    const parentChildRelations = this.getParentChildRelationsForSelectedNodes();
+
+    if (!parentChildRelations.length) {
+      return;
+    }
+
+    const nodesToExpand = new Set<string>();
+    let hasChange = false;
+
+    parentChildRelations.forEach(({ parentId, nodeIds }) => {
+      const parent = this.findNodeById(parentId);
+      if (!parent) {
+        return;
+      }
+
+      let children = parent.children as N[];
+
+      const nodesIndices = nodeIds
+        .map((nodeId) => children.findIndex((child) => child.id === nodeId))
+        .filter((index) => index >= 0)
+        .sort((a, b) => a - b);
+
+      const nodesIndicesGroup = nodesIndices
+        .reduce((res, index, i, self) => {
+          if (res.length === 0) {
+            res.push([]);
+          }
+
+          const lastGroup = res[res.length - 1];
+          lastGroup.push(index);
+
+          const nextIndex = self[i + 1];
+          if (nextIndex !== undefined && nextIndex - index > 1) {
+            res.push([]);
+          }
+
+          return res;
+        }, [] as number[][])
+        .filter((group) => group.length > 0);
+
+      const newParentsAndNodes = nodesIndicesGroup.reduce((res, group) => {
+        let possibleParent: N | undefined;
+        if (direction === 'nextSibling') {
+          const last = group[group.length - 1];
+          possibleParent = children[last + 1];
+        } else {
+          const first = group[0];
+          possibleParent = children[first - 1];
+        }
+
+        if (possibleParent && !nodeIds.includes(possibleParent.id)) {
+          const newChildren = group.map((index) => children[index]);
+          res[possibleParent.id] =
+            direction === 'nextSibling'
+              ? [...newChildren, ...((possibleParent.children ?? []) as N[])]
+              : [...((possibleParent.children ?? []) as N[]), ...newChildren];
+        }
+
+        return res;
+      }, {} as Record<string, N[]>);
+
+      const realNodesToMove = Object.values(newParentsAndNodes).reduce((res, nodes) => [...res, ...nodes], []);
+      if (realNodesToMove.length === 0) {
+        return;
+      }
+
+      children = children.filter((node) => !realNodesToMove.includes(node));
+
+      hasChange = true;
+
+      this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, children, 'replace');
+      Object.entries(newParentsAndNodes).forEach(([newParentId, newChildren]) => {
+        this._treeNodeUtils.updateChildren(this.originalRoot!, newParentId, newChildren, 'replace');
+      });
+
+      Object.keys(newParentsAndNodes).forEach((nodeId) => nodesToExpand.add(nodeId));
+    });
+
+    if (hasChange) {
+      this.refresh();
+      this.expandNodes(Array.from(nodesToExpand));
+    }
+  }
+
+  moveSelectedNodesOut(): void {
+    const parentChildRelations = this.getParentChildRelationsForSelectedNodes();
+
+    if (!parentChildRelations.length) {
+      return;
+    }
+
+    let hasChange = false;
+
+    parentChildRelations.forEach(({ parentId, nodeIds }) => {
+      const parent = this.findNodeById(parentId);
+      const grandParent = parent?.parentId ? this.findNodeById(parent.parentId!) : undefined;
+      if (!grandParent) {
+        return;
+      }
+
+      let children = parent!.children as N[];
+      let grandParentChildren = grandParent.children as N[];
+
+      const anchorIndex = grandParentChildren.findIndex((item) => item.id === parentId);
+      const grandParentChildrenBefore = grandParentChildren.filter((_, i) => i < anchorIndex!);
+      const grandParentChildrenAfter = grandParentChildren.filter((_, i) => i > anchorIndex!);
+
+      const nodesToMoveOut = children.filter((node) => nodeIds.includes(node.id));
+      if (nodesToMoveOut.length === 0) {
+        return;
+      }
+
+      children = children.filter((node) => !nodesToMoveOut.includes(node));
+      grandParentChildren = [...grandParentChildrenBefore, parent!, ...nodesToMoveOut, ...grandParentChildrenAfter];
+
+      this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, children, 'replace');
+      this._treeNodeUtils.updateChildren(this.originalRoot!, grandParent.id, grandParentChildren, 'replace');
+
+      hasChange = true;
+    });
+
+    if (hasChange) {
+      this.refresh();
+    }
+  }
+
   moveSelectedNodes(direction: 'up' | 'down'): void {
     const parentChildRelations = this.getParentChildRelationsForSelectedNodes();
 
@@ -308,8 +435,15 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
         return;
       }
 
+      const grandParent = parent.parentId ? this.findNodeById(parent.parentId) : undefined;
+      const grandParentChildren = grandParent?.children as N[] | undefined;
+      const anchorIndex = grandParentChildren?.findIndex((item) => item.id === parentId);
+      const grandParentChildrenBefore = grandParentChildren?.filter((_, i) => i < anchorIndex!);
+      const grandParentChildrenAfter = grandParentChildren?.filter((_, i) => i > anchorIndex!);
+
       let children = parent.children as N[];
       let hasLocalChange = false;
+      let hasGrandParentChange = false;
 
       const nodesIndices = nodeIds
         .map((nodeId) => {
@@ -322,25 +456,61 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
         })
         .sort((a, b) => a.index - b.index);
 
-      const nodes = nodesIndices.map((nodeIndex) => nodeIndex.node);
-      const before = children.filter((child, index) => index < nodesIndices[0].index);
-      const after = children.filter((child, index) => index > nodesIndices[nodesIndices.length - 1].index);
+      const calcNodesForMovement = () => {
+        const nodes = nodesIndices.map((nodeIndex) => nodeIndex.node);
+        const before = children.filter((child, index) => index < nodesIndices[0].index);
+        const after = children.filter((child, index) => index > nodesIndices[nodesIndices.length - 1].index);
+        return { nodes, before, after };
+      };
 
-      if (direction === 'up' && nodesIndices[0].index > 0) {
-        children = [...before.slice(0, before.length - 1), ...nodes, before[before.length - 1], ...after];
-        hasLocalChange = true;
+      if (direction === 'up') {
+        let moveUpIndex = 0;
+
+        if (grandParentChildrenBefore) {
+          while (nodesIndices[0]?.index === moveUpIndex) {
+            const { node } = nodesIndices.shift()!;
+            grandParentChildrenBefore.push(node);
+            hasGrandParentChange = true;
+            moveUpIndex++;
+          }
+        }
+
+        if (nodesIndices.length > 0 && nodesIndices[0].index > moveUpIndex) {
+          const { nodes, before, after } = calcNodesForMovement();
+          children = [...before.slice(0, before.length - 1), ...nodes, before[before.length - 1], ...after];
+          hasLocalChange = true;
+        }
       }
 
-      if (direction === 'down' && nodesIndices[nodesIndices.length - 1].index < children.length - 1) {
-        children = [...before, after[0], ...nodes, ...after.slice(1)];
-        hasLocalChange = true;
+      if (direction === 'down') {
+        let moveDownIndex = children.length - 1;
+
+        if (grandParentChildrenAfter) {
+          while (nodesIndices[nodesIndices.length - 1]?.index === moveDownIndex) {
+            const { node } = nodesIndices.pop()!;
+            grandParentChildrenAfter.unshift(node);
+            hasGrandParentChange = true;
+            moveDownIndex--;
+          }
+        }
+
+        if (nodesIndices.length > 0 && nodesIndices[nodesIndices.length - 1].index < moveDownIndex) {
+          const { nodes, before, after } = calcNodesForMovement();
+          children = [...before, after[0], ...nodes, ...after.slice(1)];
+          hasLocalChange = true;
+        }
       }
 
       if (hasLocalChange) {
         this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, children, 'replace');
       }
 
-      hasChange = hasChange || hasLocalChange;
+      if (hasGrandParentChange) {
+        const grandParentChildren = [...grandParentChildrenBefore!, parent, ...grandParentChildrenAfter!];
+        this._treeNodeUtils.updateChildren(this.originalRoot!, parent.parentId!, grandParentChildren, 'replace');
+      }
+
+      hasChange = hasChange || hasLocalChange || hasGrandParentChange;
     });
 
     if (hasChange) {

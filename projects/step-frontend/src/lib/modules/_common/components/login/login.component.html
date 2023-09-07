@@ -16,6 +16,7 @@
         <input
           [(ngModel)]="credentials.username"
           name="username"
+          autocomplete="username"
           (keyup.enter)="login()"
           placeholder="Enter your username"
         />
@@ -26,6 +27,7 @@
         <input
           [(ngModel)]="credentials.password"
           name="password"
+          autocomplete="current-password"
           type="password"
           (keyup.enter)="login()"
           placeholder="Enter your password"
