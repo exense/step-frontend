@@ -11,7 +11,7 @@ export class AuthInterceptor implements HttpInterceptor {
   private handleAuthError(error: HttpErrorResponse): Observable<any> {
     if (error.status === 401) {
       // when checking for session auth error is expected
-      if (this._authService.isAuthenticated() || this._authService.isOidc) {
+      if (this._authService.isAuthenticated()) {
         this._authService.goToLoginPage();
       }
     }

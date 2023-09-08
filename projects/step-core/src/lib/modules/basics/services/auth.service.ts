@@ -97,12 +97,15 @@ export class AuthService implements OnDestroy {
       });
   }
 
-  goToLoginPage(): any {
+  goToLoginPage(): void {
+    this._$location.path('/root/login');
+  }
+
+  checkOidc(): void {
     if (this.isOidc) {
       this.redirectToOidc();
       return;
     }
-    return this._$location.path('/root/login');
   }
 
   gotoDefaultPage(): void {
