@@ -66,17 +66,29 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
 
   constructor(@Self() private element: ElementRef) {}
 
+  redraw(): void {
+    this.uplot.setData(this.uplot.data);
+    this.uplot.setSize(this.getSize());
+  }
+
   ngOnInit(): void {
     if (this.syncKey) {
       uPlot.sync(this.syncKey);
     }
 
     this.init(this.settings);
-    window.addEventListener('resize', (e) => {
-      this.resizeChart();
-    });
+    // window.addEventListener('resize', (e) => {
+    //   this.resizeChart();
+    // });
   }
 
+  ngAfterViewInit(): void {
+    this.createRanger();
+  }
+
+  /**
+   * This method is responsible to move the selection, because the chart itself automatically adjust from the getSize() function.
+   */
   resizeChart() {
     const chartPadding = 50; // this is the way uplot works
     const fullWidth = this.uplot.width - chartPadding;
@@ -96,10 +108,6 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
   init(settings: TSRangerSettings) {
     this.start = settings.xValues[0];
     this.end = settings.xValues[this.settings.xValues.length - 1];
-  }
-
-  ngAfterViewInit(): void {
-    this.createRanger();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -151,7 +159,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     }, 50);
   }
 
-  redrawChart() {
+  recreateChart() {
     this.createRanger();
   }
 

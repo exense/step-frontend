@@ -5,11 +5,11 @@ import { Subject } from 'rxjs';
   providedIn: 'root',
 })
 export class ResourceInputBridgeService {
-  private readonly deleteLastUploadedResourceInternal$ = new Subject<void>();
+  private readonly deleteUploadedResourceInternal$ = new Subject<void>();
 
-  readonly deleteLastUploadedResource$ = this.deleteLastUploadedResourceInternal$.asObservable();
+  readonly deleteUploadedResource$ = this.deleteUploadedResourceInternal$.asObservable();
 
-  deleteLastUploadedResource(): void {
-    this.deleteLastUploadedResourceInternal$.next();
+  deleteUploadedResource(): void {
+    this.deleteUploadedResourceInternal$.next();
   }
 }
