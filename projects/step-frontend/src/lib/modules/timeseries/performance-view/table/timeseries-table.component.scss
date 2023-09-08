@@ -5,6 +5,12 @@ step-timeseries-table {
     display: flex;
     align-items: center;
 
+    span {
+      max-width: 20rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     .color-square {
       display: inline-block;
       width: 3.8rem;
