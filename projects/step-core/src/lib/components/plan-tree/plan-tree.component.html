@@ -11,6 +11,7 @@
           *ngIf="_planInteractiveSession?.isInteractiveSessionActive$ | async"
           type="button"
           mat-flat-button
+          matTooltip="Execute in interactive session"
           (click)="_planInteractiveSession?.execute(node.id)"
         >
           <step-icon name="play"></step-icon>
@@ -20,7 +21,7 @@
           class="actions-button"
           type="button"
           mat-flat-button
-          matTooltip="Show actions menu (alt. right click)"
+          matTooltip="Show actions menu (right click)"
           (click)="openTreeMenu($event, node.id)"
         >
           <step-icon name="more-horizontal"></step-icon>
