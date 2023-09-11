@@ -1,6 +1,6 @@
 {
   "name": "@exense/step-frontend",
-  "version": "0.2.0",
+  "version": "3.21.6",
   "scripts": {
     "compile": "gulp",
     "pack": ""
