@@ -4,7 +4,8 @@
   <input
     [ngModel]="value"
     (ngModelChange)="onValueChange($event)"
-    [disabled]="isDisabled"
+    [disabled]="true"
+    [class.hide-disabled]="!isDisabled"
     [placeholder]="placeholder"
     (blur)="onBlur()"
   />

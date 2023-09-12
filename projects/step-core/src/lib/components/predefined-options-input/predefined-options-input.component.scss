@@ -5,6 +5,10 @@ button.mat-menu-item {
   line-height: 1;
 }
 
+input.hide-disabled:disabled {
+  background: white;
+}
+
 step-icon {
   @include core.step-icon-size(1.8rem);
 }
