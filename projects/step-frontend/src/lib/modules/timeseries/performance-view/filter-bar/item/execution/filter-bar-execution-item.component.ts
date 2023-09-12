@@ -1,6 +1,6 @@
 import { Component, inject, Input, OnChanges, OnInit } from '@angular/core';
 import { EntitySearchValue } from '../entity-search-value';
-import { DateFormat, EntityDialogsService } from '@exense/step-core';
+import { DateFormat, EntityDialogsService, Execution } from '@exense/step-core';
 
 @Component({
   selector: 'step-ts-filter-bar-execution-item',
@@ -15,12 +15,12 @@ export class FilterBarExecutionItemComponent {
 
   showExecutionPicker() {
     this._entityDialogs.selectEntityOfType('executions', true).subscribe((result) => {
-      this.addSearchExecution(result.item);
+      this.addSearchExecution(result.item as Execution);
     });
   }
 
-  addSearchExecution(execution: any) {
-    const executionId = execution.id;
+  addSearchExecution(execution: Execution) {
+    const executionId = execution.id!;
     for (let i = 0; i < this.values.length; i++) {
       if (this.values[i].searchValue === executionId) {
         this.values[i].entity = execution;
