@@ -87,4 +87,12 @@ export class ParameterEditDialogComponent implements OnInit {
       )
       .subscribe((scopeItems) => (this.scopeItems = scopeItems));
   }
+
+  onKeyChange(key: string) {
+    this.parameter.key = key;
+    const lowerKey = key.toLowerCase();
+    if (lowerKey.includes('pwd') || lowerKey.includes('password')) {
+      this.parameter.protectedValue = true;
+    }
+  }
 }
