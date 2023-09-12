@@ -1,5 +1,5 @@
 <step-form-field [class.ng-invalid]="_ngControl.invalid" [class.ng-touched]="_ngControl.touched">
-  <step-label [attr.show-required-marker]="showRequiredMarker || null">Plan</step-label>
+  <step-label *ngIf="isLabelVisible" [attr.show-required-marker]="showRequiredMarker || null">Plan</step-label>
   <input type="text" readonly [disabled]="isDisabled" [ngModel]="planValue?.attributes?.['name']" [tabIndex]="-1" />
   <step-suffix class="button-suffix">
     <button type="button" mat-stroked-button (click)="selectPlan()" [disabled]="isDisabled">Select</button>

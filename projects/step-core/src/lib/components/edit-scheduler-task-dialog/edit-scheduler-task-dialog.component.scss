@@ -6,6 +6,6 @@ div[step-modal-window-body] > form,
   @include core.common-dialog-content;
 }
 
-mat-expansion-panel {
+mat-expansion-panel:last-child {
   margin-bottom: 1.5rem;
 }

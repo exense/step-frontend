@@ -43,9 +43,6 @@ export const $CallPlan = {
         pattern: '[a-f0-9]{24}}',
       },
     },
-    persistNode: {
-      type: 'boolean',
-    },
     skipNode: {
       type: 'DynamicValueBoolean',
     },

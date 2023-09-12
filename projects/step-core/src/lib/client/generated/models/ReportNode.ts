@@ -20,6 +20,7 @@ export type ReportNode = {
   customAttributes?: Record<string, string>;
   resolvedArtefact?: AbstractArtefact;
   orphan?: boolean;
+  contributingError?: boolean;
   id?: string;
   _class: string;
 };
