@@ -1,595 +1,605 @@
-import { Announcement02 } from './svg/announcement-02';
 import { BarChartSquare01 } from './svg/bar-chart-square-01';
 import { ActivityHeart } from './svg/activity-heart';
-import { FileAttachment03 } from './svg/file-attachment-03';
+import { Announcement02 } from './svg/announcement-02';
 import { Azure } from './svg/azure';
 import { FileCheck03 } from './svg/file-check-03';
-import { PuzzlePiece01 } from './svg/puzzle-piece-01';
-import { Rocket } from './svg/rocket';
-import { Activity } from './svg/activity';
-import { Airplay } from './svg/airplay';
-import { AlertCircle } from './svg/alert-circle';
-import { AlertOctagon } from './svg/alert-octagon';
-import { AlertTriangle } from './svg/alert-triangle';
 import { Passcode } from './svg/passcode';
-import { AlignCenter } from './svg/align-center';
-import { AlignJustify } from './svg/align-justify';
+import { PlanTestscenario } from './svg/plan-testscenario';
+import { PlanSequence } from './svg/plan-sequence';
+import { FileAttachment03 } from './svg/file-attachment-03';
+import { PlanTestset } from './svg/plan-testset';
+import { Rocket } from './svg/rocket';
+import { PuzzlePiece01 } from './svg/puzzle-piece-01';
+import { PlanTestcase } from './svg/plan-testcase';
+import { PlanThreadgroup } from './svg/plan-threadgroup';
+import { Airplay } from './svg/airplay';
+import { AlertTriangle } from './svg/alert-triangle';
+import { Activity } from './svg/activity';
 import { AlignLeft } from './svg/align-left';
-import { AlignRight } from './svg/align-right';
-import { Anchor } from './svg/anchor';
-import { Aperture } from './svg/aperture';
-import { Archive } from './svg/archive';
-import { ArrowDownCircle } from './svg/arrow-down-circle';
-import { ArrowDownLeft } from './svg/arrow-down-left';
-import { ArrowDownRight } from './svg/arrow-down-right';
 import { ArrowDown } from './svg/arrow-down';
-import { ArrowLeftCircle } from './svg/arrow-left-circle';
+import { Aperture } from './svg/aperture';
+import { ArrowDownLeft } from './svg/arrow-down-left';
 import { ArrowLeft } from './svg/arrow-left';
-import { ArrowRightCircle } from './svg/arrow-right-circle';
+import { ArrowLeftCircle } from './svg/arrow-left-circle';
+import { ArrowDownCircle } from './svg/arrow-down-circle';
+import { AlertCircle } from './svg/alert-circle';
+import { ArrowUpLeft } from './svg/arrow-up-left';
 import { ArrowUpCircle } from './svg/arrow-up-circle';
 import { ArrowRight } from './svg/arrow-right';
-import { ArrowUpLeft } from './svg/arrow-up-left';
-import { ArrowUpRight } from './svg/arrow-up-right';
 import { ArrowUp } from './svg/arrow-up';
 import { AtSign } from './svg/at-sign';
-import { Award } from './svg/award';
+import { ArrowRightCircle } from './svg/arrow-right-circle';
+import { AlignJustify } from './svg/align-justify';
 import { BarChart2 } from './svg/bar-chart-2';
-import { BarChart } from './svg/bar-chart';
-import { BatteryCharging } from './svg/battery-charging';
-import { Battery } from './svg/battery';
+import { Anchor } from './svg/anchor';
 import { BellOff } from './svg/bell-off';
+import { Bold } from './svg/bold';
+import { BarChart } from './svg/bar-chart';
 import { Bell } from './svg/bell';
 import { Bluetooth } from './svg/bluetooth';
-import { Bold } from './svg/bold';
 import { BookOpen } from './svg/book-open';
 import { Book } from './svg/book';
 import { Bookmark } from './svg/bookmark';
+import { Battery } from './svg/battery';
 import { Box } from './svg/box';
-import { Briefcase } from './svg/briefcase';
-import { Camera } from './svg/camera';
+import { Award } from './svg/award';
 import { Calendar } from './svg/calendar';
-import { Cast } from './svg/cast';
-import { CheckCircle } from './svg/check-circle';
-import { CheckSquare } from './svg/check-square';
+import { Camera } from './svg/camera';
 import { Check } from './svg/check';
-import { ChevronDown } from './svg/chevron-down';
-import { ChevronLeft } from './svg/chevron-left';
-import { ChevronRight } from './svg/chevron-right';
+import { CheckSquare } from './svg/check-square';
 import { ChevronUp } from './svg/chevron-up';
+import { ChevronDown } from './svg/chevron-down';
+import { AlertOctagon } from './svg/alert-octagon';
+import { ChevronLeft } from './svg/chevron-left';
+import { Briefcase } from './svg/briefcase';
+import { ChevronRight } from './svg/chevron-right';
+import { ArrowDownRight } from './svg/arrow-down-right';
 import { ChevronsDown } from './svg/chevrons-down';
 import { ChevronsRight } from './svg/chevrons-right';
-import { ChevronsUp } from './svg/chevrons-up';
 import { Chrome } from './svg/chrome';
-import { ChevronsLeft } from './svg/chevrons-left';
-import { Circle } from './svg/circle';
-import { Clipboard } from './svg/clipboard';
-import { Clock } from './svg/clock';
+import { Archive } from './svg/archive';
+import { ArrowUpRight } from './svg/arrow-up-right';
+import { AlignCenter } from './svg/align-center';
 import { CloudDrizzle } from './svg/cloud-drizzle';
-import { CloudOff } from './svg/cloud-off';
+import { CheckCircle } from './svg/check-circle';
 import { CloudLightning } from './svg/cloud-lightning';
+import { CloudOff } from './svg/cloud-off';
+import { Clipboard } from './svg/clipboard';
+import { AlignRight } from './svg/align-right';
+import { ChevronsLeft } from './svg/chevrons-left';
+import { Cloud } from './svg/cloud';
+import { ChevronsUp } from './svg/chevrons-up';
 import { CloudRain } from './svg/cloud-rain';
 import { CloudSnow } from './svg/cloud-snow';
-import { Cloud } from './svg/cloud';
-import { Code } from './svg/code';
-import { Codesandbox } from './svg/codesandbox';
-import { Columns } from './svg/columns';
-import { CameraOff } from './svg/camera-off';
-import { Command } from './svg/command';
-import { Compass } from './svg/compass';
-import { Copy } from './svg/copy';
 import { Codepen } from './svg/codepen';
+import { Compass } from './svg/compass';
+import { Coffee } from './svg/coffee';
+import { Copy } from './svg/copy';
+import { BatteryCharging } from './svg/battery-charging';
+import { Codesandbox } from './svg/codesandbox';
 import { CornerDownLeft } from './svg/corner-down-left';
-import { CornerDownRight } from './svg/corner-down-right';
+import { Command } from './svg/command';
 import { CornerLeftUp } from './svg/corner-left-up';
-import { CornerLeftDown } from './svg/corner-left-down';
+import { CornerDownRight } from './svg/corner-down-right';
 import { CornerRightDown } from './svg/corner-right-down';
+import { CornerLeftDown } from './svg/corner-left-down';
 import { CornerUpRight } from './svg/corner-up-right';
-import { CornerRightUp } from './svg/corner-right-up';
-import { Cpu } from './svg/cpu';
 import { CornerUpLeft } from './svg/corner-up-left';
-import { CreditCard } from './svg/credit-card';
+import { Disc } from './svg/disc';
+import { Cpu } from './svg/cpu';
+import { CornerRightUp } from './svg/corner-right-up';
+import { CameraOff } from './svg/camera-off';
+import { Delete } from './svg/delete';
 import { Crop } from './svg/crop';
+import { DownloadCloud } from './svg/download-cloud';
 import { Crosshair } from './svg/crosshair';
 import { Database } from './svg/database';
-import { Delete } from './svg/delete';
-import { Disc } from './svg/disc';
-import { DivideCircle } from './svg/divide-circle';
+import { Circle } from './svg/circle';
 import { DivideSquare } from './svg/divide-square';
-import { DollarSign } from './svg/dollar-sign';
-import { Divide } from './svg/divide';
-import { DownloadCloud } from './svg/download-cloud';
-import { Dribbble } from './svg/dribbble';
-import { Droplet } from './svg/droplet';
-import { Coffee } from './svg/coffee';
-import { Edit2 } from './svg/edit-2';
-import { Edit3 } from './svg/edit-3';
-import { Edit } from './svg/edit';
-import { EyeOff } from './svg/eye-off';
-import { Eye } from './svg/eye';
 import { Download } from './svg/download';
-import { Facebook } from './svg/facebook';
+import { Columns } from './svg/columns';
+import { Code } from './svg/code';
+import { Edit2 } from './svg/edit-2';
+import { Divide } from './svg/divide';
+import { Eye } from './svg/eye';
+import { Dribbble } from './svg/dribbble';
+import { Edit } from './svg/edit';
+import { DivideCircle } from './svg/divide-circle';
+import { Edit3 } from './svg/edit-3';
 import { ExternalLink } from './svg/external-link';
-import { FastForward } from './svg/fast-forward';
-import { FilePlus } from './svg/file-plus';
+import { Facebook } from './svg/facebook';
+import { DollarSign } from './svg/dollar-sign';
+import { EyeOff } from './svg/eye-off';
+import { Cast } from './svg/cast';
+import { Feather } from './svg/feather';
 import { FileText } from './svg/file-text';
-import { File } from './svg/file';
-import { FileMinus } from './svg/file-minus';
 import { Film } from './svg/film';
 import { Filter } from './svg/filter';
-import { Figma } from './svg/figma';
-import { Feather } from './svg/feather';
-import { FolderMinus } from './svg/folder-minus';
-import { Flag } from './svg/flag';
+import { FastForward } from './svg/fast-forward';
 import { Framer } from './svg/framer';
-import { FolderPlus } from './svg/folder-plus';
 import { Frown } from './svg/frown';
-import { Folder } from './svg/folder';
-import { GitBranch } from './svg/git-branch';
-import { GitPullRequest } from './svg/git-pull-request';
-import { Gift } from './svg/gift';
-import { GitCommit } from './svg/git-commit';
+import { FilePlus } from './svg/file-plus';
+import { FolderPlus } from './svg/folder-plus';
+import { Clock } from './svg/clock';
 import { GitMerge } from './svg/git-merge';
-import { Github } from './svg/github';
-import { Gitlab } from './svg/gitlab';
+import { CreditCard } from './svg/credit-card';
+import { Flag } from './svg/flag';
+import { Gift } from './svg/gift';
+import { GitPullRequest } from './svg/git-pull-request';
 import { Grid } from './svg/grid';
+import { FolderMinus } from './svg/folder-minus';
+import { Droplet } from './svg/droplet';
+import { Gitlab } from './svg/gitlab';
+import { Folder } from './svg/folder';
+import { Github } from './svg/github';
 import { Globe } from './svg/globe';
-import { Hash } from './svg/hash';
-import { Headphones } from './svg/headphones';
-import { HardDrive } from './svg/hard-drive';
-import { Heart } from './svg/heart';
-import { Hexagon } from './svg/hexagon';
-import { Home } from './svg/home';
 import { HelpCircle } from './svg/help-circle';
+import { FileMinus } from './svg/file-minus';
+import { GitCommit } from './svg/git-commit';
+import { Home } from './svg/home';
+import { Hash } from './svg/hash';
+import { Figma } from './svg/figma';
+import { Heart } from './svg/heart';
 import { Image } from './svg/image';
-import { Inbox } from './svg/inbox';
+import { GitBranch } from './svg/git-branch';
 import { Instagram } from './svg/instagram';
 import { Info } from './svg/info';
-import { Italic } from './svg/italic';
+import { Inbox } from './svg/inbox';
 import { Key } from './svg/key';
-import { Layers } from './svg/layers';
+import { Italic } from './svg/italic';
 import { LifeBuoy } from './svg/life-buoy';
-import { Link } from './svg/link';
 import { Layout } from './svg/layout';
-import { Linkedin } from './svg/linkedin';
-import { Link2 } from './svg/link-2';
-import { Loader } from './svg/loader';
+import { Hexagon } from './svg/hexagon';
 import { List } from './svg/list';
-import { Lock } from './svg/lock';
+import { Headphones } from './svg/headphones';
+import { Link2 } from './svg/link-2';
+import { Layers } from './svg/layers';
+import { File } from './svg/file';
+import { Link } from './svg/link';
 import { LogIn } from './svg/log-in';
-import { LogOut } from './svg/log-out';
-import { Mail } from './svg/mail';
 import { MapPin } from './svg/map-pin';
-import { Map } from './svg/map';
+import { HardDrive } from './svg/hard-drive';
+import { Lock } from './svg/lock';
 import { Maximize2 } from './svg/maximize-2';
-import { Maximize } from './svg/maximize';
-import { Menu } from './svg/menu';
-import { Meh } from './svg/meh';
-import { MessageSquare } from './svg/message-square';
+import { LogOut } from './svg/log-out';
+import { Linkedin } from './svg/linkedin';
+import { Map } from './svg/map';
 import { MicOff } from './svg/mic-off';
-import { MessageCircle } from './svg/message-circle';
-import { Minimize2 } from './svg/minimize-2';
-import { Mic } from './svg/mic';
+import { Menu } from './svg/menu';
+import { MessageSquare } from './svg/message-square';
 import { MinusCircle } from './svg/minus-circle';
-import { MinusSquare } from './svg/minus-square';
 import { Minimize } from './svg/minimize';
-import { Minus } from './svg/minus';
-import { Monitor } from './svg/monitor';
-import { Moon } from './svg/moon';
-import { MoreVertical } from './svg/more-vertical';
+import { Mic } from './svg/mic';
 import { MoreHorizontal } from './svg/more-horizontal';
-import { MousePointer } from './svg/mouse-pointer';
+import { Maximize } from './svg/maximize';
+import { Monitor } from './svg/monitor';
+import { Minimize2 } from './svg/minimize-2';
+import { Minus } from './svg/minus';
 import { Music } from './svg/music';
-import { Move } from './svg/move';
-import { Navigation2 } from './svg/navigation-2';
-import { Navigation } from './svg/navigation';
-import { Package } from './svg/package';
+import { MessageCircle } from './svg/message-circle';
+import { MousePointer } from './svg/mouse-pointer';
+import { MinusSquare } from './svg/minus-square';
 import { Octagon } from './svg/octagon';
+import { Moon } from './svg/moon';
+import { Navigation } from './svg/navigation';
+import { PenTool } from './svg/pen-tool';
+import { MoreVertical } from './svg/more-vertical';
 import { PauseCircle } from './svg/pause-circle';
 import { Paperclip } from './svg/paperclip';
+import { Package } from './svg/package';
 import { Pause } from './svg/pause';
-import { PenTool } from './svg/pen-tool';
-import { Percent } from './svg/percent';
+import { Navigation2 } from './svg/navigation-2';
 import { PhoneForwarded } from './svg/phone-forwarded';
-import { PhoneCall } from './svg/phone-call';
+import { Move } from './svg/move';
+import { Percent } from './svg/percent';
 import { PhoneIncoming } from './svg/phone-incoming';
+import { Phone } from './svg/phone';
 import { PhoneMissed } from './svg/phone-missed';
 import { PhoneOff } from './svg/phone-off';
-import { PhoneOutgoing } from './svg/phone-outgoing';
-import { Phone } from './svg/phone';
-import { PieChart } from './svg/pie-chart';
 import { Play } from './svg/play';
-import { PlayCircle } from './svg/play-circle';
-import { PlusCircle } from './svg/plus-circle';
 import { PlusSquare } from './svg/plus-square';
-import { Plus } from './svg/plus';
-import { Power } from './svg/power';
-import { Printer } from './svg/printer';
-import { Pocket } from './svg/pocket';
-import { Radio } from './svg/radio';
+import { PlayCircle } from './svg/play-circle';
+import { PhoneOutgoing } from './svg/phone-outgoing';
+import { PieChart } from './svg/pie-chart';
+import { Meh } from './svg/meh';
 import { RefreshCcw } from './svg/refresh-ccw';
-import { RefreshCw } from './svg/refresh-cw';
-import { Repeat } from './svg/repeat';
-import { Rewind } from './svg/rewind';
-import { RotateCcw } from './svg/rotate-ccw';
+import { Power } from './svg/power';
 import { Rss } from './svg/rss';
-import { RotateCw } from './svg/rotate-cw';
-import { Scissors } from './svg/scissors';
+import { RefreshCw } from './svg/refresh-cw';
+import { Printer } from './svg/printer';
+import { Mail } from './svg/mail';
+import { PhoneCall } from './svg/phone-call';
+import { Plus } from './svg/plus';
+import { Pocket } from './svg/pocket';
 import { Save } from './svg/save';
-import { Search } from './svg/search';
-import { Send } from './svg/send';
-import { Settings } from './svg/settings';
-import { Server } from './svg/server';
-import { Share2 } from './svg/share-2';
 import { Share } from './svg/share';
+import { Send } from './svg/send';
+import { Loader } from './svg/loader';
+import { Settings } from './svg/settings';
 import { ShieldOff } from './svg/shield-off';
-import { Shield } from './svg/shield';
+import { Search } from './svg/search';
+import { RotateCcw } from './svg/rotate-ccw';
+import { PlusCircle } from './svg/plus-circle';
+import { RotateCw } from './svg/rotate-cw';
 import { ShoppingBag } from './svg/shopping-bag';
-import { Shuffle } from './svg/shuffle';
-import { ShoppingCart } from './svg/shopping-cart';
+import { Radio } from './svg/radio';
 import { Sidebar } from './svg/sidebar';
-import { SkipBack } from './svg/skip-back';
-import { SkipForward } from './svg/skip-forward';
-import { Slack } from './svg/slack';
-import { Slash } from './svg/slash';
+import { Shield } from './svg/shield';
+import { Server } from './svg/server';
 import { Sliders } from './svg/sliders';
-import { Smile } from './svg/smile';
-import { Square } from './svg/square';
+import { ShoppingCart } from './svg/shopping-cart';
+import { SkipForward } from './svg/skip-forward';
+import { Repeat } from './svg/repeat';
+import { Slash } from './svg/slash';
+import { Rewind } from './svg/rewind';
 import { Smartphone } from './svg/smartphone';
-import { Star } from './svg/star';
-import { Speaker } from './svg/speaker';
-import { StopCircle } from './svg/stop-circle';
-import { Table } from './svg/table';
 import { Sunrise } from './svg/sunrise';
+import { Slack } from './svg/slack';
+import { Sun } from './svg/sun';
+import { Shuffle } from './svg/shuffle';
+import { Star } from './svg/star';
+import { Scissors } from './svg/scissors';
 import { Tablet } from './svg/tablet';
-import { Tag } from './svg/tag';
-import { Target } from './svg/target';
-import { Terminal } from './svg/terminal';
-import { ThumbsDown } from './svg/thumbs-down';
-import { Thermometer } from './svg/thermometer';
+import { Smile } from './svg/smile';
+import { Table } from './svg/table';
+import { Share2 } from './svg/share-2';
 import { Sunset } from './svg/sunset';
 import { ThumbsUp } from './svg/thumbs-up';
-import { ToggleLeft } from './svg/toggle-left';
-import { Sun } from './svg/sun';
-import { ToggleRight } from './svg/toggle-right';
+import { Square } from './svg/square';
+import { ThumbsDown } from './svg/thumbs-down';
+import { SkipBack } from './svg/skip-back';
+import { Terminal } from './svg/terminal';
+import { StopCircle } from './svg/stop-circle';
 import { Tool } from './svg/tool';
-import { Trash } from './svg/trash';
-import { Trash2 } from './svg/trash-2';
 import { Trello } from './svg/trello';
-import { TrendingDown } from './svg/trending-down';
-import { TrendingUp } from './svg/trending-up';
-import { Triangle } from './svg/triangle';
+import { ToggleRight } from './svg/toggle-right';
 import { Truck } from './svg/truck';
+import { TrendingUp } from './svg/trending-up';
+import { ToggleLeft } from './svg/toggle-left';
+import { Trash2 } from './svg/trash-2';
+import { TrendingDown } from './svg/trending-down';
+import { Speaker } from './svg/speaker';
 import { Tv } from './svg/tv';
 import { Twitch } from './svg/twitch';
-import { Twitter } from './svg/twitter';
-import { Type } from './svg/type';
+import { Triangle } from './svg/triangle';
 import { Umbrella } from './svg/umbrella';
-import { Underline } from './svg/underline';
+import { Tag } from './svg/tag';
+import { Thermometer } from './svg/thermometer';
+import { Twitter } from './svg/twitter';
 import { Unlock } from './svg/unlock';
-import { UploadCloud } from './svg/upload-cloud';
-import { Upload } from './svg/upload';
 import { UserCheck } from './svg/user-check';
 import { UserPlus } from './svg/user-plus';
-import { UserX } from './svg/user-x';
-import { UserMinus } from './svg/user-minus';
-import { User } from './svg/user';
-import { Users } from './svg/users';
-import { Video } from './svg/video';
-import { VideoOff } from './svg/video-off';
-import { Volume2 } from './svg/volume-2';
-import { Voicemail } from './svg/voicemail';
 import { Volume1 } from './svg/volume-1';
-import { Volume } from './svg/volume';
-import { VolumeX } from './svg/volume-x';
-import { Watch } from './svg/watch';
+import { Underline } from './svg/underline';
+import { UploadCloud } from './svg/upload-cloud';
+import { Trash } from './svg/trash';
+import { VideoOff } from './svg/video-off';
+import { Voicemail } from './svg/voicemail';
+import { UserX } from './svg/user-x';
+import { Type } from './svg/type';
+import { Upload } from './svg/upload';
 import { WifiOff } from './svg/wifi-off';
+import { Volume2 } from './svg/volume-2';
 import { Wifi } from './svg/wifi';
 import { Wind } from './svg/wind';
-import { XCircle } from './svg/x-circle';
+import { VolumeX } from './svg/volume-x';
 import { XOctagon } from './svg/x-octagon';
+import { Watch } from './svg/watch';
+import { User } from './svg/user';
+import { Target } from './svg/target';
+import { XCircle } from './svg/x-circle';
 import { XSquare } from './svg/x-square';
-import { X } from './svg/x';
-import { Youtube } from './svg/youtube';
+import { Users } from './svg/users';
+import { Volume } from './svg/volume';
 import { Zap } from './svg/zap';
+import { UserMinus } from './svg/user-minus';
+import { X } from './svg/x';
+import { Video } from './svg/video';
+import { Youtube } from './svg/youtube';
 import { ZapOff } from './svg/zap-off';
-import { ZoomIn } from './svg/zoom-in';
 import { ZoomOut } from './svg/zoom-out';
+import { ZoomIn } from './svg/zoom-in';
 
 export const allIcons = {
-  Announcement02,
   BarChartSquare01,
   ActivityHeart,
-  FileAttachment03,
-  Azure,
+  Announcement02,
   FileCheck03,
-  PuzzlePiece01,
-  Rocket,
-  Activity,
-  Airplay,
-  AlertCircle,
-  AlertOctagon,
-  AlertTriangle,
+  Azure,
   Passcode,
-  AlignCenter,
-  AlignJustify,
+  PlanTestscenario,
+  PlanSequence,
+  FileAttachment03,
+  PlanTestset,
+  Rocket,
+  PuzzlePiece01,
+  PlanTestcase,
+  PlanThreadgroup,
+  Airplay,
+  AlertTriangle,
+  Activity,
   AlignLeft,
-  AlignRight,
-  Anchor,
-  Aperture,
-  Archive,
-  ArrowDownCircle,
-  ArrowDownLeft,
-  ArrowDownRight,
   ArrowDown,
-  ArrowLeftCircle,
+  Aperture,
+  ArrowDownLeft,
   ArrowLeft,
-  ArrowRightCircle,
+  ArrowLeftCircle,
+  ArrowDownCircle,
+  AlertCircle,
+  ArrowUpLeft,
   ArrowUpCircle,
   ArrowRight,
-  ArrowUpLeft,
-  ArrowUpRight,
   ArrowUp,
   AtSign,
-  Award,
+  ArrowRightCircle,
+  AlignJustify,
   BarChart2,
-  BarChart,
-  BatteryCharging,
-  Battery,
+  Anchor,
   BellOff,
+  Bold,
+  BarChart,
   Bell,
   Bluetooth,
-  Bold,
   BookOpen,
   Book,
   Bookmark,
   Box,
-  Briefcase,
-  Camera,
+  Award,
+  Battery,
   Calendar,
-  Cast,
-  CheckCircle,
+  Camera,
   CheckSquare,
-  Check,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   ChevronUp,
+  ChevronDown,
+  AlertOctagon,
+  ChevronLeft,
+  Briefcase,
+  Check,
+  ChevronRight,
+  ArrowDownRight,
   ChevronsDown,
   ChevronsRight,
-  ChevronsUp,
   Chrome,
-  ChevronsLeft,
-  Circle,
-  Clipboard,
-  Clock,
+  Archive,
+  ArrowUpRight,
+  AlignCenter,
   CloudDrizzle,
-  CloudOff,
+  CheckCircle,
   CloudLightning,
+  CloudOff,
+  Clipboard,
+  AlignRight,
+  ChevronsUp,
   CloudRain,
-  CloudSnow,
-  Cloud,
-  Code,
-  Codesandbox,
-  Columns,
-  CameraOff,
-  Command,
-  Compass,
-  Copy,
+  ChevronsLeft,
   Codepen,
+  Compass,
+  Cloud,
+  CloudSnow,
+  Coffee,
+  Codesandbox,
+  BatteryCharging,
   CornerDownLeft,
-  CornerDownRight,
+  Copy,
   CornerLeftUp,
-  CornerLeftDown,
+  CornerDownRight,
   CornerRightDown,
+  Command,
+  CornerLeftDown,
   CornerUpRight,
-  CornerRightUp,
+  Disc,
   Cpu,
   CornerUpLeft,
-  CreditCard,
-  Crop,
-  Crosshair,
-  Database,
+  CameraOff,
   Delete,
-  Disc,
-  DivideCircle,
-  DivideSquare,
-  DollarSign,
-  Divide,
+  Crop,
   DownloadCloud,
-  Dribbble,
-  Droplet,
-  Coffee,
-  Edit2,
-  Edit3,
-  Edit,
-  EyeOff,
-  Eye,
+  CornerRightUp,
+  Database,
+  Crosshair,
+  Circle,
+  DivideSquare,
   Download,
-  Facebook,
+  Columns,
+  Edit2,
+  Eye,
+  Code,
+  Dribbble,
+  Edit,
+  Divide,
+  DivideCircle,
+  Edit3,
   ExternalLink,
-  FastForward,
-  FilePlus,
+  DollarSign,
+  EyeOff,
+  Cast,
+  Facebook,
   FileText,
-  File,
-  FileMinus,
+  Feather,
   Film,
   Filter,
-  Figma,
-  Feather,
-  FolderMinus,
-  Flag,
+  FastForward,
   Framer,
-  FolderPlus,
   Frown,
-  Folder,
-  GitBranch,
-  GitPullRequest,
-  Gift,
-  GitCommit,
+  FilePlus,
+  FolderPlus,
   GitMerge,
-  Github,
-  Gitlab,
+  CreditCard,
+  Flag,
+  Clock,
+  Gift,
+  GitPullRequest,
   Grid,
-  Globe,
-  Hash,
-  Headphones,
-  HardDrive,
-  Heart,
-  Hexagon,
-  Home,
+  FolderMinus,
+  Folder,
+  Gitlab,
+  Droplet,
   HelpCircle,
+  Github,
+  Globe,
+  GitCommit,
+  Home,
+  Hash,
+  Figma,
+  FileMinus,
   Image,
-  Inbox,
+  GitBranch,
   Instagram,
   Info,
-  Italic,
+  Inbox,
   Key,
-  Layers,
+  Italic,
+  Heart,
   LifeBuoy,
-  Link,
-  Layout,
-  Linkedin,
-  Link2,
-  Loader,
+  Hexagon,
   List,
-  Lock,
+  Layout,
+  Link2,
+  Layers,
+  Headphones,
+  Link,
+  File,
   LogIn,
-  LogOut,
-  Mail,
   MapPin,
-  Map,
+  Lock,
+  HardDrive,
   Maximize2,
-  Maximize,
-  Menu,
-  Meh,
-  MessageSquare,
+  LogOut,
+  Linkedin,
+  Map,
   MicOff,
-  MessageCircle,
-  Minimize2,
-  Mic,
   MinusCircle,
-  MinusSquare,
+  MessageSquare,
+  Menu,
+  Mic,
   Minimize,
-  Minus,
+  Maximize,
   Monitor,
-  Moon,
-  MoreVertical,
   MoreHorizontal,
+  Minimize2,
+  Minus,
   MousePointer,
+  MinusSquare,
   Music,
-  Move,
-  Navigation2,
+  Octagon,
+  Moon,
+  MessageCircle,
+  PenTool,
+  MoreVertical,
+  PauseCircle,
   Navigation,
   Package,
-  Octagon,
-  PauseCircle,
-  Paperclip,
-  Pause,
-  PenTool,
-  Percent,
+  Navigation2,
   PhoneForwarded,
-  PhoneCall,
+  Move,
+  Percent,
+  Paperclip,
   PhoneIncoming,
+  Pause,
+  Phone,
   PhoneMissed,
   PhoneOff,
-  PhoneOutgoing,
-  Phone,
-  PieChart,
   Play,
-  PlayCircle,
-  PlusCircle,
   PlusSquare,
-  Plus,
-  Power,
-  Printer,
-  Pocket,
-  Radio,
+  PlayCircle,
+  PhoneOutgoing,
+  PieChart,
+  Meh,
   RefreshCcw,
-  RefreshCw,
-  Repeat,
-  Rewind,
-  RotateCcw,
+  Power,
   Rss,
-  RotateCw,
-  Scissors,
+  RefreshCw,
+  Printer,
+  Mail,
+  PhoneCall,
+  Plus,
+  Pocket,
   Save,
-  Search,
-  Send,
-  Settings,
-  Server,
-  Share2,
   Share,
+  Send,
+  Loader,
+  Settings,
+  Search,
   ShieldOff,
-  Shield,
+  RotateCcw,
+  PlusCircle,
+  RotateCw,
   ShoppingBag,
-  Shuffle,
-  ShoppingCart,
+  Radio,
   Sidebar,
-  SkipBack,
-  SkipForward,
-  Slack,
-  Slash,
+  Shield,
+  Server,
   Sliders,
-  Smile,
-  Square,
+  ShoppingCart,
+  SkipForward,
+  Repeat,
+  Slash,
+  Rewind,
   Smartphone,
-  Star,
-  Speaker,
-  StopCircle,
-  Table,
   Sunrise,
+  Slack,
+  Sun,
+  Shuffle,
+  Star,
+  Scissors,
   Tablet,
-  Tag,
-  Target,
-  Terminal,
-  ThumbsDown,
-  Thermometer,
+  Smile,
+  Table,
+  Share2,
   Sunset,
   ThumbsUp,
-  ToggleLeft,
-  Sun,
-  ToggleRight,
+  Square,
+  ThumbsDown,
+  SkipBack,
+  Terminal,
+  StopCircle,
   Tool,
-  Trash,
-  Trash2,
   Trello,
-  TrendingDown,
-  TrendingUp,
-  Triangle,
+  ToggleRight,
   Truck,
-  Tv,
+  TrendingUp,
+  ToggleLeft,
+  Trash2,
+  TrendingDown,
+  Speaker,
   Twitch,
-  Twitter,
-  Type,
+  Tv,
+  Triangle,
   Umbrella,
-  Underline,
-  Unlock,
-  UploadCloud,
-  Upload,
+  Thermometer,
+  Twitter,
+  Tag,
   UserCheck,
+  Unlock,
   UserPlus,
-  UserX,
-  UserMinus,
-  User,
-  Users,
-  Video,
-  VideoOff,
-  Volume2,
-  Voicemail,
   Volume1,
-  Volume,
-  VolumeX,
-  Watch,
+  Underline,
+  UploadCloud,
+  Trash,
+  VideoOff,
+  Voicemail,
+  UserX,
+  Type,
+  Upload,
   WifiOff,
+  Volume2,
   Wifi,
   Wind,
-  XCircle,
+  VolumeX,
   XOctagon,
+  Watch,
+  User,
+  Target,
+  XCircle,
   XSquare,
-  X,
-  Youtube,
+  Users,
+  Volume,
   Zap,
+  UserMinus,
+  X,
+  Video,
+  Youtube,
   ZapOff,
-  ZoomIn,
   ZoomOut,
+  ZoomIn,
 };
