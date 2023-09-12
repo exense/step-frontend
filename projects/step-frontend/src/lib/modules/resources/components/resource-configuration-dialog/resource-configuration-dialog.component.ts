@@ -9,6 +9,7 @@ import {
   resourceConfigurationDialogFormSetValueToForm,
   resourceConfigurationDialogFormSetValueToModel,
 } from './resource-configuration-dialog.form';
+import { PredefinedResourceType } from './predefined-resource-type.enum';
 
 @Component({
   selector: 'step-resource-configuration-dialog',
@@ -22,8 +23,8 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
 
   protected _resourceConfigurationDialogData = inject<ResourceConfigurationDialogData>(MAT_DIALOG_DATA);
   protected _predefinedResourceTypes = [
-    { key: 'datasource', value: 'datasource' },
-    { key: 'functions', value: 'functions' },
+    { key: PredefinedResourceType.DATA_SOURCE, value: PredefinedResourceType.DATA_SOURCE },
+    { key: PredefinedResourceType.FUNCTIONS, value: PredefinedResourceType.FUNCTIONS },
   ];
 
   private readonly terminator$ = new Subject<void>();
