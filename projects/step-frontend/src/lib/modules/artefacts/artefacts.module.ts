@@ -110,7 +110,7 @@ export class ArtefactsModule {
       description: 'Used to invoke a plan from within another plan',
     });
     this._artefactService.register('CallKeyword', {
-      icon: 'target',
+      icon: 'keyword',
       component: CallKeywordComponent,
       description:
         'Technical node used as part of keyword invocation. Can be used explicitly in order to call a keyword by reflection',

@@ -44,7 +44,7 @@ export class KeywordsCommonModule {
 
   private registerEntities(): void {
     this._entityRegistry.register('functions', 'Keyword', {
-      icon: 'target',
+      icon: 'keyword',
       component: FunctionSelectionTableComponent,
     });
   }
