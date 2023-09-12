@@ -1,8 +1,16 @@
 <div>
-  <button mat-raised-button [matMenuTriggerFor]="menu">
-    {{ activeSelection.type === RangeSelectionType.FULL ? 'Full time range' : '' }}
-    {{ activeSelection.type === RangeSelectionType.RELATIVE ? activeSelection.relativeSelection!.label : '' }}
-    {{ activeSelection.type === RangeSelectionType.ABSOLUTE ? 'Custom Selection' : '' }}
+  <button
+    mat-raised-button
+    [matMenuTriggerFor]="menu"
+    [title]="compact ? 'Time Range' : ''"
+    [class.compact-btn]="compact"
+  >
+    <ng-container *ngIf="!compact">
+      {{ activeSelection.type === RangeSelectionType.FULL ? 'Full time range' : '' }}
+      {{ activeSelection.type === RangeSelectionType.RELATIVE ? activeSelection.relativeSelection!.label : '' }}
+      {{ activeSelection.type === RangeSelectionType.ABSOLUTE ? 'Custom Selection' : '' }}
+    </ng-container>
+    <step-icon name="clock" *ngIf="compact"></step-icon>
   </button>
   <mat-menu #menu="matMenu" class="time-selector-menu">
     <div (click)="$event.stopPropagation()">
@@ -42,14 +50,7 @@
             [class.active]="rangeOption.relativeSelection?.timeInMs === activeSelection.relativeSelection?.timeInMs"
           >
             {{ rangeOption.relativeSelection?.label }}
-          </div>
-          <div
-            *ngIf="includeFullRangeOption"
-            (click)="onFullRangeSelect()"
-            class="time-option full-range"
-            [class.active]="activeSelection.type === RangeSelectionType.FULL"
-          >
-            Full Range
+            {{ rangeOption.type === RangeSelectionType.FULL ? 'Full Range' : '' }}
           </div>
         </div>
       </div>

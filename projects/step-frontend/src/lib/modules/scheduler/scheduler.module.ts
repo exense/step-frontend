@@ -1,5 +1,11 @@
 import { NgModule } from '@angular/core';
-import { CustomCellRegistryService, EntityRegistry, SchedulerActionsService, StepCoreModule } from '@exense/step-core';
+import {
+  CustomCellRegistryService,
+  EntityRegistry,
+  SchedulerActionsService,
+  StepCoreModule,
+  ViewRegistryService,
+} from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { SchedulerTaskLinkComponent } from './components/scheduler-task-link/scheduler-task-link.component';
 import './components/scheduler-task-selection/scheduler-task-selection.component';
@@ -26,11 +32,48 @@ import { ScheduledTaskLogicService } from './services/scheduled-task-logic.servi
   ],
 })
 export class SchedulerModule {
-  constructor(_entityRegistry: EntityRegistry, _cellRegistry: CustomCellRegistryService) {
-    _entityRegistry.register('tasks', 'Scheduler task', {
+  constructor(
+    private _entityRegistry: EntityRegistry,
+    private _cellRegistry: CustomCellRegistryService,
+    private _viewRegistry: ViewRegistryService
+  ) {
+    this.registerEntity();
+    this.registerCells();
+    this.registerViews();
+    this.registerDashlets();
+  }
+
+  private registerEntity(): void {
+    this._entityRegistry.register('tasks', 'Scheduler task', {
       icon: 'clock',
       component: SchedulerTaskSelectionComponent,
     });
-    _cellRegistry.registerCell('schedulerTaskLink', SchedulerTaskLinkComponent);
+  }
+
+  private registerCells(): void {
+    this._cellRegistry.registerCell('schedulerTaskLink', SchedulerTaskLinkComponent);
+  }
+
+  private registerViews(): void {
+    this._viewRegistry.registerView('scheduler', 'partials/scheduler.html');
+  }
+
+  private registerDashlets(): void {
+    this._viewRegistry.registerDashlet(
+      'admin/controller',
+      'Scheduler',
+      'partials/scheduler/schedulerConfiguration.html',
+      'scheduler',
+      false,
+      1
+    );
+    this._viewRegistry.registerDashlet(
+      'settings',
+      'Scheduler',
+      'partials/scheduler/schedulerConfiguration.html',
+      'scheduler',
+      false,
+      1
+    );
   }
 }

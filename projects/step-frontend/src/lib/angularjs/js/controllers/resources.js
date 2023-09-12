@@ -23,20 +23,3 @@ angular
     ViewRegistry.registerView('resources', 'partials/resources/resourceList.html');
     ViewRegistry.registerMenuEntry('Resources', 'resources', 'file-attachment-03',  {weight: 50, parentId: "automation-root"});
   })
-
-
-  .controller('updateResourceWarningCtrl', function ($scope, $uibModalInstance, $http, AuthService, resource) {
-    $scope.resource = resource;
-
-    $scope.updateResource = function () {
-      $uibModalInstance.close(true);
-    };
-
-    $scope.createNewResource = function () {
-      $uibModalInstance.close(false);
-    };
-
-    $scope.cancel = function () {
-      $uibModalInstance.dismiss('cancel');
-    };
-  });

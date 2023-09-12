@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { KeyValue } from '@angular/common';
-import { KeywordSelection } from '../../execution-page/time-series-keywords.context';
+import { KeywordSelection } from '../../pages/execution-page/time-series-keywords.context';
 
 @Pipe({ name: 'measurementsProcessor' })
 export class MeasurementsFilterPipe implements PipeTransform {

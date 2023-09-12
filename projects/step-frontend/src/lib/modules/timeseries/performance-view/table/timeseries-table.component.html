@@ -1,4 +1,10 @@
-<step-table [dataSource]="tableDataSource" [inProgress]="tableIsLoading" matSort class="ts-table">
+<step-table
+  [dataSource]="tableDataSource"
+  [inProgress]="tableIsLoading"
+  matSort
+  class="ts-table"
+  [visibleColumns]="compareModeEnabled ? undefined : BASE_COLUMNS"
+>
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>
       <input
@@ -15,79 +21,327 @@
         <input
           style="margin: unset; margin-right: 6px"
           type="checkbox"
-          [(ngModel)]="element.attributes.isSelected"
+          [(ngModel)]="element.isSelected"
           class="checkbox"
-          (change)="onKeywordToggle(element.attributes[dimensionKey], $event)"
+          (change)="onKeywordToggle(element)"
         />
-        <span class="color-square" [style.background-color]="element.attributes.color"></span>
-        <span>{{ element.attributes._id }}</span>
+        <span class="color-square" [style.background-color]="element.color"></span>
+        <span>{{ element.name }}</span>
       </div>
     </td>
   </ng-container>
   <ng-container matColumnDef="count">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Count</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+      <div>
+        <div>Count</div>
+        <div *ngIf="compareModeEnabled" class="subtitle">Base</div>
+      </div>
+    </th>
     <td mat-cell *matCellDef="let element">
-      {{ element.count }}
+      {{ element.base?.count }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="count_comp">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+      <div>
+        <div>Count</div>
+        <div class="subtitle compare-value">Compare</div>
+      </div>
+    </th>
+    <td mat-cell *matCellDef="let element">
+      <div class="flex justify-between">
+        <div class="compare-value">{{ element.compare?.count }}</div>
+      </div>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="count_diff">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="right-separator">
+      <div>Diff %</div>
+    </th>
+    <td mat-cell *matCellDef="let element" class="right-separator">
+      <div class="compare-diff" *ngIf="element.compare && element.base">
+        {{ element.countDiff | comparePercentage }}
+      </div>
     </td>
   </ng-container>
   <ng-container matColumnDef="sum">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Sum (ms)</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+      <div>
+        <div>Sum (ms)</div>
+        <div *ngIf="compareModeEnabled" class="subtitle">Base</div>
+      </div>
+    </th>
     <td mat-cell *matCellDef="let element">
-      {{ element.sum }}
+      {{ element.base?.sum }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="sum_comp">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="compare-column">
+      <div>
+        <div>Sum (ms)</div>
+        <div class="subtitle compare-value">Compare</div>
+      </div>
+    </th>
+    <td mat-cell *matCellDef="let element" class="compare-value">
+      {{ element.compare?.sum }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="sum_diff">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="right-separator">
+      <div>Diff %</div>
+    </th>
+    <td mat-cell *matCellDef="let element" class="right-separator">
+      <div class="compare-diff" *ngIf="element.compare && element.base">{{ element.sumDiff | comparePercentage }}</div>
     </td>
   </ng-container>
   <ng-container matColumnDef="avg">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Avg (ms)</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+      <div>
+        <div>Avg (ms)</div>
+        <div *ngIf="compareModeEnabled" class="subtitle">Base</div>
+      </div>
+    </th>
     <td mat-cell *matCellDef="let element">
-      {{ element.attributes.avg }}
+      {{ element.base?.attributes.avg }}
     </td>
   </ng-container>
+  <ng-container matColumnDef="avg_comp">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="compare-column">
+      <div>
+        <div>Avg (ms)</div>
+        <div class="subtitle compare-value">Compare</div>
+      </div>
+    </th>
+    <td mat-cell *matCellDef="let element" class="compare-column">
+      <div class="compare-value">
+        {{ element.compare?.attributes.avg }}
+      </div>
+    </td>
+    <ng-container matColumnDef="avg_diff">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="right-separator">
+        <div>Diff %</div>
+      </th>
+      <td mat-cell *matCellDef="let element" class="right-separator">
+        <div class="compare-diff" *ngIf="element.compare && element.base">
+          {{ element.avgDiff | comparePercentage }}
+        </div>
+      </td>
+    </ng-container>
+  </ng-container>
   <ng-container matColumnDef="min">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Min (ms)</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+      <div>
+        <div>Min (ms)</div>
+        <div *ngIf="compareModeEnabled" class="subtitle">Base</div>
+      </div>
+    </th>
     <td mat-cell *matCellDef="let element">
-      {{ element.min }}
+      {{ element.base?.min }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="min_comp">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="compare-column">
+      <div>
+        <div>Min (ms)</div>
+        <div class="subtitle compare-value">Compare</div>
+      </div>
+    </th>
+    <td mat-cell *matCellDef="let element" class="compare-value">
+      {{ element.compare?.min }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="min_diff">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="right-separator">
+      <div>Diff %</div>
+    </th>
+    <td mat-cell *matCellDef="let element" class="right-separator">
+      <div class="compare-diff" *ngIf="element.compare && element.base">{{ element.minDiff | comparePercentage }}</div>
     </td>
   </ng-container>
   <ng-container matColumnDef="max">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Max (ms)</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+      <div>
+        <div>Max (ms)</div>
+        <div *ngIf="compareModeEnabled" class="subtitle">Base</div>
+      </div>
+    </th>
     <td mat-cell *matCellDef="let element">
-      {{ element.max }}
+      {{ element.base?.max }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="max_comp">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="compare-column">
+      <div>
+        <div>Max (ms)</div>
+        <div class="subtitle compare-value">Compare</div>
+      </div>
+    </th>
+    <td mat-cell *matCellDef="let element" class="compare-value">
+      {{ element.compare?.max }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="max_diff">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="right-separator">
+      <div>Diff %</div>
+    </th>
+    <td mat-cell *matCellDef="let element" class="right-separator">
+      <div class="compare-diff" *ngIf="element.compare && element.base">{{ element.maxDiff | comparePercentage }}</div>
     </td>
   </ng-container>
   <ng-container matColumnDef="pcl_80">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Pcl. 80 (ms)</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+      <div>
+        <div>Pcl. 80 (ms)</div>
+        <div *ngIf="compareModeEnabled" class="subtitle">Base</div>
+      </div>
+    </th>
     <td mat-cell *matCellDef="let element">
-      {{ element.pclValues?.[80] }}
+      {{ element.base?.pclValues?.[80] }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="pcl_80_comp">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="compare-column">
+      <div>
+        <div>Pcl. 80 (ms)</div>
+        <div class="subtitle compare-value">Compare</div>
+      </div>
+    </th>
+    <td mat-cell *matCellDef="let element" class="compare-value">
+      {{ element.compare?.pclValues?.[80] }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="pcl_80_diff">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="right-separator">
+      <div>Diff %</div>
+    </th>
+    <td mat-cell *matCellDef="let element" class="right-separator">
+      <div class="compare-diff" *ngIf="element.compare && element.base">
+        {{ element.pcl80Diff | comparePercentage }}
+      </div>
     </td>
   </ng-container>
   <ng-container matColumnDef="pcl_90">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Pcl. 90 (ms)</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+      <div>
+        <div>Pcl. 90 (ms)</div>
+        <div *ngIf="compareModeEnabled" class="subtitle">Base</div>
+      </div>
+    </th>
     <td mat-cell *matCellDef="let element">
-      {{ element.pclValues?.[90] }}
+      {{ element.base?.pclValues?.[90] }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="pcl_90_comp">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="compare-column">
+      <div>
+        <div>Pcl. 90 (ms)</div>
+        <div class="subtitle compare-value">Compare</div>
+      </div>
+    </th>
+    <td mat-cell *matCellDef="let element" class="compare-value">
+      {{ element.compare?.pclValues?.[90] }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="pcl_90_diff">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="right-separator">
+      <div>Diff %</div>
+    </th>
+    <td mat-cell *matCellDef="let element" class="right-separator">
+      <div class="compare-diff" *ngIf="element.compare && element.base">
+        {{ element.pcl90Diff | comparePercentage }}
+      </div>
     </td>
   </ng-container>
   <ng-container matColumnDef="pcl_99">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Pcl. 99 (ms)</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+      <div>
+        <div>Pcl. 99 (ms)</div>
+        <div *ngIf="compareModeEnabled" class="subtitle">Base</div>
+      </div>
+    </th>
     <td mat-cell *matCellDef="let element">
-      {{ element.pclValues?.[99] }}
+      {{ element.base?.pclValues?.[99] }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="pcl_99_comp">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="compare-column">
+      <div>
+        <div>Pcl. 99 (ms)</div>
+        <div class="subtitle compare-value">Compare</div>
+      </div>
+    </th>
+    <td mat-cell *matCellDef="let element" class="compare-value">
+      {{ element.compare?.pclValues?.[99] }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="pcl_99_diff">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="right-separator">
+      <div>Diff %</div>
+    </th>
+    <td mat-cell *matCellDef="let element" class="right-separator">
+      <div class="compare-diff" *ngIf="element.compare && element.base">
+        {{ element.pcl99Diff | comparePercentage }}
+      </div>
     </td>
   </ng-container>
   <ng-container matColumnDef="tps">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Tps</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+      <div>
+        <div>Tps</div>
+        <div *ngIf="compareModeEnabled" class="subtitle">Base</div>
+      </div>
+    </th>
     <td mat-cell *matCellDef="let element">
-      <ng-container *ngIf="response">
-        {{ element.attributes.tps }}
-      </ng-container>
+      {{ element.base?.attributes.tps }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="tps_comp">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="compare-column">
+      <div>
+        <div>Tps</div>
+        <div class="subtitle compare-value">Compare</div>
+      </div>
+    </th>
+    <td mat-cell *matCellDef="let element" class="compare-value">
+      {{ element.compare?.attributes.tps }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="tps_diff">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="right-separator">
+      <div>Diff %</div>
+    </th>
+    <td mat-cell *matCellDef="let element" class="right-separator">
+      <div class="compare-diff" *ngIf="element.compare && element.base">{{ element.tpsDiff | comparePercentage }}</div>
     </td>
   </ng-container>
   <ng-container matColumnDef="tph">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Tph</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+      <div>
+        <div>Tph</div>
+        <div *ngIf="compareModeEnabled" class="subtitle">Base</div>
+      </div>
+    </th>
     <td mat-cell *matCellDef="let element">
-      <ng-container *ngIf="response">
-        {{ element.attributes.tph }}
-      </ng-container>
+      {{ element.base?.attributes.tph }}
     </td>
   </ng-container>
-  <!--            <mat-row *matRowDef="let row; columns: tableColumns"-->
-  <!--                     [class.display-none]="!keywords[row.attributes.name].isSelected"></mat-row>-->
+  <ng-container matColumnDef="tph_comp">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="compare-column">
+      <div>
+        <div>Tph</div>
+        <div class="subtitle compare-value">Compare</div>
+      </div>
+    </th>
+    <td mat-cell *matCellDef="let element" class="compare-value">
+      {{ element.compare?.attributes.tph }}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="tph_diff">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="right-separator">
+      <div>Diff %</div>
+    </th>
+    <td mat-cell *matCellDef="let element" class="right-separator">
+      <div class="compare-diff" *ngIf="element.compare && element.base">{{ element.tphDiff | comparePercentage }}</div>
+    </td>
+  </ng-container>
 </step-table>

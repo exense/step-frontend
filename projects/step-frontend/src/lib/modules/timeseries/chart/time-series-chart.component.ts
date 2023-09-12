@@ -30,6 +30,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   @ViewChild('chart') private chartElement!: ElementRef;
 
+  @Input() title!: string;
   @Input() settings!: TSChartSettings;
   @Input() syncKey: string | undefined; // all the charts with the same syncKey in the app will be synced
 
@@ -75,6 +76,10 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     }
   }
 
+  ngAfterViewInit(): void {
+    this.createChart(this.settings);
+  }
+
   setTitle(title: string): void {
     let titles = this.chartElement.nativeElement.getElementsByClassName('u-title');
     if (titles.length) {
@@ -88,6 +93,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   createChart(settings: TSChartSettings): void {
     this.legendSettings.items = [];
     this.chartIsUnavailable = false;
+    this.seriesIndexesByIds = {};
 
     const cursorOpts: uPlot.Cursor = {
       lock: false,
@@ -124,7 +130,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
           seriesId: series.id,
           color: (series.stroke as string) || '#cccccc',
           label: series.legendName,
-          isVisible: true,
+          isVisible: !!series.show,
         });
       }
     });
@@ -139,7 +145,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     }
     this.chartIsEmpty = noData;
     const opts: uPlot.Options = {
-      title: settings.title,
+      title: this.title || settings.title,
       ms: 1, // if not specified it's going to be in seconds
       ...this.getSize(),
       legend: { show: false },
@@ -174,10 +180,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       this.uplot.destroy();
     }
     this.uplot = new uPlot(opts, data, this.chartElement.nativeElement);
-  }
-
-  ngAfterViewInit(): void {
-    this.createChart(this.settings);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -291,15 +293,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     return !!this.seriesIndexesByIds[id];
   }
 
-  addDataBySeries(data: number[], seriesKey: string): void {
-    let index = this.seriesIndexesByIds[seriesKey];
-    if (index === undefined) {
-      throw new Error('Series id not found: ' + seriesKey);
-    } else {
-      this.addDataBySeriesIndex(data, index);
-    }
-  }
-
   addDataBySeriesIndex(data: number[], seriesIndex: number): void {
     let existingData = this.uplot.data[seriesIndex] as number[];
     this.uplot.data[seriesIndex] = [...existingData, ...data];
@@ -313,7 +306,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   }
 
   /**
-   * The complete chart data will be overriden
+   * The complete chart data will be updated
    * @param series
    */
   updateFullData(series: TSChartSeries[]): void {
@@ -324,7 +317,10 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       this.uplot.addSeries({
         label: 'Timestamp',
       });
-      series.forEach((s) => this.uplot.addSeries(s));
+      series.forEach((s, i) => {
+        this.uplot.addSeries(s);
+        this.seriesIndexesByIds[i] = i + 1;
+      });
       this.uplot.setData(data, true);
     });
   }
@@ -340,12 +336,11 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   redraw(): void {
     this.uplot.setData(this.uplot.data);
-    this.uplot.setSize(this.getSize());
+    this.resize();
   }
 
-  getLastTimestamp(): number {
-    let timestampSeries = this.uplot.data[0];
-    return timestampSeries[timestampSeries.length - 1];
+  resize() {
+    this.uplot.setSize(this.getSize());
   }
 }
 

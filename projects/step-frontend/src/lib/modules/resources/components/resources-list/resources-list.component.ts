@@ -107,7 +107,7 @@ export class ResourcesListComponent implements AfterViewInit {
           return;
         }
 
-        this._resourceInputBridgeService.deleteLastUploadedResource();
+        this._resourceInputBridgeService.deleteUploadedResource();
       }),
       switchMap(() => matDialogRef.afterClosed())
     );

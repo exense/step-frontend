@@ -238,19 +238,40 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
     this.planChange$.next(this.plan!);
   }
 
+  moveOut(node?: AbstractArtefact): void {
+    if (node) {
+      this._treeState.selectNodeById(node.id!);
+    }
+    this._treeState.moveSelectedNodesOut();
+  }
+
   moveUp(node?: AbstractArtefact): void {
     if (node) {
       this._treeState.selectNodeById(node.id!);
     }
     this._treeState.moveSelectedNodes('up');
   }
-
   moveDown(node?: AbstractArtefact): void {
     if (node) {
       this._treeState.selectNodeById(node.id!);
     }
     this._treeState.moveSelectedNodes('down');
   }
+
+  moveInNextSibling(node?: AbstractArtefact) {
+    if (node) {
+      this._treeState.selectNodeById(node.id!);
+    }
+    this._treeState.moveSelectedNodesIn('nextSibling');
+  }
+
+  moveInPrevSibling(node?: AbstractArtefact) {
+    if (node) {
+      this._treeState.selectNodeById(node.id!);
+    }
+    this._treeState.moveSelectedNodesIn('prevSibling');
+  }
+
   delete(node?: AbstractArtefact): void {
     if (node) {
       this._treeState.selectNodeById(node.id!);

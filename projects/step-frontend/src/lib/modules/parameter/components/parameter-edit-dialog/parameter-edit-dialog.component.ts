@@ -21,6 +21,7 @@ export class ParameterEditDialogComponent implements OnInit {
   protected parameter!: Parameter;
   protected scopeItems: ScopeItem[] = [];
   protected selectedScope?: ScopeItem;
+  protected protectedParameter: boolean = false;
   private _authService = inject(AuthService);
   private _allScopeItems = inject(SCOPE_ITEMS);
   private _matDialogRef = inject(MatDialogRef);
@@ -59,6 +60,7 @@ export class ParameterEditDialogComponent implements OnInit {
         if (!parameter.scope) {
           parameter.scope = this._parameterScopeRenderer.normalizeScope(parameter.scope);
         }
+        this.protectedParameter = !!parameter.protectedValue;
       })
     );
 
@@ -84,5 +86,13 @@ export class ParameterEditDialogComponent implements OnInit {
         })
       )
       .subscribe((scopeItems) => (this.scopeItems = scopeItems));
+  }
+
+  onKeyChange(key: string) {
+    this.parameter.key = key;
+    const lowerKey = key.toLowerCase();
+    if (lowerKey.includes('pwd') || lowerKey.includes('password')) {
+      this.parameter.protectedValue = true;
+    }
   }
 }
