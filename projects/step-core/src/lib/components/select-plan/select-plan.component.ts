@@ -16,7 +16,7 @@ export class SelectPlanComponent implements ControlValueAccessor, OnDestroy {
   private _planDialogsService = inject(PlanDialogsService);
 
   @Input() showRequiredMarker?: boolean;
-  @Input() isLabelVisible = true;
+  @Input() label = 'Plan';
 
   private onChange: OnChange = noop;
   private onTouch: OnTouch = noop;

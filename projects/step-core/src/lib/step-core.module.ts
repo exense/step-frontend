@@ -75,6 +75,7 @@ import { FunctionActionsService, KeywordsCommonModule } from './modules/keywords
 import { FunctionActionsImplService } from './services/function-actions-impl.service';
 import { GenericFunctionListComponent } from './components/generic-function-list/generic-function-list.component';
 import { MyAccountButtonComponent } from './components/my-account-button/my-account-button.component';
+import { SelectTaskComponent } from './components/select-task/select-task.component';
 
 @NgModule({
   declarations: [
@@ -132,6 +133,7 @@ import { MyAccountButtonComponent } from './components/my-account-button/my-acco
     ProjectNamePipe,
     GenericFunctionListComponent,
     MyAccountButtonComponent,
+    SelectTaskComponent,
   ],
   imports: [
     CommonModule,
@@ -223,6 +225,7 @@ import { MyAccountButtonComponent } from './components/my-account-button/my-acco
     KeywordsCommonModule,
     GenericFunctionListComponent,
     MyAccountButtonComponent,
+    SelectTaskComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -284,7 +287,8 @@ export { PredefinedOptionsInputComponent } from './components/predefined-options
 export { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 export * from './components/report-node-status/report-node-status.component';
 export { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
-export { SelectPlanComponent } from './components/select-plan/select-plan.component';
+export * from './components/select-plan/select-plan.component';
+export * from './components/select-task/select-task.component';
 export * from './components/setting-button/setting-button.component';
 export * from './components/link-button/link-button.component';
 export * from './components/my-account-button/my-account-button.component';
