@@ -27,7 +27,6 @@ import { NewSchedulerTaskDialogComponent } from './components/new-scheduler-task
 import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 import { PlanLinkComponent } from './components/plan-link/plan-link.component';
 import { PlanNameComponent } from './components/plan-name/plan-name.component';
-import { PlanTreeActionsComponent } from './components/plan-tree-actions/plan-tree-actions.component';
 import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { PredefinedOptionsInputComponent } from './components/predefined-options-input/predefined-options-input.component';
 import { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
@@ -104,7 +103,6 @@ import { SchedulerTaskLinkComponent } from './components/scheduler-task-link/sch
     IsChartEmptyPipe,
     KeywordNameComponent,
     DynamicAttributePipe,
-    PlanTreeActionsComponent,
     CustomFormComponent,
     DynamicLabelCustomFormInputComponent,
     StandardCustomFormInputComponent,
