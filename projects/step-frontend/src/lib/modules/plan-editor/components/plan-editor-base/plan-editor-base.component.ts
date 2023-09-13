@@ -33,7 +33,20 @@ import {
   PlanLinkDialogService,
   FunctionActionsService,
 } from '@exense/step-core';
-import { catchError, filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import {
+  catchError,
+  defer,
+  EMPTY,
+  filter,
+  map,
+  mergeMap,
+  Observable,
+  of,
+  Subject,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
@@ -154,19 +167,42 @@ export class PlanEditorBaseComponent
   }
 
   displayHistory(permission: string, plan: Plan): void {
-    if (!plan || !plan.id) {
+    if (!(plan?.id || this.id)) {
       return;
     }
 
-    const planVersion = plan.customFields ? plan.customFields['versionId'] : undefined;
-
     const versionHistory = this._planEditorApi.getPlanHistory(this.id || plan.id!);
 
-    this._restoreDialogsService
-      .showRestoreDialog(planVersion, versionHistory, permission)
+    const currentVersion$ = defer(() => {
+      if (this.id && this.id !== plan.id) {
+        // composite keywords need to retrieve the current version
+        return this._keywordCallsApi.getFunctionById(this.id).pipe(
+          mergeMap((keyword) => {
+            if (keyword && keyword.customFields && keyword.customFields['versionId']) {
+              return of(keyword.customFields['versionId']);
+            } else {
+              return EMPTY;
+            }
+          })
+        );
+      } else {
+        // we are showing a real plan
+        return of(plan.customFields ? plan.customFields['versionId'] : undefined);
+      }
+    });
+
+    currentVersion$
       .pipe(
-        filter((restoreVersion) => !!restoreVersion),
-        switchMap((restoreVersion) => this._planEditorApi.restorePlanVersion(this.id || plan.id!, restoreVersion))
+        mergeMap((currentVersion) =>
+          this._restoreDialogsService.showRestoreDialog(currentVersion, versionHistory, permission).pipe(
+            filter((restoreVersion) => restoreVersion !== undefined),
+            mergeMap((restoreVersion) => this._planEditorApi.restorePlanVersion(this.id || plan.id!, restoreVersion)),
+            catchError((error) => {
+              console.error(error);
+              return EMPTY;
+            })
+          )
+        )
       )
       .subscribe(() => this.loadPlan(this.id || plan.id!));
   }
