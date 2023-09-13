@@ -35,8 +35,8 @@ export class FindBucketsRequestBuilder {
       this.percentiles = builder.percentiles ? JSON.parse(JSON.stringify(builder.percentiles)) : [];
       this.numberOfBuckets = builder.numberOfBuckets;
       this.intervalSize = builder.intervalSize;
-      this.filteringSettings = builder.filteringSettings;
-      this.customAttributes = builder.customAttributes;
+      this.filteringSettings = JSON.parse(JSON.stringify(builder.filteringSettings));
+      this.customAttributes = JSON.parse(JSON.stringify(builder.customAttributes));
     }
   }
 
@@ -54,7 +54,7 @@ export class FindBucketsRequestBuilder {
    * @param intervalSize
    */
   withIntervalSize(intervalSize: number) {
-    if (!intervalSize) {
+    if (intervalSize) {
       this.intervalSize = intervalSize;
     } else {
       this.numberOfBuckets = TimeSeriesConfig.MAX_BUCKETS_IN_CHART;

@@ -81,6 +81,7 @@ export class TimeSeriesContext {
   }
 
   updateChartsResolution(ms: number): void {
+    console.log('updating charts resolution');
     this.chartsResolution$.next(ms);
   }
 
