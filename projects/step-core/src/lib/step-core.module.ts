@@ -27,7 +27,6 @@ import { NewSchedulerTaskDialogComponent } from './components/new-scheduler-task
 import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 import { PlanLinkComponent } from './components/plan-link/plan-link.component';
 import { PlanNameComponent } from './components/plan-name/plan-name.component';
-import { PlanTreeActionsComponent } from './components/plan-tree-actions/plan-tree-actions.component';
 import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { PredefinedOptionsInputComponent } from './components/predefined-options-input/predefined-options-input.component';
 import { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
@@ -74,6 +73,7 @@ import { ProjectNamePipe } from './pipes/project-name.pipe';
 import { FunctionActionsService, KeywordsCommonModule } from './modules/keywords-common/keywords-common.module';
 import { FunctionActionsImplService } from './services/function-actions-impl.service';
 import { GenericFunctionListComponent } from './components/generic-function-list/generic-function-list.component';
+import { MyAccountButtonComponent } from './components/my-account-button/my-account-button.component';
 import { ResourceInputWrapperComponent } from './components/resource-input-wrapper/resource-input-wrapper.component';
 import { WizardModule } from './modules/wizard/wizards.module';
 
@@ -102,7 +102,6 @@ import { WizardModule } from './modules/wizard/wizards.module';
     IsChartEmptyPipe,
     KeywordNameComponent,
     DynamicAttributePipe,
-    PlanTreeActionsComponent,
     CustomFormComponent,
     DynamicLabelCustomFormInputComponent,
     StandardCustomFormInputComponent,
@@ -132,6 +131,7 @@ import { WizardModule } from './modules/wizard/wizards.module';
     WaitingArtefactsAdvancedComponent,
     ProjectNamePipe,
     GenericFunctionListComponent,
+    MyAccountButtonComponent,
     ResourceInputWrapperComponent,
   ],
   imports: [
@@ -225,6 +225,7 @@ import { WizardModule } from './modules/wizard/wizards.module';
     ProjectNamePipe,
     KeywordsCommonModule,
     GenericFunctionListComponent,
+    MyAccountButtonComponent,
     ResourceInputWrapperComponent,
   ],
   providers: [
@@ -288,7 +289,9 @@ export { ReferenceArtefactNameComponent } from './components/reference-artefact-
 export * from './components/report-node-status/report-node-status.component';
 export { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 export { SelectPlanComponent } from './components/select-plan/select-plan.component';
-export { SettingButtonComponent } from './components/setting-button/setting-button.component';
+export * from './components/setting-button/setting-button.component';
+export * from './components/link-button/link-button.component';
+export * from './components/my-account-button/my-account-button.component';
 export { SplitAreaComponent } from './components/split-area/split-area.component';
 export { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 export { SplitComponent } from './components/split/split.component';
@@ -363,6 +366,9 @@ export * from './services/artefact.service';
 export * from './services/artefact-form-change-helper.service';
 export * from './services/function-actions-impl.service';
 export * from './shared';
+export * from './modules/basics/shared/api-token.interface';
 export * from './components/base-artefact/base-artefact.component';
 export * from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 export * from './components/artefact-details/artefact-details.component';
+export * from './services/special-links.service';
+export * from './shared/special-links-strategy';

@@ -1,14 +1,22 @@
 <ng-container *ngIf="!executionHasToBeBuilt">
   <div class="header-buttons">
-    <step-time-range-picker
-      *ngIf="timeRangeSelection"
-      (onSelectionChange)="onTimeRangeChange($event)"
-      [selectOptions]="timeRangeOptions"
-      [includeFullRangeOption]="true"
-      [activeSelection]="timeRangeSelection"
-    >
-    </step-time-range-picker>
+    <button class="menu-btn" [matMenuTriggerFor]="menu" mat-button>
+      <div class="icon-container">
+        <step-icon name="settings"></step-icon>
+      </div>
+      <span>Settings</span>
+    </button>
   </div>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="toggleCompareMode()">
+      <step-icon name="bar-chart-2" [class.active]="compareModeEnabled"></step-icon>
+      {{ compareModeEnabled ? 'Disable Compare Mode' : 'Enable Compare Mode' }}
+    </button>
+    <button mat-menu-item (click)="exportRawData()">
+      <step-icon name="download"></step-icon>
+      <span>Export Raw Measurements</span>
+    </button>
+  </mat-menu>
   <step-timeseries-dashboard #dashboard *ngIf="dashboardSettings" [settings]="dashboardSettings">
   </step-timeseries-dashboard>
 </ng-container>

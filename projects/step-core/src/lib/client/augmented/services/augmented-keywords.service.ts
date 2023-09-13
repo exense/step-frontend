@@ -28,7 +28,7 @@ export class AugmentedKeywordsService extends KeywordsService {
   }
 
   override getFunctionEditor(id: string): Observable<string> {
-    return this._httpClient.request('GET', `/rest/functions/${id}/editor`, {
+    return this._httpClient.request('GET', `rest/functions/${id}/editor`, {
       responseType: 'text',
     });
   }

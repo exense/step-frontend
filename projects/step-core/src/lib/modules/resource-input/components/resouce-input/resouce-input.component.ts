@@ -11,7 +11,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { Observable, Subject, filter, takeUntil } from 'rxjs';
+import { Observable, Subject, filter, takeUntil, forkJoin } from 'rxjs';
 import { AugmentedResourcesService, ResourceUploadResponse } from '../../../../client/step-client-module';
 import { ResourceDialogsService } from '../../services/resource-dialogs.service';
 import { ResourceInputBridgeService } from '../../services/resource-input-bridge.service';
@@ -43,6 +43,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   @Input() withDynamicSwitch?: boolean;
   @Input() showRequiredMarker?: boolean;
   @Input() isDisabled: boolean = false;
+  @Input() preserveExistingResource: boolean = false;
   @Input() isInvalid?: boolean;
   @Input() isTouched?: boolean;
 
@@ -67,7 +68,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   progress$?: Observable<number>;
   response$?: Observable<ResourceUploadResponse>;
   lastStModelValue?: string;
-  lastUploadedResourceId?: string;
+  uploadedResourceIds: string[] = [];
 
   constructor(
     private _augmentedResourcesService: AugmentedResourcesService,
@@ -76,8 +77,8 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this._resourceInputBridgeService.deleteLastUploadedResource$.pipe(takeUntil(this.terminator$)).subscribe(() => {
-      this.deleteLastUploadedResource();
+    this._resourceInputBridgeService.deleteUploadedResource$.pipe(takeUntil(this.terminator$)).subscribe(() => {
+      this.deleteUploadedResource();
     });
   }
 
@@ -116,7 +117,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
 
     const [file] = files;
 
-    if (this.isResource && !this.resourceNotExisting) {
+    if (this.isResource && !this.resourceNotExisting && !this.preserveExistingResource) {
       if (!this.stBounded) {
         this._resourceDialogsService.showUpdateResourceWarning().subscribe((resultState) => {
           switch (resultState) {
@@ -192,7 +193,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     this.absoluteFilepath = '';
     this.resourceFilename = '';
     this.setStModel('');
-    this.deleteLastUploadedResource();
+    this.deleteUploadedResource();
     this.blur.emit();
     this.filesChange.emit();
 
@@ -282,8 +283,8 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
         // No similar resource found
         this.setResourceIdToFieldValue(resourceId);
         this.resourceFilename = resourceUploadResponse.resource!.resourceName;
-        this.deleteLastUploadedResource();
-        this.lastUploadedResourceId = resourceId;
+        this.deleteUploadedResource();
+        this.uploadedResourceIds.push(resourceId);
       } else {
         this._resourceDialogsService
           .showFileAlreadyExistsWarning(resourceUploadResponse.similarResources)
@@ -296,20 +297,28 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
             } else {
               // Creating a new resource
               this.setResourceIdToFieldValue(resourceId);
-              this.lastUploadedResourceId = resourceId;
+              this.uploadedResourceIds.push(resourceId);
             }
           });
       }
     });
   }
 
-  private deleteLastUploadedResource(): void {
-    if (!this.lastUploadedResourceId) {
+  /*
+   * Clean up all resources but the initial one
+   */
+  private deleteUploadedResource(): void {
+    if (!this.uploadedResourceIds || this.uploadedResourceIds.length === 0) {
       return;
     }
 
-    this._augmentedResourcesService.deleteResource(this.lastUploadedResourceId).subscribe(() => {
-      delete this.lastUploadedResourceId;
+    const cleanupIds = [...this.uploadedResourceIds];
+    const requests = cleanupIds.map((id) => this._augmentedResourcesService.deleteResource(id));
+
+    forkJoin(requests).subscribe({
+      next: (results) => {
+        this.uploadedResourceIds = this.uploadedResourceIds.filter((item) => !cleanupIds.includes(item));
+      },
     });
   }
 }

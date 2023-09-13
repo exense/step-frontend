@@ -24,6 +24,8 @@ import { TimeSeriesConfig } from '../../time-series.config';
 import { TableApiWrapperService, TimeSeriesService } from '@exense/step-core';
 import { OqlVerifyResponse } from '../../model/oql-verify-response';
 import { TsFilteringMode } from '../../model/ts-filtering-mode';
+import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
+import { RelativeTimeSelection } from '../../time-selection/model/relative-time-selection';
 import { OQLBuilder } from '../../util/oql-builder';
 import { MatDialog } from '@angular/material/dialog';
 import { DiscoverComponent } from '../../discover/discover.component';
@@ -45,13 +47,15 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
 })
 export class FilterBarComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
-  @Input() performanceViewSettings!: PerformanceViewSettings;
-  @Input() defaultFilterOptions: TsFilterItem[] = [];
   @Input() initialFilters: TsFilterItem[] = [];
+  @Input() compactView = false;
 
-  @Output() onFiltersChange = new EventEmitter<TsFilterItem[]>();
-  @Output() onFilterSettingsChange = new EventEmitter<TsFilteringSettings>();
-  @Output() onGroupingChange = new EventEmitter<string[]>();
+  @Input() timeRangeOptions!: TimeRangePickerSelection[];
+  @Input() activeTimeRange!: TimeRangePickerSelection;
+
+  _defaultFilterOptions: TsFilterItem[] = [];
+
+  @Output() onTimeRangeChange = new EventEmitter<TimeRangePickerSelection>();
 
   @ViewChild(PerformanceViewTimeSelectionComponent) timeSelection?: PerformanceViewTimeSelectionComponent;
 
@@ -62,7 +66,6 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   readonly EMIT_DEBOUNCE_TIME = 300;
   readonly FilterBarItemType = FilterBarItemType;
-  exportInProgress = false;
 
   filterItems: TsFilterItem[] = [];
   groupDimensions: string[] = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS[0].attributes;
@@ -76,21 +79,8 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   constructor(
     private _changeDetectorRef: ChangeDetectorRef,
     private _timeSeriesService: TimeSeriesService,
-    private _tableApiService: TableApiWrapperService,
     private _matDialog: MatDialog
   ) {}
-
-  getFilters(): TsFilterItem[] {
-    return this.filterItems;
-  }
-
-  getValidFilters(): TsFilterItem[] {
-    return this.getFilters().filter(FilterUtils.filterItemIsValid);
-  }
-
-  prepareVisibleFilters() {
-    this.filterItems = (this.initialFilters || []).concat(this.defaultFilterOptions);
-  }
 
   ngOnInit(): void {
     if (!this.context) {
@@ -107,6 +97,23 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     });
   }
 
+  // clone the array
+  @Input() set defaultFilterOptions(value: TsFilterItem[]) {
+    this._defaultFilterOptions = JSON.parse(JSON.stringify(value || []));
+  }
+
+  getFilters(): TsFilterItem[] {
+    return this.filterItems;
+  }
+
+  getValidFilters(): TsFilterItem[] {
+    return this.getFilters().filter(FilterUtils.filterItemIsValid);
+  }
+
+  prepareVisibleFilters() {
+    this.filterItems = (this.initialFilters || []).concat(this._defaultFilterOptions);
+  }
+
   handleOqlChange(event: any) {
     this.invalidOql = false;
   }
@@ -120,6 +127,10 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     } else {
       this.invalidOql = false;
     }
+  }
+
+  handleTimeRangeChange(selection: TimeRangePickerSelection) {
+    this.onTimeRangeChange.next(selection);
   }
 
   disableOqlMode() {
@@ -152,7 +163,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
       this.rawMeasurementsModeActive = response.hasUnknownFields;
       // for grouping change, we will trigger refresh automatically. otherwise grouping and filters will change together
       if (!this.rawMeasurementsModeActive) {
-        this.onGroupingChange.emit(dimensions);
+        this.context.updateGrouping(dimensions);
       } else {
         // wait for the manual apply
       }
@@ -165,12 +176,12 @@ export class FilterBarComponent implements OnInit, OnDestroy {
       filterItems: this.getValidFilters(),
       oql: this.oqlValue,
     };
-    this.onFilterSettingsChange.emit(settings);
+    this.context.setFilteringSettings(settings);
   }
 
   manuallyApplyFilters() {
     if (this.haveNewGrouping()) {
-      this.onGroupingChange.emit(this.groupDimensions);
+      this.context.updateGrouping(this.groupDimensions);
     }
     if (!this.oqlModeActive) {
       this.emitFiltersChange();
@@ -188,11 +199,6 @@ export class FilterBarComponent implements OnInit, OnDestroy {
         }
       });
     }
-  }
-
-  ngOnDestroy(): void {
-    this.emitFilterChange$.complete();
-    this.onFiltersChange.complete();
   }
 
   handleFilterChange(index: number, item: TsFilterItem) {
@@ -259,21 +265,6 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  exportRawData() {
-    if (this.exportInProgress) {
-      return;
-    }
-    this.exportInProgress = true;
-    const oql = this.createRawMeasurementsFilter();
-    this._timeSeriesService
-      .getMeasurementsAttributes(oql)
-      .pipe(
-        switchMap((fields) => this._tableApiService.exportAsCSV('measurements', fields, { filters: [{ oql: oql }] })),
-        tap(() => (this.exportInProgress = false))
-      )
-      .subscribe();
-  }
-
   openDiscovery() {
     const data: DiscoverDialogData = { oqlFilter: this.createRawMeasurementsFilter() };
     this._matDialog.open(DiscoverComponent, { data: data });
@@ -285,17 +276,20 @@ export class FilterBarComponent implements OnInit, OnDestroy {
       filteringSettings.mode === TsFilteringMode.OQL
         ? filteringSettings.oql.replace('attributes.', '')
         : FilterUtils.filtersToOQL(this.getValidFilters(), undefined, ATTRIBUTES_REMOVAL_FUNCTION);
-    const contextualOql = FilterUtils.objectToOQL(
-      this.performanceViewSettings.contextualFilters,
-      undefined,
-      ATTRIBUTES_REMOVAL_FUNCTION
-    );
+    // const contextualOql = FilterUtils.objectToOQL(
+    //   this.performanceViewSettings.contextualFilters,
+    //   undefined,
+    //   ATTRIBUTES_REMOVAL_FUNCTION
+    // );
     const selectedTimeRange = this.context.getSelectedTimeRange();
     return new OQLBuilder()
       .open('and')
       .append(`(begin < ${Math.trunc(selectedTimeRange.to)} and begin > ${Math.trunc(selectedTimeRange.from)})`)
       .append(filtersOql)
-      .append(contextualOql)
       .build();
+  }
+
+  ngOnDestroy(): void {
+    this.emitFilterChange$.complete();
   }
 }

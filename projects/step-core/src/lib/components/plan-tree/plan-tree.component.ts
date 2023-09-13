@@ -1,7 +1,22 @@
-import { Component, ElementRef, forwardRef, Input, Optional, ViewChild, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  forwardRef,
+  inject,
+  Input,
+  Optional,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { map, Observable, of } from 'rxjs';
 import { AbstractArtefact } from '../../client/generated';
-import { ArtefactTreeNode, TreeAction, TreeActionsService, TreeStateService } from '../../modules/tree/tree.module';
+import {
+  ArtefactTreeNode,
+  TreeAction,
+  TreeActionsService,
+  TreeComponent,
+  TreeStateService,
+} from '../../modules/tree/tree.module';
 import { PlanArtefactResolverService } from '../../services/plan-artefact-resolver.service';
 import { PlanEditorService } from '../../services/plan-editor.service';
 import { PlanInteractiveSessionService } from '../../services/plan-interactive-session.service';
@@ -20,29 +35,32 @@ import { PlanTreeAction } from '../../shared/plan-tree-action.enum';
   ],
 })
 export class PlanTreeComponent implements TreeActionsService {
+  private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
+  private _planArtefactResolver? = inject(PlanArtefactResolverService, { optional: true });
+  readonly _planEditService = inject(PlanEditorService);
+  readonly _planInteractiveSession? = inject(PlanInteractiveSessionService, { optional: true });
+
   readonly selectedArtefact$ = this._treeState.selectedNode$.pipe(map((node) => node?.originalArtefact));
   @Input() isReadonly: boolean = false;
 
   @ViewChild('area') splitAreaElementRef?: ElementRef<HTMLElement>;
 
-  private actions: TreeAction[] = [
-    { id: PlanTreeAction.rename, label: 'Rename (F2)' },
-    { id: PlanTreeAction.move_up, label: 'Move Up (Ctrl + ⬆️)' },
-    { id: PlanTreeAction.move_down, label: 'Move Down (Ctrl + ⬇️)' },
-    { id: PlanTreeAction.copy, label: 'Copy (Ctrl + C)' },
-    { id: PlanTreeAction.paste, label: 'Paste (Ctrl + V)' },
-    { id: PlanTreeAction.delete, label: 'Delete (Del)' },
-    { id: PlanTreeAction.open, label: 'Open (Ctrl + O)' },
-    { id: PlanTreeAction.enable, label: 'Enable (Ctrl + E)' },
-    { id: PlanTreeAction.disable, label: 'Disable (Ctrl + E)' },
-  ];
+  @ViewChild(TreeComponent) tree?: TreeComponent<ArtefactTreeNode>;
 
-  constructor(
-    private _treeState: TreeStateService<AbstractArtefact, ArtefactTreeNode>,
-    public _planEditService: PlanEditorService,
-    @Optional() public _planInteractiveSession?: PlanInteractiveSessionService,
-    @Optional() private _planArtefactResolver?: PlanArtefactResolverService
-  ) {}
+  private actions: TreeAction[] = [
+    { id: PlanTreeAction.OPEN, label: 'Open (Ctrl + O)' },
+    { id: PlanTreeAction.RENAME, label: 'Rename (F2)' },
+    { id: PlanTreeAction.ENABLE, label: 'Enable (Ctrl + E)', hasSeparator: true },
+    { id: PlanTreeAction.DISABLE, label: 'Disable (Ctrl + E)', hasSeparator: true },
+    { id: PlanTreeAction.COPY, label: 'Copy (Ctrl + C)' },
+    { id: PlanTreeAction.PASTE, label: 'Paste (Ctrl + V)' },
+    { id: PlanTreeAction.DUPLICATE, label: 'Duplicate (Ctrl + D)' },
+    { id: PlanTreeAction.DELETE, label: 'Delete (Del)', hasSeparator: true },
+    { id: PlanTreeAction.MOVE_UP, label: 'Move Up (Ctrl + ⬆️)' },
+    { id: PlanTreeAction.MOVE_DOWN, label: 'Move Down (Ctrl + ⬇️)' },
+    { id: PlanTreeAction.MOVE_LEFT, label: 'Move Left (Ctrl + ⬅️)' },
+    { id: PlanTreeAction.MOVE_RIGHT, label: 'Move Right (Ctrl + ➡️)' },
+  ];
 
   getActionsForNode(node: ArtefactTreeNode): Observable<TreeAction[]> {
     const isSkipped = node.isSkipped;
@@ -54,17 +72,17 @@ export class PlanTreeComponent implements TreeActionsService {
             let disabled = false;
             if (this.isReadonly) {
               disabled = true;
-            } else if (action.id === PlanTreeAction.open) {
+            } else if (action.id === PlanTreeAction.OPEN) {
               disabled = !this.canOpenArtefact(node.originalArtefact);
             }
             return { ...action, disabled };
           })
           .filter((action) => {
-            if (action.id === PlanTreeAction.disable && isSkipped) {
+            if (action.id === PlanTreeAction.DISABLE && isSkipped) {
               return false;
             }
 
-            if (action.id === PlanTreeAction.enable && !isSkipped) {
+            if (action.id === PlanTreeAction.ENABLE && !isSkipped) {
               return false;
             }
 
@@ -72,6 +90,18 @@ export class PlanTreeComponent implements TreeActionsService {
           })
       )
     );
+  }
+
+  openTreeMenu(event: MouseEvent, nodeId: string): void {
+    if (!this.tree) {
+      return;
+    }
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    this.tree.openContextMenu({
+      event,
+      nodeId,
+    });
   }
 
   hasActionsForNode(node: ArtefactTreeNode): boolean {
@@ -89,29 +119,38 @@ export class PlanTreeComponent implements TreeActionsService {
   proceedAction(actionId: string, node?: ArtefactTreeNode): void {
     const artefact = node?.originalArtefact;
     switch (actionId) {
-      case PlanTreeAction.rename:
+      case PlanTreeAction.RENAME:
         this._planEditService.rename(artefact);
         break;
-      case PlanTreeAction.move_up:
+      case PlanTreeAction.MOVE_UP:
         this._planEditService.moveUp(artefact);
         break;
-      case PlanTreeAction.move_down:
+      case PlanTreeAction.MOVE_DOWN:
         this._planEditService.moveDown(artefact);
         break;
-      case PlanTreeAction.copy:
+      case PlanTreeAction.MOVE_LEFT:
+        this._planEditService.moveOut(artefact);
+        break;
+      case PlanTreeAction.MOVE_RIGHT:
+        this._planEditService.moveInPrevSibling(artefact);
+        break;
+      case PlanTreeAction.COPY:
         this._planEditService.copy(artefact);
         break;
-      case PlanTreeAction.paste:
+      case PlanTreeAction.PASTE:
         this._planEditService.paste(artefact);
         break;
-      case PlanTreeAction.delete:
+      case PlanTreeAction.DUPLICATE:
+        this._planEditService.duplicate(artefact);
+        break;
+      case PlanTreeAction.DELETE:
         this._planEditService.delete(artefact);
         break;
-      case PlanTreeAction.open:
+      case PlanTreeAction.OPEN:
         this._planArtefactResolver?.openArtefact(artefact);
         break;
-      case PlanTreeAction.disable:
-      case PlanTreeAction.enable:
+      case PlanTreeAction.DISABLE:
+      case PlanTreeAction.ENABLE:
         this._planEditService?.toggleSkip(artefact);
         break;
       default:
