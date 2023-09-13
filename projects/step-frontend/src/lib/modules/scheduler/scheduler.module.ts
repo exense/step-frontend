@@ -3,11 +3,11 @@ import {
   CustomCellRegistryService,
   EntityRegistry,
   SchedulerActionsService,
+  SchedulerTaskLinkComponent,
   StepCoreModule,
   ViewRegistryService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
-import { SchedulerTaskLinkComponent } from './components/scheduler-task-link/scheduler-task-link.component';
 import './components/scheduler-task-selection/scheduler-task-selection.component';
 import { SchedulerTaskSelectionComponent } from './components/scheduler-task-selection/scheduler-task-selection.component';
 import { ScheduledTaskListComponent } from './components/scheduled-task-list/scheduled-task-list.component';
@@ -17,12 +17,7 @@ import { ScheduledTaskLogicService } from './services/scheduled-task-logic.servi
 
 @NgModule({
   imports: [StepCoreModule, StepCommonModule],
-  declarations: [
-    ScheduledTaskListComponent,
-    SchedulerTaskLinkComponent,
-    SchedulerTaskSelectionComponent,
-    SchedulerConfigurationComponent,
-  ],
+  declarations: [ScheduledTaskListComponent, SchedulerTaskSelectionComponent, SchedulerConfigurationComponent],
   exports: [ScheduledTaskListComponent, SchedulerTaskSelectionComponent, SchedulerConfigurationComponent],
   providers: [
     {

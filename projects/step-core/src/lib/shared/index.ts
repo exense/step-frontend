@@ -20,3 +20,4 @@ export * from './artefact-context';
 export * from './function-type-script-options.token';
 export * from './higher-order-validator';
 export * from './dynamic-value-validators-factory';
+export * from './link-display-type.enum';

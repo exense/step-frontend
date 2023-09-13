@@ -7,6 +7,12 @@ a {
   margin-right: 1rem;
 }
 
+.link-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .nav-to-plan-icon {
   transform: scale(0.7);
   margin-bottom: 6px;

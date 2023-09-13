@@ -76,6 +76,7 @@ import { FunctionActionsImplService } from './services/function-actions-impl.ser
 import { GenericFunctionListComponent } from './components/generic-function-list/generic-function-list.component';
 import { MyAccountButtonComponent } from './components/my-account-button/my-account-button.component';
 import { SelectTaskComponent } from './components/select-task/select-task.component';
+import { SchedulerTaskLinkComponent } from './components/scheduler-task-link/scheduler-task-link.component';
 
 @NgModule({
   declarations: [
@@ -86,6 +87,7 @@ import { SelectTaskComponent } from './components/select-task/select-task.compon
     TooltipImmediateCloseDirective,
     ReportNodeStatusComponent,
     PlanLinkComponent,
+    SchedulerTaskLinkComponent,
     PlanNamePipe,
     IsUsedByListComponent,
     IsUsedByModalComponent,
@@ -180,6 +182,7 @@ import { SelectTaskComponent } from './components/select-task/select-task.compon
     AngularSplitModule,
     ReportNodeStatusComponent,
     PlanLinkComponent,
+    SchedulerTaskLinkComponent,
     PlanNamePipe,
     IsUsedByModalComponent,
     SelectPlanComponent,
@@ -279,7 +282,8 @@ export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by
 export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
 export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
-export { PlanLinkComponent } from './components/plan-link/plan-link.component';
+export * from './components/plan-link/plan-link.component';
+export * from './components/scheduler-task-link/scheduler-task-link.component';
 export { PlanLinkDialogService } from './components/plan-link/plan-link-dialog.service';
 export { PlanNameComponent } from './components/plan-name/plan-name.component';
 export * from './components/plan-tree/plan-tree.component';
@@ -351,6 +355,7 @@ export * from './services/link-processor.service';
 export * from './services/menu-items-override-config.service';
 export * from './services/plan-artefact-resolver.service';
 export * from './services/plan-by-id-cache.service';
+export * from './services/task-by-id-cache.service';
 export { PlanDialogsService } from './services/plan-dialogs.service';
 export * from './services/plan-editor.service';
 export * from './services/plan-interactive-session.service';
