@@ -6,6 +6,7 @@ export enum PlanTreeAction {
   MOVE_RIGHT = 'move_right',
   COPY = 'copy',
   PASTE = 'paste',
+  DUPLICATE = 'duplicate',
   DELETE = 'delete',
   OPEN = 'open',
   ENABLE = 'enable',
