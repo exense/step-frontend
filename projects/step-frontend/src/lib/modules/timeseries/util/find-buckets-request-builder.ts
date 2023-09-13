@@ -5,8 +5,8 @@ import { OQLBuilder } from './oql-builder';
 import { FilterUtils } from './filter-utils';
 import { TsFilteringSettings } from '../model/ts-filtering-settings';
 import { TsFilteringMode } from '../model/ts-filtering-mode';
-import { TimeSeriesConfig } from '../time-series.config';
 
+import { TimeSeriesConfig } from '../time-series.config';
 export class FindBucketsRequestBuilder {
   readonly attributesPrefix = 'attributes';
 
