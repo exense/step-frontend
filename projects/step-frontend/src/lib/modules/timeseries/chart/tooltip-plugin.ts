@@ -21,7 +21,7 @@ export interface Anchor {
 export class TooltipPlugin {
   public static getInstance(optionsGetter: () => TsTooltipOptions): uPlot.Plugin {
     let over: any;
-    let bound: any;
+    let bound: Element;
     let bLeft: any;
     let bTop: any;
     let isVisible = false;
@@ -173,7 +173,7 @@ export class TooltipPlugin {
     return div;
   }
 
-  private static getAdjustedBoundaries(element: any) {
+  private static getAdjustedBoundaries(element: Element) {
     const rect = element.getBoundingClientRect();
     let shiftUp = 0; // positive value when need to avoid scroll
 
