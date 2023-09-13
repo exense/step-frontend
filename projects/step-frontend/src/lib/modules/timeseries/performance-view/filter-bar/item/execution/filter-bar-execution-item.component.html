@@ -1,14 +1,14 @@
 <div class="flex flex-column main-container">
   <div *ngFor="let value of values; let i = index" class="item-container">
-    <div class="search-item">
-      <step-report-node-icon *ngIf="value.entity" [node]="value.entity.rootReportNode"></step-report-node-icon>
-      {{ value.entity?.description || value.searchValue }}
+    <div class="search-item" *ngIf="value.entity | castToExecution as execution">
+      <step-report-node-icon *ngIf="execution" [node]="$any(execution).rootReportNode"></step-report-node-icon>
+      {{ (value.entity | castToExecution).description || value.searchValue }}
       <button mat-icon-button title="Remove" class="remove-btn">
         <step-icon (click)="removeSearchValue(i)" name="x"></step-icon>
       </button>
     </div>
     <div class="timestamp" *ngIf="value.entity">
-      {{ value.entity?.startTime | date: DateFormat.date }}
+      {{ (value.entity | castToExecution).startTime | date: DateFormat.date }}
     </div>
   </div>
   <button class="add-btn" mat-flat-button (click)="showExecutionPicker()">

@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { StepCoreModule } from '@exense/step-core';
+import { EntityModule, StepCoreModule } from '@exense/step-core';
 import { TimeSeriesChartComponent } from './chart/time-series-chart.component';
 import { TSRangerComponent } from './ranger/ts-ranger.component';
 import { TableModule } from '@exense/step-core';
@@ -72,6 +72,7 @@ import { FilterBarPlanItemComponent } from './performance-view/filter-bar/item/p
     MatFormFieldModule,
     MatInputModule,
     ReportNodesModule,
+    EntityModule,
   ],
 })
 export class TimeSeriesModule {}

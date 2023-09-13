@@ -6,11 +6,28 @@ import { CustomRegistriesModule } from '../custom-registeries/custom-registries.
 import { SelectEntityOfTypeComponent } from './components/select-entity-of-type/select-entity-of-type.component';
 import { StepBasicsModule } from '../basics/step-basics.module';
 import { EntityLegacyTableWrapperDirective } from './directives/entity-legacy-table-wrapper.directive';
+import { CastEntityToExecutionPipe } from './pipes/cast-entity-to-execution.pipe';
+import { CastEntityToTaskPipe } from './pipes/cast-entity-to-task.pipe';
+import { CastEntityToPlanPipe } from './pipes/cast-entity-to-plan.pipe';
 
 @NgModule({
   imports: [CommonModule, StepMaterialModule, CustomRegistriesModule, StepBasicsModule],
-  declarations: [EntityIconComponent, SelectEntityOfTypeComponent, EntityLegacyTableWrapperDirective],
-  exports: [EntityIconComponent, SelectEntityOfTypeComponent, EntityLegacyTableWrapperDirective],
+  declarations: [
+    EntityIconComponent,
+    SelectEntityOfTypeComponent,
+    EntityLegacyTableWrapperDirective,
+    CastEntityToExecutionPipe,
+    CastEntityToTaskPipe,
+    CastEntityToPlanPipe,
+  ],
+  exports: [
+    EntityIconComponent,
+    SelectEntityOfTypeComponent,
+    EntityLegacyTableWrapperDirective,
+    CastEntityToExecutionPipe,
+    CastEntityToTaskPipe,
+    CastEntityToPlanPipe,
+  ],
 })
 export class EntityModule {}
 

@@ -21,7 +21,7 @@ import { FilterBarItemComponent } from './item/filter-bar-item.component';
 import { FilterBarItemType, TsFilterItem } from './model/ts-filter-item';
 import { TsFilteringSettings } from '../../model/ts-filtering-settings';
 import { TimeSeriesConfig } from '../../time-series.config';
-import { TimeSeriesService } from '@exense/step-core';
+import { Execution, TimeSeriesService } from '@exense/step-core';
 import { OqlVerifyResponse } from '../../model/oql-verify-response';
 import { TsFilteringMode } from '../../model/ts-filtering-mode';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
@@ -219,12 +219,12 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     let min = Number.MAX_VALUE;
     let max = 0;
     item.searchEntities.forEach((entity) => {
-      let execution = entity.entity;
+      const execution = entity.entity as Execution;
       if (execution) {
-        if (min > execution.startTime) {
-          min = execution.startTime;
+        if (min > execution.startTime!) {
+          min = execution.startTime!;
         }
-        if (max < execution.endTime) {
+        if (execution.endTime && max < execution.endTime) {
           max = execution.endTime;
         }
       } else {

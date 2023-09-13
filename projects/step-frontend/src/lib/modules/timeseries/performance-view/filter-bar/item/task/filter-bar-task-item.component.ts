@@ -15,19 +15,19 @@ export class FilterBarTaskItemComponent {
 
   showPicker() {
     this._entityDialogs.selectEntityOfType('tasks', true).subscribe((result) => {
-      this.addSearchExecution(result.item as ExecutiontTaskParameters);
+      this.addSearchTask(result.item as ExecutiontTaskParameters);
     });
   }
 
-  addSearchExecution(task: ExecutiontTaskParameters) {
-    const executionId = task.id!;
+  addSearchTask(task: ExecutiontTaskParameters) {
+    const taskId = task.id!;
     for (let i = 0; i < this.values.length; i++) {
-      if (this.values[i].searchValue === executionId) {
+      if (this.values[i].searchValue === taskId) {
         this.values[i].entity = task;
         return;
       }
     }
-    this.values.push({ searchValue: executionId, entity: task });
+    this.values.push({ searchValue: taskId, entity: task });
   }
 
   removeSearchValue(index: number) {
