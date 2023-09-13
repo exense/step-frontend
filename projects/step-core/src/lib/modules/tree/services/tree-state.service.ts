@@ -518,18 +518,26 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     }
   }
 
-  addChildrenToSelectedNode(...children: T[]): void {
-    const parentId = this.selectedInsertionParentId$.value;
+  insertChildren(parentId: string | undefined, newChildren: T[], insertIndex?: number): void {
     if (!parentId) {
       return;
     }
-
-    const newNodes = children.map((child) => this._treeNodeUtils.convertItem(child));
+    const parent = this.findNodeById(parentId);
+    if (!parent) {
+      return;
+    }
+    const newNodes = newChildren.map((child) => this._treeNodeUtils.convertItem(child));
     if (!this.isPossibleToInsert(parentId, ...newNodes)) {
       return;
     }
 
-    this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, newNodes, 'append');
+    const children = [...(parent.children ?? [])] as N[];
+    if (insertIndex === undefined || insertIndex >= children.length) {
+      this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, newNodes, 'append');
+    } else {
+      children.splice(insertIndex, 0, ...newNodes);
+      this._treeNodeUtils.updateChildren(this.originalRoot!, parentId, children, 'replace');
+    }
 
     this.refresh();
 
@@ -539,6 +547,11 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
     const lastChild = newNodes[newNodes.length - 1];
     this.selectedNodeIds$.next([lastChild.id!]);
+  }
+
+  addChildrenToSelectedNode(...children: T[]): void {
+    const parentId = this.selectedInsertionParentId$.value;
+    this.insertChildren(parentId, children);
   }
 
   removeSelectedNodes(): void {
