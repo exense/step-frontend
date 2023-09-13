@@ -265,8 +265,14 @@ export class PlanEditorBaseComponent
     }
   }
 
-  execute(): void {
-    const artefactIds = this._treeState.getSelectedNodes().map((node) => node.id!);
+  execute(nodeId?: string): void {
+    let artefactIds: string[];
+    if (nodeId) {
+      this._treeState.selectNodeById(nodeId);
+      artefactIds = [nodeId];
+    } else {
+      artefactIds = this._treeState.getSelectedNodes().map((node) => node.id!);
+    }
 
     this._interactiveSession.execute(this.id!, artefactIds).subscribe(() => {
       if (this.keywords) {

@@ -36,6 +36,12 @@ export class PlanEditorKeyHandlerDirective {
         this._planEditorService.moveInNextSibling();
         return;
       }
+
+      if (this.checkKey(event, true, ['v', 'V'], 'plan-write')) {
+        event.preventDefault();
+        this._planEditorService.pasteAfter();
+        return;
+      }
     }
 
     if (isCtrl) {
@@ -90,6 +96,12 @@ export class PlanEditorKeyHandlerDirective {
       if (this.checkKey(event, true, 'e', 'plan-write')) {
         event.preventDefault();
         this._planEditorService.toggleSkip();
+        return;
+      }
+
+      if (this.checkKey(event, true, 'd', 'plan-write')) {
+        event.preventDefault();
+        this._planEditorService.duplicate();
         return;
       }
 

@@ -16,6 +16,7 @@ import { IsNodeSelectedPipe } from './pipes/is-node-selected.pipe';
 import { IsRootNodePipe } from './pipes/is-root-node.pipe';
 import { TreeNodeActionsPipe } from './pipes/tree-node-actions.pipe';
 import { IsNodeSelectedForInsertPipe } from './pipes/is-node-selected-for-insert.pipe';
+import { TreeNodeTemplateDirective } from './directives/tree-node-template.directive';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { IsNodeSelectedForInsertPipe } from './pipes/is-node-selected-for-insert
     TreeNodeComponent,
     ArrayOfSizePipe,
     IsNodeSelectedForInsertPipe,
+    TreeNodeTemplateDirective,
   ],
   imports: [
     CommonModule,
@@ -39,11 +41,12 @@ import { IsNodeSelectedForInsertPipe } from './pipes/is-node-selected-for-insert
     DragDropModule,
     ReactiveFormsModule,
   ],
-  exports: [TreeComponent],
+  exports: [TreeComponent, TreeNodeTemplateDirective],
 })
 export class TreeModule {}
 
 export * from './components/tree/tree.component';
+export * from './directives/tree-node-template.directive';
 export * from './services/tree-actions.service';
 export * from './services/tree-node-utils.service';
 export * from './services/tree-state.service';
