@@ -5,6 +5,7 @@ import { OQLBuilder } from './oql-builder';
 import { FilterUtils } from './filter-utils';
 import { TsFilteringSettings } from '../model/ts-filtering-settings';
 import { TsFilteringMode } from '../model/ts-filtering-mode';
+import { TimeSeriesConfig } from '../time-series.config';
 
 export class FindBucketsRequestBuilder {
   readonly attributesPrefix = 'attributes';
@@ -15,6 +16,7 @@ export class FindBucketsRequestBuilder {
   private groupDimensions?: string[];
   private percentiles?: number[];
   private numberOfBuckets?: number;
+  private intervalSize?: number; // in ms
   private filteringSettings?: TsFilteringSettings;
 
   /**
@@ -32,6 +34,7 @@ export class FindBucketsRequestBuilder {
       this.groupDimensions = builder.groupDimensions ? JSON.parse(JSON.stringify(builder.groupDimensions)) : [];
       this.percentiles = builder.percentiles ? JSON.parse(JSON.stringify(builder.percentiles)) : [];
       this.numberOfBuckets = builder.numberOfBuckets;
+      this.intervalSize = builder.intervalSize;
       this.filteringSettings = builder.filteringSettings;
       this.customAttributes = builder.customAttributes;
     }
@@ -43,6 +46,19 @@ export class FindBucketsRequestBuilder {
 
   withNumberOfBuckets(numberOfBuckets: number) {
     this.numberOfBuckets = numberOfBuckets;
+    return this;
+  }
+
+  /**
+   * If intervalSize is 0, the resolution will be siwtched to the default number of buckets
+   * @param intervalSize
+   */
+  withIntervalSize(intervalSize: number) {
+    if (!intervalSize) {
+      this.intervalSize = intervalSize;
+    } else {
+      this.numberOfBuckets = TimeSeriesConfig.MAX_BUCKETS_IN_CHART;
+    }
     return this;
   }
 
@@ -124,6 +140,7 @@ export class FindBucketsRequestBuilder {
       percentiles: this.percentiles,
       groupDimensions: this.groupDimensions,
       numberOfBuckets: this.numberOfBuckets,
+      intervalSize: this.intervalSize,
     };
   }
 }

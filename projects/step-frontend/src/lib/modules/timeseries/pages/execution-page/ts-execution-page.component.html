@@ -8,6 +8,7 @@
     </button>
   </div>
   <mat-menu #menu="matMenu">
+    <step-ts-resolution-picker (onResolutionChange)="handleResolutionChange($event)"></step-ts-resolution-picker>
     <button mat-menu-item (click)="toggleCompareMode()">
       <step-icon name="bar-chart-2" [class.active]="compareModeEnabled"></step-icon>
       {{ compareModeEnabled ? 'Disable Compare Mode' : 'Enable Compare Mode' }}
@@ -16,6 +17,9 @@
       <step-icon name="download"></step-icon>
       <span>Export Raw Measurements</span>
     </button>
+  </mat-menu>
+  <mat-menu #resolutionsMenu="matMenu">
+    <button mat-menu-item></button>
   </mat-menu>
   <step-timeseries-dashboard #dashboard *ngIf="dashboardSettings" [settings]="dashboardSettings">
   </step-timeseries-dashboard>

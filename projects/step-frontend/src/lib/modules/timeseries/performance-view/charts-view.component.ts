@@ -150,6 +150,12 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
         this.disableCompareMode();
       }
     });
+    this.context.onChartsResolutionChange().subscribe(() => {
+      this.createAllBaseCharts();
+      if (this.compareModeEnabled) {
+        this.createAllCompareCharts(this.compareModeContext!);
+      }
+    });
 
     this.createAllBaseCharts();
   }
@@ -301,7 +307,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       .withRange(settings.timeRange)
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
       .withFilteringSettings(this.context.getFilteringSettings())
-      .withNumberOfBuckets(TimeSeriesConfig.MAX_BUCKETS_IN_CHART);
+      .withIntervalSize(this.context.getChartsResolution());
   }
 
   private createAllBaseCharts() {

@@ -1,5 +1,6 @@
 import { TimeRangePickerSelection } from './time-selection/time-range-picker-selection';
 import { RangeSelectionType } from './time-selection/model/range-selection-type';
+import { ResolutionPickerOption } from './components/resolution-picker/resolution-picker-option';
 
 export class TimeSeriesConfig {
   public static readonly MAX_BUCKETS_IN_CHART = 100;
@@ -16,6 +17,19 @@ export class TimeSeriesConfig {
   static readonly METRIC_TYPE_SAMPLER = 'sampler'; // this is for thread groups measurements
   static readonly THREAD_GROUP_FILTER_FIELDS = ['eId', 'planId', 'taskId'];
   static readonly RANGER_FILTER_FIELDS = ['eId', 'planId', 'taskId'];
+
+  static readonly DEFAULT_RESOLUTION_OPTIONS: ResolutionPickerOption[] = [
+    { label: '1 second', valueMs: 1000 },
+    { label: '30 seconds', valueMs: 1000 },
+    { label: '1 minute', valueMs: 1000 },
+    { label: '15 minutes', valueMs: 1000 },
+    { label: '30 minutes', valueMs: 1000 },
+    { label: '1 hour', valueMs: 1000 },
+    { label: '12 hours', valueMs: 1000 },
+    { label: '1 day', valueMs: 1000 },
+    { label: '1 week', valueMs: 1000 },
+    { label: 'Auto', valueMs: 0 },
+  ];
 
   static readonly AUTO_REFRESH_INTERVALS: RefreshInterval[] = [
     { label: '5 Sec', value: 5000 },

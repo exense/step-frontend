@@ -75,6 +75,10 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
     });
   }
 
+  handleResolutionChange(resolution: number) {
+    this.dashboard.setChartsResolution(resolution);
+  }
+
   onTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
     this.dashboard.updateFullRange(
