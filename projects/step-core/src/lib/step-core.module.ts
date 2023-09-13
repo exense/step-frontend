@@ -72,7 +72,6 @@ import { ResourceInputModule } from './modules/resource-input/resource-input.mod
 import { ProjectNamePipe } from './pipes/project-name.pipe';
 import { FunctionActionsService, KeywordsCommonModule } from './modules/keywords-common/keywords-common.module';
 import { FunctionActionsImplService } from './services/function-actions-impl.service';
-import { GenericFunctionListComponent } from './components/generic-function-list/generic-function-list.component';
 import { MyAccountButtonComponent } from './components/my-account-button/my-account-button.component';
 
 @NgModule({
@@ -128,7 +127,6 @@ import { MyAccountButtonComponent } from './components/my-account-button/my-acco
     ArtefactDetailsComponent,
     WaitingArtefactsAdvancedComponent,
     ProjectNamePipe,
-    GenericFunctionListComponent,
     MyAccountButtonComponent,
   ],
   imports: [
@@ -219,7 +217,6 @@ import { MyAccountButtonComponent } from './components/my-account-button/my-acco
     ResourceInputModule,
     ProjectNamePipe,
     KeywordsCommonModule,
-    GenericFunctionListComponent,
     MyAccountButtonComponent,
   ],
   providers: [
@@ -295,7 +292,6 @@ export * from './components/entity-column-container/entity-column-container.comp
 export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 export * from './components/artefact-details/artefact-details.component';
-export * from './components/generic-function-list/generic-function-list.component';
 export * from './decorators/plugin';
 export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
