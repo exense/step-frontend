@@ -153,6 +153,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   private updateBaseCharts(showLoading = false) {
+    console.log('updating base charts');
     this.updateBaseChartsSubscription?.unsubscribe();
     let updateCharts$ = this.chartsView.updateBaseCharts({
       updateRanger: true,
@@ -201,10 +202,10 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.context.updateActiveFilters(filters);
   }
 
-  handleTimeRangeChange(selection: TimeRangePickerSelection) {
-    this.timeRangeSelection = selection;
-    let newTimeRange: TSTimeRange = this.calculateTimeRange(selection);
-    this.updateFullRange(newTimeRange);
+  handleTimeRangeChange(params: { selection: TimeRangePickerSelection; triggerRefresh: boolean }) {
+    this.timeRangeSelection = params.selection;
+    let newTimeRange: TSTimeRange = this.calculateTimeRange(params.selection);
+    this.updateFullRange(newTimeRange, params.triggerRefresh);
   }
 
   private calculateTimeRange(selection: TimeRangePickerSelection): TSTimeRange {
@@ -221,9 +222,12 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     return newTimeRange;
   }
 
-  handleCompareTimeRangeChange(selection: TimeRangePickerSelection) {
-    this.compareModeActiveRangeOption = selection;
-    this.updateCompareChartsFullRange(TimeSeriesUtils.convertSelectionToTimeRange(selection));
+  handleCompareTimeRangeChange(params: { selection: TimeRangePickerSelection; triggerRefresh: boolean }) {
+    this.compareModeActiveRangeOption = params.selection;
+    this.updateCompareChartsFullRange(
+      TimeSeriesUtils.convertSelectionToTimeRange(params.selection),
+      params.triggerRefresh
+    );
   }
 
   setRanges(fullRange: TSTimeRange, selection?: TSTimeRange) {
@@ -272,30 +276,34 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
    * This is a force refresh (instantly triggered).
    * The selection will be set to full selection.
    */
-  updateFullRange(range: TSTimeRange): void {
+  updateFullRange(range: TSTimeRange, forceRefresh = true): void {
     this.updateBaseChartsSubscription?.unsubscribe(); // end current execution
     this.context.updateFullRange(range, false);
     this.context.updateSelectedRange(range, false);
-    const updateCharts$ = this.chartsView.updateBaseCharts({
-      updateRanger: true,
-      updateCharts: true,
-      showLoadingBar: true,
-    });
-    let refreshRanger$ = this.filterBar?.timeSelection?.refreshRanger();
-    this.updateBaseChartsSubscription = forkJoin([updateCharts$, refreshRanger$]).subscribe();
+    if (forceRefresh) {
+      const updateCharts$ = this.chartsView.updateBaseCharts({
+        updateRanger: true,
+        updateCharts: true,
+        showLoadingBar: true,
+      });
+      let refreshRanger$ = this.filterBar?.timeSelection?.refreshRanger();
+      this.updateBaseChartsSubscription = forkJoin([updateCharts$, refreshRanger$]).subscribe();
+    }
   }
 
-  updateCompareChartsFullRange(range: TSTimeRange) {
+  updateCompareChartsFullRange(range: TSTimeRange, refreshCharts = true) {
     this.compareChartsSubscription?.unsubscribe(); // end current execution
     this.compareModeContext?.updateFullRange(range, false);
     this.compareModeContext?.updateSelectedRange(range, false);
-    const updateCharts$ = this.chartsView.updateCompareCharts({
-      updateRanger: true,
-      updateCharts: true,
-      showLoadingBar: true,
-    });
-    let refreshRanger$ = this.compareFilterBar?.timeSelection?.refreshRanger();
-    this.compareChartsSubscription = forkJoin([updateCharts$, refreshRanger$]).subscribe();
+    if (refreshCharts) {
+      const updateCharts$ = this.chartsView.updateCompareCharts({
+        updateRanger: true,
+        updateCharts: true,
+        showLoadingBar: true,
+      });
+      let refreshRanger$ = this.compareFilterBar?.timeSelection?.refreshRanger();
+      this.compareChartsSubscription = forkJoin([updateCharts$, refreshRanger$]).subscribe();
+    }
   }
 
   public disableCompareMode(): void {
@@ -341,7 +349,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   private prepareFiltersForCompareMode(): TsFilterItem[] {
-    return this.filterItems.map((i) => ({ ...i, isHidden: false })); // clone the objects
+    return this.filterItems.map((i) => ({ ...JSON.parse(JSON.stringify(i)), isHidden: false })); // deep clone the objects
   }
 
   ngOnDestroy(): void {
