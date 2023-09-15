@@ -16,6 +16,7 @@ export class SelectPlanComponent implements ControlValueAccessor, OnDestroy {
   private _planDialogsService = inject(PlanDialogsService);
 
   @Input() showRequiredMarker?: boolean;
+  @Input() withClearButton?: boolean;
   @Input() label = 'Plan';
 
   private onChange: OnChange = noop;
@@ -59,5 +60,10 @@ export class SelectPlanComponent implements ControlValueAccessor, OnDestroy {
 
   writeValue(obj?: Plan): void {
     this.planValue = obj;
+  }
+
+  protected clear(): void {
+    this.planValue = undefined;
+    this.onChange(this.planValue);
   }
 }
