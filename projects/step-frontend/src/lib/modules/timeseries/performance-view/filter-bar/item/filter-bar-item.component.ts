@@ -41,10 +41,6 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
       throw new Error('Item input is mandatory');
     }
     this.freeTextValues = this.item.freeTextValues || [];
-    if (this.item.type === FilterBarItemType.EXECUTION) {
-      this.item.searchEntities =
-        this.item.freeTextValues?.map((value) => ({ searchValue: value, entity: undefined })) || [];
-    }
   }
 
   onMenuClose(): void {
@@ -125,7 +121,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
       case FilterBarItemType.EXECUTION:
       case FilterBarItemType.PLAN:
       case FilterBarItemType.TASK:
-        const count = this.item.freeTextValues?.length;
+        const count = this.item.searchEntities?.length;
         formattedValue = count ? (count > 1 ? `${count} items` : `1 item`) : '-';
         break;
       case FilterBarItemType.FREE_TEXT:

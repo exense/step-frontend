@@ -89,13 +89,20 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     activeFilters: TsFilterItem[]
   ) {
     const contextualFilters = Object.keys(contextualParams).map((key) => {
+      const fieldType = this.getFilterFieldType(key);
+      const isEntityFilter =
+        fieldType === FilterBarItemType.PLAN ||
+        fieldType === FilterBarItemType.TASK ||
+        fieldType === FilterBarItemType.EXECUTION;
+      const searchValue = contextualParams[key];
       return {
         isHidden: !this.settings.showContextualFilters,
         removable: true,
         label: this.getFilterFieldLabel(key),
-        type: this.getFilterFieldType(key),
+        type: fieldType,
         attributeName: key,
-        freeTextValues: [contextualParams[key]],
+        freeTextValues: fieldType === FilterBarItemType.FREE_TEXT ? [searchValue] : [],
+        searchEntities: isEntityFilter ? [{ searchValue: searchValue }] : [],
         isLocked: false,
         exactMatch: true,
       } as TsFilterItem;
@@ -123,6 +130,10 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     switch (attribute) {
       case 'eId':
         return 'Execution';
+      case 'taskId':
+        return 'Task';
+      case 'plan':
+        return 'Plan';
       default:
         return attribute;
     }
@@ -132,6 +143,10 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     switch (attribute) {
       case 'eId':
         return FilterBarItemType.EXECUTION;
+      case 'taskId':
+        return FilterBarItemType.TASK;
+      case 'planId':
+        return FilterBarItemType.PLAN;
       default:
         return FilterBarItemType.FREE_TEXT;
     }
@@ -296,7 +311,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       timeRange: timeRange,
       id: new Date().getTime().toString(),
       grouping: this.context.getGroupDimensions(),
-      filters: this.compareModeFilterOptions,
+      filters: this.compareModeFilterItems,
       keywordsContext: this.context.keywordsContext, // share the same keywords context and colors
     });
     this.compareModeActiveRangeOption = { type: RangeSelectionType.ABSOLUTE, absoluteSelection: timeRange };

@@ -91,13 +91,13 @@ export class FindBucketsRequestBuilder {
     }
     let customAttributesOql = '';
     let filterItems = this.filteringSettings.filterItems;
+
     if (this.filterAttributesMask && this.filterAttributesMask.length > 0) {
       filterItems = filterItems.filter((item) => this.filterAttributesMask?.includes(item.attributeName));
     }
-
     const hiddenFilters = filterItems.filter(FilterUtils.filterItemIsValid).filter((item) => item.isHidden);
     const customFilters = filterItems.filter(FilterUtils.filterItemIsValid).filter((item) => !item.isHidden);
-
+    console.log(hiddenFilters);
     if (Object.keys(this.customAttributes).length > 0) {
       customAttributesOql = FilterUtils.objectToOQL(this.customAttributes, this.attributesPrefix);
     }

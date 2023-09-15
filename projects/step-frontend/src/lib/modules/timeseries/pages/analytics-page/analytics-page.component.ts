@@ -120,7 +120,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
         exactMatch: true,
       },
       {
-        label: 'Plan Id',
+        label: 'Plan',
         attributeName: 'planId',
         type: FilterBarItemType.PLAN,
         isLocked: true,

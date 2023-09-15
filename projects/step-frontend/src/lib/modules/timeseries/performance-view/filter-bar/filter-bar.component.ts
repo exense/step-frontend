@@ -203,8 +203,8 @@ export class FilterBarComponent implements OnInit, OnDestroy {
       this.removeFilterItem(index);
       return;
     }
-    if (item.type === FilterBarItemType.EXECUTION && item.updateTimeSelectionOnFilterChange) {
-      // calculate the new time range
+    if (item.updateTimeSelectionOnFilterChange && item.searchEntities.length > 0) {
+      // calculate the new time range. if all the entities were deleted, keep the last range.
       const newRange = this.getExecutionsTimeRange(item);
       this.activeTimeRange = { type: RangeSelectionType.ABSOLUTE, absoluteSelection: newRange };
 

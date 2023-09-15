@@ -6,7 +6,8 @@ export class FilterUtils {
       (item.freeTextValues && item.freeTextValues.length > 0) ||
       item.textValues?.some((v) => v.isSelected) ||
       item.min != undefined ||
-      item.max != undefined
+      item.max != undefined ||
+      item.searchEntities?.length > 0
     );
   }
 
@@ -53,13 +54,21 @@ export class FilterUtils {
             .join(' or ');
           break;
         case FilterBarItemType.FREE_TEXT:
-        case FilterBarItemType.EXECUTION:
-        case FilterBarItemType.PLAN:
-        case FilterBarItemType.TASK:
           clause = item.freeTextValues
             ?.map((value) => {
               let regexMatch = `${finalAttributeName} ~ ".*${value}.*"`;
               const equalityMatch = `${finalAttributeName} = ${value}`;
+              return item.exactMatch ? equalityMatch : regexMatch; // we need exact match for indexes efficiency
+            })
+            .join(' or ');
+          break;
+        case FilterBarItemType.EXECUTION:
+        case FilterBarItemType.PLAN:
+        case FilterBarItemType.TASK:
+          clause = item.searchEntities
+            ?.map((value) => {
+              let regexMatch = `${finalAttributeName} ~ ".*${value.searchValue}.*"`;
+              const equalityMatch = `${finalAttributeName} = ${value.searchValue}`;
               return item.exactMatch ? equalityMatch : regexMatch; // we need exact match for indexes efficiency
             })
             .join(' or ');
