@@ -297,7 +297,6 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   }
 
   private prepareFindRequestBuilder(settings: PerformanceViewSettings): FindBucketsRequestBuilder {
-    console.log(this.context.getFilteringSettings());
     return new FindBucketsRequestBuilder()
       .withRange(settings.timeRange)
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
@@ -397,7 +396,6 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     }
 
     const requestBuilder = compareChart ? this.compareRequestBuilder : this.findRequestBuilder;
-    console.log('requestbuilder', requestBuilder);
     const request = requestBuilder
       .clone()
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_SAMPLER)
@@ -511,7 +509,6 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   }
 
   private createCompareRequest(context: TimeSeriesContext): FindBucketsRequestBuilder {
-    console.log(context.getFilteringSettings());
     return new FindBucketsRequestBuilder()
       .withRange(context.getFullTimeRange())
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
