@@ -8,6 +8,7 @@ import { ParametersKeyComponent } from './components/parameters-key/parameters-k
 import { ParametersListComponent } from './components/parameters-list/parameters-list.component';
 import { ParameterLastModificationComponent } from './components/parameter-last-modification/parameter-last-modification.component';
 import { ParameterEditDialogComponent } from './components/parameter-edit-dialog/parameter-edit-dialog.component';
+import { ParametersBulkOperationsRegisterService } from './services/parameters-bulk-operations-register.service';
 
 @NgModule({
   imports: [StepCoreModule, StepCommonModule],
@@ -22,11 +23,16 @@ import { ParameterEditDialogComponent } from './components/parameter-edit-dialog
   ],
 })
 export class ParameterModule {
-  constructor(_entityRegistry: EntityRegistry, _cellRegister: CustomCellRegistryService) {
+  constructor(
+    _entityRegistry: EntityRegistry,
+    _cellRegister: CustomCellRegistryService,
+    _parametersRegister: ParametersBulkOperationsRegisterService
+  ) {
     _entityRegistry.register('parameters', 'Parameters', {
       icon: 'list',
       component: ParameterSelectionComponent,
     });
+    _parametersRegister.register();
 
     _cellRegister.registerCell('parameterLastModification', ParameterLastModificationComponent);
     _cellRegister.registerCell('parameterKey', ParametersKeyComponent);

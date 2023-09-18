@@ -11,6 +11,7 @@ import { FunctionTypeLabelPipe } from './pipes/function-type-label.pipe';
 import { FunctionSelectionTableComponent } from './components/function-selection-table/function-selection-table.component';
 import { EntityModule, EntityRegistry } from '../entity/entity.module';
 import { CustomRegistriesModule } from '../custom-registeries/custom-registries.module';
+import { FunctionBulkOperationsRegisterService } from './injectables/function-bulk-operations-register.service';
 
 @NgModule({
   declarations: [
@@ -38,8 +39,9 @@ import { CustomRegistriesModule } from '../custom-registeries/custom-registries.
   ],
 })
 export class KeywordsCommonModule {
-  constructor(private _entityRegistry: EntityRegistry) {
+  constructor(private _entityRegistry: EntityRegistry, private _bulkRegister: FunctionBulkOperationsRegisterService) {
     this.registerEntities();
+    this._bulkRegister.register();
   }
 
   private registerEntities(): void {
