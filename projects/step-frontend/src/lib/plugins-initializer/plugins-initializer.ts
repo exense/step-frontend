@@ -33,6 +33,7 @@ const IGNORE_PLUGINS: ReadonlyArray<string> = [
   'compareEditor',
   'silkPerformer',
   'EnterpriseArtefacts',
+  'wizard',
   'messages',
 ];
 

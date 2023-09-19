@@ -1,0 +1,7 @@
+<ng-content> </ng-content>
+<section class="wizard-step-buttons">
+  <section #customButtons [class.without-children]="!customButtons.children.length">
+    <ng-content select="step-wizard-buttons"> </ng-content>
+  </section>
+  <step-wizard-default-buttons *ngIf="!customButtons.children.length"> </step-wizard-default-buttons>
+</section>

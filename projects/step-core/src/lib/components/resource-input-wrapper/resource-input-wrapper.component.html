@@ -1,0 +1,13 @@
+<step-resource-input
+  [label]="label"
+  [stType]="type"
+  [stDirectory]="directory"
+  [withHelpIcon]="!!tooltip"
+  [helpIconTooltip]="tooltip"
+  [stModel]="value"
+  (stModelChange)="onValueChange($event)"
+  (blur)="onBlur()"
+  [isInvalid]="!!_ngControl.invalid"
+  [isTouched]="!!_ngControl.touched"
+>
+</step-resource-input>

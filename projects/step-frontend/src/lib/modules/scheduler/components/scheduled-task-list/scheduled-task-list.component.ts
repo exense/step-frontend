@@ -3,13 +3,13 @@ import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static'
 import {
   AJS_MODULE,
   AutoDeselectStrategy,
-  BulkOperationType,
   ExecutiontTaskParameters,
   selectionCollectionProvider,
   tablePersistenceConfigProvider,
   STORE_ALL,
   ArrayItemLabelValueExtractor,
   FilterConditionFactoryService,
+  AJS_LOCATION,
 } from '@exense/step-core';
 import { ScheduledTaskLogicService } from '../../services/scheduled-task-logic.service';
 import { KeyValue } from '@angular/common';
@@ -27,8 +27,9 @@ type StatusItem = KeyValue<string, string>;
   ],
 })
 export class ScheduledTaskListComponent implements AfterViewInit {
+  readonly _logic = inject(ScheduledTaskLogicService);
+
   isSchedulerEnabled: boolean = false;
-  constructor(public readonly _logic: ScheduledTaskLogicService) {}
 
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
 

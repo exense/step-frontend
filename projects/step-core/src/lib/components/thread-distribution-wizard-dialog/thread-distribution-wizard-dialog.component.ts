@@ -23,23 +23,21 @@ const calculateValues = (value: DistributionFormValue = {}, durationUnits?: KeyV
 
   const realDuration = (duration ?? 0) * (durationUnit ?? 0);
   if (!realDuration || !iterationsPerUnit) {
-    const pacingMs = 0;
-    let pacingDisplay = pacingMs.toString();
+    let pacingDisplay = pacing.toString();
     if (unit) {
       pacingDisplay = `${pacingDisplay} ${unit}`;
     }
-    return { threadsNum, pacing, isCalculationValid, pacingMs, pacingDisplay };
+    return { threadsNum, pacing, isCalculationValid, pacingDisplay };
   }
   threadsNum = Math.ceil((iterations ?? 0) / (iterationsPerUnit! / realDuration!));
   pacing = iterationsPerUnit! / (iterations! / threadsNum);
   isCalculationValid = pacing >= realDuration;
 
-  const pacingMs = pacing * 1000;
   let pacingDisplay = Math.round(pacing / durationUnit!).toString();
   if (unit) {
     pacingDisplay = `${pacingDisplay} ${unit}`;
   }
-  return { threadsNum, pacing, pacingMs, pacingDisplay, isCalculationValid };
+  return { threadsNum, pacing, pacingDisplay, isCalculationValid };
 };
 
 @Component({
@@ -111,10 +109,10 @@ export class ThreadDistributionWizardDialogComponent {
     }
 
     if (artefact.pacing?.dynamic) {
-      const expression = calculatedParams.pacingMs.toString();
+      const expression = calculatedParams.pacing.toString();
       artefact.pacing = { ...artefact.pacing, expression };
     } else {
-      const value = calculatedParams.pacingMs;
+      const value = calculatedParams.pacing;
       artefact.pacing = { ...artefact.pacing, value };
     }
 
