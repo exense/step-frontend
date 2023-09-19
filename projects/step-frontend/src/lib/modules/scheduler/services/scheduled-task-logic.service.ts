@@ -56,6 +56,11 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
     this._schedulerService
       .getExecutionTaskById(scheduledTask.id!)
       .pipe(
+        tap((task) => {
+          // switching task status in GUI immediately, note that this will be overwritten by updateDataSourceAfterChange
+          scheduledTask.active = !task.active;
+          return task;
+        }),
         switchMap((task) =>
           task.active
             ? this._schedulerService.enableExecutionTask(task.id!, false)
