@@ -139,7 +139,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
     const selectedEntity$ = this._entityDialogs.selectEntityOfType('function', true);
     const function$ = selectedEntity$.pipe(
       map((result) => result.item as Keyword),
-      switchMap((f: Keyword) => this._functionApiService.getFunctionById(f.id!))
+      switchMap((keyword) => this._functionApiService.getFunctionById(keyword.id!))
     );
     return function$;
   }
