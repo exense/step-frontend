@@ -20,6 +20,7 @@ import {
   CredentialsService,
   GenerateApiKeyService,
   ApiToken,
+  DialogsService,
 } from '@exense/step-core';
 
 const preferencesToKVPairArray = (preferences?: Preferences): KeyValuePair<string, string>[] => {
@@ -49,6 +50,7 @@ export class MyAccountComponent implements OnInit, OnChanges {
   private _authService = inject(AuthService);
   private _credentialsService = inject(CredentialsService);
   private _generateApiKey = inject(GenerateApiKeyService);
+  private _dialogs = inject(DialogsService);
 
   readonly canChangePassword = !!this._authService.getConf()?.passwordManagement;
   readonly canGenerateApiKey = !!this._authService.getConf()?.authentication;
@@ -108,7 +110,9 @@ export class MyAccountComponent implements OnInit, OnChanges {
   }
 
   revokeAPIToken(id: string) {
-    this._generateApiKey.revoke(id).subscribe(() => this.updateTokens());
+    this._dialogs
+      .showWarning('Revoking will make the API key permanently unusable. Do you want to proceed?')
+      .then(() => this._generateApiKey.revoke(id).subscribe(() => this.updateTokens()));
   }
 }
 

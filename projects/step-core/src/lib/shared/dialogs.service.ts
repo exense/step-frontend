@@ -9,7 +9,6 @@ import { INJECTOR } from '../modules/basics/step-basics.module';
 })
 export abstract class DialogsService {
   abstract showDeleteWarning(i: number, itemName?: string, secondaryText?: string): IPromise<unknown>;
-  abstract showInfo(msg: string): IPromise<unknown>;
   abstract showWarning(msg: string): IPromise<unknown>;
   abstract showErrorMsg(msg: string, callback?: Function): IPromise<unknown>;
   abstract showListOfMsgs(messages: string[]): IPromise<unknown>;
@@ -21,7 +20,5 @@ export abstract class DialogsService {
     template: string,
     functionOnSuccess: (value: string) => void
   ): void;
-  abstract selectEntityType<T>(excludeArray: string[], id: string): IPromise<T>;
   abstract showEntityInAnotherProject(newProjectName?: string): IPromise<unknown>;
-  abstract showAssignmentWarning(msg: string): IPromise<unknown>;
 }

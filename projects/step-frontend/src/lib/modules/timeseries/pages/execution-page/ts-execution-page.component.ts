@@ -104,7 +104,22 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
     const endTime = execution.endTime ? execution.endTime : new Date().getTime();
     let urlParams = TsUtils.getURLParams(window.location.href);
     const timeRangeOptions = TimeSeriesConfig.EXECUTION_PAGE_TIME_SELECTION_OPTIONS;
-    let pageFilters: TsFilterItem[] = [
+    this.dashboardSettings = {
+      contextId: this.executionId,
+      execution: execution,
+      includeThreadGroupChart: true,
+      timeRange: { from: startTime, to: endTime },
+      timeRangeOptions: timeRangeOptions,
+      activeTimeRange: timeRangeOptions[timeRangeOptions.length - 1],
+      contextualFilters: { ...urlParams, eId: this.executionId },
+      showContextualFilters: false,
+      activeFilters: this.createBaseFilters(),
+      filterOptions: this.createBaseFilters(),
+    };
+  }
+
+  private createBaseFilters(): TsFilterItem[] {
+    return [
       {
         label: 'Execution',
         attributeName: 'eId',
@@ -138,18 +153,6 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
         searchEntities: [],
       },
     ];
-    this.dashboardSettings = {
-      contextId: this.executionId,
-      execution: execution,
-      includeThreadGroupChart: true,
-      timeRange: { from: startTime, to: endTime },
-      timeRangeOptions: timeRangeOptions,
-      activeTimeRange: timeRangeOptions[timeRangeOptions.length - 1],
-      contextualFilters: { ...urlParams, eId: this.executionId },
-      showContextualFilters: false,
-      activeFilters: pageFilters,
-      filterOptions: JSON.parse(JSON.stringify(pageFilters)),
-    };
   }
 
   rebuildTimeSeries() {
