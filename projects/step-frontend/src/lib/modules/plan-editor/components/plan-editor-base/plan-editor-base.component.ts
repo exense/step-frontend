@@ -187,16 +187,13 @@ export class PlanEditorBaseComponent
 
     currentVersion$
       .pipe(
-        mergeMap((currentVersion) =>
-          this._restoreDialogsService.showRestoreDialog(currentVersion, versionHistory, permission).pipe(
-            filter((restoreVersion) => restoreVersion !== undefined),
-            mergeMap((restoreVersion) => this._planEditorApi.restorePlanVersion(this.id || plan.id!, restoreVersion)),
-            catchError((error) => {
-              console.error(error);
-              return EMPTY;
-            })
-          )
-        )
+        switchMap((currentVersion) => this._restoreDialogsService.showRestoreDialog(currentVersion, versionHistory, permission)),
+        filter((restoreVersion) => restoreVersion !== undefined),
+        switchMap((restoreVersion) => this._planEditorApi.restorePlanVersion(this.id || plan.id!, restoreVersion)),
+        catchError((error) => {
+            console.error(error);
+            return EMPTY;
+        })
       )
       .subscribe(() => this.loadPlan(this.id || plan.id!));
   }
