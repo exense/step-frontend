@@ -9,7 +9,6 @@ import { NgForm } from '@angular/forms';
 
 interface SessionArtefact extends AbstractArtefact {
   token: DynamicValueString;
-  dockerImage: DynamicValueString;
 }
 
 @Component({
