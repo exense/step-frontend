@@ -51,6 +51,14 @@ $border-radius: 8px;
   $border-color: map.get($config, border-color);
   $error-color: map.get($config, error-color);
 
+  step-label {
+    &[show-required-marker]::after {
+      content: '*';
+      display: inline-block;
+      margin-left: 0.4rem;
+    }
+  }
+
   step-form-field {
     display: flex;
     flex-direction: column;
@@ -94,14 +102,6 @@ $border-radius: 8px;
         line-height: 20px;
         pointer-events: all;
         padding-bottom: 0;
-      }
-    }
-
-    step-label {
-      &[show-required-marker]::after {
-        content: '*';
-        display: inline-block;
-        margin-left: 0.4rem;
       }
     }
 

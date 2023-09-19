@@ -1,6 +1,7 @@
 @mixin menu() {
   .mat-menu-panel {
-    border-radius: 8px;
+    border-radius: 0.8rem;
+    min-height: 3.2rem;
 
     .mat-menu-content:not(:empty) {
       padding-top: 0;

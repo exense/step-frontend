@@ -11,7 +11,7 @@ export const resourceConfigurationDialogFormCreate = (formBuilder: FormBuilder) 
 
   return nonNullable.group({
     name: nonNullable.control<string>('', []),
-    resourceType: nonNullable.control<string>(PredefinedResourceType.ATTACHMENT, [Validators.required]),
+    resourceType: nonNullable.control<string>(PredefinedResourceType.DATA_SOURCE, [Validators.required]),
     content: nonNullable.control<DynamicValueString>(createDynamicValueString(), []),
   });
 };
