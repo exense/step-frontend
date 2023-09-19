@@ -8,6 +8,9 @@ import { StepBasicsModule } from '../basics/step-basics.module';
 import { EntityLegacyTableWrapperDirective } from './directives/entity-legacy-table-wrapper.directive';
 import { EntityMenuComponent } from './components/entity-menu/entity-menu.component';
 import { EntityMenuContentDirective } from './directives/entity-menu-content.directive';
+import { CastEntityToPlanPipe } from './pipes/cast-entity-to-plan.pipe';
+import { CastEntityToTaskPipe } from './pipes/cast-entity-to-task.pipe';
+import { CastEntityToExecutionPipe } from './pipes/cast-entity-to-execution.pipe';
 
 @NgModule({
   imports: [CommonModule, StepMaterialModule, CustomRegistriesModule, StepBasicsModule],
@@ -17,6 +20,9 @@ import { EntityMenuContentDirective } from './directives/entity-menu-content.dir
     EntityLegacyTableWrapperDirective,
     EntityMenuComponent,
     EntityMenuContentDirective,
+    CastEntityToPlanPipe,
+    CastEntityToTaskPipe,
+    CastEntityToExecutionPipe,
   ],
   exports: [
     EntityIconComponent,
@@ -24,6 +30,9 @@ import { EntityMenuContentDirective } from './directives/entity-menu-content.dir
     EntityLegacyTableWrapperDirective,
     EntityMenuComponent,
     EntityMenuContentDirective,
+    CastEntityToPlanPipe,
+    CastEntityToTaskPipe,
+    CastEntityToExecutionPipe,
   ],
 })
 export class EntityModule {}
