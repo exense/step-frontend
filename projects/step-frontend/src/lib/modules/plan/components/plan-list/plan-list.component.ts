@@ -26,6 +26,7 @@ export class PlanListComponent {
   private _planDialogs = inject(PlanDialogsService);
   private _restoreDialogsService = inject(RestoreDialogsService);
   readonly _plansApiService = inject(AugmentedPlansService);
+
   readonly dataSource = this._plansApiService.getPlansTableDataSource();
 
   private updateDataSourceAfterChange = pipe(

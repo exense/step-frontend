@@ -13,7 +13,7 @@
   <ng-content select="[step-modal-window-body]"></ng-content>
 </div>
 
-<div mat-dialog-actions>
+<div mat-dialog-actions *ngIf="!hideButtonsSection">
   <step-btn-group>
     <section #customButtons [class.without-children]="!customButtons.children.length">
       <ng-content select="[step-modal-window-buttons]"></ng-content>

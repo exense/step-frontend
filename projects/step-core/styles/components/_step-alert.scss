@@ -47,5 +47,9 @@
         @include step-alert-colors($colors);
       }
     }
+    &[type='minimalist'] {
+      padding: 0;
+      text-align: justify;
+    }
   }
 }

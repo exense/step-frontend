@@ -4,4 +4,5 @@ export enum AlertType {
   danger = 'danger',
   warning = 'warning',
   info = 'info',
+  minimalist = 'minimalist',
 }
