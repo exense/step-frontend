@@ -1,12 +1,12 @@
 <step-table
+  #table
   [dataSource]="_logic.dataSource"
   matSort
   matSortActive="attributes.name"
   matSortDirection="asc"
   [matSortDisableClear]="true"
 >
-  <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-new'" [availableOperations]="availableBulkOperations">
-  </step-bulk-operations>
+  <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-new'" entity="tasks"> </step-bulk-operations>
   <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
     <step-btn-group>
       <button
@@ -16,7 +16,7 @@
         matTooltip="New task"
         matTooltipPosition="below"
         [disabled]="!('task-write' | hasRight | async)"
-        (click)="_logic.createParameter()"
+        (click)="_logic.createTask()"
       >
         <step-icon name="plus"></step-icon>
       </button>
@@ -77,7 +77,7 @@
           mat-icon-button
           matTooltip="Execute task"
           [disabled]="!('plan-execute' | hasRight | async)"
-          (click)="_logic.executeParameter(element)"
+          (click)="_logic.executeTask(element)"
         >
           <step-icon name="play"></step-icon>
         </button>
@@ -85,7 +85,7 @@
           mat-icon-button
           matTooltip="Edit task"
           [disabled]="!('task-write' | hasRight | async)"
-          (click)="_logic.editParameter(element).subscribe()"
+          (click)="_logic.editTask(element).subscribe()"
         >
           <step-icon name="edit-2"></step-icon>
         </button>
@@ -93,7 +93,7 @@
           mat-icon-button
           matTooltip="Delete task"
           [disabled]="!('task-delete' | hasRight | async)"
-          (click)="_logic.deleteParameter(element)"
+          (click)="_logic.deleteTask(element)"
         >
           <step-icon name="trash-2"></step-icon>
         </button>
@@ -105,7 +105,16 @@
         >
           <step-icon name="trending-up"></step-icon>
         </button>
+        <button
+          *ngIf="entityMenu.hasContent"
+          mat-icon-button
+          [matMenuTriggerFor]="entityMenu.menu!"
+          [matMenuTriggerData]="{ element: element }"
+        >
+          <step-icon name="more-horizontal"></step-icon>
+        </button>
       </step-btn-group>
     </td>
   </ng-container>
 </step-table>
+<step-entity-menu #entityMenu entity="tasks" (entityOperationSuccess)="table.reload()"> </step-entity-menu>

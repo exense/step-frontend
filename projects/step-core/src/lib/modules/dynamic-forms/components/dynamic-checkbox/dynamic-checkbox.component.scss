@@ -1,5 +1,27 @@
 step-dynamic-checkbox {
-  step-form-field.with-tooltip .form-field-content .step-checkbox-container {
-    border-right-style: none;
+  .step-checkbox-container,
+  .step-checkbox-container section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .step-checkbox-container {
+    justify-content: space-between;
+    padding: 0.5rem 0.7rem;
+
+    step-label {
+      font-weight: 500;
+      font-size: 1.4rem;
+      line-height: 2rem;
+    }
+
+    .dynamic-toggle {
+      width: 2rem;
+      height: 2rem;
+      step-icon {
+        line-height: 1;
+      }
+    }
   }
 }

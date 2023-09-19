@@ -30,7 +30,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
   private _dialogs = inject(DialogsService);
   private _exportDialogs = inject(ExportDialogsService);
   private _importDialogs = inject(ImportDialogsService);
-  private _isUsedByDialog = inject(IsUsedByDialogService);
+  protected _isUsedByDialog = inject(IsUsedByDialogService);
   private _entityDialogs = inject(EntityDialogsService);
   private _$location = inject<ILocationService>(AJS_LOCATION);
   private _functionDialogsConfigFactoryService = inject(FunctionDialogsConfigFactoryService);
@@ -90,6 +90,16 @@ export class FunctionActionsImplService implements FunctionActionsService {
 
   openLookUpFunctionDialog(id: string, name: string): void {
     this._isUsedByDialog.displayDialog(`Keyword "${name}" is used by`, 'KEYWORD_ID', id);
+  }
+
+  duplicateFunction(keyword: Keyword): Observable<boolean> {
+    return this.duplicateFunctionById(keyword.id!).pipe(
+      map((result) => !!result),
+      catchError((err) => {
+        console.error(err);
+        return of(false);
+      })
+    );
   }
 
   openExportFunctionDialog(id: string, name: string): Observable<boolean> {
@@ -169,6 +179,10 @@ export class FunctionActionsImplService implements FunctionActionsService {
 
   protected getFunctionById(id: string): Observable<Keyword> {
     return this._functionApiService.getFunctionById(id);
+  }
+
+  protected duplicateFunctionById(id: string): Observable<Keyword> {
+    return this._functionApiService.cloneFunction(id);
   }
 
   private configureFunctionInternal(
