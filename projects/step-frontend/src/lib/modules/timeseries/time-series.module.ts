@@ -33,6 +33,7 @@ import { FilterBarExecutionItemComponent } from './performance-view/filter-bar/i
 import { FilterBarTaskItemComponent } from './performance-view/filter-bar/item/task/filter-bar-task-item.component';
 import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import { FilterBarPlanItemComponent } from './performance-view/filter-bar/item/plan/filter-bar-plan-item.component';
+import { MetricChartComponent } from './metric-chart/metric-chart.component';
 
 @NgModule({
   declarations: [
@@ -57,8 +58,9 @@ import { FilterBarPlanItemComponent } from './performance-view/filter-bar/item/p
     DiscoverAttributeStatsComponent,
     FilterBarExecutionItemComponent,
     FilterBarTaskItemComponent,
+    MetricChartComponent,
   ],
-  exports: [ExecutionPerformanceComponent, AnalyticsPageComponent],
+  exports: [ExecutionPerformanceComponent, AnalyticsPageComponent, MetricChartComponent],
   providers: [{ provide: MatPaginatorIntl, useClass: NoTotalCountPaginator }],
   imports: [
     StepCoreModule,
