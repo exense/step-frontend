@@ -2,7 +2,9 @@ import { AfterViewInit, Component, inject } from '@angular/core';
 import {
   AJS_MODULE,
   AugmentedKeywordPackagesService,
+  AutoDeselectStrategy,
   FunctionPackage,
+  selectionCollectionProvider,
   STORE_ALL,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
@@ -13,7 +15,10 @@ import { FunctionPackageActionsService } from '../../services/function-package-a
   selector: 'step-function-package-list',
   templateUrl: './function-package-list.component.html',
   styleUrls: ['./function-package-list.component.scss'],
-  providers: [tablePersistenceConfigProvider('functionPackageList', STORE_ALL)],
+  providers: [
+    tablePersistenceConfigProvider('functionPackageList', STORE_ALL),
+    selectionCollectionProvider<string, FunctionPackage>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+  ],
 })
 export class FunctionPackageListComponent implements AfterViewInit {
   private _augApi = inject(AugmentedKeywordPackagesService);

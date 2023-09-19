@@ -1,5 +1,10 @@
 <ng-container *ngIf="!isEditMode">
-  {{ node?.name }}
+  <ng-template #defaultNameTemplate>
+    {{ node?.name }}
+  </ng-template>
+  <ng-container *ngIf="templateContainer.treeNodeTemplate?.templateRef as customTemplate; else defaultNameTemplate">
+    <ng-container *ngTemplateOutlet="customTemplate; context: { $implicit: node }"></ng-container>
+  </ng-container>
 </ng-container>
 <step-form-field [class.hidden]="!isEditMode">
   <input #inputElement type="text" (blur)="submitNameChange()" (keydown.enter)="submitNameChange()" />
