@@ -147,6 +147,20 @@ export class PlanEditorService implements PlanEditorStrategy {
     this.strategy.paste(node);
   }
 
+  pasteAfter(node?: AbstractArtefact): void {
+    if (!this.strategy) {
+      return;
+    }
+    this.strategy.pasteAfter(node);
+  }
+
+  duplicate(node?: AbstractArtefact): void {
+    if (!this.strategy) {
+      return;
+    }
+    this.strategy.duplicate(node);
+  }
+
   rename(node?: AbstractArtefact): void {
     if (!this.strategy) {
       return;

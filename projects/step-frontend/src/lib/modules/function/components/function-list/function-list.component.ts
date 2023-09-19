@@ -6,8 +6,6 @@ import {
   AJS_ROOT_SCOPE,
   AugmentedKeywordsService,
   AutoDeselectStrategy,
-  BulkOperationType,
-  BulkOperationsInvokeService,
   Function as KeywordFunction,
   InteractivePlanExecutionService,
   selectionCollectionProvider,
@@ -19,7 +17,6 @@ import {
   RestoreDialogsService,
 } from '@exense/step-core';
 import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
-import { FunctionBulkOperationsInvokeService } from '../../services/function-bulk-operations-invoke.service';
 
 @Component({
   selector: 'step-function-list',
@@ -28,10 +25,6 @@ import { FunctionBulkOperationsInvokeService } from '../../services/function-bul
   providers: [
     tablePersistenceConfigProvider('functionList', STORE_ALL),
     selectionCollectionProvider<string, KeywordFunction>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
-    {
-      provide: BulkOperationsInvokeService,
-      useClass: FunctionBulkOperationsInvokeService,
-    },
   ],
 })
 export class FunctionListComponent implements AfterViewInit {
@@ -45,10 +38,6 @@ export class FunctionListComponent implements AfterViewInit {
   private _location = inject(AJS_LOCATION);
 
   readonly dataSource = this._functionApiService.createFilteredTableDataSource();
-  readonly availableBulkOperations = [
-    { operation: BulkOperationType.delete, permission: 'kw-delete' },
-    { operation: BulkOperationType.duplicate, permission: 'kw-write' },
-  ];
 
   ngAfterViewInit(): void {
     this._functionActions.resolveConfigureLinkIfExits(this._injector);
