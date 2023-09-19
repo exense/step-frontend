@@ -177,13 +177,7 @@ export class PlanEditorBaseComponent
       if (this.id && this.id !== plan.id) {
         // composite keywords need to retrieve the current version
         return this._keywordCallsApi.getFunctionById(this.id).pipe(
-          mergeMap((keyword) => {
-            if (keyword && keyword.customFields && keyword.customFields['versionId']) {
-              return of(keyword.customFields['versionId']);
-            } else {
-              return EMPTY;
-            }
-          })
+          map((keyword) => keyword?.customFields?.['versionId'] ?? undefined)
         );
       } else {
         // we are showing a real plan
