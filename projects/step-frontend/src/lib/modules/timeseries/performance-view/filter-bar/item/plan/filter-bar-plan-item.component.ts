@@ -1,7 +1,6 @@
 import { Component, inject, Input, OnChanges, OnInit } from '@angular/core';
 import { EntitySearchValue } from '../entity-search-value';
 import { DateFormat, EntityDialogsService, Plan } from '@exense/step-core';
-import { EntityObject } from '../../../../../../../../../step-core/src/lib/modules/entity/types/entity-object';
 
 @Component({
   selector: 'step-ts-filter-bar-plan-item',
