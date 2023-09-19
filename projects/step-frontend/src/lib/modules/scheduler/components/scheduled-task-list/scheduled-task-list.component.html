@@ -1,12 +1,12 @@
 <step-table
+  #table
   [dataSource]="_logic.dataSource"
   matSort
   matSortActive="attributes.name"
   matSortDirection="asc"
   [matSortDisableClear]="true"
 >
-  <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-new'" [availableOperations]="availableBulkOperations">
-  </step-bulk-operations>
+  <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-new'" entity="tasks"> </step-bulk-operations>
   <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
     <step-btn-group>
       <button
@@ -105,7 +105,16 @@
         >
           <step-icon name="trending-up"></step-icon>
         </button>
+        <button
+          *ngIf="entityMenu.hasContent"
+          mat-icon-button
+          [matMenuTriggerFor]="entityMenu.menu!"
+          [matMenuTriggerData]="{ element: element }"
+        >
+          <step-icon name="more-horizontal"></step-icon>
+        </button>
       </step-btn-group>
     </td>
   </ng-container>
 </step-table>
+<step-entity-menu #entityMenu entity="tasks" (entityOperationSuccess)="table.reload()"> </step-entity-menu>

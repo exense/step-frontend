@@ -166,3 +166,4 @@ export * from './services/generate-api-key.service';
 export * from './services/editor-resolver.service';
 export * from './shared/logout-cleanup.token';
 export * from './services/is-used-by-dialog';
+export * from './shared/bulk-operation-type.enum';
