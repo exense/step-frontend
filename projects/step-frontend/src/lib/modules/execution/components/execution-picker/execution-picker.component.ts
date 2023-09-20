@@ -3,8 +3,6 @@ import {
   AJS_MODULE,
   AugmentedExecutionsService,
   AutoDeselectStrategy,
-  BulkOperationsInvokeService,
-  BulkOperationType,
   BulkSelectionType,
   DateFormat,
   ExecutiontTaskParameters,
@@ -16,27 +14,14 @@ import {
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { EXECUTION_RESULT, EXECUTION_STATUS } from '../../../_common/shared/status.enum';
 import { of } from 'rxjs';
-import { ExecutionBulkOperationsInvokeService } from '../../services/execution-bulk-operations-invoke.service';
 
 @Component({
   selector: 'step-execution-list',
   templateUrl: './execution-picker.component.html',
   styleUrls: ['./execution-picker.component.scss'],
-  providers: [
-    tablePersistenceConfigProvider('executionList', STORE_ALL),
-    selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
-    {
-      provide: BulkOperationsInvokeService,
-      useClass: ExecutionBulkOperationsInvokeService,
-    },
-  ],
+  providers: [tablePersistenceConfigProvider('executionList', STORE_ALL)],
 })
 export class ExecutionPickerComponent {
-  readonly availableBulkOperations = [
-    { operation: BulkOperationType.delete, permission: 'execution-delete' },
-    { operation: BulkOperationType.restart, permission: 'plan-execute' },
-    { operation: BulkOperationType.stop, permission: 'plan-execute' },
-  ];
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
   readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
   readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
