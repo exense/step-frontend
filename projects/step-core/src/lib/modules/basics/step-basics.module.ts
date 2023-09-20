@@ -32,7 +32,6 @@ import { JsonRawEditorFormattedComponent } from './components/json-raw-editor-fo
 import { LabelAddonDirective } from './directives/label-addon.directive';
 import { TimeInputComponent } from './components/time-input/time-input.component';
 import { ProjectSwitchDialogComponent } from './components/project-switch-dialog/project-switch-dialog.component';
-import { TimeInputComponent } from './components/time-input/time-input.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
