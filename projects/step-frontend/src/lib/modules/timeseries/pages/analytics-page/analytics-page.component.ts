@@ -11,6 +11,7 @@ import { TsUtils } from '../../util/ts-utils';
 import { FilterBarItemType, TsFilterItem } from '../../performance-view/filter-bar/model/ts-filter-item';
 import { range, Subject, takeUntil, timer } from 'rxjs';
 import { TimeSeriesUtils } from '../../time-series-utils';
+import { MetricChartType } from '../../metric-chart/metric-chart-type';
 
 @Component({
   selector: 'step-analytics-page',
@@ -210,6 +211,10 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.terminator$.next();
     this.terminator$.complete();
+  }
+
+  get MetricChartType() {
+    return MetricChartType;
   }
 }
 

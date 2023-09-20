@@ -1,22 +1,2 @@
-<div class="chart-wrapper" (stepElementResize)="resize()">
-  <div #chart></div>
-  <div class="no-data-tag" *ngIf="chartIsEmpty">No data...</div>
-  <div class="no-data-tag" *ngIf="chartIsUnavailable">Chart is unavailable for current settings</div>
-  <div
-    class="ts-chart-legend"
-    *ngIf="!chartIsUnavailable && (legendSettings.items.length || legendSettings.zAxisLabel)"
-  >
-    <div class="left-section">
-      <ng-container *ngFor="let item of legendSettings.items">
-        <div class="item" *ngIf="item.isVisible">
-          <div class="color-square" [style.background]="item.color"></div>
-          <div class="item-label" [title]="item.label">{{ item.label }}</div>
-        </div>
-      </ng-container>
-    </div>
-    <div class="aggregate-section" *ngIf="legendSettings.zAxisLabel">
-      <step-icon name="bar-chart-2" class="total-value-icon"></step-icon>
-      <span class="item-label">{{ legendSettings.zAxisLabel }}</span>
-    </div>
-  </div>
-</div>
+<step-chart-skeleton *ngIf="!chartSettings"></step-chart-skeleton>
+<step-timeseries-chart *ngIf="chartSettings" [settings]="chartSettings"> </step-timeseries-chart>

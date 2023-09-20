@@ -36,4 +36,12 @@
     *ngIf="dashboardSettings"
     [settings]="dashboardSettings"
   ></step-timeseries-dashboard>
+
+  <div style="height: 400px; width: 50%">
+    <step-metric-chart
+      *ngIf="dashboardSettings"
+      [metric]="MetricChartType.CPU"
+      [range]="dashboardSettings.timeRange!"
+    ></step-metric-chart>
+  </div>
 </div>
