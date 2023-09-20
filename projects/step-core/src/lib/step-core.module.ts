@@ -72,7 +72,6 @@ import { ResourceInputModule } from './modules/resource-input/resource-input.mod
 import { ProjectNamePipe } from './pipes/project-name.pipe';
 import { FunctionActionsService, KeywordsCommonModule } from './modules/keywords-common/keywords-common.module';
 import { FunctionActionsImplService } from './services/function-actions-impl.service';
-import { GenericFunctionListComponent } from './components/generic-function-list/generic-function-list.component';
 import { MyAccountButtonComponent } from './components/my-account-button/my-account-button.component';
 import { SelectTaskComponent } from './components/select-task/select-task.component';
 import { SchedulerTaskLinkComponent } from './components/scheduler-task-link/scheduler-task-link.component';
@@ -133,7 +132,6 @@ import { WizardModule } from './modules/wizard/wizards.module';
     ArtefactDetailsComponent,
     WaitingArtefactsAdvancedComponent,
     ProjectNamePipe,
-    GenericFunctionListComponent,
     MyAccountButtonComponent,
     SelectTaskComponent,
     ResourceInputWrapperComponent,
@@ -229,7 +227,6 @@ import { WizardModule } from './modules/wizard/wizards.module';
     ResourceInputModule,
     ProjectNamePipe,
     KeywordsCommonModule,
-    GenericFunctionListComponent,
     MyAccountButtonComponent,
     SelectTaskComponent,
     ResourceInputWrapperComponent,
@@ -310,7 +307,6 @@ export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.
 export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 export * from './components/artefact-details/artefact-details.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
-export * from './components/generic-function-list/generic-function-list.component';
 export * from './decorators/plugin';
 export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
