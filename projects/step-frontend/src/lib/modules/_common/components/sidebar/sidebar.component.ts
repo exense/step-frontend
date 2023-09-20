@@ -125,7 +125,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
 
     switch (viewId) {
       case 'home':
-        this._navigator.navigateToHome(isOpenInSeparateTab);
+        this._navigator.navigateToHome({ isOpenInSeparateTab, forceClientUrl: true });
         break;
       default:
         this._navigator.navigate(viewId, isOpenInSeparateTab);
