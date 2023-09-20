@@ -72,7 +72,25 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     delete urlParams.start;
     delete urlParams.end;
 
-    const allFilters: TsFilterItem[] = [
+    this.dashboardSettings = {
+      contextId: new Date().getTime().toString(),
+      includeThreadGroupChart: true,
+      disableThreadGroupOnOqlMode: true,
+      timeRange: { from: start, to: end },
+      contextualFilters: urlParams,
+      showContextualFilters: true,
+      timeRangeOptions: TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS,
+      activeTimeRange: this.timeRangeSelection, // TODO handle url param
+      filterOptions: this.getDefaultFilters(),
+      activeFilters: this.getDefaultFilters(),
+    };
+    if (this.refreshEnabled) {
+      this.startInterval(this.selectedRefreshInterval.value);
+    }
+  }
+
+  private getDefaultFilters(): TsFilterItem[] {
+    return [
       {
         label: 'Status',
         attributeName: 'rnStatus',
@@ -128,21 +146,6 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
         exactMatch: true,
       },
     ];
-    this.dashboardSettings = {
-      contextId: new Date().getTime().toString(),
-      includeThreadGroupChart: true,
-      disableThreadGroupOnOqlMode: true,
-      timeRange: { from: start, to: end },
-      contextualFilters: urlParams,
-      showContextualFilters: true,
-      timeRangeOptions: TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS,
-      activeTimeRange: this.timeRangeSelection, // TODO handle url param
-      filterOptions: allFilters,
-      activeFilters: allFilters,
-    };
-    if (this.refreshEnabled) {
-      this.startInterval(this.selectedRefreshInterval.value);
-    }
   }
 
   changeRefreshInterval(newInterval: { label: string; value: number }) {
