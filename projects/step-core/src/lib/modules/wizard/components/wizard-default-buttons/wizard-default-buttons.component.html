@@ -1,0 +1,33 @@
+<button type="button" mat-button mat-raised-button (click)="_actions.cancel()">Cancel</button>
+<button
+  *ngIf="!_actions.isFirst"
+  type="button"
+  mat-button
+  mat-raised-button
+  [disabled]="!!(_stepBehavior?.disablePrevious$ | async)"
+  (click)="_actions.goPrevious()"
+>
+  Previous
+</button>
+<button
+  *ngIf="!_actions.isLast"
+  type="button"
+  mat-button
+  mat-flat-button
+  color="primary"
+  [disabled]="!!(_stepBehavior?.disableNext$ | async)"
+  (click)="_actions.goNext()"
+>
+  Next
+</button>
+<button
+  *ngIf="_actions.isLast"
+  type="button"
+  mat-button
+  mat-flat-button
+  color="primary"
+  [disabled]="!!(_stepBehavior?.disableNext$ | async)"
+  (click)="_actions.goFinish()"
+>
+  Finish
+</button>

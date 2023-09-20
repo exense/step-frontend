@@ -14,6 +14,7 @@ import { ScheduledTaskListComponent } from './components/scheduled-task-list/sch
 import { SchedulerConfigurationComponent } from './components/scheduler-configuration/scheduler-configuration.component';
 import './components/scheduler-configuration/scheduler-configuration.component';
 import { ScheduledTaskLogicService } from './services/scheduled-task-logic.service';
+import { ScheduledTaskBulkOperationsRegisterService } from './services/scheduled-task-bulk-operations-register.service';
 
 @NgModule({
   imports: [StepCoreModule, StepCommonModule],
@@ -30,12 +31,14 @@ export class SchedulerModule {
   constructor(
     private _entityRegistry: EntityRegistry,
     private _cellRegistry: CustomCellRegistryService,
-    private _viewRegistry: ViewRegistryService
+    private _viewRegistry: ViewRegistryService,
+    _taskBulkOperations: ScheduledTaskBulkOperationsRegisterService
   ) {
     this.registerEntity();
     this.registerCells();
     this.registerViews();
     this.registerDashlets();
+    _taskBulkOperations.register();
   }
 
   private registerEntity(): void {

@@ -1,22 +1,15 @@
-import { KeyValue } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AugmentedResourcesService, Resource, ResourceInputComponent } from '@exense/step-core';
 import { Subject, takeUntil } from 'rxjs';
-import { PredefinedResourceType } from './predefined-resource-type.enum';
-import { PREDEFINED_RESOURCE_TYPES } from './predefined-resource-types.token';
 import { ResourceConfigurationDialogData } from './resource-configuration-dialog-data.interface';
 import {
   resourceConfigurationDialogFormCreate,
   resourceConfigurationDialogFormSetValueToForm,
   resourceConfigurationDialogFormSetValueToModel,
 } from './resource-configuration-dialog.form';
-
-const toKeyValue = (predefinedResourceType: PredefinedResourceType): KeyValue<string, string> => ({
-  key: predefinedResourceType,
-  value: predefinedResourceType,
-});
+import { PredefinedResourceType } from './predefined-resource-type.enum';
 
 @Component({
   selector: 'step-resource-configuration-dialog',
@@ -29,7 +22,10 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
   private _resourcesService = inject(AugmentedResourcesService);
 
   protected _resourceConfigurationDialogData = inject<ResourceConfigurationDialogData>(MAT_DIALOG_DATA);
-  protected _predefinedResourceTypes = inject<PredefinedResourceType[]>(PREDEFINED_RESOURCE_TYPES).map(toKeyValue);
+  protected _predefinedResourceTypes = [
+    { key: PredefinedResourceType.DATA_SOURCE, value: PredefinedResourceType.DATA_SOURCE },
+    { key: PredefinedResourceType.FUNCTIONS, value: PredefinedResourceType.FUNCTIONS },
+  ];
 
   private readonly terminator$ = new Subject<void>();
 

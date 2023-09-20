@@ -3,17 +3,15 @@ import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static'
 import {
   AJS_MODULE,
   AutoDeselectStrategy,
-  BulkOperationType,
-  BulkOperationsInvokeService,
   ExecutiontTaskParameters,
   selectionCollectionProvider,
   tablePersistenceConfigProvider,
   STORE_ALL,
   ArrayItemLabelValueExtractor,
   FilterConditionFactoryService,
+  AJS_LOCATION,
 } from '@exense/step-core';
 import { ScheduledTaskLogicService } from '../../services/scheduled-task-logic.service';
-import { ScheduledTaskBulkOperationsInvokeService } from '../../services/scheduled-task-bulk-operations-invoke.service';
 import { KeyValue } from '@angular/common';
 
 type StatusItem = KeyValue<string, string>;
@@ -26,19 +24,12 @@ type StatusItem = KeyValue<string, string>;
     tablePersistenceConfigProvider('scheduledTaskList', STORE_ALL),
     ScheduledTaskLogicService,
     selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
-    {
-      provide: BulkOperationsInvokeService,
-      useClass: ScheduledTaskBulkOperationsInvokeService,
-    },
   ],
 })
 export class ScheduledTaskListComponent implements AfterViewInit {
-  readonly availableBulkOperations = [
-    { operation: BulkOperationType.delete, permission: 'task-delete' },
-    { operation: BulkOperationType.duplicate, permission: 'task-write' },
-  ];
+  readonly _logic = inject(ScheduledTaskLogicService);
+
   isSchedulerEnabled: boolean = false;
-  constructor(public readonly _logic: ScheduledTaskLogicService) {}
 
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
 

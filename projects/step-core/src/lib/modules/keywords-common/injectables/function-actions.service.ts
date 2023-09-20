@@ -9,6 +9,7 @@ export abstract class FunctionActionsService {
     dialogConfig?: FunctionDialogsConfig
   ): Observable<Keyword | undefined>;
   abstract openFunctionEditor(keyword: Keyword): Observable<boolean | undefined>;
+  abstract duplicateFunction(keyword: Keyword): Observable<boolean>;
   abstract openLookUpFunctionDialog(id: string, name: string): void;
   abstract configureFunction(
     parentInjector: Injector,

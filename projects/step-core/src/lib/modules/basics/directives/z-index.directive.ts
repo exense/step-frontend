@@ -1,5 +1,5 @@
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { AfterViewInit, Directive, Input, OnDestroy } from '@angular/core';
+import { AfterViewInit, Directive, inject, Input, OnDestroy } from '@angular/core';
 
 /**
  * In most cases legacy components are displayed over material overlay, but sometimes
@@ -11,10 +11,16 @@ import { AfterViewInit, Directive, Input, OnDestroy } from '@angular/core';
   selector: '[stepZIndex]',
 })
 export class ZIndexDirective implements AfterViewInit, OnDestroy {
+  private static zIndexStack: number[] = [];
+
+  private static get lastZIndex(): number | undefined {
+    return this.zIndexStack[this.zIndexStack.length - 1];
+  }
+
+  private _overlayContainer = inject(OverlayContainer);
+
   @Input('stepZIndex') zIndex?: number;
   private cdkOverlayContainer?: HTMLElement;
-
-  constructor(private _overlayContainer: OverlayContainer) {}
 
   ngAfterViewInit(): void {
     if (this.zIndex === undefined) {
@@ -25,13 +31,19 @@ export class ZIndexDirective implements AfterViewInit, OnDestroy {
       return;
     }
     this.cdkOverlayContainer.style.zIndex = this.zIndex.toString();
+    ZIndexDirective.zIndexStack.push(this.zIndex);
   }
 
   ngOnDestroy(): void {
     if (!this.cdkOverlayContainer) {
       return;
     }
-    this.cdkOverlayContainer.style.removeProperty('z-index');
+    ZIndexDirective.zIndexStack.pop();
+    if (ZIndexDirective.lastZIndex === undefined) {
+      this.cdkOverlayContainer.style.removeProperty('z-index');
+    } else {
+      this.cdkOverlayContainer.style.zIndex = ZIndexDirective.lastZIndex.toString();
+    }
     this.cdkOverlayContainer = undefined;
   }
 }
