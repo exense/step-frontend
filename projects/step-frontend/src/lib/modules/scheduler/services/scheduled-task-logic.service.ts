@@ -32,9 +32,7 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
 
   private updateDataSourceAfterChange = pipe(
     tap((result?: ExecutiontTaskParameters | boolean) => {
-      if (result) {
-        this.dataSource.reload();
-      }
+      this.dataSource.reload();
     })
   );
 
@@ -48,7 +46,7 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
     return this._schedulerService.isSchedulerEnabled();
   }
 
-  executeParameter(scheduledTask: ExecutiontTaskParameters) {
+  executeTask(scheduledTask: ExecutiontTaskParameters) {
     this._schedulerService.executeTask(scheduledTask.id!).subscribe((executionId) => {
       this._location.go('#/root/executions/' + executionId);
     });
@@ -58,6 +56,11 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
     this._schedulerService
       .getExecutionTaskById(scheduledTask.id!)
       .pipe(
+        tap((task) => {
+          // switching task status in GUI immediately, note that this will be overwritten by updateDataSourceAfterChange
+          scheduledTask.active = !task.active;
+          return task;
+        }),
         switchMap((task) =>
           task.active
             ? this._schedulerService.enableExecutionTask(task.id!, false)
@@ -88,13 +91,13 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
     }
   }
 
-  deleteParameter(scheduledTask: ExecutiontTaskParameters): void {
+  deleteTask(scheduledTask: ExecutiontTaskParameters): void {
     this._scheduledTaskDialogs.removeScheduledTask(scheduledTask).pipe(this.updateDataSourceAfterChange).subscribe();
   }
 
-  editParameter(scheduledTask: ExecutiontTaskParameters): Observable<boolean> {
+  editTask(scheduledTask: ExecutiontTaskParameters): Observable<boolean> {
     if (this._multipleProjectList.isEntityBelongsToCurrentProject(scheduledTask)) {
-      return this.editParameterInternal(scheduledTask.id!);
+      return this.editTaskInternal(scheduledTask.id!);
     }
     const url = this._$location.path();
     const editParams = { [TASK_ID]: scheduledTask.id! };
@@ -104,14 +107,14 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
       .pipe(
         switchMap((continueEdit) => {
           if (continueEdit) {
-            return this.editParameterInternal(scheduledTask.id!);
+            return this.editTaskInternal(scheduledTask.id!);
           }
           return of(continueEdit);
         })
       );
   }
 
-  createParameter() {
+  createTask() {
     this._schedulerService
       .createExecutionTask()
       .pipe(
@@ -125,10 +128,10 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
     this._editorResolver
       .onEditEntity(TASK_ID)
       .pipe(take(1))
-      .subscribe((taskId) => this.editParameterInternal(taskId));
+      .subscribe((taskId) => this.editTaskInternal(taskId));
   }
 
-  private editParameterInternal(id: string): Observable<boolean> {
+  private editTaskInternal(id: string): Observable<boolean> {
     return this._schedulerService.getExecutionTaskById(id).pipe(
       switchMap((task) => this._scheduledTaskDialogs.editScheduledTask(task)),
       this.updateDataSourceAfterChange,
