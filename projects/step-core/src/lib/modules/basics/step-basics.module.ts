@@ -30,6 +30,7 @@ import { ProgressBarComponent } from './components/progress-bar/progress-bar.com
 import { UploadContainerComponent } from './components/upload-container/upload-container.component';
 import { JsonRawEditorFormattedComponent } from './components/json-raw-editor-formatted/json-raw-editor-formatted.component';
 import { LabelAddonDirective } from './directives/label-addon.directive';
+import { TimeInputComponent } from './components/time-input/time-input.component';
 import { ProjectSwitchDialogComponent } from './components/project-switch-dialog/project-switch-dialog.component';
 
 @NgModule({
@@ -64,6 +65,7 @@ import { ProjectSwitchDialogComponent } from './components/project-switch-dialog
     ProgressBarComponent,
     UploadContainerComponent,
     ProjectSwitchDialogComponent,
+    TimeInputComponent,
   ],
   exports: [
     ResourceLabelComponent,
@@ -95,6 +97,7 @@ import { ProjectSwitchDialogComponent } from './components/project-switch-dialog
     JsonRawEditorFormattedComponent,
     LabelAddonDirective,
     ProjectSwitchDialogComponent,
+    TimeInputComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -115,6 +118,7 @@ export * from './components/cron-selector/cron-selector.component';
 export * from './components/errors-list/errors-list.component';
 export * from './components/progress-bar/progress-bar.component';
 export * from './components/upload-container/upload-container.component';
+export * from './components/time-input/time-input.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
 export * from './pipes/has-right.pipe';
@@ -164,6 +168,7 @@ export * from './services/navigator.service';
 export * from './services/multiple-projects.service';
 export * from './services/generate-api-key.service';
 export * from './services/editor-resolver.service';
+export * from './services/app-config-container.service';
 export * from './shared/logout-cleanup.token';
 export * from './services/is-used-by-dialog';
 export * from './shared/bulk-operation-type.enum';
