@@ -43,7 +43,7 @@ export class GenericFunctionListComponent implements OnInit, AfterViewInit {
 
   readonly availableBulkOperations = [
     { operation: BulkOperationType.delete, permission: 'mask-delete' },
-    { operation: BulkOperationType.duplicate, permission: 'kw-write' },
+    { operation: BulkOperationType.duplicate, permission: 'mask-write' },
   ];
 
   constructor(

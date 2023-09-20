@@ -10,7 +10,7 @@
           color="primary"
           matTooltip="New Mask"
           matTooltipPosition="below"
-          [disabled]="!('kw-write' | hasRight | async)"
+          [disabled]="!('mask-write' | hasRight | async)"
           (click)="addMask()"
         >
           <step-icon name="plus"></step-icon>
@@ -73,18 +73,18 @@
   </step-table>
   <mat-menu #menu="matMenu">
     <ng-template matMenuContent let-element="element">
-      <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="editFunction(element.id)">
+      <button mat-menu-item [disabled]="!('mask-write' | hasRight | async)" (click)="editFunction(element.id)">
         <step-icon name="edit-2"></step-icon>
         Edit mask
       </button>
 
-      <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="duplicateFunction(element.id)">
+      <button mat-menu-item [disabled]="!('mask-write' | hasRight | async)" (click)="duplicateFunction(element.id)">
         <step-icon name="copy"></step-icon>
         Duplicate mask
       </button>
       <button
         mat-menu-item
-        [disabled]="!('kw-read' | hasRight | async)"
+        [disabled]="!('mask-read' | hasRight | async)"
         (click)="lookUp(element.id, element.attributes.name)"
       >
         <step-icon name="search"></step-icon>
