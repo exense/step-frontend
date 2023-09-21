@@ -1,0 +1,18 @@
+<mat-menu #menu="matMenu">
+  <ng-container *matMenuContent="let element = element">
+    <ng-container *ngIf="menuContent?.templateRef as templateRef">
+      <ng-container *ngTemplateOutlet="templateRef; context: { $implicit: element }"> </ng-container>
+    </ng-container>
+    <ng-container *ngFor="let item of menuItems; trackBy: trackByMenuItem">
+      <button
+        type="button"
+        mat-menu-item
+        [disabled]="!!item.permission && !(item.permission | hasRight | async)"
+        (click)="handleEntityOperation(element, item)"
+      >
+        <step-icon *ngIf="item.icon" [name]="item.icon"></step-icon>
+        {{ item.label }}
+      </button>
+    </ng-container>
+  </ng-container>
+</mat-menu>

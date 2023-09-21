@@ -1,4 +1,4 @@
-import { EntityObject } from '../../../../../../../../step-core/src/lib/modules/entity/types/entity-object';
+import { EntityObject } from '@exense/step-core';
 
 export interface EntitySearchValue {
   searchValue: string;

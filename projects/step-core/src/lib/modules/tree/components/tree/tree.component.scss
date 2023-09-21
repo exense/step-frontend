@@ -26,3 +26,12 @@ cdk-tree-node {
   visibility: hidden;
   position: fixed;
 }
+
+.tree-action-item {
+  height: 3.2rem;
+  line-height: 3.2rem;
+
+  & + mat-divider {
+    margin: 0.7rem 0;
+  }
+}

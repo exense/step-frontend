@@ -18,10 +18,8 @@ import {
 import { CustomCellComponentsPipe } from './pipe/custom-cell-components.pipe';
 import { AdditionalHeaderDirective } from './directives/additional-header.directive';
 import { BulkOperationsComponent } from './components/bulk-operations/bulk-operations.component';
-import { EntitiesSelectionModule } from '../entities-selection/entities-selection.module';
-import { BulkOperationIconPipe } from './pipe/bulk-operation-icon.pipe';
+import { BulkOperationPerformStrategy, EntitiesSelectionModule } from '../entities-selection/entities-selection.module';
 import { AsyncOperationsModule } from '../async-operations/async-operations.module';
-import { BulkOperationLabelPipe } from './pipe/bulk-operation-label.pipe';
 import { CustomSearchCellComponentsPipe } from './pipe/custom-search-cell-components.pipe';
 import { LOGOUT_CLEANUP, StepBasicsModule } from '../basics/step-basics.module';
 import { SearchColMetaDirective } from './directives/search-col-meta.directive';
@@ -31,6 +29,7 @@ import { CustomSearchCheckboxComponent } from './components/custom-search-dropdo
 import { Input as ColInput } from '../../client/generated';
 import { TableRemoteDataSourceFactoryImplService } from './services/table-remote-data-source-factory-impl.service';
 import { TableStorageService } from './services/table-storage.service';
+import { BulkOperationPerformStrategyImplService } from './services/bulk-operation-perform-strategy-impl.service';
 
 @NgModule({
   imports: [
@@ -52,8 +51,6 @@ import { TableStorageService } from './services/table-storage.service';
     CustomCellComponentsPipe,
     AdditionalHeaderDirective,
     BulkOperationsComponent,
-    BulkOperationIconPipe,
-    BulkOperationLabelPipe,
     CustomSearchCellComponentsPipe,
     SearchColMetaDirective,
     FilterConnectDirective,
@@ -77,6 +74,10 @@ import { TableStorageService } from './services/table-storage.service';
     {
       provide: TableRemoteDataSourceFactoryService,
       useExisting: TableRemoteDataSourceFactoryImplService,
+    },
+    {
+      provide: BulkOperationPerformStrategy,
+      useExisting: BulkOperationPerformStrategyImplService,
     },
     {
       provide: LOGOUT_CLEANUP,
@@ -115,10 +116,6 @@ export * from './directives/filter-connect.directive';
 export * from './services/custom-column-options';
 export * from './directives/additional-header.directive';
 export * from './components/bulk-operations/bulk-operations.component';
-export * from './services/bulk-operations-invoke.service';
-export * from './shared/bulk-operation-type.enum';
-export * from './pipe/bulk-operation-label.pipe';
-export * from './pipe/bulk-operation-icon.pipe';
 export * from './shared/filter-condition';
 export * from './shared/legacy-table-handle.interface';
 export * from './shared/table-local-data-source-config';

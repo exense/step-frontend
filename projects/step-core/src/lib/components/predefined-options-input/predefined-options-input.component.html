@@ -5,6 +5,7 @@
     [ngModel]="value"
     (ngModelChange)="onValueChange($event)"
     [disabled]="isDisabled"
+    [readonly]="true"
     [placeholder]="placeholder"
     (blur)="onBlur()"
   />

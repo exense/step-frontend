@@ -1,7 +1,7 @@
 <div class="flex flex-column main-container">
   <div *ngFor="let value of values; let i = index" class="item-container">
     <div class="search-item">
-      {{ (value.entity | castToTask).attributes?.['name'] || value.searchValue }}
+      {{ (value.entity | castToTask)?.attributes?.['name'] || value.searchValue }}
       <button mat-icon-button title="Remove" class="remove-btn">
         <step-icon (click)="removeSearchValue(i)" name="x"></step-icon>
       </button>

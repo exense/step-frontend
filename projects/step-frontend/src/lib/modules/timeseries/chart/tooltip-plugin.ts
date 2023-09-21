@@ -21,13 +21,13 @@ export interface Anchor {
 export class TooltipPlugin {
   public static getInstance(optionsGetter: () => TsTooltipOptions): uPlot.Plugin {
     let over: any;
-    let bound: any;
+    let bound: Element;
     let bLeft: any;
     let bTop: any;
     let isVisible = false;
 
     function syncBounds(): void {
-      let bbox = over.getBoundingClientRect();
+      const bbox = over.getBoundingClientRect();
       bLeft = bbox.left;
       bTop = bbox.top;
     }
@@ -149,11 +149,13 @@ export class TooltipPlugin {
           overlay.appendChild(this.createSeparator());
           overlay.appendChild(this.createTimestampItem(timestamp));
 
-          // overlay.appendChild(dots);
-          // the feature will display the closest value for the y scale only, and just one value for the second scale (if present)
-          const anchor: Anchor = { left: left + bLeft, top: top + bTop };
+          // there is no easy way to cache these. when the div gets smaller without a resize, the bbox is not updated.
+          let boundingClientRect = over.getBoundingClientRect();
+
+          const anchor: Anchor = { left: left + boundingClientRect.left, top: top + boundingClientRect.top };
           // overlay.textContent = `${x} at ${Math.round(left)},${Math.round(top)}`;
-          PlacementFunction.placement(overlay, anchor, 'right', 'start', this.getAdjustedBoundaries(bound));
+          let container = this.getAdjustedBoundaries(bound);
+          PlacementFunction.placement(overlay, anchor, 'right', 'start', container);
         },
       },
     };
@@ -173,7 +175,7 @@ export class TooltipPlugin {
     return div;
   }
 
-  private static getAdjustedBoundaries(element: any) {
+  private static getAdjustedBoundaries(element: Element) {
     const rect = element.getBoundingClientRect();
     let shiftUp = 0; // positive value when need to avoid scroll
 

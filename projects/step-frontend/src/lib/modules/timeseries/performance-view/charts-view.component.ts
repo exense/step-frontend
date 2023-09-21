@@ -320,7 +320,6 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       this.createByStatusChart(),
       this.createByKeywordsCharts(),
       this.createTableChart(),
-      // ...(this.timeSelection ? [this.timeSelection.onRangerLoaded.pipe(take(1))] : []),
     ];
     if (this.includeThreadGroupChart) {
       charts$.push(this.createThreadGroupsChart());
@@ -407,7 +406,6 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     }
 
     const requestBuilder = compareChart ? this.compareRequestBuilder : this.findRequestBuilder;
-
     const request = requestBuilder
       .clone()
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_SAMPLER)
