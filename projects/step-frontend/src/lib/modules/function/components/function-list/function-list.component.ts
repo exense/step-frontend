@@ -12,6 +12,9 @@ import {
   tablePersistenceConfigProvider,
   STORE_ALL,
   FunctionActionsService,
+  Plan,
+  FunctionType,
+  RestoreDialogsService,
 } from '@exense/step-core';
 import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
 
@@ -30,6 +33,7 @@ export class FunctionListComponent implements AfterViewInit {
   private _interactivePlanExecutionApiService = inject(InteractivePlanExecutionService);
   private _functionActions = inject(FunctionActionsService);
   private _functionPackageDialogs = inject(FunctionPackageActionsService);
+  private _restoreDialogsService = inject(RestoreDialogsService);
   private _$rootScope = inject(AJS_ROOT_SCOPE);
   private _location = inject(AJS_LOCATION);
 
@@ -99,6 +103,26 @@ export class FunctionListComponent implements AfterViewInit {
         this.dataSource.reload();
       }
     });
+  }
+
+  displayHistory(keyword: KeywordFunction, permission: string): void {
+    if (!keyword.id) {
+      return;
+    }
+
+    const id = keyword.id!;
+    const keywordVersion = keyword.customFields ? keyword.customFields['versionId'] : undefined;
+    const versionHistory = this._functionApiService.getFunctionVersions(id);
+
+    this._restoreDialogsService
+      .showRestoreDialog(keywordVersion, versionHistory, permission)
+      .subscribe((restoreVersion) => {
+        if (!restoreVersion) {
+          return;
+        }
+
+        this._functionApiService.restoreFunctionVersion(id, restoreVersion).subscribe(() => this.dataSource.reload());
+      });
   }
 }
 
