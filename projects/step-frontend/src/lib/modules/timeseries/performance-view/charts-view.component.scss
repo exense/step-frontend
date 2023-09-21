@@ -25,8 +25,8 @@
 .stamp {
   position: absolute;
   color: white;
-  padding: 2px;
-  font-size: 10px;
+  padding: 0.2rem;
+  font-size: 1rem;
   background-color: var.$gray-400;
   opacity: 0.7;
   top: -8px;
@@ -63,12 +63,12 @@
 .mat-card {
   display: flex;
   flex-wrap: wrap;
-  gap: 24px;
+  gap: 2.4rem;
 }
 
 .charts-table {
   width: 100%;
-  padding-top: 24px;
+  padding-top: 2.4rem;
 }
 
 .chart-settings {

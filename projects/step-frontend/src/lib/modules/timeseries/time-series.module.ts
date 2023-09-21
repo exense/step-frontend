@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { StepCoreModule } from '@exense/step-core';
+import { EntityModule, StepCoreModule } from '@exense/step-core';
 import { TimeSeriesChartComponent } from './chart/time-series-chart.component';
 import { TSRangerComponent } from './ranger/ts-ranger.component';
 import { TableModule } from '@exense/step-core';
@@ -27,8 +27,12 @@ import { DiscoverComponent } from './discover/discover.component';
 import { DiscoverAttributeStatsComponent } from './discover/attribute-stats/attribute-stats.component';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { NoTotalCountPaginator } from './discover/no-total-count-paginator';
-import { TsComparePercentagePipe } from './dashboard/compare/ts-compare-percentage.pipe';
 import { ChartsViewComponent } from './performance-view/charts-view.component';
+import { TsComparePercentagePipe } from './dashboard/compare/ts-compare-percentage.pipe';
+import { FilterBarExecutionItemComponent } from './performance-view/filter-bar/item/execution/filter-bar-execution-item.component';
+import { FilterBarTaskItemComponent } from './performance-view/filter-bar/item/task/filter-bar-task-item.component';
+import { ReportNodesModule } from '../report-nodes/report-nodes.module';
+import { FilterBarPlanItemComponent } from './performance-view/filter-bar/item/plan/filter-bar-plan-item.component';
 
 @NgModule({
   declarations: [
@@ -46,10 +50,13 @@ import { ChartsViewComponent } from './performance-view/charts-view.component';
     TimeSeriesDashboardComponent,
     TsGroupingComponent,
     AnalyticsPageComponent,
+    FilterBarPlanItemComponent,
     ExecutionPerformanceComponent,
     TsComparePercentagePipe,
     DiscoverComponent,
     DiscoverAttributeStatsComponent,
+    FilterBarExecutionItemComponent,
+    FilterBarTaskItemComponent,
   ],
   exports: [ExecutionPerformanceComponent, AnalyticsPageComponent],
   providers: [{ provide: MatPaginatorIntl, useClass: NoTotalCountPaginator }],
@@ -64,6 +71,8 @@ import { ChartsViewComponent } from './performance-view/charts-view.component';
     MatChipsModule,
     MatFormFieldModule,
     MatInputModule,
+    ReportNodesModule,
+    EntityModule,
   ],
 })
 export class TimeSeriesModule {}

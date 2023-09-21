@@ -8,7 +8,7 @@ export class TsComparePercentagePipe implements PipeTransform {
     if (isNaN(value)) {
       return value;
     }
-    const prefix = value >= 0 ? '+' : '-';
+    const prefix = value >= 0 ? '+' : '';
     return prefix + value.toFixed(2);
   }
 }

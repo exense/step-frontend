@@ -5,7 +5,7 @@
   class="ts-table"
   [visibleColumns]="compareModeEnabled ? undefined : BASE_COLUMNS"
 >
-  <ng-container matColumnDef="name">
+  <ng-container matColumnDef="name" sticky>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>
       <input
         type="checkbox"
@@ -25,8 +25,8 @@
           class="checkbox"
           (change)="onKeywordToggle(element)"
         />
-        <span class="color-square" [style.background-color]="element.color"></span>
-        <span>{{ element.name }}</span>
+        <div class="color-square" [style.background-color]="element.color"></div>
+        <span [title]="element.name">{{ element.name }}</span>
       </div>
     </td>
   </ng-container>

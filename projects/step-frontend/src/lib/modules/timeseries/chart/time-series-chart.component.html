@@ -3,14 +3,14 @@
   <div class="no-data-tag" *ngIf="chartIsEmpty">No data...</div>
   <div class="no-data-tag" *ngIf="chartIsUnavailable">Chart is unavailable for current settings</div>
   <div
-    *ngIf="!chartIsUnavailable && (legendSettings.items.length || legendSettings.zAxisLabel)"
     class="ts-chart-legend"
+    *ngIf="!chartIsUnavailable && (legendSettings.items.length || legendSettings.zAxisLabel)"
   >
     <div class="left-section">
       <ng-container *ngFor="let item of legendSettings.items">
         <div class="item" *ngIf="item.isVisible">
           <div class="color-square" [style.background]="item.color"></div>
-          <div class="item-label">{{ item.label }}</div>
+          <div class="item-label" [title]="item.label">{{ item.label }}</div>
         </div>
       </ng-container>
     </div>
