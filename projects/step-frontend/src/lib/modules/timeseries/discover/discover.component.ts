@@ -30,10 +30,11 @@ export class DiscoverComponent implements OnInit {
   totalCount = 1000_000;
   currentPage = 0;
 
+  private _timeSeriesService = inject(TimeSeriesService);
+
   constructor(
-    private _matDialogRef: MatDialogRef<DiscoverComponent>,
     @Inject(MAT_DIALOG_DATA) public _data: DiscoverDialogData,
-    private _timeSeriesService: TimeSeriesService
+    public _matDialogRef: MatDialogRef<DiscoverComponent>
   ) {
     this.oqlFilter = _data.oqlFilter;
   }

@@ -1,0 +1,42 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+.main-container {
+  align-items: flex-start;
+  min-width: 200px;
+}
+
+.item-container {
+  background-color: var.$gray-100;
+  border-radius: 6px;
+  padding-left: 14px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 0.6rem;
+
+  .search-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.timestamp {
+  opacity: 0.6;
+  font-size: 1.1rem;
+  margin-top: -4px;
+  padding-bottom: 0.8rem;
+  padding-right: 1.2rem;
+}
+
+.add-btn {
+  color: var.$dark-blue;
+  padding: 0;
+  padding-right: 0.8rem;
+  margin-top: 0.4rem;
+}
+
+.remove-btn {
+  transform: scale(0.7);
+}

@@ -1,27 +1,27 @@
 <ng-container *ngIf="performanceViewSettings">
   <div>
-    <div class="filter-bars-container" [class.compare-mode-enabled]="compareModeEnabled">
+    <div class="filter-bars-container" [style.gap]="compareModeEnabled ? '12px' : '0'">
       <div class="bar mat-card">
         <step-ts-filter-bar
           *ngIf="context"
           [context]="context"
-          [defaultFilterOptions]="settings.filterOptions"
-          [initialFilters]="contextualFilterItems"
+          [filterOptions]="filterOptions"
+          [activeFilters]="filterItems"
           (onTimeRangeChange)="handleTimeRangeChange($event)"
           [timeRangeOptions]="settings.timeRangeOptions"
-          [activeTimeRange]="settings.activeTimeRange"
+          [activeTimeRange]="timeRangeSelection"
           [compactView]="compareModeEnabled"
         >
         </step-ts-filter-bar>
         <div *ngIf="compareModeEnabled" class="stamp">BASE</div>
       </div>
-      <div class="bar mat-card" [class]="compareModeEnabled ? 'grow-1' : 'collapsed'">
+      <div class="bar mat-card" [style.flexGrow]="compareModeEnabled ? 1 : 0">
         <step-ts-filter-bar
           #compareFilterBar
           *ngIf="compareModeContext"
           [context]="compareModeContext"
-          [defaultFilterOptions]="settings.filterOptions"
-          [initialFilters]="compareModeContext.getFilteringSettings().filterItems"
+          [filterOptions]="compareModeFilterOptions"
+          [activeFilters]="compareModeFilterItems"
           (onTimeRangeChange)="handleCompareTimeRangeChange($event)"
           [timeRangeOptions]="compareModeTimeRangeOptions"
           [activeTimeRange]="compareModeActiveRangeOption"
