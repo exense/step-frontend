@@ -72,8 +72,9 @@ import { ResourceInputModule } from './modules/resource-input/resource-input.mod
 import { ProjectNamePipe } from './pipes/project-name.pipe';
 import { FunctionActionsService, KeywordsCommonModule } from './modules/keywords-common/keywords-common.module';
 import { FunctionActionsImplService } from './services/function-actions-impl.service';
-import { GenericFunctionListComponent } from './components/generic-function-list/generic-function-list.component';
 import { MyAccountButtonComponent } from './components/my-account-button/my-account-button.component';
+import { ResourceInputWrapperComponent } from './components/resource-input-wrapper/resource-input-wrapper.component';
+import { WizardModule } from './modules/wizard/wizards.module';
 
 @NgModule({
   declarations: [
@@ -128,8 +129,8 @@ import { MyAccountButtonComponent } from './components/my-account-button/my-acco
     ArtefactDetailsComponent,
     WaitingArtefactsAdvancedComponent,
     ProjectNamePipe,
-    GenericFunctionListComponent,
     MyAccountButtonComponent,
+    ResourceInputWrapperComponent,
   ],
   imports: [
     CommonModule,
@@ -151,6 +152,7 @@ import { MyAccountButtonComponent } from './components/my-account-button/my-acco
     JsonViewerModule,
     ResourceInputModule,
     KeywordsCommonModule,
+    WizardModule,
   ],
   exports: [
     CommonModule,
@@ -174,6 +176,7 @@ import { MyAccountButtonComponent } from './components/my-account-button/my-acco
     TooltipImmediateCloseDirective,
     TreeModule,
     AngularSplitModule,
+    WizardModule,
     ReportNodeStatusComponent,
     PlanLinkComponent,
     PlanNamePipe,
@@ -219,8 +222,8 @@ import { MyAccountButtonComponent } from './components/my-account-button/my-acco
     ResourceInputModule,
     ProjectNamePipe,
     KeywordsCommonModule,
-    GenericFunctionListComponent,
     MyAccountButtonComponent,
+    ResourceInputWrapperComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -295,7 +298,7 @@ export * from './components/entity-column-container/entity-column-container.comp
 export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 export * from './components/artefact-details/artefact-details.component';
-export * from './components/generic-function-list/generic-function-list.component';
+export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export * from './decorators/plugin';
 export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
@@ -323,6 +326,7 @@ export * from './modules/tree/tree.module';
 export * from './modules/json-viewer/json-viewer.module';
 export * from './modules/resource-input/resource-input.module';
 export * from './modules/keywords-common/keywords-common.module';
+export * from './modules/wizard/wizards.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/is-chart-empty.pipe';
