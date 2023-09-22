@@ -22,7 +22,29 @@ export class PlanEditorKeyHandlerDirective {
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
-    if (event.ctrlKey) {
+    const isCtrl = event.metaKey || event.ctrlKey;
+
+    if (isCtrl && event.shiftKey) {
+      if (this.checkKey(event, true, ['Up', 'ArrowUp'], 'plan-write')) {
+        event.preventDefault();
+        this._planEditorService.moveInPrevSibling();
+        return;
+      }
+
+      if (this.checkKey(event, true, ['Down', 'ArrowDown'], 'plan-write')) {
+        event.preventDefault();
+        this._planEditorService.moveInNextSibling();
+        return;
+      }
+
+      if (this.checkKey(event, true, ['v', 'V'], 'plan-write')) {
+        event.preventDefault();
+        this._planEditorService.pasteAfter();
+        return;
+      }
+    }
+
+    if (isCtrl) {
       if (this.checkKey(event, false, 'z', 'plan-write')) {
         event.preventDefault();
         this._planEditorService.undo();
@@ -32,6 +54,18 @@ export class PlanEditorKeyHandlerDirective {
       if (this.checkKey(event, false, 'y', 'plan-write')) {
         event.preventDefault();
         this._planEditorService.redo();
+        return;
+      }
+
+      if (this.checkKey(event, true, ['Left', 'ArrowLeft'], 'plan-write')) {
+        event.preventDefault();
+        this._planEditorService.moveOut();
+        return;
+      }
+
+      if (this.checkKey(event, true, ['Right', 'ArrowRight'], 'plan-write')) {
+        event.preventDefault();
+        this._planEditorService.moveInPrevSibling();
         return;
       }
 
@@ -62,6 +96,12 @@ export class PlanEditorKeyHandlerDirective {
       if (this.checkKey(event, true, 'e', 'plan-write')) {
         event.preventDefault();
         this._planEditorService.toggleSkip();
+        return;
+      }
+
+      if (this.checkKey(event, true, 'd', 'plan-write')) {
+        event.preventDefault();
+        this._planEditorService.duplicate();
         return;
       }
 

@@ -1,7 +1,7 @@
-<step-table [dataSource]="dataSource" matSort [matSortDisableClear]="true">
+<step-table #table [dataSource]="_logic.dataSource" matSort [matSortDisableClear]="true">
   <step-bulk-operations
     *stepAdditionalHeader="'btngroup-bulk-import-create'"
-    [availableOperations]="availableBulkOperations"
+    entity="parameters"
   ></step-bulk-operations>
   <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
     <step-btn-group>
@@ -11,7 +11,7 @@
         matTooltipPosition="below"
         matTooltip="Import parameter"
         [disabled]="!('param-write' | hasRight | async)"
-        (click)="importParameter()"
+        (click)="_logic.importParameter()"
       >
         <step-icon name="download"></step-icon>
       </button>
@@ -21,7 +21,7 @@
         matTooltipPosition="below"
         matTooltip="Export all parameters"
         [disabled]="!('param-read' | hasRight | async)"
-        (click)="exportParameter()"
+        (click)="_logic.exportParameter()"
       >
         <step-icon name="upload"></step-icon>
       </button>
@@ -34,7 +34,7 @@
         matTooltipPosition="below"
         matTooltip="New parameter"
         [disabled]="!('param-write' | hasRight | async)"
-        (click)="createParameter()"
+        (click)="_logic.createParameter()"
       >
         <step-icon name="plus"></step-icon>
       </button>
@@ -51,7 +51,7 @@
     <step-input-filter
       *stepSearchCellDef
       stepFilterConnect
-      [createConditionFn]="_filterConditionFactory.scopeFilterCondition"
+      [createConditionFn]="_logic._filterConditionFactory.scopeFilterCondition"
     >
     </step-input-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Scope</th>
@@ -73,7 +73,7 @@
     <step-input-filter
       *stepSearchCellDef
       stepFilterConnect
-      [createConditionFn]="_filterConditionFactory.numberFilterCondition"
+      [createConditionFn]="_logic._filterConditionFactory.numberFilterCondition"
     >
     </step-input-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Priority</th>
@@ -89,7 +89,7 @@
           mat-icon-button
           matTooltip="Edit parameter"
           [disabled]="!('param-write' | hasRight | async)"
-          (click)="editParameter(element)"
+          (click)="_logic.editParameter(element)"
         >
           <step-icon name="edit-2">edit</step-icon>
         </button>
@@ -97,7 +97,7 @@
           mat-icon-button
           matTooltip="Duplicate parameter"
           [disabled]="!('param-write' | hasRight | async)"
-          (click)="duplicateParameter(element)"
+          (click)="_logic.duplicateParameter(element)"
         >
           <step-icon name="copy"></step-icon>
         </button>
@@ -105,7 +105,7 @@
           mat-icon-button
           matTooltip="Delete parameter"
           [disabled]="!('param-delete' | hasRight | async)"
-          (click)="deleteParameter(element.id, element.key)"
+          (click)="_logic.deleteParameter(element.id, element.key)"
         >
           <step-icon name="trash-2"></step-icon>
         </button>
@@ -113,12 +113,21 @@
           mat-icon-button
           matTooltip="Version history"
           [disabled]="!('param-delete' | hasRight | async)"
-          (click)="displayHistory(element, 'param-write')"
+          (click)="_logic.displayHistory(element, 'param-write')"
           class="history"
         >
           <step-icon name="git-branch"></step-icon>
+        </button>
+        <button
+          *ngIf="entityMenu.hasContent"
+          mat-icon-button
+          [matMenuTriggerFor]="entityMenu.menu!"
+          [matMenuTriggerData]="{ element: element }"
+        >
+          <step-icon name="more-horizontal"></step-icon>
         </button>
       </step-btn-group>
     </td>
   </ng-container>
 </step-table>
+<step-entity-menu #entityMenu entity="parameters" (entityOperationSuccess)="table.reload()"> </step-entity-menu>

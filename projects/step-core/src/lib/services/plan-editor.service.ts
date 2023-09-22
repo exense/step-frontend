@@ -56,6 +56,13 @@ export class PlanEditorService implements PlanEditorStrategy {
     this.strategy.addFunction(keywordId);
   }
 
+  moveOut(node?: AbstractArtefact) {
+    if (!this.strategy) {
+      return;
+    }
+    this.strategy.moveOut(node);
+  }
+
   moveUp(node?: AbstractArtefact): void {
     if (!this.strategy) {
       return;
@@ -68,6 +75,20 @@ export class PlanEditorService implements PlanEditorStrategy {
       return;
     }
     this.strategy.moveDown(node);
+  }
+
+  moveInNextSibling(node?: AbstractArtefact): void {
+    if (!this.strategy) {
+      return;
+    }
+    this.strategy.moveInNextSibling(node);
+  }
+
+  moveInPrevSibling(node?: AbstractArtefact): void {
+    if (!this.strategy) {
+      return;
+    }
+    this.strategy.moveInPrevSibling(node);
   }
 
   handlePlanChange(): void {
@@ -124,6 +145,20 @@ export class PlanEditorService implements PlanEditorStrategy {
       return;
     }
     this.strategy.paste(node);
+  }
+
+  pasteAfter(node?: AbstractArtefact): void {
+    if (!this.strategy) {
+      return;
+    }
+    this.strategy.pasteAfter(node);
+  }
+
+  duplicate(node?: AbstractArtefact): void {
+    if (!this.strategy) {
+      return;
+    }
+    this.strategy.duplicate(node);
   }
 
   rename(node?: AbstractArtefact): void {

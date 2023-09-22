@@ -1,0 +1,5 @@
+<ng-container *ngIf="value">
+  <div *ngFor="let item of value; trackBy: trackByKeyValue">
+    <span class="key-value-item">{{ item.key }} = {{ item.value }}</span>
+  </div>
+</ng-container>

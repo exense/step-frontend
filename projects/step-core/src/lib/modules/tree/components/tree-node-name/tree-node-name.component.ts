@@ -1,7 +1,8 @@
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, Input, OnDestroy, ViewChild } from '@angular/core';
 import { TreeStateService } from '../../services/tree-state.service';
 import { Subject, takeUntil } from 'rxjs';
 import { TreeNode } from '../../shared/tree-node';
+import { TreeNodeTemplateContainerService } from '../../services/tree-node-template-container.service';
 
 @Component({
   selector: 'step-tree-node-name',
@@ -10,6 +11,8 @@ import { TreeNode } from '../../shared/tree-node';
 })
 export class TreeNodeNameComponent implements AfterViewInit, OnDestroy {
   private terminator$ = new Subject<void>();
+
+  readonly templateContainer = inject(TreeNodeTemplateContainerService);
 
   @Input() node?: TreeNode;
 

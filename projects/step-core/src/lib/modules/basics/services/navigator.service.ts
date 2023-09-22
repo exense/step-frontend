@@ -25,11 +25,14 @@ export class NavigatorService {
     this.navigateInternal(link, isOpenInSeparateTab);
   }
 
-  navigateToHome(isOpenInSeparateTab: boolean = false): void {
-    this.navigateInternal(this._defaultPage(), isOpenInSeparateTab);
+  navigateToHome({
+    isOpenInSeparateTab,
+    forceClientUrl,
+  }: { isOpenInSeparateTab?: boolean; forceClientUrl?: boolean } = {}): void {
+    this.navigateInternal(this._defaultPage(forceClientUrl), isOpenInSeparateTab);
   }
 
-  private navigateInternal(link: string, isOpenInSeparateTab: boolean): void {
+  private navigateInternal(link: string, isOpenInSeparateTab?: boolean): void {
     if (isOpenInSeparateTab) {
       this.navigateToSeparateTab(link);
     } else {

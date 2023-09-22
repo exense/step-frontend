@@ -32,6 +32,9 @@ const IGNORE_PLUGINS: ReadonlyArray<string> = [
   'oryonPlugin',
   'compareEditor',
   'silkPerformer',
+  'EnterpriseArtefacts',
+  'wizard',
+  'messages',
 ];
 
 // For testing purposes only

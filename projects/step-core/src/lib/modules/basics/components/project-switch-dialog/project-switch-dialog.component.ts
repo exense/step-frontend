@@ -1,0 +1,25 @@
+import { Component, inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ProjectSwitchDialogData } from '../../shared/project-switch-dialog-data.interface';
+import { ProjectSwitchDialogResult } from '../../shared/project-switch-dialog-result.enum';
+
+type DialogRef = MatDialogRef<ProjectSwitchDialogComponent, ProjectSwitchDialogResult | undefined>;
+
+@Component({
+  selector: 'step-project-switch-dialog',
+  templateUrl: './project-switch-dialog.component.html',
+  styleUrls: ['./project-switch-dialog.component.scss'],
+})
+export class ProjectSwitchDialogComponent {
+  private _dialogRef = inject<DialogRef>(MatDialogRef);
+
+  protected _data = inject<ProjectSwitchDialogData>(MAT_DIALOG_DATA);
+
+  openInCurrent(): void {
+    this._dialogRef.close(ProjectSwitchDialogResult.OPEN_IN_CURRENT);
+  }
+
+  openInTarget(): void {
+    this._dialogRef.close(ProjectSwitchDialogResult.OPEN_IN_TARGET);
+  }
+}

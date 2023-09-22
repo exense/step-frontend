@@ -31,6 +31,8 @@ export * from './services/selection-collector/selection-collector-factory.servic
 export * from './services/selection-collector/selection-collector-container';
 export * from './services/selection-collector.provider';
 export * from './services/has-filter';
+export * from './services/entity-bulk-operations-registry.service';
+export * from './services/bulk-operation-invoker.service';
 export * from './components/entity-selection/entity-selection.component';
 export * from './components/entity-selection/entity-selection-di.component';
 export * from './components/bulk-selection/bulk-selection.component';
@@ -39,3 +41,10 @@ export * from './components/bulk-selection-label/bulk-selection-label.component'
 export * from './shared/auto-deselect-strategy.enum';
 export * from './shared/bulk-selection-type.enum';
 export * from './shared/registration.strategy';
+export * from './shared/bulk-operation.type';
+export * from './shared/bulk-operation-config.interface';
+export {
+  EntityBulkOperationRegisterInfo,
+  EntityBulkOperationInfo,
+} from './shared/entity-bulk-operation-info.interface';
+export * from './shared/bulk-operation-perform.strategy';

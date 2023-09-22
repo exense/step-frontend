@@ -1,0 +1,23 @@
+<step-form-field *ngIf="context.artefact?.planId">
+  <step-label>Plan</step-label>
+  <input type="text" [readonly]="true" [ngModel]="planName" />
+  <step-suffix class="button-suffix">
+    <button type="button" mat-stroked-button (click)="gotoPlan()">
+      <step-icon name="edit-2"></step-icon>
+    </button>
+  </step-suffix>
+  <step-suffix class="button-suffix">
+    <button type="button" mat-stroked-button [disabled]="context.readonly" (click)="selectPlan()">Select</button>
+  </step-suffix>
+</step-form-field>
+<form #form="ngForm">
+  <step-plan-name
+    *ngIf="!context.artefact?.planId"
+    [artefact]="context.artefact"
+    [isDisabled]="context.readonly"
+    (onSave)="context.save()"
+  >
+  </step-plan-name>
+  <step-dynamic-json label="Input" [(ngModel)]="context.artefact!.input" [disabled]="context.readonly" name="input">
+  </step-dynamic-json>
+</form>

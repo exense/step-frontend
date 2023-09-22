@@ -3,6 +3,7 @@ import { TableComponent } from '../../../table/table.module';
 import { CustomComponent } from '../../../custom-registeries/custom-registries.module';
 import { SelectionCollector } from '../../../entities-selection/entities-selection.module';
 import { SelectEntityContext } from '../../types/select-entity-context.interface';
+import { EntityObject } from '../../types/entity-object';
 
 @Component({
   template: '',
@@ -33,11 +34,11 @@ export abstract class BaseEntitySelectionTableComponent implements AfterViewInit
     this.cleanupContext();
   }
 
-  handleSelect(id: string): void {
+  handleSelect(item: EntityObject): void {
     if (!this.contextInternal?.handleSelect) {
       return;
     }
-    this.contextInternal.handleSelect(id);
+    this.contextInternal.handleSelect(item);
   }
 
   private setupContext(): void {

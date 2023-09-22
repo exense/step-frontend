@@ -1,12 +1,9 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  AJS_LOCATION,
   AJS_MODULE,
   AugmentedPlansService,
   AutoDeselectStrategy,
-  BulkOperationsInvokeService,
-  BulkOperationType,
   Plan,
   PlanDialogsService,
   RestoreDialogsService,
@@ -14,8 +11,7 @@ import {
   STORE_ALL,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { ILocationService } from 'angular';
-import { PlansBulkOperationsInvokeService } from '../../injectables/plans-bulk-operations-invoke.service';
+import { pipe, tap } from 'rxjs';
 
 @Component({
   selector: 'step-plan-list',
@@ -24,60 +20,49 @@ import { PlansBulkOperationsInvokeService } from '../../injectables/plans-bulk-o
   providers: [
     tablePersistenceConfigProvider('planList', STORE_ALL),
     selectionCollectionProvider<string, Plan>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
-    {
-      provide: BulkOperationsInvokeService,
-      useClass: PlansBulkOperationsInvokeService,
-    },
   ],
 })
 export class PlanListComponent {
+  private _planDialogs = inject(PlanDialogsService);
+  private _restoreDialogsService = inject(RestoreDialogsService);
+  readonly _plansApiService = inject(AugmentedPlansService);
+
   readonly dataSource = this._plansApiService.getPlansTableDataSource();
-  readonly availableBulkOperations = [
-    { operation: BulkOperationType.delete, permission: 'plan-delete' },
-    { operation: BulkOperationType.duplicate, permission: 'plan-write' },
-  ];
-  constructor(
-    readonly _plansApiService: AugmentedPlansService,
-    private _planDialogs: PlanDialogsService,
-    private _restoreDialogsService: RestoreDialogsService,
-    @Inject(AJS_LOCATION) private _location: ILocationService
-  ) {}
+
+  private updateDataSourceAfterChange = pipe(
+    tap((changeResult?: Plan | boolean | string[]) => {
+      if (changeResult) {
+        this.dataSource.reload();
+      }
+    })
+  );
 
   addPlan(): void {
-    this._planDialogs.createPlan().subscribe((plan) => {
-      if (!plan) {
-        return;
-      }
-      this.dataSource.reload();
-    });
+    this._planDialogs.createPlan().pipe(this.updateDataSourceAfterChange).subscribe();
   }
 
-  editPlan(id: string): void {
-    this._location.path(`/root/plans/editor/${id}`);
+  editPlan(plan: Plan): void {
+    this._planDialogs.editPlan(plan).pipe(this.updateDataSourceAfterChange).subscribe();
   }
 
   executePlan(id: string): void {
-    this._location.path(`/root/repository`).search({ repositoryId: 'local', planid: id });
+    this._planDialogs.executePlan(id);
   }
 
   duplicatePlan(id: string): void {
-    this._planDialogs.duplicatePlan(id).subscribe(() => this.dataSource.reload());
+    this._planDialogs.duplicatePlan(id).pipe(this.updateDataSourceAfterChange).subscribe();
   }
 
   deletePlan(id: string, name: string): void {
-    this._planDialogs.deletePlan(id, name).subscribe((result) => {
-      if (result) {
-        this.dataSource.reload();
-      }
-    });
+    this._planDialogs.deletePlan(id, name).pipe(this.updateDataSourceAfterChange).subscribe();
   }
 
   importPlans(): void {
-    this._planDialogs.importPlans().subscribe(() => this.dataSource.reload());
+    this._planDialogs.importPlans().pipe(this.updateDataSourceAfterChange).subscribe();
   }
 
   exportPlans(): void {
-    this._planDialogs.exportPlans().subscribe(() => this.dataSource.reload());
+    this._planDialogs.exportPlans().pipe(this.updateDataSourceAfterChange).subscribe();
   }
 
   exportPlan(id: string, name: string): void {

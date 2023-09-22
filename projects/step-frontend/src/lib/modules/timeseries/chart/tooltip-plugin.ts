@@ -8,9 +8,10 @@ interface TooltipRowEntry {
   value: number;
   name: string;
   color: string;
+  bold?: boolean;
 }
 
-interface Anchor {
+export interface Anchor {
   left?: number;
   top?: number;
   bottom?: number;
@@ -20,13 +21,13 @@ interface Anchor {
 export class TooltipPlugin {
   public static getInstance(optionsGetter: () => TsTooltipOptions): uPlot.Plugin {
     let over: any;
-    let bound: any;
+    let bound: Element;
     let bLeft: any;
     let bTop: any;
     let isVisible = false;
 
     function syncBounds(): void {
-      let bbox = over.getBoundingClientRect();
+      const bbox = over.getBoundingClientRect();
       bLeft = bbox.left;
       bTop = bbox.top;
     }
@@ -101,6 +102,7 @@ export class TooltipPlugin {
           let elipsisAfter = true;
           if (yPoints.length > elementsToSelect) {
             var closestIndex = this.getClosestIndex(hoveredValue, yPoints);
+            yPoints[closestIndex].bold = true;
             if (closestIndex < elementsToSelect / 2) {
               yPoints = yPoints.slice(0, elementsToSelect);
               elipsisBefore = false;
@@ -147,12 +149,13 @@ export class TooltipPlugin {
           overlay.appendChild(this.createSeparator());
           overlay.appendChild(this.createTimestampItem(timestamp));
 
-          // overlay.appendChild(dots);
-          // the feature will display the closest value for the y scale only, and just one value for the second scale (if present)
-          let anchorPadding = 12;
-          const anchor: Anchor = { left: left + bLeft + anchorPadding, top: top + bTop };
+          // there is no easy way to cache these. when the div gets smaller without a resize, the bbox is not updated.
+          let boundingClientRect = over.getBoundingClientRect();
+
+          const anchor: Anchor = { left: left + boundingClientRect.left, top: top + boundingClientRect.top };
           // overlay.textContent = `${x} at ${Math.round(left)},${Math.round(top)}`;
-          PlacementFunction.placement(overlay, anchor, 'right', 'start', { bound });
+          let container = this.getAdjustedBoundaries(bound);
+          PlacementFunction.placement(overlay, anchor, 'right', 'start', container);
         },
       },
     };
@@ -172,22 +175,53 @@ export class TooltipPlugin {
     return div;
   }
 
-  private static createRowElement(point: TooltipRowEntry, yScaleUnit?: string) {
-    var rowElement = document.createElement('div');
-    rowElement.classList.add('tooltip-row');
-    let content = document.createElement('div');
-    let textContent = `${point.name} : ${Math.trunc(point.value)} `;
-    if (yScaleUnit) {
-      textContent += yScaleUnit;
+  private static getAdjustedBoundaries(element: Element) {
+    const rect = element.getBoundingClientRect();
+    let shiftUp = 0; // positive value when need to avoid scroll
+
+    if (rect.bottom > window.innerHeight) {
+      shiftUp = rect.bottom - window.innerHeight;
     }
-    content.textContent = textContent;
-    if (point.color) {
+
+    return {
+      top: rect.top - shiftUp,
+      bottom: rect.bottom - shiftUp,
+      left: 0,
+      right: window.innerWidth,
+      width: window.innerWidth,
+      height: rect.height,
+    };
+  }
+
+  private static createRowElement(row: TooltipRowEntry, yScaleUnit?: string) {
+    const rowElement = document.createElement('div');
+    rowElement.classList.add('tooltip-row');
+    if (row.bold) {
+      rowElement.setAttribute('style', 'font-weight: bold');
+    }
+    const leftContainer = document.createElement('div');
+    leftContainer.classList.add('left');
+    const nameDiv = document.createElement('div');
+    nameDiv.classList.add('name');
+    const valueDiv = document.createElement('div');
+    valueDiv.classList.add('value');
+    nameDiv.textContent = `${row.name} `;
+
+    let value = `${Math.trunc(row.value)} `;
+    if (yScaleUnit) {
+      value += yScaleUnit;
+    }
+    valueDiv.textContent = value;
+
+    if (row.color) {
       let colorDiv = document.createElement('div');
       colorDiv.classList.add('color');
-      colorDiv.style.backgroundColor = point.color;
-      rowElement.appendChild(colorDiv);
+      colorDiv.style.backgroundColor = row.color;
+      leftContainer.appendChild(colorDiv);
     }
-    rowElement.appendChild(content);
+    leftContainer.appendChild(nameDiv);
+    rowElement.appendChild(leftContainer);
+    rowElement.appendChild(valueDiv);
     return rowElement;
   }
 

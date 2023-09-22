@@ -1,4 +1,14 @@
-import { Component, OnInit, Output, EventEmitter, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Output,
+  EventEmitter,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  inject,
+  TrackByFunction,
+} from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AuthService,
@@ -9,6 +19,8 @@ import {
   UserService,
   CredentialsService,
   GenerateApiKeyService,
+  ApiToken,
+  DialogsService,
 } from '@exense/step-core';
 
 const preferencesToKVPairArray = (preferences?: Preferences): KeyValuePair<string, string>[] => {
@@ -38,6 +50,7 @@ export class MyAccountComponent implements OnInit, OnChanges {
   private _authService = inject(AuthService);
   private _credentialsService = inject(CredentialsService);
   private _generateApiKey = inject(GenerateApiKeyService);
+  private _dialogs = inject(DialogsService);
 
   readonly canChangePassword = !!this._authService.getConf()?.passwordManagement;
   readonly canGenerateApiKey = !!this._authService.getConf()?.authentication;
@@ -45,15 +58,18 @@ export class MyAccountComponent implements OnInit, OnChanges {
   @Input() error?: string;
   @Output() errorChange: EventEmitter<string | undefined> = new EventEmitter<string | undefined>();
 
+  readonly trackByToken: TrackByFunction<ApiToken> = (index, item) => item.id;
+
   user: Partial<User> = {};
   preferences: KeyValuePair<string, string>[] = [];
+  tokens: Array<any> = [];
 
   changePwd(): void {
     this._credentialsService.changePassword(false);
   }
 
   invokeShowGenerateApiKeyDialog(): void {
-    this._generateApiKey.showGenerateApiKeyDialog();
+    this._generateApiKey.showGenerateApiKeyDialog().subscribe(() => this.updateTokens());
   }
 
   addPreference(): void {
@@ -77,6 +93,7 @@ export class MyAccountComponent implements OnInit, OnChanges {
       this.user = user || {};
       this.preferences = preferencesToKVPairArray(this.user?.preferences);
     });
+    this.updateTokens();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -84,6 +101,18 @@ export class MyAccountComponent implements OnInit, OnChanges {
     if (errorChange?.currentValue !== errorChange?.previousValue) {
       this.errorChange.emit(errorChange?.currentValue);
     }
+  }
+
+  updateTokens(): void {
+    if (this.canGenerateApiKey) {
+      this._generateApiKey.getServiceAccountTokens().subscribe((tokens) => (this.tokens = tokens));
+    }
+  }
+
+  revokeAPIToken(id: string) {
+    this._dialogs
+      .showWarning('Revoking will make the API key permanently unusable. Do you want to proceed?')
+      .then(() => this._generateApiKey.revoke(id).subscribe(() => this.updateTokens()));
   }
 }
 

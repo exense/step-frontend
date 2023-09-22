@@ -1,6 +1,7 @@
 import {
   ChangeDetectorRef,
   Component,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -26,7 +27,7 @@ import { TimeSeriesConfig } from '../../time-series.config';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TimeSeriesDashboardSettings } from '../../dashboard/model/ts-dashboard-settings';
 import { TimeSeriesDashboardComponent } from '../../dashboard/time-series-dashboard.component';
-import { FilterBarItemType } from '../../performance-view/filter-bar/model/ts-filter-item';
+import { FilterBarItemType, TsFilterItem } from '../../performance-view/filter-bar/model/ts-filter-item';
 import { TsUtils } from '../../util/ts-utils';
 import { TimeSeriesUtils } from '../../time-series-utils';
 import { ChartsViewComponent } from '../../performance-view/charts-view.component';
@@ -59,13 +60,9 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
 
   dashboardSettings: TimeSeriesDashboardSettings | undefined;
 
-  constructor(
-    private timeSeriesService: TimeSeriesService,
-    private executionService: ExecutionsService,
-    private dashboardService: DashboardService,
-    private _asyncTaskService: AsyncTasksService,
-    private cd: ChangeDetectorRef
-  ) {}
+  private timeSeriesService = inject(TimeSeriesService);
+  private _asyncTaskService = inject(AsyncTasksService);
+  private cd = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     if (!this.executionId) {
@@ -97,9 +94,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
       this.initDashboard(currentExecution);
       this.cd.detectChanges();
     } else {
-      this.dashboard.refresh(
-        TimeSeriesUtils.convertExecutionAndSelectionToTimeRange(this.execution!, this.timeRangeSelection)
-      );
+      this.dashboard.refresh(); // the new execution is sent via input
     }
   }
 
@@ -118,34 +113,46 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
       activeTimeRange: timeRangeOptions[timeRangeOptions.length - 1],
       contextualFilters: { ...urlParams, eId: this.executionId },
       showContextualFilters: false,
-      filterOptions: [
-        {
-          label: 'Status',
-          attributeName: 'rnStatus',
-          type: FilterBarItemType.OPTIONS,
-          textValues: [
-            { value: 'PASSED' },
-            { value: 'FAILED' },
-            { value: 'TECHNICAL_ERROR' },
-            { value: 'INTERRUPTED' },
-          ],
-          isLocked: true,
-        },
-        {
-          label: 'Type',
-          attributeName: 'type',
-          type: FilterBarItemType.OPTIONS,
-          textValues: [{ value: 'keyword' }, { value: 'custom' }],
-          isLocked: true,
-        },
-        {
-          label: 'Name',
-          attributeName: 'name',
-          type: FilterBarItemType.FREE_TEXT,
-          isLocked: true,
-        },
-      ],
+      activeFilters: this.createBaseFilters(),
+      filterOptions: this.createBaseFilters(),
     };
+  }
+
+  private createBaseFilters(): TsFilterItem[] {
+    return [
+      {
+        label: 'Execution',
+        attributeName: 'eId',
+        type: FilterBarItemType.EXECUTION,
+        searchEntities: [],
+        removable: true,
+        exactMatch: true,
+        isHidden: true,
+      },
+      {
+        label: 'Status',
+        attributeName: 'rnStatus',
+        type: FilterBarItemType.OPTIONS,
+        textValues: [{ value: 'PASSED' }, { value: 'FAILED' }, { value: 'TECHNICAL_ERROR' }, { value: 'INTERRUPTED' }],
+        isLocked: true,
+        searchEntities: [],
+      },
+      {
+        label: 'Type',
+        attributeName: 'type',
+        type: FilterBarItemType.OPTIONS,
+        textValues: [{ value: 'keyword' }, { value: 'custom' }],
+        isLocked: true,
+        searchEntities: [],
+      },
+      {
+        label: 'Name',
+        attributeName: 'name',
+        type: FilterBarItemType.FREE_TEXT,
+        isLocked: true,
+        searchEntities: [],
+      },
+    ];
   }
 
   rebuildTimeSeries() {

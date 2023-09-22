@@ -1,4 +1,3 @@
-import { DOCUMENT } from '@angular/common';
 import {
   Component,
   forwardRef,
@@ -21,7 +20,6 @@ import {
   DialogsService,
   Function as KeywordCall,
   KeywordsService,
-  LinkProcessorService,
   Plan,
   PlanArtefactResolverService,
   PlanEditorService,
@@ -32,10 +30,24 @@ import {
   TreeNodeUtilsService,
   TreeStateService,
   ArtefactService,
+  PlanLinkDialogService,
+  FunctionActionsService,
 } from '@exense/step-core';
-import { catchError, filter, from, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import {
+  catchError,
+  defer,
+  EMPTY,
+  filter,
+  map,
+  mergeMap,
+  Observable,
+  of,
+  Subject,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
-import { FunctionDialogsService } from '../../../function/services/function-dialogs.service';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
@@ -78,16 +90,15 @@ export class PlanEditorBaseComponent
   private _planApi = inject(PlansService);
   private _keywordCallsApi = inject(KeywordsService);
   private _dialogsService = inject(DialogsService);
-  private _linkProcessor = inject(LinkProcessorService);
-  private _functionDialogs = inject(FunctionDialogsService);
+  private _functionActions = inject(FunctionActionsService);
+  private _planLinkDialogs = inject(PlanLinkDialogService, { optional: true });
   private _artefactService = inject(ArtefactService);
   public _planEditService = inject(PlanEditorService);
   private _restoreDialogsService = inject(RestoreDialogsService);
-  private _location = inject(AJS_LOCATION);
-  private _document = inject(DOCUMENT);
+  private _location$ = inject(AJS_LOCATION);
 
   private get artefactIdFromUrl(): string | undefined {
-    const { artefactId } = this._location.search() || {};
+    const { artefactId } = this._location$.search() || {};
     return artefactId;
   }
 
@@ -100,7 +111,7 @@ export class PlanEditorBaseComponent
     map((planTypes) => {
       return planTypes.map((planType) => ({
         planType,
-        icon: this._artefactService.getIconNg2(planType)!,
+        icon: this._artefactService.getArtefactType(planType)!.icon,
       }));
     })
   );
@@ -156,20 +167,37 @@ export class PlanEditorBaseComponent
   }
 
   displayHistory(permission: string, plan: Plan): void {
-    if (!plan || !plan.id) {
+    if (!(plan?.id || this.id)) {
       return;
     }
 
-    const planVersion = plan.customFields ? plan.customFields['versionId'] : undefined;
-    const versionHistory = this._planEditorApi.getPlanHistory(plan.id!);
+    const versionHistory = this._planEditorApi.getPlanHistory(this.id || plan.id!);
 
-    this._restoreDialogsService
-      .showRestoreDialog(planVersion, versionHistory, permission)
+    const currentVersion$ = defer(() => {
+      if (this.id && this.id !== plan.id) {
+        // composite keywords need to retrieve the current version
+        return this._keywordCallsApi
+          .getFunctionById(this.id)
+          .pipe(map((keyword) => keyword?.customFields?.['versionId'] ?? undefined));
+      } else {
+        // we are showing a real plan
+        return of(plan.customFields ? plan.customFields['versionId'] : undefined);
+      }
+    });
+
+    currentVersion$
       .pipe(
-        filter((restoreVersion) => !!restoreVersion),
-        switchMap((restoreVersion) => this._planEditorApi.restorePlanVersion(plan.id!, restoreVersion))
+        switchMap((currentVersion) =>
+          this._restoreDialogsService.showRestoreDialog(currentVersion, versionHistory, permission)
+        ),
+        filter((restoreVersion) => restoreVersion !== undefined),
+        switchMap((restoreVersion) => this._planEditorApi.restorePlanVersion(this.id || plan.id!, restoreVersion)),
+        catchError((error) => {
+          console.error(error);
+          return EMPTY;
+        })
       )
-      .subscribe(() => this.loadPlan(plan.id!));
+      .subscribe(() => this.loadPlan(this.id || plan.id!));
   }
 
   clonePlan(): void {
@@ -267,8 +295,14 @@ export class PlanEditorBaseComponent
     }
   }
 
-  execute(): void {
-    const artefactIds = this._treeState.getSelectedNodes().map((node) => node.id!);
+  execute(nodeId?: string): void {
+    let artefactIds: string[];
+    if (nodeId) {
+      this._treeState.selectNodeById(nodeId);
+      artefactIds = [nodeId];
+    } else {
+      artefactIds = this._treeState.getSelectedNodes().map((node) => node.id!);
+    }
 
     this._interactiveSession.execute(this.id!, artefactIds).subscribe(() => {
       if (this.keywords) {
@@ -296,7 +330,7 @@ export class PlanEditorBaseComponent
         this.planTypeControl.setValue(
           {
             planType: plan.root!._class,
-            icon: this._artefactService.getIconNg2(plan.root!._class)!,
+            icon: this._artefactService.getArtefactType(plan.root!._class)!.icon,
           },
           { emitEvent: false }
         );
@@ -330,38 +364,14 @@ export class PlanEditorBaseComponent
   }
 
   private openPlan(plan: Plan): Observable<unknown> {
-    const planId = plan!.id!;
-    const project = plan!.attributes!['project'];
-    return from(this._linkProcessor.process(project)).pipe(
-      catchError((errorMessage) => {
-        this._dialogsService.showErrorMsg(errorMessage);
-        return of(undefined);
-      }),
-      tap((isSuccess) => {
-        if (isSuccess) {
-          // for some reason location change isn't enough for reopen editor
-          // that's why the document reload was added
-          // It should gone, after the route will be refactored
-          this._location.path(`/root/plans/editor/${planId}`);
-          setTimeout(() => {
-            this._document.location.reload();
-          }, 100);
-        }
-      })
-    );
+    if (!this._planLinkDialogs) {
+      return of(undefined);
+    }
+    return this._planLinkDialogs.editPlan(plan);
   }
 
   private openFunctionEditor(keyword: KeywordCall): Observable<unknown> {
-    const keywordId = keyword!.id!;
-    const project = keyword!.attributes!['project'];
-    return this._functionDialogs.openFunctionEditor(keywordId).pipe(
-      switchMap((isSuccess) => {
-        if (isSuccess) {
-          return from(this._linkProcessor.process(project)).pipe(map(() => isSuccess));
-        }
-        return of(undefined);
-      })
-    );
+    return this._functionActions.openFunctionEditor(keyword);
   }
 
   private synchronizeDynamicName(artefact: AbstractArtefact): void {

@@ -19,6 +19,7 @@
   *ngIf="showJson"
   [ngModel]="internalValue"
   (ngModelChange)="handleChange($event)"
+  (blur)="blur.emit()"
   [disabled]="!!isDisabled"
 >
 </step-json-raw-editor>

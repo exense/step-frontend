@@ -29,10 +29,10 @@ export class ParameterDialogsService {
     return this._exportDialogs.displayExportDialog('Parameters export', 'parameters', 'allParameters.sta');
   }
 
-  editParameter(parameter?: Partial<Parameter>): Observable<Parameter | undefined> {
+  editParameter(parameterId?: string): Observable<Parameter | undefined> {
     return this._matDialog
       .open(ParameterEditDialogComponent, {
-        data: parameter?.id,
+        data: parameterId,
       })
       .afterClosed();
   }

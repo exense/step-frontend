@@ -86,8 +86,8 @@
 
   <mat-menu #executionMenu="matMenu">
     <span class="plan-execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
-      <step-plan-execution [description]="description" [repositoryObjectRef]="repositoryObjectRef">
-      </step-plan-execution>
+      <step-execution-commands [description]="description" [repositoryObjectRef]="repositoryObjectRef">
+      </step-execution-commands>
     </span>
   </mat-menu>
 </step-btn-group>

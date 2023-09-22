@@ -4,12 +4,12 @@ import {
   CustomSearchCellRegistryService,
   EntityRegistry,
   FunctionLinkComponent,
-  FunctionLinkDialogService,
   FunctionType,
   FunctionTypeRegistryService,
   StepBasicsModule,
   StepCoreModule,
   ViewRegistryService,
+  FunctionConfigurationService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
@@ -22,15 +22,12 @@ import { FunctionPackageListComponent } from './components/function-package-list
 import { FunctionPackageSearchComponent } from './components/function-package-search/function-package-search.component';
 import './components/function-package-selection/function-package-selection.component';
 import { FunctionPackageSelectionComponent } from './components/function-package-selection/function-package-selection.component';
-import { FunctionSelectionTableComponent } from './components/function-selection-table/function-selection-table.component';
 import { FunctionTypeCompositeComponent } from './components/function-type-composite/function-type-composite.component';
 import { FunctionTypeFilterComponent } from './components/function-type-filter/function-type-filter.component';
 import { FunctionTypeJMeterComponent } from './components/function-type-jmeter/function-type-jmeter.component';
 import { FunctionTypeNodeJSComponent } from './components/function-type-node-js/function-type-node-js.component';
 import { FunctionTypeScriptComponent } from './components/function-type-script/function-type-script.component';
-import { FunctionTypeLabelPipe } from './pipes/function-type-label.pipe';
-import './services/function-dialogs.service';
-import { FunctionDialogsService } from './services/function-dialogs.service';
+import { FunctionConfigurationImplService } from './services/function-configuration-impl.service';
 
 @NgModule({
   imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule],
@@ -38,14 +35,12 @@ import { FunctionDialogsService } from './services/function-dialogs.service';
     FunctionListComponent,
     FunctionPackageLinkComponent,
     FunctionPackageListComponent,
-    FunctionTypeLabelPipe,
     FunctionTypeFilterComponent,
     FunctionPackageSearchComponent,
     FunctionPackageSelectionComponent,
     CompositeFunctionEditorComponent,
     FunctionPackageConfigurationDialogComponent,
     FunctionConfigurationDialogComponent,
-    FunctionSelectionTableComponent,
     FunctionTypeCompositeComponent,
     FunctionTypeScriptComponent,
     FunctionTypeJMeterComponent,
@@ -53,18 +48,16 @@ import { FunctionDialogsService } from './services/function-dialogs.service';
   ],
   providers: [
     {
-      provide: FunctionLinkDialogService,
-      useExisting: FunctionDialogsService,
+      provide: FunctionConfigurationService,
+      useExisting: FunctionConfigurationImplService,
     },
   ],
   exports: [
-    FunctionTypeLabelPipe,
     FunctionListComponent,
     FunctionPackageSelectionComponent,
     CompositeFunctionEditorComponent,
     FunctionPackageConfigurationDialogComponent,
     FunctionConfigurationDialogComponent,
-    FunctionSelectionTableComponent,
   ],
 })
 export class FunctionModule {
@@ -83,14 +76,10 @@ export class FunctionModule {
   }
 
   private registerEntities(): void {
-    this._entityRegistry.register('functions', 'Keyword', {
-      icon: 'target',
-      component: FunctionSelectionTableComponent,
-    });
     this._entityRegistry.registerEntity(
       'KeywordPackage',
       'functionPackage',
-      'gift',
+      'package',
       'functionPackage',
       'rest/functionpackages/',
       'rest/functionpackages/',

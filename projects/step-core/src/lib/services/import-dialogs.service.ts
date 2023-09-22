@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { catchError, Observable, of } from 'rxjs';
 import { a1Promise2Observable } from '../shared';
-import { ResourceInputBridgeService } from './resource-input-bridge.service';
 import { UibModalHelperService } from './uib-modal-helper.service';
+import { ResourceInputBridgeService } from '../modules/resource-input/resource-input.module';
 
 @Injectable({
   providedIn: 'root',
@@ -26,7 +26,7 @@ export class ImportDialogsService {
 
     return a1Promise2Observable<string[]>(modalInstance.result).pipe(
       catchError(() => {
-        this._resourceInputBridgeService.deleteLastUploadedResource();
+        this._resourceInputBridgeService.deleteUploadedResource();
 
         return of(false);
       })

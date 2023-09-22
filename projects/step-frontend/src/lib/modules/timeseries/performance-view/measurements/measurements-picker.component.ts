@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
 import { KeywordSelection, TimeSeriesKeywordsContext } from '../../pages/execution-page/time-series-keywords.context';
 import { KeyValue } from '@angular/common';
@@ -20,7 +20,7 @@ export class MeasurementsPickerComponent implements OnInit, OnDestroy {
 
   terminator$ = new Subject<void>();
 
-  constructor(private contextsFactory: TimeSeriesContextsFactory) {}
+  private contextsFactory = inject(TimeSeriesContextsFactory);
 
   ngOnInit(): void {
     if (!this.contextId) {
