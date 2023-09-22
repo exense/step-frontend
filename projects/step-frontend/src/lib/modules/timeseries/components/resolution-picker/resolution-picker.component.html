@@ -1,7 +1,27 @@
-<button mat-menu-item [matMenuTriggerFor]="resolutionsMenu" (click)="$event.stopPropagation()">
-  <step-icon name="zoom-in"></step-icon>Charts Resolution
+<button
+  mat-menu-item
+  #menuTrigger="matMenuTrigger"
+  [matMenuTriggerFor]="resolutionsMenu"
+  (click)="$event.stopPropagation()"
+>
+  <step-icon name="zoom-in"></step-icon>
+  Charts Resolution
 </button>
 
 <mat-menu #resolutionsMenu="matMenu">
-  <button mat-menu-item *ngFor="let option of options" (click)="selectResolution(option)">{{ option.label }}</button>
+  <div (click)="$event.stopPropagation()" class="menu-container">
+    <div class="custom-input-container">
+      <div class="form-group custom-input-container">
+        <input class="form-control" placeholder="0" type="number" [(ngModel)]="inputValue" />
+        <mat-select [(ngModel)]="selectedUnit" class="unit-select">
+          <mat-option *ngFor="let unit of UNITS" [value]="unit">
+            {{ unit.label }}
+          </mat-option>
+        </mat-select>
+      </div>
+    </div>
+    <div class="apply-btn">
+      <button mat-stroked-button color="primary" (click)="applyResolution()">Apply</button>
+    </div>
+  </div>
 </mat-menu>

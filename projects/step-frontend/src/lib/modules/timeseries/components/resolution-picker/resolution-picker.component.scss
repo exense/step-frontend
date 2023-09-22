@@ -1,0 +1,28 @@
+.menu-container {
+  .custom-input-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem;
+    margin-bottom: 0;
+
+    input {
+      margin-right: 1.2rem;
+      width: 10rem;
+    }
+  }
+
+  .apply-btn {
+    padding: 1rem;
+    width: 100%;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .unit-select {
+    width: 9rem;
+  }
+}

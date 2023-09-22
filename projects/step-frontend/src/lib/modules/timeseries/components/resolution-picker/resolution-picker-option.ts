@@ -1,4 +1,4 @@
 export interface ResolutionPickerOption {
   label: string;
-  valueMs: number;
+  ms: number;
 }

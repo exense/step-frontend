@@ -41,7 +41,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
   terminator$ = new Subject<void>();
 
   @ViewChild('dashboard') dashboard!: TimeSeriesDashboardComponent;
-  @ViewChild('matTrigger') matTrigger!: MatMenuTrigger;
+  @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
   @ViewChild(ChartsViewComponent) performanceView!: ChartsViewComponent;
 
   @Input() executionId!: string;
@@ -76,6 +76,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
   }
 
   handleResolutionChange(resolution: number) {
+    this.menuTrigger.closeMenu();
     this.dashboard.setChartsResolution(resolution);
   }
 
