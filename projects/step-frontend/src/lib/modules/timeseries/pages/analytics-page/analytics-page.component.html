@@ -37,11 +37,21 @@
     [settings]="dashboardSettings"
   ></step-timeseries-dashboard>
 
-  <div style="height: 400px; width: 50%">
+  <div>
+    <div id="add-custom-chart" *ngIf="metricTypes" [matMenuTriggerFor]="menu">
+      <span>+ Add Custom Chart</span>
+      <mat-menu #menu="matMenu">
+        <button *ngFor="let metric of metricTypes" mat-menu-item (click)="addCustomChart(metric)">
+          {{ metric.label }}
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+
+  <div *ngFor="let settings of customChartsMetrics" style="height: 400px; width: 50%">
     <step-metric-chart
-      *ngIf="dashboardSettings"
-      [metric]="MetricChartType.CPU"
-      [range]="dashboardSettings.timeRange!"
+      [settings]="settings"
+      [range]="(dashboard?.timeRangeSelection)!.absoluteSelection!"
     ></step-metric-chart>
   </div>
 </div>

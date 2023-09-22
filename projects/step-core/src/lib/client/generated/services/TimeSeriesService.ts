@@ -8,6 +8,7 @@ import type { AsyncTaskStatusObject } from '../models/AsyncTaskStatusObject';
 import type { FetchBucketsRequest } from '../models/FetchBucketsRequest';
 import type { Measurement } from '../models/Measurement';
 import type { MeasurementsStats } from '../models/MeasurementsStats';
+import type { MetricType } from '../models/MetricType';
 import type { OQLVerifyResponse } from '../models/OQLVerifyResponse';
 import type { TimeSeriesAPIResponse } from '../models/TimeSeriesAPIResponse';
 import type { TimeSeriesRebuildRequest } from '../models/TimeSeriesRebuildRequest';
@@ -63,6 +64,17 @@ export class TimeSeriesService {
       query: {
         filter: filter,
       },
+    });
+  }
+
+  /**
+   * @returns MetricType default response
+   * @throws ApiError
+   */
+  public getMetricTypes(): Observable<Array<MetricType>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/time-series/metric-types',
     });
   }
 

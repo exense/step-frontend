@@ -1,9 +1,14 @@
 import { AfterViewInit, Component, inject, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { TSChartSettings } from '../chart/model/ts-chart-settings';
-import { MetricChartSettings, MetricDefaultSettings } from './metric-default-settings';
-import { MetricChartType } from './metric-chart-type';
 import { TSTimeRange } from '../chart/model/ts-time-range';
-import { BucketResponse, FetchBucketsRequest, TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
+import {
+  BucketResponse,
+  FetchBucketsRequest,
+  MetricType,
+  MetricTypeRenderSettings,
+  TimeSeriesAPIResponse,
+  TimeSeriesService,
+} from '@exense/step-core';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { UPlotUtils } from '../uplot/uPlot.utils';
 import { TimeSeriesConfig } from '../time-series.config';
@@ -21,38 +26,37 @@ import { FilterUtils } from '../util/filter-utils';
 export class MetricChartComponent implements OnInit, OnChanges {
   chartSettings?: TSChartSettings;
 
-  @Input() metric!: MetricChartType;
+  @Input() settings!: MetricType;
   @Input() range!: TSTimeRange;
 
   private _timeSeriesService = inject(TimeSeriesService);
 
   ngOnInit(): void {
-    if (!this.metric) {
-      throw new Error('Metric input is mandatory');
+    if (!this.settings) {
+      throw new Error('Metric settings input is mandatory');
     }
     if (!this.range) {
       throw new Error('Range input is mandatory');
     }
-    const settings = MetricDefaultSettings.getSettings(this.metric);
     const request: FetchBucketsRequest = {
       start: this.range.from,
       end: this.range.to,
       groupDimensions: ['name'],
-      oqlFilter: FilterUtils.objectToOQL({ 'attributes.metricType': settings.metricAttribute }),
+      oqlFilter: FilterUtils.objectToOQL({ 'attributes.metricType': this.settings.attributeValue! }),
       numberOfBuckets: 100,
     };
     this._timeSeriesService.getBuckets(request).subscribe((response) => {
-      this.chartSettings = this.createChartSettings(settings, response);
+      this.chartSettings = this.createChartSettings(response);
     });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     // TODO handle range change
-    // TODO handle metric change
+    // TODO handle settings change
     console.log('CHANGES');
   }
 
-  private createChartSettings(settings: MetricChartSettings, response: TimeSeriesAPIResponse): TSChartSettings {
+  private createChartSettings(response: TimeSeriesAPIResponse): TSChartSettings {
     let xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     let avgValues: (number | null | undefined)[] = [];
     let countValues: (number | null)[] = [];
@@ -64,7 +68,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
     }
 
     return {
-      title: settings.title,
+      title: this.settings.label!,
       xValues: xLabels,
       tooltipOptions: {
         enabled: true,

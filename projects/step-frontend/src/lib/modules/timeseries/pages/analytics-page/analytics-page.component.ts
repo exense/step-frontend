@@ -1,17 +1,16 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, DashboardService } from '@exense/step-core';
+import { AJS_MODULE, DashboardService, MetricType, TimeSeriesService } from '@exense/step-core';
 import { TimeSeriesConfig } from '../../time-series.config';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
 import { TimeSeriesDashboardComponent } from '../../dashboard/time-series-dashboard.component';
 import { RangeSelectionType } from '../../time-selection/model/range-selection-type';
-import { TSTimeRange } from '../../chart/model/ts-time-range';
 import { TimeSeriesDashboardSettings } from '../../dashboard/model/ts-dashboard-settings';
 import { TsUtils } from '../../util/ts-utils';
 import { FilterBarItemType, TsFilterItem } from '../../performance-view/filter-bar/model/ts-filter-item';
 import { range, Subject, takeUntil, timer } from 'rxjs';
 import { TimeSeriesUtils } from '../../time-series-utils';
-import { MetricChartType } from '../../metric-chart/metric-chart-type';
+import { TSChartSettings } from '../../chart/model/ts-chart-settings';
 
 @Component({
   selector: 'step-analytics-page',
@@ -43,7 +42,13 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   executionHasToBeBuilt = false;
   migrationInProgress = false;
 
+  timeSeriesService = inject(TimeSeriesService);
+  metricTypes?: MetricType[];
+  customChartsMetrics: MetricType[] = [];
+
   ngOnInit(): void {
+    this.timeSeriesService.getMetricTypes().subscribe((metrics) => (this.metricTypes = metrics));
+
     let now = new Date().getTime();
     let start;
     let end;
@@ -146,6 +151,10 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     }
   }
 
+  addCustomChart(metric: MetricType) {
+    this.customChartsMetrics.push(metric);
+  }
+
   changeRefreshInterval(newInterval: { label: string; value: number }) {
     const oldInterval = this.selectedRefreshInterval;
     this.selectedRefreshInterval = newInterval;
@@ -211,10 +220,6 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.terminator$.next();
     this.terminator$.complete();
-  }
-
-  get MetricChartType() {
-    return MetricChartType;
   }
 }
 
