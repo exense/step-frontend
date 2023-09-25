@@ -67,7 +67,8 @@ export class AssertComponent extends BaseArtefactComponent<AssertArtefact> imple
     this.setupNumberExpectedValue();
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
+    super.ngOnDestroy();
     this.terminator$.next();
     this.terminator$.complete();
   }
