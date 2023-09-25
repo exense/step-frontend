@@ -20,6 +20,7 @@ export class SelectEntityOfTypeComponent implements OnInit, OnDestroy {
   protected entity = this._entityRegistry.getEntityByName(this._dialogData.entityName);
   protected selectEntityContext: SelectEntityContext = {
     multipleSelection: !this._dialogData.singleSelection,
+    tableFilter: this._dialogData.tableFilter,
     handleSelect: (selectedId: string) => this.handleSelect(selectedId),
     getSourceId: () => this._dialogData.sourceId,
   };

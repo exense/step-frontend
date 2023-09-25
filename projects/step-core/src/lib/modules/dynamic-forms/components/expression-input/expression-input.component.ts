@@ -14,6 +14,7 @@ type OnTouch = () => void;
 export class ExpressionInputComponent implements ControlValueAccessor {
   @Input() label?: string;
   @Input() tooltip?: string;
+  @Input() placeholder?: string;
   @Input() isParentInvalid?: boolean;
   @Input() isParentTouched?: boolean;
   @Input() isParentDisabled?: boolean;

@@ -2,6 +2,7 @@ import { LegacyTableHandle } from '../../table/table.module';
 
 export interface SelectEntityContext extends LegacyTableHandle {
   readonly multipleSelection?: boolean;
+  readonly tableFilter?: string;
   handleSelect?(selectedId: string): void;
   getSourceId?(): string | undefined;
 }
