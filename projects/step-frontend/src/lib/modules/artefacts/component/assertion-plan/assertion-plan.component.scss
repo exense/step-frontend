@@ -1,0 +1,10 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
+form,
+.panel-content {
+  @include core.common-form-content;
+}
+
+.calc-wizard {
+  width: max-content;
+}
