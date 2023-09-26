@@ -1,6 +1,6 @@
 <ng-container *ngIf="performanceViewSettings">
   <div>
-    <div class="filter-bars-container" [style.gap]="compareModeEnabled ? '12px' : '0'">
+    <div class="filter-bars-container" [class.compare-mode-enabled]="compareModeEnabled">
       <div class="bar mat-card">
         <step-ts-filter-bar
           *ngIf="context"
@@ -15,7 +15,7 @@
         </step-ts-filter-bar>
         <div *ngIf="compareModeEnabled" class="stamp">BASE</div>
       </div>
-      <div class="bar mat-card" [style.flexGrow]="compareModeEnabled ? 1 : 0">
+      <div class="bar mat-card" [class]="compareModeEnabled ? 'grow-1' : 'collapsed'">
         <step-ts-filter-bar
           #compareFilterBar
           *ngIf="compareModeContext"
