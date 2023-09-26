@@ -3,8 +3,27 @@
 step-ts-filter-bar {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  background: #f5f5f5;
+  padding: 1.6rem;
+
+  .time-container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    margin-top: 1.2rem;
+
+    .ranger-section {
+      width: calc(100% - 150px);
+
+      &.compact {
+        width: calc(100% - 40px);
+      }
+    }
+  }
+
+  .filters-section {
+    padding-top: 12px;
+    border-top: 1px solid var.$gray-200;
+  }
 
   .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
     line-height: 22px;
@@ -15,11 +34,10 @@ step-ts-filter-bar {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
   }
 
   .warning {
-    margin: 0 20px;
-    margin-top: 1rem !important;
     font-size: 11px;
     padding: 0.8rem;
   }
@@ -27,18 +45,17 @@ step-ts-filter-bar {
   .filters {
     display: flex;
     gap: 12px;
-    padding: 12px;
     align-items: center;
-    height: 8rem;
+    min-height: 3.6rem;
   }
 
-  .applied-filters {
+  .filers-row {
     flex: 1;
     display: flex;
     flex-wrap: nowrap;
     gap: 8px;
-    padding: 8px;
     overflow: auto;
+    margin-top: 8px;
 
     &::-webkit-scrollbar {
       width: 6px;
@@ -68,6 +85,7 @@ step-ts-filter-bar {
       flex-direction: row;
       min-width: unset;
       height: 100%;
+      line-height: 32px;
 
       step-icon {
         transform: scale(0.6);
@@ -85,7 +103,7 @@ step-ts-filter-bar {
   /**
   These got override by the theme scss file
    */
-  .applied-filters button.apply-btn {
+  .filers-row button.apply-btn {
     font-size: 12px;
     line-height: 28px;
     margin-right: 12px;
@@ -139,30 +157,7 @@ step-ts-filter-bar {
     font-size: 12px;
   }
 
-  .export-btn {
-    position: absolute;
-    right: 4px;
-    top: 4px;
-    padding: 0;
-    border: 1px solid white;
-    border-radius: 4px;
-    font-size: 12px;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    opacity: 0.6;
-    transform: scale(0.8);
-  }
-
   .grouping-container {
     margin-right: 6px;
-  }
-
-  .separator {
-    width: 2px;
-    height: 40px;
-    background: var.$gray-100;
-    display: inline-block;
-    margin: 0 22px;
   }
 }

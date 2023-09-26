@@ -1,6 +1,8 @@
 <div
   class="filter-item-container"
   [class.active]="active"
+  [title]="formattedValue"
+  [class.compact]="compact"
   [matMenuTriggerFor]="menu"
   #matTrigger="matMenuTrigger"
   (menuOpened)="onMenuOpen(); focusables.scheduleRefocus()"
@@ -84,6 +86,75 @@
         </mat-chip-list>
         <mat-hint>Use "Enter" to add values</mat-hint>
       </mat-form-field>
+
+      <button
+        type="submit"
+        class="w-100 submit-btn"
+        (click)="applyChanges()"
+        mat-raised-button
+        color="primary"
+        stepFocusable
+        [defaultSpace]="false"
+        (keydownSpace)="applyChanges()"
+      >
+        Apply
+      </button>
+    </div>
+
+    <div *ngSwitchCase="FilterBarType.EXECUTION">
+      <div class="item-header">
+        {{ item.label }}
+      </div>
+      <step-ts-filter-bar-execution-item [values]="item.searchEntities"></step-ts-filter-bar-execution-item>
+
+      <div class="apply-checkbox">
+        <mat-checkbox [(ngModel)]="item.updateTimeSelectionOnFilterChange" [ngModelOptions]="{ standalone: true }"
+          >Update time range
+        </mat-checkbox>
+        <step-icon
+          matTooltip="Enabling this, the chart time range selection will adjust to cover all your executions"
+          name="help-circle"
+        ></step-icon>
+      </div>
+      <button
+        type="submit"
+        class="w-100 submit-btn"
+        (click)="applyChanges()"
+        mat-raised-button
+        color="primary"
+        stepFocusable
+        [defaultSpace]="false"
+        (keydownSpace)="applyChanges()"
+      >
+        Apply
+      </button>
+    </div>
+
+    <div *ngSwitchCase="FilterBarType.TASK">
+      <div class="item-header">
+        {{ item.label }}
+      </div>
+      <step-ts-filter-bar-task-item [values]="item.searchEntities"></step-ts-filter-bar-task-item>
+
+      <button
+        type="submit"
+        class="w-100 submit-btn"
+        (click)="applyChanges()"
+        mat-raised-button
+        color="primary"
+        stepFocusable
+        [defaultSpace]="false"
+        (keydownSpace)="applyChanges()"
+      >
+        Apply
+      </button>
+    </div>
+
+    <div *ngSwitchCase="FilterBarType.PLAN">
+      <div class="item-header">
+        {{ item.label }}
+      </div>
+      <step-ts-filter-bar-plan-item [values]="item.searchEntities"></step-ts-filter-bar-plan-item>
 
       <button
         type="submit"

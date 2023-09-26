@@ -1,5 +1,8 @@
 import { TSTimeRange } from './chart/model/ts-time-range';
 import { FilterBarItemType, TsFilterItem } from './performance-view/filter-bar/model/ts-filter-item';
+import { Execution } from '@exense/step-core';
+import { RangeSelectionType } from './time-selection/model/range-selection-type';
+import { TimeRangePickerSelection } from './time-selection/time-range-picker-selection';
 
 export class TimeSeriesUtils {
   static createTimeLabels(start: number, end: number, interval: number): number[] {
@@ -54,6 +57,46 @@ export class TimeSeriesUtils {
     return range1 && range2 && range1.from === range2.from && range1.to === range2.to;
   }
 
+  static convertExecutionAndSelectionToTimeRange(
+    execution: Execution,
+    timeRangeSelection: TimeRangePickerSelection
+  ): TSTimeRange {
+    const now = new Date().getTime();
+    let selection: TSTimeRange;
+    let newFullRange: TSTimeRange;
+    switch (timeRangeSelection.type) {
+      case RangeSelectionType.FULL:
+        newFullRange = { from: execution.startTime!, to: execution.endTime || now - 5000 };
+        selection = newFullRange;
+        break;
+      case RangeSelectionType.ABSOLUTE:
+        newFullRange = timeRangeSelection.absoluteSelection!;
+        break;
+      case RangeSelectionType.RELATIVE:
+        const end = execution.endTime || now;
+        newFullRange = { from: end - timeRangeSelection.relativeSelection!.timeInMs!, to: end };
+        break;
+    }
+    return newFullRange;
+  }
+
+  static convertSelectionToTimeRange(selection: TimeRangePickerSelection): TSTimeRange {
+    let now = new Date().getTime();
+    let newFullRange: TSTimeRange;
+    switch (selection.type) {
+      case RangeSelectionType.FULL:
+        throw new Error('Full range selection is not supported');
+      case RangeSelectionType.ABSOLUTE:
+        newFullRange = selection.absoluteSelection!;
+        break;
+      case RangeSelectionType.RELATIVE:
+        let end = now;
+        newFullRange = { from: end - selection.relativeSelection!.timeInMs!, to: end };
+        break;
+    }
+    return newFullRange;
+  }
+
   static formatInputDate(date: Date, includeTime = true): string {
     if (!date) {
       return '';
@@ -67,4 +110,12 @@ export class TimeSeriesUtils {
     const isoTime = `${hours}:${minutes}:${seconds}`;
     return `${isoDate} ${includeTime ? isoTime : ''}`;
   }
+
+  static ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
+    if (field.startsWith('attributes.')) {
+      return field.replace('attributes.', '');
+    } else {
+      return field;
+    }
+  };
 }

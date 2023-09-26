@@ -518,6 +518,10 @@ $menu-sub-item-height: 3.2rem;
         visibility: hidden;
       }
 
+      #sidebar-home-and-settings > .sidebar-home-and-settings-icon {
+        margin-right: 0;
+      }
+
       &.small-screen {
         width: map.get($config, width-closed-small-screen);
         #sidebar-logo-and-burgermenu {
@@ -534,6 +538,10 @@ $menu-sub-item-height: 3.2rem;
         }
         .sidebar-collapsable-tab > label:hover > .sidebar-aligned-text {
           left: 3.9rem;
+        }
+
+        #sidebar-home-and-settings > .sidebar-home-and-settings-icon {
+          margin-right: -1.4rem;
         }
       }
     }

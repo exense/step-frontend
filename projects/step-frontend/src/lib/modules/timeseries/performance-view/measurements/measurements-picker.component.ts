@@ -1,6 +1,6 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
-import { KeywordSelection, TimeSeriesKeywordsContext } from '../../execution-page/time-series-keywords.context';
+import { KeywordSelection, TimeSeriesKeywordsContext } from '../../pages/execution-page/time-series-keywords.context';
 import { KeyValue } from '@angular/common';
 import { Subject, Subscription, takeUntil } from 'rxjs';
 
@@ -20,13 +20,13 @@ export class MeasurementsPickerComponent implements OnInit, OnDestroy {
 
   terminator$ = new Subject<void>();
 
-  constructor(private executionPageService: TimeSeriesContextsFactory) {}
+  private contextsFactory = inject(TimeSeriesContextsFactory);
 
   ngOnInit(): void {
     if (!this.contextId) {
       throw new Error('Context Id input must be present');
     }
-    this.keywordsService = this.executionPageService.getContext(this.contextId).keywordsContext;
+    this.keywordsService = this.contextsFactory.getContext(this.contextId).keywordsContext;
     this.keywordsService
       .onKeywordsUpdated()
       .pipe(takeUntil(this.terminator$))

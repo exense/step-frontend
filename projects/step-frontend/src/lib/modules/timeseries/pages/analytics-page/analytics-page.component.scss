@@ -1,0 +1,27 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  padding: 0 19px;
+  max-width: 100%;
+  width: 100%;
+}
+
+.header-buttons {
+  display: flex;
+  margin-bottom: 0.8rem;
+  flex-direction: row;
+  gap: 1.2rem;
+}
+
+.active {
+  color: var.$orange;
+}
+
+.icon-container {
+  margin-right: 0.8rem;
+}
+
+.menu-btn {
+  display: flex;
+  align-items: center;
+}

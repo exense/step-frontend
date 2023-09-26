@@ -24,5 +24,12 @@ export abstract class SelectionCollector<KEY, ENTITY> {
   abstract unregisterPossibleSelection(item: ENTITY): void;
   abstract isSelectingPossible(): boolean;
 
+  /**
+   * Iterates over selected items, which are exists in collector.
+   * Check the predicate and returns the map with entity's id and predicate result.
+   * Method's result is approximate, because collector might not contain all information about every selected item
+   * **/
+  abstract checkCurrentSelectionState(predicate: (item: ENTITY) => boolean): Map<KEY, boolean>;
+
   abstract destroy(): void;
 }

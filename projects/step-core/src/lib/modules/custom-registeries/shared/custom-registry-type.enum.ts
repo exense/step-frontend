@@ -1,5 +1,7 @@
 export enum CustomRegistryType {
   entity = 'entity',
+  entityBulkOperations = 'entityBulkOperations',
+  entityMenuItems = 'entityMenuItems',
   planType = 'planType',
   functionType = 'functionType',
   functionPackageType = 'functionPackageType',
@@ -9,4 +11,5 @@ export enum CustomRegistryType {
 
   executionCustomPanel = 'executionCustomPanel',
   artefact = 'artefact',
+  wizardStep = 'wizardStep',
 }

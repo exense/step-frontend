@@ -1,19 +1,27 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 step-timeseries-table {
   .color-cell {
     display: flex;
     align-items: center;
 
+    span {
+      max-width: 30rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     .color-square {
       display: inline-block;
-      width: 38px;
-      height: 14px;
-      margin-right: 12px;
+      width: 3.8rem;
+      height: 1.4rem;
+      margin-right: 1.2rem;
       opacity: 0.7;
     }
   }
 
   .mat-row {
-    height: 30px !important;
+    height: 3rem !important;
   }
 
   step-table {
@@ -22,6 +30,21 @@ step-timeseries-table {
 
   table {
     white-space: nowrap;
+
+    th .subtitle {
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var.$gray-400;
+    }
+
+    .compare-value {
+      color: var.$orange !important;
+      opacity: 0.6;
+    }
+
+    th div {
+      text-align: left;
+    }
   }
 
   mat-paginator {
@@ -29,8 +52,22 @@ step-timeseries-table {
     left: 0;
   }
 
+  .compare-diff {
+    font-size: 1rem;
+    opacity: 0.6;
+    margin-left: 4px;
+  }
+
+  .right-separator {
+    border-right: 1px solid var.$gray-200;
+  }
+
+  .header-subtitle {
+    font-size: 1.2rem;
+  }
+
   .checkbox {
     margin: 0;
-    margin-right: 6px;
+    margin-right: 0.6rem;
   }
 }

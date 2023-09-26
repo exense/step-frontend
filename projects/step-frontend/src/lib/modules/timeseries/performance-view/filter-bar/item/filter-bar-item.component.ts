@@ -5,7 +5,6 @@ import { TimeSeriesUtils } from '../../../time-series-utils';
 import { FilterBarItemType, TsFilterItem } from '../model/ts-filter-item';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { MatChipInputEvent } from '@angular/material/chips';
 
 @Component({
   selector: 'step-ts-filter-bar-item',
@@ -15,6 +14,7 @@ import { MatChipInputEvent } from '@angular/material/chips';
 export class FilterBarItemComponent implements OnInit, OnChanges {
   @Input() item!: TsFilterItem;
   @Input() removable?: boolean;
+  @Input() compact = false;
 
   @Output() onRemoveItem: EventEmitter<any> = new EventEmitter<any>();
   @Output() onFilterChange: EventEmitter<TsFilterItem> = new EventEmitter<TsFilterItem>();
@@ -25,6 +25,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
   readonly FilterBarType = FilterBarItemType;
 
   freeTextValues: string[] = [];
+
   chipInputValue = '';
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
   minValue?: number; // for numbers or dates
@@ -39,6 +40,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     if (!this.item) {
       throw new Error('Item input is mandatory');
     }
+    this.freeTextValues = this.item.freeTextValues || [];
   }
 
   onMenuClose(): void {
@@ -79,6 +81,11 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
       this.item.label = this.item.attributeName;
     }
     switch (this.item.type) {
+      case FilterBarItemType.EXECUTION:
+      case FilterBarItemType.PLAN:
+      case FilterBarItemType.TASK:
+        this.item.freeTextValues = this.item.searchEntities.map((e) => e.searchValue);
+        break;
       case FilterBarItemType.OPTIONS:
         break;
       case FilterBarItemType.FREE_TEXT:
@@ -89,6 +96,8 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
         this.item.min = this.minValue;
         this.item.max = this.maxValue;
         break;
+      default:
+        throw new Error('Unhandled item type: ' + this.item.type);
     }
     this.formattedValue = this.getFormattedValue(this.item);
     this.onFilterChange.emit(this.item);
@@ -106,19 +115,25 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     this.formattedValue = this.getFormattedValue(this.item);
   }
 
-  private getFormattedValue(filter: TsFilterItem): string | undefined {
+  private getFormattedValue(item: TsFilterItem): string | undefined {
     let formattedValue: string | undefined = '';
-    switch (filter.type) {
+    switch (item.type) {
+      case FilterBarItemType.EXECUTION:
+      case FilterBarItemType.PLAN:
+      case FilterBarItemType.TASK:
+        const count = this.item.searchEntities?.length;
+        formattedValue = count ? (count > 1 ? `${count} items` : `1 item`) : '-';
+        break;
       case FilterBarItemType.FREE_TEXT:
         formattedValue = this.item.freeTextValues?.join(', ');
         break;
       case FilterBarItemType.NUMERIC:
-        if (filter.min != undefined && filter.max != undefined) {
-          formattedValue = `${filter.min} - ${filter.max}`;
-        } else if (filter.min != undefined) {
-          formattedValue = `> ${filter.min}`;
-        } else if (filter.max != undefined) {
-          formattedValue = `< ${filter.max}`;
+        if (item.min != undefined && item.max != undefined) {
+          formattedValue = `${item.min} - ${item.max}`;
+        } else if (item.min != undefined) {
+          formattedValue = `> ${item.min}`;
+        } else if (item.max != undefined) {
+          formattedValue = `< ${item.max}`;
         } else {
           // both are undefined
           formattedValue = '';
@@ -127,8 +142,8 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
         break;
 
       case FilterBarItemType.DATE:
-        const min = filter.min ? TimeSeriesUtils.formatInputDate(new Date(filter.min), false) : '';
-        const max = filter.max ? TimeSeriesUtils.formatInputDate(new Date(filter.max), false) : '';
+        const min = item.min ? TimeSeriesUtils.formatInputDate(new Date(item.min), false) : '';
+        const max = item.max ? TimeSeriesUtils.formatInputDate(new Date(item.max), false) : '';
 
         if (min && max) {
           formattedValue = `${min} to ${max}`;
@@ -141,13 +156,13 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
         break;
 
       case FilterBarItemType.OPTIONS:
-        const selectedValues = filter.textValues
-          ? filter.textValues.filter((v) => v.isSelected).map((v) => v.value)
-          : [];
+        const selectedValues = item.textValues ? item.textValues.filter((v) => v.isSelected).map((v) => v.value) : [];
 
         formattedValue = selectedValues.join(', ');
 
         break;
+      default:
+        throw new Error('Filter type not handled: ' + item.type);
     }
     return formattedValue;
   }

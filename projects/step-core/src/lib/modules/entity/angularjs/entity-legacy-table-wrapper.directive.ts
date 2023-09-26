@@ -3,6 +3,7 @@ import { getAngularJSGlobal } from '@angular/upgrade/static';
 import { LegacyTableHandle } from '../../../modules/table/table.module';
 import { SelectEntityContext } from '../types/select-entity-context.interface';
 import { STEP_CORE_JS } from '../../../angularjs';
+import { EntityObject } from '../types/entity-object';
 
 export const ENTITY_LEGACY_TABLE_WRAPPER = 'stEntityLegacyTableWrapper';
 
@@ -11,7 +12,7 @@ interface EntityLegacyTableWrapperScope extends IScope {
   context: SelectEntityContext;
   multipleSelection?: boolean;
   tableHandle?: LegacyTableHandle;
-  notifySelection?(selectedId: string): void;
+  notifySelection?(entity: EntityObject): void;
 }
 
 export const EntityLegacyTableWrapper: IDirective = {
@@ -24,9 +25,9 @@ export const EntityLegacyTableWrapper: IDirective = {
     scope.multipleSelection = scope.context.multipleSelection;
     scope.tableHandle = scope.context;
 
-    scope.notifySelection = (selectedId: string) => {
+    scope.notifySelection = (object: EntityObject) => {
       if (scope.context.handleSelect) {
-        scope.context.handleSelect(selectedId);
+        scope.context.handleSelect(object);
       }
     };
   },

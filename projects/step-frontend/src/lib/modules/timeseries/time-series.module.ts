@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
-import { StepCoreModule } from '@exense/step-core';
+import { EntityModule, StepCoreModule } from '@exense/step-core';
 import { TimeSeriesChartComponent } from './chart/time-series-chart.component';
-import { ExecutionTabsComponent } from './execution-page/tabs/execution-tabs.component';
 import { TSRangerComponent } from './ranger/ts-ranger.component';
 import { TableModule } from '@exense/step-core';
 import { FormsModule } from '@angular/forms';
@@ -10,8 +9,6 @@ import { CommonModule } from '@angular/common';
 import { TimeseriesTableComponent } from './performance-view/table/timeseries-table.component';
 import { TimeRangePickerComponent } from './time-selection/time-range-picker.component';
 import { ChartSkeletonComponent } from './chart/skeleton/chart-skeleton.component';
-import { PerformanceViewComponent } from './performance-view/performance-view.component';
-import { SyntheticMonitoringPageComponent } from './synthetic-monitoring/synthetic-monitoring-page.component';
 import { MeasurementsPickerComponent } from './performance-view/measurements/measurements-picker.component';
 import { PerformanceViewTimeSelectionComponent } from './performance-view/time-selection/performance-view-time-selection.component';
 import { MeasurementsFilterPipe } from './performance-view/measurements/measurements-filter.pipe';
@@ -20,8 +17,8 @@ import { FilterBarItemComponent } from './performance-view/filter-bar/item/filte
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { TimeSeriesDashboardComponent } from './dashboard/time-series-dashboard.component';
 import { TsGroupingComponent } from './dashboard/grouping/ts-grouping.component';
-import { AnalyticsPageComponent } from './analytics/analytics-page.component';
-import { ExecutionPerformanceComponent } from './execution-page/ts-execution-page.component';
+import { AnalyticsPageComponent } from './pages/analytics-page/analytics-page.component';
+import { ExecutionPerformanceComponent } from './pages/execution-page/ts-execution-page.component';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -30,32 +27,38 @@ import { DiscoverComponent } from './discover/discover.component';
 import { DiscoverAttributeStatsComponent } from './discover/attribute-stats/attribute-stats.component';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { NoTotalCountPaginator } from './discover/no-total-count-paginator';
+import { ChartsViewComponent } from './performance-view/charts-view.component';
+import { TsComparePercentagePipe } from './dashboard/compare/ts-compare-percentage.pipe';
+import { FilterBarExecutionItemComponent } from './performance-view/filter-bar/item/execution/filter-bar-execution-item.component';
+import { FilterBarTaskItemComponent } from './performance-view/filter-bar/item/task/filter-bar-task-item.component';
+import { ReportNodesModule } from '../report-nodes/report-nodes.module';
+import { FilterBarPlanItemComponent } from './performance-view/filter-bar/item/plan/filter-bar-plan-item.component';
 
 @NgModule({
   declarations: [
-    PerformanceViewComponent,
+    ChartsViewComponent,
     TimeSeriesChartComponent,
-    ExecutionTabsComponent,
     TSRangerComponent,
     TimeseriesTableComponent,
     TimeRangePickerComponent,
     ChartSkeletonComponent,
     PerformanceViewTimeSelectionComponent,
-    PerformanceViewComponent,
-    SyntheticMonitoringPageComponent,
     MeasurementsPickerComponent,
     MeasurementsFilterPipe,
     FilterBarComponent,
     FilterBarItemComponent,
     TimeSeriesDashboardComponent,
     TsGroupingComponent,
-    PerformanceViewComponent,
     AnalyticsPageComponent,
+    FilterBarPlanItemComponent,
     ExecutionPerformanceComponent,
+    TsComparePercentagePipe,
     DiscoverComponent,
     DiscoverAttributeStatsComponent,
+    FilterBarExecutionItemComponent,
+    FilterBarTaskItemComponent,
   ],
-  exports: [ExecutionPerformanceComponent, SyntheticMonitoringPageComponent, AnalyticsPageComponent],
+  exports: [ExecutionPerformanceComponent, AnalyticsPageComponent],
   providers: [{ provide: MatPaginatorIntl, useClass: NoTotalCountPaginator }],
   imports: [
     StepCoreModule,
@@ -68,6 +71,8 @@ import { NoTotalCountPaginator } from './discover/no-total-count-paginator';
     MatChipsModule,
     MatFormFieldModule,
     MatInputModule,
+    ReportNodesModule,
+    EntityModule,
   ],
 })
 export class TimeSeriesModule {}
