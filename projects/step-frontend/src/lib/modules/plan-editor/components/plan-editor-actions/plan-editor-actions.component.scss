@@ -1,3 +1,5 @@
+@use 'step-frontend/projects/step-core/styles/_core-variables' as var;
+
 :host {
   display: flex;
   gap: 2rem;
@@ -31,4 +33,9 @@ span.mat-menu-item.plan-execution-menu {
     gap: 1rem;
     padding-bottom: 1rem;
   }
+}
+
+button.activeMode {
+  color: white;
+  background: var.$dark-blue;
 }

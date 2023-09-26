@@ -46,7 +46,7 @@
     type="button"
     mat-stroked-button
     (click)="clone.emit()"
-    [matTooltip]="captions.copy"
+    [matTooltip]="captions.duplicate"
     matTooltipPosition="below"
   >
     <step-icon name="copy"></step-icon>
@@ -61,7 +61,33 @@
   >
     <step-icon name="upload"></step-icon>
   </button>
+</step-btn-group>
+<step-btn-group class="with-borders">
+  <button
+    type="button"
+    mat-stroked-button
+    [class]="isInteractiveSessionActive ? 'activeMode' : ''"
+    (click)="toggleInteractiveSession()"
+    [matTooltip]="isInteractiveSessionActive ? captions.stopInteractive : captions.startInteractive"
+    matTooltipPosition="below"
+  >
+    <step-icon name="bug-01"></step-icon>
+  </button>
 
+  <button
+    *ngIf="isInteractiveSessionActive"
+    type="button"
+    mat-stroked-button
+    (click)="reset.emit()"
+    [matTooltip]="captions.resetInteractive"
+    matTooltipPosition="below"
+  >
+    <step-icon name="refresh-cw"></step-icon>
+  </button>
+  <span class="interactive-trigger" #interactiveSessionTrigger [matMenuTriggerFor]="interactiveSessionMenu"></span>
+</step-btn-group>
+
+<step-btn-group class="with-borders">
   <button
     *ngIf="showExecuteButton"
     type="button"
@@ -74,30 +100,7 @@
     <step-icon name="play-circle"></step-icon>
   </button>
 </step-btn-group>
-<step-btn-group class="with-borders">
-  <button
-    *ngIf="isInteractiveSessionActive"
-    type="button"
-    mat-stroked-button
-    (click)="reset.emit()"
-    [matTooltip]="captions.resetInteractive"
-    matTooltipPosition="below"
-  >
-    <step-icon name="refresh-cw"></step-icon>
-  </button>
 
-  <button
-    type="button"
-    mat-stroked-button
-    [color]="isInteractiveSessionActive ? 'primary' : undefined"
-    (click)="toggleInteractiveSession()"
-    [matTooltip]="isInteractiveSessionActive ? captions.stopInteractive : captions.startInteractive"
-    matTooltipPosition="below"
-  >
-    <step-icon name="bug-01"></step-icon>
-  </button>
-  <span class="interactive-trigger" #interactiveSessionTrigger [matMenuTriggerFor]="interactiveSessionMenu"></span>
-</step-btn-group>
 <mat-menu #executionMenu="matMenu">
   <span class="plan-execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
     <step-execution-commands [description]="description" [repositoryObjectRef]="repositoryObjectRef">
