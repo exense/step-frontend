@@ -35,6 +35,7 @@ export class TimeSeriesContext {
 
   private readonly activeFilters$: BehaviorSubject<TsFilterItem[]>;
   private readonly filterSettings$: BehaviorSubject<TsFilteringSettings>;
+  private readonly chartsResolution$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
 
   public readonly keywordsContext: TimeSeriesKeywordsContext;
   private readonly colorsPool: TimeseriesColorsPool;
@@ -73,6 +74,19 @@ export class TimeSeriesContext {
 
   onCompareModeChange(): Observable<{ enabled: boolean; context?: TimeSeriesContext }> {
     return this.compareModeChange$.asObservable();
+  }
+
+  onChartsResolutionChange(): Observable<number> {
+    return this.chartsResolution$.asObservable();
+  }
+
+  updateChartsResolution(ms: number): void {
+    console.log('updating charts resolution');
+    this.chartsResolution$.next(ms);
+  }
+
+  getChartsResolution(): number {
+    return this.chartsResolution$.getValue();
   }
 
   setInProgress(inProgress: boolean) {
