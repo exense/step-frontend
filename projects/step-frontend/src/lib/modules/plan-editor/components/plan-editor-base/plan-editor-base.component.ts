@@ -176,9 +176,9 @@ export class PlanEditorBaseComponent
     const currentVersion$ = defer(() => {
       if (this.id && this.id !== plan.id) {
         // composite keywords need to retrieve the current version
-        return this._keywordCallsApi.getFunctionById(this.id).pipe(
-          map((keyword) => keyword?.customFields?.['versionId'] ?? undefined)
-        );
+        return this._keywordCallsApi
+          .getFunctionById(this.id)
+          .pipe(map((keyword) => keyword?.customFields?.['versionId'] ?? undefined));
       } else {
         // we are showing a real plan
         return of(plan.customFields ? plan.customFields['versionId'] : undefined);
@@ -187,12 +187,14 @@ export class PlanEditorBaseComponent
 
     currentVersion$
       .pipe(
-        switchMap((currentVersion) => this._restoreDialogsService.showRestoreDialog(currentVersion, versionHistory, permission)),
+        switchMap((currentVersion) =>
+          this._restoreDialogsService.showRestoreDialog(currentVersion, versionHistory, permission)
+        ),
         filter((restoreVersion) => restoreVersion !== undefined),
         switchMap((restoreVersion) => this._planEditorApi.restorePlanVersion(this.id || plan.id!, restoreVersion)),
         catchError((error) => {
-            console.error(error);
-            return EMPTY;
+          console.error(error);
+          return EMPTY;
         })
       )
       .subscribe(() => this.loadPlan(this.id || plan.id!));
