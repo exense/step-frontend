@@ -1,10 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { TimeRangePickerSelection } from './time-range-picker-selection';
 import { RangeSelectionType } from './model/range-selection-type';
 import { ExecutionTimeSelection } from './model/execution-time-selection';
 import { TimeSeriesUtils } from '../time-series-utils';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 /**
  * When dealing with relative/full selection, this component should not know anything about dates, therefore no date calculations are needed.
@@ -18,6 +19,7 @@ import { TimeSeriesUtils } from '../time-series-utils';
 export class TimeRangePickerComponent implements OnInit {
   @ViewChild(MatMenuTrigger) menuTrigger!: MatMenuTrigger;
 
+  @Input() activeSelection!: TimeRangePickerSelection;
   @Input() selectOptions!: TimeRangePickerSelection[];
   @Input() initialSelectionIndex: number | undefined;
   @Input() includeFullRangeOption: boolean = true;
@@ -25,13 +27,12 @@ export class TimeRangePickerComponent implements OnInit {
 
   @Output() onSelectionChange = new EventEmitter<TimeRangePickerSelection>();
 
-  @Input() activeSelection!: TimeRangePickerSelection;
   @Output() activeSelectionChange = new EventEmitter<TimeRangePickerSelection>();
-
-  _30_MINUTES = 30 * 60 * 1000; // in ms
 
   fromDateString: string | undefined; // used for formatting the date together with time
   toDateString: string | undefined;
+
+  constructor(private _snackBar: MatSnackBar) {}
 
   ngOnInit(): void {
     if (!this.selectOptions) {
@@ -73,20 +74,40 @@ export class TimeRangePickerComponent implements OnInit {
       this.toDateString = undefined;
     }
     if (!from && !to) {
+      // both are missing
       if (this.includeFullRangeOption) {
         this.emitSelectionChange({ type: RangeSelectionType.FULL });
-      }
-      // else do nothing. maybe show an error
-    } else {
-      const newSelection = {
-        type: RangeSelectionType.ABSOLUTE,
-        absoluteSelection: { from: from, to: to },
-      };
-      if (from !== this.activeSelection.absoluteSelection?.from || to !== this.activeSelection.absoluteSelection?.to) {
-        this.emitSelectionChange(newSelection);
+        this.closeMenu();
+      } else {
+        this._snackBar.open('Time range not applied', 'dismiss');
       }
     }
-    this.closeMenu();
+    if (!from) {
+      this._snackBar.open('From selection is required', 'dismiss');
+      return;
+    }
+    if (!to) {
+      // to is missing - set it to now()
+      to = new Date().getTime();
+      this.toDateString = TimeSeriesUtils.formatInputDate(new Date(to));
+    }
+    // from and to are set here
+    if (from < to) {
+      const currentSelection = this.activeSelection.absoluteSelection;
+      if (currentSelection?.from !== from || currentSelection?.to !== to) {
+        // something has changed
+        const newSelection = {
+          type: RangeSelectionType.ABSOLUTE,
+          absoluteSelection: { from: from, to: to },
+        };
+        this.emitSelectionChange(newSelection);
+        this.closeMenu();
+      } else {
+        // do nothing
+      }
+    } else {
+      this._snackBar.open("Invalid interval: 'From' must be before 'To'", 'dismiss');
+    }
   }
 
   onRelativeSelectionSelected(option: TimeRangePickerSelection) {
@@ -115,9 +136,6 @@ export class TimeRangePickerComponent implements OnInit {
    * This method reacts to the component html selection change, and should NOT be used from exterior
    */
   onFullRangeSelect(): void {
-    if (this.activeSelection.type === RangeSelectionType.FULL) {
-      return; // nothing changed
-    }
     this.emitSelectionChange({ type: RangeSelectionType.FULL });
   }
 

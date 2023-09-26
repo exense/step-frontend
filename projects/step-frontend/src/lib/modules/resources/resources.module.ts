@@ -17,7 +17,7 @@ export class ResourcesModule {
 
   private registerEntities(): void {
     this._entityRegistry.register('resources', 'Resource', {
-      icon: 'book',
+      icon: 'file-attachment-03',
       component: ResourceSelectionComponent,
     });
   }

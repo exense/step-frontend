@@ -244,7 +244,7 @@ export class ArtefactsModule {
       component: ExportComponent,
     });
     this._artefactService.register('Failure', {
-      icon: 'thumbs-down',
+      icon: 'x-octagon',
       isSelectable: false,
     });
   }

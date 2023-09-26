@@ -1,7 +1,22 @@
-import { Component, ElementRef, forwardRef, Input, Optional, ViewChild, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  forwardRef,
+  inject,
+  Input,
+  Optional,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { map, Observable, of } from 'rxjs';
 import { AbstractArtefact } from '../../client/generated';
-import { ArtefactTreeNode, TreeAction, TreeActionsService, TreeStateService } from '../../modules/tree/tree.module';
+import {
+  ArtefactTreeNode,
+  TreeAction,
+  TreeActionsService,
+  TreeComponent,
+  TreeStateService,
+} from '../../modules/tree/tree.module';
 import { PlanArtefactResolverService } from '../../services/plan-artefact-resolver.service';
 import { PlanEditorService } from '../../services/plan-editor.service';
 import { PlanInteractiveSessionService } from '../../services/plan-interactive-session.service';
@@ -20,31 +35,32 @@ import { PlanTreeAction } from '../../shared/plan-tree-action.enum';
   ],
 })
 export class PlanTreeComponent implements TreeActionsService {
+  private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
+  private _planArtefactResolver? = inject(PlanArtefactResolverService, { optional: true });
+  readonly _planEditService = inject(PlanEditorService);
+  readonly _planInteractiveSession? = inject(PlanInteractiveSessionService, { optional: true });
+
   readonly selectedArtefact$ = this._treeState.selectedNode$.pipe(map((node) => node?.originalArtefact));
   @Input() isReadonly: boolean = false;
 
   @ViewChild('area') splitAreaElementRef?: ElementRef<HTMLElement>;
 
+  @ViewChild(TreeComponent) tree?: TreeComponent<ArtefactTreeNode>;
+
   private actions: TreeAction[] = [
+    { id: PlanTreeAction.OPEN, label: 'Open (Ctrl + O)' },
     { id: PlanTreeAction.RENAME, label: 'Rename (F2)' },
+    { id: PlanTreeAction.ENABLE, label: 'Enable (Ctrl + E)', hasSeparator: true },
+    { id: PlanTreeAction.DISABLE, label: 'Disable (Ctrl + E)', hasSeparator: true },
+    { id: PlanTreeAction.COPY, label: 'Copy (Ctrl + C)' },
+    { id: PlanTreeAction.PASTE, label: 'Paste (Ctrl + V)' },
+    { id: PlanTreeAction.DUPLICATE, label: 'Duplicate (Ctrl + D)' },
+    { id: PlanTreeAction.DELETE, label: 'Delete (Del)', hasSeparator: true },
     { id: PlanTreeAction.MOVE_UP, label: 'Move Up (Ctrl + ⬆️)' },
     { id: PlanTreeAction.MOVE_DOWN, label: 'Move Down (Ctrl + ⬇️)' },
     { id: PlanTreeAction.MOVE_LEFT, label: 'Move Left (Ctrl + ⬅️)' },
     { id: PlanTreeAction.MOVE_RIGHT, label: 'Move Right (Ctrl + ➡️)' },
-    { id: PlanTreeAction.COPY, label: 'Copy (Ctrl + C)' },
-    { id: PlanTreeAction.PASTE, label: 'Paste (Ctrl + V)' },
-    { id: PlanTreeAction.DELETE, label: 'Delete (Del)' },
-    { id: PlanTreeAction.OPEN, label: 'Open (Ctrl + O)' },
-    { id: PlanTreeAction.ENABLE, label: 'Enable (Ctrl + E)' },
-    { id: PlanTreeAction.DISABLE, label: 'Disable (Ctrl + E)' },
   ];
-
-  constructor(
-    private _treeState: TreeStateService<AbstractArtefact, ArtefactTreeNode>,
-    public _planEditService: PlanEditorService,
-    @Optional() public _planInteractiveSession?: PlanInteractiveSessionService,
-    @Optional() private _planArtefactResolver?: PlanArtefactResolverService
-  ) {}
 
   getActionsForNode(node: ArtefactTreeNode): Observable<TreeAction[]> {
     const isSkipped = node.isSkipped;
@@ -74,6 +90,18 @@ export class PlanTreeComponent implements TreeActionsService {
           })
       )
     );
+  }
+
+  openTreeMenu(event: MouseEvent, nodeId: string): void {
+    if (!this.tree) {
+      return;
+    }
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    this.tree.openContextMenu({
+      event,
+      nodeId,
+    });
   }
 
   hasActionsForNode(node: ArtefactTreeNode): boolean {
@@ -111,6 +139,9 @@ export class PlanTreeComponent implements TreeActionsService {
         break;
       case PlanTreeAction.PASTE:
         this._planEditService.paste(artefact);
+        break;
+      case PlanTreeAction.DUPLICATE:
+        this._planEditService.duplicate(artefact);
         break;
       case PlanTreeAction.DELETE:
         this._planEditService.delete(artefact);

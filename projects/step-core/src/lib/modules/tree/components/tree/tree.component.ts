@@ -1,9 +1,11 @@
 import {
   Component,
+  ContentChild,
   ElementRef,
   EventEmitter,
+  forwardRef,
+  inject,
   Input,
-  Optional,
   Output,
   TrackByFunction,
   ViewChild,
@@ -15,14 +17,28 @@ import { TreeStateService } from '../../services/tree-state.service';
 import { ArtefactFlatNode } from '../../shared/artefact-flat-node';
 import { TreeAction } from '../../shared/tree-action';
 import { TreeNode } from '../../shared/tree-node';
+import { TreeNodeTemplateDirective } from '../../directives/tree-node-template.directive';
+import { TreeNodeTemplateContainerService } from '../../services/tree-node-template-container.service';
 
 @Component({
   selector: 'step-tree',
   templateUrl: './tree.component.html',
   styleUrls: ['./tree.component.scss'],
-  providers: [TreeDragDropService],
+  providers: [
+    TreeDragDropService,
+    {
+      provide: TreeNodeTemplateContainerService,
+      useExisting: forwardRef(() => TreeComponent),
+    },
+  ],
 })
-export class TreeComponent<N extends TreeNode> {
+export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContainerService {
+  private _treeActions = inject(TreeActionsService, { optional: true });
+
+  readonly _treeState = inject<TreeStateService<any, N>>(TreeStateService);
+  readonly _treeDragDrop = inject(TreeDragDropService);
+  readonly _treeContainer = inject<ElementRef<HTMLElement>>(ElementRef);
+
   readonly paddingIdent = 24;
   readonly paddingMultiplier = 8;
 
@@ -34,18 +50,15 @@ export class TreeComponent<N extends TreeNode> {
 
   @ViewChild('nodeContextMenuTrigger', { static: true, read: MatMenuTrigger }) contextMenuTrigger!: MatMenuTrigger;
 
+  @ContentChild(TreeNodeTemplateDirective) readonly treeNodeTemplate?: TreeNodeTemplateDirective;
+
   @Input() dragDisabled: boolean = false;
 
   @Output() treeContextAction = new EventEmitter<{ actionId: string; node?: N }>();
 
   @Output() nodeDblClick = new EventEmitter<{ node: N; event: MouseEvent }>();
 
-  constructor(
-    public _treeState: TreeStateService<any, N>,
-    public _treeDragDrop: TreeDragDropService,
-    public _treeContainer: ElementRef<HTMLElement>,
-    @Optional() private _treeActions?: TreeActionsService
-  ) {}
+  protected openedMenuNodeId?: string;
 
   openContextMenu({ event, nodeId }: { event: MouseEvent; nodeId: string }): void {
     const node = this._treeState.findNodeById(nodeId);
@@ -62,6 +75,7 @@ export class TreeComponent<N extends TreeNode> {
     this.contextMenuPosition.y = event.clientY;
     this.contextMenuTrigger.menuData = { node };
     this.contextMenuTrigger.openMenu();
+    this.openedMenuNodeId = nodeId;
   }
 
   handleContextAction(action: TreeAction, node?: N): void {
@@ -71,5 +85,9 @@ export class TreeComponent<N extends TreeNode> {
 
   handleDblClick(node: N, event: MouseEvent): void {
     this.nodeDblClick.emit({ node, event });
+  }
+
+  handleContextClose(): void {
+    this.openedMenuNodeId = undefined;
   }
 }

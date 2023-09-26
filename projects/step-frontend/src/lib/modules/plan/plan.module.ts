@@ -13,6 +13,7 @@ import { PlanListComponent } from './components/plan-list/plan-list.component';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
 import { PlanEditorComponent } from './components/plan-editor/plan-editor.component';
 import { PlanSelectionComponent } from './components/plan-selection/plan-selection.component';
+import { PlansBulkOperationsRegisterService } from './injectables/plans-bulk-operations-register.service';
 
 @NgModule({
   declarations: [PlanListComponent, PlanEditorComponent, PlanSelectionComponent],
@@ -28,6 +29,7 @@ import { PlanSelectionComponent } from './components/plan-selection/plan-selecti
 export class PlanModule {
   constructor(
     _entityRegistry: EntityRegistry,
+    _planBulkOperations: PlansBulkOperationsRegisterService,
     _cellsRegister: CustomCellRegistryService,
     _viewRegistry: ViewRegistryService
   ) {

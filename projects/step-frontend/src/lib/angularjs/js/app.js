@@ -510,21 +510,6 @@ angular
       return dialogs.showWarning(msg);
     };
 
-    dialogs.showInfo = function (msg) {
-      var modalInstance = $uibModal.open({
-        backdrop: 'static',
-        animation: false,
-        templateUrl: 'partials/infoMessageDialog.html',
-        controller: 'DialogCtrl',
-        resolve: {
-          message: function () {
-            return msg;
-          },
-        },
-      });
-      return modalInstance.result;
-    };
-
     dialogs.showWarning = function (msg) {
       var modalInstance = $uibModal.open({
         backdrop: 'static',
@@ -540,20 +525,6 @@ angular
       return modalInstance.result;
     };
 
-    dialogs.showAssignmentWarning = function (msg) {
-      var modalInstance = $uibModal.open({
-        backdrop: 'static',
-        animation: false,
-        templateUrl: 'partials/confirmAssignmentDialog.html',
-        controller: 'DialogCtrl',
-        resolve: {
-          message: function () {
-            return msg;
-          },
-        },
-      });
-      return modalInstance.result;
-    };
 
     dialogs.showErrorMsg = function (msg, callback) {
       var modalInstance = $uibModal
@@ -648,71 +619,9 @@ angular
     };
 
 
-    //Select entity type only
-    dialogs.selectEntityType = function (excludeArray, id) {
-      var modalInstance = $uibModal.open({
-        backdrop: 'static',
-        templateUrl: 'partials/selection/selectEntityType.html',
-        controller: 'SelectEntityTypeCtrl',
-        resolve: {
-          excludeArray: function () {
-            return excludeArray;
-          },
-          targetId: function () {
-            return id;
-          },
-        },
-      });
-
-      return modalInstance.result;
-    };
-
     return dialogs;
   })
 
-  .controller(
-    'SelectEntityTypeCtrl',
-    function ($scope, $rootScope, $uibModalInstance, EntityRegistry, helpers, excludeArray, targetId) {
-      $scope.excludeEntities = function (excludeArray) {
-        var fullEntityList = EntityRegistry.getEntities();
-        if (excludeArray && excludeArray.length > 0) {
-          var filtered = [];
-          $.each(fullEntityList, function (index, item) {
-            if (!excludeArray.includes(item.entityName)) {
-              filtered.push(item);
-            }
-          });
-          return filtered;
-        } else {
-          return fullEntityList;
-        }
-      };
-
-      if (targetId) {
-        $scope.migrationTarget = helpers.getProjectById(targetId).name;
-        $scope.currentProject = $rootScope.tenant.name;
-      }
-      $scope.entities = $scope.excludeEntities(excludeArray);
-      $scope.result = {};
-
-      $scope.$watch('selectedEntity', function (newValue) {
-        $scope.currentEntityType = newValue;
-      });
-
-      $scope.selectAll = 'false';
-      $scope.$watch('selectAll', function (newValue) {
-        $scope.selectAll = newValue;
-      });
-
-      $scope.proceed = function () {
-        $uibModalInstance.close({entity: $scope.currentEntityType, selectAll: $scope.selectAll === 'true'});
-      };
-
-      $scope.cancel = function () {
-        $uibModalInstance.dismiss('cancel');
-      };
-    }
-  )
 
   .directive('autofocus', function ($timeout) {
     return {

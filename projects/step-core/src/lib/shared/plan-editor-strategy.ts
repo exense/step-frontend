@@ -32,6 +32,10 @@ export abstract class PlanEditorStrategy {
 
   abstract paste(node?: AbstractArtefact): void;
 
+  abstract pasteAfter(node?: AbstractArtefact): void;
+
+  abstract duplicate(node?: AbstractArtefact): void;
+
   abstract rename(node?: AbstractArtefact): void;
 
   abstract toggleSkip(node?: AbstractArtefact): void;

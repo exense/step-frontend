@@ -1,11 +1,9 @@
-import { Component, inject, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AJS_MODULE,
   AugmentedPlansService,
   AutoDeselectStrategy,
-  BulkOperationsInvokeService,
-  BulkOperationType,
   Plan,
   PlanDialogsService,
   RestoreDialogsService,
@@ -13,7 +11,6 @@ import {
   STORE_ALL,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { PlansBulkOperationsInvokeService } from '../../injectables/plans-bulk-operations-invoke.service';
 import { pipe, tap } from 'rxjs';
 
 @Component({
@@ -23,21 +20,14 @@ import { pipe, tap } from 'rxjs';
   providers: [
     tablePersistenceConfigProvider('planList', STORE_ALL),
     selectionCollectionProvider<string, Plan>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
-    {
-      provide: BulkOperationsInvokeService,
-      useClass: PlansBulkOperationsInvokeService,
-    },
   ],
 })
 export class PlanListComponent {
   private _planDialogs = inject(PlanDialogsService);
   private _restoreDialogsService = inject(RestoreDialogsService);
   readonly _plansApiService = inject(AugmentedPlansService);
+
   readonly dataSource = this._plansApiService.getPlansTableDataSource();
-  readonly availableBulkOperations = [
-    { operation: BulkOperationType.delete, permission: 'plan-delete' },
-    { operation: BulkOperationType.duplicate, permission: 'plan-write' },
-  ];
 
   private updateDataSourceAfterChange = pipe(
     tap((changeResult?: Plan | boolean | string[]) => {
