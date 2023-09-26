@@ -13,5 +13,8 @@
   <button *ngFor="let field of possibleFields" type="button" mat-stroked-button (click)="addField.emit(field)">
     {{ field }}
   </button>
+  <button *ngIf="addCustomLabel" type="button" mat-stroked-button (click)="addField.emit(); showPossibleFields = false">
+    {{ addCustomLabel }}
+  </button>
 </div>
 <hr />

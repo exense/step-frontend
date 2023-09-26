@@ -8,6 +8,7 @@ import { Component, ElementRef, EventEmitter, HostListener, Input, Output } from
 export class AddFieldButtonComponent {
   protected showPossibleFields = false;
   @Input() addLabel: string = 'Add optional field';
+  @Input() addCustomLabel?: string;
   @Input() possibleFields: string[] = [];
   @Output() addField = new EventEmitter<string | undefined>();
 

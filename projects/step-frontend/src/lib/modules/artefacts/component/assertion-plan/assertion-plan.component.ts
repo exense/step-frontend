@@ -1,12 +1,5 @@
-import { Component, inject, ViewChild } from '@angular/core';
-import {
-  AbstractArtefact,
-  ArtefactFormChangeHelperService,
-  DynamicValueInteger,
-  DynamicValueString,
-  PlanDialogsService,
-  BaseArtefactComponent,
-} from '@exense/step-core';
+import { Component, ViewChild } from '@angular/core';
+import { AbstractArtefact, ArtefactFormChangeHelperService, BaseArtefactComponent } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
 
 @Component({

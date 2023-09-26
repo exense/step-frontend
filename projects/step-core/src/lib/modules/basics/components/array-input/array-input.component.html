@@ -1,0 +1,24 @@
+<mat-chip-list #chipList>
+  <ng-container *ngFor="let item of selectedItems; let i = index">
+    <mat-chip (removed)="removeItem(i)">
+      {{ item }}
+      <button *ngIf="!isDisabled" matChipRemove>
+        <step-icon name="x"></step-icon>
+      </button>
+    </mat-chip>
+  </ng-container>
+  <input
+    *ngIf="!isDisabled"
+    #inputElement
+    [formControl]="filterCtrl"
+    [matAutocomplete]="auto"
+    [matChipInputFor]="chipList"
+    (matChipInputTokenEnd)="add($event)"
+    (blur)="handleBlur()"
+  />
+</mat-chip-list>
+<mat-autocomplete #auto="matAutocomplete" (optionSelected)="select($event)">
+  <mat-option *ngFor="let item of displayItems$ | async" [value]="item">
+    {{ item }}
+  </mat-option>
+</mat-autocomplete>

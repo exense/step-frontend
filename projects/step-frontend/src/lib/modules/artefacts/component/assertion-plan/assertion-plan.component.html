@@ -5,11 +5,12 @@
     </mat-expansion-panel-header>
     <section class="panel-content">
       <step-alert type="minimalist">
-        An assertion plan containing an AssertMetric control declares assertions to be performed on the executions
-        related to one scheduler task within a given time. The failure of an assertion plan triggers an event of type
-        "ScheduledTaskAssertionsFailedEventType". An AssertMetric can be used to ensure that the number of failures of
-        the executions related to a scheduler task entry remains below a defined threshold.<br />
-        Add this plan to any scheduler task as its assertion plan to check the given assertions after every execution.
+        An assertion plan declares assertions to be performed on the series of executions of a scheduler task. It is
+        executed after each execution of the scheduler task and triggers an event of type “Assertion of task failed“
+        upon failure. <br />
+        Typically an assertion plan consists of one or more AssertMetric controls that specify the assertions.
+        AssertMetric can be for instance used to ensure that the number of failures of the executions related to a
+        scheduler task entry remains below a defined threshold.
       </step-alert>
     </section>
   </mat-expansion-panel>

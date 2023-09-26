@@ -18,7 +18,7 @@ export abstract class DynamicValueBaseComponent<D extends DynamicValueBase<T>, T
   implements ControlValueAccessor
 {
   @Input() label?: string;
-  @Input() placeholder?: string;
+  @Input() placeholder: string = '';
   @Input() tooltip?: string;
   @Input() showRequiredMarker: boolean = false;
 
