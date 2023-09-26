@@ -1,86 +1,164 @@
 // @ts-nocheck
+import { Anchor } from './tooltip-plugin';
+
 /**
  * This is used for tooltips. It creates the overlay container and display it on top of a chart.
  * This function has to be treated like a 'library'. It should not be changed at all.
  * Adding typescript for the moment is not worth it.
  */
-
 export class PlacementFunction {
-  public static placement(overlay, anchor: any, f, a, i) {
-    void 0 === f && (f = 'bottom'),
-      void 0 === a && (a = 'center'),
-      void 0 === i && (i = {}),
-      (anchor instanceof Element || anchor instanceof Range) &&
-        (anchor = this.extractBoundaries(anchor.getBoundingClientRect()));
-    var n = Object.assign(
-        {
-          top: anchor.bottom,
-          bottom: anchor.top,
-          left: anchor.right,
-          right: anchor.left,
-        },
-        anchor
-      ),
-      s = {
-        top: 0,
-        left: 0,
-        bottom: window.innerHeight,
-        right: window.innerWidth,
-      };
-    i.bound &&
-      ((i.bound instanceof Element || i.bound instanceof Range) &&
-        (i.bound = this.extractBoundaries(i.bound.getBoundingClientRect())),
-      Object.assign(s, i.bound));
-    var l = getComputedStyle(overlay),
-      m: any = {},
-      b: any = {};
-    for (var g in this.e)
-      (m[g] = this.e[g]['top' === f || 'bottom' === f ? 0 : 1]),
-        (b[g] = this.e[g]['top' === f || 'bottom' === f ? 1 : 0]);
-    (overlay.style.position = 'absolute'), (overlay.style.maxWidth = ''), (overlay.style.maxHeight = '');
-    var d = parseInt(l[b.marginBefore]),
-      c = parseInt(l[b.marginAfter]),
-      u = d + c,
-      p = s[b.after] - s[b.before] - u,
-      h = parseInt(l[b.maxSize]);
-    (!h || p < h) && (overlay.style[b.maxSize] = p + 'px');
-    var x = parseInt(l[m.marginBefore]) + parseInt(l[m.marginAfter]),
-      y = n[m.before] - s[m.before] - x,
-      z = s[m.after] - n[m.after] - x;
-    ((f === m.before && overlay[m.offsetSize] > y) || (f === m.after && overlay[m.offsetSize] > z)) &&
-      (f = y > z ? m.before : m.after);
-    var S = f === m.before ? y : z,
-      v = parseInt(l[m.maxSize]);
-    (!v || S < v) && (overlay.style[m.maxSize] = S + 'px');
-    var w = window[m.scrollOffset],
-      O = function (e: any): any {
-        return Math.max(s[m.before], Math.min(e, s[m.after] - overlay[m.offsetSize] - x));
-      };
-    f === m.before
-      ? ((overlay.style[m.before] = w + O(n[m.before] - overlay[m.offsetSize] - x) + 'px'),
-        (overlay.style[m.after] = 'auto'))
-      : ((overlay.style[m.before] = w + O(n[m.after]) + 'px'), (overlay.style[m.after] = 'auto'));
-    var B = window[b.scrollOffset],
-      I = function (e: any): any {
-        return Math.max(s[b.before], Math.min(e, s[b.after] - overlay[b.offsetSize] - u));
-      };
-    switch (a) {
+  public static placement(
+    overlay: Element,
+    anchor: Anchor,
+    side: string = 'bottom',
+    alignment: string = 'center',
+    boundContainer?: any
+  ) {
+    const anchorBoundaries = {
+      top: anchor.bottom,
+      bottom: anchor.top,
+      left: anchor.right,
+      right: anchor.left,
+      ...anchor,
+    };
+
+    const screenBoundaries = {
+      top: 0,
+      left: 0,
+      bottom: window.innerHeight,
+      right: window.innerWidth,
+    };
+
+    if (boundContainer) {
+      if (boundContainer instanceof Element || boundContainer instanceof Range) {
+        boundContainer = this.extractBoundaries(boundContainer.getBoundingClientRect());
+      }
+      Object.assign(screenBoundaries, boundContainer);
+    }
+
+    const overlayStyle = getComputedStyle(overlay);
+    const primaryAttributes: any = {};
+    const secondaryAttributes: any = {};
+
+    for (const attribute in this.attributeMapping) {
+      const sideTopOrBottom = side === 'top' || side === 'bottom';
+      primaryAttributes[attribute] = this.attributeMapping[attribute][sideTopOrBottom ? 0 : 1];
+      secondaryAttributes[attribute] = this.attributeMapping[attribute][sideTopOrBottom ? 1 : 0];
+    }
+
+    overlay.style.position = 'absolute';
+    overlay.style.maxWidth = '';
+    overlay.style.maxHeight = '';
+
+    const marginStart = parseInt(overlayStyle[secondaryAttributes.marginBefore]);
+    const marginEnd = parseInt(overlayStyle[secondaryAttributes.marginAfter]);
+    const totalMargin = marginStart + marginEnd;
+
+    const availableSpace =
+      screenBoundaries[secondaryAttributes.after] - screenBoundaries[secondaryAttributes.before] - totalMargin;
+    const overlayMaxSize = parseInt(overlayStyle[secondaryAttributes.maxSize]);
+
+    if (!overlayMaxSize || availableSpace < overlayMaxSize) {
+      overlay.style[secondaryAttributes.maxSize] = `${availableSpace}px`;
+    }
+
+    const offsetMarginStart = parseInt(overlayStyle[primaryAttributes.marginBefore]);
+    const offsetMarginEnd = parseInt(overlayStyle[primaryAttributes.marginAfter]);
+    const totalOffsetMargin = offsetMarginStart + offsetMarginEnd;
+
+    const spaceBefore =
+      anchorBoundaries[primaryAttributes.before] - screenBoundaries[primaryAttributes.before] - totalOffsetMargin;
+    const spaceAfter =
+      screenBoundaries[primaryAttributes.after] - anchorBoundaries[primaryAttributes.after] - totalOffsetMargin;
+
+    if (
+      (side === primaryAttributes.before && overlay[primaryAttributes.offsetSize] > spaceBefore) ||
+      (side === primaryAttributes.after && overlay[primaryAttributes.offsetSize] > spaceAfter)
+    ) {
+      side = spaceBefore > spaceAfter ? primaryAttributes.before : primaryAttributes.after;
+    }
+
+    const availablePrimarySpace = side === primaryAttributes.before ? spaceBefore : spaceAfter;
+    const primaryMaxSize = parseInt(overlayStyle[primaryAttributes.maxSize]);
+
+    if (!primaryMaxSize || availablePrimarySpace < primaryMaxSize) {
+      overlay.style[primaryAttributes.maxSize] = `${availablePrimarySpace}px`;
+    }
+
+    const primaryScrollOffset = window[primaryAttributes.scrollOffset];
+    const calculatePrimaryPosition = (value: number) => {
+      return Math.max(
+        screenBoundaries[primaryAttributes.before],
+        Math.min(
+          value,
+          screenBoundaries[primaryAttributes.after] - overlay[primaryAttributes.offsetSize] - totalOffsetMargin
+        )
+      );
+    };
+
+    if (side === primaryAttributes.before) {
+      overlay.style[primaryAttributes.before] = `${
+        primaryScrollOffset +
+        calculatePrimaryPosition(
+          anchorBoundaries[primaryAttributes.before] - overlay[primaryAttributes.offsetSize] - totalOffsetMargin
+        )
+      }px`;
+      overlay.style[primaryAttributes.after] = 'auto';
+    } else {
+      overlay.style[primaryAttributes.before] = `${
+        primaryScrollOffset + calculatePrimaryPosition(anchorBoundaries[primaryAttributes.after])
+      }px`;
+      overlay.style[primaryAttributes.after] = 'auto';
+    }
+
+    const secondaryScrollOffset = window[secondaryAttributes.scrollOffset];
+    const calculateSecondaryPosition = (value: number) => {
+      return Math.max(
+        screenBoundaries[secondaryAttributes.before],
+        Math.min(
+          value,
+          screenBoundaries[secondaryAttributes.after] - overlay[secondaryAttributes.offsetSize] - totalMargin
+        )
+      );
+    };
+
+    switch (alignment) {
       case 'start':
-        (overlay.style[b.before] = B + I(n[b.before] - d) + 'px'), (overlay.style[b.after] = 'auto');
+        overlay.style[secondaryAttributes.before] = `${
+          secondaryScrollOffset + calculateSecondaryPosition(anchorBoundaries[secondaryAttributes.before] - marginStart)
+        }px`;
+        overlay.style[secondaryAttributes.after] = 'auto';
         break;
       case 'end':
-        (overlay.style[b.before] = 'auto'),
-          (overlay.style[b.after] = B + I(document.documentElement[b.clientSize] - n[b.after] - c) + 'px');
+        overlay.style[secondaryAttributes.before] = 'auto';
+        overlay.style[secondaryAttributes.after] = `${
+          secondaryScrollOffset +
+          calculateSecondaryPosition(
+            document.documentElement[secondaryAttributes.clientSize] -
+              anchorBoundaries[secondaryAttributes.after] -
+              marginEnd
+          )
+        }px`;
         break;
       default:
-        var H = n[b.after] - n[b.before];
-        (overlay.style[b.before] = B + I(n[b.before] + H / 2 - overlay[b.offsetSize] / 2 - d) + 'px'),
-          (overlay.style[b.after] = 'auto');
+        const midpoint = anchorBoundaries[secondaryAttributes.after] - anchor;
+        overlay.style[secondaryAttributes.before] = `${
+          secondaryScrollOffset +
+          calculateSecondaryPosition(
+            anchorBoundaries[secondaryAttributes.before] +
+              midpoint / 2 -
+              overlay[secondaryAttributes.offsetSize] / 2 -
+              marginStart
+          )
+        }px`;
+        overlay.style[secondaryAttributes.after] = 'auto';
     }
-    (overlay.dataset.side = f), (overlay.dataset.align = a);
+
+    overlay.dataset.side = side;
+    overlay.dataset.align = alignment;
   }
 
-  static e = {
+  static attributeMapping = {
     size: ['height', 'width'],
     clientSize: ['clientHeight', 'clientWidth'],
     offsetSize: ['offsetHeight', 'offsetWidth'],
@@ -92,12 +170,12 @@ export class PlacementFunction {
     scrollOffset: ['pageYOffset', 'pageXOffset'],
   };
 
-  private static extractBoundaries(e) {
+  private static extractBoundaries(rect: ClientRect | DOMRect) {
     return {
-      top: e.top,
-      bottom: e.bottom,
-      left: e.left,
-      right: e.right,
+      top: rect.top,
+      bottom: rect.bottom,
+      left: rect.left,
+      right: rect.right,
     };
   }
 }

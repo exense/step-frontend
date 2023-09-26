@@ -368,3 +368,6 @@ export * from './components/waiting-artefacts-advanced/waiting-artefacts-advance
 export * from './components/artefact-details/artefact-details.component';
 export * from './services/special-links.service';
 export * from './shared/special-links-strategy';
+export * from './modules/entity/pipes/cast-entity-to-plan.pipe';
+export * from './modules/entity/pipes/cast-entity-to-execution.pipe';
+export * from './modules/entity/pipes/cast-entity-to-task.pipe';

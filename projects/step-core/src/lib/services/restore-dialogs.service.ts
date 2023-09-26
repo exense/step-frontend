@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { RestoreDialogComponent } from '../components/restore-dialog/restore-dialog.component';
 import { UibModalHelperService } from './uib-modal-helper.service';
-import { PlansService, History } from '../client/generated';
+import { History } from '../client/generated';
 import { RestoreDialogData } from '../modules/basics/shared/restore-dialog-data';
 
 @Injectable({
@@ -18,7 +18,6 @@ export class RestoreDialogsService {
     private _httpClient: HttpClient,
     private _uibModalHelper: UibModalHelperService,
     private _dialogs: DialogsService,
-    private _plansService: PlansService,
     private _matDialog: MatDialog
   ) {}
 

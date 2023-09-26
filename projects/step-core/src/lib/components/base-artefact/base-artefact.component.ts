@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject } from '@angular/core';
+import { AfterViewInit, Component, inject, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import {
   AbstractArtefact,
@@ -9,6 +9,7 @@ import {
 import { CustomComponent } from '../../modules/custom-registeries/custom-registries.module';
 import { ArtefactFormChangeHelperService } from '../../services/artefact-form-change-helper.service';
 import { ArtefactContext } from '../../shared';
+import { Subscription } from 'rxjs';
 
 type SimpleValue = undefined | null | string | boolean | number;
 type PossibleField = SimpleValue | DynamicValueString | DynamicValueInteger | DynamicValueBoolean;
@@ -16,22 +17,30 @@ type PossibleField = SimpleValue | DynamicValueString | DynamicValueInteger | Dy
 @Component({
   template: '',
 })
-export abstract class BaseArtefactComponent<T extends AbstractArtefact> implements CustomComponent, AfterViewInit {
+export abstract class BaseArtefactComponent<T extends AbstractArtefact>
+  implements CustomComponent, AfterViewInit, OnDestroy
+{
   protected _artefactFormChangeHelper = inject(ArtefactFormChangeHelperService);
 
   protected abstract form: NgForm;
 
+  private artefactChangeSubscription?: Subscription;
+
   context!: ArtefactContext<T>;
 
   contextChange(): void {
-    if (this.form) {
-      this._artefactFormChangeHelper.setupFormBehavior(this.form, () => this.context.save());
-    }
+    this.artefactChangeSubscription?.unsubscribe();
+    this.artefactChangeSubscription = this.context.artefactChange$.subscribe(() => this.setupFormChanges());
   }
 
   ngAfterViewInit(): void {
+    this.setupFormChanges();
+  }
+
+  private setupFormChanges(): void {
     this._artefactFormChangeHelper.setupFormBehavior(this.form, () => this.context.save());
   }
+
 
   protected determineEmptyGroup(fields: PossibleField[], emptyValues: SimpleValue[] = [undefined, null, '', 0, false]) {
     const isDynamic = (field: PossibleField) =>
@@ -52,5 +61,9 @@ export abstract class BaseArtefactComponent<T extends AbstractArtefact> implemen
       }
     }
     return true;
+  }
+
+  ngOnDestroy(): void {
+    this.artefactChangeSubscription?.unsubscribe();
   }
 }
