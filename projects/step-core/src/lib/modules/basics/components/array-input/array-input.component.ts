@@ -60,6 +60,7 @@ export class ArrayInputComponent implements ControlValueAccessor, OnChanges, OnD
   );
 
   @Input() possibleItems?: string[];
+  @Input() preventChars?: string[];
 
   @ViewChild('inputElement', { static: false }) private inputElement!: ElementRef<HTMLInputElement>;
   @ViewChild('inputElement', { static: false, read: MatAutocompleteTrigger })

@@ -10,6 +10,7 @@
   <input
     *ngIf="!isDisabled"
     #inputElement
+    [stepPreventChars]="preventChars"
     [formControl]="filterCtrl"
     [matAutocomplete]="auto"
     [matChipInputFor]="chipList"

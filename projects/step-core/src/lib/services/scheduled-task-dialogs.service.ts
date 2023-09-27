@@ -19,7 +19,7 @@ export class ScheduledTaskDialogsService {
 
   selectTask(): Observable<ExecutiontTaskParameters | undefined> {
     return this._entityDialogs.selectEntityOfType('tasks', true).pipe(
-      map((result) => result.item),
+      map((result) => result?.item?.id),
       switchMap((id) => (!id ? of(undefined) : this._schedulerService.getExecutionTaskById(id)))
     );
   }
