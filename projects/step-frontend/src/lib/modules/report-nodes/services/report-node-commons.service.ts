@@ -19,7 +19,7 @@ export abstract class ReportNodeCommonsService {
 
   private loadFunctionAttributes(): Observable<Input[]> {
     return this._screenService.getInputsForScreenPost('functionTable').pipe(
-      tap((functionAttributes) => functionAttributes.sort((a, b) => (a?.id || '').localeCompare(b?.id || ''))),
+      tap((functionAttributes) => [...functionAttributes].sort((a, b) => (a?.id || '').localeCompare(b?.id || ''))),
       tap((functionAttributes) => (this.functionAttributes = functionAttributes))
     );
   }
