@@ -13,6 +13,10 @@ export class ParametersFilterCondition extends FilterCondition<{
     super({ availableParameters, searchValue });
   }
 
+  override getSearchValue(): unknown {
+    return this.sourceObject?.searchValue;
+  }
+
   override isEmpty(): boolean {
     return !this.sourceObject?.searchValue;
   }
