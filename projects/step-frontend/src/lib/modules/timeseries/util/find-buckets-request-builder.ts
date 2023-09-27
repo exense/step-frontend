@@ -6,6 +6,7 @@ import { FilterUtils } from './filter-utils';
 import { TsFilteringSettings } from '../model/ts-filtering-settings';
 import { TsFilteringMode } from '../model/ts-filtering-mode';
 
+import { TimeSeriesConfig } from '../time-series.config';
 export class FindBucketsRequestBuilder {
   readonly attributesPrefix = 'attributes';
 
@@ -15,6 +16,7 @@ export class FindBucketsRequestBuilder {
   private groupDimensions?: string[];
   private percentiles?: number[];
   private numberOfBuckets?: number;
+  private intervalSize?: number; // in ms
   private filteringSettings?: TsFilteringSettings;
 
   /**
@@ -32,8 +34,9 @@ export class FindBucketsRequestBuilder {
       this.groupDimensions = builder.groupDimensions ? JSON.parse(JSON.stringify(builder.groupDimensions)) : [];
       this.percentiles = builder.percentiles ? JSON.parse(JSON.stringify(builder.percentiles)) : [];
       this.numberOfBuckets = builder.numberOfBuckets;
-      this.filteringSettings = builder.filteringSettings;
-      this.customAttributes = builder.customAttributes;
+      this.intervalSize = builder.intervalSize;
+      this.filteringSettings = JSON.parse(JSON.stringify(builder.filteringSettings));
+      this.customAttributes = JSON.parse(JSON.stringify(builder.customAttributes));
     }
   }
 
@@ -43,6 +46,19 @@ export class FindBucketsRequestBuilder {
 
   withNumberOfBuckets(numberOfBuckets: number) {
     this.numberOfBuckets = numberOfBuckets;
+    return this;
+  }
+
+  /**
+   * If intervalSize is 0, the resolution will be siwtched to the default number of buckets
+   * @param intervalSize
+   */
+  withIntervalSize(intervalSize: number) {
+    if (intervalSize) {
+      this.intervalSize = intervalSize;
+    } else {
+      this.numberOfBuckets = TimeSeriesConfig.MAX_BUCKETS_IN_CHART;
+    }
     return this;
   }
 
@@ -91,13 +107,13 @@ export class FindBucketsRequestBuilder {
     }
     let customAttributesOql = '';
     let filterItems = this.filteringSettings.filterItems;
+
     if (this.filterAttributesMask && this.filterAttributesMask.length > 0) {
       filterItems = filterItems.filter((item) => this.filterAttributesMask?.includes(item.attributeName));
     }
-
     const hiddenFilters = filterItems.filter(FilterUtils.filterItemIsValid).filter((item) => item.isHidden);
     const customFilters = filterItems.filter(FilterUtils.filterItemIsValid).filter((item) => !item.isHidden);
-
+    console.log(hiddenFilters);
     if (Object.keys(this.customAttributes).length > 0) {
       customAttributesOql = FilterUtils.objectToOQL(this.customAttributes, this.attributesPrefix);
     }
@@ -124,12 +140,7 @@ export class FindBucketsRequestBuilder {
       percentiles: this.percentiles,
       groupDimensions: this.groupDimensions,
       numberOfBuckets: this.numberOfBuckets,
+      intervalSize: this.intervalSize,
     };
-  }
-
-  private combineOqlWithFilters(oql: string, filterItems: TsFilterItem[]): string {
-    oql = oql.trim();
-    const filtersOql = FilterUtils.filtersToOQL(filterItems, this.attributesPrefix);
-    return [oql, filtersOql].filter((x) => x).join(' and ');
   }
 }

@@ -1,12 +1,8 @@
 <div mat-button [matMenuTriggerFor]="groupingMenu" #matTrigger="matMenuTrigger" class="filter-item-container">
-  <span class="grouping-title"> Grouping: {{ selectedGrouping.label }} </span>
+  <span class="grouping-title"> Grouping: {{ selectedGroupingInternal.label }} </span>
 </div>
 <mat-menu #groupingMenu="matMenu">
-  <button
-    mat-menu-item
-    *ngFor="let grouping of groupingOptions"
-    (click)="selectedGrouping = grouping; emitGroupingChange()"
-  >
+  <button mat-menu-item *ngFor="let grouping of groupingOptions" (click)="selectGrouping(grouping)">
     {{ grouping.label }}
   </button>
   <div mat-menu-item [matMenuTriggerFor]="customGroupingMenu">Other</div>
