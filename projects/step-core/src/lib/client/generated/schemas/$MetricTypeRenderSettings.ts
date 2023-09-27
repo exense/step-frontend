@@ -18,7 +18,7 @@ export const $MetricTypeRenderSettings = {
         type: 'string',
       },
     },
-    getyAxesUnit: {
+    yaxesUnit: {
       type: 'string',
     },
   },

@@ -1,7 +1,8 @@
 import { AfterViewInit, Component, inject, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { TSChartSettings } from '../chart/model/ts-chart-settings';
+import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import {
+  BucketAttributes,
   BucketResponse,
   FetchBucketsRequest,
   MetricType,
@@ -38,81 +39,74 @@ export class MetricChartComponent implements OnInit, OnChanges {
     if (!this.range) {
       throw new Error('Range input is mandatory');
     }
+    this.init(this.settings, this.range);
+  }
+
+  private init(settings: MetricType, range: TSTimeRange): void {
+    const groupByAttribute = settings.renderSettings!.groupingAttribute;
+    const groupDimensions = groupByAttribute ? [groupByAttribute] : [];
     const request: FetchBucketsRequest = {
-      start: this.range.from,
-      end: this.range.to,
-      groupDimensions: ['name'],
-      oqlFilter: FilterUtils.objectToOQL({ 'attributes.metricType': this.settings.attributeValue! }),
+      start: range.from,
+      end: range.to,
+      groupDimensions: groupDimensions,
+      oqlFilter: settings.oqlQuery,
       numberOfBuckets: 100,
     };
     this._timeSeriesService.getBuckets(request).subscribe((response) => {
-      this.chartSettings = this.createChartSettings(response);
+      this.chartSettings = this.createChartSettings(response, groupDimensions);
     });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // TODO handle range change
-    // TODO handle settings change
-    console.log('CHANGES');
+    if (changes['settings']?.previousValue || changes['range']?.previousValue) {
+      this.init(this.settings, this.range);
+    }
   }
 
-  private createChartSettings(response: TimeSeriesAPIResponse): TSChartSettings {
-    let xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-    let avgValues: (number | null | undefined)[] = [];
-    let countValues: (number | null)[] = [];
-    if (response.matrixKeys.length !== 0) {
-      response.matrix[0].forEach((bucket) => {
-        avgValues.push(bucket ? Math.round(bucket.sum / bucket.count) : undefined);
-        countValues.push(bucket ? bucket.throughputPerHour : 0);
-      });
-    }
-
+  private createChartSettings(response: TimeSeriesAPIResponse, groupDimensions: string[]): TSChartSettings {
+    const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
+    const series: TSChartSeries[] = response.matrix.map((series, i) => {
+      const seriesLabel = this.getSeriesKey(response.matrixKeys[i], groupDimensions);
+      const color = '#2461cc';
+      return {
+        id: seriesLabel,
+        label: seriesLabel,
+        legendName: seriesLabel,
+        data: series.map((b) => (b ? b.sum / b.count : 0)),
+        value: (self, x) => TimeSeriesUtils.formatAxisValue(x),
+        stroke: color,
+        fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
+        points: { show: false },
+      };
+    });
+    let yAxesUnit = this.settings.renderSettings!.yaxesUnit || '';
     return {
       title: this.settings.label!,
       xValues: xLabels,
+      series: series,
       tooltipOptions: {
         enabled: true,
-        yAxisUnit: 'ms',
-        zAxisLabel: 'Hits/h',
+        yAxisUnit: yAxesUnit,
       },
-      series: [
-        {
-          id: 'avg',
-          scale: 'y',
-          label: 'Response Time',
-          data: avgValues,
-          value: (x, v) => Math.trunc(v) + ' ms',
-          width: 2,
-          stroke: 'rgba(255,109,18,0.59)',
-          legendName: 'Average Response Time',
-        },
-        {
-          id: 'count',
-          scale: 'total',
-          legendName: 'Hits/h',
-          label: 'Hits/h',
-          data: countValues,
-          value: (x, v: number) => Math.trunc(v),
-          fill: (self: uPlot) => UPlotUtils.gradientFill(self, TimeSeriesConfig.TOTAL_BARS_COLOR),
-          paths: ChartGenerators.barsFunction({ size: [0.9, 100] }),
-          points: { show: false },
-        },
-      ],
       axes: [
         {
+          size: TimeSeriesConfig.CHART_LEGEND_SIZE,
           scale: 'y',
-          size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-          values: (u, vals, space) => vals.map((v: number) => UPlotUtils.formatMilliseconds(v)),
-        },
-        {
-          side: 1,
-          size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-          scale: 'total',
-          values: (u: any, vals: any, space: any) => vals.map((v: number) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
-          grid: { show: false },
+          values: (u, vals, space) => {
+            return vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + ' ' + yAxesUnit);
+          },
         },
       ],
-      autoResize: true,
     };
+  }
+
+  private getSeriesKey(attributes: BucketAttributes, groupDimensions: string[]): string {
+    if (Object.keys(attributes).length === 0) {
+      return 'Value';
+    }
+    return groupDimensions
+      .map((field) => attributes[field])
+      .filter((f) => !!f)
+      .join(' | ');
   }
 }

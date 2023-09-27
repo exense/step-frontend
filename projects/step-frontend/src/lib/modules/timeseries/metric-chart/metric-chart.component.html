@@ -1,2 +1,4 @@
-<step-chart-skeleton *ngIf="!chartSettings"></step-chart-skeleton>
-<step-timeseries-chart *ngIf="chartSettings" [settings]="chartSettings"> </step-timeseries-chart>
+<div class="h-100">
+  <step-chart-skeleton *ngIf="!chartSettings"></step-chart-skeleton>
+  <step-timeseries-chart *ngIf="chartSettings" [settings]="chartSettings"></step-timeseries-chart>
+</div>

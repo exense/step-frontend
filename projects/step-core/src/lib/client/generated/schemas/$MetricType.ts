@@ -12,7 +12,7 @@ export const $MetricType = {
     label: {
       type: 'string',
     },
-    attributeValue: {
+    oqlQuery: {
       type: 'string',
     },
     renderSettings: {

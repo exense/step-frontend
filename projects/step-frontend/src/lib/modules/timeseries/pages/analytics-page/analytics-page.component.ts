@@ -11,6 +11,7 @@ import { FilterBarItemType, TsFilterItem } from '../../performance-view/filter-b
 import { range, Subject, takeUntil, timer } from 'rxjs';
 import { TimeSeriesUtils } from '../../time-series-utils';
 import { TSChartSettings } from '../../chart/model/ts-chart-settings';
+import { TSTimeRange } from '../../chart/model/ts-time-range';
 
 @Component({
   selector: 'step-analytics-page',
@@ -19,6 +20,7 @@ import { TSChartSettings } from '../../chart/model/ts-chart-settings';
 })
 export class AnalyticsPageComponent implements OnInit, OnDestroy {
   @ViewChild('dashboard') dashboard!: TimeSeriesDashboardComponent;
+  @ViewChild('container') container: any;
   dashboardSettings: TimeSeriesDashboardSettings | undefined;
 
   terminator$ = new Subject<void>();
@@ -26,6 +28,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
 
   timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   timeRangeSelection!: TimeRangePickerSelection;
+  activeTimeRange: TSTimeRange = { from: 0, to: 0 };
 
   // this is just for running executions
   refreshIntervals = TimeSeriesConfig.AUTO_REFRESH_INTERVALS;
@@ -78,11 +81,13 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     delete urlParams.start;
     delete urlParams.end;
 
+    let timeRange = { from: start, to: end };
+    this.activeTimeRange = timeRange;
     this.dashboardSettings = {
       contextId: new Date().getTime().toString(),
       includeThreadGroupChart: true,
       disableThreadGroupOnOqlMode: true,
-      timeRange: { from: start, to: end },
+      timeRange: timeRange,
       contextualFilters: urlParams,
       showContextualFilters: true,
       timeRangeOptions: TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS,
@@ -93,6 +98,10 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     if (this.refreshEnabled) {
       this.startInterval(this.selectedRefreshInterval.value);
     }
+  }
+
+  handleDashboardTimeRangeChange(range: TSTimeRange) {
+    this.activeTimeRange = range;
   }
 
   private getDefaultFilters(): TsFilterItem[] {
