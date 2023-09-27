@@ -4,6 +4,7 @@ import { SearchValue } from '../shared/search-value';
 import { FilterCondition } from '../shared/filter-condition';
 import { map, Subject, takeUntil } from 'rxjs';
 import { SearchColumnAccessor } from '../shared/search-column-accessor';
+import { FilterConditionFactoryService } from '../services/filter-condition-factory.service';
 
 @Directive({
   selector: '[stepFilterConnect]',
@@ -11,6 +12,7 @@ import { SearchColumnAccessor } from '../shared/search-column-accessor';
 export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit, OnDestroy {
   private terminator$ = new Subject<void>();
 
+  private _filterConditionFactory = inject(FilterConditionFactoryService);
   private _searchCol = inject(SearchColumnAccessor, { optional: true });
   private _filter = inject<BaseFilterComponent<T, CV>>(BaseFilterComponent, { optional: true });
 
@@ -56,7 +58,7 @@ export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit, O
 
   private convertToSearchValue(value: T): SearchValue {
     if (this.createConditionFn) {
-      return this.createConditionFn(value);
+      return this.createConditionFn.call(this._filterConditionFactory, value);
     }
 
     if (this.useRegex !== undefined) {
@@ -74,7 +76,7 @@ export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit, O
       return value as T;
     }
     if (value instanceof FilterCondition) {
-      return value.sourceObject;
+      return value.getSearchValue() as T;
     }
 
     return value?.value as T;
