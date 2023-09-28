@@ -1,7 +1,7 @@
 <mat-chip-list #chipList>
-  <ng-container *ngFor="let item of selectedItems; let i = index">
+  <ng-container *ngFor="let item of selectedDisplayItems; trackBy: trackByKeyValue; let i = index">
     <mat-chip (removed)="removeItem(i)">
-      {{ item }}
+      {{ item.value }}
       <button *ngIf="!isDisabled" matChipRemove>
         <step-icon name="x"></step-icon>
       </button>
@@ -19,7 +19,7 @@
   />
 </mat-chip-list>
 <mat-autocomplete #auto="matAutocomplete" (optionSelected)="select($event)">
-  <mat-option *ngFor="let item of displayItems$ | async" [value]="item">
-    {{ item }}
+  <mat-option *ngFor="let item of displayItems$ | async; trackBy: trackByKeyValue" [value]="item.key">
+    {{ item.value }}
   </mat-option>
 </mat-autocomplete>

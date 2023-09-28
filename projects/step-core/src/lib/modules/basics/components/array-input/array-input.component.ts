@@ -7,6 +7,7 @@ import {
   OnChanges,
   OnDestroy,
   SimpleChanges,
+  TrackByFunction,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -14,6 +15,8 @@ import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR } from '@angular/f
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { BehaviorSubject, combineLatest, debounceTime, map, startWith, Subject, takeUntil } from 'rxjs';
+import { ArrayItemLabelValueExtractor } from '../../shared/array-item-label-value-extractor';
+import { KeyValue } from '@angular/common';
 
 type OnChange = (value?: string[]) => void;
 type OnTouch = () => void;
@@ -31,35 +34,41 @@ type OnTouch = () => void;
   ],
   encapsulation: ViewEncapsulation.None,
 })
-export class ArrayInputComponent implements ControlValueAccessor, OnChanges, OnDestroy {
+export class ArrayInputComponent<T = unknown> implements ControlValueAccessor, OnChanges, OnDestroy {
   private _fb = inject(FormBuilder).nonNullable;
 
   private terminator$ = new Subject<void>();
-  private availableItems$ = new BehaviorSubject<string[]>([]);
+  private availableItems$ = new BehaviorSubject<KeyValue<string, string>[]>([]);
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;
 
+  private selectedItems: string[] = [];
+
   protected isDisabled?: boolean;
 
-  protected selectedItems: string[] = [];
-
+  protected selectedDisplayItems: KeyValue<string, string>[] = [];
   protected filterCtrl = this._fb.control('');
+
+  protected readonly trackByKeyValue: TrackByFunction<KeyValue<string, string>> = (index, item) => item.key;
 
   protected readonly displayItems$ = combineLatest([
     this.availableItems$,
     this.filterCtrl.valueChanges.pipe(startWith(this.filterCtrl.value), debounceTime(300), takeUntil(this.terminator$)),
   ]).pipe(
     map(([availableItems, filter]) => {
-      let result = availableItems.filter((item) => !filter || item.toLowerCase().includes(filter.trim().toLowerCase()));
+      let result = availableItems.filter(
+        ({ value }) => !filter || value.toLowerCase().includes(filter.trim().toLowerCase())
+      );
       if (result.length === 0 && !!filter.trim()) {
-        result = [filter.trim()];
+        result = [{ key: filter, value: filter }];
       }
       return result;
     })
   );
 
-  @Input() possibleItems?: string[];
+  @Input() possibleItems?: T[];
+  @Input() valueLabelExtractor?: ArrayItemLabelValueExtractor<T, string>;
   @Input() preventChars?: string[];
 
   @ViewChild('inputElement', { static: false }) private inputElement!: ElementRef<HTMLInputElement>;
@@ -70,7 +79,7 @@ export class ArrayInputComponent implements ControlValueAccessor, OnChanges, OnD
     const cPossibleItems = changes['possibleItems'];
     if (cPossibleItems?.previousValue !== cPossibleItems?.currentValue || cPossibleItems?.firstChange) {
       const possibleItems = cPossibleItems.currentValue;
-      this.determineAvailableItems({ possibleItems });
+      this.determineItems({ possibleItems });
     }
   }
 
@@ -95,7 +104,7 @@ export class ArrayInputComponent implements ControlValueAccessor, OnChanges, OnD
   writeValue(selectedItems?: string[]): void {
     selectedItems = selectedItems ?? [];
     this.selectedItems = selectedItems;
-    this.determineAvailableItems({ selectedItems });
+    this.determineItems({ selectedItems });
   }
 
   protected removeItem(itemIndex: number): void {
@@ -103,7 +112,7 @@ export class ArrayInputComponent implements ControlValueAccessor, OnChanges, OnD
       return;
     }
     this.selectedItems.splice(itemIndex, 1);
-    this.determineAvailableItems();
+    this.determineItems();
     this.onChange?.(this.selectedItems);
     this.onTouch?.();
   }
@@ -138,17 +147,32 @@ export class ArrayInputComponent implements ControlValueAccessor, OnChanges, OnD
 
   private addItem(item: string): void {
     this.selectedItems.push(item);
-    this.determineAvailableItems();
+    this.determineItems();
     this.onChange?.(this.selectedItems);
     this.onTouch?.();
   }
 
-  private determineAvailableItems({
+  private determineItems({
     selectedItems,
     possibleItems,
-  }: { selectedItems?: string[]; possibleItems?: string[] } = {}): void {
+    extractor,
+  }: { selectedItems?: string[]; possibleItems?: T[]; extractor?: ArrayItemLabelValueExtractor<T> } = {}): void {
     selectedItems = selectedItems ?? this.selectedItems ?? [];
     possibleItems = possibleItems ?? this.possibleItems ?? [];
-    this.availableItems$.next(possibleItems.filter((item) => !selectedItems!.includes(item)));
+    extractor = extractor ?? this.valueLabelExtractor;
+    if (!extractor) {
+      this.availableItems$.next([]);
+      this.selectedDisplayItems = [];
+      return;
+    }
+    const items = possibleItems.map((item) => {
+      const key = extractor!.getValue(item);
+      const value = extractor!.getLabel(item);
+      return { key, value } as KeyValue<string, string>;
+    });
+    this.selectedDisplayItems = selectedItems.map(
+      (selectedItem) => items.find((item) => item.key === selectedItem) ?? { key: selectedItem, value: selectedItem }
+    );
+    this.availableItems$.next(items.filter((item) => !selectedItems!.includes(item.key)));
   }
 }
