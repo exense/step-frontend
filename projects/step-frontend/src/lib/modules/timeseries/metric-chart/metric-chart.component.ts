@@ -25,6 +25,7 @@ import { FilterUtils } from '../util/filter-utils';
 export class MetricChartComponent implements OnInit, OnChanges {
   chartSettings?: TSChartSettings;
 
+  @Input() filters: Record<string, any> = {};
   @Input() settings!: MetricType;
   @Input() range!: TSTimeRange;
 
@@ -47,7 +48,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
       start: range.from,
       end: range.to,
       groupDimensions: groupDimensions,
-      oqlFilter: FilterUtils.objectToOQL({ 'attributes.metricType': settings.name! }),
+      oqlFilter: FilterUtils.objectToOQL({ ...this.filters, 'attributes.metricType': settings.name! }),
       numberOfBuckets: 100,
     };
     this._timeSeriesService.getBuckets(request).subscribe((response) => {
