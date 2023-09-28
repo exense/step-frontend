@@ -11,6 +11,4 @@ import { NgForm } from '@angular/forms';
 export class AssertionPlanComponent extends BaseArtefactComponent<AbstractArtefact> {
   @ViewChild('form')
   protected form!: NgForm;
-
-  protected showDescription = true;
 }

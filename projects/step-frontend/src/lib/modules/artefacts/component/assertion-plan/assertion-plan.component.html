@@ -1,17 +1,13 @@
-<form #form="ngForm">
-  <mat-expansion-panel [(expanded)]="showDescription">
-    <mat-expansion-panel-header>
-      <mat-panel-title>Description</mat-panel-title>
-    </mat-expansion-panel-header>
-    <section class="panel-content">
-      <step-alert type="minimalist">
-        An assertion plan declares assertions to be performed on the series of executions of a scheduler task. It is
-        executed after each execution of the scheduler task and triggers an event of type “Assertion of task failed“
-        upon failure. <br />
-        Typically an assertion plan consists of one or more AssertMetric controls that specify the assertions.
-        AssertMetric can be for instance used to ensure that the number of failures of the executions related to a
-        scheduler task entry remains below a defined threshold.
-      </step-alert>
-    </section>
-  </mat-expansion-panel>
-</form>
+<mat-card>
+  <form #form="ngForm">
+    <h4>Assertion Plan</h4>
+    <step-alert type="minimalist">
+      An assertion plan declares assertions to be performed on the series of executions of a scheduler task. It is
+      executed after each execution of the scheduler task and triggers an event of type “Assertion of task failed“ upon
+      failure. <br />
+      Typically an assertion plan consists of one or more AssertMetric controls that specify the assertions.
+      AssertMetric can be for instance used to ensure that the number of failures of the executions related to a
+      scheduler task entry remains below a defined threshold.
+    </step-alert>
+  </form>
+</mat-card>
