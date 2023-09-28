@@ -1,5 +1,6 @@
 import { TimeRangePickerSelection } from './time-selection/time-range-picker-selection';
 import { RangeSelectionType } from './time-selection/model/range-selection-type';
+import { ResolutionPickerOption } from './components/resolution-picker/resolution-picker-option';
 
 export class TimeSeriesConfig {
   public static readonly MAX_BUCKETS_IN_CHART = 100;
