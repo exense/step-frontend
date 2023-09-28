@@ -2,12 +2,15 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { MetricTypeRenderSettings } from './MetricTypeRenderSettings';
+import type { MetricAttribute } from './MetricAttribute';
 
 export type MetricType = {
   customFields?: Record<string, any>;
+  name?: string;
   label?: string;
-  oqlQuery?: string;
-  renderSettings?: MetricTypeRenderSettings;
+  unit?: string;
+  attributes?: Array<MetricAttribute>;
+  groupingAttribute?: string;
+  seriesColors?: Record<string, string>;
   id?: string;
 };

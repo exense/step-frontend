@@ -9,14 +9,29 @@ export const $MetricType = {
         properties: {},
       },
     },
+    name: {
+      type: 'string',
+    },
     label: {
       type: 'string',
     },
-    oqlQuery: {
+    unit: {
       type: 'string',
     },
-    renderSettings: {
-      type: 'MetricTypeRenderSettings',
+    attributes: {
+      type: 'array',
+      contains: {
+        type: 'MetricAttribute',
+      },
+    },
+    groupingAttribute: {
+      type: 'string',
+    },
+    seriesColors: {
+      type: 'dictionary',
+      contains: {
+        type: 'string',
+      },
     },
     id: {
       type: 'string',

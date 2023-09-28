@@ -6,14 +6,12 @@ import {
   BucketResponse,
   FetchBucketsRequest,
   MetricType,
-  MetricTypeRenderSettings,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { UPlotUtils } from '../uplot/uPlot.utils';
 import { TimeSeriesConfig } from '../time-series.config';
-import { ChartGenerators } from '../performance-view/chart-generators/chart-generators';
 
 //@ts-ignore
 import uPlot = require('uplot');
@@ -43,13 +41,13 @@ export class MetricChartComponent implements OnInit, OnChanges {
   }
 
   private init(settings: MetricType, range: TSTimeRange): void {
-    const groupByAttribute = settings.renderSettings!.groupingAttribute;
+    const groupByAttribute = settings.groupingAttribute;
     const groupDimensions = groupByAttribute ? [groupByAttribute] : [];
     const request: FetchBucketsRequest = {
       start: range.from,
       end: range.to,
       groupDimensions: groupDimensions,
-      oqlFilter: settings.oqlQuery,
+      oqlFilter: FilterUtils.objectToOQL({ 'attributes.metricType': settings.name! }),
       numberOfBuckets: 100,
     };
     this._timeSeriesService.getBuckets(request).subscribe((response) => {
@@ -79,7 +77,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
         points: { show: false },
       };
     });
-    let yAxesUnit = this.settings.renderSettings!.yaxesUnit || '';
+    let yAxesUnit = this.settings.unit || '';
     return {
       title: this.settings.label!,
       xValues: xLabels,
