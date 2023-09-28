@@ -405,6 +405,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     const request = requestBuilder
       .clone()
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_SAMPLER)
+      .addAttribute('type', 'threadgroup')
       .withGroupDimensions(['name'])
       .withFilteringSettings(filteringSettings)
       .withFilterAttributesMask(TimeSeriesConfig.THREAD_GROUP_FILTER_FIELDS)
