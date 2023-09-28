@@ -18,7 +18,7 @@ import {
   DynamicFieldsSchema,
   SchemasFactoryService,
 } from '../../modules/dynamic-forms/dynamic-forms.module';
-import { EntityScopeResolver } from '../../modules/entity/services/entity-scope-resolver';
+import { EntityTypeResolver } from '../../modules/entity/services/entity-type-resolver';
 import { ArtefactRefreshNotificationService } from '../../services/artefact-refresh-notification.service';
 import { DynamicAttributePipe } from '../../pipes/dynamic-attribute.pipe';
 import { Entity } from '../../modules/entity/types/entity';
@@ -63,7 +63,7 @@ export abstract class ReferenceArtefactNameConfig<A extends Artefact, T = any> {
 })
 export class ReferenceArtefactNameComponent<A extends Artefact, T = any> implements OnChanges, OnInit, OnDestroy {
   private _schemaFactory = inject(SchemasFactoryService);
-  private _entityScopeResolver = inject(EntityScopeResolver);
+  private _entityTypeResolver = inject(EntityTypeResolver);
   private _changeDetectorRef = inject(ChangeDetectorRef);
   private _artefactRefreshNotification = inject(ArtefactRefreshNotificationService, { optional: true });
   readonly _artefactNameConfig = inject<ReferenceArtefactNameConfig<A, T>>(ReferenceArtefactNameConfig);
@@ -246,12 +246,12 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
         }
         return;
       }
-      const entityScope = this._entityScopeResolver.getScope(reference as Entity);
-      this.referenceMeta = entityScope
+      const entityTypeExtension = this._entityTypeResolver.getTypeExtension(reference as Entity);
+      this.referenceMeta = entityTypeExtension
         ? {
-            icon: entityScope.icon,
-            tooltip: entityScope.tooltip,
-            description: entityScope.tenant,
+            icon: entityTypeExtension.icon,
+            tooltip: entityTypeExtension.tooltip,
+            description: entityTypeExtension.tenant,
           }
         : undefined;
     });

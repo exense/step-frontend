@@ -1,5 +1,5 @@
 import { Component, Input, SimpleChanges } from '@angular/core';
-import { EntityScopeResolver } from '../../services/entity-scope-resolver';
+import { EntityTypeResolver } from '../../services/entity-type-resolver';
 import { Entity } from '../../types/entity';
 import { EntityRegistry } from '../../services/entity-registry';
 
@@ -18,7 +18,7 @@ export class EntityIconComponent {
   icon: string = '';
   tooltip: string = '';
 
-  constructor(private entityScopeResolver: EntityScopeResolver, private entityRegistry: EntityRegistry) {}
+  constructor(private _entityTypeResolver: EntityTypeResolver, private entityRegistry: EntityRegistry) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (
@@ -32,23 +32,25 @@ export class EntityIconComponent {
   }
 
   update(): void {
-    this.icon = '';
-    this.tooltip = '';
-    let entityType;
+    const iconType = this.getIconType();
+    this.icon = iconType.icon;
+    this.tooltip = iconType.tooltip;
+  }
 
-    if (this.entityName) {
-      entityType = this.entityRegistry.getEntityByName(this.entityName);
+  private getIconType(): { icon: string; tooltip: string } {
+    const entityType = this.entityName ? this.entityRegistry.getEntityByName(this.entityName) : undefined;
+    const entityTypeExtension = this._entityTypeResolver.getTypeExtension(this.entity, entityType);
+
+    if (entityTypeExtension) {
+      return { icon: entityTypeExtension.icon, tooltip: entityTypeExtension.tooltip ?? '' };
     }
 
-    const entityScope = this.entityScopeResolver.getScope(this.entity, entityType);
-    if (entityScope) {
-      this.icon = entityScope.icon ?? '';
-      this.tooltip = entityScope.tooltip ?? '';
-    } else {
-      if (entityType && entityType.icon) {
-        this.icon = entityType.icon ?? '';
-      }
+    if (entityType) {
+      return { icon: entityTypeExtension.icon ?? '', tooltip: '' };
     }
+
+    console.warn('getIconType: no icon type available');
+    return { icon: '', tooltip: '' };
   }
 }
 
