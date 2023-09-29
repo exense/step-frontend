@@ -11,6 +11,7 @@ export type MetricType = {
   unit?: string;
   attributes?: Array<MetricAttribute>;
   groupingAttribute?: string;
+  defaultAggregation?: 'SUM' | 'AVG' | 'MAX' | 'MIN';
   seriesColors?: Record<string, string>;
   id?: string;
 };

@@ -48,7 +48,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
       start: range.from,
       end: range.to,
       groupDimensions: groupDimensions,
-      oqlFilter: FilterUtils.objectToOQL({ ...this.filters, 'attributes.metricType': settings.name! }),
+      oqlFilter: FilterUtils.objectToOQL({ ...this.filters, 'attributes.metricType': `"${settings.name!}"` }),
       numberOfBuckets: 100,
     };
     this._timeSeriesService.getBuckets(request).subscribe((response) => {
@@ -71,7 +71,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
         id: seriesLabel,
         label: seriesLabel,
         legendName: seriesLabel,
-        data: series.map((b) => (b ? b.sum / b.count : 0)),
+        data: series.map((b) => this.getBucketValue(b, this.settings.defaultAggregation!)),
         value: (self, x) => TimeSeriesUtils.formatAxisValue(x),
         stroke: color,
         fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
@@ -97,6 +97,24 @@ export class MetricChartComponent implements OnInit, OnChanges {
         },
       ],
     };
+  }
+
+  private getBucketValue(b: BucketResponse, aggregation: 'SUM' | 'AVG' | 'MAX' | 'MIN'): number {
+    if (!b) {
+      return 0;
+    }
+    switch (aggregation) {
+      case 'SUM':
+        return b.sum;
+      case 'AVG':
+        return b.sum / b.count;
+      case 'MAX':
+        return b.max;
+      case 'MIN':
+        return b.min;
+      default:
+        throw new Error('Unhandled aggregation value: ' + aggregation);
+    }
   }
 
   private getSeriesKey(attributes: BucketAttributes, groupDimensions: string[]): string {

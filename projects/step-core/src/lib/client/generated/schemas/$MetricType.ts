@@ -27,6 +27,9 @@ export const $MetricType = {
     groupingAttribute: {
       type: 'string',
     },
+    defaultAggregation: {
+      type: 'Enum',
+    },
     seriesColors: {
       type: 'dictionary',
       contains: {
