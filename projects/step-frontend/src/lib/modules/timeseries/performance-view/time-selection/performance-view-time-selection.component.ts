@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FindBucketsRequest } from '../../find-buckets-request';
 import { TimeSeriesUtils } from '../../time-series-utils';
 import { TSRangerComponent } from '../../ranger/ts-ranger.component';
@@ -29,7 +29,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   private terminator$ = new Subject<void>();
 
-  constructor(private timeSeriesService: TimeSeriesService, private executionsPageService: TimeSeriesContextsFactory) {}
+  private timeSeriesService = inject(TimeSeriesService);
 
   ngOnInit(): void {
     if (!this.context) {

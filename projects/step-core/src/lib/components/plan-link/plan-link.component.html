@@ -7,7 +7,18 @@
 </ng-template>
 
 <ng-template #contentTemplate>
-  <ng-container *ngIf="iconOnly; then iconTemplate; else descriptionTemplate"></ng-container>
+  <div class="link-content" [ngSwitch]="linkDisplayType">
+    <ng-container *ngSwitchCase="LinkDisplayType.ICON_ONLY">
+      <ng-container *ngTemplateOutlet="iconTemplate"></ng-container>
+    </ng-container>
+    <ng-container *ngSwitchCase="LinkDisplayType.TEXT_ONLY">
+      <ng-container *ngTemplateOutlet="descriptionTemplate"></ng-container>
+    </ng-container>
+    <ng-container *ngSwitchDefault>
+      <ng-container *ngTemplateOutlet="iconTemplate"></ng-container>
+      <ng-container *ngTemplateOutlet="descriptionTemplate"></ng-container>
+    </ng-container>
+  </div>
 </ng-template>
 
 <ng-template #linkTemplate>

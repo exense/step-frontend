@@ -1,4 +1,11 @@
-<step-table #tableRef [dataSource]="_dataSource" matSort matSortActive="name" [matSortDisableClear]="true">
+<step-table
+  #tableRef
+  [dataSource]="_dataSource"
+  matSort
+  matSortActive="name"
+  [matSortDisableClear]="true"
+  [filter]="context?.tableFilter"
+>
   <ng-container *stepAdditionalHeader>
     <step-bulk-operations *ngIf="multipleSelection"></step-bulk-operations>
   </ng-container>
@@ -16,7 +23,7 @@
   <ng-container matColumnDef="singleSelect" *ngIf="!multipleSelection">
     <th mat-header-cell *matHeaderCellDef></th>
     <td mat-cell *matCellDef="let element">
-      <button type="button" mat-icon-button (click)="handleSelect(element.id)">
+      <button type="button" mat-icon-button (click)="handleSelect(element)">
         <step-icon name="plus"></step-icon>
       </button>
     </td>

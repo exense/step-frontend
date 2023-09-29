@@ -5,6 +5,8 @@ import { MultipleProjectsService } from '../../../basics/step-basics.module';
 import { SelectEntityOfTypeData } from '../../types/select-entity-of-type-data.interface';
 import { SelectEntityOfTypeResult } from '../../types/select-entity-of-type-result.interface';
 import { SelectEntityContext } from '../../types/select-entity-context.interface';
+import { EntityObject } from '../../types/entity-object';
+import { EntityMeta } from '../../types/entity-meta';
 
 @Component({
   selector: 'step-select-entity-of-type',
@@ -17,10 +19,11 @@ export class SelectEntityOfTypeComponent implements OnInit, OnDestroy {
   private _matDialogRef =
     inject<MatDialogRef<SelectEntityOfTypeComponent, SelectEntityOfTypeResult | undefined>>(MatDialogRef);
   protected _dialogData = inject<SelectEntityOfTypeData>(MAT_DIALOG_DATA);
-  protected entity = this._entityRegistry.getEntityByName(this._dialogData.entityName);
+  protected entity: EntityMeta = this._entityRegistry.getEntityByName(this._dialogData.entityName);
   protected selectEntityContext: SelectEntityContext = {
     multipleSelection: !this._dialogData.singleSelection,
-    handleSelect: (selectedId: string) => this.handleSelect(selectedId),
+    tableFilter: this._dialogData.tableFilter,
+    handleSelect: (item: EntityObject) => this.handleSelect(item),
     getSourceId: () => this._dialogData.sourceId,
   };
   protected migrationTarget: string = '';
@@ -72,10 +75,10 @@ export class SelectEntityOfTypeComponent implements OnInit, OnDestroy {
     this.currentProject = this._multipleProjects.currentProject()?.name || '';
   }
 
-  private handleSelect(selectedId: string): void {
+  private handleSelect(item: EntityObject): void {
     const result: SelectEntityOfTypeResult = {
       entity: this.entity,
-      item: selectedId,
+      item: item,
     };
     this._matDialogRef.close(result);
   }

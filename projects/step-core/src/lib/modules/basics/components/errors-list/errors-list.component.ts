@@ -10,7 +10,7 @@ import { ValidationErrors } from '@angular/forms';
 export class ErrorsListComponent implements OnChanges {
   protected displayErrors: string[] = [];
 
-  @Input() errors?: ValidationErrors;
+  @Input() errors?: ValidationErrors | null;
   @Input() keysDictionary?: Record<string, string>;
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -27,16 +27,16 @@ export class ErrorsListComponent implements OnChanges {
       keysDictionary = cKeysDictionary?.currentValue;
     }
 
-    if (errors || keysDictionary) {
+    if (errors !== undefined || keysDictionary) {
       this.buildDisplayErrors(errors, keysDictionary);
     }
   }
 
-  private buildDisplayErrors(errors?: ValidationErrors, keysDictionary?: Record<string, string>): void {
-    errors = errors ?? this.errors ?? {};
+  private buildDisplayErrors(errors?: ValidationErrors | null, keysDictionary?: Record<string, string>): void {
+    errors = errors !== undefined ? errors : this.errors;
     keysDictionary = keysDictionary ?? this.keysDictionary ?? {};
 
-    this.displayErrors = Object.entries(errors).map(
+    this.displayErrors = Object.entries(errors ?? {}).map(
       ([errorKey, errorValue]) => keysDictionary![errorKey] ?? errorValue
     );
   }

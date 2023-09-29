@@ -33,7 +33,20 @@ import {
   PlanLinkDialogService,
   FunctionActionsService,
 } from '@exense/step-core';
-import { catchError, filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import {
+  catchError,
+  defer,
+  EMPTY,
+  debounceTime,
+  filter,
+  map,
+  Observable,
+  of,
+  Subject,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
@@ -93,7 +106,10 @@ export class PlanEditorBaseComponent
   @Input() showExecuteButton = true;
 
   selectedTab = 'controls';
+
   readonly isInteractiveSessionActive$ = this._interactiveSession.isActive$;
+  readonly showInteractiveWarning$ = this.isInteractiveSessionActive$.pipe(debounceTime(300));
+
   planTypes$ = this._planApi.getArtefactTemplates().pipe(
     map((planTypes) => {
       return planTypes.map((planType) => ({
@@ -154,20 +170,37 @@ export class PlanEditorBaseComponent
   }
 
   displayHistory(permission: string, plan: Plan): void {
-    if (!plan || !plan.id) {
+    if (!(plan?.id || this.id)) {
       return;
     }
 
-    const planVersion = plan.customFields ? plan.customFields['versionId'] : undefined;
-    const versionHistory = this._planEditorApi.getPlanHistory(plan.id!);
+    const versionHistory = this._planEditorApi.getPlanHistory(this.id || plan.id!);
 
-    this._restoreDialogsService
-      .showRestoreDialog(planVersion, versionHistory, permission)
+    const currentVersion$ = defer(() => {
+      if (this.id && this.id !== plan.id) {
+        // composite keywords need to retrieve the current version
+        return this._keywordCallsApi
+          .getFunctionById(this.id)
+          .pipe(map((keyword) => keyword?.customFields?.['versionId'] ?? undefined));
+      } else {
+        // we are showing a real plan
+        return of(plan.customFields ? plan.customFields['versionId'] : undefined);
+      }
+    });
+
+    currentVersion$
       .pipe(
-        filter((restoreVersion) => !!restoreVersion),
-        switchMap((restoreVersion) => this._planEditorApi.restorePlanVersion(plan.id!, restoreVersion))
+        switchMap((currentVersion) =>
+          this._restoreDialogsService.showRestoreDialog(currentVersion, versionHistory, permission)
+        ),
+        filter((restoreVersion) => restoreVersion !== undefined),
+        switchMap((restoreVersion) => this._planEditorApi.restorePlanVersion(this.id || plan.id!, restoreVersion)),
+        catchError((error) => {
+          console.error(error);
+          return EMPTY;
+        })
       )
-      .subscribe(() => this.loadPlan(plan.id!));
+      .subscribe(() => this.loadPlan(this.id || plan.id!));
   }
 
   clonePlan(): void {
@@ -201,7 +234,7 @@ export class PlanEditorBaseComponent
   }
 
   resetInteractive(): void {
-    this._interactiveSession.resetInteractive().subscribe(() => (this.selectedTab = 'controls'));
+    this._interactiveSession.resetInteractive().subscribe();
   }
 
   openArtefact(node?: AbstractArtefact): void {

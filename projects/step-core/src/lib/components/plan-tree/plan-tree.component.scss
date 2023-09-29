@@ -7,9 +7,12 @@ step-plan-tree {
   height: 100%;
 
   step-tree {
-    overflow: auto;
+    overflow: hidden;
     margin-top: 2rem;
     padding-right: 6.5rem;
+    &:hover {
+      overflow: auto;
+    }
   }
 
   step-tree-node {

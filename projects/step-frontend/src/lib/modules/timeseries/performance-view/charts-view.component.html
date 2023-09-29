@@ -14,7 +14,6 @@
       <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.OVERVIEW]"></step-chart-skeleton>
       <step-timeseries-chart
         #summaryChart
-        title="Performance Overview"
         *ngIf="currentChartsSettings[TsChartType.OVERVIEW]"
         [settings]="currentChartsSettings[TsChartType.OVERVIEW]"
         [syncKey]="settings.contextId"
@@ -28,7 +27,6 @@
       <step-chart-skeleton *ngIf="!compareChartsSettings[TsChartType.OVERVIEW]"></step-chart-skeleton>
       <step-timeseries-chart
         #summaryCompareChart
-        title="Performance Overview"
         *ngIf="compareChartsSettings[TsChartType.OVERVIEW]"
         [settings]="compareChartsSettings[TsChartType.OVERVIEW]"
         [syncKey]="compareModeContext!.id"
@@ -42,7 +40,6 @@
       <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.BY_STATUS]"></step-chart-skeleton>
       <step-timeseries-chart
         #byStatusChart
-        title="Statuses"
         *ngIf="currentChartsSettings[TsChartType.BY_STATUS]"
         [settings]="currentChartsSettings[TsChartType.BY_STATUS]"
         [syncKey]="settings.contextId"
@@ -56,7 +53,6 @@
       <step-chart-skeleton *ngIf="!compareChartsSettings[TsChartType.BY_STATUS]"></step-chart-skeleton>
       <step-timeseries-chart
         #byStatusCompareChart
-        title="Statuses"
         *ngIf="compareChartsSettings[TsChartType.BY_STATUS]"
         [settings]="compareChartsSettings[TsChartType.BY_STATUS]"
         [syncKey]="compareModeContext!.id"

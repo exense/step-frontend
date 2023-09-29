@@ -1,0 +1,18 @@
+step-array-input {
+  display: block;
+
+  .mat-chip-list-wrapper {
+    overflow: hidden;
+    input.mat-input-element {
+      margin: 0;
+      padding: 0.4rem 1.4rem;
+    }
+  }
+
+  .mat-standard-chip {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    min-height: 2.4rem !important;
+    margin: 0.1rem !important;
+  }
+}

@@ -14,7 +14,6 @@ export type AbstractArtefact = {
   children?: Array<AbstractArtefact>;
   customAttributes?: Record<string, any>;
   attachments?: Array<string>;
-  persistNode?: boolean;
   skipNode?: DynamicValueBoolean;
   instrumentNode?: DynamicValueBoolean;
   continueParentNodeExecutionOnError?: DynamicValueBoolean;

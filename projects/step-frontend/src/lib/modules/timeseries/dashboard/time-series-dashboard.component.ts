@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { filter, forkJoin, merge, Subject, Subscription, switchMap, takeUntil, tap, throttle } from 'rxjs';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { FilterBarComponent } from '../performance-view/filter-bar/filter-bar.component';
@@ -45,50 +45,119 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     { label: 'Last Hour', timeInMs: this.ONE_HOUR_MS },
   ];
 
-  contextualFilterItems: TsFilterItem[] = [];
+  filterItems: TsFilterItem[] = [];
+  filterOptions: TsFilterItem[] = [];
 
   compareModeEnabled: boolean = false;
   compareModeContext: TimeSeriesContext | undefined;
+  compareModeFilterOptions: TsFilterItem[] = [];
+  compareModeFilterItems: TsFilterItem[] = [];
   compareModeTimeRangeOptions = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   compareModeActiveRangeOption: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
 
   exportInProgress = false;
 
-  constructor(
-    private contextsFactory: TimeSeriesContextsFactory,
-    private _timeSeriesService: TimeSeriesService,
-    private _tableApiService: TableApiWrapperService
-  ) {}
+  private _contextsFactory = inject(TimeSeriesContextsFactory);
+  private _timeSeriesService = inject(TimeSeriesService);
+  private _tableApiService = inject(TableApiWrapperService);
 
   ngOnInit(): void {
     if (!this.settings) {
       throw new Error('Settings input must be set');
     }
-    this.contextualFilterItems = Object.keys(this.settings.contextualFilters).map((key) => {
-      return {
-        isHidden: !this.settings.showContextualFilters,
-        removable: true,
-        label: key,
-        type: FilterBarItemType.FREE_TEXT,
-        attributeName: key,
-        freeTextValues: [this.settings.contextualFilters[key]],
-        isLocked: false,
-        exactMatch: true,
-      };
-    });
+    // combine contextual filters (from URL) with custom specified filters
+    this.filterItems = this.mergeContextualParamsWithActiveFilters(
+      this.settings.contextualFilters,
+      this.settings.activeFilters || []
+    );
+    this.timeRangeSelection = this.settings.activeTimeRange;
+    this.filterOptions = this.prepareFilterOptions(this.filterItems, this.settings);
     const contextParams: TimeSeriesContextParams = {
       id: this.settings.contextId,
       timeRange: this.settings.timeRange,
-      filters: this.contextualFilterItems,
+      filters: this.filterItems,
       grouping: ['name'],
     };
-    this.context = this.contextsFactory.createContext(contextParams);
+    this.context = this._contextsFactory.createContext(contextParams);
 
     this.performanceViewSettings = this.settings;
     this.subscribeForContextChange();
   }
 
+  private mergeContextualParamsWithActiveFilters(
+    contextualParams: Record<string, string>,
+    activeFilters: TsFilterItem[]
+  ) {
+    const contextualFilters = Object.keys(contextualParams).map((key) => {
+      const fieldType = this.getFilterFieldType(key);
+      const isEntityFilter =
+        fieldType === FilterBarItemType.PLAN ||
+        fieldType === FilterBarItemType.TASK ||
+        fieldType === FilterBarItemType.EXECUTION;
+      const searchValue = contextualParams[key];
+      return {
+        isHidden: !this.settings.showContextualFilters,
+        removable: true,
+        label: this.getFilterFieldLabel(key),
+        type: fieldType,
+        attributeName: key,
+        freeTextValues: fieldType === FilterBarItemType.FREE_TEXT ? [searchValue] : [],
+        searchEntities: isEntityFilter ? [{ searchValue: searchValue }] : [],
+        isLocked: false,
+        exactMatch: true,
+      } as TsFilterItem;
+    });
+    let notContextualFilters = activeFilters.filter((item) => !contextualParams[item.attributeName]);
+    return [...contextualFilters, ...notContextualFilters];
+  }
+
+  /**
+   * Attributes that are hidden (e.g executionId) should not appear in the add filters menu
+   * @param settings
+   * @private
+   */
+  private prepareFilterOptions(activeFilters: TsFilterItem[], settings: TimeSeriesDashboardSettings): TsFilterItem[] {
+    const hiddenFilters = activeFilters.filter((f) => f.isHidden).map((f) => f.attributeName) || [];
+    return settings.filterOptions.map((f) => {
+      if (hiddenFilters.includes(f.attributeName)) {
+        f.isHidden = true;
+      }
+      return f;
+    });
+  }
+
+  private getFilterFieldLabel(attribute: string): string {
+    switch (attribute) {
+      case 'eId':
+        return 'Execution';
+      case 'taskId':
+        return 'Task';
+      case 'plan':
+        return 'Plan';
+      default:
+        return attribute;
+    }
+  }
+
+  private getFilterFieldType(attribute: string): FilterBarItemType {
+    switch (attribute) {
+      case 'eId':
+        return FilterBarItemType.EXECUTION;
+      case 'taskId':
+        return FilterBarItemType.TASK;
+      case 'planId':
+        return FilterBarItemType.PLAN;
+      default:
+        return FilterBarItemType.FREE_TEXT;
+    }
+  }
+
+  public setChartsResolution(ms: number): void {
+    this.context.updateChartsResolution(ms);
+  }
+
   private updateBaseCharts(showLoading = false) {
+    console.log('updating base charts');
     this.updateBaseChartsSubscription?.unsubscribe();
     let updateCharts$ = this.chartsView.updateBaseCharts({
       updateRanger: true,
@@ -122,6 +191,9 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
         takeUntil(this.terminator$)
       )
       .subscribe(() => {
+        // let's calculate the new time range
+        let fullRange = this.calculateTimeRange(this.timeRangeSelection);
+        this.setRanges(fullRange);
         this.updateBaseCharts();
       });
     this.context.onCompareModeChange().subscribe(({ enabled, context }) => {
@@ -134,11 +206,16 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.context.updateActiveFilters(filters);
   }
 
-  handleTimeRangeChange(selection: TimeRangePickerSelection) {
-    this.timeRangeSelection = selection;
-    //TODO optional execution
+  handleTimeRangeChange(params: { selection: TimeRangePickerSelection; triggerRefresh: boolean }) {
+    this.timeRangeSelection = params.selection;
+    let newTimeRange: TSTimeRange = this.calculateTimeRange(params.selection);
+    this.updateFullRange(newTimeRange, params.triggerRefresh);
+  }
+
+  private calculateTimeRange(selection: TimeRangePickerSelection): TSTimeRange {
     let newTimeRange: TSTimeRange;
     if (this.settings.execution) {
+      // we have an execution
       newTimeRange = TimeSeriesUtils.convertExecutionAndSelectionToTimeRange(
         this.settings.execution!,
         this.timeRangeSelection
@@ -146,12 +223,15 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     } else {
       newTimeRange = TimeSeriesUtils.convertSelectionToTimeRange(selection);
     }
-    this.updateFullRange(newTimeRange);
+    return newTimeRange;
   }
 
-  handleCompareTimeRangeChange(selection: TimeRangePickerSelection) {
-    this.compareModeActiveRangeOption = selection;
-    this.updateCompareChartsFullRange(TimeSeriesUtils.convertSelectionToTimeRange(selection));
+  handleCompareTimeRangeChange(params: { selection: TimeRangePickerSelection; triggerRefresh: boolean }) {
+    this.compareModeActiveRangeOption = params.selection;
+    this.updateCompareChartsFullRange(
+      TimeSeriesUtils.convertSelectionToTimeRange(params.selection),
+      params.triggerRefresh
+    );
   }
 
   setRanges(fullRange: TSTimeRange, selection?: TSTimeRange) {
@@ -173,12 +253,21 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.context.updateSelectedRange(newSelection, false);
   }
 
+  refresh() {
+    if (this.compareModeEnabled) {
+      // don't do the update while in compare mode
+      return;
+    }
+    this.throttledRefreshTrigger$.next(true);
+  }
+
   /**
    * This method has to make sure that it doesn't overlap another running update.
    * Used for auto-refresh.
    * @param range
+   *  @Deprecated - the range is calculated inside the refresh
    */
-  refresh(range: TSTimeRange, selection?: TSTimeRange): void {
+  refreshWithNewRange(range: TSTimeRange, selection?: TSTimeRange): void {
     this.setRanges(range, selection);
     if (this.compareModeEnabled) {
       // don't do the update while in compare mode
@@ -191,31 +280,34 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
    * This is a force refresh (instantly triggered).
    * The selection will be set to full selection.
    */
-  updateFullRange(range: TSTimeRange): void {
+  updateFullRange(range: TSTimeRange, forceRefresh = true): void {
     this.updateBaseChartsSubscription?.unsubscribe(); // end current execution
     this.context.updateFullRange(range, false);
     this.context.updateSelectedRange(range, false);
-    console.log('range update');
-    const updateCharts$ = this.chartsView.updateBaseCharts({
-      updateRanger: true,
-      updateCharts: true,
-      showLoadingBar: true,
-    });
-    let refreshRanger$ = this.filterBar?.timeSelection?.refreshRanger();
-    this.updateBaseChartsSubscription = forkJoin([updateCharts$, refreshRanger$]).subscribe();
+    if (forceRefresh) {
+      const updateCharts$ = this.chartsView.updateBaseCharts({
+        updateRanger: true,
+        updateCharts: true,
+        showLoadingBar: true,
+      });
+      let refreshRanger$ = this.filterBar?.timeSelection?.refreshRanger();
+      this.updateBaseChartsSubscription = forkJoin([updateCharts$, refreshRanger$]).subscribe();
+    }
   }
 
-  updateCompareChartsFullRange(range: TSTimeRange) {
+  updateCompareChartsFullRange(range: TSTimeRange, refreshCharts = true) {
     this.compareChartsSubscription?.unsubscribe(); // end current execution
     this.compareModeContext?.updateFullRange(range, false);
     this.compareModeContext?.updateSelectedRange(range, false);
-    const updateCharts$ = this.chartsView.updateCompareCharts({
-      updateRanger: true,
-      updateCharts: true,
-      showLoadingBar: true,
-    });
-    let refreshRanger$ = this.compareFilterBar?.timeSelection?.refreshRanger();
-    this.compareChartsSubscription = forkJoin([updateCharts$, refreshRanger$]).subscribe();
+    if (refreshCharts) {
+      const updateCharts$ = this.chartsView.updateCompareCharts({
+        updateRanger: true,
+        updateCharts: true,
+        showLoadingBar: true,
+      });
+      let refreshRanger$ = this.compareFilterBar?.timeSelection?.refreshRanger();
+      this.compareChartsSubscription = forkJoin([updateCharts$, refreshRanger$]).subscribe();
+    }
   }
 
   public disableCompareMode(): void {
@@ -224,13 +316,14 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   public enableCompareMode(): void {
-    const filters = this.prepareFiltersForCompareMode();
+    this.compareModeFilterOptions = this.filterOptions.map((i) => ({ ...i, isHidden: false }));
+    this.compareModeFilterItems = this.prepareFiltersForCompareMode();
     const timeRange = JSON.parse(JSON.stringify(this.context.getFullTimeRange()));
-    const compareContext = this.contextsFactory.createContext({
+    const compareContext = this._contextsFactory.createContext({
       timeRange: timeRange,
       id: new Date().getTime().toString(),
-      grouping: ['name'], // the grouping component don't currently support a custom default value other than 'name'
-      filters: filters,
+      grouping: this.context.getGroupDimensions(),
+      filters: this.compareModeFilterItems,
       keywordsContext: this.context.keywordsContext, // share the same keywords context and colors
     });
     this.compareModeActiveRangeOption = { type: RangeSelectionType.ABSOLUTE, absoluteSelection: timeRange };
@@ -242,7 +335,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.context.enableCompareMode(compareContext);
   }
 
-  public exportRawData() {
+  public exportRawData(): void {
     if (this.exportInProgress) {
       return;
     }
@@ -260,23 +353,13 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   private prepareFiltersForCompareMode(): TsFilterItem[] {
-    return Object.keys(this.settings.contextualFilters).map((key) => {
-      const label = key === 'eId' ? 'Execution Id' : key;
-      return {
-        attributeName: key,
-        isHidden: false,
-        exactMatch: true,
-        label: label,
-        type: FilterBarItemType.FREE_TEXT,
-        freeTextValues: [this.settings.contextualFilters[key]],
-      };
-    });
+    return this.filterItems.map((i) => ({ ...JSON.parse(JSON.stringify(i)), isHidden: false })); // deep clone the objects
   }
 
   ngOnDestroy(): void {
     this.terminator$.next(true);
     this.compareTerminator$.next(true);
-    this.contextsFactory.destroyContext(this.context.id);
+    this._contextsFactory.destroyContext(this.context.id);
     this.updateBaseChartsSubscription.unsubscribe();
   }
 }

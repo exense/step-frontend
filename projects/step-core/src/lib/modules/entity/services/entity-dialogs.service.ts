@@ -18,14 +18,14 @@ export class EntityDialogsService {
   selectEntityOfType(
     entityName: string,
     singleSelection: boolean,
-    additionalParams?: { targetId?: string; sourceId?: string }
+    additionalParams?: { targetId?: string; sourceId?: string; tableFilter?: string }
   ): Observable<SelectEntityOfTypeResult> {
-    const { targetId, sourceId } = additionalParams ?? {};
+    const { targetId, sourceId, tableFilter } = additionalParams ?? {};
     return this._matDialog
       .open<SelectEntityOfTypeComponent, SelectEntityOfTypeData, SelectEntityOfTypeResult | undefined>(
         SelectEntityOfTypeComponent,
         {
-          data: { entityName, singleSelection, targetId, sourceId },
+          data: { entityName, singleSelection, targetId, sourceId, tableFilter },
           injector: this._injector,
         }
       )

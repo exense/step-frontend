@@ -1,11 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { map, Observable, switchMap, catchError, of } from 'rxjs';
 import { a1Promise2Observable, AJS_MODULE, DialogsService } from '../shared';
-import { ExecutionParameters, ExecutiontTaskParameters, SchedulerService } from '../client/generated';
+import { ExecutionParameters, ExecutiontTaskParameters, AugmentedSchedulerService } from '../client/step-client-module';
 import { MatDialog } from '@angular/material/dialog';
 import { NewSchedulerTaskDialogComponent } from '../components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 import { EditSchedulerTaskDialogComponent } from '../components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
+import { EntityDialogsService } from '../modules/entity/services/entity-dialogs.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +14,15 @@ import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static
 export class ScheduledTaskDialogsService {
   private _matDialog = inject(MatDialog);
   private _dialogs = inject(DialogsService);
-  private _schedulerService = inject(SchedulerService);
+  private _schedulerService = inject(AugmentedSchedulerService);
+  private _entityDialogs = inject(EntityDialogsService);
+
+  selectTask(): Observable<ExecutiontTaskParameters | undefined> {
+    return this._entityDialogs.selectEntityOfType('tasks', true).pipe(
+      map((result) => result?.item?.id),
+      switchMap((id) => (!id ? of(undefined) : this._schedulerService.getExecutionTaskById(id)))
+    );
+  }
 
   newScheduledTask(executionParams: ExecutionParameters): Observable<ExecutiontTaskParameters | undefined> {
     return this._matDialog

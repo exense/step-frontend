@@ -5,6 +5,7 @@ import {
   inject,
   Input,
   OnChanges,
+  OnDestroy,
   Output,
   SimpleChanges,
   ViewChild,
@@ -14,6 +15,7 @@ import { ArtefactContext } from '../../shared';
 import { AbstractArtefact, DynamicValueString } from '../../client/step-client-module';
 import { NgForm } from '@angular/forms';
 import { ArtefactFormChangeHelperService } from '../../services/artefact-form-change-helper.service';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 @Component({
   selector: 'step-artefact-details',
@@ -21,12 +23,16 @@ import { ArtefactFormChangeHelperService } from '../../services/artefact-form-ch
   styleUrls: ['./artefact-details.component.scss'],
   providers: [ArtefactFormChangeHelperService],
 })
-export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, AfterViewInit {
+export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, AfterViewInit, OnDestroy {
   private _artefactsService = inject(ArtefactService);
   private _artefactFormChangeHelper = inject(ArtefactFormChangeHelperService);
 
   @ViewChild('form')
   private form!: NgForm;
+
+  private artefactChangeInternal$ = new BehaviorSubject<void>(undefined);
+
+  readonly artefactChange$ = this.artefactChangeInternal$.asObservable();
 
   protected editorContext: ArtefactContext = this;
 
@@ -41,7 +47,7 @@ export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, Aft
   protected artefactMeta?: ArtefactType;
 
   ngAfterViewInit(): void {
-    this._artefactFormChangeHelper.setupFormBehavior(this.form, () => this.save());
+    this._artefactFormChangeHelper.setupFormBehavior(this.form.form, () => this.save());
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -50,9 +56,14 @@ export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, Aft
       const artefact = cArtefact?.currentValue as AbstractArtefact | undefined;
       this.determineArtefactMetaData(artefact?._class);
       if (this.form) {
-        this._artefactFormChangeHelper.setupFormBehavior(this.form, () => this.save());
+        this._artefactFormChangeHelper.setupFormBehavior(this.form.form, () => this.save());
       }
+      this.artefactChangeInternal$.next();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.artefactChangeInternal$.complete();
   }
 
   save(): void {

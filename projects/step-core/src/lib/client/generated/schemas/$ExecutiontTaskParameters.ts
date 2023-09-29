@@ -21,6 +21,10 @@ export const $ExecutiontTaskParameters = {
     executionsParameters: {
       type: 'ExecutionParameters',
     },
+    assertionPlan: {
+      type: 'string',
+      pattern: '[a-f0-9]{24}}',
+    },
     cronExpression: {
       type: 'string',
     },

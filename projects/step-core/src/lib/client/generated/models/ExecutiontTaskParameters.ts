@@ -9,6 +9,7 @@ export type ExecutiontTaskParameters = {
   attributes?: Record<string, string>;
   name?: string;
   executionsParameters?: ExecutionParameters;
+  assertionPlan?: string;
   cronExpression?: string;
   active?: boolean;
   id?: string;

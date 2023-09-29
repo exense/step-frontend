@@ -6,6 +6,7 @@ import { ScreenConfigurationListComponent } from './components/screen-configurat
 import { ScreenInputEditDialogComponent } from './components/screen-input-edit-dialog/screen-input-edit-dialog.component';
 import { ScreenInputDropdownOptionsComponent } from './components/screen-input-dropdown-options/screen-input-dropdown-options.component';
 import { RenderOptionsPipe } from './pipes/render-options.pipe';
+import { UserSelectionComponent } from './components/user-selection/user-selection.component';
 
 @NgModule({
   declarations: [
@@ -14,14 +15,21 @@ import { RenderOptionsPipe } from './pipes/render-options.pipe';
     ScreenInputEditDialogComponent,
     ScreenInputDropdownOptionsComponent,
     RenderOptionsPipe,
+    UserSelectionComponent,
   ],
-  exports: [MyAccountComponent, ScreenConfigurationListComponent, ScreenInputEditDialogComponent],
+  exports: [
+    MyAccountComponent,
+    ScreenConfigurationListComponent,
+    ScreenInputEditDialogComponent,
+    UserSelectionComponent,
+  ],
   imports: [StepCoreModule, StepCommonModule],
   providers: [RenderOptionsPipe],
 })
 export class AdminModule {
   constructor(_entityRegistry: EntityRegistry, _viewRegistry: ViewRegistryService) {
-    _entityRegistry.register('users', 'User', { icon: 'user', templateUrl: 'partials/users/userSelectionTable.html' });
+    _entityRegistry.register('users', 'User', { icon: 'user', component: UserSelectionComponent });
+
     _viewRegistry.registerDashlet('admin/controller', 'My account', 'partials/myaccount.html', 'myaccount');
     _viewRegistry.registerDashlet('settings', 'My account', 'partials/myaccount.html', 'myaccount');
   }
