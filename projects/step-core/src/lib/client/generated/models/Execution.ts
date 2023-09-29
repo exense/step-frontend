@@ -15,7 +15,16 @@ export type Execution = {
   description?: string;
   executionType?: string;
   status?: 'INITIALIZING' | 'IMPORTING' | 'RUNNING' | 'ABORTING' | 'EXPORTING' | 'ENDED';
-  result?: 'TECHNICAL_ERROR' | 'FAILED' | 'INTERRUPTED' | 'PASSED' | 'SKIPPED' | 'NORUN' | 'RUNNING';
+  result?:
+    | 'VETOED'
+    | 'IMPORT_ERROR'
+    | 'TECHNICAL_ERROR'
+    | 'FAILED'
+    | 'INTERRUPTED'
+    | 'PASSED'
+    | 'SKIPPED'
+    | 'NORUN'
+    | 'RUNNING';
   planId?: string;
   importResult?: ImportResult;
   reportExports?: Array<ReportExport>;

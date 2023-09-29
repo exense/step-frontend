@@ -10,13 +10,15 @@ export class ArtefactFormChangeHelperService implements OnDestroy {
     this.terminate();
   }
 
-  setupFormBehavior(form: NgForm | undefined, save: () => void): void {
+  setupFormBehavior(form: NgForm | undefined, operation: () => void): void {
     this.terminate();
     if (!form) {
       return;
     }
     this.terminator$ = new Subject<void>();
-    form.form.valueChanges.pipe(debounceTime(300), pairwise(), takeUntil(this.terminator$)).subscribe(() => save());
+    form.form.valueChanges
+      .pipe(debounceTime(300), pairwise(), takeUntil(this.terminator$))
+      .subscribe(() => operation());
   }
 
   private terminate(): void {
