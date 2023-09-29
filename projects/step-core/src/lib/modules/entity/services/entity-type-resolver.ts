@@ -14,7 +14,7 @@ export class EntityTypeResolver {
     this.resolvers.push(resolver);
   }
 
-  getTypeExtension(entity: Entity, type?: any): { icon: string; tooltip: string } {
+  getTypeExtension(entity: Entity, type?: any): { icon?: string; tooltip?: string; tenant?: string } | undefined {
     for (const resolver of this.resolvers) {
       const entityScope = resolver(entity, type);
       if (entityScope) {

@@ -249,9 +249,9 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
       const entityTypeExtension = this._entityTypeResolver.getTypeExtension(reference as Entity);
       this.referenceMeta = entityTypeExtension
         ? {
-            icon: entityTypeExtension.icon,
-            tooltip: entityTypeExtension.tooltip,
-            description: entityTypeExtension.tenant,
+            icon: entityTypeExtension.icon ?? '',
+            tooltip: entityTypeExtension.tooltip ?? '',
+            description: entityTypeExtension.tenant ?? '',
           }
         : undefined;
     });
