@@ -33,6 +33,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
 import { ThemeComponent } from './components/theme/theme.component';
 import { StepIconsModule } from '../step-icons/step-icons.module';
+import { MatAutocomplete, MatAutocompleteModule } from '@angular/material/autocomplete';
 
 @NgModule({
   imports: [CommonModule, StepIconsModule],
@@ -71,6 +72,7 @@ import { StepIconsModule } from '../step-icons/step-icons.module';
     MatCardModule,
     ThemeComponent,
     StepIconsModule,
+    MatAutocompleteModule,
   ],
 })
 export class StepMaterialModule {}

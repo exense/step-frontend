@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Parameter, Plan, PlansService } from '../../generated';
+import { Plan, PlansService } from '../../generated';
 import { StepDataSource, TableRemoteDataSourceFactoryService } from '../../table/step-table-client.module';
 
 @Injectable({ providedIn: 'root' })

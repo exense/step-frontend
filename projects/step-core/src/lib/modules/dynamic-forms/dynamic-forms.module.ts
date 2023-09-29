@@ -41,6 +41,7 @@ import { AddSchemaFieldDialogComponent } from './components/add-schema-field-dia
     ResourceInputModule,
   ],
   exports: [
+    AddFieldButtonComponent,
     DynamicTextfieldComponent,
     ExpressionInputComponent,
     DynamicFieldComponent,
@@ -62,6 +63,7 @@ export * from './components/dynamic-field-editor/dynamic-field-editor.component'
 export * from './components/dynamic-checkbox/dynamic-checkbox.component';
 export * from './components/dynamic-json/dynamic-json.component';
 export * from './components/dynamic-resource/dynamic-resource.component';
+export * from './components/add-field-button/add-field-button.component';
 export * from './components/add-field-schema-button/add-field-schema-button.component';
 export * from './shared/dynamic-fields-schema';
 export * from './shared/dynamic-field-group-value';

@@ -32,6 +32,7 @@ import { JsonRawEditorFormattedComponent } from './components/json-raw-editor-fo
 import { LabelAddonDirective } from './directives/label-addon.directive';
 import { TimeInputComponent } from './components/time-input/time-input.component';
 import { ProjectSwitchDialogComponent } from './components/project-switch-dialog/project-switch-dialog.component';
+import { ArrayInputComponent } from './components/array-input/array-input.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
@@ -66,6 +67,7 @@ import { ProjectSwitchDialogComponent } from './components/project-switch-dialog
     UploadContainerComponent,
     ProjectSwitchDialogComponent,
     TimeInputComponent,
+    ArrayInputComponent,
   ],
   exports: [
     ResourceLabelComponent,
@@ -98,6 +100,7 @@ import { ProjectSwitchDialogComponent } from './components/project-switch-dialog
     LabelAddonDirective,
     ProjectSwitchDialogComponent,
     TimeInputComponent,
+    ArrayInputComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -118,6 +121,7 @@ export * from './components/cron-selector/cron-selector.component';
 export * from './components/errors-list/errors-list.component';
 export * from './components/progress-bar/progress-bar.component';
 export * from './components/upload-container/upload-container.component';
+export * from './components/array-input/array-input.component';
 export * from './components/time-input/time-input.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';

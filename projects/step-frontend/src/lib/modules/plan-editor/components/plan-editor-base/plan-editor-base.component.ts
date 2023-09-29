@@ -37,9 +37,9 @@ import {
   catchError,
   defer,
   EMPTY,
+  debounceTime,
   filter,
   map,
-  mergeMap,
   Observable,
   of,
   Subject,
@@ -106,7 +106,10 @@ export class PlanEditorBaseComponent
   @Input() showExecuteButton = true;
 
   selectedTab = 'controls';
+
   readonly isInteractiveSessionActive$ = this._interactiveSession.isActive$;
+  readonly showInteractiveWarning$ = this.isInteractiveSessionActive$.pipe(debounceTime(300));
+
   planTypes$ = this._planApi.getArtefactTemplates().pipe(
     map((planTypes) => {
       return planTypes.map((planType) => ({
@@ -231,7 +234,7 @@ export class PlanEditorBaseComponent
   }
 
   resetInteractive(): void {
-    this._interactiveSession.resetInteractive().subscribe(() => (this.selectedTab = 'controls'));
+    this._interactiveSession.resetInteractive().subscribe();
   }
 
   openArtefact(node?: AbstractArtefact): void {

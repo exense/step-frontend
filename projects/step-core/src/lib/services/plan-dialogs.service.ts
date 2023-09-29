@@ -37,8 +37,8 @@ export class PlanDialogsService implements PlanLinkDialogService {
     return this._matDialog.open(ThreadDistributionWizardDialogComponent, { data: artefact }).afterClosed();
   }
 
-  selectPlan(): Observable<Plan> {
-    const selectedEntity$ = this._entityDialogs.selectEntityOfType('plans', true);
+  selectPlan(tableFilter?: string): Observable<Plan> {
+    const selectedEntity$ = this._entityDialogs.selectEntityOfType('plans', true, { tableFilter });
     const plan$ = selectedEntity$.pipe(
       map((result) => result.item as Plan),
       switchMap((plan) => this._plansApiService.getPlanById(plan.id!))
