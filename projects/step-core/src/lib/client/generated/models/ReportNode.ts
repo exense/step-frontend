@@ -15,7 +15,16 @@ export type ReportNode = {
   executionTime?: number;
   duration?: number;
   attachments?: Array<AttachmentMeta>;
-  status?: 'TECHNICAL_ERROR' | 'FAILED' | 'INTERRUPTED' | 'PASSED' | 'SKIPPED' | 'NORUN' | 'RUNNING';
+  status?:
+    | 'VETOED'
+    | 'IMPORT_ERROR'
+    | 'TECHNICAL_ERROR'
+    | 'FAILED'
+    | 'INTERRUPTED'
+    | 'PASSED'
+    | 'SKIPPED'
+    | 'NORUN'
+    | 'RUNNING';
   error?: Error;
   customAttributes?: Record<string, string>;
   resolvedArtefact?: AbstractArtefact;
