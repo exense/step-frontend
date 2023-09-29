@@ -2,7 +2,7 @@ import { KeyValue } from '@angular/common';
 import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, BucketAttributes, Execution, TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
-import { forkJoin, Observable, of, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
+import { forkJoin, Observable, of, skip, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { TimeSeriesChartComponent } from '../chart/time-series-chart.component';
@@ -138,7 +138,6 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     if (!this.context) {
       throw new Error('Context not provided!');
     }
-    this.findRequestBuilder = this.prepareFindRequestBuilder(this.settings);
     this.initContext();
     this.subscribeForKeywordsChange();
     this.subscribeForTimeRangeChange();
@@ -150,6 +149,16 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
         this.disableCompareMode();
       }
     });
+    this.context
+      .onChartsResolutionChange()
+      .pipe(skip(1))
+      .subscribe(() => {
+        console.log('RESOLUTION CHANGED');
+        this.createAllBaseCharts();
+        if (this.compareModeEnabled) {
+          this.createAllCompareCharts(this.compareModeContext!);
+        }
+      });
 
     this.createAllBaseCharts();
   }
@@ -301,10 +310,11 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       .withRange(settings.timeRange)
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
       .withFilteringSettings(this.context.getFilteringSettings())
-      .withNumberOfBuckets(TimeSeriesConfig.MAX_BUCKETS_IN_CHART);
+      .withIntervalSize(this.context.getChartsResolution());
   }
 
   private createAllBaseCharts() {
+    this.findRequestBuilder = this.prepareFindRequestBuilder(this.settings);
     const charts$ = [
       this.createSummaryChart(),
       this.createByStatusChart(),

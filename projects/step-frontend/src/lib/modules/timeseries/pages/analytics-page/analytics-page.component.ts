@@ -11,6 +11,7 @@ import { TsUtils } from '../../util/ts-utils';
 import { FilterBarItemType, TsFilterItem } from '../../performance-view/filter-bar/model/ts-filter-item';
 import { range, Subject, takeUntil, timer } from 'rxjs';
 import { TimeSeriesUtils } from '../../time-series-utils';
+import { MatMenuTrigger } from '@angular/material/menu';
 
 @Component({
   selector: 'step-analytics-page',
@@ -18,7 +19,9 @@ import { TimeSeriesUtils } from '../../time-series-utils';
   styleUrls: ['./analytics-page.component.scss'],
 })
 export class AnalyticsPageComponent implements OnInit, OnDestroy {
+  @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
   @ViewChild('dashboard') dashboard!: TimeSeriesDashboardComponent;
+
   dashboardSettings: TimeSeriesDashboardSettings | undefined;
 
   terminator$ = new Subject<void>();
@@ -146,6 +149,11 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
         exactMatch: true,
       },
     ];
+  }
+
+  handleResolutionChange(resolution: number) {
+    this.menuTrigger.closeMenu();
+    this.dashboard.setChartsResolution(resolution);
   }
 
   changeRefreshInterval(newInterval: { label: string; value: number }) {
