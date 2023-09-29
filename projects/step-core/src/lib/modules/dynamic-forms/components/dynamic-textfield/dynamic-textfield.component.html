@@ -2,6 +2,7 @@
   *ngIf="dynamic; else constantValueTemplate"
   [label]="label"
   [tooltip]="tooltip"
+  [placeholder]="placeholder"
   [isParentInvalid]="!!_ngControl.invalid"
   [isParentTouched]="!!_ngControl.touched"
   [isParentDisabled]="isDisabled"
@@ -23,6 +24,7 @@
     <ng-template #numberField>
       <input
         type="number"
+        [placeholder]="placeholder"
         [ngModel]="value"
         (ngModelChange)="onValueChange($event)"
         [disabled]="isDisabled"
@@ -33,6 +35,7 @@
     <ng-template #textField>
       <input
         type="text"
+        [placeholder]="placeholder"
         [ngModel]="value"
         (ngModelChange)="onValueChange($event)"
         [disabled]="isDisabled"

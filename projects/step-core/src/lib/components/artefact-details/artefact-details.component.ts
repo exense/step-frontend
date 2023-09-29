@@ -47,7 +47,7 @@ export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, Aft
   protected artefactMeta?: ArtefactType;
 
   ngAfterViewInit(): void {
-    this._artefactFormChangeHelper.setupFormBehavior(this.form, () => this.save());
+    this._artefactFormChangeHelper.setupFormBehavior(this.form.form, () => this.save());
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -56,7 +56,7 @@ export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, Aft
       const artefact = cArtefact?.currentValue as AbstractArtefact | undefined;
       this.determineArtefactMetaData(artefact?._class);
       if (this.form) {
-        this._artefactFormChangeHelper.setupFormBehavior(this.form, () => this.save());
+        this._artefactFormChangeHelper.setupFormBehavior(this.form.form, () => this.save());
       }
       this.artefactChangeInternal$.next();
     }

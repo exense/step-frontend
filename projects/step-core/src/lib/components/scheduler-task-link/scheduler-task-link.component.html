@@ -1,12 +1,12 @@
 <ng-template #descriptionTemplate>
-  {{ (context?.attributes)!['name'] }}
+  {{ context?.attributes?.['name'] }}
 </ng-template>
 
 <ng-template #iconTemplate>
-  <step-icon name="file" matTooltip="Go to plan" matTooltipPosition="below"></step-icon>
+  <step-icon name="clock" matTooltip="Edit task" matTooltipPosition="below"> </step-icon>
 </ng-template>
 
-<ng-template #contentTemplate>
+<a href="#" (click)="editParameter(); (false)">
   <div class="link-content" [ngSwitch]="linkDisplayType">
     <ng-container *ngSwitchCase="LinkDisplayType.ICON_ONLY">
       <ng-container *ngTemplateOutlet="iconTemplate"></ng-container>
@@ -19,12 +19,12 @@
       <ng-container *ngTemplateOutlet="descriptionTemplate"></ng-container>
     </ng-container>
   </div>
-</ng-template>
-
-<ng-template #linkTemplate>
-  <a href="#" (click)="editPlan(); (false)">
-    <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
-  </a>
-</ng-template>
-
-<ng-container *ngIf="noLink$ | async; then contentTemplate; else linkTemplate"></ng-container>
+</a>
+<step-icon
+  *ngIf="allowNavToPlan && !!context?.executionsParameters?.repositoryObject?.repositoryParameters?.['planid']"
+  class="nav-to-plan-icon"
+  matTooltip="Go to plan"
+  name="file"
+  (click)="navToPlan()"
+>
+</step-icon>

@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { debounceTime, pairwise, Subject, takeUntil } from 'rxjs';
-import { NgForm } from '@angular/forms';
+import { FormGroup, NgForm } from '@angular/forms';
 
 @Injectable()
 export class ArtefactFormChangeHelperService implements OnDestroy {
@@ -10,15 +10,13 @@ export class ArtefactFormChangeHelperService implements OnDestroy {
     this.terminate();
   }
 
-  setupFormBehavior(form: NgForm | undefined, operation: () => void): void {
+  setupFormBehavior(form: FormGroup | undefined, save: () => void): void {
     this.terminate();
     if (!form) {
       return;
     }
     this.terminator$ = new Subject<void>();
-    form.form.valueChanges
-      .pipe(debounceTime(300), pairwise(), takeUntil(this.terminator$))
-      .subscribe(() => operation());
+    form.valueChanges.pipe(debounceTime(300), pairwise(), takeUntil(this.terminator$)).subscribe(() => save());
   }
 
   private terminate(): void {

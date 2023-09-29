@@ -26,6 +26,7 @@ import { ForEachComponent } from './component/for-each/for-each.component';
 import { CallPlanComponent } from './component/call-plan/call-plan.component';
 import { CallKeywordComponent } from './component/call-keyword/call-keyword.component';
 import { ScriptComponent } from './component/script/script.component';
+import { AssertionPlanComponent } from './component/assertion-plan/assertion-plan.component';
 
 @NgModule({
   declarations: [
@@ -54,6 +55,7 @@ import { ScriptComponent } from './component/script/script.component';
     CallPlanComponent,
     CallKeywordComponent,
     ScriptComponent,
+    AssertionPlanComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -82,6 +84,7 @@ import { ScriptComponent } from './component/script/script.component';
     CallPlanComponent,
     CallKeywordComponent,
     ScriptComponent,
+    AssertionPlanComponent,
   ],
 })
 export class ArtefactsModule {
@@ -246,6 +249,13 @@ export class ArtefactsModule {
     this._artefactService.register('Failure', {
       icon: 'x-octagon',
       isSelectable: false,
+    });
+
+    /* plan type control only */
+    this._artefactService.register('AssertionPlan', {
+      icon: 'check',
+      component: AssertionPlanComponent,
+      description: 'Can use AssertionMetrics to assert multiple executions when assigned to a Scheduler',
     });
   }
 }

@@ -73,6 +73,8 @@ import { ProjectNamePipe } from './pipes/project-name.pipe';
 import { FunctionActionsService, KeywordsCommonModule } from './modules/keywords-common/keywords-common.module';
 import { FunctionActionsImplService } from './services/function-actions-impl.service';
 import { MyAccountButtonComponent } from './components/my-account-button/my-account-button.component';
+import { SelectTaskComponent } from './components/select-task/select-task.component';
+import { SchedulerTaskLinkComponent } from './components/scheduler-task-link/scheduler-task-link.component';
 import { ResourceInputWrapperComponent } from './components/resource-input-wrapper/resource-input-wrapper.component';
 import { WizardModule } from './modules/wizard/wizards.module';
 
@@ -85,6 +87,7 @@ import { WizardModule } from './modules/wizard/wizards.module';
     TooltipImmediateCloseDirective,
     ReportNodeStatusComponent,
     PlanLinkComponent,
+    SchedulerTaskLinkComponent,
     PlanNamePipe,
     IsUsedByListComponent,
     IsUsedByModalComponent,
@@ -130,6 +133,7 @@ import { WizardModule } from './modules/wizard/wizards.module';
     WaitingArtefactsAdvancedComponent,
     ProjectNamePipe,
     MyAccountButtonComponent,
+    SelectTaskComponent,
     ResourceInputWrapperComponent,
   ],
   imports: [
@@ -179,6 +183,7 @@ import { WizardModule } from './modules/wizard/wizards.module';
     WizardModule,
     ReportNodeStatusComponent,
     PlanLinkComponent,
+    SchedulerTaskLinkComponent,
     PlanNamePipe,
     IsUsedByModalComponent,
     SelectPlanComponent,
@@ -223,6 +228,7 @@ import { WizardModule } from './modules/wizard/wizards.module';
     ProjectNamePipe,
     KeywordsCommonModule,
     MyAccountButtonComponent,
+    SelectTaskComponent,
     ResourceInputWrapperComponent,
   ],
   providers: [
@@ -277,7 +283,8 @@ export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by
 export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
 export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
-export { PlanLinkComponent } from './components/plan-link/plan-link.component';
+export * from './components/plan-link/plan-link.component';
+export * from './components/scheduler-task-link/scheduler-task-link.component';
 export { PlanLinkDialogService } from './components/plan-link/plan-link-dialog.service';
 export { PlanNameComponent } from './components/plan-name/plan-name.component';
 export * from './components/plan-tree/plan-tree.component';
@@ -285,7 +292,8 @@ export { PredefinedOptionsInputComponent } from './components/predefined-options
 export { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 export * from './components/report-node-status/report-node-status.component';
 export { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
-export { SelectPlanComponent } from './components/select-plan/select-plan.component';
+export * from './components/select-plan/select-plan.component';
+export * from './components/select-task/select-task.component';
 export * from './components/setting-button/setting-button.component';
 export * from './components/link-button/link-button.component';
 export * from './components/my-account-button/my-account-button.component';
@@ -349,6 +357,7 @@ export * from './services/link-processor.service';
 export * from './services/menu-items-override-config.service';
 export * from './services/plan-artefact-resolver.service';
 export * from './services/plan-by-id-cache.service';
+export * from './services/task-by-id-cache.service';
 export { PlanDialogsService } from './services/plan-dialogs.service';
 export * from './services/plan-editor.service';
 export * from './services/plan-interactive-session.service';

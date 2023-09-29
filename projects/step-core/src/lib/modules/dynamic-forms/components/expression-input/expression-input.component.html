@@ -8,6 +8,7 @@
   <input
     type="text"
     [required]="!!showRequiredMarker"
+    [placeholder]="placeholder"
     [disabled]="isDisabled || !!isParentDisabled"
     [ngModel]="expression"
     (ngModelChange)="onExpressionChange($event)"

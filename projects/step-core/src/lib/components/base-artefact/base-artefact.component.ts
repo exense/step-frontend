@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, inject, OnDestroy } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormGroup, NgForm } from '@angular/forms';
 import {
   AbstractArtefact,
   DynamicValueBoolean,
@@ -22,7 +22,7 @@ export abstract class BaseArtefactComponent<T extends AbstractArtefact>
 {
   protected _artefactFormChangeHelper = inject(ArtefactFormChangeHelperService);
 
-  protected abstract form: NgForm;
+  protected abstract form: NgForm | FormGroup;
 
   private artefactChangeSubscription?: Subscription;
 
@@ -37,10 +37,10 @@ export abstract class BaseArtefactComponent<T extends AbstractArtefact>
     this.setupFormChanges();
   }
 
-  private setupFormChanges(): void {
-    this._artefactFormChangeHelper.setupFormBehavior(this.form, () => this.context.save());
+  protected setupFormChanges(): void {
+    const form = this.getFormGroup();
+    this._artefactFormChangeHelper.setupFormBehavior(form, () => this.context.save());
   }
-
 
   protected determineEmptyGroup(fields: PossibleField[], emptyValues: SimpleValue[] = [undefined, null, '', 0, false]) {
     const isDynamic = (field: PossibleField) =>
@@ -65,5 +65,15 @@ export abstract class BaseArtefactComponent<T extends AbstractArtefact>
 
   ngOnDestroy(): void {
     this.artefactChangeSubscription?.unsubscribe();
+  }
+
+  private getFormGroup(): FormGroup | undefined {
+    if (!this.form) {
+      return undefined;
+    }
+    if (this.form instanceof NgForm) {
+      return this.form.form;
+    }
+    return this.form;
   }
 }
