@@ -16,7 +16,12 @@ export class AugmentedScreenService extends ScreensService {
     if (!requestBody && !!this.screenCache[id]) {
       return of(this.screenCache[id]);
     }
-    return super.getInputsForScreenPost(id, requestBody).pipe(tap((inputs) => (this.screenCache[id] = inputs)));
+    return super.getInputsForScreenPost(id, requestBody).pipe(
+      tap((inputs) => {
+        Object.freeze(inputs);
+        this.screenCache[id] = inputs;
+      })
+    );
   }
 
   getDefaultParametersByScreenId(screenId: string): Observable<Record<string, string>> {
