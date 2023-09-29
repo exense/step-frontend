@@ -5,6 +5,7 @@ import {
   BucketAttributes,
   BucketResponse,
   FetchBucketsRequest,
+  MetricAttribute,
   MetricType,
   TimeSeriesAPIResponse,
   TimeSeriesService,
@@ -28,6 +29,14 @@ export class MetricChartComponent implements OnInit, OnChanges {
   @Input() filters: Record<string, any> = {};
   @Input() settings!: MetricType;
   @Input() range!: TSTimeRange;
+  @Input() allowGroupingChange = true;
+  @Input() allowMetricChange = true;
+
+  readonly AGGREGATES = ['SUM', 'AVG', 'MIN', 'MAX'];
+  selectedAggregate!: string;
+  selectedGrouping?: MetricAttribute;
+
+  isLoading = false;
 
   private _timeSeriesService = inject(TimeSeriesService);
 
@@ -38,11 +47,16 @@ export class MetricChartComponent implements OnInit, OnChanges {
     if (!this.range) {
       throw new Error('Range input is mandatory');
     }
-    this.init(this.settings, this.range);
+    this.selectedAggregate = this.settings.defaultAggregation || 'SUM';
+    if (this.settings.groupingAttribute) {
+      // we have a default grouping
+      this.selectedGrouping = this.settings.attributes?.find((a) => a.value === this.settings.groupingAttribute!);
+    }
+    this.fetchDataAndCreateChart(this.settings, this.range);
   }
 
-  private init(settings: MetricType, range: TSTimeRange): void {
-    const groupByAttribute = settings.groupingAttribute;
+  private fetchDataAndCreateChart(settings: MetricType, range: TSTimeRange): void {
+    const groupByAttribute = this.selectedGrouping?.value;
     const groupDimensions = groupByAttribute ? [groupByAttribute] : [];
     const request: FetchBucketsRequest = {
       start: range.from,
@@ -52,14 +66,27 @@ export class MetricChartComponent implements OnInit, OnChanges {
       numberOfBuckets: 100,
     };
     this._timeSeriesService.getBuckets(request).subscribe((response) => {
+      this.isLoading = false;
       this.chartSettings = this.createChartSettings(response, groupDimensions);
     });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['settings']?.previousValue || changes['range']?.previousValue) {
-      this.init(this.settings, this.range);
+      this.fetchDataAndCreateChart(this.settings, this.range);
     }
+  }
+
+  switchGrouping(attribute: MetricAttribute | undefined) {
+    this.isLoading = true;
+    this.selectedGrouping = attribute;
+    this.fetchDataAndCreateChart(this.settings, this.range);
+  }
+
+  switchAggregate(aggregate: string) {
+    this.isLoading = true;
+    this.selectedAggregate = aggregate;
+    this.fetchDataAndCreateChart(this.settings, this.range);
   }
 
   private createChartSettings(response: TimeSeriesAPIResponse, groupDimensions: string[]): TSChartSettings {
@@ -71,8 +98,8 @@ export class MetricChartComponent implements OnInit, OnChanges {
         id: seriesLabel,
         label: seriesLabel,
         legendName: seriesLabel,
-        data: series.map((b) => this.getBucketValue(b, this.settings.defaultAggregation!)),
-        value: (self, x) => TimeSeriesUtils.formatAxisValue(x),
+        data: series.map((b) => this.getBucketValue(b, this.selectedAggregate)),
+        value: (self, x) => x,
         stroke: color,
         fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
         points: { show: false },
@@ -80,7 +107,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
     });
     let yAxesUnit = this.settings.unit || '';
     return {
-      title: this.settings.label!,
+      title: `${this.settings.label!} (${this.selectedAggregate})`,
       xValues: xLabels,
       series: series,
       tooltipOptions: {
@@ -92,14 +119,14 @@ export class MetricChartComponent implements OnInit, OnChanges {
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
           scale: 'y',
           values: (u, vals, space) => {
-            return vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + ' ' + yAxesUnit);
+            return vals.map((v) => v + ' ' + yAxesUnit);
           },
         },
       ],
     };
   }
 
-  private getBucketValue(b: BucketResponse, aggregation: 'SUM' | 'AVG' | 'MAX' | 'MIN'): number {
+  private getBucketValue(b: BucketResponse, aggregation: string): number {
     if (!b) {
       return 0;
     }

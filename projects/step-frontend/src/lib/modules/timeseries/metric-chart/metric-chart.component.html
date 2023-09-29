@@ -1,4 +1,44 @@
-<div class="h-100">
+<div class="h-100 relative">
   <step-chart-skeleton *ngIf="!chartSettings"></step-chart-skeleton>
-  <step-timeseries-chart *ngIf="chartSettings" [settings]="chartSettings"></step-timeseries-chart>
+  <ng-container *ngIf="chartSettings">
+    <step-timeseries-chart [settings]="chartSettings"></step-timeseries-chart>
+    <div class="spinner">
+      <mat-spinner *ngIf="isLoading" [diameter]="24" color="contrast"></mat-spinner>
+    </div>
+    <div class="settings-container" *ngIf="allowGroupingChange || allowMetricChange">
+      <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
+        <step-icon name="settings"></step-icon>
+      </button>
+
+      <mat-menu #settingsMenu="matMenu">
+        <button *ngIf="allowGroupingChange" mat-menu-item [matMenuTriggerFor]="groupingMenu">Grouping</button>
+        <button *ngIf="allowMetricChange" mat-menu-item [matMenuTriggerFor]="aggregateMenu">Aggregate</button>
+      </mat-menu>
+
+      <mat-menu #groupingMenu="matMenu">
+        <button mat-menu-item="" (click)="switchGrouping(undefined)" [class.selected-menu-item]="!selectedGrouping">
+          No grouping
+        </button>
+        <button
+          *ngFor="let attribute of settings.attributes"
+          (click)="switchGrouping(attribute)"
+          mat-menu-item
+          [class.selected-menu-item]="attribute.value === selectedGrouping?.value"
+        >
+          {{ attribute.label }}
+        </button>
+      </mat-menu>
+
+      <mat-menu #aggregateMenu="matMenu">
+        <button
+          *ngFor="let aggregate of AGGREGATES"
+          (click)="switchAggregate(aggregate)"
+          mat-menu-item
+          [class.selected-menu-item]="aggregate === selectedAggregate"
+        >
+          {{ aggregate }}
+        </button>
+      </mat-menu>
+    </div>
+  </ng-container>
 </div>
