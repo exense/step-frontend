@@ -1,0 +1,41 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  display: flex;
+  gap: 2rem;
+}
+
+.interactive-trigger {
+  visibility: hidden;
+}
+
+span.mat-menu-item.plan-execution-menu {
+  height: auto;
+  font-size: inherit;
+  line-height: initial;
+  font-weight: initial;
+
+  &.cdk-program-focused:not([disabled]),
+  &:hover:not([disabled]) {
+    background: transparent;
+  }
+
+  .interactive-parameters,
+  step-execution-commands {
+    width: 25rem;
+    display: block;
+    padding: 0.5rem;
+  }
+
+  .interactive-parameters {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-bottom: 1rem;
+  }
+}
+
+button.activeMode {
+  color: white;
+  background: var.$dark-blue;
+}
