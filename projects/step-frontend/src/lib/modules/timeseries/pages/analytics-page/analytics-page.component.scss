@@ -8,9 +8,9 @@
 
 .header-buttons {
   display: flex;
-  margin-bottom: 8px;
+  margin-bottom: 0.8rem;
   flex-direction: row;
-  gap: 12px;
+  gap: 1.2rem;
 }
 
 .active {
@@ -18,10 +18,18 @@
 }
 
 .icon-container {
-  margin-right: 8px;
+  margin-right: 0.8rem;
 }
 
 .menu-btn {
   display: flex;
   align-items: center;
+}
+
+#add-custom-chart {
+  border: 1px dashed grey;
+  padding: 2.4rem;
+  cursor: pointer;
+  margin: 2.4rem 0;
+  display: inline-block;
 }

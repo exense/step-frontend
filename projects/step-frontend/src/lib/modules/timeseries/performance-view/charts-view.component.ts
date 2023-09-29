@@ -1,14 +1,7 @@
 import { KeyValue } from '@angular/common';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import {
-  AJS_MODULE,
-  BucketAttributes,
-  BucketResponse,
-  Execution,
-  TimeSeriesAPIResponse,
-  TimeSeriesService,
-} from '@exense/step-core';
+import { AJS_MODULE, BucketAttributes, Execution, TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
 import { forkJoin, Observable, of, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
 import { TSTimeRange } from '../chart/model/ts-time-range';
@@ -132,7 +125,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     return a.key.localeCompare(b.key);
   };
 
-  constructor(private timeSeriesService: TimeSeriesService) {}
+  private timeSeriesService = inject(TimeSeriesService);
 
   onAllSeriesCheckboxClick(event: any) {
     this.keywordsService.toggleSelectAll();
@@ -219,7 +212,9 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   updateBaseCharts(request: UpdatePerformanceViewRequest): Observable<any> {
     this.updateBaseChartsTerminator$.next(); // to keep executions synchronous
     // let's assume the complete interval and selections are set.
-    if (!this.context.inProgress$.getValue()) this.context.setInProgress(true);
+    if (!this.context.inProgress$.getValue()) {
+      this.context.setInProgress(true);
+    }
     const updates$ = [];
     if (request.showLoadingBar) {
       this.chartsAreLoading = true;
@@ -315,7 +310,6 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       this.createByStatusChart(),
       this.createByKeywordsCharts(),
       this.createTableChart(),
-      // ...(this.timeSelection ? [this.timeSelection.onRangerLoaded.pipe(take(1))] : []),
     ];
     if (this.includeThreadGroupChart) {
       charts$.push(this.createThreadGroupsChart());
@@ -342,6 +336,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
 
   private refreshAllCharts(): Observable<unknown> {
     this.findRequestBuilder = this.prepareFindRequestBuilder(this.settings); // we don't want to lose active filters
+
     const timeSelection = this.context.getSelectedTimeRange();
     this.findRequestBuilder.withRange(timeSelection);
 
@@ -401,7 +396,6 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     }
 
     const requestBuilder = compareChart ? this.compareRequestBuilder : this.findRequestBuilder;
-
     const request = requestBuilder
       .clone()
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_SAMPLER)

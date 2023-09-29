@@ -1,16 +1,17 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, DashboardService } from '@exense/step-core';
+import { AJS_MODULE, DashboardService, MetricType, TimeSeriesService } from '@exense/step-core';
 import { TimeSeriesConfig } from '../../time-series.config';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
 import { TimeSeriesDashboardComponent } from '../../dashboard/time-series-dashboard.component';
 import { RangeSelectionType } from '../../time-selection/model/range-selection-type';
-import { TSTimeRange } from '../../chart/model/ts-time-range';
 import { TimeSeriesDashboardSettings } from '../../dashboard/model/ts-dashboard-settings';
 import { TsUtils } from '../../util/ts-utils';
-import { FilterBarItemType } from '../../performance-view/filter-bar/model/ts-filter-item';
+import { FilterBarItemType, TsFilterItem } from '../../performance-view/filter-bar/model/ts-filter-item';
 import { range, Subject, takeUntil, timer } from 'rxjs';
 import { TimeSeriesUtils } from '../../time-series-utils';
+import { TSChartSettings } from '../../chart/model/ts-chart-settings';
+import { TSTimeRange } from '../../chart/model/ts-time-range';
 
 @Component({
   selector: 'step-analytics-page',
@@ -19,6 +20,7 @@ import { TimeSeriesUtils } from '../../time-series-utils';
 })
 export class AnalyticsPageComponent implements OnInit, OnDestroy {
   @ViewChild('dashboard') dashboard!: TimeSeriesDashboardComponent;
+  @ViewChild('container') container: any;
   dashboardSettings: TimeSeriesDashboardSettings | undefined;
 
   terminator$ = new Subject<void>();
@@ -26,6 +28,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
 
   timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   timeRangeSelection!: TimeRangePickerSelection;
+  activeTimeRange: TSTimeRange = { from: 0, to: 0 };
 
   // this is just for running executions
   refreshIntervals = TimeSeriesConfig.AUTO_REFRESH_INTERVALS;
@@ -42,9 +45,13 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   executionHasToBeBuilt = false;
   migrationInProgress = false;
 
-  constructor(private dashboardService: DashboardService) {}
+  timeSeriesService = inject(TimeSeriesService);
+  metricTypes?: MetricType[];
+  customChartsMetrics: MetricType[] = [];
 
   ngOnInit(): void {
+    this.timeSeriesService.getMetricTypes().subscribe((metrics) => (this.metricTypes = metrics));
+
     let now = new Date().getTime();
     let start;
     let end;
@@ -74,64 +81,90 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     delete urlParams.start;
     delete urlParams.end;
 
+    let timeRange = { from: start, to: end };
+    this.activeTimeRange = timeRange;
     this.dashboardSettings = {
       contextId: new Date().getTime().toString(),
       includeThreadGroupChart: true,
       disableThreadGroupOnOqlMode: true,
-      timeRange: { from: start, to: end },
+      timeRange: timeRange,
       contextualFilters: urlParams,
       showContextualFilters: true,
       timeRangeOptions: TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS,
       activeTimeRange: this.timeRangeSelection, // TODO handle url param
-      filterOptions: [
-        {
-          label: 'Status',
-          attributeName: 'rnStatus',
-          type: FilterBarItemType.OPTIONS,
-          textValues: [
-            { value: 'PASSED' },
-            { value: 'FAILED' },
-            { value: 'TECHNICAL_ERROR' },
-            { value: 'INTERRUPTED' },
-          ],
-          isLocked: true,
-        },
-        {
-          label: 'Type',
-          attributeName: 'type',
-          type: FilterBarItemType.OPTIONS,
-          textValues: [{ value: 'keyword' }, { value: 'custom' }],
-          isLocked: true,
-        },
-        {
-          label: 'Name',
-          attributeName: 'name',
-          type: FilterBarItemType.FREE_TEXT,
-          isLocked: true,
-        },
-        {
-          label: 'Execution Id',
-          attributeName: 'eId',
-          type: FilterBarItemType.FREE_TEXT,
-          isLocked: true,
-        },
-        {
-          label: 'Origin',
-          attributeName: 'origin',
-          type: FilterBarItemType.FREE_TEXT,
-          isLocked: true,
-        },
-        {
-          label: 'Plan Id',
-          attributeName: 'planId',
-          type: FilterBarItemType.FREE_TEXT,
-          isLocked: true,
-        },
-      ],
+      filterOptions: this.getDefaultFilters(),
+      activeFilters: this.getDefaultFilters(),
     };
     if (this.refreshEnabled) {
       this.startInterval(this.selectedRefreshInterval.value);
     }
+  }
+
+  handleDashboardTimeRangeChange(range: TSTimeRange) {
+    this.activeTimeRange = range;
+  }
+
+  private getDefaultFilters(): TsFilterItem[] {
+    return [
+      {
+        label: 'Status',
+        attributeName: 'rnStatus',
+        type: FilterBarItemType.OPTIONS,
+        textValues: [{ value: 'PASSED' }, { value: 'FAILED' }, { value: 'TECHNICAL_ERROR' }, { value: 'INTERRUPTED' }],
+        isLocked: true,
+        searchEntities: [],
+      },
+      {
+        label: 'Type',
+        attributeName: 'type',
+        type: FilterBarItemType.OPTIONS,
+        textValues: [{ value: 'keyword' }, { value: 'custom' }],
+        isLocked: true,
+        searchEntities: [],
+      },
+      {
+        label: 'Name',
+        attributeName: 'name',
+        type: FilterBarItemType.FREE_TEXT,
+        isLocked: true,
+        searchEntities: [],
+      },
+      {
+        label: 'Execution',
+        attributeName: 'eId',
+        type: FilterBarItemType.EXECUTION,
+        isLocked: true,
+        searchEntities: [],
+        exactMatch: true,
+      },
+      {
+        label: 'Origin',
+        attributeName: 'origin',
+        type: FilterBarItemType.FREE_TEXT,
+        isLocked: true,
+        searchEntities: [],
+      },
+      {
+        label: 'Task',
+        attributeName: 'taskId',
+        type: FilterBarItemType.TASK,
+        isLocked: true,
+        searchEntities: [],
+        exactMatch: true,
+      },
+      {
+        label: 'Plan',
+        attributeName: 'planId',
+        type: FilterBarItemType.PLAN,
+        isLocked: true,
+        searchEntities: [],
+        exactMatch: true,
+      },
+    ];
+  }
+
+  addCustomChart(metric: MetricType) {
+    this.customChartsMetrics.push(metric);
   }
 
   changeRefreshInterval(newInterval: { label: string; value: number }) {
@@ -154,7 +187,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   }
 
   triggerRefresh() {
-    this.dashboard.refresh(TimeSeriesUtils.convertSelectionToTimeRange(this.timeRangeSelection));
+    this.dashboard.refresh();
   }
 
   onTimeRangeChange(selection: TimeRangePickerSelection) {

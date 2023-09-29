@@ -4,6 +4,7 @@
     z-index: 1000;
     pointer-events: none;
     display: block;
+    margin: 0 2.4rem;
     padding: 8px 12px;
     background: #fffaf2d9;
     box-shadow: 2px 2px 5px 2px #a3a3a3;
@@ -14,11 +15,26 @@
       align-items: center;
       flex-direction: row;
       white-space: nowrap;
+      justify-content: space-between;
+
+      .left {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        margin-right: 2rem;
+      }
 
       .color {
-        width: 20px;
-        height: 10px;
-        margin-right: 8px;
+        width: 2rem;
+        height: 1rem;
+        margin-right: 0.8rem;
+      }
+
+      .name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 40rem;
       }
     }
 
