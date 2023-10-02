@@ -216,18 +216,18 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
     let parentId = nodeId;
 
-    if (dropType === DropType.after && this.isNodeExpanded(parentId)) {
+    if (dropType === DropType.AFTER && this.isNodeExpanded(parentId)) {
       const parent = this.findNodeById(parentId);
       // drop after for expanded node with children interpret like drop inside, as first children
       // but don't count dragging children
       const parentChildren = (parent?.children || []).filter((child) => !selectedNodeIds.includes(child.id));
       if (parentChildren.length > 0) {
-        dropType = DropType.inside;
+        dropType = DropType.INSIDE;
         insideInsertStrategy = 'prepend';
       }
     }
 
-    if (dropType !== DropType.inside) {
+    if (dropType !== DropType.INSIDE) {
       const node = this.findNodeById(parentId);
       if (!node?.parentId) {
         return;
@@ -244,18 +244,18 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
     const children = ([...parent.children!] as N[]).filter((child) => !selectedNodeIds.includes(child.id));
 
-    if (dropType === DropType.inside) {
+    if (dropType === DropType.INSIDE) {
       if (insideInsertStrategy === 'append') {
         children.push(...(nodesToAdd as N[]));
       } else {
         children.unshift(...(nodesToAdd as N[]));
       }
-    } else if (dropType === DropType.after || dropType === DropType.before) {
+    } else if (dropType === DropType.AFTER || dropType === DropType.BEFORE) {
       const siblingIndex = children.findIndex((child) => child.id === nodeId)!;
       let start: number;
-      if (dropType === DropType.before) {
+      if (dropType === DropType.BEFORE) {
         start = siblingIndex;
-      } else if (dropType === DropType.after) {
+      } else if (dropType === DropType.AFTER) {
         start = siblingIndex + 1;
       }
       children.splice(start!, 0, ...(nodesToAdd as N[]));

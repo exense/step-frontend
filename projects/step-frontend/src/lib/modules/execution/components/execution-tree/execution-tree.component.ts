@@ -41,10 +41,10 @@ export class ExecutionTreeComponent implements TreeActionsService {
   handleContextAction(actionId: string, node?: AbstractArtefact): void {
     const nodeId = node?.id!;
     switch (actionId) {
-      case ExecutionTreeAction.loadPreviousNodes:
+      case ExecutionTreeAction.LOAD_PREVIOUS_NODES:
         this.pageBefore(nodeId);
         break;
-      case ExecutionTreeAction.loadNextNodes:
+      case ExecutionTreeAction.LOAD_NEXT_NODES:
         this.pageNext(nodeId);
         break;
       default:
@@ -59,12 +59,12 @@ export class ExecutionTreeComponent implements TreeActionsService {
     const canNext = (node?.children || []).length >= EXECUTION_TREE_PAGE_LIMIT;
     return of([
       {
-        id: ExecutionTreeAction.loadPreviousNodes,
+        id: ExecutionTreeAction.LOAD_PREVIOUS_NODES,
         label: this.getPreviousLabel(node),
         disabled: !canPrevious,
       },
       {
-        id: ExecutionTreeAction.loadNextNodes,
+        id: ExecutionTreeAction.LOAD_NEXT_NODES,
         label: this.getNextLabel(node),
         disabled: !canNext,
       },

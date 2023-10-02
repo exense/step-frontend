@@ -20,7 +20,7 @@ const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === 
 export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges {
   @Input() repoRef?: RepositoryObjectReference;
 
-  @Input() selectionType: BulkSelectionType = BulkSelectionType.None;
+  @Input() selectionType: BulkSelectionType = BulkSelectionType.NONE;
   @Output() selectionTypeChange = new EventEmitter<BulkSelectionType>();
 
   readonly searchableRepositoryReport = new TableFetchLocalDataSource<TestRunStatus, RepositoryObjectReference>(
@@ -43,7 +43,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.searchableRepositoryReport.allData$.pipe(first()).subscribe((items) => {
       this._selectionCollector.registerPossibleSelectionManually(items);
-      this.selectionType = BulkSelectionType.All;
+      this.selectionType = BulkSelectionType.ALL;
     });
   }
 

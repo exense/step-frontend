@@ -6,10 +6,10 @@
     </div>
   </div>
   <div class="node-details-container" [ngSwitch]="node._class">
-    <step-retry-if-fail *ngSwitchCase="ReportNodeType.RetryIfFailsReportNode" [node]="node"> </step-retry-if-fail>
-    <step-wait-for-event *ngSwitchCase="ReportNodeType.WaitForEventReportNode" [node]="node"> </step-wait-for-event>
+    <step-retry-if-fail *ngSwitchCase="ReportNodeType.RETRY_IF_FAILS_REPORT_NODE" [node]="node"> </step-retry-if-fail>
+    <step-wait-for-event *ngSwitchCase="ReportNodeType.WAIT_FOR_EVENT_REPORT_NODE" [node]="node"> </step-wait-for-event>
     <step-call-function-report-node
-      *ngSwitchCase="ReportNodeType.CallFunctionReportNode"
+      *ngSwitchCase="ReportNodeType.CALL_FUNCTION_REPORT_NODE"
       [node]="node"
       [children]="children"
     >

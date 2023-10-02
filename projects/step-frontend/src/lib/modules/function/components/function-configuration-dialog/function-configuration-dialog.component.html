@@ -1,6 +1,6 @@
 <step-modal-window [title]="modalTitle" [showSpinner]="isLoading" [stepZIndex]="1000">
   <div step-modal-window-body>
-    <step-alert *ngIf="keyword?.managed" [type]="AlertType.warning">
+    <step-alert *ngIf="keyword?.managed" [type]="AlertType.WARNING">
       This keyword is part of a keyword package. All changes made will be lost when the package is updated.
     </step-alert>
 

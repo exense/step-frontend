@@ -48,7 +48,7 @@
         <table mat-table [dataSource]="dataSource">
           <ng-container [matColumnDef]="'timestamp'">
             <th mat-header-cell *matHeaderCellDef>Timestamp</th>
-            <td mat-cell *matCellDef="let element">{{ element['begin'] | date: DateFormat.date }}</td>
+            <td mat-cell *matCellDef="let element">{{ element['begin'] | date: DateFormat.DATE }}</td>
           </ng-container>
           <ng-container *ngFor="let column of dynamicColumns">
             <ng-container [matColumnDef]="column">

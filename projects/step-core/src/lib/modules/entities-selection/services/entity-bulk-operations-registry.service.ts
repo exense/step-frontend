@@ -33,7 +33,7 @@ const convert = ({
 export class EntityBulkOperationsRegistryService {
   private _customRegistry = inject(CustomRegistryService);
 
-  private readonly registryType = CustomRegistryType.entityBulkOperations;
+  private readonly registryType = CustomRegistryType.ENTITY_BULK_OPERATIONS;
 
   private knownOperations: Record<BulkOperationType | string, { label?: string; icon?: string }> = {
     [BulkOperationType.DELETE]: { label: 'Delete selected', icon: 'trash-2' },

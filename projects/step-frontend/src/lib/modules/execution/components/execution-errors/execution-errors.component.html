@@ -4,11 +4,11 @@
     [ngModel]="selectedErrorDistributionToggle"
     (ngModelChange)="selectedErrorDistributionToggleChange.emit($event)"
   >
-    <mat-option [value]="ErrorDistributionStatus.message">{{ ErrorDistributionStatus.message }}</mat-option>
-    <mat-option [value]="ErrorDistributionStatus.code">{{ ErrorDistributionStatus.code }}</mat-option>
+    <mat-option [value]="ErrorDistributionStatus.MESSAGE">{{ ErrorDistributionStatus.MESSAGE }}</mat-option>
+    <mat-option [value]="ErrorDistributionStatus.CODE">{{ ErrorDistributionStatus.CODE }}</mat-option>
   </mat-select>
 </step-form-field>
-<ng-container *ngIf="selectedErrorDistributionToggle === ErrorDistributionStatus.message">
+<ng-container *ngIf="selectedErrorDistributionToggle === ErrorDistributionStatus.MESSAGE">
   <step-table [dataSource]="countByErrorMsgDataSource" matSort [matSortDisableClear]="true">
     <ng-container matColumnDef="errorMessage" stepSearchCol>
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Error Message</th>
@@ -36,7 +36,7 @@
     </ng-container>
   </step-table>
 </ng-container>
-<ng-container *ngIf="selectedErrorDistributionToggle === ErrorDistributionStatus.code">
+<ng-container *ngIf="selectedErrorDistributionToggle === ErrorDistributionStatus.CODE">
   <step-table [dataSource]="countByErrorCodeDataSource" matSort [matSortDisableClear]="true">
     <ng-container matColumnDef="errorCode">
       <th mat-header-cell *matHeaderCellDef>Error code</th>

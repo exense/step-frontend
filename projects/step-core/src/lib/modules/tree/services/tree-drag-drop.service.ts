@@ -59,7 +59,7 @@ export class TreeDragDropService implements OnDestroy {
     const { dropNodeId, dropType } = this._lastDropInfo;
 
     this._treeState.insertSelectedNodesTo(dropNodeId, dropType);
-    if (dropType === DropType.inside) {
+    if (dropType === DropType.INSIDE) {
       setTimeout(() => {
         this._treeState.expandNode(dropNodeId).subscribe();
       }, 100);
@@ -88,7 +88,7 @@ export class TreeDragDropService implements OnDestroy {
         const node = this._treeState.findNodeById(dragNodeId);
         if (!drop) {
           const dropNodeId = node.parentId;
-          const dropType = DropType.out;
+          const dropType = DropType.OUT;
           const height = DEFAULT_NODE_HEIGHT;
           const canInsert = this._treeState.canInsertTo(dropNodeId, true);
           return { dragNodeId, dropNodeId, height, dropType, canInsert };
@@ -102,18 +102,18 @@ export class TreeDragDropService implements OnDestroy {
         let dropType!: DropType;
 
         if (dragY >= dropY && dragY < beforeEdge) {
-          dropType = DropType.before;
+          dropType = DropType.BEFORE;
         } else if (dragY >= beforeEdge && dragY < afterEdge) {
-          dropType = DropType.inside;
+          dropType = DropType.INSIDE;
         } else if (dragY >= afterEdge) {
-          dropType = DropType.after;
+          dropType = DropType.AFTER;
           if (dragY > dropY + height + fourthPart) {
-            dropType = DropType.out;
+            dropType = DropType.OUT;
             dropNodeId = node.parentId;
           }
         }
 
-        const canInsert = this._treeState.canInsertTo(dropNodeId, dropType !== DropType.inside);
+        const canInsert = this._treeState.canInsertTo(dropNodeId, dropType !== DropType.INSIDE);
         return { dragNodeId, dropNodeId, height, dropType, canInsert };
       })
     );

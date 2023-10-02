@@ -31,7 +31,7 @@ export class ExecutionPickerComponent {
   autoRefreshDisabled: boolean = false;
 
   changeType(selectionType: BulkSelectionType): void {
-    this.autoRefreshDisabled = selectionType !== BulkSelectionType.None;
+    this.autoRefreshDisabled = selectionType !== BulkSelectionType.NONE;
 
     if (this.autoRefreshDisabled) {
       this.dataSource.skipOngoingRequest();

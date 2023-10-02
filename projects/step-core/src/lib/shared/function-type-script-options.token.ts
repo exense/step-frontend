@@ -14,15 +14,15 @@ export const FUNCTION_TYPE_SCRIPT_OPTIONS = new InjectionToken<FunctionTypeScrip
       return [
         {
           label: 'java',
-          scriptLanguage: ScriptLanguage.java,
+          scriptLanguage: ScriptLanguage.JAVA,
         },
         {
           label: 'javascript',
-          scriptLanguage: ScriptLanguage.javascript,
+          scriptLanguage: ScriptLanguage.JAVASCRIPT,
         },
         {
           label: 'groovy',
-          scriptLanguage: ScriptLanguage.groovy,
+          scriptLanguage: ScriptLanguage.GROOVY,
         },
       ];
     },

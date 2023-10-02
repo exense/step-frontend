@@ -1,7 +1,7 @@
 export enum BulkSelectionType {
-  All = 'All',
-  Visible = 'Visible',
-  Filtered = 'Filtered',
-  Individual = 'Individual',
-  None = 'None',
+  ALL = 'All',
+  VISIBLE = 'Visible',
+  FILTERED = 'Filtered',
+  INDIVIDUAL = 'Individual',
+  NONE = 'None',
 }

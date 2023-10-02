@@ -1,5 +1,5 @@
 export enum DateFormat {
-  date = 'dd.MM.yyyy HH:mm:ss',
-  datems = 'dd.MM.yyyy HH:mm:ss.sss',
-  time = 'HH:mm:ss',
+  DATE = 'dd.MM.yyyy HH:mm:ss',
+  DATE_MS = 'dd.MM.yyyy HH:mm:ss.sss',
+  TIME = 'HH:mm:ss',
 }

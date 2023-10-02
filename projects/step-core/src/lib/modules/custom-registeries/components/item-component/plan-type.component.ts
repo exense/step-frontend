@@ -11,7 +11,7 @@ import { CustomRegistryItem } from '../../shared/custom-registry-item';
   encapsulation: ViewEncapsulation.None,
 })
 export class PlanTypeComponent extends BaseItemComponent<CustomRegistryItem> {
-  protected override readonly registryType: CustomRegistryType = CustomRegistryType.planType;
+  protected override readonly registryType: CustomRegistryType = CustomRegistryType.PLAN_TYPE;
 
   constructor(_customRegistryService: CustomRegistryService) {
     super(_customRegistryService);
