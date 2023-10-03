@@ -1,20 +1,16 @@
 import { AfterViewInit, Component, inject, Injector } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  AJS_LOCATION,
   AJS_MODULE,
-  AJS_ROOT_SCOPE,
   AugmentedKeywordsService,
   AutoDeselectStrategy,
   Function as KeywordFunction,
-  InteractivePlanExecutionService,
   selectionCollectionProvider,
   tablePersistenceConfigProvider,
   STORE_ALL,
   FunctionActionsService,
-  Plan,
-  FunctionType,
   RestoreDialogsService,
+  KeywordExecutorService,
 } from '@exense/step-core';
 import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
 
@@ -30,12 +26,10 @@ import { FunctionPackageActionsService } from '../../services/function-package-a
 export class FunctionListComponent implements AfterViewInit {
   private _injector = inject(Injector);
   private _functionApiService = inject(AugmentedKeywordsService);
-  private _interactivePlanExecutionApiService = inject(InteractivePlanExecutionService);
   private _functionActions = inject(FunctionActionsService);
   private _functionPackageDialogs = inject(FunctionPackageActionsService);
   private _restoreDialogsService = inject(RestoreDialogsService);
-  private _$rootScope = inject(AJS_ROOT_SCOPE);
-  private _location = inject(AJS_LOCATION);
+  private _keywordExecutor = inject(KeywordExecutorService);
 
   readonly dataSource = this._functionApiService.createFilteredTableDataSource();
 
@@ -60,13 +54,7 @@ export class FunctionListComponent implements AfterViewInit {
   }
 
   executeFunction(id: string): void {
-    this._interactivePlanExecutionApiService.startFunctionTestingSession(id).subscribe((result: any) => {
-      (this._$rootScope as any).planEditorInitialState = {
-        interactive: true,
-        selectedNode: result.callFunctionId,
-      };
-      this._location.path('/root/plans/editor/' + result.planId);
-    });
+    this._keywordExecutor.executeKeyword(id);
   }
 
   duplicateFunction(id: string): void {

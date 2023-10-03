@@ -380,3 +380,6 @@ export * from './shared/special-links-strategy';
 export * from './modules/entity/pipes/cast-entity-to-plan.pipe';
 export * from './modules/entity/pipes/cast-entity-to-execution.pipe';
 export * from './modules/entity/pipes/cast-entity-to-task.pipe';
+export * from './services/artefacts-factory.service';
+export * from './services/plan-open.service';
+export * from './services/keyword-executor.service';
