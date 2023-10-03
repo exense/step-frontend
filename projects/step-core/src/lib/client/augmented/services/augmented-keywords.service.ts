@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Execution, Function as KeywordFunction, KeywordsService } from '../../generated';
+import { Execution, KeywordsService } from '../../generated';
 import { StepDataSource, TableRemoteDataSourceFactoryService } from '../../table/step-table-client.module';
+import { Keyword } from '../shared/keyword';
 
 const FUNCTIONS_TABLE_ID = 'functions';
 
@@ -11,7 +12,7 @@ export class AugmentedKeywordsService extends KeywordsService {
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   private _httpClient = inject(HttpClient);
 
-  createFilteredTableDataSource(filter?: string[]): StepDataSource<KeywordFunction> {
+  createFilteredTableDataSource(filter?: string[]): StepDataSource<Keyword> {
     return this._dataSourceFactory.createDataSource(
       FUNCTIONS_TABLE_ID,
       {

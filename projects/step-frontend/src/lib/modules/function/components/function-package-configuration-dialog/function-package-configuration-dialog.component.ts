@@ -1,12 +1,7 @@
 import { Component, HostBinding, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FunctionPackageConfigurationDialogData } from '../../types/function-package-configuration-dialog-data.interface';
-import {
-  AlertType,
-  AugmentedKeywordPackagesService,
-  Function as Keyword,
-  ResourceInputBridgeService,
-} from '@exense/step-core';
+import { AlertType, AugmentedKeywordPackagesService, Keyword, ResourceInputBridgeService } from '@exense/step-core';
 import { catchError, iif, map, of, switchMap, tap } from 'rxjs';
 import { KeyValue } from '@angular/common';
 

@@ -3,7 +3,7 @@ import {
   AJS_ROOT_SCOPE,
   CustomComponent,
   DialogsService,
-  Function as KeywordFunction,
+  Keyword,
   FunctionPackage,
   KeywordPackagesService,
 } from '@exense/step-core';
@@ -16,13 +16,13 @@ import { IRootScopeService } from 'angular';
   styleUrls: ['./function-package-link.component.scss'],
 })
 export class FunctionPackageLinkComponent implements CustomComponent {
-  private innerContext?: KeywordFunction;
+  private innerContext?: Keyword;
 
-  get context(): KeywordFunction | undefined {
+  get context(): Keyword | undefined {
     return this.innerContext;
   }
 
-  set context(value: KeywordFunction | undefined) {
+  set context(value: Keyword | undefined) {
     if (value === this.innerContext) {
       return;
     }

@@ -9,7 +9,7 @@ import {
   Plan,
   ReportNode,
   RepositoryObjectReference,
-  Function as Keyword,
+  Keyword,
   History,
 } from '@exense/step-core';
 
