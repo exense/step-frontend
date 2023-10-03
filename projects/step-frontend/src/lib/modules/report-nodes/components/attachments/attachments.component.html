@@ -11,7 +11,7 @@
     <mat-menu #menu="matMenu">
       <ng-container *ngFor="let attachment of node!.attachments; trackBy: trackByAttachment">
         <button mat-menu-item (click)="openAttachment(attachment)">
-          {{ attachment!.id }}
+          {{ attachment!.name }}
         </button>
       </ng-container>
     </mat-menu>
