@@ -33,6 +33,7 @@ export class PlanModule {
     _cellsRegister: CustomCellRegistryService,
     _viewRegistry: ViewRegistryService
   ) {
+    _planBulkOperations.register();
     _entityRegistry.register('plans', 'Plan', { icon: 'plan', component: PlanSelectionComponent });
     _cellsRegister.registerCell('planLink', PlanLinkComponent);
     _viewRegistry.registerView('plans', 'partials/plans/plans.html');
