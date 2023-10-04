@@ -79,6 +79,7 @@ import { ResourceInputWrapperComponent } from './components/resource-input-wrapp
 import { WizardModule } from './modules/wizard/wizards.module';
 import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.component';
 import { SettingsComponent } from './components/settings/settings.component';
+import { PlanImportDialogComponent } from './components/plan-import-dialog/plan-import-dialog.component';
 
 @NgModule({
   declarations: [
@@ -139,6 +140,7 @@ import { SettingsComponent } from './components/settings/settings.component';
     ResourceInputWrapperComponent,
     SimpleOutletComponent,
     SettingsComponent,
+    PlanImportDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -235,6 +237,7 @@ import { SettingsComponent } from './components/settings/settings.component';
     SelectTaskComponent,
     ResourceInputWrapperComponent,
     SettingsComponent,
+    PlanImportDialogComponent,
   ],
   providers: [
     CORE_INITIALIZER,
