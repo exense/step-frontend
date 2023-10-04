@@ -12,7 +12,7 @@ import { CustomRegistryItem } from '../../shared/custom-registry-item';
   encapsulation: ViewEncapsulation.None,
 })
 export class ExecutionCustomPanelComponent extends BaseItemComponent<CustomRegistryItem> {
-  protected override readonly registryType: CustomRegistryType = CustomRegistryType.executionCustomPanel;
+  protected override readonly registryType: CustomRegistryType = CustomRegistryType.EXECUTION_CUSTOM_PANEL;
 
   constructor(_customRegistryService: CustomRegistryService) {
     super(_customRegistryService);

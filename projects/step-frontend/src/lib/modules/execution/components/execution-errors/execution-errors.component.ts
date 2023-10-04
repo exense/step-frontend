@@ -13,7 +13,7 @@ import { ExecutionErrorCodeItem } from '../../shared/execution-error-code-item';
 export class ExecutionErrorsComponent implements OnChanges {
   readonly ErrorDistributionStatus = ErrorDistributionStatus;
 
-  @Input() selectedErrorDistributionToggle: ErrorDistributionStatus = ErrorDistributionStatus.message;
+  @Input() selectedErrorDistributionToggle: ErrorDistributionStatus = ErrorDistributionStatus.MESSAGE;
   @Output() selectedErrorDistributionToggleChange = new EventEmitter<ErrorDistributionStatus>();
 
   @Input() countByErrorMsg: ExecutionErrorMessageItem[] = [];

@@ -1,5 +1,5 @@
 <mat-accordion multi>
-  <step-panel [panelType]="Panels.testCases">
+  <step-panel [panelType]="Panels.TEST_CASES">
     <ng-container titleAddon>
       <step-status-distribution
         *ngIf="execution!.status !== 'ENDED' && testCasesProgress && testCasesProgress.countForecast > 0"
@@ -59,7 +59,7 @@
       </ng-container>
     </step-table>
   </step-panel>
-  <step-panel [panelType]="Panels.steps">
+  <step-panel [panelType]="Panels.STEPS">
     <ng-container titleAddon>
       <step-status-distribution
         *ngIf="execution!.status !== 'ENDED' && progress && progress!.countForecast > 0"
@@ -79,7 +79,7 @@
     >
     </step-keyword-calls>
   </step-panel>
-  <step-panel [panelType]="Panels.parameters">
+  <step-panel [panelType]="Panels.PARAMETERS">
     <step-table [dataSource]="parameters">
       <ng-container matColumnDef="key" stepSearchCol>
         <th mat-header-cell *matHeaderCellDef>Key</th>

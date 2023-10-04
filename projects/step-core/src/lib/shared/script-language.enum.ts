@@ -1,5 +1,5 @@
 export enum ScriptLanguage {
-  java = 'java',
-  javascript = 'javascript',
-  groovy = 'groovy',
+  JAVA = 'java',
+  JAVASCRIPT = 'javascript',
+  GROOVY = 'groovy',
 }

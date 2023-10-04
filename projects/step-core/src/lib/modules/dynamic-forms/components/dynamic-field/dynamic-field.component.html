@@ -30,7 +30,7 @@
 
   <ng-template #valueInput>
     <ng-container [ngSwitch]="fieldType">
-      <ng-container *ngSwitchCase="DynamicFieldType.enum">
+      <ng-container *ngSwitchCase="DynamicFieldType.ENUM">
         <mat-select
           [disabled]="isDisabled"
           [ngModel]="value"
@@ -48,7 +48,7 @@
         </mat-select>
       </ng-container>
 
-      <ng-container *ngSwitchCase="DynamicFieldType.boolean">
+      <ng-container *ngSwitchCase="DynamicFieldType.BOOLEAN">
         <mat-radio-group
           aria-label="Select an option"
           color="primary"
@@ -63,7 +63,7 @@
         </mat-radio-group>
       </ng-container>
 
-      <ng-container *ngSwitchCase="DynamicFieldType.number">
+      <ng-container *ngSwitchCase="DynamicFieldType.NUMBER">
         <input
           type="number"
           step="any"
@@ -75,7 +75,7 @@
         />
       </ng-container>
 
-      <ng-container *ngSwitchCase="DynamicFieldType.object">
+      <ng-container *ngSwitchCase="DynamicFieldType.OBJECT">
         <input
           type="text"
           [disabled]="isDisabled"
@@ -86,7 +86,7 @@
         />
       </ng-container>
 
-      <ng-container *ngSwitchCase="DynamicFieldType.array">
+      <ng-container *ngSwitchCase="DynamicFieldType.ARRAY">
         <input
           type="text"
           [disabled]="isDisabled"
@@ -123,7 +123,7 @@
 
   <ng-container *ngIf="dynamic; then expressionInput; else valueInput"></ng-container>
 
-  <step-suffix class="button-suffix" *ngIf="fieldType === DynamicFieldType.string && !dynamic">
+  <step-suffix class="button-suffix" *ngIf="fieldType === DynamicFieldType.STRING && !dynamic">
     <button
       type="button"
       mat-stroked-button

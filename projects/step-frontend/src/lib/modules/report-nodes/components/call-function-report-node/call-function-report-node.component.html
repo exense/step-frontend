@@ -10,7 +10,7 @@
       <ng-container matColumnDef="begin">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Begin</th>
         <td mat-cell *matCellDef="let measure">
-          {{ measure.begin | date: DateFormat.date }}
+          {{ measure.begin | date: DateFormat.DATE }}
         </td>
       </ng-container>
       <ng-container matColumnDef="name">

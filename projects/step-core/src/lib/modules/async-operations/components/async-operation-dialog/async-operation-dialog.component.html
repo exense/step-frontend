@@ -2,13 +2,13 @@
 <div mat-dialog-content>
   <div class="content">
     <ng-container [ngSwitch]="state">
-      <ng-container *ngSwitchCase="AsyncOperationDialogState.success">
+      <ng-container *ngSwitchCase="AsyncOperationDialogState.SUCCESS">
         <div [innerHTML]="successMessage"></div>
       </ng-container>
-      <ng-container *ngSwitchCase="AsyncOperationDialogState.error">
+      <ng-container *ngSwitchCase="AsyncOperationDialogState.ERROR">
         <div [innerHTML]="errorMessage"></div>
       </ng-container>
-      <ng-container *ngSwitchCase="AsyncOperationDialogState.progress">
+      <ng-container *ngSwitchCase="AsyncOperationDialogState.PROGRESS">
         <mat-progress-bar [value]="progress" color="primary" mode="buffer"> </mat-progress-bar>
       </ng-container>
     </ng-container>
@@ -19,12 +19,12 @@
     <ng-container *ngSwitchDefault>
       <button type="button" mat-flat-button color="primary" (click)="closeOk()">Ok</button>
     </ng-container>
-    <ng-container *ngSwitchCase="AsyncOperationDialogState.success">
+    <ng-container *ngSwitchCase="AsyncOperationDialogState.SUCCESS">
       <button type="button" *ngIf="_dialogData.showCloseButtonOnSuccess" mat-flat-button (click)="cancel()">
         Cancel
       </button>
       <button type="button" mat-flat-button color="primary" (click)="closeOk()">Ok</button>
     </ng-container>
-    <ng-container *ngSwitchCase="AsyncOperationDialogState.progress"> </ng-container>
+    <ng-container *ngSwitchCase="AsyncOperationDialogState.PROGRESS"> </ng-container>
   </ng-container>
 </div>

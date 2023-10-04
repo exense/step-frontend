@@ -70,7 +70,7 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
 
   private determineKeywordMode(): AceMode {
     const lang = (this.keyword as any)?.scriptLanguage?.value as ScriptLanguage;
-    return convertScriptLanguageToAce(lang) ?? AceMode.javascript;
+    return convertScriptLanguageToAce(lang) ?? AceMode.JAVASCRIPT;
   }
 
   private saveInternal(): Observable<void> {

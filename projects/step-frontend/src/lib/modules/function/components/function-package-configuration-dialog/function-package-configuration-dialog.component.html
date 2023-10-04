@@ -1,6 +1,6 @@
 <step-modal-window [title]="modalTitle" [showSpinner]="isLoading">
   <div step-modal-window-body>
-    <step-alert *ngIf="previewError" [type]="AlertType.danger">
+    <step-alert *ngIf="previewError" [type]="AlertType.DANGER">
       Error while loading package file: {{ previewError }}
     </step-alert>
     <mat-card>

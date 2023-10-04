@@ -44,7 +44,7 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
 
   @Input() tooltip?: string = '';
 
-  @Input() fieldType: DynamicFieldType = DynamicFieldType.string;
+  @Input() fieldType: DynamicFieldType = DynamicFieldType.STRING;
 
   @Input() canRemove?: boolean = false;
 
@@ -99,7 +99,7 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
   }
 
   protected valueChange(value: DynamicValue['value'], type?: DynamicFieldType): void {
-    if ((type === DynamicFieldType.array || type === DynamicFieldType.object) && typeof value === 'string') {
+    if ((type === DynamicFieldType.ARRAY || type === DynamicFieldType.OBJECT) && typeof value === 'string') {
       try {
         value = JSON.parse(value);
       } catch (e) {
@@ -145,7 +145,7 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
   }
 
   private determineEnumExtraValueFlag(): void {
-    if (this.fieldType !== DynamicFieldType.enum) {
+    if (this.fieldType !== DynamicFieldType.ENUM) {
       this.displayEnumExtraValue = false;
       return;
     }

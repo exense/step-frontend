@@ -8,7 +8,7 @@ import { CustomRegistryItem } from '../shared/custom-registry-item';
   providedIn: 'root',
 })
 export class WizardRegistryService extends BaseRegistryService {
-  protected override readonly registryType = CustomRegistryType.wizardStep;
+  protected override readonly registryType = CustomRegistryType.WIZARD_STEP;
 
   constructor(customRegistry: CustomRegistryService) {
     super(customRegistry);
