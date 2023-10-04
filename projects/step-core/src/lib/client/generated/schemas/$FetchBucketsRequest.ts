@@ -41,5 +41,15 @@ export const $FetchBucketsRequest = {
         format: 'int32',
       },
     },
+    collectAttributeKeys: {
+      type: 'array',
+      contains: {
+        type: 'string',
+      },
+    },
+    collectAttributesValuesLimit: {
+      type: 'number',
+      format: 'int32',
+    },
   },
 } as const;

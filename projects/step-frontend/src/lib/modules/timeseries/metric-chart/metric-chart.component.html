@@ -19,12 +19,7 @@
         <button mat-menu-item="" (click)="switchGrouping(undefined)" [class.selected-menu-item]="!selectedGrouping">
           No grouping
         </button>
-        <button
-          *ngFor="let attribute of settings.attributes"
-          (click)="switchGrouping(attribute)"
-          mat-menu-item
-          [class.selected-menu-item]="attribute.value === selectedGrouping?.value"
-        >
+        <button *ngFor="let attribute of settings.attributes" (click)="switchGrouping(attribute)" mat-menu-item>
           {{ attribute.label }}
         </button>
       </mat-menu>

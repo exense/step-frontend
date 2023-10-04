@@ -18,6 +18,10 @@ import { TimeSeriesConfig } from '../time-series.config';
 import uPlot = require('uplot');
 import { FilterUtils } from '../util/filter-utils';
 
+interface SelectableMetricAttribute extends MetricAttribute {
+  isSelected: boolean;
+}
+
 @Component({
   selector: 'step-metric-chart',
   templateUrl: './metric-chart.component.html',
@@ -32,9 +36,11 @@ export class MetricChartComponent implements OnInit, OnChanges {
   @Input() allowGroupingChange = true;
   @Input() allowMetricChange = true;
 
-  readonly AGGREGATES = ['SUM', 'AVG', 'MIN', 'MAX'];
+  readonly AGGREGATES = ['SUM', 'AVG', 'MAX', 'MIN', 'COUNT', 'RATE', 'MEDIAN', 'PERCENTILE'];
   selectedAggregate!: string;
-  selectedGrouping?: MetricAttribute;
+  selectedGrouping?: MetricAttribute[];
+
+  metricAttributes: SelectableMetricAttribute[] = [];
 
   isLoading = false;
 
@@ -47,17 +53,30 @@ export class MetricChartComponent implements OnInit, OnChanges {
     if (!this.range) {
       throw new Error('Range input is mandatory');
     }
-    this.selectedAggregate = this.settings.defaultAggregation || 'SUM';
-    if (this.settings.groupingAttribute) {
+    const renderingSettings = this.settings.renderingSettings!;
+    this.metricAttributes = JSON.parse(JSON.stringify(this.settings.attributes));
+    renderingSettings.defaultGroupingAttributes?.forEach((attr) => {
+      const foundAttribute = this.metricAttributes.find((a) => a.value === attr);
+      if (foundAttribute) {
+        foundAttribute.isSelected = true;
+      }
+    });
+    this.selectedAggregate = renderingSettings.defaultAggregation!;
+    if (renderingSettings.defaultGroupingAttributes?.length) {
       // we have a default grouping
-      this.selectedGrouping = this.settings.attributes?.find((a) => a.value === this.settings.groupingAttribute!);
+      this.selectedGrouping = this.settings.attributes?.filter(
+        (a) =>
+          renderingSettings.defaultGroupingAttributes &&
+          renderingSettings.defaultGroupingAttributes?.indexOf(a.value!) >= 0
+      );
     }
     this.fetchDataAndCreateChart(this.settings, this.range);
   }
 
   private fetchDataAndCreateChart(settings: MetricType, range: TSTimeRange): void {
-    const groupByAttribute = this.selectedGrouping?.value;
-    const groupDimensions = groupByAttribute ? [groupByAttribute] : [];
+    const groupDimensions: string[] = this.metricAttributes
+      .filter((attr) => attr.isSelected === true)
+      .map((attr) => attr.value!);
     const request: FetchBucketsRequest = {
       start: range.from,
       end: range.to,
@@ -79,7 +98,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
 
   switchGrouping(attribute: MetricAttribute | undefined) {
     this.isLoading = true;
-    this.selectedGrouping = attribute;
+    // this.selectedGrouping = attribute;
     this.fetchDataAndCreateChart(this.settings, this.range);
   }
 
@@ -105,9 +124,9 @@ export class MetricChartComponent implements OnInit, OnChanges {
         points: { show: false },
       };
     });
-    let yAxesUnit = this.settings.unit || '';
+    let yAxesUnit = 'ms';
     return {
-      title: `${this.settings.label!} (${this.selectedAggregate})`,
+      title: `${this.settings.name!} (${this.selectedAggregate})`,
       xValues: xLabels,
       series: series,
       tooltipOptions: {

@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $MetricType = {
+export const $DockerRegistryConfiguration = {
   properties: {
     customFields: {
       type: 'dictionary',
@@ -9,23 +9,14 @@ export const $MetricType = {
         properties: {},
       },
     },
-    key: {
+    url: {
       type: 'string',
     },
-    name: {
+    username: {
       type: 'string',
     },
-    description: {
+    password: {
       type: 'string',
-    },
-    attributes: {
-      type: 'array',
-      contains: {
-        type: 'MetricAttribute',
-      },
-    },
-    renderingSettings: {
-      type: 'MetricRenderingSettings',
     },
     id: {
       type: 'string',

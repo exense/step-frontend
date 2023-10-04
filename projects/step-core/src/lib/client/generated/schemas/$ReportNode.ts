@@ -52,6 +52,9 @@ export const $ReportNode = {
     resolvedArtefact: {
       type: 'AbstractArtefact',
     },
+    contributingError: {
+      type: 'boolean',
+    },
     orphan: {
       type: 'boolean',
     },
