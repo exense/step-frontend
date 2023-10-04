@@ -11,7 +11,7 @@ import { CustomRegistryItem } from '../../shared/custom-registry-item';
   encapsulation: ViewEncapsulation.None,
 })
 export class DashletComponent extends BaseItemComponent<CustomRegistryItem> {
-  protected override readonly registryType: CustomRegistryType = CustomRegistryType.dashlet;
+  protected override readonly registryType: CustomRegistryType = CustomRegistryType.DASHLET;
 
   constructor(_customRegistryService: CustomRegistryService) {
     super(_customRegistryService);

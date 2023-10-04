@@ -1,4 +1,4 @@
-<step-panel [panelType]="Panels.currentOperations" *ngIf="_state.execution && _state.execution.status !== 'ENDED'">
+<step-panel [panelType]="Panels.CURRENT_OPERATIONS" *ngIf="_state.execution && _state.execution.status !== 'ENDED'">
   <step-table [dataSource]="_state.currentOperations">
     <ng-container matColumnDef="operation">
       <th mat-header-cell *matHeaderCellDef></th>

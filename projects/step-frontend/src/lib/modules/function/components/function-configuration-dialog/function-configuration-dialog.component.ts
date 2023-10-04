@@ -14,7 +14,7 @@ import {
   functionConfigurationDialogFormSetValueToModel,
   FunctionType,
   FunctionTypeRegistryService,
-  Function as Keyword,
+  Keyword,
   FunctionConfigurationApiService,
 } from '@exense/step-core';
 import { ILocationService } from 'angular';

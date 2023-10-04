@@ -1,4 +1,4 @@
-import { Function as Keyword } from '../../../client/step-client-module';
+import { Keyword } from '../../../client/step-client-module';
 import { Observable } from 'rxjs';
 import { Injector } from '@angular/core';
 export abstract class FunctionConfigurationService {

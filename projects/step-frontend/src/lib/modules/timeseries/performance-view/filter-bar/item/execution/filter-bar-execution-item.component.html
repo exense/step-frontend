@@ -10,7 +10,7 @@
       </div>
     </ng-container>
     <div class="timestamp" *ngIf="value.entity">
-      {{ (value.entity | castToExecution)?.startTime | date: DateFormat.date }}
+      {{ (value.entity | castToExecution)?.startTime | date: DateFormat.DATE }}
     </div>
   </div>
   <button class="add-btn" mat-flat-button (click)="showExecutionPicker()">

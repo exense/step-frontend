@@ -32,7 +32,7 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
 
   @Input() selectionCollector?: SelectionCollector<KEY, ENTITY>;
   @Input() showLabel: boolean = true;
-  @Input() selectionType: BulkSelectionType = BulkSelectionType.None;
+  @Input() selectionType: BulkSelectionType = BulkSelectionType.NONE;
   @Output() selectionTypeChange = new EventEmitter<BulkSelectionType>();
 
   protected isChecked: boolean = false;
@@ -45,7 +45,7 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
     }
     const cSelectionType = changes['selectionType'];
     if (cSelectionType?.previousValue !== cSelectionCollector?.currentValue) {
-      this.changeType(cSelectionType?.currentValue || BulkSelectionType.None);
+      this.changeType(cSelectionType?.currentValue || BulkSelectionType.NONE);
     }
   }
 
@@ -54,7 +54,7 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
   }
 
   handleCheckboxChange(): void {
-    this.changeType(this.selectionType !== BulkSelectionType.None ? BulkSelectionType.None : BulkSelectionType.Visible);
+    this.changeType(this.selectionType !== BulkSelectionType.NONE ? BulkSelectionType.NONE : BulkSelectionType.VISIBLE);
   }
 
   changeType(selectionType: BulkSelectionType): void {
@@ -63,12 +63,12 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
 
     if (this.selectionCollector) {
       switch (selectionType) {
-        case BulkSelectionType.All:
-        case BulkSelectionType.Filtered:
-        case BulkSelectionType.Visible:
+        case BulkSelectionType.ALL:
+        case BulkSelectionType.FILTERED:
+        case BulkSelectionType.VISIBLE:
           this.selectionCollector.selectPossibleItems();
           break;
-        case BulkSelectionType.None:
+        case BulkSelectionType.NONE:
           this.selectionCollector.clear();
           break;
         default:
@@ -77,11 +77,11 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
     }
 
     switch (selectionType) {
-      case BulkSelectionType.All:
+      case BulkSelectionType.ALL:
         this.isChecked = true;
         this.isIntermediate = false;
         break;
-      case BulkSelectionType.None:
+      case BulkSelectionType.NONE:
         this.isChecked = false;
         this.isIntermediate = false;
         break;
@@ -116,8 +116,8 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
         takeUntil(this.terminator$)
       )
       .subscribe(() => {
-        if (!selectionCollector?.isSelectingPossible() && this.selectionType !== BulkSelectionType.Individual) {
-          this.changeType(BulkSelectionType.Individual);
+        if (!selectionCollector?.isSelectingPossible() && this.selectionType !== BulkSelectionType.INDIVIDUAL) {
+          this.changeType(BulkSelectionType.INDIVIDUAL);
         }
       });
 
@@ -128,8 +128,8 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
         takeUntil(this.terminator$)
       )
       .subscribe(() => {
-        if (this.selectionType !== BulkSelectionType.None) {
-          this.changeType(BulkSelectionType.None);
+        if (this.selectionType !== BulkSelectionType.NONE) {
+          this.changeType(BulkSelectionType.NONE);
         }
       });
   }

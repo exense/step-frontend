@@ -10,5 +10,5 @@ export class AlertDirective {
 
   @HostBinding('attr.type')
   @Input()
-  type: AlertType | string = AlertType.default;
+  type: AlertType | string = AlertType.DEFAULT;
 }

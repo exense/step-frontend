@@ -1,5 +1,5 @@
 export enum AsyncOperationCloseStatus {
-  success,
-  error,
-  noAction,
+  SUCCESS,
+  ERROR,
+  NO_ACTION,
 }

@@ -1,8 +1,8 @@
 export enum DynamicFieldType {
-  string = 'string',
-  number = 'number',
-  boolean = 'boolean',
-  array = 'array',
-  object = 'object',
-  enum = 'enum',
+  STRING = 'string',
+  NUMBER = 'number',
+  BOOLEAN = 'boolean',
+  ARRAY = 'array',
+  OBJECT = 'object',
+  ENUM = 'enum',
 }

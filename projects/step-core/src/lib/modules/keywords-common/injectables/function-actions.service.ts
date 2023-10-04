@@ -1,7 +1,7 @@
 import { Injector } from '@angular/core';
 import { Observable } from 'rxjs';
 import { FunctionDialogsConfig } from '../types/function-dialogs-config.interface';
-import { Function as Keyword } from '../../../client/step-client-module';
+import { Keyword } from '../../../client/step-client-module';
 
 export abstract class FunctionActionsService {
   abstract openAddFunctionModal(

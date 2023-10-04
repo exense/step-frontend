@@ -1,4 +1,4 @@
 export enum AceMode {
-  javascript = 'ace/mode/javascript',
-  groovy = 'ace/mode/groovy',
+  JAVASCRIPT = 'ace/mode/javascript',
+  GROOVY = 'ace/mode/groovy',
 }

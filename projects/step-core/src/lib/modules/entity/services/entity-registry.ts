@@ -12,7 +12,7 @@ import {
   providedIn: 'root',
 })
 export class EntityRegistry {
-  protected readonly registryType = CustomRegistryType.entity;
+  protected readonly registryType = CustomRegistryType.ENTITY;
 
   constructor(private _customRegistry: CustomRegistryService) {}
 
