@@ -6,7 +6,7 @@ import {
   AJS_ROOT_SCOPE,
   AugmentedKeywordsService,
   AutoDeselectStrategy,
-  Function as KeywordFunction,
+  Keyword,
   InteractivePlanExecutionService,
   selectionCollectionProvider,
   tablePersistenceConfigProvider,
@@ -24,7 +24,7 @@ import { FunctionPackageActionsService } from '../../services/function-package-a
   styleUrls: ['./function-list.component.scss'],
   providers: [
     tablePersistenceConfigProvider('functionList', STORE_ALL),
-    selectionCollectionProvider<string, KeywordFunction>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
 })
 export class FunctionListComponent implements AfterViewInit {
@@ -55,7 +55,7 @@ export class FunctionListComponent implements AfterViewInit {
     });
   }
 
-  editFunction(keyword: KeywordFunction): void {
+  editFunction(keyword: Keyword): void {
     this._functionActions.openFunctionEditor(keyword).subscribe();
   }
 
@@ -105,7 +105,7 @@ export class FunctionListComponent implements AfterViewInit {
     });
   }
 
-  displayHistory(keyword: KeywordFunction, permission: string): void {
+  displayHistory(keyword: Keyword, permission: string): void {
     if (!keyword.id) {
       return;
     }

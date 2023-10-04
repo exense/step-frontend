@@ -1,6 +1,6 @@
 import { Component, inject, Input, SimpleChanges } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, AugmentedKeywordsService, Function as KeywordFunction } from '@exense/step-core';
+import { AJS_MODULE, AugmentedKeywordsService, Keyword } from '@exense/step-core';
 import { PlanEditorApiService } from '../../../plan-editor/plan-editor.module';
 import { CompositeKeywordPlanApiService } from '../../services/composite-keyword-plan-api.service';
 
@@ -20,7 +20,7 @@ export class CompositeFunctionEditorComponent {
 
   private _functionApiService = inject(AugmentedKeywordsService);
 
-  protected composite?: KeywordFunction;
+  protected composite?: Keyword;
 
   ngOnChanges(changes: SimpleChanges): void {
     const cId = changes['id'];
