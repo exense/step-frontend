@@ -1,7 +1,5 @@
 import { AfterViewInit, Component, inject } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  AJS_MODULE,
   AutoDeselectStrategy,
   Parameter,
   selectionCollectionProvider,
@@ -27,7 +25,3 @@ export class ParametersListComponent implements AfterViewInit {
     this._logic.resolveEditLinkIfExists();
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepParametersList', downgradeComponent({ component: ParametersListComponent }));

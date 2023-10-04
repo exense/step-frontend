@@ -53,7 +53,10 @@ export class SchedulerModule {
   }
 
   private registerViews(): void {
-    this._viewRegistry.registerView('scheduler', 'partials/scheduler.html');
+    this._viewRegistry.registerRoute({
+      path: 'scheduler',
+      component: ScheduledTaskListComponent,
+    });
   }
 
   private registerDashlets(): void {

@@ -14,6 +14,7 @@ import {
 } from '@exense/step-core';
 import { map, Observable, of, pipe, switchMap, take, tap } from 'rxjs';
 import { Location } from '@angular/common';
+import { Router } from '@angular/router';
 
 const TASK_ID = 'taskId';
 
@@ -25,8 +26,7 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
   private _dashboardService = inject(DashboardService);
   private _schedulerService = inject(AugmentedSchedulerService);
   private _scheduledTaskDialogs = inject(ScheduledTaskDialogsService);
-  private _location = inject(Location);
-  private _$location = inject(AJS_LOCATION);
+  private _router = inject(Router);
   private _multipleProjectList = inject(MultipleProjectsService);
   private _editorResolver = inject(EditorResolverService);
 
@@ -48,7 +48,7 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
 
   executeTask(scheduledTask: ExecutiontTaskParameters) {
     this._schedulerService.executeTask(scheduledTask.id!).subscribe((executionId) => {
-      this._location.go('#/root/executions/' + executionId);
+      this._router.navigate(['root', 'executions', executionId]);
     });
   }
 
@@ -85,9 +85,9 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
 
   navToSettings() {
     if (this._authService.hasRight('admin-ui-menu') && this._authService.isAuthenticated()) {
-      this._location.go('#/root/admin/controller/scheduler');
+      this._router.navigate(['root', 'admin', 'controller', 'scheduler']);
     } else {
-      this._location.go('#/root/settings/scheduler');
+      this._router.navigate(['root', 'settings', 'scheduler']);
     }
   }
 
@@ -99,7 +99,7 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
     if (this._multipleProjectList.isEntityBelongsToCurrentProject(scheduledTask)) {
       return this.editTaskInternal(scheduledTask.id!);
     }
-    const url = this._$location.path();
+    const url = this._router.url;
     const editParams = { [TASK_ID]: scheduledTask.id! };
 
     return this._multipleProjectList
