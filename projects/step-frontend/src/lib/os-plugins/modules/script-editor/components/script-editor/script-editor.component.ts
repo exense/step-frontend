@@ -7,7 +7,7 @@ import {
   AJS_ROOT_SCOPE,
   AugmentedKeywordEditorService,
   convertScriptLanguageToAce,
-  Function as Keyword,
+  Keyword,
   InteractivePlanExecutionService,
   KeywordsService,
   ScriptLanguage,

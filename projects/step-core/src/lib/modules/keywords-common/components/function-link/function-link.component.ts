@@ -1,6 +1,6 @@
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { map, of } from 'rxjs';
-import { Function as KeywordFunction } from '../../../../client/step-client-module';
+import { Keyword } from '../../../../client/step-client-module';
 import { CustomComponent } from '../../../custom-registeries/custom-registries.module';
 import { CustomColumnOptions } from '../../../table/table.module';
 import { FunctionActionsService } from '../../injectables/function-actions.service';
@@ -14,7 +14,7 @@ export class FunctionLinkComponent implements CustomComponent {
   private _functionActions = inject(FunctionActionsService, { optional: true });
   private _customColumnOptions = inject(CustomColumnOptions, { optional: true });
 
-  @Input() context?: KeywordFunction;
+  @Input() context?: Keyword;
   @Output() edit = new EventEmitter<void>();
 
   readonly noLink$ = (this._customColumnOptions?.options$ || of([])).pipe(

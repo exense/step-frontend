@@ -1,13 +1,11 @@
 import { Component, EventEmitter, forwardRef, inject, Input, Output } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AbstractArtefact,
   AugmentedKeywordsService,
   CallFunction,
   DynamicValueString,
-  Function as Keyword,
+  Keyword,
 } from '../../client/step-client-module';
-import { AJS_MODULE } from '../../shared';
 import { ReferenceArtefactNameConfig } from '../reference-artefact-name/reference-artefact-name.component';
 import { Observable } from 'rxjs';
 
