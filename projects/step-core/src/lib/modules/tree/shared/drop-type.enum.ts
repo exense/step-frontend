@@ -1,6 +1,6 @@
 export enum DropType {
-  before = 'before',
-  inside = 'inside',
-  after = 'after',
-  out = 'out',
+  BEFORE = 'before',
+  INSIDE = 'inside',
+  AFTER = 'after',
+  OUT = 'out',
 }

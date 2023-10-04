@@ -1,5 +1,5 @@
 export enum AsyncOperationDialogState {
-  progress,
-  success,
-  error,
+  PROGRESS,
+  SUCCESS,
+  ERROR,
 }

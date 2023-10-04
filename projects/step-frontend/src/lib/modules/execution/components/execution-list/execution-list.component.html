@@ -39,7 +39,7 @@
     >
     </step-date-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Start time</th>
-    <td mat-cell *matCellDef="let element">{{ element?.startTime | date: DateFormat.date }}</td>
+    <td mat-cell *matCellDef="let element">{{ element?.startTime | date: DateFormat.DATE }}</td>
   </ng-container>
   <ng-container matColumnDef="endTime" stepSearchCol>
     <step-date-filter
@@ -49,7 +49,7 @@
     >
     </step-date-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>End time</th>
-    <td mat-cell *matCellDef="let element">{{ element?.endTime | date: DateFormat.date }}</td>
+    <td mat-cell *matCellDef="let element">{{ element?.endTime | date: DateFormat.DATE }}</td>
   </ng-container>
   <ng-container matColumnDef="user" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>User</th>

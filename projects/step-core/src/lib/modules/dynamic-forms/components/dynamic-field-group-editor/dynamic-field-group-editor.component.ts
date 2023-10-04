@@ -243,32 +243,32 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
       }
 
       if (fieldDescription.enum) {
-        fieldType = DynamicFieldType.enum;
+        fieldType = DynamicFieldType.ENUM;
         enumItems = fieldDescription.enum;
       } else {
         switch (fieldDescription.type) {
           case 'string':
-            fieldType = DynamicFieldType.string;
+            fieldType = DynamicFieldType.STRING;
             break;
           case 'number':
           case 'integer':
-            fieldType = DynamicFieldType.number;
+            fieldType = DynamicFieldType.NUMBER;
             break;
           case 'boolean':
-            fieldType = DynamicFieldType.boolean;
+            fieldType = DynamicFieldType.BOOLEAN;
             break;
           case 'array':
-            fieldType = DynamicFieldType.array;
+            fieldType = DynamicFieldType.ARRAY;
             break;
           case 'object':
-            fieldType = DynamicFieldType.object;
+            fieldType = DynamicFieldType.OBJECT;
             break;
           default:
             break;
         }
       }
     } else {
-      fieldType = DynamicFieldType.string;
+      fieldType = DynamicFieldType.STRING;
     }
 
     const fieldValue: DynamicValueString | DynamicValueBoolean | DynamicValueInteger = value[field] || {

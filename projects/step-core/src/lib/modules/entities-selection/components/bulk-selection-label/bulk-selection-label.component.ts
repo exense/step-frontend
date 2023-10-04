@@ -18,14 +18,14 @@ export class BulkSelectionLabelComponent<KEY, ENTITY> {
   @Output() selectionTypeChange = new EventEmitter<BulkSelectionType>();
 
   clearSelection(): void {
-    this.selectionTypeChange.emit(BulkSelectionType.None);
+    this.selectionTypeChange.emit(BulkSelectionType.NONE);
   }
 
   selectAll(): void {
-    this.selectionTypeChange.emit(BulkSelectionType.All);
+    this.selectionTypeChange.emit(BulkSelectionType.ALL);
   }
 
   selectFiltered(): void {
-    this.selectionTypeChange.emit(BulkSelectionType.Filtered);
+    this.selectionTypeChange.emit(BulkSelectionType.FILTERED);
   }
 }

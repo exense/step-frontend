@@ -1,4 +1,4 @@
 export enum ExecutionTreeAction {
-  loadPreviousNodes = 'loadPreviousNodes',
-  loadNextNodes = 'loadNextNodes',
+  LOAD_PREVIOUS_NODES = 'loadPreviousNodes',
+  LOAD_NEXT_NODES = 'loadNextNodes',
 }

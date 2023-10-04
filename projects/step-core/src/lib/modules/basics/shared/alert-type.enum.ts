@@ -1,8 +1,8 @@
 export enum AlertType {
-  default = 'default',
-  success = 'success',
-  danger = 'danger',
-  warning = 'warning',
-  info = 'info',
-  minimalist = 'minimalist',
+  DEFAULT = 'default',
+  SUCCESS = 'success',
+  DANGER = 'danger',
+  WARNING = 'warning',
+  INFO = 'info',
+  MINIMALIST = 'minimalist',
 }

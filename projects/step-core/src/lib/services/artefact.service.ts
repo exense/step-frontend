@@ -19,7 +19,7 @@ export interface ArtefactType extends CustomRegistryItem {
 export class ArtefactService {
   protected _customRegistry = inject(CustomRegistryService);
   protected _planApiService = inject(PlansService);
-  protected readonly registryType = CustomRegistryType.artefact;
+  protected readonly registryType = CustomRegistryType.ARTEFACT;
 
   readonly availableArtefacts$ = this._planApiService.getArtefactTypes().pipe(
     map((artefactNames) => {

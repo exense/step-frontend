@@ -9,7 +9,7 @@ import { STEP_CORE_JS } from '../../../angularjs';
   providedIn: 'root',
 })
 export class PlanTypeRegistryService extends BaseRegistryService {
-  protected readonly registryType: CustomRegistryType = CustomRegistryType.planType;
+  protected readonly registryType: CustomRegistryType = CustomRegistryType.PLAN_TYPE;
 
   constructor(_customRegistry: CustomRegistryService) {
     super(_customRegistry);

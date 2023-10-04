@@ -62,7 +62,7 @@ export class BulkOperationPerformStrategyImplService<ID = string> implements Bul
 
     return this._asyncOperationService.performOperation(optionsPreview).pipe(
       switchMap((result) => {
-        if (result.closeStatus !== AsyncOperationCloseStatus.success) {
+        if (result.closeStatus !== AsyncOperationCloseStatus.SUCCESS) {
           return of(result);
         }
         return this._asyncOperationService.performOperation(optionsPerform);
@@ -77,19 +77,19 @@ export class BulkOperationPerformStrategyImplService<ID = string> implements Bul
     let tableParameters: TableParameters | undefined = undefined;
 
     switch (config.selectionType) {
-      case BulkSelectionType.All:
+      case BulkSelectionType.ALL:
         targetType = 'ALL';
         break;
-      case BulkSelectionType.Filtered:
+      case BulkSelectionType.FILTERED:
         targetType = 'FILTER';
         filters = config.filterRequest?.filters as TableFilter[] | undefined;
         tableParameters = config.filterRequest?.tableParameters;
         break;
-      case BulkSelectionType.None:
+      case BulkSelectionType.NONE:
         ids = [];
         break;
-      case BulkSelectionType.Individual:
-      case BulkSelectionType.Visible:
+      case BulkSelectionType.INDIVIDUAL:
+      case BulkSelectionType.VISIBLE:
         ids = (config.ids || []).map((id) => {
           if (typeof id === 'string') {
             return id;
@@ -114,7 +114,7 @@ export class BulkOperationPerformStrategyImplService<ID = string> implements Bul
     const operationType = config.operationInfo.type;
     const operation = this._titleCase.transform(operationType);
     let title = `Confirm ${operation}`;
-    if (operationType === BulkOperationType.DELETE && config.selectionType === BulkSelectionType.All) {
+    if (operationType === BulkOperationType.DELETE && config.selectionType === BulkSelectionType.ALL) {
       title = `<span class="danger-warning">${title}</span>`;
     }
     return this._sanitizer.bypassSecurityTrustHtml(title);
@@ -152,7 +152,7 @@ export class BulkOperationPerformStrategyImplService<ID = string> implements Bul
       const operationType = config.operationInfo.type;
 
       let message: string;
-      if (config.selectionType === BulkSelectionType.All) {
+      if (config.selectionType === BulkSelectionType.ALL) {
         message = count
           ? formatMessageWithDeleteWarning`Do you want to ${operationType} all ${count} selected item(s)`
           : formatMessageWithDeleteWarning`Do you want to ${operationType} all selected items`;
