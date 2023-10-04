@@ -42,7 +42,7 @@ export class BulkOperationsComponent<KEY, ENTITY> implements OnChanges {
 
   protected trackByOperation: TrackByFunction<EntityBulkOperationInfo> = (_, item) => item.type;
 
-  @Input() selectionType: BulkSelectionType = BulkSelectionType.None;
+  @Input() selectionType: BulkSelectionType = BulkSelectionType.NONE;
   @Output() selectionTypeChange = new EventEmitter<BulkSelectionType>();
 
   @Input() entity?: string;
@@ -56,7 +56,7 @@ export class BulkOperationsComponent<KEY, ENTITY> implements OnChanges {
       return;
     }
 
-    if (this.selectionType === BulkSelectionType.None) {
+    if (this.selectionType === BulkSelectionType.NONE) {
       return;
     }
 
@@ -66,16 +66,16 @@ export class BulkOperationsComponent<KEY, ENTITY> implements OnChanges {
       withPreview: true,
     };
 
-    if (this.selectionType === BulkSelectionType.Filtered) {
+    if (this.selectionType === BulkSelectionType.FILTERED) {
       config.filterRequest = this._tableFilter?.getTableFilterRequest() || undefined;
     }
 
-    if (this.selectionType === BulkSelectionType.Individual || this.selectionType === BulkSelectionType.Visible) {
+    if (this.selectionType === BulkSelectionType.INDIVIDUAL || this.selectionType === BulkSelectionType.VISIBLE) {
       config.ids = this._selectionCollector?.selected || undefined;
     }
 
     this._bulkOperationInvoker.invokeOperation(config, this._injector).subscribe((result) => {
-      if (result?.closeStatus !== AsyncOperationCloseStatus.success) {
+      if (result?.closeStatus !== AsyncOperationCloseStatus.SUCCESS) {
         return;
       }
       this._tableReload?.reload();

@@ -29,7 +29,7 @@ export type EntityMenuItemRegistryInfo = Omit<EntityMenuItemInfo, 'entity'>;
 export class EntityMenuItemsRegistryService {
   private _customRegistry = inject(CustomRegistryService);
 
-  private readonly registryType = CustomRegistryType.entityMenuItems;
+  private readonly registryType = CustomRegistryType.ENTITY_MENU_ITEMS;
 
   register(entity: string, menuItemInfo: EntityMenuItemRegistryInfo): this {
     const type = `${entity}_${menuItemInfo.menuId}`;

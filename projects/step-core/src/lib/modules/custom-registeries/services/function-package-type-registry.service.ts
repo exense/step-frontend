@@ -7,7 +7,7 @@ import { CustomRegistryService } from './custom-registry.service';
   providedIn: 'root',
 })
 export class FunctionPackageTypeRegistryService extends BaseRegistryService {
-  protected override readonly registryType: CustomRegistryType = CustomRegistryType.functionPackageType;
+  protected override readonly registryType: CustomRegistryType = CustomRegistryType.FUNCTION_PACKAGE_TYPE;
 
   constructor(_customRegistry: CustomRegistryService) {
     super(_customRegistry);

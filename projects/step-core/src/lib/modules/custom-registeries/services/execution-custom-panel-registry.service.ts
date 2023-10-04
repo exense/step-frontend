@@ -7,7 +7,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class ExecutionCustomPanelRegistryService extends BaseRegistryService {
-  protected override readonly registryType = CustomRegistryType.executionCustomPanel;
+  protected override readonly registryType = CustomRegistryType.EXECUTION_CUSTOM_PANEL;
 
   constructor(_customRegistry: CustomRegistryService) {
     super(_customRegistry);

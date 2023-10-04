@@ -52,7 +52,7 @@ export class RepositoryComponent implements OnInit, OnDestroy {
   readonly error?: Error;
 
   readonly includeTestcases$: Observable<IncludeTestcases | undefined> = of(undefined);
-  public testcaseSelectionType: BulkSelectionType = BulkSelectionType.None;
+  public testcaseSelectionType: BulkSelectionType = BulkSelectionType.NONE;
 
   constructor(
     @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService,
@@ -122,7 +122,7 @@ export class RepositoryComponent implements OnInit, OnDestroy {
       let by = this.repoRef!.repositoryID === 'local' ? 'id' : 'name';
 
       // @ts-ignore
-      return this.testcaseSelectionType === 'All' ? 'all' : by;
+      return this.testcaseSelectionType === 'ALL' ? 'all' : by;
     };
 
     (this as FieldAccessor).includeTestcases$ = this._selectionCollector.selected$.pipe(

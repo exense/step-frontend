@@ -13,7 +13,6 @@ import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static'
 import {
   AuthService,
   AJS_MODULE,
-  KeyValuePair,
   User,
   Preferences,
   UserService,
@@ -22,17 +21,18 @@ import {
   ApiToken,
   DialogsService,
 } from '@exense/step-core';
+import { KeyValue } from '@angular/common';
 
-const preferencesToKVPairArray = (preferences?: Preferences): KeyValuePair<string, string>[] => {
+const preferencesToKVPairArray = (preferences?: Preferences): KeyValue<string, string>[] => {
   const prefsObject = preferences?.preferences || {};
   const result = Object.keys(prefsObject).reduce((result, key) => {
     const value = prefsObject[key] || '';
     return [...result, { key, value }];
-  }, [] as KeyValuePair<string, string>[]);
+  }, [] as KeyValue<string, string>[]);
   return result;
 };
 
-const kvPairArrayToPreferences = (values?: KeyValuePair<string, string>[]): Preferences => {
+const kvPairArrayToPreferences = (values?: KeyValue<string, string>[]): Preferences => {
   const preferences = (values || []).reduce((res, { key, value }) => {
     res[key] = value;
     return res;
@@ -61,7 +61,7 @@ export class MyAccountComponent implements OnInit, OnChanges {
   readonly trackByToken: TrackByFunction<ApiToken> = (index, item) => item.id;
 
   user: Partial<User> = {};
-  preferences: KeyValuePair<string, string>[] = [];
+  preferences: KeyValue<string, string>[] = [];
   tokens: Array<any> = [];
 
   changePwd(): void {

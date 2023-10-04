@@ -18,7 +18,7 @@ import {
   ArtefactTreeNode,
   CallFunction,
   DialogsService,
-  Function as KeywordCall,
+  Keyword,
   KeywordsService,
   Plan,
   PlanArtefactResolverService,
@@ -291,7 +291,7 @@ export class PlanEditorBaseComponent
               this._dialogsService.showErrorMsg('No editor configured for this function type');
               return of('');
             }
-            return this.openFunctionEditor(keyword as KeywordCall);
+            return this.openFunctionEditor(keyword as Keyword);
           })
         )
         .subscribe();
@@ -373,7 +373,7 @@ export class PlanEditorBaseComponent
     return this._planLinkDialogs.editPlan(plan);
   }
 
-  private openFunctionEditor(keyword: KeywordCall): Observable<unknown> {
+  private openFunctionEditor(keyword: Keyword): Observable<unknown> {
     return this._functionActions.openFunctionEditor(keyword);
   }
 

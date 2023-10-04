@@ -29,7 +29,7 @@ export class TreeDragPlaceholderComponent implements OnChanges {
 
   private dropInfoChanged(dropInfo?: DropInfo): void {
     this.noInsert = dropInfo ? !dropInfo.canInsert : false;
-    this.isDropBefore = dropInfo?.dropType === DropType.before;
-    this.isDropAfter = dropInfo?.dropType === DropType.after;
+    this.isDropBefore = dropInfo?.dropType === DropType.BEFORE;
+    this.isDropAfter = dropInfo?.dropType === DropType.AFTER;
   }
 }
