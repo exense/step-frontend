@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import {
   AbstractArtefact,
-  Function as Keyword,
+  Keyword,
   BaseArtefactComponent,
   DynamicValueBoolean,
   DynamicValueString,

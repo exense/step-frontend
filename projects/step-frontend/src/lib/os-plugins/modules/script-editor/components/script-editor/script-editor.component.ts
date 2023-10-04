@@ -5,7 +5,7 @@ import {
   AJS_MODULE,
   AugmentedKeywordEditorService,
   convertScriptLanguageToAce,
-  Function as Keyword,
+  Keyword,
   KeywordExecutorService,
   KeywordsService,
   ScriptLanguage,
