@@ -4,7 +4,7 @@ import { StepDataSource, TableRemoteDataSourceFactoryService } from '../../table
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedPlansService extends PlansService {
-  private readonly PLANS_TABLE_ID = 'plans';
+  readonly PLANS_TABLE_ID = 'plans';
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
 
   getPlansTableDataSource(): StepDataSource<Plan> {

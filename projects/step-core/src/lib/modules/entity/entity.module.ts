@@ -44,7 +44,7 @@ export * from './components/entity-menu/entity-menu.component';
 export * from './directives/entity-legacy-table-wrapper.directive';
 export * from './directives/entity-menu-content.directive';
 export * from './services/entity-registry';
-export * from './services/entity-scope-resolver';
+export * from './services/entity-type-resolver';
 export * from './services/entity-dialogs.service';
 export * from './types/entity';
 export * from './types/entity-object';
