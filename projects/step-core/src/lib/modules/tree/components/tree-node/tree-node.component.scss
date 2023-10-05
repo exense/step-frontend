@@ -8,6 +8,16 @@ step-tree-node {
     gap: 8px;
     user-select: none;
 
+    &.root-node {
+      .node-content > .node-icon {
+        padding: 4px;
+
+        > step-icon {
+          @include core.step-icon-size(14px);
+        }
+      }
+    }
+
     > .node-content {
       padding: 8px 0;
       flex: 1;
@@ -19,11 +29,11 @@ step-tree-node {
       > .node-icon {
         background: var.$gray-100;
         border-radius: 50%;
-        padding: 6px;
+        padding: 5px;
         border: 1px solid transparent;
 
         > step-icon {
-          @include core.step-icon-size(10px);
+          @include core.step-icon-size(12px);
           display: flex;
         }
       }

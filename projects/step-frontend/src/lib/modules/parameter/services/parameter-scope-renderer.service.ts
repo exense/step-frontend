@@ -20,7 +20,7 @@ export class ParameterScopeRendererService {
       case 'GLOBAL':
         return 'square';
       case 'FUNCTION':
-        return 'target';
+        return 'keyword';
       case 'APPLICATION':
         return 'terminal';
       default:

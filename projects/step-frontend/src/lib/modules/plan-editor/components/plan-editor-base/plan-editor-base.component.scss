@@ -83,7 +83,7 @@ step-plan-editor-base {
   gap: 8px;
 
   step-icon {
-    @include core.step-icon-size(16px);
+    @include core.step-icon-size(22px);
     display: flex;
   }
 }

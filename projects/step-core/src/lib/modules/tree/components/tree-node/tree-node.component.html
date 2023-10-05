@@ -5,6 +5,7 @@
   [class.tree-node-hidden]="isHideRoot && (node.id | isRootNode | async)"
   [class.skipped]="node.isVisuallySkipped"
   cdkDrag
+  [class.root-node]="node.id | isRootNode | async"
   [cdkDragBoundary]="treeContainer"
   [cdkDragDisabled]="dragDisabled || (node.id | isRootNode | async)"
   [cdkDragData]="node.id"
