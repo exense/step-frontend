@@ -94,17 +94,17 @@ export class ArtefactsModule {
 
   registerArtefacts(): void {
     this._artefactService.register('TestSet', {
-      icon: 'folder',
+      icon: 'plan-testset',
       component: TestSetComponent,
       description: 'Used to group up TestCase’s as a single unit and executing them in parallel',
     });
     this._artefactService.register('TestCase', {
-      icon: 'list',
+      icon: 'plan-testcase',
       description:
         'Specific container for a group of nodes, it will activate the top-level panel in the execution view for high-level test case execution monitoring',
     });
     this._artefactService.register('TestScenario', {
-      icon: 'bar-chart-2',
+      icon: 'plan-testscenario',
       description: 'Usually used to parallelize the execution of multiple ThreadGroups or ‘sub’ plans',
     });
     this._artefactService.register('CallPlan', {
@@ -113,7 +113,7 @@ export class ArtefactsModule {
       description: 'Used to invoke a plan from within another plan',
     });
     this._artefactService.register('CallKeyword', {
-      icon: 'target',
+      icon: 'keyword',
       component: CallKeywordComponent,
       description:
         'Technical node used as part of keyword invocation. Can be used explicitly in order to call a keyword by reflection',
@@ -145,7 +145,7 @@ export class ArtefactsModule {
         'Guarantee thread safety within a test block by synchronizing all threads on the entire Test Execution',
     });
     this._artefactService.register('Sequence', {
-      icon: 'align-justify',
+      icon: 'plan-sequence',
       component: SequenceComponent,
       description: 'Guarantees the ordering of the child nodes, as displayed in the tree.',
     });
@@ -194,7 +194,7 @@ export class ArtefactsModule {
         'Executes any arbitrary groovy code. The script context is local, which means that variable used in the script control cannot be accessed externally by other nodes',
     });
     this._artefactService.register('ThreadGroup', {
-      icon: 'code',
+      icon: 'plan-threadgroup',
       component: ThreadGroupComponent,
       description: 'Starts multiple threads which will execute the node content in parallel',
     });

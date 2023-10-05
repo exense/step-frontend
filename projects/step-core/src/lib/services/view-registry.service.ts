@@ -72,8 +72,8 @@ export class ViewRegistryService {
     this.registerMenuEntry('Support', 'support-root', 'life-buoy', { weight: 100 });
 
     // Sub Menus Automation
-    this.registerMenuEntry('Keywords', 'functions', 'target', { weight: 10, parentId: 'automation-root' });
-    this.registerMenuEntry('Plans', 'plans', 'file', { weight: 30, parentId: 'automation-root' });
+    this.registerMenuEntry('Keywords', 'functions', 'keyword', { weight: 10, parentId: 'automation-root' });
+    this.registerMenuEntry('Plans', 'plans', 'plan', { weight: 30, parentId: 'automation-root' });
     this.registerMenuEntry('Parameters', 'parameters', 'list', { weight: 40, parentId: 'automation-root' });
     this.registerMenuEntry('Scheduler', 'scheduler', 'clock', { weight: 100, parentId: 'automation-root' });
 
@@ -82,9 +82,12 @@ export class ViewRegistryService {
     this.registerMenuEntry('Analytics', 'analytics', 'bar-chart-square-01', { weight: 20, parentId: 'execute-root' });
     // Sub Menus Status
     this.registerMenuEntry('Current Operations', 'operations', 'airplay', { weight: 10, parentId: 'status-root' });
-    this.registerMenuEntry('Agents', 'gridagents', 'users', { weight: 20, parentId: 'status-root' });
-    this.registerMenuEntry('Agent tokens', 'gridtokens', 'circle', { weight: 30, parentId: 'status-root' });
-    this.registerMenuEntry('Token Groups', 'gridtokengroups', 'tag', { weight: 40, parentId: 'status-root' });
+    this.registerMenuEntry('Agents', 'gridagents', 'agent', { weight: 20, parentId: 'status-root' });
+    this.registerMenuEntry('Agent tokens', 'gridtokens', 'agent-token', { weight: 30, parentId: 'status-root' });
+    this.registerMenuEntry('Token Groups', 'gridtokengroups', 'agent-token-group', {
+      weight: 40,
+      parentId: 'status-root',
+    });
     this.registerMenuEntry('Quota Manager', 'gridquotamanager', 'sidebar', { weight: 50, parentId: 'status-root' });
     // Sub Menus Support
     this.registerMenuEntry(
