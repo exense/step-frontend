@@ -70,6 +70,40 @@ export class TimeSeriesConfig {
     { type: RangeSelectionType.RELATIVE, relativeSelection: { label: 'Last 3 hours', timeInMs: this.ONE_HOUR_MS * 3 } },
     { type: RangeSelectionType.FULL },
   ];
+
+  static readonly AXES_FORMATTING_FUNCTIONS = {
+    bigNumber: (num: number): string => {
+      if (!num) {
+        return '0';
+      }
+      const lookup = [
+        { value: 1, symbol: '' },
+        { value: 1e3, symbol: 'k' },
+        { value: 1e6, symbol: 'M' },
+        { value: 1e9, symbol: 'B' },
+      ];
+      const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+      var item = lookup
+        .slice()
+        .reverse()
+        .find(function (item) {
+          return num >= item.value;
+        });
+      return item ? (num / item.value).toFixed(2).replace(rx, '$1') + item.symbol : '0';
+    },
+    time: (value: number): string => {
+      if (!value) {
+        return '0';
+      }
+      if (value >= 1000) {
+        let seconds = Math.floor(value / 1000);
+        let decimal = String(Math.floor(value % 1000).toFixed(2))[0];
+        return `${seconds}.${decimal} s`;
+      } else {
+        return Math.trunc(value) + ' ms';
+      }
+    },
+  };
 }
 
 export interface RefreshInterval {

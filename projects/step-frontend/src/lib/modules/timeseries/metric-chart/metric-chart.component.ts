@@ -81,7 +81,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
       start: range.from,
       end: range.to,
       groupDimensions: groupDimensions,
-      oqlFilter: FilterUtils.objectToOQL({ ...this.filters, 'attributes.metricType': `"${settings.name!}"` }),
+      oqlFilter: FilterUtils.objectToOQL({ ...this.filters, 'attributes.metricType': `"${settings.key!}"` }),
       numberOfBuckets: 100,
     };
     this._timeSeriesService.getBuckets(request).subscribe((response) => {
@@ -124,7 +124,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
         points: { show: false },
       };
     });
-    let yAxesUnit = 'ms';
+    let yAxesUnit = this.getUnitLabel(this.settings.renderingSettings!.unit!);
     return {
       title: `${this.settings.name!} (${this.selectedAggregate})`,
       xValues: xLabels,
@@ -158,8 +158,26 @@ export class MetricChartComponent implements OnInit, OnChanges {
         return b.max;
       case 'MIN':
         return b.min;
+      case 'COUNT':
+        return b.count;
+      case 'RATE':
+      case 'MEDIAN':
+      case 'PERCENTILE':
       default:
         throw new Error('Unhandled aggregation value: ' + aggregation);
+    }
+  }
+
+  private getUnitLabel(unit: 'MS' | 'PERCENTAGE' | 'EMPTY'): string {
+    switch (unit) {
+      case 'MS':
+        return 'ms';
+      case 'PERCENTAGE':
+        return '%';
+      case 'EMPTY':
+        return '';
+      default:
+        throw new Error('Unhandled unit value: ' + unit);
     }
   }
 
