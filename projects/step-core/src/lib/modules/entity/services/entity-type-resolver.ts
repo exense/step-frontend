@@ -7,23 +7,22 @@ import { AJS_MODULE } from '../../../shared';
 @Injectable({
   providedIn: 'root',
 })
-export class EntityScopeResolver {
+export class EntityTypeResolver {
   resolvers: Resolver<Entity>[] = [];
 
   registerResolver(resolver: Resolver<Entity>): void {
     this.resolvers.push(resolver);
   }
 
-  /* Will return result of first resolver that is not null */
-  getScope(entity: Entity, type?: any): any {
+  getTypeExtension(entity: Entity, type?: any): { icon?: string; tooltip?: string; tenant?: string } | undefined {
     for (const resolver of this.resolvers) {
       const entityScope = resolver(entity, type);
-      if (entityScope != null) {
+      if (entityScope) {
         return entityScope;
       }
     }
-    return null;
+    return;
   }
 }
 
-getAngularJSGlobal().module(AJS_MODULE).service('EntityScopeResolver', downgradeInjectable(EntityScopeResolver));
+getAngularJSGlobal().module(AJS_MODULE).service('EntityTypeResolver', downgradeInjectable(EntityTypeResolver));

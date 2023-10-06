@@ -114,7 +114,7 @@ export class PlanEditorBaseComponent
     map((planTypes) => {
       return planTypes.map((planType) => ({
         planType,
-        icon: this._artefactService.getArtefactType(planType)!.icon,
+        icon: this._artefactService.getArtefactType(planType)?.icon ?? '',
       }));
     })
   );

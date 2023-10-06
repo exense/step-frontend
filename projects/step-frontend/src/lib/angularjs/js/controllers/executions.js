@@ -19,28 +19,7 @@
 angular
   .module('executionsControllers', ['step'])
 
-  .run(function (ViewRegistry, EntityRegistry) {
+  .run(function (ViewRegistry) {
     ViewRegistry.registerView('executions', 'partials/execution.html');
     ViewRegistry.registerView('test', 'partials/execution/time-series-page.html');
-    //  ViewRegistry.registerDashlet('execution','History','partials/executions/latestExecutions.html','latestExecutions');
-  })
-
-  .directive('executionHistory', function ($http) {
-    return {
-      restrict: 'E',
-      scope: {
-        artefactRef: '=',
-      },
-      templateUrl: 'partials/executions/executionHistory.html',
-      controller: function ($scope) {
-        function loadLatestExecutions() {
-          $http.post('rest/executions/search/by/ref', $scope.artefactRef).then(function (response) {
-            $scope.executions = response.data;
-          });
-        }
-        loadLatestExecutions();
-      },
-    };
-  })
-
-  .controller('LatestExecutionsCtrl', function ($scope, $http) {});
+  });

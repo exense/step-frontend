@@ -1,10 +1,13 @@
-import { Component, Input, SimpleChanges } from '@angular/core';
-import { EntityScopeResolver } from '../../services/entity-scope-resolver';
+import { Component, inject, Input, SimpleChanges } from '@angular/core';
+import { EntityTypeResolver } from '../../services/entity-type-resolver';
 import { Entity } from '../../types/entity';
 import { EntityRegistry } from '../../services/entity-registry';
 
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE } from '../../../../shared';
+import { AugmentedPlansService } from '../../../../client/augmented/services/augmented-plans.service';
+import { Plan } from '../../../../client/generated';
+import { ArtefactService } from '../../../../services/artefact.service';
 
 @Component({
   selector: 'entity-icon', // eslint-disable-line @angular-eslint/component-selector
@@ -18,7 +21,12 @@ export class EntityIconComponent {
   icon: string = '';
   tooltip: string = '';
 
-  constructor(private entityScopeResolver: EntityScopeResolver, private entityRegistry: EntityRegistry) {}
+  private _entityTypeResolver = inject(EntityTypeResolver);
+  private entityRegistry = inject(EntityRegistry);
+  private _augmentedPlansService = inject(AugmentedPlansService);
+  private _artefactService = inject(ArtefactService);
+
+  constructor() {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (
@@ -32,23 +40,24 @@ export class EntityIconComponent {
   }
 
   update(): void {
-    this.icon = '';
-    this.tooltip = '';
-    let entityType;
+    const iconType = this.getIconType();
+    this.icon = iconType.icon;
+    this.tooltip = iconType.tooltip;
+  }
 
-    if (this.entityName) {
-      entityType = this.entityRegistry.getEntityByName(this.entityName);
-    }
+  private getIconType(): { icon: string; tooltip: string } {
+    const entityType = this.entityName ? this.entityRegistry.getEntityByName(this.entityName) : undefined;
+    let iconOverride = this._entityTypeResolver.getTypeExtension(this.entity, entityType);
 
-    const entityScope = this.entityScopeResolver.getScope(this.entity, entityType);
-    if (entityScope) {
-      this.icon = entityScope.icon ?? '';
-      this.tooltip = entityScope.tooltip ?? '';
-    } else {
-      if (entityType && entityType.icon) {
-        this.icon = entityType.icon ?? '';
+    if (entityType?.type === this._augmentedPlansService.PLANS_TABLE_ID) {
+      if (!iconOverride?.icon) {
+        const planEntity = this.entity as Plan;
+        const planTypeIcon = this._artefactService.getArtefactType(planEntity.root?._class)?.icon;
+        iconOverride = { icon: planTypeIcon };
       }
     }
+
+    return { icon: iconOverride?.icon ?? entityType?.icon ?? '', tooltip: iconOverride?.tooltip ?? '' };
   }
 }
 
