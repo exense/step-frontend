@@ -72,9 +72,12 @@ export class TimeSeriesConfig {
   ];
 
   static readonly AXES_FORMATTING_FUNCTIONS = {
-    bigNumber: (num: number): string => {
+    bigNumber: (num: number): string | null => {
       if (!num) {
         return '0';
+      }
+      if (num !== Math.floor(num)) {
+        return null;
       }
       const lookup = [
         { value: 1, symbol: '' },
@@ -91,9 +94,12 @@ export class TimeSeriesConfig {
         });
       return item ? (num / item.value).toFixed(2).replace(rx, '$1') + item.symbol : '0';
     },
-    time: (value: number): string => {
+    time: (value: number): string | null => {
       if (!value) {
         return '0';
+      }
+      if (value !== Math.floor(value)) {
+        return null;
       }
       if (value >= 1000) {
         let seconds = Math.floor(value / 1000);

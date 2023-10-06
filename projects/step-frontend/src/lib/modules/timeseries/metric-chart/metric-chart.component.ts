@@ -138,14 +138,14 @@ export class MetricChartComponent implements OnInit, OnChanges {
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
           scale: 'y',
           values: (u, vals, space) => {
-            return vals.map((v) => v + ' ' + yAxesUnit);
+            return vals.map((v) => this.getAxesFormattingFunction(this.settings.renderingSettings!.unit!)(v));
           },
         },
       ],
     };
   }
 
-  private getBucketValue(b: BucketResponse, aggregation: string): number {
+  private getBucketValue(b: BucketResponse, aggregation: string): number | undefined {
     if (!b) {
       return 0;
     }
@@ -161,7 +161,9 @@ export class MetricChartComponent implements OnInit, OnChanges {
       case 'COUNT':
         return b.count;
       case 'RATE':
+        return b.throughputPerHour;
       case 'MEDIAN':
+        return b.pclValues?.[50];
       case 'PERCENTILE':
       default:
         throw new Error('Unhandled aggregation value: ' + aggregation);
@@ -178,6 +180,19 @@ export class MetricChartComponent implements OnInit, OnChanges {
         return '';
       default:
         throw new Error('Unhandled unit value: ' + unit);
+    }
+  }
+
+  private getAxesFormattingFunction(unit: 'MS' | 'PERCENTAGE' | 'EMPTY'): (num: number) => string | null {
+    switch (unit) {
+      case 'MS':
+        return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time;
+      case 'PERCENTAGE':
+        return (v: number) => `${v}%`;
+      case 'EMPTY':
+        return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber;
+      default:
+        throw new Error('Unhandled unit: ' + unit);
     }
   }
 
