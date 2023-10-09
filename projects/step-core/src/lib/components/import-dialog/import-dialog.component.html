@@ -8,7 +8,7 @@
       </mat-expansion-panel-header>
       <section class="advanced-body">
         <div>
-          <step-alert [type]="AlertType.minimalist">
+          <step-alert [type]="AlertType.MINIMALIST">
             By default only plans are imported, if you want to import all entities contained in the provided files, you
             can select import all entities
           </step-alert>
@@ -18,7 +18,7 @@
         </div>
 
         <div>
-          <step-alert [type]="AlertType.minimalist">
+          <step-alert [type]="AlertType.MINIMALIST">
             By default entities are imported by generating new IDs, you can change this behavior by selecting the
             'overwrite' option in advanced settings. The option is only relevant if you want to reimport the data into
             the same controller and overwrite the existing entities.
