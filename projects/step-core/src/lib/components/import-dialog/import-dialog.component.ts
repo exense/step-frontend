@@ -27,29 +27,28 @@ export class ImportDialogComponent {
 
   @HostListener('keydown.enter')
   save(): void {
-    if (this.resourcePath) {
-      this.invokeImport()
-        .pipe(
-          tap(() => {
-            this.isImporting = true;
-          })
-        )
-        .subscribe({
-          next: (response: any) => {
-            this._matDialogRef.close();
-
-            if (response && response.length > 0) {
-              this._dialogs.showListOfMsgs(response);
-            }
-          },
-          complete: () => {
-            this.isImporting = false;
-          },
-          error: (error: any) => console.error(error),
-        });
-    } else {
+    if (!this.resourcePath) {
       this._dialogs.showErrorMsg('Upload not completed.');
+      return;
     }
+    this.invokeImport()
+      .pipe(
+        tap(() => {
+          this.isImporting = true;
+        })
+      )
+      .subscribe({
+        next: (response: string[]) => {
+          this._matDialogRef.close();
+          if (!!response?.length) {
+            this._dialogs.showListOfMsgs(response);
+          }
+        },
+        complete: () => {
+          this.isImporting = false;
+        },
+        error: (error: unknown) => console.error(error),
+      });
   }
 
   private invokeImport(): Observable<string[]> {
