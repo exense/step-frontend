@@ -17,7 +17,7 @@
  * along with STEP.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 angular
-  .module('plans', ['tables', 'step', 'screenConfigurationControllers'])
+  .module('plans', ['step', 'screenConfigurationControllers'])
 
   .factory('PlanTypeRegistry', function () {
     var api = {};

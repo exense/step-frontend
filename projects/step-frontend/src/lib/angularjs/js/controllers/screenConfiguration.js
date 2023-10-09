@@ -17,7 +17,7 @@
  * along with STEP.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 angular
-  .module('screenConfigurationControllers', ['tables', 'step'])
+  .module('screenConfigurationControllers', ['step'])
 
   .run(function (ViewRegistry, EntityRegistry) {
     ViewRegistry.registerDashlet(
