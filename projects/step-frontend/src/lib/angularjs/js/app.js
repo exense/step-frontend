@@ -409,67 +409,6 @@ angular
     };
   })
 
-  .factory('ImportDialogs', function ($rootScope, $uibModal, EntityRegistry, $sce) {
-    var dialogs = {};
-
-    dialogs.displayImportDialog = function (title, path) {
-      var modalInstance = $uibModal.open({
-        backdrop: 'static',
-        templateUrl: 'partials/importDialog.html',
-        controller: 'importModalCtrl',
-        resolve: {
-          title: function () {
-            return title;
-          },
-          path: function () {
-            return path;
-          },
-          importAll: function () {
-            return false;
-          },
-          overwrite: function () {
-            return false;
-          },
-        },
-      });
-      return modalInstance.result;
-    };
-
-    return dialogs;
-  })
-
-  .controller(
-    'importModalCtrl',
-    function ($scope, $http, $uibModalInstance, Upload, Dialogs, title, path, importAll, overwrite) {
-      $scope.title = title;
-      $scope.path = path;
-      $scope.importAll = importAll;
-      $scope.overwrite = overwrite;
-      $scope.resourcePath;
-
-      $scope.save = function () {
-        if ($scope.resourcePath) {
-          $http({
-            url: 'rest/import/' + path,
-            method: 'POST',
-            params: {path: $scope.resourcePath, importAll: $scope.importAll, overwrite: $scope.overwrite},
-          }).then(function (response) {
-            $uibModalInstance.close(response.data);
-            if (response.data && response.data.length > 0) {
-              Dialogs.showListOfMsgs(response.data);
-            }
-          });
-        } else {
-          Dialogs.showErrorMsg('Upload not completed.');
-        }
-      };
-
-      $scope.cancel = function () {
-        $uibModalInstance.dismiss('cancel');
-      };
-    }
-  )
-
   .factory('Dialogs', function ($rootScope, $uibModal, EntityRegistry, $sce) {
     var dialogs = {};
 
