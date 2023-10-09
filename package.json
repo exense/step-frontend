@@ -58,7 +58,8 @@
     "zone.js": "0.11.4",
     "ace-builds": "1.17.0",
     "angular-split": "14.1.0",
-    "luxon": "2.0.0"
+    "luxon": "2.0.0",
+    "@logicflow-ai/astra-wingman": "latest"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "14.2.7",
