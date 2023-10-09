@@ -43,7 +43,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   private entriesByIds = new Map<string, TableEntry>();
 
   readonly BASE_COLUMNS = ['name', 'count', 'sum', 'avg', 'min', 'max', 'pcl_80', 'pcl_90', 'pcl_99', 'tps', 'tph'];
-  readonly COMPARE_COLUMN_ID_SUFFIX = '_compare';
+  readonly COMPARE_COLUMN_ID_SUFFIX = '_comp';
   readonly DIFF_COLUMN_ID_SUFFIX = '_diff';
 
   tableIsLoading = true;
