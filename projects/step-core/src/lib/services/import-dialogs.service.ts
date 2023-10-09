@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { PlanImportDialogComponent } from '../components/plan-import-dialog/plan-import-dialog.component';
+import { ImportDialogComponent } from '../components/import-dialog/import-dialog.component';
 import { ImportDialogData } from '../shared/import-dialog-data.interface';
 
 @Injectable({
@@ -12,7 +12,7 @@ export class ImportDialogsService {
 
   displayImportDialog(title: string, entity: string): Observable<boolean> {
     return this._matDialog
-      .open<PlanImportDialogComponent, ImportDialogData, boolean>(PlanImportDialogComponent, {
+      .open<ImportDialogComponent, ImportDialogData, boolean>(ImportDialogComponent, {
         data: {
           title,
           entity,

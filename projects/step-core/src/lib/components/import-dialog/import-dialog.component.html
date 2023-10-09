@@ -1,0 +1,37 @@
+<step-modal-window [title]="title">
+  <div step-modal-window-body>
+    <div *ngIf="isImporting" class="alert alert-info">Importing, please wait...</div>
+    <step-resource-input [stType]="'temp'" [(stModel)]="resourcePath"></step-resource-input>
+    <mat-expansion-panel [(expanded)]="showOptions">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Advanced Options</mat-panel-title>
+      </mat-expansion-panel-header>
+      <section class="advanced-body">
+        <div>
+          <step-alert [type]="AlertType.minimalist">
+            By default only plans are imported, if you want to import all entities contained in the provided files, you
+            can select import all entities
+          </step-alert>
+          <mat-checkbox color="primary" [(ngModel)]="importAll">
+            <span>Import all entities</span>
+          </mat-checkbox>
+        </div>
+
+        <div>
+          <step-alert [type]="AlertType.minimalist">
+            By default entities are imported by generating new IDs, you can change this behavior by selecting the
+            'overwrite' option in advanced settings. The option is only relevant if you want to reimport the data into
+            the same controller and overwrite the existing entities.
+          </step-alert>
+          <mat-checkbox color="primary" [(ngModel)]="overwrite">
+            <span>Overwrite existing entities</span>
+          </mat-checkbox>
+        </div>
+      </section>
+    </mat-expansion-panel>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close>Close</button>
+    <button type="button" mat-flat-button color="primary" (click)="save()">Save</button>
+  </div>
+</step-modal-window>

@@ -1,16 +1,16 @@
 import { Observable, tap } from 'rxjs';
 import { Component, HostListener, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { DialogsService, ImportsService } from '@exense/step-core';
+import { AlertType, DialogsService, ImportsService } from '@exense/step-core';
 import { ImportDialogData } from '../../shared/import-dialog-data.interface';
 
 @Component({
   selector: 'step-plan-import-dialog',
-  templateUrl: './plan-import-dialog.component.html',
-  styleUrls: ['./plan-import-dialog.component.scss'],
+  templateUrl: './import-dialog.component.html',
+  styleUrls: ['./import-dialog.component.scss'],
 })
-export class PlanImportDialogComponent {
-  private _matDialogRef = inject<MatDialogRef<PlanImportDialogComponent, boolean>>(MatDialogRef);
+export class ImportDialogComponent {
+  private _matDialogRef = inject<MatDialogRef<ImportDialogComponent, boolean>>(MatDialogRef);
   private _dialogs = inject(DialogsService);
   private _data = inject<ImportDialogData>(MAT_DIALOG_DATA);
   private _importsService = inject(ImportsService);
@@ -23,6 +23,7 @@ export class PlanImportDialogComponent {
 
   readonly title = this._data.title;
   readonly entity = this._data.entity;
+  readonly AlertType = AlertType;
 
   @HostListener('keydown.enter')
   save(): void {
