@@ -1,8 +1,10 @@
 import { Observable, tap } from 'rxjs';
 import { Component, HostListener, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { AlertType, DialogsService, ImportsService } from '@exense/step-core';
 import { ImportDialogData } from '../../shared/import-dialog-data.interface';
+import { AlertType } from '../../modules/basics/step-basics.module';
+import { ImportsService } from '../../client/step-client-module';
+import { DialogsService } from '../../shared';
 
 @Component({
   selector: 'step-plan-import-dialog',

@@ -287,6 +287,7 @@ export { EditableTextareaLabelComponent } from './components/editable-textarea-l
 export * from './components/entity-column-container/entity-column-container.component';
 export * from './components/entity-column/entity-column.component';
 export * from './components/export-dialog/export-dialog.component';
+export * from './components/import-dialog/import-dialog.component';
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
 export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
