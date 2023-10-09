@@ -19,10 +19,10 @@
             </mat-checkbox>
             <step-alert [type]="AlertType.MINIMALIST">
               When selected, also referenced entities will be exported, including those from accessible 'global'
-              projects <br />
+              projects. <br />
               Indirect references can’t be resolved and therefore are not exported. This includes any reference using
               <strong>dynamic expression, file resources</strong> (dataset files, keyword libraries...) defined with a
-              filesystem path instead of a step-resource” and <strong>parameters</strong>
+              filesystem path instead of a step-resource” and <strong>parameters</strong>.
             </step-alert>
           </div>
           <div>
@@ -30,7 +30,7 @@
               <span>Include an export of all parameters</span>
             </mat-checkbox>
             <step-alert [type]="AlertType.MINIMALIST">
-              If parameter references need to be included in the export, select this option to include all parameters
+              If parameter references need to be included in the export, select this option to include all parameters.
             </step-alert>
           </div>
         </section>
