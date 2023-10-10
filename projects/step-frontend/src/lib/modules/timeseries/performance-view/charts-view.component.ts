@@ -153,10 +153,11 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       .onChartsResolutionChange()
       .pipe(skip(1))
       .subscribe(() => {
-        this.createAllBaseCharts();
+        const observables = [this.updateBaseCharts({ updateCharts: true, showLoadingBar: true, updateRanger: false })];
         if (this.compareModeEnabled) {
-          this.createAllCompareCharts(this.compareModeContext!);
+          observables.push(this.updateCompareCharts({ updateRanger: false, updateCharts: true, showLoadingBar: true }));
         }
+        forkJoin(observables).subscribe();
       });
 
     this.createAllBaseCharts();
