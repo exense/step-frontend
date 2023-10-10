@@ -88,7 +88,10 @@
         <button
           mat-icon-button
           matTooltip="Edit parameter"
-          [disabled]="!('param-write' | hasRight | async)"
+          [disabled]="
+            !('param-write' | hasRight | async) ||
+            (element.scope === 'GLOBAL' && !('param-global-write' | hasRight | async))
+          "
           (click)="_logic.editParameter(element)"
         >
           <step-icon name="edit-2">edit</step-icon>
@@ -96,7 +99,10 @@
         <button
           mat-icon-button
           matTooltip="Duplicate parameter"
-          [disabled]="!('param-write' | hasRight | async)"
+          [disabled]="
+            !('param-write' | hasRight | async) ||
+            (element.scope === 'GLOBAL' && !('param-global-write' | hasRight | async))
+          "
           (click)="_logic.duplicateParameter(element)"
         >
           <step-icon name="copy"></step-icon>
@@ -104,7 +110,10 @@
         <button
           mat-icon-button
           matTooltip="Delete parameter"
-          [disabled]="!('param-delete' | hasRight | async)"
+          [disabled]="
+            !('param-delete' | hasRight | async) ||
+            (element.scope === 'GLOBAL' && !('param-global-write' | hasRight | async))
+          "
           (click)="_logic.deleteParameter(element.id, element.key)"
         >
           <step-icon name="trash-2"></step-icon>
@@ -112,7 +121,10 @@
         <button
           mat-icon-button
           matTooltip="Version history"
-          [disabled]="!('param-delete' | hasRight | async)"
+          [disabled]="
+            !('param-delete' | hasRight | async) ||
+            (element.scope === 'GLOBAL' && !('param-global-write' | hasRight | async))
+          "
           (click)="_logic.displayHistory(element, 'param-write')"
           class="history"
         >
