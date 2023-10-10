@@ -77,6 +77,7 @@ import { SelectTaskComponent } from './components/select-task/select-task.compon
 import { SchedulerTaskLinkComponent } from './components/scheduler-task-link/scheduler-task-link.component';
 import { ResourceInputWrapperComponent } from './components/resource-input-wrapper/resource-input-wrapper.component';
 import { WizardModule } from './modules/wizard/wizards.module';
+import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.component';
 
 @NgModule({
   declarations: [
@@ -135,6 +136,7 @@ import { WizardModule } from './modules/wizard/wizards.module';
     MyAccountButtonComponent,
     SelectTaskComponent,
     ResourceInputWrapperComponent,
+    SimpleOutletComponent,
   ],
   imports: [
     CommonModule,
@@ -375,6 +377,7 @@ export * from './modules/basics/shared/api-token.interface';
 export * from './components/base-artefact/base-artefact.component';
 export * from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 export * from './components/artefact-details/artefact-details.component';
+export * from './components/simple-outlet/simple-outlet.component';
 export * from './services/special-links.service';
 export * from './shared/special-links-strategy';
 export * from './modules/entity/pipes/cast-entity-to-plan.pipe';

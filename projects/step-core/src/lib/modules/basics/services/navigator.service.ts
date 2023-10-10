@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { DEFAULT_PAGE } from './default-page.token';
 import { AJS_MODULE } from '../../../shared/constants';
-import { AJS_LOCATION } from '../../../shared/angularjs-providers';
 import { DOCUMENT } from '@angular/common';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { VIEW_ID_LINK_PREFIX } from './view-id-link-prefix.token';
@@ -12,7 +11,6 @@ import { from, switchMap, timer } from 'rxjs';
   providedIn: 'root',
 })
 export class NavigatorService {
-  // private _$location = inject(AJS_LOCATION);
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
   private _defaultPage = inject(DEFAULT_PAGE);

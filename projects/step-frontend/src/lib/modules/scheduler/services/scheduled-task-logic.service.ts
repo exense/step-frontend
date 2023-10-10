@@ -1,6 +1,5 @@
 import { inject, Injectable } from '@angular/core';
 import {
-  AJS_LOCATION,
   AugmentedPlansService,
   AugmentedSchedulerService,
   AuthService,
@@ -13,7 +12,6 @@ import {
   SchedulerActionsService,
 } from '@exense/step-core';
 import { map, Observable, of, pipe, switchMap, take, tap } from 'rxjs';
-import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 
 const TASK_ID = 'taskId';

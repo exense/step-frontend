@@ -1,6 +1,5 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import {
-  AJS_LOCATION,
   AJS_MODULE,
   AJS_ROOT_SCOPE,
   ArtefactInfo,
@@ -14,10 +13,11 @@ import {
   SelectionCollector,
   TestRunStatus,
 } from '@exense/step-core';
-import { ILocationService, IRootScopeService } from 'angular';
+import { IRootScopeService } from 'angular';
 import { map, noop, Observable, of } from 'rxjs';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { IncludeTestcases } from '../../shared/include-testcases.interface';
+import { ActivatedRoute, Router } from '@angular/router';
 
 type FieldAccessor = Mutable<
   Pick<
@@ -56,7 +56,7 @@ export class RepositoryComponent implements OnInit, OnDestroy {
 
   constructor(
     @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService,
-    @Inject(AJS_LOCATION) private _$location: ILocationService,
+    private _activatedRoute: ActivatedRoute,
     private _auth: AuthService,
     private _controllersApi: ControllerService,
 
@@ -81,16 +81,16 @@ export class RepositoryComponent implements OnInit, OnDestroy {
   }
 
   private setupLocationParams(): void {
-    const search = this._$location.search();
-    (this as FieldAccessor).isolateExecution = !!search.isolate;
+    const search = this._activatedRoute.snapshot.queryParams;
+    (this as FieldAccessor).isolateExecution = !!search['isolate'];
 
-    if (search.user) {
-      this._auth.updateContext({ userID: search.user });
+    if (search['user']) {
+      this._auth.updateContext({ userID: search['user'] });
     }
 
-    if (search.repositoryId) {
+    if (search['repositoryId']) {
       (this as FieldAccessor).repoRef = {
-        repositoryID: search.repositoryId,
+        repositoryID: search['repositoryId'],
         repositoryParameters: Object.entries(search).reduce((result, [key, value]) => {
           if (!['repositoryId', 'tenant'].includes(key)) {
             result[key] = value as string;
