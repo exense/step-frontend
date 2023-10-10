@@ -35,6 +35,7 @@ export class ByStatusChartGenerator {
         stroke: color,
         fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
         points: { show: false },
+        show: true,
       };
     });
     return {
