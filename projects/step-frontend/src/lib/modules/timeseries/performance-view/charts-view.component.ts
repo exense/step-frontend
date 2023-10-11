@@ -151,13 +151,29 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     });
     this.context
       .onChartsResolutionChange()
-      .pipe(skip(1))
-      .subscribe(() => {
-        this.createAllBaseCharts();
-        if (this.compareModeEnabled) {
-          this.createAllCompareCharts(this.compareModeContext!);
-        }
-      });
+      .pipe(
+        skip(1),
+        switchMap(() => {
+          const chartsUpdates$ = [
+            this.updateBaseCharts({
+              updateCharts: true,
+              showLoadingBar: true,
+              updateRanger: false,
+            }),
+          ];
+          if (this.compareModeEnabled) {
+            chartsUpdates$.push(
+              this.updateCompareCharts({
+                updateRanger: false,
+                updateCharts: true,
+                showLoadingBar: true,
+              })
+            );
+          }
+          return forkJoin(chartsUpdates$);
+        })
+      )
+      .subscribe();
 
     this.createAllBaseCharts();
   }
