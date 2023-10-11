@@ -159,29 +159,3 @@ angular
       $scope.autorefresh = { enabled: true, interval: 5000, refreshFct: refresh };
     },
   ])
-
-  .controller('QuotaManagerCtrl', [
-    '$scope',
-    '$http',
-    '$interval',
-    function ($scope, $http, $interval) {
-      $scope.$state = 'quotamanager';
-
-      $scope.load = function loadTable() {
-        $http.get('rest/quotamanager/status').then(
-          function (response) {
-            $scope.statusText = response.data;
-          },
-          function (error) {
-            $scope.statusText = '';
-          }
-        );
-      };
-
-      var refresh = function () {
-        $scope.load();
-      };
-      $scope.autorefresh = { enabled: true, interval: 5000, refreshFct: refresh };
-      $scope.load();
-    },
-  ]);
