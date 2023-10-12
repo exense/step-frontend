@@ -30,7 +30,10 @@ export class CustomFormComponent implements OnInit {
 
   protected updateInputs() {
     this._screensService.getInputsForScreenPost(this.stScreen, this.stModel).subscribe((inputs) => {
-      this.inputs = inputs.filter((input) => !this.stExcludeFields.includes(input.id!));
+      const updatedInputs = inputs.filter((input) => !this.stExcludeFields.includes(input.id!));
+      if (JSON.stringify(this.inputs) !== JSON.stringify(updatedInputs)) {
+        this.inputs = updatedInputs;
+      }
     });
   }
 
