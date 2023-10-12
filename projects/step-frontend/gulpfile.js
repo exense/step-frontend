@@ -42,7 +42,6 @@ const SCRIPTS = [
   './src/lib/angularjs/js/controllers/executions.js',
   './src/lib/angularjs/js/controllers/screenConfiguration.js',
   './src/lib/angularjs/js/controllers/repository.js',
-  './src/lib/angularjs/js/controllers/settings.js',
   './src/lib/angularjs/js/controllers/dynamicForms.js',
   './src/lib/angularjs/js/controllers/components.js',
   './src/lib/angularjs/js/datatable-ext-paginationinput.js',

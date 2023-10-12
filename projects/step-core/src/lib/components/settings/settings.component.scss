@@ -1,0 +1,20 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  display: flex;
+  gap: 3rem;
+  padding: 3rem;
+  justify-content: space-between;
+}
+
+mat-nav-list {
+  width: 16.6%;
+  a.active-list-item {
+    color: var.$white !important;
+    background: var.$blue-600 !important;
+  }
+}
+
+.content {
+  flex-grow: 1;
+}
