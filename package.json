@@ -1,6 +1,6 @@
 {
   "name": "step-frontend",
-  "version": "0.0.0",
+  "version": "3.24.0",
   "scripts": {
     "ng": "ng",
     "build:core:lib": "ng build @exense/step-core",
