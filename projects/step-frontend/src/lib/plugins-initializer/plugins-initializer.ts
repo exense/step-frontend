@@ -56,7 +56,7 @@ const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
       //@ts-ignore
       if (plugin['entryPoint']) {
         //@ts-ignore
-        plugin['entryPoint'] += '?v=${project.version}';
+        plugin['entryPoint'] += '?v=3.23.0';
       }
 
       const angularModules = (plugin as LegacyPluginDefinition)?.angularModules || [];
