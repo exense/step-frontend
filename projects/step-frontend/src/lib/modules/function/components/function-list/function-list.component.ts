@@ -1,7 +1,6 @@
 import { AfterViewInit, Component, inject, Injector } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  AJS_LOCATION,
   AJS_MODULE,
   AJS_ROOT_SCOPE,
   AugmentedKeywordsService,
@@ -12,11 +11,10 @@ import {
   tablePersistenceConfigProvider,
   STORE_ALL,
   FunctionActionsService,
-  Plan,
-  FunctionType,
   RestoreDialogsService,
 } from '@exense/step-core';
 import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'step-function-list',
@@ -35,8 +33,7 @@ export class FunctionListComponent implements AfterViewInit {
   private _functionPackageDialogs = inject(FunctionPackageActionsService);
   private _restoreDialogsService = inject(RestoreDialogsService);
   private _$rootScope = inject(AJS_ROOT_SCOPE);
-  private _location = inject(AJS_LOCATION);
-
+  private _router = inject(Router);
   readonly dataSource = this._functionApiService.createFilteredTableDataSource();
 
   ngAfterViewInit(): void {
@@ -65,7 +62,7 @@ export class FunctionListComponent implements AfterViewInit {
         interactive: true,
         selectedNode: result.callFunctionId,
       };
-      this._location.path('/root/plans/editor/' + result.planId);
+      this._router.navigateByUrl(`/root/plans/editor/${result.planId}`);
     });
   }
 

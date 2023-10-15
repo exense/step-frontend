@@ -27,7 +27,6 @@ var tecAdminApp = angular
     'repositoryControllers',
     'functionsControllers',
     'executionsControllers',
-    'parametersControllers',
     'resourcesControllers',
     'settingControllers',
     'screenConfigurationControllers',

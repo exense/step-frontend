@@ -3,7 +3,7 @@ import { inject, Injectable, OnDestroy } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { SessionDto } from '../../../domain';
 import { BehaviorSubject, catchError, map, Observable, of, switchMap, tap } from 'rxjs';
-import { AJS_LOCATION, AJS_PREFERENCES, AJS_ROOT_SCOPE } from '../../../shared/angularjs-providers';
+import { AJS_PREFERENCES, AJS_ROOT_SCOPE } from '../../../shared/angularjs-providers';
 import { AJS_MODULE } from '../../../shared/constants';
 import { AdditionalRightRuleService } from '../../../services/additional-right-rule.service';
 import { ApplicationConfiguration, PrivateApplicationService } from '../../../client/generated';
@@ -12,6 +12,7 @@ import { AuthContext } from '../shared/auth-context.interface';
 import { CredentialsService } from './credentials.service';
 import { AppConfigContainerService } from './app-config-container.service';
 import { NavigatorService } from './navigator.service';
+import { Router } from '@angular/router';
 
 type FieldAccessor = Mutable<Pick<AuthService, 'isOidc'>>;
 
@@ -24,7 +25,7 @@ const ANONYMOUS = 'anonymous';
 })
 export class AuthService implements OnDestroy {
   private _$rootScope = inject(AJS_ROOT_SCOPE);
-  private _$location = inject(AJS_LOCATION);
+  private _router = inject(Router);
   private _document = inject(DOCUMENT);
   private _preferences = inject(AJS_PREFERENCES);
   private _additionalRightRules = inject(AdditionalRightRuleService);
@@ -76,7 +77,7 @@ export class AuthService implements OnDestroy {
       tap(() => {
         const context = this.getContext();
         if (context && !context.otp) {
-          if (this._$location.path().indexOf('login') !== -1) {
+          if (this._router.url.indexOf('login') !== -1) {
             this._navigator.navigateToHome();
           }
           (this._$rootScope as any).broadcast('step.login.succeeded');

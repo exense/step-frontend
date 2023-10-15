@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { UpgradeModule } from '@angular/upgrade/static';
-import { AJS_MODULE, StepCoreModule } from '@exense/step-core';
+import { AJS_MODULE, StepCoreModule, ViewRegistryService } from '@exense/step-core';
 import { AdminModule } from './modules/admin/admin.module';
 import { DefaultThemeModule } from './modules/default-theme/default-theme.module';
 import { ExecutionModule } from './modules/execution/execution.module';
@@ -16,8 +16,22 @@ import { TimeSeriesModule } from './modules/timeseries/time-series.module';
 import { ArtefactsModule } from './modules/artefacts/artefacts.module';
 import { PLUGINS_INITIALIZER } from './plugins-initializer/plugins-initializer';
 import { Settings } from 'luxon';
+import { RouterModule, Routes } from '@angular/router';
+import { LegacyOutletComponent } from './modules/_common/components/legacy-outlet/legacy-outlet.component';
 
 Settings.defaultLocale = 'en';
+
+const ROOT_ROUTES: Routes = [
+  {
+    path: 'root',
+    children: [
+      {
+        matcher: ViewRegistryService.isMatchToLegacyRoutes,
+        component: LegacyOutletComponent,
+      },
+    ],
+  },
+];
 
 @NgModule({
   declarations: [],
@@ -37,6 +51,7 @@ Settings.defaultLocale = 'en';
     DefaultThemeModule,
     ArtefactsModule,
     ResourcesModule,
+    RouterModule.forRoot(ROOT_ROUTES, { useHash: true }),
   ],
   providers: [PLUGINS_INITIALIZER],
 })

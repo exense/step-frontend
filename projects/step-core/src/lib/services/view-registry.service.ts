@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE } from '../shared';
 import { VIEW_ID_LINK_PREFIX } from '../modules/basics/services/view-id-link-prefix.token';
+import { Route, Router, UrlMatcher, UrlSegment } from '@angular/router';
 
 export interface CustomView {
   template: string;
@@ -31,11 +32,30 @@ export interface Dashlet {
 })
 export class ViewRegistryService {
   private _viewIdLinkPrefix = inject(VIEW_ID_LINK_PREFIX);
+  private _router = inject(Router);
 
   registeredViews: { [key: string]: CustomView } = {};
   registeredMenuEntries: MenuEntry[] = [];
   registeredMenuIds: string[] = [];
   registeredDashlets: { [key: string]: Dashlet[] | undefined } = {};
+
+  private static registeredRoutes: string[] = [];
+
+  static readonly isMatchToLegacyRoutes: UrlMatcher = (url: UrlSegment[]) => {
+    if (url.length < 0) {
+      return null;
+    }
+    const path = url[0].path;
+    if (ViewRegistryService.registeredRoutes.find((route) => path.startsWith(route))) {
+      return null;
+    }
+
+    return { consumed: url };
+  };
+
+  isMigratedRoute(view: string): boolean {
+    return ViewRegistryService.registeredRoutes.includes(view);
+  }
 
   constructor() {
     this.registerStandardMenuEntries();
@@ -98,20 +118,43 @@ export class ViewRegistryService {
     }
   }
 
+  /**
+   * @deprecated use getCustomView instead
+   * @param view
+   */
   getViewTemplate(view: string) {
     return this.getCustomView(view).template;
   }
 
+  /**
+   * @deprecated use getCustomView instead
+   * @param view
+   */
   isPublicView(view: string) {
     return this.getCustomView(view).isPublicView;
   }
 
+  /**
+   * @deprecated use getCustomView instead
+   * @param view
+   */
   isStaticView(view: string) {
     return this.getCustomView(view).isStaticView;
   }
 
   registerView(viewId: string, template: string, isPublicView?: boolean): void {
     this.registerViewWithConfig(viewId, template, { isPublicView: isPublicView });
+  }
+
+  registerRoute(route: Route): void {
+    const root = this._router.config.find((parent) => parent.path === 'root');
+    if (!root?.children) {
+      return;
+    }
+    if (route.path) {
+      ViewRegistryService.registeredRoutes.push(route.path);
+    }
+    root.children.push(route);
   }
 
   registerViewWithConfig(
