@@ -20,12 +20,17 @@ export class QuotaManagerComponent implements OnInit {
   getQuotaManagerStatus(): void {
     this._augmentedQuotaManagerService.getQuotaManagerStatus().subscribe({
       next: (response: string) => {
-        const parts = response.split('.');
-        if (parts.length > 1) {
-          this.statusTitle = parts[0].trim();
-          this.statusBody = parts.slice(1).join('.').trim();
-        } else {
+        if (response.includes(':')) {
           this.statusTitle = response.trim();
+          this.statusBody = '';
+        } else if (response.includes('.')) {
+          const parts = response.split('.');
+          const title = parts[0].trim();
+          const body = parts.slice(1).join('.').trim();
+          this.statusTitle = title || response.trim();
+          this.statusBody = body;
+        } else {
+          this.statusTitle = '';
           this.statusBody = '';
         }
       },
