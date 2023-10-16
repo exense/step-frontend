@@ -65,7 +65,7 @@ export class NavigatorService {
   }
 
   private prepareQueryParams(): Params | null {
-    const queryParams = this._activatedRoute.snapshot.queryParams;
+    const queryParams = { ...this._activatedRoute.snapshot.queryParams };
     if (!queryParams?.['tsParams']) {
       return null;
     }
