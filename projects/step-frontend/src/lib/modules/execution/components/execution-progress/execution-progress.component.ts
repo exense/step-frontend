@@ -315,8 +315,8 @@ export class ExecutionProgressComponent
       return;
     }
     this._executionService.getExecutionById(eId).subscribe((execution) => {
-      this.onExecutionStatusUpdate(execution?.status);
       this.execution = execution;
+      this.onExecutionStatusUpdate(execution?.status);
       if (updateSelection !== UpdateSelection.NONE) {
         this.determineDefaultSelection();
       }
