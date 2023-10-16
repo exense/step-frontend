@@ -20,29 +20,35 @@ export class QuotaManagerComponent implements OnInit {
   getQuotaManagerStatus(): void {
     this._augmentedQuotaManagerService.getQuotaManagerStatus().subscribe({
       next: (response: string) => {
-        if (response.includes(':')) {
-          this.statusTitle = response.trim();
-          this.statusBody = '';
-        } else if (response.includes('.')) {
-          const parts = response.split('.');
-          const title = parts[0].trim();
-          const body = parts.slice(1).join('.').trim();
-          this.statusTitle = title || response.trim();
-          this.statusBody = body;
-        } else {
-          this.statusTitle = '';
-          this.statusBody = '';
-        }
+        this.updateStatus(response);
       },
       error: () => {
-        this.statusTitle = '';
-        this.statusBody = '';
+        this.clearStatus();
       },
     });
   }
 
   refresh(): void {
     this.getQuotaManagerStatus();
+  }
+
+  private updateStatus(response: string): void {
+    const delimiter = response.includes(':') ? ':' : '.';
+    const { title, body } = this.renderMessage(response, delimiter);
+    this.statusTitle = title;
+    this.statusBody = body;
+  }
+
+  private clearStatus(): void {
+    this.statusTitle = '';
+    this.statusBody = '';
+  }
+
+  private renderMessage(message: string, delimiter: string): { title: string; body: string } {
+    const parts = message.split(delimiter);
+    const title = parts[0].trim() || message.trim();
+    const body = parts.slice(1).join(delimiter).trim();
+    return { title, body };
   }
 }
 
