@@ -153,7 +153,6 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       .onChartsResolutionChange()
       .pipe(skip(1))
       .subscribe(() => {
-        console.log('RESOLUTION CHANGED');
         this.createAllBaseCharts();
         if (this.compareModeEnabled) {
           this.createAllCompareCharts(this.compareModeContext!);
