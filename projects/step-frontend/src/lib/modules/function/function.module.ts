@@ -11,6 +11,7 @@ import {
   ViewRegistryService,
   FunctionConfigurationService,
   SimpleOutletComponent,
+  FunctionPackageTypeRegistryService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
@@ -67,13 +68,15 @@ export class FunctionModule {
     private _cellsRegistry: CustomCellRegistryService,
     private _viewRegistry: ViewRegistryService,
     private _searchCellsRegistry: CustomSearchCellRegistryService,
-    private _functionTypeRegistryService: FunctionTypeRegistryService
+    private _functionTypeRegistryService: FunctionTypeRegistryService,
+    private _functionPackageTypeRegistryService: FunctionPackageTypeRegistryService
   ) {
     this.registerEntities();
     this.registerViews();
     this.registerCells();
     this.registerSearchCells();
     this.registerFunctionTypes();
+    this.registerFunctionPackageTypes();
   }
 
   private registerEntities(): void {
@@ -90,6 +93,10 @@ export class FunctionModule {
   }
 
   private registerViews(): void {
+    this._viewRegistry.registerRoute({
+      path: 'functionPackages',
+      component: FunctionPackageListComponent,
+    });
     this._viewRegistry.registerRoute({
       path: 'functions',
       component: FunctionListComponent,
@@ -127,5 +134,10 @@ export class FunctionModule {
     );
     this._functionTypeRegistryService.register(FunctionType.J_METER, 'JMeter', FunctionTypeJMeterComponent);
     this._functionTypeRegistryService.register(FunctionType.NODE_JS, 'Node.js', FunctionTypeNodeJSComponent);
+  }
+
+  private registerFunctionPackageTypes(): void {
+    this._functionPackageTypeRegistryService.register('java', 'Java Jar');
+    this._functionPackageTypeRegistryService.register('dotnet', '.NET DLL');
   }
 }
