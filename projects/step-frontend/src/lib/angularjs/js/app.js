@@ -24,7 +24,6 @@ var tecAdminApp = angular
     'gridControllers',
     'repositoryControllers',
     'executionsControllers',
-    'resourcesControllers',
     'screenConfigurationControllers',
     'dashboardsControllers',
     'asyncTask',
