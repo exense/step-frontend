@@ -10,6 +10,7 @@ import {
   StepCoreModule,
   ViewRegistryService,
   FunctionConfigurationService,
+  SimpleOutletComponent,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
@@ -89,8 +90,20 @@ export class FunctionModule {
   }
 
   private registerViews(): void {
-    this._viewRegistry.registerView('functions', 'partials/functionList.html');
-    this._viewRegistry.registerView('composites', 'partials/functions/compositeKeywordEditor.html');
+    this._viewRegistry.registerRoute({
+      path: 'functions',
+      component: FunctionListComponent,
+    });
+    this._viewRegistry.registerRoute({
+      path: 'composites',
+      component: SimpleOutletComponent,
+      children: [
+        {
+          path: 'editor/:id',
+          component: CompositeFunctionEditorComponent,
+        },
+      ],
+    });
   }
 
   private registerCells(): void {

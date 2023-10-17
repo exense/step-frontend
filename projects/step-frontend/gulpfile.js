@@ -36,7 +36,6 @@ const SCRIPTS = [
   './src/lib/angularjs/js/controllers/grid.js',
   './src/lib/angularjs/js/controllers/plans.js',
   './src/lib/angularjs/js/controllers/planEditor.js',
-  './src/lib/angularjs/js/controllers/functions.js',
   './src/lib/angularjs/js/controllers/resources.js',
   './src/lib/angularjs/js/controllers/dashboards.js',
   './src/lib/angularjs/js/controllers/executions.js',

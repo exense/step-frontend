@@ -142,6 +142,9 @@ export class ViewRegistryService {
     return this.getCustomView(view).isStaticView;
   }
 
+  /**
+   * @deprecated
+   * **/
   registerView(viewId: string, template: string, isPublicView?: boolean): void {
     this.registerViewWithConfig(viewId, template, { isPublicView: isPublicView });
   }
@@ -157,6 +160,9 @@ export class ViewRegistryService {
     root.children.push(route);
   }
 
+  /**
+   * @deprecated
+   * **/
   registerViewWithConfig(
     viewId: string,
     template: string,
