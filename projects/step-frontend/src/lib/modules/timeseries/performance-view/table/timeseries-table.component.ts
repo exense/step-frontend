@@ -114,7 +114,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         isVisible: true,
         isCompareColumn: false,
         mapValue: (entry) => entry?.sum,
-        mapDiffValue: (entry) => entry.countDiff,
+        mapDiffValue: (entry) => entry.sumDiff,
       },
       {
         id: 'avg',
@@ -123,7 +123,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         isVisible: true,
         isCompareColumn: false,
         mapValue: (entry) => entry?.attributes?.['avg'],
-        mapDiffValue: (entry) => entry.countDiff,
+        mapDiffValue: (entry) => entry.avgDiff,
       },
       {
         id: 'min',
@@ -132,7 +132,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         isVisible: true,
         isCompareColumn: false,
         mapValue: (entry) => entry?.min,
-        mapDiffValue: (entry) => entry.countDiff,
+        mapDiffValue: (entry) => entry.minDiff,
       },
       {
         id: 'max',
@@ -141,7 +141,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         isVisible: true,
         isCompareColumn: false,
         mapValue: (entry) => entry?.max,
-        mapDiffValue: (entry) => entry.countDiff,
+        mapDiffValue: (entry) => entry.maxDiff,
       },
       {
         id: 'pcl_80',
@@ -150,7 +150,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         isVisible: true,
         isCompareColumn: false,
         mapValue: (entry) => entry?.pclValues?.[80],
-        mapDiffValue: (entry) => entry.countDiff,
+        mapDiffValue: (entry) => entry.pcl80Diff,
       },
       {
         id: 'pcl_90',
@@ -159,7 +159,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         isVisible: true,
         isCompareColumn: false,
         mapValue: (entry) => entry?.max,
-        mapDiffValue: (entry) => entry.countDiff,
+        mapDiffValue: (entry) => entry.pcl90Diff,
       },
       {
         id: 'pcl_99',
@@ -168,7 +168,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         isVisible: true,
         isCompareColumn: false,
         mapValue: (entry) => entry?.max,
-        mapDiffValue: (entry) => entry.countDiff,
+        mapDiffValue: (entry) => entry.pcl99Diff,
       },
       {
         id: 'tps',
@@ -177,7 +177,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         isVisible: true,
         isCompareColumn: false,
         mapValue: (entry) => entry?.attributes?.['tps'],
-        mapDiffValue: (entry) => entry.countDiff,
+        mapDiffValue: (entry) => entry.tpsDiff,
       },
       {
         id: 'tph',
@@ -186,7 +186,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         isVisible: true,
         isCompareColumn: false,
         mapValue: (entry) => entry?.attributes?.['tps'],
-        mapDiffValue: (entry) => entry.countDiff,
+        mapDiffValue: (entry) => entry.tphDiff,
       },
     ];
   }
