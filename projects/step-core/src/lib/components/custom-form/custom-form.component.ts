@@ -1,5 +1,4 @@
 import { Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { Input as StInput, ScreensService } from '../../client/generated';
 import { AJS_MODULE, setObjectFieldValue } from '../../shared';
 
@@ -41,7 +40,3 @@ export class CustomFormComponent implements OnInit {
     this.customInputTouch.emit();
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepCustomForms', downgradeComponent({ component: CustomFormComponent }));
