@@ -1,0 +1,16 @@
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+step-form-field {
+  min-width: 50rem;
+}
