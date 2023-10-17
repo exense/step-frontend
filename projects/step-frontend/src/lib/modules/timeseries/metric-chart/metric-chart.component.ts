@@ -42,16 +42,15 @@ export class MetricChartComponent implements OnInit, OnChanges {
   }
 
   private init(settings: MetricType, range: TSTimeRange): void {
-    const groupByAttribute = settings.groupingAttribute;
-    const groupDimensions = groupByAttribute ? [groupByAttribute] : [];
+    const groupDimensions = settings.renderingSettings!.defaultGroupingAttributes || [];
     const request: FetchBucketsRequest = {
       start: range.from,
       end: range.to,
       groupDimensions: groupDimensions,
-      oqlFilter: FilterUtils.objectToOQL({ ...this.filters, 'attributes.metricType': `"${settings.name!}"` }),
+      oqlFilter: FilterUtils.objectToOQL({ ...this.filters, 'attributes.metricType': `"${settings.key!}"` }),
       numberOfBuckets: 100,
     };
-    this._timeSeriesService.getBuckets(request).subscribe((response) => {
+    this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
       this.chartSettings = this.createChartSettings(response, groupDimensions);
     });
   }
@@ -63,6 +62,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
   }
 
   private createChartSettings(response: TimeSeriesAPIResponse, groupDimensions: string[]): TSChartSettings {
+    const renderingSettings = this.settings.renderingSettings!;
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const series: TSChartSeries[] = response.matrix.map((series, i) => {
       const seriesLabel = this.getSeriesKey(response.matrixKeys[i], groupDimensions);
@@ -71,16 +71,17 @@ export class MetricChartComponent implements OnInit, OnChanges {
         id: seriesLabel,
         label: seriesLabel,
         legendName: seriesLabel,
-        data: series.map((b) => this.getBucketValue(b, this.settings.defaultAggregation!)),
-        value: (self, x) => TimeSeriesUtils.formatAxisValue(x),
+        data: series.map((b) => this.getBucketValue(b, renderingSettings!.defaultAggregation!)),
+        value: (self, x) => TimeSeriesUtils.formatNumericAxisValue(x),
         stroke: color,
         fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
         points: { show: false },
       };
     });
-    let yAxesUnit = this.settings.unit || '';
+    let yAxesUnit = this.getUnitLabel(renderingSettings!.unit);
+
     return {
-      title: this.settings.label!,
+      title: this.settings.name!,
       xValues: xLabels,
       series: series,
       tooltipOptions: {
@@ -92,14 +93,41 @@ export class MetricChartComponent implements OnInit, OnChanges {
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
           scale: 'y',
           values: (u, vals, space) => {
-            return vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + ' ' + yAxesUnit);
+            return vals.map(
+              (v) => this.getAxesFormatFunction(renderingSettings.unit)(v) + this.getUnitLabel(renderingSettings.unit)
+            );
           },
         },
       ],
     };
   }
 
-  private getBucketValue(b: BucketResponse, aggregation: 'SUM' | 'AVG' | 'MAX' | 'MIN'): number {
+  private getAxesFormatFunction(unit: undefined | 'MS' | 'PERCENTAGE' | 'EMPTY'): (v: number) => string {
+    if (!unit) {
+      return (v) => v.toString();
+    }
+    switch (unit) {
+      case 'MS':
+        return TimeSeriesUtils.formatTimeAxisValue;
+      case 'PERCENTAGE':
+        return (v) => v.toString();
+      case 'EMPTY':
+        return TimeSeriesUtils.formatNumericAxisValue;
+    }
+  }
+
+  private getUnitLabel(unit: undefined | 'MS' | 'PERCENTAGE' | 'EMPTY'): string {
+    if (unit === 'PERCENTAGE') {
+      return '%';
+    } else {
+      return '';
+    }
+  }
+
+  private getBucketValue(
+    b: BucketResponse,
+    aggregation: 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE'
+  ): number {
     if (!b) {
       return 0;
     }
@@ -112,6 +140,12 @@ export class MetricChartComponent implements OnInit, OnChanges {
         return b.max;
       case 'MIN':
         return b.min;
+      case 'COUNT':
+        return b.count;
+      case 'RATE':
+        return b.throughputPerHour;
+      case 'MEDIAN':
+      case 'PERCENTILE':
       default:
         throw new Error('Unhandled aggregation value: ' + aggregation);
     }

@@ -43,10 +43,10 @@ export class TimeSeriesService {
    * @returns TimeSeriesAPIResponse default response
    * @throws ApiError
    */
-  public getBuckets(requestBody?: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
+  public getMeasurements(requestBody?: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/time-series/buckets',
+      url: '/time-series/measurements',
       body: requestBody,
       mediaType: 'application/json',
     });
@@ -90,6 +90,20 @@ export class TimeSeriesService {
       query: {
         filter: filter,
       },
+    });
+  }
+
+  /**
+   * @param requestBody
+   * @returns TimeSeriesAPIResponse default response
+   * @throws ApiError
+   */
+  public getTimeSeries(requestBody?: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/time-series',
+      body: requestBody,
+      mediaType: 'application/json',
     });
   }
 

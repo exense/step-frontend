@@ -22,19 +22,19 @@ export class ChartsViewConfig {
     {
       label: ThroughputMetricType.TPH,
       mapFunction: (b: BucketResponse) => (b ? b.throughputPerHour : 0),
-      labelFunction: (value: number) => `${TimeSeriesUtils.formatAxisValue(value)}/h`,
+      labelFunction: (value: number) => `${TimeSeriesUtils.formatNumericAxisValue(value)}/h`,
       tooltipZAxisLabel: 'Total Hits/h',
     },
     {
       label: ThroughputMetricType.TPM,
       mapFunction: (b: BucketResponse) => (b ? b.throughputPerHour / 60 : 0),
-      labelFunction: (value: number) => `${TimeSeriesUtils.formatAxisValue(value)}/m`,
+      labelFunction: (value: number) => `${TimeSeriesUtils.formatNumericAxisValue(value)}/m`,
       tooltipZAxisLabel: 'Total Hits/m',
     },
     {
       label: ThroughputMetricType.TPS,
       mapFunction: (b: BucketResponse) => (b ? b.throughputPerHour / (60 * 60) : 0),
-      labelFunction: (value: number) => `${TimeSeriesUtils.formatAxisValue(value)}/s`,
+      labelFunction: (value: number) => `${TimeSeriesUtils.formatNumericAxisValue(value)}/s`,
       tooltipZAxisLabel: 'Total Hits/s',
     },
   ];

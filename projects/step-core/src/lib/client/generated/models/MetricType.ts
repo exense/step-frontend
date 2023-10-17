@@ -3,15 +3,14 @@
 /* eslint-disable */
 
 import type { MetricAttribute } from './MetricAttribute';
+import type { MetricRenderingSettings } from './MetricRenderingSettings';
 
 export type MetricType = {
   customFields?: Record<string, any>;
+  key?: string;
   name?: string;
-  label?: string;
-  unit?: string;
+  description?: string;
   attributes?: Array<MetricAttribute>;
-  groupingAttribute?: string;
-  defaultAggregation?: 'SUM' | 'AVG' | 'MAX' | 'MIN';
-  seriesColors?: Record<string, string>;
+  renderingSettings?: MetricRenderingSettings;
   id?: string;
 };

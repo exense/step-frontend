@@ -31,7 +31,7 @@ export class ByStatusChartGenerator {
         legendName: status,
         data: series.map((b) => (b ? b.throughputPerHour : 0)),
         // scale: 'mb',
-        value: (self, x) => TimeSeriesUtils.formatAxisValue(x) + '/h',
+        value: (self, x) => TimeSeriesUtils.formatNumericAxisValue(x) + '/h',
         stroke: color,
         fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
         points: { show: false },
@@ -49,7 +49,7 @@ export class ByStatusChartGenerator {
         {
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
           scale: 'y',
-          values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
+          values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatNumericAxisValue(v) + '/h'),
         },
       ],
     };

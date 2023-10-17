@@ -86,7 +86,8 @@ export class ChartGenerators {
           side: 1,
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
           scale: 'total',
-          values: (u: any, vals: any, space: any) => vals.map((v: number) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
+          values: (u: any, vals: any, space: any) =>
+            vals.map((v: number) => TimeSeriesUtils.formatNumericAxisValue(v) + '/h'),
           grid: { show: false },
         },
       ],

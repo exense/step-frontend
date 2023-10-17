@@ -405,7 +405,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       .withSkipCustomOQL(true)
       .build();
     return this.timeSeriesService
-      .getBuckets(request)
+      .getMeasurements(request)
       .pipe(tap((response) => this.createChart(TsChartType.THREAD_GROUP, request, response, compareChart)));
   }
 
@@ -432,7 +432,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     const requestBuilder = this.getRequestBuilder(compareChart);
     const request = requestBuilder.build();
     return this.timeSeriesService
-      .getBuckets(request)
+      .getMeasurements(request)
       .pipe(tap((response) => this.createChart(TsChartType.OVERVIEW, request, response, compareChart)));
   }
 
@@ -476,7 +476,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       .withGroupDimensions([TimeSeriesConfig.STATUS_ATTRIBUTE])
       .build();
     return this.timeSeriesService
-      .getBuckets(request)
+      .getMeasurements(request)
       .pipe(tap((response) => this.createChart(TsChartType.BY_STATUS, request, response, compareChart)));
   }
 
@@ -489,7 +489,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     const requestBuilder = compareChart ? this.compareRequestBuilder : this.findRequestBuilder;
     const findRequest = this.getTableRequest(requestBuilder, context);
 
-    return this.timeSeriesService.getBuckets(findRequest).pipe(
+    return this.timeSeriesService.getMeasurements(findRequest).pipe(
       tap((response) => {
         if (compareChart) {
           this.tableChart.enableCompareMode(response, context);
@@ -528,7 +528,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   updateTableCompareData(): Observable<TimeSeriesAPIResponse> {
     let context = this.getContext(true);
     const request = this.getTableRequest(this.compareRequestBuilder, context);
-    return this.timeSeriesService.getBuckets(request).pipe(
+    return this.timeSeriesService.getMeasurements(request).pipe(
       tap((response) => {
         this.tableChart.updateCompareData(response, context);
       })
@@ -552,7 +552,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       .withGroupDimensions(groupDimensions)
       .withPercentiles([90, 99])
       .build();
-    return this.timeSeriesService.getBuckets(findRequest).pipe(
+    return this.timeSeriesService.getMeasurements(findRequest).pipe(
       tap((response) => {
         // save the response for further metrics change
         if (compareChart) {
