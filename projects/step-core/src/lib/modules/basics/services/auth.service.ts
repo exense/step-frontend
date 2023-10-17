@@ -2,7 +2,7 @@ import { DOCUMENT } from '@angular/common';
 import { inject, Injectable, OnDestroy } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { SessionDto } from '../../../domain';
-import { BehaviorSubject, catchError, map, Observable, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
 import { AJS_PREFERENCES, AJS_ROOT_SCOPE } from '../../../shared/angularjs-providers';
 import { AJS_MODULE } from '../../../shared/constants';
 import { AdditionalRightRuleService } from '../../../services/additional-right-rule.service';
@@ -43,6 +43,20 @@ export class AuthService implements OnDestroy {
   readonly context$ = this._context$.asObservable();
 
   readonly isOidc: boolean = false;
+
+  readonly initialize$ = this._privateApplicationApi.getApplicationConfiguration().pipe(
+    tap((conf) => {
+      this._serviceContext.setConfiguration(conf);
+      if (conf.title) {
+        this._document.title = conf.title;
+      }
+      const startOidcEndpoint = conf?.miscParams?.[OIDC_ENDPOINT_PARAM] || undefined;
+      (this as FieldAccessor).isOidc = !!startOidcEndpoint && !!conf?.noLoginMask && !!conf.authentication;
+    }),
+    switchMap(() => this.getSession()),
+    map(() => this._serviceContext?.conf?.debug || false),
+    shareReplay(1)
+  );
 
   private setContextFromSession(session: SessionDto): void {
     const context: AuthContext = {
@@ -146,21 +160,6 @@ export class AuthService implements OnDestroy {
   ngOnDestroy(): void {
     this._context$.complete();
     this._triggerRightCheck$.complete();
-  }
-
-  initialize(): Observable<boolean> {
-    return this._privateApplicationApi.getApplicationConfiguration().pipe(
-      tap((conf) => {
-        this._serviceContext.setConfiguration(conf);
-        if (conf.title) {
-          this._document.title = conf.title;
-        }
-        const startOidcEndpoint = conf?.miscParams?.[OIDC_ENDPOINT_PARAM] || undefined;
-        (this as FieldAccessor).isOidc = !!startOidcEndpoint && !!conf?.noLoginMask && !!conf.authentication;
-      }),
-      switchMap(() => this.getSession()),
-      map(() => this._serviceContext?.conf?.debug || false)
-    );
   }
 
   private redirectToOidc(): void {

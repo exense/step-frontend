@@ -1,8 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '../shared';
+import { AJS_MODULE, SubRouteData, SubRouterConfig } from '../shared';
 import { VIEW_ID_LINK_PREFIX } from '../modules/basics/services/view-id-link-prefix.token';
-import { Route, Router, UrlMatcher, UrlSegment } from '@angular/router';
+import { Route, Router, Routes, UrlMatcher, UrlSegment } from '@angular/router';
+import { SimpleOutletComponent } from '../components/simple-outlet/simple-outlet.component';
+
+export const SUB_ROUTE_DATA = Symbol('SubRouteData');
 
 export interface CustomView {
   template: string;
@@ -16,6 +19,7 @@ export interface MenuEntry {
   icon: string;
   weight?: number;
   parentId?: string;
+
   isEnabledFct(): boolean;
 }
 
@@ -24,6 +28,7 @@ export interface Dashlet {
   template: string;
   id: string;
   weight?: number;
+
   isEnabledFct?(): boolean;
 }
 
@@ -33,6 +38,8 @@ export interface Dashlet {
 export class ViewRegistryService {
   private _viewIdLinkPrefix = inject(VIEW_ID_LINK_PREFIX);
   private _router = inject(Router);
+
+  private temporaryRouteChildren = new Map<string, Routes>();
 
   registeredViews: { [key: string]: CustomView } = {};
   registeredMenuEntries: MenuEntry[] = [];
@@ -153,15 +160,99 @@ export class ViewRegistryService {
     this.registerViewWithConfig(viewId, template, { isPublicView: isPublicView });
   }
 
-  registerRoute(route: Route): void {
-    const root = this._router.config.find((parent) => parent.path === 'root');
+  getChildrenRouteInfo(parentPath: string): SubRouteData[] {
+    const parentChildren = this.getRouteParentChildren(parentPath);
+    return parentChildren
+      .map((child) => {
+        const data = child.data?.[SUB_ROUTE_DATA];
+        if (!data) {
+          return undefined;
+        }
+        const path = child.path;
+        return { ...data, path } as SubRouteData;
+      })
+      .filter((data) => !!data)
+      .sort((a, b) => {
+        const weightA = a?.weight ?? 1;
+        const weightB = b?.weight ?? 1;
+        return weightA - weightB;
+      }) as SubRouteData[];
+  }
+
+  private getRouteParentChildren(parentPath: string): Routes {
+    const root = this._router.config.find((route) => route.path === 'root')!;
+    let parentChildren = root.children!;
+
+    if (!parentPath) {
+      return parentChildren;
+    }
+
+    const parts = parentPath.split('/');
+
+    for (const parentPathPart of parts) {
+      const parent = parentChildren.find((route) => route.path === parentPathPart);
+
+      if (parent) {
+        parent.children = parent.children ?? [];
+        parentChildren = parent.children;
+        continue;
+      }
+
+      if (this.temporaryRouteChildren.has(parentPathPart)) {
+        parentChildren = this.temporaryRouteChildren.get(parentPathPart)!;
+      } else {
+        parentChildren = [];
+        this.temporaryRouteChildren.set(parentPathPart, parentChildren);
+      }
+    }
+
+    return parentChildren;
+  }
+
+  registerRoute(route: Route, { parentPath, label, weight }: SubRouterConfig = {}): void {
+    const root = this._router.config.find((route) => route.path === 'root');
     if (!root?.children) {
       return;
     }
-    if (route.path) {
-      ViewRegistryService.registeredRoutes.push(route.path);
+
+    if (route.path && this.temporaryRouteChildren.has(route.path)) {
+      route.children = route.children || [];
+      route.children.push(...this.temporaryRouteChildren.get(route.path)!);
+      this.temporaryRouteChildren.delete(route.path);
     }
-    root.children.push(route);
+
+    if (!parentPath) {
+      if (route.path) {
+        ViewRegistryService.registeredRoutes.push(route.path);
+      }
+
+      if (weight || label) {
+        route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label } };
+      }
+      root.children.push(route);
+      return;
+    }
+
+    const parentChildren = this.getRouteParentChildren(parentPath);
+
+    let redirectRoute = parentChildren!.find((route) => route.path === '')!;
+    if (!redirectRoute) {
+      redirectRoute = { path: '', redirectTo: route.path };
+      parentChildren.push(redirectRoute);
+    }
+
+    if (weight || label) {
+      route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label } };
+    }
+    parentChildren!.push(route);
+    const otherRoutes = parentChildren!
+      .filter((route) => route.path !== '')
+      .sort((routeA, routeB) => {
+        const weightA = routeA.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
+        const weightB = routeB.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
+        return weightA - weightB;
+      });
+    redirectRoute.redirectTo = otherRoutes[0].path;
   }
 
   /**

@@ -9,10 +9,8 @@ import {
   inject,
   TrackByFunction,
 } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AuthService,
-  AJS_MODULE,
   User,
   Preferences,
   UserService,
@@ -115,7 +113,3 @@ export class MyAccountComponent implements OnInit, OnChanges {
       .then(() => this._generateApiKey.revoke(id).subscribe(() => this.updateTokens()));
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepMyAccount', downgradeComponent({ component: MyAccountComponent }));
