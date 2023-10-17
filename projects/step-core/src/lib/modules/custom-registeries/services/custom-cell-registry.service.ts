@@ -8,7 +8,7 @@ import { CustomComponent } from '../shared/custom-component';
   providedIn: 'root',
 })
 export class CustomCellRegistryService extends BaseRegistryService {
-  protected override readonly registryType = CustomRegistryType.customCell;
+  protected override readonly registryType = CustomRegistryType.CUSTOM_CELL;
 
   constructor(_customRegistry: CustomRegistryService) {
     super(_customRegistry);

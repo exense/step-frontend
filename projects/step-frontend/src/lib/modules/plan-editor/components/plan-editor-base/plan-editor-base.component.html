@@ -1,5 +1,5 @@
 <div>
-  <step-alert type="info" *ngIf="_interactiveSession.isActive$ | async">
+  <step-alert type="info" *ngIf="showInteractiveWarning$ | async">
     Welcome to the interactive mode. In this mode you can select tree nodes and run them directly by clicking the
     &nbsp;'Run interactively' button
   </step-alert>
@@ -21,7 +21,7 @@
           [items]="planTypes"
           [itemTemplate]="itemTemplate"
           [formControl]="planTypeControl"
-          matTooltip="Plan type"
+          tooltip="Plan type"
         ></step-editable-dropdown-label>
       </ng-container>
 

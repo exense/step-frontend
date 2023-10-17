@@ -17,7 +17,7 @@ import { SafeHtml } from '@angular/platform-browser';
 export class AsyncOperationDialogComponent implements AfterViewInit {
   readonly AsyncOperationDialogState = AsyncOperationDialogState;
 
-  state: AsyncOperationDialogState = AsyncOperationDialogState.progress;
+  state: AsyncOperationDialogState = AsyncOperationDialogState.PROGRESS;
   progress: number = 0;
 
   successMessage: SafeHtml = '';
@@ -37,20 +37,20 @@ export class AsyncOperationDialogComponent implements AfterViewInit {
   }
 
   cancel(): void {
-    const result: AsyncOperationDialogResult = { closeStatus: AsyncOperationCloseStatus.noAction };
+    const result: AsyncOperationDialogResult = { closeStatus: AsyncOperationCloseStatus.NO_ACTION };
     this._dialogRef.close(result);
   }
 
   closeOk(): void {
     let result: AsyncOperationDialogResult;
-    if (this.state === AsyncOperationDialogState.success) {
+    if (this.state === AsyncOperationDialogState.SUCCESS) {
       result = {
-        closeStatus: AsyncOperationCloseStatus.success,
+        closeStatus: AsyncOperationCloseStatus.SUCCESS,
         operationStatus: this.operationStatus,
       };
     } else {
       result = {
-        closeStatus: AsyncOperationCloseStatus.error,
+        closeStatus: AsyncOperationCloseStatus.ERROR,
         error: this.error,
       };
     }
@@ -73,7 +73,7 @@ export class AsyncOperationDialogComponent implements AfterViewInit {
         catchError((err) => {
           this.errorMessage = this._dialogData.errorMessage(err);
           this.error = err;
-          this.state = AsyncOperationDialogState.error;
+          this.state = AsyncOperationDialogState.ERROR;
           console.error(err);
           return of(undefined);
         }),
@@ -86,7 +86,7 @@ export class AsyncOperationDialogComponent implements AfterViewInit {
         }
         this.successMessage = this._dialogData.successMessage(result);
         this.operationStatus = result;
-        this.state = AsyncOperationDialogState.success;
+        this.state = AsyncOperationDialogState.SUCCESS;
       });
   }
 }

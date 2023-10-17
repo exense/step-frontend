@@ -8,7 +8,7 @@ import { CustomComponent } from '../shared/custom-component';
   providedIn: 'root',
 })
 export class DashletRegistryService extends BaseRegistryService {
-  protected override readonly registryType = CustomRegistryType.dashlet;
+  protected override readonly registryType = CustomRegistryType.DASHLET;
 
   constructor(_customRegistry: CustomRegistryService) {
     super(_customRegistry);

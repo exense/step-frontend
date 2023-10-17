@@ -65,23 +65,6 @@ step-plan-editor-base {
   }
 }
 
-span.mat-menu-item.plan-execution-menu {
-  height: auto;
-  font-size: inherit;
-  line-height: initial;
-  font-weight: initial;
-
-  &:hover:not([disabled]) {
-    background: transparent;
-  }
-
-  step-execution-commands {
-    width: 250px;
-    display: block;
-    padding: 5px;
-  }
-}
-
 .actions-header {
   display: flex;
   justify-content: space-between;
@@ -100,7 +83,7 @@ span.mat-menu-item.plan-execution-menu {
   gap: 8px;
 
   step-icon {
-    @include core.step-icon-size(16px);
+    @include core.step-icon-size(22px);
     display: flex;
   }
 }

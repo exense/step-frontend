@@ -7,7 +7,7 @@ export type FunctionTypeScriptForm = ReturnType<typeof functionTypeScriptFormCre
 export const functionTypeScriptFormCreate = (formBuilder: FormBuilder) => {
   const { createDynamicValueString } = dynamicValueFactory();
   const formGroup = formBuilder.nonNullable.group({
-    scriptLanguage: formBuilder.nonNullable.control<ScriptLanguage>(ScriptLanguage.java, []),
+    scriptLanguage: formBuilder.nonNullable.control<ScriptLanguage>(ScriptLanguage.JAVA, []),
     librariesFile: formBuilder.nonNullable.control<DynamicValueString>(createDynamicValueString(), []),
     scriptFile: formBuilder.nonNullable.control<DynamicValueString>(createDynamicValueString(), []),
   });

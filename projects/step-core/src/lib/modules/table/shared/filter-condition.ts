@@ -9,6 +9,10 @@ export abstract class FilterCondition<T = any> implements FilterConditionJson<T>
 
   abstract filterConditionType: FilterConditionType;
 
+  getSearchValue(): unknown {
+    return this.sourceObject;
+  }
+
   toJSON(): FilterConditionJson {
     const filterConditionType = this.filterConditionType;
     const sourceObject = this.sourceObject;

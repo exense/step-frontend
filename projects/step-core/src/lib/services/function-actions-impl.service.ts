@@ -2,7 +2,7 @@ import { Injectable, inject, Injector, EnvironmentInjector } from '@angular/core
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { ILocationService } from 'angular';
 import { Observable, catchError, map, of, switchMap, tap, take } from 'rxjs';
-import { AugmentedKeywordsService, Function as Keyword } from '../client/step-client-module';
+import { AugmentedKeywordsService, Keyword } from '../client/step-client-module';
 import { EditorResolverService, MultipleProjectsService } from '../modules/basics/step-basics.module';
 import { EntityDialogsService } from '../modules/entity/entity.module';
 import {

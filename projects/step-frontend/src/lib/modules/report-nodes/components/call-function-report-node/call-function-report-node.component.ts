@@ -52,7 +52,9 @@ export class CallFunctionReportNodeComponent implements OnChanges {
 
   private filterChildren(children?: ReportNode[]): void {
     this.displayChildren = (children || []).filter((child) =>
-      ([ReportNodeType.AssertReportNode, ReportNodeType.PerformanceAssertReportNode] as string[]).includes(child._class)
+      ([ReportNodeType.ASSERT_REPORT_NODE, ReportNodeType.PERFORMANCE_ASSERT_REPORT_NODE] as string[]).includes(
+        child._class
+      )
     );
   }
 }

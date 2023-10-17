@@ -1,10 +1,10 @@
 import { inject, Injectable } from '@angular/core';
-import { Parameter, Plan, PlansService } from '../../generated';
+import { Plan, PlansService } from '../../generated';
 import { StepDataSource, TableRemoteDataSourceFactoryService } from '../../table/step-table-client.module';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedPlansService extends PlansService {
-  private readonly PLANS_TABLE_ID = 'plans';
+  readonly PLANS_TABLE_ID = 'plans';
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
 
   getPlansTableDataSource(): StepDataSource<Plan> {

@@ -42,7 +42,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
   protected keywordParameters$?: Observable<KeywordParameters>;
   readonly statusOptions = REPORT_NODE_STATUS;
 
-  selectionType: BulkSelectionType = BulkSelectionType.None;
+  selectionType: BulkSelectionType = BulkSelectionType.NONE;
 
   @Input() eId: string = '';
   @Input() testCasesProgress?: ExecutionSummaryDto;
@@ -122,7 +122,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
       map((testcases) => ({
         type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
         eid,
-        testcases: this.panelService.isPanelEnabled(Panels.testCases) ? testcases : undefined,
+        testcases: this.panelService.isPanelEnabled(Panels.TEST_CASES) ? testcases : undefined,
       })),
       takeUntil(this.selectionTerminator$)
     );
@@ -164,7 +164,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
         true
       );
       if (isAllIncluded) {
-        this.selectionType = BulkSelectionType.All;
+        this.selectionType = BulkSelectionType.ALL;
       }
     }
   }

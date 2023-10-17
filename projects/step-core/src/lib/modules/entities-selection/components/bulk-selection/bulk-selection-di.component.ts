@@ -15,7 +15,7 @@ import { BulkSelectionType } from '../../shared/bulk-selection-type.enum';
 })
 export class BulkSelectionDiComponent<KEY, ENTITY> {
   @Input() showLabel: boolean = true;
-  @Input() selectionType: BulkSelectionType = BulkSelectionType.None;
+  @Input() selectionType: BulkSelectionType = BulkSelectionType.NONE;
   @Output() selectionTypeChange = new EventEmitter<BulkSelectionType>();
   constructor(@Optional() public _selectionCollector?: SelectionCollector<KEY, ENTITY>) {}
 }

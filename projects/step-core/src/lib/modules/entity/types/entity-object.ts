@@ -1,3 +1,3 @@
-import { Execution, ExecutiontTaskParameters, Function, Plan } from '../../../client/generated';
+import { Execution, ExecutiontTaskParameters, Keyword, Plan } from '../../../client/step-client-module';
 
-export type EntityObject = Execution | Plan | ExecutiontTaskParameters | Function;
+export type EntityObject = Execution | Plan | ExecutiontTaskParameters | Keyword;

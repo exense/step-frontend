@@ -74,13 +74,21 @@
       <section class="last-modification" *ngIf="parameter.lastModificationDate">
         <label>Last modification</label>
         <span
-          >{{ parameter.lastModificationDate | date: DateFormat.date }} by {{ parameter.lastModificationUser }}</span
+          >{{ parameter.lastModificationDate | date: DateFormat.DATE }} by {{ parameter.lastModificationUser }}</span
         >
       </section>
     </ng-container>
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
-    <button type="button" mat-flat-button color="primary" (click)="save()">Save</button>
+    <button
+      [disabled]="parameter.scope === 'GLOBAL' && !('param-global-write' | hasRight | async)"
+      type="button"
+      mat-flat-button
+      color="primary"
+      (click)="save()"
+    >
+      Save
+    </button>
   </div>
 </step-modal-window>

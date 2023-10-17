@@ -18,7 +18,7 @@ import {
   ArtefactTreeNode,
   CallFunction,
   DialogsService,
-  Function as KeywordCall,
+  Keyword,
   KeywordsService,
   Plan,
   PlanArtefactResolverService,
@@ -37,9 +37,9 @@ import {
   catchError,
   defer,
   EMPTY,
+  debounceTime,
   filter,
   map,
-  mergeMap,
   Observable,
   of,
   Subject,
@@ -106,12 +106,15 @@ export class PlanEditorBaseComponent
   @Input() showExecuteButton = true;
 
   selectedTab = 'controls';
+
   readonly isInteractiveSessionActive$ = this._interactiveSession.isActive$;
+  readonly showInteractiveWarning$ = this.isInteractiveSessionActive$.pipe(debounceTime(300));
+
   planTypes$ = this._planApi.getArtefactTemplates().pipe(
     map((planTypes) => {
       return planTypes.map((planType) => ({
         planType,
-        icon: this._artefactService.getArtefactType(planType)!.icon,
+        icon: this._artefactService.getArtefactType(planType)?.icon ?? '',
       }));
     })
   );
@@ -176,9 +179,9 @@ export class PlanEditorBaseComponent
     const currentVersion$ = defer(() => {
       if (this.id && this.id !== plan.id) {
         // composite keywords need to retrieve the current version
-        return this._keywordCallsApi.getFunctionById(this.id).pipe(
-          map((keyword) => keyword?.customFields?.['versionId'] ?? undefined)
-        );
+        return this._keywordCallsApi
+          .getFunctionById(this.id)
+          .pipe(map((keyword) => keyword?.customFields?.['versionId'] ?? undefined));
       } else {
         // we are showing a real plan
         return of(plan.customFields ? plan.customFields['versionId'] : undefined);
@@ -187,12 +190,14 @@ export class PlanEditorBaseComponent
 
     currentVersion$
       .pipe(
-        switchMap((currentVersion) => this._restoreDialogsService.showRestoreDialog(currentVersion, versionHistory, permission)),
+        switchMap((currentVersion) =>
+          this._restoreDialogsService.showRestoreDialog(currentVersion, versionHistory, permission)
+        ),
         filter((restoreVersion) => restoreVersion !== undefined),
         switchMap((restoreVersion) => this._planEditorApi.restorePlanVersion(this.id || plan.id!, restoreVersion)),
         catchError((error) => {
-            console.error(error);
-            return EMPTY;
+          console.error(error);
+          return EMPTY;
         })
       )
       .subscribe(() => this.loadPlan(this.id || plan.id!));
@@ -229,7 +234,7 @@ export class PlanEditorBaseComponent
   }
 
   resetInteractive(): void {
-    this._interactiveSession.resetInteractive().subscribe(() => (this.selectedTab = 'controls'));
+    this._interactiveSession.resetInteractive().subscribe();
   }
 
   openArtefact(node?: AbstractArtefact): void {
@@ -286,7 +291,7 @@ export class PlanEditorBaseComponent
               this._dialogsService.showErrorMsg('No editor configured for this function type');
               return of('');
             }
-            return this.openFunctionEditor(keyword as KeywordCall);
+            return this.openFunctionEditor(keyword as Keyword);
           })
         )
         .subscribe();
@@ -368,7 +373,7 @@ export class PlanEditorBaseComponent
     return this._planLinkDialogs.editPlan(plan);
   }
 
-  private openFunctionEditor(keyword: KeywordCall): Observable<unknown> {
+  private openFunctionEditor(keyword: Keyword): Observable<unknown> {
     return this._functionActions.openFunctionEditor(keyword);
   }
 

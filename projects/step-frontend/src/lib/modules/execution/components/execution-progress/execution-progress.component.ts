@@ -112,7 +112,7 @@ export class ExecutionProgressComponent
   countByErrorMsg: ExecutionErrorMessageItem[] = [];
   countByErrorCode: ExecutionErrorCodeItem[] = [];
   currentOperations: Operation[] = [];
-  selectedErrorDistributionToggle = ErrorDistributionStatus.message;
+  selectedErrorDistributionToggle = ErrorDistributionStatus.MESSAGE;
 
   autoRefreshDisabled: boolean = true;
   showAutoRefreshButton = false;
@@ -193,13 +193,13 @@ export class ExecutionProgressComponent
           }
         }),
         tap((node) => {
-          this._executionPanels.enablePanel(Panels.testCases, true);
-          this._executionPanels.setShowPanel(Panels.testCases, true);
+          this._executionPanels.enablePanel(Panels.TEST_CASES, true);
+          this._executionPanels.setShowPanel(Panels.TEST_CASES, true);
         })
       )
       .subscribe(() => {
         this.selectTab('steps');
-        this.scrollToPanel(Panels.testCases);
+        this.scrollToPanel(Panels.TEST_CASES);
       });
   }
 
@@ -245,9 +245,9 @@ export class ExecutionProgressComponent
   drillDownTestCase(id: string): void {
     this._testCasesSelection.clear();
     this._testCasesSelection.selectById(id);
-    this._executionPanels.enablePanel(Panels.steps, true);
-    this._executionPanels.setShowPanel(Panels.steps, true);
-    this.scrollToPanel(Panels.steps);
+    this._executionPanels.enablePanel(Panels.STEPS, true);
+    this._executionPanels.setShowPanel(Panels.STEPS, true);
+    this.scrollToPanel(Panels.STEPS);
   }
 
   searchStepByError(error: string): void {
@@ -315,8 +315,8 @@ export class ExecutionProgressComponent
       return;
     }
     this._executionService.getExecutionById(eId).subscribe((execution) => {
-      this.onExecutionStatusUpdate(execution?.status);
       this.execution = execution;
+      this.onExecutionStatusUpdate(execution?.status);
       if (updateSelection !== UpdateSelection.NONE) {
         this.determineDefaultSelection();
       }
@@ -373,11 +373,11 @@ export class ExecutionProgressComponent
       .getReportNodesByExecutionId(eId, 'step.artefacts.reports.TestCaseReportNode', 500)
       .subscribe((reportNodes) => {
         if (reportNodes.length > 0) {
-          if (reportNodes.length > 1 && !this._executionPanels.isPanelEnabled(Panels.testCases)) {
-            this._executionPanels.setShowPanel(Panels.steps, false);
-            this._executionPanels.setShowPanel(Panels.testCases, true);
+          if (reportNodes.length > 1 && !this._executionPanels.isPanelEnabled(Panels.TEST_CASES)) {
+            this._executionPanels.setShowPanel(Panels.STEPS, false);
+            this._executionPanels.setShowPanel(Panels.TEST_CASES, true);
           }
-          this._executionPanels.enablePanel(Panels.testCases, true);
+          this._executionPanels.enablePanel(Panels.TEST_CASES, true);
         }
         const oldTestCasesIds = (this.testCases ?? []).map((testCase) => testCase.id);
         const newTestCases = reportNodes.filter((testCase) => !oldTestCasesIds.includes(testCase.id));
@@ -419,7 +419,7 @@ export class ExecutionProgressComponent
       }));
     });
 
-    this.selectedErrorDistributionToggle = ErrorDistributionStatus.message;
+    this.selectedErrorDistributionToggle = ErrorDistributionStatus.MESSAGE;
 
     a1Promise2Observable(this._viewFactory.getReportNodeStatisticCharts(eId)).subscribe((charts) => {
       this.throughputchart = charts.throughputchart;

@@ -10,7 +10,7 @@ import { CustomRegistryService } from '../../services/custom-registry.service';
   styleUrls: [],
 })
 export class CustomSearchCellComponent extends BaseItemComponent<CustomRegistryItem> {
-  protected readonly registryType = CustomRegistryType.customSearchCell;
+  protected readonly registryType = CustomRegistryType.CUSTOM_SEARCH_CELL;
 
   constructor(_customRegistryService: CustomRegistryService) {
     super(_customRegistryService);

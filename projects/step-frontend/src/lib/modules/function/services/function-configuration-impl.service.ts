@@ -1,7 +1,7 @@
 import { inject, Injectable, Injector } from '@angular/core';
 import {
   FunctionConfigurationService,
-  Function as Keyword,
+  Keyword,
   FunctionDialogsConfig,
   FunctionConfigurationDialogData,
 } from '@exense/step-core';

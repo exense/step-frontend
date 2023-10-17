@@ -155,8 +155,11 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
+  public setChartsResolution(ms: number): void {
+    this.context.updateChartsResolution(ms);
+  }
+
   private updateBaseCharts(showLoading = false) {
-    console.log('updating base charts');
     this.updateBaseChartsSubscription?.unsubscribe();
     let updateCharts$ = this.chartsView.updateBaseCharts({
       updateRanger: true,

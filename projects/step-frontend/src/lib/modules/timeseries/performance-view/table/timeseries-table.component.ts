@@ -41,6 +41,8 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   private entriesByIds = new Map<string, TableEntry>();
 
   readonly BASE_COLUMNS = ['name', 'count', 'sum', 'avg', 'min', 'max', 'pcl_80', 'pcl_90', 'pcl_99', 'tps', 'tph'];
+  readonly COMPARE_COLUMN_ID_SUFFIX = '_comp';
+  readonly DIFF_COLUMN_ID_SUFFIX = '_diff';
 
   tableIsLoading = true;
   dimensionKey = 'name';
@@ -57,11 +59,15 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   keywordsService!: TimeSeriesKeywordsContext;
 
   private terminator$ = new Subject<void>();
+  columns: TableColumn[] = [];
+  visibleColumnsIds: string[] = [];
 
   ngOnInit(): void {
     if (!this.executionContext) {
       throw new Error('Execution context is mandatory');
     }
+    this.columns = this.getInitialColumns();
+    this.prepareVisibleColumns();
     this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
     this.keywordsService = this.executionContext.keywordsContext;
     const keywordsContext = this.executionContext.keywordsContext;
@@ -88,6 +94,101 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     });
   }
 
+  private getInitialColumns(): TableColumn[] {
+    return [
+      {
+        id: 'count',
+        type: TableColumnType.BASE,
+        label: 'Count',
+        isVisible: true,
+        isCompareColumn: false,
+        mapValue: (entry) => entry?.count,
+        mapDiffValue: (entry) => entry.countDiff,
+      },
+      {
+        id: 'sum',
+        type: TableColumnType.BASE,
+        label: 'Sum',
+        isVisible: true,
+        isCompareColumn: false,
+        mapValue: (entry) => entry?.sum,
+        mapDiffValue: (entry) => entry.countDiff,
+      },
+      {
+        id: 'avg',
+        type: TableColumnType.BASE,
+        label: 'Avg',
+        isVisible: true,
+        isCompareColumn: false,
+        mapValue: (entry) => entry?.attributes?.['avg'],
+        mapDiffValue: (entry) => entry.countDiff,
+      },
+      {
+        id: 'min',
+        type: TableColumnType.BASE,
+        label: 'Min',
+        isVisible: true,
+        isCompareColumn: false,
+        mapValue: (entry) => entry?.min,
+        mapDiffValue: (entry) => entry.countDiff,
+      },
+      {
+        id: 'max',
+        type: TableColumnType.BASE,
+        label: 'Max',
+        isVisible: true,
+        isCompareColumn: false,
+        mapValue: (entry) => entry?.max,
+        mapDiffValue: (entry) => entry.countDiff,
+      },
+      {
+        id: 'pcl_80',
+        type: TableColumnType.BASE,
+        label: 'Pcl. 80 (ms)',
+        isVisible: true,
+        isCompareColumn: false,
+        mapValue: (entry) => entry?.pclValues?.[80],
+        mapDiffValue: (entry) => entry.countDiff,
+      },
+      {
+        id: 'pcl_90',
+        type: TableColumnType.BASE,
+        label: 'Pcl. 90 (ms)',
+        isVisible: true,
+        isCompareColumn: false,
+        mapValue: (entry) => entry?.max,
+        mapDiffValue: (entry) => entry.countDiff,
+      },
+      {
+        id: 'pcl_99',
+        type: TableColumnType.BASE,
+        label: 'Pcl. 99 (ms)',
+        isVisible: true,
+        isCompareColumn: false,
+        mapValue: (entry) => entry?.max,
+        mapDiffValue: (entry) => entry.countDiff,
+      },
+      {
+        id: 'tps',
+        type: TableColumnType.BASE,
+        label: 'Tps',
+        isVisible: true,
+        isCompareColumn: false,
+        mapValue: (entry) => entry?.attributes?.['tps'],
+        mapDiffValue: (entry) => entry.countDiff,
+      },
+      {
+        id: 'tph',
+        type: TableColumnType.BASE,
+        label: 'Tph',
+        isVisible: true,
+        isCompareColumn: false,
+        mapValue: (entry) => entry?.attributes?.['tps'],
+        mapDiffValue: (entry) => entry.countDiff,
+      },
+    ];
+  }
+
   /**
    * This method is used to initialize and refresh the table.
    * @param response
@@ -102,6 +203,22 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     const mergedData = this.mergeBaseAndCompareData(baseData, compareData);
     this.updateDataSourceAndKeywords(mergedData);
     this.tableIsLoading = false;
+  }
+
+  prepareVisibleColumns() {
+    const visibleColumns = ['name'];
+    this.columns.forEach((c) => {
+      if (!c.isVisible) {
+        return;
+      } else {
+        visibleColumns.push(c.id);
+        if (this.compareModeEnabled) {
+          visibleColumns.push(c.id + this.COMPARE_COLUMN_ID_SUFFIX);
+          visibleColumns.push(c.id + this.DIFF_COLUMN_ID_SUFFIX);
+        }
+      }
+    });
+    this.visibleColumnsIds = visibleColumns;
   }
 
   updateCompareData(response: TimeSeriesAPIResponse, compareContext: TimeSeriesContext) {
@@ -170,6 +287,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     this.compareModeEnabled = true;
     this.compareContext = compareContext;
     this.compareResponse = response;
+    this.prepareVisibleColumns();
     const baseData = this.processResponse(this.baseResponse!, this.executionContext);
     const compareData = this.processResponse(response, compareContext);
     const mergedData = this.mergeBaseAndCompareData(baseData, compareData);
@@ -265,9 +383,30 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     this.terminator$.next();
     this.terminator$.complete();
   }
+
+  get TableColumnType() {
+    return TableColumnType;
+  }
 }
 
 interface ProcessedBuckets {
   keywords: string[];
   buckets: Record<string, BucketResponse>;
+}
+
+enum TableColumnType {
+  BASE,
+  COMPARE,
+  DIFF,
+}
+
+interface TableColumn {
+  id: string;
+  type: TableColumnType;
+  label: string;
+  subLabel?: string;
+  mapValue: (bucket: BucketResponse) => any;
+  mapDiffValue: (entry: TableEntry) => number | undefined;
+  isCompareColumn: boolean;
+  isVisible: boolean;
 }

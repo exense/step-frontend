@@ -10,7 +10,7 @@ import { TsUtils } from '../../util/ts-utils';
 import { FilterBarItemType, TsFilterItem } from '../../performance-view/filter-bar/model/ts-filter-item';
 import { range, Subject, takeUntil, timer } from 'rxjs';
 import { TimeSeriesUtils } from '../../time-series-utils';
-import { TSChartSettings } from '../../chart/model/ts-chart-settings';
+import { MatMenuTrigger } from '@angular/material/menu';
 import { TSTimeRange } from '../../chart/model/ts-time-range';
 
 @Component({
@@ -19,8 +19,9 @@ import { TSTimeRange } from '../../chart/model/ts-time-range';
   styleUrls: ['./analytics-page.component.scss'],
 })
 export class AnalyticsPageComponent implements OnInit, OnDestroy {
+  @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
   @ViewChild('dashboard') dashboard!: TimeSeriesDashboardComponent;
-  @ViewChild('container') container: any;
+
   dashboardSettings: TimeSeriesDashboardSettings | undefined;
 
   terminator$ = new Subject<void>();
@@ -161,6 +162,11 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
         exactMatch: true,
       },
     ];
+  }
+
+  handleResolutionChange(resolution: number) {
+    this.menuTrigger.closeMenu();
+    this.dashboard.setChartsResolution(resolution);
   }
 
   addCustomChart(metric: MetricType) {
