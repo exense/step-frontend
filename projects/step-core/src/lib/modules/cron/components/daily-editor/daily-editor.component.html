@@ -1,0 +1,16 @@
+<mat-radio-group [(ngModel)]="selected">
+  <mat-radio-button [value]="DailyType.EVERY_DAY" color="primary">
+    <step-every-day-editor
+      [isActive]="selected === DailyType.EVERY_DAY"
+      (expressionChange)="expressionChange.emit($event)"
+    >
+    </step-every-day-editor>
+  </mat-radio-button>
+  <mat-radio-button [value]="DailyType.EVERY_WEEK_DAY" color="primary">
+    <step-every-week-day-editor
+      [isActive]="selected === DailyType.EVERY_WEEK_DAY"
+      (expressionChange)="expressionChange.emit($event)"
+    >
+    </step-every-week-day-editor>
+  </mat-radio-button>
+</mat-radio-group>

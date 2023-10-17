@@ -78,6 +78,7 @@ import { SchedulerTaskLinkComponent } from './components/scheduler-task-link/sch
 import { ResourceInputWrapperComponent } from './components/resource-input-wrapper/resource-input-wrapper.component';
 import { WizardModule } from './modules/wizard/wizards.module';
 import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.component';
+import { CronModule } from './modules/cron/cron.module';
 
 @NgModule({
   declarations: [
@@ -159,6 +160,7 @@ import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.
     ResourceInputModule,
     KeywordsCommonModule,
     WizardModule,
+    CronModule,
   ],
   exports: [
     CommonModule,
@@ -232,6 +234,7 @@ import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.
     MyAccountButtonComponent,
     SelectTaskComponent,
     ResourceInputWrapperComponent,
+    CronModule,
   ],
   providers: [
     CORE_INITIALIZER,

@@ -1,0 +1,32 @@
+<step-modal-window title="Configure CRON expression">
+  <div step-modal-window-body>
+    <step-tabs [tabs]="cronEditorTabs" [(activeTabId)]="selectedTab"> </step-tabs>
+    <div class="tab-content">
+      <section [ngSwitch]="selectedTab">
+        <step-minutes-editor *ngSwitchCase="CronEditorTab.MINUTES" (expressionChange)="handleExpressionChange($event)">
+        </step-minutes-editor>
+        <step-hours-editor *ngSwitchCase="CronEditorTab.HOURLY" (expressionChange)="handleExpressionChange($event)">
+        </step-hours-editor>
+        <step-daily-editor *ngSwitchCase="CronEditorTab.DAILY" (expressionChange)="handleExpressionChange($event)">
+        </step-daily-editor>
+        <step-weekly-editor *ngSwitchCase="CronEditorTab.WEEKLY" (expressionChange)="handleExpressionChange($event)">
+        </step-weekly-editor>
+        <step-monthly-editor *ngSwitchCase="CronEditorTab.MONTHLY" (expressionChange)="handleExpressionChange($event)">
+        </step-monthly-editor>
+        <step-yearly-editor *ngSwitchCase="CronEditorTab.YEARLY" (expressionChange)="handleExpressionChange($event)">
+        </step-yearly-editor>
+        <step-preset-editor *ngSwitchCase="CronEditorTab.PRESET" (expressionChange)="handleExpressionChange($event)">
+        </step-preset-editor>
+        <ng-container *ngSwitchDefault> </ng-container>
+      </section>
+      <section><strong>Generated CRON Expression:</strong> {{ cronExpression }}</section>
+      <step-alert *ngIf="!isExpressionValid" [type]="AlertType.DANGER"> CRON Expression is invalid </step-alert>
+    </div>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button matDialogClose>Cancel</button>
+    <button type="button" mat-flat-button color="primary" (click)="apply()" [disabled]="!isExpressionValid">
+      Apply
+    </button>
+  </div>
+</step-modal-window>
