@@ -1,8 +1,6 @@
-import { AfterViewInit, Component, ElementRef, inject, Input, OnDestroy, ViewChild } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
+import { AfterViewInit, Component, ElementRef, inject, OnDestroy, ViewChild } from '@angular/core';
 import {
   AceMode,
-  AJS_MODULE,
   AJS_ROOT_SCOPE,
   AugmentedKeywordEditorService,
   convertScriptLanguageToAce,
@@ -12,7 +10,7 @@ import {
   ScriptLanguage,
 } from '@exense/step-core';
 import { forkJoin, Observable, switchMap } from 'rxjs';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as ace from 'ace-builds';
 import 'ace-builds/src-min-noconflict/theme-chrome.js';
 import 'ace-builds/src-min-noconflict/mode-javascript.js';
@@ -35,7 +33,7 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
   private editorElement!: ElementRef<HTMLDivElement>;
   private editor?: ace.Ace.Editor;
 
-  @Input() functionId!: string;
+  protected _functionId = inject(ActivatedRoute).snapshot.params['id']! as string;
 
   protected keyword?: Keyword;
 
@@ -54,7 +52,7 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
 
   execute(): void {
     this.saveInternal()
-      .pipe(switchMap(() => this._interactiveApi.startFunctionTestingSession(this.functionId)))
+      .pipe(switchMap(() => this._interactiveApi.startFunctionTestingSession(this._functionId)))
       .subscribe((result) => {
         (this._$rootScope as any).planEditorInitialState = {
           interactive: true,
@@ -71,8 +69,8 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
 
   private loadKeyword(): void {
     forkJoin([
-      this._keywordApi.getFunctionById(this.functionId),
-      this._keywordEditorApi.getFunctionScript(this.functionId),
+      this._keywordApi.getFunctionById(this._functionId),
+      this._keywordEditorApi.getFunctionScript(this._functionId),
     ]).subscribe(([keyword, keywordScript]) => {
       this.keyword = keyword;
       this.editor!.getSession().setMode(this.determineKeywordMode());
@@ -86,10 +84,6 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
   }
 
   private saveInternal(): Observable<void> {
-    return this._keywordEditorApi.saveFunctionScript(this.functionId, this.editor!.getValue());
+    return this._keywordEditorApi.saveFunctionScript(this._functionId, this.editor!.getValue());
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepScriptEditor', downgradeComponent({ component: ScriptEditorComponent }));
