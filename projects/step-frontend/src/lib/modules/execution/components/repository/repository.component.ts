@@ -1,6 +1,5 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import {
-  AJS_MODULE,
   AJS_ROOT_SCOPE,
   ArtefactInfo,
   AuthService,
@@ -15,7 +14,6 @@ import {
 } from '@exense/step-core';
 import { IRootScopeService } from 'angular';
 import { map, noop, Observable, of } from 'rxjs';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { IncludeTestcases } from '../../shared/include-testcases.interface';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -30,6 +28,9 @@ type FieldAccessor = Mutable<
   selector: 'step-repository',
   templateUrl: './repository.component.html',
   styleUrls: ['./repository.component.scss'],
+  host: {
+    class: 'container',
+  },
   providers: [
     selectionCollectionProvider<string, TestRunStatus>({
       selectionKeyProperty: 'id',
@@ -131,7 +132,3 @@ export class RepositoryComponent implements OnInit, OnDestroy {
     );
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepRepository', downgradeComponent({ component: RepositoryComponent }));

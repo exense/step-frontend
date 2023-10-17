@@ -10,7 +10,6 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {
-  AJS_MODULE,
   AJS_ROOT_SCOPE,
   ArtefactFilter,
   AugmentedExecutionsService,
@@ -21,7 +20,6 @@ import {
   ScheduledTaskDialogsService,
 } from '@exense/step-core';
 import { IRootScopeService } from 'angular';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { DOCUMENT } from '@angular/common';
 import { IncludeTestcases } from '../../shared/include-testcases.interface';
 import { Router } from '@angular/router';
@@ -175,7 +173,3 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
     };
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepExecutionCommands', downgradeComponent({ component: ExecutionCommandsComponent }));

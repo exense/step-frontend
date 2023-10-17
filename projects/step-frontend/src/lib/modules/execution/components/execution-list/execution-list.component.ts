@@ -1,6 +1,5 @@
 import { Component, inject } from '@angular/core';
 import {
-  AJS_MODULE,
   AugmentedExecutionsService,
   AutoDeselectStrategy,
   BulkSelectionType,
@@ -11,10 +10,9 @@ import {
   STORE_ALL,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { EXECUTION_RESULT, EXECUTION_STATUS } from '../../../_common/shared/status.enum';
 import { from, of } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { ExecutionOpenNotificatorService } from '../../services/execution-open-notificator.service';
 
 @Component({
@@ -55,7 +53,3 @@ export class ExecutionListComponent {
     });
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepExecutionList', downgradeComponent({ component: ExecutionListComponent }));

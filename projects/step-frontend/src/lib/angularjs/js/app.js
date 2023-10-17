@@ -21,10 +21,7 @@ var tecAdminApp = angular
     'step',
     'entities',
     'tecAdminControllers',
-    'repositoryControllers',
-    'executionsControllers',
     'screenConfigurationControllers',
-    'dashboardsControllers',
     'asyncTask',
   ])
 

@@ -13,7 +13,6 @@ import {
 } from '@angular/core';
 import {
   a1Promise2Observable,
-  AJS_MODULE,
   AugmentedExecutionsService,
   AutoDeselectStrategy,
   ControllerService,
@@ -39,7 +38,6 @@ import { ExecutionErrorCodeItem } from '../../shared/execution-error-code-item';
 import { ErrorDistributionStatus } from '../../shared/error-distribution-status.enum';
 import { ExecutionStateService } from '../../services/execution-state.service';
 import { filter, map, Observable, of, switchMap, tap } from 'rxjs';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { Panels } from '../../shared/panels.enum';
 import { ReportTreeNode } from '../../shared/report-tree-node';
 import { ReportTreeNodeUtilsService } from '../../services/report-tree-node-utils.service';
@@ -456,7 +454,3 @@ export class ExecutionProgressComponent
     }
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepExecutionProgress', downgradeComponent({ component: ExecutionProgressComponent }));

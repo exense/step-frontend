@@ -14,12 +14,7 @@ import { KeywordCallsComponent } from './components/keyword-calls/keyword-calls.
 import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import { ExecutionTabsComponent } from './components/execution-tabs/execution-tabs.component';
 import './components/execution-tabs/execution-tabs.component';
-import {
-  CustomCellRegistryService,
-  DashletRegistryService,
-  EntityRegistry,
-  ViewRegistryService,
-} from '@exense/step-core';
+import { DashletRegistryService, EntityRegistry, ViewRegistryService } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
 import { ExecutionTreeComponent } from './components/execution-tree/execution-tree.component';
@@ -85,23 +80,33 @@ import { IsExecutionProgressPipe } from './pipes/is-execution-progress.pipe';
 })
 export class ExecutionModule {
   constructor(
-    _entityRegistry: EntityRegistry,
-    _cellsRegister: CustomCellRegistryService,
-    _dashletRegistry: DashletRegistryService,
-    _viewRegistry: ViewRegistryService,
+    private _entityRegistry: EntityRegistry,
+    private _dashletRegistry: DashletRegistryService,
+    private _viewRegistry: ViewRegistryService,
     _bulkOperationsRegistry: ExecutionBulkOperationsRegisterService
   ) {
-    _entityRegistry.register('executions', 'Execution', {
+    _bulkOperationsRegistry.register();
+    this.registerEntities();
+    this.registerDashlets();
+    this.registerRoutes();
+  }
+
+  private registerEntities(): void {
+    this._entityRegistry.register('executions', 'Execution', {
       icon: 'rocket',
       component: ExecutionSelectionTableComponent,
     });
-    _bulkOperationsRegistry.register();
-    _dashletRegistry.registerDashlet('executionStep', DashletExecutionStepComponent);
-    _dashletRegistry.registerDashlet('executionTree', DashletExecutionTreeComponent);
-    _dashletRegistry.registerDashlet('executionViz', DashletExecutionVizComponent);
-    _dashletRegistry.registerDashlet('executionError', DashletExecutionErrorsComponent);
 
-    _viewRegistry.registerDashletAdvanced(
+    this._entityRegistry.registerEntity('Repository', 'repository', 'database');
+  }
+
+  private registerDashlets(): void {
+    this._dashletRegistry.registerDashlet('executionStep', DashletExecutionStepComponent);
+    this._dashletRegistry.registerDashlet('executionTree', DashletExecutionTreeComponent);
+    this._dashletRegistry.registerDashlet('executionViz', DashletExecutionVizComponent);
+    this._dashletRegistry.registerDashlet('executionError', DashletExecutionErrorsComponent);
+
+    this._viewRegistry.registerDashletAdvanced(
       'executionTabMigrated',
       'Execution steps',
       'executionStep',
@@ -110,7 +115,7 @@ export class ExecutionModule {
       () => true
     );
 
-    _viewRegistry.registerDashletAdvanced(
+    this._viewRegistry.registerDashletAdvanced(
       'executionTabMigrated',
       'Execution tree',
       'executionTree',
@@ -121,12 +126,35 @@ export class ExecutionModule {
       }
     );
 
-    _viewRegistry.registerDashletAdvanced('executionTabMigrated', 'Performance', 'executionViz', 'viz', 2, function () {
-      return true;
-    });
+    this._viewRegistry.registerDashletAdvanced(
+      'executionTabMigrated',
+      'Performance',
+      'executionViz',
+      'viz',
+      2,
+      function () {
+        return true;
+      }
+    );
 
-    _viewRegistry.registerDashletAdvanced('executionTabMigrated', 'Errors', 'executionError', 'errors', 3, function () {
-      return true;
+    this._viewRegistry.registerDashletAdvanced(
+      'executionTabMigrated',
+      'Errors',
+      'executionError',
+      'errors',
+      3,
+      function () {
+        return true;
+      }
+    );
+  }
+
+  private registerRoutes(): void {
+    this._viewRegistry.registerView('executions', 'partials/execution.html');
+
+    this._viewRegistry.registerRoute({
+      path: 'repository',
+      component: RepositoryComponent,
     });
   }
 }
