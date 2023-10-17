@@ -37,7 +37,7 @@ export class SchedulerModule {
     this.registerEntity();
     this.registerCells();
     this.registerViews();
-    this.registerDashlets();
+    this.registerSettings();
     _taskBulkOperations.register();
   }
 
@@ -59,22 +59,21 @@ export class SchedulerModule {
     });
   }
 
-  private registerDashlets(): void {
-    this._viewRegistry.registerDashlet(
-      'admin/controller',
-      'Scheduler',
-      'partials/scheduler/schedulerConfiguration.html',
-      'scheduler',
-      false,
-      1
-    );
-    this._viewRegistry.registerDashlet(
-      'settings',
-      'Scheduler',
-      'partials/scheduler/schedulerConfiguration.html',
-      'scheduler',
-      false,
-      1
-    );
+  private registerSettings(): void {
+    const register = (parentPath: string) => {
+      this._viewRegistry.registerRoute(
+        {
+          path: 'scheduler',
+          component: SchedulerConfigurationComponent,
+        },
+        {
+          parentPath,
+          label: 'Scheduler',
+          weight: 0,
+        }
+      );
+    };
+    register('settings');
+    register('admin/controller');
   }
 }
