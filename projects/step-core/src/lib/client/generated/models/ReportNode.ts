@@ -30,7 +30,6 @@ export type ReportNode = {
   resolvedArtefact?: AbstractArtefact;
   contributingError?: boolean;
   orphan?: boolean;
-  contributingError?: boolean;
   id?: string;
   _class: string;
 };

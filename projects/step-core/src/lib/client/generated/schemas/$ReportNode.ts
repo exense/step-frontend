@@ -58,9 +58,6 @@ export const $ReportNode = {
     orphan: {
       type: 'boolean',
     },
-    contributingError: {
-      type: 'boolean',
-    },
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',

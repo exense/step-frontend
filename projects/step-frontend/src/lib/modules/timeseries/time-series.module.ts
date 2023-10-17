@@ -34,6 +34,7 @@ import { FilterBarTaskItemComponent } from './performance-view/filter-bar/item/t
 import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import { FilterBarPlanItemComponent } from './performance-view/filter-bar/item/plan/filter-bar-plan-item.component';
 import { MetricChartComponent } from './metric-chart/metric-chart.component';
+import { ResolutionPickerComponent } from './components/resolution-picker/resolution-picker.component';
 
 @NgModule({
   declarations: [
@@ -59,6 +60,7 @@ import { MetricChartComponent } from './metric-chart/metric-chart.component';
     FilterBarExecutionItemComponent,
     FilterBarTaskItemComponent,
     MetricChartComponent,
+    ResolutionPickerComponent,
   ],
   exports: [ExecutionPerformanceComponent, AnalyticsPageComponent, MetricChartComponent],
   providers: [{ provide: MatPaginatorIntl, useClass: NoTotalCountPaginator }],

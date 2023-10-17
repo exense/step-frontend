@@ -1,132 +1,22 @@
-.chart-wrapper {
-  width: 100%;
-  max-width: 100%;
-  max-height: 100%;
-  position: relative;
+.settings-container {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  z-index: 1;
 }
 
-.u-axis {
-  //width: 100px !important;
+.selected-menu-item {
+  background: rgba(0, 0, 0, 0.04);
 }
 
-:host {
-  ::ng-deep {
-    .u-legend {
-      font-size: 1.3rem;
-      display: flex;
-      justify-content: space-around;
-
-      .u-series {
-        margin-right: 0.8rem;
-        white-space: nowrap;
-
-        .u-marker:empty {
-          display: none;
-        }
-      }
-    }
-  }
-}
-
-.ranger {
-  .u-grip-l,
-  .u-grip-r {
-    z-index: 100 !important;
-  }
-}
-
-.no-data-tag {
+.spinner {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  max-width: 100%;
-  text-align: center;
-  font-weight: bold;
-  background: white;
-  font-size: 1.5rem;
-  padding: 0.8rem 1.6rem;
-  color: rgba(0, 0, 0, 0.38);
-  border-bottom: 1px solid #d9d9d9;
-  border-top: 1px solid #d9d9d9;
 }
 
-.u-axis {
-  //width: 100px !important;
-}
-
-.ts-chart-legend {
-  display: flex;
-  justify-content: space-between;
-  flex-direction: row;
-  padding: 1rem 1.6rem 0;
-  border-top: 1px solid #e9e9e9;
+.checkbox-row {
+  gap: 12px;
   align-items: center;
-  font-size: 1.3rem;
-  height: 2.6rem;
-
-  .left-section {
-    display: flex;
-    overflow: hidden;
-    max-width: 100%;
-
-    &:hover {
-      overflow: auto;
-    }
-  }
-
-  .item {
-    margin-right: 1rem;
-    display: flex;
-    align-items: center;
-
-    .color-square {
-      display: inline-block;
-      width: 1.4rem;
-      height: 1rem;
-      opacity: 0.7;
-    }
-  }
-
-  .item-label {
-    margin-left: 0.4rem;
-    display: inline-block;
-    white-space: nowrap;
-    max-width: 20rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .aggregate-section {
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    margin-left: 5rem;
-  }
-
-  /* width */
-  ::-webkit-scrollbar {
-    width: 2px;
-    height: 4px;
-  }
-
-  /* Track */
-  ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
-    background: rgba(41, 62, 80, 0.22);
-  }
-
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(41, 62, 80, 0.4);
-  }
-}
-
-.total-value-icon {
-  color: #c9d4dd;
-  stroke-width: 4px;
 }

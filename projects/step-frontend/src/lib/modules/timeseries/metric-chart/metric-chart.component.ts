@@ -5,6 +5,7 @@ import {
   BucketAttributes,
   BucketResponse,
   FetchBucketsRequest,
+  MetricAttribute,
   MetricType,
   TimeSeriesAPIResponse,
   TimeSeriesService,
@@ -16,6 +17,13 @@ import { TimeSeriesConfig } from '../time-series.config';
 //@ts-ignore
 import uPlot = require('uplot');
 import { FilterUtils } from '../util/filter-utils';
+import { reduce } from 'rxjs';
+
+type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
+
+interface MetricAttributeSelection extends MetricAttribute {
+  selected: boolean;
+}
 
 @Component({
   selector: 'step-metric-chart',
@@ -28,6 +36,14 @@ export class MetricChartComponent implements OnInit, OnChanges {
   @Input() filters: Record<string, any> = {};
   @Input() settings!: MetricType;
   @Input() range!: TSTimeRange;
+  @Input() allowGroupingChange = true;
+  @Input() allowMetricChange = true;
+
+  readonly AGGREGATES: AggregationType[] = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'RATE', 'MEDIAN', 'PERCENTILE'];
+  selectedAggregate!: AggregationType;
+  groupingAttributes: MetricAttributeSelection[] = [];
+
+  isLoading = false;
 
   private _timeSeriesService = inject(TimeSeriesService);
 
@@ -38,11 +54,20 @@ export class MetricChartComponent implements OnInit, OnChanges {
     if (!this.range) {
       throw new Error('Range input is mandatory');
     }
-    this.init(this.settings, this.range);
+    const renderingSettings = this.settings.renderingSettings!;
+    this.groupingAttributes = this.settings.attributes?.map((a) => ({ ...a, selected: false })) || [];
+    renderingSettings.defaultGroupingAttributes?.forEach((a) => {
+      const foundAttribute = this.groupingAttributes.find((attr) => attr.value === a);
+      if (foundAttribute) {
+        foundAttribute.selected = true;
+      }
+    });
+    this.selectedAggregate = renderingSettings.defaultAggregation || 'SUM';
+    this.fetchDataAndCreateChart(this.settings, this.range);
   }
 
-  private init(settings: MetricType, range: TSTimeRange): void {
-    const groupDimensions = settings.renderingSettings!.defaultGroupingAttributes || [];
+  private fetchDataAndCreateChart(settings: MetricType, range: TSTimeRange): void {
+    const groupDimensions: string[] = this.groupingAttributes.filter((a) => a.selected).map((a) => a.value!);
     const request: FetchBucketsRequest = {
       start: range.from,
       end: range.to,
@@ -51,14 +76,27 @@ export class MetricChartComponent implements OnInit, OnChanges {
       numberOfBuckets: 100,
     };
     this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
+      this.isLoading = false;
       this.chartSettings = this.createChartSettings(response, groupDimensions);
     });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['settings']?.previousValue || changes['range']?.previousValue) {
-      this.init(this.settings, this.range);
+      this.fetchDataAndCreateChart(this.settings, this.range);
     }
+  }
+
+  toggleGroupingAttribute(attribute: MetricAttributeSelection) {
+    this.isLoading = true;
+    attribute.selected = !attribute.selected;
+    this.fetchDataAndCreateChart(this.settings, this.range);
+  }
+
+  switchAggregate(aggregate: AggregationType) {
+    this.isLoading = true;
+    this.selectedAggregate = aggregate;
+    this.fetchDataAndCreateChart(this.settings, this.range);
   }
 
   private createChartSettings(response: TimeSeriesAPIResponse, groupDimensions: string[]): TSChartSettings {
@@ -71,7 +109,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
         id: seriesLabel,
         label: seriesLabel,
         legendName: seriesLabel,
-        data: series.map((b) => this.getBucketValue(b, renderingSettings!.defaultAggregation!)),
+        data: series.map((b) => this.getBucketValue(b, this.selectedAggregate!)),
         value: (self, x) => TimeSeriesUtils.formatNumericAxisValue(x),
         stroke: color,
         fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
@@ -81,7 +119,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
     let yAxesUnit = this.getUnitLabel(renderingSettings!.unit);
 
     return {
-      title: this.settings.name!,
+      title: `${this.settings.name!} (${this.selectedAggregate})`,
       xValues: xLabels,
       series: series,
       tooltipOptions: {
@@ -124,10 +162,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
     }
   }
 
-  private getBucketValue(
-    b: BucketResponse,
-    aggregation: 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE'
-  ): number {
+  private getBucketValue(b: BucketResponse, aggregation: AggregationType): number {
     if (!b) {
       return 0;
     }
