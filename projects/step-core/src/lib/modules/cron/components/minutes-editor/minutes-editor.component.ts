@@ -5,9 +5,6 @@ import { BaseEditorComponent } from '../base-editor/base-editor.component';
   selector: 'step-minutes-editor',
   templateUrl: './minutes-editor.component.html',
   styleUrls: ['./minutes-editor.component.scss'],
-  host: {
-    class: 'editor-content',
-  },
   encapsulation: ViewEncapsulation.None,
 })
 export class MinutesEditorComponent extends BaseEditorComponent {

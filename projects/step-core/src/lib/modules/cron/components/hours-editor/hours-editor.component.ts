@@ -5,9 +5,6 @@ import { MinutesEditorComponent } from '../minutes-editor/minutes-editor.compone
   selector: 'step-hours-editor',
   templateUrl: './hours-editor.component.html',
   styleUrls: ['./hours-editor.component.scss'],
-  host: {
-    class: 'editor-content',
-  },
   encapsulation: ViewEncapsulation.None,
 })
 export class HoursEditorComponent extends MinutesEditorComponent {

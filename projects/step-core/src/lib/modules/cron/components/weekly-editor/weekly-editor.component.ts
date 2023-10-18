@@ -12,6 +12,9 @@ const createDayInfo = (key: string, value: string): DayInfo => ({ key, value });
   selector: 'step-weekly-editor',
   templateUrl: './weekly-editor.component.html',
   styleUrls: ['./weekly-editor.component.scss'],
+  host: {
+    class: 'editor-content',
+  },
   encapsulation: ViewEncapsulation.None,
 })
 export class WeeklyEditorComponent extends HoursEditorComponent {
