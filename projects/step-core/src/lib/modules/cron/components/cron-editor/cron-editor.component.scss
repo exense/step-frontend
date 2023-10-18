@@ -6,6 +6,10 @@ step-cron-editor {
     flex-direction: column;
   }
 
+  h4 {
+    margin-top: 0;
+  }
+
   .editor-content {
     display: flex;
     align-items: center;

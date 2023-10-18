@@ -3,6 +3,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { Tab } from '../../../tabs/tabs.module';
 import { CronValidation } from '../../types/cron/_cron-validation';
 import { AlertType } from '../../../basics/shared/alert-type.enum';
+import { ExpressionChangeEvent } from '../base-editor/base-editor.component';
 
 type DialogRef = MatDialogRef<CronEditorComponent, string>;
 
@@ -31,23 +32,26 @@ export class CronEditorComponent {
   protected readonly AlertType = AlertType;
 
   protected readonly cronEditorTabs: Tab[] = [
-    createTab(CronEditorTab.MINUTES, 'Minutes'),
+    createTab(CronEditorTab.PRESET, 'Preset'),
+    createTab(CronEditorTab.MINUTES, 'Minutely'),
     createTab(CronEditorTab.HOURLY, 'Hourly'),
     createTab(CronEditorTab.DAILY, 'Daily'),
     createTab(CronEditorTab.WEEKLY, 'Weekly'),
     createTab(CronEditorTab.MONTHLY, 'Monthly'),
     createTab(CronEditorTab.YEARLY, 'Yearly'),
-    createTab(CronEditorTab.PRESET, 'Preset'),
   ];
 
   protected selectedTab = this.cronEditorTabs[0].id;
 
   protected cronExpression = '';
 
-  protected isExpressionValid = true;
+  protected isExpressionValid = false;
 
-  handleExpressionChange(value: string): void {
-    this.cronExpression = value;
+  protected isTouched = false;
+
+  handleExpressionChange({ expression, isTouched }: ExpressionChangeEvent): void {
+    this.cronExpression = expression;
+    this.isTouched = isTouched;
     this.isExpressionValid = CronValidation.validate(this.cronExpression);
   }
 

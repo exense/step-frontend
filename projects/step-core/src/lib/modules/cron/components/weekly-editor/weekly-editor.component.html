@@ -1,19 +1,26 @@
-<section class="day-of-week">
-  <ng-container *ngFor="let day of selectedDays; trackBy: trackByDay">
-    <mat-checkbox color="primary" [ngModel]="day.isSelected" (ngModelChange)="handleDayChange(day)">{{
-      day.value
-    }}</mat-checkbox>
-  </ng-container>
+<section>
+  <h4>Every</h4>
+  <div class="day-of-week">
+    <ng-container *ngFor="let day of selectedDays; trackBy: trackByDay">
+      <mat-checkbox color="primary" [ngModel]="day.isSelected" (ngModelChange)="handleDayChange(day)">{{
+        day.value
+      }}</mat-checkbox>
+    </ng-container>
+  </div>
 </section>
-<section class="editor-content">
-  <span>Start Time</span>
-  <mat-select [ngModel]="hour" (ngModelChange)="handleHourChange($event)">
-    <mat-option *ngFor="let h of HOURS; trackBy: trackByKeyValue" [value]="h.key">{{ h.value }}</mat-option>
-  </mat-select>
-  <mat-select [ngModel]="minute" (ngModelChange)="handleMinuteChange($event)">
-    <mat-option *ngFor="let m of MINUTES; trackBy: trackByKeyValue" [value]="m.key">{{ m.value }}</mat-option>
-  </mat-select>
-  <mat-select [ngModel]="second" (ngModelChange)="handleSecondChange($event)">
-    <mat-option *ngFor="let s of SECONDS; trackBy: trackByKeyValue" [value]="s.key">{{ s.value }}</mat-option>
-  </mat-select>
+<section>
+  <h4>On</h4>
+  <div class="editor-content">
+    <mat-select [ngModel]="hour" (ngModelChange)="handleHourChange($event)">
+      <mat-option *ngFor="let h of HOURS; trackBy: trackByKeyValue" [value]="h.key">{{ h.value }}</mat-option>
+    </mat-select>
+    <span>,</span>
+    <mat-select [ngModel]="minute" (ngModelChange)="handleMinuteChange($event)">
+      <mat-option *ngFor="let m of MINUTES; trackBy: trackByKeyValue" [value]="m.key">{{ m.value }}</mat-option>
+    </mat-select>
+    <span>,</span>
+    <mat-select [ngModel]="second" (ngModelChange)="handleSecondChange($event)">
+      <mat-option *ngFor="let s of SECONDS; trackBy: trackByKeyValue" [value]="s.key">{{ s.value }}</mat-option>
+    </mat-select>
+  </div>
 </section>

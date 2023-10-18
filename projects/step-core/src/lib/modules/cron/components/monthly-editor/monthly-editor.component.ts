@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
+import { ExpressionChangeEvent } from '../base-editor/base-editor.component';
 
 enum MonthlyType {
   DAY = 'day',
@@ -14,10 +15,14 @@ enum MonthlyType {
   },
   encapsulation: ViewEncapsulation.None,
 })
-export class MonthlyEditorComponent {
-  @Output() expressionChange = new EventEmitter<string>();
+export class MonthlyEditorComponent implements AfterViewInit {
+  @Output() expressionChange = new EventEmitter<ExpressionChangeEvent>();
 
   readonly MonthlyType = MonthlyType;
 
-  protected selected = MonthlyType.DAY;
+  protected selected?: MonthlyType;
+
+  ngAfterViewInit(): void {
+    this.expressionChange.emit({ expression: '', isTouched: false });
+  }
 }

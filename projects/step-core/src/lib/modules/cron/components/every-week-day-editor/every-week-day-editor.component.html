@@ -1,10 +1,12 @@
-<span>Every week day (Monday through Friday) at</span>
+<span>week day (Monday through Friday) at</span>
 <mat-select [ngModel]="hour" (ngModelChange)="handleHourChange($event)" [disabled]="!isActive">
   <mat-option *ngFor="let h of HOURS; trackBy: trackByKeyValue" [value]="h.key">{{ h.value }}</mat-option>
 </mat-select>
+<span>,</span>
 <mat-select [ngModel]="minute" (ngModelChange)="handleMinuteChange($event)" [disabled]="!isActive">
   <mat-option *ngFor="let m of MINUTES; trackBy: trackByKeyValue" [value]="m.key">{{ m.value }}</mat-option>
 </mat-select>
+<span>,</span>
 <mat-select [ngModel]="second" (ngModelChange)="handleSecondChange($event)" [disabled]="!isActive">
   <mat-option *ngFor="let s of SECONDS; trackBy: trackByKeyValue" [value]="s.key">{{ s.value }}</mat-option>
 </mat-select>

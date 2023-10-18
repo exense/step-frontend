@@ -14,7 +14,7 @@ import { CRON_PRESETS } from '../../../basics/step-basics.module';
 export class PresetEditorComponent extends BaseEditorComponent {
   protected readonly items = inject(CRON_PRESETS);
 
-  protected selectedValue = this.items[0].key;
+  protected selectedValue = '';
 
   handleValueChange(value: string): void {
     this.selectedValue = value;
