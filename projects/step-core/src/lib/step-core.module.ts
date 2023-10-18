@@ -78,6 +78,7 @@ import { SchedulerTaskLinkComponent } from './components/scheduler-task-link/sch
 import { ResourceInputWrapperComponent } from './components/resource-input-wrapper/resource-input-wrapper.component';
 import { WizardModule } from './modules/wizard/wizards.module';
 import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.component';
+import { SettingsComponent } from './components/settings/settings.component';
 import { CronModule } from './modules/cron/cron.module';
 
 @NgModule({
@@ -138,6 +139,7 @@ import { CronModule } from './modules/cron/cron.module';
     SelectTaskComponent,
     ResourceInputWrapperComponent,
     SimpleOutletComponent,
+    SettingsComponent,
   ],
   imports: [
     CommonModule,
@@ -234,6 +236,7 @@ import { CronModule } from './modules/cron/cron.module';
     MyAccountButtonComponent,
     SelectTaskComponent,
     ResourceInputWrapperComponent,
+    SettingsComponent,
     CronModule,
   ],
   providers: [
@@ -312,6 +315,7 @@ export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.
 export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 export * from './components/artefact-details/artefact-details.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
+export * from './components/settings/settings.component';
 export * from './decorators/plugin';
 export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';

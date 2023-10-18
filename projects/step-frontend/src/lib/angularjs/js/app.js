@@ -28,7 +28,6 @@ var tecAdminApp = angular
     'functionsControllers',
     'executionsControllers',
     'resourcesControllers',
-    'settingControllers',
     'screenConfigurationControllers',
     'dashboardsControllers',
     'asyncTask',
@@ -75,7 +74,6 @@ var tecAdminApp = angular
   ])
 
   .run(function (ViewRegistry, EntityRegistry) {
-    ViewRegistry.registerView('myaccount', 'partials/myaccount.html');
     ViewRegistry.registerView('login', 'partials/loginForm.html', true);
   })
 
@@ -105,7 +103,7 @@ var tecAdminApp = angular
         stateStorage.push($scope, 'root', {});
 
         $rootScope.isInitialized = false;
-        AuthService.initialize().subscribe(() => {
+        AuthService.initialize$.subscribe(() => {
           $rootScope.isInitialized = true;
 
           $scope.logo = '../../../images/logotopleft.png';
