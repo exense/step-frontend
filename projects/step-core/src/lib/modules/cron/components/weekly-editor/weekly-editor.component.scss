@@ -6,7 +6,7 @@ step-weekly-editor.editor-content {
 
   .day-of-week {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(4, 1fr);
     column-gap: 1rem;
     row-gap: 1rem;
   }

@@ -1,9 +1,24 @@
 step-cron-editor {
+  step-tabs > nav {
+    border: none !important;
+
+    .mat-tab-links {
+      margin: 0 !important;
+
+      & > a {
+        padding: 0 1.2rem;
+        min-width: 6rem !important;
+      }
+    }
+  }
+
   .tab-content {
-    padding: 2rem 0;
+    margin-left: 1rem;
+    padding: 1rem 0;
     display: flex;
     gap: 3rem;
     flex-direction: column;
+    min-height: 22rem;
   }
 
   h4 {
