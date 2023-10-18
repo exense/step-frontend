@@ -158,7 +158,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         label: 'Pcl. 90 (ms)',
         isVisible: true,
         isCompareColumn: false,
-        mapValue: (entry) => entry?.max,
+        mapValue: (entry) => entry?.pclValues?.[90],
         mapDiffValue: (entry) => entry.pcl90Diff,
       },
       {
@@ -167,7 +167,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         label: 'Pcl. 99 (ms)',
         isVisible: true,
         isCompareColumn: false,
-        mapValue: (entry) => entry?.max,
+        mapValue: (entry) => entry?.pclValues?.[99],
         mapDiffValue: (entry) => entry.pcl99Diff,
       },
       {
@@ -185,7 +185,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
         label: 'Tph',
         isVisible: true,
         isCompareColumn: false,
-        mapValue: (entry) => entry?.attributes?.['tps'],
+        mapValue: (entry) => entry?.attributes?.['tph'],
         mapDiffValue: (entry) => entry.tphDiff,
       },
     ];
