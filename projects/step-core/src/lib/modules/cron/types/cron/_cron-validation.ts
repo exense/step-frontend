@@ -2,7 +2,11 @@ import { BaseCronValidator } from './_base-cron-validator';
 import { CronValidatorsFactory } from './_cron-validators-factory';
 
 export class CronValidation {
-  static validate(cronExpression: string): boolean {
+  static validate(cronExpression?: string): boolean {
+    if (!cronExpression) {
+      return true;
+    }
+
     const parts = cronExpression.split(' ');
     if (parts.length < 6 || parts.length > 7) {
       return false;
