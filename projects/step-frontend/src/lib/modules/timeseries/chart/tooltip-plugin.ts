@@ -207,7 +207,7 @@ export class TooltipPlugin {
     valueDiv.classList.add('value');
     nameDiv.textContent = `${row.name} `;
 
-    let value = `${Math.trunc(row.value)} `;
+    let value = `${Math.trunc(row.value)}`;
     if (yScaleUnit) {
       value += yScaleUnit;
     }

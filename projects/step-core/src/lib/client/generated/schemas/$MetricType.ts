@@ -24,6 +24,18 @@ export const $MetricType = {
         type: 'MetricAttribute',
       },
     },
+    unit: {
+      type: 'Enum',
+    },
+    defaultAggregation: {
+      type: 'Enum',
+    },
+    defaultGroupingAttributes: {
+      type: 'array',
+      contains: {
+        type: 'string',
+      },
+    },
     renderingSettings: {
       type: 'MetricRenderingSettings',
     },

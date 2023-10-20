@@ -44,7 +44,7 @@ export class ByStatusChartGenerator {
       series: series,
       tooltipOptions: {
         enabled: true,
-        yAxisUnit: '/ h',
+        yAxisUnit: ' / h',
       },
       axes: [
         {

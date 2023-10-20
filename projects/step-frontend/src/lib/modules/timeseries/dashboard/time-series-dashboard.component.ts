@@ -73,7 +73,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       this.settings.activeFilters || []
     );
     this.timeRangeSelection = this.settings.activeTimeRange;
-    console.log(this.settings);
     this.filterOptions = this.prepareFilterOptions(this.filterItems, this.settings);
     const contextParams: TimeSeriesContextParams = {
       id: this.settings.contextId,

@@ -10,6 +10,7 @@ export interface TSChartSettings {
   autoResize?: boolean; // autoresize on window size change
   axes: Axis[];
   tooltipOptions: TsTooltipOptions;
+  showLegend?: boolean; // default true
 }
 
 export interface TSChartSeries extends Series {

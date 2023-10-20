@@ -27,6 +27,9 @@ export class UPlotUtils {
    * @param strokeColor
    */
   static gradientFill(uPlot: uPlot, strokeColor: string) {
+    if (strokeColor.length > 7) {
+      strokeColor = strokeColor.slice(0, 7); // remove existing opacity
+    }
     let canvasHeight = uPlot.ctx.canvas.height;
     let gradient = uPlot.ctx.createLinearGradient(0, 0, 0, canvasHeight);
     gradient.addColorStop(0, strokeColor + '80');

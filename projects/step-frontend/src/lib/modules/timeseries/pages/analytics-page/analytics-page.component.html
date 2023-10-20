@@ -50,7 +50,7 @@
     </div>
   </div>
 
-  <div *ngFor="let settings of customChartsMetrics" style="height: 400px; width: 50%">
+  <div *ngFor="let settings of customChartsMetrics" class="metric-type-container">
     <step-metric-chart [settings]="settings" [range]="activeTimeRange"></step-metric-chart>
   </div>
 </div>

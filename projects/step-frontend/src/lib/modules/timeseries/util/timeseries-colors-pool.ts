@@ -17,6 +17,8 @@ export class TimeseriesColorsPool {
    * @param key - If it is not new, the existing value will be returned, otherwise a new color is generated.
    */
   assignColor(key: string): string {
+    if (key === 'Value') {
+    }
     let color;
     if (this.predefinedColors.length == 0) {
       color = this.randomRGBA();
@@ -41,11 +43,28 @@ export class TimeseriesColorsPool {
   }
 
   randomRGBA(): string {
+    const rgb = this.randomRGB();
+    // Generate alpha value (0.5 to 1 range)
+    const toHex = (num: number) => num.toString(16).padStart(2, '0');
+    const alpha = Math.max(Number(Math.random().toFixed(1)), 0.5);
+    const alphaHex = toHex(Math.round(alpha * 255));
+    return `${rgb}${alphaHex}`;
+  }
+
+  randomRGB(): string {
     var o = Math.round,
       r = Math.random,
       s = 255;
-    let alpha = Math.max(Number(r().toFixed(1)), 0.5);
-    return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + alpha + ')';
+
+    // Convert a number to a 2-digit hexadecimal string
+    const toHex = (num: number) => num.toString(16).padStart(2, '0');
+
+    // Generate RGB values
+    const red = o(r() * s);
+    const green = o(r() * s);
+    const blue = o(r() * s);
+
+    return `#${toHex(red)}${toHex(green)}${toHex(blue)}`;
   }
 
   /**
@@ -66,7 +85,7 @@ export class TimeseriesColorsPool {
   }
 }
 
-const colors = ['#c90e00', '#ffa845', '#009359', '#050c91', '#7baaff', '#ffd61f'];
+const colors = ['#0b75ff', '#23ad9d', '#8c13ff'];
 
 const statusColors: { [key: string]: string } = {
   technical_error: '#000000',

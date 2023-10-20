@@ -11,6 +11,9 @@ export type MetricType = {
   name?: string;
   description?: string;
   attributes?: Array<MetricAttribute>;
+  unit?: 'MS' | 'PERCENTAGE' | 'EMPTY';
+  defaultAggregation?: 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
+  defaultGroupingAttributes?: Array<string>;
   renderingSettings?: MetricRenderingSettings;
   id?: string;
 };

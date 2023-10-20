@@ -18,6 +18,7 @@ import { TimeSeriesConfig } from '../time-series.config';
 import uPlot = require('uplot');
 import { FilterUtils } from '../util/filter-utils';
 import { reduce } from 'rxjs';
+import { TimeseriesColorsPool } from '../util/timeseries-colors-pool';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -38,6 +39,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
   @Input() range!: TSTimeRange;
   @Input() allowGroupingChange = true;
   @Input() allowMetricChange = true;
+  @Input() colorsPool: TimeseriesColorsPool = new TimeseriesColorsPool();
 
   readonly AGGREGATES: AggregationType[] = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'RATE', 'MEDIAN', 'PERCENTILE'];
   selectedAggregate!: AggregationType;
@@ -54,26 +56,32 @@ export class MetricChartComponent implements OnInit, OnChanges {
     if (!this.range) {
       throw new Error('Range input is mandatory');
     }
-    const renderingSettings = this.settings.renderingSettings!;
     this.groupingAttributes = this.settings.attributes?.map((a) => ({ ...a, selected: false })) || [];
-    renderingSettings.defaultGroupingAttributes?.forEach((a) => {
+    this.settings.defaultGroupingAttributes?.forEach((a) => {
       const foundAttribute = this.groupingAttributes.find((attr) => attr.value === a);
       if (foundAttribute) {
         foundAttribute.selected = true;
       }
     });
-    this.selectedAggregate = renderingSettings.defaultAggregation || 'SUM';
+    this.selectedAggregate = this.settings.defaultAggregation || 'SUM';
     this.fetchDataAndCreateChart(this.settings, this.range);
   }
 
   private fetchDataAndCreateChart(settings: MetricType, range: TSTimeRange): void {
     const groupDimensions: string[] = this.groupingAttributes.filter((a) => a.selected).map((a) => a.value!);
+    let pclValues: number[] | undefined;
+    if (this.selectedAggregate === 'MEDIAN') {
+      pclValues = [50];
+    } else if (this.selectedAggregate === 'PERCENTILE') {
+      pclValues = [80, 90, 99];
+    }
     const request: FetchBucketsRequest = {
       start: range.from,
       end: range.to,
       groupDimensions: groupDimensions,
       oqlFilter: FilterUtils.objectToOQL({ ...this.filters, 'attributes.metricType': `"${settings.key!}"` }),
       numberOfBuckets: 100,
+      percentiles: pclValues,
     };
     this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
       this.isLoading = false;
@@ -100,11 +108,11 @@ export class MetricChartComponent implements OnInit, OnChanges {
   }
 
   private createChartSettings(response: TimeSeriesAPIResponse, groupDimensions: string[]): TSChartSettings {
-    const renderingSettings = this.settings.renderingSettings!;
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const series: TSChartSeries[] = response.matrix.map((series, i) => {
       const seriesLabel = this.getSeriesKey(response.matrixKeys[i], groupDimensions);
-      const color = '#2461cc';
+      const color =
+        this.settings.renderingSettings?.seriesColors?.[seriesLabel] || this.colorsPool.getColor(seriesLabel);
       return {
         id: seriesLabel,
         label: seriesLabel,
@@ -114,9 +122,10 @@ export class MetricChartComponent implements OnInit, OnChanges {
         stroke: color,
         fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
         points: { show: false },
+        show: true,
       };
     });
-    let yAxesUnit = this.getUnitLabel(renderingSettings!.unit);
+    let yAxesUnit = this.getUnitLabel(this.settings);
 
     return {
       title: `${this.settings.name!} (${this.selectedAggregate})`,
@@ -126,13 +135,14 @@ export class MetricChartComponent implements OnInit, OnChanges {
         enabled: true,
         yAxisUnit: yAxesUnit,
       },
+      showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
       axes: [
         {
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
           scale: 'y',
           values: (u, vals, space) => {
             return vals.map(
-              (v) => this.getAxesFormatFunction(renderingSettings.unit)(v) + this.getUnitLabel(renderingSettings.unit)
+              (v) => this.getAxesFormatFunction(this.settings.unit)(v) + this.getUnitLabel(this.settings)
             );
           },
         },
@@ -154,10 +164,13 @@ export class MetricChartComponent implements OnInit, OnChanges {
     }
   }
 
-  private getUnitLabel(unit: undefined | 'MS' | 'PERCENTAGE' | 'EMPTY'): string {
-    if (unit === 'PERCENTAGE') {
+  private getUnitLabel(metric: MetricType): string {
+    if (metric.unit === 'PERCENTAGE') {
       return '%';
     } else {
+      if (this.selectedAggregate === 'RATE') {
+        return '/h';
+      }
       return '';
     }
   }
@@ -180,7 +193,9 @@ export class MetricChartComponent implements OnInit, OnChanges {
       case 'RATE':
         return b.throughputPerHour;
       case 'MEDIAN':
+        return b.pclValues?.[50] || 0;
       case 'PERCENTILE':
+        return b.pclValues?.[90] || 0;
       default:
         throw new Error('Unhandled aggregation value: ' + aggregation);
     }

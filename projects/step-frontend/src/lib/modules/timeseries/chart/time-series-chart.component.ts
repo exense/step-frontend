@@ -46,7 +46,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   chartIsEmpty = false; // meaning the chart is already created, but it has no data
   chartIsUnavailable = false;
 
-  legendSettings: LegendSettings = { items: [] };
+  legendSettings: LegendSettings = { show: true, items: [] };
 
   getSize = () => {
     return {
@@ -91,6 +91,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
    * @param settings
    */
   createChart(settings: TSChartSettings): void {
+    this.legendSettings.show = settings.showLegend ?? true;
     this.legendSettings.items = [];
     this.chartIsUnavailable = false;
     this.seriesIndexesByIds = {};
@@ -130,7 +131,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
           seriesId: series.id,
           color: (series.stroke as string) || '#cccccc',
           label: series.legendName,
-          isVisible: !!series.show,
+          isVisible: series.show ?? true,
         });
       }
     });
@@ -345,6 +346,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 }
 
 interface LegendSettings {
+  show: boolean;
   items: LegendItem[];
   zAxisLabel?: string;
 }

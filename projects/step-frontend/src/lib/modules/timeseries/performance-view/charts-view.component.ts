@@ -696,7 +696,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
           series: responseTimeSeries,
           tooltipOptions: {
             enabled: true,
-            yAxisUnit: 'ms',
+            yAxisUnit: ' ms',
           },
           axes: [
             {

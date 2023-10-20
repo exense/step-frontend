@@ -50,7 +50,7 @@ export class ChartGenerators {
       xValues: xLabels,
       tooltipOptions: {
         enabled: true,
-        yAxisUnit: 'ms',
+        yAxisUnit: ' ms',
         zAxisLabel: 'Hits/h',
       },
       series: [
