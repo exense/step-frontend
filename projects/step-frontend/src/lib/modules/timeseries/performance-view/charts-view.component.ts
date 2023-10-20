@@ -310,7 +310,8 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       .withRange(settings.timeRange)
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
       .withFilteringSettings(this.context.getFilteringSettings())
-      .withIntervalSize(this.context.getChartsResolution());
+      .withIntervalSize(this.context.getChartsResolution())
+      .withCollectAttributeKeys(['eId']);
   }
 
   private createAllBaseCharts() {

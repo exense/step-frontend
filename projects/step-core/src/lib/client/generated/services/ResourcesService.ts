@@ -18,6 +18,7 @@ export class ResourcesService {
    * @param type
    * @param duplicateCheck
    * @param directory
+   * @param trackingAttribute
    * @param formData
    * @returns ResourceUploadResponse default response
    * @throws ApiError
@@ -26,6 +27,7 @@ export class ResourcesService {
     type?: string,
     duplicateCheck?: boolean,
     directory?: boolean,
+    trackingAttribute?: string,
     formData?: {
       file?: FormDataContentDisposition;
     }
@@ -37,6 +39,7 @@ export class ResourcesService {
         type: type,
         duplicateCheck: duplicateCheck,
         directory: directory,
+        trackingAttribute: trackingAttribute,
       },
       formData: formData,
       mediaType: 'multipart/form-data',
@@ -70,6 +73,20 @@ export class ResourcesService {
       path: {
         id: id,
       },
+    });
+  }
+
+  /**
+   * @param requestBody
+   * @returns Resource default response
+   * @throws ApiError
+   */
+  public findManyByCriteria(requestBody?: Record<string, string>): Observable<Array<Resource>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/resources/find',
+      body: requestBody,
+      mediaType: 'application/json',
     });
   }
 

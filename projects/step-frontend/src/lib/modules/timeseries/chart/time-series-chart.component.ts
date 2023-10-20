@@ -27,7 +27,8 @@ import uPlot = require('uplot');
 })
 export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChanges {
   private readonly HEADER_WITH_FOOTER_SIZE = 48;
-
+  // seriesId - metadata buckets
+  private seriesMetadata: { [key: string]: any[] } = {};
   @ViewChild('chart') private chartElement!: ElementRef;
 
   @Input() title!: string;
@@ -96,7 +97,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     this.seriesIndexesByIds = {};
 
     const cursorOpts: uPlot.Cursor = {
-      lock: false,
+      lock: true,
       y: false,
       bind: {
         dblclick: (self: uPlot, target: HTMLElement, handler: MouseListener) => {
@@ -123,6 +124,9 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     settings.series.forEach((series, i) => {
       if (series.id) {
         this.seriesIndexesByIds[series.id] = i + 1; // because the first series is the time
+        if (series.metadata) {
+          this.seriesMetadata[series.id] = series.metadata;
+        }
       }
       if (series.stroke) {
         // aggregate series don't have stroke (e.g total)
@@ -159,7 +163,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         // y: {auto: true},
       },
       plugins: this.settings.tooltipOptions.enabled
-        ? [TooltipPlugin.getInstance(() => this.settings.tooltipOptions)]
+        ? [TooltipPlugin.getInstance(() => this.settings.tooltipOptions, this)]
         : [],
       axes: [{}, ...(settings.axes || [])],
       series: [

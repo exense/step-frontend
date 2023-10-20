@@ -15,5 +15,6 @@ export interface TSChartSettings {
 export interface TSChartSeries extends Series {
   id: string;
   data: (number | null | undefined)[];
+  metadata?: any[];
   legendName: string;
 }

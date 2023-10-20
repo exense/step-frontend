@@ -3,6 +3,7 @@ import uPlot = require('uplot');
 import { PlacementFunction } from './placement-function';
 import { TimeSeriesConfig } from '../time-series.config';
 import { TsTooltipOptions } from './model/ts-tooltip-options';
+import { TimeSeriesChartComponent } from './time-series-chart.component';
 
 interface TooltipRowEntry {
   value: number;
@@ -19,7 +20,7 @@ export interface Anchor {
 }
 
 export class TooltipPlugin {
-  public static getInstance(optionsGetter: () => TsTooltipOptions): uPlot.Plugin {
+  public static getInstance(optionsGetter: () => TsTooltipOptions, ref?: TimeSeriesChartComponent): uPlot.Plugin {
     let over: any;
     let bound: Element;
     let bLeft: any;
@@ -68,7 +69,7 @@ export class TooltipPlugin {
           if (!isVisible) {
             return;
           }
-          const settings = optionsGetter();
+          const settings = ref!.settings.tooltipOptions;
           const { left, top, idx } = u.cursor;
           if (!top || top < 0 || !idx || !left) {
             // some weird uPlot behaviour. it happens to be -10 many times
