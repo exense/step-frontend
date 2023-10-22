@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import {
@@ -17,8 +17,9 @@ import { TimeSeriesConfig } from '../time-series.config';
 //@ts-ignore
 import uPlot = require('uplot');
 import { FilterUtils } from '../util/filter-utils';
-import { reduce } from 'rxjs';
 import { TimeseriesColorsPool } from '../util/timeseries-colors-pool';
+import MouseListener = uPlot.Cursor.MouseListener;
+import { TimeSeriesChartComponent } from '../chart/time-series-chart.component';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -33,6 +34,7 @@ interface MetricAttributeSelection extends MetricAttribute {
 })
 export class MetricChartComponent implements OnInit, OnChanges {
   chartSettings?: TSChartSettings;
+  @ViewChild(TimeSeriesChartComponent) chart!: TimeSeriesChartComponent;
 
   @Input() filters: Record<string, any> = {};
   @Input() settings!: MetricType;
@@ -44,6 +46,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
   readonly AGGREGATES: AggregationType[] = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'RATE', 'MEDIAN', 'PERCENTILE'];
   selectedAggregate!: AggregationType;
   groupingAttributes: MetricAttributeSelection[] = [];
+  selectedRange!: TSTimeRange; // when zooming, this will get smaller
 
   isLoading = false;
 
@@ -56,6 +59,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
     if (!this.range) {
       throw new Error('Range input is mandatory');
     }
+    this.selectedRange = this.range;
     this.groupingAttributes = this.settings.attributes?.map((a) => ({ ...a, selected: false })) || [];
     this.settings.defaultGroupingAttributes?.forEach((a) => {
       const foundAttribute = this.groupingAttributes.find((attr) => attr.value === a);
@@ -64,10 +68,11 @@ export class MetricChartComponent implements OnInit, OnChanges {
       }
     });
     this.selectedAggregate = this.settings.defaultAggregation || 'SUM';
-    this.fetchDataAndCreateChart(this.settings, this.range);
+    this.fetchDataAndCreateChart(this.settings);
   }
 
-  private fetchDataAndCreateChart(settings: MetricType, range: TSTimeRange): void {
+  private fetchDataAndCreateChart(settings: MetricType): void {
+    this.chart?.setBlur(true);
     const groupDimensions: string[] = this.groupingAttributes.filter((a) => a.selected).map((a) => a.value!);
     let pclValues: number[] | undefined;
     if (this.selectedAggregate === 'MEDIAN') {
@@ -76,8 +81,8 @@ export class MetricChartComponent implements OnInit, OnChanges {
       pclValues = [80, 90, 99];
     }
     const request: FetchBucketsRequest = {
-      start: range.from,
-      end: range.to,
+      start: this.selectedRange.from,
+      end: this.selectedRange.to,
       groupDimensions: groupDimensions,
       oqlFilter: FilterUtils.objectToOQL({ ...this.filters, 'attributes.metricType': `"${settings.key!}"` }),
       numberOfBuckets: 100,
@@ -89,22 +94,36 @@ export class MetricChartComponent implements OnInit, OnChanges {
     });
   }
 
+  changeSelection(range: TSTimeRange) {
+    range.from = Math.floor(range.from);
+    range.to = Math.floor(range.to);
+    if (this.selectedRange.from !== range.from || this.selectedRange.to !== range.to) {
+      this.selectedRange = range;
+      this.fetchDataAndCreateChart(this.settings);
+    }
+  }
+
+  resetSelection() {
+    this.selectedRange = this.range;
+    this.fetchDataAndCreateChart(this.settings);
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['settings']?.previousValue || changes['range']?.previousValue) {
-      this.fetchDataAndCreateChart(this.settings, this.range);
+      this.fetchDataAndCreateChart(this.settings);
     }
   }
 
   toggleGroupingAttribute(attribute: MetricAttributeSelection) {
     this.isLoading = true;
     attribute.selected = !attribute.selected;
-    this.fetchDataAndCreateChart(this.settings, this.range);
+    this.fetchDataAndCreateChart(this.settings);
   }
 
   switchAggregate(aggregate: AggregationType) {
     this.isLoading = true;
     this.selectedAggregate = aggregate;
-    this.fetchDataAndCreateChart(this.settings, this.range);
+    this.fetchDataAndCreateChart(this.settings);
   }
 
   private createChartSettings(response: TimeSeriesAPIResponse, groupDimensions: string[]): TSChartSettings {
