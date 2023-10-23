@@ -46,7 +46,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
   readonly AGGREGATES: AggregationType[] = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'RATE', 'MEDIAN', 'PERCENTILE'];
   selectedAggregate!: AggregationType;
   groupingAttributes: MetricAttributeSelection[] = [];
-  selectedRange!: TSTimeRange; // when zooming, this will get smaller
+  selectedRange = this.range;
 
   isLoading = false;
 
