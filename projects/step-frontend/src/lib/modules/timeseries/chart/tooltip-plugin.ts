@@ -101,7 +101,7 @@ export class TooltipPlugin {
           let elipsisBefore = true;
           let elipsisAfter = true;
           const closestIndex = this.getClosestIndex(hoveredValue, yPoints);
-          if (closestIndex > -1) {
+          if (closestIndex >= 0) {
             yPoints[closestIndex].bold = true;
           }
           if (yPoints.length > elementsToSelect) {
