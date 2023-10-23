@@ -1,15 +1,23 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_LOCATION, AJS_MODULE, Execution, IS_SMALL_SCREEN } from '@exense/step-core';
+import { AJS_MODULE, Execution, IS_SMALL_SCREEN } from '@exense/step-core';
 import { ExecutionTab } from '../../shared/execution-tab';
+import { Router } from '@angular/router';
+import { ExecutionOpenNotificatorService } from '../../services/execution-open-notificator.service';
 
 @Component({
   selector: 'step-execution-page',
   templateUrl: './execution-page.component.html',
   styleUrls: ['./execution-page.component.scss'],
+  providers: [
+    {
+      provide: ExecutionOpenNotificatorService,
+      useExisting: ExecutionPageComponent,
+    },
+  ],
 })
-export class ExecutionPageComponent implements OnInit, OnDestroy {
-  private _location = inject(AJS_LOCATION);
+export class ExecutionPageComponent implements OnInit, OnDestroy, ExecutionOpenNotificatorService {
+  private _router = inject(Router);
 
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
@@ -18,7 +26,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   activeTab!: ExecutionTab;
 
   private locationChangeFunction = () => {
-    if (!this._location.path().includes('executions')) {
+    if (!this._router.url.includes('executions')) {
       return;
     }
 
@@ -52,9 +60,9 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
     let url = this.createUrl(this.activeTab);
     if (this.listTab.id === 'list') {
       //FIXME: workarround for url rewrite /executions => /executions/list should be removed with Angular Routing
-      this._location.path(url).replace();
+      this._router.navigateByUrl(url, { replaceUrl: true });
     } else {
-      this._location.path(url);
+      this._router.navigateByUrl(url);
     }
   }
 
@@ -95,7 +103,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
   replaceUrlSubTab(subTab: string): void {
     let urlItems = this.getUrlParts();
     urlItems[3] = subTab;
-    this._location.path(urlItems.join('/'));
+    this._router.navigate(urlItems);
   }
 
   handleTabClose(tabId: string, openList: boolean = true) {
@@ -119,10 +127,14 @@ export class ExecutionPageComponent implements OnInit, OnDestroy {
    * @private
    */
   private getUrlParts(): string[] {
-    const url = this._location.path().substring(1); // remove first backslash
+    let url = this._router.url.split('?')[0].substring(1); // remove first backslash
     // executions/12345/performance
     let parts = url.split('/');
     return parts;
+  }
+
+  openNotify(eId: string) {
+    this.locationChangeFunction();
   }
 
   ngOnInit(): void {

@@ -33,9 +33,10 @@ import { LabelAddonDirective } from './directives/label-addon.directive';
 import { TimeInputComponent } from './components/time-input/time-input.component';
 import { ProjectSwitchDialogComponent } from './components/project-switch-dialog/project-switch-dialog.component';
 import { ArrayInputComponent } from './components/array-input/array-input.component';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
   declarations: [
     ResourceLabelComponent,
     ArrayFilterComponent,
@@ -101,6 +102,7 @@ import { ArrayInputComponent } from './components/array-input/array-input.compon
     ProjectSwitchDialogComponent,
     TimeInputComponent,
     ArrayInputComponent,
+    RouterModule,
   ],
 })
 export class StepBasicsModule {}
