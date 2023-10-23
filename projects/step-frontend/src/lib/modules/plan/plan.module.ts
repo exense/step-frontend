@@ -5,6 +5,7 @@ import {
   PlanDialogsService,
   PlanLinkComponent,
   PlanLinkDialogService,
+  SimpleOutletComponent,
   ViewRegistryService,
 } from '@exense/step-core';
 import { ExecutionModule } from '../execution/execution.module';
@@ -36,6 +37,23 @@ export class PlanModule {
     _planBulkOperations.register();
     _entityRegistry.register('plans', 'Plan', { icon: 'plan', component: PlanSelectionComponent });
     _cellsRegister.registerCell('planLink', PlanLinkComponent);
-    _viewRegistry.registerView('plans', 'partials/plans/plans.html');
+    _viewRegistry.registerRoute({
+      path: 'plans',
+      component: SimpleOutletComponent,
+      children: [
+        {
+          path: '',
+          redirectTo: 'list',
+        },
+        {
+          path: 'list',
+          component: PlanListComponent,
+        },
+        {
+          path: 'editor/:id',
+          component: PlanEditorComponent,
+        },
+      ],
+    });
   }
 }

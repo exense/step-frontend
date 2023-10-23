@@ -2,7 +2,6 @@ import { AfterViewInit, Component, ElementRef, inject, Input, OnDestroy, ViewChi
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AceMode,
-  AJS_LOCATION,
   AJS_MODULE,
   AJS_ROOT_SCOPE,
   AugmentedKeywordEditorService,
@@ -13,6 +12,7 @@ import {
   ScriptLanguage,
 } from '@exense/step-core';
 import { forkJoin, Observable, switchMap } from 'rxjs';
+import { Router } from '@angular/router';
 import * as ace from 'ace-builds';
 import 'ace-builds/src-min-noconflict/theme-chrome.js';
 import 'ace-builds/src-min-noconflict/mode-javascript.js';
@@ -26,7 +26,7 @@ import 'ace-builds/src-min-noconflict/mode-java.js';
 })
 export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
   private _$rootScope = inject(AJS_ROOT_SCOPE);
-  private _$location = inject(AJS_LOCATION);
+  private _router = inject(Router);
   private _keywordApi = inject(KeywordsService);
   private _keywordEditorApi = inject(AugmentedKeywordEditorService);
   private _interactiveApi = inject(InteractivePlanExecutionService);
@@ -60,7 +60,7 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
           interactive: true,
           selectedNode: result.callFunctionId,
         };
-        this._$location.path('/root/plans/editor/' + result.planId);
+        this._router.navigateByUrl(`/root/plans/editor/${result.planId}`);
       });
   }
 

@@ -5,11 +5,11 @@ import { Plan } from '../step-core.module';
   name: 'planName',
 })
 export class PlanNamePipe implements PipeTransform {
-  transform(plan: Plan): string | undefined {
+  transform(plan?: Plan): string | undefined {
     return PlanNamePipe.transform(plan);
   }
 
-  static transform(plan: Plan): string | undefined {
-    return plan.attributes?.['name'];
+  static transform(plan?: Plan): string | undefined {
+    return plan?.attributes?.['name'];
   }
 }

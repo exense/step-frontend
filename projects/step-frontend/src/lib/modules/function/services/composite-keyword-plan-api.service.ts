@@ -2,7 +2,6 @@ import { inject, Injectable } from '@angular/core';
 import { PlanEditorApiService } from '../../plan-editor/plan-editor.module';
 import { map, Observable, pipe, tap } from 'rxjs';
 import {
-  AJS_LOCATION,
   AugmentedInteractivePlanExecutionService,
   AugmentedKeywordsService,
   ExportDialogsService,
@@ -12,11 +11,12 @@ import {
   Keyword,
   History,
 } from '@exense/step-core';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class CompositeKeywordPlanApiService implements PlanEditorApiService {
   private _keywordApi = inject(AugmentedKeywordsService);
-  private _$location = inject(AJS_LOCATION);
+  private _router = inject(Router);
   private _interactiveApi = inject(AugmentedInteractivePlanExecutionService);
   private _exportDialogs = inject(ExportDialogsService);
 
@@ -64,7 +64,7 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService {
   }
 
   navigateToPlan(id: string): void {
-    this._$location.path(`/root/composites/editor/${id}`);
+    this._router.navigateByUrl(`/root/composites/editor/${id}`);
   }
 
   restorePlanVersion(id: string, versionId: string): Observable<Plan> {

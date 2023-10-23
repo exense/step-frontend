@@ -15,7 +15,7 @@ import { ArtefactContext } from '../../shared';
 import { AbstractArtefact, DynamicValueString } from '../../client/step-client-module';
 import { NgForm } from '@angular/forms';
 import { ArtefactFormChangeHelperService } from '../../services/artefact-form-change-helper.service';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'step-artefact-details',
