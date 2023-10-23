@@ -702,7 +702,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
             {
               scale: 'y',
               size: this.CHART_LEGEND_SIZE,
-              values: (u, vals, space) => vals.map((v) => UPlotUtils.formatMilliseconds(v)),
+              values: (u, vals, space) => vals.map((v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(v)),
             },
           ],
         };

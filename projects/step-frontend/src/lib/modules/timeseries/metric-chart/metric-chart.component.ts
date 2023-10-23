@@ -137,7 +137,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
         label: seriesLabel,
         legendName: seriesLabel,
         data: series.map((b) => this.getBucketValue(b, this.selectedAggregate!)),
-        value: (self, x) => TimeSeriesUtils.formatNumericAxisValue(x),
+        value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x),
         stroke: color,
         fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
         points: { show: false },
@@ -175,11 +175,11 @@ export class MetricChartComponent implements OnInit, OnChanges {
     }
     switch (unit) {
       case 'MS':
-        return TimeSeriesUtils.formatTimeAxisValue;
+        return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time;
       case 'PERCENTAGE':
         return (v) => v.toString();
       case 'EMPTY':
-        return TimeSeriesUtils.formatNumericAxisValue;
+        return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber;
     }
   }
 
@@ -194,7 +194,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
     }
   }
 
-  private getBucketValue(b: BucketResponse, aggregation: AggregationType): number {
+  private getBucketValue(b: BucketResponse, aggregation: AggregationType): number | undefined {
     if (!b) {
       return 0;
     }
@@ -212,9 +212,9 @@ export class MetricChartComponent implements OnInit, OnChanges {
       case 'RATE':
         return b.throughputPerHour;
       case 'MEDIAN':
-        return b.pclValues?.[50] || 0;
+        return b.pclValues?.[50];
       case 'PERCENTILE':
-        return b.pclValues?.[90] || 0;
+        return b.pclValues?.[90];
       default:
         throw new Error('Unhandled aggregation value: ' + aggregation);
     }

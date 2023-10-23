@@ -16,44 +16,6 @@ export class TimeSeriesUtils {
     return result;
   }
 
-  static formatNumericAxisValue(num: number): string {
-    if (num && num < 10) {
-      return num.toString();
-    }
-    const lookup = [
-      { value: 1, symbol: '' },
-      { value: 1e3, symbol: 'k' },
-      { value: 1e6, symbol: 'M' },
-      { value: 1e9, symbol: 'B' },
-    ];
-    const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
-    var item = lookup
-      .slice()
-      .reverse()
-      .find(function (item) {
-        return num >= item.value;
-      });
-    return item ? (num / item.value).toFixed(2).replace(rx, '$1') + item.symbol : '0';
-  }
-
-  static formatTimeAxisValue(milliseconds: number): string {
-    const lookup = [
-      { value: 1, symbol: ' ms' }, // milliseconds
-      { value: 1000, symbol: ' s' }, // seconds
-      { value: 60 * 1000, symbol: ' m' }, // minutes
-      { value: 3600 * 1000, symbol: ' h' }, // hours
-      // Add more units if needed, like { value: 86400 * 1000, symbol: 'd' } for days
-    ];
-    const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
-    var item = lookup
-      .slice()
-      .reverse()
-      .find(function (item) {
-        return milliseconds >= item.value;
-      });
-    return item ? (milliseconds / item.value).toFixed(2).replace(rx, '$1') + item.symbol : '0 ms';
-  }
-
   static intervalIsInside(bigInterval: TSTimeRange, smallInterval: TSTimeRange): boolean {
     return !(bigInterval.from > smallInterval.from || bigInterval.to < smallInterval.to);
   }

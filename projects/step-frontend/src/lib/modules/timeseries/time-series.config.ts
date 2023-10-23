@@ -71,6 +71,45 @@ export class TimeSeriesConfig {
     { type: RangeSelectionType.RELATIVE, relativeSelection: { label: 'Last 3 hours', timeInMs: this.ONE_HOUR_MS * 3 } },
     { type: RangeSelectionType.FULL },
   ];
+
+  static readonly AXES_FORMATTING_FUNCTIONS = {
+    bigNumber: (num: number) => {
+      if (num && num < 10) {
+        return num.toString();
+      }
+      const lookup = [
+        { value: 1, symbol: '' },
+        { value: 1e3, symbol: 'k' },
+        { value: 1e6, symbol: 'M' },
+        { value: 1e9, symbol: 'B' },
+      ];
+      const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+      var item = lookup
+        .slice()
+        .reverse()
+        .find(function (item) {
+          return num >= item.value;
+        });
+      return item ? (num / item.value).toFixed(2).replace(rx, '$1') + item.symbol : '0';
+    },
+    time: (milliseconds: number) => {
+      const lookup = [
+        { value: 1, symbol: ' ms' }, // milliseconds
+        { value: 1000, symbol: ' s' }, // seconds
+        { value: 60 * 1000, symbol: ' m' }, // minutes
+        { value: 3600 * 1000, symbol: ' h' }, // hours
+        // Add more units if needed, like { value: 86400 * 1000, symbol: 'd' } for days
+      ];
+      const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+      var item = lookup
+        .slice()
+        .reverse()
+        .find(function (item) {
+          return milliseconds >= item.value;
+        });
+      return item ? (milliseconds / item.value).toFixed(2).replace(rx, '$1') + item.symbol : '0 ms';
+    },
+  };
 }
 
 export interface RefreshInterval {
