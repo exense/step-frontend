@@ -10,14 +10,14 @@ import { AugmentedQuotaManagerService } from '../../services/augmented-quota-man
 })
 export class QuotaManagerComponent implements OnInit {
   private _augmentedQuotaManagerService = inject(AugmentedQuotaManagerService);
-  protected statusTitle!: string;
-  protected statusBody!: string;
+  protected statusTitle = 'Quota Manager';
+  protected statusBody = 'Loading...';
 
   ngOnInit(): void {
-    this.getQuotaManagerStatus();
+    this.updateQuotaManagerStatus();
   }
 
-  getQuotaManagerStatus(): void {
+  updateQuotaManagerStatus(): void {
     this._augmentedQuotaManagerService.getQuotaManagerStatus().subscribe({
       next: (response: string) => {
         this.updateStatus(response);
@@ -29,7 +29,7 @@ export class QuotaManagerComponent implements OnInit {
   }
 
   refresh(): void {
-    this.getQuotaManagerStatus();
+    this.updateQuotaManagerStatus();
   }
 
   private updateStatus(response: string): void {

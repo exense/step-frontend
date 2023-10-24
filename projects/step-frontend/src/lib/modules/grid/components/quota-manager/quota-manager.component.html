@@ -7,6 +7,9 @@
       <p class="title">{{ statusTitle }}</p>
       <p class="description">{{ statusBody }}</p>
     </div>
-    <button (click)="refresh()">Refresh</button>
+    <div class="action-group">
+      <button (click)="refresh()">Refresh</button>
+      <step-autorefresh-toggle [interval]="5000" (refresh)="refresh()"> </step-autorefresh-toggle>
+    </div>
   </div>
 </div>
