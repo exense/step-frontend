@@ -21,3 +21,5 @@ export * from './function-type-script-options.token';
 export * from './higher-order-validator';
 export * from './dynamic-value-validators-factory';
 export * from './link-display-type.enum';
+export * from './sub-route-data.interface';
+export * from './sub-router-config.interface';

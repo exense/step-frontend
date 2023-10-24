@@ -1,6 +1,15 @@
-import { Component, EventEmitter, Inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import {
-  AJS_LOCATION,
+  Component,
+  EventEmitter,
+  inject,
+  Inject,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
+import {
   AJS_MODULE,
   AJS_ROOT_SCOPE,
   ArtefactFilter,
@@ -11,10 +20,13 @@ import {
   RepositoryObjectReference,
   ScheduledTaskDialogsService,
 } from '@exense/step-core';
-import { ILocationService, IRootScopeService } from 'angular';
+import { IRootScopeService } from 'angular';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { DOCUMENT } from '@angular/common';
 import { IncludeTestcases } from '../../shared/include-testcases.interface';
+import { Router } from '@angular/router';
+import { from, map, switchMap } from 'rxjs';
+import { ExecutionOpenNotificatorService } from '../../services/execution-open-notificator.service';
 
 @Component({
   selector: 'step-execution-commands',
@@ -22,6 +34,9 @@ import { IncludeTestcases } from '../../shared/include-testcases.interface';
   styleUrls: ['./execution-commands.component.scss'],
 })
 export class ExecutionCommandsComponent implements OnInit, OnChanges {
+  private _executionOpenNotifier = inject(ExecutionOpenNotificatorService, { optional: true });
+  private _router = inject(Router);
+
   @Input() description?: string;
   @Input() repositoryObjectRef?: RepositoryObjectReference;
   @Input() isolateExecution?: boolean;
@@ -37,7 +52,6 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
     private _screenTemplates: AugmentedScreenService,
     private _scheduledTaskDialogs: ScheduledTaskDialogsService,
     @Inject(AJS_ROOT_SCOPE) private _rootScope$: IRootScopeService,
-    @Inject(AJS_LOCATION) private _location$: ILocationService,
     @Inject(DOCUMENT) private _document: Document
   ) {}
 
@@ -73,11 +87,13 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
 
   execute(simulate: boolean): void {
     const executionParams = this.buildExecutionParams(simulate);
-    this._executionService.execute(executionParams).subscribe((eId) => {
-      (this._location$ as any)['$$search'] = {};
-      this._location$.path(`/root/executions/${eId}`);
-      this.onExecute.emit({});
-    });
+    this._executionService
+      .execute(executionParams)
+      .pipe(switchMap((eId) => from(this._router.navigateByUrl(`/root/executions/${eId}`)).pipe(map(() => eId))))
+      .subscribe((eId) => {
+        this.onExecute.emit({});
+        this._executionOpenNotifier?.openNotify(eId);
+      });
   }
 
   stop(): void {
@@ -88,7 +104,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
     const executionParams = this.buildExecutionParams(false);
     this._scheduledTaskDialogs.newScheduledTask(executionParams).subscribe((result) => {
       if (result) {
-        this._location$.path('/root/scheduler/');
+        this._router.navigate(['root', 'scheduler']);
       }
     });
   }

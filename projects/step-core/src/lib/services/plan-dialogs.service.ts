@@ -6,12 +6,13 @@ import { AbstractArtefact, AugmentedPlansService, Plan } from '../client/step-cl
 import { PlanCreateDialogComponent } from '../components/plan-create-dialog/plan-create-dialog.component';
 import { ThreadDistributionWizardDialogComponent } from '../components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 import { EntityDialogsService } from '../modules/entity/services/entity-dialogs.service';
-import { a1Promise2Observable, AJS_LOCATION, AJS_MODULE, DialogsService } from '../shared';
+import { a1Promise2Observable, AJS_MODULE, DialogsService } from '../shared';
 import { ExportDialogsService } from './export-dialogs.service';
 import { ImportDialogsService } from './import-dialogs.service';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
 import { MultipleProjectsService } from '../modules/basics/services/multiple-projects.service';
 import { PlanLinkDialogService } from '../components/plan-link/plan-link-dialog.service';
+import { Router } from '@angular/router';
 
 const ARTEFACT_ID = 'artefactId';
 
@@ -27,7 +28,7 @@ export class PlanDialogsService implements PlanLinkDialogService {
   private _importDialogs = inject(ImportDialogsService);
   private _isUsedByDialogs = inject(IsUsedByDialogService);
   private _multipleProjects = inject(MultipleProjectsService);
-  private _$location = inject(AJS_LOCATION);
+  private _router = inject(Router);
 
   createPlan(): Observable<Plan | undefined> {
     return this._matDialog.open(PlanCreateDialogComponent).afterClosed();
@@ -101,14 +102,18 @@ export class PlanDialogsService implements PlanLinkDialogService {
   }
 
   executePlan(planId: string): void {
-    this._$location.path(`/root/repository`).search({ repositoryId: 'local', planid: planId });
+    this._router.navigate(['root', 'repository'], {
+      queryParams: {
+        repositoryId: 'local',
+        planid: planId,
+      },
+    });
   }
 
   private openPlanInternal(planEditLink: string, artefactId?: string): void {
-    if (artefactId) {
-      this._$location.search(ARTEFACT_ID, artefactId);
-    }
-    this._$location.path(planEditLink);
+    const queryParams = artefactId ? { [ARTEFACT_ID]: artefactId } : undefined;
+    const commands = planEditLink.split('/');
+    this._router.navigate(commands, { queryParams });
   }
 }
 
