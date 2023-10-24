@@ -24,8 +24,15 @@ export class CustomFormComponent implements OnInit {
   constructor(private _screensService: ScreensService) {}
 
   ngOnInit(): void {
+    this.updateInputs();
+  }
+
+  protected updateInputs() {
     this._screensService.getInputsForScreenPost(this.stScreen, this.stModel).subscribe((inputs) => {
-      this.inputs = inputs.filter((input) => !this.stExcludeFields.includes(input.id!));
+      const updatedInputs = inputs.filter((input) => !this.stExcludeFields.includes(input.id!));
+      if (JSON.stringify(this.inputs) !== JSON.stringify(updatedInputs)) {
+        this.inputs = updatedInputs;
+      }
     });
   }
 
@@ -34,6 +41,7 @@ export class CustomFormComponent implements OnInit {
     this.stModelChange.emit({
       ...this.stModel,
     });
+    this.updateInputs();
   }
 
   protected onCustomInputTouched(): void {

@@ -113,7 +113,6 @@ export class FindBucketsRequestBuilder {
     }
     const hiddenFilters = filterItems.filter(FilterUtils.filterItemIsValid).filter((item) => item.isHidden);
     const customFilters = filterItems.filter(FilterUtils.filterItemIsValid).filter((item) => !item.isHidden);
-    console.log(hiddenFilters);
     if (Object.keys(this.customAttributes).length > 0) {
       customAttributesOql = FilterUtils.objectToOQL(this.customAttributes, this.attributesPrefix);
     }
