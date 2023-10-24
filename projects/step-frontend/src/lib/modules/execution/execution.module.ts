@@ -30,10 +30,11 @@ import { PanelExecutionDetailsComponent } from './components/panel-execution-det
 import { PanelComponent } from './components/panel/panel.component';
 import { PanelOperationsComponent } from './components/panel-operations/panel-operations.component';
 import { RepositoryComponent } from './components/repository/repository.component';
-import { ExecutionPageComponent } from './components/execution-page/execution-page.component';
 import { ExecutionSelectionTableComponent } from './components/execution-selection-table/execution-selection-table.component';
 import { ExecutionBulkOperationsRegisterService } from './services/execution-bulk-operations-register.service';
 import { IsExecutionProgressPipe } from './pipes/is-execution-progress.pipe';
+import { ExecutionsComponent } from './components/executions/executions.component';
+import { ExecutionOpenerComponent } from './components/execution-opener/execution-opener.component';
 
 @NgModule({
   declarations: [
@@ -59,9 +60,10 @@ import { IsExecutionProgressPipe } from './pipes/is-execution-progress.pipe';
     PanelExecutionDetailsComponent,
     PanelComponent,
     PanelOperationsComponent,
-    ExecutionPageComponent,
     ExecutionSelectionTableComponent,
     IsExecutionProgressPipe,
+    ExecutionsComponent,
+    ExecutionOpenerComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [
@@ -74,7 +76,6 @@ import { IsExecutionProgressPipe } from './pipes/is-execution-progress.pipe';
     ExecutionCommandsComponent,
     ExecutionProgressComponent,
     RepositoryComponent,
-    ExecutionPageComponent,
     ExecutionSelectionTableComponent,
   ],
 })
@@ -150,11 +151,39 @@ export class ExecutionModule {
   }
 
   private registerRoutes(): void {
-    this._viewRegistry.registerView('executions', 'partials/execution.html');
-
     this._viewRegistry.registerRoute({
       path: 'repository',
       component: RepositoryComponent,
+    });
+
+    this._viewRegistry.registerRoute({
+      path: 'executions',
+      component: ExecutionsComponent,
+      children: [
+        {
+          path: '',
+          redirectTo: 'list',
+        },
+        {
+          path: 'list',
+          component: ExecutionListComponent,
+        },
+        {
+          // This additional route is required, to rerender the execution progress component properly
+          // when the user navigates from one execution to another
+          path: 'open/:id',
+          component: ExecutionOpenerComponent,
+        },
+        {
+          matcher: (url) => {
+            if (url[0].path === 'list' || url[0].path === 'open') {
+              return null;
+            }
+            return { consumed: url };
+          },
+          component: ExecutionProgressComponent,
+        },
+      ],
     });
   }
 }

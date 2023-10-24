@@ -1,16 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  forwardRef,
-  inject,
-  Inject,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges,
-  TrackByFunction,
-} from '@angular/core';
+import { Component, forwardRef, inject, Inject, OnDestroy, OnInit, TrackByFunction } from '@angular/core';
 import {
   a1Promise2Observable,
   AugmentedExecutionsService,
@@ -37,13 +25,16 @@ import { ExecutionErrorMessageItem } from '../../shared/execution-error-message-
 import { ExecutionErrorCodeItem } from '../../shared/execution-error-code-item';
 import { ErrorDistributionStatus } from '../../shared/error-distribution-status.enum';
 import { ExecutionStateService } from '../../services/execution-state.service';
-import { filter, map, Observable, of, switchMap, tap } from 'rxjs';
+import { filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Panels } from '../../shared/panels.enum';
 import { ReportTreeNode } from '../../shared/report-tree-node';
 import { ReportTreeNodeUtilsService } from '../../services/report-tree-node-utils.service';
 import { EXECUTION_TREE_PAGING } from '../../services/execution-tree-paging';
 import { DOCUMENT } from '@angular/common';
 import { ViewFactoryService } from '../../services/view-factory.service';
+import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ActiveExecutionsService } from '../../services/active-executions.service';
 
 const R_ERROR_KEY = /\\\\u([\d\w]{4})/gi;
 
@@ -88,9 +79,16 @@ interface RefreshParams {
   ],
 })
 export class ExecutionProgressComponent
-  implements OnInit, OnChanges, ExecutionStateService, ExecutionCloseHandleService
+  implements OnInit, ExecutionStateService, ExecutionCloseHandleService, OnDestroy
 {
+  private _activeExecutions = inject(ActiveExecutionsService);
+  private _executionTabManager = inject(ExecutionTabManagerService);
+  private _activatedRoute = inject(ActivatedRoute);
+  private _router = inject(Router);
+  private _terminator$ = new Subject<void>();
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
+
+  private isFirstUpdate = true;
 
   readonly trackByItemInfo: TrackByFunction<ItemInfo> = (index, item) => item.type;
 
@@ -112,10 +110,7 @@ export class ExecutionProgressComponent
   currentOperations: Operation[] = [];
   selectedErrorDistributionToggle = ErrorDistributionStatus.MESSAGE;
 
-  autoRefreshDisabled: boolean = true;
   showAutoRefreshButton = false;
-  autoRefreshInterval: number = 0;
-  autoRefreshIncreasedTo: number = 0;
 
   readonly includedTestcases$: Observable<{ by: 'id' | 'name'; list: string[] } | null> =
     this._testCasesSelection.selected$.pipe(
@@ -134,12 +129,9 @@ export class ExecutionProgressComponent
       })
     );
 
-  @Input() eId?: string;
-  @Input() isActive?: boolean;
-  @Input() activeTabId?: string;
-  @Output() activeTabIdChange = new EventEmitter<string>();
-  @Output() titleUpdate = new EventEmitter<{ eId: string; execution: Execution }>();
-  @Output() close = new EventEmitter<{ eId: string; openList?: boolean }>();
+  readonly eId = this._activatedRoute.snapshot.url[0].path!;
+  readonly activeExecution = this._activeExecutions.getActiveExecution(this.eId);
+  protected activeTabId?: string = this._activatedRoute.snapshot.url?.[1]?.path;
 
   throughputchart: any | { series: any[]; data: any[][] } = {};
 
@@ -154,7 +146,6 @@ export class ExecutionProgressComponent
     public _executionPanels: SingleExecutionPanelsService,
     public _testCasesSelection: SelectionCollector<string, ReportNode>,
     private _viewFactory: ViewFactoryService,
-    private _treeState: TreeStateService<ReportNode, ReportTreeNode>,
     private _treeUtils: ReportTreeNodeUtilsService
   ) {}
 
@@ -201,43 +192,33 @@ export class ExecutionProgressComponent
       });
   }
 
-  getExecution(): Execution {
-    return this.execution!;
-  }
-
   ngOnInit(): void {
+    this.initRefreshExecution();
     this.initTabs();
   }
 
-  refresh(): void {
-    if (this.autoRefreshDisabled) {
-      return;
-    }
-    this.refreshExecution({ updateSelection: UpdateSelection.NONE });
-    if (!this.execution || this.execution.status !== 'ENDED') {
-      if (this.isActive) {
-        this.refreshOther();
-        this.refreshExecutionTree();
-        this.refreshTestCaseTable({ updateSelection: UpdateSelection.ONLY_NEW });
-      }
-    } else {
-      this.autoRefreshDisabled = true;
-      this.showAutoRefreshButton = false;
-      this.refreshOther();
-      this.refreshExecutionTree();
-      this.refreshTestCaseTable({ updateSelection: UpdateSelection.ONLY_NEW });
-    }
+  ngOnDestroy(): void {
+    this._terminator$.next();
+    this._terminator$.complete();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    const cEid = changes['eId'];
-    if (cEid?.previousValue !== cEid?.currentValue || cEid?.firstChange) {
-      this._executionPanels.initialize(cEid?.currentValue);
-      this.refreshExecution({ eId: cEid?.currentValue });
-      this.loadExecutionTree(cEid?.currentValue);
-      this.refreshOther(cEid?.currentValue);
-      this.refreshTestCaseTable({ eId: cEid?.currentValue });
-    }
+  initRefreshExecution(): void {
+    this._executionPanels.initialize(this.eId);
+    this.activeExecution.execution$.pipe(takeUntil(this._terminator$)).subscribe((execution) => {
+      this.execution = execution;
+      this.showAutoRefreshButton = this.execution.status !== 'ENDED';
+      this.handleExecutionRefresh({ updateSelection: this.isFirstUpdate ? UpdateSelection.ALL : UpdateSelection.NONE });
+      this.refreshOther();
+      if (this.isFirstUpdate) {
+        this.loadExecutionTree();
+      } else {
+        this.refreshExecutionTree();
+      }
+      this.refreshTestCaseTable({
+        updateSelection: this.isFirstUpdate ? UpdateSelection.ALL : UpdateSelection.ONLY_NEW,
+      });
+      this.isFirstUpdate = false;
+    });
   }
 
   drillDownTestCase(id: string): void {
@@ -256,12 +237,14 @@ export class ExecutionProgressComponent
   selectTab(tabId: string): void {
     this.activeTabId = tabId;
     this.activeTab = this.tabs.find((tab) => tab.id === tabId);
-    this.activeTabIdChange.emit(tabId);
+    const relativeTo = this._activatedRoute;
+    const relativePath = this._activatedRoute.snapshot.url.length === 1 ? '.' : '..';
+    this._router.navigate([relativePath, tabId], { relativeTo });
   }
 
   closeExecution(openList: boolean = true): void {
     const eId = this.eId!;
-    this.close.emit({ eId, openList });
+    this._executionTabManager.handleTabClose(eId, openList);
   }
 
   private initTabs(): void {
@@ -307,34 +290,26 @@ export class ExecutionProgressComponent
     return { eId, updateSelection };
   }
 
-  private refreshExecution(params?: RefreshParams): void {
-    const { eId, updateSelection } = this.prepareRefreshParams(params);
-    if (!eId) {
-      return;
+  private handleExecutionRefresh(params?: RefreshParams): void {
+    const { updateSelection } = this.prepareRefreshParams(params);
+    const execution = this.execution!;
+    if (updateSelection !== UpdateSelection.NONE) {
+      this.determineDefaultSelection();
     }
-    this._executionService.getExecutionById(eId).subscribe((execution) => {
-      this.execution = execution;
-      this.onExecutionStatusUpdate(execution?.status);
-      if (updateSelection !== UpdateSelection.NONE) {
-        this.determineDefaultSelection();
-      }
-      const parameters: { key: string; value: string }[] = (execution.parameters as any) || [];
-      const showTestCaseCurrentOperation = parameters.find(
-        (o) => o.key === 'step.executionView.testcases.current-operations'
-      );
-      this.showTestCaseCurrentOperation = showTestCaseCurrentOperation?.value.toLowerCase() === 'true';
-      this.titleUpdate.emit({ eId: eId!, execution });
-    });
+    const parameters: { key: string; value: string }[] = (execution.parameters as any) || [];
+    const showTestCaseCurrentOperation = parameters.find(
+      (o) => o.key === 'step.executionView.testcases.current-operations'
+    );
+    this.showTestCaseCurrentOperation = showTestCaseCurrentOperation?.value.toLowerCase() === 'true';
   }
 
-  private loadExecutionTree(eId?: string): void {
-    eId = eId || this.eId;
-    if (!eId) {
+  private loadExecutionTree(): void {
+    if (!this.eId) {
       return;
     }
-    this._treeUtils.loadNodes(eId).subscribe((nodes) => {
+    this._treeUtils.loadNodes(this.eId).subscribe((nodes) => {
       if (nodes[0]) {
-        this._treeState.init(nodes[0], { expandAllByDefault: false });
+        this._executionTreeState.init(nodes[0], { expandAllByDefault: false });
       }
     });
   }
@@ -343,7 +318,7 @@ export class ExecutionProgressComponent
     if (!this.eId) {
       return;
     }
-    const expandedNodIds = this._treeState.getExpandedNodeIds();
+    const expandedNodIds = this._executionTreeState.getExpandedNodeIds();
     this._treeUtils
       .loadNodes(this.eId)
       .pipe(
@@ -357,7 +332,7 @@ export class ExecutionProgressComponent
       )
       .subscribe((rootNode) => {
         if (rootNode) {
-          this._treeState.init(rootNode, { expandAllByDefault: false });
+          this._executionTreeState.init(rootNode, { expandAllByDefault: false });
         }
       });
   }
@@ -426,24 +401,6 @@ export class ExecutionProgressComponent
     this._systemService.getCurrentOperations(eId).subscribe((operations) => {
       this.currentOperations = operations;
     });
-  }
-
-  private onExecutionStatusUpdate(status?: string): void {
-    if (!status) {
-      return;
-    }
-    if (status === 'ENDED') {
-      this.refresh();
-      this.showAutoRefreshButton = false;
-      this.autoRefreshDisabled = true;
-      this.autoRefreshInterval = 0;
-      this.autoRefreshIncreasedTo = 0;
-    } else {
-      this.showAutoRefreshButton = true;
-      this.autoRefreshDisabled = false;
-      this.autoRefreshInterval = 100;
-      this.autoRefreshIncreasedTo = 5000;
-    }
   }
 
   private scrollToPanel(panel: Panels): void {

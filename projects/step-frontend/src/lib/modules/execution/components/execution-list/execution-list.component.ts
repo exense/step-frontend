@@ -6,14 +6,14 @@ import {
   DateFormat,
   ExecutiontTaskParameters,
   FilterConditionFactoryService,
+  IS_SMALL_SCREEN,
   selectionCollectionProvider,
   STORE_ALL,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { EXECUTION_RESULT, EXECUTION_STATUS } from '../../../_common/shared/status.enum';
-import { from, of } from 'rxjs';
+import { of } from 'rxjs';
 import { Router } from '@angular/router';
-import { ExecutionOpenNotificatorService } from '../../services/execution-open-notificator.service';
 
 @Component({
   selector: 'step-execution-list',
@@ -26,7 +26,7 @@ import { ExecutionOpenNotificatorService } from '../../services/execution-open-n
 })
 export class ExecutionListComponent {
   private _router = inject(Router);
-  private _executionOpenNotifier = inject(ExecutionOpenNotificatorService, { optional: true });
+  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
   readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
   readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
@@ -48,8 +48,6 @@ export class ExecutionListComponent {
   }
 
   navigateToExecution(id: string): void {
-    from(this._router.navigateByUrl(`/root/executions/${id}`)).subscribe(() => {
-      this._executionOpenNotifier?.openNotify(id);
-    });
+    this._router.navigateByUrl(`/root/executions/${id}`);
   }
 }

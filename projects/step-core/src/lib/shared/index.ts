@@ -23,3 +23,4 @@ export * from './dynamic-value-validators-factory';
 export * from './link-display-type.enum';
 export * from './sub-route-data.interface';
 export * from './sub-router-config.interface';
+export * from './auto-refresh-model.interface';

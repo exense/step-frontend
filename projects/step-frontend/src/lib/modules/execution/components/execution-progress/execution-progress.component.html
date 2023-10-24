@@ -1,81 +1,76 @@
-<section *ngIf="execution?.importResult && !execution!.importResult!.successful">
-  <step-alert type="danger" role="alert">
-    <step-icon name="help-circle" aria-hidden="true"></step-icon>
-    Error while importing plan:
-    <ul>
-      <li *ngFor="let error of execution?.importResult?.errors">{{ error }}</li>
-    </ul>
-  </step-alert>
-</section>
-<section *ngIf="execution" [class.small-screen]="_isSmallScreen$ | async">
-  <ng-template #executionTabs>
-    <div class="tab-panel">
-      <step-tabs [tabs]="tabs" [activeTabId]="activeTabId" (activeTabIdChange)="selectTab($event)"> </step-tabs>
-      <step-btn-group>
-        <step-autorefresh-toggle
-          *ngIf="showAutoRefreshButton"
-          [(disabled)]="autoRefreshDisabled"
-          [interval]="autoRefreshInterval"
-          [autoIncreaseTo]="autoRefreshIncreasedTo"
-          (refresh)="refresh()"
-        >
-        </step-autorefresh-toggle>
-      </step-btn-group>
-    </div>
-    <div class="tab-content">
-      <div class="tab-pane" *ngFor="let tab of tabs" [class.active]="tab.id === activeTabId">
-        <step-dashlet *ngIf="tab | includeTab: activeTabId" [itemKey]="tab.template"> </step-dashlet>
+<div class="panel-body" [class.small-screen]="_isSmallScreen$ | async">
+  <section *ngIf="execution?.importResult && !execution!.importResult!.successful">
+    <step-alert type="danger" role="alert">
+      <step-icon name="help-circle" aria-hidden="true"></step-icon>
+      Error while importing plan:
+      <ul>
+        <li *ngFor="let error of execution?.importResult?.errors">{{ error }}</li>
+      </ul>
+    </step-alert>
+  </section>
+  <section *ngIf="execution" [class.small-screen]="_isSmallScreen$ | async">
+    <ng-template #executionTabs>
+      <div class="tab-panel">
+        <step-tabs [tabs]="tabs" [activeTabId]="activeTabId" (activeTabIdChange)="selectTab($event)"> </step-tabs>
+        <step-btn-group>
+          <step-autorefresh-toggle *ngIf="showAutoRefreshButton" [model]="activeExecution.autoRefreshModel">
+          </step-autorefresh-toggle>
+        </step-btn-group>
       </div>
-    </div>
-  </ng-template>
-  <ng-template #executionParameters>
-    <mat-accordion multi>
-      <mat-expansion-panel [expanded]="true" togglePosition="before">
-        <mat-expansion-panel-header>
-          <mat-panel-title>Execution parameters</mat-panel-title>
-        </mat-expansion-panel-header>
-        <ng-container *ngIf="execution">
-          <step-execution-commands
-            [description]="execution.description"
-            [repositoryObjectRef]="execution!.executionParameters!.repositoryObject"
-            [includedTestcases]="includedTestcases$ | async"
-            [execution]="execution"
-            (onExecute)="closeExecution(false)"
-          >
-          </step-execution-commands>
+      <div class="tab-content">
+        <div class="tab-pane" *ngFor="let tab of tabs" [class.active]="tab.id === activeTabId">
+          <step-dashlet *ngIf="tab | includeTab: activeTabId" [itemKey]="tab.template"> </step-dashlet>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #executionParameters>
+      <mat-accordion multi>
+        <mat-expansion-panel [expanded]="true" togglePosition="before">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Execution parameters</mat-panel-title>
+          </mat-expansion-panel-header>
+          <ng-container *ngIf="execution">
+            <step-execution-commands
+              [description]="execution.description"
+              [repositoryObjectRef]="execution!.executionParameters!.repositoryObject"
+              [includedTestcases]="includedTestcases$ | async"
+              [execution]="execution"
+            >
+            </step-execution-commands>
+          </ng-container>
+        </mat-expansion-panel>
+
+        <step-panel-execution-details> </step-panel-execution-details>
+
+        <ng-container *ngFor="let customPanel of _executionPanels.customPanels; trackBy: trackByItemInfo">
+          <step-panel [panelType]="customPanel.type">
+            <step-execution-custom-panel [itemKey]="customPanel.type" [context]="execution">
+            </step-execution-custom-panel>
+          </step-panel>
         </ng-container>
-      </mat-expansion-panel>
+        <step-panel-operations> </step-panel-operations>
 
-      <step-panel-execution-details> </step-panel-execution-details>
-
-      <ng-container *ngFor="let customPanel of _executionPanels.customPanels; trackBy: trackByItemInfo">
-        <step-panel [panelType]="customPanel.type">
-          <step-execution-custom-panel [itemKey]="customPanel.type" [context]="execution">
-          </step-execution-custom-panel>
+        <step-panel [panelType]="Panels.THROUGHPUT" *ngIf="!(throughputchart | isChartEmpty)">
+          <step-simple-line-chart chartId="throughput-chart" [handle]="throughputchart"> </step-simple-line-chart>
         </step-panel>
-      </ng-container>
-      <step-panel-operations> </step-panel-operations>
-
-      <step-panel [panelType]="Panels.THROUGHPUT" *ngIf="!(throughputchart | isChartEmpty)">
-        <step-simple-line-chart chartId="throughput-chart" [handle]="throughputchart"> </step-simple-line-chart>
-      </step-panel>
-    </mat-accordion>
-  </ng-template>
-  <ng-template #splitView>
-    <as-split>
-      <as-split-area [size]="75">
+      </mat-accordion>
+    </ng-template>
+    <ng-template #splitView>
+      <as-split>
+        <as-split-area [size]="75">
+          <ng-container *ngTemplateOutlet="executionTabs"> </ng-container>
+        </as-split-area>
+        <as-split-area [size]="25">
+          <ng-container *ngTemplateOutlet="executionParameters"> </ng-container>
+        </as-split-area>
+      </as-split>
+    </ng-template>
+    <ng-template #smallView>
+      <div class="small-container">
         <ng-container *ngTemplateOutlet="executionTabs"> </ng-container>
-      </as-split-area>
-      <as-split-area [size]="25">
         <ng-container *ngTemplateOutlet="executionParameters"> </ng-container>
-      </as-split-area>
-    </as-split>
-  </ng-template>
-  <ng-template #smallView>
-    <div class="small-container">
-      <ng-container *ngTemplateOutlet="executionTabs"> </ng-container>
-      <ng-container *ngTemplateOutlet="executionParameters"> </ng-container>
-    </div>
-  </ng-template>
-  <ng-container *ngIf="_isSmallScreen$ | async; then smallView; else splitView"> </ng-container>
-</section>
+      </div>
+    </ng-template>
+    <ng-container *ngIf="_isSmallScreen$ | async; then smallView; else splitView"> </ng-container>
+  </section>
+</div>

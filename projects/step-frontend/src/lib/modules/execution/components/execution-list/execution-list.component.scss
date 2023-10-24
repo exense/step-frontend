@@ -8,6 +8,10 @@
   @include core.table-header;
 }
 
+.panel-body.small-screen {
+  padding: 0.75rem;
+}
+
 .result {
   display: flex;
 }
