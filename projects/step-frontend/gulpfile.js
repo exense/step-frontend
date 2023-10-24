@@ -36,7 +36,6 @@ const SCRIPTS = [
   './src/lib/angularjs/js/controllers/screenConfiguration.js',
   './src/lib/angularjs/js/controllers/dynamicForms.js',
   './src/lib/angularjs/js/controllers/components.js',
-  './src/lib/angularjs/js/datatable-ext-paginationinput.js',
 ];
 
 const STYLES = [
