@@ -41,7 +41,7 @@ export class ImportDialogComponent {
       )
       .subscribe({
         next: (response: string[]) => {
-          this._matDialogRef.close();
+          this._matDialogRef.close(true);
           if (!!response?.length) {
             this._dialogs.showListOfMsgs(response);
           }
