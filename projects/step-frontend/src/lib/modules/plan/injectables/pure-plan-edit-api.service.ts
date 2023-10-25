@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, map, Observable } from 'rxjs';
+import { catchError, from, map, Observable } from 'rxjs';
 import {
   Plan,
   PlansService,
@@ -71,6 +71,11 @@ export class PurePlanEditApiService implements PlanEditorApiService {
   }
 
   navigateToPlan(id: string): void {
-    this._router.navigateByUrl(`/root/plans/editor/${id}`);
+    const EDITOR_URL = `/root/plans/editor`;
+    if (!this._router.url.includes(EDITOR_URL)) {
+      this._router.navigateByUrl(`${EDITOR_URL}/${id}`);
+      return;
+    }
+    from(this._router.navigateByUrl('/')).subscribe(() => this._router.navigateByUrl(`${EDITOR_URL}/${id}`));
   }
 }
