@@ -10,14 +10,28 @@
       </step-form-field>
       <step-select-plan required [ngModel]="plan" (ngModelChange)="handlePlanChange($event)" name="plan">
       </step-select-plan>
-      <step-cron-selector
-        label="CRON Expression"
-        placeholder="CRON Expression"
-        required
-        [(ngModel)]="_task.cronExpression"
-        name="cron"
-      >
-      </step-cron-selector>
+      <step-form-field>
+        <step-label>CRON expression</step-label>
+        <input
+          type="text"
+          placeholder="CRON expression"
+          required
+          stepValidateCron
+          [(ngModel)]="_task.cronExpression"
+          name="cron"
+        />
+        <step-suffix class="button-suffix">
+          <button
+            type="button"
+            mat-stroked-button
+            color="primary"
+            matTooltip="Configure CRON expression"
+            (click)="configureCronExpression()"
+          >
+            <step-icon name="watch"></step-icon>
+          </button>
+        </step-suffix>
+      </step-form-field>
       <step-custom-forms
         [stModel]="_task.executionsParameters!.customParameters!"
         (stModelChange)="handleCustomParametersChange($event)"

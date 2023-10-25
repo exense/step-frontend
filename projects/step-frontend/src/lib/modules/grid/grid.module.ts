@@ -10,6 +10,7 @@ import { AddPrefixPipe } from './components/token-type/add-prefix.pipe';
 import { TokenTypeComponent } from './components/token-type/token-type.component';
 import { TokenStateComponent } from './components/token-state/token-state.component';
 import { TokenGroupListComponent } from './components/token-group-list/token-group-list.component';
+import { QuotaManagerComponent } from './components/quota-manager/quota-manager.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { TokenGroupListComponent } from './components/token-group-list/token-gro
     FlatObjectStringFormatPipe,
     AddPrefixPipe,
     TokenGroupListComponent,
+    QuotaManagerComponent,
   ],
   exports: [AgentListComponent, TokenListComponent, TokenGroupListComponent, TokenStateProgressbarComponent],
   imports: [StepCoreModule, StepCommonModule],

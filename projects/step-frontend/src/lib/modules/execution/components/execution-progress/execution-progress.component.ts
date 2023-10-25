@@ -45,7 +45,6 @@ import { ReportTreeNode } from '../../shared/report-tree-node';
 import { ReportTreeNodeUtilsService } from '../../services/report-tree-node-utils.service';
 import { EXECUTION_TREE_PAGING } from '../../services/execution-tree-paging';
 import { DOCUMENT } from '@angular/common';
-import { ViewFactoryService } from '../../services/view-factory.service';
 
 const R_ERROR_KEY = /\\\\u([\d\w]{4})/gi;
 
@@ -155,7 +154,6 @@ export class ExecutionProgressComponent
     private _executionTreeState: TreeStateService<ReportNode, ReportTreeNode>,
     public _executionPanels: SingleExecutionPanelsService,
     public _testCasesSelection: SelectionCollector<string, ReportNode>,
-    private _viewFactory: ViewFactoryService,
     private _treeState: TreeStateService<ReportNode, ReportTreeNode>,
     private _treeUtils: ReportTreeNodeUtilsService
   ) {}
@@ -420,10 +418,6 @@ export class ExecutionProgressComponent
     });
 
     this.selectedErrorDistributionToggle = ErrorDistributionStatus.MESSAGE;
-
-    a1Promise2Observable(this._viewFactory.getReportNodeStatisticCharts(eId)).subscribe((charts) => {
-      this.throughputchart = charts.throughputchart;
-    });
 
     this._systemService.getCurrentOperations(eId).subscribe((operations) => {
       this.currentOperations = operations;

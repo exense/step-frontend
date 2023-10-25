@@ -1,0 +1,7 @@
+<mat-radio-group [ngModel]="selectedValue" (ngModelChange)="handleValueChange($event)">
+  <ng-container *ngFor="let item of items; trackBy: trackByKeyValue">
+    <mat-radio-button [value]="item.key" color="primary">
+      {{ item.value }}
+    </mat-radio-button>
+  </ng-container>
+</mat-radio-group>
