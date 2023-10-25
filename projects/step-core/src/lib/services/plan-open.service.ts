@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { AJS_LOCATION } from '../shared';
+import { Router } from '@angular/router';
 
 interface PlanOpenState {
   readonly artefactId?: string;
@@ -11,7 +11,7 @@ interface PlanOpenState {
 })
 export class PlanOpenService {
   private lastOpenState?: PlanOpenState;
-  private _$location = inject(AJS_LOCATION);
+  private _router = inject(Router);
 
   getLastPlanOpenState(): PlanOpenState | undefined {
     const result = this.lastOpenState;
@@ -21,6 +21,6 @@ export class PlanOpenService {
 
   open(planId: string, planOpenState?: PlanOpenState): void {
     this.lastOpenState = planOpenState;
-    this._$location.path(`/root/plans/editor/${planId}`);
+    this._router.navigateByUrl(`/root/plans/editor/${planId}`);
   }
 }
