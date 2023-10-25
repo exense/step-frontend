@@ -3,4 +3,12 @@ div[step-modal-window-body],
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+
+  div {
+    max-width: 80rem;
+
+    step-alert {
+      margin: 0.5rem 0;
+    }
+  }
 }

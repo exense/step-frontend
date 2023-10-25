@@ -22,7 +22,6 @@ var tecAdminControllers = angular.module('tecAdminControllers', [
   'components',
   'chart.js',
   'step',
-  'views',
   'ui.bootstrap',
 ]);
 

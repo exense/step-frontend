@@ -46,7 +46,6 @@ import { FocusablesDirective } from './directives/focusables.directive';
 import { InputModelFormatterDirective } from './directives/input-model-formatter.directive';
 import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 import { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
-import { SimpleLineChartDirective } from './directives/simple-line-chart.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 import { TooltipDirective } from './directives/tooltip.directive';
 import { TrapFocusDirective } from './directives/trap-focus.directive';
@@ -80,6 +79,7 @@ import { WizardModule } from './modules/wizard/wizards.module';
 import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.component';
 import { SettingsComponent } from './components/settings/settings.component';
 import { ImportDialogComponent } from './components/import-dialog/import-dialog.component';
+import { CronModule } from './modules/cron/cron.module';
 
 @NgModule({
   declarations: [
@@ -99,7 +99,6 @@ import { ImportDialogComponent } from './components/import-dialog/import-dialog.
     SettingButtonComponent,
     PlanTreeComponent,
     RestoreDialogComponent,
-    SimpleLineChartDirective,
     EditableActionsComponent,
     EditableLabelComponent,
     EditableTextareaLabelComponent,
@@ -163,6 +162,7 @@ import { ImportDialogComponent } from './components/import-dialog/import-dialog.
     ResourceInputModule,
     KeywordsCommonModule,
     WizardModule,
+    CronModule,
   ],
   exports: [
     CommonModule,
@@ -197,7 +197,6 @@ import { ImportDialogComponent } from './components/import-dialog/import-dialog.
     AutorefreshToggleComponent,
     SettingButtonComponent,
     RestoreDialogComponent,
-    SimpleLineChartDirective,
     EditableLabelComponent,
     EditableTextareaLabelComponent,
     EditableDropdownLabelComponent,
@@ -238,6 +237,7 @@ import { ImportDialogComponent } from './components/import-dialog/import-dialog.
     ResourceInputWrapperComponent,
     SettingsComponent,
     ImportDialogComponent,
+    CronModule,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -325,7 +325,6 @@ export { FocusablesDirective } from './directives/focusables.directive';
 export * from './directives/input-model-formatter.directive';
 export { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
-export * from './directives/simple-line-chart.directive';
 export * from './directives/tooltip-immediate-close.directive';
 export * from './directives/tooltip.directive';
 export { TrapFocusDirective } from './directives/trap-focus.directive';
@@ -345,6 +344,7 @@ export * from './modules/json-viewer/json-viewer.module';
 export * from './modules/resource-input/resource-input.module';
 export * from './modules/keywords-common/keywords-common.module';
 export * from './modules/wizard/wizards.module';
+export * from './modules/cron/cron.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/is-chart-empty.pipe';

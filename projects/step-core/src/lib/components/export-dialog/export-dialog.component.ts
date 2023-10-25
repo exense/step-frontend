@@ -11,6 +11,7 @@ import { a1Promise2Observable, DialogsService, ExportDialogData } from '../../sh
 import { map, Observable, of, tap, timer } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { FormBuilder, Validators } from '@angular/forms';
+import { AlertType } from '../../modules/basics/step-basics.module';
 
 @Component({
   selector: 'step-export-dialog',
@@ -36,6 +37,7 @@ export class ExportDialogComponent {
     recursively: this._fb.control(true),
     parameters: this._fb.control(false),
   });
+  readonly AlertType = AlertType;
 
   @HostListener('keydown.enter')
   save(): void {
