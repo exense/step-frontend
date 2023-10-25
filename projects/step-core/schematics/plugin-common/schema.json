@@ -15,10 +15,10 @@
       "x-prompt": "What name would you like to use for the library?"
     },
     "port": {
-      "type": "string",
+      "type": "number",
       "description": "The port to use for the federated module (remote, micro frontend, etc.)",
       "x-prompt": "Port to use",
-      "default": "5002"
+      "default": 5002
     },
     "prefix": {
       "type": "string",
