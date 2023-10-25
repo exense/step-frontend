@@ -55,10 +55,6 @@
         </step-panel>
       </ng-container>
       <step-panel-operations> </step-panel-operations>
-
-      <step-panel [panelType]="Panels.THROUGHPUT" *ngIf="!(throughputchart | isChartEmpty)">
-        <step-simple-line-chart chartId="throughput-chart" [handle]="throughputchart"> </step-simple-line-chart>
-      </step-panel>
     </mat-accordion>
   </ng-template>
   <ng-template #splitView>

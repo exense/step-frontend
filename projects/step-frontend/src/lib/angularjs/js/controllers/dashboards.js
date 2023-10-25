@@ -17,7 +17,7 @@
  * along with STEP.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 angular
-  .module('dashboardsControllers', ['tables', 'step'])
+  .module('dashboardsControllers', ['step'])
 
   .run(function (ViewRegistry) {
     ViewRegistry.registerView('analytics', 'partials/dashboards/analyticsController.html');
@@ -33,43 +33,9 @@ angular
       Dialogs,
       ImportDialogs,
       AuthService,
-      $location,
-      ViewRegistry,
-      EntityRegistry,
-      $element,
-      $uibModal
     ) {
       $scope.authService = AuthService;
       $scope.staticPresets = new StaticPresets();
       $scope.dashboardsendpoint = [];
-
-      $scope.getDynInputs = function () {
-        var inputs = [];
-        if ($location.$$search) {
-          var keys = Object.keys($location.$$search);
-          _.each(keys, function (item, index) {
-            var dyn = false;
-            if (item.startsWith('__dyn__')) {
-              dyn = true;
-            }
-            inputs.push({ key: item, value: $location.$$search[item], isDynamic: dyn });
-          });
-        }
-        return inputs;
-      };
-
-      $scope.initFromLocation = function () {
-        if ($scope.$state.startsWith('__pp__')) {
-          var dashboardClass = $scope.$state.split('__pp__')[1];
-          var dashboardInst = window[dashboardClass]();
-          // apply inputs
-          dashboardInst.dstate.globalsettings.placeholders = $scope.getDynInputs();
-          $scope.dashboardsendpoint.push(dashboardInst);
-        }
-      };
-
-      if ($scope.$state && $scope.$state) {
-        $scope.initFromLocation();
-      }
     }
   );

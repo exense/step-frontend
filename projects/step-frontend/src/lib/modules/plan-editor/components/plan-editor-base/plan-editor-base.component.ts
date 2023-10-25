@@ -13,7 +13,6 @@ import {
 import { FormControl } from '@angular/forms';
 import {
   AbstractArtefact,
-  AJS_LOCATION,
   ArtefactRefreshNotificationService,
   ArtefactTreeNode,
   CallFunction,
@@ -53,6 +52,7 @@ import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-no
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
 import { PlanEditorApiService } from '../../injectables/plan-editor-api.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'step-plan-editor-base',
@@ -96,11 +96,11 @@ export class PlanEditorBaseComponent
   private _artefactService = inject(ArtefactService);
   public _planEditService = inject(PlanEditorService);
   private _restoreDialogsService = inject(RestoreDialogsService);
-  private _$location = inject(AJS_LOCATION);
+  private _activatedRoute = inject(ActivatedRoute);
   private _planOpen = inject(PlanOpenService);
 
   private get artefactIdFromUrl(): string | undefined {
-    const { artefactId } = this._$location.search() || {};
+    const { artefactId } = this._activatedRoute.snapshot.queryParams ?? {};
     return artefactId;
   }
 

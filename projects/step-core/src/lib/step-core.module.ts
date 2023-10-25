@@ -46,7 +46,6 @@ import { FocusablesDirective } from './directives/focusables.directive';
 import { InputModelFormatterDirective } from './directives/input-model-formatter.directive';
 import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 import { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
-import { SimpleLineChartDirective } from './directives/simple-line-chart.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 import { TooltipDirective } from './directives/tooltip.directive';
 import { TrapFocusDirective } from './directives/trap-focus.directive';
@@ -77,6 +76,9 @@ import { SelectTaskComponent } from './components/select-task/select-task.compon
 import { SchedulerTaskLinkComponent } from './components/scheduler-task-link/scheduler-task-link.component';
 import { ResourceInputWrapperComponent } from './components/resource-input-wrapper/resource-input-wrapper.component';
 import { WizardModule } from './modules/wizard/wizards.module';
+import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.component';
+import { SettingsComponent } from './components/settings/settings.component';
+import { CronModule } from './modules/cron/cron.module';
 
 @NgModule({
   declarations: [
@@ -96,7 +98,6 @@ import { WizardModule } from './modules/wizard/wizards.module';
     SettingButtonComponent,
     PlanTreeComponent,
     RestoreDialogComponent,
-    SimpleLineChartDirective,
     EditableActionsComponent,
     EditableLabelComponent,
     EditableTextareaLabelComponent,
@@ -135,6 +136,8 @@ import { WizardModule } from './modules/wizard/wizards.module';
     MyAccountButtonComponent,
     SelectTaskComponent,
     ResourceInputWrapperComponent,
+    SimpleOutletComponent,
+    SettingsComponent,
   ],
   imports: [
     CommonModule,
@@ -157,6 +160,7 @@ import { WizardModule } from './modules/wizard/wizards.module';
     ResourceInputModule,
     KeywordsCommonModule,
     WizardModule,
+    CronModule,
   ],
   exports: [
     CommonModule,
@@ -191,7 +195,6 @@ import { WizardModule } from './modules/wizard/wizards.module';
     AutorefreshToggleComponent,
     SettingButtonComponent,
     RestoreDialogComponent,
-    SimpleLineChartDirective,
     EditableLabelComponent,
     EditableTextareaLabelComponent,
     EditableDropdownLabelComponent,
@@ -230,6 +233,8 @@ import { WizardModule } from './modules/wizard/wizards.module';
     MyAccountButtonComponent,
     SelectTaskComponent,
     ResourceInputWrapperComponent,
+    SettingsComponent,
+    CronModule,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -307,6 +312,7 @@ export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.
 export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 export * from './components/artefact-details/artefact-details.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
+export * from './components/settings/settings.component';
 export * from './decorators/plugin';
 export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
@@ -315,7 +321,6 @@ export { FocusablesDirective } from './directives/focusables.directive';
 export * from './directives/input-model-formatter.directive';
 export { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
-export * from './directives/simple-line-chart.directive';
 export * from './directives/tooltip-immediate-close.directive';
 export * from './directives/tooltip.directive';
 export { TrapFocusDirective } from './directives/trap-focus.directive';
@@ -335,6 +340,7 @@ export * from './modules/json-viewer/json-viewer.module';
 export * from './modules/resource-input/resource-input.module';
 export * from './modules/keywords-common/keywords-common.module';
 export * from './modules/wizard/wizards.module';
+export * from './modules/cron/cron.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/is-chart-empty.pipe';
@@ -375,6 +381,7 @@ export * from './modules/basics/shared/api-token.interface';
 export * from './components/base-artefact/base-artefact.component';
 export * from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 export * from './components/artefact-details/artefact-details.component';
+export * from './components/simple-outlet/simple-outlet.component';
 export * from './services/special-links.service';
 export * from './shared/special-links-strategy';
 export * from './modules/entity/pipes/cast-entity-to-plan.pipe';

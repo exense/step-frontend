@@ -3,7 +3,6 @@ import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angula
 import { FormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
-  AJS_LOCATION,
   AlertType,
   AuthService,
   DialogsService,
@@ -17,8 +16,8 @@ import {
   Keyword,
   FunctionConfigurationApiService,
 } from '@exense/step-core';
-import { ILocationService } from 'angular';
 import { of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'step-function-configuration-dialog',
@@ -29,7 +28,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
   private _functionConfigurationDialogData = inject<FunctionConfigurationDialogData>(MAT_DIALOG_DATA);
   private _api = inject(FunctionConfigurationApiService);
   private _matDialogRef = inject<MatDialogRef<FunctionConfigurationDialogComponent, Keyword>>(MatDialogRef);
-  private _ajsLocation = inject<ILocationService>(AJS_LOCATION);
+  private _router = inject(Router);
   private _dialogsService = inject(DialogsService);
   private _functionTypeRegistryService = inject(FunctionTypeRegistryService);
   private _formBuilder = inject(FormBuilder);
@@ -124,7 +123,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
         }),
         tap((path) => {
           if (path) {
-            this._ajsLocation.path(path);
+            this._router.navigateByUrl(path);
           } else {
             this._dialogsService.showErrorMsg('No editor configured for this function type');
           }

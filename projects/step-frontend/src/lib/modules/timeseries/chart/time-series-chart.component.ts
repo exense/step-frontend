@@ -170,7 +170,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
             return date.toLocaleDateString() + ` ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
           },
         },
-        ...settings.series,
+        ...settings.series.filter((s) => s.show !== false),
       ],
       hooks: {},
     };

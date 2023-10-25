@@ -17,7 +17,7 @@
  * along with STEP.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 angular
-  .module('plans', ['tables', 'step', 'screenConfigurationControllers'])
+  .module('plans', ['step', 'screenConfigurationControllers'])
 
   .factory('PlanTypeRegistry', function () {
     var api = {};
@@ -59,84 +59,4 @@ angular
         $scope.selectView = $scope.$state;
       }
     });
-  }])
-
-
-  .directive('planLink', function () {
-    return {
-      restrict: 'E',
-      scope: {
-        entityRef: '=?',
-        entityId: '=?',
-        entityTenant: '=?',
-        description: '=?',
-        linkOnly: '=?',
-        stOptions: '=?',
-        continueOnCancel: '=?',
-      },
-      templateUrl: 'partials/components/planLink.html',
-      controller: function ($scope, LinkProcessor, $location, Dialogs) {
-        $scope.noLink = $scope.stOptions && $scope.stOptions.includes('noEditorLink');
-        if ($scope.entityRef && $scope.entityRef.repositoryID === 'local') {
-          $scope.entityId = $scope.entityRef.repositoryParameters.planid;
-        }
-        $scope.openLink = () => {
-          LinkProcessor.process($scope.entityTenant)
-            .then(
-              () => {
-                $location.path('/root/plans/editor/' + $scope.entityId);
-                $scope.$apply();
-              },
-              () => {
-                if ($scope.continueOnCancel) {
-                  $location.path('/root/plans/editor/' + $scope.entityId);
-                  $scope.$apply();
-                }
-              }
-            )
-            .catch((errorMessage) => {
-              if (errorMessage) {
-                Dialogs.showErrorMsg(errorMessage);
-              }
-            });
-        };
-      },
-    };
-  })
-
-  .directive('planLinkAndName', function () {
-    return {
-      restrict: 'E',
-      scope: {
-        planRef: '=?',
-      },
-      templateUrl: 'partials/components/planLinkAndName.html',
-      controller: function ($scope, $http) {
-        $scope.noLink = $scope.stOptions && $scope.stOptions.includes('noEditorLink');
-        if ($scope.planRef && $scope.planRef.repositoryID == 'local') {
-          $scope.planId = $scope.planRef.repositoryParameters.planid;
-          $http.get('rest/plans/' + $scope.planId).then(function (response) {
-            $scope.planName = response.data.attributes.name;
-          });
-        }
-      },
-    };
-  })
-
-  .directive('planName', function () {
-    return {
-      restrict: 'E',
-      scope: {
-        planRef: '=?',
-      },
-      templateUrl: 'partials/components/planName.html',
-      controller: function ($scope, $http) {
-        if ($scope.planRef && $scope.planRef.repositoryID == 'local') {
-          $scope.planId = $scope.planRef.repositoryParameters.planid;
-          $http.get('rest/plans/' + $scope.planId).then(function (response) {
-            $scope.planName = response.data.attributes.name;
-          });
-        }
-      },
-    };
-  });
+  }]);

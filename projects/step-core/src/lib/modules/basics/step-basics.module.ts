@@ -4,7 +4,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StepMaterialModule } from '../step-material/step-material.module';
 import { ArrayFilterComponent } from './components/array-filter/array-filter.component';
 import { DateFilterComponent } from './components/date-filter/date-filter.component';
-import { CronSelectorComponent } from './components/cron-selector/cron-selector.component';
 import { HexadecimalInputFilterComponent } from './components/input-filter/hexadecimal-input-filter.component';
 import { InputFilterComponent } from './components/input-filter/input-filter.component';
 import { ResourceLabelComponent } from './components/resource-label/resource-label.component';
@@ -33,14 +32,14 @@ import { LabelAddonDirective } from './directives/label-addon.directive';
 import { TimeInputComponent } from './components/time-input/time-input.component';
 import { ProjectSwitchDialogComponent } from './components/project-switch-dialog/project-switch-dialog.component';
 import { ArrayInputComponent } from './components/array-input/array-input.component';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
   declarations: [
     ResourceLabelComponent,
     ArrayFilterComponent,
     DateFilterComponent,
-    CronSelectorComponent,
     InputFilterComponent,
     HasRightPipe,
     HexadecimalInputFilterComponent,
@@ -73,7 +72,6 @@ import { ArrayInputComponent } from './components/array-input/array-input.compon
     ResourceLabelComponent,
     ArrayFilterComponent,
     DateFilterComponent,
-    CronSelectorComponent,
     InputFilterComponent,
     HasRightPipe,
     HexadecimalInputFilterComponent,
@@ -101,6 +99,7 @@ import { ArrayInputComponent } from './components/array-input/array-input.compon
     ProjectSwitchDialogComponent,
     TimeInputComponent,
     ArrayInputComponent,
+    RouterModule,
   ],
 })
 export class StepBasicsModule {}
@@ -117,7 +116,6 @@ export * from './components/json-raw-editor-formatted/json-raw-editor-formatted.
 export * from './components/project-switch-dialog/project-switch-dialog.component';
 export * from './components/modal-window/modal-window.component';
 export * from './components/form-field/form-field.component';
-export * from './components/cron-selector/cron-selector.component';
 export * from './components/errors-list/errors-list.component';
 export * from './components/progress-bar/progress-bar.component';
 export * from './components/upload-container/upload-container.component';

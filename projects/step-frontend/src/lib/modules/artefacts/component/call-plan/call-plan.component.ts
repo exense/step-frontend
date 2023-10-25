@@ -1,7 +1,6 @@
 import { Component, inject, ViewChild } from '@angular/core';
 import {
   AbstractArtefact,
-  AJS_LOCATION,
   ArtefactFormChangeHelperService,
   AugmentedPlansService,
   BaseArtefactComponent,
@@ -13,6 +12,7 @@ import {
 } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
 import { from, map } from 'rxjs';
+import { Router } from '@angular/router';
 
 interface CallPlanArtefact extends AbstractArtefact {
   planId?: string;
@@ -30,7 +30,7 @@ export class CallPlanComponent extends BaseArtefactComponent<CallPlanArtefact> {
   private _planDialogs = inject(PlanDialogsService);
   private _linkProcessor = inject(LinkProcessorService);
   private _dialogs = inject(DialogsService);
-  private _$location = inject(AJS_LOCATION);
+  private _router = inject(Router);
 
   planName = '';
   planProject = '';
@@ -54,7 +54,7 @@ export class CallPlanComponent extends BaseArtefactComponent<CallPlanArtefact> {
     from(this._linkProcessor.process(this.planProject))
       .pipe(map(() => `/root/plans/editor/${this.context.artefact!.planId!}`))
       .subscribe({
-        next: (url) => this._$location.path(url),
+        next: (url) => this._router.navigateByUrl(url),
         error: (error) => this._dialogs.showErrorMsg(error),
       });
   }
