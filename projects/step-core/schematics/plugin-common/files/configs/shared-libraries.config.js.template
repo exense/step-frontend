@@ -1,6 +1,16 @@
-const libraryConfig = (conf = {}) => {
+const libraryConfig = (conf = {}, disableSecondaries = true) => {
   const defaultConfig = { singleton: true, strictVersion: true, requiredVersion: 'auto' };
-  return { ...defaultConfig, ...conf };
+  const res = { ...defaultConfig, ...conf };
+
+  if (disableSecondaries) {
+    Object.defineProperty(res, 'includeSecondaries', {
+      enumerable: false,
+      configurable: false,
+      value: false,
+    });
+  }
+
+  return res;
 };
 
 module.exports = {
