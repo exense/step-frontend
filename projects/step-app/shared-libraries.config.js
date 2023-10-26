@@ -11,45 +11,78 @@ const libraryConfig = (conf = {}, disableSecondaries = false) => {
   return res;
 };
 
+const PACKAGES = [
+  '@angular/core',
+  '@angular/animations',
+  '@angular/common',
+  '@angular/common/http',
+  '@angular/router',
+  '@angular/forms',
+  '@angular/material/checkbox',
+  '@angular/material/chips',
+  '@angular/material/stepper',
+  '@angular/material/datepicker',
+  '@angular/material/dialog',
+  '@angular/material/divider',
+  '@angular/material/expansion',
+  '@angular/material/grid-list',
+  '@angular/material/icon',
+  '@angular/material/input',
+  '@angular/material/list',
+  '@angular/material/menu',
+  '@angular/material/progress-bar',
+  '@angular/material/core',
+  '@angular/material/sidenav',
+  '@angular/material/progress-spinner',
+  '@angular/material/paginator',
+  '@angular/material/slide-toggle',
+  '@angular/material/tabs',
+  '@angular/material/select',
+  '@angular/material/radio',
+  '@angular/material/sort',
+  '@angular/material/toolbar',
+  '@angular/material/table',
+  '@angular/material/tooltip',
+  '@angular/material/button',
+  '@angular/material/card',
+  '@angular/material-luxon-adapter',
+  '@angular/material/form-field',
+  '@angular/cdk/overlay',
+  '@angular/cdk/portal',
+  'angular-split',
+  '@exense/step-core',
+  'luxon',
+];
+
+const createSharedConfig = (options = {}) => {
+  const defaultOptions = {
+    defaultDisableSecondaries: false,
+    disableSecondariesExplicitPackages: [],
+    packageConfigs: {
+      '@exense/step-core': { requiredVersion: '0.2.0' },
+      luxon: { requiredVersion: '2.0.0' },
+    },
+  };
+  const resultOptions = {
+    ...defaultOptions,
+    ...options,
+    packageConfigs: {
+      ...defaultOptions.packageConfigs,
+      ...(options.packageConfigs ?? {}),
+    },
+  };
+
+  const result = PACKAGES.reduce((res, packageName) => {
+    const config = resultOptions.packageConfigs[packageName];
+    const disableSecondary =
+      resultOptions.disableSecondariesExplicitPackages.includes(packageName) || resultOptions.defaultDisableSecondaries;
+    res[packageName] = libraryConfig(config, disableSecondary);
+    return res;
+  }, {});
+
+  return result;
+};
+
 module.exports = {
-  '@angular/core': libraryConfig(),
-  '@angular/animations': libraryConfig(),
-  '@angular/common': libraryConfig(),
-  '@angular/common/http': libraryConfig(),
-  '@angular/router': libraryConfig(),
-  '@angular/forms': libraryConfig(),
-  '@angular/material/checkbox': libraryConfig(),
-  '@angular/material/chips': libraryConfig(),
-  '@angular/material/stepper': libraryConfig(),
-  '@angular/material/datepicker': libraryConfig(),
-  '@angular/material/dialog': libraryConfig(),
-  '@angular/material/divider': libraryConfig(),
-  '@angular/material/expansion': libraryConfig(),
-  '@angular/material/grid-list': libraryConfig(),
-  '@angular/material/icon': libraryConfig(),
-  '@angular/material/input': libraryConfig(),
-  '@angular/material/list': libraryConfig(),
-  '@angular/material/menu': libraryConfig(),
-  '@angular/material/progress-bar': libraryConfig(),
-  '@angular/material/core': libraryConfig(),
-  '@angular/material/sidenav': libraryConfig(),
-  '@angular/material/progress-spinner': libraryConfig(),
-  '@angular/material/paginator': libraryConfig(),
-  '@angular/material/slide-toggle': libraryConfig(),
-  '@angular/material/tabs': libraryConfig(),
-  '@angular/material/select': libraryConfig(),
-  '@angular/material/radio': libraryConfig(),
-  '@angular/material/sort': libraryConfig(),
-  '@angular/material/toolbar': libraryConfig(),
-  '@angular/material/table': libraryConfig(),
-  '@angular/material/tooltip': libraryConfig(),
-  '@angular/material/button': libraryConfig(),
-  '@angular/material/card': libraryConfig(),
-  '@angular/material-luxon-adapter': libraryConfig(),
-  '@angular/material/form-field': libraryConfig(),
-  '@angular/cdk/overlay': libraryConfig(),
-  '@angular/cdk/portal': libraryConfig(),
-  'angular-split': libraryConfig(),
-  '@exense/step-core': libraryConfig({ requiredVersion: '0.2.0' }, true),
-  luxon: libraryConfig({ requiredVersion: '2.0.0' }),
+  createSharedConfig,
 };
