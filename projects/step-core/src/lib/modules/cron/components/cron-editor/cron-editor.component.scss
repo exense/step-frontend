@@ -1,0 +1,58 @@
+step-cron-editor {
+  step-tabs > nav {
+    border: none !important;
+
+    .mat-tab-links {
+      margin: 0 !important;
+
+      & > a {
+        padding: 0 1.2rem;
+        min-width: 6rem !important;
+      }
+    }
+  }
+
+  .tab-content {
+    margin-left: 1rem;
+    padding: 1rem 0;
+    display: flex;
+    gap: 3rem;
+    flex-direction: column;
+    min-height: 25rem;
+  }
+
+  h4 {
+    margin-top: 0;
+  }
+
+  .editor-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    mat-select {
+      width: auto;
+      min-width: 5rem;
+    }
+
+    span {
+      white-space: nowrap;
+    }
+  }
+
+  .editors-group {
+    mat-radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    label.mat-radio-label {
+      font-weight: normal;
+    }
+  }
+
+  step-alert {
+    margin: 0 !important;
+  }
+}

@@ -26,7 +26,6 @@ const SCRIPTS = [
 
   './src/lib/angularjs/js/common.js',
   './src/lib/angularjs/js/app.js',
-  './src/lib/angularjs/js/views.js',
   './src/lib/angularjs/js/ntables.js',
   './src/lib/angularjs/js/chart.js',
   './src/lib/angularjs/js/export.js',
@@ -44,7 +43,6 @@ const SCRIPTS = [
   './src/lib/angularjs/js/controllers/repository.js',
   './src/lib/angularjs/js/controllers/dynamicForms.js',
   './src/lib/angularjs/js/controllers/components.js',
-  './src/lib/angularjs/js/datatable-ext-paginationinput.js',
 ];
 
 const STYLES = [
