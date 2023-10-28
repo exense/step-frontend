@@ -4,7 +4,7 @@
 }
 
 a {
-  margin-right: 1rem;
+  margin-right: 0.5rem;
 }
 
 .nav-to-plan-icon {
@@ -12,4 +12,10 @@ a {
   margin-bottom: 6px;
   vertical-align: middle;
   cursor: pointer;
+}
+
+.link-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
