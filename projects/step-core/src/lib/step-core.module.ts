@@ -79,6 +79,8 @@ import { WizardModule } from './modules/wizard/wizards.module';
 import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.component';
 import { SettingsComponent } from './components/settings/settings.component';
 import { CronModule } from './modules/cron/cron.module';
+import { TriggerHtmlPopoverDirective } from './directives/trigger-html-popover.directive';
+import { HtmlPopoverComponent } from './components/html-popover/html-popover.component';
 
 @NgModule({
   declarations: [
@@ -118,6 +120,7 @@ import { CronModule } from './modules/cron/cron.module';
     FocusablesDirective,
     MaxHeightViewportHeightMinusOffsetTopDirective,
     RecursiveTabIndexDirective,
+    TriggerHtmlPopoverDirective,
     ReferenceArtefactNameComponent,
     PlanNameComponent,
     PlanCreateDialogComponent,
@@ -138,6 +141,7 @@ import { CronModule } from './modules/cron/cron.module';
     ResourceInputWrapperComponent,
     SimpleOutletComponent,
     SettingsComponent,
+    HtmlPopoverComponent,
   ],
   imports: [
     CommonModule,
@@ -214,6 +218,7 @@ import { CronModule } from './modules/cron/cron.module';
     FocusablesDirective,
     MaxHeightViewportHeightMinusOffsetTopDirective,
     RecursiveTabIndexDirective,
+    TriggerHtmlPopoverDirective,
     PlanNameComponent,
     PlanCreateDialogComponent,
     InputModelFormatterDirective,
@@ -234,6 +239,7 @@ import { CronModule } from './modules/cron/cron.module';
     SelectTaskComponent,
     ResourceInputWrapperComponent,
     SettingsComponent,
+    HtmlPopoverComponent,
     CronModule,
   ],
   providers: [
@@ -313,6 +319,7 @@ export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialo
 export * from './components/artefact-details/artefact-details.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export * from './components/settings/settings.component';
+export { HtmlPopoverComponent } from './components/html-popover/html-popover.component';
 export * from './decorators/plugin';
 export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
@@ -324,6 +331,7 @@ export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.dir
 export * from './directives/tooltip-immediate-close.directive';
 export * from './directives/tooltip.directive';
 export { TrapFocusDirective } from './directives/trap-focus.directive';
+export { TriggerHtmlPopoverDirective } from './directives/trigger-html-popover.directive';
 export * from './domain';
 export * from './modules/async-operations/async-operations.module';
 export * from './modules/basics/step-basics.module';

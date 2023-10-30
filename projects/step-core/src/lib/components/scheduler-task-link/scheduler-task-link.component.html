@@ -20,11 +20,12 @@
     </ng-container>
   </div>
 </a>
-<step-icon
-  *ngIf="allowNavToPlan && !!context?.executionsParameters?.repositoryObject?.repositoryParameters?.['planid']"
-  class="nav-to-plan-icon"
-  matTooltip="Go to plan"
-  name="file"
-  (click)="navToPlan()"
+<step-html-popover
+  *ngIf="!!context?.attributes?.['description']"
+  [htmlContent]="context?.attributes?.['description']!"
+  #popover="StepHtmlPopover"
+  (toggledEvent)="setActiveState($event)"
 >
-</step-icon>
+  <step-icon name="help-circle" *ngIf="!descriptionToggledActive"></step-icon>
+  <step-icon name="x-circle" *ngIf="descriptionToggledActive"></step-icon>
+</step-html-popover>
