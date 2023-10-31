@@ -1,15 +1,12 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import {
   AbstractArtefact,
+  ArtefactsFactoryService,
   ArtefactTreeNode,
-  AugmentedScreenService,
-  AuthService,
   breadthFirstSearch,
   COPIED_ARTEFACTS,
   CustomComponent,
   DialogsService,
-  DynamicFieldsSchema,
-  DynamicValueString,
   KeywordsService,
   PersistenceService,
   Plan,
@@ -20,7 +17,6 @@ import {
 } from '@exense/step-core';
 import { BehaviorSubject, filter, first, map, merge, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
-import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { PlanEditorApiService } from '../../injectables/plan-editor-api.service';
 
 const MESSAGE_ADD_AT_MULTIPLE_NODES =
@@ -36,13 +32,10 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
   private _planEditorApi = inject(PlanEditorApiService);
   private _planApi = inject(PlansService);
   private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
-  private _authService = inject(AuthService);
-  private _keywordCallsApi = inject(KeywordsService);
-  private _screenTemplates = inject(AugmentedScreenService);
   private _planHistory = inject(PlanHistoryService);
   private _dialogs = inject(DialogsService);
   private _persistenceService = inject(PersistenceService);
-  private _artefactTreeNodeUtilsService = inject(ArtefactTreeNodeUtilsService);
+  private _artefactsFactory = inject(ArtefactsFactoryService);
 
   context?: any;
   private terminator$ = new Subject<void>();
@@ -76,17 +69,9 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
       this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES);
       return;
     }
-    this._planApi
-      .getArtefactType(artefactTypeId)
-      .pipe(
-        map((artefact) => {
-          artefact!.dynamicName!.dynamic = artefact!.useDynamicName;
-          return artefact;
-        })
-      )
-      .subscribe((artefact) => {
-        this._treeState.addChildrenToSelectedNode(artefact);
-      });
+    this._artefactsFactory.createControlArtefact(artefactTypeId).subscribe((artefact) => {
+      this._treeState.addChildrenToSelectedNode(artefact);
+    });
   }
 
   addFunction(keywordId: string): void {
@@ -94,73 +79,9 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
       this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES);
       return;
     }
-    this._keywordCallsApi
-      .getFunctionById(keywordId)
-      .pipe(
-        switchMap((keyword) => {
-          const artefact$ = this._planApi.getArtefactType('CallKeyword');
-          return artefact$.pipe(
-            map((artefact) => {
-              artefact!.attributes!['name'] = keyword!.attributes!['name'];
-              artefact!.dynamicName!.dynamic = artefact.useDynamicName;
-              return { artefact, keyword };
-            })
-          );
-        }),
-        switchMap(({ artefact, keyword }) => {
-          const inputs$ = this._screenTemplates.getInputsForScreenPost('functionTable');
-          return inputs$.pipe(
-            map((inputs) => {
-              const functionAttributes = inputs.reduce((res, input) => {
-                const attributeId = (input?.id || '').replace('attributes.', '');
-                if (!attributeId || !keyword?.attributes?.[attributeId]) {
-                  return res;
-                }
-                const dynamic = false;
-                const value = keyword.attributes[attributeId];
-                res[attributeId] = { value, dynamic };
-                return res;
-              }, {} as Record<string, { value: string; dynamic: boolean }>);
-
-              (artefact as any)['function'] = { value: JSON.stringify(functionAttributes), dynamic: false };
-              return { artefact, keyword };
-            })
-          );
-        }),
-        map(({ artefact, keyword }) => {
-          if (this._authService.getConf()?.miscParams?.['enforceschemas'] !== 'true') {
-            return artefact;
-          }
-
-          const schema = keyword?.schema as unknown as DynamicFieldsSchema | undefined;
-          if (!schema?.properties) {
-            return artefact;
-          }
-
-          const targetObject = (schema?.required || []).reduce((res, field) => {
-            const property = schema?.properties[field];
-            if (!property) {
-              return res;
-            }
-
-            const value = property.default;
-            res[field] = { value, dynamic: false };
-            return res;
-          }, {} as Record<string, DynamicValueString>);
-
-          (artefact as any)['argument'] = {
-            dynamic: false,
-            value: JSON.stringify(targetObject),
-            expression: null,
-            expressionType: null,
-          };
-
-          return artefact;
-        })
-      )
-      .subscribe((artefact) => {
-        this._treeState.addChildrenToSelectedNode(artefact);
-      });
+    this._artefactsFactory.createCallKeywordArtefact(keywordId).subscribe((artefact) => {
+      this._treeState.addChildrenToSelectedNode(artefact);
+    });
   }
 
   addPlan(planId: string): void {
@@ -168,24 +89,9 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
       this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES);
       return;
     }
-    this._planApi
-      .getPlanById(planId)
-      .pipe(
-        switchMap((plan) => {
-          const artefact$ = this._planApi.getArtefactType('CallPlan');
-          return artefact$.pipe(
-            map((artefact) => {
-              artefact.attributes!['name'] = plan.attributes!['name'];
-              (artefact as any)['planId'] = planId;
-              artefact.dynamicName!.dynamic = artefact.useDynamicName;
-              return artefact;
-            })
-          );
-        })
-      )
-      .subscribe((artefact) => {
-        this._treeState.addChildrenToSelectedNode(artefact);
-      });
+    this._artefactsFactory.createCallPlanArtefact(planId).subscribe((artefact) => {
+      this._treeState.addChildrenToSelectedNode(artefact);
+    });
   }
 
   undo(): void {

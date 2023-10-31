@@ -7,6 +7,7 @@ import {
   ExecutiontTaskParameters,
   Plan,
 } from '../../client/step-client-module';
+import { CronService } from '../../modules/cron/cron.module';
 
 type EditDialogRef = MatDialogRef<EditSchedulerTaskDialogComponent, ExecutiontTaskParameters>;
 
@@ -18,6 +19,7 @@ type EditDialogRef = MatDialogRef<EditSchedulerTaskDialogComponent, ExecutiontTa
 export class EditSchedulerTaskDialogComponent implements OnInit {
   readonly rawValueModelOptions: NgModel['options'] = { updateOn: 'blur' };
 
+  private _cron = inject(CronService);
   private _api = inject(AugmentedSchedulerService);
   private _matDialogRef = inject<EditDialogRef>(MatDialogRef);
   protected _task = inject<ExecutiontTaskParameters>(MAT_DIALOG_DATA);
@@ -87,6 +89,14 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
     if (executionParameters) {
       this._task.executionsParameters = executionParameters;
     }
+  }
+
+  configureCronExpression(): void {
+    this._cron.configureExpression().subscribe((expression) => {
+      if (expression) {
+        this._task.cronExpression = expression;
+      }
+    });
   }
 
   private initializeTask(): void {

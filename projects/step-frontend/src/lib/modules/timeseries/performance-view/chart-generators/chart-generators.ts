@@ -66,6 +66,7 @@ export class ChartGenerators {
           width: 2,
           stroke: 'rgba(255,109,18,0.59)',
           legendName: 'Average Response Time',
+          show: true,
         },
         {
           id: 'count',
@@ -77,6 +78,7 @@ export class ChartGenerators {
           fill: (self: uPlot) => UPlotUtils.gradientFill(self, TimeSeriesConfig.TOTAL_BARS_COLOR),
           paths: this.barsFunction({ size: [0.9, 100] }),
           points: { show: false },
+          show: true,
         },
       ],
       axes: [
