@@ -74,6 +74,9 @@ angular
     };
 
     $scope.addCronExclusion = function() {
+      if (!$scope.task.cronExclusions) {
+        $scope.task.cronExclusions = [];
+      }
       $scope.task.cronExclusions.push({description: undefined, cronExpression: undefined});
     };
 
