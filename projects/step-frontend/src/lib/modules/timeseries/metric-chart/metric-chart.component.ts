@@ -43,7 +43,9 @@ export class MetricChartComponent implements OnInit, OnChanges {
   @Input() allowMetricChange = true;
   @Input() colorsPool: TimeseriesColorsPool = new TimeseriesColorsPool();
 
-  readonly AGGREGATES: AggregationType[] = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'RATE', 'MEDIAN', 'PERCENTILE'];
+  readonly AGGREGATES: AggregationType[] = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'RATE', 'MEDIAN'];
+  readonly PCL_VALUES = [80, 90, 99];
+  selectedPclValue: number = this.PCL_VALUES[0];
   selectedAggregate!: AggregationType;
   groupingAttributes: MetricAttributeSelection[] = [];
   selectedRange = this.range;
@@ -78,7 +80,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
     if (this.selectedAggregate === 'MEDIAN') {
       pclValues = [50];
     } else if (this.selectedAggregate === 'PERCENTILE') {
-      pclValues = [80, 90, 99];
+      pclValues = [this.selectedPclValue];
     }
     const request: FetchBucketsRequest = {
       start: this.selectedRange.from,
@@ -147,7 +149,9 @@ export class MetricChartComponent implements OnInit, OnChanges {
     let yAxesUnit = this.getUnitLabel(this.settings);
 
     return {
-      title: `${this.settings.displayName!} (${this.selectedAggregate})`,
+      title: `${this.settings.displayName!} (${this.selectedAggregate}${
+        this.selectedAggregate === 'PERCENTILE' ? ` ${this.selectedPclValue}th` : ''
+      })`,
       xValues: xLabels,
       series: series,
       tooltipOptions: {
@@ -219,7 +223,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
       case 'MEDIAN':
         return b.pclValues?.[50];
       case 'PERCENTILE':
-        return b.pclValues?.[90];
+        return b.pclValues?.[this.selectedPclValue];
       default:
         throw new Error('Unhandled aggregation value: ' + aggregation);
     }

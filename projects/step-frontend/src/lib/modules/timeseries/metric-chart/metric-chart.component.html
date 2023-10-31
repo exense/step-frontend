@@ -42,6 +42,24 @@
         >
           {{ aggregate }}
         </button>
+        <button
+          mat-menu-item
+          [matMenuTriggerFor]="pclMenu"
+          [class.selected-menu-item]="selectedAggregate === 'PERCENTILE'"
+        >
+          PERCENTILE
+        </button>
+      </mat-menu>
+
+      <mat-menu #pclMenu="matMenu">
+        <button
+          *ngFor="let pcl of PCL_VALUES"
+          (click)="selectedPclValue = pcl; switchAggregate('PERCENTILE')"
+          [class.selected-menu-item]="selectedAggregate === 'PERCENTILE' && selectedPclValue === pcl"
+          mat-menu-item
+        >
+          {{ pcl }}th
+        </button>
       </mat-menu>
     </div>
   </ng-container>
