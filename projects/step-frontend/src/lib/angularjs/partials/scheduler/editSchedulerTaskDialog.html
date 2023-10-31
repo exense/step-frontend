@@ -34,6 +34,27 @@
 				</div>
 			</div>
 		</div>
+
+    <div class="form-group">
+			<label for="desc">CRON Exclusion</label>
+			<div class="panel panel-default">
+				<div class="panel-body exclusions-container">
+          <div ng-repeat="exclusion in task.cronExclusions" class="exclusion-item input-group">
+            <input class="form-control cron-expression" type="text" ng-model="exclusion.cronExpression" placeholder="Cron Expression">
+            <input class="form-control" type="text" ng-model="exclusion.description" placeholder="Description">
+            <span class="input-group-btn">
+              <button class="btn btn-default legacy-class-to-remove" type="button" ng-disabled="readonly" ng-click="removeCronExclusion($index)">
+                <step-ajs-icon name="trash-2">delete</step-ajs-icon>
+              </button>
+            </span>
+          </div>
+        </div>
+        <button class="btn btn-default add-exclusion-button" type="button" ng-click="addCronExclusion()">
+          <step-ajs-icon name="plus">plus</step-ajs-icon>
+        </button>
+			</div>
+		</div>
+
 		<div class="form-group">
 			<label for="desc">Parameters</label>
 			<div class="panel panel-default">
