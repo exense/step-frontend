@@ -55,12 +55,6 @@ export class MetricChartComponent implements OnInit, OnChanges {
   private _timeSeriesService = inject(TimeSeriesService);
 
   ngOnInit(): void {
-    if (!this.settings) {
-      throw new Error('Metric settings input is mandatory');
-    }
-    if (!this.range) {
-      throw new Error('Range input is mandatory');
-    }
     this.selectedRange = this.range;
     this.groupingAttributes = this.settings.attributes?.map((a) => ({ ...a, selected: false })) || [];
     this.settings.defaultGroupingAttributes?.forEach((a) => {
@@ -111,7 +105,19 @@ export class MetricChartComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['settings']?.previousValue || changes['range']?.previousValue) {
+    const cSettings = changes['settings'];
+    const cRange = changes['range'];
+
+    if (cSettings && cSettings.currentValue == undefined) {
+      throw new Error('Metric settings input is mandatory');
+    }
+    if (cRange && cRange.currentValue == undefined) {
+      throw new Error('Range input is mandatory');
+    }
+    if (cRange) {
+      this.selectedRange = this.range;
+    }
+    if (cSettings?.previousValue || cRange?.previousValue) {
       this.fetchDataAndCreateChart(this.settings);
     }
   }

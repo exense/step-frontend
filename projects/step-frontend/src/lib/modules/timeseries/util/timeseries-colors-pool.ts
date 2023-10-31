@@ -17,8 +17,6 @@ export class TimeseriesColorsPool {
    * @param key - If it is not new, the existing value will be returned, otherwise a new color is generated.
    */
   assignColor(key: string): string {
-    if (key === 'Value') {
-    }
     let color;
     if (this.predefinedColors.length == 0) {
       color = this.randomRGBA();
@@ -52,17 +50,13 @@ export class TimeseriesColorsPool {
   }
 
   randomRGB(): string {
-    var o = Math.round,
-      r = Math.random,
-      s = 255;
-
     // Convert a number to a 2-digit hexadecimal string
     const toHex = (num: number) => num.toString(16).padStart(2, '0');
 
     // Generate RGB values
-    const red = o(r() * s);
-    const green = o(r() * s);
-    const blue = o(r() * s);
+    const red = Math.round(Math.random() * 255);
+    const green = Math.round(Math.random() * 255);
+    const blue = Math.round(Math.random() * 255);
 
     return `#${toHex(red)}${toHex(green)}${toHex(blue)}`;
   }
