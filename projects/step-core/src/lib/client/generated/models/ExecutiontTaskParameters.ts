@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { CronExclusion } from './CronExclusion';
 import type { ExecutionParameters } from './ExecutionParameters';
 
 export type ExecutiontTaskParameters = {
@@ -10,6 +11,7 @@ export type ExecutiontTaskParameters = {
   name?: string;
   executionsParameters?: ExecutionParameters;
   cronExpression?: string;
+  cronExclusions?: Array<CronExclusion>;
   active?: boolean;
   id?: string;
 };
