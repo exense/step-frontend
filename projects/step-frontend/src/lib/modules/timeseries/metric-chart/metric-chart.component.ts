@@ -160,9 +160,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
           scale: 'y',
           values: (u, vals, space) => {
-            return vals.map(
-              (v) => this.getAxesFormatFunction(this.settings.unit!)(v) + this.getUnitLabel(this.settings)
-            );
+            return vals.map((v) => this.getAxesFormatFunction(this.settings.unit!)(v));
           },
         },
       ],
@@ -173,25 +171,30 @@ export class MetricChartComponent implements OnInit, OnChanges {
     if (!unit) {
       return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber;
     }
+    if (this.selectedAggregate === 'RATE') {
+      return (v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(v) + '/h';
+    }
     switch (unit) {
       case '1':
-        return (v) => v.toString();
+        return (v) => v.toString() + this.getUnitLabel(this.settings);
       case 'ms':
         return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time;
       case '%':
-        return (v) => v.toString();
+        return (v) => v.toString() + this.getUnitLabel(this.settings);
       default:
         throw new Error('Unit not handled: ' + unit);
     }
   }
 
   private getUnitLabel(metric: MetricType): string {
+    if (this.selectedAggregate === 'RATE') {
+      return '/h';
+    }
     if (metric.unit === '%') {
       return '%';
+    } else if (metric.unit === 'ms') {
+      return ' ms';
     } else {
-      if (this.selectedAggregate === 'RATE') {
-        return '/h';
-      }
       return '';
     }
   }
