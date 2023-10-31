@@ -62,7 +62,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
     this.selectedRange = this.range;
     this.groupingAttributes = this.settings.attributes?.map((a) => ({ ...a, selected: false })) || [];
     this.settings.defaultGroupingAttributes?.forEach((a) => {
-      const foundAttribute = this.groupingAttributes.find((attr) => attr.value === a);
+      const foundAttribute = this.groupingAttributes.find((attr) => attr.name === a);
       if (foundAttribute) {
         foundAttribute.selected = true;
       }
@@ -73,7 +73,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
 
   private fetchDataAndCreateChart(settings: MetricType): void {
     this.chart?.setBlur(true);
-    const groupDimensions: string[] = this.groupingAttributes.filter((a) => a.selected).map((a) => a.value!);
+    const groupDimensions: string[] = this.groupingAttributes.filter((a) => a.selected).map((a) => a.name!);
     let pclValues: number[] | undefined;
     if (this.selectedAggregate === 'MEDIAN') {
       pclValues = [50];
@@ -84,7 +84,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
       start: this.selectedRange.from,
       end: this.selectedRange.to,
       groupDimensions: groupDimensions,
-      oqlFilter: FilterUtils.objectToOQL({ ...this.filters, 'attributes.metricType': `"${settings.key!}"` }),
+      oqlFilter: FilterUtils.objectToOQL({ ...this.filters, 'attributes.metricType': `"${settings.name!}"` }),
       numberOfBuckets: 100,
       percentiles: pclValues,
     };
@@ -147,7 +147,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
     let yAxesUnit = this.getUnitLabel(this.settings);
 
     return {
-      title: `${this.settings.name!} (${this.selectedAggregate})`,
+      title: `${this.settings.displayName!} (${this.selectedAggregate})`,
       xValues: xLabels,
       series: series,
       tooltipOptions: {
@@ -161,7 +161,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
           scale: 'y',
           values: (u, vals, space) => {
             return vals.map(
-              (v) => this.getAxesFormatFunction(this.settings.unit)(v) + this.getUnitLabel(this.settings)
+              (v) => this.getAxesFormatFunction(this.settings.unit!)(v) + this.getUnitLabel(this.settings)
             );
           },
         },
@@ -169,22 +169,24 @@ export class MetricChartComponent implements OnInit, OnChanges {
     };
   }
 
-  private getAxesFormatFunction(unit: undefined | 'MS' | 'PERCENTAGE' | 'EMPTY'): (v: number) => string {
+  private getAxesFormatFunction(unit: string): (v: number) => string {
     if (!unit) {
-      return (v) => v.toString();
+      return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber;
     }
     switch (unit) {
-      case 'MS':
-        return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time;
-      case 'PERCENTAGE':
+      case '1':
         return (v) => v.toString();
-      case 'EMPTY':
-        return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber;
+      case 'ms':
+        return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time;
+      case '%':
+        return (v) => v.toString();
+      default:
+        throw new Error('Unit not handled: ' + unit);
     }
   }
 
   private getUnitLabel(metric: MetricType): string {
-    if (metric.unit === 'PERCENTAGE') {
+    if (metric.unit === '%') {
       return '%';
     } else {
       if (this.selectedAggregate === 'RATE') {

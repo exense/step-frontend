@@ -44,7 +44,7 @@
       <span>+ Custom Metric Chart</span>
       <mat-menu #menu="matMenu">
         <button *ngFor="let metric of metricTypes" mat-menu-item (click)="addCustomChart(metric)">
-          {{ metric.name }}
+          {{ metric.displayName }}
         </button>
       </mat-menu>
     </div>

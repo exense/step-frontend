@@ -3,6 +3,6 @@
 /* eslint-disable */
 
 export type MetricAttribute = {
-  value?: string;
-  label?: string;
+  name?: string;
+  displayName?: string;
 };

@@ -3,10 +3,10 @@
 /* eslint-disable */
 export const $MetricAttribute = {
   properties: {
-    value: {
+    name: {
       type: 'string',
     },
-    label: {
+    displayName: {
       type: 'string',
     },
   },

@@ -7,11 +7,11 @@ import type { MetricRenderingSettings } from './MetricRenderingSettings';
 
 export type MetricType = {
   customFields?: Record<string, any>;
-  key?: string;
   name?: string;
+  displayName?: string;
   description?: string;
   attributes?: Array<MetricAttribute>;
-  unit?: 'MS' | 'PERCENTAGE' | 'EMPTY';
+  unit?: string;
   defaultAggregation?: 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
   defaultGroupingAttributes?: Array<string>;
   renderingSettings?: MetricRenderingSettings;

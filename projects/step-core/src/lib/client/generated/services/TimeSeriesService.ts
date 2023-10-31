@@ -68,6 +68,7 @@ export class TimeSeriesService {
   }
 
   /**
+   * Returns the list of all supported metric types
    * @returns MetricType default response
    * @throws ApiError
    */

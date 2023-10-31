@@ -9,10 +9,10 @@ export const $MetricType = {
         properties: {},
       },
     },
-    key: {
+    name: {
       type: 'string',
     },
-    name: {
+    displayName: {
       type: 'string',
     },
     description: {
@@ -25,7 +25,7 @@ export const $MetricType = {
       },
     },
     unit: {
-      type: 'Enum',
+      type: 'string',
     },
     defaultAggregation: {
       type: 'Enum',
