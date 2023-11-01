@@ -183,6 +183,10 @@ $border-radius: 8px;
         flex: auto;
       }
 
+      & > input:not(:first-child) {
+        border-left: none;
+      }
+
       & > *:first-child {
         @include left-border-round;
       }

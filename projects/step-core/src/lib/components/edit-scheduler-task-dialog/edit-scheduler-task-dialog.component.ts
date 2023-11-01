@@ -99,6 +99,17 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
     });
   }
 
+  addCronExclusion() {
+    if (!this._task.cronExclusions) {
+      this._task.cronExclusions = [];
+    }
+    this._task.cronExclusions.push({ description: undefined, cronExpression: undefined });
+  }
+
+  removeExclusion(index: number) {
+    this._task.cronExclusions!.splice(index, 1);
+  }
+
   private initializeTask(): void {
     if (!this._task.attributes) {
       this._task.attributes = {};
