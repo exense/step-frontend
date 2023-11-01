@@ -614,7 +614,9 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
           const seriesKey = this.getSeriesKey(key, groupDimensions);
           const responseTimeData: (number | null | undefined)[] = [];
           const color = this.keywordsService.getColor(seriesKey);
+          const metadata: any[] = [];
           const throughputData = response.matrix[i].map((b, j) => {
+            metadata.push(b?.attributes);
             const bucketValue = throughputMetric.mapFunction(b);
             if (totalThroughput[j] == undefined) {
               totalThroughput[j] = bucketValue;
@@ -636,6 +638,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
             legendName: seriesKey,
             id: seriesKey,
             data: [], // will override it
+            metadata: metadata,
             value: (x, v) => Math.trunc(v),
             stroke: color,
             points: { show: false },

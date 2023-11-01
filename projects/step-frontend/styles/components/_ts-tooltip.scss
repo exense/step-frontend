@@ -2,7 +2,6 @@
   .ts-tooltip {
     position: absolute;
     z-index: 1000;
-    pointer-events: none;
     display: block;
     margin: 0 2.4rem;
     padding: 8px 12px;
@@ -12,10 +11,18 @@
 
     .tooltip-row {
       display: flex;
+      position: relative;
       align-items: center;
       flex-direction: row;
       white-space: nowrap;
       justify-content: space-between;
+
+      .link {
+        &:hover {
+          text-decoration: underline;
+          cursor: pointer;
+        }
+      }
 
       .left {
         display: flex;
@@ -36,6 +43,30 @@
         text-overflow: ellipsis;
         max-width: 40rem;
       }
+    }
+
+    .link-row {
+      padding: 0.5rem;
+      max-width: 20rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      &:hover {
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    }
+
+    .tooltip-menu {
+      position: absolute;
+      background: #fff;
+      min-width: 10rem;
+      min-height: 7rem;
+      top: -4px;
+      border: 1px solid #d1d1d1;
+      padding: 1rem;
+      z-index: 1000;
     }
 
     .separator {

@@ -9,6 +9,7 @@ interface TooltipRowEntry {
   value: number;
   name: string;
   color: string;
+  executions?: string[];
   bold?: boolean;
 }
 
@@ -20,7 +21,7 @@ export interface Anchor {
 }
 
 export class TooltipPlugin {
-  public static getInstance(optionsGetter: () => TsTooltipOptions, ref?: TimeSeriesChartComponent): uPlot.Plugin {
+  public static getInstance(ref: TimeSeriesChartComponent): uPlot.Plugin {
     let over: any;
     let bound: Element;
     let bLeft: any;
@@ -38,7 +39,79 @@ export class TooltipPlugin {
     overlay.classList.add('ts-tooltip');
     overlay.style.display = 'none';
     overlay.style.position = 'absolute';
+    // overlay.addEventListener('mousemove', function (event) {
+    //   event.stopPropagation();
+    // });
     document.body.appendChild(overlay);
+
+    let openMenu: Element | undefined;
+
+    const createExecutionsMenu = (event: any, container: any, executionIds: string[]) => {
+      const menu = createElementWithClass('div', 'tooltip-menu');
+      menu.innerText = 'Loading...';
+      const bounds = container.getBoundingClientRect();
+      ref.getExecutionDetails(executionIds).subscribe((executions) => {
+        menu.innerText = '';
+        executions.forEach((ex) => {
+          const row = createElementWithClass('div', 'link-row');
+          row.setAttribute('title', 'Jump to execution');
+          row.innerText = ex.description!;
+          row.addEventListener('click', () => {
+            window.open(getExecutionLink(ex.id!));
+          });
+          menu.appendChild(row);
+        });
+      });
+      // menu.style.left = (rect.width + 4) + 'px';
+      menu.style.left = event.clientX - bounds.left + 16 + 'px';
+      menu.style.top = event.clientY - bounds.top + 4 + 'px';
+      return menu;
+    };
+
+    const createRowElement = (row: TooltipRowEntry, yScaleUnit?: string): Element => {
+      const rowElement = document.createElement('div');
+      rowElement.classList.add('tooltip-row');
+      if (row.bold) {
+        rowElement.setAttribute('style', 'font-weight: bold');
+      }
+      const leftContainer = createElementWithClass('div', 'left');
+      const nameDiv = createElementWithClass('div', 'name');
+      const valueDiv = createElementWithClass('div', 'value');
+      rowElement.appendChild(leftContainer);
+      rowElement.appendChild(valueDiv);
+
+      nameDiv.textContent = `${row.name} `;
+      let value = `${Math.trunc(row.value)} `;
+      if (yScaleUnit) {
+        value += yScaleUnit;
+      }
+      valueDiv.textContent = value;
+
+      if (row.color) {
+        let colorDiv = document.createElement('div');
+        colorDiv.classList.add('color');
+        colorDiv.style.backgroundColor = row.color;
+        leftContainer.appendChild(colorDiv);
+      }
+      leftContainer.appendChild(nameDiv);
+      if (row.executions?.length) {
+        nameDiv.classList.add('link');
+        nameDiv.setAttribute('title', 'Jump to execution');
+        nameDiv.addEventListener('click', (event) => {
+          if (openMenu) {
+            overlay.removeChild(openMenu);
+            openMenu = undefined;
+          }
+          if (row.executions!.length === 1) {
+            window.open(getExecutionLink(row.executions![0]!));
+          } else {
+            openMenu = createExecutionsMenu(event, overlay, row.executions!);
+            overlay.appendChild(openMenu);
+          }
+        });
+      }
+      return rowElement;
+    };
 
     return {
       hooks: {
@@ -53,9 +126,15 @@ export class TooltipPlugin {
             isVisible = true;
           };
 
-          over.onmouseleave = () => {
-            overlay.style.display = 'none';
-            isVisible = false;
+          over.onmouseleave = (event: any) => {
+            if (!overlay.contains(event.relatedTarget)) {
+              overlay.style.display = 'none';
+              isVisible = false;
+              if (openMenu) {
+                overlay.removeChild(openMenu);
+                openMenu = undefined;
+              }
+            }
           };
         },
         destroy: (u: uPlot) => {
@@ -83,8 +162,15 @@ export class TooltipPlugin {
             let bucketValue = u.data[i][idx];
             if (series.scale === 'y' && series.show) {
               if (bucketValue != undefined) {
+                const executionIds = ref.chartMetadata[i]?.[idx]?.['eId'];
+
                 // @ts-ignore
-                yPoints.push({ value: bucketValue, name: series.label, color: series._stroke });
+                yPoints.push({
+                  value: bucketValue,
+                  name: series.label,
+                  color: series._stroke,
+                  executions: executionIds,
+                });
               }
               continue;
             }
@@ -122,7 +208,7 @@ export class TooltipPlugin {
           }
           overlay.innerHTML = '';
           yPoints.forEach((point) => {
-            let rowElement = this.createRowElement(point, settings.yAxisUnit);
+            let rowElement = createRowElement(point, settings.yAxisUnit);
             overlay.appendChild(rowElement);
           });
           if (yPoints.length < allSeriesLength) {
@@ -140,7 +226,7 @@ export class TooltipPlugin {
             }
           }
           if (summaryRow) {
-            let summaryElement = this.createRowElement(summaryRow);
+            let summaryElement = createRowElement(summaryRow);
 
             overlay.appendChild(this.createSeparator());
             overlay.appendChild(summaryElement);
@@ -194,38 +280,6 @@ export class TooltipPlugin {
     };
   }
 
-  private static createRowElement(row: TooltipRowEntry, yScaleUnit?: string) {
-    const rowElement = document.createElement('div');
-    rowElement.classList.add('tooltip-row');
-    if (row.bold) {
-      rowElement.setAttribute('style', 'font-weight: bold');
-    }
-    const leftContainer = document.createElement('div');
-    leftContainer.classList.add('left');
-    const nameDiv = document.createElement('div');
-    nameDiv.classList.add('name');
-    const valueDiv = document.createElement('div');
-    valueDiv.classList.add('value');
-    nameDiv.textContent = `${row.name} `;
-
-    let value = `${Math.trunc(row.value)} `;
-    if (yScaleUnit) {
-      value += yScaleUnit;
-    }
-    valueDiv.textContent = value;
-
-    if (row.color) {
-      let colorDiv = document.createElement('div');
-      colorDiv.classList.add('color');
-      colorDiv.style.backgroundColor = row.color;
-      leftContainer.appendChild(colorDiv);
-    }
-    leftContainer.appendChild(nameDiv);
-    rowElement.appendChild(leftContainer);
-    rowElement.appendChild(valueDiv);
-    return rowElement;
-  }
-
   private static getClosestIndex(num: number, arr: TooltipRowEntry[]): number {
     let curr = arr[0];
     let diff = Math.abs(num - curr.value);
@@ -241,3 +295,11 @@ export class TooltipPlugin {
     return index;
   }
 }
+
+const createElementWithClass = (element: string, className: string) => {
+  const dom = document.createElement(element);
+  dom.classList.add(className);
+  return dom;
+};
+
+const getExecutionLink = (executionId: string) => `#/root/executions/${executionId}/viz`;

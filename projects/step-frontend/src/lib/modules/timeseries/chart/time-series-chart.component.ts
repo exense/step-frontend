@@ -19,6 +19,8 @@ import MouseListener = uPlot.Cursor.MouseListener;
 
 //@ts-ignore
 import uPlot = require('uplot');
+import { Execution, ExecutionsService } from '@exense/step-core';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'step-timeseries-chart',
@@ -27,8 +29,7 @@ import uPlot = require('uplot');
 })
 export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChanges {
   private readonly HEADER_WITH_FOOTER_SIZE = 48;
-  // seriesId - metadata buckets
-  private seriesMetadata: { [key: string]: any[] } = {};
+  chartMetadata: any[][] = [[]]; // 1 on 1 to chart 'data'. first item is time axes
   @ViewChild('chart') private chartElement!: ElementRef;
 
   @Input() title!: string;
@@ -56,7 +57,12 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     };
   };
 
-  constructor(@Self() private element: ElementRef) {}
+  constructor(@Self() private element: ElementRef, private executionService: ExecutionsService) {}
+
+  // used by the tooltip
+  getExecutionDetails(executionIds: string[]): Observable<Execution[]> {
+    return this.executionService.getExecutionsByIds(executionIds);
+  }
 
   setBlur(blur: boolean) {
     let foundElements = this.chartElement.nativeElement.getElementsByClassName('u-over');
@@ -124,10 +130,8 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     settings.series.forEach((series, i) => {
       if (series.id) {
         this.seriesIndexesByIds[series.id] = i + 1; // because the first series is the time
-        if (series.metadata) {
-          this.seriesMetadata[series.id] = series.metadata;
-        }
       }
+      this.chartMetadata.push(series.metadata || []);
       if (series.stroke) {
         // aggregate series don't have stroke (e.g total)
         this.legendSettings.items.push({
@@ -162,9 +166,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         },
         // y: {auto: true},
       },
-      plugins: this.settings.tooltipOptions.enabled
-        ? [TooltipPlugin.getInstance(() => this.settings.tooltipOptions, this)]
-        : [],
+      plugins: this.settings.tooltipOptions.enabled ? [TooltipPlugin.getInstance(this)] : [],
       axes: [{}, ...(settings.axes || [])],
       series: [
         {
