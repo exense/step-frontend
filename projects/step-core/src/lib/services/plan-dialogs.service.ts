@@ -13,6 +13,7 @@ import { IsUsedByDialogService } from './is-used-by-dialog.service';
 import { MultipleProjectsService } from '../modules/basics/services/multiple-projects.service';
 import { PlanLinkDialogService } from '../components/plan-link/plan-link-dialog.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../modules/basics/services/auth.service';
 
 const ARTEFACT_ID = 'artefactId';
 
@@ -24,6 +25,7 @@ export class PlanDialogsService implements PlanLinkDialogService {
   private _plansApiService = inject(AugmentedPlansService);
   private _dialogs = inject(DialogsService);
   private _entityDialogs = inject(EntityDialogsService);
+  private _authService = inject(AuthService);
   private _exportDialogs = inject(ExportDialogsService);
   private _importDialogs = inject(ImportDialogsService);
   private _isUsedByDialogs = inject(IsUsedByDialogService);
@@ -80,7 +82,10 @@ export class PlanDialogsService implements PlanLinkDialogService {
   editPlan(plan: Plan, artefactId?: string): Observable<boolean> {
     const planEditLink = `/root/plans/editor/${plan.id}`;
 
-    if (this._multipleProjects.isEntityBelongsToCurrentProject(plan)) {
+    if (
+      this._authService.hasRight('admin-no-multitenancy') ||
+      this._multipleProjects.isEntityBelongsToCurrentProject(plan)
+    ) {
       this.openPlanInternal(planEditLink, artefactId);
       return of(true);
     }
