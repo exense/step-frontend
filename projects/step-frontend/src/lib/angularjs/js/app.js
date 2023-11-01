@@ -488,6 +488,7 @@ angular
         backdrop: 'static',
         animation: false,
         templateUrl: 'partials/messagesListDialog.html',
+        windowClass: 'raised-z-index',
         controller: 'DialogCtrl',
         resolve: {
           message: function () {
