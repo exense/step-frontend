@@ -73,7 +73,24 @@ angular
       }
     };
 
+    $scope.addCronExclusion = function() {
+      if (!$scope.task.cronExclusions) {
+        $scope.task.cronExclusions = [];
+      }
+      $scope.task.cronExclusions.push({description: undefined, cronExpression: undefined});
+    };
+
+    $scope.removeCronExclusion = function(index) {
+      $scope.task.cronExclusions.splice(index, 1);
+    };
+
     $scope.save = function () {
+      if ($scope.task.cronExclusions) {
+        $scope.task.cronExclusions = $scope.task.cronExclusions.filter(function(exclusion) {
+          return exclusion.cronExpression &&  exclusion.cronExpression !== '';
+        });
+      }
+
       $http.post('rest/scheduler/task', $scope.task).then(
         function (response) {
           $uibModalInstance.close(response.data);
