@@ -898,3 +898,40 @@ fieldset {
 .alert {
   white-space: pre-line;
 }
+
+.exclusions-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.exclusion-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.exclusion-item:last-child {
+  margin-bottom: 0;
+}
+
+.exclusion-item input:nth-child(2) {
+  border-left: none;
+}
+
+.exclusions-container .exclusion-item button {
+  cursor: pointer;
+  padding: 7px 8px;
+}
+
+.exclusions-container .cron-expression {
+  width: 140px;
+}
+
+.panel-heading .add-exclusion-button {
+  padding: 0;
+  background: none;
+  border: none;
+  margin-top: -4px;
+}
