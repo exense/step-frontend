@@ -1,13 +1,28 @@
 {
   "NAME": "Step OSS frontend",
-
-  "ACTION": "COMPILE",
-  "TYPE": "NPM",
-  "BEFORE": "step-frontend-before-compile",
-  "PARAMETERS": [
+  "ACTIONS": [
     {
-      "URL": "nexus-staging https://nexus-enterprise.exense.ch/repository/staging-npm/"
+      "ACTION": "COMPILE",
+      "TYPE": "NPM",
+      "BEFORE": "step-frontend-before-compile",
+      "PARAMETERS": [
+        {
+          "URL": "nexus-staging https://nexus-enterprise.exense.ch/repository/staging-npm/"
+        }
+      ],
+      "FOLDER": "."
+    },
+    {
+      "ACTION": "PUSH",
+      "TYPE": "MAVEN",
+      "PARAMETERS": [
+        {
+          "URL": "nexus-staging::https://nexus-enterprise.exense.ch/repository/staging-maven/"
+        }
+      ],
+      "ORIGIN": "dist/step-app",
+      "DESTINATION": "ch.exense.step.frontend:step-app:${VERSION}",
+      "PACKAGING": "jar"
     }
-  ],
-  "FOLDER": "."
+  ]
 }
