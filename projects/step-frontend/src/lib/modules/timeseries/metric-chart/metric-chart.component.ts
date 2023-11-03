@@ -237,7 +237,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
 
   private getSeriesKey(attributes: BucketAttributes, groupDimensions: string[]): string {
     if (Object.keys(attributes).length === 0) {
-      return 'Value';
+      return '<Empty>';
     }
     return groupDimensions
       .map((field) => attributes[field])
