@@ -68,7 +68,7 @@ export class SchedulerModule {
         },
         {
           parentPath,
-          label: 'Scheduler',
+          label: 'Schedules',
           weight: 0,
         }
       );
