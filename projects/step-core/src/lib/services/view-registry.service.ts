@@ -247,7 +247,6 @@ export class ViewRegistryService {
     }
 
     parentChildren!.push(route);
-    // const auth = this._injector.get(AuthService);
     const otherRoutes = parentChildren!.filter((route) => route.path !== '').sort(routesPrioritySortPredicate);
 
     redirectRoute.redirectTo = otherRoutes[0].path;
