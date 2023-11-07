@@ -1,10 +1,1 @@
 <a href="#" (click)="editParameter(); (false)">{{ context?.attributes?.['name'] }}</a>
-<step-html-popover
-  *ngIf="!!context?.attributes?.['description']"
-  [htmlContent]="context?.attributes?.['description']!"
-  #popover="StepHtmlPopover"
-  (toggledEvent)="setActiveState($event)"
->
-  <step-icon name="help-circle" *ngIf="!descriptionToggledActive"></step-icon>
-  <step-icon name="x-circle" *ngIf="descriptionToggledActive"></step-icon>
-</step-html-popover>

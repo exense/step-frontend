@@ -47,7 +47,10 @@ import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-c
 import { TooltipDirective } from './directives/tooltip.directive';
 import { TrapFocusDirective } from './directives/trap-focus.directive';
 import { REPOSITORY_PARAMETERS_INITIALIZER, StepBasicsModule } from './modules/basics/step-basics.module';
-import { CustomRegistriesModule } from './modules/custom-registeries/custom-registries.module';
+import {
+  CustomCellRegistryService,
+  CustomRegistriesModule,
+} from './modules/custom-registeries/custom-registries.module';
 import { DynamicFormsModule } from './modules/dynamic-forms/dynamic-forms.module';
 import { EntitiesSelectionModule } from './modules/entities-selection/entities-selection.module';
 import { EntityModule } from './modules/entity/entity.module';
@@ -68,6 +71,8 @@ import { InputModelFormatterDirective } from './directives/input-model-formatter
 import { ThreadDistributionWizardDialogComponent } from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 import { HtmlPopoverComponent } from './components/html-popover/html-popover.component';
 import { TriggerHtmlPopoverDirective } from './directives/trigger-html-popover.directive';
+import { HtmlDescriptionCellComponent } from './components/html-description-cell/html-description-cell.component';
+import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 
 @NgModule({
   declarations: [
@@ -122,6 +127,8 @@ import { TriggerHtmlPopoverDirective } from './directives/trigger-html-popover.d
     ThreadDistributionWizardDialogComponent,
     HtmlPopoverComponent,
     TriggerHtmlPopoverDirective,
+    HtmlDescriptionCellComponent,
+    SafeHtmlPipe,
   ],
   imports: [
     CommonModule,
@@ -203,6 +210,8 @@ import { TriggerHtmlPopoverDirective } from './directives/trigger-html-popover.d
     ThreadDistributionWizardDialogComponent,
     HtmlPopoverComponent,
     TriggerHtmlPopoverDirective,
+    HtmlDescriptionCellComponent,
+    SafeHtmlPipe,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -227,7 +236,11 @@ import { TriggerHtmlPopoverDirective } from './directives/trigger-html-popover.d
     },
   ],
 })
-export class StepCoreModule {}
+export class StepCoreModule {
+  constructor(_cellRegistry: CustomCellRegistryService) {
+    _cellRegistry.registerCell('htmlDescription', HtmlDescriptionCellComponent);
+  }
+}
 
 export * from './angularjs';
 export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
@@ -247,6 +260,7 @@ export { EditableTextareaLabelComponent } from './components/editable-textarea-l
 export { FunctionLinkDialogService } from './components/function-link/function-link-dialog.service';
 export { FunctionLinkComponent } from './components/function-link/function-link.component';
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
+export * from './components/html-description-cell/html-description-cell.component';
 export { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
 export { PlanNameComponent } from './components/plan-name/plan-name.component';
@@ -294,6 +308,7 @@ export * from './modules/tabs/tabs.module';
 export * from './modules/tree/tree.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/dynamic-attribute.pipe';
+export * from './pipes/safe-html.pipe';
 export * from './pipes/is-chart-empty.pipe';
 export * from './pipes/matching-authenticator.pipe';
 export { PlanNamePipe } from './pipes/plan-name.pipe';
