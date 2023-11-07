@@ -1,6 +1,6 @@
 import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { from, switchMap, timer } from 'rxjs';
+import { from } from 'rxjs';
 
 @Component({
   template: '',
@@ -26,8 +26,6 @@ export abstract class LinkButtonComponent implements OnInit {
       return;
     }
 
-    from(this._router.navigateByUrl('/'))
-      .pipe(switchMap(() => timer(100)))
-      .subscribe(() => this._router.navigateByUrl(this.url!, { replaceUrl: true }));
+    from(this._router.navigateByUrl('/')).subscribe(() => this._router.navigateByUrl(this.url!, { replaceUrl: true }));
   }
 }
