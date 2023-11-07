@@ -1,11 +1,10 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, Injector } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, SubRouteData, SubRouterConfig } from '../shared';
-import { VIEW_ID_LINK_PREFIX } from '../modules/basics/services/view-id-link-prefix.token';
+import { AJS_MODULE, routesPrioritySortPredicate, SUB_ROUTE_DATA, SubRouteData, SubRouterConfig } from '../shared';
 import { Route, Router, Routes, UrlMatcher, UrlSegment } from '@angular/router';
-import { SimpleOutletComponent } from '../components/simple-outlet/simple-outlet.component';
-
-export const SUB_ROUTE_DATA = Symbol('SubRouteData');
+import { CheckPermissionsGuard } from './check-permissions.guard';
+import { VIEW_ID_LINK_PREFIX } from '../modules/basics/services/view-id-link-prefix.token';
+import { AuthService } from '../modules/basics/services/auth.service';
 
 export interface CustomView {
   template: string;
@@ -202,7 +201,7 @@ export class ViewRegistryService {
     return parentChildren;
   }
 
-  registerRoute(route: Route, { parentPath, label, weight }: SubRouterConfig = {}): void {
+  registerRoute(route: Route, { parentPath, label, weight, accessPermissions }: SubRouterConfig = {}): void {
     const root = this._router.config.find((route) => route.path === 'root');
     if (!root?.children) {
       return;
@@ -219,8 +218,12 @@ export class ViewRegistryService {
         ViewRegistryService.registeredRoutes.push(route.path);
       }
 
-      if (weight || label) {
-        route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label } };
+      if (weight || label || accessPermissions) {
+        route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label, accessPermissions } };
+      }
+      if (accessPermissions) {
+        route.canActivate = route.canActivate ?? [];
+        route.canActivate.push(CheckPermissionsGuard);
       }
       root.children.push(route);
       return;
@@ -234,17 +237,19 @@ export class ViewRegistryService {
       parentChildren.push(redirectRoute);
     }
 
-    if (weight || label) {
-      route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label } };
+    if (weight || label || accessPermissions) {
+      route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label, accessPermissions } };
     }
+
+    if (accessPermissions) {
+      route.canActivate = route.canActivate ?? [];
+      route.canActivate.push(CheckPermissionsGuard);
+    }
+
     parentChildren!.push(route);
-    const otherRoutes = parentChildren!
-      .filter((route) => route.path !== '')
-      .sort((routeA, routeB) => {
-        const weightA = routeA.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
-        const weightB = routeB.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
-        return weightA - weightB;
-      });
+    // const auth = this._injector.get(AuthService);
+    const otherRoutes = parentChildren!.filter((route) => route.path !== '').sort(routesPrioritySortPredicate);
+
     redirectRoute.redirectTo = otherRoutes[0].path;
   }
 
