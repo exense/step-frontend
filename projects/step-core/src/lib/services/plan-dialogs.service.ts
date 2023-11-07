@@ -119,11 +119,7 @@ export class PlanDialogsService implements PlanLinkDialogService {
   private openPlanInternal(planEditLink: string, artefactId?: string): void {
     const queryParams = artefactId ? { [ARTEFACT_ID]: artefactId } : undefined;
     const commands = planEditLink.split('/');
-    if (!this._router.url.includes(EDITOR_URL)) {
-      this._router.navigate(commands, { queryParams });
-      return;
-    }
-    from(this._router.navigateByUrl('/')).subscribe(() => this._router.navigate(commands, { queryParams }));
+    this._router.navigate(commands, { queryParams });
   }
 }
 

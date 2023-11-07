@@ -28,6 +28,6 @@ export abstract class LinkButtonComponent implements OnInit {
 
     from(this._router.navigateByUrl('/'))
       .pipe(switchMap(() => timer(100)))
-      .subscribe(() => this._router.navigateByUrl(this.url!));
+      .subscribe(() => this._router.navigateByUrl(this.url!, { replaceUrl: true }));
   }
 }
