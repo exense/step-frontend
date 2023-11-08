@@ -58,6 +58,13 @@
         >
         </step-dynamic-textfield>
         <step-dynamic-textfield
+          label="Driver class"
+          [(ngModel)]="context.artefact!.dataSource!.driverClass"
+          [disabled]="context.readonly"
+          name="driverClass"
+        >
+        </step-dynamic-textfield>
+        <step-dynamic-textfield
           label="Query"
           [(ngModel)]="context.artefact!.dataSource!.query"
           [disabled]="context.readonly"
