@@ -9,7 +9,7 @@ import { ScheduledTaskLogicService } from '../../services/scheduled-task-logic.s
 })
 export class SchedulerTaskLinkComponent implements CustomComponent {
   context?: ExecutiontTaskParameters;
-
+  protected descriptionToggledActive = false;
   constructor(@Optional() private _logic?: ScheduledTaskLogicService) {}
 
   editParameter(): void {
@@ -19,10 +19,7 @@ export class SchedulerTaskLinkComponent implements CustomComponent {
     this._logic.editParameter(this.context);
   }
 
-  navToPlan(): void {
-    if (!this._logic || !this.context) {
-      return;
-    }
-    this._logic.navToPlan(this.context!.executionsParameters!.repositoryObject!.repositoryParameters!['planid']!);
+  setActiveState(isToggledActive: boolean) {
+    this.descriptionToggledActive = isToggledActive;
   }
 }

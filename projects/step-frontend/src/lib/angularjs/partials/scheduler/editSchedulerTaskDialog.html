@@ -5,11 +5,11 @@
 	<form ng-submit="save()">
 		<div ng-if="error">{{error}}</div>
 		<div class="form-group">
-			<label for="desc">Name</label> <input class="form-control"
-				id="desc" ng-model="task.attributes.name" placeholder="Name" autofocus>
+			<label for="name">Name</label>
+      <input class="form-control" id="name" ng-model="task.attributes.name" placeholder="Name" autofocus>
 		</div>
 		<div class="form-group">
-			<label for="comment">Plan</label>
+			<label>Plan</label>
 			<div class="input-group">
 				<input ng-disabled="true" type="text" class="form-control" ng-model="task.executionsParameters.description" />
 				<span class="input-group-btn">
@@ -18,9 +18,9 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="desc">CRON Expression</label>
+			<label for="cron-expression">CRON Expression</label>
 			<div class="input-group">
-				<input class="form-control" id="desc" ng-model="task.cronExpression" placeholder="CRON Expression" autofocus>
+				<input class="form-control" id="cron-expression" ng-model="task.cronExpression" placeholder="CRON Expression" autofocus>
 
 				<div class="input-group-btn" uib-dropdown>
 					<button type="button" class="btn btn-primary legacy-class-to-remove" uib-dropdown-toggle>Presets <span class="caret"></span></button>
@@ -34,7 +34,10 @@
 				</div>
 			</div>
 		</div>
-
+    <div class="form-group">
+      <label>Description</label>
+      <input class="form-control" id="description" ng-model="task.attributes.description" placeholder="Description">
+    </div>
     <div class="panel panel-default">
 			<div class="panel-heading" style="display:flex">
         <span style="margin-right: auto">
@@ -56,9 +59,8 @@
         </div>
 			</div>
 		</div>
-
 		<div class="form-group">
-			<label for="desc">Parameters</label>
+			<label>Parameters</label>
 			<div class="panel panel-default">
 				<div class="panel-body">
 					<st-custom-form st-model="task.executionsParameters.customParameters" st-screen="executionParameters" />
@@ -66,7 +68,7 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="desc">User</label> <input class="form-control" id="desc" ng-model="task.executionsParameters.userID"	placeholder="User">
+			<label for="user-id">User</label> <input class="form-control" id="user-id" ng-model="task.executionsParameters.userID"	placeholder="User">
 		</div>
 
 		<div class="panel panel-default">
@@ -75,7 +77,7 @@
 			</div>
 			<div class="panel-body" ng-show="showParameters">
 				<div class="form-group">
-					<label for="desc">Parameters</label>
+					<label>Parameters</label>
 					<textarea ng-model="executionsParameters" rows="7"
 						ng-model-options="{ getterSetter: true }" class="form-control"></textarea>
 				</div>
