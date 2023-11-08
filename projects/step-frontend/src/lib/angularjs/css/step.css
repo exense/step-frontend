@@ -436,6 +436,10 @@ resource-input .input-group {
   width: 100px;
 }
 
+.modal.raised-z-index {
+  z-index: 1051!important;
+}
+
 .input-xs {
   height: 22px;
   padding: 2px 5px;

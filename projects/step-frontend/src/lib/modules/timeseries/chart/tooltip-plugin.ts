@@ -40,9 +40,6 @@ export class TooltipPlugin {
     overlay.classList.add('ts-tooltip');
     overlay.style.display = 'none';
     overlay.style.position = 'absolute';
-    // overlay.addEventListener('mousemove', function (event) {
-    //   event.stopPropagation();
-    // });
     document.body.appendChild(overlay);
 
     let openMenu: Element | undefined;
@@ -183,13 +180,15 @@ export class TooltipPlugin {
             }
           }
           yPoints.sort((a, b) => (a.value - b.value) * -1);
-          let allSeriesLength = yPoints.length;
-          let elementsToSelect = 5;
+          const allSeriesLength = yPoints.length;
+          const elementsToSelect = 5;
           let elipsisBefore = true;
           let elipsisAfter = true;
-          if (yPoints.length > elementsToSelect) {
-            var closestIndex = this.getClosestIndex(hoveredValue, yPoints);
+          const closestIndex = this.getClosestIndex(hoveredValue, yPoints);
+          if (closestIndex >= 0) {
             yPoints[closestIndex].bold = true;
+          }
+          if (yPoints.length > elementsToSelect) {
             if (closestIndex < elementsToSelect / 2) {
               yPoints = yPoints.slice(0, elementsToSelect);
               elipsisBefore = false;
@@ -281,6 +280,9 @@ export class TooltipPlugin {
   }
 
   private static getClosestIndex(num: number, arr: TooltipRowEntry[]): number {
+    if (!arr || arr.length === 0) {
+      return -1;
+    }
     let curr = arr[0];
     let diff = Math.abs(num - curr.value);
     let index = 0;

@@ -37,7 +37,7 @@ export class ByStatusChartGenerator {
         data: data,
         // scale: 'mb',
         metadata: metadata,
-        value: (self, x) => TimeSeriesUtils.formatAxisValue(x) + '/h',
+        value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x) + '/h',
         stroke: color,
         fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
         points: { show: false },
@@ -50,13 +50,13 @@ export class ByStatusChartGenerator {
       series: series,
       tooltipOptions: {
         enabled: true,
-        yAxisUnit: '/ h',
+        yAxisUnit: ' / h',
       },
       axes: [
         {
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
           scale: 'y',
-          values: (u, vals, space) => vals.map((v) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
+          values: (u, vals, space) => vals.map((v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(v) + '/h'),
         },
       ],
     };
