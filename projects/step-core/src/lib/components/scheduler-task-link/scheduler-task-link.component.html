@@ -20,12 +20,9 @@
     </ng-container>
   </div>
 </a>
-<step-html-popover
-  *ngIf="!!context?.attributes?.['description']"
-  [htmlContent]="context?.attributes?.['description']!"
-  #popover="StepHtmlPopover"
-  (toggledEvent)="setActiveState($event)"
->
-  <step-icon name="help-circle" *ngIf="!descriptionToggledActive"></step-icon>
-  <step-icon name="x-circle" *ngIf="descriptionToggledActive"></step-icon>
-</step-html-popover>
+<step-popover *ngIf="!!context?.attributes?.['description']" (toggledEvent)="descriptionToggledActive = $event">
+  <step-icon [name]="descriptionToggledActive ? 'x-circle' : 'help-circle'"></step-icon>
+  <step-popover-content>
+    <div [innerHTML]="context?.attributes?.['description'] | safeHtml"></div>
+  </step-popover-content>
+</step-popover>

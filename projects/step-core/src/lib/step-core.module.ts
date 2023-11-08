@@ -322,7 +322,6 @@ export { PlanLinkDialogService } from './components/plan-link/plan-link-dialog.s
 export { PlanNameComponent } from './components/plan-name/plan-name.component';
 export * from './components/plan-tree/plan-tree.component';
 export { PredefinedOptionsInputComponent } from './components/predefined-options-input/predefined-options-input.component';
-export { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 export * from './components/report-node-status/report-node-status.component';
 export { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 export * from './components/select-plan/select-plan.component';

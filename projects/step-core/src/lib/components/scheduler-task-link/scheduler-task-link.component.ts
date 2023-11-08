@@ -26,8 +26,4 @@ export class SchedulerTaskLinkComponent implements CustomComponent {
     }
     this._logic.editTask(this.context).subscribe();
   }
-
-  setActiveState(isToggledActive: boolean) {
-    this.descriptionToggledActive = isToggledActive;
-  }
 }
