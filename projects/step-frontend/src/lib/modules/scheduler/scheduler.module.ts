@@ -6,6 +6,7 @@ import { SchedulerTaskLinkComponent } from './components/scheduler-task-link/sch
 import './components/scheduler-task-selection/scheduler-task-selection.component';
 import { SchedulerTaskSelectionComponent } from './components/scheduler-task-selection/scheduler-task-selection.component';
 import { ScheduledTaskListComponent } from './scheduled-task-list/scheduled-task-list.component';
+import { CronExpressionCellComponent } from './components/cron-expression-cell/cron-expression-cell.component';
 
 @NgModule({
   imports: [StepCoreModule, StepCommonModule],
@@ -14,6 +15,7 @@ import { ScheduledTaskListComponent } from './scheduled-task-list/scheduled-task
     SchedulerIconComponent,
     SchedulerTaskLinkComponent,
     SchedulerTaskSelectionComponent,
+    CronExpressionCellComponent,
   ],
   exports: [ScheduledTaskListComponent, SchedulerTaskSelectionComponent],
 })
