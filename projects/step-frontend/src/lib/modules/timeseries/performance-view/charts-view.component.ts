@@ -450,10 +450,10 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       response,
       this.context.keywordsContext.colorsPool
     );
-    newChartSettings.showExecutionsLinks = this.settings.displayTooltipLinks;
     if (compareChart) {
       this.compareChartsSettings[type] = newChartSettings;
     } else {
+      newChartSettings.showExecutionsLinks = this.settings.displayTooltipLinks;
       this.currentChartsSettings[type] = newChartSettings;
     }
   }
