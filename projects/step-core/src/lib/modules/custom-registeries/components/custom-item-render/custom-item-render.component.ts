@@ -21,6 +21,7 @@ import { CustomComponent } from '../../shared/custom-component';
 export class CustomItemRenderComponent implements OnChanges, AfterViewInit {
   @Input() component?: Type<CustomComponent>;
   @Input() context?: any;
+  @Input() artefactId?: string;
 
   @Output() renderComplete = new EventEmitter<void>();
 
@@ -36,15 +37,19 @@ export class CustomItemRenderComponent implements OnChanges, AfterViewInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     const cComponent = changes['component'];
-
     if (cComponent?.previousValue !== cComponent?.currentValue) {
       this.render(cComponent?.currentValue);
     }
 
     const cContext = changes['context'];
-
     if (cContext?.previousValue !== cContext?.currentValue) {
       this.updateContext(cContext?.currentValue);
+    }
+
+    const cArtefactId = changes['artefactId'];
+    if (cArtefactId?.previousValue !== cArtefactId?.currentValue) {
+      // force a re-rendering since the component might have stayed the same but displays a different artefact
+      this.render(this.component);
     }
   }
 

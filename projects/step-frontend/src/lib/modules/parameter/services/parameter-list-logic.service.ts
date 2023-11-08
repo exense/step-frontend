@@ -25,7 +25,11 @@ export class ParameterListLogicService {
   readonly dataSource = this._parametersService.createDataSource();
 
   importParameter(): void {
-    this._parameterDialogs.importParameter().subscribe(() => this.dataSource.reload());
+    this._parameterDialogs.importParameter().subscribe((result) => {
+      if (result) {
+        this.dataSource.reload();
+      }
+    });
   }
 
   exportParameter(): void {

@@ -2,8 +2,6 @@ import { Component, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } fro
 import {
   BucketAttributes,
   BucketResponse,
-  KeywordsService,
-  TableComponent,
   TableDataSource,
   TableLocalDataSource,
   TableLocalDataSourceConfig,

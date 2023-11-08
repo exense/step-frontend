@@ -50,7 +50,7 @@ export class ChartGenerators {
       xValues: xLabels,
       tooltipOptions: {
         enabled: true,
-        yAxisUnit: 'ms',
+        yAxisUnit: ' ms',
         zAxisLabel: 'Hits/h',
       },
       series: [
@@ -82,13 +82,14 @@ export class ChartGenerators {
         {
           scale: 'y',
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-          values: (u, vals, space) => vals.map((v: number) => UPlotUtils.formatMilliseconds(v)),
+          values: (u, vals, space) => vals.map((v: number) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(v)),
         },
         {
           side: 1,
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
           scale: 'total',
-          values: (u: any, vals: any, space: any) => vals.map((v: number) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
+          values: (u: any, vals: any, space: any) =>
+            vals.map((v: number) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(v) + '/h'),
           grid: { show: false },
         },
       ],

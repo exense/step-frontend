@@ -78,6 +78,7 @@ import { ResourceInputWrapperComponent } from './components/resource-input-wrapp
 import { WizardModule } from './modules/wizard/wizards.module';
 import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.component';
 import { SettingsComponent } from './components/settings/settings.component';
+import { ImportDialogComponent } from './components/import-dialog/import-dialog.component';
 import { CronModule } from './modules/cron/cron.module';
 import { TriggerHtmlPopoverDirective } from './directives/trigger-html-popover.directive';
 import { HtmlPopoverComponent } from './components/html-popover/html-popover.component';
@@ -141,6 +142,7 @@ import { HtmlPopoverComponent } from './components/html-popover/html-popover.com
     ResourceInputWrapperComponent,
     SimpleOutletComponent,
     SettingsComponent,
+    ImportDialogComponent,
     HtmlPopoverComponent,
   ],
   imports: [
@@ -239,6 +241,7 @@ import { HtmlPopoverComponent } from './components/html-popover/html-popover.com
     SelectTaskComponent,
     ResourceInputWrapperComponent,
     SettingsComponent,
+    ImportDialogComponent,
     HtmlPopoverComponent,
     CronModule,
   ],
@@ -290,6 +293,7 @@ export { EditableTextareaLabelComponent } from './components/editable-textarea-l
 export * from './components/entity-column-container/entity-column-container.component';
 export * from './components/entity-column/entity-column.component';
 export * from './components/export-dialog/export-dialog.component';
+export * from './components/import-dialog/import-dialog.component';
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
 export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
