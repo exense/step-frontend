@@ -326,7 +326,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
       .withFilteringSettings(this.context.getFilteringSettings())
       .withIntervalSize(this.context.getChartsResolution())
-      .withCollectAttributeKeys(['eId']);
+      .withCollectAttributeKeys(this.settings.displayTooltipLinks ? ['eId'] : []);
   }
 
   private createAllBaseCharts() {
@@ -444,11 +444,17 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       existingChart.clear();
       return;
     }
-    const newChart = ChartGenerators.generateChart(type, request, response, this.context.keywordsContext.colorsPool);
+    const newChartSettings = ChartGenerators.generateChart(
+      type,
+      request,
+      response,
+      this.context.keywordsContext.colorsPool
+    );
+    newChartSettings.showExecutionsLinks = this.settings.displayTooltipLinks;
     if (compareChart) {
-      this.compareChartsSettings[type] = newChart;
+      this.compareChartsSettings[type] = newChartSettings;
     } else {
-      this.currentChartsSettings[type] = newChart;
+      this.currentChartsSettings[type] = newChartSettings;
     }
   }
 
@@ -651,6 +657,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
         const throughputChartSettings: TSChartSettings = {
           title: 'Throughput',
           xValues: timeLabels,
+          showExecutionsLinks: this.settings.displayTooltipLinks,
           tooltipOptions: {
             enabled: true,
             zAxisLabel: throughputMetric.tooltipZAxisLabel,
@@ -697,6 +704,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
         const responseTimeSettings: TSChartSettings = {
           title: TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${responseTimeMetric.label})`,
           xValues: timeLabels,
+          showExecutionsLinks: this.settings.displayTooltipLinks,
           series: responseTimeSeries,
           tooltipOptions: {
             enabled: true,

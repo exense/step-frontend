@@ -101,9 +101,10 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     this.legendSettings.items = [];
     this.chartIsUnavailable = false;
     this.seriesIndexesByIds = {};
+    this.chartMetadata = [[]];
 
     const cursorOpts: uPlot.Cursor = {
-      lock: true,
+      lock: settings.showExecutionsLinks,
       y: false,
       bind: {
         dblclick: (self: uPlot, target: HTMLElement, handler: MouseListener) => {
@@ -186,6 +187,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       this.uplot.destroy();
     }
     this.uplot = new uPlot(opts, data, this.chartElement.nativeElement);
+    console.log(this.chartMetadata);
   }
 
   ngOnChanges(changes: SimpleChanges): void {

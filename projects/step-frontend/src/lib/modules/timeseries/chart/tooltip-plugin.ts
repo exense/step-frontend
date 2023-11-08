@@ -22,6 +22,7 @@ export interface Anchor {
 
 export class TooltipPlugin {
   public static getInstance(ref: TimeSeriesChartComponent): uPlot.Plugin {
+    const showExecutionsLinks = ref.settings.showExecutionsLinks;
     let over: any;
     let bound: Element;
     let bLeft: any;
@@ -54,7 +55,7 @@ export class TooltipPlugin {
         menu.innerText = '';
         executions.forEach((ex) => {
           const row = createElementWithClass('div', 'link-row');
-          row.setAttribute('title', 'Jump to execution');
+          row.setAttribute('title', 'See the execution');
           row.innerText = ex.description!;
           row.addEventListener('click', () => {
             window.open(getExecutionLink(ex.id!));
@@ -94,9 +95,9 @@ export class TooltipPlugin {
         leftContainer.appendChild(colorDiv);
       }
       leftContainer.appendChild(nameDiv);
-      if (row.executions?.length) {
+      if (showExecutionsLinks && row.executions?.length) {
         nameDiv.classList.add('link');
-        nameDiv.setAttribute('title', 'Jump to execution');
+        nameDiv.setAttribute('title', 'See the execution');
         nameDiv.addEventListener('click', (event) => {
           if (openMenu) {
             overlay.removeChild(openMenu);
@@ -163,7 +164,6 @@ export class TooltipPlugin {
             if (series.scale === 'y' && series.show) {
               if (bucketValue != undefined) {
                 const executionIds = ref.chartMetadata[i]?.[idx]?.['eId'];
-
                 yPoints.push({
                   value: bucketValue,
                   name: series.label || '',

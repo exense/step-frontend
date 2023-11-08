@@ -24,13 +24,19 @@ export class ByStatusChartGenerator {
       let status = response.matrixKeys[i][this.STATUS_ATTRIBUTE];
       let color = colorsPool.getStatusColor(status);
       status = status || 'No Status';
-
+      const metadata: any[] = [];
+      const data: any[] = [];
+      series.forEach((b) => {
+        data.push(b ? b.throughputPerHour : 0);
+        metadata.push(b?.attributes);
+      });
       return {
         id: status,
         label: status,
         legendName: status,
-        data: series.map((b) => (b ? b.throughputPerHour : 0)),
+        data: data,
         // scale: 'mb',
+        metadata: metadata,
         value: (self, x) => TimeSeriesUtils.formatAxisValue(x) + '/h',
         stroke: color,
         fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),

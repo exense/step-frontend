@@ -1,6 +1,6 @@
 export interface TsTooltipOptions {
   enabled: boolean;
-  pointsLinks?: boolean;
+  useExecutionLinks?: boolean;
   yAxisUnit?: string;
   zAxisUnit?: string;
   zAxisLabel?: string;
