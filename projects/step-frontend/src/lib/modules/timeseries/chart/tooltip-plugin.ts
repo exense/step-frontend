@@ -164,10 +164,10 @@ export class TooltipPlugin {
               if (bucketValue != undefined) {
                 const executionIds = ref.chartMetadata[i]?.[idx]?.['eId'];
 
-                // @ts-ignore
                 yPoints.push({
                   value: bucketValue,
                   name: series.label,
+                  // @ts-ignore
                   color: series._stroke,
                   executions: executionIds,
                 });
