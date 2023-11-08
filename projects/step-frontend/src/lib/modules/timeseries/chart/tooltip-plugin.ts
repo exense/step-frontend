@@ -166,7 +166,7 @@ export class TooltipPlugin {
 
                 yPoints.push({
                   value: bucketValue,
-                  name: series.label,
+                  name: series.label || '',
                   // @ts-ignore
                   color: series._stroke,
                   executions: executionIds,
