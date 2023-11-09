@@ -11,22 +11,15 @@ export class UPlotUtils {
     return !(xData[0] === uplot.scales['x'].min && xData[xData.length - 1] === uplot.scales['x'].max);
   }
 
-  static formatMilliseconds(value: number): string {
-    if (value >= 1000) {
-      let seconds = Math.floor(value / 1000);
-      let decimal = String(Math.floor(value % 1000).toFixed(2))[0];
-      return `${seconds}.${decimal} s`;
-    } else {
-      return Math.trunc(value) + ' ms';
-    }
-  }
-
   /**
    * This method will create a gradient from the strokeColor to almost a transparent version of the stroke.
    * @param uPlot
    * @param strokeColor
    */
   static gradientFill(uPlot: uPlot, strokeColor: string) {
+    if (strokeColor.length > 7) {
+      strokeColor = strokeColor.slice(0, 7); // remove existing opacity
+    }
     let canvasHeight = uPlot.ctx.canvas.height;
     let gradient = uPlot.ctx.createLinearGradient(0, 0, 0, canvasHeight);
     gradient.addColorStop(0, strokeColor + '80');
