@@ -6,8 +6,6 @@ import { TSTimeRange } from '../../chart/model/ts-time-range';
 import { TimeSeriesContext } from '../../time-series-context';
 import { TimeSeriesConfig } from '../../time-series.config';
 import { TSRangerSettings } from '../../ranger/ts-ranger-settings';
-import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
-import { PerformanceViewSettings } from '../model/performance-view-settings';
 import { Observable, Subject, takeUntil, tap } from 'rxjs';
 import { TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
 import { FindBucketsRequestBuilder } from '../../util/find-buckets-request-builder';
@@ -80,7 +78,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
       .withFilterAttributesMask(TimeSeriesConfig.RANGER_FILTER_FIELDS)
       .withSkipCustomOQL(true)
       .build();
-    return this.timeSeriesService.getBuckets(request).pipe(
+    return this.timeSeriesService.getMeasurements(request).pipe(
       tap((response) => {
         this.timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
         let avgData: (number | null)[] = [];

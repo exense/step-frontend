@@ -32,6 +32,16 @@
           </button>
         </step-suffix>
       </step-form-field>
+      <step-form-field>
+        <step-label>Description</step-label>
+        <input
+          type="text"
+          placeholder="Description"
+          [ngModel]="_task.attributes!['description']"
+          (ngModelChange)="handleDescriptionChange($event)"
+          name="description"
+        />
+      </step-form-field>
       <step-custom-forms
         [stModel]="_task.executionsParameters!.customParameters!"
         (stModelChange)="handleCustomParametersChange($event)"
