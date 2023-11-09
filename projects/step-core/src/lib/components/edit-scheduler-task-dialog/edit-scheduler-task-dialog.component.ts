@@ -71,6 +71,11 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
     this.updateParametersRawValue();
   }
 
+  handleDescriptionChange(description: string): void {
+    this._task.attributes!['description'] = description;
+    this.updateParametersRawValue();
+  }
+
   handleUserIdChange(userId: string): void {
     this._task.executionsParameters!.userID = userId;
     this.updateParametersRawValue();
