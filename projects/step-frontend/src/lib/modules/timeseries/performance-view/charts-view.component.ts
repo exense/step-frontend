@@ -79,7 +79,6 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   allBaseSeriesChecked: boolean = true;
 
   compareKeywords: { [key: string]: KeywordSelection } = {};
-  compareKeywordSearchValue: string = '';
   allCompareSeriesChecked: boolean = true;
 
   byKeywordsChartResponseCache?: TimeSeriesAPIResponse; // for caching

@@ -161,6 +161,7 @@ export class TooltipPlugin {
             if (series.scale === 'y' && series.show) {
               if (bucketValue != undefined) {
                 const executionIds = ref.chartMetadata[i]?.[idx]?.['eId'];
+                console.log(ref.chartMetadata);
                 yPoints.push({
                   value: bucketValue,
                   name: series.label || '',

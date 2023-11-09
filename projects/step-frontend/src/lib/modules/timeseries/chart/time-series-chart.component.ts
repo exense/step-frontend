@@ -133,6 +133,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       if (series.id) {
         this.seriesIndexesByIds[series.id] = i + 1; // because the first series is the time
       }
+      this.chartMetadata.push(series.metadata || []);
       if (series.stroke) {
         // aggregate series don't have stroke (e.g total)
         this.legendSettings.items.push({
