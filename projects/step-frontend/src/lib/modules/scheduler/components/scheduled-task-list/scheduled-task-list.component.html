@@ -77,6 +77,16 @@
       <step-btn-group>
         <button
           mat-icon-button
+          matTooltip="Go to plan"
+          [disabled]="!element?.executionsParameters?.repositoryObject?.repositoryParameters?.['planid']"
+          (click)="
+            this._logic.navToPlan(element.executionsParameters!.repositoryObject!.repositoryParameters!['planid']!)
+          "
+        >
+          <step-icon name="file"></step-icon>
+        </button>
+        <button
+          mat-icon-button
           matTooltip="Execute task"
           [disabled]="!('plan-execute' | hasRight | async)"
           (click)="_logic.executeTask(element)"
