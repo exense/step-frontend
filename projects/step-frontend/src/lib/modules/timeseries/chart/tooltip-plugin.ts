@@ -28,6 +28,7 @@ export class TooltipPlugin {
     let bLeft: any;
     let bTop: any;
     let isVisible = false;
+    let cursorIsOnChartArea = false; // will be changed by onmouseleave and onmouseenter events
 
     function syncBounds(): void {
       const bbox = over.getBoundingClientRect();
@@ -35,12 +36,12 @@ export class TooltipPlugin {
       bTop = bbox.top;
     }
 
-    const overlay = document.createElement('div');
-    overlay.id = 'overlay';
-    overlay.classList.add('ts-tooltip');
-    overlay.style.display = 'none';
-    overlay.style.position = 'absolute';
-    document.body.appendChild(overlay);
+    const tooltip = document.createElement('div');
+    tooltip.id = 'tooltip';
+    tooltip.classList.add('ts-tooltip');
+    tooltip.style.display = 'none';
+    tooltip.style.position = 'absolute';
+    document.body.appendChild(tooltip);
 
     let openMenu: Element | undefined;
 
@@ -88,18 +89,17 @@ export class TooltipPlugin {
       }
       valueDiv.textContent = value;
       rightContainer.appendChild(valueDiv);
-      const linkIcon = createElementWithClass('span', 'link-icon');
-      linkIcon.setAttribute('title', 'See execution');
-      rightContainer.appendChild(linkIcon);
       if (showExecutionsLinks && row.executions?.length) {
-        valueDiv.appendChild(linkIcon);
+        const linkIcon = createElementWithClass('span', 'link-icon');
+        linkIcon.setAttribute('title', 'See execution');
+        rightContainer.appendChild(linkIcon);
         linkIcon.addEventListener('click', (event) => {
           if (openMenu) {
-            overlay.removeChild(openMenu);
+            tooltip.removeChild(openMenu);
             openMenu = undefined;
           }
-          openMenu = createExecutionsMenu(event, overlay, row.executions!);
-          overlay.appendChild(openMenu);
+          openMenu = createExecutionsMenu(event, tooltip, row.executions!);
+          tooltip.appendChild(openMenu);
         });
       }
       return rightContainer;
@@ -120,6 +120,22 @@ export class TooltipPlugin {
       return rowElement;
     };
 
+    const createDotsSeparator = () => {
+      let dots = document.createElement('div');
+      dots.classList.add('dots');
+      dots.textContent = '...';
+      return dots;
+    };
+
+    const tooltipOnMouseLeaveEvent = () => {
+      console.log('TOOLTIP LEFT');
+      if (!cursorIsOnChartArea) {
+        tooltip.style.display = 'none';
+        isVisible = false;
+      }
+      tooltip.removeEventListener('mouseleave', tooltipOnMouseLeaveEvent);
+    };
+
     return {
       hooks: {
         init: (u: uPlot) => {
@@ -129,54 +145,63 @@ export class TooltipPlugin {
           //	bound = document.body;
 
           over.onmouseenter = () => {
-            overlay.style.display = 'block';
+            console.log('on mouse enter');
+            tooltip.style.display = 'block';
+            cursorIsOnChartArea = true;
             isVisible = true;
           };
 
           over.onmouseleave = (event: any) => {
-            // if (!overlay.contains(event.relatedTarget)) {
-            //   overlay.style.display = 'none';
-            //   isVisible = false;
-            //   if (openMenu) {
-            //     overlay.removeChild(openMenu);
-            //     openMenu = undefined;
-            //   }
+            if (event.relatedTarget?.id === 'tooltip') {
+              console.log('LEAVING THROUGH TOOLTIP');
+              tooltip.addEventListener('mouseleave', tooltipOnMouseLeaveEvent);
+            }
+            // if (!over.contains(event.relatedTarget)) {
+            //   console.log('YES');
             // }
-            const tooltipRect = overlay.getBoundingClientRect();
+            const tooltipRect = tooltip.getBoundingClientRect();
             const chartRect = over.getBoundingClientRect();
-
+            console.log(chartRect.right, event.clientX);
             const isOverTooltip =
-              event.clientX >= tooltipRect.left &&
-              event.clientX <= tooltipRect.right &&
-              event.clientY >= tooltipRect.top &&
-              event.clientY <= tooltipRect.bottom;
+              event.clientX > tooltipRect.left &&
+              event.clientX < tooltipRect.right &&
+              event.clientY > tooltipRect.top &&
+              event.clientY < tooltipRect.bottom;
 
             const isOverChart =
-              event.clientX >= chartRect.left &&
-              event.clientX <= chartRect.right &&
-              event.clientY >= chartRect.top &&
-              event.clientY <= chartRect.bottom;
+              event.clientX > chartRect.left &&
+              event.clientX < chartRect.right &&
+              event.clientY > chartRect.top &&
+              event.clientY < chartRect.bottom;
+            if (!isOverChart) {
+              cursorIsOnChartArea = false;
+              // no need to hide the tooltip because the cursor may be over it
+            }
+
+            console.log('on mouse leave', isOverChart, isOverTooltip);
 
             if (!isOverTooltip && !isOverChart) {
               // Hide the tooltip
-              overlay.style.display = 'none';
+              tooltip.style.display = 'none';
               isVisible = false;
               if (openMenu) {
-                overlay.removeChild(openMenu);
+                tooltip.removeChild(openMenu);
                 openMenu = undefined;
               }
             }
           };
         },
         destroy: (u: uPlot) => {
-          overlay.remove();
+          tooltip.remove();
         },
         setSize: (u: uPlot) => {
           syncBounds();
+          // @ts-ignore
+          console.log('cursor', u.cursor._lock);
         },
         setCursor: (u: uPlot) => {
           // this is called for all linked charts
-          console.log('cursor');
+
           if (!isVisible) {
             return;
           }
@@ -234,48 +259,42 @@ export class TooltipPlugin {
             }
           }
           if (yPoints.length === 0) {
-            overlay.style.zIndex = '-1';
+            tooltip.style.zIndex = '-1';
             return; // there is no data to show
           } else {
-            overlay.style.zIndex = '1000';
+            tooltip.style.zIndex = '1000';
           }
-          overlay.innerHTML = '';
+          tooltip.innerHTML = '';
           yPoints.forEach((point) => {
             let rowElement = createRowElement(point, settings.yAxisUnit);
-            overlay.appendChild(rowElement);
+            tooltip.appendChild(rowElement);
           });
           if (yPoints.length < allSeriesLength) {
             if (elipsisBefore) {
-              let dots = document.createElement('div');
-              dots.classList.add('dots');
-              dots.textContent = '...';
-              overlay.prepend(dots);
+              tooltip.prepend(createDotsSeparator());
             }
             if (elipsisAfter) {
-              let dots = document.createElement('div');
-              dots.classList.add('dots');
-              dots.textContent = '...';
-              overlay.appendChild(dots);
+              tooltip.appendChild(createDotsSeparator());
             }
           }
           if (summaryRow) {
             let summaryElement = createRowElement(summaryRow);
 
-            overlay.appendChild(this.createSeparator());
-            overlay.appendChild(summaryElement);
+            tooltip.appendChild(this.createSeparator());
+            tooltip.appendChild(summaryElement);
           }
 
           let timestamp = u.posToVal(left, 'x');
-          overlay.appendChild(this.createSeparator());
-          overlay.appendChild(this.createTimestampItem(timestamp));
+          tooltip.appendChild(this.createSeparator());
+          tooltip.appendChild(this.createTimestampItem(timestamp));
 
           // there is no easy way to cache these. when the div gets smaller without a resize, the bbox is not updated.
           let boundingClientRect = over.getBoundingClientRect();
 
           const anchor: Anchor = { left: left + boundingClientRect.left, top: top + boundingClientRect.top };
-          // overlay.textContent = `${x} at ${Math.round(left)},${Math.round(top)}`;
+          // tooltip.textContent = `${x} at ${Math.round(left)},${Math.round(top)}`;
           let container = this.getAdjustedBoundaries(bound);
-          PlacementFunction.placement(overlay, anchor, 'right', 'start', container);
+          PlacementFunction.placement(tooltip, anchor, 'right', 'start', container);
         },
       },
     };
