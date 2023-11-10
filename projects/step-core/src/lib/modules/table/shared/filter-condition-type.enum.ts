@@ -7,4 +7,5 @@ export enum FilterConditionType {
   SCOPE,
   SINGLE_DATE,
   BOOLEAN,
+  DATE_RANGE,
 }
