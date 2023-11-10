@@ -16,13 +16,7 @@
       flex-direction: row;
       white-space: nowrap;
       justify-content: space-between;
-
-      .link {
-        &:hover {
-          text-decoration: underline;
-          cursor: pointer;
-        }
-      }
+      margin-bottom: 0.4rem;
 
       .left {
         display: flex;
@@ -47,7 +41,7 @@
 
     .link-row {
       padding: 0.5rem;
-      max-width: 20rem;
+      max-width: 40rem;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -62,7 +56,6 @@
       position: absolute;
       background: #fff;
       min-width: 10rem;
-      min-height: 7rem;
       top: -4px;
       border: 1px solid #d1d1d1;
       padding: 1rem;
@@ -86,6 +79,50 @@
 
     .dots {
       font-size: 18px;
+    }
+  }
+
+  .link-icon {
+    margin-left: 0.6rem;
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid;
+    border-radius: 4px;
+    cursor: pointer;
+    transform: scale(0.9);
+    padding: 0.6rem;
+    opacity: 0.8;
+
+    &::after,
+    &::before {
+      content: '';
+      display: block;
+      box-sizing: border-box;
+      position: absolute;
+      right: 4px;
+      top: 0;
+    }
+
+    &::after {
+      width: 8px;
+      height: 2px;
+      background: currentColor;
+      transform: rotate(-45deg);
+      /* bottom: 4px; */
+      left: 2px;
+      top: 5px;
+    }
+
+    &::before {
+      width: 6px;
+      height: 6px;
+      top: 2px;
+      right: 2px;
+      border-top: 2px solid;
+      border-right: 2px solid;
     }
   }
 }

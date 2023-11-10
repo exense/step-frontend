@@ -52,15 +52,14 @@ export class TooltipPlugin {
         menu.innerText = '';
         executions.forEach((ex) => {
           const row = createElementWithClass('div', 'link-row');
-          row.setAttribute('title', 'See the execution');
-          row.innerText = ex.description!;
+          row.setAttribute('title', 'Show executions');
+          row.innerText = `${ex.description!} (${new Date(ex.startTime!).toLocaleString()})`;
           row.addEventListener('click', () => {
             window.open(getExecutionLink(ex.id!));
           });
           menu.appendChild(row);
         });
       });
-      // menu.style.left = (rect.width + 4) + 'px';
       menu.style.left = event.clientX - bounds.left + 16 + 'px';
       menu.style.top = event.clientY - bounds.top + 4 + 'px';
       return menu;
@@ -74,6 +73,8 @@ export class TooltipPlugin {
       }
       const leftContainer = createElementWithClass('div', 'left');
       const nameDiv = createElementWithClass('div', 'name');
+      const linkIcon = createElementWithClass('span', 'link-icon');
+      linkIcon.setAttribute('title', 'See execution');
       const valueDiv = createElementWithClass('div', 'value');
       rowElement.appendChild(leftContainer);
       rowElement.appendChild(valueDiv);
@@ -93,19 +94,14 @@ export class TooltipPlugin {
       }
       leftContainer.appendChild(nameDiv);
       if (showExecutionsLinks && row.executions?.length) {
-        nameDiv.classList.add('link');
-        nameDiv.setAttribute('title', 'See the execution');
-        nameDiv.addEventListener('click', (event) => {
+        leftContainer.appendChild(linkIcon);
+        linkIcon.addEventListener('click', (event) => {
           if (openMenu) {
             overlay.removeChild(openMenu);
             openMenu = undefined;
           }
-          if (row.executions!.length === 1) {
-            window.open(getExecutionLink(row.executions![0]!));
-          } else {
-            openMenu = createExecutionsMenu(event, overlay, row.executions!);
-            overlay.appendChild(openMenu);
-          }
+          openMenu = createExecutionsMenu(event, overlay, row.executions!);
+          overlay.appendChild(openMenu);
         });
       }
       return rowElement;
@@ -143,6 +139,7 @@ export class TooltipPlugin {
         },
         setCursor: (u: uPlot) => {
           // this is called for all linked charts
+          console.log('cursor');
           if (!isVisible) {
             return;
           }
@@ -161,7 +158,6 @@ export class TooltipPlugin {
             if (series.scale === 'y' && series.show) {
               if (bucketValue != undefined) {
                 const executionIds = ref.chartMetadata[i]?.[idx]?.['eId'];
-                console.log(ref.chartMetadata);
                 yPoints.push({
                   value: bucketValue,
                   name: series.label || '',
