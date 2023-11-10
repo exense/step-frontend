@@ -65,27 +65,10 @@ export class TooltipPlugin {
       return menu;
     };
 
-    const createRowElement = (row: TooltipRowEntry, yScaleUnit?: string): Element => {
-      const rowElement = document.createElement('div');
-      rowElement.classList.add('tooltip-row');
-      if (row.bold) {
-        rowElement.setAttribute('style', 'font-weight: bold');
-      }
+    const createRowLeftSection = (row: TooltipRowEntry) => {
       const leftContainer = createElementWithClass('div', 'left');
       const nameDiv = createElementWithClass('div', 'name');
-      const linkIcon = createElementWithClass('span', 'link-icon');
-      linkIcon.setAttribute('title', 'See execution');
-      const valueDiv = createElementWithClass('div', 'value');
-      rowElement.appendChild(leftContainer);
-      rowElement.appendChild(valueDiv);
-
       nameDiv.textContent = `${row.name} `;
-      let value = `${Math.trunc(row.value)} `;
-      if (yScaleUnit) {
-        value += yScaleUnit;
-      }
-      valueDiv.textContent = value;
-
       if (row.color) {
         let colorDiv = document.createElement('div');
         colorDiv.classList.add('color');
@@ -93,8 +76,23 @@ export class TooltipPlugin {
         leftContainer.appendChild(colorDiv);
       }
       leftContainer.appendChild(nameDiv);
+      return leftContainer;
+    };
+
+    const createRowRightSection = (row: TooltipRowEntry, yScaleUnit?: string) => {
+      const rightContainer = createElementWithClass('div', 'right');
+      const valueDiv = createElementWithClass('div', 'value');
+      let value = `${Math.trunc(row.value)} `;
+      if (yScaleUnit) {
+        value += yScaleUnit;
+      }
+      valueDiv.textContent = value;
+      rightContainer.appendChild(valueDiv);
+      const linkIcon = createElementWithClass('span', 'link-icon');
+      linkIcon.setAttribute('title', 'See execution');
+      rightContainer.appendChild(linkIcon);
       if (showExecutionsLinks && row.executions?.length) {
-        leftContainer.appendChild(linkIcon);
+        valueDiv.appendChild(linkIcon);
         linkIcon.addEventListener('click', (event) => {
           if (openMenu) {
             overlay.removeChild(openMenu);
@@ -104,6 +102,21 @@ export class TooltipPlugin {
           overlay.appendChild(openMenu);
         });
       }
+      return rightContainer;
+    };
+
+    const createRowElement = (row: TooltipRowEntry, yScaleUnit?: string): Element => {
+      const rowElement = document.createElement('div');
+      rowElement.classList.add('tooltip-row');
+      if (row.bold) {
+        rowElement.setAttribute('style', 'font-weight: bold');
+      }
+      let leftContainer = createRowLeftSection(row);
+      let rightContainer = createRowRightSection(row, yScaleUnit);
+
+      rowElement.appendChild(leftContainer);
+      rowElement.appendChild(rightContainer);
+
       return rowElement;
     };
 
@@ -121,7 +134,31 @@ export class TooltipPlugin {
           };
 
           over.onmouseleave = (event: any) => {
-            if (!overlay.contains(event.relatedTarget)) {
+            // if (!overlay.contains(event.relatedTarget)) {
+            //   overlay.style.display = 'none';
+            //   isVisible = false;
+            //   if (openMenu) {
+            //     overlay.removeChild(openMenu);
+            //     openMenu = undefined;
+            //   }
+            // }
+            const tooltipRect = overlay.getBoundingClientRect();
+            const chartRect = over.getBoundingClientRect();
+
+            const isOverTooltip =
+              event.clientX >= tooltipRect.left &&
+              event.clientX <= tooltipRect.right &&
+              event.clientY >= tooltipRect.top &&
+              event.clientY <= tooltipRect.bottom;
+
+            const isOverChart =
+              event.clientX >= chartRect.left &&
+              event.clientX <= chartRect.right &&
+              event.clientY >= chartRect.top &&
+              event.clientY <= chartRect.bottom;
+
+            if (!isOverTooltip && !isOverChart) {
+              // Hide the tooltip
               overlay.style.display = 'none';
               isVisible = false;
               if (openMenu) {

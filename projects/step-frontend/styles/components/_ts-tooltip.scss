@@ -9,6 +9,10 @@
     box-shadow: 2px 2px 5px 2px #a3a3a3;
     top: 0; // this is a tricky fix. if top is not set it will make the container overflow
 
+    &.pointer {
+      cursor: pointer;
+    }
+
     .tooltip-row {
       display: flex;
       position: relative;
@@ -23,6 +27,9 @@
         align-items: center;
         flex-direction: row;
         margin-right: 2rem;
+      }
+
+      .right {
       }
 
       .color {
@@ -54,11 +61,11 @@
 
     .tooltip-menu {
       position: absolute;
-      background: #fff;
+      background: #fffbf5;
       min-width: 10rem;
       top: -4px;
       border: 1px solid #d1d1d1;
-      padding: 1rem;
+      padding: 0.6rem;
       z-index: 1000;
     }
 
