@@ -4,6 +4,7 @@ import { PlacementFunction } from './placement-function';
 import { TimeSeriesConfig } from '../time-series.config';
 import { TsTooltipOptions } from './model/ts-tooltip-options';
 import { TimeSeriesChartComponent } from './time-series-chart.component';
+import { Options } from 'uplot';
 
 interface TooltipRowEntry {
   value: number;
@@ -23,11 +24,11 @@ export interface Anchor {
 export class TooltipPlugin {
   public static getInstance(ref: TimeSeriesChartComponent): uPlot.Plugin {
     const showExecutionsLinks = ref.settings.showExecutionsLinks;
+    let chart: uPlot;
     let over: any;
     let bound: Element;
     let bLeft: any;
     let bTop: any;
-    let isVisible = false;
     let cursorIsOnChartArea = false; // will be changed by onmouseleave and onmouseenter events
 
     function syncBounds(): void {
@@ -36,7 +37,15 @@ export class TooltipPlugin {
       bTop = bbox.top;
     }
 
-    const tooltip = document.createElement('div');
+    const hideTooltip = () => {
+      tooltip.style.display = 'none';
+    };
+
+    const showTooltip = () => {
+      tooltip.style.display = 'block';
+    };
+
+    const tooltip = createElementWithClass('div', 'ts-tooltip');
     tooltip.id = 'tooltip';
     tooltip.classList.add('ts-tooltip');
     tooltip.style.display = 'none';
@@ -127,67 +136,46 @@ export class TooltipPlugin {
       return dots;
     };
 
+    const chartIsLocked = () => {
+      //@ts-ignore
+      return chart.cursor._lock;
+    };
+
     const tooltipOnMouseLeaveEvent = () => {
-      console.log('TOOLTIP LEFT');
       if (!cursorIsOnChartArea) {
-        tooltip.style.display = 'none';
-        isVisible = false;
+        hideTooltip();
       }
-      tooltip.removeEventListener('mouseleave', tooltipOnMouseLeaveEvent);
     };
 
     return {
+      opts: (self: uPlot, opts: Options) => {
+        // here we can override the charts settings
+        return opts;
+      },
       hooks: {
         init: (u: uPlot) => {
+          chart = u;
           over = u.over;
 
           bound = over;
           //	bound = document.body;
 
           over.onmouseenter = () => {
-            console.log('on mouse enter');
-            tooltip.style.display = 'block';
             cursorIsOnChartArea = true;
-            isVisible = true;
+            if (chartIsLocked()) {
+              return;
+            }
+            console.log('MOUSE ENTER');
+            showTooltip();
           };
 
           over.onmouseleave = (event: any) => {
-            if (event.relatedTarget?.id === 'tooltip') {
-              console.log('LEAVING THROUGH TOOLTIP');
-              tooltip.addEventListener('mouseleave', tooltipOnMouseLeaveEvent);
-            }
-            // if (!over.contains(event.relatedTarget)) {
-            //   console.log('YES');
-            // }
-            const tooltipRect = tooltip.getBoundingClientRect();
-            const chartRect = over.getBoundingClientRect();
-            console.log(chartRect.right, event.clientX);
-            const isOverTooltip =
-              event.clientX > tooltipRect.left &&
-              event.clientX < tooltipRect.right &&
-              event.clientY > tooltipRect.top &&
-              event.clientY < tooltipRect.bottom;
-
-            const isOverChart =
-              event.clientX > chartRect.left &&
-              event.clientX < chartRect.right &&
-              event.clientY > chartRect.top &&
-              event.clientY < chartRect.bottom;
-            if (!isOverChart) {
-              cursorIsOnChartArea = false;
-              // no need to hide the tooltip because the cursor may be over it
-            }
-
-            console.log('on mouse leave', isOverChart, isOverTooltip);
-
-            if (!isOverTooltip && !isOverChart) {
-              // Hide the tooltip
+            console.log('MOUSE LEAVE');
+            cursorIsOnChartArea = false;
+            // @ts-ignore
+            if (!chartIsLocked()) {
               tooltip.style.display = 'none';
-              isVisible = false;
-              if (openMenu) {
-                tooltip.removeChild(openMenu);
-                openMenu = undefined;
-              }
+              hideTooltip();
             }
           };
         },
@@ -196,15 +184,23 @@ export class TooltipPlugin {
         },
         setSize: (u: uPlot) => {
           syncBounds();
-          // @ts-ignore
-          console.log('cursor', u.cursor._lock);
         },
         setCursor: (u: uPlot) => {
           // this is called for all linked charts
-
-          if (!isVisible) {
+          if (chartIsLocked()) {
+            return;
+          } else {
+            if (!cursorIsOnChartArea) {
+              // the cursor is moving on another chart
+              hideTooltip();
+            } else {
+              tooltip.style.display = 'block';
+            }
+          }
+          if (!cursorIsOnChartArea) {
             return;
           }
+
           const settings = ref!.settings.tooltipOptions;
           const { left, top, idx } = u.cursor;
           if (!top || top < 0 || !idx || !left) {

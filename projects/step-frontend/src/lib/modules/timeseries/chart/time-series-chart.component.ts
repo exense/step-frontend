@@ -123,6 +123,13 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         key: this.syncKey,
         setSeries: false,
         match: [UplotSyncService.syncFunction, UplotSyncService.syncFunction],
+        // @ts-ignore
+        filters: {
+          pub: (type) => {
+            console.log(type);
+            return type !== 'keyup';
+          },
+        },
       };
     }
 
