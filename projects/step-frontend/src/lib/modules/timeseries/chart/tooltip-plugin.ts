@@ -119,7 +119,6 @@ export class TooltipPlugin {
         rightContainer.appendChild(linkIcon);
         linkIcon.addEventListener('click', (event: MouseEvent) => {
           event.stopPropagation(); // the menu has a listener already
-          console.log('clicked', openMenu);
           if (openMenu) {
             openMenu.remove();
             openMenu = undefined;
@@ -182,16 +181,12 @@ export class TooltipPlugin {
             if (chartIsLocked()) {
               return;
             }
-            console.log('MOUSE ENTER');
             showTooltip();
           };
 
           over.onmouseleave = (event: any) => {
-            console.log('MOUSE LEAVE');
             cursorIsOnChartArea = false;
-            // @ts-ignore
             if (!chartIsLocked()) {
-              tooltip.style.display = 'none';
               hideTooltip();
             }
           };
