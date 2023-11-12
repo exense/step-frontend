@@ -5,6 +5,7 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   Output,
   Self,
@@ -28,7 +29,7 @@ import { Observable } from 'rxjs';
   templateUrl: './time-series-chart.component.html',
   styleUrls: ['./time-series-chart.component.scss'],
 })
-export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChanges {
+export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   private readonly HEADER_WITH_FOOTER_SIZE = 48;
   chartMetadata: any[][] = [[]]; // 1 on 1 to chart 'data'. first item is time axes
   @ViewChild('chart') private chartElement!: ElementRef;
@@ -372,6 +373,10 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   resize() {
     this.uplot.setSize(this.getSize());
+  }
+
+  ngOnDestroy(): void {
+    this.uplot?.destroy();
   }
 }
 

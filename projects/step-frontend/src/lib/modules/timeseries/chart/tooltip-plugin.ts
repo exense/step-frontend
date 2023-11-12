@@ -54,10 +54,22 @@ export class TooltipPlugin {
 
     let openMenu: Element | undefined;
 
-    const createExecutionsMenu = (event: any, container: any, executionIds: string[]) => {
+    tooltip.addEventListener('click', () => {
+      openMenu?.remove();
+    });
+
+    const createExecutionsMenu = (event: MouseEvent, tooltipContainer: any, executionIds: string[]) => {
       const menu = createElementWithClass('div', 'tooltip-menu');
       menu.innerText = 'Loading...';
-      const bounds = container.getBoundingClientRect();
+      const tooltipBounds = tooltipContainer.getBoundingClientRect();
+      let computedLeft = event.clientX - tooltipBounds.left + 16;
+      let computedTop = event.clientY - tooltipBounds.top + 4;
+      let estimatedWidthOfExecutionLabel = 150;
+      if (event.clientX + 16 + estimatedWidthOfExecutionLabel > window.innerWidth) {
+        computedLeft -= estimatedWidthOfExecutionLabel;
+      }
+      menu.style.left = computedLeft + 'px';
+      menu.style.top = computedTop + 'px';
       ref.getExecutionDetails(executionIds).subscribe((executions) => {
         menu.innerText = '';
         executions.forEach((ex) => {
@@ -69,9 +81,12 @@ export class TooltipPlugin {
           });
           menu.appendChild(row);
         });
+        let menuRightBound = menu.getBoundingClientRect().right;
+        if (menuRightBound > window.innerWidth) {
+          menu.style.left = computedLeft - (menuRightBound - window.innerWidth) - 16 + 'px';
+        }
       });
-      menu.style.left = event.clientX - bounds.left + 16 + 'px';
-      menu.style.top = event.clientY - bounds.top + 4 + 'px';
+
       return menu;
     };
 
@@ -102,9 +117,11 @@ export class TooltipPlugin {
         const linkIcon = createElementWithClass('span', 'link-icon');
         linkIcon.setAttribute('title', 'See execution');
         rightContainer.appendChild(linkIcon);
-        linkIcon.addEventListener('click', (event) => {
+        linkIcon.addEventListener('click', (event: MouseEvent) => {
+          event.stopPropagation(); // the menu has a listener already
+          console.log('clicked', openMenu);
           if (openMenu) {
-            tooltip.removeChild(openMenu);
+            openMenu.remove();
             openMenu = undefined;
           }
           openMenu = createExecutionsMenu(event, tooltip, row.executions!);
@@ -180,7 +197,7 @@ export class TooltipPlugin {
           };
         },
         destroy: (u: uPlot) => {
-          tooltip.remove();
+          tooltip?.remove();
         },
         setSize: (u: uPlot) => {
           syncBounds();
