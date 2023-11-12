@@ -7,5 +7,8 @@
   <step-suffix class="icon-suffix">
     <step-icon name="calendar" (click)="rangePicker.open()"></step-icon>
   </step-suffix>
+  <step-suffix class="icon-suffix">
+    <step-icon name="x" (click)="clear()"></step-icon>
+  </step-suffix>
 </step-form-field>
 <mat-date-range-picker #rangePicker></mat-date-range-picker>

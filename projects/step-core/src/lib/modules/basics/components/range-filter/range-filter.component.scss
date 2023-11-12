@@ -1,4 +1,23 @@
-:host {
+step-range-filter {
   display: block;
-  min-width: 32rem;
+  min-width: 29.5rem;
+
+  mat-date-range-input {
+    padding: 0.8rem 0.7rem !important;
+
+    .mat-date-range-input-start-wrapper {
+      max-width: none;
+      overflow: initial;
+    }
+
+    .mat-date-range-input-end-wrapper {
+      max-width: none;
+      overflow: initial;
+      flex-grow: unset;
+    }
+
+    .mat-date-range-input-separator {
+      margin: 0 0.2rem;
+    }
+  }
 }

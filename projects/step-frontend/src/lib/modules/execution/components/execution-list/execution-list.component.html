@@ -41,7 +41,6 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Start time</th>
     <td mat-cell *matCellDef="let element">
       {{ element?.startTime | date: DateFormat.DATE }}
-      {{ element?.startTime }}
     </td>
   </ng-container>
   <ng-container matColumnDef="endTime" stepSearchCol>
