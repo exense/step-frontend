@@ -436,3 +436,8 @@ export * from './modules/entity/pipes/cast-entity-to-task.pipe';
 export * from './services/artefacts-factory.service';
 export * from './services/plan-open.service';
 export * from './services/keyword-executor.service';
+export * from './components/enter-text-value-dialog/enter-text-value-dialog.component';
+export * from './components/confirmation-dialog/confirmation-dialog.component';
+export * from './directives/dialog-close.directive';
+export * from './components/messages-list-dialog/messages-list-dialog.component';
+export * from './components/message-dialog/message-dialog.component';
