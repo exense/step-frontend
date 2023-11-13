@@ -67,6 +67,7 @@ $border-radius: 8px;
 
     mat-select,
     mat-radio-group,
+    mat-date-range-input,
     .step-checkbox-container,
     input,
     pre,
@@ -86,6 +87,10 @@ $border-radius: 8px;
       padding: 7px 14px 4px 14px;
       display: flex;
       gap: 1rem;
+    }
+
+    mat-date-range-input .mat-date-range-input-container input {
+      padding: 0;
     }
 
     & > .label-container {
@@ -119,6 +124,7 @@ $border-radius: 8px;
       & > .form-field-content {
         mat-select,
         mat-radio-group,
+        mat-date-range-input,
         .step-checkbox-container,
         input,
         pre,
@@ -143,6 +149,7 @@ $border-radius: 8px;
       input,
       pre,
       step-array-input,
+      mat-date-range-input,
       textarea {
         border-color: $error-color;
       }
@@ -171,6 +178,7 @@ $border-radius: 8px;
 
       & > mat-select,
       & > mat-radio-group,
+      & > mat-date-range-input,
       & > .step-checkbox-container,
       & > input,
       pre,
