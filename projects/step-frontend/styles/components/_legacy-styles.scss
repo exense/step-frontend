@@ -4,7 +4,6 @@
 @use './legacy-panels' as legacy-panels;
 @use './legacy-dialogs' as legacy-dialogs;
 @use './legacy-common-rules' as legacy-common-rules;
-@use './quota-manager-ctrl' as quota-manager-ctrl;
 @use './notification-subscription-list-ctrl' as notification-subscription-list-ctrl;
 
 @mixin legacy-styles {
@@ -14,6 +13,5 @@
   @include legacy-panels.legacy-panels();
   @include legacy-dialogs.legacy-dialogs();
   @include legacy-common-rules.legacy-common-rules();
-  @include quota-manager-ctrl.quota-manager-ctrl();
   @include notification-subscription-list-ctrl.notification-subscription-list-ctrl();
 }

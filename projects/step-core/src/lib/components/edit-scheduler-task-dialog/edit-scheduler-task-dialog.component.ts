@@ -7,6 +7,7 @@ import {
   ExecutiontTaskParameters,
   Plan,
 } from '../../client/step-client-module';
+import { CronService } from '../../modules/cron/cron.module';
 
 type EditDialogRef = MatDialogRef<EditSchedulerTaskDialogComponent, ExecutiontTaskParameters>;
 
@@ -18,6 +19,7 @@ type EditDialogRef = MatDialogRef<EditSchedulerTaskDialogComponent, ExecutiontTa
 export class EditSchedulerTaskDialogComponent implements OnInit {
   readonly rawValueModelOptions: NgModel['options'] = { updateOn: 'blur' };
 
+  private _cron = inject(CronService);
   private _api = inject(AugmentedSchedulerService);
   private _matDialogRef = inject<EditDialogRef>(MatDialogRef);
   protected _task = inject<ExecutiontTaskParameters>(MAT_DIALOG_DATA);
@@ -69,6 +71,11 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
     this.updateParametersRawValue();
   }
 
+  handleDescriptionChange(description: string): void {
+    this._task.attributes!['description'] = description;
+    this.updateParametersRawValue();
+  }
+
   handleUserIdChange(userId: string): void {
     this._task.executionsParameters!.userID = userId;
     this.updateParametersRawValue();
@@ -87,6 +94,25 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
     if (executionParameters) {
       this._task.executionsParameters = executionParameters;
     }
+  }
+
+  configureCronExpression(): void {
+    this._cron.configureExpression().subscribe((expression) => {
+      if (expression) {
+        this._task.cronExpression = expression;
+      }
+    });
+  }
+
+  addCronExclusion() {
+    if (!this._task.cronExclusions) {
+      this._task.cronExclusions = [];
+    }
+    this._task.cronExclusions.push({ description: undefined, cronExpression: undefined });
+  }
+
+  removeExclusion(index: number) {
+    this._task.cronExclusions!.splice(index, 1);
   }
 
   private initializeTask(): void {

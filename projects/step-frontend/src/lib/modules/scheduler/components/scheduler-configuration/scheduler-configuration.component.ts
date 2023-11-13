@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, AugmentedSchedulerService, AugmentedSettingsService } from '@exense/step-core';
+import { AugmentedSchedulerService, AugmentedSettingsService } from '@exense/step-core';
 import { forkJoin, map } from 'rxjs';
 
 const SCHEDULER_ENABLED = 'scheduler_enabled';
@@ -46,7 +45,3 @@ export class SchedulerConfigurationComponent implements OnInit {
     });
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepSchedulerConfiguration', downgradeComponent({ component: SchedulerConfigurationComponent }));

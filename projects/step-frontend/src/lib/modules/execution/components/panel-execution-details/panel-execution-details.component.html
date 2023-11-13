@@ -3,7 +3,9 @@
   <ul class="list-unstyled">
     <li>
       <strong>Plan</strong>&nbsp;<span
-        ><a href="#/root/plans/editor/{{ _state.execution!.planId! }}">{{ _state.execution!.description }}</a></span
+        ><a routerLink="/root/plans/editor/{{ _state.execution!.planId! }}">{{
+          _state.execution!.description
+        }}</a></span
       >
     </li>
     <ng-container *ngIf="_state.execution?.executionParameters?.customParameters as execParams">

@@ -1,7 +1,7 @@
 import { Component, HostListener, inject, TrackByFunction } from '@angular/core';
 import { shareReplay, switchMap, tap } from 'rxjs';
+import { Router } from '@angular/router';
 import { MatDialogRef } from '@angular/material/dialog';
-import { AJS_LOCATION } from '../../shared';
 import { AugmentedPlansService, Plan } from '../../client/step-client-module';
 import { ItemInfo, PlanTypeRegistryService } from '../../modules/custom-registeries/custom-registries.module';
 
@@ -13,7 +13,7 @@ import { ItemInfo, PlanTypeRegistryService } from '../../modules/custom-register
 export class PlanCreateDialogComponent {
   private _api = inject(AugmentedPlansService);
   private _matDialogRef = inject<MatDialogRef<PlanCreateDialogComponent>>(MatDialogRef);
-  private _$location = inject(AJS_LOCATION);
+  private _router = inject(Router);
 
   protected template: string = 'TestCase';
   protected plan: Partial<Plan> = { attributes: {} };
@@ -40,7 +40,7 @@ export class PlanCreateDialogComponent {
       )
       .subscribe((plan) => {
         if (editAfterSave) {
-          this._$location.path(`/root/plans/editor/${plan.id}`);
+          this._router.navigate(['root', 'plans', 'editor', plan.id]);
         }
         this._matDialogRef.close(plan);
       });

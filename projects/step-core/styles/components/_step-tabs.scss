@@ -6,7 +6,8 @@
 }
 
 @mixin tabbar($primary-tabs-color) {
-  step-tabs {
+  step-tabs,
+  .step-tabs {
     &.tab-mode-buttons {
       display: block;
 

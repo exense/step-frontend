@@ -1,0 +1,17 @@
+<h4>On the</h4>
+<mat-radio-group [(ngModel)]="selected">
+  <mat-radio-button [value]="MonthlyType.DAY" color="primary">
+    <step-monthly-day-editor
+      [isActive]="selected === MonthlyType.DAY"
+      (expressionChange)="expressionChange.emit($event)"
+    >
+    </step-monthly-day-editor>
+  </mat-radio-button>
+  <mat-radio-button [value]="MonthlyType.WEEK_DAY" color="primary">
+    <step-monthly-week-editor
+      [isActive]="selected === MonthlyType.WEEK_DAY"
+      (expressionChange)="expressionChange.emit($event)"
+    >
+    </step-monthly-week-editor>
+  </mat-radio-button>
+</mat-radio-group>

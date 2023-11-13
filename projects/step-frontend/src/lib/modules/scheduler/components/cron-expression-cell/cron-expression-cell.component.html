@@ -1,0 +1,19 @@
+{{ task?.cronExpression }}
+<step-popover *ngIf="!!task?.cronExclusions?.length" (toggledEvent)="isPopoverToggled = $event">
+  <step-icon [name]="isPopoverToggled ? 'x-circle' : 'help-circle'"></step-icon>
+  <step-popover-content>
+    <table class="table">
+      <thead>
+        <tr>
+          <th colspan="2">Cron Exclusions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let exclusion of task!.cronExclusions!; trackBy: trackByExclusion">
+          <td>{{ exclusion.cronExpression }}</td>
+          <td>{{ exclusion.description }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </step-popover-content>
+</step-popover>
