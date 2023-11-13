@@ -2,7 +2,6 @@
 import uPlot = require('uplot');
 import { PlacementFunction } from './placement-function';
 import { TimeSeriesConfig } from '../time-series.config';
-import { TsTooltipOptions } from './model/ts-tooltip-options';
 import { TimeSeriesChartComponent } from './time-series-chart.component';
 import { Options } from 'uplot';
 
@@ -63,8 +62,8 @@ export class TooltipPlugin {
       menu.innerText = 'Loading...';
       const tooltipBounds = tooltipContainer.getBoundingClientRect();
       let computedLeft = event.clientX - tooltipBounds.left + 16;
-      let computedTop = event.clientY - tooltipBounds.top + 4;
-      let estimatedWidthOfExecutionLabel = 150;
+      const computedTop = event.clientY - tooltipBounds.top + 4;
+      const estimatedWidthOfExecutionLabel = 150;
       if (event.clientX + 16 + estimatedWidthOfExecutionLabel > window.innerWidth) {
         computedLeft -= estimatedWidthOfExecutionLabel;
       }
@@ -136,8 +135,8 @@ export class TooltipPlugin {
       if (row.bold) {
         rowElement.setAttribute('style', 'font-weight: bold');
       }
-      let leftContainer = createRowLeftSection(row);
-      let rightContainer = createRowRightSection(row, yScaleUnit);
+      const leftContainer = createRowLeftSection(row);
+      const rightContainer = createRowRightSection(row, yScaleUnit);
 
       rowElement.appendChild(leftContainer);
       rowElement.appendChild(rightContainer);
@@ -146,7 +145,7 @@ export class TooltipPlugin {
     };
 
     const createDotsSeparator = () => {
-      let dots = document.createElement('div');
+      const dots = document.createElement('div');
       dots.classList.add('dots');
       dots.textContent = '...';
       return dots;
@@ -217,8 +216,8 @@ export class TooltipPlugin {
           let yPoints: TooltipRowEntry[] = [];
           let summaryRow: TooltipRowEntry | undefined;
           for (let i = 1; i < u.series.length; i++) {
-            let series = u.series[i];
-            let bucketValue = u.data[i][idx];
+            const series = u.series[i];
+            const bucketValue = u.data[i][idx];
             if (series.scale === 'y' && series.show) {
               if (bucketValue != undefined) {
                 const executionIds = ref.chartMetadata[i]?.[idx]?.['eId'];
@@ -268,7 +267,7 @@ export class TooltipPlugin {
           }
           tooltip.innerHTML = '';
           yPoints.forEach((point) => {
-            let rowElement = createRowElement(point, settings.yAxisUnit);
+            const rowElement = createRowElement(point, settings.yAxisUnit);
             tooltip.appendChild(rowElement);
           });
           if (yPoints.length < allSeriesLength) {
@@ -280,22 +279,22 @@ export class TooltipPlugin {
             }
           }
           if (summaryRow) {
-            let summaryElement = createRowElement(summaryRow);
+            const summaryElement = createRowElement(summaryRow);
 
             tooltip.appendChild(this.createSeparator());
             tooltip.appendChild(summaryElement);
           }
 
-          let timestamp = u.posToVal(left, 'x');
+          const timestamp = u.posToVal(left, 'x');
           tooltip.appendChild(this.createSeparator());
           tooltip.appendChild(this.createTimestampItem(timestamp));
 
           // there is no easy way to cache these. when the div gets smaller without a resize, the bbox is not updated.
-          let boundingClientRect = over.getBoundingClientRect();
+          const boundingClientRect = over.getBoundingClientRect();
 
           const anchor: Anchor = { left: left + boundingClientRect.left, top: top + boundingClientRect.top };
           // tooltip.textContent = `${x} at ${Math.round(left)},${Math.round(top)}`;
-          let container = this.getAdjustedBoundaries(bound);
+          const container = this.getAdjustedBoundaries(bound);
           PlacementFunction.placement(tooltip, anchor, 'right', 'start', container);
         },
       },
@@ -303,14 +302,14 @@ export class TooltipPlugin {
   }
 
   private static createSeparator() {
-    let separator = document.createElement('div');
+    const separator = document.createElement('div');
     separator.classList.add('separator');
     return separator;
   }
 
   private static createTimestampItem(timestamp: number) {
-    let date = new Date(timestamp);
-    let div = document.createElement('div');
+    const date = new Date(timestamp);
+    const div = document.createElement('div');
     div.textContent = date.toLocaleString();
     div.classList.add('timestamp');
     return div;

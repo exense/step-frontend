@@ -32,7 +32,7 @@ import { Observable } from 'rxjs';
 })
 export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   private readonly HEADER_WITH_FOOTER_SIZE = 48;
-  chartMetadata: any[][] = [[]]; // 1 on 1 to chart 'data'. first item is time axes
+  chartMetadata: Record<string, any>[] = [[]]; // 1 on 1 to chart 'data'. first item is time axes
   @ViewChild('chart') private chartElement!: ElementRef;
 
   @Input() title!: string;

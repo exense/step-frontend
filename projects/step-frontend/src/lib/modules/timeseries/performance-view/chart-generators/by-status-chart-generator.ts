@@ -22,10 +22,10 @@ export class ByStatusChartGenerator {
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const series: TSChartSeries[] = response.matrix.map((series, i) => {
       let status = response.matrixKeys[i][this.STATUS_ATTRIBUTE];
-      let color = colorsPool.getStatusColor(status);
+      const color = colorsPool.getStatusColor(status);
       status = status || 'No Status';
-      const metadata: any[] = [];
-      const data: any[] = [];
+      const metadata: Record<string, any>[] = [];
+      const data: (number | null | undefined)[] = [];
       series.forEach((b) => {
         data.push(b ? b.throughputPerHour : 0);
         metadata.push(b?.attributes);
