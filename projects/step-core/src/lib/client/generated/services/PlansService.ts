@@ -193,7 +193,7 @@ export class PlansService {
   }
 
   /**
-   * Returns the names of the supported artefacts.
+   * Returns the list of artefact types that can be used as root element of Plans.
    * @returns string default response
    * @throws ApiError
    */
@@ -221,7 +221,7 @@ export class PlansService {
   }
 
   /**
-   * Returns the supported artefact types.
+   * Returns the list of artefact types that can be used as control within Plans
    * @returns string default response
    * @throws ApiError
    */

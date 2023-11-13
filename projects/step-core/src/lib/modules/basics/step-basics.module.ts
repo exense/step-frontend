@@ -33,6 +33,7 @@ import { TimeInputComponent } from './components/time-input/time-input.component
 import { ProjectSwitchDialogComponent } from './components/project-switch-dialog/project-switch-dialog.component';
 import { ArrayInputComponent } from './components/array-input/array-input.component';
 import { RouterModule } from '@angular/router';
+import { RangeFilterComponent } from './components/range-filter/range-filter.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -67,6 +68,7 @@ import { RouterModule } from '@angular/router';
     ProjectSwitchDialogComponent,
     TimeInputComponent,
     ArrayInputComponent,
+    RangeFilterComponent,
   ],
   exports: [
     ResourceLabelComponent,
@@ -100,6 +102,7 @@ import { RouterModule } from '@angular/router';
     TimeInputComponent,
     ArrayInputComponent,
     RouterModule,
+    RangeFilterComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -121,6 +124,7 @@ export * from './components/progress-bar/progress-bar.component';
 export * from './components/upload-container/upload-container.component';
 export * from './components/array-input/array-input.component';
 export * from './components/time-input/time-input.component';
+export * from './components/range-filter/range-filter.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
 export * from './pipes/has-right.pipe';
