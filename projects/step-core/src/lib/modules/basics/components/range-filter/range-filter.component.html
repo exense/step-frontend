@@ -1,0 +1,14 @@
+<step-form-field>
+  <step-label *ngIf="label">{{ label }}</step-label>
+  <mat-date-range-input [formGroup]="filterGroup" [rangePicker]="rangePicker">
+    <input #startDate matStartDate placeholder="From" formControlName="start" />
+    <input #endDate matEndDate placeholder="To" formControlName="end" />
+  </mat-date-range-input>
+  <step-suffix class="icon-suffix">
+    <step-icon name="calendar" (click)="rangePicker.open()"></step-icon>
+  </step-suffix>
+  <step-suffix class="icon-suffix">
+    <step-icon name="x" (click)="clear()"></step-icon>
+  </step-suffix>
+</step-form-field>
+<mat-date-range-picker #rangePicker></mat-date-range-picker>

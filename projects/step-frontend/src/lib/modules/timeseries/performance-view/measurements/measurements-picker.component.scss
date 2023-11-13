@@ -18,3 +18,10 @@
     margin-right: 0.4rem;
   }
 }
+
+.series-label {
+  max-width: 20rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
