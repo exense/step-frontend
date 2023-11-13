@@ -94,7 +94,7 @@ export class TooltipPlugin {
       const nameDiv = createElementWithClass('div', 'name');
       nameDiv.textContent = `${row.name} `;
       if (row.color) {
-        let colorDiv = document.createElement('div');
+        const colorDiv = document.createElement('div');
         colorDiv.classList.add('color');
         colorDiv.style.backgroundColor = row.color;
         leftContainer.appendChild(colorDiv);
