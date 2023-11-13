@@ -5,6 +5,7 @@ export interface TSChartSettings {
   title: string;
   xValues: number[]; // in milliseconds
   cursor?: Cursor; // cursor related settings and events
+  showExecutionsLinks?: boolean;
   series: TSChartSeries[];
   scales?: Scale[];
   autoResize?: boolean; // autoresize on window size change
@@ -17,5 +18,6 @@ export interface TSChartSettings {
 export interface TSChartSeries extends Series {
   id: string;
   data: (number | null | undefined)[];
+  metadata?: Record<string, any>[];
   legendName: string;
 }
