@@ -32,6 +32,49 @@
           </button>
         </step-suffix>
       </step-form-field>
+      <step-form-field>
+        <step-label>Description</step-label>
+        <input
+          type="text"
+          placeholder="Description"
+          [ngModel]="_task.attributes!['description']"
+          (ngModelChange)="handleDescriptionChange($event)"
+          name="description"
+        />
+      </step-form-field>
+
+      <div class="exclusion-panel">
+        <div class="heading" style="display: flex">
+          <span style="margin-right: auto"> CRON Exclusions </span>
+          <button mat-button class="add-exclusion-button" type="button" (click)="addCronExclusion()">
+            <step-icon name="plus">plus</step-icon>
+          </button>
+        </div>
+        <div class="exclusions-container" *ngIf="_task.cronExclusions && _task.cronExclusions.length > 0">
+          <div *ngFor="let exclusion of _task.cronExclusions; let i = index" class="exclusion-item">
+            <step-form-field>
+              <input
+                type="text"
+                name="exclusion.cronExpression_{{ i }}"
+                [(ngModel)]="exclusion.cronExpression"
+                placeholder="Cron Expression"
+              />
+              <input
+                type="text"
+                name="exclusion.description_{{ i }}"
+                [(ngModel)]="exclusion.description"
+                placeholder="Description (optional)"
+              />
+              <step-suffix class="button-suffix">
+                <button mat-button (click)="removeExclusion(i)">
+                  <step-icon name="x">delete</step-icon>
+                </button>
+              </step-suffix>
+            </step-form-field>
+          </div>
+        </div>
+      </div>
+
       <step-custom-forms
         [stModel]="_task.executionsParameters!.customParameters!"
         (stModelChange)="handleCustomParametersChange($event)"

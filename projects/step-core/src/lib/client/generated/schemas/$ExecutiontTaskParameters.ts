@@ -28,6 +28,12 @@ export const $ExecutiontTaskParameters = {
     cronExpression: {
       type: 'string',
     },
+    cronExclusions: {
+      type: 'array',
+      contains: {
+        type: 'CronExclusion',
+      },
+    },
     active: {
       type: 'boolean',
     },

@@ -43,7 +43,9 @@
   <step-custom-columns screen="schedulerTable" [isSearchDisabled]="false"></step-custom-columns>
   <ng-container matColumnDef="cronExpression" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>CronExpression</th>
-    <td mat-cell *matCellDef="let element">{{ element.cronExpression }}</td>
+    <td mat-cell *matCellDef="let element">
+      <step-cron-expression-cell [task]="element"> </step-cron-expression-cell>
+    </td>
   </ng-container>
   <ng-container matColumnDef="active" stepSearchCol>
     <step-single-item-array-filter
@@ -73,6 +75,16 @@
     <th mat-header-cell *matHeaderCellDef>Actions</th>
     <td mat-cell *matCellDef="let element" class="cell-actions">
       <step-btn-group>
+        <button
+          mat-icon-button
+          matTooltip="Go to plan"
+          [disabled]="!element?.executionsParameters?.repositoryObject?.repositoryParameters?.['planid']"
+          (click)="
+            this._logic.navToPlan(element.executionsParameters!.repositoryObject!.repositoryParameters!['planid']!)
+          "
+        >
+          <step-icon name="file"></step-icon>
+        </button>
         <button
           mat-icon-button
           matTooltip="Execute schedule"
