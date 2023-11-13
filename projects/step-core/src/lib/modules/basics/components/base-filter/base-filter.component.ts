@@ -35,7 +35,7 @@ export abstract class BaseFilterComponent<T, CV = T> implements OnInit, OnDestro
     this.terminator$.complete();
   }
 
-  private setupChange(): void {
+  protected setupChange(): void {
     this.createControlChangeStream(this.filterControl)
       .pipe(takeUntil(this.terminator$))
       .subscribe((value) => this.handleChange(value));

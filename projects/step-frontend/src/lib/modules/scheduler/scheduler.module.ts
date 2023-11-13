@@ -15,10 +15,16 @@ import { SchedulerConfigurationComponent } from './components/scheduler-configur
 import './components/scheduler-configuration/scheduler-configuration.component';
 import { ScheduledTaskLogicService } from './services/scheduled-task-logic.service';
 import { ScheduledTaskBulkOperationsRegisterService } from './services/scheduled-task-bulk-operations-register.service';
+import { CronExpressionCellComponent } from './components/cron-expression-cell/cron-expression-cell.component';
 
 @NgModule({
   imports: [StepCoreModule, StepCommonModule],
-  declarations: [ScheduledTaskListComponent, SchedulerTaskSelectionComponent, SchedulerConfigurationComponent],
+  declarations: [
+    ScheduledTaskListComponent,
+    SchedulerTaskSelectionComponent,
+    SchedulerConfigurationComponent,
+    CronExpressionCellComponent,
+  ],
   exports: [ScheduledTaskListComponent, SchedulerTaskSelectionComponent, SchedulerConfigurationComponent],
   providers: [
     {

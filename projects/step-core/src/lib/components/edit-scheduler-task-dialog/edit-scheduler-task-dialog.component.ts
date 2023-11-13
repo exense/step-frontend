@@ -71,6 +71,11 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
     this.updateParametersRawValue();
   }
 
+  handleDescriptionChange(description: string): void {
+    this._task.attributes!['description'] = description;
+    this.updateParametersRawValue();
+  }
+
   handleUserIdChange(userId: string): void {
     this._task.executionsParameters!.userID = userId;
     this.updateParametersRawValue();
@@ -97,6 +102,17 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
         this._task.cronExpression = expression;
       }
     });
+  }
+
+  addCronExclusion() {
+    if (!this._task.cronExclusions) {
+      this._task.cronExclusions = [];
+    }
+    this._task.cronExclusions.push({ description: undefined, cronExpression: undefined });
+  }
+
+  removeExclusion(index: number) {
+    this._task.cronExclusions!.splice(index, 1);
   }
 
   private initializeTask(): void {

@@ -22,7 +22,7 @@
       />
       <div style="display: flex; align-items: center; margin-top: 3px">
         <span class="color-square" [style.background-color]="item.value.color"></span>
-        <span>{{ item.key }}</span>
+        <span [title]="item.key" class="series-label">{{ item.key }}</span>
       </div>
     </div>
   </ng-container>
