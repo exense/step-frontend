@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -52,18 +53,21 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   legendSettings: LegendSettings = { show: true, items: [] };
 
+  private _element = inject(ElementRef);
+  private _executionsService = inject(ExecutionsService);
+
   getSize = () => {
     return {
-      width: this.element.nativeElement.parentElement.offsetWidth - 32,
-      height: this.element.nativeElement.parentElement.offsetHeight - this.HEADER_WITH_FOOTER_SIZE,
+      width: this._element.nativeElement.parentElement.offsetWidth - 32,
+      height: this._element.nativeElement.parentElement.offsetHeight - this.HEADER_WITH_FOOTER_SIZE,
     };
   };
 
-  constructor(@Self() private element: ElementRef, private executionService: ExecutionsService) {}
+  constructor() {}
 
   // used by the tooltip
   getExecutionDetails(executionIds: string[]): Observable<Execution[]> {
-    return this.executionService.getExecutionsByIds(executionIds);
+    return this._executionsService.getExecutionsByIds(executionIds);
   }
 
   setBlur(blur: boolean) {

@@ -25,10 +25,10 @@ export class TooltipPlugin {
   public static getInstance(ref: TimeSeriesChartComponent): uPlot.Plugin {
     const showExecutionsLinks = ref.settings.showExecutionsLinks;
     let chart: uPlot;
-    let over: any;
+    let over: HTMLDivElement;
     let bound: Element;
-    let bLeft: any;
-    let bTop: any;
+    let bLeft: number;
+    let bTop: number;
     let cursorIsOnChartArea = false; // will be changed by onmouseleave and onmouseenter events
 
     function syncBounds(): void {
@@ -58,7 +58,7 @@ export class TooltipPlugin {
       openMenu?.remove();
     });
 
-    const createExecutionsMenu = (event: MouseEvent, tooltipContainer: any, executionIds: string[]) => {
+    const createExecutionsMenu = (event: MouseEvent, tooltipContainer: HTMLElement, executionIds: string[]) => {
       const menu = createElementWithClass('div', 'tooltip-menu');
       menu.innerText = 'Loading...';
       const tooltipBounds = tooltipContainer.getBoundingClientRect();
@@ -157,12 +157,6 @@ export class TooltipPlugin {
       return chart.cursor._lock;
     };
 
-    const tooltipOnMouseLeaveEvent = () => {
-      if (!cursorIsOnChartArea) {
-        hideTooltip();
-      }
-    };
-
     return {
       opts: (self: uPlot, opts: Options) => {
         // here we can override the charts settings
@@ -184,7 +178,7 @@ export class TooltipPlugin {
             showTooltip();
           };
 
-          over.onmouseleave = (event: any) => {
+          over.onmouseleave = () => {
             cursorIsOnChartArea = false;
             if (!chartIsLocked()) {
               hideTooltip();
@@ -219,7 +213,7 @@ export class TooltipPlugin {
             // some weird uPlot behaviour. it happens to be -10 many times
             return;
           }
-          let hoveredValue = u.posToVal(top, 'y');
+          const hoveredValue = u.posToVal(top, 'y');
           let yPoints: TooltipRowEntry[] = [];
           let summaryRow: TooltipRowEntry | undefined;
           for (let i = 1; i < u.series.length; i++) {
