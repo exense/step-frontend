@@ -68,7 +68,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   constructor(@Self() private element: ElementRef) {}
 
   ngOnDestroy(): void {
-    this.uplot?.default;
+    this.uplot?.destroy();
   }
 
   redraw(): void {
