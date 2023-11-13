@@ -34,6 +34,7 @@ import { ProjectSwitchDialogComponent } from './components/project-switch-dialog
 import { ArrayInputComponent } from './components/array-input/array-input.component';
 import { RouterModule } from '@angular/router';
 import { RangeFilterComponent } from './components/range-filter/range-filter.component';
+import { StringArrayInputComponent } from './components/string-array-input/string-array-input.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -69,6 +70,7 @@ import { RangeFilterComponent } from './components/range-filter/range-filter.com
     TimeInputComponent,
     ArrayInputComponent,
     RangeFilterComponent,
+    StringArrayInputComponent,
   ],
   exports: [
     ResourceLabelComponent,
@@ -103,6 +105,7 @@ import { RangeFilterComponent } from './components/range-filter/range-filter.com
     ArrayInputComponent,
     RouterModule,
     RangeFilterComponent,
+    StringArrayInputComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -125,6 +128,7 @@ export * from './components/upload-container/upload-container.component';
 export * from './components/array-input/array-input.component';
 export * from './components/time-input/time-input.component';
 export * from './components/range-filter/range-filter.component';
+export * from './components/string-array-input/string-array-input.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
 export * from './pipes/has-right.pipe';
