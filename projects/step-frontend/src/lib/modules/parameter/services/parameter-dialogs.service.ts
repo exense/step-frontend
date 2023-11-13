@@ -1,14 +1,13 @@
 import { inject, Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import {
-  a1Promise2Observable,
   DialogsService,
   ExportDialogsService,
   ImportDialogsService,
   Parameter,
   ParametersService,
 } from '@exense/step-core';
-import { catchError, map, Observable, of, switchMap } from 'rxjs';
-import { MatDialog } from '@angular/material/dialog';
+import { filter, Observable, switchMap } from 'rxjs';
 import { ParameterEditDialogComponent } from '../components/parameter-edit-dialog/parameter-edit-dialog.component';
 
 @Injectable({
@@ -38,10 +37,9 @@ export class ParameterDialogsService {
   }
 
   deleteParameter(id: string, label: string): Observable<any> {
-    return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Parameter "${label}"`)).pipe(
-      switchMap(() => this._parametersService.deleteParameter(id)),
-      map(() => true),
-      catchError(() => of(false))
+    return this._dialogs.showDeleteWarning(1, `Parameter "${label}"`).pipe(
+      filter((result) => result),
+      switchMap(() => this._parametersService.deleteParameter(id))
     );
   }
 }

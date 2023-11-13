@@ -1,0 +1,12 @@
+<step-modal-window title="Error" [hideButtonsSection]="true">
+  <div step-modal-window-body>
+    <form (submit)="onSubmit()">
+      <step-alert [type]="AlertType.DANGER" [innerHTML]="dialogData.messageHTML | safeHtml"></step-alert>
+
+      <div class="dialog-actions">
+        <button type="button" mat-stroked-button step-dialog-close>Cancel</button>
+        <button type="submit" mat-flat-button color="primary">OK</button>
+      </div>
+    </form>
+  </div>
+</step-modal-window>

@@ -17,7 +17,7 @@
  * along with STEP.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 angular
-  .module('planEditor', ['step', 'dynamicForms', 'export'])
+  .module('planEditor', ['step', 'export'])
 
   .controller(
     'PlanEditorCtrl',

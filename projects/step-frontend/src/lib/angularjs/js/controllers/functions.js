@@ -36,7 +36,7 @@ angular
     }
   }])
 
-  .factory('FunctionDialogsConfig', function ($rootScope, $uibModal, $http, Dialogs, $location) {
+  .factory('FunctionDialogsConfig', function ($rootScope, $uibModal, $http, $location) {
     var functionDialogsConfig = {};
 
     functionDialogsConfig.getConfigObject = function (

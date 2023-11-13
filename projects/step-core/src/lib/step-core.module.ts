@@ -88,6 +88,11 @@ import { TriggerPopoverDirective } from './directives/trigger-popover.directive'
 import { HtmlDescriptionCellComponent } from './components/html-description-cell/html-description-cell.component';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { PopoverContentDirective } from './directives/popover-content.directive';
+import { EnterTextValueDialogComponent } from './components/enter-text-value-dialog/enter-text-value-dialog.component';
+import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
+import { DialogCloseDirective } from './directives/dialog-close.directive';
+import { MessagesListDialogComponent } from './components/messages-list-dialog/messages-list-dialog.component';
+import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
 
 @NgModule({
   declarations: [
@@ -153,6 +158,11 @@ import { PopoverContentDirective } from './directives/popover-content.directive'
     HtmlDescriptionCellComponent,
     SafeHtmlPipe,
     PopoverContentDirective,
+    EnterTextValueDialogComponent,
+    ConfirmationDialogComponent,
+    MessagesListDialogComponent,
+    DialogCloseDirective,
+    MessageDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -256,6 +266,11 @@ import { PopoverContentDirective } from './directives/popover-content.directive'
     PopoverContentDirective,
     HtmlDescriptionCellComponent,
     SafeHtmlPipe,
+    EnterTextValueDialogComponent,
+    ConfirmationDialogComponent,
+    MessagesListDialogComponent,
+    DialogCloseDirective,
+    MessageDialogComponent,
   ],
   providers: [
     CORE_INITIALIZER,
