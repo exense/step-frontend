@@ -7,6 +7,7 @@ import { TsFilteringSettings } from '../model/ts-filtering-settings';
 import { TsFilteringMode } from '../model/ts-filtering-mode';
 
 import { TimeSeriesConfig } from '../time-series.config';
+import { FetchBucketsRequest } from '@exense/step-core';
 export class FindBucketsRequestBuilder {
   readonly attributesPrefix = 'attributes';
 
@@ -18,6 +19,7 @@ export class FindBucketsRequestBuilder {
   private numberOfBuckets?: number;
   private intervalSize?: number; // in ms
   private filteringSettings?: TsFilteringSettings;
+  private collectAttributeKeys?: string[];
 
   /**
    * If present, only the that that are specified in the mask are preserved in the final filter. The other are removed.
@@ -37,6 +39,7 @@ export class FindBucketsRequestBuilder {
       this.intervalSize = builder.intervalSize;
       this.filteringSettings = JSON.parse(JSON.stringify(builder.filteringSettings));
       this.customAttributes = JSON.parse(JSON.stringify(builder.customAttributes));
+      this.collectAttributeKeys = builder.collectAttributeKeys;
     }
   }
 
@@ -77,6 +80,11 @@ export class FindBucketsRequestBuilder {
     return this;
   }
 
+  withCollectAttributeKeys(keys: string[]) {
+    this.collectAttributeKeys = keys;
+    return this;
+  }
+
   addAttribute(key: string, value: string): FindBucketsRequestBuilder {
     this.customAttributes[key] = value;
     return this;
@@ -101,7 +109,7 @@ export class FindBucketsRequestBuilder {
     return this.range;
   }
 
-  build(): FindBucketsRequest {
+  build(): FetchBucketsRequest {
     if (!this.filteringSettings) {
       throw new Error('Filtering settings are mandatory');
     }
@@ -140,6 +148,8 @@ export class FindBucketsRequestBuilder {
       groupDimensions: this.groupDimensions,
       numberOfBuckets: this.numberOfBuckets,
       intervalSize: this.intervalSize,
+      collectAttributeKeys: this.collectAttributeKeys,
+      collectAttributesValuesLimit: 10,
     };
   }
 }
