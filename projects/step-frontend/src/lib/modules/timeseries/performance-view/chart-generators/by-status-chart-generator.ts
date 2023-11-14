@@ -22,15 +22,21 @@ export class ByStatusChartGenerator {
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const series: TSChartSeries[] = response.matrix.map((series, i) => {
       let status = response.matrixKeys[i][this.STATUS_ATTRIBUTE];
-      let color = colorsPool.getStatusColor(status);
+      const color = colorsPool.getStatusColor(status);
       status = status || 'No Status';
-
+      const metadata: Record<string, any>[] = [];
+      const data: (number | null | undefined)[] = [];
+      series.forEach((b) => {
+        data.push(b ? b.throughputPerHour : 0);
+        metadata.push(b?.attributes);
+      });
       return {
         id: status,
         label: status,
         legendName: status,
-        data: series.map((b) => (b ? b.throughputPerHour : 0)),
+        data: data,
         // scale: 'mb',
+        metadata: metadata,
         value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x) + '/h',
         stroke: color,
         fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
