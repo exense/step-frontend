@@ -1,0 +1,22 @@
+.settings-container {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  z-index: 1;
+}
+
+.selected-menu-item {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.checkbox-row {
+  gap: 12px;
+  align-items: center;
+}

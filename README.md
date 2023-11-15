@@ -21,3 +21,7 @@ Start step BE on your local machine, with the start:local configuration the FE w
 ## Build step
 
 Invoke the command `npm run build` it will assemble the core library and step FE
+
+## Generate OpenAPI classes with a local backend
+
+`node generate-openapi-client.js http://localhost:8080/rest/private-openapi.json`

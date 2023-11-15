@@ -31,6 +31,7 @@ import {
   ArtefactService,
   PlanLinkDialogService,
   FunctionActionsService,
+  PlanOpenService,
 } from '@exense/step-core';
 import {
   catchError,
@@ -96,6 +97,7 @@ export class PlanEditorBaseComponent
   public _planEditService = inject(PlanEditorService);
   private _restoreDialogsService = inject(RestoreDialogsService);
   private _activatedRoute = inject(ActivatedRoute);
+  private _planOpen = inject(PlanOpenService);
 
   private get artefactIdFromUrl(): string | undefined {
     const { artefactId } = this._activatedRoute.snapshot.queryParams ?? {};
@@ -337,8 +339,13 @@ export class PlanEditorBaseComponent
           },
           { emitEvent: false }
         );
-        const artefactId = preselectArtefact ? this.artefactIdFromUrl : undefined;
+
+        const planOpenState = this._planOpen.getLastPlanOpenState();
+        const artefactId = preselectArtefact ? planOpenState?.artefactId ?? this.artefactIdFromUrl : undefined;
         this._planEditService.init(plan, artefactId);
+        if (planOpenState?.startInteractive) {
+          this.startInteractive();
+        }
       });
   }
 

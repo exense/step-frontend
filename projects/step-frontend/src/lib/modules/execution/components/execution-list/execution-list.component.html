@@ -33,22 +33,24 @@
       </td>
     </ng-container>
     <ng-container matColumnDef="startTime" stepSearchCol>
-      <step-date-filter
+      <step-range-filter
         *stepSearchCellDef
         stepFilterConnect
-        [createConditionFn]="_filterConditionFactory.singleDateFilterCondition"
+        [createConditionFn]="_filterConditionFactory.dateRangeFilterCondition"
       >
-      </step-date-filter>
+      </step-range-filter>
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Start time</th>
-      <td mat-cell *matCellDef="let element">{{ element?.startTime | date: DateFormat.DATE }}</td>
+      <td mat-cell *matCellDef="let element">
+        {{ element?.startTime | date: DateFormat.DATE }}
+      </td>
     </ng-container>
     <ng-container matColumnDef="endTime" stepSearchCol>
-      <step-date-filter
+      <step-range-filter
         *stepSearchCellDef
         stepFilterConnect
-        [createConditionFn]="_filterConditionFactory.singleDateFilterCondition"
+        [createConditionFn]="_filterConditionFactory.dateRangeFilterCondition"
       >
-      </step-date-filter>
+      </step-range-filter>
       <th mat-header-cell *matHeaderCellDef mat-sort-header>End time</th>
       <td mat-cell *matCellDef="let element">{{ element?.endTime | date: DateFormat.DATE }}</td>
     </ng-container>

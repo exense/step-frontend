@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { DashboardService, MetricType, TimeSeriesService } from '@exense/step-core';
 import { TimeSeriesConfig } from '../../time-series.config';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
 import { TimeSeriesDashboardComponent } from '../../dashboard/time-series-dashboard.component';
@@ -9,6 +10,7 @@ import { FilterBarItemType, TsFilterItem } from '../../performance-view/filter-b
 import { Subject, takeUntil, timer } from 'rxjs';
 import { TimeSeriesUtils } from '../../time-series-utils';
 import { MatMenuTrigger } from '@angular/material/menu';
+import { TSTimeRange } from '../../chart/model/ts-time-range';
 
 @Component({
   selector: 'step-analytics-page',
@@ -26,6 +28,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
 
   timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   timeRangeSelection!: TimeRangePickerSelection;
+  activeTimeRange: TSTimeRange = { from: 0, to: 0 };
 
   // this is just for running executions
   refreshIntervals = TimeSeriesConfig.AUTO_REFRESH_INTERVALS;
@@ -42,7 +45,13 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   executionHasToBeBuilt = false;
   migrationInProgress = false;
 
+  timeSeriesService = inject(TimeSeriesService);
+  metricTypes?: MetricType[];
+  customChartsMetrics: MetricType[] = [];
+
   ngOnInit(): void {
+    this.timeSeriesService.getMetricTypes().subscribe((metrics) => (this.metricTypes = metrics));
+
     let now = new Date().getTime();
     let start;
     let end;
@@ -72,11 +81,13 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     delete urlParams.start;
     delete urlParams.end;
 
+    let timeRange = { from: start, to: end };
+    this.activeTimeRange = timeRange;
     this.dashboardSettings = {
       contextId: new Date().getTime().toString(),
       includeThreadGroupChart: true,
       disableThreadGroupOnOqlMode: true,
-      timeRange: { from: start, to: end },
+      timeRange: timeRange,
       contextualFilters: urlParams,
       showContextualFilters: true,
       timeRangeOptions: TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS,
@@ -87,6 +98,10 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     if (this.refreshEnabled) {
       this.startInterval(this.selectedRefreshInterval.value);
     }
+  }
+
+  handleDashboardTimeRangeChange(range: TSTimeRange) {
+    this.activeTimeRange = range;
   }
 
   private getDefaultFilters(): TsFilterItem[] {
@@ -151,6 +166,10 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   handleResolutionChange(resolution: number) {
     this.menuTrigger.closeMenu();
     this.dashboard.setChartsResolution(resolution);
+  }
+
+  addCustomChart(metric: MetricType) {
+    this.customChartsMetrics.push(metric);
   }
 
   changeRefreshInterval(newInterval: { label: string; value: number }) {

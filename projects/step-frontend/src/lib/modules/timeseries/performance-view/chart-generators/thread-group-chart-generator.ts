@@ -80,13 +80,13 @@ export class ThreadGroupChartGenerator {
         {
           scale: 'y',
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-          values: (u, vals, space) => vals.map((v) => v),
+          values: (u, vals) => vals.map((v) => (v === Math.floor(v) ? v : null)),
         },
         {
           side: 1,
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
           scale: 'total',
-          values: (u, vals, space) => vals.map((v) => v),
+          values: (u, vals) => vals.map((v) => (v === Math.floor(v) ? v : null)),
           grid: { show: false },
         },
       ],

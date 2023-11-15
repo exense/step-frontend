@@ -1,0 +1,30 @@
+.step-popover-menu {
+  margin-bottom: 1rem;
+  margin-left: calc(-50% + 2rem);
+  min-width: inherit;
+  width: unset !important;
+  max-width: inherit !important;
+
+  .mat-menu-item {
+    height: auto;
+    white-space: normal;
+    line-height: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+
+    &.cdk-program-focused:not([disabled]),
+    &:hover:not([disabled]) {
+      background: inherit;
+    }
+  }
+
+  .default-theme .cdk-overlay-pane {
+    padding: 0 0 8px 0;
+  }
+
+  .mat-menu-content {
+    padding: 0;
+  }
+}

@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
+import { catchError, from, map, Observable, of, switchMap, tap } from 'rxjs';
 import { AbstractArtefact, AugmentedPlansService, Plan } from '../client/step-client-module';
 import { PlanCreateDialogComponent } from '../components/plan-create-dialog/plan-create-dialog.component';
 import { ThreadDistributionWizardDialogComponent } from '../components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
@@ -13,8 +13,10 @@ import { IsUsedByDialogService } from './is-used-by-dialog.service';
 import { MultipleProjectsService } from '../modules/basics/services/multiple-projects.service';
 import { PlanLinkDialogService } from '../components/plan-link/plan-link-dialog.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../modules/basics/services/auth.service';
 
 const ARTEFACT_ID = 'artefactId';
+const EDITOR_URL = '/root/plans/editor';
 
 @Injectable({
   providedIn: 'root',
@@ -24,6 +26,7 @@ export class PlanDialogsService implements PlanLinkDialogService {
   private _plansApiService = inject(AugmentedPlansService);
   private _dialogs = inject(DialogsService);
   private _entityDialogs = inject(EntityDialogsService);
+  private _authService = inject(AuthService);
   private _exportDialogs = inject(ExportDialogsService);
   private _importDialogs = inject(ImportDialogsService);
   private _isUsedByDialogs = inject(IsUsedByDialogService);
@@ -78,9 +81,12 @@ export class PlanDialogsService implements PlanLinkDialogService {
   }
 
   editPlan(plan: Plan, artefactId?: string): Observable<boolean> {
-    const planEditLink = `/root/plans/editor/${plan.id}`;
+    const planEditLink = `${EDITOR_URL}/${plan.id}`;
 
-    if (this._multipleProjects.isEntityBelongsToCurrentProject(plan)) {
+    if (
+      this._authService.hasRight('admin-no-multitenancy') ||
+      this._multipleProjects.isEntityBelongsToCurrentProject(plan)
+    ) {
       this.openPlanInternal(planEditLink, artefactId);
       return of(true);
     }

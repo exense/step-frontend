@@ -11,4 +11,6 @@ export type FetchBucketsRequest = {
   numberOfBuckets?: number;
   intervalSize?: number;
   percentiles?: Array<number>;
+  collectAttributeKeys?: Array<string>;
+  collectAttributesValuesLimit?: number;
 };

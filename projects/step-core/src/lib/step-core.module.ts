@@ -46,12 +46,14 @@ import { FocusablesDirective } from './directives/focusables.directive';
 import { InputModelFormatterDirective } from './directives/input-model-formatter.directive';
 import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 import { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
-import { SimpleLineChartDirective } from './directives/simple-line-chart.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 import { TooltipDirective } from './directives/tooltip.directive';
 import { TrapFocusDirective } from './directives/trap-focus.directive';
 import { REPOSITORY_PARAMETERS_INITIALIZER, StepBasicsModule } from './modules/basics/step-basics.module';
-import { CustomRegistriesModule } from './modules/custom-registeries/custom-registries.module';
+import {
+  CustomCellRegistryService,
+  CustomRegistriesModule,
+} from './modules/custom-registeries/custom-registries.module';
 import { DynamicFormsModule } from './modules/dynamic-forms/dynamic-forms.module';
 import { EntitiesSelectionModule } from './modules/entities-selection/entities-selection.module';
 import { EntityModule } from './modules/entity/entity.module';
@@ -79,6 +81,13 @@ import { ResourceInputWrapperComponent } from './components/resource-input-wrapp
 import { WizardModule } from './modules/wizard/wizards.module';
 import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.component';
 import { SettingsComponent } from './components/settings/settings.component';
+import { ImportDialogComponent } from './components/import-dialog/import-dialog.component';
+import { CronModule } from './modules/cron/cron.module';
+import { PopoverComponent } from './components/popover/popover.component';
+import { TriggerPopoverDirective } from './directives/trigger-popover.directive';
+import { HtmlDescriptionCellComponent } from './components/html-description-cell/html-description-cell.component';
+import { SafeHtmlPipe } from './pipes/safe-html.pipe';
+import { PopoverContentDirective } from './directives/popover-content.directive';
 
 @NgModule({
   declarations: [
@@ -98,7 +107,6 @@ import { SettingsComponent } from './components/settings/settings.component';
     SettingButtonComponent,
     PlanTreeComponent,
     RestoreDialogComponent,
-    SimpleLineChartDirective,
     EditableActionsComponent,
     EditableLabelComponent,
     EditableTextareaLabelComponent,
@@ -139,6 +147,12 @@ import { SettingsComponent } from './components/settings/settings.component';
     ResourceInputWrapperComponent,
     SimpleOutletComponent,
     SettingsComponent,
+    ImportDialogComponent,
+    PopoverComponent,
+    TriggerPopoverDirective,
+    HtmlDescriptionCellComponent,
+    SafeHtmlPipe,
+    PopoverContentDirective,
   ],
   imports: [
     CommonModule,
@@ -161,6 +175,7 @@ import { SettingsComponent } from './components/settings/settings.component';
     ResourceInputModule,
     KeywordsCommonModule,
     WizardModule,
+    CronModule,
   ],
   exports: [
     CommonModule,
@@ -195,7 +210,6 @@ import { SettingsComponent } from './components/settings/settings.component';
     AutorefreshToggleComponent,
     SettingButtonComponent,
     RestoreDialogComponent,
-    SimpleLineChartDirective,
     EditableLabelComponent,
     EditableTextareaLabelComponent,
     EditableDropdownLabelComponent,
@@ -235,6 +249,13 @@ import { SettingsComponent } from './components/settings/settings.component';
     SelectTaskComponent,
     ResourceInputWrapperComponent,
     SettingsComponent,
+    ImportDialogComponent,
+    CronModule,
+    PopoverComponent,
+    TriggerPopoverDirective,
+    PopoverContentDirective,
+    HtmlDescriptionCellComponent,
+    SafeHtmlPipe,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -263,7 +284,11 @@ import { SettingsComponent } from './components/settings/settings.component';
     },
   ],
 })
-export class StepCoreModule {}
+export class StepCoreModule {
+  constructor(_cellRegistry: CustomCellRegistryService) {
+    _cellRegistry.registerCell('htmlDescription', HtmlDescriptionCellComponent);
+  }
+}
 
 export * from './angularjs';
 export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
@@ -284,7 +309,10 @@ export { EditableTextareaLabelComponent } from './components/editable-textarea-l
 export * from './components/entity-column-container/entity-column-container.component';
 export * from './components/entity-column/entity-column.component';
 export * from './components/export-dialog/export-dialog.component';
+export * from './components/import-dialog/import-dialog.component';
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
+export * from './components/html-description-cell/html-description-cell.component';
+export { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
 export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
@@ -294,7 +322,6 @@ export { PlanLinkDialogService } from './components/plan-link/plan-link-dialog.s
 export { PlanNameComponent } from './components/plan-name/plan-name.component';
 export * from './components/plan-tree/plan-tree.component';
 export { PredefinedOptionsInputComponent } from './components/predefined-options-input/predefined-options-input.component';
-export { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 export * from './components/report-node-status/report-node-status.component';
 export { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 export * from './components/select-plan/select-plan.component';
@@ -315,13 +342,15 @@ export * from './components/resource-input-wrapper/resource-input-wrapper.compon
 export * from './components/settings/settings.component';
 export * from './decorators/plugin';
 export * from './directives/caps-lock.directive';
+export * from './components/popover/popover.component';
+export * from './directives/trigger-popover.directive';
+export * from './directives/popover-content.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
 export { FocusableDirective } from './directives/focusable.directive';
 export { FocusablesDirective } from './directives/focusables.directive';
 export * from './directives/input-model-formatter.directive';
 export { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
-export * from './directives/simple-line-chart.directive';
 export * from './directives/tooltip-immediate-close.directive';
 export * from './directives/tooltip.directive';
 export { TrapFocusDirective } from './directives/trap-focus.directive';
@@ -341,8 +370,10 @@ export * from './modules/json-viewer/json-viewer.module';
 export * from './modules/resource-input/resource-input.module';
 export * from './modules/keywords-common/keywords-common.module';
 export * from './modules/wizard/wizards.module';
+export * from './modules/cron/cron.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/dynamic-attribute.pipe';
+export * from './pipes/safe-html.pipe';
 export * from './pipes/is-chart-empty.pipe';
 export * from './pipes/project-name.pipe';
 export * from './pipes/matching-authenticator.pipe';
@@ -388,3 +419,6 @@ export * from './modules/entity/pipes/cast-entity-to-plan.pipe';
 export * from './modules/entity/pipes/cast-entity-to-execution.pipe';
 export * from './modules/entity/pipes/cast-entity-to-task.pipe';
 export * from './services/auto-refresh-model-factory.service';
+export * from './services/artefacts-factory.service';
+export * from './services/plan-open.service';
+export * from './services/keyword-executor.service';

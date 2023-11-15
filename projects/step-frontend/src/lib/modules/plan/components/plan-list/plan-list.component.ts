@@ -56,7 +56,14 @@ export class PlanListComponent {
   }
 
   importPlans(): void {
-    this._planDialogs.importPlans().pipe(this.updateDataSourceAfterChange).subscribe();
+    this._planDialogs
+      .importPlans()
+      .pipe(this.updateDataSourceAfterChange)
+      .subscribe((result) => {
+        if (result) {
+          this.dataSource.reload();
+        }
+      });
   }
 
   exportPlans(): void {

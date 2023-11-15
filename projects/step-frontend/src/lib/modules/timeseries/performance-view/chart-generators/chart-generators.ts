@@ -38,10 +38,12 @@ export class ChartGenerators {
     let xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     let avgValues: (number | null | undefined)[] = [];
     let countValues: (number | null)[] = [];
+    const metadata: any[] = [];
     if (response.matrixKeys.length !== 0) {
       response.matrix[0].forEach((bucket) => {
         avgValues.push(bucket ? Math.round(bucket.sum / bucket.count) : undefined);
         countValues.push(bucket ? bucket.throughputPerHour : 0);
+        metadata.push(bucket?.attributes);
       });
     }
 
@@ -50,7 +52,7 @@ export class ChartGenerators {
       xValues: xLabels,
       tooltipOptions: {
         enabled: true,
-        yAxisUnit: 'ms',
+        yAxisUnit: ' ms',
         zAxisLabel: 'Hits/h',
       },
       series: [
@@ -59,6 +61,7 @@ export class ChartGenerators {
           scale: 'y',
           label: 'Response Time',
           data: avgValues,
+          metadata: metadata,
           value: (x, v) => Math.trunc(v) + ' ms',
           width: 2,
           stroke: 'rgba(255,109,18,0.59)',
@@ -82,13 +85,14 @@ export class ChartGenerators {
         {
           scale: 'y',
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-          values: (u, vals, space) => vals.map((v: number) => UPlotUtils.formatMilliseconds(v)),
+          values: (u, vals, space) => vals.map((v: number) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(v)),
         },
         {
           side: 1,
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
           scale: 'total',
-          values: (u: any, vals: any, space: any) => vals.map((v: number) => TimeSeriesUtils.formatAxisValue(v) + '/h'),
+          values: (u: any, vals: any, space: any) =>
+            vals.map((v: number) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(v) + '/h'),
           grid: { show: false },
         },
       ],

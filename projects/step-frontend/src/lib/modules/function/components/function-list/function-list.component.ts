@@ -4,15 +4,14 @@ import {
   AugmentedKeywordsService,
   AutoDeselectStrategy,
   Keyword,
-  InteractivePlanExecutionService,
   selectionCollectionProvider,
   tablePersistenceConfigProvider,
   STORE_ALL,
   FunctionActionsService,
   RestoreDialogsService,
+  KeywordExecutorService,
 } from '@exense/step-core';
 import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'step-function-list',
@@ -26,12 +25,11 @@ import { Router } from '@angular/router';
 export class FunctionListComponent implements AfterViewInit {
   private _injector = inject(Injector);
   private _functionApiService = inject(AugmentedKeywordsService);
-  private _interactivePlanExecutionApiService = inject(InteractivePlanExecutionService);
   private _functionActions = inject(FunctionActionsService);
   private _functionPackageDialogs = inject(FunctionPackageActionsService);
   private _restoreDialogsService = inject(RestoreDialogsService);
-  private _$rootScope = inject(AJS_ROOT_SCOPE);
-  private _router = inject(Router);
+  private _keywordExecutor = inject(KeywordExecutorService);
+
   readonly dataSource = this._functionApiService.createFilteredTableDataSource();
 
   ngAfterViewInit(): void {
@@ -55,13 +53,7 @@ export class FunctionListComponent implements AfterViewInit {
   }
 
   executeFunction(id: string): void {
-    this._interactivePlanExecutionApiService.startFunctionTestingSession(id).subscribe((result: any) => {
-      (this._$rootScope as any).planEditorInitialState = {
-        interactive: true,
-        selectedNode: result.callFunctionId,
-      };
-      this._router.navigateByUrl(`/root/plans/editor/${result.planId}`);
-    });
+    this._keywordExecutor.executeKeyword(id);
   }
 
   duplicateFunction(id: string): void {

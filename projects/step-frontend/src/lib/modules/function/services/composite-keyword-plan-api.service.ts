@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { PlanEditorApiService } from '../../plan-editor/plan-editor.module';
-import { map, Observable, pipe, tap } from 'rxjs';
+import { from, map, Observable, pipe, tap } from 'rxjs';
 import {
   AugmentedInteractivePlanExecutionService,
   AugmentedKeywordsService,
@@ -64,7 +64,8 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService {
   }
 
   navigateToPlan(id: string): void {
-    this._router.navigateByUrl(`/root/composites/editor/${id}`);
+    const EDITOR_URL = '/root/composites/editor';
+    this._router.navigateByUrl(`${EDITOR_URL}/${id}`);
   }
 
   restorePlanVersion(id: string, versionId: string): Observable<Plan> {

@@ -5,7 +5,7 @@ import {
   AugmentedKeywordEditorService,
   convertScriptLanguageToAce,
   Keyword,
-  InteractivePlanExecutionService,
+  KeywordExecutorService,
   KeywordsService,
   ScriptLanguage,
 } from '@exense/step-core';
@@ -23,11 +23,9 @@ import 'ace-builds/src-min-noconflict/mode-java.js';
   styleUrls: ['./script-editor.component.scss'],
 })
 export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
-  private _$rootScope = inject(AJS_ROOT_SCOPE);
-  private _router = inject(Router);
   private _keywordApi = inject(KeywordsService);
   private _keywordEditorApi = inject(AugmentedKeywordEditorService);
-  private _interactiveApi = inject(InteractivePlanExecutionService);
+  private _keywordExecutor = inject(KeywordExecutorService);
 
   @ViewChild('editor', { static: false })
   private editorElement!: ElementRef<HTMLDivElement>;
