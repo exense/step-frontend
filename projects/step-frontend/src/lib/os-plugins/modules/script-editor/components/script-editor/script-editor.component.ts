@@ -1,7 +1,6 @@
 import { AfterViewInit, Component, ElementRef, inject, OnDestroy, ViewChild } from '@angular/core';
 import {
   AceMode,
-  AJS_ROOT_SCOPE,
   AugmentedKeywordEditorService,
   convertScriptLanguageToAce,
   Keyword,
@@ -9,8 +8,8 @@ import {
   KeywordsService,
   ScriptLanguage,
 } from '@exense/step-core';
-import { forkJoin, Observable, switchMap } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { forkJoin, Observable } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 import * as ace from 'ace-builds';
 import 'ace-builds/src-min-noconflict/theme-chrome.js';
 import 'ace-builds/src-min-noconflict/mode-javascript.js';
@@ -49,15 +48,7 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
   }
 
   execute(): void {
-    this.saveInternal()
-      .pipe(switchMap(() => this._interactiveApi.startFunctionTestingSession(this._functionId)))
-      .subscribe((result) => {
-        (this._$rootScope as any).planEditorInitialState = {
-          interactive: true,
-          selectedNode: result.callFunctionId,
-        };
-        this._router.navigateByUrl(`/root/plans/editor/${result.planId}`);
-      });
+    this.saveInternal().subscribe(() => this._keywordExecutor.executeKeyword(this._functionId));
   }
 
   private setupEditor(): void {
