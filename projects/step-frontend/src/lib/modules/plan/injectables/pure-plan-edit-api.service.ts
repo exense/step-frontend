@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, map, Observable, tap } from 'rxjs';
+import { catchError, from, map, Observable } from 'rxjs';
 import {
   Plan,
   PlansService,
@@ -8,14 +8,14 @@ import {
   AugmentedInteractivePlanExecutionService,
   ReportNode,
   ExportDialogsService,
-  AJS_LOCATION,
   GlobalProgressSpinnerService,
 } from '@exense/step-core';
+import { Router } from '@angular/router';
 import { PlanEditorApiService } from '../../plan-editor/plan-editor.module';
 
 @Injectable()
 export class PurePlanEditApiService implements PlanEditorApiService {
-  private _$location = inject(AJS_LOCATION);
+  private _router = inject(Router);
   private _planApi = inject(PlansService);
   private _interactiveApi = inject(AugmentedInteractivePlanExecutionService);
   private _exportDialogs = inject(ExportDialogsService);
@@ -71,6 +71,7 @@ export class PurePlanEditApiService implements PlanEditorApiService {
   }
 
   navigateToPlan(id: string): void {
-    this._$location.path(`/root/plans/editor/${id}`);
+    const EDITOR_URL = `/root/plans/editor`;
+    this._router.navigateByUrl(`${EDITOR_URL}/${id}`);
   }
 }

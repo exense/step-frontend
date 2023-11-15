@@ -4,6 +4,8 @@
   padding: 0 19px;
   max-width: 100%;
   width: 100%;
+  margin-bottom: 1rem;
+  display: block;
 }
 
 .header-buttons {
@@ -24,4 +26,18 @@
 .menu-btn {
   display: flex;
   align-items: center;
+}
+
+#add-custom-chart {
+  border: 1px dashed grey;
+  padding: 2.4rem;
+  cursor: pointer;
+  margin: 2.4rem 0;
+  display: inline-block;
+}
+
+.metric-type-container {
+  height: 400px;
+  width: 50%;
+  margin-bottom: 12px;
 }

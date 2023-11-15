@@ -3,8 +3,10 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  inject,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   Output,
   Self,
@@ -19,23 +21,26 @@ import MouseListener = uPlot.Cursor.MouseListener;
 
 //@ts-ignore
 import uPlot = require('uplot');
+import { TSTimeRange } from './model/ts-time-range';
+import { Execution, ExecutionsService } from '@exense/step-core';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'step-timeseries-chart',
   templateUrl: './time-series-chart.component.html',
   styleUrls: ['./time-series-chart.component.scss'],
 })
-export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChanges {
+export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   private readonly HEADER_WITH_FOOTER_SIZE = 48;
-
+  chartMetadata: Record<string, any>[] = [[]]; // 1 on 1 to chart 'data'. first item is time axes
   @ViewChild('chart') private chartElement!: ElementRef;
 
   @Input() title!: string;
   @Input() settings!: TSChartSettings;
   @Input() syncKey: string | undefined; // all the charts with the same syncKey in the app will be synced
 
-  @Output() onZoomReset = new EventEmitter();
-  @Output() onZoomChange = new EventEmitter();
+  @Output() onZoomReset = new EventEmitter<void>();
+  @Output() onZoomChange = new EventEmitter<TSTimeRange>();
 
   uplot!: uPlot;
 
@@ -46,16 +51,24 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   chartIsEmpty = false; // meaning the chart is already created, but it has no data
   chartIsUnavailable = false;
 
-  legendSettings: LegendSettings = { items: [] };
+  legendSettings: LegendSettings = { show: true, items: [] };
+
+  private _element = inject(ElementRef);
+  private _executionsService = inject(ExecutionsService);
 
   getSize = () => {
     return {
-      width: this.element.nativeElement.parentElement.offsetWidth - 32,
-      height: this.element.nativeElement.parentElement.offsetHeight - this.HEADER_WITH_FOOTER_SIZE,
+      width: this._element.nativeElement.parentElement.offsetWidth - 32,
+      height: this._element.nativeElement.parentElement.offsetHeight - this.HEADER_WITH_FOOTER_SIZE,
     };
   };
 
-  constructor(@Self() private element: ElementRef) {}
+  constructor() {}
+
+  // used by the tooltip
+  getExecutionDetails(executionIds: string[]): Observable<Execution[]> {
+    return this._executionsService.getExecutionsByIds(executionIds);
+  }
 
   setBlur(blur: boolean) {
     let foundElements = this.chartElement.nativeElement.getElementsByClassName('u-over');
@@ -94,14 +107,15 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     this.legendSettings.items = [];
     this.chartIsUnavailable = false;
     this.seriesIndexesByIds = {};
+    this.chartMetadata = [[]];
 
     const cursorOpts: uPlot.Cursor = {
-      lock: false,
+      lock: settings.showExecutionsLinks,
       y: false,
       bind: {
         dblclick: (self: uPlot, target: HTMLElement, handler: MouseListener) => {
           return (e: any) => {
-            this.onZoomReset.emit(true);
+            this.onZoomReset.emit();
             handler(e);
             return null;
           };
@@ -124,13 +138,14 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       if (series.id) {
         this.seriesIndexesByIds[series.id] = i + 1; // because the first series is the time
       }
+      this.chartMetadata.push(series.metadata || []);
       if (series.stroke) {
         // aggregate series don't have stroke (e.g total)
         this.legendSettings.items.push({
           seriesId: series.id,
           color: (series.stroke as string) || '#cccccc',
           label: series.legendName,
-          isVisible: !!series.show,
+          isVisible: series.show ?? true,
         });
       }
     });
@@ -158,9 +173,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         },
         // y: {auto: true},
       },
-      plugins: this.settings.tooltipOptions.enabled
-        ? [TooltipPlugin.getInstance(() => this.settings.tooltipOptions)]
-        : [],
+      plugins: this.settings.tooltipOptions.enabled ? [TooltipPlugin.getInstance(this)] : [],
       axes: [{}, ...(settings.axes || [])],
       series: [
         {
@@ -172,7 +185,23 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         },
         ...settings.series.filter((s) => s.show !== false),
       ],
-      hooks: {},
+      hooks: {
+        ...settings.hooks,
+        setSelect: [
+          (u: uPlot) => {
+            if (u.select.width < 1) {
+              // this is the bug from uplot. See https://github.com/leeoniya/uPlot/issues/766
+              return;
+            }
+            const min = u.posToVal(u.select.left, 'x');
+            const max = u.posToVal(u.select.left + u.select.width, 'x');
+            if (min < max) {
+              this.onZoomChange.next({ from: min, to: max });
+            }
+          },
+          ...(settings.hooks?.setSelect || []),
+        ],
+      },
     };
 
     let data: AlignedData = [settings.xValues, ...settings.series.map((s) => s.data)];
@@ -342,9 +371,14 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   resize() {
     this.uplot.setSize(this.getSize());
   }
+
+  ngOnDestroy(): void {
+    this.uplot?.destroy();
+  }
 }
 
 interface LegendSettings {
+  show: boolean;
   items: LegendItem[];
   zAxisLabel?: string;
 }

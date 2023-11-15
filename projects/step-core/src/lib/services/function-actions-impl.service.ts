@@ -12,10 +12,11 @@ import {
   FunctionDialogsConfig,
   FunctionDialogsConfigFactoryService,
 } from '../modules/keywords-common/keywords-common.module';
-import { a1Promise2Observable, AJS_LOCATION, AJS_MODULE, DialogsService } from '../shared';
+import { a1Promise2Observable, AJS_MODULE, DialogsService } from '../shared';
 import { ExportDialogsService } from './export-dialogs.service';
 import { ImportDialogsService } from './import-dialogs.service';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
+import { Router } from '@angular/router';
 
 const CONFIGURER_KEYWORD_ID = 'configurerKeywordId';
 const ENTITY_TYPE = 'keyword';
@@ -32,7 +33,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
   private _importDialogs = inject(ImportDialogsService);
   protected _isUsedByDialog = inject(IsUsedByDialogService);
   private _entityDialogs = inject(EntityDialogsService);
-  private _$location = inject<ILocationService>(AJS_LOCATION);
+  private _router = inject(Router);
   private _functionDialogsConfigFactoryService = inject(FunctionDialogsConfigFactoryService);
   private _functionConfigurationService = inject(FunctionConfigurationService);
 
@@ -62,7 +63,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
           return of({ keyword, continueEdit: true });
         }
 
-        const url = this._$location.path();
+        const url = this._router.url;
         const editParam = { [CONFIGURER_KEYWORD_ID]: id };
 
         return this._multipleProjectService
@@ -134,7 +135,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
       }),
       map((result) => {
         if (result.continueEdit) {
-          this._$location.path(result.editorPath);
+          this._router.navigateByUrl(result.editorPath);
         }
         return result.continueEdit;
       }),

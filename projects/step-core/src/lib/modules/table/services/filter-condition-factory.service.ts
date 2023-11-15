@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { DateTime } from 'luxon';
-import { REPOSITORY_PARAMETERS } from '../../basics/step-basics.module';
+import { DateRange, REPOSITORY_PARAMETERS } from '../../basics/step-basics.module';
 import { FilterCondition } from '../shared/filter-condition';
 import { SingleDateFilterCondition } from '../shared/single-date-filter-condition';
 import { ScopeFilterCondition } from '../shared/scope-filter-condition';
@@ -13,6 +13,7 @@ import { ParametersFilterCondition } from '../shared/parameters-filter-condition
 import { FilterConditionJson } from '../shared/filter-condition-json.interface';
 import { FilterConditionType } from '../shared/filter-condition-type.enum';
 import { BooleanFilterCondition } from '../shared/boolean-filter-condition';
+import { DateRangeFilterCondition } from '../shared/date-range-filter-condition';
 
 @Injectable({
   providedIn: 'root',
@@ -26,6 +27,10 @@ export class FilterConditionFactoryService {
 
   singleDateFilterCondition(date?: DateTime): FilterCondition {
     return new SingleDateFilterCondition(date);
+  }
+
+  dateRangeFilterCondition(range?: DateRange): FilterCondition {
+    return new DateRangeFilterCondition(range);
   }
 
   scopeFilterCondition(value?: string): FilterCondition {
@@ -71,6 +76,8 @@ export class FilterConditionFactoryService {
         return this.scopeFilterCondition(filterCondition?.sourceObject);
       case FilterConditionType.SINGLE_DATE:
         return this.singleDateFilterCondition(filterCondition?.sourceObject);
+      case FilterConditionType.DATE_RANGE:
+        return this.dateRangeFilterCondition(filterCondition?.sourceObject);
       default:
         return undefined;
     }

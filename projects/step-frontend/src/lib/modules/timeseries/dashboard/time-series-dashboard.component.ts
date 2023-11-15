@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { filter, forkJoin, merge, Subject, Subscription, switchMap, takeUntil, tap, throttle } from 'rxjs';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import { FilterBarComponent } from '../performance-view/filter-bar/filter-bar.component';
@@ -23,6 +23,8 @@ import { TableApiWrapperService, TimeSeriesService } from '@exense/step-core';
 })
 export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   readonly ONE_HOUR_MS = 3600 * 1000;
+
+  @Output() onTimeRangeChange: EventEmitter<TSTimeRange> = new EventEmitter<TSTimeRange>();
 
   @Input() settings!: TimeSeriesDashboardSettings;
   @ViewChild(ChartsViewComponent) chartsView!: ChartsViewComponent;
@@ -81,6 +83,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.context = this._contextsFactory.createContext(contextParams);
 
     this.performanceViewSettings = this.settings;
+    this.performanceViewSettings.displayTooltipLinks = !this.settings.execution; // we're on analytics
     this.subscribeForContextChange();
   }
 
@@ -280,6 +283,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
    * The selection will be set to full selection.
    */
   updateFullRange(range: TSTimeRange, forceRefresh = true): void {
+    this.onTimeRangeChange.emit(range);
     this.updateBaseChartsSubscription?.unsubscribe(); // end current execution
     this.context.updateFullRange(range, false);
     this.context.updateSelectedRange(range, false);

@@ -7,11 +7,11 @@ import {
   ScreenInput,
   MultipleProjectsService,
   EditorResolverService,
-  AJS_LOCATION,
 } from '@exense/step-core';
 import { ScreenDialogsService } from '../../services/screen-dialogs.service';
 import { RenderOptionsPipe } from '../../pipes/render-options.pipe';
 import { pipe, take, tap } from 'rxjs';
+import { Router } from '@angular/router';
 
 const SCREEN_ID = 'screenId';
 
@@ -26,7 +26,7 @@ export class ScreenConfigurationListComponent implements AfterViewInit {
   private _renderOptions = inject(RenderOptionsPipe);
   private _multipleProjectList = inject(MultipleProjectsService);
   private _editorResolver = inject(EditorResolverService);
-  private _$location = inject(AJS_LOCATION);
+  private _router = inject(Router);
 
   private updateDataSourceAfterChange = pipe(
     tap((result?: boolean) => {
@@ -81,7 +81,7 @@ export class ScreenConfigurationListComponent implements AfterViewInit {
       return;
     }
 
-    const screenLink = this._$location.path();
+    const screenLink = this._router.url;
     const screenEditParams = { [SCREEN_ID]: screen.id! };
     this._multipleProjectList
       .confirmEntityEditInASeparateProject(screen, { url: screenLink, search: screenEditParams }, 'screen input')

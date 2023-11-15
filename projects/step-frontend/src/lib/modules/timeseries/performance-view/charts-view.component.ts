@@ -79,7 +79,6 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   allBaseSeriesChecked: boolean = true;
 
   compareKeywords: { [key: string]: KeywordSelection } = {};
-  compareKeywordSearchValue: string = '';
   allCompareSeriesChecked: boolean = true;
 
   byKeywordsChartResponseCache?: TimeSeriesAPIResponse; // for caching
@@ -325,7 +324,8 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       .withRange(settings.timeRange)
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
       .withFilteringSettings(this.context.getFilteringSettings())
-      .withIntervalSize(this.context.getChartsResolution());
+      .withIntervalSize(this.context.getChartsResolution())
+      .withCollectAttributeKeys(this.settings.displayTooltipLinks ? ['eId'] : []);
   }
 
   private createAllBaseCharts() {
@@ -431,7 +431,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       .withSkipCustomOQL(true)
       .build();
     return this.timeSeriesService
-      .getBuckets(request)
+      .getMeasurements(request)
       .pipe(tap((response) => this.createChart(TsChartType.THREAD_GROUP, request, response, compareChart)));
   }
 
@@ -443,11 +443,17 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       existingChart.clear();
       return;
     }
-    const newChart = ChartGenerators.generateChart(type, request, response, this.context.keywordsContext.colorsPool);
+    const newChartSettings = ChartGenerators.generateChart(
+      type,
+      request,
+      response,
+      this.context.keywordsContext.colorsPool
+    );
     if (compareChart) {
-      this.compareChartsSettings[type] = newChart;
+      this.compareChartsSettings[type] = newChartSettings;
     } else {
-      this.currentChartsSettings[type] = newChart;
+      newChartSettings.showExecutionsLinks = this.settings.displayTooltipLinks;
+      this.currentChartsSettings[type] = newChartSettings;
     }
   }
 
@@ -458,7 +464,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     const requestBuilder = this.getRequestBuilder(compareChart);
     const request = requestBuilder.build();
     return this.timeSeriesService
-      .getBuckets(request)
+      .getMeasurements(request)
       .pipe(tap((response) => this.createChart(TsChartType.OVERVIEW, request, response, compareChart)));
   }
 
@@ -502,7 +508,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       .withGroupDimensions([TimeSeriesConfig.STATUS_ATTRIBUTE])
       .build();
     return this.timeSeriesService
-      .getBuckets(request)
+      .getMeasurements(request)
       .pipe(tap((response) => this.createChart(TsChartType.BY_STATUS, request, response, compareChart)));
   }
 
@@ -515,7 +521,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     const requestBuilder = compareChart ? this.compareRequestBuilder : this.findRequestBuilder;
     const findRequest = this.getTableRequest(requestBuilder, context);
 
-    return this.timeSeriesService.getBuckets(findRequest).pipe(
+    return this.timeSeriesService.getMeasurements(findRequest).pipe(
       tap((response) => {
         if (compareChart) {
           this.tableChart.enableCompareMode(response, context);
@@ -554,7 +560,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   updateTableCompareData(): Observable<TimeSeriesAPIResponse> {
     let context = this.getContext(true);
     const request = this.getTableRequest(this.compareRequestBuilder, context);
-    return this.timeSeriesService.getBuckets(request).pipe(
+    return this.timeSeriesService.getMeasurements(request).pipe(
       tap((response) => {
         this.tableChart.updateCompareData(response, context);
       })
@@ -578,7 +584,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       .withGroupDimensions(groupDimensions)
       .withPercentiles([90, 99])
       .build();
-    return this.timeSeriesService.getBuckets(findRequest).pipe(
+    return this.timeSeriesService.getMeasurements(findRequest).pipe(
       tap((response) => {
         // save the response for further metrics change
         if (compareChart) {
@@ -613,7 +619,9 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
           const seriesKey = this.getSeriesKey(key, groupDimensions);
           const responseTimeData: (number | null | undefined)[] = [];
           const color = this.keywordsService.getColor(seriesKey);
+          const metadata: any[] = [];
           const throughputData = response.matrix[i].map((b, j) => {
+            metadata.push(b?.attributes);
             const bucketValue = throughputMetric.mapFunction(b);
             if (totalThroughput[j] == undefined) {
               totalThroughput[j] = bucketValue;
@@ -635,6 +643,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
             legendName: seriesKey,
             id: seriesKey,
             data: [], // will override it
+            metadata: metadata,
             value: (x, v) => Math.trunc(v),
             stroke: color,
             points: { show: false },
@@ -647,6 +656,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
         const throughputChartSettings: TSChartSettings = {
           title: 'Throughput',
           xValues: timeLabels,
+          showExecutionsLinks: this.settings.displayTooltipLinks,
           tooltipOptions: {
             enabled: true,
             zAxisLabel: throughputMetric.tooltipZAxisLabel,
@@ -693,16 +703,17 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
         const responseTimeSettings: TSChartSettings = {
           title: TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${responseTimeMetric.label})`,
           xValues: timeLabels,
+          showExecutionsLinks: this.settings.displayTooltipLinks,
           series: responseTimeSeries,
           tooltipOptions: {
             enabled: true,
-            yAxisUnit: 'ms',
+            yAxisUnit: ' ms',
           },
           axes: [
             {
               scale: 'y',
               size: this.CHART_LEGEND_SIZE,
-              values: (u, vals, space) => vals.map((v) => UPlotUtils.formatMilliseconds(v)),
+              values: (u, vals, space) => vals.map((v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(v)),
             },
           ],
         };

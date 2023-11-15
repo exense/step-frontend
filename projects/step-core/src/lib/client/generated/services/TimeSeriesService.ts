@@ -8,6 +8,7 @@ import type { AsyncTaskStatusObject } from '../models/AsyncTaskStatusObject';
 import type { FetchBucketsRequest } from '../models/FetchBucketsRequest';
 import type { Measurement } from '../models/Measurement';
 import type { MeasurementsStats } from '../models/MeasurementsStats';
+import type { MetricType } from '../models/MetricType';
 import type { OQLVerifyResponse } from '../models/OQLVerifyResponse';
 import type { TimeSeriesAPIResponse } from '../models/TimeSeriesAPIResponse';
 import type { TimeSeriesRebuildRequest } from '../models/TimeSeriesRebuildRequest';
@@ -42,10 +43,10 @@ export class TimeSeriesService {
    * @returns TimeSeriesAPIResponse default response
    * @throws ApiError
    */
-  public getBuckets(requestBody?: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
+  public getMeasurements(requestBody?: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/time-series/buckets',
+      url: '/time-series/measurements',
       body: requestBody,
       mediaType: 'application/json',
     });
@@ -67,6 +68,18 @@ export class TimeSeriesService {
   }
 
   /**
+   * Returns the list of all supported metric types
+   * @returns MetricType default response
+   * @throws ApiError
+   */
+  public getMetricTypes(): Observable<Array<MetricType>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/time-series/metric-types',
+    });
+  }
+
+  /**
    * @param filter
    * @returns MeasurementsStats default response
    * @throws ApiError
@@ -78,6 +91,20 @@ export class TimeSeriesService {
       query: {
         filter: filter,
       },
+    });
+  }
+
+  /**
+   * @param requestBody
+   * @returns TimeSeriesAPIResponse default response
+   * @throws ApiError
+   */
+  public getTimeSeries(requestBody?: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/time-series',
+      body: requestBody,
+      mediaType: 'application/json',
     });
   }
 

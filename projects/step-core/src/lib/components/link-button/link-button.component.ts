@@ -1,11 +1,12 @@
 import { Component, HostListener, inject, OnInit } from '@angular/core';
-import { AJS_LOCATION } from '../../shared';
+import { Router } from '@angular/router';
+import { from } from 'rxjs';
 
 @Component({
   template: '',
 })
 export abstract class LinkButtonComponent implements OnInit {
-  private _$location = inject(AJS_LOCATION);
+  private _router = inject(Router);
 
   private url?: string;
 
@@ -20,11 +21,11 @@ export abstract class LinkButtonComponent implements OnInit {
     if (!this.url) {
       return;
     }
-    if (this._$location.path().includes(this.url)) {
-      this._$location.path('/');
-      setTimeout(() => this._$location.path(this.url!));
-    } else {
-      this._$location.path(this.url);
+    if (!this._router.url.includes(this.url)) {
+      this._router.navigateByUrl(this.url);
+      return;
     }
+
+    from(this._router.navigateByUrl('/')).subscribe(() => this._router.navigateByUrl(this.url!, { replaceUrl: true }));
   }
 }

@@ -1,4 +1,4 @@
-<div class="relative">
+<div class="relative" #container>
   <div class="header-buttons">
     <div>
       <button mat-raised-button [matMenuTriggerFor]="refreshMenu">Refresh ({{ selectedRefreshInterval.label }})</button>
@@ -36,5 +36,21 @@
     #dashboard
     *ngIf="dashboardSettings"
     [settings]="dashboardSettings"
+    (onTimeRangeChange)="handleDashboardTimeRangeChange($event)"
   ></step-timeseries-dashboard>
+
+  <div>
+    <div id="add-custom-chart" *ngIf="metricTypes" [matMenuTriggerFor]="menu">
+      <span>+ Custom Metric Chart</span>
+      <mat-menu #menu="matMenu">
+        <button *ngFor="let metric of metricTypes" mat-menu-item (click)="addCustomChart(metric)">
+          {{ metric.displayName }}
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+
+  <div *ngFor="let settings of customChartsMetrics" class="metric-type-container">
+    <step-metric-chart [settings]="settings" [range]="activeTimeRange"></step-metric-chart>
+  </div>
 </div>
