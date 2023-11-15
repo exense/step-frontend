@@ -5,6 +5,7 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   Output,
   Self,
@@ -32,7 +33,7 @@ import MouseListener = uPlot.Cursor.MouseListener;
   styleUrls: ['./ts-ranger.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
+export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   private readonly CHART_HEIGHT = 100;
 
   @ViewChild('chart') private chartElement!: ElementRef;
@@ -65,6 +66,10 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
   };
 
   constructor(@Self() private element: ElementRef) {}
+
+  ngOnDestroy(): void {
+    this.uplot?.destroy();
+  }
 
   redraw(): void {
     this.uplot.setData(this.uplot.data);

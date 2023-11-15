@@ -3,8 +3,10 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  inject,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   Output,
   Self,
@@ -20,15 +22,17 @@ import MouseListener = uPlot.Cursor.MouseListener;
 //@ts-ignore
 import uPlot = require('uplot');
 import { TSTimeRange } from './model/ts-time-range';
+import { Execution, ExecutionsService } from '@exense/step-core';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'step-timeseries-chart',
   templateUrl: './time-series-chart.component.html',
   styleUrls: ['./time-series-chart.component.scss'],
 })
-export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChanges {
+export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   private readonly HEADER_WITH_FOOTER_SIZE = 48;
-
+  chartMetadata: Record<string, any>[] = [[]]; // 1 on 1 to chart 'data'. first item is time axes
   @ViewChild('chart') private chartElement!: ElementRef;
 
   @Input() title!: string;
@@ -49,14 +53,22 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   legendSettings: LegendSettings = { show: true, items: [] };
 
+  private _element = inject(ElementRef);
+  private _executionsService = inject(ExecutionsService);
+
   getSize = () => {
     return {
-      width: this.element.nativeElement.parentElement.offsetWidth - 32,
-      height: this.element.nativeElement.parentElement.offsetHeight - this.HEADER_WITH_FOOTER_SIZE,
+      width: this._element.nativeElement.parentElement.offsetWidth - 32,
+      height: this._element.nativeElement.parentElement.offsetHeight - this.HEADER_WITH_FOOTER_SIZE,
     };
   };
 
-  constructor(@Self() private element: ElementRef) {}
+  constructor() {}
+
+  // used by the tooltip
+  getExecutionDetails(executionIds: string[]): Observable<Execution[]> {
+    return this._executionsService.getExecutionsByIds(executionIds);
+  }
 
   setBlur(blur: boolean) {
     let foundElements = this.chartElement.nativeElement.getElementsByClassName('u-over');
@@ -92,13 +104,13 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
    * @param settings
    */
   createChart(settings: TSChartSettings): void {
-    this.legendSettings.show = settings.showLegend ?? true;
     this.legendSettings.items = [];
     this.chartIsUnavailable = false;
     this.seriesIndexesByIds = {};
+    this.chartMetadata = [[]];
 
     const cursorOpts: uPlot.Cursor = {
-      lock: false,
+      lock: settings.showExecutionsLinks,
       y: false,
       bind: {
         dblclick: (self: uPlot, target: HTMLElement, handler: MouseListener) => {
@@ -126,6 +138,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       if (series.id) {
         this.seriesIndexesByIds[series.id] = i + 1; // because the first series is the time
       }
+      this.chartMetadata.push(series.metadata || []);
       if (series.stroke) {
         // aggregate series don't have stroke (e.g total)
         this.legendSettings.items.push({
@@ -160,9 +173,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         },
         // y: {auto: true},
       },
-      plugins: this.settings.tooltipOptions.enabled
-        ? [TooltipPlugin.getInstance(() => this.settings.tooltipOptions)]
-        : [],
+      plugins: this.settings.tooltipOptions.enabled ? [TooltipPlugin.getInstance(this)] : [],
       axes: [{}, ...(settings.axes || [])],
       series: [
         {
@@ -359,6 +370,10 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   resize() {
     this.uplot.setSize(this.getSize());
+  }
+
+  ngOnDestroy(): void {
+    this.uplot?.destroy();
   }
 }
 
