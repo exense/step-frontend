@@ -6,4 +6,5 @@ export interface PerformanceViewSettings {
   timeRange: TSTimeRange;
   includeThreadGroupChart?: boolean;
   disableThreadGroupOnOqlMode?: boolean;
+  displayTooltipLinks?: boolean;
 }

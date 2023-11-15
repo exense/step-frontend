@@ -32,7 +32,14 @@
     "lint:core": "ng lint @exense/step-core",
     "lint:step-frontend": "ng lint @exense/step-frontend",
     "lint:app": "ng lint @exense/step-app",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "deploy:core:copy": "copyfiles .npmrc dist/step-core",
+    "deploy:core:publish": "cd dist/step-core && npm publish",
+    "deploy:core": "npm run deploy:core:copy && npm run deploy:core:publish",
+    "deploy:step-frontend:copy": "copyfiles .npmrc dist/step-frontend",
+    "deploy:step-frontend:publish": "cd dist/step-frontend && npm publish",
+    "deploy:step-frontend": "npm run deploy:step-frontend:copy && npm run deploy:step-frontend:publish",
+    "deploy": "npm run deploy:core && npm run deploy:step-frontend"
   },
   "private": false,
   "dependencies": {

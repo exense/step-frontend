@@ -83,6 +83,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.context = this._contextsFactory.createContext(contextParams);
 
     this.performanceViewSettings = this.settings;
+    this.performanceViewSettings.displayTooltipLinks = !this.settings.execution; // we're on analytics
     this.subscribeForContextChange();
   }
 
