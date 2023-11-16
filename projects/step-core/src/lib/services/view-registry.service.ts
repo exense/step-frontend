@@ -216,7 +216,11 @@ export class ViewRegistryService {
 
     if (!parentPath) {
       if (route.path) {
-        ViewRegistryService.registeredRoutes.push(route.path);
+        let path = route.path;
+        if (path.includes('/') && path.includes(':')) {
+          path = path.split('/')[0];
+        }
+        ViewRegistryService.registeredRoutes.push(path);
       }
 
       if (weight || label) {
