@@ -236,28 +236,28 @@ export class MetricChartComponent implements OnInit, OnChanges {
     mapEntityToLabel: (entity: T) => string | undefined
   ) {
     const ids: string[] = series.map((s) => s.labelItems[groupDimensionIndex] as string).filter((id) => id);
-
-    if (ids.length > 0) {
-      fetchByIds(ids).subscribe((entities) => {
-        const entitiesByIds = new Map<string, T>();
-        entities.forEach((entity) => {
-          // Assuming each entity has an 'id' property
-          const entityId = (entity as any).id as string; // Cast to any to access 'id' property
-          if (entityId) {
-            entitiesByIds.set(entityId, entity);
-          }
-        });
-        series.forEach((s) => {
-          const entityId = s.labelItems[groupDimensionIndex];
-          if (entityId) {
-            const entity = entitiesByIds.get(entityId);
-            if (entity) {
-              this.chart.setLabelItem(s.id, groupDimensionIndex, mapEntityToLabel(entity));
-            }
-          }
-        });
-      });
+    if (!ids.length) {
+      return;
     }
+    fetchByIds(ids).subscribe((entities) => {
+      const entitiesByIds = new Map<string, T>();
+      entities.forEach((entity) => {
+        // Assuming each entity has an 'id' property
+        const entityId = (entity as any).id as string; // Cast to any to access 'id' property
+        if (entityId) {
+          entitiesByIds.set(entityId, entity);
+        }
+      });
+      series.forEach((s) => {
+        const entityId = s.labelItems[groupDimensionIndex];
+        if (entityId) {
+          const entity = entitiesByIds.get(entityId);
+          if (entity) {
+            this.chart.setLabelItem(s.id, groupDimensionIndex, mapEntityToLabel(entity));
+          }
+        }
+      });
+    });
   }
 
   private getAxesFormatFunction(unit: string): (v: number) => string {
