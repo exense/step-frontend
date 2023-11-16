@@ -640,6 +640,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
             scale: 'y',
             show: keywordSelection ? keywordSelection.isSelected : true,
             label: seriesKey,
+            labelItems: [seriesKey],
             legendName: seriesKey,
             id: seriesKey,
             data: [], // will override it
@@ -665,6 +666,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
             {
               scale: 'total',
               label: 'Total',
+              labelItems: ['Total'],
               legendName: 'Total',
               id: 'total',
               data: totalThroughput,

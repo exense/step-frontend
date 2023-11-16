@@ -33,6 +33,7 @@ export class ByStatusChartGenerator {
       return {
         id: status,
         label: status,
+        labelItems: [status],
         legendName: status,
         data: data,
         // scale: 'mb',
