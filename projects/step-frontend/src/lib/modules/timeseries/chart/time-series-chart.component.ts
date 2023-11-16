@@ -305,7 +305,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   setLabelItem(seriesId: string, labelIndex: number, label?: string): void {
     const index = this.seriesIndexesByIds[seriesId];
-    if (index == undefined || !label) return;
+    if (index === undefined || !label) return;
     const series = this.uplot.series[index];
     // @ts-ignore
     const labelItems = series.labelItems;
