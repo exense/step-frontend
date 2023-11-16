@@ -193,6 +193,8 @@ export class MetricChartComponent implements OnInit, OnChanges {
             (plan: Plan) => plan.attributes?.['name']
           );
           break;
+        default:
+          break;
       }
     });
 
