@@ -327,7 +327,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       return;
     }
     const index = this.seriesIndexesByIds[id];
-    if (index == undefined) return;
+    if (index === undefined) return;
     const series = this.uplot.series[index];
     series.label = label;
     const legendItem = this.legendSettings.items.find((i) => i.seriesId === id);
