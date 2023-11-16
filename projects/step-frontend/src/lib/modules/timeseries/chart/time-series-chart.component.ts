@@ -319,7 +319,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   }
 
   private mergeLabelItems(items: (string | undefined)[]): string {
-    return items.map((i) => (i ? i : '<Empty>')).join(' | ');
+    return items.map((i) => (i ??  '<Empty>')).join(' | ');
   }
 
   setSeriesLabel(id: string, label: string): void {
