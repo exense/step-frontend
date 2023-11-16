@@ -36,6 +36,7 @@ export class TimeSeriesContext {
   private readonly activeFilters$: BehaviorSubject<TsFilterItem[]>;
   private readonly filterSettings$: BehaviorSubject<TsFilteringSettings>;
   private readonly chartsResolution$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  private readonly chartsLockedState$ = new BehaviorSubject<boolean>(false);
 
   public readonly keywordsContext: TimeSeriesKeywordsContext;
   private readonly colorsPool: TimeseriesColorsPool;
@@ -102,6 +103,14 @@ export class TimeSeriesContext {
 
   updateFilters(items: TsFilterItem[]) {
     this.activeFilters$.next(items);
+  }
+
+  getChartsLockedState(): boolean {
+    return this.chartsLockedState$.getValue();
+  }
+
+  setChartsLockedState(state: boolean): void {
+    this.chartsLockedState$.next(state);
   }
 
   updateFullRange(range: TSTimeRange, emitEvent = true) {

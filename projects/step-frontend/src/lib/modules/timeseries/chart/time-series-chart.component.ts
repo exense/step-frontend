@@ -41,6 +41,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
 
   @Output() onZoomReset = new EventEmitter<void>();
   @Output() onZoomChange = new EventEmitter<TSTimeRange>();
+  @Output() onLockStateChange = new EventEmitter<boolean>();
 
   uplot!: uPlot;
 
