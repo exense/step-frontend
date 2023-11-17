@@ -197,7 +197,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
             const min = u.posToVal(u.select.left, 'x');
             const max = u.posToVal(u.select.left + u.select.width, 'x');
             if (min < max) {
-              this.zoomChange.next({ from: min, to: max });
+              this.zoomChange.emit({ from: min, to: max });
             }
           },
           ...(settings.hooks?.setSelect || []),
