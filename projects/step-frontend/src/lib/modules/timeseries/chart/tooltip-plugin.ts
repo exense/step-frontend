@@ -172,7 +172,7 @@ export class TooltipPlugin {
           over.onclick = () => {
             // @ts-ignore
             const lockState = u.cursor._lock;
-            ref.onLockStateChange.next(lockState);
+            ref.lockStateChange.emit(lockState);
           };
 
           over.onmouseenter = () => {
