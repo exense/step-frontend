@@ -6,6 +6,8 @@
   max-width: inherit !important;
 
   .mat-menu-item {
+    user-select: auto;
+    cursor: default;
     height: auto;
     white-space: normal;
     line-height: inherit;
