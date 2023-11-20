@@ -1,9 +1,11 @@
 <step-form-field [class.ng-invalid]="_ngControl.invalid" [class.ng-touched]="_ngControl.touched">
   <step-label *ngIf="label" [attr.show-required-marker]="showRequiredMarker || null">
     {{ label }}
-    <step-icon *ngIf="tooltip" name="help-circle" [matTooltip]="tooltip"> </step-icon>
   </step-label>
   <input type="text" [formControl]="internalControl" (blur)="handleBlur()" />
+  <step-suffix class="icon-suffix" *ngIf="tooltip">
+    <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below"> </step-icon>
+  </step-suffix>
   <step-error *ngIf="_ngControl.touched && _ngControl.errors && errorsDictionary">
     <step-errors-list [errors]="_ngControl.errors" [keysDictionary]="errorsDictionary"> </step-errors-list>
   </step-error>
