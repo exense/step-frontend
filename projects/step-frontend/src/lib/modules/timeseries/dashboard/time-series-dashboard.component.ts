@@ -256,8 +256,8 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   refresh() {
-    if (this.compareModeEnabled) {
-      // don't do the update while in compare mode
+    if (this.compareModeEnabled || this.context.getChartsLockedState()) {
+      // don't do the update while in compare mode or charts are locked
       return;
     }
     this.throttledRefreshTrigger$.next(true);

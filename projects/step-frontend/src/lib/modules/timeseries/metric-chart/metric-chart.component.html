@@ -3,8 +3,8 @@
   <ng-container *ngIf="chartSettings">
     <step-timeseries-chart
       [settings]="chartSettings"
-      (onZoomReset)="resetSelection()"
-      (onZoomChange)="changeSelection($event)"
+      (zoomReset)="resetSelection()"
+      (zoomChange)="changeSelection($event)"
     ></step-timeseries-chart>
     <div class="spinner">
       <mat-spinner *ngIf="isLoading" [diameter]="24" color="contrast"></mat-spinner>
