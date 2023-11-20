@@ -145,6 +145,21 @@ export class ExecutionsService {
   }
 
   /**
+   * Returns a list of executions by the provided ids.
+   * @param requestBody
+   * @returns Execution default response
+   * @throws ApiError
+   */
+  public getExecutionsByIds(requestBody?: Array<string>): Observable<Array<Execution>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/executions/search/by/ids',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
    * Returns the execution matching the provided repository object reference.
    * @param requestBody
    * @returns Execution default response

@@ -24,4 +24,4 @@ Invoke the command `npm run build` it will assemble the core library and step FE
 
 ## Generate OpenAPI classes with a local backend
 
-`node generate-openapi-client.js http://localhost:8080/rest/private-openapi.json `
+`node generate-openapi-client.js http://localhost:8080/rest/private-openapi.json`

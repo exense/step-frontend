@@ -79,7 +79,6 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   allBaseSeriesChecked: boolean = true;
 
   compareKeywords: { [key: string]: KeywordSelection } = {};
-  compareKeywordSearchValue: string = '';
   allCompareSeriesChecked: boolean = true;
 
   byKeywordsChartResponseCache?: TimeSeriesAPIResponse; // for caching
@@ -325,7 +324,8 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       .withRange(settings.timeRange)
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
       .withFilteringSettings(this.context.getFilteringSettings())
-      .withIntervalSize(this.context.getChartsResolution());
+      .withIntervalSize(this.context.getChartsResolution())
+      .withCollectAttributeKeys(this.settings.displayTooltipLinks ? ['eId'] : []);
   }
 
   private createAllBaseCharts() {
@@ -360,6 +360,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   }
 
   private refreshAllCharts(): Observable<unknown> {
+    this.context.setChartsLockedState(false);
     this.findRequestBuilder = this.prepareFindRequestBuilder(this.settings); // we don't want to lose active filters
 
     const timeSelection = this.context.getSelectedTimeRange();
@@ -401,10 +402,16 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   }
 
   onChartsZoomReset() {
+    this.context.setChartsLockedState(false);
     this.context.resetZoom();
   }
 
+  onChartsLockChange(locked: boolean) {
+    this.context.setChartsLockedState(locked);
+  }
+
   onCompareChartsZoomReset() {
+    this.context.setChartsLockedState(false);
     this.compareModeContext?.resetZoom();
   }
 
@@ -443,11 +450,17 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       existingChart.clear();
       return;
     }
-    const newChart = ChartGenerators.generateChart(type, request, response, this.context.keywordsContext.colorsPool);
+    const newChartSettings = ChartGenerators.generateChart(
+      type,
+      request,
+      response,
+      this.context.keywordsContext.colorsPool
+    );
     if (compareChart) {
-      this.compareChartsSettings[type] = newChart;
+      this.compareChartsSettings[type] = newChartSettings;
     } else {
-      this.currentChartsSettings[type] = newChart;
+      newChartSettings.showExecutionsLinks = this.settings.displayTooltipLinks;
+      this.currentChartsSettings[type] = newChartSettings;
     }
   }
 
@@ -613,7 +626,9 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
           const seriesKey = this.getSeriesKey(key, groupDimensions);
           const responseTimeData: (number | null | undefined)[] = [];
           const color = this.keywordsService.getColor(seriesKey);
+          const metadata: any[] = [];
           const throughputData = response.matrix[i].map((b, j) => {
+            metadata.push(b?.attributes);
             const bucketValue = throughputMetric.mapFunction(b);
             if (totalThroughput[j] == undefined) {
               totalThroughput[j] = bucketValue;
@@ -635,6 +650,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
             legendName: seriesKey,
             id: seriesKey,
             data: [], // will override it
+            metadata: metadata,
             value: (x, v) => Math.trunc(v),
             stroke: color,
             points: { show: false },
@@ -647,6 +663,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
         const throughputChartSettings: TSChartSettings = {
           title: 'Throughput',
           xValues: timeLabels,
+          showExecutionsLinks: this.settings.displayTooltipLinks,
           tooltipOptions: {
             enabled: true,
             zAxisLabel: throughputMetric.tooltipZAxisLabel,
@@ -693,6 +710,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
         const responseTimeSettings: TSChartSettings = {
           title: TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${responseTimeMetric.label})`,
           xValues: timeLabels,
+          showExecutionsLinks: this.settings.displayTooltipLinks,
           series: responseTimeSeries,
           tooltipOptions: {
             enabled: true,
