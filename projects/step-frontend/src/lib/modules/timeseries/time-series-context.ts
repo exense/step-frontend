@@ -36,6 +36,7 @@ export class TimeSeriesContext {
   private readonly activeFilters$: BehaviorSubject<TsFilterItem[]>;
   private readonly filterSettings$: BehaviorSubject<TsFilteringSettings>;
   private readonly chartsResolution$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  private readonly chartsLockedState$ = new BehaviorSubject<boolean>(false);
 
   public readonly keywordsContext: TimeSeriesKeywordsContext;
   private readonly colorsPool: TimeseriesColorsPool;
@@ -62,6 +63,7 @@ export class TimeSeriesContext {
     this.activeGroupings$.complete();
     this.activeFilters$.complete();
     this.filterSettings$.complete();
+    this.chartsLockedState$.complete();
   }
 
   enableCompareMode(context: TimeSeriesContext) {
@@ -102,6 +104,14 @@ export class TimeSeriesContext {
 
   updateFilters(items: TsFilterItem[]) {
     this.activeFilters$.next(items);
+  }
+
+  getChartsLockedState(): boolean {
+    return this.chartsLockedState$.getValue();
+  }
+
+  setChartsLockedState(state: boolean): void {
+    this.chartsLockedState$.next(state);
   }
 
   updateFullRange(range: TSTimeRange, emitEvent = true) {
@@ -167,9 +177,6 @@ export class TimeSeriesContext {
   }
 
   resetZoom() {
-    if (JSON.stringify(this.selectedTimeRange) === JSON.stringify(this.fullTimeRange)) {
-      // return; // this is causing some issues in the ranger. it's selection get 0 width, so better keep it like this for now.
-    }
     this.selectedTimeRange = this.fullTimeRange;
     this.selectedTimeRangeChange$.next(this.selectedTimeRange);
   }
