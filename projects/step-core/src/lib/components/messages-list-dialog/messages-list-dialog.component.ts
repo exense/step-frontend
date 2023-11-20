@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { AlertType } from '../../step-core.module';
+import { AlertType } from '../../modules/basics/step-basics.module';
 
 export interface MessagesListDialogData {
   messages: string[];
