@@ -90,7 +90,6 @@ import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { PopoverContentDirective } from './directives/popover-content.directive';
 import { EnterTextValueDialogComponent } from './components/enter-text-value-dialog/enter-text-value-dialog.component';
 import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
-import { DialogCloseDirective } from './directives/dialog-close.directive';
 import { MessagesListDialogComponent } from './components/messages-list-dialog/messages-list-dialog.component';
 import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
 
@@ -161,7 +160,6 @@ import { MessageDialogComponent } from './components/message-dialog/message-dial
     EnterTextValueDialogComponent,
     ConfirmationDialogComponent,
     MessagesListDialogComponent,
-    DialogCloseDirective,
     MessageDialogComponent,
   ],
   imports: [
@@ -269,7 +267,6 @@ import { MessageDialogComponent } from './components/message-dialog/message-dial
     EnterTextValueDialogComponent,
     ConfirmationDialogComponent,
     MessagesListDialogComponent,
-    DialogCloseDirective,
     MessageDialogComponent,
   ],
   providers: [
@@ -438,6 +435,5 @@ export * from './services/plan-open.service';
 export * from './services/keyword-executor.service';
 export * from './components/enter-text-value-dialog/enter-text-value-dialog.component';
 export * from './components/confirmation-dialog/confirmation-dialog.component';
-export * from './directives/dialog-close.directive';
 export * from './components/messages-list-dialog/messages-list-dialog.component';
 export * from './components/message-dialog/message-dialog.component';
