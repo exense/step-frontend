@@ -149,6 +149,21 @@ export class KeywordsService {
    * @returns Function default response
    * @throws ApiError
    */
+  public findFunctionsByIds(requestBody?: Array<string>): Observable<Array<Function>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/functions/find/by/ids',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Returns the list of entities matching the provided attributes
+   * @param requestBody
+   * @returns Function default response
+   * @throws ApiError
+   */
   public findFunctionsByAttributes(requestBody?: Record<string, string>): Observable<Array<Function>> {
     return this.httpRequest.request({
       method: 'POST',

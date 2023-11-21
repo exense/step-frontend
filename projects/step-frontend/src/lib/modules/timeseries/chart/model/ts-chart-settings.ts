@@ -20,4 +20,5 @@ export interface TSChartSeries extends Series {
   data: (number | null | undefined)[];
   metadata?: Record<string, any>[];
   legendName: string;
+  labelItems: (string | undefined)[]; // can have multiple group dimensions
 }

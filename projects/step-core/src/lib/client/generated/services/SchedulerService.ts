@@ -169,6 +169,21 @@ export class SchedulerService {
    * @returns ExecutiontTaskParameters default response
    * @throws ApiError
    */
+  public findExecutionTasksByIds(requestBody?: Array<string>): Observable<Array<ExecutiontTaskParameters>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/scheduler/task/find/by/ids',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Returns the list of entities matching the provided attributes
+   * @param requestBody
+   * @returns ExecutiontTaskParameters default response
+   * @throws ApiError
+   */
   public findExecutionTasksByAttributes(
     requestBody?: Record<string, string>
   ): Observable<Array<ExecutiontTaskParameters>> {

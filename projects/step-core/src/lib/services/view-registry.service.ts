@@ -86,7 +86,7 @@ export class ViewRegistryService {
     this.registerMenuEntry('Keywords', 'functions', 'keyword', { weight: 10, parentId: 'automation-root' });
     this.registerMenuEntry('Plans', 'plans', 'plan', { weight: 30, parentId: 'automation-root' });
     this.registerMenuEntry('Parameters', 'parameters', 'list', { weight: 40, parentId: 'automation-root' });
-    this.registerMenuEntry('Scheduler', 'scheduler', 'clock', { weight: 100, parentId: 'automation-root' });
+    this.registerMenuEntry('Schedules', 'scheduler', 'clock', { weight: 100, parentId: 'automation-root' });
 
     // Sub Menus Execute
     this.registerMenuEntry('Executions', 'executions', 'rocket', { weight: 10, parentId: 'execute-root' });
