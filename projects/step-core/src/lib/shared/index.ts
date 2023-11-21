@@ -3,7 +3,6 @@ export * from './angularjs-providers';
 export * from './constants';
 export * from './date-format.enum';
 export * from './dialogs.service';
-export * from './export.service';
 export * from './mutable';
 export * from './plugin-on-init';
 export * from './plugin-lazy-load';
