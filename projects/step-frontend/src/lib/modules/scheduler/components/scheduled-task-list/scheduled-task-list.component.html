@@ -13,7 +13,7 @@
         type="button"
         mat-mini-fab
         color="primary"
-        matTooltip="New task"
+        matTooltip="New schedule"
         matTooltipPosition="below"
         [disabled]="!('task-write' | hasRight | async)"
         (click)="_logic.createTask()"
@@ -87,7 +87,7 @@
         </button>
         <button
           mat-icon-button
-          matTooltip="Execute task"
+          matTooltip="Execute schedule"
           [disabled]="!('plan-execute' | hasRight | async)"
           (click)="_logic.executeTask(element)"
         >
@@ -95,7 +95,7 @@
         </button>
         <button
           mat-icon-button
-          matTooltip="Edit task"
+          matTooltip="Edit schedule"
           [disabled]="!('task-write' | hasRight | async)"
           (click)="_logic.editTask(element).subscribe()"
         >
@@ -103,7 +103,7 @@
         </button>
         <button
           mat-icon-button
-          matTooltip="Delete task"
+          matTooltip="Delete schedule"
           [disabled]="!('task-delete' | hasRight | async)"
           (click)="_logic.deleteTask(element)"
         >
