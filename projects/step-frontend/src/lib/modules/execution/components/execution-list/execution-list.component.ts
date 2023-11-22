@@ -48,6 +48,6 @@ export class ExecutionListComponent {
   }
 
   navigateToExecution(id: string): void {
-    this._router.navigateByUrl(`/root/executions/${id}`);
+    this._router.navigate(['root', 'executions', id], { queryParamsHandling: 'preserve' });
   }
 }

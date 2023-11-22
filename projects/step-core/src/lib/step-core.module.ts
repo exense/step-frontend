@@ -88,6 +88,7 @@ import { TriggerPopoverDirective } from './directives/trigger-popover.directive'
 import { HtmlDescriptionCellComponent } from './components/html-description-cell/html-description-cell.component';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { PopoverContentDirective } from './directives/popover-content.directive';
+import { ReportNodeIconComponent } from './components/report-node-icon/report-node-icon.component';
 
 @NgModule({
   declarations: [
@@ -97,6 +98,7 @@ import { PopoverContentDirective } from './directives/popover-content.directive'
     CapsLockDirective,
     TooltipImmediateCloseDirective,
     ReportNodeStatusComponent,
+    ReportNodeIconComponent,
     PlanLinkComponent,
     SchedulerTaskLinkComponent,
     PlanNamePipe,
@@ -201,6 +203,7 @@ import { PopoverContentDirective } from './directives/popover-content.directive'
     AngularSplitModule,
     WizardModule,
     ReportNodeStatusComponent,
+    ReportNodeIconComponent,
     PlanLinkComponent,
     SchedulerTaskLinkComponent,
     PlanNamePipe,
@@ -422,3 +425,4 @@ export * from './services/auto-refresh-model-factory.service';
 export * from './services/artefacts-factory.service';
 export * from './services/plan-open.service';
 export * from './services/keyword-executor.service';
+export * from './components/report-node-icon/report-node-icon.component';
