@@ -21,10 +21,10 @@ export class ScreenDialogsService {
       .afterClosed();
   }
 
-  removeScreen(dbId: string, label: string): Observable<any> {
+  removeScreen(screenId: string, label: string): Observable<any> {
     return this._dialogs.showDeleteWarning(1, `Screen "${label}"`).pipe(
       filter((result) => result),
-      switchMap(() => this._screensService.deleteInput(dbId))
+      switchMap(() => this._screensService.deleteInput(screenId))
     );
   }
 }
