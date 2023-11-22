@@ -327,9 +327,6 @@ angular
               console.log('changing current path  to ' + newPath);
             }
             $rootScope.currentPath = newPath;
-            if (!$rootScope.locationChangeBlocked) {
-              $location.path(newPath.join('/'));
-            }
           }
         });
 
