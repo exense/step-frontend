@@ -54,7 +54,7 @@ export class ExecutionsComponent implements OnInit, OnDestroy, ExecutionTabManag
 
   handleTabChange(id: string): void {
     const commands = id === ID_LIST ? ['.', ID_LIST] : ['.', 'open', id];
-    this._router.navigate(commands, { relativeTo: this._activatedRoute });
+    this._router.navigate(commands, { relativeTo: this._activatedRoute, queryParamsHandling: 'preserve' });
   }
 
   handleTabClose(tabId: string, openList: boolean = true): void {
