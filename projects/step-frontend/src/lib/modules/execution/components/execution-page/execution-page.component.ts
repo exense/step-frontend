@@ -56,7 +56,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy, ExecutionOpenN
     }
   };
 
-  updateUrl() {
+  private updateUrl() {
     let url = this.createUrl(this.activeTab);
     if (this.listTab.id === 'list') {
       //FIXME: workarround for url rewrite /executions => /executions/list should be removed with Angular Routing
@@ -100,10 +100,10 @@ export class ExecutionPageComponent implements OnInit, OnDestroy, ExecutionOpenN
     }
   }
 
-  replaceUrlSubTab(subTab: string): void {
+  private replaceUrlSubTab(subTab: string): void {
     let urlItems = this.getUrlParts();
     urlItems[3] = subTab;
-    this._router.navigate(urlItems);
+    this._router.navigate(urlItems, { replaceUrl: true });
   }
 
   handleTabClose(tabId: string, openList: boolean = true) {
@@ -115,7 +115,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy, ExecutionOpenN
     }
   }
 
-  switchTab(tab: ExecutionTab) {
+  private switchTab(tab: ExecutionTab) {
     this.tabs.forEach((tab) => (tab.active = false));
     this.activeTab = tab;
     tab.active = true;

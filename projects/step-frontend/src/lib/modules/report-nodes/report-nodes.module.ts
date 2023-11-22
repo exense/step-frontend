@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { StepCommonModule } from '../_common/step-common.module';
-import { ReportNodeIconComponent } from './components/report-node-icon/report-node-icon.component';
 import { AttachmentsComponent } from './components/attachments/attachments.component';
 import { AttachmentUrlPipe } from './pipes/attachment-url.pipe';
 import { AssertReportNodeShortComponent } from './components/assert-report-node-short/assert-report-node-short.component';
@@ -18,7 +17,6 @@ import { CallFunctionReportNodeExternalLinkPipe } from './pipes/call-function-re
 
 @NgModule({
   declarations: [
-    ReportNodeIconComponent,
     AttachmentsComponent,
     AttachmentUrlPipe,
     AssertReportNodeShortComponent,
@@ -35,6 +33,6 @@ import { CallFunctionReportNodeExternalLinkPipe } from './pipes/call-function-re
     CallFunctionReportNodeExternalLinkPipe,
   ],
   imports: [StepCommonModule],
-  exports: [ReportNodeShortComponent, ReportNodeIconComponent, ReportNodeComponent],
+  exports: [ReportNodeShortComponent, ReportNodeComponent],
 })
 export class ReportNodesModule {}
