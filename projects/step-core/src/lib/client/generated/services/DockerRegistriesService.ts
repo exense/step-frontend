@@ -105,6 +105,21 @@ export class DockerRegistriesService {
    * @returns DockerRegistryConfiguration default response
    * @throws ApiError
    */
+  public findDockerRegistrysByIds(requestBody?: Array<string>): Observable<Array<DockerRegistryConfiguration>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/docker/registry/find/by/ids',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Returns the list of entities matching the provided attributes
+   * @param requestBody
+   * @returns DockerRegistryConfiguration default response
+   * @throws ApiError
+   */
   public findDockerRegistrysByAttributes(
     requestBody?: Record<string, string>
   ): Observable<Array<DockerRegistryConfiguration>> {

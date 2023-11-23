@@ -92,6 +92,7 @@ import { EnterTextValueDialogComponent } from './components/enter-text-value-dia
 import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
 import { MessagesListDialogComponent } from './components/messages-list-dialog/messages-list-dialog.component';
 import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
+import { ReportNodeIconComponent } from './components/report-node-icon/report-node-icon.component';
 
 @NgModule({
   declarations: [
@@ -101,6 +102,7 @@ import { MessageDialogComponent } from './components/message-dialog/message-dial
     CapsLockDirective,
     TooltipImmediateCloseDirective,
     ReportNodeStatusComponent,
+    ReportNodeIconComponent,
     PlanLinkComponent,
     SchedulerTaskLinkComponent,
     PlanNamePipe,
@@ -209,6 +211,7 @@ import { MessageDialogComponent } from './components/message-dialog/message-dial
     AngularSplitModule,
     WizardModule,
     ReportNodeStatusComponent,
+    ReportNodeIconComponent,
     PlanLinkComponent,
     SchedulerTaskLinkComponent,
     PlanNamePipe,
@@ -437,3 +440,4 @@ export * from './components/enter-text-value-dialog/enter-text-value-dialog.comp
 export * from './components/confirmation-dialog/confirmation-dialog.component';
 export * from './components/messages-list-dialog/messages-list-dialog.component';
 export * from './components/message-dialog/message-dialog.component';
+export * from './components/report-node-icon/report-node-icon.component';

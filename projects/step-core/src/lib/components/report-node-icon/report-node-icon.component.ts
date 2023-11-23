@@ -1,7 +1,6 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { ArtefactService, Mutable, ReportNode } from '@exense/step-core';
-
-type FieldAccessor = Mutable<Pick<ReportNodeIconComponent, 'statusClass' | 'icon'>>;
+import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ArtefactService } from '../../services/artefact.service';
+import { ReportNode } from '../../client/step-client-module';
 
 @Component({
   selector: 'step-report-node-icon',
@@ -9,12 +8,12 @@ type FieldAccessor = Mutable<Pick<ReportNodeIconComponent, 'statusClass' | 'icon
   styleUrls: ['./report-node-icon.component.scss'],
 })
 export class ReportNodeIconComponent implements OnChanges {
-  readonly statusClass?: string;
-  readonly icon?: string;
+  private _artefactTypes = inject(ArtefactService);
+
+  protected statusClass?: string;
+  protected icon?: string;
 
   @Input() node?: ReportNode;
-
-  constructor(private _artefactTypes: ArtefactService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     const cNode = changes['node'];
@@ -24,18 +23,16 @@ export class ReportNodeIconComponent implements OnChanges {
   }
 
   private determineClassAndIcon(node?: ReportNode): void {
-    const fieldAccessor = this as FieldAccessor;
-
     if (!node) {
-      fieldAccessor.statusClass = undefined;
-      fieldAccessor.icon = undefined;
+      this.statusClass = undefined;
+      this.icon = undefined;
       return;
     }
 
     const icon =
       this._artefactTypes.getArtefactType(node.resolvedArtefact?._class)?.icon ?? this._artefactTypes.defaultIcon;
 
-    fieldAccessor.statusClass = `step-node-status-${node.status}`;
-    fieldAccessor.icon = icon;
+    this.statusClass = `step-node-status-${node.status}`;
+    this.icon = icon;
   }
 }
