@@ -1,9 +1,10 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, SubRouteData, SubRouterConfig } from '../shared';
 import { VIEW_ID_LINK_PREFIX } from '../modules/basics/services/view-id-link-prefix.token';
 import { Route, Router, Routes, UrlMatcher, UrlSegment } from '@angular/router';
 import { SimpleOutletComponent } from '../components/simple-outlet/simple-outlet.component';
+import { BehaviorSubject } from 'rxjs';
 
 export const SUB_ROUTE_DATA = Symbol('SubRouteData');
 
@@ -35,11 +36,14 @@ export interface Dashlet {
 @Injectable({
   providedIn: 'root',
 })
-export class ViewRegistryService {
+export class ViewRegistryService implements OnDestroy {
   private _viewIdLinkPrefix = inject(VIEW_ID_LINK_PREFIX);
   private _router = inject(Router);
 
   private temporaryRouteChildren = new Map<string, Routes>();
+
+  private isNavigationInitializedInternal$ = new BehaviorSubject(false);
+  readonly isNavigationInitialized$ = this.isNavigationInitializedInternal$.asObservable();
 
   registeredViews: { [key: string]: CustomView } = {};
   registeredMenuEntries: MenuEntry[] = [];
@@ -66,6 +70,17 @@ export class ViewRegistryService {
 
   constructor() {
     this.registerStandardMenuEntries();
+  }
+
+  ngOnDestroy(): void {
+    this.isNavigationInitializedInternal$.complete();
+  }
+
+  initialNavigation(): void {
+    this._router.initialNavigation();
+    if (!this.isNavigationInitializedInternal$.value) {
+      this.isNavigationInitializedInternal$.next(true);
+    }
   }
 
   /**
