@@ -15,7 +15,7 @@ import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR } from '@angular/f
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { BehaviorSubject, combineLatest, debounceTime, map, startWith, Subject, takeUntil } from 'rxjs';
-import { ArrayItemLabelValueExtractor } from '../../shared/array-item-label-value-extractor';
+import { ArrayItemLabelValueExtractor } from '../../services/array-item-label-value-extractor';
 import { KeyValue } from '@angular/common';
 
 type OnChange = (value?: string[]) => void;

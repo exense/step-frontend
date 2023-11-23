@@ -1,10 +1,14 @@
-import { inject, Injectable, Injector } from '@angular/core';
+import { inject, Injectable, Injector, OnDestroy } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, routesPrioritySortPredicate, SUB_ROUTE_DATA, SubRouteData, SubRouterConfig } from '../shared';
 import { Route, Router, Routes, UrlMatcher, UrlSegment } from '@angular/router';
 import { CheckPermissionsGuard } from './check-permissions.guard';
 import { VIEW_ID_LINK_PREFIX } from '../modules/basics/services/view-id-link-prefix.token';
 import { AuthService } from '../modules/basics/services/auth.service';
+import { SimpleOutletComponent } from '../components/simple-outlet/simple-outlet.component';
+import { BehaviorSubject } from 'rxjs';
+
+export const SUB_ROUTE_DATA = Symbol('SubRouteData');
 
 export interface CustomView {
   template: string;
@@ -34,11 +38,14 @@ export interface Dashlet {
 @Injectable({
   providedIn: 'root',
 })
-export class ViewRegistryService {
+export class ViewRegistryService implements OnDestroy {
   private _viewIdLinkPrefix = inject(VIEW_ID_LINK_PREFIX);
   private _router = inject(Router);
 
   private temporaryRouteChildren = new Map<string, Routes>();
+
+  private isNavigationInitializedInternal$ = new BehaviorSubject(false);
+  readonly isNavigationInitialized$ = this.isNavigationInitializedInternal$.asObservable();
 
   registeredViews: { [key: string]: CustomView } = {};
   registeredMenuEntries: MenuEntry[] = [];
@@ -67,6 +74,17 @@ export class ViewRegistryService {
     this.registerStandardMenuEntries();
   }
 
+  ngOnDestroy(): void {
+    this.isNavigationInitializedInternal$.complete();
+  }
+
+  initialNavigation(): void {
+    this._router.initialNavigation();
+    if (!this.isNavigationInitializedInternal$.value) {
+      this.isNavigationInitializedInternal$.next(true);
+    }
+  }
+
   /**
    * Registers basic set of main- and submenu entries
    */
@@ -81,7 +99,7 @@ export class ViewRegistryService {
     this.registerMenuEntry('Keywords', 'functions', 'keyword', { weight: 10, parentId: 'automation-root' });
     this.registerMenuEntry('Plans', 'plans', 'plan', { weight: 30, parentId: 'automation-root' });
     this.registerMenuEntry('Parameters', 'parameters', 'list', { weight: 40, parentId: 'automation-root' });
-    this.registerMenuEntry('Scheduler', 'scheduler', 'clock', { weight: 100, parentId: 'automation-root' });
+    this.registerMenuEntry('Schedules', 'scheduler', 'clock', { weight: 100, parentId: 'automation-root' });
 
     // Sub Menus Execute
     this.registerMenuEntry('Executions', 'executions', 'rocket', { weight: 10, parentId: 'execute-root' });

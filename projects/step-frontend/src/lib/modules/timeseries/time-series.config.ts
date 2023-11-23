@@ -17,7 +17,10 @@ export class TimeSeriesConfig {
   static readonly METRIC_TYPE_RESPONSE_TIME = 'response-time'; // this is for normal measurements
   static readonly METRIC_TYPE_SAMPLER = 'sampler'; // this is for thread groups measurements
   static readonly THREAD_GROUP_FILTER_FIELDS = ['eId', 'planId', 'taskId'];
-  static readonly RANGER_FILTER_FIELDS = ['eId', 'planId', 'taskId'];
+  static readonly EXECUTION_ID_ATTRIBUTE = 'eId';
+  static readonly PLAN_ID_ATTRIBUTE = 'planId';
+  static readonly TASK_ID_ATTRIBUTE = 'taskId';
+  static readonly RANGER_FILTER_FIELDS = [this.EXECUTION_ID_ATTRIBUTE, this.PLAN_ID_ATTRIBUTE, this.TASK_ID_ATTRIBUTE];
 
   static readonly AUTO_REFRESH_INTERVALS: RefreshInterval[] = [
     { label: '5 Sec', value: 5000 },

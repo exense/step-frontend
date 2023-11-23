@@ -56,17 +56,17 @@ export class ExecutionPageComponent implements OnInit, OnDestroy, ExecutionOpenN
     }
   };
 
-  updateUrl() {
+  private updateUrl() {
     let url = this.createUrl(this.activeTab);
     if (this.listTab.id === 'list') {
       //FIXME: workarround for url rewrite /executions => /executions/list should be removed with Angular Routing
-      this._router.navigateByUrl(url, { replaceUrl: true });
+      this._router.navigate(url, { replaceUrl: true, queryParamsHandling: 'preserve' });
     } else {
-      this._router.navigateByUrl(url);
+      this._router.navigate(url, { queryParamsHandling: 'preserve' });
     }
   }
 
-  createUrl(tab: ExecutionTab): string {
+  createUrl(tab: ExecutionTab): string[] {
     let urlItems = this.getUrlParts();
     urlItems[2] = tab.id;
     if (tab.subTab) {
@@ -74,7 +74,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy, ExecutionOpenN
     } else {
       urlItems.length = 3;
     }
-    return '/' + urlItems.join('/');
+    return urlItems;
   }
 
   handleTabChange(tabId: string) {
@@ -100,10 +100,10 @@ export class ExecutionPageComponent implements OnInit, OnDestroy, ExecutionOpenN
     }
   }
 
-  replaceUrlSubTab(subTab: string): void {
+  private replaceUrlSubTab(subTab: string): void {
     let urlItems = this.getUrlParts();
     urlItems[3] = subTab;
-    this._router.navigate(urlItems);
+    this._router.navigate(urlItems, { replaceUrl: true, queryParamsHandling: 'preserve' });
   }
 
   handleTabClose(tabId: string, openList: boolean = true) {
@@ -115,7 +115,7 @@ export class ExecutionPageComponent implements OnInit, OnDestroy, ExecutionOpenN
     }
   }
 
-  switchTab(tab: ExecutionTab) {
+  private switchTab(tab: ExecutionTab) {
     this.tabs.forEach((tab) => (tab.active = false));
     this.activeTab = tab;
     tab.active = true;

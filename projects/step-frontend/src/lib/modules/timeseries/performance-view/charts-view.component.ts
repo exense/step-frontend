@@ -360,6 +360,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   }
 
   private refreshAllCharts(): Observable<unknown> {
+    this.context.setChartsLockedState(false);
     this.findRequestBuilder = this.prepareFindRequestBuilder(this.settings); // we don't want to lose active filters
 
     const timeSelection = this.context.getSelectedTimeRange();
@@ -401,10 +402,16 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   }
 
   onChartsZoomReset() {
+    this.context.setChartsLockedState(false);
     this.context.resetZoom();
   }
 
+  onChartsLockChange(locked: boolean) {
+    this.context.setChartsLockedState(locked);
+  }
+
   onCompareChartsZoomReset() {
+    this.context.setChartsLockedState(false);
     this.compareModeContext?.resetZoom();
   }
 
@@ -640,6 +647,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
             scale: 'y',
             show: keywordSelection ? keywordSelection.isSelected : true,
             label: seriesKey,
+            labelItems: [seriesKey],
             legendName: seriesKey,
             id: seriesKey,
             data: [], // will override it
@@ -665,6 +673,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
             {
               scale: 'total',
               label: 'Total',
+              labelItems: ['Total'],
               legendName: 'Total',
               id: 'total',
               data: totalThroughput,

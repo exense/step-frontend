@@ -7,6 +7,7 @@ import {
   Input,
   OnChanges,
   OnDestroy,
+  OnInit,
   Optional,
   Output,
   QueryList,
@@ -75,7 +76,7 @@ export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Obser
   ],
 })
 export class TableComponent<T>
-  implements AfterViewInit, OnChanges, OnDestroy, TableSearch, TableFilter, TableReload, HasFilter
+  implements OnInit, AfterViewInit, OnChanges, OnDestroy, TableSearch, TableFilter, TableReload, HasFilter
 {
   @Output() onReload = new EventEmitter<unknown>();
   @Input() trackBy: TrackByFunction<T> = (index) => index;
@@ -84,6 +85,7 @@ export class TableComponent<T>
   tableDataSource?: TableDataSource<T>;
   @Input() pageSizeInputDisabled?: boolean;
   @Input() visibleColumns?: string[];
+  @Input() defaultSearch?: Record<string, SearchValue>;
 
   @Input() set filter(value: string | undefined) {
     if (value === this.filter) {
@@ -355,6 +357,14 @@ export class TableComponent<T>
     });
   }
 
+  private setupDefaultSearch(): void {
+    if (!this.defaultSearch) {
+      return;
+    }
+    const searchValue = { ...this.defaultSearch, ...this.search$.value };
+    this.search$.next(searchValue);
+  }
+
   onSearch(column: string, searchValue: SearchValue): void;
   onSearch(column: string, value: string, regex?: boolean): void;
   onSearch(column: string, searchValue: string | SearchValue, regex: boolean = true): void {
@@ -379,6 +389,10 @@ export class TableComponent<T>
   reload(): void {
     this.onReload.emit({});
     this.tableDataSource?.reload();
+  }
+
+  ngOnInit(): void {
+    this.setupDefaultSearch();
   }
 
   ngAfterViewInit(): void {

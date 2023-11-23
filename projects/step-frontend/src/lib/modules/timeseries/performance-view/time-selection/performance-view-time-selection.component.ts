@@ -93,6 +93,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
             {
               id: 'avg',
               label: 'Response Time',
+              labelItems: ['Response Time'],
               data: avgData,
               // value: (self, x) => Math.trunc(x) + ' ms',
               stroke: 'red',

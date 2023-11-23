@@ -22,6 +22,7 @@ import { MatMenu } from '@angular/material/menu';
 export class PopoverComponent {
   @Input() xPosition: MatMenu['xPosition'] = 'after';
   @Input() yPosition: MatMenu['yPosition'] = 'above';
+  @Input() displayByClick = false;
 
   @Output() toggledEvent = new EventEmitter<boolean>();
 
@@ -31,21 +32,39 @@ export class PopoverComponent {
 
   protected isMouseOverPopover = false;
 
-  @HostListener('click')
-  private togglePopover(): void {
+  @HostListener('click', ['$event'])
+  private togglePopover($event?: MouseEvent): void {
+    if ($event) {
+      $event.preventDefault();
+      $event.stopImmediatePropagation();
+    }
     this.toggled = !this.toggled;
     this.toggled ? this.triggerPopoverDirective.openMenu() : this.triggerPopoverDirective.closeMenu();
     this.toggledEvent.emit(this.toggled);
   }
 
+  @HostListener('document:click')
+  private handleDocumentClick(): void {
+    if (!this.displayByClick || !this.toggled) {
+      return;
+    }
+    this.togglePopover();
+  }
+
   @HostListener('mouseenter')
   protected onPopoverMouseEnter(): void {
+    if (this.displayByClick) {
+      return;
+    }
     this.isMouseOverPopover = true;
     this.triggerPopoverDirective.openMenu();
   }
 
   @HostListener('mouseleave')
   protected onPopoverMouseLeave(): void {
+    if (this.displayByClick) {
+      return;
+    }
     this.isMouseOverPopover = false;
     this.closePopover();
   }

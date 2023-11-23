@@ -39,8 +39,9 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   @Input() settings!: TSChartSettings;
   @Input() syncKey: string | undefined; // all the charts with the same syncKey in the app will be synced
 
-  @Output() onZoomReset = new EventEmitter<void>();
-  @Output() onZoomChange = new EventEmitter<TSTimeRange>();
+  @Output() zoomReset = new EventEmitter<void>();
+  @Output() zoomChange = new EventEmitter<TSTimeRange>();
+  @Output() lockStateChange = new EventEmitter<boolean>();
 
   uplot!: uPlot;
 
@@ -115,7 +116,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       bind: {
         dblclick: (self: uPlot, target: HTMLElement, handler: MouseListener) => {
           return (e: any) => {
-            this.onZoomReset.emit();
+            this.zoomReset.emit();
             handler(e);
             return null;
           };
@@ -138,13 +139,14 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       if (series.id) {
         this.seriesIndexesByIds[series.id] = i + 1; // because the first series is the time
       }
+      series.label = this.mergeLabelItems(series.labelItems);
       this.chartMetadata.push(series.metadata || []);
       if (series.stroke) {
         // aggregate series don't have stroke (e.g total)
         this.legendSettings.items.push({
           seriesId: series.id,
           color: (series.stroke as string) || '#cccccc',
-          label: series.legendName,
+          label: this.mergeLabelItems(series.labelItems),
           isVisible: series.show ?? true,
         });
       }
@@ -196,7 +198,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
             const min = u.posToVal(u.select.left, 'x');
             const max = u.posToVal(u.select.left + u.select.width, 'x');
             if (min < max) {
-              this.onZoomChange.next({ from: min, to: max });
+              this.zoomChange.emit({ from: min, to: max });
             }
           },
           ...(settings.hooks?.setSelect || []),
@@ -299,6 +301,39 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       this.showSeries(id);
     } else {
       this.hideSeries(id);
+    }
+  }
+
+  setLabelItem(seriesId: string, labelIndex: number, label?: string): void {
+    const index = this.seriesIndexesByIds[seriesId];
+    if (index === undefined || !label) return;
+    const series = this.uplot.series[index];
+    // @ts-ignore
+    const labelItems = series.labelItems;
+    labelItems[labelIndex] = label;
+    const finalLabel = this.mergeLabelItems(labelItems);
+    series.label = finalLabel;
+    const legendItem = this.legendSettings.items.find((i) => i.seriesId === seriesId);
+    if (legendItem) {
+      legendItem.label = finalLabel;
+    }
+  }
+
+  private mergeLabelItems(items: (string | undefined)[]): string {
+    return items.map((i) => (i ??  '<Empty>')).join(' | ');
+  }
+
+  setSeriesLabel(id: string, label: string): void {
+    if (!label) {
+      return;
+    }
+    const index = this.seriesIndexesByIds[id];
+    if (index === undefined) return;
+    const series = this.uplot.series[index];
+    series.label = label;
+    const legendItem = this.legendSettings.items.find((i) => i.seriesId === id);
+    if (legendItem) {
+      legendItem.label = label;
     }
   }
 
