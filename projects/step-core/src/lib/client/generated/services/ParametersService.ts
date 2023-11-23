@@ -103,6 +103,21 @@ export class ParametersService {
    * @returns Parameter default response
    * @throws ApiError
    */
+  public findParametersByIds(requestBody?: Array<string>): Observable<Array<Parameter>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/parameters/find/by/ids',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Returns the list of entities matching the provided attributes
+   * @param requestBody
+   * @returns Parameter default response
+   * @throws ApiError
+   */
   public findParametersByAttributes(requestBody?: Record<string, string>): Observable<Array<Parameter>> {
     return this.httpRequest.request({
       method: 'POST',

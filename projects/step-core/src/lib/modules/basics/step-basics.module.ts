@@ -34,6 +34,8 @@ import { ProjectSwitchDialogComponent } from './components/project-switch-dialog
 import { ArrayInputComponent } from './components/array-input/array-input.component';
 import { RouterModule } from '@angular/router';
 import { RangeFilterComponent } from './components/range-filter/range-filter.component';
+import { StringArrayInputComponent } from './components/string-array-input/string-array-input.component';
+import { ArrayItemLabelPipe } from './pipes/array-item-label.pipe';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -69,6 +71,8 @@ import { RangeFilterComponent } from './components/range-filter/range-filter.com
     TimeInputComponent,
     ArrayInputComponent,
     RangeFilterComponent,
+    StringArrayInputComponent,
+    ArrayItemLabelPipe,
   ],
   exports: [
     ResourceLabelComponent,
@@ -103,6 +107,8 @@ import { RangeFilterComponent } from './components/range-filter/range-filter.com
     ArrayInputComponent,
     RouterModule,
     RangeFilterComponent,
+    StringArrayInputComponent,
+    ArrayItemLabelPipe,
   ],
 })
 export class StepBasicsModule {}
@@ -125,9 +131,11 @@ export * from './components/upload-container/upload-container.component';
 export * from './components/array-input/array-input.component';
 export * from './components/time-input/time-input.component';
 export * from './components/range-filter/range-filter.component';
+export * from './components/string-array-input/string-array-input.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
 export * from './pipes/has-right.pipe';
+export * from './pipes/array-item-label.pipe';
 export * from './services/credentials.service';
 export * from './services/auth.service';
 export * from './services/item-by-id-cache.service';
@@ -157,7 +165,7 @@ export * from './directives/prevent-chars.directive';
 export * from './directives/label-addon.directive';
 export * from './shared/repository-parameters.token';
 export * from './repository-parameters-initializer';
-export * from './shared/array-item-label-value-extractor';
+export * from './services/array-item-label-value-extractor';
 export * from './shared/storage-proxy';
 export * from './shared/storage.token';
 export * from './shared/multiple-projects-strategy';

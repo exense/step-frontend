@@ -1,11 +1,13 @@
 .step-popover-menu {
   margin-bottom: 1rem;
-  margin-left: calc(-50% + 2rem);
-  min-width: inherit;
+  margin-left: 0;
+  min-width: unset !important;
   width: unset !important;
   max-width: inherit !important;
 
   .mat-menu-item {
+    user-select: auto;
+    cursor: default;
     height: auto;
     white-space: normal;
     line-height: inherit;

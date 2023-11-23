@@ -165,6 +165,21 @@ export class PlansService {
    * @returns Plan default response
    * @throws ApiError
    */
+  public findPlansByIds(requestBody?: Array<string>): Observable<Array<Plan>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/plans/find/by/ids',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Returns the list of entities matching the provided attributes
+   * @param requestBody
+   * @returns Plan default response
+   * @throws ApiError
+   */
   public findPlansByAttributes(requestBody?: Record<string, string>): Observable<Array<Plan>> {
     return this.httpRequest.request({
       method: 'POST',

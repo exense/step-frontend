@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { AuthService } from '../modules/basics/services/auth.service';
 import { ViewRegistryService } from './view-registry.service';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
@@ -17,8 +17,24 @@ export class DashboardService {
     private _viewRegistryService: ViewRegistryService
   ) {}
 
+  generateDashboardLink(parameters: Record<string, any>): string {
+    let httpParams = new HttpParams();
+    Object.keys(parameters).forEach((key) => {
+      httpParams = httpParams.append(key, parameters[key]);
+    });
+    httpParams = httpParams.append('tsParams', Object.keys(parameters).join(','));
+
+    return `#/root/analytics?${httpParams.toString()}`;
+  }
+
   getDashboardLink(taskId: string): string {
-    return `#/root/analytics?taskId=${taskId}&refresh=1&relativeRange=${ONE_DAY_MS}&tsParams=taskId,refresh,relativeRange`;
+    const parameters = {
+      taskId,
+      refresh: 1,
+      relativeRange: ONE_DAY_MS,
+    };
+
+    return this.generateDashboardLink(parameters);
   }
 }
 

@@ -5,8 +5,15 @@ import { inject, Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
-import { ExecutiontTaskParameters, SchedulerService } from '../../generated';
-import { StepDataSource, TableRemoteDataSourceFactoryService } from '../../table/step-table-client.module';
+import { Execution, ExecutiontTaskParameters, SchedulerService } from '../../generated';
+import {
+  StepDataSource,
+  TableApiWrapperService,
+  TableCollectionFilter,
+  TableRemoteDataSourceFactoryService,
+} from '../../table/step-table-client.module';
+import { CompareCondition } from '../../../modules/basics/shared/compare-condition.enum';
+import { map } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedSchedulerService extends SchedulerService {
@@ -14,6 +21,7 @@ export class AugmentedSchedulerService extends SchedulerService {
 
   private _httpClient = inject(HttpClient);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
+  private _tableApiWrapper = inject(TableApiWrapperService);
 
   createSelectionDataSource(): StepDataSource<ExecutiontTaskParameters> {
     return this._dataSourceFactory.createDataSource(this.TASKS_TABLE_ID, {
@@ -38,5 +46,22 @@ export class AugmentedSchedulerService extends SchedulerService {
 
   isSchedulerEnabled(): Observable<boolean> {
     return this._httpClient.get<boolean>('rest/settings/scheduler_enabled');
+  }
+
+  searchByIds(scheduleIds: string[]): Observable<ExecutiontTaskParameters[]> {
+    const idsFilter: TableCollectionFilter = {
+      collectionFilter: {
+        type: CompareCondition.OR,
+        children: scheduleIds.map((expectedValue) => ({
+          type: CompareCondition.EQUALS,
+          field: 'id',
+          expectedValue,
+        })),
+      },
+    };
+
+    return this._tableApiWrapper
+      .requestTable<ExecutiontTaskParameters>(this.TASKS_TABLE_ID, { filters: [idsFilter] })
+      .pipe(map((response) => response.data));
   }
 }

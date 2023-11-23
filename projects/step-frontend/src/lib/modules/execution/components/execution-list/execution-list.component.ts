@@ -50,7 +50,7 @@ export class ExecutionListComponent {
   }
 
   navigateToExecution(id: string): void {
-    from(this._router.navigateByUrl(`/root/executions/${id}`)).subscribe(() => {
+    from(this._router.navigate(['root', 'executions', id], { queryParamsHandling: 'preserve' })).subscribe(() => {
       this._executionOpenNotifier?.openNotify(id);
     });
   }

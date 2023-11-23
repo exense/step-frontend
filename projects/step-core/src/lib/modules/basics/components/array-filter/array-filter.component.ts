@@ -1,5 +1,5 @@
 import { Component, forwardRef, Input, OnChanges, SimpleChanges, TrackByFunction } from '@angular/core';
-import { ArrayItemLabelValueExtractor } from '../../shared/array-item-label-value-extractor';
+import { ArrayItemLabelValueExtractor } from '../../services/array-item-label-value-extractor';
 import { KeyValue } from '@angular/common';
 import { BaseFilterComponent } from '../base-filter/base-filter.component';
 import { FormBuilder, FormControl } from '@angular/forms';
