@@ -1,14 +1,10 @@
-import { inject, Injectable, Injector, OnDestroy } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { AJS_MODULE, routesPrioritySortPredicate, SUB_ROUTE_DATA, SubRouteData, SubRouterConfig } from '../shared';
 import { Route, Router, Routes, UrlMatcher, UrlSegment } from '@angular/router';
 import { CheckPermissionsGuard } from './check-permissions.guard';
 import { VIEW_ID_LINK_PREFIX } from '../modules/basics/services/view-id-link-prefix.token';
-import { AuthService } from '../modules/basics/services/auth.service';
-import { SimpleOutletComponent } from '../components/simple-outlet/simple-outlet.component';
 import { BehaviorSubject } from 'rxjs';
-
-export const SUB_ROUTE_DATA = Symbol('SubRouteData');
 
 export interface CustomView {
   template: string;
