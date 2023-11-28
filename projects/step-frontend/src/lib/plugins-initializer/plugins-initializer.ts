@@ -35,6 +35,8 @@ const IGNORE_PLUGINS: ReadonlyArray<string> = [
   'EnterpriseArtefacts',
   'wizard',
   'messages',
+  'astraPlugin',
+  'K6',
 ];
 
 // For testing purposes only
