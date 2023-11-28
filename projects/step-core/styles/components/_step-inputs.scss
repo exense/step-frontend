@@ -97,6 +97,11 @@ $border-radius: 8px;
       display: flex;
       justify-content: space-between;
 
+      &.align-left {
+        justify-content: flex-start;
+        gap: 0.5rem;
+      }
+
       & > .label-addon:empty {
         display: none;
       }
