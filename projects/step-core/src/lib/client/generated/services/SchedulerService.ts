@@ -12,6 +12,7 @@ import type { TableRequest } from '../models/TableRequest';
 import type { TableResponseExecutiontTaskParameters } from '../models/TableResponseExecutiontTaskParameters';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
+import { mergeMap, throwError, timer } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class SchedulerService {
@@ -170,6 +171,12 @@ export class SchedulerService {
    * @throws ApiError
    */
   public findExecutionTasksByIds(requestBody?: Array<string>): Observable<Array<ExecutiontTaskParameters>> {
+    return timer(2000) // Delay of 2 seconds
+      .pipe(
+        mergeMap(() => {
+          throw new Error('This is a delayed error!');
+        })
+      );
     return this.httpRequest.request({
       method: 'POST',
       url: '/scheduler/task/find/by/ids',

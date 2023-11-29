@@ -623,7 +623,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
           ? this.selectedCompareResponseTimeMetric
           : this.selectedResponseTimeMetric;
         response.matrixKeys.map((key, i) => {
-          const seriesKey = this.getSeriesKey(key, groupDimensions);
+          const seriesKey = TimeSeriesUtils.getSeriesKey(key, groupDimensions);
           const responseTimeData: (number | null | undefined)[] = [];
           const color = this.keywordsService.getColor(seriesKey);
           const metadata: any[] = [];
@@ -813,16 +813,6 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     }
     this.selectedThroughputMetric = metric;
     this.switchThroughputMetric(this.throughputChart, this.byKeywordsChartResponseCache, metric);
-  }
-
-  getSeriesKey(attributes: BucketAttributes, groupDimensions: string[]): string {
-    if (Object.keys(attributes).length === 0) {
-      return '<empty>';
-    }
-    return groupDimensions
-      .map((field) => attributes[field])
-      .filter((f) => !!f)
-      .join(' | ');
   }
 
   private getContext(compareMode = false): TimeSeriesContext {
