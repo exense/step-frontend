@@ -409,157 +409,6 @@ angular
     };
   })
 
-  .factory('Dialogs', function ($rootScope, $uibModal, EntityRegistry, $sce) {
-    var dialogs = {};
-
-    /*
-     * i = number of items
-     * itemName (optional) the name of the item (often with the category in front)
-     */
-    dialogs.showDeleteWarning = function (i, itemName, secondaryText) {
-      var msg;
-      if (i == undefined || i == 1) {
-        if (itemName) {
-          msg = 'Are you sure you want to delete the ' + itemName + '?';
-        } else {
-          msg = 'Are you sure you want to delete this item?';
-        }
-      } else {
-        msg = 'Are you sure you want to delete these ' + i + ' items?';
-      }
-
-      if (secondaryText) {
-        msg += '\n\n' + secondaryText;
-      }
-
-      return dialogs.showWarning(msg);
-    };
-
-    dialogs.showEntityInAnotherProject = function (newProjectName) {
-      var msg;
-      if (newProjectName) {
-        msg = 'This entity is part of the project "' + newProjectName + '". Do you wish to switch to this project?';
-      } else {
-        msg = 'This entity is part of another project. Do you wish to switch to this project?';
-      }
-
-      return dialogs.showWarning(msg);
-    };
-
-    dialogs.showWarning = function (msg) {
-      var modalInstance = $uibModal.open({
-        backdrop: 'static',
-        animation: false,
-        templateUrl: 'partials/confirmationDialog.html',
-        controller: 'DialogCtrl',
-        resolve: {
-          message: function () {
-            return msg;
-          },
-        },
-      });
-      return modalInstance.result;
-    };
-
-
-    dialogs.showErrorMsg = function (msg, callback) {
-      var modalInstance = $uibModal
-        .open({
-          backdrop: 'static',
-          animation: false,
-          templateUrl: 'partials/messageDialog.html',
-          controller: 'DialogCtrl',
-          resolve: {
-            message: function () {
-              return $sce.trustAsHtml(msg);
-            },
-          },
-        })
-        .result.then(function () {
-          if (callback) {
-            callback();
-          }
-        });
-      return modalInstance.result;
-    };
-
-    dialogs.showListOfMsgs = function (messages) {
-      var modalInstance = $uibModal.open({
-        backdrop: 'static',
-        animation: false,
-        templateUrl: 'partials/messagesListDialog.html',
-        windowClass: 'raised-z-index',
-        controller: 'DialogCtrl',
-        resolve: {
-          message: function () {
-            return messages;
-          },
-        },
-      });
-      return modalInstance.result;
-    };
-
-    dialogs.editTextField = function (scope) {
-      var modalInstance = $uibModal
-        .open({
-          backdrop: 'static',
-          animation: false,
-          templateUrl: 'partials/textFieldDialog.html',
-          size: 'lg',
-          controller: 'DialogCtrl',
-          resolve: {
-            message: function () {
-              return scope.ngModel;
-            },
-          },
-        })
-        .result.then(
-          function (value) {
-            // Use the value you passed from the $modalInstance.close() call
-            scope.ngModel = value;
-          },
-          function (dismissed) {
-            // Use the value you passed from the $modalInstance.dismiss() call
-          }
-        );
-    };
-    //template as param?
-    //sizes: sm, md, lg
-    //templates: enterValueDialog or enterTextValueDialog
-    dialogs.enterValue = function (title, message, size, template, functionOnSuccess) {
-      var modalInstance = $uibModal
-        .open({
-          backdrop: 'static',
-          animation: false,
-          templateUrl: 'partials/' + template + '.html',
-          controller: 'ExtentedDialogCtrl',
-          size: size,
-          resolve: {
-            message: function () {
-              return message;
-            },
-            title: function () {
-              return title;
-            },
-          },
-        })
-        .result.then(
-          function (value) {
-            // Use the value you passed from the $modalInstance.close() call
-            functionOnSuccess(value);
-            //scope.ngModel = value;
-          },
-          function (dismissed) {
-            // Use the value you passed from the $modalInstance.dismiss() call
-          }
-        );
-    };
-
-
-    return dialogs;
-  })
-
-
   .directive('autofocus', function ($timeout) {
     return {
       restrict: 'A',
@@ -622,28 +471,28 @@ angular
     const service = this;
 
     service.response = function (response) {
-      const Dialogs = $injector.get('Dialogs');
+      const DialogsService = $injector.get('DialogsService');
 
       const responsePayload = response?.data;
       if (responsePayload?.error) {
-        Dialogs.showErrorMsg(responsePayload.error);
+        DialogsService.showErrorMsg(responsePayload.error).subscribe();
       }
 
       return response || $q.when(response);
     };
 
     service.responseError = function (response) {
-      const Dialogs = $injector.get('Dialogs');
+      const DialogsService = $injector.get('DialogsService');
       const responsePayload = response?.data;
       if (response.status !== 200 && responsePayload?.errorMessage) {
-        Dialogs.showErrorMsg(responsePayload.errorMessage);
+        DialogsService.showErrorMsg(responsePayload.errorMessage).subscribe();
       } else {
         // Legacy error handling
         if (response.status === 500) {
           if (responsePayload?.metaMessage?.includes('org.rtm.stream.UnknownStreamException')) {
             console.log('genericErrorInterceptor for rtm: ' + responsePayload.metaMessage);
           } else {
-            Dialogs.showErrorMsg(responsePayload);
+            DialogsService.showErrorMsg(responsePayload).subscribe();
           }
         }
       }

@@ -1,17 +1,18 @@
 import { DOCUMENT } from '@angular/common';
 import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Observable, catchError, map, of, switchMap } from 'rxjs';
+import { Observable, filter, switchMap } from 'rxjs';
 import { Resource, ResourcesService } from '../../../client/step-client-module';
+import { IsUsedByDialogService } from '../../../services/is-used-by-dialog.service';
+import { DialogsService } from '../../../shared';
 import {
   FileAlreadyExistingDialogComponent,
   FileAlreadyExistingDialogData,
 } from '../components/file-already-existing-dialog/file-already-existing-dialog.component';
 import { SearchResourceDialogComponent } from '../components/search-resource-dialog/search-resource-dialog.component';
 import { UpdateResourceWarningDialogComponent } from '../components/update-resource-warning-dialog/update-resource-warning-dialog.component';
-import { DialogsService, a1Promise2Observable } from '../../../shared';
 import { UpdateResourceWarningResultState } from '../shared/update-resource-warning-result-state.enum';
-import { IsUsedByDialogService } from '../../../services/is-used-by-dialog.service';
+
 const RESOURCE_SEARCH_TYPE = 'RESOURCE_ID';
 
 @Injectable({
@@ -25,10 +26,9 @@ export class ResourceDialogsService {
   private _isUsedByDialogs = inject(IsUsedByDialogService);
 
   deleteResource(id: string, label: string): Observable<boolean> {
-    return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Resource "${label}"`)).pipe(
-      switchMap(() => this._resourcesService.deleteResource(id)),
-      map(() => true),
-      catchError(() => of(false))
+    return this._dialogs.showDeleteWarning(1, `Resource "${label}"`).pipe(
+      filter((result) => result),
+      switchMap(() => this._resourcesService.deleteResource(id))
     );
   }
 

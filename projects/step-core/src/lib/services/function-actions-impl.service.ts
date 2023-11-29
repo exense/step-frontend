@@ -1,7 +1,7 @@
-import { Injectable, inject, Injector, EnvironmentInjector } from '@angular/core';
+import { EnvironmentInjector, Injectable, Injector, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { ILocationService } from 'angular';
-import { Observable, catchError, map, of, switchMap, tap, take } from 'rxjs';
+import { Observable, catchError, map, of, switchMap, take, tap } from 'rxjs';
 import { AugmentedKeywordsService, Keyword } from '../client/step-client-module';
 import { EditorResolverService, MultipleProjectsService } from '../modules/basics/step-basics.module';
 import { EntityDialogsService } from '../modules/entity/entity.module';
@@ -12,11 +12,10 @@ import {
   FunctionDialogsConfig,
   FunctionDialogsConfigFactoryService,
 } from '../modules/keywords-common/keywords-common.module';
-import { a1Promise2Observable, AJS_MODULE, DialogsService } from '../shared';
+import { AJS_MODULE, DialogsService } from '../shared';
 import { ExportDialogsService } from './export-dialogs.service';
 import { ImportDialogsService } from './import-dialogs.service';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
-import { Router } from '@angular/router';
 
 const CONFIGURER_KEYWORD_ID = 'configurerKeywordId';
 const ENTITY_TYPE = 'keyword';
@@ -80,13 +79,13 @@ export class FunctionActionsImplService implements FunctionActionsService {
   }
 
   openDeleteFunctionDialog(id: string, name: string): Observable<boolean> {
-    return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Keyword "${name}"`)).pipe(
-      map(() => true),
-      catchError(() => of(false)),
-      switchMap((isDeleteConfirmed) =>
-        isDeleteConfirmed ? this._functionApiService.deleteFunction(id).pipe(map(() => true)) : of(false)
-      )
-    );
+    return this._dialogs
+      .showDeleteWarning(1, `Keyword "${name}"`)
+      .pipe(
+        switchMap((isDeleteConfirmed) =>
+          isDeleteConfirmed ? this._functionApiService.deleteFunction(id).pipe(map(() => true)) : of(false)
+        )
+      );
   }
 
   openLookUpFunctionDialog(id: string, name: string): void {
@@ -119,7 +118,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
     return this.getFunctionEditor(keyword.id!).pipe(
       tap((path) => {
         if (!path) {
-          this._dialogs.showErrorMsg('No editor configured for this function type');
+          this._dialogs.showErrorMsg('No editor configured for this function type').subscribe();
           throw new Error('No path');
         }
       }),

@@ -1,4 +1,4 @@
-<div class="chart-wrapper" [class.pointer]="settings?.showExecutionsLinks" (stepElementResize)="resize()">
+<div class="chart-wrapper" [class.pointer]="settings.showExecutionsLinks" (stepElementResize)="resize()">
   <div #chart></div>
   <div class="no-data-tag" *ngIf="chartIsEmpty">No data...</div>
   <div class="no-data-tag" *ngIf="chartIsUnavailable">Chart is unavailable for current settings</div>

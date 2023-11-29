@@ -52,16 +52,10 @@ export class DynamicTextfieldComponent
   }
 
   editConstantValue(): void {
-    this._dialogsService.enterValue(
-      'Free text editor',
-      this.value.toString(),
-      'lg',
-      'enterTextValueDialog',
-      (value) => {
-        this.value = this.parseValue(value);
-        this.emitChanges();
-      }
-    );
+    this._dialogsService.enterValue('Free text editor', this.value.toString(), true).subscribe((value) => {
+      this.value = this.parseValue(value);
+      this.emitChanges();
+    });
   }
 
   private parseValue(value: string): string | number {

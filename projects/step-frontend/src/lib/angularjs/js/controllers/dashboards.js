@@ -30,7 +30,6 @@ angular
       $scope,
       $http,
       stateStorage,
-      Dialogs,
       ImportDialogs,
       AuthService,
     ) {
