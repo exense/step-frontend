@@ -1,5 +1,6 @@
 <div class="relative" #container>
   <div class="header-buttons">
+    <a routerLink="root/dashboards">Go to dashboard view</a>
     <div>
       <button mat-raised-button [matMenuTriggerFor]="refreshMenu">Refresh ({{ selectedRefreshInterval.label }})</button>
       <mat-menu #refreshMenu="matMenu">

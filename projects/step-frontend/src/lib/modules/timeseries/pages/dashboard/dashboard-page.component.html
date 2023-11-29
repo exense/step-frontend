@@ -1,0 +1,7 @@
+<div *ngIf="dashboard" style="margin: 12px">
+  <div style="font-size: 24px">{{ dashboard.name }}</div>
+
+  <div *ngFor="let settings of chartSettings" style="height: 300px; width: 800px">
+    <step-timeseries-chart *ngIf="settings" [settings]="settings"></step-timeseries-chart>
+  </div>
+</div>

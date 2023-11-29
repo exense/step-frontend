@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { EntityModule, StepCoreModule } from '@exense/step-core';
+import { EntityModule, SimpleOutletComponent, StepCoreModule, ViewRegistryService } from '@exense/step-core';
 import { TimeSeriesChartComponent } from './chart/time-series-chart.component';
 import { TSRangerComponent } from './ranger/ts-ranger.component';
 import { TableModule } from '@exense/step-core';
@@ -35,6 +35,9 @@ import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import { FilterBarPlanItemComponent } from './performance-view/filter-bar/item/plan/filter-bar-plan-item.component';
 import { MetricChartComponent } from './metric-chart/metric-chart.component';
 import { ResolutionPickerComponent } from './components/resolution-picker/resolution-picker.component';
+import { DashboardPageComponent } from './pages/dashboard/dashboard-page.component';
+import { PlanListComponent } from '../plan/components/plan-list/plan-list.component';
+import { PlanEditorComponent } from '../plan/components/plan-editor/plan-editor.component';
 
 @NgModule({
   declarations: [
@@ -61,8 +64,9 @@ import { ResolutionPickerComponent } from './components/resolution-picker/resolu
     FilterBarTaskItemComponent,
     MetricChartComponent,
     ResolutionPickerComponent,
+    DashboardPageComponent,
   ],
-  exports: [ExecutionPerformanceComponent, AnalyticsPageComponent, MetricChartComponent],
+  exports: [ExecutionPerformanceComponent, DashboardPageComponent, AnalyticsPageComponent, MetricChartComponent],
   providers: [{ provide: MatPaginatorIntl, useClass: NoTotalCountPaginator }],
   imports: [
     StepCoreModule,
@@ -79,4 +83,11 @@ import { ResolutionPickerComponent } from './components/resolution-picker/resolu
     EntityModule,
   ],
 })
-export class TimeSeriesModule {}
+export class TimeSeriesModule {
+  constructor(_viewRegistry: ViewRegistryService) {
+    _viewRegistry.registerRoute({
+      path: 'dashboards',
+      component: DashboardPageComponent,
+    });
+  }
+}

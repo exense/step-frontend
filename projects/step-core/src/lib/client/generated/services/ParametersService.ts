@@ -98,7 +98,7 @@ export class ParametersService {
   }
 
   /**
-   * Returns the list of entities matching the provided attributes
+   * Returns the list of entities for the provided list of IDs
    * @param requestBody
    * @returns Parameter default response
    * @throws ApiError
