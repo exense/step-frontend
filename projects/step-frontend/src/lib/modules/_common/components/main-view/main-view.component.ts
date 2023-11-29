@@ -1,7 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { Router } from '@angular/router';
-import { AJS_MODULE } from '@exense/step-core';
+import { AJS_MODULE, ViewRegistryService } from '@exense/step-core';
 
 @Component({
   selector: 'step-main-view',
@@ -9,10 +8,10 @@ import { AJS_MODULE } from '@exense/step-core';
   styleUrls: ['./main-view.component.scss'],
 })
 export class MainViewComponent implements OnInit {
-  private _router = inject(Router);
+  private _viewRegistry = inject(ViewRegistryService);
 
   ngOnInit(): void {
-    this._router.initialNavigation();
+    this._viewRegistry.initialNavigation();
   }
 }
 

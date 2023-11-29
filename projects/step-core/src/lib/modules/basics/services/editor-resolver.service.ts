@@ -20,7 +20,7 @@ export class EditorResolverService {
   }
 
   private proceedSearchParameter<T>(parameterName: string): Observable<T | undefined> {
-    const queryParams = this._activatedRoute.snapshot.queryParams;
+    const queryParams = { ...this._activatedRoute.snapshot.queryParams };
     const parameterValue = queryParams?.[parameterName];
     if (parameterValue === undefined) {
       return of(undefined);

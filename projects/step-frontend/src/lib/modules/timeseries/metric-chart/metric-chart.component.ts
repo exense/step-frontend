@@ -2,11 +2,18 @@ import { AfterViewInit, Component, inject, Input, OnChanges, OnInit, SimpleChang
 import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
 import { TSTimeRange } from '../chart/model/ts-time-range';
 import {
+  AugmentedSchedulerService,
   BucketAttributes,
   BucketResponse,
+  Execution,
+  ExecutionsService,
+  ExecutiontTaskParameters,
   FetchBucketsRequest,
   MetricAttribute,
   MetricType,
+  Plan,
+  PlansService,
+  SchedulerService,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
@@ -20,6 +27,8 @@ import { FilterUtils } from '../util/filter-utils';
 import { TimeseriesColorsPool } from '../util/timeseries-colors-pool';
 import MouseListener = uPlot.Cursor.MouseListener;
 import { TimeSeriesChartComponent } from '../chart/time-series-chart.component';
+import { ScheduledTaskLogicService } from '../../scheduler/services/scheduled-task-logic.service';
+import { Observable } from 'rxjs';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -53,6 +62,9 @@ export class MetricChartComponent implements OnInit, OnChanges {
   isLoading = false;
 
   private _timeSeriesService = inject(TimeSeriesService);
+  private _executionService = inject(ExecutionsService);
+  private _planService = inject(PlansService);
+  private _schedulerService = inject(SchedulerService);
 
   ngOnInit(): void {
     this.selectedRange = this.range;
@@ -137,13 +149,14 @@ export class MetricChartComponent implements OnInit, OnChanges {
   private createChartSettings(response: TimeSeriesAPIResponse, groupDimensions: string[]): TSChartSettings {
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const series: TSChartSeries[] = response.matrix.map((series, i) => {
-      const seriesLabel = this.getSeriesKey(response.matrixKeys[i], groupDimensions);
-      const color =
-        this.settings.renderingSettings?.seriesColors?.[seriesLabel] || this.colorsPool.getColor(seriesLabel);
+      const labelItems = this.getSeriesKeys(response.matrixKeys[i], groupDimensions);
+      const seriesKey = labelItems.join(' | ');
+      const color = this.settings.renderingSettings?.seriesColors?.[seriesKey] || this.colorsPool.getColor(seriesKey);
       return {
-        id: seriesLabel,
-        label: seriesLabel,
-        legendName: seriesLabel,
+        id: seriesKey,
+        label: seriesKey,
+        labelItems: labelItems,
+        legendName: seriesKey,
         data: series.map((b) => this.getBucketValue(b, this.selectedAggregate!)),
         value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x),
         stroke: color,
@@ -153,6 +166,37 @@ export class MetricChartComponent implements OnInit, OnChanges {
       };
     });
     let yAxesUnit = this.getUnitLabel(this.settings);
+
+    groupDimensions.forEach((dimension, i) => {
+      switch (dimension) {
+        case TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE:
+          this.fetchAndSetLabels(
+            series,
+            i,
+            (entitiesIds) => this._executionService.getExecutionsByIds(entitiesIds),
+            (e: Execution) => e.description!
+          );
+          break;
+        case TimeSeriesConfig.TASK_ID_ATTRIBUTE:
+          this.fetchAndSetLabels(
+            series,
+            i,
+            (entitiesIds) => this._schedulerService.findExecutionTasksByIds(entitiesIds),
+            (task: ExecutiontTaskParameters) => task.attributes?.['name']
+          );
+          break;
+        case TimeSeriesConfig.PLAN_ID_ATTRIBUTE:
+          this.fetchAndSetLabels(
+            series,
+            i,
+            (entitiesIds) => this._planService.findPlansByIds(entitiesIds),
+            (plan: Plan) => plan.attributes?.['name']
+          );
+          break;
+        default:
+          break;
+      }
+    });
 
     return {
       title: `${this.settings.displayName!} (${this.selectedAggregate}${
@@ -175,6 +219,45 @@ export class MetricChartComponent implements OnInit, OnChanges {
         },
       ],
     };
+  }
+
+  /**
+   * This function will fetch the entities found in the labels, and replace their ids with the appropriate name.
+   * @param series
+   * @param groupDimensionIndex
+   * @param fetchByIds
+   * @param mapEntityToLabel
+   * @private
+   */
+  private fetchAndSetLabels<T>(
+    series: TSChartSeries[],
+    groupDimensionIndex: number,
+    fetchByIds: (ids: string[]) => Observable<T[]>,
+    mapEntityToLabel: (entity: T) => string | undefined
+  ) {
+    const ids: string[] = series.map((s) => s.labelItems[groupDimensionIndex] as string).filter((id) => id);
+    if (!ids.length) {
+      return;
+    }
+    fetchByIds(ids).subscribe((entities) => {
+      const entitiesByIds = new Map<string, T>();
+      entities.forEach((entity) => {
+        // Assuming each entity has an 'id' property
+        const entityId = (entity as any).id as string; // Cast to any to access 'id' property
+        if (entityId) {
+          entitiesByIds.set(entityId, entity);
+        }
+      });
+      series.forEach((s) => {
+        const entityId = s.labelItems[groupDimensionIndex];
+        if (entityId) {
+          const entity = entitiesByIds.get(entityId);
+          if (entity) {
+            this.chart.setLabelItem(s.id, groupDimensionIndex, mapEntityToLabel(entity));
+          }
+        }
+      });
+    });
   }
 
   private getAxesFormatFunction(unit: string): (v: number) => string {
@@ -235,13 +318,10 @@ export class MetricChartComponent implements OnInit, OnChanges {
     }
   }
 
-  private getSeriesKey(attributes: BucketAttributes, groupDimensions: string[]): string {
+  private getSeriesKeys(attributes: BucketAttributes, groupDimensions: string[]): (string | undefined)[] {
     if (Object.keys(attributes).length === 0) {
-      return '<Empty>';
+      return [undefined];
     }
-    return groupDimensions
-      .map((field) => attributes[field])
-      .filter((f) => !!f)
-      .join(' | ');
+    return groupDimensions.map((field) => attributes[field]);
   }
 }
