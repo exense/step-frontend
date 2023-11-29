@@ -46,6 +46,7 @@ import { ReportTreeNodeUtilsService } from '../../services/report-tree-node-util
 import { EXECUTION_TREE_PAGING } from '../../services/execution-tree-paging';
 import { DOCUMENT } from '@angular/common';
 import { ViewFactoryService } from '../../services/view-factory.service';
+import { IncludeTestcases } from '../../shared/include-testcases.interface';
 
 const R_ERROR_KEY = /\\\\u([\d\w]{4})/gi;
 
@@ -119,22 +120,22 @@ export class ExecutionProgressComponent
   autoRefreshInterval: number = 0;
   autoRefreshIncreasedTo: number = 0;
 
-  readonly includedTestcases$: Observable<{ by: 'id' | 'name'; list: string[] } | null> =
-    this._testCasesSelection.selected$.pipe(
-      map((ids) => {
-        const testCases = this.testCases || [];
-        if (ids.length === testCases.length) {
-          return null;
-        }
-        const by = this.execution?.executionParameters?.repositoryObject?.repositoryID === 'local' ? 'id' : 'name';
+  readonly includedTestcases$: Observable<IncludeTestcases | undefined> = this._testCasesSelection.selected$.pipe(
+    map((ids) => {
+      const testCases = this.testCases || [];
+      if (ids.length === testCases.length) {
+        return undefined;
+      }
+      const by: IncludeTestcases['by'] =
+        this.execution?.executionParameters?.repositoryObject?.repositoryID === 'local' ? 'id' : 'name';
 
-        const list = testCases
-          .filter((testCase) => ids.includes(testCase.id!) || ids.includes(testCase.artefactID!))
-          .map(({ artefactID, name }) => (by === 'id' ? artefactID! : name!));
+      const list = testCases
+        .filter((testCase) => ids.includes(testCase.id!) || ids.includes(testCase.artefactID!))
+        .map(({ artefactID, name }) => (by === 'id' ? artefactID! : name!));
 
-        return { by, list };
-      })
-    );
+      return { by, list };
+    })
+  );
 
   @Input() eId?: string;
   @Input() isActive?: boolean;
