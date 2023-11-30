@@ -59,7 +59,7 @@ export class RepositoryComponent implements OnInit, OnDestroy {
 
   private setupLocationParams(): void {
     const search = this._activatedRoute.snapshot.queryParams;
-    this.isolateExecution = !!search.isolate;
+    this.isolateExecution = !!search['isolate'];
 
     if (search['user']) {
       this._auth.updateContext({ userID: search['user'] });
