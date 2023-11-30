@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import {
   BucketAttributes,
   BucketResponse,
@@ -6,12 +6,8 @@ import {
   DashboardItem,
   DashboardsService,
   DashboardView,
-  Execution,
-  ExecutiontTaskParameters,
   FetchBucketsRequest,
-  MetricType,
-  Plan,
-  TimeRangeSelection,
+  MetricAttribute,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
@@ -27,12 +23,25 @@ import uPlot = require('uplot');
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
+interface ChartConfig {
+  state: DashboardItem; // input
+  finalSettings?: TSChartSettings; // output
+
+  groupingAttributes: MetricAttributeSelection[];
+}
+
+interface MetricAttributeSelection extends MetricAttribute {
+  selected: boolean;
+}
+
 @Component({
   selector: 'step-dashboard-page',
   templateUrl: './dashboard-page.component.html',
   styleUrls: ['./dashboard-page.component.scss'],
 })
 export class DashboardPageComponent implements OnInit {
+  readonly AGGREGATES: AggregationType[] = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'RATE', 'MEDIAN'];
+
   private _timeSeriesService = inject(TimeSeriesService);
   private _dashboardService = inject(DashboardsService);
   colorsPool: TimeseriesColorsPool = new TimeseriesColorsPool();
@@ -40,27 +49,56 @@ export class DashboardPageComponent implements OnInit {
   dashboard!: DashboardView;
   chartSettings: TSChartSettings[] = [];
 
+  chartConfigs: ChartConfig[] = [];
+
   ngOnInit(): void {
     this._dashboardService.getAll1().subscribe((dashboards) => {
       this.dashboard = dashboards[0];
       this.chartSettings = new Array(this.dashboard!.dashlets!.length);
       this.dashboard.dashlets!.forEach((dashlet, i) => {
         const settings = dashlet.chartSettings!;
+        const primarySettings = settings.primaryAxes!;
         const grouping = settings.grouping || [];
         const request: FetchBucketsRequest = {
           start: this.dashboard.timeRange!.absoluteSelection!.from!,
           end: this.dashboard.timeRange!.absoluteSelection!.to!,
           groupDimensions: grouping,
-          oqlFilter: FilterUtils.objectToOQL({ 'attributes.metricType': `"${settings.primaryAxes!.metricKey!}"` }),
+          oqlFilter: FilterUtils.objectToOQL({ 'attributes.metricType': `"${settings.metricKey!}"` }),
           numberOfBuckets: 100,
-          //   percentiles: pclValues,
+          percentiles: this.getChartPclToRequest(primarySettings.aggregation!),
         };
 
+        const groupingSelection: MetricAttributeSelection[] =
+          settings.attributes?.map((a) => ({ ...a, selected: false })) || [];
+        settings.grouping?.forEach((a) => {
+          const foundAttribute = groupingSelection.find((attr) => attr.name === a);
+          if (foundAttribute) {
+            foundAttribute.selected = true;
+          }
+        });
+
+        const chartConfig: ChartConfig = {
+          state: this.dashboard,
+          groupingAttributes: groupingSelection,
+        };
+        this.chartConfigs.push(chartConfig);
+
         this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
-          this.chartSettings[i] = this.createChartSettings(dashlet!.name!, settings, response, grouping);
+          chartConfig.finalSettings = this.createChartSettings(dashlet!.name!, settings, response, grouping);
         });
       });
     });
+  }
+
+  private getChartPclToRequest(aggregation: AggregationType): number[] {
+    switch (aggregation) {
+      case 'MEDIAN':
+        return [50];
+      case 'PERCENTILE':
+        return [90, 98, 99];
+      default:
+        return [];
+    }
   }
 
   private createChartSettings(
@@ -75,7 +113,8 @@ export class DashboardPageComponent implements OnInit {
     const series: TSChartSeries[] = response.matrix.map((series, i) => {
       const labelItems = this.getSeriesKeys(response.matrixKeys[i], groupDimensions);
       const seriesKey = labelItems.join(' | ');
-      const color = this.colorsPool.getColor(seriesKey);
+      const color = primaryAxes.renderingSettings?.seriesColors?.[seriesKey] || this.colorsPool.getColor(seriesKey);
+
       return {
         id: seriesKey,
         label: seriesKey,

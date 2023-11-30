@@ -3,11 +3,23 @@
 /* eslint-disable */
 export const $ChartSettings = {
   properties: {
+    metricKey: {
+      type: 'string',
+    },
+    attributes: {
+      type: 'array',
+      contains: {
+        type: 'MetricAttribute',
+      },
+    },
     primaryAxes: {
       type: 'AxesSettings',
     },
-    secondaryAxes: {
-      type: 'AxesSettings',
+    filters: {
+      type: 'array',
+      contains: {
+        type: 'ChartFilterItem',
+      },
     },
     grouping: {
       type: 'array',
@@ -21,11 +33,11 @@ export const $ChartSettings = {
     inheritGlobalGrouping: {
       type: 'boolean',
     },
-    filters: {
-      type: 'array',
-      contains: {
-        type: 'ChartFilterItem',
-      },
+    readonlyGrouping: {
+      type: 'boolean',
+    },
+    readonlyAggregate: {
+      type: 'boolean',
     },
   },
 } as const;

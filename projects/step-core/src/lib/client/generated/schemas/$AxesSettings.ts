@@ -3,14 +3,17 @@
 /* eslint-disable */
 export const $AxesSettings = {
   properties: {
-    metricKey: {
-      type: 'string',
-    },
     aggregation: {
       type: 'Enum',
     },
     displayType: {
       type: 'Enum',
+    },
+    unit: {
+      type: 'string',
+    },
+    renderingSettings: {
+      type: 'MetricRenderingSettings',
     },
   },
 } as const;

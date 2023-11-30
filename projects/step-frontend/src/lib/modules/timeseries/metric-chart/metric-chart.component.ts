@@ -25,9 +25,7 @@ import { TimeSeriesConfig } from '../time-series.config';
 import uPlot = require('uplot');
 import { FilterUtils } from '../util/filter-utils';
 import { TimeseriesColorsPool } from '../util/timeseries-colors-pool';
-import MouseListener = uPlot.Cursor.MouseListener;
 import { TimeSeriesChartComponent } from '../chart/time-series-chart.component';
-import { ScheduledTaskLogicService } from '../../scheduler/services/scheduled-task-logic.service';
 import { Observable } from 'rxjs';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
