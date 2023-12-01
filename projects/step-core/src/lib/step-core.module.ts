@@ -93,6 +93,7 @@ import { ConfirmationDialogComponent } from './components/confirmation-dialog/co
 import { MessagesListDialogComponent } from './components/messages-list-dialog/messages-list-dialog.component';
 import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
 import { ReportNodeIconComponent } from './components/report-node-icon/report-node-icon.component';
+import { AutomationPackageCommonModule } from './modules/automation-package-common/automation-package-common.module';
 
 @NgModule({
   declarations: [
@@ -184,6 +185,7 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     JsonViewerModule,
     ResourceInputModule,
     KeywordsCommonModule,
+    AutomationPackageCommonModule,
     WizardModule,
     CronModule,
   ],
@@ -256,6 +258,7 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     ResourceInputModule,
     ProjectNamePipe,
     KeywordsCommonModule,
+    AutomationPackageCommonModule,
     MyAccountButtonComponent,
     SelectTaskComponent,
     ResourceInputWrapperComponent,
@@ -385,6 +388,7 @@ export * from './modules/json-viewer/json-viewer.module';
 export * from './modules/resource-input/resource-input.module';
 export * from './modules/keywords-common/keywords-common.module';
 export * from './modules/wizard/wizards.module';
+export * from './modules/automation-package-common/automation-package-common.module';
 export * from './modules/cron/cron.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/dynamic-attribute.pipe';
