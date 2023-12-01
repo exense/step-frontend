@@ -1,10 +1,10 @@
-import { Observable, tap } from 'rxjs';
 import { Component, HostListener, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ImportDialogData } from '../../shared/import-dialog-data.interface';
-import { AlertType } from '../../modules/basics/step-basics.module';
+import { Observable, tap } from 'rxjs';
 import { ImportsService } from '../../client/step-client-module';
+import { AlertType } from '../../modules/basics/step-basics.module';
 import { DialogsService } from '../../shared';
+import { ImportDialogData } from '../../shared/import-dialog-data.interface';
 
 @Component({
   selector: 'step-plan-import-dialog',
@@ -30,7 +30,7 @@ export class ImportDialogComponent {
   @HostListener('keydown.enter')
   save(): void {
     if (!this.resourcePath) {
-      this._dialogs.showErrorMsg('Upload not completed.');
+      this._dialogs.showErrorMsg('Upload not completed.').subscribe();
       return;
     }
     this.invokeImport()
@@ -42,8 +42,9 @@ export class ImportDialogComponent {
       .subscribe({
         next: (response: string[]) => {
           this._matDialogRef.close(true);
+
           if (!!response?.length) {
-            this._dialogs.showListOfMsgs(response);
+            this._dialogs.showListOfMsgs(response).subscribe();
           }
         },
         complete: () => {

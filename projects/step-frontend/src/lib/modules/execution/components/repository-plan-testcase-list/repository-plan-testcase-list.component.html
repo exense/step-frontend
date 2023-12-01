@@ -1,8 +1,8 @@
 <step-table [dataSource]="searchableRepositoryReport" matSort [matSortDisableClear]="true">
   <step-bulk-operations
     *stepAdditionalHeader
-    [(selectionType)]="selectionType"
-    (selectionTypeChange)="selectionTypeChange.emit(selectionType)"
+    [selectionType]="(selectionType$ | async)!"
+    (selectionTypeChange)="selectionType$.next($event)"
   ></step-bulk-operations>
 
   <ng-container matColumnDef="bulkSelection">

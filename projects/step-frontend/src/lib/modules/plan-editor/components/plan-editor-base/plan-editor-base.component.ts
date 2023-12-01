@@ -209,22 +209,26 @@ export class PlanEditorBaseComponent
     if (!this.id) {
       return;
     }
+
     const name = this._planEditService.plan!.attributes!['name'];
-    this._dialogsService.enterValue('Clone plan as', `${name}_Copy`, 'md', 'enterValueDialog', (value: string) => {
-      this._planEditorApi
-        .clonePlan(this.id!)
-        .pipe(
-          map((plan) => {
-            plan!.attributes!['name'] = value;
-            return plan;
-          }),
-          switchMap((plan) => this._planEditorApi.savePlan(plan)),
-          map(({ id }) => id)
+
+    this._dialogsService
+      .enterValue('Clone plan as', `${name}_Copy`)
+      .pipe(
+        switchMap((value) =>
+          this._planEditorApi.clonePlan(this.id!).pipe(
+            map((plan) => {
+              plan!.attributes!['name'] = value;
+              return plan;
+            }),
+            switchMap((plan) => this._planEditorApi.savePlan(plan)),
+            map(({ id }) => id)
+          )
         )
-        .subscribe((id) => {
-          this._planEditorApi.navigateToPlan(id);
-        });
-    });
+      )
+      .subscribe((id) => {
+        this._planEditorApi.navigateToPlan(id);
+      });
   }
 
   startInteractive(): void {
@@ -261,12 +265,12 @@ export class PlanEditorBaseComponent
           }),
           switchMap((plan) => {
             if (!plan) {
-              this._dialogsService.showErrorMsg('The related plan was not found');
+              this._dialogsService.showErrorMsg('The related plan was not found').subscribe();
               return of(undefined);
             }
 
             if (plan.toString() === NO_DATA) {
-              this._dialogsService.showErrorMsg('No editor configured for this plan type');
+              this._dialogsService.showErrorMsg('No editor configured for this plan type').subscribe();
               return of(undefined);
             }
 
@@ -286,11 +290,11 @@ export class PlanEditorBaseComponent
           }),
           switchMap((keyword) => {
             if (!keyword) {
-              this._dialogsService.showErrorMsg('The related keyword was not found');
+              this._dialogsService.showErrorMsg('The related keyword was not found').subscribe();
               return of('');
             }
             if (keyword.toString() === NO_DATA) {
-              this._dialogsService.showErrorMsg('No editor configured for this function type');
+              this._dialogsService.showErrorMsg('No editor configured for this function type').subscribe();
               return of('');
             }
             return this.openFunctionEditor(keyword as Keyword);
