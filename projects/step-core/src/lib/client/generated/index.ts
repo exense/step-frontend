@@ -17,6 +17,7 @@ export type { AsyncTaskStatusTableBulkOperationReport } from './models/AsyncTask
 export type { Attachment } from './models/Attachment';
 export type { AttachmentMeta } from './models/AttachmentMeta';
 export type { AttributeStats } from './models/AttributeStats';
+export type { AutomationPackage } from './models/AutomationPackage';
 export type { BucketAttributes } from './models/BucketAttributes';
 export type { BucketResponse } from './models/BucketResponse';
 export type { CallFunction } from './models/CallFunction';
@@ -131,6 +132,7 @@ export { $AsyncTaskStatusTableBulkOperationReport } from './schemas/$AsyncTaskSt
 export { $Attachment } from './schemas/$Attachment';
 export { $AttachmentMeta } from './schemas/$AttachmentMeta';
 export { $AttributeStats } from './schemas/$AttributeStats';
+export { $AutomationPackage } from './schemas/$AutomationPackage';
 export { $BucketAttributes } from './schemas/$BucketAttributes';
 export { $BucketResponse } from './schemas/$BucketResponse';
 export { $CallFunction } from './schemas/$CallFunction';
@@ -232,6 +234,7 @@ export { $Version } from './schemas/$Version';
 export { $ViewModel } from './schemas/$ViewModel';
 
 export { AsyncTasksService } from './services/AsyncTasksService';
+export { AutomationPackagesService } from './services/AutomationPackagesService';
 export { CollectionsService } from './services/CollectionsService';
 export { ControllerService } from './services/ControllerService';
 export { DockerRegistriesService } from './services/DockerRegistriesService';
@@ -247,7 +250,6 @@ export { ParametersService } from './services/ParametersService';
 export { PlansService } from './services/PlansService';
 export { PrivateApplicationService } from './services/PrivateApplicationService';
 export { PrivateDataPoolPluginService } from './services/PrivateDataPoolPluginService';
-export { PrivateStagingRepositoryService } from './services/PrivateStagingRepositoryService';
 export { PrivateViewPluginService } from './services/PrivateViewPluginService';
 export { QuotaManagerService } from './services/QuotaManagerService';
 export { ReferencesService } from './services/ReferencesService';

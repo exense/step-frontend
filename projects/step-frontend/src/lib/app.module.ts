@@ -18,6 +18,7 @@ import { PLUGINS_INITIALIZER } from './plugins-initializer/plugins-initializer';
 import { Settings } from 'luxon';
 import { RouterModule, Routes } from '@angular/router';
 import { LegacyOutletComponent } from './modules/_common/components/legacy-outlet/legacy-outlet.component';
+import { AutomationPackagesModule } from './modules/automation-packages/automation-packages.module';
 
 Settings.defaultLocale = 'en';
 
@@ -42,6 +43,7 @@ const ROOT_ROUTES: Routes = [
     AdminModule,
     PlanModule,
     FunctionModule,
+    AutomationPackagesModule,
     ExecutionModule,
     BrowserAnimationsModule,
     SchedulerModule,

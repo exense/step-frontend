@@ -1,0 +1,21 @@
+<step-modal-window title="Upload Automation Package">
+  <div step-modal-window-body>
+    <step-progress-bar *ngIf="progress$; else uploadForm" [progress$]="progress$"> </step-progress-bar>
+    <ng-template #uploadForm>
+      <step-form-field>
+        <step-label>Choose file:</step-label>
+        <input type="text" readonly [ngModel]="file?.name" />
+        <step-suffix class="button-suffix">
+          <button type="button" mat-stroked-button (click)="openFileChooseDialog()">
+            <step-icon name="folder"></step-icon>
+          </button>
+        </step-suffix>
+      </step-form-field>
+    </ng-template>
+  </div>
+  <input #fileInput type="file" (input)="selectFile()" />
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close [disabled]="!!progress$">Cancel</button>
+    <button type="button" mat-flat-button color="primary" (click)="upload()" [disabled]="!!progress$">Upload</button>
+  </div>
+</step-modal-window>

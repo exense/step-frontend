@@ -1,8 +1,9 @@
-import { HttpClient, HttpEventType, HttpProgressEvent, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { filter, Observable, of, shareReplay, switchMap } from 'rxjs';
+import { map, Observable, switchMap } from 'rxjs';
 import { Resource, ResourcesService, ResourceUploadResponse } from '../../generated';
 import { TableRemoteDataSourceFactoryService, StepDataSource } from '../../table/step-table-client.module';
+import { uploadWithProgress } from '../shared/pipe-operators';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedResourcesService extends ResourcesService {
@@ -51,53 +52,26 @@ export class AugmentedResourcesService extends ResourcesService {
 
     formData.set('file', file);
 
-    const stream$ = this._httpClient
-      .request('POST', `rest/resources${resourceId ? `/${resourceId}` : ''}/content`, {
-        body: formData,
-        params: {
-          type,
-          duplicateCheck,
-          directory,
-        },
-        headers: {
-          enctype: 'multipart/form-data',
-        },
-        observe: 'events',
-        responseType: 'arraybuffer',
-        reportProgress: true,
-      })
-      .pipe(shareReplay());
+    const request$ = this._httpClient.request('POST', `rest/resources${resourceId ? `/${resourceId}` : ''}/content`, {
+      body: formData,
+      params: {
+        type,
+        duplicateCheck,
+        directory,
+      },
+      headers: {
+        enctype: 'multipart/form-data',
+      },
+      observe: 'events',
+      responseType: 'arraybuffer',
+      reportProgress: true,
+    });
 
-    const progress$ = stream$.pipe(
-      filter((httpEvent) => httpEvent.type === HttpEventType.UploadProgress),
-      switchMap((httpEvent) => {
-        const httpProgressEvent = httpEvent as HttpProgressEvent;
-
-        const progressPercentage = this.calculateProgressPercentage(httpProgressEvent);
-
-        return of(progressPercentage);
-      })
+    const { progress$, response$: responseString$ } = uploadWithProgress(request$);
+    const response$ = responseString$.pipe(
+      map((responseString) => JSON.parse(responseString) as ResourceUploadResponse)
     );
-
-    const response$ = stream$.pipe(
-      filter((httpEvent) => httpEvent.type === HttpEventType.Response),
-      switchMap((httpEvent) => {
-        const httpResponse = httpEvent as HttpResponse<ArrayBuffer>;
-
-        if (!httpResponse.body) {
-          return of();
-        }
-
-        const resourceUploadResponse = this.decodeArrayBuffer<ResourceUploadResponse>(httpResponse.body);
-
-        return of(resourceUploadResponse);
-      })
-    );
-
-    return {
-      progress$,
-      response$,
-    };
+    return { progress$, response$ };
   }
 
   getDownloadResourceUrl(resourceId: string): string {
@@ -117,13 +91,5 @@ export class AugmentedResourcesService extends ResourcesService {
         aElement.click();
         URL.revokeObjectURL(href);
       });
-  }
-
-  private calculateProgressPercentage(httpProgressEvent: HttpProgressEvent) {
-    return httpProgressEvent.total ? Math.round((100 * httpProgressEvent.loaded) / httpProgressEvent.total) : 0;
-  }
-
-  private decodeArrayBuffer<T>(arrayBuffer: ArrayBuffer): T {
-    return JSON.parse(String.fromCharCode.apply(null, Array.from(new Uint8Array(arrayBuffer))));
   }
 }
