@@ -66,7 +66,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
 
   addControl(artefactTypeId: string): void {
     if (this._treeState.isMultipleNodesSelected()) {
-      this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES);
+      this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES).subscribe();
       return;
     }
     this._artefactsFactory.createControlArtefact(artefactTypeId).subscribe((artefact) => {
@@ -76,7 +76,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
 
   addFunction(keywordId: string): void {
     if (this._treeState.isMultipleNodesSelected()) {
-      this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES);
+      this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES).subscribe();
       return;
     }
     this._artefactsFactory.createCallKeywordArtefact(keywordId).subscribe((artefact) => {
@@ -86,7 +86,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
 
   addPlan(planId: string): void {
     if (this._treeState.isMultipleNodesSelected()) {
-      this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES);
+      this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES).subscribe();
       return;
     }
     this._artefactsFactory.createCallPlanArtefact(planId).subscribe((artefact) => {

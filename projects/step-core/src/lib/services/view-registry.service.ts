@@ -1,12 +1,10 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
 import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, SubRouteData, SubRouterConfig } from '../shared';
-import { VIEW_ID_LINK_PREFIX } from '../modules/basics/services/view-id-link-prefix.token';
+import { AJS_MODULE, routesPrioritySortPredicate, SUB_ROUTE_DATA, SubRouteData, SubRouterConfig } from '../shared';
 import { Route, Router, Routes, UrlMatcher, UrlSegment } from '@angular/router';
-import { SimpleOutletComponent } from '../components/simple-outlet/simple-outlet.component';
+import { CheckPermissionsGuard } from './check-permissions.guard';
+import { VIEW_ID_LINK_PREFIX } from '../modules/basics/services/view-id-link-prefix.token';
 import { BehaviorSubject } from 'rxjs';
-
-export const SUB_ROUTE_DATA = Symbol('SubRouteData');
 
 export interface CustomView {
   template: string;
@@ -217,7 +215,7 @@ export class ViewRegistryService implements OnDestroy {
     return parentChildren;
   }
 
-  registerRoute(route: Route, { parentPath, label, weight }: SubRouterConfig = {}): void {
+  registerRoute(route: Route, { parentPath, label, weight, accessPermissions }: SubRouterConfig = {}): void {
     const root = this._router.config.find((route) => route.path === 'root');
     if (!root?.children) {
       return;
@@ -238,8 +236,12 @@ export class ViewRegistryService implements OnDestroy {
         ViewRegistryService.registeredRoutes.push(path);
       }
 
-      if (weight || label) {
-        route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label } };
+      if (weight || label || accessPermissions) {
+        route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label, accessPermissions } };
+      }
+      if (accessPermissions) {
+        route.canActivate = route.canActivate ?? [];
+        route.canActivate.push(CheckPermissionsGuard);
       }
       root.children.push(route);
       return;
@@ -253,17 +255,18 @@ export class ViewRegistryService implements OnDestroy {
       parentChildren.push(redirectRoute);
     }
 
-    if (weight || label) {
-      route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label } };
+    if (weight || label || accessPermissions) {
+      route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label, accessPermissions } };
     }
+
+    if (accessPermissions) {
+      route.canActivate = route.canActivate ?? [];
+      route.canActivate.push(CheckPermissionsGuard);
+    }
+
     parentChildren!.push(route);
-    const otherRoutes = parentChildren!
-      .filter((route) => route.path !== '')
-      .sort((routeA, routeB) => {
-        const weightA = routeA.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
-        const weightB = routeB.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
-        return weightA - weightB;
-      });
+    const otherRoutes = parentChildren!.filter((route) => route.path !== '').sort(routesPrioritySortPredicate);
+
     redirectRoute.redirectTo = otherRoutes[0].path;
   }
 
