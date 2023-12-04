@@ -59,6 +59,17 @@
                 [(ngModel)]="exclusion.cronExpression"
                 placeholder="Cron Expression"
               />
+              <step-suffix class="button-suffix">
+                <button
+                  type="button"
+                  mat-stroked-button
+                  color="primary"
+                  matTooltip="Configure CRON expression"
+                  (click)="configureCronExpressionForExclusion(exclusion)"
+                >
+                  <step-icon name="watch"></step-icon>
+                </button>
+              </step-suffix>
               <input
                 type="text"
                 name="exclusion.description_{{ i }}"

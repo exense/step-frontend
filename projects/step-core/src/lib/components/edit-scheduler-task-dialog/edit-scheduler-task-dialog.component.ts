@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm, NgModel } from '@angular/forms';
 import {
   AugmentedSchedulerService,
+  CronExclusion,
   ExecutionParameters,
   ExecutiontTaskParameters,
   Plan,
@@ -113,6 +114,14 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
 
   removeExclusion(index: number) {
     this._task.cronExclusions!.splice(index, 1);
+  }
+
+  configureCronExpressionForExclusion(exclusion: CronExclusion): void {
+    this._cron.configureExpression().subscribe((expression) => {
+      if (expression) {
+        exclusion.cronExpression = expression;
+      }
+    });
   }
 
   private initializeTask(): void {
