@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with STEP.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-angular.module('asyncTask', []).factory('AsyncTaskService', function ($http, $timeout, Dialogs) {
+angular.module('asyncTask', []).factory('AsyncTaskService', function ($http, $timeout, DialogsService) {
   const factory = {};
 
   factory.pollUrl = function (asyncTaskUrl) {
@@ -27,8 +27,10 @@ angular.module('asyncTask', []).factory('AsyncTaskService', function ($http, $ti
       }
       if (data.ready) {
         if (data.warnings !== undefined && data.warnings !== null && data.warnings.length > 0) {
-          Dialogs.showListOfMsgs(data.warnings).then(function () {
-            factory.finish(data);
+          DialogsService.showListOfMsgs(data.warnings).subscribe((isConfirmed) => {
+            if (isConfirmed) {
+              factory.finish(data);
+            }
           });
         } else {
           factory.finish(data);

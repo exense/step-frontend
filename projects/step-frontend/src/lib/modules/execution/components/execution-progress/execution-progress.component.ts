@@ -1,6 +1,5 @@
 import { Component, forwardRef, inject, Inject, OnDestroy, OnInit, TrackByFunction } from '@angular/core';
 import {
-  a1Promise2Observable,
   AugmentedExecutionsService,
   AutoDeselectStrategy,
   ControllerService,
@@ -31,6 +30,7 @@ import { ReportTreeNode } from '../../shared/report-tree-node';
 import { ReportTreeNodeUtilsService } from '../../services/report-tree-node-utils.service';
 import { EXECUTION_TREE_PAGING } from '../../services/execution-tree-paging';
 import { DOCUMENT } from '@angular/common';
+import { IncludeTestcases } from '../../shared/include-testcases.interface';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
@@ -111,22 +111,22 @@ export class ExecutionProgressComponent
 
   showAutoRefreshButton = false;
 
-  readonly includedTestcases$: Observable<{ by: 'id' | 'name'; list: string[] } | null> =
-    this._testCasesSelection.selected$.pipe(
-      map((ids) => {
-        const testCases = this.testCases || [];
-        if (ids.length === testCases.length) {
-          return null;
-        }
-        const by = this.execution?.executionParameters?.repositoryObject?.repositoryID === 'local' ? 'id' : 'name';
+  readonly includedTestcases$: Observable<IncludeTestcases | undefined> = this._testCasesSelection.selected$.pipe(
+    map((ids) => {
+      const testCases = this.testCases || [];
+      if (ids.length === testCases.length) {
+        return undefined;
+      }
+      const by: IncludeTestcases['by'] =
+        this.execution?.executionParameters?.repositoryObject?.repositoryID === 'local' ? 'id' : 'name';
 
-        const list = testCases
-          .filter((testCase) => ids.includes(testCase.id!) || ids.includes(testCase.artefactID!))
-          .map(({ artefactID, name }) => (by === 'id' ? artefactID! : name!));
+      const list = testCases
+        .filter((testCase) => ids.includes(testCase.id!) || ids.includes(testCase.artefactID!))
+        .map(({ artefactID, name }) => (by === 'id' ? artefactID! : name!));
 
-        return { by, list };
-      })
-    );
+      return { by, list };
+    })
+  );
 
   readonly eId = this._activatedRoute.snapshot.url[0].path!;
   readonly activeExecution = this._activeExecutions.getActiveExecution(this.eId);

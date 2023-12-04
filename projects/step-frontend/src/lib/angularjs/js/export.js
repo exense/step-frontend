@@ -17,4 +17,60 @@
  * along with STEP.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 angular
-  .module('export', []);
+  .module('export', [])
+
+  .factory('ExportService', function ($http, $timeout, Dialogs) {
+    var factory = {};
+
+    factory.pollUrl = function (exportUrl, callback) {
+      (function poll() {
+        $http.get(exportUrl).then(function (response) {
+          var status = response.data;
+          if (status.ready) {
+            if (callback) {
+              callback();
+            }
+            var attachmentID = status.result.id;
+            if (status.warnings !== undefined && status.warnings !== null && status.warnings.length > 0) {
+              Dialogs.showListOfMsgs(status.warnings).then(function () {
+                downloadExport(attachmentID);
+              });
+            } else {
+              downloadExport(attachmentID);
+            }
+          } else {
+            $timeout(poll, 500);
+          }
+        });
+      })();
+    };
+
+    var downloadExport = function (attachmentID) {
+      if (attachmentID !== undefined && attachmentID !== null) {
+        download(attachmentID);
+      } else {
+        Dialogs.showErrorMsg('The export file could not be created, check the controller logs for more details');
+      }
+    };
+
+    var download = function (attachmentID) {
+      $.fileDownload('rest/resources/' + attachmentID + '/content')
+        .done(function () {})
+        .fail(function () {
+          alert('File download failed!');
+        });
+    };
+
+    factory.poll = function (exportId, callback) {
+      factory.pollUrl('rest/async/' + exportId, callback);
+    };
+
+    factory.get = function (exportUrl, callback) {
+      $http.get(exportUrl).then(function (response) {
+        var exportStatus = response.data;
+        factory.poll(exportStatus.id, callback);
+      });
+    };
+
+    return factory;
+  });

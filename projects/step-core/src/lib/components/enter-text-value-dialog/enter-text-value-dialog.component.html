@@ -1,0 +1,20 @@
+<step-modal-window [title]="dialogData.title" [hideButtonsSection]="true">
+  <div step-modal-window-body>
+    <form (submit)="onSubmit()">
+      <step-form-field>
+        <ng-container *ngIf="dialogData.multiline; else inputTemplate">
+          <textarea rows="5" name="value" [(ngModel)]="value"></textarea>
+        </ng-container>
+
+        <ng-template #inputTemplate>
+          <input type="text" name="value" [(ngModel)]="value" />
+        </ng-template>
+      </step-form-field>
+
+      <div class="dialog-actions">
+        <button type="button" mat-stroked-button [matDialogClose]="undefined">Cancel</button>
+        <button type="submit" mat-flat-button color="primary">Save</button>
+      </div>
+    </form>
+  </div>
+</step-modal-window>

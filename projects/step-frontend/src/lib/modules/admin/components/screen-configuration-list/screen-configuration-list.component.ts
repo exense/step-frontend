@@ -95,7 +95,7 @@ export class ScreenConfigurationListComponent implements AfterViewInit {
   }
 
   removeScreen(dbId: string, label: string): void {
-    this._screenDialogs.removeScreen(dbId, label).pipe(this.updateDataSourceAfterChange).subscribe();
+    this._screenDialogs.removeScreen(dbId, label).pipe(this.updateDataSource).subscribe();
   }
 
   private editScreenInternal(inputId: string): void {

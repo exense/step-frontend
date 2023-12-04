@@ -48,7 +48,7 @@ export class ReportNodeComponent implements OnChanges {
         catchError((errorMessage) => {
           if (errorMessage) {
             console.error('reportNodes.openPlan', errorMessage);
-            this._dialogs.showErrorMsg(errorMessage);
+            this._dialogs.showErrorMsg(errorMessage).subscribe();
           }
           return of(false);
         })

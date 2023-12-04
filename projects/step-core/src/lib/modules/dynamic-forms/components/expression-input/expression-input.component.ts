@@ -62,7 +62,7 @@ export class ExpressionInputComponent implements ControlValueAccessor {
   }
 
   protected editDynamicExpression(): void {
-    this._dialogsService.enterValue('Free text editor', this.expression, 'lg', 'enterTextValueDialog', (expression) => {
+    this._dialogsService.enterValue('Free text editor', this.expression, true).subscribe((expression) => {
       this.expression = expression;
       this.onChange?.(expression);
     });

@@ -1,9 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { DialogsService } from '../../../../shared';
 import { WizardDialogData } from '../../types/wizard-dialog-data.interface';
-import { a1Promise2Observable, DialogsService } from '../../../../shared';
-import { map, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'step-wizard-dialog',
@@ -20,15 +18,10 @@ export class WizardDialogComponent {
   }
 
   onClose(): void {
-    a1Promise2Observable(this._dialogs.showWarning('Are you sure to close the wizard dialog?'))
-      .pipe(
-        map(() => true),
-        catchError(() => of(false))
-      )
-      .subscribe((isConfirmed) => {
-        if (isConfirmed) {
-          this._dialogRef.close();
-        }
-      });
+    this._dialogs.showWarning('Are you sure to close the wizard dialog?').subscribe((isConfirmed) => {
+      if (isConfirmed) {
+        this._dialogRef.close();
+      }
+    });
   }
 }

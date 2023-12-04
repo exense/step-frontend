@@ -76,6 +76,7 @@ export class SchedulerModule {
           parentPath,
           label: 'Scheduler',
           weight: 0,
+          accessPermissions: ['settings-ui-menu', 'admin-ui-menu'],
         }
       );
     };
