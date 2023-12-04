@@ -33,8 +33,6 @@ const SCRIPTS = [
   './src/lib/angularjs/js/controllers.js',
   './src/lib/angularjs/js/controllers/entities.js',
   './src/lib/angularjs/js/controllers/screenConfiguration.js',
-  './src/lib/angularjs/js/controllers/repository.js',
-  './src/lib/angularjs/js/controllers/dynamicForms.js',
   './src/lib/angularjs/js/controllers/components.js',
 ];
 
