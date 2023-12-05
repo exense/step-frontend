@@ -1,6 +1,6 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { MonthlyDayEditorComponent } from '../monthly-day-editor/monthly-day-editor.component';
-import { MONTHS_DICTIONARY } from '../../types/months';
+import { RANGE_MONTHS_NAMES } from '../../injectables/ranges.tokens';
 
 @Component({
   selector: 'step-yearly-day-editor',
@@ -12,7 +12,7 @@ import { MONTHS_DICTIONARY } from '../../types/months';
   encapsulation: ViewEncapsulation.None,
 })
 export class YearlyDayEditorComponent extends MonthlyDayEditorComponent {
-  override readonly MONTHS = this.createRange(12, 1).map((key) => ({ key, value: MONTHS_DICTIONARY[key] }));
+  override readonly _MONTHS = inject(RANGE_MONTHS_NAMES);
 
   protected override getExpression(): string {
     return `${this.second} ${this.minute} ${this.hour} ${this.day} ${this.month} ? *`;

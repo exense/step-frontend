@@ -1,0 +1,20 @@
+<ng-container [formGroup]="weeklyTimeRangeForm">
+  <section>
+    <h4>Every</h4>
+    <step-day-of-week-selector formControlName="dayOfWeek"> </step-day-of-week-selector>
+  </section>
+  <section class="editor-content">
+    <span>Hour from </span>
+    <mat-select formControlName="hourFrom">
+      <mat-option [value]="null"></mat-option>
+      <mat-option [value]="0">00</mat-option>
+      <mat-option *ngFor="let item of _HOURS; trackBy: trackByKeyValue" [value]="item.key">{{ item.value }}</mat-option>
+    </mat-select>
+    <span>to </span>
+    <mat-select formControlName="hourTo">
+      <mat-option [value]="null"></mat-option>
+      <mat-option [value]="0">00</mat-option>
+      <mat-option *ngFor="let item of _HOURS; trackBy: trackByKeyValue" [value]="item.key">{{ item.value }}</mat-option>
+    </mat-select>
+  </section>
+</ng-container>

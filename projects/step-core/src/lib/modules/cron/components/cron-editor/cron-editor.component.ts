@@ -1,23 +1,26 @@
 import { Component, inject, ViewEncapsulation } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Tab } from '../../../tabs/tabs.module';
 import { CronValidation } from '../../types/cron/_cron-validation';
 import { AlertType } from '../../../basics/shared/alert-type.enum';
 import { ExpressionChangeEvent } from '../base-editor/base-editor.component';
+import { CronEditorTab } from '../../types/cron-editor-tab.enum';
 
 type DialogRef = MatDialogRef<CronEditorComponent, string>;
 
-enum CronEditorTab {
-  MINUTES = 'minutes',
-  HOURLY = 'hourly',
-  DAILY = 'daily',
-  WEEKLY = 'weekly',
-  MONTHLY = 'monthly',
-  YEARLY = 'yearly',
-  PRESET = 'preset',
-}
-
 const createTab = (id: CronEditorTab, label: string): Tab => ({ id, label });
+
+const CRON_EDITOR_TAB_LABELS: Record<CronEditorTab, string> = {
+  [CronEditorTab.PRESET]: 'Preset',
+  [CronEditorTab.MINUTES]: 'Minutely',
+  [CronEditorTab.HOURLY]: 'Hourly',
+  [CronEditorTab.DAILY]: 'Daily',
+  [CronEditorTab.WEEKLY]: 'Weekly',
+  [CronEditorTab.MONTHLY]: 'Monthly',
+  [CronEditorTab.YEARLY]: 'Yearly',
+  [CronEditorTab.TIME_RANGE]: 'Time range',
+  [CronEditorTab.WEEKLY_TIME_RANGE]: 'Weekly',
+};
 
 @Component({
   selector: 'step-cron-editor',
@@ -27,21 +30,14 @@ const createTab = (id: CronEditorTab, label: string): Tab => ({ id, label });
 })
 export class CronEditorComponent {
   private _dialogRef = inject<DialogRef>(MatDialogRef);
+  private _availableTabs = inject<CronEditorTab[]>(MAT_DIALOG_DATA);
 
   protected readonly CronEditorTab = CronEditorTab;
   protected readonly AlertType = AlertType;
 
-  protected readonly cronEditorTabs: Tab[] = [
-    createTab(CronEditorTab.PRESET, 'Preset'),
-    createTab(CronEditorTab.MINUTES, 'Minutely'),
-    createTab(CronEditorTab.HOURLY, 'Hourly'),
-    createTab(CronEditorTab.DAILY, 'Daily'),
-    createTab(CronEditorTab.WEEKLY, 'Weekly'),
-    createTab(CronEditorTab.MONTHLY, 'Monthly'),
-    createTab(CronEditorTab.YEARLY, 'Yearly'),
-  ];
+  protected readonly cronEditorTabs = this._availableTabs.map((id) => createTab(id, CRON_EDITOR_TAB_LABELS[id]));
 
-  protected selectedTab = this.cronEditorTabs[0].id;
+  protected selectedTab: string = this._availableTabs[0];
 
   protected cronExpression = '';
 

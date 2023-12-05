@@ -1,5 +1,6 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { BaseEditorComponent } from '../base-editor/base-editor.component';
+import { RANGE_MINUTES, RANGE_SECONDS } from '../../injectables/ranges.tokens';
 
 @Component({
   selector: 'step-minutes-editor',
@@ -8,12 +9,11 @@ import { BaseEditorComponent } from '../base-editor/base-editor.component';
   encapsulation: ViewEncapsulation.None,
 })
 export class MinutesEditorComponent extends BaseEditorComponent {
-  readonly MINUTES = this.createRange(59, 1).map((key) => ({ key, value: key.toString() }));
+  readonly _MINUTES = inject(RANGE_MINUTES);
+  readonly _SECONDS = inject(RANGE_SECONDS);
 
-  readonly SECONDS = this.createRange(59).map((key) => ({ key, value: key.toString().padStart(2, '0') }));
-
-  protected minute = this.MINUTES[0].key;
-  protected second = this.SECONDS[0].key;
+  protected minute = this._MINUTES[0].key;
+  protected second = this._SECONDS[0].key;
 
   protected handleMinuteChange(minute: number): void {
     this.minute = minute;
