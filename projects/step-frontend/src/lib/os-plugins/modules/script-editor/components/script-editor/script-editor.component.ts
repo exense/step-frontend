@@ -18,6 +18,7 @@ import 'ace-builds/src-min-noconflict/theme-chrome.js';
 import 'ace-builds/src-min-noconflict/mode-javascript.js';
 import 'ace-builds/src-min-noconflict/mode-groovy.js';
 import 'ace-builds/src-min-noconflict/mode-java.js';
+import 'ace-builds/src-min-noconflict/ext-searchbox';
 
 @Component({
   selector: 'step-script-editor',
