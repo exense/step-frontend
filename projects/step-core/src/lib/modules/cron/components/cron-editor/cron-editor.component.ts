@@ -18,7 +18,7 @@ const CRON_EDITOR_TAB_LABELS: Record<CronEditorTab, string> = {
   [CronEditorTab.WEEKLY]: 'Weekly',
   [CronEditorTab.MONTHLY]: 'Monthly',
   [CronEditorTab.YEARLY]: 'Yearly',
-  [CronEditorTab.TIME_RANGE]: 'Time range',
+  [CronEditorTab.TIME_RANGE]: 'Date',
   [CronEditorTab.WEEKLY_TIME_RANGE]: 'Weekly',
 };
 

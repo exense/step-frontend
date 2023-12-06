@@ -1,4 +1,4 @@
-<ng-container [formGroup]="weeklyTimeRangeForm">
+<section [formGroup]="weeklyTimeRangeForm">
   <section>
     <h4>Every</h4>
     <step-day-of-week-selector formControlName="dayOfWeek"> </step-day-of-week-selector>
@@ -17,4 +17,4 @@
       <mat-option *ngFor="let item of _HOURS; trackBy: trackByKeyValue" [value]="item.key">{{ item.value }}</mat-option>
     </mat-select>
   </section>
-</ng-container>
+</section>

@@ -1,22 +1,36 @@
-<ng-container [formGroup]="timeRangeForm">
+<section [formGroup]="timeRangeForm">
   <mat-radio-group formControlName="type">
     <mat-radio-button [value]="TimeRangeType.CONCRETE_DATE" color="primary">
-      <step-form-field>
-        <input type="text" [matDatepicker]="picker" formControlName="date" />
-        <step-suffix class="button-suffix">
-          <button
-            type="button"
-            mat-stroked-button
-            (click)="picker.open()"
-            [disabled]="timeRangeForm.controls['date'].disabled"
-          >
-            <step-icon name="calendar" (click)="picker.open()"></step-icon>
-          </button>
-        </step-suffix>
-      </step-form-field>
+      <div class="editor-content">
+        <step-label>Specific date</step-label>
+        <step-form-field>
+          <input type="text" [matDatepicker]="picker" formControlName="date" />
+          <step-suffix class="button-suffix">
+            <button
+              type="button"
+              mat-stroked-button
+              (click)="picker.open()"
+              [disabled]="timeRangeForm.controls['date'].disabled"
+            >
+              <step-icon name="calendar" (click)="picker.open()"></step-icon>
+            </button>
+          </step-suffix>
+        </step-form-field>
+      </div>
     </mat-radio-button>
     <mat-radio-button [value]="TimeRangeType.DAYS_RANGE" color="primary">
       <div formGroupName="daysRange" class="editor-content">
+        <span>Day range </span>
+        <mat-select formControlName="month">
+          <mat-option *ngFor="let item of _MONTHS; trackBy: trackByKeyValue" [value]="item.key">{{
+            item.value
+          }}</mat-option>
+        </mat-select>
+        <mat-select formControlName="year">
+          <mat-option *ngFor="let item of _YEARS; trackBy: trackByKeyValue" [value]="item.key">{{
+            item.value
+          }}</mat-option>
+        </mat-select>
         <span>Day from </span>
         <mat-select formControlName="dayFrom">
           <mat-option [value]="null"></mat-option>
@@ -28,16 +42,6 @@
         <mat-select formControlName="dayTo">
           <mat-option [value]="null"></mat-option>
           <mat-option *ngFor="let item of _DAYS; trackBy: trackByKeyValue" [value]="item.key">{{
-            item.value
-          }}</mat-option>
-        </mat-select>
-        <mat-select formControlName="month">
-          <mat-option *ngFor="let item of _MONTHS; trackBy: trackByKeyValue" [value]="item.key">{{
-            item.value
-          }}</mat-option>
-        </mat-select>
-        <mat-select formControlName="year">
-          <mat-option *ngFor="let item of _YEARS; trackBy: trackByKeyValue" [value]="item.key">{{
             item.value
           }}</mat-option>
         </mat-select>
@@ -58,5 +62,5 @@
       <mat-option *ngFor="let item of _HOURS; trackBy: trackByKeyValue" [value]="item.key">{{ item.value }}</mat-option>
     </mat-select>
   </section>
-</ng-container>
+</section>
 <mat-datepicker #picker></mat-datepicker>
