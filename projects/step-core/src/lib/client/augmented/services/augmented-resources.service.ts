@@ -74,8 +74,12 @@ export class AugmentedResourcesService extends ResourcesService {
     return { progress$, response$ };
   }
 
-  getDownloadResourceUrl(resourceId: string): string {
-    return `rest/resources/${resourceId}/content`;
+  getDownloadResourceUrl(resourceId: string, inline?: boolean): string {
+    let result = `rest/resources/${resourceId}/content`;
+    if (inline) {
+      result = `${result}?inline=true`;
+    }
+    return result;
   }
 
   downloadResource(resourceId: string, fileName: string) {

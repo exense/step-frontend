@@ -29,7 +29,8 @@
         (ngModelChange)="onValueChange($event)"
         [disabled]="isDisabled"
         (blur)="onBlur()"
-        [stepPreventChars]="numberInputInvalidChars"
+        [stepAllowChars]="allowedChars"
+        [min]="isNegativeNumberAllowed ? null : 0"
       />
     </ng-template>
     <ng-template #textField>
