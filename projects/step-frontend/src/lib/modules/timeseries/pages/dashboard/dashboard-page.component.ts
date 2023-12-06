@@ -78,7 +78,7 @@ export class DashboardPageComponent implements OnInit {
         });
 
         const chartConfig: ChartConfig = {
-          state: this.dashboard,
+          state: dashlet,
           groupingAttributes: groupingSelection,
         };
         this.chartConfigs.push(chartConfig);
@@ -88,6 +88,10 @@ export class DashboardPageComponent implements OnInit {
         });
       });
     });
+  }
+
+  toggleGroupingAttribute(chartConfig: ChartConfig, attribute: MetricAttributeSelection) {
+    attribute.selected = !attribute.selected;
   }
 
   private getChartPclToRequest(aggregation: AggregationType): number[] {

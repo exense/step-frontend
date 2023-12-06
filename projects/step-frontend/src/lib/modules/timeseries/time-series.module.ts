@@ -38,6 +38,7 @@ import { ResolutionPickerComponent } from './components/resolution-picker/resolu
 import { DashboardPageComponent } from './pages/dashboard/dashboard-page.component';
 import { PlanListComponent } from '../plan/components/plan-list/plan-list.component';
 import { PlanEditorComponent } from '../plan/components/plan-editor/plan-editor.component';
+import { ChartDashletComponent } from './pages/dashboard/chart-dashlet/chart-dashlet.component';
 
 @NgModule({
   declarations: [
@@ -65,6 +66,7 @@ import { PlanEditorComponent } from '../plan/components/plan-editor/plan-editor.
     MetricChartComponent,
     ResolutionPickerComponent,
     DashboardPageComponent,
+    ChartDashletComponent,
   ],
   exports: [ExecutionPerformanceComponent, DashboardPageComponent, AnalyticsPageComponent, MetricChartComponent],
   providers: [{ provide: MatPaginatorIntl, useClass: NoTotalCountPaginator }],

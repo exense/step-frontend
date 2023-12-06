@@ -20,22 +20,24 @@
     </button>
 
     <mat-menu #settingsMenu="matMenu">
-      <!--        <button mat-menu-item [matMenuTriggerFor]="groupingMenu">Grouping</button>-->
+      <button *ngIf="!config.state?.chartSettings?.readonlyGrouping" mat-menu-item [matMenuTriggerFor]="groupingMenu">
+        Grouping
+      </button>
       <!--        <button mat-menu-item [matMenuTriggerFor]="aggregateMenu">Aggregate</button>-->
     </mat-menu>
 
     <mat-menu #groupingMenu="matMenu">
-      <!--        <button-->
-      <!--          *ngFor="let attribute of groupingAttributes"-->
-      <!--          (click)="toggleGroupingAttribute(attribute); $event.stopPropagation()"-->
-      <!--          mat-menu-item-->
-      <!--          [class.selected-menu-item]="attribute.selected"-->
-      <!--        >-->
-      <!--          <div class="flex flex-row checkbox-row">-->
-      <!--            <input type="checkbox" class="checkbox" [ngModel]="attribute.selected" />-->
-      <!--            <span>{{ attribute.displayName }}</span>-->
-      <!--          </div>-->
-      <!--        </button>-->
+      <button
+        *ngFor="let attribute of config.groupingAttributes"
+        (click)="toggleGroupingAttribute(config, attribute); $event.stopPropagation()"
+        mat-menu-item
+        [class.selected-menu-item]="attribute.selected"
+      >
+        <div class="flex flex-row checkbox-row">
+          <input type="checkbox" class="checkbox" [ngModel]="attribute.selected" />
+          <span>{{ attribute.displayName }}</span>
+        </div>
+      </button>
     </mat-menu>
 
     <!--      <mat-menu #aggregateMenu="matMenu">-->
