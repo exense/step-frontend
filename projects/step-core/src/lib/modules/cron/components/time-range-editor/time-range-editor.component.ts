@@ -53,6 +53,13 @@ export class TimeRangeEditorComponent extends BaseEditorComponent implements OnI
     this.terminator$.complete();
   }
 
+  protected updateRange(rangeType: TimeRangeType): void {
+    if (this.timeRangeForm.controls.type.value === rangeType) {
+      return;
+    }
+    this.timeRangeForm.controls.type.setValue(rangeType);
+  }
+
   protected override getExpression(): string {
     const formValue = this.timeRangeForm.value;
     console.log(formValue);
