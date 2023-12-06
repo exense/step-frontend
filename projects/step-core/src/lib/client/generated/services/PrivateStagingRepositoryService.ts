@@ -4,73 +4,82 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
-import type { AutomationPackage } from '../models/AutomationPackage';
 import type { FormDataContentDisposition } from '../models/FormDataContentDisposition';
+import type { Plan } from '../models/Plan';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
 @Injectable({ providedIn: 'root' })
-export class AutomationPackagesService {
+export class PrivateStagingRepositoryService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 
   /**
-   * @param formData
-   * @returns any default response
+   * @returns string default response
    * @throws ApiError
    */
-  public createOrUpdateAutomationPackage(formData?: { file?: FormDataContentDisposition }): Observable<any> {
+  public createContext(): Observable<string> {
     return this.httpRequest.request({
-      method: 'PUT',
-      url: '/automation-packages',
-      formData: formData,
-      mediaType: 'multipart/form-data',
+      method: 'GET',
+      url: '/staging/context',
     });
   }
 
   /**
+   * @param id
+   * @returns any default response
+   * @throws ApiError
+   */
+  public destroyStagingContext(id: string): Observable<any> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/staging/context/{id}/destroy',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
+   * @param id
+   * @param isolate
+   * @param requestBody
+   * @returns string default response
+   * @throws ApiError
+   */
+  public executeInStagingContext(
+    id: string,
+    isolate?: boolean,
+    requestBody?: Record<string, string>
+  ): Observable<string> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/staging/context/{id}/execute',
+      path: {
+        id: id,
+      },
+      query: {
+        isolate: isolate,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * @param id
    * @param formData
    * @returns string default response
    * @throws ApiError
    */
-  public createAutomationPackage(formData?: { file?: FormDataContentDisposition }): Observable<string> {
-    return this.httpRequest.request({
-      method: 'POST',
-      url: '/automation-packages',
-      formData: formData,
-      mediaType: 'multipart/form-data',
-    });
-  }
-
-  /**
-   * @param id
-   * @returns AutomationPackage default response
-   * @throws ApiError
-   */
-  public getAutomationPackage(id: string): Observable<AutomationPackage> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/automation-packages/{id}',
-      path: {
-        id: id,
-      },
-    });
-  }
-
-  /**
-   * @param id
-   * @param formData
-   * @returns any default response
-   * @throws ApiError
-   */
-  public updateAutomationPackageById(
+  public uploadFile(
     id: string,
     formData?: {
       file?: FormDataContentDisposition;
     }
-  ): Observable<any> {
+  ): Observable<string> {
     return this.httpRequest.request({
-      method: 'PUT',
-      url: '/automation-packages/{id}',
+      method: 'POST',
+      url: '/staging/context/{id}/file',
       path: {
         id: id,
       },
@@ -81,16 +90,19 @@ export class AutomationPackagesService {
 
   /**
    * @param id
+   * @param requestBody
    * @returns any default response
    * @throws ApiError
    */
-  public deleteAutomationPackage(id: string): Observable<any> {
+  public uploadPlan(id: string, requestBody?: Plan): Observable<any> {
     return this.httpRequest.request({
-      method: 'DELETE',
-      url: '/automation-packages/{id}',
+      method: 'POST',
+      url: '/staging/context/{id}/plan',
       path: {
         id: id,
       },
+      body: requestBody,
+      mediaType: 'application/json',
     });
   }
 }

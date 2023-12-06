@@ -1,4 +1,4 @@
-<step-modal-window title="Upload Automation Package">
+<step-modal-window [title]="dialogTitle">
   <div step-modal-window-body>
     <step-progress-bar *ngIf="progress$; else uploadForm" [progress$]="progress$"> </step-progress-bar>
     <ng-template #uploadForm>

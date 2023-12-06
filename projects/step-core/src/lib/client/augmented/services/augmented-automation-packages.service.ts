@@ -68,11 +68,28 @@ export class AugmentedAutomationPackagesService extends AutomationPackagesServic
       );
   }
 
-  uploadAutomationPackage(file: File): ReturnType<typeof uploadWithProgress> {
+  uploadCreateAutomationPackage(file: File): ReturnType<typeof uploadWithProgress> {
     const body = new FormData();
     body.set('file', file);
 
     const request$ = this._http.request('POST', `/rest/automation-packages`, {
+      body,
+      headers: {
+        enctype: 'multipart/form-data',
+      },
+      observe: 'events',
+      responseType: 'arraybuffer',
+      reportProgress: true,
+    });
+
+    return uploadWithProgress(request$);
+  }
+
+  uploadUpdateAutomationPackage(id: string, file: File): ReturnType<typeof uploadWithProgress> {
+    const body = new FormData();
+    body.set('file', file);
+
+    const request$ = this._http.request('PUT', `/rest/automation-packages/${id}`, {
       body,
       headers: {
         enctype: 'multipart/form-data',

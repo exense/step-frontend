@@ -250,6 +250,7 @@ export { ParametersService } from './services/ParametersService';
 export { PlansService } from './services/PlansService';
 export { PrivateApplicationService } from './services/PrivateApplicationService';
 export { PrivateDataPoolPluginService } from './services/PrivateDataPoolPluginService';
+export { PrivateStagingRepositoryService } from './services/PrivateStagingRepositoryService';
 export { PrivateViewPluginService } from './services/PrivateViewPluginService';
 export { QuotaManagerService } from './services/QuotaManagerService';
 export { ReferencesService } from './services/ReferencesService';

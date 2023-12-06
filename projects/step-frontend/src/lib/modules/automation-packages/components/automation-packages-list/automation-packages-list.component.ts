@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { AfterViewInit, Component, inject } from '@angular/core';
 import {
   AugmentedAutomationPackagesService,
   AutoDeselectStrategy,
@@ -8,8 +8,9 @@ import {
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { ENTITY_ID } from '../../types/constants';
-import { MatDialog } from '@angular/material/dialog';
-import { AutomationPackageUploadDialogComponent } from '../automation-package-upload-dialog/automation-package-upload-dialog.component';
+import { AutomationPackagesDialogsService } from '../../injectables/automation-packages-dialogs.service';
+import { pipe, tap } from 'rxjs';
+import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
 
 @Component({
   selector: 'step-automation-packages-list',
@@ -20,28 +21,35 @@ import { AutomationPackageUploadDialogComponent } from '../automation-package-up
     selectionCollectionProvider<string, AutomationPackage>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
 })
-export class AutomationPackagesListComponent {
-  private _matDialog = inject(MatDialog);
-  private _api = inject(AugmentedAutomationPackagesService);
-  readonly dataSource = this._api.createDataSource();
+export class AutomationPackagesListComponent implements AfterViewInit {
+  private _dialogs = inject(AutomationPackagesDialogsService);
+  readonly _dataSource = inject(AugmentedAutomationPackagesService).createDataSource();
+
   readonly ENTITY_ID = ENTITY_ID;
 
-  uploadPackage(): void {
-    this._matDialog
-      .open(AutomationPackageUploadDialogComponent)
-      .afterClosed()
-      .subscribe((packageId) => {
-        if (packageId) {
-          this.dataSource.reload();
-        }
-      });
+  readonly AutomationPackagePermission = AutomationPackagePermission;
+
+  private updateDataSourceAfterChange = pipe(
+    tap((changeResult?: boolean) => {
+      if (changeResult) {
+        this._dataSource.reload();
+      }
+    })
+  );
+
+  ngAfterViewInit(): void {
+    this._dialogs.resolveEditLinkIfExists().pipe(this.updateDataSourceAfterChange).subscribe();
+  }
+
+  createPackage(): void {
+    this._dialogs.createAutomationPackage().pipe(this.updateDataSourceAfterChange).subscribe();
+  }
+
+  editPackage(automationPackage: AutomationPackage): void {
+    this._dialogs.editAutomationPackage(automationPackage).pipe(this.updateDataSourceAfterChange).subscribe();
   }
 
   deletePackage(automationPackage: AutomationPackage): void {
-    const name = automationPackage.attributes?.['name'] ?? '';
-    if (!name) {
-      return;
-    }
-    this._api.deleteAutomationPackage(name).subscribe(() => this.dataSource.reload());
+    this._dialogs.deleteAutomationPackage(automationPackage).pipe(this.updateDataSourceAfterChange).subscribe();
   }
 }
