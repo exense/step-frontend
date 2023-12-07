@@ -154,7 +154,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         });
       }
     });
-    console.log(this.seriesIndexesByIds);
     this.sortLegend();
     let noData = true;
     for (let series of settings.series) {
