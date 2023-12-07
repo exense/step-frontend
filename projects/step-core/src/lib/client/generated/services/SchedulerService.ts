@@ -12,7 +12,6 @@ import type { TableRequest } from '../models/TableRequest';
 import type { TableResponseExecutiontTaskParameters } from '../models/TableResponseExecutiontTaskParameters';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
-import { mergeMap, throwError, timer } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class SchedulerService {
