@@ -39,8 +39,8 @@ export class TimeRangeEditorComponent extends BaseEditorComponent implements OnI
       dayFrom: this._fb.control<number>(this._DAYS[0].key as number),
       dayTo: this._fb.control<number>(this._DAYS[this._DAYS.length - 1].key as number),
     }),
-    hourFrom: this._fb.control<number | null>(null),
-    hourTo: this._fb.control<number | null>(null),
+    hourFrom: this._fb.control<number | null>(0),
+    hourTo: this._fb.control<number | null>(this._HOURS[this._HOURS.length - 1].key as number),
   });
 
   ngOnInit(): void {
@@ -67,8 +67,7 @@ export class TimeRangeEditorComponent extends BaseEditorComponent implements OnI
       return '* * * ? * *';
     }
 
-    const hoursRange =
-      formValue.hourFrom === null || formValue.hourTo === null ? '*' : `${formValue.hourFrom}-${formValue.hourTo}`;
+    const hoursRange = this.formatInterval(formValue.hourFrom, formValue.hourTo);
 
     if (formValue.type === TimeRangeType.CONCRETE_DATE) {
       const day = formValue.date?.day?.toString() ?? '*';
@@ -77,10 +76,7 @@ export class TimeRangeEditorComponent extends BaseEditorComponent implements OnI
       return `* * ${hoursRange} ${day} ${month} ? ${year}`;
     }
 
-    const daysRange =
-      !formValue.daysRange?.dayFrom || !formValue.daysRange?.dayTo
-        ? '*'
-        : `${formValue.daysRange.dayFrom}-${formValue.daysRange.dayTo}`;
+    const daysRange = this.formatInterval(formValue.daysRange?.dayFrom, formValue.daysRange?.dayTo);
     const month = formValue.daysRange?.month?.toString() ?? '*';
     const year = formValue.daysRange?.year?.toString() ?? '*';
 

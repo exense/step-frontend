@@ -21,8 +21,8 @@ export class WeeklyTimeRangeEditorComponent extends BaseEditorComponent implemen
 
   readonly weeklyTimeRangeForm = this._fb.group({
     dayOfWeek: this._fb.control<string[]>([]),
-    hourFrom: this._fb.control<number | null>(null),
-    hourTo: this._fb.control<number | null>(null),
+    hourFrom: this._fb.control<number | null>(0),
+    hourTo: this._fb.control<number | null>(this._HOURS[this._HOURS.length - 1].key as number),
   });
 
   ngOnInit(): void {
@@ -37,8 +37,7 @@ export class WeeklyTimeRangeEditorComponent extends BaseEditorComponent implemen
   protected override getExpression(): string {
     const formValue = this.weeklyTimeRangeForm.value;
 
-    const hoursRange =
-      formValue.hourFrom === null || formValue.hourTo === null ? '*' : `${formValue.hourFrom}-${formValue.hourTo}`;
+    const hoursRange = this.formatInterval(formValue.hourFrom, formValue.hourTo);
 
     let days = (formValue.dayOfWeek ?? []).join(',');
     days = !days ? '*' : `${days} *`;

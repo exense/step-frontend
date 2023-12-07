@@ -8,4 +8,5 @@ export enum CronEditorTab {
   PRESET = 'preset',
   TIME_RANGE = 'time_range',
   WEEKLY_TIME_RANGE = 'weekly_time_range',
+  ANY_DAY_TIME_RANGE = 'any_day_time_range',
 }

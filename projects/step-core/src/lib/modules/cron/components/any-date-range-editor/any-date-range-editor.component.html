@@ -1,0 +1,51 @@
+<section [formGroup]="anyDateRangeForm">
+  <step-alert [type]="AlertType.MINIMALIST">
+    The provided hour and minute range will be excluded for any day.<br />
+    Note that the minute range will apply for every given hour, so hour 10 to 12 and minute 0 to 29 will exclude
+    10:00-10:30, 11:00-11:30 and 12:00-12:30
+  </step-alert>
+  <step-form-field class="no-label-focus" alignLabelAddon="near">
+    <step-label>Hour range</step-label>
+    <step-label-addon>
+      <step-icon name="help-circle" matTooltip="Exclused only the hours within gived from to"></step-icon>
+    </step-label-addon>
+    <section class="editor-content">
+      <span>From </span>
+      <mat-select formControlName="hourFrom">
+        <mat-option [value]="0">00</mat-option>
+        <mat-option *ngFor="let item of _HOURS; trackBy: trackByKeyValue" [value]="item.key">{{
+          item.value
+        }}</mat-option>
+      </mat-select>
+      <span>to </span>
+      <mat-select formControlName="hourTo">
+        <mat-option [value]="0">00</mat-option>
+        <mat-option *ngFor="let item of _HOURS; trackBy: trackByKeyValue" [value]="item.key">{{
+          item.value
+        }}</mat-option>
+      </mat-select>
+    </section>
+  </step-form-field>
+  <step-form-field class="no-label-focus" alignLabelAddon="near">
+    <step-label>Minute range</step-label>
+    <step-label-addon>
+      <step-icon name="help-circle" matTooltip="Exclused only the minutes within gived from to"></step-icon>
+    </step-label-addon>
+    <section class="editor-content">
+      <span>From </span>
+      <mat-select formControlName="minuteFrom">
+        <mat-option [value]="0">00</mat-option>
+        <mat-option *ngFor="let item of _MINUTES; trackBy: trackByKeyValue" [value]="item.key">{{
+          item.value
+        }}</mat-option>
+      </mat-select>
+      <span>to </span>
+      <mat-select formControlName="minuteTo">
+        <mat-option [value]="0">00</mat-option>
+        <mat-option *ngFor="let item of _MINUTES; trackBy: trackByKeyValue" [value]="item.key">{{
+          item.value
+        }}</mat-option>
+      </mat-select>
+    </section>
+  </step-form-field>
+</section>

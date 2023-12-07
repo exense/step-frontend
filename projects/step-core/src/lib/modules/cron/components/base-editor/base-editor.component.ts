@@ -46,4 +46,16 @@ export abstract class BaseEditorComponent implements AfterViewInit, OnChanges {
     const expression = this.getExpression();
     this.expressionChange.emit({ expression, isTouched: true });
   }
+
+  protected formatInterval(from?: number | null, to?: number | null, notSetValue = '*'): string {
+    if (from === undefined || from === null || to === undefined || to === null) {
+      return notSetValue;
+    }
+
+    if (from === to) {
+      return from.toString();
+    }
+
+    return `${from}-${to}`;
+  }
 }

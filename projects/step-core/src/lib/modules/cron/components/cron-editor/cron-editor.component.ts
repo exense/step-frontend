@@ -20,6 +20,7 @@ const CRON_EDITOR_TAB_LABELS: Record<CronEditorTab, string> = {
   [CronEditorTab.YEARLY]: 'Yearly',
   [CronEditorTab.TIME_RANGE]: 'Date',
   [CronEditorTab.WEEKLY_TIME_RANGE]: 'Weekly',
+  [CronEditorTab.ANY_DAY_TIME_RANGE]: 'Any Day',
 };
 
 @Component({

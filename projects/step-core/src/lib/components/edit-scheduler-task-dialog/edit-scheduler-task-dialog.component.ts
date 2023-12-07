@@ -121,7 +121,7 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
 
   configureCronExpressionForExclusion(exclusion: CronExclusion): void {
     this._cron
-      .configureExpression(CronEditorTab.TIME_RANGE, CronEditorTab.WEEKLY_TIME_RANGE)
+      .configureExpression(CronEditorTab.TIME_RANGE, CronEditorTab.WEEKLY_TIME_RANGE, CronEditorTab.ANY_DAY_TIME_RANGE)
       .subscribe((expression) => {
         if (expression) {
           exclusion.cronExpression = expression;
