@@ -278,7 +278,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
   }
 
   private updateFailedToLoadLabel(label: string): string {
-    return label + ' (Failed to load)';
+    return label + ' (unresolved)';
   }
 
   private getAxesFormatFunction(unit: string): (v: number) => string {
