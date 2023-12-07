@@ -1,8 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { LinkButtonComponent } from '../link-button/link-button.component';
 import { SpecialLinksService } from '../../services/special-links.service';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '../../shared';
 
 @Component({
   selector: 'step-settings-button',
@@ -16,7 +14,3 @@ export class SettingButtonComponent extends LinkButtonComponent {
     return this._specialLinks.settings();
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepSettingsButton', downgradeComponent({ component: SettingButtonComponent }));

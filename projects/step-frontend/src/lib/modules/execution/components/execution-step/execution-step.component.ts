@@ -9,9 +9,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  AJS_MODULE,
   BulkSelectionType,
   Execution,
   ExecutionSummaryDto,
@@ -169,7 +167,3 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
     }
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepExecutionStep', downgradeComponent({ component: ExecutionStepComponent }));

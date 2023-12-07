@@ -12,8 +12,6 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { Tab } from '../../shared/tab';
-import { AJS_MODULE } from '../../../../shared';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { MatTabNav } from '@angular/material/tabs';
 
 @Component({
@@ -58,7 +56,3 @@ export class TabsComponent implements OnChanges {
     this.tabBar.updatePagination();
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepTabs', downgradeComponent({ component: TabsComponent }));

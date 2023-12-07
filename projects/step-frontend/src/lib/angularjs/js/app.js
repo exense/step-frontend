@@ -21,15 +21,7 @@ var tecAdminApp = angular
     'step',
     'entities',
     'tecAdminControllers',
-    'plans',
-    'planEditor',
-    'gridControllers',
-    'repositoryControllers',
-    'functionsControllers',
-    'executionsControllers',
-    'resourcesControllers',
     'screenConfigurationControllers',
-    'dashboardsControllers',
     'asyncTask',
   ])
 
@@ -335,9 +327,6 @@ angular
               console.log('changing current path  to ' + newPath);
             }
             $rootScope.currentPath = newPath;
-            if (!$rootScope.locationChangeBlocked) {
-              $location.path(newPath.join('/'));
-            }
           }
         });
 

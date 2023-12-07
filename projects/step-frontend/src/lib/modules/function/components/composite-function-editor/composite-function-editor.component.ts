@@ -1,8 +1,8 @@
-import { Component, inject, Input, SimpleChanges } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, AugmentedKeywordsService, Keyword } from '@exense/step-core';
+import { Component, inject, OnInit } from '@angular/core';
+import { AugmentedKeywordsService, Keyword } from '@exense/step-core';
 import { PlanEditorApiService } from '../../../plan-editor/plan-editor.module';
 import { CompositeKeywordPlanApiService } from '../../services/composite-keyword-plan-api.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'step-composite-function-editor',
@@ -15,18 +15,14 @@ import { CompositeKeywordPlanApiService } from '../../services/composite-keyword
     },
   ],
 })
-export class CompositeFunctionEditorComponent {
-  @Input() id?: string;
-
+export class CompositeFunctionEditorComponent implements OnInit {
   private _functionApiService = inject(AugmentedKeywordsService);
+  protected _id: string | undefined = inject(ActivatedRoute).snapshot.params['id'];
 
   protected composite?: Keyword;
 
-  ngOnChanges(changes: SimpleChanges): void {
-    const cId = changes['id'];
-    if (cId?.previousValue !== cId?.currentValue || cId?.firstChange) {
-      this.loadKeyword(cId?.currentValue);
-    }
+  ngOnInit(): void {
+    this.loadKeyword(this._id);
   }
 
   private loadKeyword(id?: string): void {
@@ -39,7 +35,3 @@ export class CompositeFunctionEditorComponent {
     });
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepCompositeFunctionEditor', downgradeComponent({ component: CompositeFunctionEditorComponent }));
