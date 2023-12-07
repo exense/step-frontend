@@ -255,6 +255,9 @@ export class MetricChartComponent implements OnInit, OnChanges {
             const entity = entitiesByIds.get(entityId);
             if (entity) {
               this.chart.setLabelItem(s.id, groupDimensionIndex, mapEntityToLabel(entity));
+            } else {
+              // entity was not fetched
+              this.chart.setLabelItem(s.id, groupDimensionIndex, this.updateFailedToLoadLabel(entityId));
             }
           }
         });
@@ -269,9 +272,13 @@ export class MetricChartComponent implements OnInit, OnChanges {
     series.forEach((s) => {
       const entityId = s.labelItems[groupDimensionIndex];
       if (entityId) {
-        this.chart.setLabelItem(s.id, groupDimensionIndex, entityId + ' (Failed to load)');
+        this.chart.setLabelItem(s.id, groupDimensionIndex, this.updateFailedToLoadLabel(entityId));
       }
     });
+  }
+
+  private updateFailedToLoadLabel(label: string): string {
+    return label + ' (Failed to load)';
   }
 
   private getAxesFormatFunction(unit: string): (v: number) => string {
