@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  AJS_MODULE,
   GridService,
   AugmentedTokenWrapperOwner,
   TableFetchLocalDataSource,
@@ -64,7 +62,3 @@ export class TokenListComponent {
     });
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepTokenList', downgradeComponent({ component: TokenListComponent }));

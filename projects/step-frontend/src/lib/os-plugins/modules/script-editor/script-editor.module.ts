@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { StepCoreModule, ViewRegistryService } from '@exense/step-core';
+import { SimpleOutletComponent, StepCoreModule, ViewRegistryService } from '@exense/step-core';
 import { ScriptEditorComponent } from './components/script-editor/script-editor.component';
 import './components/script-editor/script-editor.component';
 
@@ -10,9 +10,17 @@ import './components/script-editor/script-editor.component';
 })
 export class ScriptEditorModule {
   constructor(_viewRegistry: ViewRegistryService) {
-    _viewRegistry.registerView('scripteditor', 'scripteditor/partials/scriptEditor.html');
+    _viewRegistry.registerRoute({
+      path: 'scripteditor',
+      component: SimpleOutletComponent,
+      children: [
+        {
+          path: ':id',
+          component: ScriptEditorComponent,
+        },
+      ],
+    });
   }
 }
 
-export * from './angularjs/script-editor.module';
 export * from './components/script-editor/script-editor.component';
