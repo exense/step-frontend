@@ -4,6 +4,7 @@ import { RANGE_HOURS, RANGE_MINUTES } from '../../injectables/ranges.tokens';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { FormBuilder } from '@angular/forms';
 import { AlertType } from '../../../basics/shared/alert-type.enum';
+import { TOOLTIP_HOURS_RANGE, TOOLTIP_MINUTES_RANGE } from '../../injectables/tooltip.tokens';
 
 @Component({
   selector: 'step-any-date-range-editor',
@@ -20,6 +21,8 @@ export class AnyDateRangeEditorComponent extends BaseEditorComponent implements 
   private _fb = inject(FormBuilder);
   readonly _MINUTES = inject(RANGE_MINUTES);
   readonly _HOURS = inject(RANGE_HOURS);
+  readonly _tooltipMinutes = inject(TOOLTIP_MINUTES_RANGE);
+  readonly _tooltipHours = inject(TOOLTIP_HOURS_RANGE);
 
   readonly anyDateRangeForm = this._fb.group({
     minuteFrom: this._fb.control<number>(0),

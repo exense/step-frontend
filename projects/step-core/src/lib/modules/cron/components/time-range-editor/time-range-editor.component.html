@@ -48,8 +48,11 @@
       </step-form-field>
     </mat-radio-button>
   </mat-radio-group>
-  <step-form-field class="no-label-focus">
+  <step-form-field class="no-label-focus" alignLabelAddon="near">
     <step-label>Hour range</step-label>
+    <step-label-addon>
+      <step-icon name="help-circle" [matTooltip]="_tooltipHours" matTooltipPosition="above"> </step-icon>
+    </step-label-addon>
     <section class="editor-content">
       <span>from </span>
       <mat-select formControlName="hourFrom">

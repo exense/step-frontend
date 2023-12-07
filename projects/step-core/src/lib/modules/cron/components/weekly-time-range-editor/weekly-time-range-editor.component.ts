@@ -3,6 +3,7 @@ import { BaseEditorComponent } from '../base-editor/base-editor.component';
 import { FormBuilder } from '@angular/forms';
 import { RANGE_HOURS } from '../../injectables/ranges.tokens';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
+import { TOOLTIP_HOURS_RANGE } from '../../injectables/tooltip.tokens';
 
 @Component({
   selector: 'step-weekly-time-range-editor',
@@ -18,6 +19,7 @@ export class WeeklyTimeRangeEditorComponent extends BaseEditorComponent implemen
 
   private _fb = inject(FormBuilder);
   readonly _HOURS = inject(RANGE_HOURS);
+  readonly _tooltipHours = inject(TOOLTIP_HOURS_RANGE);
 
   readonly weeklyTimeRangeForm = this._fb.group({
     dayOfWeek: this._fb.control<string[]>([]),

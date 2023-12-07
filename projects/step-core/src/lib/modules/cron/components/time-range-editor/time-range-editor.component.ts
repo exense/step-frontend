@@ -4,6 +4,7 @@ import { FormBuilder } from '@angular/forms';
 import { DateTime } from 'luxon';
 import { RANGE_DAYS, RANGE_HOURS, RANGE_MONTHS_NAMES, RANGE_YEARS } from '../../injectables/ranges.tokens';
 import { debounceTime, distinctUntilChanged, startWith, Subject, takeUntil } from 'rxjs';
+import { TOOLTIP_HOURS_RANGE } from '../../injectables/tooltip.tokens';
 
 enum TimeRangeType {
   CONCRETE_DATE = 'CONCRETE_DATE',
@@ -27,6 +28,7 @@ export class TimeRangeEditorComponent extends BaseEditorComponent implements OnI
   readonly _YEARS = inject(RANGE_YEARS);
   readonly _DAYS = inject(RANGE_DAYS);
   readonly _HOURS = inject(RANGE_HOURS);
+  readonly _tooltipHours = inject(TOOLTIP_HOURS_RANGE);
 
   readonly TimeRangeType = TimeRangeType;
 

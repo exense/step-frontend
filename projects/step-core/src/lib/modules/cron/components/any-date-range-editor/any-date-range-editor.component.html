@@ -7,12 +7,7 @@
   <step-form-field class="no-label-focus" alignLabelAddon="near">
     <step-label>Hour range</step-label>
     <step-label-addon>
-      <step-icon
-        name="help-circle"
-        matTooltip="Exclused only the hours within gived from to"
-        matTooltipPosition="above"
-      >
-      </step-icon>
+      <step-icon name="help-circle" [matTooltip]="_tooltipHours" matTooltipPosition="above"> </step-icon>
     </step-label-addon>
     <section class="editor-content">
       <span>From </span>
@@ -34,12 +29,7 @@
   <step-form-field class="no-label-focus" alignLabelAddon="near">
     <step-label>Minute range</step-label>
     <step-label-addon>
-      <step-icon
-        name="help-circle"
-        matTooltip="Exclused only the minutes within gived from to"
-        matTooltipPosition="above"
-      >
-      </step-icon>
+      <step-icon name="help-circle" [matTooltip]="_tooltipMinutes" matTooltipPosition="above"> </step-icon>
     </step-label-addon>
     <section class="editor-content">
       <span>From </span>
