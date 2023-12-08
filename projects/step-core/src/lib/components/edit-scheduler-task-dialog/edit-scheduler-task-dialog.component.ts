@@ -3,11 +3,12 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm, NgModel } from '@angular/forms';
 import {
   AugmentedSchedulerService,
+  CronExclusion,
   ExecutionParameters,
   ExecutiontTaskParameters,
   Plan,
 } from '../../client/step-client-module';
-import { CronService } from '../../modules/cron/cron.module';
+import { CronEditorTab, CronService } from '../../modules/cron/cron.module';
 
 type EditDialogRef = MatDialogRef<EditSchedulerTaskDialogComponent, ExecutiontTaskParameters>;
 
@@ -18,6 +19,9 @@ type EditDialogRef = MatDialogRef<EditSchedulerTaskDialogComponent, ExecutiontTa
 })
 export class EditSchedulerTaskDialogComponent implements OnInit {
   readonly rawValueModelOptions: NgModel['options'] = { updateOn: 'blur' };
+
+  readonly EXCLUSION_HELP_MESSAGE =
+    'Optionally provide CRON expression(s) for excluding time ranges. (Example: for a schedule set to run every 5 minutes, you can exclude the execution on weekends with “* * * ? * SAT-SUN” )';
 
   private _cron = inject(CronService);
   private _api = inject(AugmentedSchedulerService);
@@ -113,6 +117,16 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
 
   removeExclusion(index: number) {
     this._task.cronExclusions!.splice(index, 1);
+  }
+
+  configureCronExpressionForExclusion(exclusion: CronExclusion): void {
+    this._cron
+      .configureExpression(CronEditorTab.TIME_RANGE, CronEditorTab.WEEKLY_TIME_RANGE, CronEditorTab.ANY_DAY_TIME_RANGE)
+      .subscribe((expression) => {
+        if (expression) {
+          exclusion.cronExpression = expression;
+        }
+      });
   }
 
   private initializeTask(): void {

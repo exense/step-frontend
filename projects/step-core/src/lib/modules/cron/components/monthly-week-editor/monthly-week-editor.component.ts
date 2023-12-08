@@ -1,5 +1,6 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { HoursEditorComponent } from '../hours-editor/hours-editor.component';
+import { RANGE_DAY_NUM, RANGE_MONTHS_NUMBERS, RANGE_WEEK_DAY } from '../../injectables/ranges.tokens';
 
 @Component({
   selector: 'step-monthly-week-editor',
@@ -11,34 +12,15 @@ import { HoursEditorComponent } from '../hours-editor/hours-editor.component';
   encapsulation: ViewEncapsulation.None,
 })
 export class MonthlyWeekEditorComponent extends HoursEditorComponent {
-  override readonly HOURS = this.createRange(23, 1).map((key) => ({ key, value: key.toString().padStart(2, '0') }));
+  readonly _MONTHS = inject(RANGE_MONTHS_NUMBERS);
+  readonly _DAY_NUM = inject(RANGE_DAY_NUM);
+  readonly _WEEK_DAY = inject(RANGE_WEEK_DAY);
 
-  readonly MONTHS = this.createRange(12, 1).map((key) => ({ key, value: key.toString() }));
+  protected month = this._MONTHS[0].key;
 
-  readonly DAY_NUM = [
-    { key: '#1', value: 'First' },
-    { key: '#2', value: 'Second' },
-    { key: '#3', value: 'Third' },
-    { key: '#4', value: 'Fourth' },
-    { key: '#5', value: 'Fifth' },
-    { key: 'L', value: 'Last' },
-  ];
+  protected dayNum = this._DAY_NUM[0].key;
 
-  readonly WEEK_DAY = [
-    { key: 'MON', value: 'Monday' },
-    { key: 'TUE', value: 'Tuesday' },
-    { key: 'WED', value: 'Wednesday' },
-    { key: 'THU', value: 'Thursday' },
-    { key: 'FRI', value: 'Friday' },
-    { key: 'SAT', value: 'Saturday' },
-    { key: 'SUN', value: 'Sunday' },
-  ];
-
-  protected month = this.MONTHS[0].key;
-
-  protected dayNum = this.DAY_NUM[0].key;
-
-  protected weekDay = this.WEEK_DAY[0].key;
+  protected weekDay = this._WEEK_DAY[0].key;
 
   handleMonthChange(month: number): void {
     this.month = month;

@@ -16,7 +16,7 @@ export class CronValidatorsFactory {
   private hours = new NumberValidator(0, 23);
   private daysOfMonths = new NumberValidator(1, 32);
   private years = new NumberValidator(1970, 2199);
-  private months = new MonthValidator(new NumberValidator(0, 11));
+  private months = new MonthValidator(new NumberValidator(1, 12));
   private weekDays = new DayOfWeekValidator(new NumberValidator(1, 7));
 
   static readonly instance = new CronValidatorsFactory();
