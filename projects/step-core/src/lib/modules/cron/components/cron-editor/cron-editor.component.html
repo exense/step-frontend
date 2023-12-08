@@ -17,6 +17,21 @@
         </step-monthly-editor>
         <step-yearly-editor *ngSwitchCase="CronEditorTab.YEARLY" (expressionChange)="handleExpressionChange($event)">
         </step-yearly-editor>
+        <step-time-range-editor
+          *ngSwitchCase="CronEditorTab.TIME_RANGE"
+          (expressionChange)="handleExpressionChange($event)"
+        >
+        </step-time-range-editor>
+        <step-weekly-time-range-editor
+          *ngSwitchCase="CronEditorTab.WEEKLY_TIME_RANGE"
+          (expressionChange)="handleExpressionChange($event)"
+        >
+        </step-weekly-time-range-editor>
+        <step-any-date-range-editor
+          *ngSwitchCase="CronEditorTab.ANY_DAY_TIME_RANGE"
+          (expressionChange)="handleExpressionChange($event)"
+        >
+        </step-any-date-range-editor>
         <ng-container *ngSwitchDefault> </ng-container>
       </section>
       <section *ngIf="cronExpression"><strong>Generated CRON Expression:</strong> {{ cronExpression }}</section>

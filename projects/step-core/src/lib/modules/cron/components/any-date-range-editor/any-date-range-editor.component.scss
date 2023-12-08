@@ -1,0 +1,10 @@
+step-any-date-range-editor > section {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  & > step-alert {
+    max-width: 60rem;
+    line-height: 1.5;
+  }
+}

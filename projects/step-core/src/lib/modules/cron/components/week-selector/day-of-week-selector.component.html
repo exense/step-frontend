@@ -1,0 +1,9 @@
+<mat-checkbox
+  *ngFor="let day of _WEEK_DAYS; trackBy: trackByDay"
+  color="primary"
+  [ngModel]="$any(day).isSelected"
+  (ngModelChange)="handleDayChange(day)"
+  [disabled]="isDisabled"
+>
+  {{ day.value }}
+</mat-checkbox>
