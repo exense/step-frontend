@@ -8,8 +8,6 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '@exense/step-core';
 
 @Component({
   selector: 'step-status',
@@ -45,7 +43,3 @@ export class StatusComponent implements OnChanges {
     }
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepStatus', downgradeComponent({ component: StatusComponent }));

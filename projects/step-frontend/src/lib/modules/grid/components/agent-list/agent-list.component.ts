@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
   AgentListEntry,
-  AJS_MODULE,
   GridService,
   STORE_ALL,
   TableFetchLocalDataSource,
@@ -51,7 +49,3 @@ export class AgentListComponent {
     });
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepAgentList', downgradeComponent({ component: AgentListComponent }));

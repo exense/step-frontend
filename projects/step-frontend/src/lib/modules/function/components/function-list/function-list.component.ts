@@ -1,7 +1,6 @@
 import { AfterViewInit, Component, inject, Injector } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  AJS_MODULE,
+  AJS_ROOT_SCOPE,
   AugmentedKeywordsService,
   AutoDeselectStrategy,
   Keyword,
@@ -113,7 +112,3 @@ export class FunctionListComponent implements AfterViewInit {
       });
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepFunctionList', downgradeComponent({ component: FunctionListComponent }));

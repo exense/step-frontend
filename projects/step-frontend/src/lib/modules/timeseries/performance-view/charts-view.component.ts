@@ -1,7 +1,6 @@
 import { KeyValue } from '@angular/common';
 import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, BucketAttributes, Execution, TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
+import { BucketAttributes, Execution, TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
 import { forkJoin, Observable, of, skip, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
 import { TSTimeRange } from '../chart/model/ts-time-range';
@@ -854,7 +853,3 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     return TsChartType;
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepPerformanceView', downgradeComponent({ component: ChartsViewComponent }));

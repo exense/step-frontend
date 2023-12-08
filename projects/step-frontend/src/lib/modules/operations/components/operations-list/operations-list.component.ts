@@ -1,7 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  AJS_MODULE,
   OperationDetails,
   STORE_ALL,
   SystemService,
@@ -61,12 +59,3 @@ export class OperationsListComponent {
     return operationDetails.operation?.name;
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive(
-    'stepOperationsList',
-    downgradeComponent({
-      component: OperationsListComponent,
-    })
-  );

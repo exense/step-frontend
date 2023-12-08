@@ -1,7 +1,17 @@
-import { Component, EventEmitter, Inject, Input, OnDestroy, Output } from '@angular/core';
-import { IRootScopeService } from 'angular';
-import { interval, Observable, Subscription } from 'rxjs';
-import { AJS_ROOT_SCOPE } from '../../shared';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
+import { AutoRefreshModelFactoryService } from '../../services/auto-refresh-model-factory.service';
+import { Subject, takeUntil } from 'rxjs';
+import { AutoRefreshModel } from '../../shared';
 
 interface AutorefreshPreset {
   label: string;
@@ -13,11 +23,12 @@ interface AutorefreshPreset {
   templateUrl: './autorefresh-toggle.component.html',
   styleUrls: ['./autorefresh-toggle.component.scss'],
 })
-export class AutorefreshToggleComponent implements OnDestroy {
-  private _intervalSubscription?: Subscription;
-  private _interval$?: Observable<unknown>;
+export class AutorefreshToggleComponent implements OnInit, OnChanges, OnDestroy {
+  private terminator$?: Subject<void>;
+  private isExternalModel = false;
 
-  private _isManuallyChanged: boolean = false;
+  private _autoRefreshModelFactory = inject(AutoRefreshModelFactoryService);
+  @Input() model = this._autoRefreshModelFactory.create();
 
   readonly presets: ReadonlyArray<AutorefreshPreset> = [
     { label: 'OFF', value: 0 },
@@ -30,94 +41,99 @@ export class AutorefreshToggleComponent implements OnDestroy {
   selectedInterval: AutorefreshPreset = this.presets[0];
 
   @Input() autoIncreaseTo?: number;
-
-  _disabled: boolean = false;
-  _lastInterval?: number;
-
-  get disabled(): boolean {
-    return this._disabled;
-  }
-
-  @Input() set disabled(value: boolean) {
-    if (this.disabled === value) {
-      return;
-    }
-    this._disabled = value;
-    this.disabledChange.emit(value);
-    this._$rootScope.$broadcast('globalsettings-globalRefreshToggle', { new: !value });
-    if (!value) {
-      if (this._lastInterval) {
-        this.interval = this._lastInterval;
-      }
-      this.refresh.emit();
-    } else {
-      this._lastInterval = this.interval;
-      this.interval = 0;
-    }
-  }
-
-  private _interval: number = 0;
-
-  get interval(): number {
-    return this._interval;
-  }
-
-  @Input() set interval(value: number) {
-    if (value === this._interval) {
-      return;
-    }
-    this.stopTimer();
-    this._interval = value;
-    this.selectedInterval = this.presets.find((p) => p.value === value) || { label: '', value: value };
-    this.intervalChange.emit(value);
-    this._$rootScope.$broadcast('globalsettings-refreshInterval', { new: value });
-    this.startTimer();
-
-    if (value !== 0) {
-      this._lastInterval = undefined;
-    }
-  }
+  @Input() interval: number = 0;
+  @Input() disabled: boolean = false;
 
   @Output() disabledChange = new EventEmitter<boolean>();
   @Output() intervalChange = new EventEmitter<number>();
-
   @Output() refresh = new EventEmitter<unknown>();
 
-  constructor(@Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService) {}
+  ngOnInit(): void {
+    if (!this.isExternalModel) {
+      this.setupModelChanges(this.model);
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const cModel = changes['model'];
+    if (cModel?.previousValue !== cModel?.currentValue || cModel?.firstChange) {
+      this.setModel(cModel?.currentValue);
+    }
+
+    const cInterval = changes['interval'];
+    if (cInterval?.previousValue !== cInterval?.currentValue || cInterval?.firstChange) {
+      this.setInterval(cInterval?.currentValue);
+    }
+
+    const cDisabled = changes['disabled'];
+    if (cDisabled?.previousValue !== cDisabled?.currentValue || cDisabled?.firstChange) {
+      this.setIsDisabled(cDisabled?.currentValue);
+    }
+
+    const cAutoIncreaseTo = changes['autoIncreaseTo'];
+    if (cAutoIncreaseTo?.previousValue !== cAutoIncreaseTo?.currentValue || cAutoIncreaseTo?.firstChange) {
+      this.setAutoIncrease(cAutoIncreaseTo?.currentValue);
+    }
+  }
 
   ngOnDestroy(): void {
-    this.stopTimer();
+    if (!this.isExternalModel) {
+      this.model.destroy();
+    }
+    this.terminate();
   }
 
   changeRefreshInterval(newInterval: AutorefreshPreset): void {
-    this._isManuallyChanged = true;
     this.selectedInterval = newInterval;
-    this.interval = newInterval.value;
-    this.disabled = this.interval <= 0;
+    this.model.setInterval(newInterval.value, true);
+    this.model.setDisabled(newInterval.value < 0);
   }
 
-  private stopTimer(): void {
-    if (this._intervalSubscription) {
-      this._intervalSubscription.unsubscribe();
-      this._intervalSubscription = undefined;
-    }
-    this._interval$ = undefined;
-  }
-
-  private startTimer(): void {
-    if (this._interval$ || this.interval <= 0) {
+  private terminate(): void {
+    if (!this.terminator$) {
       return;
     }
+    this.terminator$.next();
+    this.terminator$.complete();
+    this.terminator$ = undefined;
+  }
 
-    this._interval$ = interval(this.interval);
-    this._intervalSubscription = this._interval$.subscribe(() => {
-      this.refresh.emit();
+  private setupModelChanges(model: AutoRefreshModel): void {
+    this.terminate();
+    this.terminator$ = new Subject<void>();
+    model.disableChange$.pipe(takeUntil(this.terminator$)).subscribe((disabled) => this.disabledChange.emit(disabled));
+    model.intervalChange$.pipe(takeUntil(this.terminator$)).subscribe((interval) => this.intervalChange.emit(interval));
+    model.refresh$.pipe(takeUntil(this.terminator$)).subscribe(() => this.refresh.emit());
+  }
 
-      if (this.autoIncreaseTo && !this._isManuallyChanged && this._interval < this.autoIncreaseTo) {
-        const newInterval = this.interval * 2;
-        this.interval = newInterval < this.autoIncreaseTo ? newInterval : this.autoIncreaseTo;
-      }
-      this._isManuallyChanged = false;
-    });
+  private setModel(model: AutoRefreshModel): void {
+    this.isExternalModel = true;
+    this.setupModelChanges(model);
+    this.selectedInterval = this.presets.find((p) => p.value === model.interval) || {
+      label: '',
+      value: model.interval,
+    };
+  }
+
+  private setInterval(interval: number): void {
+    if (this.isExternalModel) {
+      return;
+    }
+    this.selectedInterval = this.presets.find((p) => p.value === interval) || { label: '', value: interval };
+    this.model.setInterval(interval ?? 0);
+  }
+
+  private setIsDisabled(disabled: boolean): void {
+    if (this.isExternalModel) {
+      return;
+    }
+    this.model.setDisabled(disabled);
+  }
+
+  private setAutoIncrease(autoIncreaseTo: number): void {
+    if (this.isExternalModel) {
+      return;
+    }
+    this.model.setAutoIncreaseTo(autoIncreaseTo);
   }
 }

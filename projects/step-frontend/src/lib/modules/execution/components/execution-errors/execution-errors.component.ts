@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { AJS_MODULE, SortPredicate, TableLocalDataSource } from '@exense/step-core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
+import { SortPredicate, TableLocalDataSource } from '@exense/step-core';
 import { ErrorDistributionStatus } from '../../shared/error-distribution-status.enum';
 import { ExecutionErrorMessageItem } from '../../shared/execution-error-message-item';
 import { ExecutionErrorCodeItem } from '../../shared/execution-error-code-item';
@@ -72,7 +71,3 @@ export class ExecutionErrorsComponent implements OnChanges {
     });
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepExecutionErrors', downgradeComponent({ component: ExecutionErrorsComponent }));
