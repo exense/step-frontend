@@ -91,11 +91,11 @@ $menu-sub-item-height: 3.2rem;
   step-tenant-selection {
     display: block;
     position: fixed;
-    top: 70px;
-    left: 56px;
+    top: 7rem;
+    left: 5.6rem;
     z-index: 2;
-    max-width: 150px;
-    min-width: 150px;
+    max-width: 15rem;
+    min-width: 15rem;
   }
   .tenant-selector-when-sidebar-closed {
     display: none;

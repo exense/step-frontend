@@ -185,6 +185,9 @@ export class AuthService implements OnDestroy {
           map(() => {
             session.otp = true;
             return session;
+          }),
+          tap(() => {
+            this._navigator.navigateAfterLogin();
           })
         );
       }),

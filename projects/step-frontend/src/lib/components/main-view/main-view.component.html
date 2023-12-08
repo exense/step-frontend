@@ -17,16 +17,12 @@
         </div>
       </section>
     </header>
-    <div id="step-main-scrollable-content" class="st-flex-row">
-      <div class="container-fluid st-flex-column">
-        <step-dashlet itemKey="projectAlerts"> </step-dashlet>
-        <step-dashlet *ngFor="let alert of adminAlerts; trackBy: trackByDashlet" [itemKey]="alert.template">
-        </step-dashlet>
-        <div class="st-flex-row">
-          <div id="mainView" class="st-flex-column">
-            <router-outlet></router-outlet>
-          </div>
-        </div>
+    <div id="step-main-scrollable-content">
+      <step-dashlet itemKey="projectAlerts"></step-dashlet>
+      <step-dashlet *ngFor="let alert of adminAlerts; trackBy: trackByDashlet" [itemKey]="alert.template">
+      </step-dashlet>
+      <div id="mainView">
+        <router-outlet></router-outlet>
       </div>
     </div>
   </div>
@@ -45,6 +41,6 @@
     </button>
   </ng-template>
   <ng-container *ngIf="_appConfig.conf?.authentication">
-    <ng-container *ngIf="_authService.isAuthenticated$ | async; then logout; else signIn"> </ng-container>
+    <ng-container *ngIf="_authService.isAuthenticated$ | async; then logout; else signIn"></ng-container>
   </ng-container>
 </mat-menu>
