@@ -36,6 +36,7 @@ import { RouterModule } from '@angular/router';
 import { RangeFilterComponent } from './components/range-filter/range-filter.component';
 import { StringArrayInputComponent } from './components/string-array-input/string-array-input.component';
 import { ArrayItemLabelPipe } from './pipes/array-item-label.pipe';
+import { AllowCharsDirective } from './directives/allow-chars.directive';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -73,6 +74,7 @@ import { ArrayItemLabelPipe } from './pipes/array-item-label.pipe';
     RangeFilterComponent,
     StringArrayInputComponent,
     ArrayItemLabelPipe,
+    AllowCharsDirective,
   ],
   exports: [
     ResourceLabelComponent,
@@ -109,6 +111,7 @@ import { ArrayItemLabelPipe } from './pipes/array-item-label.pipe';
     RangeFilterComponent,
     StringArrayInputComponent,
     ArrayItemLabelPipe,
+    AllowCharsDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -162,6 +165,7 @@ export * from './directives/hint.directive';
 export * from './directives/error.directive';
 export * from './directives/alert.directive';
 export * from './directives/prevent-chars.directive';
+export * from './directives/allow-chars.directive';
 export * from './directives/label-addon.directive';
 export * from './shared/repository-parameters.token';
 export * from './repository-parameters-initializer';

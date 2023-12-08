@@ -55,7 +55,7 @@ export class CallPlanComponent extends BaseArtefactComponent<CallPlanArtefact> {
       .pipe(map(() => `/root/plans/editor/${this.context.artefact!.planId!}`))
       .subscribe({
         next: (url) => this._router.navigateByUrl(url),
-        error: (error) => this._dialogs.showErrorMsg(error),
+        error: (error) => this._dialogs.showErrorMsg(error).subscribe(),
       });
   }
 

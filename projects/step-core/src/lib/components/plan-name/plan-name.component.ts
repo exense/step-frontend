@@ -2,8 +2,6 @@ import { Component, EventEmitter, forwardRef, inject, Input, Output } from '@ang
 import { ReferenceArtefactNameConfig } from '../reference-artefact-name/reference-artefact-name.component';
 import { CallPlan, Plan, AugmentedPlansService, DynamicValueString } from '../../client/step-client-module';
 import { Observable } from 'rxjs';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '../../shared';
 
 const PLAN_CAPTIONS: ReferenceArtefactNameConfig<CallPlan, Plan>['captions'] = {
   searchReference: 'Select a plan',
@@ -52,7 +50,3 @@ export class PlanNameComponent implements ReferenceArtefactNameConfig<CallPlan, 
     return this._plansApi.lookupCallPlan(artefact);
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepPlanName', downgradeComponent({ component: PlanNameComponent }));

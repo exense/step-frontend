@@ -1,67 +1,46 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
-  AJS_MODULE,
   AJS_ROOT_SCOPE,
   ArtefactInfo,
   AuthService,
-  BulkSelectionType,
   ControllerService,
-  Mutable,
-  RegistrationStrategy,
   RepositoryObjectReference,
-  selectionCollectionProvider,
-  SelectionCollector,
-  TestRunStatus,
 } from '@exense/step-core';
-import { IRootScopeService } from 'angular';
-import { map, noop, Observable, of } from 'rxjs';
+import { noop } from 'rxjs';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { IncludeTestcases } from '../../shared/include-testcases.interface';
-import { ActivatedRoute, Router } from '@angular/router';
-
-type FieldAccessor = Mutable<
-  Pick<
-    RepositoryComponent,
-    'reload' | 'isolateExecution' | 'repoRef' | 'loading' | 'artefact' | 'error' | 'includeTestcases$'
-  >
->;
+import { ActivatedRoute } from '@angular/router';
+import { RepositoryPlanTestcaseListComponent } from '../repository-plan-testcase-list/repository-plan-testcase-list.component';
 
 @Component({
   selector: 'step-repository',
   templateUrl: './repository.component.html',
   styleUrls: ['./repository.component.scss'],
-  providers: [
-    selectionCollectionProvider<string, TestRunStatus>({
-      selectionKeyProperty: 'id',
-      registrationStrategy: RegistrationStrategy.MANUAL,
-    }),
-  ],
+  host: {
+    class: 'container',
+  },
 })
 export class RepositoryComponent implements OnInit, OnDestroy {
+  private _$rootScope = inject(AJS_ROOT_SCOPE);
+
+  private _auth = inject(AuthService);
+  private _controllersApi = inject(ControllerService);
+  private _activatedRoute = inject(ActivatedRoute);
+
   private cancelRootScopeEvent: () => void = noop;
 
-  readonly reload: boolean = true;
+  protected reload: boolean = true;
 
-  readonly loading: boolean = false;
-  readonly isolateExecution: boolean = false;
+  @ViewChild('planTestcaseListComponent')
+  readonly planTestCases?: RepositoryPlanTestcaseListComponent;
 
-  readonly repoRef?: RepositoryObjectReference;
+  protected loading: boolean = false;
+  protected isolateExecution: boolean = false;
 
-  readonly artefact?: ArtefactInfo;
+  protected repoRef?: RepositoryObjectReference;
 
-  readonly error?: Error;
+  protected artefact?: ArtefactInfo;
 
-  readonly includeTestcases$: Observable<IncludeTestcases | undefined> = of(undefined);
-  public testcaseSelectionType: BulkSelectionType = BulkSelectionType.NONE;
-
-  constructor(
-    @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService,
-    private _activatedRoute: ActivatedRoute,
-    private _auth: AuthService,
-    private _controllersApi: ControllerService,
-
-    protected _selectionCollector: SelectionCollector<string, TestRunStatus>
-  ) {}
+  protected error?: Error;
 
   ngOnInit(): void {
     this.setupReloadLogic();
@@ -75,21 +54,21 @@ export class RepositoryComponent implements OnInit, OnDestroy {
 
   private setupReloadLogic(): void {
     this.cancelRootScopeEvent = this._$rootScope.$on('$locationChangeSuccess', () => {
-      (this as FieldAccessor).reload = false;
-      setTimeout(() => ((this as FieldAccessor).reload = true));
+      this.reload = false;
+      setTimeout(() => (this.reload = true));
     });
   }
 
   private setupLocationParams(): void {
     const search = this._activatedRoute.snapshot.queryParams;
-    (this as FieldAccessor).isolateExecution = !!search['isolate'];
+    this.isolateExecution = !!search['isolate'];
 
     if (search['user']) {
       this._auth.updateContext({ userID: search['user'] });
     }
 
     if (search['repositoryId']) {
-      (this as FieldAccessor).repoRef = {
+      this.repoRef = {
         repositoryID: search['repositoryId'],
         repositoryParameters: Object.entries(search).reduce((result, [key, value]) => {
           if (!['repositoryId', 'tenant'].includes(key)) {
@@ -102,36 +81,11 @@ export class RepositoryComponent implements OnInit, OnDestroy {
   }
 
   private loadArtefact(): void {
-    const fieldAccessor = this as FieldAccessor;
-    fieldAccessor.loading = true;
-    this._controllersApi.getArtefactInfo(this.repoRef).subscribe(
-      (artefact) => {
-        fieldAccessor.artefact = artefact;
-        this.setupTestCases();
-      },
-      (error) => (fieldAccessor.error = error),
-      () => (fieldAccessor.loading = false)
-    );
-  }
-
-  protected setupTestCases(): void {
-    if (this.artefact!.type !== 'TestSet') {
-      return;
-    }
-    const isBy = (): 'id' | 'name' | 'all' => {
-      let by = this.repoRef!.repositoryID === 'local' ? 'id' : 'name';
-
-      // @ts-ignore
-      return this.testcaseSelectionType === 'ALL' ? 'all' : by;
-    };
-
-    (this as FieldAccessor).includeTestcases$ = this._selectionCollector.selected$.pipe(
-      map((list) => list as string[]),
-      map((list) => ({ by: isBy(), list }))
-    );
+    this.loading = true;
+    this._controllersApi.getArtefactInfo(this.repoRef).subscribe({
+      next: (artefact) => (this.artefact = artefact),
+      error: (error) => (this.error = error),
+      complete: () => (this.loading = false),
+    });
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepRepository', downgradeComponent({ component: RepositoryComponent }));

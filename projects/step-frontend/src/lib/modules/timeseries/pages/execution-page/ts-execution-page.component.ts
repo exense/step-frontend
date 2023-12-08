@@ -9,16 +9,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import {
-  AJS_MODULE,
-  AsyncTasksService,
-  DashboardService,
-  Execution,
-  ExecutionsService,
-  pollAsyncTask,
-  TimeSeriesService,
-} from '@exense/step-core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
+import { AsyncTasksService, Execution, pollAsyncTask, TimeSeriesService } from '@exense/step-core';
 import { PerformanceViewSettings } from '../../performance-view/model/performance-view-settings';
 import { RangeSelectionType } from '../../time-selection/model/range-selection-type';
 import { Subject, Subscription, switchMap, takeUntil, tap, timer } from 'rxjs';
@@ -198,7 +189,3 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
     this.terminator$.complete();
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepExecutionPerformance', downgradeComponent({ component: ExecutionPerformanceComponent }));
