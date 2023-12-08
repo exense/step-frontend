@@ -1,6 +1,5 @@
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
-  AJS_MODULE,
   AJS_ROOT_SCOPE,
   ArtefactInfo,
   AuthService,
@@ -16,6 +15,9 @@ import { RepositoryPlanTestcaseListComponent } from '../repository-plan-testcase
   selector: 'step-repository',
   templateUrl: './repository.component.html',
   styleUrls: ['./repository.component.scss'],
+  host: {
+    class: 'container',
+  },
 })
 export class RepositoryComponent implements OnInit, OnDestroy {
   private _$rootScope = inject(AJS_ROOT_SCOPE);
@@ -87,7 +89,3 @@ export class RepositoryComponent implements OnInit, OnDestroy {
     });
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepRepository', downgradeComponent({ component: RepositoryComponent }));

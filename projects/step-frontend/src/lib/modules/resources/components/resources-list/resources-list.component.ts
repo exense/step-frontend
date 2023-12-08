@@ -1,8 +1,6 @@
 import { AfterViewInit, Component, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  AJS_MODULE,
   AugmentedResourcesService,
   AutoDeselectStrategy,
   EditorResolverService,
@@ -128,7 +126,3 @@ export class ResourcesListComponent implements AfterViewInit {
       .subscribe();
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepResourcesList', downgradeComponent({ component: ResourcesListComponent }));
