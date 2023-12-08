@@ -70,3 +70,6 @@ export class AppModule {
     this.upgrade.bootstrap(document.body, [AJS_MODULE]);
   }
 }
+
+export * from './components/root/root.component';
+export * from './components/main-view/main-view.component';
