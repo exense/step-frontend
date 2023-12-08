@@ -5,6 +5,7 @@ import { Route, Router, Routes, UrlMatcher, UrlSegment } from '@angular/router';
 import { CheckPermissionsGuard } from './check-permissions.guard';
 import { VIEW_ID_LINK_PREFIX } from '../modules/basics/services/view-id-link-prefix.token';
 import { BehaviorSubject } from 'rxjs';
+import { authGuard } from '../modules/basics/shared/auth.guards';
 
 export interface CustomView {
   template: string;
@@ -192,8 +193,12 @@ export class ViewRegistryService implements OnDestroy {
       }) as SubRouteData[];
   }
 
+  private getRootRoute(): Route {
+    return this._router.config[0]!.children!.find((route) => route.path === 'root')!;
+  }
+
   private getRouteParentChildren(parentPath: string): Routes {
-    const root = this._router.config.find((route) => route.path === 'root')!;
+    const root = this.getRootRoute();
     let parentChildren = root.children!;
 
     if (!parentPath) {
@@ -222,8 +227,15 @@ export class ViewRegistryService implements OnDestroy {
     return parentChildren;
   }
 
+  private addAuthGuard(route: Route): void {
+    route.canActivate = route.canActivate ?? [];
+    if (!route.canActivate!.includes(authGuard)) {
+      route.canActivate.push(authGuard);
+    }
+  }
+
   registerRoute(route: Route, { parentPath, label, weight, accessPermissions }: SubRouterConfig = {}): void {
-    const root = this._router.config.find((route) => route.path === 'root');
+    const root = this.getRootRoute();
     if (!root?.children) {
       return;
     }
@@ -246,9 +258,9 @@ export class ViewRegistryService implements OnDestroy {
       if (weight || label || accessPermissions) {
         route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label, accessPermissions } };
       }
+      this.addAuthGuard(route);
       if (accessPermissions) {
-        route.canActivate = route.canActivate ?? [];
-        route.canActivate.push(CheckPermissionsGuard);
+        route.canActivate!.push(CheckPermissionsGuard);
       }
       root.children.push(route);
       return;
@@ -266,9 +278,9 @@ export class ViewRegistryService implements OnDestroy {
       route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label, accessPermissions } };
     }
 
+    this.addAuthGuard(route);
     if (accessPermissions) {
-      route.canActivate = route.canActivate ?? [];
-      route.canActivate.push(CheckPermissionsGuard);
+      route.canActivate!.push(CheckPermissionsGuard);
     }
 
     parentChildren!.push(route);

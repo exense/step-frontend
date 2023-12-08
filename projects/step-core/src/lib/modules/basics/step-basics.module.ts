@@ -190,3 +190,4 @@ export * from './services/app-config-container.service';
 export * from './shared/logout-cleanup.token';
 export * from './services/is-used-by-dialog';
 export * from './shared/bulk-operation-type.enum';
+export * from './shared/auth.guards';

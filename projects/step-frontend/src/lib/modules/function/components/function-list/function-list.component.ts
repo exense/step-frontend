@@ -1,6 +1,5 @@
 import { AfterViewInit, Component, inject, Injector } from '@angular/core';
 import {
-  AJS_ROOT_SCOPE,
   AugmentedKeywordsService,
   AutoDeselectStrategy,
   Keyword,

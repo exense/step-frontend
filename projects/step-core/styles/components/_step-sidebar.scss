@@ -88,7 +88,7 @@ $menu-sub-item-height: 3.2rem;
     margin-left: map.get($config, width-closed-small-screen);
   }
 
-  step-tenant-selection-downgraded {
+  step-tenant-selection {
     display: block;
     position: fixed;
     top: 70px;
@@ -513,7 +513,7 @@ $menu-sub-item-height: 3.2rem;
       }
       // MENU ITEMS TOOLTIPS FOR SMALL SCREEN END
 
-      & ~ step-tenant-selection-downgraded {
+      & ~ #project-select {
         width: map.get($config, width-closed);
         visibility: hidden;
       }

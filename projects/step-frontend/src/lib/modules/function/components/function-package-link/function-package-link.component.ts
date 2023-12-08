@@ -1,14 +1,6 @@
-import { Component, Inject } from '@angular/core';
-import {
-  AJS_ROOT_SCOPE,
-  CustomComponent,
-  DialogsService,
-  Keyword,
-  FunctionPackage,
-  KeywordPackagesService,
-} from '@exense/step-core';
+import { Component } from '@angular/core';
+import { CustomComponent, Keyword, FunctionPackage, KeywordPackagesService } from '@exense/step-core';
 import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
-import { IRootScopeService } from 'angular';
 
 @Component({
   selector: 'step-function-package-link',
@@ -41,9 +33,7 @@ export class FunctionPackageLinkComponent implements CustomComponent {
 
   constructor(
     private _api: KeywordPackagesService,
-    private _functionPackageActionsService: FunctionPackageActionsService,
-    private _dialogs: DialogsService,
-    @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService
+    private _functionPackageActionsService: FunctionPackageActionsService
   ) {}
 
   delete(): void {
@@ -86,7 +76,6 @@ export class FunctionPackageLinkComponent implements CustomComponent {
   }
 
   reload(): void {
-    this._$rootScope.$broadcast('functions.collection.change', {});
     this.loadFunctionPackage();
   }
 

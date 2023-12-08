@@ -416,7 +416,6 @@ export * from './services/plan-interactive-session.service';
 export * from './services/plugin-info-registry.service';
 export * from './services/restore-dialogs.service';
 export * from './services/scheduled-task-dialogs.service';
-export { UibModalHelperService, UibModalInstance } from './services/uib-modal-helper.service';
 export * from './services/view-registry.service';
 export * from './services/view-state.service';
 export * from './services/artefact.service';
