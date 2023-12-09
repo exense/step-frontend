@@ -9,7 +9,6 @@ import {
   OnDestroy,
   OnInit,
   Output,
-  Self,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -21,8 +20,7 @@ import MouseListener = uPlot.Cursor.MouseListener;
 
 //@ts-ignore
 import uPlot = require('uplot');
-import { TSTimeRange } from './model/ts-time-range';
-import { Execution, ExecutionsService } from '@exense/step-core';
+import { Execution, ExecutionsService, TimeRange } from '@exense/step-core';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -40,7 +38,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   @Input() syncKey: string | undefined; // all the charts with the same syncKey in the app will be synced
 
   @Output() zoomReset = new EventEmitter<void>();
-  @Output() zoomChange = new EventEmitter<TSTimeRange>();
+  @Output() zoomChange = new EventEmitter<TimeRange>();
   @Output() lockStateChange = new EventEmitter<boolean>();
 
   uplot!: uPlot;
@@ -85,6 +83,9 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   }
 
   ngOnInit(): void {
+    if (!this.settings) {
+      throw new Error('Missing settings input');
+    }
     if (this.syncKey) {
       uPlot.sync(this.syncKey);
     }
@@ -320,7 +321,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   }
 
   private mergeLabelItems(items: (string | undefined)[]): string {
-    return items.map((i) => (i ??  '<Empty>')).join(' | ');
+    return items.map((i) => i ?? '<Empty>').join(' | ');
   }
 
   setSeriesLabel(id: string, label: string): void {

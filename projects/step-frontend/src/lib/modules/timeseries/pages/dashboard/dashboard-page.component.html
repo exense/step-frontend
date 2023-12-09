@@ -1,14 +1,29 @@
 <div *ngIf="dashboard" style="margin: 12px">
   <div style="font-size: 24px">{{ dashboard.name }}</div>
 
+  <div>
+    <step-ts-filter-bar
+      *ngIf="context"
+      [context]="context"
+      [filterOptions]="[]"
+      [activeFilters]="[]"
+      (onTimeRangeChange)="handleTimeRangeChange($event)"
+      [timeRangeOptions]="timeRangeOptions"
+      [activeTimeRange]="timeRangeSelection"
+      [compactView]="compareModeEnabled"
+    >
+    </step-ts-filter-bar>
+  </div>
+
   <div style="width: 100%; flex-direction: row; flex-wrap: wrap; display: flex">
     <div
       *ngFor="let config of chartConfigs"
       style="height: 300px; width: 500px; margin-top: 40px; margin-right: 40px; position: relative"
     >
-      <step-chart-skeleton *ngIf="!config.finalSettings"></step-chart-skeleton>
-      <step-timeseries-chart *ngIf="config.finalSettings" [settings]="config.finalSettings"></step-timeseries-chart>
-      <ng-container *ngTemplateOutlet="menuTemplate; context: { $implicit: config }"></ng-container>
+      <step-chart-dashlet [item]="config.state" [context]="context"></step-chart-dashlet>
+      <!--      <step-chart-skeleton *ngIf="!config.finalSettings"></step-chart-skeleton>-->
+      <!--      <step-timeseries-chart *ngIf="config.finalSettings" [settings]="config.finalSettings"></step-timeseries-chart>-->
+      <!--      <ng-container *ngTemplateOutlet="menuTemplate; context: { $implicit: config }"></ng-container>-->
     </div>
   </div>
 </div>

@@ -20,7 +20,6 @@ import {
 } from '@exense/step-core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { PerformanceViewSettings } from '../../performance-view/model/performance-view-settings';
-import { RangeSelectionType } from '../../time-selection/model/range-selection-type';
 import { Subject, Subscription, switchMap, takeUntil, tap, timer } from 'rxjs';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
 import { TimeSeriesConfig } from '../../time-series.config';
@@ -48,7 +47,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
   @Input() executionInput: Execution | undefined;
   execution: Execution | undefined;
 
-  timeRangeSelection: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
+  timeRangeSelection: TimeRangePickerSelection = { type: 'FULL' };
 
   performanceViewSettings: PerformanceViewSettings | undefined;
 

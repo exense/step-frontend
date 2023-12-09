@@ -1,10 +1,16 @@
 import { KeyValue } from '@angular/common';
 import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, BucketAttributes, Execution, TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
+import {
+  AJS_MODULE,
+  BucketAttributes,
+  Execution,
+  TimeRange,
+  TimeSeriesAPIResponse,
+  TimeSeriesService,
+} from '@exense/step-core';
 import { forkJoin, Observable, of, skip, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
-import { TSTimeRange } from '../chart/model/ts-time-range';
 import { TimeSeriesChartComponent } from '../chart/time-series-chart.component';
 import { KeywordSelection, TimeSeriesKeywordsContext } from '../pages/execution-page/time-series-keywords.context';
 import { FindBucketsRequest } from '../find-buckets-request';
@@ -287,7 +293,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     );
   }
 
-  handleSelectionChange(selection: TSTimeRange): Observable<any> {
+  handleSelectionChange(selection: TimeRange): Observable<any> {
     if (TimeSeriesUtils.intervalsEqual(this.findRequestBuilder.getRange(), selection)) {
       // nothing happened
       return of(undefined);
@@ -299,7 +305,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     return this.refreshAllCharts();
   }
 
-  handleCompareSelectionChange(selection: TSTimeRange): Observable<any> {
+  handleCompareSelectionChange(selection: TimeRange): Observable<any> {
     if (TimeSeriesUtils.intervalsEqual(this.compareRequestBuilder.getRange(), selection)) {
       // nothing happened
       return of(undefined);

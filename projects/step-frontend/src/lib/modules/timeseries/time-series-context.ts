@@ -1,8 +1,7 @@
 import { BehaviorSubject, Observable, skip, Subject } from 'rxjs';
 import { TimeSeriesKeywordsContext } from './pages/execution-page/time-series-keywords.context';
 import { TimeseriesColorsPool } from './util/timeseries-colors-pool';
-import { Execution } from '@exense/step-core';
-import { TSTimeRange } from './chart/model/ts-time-range';
+import { Execution, TimeRange } from '@exense/step-core';
 import { TsFilterItem } from './performance-view/filter-bar/model/ts-filter-item';
 import { TimeSeriesContextParams } from './time-series-context-params';
 import { TsFilteringMode } from './model/ts-filtering-mode';
@@ -26,10 +25,10 @@ export class TimeSeriesContext {
 
   inProgress$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  private fullTimeRange: TSTimeRange; // this represents the entire time-series interval. usually this is displayed entirely in the time-ranger
-  private readonly fullTimeRangeChange$: Subject<TSTimeRange> = new Subject<TSTimeRange>();
-  private selectedTimeRange: TSTimeRange; // this is the zooming selection.
-  private readonly selectedTimeRangeChange$: Subject<TSTimeRange> = new Subject<TSTimeRange>();
+  private fullTimeRange: TimeRange; // this represents the entire time-series interval. usually this is displayed entirely in the time-ranger
+  private readonly fullTimeRangeChange$: Subject<TimeRange> = new Subject<TimeRange>();
+  private selectedTimeRange: TimeRange; // this is the zooming selection.
+  private readonly selectedTimeRangeChange$: Subject<TimeRange> = new Subject<TimeRange>();
 
   private readonly activeGroupings$: BehaviorSubject<string[]>;
 
@@ -114,25 +113,25 @@ export class TimeSeriesContext {
     this.chartsLockedState$.next(state);
   }
 
-  updateFullRange(range: TSTimeRange, emitEvent = true) {
+  updateFullRange(range: TimeRange, emitEvent = true) {
     this.fullTimeRange = range;
     if (emitEvent) {
       this.fullTimeRangeChange$.next(range);
     }
   }
 
-  updateSelectedRange(range: TSTimeRange, emitEvent = true) {
+  updateSelectedRange(range: TimeRange, emitEvent = true) {
     this.selectedTimeRange = range;
     if (emitEvent) {
       this.selectedTimeRangeChange$.next(range);
     }
   }
 
-  onFullRangeChange(): Observable<TSTimeRange> {
+  onFullRangeChange(): Observable<TimeRange> {
     return this.fullTimeRangeChange$.asObservable();
   }
 
-  onTimeSelectionChange(): Observable<TSTimeRange> {
+  onTimeSelectionChange(): Observable<TimeRange> {
     return this.selectedTimeRangeChange$.asObservable();
   }
 
@@ -140,7 +139,7 @@ export class TimeSeriesContext {
     return JSON.stringify(this.selectedTimeRange) === JSON.stringify(this.fullTimeRange);
   }
 
-  getSelectedTimeRange(): TSTimeRange {
+  getSelectedTimeRange(): TimeRange {
     return this.selectedTimeRange;
   }
 
@@ -171,7 +170,7 @@ export class TimeSeriesContext {
     const selectedTimeRange = this.getSelectedTimeRange();
     return new OQLBuilder()
       .open('and')
-      .append(`(begin < ${Math.trunc(selectedTimeRange.to)} and begin > ${Math.trunc(selectedTimeRange.from)})`)
+      .append(`(begin < ${Math.trunc(selectedTimeRange.to!)} and begin > ${Math.trunc(selectedTimeRange.from!)})`)
       .append(filtersOql)
       .build();
   }
@@ -216,7 +215,7 @@ export class TimeSeriesContext {
     return this.activeGroupings$.getValue();
   }
 
-  getFullTimeRange(): TSTimeRange {
+  getFullTimeRange(): TimeRange {
     return this.fullTimeRange;
   }
 }

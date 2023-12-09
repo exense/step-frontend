@@ -14,11 +14,11 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { TSRangerSettings } from './ts-ranger-settings';
-import { TSTimeRange } from '../chart/model/ts-time-range';
 
 //@ts-ignore
 import uPlot = require('uplot');
 import MouseListener = uPlot.Cursor.MouseListener;
+import { TimeRange } from '@exense/step-core';
 
 /**
  * There are 3 ways of interaction with the ranger:
@@ -46,14 +46,14 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
    * 1. when a synced chart or this chart is zooming
    * 2. when the grips are moved
    */
-  @Output() onRangeChange = new EventEmitter<TSTimeRange>();
+  @Output() onRangeChange = new EventEmitter<TimeRange>();
 
-  @Output() onZoomReset = new EventEmitter<TSTimeRange>();
+  @Output() onZoomReset = new EventEmitter<TimeRange>();
 
   @Output() onChartLoaded = new EventEmitter<void>();
 
   uplot!: any;
-  previousRange: TSTimeRange | undefined;
+  previousRange: TimeRange | undefined;
 
   start!: number;
   end!: number;
@@ -124,13 +124,13 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     }
   }
 
-  selectRange(range: TSTimeRange) {
+  selectRange(range: TimeRange) {
     const select = this.transformRangeToSelect(range);
     this.uplot.setSelect(select, false);
     this.emitSelectionToLinkedCharts();
   }
 
-  transformRangeToSelect(range: TSTimeRange): uPlot.Select {
+  transformRangeToSelect(range: TimeRange): uPlot.Select {
     const fromTimestamp = range.from;
     const toTimestamp = range.to;
     let left, width;

@@ -1,8 +1,6 @@
 import { AfterViewInit, Component, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
-import { TSTimeRange } from '../chart/model/ts-time-range';
 import {
-  AugmentedSchedulerService,
   BucketAttributes,
   BucketResponse,
   Execution,
@@ -14,6 +12,7 @@ import {
   Plan,
   PlansService,
   SchedulerService,
+  TimeRange,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
@@ -45,7 +44,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
 
   @Input() filters: Record<string, any> = {};
   @Input() settings!: MetricType;
-  @Input() range!: TSTimeRange;
+  @Input() range!: TimeRange;
   @Input() allowGroupingChange = true;
   @Input() allowMetricChange = true;
   @Input() colorsPool: TimeseriesColorsPool = new TimeseriesColorsPool();
@@ -100,9 +99,9 @@ export class MetricChartComponent implements OnInit, OnChanges {
     });
   }
 
-  changeSelection(range: TSTimeRange) {
-    range.from = Math.floor(range.from);
-    range.to = Math.floor(range.to);
+  changeSelection(range: TimeRange) {
+    range.from = Math.floor(range.from!);
+    range.to = Math.floor(range.to!);
     if (this.selectedRange.from !== range.from || this.selectedRange.to !== range.to) {
       this.selectedRange = range;
       this.fetchDataAndCreateChart(this.settings);

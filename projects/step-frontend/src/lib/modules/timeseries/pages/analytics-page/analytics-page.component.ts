@@ -1,17 +1,15 @@
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, DashboardService, MetricType, TimeSeriesService } from '@exense/step-core';
+import { AJS_MODULE, DashboardService, MetricType, TimeRange, TimeSeriesService } from '@exense/step-core';
 import { TimeSeriesConfig } from '../../time-series.config';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
 import { TimeSeriesDashboardComponent } from '../../dashboard/time-series-dashboard.component';
-import { RangeSelectionType } from '../../time-selection/model/range-selection-type';
 import { TimeSeriesDashboardSettings } from '../../dashboard/model/ts-dashboard-settings';
 import { TsUtils } from '../../util/ts-utils';
 import { FilterBarItemType, TsFilterItem } from '../../performance-view/filter-bar/model/ts-filter-item';
 import { range, Subject, takeUntil, timer } from 'rxjs';
 import { TimeSeriesUtils } from '../../time-series-utils';
 import { MatMenuTrigger } from '@angular/material/menu';
-import { TSTimeRange } from '../../chart/model/ts-time-range';
 
 @Component({
   selector: 'step-analytics-page',
@@ -29,7 +27,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
 
   timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   timeRangeSelection!: TimeRangePickerSelection;
-  activeTimeRange: TSTimeRange = { from: 0, to: 0 };
+  activeTimeRange: TimeRange = { from: 0, to: 0 };
 
   // this is just for running executions
   refreshIntervals = TimeSeriesConfig.AUTO_REFRESH_INTERVALS;
@@ -65,7 +63,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     if (urlParams.start) {
       start = parseInt(urlParams.start);
       end = parseInt(urlParams.end) ? parseInt(urlParams.end) : now;
-      this.timeRangeSelection = { type: RangeSelectionType.ABSOLUTE, absoluteSelection: { from: start, to: end } };
+      this.timeRangeSelection = { type: 'ABSOLUTE', absoluteSelection: { from: start, to: end } };
     } else {
       if (urlParams.relativeRange && !isNaN(urlParams.relativeRange)) {
         const range = Number(urlParams.relativeRange);
@@ -101,7 +99,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleDashboardTimeRangeChange(range: TSTimeRange) {
+  handleDashboardTimeRangeChange(range: TimeRange) {
     this.activeTimeRange = range;
   }
 
@@ -209,7 +207,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     let lastRelativeOption: TimeRangePickerSelection = this.timeRangeOptions[0];
     for (let i = 0; i < this.timeRangeOptions.length; i++) {
       const currentOption = this.timeRangeOptions[i];
-      if (currentOption.type === RangeSelectionType.RELATIVE) {
+      if (currentOption.type === 'RELATIVE') {
         if (currentOption.relativeSelection!.timeInMs === rangeMs) {
           return currentOption;
         }

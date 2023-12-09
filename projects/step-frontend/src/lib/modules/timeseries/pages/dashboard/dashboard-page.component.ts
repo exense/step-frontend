@@ -8,6 +8,7 @@ import {
   DashboardView,
   FetchBucketsRequest,
   MetricAttribute,
+  TimeRange,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
@@ -17,6 +18,9 @@ import { TimeSeriesUtils } from '../../time-series-utils';
 import { TimeSeriesConfig } from '../../time-series.config';
 import { UPlotUtils } from '../../uplot/uPlot.utils';
 import { TimeseriesColorsPool } from '../../util/timeseries-colors-pool';
+import { TimeSeriesContext } from '../../time-series-context';
+import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
+import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
 
 //@ts-ignore
 import uPlot = require('uplot');
@@ -43,6 +47,7 @@ export class DashboardPageComponent implements OnInit {
   readonly AGGREGATES: AggregationType[] = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'RATE', 'MEDIAN'];
 
   private _timeSeriesService = inject(TimeSeriesService);
+  private _timeSeriesContextFactory = inject(TimeSeriesContextsFactory);
   private _dashboardService = inject(DashboardsService);
   colorsPool: TimeseriesColorsPool = new TimeseriesColorsPool();
 
@@ -51,9 +56,41 @@ export class DashboardPageComponent implements OnInit {
 
   chartConfigs: ChartConfig[] = [];
 
+  context!: TimeSeriesContext;
+
+  compareModeEnabled = false;
+  timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
+  timeRangeSelection: TimeRangePickerSelection = this.timeRangeOptions[0];
+
+  initContext(dashboard: DashboardView) {
+    const dashboardTimeRange = dashboard.timeRange!;
+    const timeRange: TimeRange = {
+      from: dashboardTimeRange.absoluteSelection!.from!,
+      to: dashboardTimeRange.absoluteSelection!.to!,
+    };
+    if (dashboard.timeRange && dashboard.timeRange.type === 'RELATIVE') {
+      const timeInMs = dashboardTimeRange.relativeRangeMs!;
+      const foundRelativeOption = this.timeRangeOptions.find((o) => {
+        return o.type === 'RELATIVE' && timeInMs === timeInMs;
+      });
+      this.timeRangeSelection = foundRelativeOption || {
+        type: 'RELATIVE',
+        relativeSelection: { label: `Last ${timeInMs / 60000} minutes`, timeInMs: timeInMs },
+      };
+    } else {
+      this.timeRangeSelection = { ...dashboardTimeRange, type: dashboardTimeRange.type! };
+    }
+    this.context = this._timeSeriesContextFactory.createContext({
+      id: dashboard.id!,
+      timeRange: timeRange,
+      grouping: [],
+    });
+  }
+
   ngOnInit(): void {
     this._dashboardService.getAll1().subscribe((dashboards) => {
       this.dashboard = dashboards[0];
+      this.initContext(this.dashboard);
       this.chartSettings = new Array(this.dashboard!.dashlets!.length);
       this.dashboard.dashlets!.forEach((dashlet, i) => {
         const settings = dashlet.chartSettings!;
@@ -173,6 +210,12 @@ export class DashboardPageComponent implements OnInit {
       default:
         throw new Error('Unit not handled: ' + unit);
     }
+  }
+
+  handleTimeRangeChange(params: { selection: TimeRangePickerSelection; triggerRefresh: boolean }) {
+    // this.timeRangeSelection = params.selection;
+    // let newTimeRange: TSTimeRange = this.calculateTimeRange(params.selection);
+    // this.updateFullRange(newTimeRange, params.triggerRefresh);
   }
 
   private getUnitLabel(aggregation: AggregationType, unit: string): string {

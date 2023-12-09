@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { MatMenuTrigger } from '@angular/material/menu';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { TimeRangePickerSelection } from './time-range-picker-selection';
-import { RangeSelectionType } from './model/range-selection-type';
 import { ExecutionTimeSelection } from './model/execution-time-selection';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -44,7 +43,7 @@ export class TimeRangePickerComponent implements OnInit {
       if (!this.activeSelection) {
         this.activeSelection = this.selectOptions[0];
       } else {
-        if (this.activeSelection.type === RangeSelectionType.ABSOLUTE) {
+        if (this.activeSelection.type === 'ABSOLUTE') {
           let from = this.activeSelection.absoluteSelection!.from!;
           let to = this.activeSelection.absoluteSelection!.to!;
           this.fromDateString = TimeSeriesUtils.formatInputDate(new Date(from));
@@ -76,7 +75,7 @@ export class TimeRangePickerComponent implements OnInit {
     if (!from && !to) {
       // both are missing
       if (this.includeFullRangeOption) {
-        this.emitSelectionChange({ type: RangeSelectionType.FULL });
+        this.emitSelectionChange({ type: 'FULL' });
         this.closeMenu();
       } else {
         this._snackBar.open('Time range not applied', 'dismiss');
@@ -96,8 +95,8 @@ export class TimeRangePickerComponent implements OnInit {
       const currentSelection = this.activeSelection.absoluteSelection;
       if (currentSelection?.from !== from || currentSelection?.to !== to) {
         // something has changed
-        const newSelection = {
-          type: RangeSelectionType.ABSOLUTE,
+        const newSelection: TimeRangePickerSelection = {
+          type: 'ABSOLUTE',
           absoluteSelection: { from: from, to: to },
         };
         this.emitSelectionChange(newSelection);
@@ -111,12 +110,12 @@ export class TimeRangePickerComponent implements OnInit {
   }
 
   onRelativeSelectionSelected(option: TimeRangePickerSelection) {
-    if (option.type === RangeSelectionType.FULL) {
+    if (option.type === 'FULL') {
       this.onFullRangeSelect();
       return;
     }
     if (
-      this.activeSelection.type === RangeSelectionType.RELATIVE &&
+      this.activeSelection.type === 'RELATIVE' &&
       this.activeSelection.relativeSelection!.timeInMs === option.relativeSelection!.timeInMs
     ) {
       return;
@@ -129,14 +128,14 @@ export class TimeRangePickerComponent implements OnInit {
    */
   selectFullRange() {
     this.resetCustomDates();
-    this.activeSelection = { type: RangeSelectionType.FULL };
+    this.activeSelection = { type: 'FULL' };
   }
 
   /**
    * This method reacts to the component html selection change, and should NOT be used from exterior
    */
   onFullRangeSelect(): void {
-    this.emitSelectionChange({ type: RangeSelectionType.FULL });
+    this.emitSelectionChange({ type: 'FULL' });
   }
 
   /**
@@ -145,9 +144,9 @@ export class TimeRangePickerComponent implements OnInit {
    */
   setSelection(selection: ExecutionTimeSelection) {
     this.activeSelection = selection;
-    if (selection.type === RangeSelectionType.ABSOLUTE) {
+    if (selection.type === 'ABSOLUTE') {
       this.setAbsoluteSelection(selection);
-    } else if (selection.type === RangeSelectionType.RELATIVE) {
+    } else if (selection.type === 'RELATIVE') {
       this.resetCustomDates();
     } else {
       // it is full
@@ -209,9 +208,5 @@ export class TimeRangePickerComponent implements OnInit {
 
   getActiveSelection() {
     return this.activeSelection;
-  }
-
-  get RangeSelectionType() {
-    return RangeSelectionType;
   }
 }

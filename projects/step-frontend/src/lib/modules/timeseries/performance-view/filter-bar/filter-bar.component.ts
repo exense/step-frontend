@@ -21,7 +21,7 @@ import { FilterBarItemComponent } from './item/filter-bar-item.component';
 import { FilterBarItemType, TsFilterItem } from './model/ts-filter-item';
 import { TsFilteringSettings } from '../../model/ts-filtering-settings';
 import { TimeSeriesConfig } from '../../time-series.config';
-import { Execution, TimeSeriesService } from '@exense/step-core';
+import { Execution, TimeRange, TimeSeriesService } from '@exense/step-core';
 import { OqlVerifyResponse } from '../../model/oql-verify-response';
 import { TsFilteringMode } from '../../model/ts-filtering-mode';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
@@ -29,8 +29,6 @@ import { OQLBuilder } from '../../util/oql-builder';
 import { MatDialog } from '@angular/material/dialog';
 import { DiscoverComponent } from '../../discover/discover.component';
 import { DiscoverDialogData } from '../../discover/discover-dialog-data';
-import { TSTimeRange } from '../../chart/model/ts-time-range';
-import { RangeSelectionType } from '../../time-selection/model/range-selection-type';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
@@ -206,14 +204,14 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     if (item.updateTimeSelectionOnFilterChange && item.searchEntities.length > 0) {
       // calculate the new time range. if all the entities were deleted, keep the last range.
       const newRange = this.getExecutionsTimeRange(item);
-      this.activeTimeRange = { type: RangeSelectionType.ABSOLUTE, absoluteSelection: newRange };
+      this.activeTimeRange = { type: 'ABSOLUTE', absoluteSelection: newRange };
       this.onTimeRangeChange.next({ selection: this.activeTimeRange, triggerRefresh: false });
     }
 
     this.emitFilterChange$.next();
   }
 
-  private getExecutionsTimeRange(item: TsFilterItem): TSTimeRange {
+  private getExecutionsTimeRange(item: TsFilterItem): TimeRange {
     let allExecutionsAreKnown = true;
     let min = Number.MAX_VALUE;
     let max = 0;
@@ -233,8 +231,8 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     if (!allExecutionsAreKnown) {
       // don't reduce the interval because we have execution with no info
       let fullTimeRange = this.context.getFullTimeRange();
-      min = Math.min(fullTimeRange.from, min);
-      max = Math.max(fullTimeRange.to, max);
+      min = Math.min(fullTimeRange.from!, min);
+      max = Math.max(fullTimeRange.to!, max);
     }
     return { from: min, to: max };
   }
@@ -318,7 +316,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     const selectedTimeRange = this.context.getSelectedTimeRange();
     return new OQLBuilder()
       .open('and')
-      .append(`(begin < ${Math.trunc(selectedTimeRange.to)} and begin > ${Math.trunc(selectedTimeRange.from)})`)
+      .append(`(begin < ${Math.trunc(selectedTimeRange.to!)} and begin > ${Math.trunc(selectedTimeRange.from!)})`)
       .append(filtersOql)
       .build();
   }

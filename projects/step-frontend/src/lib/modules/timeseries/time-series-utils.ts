@@ -1,7 +1,5 @@
-import { TSTimeRange } from './chart/model/ts-time-range';
 import { FilterBarItemType, TsFilterItem } from './performance-view/filter-bar/model/ts-filter-item';
-import { Execution } from '@exense/step-core';
-import { RangeSelectionType } from './time-selection/model/range-selection-type';
+import { Execution, TimeRange } from '@exense/step-core';
 import { TimeRangePickerSelection } from './time-selection/time-range-picker-selection';
 
 export class TimeSeriesUtils {
@@ -16,8 +14,8 @@ export class TimeSeriesUtils {
     return result;
   }
 
-  static intervalIsInside(bigInterval: TSTimeRange, smallInterval: TSTimeRange): boolean {
-    return !(bigInterval.from > smallInterval.from || bigInterval.to < smallInterval.to);
+  static intervalIsInside(bigInterval: TimeRange, smallInterval: TimeRange): boolean {
+    return !(bigInterval.from! > smallInterval.from! || bigInterval.to! < smallInterval.to!);
   }
 
   /**
@@ -25,37 +23,37 @@ export class TimeSeriesUtils {
    * @param boundaries
    * @param interval
    */
-  static cropInterval(boundaries: TSTimeRange, interval: TSTimeRange): TSTimeRange | undefined {
+  static cropInterval(boundaries: TimeRange, interval: TimeRange): TimeRange | undefined {
     if (!this.intervalsOverlap(boundaries, interval)) {
       return undefined;
     }
-    return { from: Math.max(boundaries.from, interval.from), to: Math.min(boundaries.to, interval.to) };
+    return { from: Math.max(boundaries.from!, interval.from!), to: Math.min(boundaries.to!, interval.to!) };
   }
 
-  static intervalsOverlap(range1: TSTimeRange, range2: TSTimeRange) {
-    return range1.from <= range2.to && range2.from <= range1.to;
+  static intervalsOverlap(range1: TimeRange, range2: TimeRange) {
+    return range1.from! <= range2.to! && range2.from! <= range1.to!;
   }
 
-  static intervalsEqual(range1?: TSTimeRange, range2?: TSTimeRange) {
-    return range1 && range2 && range1.from === range2.from && range1.to === range2.to;
+  static intervalsEqual(range1?: TimeRange, range2?: TimeRange) {
+    return range1 && range2 && range1.from! === range2.from! && range1.to! === range2.to!;
   }
 
   static convertExecutionAndSelectionToTimeRange(
     execution: Execution,
     timeRangeSelection: TimeRangePickerSelection
-  ): TSTimeRange {
+  ): TimeRange {
     const now = new Date().getTime();
-    let selection: TSTimeRange;
-    let newFullRange: TSTimeRange;
+    let selection: TimeRange;
+    let newFullRange: TimeRange;
     switch (timeRangeSelection.type) {
-      case RangeSelectionType.FULL:
-        newFullRange = { from: execution.startTime!, to: execution.endTime || now - 5000 };
+      case 'FULL':
+        newFullRange = { from: execution.startTime!, to: (execution.endTime || now) - 5000 };
         selection = newFullRange;
         break;
-      case RangeSelectionType.ABSOLUTE:
+      case 'ABSOLUTE':
         newFullRange = timeRangeSelection.absoluteSelection!;
         break;
-      case RangeSelectionType.RELATIVE:
+      case 'RELATIVE':
         const end = execution.endTime || now;
         newFullRange = { from: end - timeRangeSelection.relativeSelection!.timeInMs!, to: end };
         break;
@@ -63,16 +61,16 @@ export class TimeSeriesUtils {
     return newFullRange;
   }
 
-  static convertSelectionToTimeRange(selection: TimeRangePickerSelection): TSTimeRange {
+  static convertSelectionToTimeRange(selection: TimeRangePickerSelection): TimeRange {
     let now = new Date().getTime();
-    let newFullRange: TSTimeRange;
+    let newFullRange: TimeRange;
     switch (selection.type) {
-      case RangeSelectionType.FULL:
+      case 'FULL':
         throw new Error('Full range selection is not supported');
-      case RangeSelectionType.ABSOLUTE:
+      case 'ABSOLUTE':
         newFullRange = selection.absoluteSelection!;
         break;
-      case RangeSelectionType.RELATIVE:
+      case 'RELATIVE':
         let end = now;
         newFullRange = { from: end - selection.relativeSelection!.timeInMs!, to: end };
         break;

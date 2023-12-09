@@ -12,7 +12,6 @@ import {
   TimeSeriesService,
 } from '@exense/step-core';
 import { FilterUtils } from '../../../util/filter-utils';
-import { TSTimeRange } from '../../../chart/model/ts-time-range';
 import { TSChartSeries, TSChartSettings } from '../../../chart/model/ts-chart-settings';
 import { TimeSeriesUtils } from '../../../time-series-utils';
 import { TimeSeriesConfig } from '../../../time-series.config';
@@ -34,24 +33,23 @@ interface MetricAttributeSelection extends MetricAttribute {
 export class ChartDashletComponent implements OnInit, Dashlet {
   readonly AGGREGATES: AggregationType[] = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'RATE', 'MEDIAN'];
 
-  @Input() name!: string;
-  @Input() settings!: ChartSettings;
-  @Input() timeRange!: TSTimeRange;
-  @Input() context: TimeSeriesContext;
-  @Input() colorsPool: TimeseriesColorsPool;
+  _internalSettings?: TSChartSettings;
+
+  @Input() item!: DashboardItem;
+  @Input() context!: TimeSeriesContext;
 
   groupingSelection: MetricAttributeSelection[] = [];
 
   private _timeSeriesService = inject(TimeSeriesService);
 
   ngOnInit(): void {
-    if (!this.name || !this.settings || !this.timeRange) {
+    if (!this.item || !this.context) {
       throw new Error('Missing input values');
     }
-    const settings = this.settings;
+    const settings = this.item.chartSettings!;
 
     this.groupingSelection = settings.attributes?.map((a) => ({ ...a, selected: false })) || [];
-    this.settings.grouping.forEach((a) => {
+    settings.grouping?.forEach((a) => {
       const foundAttribute = this.groupingSelection.find((attr) => attr.name === a);
       if (foundAttribute) {
         foundAttribute.selected = true;
@@ -62,23 +60,25 @@ export class ChartDashletComponent implements OnInit, Dashlet {
   }
 
   private createChart(): void {
+    const settings = this.item.chartSettings!;
     const groupDimensions = this.getChartGrouping();
     const request: FetchBucketsRequest = {
-      start: this.timeRange.from,
-      end: this.timeRange.to,
+      start: this.context.getSelectedTimeRange().from,
+      end: this.context.getSelectedTimeRange().to,
       groupDimensions: groupDimensions,
-      oqlFilter: FilterUtils.objectToOQL({ 'attributes.metricType': `"${this.settings.metricKey!}"` }),
+      oqlFilter: FilterUtils.objectToOQL({ 'attributes.metricType': `"${settings.metricKey!}"` }),
       numberOfBuckets: 100,
-      percentiles: this.getChartPclToRequest(this.settings.primaryAxes!.aggregation!),
+      percentiles: this.getChartPclToRequest(settings.primaryAxes!.aggregation!),
     };
     this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
       const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-      const primaryAxes = this.settings.primaryAxes!;
+      const primaryAxes = settings.primaryAxes!;
       const primaryAggregation = primaryAxes.aggregation!;
       const series: TSChartSeries[] = response.matrix.map((series, i) => {
         const labelItems = this.getSeriesKeys(response.matrixKeys[i], groupDimensions);
         const seriesKey = labelItems.join(' | ');
-        const color = primaryAxes.renderingSettings?.seriesColors?.[seriesKey] || this.colorsPool.getColor(seriesKey);
+        const color =
+          primaryAxes.renderingSettings?.seriesColors?.[seriesKey] || this.context.keywordsContext.getColor(seriesKey);
 
         return {
           id: seriesKey,
@@ -96,7 +96,7 @@ export class ChartDashletComponent implements OnInit, Dashlet {
       const primaryUnit = primaryAxes.unit!;
       const yAxesUnit = this.getUnitLabel(primaryAggregation, primaryUnit);
 
-      return {
+      this._internalSettings = {
         title: `${name} (${primaryAggregation})`,
         xValues: xLabels,
         series: series,
@@ -109,8 +109,8 @@ export class ChartDashletComponent implements OnInit, Dashlet {
           {
             size: TimeSeriesConfig.CHART_LEGEND_SIZE,
             scale: 'y',
-            values: (u, vals, space) => {
-              return vals.map((v) => this.getAxesFormatFunction(primaryAggregation, primaryUnit)(v));
+            values: (u, vals) => {
+              return vals.map((v: any) => this.getAxesFormatFunction(primaryAggregation, primaryUnit)(v));
             },
           },
         ],
@@ -119,10 +119,10 @@ export class ChartDashletComponent implements OnInit, Dashlet {
   }
 
   private getChartGrouping(): string[] {
-    if (this.settings.inheritGlobalGrouping) {
+    if (this.item!.chartSettings!.inheritGlobalGrouping) {
       return this.context.getGroupDimensions();
     } else {
-      return this.groupingSelection.filter((s) => s.selected).map((a) => a.name);
+      return this.groupingSelection.filter((s) => s.selected).map((a) => a.name!);
     }
   }
 
