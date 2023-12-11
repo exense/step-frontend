@@ -88,6 +88,10 @@ import { TriggerPopoverDirective } from './directives/trigger-popover.directive'
 import { HtmlDescriptionCellComponent } from './components/html-description-cell/html-description-cell.component';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { PopoverContentDirective } from './directives/popover-content.directive';
+import { EnterTextValueDialogComponent } from './components/enter-text-value-dialog/enter-text-value-dialog.component';
+import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
+import { MessagesListDialogComponent } from './components/messages-list-dialog/messages-list-dialog.component';
+import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
 import { ReportNodeIconComponent } from './components/report-node-icon/report-node-icon.component';
 
 @NgModule({
@@ -155,6 +159,10 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     HtmlDescriptionCellComponent,
     SafeHtmlPipe,
     PopoverContentDirective,
+    EnterTextValueDialogComponent,
+    ConfirmationDialogComponent,
+    MessagesListDialogComponent,
+    MessageDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -259,6 +267,10 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     PopoverContentDirective,
     HtmlDescriptionCellComponent,
     SafeHtmlPipe,
+    EnterTextValueDialogComponent,
+    ConfirmationDialogComponent,
+    MessagesListDialogComponent,
+    MessageDialogComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -421,7 +433,12 @@ export * from './shared/special-links-strategy';
 export * from './modules/entity/pipes/cast-entity-to-plan.pipe';
 export * from './modules/entity/pipes/cast-entity-to-execution.pipe';
 export * from './modules/entity/pipes/cast-entity-to-task.pipe';
+export * from './services/auto-refresh-model-factory.service';
 export * from './services/artefacts-factory.service';
 export * from './services/plan-open.service';
 export * from './services/keyword-executor.service';
+export * from './components/enter-text-value-dialog/enter-text-value-dialog.component';
+export * from './components/confirmation-dialog/confirmation-dialog.component';
+export * from './components/messages-list-dialog/messages-list-dialog.component';
+export * from './components/message-dialog/message-dialog.component';
 export * from './components/report-node-icon/report-node-icon.component';

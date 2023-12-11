@@ -1,5 +1,6 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { MinutesEditorComponent } from '../minutes-editor/minutes-editor.component';
+import { RANGE_HOURS } from '../../injectables/ranges.tokens';
 
 @Component({
   selector: 'step-hours-editor',
@@ -8,13 +9,11 @@ import { MinutesEditorComponent } from '../minutes-editor/minutes-editor.compone
   encapsulation: ViewEncapsulation.None,
 })
 export class HoursEditorComponent extends MinutesEditorComponent {
-  override readonly MINUTES = this.SECONDS;
+  readonly _HOURS = inject(RANGE_HOURS);
 
-  readonly HOURS = this.createRange(23, 1).map((key) => ({ key, value: key.toString() }));
+  protected override minute = this._MINUTES[0].key;
 
-  protected override minute = this.MINUTES[0].key;
-
-  protected hour = this.HOURS[0].key;
+  protected hour = this._HOURS[0].key;
 
   handleHourChange(hour: number): void {
     this.hour = hour;

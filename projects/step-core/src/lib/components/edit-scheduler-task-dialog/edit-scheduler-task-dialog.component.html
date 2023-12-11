@@ -44,8 +44,11 @@
       </step-form-field>
 
       <div class="exclusion-panel">
-        <div class="heading" style="display: flex">
-          <span style="margin-right: auto"> CRON Exclusions </span>
+        <div class="heading">
+          <span>
+            CRON Exclusions
+            <step-icon name="help-circle" [matTooltip]="EXCLUSION_HELP_MESSAGE" matTooltipPosition="above"> </step-icon>
+          </span>
           <button mat-button class="add-exclusion-button" type="button" (click)="addCronExclusion()">
             <step-icon name="plus">plus</step-icon>
           </button>
@@ -58,7 +61,20 @@
                 name="exclusion.cronExpression_{{ i }}"
                 [(ngModel)]="exclusion.cronExpression"
                 placeholder="Cron Expression"
+                required
+                stepValidateCron
               />
+              <step-suffix class="button-suffix">
+                <button
+                  type="button"
+                  mat-stroked-button
+                  color="primary"
+                  matTooltip="Configure CRON expression"
+                  (click)="configureCronExpressionForExclusion(exclusion)"
+                >
+                  <step-icon name="watch"></step-icon>
+                </button>
+              </step-suffix>
               <input
                 type="text"
                 name="exclusion.description_{{ i }}"

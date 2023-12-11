@@ -125,7 +125,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
           if (path) {
             this._router.navigateByUrl(path);
           } else {
-            this._dialogsService.showErrorMsg('No editor configured for this function type');
+            this._dialogsService.showErrorMsg('No editor configured for this function type').subscribe();
           }
         })
       )

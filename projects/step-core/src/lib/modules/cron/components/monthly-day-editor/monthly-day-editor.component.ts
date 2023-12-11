@@ -1,25 +1,6 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { HoursEditorComponent } from '../hours-editor/hours-editor.component';
-
-const createDayLabel = (day: number) => {
-  const dayStr = day.toString();
-  let suffix: string;
-  switch (dayStr[dayStr.length - 1]) {
-    case '1':
-      suffix = 'st';
-      break;
-    case '2':
-      suffix = 'nd';
-      break;
-    case '3':
-      suffix = 'rd';
-      break;
-    default:
-      suffix = 'th';
-      break;
-  }
-  return `${dayStr}${suffix} Day`;
-};
+import { RANGE_MONTHLY_DAYS, RANGE_MONTHS_NUMBERS } from '../../injectables/ranges.tokens';
 
 @Component({
   selector: 'step-monthly-day-editor',
@@ -31,28 +12,17 @@ const createDayLabel = (day: number) => {
   encapsulation: ViewEncapsulation.None,
 })
 export class MonthlyDayEditorComponent extends HoursEditorComponent {
-  override readonly HOURS = this.createRange(23, 1).map((key) => ({ key, value: key.toString().padStart(2, '0') }));
+  readonly _MONTHS = inject(RANGE_MONTHS_NUMBERS);
+  readonly _DAYS = inject(RANGE_MONTHLY_DAYS);
 
-  readonly MONTHS = this.createRange(12, 1).map((key) => ({ key, value: key.toString() }));
-
-  readonly DAYS = [
-    { key: '1W', value: 'First Weekday' },
-    ...this.createRange(31, 1).map((key) => ({
-      key,
-      value: createDayLabel(key),
-    })),
-    { key: 'LW', value: 'Last Weekday' },
-    { key: 'L', value: 'Last Day' },
-  ];
-
-  protected month = this.MONTHS[0].key;
+  protected month = this._MONTHS[0].key;
 
   handleMonthChange(value: number): void {
     this.month = value;
     this.updateExpression();
   }
 
-  protected day = this.DAYS[0].key;
+  protected day = this._DAYS[0].key;
 
   handleDayChange(value: string | number): void {
     this.day = value;

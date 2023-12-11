@@ -1,15 +1,6 @@
-<div class="quota-manager-wrapper">
-  <div class="content">
-    <div class="featured-icon">
-      <step-icon name="toggle-left"> </step-icon>
-    </div>
-    <div class="text-wrapper">
-      <p class="title">{{ statusTitle }}</p>
-      <p class="description">{{ statusBody }}</p>
-    </div>
-    <div class="action-group">
-      <button (click)="refresh()">Refresh</button>
-      <step-autorefresh-toggle [interval]="5000" (refresh)="refresh()"> </step-autorefresh-toggle>
-    </div>
-  </div>
-</div>
+<section>
+  <step-autorefresh-toggle [interval]="5000" (refresh)="load()"> </step-autorefresh-toggle>
+  <step-form-field>
+    <textarea rows="10" readonly [ngModel]="statusText"> </textarea>
+  </step-form-field>
+</section>

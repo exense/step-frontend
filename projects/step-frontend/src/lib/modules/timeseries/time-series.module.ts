@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { EntityModule, StepCoreModule } from '@exense/step-core';
+import { EntityModule, StepCoreModule, ViewRegistryService } from '@exense/step-core';
 import { TimeSeriesChartComponent } from './chart/time-series-chart.component';
 import { TSRangerComponent } from './ranger/ts-ranger.component';
 import { TableModule } from '@exense/step-core';
@@ -79,4 +79,11 @@ import { ResolutionPickerComponent } from './components/resolution-picker/resolu
     EntityModule,
   ],
 })
-export class TimeSeriesModule {}
+export class TimeSeriesModule {
+  constructor(_viewRegistry: ViewRegistryService) {
+    _viewRegistry.registerRoute({
+      path: 'analytics',
+      component: AnalyticsPageComponent,
+    });
+  }
+}

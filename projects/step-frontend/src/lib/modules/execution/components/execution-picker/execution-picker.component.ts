@@ -1,17 +1,12 @@
 import { Component, inject } from '@angular/core';
 import {
-  AJS_MODULE,
   AugmentedExecutionsService,
-  AutoDeselectStrategy,
   BulkSelectionType,
   DateFormat,
-  ExecutiontTaskParameters,
   FilterConditionFactoryService,
-  selectionCollectionProvider,
   STORE_ALL,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { EXECUTION_RESULT, EXECUTION_STATUS } from '../../../_common/shared/status.enum';
 import { of } from 'rxjs';
 
@@ -42,7 +37,3 @@ export class ExecutionPickerComponent {
     this.dataSource.reload({ hideProgress: true });
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepExecutionList', downgradeComponent({ component: ExecutionPickerComponent }));

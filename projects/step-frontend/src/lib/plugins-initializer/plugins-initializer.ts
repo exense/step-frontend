@@ -36,6 +36,7 @@ const IGNORE_PLUGINS: ReadonlyArray<string> = [
   'wizard',
   'messages',
   'astraPlugin',
+  'grafana',
   'K6',
 ];
 

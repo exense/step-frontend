@@ -144,6 +144,14 @@ export class AuthService implements OnDestroy {
     return !!context?.rights ? context.rights.indexOf(right) !== -1 : false;
   }
 
+  hasAnyRights(rights: string[]): boolean {
+    return rights.reduce((res, right) => res || this.hasRight(right), false);
+  }
+
+  hasAllRights(rights: string[]): boolean {
+    return rights.reduce((res, right) => res && this.hasRight(right), true);
+  }
+
   getConf(): ApplicationConfiguration | undefined {
     return this._serviceContext.conf;
   }

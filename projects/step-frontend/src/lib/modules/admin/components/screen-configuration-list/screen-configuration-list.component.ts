@@ -1,7 +1,5 @@
 import { AfterViewInit, Component, inject } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  AJS_MODULE,
   ScreensService,
   TableFetchLocalDataSource,
   ScreenInput,
@@ -97,14 +95,10 @@ export class ScreenConfigurationListComponent implements AfterViewInit {
   }
 
   removeScreen(dbId: string, label: string): void {
-    this._screenDialogs.removeScreen(dbId, label).pipe(this.updateDataSourceAfterChange).subscribe();
+    this._screenDialogs.removeScreen(dbId, label).pipe(this.updateDataSource).subscribe();
   }
 
   private editScreenInternal(inputId: string): void {
     this._screenDialogs.editScreen({ inputId }).pipe(this.updateDataSourceAfterChange).subscribe();
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepScreenConfigurationList', downgradeComponent({ component: ScreenConfigurationListComponent }));
