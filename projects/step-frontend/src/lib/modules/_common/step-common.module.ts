@@ -13,8 +13,6 @@ import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
 import { MenuFilterPipe } from './pipes/menu-filter.pipe';
 import { MenuStorageService } from './injectables/menu-storage.service';
 import { SidebarStateService } from './injectables/sidebar-state.service';
-import { LegacyOutletWrapperDirective } from './directives/legacy-outlet-wrapper.directive';
-import { LegacyOutletComponent } from './components/legacy-outlet/legacy-outlet.component';
 import { IsMenuItemActivePipe } from './pipes/is-menu-item-active.pipe';
 
 @NgModule({
@@ -26,8 +24,6 @@ import { IsMenuItemActivePipe } from './pipes/is-menu-item-active.pipe';
     ContainsVersionPipe,
     MenuFilterPipe,
     VersionsDialogComponent,
-    LegacyOutletWrapperDirective,
-    LegacyOutletComponent,
     IsMenuItemActivePipe,
   ],
   exports: [
@@ -38,8 +34,6 @@ import { IsMenuItemActivePipe } from './pipes/is-menu-item-active.pipe';
     IsEmptyJsonPipe,
     ContainsVersionPipe,
     MenuFilterPipe,
-    LegacyOutletWrapperDirective,
-    LegacyOutletComponent,
   ],
   imports: [StepCoreModule],
   providers: [
@@ -77,6 +71,4 @@ export class StepCommonModule {
 }
 
 export * from './shared/status.enum';
-export * from './directives/legacy-outlet-wrapper.directive';
-export * from './components/legacy-outlet/legacy-outlet.component';
 export * from './components/login/login.component';

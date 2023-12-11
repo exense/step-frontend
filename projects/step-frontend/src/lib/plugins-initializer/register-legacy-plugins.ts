@@ -1,6 +1,4 @@
 import { LegacyPluginDefinition } from './shared/legacy-plugin-definition';
-import { getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '@exense/step-core';
 
 const loadScript = (fileName: string): Promise<unknown> =>
   new Promise<unknown>((resolve, reject) => {
@@ -33,16 +31,5 @@ const loadSinglePlugin = async (pluginDefinition: LegacyPluginDefinition): Promi
 };
 
 export const registerLegacyPlugins = async (pluginDefinitions: LegacyPluginDefinition[]) => {
-  if (pluginDefinitions.length === 0) {
-    return;
-  }
-  console.log('Load plugins');
-  const pluginsLoad = pluginDefinitions.map((def) => loadSinglePlugin(def));
-  const angularModules = (await Promise.all(pluginsLoad)).reduce((res, item) => [...res, ...item], []);
-  console.log('Plugins script created');
-
-  getAngularJSGlobal()
-    .module(AJS_MODULE)
-    .requires.push(...angularModules);
-  console.log('angularJS plugins added');
+  return;
 };

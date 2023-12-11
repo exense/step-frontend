@@ -1,6 +1,5 @@
 import { Component, inject, Input, OnInit, ViewEncapsulation } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, ApiError, AuthService } from '@exense/step-core';
+import { ApiError, AuthService } from '@exense/step-core';
 import { HttpErrorInterceptor } from '../../interceptors/http-error.interceptor';
 
 @Component({
@@ -44,7 +43,3 @@ export class LoginComponent implements OnInit {
       });
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepLogin', downgradeComponent({ component: LoginComponent }));

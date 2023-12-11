@@ -1,9 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { SessionDto } from '../../../domain';
 import { BehaviorSubject, catchError, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
-import { AJS_MODULE } from '../../../shared/constants';
 import { AdditionalRightRuleService } from '../../../services/additional-right-rule.service';
 import { ApplicationConfiguration, PrivateApplicationService } from '../../../client/generated';
 import { Mutable } from '../../../shared';
@@ -199,5 +197,3 @@ export class AuthService implements OnDestroy {
     );
   }
 }
-
-getAngularJSGlobal().module(AJS_MODULE).service('AuthService', downgradeInjectable(AuthService));

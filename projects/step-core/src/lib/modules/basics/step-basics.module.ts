@@ -142,7 +142,6 @@ export * from './pipes/array-item-label.pipe';
 export * from './services/credentials.service';
 export * from './services/auth.service';
 export * from './services/item-by-id-cache.service';
-export * from './services/hybrid-injector-helper';
 export * from './services/cron-presets.token';
 export * from './shared/angularjs-provider-options';
 export * from './shared/auth-context.interface';

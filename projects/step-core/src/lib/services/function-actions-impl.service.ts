@@ -1,6 +1,5 @@
 import { EnvironmentInjector, Injectable, Injector, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { Observable, catchError, map, of, switchMap, take, tap } from 'rxjs';
 import { AugmentedKeywordsService, Keyword } from '../client/step-client-module';
 import { EditorResolverService, MultipleProjectsService } from '../modules/basics/step-basics.module';
@@ -12,7 +11,7 @@ import {
   FunctionDialogsConfig,
   FunctionDialogsConfigFactoryService,
 } from '../modules/keywords-common/keywords-common.module';
-import { AJS_MODULE, DialogsService } from '../shared';
+import { DialogsService } from '../shared';
 import { ExportDialogsService } from './export-dialogs.service';
 import { ImportDialogsService } from './import-dialogs.service';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
@@ -226,5 +225,3 @@ export class FunctionActionsImplService implements FunctionActionsService {
       .pipe(tap(() => modalInjector.destroy()));
   }
 }
-
-getAngularJSGlobal().module(AJS_MODULE).service('FunctionDialogs', downgradeInjectable(FunctionActionsImplService));

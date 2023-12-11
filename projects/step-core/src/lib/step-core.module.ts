@@ -47,7 +47,6 @@ import { InputModelFormatterDirective } from './directives/input-model-formatter
 import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 import { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
-import { TooltipDirective } from './directives/tooltip.directive';
 import { TrapFocusDirective } from './directives/trap-focus.directive';
 import { REPOSITORY_PARAMETERS_INITIALIZER, StepBasicsModule } from './modules/basics/step-basics.module';
 import {
@@ -96,7 +95,6 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
 
 @NgModule({
   declarations: [
-    TooltipDirective,
     MatchingAuthenticator,
     DashboardLinkPipe,
     CapsLockDirective,
@@ -193,7 +191,6 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     ReactiveFormsModule,
     HttpClientModule,
     UpgradeModule,
-    TooltipDirective,
     CapsLockDirective,
     StepMaterialModule,
     JsonViewerModule,
@@ -305,7 +302,6 @@ export class StepCoreModule {
   }
 }
 
-export * from './angularjs';
 export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
 export { CancelError, CancelablePromise } from './client/generated/core/CancelablePromise';
 export { OpenAPI } from './client/generated/core/OpenAPI';
@@ -367,7 +363,6 @@ export * from './directives/input-model-formatter.directive';
 export { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 export * from './directives/tooltip-immediate-close.directive';
-export * from './directives/tooltip.directive';
 export { TrapFocusDirective } from './directives/trap-focus.directive';
 export * from './domain';
 export * from './modules/async-operations/async-operations.module';

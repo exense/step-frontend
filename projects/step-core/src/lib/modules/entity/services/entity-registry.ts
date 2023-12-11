@@ -1,7 +1,5 @@
 import { Injectable, Type } from '@angular/core';
 import { EntityMeta } from '../types/entity-meta';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '../../../shared';
 import {
   CustomComponent,
   CustomRegistryService,
@@ -83,5 +81,3 @@ export class EntityRegistry {
     return item as EntityMeta;
   }
 }
-
-getAngularJSGlobal().module(AJS_MODULE).service('EntityRegistry', downgradeInjectable(EntityRegistry));

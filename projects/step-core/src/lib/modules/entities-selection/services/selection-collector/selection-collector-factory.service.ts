@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SelectionCollector } from './selection-collector';
 import { SelectionCollectorImpl } from './selection-collector-impl';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '../../../../shared';
 import { AutoDeselectStrategy } from '../../shared/auto-deselect-strategy.enum';
 import { RegistrationStrategy } from '../../shared/registration.strategy';
 
@@ -20,8 +18,3 @@ export class SelectionCollectorFactoryService {
     return selectionCollector;
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .constant('AutoDeselectStrategy', AutoDeselectStrategy)
-  .service('selectionCollectorFactoryService', downgradeInjectable(SelectionCollectorFactoryService));

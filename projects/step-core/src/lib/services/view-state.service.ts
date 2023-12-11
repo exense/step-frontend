@@ -1,7 +1,6 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
 import { ViewRegistryService } from './view-registry.service';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, Mutable } from '../shared';
+import { Mutable } from '../shared';
 import { BehaviorSubject, map } from 'rxjs';
 
 type PropsAccessor = Mutable<Pick<ViewStateService, 'viewTemplate' | 'isPublicView' | 'isStaticView'>>;
@@ -60,5 +59,3 @@ export class ViewStateService implements OnDestroy {
     this.viewInternal$.complete();
   }
 }
-
-getAngularJSGlobal().module(AJS_MODULE).service('ViewState', downgradeInjectable(ViewStateService));

@@ -1,6 +1,5 @@
 import { Compiler, Injector, Type } from '@angular/core';
-import { AJS_MODULE, getPluginMetaInfo, PluginOnInit } from '@exense/step-core';
-import { getAngularJSGlobal } from '@angular/upgrade/static';
+import { getPluginMetaInfo, PluginOnInit } from '@exense/step-core';
 
 export interface CompileCtx {
   compiler: Compiler;
@@ -48,7 +47,7 @@ export const registerCompiledModules = async (modules: CompiledModule[]): Promis
     .filter((x) => !!x);
 
   if (hybridModules.length > 0) {
-    const hostModule = getAngularJSGlobal().module(AJS_MODULE);
-    hostModule.requires.push(...hybridModules);
+    // const hostModule = getAngularJSGlobal().module(AJS_MODULE);
+    // hostModule.requires.push(...hybridModules);
   }
 };

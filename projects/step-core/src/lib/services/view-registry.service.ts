@@ -1,7 +1,6 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, routesPrioritySortPredicate, SUB_ROUTE_DATA, SubRouteData, SubRouterConfig } from '../shared';
-import { Route, Router, Routes, UrlMatcher, UrlSegment } from '@angular/router';
+import { routesPrioritySortPredicate, SUB_ROUTE_DATA, SubRouteData, SubRouterConfig } from '../shared';
+import { Route, Router, Routes } from '@angular/router';
 import { CheckPermissionsGuard } from './check-permissions.guard';
 import { VIEW_ID_LINK_PREFIX } from '../modules/basics/services/view-id-link-prefix.token';
 import { BehaviorSubject } from 'rxjs';
@@ -51,6 +50,8 @@ export class ViewRegistryService implements OnDestroy {
 
   private static registeredRoutes: string[] = [];
 
+  /*
+  //todo remove
   static readonly isMatchToLegacyRoutes: UrlMatcher = (url: UrlSegment[]) => {
     if (url.length < 0) {
       return null;
@@ -62,6 +63,7 @@ export class ViewRegistryService implements OnDestroy {
 
     return { consumed: url };
   };
+*/
 
   isMigratedRoute(view: string): boolean {
     return ViewRegistryService.registeredRoutes.includes(view);
@@ -381,5 +383,3 @@ export class ViewRegistryService implements OnDestroy {
     return dashlets;
   }
 }
-
-getAngularJSGlobal().module(AJS_MODULE).service('ViewRegistry', downgradeInjectable(ViewRegistryService));

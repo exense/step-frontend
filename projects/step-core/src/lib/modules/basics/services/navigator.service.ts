@@ -1,8 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { DEFAULT_PAGE } from './default-page.token';
-import { AJS_MODULE } from '../../../shared/constants';
 import { DOCUMENT, Location } from '@angular/common';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { VIEW_ID_LINK_PREFIX } from './view-id-link-prefix.token';
 import { ActivatedRoute, NavigationEnd, Params, QueryParamsHandling, Router, UrlTree } from '@angular/router';
 import { filter, from, map, Observable, shareReplay, startWith, switchMap, timer } from 'rxjs';
@@ -102,5 +100,3 @@ export class NavigatorService {
     return queryParams;
   }
 }
-
-getAngularJSGlobal().module(AJS_MODULE).service('navigatorService', downgradeInjectable(NavigatorService));

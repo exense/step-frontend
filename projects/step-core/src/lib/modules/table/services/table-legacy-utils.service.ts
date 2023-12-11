@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '../../../shared';
 import {
   TableRequestData,
   SortDirection,
@@ -110,7 +108,3 @@ export class TableLegacyUtilsService {
     return result;
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .service('tableLegacyUtilsService', downgradeInjectable(TableLegacyUtilsService));

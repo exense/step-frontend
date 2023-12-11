@@ -1,6 +1,5 @@
 import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
-import { AJS_MODULE, AuthService, ViewRegistryService } from '@exense/step-core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
+import { AuthService, ViewRegistryService } from '@exense/step-core';
 
 @Component({
   selector: 'step-root',
@@ -16,7 +15,3 @@ export class RootComponent implements OnInit {
     this._viewRegistry.initialNavigation();
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepRoot', downgradeComponent({ component: RootComponent }));
