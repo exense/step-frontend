@@ -17,6 +17,7 @@ export class AugmentedResourcesService extends ResourcesService {
       name: 'attributes.name',
       resourceType: 'resourceType',
       id: 'id',
+      automationPackage: 'customFields.automationPackageId',
     });
   }
 

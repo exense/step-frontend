@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CustomComponent } from '../../../custom-registeries/custom-registries.module';
 import { AutomationPackageChildEntity } from '../../types/automation-package-child-entity';
 import { EntityAutomationPackageService } from '../../injectables/entity-automation-package.service';
@@ -10,12 +10,21 @@ import { AutomationPackage } from '../../../../client/step-client-module';
   templateUrl: './automation-package-info.component.html',
   styleUrls: ['./automation-package-info.component.scss'],
 })
-export class AutomationPackageInfoComponent<T extends AutomationPackageChildEntity> implements CustomComponent {
+export class AutomationPackageInfoComponent<T extends AutomationPackageChildEntity>
+  implements CustomComponent, OnChanges
+{
   private entityAutomationPackageService = inject(EntityAutomationPackageService);
 
   protected automationPackage$: Observable<AutomationPackage | undefined> = of(undefined);
 
-  context?: T;
+  @Input() context?: T;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const cContext = changes['context'];
+    if (cContext) {
+      this.contextChange(cContext.previousValue, cContext.currentValue);
+    }
+  }
 
   contextChange(previousContext?: T, currentContext?: T): void {
     if (previousContext !== currentContext) {
