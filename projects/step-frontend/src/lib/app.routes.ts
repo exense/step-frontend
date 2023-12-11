@@ -26,6 +26,7 @@ export const APP_ROUTES: Routes = [
         component: MainViewComponent,
         children: [],
         canActivate: [authGuard],
+        runGuardsAndResolvers: 'always',
       },
       {
         path: 'login',

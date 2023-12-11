@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   forwardRef,
   inject,
@@ -98,6 +99,7 @@ export class PlanEditorBaseComponent
   private _restoreDialogsService = inject(RestoreDialogsService);
   private _activatedRoute = inject(ActivatedRoute);
   private _planOpen = inject(PlanOpenService);
+  private _cd = inject(ChangeDetectorRef);
 
   private get artefactIdFromUrl(): string | undefined {
     const { artefactId } = this._activatedRoute.snapshot.queryParams ?? {};
@@ -137,6 +139,7 @@ export class PlanEditorBaseComponent
     this._interactiveSession.init();
     this.initConsoleTabToggle();
     this.initPlanTypeChanges();
+    this._planEditService.strategyChanged$.pipe(takeUntil(this.terminator$)).subscribe(() => this._cd.detectChanges());
   }
 
   ngOnChanges(changes: SimpleChanges): void {

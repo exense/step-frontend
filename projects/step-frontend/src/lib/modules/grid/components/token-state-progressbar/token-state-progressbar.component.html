@@ -1,36 +1,41 @@
 <div
-  class="progress"
-  matTooltip="Used: {{ tokenGroup.countByState!['IN_USE'] || 0 }}, In error: {{
-    tokenGroup.countByState!['ERROR'] || 0
+  class="token-progress"
+  matTooltip="Used: {{ tokenGroup.countByState?.['IN_USE'] || 0 }}, In error: {{
+    tokenGroup.countByState?.['ERROR'] || 0
   }}, Total: {{ tokenGroup.capacity }} "
 >
   <div
-    class="progress-bar token-status-IN_USE"
-    [style.width.%]="tokenGroup | calcStatusSummaryProgressbarPercent: 'IN_USE'"
+    *ngIf="tokenGroup | calcStatusSummaryProgressbarPercent: 'IN_USE' as inUse"
+    class="token-status-IN_USE"
+    [style.width.%]="inUse"
   >
     {{ tokenGroup.countByState!['IN_USE'] }}
   </div>
   <div
-    class="progress-bar token-status-MAINTENANCE_REQUESTED"
-    [style.width.%]="tokenGroup | calcStatusSummaryProgressbarPercent: 'MAINTENANCE_REQUESTED'"
+    *ngIf="tokenGroup | calcStatusSummaryProgressbarPercent: 'MAINTENANCE_REQUESTED' as maintenanceRequested"
+    class="token-status-MAINTENANCE_REQUESTED"
+    [style.width.%]="maintenanceRequested"
   >
     {{ tokenGroup.countByState!['MAINTENANCE_REQUESTED'] }}
   </div>
   <div
-    class="progress-bar token-status-MAINTENANCE"
-    [style.width.%]="tokenGroup | calcStatusSummaryProgressbarPercent: 'MAINTENANCE'"
+    *ngIf="tokenGroup | calcStatusSummaryProgressbarPercent: 'MAINTENANCE' as maintenance"
+    class="token-status-MAINTENANCE"
+    [style.width.%]="maintenance"
   >
     {{ tokenGroup.countByState!['MAINTENANCE'] }}
   </div>
   <div
-    class="progress-bar token-status-ERROR"
-    [style.width.%]="tokenGroup | calcStatusSummaryProgressbarPercent: 'ERROR'"
+    *ngIf="tokenGroup | calcStatusSummaryProgressbarPercent: 'ERROR' as error"
+    class="token-status-ERROR"
+    [style.width.%]="error"
   >
     {{ tokenGroup.countByState!['ERROR'] }}
   </div>
   <div
-    class="progress-bar token-status-FREE"
-    [style.width.%]="tokenGroup | calcStatusSummaryProgressbarPercent: 'FREE'"
+    *ngIf="tokenGroup | calcStatusSummaryProgressbarPercent: 'FREE' as free"
+    class="token-status-FREE"
+    [style.width.%]="free"
   >
     {{ tokenGroup.countByState!['FREE'] }}
   </div>

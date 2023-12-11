@@ -8,6 +8,4 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 })
 export class TokenStateComponent {
   @Input() state!: string;
-
-  constructor() {}
 }

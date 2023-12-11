@@ -101,7 +101,7 @@ export class AuthService implements OnDestroy {
 
   performPostLogoutActions(): void {
     this.setContext({ userID: ANONYMOUS });
-    this._navigator.navigateToHome();
+    this._navigator.navigateToRoot();
   }
 
   goToLoginPage(): void {

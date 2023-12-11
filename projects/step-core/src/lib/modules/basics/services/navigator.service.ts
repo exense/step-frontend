@@ -45,8 +45,12 @@ export class NavigatorService {
     this.navigateInternal(this._defaultPage(forceClientUrl), isOpenInSeparateTab);
   }
 
+  navigateToRoot(): void {
+    this._router.navigate(['/']);
+  }
+
   navigateLogin(skipLocationChange: boolean = true): void {
-    this._router.navigate(['login'], { skipLocationChange });
+    this._router.navigate(['/', 'login'], { skipLocationChange });
   }
 
   navigateAfterLogin(): void {
