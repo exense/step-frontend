@@ -95,7 +95,7 @@ function modifyPackageJson({ pluginName }: Names): Rule {
   };
 }
 
-function modifyProxyConfig(names: Names, port: string): Rule {
+function modifyProxyConfig(names: Names, port: number): Rule {
   return (host: Tree) => {
     const proxyEEConfig = new JSONFile(host, '/proxy-ee.conf.json');
     const proxyConf = {
@@ -121,7 +121,10 @@ export default function createPlugin(options: Schema): Rule {
     const angularJsonChanges = moveAngularJsonChangesToWorkspace(names);
     const workspaceConfigs = addAdditionalWorkspaceConfigs(names);
     const packageJsonFile = modifyPackageJson(names);
-    const proxyConfig = modifyProxyConfig(names, options.port.toString());
+    const proxyConfig = modifyProxyConfig(
+      names,
+      typeof options.port === 'number' ? options.port : parseInt(options.port)
+    );
 
     return chain([pluginToSubtree, angularJsonChanges, workspaceConfigs, packageJsonFile, proxyConfig]);
   };
