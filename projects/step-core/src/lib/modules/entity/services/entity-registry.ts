@@ -14,7 +14,6 @@ export class EntityRegistry {
 
   constructor(private _customRegistry: CustomRegistryService) {}
 
-  //FIXME: we attach information like the view to the entityMeta, this approach will not work in Angular2+
   registerEntity(
     displayName: string,
     entityName: string,
@@ -23,22 +22,11 @@ export class EntityRegistry {
     getUrl?: string,
     postUrl?: string,
     tableType?: string,
-    templateUrlOrComponent?: string | Type<CustomComponent>,
+    component?: Type<CustomComponent>,
     callback?: Function
   ): void {
     const type = entityName;
     const label = displayName;
-
-    let templateUrl: string | undefined = undefined;
-    let component: Type<CustomComponent> | undefined = undefined;
-
-    if (templateUrlOrComponent) {
-      if (typeof templateUrlOrComponent === 'string') {
-        templateUrl = templateUrlOrComponent;
-      } else {
-        component = templateUrlOrComponent;
-      }
-    }
 
     const entity: EntityMeta = {
       type,
@@ -49,7 +37,6 @@ export class EntityRegistry {
       getUrl,
       postUrl,
       tableType,
-      templateUrl,
       callback,
       icon,
       component,
@@ -63,13 +50,9 @@ export class EntityRegistry {
    * @param label
    * @param options
    */
-  register(
-    type: string,
-    label: string,
-    options: { icon?: string; templateUrl?: string; component?: Type<CustomComponent> } = {}
-  ): void {
-    const { icon, templateUrl, component } = options;
-    return this.registerEntity(label, type, icon, undefined, undefined, undefined, undefined, component || templateUrl);
+  register(type: string, label: string, options: { icon?: string; component?: Type<CustomComponent> } = {}): void {
+    const { icon, component } = options;
+    return this.registerEntity(label, type, icon, undefined, undefined, undefined, undefined, component);
   }
 
   getEntities(): ReadonlyArray<EntityMeta> {

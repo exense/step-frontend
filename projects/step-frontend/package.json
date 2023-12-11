@@ -2,7 +2,7 @@
   "name": "@exense/step-frontend",
   "version": "0.2.0",
   "scripts": {
-    "compile": "gulp",
+    "copyimages": "copyfiles images/*.* ../../dist/step-frontend",
     "pack": ""
   },
   "exports": {
@@ -26,7 +26,6 @@
     "@angular/platform-browser": "14.2.8",
     "@angular/platform-browser-dynamic": "14.2.8",
     "@angular/router": "14.2.8",
-    "@angular/upgrade": "14.2.8",
     "@angular/material": "14.2.6",
     "@angular/material-luxon-adapter": "14.2.6",
     "uuid": "8.3.2",
@@ -40,7 +39,6 @@
     "tslib": "2.3.0"
   },
   "devDependencies": {
-    "gulp": "4.0.2",
-    "gulp-concat": "2.6.1"
+    "copyfiles": "2.4.1"
   }
 }

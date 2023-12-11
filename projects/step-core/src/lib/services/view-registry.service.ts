@@ -50,21 +50,6 @@ export class ViewRegistryService implements OnDestroy {
 
   private static registeredRoutes: string[] = [];
 
-  /*
-  //todo remove
-  static readonly isMatchToLegacyRoutes: UrlMatcher = (url: UrlSegment[]) => {
-    if (url.length < 0) {
-      return null;
-    }
-    const path = url[0].path;
-    if (ViewRegistryService.registeredRoutes.find((route) => path.startsWith(route))) {
-      return null;
-    }
-
-    return { consumed: url };
-  };
-*/
-
   isMigratedRoute(view: string): boolean {
     return ViewRegistryService.registeredRoutes.includes(view);
   }

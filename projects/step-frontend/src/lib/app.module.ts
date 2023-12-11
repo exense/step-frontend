@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { UpgradeModule } from '@angular/upgrade/static';
 import { StepCoreModule } from '@exense/step-core';
 import { AdminModule } from './modules/admin/admin.module';
 import { DefaultThemeModule } from './modules/default-theme/default-theme.module';
@@ -24,27 +23,11 @@ import { APP_ROUTES, DEFAULT_ROUTE_INITIALIZER } from './app.routes';
 
 Settings.defaultLocale = 'en';
 
-/*
-todo remove
-const ROOT_ROUTES: Routes = [
-  {
-    path: 'root',
-    children: [
-      {
-        matcher: ViewRegistryService.isMatchToLegacyRoutes,
-        component: LegacyOutletComponent,
-      },
-    ],
-  },
-];
-*/
-
 @NgModule({
   declarations: [RootComponent, MainViewComponent],
   imports: [
     StepCommonModule,
     BrowserModule,
-    UpgradeModule,
     StepCoreModule,
     AdminModule,
     PlanModule,

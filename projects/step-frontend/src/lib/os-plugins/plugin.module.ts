@@ -1,11 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StepCoreModule, PluginLazyLoad, ImportMeta } from '@exense/step-core';
-import { UpgradeModule } from '@angular/upgrade/static';
 
 @NgModule({
   declarations: [],
-  imports: [CommonModule, StepCoreModule, UpgradeModule],
+  imports: [CommonModule, StepCoreModule],
 })
 export class PluginModule extends PluginLazyLoad {
   constructor() {

@@ -4,7 +4,6 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MAT_LUXON_DATE_ADAPTER_OPTIONS } from '@angular/material-luxon-adapter';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
-import { UpgradeModule } from '@angular/upgrade/static';
 import { AngularSplitModule } from 'angular-split';
 import { StepGeneratedClientModule } from './client/generated';
 import { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
@@ -167,7 +166,6 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    UpgradeModule,
     StepMaterialModule,
     TableModule,
     StepBasicsModule,
@@ -190,7 +188,6 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    UpgradeModule,
     CapsLockDirective,
     StepMaterialModule,
     JsonViewerModule,
