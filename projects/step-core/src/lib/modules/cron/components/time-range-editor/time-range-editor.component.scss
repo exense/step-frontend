@@ -1,0 +1,13 @@
+step-time-range-editor > section {
+  display: flex;
+  flex-direction: column;
+  gap: 5rem;
+
+  .range-group mat-select:first-child {
+    padding-left: 0;
+  }
+
+  mat-radio-button label.mat-radio-label {
+    align-items: flex-start;
+  }
+}

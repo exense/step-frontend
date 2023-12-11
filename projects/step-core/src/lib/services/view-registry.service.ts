@@ -92,6 +92,10 @@ export class ViewRegistryService implements OnDestroy {
     this.registerMenuEntry('Support', 'support-root', 'life-buoy', { weight: 100 });
 
     // Sub Menus Automation
+    this.registerMenuEntry('Keyword packages', 'functionPackages', 'package', {
+      weight: 20,
+      parentId: 'automation-root',
+    });
     this.registerMenuEntry('Keywords', 'functions', 'keyword', { weight: 10, parentId: 'automation-root' });
     this.registerMenuEntry('Plans', 'plans', 'plan', { weight: 30, parentId: 'automation-root' });
     this.registerMenuEntry('Parameters', 'parameters', 'list', { weight: 40, parentId: 'automation-root' });
@@ -162,6 +166,9 @@ export class ViewRegistryService implements OnDestroy {
     return this.getCustomView(view).isStaticView;
   }
 
+  /**
+   * @deprecated
+   * **/
   registerView(viewId: string, template: string, isPublicView?: boolean): void {
     this.registerViewWithConfig(viewId, template, { isPublicView: isPublicView });
   }
@@ -270,6 +277,9 @@ export class ViewRegistryService implements OnDestroy {
     redirectRoute.redirectTo = otherRoutes[0].path;
   }
 
+  /**
+   * @deprecated
+   * **/
   registerViewWithConfig(
     viewId: string,
     template: string,

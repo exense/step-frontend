@@ -19,7 +19,6 @@ export class PluginModule extends PluginLazyLoad {
       scriptEditor: () =>
         import('./modules/script-editor/script-editor.module').then((m) => ({
           Module: m.ScriptEditorModule,
-          ajsModuleName: m.scriptEditorModule.name,
         })),
     };
   }

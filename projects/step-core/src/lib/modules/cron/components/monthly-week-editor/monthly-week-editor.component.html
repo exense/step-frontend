@@ -1,22 +1,22 @@
 <mat-select [ngModel]="dayNum" (ngModelChange)="handleDayNumChange($event)" [disabled]="!isActive">
-  <mat-option *ngFor="let d of DAY_NUM; trackBy: trackByKeyValue" [value]="d.key">{{ d.value }}</mat-option>
+  <mat-option *ngFor="let d of _DAY_NUM; trackBy: trackByKeyValue" [value]="d.key">{{ d.value }}</mat-option>
 </mat-select>
 <mat-select [ngModel]="weekDay" (ngModelChange)="handleWeekDayChange($event)" [disabled]="!isActive">
-  <mat-option *ngFor="let w of WEEK_DAY; trackBy: trackByKeyValue" [value]="w.key">{{ w.value }}</mat-option>
+  <mat-option *ngFor="let w of _WEEK_DAY; trackBy: trackByKeyValue" [value]="w.key">{{ w.value }}</mat-option>
 </mat-select>
 <span>of every</span>
 <mat-select [ngModel]="month" (ngModelChange)="handleMonthChange($event)" [disabled]="!isActive">
-  <mat-option *ngFor="let m of MONTHS; trackBy: trackByKeyValue" [value]="m.key">{{ m.value }}</mat-option>
+  <mat-option *ngFor="let m of _MONTHS; trackBy: trackByKeyValue" [value]="m.key">{{ m.value }}</mat-option>
 </mat-select>
 <span>month(s) at</span>
 <mat-select [ngModel]="hour" (ngModelChange)="handleHourChange($event)" [disabled]="!isActive">
-  <mat-option *ngFor="let h of HOURS; trackBy: trackByKeyValue" [value]="h.key">{{ h.value }}</mat-option>
+  <mat-option *ngFor="let h of _HOURS; trackBy: trackByKeyValue" [value]="h.key">{{ h.value }}</mat-option>
 </mat-select>
 <span>:</span>
 <mat-select [ngModel]="minute" (ngModelChange)="handleMinuteChange($event)" [disabled]="!isActive">
-  <mat-option *ngFor="let m of MINUTES; trackBy: trackByKeyValue" [value]="m.key">{{ m.value }}</mat-option>
+  <mat-option *ngFor="let m of _MINUTES; trackBy: trackByKeyValue" [value]="m.key">{{ m.value }}</mat-option>
 </mat-select>
 <span>:</span>
 <mat-select [ngModel]="second" (ngModelChange)="handleSecondChange($event)" [disabled]="!isActive">
-  <mat-option *ngFor="let s of SECONDS; trackBy: trackByKeyValue" [value]="s.key">{{ s.value }}</mat-option>
+  <mat-option *ngFor="let s of _SECONDS; trackBy: trackByKeyValue" [value]="s.key">{{ s.value }}</mat-option>
 </mat-select>

@@ -1,7 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  AJS_MODULE,
   AugmentedPlansService,
   AutoDeselectStrategy,
   Plan,
@@ -100,7 +98,3 @@ export class PlanListComponent {
       });
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepPlanList', downgradeComponent({ component: PlanListComponent }));

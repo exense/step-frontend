@@ -21,3 +21,7 @@ as-split-area {
 .small-screen {
   width: fit-content;
 }
+
+.panel-body.small-screen {
+  padding: 0.75rem;
+}
