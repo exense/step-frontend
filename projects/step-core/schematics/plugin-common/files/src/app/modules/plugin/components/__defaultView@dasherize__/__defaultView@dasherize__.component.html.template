@@ -1,1 +1,2 @@
-<h3>Plugin {{pluginName}}</h3>
+<h3>Example Plugin Headline</h3>
+<h4>{{plansCount$ | async}} Plans found</h4>
