@@ -38,6 +38,7 @@ const IGNORE_PLUGINS: ReadonlyArray<string> = [
   'astraPlugin',
   'grafana',
   'K6',
+  'alerting',
 ];
 
 // For testing purposes only
