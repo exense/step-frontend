@@ -31,6 +31,10 @@ export class AutomationPackageUploadDialogComponent {
     this.file = this.fileInput.nativeElement.files?.[0] ?? undefined;
   }
 
+  handleDrop(file?: File[]): void {
+    this.file = file?.[0] ?? undefined;
+  }
+
   upload(): void {
     if (!this.file) {
       return;
