@@ -1,3 +1,5 @@
+@use '../core-variables' as var;
+
 @mixin table-container {
   max-height: 100%;
   display: block;
@@ -15,6 +17,10 @@
 }
 
 step-table {
+  tr.row-highlight {
+    background: var.$gray-300 !important;
+  }
+
   th.mat-header-cell,
   td.mat-cell,
   td.mat-footer-cell {

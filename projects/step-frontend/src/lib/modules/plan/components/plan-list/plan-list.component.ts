@@ -7,6 +7,7 @@ import {
   RestoreDialogsService,
   selectionCollectionProvider,
   STORE_ALL,
+  tableHighlightItemContainerProvider,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { pipe, tap } from 'rxjs';
@@ -18,6 +19,7 @@ import { pipe, tap } from 'rxjs';
   providers: [
     tablePersistenceConfigProvider('planList', STORE_ALL),
     selectionCollectionProvider<string, Plan>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    tableHighlightItemContainerProvider(),
   ],
 })
 export class PlanListComponent {

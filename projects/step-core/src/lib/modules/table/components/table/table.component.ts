@@ -47,6 +47,7 @@ import { HasFilter } from '../../../entities-selection/services/has-filter';
 import { FilterCondition } from '../../shared/filter-condition';
 import { SearchColumn } from '../../shared/search-column.interface';
 import { TablePersistenceStateService } from '../../services/table-persistence-state.service';
+import { TableHighlightItemContainer } from '../../services/table-highlight-item-container.provider';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -135,7 +136,6 @@ export class TableComponent<T>
   searchColumns: SearchColumn[] = [];
 
   pageSizeOptions: Array<number>;
-
   readonly trackBySearchColumn: TrackByFunction<SearchColumn> = (index, item) => item.colName;
 
   private terminator$ = new Subject<void>();
@@ -168,7 +168,8 @@ export class TableComponent<T>
   constructor(
     @Optional() private _sort: MatSort,
     _itemsPerPageService: ItemsPerPageService,
-    private _tableState: TablePersistenceStateService
+    private _tableState: TablePersistenceStateService,
+    @Optional() protected _tableHighlightItemContainer?: TableHighlightItemContainer
   ) {
     this.pageSizeOptions = _itemsPerPageService.getItemsPerPage((userPreferredItemsPerPage: number) =>
       this.page._changePageSize(userPreferredItemsPerPage)

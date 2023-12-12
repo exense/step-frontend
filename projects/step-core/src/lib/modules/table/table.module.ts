@@ -30,6 +30,7 @@ import { Input as ColInput } from '../../client/generated';
 import { TableRemoteDataSourceFactoryImplService } from './services/table-remote-data-source-factory-impl.service';
 import { TableStorageService } from './services/table-storage.service';
 import { BulkOperationPerformStrategyImplService } from './services/bulk-operation-perform-strategy-impl.service';
+import { RowHighlightDirective } from './directives/row-highlight.directive';
 
 @NgModule({
   imports: [
@@ -56,6 +57,7 @@ import { BulkOperationPerformStrategyImplService } from './services/bulk-operati
     FilterConnectDirective,
     CustomSearchDropdownComponent,
     CustomSearchCheckboxComponent,
+    RowHighlightDirective,
   ],
   exports: [
     TableComponent,
@@ -68,6 +70,7 @@ import { BulkOperationPerformStrategyImplService } from './services/bulk-operati
     FilterConnectDirective,
     CustomSearchDropdownComponent,
     CustomSearchCheckboxComponent,
+    RowHighlightDirective,
   ],
   providers: [
     TitleCasePipe,
@@ -125,3 +128,5 @@ export * from './shared/table-persistence-config';
 export * from './services/table-persistence-config.provider';
 export * from './services/table-storage.service';
 export * from './shared/search-column-accessor';
+export * from './directives/row-highlight.directive';
+export * from './services/table-highlight-item-container.provider';
