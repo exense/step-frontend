@@ -21,6 +21,8 @@ export class TimeSeriesConfig {
   static readonly PLAN_ID_ATTRIBUTE = 'planId';
   static readonly TASK_ID_ATTRIBUTE = 'taskId';
   static readonly RANGER_FILTER_FIELDS = [this.EXECUTION_ID_ATTRIBUTE, this.PLAN_ID_ATTRIBUTE, this.TASK_ID_ATTRIBUTE];
+  static readonly SERIES_LABEL_EMPTY = '<Empty>';
+  static readonly SERIES_LABEL_VALUE = 'Value';
 
   static readonly AUTO_REFRESH_INTERVALS: RefreshInterval[] = [
     { label: '5 Sec', value: 5000 },
