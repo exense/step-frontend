@@ -101,7 +101,12 @@
     </td>
   </ng-container>
 </step-table>
-<step-entity-menu #entityMenu entity="functions" (entityOperationSuccess)="table.reload()">
+<step-entity-menu
+  #entityMenu
+  entity="functions"
+  (entityOperationSuccess)="table.reload()"
+  [stepHighlightTableRow]="table"
+>
   <ng-container *stepEntityMenuContent="let element">
     <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="editFunction(element)">
       <step-icon name="edit-2"></step-icon>

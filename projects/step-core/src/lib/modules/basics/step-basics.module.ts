@@ -37,6 +37,7 @@ import { RangeFilterComponent } from './components/range-filter/range-filter.com
 import { StringArrayInputComponent } from './components/string-array-input/string-array-input.component';
 import { ArrayItemLabelPipe } from './pipes/array-item-label.pipe';
 import { AllowCharsDirective } from './directives/allow-chars.directive';
+import { ItemHoverDirective } from './directives/item-hover.directive';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -75,6 +76,7 @@ import { AllowCharsDirective } from './directives/allow-chars.directive';
     StringArrayInputComponent,
     ArrayItemLabelPipe,
     AllowCharsDirective,
+    ItemHoverDirective,
   ],
   exports: [
     ResourceLabelComponent,
@@ -112,6 +114,7 @@ import { AllowCharsDirective } from './directives/allow-chars.directive';
     StringArrayInputComponent,
     ArrayItemLabelPipe,
     AllowCharsDirective,
+    ItemHoverDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -189,4 +192,5 @@ export * from './services/editor-resolver.service';
 export * from './services/app-config-container.service';
 export * from './shared/logout-cleanup.token';
 export * from './services/is-used-by-dialog';
+export * from './services/item-hover-receiver.service';
 export * from './shared/bulk-operation-type.enum';

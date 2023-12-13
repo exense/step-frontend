@@ -51,7 +51,7 @@
   </ng-container>
   <ng-container matColumnDef="actions">
     <th mat-header-cell *matHeaderCellDef>Actions</th>
-    <td mat-cell *matCellDef="let element" class="cell-actions" [stepRowHighlight]="element">
+    <td mat-cell *matCellDef="let element" class="cell-actions">
       <step-btn-group>
         <button
           mat-icon-button
@@ -89,8 +89,8 @@
     </td>
   </ng-container>
 </step-table>
-<step-entity-menu #entityMenu entity="plans" (entityOperationSuccess)="table.reload()">
-  <div *stepEntityMenuContent="let element" [stepRowHighlight]="element">
+<step-entity-menu #entityMenu entity="plans" (entityOperationSuccess)="table.reload()" [stepHighlightTableRow]="table">
+  <ng-container *stepEntityMenuContent="let element">
     <button mat-menu-item [disabled]="!('plan-write' | hasRight | async)" (click)="editPlan(element)">
       <step-icon name="edit-2"></step-icon>
       Edit plan
@@ -120,5 +120,5 @@
       <step-icon name="git-branch"></step-icon>
       Version history
     </button>
-  </div>
+  </ng-container>
 </step-entity-menu>

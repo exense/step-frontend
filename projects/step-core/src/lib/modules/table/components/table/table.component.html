@@ -34,7 +34,8 @@
     <tr
       mat-row
       *matRowDef="let row; columns: displayColumns"
-      [class.row-highlight]="row === _tableHighlightItemContainer?.highlightedItem"
+      class="content-row"
+      [class.row-highlight]="row === highlightedItem"
     ></tr>
     <tr class="mat-row" *matNoDataRow>
       <td class="mat-cell no-data" [colSpan]="displayColumns.length">

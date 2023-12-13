@@ -17,8 +17,9 @@
 }
 
 step-table {
-  tr.row-highlight {
-    background: var.$gray-300 !important;
+  tr.row-highlight,
+  tr.content-row:hover {
+    background: var.$highlight !important;
   }
 
   th.mat-header-cell,

@@ -47,7 +47,7 @@ import { HasFilter } from '../../../entities-selection/services/has-filter';
 import { FilterCondition } from '../../shared/filter-condition';
 import { SearchColumn } from '../../shared/search-column.interface';
 import { TablePersistenceStateService } from '../../services/table-persistence-state.service';
-import { TableHighlightItemContainer } from '../../services/table-highlight-item-container.provider';
+import { TableHighlightItemContainer } from '../../shared/table-highlight-item-container';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -77,7 +77,16 @@ export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Obser
   ],
 })
 export class TableComponent<T>
-  implements OnInit, AfterViewInit, OnChanges, OnDestroy, TableSearch, TableFilter, TableReload, HasFilter
+  implements
+    OnInit,
+    AfterViewInit,
+    OnChanges,
+    OnDestroy,
+    TableSearch,
+    TableFilter,
+    TableReload,
+    HasFilter,
+    TableHighlightItemContainer
 {
   @Output() onReload = new EventEmitter<unknown>();
   @Input() trackBy: TrackByFunction<T> = (index) => index;
@@ -165,11 +174,12 @@ export class TableComponent<T>
     })
   );
 
+  highlightedItem?: unknown;
+
   constructor(
     @Optional() private _sort: MatSort,
     _itemsPerPageService: ItemsPerPageService,
-    private _tableState: TablePersistenceStateService,
-    @Optional() protected _tableHighlightItemContainer?: TableHighlightItemContainer
+    private _tableState: TablePersistenceStateService
   ) {
     this.pageSizeOptions = _itemsPerPageService.getItemsPerPage((userPreferredItemsPerPage: number) =>
       this.page._changePageSize(userPreferredItemsPerPage)

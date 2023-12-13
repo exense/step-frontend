@@ -71,4 +71,10 @@
     </td>
   </ng-container>
 </step-table>
-<step-entity-menu #entityMenu entity="resources" (entityOperationSuccess)="table.reload()"> </step-entity-menu>
+<step-entity-menu
+  #entityMenu
+  entity="resources"
+  (entityOperationSuccess)="table.reload()"
+  [stepHighlightTableRow]="table"
+>
+</step-entity-menu>
