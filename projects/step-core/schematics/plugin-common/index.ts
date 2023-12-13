@@ -18,7 +18,7 @@ import { JSONFile } from '@schematics/angular/utility/json-file';
 import { Schema } from '../shared/schema';
 import { createNames, Names } from '../shared/create-names';
 
-const CURRENT_VERSION = '0.0.1';
+const CURRENT_VERSION = '0.2.0';
 
 interface InnerOptions {
   names: Names;

@@ -14,7 +14,7 @@ export class RangeValidator extends BaseCronValidator {
     const res =
       this.validator!.validate(parts[0]) &&
       this.validator!.validate(parts[1]) &&
-      this.validator!.valToNumber(parts[0]) > this.validator!.valToNumber(parts[1]);
+      this.validator!.valToNumber(parts[1]) > this.validator!.valToNumber(parts[0]);
 
     return res;
   }

@@ -118,7 +118,7 @@ $border-radius: 8px;
 
     &:focus-within,
     &.step-force-focus {
-      & > .label-container > label {
+      &:not(.no-label-focus) > .label-container > label {
         color: $primary-color;
         step-label {
           &[show-required-marker]::after {

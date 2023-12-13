@@ -19,6 +19,10 @@ import { YearlyWeekEditorComponent } from './components/yearly-week-editor/yearl
 import { YearlyEditorComponent } from './components/yearly-editor/yearly-editor.component';
 import { PresetEditorComponent } from './components/preset-editor/preset-editor.component';
 import { ValidateCronDirective } from './directives/validate-cron.directive';
+import { TimeRangeEditorComponent } from './components/time-range-editor/time-range-editor.component';
+import { DayOfWeekSelectorComponent } from './components/week-selector/day-of-week-selector.component';
+import { WeeklyTimeRangeEditorComponent } from './components/weekly-time-range-editor/weekly-time-range-editor.component';
+import { AnyDateRangeEditorComponent } from './components/any-date-range-editor/any-date-range-editor.component';
 
 @NgModule({
   declarations: [
@@ -37,6 +41,10 @@ import { ValidateCronDirective } from './directives/validate-cron.directive';
     YearlyEditorComponent,
     PresetEditorComponent,
     ValidateCronDirective,
+    TimeRangeEditorComponent,
+    DayOfWeekSelectorComponent,
+    WeeklyTimeRangeEditorComponent,
+    AnyDateRangeEditorComponent,
   ],
   imports: [StepBasicsModule, TabsModule, StepMaterialModule, FormsModule, ReactiveFormsModule, CommonModule],
   exports: [ValidateCronDirective],
@@ -47,3 +55,4 @@ export * from './injectables/cron.service';
 export * from './components/cron-editor/cron-editor.component';
 export * from './directives/validate-cron.directive';
 export * from './types/cron-validator';
+export * from './types/cron-editor-tab.enum';

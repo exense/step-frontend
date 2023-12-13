@@ -1,12 +1,15 @@
-.other-plan-name {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+step-plan-otherplan-list {
+  .actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.4rem;
+  }
 
-.actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
+  table {
+    thead > tr > th:first-child,
+    tbody > tr > td:first-child {
+      padding-right: 0.8rem !important;
+    }
+  }
 }

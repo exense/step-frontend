@@ -1,13 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UpgradeModule } from '@angular/upgrade/static';
-import { StepCoreModule, Plugin, DeferredViewRegistryService } from '@exense/step-core';
-import { <%= camelize(nAJSModule) %>Module as ajsPluginModule } from './share';
+import { StepCoreModule, ViewRegistryService } from '@exense/step-core';
 
 import { <%= classify(defaultView) %>Component } from './components/<%= dasherize(defaultView) %>/<%= dasherize(defaultView) %>.component';
 import './components/<%= dasherize(defaultView) %>/<%= dasherize(defaultView) %>.component';
 
-@Plugin(ajsPluginModule.name)
 @NgModule({
   declarations: [
     <%= classify(defaultView) %>Component
@@ -23,13 +21,25 @@ import './components/<%= dasherize(defaultView) %>/<%= dasherize(defaultView) %>
 })
 export class PluginModule {
   constructor(
-    viewRegistry: DeferredViewRegistryService,
+    private _viewRegistry: ViewRegistryService,
   ) {
-    viewRegistry.registerView(
-      '<%= camelize(defaultView) %>',
-      `<<%= dasherize(defaultViewSelector) %>-downgraded></<%= dasherize(defaultViewSelector) %>-downgraded>`
+    this.registerRoutes();
+    this.registerMenuEntries();
+  }
+
+  private registerRoutes(): void {
+    this._viewRegistry.registerRoute({
+      path: '<%= camelize(defaultView)  %>',
+      component: <%= classify(defaultView) %>Component
+    });
+  }
+
+  private registerMenuEntries(): void {
+    this._viewRegistry.registerMenuEntry(
+      'Example Plugin',
+      '<%= camelize(defaultView)  %>',
+      'puzzle-piece-01',
+      { parentId: 'automation-root', weight: 250 }
     );
   }
 }
-
-export * from './share';
