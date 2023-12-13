@@ -59,22 +59,11 @@
         <button mat-icon-button matTooltip="Delete resource" (click)="deleteResource(element.id, element.resourceName)">
           <step-icon name="trash-2">delete</step-icon>
         </button>
-        <button
-          *ngIf="entityMenu.hasContent"
-          mat-icon-button
-          [matMenuTriggerFor]="entityMenu.menu!"
-          [matMenuTriggerData]="{ element: element }"
-        >
+        <step-entity-menu-button [entityItem]="element" [entityMenu]="entityMenu" stepHighlightTableRow>
           <step-icon name="more-horizontal"></step-icon>
-        </button>
+        </step-entity-menu-button>
       </step-btn-group>
     </td>
   </ng-container>
 </step-table>
-<step-entity-menu
-  #entityMenu
-  entity="resources"
-  (entityOperationSuccess)="table.reload()"
-  [stepHighlightTableRow]="table"
->
-</step-entity-menu>
+<step-entity-menu #entityMenu entity="resources" (entityOperationSuccess)="table.reload()"> </step-entity-menu>

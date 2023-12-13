@@ -89,24 +89,14 @@
         >
           <step-icon name="trash-2"></step-icon>
         </button>
-        <button
-          *ngIf="entityMenu.hasContent"
-          mat-icon-button
-          [matMenuTriggerFor]="entityMenu.menu!"
-          [matMenuTriggerData]="{ element: element }"
-        >
+        <step-entity-menu-button [entityItem]="element" [entityMenu]="entityMenu" stepHighlightTableRow>
           <step-icon name="more-horizontal"></step-icon>
-        </button>
+        </step-entity-menu-button>
       </step-btn-group>
     </td>
   </ng-container>
 </step-table>
-<step-entity-menu
-  #entityMenu
-  entity="functions"
-  (entityOperationSuccess)="table.reload()"
-  [stepHighlightTableRow]="table"
->
+<step-entity-menu #entityMenu entity="functions" (entityOperationSuccess)="table.reload()">
   <ng-container *stepEntityMenuContent="let element">
     <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="editFunction(element)">
       <step-icon name="edit-2"></step-icon>

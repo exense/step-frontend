@@ -129,4 +129,4 @@ export * from './shared/table-persistence-config';
 export * from './services/table-persistence-config.provider';
 export * from './services/table-storage.service';
 export * from './shared/search-column-accessor';
-export * from './shared/table-highlight-item-container';
+export * from './services/table-highlight-item-container.service';

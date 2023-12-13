@@ -47,7 +47,7 @@ import { HasFilter } from '../../../entities-selection/services/has-filter';
 import { FilterCondition } from '../../shared/filter-condition';
 import { SearchColumn } from '../../shared/search-column.interface';
 import { TablePersistenceStateService } from '../../services/table-persistence-state.service';
-import { TableHighlightItemContainer } from '../../shared/table-highlight-item-container';
+import { TableHighlightItemContainer } from '../../services/table-highlight-item-container.service';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -71,6 +71,10 @@ export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Obser
     },
     {
       provide: HasFilter,
+      useExisting: forwardRef(() => TableComponent),
+    },
+    {
+      provide: TableHighlightItemContainer,
       useExisting: forwardRef(() => TableComponent),
     },
     TablePersistenceStateService,
