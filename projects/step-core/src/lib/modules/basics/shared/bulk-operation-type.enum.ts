@@ -4,5 +4,5 @@ export enum BulkOperationType {
   EXPORT = 'export',
   RESTART = 'restart',
   STOP = 'stop',
-  CLOSE = 'close',
+  CLOSE = 'closed',
 }
