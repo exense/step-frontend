@@ -2,17 +2,16 @@
   <div style="font-size: 24px">{{ dashboard.name }}</div>
 
   <div>
-    <step-ts-filter-bar
+    <step-ts-dashboard-filter-bar
       *ngIf="context"
       [context]="context"
-      [filterOptions]="[]"
-      [activeFilters]="[]"
+      [activeFilters]="dashboard.filters"
       (onTimeRangeChange)="handleTimeRangeChange($event)"
       [timeRangeOptions]="timeRangeOptions"
       [activeTimeRange]="timeRangeSelection"
       [compactView]="compareModeEnabled"
     >
-    </step-ts-filter-bar>
+    </step-ts-dashboard-filter-bar>
   </div>
 
   <div style="width: 100%; flex-direction: row; flex-wrap: wrap; display: flex">

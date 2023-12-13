@@ -2,6 +2,8 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angu
 import { TimeSeriesConfig } from '../../time-series.config';
 import { MatMenuTrigger } from '@angular/material/menu';
 
+const EMPTY_DIMENSIONS_LABEL = 'Empty';
+
 @Component({
   selector: 'step-timeseries-grouping',
   templateUrl: './ts-grouping.component.html',
@@ -12,9 +14,14 @@ export class TsGroupingComponent implements OnInit {
 
   @ViewChild('matTrigger') matTrigger!: MatMenuTrigger;
 
-  protected selectedGroupingInternal: { label: string; attributes: string[] } = { label: '', attributes: [] };
+  protected selectedGroupingInternal: { label: string; attributes: string[] } = {
+    label: EMPTY_DIMENSIONS_LABEL,
+    attributes: [],
+  };
 
-  @Input() dimensions: string[] = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS[0].attributes;
+  @Input() dimensions: string[] = [];
+
+  label: string = EMPTY_DIMENSIONS_LABEL;
 
   customGroupingString = '';
   groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS;
@@ -25,10 +32,8 @@ export class TsGroupingComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    if (this.dimensions) {
-      this.selectedGroupingInternal = { label: this.formatDimensions(this.dimensions), attributes: this.dimensions };
-    } else {
-      this.selectedGroupingInternal = this.groupingOptions[0];
+    if (this.dimensions?.length) {
+      this.label = this.formatDimensions(this.dimensions);
     }
   }
 

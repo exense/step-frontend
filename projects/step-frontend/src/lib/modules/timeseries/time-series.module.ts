@@ -12,7 +12,7 @@ import { ChartSkeletonComponent } from './chart/skeleton/chart-skeleton.componen
 import { MeasurementsPickerComponent } from './performance-view/measurements/measurements-picker.component';
 import { PerformanceViewTimeSelectionComponent } from './performance-view/time-selection/performance-view-time-selection.component';
 import { MeasurementsFilterPipe } from './performance-view/measurements/measurements-filter.pipe';
-import { FilterBarComponent } from './performance-view/filter-bar/filter-bar.component';
+import { FilterBarComponent } from './performance-view/filter-bar/legacy/filter-bar.component';
 import { FilterBarItemComponent } from './performance-view/filter-bar/item/filter-bar-item.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { TimeSeriesDashboardComponent } from './dashboard/time-series-dashboard.component';
@@ -39,6 +39,7 @@ import { DashboardPageComponent } from './pages/dashboard/dashboard-page.compone
 import { PlanListComponent } from '../plan/components/plan-list/plan-list.component';
 import { PlanEditorComponent } from '../plan/components/plan-editor/plan-editor.component';
 import { ChartDashletComponent } from './pages/dashboard/chart-dashlet/chart-dashlet.component';
+import { DashboardFilterBarComponent } from './performance-view/filter-bar/dashboard-filter-bar.component';
 
 @NgModule({
   declarations: [
@@ -67,6 +68,7 @@ import { ChartDashletComponent } from './pages/dashboard/chart-dashlet/chart-das
     ResolutionPickerComponent,
     DashboardPageComponent,
     ChartDashletComponent,
+    DashboardFilterBarComponent,
   ],
   exports: [ExecutionPerformanceComponent, DashboardPageComponent, AnalyticsPageComponent, MetricChartComponent],
   providers: [{ provide: MatPaginatorIntl, useClass: NoTotalCountPaginator }],

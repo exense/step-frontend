@@ -3,10 +3,13 @@
 /* eslint-disable */
 
 export type ChartFilterItem = {
+  label?: string;
   attribute?: string;
   type?: 'OPTIONS' | 'FREE_TEXT' | 'EXECUTION' | 'TASK' | 'PLAN' | 'NUMERIC' | 'DATE';
+  exactMatch?: boolean;
   min?: number;
   max?: number;
   textValues?: Array<string>;
-  exactMatch?: boolean;
+  textOptions?: Array<string>;
+  removable?: boolean;
 };

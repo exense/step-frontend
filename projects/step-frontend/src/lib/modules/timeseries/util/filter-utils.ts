@@ -1,7 +1,12 @@
 import { FilterBarItemType, TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
+import { ChartFilterItem } from '@exense/step-core';
 
 export class FilterUtils {
-  static filterItemIsValid(item: TsFilterItem): boolean {
+  static filterItemIsValid(item: ChartFilterItem): boolean {
+    return (item.textValues && item.textValues.length > 0) || item.min != undefined || item.max != undefined;
+  }
+
+  static filterItemIsValidLegacy(item: TsFilterItem): boolean {
     return (
       (item.freeTextValues && item.freeTextValues.length > 0) ||
       item.textValues?.some((v) => v.isSelected) ||

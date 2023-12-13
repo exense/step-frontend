@@ -83,7 +83,7 @@ export class DashboardPageComponent implements OnInit {
     this.context = this._timeSeriesContextFactory.createContext({
       id: dashboard.id!,
       timeRange: timeRange,
-      grouping: [],
+      grouping: dashboard.grouping || [],
     });
   }
 

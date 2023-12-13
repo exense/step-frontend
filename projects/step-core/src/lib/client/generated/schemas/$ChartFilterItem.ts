@@ -3,11 +3,17 @@
 /* eslint-disable */
 export const $ChartFilterItem = {
   properties: {
+    label: {
+      type: 'string',
+    },
     attribute: {
       type: 'string',
     },
     type: {
       type: 'Enum',
+    },
+    exactMatch: {
+      type: 'boolean',
     },
     min: {
       type: 'number',
@@ -23,7 +29,13 @@ export const $ChartFilterItem = {
         type: 'string',
       },
     },
-    exactMatch: {
+    textOptions: {
+      type: 'array',
+      contains: {
+        type: 'string',
+      },
+    },
+    removable: {
       type: 'boolean',
     },
   },

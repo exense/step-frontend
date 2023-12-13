@@ -14,21 +14,21 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { debounceTime, Observable, Subject, take } from 'rxjs';
-import { TimeSeriesContext } from '../../time-series-context';
-import { FilterUtils } from '../../util/filter-utils';
-import { PerformanceViewTimeSelectionComponent } from '../time-selection/performance-view-time-selection.component';
-import { FilterBarItemComponent } from './item/filter-bar-item.component';
-import { FilterBarItemType, TsFilterItem } from './model/ts-filter-item';
-import { TsFilteringSettings } from '../../model/ts-filtering-settings';
-import { TimeSeriesConfig } from '../../time-series.config';
+import { TimeSeriesContext } from '../../../time-series-context';
+import { FilterUtils } from '../../../util/filter-utils';
+import { PerformanceViewTimeSelectionComponent } from '../../time-selection/performance-view-time-selection.component';
+import { FilterBarItemComponent } from '../item/filter-bar-item.component';
+import { FilterBarItemType, TsFilterItem } from '../model/ts-filter-item';
+import { TsFilteringSettings } from '../../../model/ts-filtering-settings';
+import { TimeSeriesConfig } from '../../../time-series.config';
 import { Execution, TimeRange, TimeSeriesService } from '@exense/step-core';
-import { OqlVerifyResponse } from '../../model/oql-verify-response';
-import { TsFilteringMode } from '../../model/ts-filtering-mode';
-import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
-import { OQLBuilder } from '../../util/oql-builder';
+import { OqlVerifyResponse } from '../../../model/oql-verify-response';
+import { TsFilteringMode } from '../../../model/ts-filtering-mode';
+import { TimeRangePickerSelection } from '../../../time-selection/time-range-picker-selection';
+import { OQLBuilder } from '../../../util/oql-builder';
 import { MatDialog } from '@angular/material/dialog';
-import { DiscoverComponent } from '../../discover/discover.component';
-import { DiscoverDialogData } from '../../discover/discover-dialog-data';
+import { DiscoverComponent } from '../../../discover/discover.component';
+import { DiscoverDialogData } from '../../../discover/discover-dialog-data';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
@@ -97,7 +97,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   }
 
   getValidFilters(): TsFilterItem[] {
-    return this.activeFilters.filter(FilterUtils.filterItemIsValid);
+    return this.activeFilters.filter(FilterUtils.filterItemIsValidLegacy);
   }
 
   handleOqlChange(event: any) {
@@ -128,7 +128,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     const filtersOql = this.oqlModeActive
       ? this.oqlValue
       : FilterUtils.filtersToOQL(
-          this.activeFilters.filter(FilterUtils.filterItemIsValid),
+          this.activeFilters.filter(FilterUtils.filterItemIsValidLegacy),
           TimeSeriesConfig.ATTRIBUTES_PREFIX
         );
     let groupingItems: TsFilterItem[] = groupDimensions.map((dimension) => ({
@@ -267,7 +267,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
     this.activeFilters.splice(index, 1);
 
-    if (FilterUtils.filterItemIsValid(itemToDelete)) {
+    if (FilterUtils.filterItemIsValidLegacy(itemToDelete)) {
       this.emitFilterChange$.next();
     }
   }

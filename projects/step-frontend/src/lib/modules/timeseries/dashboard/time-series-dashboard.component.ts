@@ -1,6 +1,6 @@
 import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { filter, forkJoin, merge, Subject, Subscription, switchMap, takeUntil, tap, throttle } from 'rxjs';
-import { FilterBarComponent } from '../performance-view/filter-bar/filter-bar.component';
+import { FilterBarComponent } from '../performance-view/filter-bar/legacy/filter-bar.component';
 import { FilterBarItemType, TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
 import { PerformanceViewSettings } from '../performance-view/model/performance-view-settings';
 import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';

@@ -1,5 +1,5 @@
 <div mat-button [matMenuTriggerFor]="groupingMenu" #matTrigger="matMenuTrigger" class="filter-item-container">
-  <span class="grouping-title"> Grouping: {{ selectedGroupingInternal.label }} </span>
+  <span class="grouping-title"> Grouping: {{ label }} </span>
 </div>
 <mat-menu #groupingMenu="matMenu">
   <button mat-menu-item *ngFor="let grouping of groupingOptions" (click)="selectGrouping(grouping)">
