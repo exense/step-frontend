@@ -24,6 +24,7 @@ import uPlot = require('uplot');
 import { TSTimeRange } from './model/ts-time-range';
 import { Execution, ExecutionsService } from '@exense/step-core';
 import { Observable } from 'rxjs';
+import { TimeSeriesUtils } from '../time-series-utils';
 
 @Component({
   selector: 'step-timeseries-chart',
@@ -136,17 +137,19 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       this.legendSettings.zAxisLabel = this.settings.tooltipOptions.zAxisLabel || 'Total';
     }
     settings.series.forEach((series, i) => {
-      if (series.id) {
-        this.seriesIndexesByIds[series.id] = i + 1; // because the first series is the time
+      if (!series.id) {
+        throw new Error('Every series must have an id');
       }
-      series.label = this.mergeLabelItems(series.labelItems);
+      this.seriesIndexesByIds[series.id] = i + 1; // because the first series is the time
+
+      series.label = TimeSeriesUtils.mergeSeriesLabels(series.labelItems);
       this.chartMetadata.push(series.metadata || []);
       if (series.stroke) {
         // aggregate series don't have stroke (e.g total)
         this.legendSettings.items.push({
           seriesId: series.id,
           color: (series.stroke as string) || '#cccccc',
-          label: this.mergeLabelItems(series.labelItems),
+          label: series.label,
           isVisible: series.show ?? true,
         });
       }
@@ -305,22 +308,19 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   }
 
   setLabelItem(seriesId: string, labelIndex: number, label?: string): void {
+    console.log('foundIndexes', this.seriesIndexesByIds);
     const index = this.seriesIndexesByIds[seriesId];
     if (index === undefined || !label) return;
     const series = this.uplot.series[index];
     // @ts-ignore
     const labelItems = series.labelItems;
     labelItems[labelIndex] = label;
-    const finalLabel = this.mergeLabelItems(labelItems);
+    const finalLabel = TimeSeriesUtils.mergeSeriesLabels(labelItems);
     series.label = finalLabel;
     const legendItem = this.legendSettings.items.find((i) => i.seriesId === seriesId);
     if (legendItem) {
       legendItem.label = finalLabel;
     }
-  }
-
-  private mergeLabelItems(items: (string | undefined)[]): string {
-    return items.map((i) => (i ??  '<Empty>')).join(' | ');
   }
 
   setSeriesLabel(id: string, label: string): void {
