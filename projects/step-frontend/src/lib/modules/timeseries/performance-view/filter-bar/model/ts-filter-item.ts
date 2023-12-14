@@ -1,7 +1,7 @@
 import { EntitySearchValue } from '../item/entity-search-value';
 
 export interface TsFilterItem {
-  label: string;
+  label?: string;
   attributeName: string;
   type: FilterBarItemType;
   isHidden?: boolean;

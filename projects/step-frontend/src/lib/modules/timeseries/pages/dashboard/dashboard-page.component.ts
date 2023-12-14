@@ -24,6 +24,7 @@ import { TimeRangePickerSelection } from '../../time-selection/time-range-picker
 
 //@ts-ignore
 import uPlot = require('uplot');
+import { TsFilterItem } from '../../performance-view/filter-bar/model/ts-filter-item';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -84,6 +85,7 @@ export class DashboardPageComponent implements OnInit {
       id: dashboard.id!,
       timeRange: timeRange,
       grouping: dashboard.grouping || [],
+      filters: this.prepareFilterItems(),
     });
   }
 
@@ -255,6 +257,33 @@ export class DashboardPageComponent implements OnInit {
       default:
         throw new Error('Unhandled aggregation value: ' + aggregation);
     }
+  }
+
+  private prepareFilterItems(): TsFilterItem[] {
+    return (
+      this.dashboard.filters?.map((item) => {
+        const textValues: { value: string; isSelected?: boolean }[] =
+          item.textOptions?.map((option) => ({
+            value: option,
+            isSelected: false,
+          })) || [];
+        item!.textValues?.forEach((value) => {
+          textValues.filter((t) => t.value === value).forEach((item) => (item.isSelected = true));
+        });
+        return {
+          type: item.type!,
+          label: item.label || '',
+          attributeName: item.attribute!,
+          exactMatch: item.exactMatch!,
+          textValues: textValues,
+          searchEntities: [],
+          min: item.min,
+          max: item.max,
+          isLocked: !!item.label,
+          removable: false,
+        };
+      }) || []
+    );
   }
 
   private getSeriesKeys(attributes: BucketAttributes, groupDimensions: string[]): (string | undefined)[] {

@@ -87,28 +87,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     if (this.context.getGroupDimensions()) {
       this.activeGrouping = this.context.getGroupDimensions();
     }
-    this._activeFilters = this.filters.map((item) => {
-      const textValues: { value: string; isSelected?: boolean }[] =
-        item.textOptions?.map((option) => ({
-          value: option,
-          isSelected: false,
-        })) || [];
-      item!.textValues?.forEach((value) => {
-        textValues.filter((t) => t.value === value).forEach((item) => (item.isSelected = true));
-      });
-      return {
-        type: item.type!,
-        label: item.label || '',
-        attributeName: item.attribute!,
-        exactMatch: item.exactMatch!,
-        textValues: textValues,
-        searchEntities: [],
-        min: item.min,
-        max: item.max,
-        isLocked: !!item.label,
-        removable: false,
-      };
-    });
+    this._activeFilters = this.context.getFilteringSettings().filterItems;
 
     this.emitFilterChange$.pipe(debounceTime(this.EMIT_DEBOUNCE_TIME)).subscribe(() => {
       this.composeAndVerifyFullOql(this.activeGrouping).subscribe((response) => {
@@ -121,7 +100,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   getValidFilters(): TsFilterItem[] {
-    return this._activeFilters.filter(FilterUtils.filterItemIsValidLegacy);
+    return this._activeFilters.filter(FilterUtils.filterItemIsValid);
   }
 
   handleOqlChange(event: any) {
@@ -152,7 +131,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     const filtersOql = this.oqlModeActive
       ? this.oqlValue
       : FilterUtils.filtersToOQL(
-          this._activeFilters.filter(FilterUtils.filterItemIsValidLegacy),
+          this._activeFilters.filter(FilterUtils.filterItemIsValid),
           TimeSeriesConfig.ATTRIBUTES_PREFIX
         );
     let groupingItems: TsFilterItem[] = groupDimensions.map((dimension) => ({
@@ -291,7 +270,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
 
     this._activeFilters.splice(index, 1);
 
-    if (FilterUtils.filterItemIsValidLegacy(itemToDelete)) {
+    if (FilterUtils.filterItemIsValid(itemToDelete)) {
       this.emitFilterChange$.next();
     }
   }

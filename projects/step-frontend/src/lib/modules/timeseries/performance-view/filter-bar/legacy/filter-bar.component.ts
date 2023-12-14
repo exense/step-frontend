@@ -96,7 +96,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   }
 
   getValidFilters(): TsFilterItem[] {
-    return this.activeFilters.filter(FilterUtils.filterItemIsValidLegacy);
+    return this.activeFilters.filter(FilterUtils.filterItemIsValid);
   }
 
   handleOqlChange(event: any) {
@@ -127,7 +127,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     const filtersOql = this.oqlModeActive
       ? this.oqlValue
       : FilterUtils.filtersToOQL(
-          this.activeFilters.filter(FilterUtils.filterItemIsValidLegacy),
+          this.activeFilters.filter(FilterUtils.filterItemIsValid),
           TimeSeriesConfig.ATTRIBUTES_PREFIX
         );
     let groupingItems: TsFilterItem[] = groupDimensions.map((dimension) => ({
@@ -266,7 +266,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
     this.activeFilters.splice(index, 1);
 
-    if (FilterUtils.filterItemIsValidLegacy(itemToDelete)) {
+    if (FilterUtils.filterItemIsValid(itemToDelete)) {
       this.emitFilterChange$.next();
     }
   }

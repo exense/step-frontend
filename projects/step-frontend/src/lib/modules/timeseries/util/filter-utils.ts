@@ -1,12 +1,8 @@
-import { FilterBarItemType, TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
+import { TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
 import { ChartFilterItem } from '@exense/step-core';
 
 export class FilterUtils {
-  static filterItemIsValid(item: ChartFilterItem): boolean {
-    return (item.textValues && item.textValues.length > 0) || item.min != undefined || item.max != undefined;
-  }
-
-  static filterItemIsValidLegacy(item: TsFilterItem): boolean {
+  static filterItemIsValid(item: TsFilterItem): boolean {
     return (
       (item.freeTextValues && item.freeTextValues.length > 0) ||
       item.textValues?.some((v) => v.isSelected) ||
@@ -34,6 +30,19 @@ export class FilterUtils {
     return `(${clause})`;
   }
 
+  /**
+   * Method to convert API filters to a valid OQL
+   */
+  static combineGlobalWithChartFilters(globalFilters: TsFilterItem[], items: ChartFilterItem[]): string {
+    if (!items || items.length === 0) {
+      return '';
+    }
+    return '';
+  }
+
+  /**
+   * Method to convert FE filters to a valid OQL
+   */
   static filtersToOQL(
     items: TsFilterItem[],
     attributesPrefix?: string,
@@ -72,9 +81,7 @@ export class FilterUtils {
         case 'TASK':
           clause = item.searchEntities
             ?.map((value) => {
-              let regexMatch = `${finalAttributeName} ~ ".*${value.searchValue}.*"`;
-              const equalityMatch = `${finalAttributeName} = ${value.searchValue}`;
-              return item.exactMatch ? equalityMatch : regexMatch; // we need exact match for indexes efficiency
+              return `${finalAttributeName} = ${value.searchValue}`; // we need exact match for indexes efficiency
             })
             .join(' or ');
           break;
@@ -96,5 +103,34 @@ export class FilterUtils {
     });
 
     return andFilters.filter((f) => f).join(' and ');
+  }
+
+  private convertApiFilterItem(item: ChartFilterItem): TsFilterItem {
+    const baseObject: TsFilterItem = {
+      label: item.label,
+      attributeName: item.attribute,
+      exactMatch: item.exactMatch,
+      min: item.min,
+      max: item.max,
+      type: item.type,
+      searchEntities: [],
+      textValues: [],
+      freeTextValues: [],
+    };
+    switch (item.type) {
+      case 'OPTIONS':
+        break;
+      case 'FREE_TEXT':
+        break;
+      case 'EXECUTION':
+      case 'TASK':
+      case 'PLAN':
+        break;
+      case 'NUMERIC':
+      case 'DATE':
+        break;
+    }
+
+    return baseObject;
   }
 }
