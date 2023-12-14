@@ -37,6 +37,8 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   }
 
   private handleAsyncError(response: HttpEvent<any>): HttpEvent<any> {
+    console.error('handleAsyncError', response);
+
     if (response instanceof HttpResponse && response.body?.error) {
       console.error('Non HTTP Error', response.body?.error);
       const parsedError = HttpErrorInterceptor.formatError(response.body?.error);
