@@ -66,7 +66,6 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   private emitFilterChange$ = new Subject<void>();
 
   readonly EMIT_DEBOUNCE_TIME = 300;
-  readonly FilterBarItemType = FilterBarItemType;
 
   rawMeasurementsModeActive = false;
 
@@ -133,7 +132,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
         );
     let groupingItems: TsFilterItem[] = groupDimensions.map((dimension) => ({
       attributeName: dimension,
-      type: FilterBarItemType.FREE_TEXT,
+      type: 'FREE_TEXT',
       freeTextValues: ['fake-group-dimension'],
       exactMatch: true,
       label: '',

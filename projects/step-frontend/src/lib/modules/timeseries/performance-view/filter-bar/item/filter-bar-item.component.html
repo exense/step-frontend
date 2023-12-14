@@ -28,7 +28,7 @@
     stepFocusables
     #focusables="stepFocusables"
   >
-    <div *ngSwitchCase="FilterBarType.OPTIONS">
+    <div *ngSwitchCase="'OPTIONS'">
       <div class="item-header">
         {{ item.label }}
       </div>
@@ -51,7 +51,10 @@
       </div>
     </div>
 
-    <div *ngSwitchCase="FilterBarType.FREE_TEXT">
+    <div *ngSwitchCase="'FREE_TEXT'">
+      <div class="item-header">
+        {{ item.label }}
+      </div>
       <mat-form-field *ngIf="!item.isLocked" class="w-100">
         <mat-label>Attribute name</mat-label>
         <input
@@ -101,7 +104,7 @@
       </button>
     </div>
 
-    <div *ngSwitchCase="FilterBarType.EXECUTION">
+    <div *ngSwitchCase="'EXECUTION'">
       <div class="item-header">
         {{ item.label }}
       </div>
@@ -130,7 +133,7 @@
       </button>
     </div>
 
-    <div *ngSwitchCase="FilterBarType.TASK">
+    <div *ngSwitchCase="'TASK'">
       <div class="item-header">
         {{ item.label }}
       </div>
@@ -150,7 +153,7 @@
       </button>
     </div>
 
-    <div *ngSwitchCase="FilterBarType.PLAN">
+    <div *ngSwitchCase="'PLAN'">
       <div class="item-header">
         {{ item.label }}
       </div>
@@ -170,7 +173,7 @@
       </button>
     </div>
 
-    <div *ngSwitchCase="FilterBarType.NUMERIC">
+    <div *ngSwitchCase="'NUMERIC'">
       <mat-form-field *ngIf="!item.isLocked" class="w-100">
         <mat-label>Attribute name</mat-label>
         <input
@@ -208,7 +211,7 @@
       </button>
     </div>
 
-    <div *ngSwitchCase="FilterBarType.DATE">
+    <div *ngSwitchCase="'DATE'">
       <mat-form-field *ngIf="!item.isLocked" class="w-100">
         <mat-label>Attribute name</mat-label>
         <input

@@ -47,7 +47,9 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
 })
 export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
-  @Input() activeFilters: TsFilterItem[] = [];
+  @Input() filters: ChartFilterItem[] = [];
+
+  _activeFilters: TsFilterItem[] = [];
   @Input() compactView = false;
 
   @Input() timeRangeOptions!: TimeRangePickerSelection[];
@@ -61,12 +63,11 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   @ViewChildren(FilterBarItemComponent) filterComponents?: QueryList<FilterBarItemComponent>;
   @ViewChildren('appliedFilter', { read: ElementRef }) appliedFilters?: QueryList<ElementRef<HTMLElement>>;
 
-  activeGrouping: string[];
+  activeGrouping: string[] = [];
 
   private emitFilterChange$ = new Subject<void>();
 
   readonly EMIT_DEBOUNCE_TIME = 300;
-  readonly FilterBarItemType = FilterBarItemType;
 
   rawMeasurementsModeActive = false;
 
@@ -86,6 +87,29 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     if (this.context.getGroupDimensions()) {
       this.activeGrouping = this.context.getGroupDimensions();
     }
+    this._activeFilters = this.filters.map((item) => {
+      const textValues: { value: string; isSelected?: boolean }[] =
+        item.textOptions?.map((option) => ({
+          value: option,
+          isSelected: false,
+        })) || [];
+      item!.textValues?.forEach((value) => {
+        textValues.filter((t) => t.value === value).forEach((item) => (item.isSelected = true));
+      });
+      return {
+        type: item.type!,
+        label: item.label || '',
+        attributeName: item.attribute!,
+        exactMatch: item.exactMatch!,
+        textValues: textValues,
+        searchEntities: [],
+        min: item.min,
+        max: item.max,
+        isLocked: !!item.label,
+        removable: false,
+      };
+    });
+
     this.emitFilterChange$.pipe(debounceTime(this.EMIT_DEBOUNCE_TIME)).subscribe(() => {
       this.composeAndVerifyFullOql(this.activeGrouping).subscribe((response) => {
         this.rawMeasurementsModeActive = response.hasUnknownFields;
@@ -97,7 +121,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   getValidFilters(): TsFilterItem[] {
-    return this.activeFilters.filter(FilterUtils.filterItemIsValidLegacy);
+    return this._activeFilters.filter(FilterUtils.filterItemIsValidLegacy);
   }
 
   handleOqlChange(event: any) {
@@ -128,12 +152,12 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     const filtersOql = this.oqlModeActive
       ? this.oqlValue
       : FilterUtils.filtersToOQL(
-          this.activeFilters.filter(FilterUtils.filterItemIsValidLegacy),
+          this._activeFilters.filter(FilterUtils.filterItemIsValidLegacy),
           TimeSeriesConfig.ATTRIBUTES_PREFIX
         );
     let groupingItems: TsFilterItem[] = groupDimensions.map((dimension) => ({
       attributeName: dimension,
-      type: FilterBarItemType.FREE_TEXT,
+      type: 'FREE_TEXT',
       freeTextValues: ['fake-group-dimension'],
       exactMatch: true,
       label: '',
@@ -189,12 +213,12 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   handleFilterChange(index: number, item: TsFilterItem) {
-    this.activeFilters[index] = item;
+    this._activeFilters[index] = item;
     if (!item.attributeName) {
       this.removeFilterItem(index);
       return;
     }
-    const existingItems = this.activeFilters.filter((i) => i.attributeName === item.attributeName);
+    const existingItems = this._activeFilters.filter((i) => i.attributeName === item.attributeName);
     if (existingItems.length > 1) {
       // the filter is duplicated
       this._snackbar.open('Filter not applied', 'dismiss');
@@ -238,13 +262,13 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   addFilterItem(item: TsFilterItem) {
-    const filterIndex = this.activeFilters.findIndex((i) => i.attributeName === item.attributeName);
+    const filterIndex = this._activeFilters.findIndex((i) => i.attributeName === item.attributeName);
 
     if (filterIndex !== -1) {
       const index =
-        filterIndex < this.activeFilters.length - this.activeFilters.length
+        filterIndex < this._activeFilters.length - this._activeFilters.length
           ? filterIndex
-          : filterIndex + this.activeFilters.length;
+          : filterIndex + this._activeFilters.length;
 
       this.filterComponents!.toArray()[index].menuTrigger!.openMenu();
     } else {
@@ -263,9 +287,9 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   removeFilterItem(index: number) {
-    const itemToDelete = this.activeFilters[index];
+    const itemToDelete = this._activeFilters[index];
 
-    this.activeFilters.splice(index, 1);
+    this._activeFilters.splice(index, 1);
 
     if (FilterUtils.filterItemIsValidLegacy(itemToDelete)) {
       this.emitFilterChange$.next();
@@ -273,12 +297,12 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   private addFilter(item: TsFilterItem): void {
-    this.activeFilters.push(item);
+    this._activeFilters.push(item);
     this._changeDetectorRef.detectChanges();
     this.filterComponents!.last.openMenu();
     this.filterComponents!.last.menuTrigger!.menuClosed.pipe(take(1)).subscribe(() => {
       if (!item.attributeName) {
-        this.activeFilters.pop();
+        this._activeFilters.pop();
       }
     });
   }

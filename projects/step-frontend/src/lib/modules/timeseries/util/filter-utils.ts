@@ -50,7 +50,7 @@ export class FilterUtils {
         finalAttributeName = `"${finalAttributeName}"`;
       }
       switch (item.type) {
-        case FilterBarItemType.OPTIONS:
+        case 'OPTIONS':
           clause = item.textValues
             ?.filter((f) => f.isSelected)
             .map((f) => {
@@ -58,7 +58,7 @@ export class FilterUtils {
             })
             .join(' or ');
           break;
-        case FilterBarItemType.FREE_TEXT:
+        case 'FREE_TEXT':
           clause = item.freeTextValues
             ?.map((value) => {
               let regexMatch = `${finalAttributeName} ~ ".*${value}.*"`;
@@ -67,9 +67,9 @@ export class FilterUtils {
             })
             .join(' or ');
           break;
-        case FilterBarItemType.EXECUTION:
-        case FilterBarItemType.PLAN:
-        case FilterBarItemType.TASK:
+        case 'EXECUTION':
+        case 'PLAN':
+        case 'TASK':
           clause = item.searchEntities
             ?.map((value) => {
               let regexMatch = `${finalAttributeName} ~ ".*${value.searchValue}.*"`;
@@ -78,8 +78,8 @@ export class FilterUtils {
             })
             .join(' or ');
           break;
-        case FilterBarItemType.NUMERIC:
-        case FilterBarItemType.DATE:
+        case 'NUMERIC':
+        case 'DATE':
           let clauses = [];
           if (item.min != null) {
             clauses.push(`${finalAttributeName} >= ${item.min}`);

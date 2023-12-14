@@ -5,7 +5,7 @@
     <step-ts-dashboard-filter-bar
       *ngIf="context"
       [context]="context"
-      [activeFilters]="dashboard.filters"
+      [filters]="dashboard.filters || []"
       (onTimeRangeChange)="handleTimeRangeChange($event)"
       [timeRangeOptions]="timeRangeOptions"
       [activeTimeRange]="timeRangeSelection"
@@ -20,9 +20,6 @@
       style="height: 300px; width: 500px; margin-top: 40px; margin-right: 40px; position: relative"
     >
       <step-chart-dashlet [item]="config.state" [context]="context"></step-chart-dashlet>
-      <!--      <step-chart-skeleton *ngIf="!config.finalSettings"></step-chart-skeleton>-->
-      <!--      <step-timeseries-chart *ngIf="config.finalSettings" [settings]="config.finalSettings"></step-timeseries-chart>-->
-      <!--      <ng-container *ngTemplateOutlet="menuTemplate; context: { $implicit: config }"></ng-container>-->
     </div>
   </div>
 </div>

@@ -108,7 +108,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
       {
         label: 'Status',
         attributeName: 'rnStatus',
-        type: FilterBarItemType.OPTIONS,
+        type: 'OPTIONS',
         textValues: [{ value: 'PASSED' }, { value: 'FAILED' }, { value: 'TECHNICAL_ERROR' }, { value: 'INTERRUPTED' }],
         isLocked: true,
         searchEntities: [],
@@ -116,7 +116,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
       {
         label: 'Type',
         attributeName: 'type',
-        type: FilterBarItemType.OPTIONS,
+        type: 'OPTIONS',
         textValues: [{ value: 'keyword' }, { value: 'custom' }],
         isLocked: true,
         searchEntities: [],
@@ -124,14 +124,14 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
       {
         label: 'Name',
         attributeName: 'name',
-        type: FilterBarItemType.FREE_TEXT,
+        type: 'FREE_TEXT',
         isLocked: true,
         searchEntities: [],
       },
       {
         label: 'Execution',
         attributeName: 'eId',
-        type: FilterBarItemType.EXECUTION,
+        type: 'EXECUTION',
         isLocked: true,
         searchEntities: [],
         exactMatch: true,
@@ -139,14 +139,14 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
       {
         label: 'Origin',
         attributeName: 'origin',
-        type: FilterBarItemType.FREE_TEXT,
+        type: 'FREE_TEXT',
         isLocked: true,
         searchEntities: [],
       },
       {
         label: 'Task',
         attributeName: 'taskId',
-        type: FilterBarItemType.TASK,
+        type: 'TASK',
         isLocked: true,
         searchEntities: [],
         exactMatch: true,
@@ -154,7 +154,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
       {
         label: 'Plan',
         attributeName: 'planId',
-        type: FilterBarItemType.PLAN,
+        type: 'PLAN',
         isLocked: true,
         searchEntities: [],
         exactMatch: true,

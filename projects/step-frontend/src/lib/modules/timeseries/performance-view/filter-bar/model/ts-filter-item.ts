@@ -19,12 +19,4 @@ export interface TsFilterItem {
   updateTimeSelectionOnFilterChange?: boolean;
 }
 
-export enum FilterBarItemType {
-  OPTIONS = 'OPTIONS', // this is a text with suggestions
-  FREE_TEXT = 'FREE_TEXT', // used for custom attributes we don't know the values
-  EXECUTION = 'EXECUTION', // custom behavior with picker for executions
-  TASK = 'TASK', // custom behavior with picker for tasks
-  PLAN = 'PLAN', // custom behavior with picker for plans
-  NUMERIC = 'NUMERIC',
-  DATE = 'DATE',
-}
+export type FilterBarItemType = 'OPTIONS' | 'FREE_TEXT' | 'EXECUTION' | 'TASK' | 'PLAN' | 'NUMERIC' | 'DATE';
