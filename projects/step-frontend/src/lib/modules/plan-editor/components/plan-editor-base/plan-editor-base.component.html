@@ -1,9 +1,9 @@
 <div>
+  <step-plan-alerts [plan]="plan"> </step-plan-alerts>
   <step-alert type="info" *ngIf="showInteractiveWarning$ | async">
     Welcome to the interactive mode. In this mode you can select tree nodes and run them directly by clicking the
     &nbsp;'Run interactively' button
   </step-alert>
-
   <div class="actions-header">
     <div class="editable-labels">
       <ng-container *ngIf="planTypes$ | async as planTypes">

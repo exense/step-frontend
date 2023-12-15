@@ -144,7 +144,7 @@ export class KeywordsService {
   }
 
   /**
-   * Returns the list of entities matching the provided attributes
+   * Returns the list of entities for the provided list of IDs
    * @param requestBody
    * @returns Function default response
    * @throws ApiError
@@ -262,6 +262,41 @@ export class KeywordsService {
       path: {
         id: id,
       },
+    });
+  }
+
+  /**
+   * Get entity locking state
+   * @param id
+   * @returns boolean default response
+   * @throws ApiError
+   */
+  public isFunctionLocked(id: string): Observable<boolean> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/functions/{id}/locked',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
+   * Lock this entity
+   * @param id
+   * @param requestBody
+   * @returns any default response
+   * @throws ApiError
+   */
+  public lockFunction(id: string, requestBody?: boolean): Observable<any> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/functions/{id}/locked',
+      path: {
+        id: id,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
     });
   }
 

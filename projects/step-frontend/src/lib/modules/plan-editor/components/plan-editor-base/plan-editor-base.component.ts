@@ -106,7 +106,7 @@ export class PlanEditorBaseComponent
     return artefactId;
   }
 
-  @Input() id?: string;
+  @Input() plan?: Plan | null;
   @Input() showExecuteButton = true;
 
   selectedTab = 'controls';
@@ -143,10 +143,10 @@ export class PlanEditorBaseComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const cId = changes['id'];
-    if (cId?.previousValue !== cId?.currentValue || cId?.firstChange) {
-      this.loadPlan(cId?.currentValue, true);
-      this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference(cId?.currentValue);
+    const cPlan = changes['plan'];
+    if (cPlan?.previousValue !== cPlan?.currentValue || cPlan?.firstChange) {
+      this.setupPlan(cPlan?.currentValue, true);
+      this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference((cPlan?.currentValue as Plan)?.id);
     }
   }
 
@@ -168,24 +168,24 @@ export class PlanEditorBaseComponent
   }
 
   exportPlan(): void {
-    if (!this.id) {
+    if (!this.plan?.id) {
       return;
     }
-    this._planEditorApi.exportPlan(this.id, `${this._planEditService.plan!.attributes!['name']}.sta`).subscribe();
+    this._planEditorApi.exportPlan(this.plan.id, `${this._planEditService.plan!.attributes!['name']}.sta`).subscribe();
   }
 
   displayHistory(permission: string, plan: Plan): void {
-    if (!(plan?.id || this.id)) {
+    if (!(plan?.id || this.plan?.id)) {
       return;
     }
 
-    const versionHistory = this._planEditorApi.getPlanHistory(this.id || plan.id!);
+    const versionHistory = this._planEditorApi.getPlanHistory(this.plan?.id ?? plan.id!);
 
     const currentVersion$ = defer(() => {
-      if (this.id && this.id !== plan.id) {
+      if (this.plan?.id && this.plan?.id !== plan.id) {
         // composite keywords need to retrieve the current version
         return this._keywordCallsApi
-          .getFunctionById(this.id)
+          .getFunctionById(this.plan!.id)
           .pipe(map((keyword) => keyword?.customFields?.['versionId'] ?? undefined));
       } else {
         // we are showing a real plan
@@ -199,17 +199,20 @@ export class PlanEditorBaseComponent
           this._restoreDialogsService.showRestoreDialog(currentVersion, versionHistory, permission)
         ),
         filter((restoreVersion) => restoreVersion !== undefined),
-        switchMap((restoreVersion) => this._planEditorApi.restorePlanVersion(this.id || plan.id!, restoreVersion)),
+        switchMap((restoreVersion) =>
+          this._planEditorApi.restorePlanVersion(this.plan?.id ?? plan.id!, restoreVersion)
+        ),
+        switchMap(() => this._planEditorApi.loadPlan(this.plan?.id ?? plan.id!)),
         catchError((error) => {
           console.error(error);
           return EMPTY;
         })
       )
-      .subscribe(() => this.loadPlan(this.id || plan.id!));
+      .subscribe((plan) => this.setupPlan(plan));
   }
 
   clonePlan(): void {
-    if (!this.id) {
+    if (!this.plan?.id) {
       return;
     }
 
@@ -219,7 +222,7 @@ export class PlanEditorBaseComponent
       .enterValue('Clone plan as', `${name}_Copy`)
       .pipe(
         switchMap((value) =>
-          this._planEditorApi.clonePlan(this.id!).pipe(
+          this._planEditorApi.clonePlan(this.plan!.id!).pipe(
             map((plan) => {
               plan!.attributes!['name'] = value;
               return plan;
@@ -259,7 +262,7 @@ export class PlanEditorBaseComponent
 
     if (isPlan) {
       this._planApi
-        .lookupPlan(this.id!, artefact!.id!)
+        .lookupPlan(this.plan!.id!, artefact!.id!)
         .pipe(
           map((plan) => plan || NO_DATA),
           catchError((err) => {
@@ -316,44 +319,37 @@ export class PlanEditorBaseComponent
       artefactIds = this._treeState.getSelectedNodes().map((node) => node.id!);
     }
 
-    this._interactiveSession.execute(this.id!, artefactIds).subscribe(() => {
+    this._interactiveSession.execute(this.plan!.id!, artefactIds).subscribe(() => {
       if (this.keywords) {
         this.keywords._leafReportsDataSource.reload();
       }
     });
   }
 
-  private loadPlan(id?: string, preselectArtefact?: boolean): void {
-    if (!id) {
+  private setupPlan(plan?: Plan, preselectArtefact?: boolean): void {
+    if (!plan) {
       return;
     }
 
-    this._planEditorApi
-      .loadPlan(id)
-      .pipe(
-        tap((plan) => {
-          if (plan.root) {
-            this.synchronizeDynamicName(plan.root);
-          }
-        })
-      )
-      .subscribe((plan) => {
-        this.planClass = plan._class;
-        this.planTypeControl.setValue(
-          {
-            planType: plan.root!._class,
-            icon: this._artefactService.getArtefactType(plan.root!._class)!.icon,
-          },
-          { emitEvent: false }
-        );
+    if (plan.root) {
+      this.synchronizeDynamicName(plan.root);
+    }
 
-        const planOpenState = this._planOpen.getLastPlanOpenState();
-        const artefactId = preselectArtefact ? planOpenState?.artefactId ?? this.artefactIdFromUrl : undefined;
-        this._planEditService.init(plan, artefactId);
-        if (planOpenState?.startInteractive) {
-          this.startInteractive();
-        }
-      });
+    this.planClass = plan._class;
+    this.planTypeControl.setValue(
+      {
+        planType: plan.root!._class,
+        icon: this._artefactService.getArtefactType(plan.root!._class)!.icon,
+      },
+      { emitEvent: false }
+    );
+
+    const planOpenState = this._planOpen.getLastPlanOpenState();
+    const artefactId = preselectArtefact ? planOpenState?.artefactId ?? this.artefactIdFromUrl : undefined;
+    this._planEditService.init(plan, artefactId);
+    if (planOpenState?.startInteractive) {
+      this.startInteractive();
+    }
   }
 
   private initConsoleTabToggle(): void {

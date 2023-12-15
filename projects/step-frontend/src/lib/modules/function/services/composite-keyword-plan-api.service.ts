@@ -1,6 +1,6 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import { PlanEditorApiService } from '../../plan-editor/plan-editor.module';
-import { from, map, Observable, pipe, tap } from 'rxjs';
+import { BehaviorSubject, from, map, Observable, pipe, tap } from 'rxjs';
 import {
   AugmentedInteractivePlanExecutionService,
   AugmentedKeywordsService,
@@ -13,17 +13,24 @@ import {
 } from '@exense/step-core';
 import { Router } from '@angular/router';
 
-@Injectable()
-export class CompositeKeywordPlanApiService implements PlanEditorApiService {
+@Injectable({
+  providedIn: 'root',
+})
+export class CompositeKeywordPlanApiService implements PlanEditorApiService, OnDestroy {
   private _keywordApi = inject(AugmentedKeywordsService);
   private _router = inject(Router);
   private _interactiveApi = inject(AugmentedInteractivePlanExecutionService);
   private _exportDialogs = inject(ExportDialogsService);
 
-  private keyword?: Keyword;
+  private keywordInternal$ = new BehaviorSubject<Keyword | undefined>(undefined);
+  readonly keyword$ = this.keywordInternal$.asObservable();
+
+  ngOnDestroy(): void {
+    this.keywordInternal$.complete();
+  }
 
   private readonly getPlanWidthId = pipe(
-    tap((keyword: Keyword) => (this.keyword = keyword)),
+    tap((keyword: Keyword) => this.keywordInternal$.next(keyword)),
     map((keyword) => {
       const id = keyword.id!;
       const plan = (keyword as any).plan as Plan;
@@ -74,7 +81,7 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService {
 
   savePlan(plan: Plan): Observable<{ id: string; plan: Plan }> {
     const keyword = {
-      ...this.keyword!,
+      ...this.keywordInternal$.value!,
       plan,
     } as Keyword;
 

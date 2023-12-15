@@ -91,6 +91,8 @@ import { ConfirmationDialogComponent } from './components/confirmation-dialog/co
 import { MessagesListDialogComponent } from './components/messages-list-dialog/messages-list-dialog.component';
 import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
 import { ReportNodeIconComponent } from './components/report-node-icon/report-node-icon.component';
+import { LockColumnContainerComponent } from './components/lock-column-container/lock-column-container.component';
+import { LockColumnComponent } from './components/lock-column/lock-column.component';
 
 @NgModule({
   declarations: [
@@ -160,6 +162,8 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     ConfirmationDialogComponent,
     MessagesListDialogComponent,
     MessageDialogComponent,
+    LockColumnContainerComponent,
+    LockColumnComponent,
   ],
   imports: [
     CommonModule,
@@ -242,6 +246,7 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     CustomFormWrapperComponent,
     EntityColumnComponent,
     EntityColumnContainerComponent,
+    LockColumnContainerComponent,
     NewSchedulerTaskDialogComponent,
     EditSchedulerTaskDialogComponent,
     ExportDialogComponent,
@@ -265,6 +270,7 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     ConfirmationDialogComponent,
     MessagesListDialogComponent,
     MessageDialogComponent,
+    LockColumnComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -316,6 +322,8 @@ export { EditableLabelComponent } from './components/editable-label/editable-lab
 export { EditableTextareaLabelComponent } from './components/editable-textarea-label/editable-textarea-label.component';
 export * from './components/entity-column-container/entity-column-container.component';
 export * from './components/entity-column/entity-column.component';
+export * from './components/lock-column-container/lock-column-container.component';
+export * from './components/lock-column/lock-column.component';
 export * from './components/export-dialog/export-dialog.component';
 export * from './components/import-dialog/import-dialog.component';
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';

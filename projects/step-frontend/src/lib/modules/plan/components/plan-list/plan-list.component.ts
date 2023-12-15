@@ -51,8 +51,8 @@ export class PlanListComponent {
     this._planDialogs.duplicatePlan(id).pipe(this.updateDataSourceAfterChange).subscribe();
   }
 
-  deletePlan(id: string, name: string): void {
-    this._planDialogs.deletePlan(id, name).pipe(this.updateDataSourceAfterChange).subscribe();
+  deletePlan(plan: Plan): void {
+    this._planDialogs.deletePlan(plan).pipe(this.updateDataSourceAfterChange).subscribe();
   }
 
   importPlans(): void {
