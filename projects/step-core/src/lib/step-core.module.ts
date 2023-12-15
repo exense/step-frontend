@@ -348,7 +348,6 @@ export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialo
 export * from './components/artefact-details/artefact-details.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export * from './components/settings/settings.component';
-export * from './decorators/plugin';
 export * from './directives/caps-lock.directive';
 export * from './components/popover/popover.component';
 export * from './directives/trigger-popover.directive';

@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, Compiler, FactoryProvider, inject, Injector } from '@angular/core';
+import { APP_INITIALIZER, FactoryProvider, inject, Injector } from '@angular/core';
 import { LegacyPluginDefinition } from './shared/legacy-plugin-definition';
 import { MicrofrontendPluginDefinition } from './shared/microfrontend-plugin-definition';
 import { registerMicrofrontendPlugins } from './register-microfrontend-plugins';
@@ -42,7 +42,6 @@ const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
 };
 
 const registerPlugins = () => {
-  const compiler = inject(Compiler);
   const injector = inject(Injector);
   const registry = inject(PluginInfoRegistryService);
 
@@ -75,10 +74,7 @@ const registerPlugins = () => {
 
     microfrontend = microfrontend.filter((m) => !IGNORE_PLUGINS.includes(m.name));
 
-    await Promise.all([
-      registerMicrofrontendPlugins(microfrontend, { compiler, injector }),
-      registerOsPlugins({ compiler, injector }),
-    ]);
+    await Promise.all([registerMicrofrontendPlugins(microfrontend, injector), registerOsPlugins(injector)]);
   };
 };
 

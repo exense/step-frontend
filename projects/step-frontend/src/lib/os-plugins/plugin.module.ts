@@ -7,10 +7,6 @@ import { StepCoreModule, PluginLazyLoad, ImportMeta } from '@exense/step-core';
   imports: [CommonModule, StepCoreModule],
 })
 export class PluginModule extends PluginLazyLoad {
-  constructor() {
-    super();
-  }
-
   protected override getPluginsLazyLoadMeta(): Record<string, ImportMeta> {
     return {
       scriptEditor: () =>
