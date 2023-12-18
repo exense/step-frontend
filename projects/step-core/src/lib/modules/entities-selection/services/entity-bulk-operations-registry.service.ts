@@ -41,6 +41,7 @@ export class EntityBulkOperationsRegistryService {
     [BulkOperationType.EXPORT]: { label: 'Export selected', icon: 'upload' },
     [BulkOperationType.RESTART]: { label: 'Restart selected', icon: 'play-circle' },
     [BulkOperationType.STOP]: { label: 'Stop selected', icon: 'stop-circle' },
+    [BulkOperationType.CLOSE]: { label: 'Close selected', icon: 'x-circle' },
   };
 
   register(
