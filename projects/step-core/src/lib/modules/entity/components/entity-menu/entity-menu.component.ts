@@ -19,12 +19,9 @@ import {
 } from '../../../custom-registeries/custom-registries.module';
 import { EntityMenuContentDirective } from '../../directives/entity-menu-content.directive';
 import { Mutable } from '../../../../shared';
+import { OperationCompleteHandler } from '../../injectables/operation-complete-handler';
 
 type FieldAccessor = Mutable<Pick<EntityMenuComponent, 'hasContent'>>;
-
-export abstract class OperationCompleteHandler {
-  abstract handleOperationComplete(): void;
-}
 
 @Component({
   selector: 'step-entity-menu',

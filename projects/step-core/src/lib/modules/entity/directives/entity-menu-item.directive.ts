@@ -16,7 +16,7 @@ import {
 } from '../../custom-registeries/custom-registries.module';
 import { Mutable } from '../../../shared';
 import { AuthService } from '../../basics/services/auth.service';
-import { OperationCompleteHandler } from '../components/entity-menu/entity-menu.component';
+import { OperationCompleteHandler } from '../injectables/operation-complete-handler';
 
 class SimpleController implements EntityMenuItemCommandController<unknown> {
   constructor(private _menuItemInfo: EntityMenuItemInfo) {}
