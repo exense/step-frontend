@@ -145,7 +145,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
   }
 
   selectFunction(): Observable<Keyword> {
-    const selectedEntity$ = this._entityDialogs.selectEntityOfType('function', true);
+    const selectedEntity$ = this._entityDialogs.selectEntityOfType('function');
     const function$ = selectedEntity$.pipe(
       map((result) => result.item as Keyword),
       switchMap((keyword) => this._functionApiService.getFunctionById(keyword.id!))

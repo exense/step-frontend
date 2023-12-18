@@ -120,7 +120,6 @@ export * from './services/custom-column-options';
 export * from './directives/additional-header.directive';
 export * from './components/bulk-operations/bulk-operations.component';
 export * from './shared/filter-condition';
-export * from './shared/legacy-table-handle.interface';
 export * from './shared/table-local-data-source-config';
 export * from './shared/search-column.interface';
 export * from './services/filter-condition-factory.service';
