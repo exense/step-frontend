@@ -1,10 +1,8 @@
 import {
-  EnvironmentInjector,
   OnChanges,
   SimpleChanges,
   TrackByFunction,
   AfterContentInit,
-  Injector,
   Component,
   ContentChild,
   EventEmitter,
@@ -12,12 +10,10 @@ import {
   Input,
   Output,
   ViewChild,
-  Type,
+  forwardRef,
 } from '@angular/core';
 import { MatMenu } from '@angular/material/menu';
 import {
-  EntityMenuItemCommandInvoke,
-  EntityMenuItemCommandInvoker,
   EntityMenuItemInfo,
   EntityMenuItemsRegistryService,
 } from '../../../custom-registeries/custom-registries.module';
@@ -26,13 +22,22 @@ import { Mutable } from '../../../../shared';
 
 type FieldAccessor = Mutable<Pick<EntityMenuComponent, 'hasContent'>>;
 
+export abstract class OperationCompleteHandler {
+  abstract handleOperationComplete(): void;
+}
+
 @Component({
   selector: 'step-entity-menu',
   templateUrl: './entity-menu.component.html',
   styleUrls: ['./entity-menu.component.scss'],
+  providers: [
+    {
+      provide: OperationCompleteHandler,
+      useExisting: forwardRef(() => EntityMenuComponent),
+    },
+  ],
 })
-export class EntityMenuComponent implements AfterContentInit, OnChanges {
-  private _injector = inject(Injector);
+export class EntityMenuComponent implements OperationCompleteHandler, AfterContentInit, OnChanges {
   private _menuItemRegistry = inject(EntityMenuItemsRegistryService);
 
   protected menuItems: EntityMenuItemInfo[] = [];
@@ -57,33 +62,8 @@ export class EntityMenuComponent implements AfterContentInit, OnChanges {
     }
   }
 
-  handleEntityOperation<T>(entity: T, menuItem: EntityMenuItemInfo): void {
-    const entityType = menuItem.entity;
-    const entityKey = (entity as Record<string, unknown>)[menuItem.entityKeyProperty] as string;
-
-    if (menuItem.operation?.prototype?.constructor) {
-      const commandInvoker = menuItem.operation as Type<EntityMenuItemCommandInvoker<T>>;
-      const injector = Injector.create({
-        providers: [
-          {
-            provide: commandInvoker,
-            useClass: commandInvoker,
-          },
-        ],
-        parent: this._injector,
-      }) as EnvironmentInjector;
-
-      const invoker = injector.get<EntityMenuItemCommandInvoker<T>>(commandInvoker);
-      invoker.invoke(entityType, entityKey, entity).subscribe({
-        next: () => this.entityOperationSuccess.emit(),
-        complete: () => injector.destroy(),
-      });
-      return;
-    }
-
-    const invoke = menuItem.operation as EntityMenuItemCommandInvoke<T>;
-
-    invoke(entityType, entityKey, entity).subscribe(() => this.entityOperationSuccess.emit());
+  handleOperationComplete(): void {
+    this.entityOperationSuccess.emit();
   }
 
   private getEntityMenuItems(entity?: string): void {

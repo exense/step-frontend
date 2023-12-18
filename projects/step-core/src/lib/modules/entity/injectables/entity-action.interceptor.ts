@@ -1,4 +1,5 @@
 import { Observable, of, switchMap, tap } from 'rxjs';
+import { isDevMode } from '@angular/core';
 import { EntityAction } from '../types/entity-action';
 
 export abstract class EntityActionInterceptor<T> implements EntityAction {
@@ -9,7 +10,11 @@ export abstract class EntityActionInterceptor<T> implements EntityAction {
 
   invokeAction(entity: T, additionalParams?: unknown): Observable<boolean> {
     return of(undefined).pipe(
-      tap(() => console.log(`INVOKE "${this.entityType}.${this.action}.${this.name}"`)),
+      tap(() => {
+        if (isDevMode()) {
+          console.log(`INVOKE "${this.entityType}.${this.action}.${this.name}"`);
+        }
+      }),
       switchMap(() => this.proceedAction(entity, additionalParams))
     );
   }
