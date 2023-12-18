@@ -95,10 +95,6 @@
       margin-left: 16px;
     }
 
-    step-ajs-icon {
-      @include tabbar-icon;
-    }
-
     &.mat-primary {
       .mat-tab-link.mat-tab-label-active {
         color: $primary-tabs-color;
