@@ -13,15 +13,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import {
-  AJS_MODULE,
-  IS_SMALL_SCREEN,
-  MenuEntry,
-  NavigatorService,
-  ViewRegistryService,
-  ViewStateService,
-} from '@exense/step-core';
+import { IS_SMALL_SCREEN, MenuEntry, NavigatorService, ViewRegistryService, ViewStateService } from '@exense/step-core';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
 import { MENU_ITEMS } from '../../injectables/menu-items';
 import { Subject, SubscriptionLike, takeUntil } from 'rxjs';
@@ -148,7 +140,3 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
     });
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepSidebar', downgradeComponent({ component: SidebarComponent }));

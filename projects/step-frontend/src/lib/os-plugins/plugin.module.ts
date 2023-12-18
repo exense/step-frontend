@@ -1,19 +1,12 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { StepCoreModule, Plugin, PluginLazyLoad, ImportMeta } from '@exense/step-core';
-import { UpgradeModule } from '@angular/upgrade/static';
-import { osPluginModule } from './angularjs/os-plugin.module';
+import { StepCoreModule, PluginLazyLoad, ImportMeta } from '@exense/step-core';
 
-@Plugin(osPluginModule.name)
 @NgModule({
   declarations: [],
-  imports: [CommonModule, StepCoreModule, UpgradeModule],
+  imports: [CommonModule, StepCoreModule],
 })
 export class PluginModule extends PluginLazyLoad {
-  constructor() {
-    super(osPluginModule);
-  }
-
   protected override getPluginsLazyLoadMeta(): Record<string, ImportMeta> {
     return {
       scriptEditor: () =>
@@ -23,5 +16,3 @@ export class PluginModule extends PluginLazyLoad {
     };
   }
 }
-
-export * from './angularjs/os-plugin.module';

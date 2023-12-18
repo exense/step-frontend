@@ -48,7 +48,7 @@
           <section *ngFor="let entry of _menuItems$ | async | menuFilter: mainMenuEntry.id; trackBy: trackByMenuEntry">
             <div
               class="sidebar-subtab"
-              [class.sidebar-highlighted-subtab]="_viewStateService.isViewActive(entry.id)"
+              [class.sidebar-highlighted-subtab]="entry.id | isMenuItemActive | async"
               (mouseup)="navigateTo(entry.id, $event)"
             >
               <step-icon class="visible-when-collapsed" [name]="entry.icon"></step-icon>

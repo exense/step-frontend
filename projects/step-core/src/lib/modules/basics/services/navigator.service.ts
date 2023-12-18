@@ -1,21 +1,32 @@
 import { inject, Injectable } from '@angular/core';
 import { DEFAULT_PAGE } from './default-page.token';
-import { AJS_MODULE } from '../../../shared/constants';
-import { DOCUMENT } from '@angular/common';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
+import { DOCUMENT, Location } from '@angular/common';
 import { VIEW_ID_LINK_PREFIX } from './view-id-link-prefix.token';
-import { ActivatedRoute, Params, QueryParamsHandling, Router } from '@angular/router';
-import { from, switchMap, timer } from 'rxjs';
+import { ActivatedRoute, NavigationEnd, Params, QueryParamsHandling, Router, UrlTree } from '@angular/router';
+import { filter, from, map, Observable, shareReplay, startWith, switchMap, timer } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class NavigatorService {
   private _router = inject(Router);
+  private _location = inject(Location);
   private _activatedRoute = inject(ActivatedRoute);
   private _defaultPage = inject(DEFAULT_PAGE);
   private _window = inject(DOCUMENT).defaultView!;
   private _viewIdLinkPrefix = inject(VIEW_ID_LINK_PREFIX);
+
+  readonly activeUrl$ = this._router.events.pipe(
+    filter((event) => event instanceof NavigationEnd),
+    map(() => this._router.url),
+    startWith(this._router.url),
+    shareReplay(1)
+  );
+
+  isViewIdActive(viewId: string): Observable<boolean> {
+    const viewLink = `/root/${viewId}`;
+    return this.activeUrl$.pipe(map((url) => url.startsWith(viewLink)));
+  }
 
   navigate(viewId: string, isOpenInSeparateTab: boolean = false): void {
     if (viewId.startsWith(this._viewIdLinkPrefix)) {
@@ -32,6 +43,24 @@ export class NavigatorService {
     forceClientUrl,
   }: { isOpenInSeparateTab?: boolean; forceClientUrl?: boolean } = {}): void {
     this.navigateInternal(this._defaultPage(forceClientUrl), isOpenInSeparateTab);
+  }
+
+  navigateToRoot(): void {
+    this._router.navigate(['/']);
+  }
+
+  navigateLogin(skipLocationChange: boolean = true): void {
+    this._router.navigate(['/', 'login'], { skipLocationChange });
+  }
+
+  navigateAfterLogin(): void {
+    const emptyUrls = ['', '/', 'root'];
+    const url = this._location.path();
+    if (emptyUrls.includes(url)) {
+      this.navigateToHome();
+      return;
+    }
+    this._router.navigateByUrl(url, { skipLocationChange: true });
   }
 
   private navigateInternal(link: string, isOpenInSeparateTab?: boolean): void {
@@ -75,5 +104,3 @@ export class NavigatorService {
     return queryParams;
   }
 }
-
-getAngularJSGlobal().module(AJS_MODULE).service('navigatorService', downgradeInjectable(NavigatorService));

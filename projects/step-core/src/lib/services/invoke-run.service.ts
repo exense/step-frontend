@@ -1,6 +1,4 @@
 import { forwardRef, Injectable } from '@angular/core';
-import { AJS_MODULE } from '../shared';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
@@ -33,13 +31,3 @@ export class InvokeRunService implements InvokeRunRegister, InvokeRunExecutor {
     this._runBlocks = [];
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .service('invokeRunExecutor', downgradeInjectable(InvokeRunExecutor))
-  .run([
-    'invokeRunExecutor',
-    (invokeRunExecutor: InvokeRunExecutor) => {
-      invokeRunExecutor.invoke();
-    },
-  ]);

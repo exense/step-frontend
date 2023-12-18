@@ -5,14 +5,7 @@
     >
   </div>
   <div step-modal-window-body>
-    <ng-template #legacy>
-      <step-entity-legacy-table-wrapper [templateUrl]="entity.templateUrl" [context]="selectEntityContext">
-      </step-entity-legacy-table-wrapper>
-    </ng-template>
-    <ng-container *ngIf="entity.component; else legacy">
-      <step-custom-item-render [component]="entity.component" [context]="selectEntityContext">
-      </step-custom-item-render>
-    </ng-container>
+    <step-custom-item-render [component]="entity.component" [context]="selectEntityContext"> </step-custom-item-render>
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>

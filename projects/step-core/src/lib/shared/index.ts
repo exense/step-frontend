@@ -1,5 +1,4 @@
 export * from './additional-right-rule';
-export * from './angularjs-providers';
 export * from './constants';
 export * from './date-format.enum';
 export * from './dialogs.service';

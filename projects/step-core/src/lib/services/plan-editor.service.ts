@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Mutable, PlanEditorStrategy } from '../shared';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import { AbstractArtefact, Plan } from '../client/generated';
 
 type FieldAccessor = Mutable<Partial<Pick<PlanEditorService, 'hasRedo$' | 'hasUndo$' | 'plan$'>>>;
@@ -8,7 +8,9 @@ type FieldAccessor = Mutable<Partial<Pick<PlanEditorService, 'hasRedo$' | 'hasUn
 @Injectable({
   providedIn: 'root',
 })
-export class PlanEditorService implements PlanEditorStrategy {
+export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
+  private strategyChangedInternal$ = new Subject<void>();
+
   private planInit?: Plan;
   private selectedArtefactIdInit?: string;
 
@@ -20,8 +22,14 @@ export class PlanEditorService implements PlanEditorStrategy {
 
   readonly plan$: Observable<Plan | undefined> = of(undefined);
 
+  readonly strategyChanged$ = this.strategyChangedInternal$.asObservable();
+
   get plan(): Plan | undefined {
     return this.strategy?.plan;
+  }
+
+  ngOnDestroy(): void {
+    this.strategyChangedInternal$.complete();
   }
 
   useStrategy(strategy: PlanEditorStrategy): void {
@@ -34,6 +42,7 @@ export class PlanEditorService implements PlanEditorStrategy {
       this.planInit = undefined;
       this.selectedArtefactIdInit = undefined;
     }
+    this.strategyChangedInternal$.next();
   }
 
   removeStrategy(): void {
@@ -41,6 +50,7 @@ export class PlanEditorService implements PlanEditorStrategy {
     (this as FieldAccessor).hasRedo$ = of(false);
     (this as FieldAccessor).hasUndo$ = of(false);
     (this as FieldAccessor).plan$ = of(undefined);
+    this.strategyChangedInternal$.next();
   }
 
   addControl(artefactTypeId: string): void {

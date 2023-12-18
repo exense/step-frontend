@@ -1,13 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ExecutionStepPanel } from '../shared/execution-step-panel';
-import {
-  AJS_MODULE,
-  ExecutionCustomPanelRegistryService,
-  ItemInfo,
-  Mutable,
-  ViewRegistryService,
-} from '@exense/step-core';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
+import { ExecutionCustomPanelRegistryService, ItemInfo, Mutable, ViewRegistryService } from '@exense/step-core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 type FieldsAccessor = Mutable<Pick<ExecutionsPanelsService, 'panels' | 'customPanels'>>;
@@ -113,7 +106,3 @@ export class ExecutionsPanelsService {
     }, {} as Record<string, ExecutionStepPanel>);
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .service('executionsPanelsService', downgradeInjectable(ExecutionsPanelsService));

@@ -18,7 +18,7 @@ import { SCOPE_ITEMS, ScopeItem } from '../../types/scope-items.token';
 })
 export class ParameterEditDialogComponent implements OnInit {
   readonly DateFormat = DateFormat;
-  protected parameter!: Parameter;
+  protected parameter?: Parameter;
   protected scopeItems: ScopeItem[] = [];
   protected selectedScope?: ScopeItem;
   protected protectedParameter: boolean = false;
@@ -47,6 +47,9 @@ export class ParameterEditDialogComponent implements OnInit {
   }
 
   selectScope(scopeItem: ScopeItem): void {
+    if (!this.parameter) {
+      return;
+    }
     this.parameter.scopeEntity = '';
     this.parameter.scope = scopeItem.scope;
     this.selectedScope = scopeItem;
@@ -89,6 +92,9 @@ export class ParameterEditDialogComponent implements OnInit {
   }
 
   onKeyChange(key: string) {
+    if (!this.parameter) {
+      return;
+    }
     this.parameter.key = key;
     const lowerKey = key.toLowerCase();
     if (lowerKey.includes('pwd') || lowerKey.includes('password')) {

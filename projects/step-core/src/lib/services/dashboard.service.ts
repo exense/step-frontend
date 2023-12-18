@@ -1,9 +1,7 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { AuthService } from '../modules/basics/services/auth.service';
 import { ViewRegistryService } from './view-registry.service';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '../shared';
 import { MultipleProjectsService } from '../modules/basics/services/multiple-projects.service';
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
@@ -42,5 +40,3 @@ export class DashboardService {
     return this.generateDashboardLink(parameters);
   }
 }
-
-getAngularJSGlobal().module(AJS_MODULE).service('DashboardService', downgradeInjectable(DashboardService));

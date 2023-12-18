@@ -4,7 +4,6 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MAT_LUXON_DATE_ADAPTER_OPTIONS } from '@angular/material-luxon-adapter';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
-import { UpgradeModule } from '@angular/upgrade/static';
 import { AngularSplitModule } from 'angular-split';
 import { StepGeneratedClientModule } from './client/generated';
 import { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
@@ -47,7 +46,6 @@ import { InputModelFormatterDirective } from './directives/input-model-formatter
 import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 import { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
-import { TooltipDirective } from './directives/tooltip.directive';
 import { TrapFocusDirective } from './directives/trap-focus.directive';
 import { REPOSITORY_PARAMETERS_INITIALIZER, StepBasicsModule } from './modules/basics/step-basics.module';
 import {
@@ -96,7 +94,6 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
 
 @NgModule({
   declarations: [
-    TooltipDirective,
     MatchingAuthenticator,
     DashboardLinkPipe,
     CapsLockDirective,
@@ -169,7 +166,6 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    UpgradeModule,
     StepMaterialModule,
     TableModule,
     StepBasicsModule,
@@ -192,8 +188,6 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    UpgradeModule,
-    TooltipDirective,
     CapsLockDirective,
     StepMaterialModule,
     JsonViewerModule,
@@ -305,7 +299,6 @@ export class StepCoreModule {
   }
 }
 
-export * from './angularjs';
 export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
 export { CancelError, CancelablePromise } from './client/generated/core/CancelablePromise';
 export { OpenAPI } from './client/generated/core/OpenAPI';
@@ -355,7 +348,6 @@ export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialo
 export * from './components/artefact-details/artefact-details.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export * from './components/settings/settings.component';
-export * from './decorators/plugin';
 export * from './directives/caps-lock.directive';
 export * from './components/popover/popover.component';
 export * from './directives/trigger-popover.directive';
@@ -367,7 +359,6 @@ export * from './directives/input-model-formatter.directive';
 export { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 export * from './directives/tooltip-immediate-close.directive';
-export * from './directives/tooltip.directive';
 export { TrapFocusDirective } from './directives/trap-focus.directive';
 export * from './domain';
 export * from './modules/async-operations/async-operations.module';
@@ -416,7 +407,6 @@ export * from './services/plan-interactive-session.service';
 export * from './services/plugin-info-registry.service';
 export * from './services/restore-dialogs.service';
 export * from './services/scheduled-task-dialogs.service';
-export { UibModalHelperService, UibModalInstance } from './services/uib-modal-helper.service';
 export * from './services/view-registry.service';
 export * from './services/view-state.service';
 export * from './services/artefact.service';

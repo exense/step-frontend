@@ -1,101 +1,100 @@
-<ng-container>
-  <h3 class="page-header">My account</h3>
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4>Credentials</h4>
-    </div>
-    <div class="panel-body">
-      <span class="text-grey">Username </span>
-      <span>{{ user.username }}</span>
-      <div class="pull-right">
-        <button type="button" class="btn btn-success" (click)="changePwd()" [disabled]="!canChangePassword">
-          Change password
-        </button>
-      </div>
-    </div>
-    <div class="panel-body">
-      <label for="generate-key" class="text-grey generate-key">Api key </label>
-      <div class="pull-right">
-        <button
-          type="button"
-          class="btn btn-success"
-          id="generate-key"
-          (click)="invokeShowGenerateApiKeyDialog()"
-          [disabled]="!canGenerateApiKey"
-        >
-          Generate new Key
-        </button>
-      </div>
-      <table class="table api-token-table {{ canGenerateApiKey ? '' : 'disabled' }}">
-        <thead>
-          <tr>
-            <th>Label</th>
-            <th>Created</th>
-            <th>Valid until</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let token of tokens; trackBy: trackByToken">
-            <td [matTooltip]="token.token">
-              {{ token.label || token.id }}
-            </td>
-            <td>
-              {{ token.creationTime | date }}
-            </td>
-            <td>
-              {{ token.expiryTime | date }}
-            </td>
-            <td><a (click)="revokeAPIToken(token.id)">revoke</a></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4>Role</h4>
-    </div>
-    <div class="panel-body">
-      <div>
-        <span class="text-grey">Role </span>
+<h3>My account</h3>
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Credentials</mat-card-title>
+  </mat-card-header>
+  <mat-card-content class="credentials">
+    <section>
+      <step-label>
+        <strong>Username </strong>
+        <span>{{ user.username }}</span>
+      </step-label>
+      <button type="button" mat-flat-button color="primary" (click)="changePwd()" [disabled]="!canChangePassword">
+        Change password
+      </button>
+    </section>
+    <section>
+      <step-label>
+        <strong>Api key</strong>
+      </step-label>
+      <button
+        type="button"
+        mat-flat-button
+        color="primary"
+        (click)="invokeShowGenerateApiKeyDialog()"
+        [disabled]="!canGenerateApiKey"
+      >
+        Generate new Key
+      </button>
+    </section>
+    <table class="account-table api-token-table" [class.disabled]="!canGenerateApiKey">
+      <thead>
+        <tr>
+          <th>Label</th>
+          <th>Created</th>
+          <th>Valid until</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let token of tokens; trackBy: trackByToken">
+          <td [matTooltip]="token.token">
+            {{ token.label || token.id }}
+          </td>
+          <td>
+            {{ token.creationTime | date }}
+          </td>
+          <td>
+            {{ token.expiryTime | date }}
+          </td>
+          <td><a (click)="revokeAPIToken(token.id)">revoke</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </mat-card-content>
+</mat-card>
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Role</mat-card-title>
+  </mat-card-header>
+  <mat-card-content class="role">
+    <section>
+      <step-label>
+        <strong>Role </strong>
         <span>{{ user.role }}</span>
-      </div>
-    </div>
-  </div>
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4>
-        Preferences
-        <button style="float: right" class="btn btn-default btn-sm" (click)="addPreference()">
-          <step-icon name="plus"></step-icon>
-        </button>
-      </h4>
-    </div>
-    <div class="panel-body">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Key</th>
-            <th>Value</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let pref of preferences">
-            <td>
-              <input class="form-control w-100" [(ngModel)]="pref.key" placeholder="Key" (blur)="savePreferences()" />
-            </td>
-            <td>
-              <input
-                class="form-control w-100"
-                [(ngModel)]="pref.value"
-                placeholder="Value"
-                (blur)="savePreferences()"
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</ng-container>
+      </step-label>
+    </section>
+  </mat-card-content>
+</mat-card>
+<mat-card>
+  <mat-card-header class="preferences-title">
+    <mat-card-title> Preferences </mat-card-title>
+    <button type="button" mat-icon-button mat-flat-button color="primary" (click)="addPreference()">
+      <step-icon name="plus"></step-icon>
+    </button>
+  </mat-card-header>
+  <mat-card-content>
+    <table class="account-table">
+      <thead>
+        <tr>
+          <th>Key</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pref of preferences">
+          <td>
+            <step-form-field>
+              <input [(ngModel)]="pref.key" placeholder="Key" (blur)="savePreferences()" />
+            </step-form-field>
+          </td>
+          <td>
+            <step-form-field>
+              <input [(ngModel)]="pref.value" placeholder="Value" (blur)="savePreferences()" />
+            </step-form-field>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </mat-card-content>
+</mat-card>

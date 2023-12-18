@@ -44,13 +44,8 @@
               "projects/step-app/src/assets",
               {
                 "glob": "**/*",
-                "input": "projects/step-app/src/plugins",
-                "output": "/"
-              },
-              {
-                "glob": "**/*",
-                "input": "dist/step-frontend/src/lib/angularjs",
-                "output": "/"
+                "input": "dist/step-frontend/images",
+                "output": "/images"
               },
               {
                 "glob": "worker-javascript.js",

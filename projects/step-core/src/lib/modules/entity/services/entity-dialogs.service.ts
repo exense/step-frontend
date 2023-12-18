@@ -1,18 +1,15 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, Injector } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { SelectEntityOfTypeComponent } from '../components/select-entity-of-type/select-entity-of-type.component';
 import { SelectEntityOfTypeData } from '../types/select-entity-of-type-data.interface';
 import { filter, Observable } from 'rxjs';
 import { SelectEntityOfTypeResult } from '../types/select-entity-of-type-result.interface';
-import { HYBRID_INJECTOR_HELPER } from '../../basics/step-basics.module';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '../../../shared';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EntityDialogsService {
-  private _injector = inject(HYBRID_INJECTOR_HELPER);
+  private _injector = inject(Injector);
   private _matDialog = inject(MatDialog);
 
   selectEntityOfType(
@@ -33,5 +30,3 @@ export class EntityDialogsService {
       .pipe(filter((result) => !!result)) as Observable<SelectEntityOfTypeResult>;
   }
 }
-
-getAngularJSGlobal().module(AJS_MODULE).service('EntityDialogsService', downgradeInjectable(EntityDialogsService));
