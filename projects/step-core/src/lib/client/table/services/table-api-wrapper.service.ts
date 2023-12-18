@@ -6,6 +6,7 @@ import { AsyncTasksService, AsyncTaskStatusResource, TablesService } from '../..
 import { pollAsyncTask, AsyncTaskStatus } from '../../async-task/async-task.module';
 import { DOCUMENT } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { FileDownloaderService } from '../../../modules/basics/services/file-downloader.service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +15,7 @@ export class TableApiWrapperService {
   private _httpClient = inject(HttpClient);
   private _tables = inject(TablesService);
   private _asyncTaskService = inject(AsyncTasksService);
-  private _document = inject(DOCUMENT);
+  private _fileDownloader = inject(FileDownloaderService);
 
   private proceedAsyncRequest = pipe(
     pollAsyncTask(this._asyncTaskService),
@@ -22,9 +23,10 @@ export class TableApiWrapperService {
       if (!status?.result?.id) {
         throw 'Invalid attachment id';
       }
-      return status.result.id;
+      return status.result;
     }),
-    tap((attachmentId) => this.downloadDatasource(attachmentId))
+    tap((resource) => this.downloadDatasource(resource.id!, resource.resourceName!)),
+    map((resourse) => resourse.id!)
   );
 
   requestTable<T>(tableId: string, tableRequest: TableRequestData): Observable<TableResponseGeneric<T>> {
@@ -43,11 +45,8 @@ export class TableApiWrapperService {
     return this._httpClient.get(url).pipe(this.proceedAsyncRequest);
   }
 
-  private downloadDatasource(id: string): void {
+  private downloadDatasource(id: string, fileName: string): void {
     const url = `rest/resources/${id}/content`;
-    const $ = (this._document.defaultView as any).$;
-    $.fileDownload(url)
-      .done(() => {})
-      .fail();
+    this._fileDownloader.download(url, fileName);
   }
 }
