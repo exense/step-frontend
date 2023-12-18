@@ -1,6 +1,66 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 @mixin common-styles {
+  @import 'normalize.css/normalize.css';
+
+  html,
+  body,
+  div,
+  article,
+  aside,
+  section,
+  main,
+  nav,
+  footer,
+  header,
+  form,
+  fieldset,
+  legend,
+  pre,
+  code,
+  a,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  ul,
+  ol,
+  li,
+  dl,
+  dt,
+  dd,
+  blockquote,
+  figcaption,
+  figure,
+  textarea,
+  table,
+  td,
+  th,
+  tr,
+  input[type='email'],
+  input[type='number'],
+  input[type='password'],
+  input[type='tel'],
+  input[type='text'],
+  input[type='url'],
+  .border-box {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-size: 10px;
+    height: 100%;
+  }
+
+  body {
+    font-size: 14px;
+    height: 100%;
+    min-height: 100%;
+  }
+
   .w-100 {
     width: 100%;
   }
@@ -21,5 +81,49 @@
 
   .danger-warning {
     color: var.$red-50;
+  }
+
+  a {
+    color: var.$blue-675;
+    text-decoration: none;
+  }
+
+  .tab-content > .tab-pane {
+    display: none;
+  }
+  .tab-content > .active {
+    display: block;
+  }
+
+  .list-unstyled {
+    padding-left: 0;
+    list-style: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 500;
+  }
+  h1 {
+    font-size: 2em;
+  }
+  h2 {
+    font-size: 3rem;
+  }
+  h3 {
+    font-size: 2.4rem;
+  }
+  h4 {
+    font-size: 1.8rem;
+  }
+  h5 {
+    font-size: 1.4rem;
+  }
+  h6 {
+    font-size: 1.2rem;
   }
 }

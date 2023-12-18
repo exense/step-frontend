@@ -7,7 +7,6 @@ export interface EntityMeta extends CustomRegistryItem {
   getUrl?: string;
   postUrl?: string;
   tableType?: string;
-  templateUrl?: string;
   callback?: Function;
   icon?: string;
 }

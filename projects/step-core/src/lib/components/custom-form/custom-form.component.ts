@@ -1,6 +1,6 @@
 import { Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
 import { Input as StInput, ScreensService } from '../../client/generated';
-import { AJS_MODULE, setObjectFieldValue } from '../../shared';
+import { setObjectFieldValue } from '../../shared';
 
 @Component({
   selector: 'step-custom-forms',

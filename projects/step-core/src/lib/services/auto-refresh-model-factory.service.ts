@@ -1,7 +1,6 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { interval, Observable, Subject, Subscription, take, tap } from 'rxjs';
-import { AJS_ROOT_SCOPE, Mutable, AutoRefreshModel } from '../shared';
-import { IRootScopeService } from 'angular';
+import { Mutable, AutoRefreshModel } from '../shared';
 
 type FieldAccessor = Mutable<Pick<AutoRefreshModel, 'autoIncreaseTo' | 'disabled' | 'interval'>>;
 
@@ -23,8 +22,6 @@ class AutoRefreshModelImpl implements AutoRefreshModel {
   readonly intervalChange$ = this.intervalChangeInternal$.asObservable();
   readonly refresh$ = this.refreshInternal$.asObservable();
 
-  constructor(private $rootScope: IRootScopeService) {}
-
   destroy(): void {
     this.disableChangeInternal$.complete();
     this.intervalChangeInternal$.complete();
@@ -45,7 +42,6 @@ class AutoRefreshModelImpl implements AutoRefreshModel {
     }
     (this as FieldAccessor).disabled = disabled;
     this.disableChangeInternal$.next(disabled);
-    this.$rootScope.$broadcast('globalsettings-globalRefreshToggle', { new: !disabled });
     if (!disabled) {
       if (this.lastInterval) {
         this.setInterval(this.lastInterval);
@@ -65,7 +61,6 @@ class AutoRefreshModelImpl implements AutoRefreshModel {
     this.stopTimer();
     (this as FieldAccessor).interval = interval;
     this.intervalChangeInternal$.next(interval);
-    this.$rootScope.$broadcast('globalsettings-refreshInterval', { new: interval });
     this.startTimer();
     if (interval !== 0) {
       this.lastInterval = undefined;
@@ -101,9 +96,7 @@ class AutoRefreshModelImpl implements AutoRefreshModel {
   providedIn: 'root',
 })
 export class AutoRefreshModelFactoryService {
-  private _$rootScope = inject(AJS_ROOT_SCOPE);
-
   create(): AutoRefreshModel {
-    return new AutoRefreshModelImpl(this._$rootScope);
+    return new AutoRefreshModelImpl();
   }
 }

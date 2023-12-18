@@ -5,7 +5,6 @@ import { CommonModule } from '@angular/common';
 import { CustomRegistriesModule } from '../custom-registeries/custom-registries.module';
 import { SelectEntityOfTypeComponent } from './components/select-entity-of-type/select-entity-of-type.component';
 import { StepBasicsModule } from '../basics/step-basics.module';
-import { EntityLegacyTableWrapperDirective } from './directives/entity-legacy-table-wrapper.directive';
 import { EntityMenuComponent } from './components/entity-menu/entity-menu.component';
 import { EntityMenuContentDirective } from './directives/entity-menu-content.directive';
 import { CastEntityToPlanPipe } from './pipes/cast-entity-to-plan.pipe';
@@ -18,7 +17,6 @@ import { EntityMenuButtonComponent } from './components/entity-menu-button/entit
   declarations: [
     EntityIconComponent,
     SelectEntityOfTypeComponent,
-    EntityLegacyTableWrapperDirective,
     EntityMenuComponent,
     EntityMenuContentDirective,
     CastEntityToPlanPipe,
@@ -29,7 +27,6 @@ import { EntityMenuButtonComponent } from './components/entity-menu-button/entit
   exports: [
     EntityIconComponent,
     SelectEntityOfTypeComponent,
-    EntityLegacyTableWrapperDirective,
     EntityMenuComponent,
     EntityMenuContentDirective,
     CastEntityToPlanPipe,
@@ -44,7 +41,6 @@ export * from './components/entity-icon/entity-icon.component';
 export * from './components/select-entity-of-type/select-entity-of-type.component';
 export * from './components/base-entity-selection-table/base-entity-selection-table.component';
 export * from './components/entity-menu/entity-menu.component';
-export * from './directives/entity-legacy-table-wrapper.directive';
 export * from './components/entity-menu-button/entity-menu-button.component';
 export * from './directives/entity-menu-content.directive';
 export * from './services/entity-registry';

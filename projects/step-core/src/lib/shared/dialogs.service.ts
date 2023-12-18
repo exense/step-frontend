@@ -1,6 +1,5 @@
 import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { Observable, filter, map } from 'rxjs';
 import {
   ConfirmationDialogComponent,
@@ -22,7 +21,6 @@ import {
   MessagesListDialogData,
   MessagesListDialogResult,
 } from '../components/messages-list-dialog/messages-list-dialog.component';
-import { AJS_MODULE } from './constants';
 
 @Injectable({
   providedIn: 'root',
@@ -121,5 +119,3 @@ export class DialogsService {
     return dialogRef.afterClosed().pipe(map((result) => !!result)) as Observable<boolean>;
   }
 }
-
-getAngularJSGlobal().module(AJS_MODULE).service('DialogsService', downgradeInjectable(DialogsService));

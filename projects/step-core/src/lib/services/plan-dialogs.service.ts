@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { map, Observable, of, switchMap, tap } from 'rxjs';
 import { AbstractArtefact, AugmentedPlansService, Plan } from '../client/step-client-module';
 import { PlanCreateDialogComponent } from '../components/plan-create-dialog/plan-create-dialog.component';
@@ -10,7 +9,7 @@ import { ThreadDistributionWizardDialogComponent } from '../components/thread-di
 import { AuthService } from '../modules/basics/services/auth.service';
 import { MultipleProjectsService } from '../modules/basics/services/multiple-projects.service';
 import { EntityDialogsService } from '../modules/entity/services/entity-dialogs.service';
-import { AJS_MODULE, DialogsService } from '../shared';
+import { DialogsService } from '../shared';
 import { ExportDialogsService } from './export-dialogs.service';
 import { ImportDialogsService } from './import-dialogs.service';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
@@ -122,5 +121,3 @@ export class PlanDialogsService implements PlanLinkDialogService {
     this._router.navigate(commands, { queryParams });
   }
 }
-
-getAngularJSGlobal().module(AJS_MODULE).service('PlanDialogsService', downgradeInjectable(PlanDialogsService));
