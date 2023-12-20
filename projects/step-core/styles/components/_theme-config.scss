@@ -89,6 +89,7 @@ $light-primary-text: white;
   $mat-primary-palette: null,
   $mat-typography-config: null,
   $mat-accent-palette: null,
+  $mat-warn-palette: null,
   $step-sidebar-config: null,
   $step-header-config: null,
   $step-login-config: null
@@ -105,12 +106,19 @@ $light-primary-text: white;
     $mat-accent-palette: mat.define-palette(mat.$pink-palette);
   }
 
+  @if not $mat-warn-palette {
+    $mat-warn-palette: mat.define-palette(mat.$red-palette);
+  }
+
   $mat-theme: mat.define-light-theme(
     (
       color: (
         primary: $mat-primary-palette,
         accent: $mat-accent-palette,
+        warn: $mat-warn-palette,
       ),
+      typograhpy: $mat-typography-config,
+      density: 0,
     )
   );
 
@@ -125,8 +133,9 @@ $light-primary-text: white;
   );
 
   font-family: map-get($mat-typography-config, font-family);
-  @include mat.core($mat-typography-config);
-  @include mat.all-component-themes($mat-theme-ext);
+  @include mat.core();
+  @include mat.legacy-core($mat-theme);
+  @include mat.all-component-themes($mat-theme);
 
   $primary-color: map-get($mat-primary-palette, default);
 
