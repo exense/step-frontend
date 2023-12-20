@@ -5,12 +5,12 @@ step-range-filter {
   mat-date-range-input {
     padding: 0.8rem 0.7rem !important;
 
-    .mat-date-range-input-start-wrapper {
+    .mat-date-range-input:not(.mat-date-range-input-end-wrapper) {
       max-width: none;
       overflow: initial;
     }
 
-    .mat-date-range-input-end-wrapper {
+    .mat-date-range-input.mat-date-range-input-end-wrapper {
       max-width: none;
       overflow: initial;
       flex-grow: unset;

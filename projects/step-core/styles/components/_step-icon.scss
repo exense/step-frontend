@@ -17,18 +17,23 @@
     stroke-linecap: round;
     stroke-linejoin: round;
     vertical-align: middle;
+
+    svg {
+      width: inherit !important;
+      height: inherit !important;
+    }
   }
 
-  .mat-menu-item > step-icon {
+  .mat-mdc-menu-item > step-icon {
     vertical-align: top;
     margin: $offset $offset 0 0;
   }
 
-  .mat-button > .mat-button-wrapper > step-icon {
+  .mat-mdc-button > step-icon {
     vertical-align: text-bottom;
   }
 
-  .mat-icon-button > .mat-button-wrapper > step-icon {
+  .mat-mdc-icon-button > step-icon {
     vertical-align: top;
     margin-top: $offset;
   }

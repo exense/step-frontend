@@ -27,12 +27,12 @@ step-table {
     }
   }
 
-  [mat-sort-header].cdk-keyboard-focused .mat-sort-header-container,
-  [mat-sort-header].cdk-program-focused .mat-sort-header-container {
+  [mat-sort-header].cdk-keyboard-focused .mat-mdc-sort-header-container,
+  [mat-sort-header].cdk-program-focused .mat-mdc-sort-header-container {
     border-bottom: none;
   }
 
-  ::ng-deep .mat-form-field-infix {
+  ::ng-deep .mat-mdc-form-field-infix {
     width: auto !important;
   }
 
@@ -57,6 +57,7 @@ step-table {
 
   .no-data {
     text-align: center;
+    height: 4.8rem;
   }
 
   mat-paginator {

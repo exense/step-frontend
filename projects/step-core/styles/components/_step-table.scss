@@ -22,40 +22,41 @@ step-table {
     background: var.$highlight !important;
   }
 
-  th.mat-header-cell,
-  td.mat-cell,
-  td.mat-footer-cell {
+  th.mat-mdc-header-cell,
+  td.mat-mdc-cell,
+  td.mat-mdc-footer-cell {
     padding-top: 8px;
     padding-bottom: 8px;
+    font-size: 1.2rem;
   }
 
   &:not(.paddingless) {
-    tr > td.mat-cell:not(:first-of-type):not(:last-of-type):not(.mat-column-actions),
-    tr > th.mat-header-cell:not(:first-of-type):not(:last-of-type):not(.mat-column-actions) {
+    tr > td.mat-mdc-cell:not(:first-of-type):not(:last-of-type):not(.mat-mdc-column-actions),
+    tr > th.mat-mdc-header-cell:not(:first-of-type):not(:last-of-type):not(.mat-mdc-column-actions) {
       padding: 8px;
     }
 
-    tr > td.mat-cell:first-of-type:not(.mat-column-actions),
-    tr > th.mat-header-cell:first-of-type:not(.mat-column-actions) {
+    tr > td.mat-mdc-cell:first-of-type:not(.mat-mdc-column-actions),
+    tr > th.mat-mdc-header-cell:first-of-type:not(.mat-mdc-column-actions) {
       padding: 8px 8px 8px 24px;
     }
 
-    tr > td.mat-cell:last-of-type:not(.mat-column-actions),
-    tr > th.mat-header-cell:last-of-type:not(.mat-column-actions) {
+    tr > td.mat-mdc-cell:last-of-type:not(.mat-mdc-column-actions),
+    tr > th.mat-mdc-header-cell:last-of-type:not(.mat-mdc-column-actions) {
       padding: 8px 24px 8px 8px;
     }
   }
 
   &.paddingless {
-    th.mat-header-cell:first-of-type,
-    td.mat-cell:first-of-type,
-    td.mat-footer-cell:first-of-type {
+    th.mat-mdc-header-cell:first-of-type,
+    td.mat-mdc-cell:first-of-type,
+    td.mat-mdc-footer-cell:first-of-type {
       padding-left: 0;
     }
 
-    th.mat-header-cell:last-of-type,
-    td.mat-cell:last-of-type,
-    td.mat-footer-cell:last-of-type {
+    th.mat-mdc-header-cell:last-of-type,
+    td.mat-mdc-cell:last-of-type,
+    td.mat-mdc-footer-cell:last-of-type {
       padding-right: 0;
     }
   }

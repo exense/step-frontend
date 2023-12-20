@@ -17,8 +17,8 @@
 @forward 'step-header' show step-define-header-config;
 @forward 'step-alert' show step-define-alert-color, step-alert-colors;
 
-$dark-primary-text: #293e50;
-$light-primary-text: white;
+$dark-primary-text: var.$blue-700;
+$light-primary-text: var.$white;
 
 @function extend-mat-theme($theme, $overrides) {
   $color: map.get($theme, color);
@@ -34,10 +34,17 @@ $light-primary-text: white;
     )
   );
 
-  $result: map.merge(
+  $result-color: map.merge(
     $color,
     (
       foreground: $foreground-ext,
+    )
+  );
+
+  $result: map.merge(
+    $theme,
+    (
+      color: $result-color,
     )
   );
 
@@ -134,8 +141,9 @@ $light-primary-text: white;
 
   font-family: map-get($mat-typography-config, font-family);
   @include mat.core();
-  @include mat.legacy-core($mat-theme);
-  @include mat.all-component-themes($mat-theme);
+  @include mat.all-component-themes($mat-theme-ext);
+  @include mat.dialog-typography($mat-typography-config);
+  @include mat.card-typography($mat-typography-config);
 
   $primary-color: map-get($mat-primary-palette, default);
 
@@ -179,15 +187,20 @@ $light-primary-text: white;
   color: $text-color;
   line-height: 16px;
 
-  .mat-mini-fab {
+  .mat-mdc-mini-fab {
     box-shadow: none !important;
-    width: 36px;
-    height: 36px;
+    width: 3.6rem;
+    height: 3.6rem;
   }
 
-  .mat-button-wrapper {
+  .mat-mdc-icon-button.mat-mdc-button-base {
+    width: 4rem;
+    height: 4rem;
     padding: 0;
-    display: flex;
+  }
+
+  .mat-mdc-button-base {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
 
@@ -204,7 +217,7 @@ $light-primary-text: white;
   step-dynamic-checkbox,
   step-expression-input,
   step-resource-input {
-    .mat-button-wrapper {
+    .mat-mdc-button-base {
       @include step-icon.step-icon(16px);
     }
   }
@@ -243,33 +256,33 @@ $light-primary-text: white;
     margin-bottom: 15px;
   }
 
-  .mat-accordion .mat-expansion-panel:first-of-type {
+  .mat-mdc-accordion .mat-mdc-expansion-panel:first-of-type {
     border-top-right-radius: 0;
     border-top-left-radius: 0;
   }
 
-  .mat-accordion .mat-expansion-panel:last-of-type {
+  .mat-mdc-accordion .mat-mdc-expansion-panel:last-of-type {
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
   }
 
-  .mat-accordion > .mat-expansion-panel:first-child,
-  .mat-accordion > *:first-child .mat-expansion-panel {
+  .mat-mdc-accordion > .mat-mdc-expansion-panel:first-child,
+  .mat-mdc-accordion > *:first-child .mat-mdc-expansion-panel {
     border-top-right-radius: 8px;
     border-top-left-radius: 8px;
   }
 
-  .mat-accordion > .mat-expansion-panel:last-child,
-  .mat-accordion > *:last-child .mat-expansion-panel {
+  .mat-mdc-accordion > .mat-mdc-expansion-panel:last-child,
+  .mat-mdc-accordion > *:last-child .mat-mdc-expansion-panel {
     border-bottom-right-radius: 8px;
     border-bottom-left-radius: 8px;
   }
 
-  .mat-card {
+  .mat-mdc-card {
     border-radius: 8px;
   }
 
-  .mat-tooltip {
+  .mat-mdc-tooltip {
     white-space: pre-line;
   }
 
@@ -284,29 +297,29 @@ $light-primary-text: white;
     padding-bottom: 1px;
   }
 
-  step-modal-window .mat-expansion-panel {
+  step-modal-window .mat-mdc-expansion-panel {
     border: 1px solid var.$gray-300;
     border-radius: 0.8rem;
 
-    .mat-expansion-panel-header {
+    .mat-mdc-expansion-panel-header {
       padding: 0 1.6rem;
       height: 4rem;
 
-      .mat-expansion-panel-header-title {
+      .mat-mdc-expansion-panel-header-title {
         font-weight: 500;
       }
 
-      &.mat-expanded {
+      &.mat-mdc-expanded {
         border-bottom: 1px solid var.$gray-300;
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
       }
     }
 
-    .mat-expansion-panel-content {
+    .mat-mdc-expansion-panel-content {
       font-size: 1.4rem;
 
-      .mat-expansion-panel-body {
+      .mat-mdc-expansion-panel-body {
         display: flex;
         flex-direction: column;
         gap: 0.8rem;
@@ -324,21 +337,21 @@ $light-primary-text: white;
   This will create a nice scrollbar inside the form field when the chips content are very long.
   Otherwise they will overflow the container.
    */
-  .mat-chip-list-wrapper {
+  .mat-mdc-chip-list-wrapper {
     overflow-x: auto;
   }
 
-  .mat-menu-panel.wide {
+  .mat-mdc-menu-panel.wide {
     max-width: 380px;
     width: 380px;
   }
 
-  .mat-checkbox-label {
+  .mat-mdc-checkbox-label {
     font-weight: 500;
   }
 
-  .mat-checkbox-background,
-  .mat-checkbox-frame {
+  .mat-mdc-checkbox-background,
+  .mat-mdc-checkbox-frame {
     border-radius: 0.4rem;
   }
 }
