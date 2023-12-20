@@ -18,6 +18,7 @@ import { TimeSeriesConfig } from '../../../time-series.config';
 import { UPlotUtils } from '../../../uplot/uPlot.utils';
 import { TimeSeriesContext } from '../../../time-series-context';
 import { TimeseriesColorsPool } from '../../../util/timeseries-colors-pool';
+import { TsFilterItem } from '../../../performance-view/filter-bar/model/ts-filter-item';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -59,6 +60,29 @@ export class ChartDashletComponent implements OnInit, Dashlet {
     this.createChart();
   }
 
+  private composeRequestFilter(metricKey: string): string {
+    let filterItems: TsFilterItem[] = [
+      {
+        attributeName: 'metricType',
+        type: 'FREE_TEXT',
+        exactMatch: true,
+        freeTextValues: [`"${metricKey}"`],
+        searchEntities: [],
+      },
+    ];
+
+    if (this.item.chartSettings!.inheritGlobalFilters) {
+      filterItems = [
+        ...filterItems,
+        ...FilterUtils.combineGlobalWithChartFilters(
+          this.context.getFilteringSettings().filterItems,
+          this.item.chartSettings!.filters
+        ),
+      ];
+    }
+    return FilterUtils.filtersToOQL(filterItems, 'attributes');
+  }
+
   private createChart(): void {
     const settings = this.item.chartSettings!;
     const groupDimensions = this.getChartGrouping();
@@ -66,7 +90,7 @@ export class ChartDashletComponent implements OnInit, Dashlet {
       start: this.context.getSelectedTimeRange().from,
       end: this.context.getSelectedTimeRange().to,
       groupDimensions: groupDimensions,
-      oqlFilter: FilterUtils.objectToOQL({ 'attributes.metricType': `"${settings.metricKey!}"` }),
+      oqlFilter: this.composeRequestFilter(settings.metricKey!),
       numberOfBuckets: 100,
       percentiles: this.getChartPclToRequest(settings.primaryAxes!.aggregation!),
     };

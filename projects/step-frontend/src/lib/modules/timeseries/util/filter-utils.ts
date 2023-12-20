@@ -1,5 +1,6 @@
 import { TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
 import { ChartFilterItem } from '@exense/step-core';
+import { map } from 'rxjs';
 
 export class FilterUtils {
   static filterItemIsValid(item: TsFilterItem): boolean {
@@ -31,13 +32,17 @@ export class FilterUtils {
   }
 
   /**
-   * Method to convert API filters to a valid OQL
+   * Method to convert API filters to a valid OQL. Local items take precedence.
    */
-  static combineGlobalWithChartFilters(globalFilters: TsFilterItem[], items: ChartFilterItem[]): string {
-    if (!items || items.length === 0) {
-      return '';
-    }
-    return '';
+  static combineGlobalWithChartFilters(globalFilters: TsFilterItem[], items: ChartFilterItem[]): TsFilterItem[] {
+    const convertedItems: TsFilterItem[] = items.map((item) => this.convertApiFilterItem(item));
+    const localItemsIdsMap: Record<string, boolean> = {};
+    convertedItems.forEach((item) => {
+      localItemsIdsMap[item.attributeName!] = true;
+    });
+    globalFilters = globalFilters.filter((item) => !localItemsIdsMap[item.attributeName!]);
+
+    return [...globalFilters, ...convertedItems];
   }
 
   /**
@@ -105,32 +110,38 @@ export class FilterUtils {
     return andFilters.filter((f) => f).join(' and ');
   }
 
-  private convertApiFilterItem(item: ChartFilterItem): TsFilterItem {
-    const baseObject: TsFilterItem = {
+  static convertApiFilterItem(item: ChartFilterItem): TsFilterItem {
+    const mappedItem: TsFilterItem = {
       label: item.label,
-      attributeName: item.attribute,
-      exactMatch: item.exactMatch,
+      attributeName: item.attribute!,
+      exactMatch: item.exactMatch!,
       min: item.min,
       max: item.max,
-      type: item.type,
+      type: item.type!,
       searchEntities: [],
       textValues: [],
       freeTextValues: [],
+      removable: item.removable,
     };
     switch (item.type) {
       case 'OPTIONS':
+        mappedItem.textValues = item.textValues?.map((v) => ({ value: v, isSelected: true }));
         break;
       case 'FREE_TEXT':
+        mappedItem.freeTextValues = item.textValues;
         break;
       case 'EXECUTION':
       case 'TASK':
       case 'PLAN':
+        mappedItem.searchEntities = [{ searchValue: item.textValues?.[0] || '' }];
         break;
       case 'NUMERIC':
       case 'DATE':
+        mappedItem.min = item.min;
+        mappedItem.max = item.max;
         break;
     }
 
-    return baseObject;
+    return mappedItem;
   }
 }

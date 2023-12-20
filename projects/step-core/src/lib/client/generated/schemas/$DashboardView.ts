@@ -17,6 +17,7 @@ export const $DashboardView = {
     },
     name: {
       type: 'string',
+      isRequired: true,
     },
     resolution: {
       type: 'number',
@@ -24,24 +25,28 @@ export const $DashboardView = {
     },
     timeRange: {
       type: 'TimeRangeSelection',
+      isRequired: true,
     },
     grouping: {
       type: 'array',
       contains: {
         type: 'string',
       },
+      isRequired: true,
     },
     filters: {
       type: 'array',
       contains: {
         type: 'ChartFilterItem',
       },
+      isRequired: true,
     },
     dashlets: {
       type: 'array',
       contains: {
         type: 'DashboardItem',
       },
+      isRequired: true,
     },
     id: {
       type: 'string',

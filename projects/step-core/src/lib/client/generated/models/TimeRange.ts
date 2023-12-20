@@ -3,6 +3,6 @@
 /* eslint-disable */
 
 export type TimeRange = {
-  from?: number;
-  to?: number;
+  from: number;
+  to: number;
 };

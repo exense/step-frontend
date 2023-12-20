@@ -8,12 +8,15 @@ export const $ChartFilterItem = {
     },
     attribute: {
       type: 'string',
+      isRequired: true,
     },
     type: {
       type: 'Enum',
+      isRequired: true,
     },
     exactMatch: {
       type: 'boolean',
+      isRequired: true,
     },
     min: {
       type: 'number',

@@ -5,6 +5,7 @@ export const $TimeRangeSelection = {
   properties: {
     type: {
       type: 'Enum',
+      isRequired: true,
     },
     absoluteSelection: {
       type: 'TimeRange',

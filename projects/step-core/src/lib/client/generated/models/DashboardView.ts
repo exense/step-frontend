@@ -9,11 +9,11 @@ import type { TimeRangeSelection } from './TimeRangeSelection';
 export type DashboardView = {
   customFields?: Record<string, any>;
   attributes?: Record<string, string>;
-  name?: string;
+  name: string;
   resolution?: number;
-  timeRange?: TimeRangeSelection;
-  grouping?: Array<string>;
-  filters?: Array<ChartFilterItem>;
-  dashlets?: Array<DashboardItem>;
+  timeRange: TimeRangeSelection;
+  grouping: Array<string>;
+  filters: Array<ChartFilterItem>;
+  dashlets: Array<DashboardItem>;
   id?: string;
 };
