@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChildren } from '@angular/core';
 import {
   BucketAttributes,
   BucketResponse,
@@ -6,6 +6,7 @@ import {
   DashboardItem,
   DashboardsService,
   DashboardView,
+  DashletComponent,
   FetchBucketsRequest,
   MetricAttribute,
   TimeRange,
@@ -25,6 +26,9 @@ import { TimeRangePickerSelection } from '../../time-selection/time-range-picker
 //@ts-ignore
 import uPlot = require('uplot');
 import { TsFilterItem } from '../../performance-view/filter-bar/model/ts-filter-item';
+import { Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { ChartDashletComponent } from './chart-dashlet/chart-dashlet.component';
+import { Dashlet } from './model/dashlet';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -47,6 +51,8 @@ interface MetricAttributeSelection extends MetricAttribute {
 export class DashboardPageComponent implements OnInit {
   readonly AGGREGATES: AggregationType[] = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'RATE', 'MEDIAN'];
 
+  @ViewChildren(ChartDashletComponent) dashlets: Dashlet[] = [];
+
   private _timeSeriesService = inject(TimeSeriesService);
   private _timeSeriesContextFactory = inject(TimeSeriesContextsFactory);
   private _dashboardService = inject(DashboardsService);
@@ -62,6 +68,8 @@ export class DashboardPageComponent implements OnInit {
   compareModeEnabled = false;
   timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   timeRangeSelection: TimeRangePickerSelection = this.timeRangeOptions[0];
+
+  terminator$ = new Subject<void>();
 
   initContext(dashboard: DashboardView) {
     const dashboardTimeRange = dashboard.timeRange!;
@@ -125,8 +133,42 @@ export class DashboardPageComponent implements OnInit {
         this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
           chartConfig.finalSettings = this.createChartSettings(dashlet!.name!, settings, response, grouping);
         });
+        this.subscribeForTimeRangeChange();
       });
     });
+  }
+
+  private getContext(compare: boolean): TimeSeriesContext {
+    return this.context;
+  }
+
+  private subscribeForTimeRangeChange(compareCharts = false) {
+    const context = this.getContext(compareCharts);
+    context
+      .onTimeSelectionChange()
+      .pipe(
+        switchMap((newRange) =>
+          compareCharts ? this.handleSelectionChange(newRange) : this.handleSelectionChange(newRange)
+        ),
+        takeUntil(compareCharts ? this.terminator$ : this.terminator$)
+      )
+      .subscribe();
+  }
+
+  handleSelectionChange(selection: TimeRange): Observable<any> {
+    // if (TimeSeriesUtils.intervalsEqual(this.findRequestBuilder.getRange(), selection)) {
+    //   // nothing happened
+    //   return of(undefined);
+    // }
+    return this.refreshAllCharts();
+  }
+
+  private refreshAllCharts(): Observable<void> {
+    console.log('REFRESHING ALL');
+    this.dashlets?.forEach((dashlet) => {
+      console.log('WE HAVE ONE', dashlet);
+    });
+    return of();
   }
 
   toggleGroupingAttribute(chartConfig: ChartConfig, attribute: MetricAttributeSelection) {

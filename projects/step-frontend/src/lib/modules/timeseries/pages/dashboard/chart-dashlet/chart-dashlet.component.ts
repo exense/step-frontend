@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { Dashlet } from '../model/dashlet';
 import {
   BucketAttributes,
@@ -7,6 +7,7 @@ import {
   DashboardItem,
   FetchBucketsRequest,
   MetricAttribute,
+  TimeRange,
   TimeRangeSelection,
   TimeSeriesAPIResponse,
   TimeSeriesService,
@@ -19,6 +20,8 @@ import { UPlotUtils } from '../../../uplot/uPlot.utils';
 import { TimeSeriesContext } from '../../../time-series-context';
 import { TimeseriesColorsPool } from '../../../util/timeseries-colors-pool';
 import { TsFilterItem } from '../../../performance-view/filter-bar/model/ts-filter-item';
+import { TimeSeriesChartComponent } from '../../../chart/time-series-chart.component';
+import { Observable, of, tap } from 'rxjs';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -34,6 +37,7 @@ interface MetricAttributeSelection extends MetricAttribute {
 export class ChartDashletComponent implements OnInit, Dashlet {
   readonly AGGREGATES: AggregationType[] = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'RATE', 'MEDIAN'];
 
+  @ViewChild('chart') chart!: TimeSeriesChartComponent;
   _internalSettings?: TSChartSettings;
 
   @Input() item!: DashboardItem;
@@ -57,7 +61,12 @@ export class ChartDashletComponent implements OnInit, Dashlet {
       }
     });
 
-    this.createChart();
+    this.createChart().subscribe();
+  }
+
+  refresh(): Observable<any> {
+    this.chart?.setBlur(true);
+    return this.createChart();
   }
 
   private composeRequestFilter(metricKey: string): string {
@@ -83,7 +92,7 @@ export class ChartDashletComponent implements OnInit, Dashlet {
     return FilterUtils.filtersToOQL(filterItems, 'attributes');
   }
 
-  private createChart(): void {
+  private createChart(): Observable<TimeSeriesAPIResponse> {
     const settings = this.item.chartSettings!;
     const groupDimensions = this.getChartGrouping();
     const request: FetchBucketsRequest = {
@@ -94,52 +103,55 @@ export class ChartDashletComponent implements OnInit, Dashlet {
       numberOfBuckets: 100,
       percentiles: this.getChartPclToRequest(settings.primaryAxes!.aggregation!),
     };
-    this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
-      const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-      const primaryAxes = settings.primaryAxes!;
-      const primaryAggregation = primaryAxes.aggregation!;
-      const series: TSChartSeries[] = response.matrix.map((series, i) => {
-        const labelItems = this.getSeriesKeys(response.matrixKeys[i], groupDimensions);
-        const seriesKey = labelItems.join(' | ');
-        const color =
-          primaryAxes.renderingSettings?.seriesColors?.[seriesKey] || this.context.keywordsContext.getColor(seriesKey);
+    return this._timeSeriesService.getTimeSeries(request).pipe(
+      tap((response) => {
+        const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
+        const primaryAxes = settings.primaryAxes!;
+        const primaryAggregation = primaryAxes.aggregation!;
+        const series: TSChartSeries[] = response.matrix.map((series, i) => {
+          const labelItems = this.getSeriesKeys(response.matrixKeys[i], groupDimensions);
+          const seriesKey = labelItems.join(' | ');
+          const color =
+            primaryAxes.renderingSettings?.seriesColors?.[seriesKey] ||
+            this.context.keywordsContext.getColor(seriesKey);
 
-        return {
-          id: seriesKey,
-          label: seriesKey,
-          labelItems: labelItems,
-          legendName: seriesKey,
-          data: series.map((b) => this.getBucketValue(b, primaryAggregation!)),
-          value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x),
-          stroke: color,
-          fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
-          points: { show: false },
-          show: true,
-        };
-      });
-      const primaryUnit = primaryAxes.unit!;
-      const yAxesUnit = this.getUnitLabel(primaryAggregation, primaryUnit);
+          return {
+            id: seriesKey,
+            label: seriesKey,
+            labelItems: labelItems,
+            legendName: seriesKey,
+            data: series.map((b) => this.getBucketValue(b, primaryAggregation!)),
+            value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x),
+            stroke: color,
+            fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
+            points: { show: false },
+            show: true,
+          };
+        });
+        const primaryUnit = primaryAxes.unit!;
+        const yAxesUnit = this.getUnitLabel(primaryAggregation, primaryUnit);
 
-      this._internalSettings = {
-        title: `${name} (${primaryAggregation})`,
-        xValues: xLabels,
-        series: series,
-        tooltipOptions: {
-          enabled: true,
-          yAxisUnit: yAxesUnit,
-        },
-        showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
-        axes: [
-          {
-            size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-            scale: 'y',
-            values: (u, vals) => {
-              return vals.map((v: any) => this.getAxesFormatFunction(primaryAggregation, primaryUnit)(v));
-            },
+        this._internalSettings = {
+          title: `${name} (${primaryAggregation})`,
+          xValues: xLabels,
+          series: series,
+          tooltipOptions: {
+            enabled: true,
+            yAxisUnit: yAxesUnit,
           },
-        ],
-      };
-    });
+          showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
+          axes: [
+            {
+              size: TimeSeriesConfig.CHART_LEGEND_SIZE,
+              scale: 'y',
+              values: (u, vals) => {
+                return vals.map((v: any) => this.getAxesFormatFunction(primaryAggregation, primaryUnit)(v));
+              },
+            },
+          ],
+        };
+      })
+    );
   }
 
   private getChartGrouping(): string[] {
