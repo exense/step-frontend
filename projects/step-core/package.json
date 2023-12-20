@@ -17,24 +17,24 @@
     }
   },
   "peerDependencies": {
-    "@angular-architects/module-federation": "14.3.0",
-    "@angular/common": "14.2.8",
-    "@angular/core": "14.2.8",
-    "@angular/forms": "14.2.8",
-    "@angular-devkit/schematics": "14.2.7",
-    "@angular/material": "14.2.6",
-    "@angular/router": "14.2.8",
-    "@angular/material-luxon-adapter": "14.2.6",
+    "@angular-architects/module-federation": "15.0.3",
+    "@angular/common": "15.2.10",
+    "@angular/core": "15.2.10",
+    "@angular/forms": "15.2.10",
+    "@angular-devkit/schematics": "15.2.10",
+    "@angular/material": "15.2.9",
+    "@angular/router": "15.2.10",
+    "@angular/material-luxon-adapter": "15.2.9",
     "@types/luxon": "2.3.2",
-    "@angular/cdk": "14.2.6",
-    "@schematics/angular": "14.2.7",
+    "@angular/cdk": "15.2.9",
+    "@schematics/angular": "15.2.10",
     "@types/angular": "1.7.4",
     "@types/uuid": "8.3.4",
     "uuid": "8.3.2",
     "rxjs": "7.4.0",
     "angular-split": "14.1.0",
     "ngx-build-plus": "14.0.0",
-    "luxon": "2.0.0"
+    "luxon": "3.4.4"
   },
   "dependencies": {
     "tslib": "2.3.0"
