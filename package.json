@@ -42,7 +42,7 @@
   },
   "private": false,
   "dependencies": {
-    "@angular-architects/module-federation": "15.0.3",
+    "@angular-architects/module-federation": "16.0.4",
     "@angular/animations": "16.2.12",
     "@angular/cdk": "16.2.12",
     "@angular/common": "16.2.12",
@@ -76,7 +76,7 @@
     "@angular-eslint/template-parser": "16.3.1",
     "@angular/cli": "16.2.10",
     "@angular/compiler-cli": "16.2.12",
-    "@schematics/angular": "15.2.10",
+    "@schematics/angular": "16.2.10",
     "@types/angular": "1.7.4",
     "@types/jasmine": "3.10.0",
     "@types/luxon": "2.3.2",
