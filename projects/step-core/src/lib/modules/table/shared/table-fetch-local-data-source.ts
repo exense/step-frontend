@@ -1,16 +1,18 @@
 import { TableLocalDataSource } from './table-local-data-source';
-import { BehaviorSubject, map, Observable, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, map, Observable, of, switchMap, tap } from 'rxjs';
 import { CollectionViewer } from '@angular/cdk/collections';
 import { TableLocalDataSourceConfig } from './table-local-data-source-config';
+import { Mutable } from '../../../shared';
 
 type ReloadOptions<R> = { hideProgress?: boolean; request?: R } | undefined;
+type FieldAccessor = Mutable<Pick<TableFetchLocalDataSource<any>, 'inProgress$'>>;
 
 export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<T> {
   private inProgressInternal$!: BehaviorSubject<boolean>;
 
   private reload$!: BehaviorSubject<ReloadOptions<R>>;
 
-  override readonly inProgress$ = this.inProgressInternal$.asObservable();
+  override readonly inProgress$ = of(false);
 
   constructor(
     private retrieveData: (request?: R) => Observable<T[]>,
@@ -41,6 +43,7 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
     // but these subject are already required to setup streams
     this.reload$ = new BehaviorSubject<ReloadOptions<R>>(this.initialReloadOptions);
     this.inProgressInternal$ = new BehaviorSubject<boolean>(false);
+    (this as FieldAccessor).inProgress$ = this.inProgressInternal$.asObservable();
     const source$ = this.createDataStream();
     super.setupStreams(source$, config);
   }

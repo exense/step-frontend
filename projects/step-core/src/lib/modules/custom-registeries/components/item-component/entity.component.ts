@@ -12,7 +12,7 @@ import { CustomRegistryService } from '../../services/custom-registry.service';
 export class EntityComponent extends BaseItemComponent<EntityItem> {
   protected override readonly registryType: CustomRegistryType = CustomRegistryType.ENTITY;
 
-  @Input('entity') override itemKey?: string;
+  @Input('entity') override itemKey?: string = undefined;
 
   constructor(_customRegistryService: CustomRegistryService) {
     super(_customRegistryService);
