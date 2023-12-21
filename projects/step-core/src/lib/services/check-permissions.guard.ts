@@ -1,12 +1,12 @@
 import { inject, Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { AuthService } from '../modules/basics/services/auth.service';
 import { routesPrioritySortPredicate, SUB_ROUTE_DATA, SubRouteData } from '../shared';
 
 @Injectable({
   providedIn: 'root',
 })
-export class CheckPermissionsGuard implements CanActivate {
+export class CheckPermissionsGuard {
   private _auth = inject(AuthService);
   private _router = inject(Router);
 
