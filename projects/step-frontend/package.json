@@ -40,5 +40,8 @@
   },
   "devDependencies": {
     "copyfiles": "2.4.1"
+  },
+  "engines": {
+    "node": ">=18.15.0"
   }
 }

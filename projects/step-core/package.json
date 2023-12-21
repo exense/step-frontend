@@ -41,5 +41,8 @@
   },
   "devDependencies": {
     "shelljs": "0.8.5"
+  },
+  "engines": {
+    "node": ">=18.15.0"
   }
 }
