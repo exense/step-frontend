@@ -81,6 +81,11 @@ import { ItemHoldDirective } from './directives/item-hold.directive';
     ItemHoldDirective,
   ],
   exports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    StepMaterialModule,
+    RouterModule,
     ResourceLabelComponent,
     ArrayFilterComponent,
     DateFilterComponent,
@@ -111,7 +116,6 @@ import { ItemHoldDirective } from './directives/item-hold.directive';
     ProjectSwitchDialogComponent,
     TimeInputComponent,
     ArrayInputComponent,
-    RouterModule,
     RangeFilterComponent,
     StringArrayInputComponent,
     ArrayItemLabelPipe,
@@ -160,6 +164,7 @@ export * from './shared/is-small-screen.token';
 export * from './shared/resize-observable';
 export * from './shared/time-unit.enum';
 export * from './shared/generate-api-key-strategy';
+export * from './shared/create-range';
 export * from './directives/element-ref-map.directive';
 export * from './directives/width-expanders.directive';
 export * from './directives/validate-json.directive';
