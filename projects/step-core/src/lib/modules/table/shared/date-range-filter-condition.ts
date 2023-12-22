@@ -1,9 +1,9 @@
-import { CompareCondition, DateRange } from '../../basics/step-basics.module';
+import { CompareCondition } from '../../basics/step-basics.module';
 import { TableCollectionFilter, TableRequestFilter } from '../../../client/step-client-module';
 import { FilterCondition } from './filter-condition';
 import { FilterConditionType } from './filter-condition-type.enum';
 import { DateTime } from 'luxon';
-import { FilterConditionJson } from './filter-condition-json.interface';
+import { DateRange } from '../../date-picker/date-picker.module';
 
 export class DateRangeFilterCondition extends FilterCondition<DateRange> {
   readonly filterConditionType = FilterConditionType.DATE_RANGE;

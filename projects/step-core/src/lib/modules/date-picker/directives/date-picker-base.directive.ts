@@ -1,11 +1,13 @@
 import {
   Directive,
   ElementRef,
+  EventEmitter,
   HostBinding,
   HostListener,
   inject,
   Input,
   OnChanges,
+  Output,
   SimpleChanges,
 } from '@angular/core';
 import { DateField } from '../types/date-field';
@@ -31,6 +33,8 @@ export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChan
 
   @HostBinding('attr.disabled')
   protected isDisabled?: boolean;
+
+  @Output() dateChange = new EventEmitter<D | null | undefined>();
 
   writeValue(date?: D | null): void {
     this.modelValue = date;
@@ -65,6 +69,7 @@ export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChan
     this.modelValue = date;
     this.formatValue(date);
     this.onChange?.(date);
+    this.dateChange.emit(date);
   }
 
   isFieldDisabled(): boolean {
@@ -99,12 +104,14 @@ export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChan
     if (hasChanges) {
       this.modelValue = date;
       this.onChange?.(date);
+      this.dateChange.emit(date);
     }
   }
 
   @HostListener('change')
   private handleChange(): void {
     this.onChange?.(this.modelValue);
+    this.dateChange.emit(this.modelValue);
   }
 
   @HostListener('blur')

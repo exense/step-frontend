@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StepMaterialModule } from '../step-material/step-material.module';
 import { ArrayFilterComponent } from './components/array-filter/array-filter.component';
-import { DateFilterComponent } from './components/date-filter/date-filter.component';
 import { HexadecimalInputFilterComponent } from './components/input-filter/hexadecimal-input-filter.component';
 import { InputFilterComponent } from './components/input-filter/input-filter.component';
 import { ResourceLabelComponent } from './components/resource-label/resource-label.component';
@@ -33,7 +32,6 @@ import { TimeInputComponent } from './components/time-input/time-input.component
 import { ProjectSwitchDialogComponent } from './components/project-switch-dialog/project-switch-dialog.component';
 import { ArrayInputComponent } from './components/array-input/array-input.component';
 import { RouterModule } from '@angular/router';
-import { RangeFilterComponent } from './components/range-filter/range-filter.component';
 import { StringArrayInputComponent } from './components/string-array-input/string-array-input.component';
 import { ArrayItemLabelPipe } from './pipes/array-item-label.pipe';
 import { AllowCharsDirective } from './directives/allow-chars.directive';
@@ -45,7 +43,6 @@ import { ItemHoldDirective } from './directives/item-hold.directive';
   declarations: [
     ResourceLabelComponent,
     ArrayFilterComponent,
-    DateFilterComponent,
     InputFilterComponent,
     HasRightPipe,
     HexadecimalInputFilterComponent,
@@ -73,7 +70,6 @@ import { ItemHoldDirective } from './directives/item-hold.directive';
     ProjectSwitchDialogComponent,
     TimeInputComponent,
     ArrayInputComponent,
-    RangeFilterComponent,
     StringArrayInputComponent,
     ArrayItemLabelPipe,
     AllowCharsDirective,
@@ -88,7 +84,6 @@ import { ItemHoldDirective } from './directives/item-hold.directive';
     RouterModule,
     ResourceLabelComponent,
     ArrayFilterComponent,
-    DateFilterComponent,
     InputFilterComponent,
     HasRightPipe,
     HexadecimalInputFilterComponent,
@@ -116,7 +111,6 @@ import { ItemHoldDirective } from './directives/item-hold.directive';
     ProjectSwitchDialogComponent,
     TimeInputComponent,
     ArrayInputComponent,
-    RangeFilterComponent,
     StringArrayInputComponent,
     ArrayItemLabelPipe,
     AllowCharsDirective,
@@ -129,7 +123,6 @@ export class StepBasicsModule {}
 export * from './components/base-filter/base-filter.component';
 export * from './components/array-filter/array-filter.component';
 export * from './components/single-item-array-filter/single-item-array-filter.component';
-export * from './components/date-filter/date-filter.component';
 export * from './components/input-filter/hexadecimal-input-filter.component';
 export * from './components/input-filter/input-filter.component';
 export * from './components/resource-label/resource-label.component';
@@ -143,7 +136,6 @@ export * from './components/progress-bar/progress-bar.component';
 export * from './components/upload-container/upload-container.component';
 export * from './components/array-input/array-input.component';
 export * from './components/time-input/time-input.component';
-export * from './components/range-filter/range-filter.component';
 export * from './components/string-array-input/string-array-input.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';

@@ -1,9 +1,9 @@
 import { Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, ValidatorFn } from '@angular/forms';
-import { MatDatepicker } from '@angular/material/datepicker';
 import { DateTime } from 'luxon';
 import { debounceTime, map, Observable } from 'rxjs';
-import { BaseFilterComponent } from '../base-filter/base-filter.component';
+import { BaseFilterComponent } from '../../../basics/step-basics.module';
+import { DatePickerComponent } from '../../../date-picker/date-picker.module';
 
 @Component({
   selector: 'step-date-filter',
@@ -23,7 +23,7 @@ export class DateFilterComponent extends BaseFilterComponent<DateTime | undefine
   @Input() initialDate = false;
 
   @ViewChild('dateInput') private dateInput?: ElementRef;
-  @ViewChild(MatDatepicker) matDatepicker?: MatDatepicker<Date>;
+  @ViewChild('picker') readonly stepPicker?: DatePickerComponent;
 
   protected override createControl(fb: FormBuilder): FormControl<DateTime | null> {
     return fb.control<DateTime | null>(null, [this.createDateValidator()]);
