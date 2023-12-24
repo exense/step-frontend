@@ -38,7 +38,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   @Input() syncKey: string | undefined; // all the charts with the same syncKey in the app will be synced
 
   @Output() zoomReset = new EventEmitter<void>();
-  @Output() zoomChange = new EventEmitter<TimeRange>();
+  @Output() zoomChange = new EventEmitter<TimeRange>(); // warning! this event will be emitted by all charts synchronized.
   @Output() lockStateChange = new EventEmitter<boolean>();
 
   uplot!: uPlot;
@@ -118,6 +118,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
         dblclick: (self: uPlot, target: HTMLElement, handler: MouseListener) => {
           return (e: any) => {
             this.zoomReset.emit();
+            console.log('ZOOM RESET');
             handler(e);
             return null;
           };
@@ -199,6 +200,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
             const min = u.posToVal(u.select.left, 'x');
             const max = u.posToVal(u.select.left + u.select.width, 'x');
             if (min < max) {
+              console.log('EMITED from chart');
               this.zoomChange.emit({ from: min, to: max });
             }
           },

@@ -26,7 +26,7 @@ import { TimeRangePickerSelection } from '../../time-selection/time-range-picker
 //@ts-ignore
 import uPlot = require('uplot');
 import { TsFilterItem } from '../../performance-view/filter-bar/model/ts-filter-item';
-import { Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { forkJoin, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { ChartDashletComponent } from './chart-dashlet/chart-dashlet.component';
 import { Dashlet } from './model/dashlet';
 
@@ -71,7 +71,7 @@ export class DashboardPageComponent implements OnInit {
 
   terminator$ = new Subject<void>();
 
-  initContext(dashboard: DashboardView) {
+  createContext(dashboard: DashboardView): TimeSeriesContext {
     const dashboardTimeRange = dashboard.timeRange!;
     const timeRange: TimeRange = {
       from: dashboardTimeRange.absoluteSelection!.from!,
@@ -89,7 +89,7 @@ export class DashboardPageComponent implements OnInit {
     } else {
       this.timeRangeSelection = { ...dashboardTimeRange, type: dashboardTimeRange.type! };
     }
-    this.context = this._timeSeriesContextFactory.createContext({
+    return this._timeSeriesContextFactory.createContext({
       id: dashboard.id!,
       timeRange: timeRange,
       grouping: dashboard.grouping || [],
@@ -100,7 +100,7 @@ export class DashboardPageComponent implements OnInit {
   ngOnInit(): void {
     this._dashboardService.getAll1().subscribe((dashboards) => {
       this.dashboard = dashboards[0];
-      this.initContext(this.dashboard);
+      this.context = this.createContext(this.dashboard);
       this.chartSettings = new Array(this.dashboard!.dashlets!.length);
       this.dashboard.dashlets!.forEach((dashlet, i) => {
         const settings = dashlet.chartSettings!;
@@ -155,20 +155,19 @@ export class DashboardPageComponent implements OnInit {
       .subscribe();
   }
 
-  handleSelectionChange(selection: TimeRange): Observable<any> {
+  handleSelectionChange(timeRange?: TimeRange): Observable<any> {
+    console.log('selection changed');
     // if (TimeSeriesUtils.intervalsEqual(this.findRequestBuilder.getRange(), selection)) {
     //   // nothing happened
     //   return of(undefined);
     // }
+    // this.context.update
     return this.refreshAllCharts();
   }
 
-  private refreshAllCharts(): Observable<void> {
+  private refreshAllCharts(): Observable<any[]> {
     console.log('REFRESHING ALL');
-    this.dashlets?.forEach((dashlet) => {
-      console.log('WE HAVE ONE', dashlet);
-    });
-    return of();
+    return forkJoin(this.dashlets?.map((dashlet) => dashlet.refresh()) || []);
   }
 
   toggleGroupingAttribute(chartConfig: ChartConfig, attribute: MetricAttributeSelection) {

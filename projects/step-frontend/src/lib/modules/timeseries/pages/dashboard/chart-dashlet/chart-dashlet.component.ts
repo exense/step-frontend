@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Dashlet } from '../model/dashlet';
 import {
   BucketAttributes,
@@ -42,8 +42,13 @@ export class ChartDashletComponent implements OnInit, Dashlet {
 
   @Input() item!: DashboardItem;
   @Input() context!: TimeSeriesContext;
+  @Input() allowGroupingChange: boolean = true;
+  @Input() allowMetricChange: boolean = true;
 
+  readonly PCL_VALUES = [80, 90, 99];
+  selectedPclValue: number = this.PCL_VALUES[0];
   groupingSelection: MetricAttributeSelection[] = [];
+  selectedAggregate!: AggregationType;
 
   private _timeSeriesService = inject(TimeSeriesService);
 
@@ -51,22 +56,45 @@ export class ChartDashletComponent implements OnInit, Dashlet {
     if (!this.item || !this.context) {
       throw new Error('Missing input values');
     }
-    const settings = this.item.chartSettings!;
+    this.groupingSelection = this.prepareGroupingAttributes();
+    this.fetchDataAndCreateChart().subscribe();
+  }
 
-    this.groupingSelection = settings.attributes?.map((a) => ({ ...a, selected: false })) || [];
+  private prepareGroupingAttributes(): MetricAttributeSelection[] {
+    const settings = this.item.chartSettings!;
+    const groupingSelection: MetricAttributeSelection[] =
+      settings.attributes?.map((a) => ({ ...a, selected: false })) || [];
     settings.grouping?.forEach((a) => {
-      const foundAttribute = this.groupingSelection.find((attr) => attr.name === a);
+      const foundAttribute = groupingSelection.find((attr) => attr.name === a);
       if (foundAttribute) {
         foundAttribute.selected = true;
       }
     });
-
-    this.createChart().subscribe();
+    return groupingSelection;
   }
 
   refresh(): Observable<any> {
     this.chart?.setBlur(true);
-    return this.createChart();
+    return this.fetchDataAndCreateChart();
+  }
+
+  handleZoomReset() {
+    this.context.setChartsLockedState(false);
+    this.context.resetZoom();
+  }
+
+  switchAggregate(aggregate: AggregationType) {
+    // this.isLoading = true;
+    this.selectedAggregate = aggregate;
+    this.refresh().subscribe();
+    // this.fetchDataAndCreateChart(this.settings);
+  }
+
+  toggleGroupingAttribute(attribute: MetricAttributeSelection) {
+    // this.isLoading = true;
+    attribute.selected = !attribute.selected;
+    this.refresh().subscribe();
+    // this.fetchDataAndCreateChart(this.settings);
   }
 
   private composeRequestFilter(metricKey: string): string {
@@ -92,7 +120,55 @@ export class ChartDashletComponent implements OnInit, Dashlet {
     return FilterUtils.filtersToOQL(filterItems, 'attributes');
   }
 
-  private createChart(): Observable<TimeSeriesAPIResponse> {
+  private createChart(response: TimeSeriesAPIResponse): void {
+    const groupDimensions = this.getChartGrouping();
+    const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
+    const primaryAxes = this.item.chartSettings!.primaryAxes!;
+    const primaryAggregation = primaryAxes.aggregation!;
+    const series: TSChartSeries[] = response.matrix.map((series, i) => {
+      const labelItems = this.getSeriesKeys(response.matrixKeys[i], groupDimensions);
+      const seriesKey = labelItems.join(' | ');
+      const color =
+        primaryAxes.renderingSettings?.seriesColors?.[seriesKey] || this.context.keywordsContext.getColor(seriesKey);
+
+      return {
+        id: seriesKey,
+        label: seriesKey,
+        labelItems: labelItems,
+        legendName: seriesKey,
+        data: series.map((b) => this.getBucketValue(b, primaryAggregation!)),
+        value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x),
+        stroke: color,
+        fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
+        points: { show: false },
+        show: true,
+      };
+    });
+    const primaryUnit = primaryAxes.unit!;
+    const yAxesUnit = this.getUnitLabel(primaryAggregation, primaryUnit);
+
+    this._internalSettings = {
+      title: `${this.item.name} (${primaryAggregation})`,
+      xValues: xLabels,
+      series: series,
+      tooltipOptions: {
+        enabled: true,
+        yAxisUnit: yAxesUnit,
+      },
+      showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
+      axes: [
+        {
+          size: TimeSeriesConfig.CHART_LEGEND_SIZE,
+          scale: 'y',
+          values: (u, vals) => {
+            return vals.map((v: any) => this.getAxesFormatFunction(primaryAggregation, primaryUnit)(v));
+          },
+        },
+      ],
+    };
+  }
+
+  private fetchDataAndCreateChart(): Observable<TimeSeriesAPIResponse> {
     const settings = this.item.chartSettings!;
     const groupDimensions = this.getChartGrouping();
     const request: FetchBucketsRequest = {
@@ -105,51 +181,7 @@ export class ChartDashletComponent implements OnInit, Dashlet {
     };
     return this._timeSeriesService.getTimeSeries(request).pipe(
       tap((response) => {
-        const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-        const primaryAxes = settings.primaryAxes!;
-        const primaryAggregation = primaryAxes.aggregation!;
-        const series: TSChartSeries[] = response.matrix.map((series, i) => {
-          const labelItems = this.getSeriesKeys(response.matrixKeys[i], groupDimensions);
-          const seriesKey = labelItems.join(' | ');
-          const color =
-            primaryAxes.renderingSettings?.seriesColors?.[seriesKey] ||
-            this.context.keywordsContext.getColor(seriesKey);
-
-          return {
-            id: seriesKey,
-            label: seriesKey,
-            labelItems: labelItems,
-            legendName: seriesKey,
-            data: series.map((b) => this.getBucketValue(b, primaryAggregation!)),
-            value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x),
-            stroke: color,
-            fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
-            points: { show: false },
-            show: true,
-          };
-        });
-        const primaryUnit = primaryAxes.unit!;
-        const yAxesUnit = this.getUnitLabel(primaryAggregation, primaryUnit);
-
-        this._internalSettings = {
-          title: `${name} (${primaryAggregation})`,
-          xValues: xLabels,
-          series: series,
-          tooltipOptions: {
-            enabled: true,
-            yAxisUnit: yAxesUnit,
-          },
-          showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
-          axes: [
-            {
-              size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-              scale: 'y',
-              values: (u, vals) => {
-                return vals.map((v: any) => this.getAxesFormatFunction(primaryAggregation, primaryUnit)(v));
-              },
-            },
-          ],
-        };
+        this.createChart(response);
       })
     );
   }
