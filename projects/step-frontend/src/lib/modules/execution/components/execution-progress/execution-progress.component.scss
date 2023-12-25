@@ -1,13 +1,9 @@
-.panel-body {
-  padding: 1.5rem;
-}
-
 as-split {
-  height: calc(100vh - 134px);
+  height: calc(100vh - 120px);
 }
 
-as-split-area {
-  padding: 2px 1rem;
+.split-area-content {
+  padding: 0.2rem 1rem;
 }
 
 .tab-panel {
@@ -24,8 +20,4 @@ as-split-area {
 
 .small-screen {
   width: fit-content;
-}
-
-.panel-body.small-screen {
-  padding: 0.75rem;
 }
