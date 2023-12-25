@@ -1,13 +1,6 @@
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import {
-  AJS_ROOT_SCOPE,
-  ArtefactInfo,
-  AuthService,
-  ControllerService,
-  RepositoryObjectReference,
-} from '@exense/step-core';
+import { ArtefactInfo, AuthService, ControllerService, RepositoryObjectReference } from '@exense/step-core';
 import { noop } from 'rxjs';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { ActivatedRoute } from '@angular/router';
 import { RepositoryPlanTestcaseListComponent } from '../repository-plan-testcase-list/repository-plan-testcase-list.component';
 
@@ -20,8 +13,6 @@ import { RepositoryPlanTestcaseListComponent } from '../repository-plan-testcase
   },
 })
 export class RepositoryComponent implements OnInit, OnDestroy {
-  private _$rootScope = inject(AJS_ROOT_SCOPE);
-
   private _auth = inject(AuthService);
   private _controllersApi = inject(ControllerService);
   private _activatedRoute = inject(ActivatedRoute);
@@ -53,10 +44,13 @@ export class RepositoryComponent implements OnInit, OnDestroy {
   }
 
   private setupReloadLogic(): void {
+    // TODO CHECK
+    /*
     this.cancelRootScopeEvent = this._$rootScope.$on('$locationChangeSuccess', () => {
       this.reload = false;
       setTimeout(() => (this.reload = true));
     });
+*/
   }
 
   private setupLocationParams(): void {

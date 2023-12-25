@@ -8,6 +8,10 @@
   @include core.table-header;
 }
 
+.panel-body {
+  padding: 1.5rem;
+}
+
 step-report-node-icon.is-importing {
   visibility: hidden;
 }

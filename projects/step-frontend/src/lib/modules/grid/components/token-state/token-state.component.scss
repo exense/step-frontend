@@ -1,29 +1,21 @@
+@use 'sass:map';
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
 
-.token-status-IN_USE {
-  background: map-get(var.$tokenstates, 'IN_USE');
-}
-
-.token-status-ERROR {
-  background: map-get(var.$tokenstates, 'ERROR');
-}
-
-.token-status-FREE {
-  background: map-get(var.$tokenstates, 'FREE');
-}
-
-.token-status-MAINTENANCE_REQUESTED {
-  background: map-get(var.$tokenstates, 'MAINTENANCE_REQUESTED');
-}
-
-.token-status-MAINTENANCE {
-  background: map-get(var.$tokenstates, 'MAINTENANCE');
+@mixin token-status($status) {
+  &.token-status-#{$status} {
+    background: map-get(var.$tokenstates, $status);
+  }
 }
 
 .token-status {
-  color: white;
-  padding: 4px;
-  border-radius: 10px;
-  font-size: 75%;
-  width: 100px;
+  @include core.status-common;
+  @include core.status-left-side;
+  @include core.status-right-side;
+  color: var.$white;
+  @include token-status('IN_USE');
+  @include token-status('ERROR');
+  @include token-status('FREE');
+  @include token-status('MAINTENANCE_REQUESTED');
+  @include token-status('MAINTENANCE');
 }

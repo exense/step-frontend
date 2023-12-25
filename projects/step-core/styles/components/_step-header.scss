@@ -30,37 +30,20 @@ $default-color: dc.default-colors();
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
-      height: 32px;
-    }
-
-    .app-header-nav > li {
-      > div a,
-      > a {
-        color: map.get($config, main-text-color);
-      }
-    }
-
-    #session-dropdown {
-      user-select: none;
-      background: none !important;
-    }
-
-    .dropdown-menu {
-      min-width: auto;
-      top: initial;
-      left: initial;
-      margin-left: -20px;
-
-      li {
-        width: 100%;
-      }
+      height: 3.2rem;
     }
 
     .app-header-nav {
-      margin: 6px 20px;
+      margin: 0.6rem 2rem;
       list-style-type: none;
       display: flex;
       gap: 1rem;
+
+      a {
+        color: map.get($config, main-text-color);
+        user-select: none;
+        background: none !important;
+      }
     }
 
     &::after {
@@ -68,8 +51,8 @@ $default-color: dc.default-colors();
       display: block;
       width: 100%;
       background-color: map.get($config, alt-background-color);
-      border-top-left-radius: 16px;
-      height: 16px;
+      border-top-left-radius: 1.6rem;
+      height: 1.6rem;
     }
   }
 }

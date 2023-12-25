@@ -1,0 +1,13 @@
+<button
+  *ngIf="entityMenu?.hasContent"
+  type="button"
+  mat-icon-button
+  [stepItemHold]="entityItem"
+  #itemHold="ItemHold"
+  [matMenuTriggerFor]="entityMenu!.menu!"
+  [matMenuTriggerData]="{ element: entityItem }"
+  (menuOpened)="itemHold.hold()"
+  (menuClosed)="itemHold.unHold()"
+>
+  <ng-content></ng-content>
+</button>

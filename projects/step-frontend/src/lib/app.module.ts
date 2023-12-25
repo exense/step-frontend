@@ -1,8 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { UpgradeModule } from '@angular/upgrade/static';
-import { AJS_MODULE, StepCoreModule, ViewRegistryService } from '@exense/step-core';
+import { StepCoreModule } from '@exense/step-core';
 import { AdminModule } from './modules/admin/admin.module';
 import { DefaultThemeModule } from './modules/default-theme/default-theme.module';
 import { ExecutionModule } from './modules/execution/execution.module';
@@ -16,29 +15,20 @@ import { TimeSeriesModule } from './modules/timeseries/time-series.module';
 import { ArtefactsModule } from './modules/artefacts/artefacts.module';
 import { PLUGINS_INITIALIZER } from './plugins-initializer/plugins-initializer';
 import { Settings } from 'luxon';
-import { RouterModule, Routes } from '@angular/router';
-import { LegacyOutletComponent } from './modules/_common/components/legacy-outlet/legacy-outlet.component';
+import { RouterModule } from '@angular/router';
+import { RootComponent } from './components/root/root.component';
+import { StepCommonModule } from './modules/_common/step-common.module';
+import { MainViewComponent } from './components/main-view/main-view.component';
+import { APP_ROUTES, DEFAULT_ROUTE_INITIALIZER } from './app.routes';
 import { AutomationPackagesModule } from './modules/automation-packages/automation-packages.module';
 
 Settings.defaultLocale = 'en';
 
-const ROOT_ROUTES: Routes = [
-  {
-    path: 'root',
-    children: [
-      {
-        matcher: ViewRegistryService.isMatchToLegacyRoutes,
-        component: LegacyOutletComponent,
-      },
-    ],
-  },
-];
-
 @NgModule({
-  declarations: [],
+  declarations: [RootComponent, MainViewComponent],
   imports: [
+    StepCommonModule,
     BrowserModule,
-    UpgradeModule,
     StepCoreModule,
     AdminModule,
     PlanModule,
@@ -53,14 +43,13 @@ const ROOT_ROUTES: Routes = [
     DefaultThemeModule,
     ArtefactsModule,
     ResourcesModule,
-    RouterModule.forRoot(ROOT_ROUTES, { useHash: true }),
+    RouterModule.forRoot(APP_ROUTES, { useHash: true }),
   ],
-  providers: [PLUGINS_INITIALIZER],
+  exports: [RootComponent],
+  providers: [PLUGINS_INITIALIZER, DEFAULT_ROUTE_INITIALIZER],
+  bootstrap: [RootComponent],
 })
-export class AppModule {
-  constructor(private upgrade: UpgradeModule) {}
+export class AppModule {}
 
-  ngDoBootstrap() {
-    this.upgrade.bootstrap(document.body, [AJS_MODULE]);
-  }
-}
+export * from './components/root/root.component';
+export * from './components/main-view/main-view.component';

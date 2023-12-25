@@ -1,7 +1,5 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { TimeSeriesConfig } from '../../time-series.config';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { ResolutionPickerOption } from './resolution-picker-option';
-import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
 
 @Component({
   selector: 'step-ts-resolution-picker',

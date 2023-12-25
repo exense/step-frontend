@@ -1,8 +1,8 @@
 import { TSTimeRange } from './chart/model/ts-time-range';
-import { FilterBarItemType, TsFilterItem } from './performance-view/filter-bar/model/ts-filter-item';
-import { Execution } from '@exense/step-core';
+import { BucketAttributes, Execution } from '@exense/step-core';
 import { RangeSelectionType } from './time-selection/model/range-selection-type';
 import { TimeRangePickerSelection } from './time-selection/time-range-picker-selection';
+import { TimeSeriesConfig } from './time-series.config';
 
 export class TimeSeriesUtils {
   static createTimeLabels(start: number, end: number, interval: number): number[] {
@@ -14,6 +14,20 @@ export class TimeSeriesUtils {
     // result[intervals] = result[intervals - 1] + TimeSeriesConfig.RESOLUTION; // we add one second as a small padding
 
     return result;
+  }
+
+  static getSeriesKey(attributes: BucketAttributes, groupDimensions: string[]): string {
+    if (groupDimensions?.length === 0) {
+      return TimeSeriesConfig.SERIES_LABEL_VALUE;
+    }
+    return this.mergeSeriesLabels(groupDimensions.map((field) => attributes[field]));
+  }
+
+  static mergeSeriesLabels(items: (string | undefined)[]): string {
+    if (items.length === 0) {
+      return TimeSeriesConfig.SERIES_LABEL_VALUE;
+    }
+    return items.map((i) => i ?? TimeSeriesConfig.SERIES_LABEL_EMPTY).join(' | ');
   }
 
   static intervalIsInside(bigInterval: TSTimeRange, smallInterval: TSTimeRange): boolean {

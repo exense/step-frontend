@@ -1,8 +1,12 @@
-<div class="label-container" [class.align-left]="alignLabelAddon === 'near'">
-  <label>
+<div
+  class="label-container"
+  [class.align-left]="alignLabelAddon === 'near'"
+  [class.without-children]="!label.children.length && !labelAddon.children.length"
+>
+  <label #label>
     <ng-content select="step-label"> </ng-content>
   </label>
-  <div class="label-addon">
+  <div #labelAddon class="label-addon">
     <ng-content select="step-label-addon"></ng-content>
   </div>
 </div>

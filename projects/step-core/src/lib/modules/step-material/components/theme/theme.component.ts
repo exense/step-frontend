@@ -8,8 +8,6 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { STEP_CORE_JS } from '../../../../angularjs/module';
 import { ThemeRegisterService } from '../../services/theme-register.service';
 
 @Component({
@@ -42,7 +40,3 @@ export class ThemeComponent implements AfterViewInit {
     }
   }
 }
-
-getAngularJSGlobal()
-  .module(STEP_CORE_JS)
-  .directive('stepTheme', downgradeComponent({ component: ThemeComponent }));

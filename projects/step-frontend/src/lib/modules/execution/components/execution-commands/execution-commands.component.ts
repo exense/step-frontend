@@ -1,30 +1,17 @@
+import { Component, inject, Inject, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import {
-  Component,
-  EventEmitter,
-  inject,
-  Inject,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
-import {
-  AJS_ROOT_SCOPE,
   ArtefactFilter,
   AugmentedExecutionsService,
   AugmentedScreenService,
+  AuthService,
   Execution,
   ExecutionParameters,
   RepositoryObjectReference,
   ScheduledTaskDialogsService,
 } from '@exense/step-core';
-import { IRootScopeService } from 'angular';
 import { DOCUMENT } from '@angular/common';
 import { IncludeTestcases } from '../../shared/include-testcases.interface';
 import { Router } from '@angular/router';
-import { from, map, Observable, switchMap } from 'rxjs';
-import { ExecutionOpenNotificatorService } from '../../services/execution-open-notificator.service';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 
 @Component({
@@ -49,7 +36,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
     private _executionService: AugmentedExecutionsService,
     private _screenTemplates: AugmentedScreenService,
     private _scheduledTaskDialogs: ScheduledTaskDialogsService,
-    @Inject(AJS_ROOT_SCOPE) private _rootScope$: IRootScopeService,
+    private _authService: AuthService,
     @Inject(DOCUMENT) private _document: Document
   ) {}
 
@@ -137,7 +124,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
   }
 
   private buildExecutionParams(simulate: boolean): ExecutionParameters {
-    const userID = (this._rootScope$ as any)['context']['userID'];
+    const userID = this._authService.getContext().userID;
     const description = this.description;
     const mode = simulate ? 'SIMULATION' : 'RUN';
     const repositoryObject = this.repositoryObjectRef;

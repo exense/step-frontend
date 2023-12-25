@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Entity } from '../types/entity';
 import { Resolver } from '../types/resolver';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '../../../shared';
 
 @Injectable({
   providedIn: 'root',
@@ -24,5 +22,3 @@ export class EntityTypeResolver {
     return;
   }
 }
-
-getAngularJSGlobal().module(AJS_MODULE).service('EntityTypeResolver', downgradeInjectable(EntityTypeResolver));

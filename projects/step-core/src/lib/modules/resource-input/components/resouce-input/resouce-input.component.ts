@@ -10,12 +10,10 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { Observable, Subject, filter, takeUntil, forkJoin } from 'rxjs';
 import { AugmentedResourcesService, ResourceUploadResponse } from '../../../../client/step-client-module';
 import { ResourceDialogsService } from '../../services/resource-dialogs.service';
 import { ResourceInputBridgeService } from '../../services/resource-input-bridge.service';
-import { AJS_MODULE } from '../../../../shared';
 import { UpdateResourceWarningResultState } from '../../shared/update-resource-warning-result-state.enum';
 
 const MAX_FILES = 1;
@@ -322,12 +320,3 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive(
-    'stepResourceInput',
-    downgradeComponent({
-      component: ResourceInputComponent,
-    })
-  );

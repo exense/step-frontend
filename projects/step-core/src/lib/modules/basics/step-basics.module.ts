@@ -37,6 +37,8 @@ import { RangeFilterComponent } from './components/range-filter/range-filter.com
 import { StringArrayInputComponent } from './components/string-array-input/string-array-input.component';
 import { ArrayItemLabelPipe } from './pipes/array-item-label.pipe';
 import { AllowCharsDirective } from './directives/allow-chars.directive';
+import { ItemHoverDirective } from './directives/item-hover.directive';
+import { ItemHoldDirective } from './directives/item-hold.directive';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -75,6 +77,8 @@ import { AllowCharsDirective } from './directives/allow-chars.directive';
     StringArrayInputComponent,
     ArrayItemLabelPipe,
     AllowCharsDirective,
+    ItemHoverDirective,
+    ItemHoldDirective,
   ],
   exports: [
     ResourceLabelComponent,
@@ -112,6 +116,8 @@ import { AllowCharsDirective } from './directives/allow-chars.directive';
     StringArrayInputComponent,
     ArrayItemLabelPipe,
     AllowCharsDirective,
+    ItemHoverDirective,
+    ItemHoldDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -142,7 +148,6 @@ export * from './pipes/array-item-label.pipe';
 export * from './services/credentials.service';
 export * from './services/auth.service';
 export * from './services/item-by-id-cache.service';
-export * from './services/hybrid-injector-helper';
 export * from './services/cron-presets.token';
 export * from './shared/angularjs-provider-options';
 export * from './shared/auth-context.interface';
@@ -187,6 +192,12 @@ export * from './services/multiple-projects.service';
 export * from './services/generate-api-key.service';
 export * from './services/editor-resolver.service';
 export * from './services/app-config-container.service';
+export * from './services/file-downloader.service';
 export * from './shared/logout-cleanup.token';
 export * from './services/is-used-by-dialog';
+export * from './directives/item-hover.directive';
+export * from './directives/item-hold.directive';
+export * from './services/item-hover-receiver.service';
+export * from './services/item-hold-receiver.service';
 export * from './shared/bulk-operation-type.enum';
+export * from './shared/auth.guards';

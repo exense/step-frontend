@@ -1,10 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { SessionDto } from '../../../domain';
 import { BehaviorSubject, catchError, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
-import { AJS_PREFERENCES, AJS_ROOT_SCOPE } from '../../../shared/angularjs-providers';
-import { AJS_MODULE } from '../../../shared/constants';
 import { AdditionalRightRuleService } from '../../../services/additional-right-rule.service';
 import { ApplicationConfiguration, PrivateApplicationService } from '../../../client/generated';
 import { Mutable } from '../../../shared';
@@ -24,23 +21,24 @@ const ANONYMOUS = 'anonymous';
   providedIn: 'root',
 })
 export class AuthService implements OnDestroy {
-  private _$rootScope = inject(AJS_ROOT_SCOPE);
   private _router = inject(Router);
   private _document = inject(DOCUMENT);
-  private _preferences = inject(AJS_PREFERENCES);
+
   private _additionalRightRules = inject(AdditionalRightRuleService);
   private _privateApplicationApi = inject(PrivateApplicationService);
   private _credentialsService = inject(CredentialsService);
   private _serviceContext = inject(AppConfigContainerService);
   private _navigator = inject(NavigatorService);
 
-  private _triggerRightCheck$ = new BehaviorSubject<unknown>(undefined);
+  private triggerRightCheckInternal$ = new BehaviorSubject<unknown>(undefined);
 
-  readonly triggerRightCheck$ = this._triggerRightCheck$.asObservable();
+  readonly triggerRightCheck$ = this.triggerRightCheckInternal$.asObservable();
 
-  private _context$ = new BehaviorSubject<AuthContext | undefined>(undefined);
+  private contextInternal$ = new BehaviorSubject<AuthContext | undefined>(undefined);
 
-  readonly context$ = this._context$.asObservable();
+  readonly context$ = this.contextInternal$.asObservable();
+
+  readonly isAuthenticated$ = this.context$.pipe(map((context) => !!context?.userID && context?.userID !== ANONYMOUS));
 
   readonly isOidc: boolean = false;
 
@@ -68,16 +66,14 @@ export class AuthService implements OnDestroy {
     };
     this.setContext(context);
     this.triggerRightCheck();
-    this._preferences.load();
   }
 
   private setContext(context: AuthContext) {
-    (this._$rootScope as any).context = context;
-    this._context$.next(context);
+    this.contextInternal$.next(context);
   }
 
   getContext(): AuthContext {
-    return this._context$.value as AuthContext;
+    return this.contextInternal$.value as AuthContext;
   }
 
   updateContext(info: Partial<AuthContext>): void {
@@ -92,9 +88,8 @@ export class AuthService implements OnDestroy {
         const context = this.getContext();
         if (context && !context.otp) {
           if (this._router.url.indexOf('login') !== -1) {
-            this._navigator.navigateToHome();
+            this._navigator.navigateAfterLogin();
           }
-          (this._$rootScope as any).broadcast('step.login.succeeded');
         }
       })
     );
@@ -106,7 +101,7 @@ export class AuthService implements OnDestroy {
 
   performPostLogoutActions(): void {
     this.setContext({ userID: ANONYMOUS });
-    this._navigator.navigateToHome();
+    this._navigator.navigateToRoot();
   }
 
   goToLoginPage(): void {
@@ -140,7 +135,7 @@ export class AuthService implements OnDestroy {
       return false;
     }
 
-    const context = this._context$.value;
+    const context = this.contextInternal$.value;
     return !!context?.rights ? context.rights.indexOf(right) !== -1 : false;
   }
 
@@ -162,12 +157,12 @@ export class AuthService implements OnDestroy {
   }
 
   triggerRightCheck(): void {
-    this._triggerRightCheck$.next(undefined);
+    this.triggerRightCheckInternal$.next(undefined);
   }
 
   ngOnDestroy(): void {
-    this._context$.complete();
-    this._triggerRightCheck$.complete();
+    this.contextInternal$.complete();
+    this.triggerRightCheckInternal$.complete();
   }
 
   private redirectToOidc(): void {
@@ -188,6 +183,9 @@ export class AuthService implements OnDestroy {
           map(() => {
             session.otp = true;
             return session;
+          }),
+          tap(() => {
+            this._navigator.navigateAfterLogin();
           })
         );
       }),
@@ -199,5 +197,3 @@ export class AuthService implements OnDestroy {
     );
   }
 }
-
-getAngularJSGlobal().module(AJS_MODULE).service('AuthService', downgradeInjectable(AuthService));
