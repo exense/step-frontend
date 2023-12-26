@@ -13,7 +13,7 @@ import { DateFormat } from '../../../../shared';
   selector: 'step-function-selection-table',
   templateUrl: './function-selection-table.component.html',
   styleUrls: ['./function-selection-table.component.scss'],
-  providers: [selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
+  providers: [...selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
 })
 export class FunctionSelectionTableComponent extends BaseEntitySelectionTableComponent {
   protected _selectionCollector = inject<SelectionCollector<string, Keyword>>(SelectionCollector);

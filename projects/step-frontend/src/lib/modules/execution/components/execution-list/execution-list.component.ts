@@ -21,7 +21,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./execution-list.component.scss'],
   providers: [
     tablePersistenceConfigProvider('executionList', STORE_ALL),
-    selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
 })
 export class ExecutionListComponent {
