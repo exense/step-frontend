@@ -1,4 +1,4 @@
-<step-table #table [dataSource]="_dataSource" matSort [matSortDisableClear]="true">
+<step-table #table [dataSource]="_dataSource" [filter]="$any(_filterId$ | async)" matSort [matSortDisableClear]="true">
   <step-bulk-operations *stepAdditionalHeader="'automation-package-header'" [entity]="ENTITY_ID">
   </step-bulk-operations>
   <section class="header" *stepAdditionalHeader="'automation-package-header'">

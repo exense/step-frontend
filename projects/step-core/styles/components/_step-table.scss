@@ -16,6 +16,25 @@
   }
 }
 
+@mixin table-common-cells {
+  .cell-actions {
+    width: 20rem;
+    button {
+      padding: 0;
+      min-width: 4rem;
+      min-height: 4rem;
+    }
+  }
+
+  .automation-package-cell {
+    width: 3rem;
+  }
+
+  .bulk-selection-cell {
+    width: 6rem;
+  }
+}
+
 step-table {
   tr.row-highlight,
   tr.content-row:hover {

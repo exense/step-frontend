@@ -9,8 +9,9 @@ import {
 } from '@exense/step-core';
 import { ENTITY_ID } from '../../types/constants';
 import { AutomationPackagesDialogsService } from '../../injectables/automation-packages-dialogs.service';
-import { pipe, tap } from 'rxjs';
+import { map, pipe, tap } from 'rxjs';
 import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'step-automation-packages-list',
@@ -24,6 +25,10 @@ import { AutomationPackagePermission } from '../../types/automation-package-perm
 export class AutomationPackagesListComponent implements AfterViewInit {
   private _dialogs = inject(AutomationPackagesDialogsService);
   readonly _dataSource = inject(AugmentedAutomationPackagesService).createDataSource();
+  readonly _filterId$ = inject(ActivatedRoute).queryParams.pipe(
+    map((params) => params?.['packageId']),
+    map((packageId) => (!!packageId ? `id=${packageId}` : undefined))
+  );
 
   readonly ENTITY_ID = ENTITY_ID;
 

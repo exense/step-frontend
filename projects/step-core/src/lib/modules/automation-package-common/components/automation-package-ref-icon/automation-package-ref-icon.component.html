@@ -1,0 +1,4 @@
+<ng-container *ngIf="automationPackage$ | async as package">
+  <step-icon name="automation" [matTooltip]="package?.attributes?.['name'] ?? ''" (click)="openPackageList()">
+  </step-icon>
+</ng-container>
