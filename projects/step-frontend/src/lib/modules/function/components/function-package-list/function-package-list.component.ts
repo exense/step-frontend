@@ -15,7 +15,7 @@ import { FunctionPackageActionsService } from '../../services/function-package-a
   styleUrls: ['./function-package-list.component.scss'],
   providers: [
     tablePersistenceConfigProvider('functionPackageList', STORE_ALL),
-    selectionCollectionProvider<string, FunctionPackage>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...selectionCollectionProvider<string, FunctionPackage>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
 })
 export class FunctionPackageListComponent implements AfterViewInit {

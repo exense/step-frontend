@@ -20,7 +20,7 @@ const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === 
   templateUrl: './repository-plan-testcase-list.component.html',
   styleUrls: ['./repository-plan-testcase-list.component.scss'],
   providers: [
-    selectionCollectionProvider<string, TestRunStatus>({
+    ...selectionCollectionProvider<string, TestRunStatus>({
       selectionKeyProperty: 'id',
       registrationStrategy: RegistrationStrategy.MANUAL,
     }),
