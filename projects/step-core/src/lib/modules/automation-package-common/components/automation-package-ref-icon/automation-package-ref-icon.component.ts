@@ -25,13 +25,13 @@ export class AutomationPackageRefIconComponent<T extends AutomationPackageChildE
     }
   }
 
-  openPackageList(): void {
-    const packageId = this.entity?.customFields?.automationPackageId;
-    if (!packageId) {
+  openPackageList(automationPackage: AutomationPackage): void {
+    const automationPackageFileName = automationPackage.customFields?.['automationPackageFileName'];
+    if (!automationPackageFileName) {
       return;
     }
     this._router.navigate(['root', 'automationPackage', 'list'], {
-      queryParams: { packageId },
+      queryParams: { automationPackageFileName },
       queryParamsHandling: 'merge',
     });
   }
