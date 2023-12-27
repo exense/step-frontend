@@ -106,7 +106,11 @@ export class PlanEditorBaseComponent
     return artefactId;
   }
 
-  @Input() plan?: Plan | null;
+  private get currentPlanId(): string | undefined {
+    return this.initialPlan?.id;
+  }
+
+  @Input() initialPlan?: Plan | null;
   @Input() showExecuteButton = true;
 
   selectedTab = 'controls';
@@ -143,7 +147,7 @@ export class PlanEditorBaseComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const cPlan = changes['plan'];
+    const cPlan = changes['initialPlan'];
     if (cPlan?.previousValue !== cPlan?.currentValue || cPlan?.firstChange) {
       this.setupPlan(cPlan?.currentValue, true);
       this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference((cPlan?.currentValue as Plan)?.id);
@@ -168,24 +172,26 @@ export class PlanEditorBaseComponent
   }
 
   exportPlan(): void {
-    if (!this.plan?.id) {
+    if (!this.currentPlanId) {
       return;
     }
-    this._planEditorApi.exportPlan(this.plan.id, `${this._planEditService.plan!.attributes!['name']}.sta`).subscribe();
+    this._planEditorApi
+      .exportPlan(this.currentPlanId, `${this._planEditService.plan!.attributes!['name']}.sta`)
+      .subscribe();
   }
 
   displayHistory(permission: string, plan: Plan): void {
-    if (!(plan?.id || this.plan?.id)) {
+    if (!(plan?.id || this.currentPlanId)) {
       return;
     }
 
-    const versionHistory = this._planEditorApi.getPlanHistory(this.plan?.id ?? plan.id!);
+    const versionHistory = this._planEditorApi.getPlanHistory(this.currentPlanId ?? plan.id!);
 
     const currentVersion$ = defer(() => {
-      if (this.plan?.id && this.plan?.id !== plan.id) {
+      if (this.currentPlanId && this.currentPlanId !== plan.id) {
         // composite keywords need to retrieve the current version
         return this._keywordCallsApi
-          .getFunctionById(this.plan!.id)
+          .getFunctionById(this.currentPlanId)
           .pipe(map((keyword) => keyword?.customFields?.['versionId'] ?? undefined));
       } else {
         // we are showing a real plan
@@ -200,9 +206,9 @@ export class PlanEditorBaseComponent
         ),
         filter((restoreVersion) => restoreVersion !== undefined),
         switchMap((restoreVersion) =>
-          this._planEditorApi.restorePlanVersion(this.plan?.id ?? plan.id!, restoreVersion)
+          this._planEditorApi.restorePlanVersion(this.currentPlanId ?? plan.id!, restoreVersion)
         ),
-        switchMap(() => this._planEditorApi.loadPlan(this.plan?.id ?? plan.id!)),
+        switchMap(() => this._planEditorApi.loadPlan(this.currentPlanId ?? plan.id!)),
         catchError((error) => {
           console.error(error);
           return EMPTY;
@@ -212,7 +218,7 @@ export class PlanEditorBaseComponent
   }
 
   clonePlan(): void {
-    if (!this.plan?.id) {
+    if (!this.currentPlanId) {
       return;
     }
 
@@ -222,7 +228,7 @@ export class PlanEditorBaseComponent
       .enterValue('Clone plan as', `${name}_Copy`)
       .pipe(
         switchMap((value) =>
-          this._planEditorApi.clonePlan(this.plan!.id!).pipe(
+          this._planEditorApi.clonePlan(this.currentPlanId!).pipe(
             map((plan) => {
               plan!.attributes!['name'] = value;
               return plan;
@@ -262,7 +268,7 @@ export class PlanEditorBaseComponent
 
     if (isPlan) {
       this._planApi
-        .lookupPlan(this.plan!.id!, artefact!.id!)
+        .lookupPlan(this.currentPlanId!, artefact!.id!)
         .pipe(
           map((plan) => plan || NO_DATA),
           catchError((err) => {
@@ -319,7 +325,7 @@ export class PlanEditorBaseComponent
       artefactIds = this._treeState.getSelectedNodes().map((node) => node.id!);
     }
 
-    this._interactiveSession.execute(this.plan!.id!, artefactIds).subscribe(() => {
+    this._interactiveSession.execute(this.currentPlanId!, artefactIds).subscribe(() => {
       if (this.keywords) {
         this.keywords._leafReportsDataSource.reload();
       }

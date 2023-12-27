@@ -1,5 +1,14 @@
-import { Component, EventEmitter, inject, Input, Output, ViewChild } from '@angular/core';
-import { RepositoryObjectReference } from '@exense/step-core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  Output,
+  TrackByFunction,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
+import { Dashlet, Plan, RepositoryObjectReference, ViewRegistryService } from '@exense/step-core';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 import { MatMenuTrigger } from '@angular/material/menu';
 
@@ -7,9 +16,15 @@ import { MatMenuTrigger } from '@angular/material/menu';
   selector: 'step-plan-editor-actions',
   templateUrl: './plan-editor-actions.component.html',
   styleUrls: ['./plan-editor-actions.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class PlanEditorActionsComponent {
   protected _interactiveSession = inject(InteractiveSessionService);
+
+  readonly _planActions = inject(ViewRegistryService).getDashlets('plan/editorActions');
+  readonly trackByDashlet: TrackByFunction<Dashlet> = (index, item) => item.id;
+
+  @Input() plan?: Plan | null;
 
   @Input() hasUndo?: boolean | null;
   @Input() hasRedo?: boolean | null;
