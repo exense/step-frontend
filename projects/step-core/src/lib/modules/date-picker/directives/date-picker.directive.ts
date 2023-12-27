@@ -22,6 +22,7 @@ import { STEP_DATE_TIME_FORMAT_PROVIDERS } from '../injectables/step-date-format
       useExisting: DateSingleAdapterService,
     },
   ],
+  exportAs: 'DatePicker',
 })
 export class DatePickerDirective extends DatePickerBaseDirective<DateTime> {
   @Input('stepDatePicker') override picker?: DatePickerComponent;

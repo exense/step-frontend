@@ -14,6 +14,7 @@ const END_RANGE_TIME: Time = { hour: 23, minute: 59, second: 59 };
 export class CalendarRangeStrategyService implements CalendarStrategyService<DateRange, TimeRange> {
   private _adapter = inject(DateSingleAdapterService);
 
+  private lastEndDate: DateTime | null = null;
   private lastEndTime?: Time;
 
   handleDateSelection(
@@ -21,14 +22,21 @@ export class CalendarRangeStrategyService implements CalendarStrategyService<Dat
     currentSelection: DateRange,
     keepTime: boolean
   ): DateRange | null | undefined {
-    let { start, end } = currentSelection ?? {};
+    let start = currentSelection?.start;
+    let end = this.lastEndDate;
+
     if (!start) {
       start = date ?? null;
+      if (start && !end) {
+        end = start.set(END_RANGE_TIME);
+      }
     } else if (!end && date && this._adapter.compare(date, start) >= 0) {
       if (!keepTime) {
         end = date;
+        this.lastEndDate = end;
       } else {
         end = date.set(this.lastEndTime ?? END_RANGE_TIME);
+        this.lastEndDate = end;
         this.lastEndTime = undefined;
       }
     } else {
@@ -38,10 +46,12 @@ export class CalendarRangeStrategyService implements CalendarStrategyService<Dat
         start = date.set({ ...extractTime(start) });
       }
 
-      if (keepTime && end) {
-        this.lastEndTime = extractTime(end);
+      if (start) {
+        end = start.set(END_RANGE_TIME);
+      } else {
+        end = null;
       }
-      end = null;
+      this.lastEndDate = null;
     }
     return { start, end };
   }
@@ -51,7 +61,8 @@ export class CalendarRangeStrategyService implements CalendarStrategyService<Dat
       return currentSelection;
     }
 
-    let { start, end } = currentSelection;
+    let start = currentSelection.start;
+    let end = this.lastEndDate;
 
     let startChanged = false;
     let endChanged = false;
@@ -60,9 +71,13 @@ export class CalendarRangeStrategyService implements CalendarStrategyService<Dat
       start = start.set({ ...time.start });
       startChanged = true;
     }
-    if (end && time.end) {
-      end = end.set({ ...time.end });
-      endChanged = true;
+    if (time.end) {
+      const potentialEnd = end ?? start;
+      if (potentialEnd) {
+        end = potentialEnd.set({ ...time.end });
+        this.lastEndDate = end;
+        endChanged = true;
+      }
     }
 
     if (startChanged || endChanged) {

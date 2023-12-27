@@ -1,20 +1,14 @@
 import { Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, ValidatorFn } from '@angular/forms';
-import { debounceTime, map, Observable, tap } from 'rxjs';
+import { debounceTime, map, Observable } from 'rxjs';
 import { BaseFilterComponent } from '../../../basics/step-basics.module';
-import { DateRange, STEP_DATE_FORMAT_CONFIG, StepDateFormatConfig } from '../../../date-picker/date-picker.module';
+import { DateRange } from '../../../date-picker/date-picker.module';
 
 @Component({
   selector: 'step-range-filter',
   templateUrl: './range-filter.component.html',
   styleUrls: ['./range-filter.component.scss'],
   providers: [
-    {
-      provide: STEP_DATE_FORMAT_CONFIG,
-      useValue: {
-        formatTime: 'HH:mm',
-      } as StepDateFormatConfig,
-    },
     {
       provide: BaseFilterComponent,
       useExisting: forwardRef(() => RangeFilterComponent),
@@ -33,13 +27,8 @@ export class RangeFilterComponent extends BaseFilterComponent<DateRange | undefi
   protected createControlChangeStream(control: FormControl<DateRange>): Observable<DateRange> {
     return control.valueChanges.pipe(
       debounceTime(200),
-      map((value) => value ?? undefined),
-      tap((value) => console.log('CHANGE', value))
+      map((value) => value ?? undefined)
     );
-  }
-
-  clear(): void {
-    this.filterControl.setValue({ start: undefined, end: undefined });
   }
 
   private createDateRangeValidator(): ValidatorFn {

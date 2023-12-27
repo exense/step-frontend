@@ -1,7 +1,16 @@
 step-date-picker-content {
   mat-card {
     padding: 0 !important;
-    min-width: 29.6rem;
-    min-height: 35.4rem;
+
+    mat-calendar {
+      width: 29.6rem;
+      height: 35.4rem;
+    }
+
+    mat-card-content {
+      display: flex !important;
+      align-items: baseline;
+      gap: 1rem;
+    }
   }
 }

@@ -1,10 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
 import { Time } from '../../types/time';
 
 @Component({
   selector: 'step-range-time-picker',
   templateUrl: './range-time-picker.component.html',
   styleUrls: ['./range-time-picker.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class RangeTimePickerComponent {
   @Input() startTime?: Time;

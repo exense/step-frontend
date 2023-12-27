@@ -1,4 +1,8 @@
 :host {
-  padding: 0 2rem 1rem;
+  padding-right: 0.5rem;
   display: block;
+}
+
+step-range-time-picker {
+  flex-direction: column;
 }

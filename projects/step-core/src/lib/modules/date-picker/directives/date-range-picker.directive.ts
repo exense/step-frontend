@@ -24,6 +24,7 @@ import { DateSingleAdapterService } from '../injectables/date-single-adapter.ser
       useExisting: DateRangeAdapterService,
     },
   ],
+  exportAs: 'DateRangePicker',
 })
 export class DateRangePickerDirective extends DatePickerBaseDirective<DateRange> {
   @Input('stepDateRangePicker') override picker?: DatePickerComponent;

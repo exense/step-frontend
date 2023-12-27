@@ -14,7 +14,9 @@ import { DateField } from '../types/date-field';
 import { DatePickerComponent } from '../components/date-picker/date-picker.component';
 import { ControlValueAccessor } from '@angular/forms';
 import { DateAdapterService } from '../injectables/date-adapter.service';
+import { Mutable } from '../../../shared';
 
+type FieldAccessor = Mutable<Pick<DatePickerBaseDirective<any>, 'formattedValue'>>;
 type OnChange<D> = (date?: D | null) => void;
 type OnTouch = () => void;
 
@@ -35,6 +37,8 @@ export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChan
   protected isDisabled?: boolean;
 
   @Output() dateChange = new EventEmitter<D | null | undefined>();
+
+  readonly formattedValue: string = '';
 
   writeValue(date?: D | null): void {
     this.modelValue = date;
@@ -91,13 +95,16 @@ export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChan
   }
 
   private formatValue(value?: D | null): void {
-    this._elRef.nativeElement.value = this._dateAdapter.format(value, this.showTime);
+    (this as FieldAccessor).formattedValue = this._dateAdapter.format(value, this.showTime);
+    this._elRef.nativeElement.value = this.formattedValue;
   }
 
   @HostListener('input', ['$event'])
   private handleInput($event: Event): void {
     const value = ($event.target as HTMLInputElement).value;
     const date = this._dateAdapter.parse(value, this.showTime);
+
+    (this as FieldAccessor).formattedValue = date ? value : '';
 
     const hasChanges = !this._dateAdapter.areEqual(date, this.modelValue);
 
