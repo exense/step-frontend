@@ -6,7 +6,6 @@ import {
   DateFormat,
   ExecutiontTaskParameters,
   FilterConditionFactoryService,
-  IS_SMALL_SCREEN,
   selectionCollectionProvider,
   STORE_ALL,
   tablePersistenceConfigProvider,
@@ -21,12 +20,11 @@ import { Router } from '@angular/router';
   styleUrls: ['./execution-list.component.scss'],
   providers: [
     tablePersistenceConfigProvider('executionList', STORE_ALL),
-    selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
 })
 export class ExecutionListComponent {
   private _router = inject(Router);
-  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
   readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
   readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
