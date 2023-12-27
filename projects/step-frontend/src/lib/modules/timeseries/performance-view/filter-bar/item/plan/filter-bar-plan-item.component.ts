@@ -14,7 +14,7 @@ export class FilterBarPlanItemComponent {
   private _entityDialogs = inject(EntityDialogsService);
 
   showPicker() {
-    this._entityDialogs.selectEntityOfType('plans', true).subscribe((result) => {
+    this._entityDialogs.selectEntityOfType('plans').subscribe((result) => {
       this.addSearchEntity(result.item as Plan);
     });
   }

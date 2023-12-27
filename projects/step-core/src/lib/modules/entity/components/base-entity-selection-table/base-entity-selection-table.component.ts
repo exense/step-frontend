@@ -46,10 +46,6 @@ export abstract class BaseEntitySelectionTableComponent implements AfterViewInit
       return;
     }
     this.multipleSelection = this.contextInternal.multipleSelection;
-    this.contextInternal.getSelectedIds = () => (this._selectionCollector ? this._selectionCollector.selected : []);
-
-    this.contextInternal.getLastServerSideRequest = () =>
-      this._tableRef ? this._tableRef.getTableFilterRequest() : undefined;
 
     if (this._tableRef) {
       this.initialSearch();
@@ -63,8 +59,6 @@ export abstract class BaseEntitySelectionTableComponent implements AfterViewInit
     if (!this.contextInternal) {
       return;
     }
-    this.contextInternal.getSelectedIds = undefined;
-    this.contextInternal.getLastServerSideRequest = undefined;
   }
 
   private initialSearch(): void {

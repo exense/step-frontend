@@ -4,6 +4,7 @@ import { ExecutionTab } from '../../shared/execution-tab';
 import { filter, map, startWith, Subject, takeUntil } from 'rxjs';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
+import { IS_SMALL_SCREEN } from '@exense/step-core';
 
 const ID_LIST = 'list';
 const ID_OPEN = 'open';
@@ -24,7 +25,8 @@ export class ExecutionsComponent implements OnInit, OnDestroy, ExecutionTabManag
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
   private _activeExecutionsService = inject(ActiveExecutionsService);
-  private _terminator$ = new Subject<void>();
+  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
+  private terminator$ = new Subject<void>();
 
   listTab: ExecutionTab = { label: 'Executions', type: 'list', id: ID_LIST, title: 'Executions List' };
   tabs: ExecutionTab[] = [this.listTab];
@@ -42,14 +44,14 @@ export class ExecutionsComponent implements OnInit, OnDestroy, ExecutionTabManag
       .pipe(
         map(() => this._activatedRoute.snapshot.firstChild?.url?.[0]?.path),
         filter((path) => !!path && this.activeTab?.id !== path),
-        takeUntil(this._terminator$)
+        takeUntil(this.terminator$)
       )
       .subscribe((executionId) => this.handleLocationChange(executionId!));
   }
 
   ngOnDestroy(): void {
-    this._terminator$.next();
-    this._terminator$.complete();
+    this.terminator$.next();
+    this.terminator$.complete();
   }
 
   handleTabChange(id: string): void {

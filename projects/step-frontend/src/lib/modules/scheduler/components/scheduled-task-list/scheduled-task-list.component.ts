@@ -20,7 +20,7 @@ type StatusItem = KeyValue<string, string>;
   providers: [
     tablePersistenceConfigProvider('scheduledTaskList', STORE_ALL),
     ScheduledTaskLogicService,
-    selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
 })
 export class ScheduledTaskListComponent implements AfterViewInit {
