@@ -17,7 +17,7 @@ import { pipe, tap } from 'rxjs';
   styleUrls: ['./plan-list.component.scss'],
   providers: [
     tablePersistenceConfigProvider('planList', STORE_ALL),
-    selectionCollectionProvider<string, Plan>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...selectionCollectionProvider<string, Plan>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
 })
 export class PlanListComponent {
