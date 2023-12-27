@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { DateTime } from 'luxon';
-import { DateRange, REPOSITORY_PARAMETERS } from '../../basics/step-basics.module';
+import { REPOSITORY_PARAMETERS } from '../../basics/step-basics.module';
 import { FilterCondition } from '../shared/filter-condition';
 import { SingleDateFilterCondition } from '../shared/single-date-filter-condition';
 import { ScopeFilterCondition } from '../shared/scope-filter-condition';
@@ -14,6 +14,7 @@ import { FilterConditionJson } from '../shared/filter-condition-json.interface';
 import { FilterConditionType } from '../shared/filter-condition-type.enum';
 import { BooleanFilterCondition } from '../shared/boolean-filter-condition';
 import { DateRangeFilterCondition } from '../shared/date-range-filter-condition';
+import { DateRange } from '../../date-picker/date-picker.module';
 
 @Injectable({
   providedIn: 'root',

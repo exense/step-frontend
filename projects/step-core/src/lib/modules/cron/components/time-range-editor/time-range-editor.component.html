@@ -3,7 +3,7 @@
     <mat-radio-button [value]="TimeRangeType.CONCRETE_DATE" color="primary">
       <step-form-field class="no-label-focus" (click)="updateRange(TimeRangeType.CONCRETE_DATE)">
         <step-label>Specific date</step-label>
-        <input type="text" [matDatepicker]="picker" formControlName="date" />
+        <input type="text" [stepDatePicker]="picker" formControlName="date" />
         <step-suffix class="button-suffix">
           <button
             type="button"
@@ -71,4 +71,4 @@
     </section>
   </step-form-field>
 </section>
-<mat-datepicker #picker></mat-datepicker>
+<step-date-picker #picker></step-date-picker>

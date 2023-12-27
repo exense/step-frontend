@@ -64,7 +64,6 @@ export class TimeRangeEditorComponent extends BaseEditorComponent implements OnI
 
   protected override getExpression(): string {
     const formValue = this.timeRangeForm.value;
-    console.log(formValue);
     if (!formValue.type) {
       return '* * * ? * *';
     }

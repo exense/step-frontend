@@ -1,0 +1,16 @@
+<step-form-field [matTooltip]="dateRangePicker.formattedValue" matTooltipPosition="above">
+  <step-label *ngIf="label">{{ label }}</step-label>
+  <input
+    #filterInput
+    type="text"
+    placeholder="From - To"
+    [formControl]="filterControl"
+    [stepDateRangePicker]="picker"
+    [showTime]="true"
+    #dateRangePicker="DateRangePicker"
+  />
+  <step-suffix class="icon-suffix">
+    <step-icon name="calendar" (click)="picker.open()"></step-icon>
+  </step-suffix>
+</step-form-field>
+<step-date-picker #picker></step-date-picker>
