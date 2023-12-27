@@ -89,30 +89,4 @@
       margin-left: 16px;
     }
   }
-
-  .step-legacy-tabs {
-    .mat-tab-links {
-      margin-left: 16px;
-    }
-
-    step-ajs-icon {
-      @include tabbar-icon;
-    }
-
-    &.mat-primary {
-      .mat-tab-link.mat-tab-label-active {
-        color: $primary-tabs-color;
-      }
-    }
-
-    .mat-tab-link {
-      min-width: auto;
-      padding: 0 10px;
-      opacity: 1;
-    }
-
-    execution-result {
-      margin-right: 11px;
-    }
-  }
 }

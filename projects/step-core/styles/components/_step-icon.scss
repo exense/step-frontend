@@ -6,9 +6,7 @@
 }
 
 @mixin step-icon($size: 20px, $offset: 6px) {
-  step-icon,
-  step-ajs-icon,
-  .step-ajs-icon {
+  step-icon {
     display: inline-block;
     @include step-icon-size($size);
     fill: none;
