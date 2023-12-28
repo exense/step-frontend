@@ -93,6 +93,7 @@ import { MessageDialogComponent } from './components/message-dialog/message-dial
 import { ReportNodeIconComponent } from './components/report-node-icon/report-node-icon.component';
 import { LockColumnContainerComponent } from './components/lock-column-container/lock-column-container.component';
 import { LockColumnComponent } from './components/lock-column/lock-column.component';
+import { DatePickerModule } from './modules/date-picker/date-picker.module';
 
 @NgModule({
   declarations: [
@@ -186,6 +187,7 @@ import { LockColumnComponent } from './components/lock-column/lock-column.compon
     KeywordsCommonModule,
     WizardModule,
     CronModule,
+    DatePickerModule,
   ],
   exports: [
     CommonModule,
@@ -271,6 +273,7 @@ import { LockColumnComponent } from './components/lock-column/lock-column.compon
     MessagesListDialogComponent,
     MessageDialogComponent,
     LockColumnComponent,
+    DatePickerModule,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -385,6 +388,7 @@ export * from './modules/resource-input/resource-input.module';
 export * from './modules/keywords-common/keywords-common.module';
 export * from './modules/wizard/wizards.module';
 export * from './modules/cron/cron.module';
+export * from './modules/date-picker/date-picker.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/safe-html.pipe';

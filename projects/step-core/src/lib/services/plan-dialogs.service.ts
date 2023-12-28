@@ -34,7 +34,7 @@ export class PlanDialogsService implements PlanLinkDialogService {
   }
 
   selectPlan(tableFilter?: string): Observable<Plan> {
-    const selectedEntity$ = this._entityDialogs.selectEntityOfType('plans', true, { tableFilter });
+    const selectedEntity$ = this._entityDialogs.selectEntityOfType('plans', { tableFilter });
     const plan$ = selectedEntity$.pipe(
       map((result) => result.item as Plan),
       switchMap((plan) => this._plansApiService.getPlanById(plan.id!))

@@ -1,0 +1,18 @@
+<step-form-field>
+  <step-label *ngIf="label">{{ label }}</step-label>
+  <ng-container [formGroup]="timeForm">
+    <mat-select formControlName="hour">
+      <mat-option *ngFor="let hour of hours; trackBy: trackByKeyValue" [value]="hour.key">{{ hour.value }}</mat-option>
+    </mat-select>
+    <mat-select formControlName="minute">
+      <mat-option *ngFor="let minute of minutes; trackBy: trackByKeyValue" [value]="minute.key">{{
+        minute.value
+      }}</mat-option>
+    </mat-select>
+    <mat-select formControlName="second">
+      <mat-option *ngFor="let second of seconds; trackBy: trackByKeyValue" [value]="second.key">{{
+        second.value
+      }}</mat-option>
+    </mat-select>
+  </ng-container>
+</step-form-field>
