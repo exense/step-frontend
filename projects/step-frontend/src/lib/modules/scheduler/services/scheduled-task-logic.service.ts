@@ -46,7 +46,7 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
 
   executeTask(scheduledTask: ExecutiontTaskParameters) {
     this._schedulerService.executeTask(scheduledTask.id!).subscribe((executionId) => {
-      this._router.navigate(['root', 'executions', executionId]);
+      this._router.navigate(['executions', executionId]);
     });
   }
 
@@ -83,9 +83,9 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
 
   navToSettings() {
     if (this._authService.hasRight('admin-ui-menu') && this._authService.isAuthenticated()) {
-      this._router.navigate(['root', 'admin', 'controller', 'scheduler']);
+      this._router.navigate(['admin', 'controller', 'scheduler']);
     } else {
-      this._router.navigate(['root', 'settings', 'scheduler']);
+      this._router.navigate(['settings', 'scheduler']);
     }
   }
 

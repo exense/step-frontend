@@ -18,11 +18,6 @@ export const APP_ROUTES: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'root',
-        pathMatch: 'full',
-      },
-      {
-        path: 'root',
         component: MainViewComponent,
         children: [],
         canActivate: [authGuard],
@@ -44,7 +39,7 @@ export const DEFAULT_ROUTE_INITIALIZER: FactoryProvider = {
     const _router = inject(Router);
     const _defaultPage = inject(DEFAULT_PAGE);
     return () => {
-      const root = _router.config[0].children?.find((route) => route.path === 'root');
+      const root = _router.config[0].children?.find((route) => route.path === '');
       if (!root) {
         return true;
       }

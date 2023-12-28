@@ -32,7 +32,7 @@ export class FunctionPackageActionsService {
       return this.editFunctionPackageInternal(functionPackage.id!);
     }
 
-    const url = `/root/functionPackages`;
+    const url = `/functionPackages`;
     const editParams = { [FUNCTION_PACKAGE_ID]: functionPackage.id! };
 
     return this._multipleProjects

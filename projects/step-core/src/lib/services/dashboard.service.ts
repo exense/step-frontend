@@ -27,7 +27,7 @@ export class DashboardService {
     const currentTenant = this._multipleProjects.currentProject()?.name || '';
     httpParams = httpParams.append('tenant', currentTenant);
 
-    return `#/root/analytics?${httpParams.toString()}`;
+    return `#/analytics?${httpParams.toString()}`;
   }
 
   getDashboardLink(taskId: string): string {

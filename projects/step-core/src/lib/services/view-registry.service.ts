@@ -180,7 +180,7 @@ export class ViewRegistryService implements OnDestroy {
   }
 
   private getRootRoute(): Route {
-    return this._router.config[0]!.children!.find((route) => route.path === 'root')!;
+    return this._router.config[0]!.children!.find((route) => route.path === '')!;
   }
 
   private getRouteParentChildren(parentPath: string): Routes {

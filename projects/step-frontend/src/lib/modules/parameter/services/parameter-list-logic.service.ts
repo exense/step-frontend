@@ -46,7 +46,7 @@ export class ParameterListLogicService {
       return;
     }
 
-    const url = '/root/parameters';
+    const url = '/parameters';
     const editParams = { [PARAMETER_ID]: parameter.id! };
 
     this._multipleProject

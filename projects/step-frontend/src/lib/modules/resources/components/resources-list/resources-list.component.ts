@@ -58,7 +58,7 @@ export class ResourcesListComponent implements AfterViewInit {
       return;
     }
 
-    const url = '/root/resources';
+    const url = '/resources';
     const editParams = { [RESOURCE_ID]: resource.id };
 
     this._multipleProjectService

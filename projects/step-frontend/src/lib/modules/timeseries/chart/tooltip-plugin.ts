@@ -364,4 +364,4 @@ const createElementWithClass = (element: string, className: string) => {
   return dom;
 };
 
-const getExecutionLink = (executionId: string) => `#/root/executions/${executionId}/viz`;
+const getExecutionLink = (executionId: string) => `#/executions/${executionId}/viz`;

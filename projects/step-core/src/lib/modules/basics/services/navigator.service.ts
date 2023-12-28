@@ -24,7 +24,7 @@ export class NavigatorService {
   );
 
   isViewIdActive(viewId: string): Observable<boolean> {
-    const viewLink = `/root/${viewId}`;
+    const viewLink = `/${viewId}`;
     return this.activeUrl$.pipe(map((url) => url.startsWith(viewLink)));
   }
 
@@ -34,7 +34,7 @@ export class NavigatorService {
       this._window.open(link, '_blank');
       return;
     }
-    const link = `/root/${viewId}`;
+    const link = `/${viewId}`;
     this.navigateInternal(link, isOpenInSeparateTab);
   }
 
@@ -54,7 +54,7 @@ export class NavigatorService {
   }
 
   navigateAfterLogin(): void {
-    const emptyUrls = ['', '/', 'root'];
+    const emptyUrls = ['', '/'];
     const url = this._location.path();
     if (emptyUrls.includes(url)) {
       this.navigateToHome();

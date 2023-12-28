@@ -64,7 +64,7 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService {
   }
 
   navigateToPlan(id: string): void {
-    const EDITOR_URL = '/root/composites/editor';
+    const EDITOR_URL = '/composites/editor';
     this._router.navigateByUrl(`${EDITOR_URL}/${id}`);
   }
 

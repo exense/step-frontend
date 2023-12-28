@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, from, map, Observable } from 'rxjs';
+import { catchError, map, Observable } from 'rxjs';
 import {
   Plan,
   PlansService,
@@ -71,7 +71,7 @@ export class PurePlanEditApiService implements PlanEditorApiService {
   }
 
   navigateToPlan(id: string): void {
-    const EDITOR_URL = `/root/plans/editor`;
+    const EDITOR_URL = `/plans/editor`;
     this._router.navigateByUrl(`${EDITOR_URL}/${id}`);
   }
 }

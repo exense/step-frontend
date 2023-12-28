@@ -77,7 +77,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
       if (currentEId && this._executionTabManager) {
         this._executionTabManager.handleTabClose(currentEId, false);
       }
-      this._router.navigateByUrl(`/root/executions/open/${eId}`);
+      this._router.navigateByUrl(`/executions/open/${eId}`);
     });
   }
 
@@ -89,7 +89,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
     const executionParams = this.buildExecutionParams(false);
     this._scheduledTaskDialogs.newScheduledTask(executionParams).subscribe((result) => {
       if (result) {
-        this._router.navigate(['root', 'scheduler']);
+        this._router.navigate(['scheduler']);
       }
     });
   }

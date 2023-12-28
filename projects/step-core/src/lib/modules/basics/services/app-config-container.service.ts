@@ -10,7 +10,7 @@ type FieldAccessor = Mutable<Pick<AppConfigContainerService, 'conf'>>;
 export class AppConfigContainerService {
   readonly conf?: ApplicationConfiguration;
 
-  private defaultClientUrl = '/root/plans/list';
+  private defaultClientUrl = '/plans/list';
 
   setConfiguration(conf: ApplicationConfiguration): void {
     (this as FieldAccessor).conf = conf;
@@ -24,6 +24,11 @@ export class AppConfigContainerService {
     if (forceClientUrl) {
       return this.defaultClientUrl;
     }
-    return this.conf?.defaultUrl ?? this.defaultClientUrl;
+    let result = this.conf?.defaultUrl ?? this.defaultClientUrl;
+    if (result.startsWith('/root')) {
+      //TODO: temporary fix, until server side default url isn't reconfigured
+      result = result.replace('/root', '');
+    }
+    return result;
   }
 }

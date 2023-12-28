@@ -20,6 +20,7 @@ import { RootComponent } from './components/root/root.component';
 import { StepCommonModule } from './modules/_common/step-common.module';
 import { MainViewComponent } from './components/main-view/main-view.component';
 import { APP_ROUTES, DEFAULT_ROUTE_INITIALIZER } from './app.routes';
+import { APP_BASE_HREF } from '@angular/common';
 
 Settings.defaultLocale = 'en';
 
@@ -41,7 +42,7 @@ Settings.defaultLocale = 'en';
     DefaultThemeModule,
     ArtefactsModule,
     ResourcesModule,
-    RouterModule.forRoot(APP_ROUTES, { useHash: true }),
+    RouterModule.forRoot(APP_ROUTES),
   ],
   exports: [RootComponent],
   providers: [PLUGINS_INITIALIZER, DEFAULT_ROUTE_INITIALIZER],

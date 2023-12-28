@@ -15,7 +15,7 @@ import { ImportDialogsService } from './import-dialogs.service';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
 
 const ARTEFACT_ID = 'artefactId';
-const EDITOR_URL = '/root/plans/editor';
+const EDITOR_URL = '/plans/editor';
 
 @Injectable({
   providedIn: 'root',
@@ -107,7 +107,7 @@ export class PlanDialogsService implements PlanLinkDialogService {
   }
 
   executePlan(planId: string): void {
-    this._router.navigate(['root', 'repository'], {
+    this._router.navigate(['repository'], {
       queryParams: {
         repositoryId: 'local',
         planid: planId,

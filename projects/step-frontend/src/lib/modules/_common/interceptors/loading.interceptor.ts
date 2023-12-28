@@ -6,7 +6,7 @@ import { Observable, tap } from 'rxjs';
 @Injectable()
 export class LoadingInterceptor implements HttpInterceptor {
   private readonly endpoints: string[] = ['rest/plans'];
-  private readonly routes: string[] = ['/root/plans/editor/'];
+  private readonly routes: string[] = ['/plans/editor/'];
 
   private _globalProgressSpinnerService = inject(GlobalProgressSpinnerService);
 
