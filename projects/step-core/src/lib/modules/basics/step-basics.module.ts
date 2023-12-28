@@ -37,6 +37,7 @@ import { ArrayItemLabelPipe } from './pipes/array-item-label.pipe';
 import { AllowCharsDirective } from './directives/allow-chars.directive';
 import { ItemHoverDirective } from './directives/item-hover.directive';
 import { ItemHoldDirective } from './directives/item-hold.directive';
+import { OperationPerTimeInputComponent } from './components/time-input/operation-per-time-input.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -69,6 +70,7 @@ import { ItemHoldDirective } from './directives/item-hold.directive';
     UploadContainerComponent,
     ProjectSwitchDialogComponent,
     TimeInputComponent,
+    OperationPerTimeInputComponent,
     ArrayInputComponent,
     StringArrayInputComponent,
     ArrayItemLabelPipe,
@@ -110,6 +112,7 @@ import { ItemHoldDirective } from './directives/item-hold.directive';
     LabelAddonDirective,
     ProjectSwitchDialogComponent,
     TimeInputComponent,
+    OperationPerTimeInputComponent,
     ArrayInputComponent,
     StringArrayInputComponent,
     ArrayItemLabelPipe,
@@ -135,7 +138,9 @@ export * from './components/errors-list/errors-list.component';
 export * from './components/progress-bar/progress-bar.component';
 export * from './components/upload-container/upload-container.component';
 export * from './components/array-input/array-input.component';
+export { TimeUnitDictionary } from './components/time-input/base-time-converter.component';
 export * from './components/time-input/time-input.component';
+export * from './components/time-input/operation-per-time-input.component';
 export * from './components/string-array-input/string-array-input.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
