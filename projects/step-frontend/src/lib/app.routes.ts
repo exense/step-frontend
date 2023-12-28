@@ -4,6 +4,7 @@ import { APP_INITIALIZER, FactoryProvider, inject } from '@angular/core';
 import { authGuard, AuthService, DEFAULT_PAGE, nonAuthGuard } from '@exense/step-core';
 import { map, take } from 'rxjs';
 import { MainViewComponent } from './components/main-view/main-view.component';
+import { Location } from '@angular/common';
 
 export const APP_ROUTES: Routes = [
   {
@@ -55,6 +56,22 @@ export const DEFAULT_ROUTE_INITIALIZER: FactoryProvider = {
         pathMatch: 'full',
       });
 
+      return true;
+    };
+  },
+};
+
+export const LEGACY_URL_HANDLER: FactoryProvider = {
+  provide: APP_INITIALIZER,
+  multi: true,
+  useFactory: () => {
+    const _location = inject(Location);
+    return () => {
+      let path = _location.path(true);
+      if (path.includes('#/root')) {
+        path = path.replace('#/root', '');
+        _location.go(path);
+      }
       return true;
     };
   },

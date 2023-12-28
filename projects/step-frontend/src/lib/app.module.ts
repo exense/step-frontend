@@ -19,8 +19,7 @@ import { RouterModule } from '@angular/router';
 import { RootComponent } from './components/root/root.component';
 import { StepCommonModule } from './modules/_common/step-common.module';
 import { MainViewComponent } from './components/main-view/main-view.component';
-import { APP_ROUTES, DEFAULT_ROUTE_INITIALIZER } from './app.routes';
-import { APP_BASE_HREF } from '@angular/common';
+import { APP_ROUTES, DEFAULT_ROUTE_INITIALIZER, LEGACY_URL_HANDLER } from './app.routes';
 
 Settings.defaultLocale = 'en';
 
@@ -45,7 +44,7 @@ Settings.defaultLocale = 'en';
     RouterModule.forRoot(APP_ROUTES),
   ],
   exports: [RootComponent],
-  providers: [PLUGINS_INITIALIZER, DEFAULT_ROUTE_INITIALIZER],
+  providers: [LEGACY_URL_HANDLER, PLUGINS_INITIALIZER, DEFAULT_ROUTE_INITIALIZER],
   bootstrap: [RootComponent],
 })
 export class AppModule {}

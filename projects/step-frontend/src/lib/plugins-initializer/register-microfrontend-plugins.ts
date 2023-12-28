@@ -15,11 +15,7 @@ export interface PluginCtx {
 const loadModule = async (definition: MicrofrontendPluginDefinition): Promise<PluginCtx | undefined> => {
   let result: PluginCtx | undefined = undefined;
   try {
-    let href = window.location.href;
-    if (href.includes('#')) {
-      href = href.substring(0, href.indexOf('#'));
-    }
-
+    let href = window.document.baseURI;
     if (!href.endsWith('/')) {
       href += '/';
     }
