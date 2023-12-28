@@ -17,10 +17,10 @@ import { tablePersistenceConfigProvider } from '../../../table/services/table-pe
       storeSort: false,
       storeSearch: false,
     }),
-    selectionCollectionProvider<string, AutomationPackage>('id', AutoDeselectStrategy.KEEP_SELECTION),
+    ...selectionCollectionProvider<string, AutomationPackage>('id', AutoDeselectStrategy.KEEP_SELECTION),
   ],
 })
-export class AutomationPackageFilterPopoverComponent implements AfterViewInit, OnDestroy {
+export class AutomationPackageFilterPopoverComponent implements AfterViewInit {
   private _selectionCollector = inject<SelectionCollector<string, AutomationPackage>>(SelectionCollector);
   protected _dataSource = inject(AugmentedAutomationPackagesService).createDataSource();
 
@@ -43,10 +43,5 @@ export class AutomationPackageFilterPopoverComponent implements AfterViewInit, O
       this._selectionCollector.selectById(...this.preselectedIds!);
       this.preselectedIds = undefined;
     }
-  }
-
-  ngOnDestroy(): void {
-    //TODO this should be fixed!!!
-    this._selectionCollector.destroy();
   }
 }
