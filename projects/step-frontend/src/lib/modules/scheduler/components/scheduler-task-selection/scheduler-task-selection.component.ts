@@ -14,7 +14,7 @@ import {
   templateUrl: './scheduler-task-selection.component.html',
   styleUrls: ['./scheduler-task-selection.component.scss'],
   providers: [
-    selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
 })
 export class SchedulerTaskSelectionComponent extends BaseEntitySelectionTableComponent {

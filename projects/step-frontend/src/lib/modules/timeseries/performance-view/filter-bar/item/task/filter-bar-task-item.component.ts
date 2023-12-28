@@ -14,7 +14,7 @@ export class FilterBarTaskItemComponent {
   private _entityDialogs = inject(EntityDialogsService);
 
   showPicker() {
-    this._entityDialogs.selectEntityOfType('tasks', true).subscribe((result) => {
+    this._entityDialogs.selectEntityOfType('tasks').subscribe((result) => {
       this.addSearchTask(result.item as ExecutiontTaskParameters);
     });
   }

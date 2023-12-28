@@ -14,7 +14,7 @@ export class FilterBarExecutionItemComponent {
   private _entityDialogs = inject(EntityDialogsService);
 
   showExecutionPicker() {
-    this._entityDialogs.selectEntityOfType('executions', true).subscribe((result) => {
+    this._entityDialogs.selectEntityOfType('executions').subscribe((result) => {
       this.addSearchExecution(result.item as Execution);
     });
   }

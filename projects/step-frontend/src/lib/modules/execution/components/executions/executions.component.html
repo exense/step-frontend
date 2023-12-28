@@ -7,4 +7,6 @@
   >
   </step-execution-tabs>
 </ng-container>
-<router-outlet> </router-outlet>
+<div class="panel-body" [class.small-screen]="_isSmallScreen$ | async">
+  <router-outlet> </router-outlet>
+</div>

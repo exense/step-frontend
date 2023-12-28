@@ -30,6 +30,4 @@ export abstract class SelectionCollector<KEY, ENTITY> {
    * Method's result is approximate, because collector might not contain all information about every selected item
    * **/
   abstract checkCurrentSelectionState(predicate: (item: ENTITY) => boolean): Map<KEY, boolean>;
-
-  abstract destroy(): void;
 }

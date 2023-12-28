@@ -24,7 +24,7 @@ const RESOURCE_ID = 'resourceId';
   styleUrls: ['./resources-list.component.scss'],
   providers: [
     tablePersistenceConfigProvider('resourceList', STORE_ALL),
-    selectionCollectionProvider<string, Resource>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...selectionCollectionProvider<string, Resource>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
 })
 export class ResourcesListComponent implements AfterViewInit {

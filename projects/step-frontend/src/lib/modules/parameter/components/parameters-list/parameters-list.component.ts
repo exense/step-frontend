@@ -14,7 +14,7 @@ import { ParameterListLogicService } from '../../services/parameter-list-logic.s
   styleUrls: ['./parameters-list.component.scss'],
   providers: [
     tablePersistenceConfigProvider('parametersList', STORE_ALL),
-    selectionCollectionProvider<string, Parameter>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...selectionCollectionProvider<string, Parameter>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     ParameterListLogicService,
   ],
 })

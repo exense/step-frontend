@@ -229,7 +229,7 @@
           #from="stepDateFilter"
           stepFocusable
           [defaultSpace]="false"
-          (keydownSpace)="from.matDatepicker?.open()"
+          (keydownSpace)="from.stepPicker?.open()"
           [stepRecursiveTabIndex]="-1"
         ></step-date-filter>
 
@@ -239,7 +239,7 @@
           #to="stepDateFilter"
           stepFocusable
           [defaultSpace]="false"
-          (keydownSpace)="to.matDatepicker?.open()"
+          (keydownSpace)="to.stepPicker?.open()"
           [stepRecursiveTabIndex]="-1"
         ></step-date-filter>
       </div>
