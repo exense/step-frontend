@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewEncapsulation } from '@angular/core';
 import {
   AugmentedExecutionsService,
   AutoDeselectStrategy,
@@ -22,6 +22,7 @@ import { Router } from '@angular/router';
     tablePersistenceConfigProvider('executionList', STORE_ALL),
     ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
+  encapsulation: ViewEncapsulation.None,
 })
 export class ExecutionListComponent {
   private _router = inject(Router);
