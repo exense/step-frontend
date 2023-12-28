@@ -1,13 +1,11 @@
 import { InjectionToken, TrackByFunction } from '@angular/core';
 import { KeyValue } from '@angular/common';
 import { MONTHS_DICTIONARY } from '../types/months';
+import { createRange } from '../../basics/step-basics.module';
 
 export type RangeItem = KeyValue<number | string, string>;
 
 export const trackByRange: TrackByFunction<RangeItem> = (_, item) => item.key;
-
-const createRange = (stop: number, start: number = 0, step: number = 1) =>
-  Array.from({ length: (stop - start) / step + 1 }, (_, index) => start + index * step);
 
 const createDayLabel = (day: number) => {
   const dayStr = day.toString();

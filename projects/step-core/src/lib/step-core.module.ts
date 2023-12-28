@@ -92,6 +92,7 @@ import { MessagesListDialogComponent } from './components/messages-list-dialog/m
 import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
 import { ReportNodeIconComponent } from './components/report-node-icon/report-node-icon.component';
 import { AutomationPackageCommonModule } from './modules/automation-package-common/automation-package-common.module';
+import { DatePickerModule } from './modules/date-picker/date-picker.module';
 
 @NgModule({
   declarations: [
@@ -184,6 +185,7 @@ import { AutomationPackageCommonModule } from './modules/automation-package-comm
     AutomationPackageCommonModule,
     WizardModule,
     CronModule,
+    DatePickerModule,
   ],
   exports: [
     CommonModule,
@@ -268,6 +270,7 @@ import { AutomationPackageCommonModule } from './modules/automation-package-comm
     ConfirmationDialogComponent,
     MessagesListDialogComponent,
     MessageDialogComponent,
+    DatePickerModule,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -381,6 +384,7 @@ export * from './modules/keywords-common/keywords-common.module';
 export * from './modules/wizard/wizards.module';
 export * from './modules/automation-package-common/automation-package-common.module';
 export * from './modules/cron/cron.module';
+export * from './modules/date-picker/date-picker.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/safe-html.pipe';

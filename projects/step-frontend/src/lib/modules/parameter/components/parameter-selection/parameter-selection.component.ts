@@ -13,7 +13,7 @@ import {
   selector: 'step-parameter-selection',
   templateUrl: './parameter-selection.component.html',
   styleUrls: ['./parameter-selection.component.scss'],
-  providers: [selectionCollectionProvider<string, Parameter>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
+  providers: [...selectionCollectionProvider<string, Parameter>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
 })
 export class ParameterSelectionComponent extends BaseEntitySelectionTableComponent {
   protected _selectionCollector = inject<SelectionCollector<string, Parameter>>(SelectionCollector);

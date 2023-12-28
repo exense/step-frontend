@@ -148,13 +148,9 @@ export class SelectionCollectorImpl<KEY, ENTITY> implements SelectionCollector<K
     return this.selectedPossible;
   }
 
-  destroy(): void {
+  ngOnDestroy(): void {
     this._selected$.complete();
     this.possibleSelections.clear();
     this.unregister$.complete();
-  }
-
-  ngOnDestroy(): void {
-    this.destroy();
   }
 }
