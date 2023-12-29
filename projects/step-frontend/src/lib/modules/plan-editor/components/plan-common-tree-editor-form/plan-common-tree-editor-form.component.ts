@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import {
   AbstractArtefact,
   ArtefactsFactoryService,
@@ -14,10 +14,10 @@ import {
   PlanEditorStrategy,
   PlansService,
   TreeStateService,
+  PlanEditorApiService,
 } from '@exense/step-core';
 import { BehaviorSubject, filter, first, map, merge, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
-import { PlanEditorApiService } from '../../injectables/plan-editor-api.service';
 
 const MESSAGE_ADD_AT_MULTIPLE_NODES =
   'Adding elements is not supported when more then one node is selected in the tree';
@@ -66,7 +66,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
 
   addControl(artefactTypeId: string): void {
     if (this._treeState.isMultipleNodesSelected()) {
-      this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES);
+      this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES).subscribe();
       return;
     }
     this._artefactsFactory.createControlArtefact(artefactTypeId).subscribe((artefact) => {
@@ -76,7 +76,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
 
   addFunction(keywordId: string): void {
     if (this._treeState.isMultipleNodesSelected()) {
-      this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES);
+      this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES).subscribe();
       return;
     }
     this._artefactsFactory.createCallKeywordArtefact(keywordId).subscribe((artefact) => {
@@ -86,7 +86,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
 
   addPlan(planId: string): void {
     if (this._treeState.isMultipleNodesSelected()) {
-      this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES);
+      this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES).subscribe();
       return;
     }
     this._artefactsFactory.createCallPlanArtefact(planId).subscribe((artefact) => {

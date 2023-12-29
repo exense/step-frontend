@@ -1,6 +1,5 @@
 import { AfterViewInit, Component, inject } from '@angular/core';
 import {
-  AJS_MODULE,
   AugmentedKeywordPackagesService,
   AutoDeselectStrategy,
   FunctionPackage,
@@ -8,7 +7,6 @@ import {
   STORE_ALL,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
 
 @Component({
@@ -17,7 +15,7 @@ import { FunctionPackageActionsService } from '../../services/function-package-a
   styleUrls: ['./function-package-list.component.scss'],
   providers: [
     tablePersistenceConfigProvider('functionPackageList', STORE_ALL),
-    selectionCollectionProvider<string, FunctionPackage>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...selectionCollectionProvider<string, FunctionPackage>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
 })
 export class FunctionPackageListComponent implements AfterViewInit {
@@ -63,7 +61,3 @@ export class FunctionPackageListComponent implements AfterViewInit {
     });
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepFunctionPackageList', downgradeComponent({ component: FunctionPackageListComponent }));

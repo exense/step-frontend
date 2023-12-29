@@ -1,7 +1,11 @@
 :host {
-  display: block;
-  padding: 0.3rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   clear: both;
   white-space: nowrap;
-  cursor: pointer;
+}
+
+step-icon {
+  line-height: 1;
 }

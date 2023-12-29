@@ -4,8 +4,8 @@ import { DynamicValueInteger, DynamicValueString } from '../../../../client/step
 import { DialogsService } from '../../../../shared';
 import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-base.component';
 
-const NUMBER_RESTRICTION_POSITIVE_ONLY = ['+', '-', 'e'];
-const NUMBER_RESTRICTION_WITH_NEGATIVE = ['+', 'e'];
+const NUMBER_CHARS_POSITIVE_ONLY = '0123456789.,'.split('');
+const NUMBER_CHARS_WITH_NEGATIVE = ['-', ...NUMBER_CHARS_POSITIVE_ONLY];
 
 @Component({
   selector: 'step-dynamic-textfield',
@@ -20,7 +20,7 @@ export class DynamicTextfieldComponent
   @Input() isNumber = false;
   @Input() isNegativeNumberAllowed = false;
 
-  protected numberInputInvalidChars = NUMBER_RESTRICTION_POSITIVE_ONLY;
+  protected allowedChars = NUMBER_CHARS_POSITIVE_ONLY;
 
   constructor(private _dialogsService: DialogsService, _ngControl: NgControl) {
     super(_ngControl);
@@ -45,23 +45,17 @@ export class DynamicTextfieldComponent
       cIsNegativeNumberAllowed?.previousValue !== cIsNegativeNumberAllowed?.currentValue ||
       cIsNegativeNumberAllowed?.firstChange
     ) {
-      this.numberInputInvalidChars = cIsNegativeNumberAllowed?.currentValue
-        ? NUMBER_RESTRICTION_WITH_NEGATIVE
-        : NUMBER_RESTRICTION_POSITIVE_ONLY;
+      this.allowedChars = cIsNegativeNumberAllowed?.currentValue
+        ? NUMBER_CHARS_WITH_NEGATIVE
+        : NUMBER_CHARS_POSITIVE_ONLY;
     }
   }
 
   editConstantValue(): void {
-    this._dialogsService.enterValue(
-      'Free text editor',
-      this.value.toString(),
-      'lg',
-      'enterTextValueDialog',
-      (value) => {
-        this.value = this.parseValue(value);
-        this.emitChanges();
-      }
-    );
+    this._dialogsService.enterValue('Free text editor', this.value.toString(), true).subscribe((value) => {
+      this.value = this.parseValue(value);
+      this.emitChanges();
+    });
   }
 
   private parseValue(value: string): string | number {

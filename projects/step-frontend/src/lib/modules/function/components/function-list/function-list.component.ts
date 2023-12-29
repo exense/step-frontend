@@ -1,7 +1,5 @@
 import { AfterViewInit, Component, inject, Injector } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  AJS_MODULE,
   AugmentedKeywordsService,
   AutoDeselectStrategy,
   Keyword,
@@ -9,7 +7,6 @@ import {
   tablePersistenceConfigProvider,
   STORE_ALL,
   FunctionActionsService,
-  RestoreDialogsService,
   KeywordExecutorService,
 } from '@exense/step-core';
 import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
@@ -20,7 +17,7 @@ import { FunctionPackageActionsService } from '../../services/function-package-a
   styleUrls: ['./function-list.component.scss'],
   providers: [
     tablePersistenceConfigProvider('functionList', STORE_ALL),
-    selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
 })
 export class FunctionListComponent implements AfterViewInit {
@@ -28,7 +25,6 @@ export class FunctionListComponent implements AfterViewInit {
   private _functionApiService = inject(AugmentedKeywordsService);
   private _functionActions = inject(FunctionActionsService);
   private _functionPackageDialogs = inject(FunctionPackageActionsService);
-  private _restoreDialogsService = inject(RestoreDialogsService);
   private _keywordExecutor = inject(KeywordExecutorService);
 
   readonly dataSource = this._functionApiService.createFilteredTableDataSource();
@@ -92,28 +88,4 @@ export class FunctionListComponent implements AfterViewInit {
       }
     });
   }
-
-  displayHistory(keyword: Keyword, permission: string): void {
-    if (!keyword.id) {
-      return;
-    }
-
-    const id = keyword.id!;
-    const keywordVersion = keyword.customFields ? keyword.customFields['versionId'] : undefined;
-    const versionHistory = this._functionApiService.getFunctionVersions(id);
-
-    this._restoreDialogsService
-      .showRestoreDialog(keywordVersion, versionHistory, permission)
-      .subscribe((restoreVersion) => {
-        if (!restoreVersion) {
-          return;
-        }
-
-        this._functionApiService.restoreFunctionVersion(id, restoreVersion).subscribe(() => this.dataSource.reload());
-      });
-  }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepFunctionList', downgradeComponent({ component: FunctionListComponent }));

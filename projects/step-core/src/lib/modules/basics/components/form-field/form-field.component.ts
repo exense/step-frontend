@@ -1,4 +1,4 @@
-import { Component, ContentChild, ViewEncapsulation } from '@angular/core';
+import { Component, ContentChild, Input, ViewEncapsulation } from '@angular/core';
 import { NgControl } from '@angular/forms';
 @Component({
   selector: 'step-form-field',
@@ -13,4 +13,6 @@ import { NgControl } from '@angular/forms';
 export class FormFieldComponent {
   @ContentChild(NgControl)
   control?: NgControl;
+
+  @Input() alignLabelAddon: 'separate' | 'near' = 'separate';
 }

@@ -13,7 +13,9 @@ import {
   selector: 'step-function-package-selection',
   templateUrl: 'function-package-selection.component.html',
   styleUrls: ['./function-package-selection.component.scss'],
-  providers: [selectionCollectionProvider<string, FunctionPackage>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
+  providers: [
+    ...selectionCollectionProvider<string, FunctionPackage>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+  ],
 })
 export class FunctionPackageSelectionComponent extends BaseEntitySelectionTableComponent {
   protected _selectionCollector = inject<SelectionCollector<string, FunctionPackage>>(SelectionCollector);

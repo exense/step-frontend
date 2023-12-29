@@ -1,32 +1,18 @@
+import { Component, inject, Inject, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import {
-  Component,
-  EventEmitter,
-  inject,
-  Inject,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
-import {
-  AJS_MODULE,
-  AJS_ROOT_SCOPE,
   ArtefactFilter,
   AugmentedExecutionsService,
   AugmentedScreenService,
+  AuthService,
   Execution,
   ExecutionParameters,
   RepositoryObjectReference,
   ScheduledTaskDialogsService,
 } from '@exense/step-core';
-import { IRootScopeService } from 'angular';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { DOCUMENT } from '@angular/common';
 import { IncludeTestcases } from '../../shared/include-testcases.interface';
 import { Router } from '@angular/router';
-import { from, map, switchMap } from 'rxjs';
-import { ExecutionOpenNotificatorService } from '../../services/execution-open-notificator.service';
+import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 
 @Component({
   selector: 'step-execution-commands',
@@ -34,7 +20,7 @@ import { ExecutionOpenNotificatorService } from '../../services/execution-open-n
   styleUrls: ['./execution-commands.component.scss'],
 })
 export class ExecutionCommandsComponent implements OnInit, OnChanges {
-  private _executionOpenNotifier = inject(ExecutionOpenNotificatorService, { optional: true });
+  private _executionTabManager = inject(ExecutionTabManagerService, { optional: true });
   private _router = inject(Router);
 
   @Input() description?: string;
@@ -42,7 +28,6 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
   @Input() isolateExecution?: boolean;
   @Input() includedTestcases?: IncludeTestcases | null;
   @Input() execution?: Execution;
-  @Output() onExecute = new EventEmitter<unknown>();
 
   executionParameters?: Record<string, string>;
   isExecutionIsolated: boolean = false;
@@ -51,7 +36,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
     private _executionService: AugmentedExecutionsService,
     private _screenTemplates: AugmentedScreenService,
     private _scheduledTaskDialogs: ScheduledTaskDialogsService,
-    @Inject(AJS_ROOT_SCOPE) private _rootScope$: IRootScopeService,
+    private _authService: AuthService,
     @Inject(DOCUMENT) private _document: Document
   ) {}
 
@@ -86,14 +71,14 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
   }
 
   execute(simulate: boolean): void {
+    const currentEId = this.execution?.id;
     const executionParams = this.buildExecutionParams(simulate);
-    this._executionService
-      .execute(executionParams)
-      .pipe(switchMap((eId) => from(this._router.navigateByUrl(`/root/executions/${eId}`)).pipe(map(() => eId))))
-      .subscribe((eId) => {
-        this.onExecute.emit({});
-        this._executionOpenNotifier?.openNotify(eId);
-      });
+    this._executionService.execute(executionParams).subscribe((eId) => {
+      if (currentEId && this._executionTabManager) {
+        this._executionTabManager.handleTabClose(currentEId, false);
+      }
+      this._router.navigateByUrl(`/root/executions/open/${eId}`);
+    });
   }
 
   stop(): void {
@@ -139,7 +124,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
   }
 
   private buildExecutionParams(simulate: boolean): ExecutionParameters {
-    const userID = (this._rootScope$ as any)['context']['userID'];
+    const userID = this._authService.getContext().userID;
     const description = this.description;
     const mode = simulate ? 'SIMULATION' : 'RUN';
     const repositoryObject = this.repositoryObjectRef;
@@ -175,7 +160,3 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
     };
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepExecutionCommands', downgradeComponent({ component: ExecutionCommandsComponent }));

@@ -1,12 +1,11 @@
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, switchMap, catchError, of } from 'rxjs';
-import { a1Promise2Observable, AJS_MODULE, DialogsService } from '../shared';
-import { ExecutionParameters, ExecutiontTaskParameters, AugmentedSchedulerService } from '../client/step-client-module';
 import { MatDialog } from '@angular/material/dialog';
-import { NewSchedulerTaskDialogComponent } from '../components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
+import { filter, map, Observable, of, switchMap } from 'rxjs';
+import { AugmentedSchedulerService, ExecutionParameters, ExecutiontTaskParameters } from '../client/step-client-module';
 import { EditSchedulerTaskDialogComponent } from '../components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
+import { NewSchedulerTaskDialogComponent } from '../components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 import { EntityDialogsService } from '../modules/entity/services/entity-dialogs.service';
+import { DialogsService } from '../shared';
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +17,7 @@ export class ScheduledTaskDialogsService {
   private _entityDialogs = inject(EntityDialogsService);
 
   selectTask(): Observable<ExecutiontTaskParameters | undefined> {
-    return this._entityDialogs.selectEntityOfType('tasks', true).pipe(
+    return this._entityDialogs.selectEntityOfType('tasks').pipe(
       map((result) => result?.item?.id),
       switchMap((id) => (!id ? of(undefined) : this._schedulerService.getExecutionTaskById(id)))
     );
@@ -52,14 +51,10 @@ export class ScheduledTaskDialogsService {
 
   removeScheduledTask(task: ExecutiontTaskParameters): Observable<boolean> {
     const paramName: string = task.attributes!['name']!;
-    return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Task "${paramName}"`)).pipe(
-      switchMap(() => this._schedulerService.deleteExecutionTask(task.id!)),
-      map(() => true),
-      catchError(() => of(false))
+
+    return this._dialogs.showDeleteWarning(1, `Task "${paramName}"`).pipe(
+      filter((result) => result),
+      switchMap(() => this._schedulerService.deleteExecutionTask(task.id!))
     );
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .service('ScheduledTaskDialogsService', downgradeInjectable(ScheduledTaskDialogsService));

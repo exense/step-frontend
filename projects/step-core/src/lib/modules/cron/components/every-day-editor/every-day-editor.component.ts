@@ -1,5 +1,6 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { HoursEditorComponent } from '../hours-editor/hours-editor.component';
+import { RANGE_DAYS } from '../../injectables/ranges.tokens';
 
 @Component({
   selector: 'step-every-day-editor',
@@ -11,11 +12,9 @@ import { HoursEditorComponent } from '../hours-editor/hours-editor.component';
   encapsulation: ViewEncapsulation.None,
 })
 export class EveryDayEditorComponent extends HoursEditorComponent {
-  override readonly HOURS = this.createRange(23, 1).map((key) => ({ key, value: key.toString().padStart(2, '0') }));
+  readonly _DAYS = inject(RANGE_DAYS);
 
-  readonly DAYS = this.createRange(31, 1).map((key) => ({ key, value: key.toString() }));
-
-  protected day = this.DAYS[0].key;
+  protected day = this._DAYS[0].key;
 
   protected handleDayChange(value: number): void {
     this.day = value;

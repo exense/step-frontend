@@ -47,6 +47,7 @@ import { HasFilter } from '../../../entities-selection/services/has-filter';
 import { FilterCondition } from '../../shared/filter-condition';
 import { SearchColumn } from '../../shared/search-column.interface';
 import { TablePersistenceStateService } from '../../services/table-persistence-state.service';
+import { TableHighlightItemContainer } from '../../services/table-highlight-item-container.service';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -72,11 +73,24 @@ export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Obser
       provide: HasFilter,
       useExisting: forwardRef(() => TableComponent),
     },
+    {
+      provide: TableHighlightItemContainer,
+      useExisting: forwardRef(() => TableComponent),
+    },
     TablePersistenceStateService,
   ],
 })
 export class TableComponent<T>
-  implements OnInit, AfterViewInit, OnChanges, OnDestroy, TableSearch, TableFilter, TableReload, HasFilter
+  implements
+    OnInit,
+    AfterViewInit,
+    OnChanges,
+    OnDestroy,
+    TableSearch,
+    TableFilter,
+    TableReload,
+    HasFilter,
+    TableHighlightItemContainer
 {
   @Output() onReload = new EventEmitter<unknown>();
   @Input() trackBy: TrackByFunction<T> = (index) => index;
@@ -135,7 +149,6 @@ export class TableComponent<T>
   searchColumns: SearchColumn[] = [];
 
   pageSizeOptions: Array<number>;
-
   readonly trackBySearchColumn: TrackByFunction<SearchColumn> = (index, item) => item.colName;
 
   private terminator$ = new Subject<void>();
@@ -164,6 +177,8 @@ export class TableComponent<T>
       return hasFilter;
     })
   );
+
+  highlightedItem?: unknown;
 
   constructor(
     @Optional() private _sort: MatSort,

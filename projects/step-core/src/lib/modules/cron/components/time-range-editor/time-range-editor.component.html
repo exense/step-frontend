@@ -1,0 +1,74 @@
+<section [formGroup]="timeRangeForm">
+  <mat-radio-group formControlName="type">
+    <mat-radio-button [value]="TimeRangeType.CONCRETE_DATE" color="primary">
+      <step-form-field class="no-label-focus" (click)="updateRange(TimeRangeType.CONCRETE_DATE)">
+        <step-label>Specific date</step-label>
+        <input type="text" [stepDatePicker]="picker" formControlName="date" />
+        <step-suffix class="button-suffix">
+          <button
+            type="button"
+            mat-stroked-button
+            (click)="picker.open()"
+            [disabled]="timeRangeForm.controls['date'].disabled"
+          >
+            <step-icon name="calendar" (click)="picker.open()"></step-icon>
+          </button>
+        </step-suffix>
+      </step-form-field>
+    </mat-radio-button>
+    <mat-radio-button [value]="TimeRangeType.DAYS_RANGE" color="primary">
+      <step-form-field class="no-label-focus" (click)="updateRange(TimeRangeType.DAYS_RANGE)">
+        <step-label>Day range</step-label>
+        <div formGroupName="daysRange" class="editor-content range-group">
+          <mat-select formControlName="month">
+            <mat-option *ngFor="let item of _MONTHS; trackBy: trackByKeyValue" [value]="item.key">{{
+              item.value
+            }}</mat-option>
+          </mat-select>
+          <mat-select formControlName="year">
+            <mat-option *ngFor="let item of _YEARS; trackBy: trackByKeyValue" [value]="item.key">{{
+              item.value
+            }}</mat-option>
+          </mat-select>
+          <span>Day from </span>
+          <mat-select formControlName="dayFrom">
+            <mat-option [value]="null"></mat-option>
+            <mat-option *ngFor="let item of _DAYS; trackBy: trackByKeyValue" [value]="item.key">{{
+              item.value
+            }}</mat-option>
+          </mat-select>
+          <span>to </span>
+          <mat-select formControlName="dayTo">
+            <mat-option [value]="null"></mat-option>
+            <mat-option *ngFor="let item of _DAYS; trackBy: trackByKeyValue" [value]="item.key">{{
+              item.value
+            }}</mat-option>
+          </mat-select>
+        </div>
+      </step-form-field>
+    </mat-radio-button>
+  </mat-radio-group>
+  <step-form-field class="no-label-focus" alignLabelAddon="near">
+    <step-label>Hour range</step-label>
+    <step-label-addon>
+      <step-icon name="help-circle" [matTooltip]="_tooltipHours" matTooltipPosition="above"> </step-icon>
+    </step-label-addon>
+    <section class="editor-content">
+      <span>from </span>
+      <mat-select formControlName="hourFrom">
+        <mat-option [value]="0">00</mat-option>
+        <mat-option *ngFor="let item of _HOURS; trackBy: trackByKeyValue" [value]="item.key">{{
+          item.value
+        }}</mat-option>
+      </mat-select>
+      <span>to </span>
+      <mat-select formControlName="hourTo">
+        <mat-option [value]="0">00</mat-option>
+        <mat-option *ngFor="let item of _HOURS; trackBy: trackByKeyValue" [value]="item.key">{{
+          item.value
+        }}</mat-option>
+      </mat-select>
+    </section>
+  </step-form-field>
+</section>
+<step-date-picker #picker></step-date-picker>

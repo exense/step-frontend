@@ -13,7 +13,7 @@ import {
   selector: 'step-user-selection',
   templateUrl: './user-selection.component.html',
   styleUrls: ['./user-selection.component.scss'],
-  providers: [selectionCollectionProvider<string, User>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
+  providers: [...selectionCollectionProvider<string, User>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
 })
 export class UserSelectionComponent extends BaseEntitySelectionTableComponent {
   protected _selectionCollector = inject<SelectionCollector<string, User>>(SelectionCollector);

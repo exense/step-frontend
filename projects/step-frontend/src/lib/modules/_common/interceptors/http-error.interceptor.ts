@@ -63,9 +63,11 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   }
 
   private showError(error: any) {
-    /* Filtering out ": 0 Unknown Error" which is not helpful and confuses users */
-    if (typeof error !== 'string' || error.endsWith(': 0 Unknown Error')) {
-      console.error('Silent Error', error);
+    if (typeof error !== 'string') {
+      console.error('Error with unknown format', error);
+    } else if (error.endsWith(': 0 Unknown Error')) {
+      /* ": 0 Unknown Error" indicates a general network error, for now we assume this is always the case and format it in a user-friendly way */
+      this._snackBar.open('An unknown Network Error occurred', 'dismiss');
     } else {
       this._snackBar.open(error, 'dismiss');
     }

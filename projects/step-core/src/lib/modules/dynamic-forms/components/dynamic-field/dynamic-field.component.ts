@@ -83,13 +83,11 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
   }
 
   editStringValueInModal(): void {
-    this._dialogService.enterValue(
-      'Free text editor',
-      this.value ? this.value.toString() : '',
-      'lg',
-      'enterTextValueDialog',
-      (value) => this.valueChange(value)
-    );
+    this._dialogService
+      .enterValue('Free text editor', this.value ? this.value.toString() : '', true)
+      .subscribe((value) => {
+        this.valueChange(value);
+      });
   }
 
   protected fixLabelFocus($event: MouseEvent): void {

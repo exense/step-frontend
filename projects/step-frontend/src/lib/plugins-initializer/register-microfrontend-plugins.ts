@@ -1,7 +1,7 @@
 import { loadRemoteModule, LoadRemoteModuleOptions } from '@angular-architects/module-federation';
-import { Type } from '@angular/core';
+import { Injector, Type } from '@angular/core';
 import { MicrofrontendPluginDefinition } from './shared/microfrontend-plugin-definition';
-import { CompileCtx, CompiledModule, compileModule, registerCompiledModules } from './shared/module-utils';
+import { CompiledModule, compileModule, registerCompiledModules } from './shared/module-utils';
 
 interface PluginModuleDeclaration {
   PluginModule: Type<any>;
@@ -44,7 +44,7 @@ const loadModule = async (definition: MicrofrontendPluginDefinition): Promise<Pl
 
 export const registerMicrofrontendPlugins = async (
   pluginsDefinitions: MicrofrontendPluginDefinition[],
-  compileCtx: CompileCtx
+  injector: Injector
 ): Promise<void> => {
   if (pluginsDefinitions.length === 0) {
     return;
@@ -54,7 +54,7 @@ export const registerMicrofrontendPlugins = async (
   const pluginCtxs = (await Promise.all(loadModules)).filter((x) => !!x) as PluginCtx[];
 
   const compileModules = pluginCtxs.map((ctx) =>
-    compileModule(ctx.definition.entryPoint, ctx.declaration.PluginModule, compileCtx)
+    compileModule(ctx.definition.entryPoint, ctx.declaration.PluginModule, injector)
   );
   const modules = (await Promise.all(compileModules)).filter((x) => !!x) as CompiledModule[];
 

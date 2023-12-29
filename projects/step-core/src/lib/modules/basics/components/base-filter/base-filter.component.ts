@@ -1,9 +1,10 @@
 import { FormBuilder, FormControl } from '@angular/forms';
-import { Directive, EventEmitter, inject, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Directive, EventEmitter, inject, OnDestroy, OnInit, Output } from '@angular/core';
 import { Observable, Subject, takeUntil } from 'rxjs';
 
 @Directive({})
 export abstract class BaseFilterComponent<T, CV = T> implements OnInit, OnDestroy {
+  private _cd = inject(ChangeDetectorRef);
   protected _formBuilder = inject(FormBuilder);
 
   readonly filterControl = this.createControl(this._formBuilder);
@@ -24,6 +25,7 @@ export abstract class BaseFilterComponent<T, CV = T> implements OnInit, OnDestro
   assignValue(value: T): void {
     const controlValue = this.transformFilterValueToControlValue(value);
     this.filterControl.setValue(controlValue, { emitEvent: false });
+    this._cd.detectChanges();
   }
 
   ngOnInit(): void {

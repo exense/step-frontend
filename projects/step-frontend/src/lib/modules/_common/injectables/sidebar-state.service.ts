@@ -101,7 +101,7 @@ export class SidebarStateService implements OnDestroy, LogoutCleanup {
   private setupIsOpenedChange(): void {
     combineLatest([this.isOpened$, this._isSmallScreen$]).subscribe(([isOpened, isSmallScreen]) => {
       const main = this._document.querySelector('#main');
-      const tenantSelection = this._document.querySelector('step-tenant-selection-downgraded');
+      const tenantSelection = this._document.querySelector('#project-select');
 
       if (!isOpened) {
         if (isSmallScreen) {
@@ -111,11 +111,11 @@ export class SidebarStateService implements OnDestroy, LogoutCleanup {
           main!.classList.remove(MAIN_WHEN_SIDEBAR_CLOSED_SMALL_SCREEN);
           main!.classList.add(MAIN_WHEN_SIDEBAR_CLOSED);
         }
-        tenantSelection!.classList.add(TENANT_SELECTOR_WHEN_SIDEBAR_CLOSED);
+        tenantSelection?.classList?.add?.(TENANT_SELECTOR_WHEN_SIDEBAR_CLOSED);
       } else {
         main!.classList.remove(MAIN_WHEN_SIDEBAR_CLOSED);
         main!.classList.remove(MAIN_WHEN_SIDEBAR_CLOSED_SMALL_SCREEN);
-        tenantSelection!.classList.remove(TENANT_SELECTOR_WHEN_SIDEBAR_CLOSED);
+        tenantSelection?.classList?.remove?.(TENANT_SELECTOR_WHEN_SIDEBAR_CLOSED);
       }
     });
   }

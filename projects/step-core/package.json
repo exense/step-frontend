@@ -4,7 +4,7 @@
   "schematics": "./schematics/collection.json",
   "scripts": {
     "build": "tsc -p tsconfig.schematcis.json",
-    "postbuild": "copyfiles schematics/*/schema.json schematics/*/files/** schematics/*/files/**/.* schematics/collection.json ../../dist/step-core ",
+    "postbuild": "node copy-schematic-files.js",
     "pack": "",
     "push": "npm publish ../../dist/step-core/*.tgz"
   },
@@ -17,11 +17,10 @@
     }
   },
   "peerDependencies": {
-    "@angular-architects/module-federation": "14.2.0",
+    "@angular-architects/module-federation": "14.3.0",
     "@angular/common": "14.2.8",
     "@angular/core": "14.2.8",
     "@angular/forms": "14.2.8",
-    "@angular/upgrade": "14.2.8",
     "@angular-devkit/schematics": "14.2.7",
     "@angular/material": "14.2.6",
     "@angular/router": "14.2.8",
@@ -33,12 +32,14 @@
     "@types/uuid": "8.3.4",
     "uuid": "8.3.2",
     "rxjs": "7.4.0",
-    "angular-split": "14.1.0"
+    "angular-split": "14.1.0",
+    "ngx-build-plus": "14.0.0",
+    "luxon": "2.0.0"
   },
   "dependencies": {
     "tslib": "2.3.0"
   },
   "devDependencies": {
-    "copyfiles": "2.4.1"
+    "shelljs": "0.8.5"
   }
 }

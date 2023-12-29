@@ -1,5 +1,4 @@
 export * from './additional-right-rule';
-export * from './angularjs-providers';
 export * from './constants';
 export * from './date-format.enum';
 export * from './dialogs.service';
@@ -9,6 +8,7 @@ export * from './plugin-lazy-load';
 export * from './utils';
 export * from './plan-tree-action.enum';
 export * from './plan-editor-strategy';
+export * from './plan-editor-context.interface';
 export * from './ace-mode.enum';
 export * from './script-language.enum';
 export * from './persistence-tokens';
@@ -22,3 +22,4 @@ export * from './dynamic-value-validators-factory';
 export * from './link-display-type.enum';
 export * from './sub-route-data.interface';
 export * from './sub-router-config.interface';
+export * from './auto-refresh-model.interface';

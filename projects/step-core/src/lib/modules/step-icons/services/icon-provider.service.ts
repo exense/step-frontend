@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 import { allIcons } from '../icons';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { STEP_CORE_JS } from '../../../angularjs';
 
 const STRING_CAMELIZE_REGEXP = /(-|_|\.|\s)+(.)?/g;
 
@@ -33,5 +31,3 @@ export class IconProviderService {
     return svg;
   }
 }
-
-getAngularJSGlobal().module(STEP_CORE_JS).service('iconProverService', downgradeInjectable(IconProviderService));

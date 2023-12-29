@@ -5,6 +5,7 @@ import { TimeRangePickerSelection } from './time-range-picker-selection';
 import { ExecutionTimeSelection } from './model/execution-time-selection';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { DateTime } from 'luxon';
 
 /**
  * When dealing with relative/full selection, this component should not know anything about dates, therefore no date calculations are needed.
@@ -171,14 +172,20 @@ export class TimeRangePickerComponent implements OnInit {
     this.onSelectionChange.emit(selection);
   }
 
-  setFromDate(event: MatDatepickerInputEvent<any>) {
-    const utcDate = new Date(event.value.ts); // this is 00:00:00 in GMT
+  setFromDate(date?: DateTime | null): void {
+    if (!date) {
+      return;
+    }
+    const utcDate = new Date(date?.toMillis()); // this is 00:00:00 in GMT
     const localDate = new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), 0, 0, 0);
     this.fromDateString = TimeSeriesUtils.formatInputDate(localDate);
   }
 
-  setToDate(event: MatDatepickerInputEvent<any>) {
-    const utcDate = new Date(event.value.ts);
+  setToDate(date?: DateTime | null) {
+    if (!date) {
+      return;
+    }
+    const utcDate = new Date(date?.toMillis());
     const localDate = new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), 0, 0, 0);
     this.toDateString = TimeSeriesUtils.formatInputDate(localDate);
   }

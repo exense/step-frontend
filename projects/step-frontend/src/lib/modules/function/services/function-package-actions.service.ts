@@ -1,15 +1,13 @@
 import { inject, Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import {
-  a1Promise2Observable,
   DialogsService,
   EditorResolverService,
   FunctionPackage,
   KeywordPackagesService,
   MultipleProjectsService,
 } from '@exense/step-core';
-import { map, Observable, of, switchMap, take } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { MatDialog } from '@angular/material/dialog';
+import { filter, Observable, of, switchMap, take } from 'rxjs';
 import { FunctionPackageConfigurationDialogComponent } from '../components/function-package-configuration-dialog/function-package-configuration-dialog.component';
 import { FunctionPackageConfigurationDialogData } from '../types/function-package-configuration-dialog-data.interface';
 
@@ -50,10 +48,9 @@ export class FunctionPackageActionsService {
   }
 
   deleteFunctionPackage(id: string, name: string): Observable<boolean> {
-    return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Keyword Package "${name}"`)).pipe(
-      switchMap(() => this._api.deleteFunctionPackage(id)),
-      map(() => true),
-      catchError(() => of(false))
+    return this._dialogs.showDeleteWarning(1, `Keyword Package "${name}"`).pipe(
+      filter((result) => result),
+      switchMap(() => this._api.deleteFunctionPackage(id))
     );
   }
 

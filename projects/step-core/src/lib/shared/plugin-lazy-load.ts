@@ -1,11 +1,9 @@
 import { PluginOnInit } from './plugin-on-init';
-import { Compiler, inject, Injector, Type } from '@angular/core';
+import { createNgModule, inject, Injector, Type } from '@angular/core';
 import { PluginInfoRegistryService } from '../services/plugin-info-registry.service';
-import { IModule } from 'angular';
 
 export interface LazyLoadPluginMeta {
   Module: Type<any>;
-  ajsModuleName?: string;
 }
 
 export type ImportMeta =
@@ -16,11 +14,8 @@ export type ImportMeta =
     };
 
 export abstract class PluginLazyLoad implements PluginOnInit {
-  private _compiler = inject(Compiler);
   private _injector = inject(Injector);
   private _pluginInfoRegistry = inject(PluginInfoRegistryService);
-
-  constructor(private parentAjsModule?: IModule) {}
 
   pluginOnInit(): Promise<unknown> {
     const metaDictionary = this.getPluginsLazyLoadMeta();
@@ -41,13 +36,7 @@ export abstract class PluginLazyLoad implements PluginOnInit {
   private registerPlugin(pluginName: string, load: () => Promise<LazyLoadPluginMeta>): Promise<void> {
     console.log(`PLUGIN "${pluginName}" LAZYLOAD`);
     return load()
-      .then((meta) => {
-        if (meta.ajsModuleName && this.parentAjsModule) {
-          this.parentAjsModule.requires.push(meta.ajsModuleName);
-        }
-        return this._compiler.compileModuleAsync(meta.Module);
-      })
-      .then((moduleFactory) => moduleFactory.create(this._injector))
+      .then((meta) => createNgModule(meta.Module, this._injector).instance)
       .then(() => console.log(`MODULE "${pluginName}" REGISTERED`));
   }
 }

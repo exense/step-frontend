@@ -23,11 +23,14 @@
       <step-entity-selection-di [entity]="element"></step-entity-selection-di>
     </td>
   </ng-container>
-  <step-entity-column-container entityName="executions"> </step-entity-column-container>
+  <step-entity-column-container entityName="executions"></step-entity-column-container>
   <ng-container matColumnDef="description" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
     <td mat-cell *matCellDef="let element" class="description-cell">
-      <step-report-node-icon [node]="element.rootReportNode"></step-report-node-icon>
+      <step-report-node-icon
+        [class.is-importing]="element.status === 'IMPORTING'"
+        [node]="element.rootReportNode"
+      ></step-report-node-icon>
       <a (click)="navigateToExecution(element.id); (false)">{{ element?.description }}</a>
     </td>
   </ng-container>
@@ -57,7 +60,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>User</th>
     <td mat-cell *matCellDef="let element">{{ element?.executionParameters?.userID }}</td>
   </ng-container>
-  <step-custom-columns screen="executionTable"> </step-custom-columns>
+  <step-custom-columns screen="executionTable"></step-custom-columns>
   <ng-container matColumnDef="status" stepSearchCol>
     <step-array-filter *stepSearchCellDef stepFilterConnect [useRegex]="true" [items]="(statusItems$ | async)!">
     </step-array-filter>
@@ -81,7 +84,7 @@
     <th mat-header-cell *matHeaderCellDef>Summary</th>
     <td mat-cell *matCellDef="let element">
       <div class="result">
-        <step-status-distribution [summary]="element.executionSummary"> </step-status-distribution>
+        <step-status-distribution [summary]="element.executionSummary"></step-status-distribution>
       </div>
     </td>
   </ng-container>

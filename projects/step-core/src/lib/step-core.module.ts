@@ -4,7 +4,6 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MAT_LUXON_DATE_ADAPTER_OPTIONS } from '@angular/material-luxon-adapter';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
-import { UpgradeModule } from '@angular/upgrade/static';
 import { AngularSplitModule } from 'angular-split';
 import { StepGeneratedClientModule } from './client/generated';
 import { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
@@ -31,7 +30,6 @@ import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { PredefinedOptionsInputComponent } from './components/predefined-options-input/predefined-options-input.component';
 import { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
-import { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 import { SelectPlanComponent } from './components/select-plan/select-plan.component';
 import { SettingButtonComponent } from './components/setting-button/setting-button.component';
 import { SplitAreaComponent } from './components/split-area/split-area.component';
@@ -47,7 +45,6 @@ import { InputModelFormatterDirective } from './directives/input-model-formatter
 import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 import { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
-import { TooltipDirective } from './directives/tooltip.directive';
 import { TrapFocusDirective } from './directives/trap-focus.directive';
 import { REPOSITORY_PARAMETERS_INITIALIZER, StepBasicsModule } from './modules/basics/step-basics.module';
 import {
@@ -88,11 +85,15 @@ import { TriggerPopoverDirective } from './directives/trigger-popover.directive'
 import { HtmlDescriptionCellComponent } from './components/html-description-cell/html-description-cell.component';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { PopoverContentDirective } from './directives/popover-content.directive';
+import { EnterTextValueDialogComponent } from './components/enter-text-value-dialog/enter-text-value-dialog.component';
+import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
+import { MessagesListDialogComponent } from './components/messages-list-dialog/messages-list-dialog.component';
+import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
 import { ReportNodeIconComponent } from './components/report-node-icon/report-node-icon.component';
+import { DatePickerModule } from './modules/date-picker/date-picker.module';
 
 @NgModule({
   declarations: [
-    TooltipDirective,
     MatchingAuthenticator,
     DashboardLinkPipe,
     CapsLockDirective,
@@ -108,7 +109,6 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     AutorefreshToggleComponent,
     SettingButtonComponent,
     PlanTreeComponent,
-    RestoreDialogComponent,
     EditableActionsComponent,
     EditableLabelComponent,
     EditableTextareaLabelComponent,
@@ -155,13 +155,16 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     HtmlDescriptionCellComponent,
     SafeHtmlPipe,
     PopoverContentDirective,
+    EnterTextValueDialogComponent,
+    ConfirmationDialogComponent,
+    MessagesListDialogComponent,
+    MessageDialogComponent,
   ],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    UpgradeModule,
     StepMaterialModule,
     TableModule,
     StepBasicsModule,
@@ -178,14 +181,13 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     KeywordsCommonModule,
     WizardModule,
     CronModule,
+    DatePickerModule,
   ],
   exports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    UpgradeModule,
-    TooltipDirective,
     CapsLockDirective,
     StepMaterialModule,
     JsonViewerModule,
@@ -212,7 +214,6 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     PlanTreeComponent,
     AutorefreshToggleComponent,
     SettingButtonComponent,
-    RestoreDialogComponent,
     EditableLabelComponent,
     EditableTextareaLabelComponent,
     EditableDropdownLabelComponent,
@@ -259,6 +260,11 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     PopoverContentDirective,
     HtmlDescriptionCellComponent,
     SafeHtmlPipe,
+    EnterTextValueDialogComponent,
+    ConfirmationDialogComponent,
+    MessagesListDialogComponent,
+    MessageDialogComponent,
+    DatePickerModule,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -293,7 +299,6 @@ export class StepCoreModule {
   }
 }
 
-export * from './angularjs';
 export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
 export { CancelError, CancelablePromise } from './client/generated/core/CancelablePromise';
 export { OpenAPI } from './client/generated/core/OpenAPI';
@@ -326,7 +331,6 @@ export { PlanNameComponent } from './components/plan-name/plan-name.component';
 export * from './components/plan-tree/plan-tree.component';
 export { PredefinedOptionsInputComponent } from './components/predefined-options-input/predefined-options-input.component';
 export * from './components/report-node-status/report-node-status.component';
-export { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 export * from './components/select-plan/select-plan.component';
 export * from './components/select-task/select-task.component';
 export * from './components/setting-button/setting-button.component';
@@ -343,7 +347,6 @@ export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialo
 export * from './components/artefact-details/artefact-details.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export * from './components/settings/settings.component';
-export * from './decorators/plugin';
 export * from './directives/caps-lock.directive';
 export * from './components/popover/popover.component';
 export * from './directives/trigger-popover.directive';
@@ -355,7 +358,6 @@ export * from './directives/input-model-formatter.directive';
 export { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 export * from './directives/tooltip-immediate-close.directive';
-export * from './directives/tooltip.directive';
 export { TrapFocusDirective } from './directives/trap-focus.directive';
 export * from './domain';
 export * from './modules/async-operations/async-operations.module';
@@ -374,6 +376,7 @@ export * from './modules/resource-input/resource-input.module';
 export * from './modules/keywords-common/keywords-common.module';
 export * from './modules/wizard/wizards.module';
 export * from './modules/cron/cron.module';
+export * from './modules/date-picker/date-picker.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/safe-html.pipe';
@@ -401,10 +404,10 @@ export * from './services/task-by-id-cache.service';
 export { PlanDialogsService } from './services/plan-dialogs.service';
 export * from './services/plan-editor.service';
 export * from './services/plan-interactive-session.service';
+export * from './services/plan-setup.service';
 export * from './services/plugin-info-registry.service';
-export * from './services/restore-dialogs.service';
+export * from './services/plan-editor-api.service';
 export * from './services/scheduled-task-dialogs.service';
-export { UibModalHelperService, UibModalInstance } from './services/uib-modal-helper.service';
 export * from './services/view-registry.service';
 export * from './services/view-state.service';
 export * from './services/artefact.service';
@@ -421,7 +424,12 @@ export * from './shared/special-links-strategy';
 export * from './modules/entity/pipes/cast-entity-to-plan.pipe';
 export * from './modules/entity/pipes/cast-entity-to-execution.pipe';
 export * from './modules/entity/pipes/cast-entity-to-task.pipe';
+export * from './services/auto-refresh-model-factory.service';
 export * from './services/artefacts-factory.service';
 export * from './services/plan-open.service';
 export * from './services/keyword-executor.service';
+export * from './components/enter-text-value-dialog/enter-text-value-dialog.component';
+export * from './components/confirmation-dialog/confirmation-dialog.component';
+export * from './components/messages-list-dialog/messages-list-dialog.component';
+export * from './components/message-dialog/message-dialog.component';
 export * from './components/report-node-icon/report-node-icon.component';

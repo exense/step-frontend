@@ -1,12 +1,9 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, SubRouteData, SubRouterConfig } from '../shared';
+import { routesPrioritySortPredicate, SUB_ROUTE_DATA, SubRouteData, SubRouterConfig } from '../shared';
+import { Route, Router, Routes } from '@angular/router';
+import { CheckPermissionsGuard } from './check-permissions.guard';
 import { VIEW_ID_LINK_PREFIX } from '../modules/basics/services/view-id-link-prefix.token';
-import { Route, Router, Routes, UrlMatcher, UrlSegment } from '@angular/router';
-import { SimpleOutletComponent } from '../components/simple-outlet/simple-outlet.component';
 import { BehaviorSubject } from 'rxjs';
-
-export const SUB_ROUTE_DATA = Symbol('SubRouteData');
 
 export interface CustomView {
   template: string;
@@ -52,18 +49,6 @@ export class ViewRegistryService implements OnDestroy {
 
   private static registeredRoutes: string[] = [];
 
-  static readonly isMatchToLegacyRoutes: UrlMatcher = (url: UrlSegment[]) => {
-    if (url.length < 0) {
-      return null;
-    }
-    const path = url[0].path;
-    if (ViewRegistryService.registeredRoutes.find((route) => path.startsWith(route))) {
-      return null;
-    }
-
-    return { consumed: url };
-  };
-
   isMigratedRoute(view: string): boolean {
     return ViewRegistryService.registeredRoutes.includes(view);
   }
@@ -94,6 +79,10 @@ export class ViewRegistryService implements OnDestroy {
     this.registerMenuEntry('Support', 'support-root', 'life-buoy', { weight: 100 });
 
     // Sub Menus Automation
+    this.registerMenuEntry('Keyword packages', 'functionPackages', 'package', {
+      weight: 20,
+      parentId: 'automation-root',
+    });
     this.registerMenuEntry('Keywords', 'functions', 'keyword', { weight: 10, parentId: 'automation-root' });
     this.registerMenuEntry('Plans', 'plans', 'plan', { weight: 30, parentId: 'automation-root' });
     this.registerMenuEntry('Parameters', 'parameters', 'list', { weight: 40, parentId: 'automation-root' });
@@ -164,6 +153,9 @@ export class ViewRegistryService implements OnDestroy {
     return this.getCustomView(view).isStaticView;
   }
 
+  /**
+   * @deprecated
+   * **/
   registerView(viewId: string, template: string, isPublicView?: boolean): void {
     this.registerViewWithConfig(viewId, template, { isPublicView: isPublicView });
   }
@@ -187,8 +179,12 @@ export class ViewRegistryService implements OnDestroy {
       }) as SubRouteData[];
   }
 
+  private getRootRoute(): Route {
+    return this._router.config[0]!.children!.find((route) => route.path === 'root')!;
+  }
+
   private getRouteParentChildren(parentPath: string): Routes {
-    const root = this._router.config.find((route) => route.path === 'root')!;
+    const root = this.getRootRoute();
     let parentChildren = root.children!;
 
     if (!parentPath) {
@@ -217,8 +213,8 @@ export class ViewRegistryService implements OnDestroy {
     return parentChildren;
   }
 
-  registerRoute(route: Route, { parentPath, label, weight }: SubRouterConfig = {}): void {
-    const root = this._router.config.find((route) => route.path === 'root');
+  registerRoute(route: Route, { parentPath, label, weight, accessPermissions }: SubRouterConfig = {}): void {
+    const root = this.getRootRoute();
     if (!root?.children) {
       return;
     }
@@ -231,11 +227,20 @@ export class ViewRegistryService implements OnDestroy {
 
     if (!parentPath) {
       if (route.path) {
-        ViewRegistryService.registeredRoutes.push(route.path);
+        let path = route.path;
+        if (path.includes('/') && path.includes(':')) {
+          path = path.split('/')[0];
+        }
+        ViewRegistryService.registeredRoutes.push(path);
       }
 
-      if (weight || label) {
-        route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label } };
+      if (weight || label || accessPermissions) {
+        route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label, accessPermissions } };
+      }
+
+      if (accessPermissions) {
+        route.canActivate = route.canActivate ?? [];
+        route.canActivate.push(CheckPermissionsGuard);
       }
       root.children.push(route);
       return;
@@ -249,20 +254,24 @@ export class ViewRegistryService implements OnDestroy {
       parentChildren.push(redirectRoute);
     }
 
-    if (weight || label) {
-      route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label } };
+    if (weight || label || accessPermissions) {
+      route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label, accessPermissions } };
     }
+
+    if (accessPermissions) {
+      route.canActivate = route.canActivate ?? [];
+      route.canActivate.push(CheckPermissionsGuard);
+    }
+
     parentChildren!.push(route);
-    const otherRoutes = parentChildren!
-      .filter((route) => route.path !== '')
-      .sort((routeA, routeB) => {
-        const weightA = routeA.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
-        const weightB = routeB.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
-        return weightA - weightB;
-      });
+    const otherRoutes = parentChildren!.filter((route) => route.path !== '').sort(routesPrioritySortPredicate);
+
     redirectRoute.redirectTo = otherRoutes[0].path;
   }
 
+  /**
+   * @deprecated
+   * **/
   registerViewWithConfig(
     viewId: string,
     template: string,
@@ -352,5 +361,3 @@ export class ViewRegistryService implements OnDestroy {
     return dashlets;
   }
 }
-
-getAngularJSGlobal().module(AJS_MODULE).service('ViewRegistry', downgradeInjectable(ViewRegistryService));

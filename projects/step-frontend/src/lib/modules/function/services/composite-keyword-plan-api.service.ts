@@ -1,6 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { PlanEditorApiService } from '../../plan-editor/plan-editor.module';
-import { from, map, Observable, pipe, tap } from 'rxjs';
+import { map, Observable, pipe, tap } from 'rxjs';
 import {
   AugmentedInteractivePlanExecutionService,
   AugmentedKeywordsService,
@@ -10,6 +9,7 @@ import {
   RepositoryObjectReference,
   Keyword,
   History,
+  PlanEditorApiService,
 } from '@exense/step-core';
 import { Router } from '@angular/router';
 
@@ -70,6 +70,10 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService {
 
   restorePlanVersion(id: string, versionId: string): Observable<Plan> {
     return this._keywordApi.restoreFunctionVersion(id, versionId).pipe(this.getPlan);
+  }
+
+  getPlanVersion(id: string, plan: Plan): Observable<string> {
+    return this._keywordApi.getFunctionById(id).pipe(map((keyword) => keyword?.customFields?.['versionId']));
   }
 
   savePlan(plan: Plan): Observable<{ id: string; plan: Plan }> {

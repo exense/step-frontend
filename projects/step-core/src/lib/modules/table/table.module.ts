@@ -30,6 +30,10 @@ import { Input as ColInput } from '../../client/generated';
 import { TableRemoteDataSourceFactoryImplService } from './services/table-remote-data-source-factory-impl.service';
 import { TableStorageService } from './services/table-storage.service';
 import { BulkOperationPerformStrategyImplService } from './services/bulk-operation-perform-strategy-impl.service';
+import { HighlightTableRowDirective } from './directives/highlight-table-row.directive';
+import { DatePickerModule } from '../date-picker/date-picker.module';
+import { RangeFilterComponent } from './components/range-filter/range-filter.component';
+import { DateFilterComponent } from './components/date-filter/date-filter.component';
 
 @NgModule({
   imports: [
@@ -40,6 +44,7 @@ import { BulkOperationPerformStrategyImplService } from './services/bulk-operati
     CustomRegistriesModule,
     AsyncOperationsModule,
     StepBasicsModule,
+    DatePickerModule,
   ],
   declarations: [
     TableComponent,
@@ -56,6 +61,9 @@ import { BulkOperationPerformStrategyImplService } from './services/bulk-operati
     FilterConnectDirective,
     CustomSearchDropdownComponent,
     CustomSearchCheckboxComponent,
+    HighlightTableRowDirective,
+    RangeFilterComponent,
+    DateFilterComponent,
   ],
   exports: [
     TableComponent,
@@ -68,6 +76,9 @@ import { BulkOperationPerformStrategyImplService } from './services/bulk-operati
     FilterConnectDirective,
     CustomSearchDropdownComponent,
     CustomSearchCheckboxComponent,
+    HighlightTableRowDirective,
+    RangeFilterComponent,
+    DateFilterComponent,
   ],
   providers: [
     TitleCasePipe,
@@ -101,6 +112,8 @@ export * from './components/custom-columns/custom-columns.component';
 export * from './components/custom-search-dropdown/custom-search-dropdown.component';
 export * from './components/custom-search-dropdown/custom-search-checkbox.component';
 export * from './components/custom-columns/custom-columns-base.component';
+export * from './components/range-filter/range-filter.component';
+export * from './components/date-filter/date-filter.component';
 export * from './directives/column.directive';
 export * from './shared/search-value';
 export * from './shared/table-remote-data-source';
@@ -109,15 +122,14 @@ export * from './shared/table-fetch-local-data-source';
 export * from './shared/table-data-source';
 export * from './services/table-search';
 export * from './services/table-reload';
-export * from './services/table-legacy-utils.service';
 export * from './directives/search-col.directive';
 export * from './directives/search-cell-def.directive';
 export * from './directives/filter-connect.directive';
+export * from './directives/highlight-table-row.directive';
 export * from './services/custom-column-options';
 export * from './directives/additional-header.directive';
 export * from './components/bulk-operations/bulk-operations.component';
 export * from './shared/filter-condition';
-export * from './shared/legacy-table-handle.interface';
 export * from './shared/table-local-data-source-config';
 export * from './shared/search-column.interface';
 export * from './services/filter-condition-factory.service';
@@ -125,3 +137,4 @@ export * from './shared/table-persistence-config';
 export * from './services/table-persistence-config.provider';
 export * from './services/table-storage.service';
 export * from './shared/search-column-accessor';
+export * from './services/table-highlight-item-container.service';

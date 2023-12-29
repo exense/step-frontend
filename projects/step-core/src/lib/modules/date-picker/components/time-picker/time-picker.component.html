@@ -1,0 +1,14 @@
+<ng-container *ngIf="_isRange; then rangeTime; else singleTime"> </ng-container>
+<ng-template #singleTime>
+  <step-single-time-picker label="Time" [time]="start" (timeChange)="handleStartChange($event)">
+  </step-single-time-picker>
+</ng-template>
+<ng-template #rangeTime>
+  <step-range-time-picker
+    [startTime]="start"
+    (startTimeChange)="handleStartChange($event)"
+    [endTime]="end"
+    (endTimeChange)="handleEndChange($event)"
+  >
+  </step-range-time-picker>
+</ng-template>

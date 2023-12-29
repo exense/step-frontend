@@ -25,8 +25,8 @@
                 <step-icon name="calendar" (click)="fromPicker.open()"></step-icon>
               </step-suffix>
             </step-form-field>
-            <input class="hidden-input" [matDatepicker]="fromPicker" (dateChange)="setFromDate($event)" />
-            <mat-datepicker #fromPicker disabled="false"></mat-datepicker>
+            <input class="hidden-input" [stepDatePicker]="fromPicker" (dateChange)="setFromDate($event)" />
+            <step-date-picker #fromPicker></step-date-picker>
           </div>
           <div class="bottom-gap">
             <step-form-field>
@@ -36,8 +36,8 @@
                 <step-icon name="calendar" (click)="toPicker.open()"></step-icon>
               </step-suffix>
             </step-form-field>
-            <input class="hidden-input" [matDatepicker]="toPicker" (dateChange)="setToDate($event)" />
-            <mat-datepicker #toPicker disabled="false"></mat-datepicker>
+            <input class="hidden-input" [stepDatePicker]="toPicker" (dateChange)="setToDate($event)" />
+            <step-date-picker #toPicker></step-date-picker>
           </div>
           <button (click)="applyAbsoluteInterval()" mat-raised-button color="primary">Apply time range</button>
         </div>

@@ -97,6 +97,15 @@ $border-radius: 8px;
       display: flex;
       justify-content: space-between;
 
+      &.without-children {
+        display: none;
+      }
+
+      &.align-left {
+        justify-content: flex-start;
+        gap: 0.5rem;
+      }
+
       & > .label-addon:empty {
         display: none;
       }
@@ -113,7 +122,7 @@ $border-radius: 8px;
 
     &:focus-within,
     &.step-force-focus {
-      & > .label-container > label {
+      &:not(.no-label-focus) > .label-container > label {
         color: $primary-color;
         step-label {
           &[show-required-marker]::after {

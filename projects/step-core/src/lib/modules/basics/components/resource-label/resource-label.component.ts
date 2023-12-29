@@ -1,6 +1,4 @@
-import { Component, Inject, Input, SimpleChanges } from '@angular/core';
-import { AJS_ROOT_SCOPE } from '../../../../shared';
-import { IRootScopeService } from 'angular';
+import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { Resource, ResourcesService } from '../../../../client/generated';
 
 @Component({
@@ -8,7 +6,9 @@ import { Resource, ResourcesService } from '../../../../client/generated';
   templateUrl: './resource-label.component.html',
   styleUrls: ['./resource-label.component.scss'],
 })
-export class ResourceLabelComponent {
+export class ResourceLabelComponent implements OnChanges {
+  private _api = inject(ResourcesService);
+
   @Input() stModel: any;
   @Input() stFormat?: string;
   resourceFilename?: string;
@@ -17,8 +17,6 @@ export class ResourceLabelComponent {
   fileName?: string;
 
   isResource: boolean = false;
-
-  constructor(private _api: ResourcesService, @Inject(AJS_ROOT_SCOPE) private _$rootScope: IRootScopeService) {}
 
   private getResourceId(stModel: string): string {
     return stModel.replace('resource:', '');

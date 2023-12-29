@@ -1,25 +1,25 @@
+import { KeyValue } from '@angular/common';
 import {
   Component,
-  OnInit,
-  Output,
   EventEmitter,
   Input,
   OnChanges,
+  OnInit,
+  Output,
   SimpleChanges,
-  inject,
   TrackByFunction,
+  inject,
 } from '@angular/core';
 import {
-  AuthService,
-  User,
-  Preferences,
-  UserService,
-  CredentialsService,
-  GenerateApiKeyService,
   ApiToken,
+  AuthService,
+  CredentialsService,
   DialogsService,
+  GenerateApiKeyService,
+  Preferences,
+  User,
+  UserService,
 } from '@exense/step-core';
-import { KeyValue } from '@angular/common';
 
 const preferencesToKVPairArray = (preferences?: Preferences): KeyValue<string, string>[] => {
   const prefsObject = preferences?.preferences || {};
@@ -110,6 +110,10 @@ export class MyAccountComponent implements OnInit, OnChanges {
   revokeAPIToken(id: string) {
     this._dialogs
       .showWarning('Revoking will make the API key permanently unusable. Do you want to proceed?')
-      .then(() => this._generateApiKey.revoke(id).subscribe(() => this.updateTokens()));
+      .subscribe((isConfirmed) => {
+        if (isConfirmed) {
+          this._generateApiKey.revoke(id).subscribe(() => this.updateTokens());
+        }
+      });
   }
 }

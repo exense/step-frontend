@@ -1,5 +1,5 @@
 <mat-menu #menu="matMenu">
-  <ng-container *matMenuContent="let element = element">
+  <div *matMenuContent="let element = element" [stepItemHover]="element">
     <ng-container *ngIf="menuContent?.templateRef as templateRef">
       <ng-container *ngTemplateOutlet="templateRef; context: { $implicit: element }"> </ng-container>
     </ng-container>
@@ -7,12 +7,16 @@
       <button
         type="button"
         mat-menu-item
-        [disabled]="!!item.permission && !(item.permission | hasRight | async)"
-        (click)="handleEntityOperation(element, item)"
+        [stepEntityMenuItem]="item"
+        [entity]="element"
+        #menuItem="EntityMenuItem"
+        [disabled]="!!(menuItem.isDisabled$ | async)"
+        [class.hidden]="!(menuItem.isVisible$ | async)"
+        (click)="menuItem.invoke()"
       >
         <step-icon *ngIf="item.icon" [name]="item.icon"></step-icon>
         {{ item.label }}
       </button>
     </ng-container>
-  </ng-container>
+  </div>
 </mat-menu>

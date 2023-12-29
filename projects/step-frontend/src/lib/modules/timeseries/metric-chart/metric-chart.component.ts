@@ -146,8 +146,8 @@ export class MetricChartComponent implements OnInit, OnChanges {
   private createChartSettings(response: TimeSeriesAPIResponse, groupDimensions: string[]): TSChartSettings {
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const series: TSChartSeries[] = response.matrix.map((series, i) => {
-      const labelItems = this.getSeriesKeys(response.matrixKeys[i], groupDimensions);
-      const seriesKey = labelItems.join(' | ');
+      const labelItems = this.getSeriesLabels(response.matrixKeys[i], groupDimensions);
+      const seriesKey = TimeSeriesUtils.getSeriesKey(response.matrixKeys[i], groupDimensions);
       const color = this.settings.renderingSettings?.seriesColors?.[seriesKey] || this.colorsPool.getColor(seriesKey);
       return {
         id: seriesKey,
@@ -232,29 +232,50 @@ export class MetricChartComponent implements OnInit, OnChanges {
     fetchByIds: (ids: string[]) => Observable<T[]>,
     mapEntityToLabel: (entity: T) => string | undefined
   ) {
-    const ids: string[] = series.map((s) => s.labelItems[groupDimensionIndex] as string).filter((id) => id);
+    const ids: string[] = series.map((s) => s.labelItems[groupDimensionIndex] as string).filter((id) => !!id);
     if (!ids.length) {
       return;
     }
-    fetchByIds(ids).subscribe((entities) => {
-      const entitiesByIds = new Map<string, T>();
-      entities.forEach((entity) => {
-        // Assuming each entity has an 'id' property
-        const entityId = (entity as any).id as string; // Cast to any to access 'id' property
-        if (entityId) {
-          entitiesByIds.set(entityId, entity);
-        }
-      });
-      series.forEach((s) => {
-        const entityId = s.labelItems[groupDimensionIndex];
-        if (entityId) {
-          const entity = entitiesByIds.get(entityId);
-          if (entity) {
-            this.chart.setLabelItem(s.id, groupDimensionIndex, mapEntityToLabel(entity));
+    fetchByIds(ids).subscribe(
+      (entities) => {
+        const entitiesByIds = new Map<string, T>();
+        entities.forEach((entity) => {
+          // Assuming each entity has an 'id' property
+          const entityId = (entity as any).id as string; // Cast to any to access 'id' property
+          if (entityId) {
+            entitiesByIds.set(entityId, entity);
           }
-        }
-      });
+        });
+        series.forEach((s) => {
+          const entityId = s.labelItems[groupDimensionIndex];
+          if (entityId) {
+            const entity = entitiesByIds.get(entityId);
+            if (entity) {
+              this.chart.setLabelItem(s.id, groupDimensionIndex, mapEntityToLabel(entity));
+            } else {
+              // entity was not fetched
+              this.chart.setLabelItem(s.id, groupDimensionIndex, this.updateFailedToLoadLabel(entityId));
+            }
+          }
+        });
+      },
+      (error) => {
+        this.handleEntityLoadingFailed(series, groupDimensionIndex);
+      }
+    );
+  }
+
+  private handleEntityLoadingFailed(series: TSChartSeries[], groupDimensionIndex: number) {
+    series.forEach((s) => {
+      const entityId = s.labelItems[groupDimensionIndex];
+      if (entityId) {
+        this.chart.setLabelItem(s.id, groupDimensionIndex, this.updateFailedToLoadLabel(entityId));
+      }
     });
+  }
+
+  private updateFailedToLoadLabel(label: string): string {
+    return label + ' (unresolved)';
   }
 
   private getAxesFormatFunction(unit: string): (v: number) => string {
@@ -315,10 +336,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
     }
   }
 
-  private getSeriesKeys(attributes: BucketAttributes, groupDimensions: string[]): (string | undefined)[] {
-    if (Object.keys(attributes).length === 0) {
-      return [undefined];
-    }
+  private getSeriesLabels(attributes: BucketAttributes, groupDimensions: string[]): (string | undefined)[] {
     return groupDimensions.map((field) => attributes[field]);
   }
 }

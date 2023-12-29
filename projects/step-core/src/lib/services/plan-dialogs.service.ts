@@ -1,19 +1,18 @@
 import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { catchError, from, map, Observable, of, switchMap, tap } from 'rxjs';
+import { Router } from '@angular/router';
+import { map, Observable, of, switchMap, tap } from 'rxjs';
 import { AbstractArtefact, AugmentedPlansService, Plan } from '../client/step-client-module';
 import { PlanCreateDialogComponent } from '../components/plan-create-dialog/plan-create-dialog.component';
+import { PlanLinkDialogService } from '../components/plan-link/plan-link-dialog.service';
 import { ThreadDistributionWizardDialogComponent } from '../components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
+import { AuthService } from '../modules/basics/services/auth.service';
+import { MultipleProjectsService } from '../modules/basics/services/multiple-projects.service';
 import { EntityDialogsService } from '../modules/entity/services/entity-dialogs.service';
-import { a1Promise2Observable, AJS_MODULE, DialogsService } from '../shared';
+import { DialogsService } from '../shared';
 import { ExportDialogsService } from './export-dialogs.service';
 import { ImportDialogsService } from './import-dialogs.service';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
-import { MultipleProjectsService } from '../modules/basics/services/multiple-projects.service';
-import { PlanLinkDialogService } from '../components/plan-link/plan-link-dialog.service';
-import { Router } from '@angular/router';
-import { AuthService } from '../modules/basics/services/auth.service';
 
 const ARTEFACT_ID = 'artefactId';
 const EDITOR_URL = '/root/plans/editor';
@@ -42,7 +41,7 @@ export class PlanDialogsService implements PlanLinkDialogService {
   }
 
   selectPlan(tableFilter?: string): Observable<Plan> {
-    const selectedEntity$ = this._entityDialogs.selectEntityOfType('plans', true, { tableFilter });
+    const selectedEntity$ = this._entityDialogs.selectEntityOfType('plans', { tableFilter });
     const plan$ = selectedEntity$.pipe(
       map((result) => result.item as Plan),
       switchMap((plan) => this._plansApiService.getPlanById(plan.id!))
@@ -55,13 +54,13 @@ export class PlanDialogsService implements PlanLinkDialogService {
   }
 
   deletePlan(id: string, name: string): Observable<boolean> {
-    return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Plan "${name}"`)).pipe(
-      map(() => true),
-      catchError(() => of(false)),
-      switchMap((isDeleteConfirmed) =>
-        isDeleteConfirmed ? this._plansApiService.deletePlan(id).pipe(map(() => true)) : of(false)
-      )
-    );
+    return this._dialogs
+      .showDeleteWarning(1, `Plan "${name}"`)
+      .pipe(
+        switchMap((isDeleteConfirmed) =>
+          isDeleteConfirmed ? this._plansApiService.deletePlan(id).pipe(map(() => true)) : of(false)
+        )
+      );
   }
 
   importPlans(): Observable<boolean | string[]> {
@@ -122,5 +121,3 @@ export class PlanDialogsService implements PlanLinkDialogService {
     this._router.navigate(commands, { queryParams });
   }
 }
-
-getAngularJSGlobal().module(AJS_MODULE).service('PlanDialogsService', downgradeInjectable(PlanDialogsService));

@@ -16,7 +16,10 @@ export class OperationsModule {
   }
 
   private registerViews(): void {
-    this._viewRegistryService.registerView('operations', 'partials/operations/operationsList.html');
+    this._viewRegistryService.registerRoute({
+      path: 'operations',
+      component: OperationsListComponent,
+    });
   }
 }
 
