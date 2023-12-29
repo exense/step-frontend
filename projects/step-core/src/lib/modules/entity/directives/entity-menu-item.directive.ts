@@ -37,6 +37,7 @@ export class EntityMenuItemDirective<E = unknown> implements OnChanges, OnDestro
   private _parentInjector = inject(Injector);
   private _operationCompleteHandler = inject(OperationCompleteHandler);
 
+  private keepInternalInjector = false;
   private internalInjector?: EnvironmentInjector;
   private operationController?: EntityMenuItemCommandController<E>;
 
@@ -66,17 +67,18 @@ export class EntityMenuItemDirective<E = unknown> implements OnChanges, OnDestro
     if (!this.entityMenuItem || !this.operationController || !this.entity) {
       return;
     }
+    this.keepInternalInjector = true;
     const entityType = this.entityMenuItem.entity;
     const entityKey = (this.entity as Record<string, unknown>)[this.entityMenuItem.entityKeyProperty] as string;
 
     this.operationController.invoke(entityType, entityKey, this.entity).subscribe(() => {
       this._operationCompleteHandler.handleOperationComplete();
+      this.destroyInternalInjector(true);
     });
   }
 
   private setupMenuItem(menuItem: EntityMenuItemInfo): void {
-    this.internalInjector?.destroy();
-    this.internalInjector = undefined;
+    this.destroyInternalInjector(true);
 
     if (menuItem.menuItemController) {
       const menuItemController = menuItem.menuItemController;
@@ -115,8 +117,12 @@ export class EntityMenuItemDirective<E = unknown> implements OnChanges, OnDestro
     (this as FieldAccessor).isDisabled$ = isDisabled$ ?? of(false);
   }
 
-  private destroyInternalInjector(): void {
+  private destroyInternalInjector(force?: boolean): void {
+    if (this.keepInternalInjector && !force) {
+      return;
+    }
     this.internalInjector?.destroy();
     this.internalInjector = undefined;
+    this.keepInternalInjector = false;
   }
 }
