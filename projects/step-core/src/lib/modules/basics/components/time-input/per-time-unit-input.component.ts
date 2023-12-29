@@ -4,12 +4,12 @@ import { Component, ViewEncapsulation } from '@angular/core';
 import { NgControl } from '@angular/forms';
 
 @Component({
-  selector: 'step-operation-per-time-input',
+  selector: 'step-per-time-unit-input',
   templateUrl: './base-time-converter.component.html',
   styleUrls: ['./base-time-converter.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class OperationPerTimeInputComponent extends BaseTimeConverterComponent {
+export class PerTimeUnitInputComponent extends BaseTimeConverterComponent {
   protected override separator = 'per';
 
   constructor(_ngControl: NgControl) {
@@ -20,15 +20,15 @@ export class OperationPerTimeInputComponent extends BaseTimeConverterComponent {
     if (!displayMeasure) {
       return modelValue;
     }
-    const operations = modelValue / modelMeasure;
-    return Math.round(operations / displayMeasure);
+    const units = modelValue / modelMeasure;
+    return Math.round(units / displayMeasure);
   }
 
   protected calculateModelValue(displayValue: number, modelMeasure: TimeUnit, displayMeasure?: TimeUnit): number {
     if (!displayMeasure) {
       return displayValue;
     }
-    const operations = displayValue / displayMeasure;
-    return operations * modelMeasure;
+    const units = displayValue / displayMeasure;
+    return units * modelMeasure;
   }
 }
