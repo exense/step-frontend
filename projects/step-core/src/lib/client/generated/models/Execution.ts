@@ -14,7 +14,7 @@ export type Execution = {
   endTime?: number;
   description?: string;
   executionType?: string;
-  status?: 'INITIALIZING' | 'IMPORTING' | 'RUNNING' | 'ABORTING' | 'EXPORTING' | 'ENDED';
+  status?: 'INITIALIZING' | 'IMPORTING' | 'RUNNING' | 'ABORTING' | 'FORCING_ABORT' | 'EXPORTING' | 'ENDED';
   result?:
     | 'VETOED'
     | 'IMPORT_ERROR'

@@ -85,6 +85,10 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
     this._executionService.abort(this.execution!.id!).subscribe();
   }
 
+  forceStop(): void {
+    this._executionService.forceStop(this.execution!.id!).subscribe();
+  }
+
   schedule(): void {
     const executionParams = this.buildExecutionParams(false);
     this._scheduledTaskDialogs.newScheduledTask(executionParams).subscribe((result) => {

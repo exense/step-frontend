@@ -97,6 +97,22 @@ export class ExecutionsService {
   }
 
   /**
+   * Stops the execution with the given execution id.
+   * @param id
+   * @returns any default response
+   * @throws ApiError
+   */
+  public forceStop(id: string): Observable<any> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/{id}/force-stop',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
    * Returns all executions.
    * @param skip
    * @param limit

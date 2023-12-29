@@ -35,7 +35,15 @@
         <step-icon name="clock" aria-hidden="true"></step-icon>
       </button>
     </div>
-    <div class="flex" *ngIf="execution && execution.status !== 'ENDED'">
+    <div
+      class="flex"
+      *ngIf="
+        execution &&
+        execution.status !== 'ENDED' &&
+        execution.status !== 'ABORTING' &&
+        execution.status !== 'FORCING_ABORT'
+      "
+    >
       <button
         type="button"
         mat-icon-button
@@ -43,6 +51,19 @@
         matTooltip="Stop"
         [disabled]="!('plan-execute' | hasRight | async)"
         (click)="stop()"
+      >
+        <step-icon name="stop-circle" aria-hidden="true"></step-icon>
+      </button>
+    </div>
+    <div class="flex" *ngIf="execution && execution.status === 'ABORTING'">
+      <button
+        type="button"
+        mat-icon-button
+        class="warning"
+        aria-label="Left Align"
+        matTooltip="Force stop"
+        [disabled]="!('plan-execute' | hasRight | async)"
+        (click)="forceStop()"
       >
         <step-icon name="stop-circle" aria-hidden="true"></step-icon>
       </button>
