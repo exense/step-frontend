@@ -1,12 +1,15 @@
-<step-chart-skeleton *ngIf="!_internalSettings"></step-chart-skeleton>
-<step-timeseries-chart
-  #chart
-  *ngIf="_internalSettings"
-  (zoomReset)="handleZoomReset()"
-  [syncKey]="context.id"
-  [settings]="_internalSettings!"
->
-</step-timeseries-chart>
+<div [style.height]="height + 'px'">
+  <step-chart-skeleton *ngIf="!_internalSettings"></step-chart-skeleton>
+  <step-timeseries-chart
+    #chart
+    *ngIf="_internalSettings"
+    (zoomReset)="handleZoomReset()"
+    [syncKey]="context.id"
+    [settings]="_internalSettings!"
+    [height]="height"
+  >
+  </step-timeseries-chart>
+</div>
 
 <div class="settings-container" *ngIf="allowGroupingChange || allowMetricChange">
   <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">

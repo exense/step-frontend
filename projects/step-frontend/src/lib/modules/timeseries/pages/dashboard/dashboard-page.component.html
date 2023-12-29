@@ -14,12 +14,13 @@
     </step-ts-dashboard-filter-bar>
   </div>
 
-  <div style="width: 100%; flex-direction: row; flex-wrap: wrap; display: flex">
+  <div style="width: 100%; flex-direction: row; flex-wrap: wrap; display: flex; justify-content: space-between">
     <div
       *ngFor="let config of chartConfigs"
-      style="height: 300px; width: 500px; margin-top: 40px; margin-right: 40px; position: relative"
+      style="margin-top: 3rem; position: relative; border: 1px solid #eee"
+      [style.width]="config.state.size === 2 ? '100%' : '50%'"
     >
-      <step-chart-dashlet [item]="config.state" [context]="context"></step-chart-dashlet>
+      <step-chart-dashlet [item]="config.state" [context]="context" [height]="300"></step-chart-dashlet>
     </div>
   </div>
 </div>

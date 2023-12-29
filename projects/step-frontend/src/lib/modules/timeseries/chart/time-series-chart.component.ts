@@ -29,13 +29,15 @@ import { Observable } from 'rxjs';
   styleUrls: ['./time-series-chart.component.scss'],
 })
 export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
-  private readonly HEADER_WITH_FOOTER_SIZE = 48;
+  private readonly HEADER_HEIGHT = 27;
+  private readonly LEGEND_HEIGHT = 24;
   chartMetadata: Record<string, any>[] = [[]]; // 1 on 1 to chart 'data'. first item is time axes
   @ViewChild('chart') private chartElement!: ElementRef;
 
   @Input() title!: string;
   @Input() settings!: TSChartSettings;
   @Input() syncKey: string | undefined; // all the charts with the same syncKey in the app will be synced
+  @Input() height: number = 300;
 
   @Output() zoomReset = new EventEmitter<void>();
   @Output() zoomChange = new EventEmitter<TimeRange>(); // warning! this event will be emitted by all charts synchronized.
@@ -58,7 +60,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   getSize = () => {
     return {
       width: this._element.nativeElement.parentElement.offsetWidth - 32,
-      height: this._element.nativeElement.parentElement.offsetHeight - this.HEADER_WITH_FOOTER_SIZE,
+      height: this.height - this.HEADER_HEIGHT - this.LEGEND_HEIGHT,
     };
   };
 

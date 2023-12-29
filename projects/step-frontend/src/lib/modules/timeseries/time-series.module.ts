@@ -40,6 +40,7 @@ import { PlanListComponent } from '../plan/components/plan-list/plan-list.compon
 import { PlanEditorComponent } from '../plan/components/plan-editor/plan-editor.component';
 import { ChartDashletComponent } from './pages/dashboard/chart-dashlet/chart-dashlet.component';
 import { DashboardFilterBarComponent } from './performance-view/filter-bar/dashboard-filter-bar.component';
+import { DashboardsListPageComponent } from './pages/dashboards-list/dashboards-list-page.component';
 
 @NgModule({
   declarations: [
@@ -69,8 +70,15 @@ import { DashboardFilterBarComponent } from './performance-view/filter-bar/dashb
     DashboardPageComponent,
     ChartDashletComponent,
     DashboardFilterBarComponent,
+    DashboardsListPageComponent,
   ],
-  exports: [ExecutionPerformanceComponent, DashboardPageComponent, AnalyticsPageComponent, MetricChartComponent],
+  exports: [
+    ExecutionPerformanceComponent,
+    DashboardPageComponent,
+    DashboardsListPageComponent,
+    AnalyticsPageComponent,
+    MetricChartComponent,
+  ],
   providers: [{ provide: MatPaginatorIntl, useClass: NoTotalCountPaginator }],
   imports: [
     StepCoreModule,
@@ -91,6 +99,10 @@ export class TimeSeriesModule {
   constructor(_viewRegistry: ViewRegistryService) {
     _viewRegistry.registerRoute({
       path: 'dashboards',
+      component: DashboardsListPageComponent,
+    });
+    _viewRegistry.registerRoute({
+      path: 'dashboards/:id',
       component: DashboardPageComponent,
     });
   }

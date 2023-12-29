@@ -12,6 +12,7 @@ export class ElementResizeDirective implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.resizeObserver = new ResizeObserver(() => {
+      console.log('RESIZING');
       this.elementResize.emit();
     });
 

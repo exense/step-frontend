@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewChildren } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChildren } from '@angular/core';
 import {
   BucketAttributes,
   BucketResponse,
@@ -26,9 +26,10 @@ import { TimeRangePickerSelection } from '../../time-selection/time-range-picker
 //@ts-ignore
 import uPlot = require('uplot');
 import { TsFilterItem } from '../../performance-view/filter-bar/model/ts-filter-item';
-import { forkJoin, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { filter, forkJoin, merge, Observable, of, Subject, switchMap, takeUntil, throttle } from 'rxjs';
 import { ChartDashletComponent } from './chart-dashlet/chart-dashlet.component';
 import { Dashlet } from './model/dashlet';
+import { ActivatedRoute } from '@angular/router';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -48,7 +49,7 @@ interface MetricAttributeSelection extends MetricAttribute {
   templateUrl: './dashboard-page.component.html',
   styleUrls: ['./dashboard-page.component.scss'],
 })
-export class DashboardPageComponent implements OnInit {
+export class DashboardPageComponent implements OnInit, OnDestroy {
   readonly AGGREGATES: AggregationType[] = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'RATE', 'MEDIAN'];
 
   @ViewChildren(ChartDashletComponent) dashlets: Dashlet[] = [];
@@ -56,6 +57,7 @@ export class DashboardPageComponent implements OnInit {
   private _timeSeriesService = inject(TimeSeriesService);
   private _timeSeriesContextFactory = inject(TimeSeriesContextsFactory);
   private _dashboardService = inject(DashboardsService);
+  private _route: ActivatedRoute = inject(ActivatedRoute);
   colorsPool: TimeseriesColorsPool = new TimeseriesColorsPool();
 
   dashboard!: DashboardView;
@@ -70,6 +72,63 @@ export class DashboardPageComponent implements OnInit {
   timeRangeSelection: TimeRangePickerSelection = this.timeRangeOptions[0];
 
   terminator$ = new Subject<void>();
+
+  ngOnInit(): void {
+    this._route.paramMap.subscribe((params) => {
+      const id: string = params.get('id')!;
+      if (!id) {
+        throw new Error('Dashboard id not present');
+      }
+      // Now you can use this.id as needed
+      this._dashboardService.getEntityById5(id).subscribe((dashboard) => {
+        this.dashboard = dashboard;
+        this.context = this.createContext(this.dashboard);
+        this.createCharts(this.dashboard);
+      });
+    });
+  }
+
+  ngOnDestroy(): void {
+    this._timeSeriesContextFactory?.destroyContext(this.context?.id);
+  }
+
+  private createCharts(dashboard: DashboardView): void {
+    this.chartSettings = new Array(dashboard.dashlets!.length);
+    this.dashboard.dashlets!.forEach((dashlet, i) => {
+      const settings = dashlet.chartSettings!;
+      const primarySettings = settings.primaryAxes!;
+      const grouping = settings.grouping || [];
+      const request: FetchBucketsRequest = {
+        start: dashboard.timeRange!.absoluteSelection!.from!,
+        end: dashboard.timeRange!.absoluteSelection!.to!,
+        groupDimensions: grouping,
+        oqlFilter: FilterUtils.objectToOQL({ 'attributes.metricType': `"${settings.metricKey!}"` }),
+        numberOfBuckets: 100,
+        percentiles: this.getChartPclToRequest(primarySettings.aggregation!),
+      };
+
+      const groupingSelection: MetricAttributeSelection[] =
+        settings.attributes?.map((a) => ({ ...a, selected: false })) || [];
+      settings.grouping?.forEach((a) => {
+        const foundAttribute = groupingSelection.find((attr) => attr.name === a);
+        if (foundAttribute) {
+          foundAttribute.selected = true;
+        }
+      });
+
+      const chartConfig: ChartConfig = {
+        state: dashlet,
+        groupingAttributes: groupingSelection,
+      };
+      this.chartConfigs.push(chartConfig);
+
+      this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
+        chartConfig.finalSettings = this.createChartSettings(dashlet!.name!, settings, response, grouping);
+      });
+      this.subscribeForTimeRangeChange();
+      this.subscribeForContextChange();
+    });
+  }
 
   createContext(dashboard: DashboardView): TimeSeriesContext {
     const dashboardTimeRange = dashboard.timeRange!;
@@ -97,45 +156,23 @@ export class DashboardPageComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    this._dashboardService.getAll1().subscribe((dashboards) => {
-      this.dashboard = dashboards[0];
-      this.context = this.createContext(this.dashboard);
-      this.chartSettings = new Array(this.dashboard!.dashlets!.length);
-      this.dashboard.dashlets!.forEach((dashlet, i) => {
-        const settings = dashlet.chartSettings!;
-        const primarySettings = settings.primaryAxes!;
-        const grouping = settings.grouping || [];
-        const request: FetchBucketsRequest = {
-          start: this.dashboard.timeRange!.absoluteSelection!.from!,
-          end: this.dashboard.timeRange!.absoluteSelection!.to!,
-          groupDimensions: grouping,
-          oqlFilter: FilterUtils.objectToOQL({ 'attributes.metricType': `"${settings.metricKey!}"` }),
-          numberOfBuckets: 100,
-          percentiles: this.getChartPclToRequest(primarySettings.aggregation!),
-        };
-
-        const groupingSelection: MetricAttributeSelection[] =
-          settings.attributes?.map((a) => ({ ...a, selected: false })) || [];
-        settings.grouping?.forEach((a) => {
-          const foundAttribute = groupingSelection.find((attr) => attr.name === a);
-          if (foundAttribute) {
-            foundAttribute.selected = true;
-          }
-        });
-
-        const chartConfig: ChartConfig = {
-          state: dashlet,
-          groupingAttributes: groupingSelection,
-        };
-        this.chartConfigs.push(chartConfig);
-
-        this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
-          chartConfig.finalSettings = this.createChartSettings(dashlet!.name!, settings, response, grouping);
-        });
-        this.subscribeForTimeRangeChange();
+  subscribeForContextChange(): void {
+    merge(this.context.onFilteringChange(), this.context.onGroupingChange())
+      .pipe(takeUntil(this.terminator$))
+      .subscribe(() => {
+        this.refreshAllCharts().subscribe();
       });
-    });
+    // this.throttledRefreshTrigger$
+    //   .pipe(
+    //     throttle(() => this.context.inProgressChange().pipe(filter((inProgress) => !inProgress))),
+    //     takeUntil(this.terminator$)
+    //   )
+    //   .subscribe(() => {
+    //     // let's calculate the new time range
+    //     let fullRange = this.calculateTimeRange(this.timeRangeSelection);
+    //     this.setRanges(fullRange);
+    //     this.updateBaseCharts();
+    //   });
   }
 
   private getContext(compare: boolean): TimeSeriesContext {

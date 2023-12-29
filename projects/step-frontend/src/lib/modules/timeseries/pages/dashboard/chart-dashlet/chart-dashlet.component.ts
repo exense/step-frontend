@@ -44,6 +44,7 @@ export class ChartDashletComponent implements OnInit, Dashlet {
   @Input() context!: TimeSeriesContext;
   @Input() allowGroupingChange: boolean = true;
   @Input() allowMetricChange: boolean = true;
+  @Input() height!: number;
 
   readonly PCL_VALUES = [80, 90, 99];
   selectedPclValue: number = this.PCL_VALUES[0];
@@ -53,7 +54,7 @@ export class ChartDashletComponent implements OnInit, Dashlet {
   private _timeSeriesService = inject(TimeSeriesService);
 
   ngOnInit(): void {
-    if (!this.item || !this.context) {
+    if (!this.item || !this.context || !this.height) {
       throw new Error('Missing input values');
     }
     this.groupingSelection = this.prepareGroupingAttributes();

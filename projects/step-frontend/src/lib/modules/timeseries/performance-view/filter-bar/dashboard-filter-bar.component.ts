@@ -148,6 +148,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   handleGroupingChange(dimensions: string[]) {
+    console.log('handling grouping', dimensions);
     this.activeGrouping = dimensions;
     this.composeAndVerifyFullOql(dimensions).subscribe((response) => {
       this.rawMeasurementsModeActive = response.hasUnknownFields;
