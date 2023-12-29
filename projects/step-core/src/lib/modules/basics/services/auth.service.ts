@@ -124,6 +124,10 @@ export class AuthService implements OnDestroy {
     return !!this._serviceContext?.conf?.noLoginMask;
   }
 
+  hasRight$(right: string): Observable<boolean> {
+    return this.triggerRightCheck$.pipe(map(() => this.hasRight(right)));
+  }
+
   hasRight(right: string): boolean {
     const conf = this.getConf();
     if (!!conf && !conf.authentication) {

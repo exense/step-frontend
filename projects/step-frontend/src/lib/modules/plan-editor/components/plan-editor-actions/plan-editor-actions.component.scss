@@ -1,41 +1,48 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
-:host {
+step-plan-editor-actions {
   display: flex;
   gap: 2rem;
-}
 
-.interactive-trigger {
-  visibility: hidden;
-}
-
-span.mat-menu-item.plan-execution-menu {
-  height: auto;
-  font-size: inherit;
-  line-height: initial;
-  font-weight: initial;
-
-  &.cdk-program-focused:not([disabled]),
-  &:hover:not([disabled]) {
-    background: transparent;
+  .interactive-trigger {
+    visibility: hidden;
   }
 
-  .interactive-parameters,
-  step-execution-commands {
-    width: 25rem;
-    display: block;
-    padding: 0.5rem;
+  span.mat-menu-item.plan-execution-menu {
+    height: auto;
+    font-size: inherit;
+    line-height: initial;
+    font-weight: initial;
+
+    &.cdk-program-focused:not([disabled]),
+    &:hover:not([disabled]) {
+      background: transparent;
+    }
+
+    .interactive-parameters,
+    step-execution-commands {
+      width: 25rem;
+      display: block;
+      padding: 0.5rem;
+    }
+
+    .interactive-parameters {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding-bottom: 1rem;
+    }
   }
 
-  .interactive-parameters {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding-bottom: 1rem;
+  button.activeMode {
+    color: white;
+    background: var.$dark-blue;
   }
-}
 
-button.activeMode {
-  color: white;
-  background: var.$dark-blue;
+  step-btn-group.with-borders {
+    step-dashlet .mat-stroked-button {
+      border-radius: 0 !important;
+      border-right: 1px solid var.$gray-300;
+    }
+  }
 }
