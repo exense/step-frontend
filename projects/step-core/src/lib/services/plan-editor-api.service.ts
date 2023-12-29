@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { History, Plan, ReportNode, RepositoryObjectReference } from '@exense/step-core';
+import { Plan, ReportNode, RepositoryObjectReference, History } from '../client/step-client-module';
 
 export abstract class PlanEditorApiService {
   abstract loadPlan(id: string): Observable<Plan>;
