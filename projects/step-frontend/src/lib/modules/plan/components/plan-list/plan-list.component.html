@@ -107,14 +107,5 @@
       <step-icon name="search"></step-icon>
       Find usages
     </button>
-    <button
-      mat-menu-item
-      [disabled]="!('plan-write' | hasRight | async)"
-      (click)="displayHistory(element, 'plan-write')"
-      class="history"
-    >
-      <step-icon name="git-branch"></step-icon>
-      Version history
-    </button>
   </ng-container>
 </step-entity-menu>

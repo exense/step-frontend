@@ -30,7 +30,6 @@ import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { PredefinedOptionsInputComponent } from './components/predefined-options-input/predefined-options-input.component';
 import { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
-import { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 import { SelectPlanComponent } from './components/select-plan/select-plan.component';
 import { SettingButtonComponent } from './components/setting-button/setting-button.component';
 import { SplitAreaComponent } from './components/split-area/split-area.component';
@@ -112,7 +111,6 @@ import { DatePickerModule } from './modules/date-picker/date-picker.module';
     AutorefreshToggleComponent,
     SettingButtonComponent,
     PlanTreeComponent,
-    RestoreDialogComponent,
     EditableActionsComponent,
     EditableLabelComponent,
     EditableTextareaLabelComponent,
@@ -220,7 +218,6 @@ import { DatePickerModule } from './modules/date-picker/date-picker.module';
     PlanTreeComponent,
     AutorefreshToggleComponent,
     SettingButtonComponent,
-    RestoreDialogComponent,
     EditableLabelComponent,
     EditableTextareaLabelComponent,
     EditableDropdownLabelComponent,
@@ -342,7 +339,6 @@ export { PlanNameComponent } from './components/plan-name/plan-name.component';
 export * from './components/plan-tree/plan-tree.component';
 export { PredefinedOptionsInputComponent } from './components/predefined-options-input/predefined-options-input.component';
 export * from './components/report-node-status/report-node-status.component';
-export { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 export * from './components/select-plan/select-plan.component';
 export * from './components/select-task/select-task.component';
 export * from './components/setting-button/setting-button.component';
@@ -416,8 +412,9 @@ export * from './services/task-by-id-cache.service';
 export { PlanDialogsService } from './services/plan-dialogs.service';
 export * from './services/plan-editor.service';
 export * from './services/plan-interactive-session.service';
+export * from './services/plan-setup.service';
 export * from './services/plugin-info-registry.service';
-export * from './services/restore-dialogs.service';
+export * from './services/plan-editor-api.service';
 export * from './services/scheduled-task-dialogs.service';
 export * from './services/view-registry.service';
 export * from './services/view-state.service';

@@ -31,20 +31,10 @@
   >
     <step-icon name="rotate-cw"></step-icon>
   </button>
-  <button
-    type="button"
-    mat-stroked-button
-    (click)="displayHistory.emit()"
-    [matTooltip]="captions.history"
-    class="history"
-    matTooltipPosition="below"
-  >
-    <step-icon name="git-branch"></step-icon>
-  </button>
   <step-dashlet
     *ngFor="let editorAction of _planActions; trackBy: trackByDashlet"
     [itemKey]="editorAction.template"
-    [context]="plan"
+    [context]="planEditorContext"
   >
   </step-dashlet>
   <button

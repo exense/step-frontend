@@ -1,6 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { Plan } from '@exense/step-core';
-import { PlanEditorApiService } from '../../../plan-editor/plan-editor.module';
+import { Plan, PlanEditorApiService } from '@exense/step-core';
 import { CompositeKeywordPlanApiService } from '../../services/composite-keyword-plan-api.service';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';

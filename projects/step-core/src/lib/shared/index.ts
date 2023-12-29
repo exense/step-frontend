@@ -8,6 +8,7 @@ export * from './plugin-lazy-load';
 export * from './utils';
 export * from './plan-tree-action.enum';
 export * from './plan-editor-strategy';
+export * from './plan-editor-context.interface';
 export * from './ace-mode.enum';
 export * from './script-language.enum';
 export * from './persistence-tokens';

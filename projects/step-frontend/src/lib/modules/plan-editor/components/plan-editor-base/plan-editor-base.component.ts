@@ -26,33 +26,20 @@ import {
   PlanInteractiveSessionService,
   PlansService,
   RepositoryObjectReference,
-  RestoreDialogsService,
   TreeNodeUtilsService,
   TreeStateService,
   ArtefactService,
   PlanLinkDialogService,
   FunctionActionsService,
   PlanOpenService,
+  PlanSetupService,
+  PlanEditorApiService,
 } from '@exense/step-core';
-import {
-  catchError,
-  defer,
-  EMPTY,
-  debounceTime,
-  filter,
-  map,
-  Observable,
-  of,
-  Subject,
-  switchMap,
-  takeUntil,
-  tap,
-} from 'rxjs';
+import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
-import { PlanEditorApiService } from '../../injectables/plan-editor-api.service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -81,10 +68,14 @@ import { ActivatedRoute } from '@angular/router';
       provide: PlanArtefactResolverService,
       useExisting: forwardRef(() => PlanEditorBaseComponent),
     },
+    {
+      provide: PlanSetupService,
+      useExisting: forwardRef(() => PlanEditorBaseComponent),
+    },
   ],
 })
 export class PlanEditorBaseComponent
-  implements OnInit, OnChanges, OnDestroy, PlanInteractiveSessionService, PlanArtefactResolverService
+  implements OnInit, OnChanges, OnDestroy, PlanInteractiveSessionService, PlanArtefactResolverService, PlanSetupService
 {
   readonly _interactiveSession = inject(InteractiveSessionService);
   private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
@@ -96,7 +87,6 @@ export class PlanEditorBaseComponent
   private _planLinkDialogs = inject(PlanLinkDialogService, { optional: true });
   private _artefactService = inject(ArtefactService);
   public _planEditService = inject(PlanEditorService);
-  private _restoreDialogsService = inject(RestoreDialogsService);
   private _activatedRoute = inject(ActivatedRoute);
   private _planOpen = inject(PlanOpenService);
   private _cd = inject(ChangeDetectorRef);
@@ -178,43 +168,6 @@ export class PlanEditorBaseComponent
     this._planEditorApi
       .exportPlan(this.currentPlanId, `${this._planEditService.plan!.attributes!['name']}.sta`)
       .subscribe();
-  }
-
-  displayHistory(permission: string, plan: Plan): void {
-    if (!(plan?.id || this.currentPlanId)) {
-      return;
-    }
-
-    const versionHistory = this._planEditorApi.getPlanHistory(this.currentPlanId ?? plan.id!);
-
-    const currentVersion$ = defer(() => {
-      if (this.currentPlanId && this.currentPlanId !== plan.id) {
-        // composite keywords need to retrieve the current version
-        return this._keywordCallsApi
-          .getFunctionById(this.currentPlanId)
-          .pipe(map((keyword) => keyword?.customFields?.['versionId'] ?? undefined));
-      } else {
-        // we are showing a real plan
-        return of(plan.customFields ? plan.customFields['versionId'] : undefined);
-      }
-    });
-
-    currentVersion$
-      .pipe(
-        switchMap((currentVersion) =>
-          this._restoreDialogsService.showRestoreDialog(currentVersion, versionHistory, permission)
-        ),
-        filter((restoreVersion) => restoreVersion !== undefined),
-        switchMap((restoreVersion) =>
-          this._planEditorApi.restorePlanVersion(this.currentPlanId ?? plan.id!, restoreVersion)
-        ),
-        switchMap(() => this._planEditorApi.loadPlan(this.currentPlanId ?? plan.id!)),
-        catchError((error) => {
-          console.error(error);
-          return EMPTY;
-        })
-      )
-      .subscribe((plan) => this.setupPlan(plan));
   }
 
   clonePlan(): void {
@@ -332,7 +285,7 @@ export class PlanEditorBaseComponent
     });
   }
 
-  private setupPlan(plan?: Plan, preselectArtefact?: boolean): void {
+  setupPlan(plan?: Plan, preselectArtefact?: boolean): void {
     if (!plan) {
       return;
     }

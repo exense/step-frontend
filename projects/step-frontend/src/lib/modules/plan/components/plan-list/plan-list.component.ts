@@ -4,7 +4,6 @@ import {
   AutoDeselectStrategy,
   Plan,
   PlanDialogsService,
-  RestoreDialogsService,
   selectionCollectionProvider,
   STORE_ALL,
   tablePersistenceConfigProvider,
@@ -22,7 +21,6 @@ import { pipe, tap } from 'rxjs';
 })
 export class PlanListComponent {
   private _planDialogs = inject(PlanDialogsService);
-  private _restoreDialogsService = inject(RestoreDialogsService);
   readonly _plansApiService = inject(AugmentedPlansService);
 
   readonly dataSource = this._plansApiService.getPlansTableDataSource();
@@ -76,25 +74,5 @@ export class PlanListComponent {
 
   lookUp(id: string, name: string): void {
     this._planDialogs.lookUp(id, name);
-  }
-
-  displayHistory(plan: Plan, permission: string): void {
-    if (!plan.id) {
-      return;
-    }
-
-    const id = plan.id!;
-    const planVersion = plan.customFields ? plan.customFields['versionId'] : undefined;
-    const versionHistory = this._plansApiService.getPlanVersions(id);
-
-    this._restoreDialogsService
-      .showRestoreDialog(planVersion, versionHistory, permission)
-      .subscribe((restoreVersion) => {
-        if (!restoreVersion) {
-          return;
-        }
-
-        this._plansApiService.restorePlanVersion(id, restoreVersion).subscribe(() => this.dataSource.reload());
-      });
   }
 }

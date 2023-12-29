@@ -1,9 +1,8 @@
 import { Component, inject } from '@angular/core';
-import { PlanEditorApiService } from '../../../plan-editor/injectables/plan-editor-api.service';
 import { PurePlanEditApiService } from '../../injectables/pure-plan-edit-api.service';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
-import { Plan } from '@exense/step-core';
+import { Plan, PlanEditorApiService } from '@exense/step-core';
 
 @Component({
   selector: 'step-plan-editor',

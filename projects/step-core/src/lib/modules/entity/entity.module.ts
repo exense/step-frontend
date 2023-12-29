@@ -46,6 +46,7 @@ export * from './components/entity-menu/entity-menu.component';
 export * from './components/entity-menu-button/entity-menu-button.component';
 export * from './directives/entity-menu-content.directive';
 export * from './directives/entity-menu-item.directive';
+export * from './directives/entity-menu-item.directive';
 export * from './injectables/entity-registry';
 export * from './injectables/entity-type-resolver';
 export * from './injectables/entity-dialogs.service';

@@ -37,6 +37,7 @@
     </div>
     <ng-container *ngIf="_planEditService.plan$ | async as plan">
       <step-plan-editor-actions
+        [currentPlanId]="initialPlan?.id"
         [plan]="plan"
         [showExecuteButton]="showExecuteButton"
         [hasUndo]="_planEditService.hasUndo$ | async"
@@ -47,7 +48,6 @@
         (discardAll)="_planEditService.discardAll()"
         (undo)="_planEditService.undo()"
         (redo)="_planEditService.redo()"
-        (displayHistory)="displayHistory('plan-write', plan)"
         (clone)="clonePlan()"
         (export)="exportPlan()"
         (startInteractive)="startInteractive()"

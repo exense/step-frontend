@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { History, Plan, ReportNode, RepositoryObjectReference } from '@exense/step-core';
+import { Plan, ReportNode, RepositoryObjectReference, History } from '../client/step-client-module';
 
 export abstract class PlanEditorApiService {
   abstract loadPlan(id: string): Observable<Plan>;
@@ -9,6 +9,7 @@ export abstract class PlanEditorApiService {
 
   abstract getPlanHistory(id: string): Observable<History[]>;
   abstract restorePlanVersion(id: string, versionId: string): Observable<Plan>;
+  abstract getPlanVersion(id: string, plan: Plan): Observable<string>;
 
   abstract createRepositoryObjectReference(id?: string): RepositoryObjectReference | undefined;
   abstract executeArtefact(sessionId: string, id: string, artefactId: string): Observable<ReportNode>;
