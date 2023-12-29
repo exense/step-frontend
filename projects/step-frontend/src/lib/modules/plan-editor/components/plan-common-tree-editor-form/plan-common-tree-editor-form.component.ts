@@ -14,10 +14,10 @@ import {
   PlanEditorStrategy,
   PlansService,
   TreeStateService,
+  PlanEditorApiService,
 } from '@exense/step-core';
 import { BehaviorSubject, filter, first, map, merge, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
-import { PlanEditorApiService } from '../../injectables/plan-editor-api.service';
 
 const MESSAGE_ADD_AT_MULTIPLE_NODES =
   'Adding elements is not supported when more then one node is selected in the tree';

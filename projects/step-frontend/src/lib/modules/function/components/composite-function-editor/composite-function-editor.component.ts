@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { AugmentedKeywordsService, Keyword } from '@exense/step-core';
-import { PlanEditorApiService } from '../../../plan-editor/plan-editor.module';
+import { AugmentedKeywordsService, Keyword, PlanEditorApiService } from '@exense/step-core';
 import { CompositeKeywordPlanApiService } from '../../services/composite-keyword-plan-api.service';
 import { ActivatedRoute } from '@angular/router';
 

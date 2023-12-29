@@ -118,18 +118,6 @@
         >
           <step-icon name="trash-2"></step-icon>
         </button>
-        <button
-          mat-icon-button
-          matTooltip="Version history"
-          [disabled]="
-            !('param-delete' | hasRight | async) ||
-            (element.scope === 'GLOBAL' && !('param-global-write' | hasRight | async))
-          "
-          (click)="_logic.displayHistory(element, 'param-write')"
-          class="history"
-        >
-          <step-icon name="git-branch"></step-icon>
-        </button>
         <step-entity-menu-button [entityItem]="element" [entityMenu]="entityMenu" stepHighlightTableRow>
           <step-icon name="more-horizontal"></step-icon>
         </step-entity-menu-button>
