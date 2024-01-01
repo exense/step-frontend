@@ -1,5 +1,12 @@
 .name-column {
+  cursor: pointer;
+
   &:hover {
     text-decoration: underline;
   }
+}
+
+.dashlet-icon {
+  cursor: pointer;
+  transform: rotate(180deg);
 }

@@ -146,8 +146,8 @@ export class MetricChartComponent implements OnInit, OnChanges {
   private createChartSettings(response: TimeSeriesAPIResponse, groupDimensions: string[]): TSChartSettings {
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const series: TSChartSeries[] = response.matrix.map((series, i) => {
-      const labelItems = this.getSeriesLabels(response.matrixKeys[i], groupDimensions);
-      const seriesKey = TimeSeriesUtils.getSeriesKey(response.matrixKeys[i], groupDimensions);
+      const labelItems = this.getSeriesKeys(response.matrixKeys[i], groupDimensions);
+      const seriesKey = labelItems.join(' | ');
       const color = this.settings.renderingSettings?.seriesColors?.[seriesKey] || this.colorsPool.getColor(seriesKey);
       return {
         id: seriesKey,
@@ -336,7 +336,10 @@ export class MetricChartComponent implements OnInit, OnChanges {
     }
   }
 
-  private getSeriesLabels(attributes: BucketAttributes, groupDimensions: string[]): (string | undefined)[] {
+  private getSeriesKeys(attributes: BucketAttributes, groupDimensions: string[]): (string | undefined)[] {
+    if (Object.keys(attributes).length === 0) {
+      return [undefined];
+    }
     return groupDimensions.map((field) => attributes[field]);
   }
 }

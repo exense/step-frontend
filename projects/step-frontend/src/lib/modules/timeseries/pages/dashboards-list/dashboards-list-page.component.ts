@@ -28,7 +28,8 @@ export class DashboardsListPageComponent {
   });
 
   delete(dashboard: DashboardView) {
-    a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Dashboard "${dashboard.name}"`))
+    this._dialogs
+      .showDeleteWarning(1, `Dashboard "${dashboard.name}"`)
       .pipe(
         map(() => true),
         catchError(() => of(false)),

@@ -1,6 +1,5 @@
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, DashboardService, MetricType, TimeRange, TimeSeriesService } from '@exense/step-core';
+import { MetricType, TimeRange, TimeSeriesService } from '@exense/step-core';
 import { TimeSeriesConfig } from '../../time-series.config';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
 import { TimeSeriesDashboardComponent } from '../../dashboard/time-series-dashboard.component';
@@ -238,7 +237,3 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     this.terminator$.complete();
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepAnalyticsPage', downgradeComponent({ component: AnalyticsPageComponent }));

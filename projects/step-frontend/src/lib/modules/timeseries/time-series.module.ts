@@ -98,6 +98,10 @@ import { DashboardsListPageComponent } from './pages/dashboards-list/dashboards-
 export class TimeSeriesModule {
   constructor(_viewRegistry: ViewRegistryService) {
     _viewRegistry.registerRoute({
+      path: 'analytics',
+      component: AnalyticsPageComponent,
+    });
+    _viewRegistry.registerRoute({
       path: 'dashboards',
       component: DashboardsListPageComponent,
     });
