@@ -35,7 +35,7 @@ import {
   PlanSetupService,
   PlanEditorApiService,
 } from '@exense/step-core';
-import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
@@ -100,6 +100,7 @@ export class PlanEditorBaseComponent
     return this.initialPlan?.id;
   }
 
+  @Input() id?: string;
   @Input() initialPlan?: Plan | null;
   @Input() showExecuteButton = true;
 
@@ -141,6 +142,12 @@ export class PlanEditorBaseComponent
     if (cPlan?.previousValue !== cPlan?.currentValue || cPlan?.firstChange) {
       this.setupPlan(cPlan?.currentValue, true);
       this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference((cPlan?.currentValue as Plan)?.id);
+    }
+
+    const cId = changes['id'];
+    if (cId?.previousValue !== cId?.currentValue || cId?.firstChange) {
+      this.loadPlan(cId?.currentValue, true);
+      this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference(cId?.currentValue);
     }
   }
 
@@ -283,6 +290,14 @@ export class PlanEditorBaseComponent
         this.keywords._leafReportsDataSource.reload();
       }
     });
+  }
+
+  private loadPlan(id?: string, preselectArtefact?: boolean): void {
+    if (!id) {
+      return;
+    }
+
+    this._planEditorApi.loadPlan(id).subscribe((plan) => this.setupPlan(plan, preselectArtefact));
   }
 
   setupPlan(plan?: Plan, preselectArtefact?: boolean): void {
