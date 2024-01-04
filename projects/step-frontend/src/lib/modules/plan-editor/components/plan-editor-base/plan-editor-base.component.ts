@@ -97,10 +97,10 @@ export class PlanEditorBaseComponent
   }
 
   private get currentPlanId(): string | undefined {
-    return this.initialPlan?.id;
+    return this.compositeId ?? this.initialPlan?.id;
   }
 
-  @Input() id?: string;
+  @Input() compositeId?: string;
   @Input() initialPlan?: Plan | null;
   @Input() showExecuteButton = true;
 
@@ -144,10 +144,10 @@ export class PlanEditorBaseComponent
       this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference((cPlan?.currentValue as Plan)?.id);
     }
 
-    const cId = changes['id'];
-    if (cId?.previousValue !== cId?.currentValue || cId?.firstChange) {
-      this.loadPlan(cId?.currentValue, true);
-      this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference(cId?.currentValue);
+    const cCompositeId = changes['compositeId'];
+    if (cCompositeId?.previousValue !== cCompositeId?.currentValue || cCompositeId?.firstChange) {
+      this.loadPlan(cCompositeId?.currentValue, true);
+      this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference(cCompositeId?.currentValue);
     }
   }
 
