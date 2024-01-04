@@ -5,7 +5,7 @@
   [matAutocomplete]="auto"
   (blur)="handleBlur()"
 />
-<mat-autocomplete #auto="matAutocomplete" (optionSelected)="select($event)">
+<mat-autocomplete #auto="matAutocomplete" (optionSelected)="select($event)" panelWidth="auto">
   <mat-option *ngFor="let item of displayItems$ | async; trackBy: trackByKeyValue" [value]="item.key">
     {{ item.value }}
   </mat-option>
