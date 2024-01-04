@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, pipe, tap } from 'rxjs';
+import { map, Observable, of, pipe, tap } from 'rxjs';
 import {
   AugmentedInteractivePlanExecutionService,
   AugmentedKeywordsService,
@@ -22,7 +22,7 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService {
 
   private keyword?: Keyword;
 
-  private readonly getPlanWidthId = pipe(
+  private readonly getPlanWithId = pipe(
     tap((keyword: Keyword) => (this.keyword = keyword)),
     map((keyword) => {
       const id = keyword.id!;
@@ -32,7 +32,7 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService {
   );
 
   private readonly getPlan = pipe(
-    this.getPlanWidthId,
+    this.getPlanWithId,
     map(({ plan }) => plan)
   );
 
@@ -82,6 +82,6 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService {
       plan,
     } as Keyword;
 
-    return this._keywordApi.saveFunction(keyword).pipe(this.getPlanWidthId);
+    return this._keywordApi.saveFunction(keyword).pipe(this.getPlanWithId);
   }
 }
