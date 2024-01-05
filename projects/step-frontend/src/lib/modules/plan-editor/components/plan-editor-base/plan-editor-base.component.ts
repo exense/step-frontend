@@ -189,17 +189,14 @@ export class PlanEditorBaseComponent
       .pipe(
         switchMap((value) =>
           this._planEditorApi.clonePlan(this.currentPlanId!).pipe(
-            map((plan) => {
-              plan!.attributes!['name'] = value;
-              return plan;
-            }),
-            switchMap((plan) => this._planEditorApi.savePlan(plan)),
-            map(({ id }) => id)
+            switchMap((plan) => this._planEditorApi.renamePlan(plan, value)),
+            tap(console.log),
+            map(({ plan }) => plan.id)
           )
         )
       )
       .subscribe((id) => {
-        this._planEditorApi.navigateToPlan(id);
+        this._planEditorApi.navigateToPlan(id, true);
       });
   }
 
