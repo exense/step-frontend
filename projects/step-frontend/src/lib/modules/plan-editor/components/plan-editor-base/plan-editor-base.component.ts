@@ -190,7 +190,6 @@ export class PlanEditorBaseComponent
         switchMap((value) =>
           this._planEditorApi.clonePlan(this.currentPlanId!).pipe(
             switchMap((plan) => this._planEditorApi.renamePlan(plan, value)),
-            tap(console.log),
             map(({ plan }) => plan.id)
           )
         )
