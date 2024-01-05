@@ -164,7 +164,7 @@ export class SchedulerService {
   }
 
   /**
-   * Returns the list of entities matching the provided attributes
+   * Returns the list of entities for the provided list of IDs
    * @param requestBody
    * @returns ExecutiontTaskParameters default response
    * @throws ApiError
