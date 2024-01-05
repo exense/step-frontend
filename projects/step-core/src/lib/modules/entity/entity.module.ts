@@ -11,6 +11,7 @@ import { CastEntityToPlanPipe } from './pipes/cast-entity-to-plan.pipe';
 import { CastEntityToTaskPipe } from './pipes/cast-entity-to-task.pipe';
 import { CastEntityToExecutionPipe } from './pipes/cast-entity-to-execution.pipe';
 import { EntityMenuButtonComponent } from './components/entity-menu-button/entity-menu-button.component';
+import { EntityMenuItemDirective } from './directives/entity-menu-item.directive';
 
 @NgModule({
   imports: [CommonModule, StepMaterialModule, CustomRegistriesModule, StepBasicsModule],
@@ -23,6 +24,7 @@ import { EntityMenuButtonComponent } from './components/entity-menu-button/entit
     CastEntityToTaskPipe,
     CastEntityToExecutionPipe,
     EntityMenuButtonComponent,
+    EntityMenuItemDirective,
   ],
   exports: [
     EntityIconComponent,
@@ -43,6 +45,7 @@ export * from './components/base-entity-selection-table/base-entity-selection-ta
 export * from './components/entity-menu/entity-menu.component';
 export * from './components/entity-menu-button/entity-menu-button.component';
 export * from './directives/entity-menu-content.directive';
+export * from './directives/entity-menu-item.directive';
 export * from './services/entity-registry';
 export * from './services/entity-type-resolver';
 export * from './services/entity-dialogs.service';

@@ -154,7 +154,6 @@ export * from './shared/auth-context.interface';
 export * from './shared/compare-condition.enum';
 export * from './shared/credentials-strategy';
 export * from './shared/alert-type.enum';
-export * from './shared/restore-dialog-data';
 export * from './shared/screen-width.token';
 export * from './shared/is-small-screen.token';
 export * from './shared/resize-observable';

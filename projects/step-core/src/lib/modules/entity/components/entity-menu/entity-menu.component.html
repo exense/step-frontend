@@ -7,8 +7,12 @@
       <button
         type="button"
         mat-menu-item
-        [disabled]="!!item.permission && !(item.permission | hasRight | async)"
-        (click)="handleEntityOperation(element, item)"
+        [stepEntityMenuItem]="item"
+        [entity]="element"
+        #menuItem="EntityMenuItem"
+        [disabled]="!!(menuItem.isDisabled$ | async)"
+        [class.hidden]="!(menuItem.isVisible$ | async)"
+        (click)="menuItem.invoke()"
       >
         <step-icon *ngIf="item.icon" [name]="item.icon"></step-icon>
         {{ item.label }}
