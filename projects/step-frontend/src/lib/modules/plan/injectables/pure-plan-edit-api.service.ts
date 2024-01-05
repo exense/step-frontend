@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, from, map, Observable } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 import {
   Plan,
   PlansService,
@@ -9,9 +9,9 @@ import {
   ReportNode,
   ExportDialogsService,
   GlobalProgressSpinnerService,
+  PlanEditorApiService,
 } from '@exense/step-core';
 import { Router } from '@angular/router';
-import { PlanEditorApiService } from '../../plan-editor/plan-editor.module';
 
 @Injectable()
 export class PurePlanEditApiService implements PlanEditorApiService {
@@ -54,6 +54,10 @@ export class PurePlanEditApiService implements PlanEditorApiService {
 
   restorePlanVersion(id: string, versionId: string): Observable<Plan> {
     return this._planApi.restorePlanVersion(id, versionId);
+  }
+
+  getPlanVersion(id: string, plan: Plan): Observable<string> {
+    return of(plan.customFields?.['versionId']);
   }
 
   savePlan(plan: Plan): Observable<{ id: string; plan: Plan; forceRefresh?: boolean }> {

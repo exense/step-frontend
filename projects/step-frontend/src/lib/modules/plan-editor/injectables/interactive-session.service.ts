@@ -4,10 +4,10 @@ import {
   AugmentedScreenService,
   ExecutionParameters,
   RepositoryObjectReference,
+  PlanEditorApiService,
 } from '@exense/step-core';
 import { BehaviorSubject, map, Observable, of, switchMap, tap } from 'rxjs';
 import { KeywordParameters, TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../execution/execution.module';
-import { PlanEditorApiService } from './plan-editor-api.service';
 
 @Injectable()
 export class InteractiveSessionService implements OnDestroy {

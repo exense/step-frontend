@@ -1,7 +1,7 @@
 <step-modal-window title="Load Distribution Wizard">
   <div step-modal-window-body>
     <ng-container [formGroup]="wizardForm">
-      <step-form-field>
+      <step-form-field [showRequiredMarker]="true">
         <step-label
           >Target throughput
           <step-icon
@@ -20,7 +20,7 @@
           </mat-select>
         </step-suffix>
       </step-form-field>
-      <step-form-field>
+      <step-form-field [showRequiredMarker]="true">
         <step-label
           >Estimated iteration durations max
           <step-icon
