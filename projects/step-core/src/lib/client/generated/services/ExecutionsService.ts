@@ -51,7 +51,7 @@ export class ExecutionsService {
   }
 
   /**
-   * Delete the execution with the given execution id.
+   * Delete the execution with the given execution id, use the housekeeping services for full deletion
    * @param id
    * @returns any default response
    * @throws ApiError

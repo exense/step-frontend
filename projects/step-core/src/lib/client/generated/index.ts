@@ -233,6 +233,7 @@ export { $ViewModel } from './schemas/$ViewModel';
 
 export { AsyncTasksService } from './services/AsyncTasksService';
 export { CollectionsService } from './services/CollectionsService';
+export { CompositesService } from './services/CompositesService';
 export { ControllerService } from './services/ControllerService';
 export { DockerRegistriesService } from './services/DockerRegistriesService';
 export { ExecutionsService } from './services/ExecutionsService';
