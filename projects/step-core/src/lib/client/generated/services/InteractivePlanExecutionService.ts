@@ -5,7 +5,6 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import type { ExecutionParameters } from '../models/ExecutionParameters';
-import type { FunctionTestingSession } from '../models/FunctionTestingSession';
 import type { ReportNode } from '../models/ReportNode';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -48,21 +47,6 @@ export class InteractivePlanExecutionService {
         id: id,
         functionid: functionid,
         artefactid: artefactid,
-      },
-    });
-  }
-
-  /**
-   * @param keywordid
-   * @returns FunctionTestingSession default response
-   * @throws ApiError
-   */
-  public startFunctionTestingSession(keywordid: string): Observable<FunctionTestingSession> {
-    return this.httpRequest.request({
-      method: 'POST',
-      url: '/interactive/functiontest/{keywordid}/start',
-      path: {
-        keywordid: keywordid,
       },
     });
   }
