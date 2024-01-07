@@ -73,6 +73,7 @@ $border-radius: 8px;
     input,
     pre,
     step-array-input,
+    step-autocomplete-input,
     textarea {
       border-color: $border-color;
       font-weight: 400;
@@ -161,6 +162,7 @@ $border-radius: 8px;
         input,
         pre,
         step-array-input,
+        step-autocomplete-input,
         textarea,
         & > step-suffix,
         & > step-prefix {
@@ -181,6 +183,7 @@ $border-radius: 8px;
       input,
       pre,
       step-array-input,
+      step-autocomplete-input,
       mat-date-range-input,
       textarea {
         border-color: $error-color;
@@ -218,6 +221,7 @@ $border-radius: 8px;
       & > input,
       pre,
       step-array-input,
+      step-autocomplete-input,
       textarea {
         @include border-base;
         @include right-border;
