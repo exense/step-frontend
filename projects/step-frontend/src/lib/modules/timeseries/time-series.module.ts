@@ -41,6 +41,7 @@ import { PlanEditorComponent } from '../plan/components/plan-editor/plan-editor.
 import { ChartDashletComponent } from './pages/dashboard/chart-dashlet/chart-dashlet.component';
 import { DashboardFilterBarComponent } from './performance-view/filter-bar/dashboard-filter-bar.component';
 import { DashboardsListPageComponent } from './pages/dashboards-list/dashboards-list-page.component';
+import { ChartDashletSettingsComponent } from './pages/dashboard/chart-dashlet/settings/chart-dashlet-settings.component';
 
 @NgModule({
   declarations: [
@@ -71,6 +72,7 @@ import { DashboardsListPageComponent } from './pages/dashboards-list/dashboards-
     ChartDashletComponent,
     DashboardFilterBarComponent,
     DashboardsListPageComponent,
+    ChartDashletSettingsComponent,
   ],
   exports: [
     ExecutionPerformanceComponent,

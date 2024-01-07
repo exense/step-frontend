@@ -1,0 +1,44 @@
+.section {
+  margin-top: 2rem;
+}
+
+.help-icon {
+  margin-left: 0.2rem;
+  transform: scale(0.9);
+}
+
+.option-with-icon {
+  line-height: unset !important;
+}
+
+.attributes-table {
+  width: 100%;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+
+  td,
+  th {
+    text-align: left;
+    padding: 0 1rem;
+  }
+
+  th {
+    padding: 0.6rem 1.4rem;
+  }
+
+  td {
+    font-size: 1.3rem;
+  }
+
+  tr:nth-child(odd) {
+    background-color: #f7f7f7;
+  }
+}
+
+.hidden-input {
+  border: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  padding: 0.4rem;
+}

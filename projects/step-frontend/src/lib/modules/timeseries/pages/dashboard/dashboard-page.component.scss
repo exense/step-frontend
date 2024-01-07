@@ -1,3 +1,8 @@
+.header-container {
+  display: flex;
+  justify-content: space-between;
+}
+
 .settings-container {
   position: absolute;
   right: 8px;
@@ -8,4 +13,18 @@
 .checkbox-row {
   gap: 12px;
   align-items: center;
+}
+
+.dashlet {
+  margin-top: 3rem;
+  position: relative;
+  border: 1px solid #eee;
+  transition: width 400ms ease-in-out;
+}
+
+.add-dashlet-container {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

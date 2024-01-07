@@ -9,6 +9,7 @@ import {
   DashletComponent,
   FetchBucketsRequest,
   MetricAttribute,
+  MetricType,
   TimeRange,
   TimeSeriesAPIResponse,
   TimeSeriesService,
@@ -29,20 +30,19 @@ import { TsFilterItem } from '../../performance-view/filter-bar/model/ts-filter-
 import { filter, forkJoin, merge, Observable, of, Subject, switchMap, takeUntil, throttle } from 'rxjs';
 import { ChartDashletComponent } from './chart-dashlet/chart-dashlet.component';
 import { Dashlet } from './model/dashlet';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
-
-interface ChartConfig {
-  state: DashboardItem; // input
-  finalSettings?: TSChartSettings; // output
-
-  groupingAttributes: MetricAttributeSelection[];
-}
 
 interface MetricAttributeSelection extends MetricAttribute {
   selected: boolean;
 }
+
+interface PageParams {
+  editMode?: boolean;
+}
+
+const EDIT_PARAM_NAME = 'edit';
 
 @Component({
   selector: 'step-dashboard-page',
@@ -51,6 +51,7 @@ interface MetricAttributeSelection extends MetricAttribute {
 })
 export class DashboardPageComponent implements OnInit, OnDestroy {
   readonly AGGREGATES: AggregationType[] = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'RATE', 'MEDIAN'];
+  readonly DASHLET_HEIGHT = 300;
 
   @ViewChildren(ChartDashletComponent) dashlets: Dashlet[] = [];
 
@@ -58,12 +59,11 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   private _timeSeriesContextFactory = inject(TimeSeriesContextsFactory);
   private _dashboardService = inject(DashboardsService);
   private _route: ActivatedRoute = inject(ActivatedRoute);
+  private _router: Router = inject(Router);
   colorsPool: TimeseriesColorsPool = new TimeseriesColorsPool();
 
   dashboard!: DashboardView;
-  chartSettings: TSChartSettings[] = [];
-
-  chartConfigs: ChartConfig[] = [];
+  dashboardBackup!: DashboardView;
 
   context!: TimeSeriesContext;
 
@@ -73,60 +73,79 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   terminator$ = new Subject<void>();
 
+  editMode = false;
+  metricTypes?: MetricType[];
+
   ngOnInit(): void {
+    const pageParams = this.extractUrlParams();
+    this.removeOneTimeUrlParams();
+    this.editMode = pageParams.editMode || false;
     this._route.paramMap.subscribe((params) => {
       const id: string = params.get('id')!;
       if (!id) {
         throw new Error('Dashboard id not present');
       }
-      // Now you can use this.id as needed
       this._dashboardService.getEntityById5(id).subscribe((dashboard) => {
         this.dashboard = dashboard;
         this.context = this.createContext(this.dashboard);
-        this.createCharts(this.dashboard);
+        this.subscribeForContextChange();
+        this.subscribeForTimeRangeChange();
       });
     });
+  }
+
+  private extractUrlParams(): PageParams {
+    const initialParams: Params = this._route.snapshot.queryParams;
+    return {
+      editMode: initialParams[EDIT_PARAM_NAME] == '1',
+    };
   }
 
   ngOnDestroy(): void {
     this._timeSeriesContextFactory?.destroyContext(this.context?.id);
   }
 
-  private createCharts(dashboard: DashboardView): void {
-    this.chartSettings = new Array(dashboard.dashlets!.length);
-    this.dashboard.dashlets!.forEach((dashlet, i) => {
-      const settings = dashlet.chartSettings!;
-      const primarySettings = settings.primaryAxes!;
-      const grouping = settings.grouping || [];
-      const request: FetchBucketsRequest = {
-        start: dashboard.timeRange!.absoluteSelection!.from!,
-        end: dashboard.timeRange!.absoluteSelection!.to!,
-        groupDimensions: grouping,
-        oqlFilter: FilterUtils.objectToOQL({ 'attributes.metricType': `"${settings.metricKey!}"` }),
-        numberOfBuckets: 100,
-        percentiles: this.getChartPclToRequest(primarySettings.aggregation!),
-      };
+  enableEditMode() {
+    this.dashboardBackup = { ...this.dashboard, dashlets: [...this.dashboard.dashlets.map((item) => ({ ...item }))] };
+    this.editMode = true;
+    if (!this.metricTypes) {
+      this._timeSeriesService.getMetricTypes().subscribe((metrics) => (this.metricTypes = metrics));
+    }
+  }
 
-      const groupingSelection: MetricAttributeSelection[] =
-        settings.attributes?.map((a) => ({ ...a, selected: false })) || [];
-      settings.grouping?.forEach((a) => {
-        const foundAttribute = groupingSelection.find((attr) => attr.name === a);
-        if (foundAttribute) {
-          foundAttribute.selected = true;
-        }
-      });
+  disableEditMode() {
+    this.dashboard = { ...this.dashboardBackup };
+    this.editMode = false;
+  }
 
-      const chartConfig: ChartConfig = {
-        state: dashlet,
-        groupingAttributes: groupingSelection,
-      };
-      this.chartConfigs.push(chartConfig);
+  saveEditChanges() {
+    this.editMode = false;
+    this._dashboardService.saveEntity5(this.dashboard).subscribe((response) => {
+      console.log('success');
+    });
+  }
 
-      this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
-        chartConfig.finalSettings = this.createChartSettings(dashlet!.name!, settings, response, grouping);
-      });
-      this.subscribeForTimeRangeChange();
-      this.subscribeForContextChange();
+  addDashlet(metric: MetricType) {
+    this.dashboard.dashlets.push({
+      name: metric.displayName!,
+      type: 'CHART',
+      size: 1,
+      chartSettings: {
+        filters: [],
+        metricKey: metric.name!,
+        inheritGlobalFilters: false,
+        inheritGlobalGrouping: !metric.defaultGroupingAttributes?.length,
+        grouping: metric.defaultGroupingAttributes || [],
+        attributes: metric.attributes || [],
+        readonlyAggregate: false,
+        readonlyGrouping: false,
+        primaryAxes: {
+          aggregation: metric.defaultAggregation!,
+          unit: metric.unit!,
+          displayType: 'LINE',
+          renderingSettings: metric.renderingSettings,
+        },
+      },
     });
   }
 
@@ -203,93 +222,37 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   }
 
   private refreshAllCharts(): Observable<any[]> {
-    console.log('REFRESHING ALL');
     return forkJoin(this.dashlets?.map((dashlet) => dashlet.refresh()) || []);
   }
 
-  toggleGroupingAttribute(chartConfig: ChartConfig, attribute: MetricAttributeSelection) {
-    attribute.selected = !attribute.selected;
+  handleChartDelete(index: number) {
+    this.dashboard.dashlets.splice(index, 1);
   }
 
-  private getChartPclToRequest(aggregation: AggregationType): number[] {
-    switch (aggregation) {
-      case 'MEDIAN':
-        return [50];
-      case 'PERCENTILE':
-        return [90, 98, 99];
-      default:
-        return [];
+  handleChartShiftLeft(index: number) {
+    const listLength = this.dashboard.dashlets.length;
+    let swapIndex = index - 1;
+    if (index === 0) {
+      // first element
+      swapIndex = listLength - 1;
     }
+    [this.dashboard.dashlets[index], this.dashboard.dashlets[swapIndex]] = [
+      this.dashboard.dashlets[swapIndex],
+      this.dashboard.dashlets[index],
+    ];
   }
 
-  private createChartSettings(
-    name: string,
-    settings: ChartSettings,
-    response: TimeSeriesAPIResponse,
-    groupDimensions: string[]
-  ): TSChartSettings {
-    const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-    const primaryAxes = settings.primaryAxes!;
-    const primaryAggregation = primaryAxes.aggregation!;
-    const series: TSChartSeries[] = response.matrix.map((series, i) => {
-      const labelItems = this.getSeriesKeys(response.matrixKeys[i], groupDimensions);
-      const seriesKey = labelItems.join(' | ');
-      const color = primaryAxes.renderingSettings?.seriesColors?.[seriesKey] || this.colorsPool.getColor(seriesKey);
-
-      return {
-        id: seriesKey,
-        label: seriesKey,
-        labelItems: labelItems,
-        legendName: seriesKey,
-        data: series.map((b) => this.getBucketValue(b, primaryAggregation!)),
-        value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x),
-        stroke: color,
-        fill: (self: uPlot, seriesIdx: number) => UPlotUtils.gradientFill(self, color),
-        points: { show: false },
-        show: true,
-      };
-    });
-    const primaryUnit = primaryAxes.unit!;
-    const yAxesUnit = this.getUnitLabel(primaryAggregation, primaryUnit);
-
-    return {
-      title: `${name} (${primaryAggregation})`,
-      xValues: xLabels,
-      series: series,
-      tooltipOptions: {
-        enabled: true,
-        yAxisUnit: yAxesUnit,
-      },
-      showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
-      axes: [
-        {
-          size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-          scale: 'y',
-          values: (u, vals, space) => {
-            return vals.map((v) => this.getAxesFormatFunction(primaryAggregation, primaryUnit)(v));
-          },
-        },
-      ],
-    };
-  }
-
-  private getAxesFormatFunction(aggregation: AggregationType, unit: string): (v: number) => string {
-    if (!unit) {
-      return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber;
+  handleChartShiftRight(index: number) {
+    const listLength = this.dashboard.dashlets.length;
+    let swapIndex = index + 1;
+    if (index === listLength - 1) {
+      // last element
+      swapIndex = 0;
     }
-    if (aggregation === 'RATE') {
-      return (v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(v) + '/h';
-    }
-    switch (unit) {
-      case '1':
-        return (v) => v.toString() + this.getUnitLabel(aggregation, unit);
-      case 'ms':
-        return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time;
-      case '%':
-        return (v) => v.toString() + this.getUnitLabel(aggregation, unit);
-      default:
-        throw new Error('Unit not handled: ' + unit);
-    }
+    [this.dashboard.dashlets[index], this.dashboard.dashlets[swapIndex]] = [
+      this.dashboard.dashlets[swapIndex],
+      this.dashboard.dashlets[index],
+    ];
   }
 
   handleTimeRangeChange(params: { selection: TimeRangePickerSelection; triggerRefresh: boolean }) {
@@ -298,43 +261,21 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     // this.updateFullRange(newTimeRange, params.triggerRefresh);
   }
 
-  private getUnitLabel(aggregation: AggregationType, unit: string): string {
-    if (aggregation === 'RATE') {
-      return '/h';
-    }
-    if (unit === '%') {
-      return '%';
-    } else if (unit === 'ms') {
-      return ' ms';
-    } else {
-      return '';
-    }
-  }
+  removeOneTimeUrlParams() {
+    // Get a copy of the current query parameters
+    const currentParams = { ...this._route.snapshot.queryParams };
 
-  private getBucketValue(b: BucketResponse, aggregation: AggregationType): number | undefined {
-    if (!b) {
-      return 0;
-    }
-    switch (aggregation) {
-      case 'SUM':
-        return b.sum;
-      case 'AVG':
-        return b.sum / b.count;
-      case 'MAX':
-        return b.max;
-      case 'MIN':
-        return b.min;
-      case 'COUNT':
-        return b.count;
-      case 'RATE':
-        return b.throughputPerHour;
-      case 'MEDIAN':
-        return b.pclValues?.[50];
-      case 'PERCENTILE':
-      // return b.pclValues?.[this.selectedPclValue];
-      default:
-        throw new Error('Unhandled aggregation value: ' + aggregation);
-    }
+    // Remove the specific parameter
+    currentParams[EDIT_PARAM_NAME] = null;
+    console.log(currentParams);
+
+    // Navigate with the updated parameters
+    this._router.navigate([], {
+      relativeTo: this._route,
+      replaceUrl: true,
+      queryParams: currentParams,
+      queryParamsHandling: 'merge',
+    });
   }
 
   private prepareFilterItems(): TsFilterItem[] {

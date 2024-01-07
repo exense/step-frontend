@@ -1,5 +1,18 @@
 <div *ngIf="dashboard" style="margin: 12px">
-  <div style="font-size: 24px">{{ dashboard.name }}</div>
+  <div class="header-container">
+    <div>Here we have settings</div>
+    <div>
+      <ng-container *ngIf="!editMode">
+        <button (click)="enableEditMode()">Edit</button>
+        <span>{{ dashboard.name }}</span>
+      </ng-container>
+      <ng-container *ngIf="editMode">
+        <button (click)="saveEditChanges()">Save</button>
+        <button (click)="disableEditMode()">Cancel</button>
+        <input [(ngModel)]="dashboard.name" />
+      </ng-container>
+    </div>
+  </div>
 
   <div>
     <step-ts-dashboard-filter-bar
@@ -16,69 +29,29 @@
 
   <div style="width: 100%; flex-direction: row; flex-wrap: wrap; display: flex; justify-content: space-between">
     <div
-      *ngFor="let config of chartConfigs"
-      style="margin-top: 3rem; position: relative; border: 1px solid #eee"
-      [style.width]="config.state.size === 2 ? '100%' : '50%'"
+      *ngFor="let dashlet of dashboard.dashlets; let i = index"
+      class="dashlet"
+      [style.width]="dashlet.size === 2 ? '100%' : '50%'"
     >
-      <step-chart-dashlet [item]="config.state" [context]="context" [height]="300"></step-chart-dashlet>
+      <step-chart-dashlet
+        [editMode]="editMode"
+        [item]="dashlet"
+        [context]="context"
+        [height]="DASHLET_HEIGHT"
+        (remove)="handleChartDelete(i)"
+        (shiftLeft)="handleChartShiftLeft(i)"
+        (shiftRight)="handleChartShiftRight(i)"
+      ></step-chart-dashlet>
+    </div>
+    <div *ngIf="editMode" class="add-dashlet-container" [style.height]="DASHLET_HEIGHT + 'px'">
+      <div id="add-custom-chart" *ngIf="metricTypes" [matMenuTriggerFor]="menu">
+        <span>+ Add Chart</span>
+        <mat-menu #menu="matMenu">
+          <button *ngFor="let metric of metricTypes" mat-menu-item (click)="addDashlet(metric)">
+            {{ metric.displayName }}
+          </button>
+        </mat-menu>
+      </div>
     </div>
   </div>
 </div>
-
-<ng-template #menuTemplate let-config>
-  <div class="settings-container">
-    <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
-      <step-icon name="settings"></step-icon>
-    </button>
-
-    <mat-menu #settingsMenu="matMenu">
-      <button *ngIf="!config.state?.chartSettings?.readonlyGrouping" mat-menu-item [matMenuTriggerFor]="groupingMenu">
-        Grouping
-      </button>
-      <!--        <button mat-menu-item [matMenuTriggerFor]="aggregateMenu">Aggregate</button>-->
-    </mat-menu>
-
-    <mat-menu #groupingMenu="matMenu">
-      <button
-        *ngFor="let attribute of config.groupingAttributes"
-        (click)="toggleGroupingAttribute(config, attribute); $event.stopPropagation()"
-        mat-menu-item
-        [class.selected-menu-item]="attribute.selected"
-      >
-        <div class="flex flex-row checkbox-row">
-          <input type="checkbox" class="checkbox" [ngModel]="attribute.selected" />
-          <span>{{ attribute.displayName }}</span>
-        </div>
-      </button>
-    </mat-menu>
-
-    <!--      <mat-menu #aggregateMenu="matMenu">-->
-    <!--        <button-->
-    <!--          *ngFor="let aggregate of AGGREGATES"-->
-    <!--          (click)="switchAggregate(aggregate)"-->
-    <!--          mat-menu-item-->
-    <!--          [class.selected-menu-item]="aggregate === selectedAggregate"-->
-    <!--        >-->
-    <!--          {{ aggregate }}-->
-    <!--        </button>-->
-    <!--        <button-->
-    <!--          mat-menu-item-->
-    <!--          [matMenuTriggerFor]="pclMenu"-->
-    <!--          [class.selected-menu-item]="selectedAggregate === 'PERCENTILE'"-->
-    <!--        >-->
-    <!--          PERCENTILE-->
-    <!--        </button>-->
-    <!--      </mat-menu>-->
-
-    <!--      <mat-menu #pclMenu="matMenu">-->
-    <!--        <button-->
-    <!--          *ngFor="let pcl of PCL_VALUES"-->
-    <!--          (click)="selectedPclValue = pcl; switchAggregate('PERCENTILE')"-->
-    <!--          [class.selected-menu-item]="selectedAggregate === 'PERCENTILE' && selectedPclValue === pcl"-->
-    <!--          mat-menu-item-->
-    <!--        >-->
-    <!--          {{ pcl }}th-->
-    <!--        </button>-->
-    <!--      </mat-menu>-->
-  </div>
-</ng-template>

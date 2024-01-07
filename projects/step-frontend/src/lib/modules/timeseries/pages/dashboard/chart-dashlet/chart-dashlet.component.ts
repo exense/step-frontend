@@ -22,6 +22,8 @@ import { TimeseriesColorsPool } from '../../../util/timeseries-colors-pool';
 import { TsFilterItem } from '../../../performance-view/filter-bar/model/ts-filter-item';
 import { TimeSeriesChartComponent } from '../../../chart/time-series-chart.component';
 import { Observable, of, tap } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { ChartDashletSettingsComponent } from './settings/chart-dashlet-settings.component';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -37,6 +39,8 @@ interface MetricAttributeSelection extends MetricAttribute {
 export class ChartDashletComponent implements OnInit, Dashlet {
   readonly AGGREGATES: AggregationType[] = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'RATE', 'MEDIAN'];
 
+  private _matDialog = inject(MatDialog);
+
   @ViewChild('chart') chart!: TimeSeriesChartComponent;
   _internalSettings?: TSChartSettings;
 
@@ -45,6 +49,11 @@ export class ChartDashletComponent implements OnInit, Dashlet {
   @Input() allowGroupingChange: boolean = true;
   @Input() allowMetricChange: boolean = true;
   @Input() height!: number;
+  @Input() editMode = false;
+
+  @Output() remove = new EventEmitter();
+  @Output() shiftLeft = new EventEmitter();
+  @Output() shiftRight = new EventEmitter();
 
   readonly PCL_VALUES = [80, 90, 99];
   selectedPclValue: number = this.PCL_VALUES[0];
@@ -119,6 +128,16 @@ export class ChartDashletComponent implements OnInit, Dashlet {
       ];
     }
     return FilterUtils.filtersToOQL(filterItems, 'attributes');
+  }
+
+  openChartSettings(): void {
+    this._matDialog
+      .open(ChartDashletSettingsComponent, { data: { item: this.item } })
+      .afterClosed()
+      .subscribe((updatedItem) => {
+        Object.assign(this.item, updatedItem);
+        this.refresh().subscribe();
+      });
   }
 
   private createChart(response: TimeSeriesAPIResponse): void {

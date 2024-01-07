@@ -41,6 +41,9 @@ export class DashboardsListPageComponent {
   }
 
   navigateToDashboard(id: string, editMode = false) {
-    this._router.navigate(['root', 'dashboards', id]);
+    this._router.navigate(['root', 'dashboards', id], {
+      queryParams: { edit: editMode ? '1' : '0' },
+      queryParamsHandling: 'merge',
+    });
   }
 }

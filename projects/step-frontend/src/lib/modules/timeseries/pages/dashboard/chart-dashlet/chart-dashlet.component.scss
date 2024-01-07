@@ -1,8 +1,9 @@
 .settings-container {
   position: absolute;
   right: 8px;
-  top: 8px;
+  top: 4px;
   z-index: 1;
+  transform: scale(0.9);
 }
 
 .checkbox-row {
