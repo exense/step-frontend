@@ -42,7 +42,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
 
   selectionType: BulkSelectionType = BulkSelectionType.NONE;
 
-  @Input() eId: string = '';
+  @Input() executionId: string = '';
   @Input() testCasesProgress?: ExecutionSummaryDto;
   @Input() progress?: ExecutionSummaryDto;
   @Input() execution?: Execution;
@@ -110,8 +110,8 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
     this.selectionTerminator$ = undefined;
   }
 
-  private setupSelectionChanges(eid?: string): void {
-    eid = eid || this.eId;
+  private setupSelectionChanges(executionId?: string): void {
+    executionId = executionId || this.executionId;
     this.terminateSelectionChanges();
 
     this.selectionTerminator$ = new Subject<void>();
@@ -119,7 +119,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
     this.keywordParameters$ = this._testCasesSelection!.selected$.pipe(
       map((testcases) => ({
         type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
-        eid,
+        executionId,
         testcases: this.panelService.isPanelEnabled(Panels.TEST_CASES) ? testcases : undefined,
       })),
       takeUntil(this.selectionTerminator$)

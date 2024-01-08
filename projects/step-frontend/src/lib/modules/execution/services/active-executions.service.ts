@@ -8,7 +8,7 @@ import {
 import { BehaviorSubject, concatMap, filter, Observable, startWith } from 'rxjs';
 
 export interface ActiveExecution {
-  readonly eId: string;
+  readonly executionId: string;
   readonly execution$: Observable<Execution>;
   readonly autoRefreshModel: AutoRefreshModel;
   destroy(): void;
@@ -16,7 +16,7 @@ export interface ActiveExecution {
 
 class ActiveExecutionImpl implements ActiveExecution {
   constructor(
-    readonly eId: string,
+    readonly executionId: string,
     readonly autoRefreshModel: AutoRefreshModel,
     private loadExecution: (eId: string) => Observable<Execution>
   ) {
@@ -36,7 +36,7 @@ class ActiveExecutionImpl implements ActiveExecution {
     this.autoRefreshModel.refresh$
       .pipe(
         startWith(() => undefined),
-        concatMap(() => this.loadExecution(this.eId))
+        concatMap(() => this.loadExecution(this.executionId))
       )
       .subscribe((execution) => {
         this.executionInternal$.next(execution);

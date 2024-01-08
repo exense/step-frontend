@@ -36,7 +36,7 @@ export class CallFunctionReportNodeComponent implements OnChanges {
     const start = this.execution.startTime;
     const executionInProgress = !this.execution.endTime;
     const params: any = {
-      eId: this.execution.id,
+      executionId: this.execution.id,
       name: measure.name,
       start: start,
       refresh: executionInProgress ? '1' : '0',

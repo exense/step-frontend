@@ -195,7 +195,9 @@ export class PlanEditorBaseComponent
         )
       )
       .subscribe((id) => {
-        this._planEditorApi.navigateToPlan(id, true);
+        if (id) {
+          this._planEditorApi.navigateToPlan(id, true);
+        }
       });
   }
 
