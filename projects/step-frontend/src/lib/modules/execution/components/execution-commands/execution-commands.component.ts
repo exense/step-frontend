@@ -1,4 +1,14 @@
-import { Component, inject, Inject, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Inject,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import {
   ArtefactFilter,
   AugmentedExecutionsService,
@@ -28,6 +38,8 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
   @Input() isolateExecution?: boolean;
   @Input() includedTestcases?: IncludeTestcases | null;
   @Input() execution?: Execution;
+
+  @Output() refresh = new EventEmitter<void>();
 
   executionParameters?: Record<string, string>;
   isExecutionIsolated: boolean = false;
@@ -82,11 +94,11 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
   }
 
   stop(): void {
-    this._executionService.abort(this.execution!.id!).subscribe();
+    this._executionService.abort(this.execution!.id!).subscribe(() => this.refresh.emit());
   }
 
   forceStop(): void {
-    this._executionService.forceStop(this.execution!.id!).subscribe();
+    this._executionService.forceStop(this.execution!.id!).subscribe(() => this.refresh.emit());
   }
 
   schedule(): void {
