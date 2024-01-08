@@ -45,8 +45,11 @@
         (shiftRight)="handleChartShiftRight(i)"
       ></step-chart-dashlet>
     </div>
-    <div *ngIf="editMode" class="add-dashlet-container" [style.height]="DASHLET_HEIGHT + 'px'">
-      <div *ngIf="metricTypes" [matMenuTriggerFor]="menu">
+    <div class="no-charts-message" *ngIf="!editMode && dashboard && dashboard.dashlets.length === 0">
+      Dashboard has no charts.
+    </div>
+    <div *ngIf="editMode && metricTypes" class="add-dashlet-container" [style.height]="DASHLET_HEIGHT + 'px'">
+      <div [matMenuTriggerFor]="menu">
         <button mat-raised-button color="primary"><step-icon name="plus"></step-icon>Add Chart</button>
         <mat-menu #menu="matMenu">
           <button *ngFor="let metric of metricTypes" mat-menu-item (click)="addDashlet(metric)">

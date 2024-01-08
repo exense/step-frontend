@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, ViewChildren } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import {
   BucketAttributes,
   BucketResponse,
@@ -32,6 +32,7 @@ import { filter, forkJoin, merge, Observable, of, Subject, switchMap, takeUntil,
 import { ChartDashletComponent } from './chart-dashlet/chart-dashlet.component';
 import { Dashlet } from './model/dashlet';
 import { ActivatedRoute, Params, Router } from '@angular/router';
+import { FilterBarComponent } from '../../performance-view/filter-bar/legacy/filter-bar.component';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -55,6 +56,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   readonly DASHLET_HEIGHT = 300;
 
   @ViewChildren(ChartDashletComponent) dashlets: Dashlet[] = [];
+  @ViewChild(FilterBarComponent) filterBar?: FilterBarComponent;
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _timeSeriesContextFactory = inject(TimeSeriesContextsFactory);
@@ -81,6 +83,10 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     const pageParams = this.extractUrlParams();
     this.removeOneTimeUrlParams();
     this.editMode = pageParams.editMode || false;
+    if (this.editMode) {
+      // TODO permissions
+      this.fetchMetricTypes();
+    }
     this._route.paramMap.subscribe((params) => {
       const id: string = params.get('id')!;
       if (!id) {
@@ -110,8 +116,12 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     this.dashboardBackup = { ...this.dashboard, dashlets: [...this.dashboard.dashlets.map((item) => ({ ...item }))] };
     this.editMode = true;
     if (!this.metricTypes) {
-      this._timeSeriesService.getMetricTypes().subscribe((metrics) => (this.metricTypes = metrics));
+      this.fetchMetricTypes();
     }
+  }
+
+  private fetchMetricTypes() {
+    this._timeSeriesService.getMetricTypes().subscribe((metrics) => (this.metricTypes = metrics));
   }
 
   disableEditMode() {
@@ -150,14 +160,14 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getTimeRangeFromTimeSelection(selection: TimeRangeSelection): TimeRange {
+  private getTimeRangeFromTimeSelection(selection: TimeRangePickerSelection): TimeRange {
     switch (selection.type) {
       case 'ABSOLUTE':
         return { from: selection.absoluteSelection!.from!, to: selection.absoluteSelection!.to! };
         break;
       case 'RELATIVE':
         let now = new Date().getTime();
-        return { from: now - selection.relativeRangeMs!, to: now };
+        return { from: now - selection.relativeSelection!.timeInMs!, to: now };
         break;
       default:
         throw new Error('Unsupported time selection type: ' + selection.type);
@@ -170,7 +180,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     if (dashboard.timeRange && dashboard.timeRange.type === 'RELATIVE') {
       const timeInMs = dashboardTimeRange.relativeRangeMs!;
       const foundRelativeOption = this.timeRangeOptions.find((o) => {
-        return o.type === 'RELATIVE' && timeInMs === timeInMs;
+        return o.type === 'RELATIVE' && timeInMs === o.relativeSelection?.timeInMs;
       });
       this.timeRangeSelection = foundRelativeOption || {
         type: 'RELATIVE',
@@ -215,21 +225,13 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     context
       .onTimeSelectionChange()
       .pipe(
-        switchMap((newRange) =>
-          compareCharts ? this.handleSelectionChange(newRange) : this.handleSelectionChange(newRange)
-        ),
+        switchMap((newRange) => this.handleSelectionChange(newRange)),
         takeUntil(compareCharts ? this.terminator$ : this.terminator$)
       )
       .subscribe();
   }
 
-  handleSelectionChange(timeRange?: TimeRange): Observable<any> {
-    console.log('selection changed');
-    // if (TimeSeriesUtils.intervalsEqual(this.findRequestBuilder.getRange(), selection)) {
-    //   // nothing happened
-    //   return of(undefined);
-    // }
-    // this.context.update
+  private handleSelectionChange(range?: TimeRange): Observable<any[]> {
     return this.refreshAllCharts();
   }
 
@@ -268,9 +270,12 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   }
 
   handleTimeRangeChange(params: { selection: TimeRangePickerSelection; triggerRefresh: boolean }) {
-    // this.timeRangeSelection = params.selection;
-    // let newTimeRange: TSTimeRange = this.calculateTimeRange(params.selection);
-    // this.updateFullRange(newTimeRange, params.triggerRefresh);
+    let range = this.getTimeRangeFromTimeSelection(params.selection);
+    console.log(range, params.selection);
+    this.context.updateFullRange(range, false);
+    this.context.updateSelectedRange(range, false);
+    let refreshRanger$ = this.filterBar?.timeSelection?.refreshRanger();
+    forkJoin([this.refreshAllCharts()]).subscribe();
   }
 
   removeOneTimeUrlParams() {
