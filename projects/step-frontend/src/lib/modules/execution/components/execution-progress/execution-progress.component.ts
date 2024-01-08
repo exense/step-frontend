@@ -73,7 +73,7 @@ interface RefreshParams {
       useExisting: forwardRef(() => ExecutionProgressComponent),
     },
     SingleExecutionPanelsService,
-    selectionCollectionProvider('artefactID', AutoDeselectStrategy.KEEP_SELECTION),
+    ...selectionCollectionProvider('artefactID', AutoDeselectStrategy.KEEP_SELECTION),
     TreeStateService,
   ],
 })

@@ -23,6 +23,7 @@ import { TimeRangeEditorComponent } from './components/time-range-editor/time-ra
 import { DayOfWeekSelectorComponent } from './components/week-selector/day-of-week-selector.component';
 import { WeeklyTimeRangeEditorComponent } from './components/weekly-time-range-editor/weekly-time-range-editor.component';
 import { AnyDateRangeEditorComponent } from './components/any-date-range-editor/any-date-range-editor.component';
+import { DatePickerModule } from '../date-picker/date-picker.module';
 
 @NgModule({
   declarations: [
@@ -46,7 +47,15 @@ import { AnyDateRangeEditorComponent } from './components/any-date-range-editor/
     WeeklyTimeRangeEditorComponent,
     AnyDateRangeEditorComponent,
   ],
-  imports: [StepBasicsModule, TabsModule, StepMaterialModule, FormsModule, ReactiveFormsModule, CommonModule],
+  imports: [
+    StepBasicsModule,
+    TabsModule,
+    StepMaterialModule,
+    FormsModule,
+    ReactiveFormsModule,
+    CommonModule,
+    DatePickerModule,
+  ],
   exports: [ValidateCronDirective],
 })
 export class CronModule {}

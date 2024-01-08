@@ -15,6 +15,7 @@ import { PlanEditorModule } from '../plan-editor/plan-editor.module';
 import { PlanEditorComponent } from './components/plan-editor/plan-editor.component';
 import { PlanSelectionComponent } from './components/plan-selection/plan-selection.component';
 import { PlansBulkOperationsRegisterService } from './injectables/plans-bulk-operations-register.service';
+import { planResolver } from './guards/plan.resolver';
 
 @NgModule({
   declarations: [PlanListComponent, PlanEditorComponent, PlanSelectionComponent],
@@ -52,6 +53,9 @@ export class PlanModule {
         {
           path: 'editor/:id',
           component: PlanEditorComponent,
+          resolve: {
+            plan: planResolver,
+          },
         },
       ],
     });

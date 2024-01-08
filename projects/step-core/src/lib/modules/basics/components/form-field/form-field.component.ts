@@ -15,4 +15,5 @@ export class FormFieldComponent {
   control?: NgControl;
 
   @Input() alignLabelAddon: 'separate' | 'near' = 'separate';
+  @Input() showRequiredMarker?: boolean;
 }

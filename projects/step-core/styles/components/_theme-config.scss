@@ -224,9 +224,7 @@ $light-primary-text: var.$white;
 
   .btn-xs {
     @include step-icon.step-icon(12px);
-    step-icon,
-    step-ajs-icon,
-    .step-ajs-icon {
+    step-icon {
       vertical-align: text-top;
     }
   }
@@ -234,22 +232,14 @@ $light-primary-text: var.$white;
   .btn-auto-size,
   a:not(.jstree-anchor) {
     @include step-icon.step-icon(16px);
-    step-icon,
-    step-ajs-icon,
-    .step-ajs-icon {
+    step-icon {
       vertical-align: top;
     }
   }
 
-  label + step-ajs-icon,
   step-label > step-icon {
     @include step-icon.step-icon-size(18px);
     vertical-align: text-top;
-  }
-
-  .jstree-icon.step-ajs-icon {
-    @include step-icon.step-icon-size(18px);
-    margin-top: -2px;
   }
 
   tbody .form-group {

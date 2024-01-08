@@ -46,7 +46,7 @@
             "tsConfig": "projects/step-app/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "projects/step-app/src/favicon.ico",
+              "projects/step-app/src/favicon.png",
               "projects/step-app/src/assets",
               {
                 "glob": "**/*",

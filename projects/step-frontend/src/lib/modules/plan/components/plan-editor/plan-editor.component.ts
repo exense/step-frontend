@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
-import { PlanEditorApiService } from '../../../plan-editor/injectables/plan-editor-api.service';
 import { PurePlanEditApiService } from '../../injectables/pure-plan-edit-api.service';
 import { ActivatedRoute } from '@angular/router';
-import { distinctUntilChanged, map, startWith } from 'rxjs';
+import { map } from 'rxjs';
+import { Plan, PlanEditorApiService } from '@exense/step-core';
 
 @Component({
   selector: 'step-plan-editor',
@@ -16,11 +16,5 @@ import { distinctUntilChanged, map, startWith } from 'rxjs';
   ],
 })
 export class PlanEditorComponent {
-  private _activatedRoute = inject(ActivatedRoute);
-
-  readonly id$ = this._activatedRoute.params.pipe(
-    startWith(this._activatedRoute.snapshot.params),
-    map((params) => params['id']),
-    distinctUntilChanged()
-  );
+  readonly _plan$ = inject(ActivatedRoute).data.pipe(map((data) => data['plan'] as Plan | undefined));
 }

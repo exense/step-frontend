@@ -6,15 +6,18 @@ import { CustomRegistryItem } from '../shared/custom-registry-item';
 
 export type EntityMenuItemCommandInvoke<E> = (entityType: string, entityKey: string, entity: E) => Observable<boolean>;
 
-export abstract class EntityMenuItemCommandInvoker<E> {
+export abstract class EntityMenuItemCommandController<E> {
   abstract invoke(entityType: string, entityKey: string, entity: E): Observable<boolean>;
+  abstract isDisabled?(entity: E): Observable<boolean>;
+  abstract isVisible?(entity: E): Observable<boolean>;
 }
 
 interface EntityMenuItem<E = unknown> extends CustomRegistryItem {
   entity: string;
   menuId: string;
   entityKeyProperty: string;
-  operation: EntityMenuItemCommandInvoke<E> | Type<EntityMenuItemCommandInvoker<E>>;
+  menuItemController?: Type<EntityMenuItemCommandController<E>>;
+  operation?: EntityMenuItemCommandInvoke<E>;
   icon?: string;
   permission?: string;
   order?: number;
@@ -45,7 +48,7 @@ export class EntityMenuItemsRegistryService {
   getEntityMenuItems(entity: string): EntityMenuItemInfo[] {
     return (this._customRegistry.getRegisteredItems(this.registryType) as EntityMenuItem[])
       .filter((item) => item.entity === entity)
-      .map(({ menuId, entity, entityKeyProperty, icon, label, operation, permission, order }) => ({
+      .map(({ menuId, entity, entityKeyProperty, icon, label, operation, permission, order, menuItemController }) => ({
         menuId,
         entity,
         entityKeyProperty,
@@ -53,6 +56,7 @@ export class EntityMenuItemsRegistryService {
         label,
         operation,
         permission,
+        menuItemController,
         order,
       }))
       .sort((a, b) => {

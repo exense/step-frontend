@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StepMaterialModule } from '../step-material/step-material.module';
 import { ArrayFilterComponent } from './components/array-filter/array-filter.component';
-import { DateFilterComponent } from './components/date-filter/date-filter.component';
 import { HexadecimalInputFilterComponent } from './components/input-filter/hexadecimal-input-filter.component';
 import { InputFilterComponent } from './components/input-filter/input-filter.component';
 import { ResourceLabelComponent } from './components/resource-label/resource-label.component';
@@ -33,19 +32,19 @@ import { TimeInputComponent } from './components/time-input/time-input.component
 import { ProjectSwitchDialogComponent } from './components/project-switch-dialog/project-switch-dialog.component';
 import { ArrayInputComponent } from './components/array-input/array-input.component';
 import { RouterModule } from '@angular/router';
-import { RangeFilterComponent } from './components/range-filter/range-filter.component';
 import { StringArrayInputComponent } from './components/string-array-input/string-array-input.component';
 import { ArrayItemLabelPipe } from './pipes/array-item-label.pipe';
 import { AllowCharsDirective } from './directives/allow-chars.directive';
 import { ItemHoverDirective } from './directives/item-hover.directive';
 import { ItemHoldDirective } from './directives/item-hold.directive';
+import { PerTimeUnitInputComponent } from './components/time-input/per-time-unit-input.component';
+import { AutocompleteInputComponent } from './components/autocomplete-input/autocomplete-input.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
   declarations: [
     ResourceLabelComponent,
     ArrayFilterComponent,
-    DateFilterComponent,
     InputFilterComponent,
     HasRightPipe,
     HexadecimalInputFilterComponent,
@@ -72,18 +71,23 @@ import { ItemHoldDirective } from './directives/item-hold.directive';
     UploadContainerComponent,
     ProjectSwitchDialogComponent,
     TimeInputComponent,
+    PerTimeUnitInputComponent,
     ArrayInputComponent,
-    RangeFilterComponent,
     StringArrayInputComponent,
     ArrayItemLabelPipe,
     AllowCharsDirective,
     ItemHoverDirective,
     ItemHoldDirective,
+    AutocompleteInputComponent,
   ],
   exports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    StepMaterialModule,
+    RouterModule,
     ResourceLabelComponent,
     ArrayFilterComponent,
-    DateFilterComponent,
     InputFilterComponent,
     HasRightPipe,
     HexadecimalInputFilterComponent,
@@ -110,14 +114,14 @@ import { ItemHoldDirective } from './directives/item-hold.directive';
     LabelAddonDirective,
     ProjectSwitchDialogComponent,
     TimeInputComponent,
+    PerTimeUnitInputComponent,
     ArrayInputComponent,
-    RouterModule,
-    RangeFilterComponent,
     StringArrayInputComponent,
     ArrayItemLabelPipe,
     AllowCharsDirective,
     ItemHoverDirective,
     ItemHoldDirective,
+    AutocompleteInputComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -125,7 +129,6 @@ export class StepBasicsModule {}
 export * from './components/base-filter/base-filter.component';
 export * from './components/array-filter/array-filter.component';
 export * from './components/single-item-array-filter/single-item-array-filter.component';
-export * from './components/date-filter/date-filter.component';
 export * from './components/input-filter/hexadecimal-input-filter.component';
 export * from './components/input-filter/input-filter.component';
 export * from './components/resource-label/resource-label.component';
@@ -138,8 +141,10 @@ export * from './components/errors-list/errors-list.component';
 export * from './components/progress-bar/progress-bar.component';
 export * from './components/upload-container/upload-container.component';
 export * from './components/array-input/array-input.component';
+export * from './components/autocomplete-input/autocomplete-input.component';
+export { TimeUnitDictionary } from './components/time-input/base-time-converter.component';
 export * from './components/time-input/time-input.component';
-export * from './components/range-filter/range-filter.component';
+export * from './components/time-input/per-time-unit-input.component';
 export * from './components/string-array-input/string-array-input.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
@@ -149,17 +154,16 @@ export * from './services/credentials.service';
 export * from './services/auth.service';
 export * from './services/item-by-id-cache.service';
 export * from './services/cron-presets.token';
-export * from './shared/angularjs-provider-options';
 export * from './shared/auth-context.interface';
 export * from './shared/compare-condition.enum';
 export * from './shared/credentials-strategy';
 export * from './shared/alert-type.enum';
-export * from './shared/restore-dialog-data';
 export * from './shared/screen-width.token';
 export * from './shared/is-small-screen.token';
 export * from './shared/resize-observable';
 export * from './shared/time-unit.enum';
 export * from './shared/generate-api-key-strategy';
+export * from './shared/create-range';
 export * from './directives/element-ref-map.directive';
 export * from './directives/width-expanders.directive';
 export * from './directives/validate-json.directive';
@@ -193,6 +197,7 @@ export * from './services/generate-api-key.service';
 export * from './services/editor-resolver.service';
 export * from './services/app-config-container.service';
 export * from './services/file-downloader.service';
+export * from './services/popover-overlay.service';
 export * from './shared/logout-cleanup.token';
 export * from './services/is-used-by-dialog';
 export * from './directives/item-hover.directive';

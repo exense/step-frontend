@@ -1,35 +1,32 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 
-:host {
+step-execution-list {
   @include core.table-container;
-}
 
-.header {
-  @include core.table-header;
-}
-
-.panel-body {
-  padding: 1.5rem;
-}
-
-step-report-node-icon.is-importing {
-  visibility: hidden;
-}
-
-.panel-body.small-screen {
-  padding: 0.75rem;
-}
-
-.result {
-  display: flex;
-}
-
-.description-cell {
-  entity-icon {
-    margin-right: 5px;
+  .header {
+    @include core.table-header;
   }
 
-  a {
-    vertical-align: middle;
+  step-report-node-icon.is-importing {
+    visibility: hidden;
+  }
+
+  .result {
+    display: flex;
+  }
+
+  .description-cell {
+    entity-icon {
+      margin-right: 5px;
+    }
+
+    a {
+      vertical-align: middle;
+    }
+  }
+
+  th step-input-filter step-form-field .form-field-content input,
+  th step-array-filter step-form-field .form-field-content mat-select {
+    width: 8rem !important;
   }
 }
