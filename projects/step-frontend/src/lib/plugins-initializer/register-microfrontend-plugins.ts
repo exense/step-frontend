@@ -1,6 +1,5 @@
 import { loadRemoteModule, LoadRemoteModuleOptions } from '@angular-architects/module-federation';
 import { Injector, Type } from '@angular/core';
-import { MicrofrontendPluginDefinition } from './shared/microfrontend-plugin-definition';
 import { CompiledModule, compileModule, registerCompiledModules } from './shared/module-utils';
 
 interface PluginModuleDeclaration {
@@ -8,11 +7,11 @@ interface PluginModuleDeclaration {
 }
 
 export interface PluginCtx {
-  definition: MicrofrontendPluginDefinition;
+  entryPoint: string;
   declaration: PluginModuleDeclaration;
 }
 
-const loadModule = async (definition: MicrofrontendPluginDefinition): Promise<PluginCtx | undefined> => {
+const loadModule = async (entryPoint: string): Promise<PluginCtx | undefined> => {
   let result: PluginCtx | undefined = undefined;
   try {
     let href = window.location.href;
@@ -24,7 +23,7 @@ const loadModule = async (definition: MicrofrontendPluginDefinition): Promise<Pl
       href += '/';
     }
 
-    const remoteEntry = href + definition.entryPoint;
+    const remoteEntry = href + entryPoint;
 
     const options: LoadRemoteModuleOptions = {
       type: 'module',
@@ -33,19 +32,16 @@ const loadModule = async (definition: MicrofrontendPluginDefinition): Promise<Pl
     };
     const declaration = await loadRemoteModule<PluginModuleDeclaration>(options);
     result = {
-      definition,
+      entryPoint,
       declaration,
     };
   } catch (e) {
-    console.error(`Angular 2+ module "${definition.entryPoint}" load fail`, e);
+    console.error(`Angular 2+ module "${entryPoint}" load fail`, e);
   }
   return result;
 };
 
-export const registerMicrofrontendPlugins = async (
-  pluginsDefinitions: MicrofrontendPluginDefinition[],
-  injector: Injector
-): Promise<void> => {
+export const registerMicrofrontendPlugins = async (pluginsDefinitions: string[], injector: Injector): Promise<void> => {
   if (pluginsDefinitions.length === 0) {
     return;
   }
@@ -53,9 +49,7 @@ export const registerMicrofrontendPlugins = async (
   const loadModules = pluginsDefinitions.map((def) => loadModule(def));
   const pluginCtxs = (await Promise.all(loadModules)).filter((x) => !!x) as PluginCtx[];
 
-  const compileModules = pluginCtxs.map((ctx) =>
-    compileModule(ctx.definition.entryPoint, ctx.declaration.PluginModule, injector)
-  );
+  const compileModules = pluginCtxs.map((ctx) => compileModule(ctx.entryPoint, ctx.declaration.PluginModule, injector));
   const modules = (await Promise.all(compileModules)).filter((x) => !!x) as CompiledModule[];
 
   await registerCompiledModules(modules);
