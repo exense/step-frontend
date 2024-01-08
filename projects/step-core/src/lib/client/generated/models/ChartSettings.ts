@@ -11,6 +11,7 @@ export type ChartSettings = {
   attributes: Array<MetricAttribute>;
   primaryAxes: AxesSettings;
   filters: Array<ChartFilterItem>;
+  oql?: string;
   grouping: Array<string>;
   inheritGlobalFilters: boolean;
   inheritGlobalGrouping: boolean;

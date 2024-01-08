@@ -19,6 +19,9 @@ export const $DashboardView = {
       type: 'string',
       isRequired: true,
     },
+    description: {
+      type: 'string',
+    },
     resolution: {
       type: 'number',
       format: 'int64',

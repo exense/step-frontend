@@ -1,6 +1,9 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 .header-container {
   display: flex;
   justify-content: space-between;
+  margin: 0 1.8rem;
 }
 
 .settings-container {
@@ -27,4 +30,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 3rem;
+  background-color: #f8f8f8;
+}
+
+.header-buttons-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1.4rem;
+  align-items: center;
+}
+
+.dashboard-name {
+  font-size: 1.8rem;
+  min-width: 10rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.name-input {
+  padding: 0.8rem;
 }

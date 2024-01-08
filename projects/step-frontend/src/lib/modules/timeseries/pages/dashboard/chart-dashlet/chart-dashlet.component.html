@@ -12,7 +12,7 @@
 </div>
 
 <div class="settings-container" *ngIf="allowGroupingChange || allowMetricChange">
-  <ng-container *ngIf="editMode">
+  <div class="edit-buttons" *ngIf="editMode">
     <button mat-icon-button matTooltip="Shift left" (click)="shiftLeft.emit()">
       <step-icon name="chevron-left"></step-icon>
     </button>
@@ -25,7 +25,7 @@
     <button mat-icon-button matTooltip="Remove chart" (click)="remove.emit()">
       <step-icon name="x"></step-icon>
     </button>
-  </ng-container>
+  </div>
   <button *ngIf="!editMode" mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
     <step-icon name="settings"></step-icon>
   </button>

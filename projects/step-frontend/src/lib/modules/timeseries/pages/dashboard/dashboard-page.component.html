@@ -1,15 +1,17 @@
 <div *ngIf="dashboard" style="margin: 12px">
   <div class="header-container">
-    <div>Here we have settings</div>
-    <div>
+    <div></div>
+    <div class="header-buttons-container">
       <ng-container *ngIf="!editMode">
-        <button (click)="enableEditMode()">Edit</button>
-        <span>{{ dashboard.name }}</span>
+        <button mat-button mat-flat-button color="primary" (click)="enableEditMode()">Edit</button>
+        <span class="dashboard-name">{{ dashboard.name }}</span>
       </ng-container>
       <ng-container *ngIf="editMode">
-        <button (click)="saveEditChanges()">Save</button>
-        <button (click)="disableEditMode()">Cancel</button>
-        <input [(ngModel)]="dashboard.name" />
+        <button [disabled]="!dashboard.name" mat-button mat-flat-button color="primary" (click)="saveEditChanges()">
+          Save
+        </button>
+        <button mat-button mat-stroked-button (click)="disableEditMode()">Cancel</button>
+        <input class="name-input" [(ngModel)]="dashboard.name" />
       </ng-container>
     </div>
   </div>
@@ -44,8 +46,8 @@
       ></step-chart-dashlet>
     </div>
     <div *ngIf="editMode" class="add-dashlet-container" [style.height]="DASHLET_HEIGHT + 'px'">
-      <div id="add-custom-chart" *ngIf="metricTypes" [matMenuTriggerFor]="menu">
-        <span>+ Add Chart</span>
+      <div *ngIf="metricTypes" [matMenuTriggerFor]="menu">
+        <button mat-raised-button color="primary"><step-icon name="plus"></step-icon>Add Chart</button>
         <mat-menu #menu="matMenu">
           <button *ngFor="let metric of metricTypes" mat-menu-item (click)="addDashlet(metric)">
             {{ metric.displayName }}

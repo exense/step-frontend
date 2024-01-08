@@ -25,6 +25,9 @@ export const $ChartSettings = {
       },
       isRequired: true,
     },
+    oql: {
+      type: 'string',
+    },
     grouping: {
       type: 'array',
       contains: {

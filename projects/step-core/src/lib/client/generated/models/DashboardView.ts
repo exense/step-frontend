@@ -10,6 +10,7 @@ export type DashboardView = {
   customFields?: Record<string, any>;
   attributes?: Record<string, string>;
   name: string;
+  description?: string;
   resolution?: number;
   timeRange: TimeRangeSelection;
   grouping: Array<string>;

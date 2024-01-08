@@ -9,6 +9,7 @@ import {
 } from '@exense/step-core';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'step-dashboards-list-page',
@@ -17,6 +18,7 @@ import { Router } from '@angular/router';
 })
 export class DashboardsListPageComponent {
   private readonly TABLE_ID = 'dashboards';
+  private _matDialog = inject(MatDialog);
   private readonly _dialogs = inject(DialogsService);
   private readonly _router = inject(Router);
   private readonly _dashboardsService = inject(DashboardsService);
@@ -26,6 +28,34 @@ export class DashboardsListPageComponent {
     description: 'description',
     actions: '',
   });
+
+  createDashboardModel: DashboardView = this.createEmptyDashboardObject();
+
+  openDialog(template: any) {
+    this._matDialog.open(template);
+  }
+
+  saveNewDashboard(edit = false) {
+    this._dashboardsService.saveEntity5(this.createDashboardModel).subscribe((dashboard) => {
+      if (edit) {
+        this.navigateToDashboard(dashboard.id!, true);
+      } else {
+        this.dataSource.reload();
+      }
+      this._matDialog.closeAll();
+      this.createDashboardModel = this.createEmptyDashboardObject();
+    });
+  }
+
+  private createEmptyDashboardObject(): DashboardView {
+    return {
+      name: '',
+      timeRange: { type: 'RELATIVE', relativeRangeMs: 3600_000 },
+      grouping: [],
+      filters: [],
+      dashlets: [],
+    };
+  }
 
   delete(dashboard: DashboardView) {
     this._dialogs
@@ -37,7 +67,7 @@ export class DashboardsListPageComponent {
           isDeleteConfirmed ? this._dashboardsService.deleteEntity5(dashboard.id!).pipe(map(() => true)) : of(false)
         )
       )
-      .subscribe();
+      .subscribe(() => this.dataSource.reload());
   }
 
   navigateToDashboard(id: string, editMode = false) {

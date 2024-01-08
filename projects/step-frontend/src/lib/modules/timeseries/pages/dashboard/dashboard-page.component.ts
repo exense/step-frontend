@@ -11,6 +11,7 @@ import {
   MetricAttribute,
   MetricType,
   TimeRange,
+  TimeRangeSelection,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
@@ -149,12 +150,23 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  private getTimeRangeFromTimeSelection(selection: TimeRangeSelection): TimeRange {
+    switch (selection.type) {
+      case 'ABSOLUTE':
+        return { from: selection.absoluteSelection!.from!, to: selection.absoluteSelection!.to! };
+        break;
+      case 'RELATIVE':
+        let now = new Date().getTime();
+        return { from: now - selection.relativeRangeMs!, to: now };
+        break;
+      default:
+        throw new Error('Unsupported time selection type: ' + selection.type);
+    }
+  }
+
   createContext(dashboard: DashboardView): TimeSeriesContext {
     const dashboardTimeRange = dashboard.timeRange!;
-    const timeRange: TimeRange = {
-      from: dashboardTimeRange.absoluteSelection!.from!,
-      to: dashboardTimeRange.absoluteSelection!.to!,
-    };
+    const timeRange: TimeRange = this.getTimeRangeFromTimeSelection(dashboard.timeRange);
     if (dashboard.timeRange && dashboard.timeRange.type === 'RELATIVE') {
       const timeInMs = dashboardTimeRange.relativeRangeMs!;
       const foundRelativeOption = this.timeRangeOptions.find((o) => {
