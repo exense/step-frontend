@@ -1,7 +1,7 @@
 <ng-container *ngIf="automationPackage$ | async as automationPackage">
   <step-icon
     name="automation"
-    [matTooltip]="automationPackage?.attributes?.['name'] ?? ''"
+    matTooltip="This entity is part of the package: {{automationPackage?.attributes?.['name']}}"
     (click)="openPackageList(automationPackage)"
   >
   </step-icon>

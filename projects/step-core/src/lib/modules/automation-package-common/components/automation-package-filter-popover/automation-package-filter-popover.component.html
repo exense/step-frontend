@@ -1,5 +1,8 @@
 <mat-card>
   <mat-card-content>
+    <div class="clear-container">
+      <button mat-flat-button (click)="clearSelection()">Clear selection</button>
+    </div>
     <step-table [dataSource]="_dataSource" matSort [matSortDisableClear]="true">
       <ng-container matColumnDef="bulkSelection">
         <th mat-header-cell *matHeaderCellDef class="bulk-selection-cell"></th>

@@ -44,7 +44,7 @@ export class AutomationPackagesModule {
   private registerMenuEntries(): void {
     this._viewRegistry.registerMenuEntry(LABEL_MENU, PATH, ICON, {
       parentId: 'automation-root',
-      weight: 10,
+      weight: 100,
     });
   }
 }

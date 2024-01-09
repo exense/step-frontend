@@ -23,6 +23,8 @@ import { EntityAutomationPackageService } from '../../injectables/entity-automat
 
 type PopoverOverlay = PopoverOverlayService<AutomationPackageFilterPopoverComponent>;
 
+const DEFAULT_TOOLTIP = 'Filter by package name';
+
 @Component({
   selector: 'step-automation-package-filter',
   templateUrl: './automation-package-filter.component.html',
@@ -47,7 +49,7 @@ export class AutomationPackageFilterComponent
   private _entityAutomationPackageService = inject(EntityAutomationPackageService);
 
   protected selectedIds: string[] = [];
-  protected tooltipText$: Observable<string> = of('');
+  protected tooltipText$: Observable<string> = of(DEFAULT_TOOLTIP);
 
   override ngOnInit(): void {
     super.ngOnInit();
@@ -79,9 +81,11 @@ export class AutomationPackageFilterComponent
     this.popoverStreamsTerminator$ = new Subject<void>();
 
     component.select(this.filterControl.value as string[]);
+    component.select(['deleted-packages']);
     component.selected$
       .pipe(takeUntil(this.popoverStreamsTerminator$))
       .subscribe((selectedIds) => (this.selectedIds = selectedIds as string[]));
+    component.cleared.subscribe(() => this._popoverOverlay.close());
 
     this._popoverOverlay
       .getCloseStream$()
@@ -123,7 +127,8 @@ export class AutomationPackageFilterComponent
         });
         return combineLatest(packageNames$);
       }),
-      map((packageNames) => packageNames.filter((name) => !!name).join(', '))
+      map((packageNames) => packageNames.filter((name) => !!name).join(', ')),
+      map((tooltip) => (tooltip ? 'Currently filtering: ' + tooltip : DEFAULT_TOOLTIP))
     );
   }
 

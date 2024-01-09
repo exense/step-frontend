@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, inject, OnDestroy } from '@angular/core';
 import { AugmentedAutomationPackagesService, AutomationPackage } from '../../../../client/step-client-module';
 import {
   selectionCollectionProvider,
@@ -26,6 +26,8 @@ export class AutomationPackageFilterPopoverComponent implements AfterViewInit {
 
   readonly selected$ = this._selectionCollector.selected$;
 
+  readonly cleared = new EventEmitter<void>();
+
   private preselectedIds?: string[];
   private isInitialised = false;
 
@@ -35,6 +37,11 @@ export class AutomationPackageFilterPopoverComponent implements AfterViewInit {
       return;
     }
     this._selectionCollector.selectById(...ids);
+  }
+
+  clearSelection() {
+    this._selectionCollector.clear();
+    this.cleared.emit();
   }
 
   ngAfterViewInit(): void {
