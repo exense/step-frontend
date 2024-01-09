@@ -34,7 +34,7 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService, OnD
 
   readonly keyword$ = this.keywordInternal$.asObservable();
 
-  private readonly getPlanWidthId = pipe(
+  private readonly getPlanWithId = pipe(
     tap((keyword: Keyword) => this.keywordInternal$.next(keyword)),
     map((keyword) => {
       const id = keyword.id!;
