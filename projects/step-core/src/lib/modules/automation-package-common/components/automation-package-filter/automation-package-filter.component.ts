@@ -81,7 +81,6 @@ export class AutomationPackageFilterComponent
     this.popoverStreamsTerminator$ = new Subject<void>();
 
     component.select(this.filterControl.value as string[]);
-    component.select(['deleted-packages']);
     component.selected$
       .pipe(takeUntil(this.popoverStreamsTerminator$))
       .subscribe((selectedIds) => (this.selectedIds = selectedIds as string[]));
