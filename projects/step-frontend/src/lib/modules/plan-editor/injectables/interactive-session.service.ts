@@ -19,7 +19,7 @@ export class InteractiveSessionService implements OnDestroy {
   readonly isActive$ = this.interactiveSessionId$.pipe(map((value) => !!value));
 
   readonly keywordParameters$: Observable<KeywordParameters> = this.interactiveSessionId$.pipe(
-    map((executionId) => ({ executionId, type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS }))
+    map((eid) => ({ eid, type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS }))
   );
 
   private _screenTemplates = inject(AugmentedScreenService);
