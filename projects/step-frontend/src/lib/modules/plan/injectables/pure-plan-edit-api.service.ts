@@ -74,7 +74,12 @@ export class PurePlanEditApiService implements PlanEditorApiService {
     );
   }
 
-  navigateToPlan(id: string): void {
+  renamePlan(plan: Plan, name: string): Observable<{ id: string; plan: Plan }> {
+    plan.attributes!['name'] = name;
+    return this.savePlan(plan);
+  }
+
+  navigateToPlan(id: string, enforcePurePlan?: boolean): void {
     const EDITOR_URL = `/root/plans/editor`;
     this._router.navigateByUrl(`${EDITOR_URL}/${id}`);
   }

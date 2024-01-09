@@ -1,5 +1,5 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, from, map, Observable, pipe, tap } from 'rxjs';
+import { BehaviorSubject, from, map, Observable, of, pipe, tap } from 'rxjs';
 import {
   AugmentedInteractivePlanExecutionService,
   AugmentedKeywordsService,
@@ -10,6 +10,8 @@ import {
   Keyword,
   History,
   PlanEditorApiService,
+  CompositesService,
+  PlansService,
 } from '@exense/step-core';
 import { Router } from '@angular/router';
 
@@ -18,16 +20,19 @@ import { Router } from '@angular/router';
 })
 export class CompositeKeywordPlanApiService implements PlanEditorApiService, OnDestroy {
   private _keywordApi = inject(AugmentedKeywordsService);
+  private _compositeApi = inject(CompositesService);
+  private _planApi = inject(PlansService);
   private _router = inject(Router);
   private _interactiveApi = inject(AugmentedInteractivePlanExecutionService);
   private _exportDialogs = inject(ExportDialogsService);
 
   private keywordInternal$ = new BehaviorSubject<Keyword | undefined>(undefined);
-  readonly keyword$ = this.keywordInternal$.asObservable();
 
   ngOnDestroy(): void {
     this.keywordInternal$.complete();
   }
+
+  readonly keyword$ = this.keywordInternal$.asObservable();
 
   private readonly getPlanWidthId = pipe(
     tap((keyword: Keyword) => this.keywordInternal$.next(keyword)),
@@ -39,12 +44,12 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService, OnD
   );
 
   private readonly getPlan = pipe(
-    this.getPlanWidthId,
+    this.getPlanWithId,
     map(({ plan }) => plan)
   );
 
   clonePlan(id: string): Observable<Plan> {
-    return this._keywordApi.cloneFunction(id).pipe(this.getPlan);
+    return this._compositeApi.cloneCompositePlan(id);
   }
 
   createRepositoryObjectReference(id?: string): RepositoryObjectReference | undefined {
@@ -70,8 +75,8 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService, OnD
     return this._keywordApi.getFunctionById(id).pipe(this.getPlan);
   }
 
-  navigateToPlan(id: string): void {
-    const EDITOR_URL = '/root/composites/editor';
+  navigateToPlan(id: string, enforcePurePlan?: boolean): void {
+    const EDITOR_URL = enforcePurePlan ? `/root/plans/editor` : '/root/composites/editor';
     this._router.navigateByUrl(`${EDITOR_URL}/${id}`);
   }
 
@@ -89,6 +94,15 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService, OnD
       plan,
     } as Keyword;
 
-    return this._keywordApi.saveFunction(keyword).pipe(this.getPlanWidthId);
+    return this._keywordApi.saveFunction(keyword).pipe(this.getPlanWithId);
+  }
+
+  renamePlan(plan: Plan, name: string): Observable<{ id: string; plan: Plan }> {
+    plan.attributes!['name'] = name;
+    return this._planApi.savePlan(plan).pipe(
+      map((plan: Plan) => {
+        return { id: plan.id!, plan };
+      })
+    );
   }
 }

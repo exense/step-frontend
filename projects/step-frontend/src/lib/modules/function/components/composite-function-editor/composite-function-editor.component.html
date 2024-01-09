@@ -1,7 +1,5 @@
-<ng-container *ngIf="_composite$ | async as composite">
-  <div *ngIf="composite?.customFields?.['functionPackageId']" class="alert alert-warning ng-scope" role="alert">
-    This composite belongs to a keyword package, all changes to it may be overridden by the package.
-  </div>
-</ng-container>
-<step-plan-editor-base stepPlanEditorKeyHandler [initialPlan]="_compositePlan$ | async" [showExecuteButton]="false">
+<div *ngIf="composite?.customFields?.['functionPackageId']" class="alert alert-warning ng-scope" role="alert">
+  This composite belongs to a keyword package, all changes to it may be overridden by the package.
+</div>
+<step-plan-editor-base stepPlanEditorKeyHandler [compositeId]="_id" [showExecuteButton]="false">
 </step-plan-editor-base>
