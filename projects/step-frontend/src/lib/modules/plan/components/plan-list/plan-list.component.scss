@@ -13,8 +13,6 @@
   }
 }
 
-@include core.table-common-cells;
-
-.history {
-  display: none;
+.bulk-selection-cell {
+  width: 6rem;
 }

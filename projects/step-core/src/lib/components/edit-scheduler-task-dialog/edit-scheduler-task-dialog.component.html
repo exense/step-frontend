@@ -4,13 +4,19 @@
       {{ error }}
     </step-alert>
     <form #formContainer="ngForm">
-      <step-form-field>
+      <step-form-field [showRequiredMarker]="true">
         <step-label>Name</step-label>
         <input type="text" placeholder="Name" required [(ngModel)]="_task.attributes!['name']" name="name" />
       </step-form-field>
-      <step-select-plan required [ngModel]="plan" (ngModelChange)="handlePlanChange($event)" name="plan">
+      <step-select-plan
+        [showRequiredMarker]="true"
+        required
+        [ngModel]="plan"
+        (ngModelChange)="handlePlanChange($event)"
+        name="plan"
+      >
       </step-select-plan>
-      <step-form-field>
+      <step-form-field [showRequiredMarker]="true">
         <step-label>CRON expression</step-label>
         <input
           type="text"

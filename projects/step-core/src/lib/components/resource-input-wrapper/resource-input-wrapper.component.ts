@@ -14,6 +14,7 @@ export class ResourceInputWrapperComponent implements ControlValueAccessor {
   @Input() type!: string;
   @Input() directory?: boolean;
   @Input() tooltip?: string;
+  @Input() showRequiredMarker?: boolean;
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;

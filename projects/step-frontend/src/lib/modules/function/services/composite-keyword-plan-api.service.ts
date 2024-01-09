@@ -1,6 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { PlanEditorApiService } from '../../plan-editor/plan-editor.module';
-import { from, map, Observable, pipe, tap } from 'rxjs';
+import { map, Observable, of, pipe, tap } from 'rxjs';
 import {
   AugmentedInteractivePlanExecutionService,
   AugmentedKeywordsService,
@@ -10,19 +9,24 @@ import {
   RepositoryObjectReference,
   Keyword,
   History,
+  PlanEditorApiService,
+  CompositesService,
+  PlansService,
 } from '@exense/step-core';
 import { Router } from '@angular/router';
 
 @Injectable()
 export class CompositeKeywordPlanApiService implements PlanEditorApiService {
   private _keywordApi = inject(AugmentedKeywordsService);
+  private _compositeApi = inject(CompositesService);
+  private _planApi = inject(PlansService);
   private _router = inject(Router);
   private _interactiveApi = inject(AugmentedInteractivePlanExecutionService);
   private _exportDialogs = inject(ExportDialogsService);
 
-  private keyword?: Keyword;
+  private keyword?: Keyword & { plan?: Plan };
 
-  private readonly getPlanWidthId = pipe(
+  private readonly getPlanWithId = pipe(
     tap((keyword: Keyword) => (this.keyword = keyword)),
     map((keyword) => {
       const id = keyword.id!;
@@ -32,12 +36,12 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService {
   );
 
   private readonly getPlan = pipe(
-    this.getPlanWidthId,
+    this.getPlanWithId,
     map(({ plan }) => plan)
   );
 
   clonePlan(id: string): Observable<Plan> {
-    return this._keywordApi.cloneFunction(id).pipe(this.getPlan);
+    return this._compositeApi.cloneCompositePlan(id);
   }
 
   createRepositoryObjectReference(id?: string): RepositoryObjectReference | undefined {
@@ -63,13 +67,17 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService {
     return this._keywordApi.getFunctionById(id).pipe(this.getPlan);
   }
 
-  navigateToPlan(id: string): void {
-    const EDITOR_URL = '/root/composites/editor';
+  navigateToPlan(id: string, enforcePurePlan?: boolean): void {
+    const EDITOR_URL = enforcePurePlan ? `/root/plans/editor` : '/root/composites/editor';
     this._router.navigateByUrl(`${EDITOR_URL}/${id}`);
   }
 
   restorePlanVersion(id: string, versionId: string): Observable<Plan> {
     return this._keywordApi.restoreFunctionVersion(id, versionId).pipe(this.getPlan);
+  }
+
+  getPlanVersion(id: string, plan: Plan): Observable<string> {
+    return this._keywordApi.getFunctionById(id).pipe(map((keyword) => keyword?.customFields?.['versionId']));
   }
 
   savePlan(plan: Plan): Observable<{ id: string; plan: Plan }> {
@@ -78,6 +86,15 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService {
       plan,
     } as Keyword;
 
-    return this._keywordApi.saveFunction(keyword).pipe(this.getPlanWidthId);
+    return this._keywordApi.saveFunction(keyword).pipe(this.getPlanWithId);
+  }
+
+  renamePlan(plan: Plan, name: string): Observable<{ id: string; plan: Plan }> {
+    plan.attributes!['name'] = name;
+    return this._planApi.savePlan(plan).pipe(
+      map((plan: Plan) => {
+        return { id: plan.id!, plan };
+      })
+    );
   }
 }
