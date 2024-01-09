@@ -50,7 +50,7 @@ export class DashboardsListPageComponent {
   private createEmptyDashboardObject(): DashboardView {
     return {
       name: '',
-      timeRange: { type: 'RELATIVE', relativeRangeMs: 3600_000 },
+      timeRange: { type: 'RELATIVE', relativeSelection: { timeInMs: 3600_000 } },
       grouping: [],
       filters: [],
       dashlets: [],

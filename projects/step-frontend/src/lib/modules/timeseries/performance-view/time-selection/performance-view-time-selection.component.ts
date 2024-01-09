@@ -69,6 +69,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   }
 
   createRanger(fullTimeRange: TimeRange, selection?: TimeRange): Observable<TimeSeriesAPIResponse> {
+    console.log('creating ranger');
     const request = new FindBucketsRequestBuilder()
       .withRange(fullTimeRange)
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
@@ -79,6 +80,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
       .build();
     return this.timeSeriesService.getMeasurements(request).pipe(
       tap((response) => {
+        console.log('tap');
         this.timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
         let avgData: (number | null)[] = [];
         if (response.matrix[0]) {

@@ -10,9 +10,8 @@ export const $TimeRangeSelection = {
     absoluteSelection: {
       type: 'TimeRange',
     },
-    relativeRangeMs: {
-      type: 'number',
-      format: 'int64',
+    relativeSelection: {
+      type: 'TimeRangeRelativeSelection',
     },
   },
 } as const;

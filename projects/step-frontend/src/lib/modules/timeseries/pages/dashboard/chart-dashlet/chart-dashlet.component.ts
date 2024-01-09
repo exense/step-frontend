@@ -46,8 +46,6 @@ export class ChartDashletComponent implements OnInit, Dashlet {
 
   @Input() item!: DashboardItem;
   @Input() context!: TimeSeriesContext;
-  @Input() allowGroupingChange: boolean = true;
-  @Input() allowMetricChange: boolean = true;
   @Input() height!: number;
   @Input() editMode = false;
 
@@ -135,8 +133,10 @@ export class ChartDashletComponent implements OnInit, Dashlet {
       .open(ChartDashletSettingsComponent, { data: { item: this.item } })
       .afterClosed()
       .subscribe((updatedItem) => {
-        Object.assign(this.item, updatedItem);
-        this.refresh().subscribe();
+        if (updatedItem) {
+          Object.assign(this.item, updatedItem);
+          this.refresh().subscribe();
+        }
       });
   }
 
@@ -207,7 +207,6 @@ export class ChartDashletComponent implements OnInit, Dashlet {
   }
 
   private getChartGrouping(): string[] {
-    console.log(this.item?.chartSettings?.inheritGlobalGrouping);
     if (this.item!.chartSettings!.inheritGlobalGrouping) {
       return this.context.getGroupDimensions();
     } else {

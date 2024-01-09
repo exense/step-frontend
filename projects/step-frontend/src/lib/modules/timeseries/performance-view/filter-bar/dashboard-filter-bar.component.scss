@@ -112,8 +112,11 @@ step-ts-dashboard-filter-bar {
 
   .oql-container {
     position: relative;
+    display: flex;
+    flex-grow: 1;
 
     .oql-input {
+      height: 100%;
       flex-grow: 1;
       padding-right: 28px;
       background: var.$gray-50;

@@ -5,19 +5,34 @@
         <step-label>Name</step-label>
         <input placeholder="Dashlet name" [(ngModel)]="item.name" />
       </step-form-field>
+      <div class="form-row">
+        <step-form-field>
+          <step-label>Type</step-label>
+          <input disabled placeholder="Type" [value]="item.type" />
+        </step-form-field>
 
-      <step-form-field>
-        <step-label>Type</step-label>
-        <input disabled placeholder="Type" [value]="item.type" />
-      </step-form-field>
+        <step-form-field>
+          <step-label>Metric</step-label>
+          <input disabled placeholder="Metric" [value]="item.chartSettings!.metricKey" />
+        </step-form-field>
+      </div>
 
-      <step-form-field>
-        <step-label>Metric</step-label>
-        <input disabled placeholder="Metric" [value]="item.chartSettings!.metricKey" />
-      </step-form-field>
+      <div class="form-row">
+        <step-form-field>
+          <step-label>Aggregate</step-label>
+          <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.aggregation">
+            <mat-option *ngFor="let attr of AGGREGATE_TYPES" [value]="attr">{{ attr }}</mat-option>
+          </mat-select>
+        </step-form-field>
+
+        <step-form-field>
+          <step-label>Unit</step-label>
+          <input placeholder="Series units, like 'ms', 'hrs', '%'" [(ngModel)]="item.chartSettings!.primaryAxes.unit" />
+        </step-form-field>
+      </div>
 
       <div class="section">
-        <div>Attributes</div>
+        <div class="title">Attributes</div>
         <table class="attributes-table">
           <thead>
             <th>Display Name</th>
@@ -28,56 +43,58 @@
               <td><input class="hidden-input" [(ngModel)]="attr.displayName" /></td>
               <td><input class="hidden-input" [(ngModel)]="attr.name" /></td>
             </tr>
+            <tr>
+              <td class="pointer" (click)="addAttribute()">+ Add attribute</td>
+              <td></td>
+            </tr>
           </tbody>
         </table>
-        <div style="margin-top: 4px; cursor: pointer" (click)="addAttribute()">
-          <step-icon style="transform: scale(0.9)" name="plus"></step-icon>
-          <span>Add attribute</span>
+      </div>
+      <div class="form-row">
+        <div>
+          <step-form-field>
+            <mat-checkbox color="primary" [(ngModel)]="item.chartSettings!.inheritGlobalFilters">
+              <span>Inherit global filters</span>
+              <step-icon
+                class="help-icon"
+                matTooltip="The chart filters will be combined with the dashboard filters"
+                name="help-circle"
+              ></step-icon>
+            </mat-checkbox>
+          </step-form-field>
+          <step-form-field>
+            <mat-checkbox color="primary" [(ngModel)]="item.chartSettings!.inheritGlobalGrouping">
+              <span>Inherit global grouping</span>
+              <step-icon
+                class="help-icon"
+                matTooltip="The grouping will be inherited from the dashboard level"
+                name="help-circle"
+              ></step-icon>
+            </mat-checkbox>
+          </step-form-field>
         </div>
-      </div>
-
-      <div style="margin-top: 12px">
-        <mat-checkbox color="primary" [(ngModel)]="item.chartSettings!.inheritGlobalFilters">
-          <span>Inherit global filters</span>
-          <step-icon
-            class="help-icon"
-            matTooltip="The chart filters will be combined with the dashboard filters"
-            name="help-circle"
-          ></step-icon>
-        </mat-checkbox>
-      </div>
-
-      <div>
-        <mat-checkbox color="primary" [(ngModel)]="item.chartSettings!.inheritGlobalGrouping">
-          <span>Inherit global grouping</span>
-          <step-icon
-            class="help-icon"
-            matTooltip="The grouping will be inherited from the dashboard level"
-            name="help-circle"
-          ></step-icon>
-        </mat-checkbox>
-      </div>
-
-      <div>
-        <mat-checkbox color="primary" [(ngModel)]="item.chartSettings!.readonlyGrouping">
-          <span>Readonly grouping</span>
-          <step-icon
-            class="help-icon"
-            matTooltip="The users will not be able to change the grouping of this dashlet"
-            name="help-circle"
-          ></step-icon>
-        </mat-checkbox>
-      </div>
-
-      <div>
-        <mat-checkbox color="primary" [(ngModel)]="item.chartSettings!.readonlyAggregate">
-          <span>Readonly aggregate</span>
-          <step-icon
-            class="help-icon"
-            matTooltip="The users will not be able to change the aggregate of this dashlet"
-            name="help-circle"
-          ></step-icon>
-        </mat-checkbox>
+        <div>
+          <step-form-field>
+            <mat-checkbox color="primary" [(ngModel)]="item.chartSettings!.readonlyGrouping">
+              <span>Readonly grouping</span>
+              <step-icon
+                class="help-icon"
+                matTooltip="The users will not be able to change the grouping of this dashlet"
+                name="help-circle"
+              ></step-icon>
+            </mat-checkbox>
+          </step-form-field>
+          <step-form-field>
+            <mat-checkbox color="primary" [(ngModel)]="item.chartSettings!.readonlyAggregate">
+              <span>Readonly aggregate</span>
+              <step-icon
+                class="help-icon"
+                matTooltip="The users will not be able to change the aggregate of this dashlet"
+                name="help-circle"
+              ></step-icon>
+            </mat-checkbox>
+          </step-form-field>
+        </div>
       </div>
 
       <step-form-field *ngIf="!item.chartSettings!.inheritGlobalGrouping">
@@ -96,56 +113,33 @@
           }}</mat-option>
         </mat-select>
       </step-form-field>
-      <step-form-field>
-        <step-label>Chart width</step-label>
-        <mat-select [(ngModel)]="item.size">
-          <mat-option [value]="1">50%</mat-option>
-          <mat-option [value]="2">100%</mat-option>
-        </mat-select>
-      </step-form-field>
 
-      <step-form-field>
-        <step-label>Aggregate</step-label>
-        <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.aggregation">
-          <mat-option *ngFor="let attr of AGGREGATE_TYPES" [value]="attr">{{ attr }}</mat-option>
-        </mat-select>
-      </step-form-field>
-
-      <step-form-field>
-        <step-label>Unit</step-label>
-        <input placeholder="Series units, like 'ms', 'hrs', '%'" [(ngModel)]="item.chartSettings!.primaryAxes.unit" />
-      </step-form-field>
-
-      <step-form-field>
-        <step-label>Chart display</step-label>
-        <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.displayType">
-          <mat-option [value]="'LINE'" class="option-with-icon">
-            <div style="display: flex; align-items: center; gap: 12px">
-              <step-icon name="trending-up"></step-icon>
-              <span>Line chart</span>
-            </div>
-          </mat-option>
-          <mat-option [value]="'BAR_CHART'" class="option-with-icon">
-            <div style="display: flex; align-items: center; gap: 12px">
-              <step-icon name="bar-chart-2"></step-icon>
-              <span>Bar chart</span>
-            </div>
-          </mat-option>
-        </mat-select>
-      </step-form-field>
-
-      <!--      <step-form-field>-->
-      <!--        <step-label>Type</step-label>-->
-      <!--        <mat-select-->
-      <!--          [ngModel]="formGroup!.controls.type.value"-->
-      <!--          (ngModelChange)="fetchStepFunction($event)"-->
-      <!--          [ngModelOptions]="{ standalone: true }"-->
-      <!--        >-->
-      <!--          <mat-option *ngFor="let itemInfo of functionTypeItemInfos" [value]="itemInfo.type">-->
-      <!--            {{ itemInfo.label }}-->
-      <!--          </mat-option>-->
-      <!--        </mat-select>-->
-      <!--      </step-form-field>-->
+      <div class="form-row">
+        <step-form-field>
+          <step-label>Chart width</step-label>
+          <mat-select [(ngModel)]="item.size">
+            <mat-option [value]="1">50%</mat-option>
+            <mat-option [value]="2">100%</mat-option>
+          </mat-select>
+        </step-form-field>
+        <step-form-field>
+          <step-label>Chart display</step-label>
+          <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.displayType">
+            <mat-option [value]="'LINE'" class="option-with-icon">
+              <div style="display: flex; align-items: center; gap: 12px">
+                <step-icon name="trending-up"></step-icon>
+                <span>Line chart</span>
+              </div>
+            </mat-option>
+            <mat-option [value]="'BAR_CHART'" class="option-with-icon">
+              <div style="display: flex; align-items: center; gap: 12px">
+                <step-icon name="bar-chart-2"></step-icon>
+                <span>Bar chart</span>
+              </div>
+            </mat-option>
+          </mat-select>
+        </step-form-field>
+      </div>
     </ng-container>
   </div>
 

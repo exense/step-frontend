@@ -28,7 +28,7 @@ import { TimeRangePickerSelection } from '../../time-selection/time-range-picker
 //@ts-ignore
 import uPlot = require('uplot');
 import { TsFilterItem } from '../../performance-view/filter-bar/model/ts-filter-item';
-import { filter, forkJoin, merge, Observable, of, Subject, switchMap, takeUntil, throttle } from 'rxjs';
+import { defaultIfEmpty, filter, forkJoin, merge, Observable, of, Subject, switchMap, takeUntil, throttle } from 'rxjs';
 import { ChartDashletComponent } from './chart-dashlet/chart-dashlet.component';
 import { Dashlet } from './model/dashlet';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -132,9 +132,9 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   saveEditChanges() {
     this.editMode = false;
-    this._dashboardService.saveEntity5(this.dashboard).subscribe((response) => {
-      console.log('success');
-    });
+    this.dashboard.grouping = this.context.getGroupDimensions();
+    this.dashboard.timeRange = this.timeRangeSelection;
+    this._dashboardService.saveEntity5(this.dashboard).subscribe((response) => {});
   }
 
   addDashlet(metric: MetricType) {
@@ -161,7 +161,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getTimeRangeFromTimeSelection(selection: TimeRangePickerSelection): TimeRange {
+  private getTimeRangeFromTimeSelection(selection: TimeRangeSelection): TimeRange {
     switch (selection.type) {
       case 'ABSOLUTE':
         return { from: selection.absoluteSelection!.from!, to: selection.absoluteSelection!.to! };
@@ -178,16 +178,21 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   createContext(dashboard: DashboardView): TimeSeriesContext {
     const dashboardTimeRange = dashboard.timeRange!;
     const timeRange: TimeRange = this.getTimeRangeFromTimeSelection(dashboard.timeRange);
-    if (dashboard.timeRange && dashboard.timeRange.type === 'RELATIVE') {
-      const timeInMs = dashboardTimeRange.relativeRangeMs!;
+    if (dashboard.timeRange.type === 'RELATIVE') {
+      const timeInMs = dashboardTimeRange.relativeSelection!.timeInMs;
       const foundRelativeOption = this.timeRangeOptions.find((o) => {
         return o.type === 'RELATIVE' && timeInMs === o.relativeSelection?.timeInMs;
       });
+      console.log('found', foundRelativeOption);
       this.timeRangeSelection = foundRelativeOption || {
         type: 'RELATIVE',
-        relativeSelection: { label: `Last ${timeInMs / 60000} minutes`, timeInMs: timeInMs },
+        relativeSelection: {
+          label: dashboardTimeRange.relativeSelection!.label || `Last ${timeInMs / 60000} minutes`,
+          timeInMs: timeInMs,
+        },
       };
     } else {
+      // absolute
       this.timeRangeSelection = { ...dashboardTimeRange, type: dashboardTimeRange.type! };
     }
     return this._timeSeriesContextFactory.createContext({
@@ -237,7 +242,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   }
 
   private refreshAllCharts(): Observable<any[]> {
-    return forkJoin(this.dashlets?.map((dashlet) => dashlet.refresh()) || []);
+    return forkJoin(this.dashlets?.map((dashlet) => dashlet.refresh())).pipe(defaultIfEmpty([]));
   }
 
   handleChartDelete(index: number) {
@@ -271,12 +276,15 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   }
 
   handleTimeRangeChange(params: { selection: TimeRangePickerSelection; triggerRefresh: boolean }) {
+    this.timeRangeSelection = params.selection;
     let range = this.getTimeRangeFromTimeSelection(params.selection);
-    console.log(range, params.selection);
     this.context.updateFullRange(range, false);
     this.context.updateSelectedRange(range, false);
     let refreshRanger$ = this.filterBar?.timeSelection?.refreshRanger();
-    forkJoin([this.refreshAllCharts(), refreshRanger$]).subscribe();
+    console.log('refreshranger');
+    forkJoin([this.refreshAllCharts(), refreshRanger$]).subscribe(() => {
+      console.log('yei');
+    });
   }
 
   removeOneTimeUrlParams() {
@@ -285,7 +293,6 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
     // Remove the specific parameter
     currentParams[EDIT_PARAM_NAME] = null;
-    console.log(currentParams);
 
     // Navigate with the updated parameters
     this._router.navigate([], {
