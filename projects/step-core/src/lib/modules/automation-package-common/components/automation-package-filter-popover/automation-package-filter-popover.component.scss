@@ -1,9 +1,17 @@
-.bulk-selection-cell {
-  width: 6rem;
-}
+mat-card {
+  min-width: 38rem;
 
-.clear-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
+  .bulk-selection-cell {
+    width: 6rem;
+  }
+
+  .clear-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  mat-card-title {
+    font-size: 2rem;
+  }
 }
