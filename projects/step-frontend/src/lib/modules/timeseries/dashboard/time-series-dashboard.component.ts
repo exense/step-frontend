@@ -22,7 +22,7 @@ import { TableApiWrapperService, TimeRange, TimeSeriesService } from '@exense/st
 export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   readonly ONE_HOUR_MS = 3600 * 1000;
 
-  @Output() onTimeRangeChange: EventEmitter<TimeRange> = new EventEmitter<TimeRange>();
+  @Output() timeRangeChange: EventEmitter<TimeRange> = new EventEmitter<TimeRange>();
 
   @Input() settings!: TimeSeriesDashboardSettings;
   @ViewChild(ChartsViewComponent) chartsView!: ChartsViewComponent;
@@ -278,7 +278,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
    * The selection will be set to full selection.
    */
   updateFullRange(range: TimeRange, forceRefresh = true): void {
-    this.onTimeRangeChange.emit(range);
+    this.timeRangeChange.emit(range);
     this.updateBaseChartsSubscription?.unsubscribe(); // end current execution
     this.context.updateFullRange(range, false);
     this.context.updateSelectedRange(range, false);

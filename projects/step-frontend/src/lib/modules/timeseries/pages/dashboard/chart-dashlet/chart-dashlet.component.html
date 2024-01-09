@@ -31,7 +31,13 @@
   </button>
 
   <mat-menu #settingsMenu="matMenu">
-    <button *ngIf="allowGroupingChange" mat-menu-item [matMenuTriggerFor]="groupingMenu">Grouping</button>
+    <button
+      *ngIf="allowGroupingChange && !item.chartSettings?.inheritGlobalGrouping"
+      mat-menu-item
+      [matMenuTriggerFor]="groupingMenu"
+    >
+      Grouping
+    </button>
     <button *ngIf="allowMetricChange" mat-menu-item [matMenuTriggerFor]="aggregateMenu">Aggregate</button>
   </mat-menu>
 

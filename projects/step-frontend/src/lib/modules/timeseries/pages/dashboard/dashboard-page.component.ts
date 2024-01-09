@@ -33,6 +33,7 @@ import { ChartDashletComponent } from './chart-dashlet/chart-dashlet.component';
 import { Dashlet } from './model/dashlet';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { FilterBarComponent } from '../../performance-view/filter-bar/legacy/filter-bar.component';
+import { DashboardFilterBarComponent } from '../../performance-view/filter-bar/dashboard-filter-bar.component';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -56,7 +57,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   readonly DASHLET_HEIGHT = 300;
 
   @ViewChildren(ChartDashletComponent) dashlets: Dashlet[] = [];
-  @ViewChild(FilterBarComponent) filterBar?: FilterBarComponent;
+  @ViewChild(DashboardFilterBarComponent) filterBar?: DashboardFilterBarComponent;
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _timeSeriesContextFactory = inject(TimeSeriesContextsFactory);
@@ -275,7 +276,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     this.context.updateFullRange(range, false);
     this.context.updateSelectedRange(range, false);
     let refreshRanger$ = this.filterBar?.timeSelection?.refreshRanger();
-    forkJoin([this.refreshAllCharts()]).subscribe();
+    forkJoin([this.refreshAllCharts(), refreshRanger$]).subscribe();
   }
 
   removeOneTimeUrlParams() {

@@ -1,6 +1,6 @@
 <step-modal-window title="Chart settings" [stepZIndex]="1000">
   <div step-modal-window-body>
-    <div *ngIf="item">
+    <ng-container *ngIf="item">
       <step-form-field>
         <step-label>Name</step-label>
         <input placeholder="Dashlet name" [(ngModel)]="item.name" />
@@ -146,7 +146,7 @@
       <!--          </mat-option>-->
       <!--        </mat-select>-->
       <!--      </step-form-field>-->
-    </div>
+    </ng-container>
   </div>
 
   <div step-modal-window-buttons>

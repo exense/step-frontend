@@ -207,6 +207,7 @@ export class ChartDashletComponent implements OnInit, Dashlet {
   }
 
   private getChartGrouping(): string[] {
+    console.log(this.item?.chartSettings?.inheritGlobalGrouping);
     if (this.item!.chartSettings!.inheritGlobalGrouping) {
       return this.context.getGroupDimensions();
     } else {

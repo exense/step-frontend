@@ -16,8 +16,8 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
   @Input() removable?: boolean;
   @Input() compact = false;
 
-  @Output() onRemoveItem: EventEmitter<any> = new EventEmitter<any>();
-  @Output() onFilterChange: EventEmitter<TsFilterItem> = new EventEmitter<TsFilterItem>();
+  @Output() removeItem: EventEmitter<any> = new EventEmitter<any>();
+  @Output() filterChange: EventEmitter<TsFilterItem> = new EventEmitter<TsFilterItem>();
 
   @ViewChild('matTrigger') matTrigger!: MatMenuTrigger;
   @ViewChild(MatMenuTrigger) menuTrigger?: MatMenuTrigger;
@@ -67,7 +67,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     }
 
     this.formattedValue = this.getFormattedValue(this.item);
-    this.onFilterChange.emit(this.item);
+    this.filterChange.emit(this.item);
     this.changesApplied = true;
   }
 
@@ -98,7 +98,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
         throw new Error('Unhandled item type: ' + this.item.type);
     }
     this.formattedValue = this.getFormattedValue(this.item);
-    this.onFilterChange.emit(this.item);
+    this.filterChange.emit(this.item);
     this.changesApplied = true;
     this.matTrigger.closeMenu();
   }

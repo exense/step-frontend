@@ -1,3 +1,9 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
+div[step-modal-window-body] {
+  @include core.common-dialog-content;
+}
+
 .section {
   margin-top: 2rem;
 }

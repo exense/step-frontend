@@ -21,7 +21,7 @@
       *ngIf="context"
       [context]="context"
       [filters]="dashboard.filters || []"
-      (onTimeRangeChange)="handleTimeRangeChange($event)"
+      (timeRangeChange)="handleTimeRangeChange($event)"
       [timeRangeOptions]="timeRangeOptions"
       [activeTimeRange]="timeRangeSelection"
       [compactView]="compareModeEnabled"

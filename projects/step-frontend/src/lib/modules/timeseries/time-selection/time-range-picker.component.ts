@@ -25,7 +25,7 @@ export class TimeRangePickerComponent implements OnInit {
   @Input() includeFullRangeOption: boolean = true;
   @Input() compact = false;
 
-  @Output() onSelectionChange = new EventEmitter<TimeRangePickerSelection>();
+  @Output() selectionChange = new EventEmitter<TimeRangePickerSelection>();
 
   @Output() activeSelectionChange = new EventEmitter<TimeRangePickerSelection>();
 
@@ -169,7 +169,7 @@ export class TimeRangePickerComponent implements OnInit {
 
   emitSelectionChange(selection: TimeRangePickerSelection) {
     this.activeSelection = selection;
-    this.onSelectionChange.emit(selection);
+    this.selectionChange.emit(selection);
   }
 
   setFromDate(date?: DateTime | null): void {

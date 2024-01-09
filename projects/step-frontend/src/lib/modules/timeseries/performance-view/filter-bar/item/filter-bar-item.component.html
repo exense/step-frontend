@@ -10,7 +10,7 @@
   <div class="filter-label">{{ item.label || 'Unspecified' }}</div>
   <div class="filter-value">{{ formattedValue || '-' }}</div>
 
-  <div (click)="onRemoveItem.emit()" class="remove-btn" *ngIf="removable">
+  <div (click)="removeItem.emit()" class="remove-btn" *ngIf="removable">
     <step-icon class="remove-btn" name="x"></step-icon>
   </div>
 </div>

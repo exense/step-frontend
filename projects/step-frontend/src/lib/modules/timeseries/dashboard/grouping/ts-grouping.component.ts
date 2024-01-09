@@ -11,7 +11,7 @@ const EMPTY_DIMENSIONS_LABEL = 'Empty';
   styleUrls: ['./ts-grouping.component.scss'],
 })
 export class TsGroupingComponent implements OnInit, OnChanges {
-  @Output() onGroupingChange = new EventEmitter<string[]>();
+  @Output() groupingChange = new EventEmitter<string[]>();
 
   @ViewChild('matTrigger') matTrigger!: MatMenuTrigger;
 
@@ -48,7 +48,7 @@ export class TsGroupingComponent implements OnInit, OnChanges {
   }
 
   emitGroupingChange() {
-    this.onGroupingChange.emit(this.selectedGroupingInternal.attributes);
+    this.groupingChange.emit(this.selectedGroupingInternal.attributes);
   }
 
   applyCustomGrouping() {

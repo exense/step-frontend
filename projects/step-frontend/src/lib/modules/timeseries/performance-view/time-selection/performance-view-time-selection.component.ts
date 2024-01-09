@@ -17,7 +17,7 @@ import { FindBucketsRequestBuilder } from '../../util/find-buckets-request-build
 export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
 
-  @Output() onRangerLoaded = new EventEmitter<void>();
+  @Output() rangerLoaded = new EventEmitter<void>();
 
   rangerSettings: TSRangerSettings | undefined;
   @ViewChild(TSRangerComponent) rangerComponent!: TSRangerComponent;
@@ -32,7 +32,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
     if (!this.context) {
       throw new Error('Settings input is required');
     }
-    this.createRanger(this.context.getFullTimeRange()).subscribe(() => this.onRangerLoaded.next());
+    this.createRanger(this.context.getFullTimeRange()).subscribe(() => this.rangerLoaded.next());
     this.context
       .onTimeSelectionChange()
       .pipe(takeUntil(this.terminator$))

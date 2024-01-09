@@ -4,7 +4,7 @@
   </div>
   <div>
     <step-time-range-picker
-      (onSelectionChange)="handleTimeRangeChange($event)"
+      (selectionChange)="handleTimeRangeChange($event)"
       [selectOptions]="timeRangeOptions"
       [activeSelection]="activeTimeRange"
       [compact]="compactView"
@@ -25,7 +25,7 @@
     </mat-button-toggle-group>
     <step-timeseries-grouping
       [dimensions]="activeGrouping"
-      (onGroupingChange)="handleGroupingChange($event)"
+      (groupingChange)="handleGroupingChange($event)"
     ></step-timeseries-grouping>
   </div>
 
@@ -59,8 +59,8 @@
             [item]="item"
             [compact]="compactView"
             [removable]="item.removable"
-            (onRemoveItem)="removeFilterItem(i)"
-            (onFilterChange)="handleFilterChange(i, $event)"
+            (removeItem)="removeFilterItem(i)"
+            (filterChange)="handleFilterChange(i, $event)"
           >
           </step-ts-filter-bar-item>
         </ng-container>
@@ -107,7 +107,7 @@
       </mat-button-toggle-group>
       <step-timeseries-grouping
         [dimensions]="activeGrouping"
-        (onGroupingChange)="handleGroupingChange($event)"
+        (groupingChange)="handleGroupingChange($event)"
       ></step-timeseries-grouping>
     </div>
   </div>

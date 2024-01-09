@@ -66,8 +66,8 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   @Input() timeSelection?: PerformanceViewTimeSelectionComponent;
   @Input() includeThreadGroupChart = true;
 
-  @Output() onInitializationComplete: EventEmitter<void> = new EventEmitter<void>();
-  @Output() onUpdateComplete: EventEmitter<void> = new EventEmitter<void>();
+  @Output() initializationComplete: EventEmitter<void> = new EventEmitter<void>();
+  @Output() updateComplete: EventEmitter<void> = new EventEmitter<void>();
 
   chartsAreLoading = false;
   compareChartsAreLoading = false;
@@ -340,7 +340,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
 
     forkJoin(charts$)
       .pipe(takeUntil(this.terminator$))
-      .subscribe((allCompleted) => this.onInitializationComplete.emit());
+      .subscribe((allCompleted) => this.initializationComplete.emit());
   }
 
   createAllCompareCharts(context: TimeSeriesContext) {

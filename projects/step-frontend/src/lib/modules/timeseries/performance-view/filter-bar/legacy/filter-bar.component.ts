@@ -56,7 +56,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   @Input() filterOptions: TsFilterItem[] = [];
 
-  @Output() onTimeRangeChange = new EventEmitter<{ selection: TimeRangePickerSelection; triggerRefresh: boolean }>();
+  @Output() timeRangeChange = new EventEmitter<{ selection: TimeRangePickerSelection; triggerRefresh: boolean }>();
 
   @ViewChild(PerformanceViewTimeSelectionComponent) timeSelection?: PerformanceViewTimeSelectionComponent;
 
@@ -115,7 +115,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   }
 
   handleTimeRangeChange(selection: TimeRangePickerSelection) {
-    this.onTimeRangeChange.next({ selection, triggerRefresh: true });
+    this.timeRangeChange.next({ selection, triggerRefresh: true });
   }
 
   disableOqlMode() {
@@ -204,7 +204,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
       // calculate the new time range. if all the entities were deleted, keep the last range.
       const newRange = this.getExecutionsTimeRange(item);
       this.activeTimeRange = { type: 'ABSOLUTE', absoluteSelection: newRange };
-      this.onTimeRangeChange.next({ selection: this.activeTimeRange, triggerRefresh: false });
+      this.timeRangeChange.next({ selection: this.activeTimeRange, triggerRefresh: false });
     }
 
     this.emitFilterChange$.next();

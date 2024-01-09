@@ -28,11 +28,11 @@ import { Observable } from 'rxjs';
   templateUrl: './time-series-chart.component.html',
   styleUrls: ['./time-series-chart.component.scss'],
 })
-export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
+export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy {
   private readonly HEADER_HEIGHT = 27;
   private readonly LEGEND_HEIGHT = 24;
   chartMetadata: Record<string, any>[] = [[]]; // 1 on 1 to chart 'data'. first item is time axes
-  @ViewChild('chart') private chartElement!: ElementRef;
+  @ViewChild('chart', { static: true }) private chartElement!: ElementRef;
 
   @Input() title!: string;
   @Input() settings!: TSChartSettings;
@@ -64,7 +64,22 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
     };
   };
 
-  constructor() {}
+  ngOnInit(): void {
+    if (!this.settings) {
+      throw new Error('Missing settings input');
+    }
+    if (this.syncKey) {
+      uPlot.sync(this.syncKey);
+    }
+    this.createChart(this.settings);
+  }
+
+  setTitle(title: string): void {
+    let titles = this.chartElement.nativeElement.getElementsByClassName('u-title');
+    if (titles.length) {
+      titles[0].innerHTML = title;
+    }
+  }
 
   // used by the tooltip
   getExecutionDetails(executionIds: string[]): Observable<Execution[]> {
@@ -81,26 +96,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       overlay.style.backdropFilter = 'blur(2px)';
     } else {
       overlay.style.removeProperty('backdrop-filter');
-    }
-  }
-
-  ngOnInit(): void {
-    if (!this.settings) {
-      throw new Error('Missing settings input');
-    }
-    if (this.syncKey) {
-      uPlot.sync(this.syncKey);
-    }
-  }
-
-  ngAfterViewInit(): void {
-    this.createChart(this.settings);
-  }
-
-  setTitle(title: string): void {
-    let titles = this.chartElement.nativeElement.getElementsByClassName('u-title');
-    if (titles.length) {
-      titles[0].innerHTML = title;
     }
   }
 
