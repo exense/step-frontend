@@ -16,11 +16,12 @@
 
 <ng-template #constantValueTemplate>
   <step-form-field
+    [showRequiredMarker]="showRequiredMarker"
     [class.ng-invalid]="!!_ngControl.invalid"
     [class.ng-touched]="_ngControl.touched"
     [class.with-tooltip]="tooltip"
   >
-    <step-label [attr.show-required-marker]="showRequiredMarker || null" *ngIf="label">{{ label }}</step-label>
+    <step-label *ngIf="label">{{ label }}</step-label>
     <ng-template #numberField>
       <input
         type="number"

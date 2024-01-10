@@ -1,19 +1,16 @@
 import { APP_INITIALIZER, FactoryProvider, inject, Injector } from '@angular/core';
-import { LegacyPluginDefinition } from './shared/legacy-plugin-definition';
 import { MicrofrontendPluginDefinition } from './shared/microfrontend-plugin-definition';
 import { registerMicrofrontendPlugins } from './register-microfrontend-plugins';
 import { PluginInfoRegistryService } from '@exense/step-core';
 import { registerOsPlugins } from './register-os-plugins';
 
-const IGNORE_PLUGINS: ReadonlyArray<string> = [];
-
 // For testing purposes only
-// Allows to add plugins, that don't returned from BE
+// Allows to add plugins that aren't enabled in the BE
 const ADDITIONAL_PLUGINS: ReadonlyArray<MicrofrontendPluginDefinition> = [
   // Add object like this {name: 'pluginName', entryPoint: 'pluginName/remoteEntry.js' }
 ];
 
-export type PluginDefinition = LegacyPluginDefinition | MicrofrontendPluginDefinition;
+export type PluginDefinition = MicrofrontendPluginDefinition;
 
 const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
   let result: PluginDefinition[] = [];
@@ -23,9 +20,7 @@ const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
     result = ((await pluginsResponse.json()) as PluginDefinition[]).map((plugin) => {
       console.log('received plugins', plugin);
 
-      //@ts-ignore
       if (plugin['entryPoint']) {
-        //@ts-ignore
         plugin['entryPoint'] += '?v=${project.version}';
       }
 
@@ -51,30 +46,29 @@ const registerPlugins = () => {
       return;
     }
 
-    let { legacy, microfrontend } = pluginDefinitions.reduce(
+    let { microfrontend } = pluginDefinitions.reduce(
       (res, plugin) => {
         if (plugin.hasOwnProperty('entryPoint')) {
           res.microfrontend.push(plugin as MicrofrontendPluginDefinition);
-        } else {
-          res.legacy.push(plugin as LegacyPluginDefinition);
         }
         return res;
       },
       {
-        legacy: [] as LegacyPluginDefinition[],
         microfrontend: [] as MicrofrontendPluginDefinition[],
       }
     );
 
-    const pluginNames = [
-      ...legacy.reduce((res, pluginInfo) => [...res, ...pluginInfo.angularModules], [] as string[]),
-      ...microfrontend.map((pluginInfo) => pluginInfo.name),
-    ];
+    const pluginNames = [...microfrontend.map((pluginInfo) => pluginInfo.name)];
+
     registry.register(...pluginNames);
 
-    microfrontend = microfrontend.filter((m) => !IGNORE_PLUGINS.includes(m.name));
+    const entryPoints = new Set<string>();
 
-    await Promise.all([registerMicrofrontendPlugins(microfrontend, injector), registerOsPlugins(injector)]);
+    microfrontend.forEach((plugin) => {
+      entryPoints.add(plugin.entryPoint);
+    });
+
+    await Promise.all([registerMicrofrontendPlugins(Array.from(entryPoints), injector), registerOsPlugins(injector)]);
   };
 };
 

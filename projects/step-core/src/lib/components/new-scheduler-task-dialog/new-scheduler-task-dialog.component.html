@@ -1,11 +1,11 @@
 <step-modal-window title="New task">
   <div step-modal-window-body>
     <ng-container [formGroup]="newSchedulerTaskForm">
-      <step-form-field>
+      <step-form-field [showRequiredMarker]="true">
         <step-label>Description</step-label>
         <input type="text" placeholder="Description" formControlName="name" />
       </step-form-field>
-      <step-form-field>
+      <step-form-field [showRequiredMarker]="true">
         <step-label>CRON expression</step-label>
         <input type="text" placeholder="CRON expression" formControlName="cronExpression" />
         <step-suffix class="button-suffix">

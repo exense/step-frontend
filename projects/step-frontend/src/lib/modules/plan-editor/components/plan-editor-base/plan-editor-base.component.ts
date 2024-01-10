@@ -35,7 +35,7 @@ import {
   PlanSetupService,
   PlanEditorApiService,
 } from '@exense/step-core';
-import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
@@ -97,9 +97,10 @@ export class PlanEditorBaseComponent
   }
 
   private get currentPlanId(): string | undefined {
-    return this.initialPlan?.id;
+    return this.compositeId ?? this.initialPlan?.id;
   }
 
+  @Input() compositeId?: string;
   @Input() initialPlan?: Plan | null;
   @Input() showExecuteButton = true;
 
@@ -142,6 +143,12 @@ export class PlanEditorBaseComponent
       this.setupPlan(cPlan?.currentValue, true);
       this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference((cPlan?.currentValue as Plan)?.id);
     }
+
+    const cCompositeId = changes['compositeId'];
+    if (cCompositeId?.previousValue !== cCompositeId?.currentValue || cCompositeId?.firstChange) {
+      this.loadPlan(cCompositeId?.currentValue, true);
+      this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference(cCompositeId?.currentValue);
+    }
   }
 
   ngOnDestroy(): void {
@@ -182,17 +189,16 @@ export class PlanEditorBaseComponent
       .pipe(
         switchMap((value) =>
           this._planEditorApi.clonePlan(this.currentPlanId!).pipe(
-            map((plan) => {
-              plan!.attributes!['name'] = value;
-              return plan;
-            }),
-            switchMap((plan) => this._planEditorApi.savePlan(plan)),
-            map(({ id }) => id)
+            switchMap((plan) => this._planEditorApi.renamePlan(plan, value)),
+            map(({ plan }) => plan.id)
           )
         )
       )
       .subscribe((id) => {
-        this._planEditorApi.navigateToPlan(id);
+        if (!id) {
+          return;
+        }
+        this._planEditorApi.navigateToPlan(id, true);
       });
   }
 
@@ -283,6 +289,14 @@ export class PlanEditorBaseComponent
         this.keywords._leafReportsDataSource.reload();
       }
     });
+  }
+
+  private loadPlan(id?: string, preselectArtefact?: boolean): void {
+    if (!id) {
+      return;
+    }
+
+    this._planEditorApi.loadPlan(id).subscribe((plan) => this.setupPlan(plan, preselectArtefact));
   }
 
   setupPlan(plan?: Plan, preselectArtefact?: boolean): void {

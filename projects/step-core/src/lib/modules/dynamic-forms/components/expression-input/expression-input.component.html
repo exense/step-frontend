@@ -2,8 +2,9 @@
   [class.ng-invalid]="!!_ngControl.invalid || !!isParentInvalid"
   [class.ng-touched]="!!_ngControl.touched || !!isParentTouched"
   [class.with-tooltip]="tooltip"
+  [showRequiredMarker]="showRequiredMarker"
 >
-  <step-label *ngIf="label" [attr.show-required-marker]="showRequiredMarker || null">{{ label }}</step-label>
+  <step-label *ngIf="label">{{ label }}</step-label>
 
   <input
     type="text"
