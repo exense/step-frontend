@@ -7,6 +7,9 @@
         <span class="dashboard-name">{{ dashboard.name }}</span>
       </ng-container>
       <ng-container *ngIf="editMode">
+        <step-alert class="edit-alert" type="WARNING"
+          >Saving will collect all the current settings, like filters, grouping, and charts</step-alert
+        >
         <button [disabled]="!dashboard.name" mat-button mat-flat-button color="primary" (click)="saveEditChanges()">
           Save
         </button>
@@ -19,6 +22,7 @@
   <div>
     <step-ts-dashboard-filter-bar
       *ngIf="context"
+      [editMode]="editMode"
       [context]="context"
       [filters]="dashboard.filters || []"
       (timeRangeChange)="handleTimeRangeChange($event)"

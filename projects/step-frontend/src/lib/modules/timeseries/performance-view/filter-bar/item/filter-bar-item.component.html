@@ -7,7 +7,7 @@
   #matTrigger="matMenuTrigger"
   (menuOpened)="onMenuOpen(); focusables.scheduleRefocus()"
 >
-  <div class="filter-label">{{ item.label || 'Unspecified' }}</div>
+  <div class="filter-label">{{ item.label || formattedValue || 'Unspecified' }}</div>
   <div class="filter-value">{{ formattedValue || '-' }}</div>
 
   <div (click)="removeItem.emit()" class="remove-btn" *ngIf="removable">
@@ -52,7 +52,7 @@
     </div>
 
     <div *ngSwitchCase="'FREE_TEXT'">
-      <div class="item-header">
+      <div *ngIf="item.label" class="item-header">
         {{ item.label }}
       </div>
       <mat-form-field *ngIf="!item.isLocked" class="w-100">

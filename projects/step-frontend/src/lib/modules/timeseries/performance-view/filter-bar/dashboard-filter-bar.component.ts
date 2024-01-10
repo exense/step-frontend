@@ -54,6 +54,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
 
   @Input() timeRangeOptions!: TimeRangePickerSelection[];
   @Input() activeTimeRange!: TimeRangePickerSelection;
+  @Input() editMode = false;
 
   @Input() filterOptions: TsFilterItem[] = [];
 

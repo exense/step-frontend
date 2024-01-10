@@ -15,6 +15,8 @@ import { ChartDashletSettingsData } from './chart-dashlet-settings-data';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NotificationEventType } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/notification/types/notification-event-type.enum';
 import { GatewayInfo } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/client/generated';
+import { FilterBarItemType, TsFilterItem } from '../../../../performance-view/filter-bar/model/ts-filter-item';
+import { FilterUtils } from '../../../../util/filter-utils';
 
 export type ChartForm = FormGroup<{
   name: FormControl<string | null>;
@@ -48,14 +50,43 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   item!: DashboardItem;
   newAttributeInputValue = '';
+  filterItems: TsFilterItem[] = [];
 
   ngOnInit(): void {
     this.item = JSON.parse(JSON.stringify(this._inputData.item));
     this.formGroup = this.createFormGroup(this._formBuilder, this.item);
+    this.filterItems = this.item.chartSettings!.filters.map((item) => ({
+      type: item.type,
+      attributeName: item.attribute,
+      searchEntities: [],
+      freeTextValues: item.textValues,
+    }));
+  }
+
+  addCustomFilter(type: FilterBarItemType) {
+    this.filterItems.push({
+      attributeName: '',
+      type: type,
+      label: '',
+      exactMatch: false,
+      removable: true,
+      searchEntities: [],
+    });
   }
 
   addAttribute(): void {
     this.item.chartSettings!.attributes.push({ name: '', displayName: '' });
+  }
+
+  convertToApiFilterItem(item: TsFilterItem): ChartFilterItem {
+    return {
+      type: item.type,
+      attribute: item.attributeName,
+      min: item.min,
+      max: item.max,
+      textValues: item.freeTextValues,
+      exactMatch: !!item.exactMatch,
+    };
   }
 
   private createFormGroup(fb: FormBuilder, item: DashboardItem): ChartForm {
@@ -81,6 +112,9 @@ export class ChartDashletSettingsComponent implements OnInit {
   }
 
   submitForm() {
+    this.item.chartSettings!.filters = this.filterItems
+      .filter(FilterUtils.filterItemIsValid)
+      .map(this.convertToApiFilterItem);
     this.item.chartSettings!.attributes = this.item.chartSettings!.attributes.filter((a) => a.name && a.displayName); // keep only non null attributes
     this._dialogRef.close({ ...this.item });
   }

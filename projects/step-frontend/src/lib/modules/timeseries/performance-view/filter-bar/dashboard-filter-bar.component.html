@@ -58,7 +58,7 @@
             *ngIf="!item.isHidden"
             [item]="item"
             [compact]="compactView"
-            [removable]="item.removable"
+            [removable]="item.removable || editMode"
             (removeItem)="removeFilterItem(i)"
             (filterChange)="handleFilterChange(i, $event)"
           >

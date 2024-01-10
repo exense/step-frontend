@@ -11,7 +11,7 @@ div[step-modal-window-body] {
 }
 
 .section {
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 
 .help-icon {
@@ -64,4 +64,10 @@ div[step-modal-window-body] {
     flex-grow: 1;
     flex-basis: 0;
   }
+}
+
+.filters-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
 }
