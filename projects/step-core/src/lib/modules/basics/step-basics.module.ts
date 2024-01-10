@@ -206,3 +206,4 @@ export * from './services/item-hover-receiver.service';
 export * from './services/item-hold-receiver.service';
 export * from './shared/bulk-operation-type.enum';
 export * from './shared/auth.guards';
+export * from './shared/string-array-regex';

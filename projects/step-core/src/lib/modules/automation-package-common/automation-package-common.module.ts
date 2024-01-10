@@ -12,9 +12,19 @@ import { TableModule } from '../table/table.module';
 import { EntityModule } from '../entity/entity.module';
 import { AutomationPackageInfoComponent } from './components/automation-package-info/automation-package-info.component';
 import { AutomationPackageSearchComponent } from './components/automation-package-search/automation-package-search.component';
+import { AutomationPackageRefIconComponent } from './components/automation-package-ref-icon/automation-package-ref-icon.component';
+import { AutomationPackageFilterPopoverComponent } from './components/automation-package-filter-popover/automation-package-filter-popover.component';
+import { EntitiesSelectionModule } from '../entities-selection/entities-selection.module';
+import { AutomationPackageFilterComponent } from './components/automation-package-filter/automation-package-filter.component';
 
 @NgModule({
-  declarations: [AutomationPackageInfoComponent, AutomationPackageSearchComponent],
+  declarations: [
+    AutomationPackageInfoComponent,
+    AutomationPackageSearchComponent,
+    AutomationPackageRefIconComponent,
+    AutomationPackageFilterPopoverComponent,
+    AutomationPackageFilterComponent,
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -24,8 +34,14 @@ import { AutomationPackageSearchComponent } from './components/automation-packag
     CustomRegistriesModule,
     TableModule,
     EntityModule,
+    EntitiesSelectionModule,
   ],
-  exports: [AutomationPackageInfoComponent, AutomationPackageSearchComponent],
+  exports: [
+    AutomationPackageInfoComponent,
+    AutomationPackageSearchComponent,
+    AutomationPackageRefIconComponent,
+    AutomationPackageFilterComponent,
+  ],
 })
 export class AutomationPackageCommonModule {
   constructor(
@@ -47,3 +63,5 @@ export class AutomationPackageCommonModule {
 
 export * from './components/automation-package-info/automation-package-info.component';
 export * from './components/automation-package-search/automation-package-search.component';
+export * from './components/automation-package-ref-icon/automation-package-ref-icon.component';
+export * from './components/automation-package-filter/automation-package-filter.component';

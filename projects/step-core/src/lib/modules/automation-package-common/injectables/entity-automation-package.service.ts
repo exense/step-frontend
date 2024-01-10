@@ -18,7 +18,10 @@ export class EntityAutomationPackageService implements OnDestroy {
   }
 
   getEntityPackage<T extends AutomationPackageChildEntity>(entity?: T): Observable<AutomationPackage | undefined> {
-    const packageId = entity?.customFields?.automationPackageId;
+    return this.getEntityPackageById(entity?.customFields?.automationPackageId);
+  }
+
+  getEntityPackageById(packageId?: string): Observable<AutomationPackage | undefined> {
     if (!packageId) {
       return of(undefined);
     }

@@ -4,18 +4,11 @@
   @include core.table-container;
 }
 
-.cell-actions {
-  width: 20rem;
-  button {
-    padding: 0;
-    min-width: 4rem;
-    min-height: 4rem;
-  }
-}
-
 .header {
   @include core.table-header;
 }
+
+@include core.table-common-cells;
 
 .create-keyword-button-group button {
   margin-left: 1rem;
