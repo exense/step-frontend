@@ -17,7 +17,6 @@ export * from './entity-column-container';
 export * from './function-script-language.interface';
 export * from './artefact-context';
 export * from './function-type-script-options.token';
-export * from './higher-order-validator';
 export * from './dynamic-value-validators-factory';
 export * from './link-display-type.enum';
 export * from './sub-route-data.interface';

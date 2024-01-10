@@ -1,48 +1,35 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormGroup, ValidatorFn } from '@angular/forms';
-import { Subject, takeUntil } from 'rxjs';
+import { AfterViewInit, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { FormGroup, UntypedFormGroup } from '@angular/forms';
 import { CustomComponent } from '../../../custom-registeries/custom-registries.module';
-import { FunctionTypeFormComponentContext } from '../../types/function-type-form-component-context.interface';
+import { v4 } from 'uuid';
+import { FunctionTypeParentFormService } from '../../injectables/function-type-parent-form.service';
 
 @Component({
   template: '',
 })
-export abstract class FunctionTypeFormComponent<T extends FormGroup> implements CustomComponent, OnInit, OnDestroy {
-  private readonly terminator$ = new Subject<void>();
+export abstract class FunctionTypeFormComponent<T extends FormGroup>
+  implements CustomComponent, OnInit, AfterViewInit, OnDestroy
+{
+  protected _parent = inject(FunctionTypeParentFormService);
+  private functionTypeCtrlName = `functionType_${v4()}`;
 
   protected abstract formGroup: T;
-  protected abstract formGroupValidator: ValidatorFn;
 
-  context!: FunctionTypeFormComponentContext;
+  context?: unknown;
 
   ngOnInit(): void {
-    this.context!.formGroup.addValidators(this.formGroupValidator);
+    (this._parent.formGroup as UntypedFormGroup).addControl(this.functionTypeCtrlName, this.formGroup);
+  }
 
-    this.context!.formGroup.controls.type.valueChanges.pipe(takeUntil(this.terminator$)).subscribe(() => {
-      this.formGroup.reset();
-    });
-
-    this.formGroup.valueChanges.pipe(takeUntil(this.terminator$)).subscribe(() => {
-      this.context!.formGroup.updateValueAndValidity();
-    });
-
-    this.context!.setValueToForm$.pipe(takeUntil(this.terminator$)).subscribe(() => {
-      this.setValueToForm();
-    });
-
-    this.context!.setValueToModel$.pipe(takeUntil(this.terminator$)).subscribe(() => {
-      this.setValueToModel();
-    });
+  ngAfterViewInit(): void {
+    this.setValueToForm();
   }
 
   ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
-
-    this.context!.formGroup.removeValidators(this.formGroupValidator);
+    (this._parent.formGroup as UntypedFormGroup).removeControl(this.functionTypeCtrlName);
   }
 
-  protected abstract setValueToForm(): void;
+  abstract setValueToForm(): void;
 
-  protected abstract setValueToModel(): void;
+  abstract setValueToModel(): void;
 }

@@ -11,8 +11,4 @@ import { CustomRegistryItem } from '../../shared/custom-registry-item';
 })
 export class FunctionTypeComponent extends BaseItemComponent<CustomRegistryItem> {
   protected override readonly registryType: CustomRegistryType = CustomRegistryType.FUNCTION_TYPE;
-
-  constructor(_customRegistryService: CustomRegistryService) {
-    super(_customRegistryService);
-  }
 }
