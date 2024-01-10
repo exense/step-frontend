@@ -1,5 +1,5 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, from, map, Observable, of, pipe, tap } from 'rxjs';
+import { BehaviorSubject, switchMap, map, Observable, of, pipe, tap, filter } from 'rxjs';
 import {
   AugmentedInteractivePlanExecutionService,
   AugmentedKeywordsService,
@@ -64,11 +64,14 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService, OnD
   }
 
   exportPlan(id: string, fileName: string): Observable<boolean> {
-    return this._exportDialogs.displayExportDialog('Composite Keyword export', `functions`, fileName, id);
+    return this._exportDialogs.displayExportDialog('Composite Keyword export', 'functions', fileName, id);
   }
 
   getPlanHistory(id: string): Observable<History[]> {
-    return this._keywordApi.getFunctionVersions(id);
+    return this.keyword$.pipe(
+      map((keyword) => keyword!),
+      switchMap((keyword: Keyword) => this._keywordApi.getFunctionVersions(keyword.id!))
+    );
   }
 
   loadPlan(id: string): Observable<Plan> {
@@ -76,12 +79,22 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService, OnD
   }
 
   navigateToPlan(id: string, enforcePurePlan?: boolean): void {
-    const EDITOR_URL = enforcePurePlan ? `/root/plans/editor` : '/root/composites/editor';
+    const EDITOR_URL = enforcePurePlan ? '/root/plans/editor' : '/root/composites/editor';
     this._router.navigateByUrl(`${EDITOR_URL}/${id}`);
   }
 
   restorePlanVersion(id: string, versionId: string): Observable<Plan> {
-    return this._keywordApi.restoreFunctionVersion(id, versionId).pipe(this.getPlan);
+    if (versionId) {
+      return this.keyword$.pipe(
+        map((keyword) => keyword!),
+        switchMap((keyword: Keyword) => this._keywordApi.restoreFunctionVersion(keyword.id!, versionId)),
+        this.getPlan
+      );
+    }
+    return this.keyword$.pipe(
+      map((keyword) => keyword!),
+      this.getPlan
+    );
   }
 
   getPlanVersion(id: string, plan: Plan): Observable<string> {

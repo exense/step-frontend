@@ -8,6 +8,7 @@ import { Dashlet, Plan, ViewRegistryService } from '@exense/step-core';
 })
 export class PlanAlertsComponent {
   @Input() plan?: Plan | null;
+  @Input() compositeId?: string;
 
   readonly _planAlerts = inject(ViewRegistryService).getDashlets('plan/alerts');
   readonly trackByDashlet: TrackByFunction<Dashlet> = (index, item) => item.id;

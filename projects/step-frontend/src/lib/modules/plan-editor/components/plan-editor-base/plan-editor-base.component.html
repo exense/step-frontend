@@ -1,5 +1,5 @@
 <div>
-  <step-plan-alerts [plan]="_planEditService.plan$ | async"> </step-plan-alerts>
+  <step-plan-alerts [compositeId]="compositeId" [plan]="_planEditService.plan$ | async"> </step-plan-alerts>
   <step-alert type="info" *ngIf="showInteractiveWarning$ | async">
     Welcome to the interactive mode. In this mode you can select tree nodes and run them directly by clicking the
     &nbsp;'Run interactively' button
@@ -39,6 +39,7 @@
       <step-plan-editor-actions
         [currentPlanId]="initialPlan?.id"
         [plan]="plan"
+        [compositeId]="compositeId"
         [showExecuteButton]="showExecuteButton"
         [hasUndo]="_planEditService.hasUndo$ | async"
         [hasRedo]="_planEditService.hasRedo$ | async"

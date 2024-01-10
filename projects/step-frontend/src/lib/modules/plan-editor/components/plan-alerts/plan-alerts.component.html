@@ -1,2 +1,6 @@
-<step-dashlet *ngFor="let alert of _planAlerts; trackBy: trackByDashlet" [itemKey]="alert.template" [context]="plan">
+<step-dashlet
+  *ngFor="let alert of _planAlerts; trackBy: trackByDashlet"
+  [itemKey]="alert.template"
+  [context]="{plan, compositeId}"
+>
 </step-dashlet>
