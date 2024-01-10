@@ -110,6 +110,17 @@ export class FilterUtils {
     return andFilters.filter((f) => f).join(' and ');
   }
 
+  static convertToApiFilterItem(item: TsFilterItem): ChartFilterItem {
+    return {
+      type: item.type,
+      attribute: item.attributeName,
+      min: item.min,
+      max: item.max,
+      textValues: item.freeTextValues,
+      exactMatch: !!item.exactMatch,
+    };
+  }
+
   static convertApiFilterItem(item: ChartFilterItem): TsFilterItem {
     const mappedItem: TsFilterItem = {
       label: item.label,

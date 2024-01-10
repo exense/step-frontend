@@ -134,6 +134,10 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     this.editMode = false;
     this.dashboard.grouping = this.context.getGroupDimensions();
     this.dashboard.timeRange = this.timeRangeSelection;
+    this.dashboard.filters = this.context
+      .getFilteringSettings()
+      .filterItems.filter(FilterUtils.filterItemIsValid)
+      .map(FilterUtils.convertToApiFilterItem);
     this._dashboardService.saveEntity5(this.dashboard).subscribe((response) => {});
   }
 
@@ -316,16 +320,18 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
         });
         return {
           type: item.type!,
-          label: item.label || '',
+          label: item.label || item.attribute || '',
           attributeName: item.attribute!,
           exactMatch: item.exactMatch!,
           textValues: textValues,
+          freeTextValues: item.textValues,
           searchEntities: [],
           min: item.min,
           max: item.max,
           isLocked: !!item.label,
           removable: false,
         };
+        // return FilterUtils.convertApiFilterItem(item);
       }) || []
     );
   }

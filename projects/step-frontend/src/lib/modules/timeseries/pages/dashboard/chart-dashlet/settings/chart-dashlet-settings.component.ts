@@ -78,17 +78,6 @@ export class ChartDashletSettingsComponent implements OnInit {
     this.item.chartSettings!.attributes.push({ name: '', displayName: '' });
   }
 
-  convertToApiFilterItem(item: TsFilterItem): ChartFilterItem {
-    return {
-      type: item.type,
-      attribute: item.attributeName,
-      min: item.min,
-      max: item.max,
-      textValues: item.freeTextValues,
-      exactMatch: !!item.exactMatch,
-    };
-  }
-
   private createFormGroup(fb: FormBuilder, item: DashboardItem): ChartForm {
     return fb.group({
       name: fb.control(item.name, [Validators.required]),
@@ -114,7 +103,7 @@ export class ChartDashletSettingsComponent implements OnInit {
   submitForm() {
     this.item.chartSettings!.filters = this.filterItems
       .filter(FilterUtils.filterItemIsValid)
-      .map(this.convertToApiFilterItem);
+      .map(FilterUtils.convertToApiFilterItem);
     this.item.chartSettings!.attributes = this.item.chartSettings!.attributes.filter((a) => a.name && a.displayName); // keep only non null attributes
     this._dialogRef.close({ ...this.item });
   }
