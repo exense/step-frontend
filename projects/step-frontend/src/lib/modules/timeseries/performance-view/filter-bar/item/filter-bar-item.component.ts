@@ -16,7 +16,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
   @Input() removable?: boolean;
   @Input() compact = false;
 
-  @Output() removeItem: EventEmitter<any> = new EventEmitter<any>();
+  @Output() removeItem: EventEmitter<void> = new EventEmitter<void>();
   @Output() filterChange: EventEmitter<TsFilterItem> = new EventEmitter<TsFilterItem>();
 
   @ViewChild('matTrigger') matTrigger!: MatMenuTrigger;
