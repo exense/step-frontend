@@ -1,9 +1,10 @@
 <step-form-field
   class="step-base-time-converter"
+  [showRequiredMarker]="showRequiredMarker"
   [class.ng-invalid]="_ngControl.invalid"
   [class.ng-touched]="_ngControl.touched"
 >
-  <step-label *ngIf="label" [attr.show-required-marker]="showRequiredMarker || null">
+  <step-label *ngIf="label">
     {{ label }}
     <step-icon *ngIf="tooltip" name="help-circle" [matTooltip]="tooltip"> </step-icon>
   </step-label>

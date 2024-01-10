@@ -38,6 +38,7 @@ import { AllowCharsDirective } from './directives/allow-chars.directive';
 import { ItemHoverDirective } from './directives/item-hover.directive';
 import { ItemHoldDirective } from './directives/item-hold.directive';
 import { PerTimeUnitInputComponent } from './components/time-input/per-time-unit-input.component';
+import { AutocompleteInputComponent } from './components/autocomplete-input/autocomplete-input.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -77,6 +78,7 @@ import { PerTimeUnitInputComponent } from './components/time-input/per-time-unit
     AllowCharsDirective,
     ItemHoverDirective,
     ItemHoldDirective,
+    AutocompleteInputComponent,
   ],
   exports: [
     CommonModule,
@@ -119,6 +121,7 @@ import { PerTimeUnitInputComponent } from './components/time-input/per-time-unit
     AllowCharsDirective,
     ItemHoverDirective,
     ItemHoldDirective,
+    AutocompleteInputComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -138,6 +141,7 @@ export * from './components/errors-list/errors-list.component';
 export * from './components/progress-bar/progress-bar.component';
 export * from './components/upload-container/upload-container.component';
 export * from './components/array-input/array-input.component';
+export * from './components/autocomplete-input/autocomplete-input.component';
 export { TimeUnitDictionary } from './components/time-input/base-time-converter.component';
 export * from './components/time-input/time-input.component';
 export * from './components/time-input/per-time-unit-input.component';

@@ -40,7 +40,7 @@
             "tsConfig": "projects/step-app/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "projects/step-app/src/favicon.ico",
+              "projects/step-app/src/favicon.png",
               "projects/step-app/src/assets",
               {
                 "glob": "**/*",
@@ -135,7 +135,7 @@
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
             "inlineStyleLanguage": "scss",
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": ["src/favicon.png", "src/assets"],
             "styles": ["src/styles.scss"],
             "scripts": []
           }

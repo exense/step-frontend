@@ -8,15 +8,16 @@ import {
 import { BehaviorSubject, concatMap, filter, Observable, startWith } from 'rxjs';
 
 export interface ActiveExecution {
-  readonly eId: string;
+  readonly executionId: string;
   readonly execution$: Observable<Execution>;
   readonly autoRefreshModel: AutoRefreshModel;
   destroy(): void;
+  manualRefresh(): void;
 }
 
 class ActiveExecutionImpl implements ActiveExecution {
   constructor(
-    readonly eId: string,
+    readonly executionId: string,
     readonly autoRefreshModel: AutoRefreshModel,
     private loadExecution: (eId: string) => Observable<Execution>
   ) {
@@ -36,7 +37,7 @@ class ActiveExecutionImpl implements ActiveExecution {
     this.autoRefreshModel.refresh$
       .pipe(
         startWith(() => undefined),
-        concatMap(() => this.loadExecution(this.eId))
+        concatMap(() => this.loadExecution(this.executionId))
       )
       .subscribe((execution) => {
         this.executionInternal$.next(execution);
@@ -50,6 +51,10 @@ class ActiveExecutionImpl implements ActiveExecution {
     this.autoRefreshModel.setInterval(100);
     this.autoRefreshModel.setAutoIncreaseTo(5000);
   }
+
+  manualRefresh(): void {
+    this.loadExecution(this.executionId).subscribe((execution) => this.executionInternal$.next(execution));
+  }
 }
 
 @Injectable()
@@ -59,20 +64,20 @@ export class ActiveExecutionsService implements OnDestroy {
 
   private executions = new Map<string, ActiveExecution>();
 
-  getActiveExecution(eId: string): ActiveExecution {
-    if (!this.executions.has(eId)) {
-      this.executions.set(eId, this.createActiveExecution(eId));
+  getActiveExecution(executionId: string): ActiveExecution {
+    if (!this.executions.has(executionId)) {
+      this.executions.set(executionId, this.createActiveExecution(executionId));
     }
-    return this.executions.get(eId)!;
+    return this.executions.get(executionId)!;
   }
 
-  removeActiveExecution(eId: string): void {
-    if (!this.executions.has(eId)) {
+  removeActiveExecution(executionId: string): void {
+    if (!this.executions.has(executionId)) {
       return;
     }
-    const execution = this.executions.get(eId)!;
+    const execution = this.executions.get(executionId)!;
     execution.destroy();
-    this.executions.delete(eId);
+    this.executions.delete(executionId);
   }
 
   ngOnDestroy(): void {
@@ -80,10 +85,10 @@ export class ActiveExecutionsService implements OnDestroy {
     this.executions.clear();
   }
 
-  private createActiveExecution(eId: string): ActiveExecution {
+  private createActiveExecution(executionId: string): ActiveExecution {
     const autoRefreshModel = this._autoRefreshFactory.create();
-    return new ActiveExecutionImpl(eId, autoRefreshModel, (eId: string) =>
-      this._executionService.getExecutionById(eId)
+    return new ActiveExecutionImpl(executionId, autoRefreshModel, (executionId: string) =>
+      this._executionService.getExecutionById(executionId)
     );
   }
 }
