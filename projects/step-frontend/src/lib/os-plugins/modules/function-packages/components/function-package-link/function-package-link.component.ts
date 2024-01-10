@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CustomComponent, Keyword, FunctionPackage, KeywordPackagesService } from '@exense/step-core';
-import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
+import { FunctionPackageActionsService } from '../../injectables/function-package-actions.service';
 
 @Component({
   selector: 'step-function-package-link',

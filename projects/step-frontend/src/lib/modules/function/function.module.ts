@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
 import {
   CustomCellRegistryService,
-  CustomSearchCellRegistryService,
-  EntityRegistry,
   FunctionLinkComponent,
   FunctionType,
   FunctionTypeRegistryService,
@@ -18,12 +16,6 @@ import { PlanEditorModule } from '../plan-editor/plan-editor.module';
 import { CompositeFunctionEditorComponent } from './components/composite-function-editor/composite-function-editor.component';
 import { FunctionConfigurationDialogComponent } from './components/function-configuration-dialog/function-configuration-dialog.component';
 import { FunctionListComponent } from './components/function-list/function-list.component';
-import { FunctionPackageConfigurationDialogComponent } from './components/function-package-configuration-dialog/function-package-configuration-dialog.component';
-import { FunctionPackageLinkComponent } from './components/function-package-link/function-package-link.component';
-import { FunctionPackageListComponent } from './components/function-package-list/function-package-list.component';
-import { FunctionPackageSearchComponent } from './components/function-package-search/function-package-search.component';
-import './components/function-package-selection/function-package-selection.component';
-import { FunctionPackageSelectionComponent } from './components/function-package-selection/function-package-selection.component';
 import { FunctionTypeCompositeComponent } from './components/function-type-composite/function-type-composite.component';
 import { FunctionTypeFilterComponent } from './components/function-type-filter/function-type-filter.component';
 import { FunctionTypeJMeterComponent } from './components/function-type-jmeter/function-type-jmeter.component';
@@ -35,13 +27,8 @@ import { FunctionConfigurationImplService } from './services/function-configurat
   imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule],
   declarations: [
     FunctionListComponent,
-    FunctionPackageLinkComponent,
-    FunctionPackageListComponent,
     FunctionTypeFilterComponent,
-    FunctionPackageSearchComponent,
-    FunctionPackageSelectionComponent,
     CompositeFunctionEditorComponent,
-    FunctionPackageConfigurationDialogComponent,
     FunctionConfigurationDialogComponent,
     FunctionTypeCompositeComponent,
     FunctionTypeScriptComponent,
@@ -54,49 +41,22 @@ import { FunctionConfigurationImplService } from './services/function-configurat
       useExisting: FunctionConfigurationImplService,
     },
   ],
-  exports: [
-    FunctionListComponent,
-    FunctionPackageSelectionComponent,
-    CompositeFunctionEditorComponent,
-    FunctionPackageConfigurationDialogComponent,
-    FunctionConfigurationDialogComponent,
-  ],
+  exports: [FunctionListComponent, CompositeFunctionEditorComponent, FunctionConfigurationDialogComponent],
 })
 export class FunctionModule {
   constructor(
-    private _entityRegistry: EntityRegistry,
     private _cellsRegistry: CustomCellRegistryService,
     private _viewRegistry: ViewRegistryService,
-    private _searchCellsRegistry: CustomSearchCellRegistryService,
     private _functionTypeRegistryService: FunctionTypeRegistryService,
     private _functionPackageTypeRegistryService: FunctionPackageTypeRegistryService
   ) {
-    this.registerEntities();
     this.registerViews();
     this.registerCells();
-    this.registerSearchCells();
     this.registerFunctionTypes();
     this.registerFunctionPackageTypes();
   }
 
-  private registerEntities(): void {
-    this._entityRegistry.registerEntity(
-      'KeywordPackage',
-      'functionPackage',
-      'package',
-      'functionPackage',
-      'rest/functionpackages/',
-      'rest/functionpackages/',
-      'st-table',
-      FunctionPackageSelectionComponent
-    );
-  }
-
   private registerViews(): void {
-    this._viewRegistry.registerRoute({
-      path: 'functionPackages',
-      component: FunctionPackageListComponent,
-    });
     this._viewRegistry.registerRoute({
       path: 'functions',
       component: FunctionListComponent,
@@ -115,14 +75,6 @@ export class FunctionModule {
 
   private registerCells(): void {
     this._cellsRegistry.registerCell('functionLink', FunctionLinkComponent);
-    this._cellsRegistry.registerCell('functionPackageLink', FunctionPackageLinkComponent);
-  }
-
-  private registerSearchCells(): void {
-    this._searchCellsRegistry.registerSearchCell(
-      'rest/table/functionPackage/searchIdsBy/attributes.name',
-      FunctionPackageSearchComponent
-    );
   }
 
   private registerFunctionTypes(): void {

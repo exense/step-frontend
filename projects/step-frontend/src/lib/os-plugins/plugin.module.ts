@@ -13,6 +13,10 @@ export class PluginModule extends PluginLazyLoad {
         import('./modules/script-editor/script-editor.module').then((m) => ({
           Module: m.ScriptEditorModule,
         })),
+      functionPackages: () =>
+        import('./modules/function-packages/function-packages.module').then((m) => ({
+          Module: m.FunctionPackagesModule,
+        })),
     };
   }
 }

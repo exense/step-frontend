@@ -9,7 +9,6 @@ import {
   FunctionActionsService,
   KeywordExecutorService,
 } from '@exense/step-core';
-import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
 
 @Component({
   selector: 'step-function-list',
@@ -24,7 +23,6 @@ export class FunctionListComponent implements AfterViewInit {
   private _injector = inject(Injector);
   private _functionApiService = inject(AugmentedKeywordsService);
   private _functionActions = inject(FunctionActionsService);
-  private _functionPackageDialogs = inject(FunctionPackageActionsService);
   private _keywordExecutor = inject(KeywordExecutorService);
 
   readonly dataSource = this._functionApiService.createFilteredTableDataSource();
@@ -37,6 +35,7 @@ export class FunctionListComponent implements AfterViewInit {
     this._functionActions.openAddFunctionModal(this._injector).subscribe(() => this.dataSource.reload());
   }
 
+  /*
   addFunctionPackage(): void {
     this._functionPackageDialogs.openAddFunctionPackageDialog().subscribe((result) => {
       if (result) {
@@ -44,6 +43,7 @@ export class FunctionListComponent implements AfterViewInit {
       }
     });
   }
+*/
 
   editFunction(keyword: Keyword): void {
     this._functionActions.openFunctionEditor(keyword).subscribe();
