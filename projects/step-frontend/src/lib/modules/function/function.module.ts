@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { inject, NgModule } from '@angular/core';
 import {
   CustomCellRegistryService,
   CustomSearchCellRegistryService,
@@ -12,6 +12,9 @@ import {
   FunctionConfigurationService,
   SimpleOutletComponent,
   FunctionPackageTypeRegistryService,
+  PlansService,
+  AugmentedKeywordsService,
+  Plan,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
@@ -30,6 +33,8 @@ import { FunctionTypeJMeterComponent } from './components/function-type-jmeter/f
 import { FunctionTypeNodeJSComponent } from './components/function-type-node-js/function-type-node-js.component';
 import { FunctionTypeScriptComponent } from './components/function-type-script/function-type-script.component';
 import { FunctionConfigurationImplService } from './services/function-configuration-impl.service';
+import { ActivatedRouteSnapshot } from '@angular/router';
+import { CompositeKeywordPlanApiService } from './services/composite-keyword-plan-api.service';
 
 @NgModule({
   imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule],
@@ -108,6 +113,12 @@ export class FunctionModule {
         {
           path: 'editor/:id',
           component: CompositeFunctionEditorComponent,
+          resolve: {
+            compositePlan: (route: ActivatedRouteSnapshot) => {
+              const id = route.params['id'];
+              return id ? inject(CompositeKeywordPlanApiService).loadPlan(id) : undefined;
+            },
+          },
         },
       ],
     });

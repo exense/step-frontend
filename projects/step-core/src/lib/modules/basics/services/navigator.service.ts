@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { DEFAULT_PAGE } from './default-page.token';
 import { DOCUMENT, Location } from '@angular/common';
 import { VIEW_ID_LINK_PREFIX } from './view-id-link-prefix.token';
-import { ActivatedRoute, NavigationEnd, Params, QueryParamsHandling, Router, UrlTree } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Params, QueryParamsHandling, Router } from '@angular/router';
 import { filter, from, map, Observable, shareReplay, startWith, switchMap, timer } from 'rxjs';
 
 @Injectable({
