@@ -1,5 +1,5 @@
-import { inject, Injectable } from '@angular/core';
-import { map, Observable, of, pipe, tap } from 'rxjs';
+import { inject, Injectable, OnDestroy } from '@angular/core';
+import { BehaviorSubject, switchMap, map, Observable, of, pipe, tap, filter } from 'rxjs';
 import {
   AugmentedInteractivePlanExecutionService,
   AugmentedKeywordsService,
@@ -15,8 +15,10 @@ import {
 } from '@exense/step-core';
 import { Router } from '@angular/router';
 
-@Injectable()
-export class CompositeKeywordPlanApiService implements PlanEditorApiService {
+@Injectable({
+  providedIn: 'root',
+})
+export class CompositeKeywordPlanApiService implements PlanEditorApiService, OnDestroy {
   private _keywordApi = inject(AugmentedKeywordsService);
   private _compositeApi = inject(CompositesService);
   private _planApi = inject(PlansService);
@@ -24,10 +26,16 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService {
   private _interactiveApi = inject(AugmentedInteractivePlanExecutionService);
   private _exportDialogs = inject(ExportDialogsService);
 
-  private keyword?: Keyword & { plan?: Plan };
+  private keywordInternal$ = new BehaviorSubject<Keyword | undefined>(undefined);
+
+  ngOnDestroy(): void {
+    this.keywordInternal$.complete();
+  }
+
+  readonly keyword$ = this.keywordInternal$.asObservable();
 
   private readonly getPlanWithId = pipe(
-    tap((keyword: Keyword) => (this.keyword = keyword)),
+    tap((keyword: Keyword) => this.keywordInternal$.next(keyword)),
     map((keyword) => {
       const id = keyword.id!;
       const plan = (keyword as any).plan as Plan;
@@ -56,11 +64,14 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService {
   }
 
   exportPlan(id: string, fileName: string): Observable<boolean> {
-    return this._exportDialogs.displayExportDialog('Composite Keyword export', `functions`, fileName, id);
+    return this._exportDialogs.displayExportDialog('Composite Keyword export', 'functions', fileName, id);
   }
 
   getPlanHistory(id: string): Observable<History[]> {
-    return this._keywordApi.getFunctionVersions(id);
+    return this.keyword$.pipe(
+      map((keyword) => keyword!),
+      switchMap((keyword: Keyword) => this._keywordApi.getFunctionVersions(keyword.id!))
+    );
   }
 
   loadPlan(id: string): Observable<Plan> {
@@ -68,12 +79,22 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService {
   }
 
   navigateToPlan(id: string, enforcePurePlan?: boolean): void {
-    const EDITOR_URL = enforcePurePlan ? `/root/plans/editor` : '/root/composites/editor';
+    const EDITOR_URL = enforcePurePlan ? '/root/plans/editor' : '/root/composites/editor';
     this._router.navigateByUrl(`${EDITOR_URL}/${id}`);
   }
 
   restorePlanVersion(id: string, versionId: string): Observable<Plan> {
-    return this._keywordApi.restoreFunctionVersion(id, versionId).pipe(this.getPlan);
+    if (versionId) {
+      return this.keyword$.pipe(
+        map((keyword) => keyword!),
+        switchMap((keyword: Keyword) => this._keywordApi.restoreFunctionVersion(keyword.id!, versionId)),
+        this.getPlan
+      );
+    }
+    return this.keyword$.pipe(
+      map((keyword) => keyword!),
+      this.getPlan
+    );
   }
 
   getPlanVersion(id: string, plan: Plan): Observable<string> {
@@ -82,7 +103,7 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService {
 
   savePlan(plan: Plan): Observable<{ id: string; plan: Plan }> {
     const keyword = {
-      ...this.keyword!,
+      ...this.keywordInternal$.value!,
       plan,
     } as Keyword;
 

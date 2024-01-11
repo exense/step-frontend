@@ -4,7 +4,7 @@ import { filter, map, Observable, of, switchMap } from 'rxjs';
 import { AugmentedSchedulerService, ExecutionParameters, ExecutiontTaskParameters } from '../client/step-client-module';
 import { EditSchedulerTaskDialogComponent } from '../components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 import { NewSchedulerTaskDialogComponent } from '../components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
-import { EntityDialogsService } from '../modules/entity/services/entity-dialogs.service';
+import { EntityDialogsService } from '../modules/entity/injectables/entity-dialogs.service';
 import { DialogsService } from '../shared';
 
 @Injectable({

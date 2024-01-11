@@ -5,7 +5,8 @@ import { SearchColDirective } from './search-col.directive';
 import { CustomColumnsBaseComponent } from '../components/custom-columns/custom-columns-base.component';
 
 @Directive({
-  selector: '[matColumnDef]:not([internal]):not([stepAdditionalCol]),step-custom-columns,step-entity-column-container',
+  selector:
+    '[matColumnDef]:not([internal]):not([stepAdditionalCol]),step-custom-columns,step-entity-column-container,step-lock-column-container',
 })
 export class ColumnDirective {
   constructor(
@@ -23,13 +24,13 @@ export class ColumnDirective {
   }
 
   get columnDefinitions(): MatColumnDef[] {
-    return !this.isCustom ? [this._matColumnDef!].filter((x) => !!x) : this._customColumns!.colDef!.map((x) => x);
+    return !this.isCustom ? [this._matColumnDef!].filter((x) => !!x) : this._customColumns!.colDef?.map((x) => x) ?? [];
   }
 
   get searchColumnDefinitions(): SearchColDirective[] {
     const searchCols = !this.isCustom
       ? [this._searchColumn!].filter((x) => !!x)
-      : this._customColumns!.searchColDef!.map((x) => x);
+      : this._customColumns!.searchColDef?.map((x) => x) ?? [];
 
     return searchCols.filter((col) => !col.isSearchDisabled);
   }

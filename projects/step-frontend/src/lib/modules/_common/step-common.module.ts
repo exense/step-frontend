@@ -1,6 +1,12 @@
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { DashletRegistryService, EntityColumnComponent, LOGOUT_CLEANUP, StepCoreModule } from '@exense/step-core';
+import {
+  DashletRegistryService,
+  EntityColumnComponent,
+  LOGOUT_CLEANUP,
+  StepCoreModule,
+  LockColumnComponent,
+} from '@exense/step-core';
 import { ExecutionLinkComponent } from './components/execution-link/execution-link.component';
 import { LoginComponent } from './components/login/login.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
@@ -67,6 +73,7 @@ import { IsMenuItemActivePipe } from './pipes/is-menu-item-active.pipe';
 export class StepCommonModule {
   constructor(dashletRegistryService: DashletRegistryService) {
     dashletRegistryService.registerDashlet('entityColumn', EntityColumnComponent);
+    dashletRegistryService.registerDashlet('entityLock', LockColumnComponent);
   }
 }
 
