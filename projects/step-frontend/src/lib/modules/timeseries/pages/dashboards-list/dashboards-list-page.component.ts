@@ -7,7 +7,7 @@ import {
   StepDataSource,
   TableRemoteDataSourceFactoryService,
 } from '@exense/step-core';
-import { catchError, map, Observable, of, switchMap } from 'rxjs';
+import { catchError, filter, map, Observable, of, switchMap } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -61,13 +61,17 @@ export class DashboardsListPageComponent {
     this._dialogs
       .showDeleteWarning(1, `Dashboard "${dashboard.name}"`)
       .pipe(
-        map(() => true),
+        filter((confirm) => confirm),
         catchError(() => of(false)),
         switchMap((isDeleteConfirmed) =>
           isDeleteConfirmed ? this._dashboardsService.deleteEntity5(dashboard.id!).pipe(map(() => true)) : of(false)
         )
       )
-      .subscribe(() => this.dataSource.reload());
+      .subscribe((deleteConfirmed) => {
+        if (deleteConfirmed) {
+          this.dataSource.reload();
+        }
+      });
   }
 
   navigateToDashboard(dashboard: DashboardView, editMode = false) {
