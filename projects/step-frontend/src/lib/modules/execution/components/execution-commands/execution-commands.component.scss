@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 .main-container,
 .sub-container {
   display: flex;
@@ -5,4 +7,8 @@
 
 .main-container {
   justify-content: space-between;
+}
+
+button.warning {
+  color: var.$red-50;
 }

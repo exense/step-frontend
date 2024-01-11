@@ -46,7 +46,7 @@ enum UpdateSelection {
 }
 
 interface RefreshParams {
-  eId?: string;
+  executionId?: string;
   updateSelection?: UpdateSelection;
 }
 
@@ -138,8 +138,8 @@ export class ExecutionProgressComponent
     })
   );
 
-  readonly eId = this._activatedRoute.snapshot.url[0].path!;
-  readonly activeExecution = this._activeExecutions.getActiveExecution(this.eId);
+  readonly executionId = this._activatedRoute.snapshot.url[0].path!;
+  readonly activeExecution = this._activeExecutions.getActiveExecution(this.executionId);
   protected activeTabId?: string = this._activatedRoute.snapshot.url?.[1]?.path;
 
   throughputchart: any | { series: any[]; data: any[][] } = {};
@@ -198,7 +198,7 @@ export class ExecutionProgressComponent
   }
 
   initRefreshExecution(): void {
-    this._executionPanels.initialize(this.eId);
+    this._executionPanels.initialize(this.executionId);
     this.activeExecution.execution$.pipe(takeUntil(this._terminator$)).subscribe((execution) => {
       this.execution = execution;
       this.showAutoRefreshButton = this.execution.status !== 'ENDED';
@@ -238,8 +238,8 @@ export class ExecutionProgressComponent
   }
 
   closeExecution(openList: boolean = true): void {
-    const eId = this.eId!;
-    this._executionTabManager.handleTabClose(eId, openList);
+    const executionId = this.executionId!;
+    this._executionTabManager.handleTabClose(executionId, openList);
   }
 
   private initTabs(): void {
@@ -280,9 +280,9 @@ export class ExecutionProgressComponent
   }
 
   private prepareRefreshParams(params?: RefreshParams): RefreshParams {
-    const eId = params?.eId ?? this.eId;
+    const executionId = params?.executionId ?? this.executionId;
     const updateSelection = params?.updateSelection ?? UpdateSelection.ALL;
-    return { eId, updateSelection };
+    return { executionId, updateSelection };
   }
 
   private handleExecutionRefresh(params?: RefreshParams): void {
@@ -299,10 +299,10 @@ export class ExecutionProgressComponent
   }
 
   private loadExecutionTree(): void {
-    if (!this.eId) {
+    if (!this.executionId) {
       return;
     }
-    this._treeUtils.loadNodes(this.eId).subscribe((nodes) => {
+    this._treeUtils.loadNodes(this.executionId).subscribe((nodes) => {
       if (nodes[0]) {
         this._executionTreeState.init(nodes[0], { expandAllByDefault: false });
       }
@@ -310,12 +310,12 @@ export class ExecutionProgressComponent
   }
 
   private refreshExecutionTree(): void {
-    if (!this.eId) {
+    if (!this.executionId) {
       return;
     }
     const expandedNodIds = this._executionTreeState.getExpandedNodeIds();
     this._treeUtils
-      .loadNodes(this.eId)
+      .loadNodes(this.executionId)
       .pipe(
         map((nodes) => nodes[0]),
         switchMap((rootNode) => {
@@ -333,12 +333,12 @@ export class ExecutionProgressComponent
   }
 
   private refreshTestCaseTable(params?: RefreshParams): void {
-    const { eId, updateSelection } = this.prepareRefreshParams(params);
-    if (!eId) {
+    const { executionId, updateSelection } = this.prepareRefreshParams(params);
+    if (!executionId) {
       return;
     }
     this._executionService
-      .getReportNodesByExecutionId(eId, 'step.artefacts.reports.TestCaseReportNode', 500)
+      .getReportNodesByExecutionId(executionId, 'step.artefacts.reports.TestCaseReportNode', 500)
       .subscribe((reportNodes) => {
         if (reportNodes.length > 0) {
           if (reportNodes.length > 1 && !this._executionPanels.isPanelEnabled(Panels.TEST_CASES)) {
@@ -356,21 +356,21 @@ export class ExecutionProgressComponent
       });
   }
 
-  private refreshOther(eId?: string): void {
-    eId = eId || this.eId;
-    if (!eId) {
+  private refreshOther(executionId?: string): void {
+    executionId = executionId || this.executionId;
+    if (!executionId) {
       return;
     }
 
     this._viewService
-      .getView('statusDistributionForFunctionCalls', eId)
+      .getView('statusDistributionForFunctionCalls', executionId)
       .subscribe((progress) => (this.progress = progress as ExecutionSummaryDto));
 
     this._viewService
-      .getView('statusDistributionForTestcases', eId)
+      .getView('statusDistributionForTestcases', executionId)
       .subscribe((testCasesProgress) => (this.testCasesProgress = testCasesProgress as ExecutionSummaryDto));
 
-    this._viewService.getView('errorDistribution', eId).subscribe((errorDistribution) => {
+    this._viewService.getView('errorDistribution', executionId).subscribe((errorDistribution) => {
       this.errorDistribution = errorDistribution as any as { errorCount: number; count: number };
 
       const countByErrorMsg: Record<string, number> = (this.errorDistribution as any).countByErrorMsg;
@@ -389,7 +389,7 @@ export class ExecutionProgressComponent
 
     this.selectedErrorDistributionToggle = ErrorDistributionStatus.MESSAGE;
 
-    this._systemService.getCurrentOperations(eId).subscribe((operations) => {
+    this._systemService.getCurrentOperations(executionId).subscribe((operations) => {
       this.currentOperations = operations;
     });
   }
