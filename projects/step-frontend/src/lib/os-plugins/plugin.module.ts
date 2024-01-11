@@ -17,6 +17,14 @@ export class PluginModule extends PluginLazyLoad {
         import('./modules/function-packages/function-packages.module').then((m) => ({
           Module: m.FunctionPackagesModule,
         })),
+      NodePlugin: () =>
+        import('./modules/node-plugin/node-plugin.module').then((m) => ({
+          Module: m.NodePluginModule,
+        })),
+      jmeterPlugin: () =>
+        import('./modules/jmeter-plugin/jmeter-plugin.module').then((m) => ({
+          Module: m.JmeterPluginModule,
+        })),
     };
   }
 }

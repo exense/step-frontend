@@ -1,16 +1,32 @@
 import { NgModule } from '@angular/core';
-import { SimpleOutletComponent, StepCoreModule, ViewRegistryService } from '@exense/step-core';
+import {
+  FunctionType,
+  FunctionTypeRegistryService,
+  SimpleOutletComponent,
+  StepCoreModule,
+  ViewRegistryService,
+} from '@exense/step-core';
 import { ScriptEditorComponent } from './components/script-editor/script-editor.component';
 import './components/script-editor/script-editor.component';
+import { FunctionTypeScriptComponent } from './components/function-type-script/function-type-script.component';
+import './components/function-type-script/function-type-script.component';
 
 @NgModule({
-  declarations: [ScriptEditorComponent],
+  declarations: [ScriptEditorComponent, FunctionTypeScriptComponent],
   imports: [StepCoreModule],
-  exports: [ScriptEditorComponent],
+  exports: [ScriptEditorComponent, FunctionTypeScriptComponent],
 })
 export class ScriptEditorModule {
-  constructor(_viewRegistry: ViewRegistryService) {
-    _viewRegistry.registerRoute({
+  constructor(
+    private _viewRegistry: ViewRegistryService,
+    private _functionTypeRegistryService: FunctionTypeRegistryService
+  ) {
+    this.registerViews();
+    this.registerFunctionTypes();
+  }
+
+  private registerViews(): void {
+    this._viewRegistry.registerRoute({
       path: 'scripteditor',
       component: SimpleOutletComponent,
       children: [
@@ -21,6 +37,12 @@ export class ScriptEditorModule {
       ],
     });
   }
-}
 
-export * from './components/script-editor/script-editor.component';
+  private registerFunctionTypes(): void {
+    this._functionTypeRegistryService.register(
+      FunctionType.SCRIPT,
+      'Script (Java, JS, Groovy, etc)',
+      FunctionTypeScriptComponent
+    );
+  }
+}

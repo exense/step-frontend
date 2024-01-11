@@ -133,13 +133,17 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
       .subscribe();
   }
 
+  private determineDefaultType(): string {
+    const allowedTypes = this.functionTypeItemInfos.map((item) => item.type);
+    const defaultTypeCandidate =
+      this._functionConfigurationDialogData?.dialogConfig?.functionTypeFilters?.[0] ?? FunctionType.SCRIPT;
+    return allowedTypes.includes(defaultTypeCandidate) ? defaultTypeCandidate : allowedTypes[0];
+  }
+
   private initStepFunction(): void {
     if (!this._functionConfigurationDialogData.keyword) {
-      const { functionTypeFilters } = this._functionConfigurationDialogData.dialogConfig;
-      const [type] = functionTypeFilters.length ? functionTypeFilters : [FunctionType.SCRIPT];
-
       this.keyword = {
-        type,
+        type: this.determineDefaultType(),
       };
       this.fetchStepFunction(this.keyword.type);
     } else {

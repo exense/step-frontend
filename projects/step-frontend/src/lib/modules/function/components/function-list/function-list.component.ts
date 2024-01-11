@@ -35,16 +35,6 @@ export class FunctionListComponent implements AfterViewInit {
     this._functionActions.openAddFunctionModal(this._injector).subscribe(() => this.dataSource.reload());
   }
 
-  /*
-  addFunctionPackage(): void {
-    this._functionPackageDialogs.openAddFunctionPackageDialog().subscribe((result) => {
-      if (result) {
-        this.dataSource.reload();
-      }
-    });
-  }
-*/
-
   editFunction(keyword: Keyword): void {
     this._functionActions.openFunctionEditor(keyword).subscribe();
   }

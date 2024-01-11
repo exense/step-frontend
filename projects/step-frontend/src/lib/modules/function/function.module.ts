@@ -18,9 +18,6 @@ import { FunctionConfigurationDialogComponent } from './components/function-conf
 import { FunctionListComponent } from './components/function-list/function-list.component';
 import { FunctionTypeCompositeComponent } from './components/function-type-composite/function-type-composite.component';
 import { FunctionTypeFilterComponent } from './components/function-type-filter/function-type-filter.component';
-import { FunctionTypeJMeterComponent } from './components/function-type-jmeter/function-type-jmeter.component';
-import { FunctionTypeNodeJSComponent } from './components/function-type-node-js/function-type-node-js.component';
-import { FunctionTypeScriptComponent } from './components/function-type-script/function-type-script.component';
 import { FunctionConfigurationImplService } from './services/function-configuration-impl.service';
 
 @NgModule({
@@ -31,9 +28,6 @@ import { FunctionConfigurationImplService } from './services/function-configurat
     CompositeFunctionEditorComponent,
     FunctionConfigurationDialogComponent,
     FunctionTypeCompositeComponent,
-    FunctionTypeScriptComponent,
-    FunctionTypeJMeterComponent,
-    FunctionTypeNodeJSComponent,
   ],
   providers: [
     {
@@ -79,13 +73,6 @@ export class FunctionModule {
 
   private registerFunctionTypes(): void {
     this._functionTypeRegistryService.register(FunctionType.COMPOSITE, 'Composite', FunctionTypeCompositeComponent);
-    this._functionTypeRegistryService.register(
-      FunctionType.SCRIPT,
-      'Script (Java, JS, Groovy, etc)',
-      FunctionTypeScriptComponent
-    );
-    this._functionTypeRegistryService.register(FunctionType.J_METER, 'JMeter', FunctionTypeJMeterComponent);
-    this._functionTypeRegistryService.register(FunctionType.NODE_JS, 'Node.js', FunctionTypeNodeJSComponent);
   }
 
   private registerFunctionPackageTypes(): void {
