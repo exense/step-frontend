@@ -38,7 +38,7 @@ export class DashboardsListPageComponent {
   saveNewDashboard(edit = false) {
     this._dashboardsService.saveEntity5(this.createDashboardModel).subscribe((dashboard) => {
       if (edit) {
-        this.navigateToDashboard(dashboard.id!, true);
+        this.navigateToDashboard(dashboard, true);
       } else {
         this.dataSource.reload();
       }
@@ -70,10 +70,19 @@ export class DashboardsListPageComponent {
       .subscribe(() => this.dataSource.reload());
   }
 
-  navigateToDashboard(id: string, editMode = false) {
-    this._router.navigate(['root', 'dashboards', id], {
-      queryParams: { edit: editMode ? '1' : '0' },
-      queryParamsHandling: 'merge',
-    });
+  navigateToDashboard(dashboard: DashboardView, editMode = false) {
+    if (dashboard.metadata?.['isLegacy']) {
+      const link = dashboard.metadata?.['link'];
+      if (link) {
+        this._router.navigate(['root', link]);
+      } else {
+        console.error('No link specified for dashboard');
+      }
+    } else {
+      this._router.navigate(['root', 'dashboards', dashboard.id], {
+        queryParams: { edit: editMode ? '1' : '0' },
+        queryParamsHandling: 'merge',
+      });
+    }
   }
 }

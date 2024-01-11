@@ -7,13 +7,13 @@ import type { MetricRenderingSettings } from './MetricRenderingSettings';
 
 export type MetricType = {
   customFields?: Record<string, any>;
-  name: string;
-  displayName: string;
+  name?: string;
+  displayName?: string;
   description?: string;
-  attributes: Array<MetricAttribute>;
+  attributes?: Array<MetricAttribute>;
   unit?: string;
-  defaultAggregation: 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
-  defaultGroupingAttributes: Array<string>;
-  renderingSettings: MetricRenderingSettings;
+  defaultAggregation?: 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
+  defaultGroupingAttributes?: Array<string>;
+  renderingSettings?: MetricRenderingSettings;
   id?: string;
 };

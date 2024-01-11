@@ -27,7 +27,7 @@
   <ng-container matColumnDef="type" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
     <td mat-cell *matCellDef="let element">
-      <a title="Go to dashboard" (click)="navigateToDashboard(element.id)" class="name-column">{{ element.name }}</a>
+      <a title="Go to dashboard" (click)="navigateToDashboard(element)" class="name-column">{{ element.name }}</a>
     </td>
   </ng-container>
   <ng-container matColumnDef="description" stepSearchCol>
@@ -54,26 +54,28 @@
           mat-icon-button
           matTooltip="View dashboard"
           [disabled]="!('dashboard-edit' | hasRight | async)"
-          (click)="navigateToDashboard(element.id)"
+          (click)="navigateToDashboard(element)"
         >
           <step-icon name="eye"></step-icon>
         </button>
-        <button
-          mat-icon-button
-          matTooltip="Edit dashboard"
-          [disabled]="!('dashboard-edit' | hasRight | async)"
-          (click)="navigateToDashboard(element.id, true)"
-        >
-          <step-icon name="edit"></step-icon>
-        </button>
-        <button
-          mat-icon-button
-          matTooltip="Delete dashboard"
-          [disabled]="!('dashboard-delete' | hasRight | async)"
-          (click)="delete(element)"
-        >
-          <step-icon name="trash-2"></step-icon>
-        </button>
+        <ng-container *ngIf="!element.metadata?.isLegacy">
+          <button
+            mat-icon-button
+            matTooltip="Edit dashboard"
+            [disabled]="!('dashboard-edit' | hasRight | async)"
+            (click)="navigateToDashboard(element, true)"
+          >
+            <step-icon name="edit"></step-icon>
+          </button>
+          <button
+            mat-icon-button
+            matTooltip="Delete dashboard"
+            [disabled]="!('dashboard-delete' | hasRight | async)"
+            (click)="delete(element)"
+          >
+            <step-icon name="trash-2"></step-icon>
+          </button>
+        </ng-container>
       </step-btn-group>
     </td>
   </ng-container>

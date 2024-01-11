@@ -51,6 +51,12 @@ export const $DashboardView = {
       },
       isRequired: true,
     },
+    metadata: {
+      type: 'dictionary',
+      contains: {
+        properties: {},
+      },
+    },
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',

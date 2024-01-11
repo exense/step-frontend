@@ -11,11 +11,9 @@ export const $MetricType = {
     },
     name: {
       type: 'string',
-      isRequired: true,
     },
     displayName: {
       type: 'string',
-      isRequired: true,
     },
     description: {
       type: 'string',
@@ -25,25 +23,21 @@ export const $MetricType = {
       contains: {
         type: 'MetricAttribute',
       },
-      isRequired: true,
     },
     unit: {
       type: 'string',
     },
     defaultAggregation: {
       type: 'Enum',
-      isRequired: true,
     },
     defaultGroupingAttributes: {
       type: 'array',
       contains: {
         type: 'string',
       },
-      isRequired: true,
     },
     renderingSettings: {
       type: 'MetricRenderingSettings',
-      isRequired: true,
     },
     id: {
       type: 'string',

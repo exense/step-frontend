@@ -16,5 +16,6 @@ export type DashboardView = {
   grouping: Array<string>;
   filters: Array<ChartFilterItem>;
   dashlets: Array<DashboardItem>;
+  metadata?: Record<string, any>;
   id?: string;
 };

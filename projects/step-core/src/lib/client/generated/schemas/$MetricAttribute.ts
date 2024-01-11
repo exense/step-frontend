@@ -5,11 +5,9 @@ export const $MetricAttribute = {
   properties: {
     name: {
       type: 'string',
-      isRequired: true,
     },
     displayName: {
       type: 'string',
-      isRequired: true,
     },
   },
 } as const;
