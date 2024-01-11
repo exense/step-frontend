@@ -2,7 +2,6 @@ import { BaseItemComponent } from './base-item.component';
 import { EntityItem } from '../../shared/entity-item';
 import { CustomRegistryType } from '../../shared/custom-registry-type.enum';
 import { Component, Input } from '@angular/core';
-import { CustomRegistryService } from '../../services/custom-registry.service';
 
 @Component({
   selector: 'step-entity',
