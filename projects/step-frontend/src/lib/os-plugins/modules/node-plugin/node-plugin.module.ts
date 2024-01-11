@@ -15,3 +15,5 @@ export class NodePluginModule {
     this._functionTypeRegistryService.register(FunctionType.NODE_JS, 'Node.js', FunctionTypeNodeJSComponent);
   }
 }
+
+export * from './components/function-type-node-js/function-type-node-js.component';

@@ -93,3 +93,10 @@ export class FunctionPackagesModule {
     this._dashletsRegistry.registerDashlet('uploadPackageBtn', UploadPackageBtnComponent);
   }
 }
+
+export * from './components/function-package-configuration-dialog/function-package-configuration-dialog.component';
+export * from './components/function-package-link/function-package-link.component';
+export * from './components/function-package-list/function-package-list.component';
+export * from './components/function-package-search/function-package-search.component';
+export * from './components/function-package-selection/function-package-selection.component';
+export * from './components/upload-package-btn/upload-package-btn.component';

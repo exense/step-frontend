@@ -15,3 +15,5 @@ export class JmeterPluginModule {
     this._functionTypeRegistryService.register(FunctionType.J_METER, 'JMeter', FunctionTypeJMeterComponent);
   }
 }
+
+export * from './components/function-type-jmeter/function-type-jmeter.component';

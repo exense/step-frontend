@@ -46,3 +46,6 @@ export class ScriptEditorModule {
     );
   }
 }
+
+export * from './components/function-type-script/function-type-script.component';
+export * from './components/script-editor/script-editor.component';
