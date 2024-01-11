@@ -18,7 +18,7 @@ import {
   DynamicFieldsSchema,
   SchemasFactoryService,
 } from '../../modules/dynamic-forms/dynamic-forms.module';
-import { EntityTypeResolver } from '../../modules/entity/services/entity-type-resolver';
+import { EntityTypeResolver } from '../../modules/entity/injectables/entity-type-resolver';
 import { ArtefactRefreshNotificationService } from '../../services/artefact-refresh-notification.service';
 import { DynamicAttributePipe } from '../../pipes/dynamic-attribute.pipe';
 import { Entity } from '../../modules/entity/types/entity';
