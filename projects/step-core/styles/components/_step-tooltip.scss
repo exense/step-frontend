@@ -1,0 +1,20 @@
+@use '../core-variables' as var;
+
+@mixin tooltip($text-color) {
+  .mat-tooltip {
+    white-space: pre-line;
+    background: var.$white;
+    color: $text-color;
+    box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14),
+      0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin: 1.4rem;
+    max-width: 25rem;
+    padding: 1rem;
+    border-radius: 0.8rem;
+    overflow: hidden;
+    text-align: unset;
+  }
+}

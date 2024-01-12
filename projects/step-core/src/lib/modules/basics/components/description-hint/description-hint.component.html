@@ -1,0 +1,11 @@
+<step-popover
+  *ngIf="description"
+  [xPosition]="xPosition"
+  [yPosition]="yPosition"
+  (toggledEvent)="toggleActive = $event"
+>
+  <step-icon [name]="toggleActive ? 'x-circle' : 'help-circle'"></step-icon>
+  <step-popover-content>
+    <div [innerHTML]="description | safeHtml"></div>
+  </step-popover-content>
+</step-popover>
