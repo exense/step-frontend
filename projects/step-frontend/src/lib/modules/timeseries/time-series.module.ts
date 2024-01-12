@@ -36,8 +36,6 @@ import { FilterBarPlanItemComponent } from './performance-view/filter-bar/item/p
 import { MetricChartComponent } from './metric-chart/metric-chart.component';
 import { ResolutionPickerComponent } from './components/resolution-picker/resolution-picker.component';
 import { DashboardPageComponent } from './pages/dashboard/dashboard-page.component';
-import { PlanListComponent } from '../plan/components/plan-list/plan-list.component';
-import { PlanEditorComponent } from '../plan/components/plan-editor/plan-editor.component';
 import { ChartDashletComponent } from './pages/dashboard/chart-dashlet/chart-dashlet.component';
 import { DashboardFilterBarComponent } from './performance-view/filter-bar/dashboard-filter-bar.component';
 import { DashboardsListPageComponent } from './pages/dashboards-list/dashboards-list-page.component';
