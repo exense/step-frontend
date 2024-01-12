@@ -4,6 +4,5 @@
 <ng-container *ngIf="noLink$ | async; else link">
   {{ context?.key }}
 </ng-container>
-<ng-container *ngIf="context?.description">
-  <step-icon name="help-circle" [matTooltip]="context!.description!"></step-icon>
-</ng-container>
+<step-description-hint *ngIf="!(noDescriptionHint$ | async)" [description]="context?.description">
+</step-description-hint>
