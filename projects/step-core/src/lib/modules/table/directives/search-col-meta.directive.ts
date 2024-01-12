@@ -1,5 +1,4 @@
-import { ContentChild, Directive, forwardRef, Input } from '@angular/core';
-import { BaseFilterComponent } from '../../basics/step-basics.module';
+import { Directive, forwardRef, Input } from '@angular/core';
 import { SearchColumn } from '../shared/search-column.interface';
 import { SearchColBase } from './search-col-base';
 import { SearchColumnAccessor } from '../shared/search-column-accessor';
