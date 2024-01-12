@@ -134,10 +134,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     this.editMode = false;
     this.dashboard.grouping = this.context.getGroupDimensions();
     this.dashboard.timeRange = this.timeRangeSelection;
-    this.dashboard.filters = this.context
-      .getFilteringSettings()
-      .filterItems.filter(FilterUtils.filterItemIsValid)
-      .map(FilterUtils.convertToApiFilterItem);
+    this.dashboard.filters = this.context.getFilteringSettings().filterItems.map(FilterUtils.convertToApiFilterItem);
     this._dashboardService.saveEntity5(this.dashboard).subscribe((response) => {});
   }
 
@@ -187,7 +184,6 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
       const foundRelativeOption = this.timeRangeOptions.find((o) => {
         return o.type === 'RELATIVE' && timeInMs === o.relativeSelection?.timeInMs;
       });
-      console.log('found', foundRelativeOption);
       this.timeRangeSelection = foundRelativeOption || {
         type: 'RELATIVE',
         relativeSelection: {
@@ -203,7 +199,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
       id: dashboard.id!,
       timeRange: timeRange,
       grouping: dashboard.grouping || [],
-      filters: this.prepareFilterItems(),
+      filters: dashboard.filters?.map(FilterUtils.convertApiFilterItem),
     });
   }
 
@@ -305,41 +301,5 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
       queryParams: currentParams,
       queryParamsHandling: 'merge',
     });
-  }
-
-  private prepareFilterItems(): TsFilterItem[] {
-    return (
-      this.dashboard.filters?.map((item) => {
-        const textValues: { value: string; isSelected?: boolean }[] =
-          item.textOptions?.map((option) => ({
-            value: option,
-            isSelected: false,
-          })) || [];
-        item!.textValues?.forEach((value) => {
-          textValues.filter((t) => t.value === value).forEach((item) => (item.isSelected = true));
-        });
-        return {
-          type: item.type!,
-          label: item.label || item.attribute || '',
-          attributeName: item.attribute!,
-          exactMatch: item.exactMatch!,
-          textValues: textValues,
-          freeTextValues: item.textValues,
-          searchEntities: [],
-          min: item.min,
-          max: item.max,
-          isLocked: !!item.label,
-          removable: false,
-        };
-        // return FilterUtils.convertApiFilterItem(item);
-      }) || []
-    );
-  }
-
-  private getSeriesKeys(attributes: BucketAttributes, groupDimensions: string[]): (string | undefined)[] {
-    if (Object.keys(attributes).length === 0) {
-      return [undefined];
-    }
-    return groupDimensions.map((field) => attributes[field]);
   }
 }

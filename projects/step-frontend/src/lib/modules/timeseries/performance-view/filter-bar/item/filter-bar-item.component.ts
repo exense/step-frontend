@@ -75,14 +75,13 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     if (this.chipInputValue) {
       this.addSearchValue(this.chipInputValue);
     }
-    if (!this.item.isLocked) {
-      this.item.label = this.item.attributeName;
-    }
+    let isEntityFilter = false;
     switch (this.item.type) {
       case 'EXECUTION':
       case 'PLAN':
       case 'TASK':
         this.item.freeTextValues = this.item.searchEntities.map((e) => e.searchValue);
+        isEntityFilter = true;
         break;
       case 'OPTIONS':
         break;
@@ -97,6 +96,11 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
       default:
         throw new Error('Unhandled item type: ' + this.item.type);
     }
+    console.log(this.item.label);
+    if (!this.item.isLocked && !isEntityFilter) {
+      this.item.label = this.item.attributeName;
+    }
+
     this.formattedValue = this.getFormattedValue(this.item);
     this.filterChange.emit(this.item);
     this.changesApplied = true;

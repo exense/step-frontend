@@ -111,12 +111,28 @@ export class FilterUtils {
   }
 
   static convertToApiFilterItem(item: TsFilterItem): ChartFilterItem {
+    let textValues: string[] = [];
+    switch (item.type) {
+      case 'OPTIONS':
+        textValues = item.textValues?.filter((i) => i.isSelected).map((item) => item.value) || [];
+        break;
+      case 'FREE_TEXT':
+        textValues = item.freeTextValues || [];
+        break;
+      case 'EXECUTION':
+      case 'TASK':
+      case 'PLAN':
+        textValues = item.searchEntities.map((e) => e.searchValue).filter((x) => !!x) || [];
+        break;
+    }
     return {
       type: item.type,
       attribute: item.attributeName,
       min: item.min,
       max: item.max,
-      textValues: item.freeTextValues,
+      label: item.label,
+      textValues: textValues,
+      textOptions: item.textValues?.map((o) => o.value),
       exactMatch: !!item.exactMatch,
     };
   }
@@ -136,7 +152,16 @@ export class FilterUtils {
     };
     switch (item.type) {
       case 'OPTIONS':
-        mappedItem.textValues = item.textValues?.map((v) => ({ value: v, isSelected: true }));
+        const options = item.textOptions?.map((o) => ({ value: o, isSelected: false })) || [];
+        item.textValues?.forEach((v) => {
+          const foundOption = options.find((o) => o.value === v);
+          if (foundOption) {
+            foundOption.isSelected = true;
+          } else {
+            options.push({ isSelected: true, value: v });
+          }
+        });
+        mappedItem.textValues = options;
         break;
       case 'FREE_TEXT':
         mappedItem.freeTextValues = item.textValues;
@@ -144,7 +169,7 @@ export class FilterUtils {
       case 'EXECUTION':
       case 'TASK':
       case 'PLAN':
-        mappedItem.searchEntities = [{ searchValue: item.textValues?.[0] || '' }];
+        mappedItem.searchEntities = item.textValues?.map((v) => ({ searchValue: v, entity: undefined })) || [];
         break;
       case 'NUMERIC':
       case 'DATE':
@@ -152,6 +177,7 @@ export class FilterUtils {
         mappedItem.max = item.max;
         break;
     }
+    console.log(mappedItem);
 
     return mappedItem;
   }
