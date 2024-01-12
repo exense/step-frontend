@@ -49,7 +49,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
   @Input() filters: ChartFilterItem[] = [];
 
-  _activeFilters: TsFilterItem[] = [];
+  _internalFilters: TsFilterItem[] = [];
   @Input() compactView = false;
 
   @Input() timeRangeOptions!: TimeRangePickerSelection[];
@@ -81,6 +81,10 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   private _matDialog = inject(MatDialog);
   private _snackbar = inject(MatSnackBar);
 
+  getInternalFilters() {
+    return this._internalFilters;
+  }
+
   ngOnInit(): void {
     if (!this.context) {
       throw new Error('Context input is mandatory');
@@ -88,7 +92,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     if (this.context.getGroupDimensions()) {
       this.activeGrouping = this.context.getGroupDimensions();
     }
-    this._activeFilters = this.context.getFilteringSettings().filterItems;
+    this._internalFilters = this.context.getFilteringSettings().filterItems;
 
     this.emitFilterChange$.pipe(debounceTime(this.EMIT_DEBOUNCE_TIME)).subscribe(() => {
       this.composeAndVerifyFullOql(this.activeGrouping).subscribe((response) => {
@@ -101,7 +105,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   getValidFilters(): TsFilterItem[] {
-    return this._activeFilters.filter(FilterUtils.filterItemIsValid);
+    return this._internalFilters.filter(FilterUtils.filterItemIsValid);
   }
 
   handleOqlChange(event: any) {
@@ -132,7 +136,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     const filtersOql = this.oqlModeActive
       ? this.oqlValue
       : FilterUtils.filtersToOQL(
-          this._activeFilters.filter(FilterUtils.filterItemIsValid),
+          this._internalFilters.filter(FilterUtils.filterItemIsValid),
           TimeSeriesConfig.ATTRIBUTES_PREFIX
         );
     let groupingItems: TsFilterItem[] = groupDimensions.map((dimension) => ({
@@ -193,12 +197,12 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   handleFilterChange(index: number, item: TsFilterItem) {
-    this._activeFilters[index] = item;
+    this._internalFilters[index] = item;
     if (!item.attributeName) {
       this.removeFilterItem(index);
       return;
     }
-    const existingItems = this._activeFilters.filter((i) => i.attributeName === item.attributeName);
+    const existingItems = this._internalFilters.filter((i) => i.attributeName === item.attributeName);
     if (existingItems.length > 1) {
       // the filter is duplicated
       this._snackbar.open('Filter not applied', 'dismiss');
@@ -242,13 +246,13 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   addFilterItem(item: TsFilterItem) {
-    const filterIndex = this._activeFilters.findIndex((i) => i.attributeName === item.attributeName);
+    const filterIndex = this._internalFilters.findIndex((i) => i.attributeName === item.attributeName);
 
     if (filterIndex !== -1) {
       const index =
-        filterIndex < this._activeFilters.length - this._activeFilters.length
+        filterIndex < this._internalFilters.length - this._internalFilters.length
           ? filterIndex
-          : filterIndex + this._activeFilters.length;
+          : filterIndex + this._internalFilters.length;
 
       this.filterComponents!.toArray()[index].menuTrigger!.openMenu();
     } else {
@@ -267,9 +271,9 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   removeFilterItem(index: number) {
-    const itemToDelete = this._activeFilters[index];
+    const itemToDelete = this._internalFilters[index];
 
-    this._activeFilters.splice(index, 1);
+    this._internalFilters.splice(index, 1);
 
     if (FilterUtils.filterItemIsValid(itemToDelete)) {
       this.emitFilterChange$.next();
@@ -277,12 +281,12 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   private addFilter(item: TsFilterItem): void {
-    this._activeFilters.push(item);
+    this._internalFilters.push(item);
     this._changeDetectorRef.detectChanges();
     this.filterComponents!.last.openMenu();
     this.filterComponents!.last.menuTrigger!.menuClosed.pipe(take(1)).subscribe(() => {
       if (!item.attributeName) {
-        this._activeFilters.pop();
+        this._internalFilters.pop();
       }
     });
   }

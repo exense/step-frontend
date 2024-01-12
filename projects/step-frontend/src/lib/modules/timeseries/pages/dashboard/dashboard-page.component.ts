@@ -1,5 +1,6 @@
 import { Component, inject, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import {
+  AuthService,
   BucketAttributes,
   BucketResponse,
   ChartSettings,
@@ -64,6 +65,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   private _dashboardService = inject(DashboardsService);
   private _route: ActivatedRoute = inject(ActivatedRoute);
   private _router: Router = inject(Router);
+  private _authService: AuthService = inject(AuthService);
   colorsPool: TimeseriesColorsPool = new TimeseriesColorsPool();
 
   dashboard!: DashboardView;
@@ -83,11 +85,6 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const pageParams = this.extractUrlParams();
     this.removeOneTimeUrlParams();
-    this.editMode = pageParams.editMode || false;
-    if (this.editMode) {
-      // TODO permissions
-      this.fetchMetricTypes();
-    }
     this._route.paramMap.subscribe((params) => {
       const id: string = params.get('id')!;
       if (!id) {
@@ -98,6 +95,10 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
         this.context = this.createContext(this.dashboard);
         this.subscribeForContextChange();
         this.subscribeForTimeRangeChange();
+        if (pageParams.editMode && this._authService.hasRight('dashboard_write')) {
+          this.fetchMetricTypes();
+          this.enableEditMode();
+        }
       });
     });
   }
@@ -134,7 +135,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     this.editMode = false;
     this.dashboard.grouping = this.context.getGroupDimensions();
     this.dashboard.timeRange = this.timeRangeSelection;
-    this.dashboard.filters = this.context.getFilteringSettings().filterItems.map(FilterUtils.convertToApiFilterItem);
+    this.dashboard.filters = this.filterBar?._internalFilters.map(FilterUtils.convertToApiFilterItem) || [];
     this._dashboardService.saveEntity5(this.dashboard).subscribe((response) => {});
   }
 

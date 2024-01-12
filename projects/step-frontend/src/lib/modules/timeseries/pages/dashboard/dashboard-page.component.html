@@ -3,7 +3,15 @@
     <div></div>
     <div class="header-buttons-container">
       <ng-container *ngIf="!editMode">
-        <button mat-button mat-flat-button color="primary" (click)="enableEditMode()">Edit</button>
+        <button
+          mat-button
+          mat-flat-button
+          color="primary"
+          [disabled]="!('dashboard-write' | hasRight | async)"
+          (click)="enableEditMode()"
+        >
+          Edit
+        </button>
         <span class="dashboard-name">{{ dashboard.name }}</span>
       </ng-container>
       <ng-container *ngIf="editMode">

@@ -52,7 +52,7 @@
       [style.flexWrap]="compactView ? 'wrap' : 'nowrap'"
     >
       <ng-container *ngIf="!oqlModeActive">
-        <ng-container *ngFor="let item of _activeFilters; let i = index">
+        <ng-container *ngFor="let item of _internalFilters; let i = index">
           <step-ts-filter-bar-item
             #appliedFilter
             *ngIf="!item.isHidden"

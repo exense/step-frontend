@@ -50,7 +50,7 @@
         <button
           mat-icon-button
           matTooltip="View dashboard"
-          [disabled]="!('dashboard-edit' | hasRight | async)"
+          [disabled]="!('dashboard-write' | hasRight | async)"
           (click)="navigateToDashboard(element)"
         >
           <step-icon name="eye"></step-icon>
@@ -59,7 +59,7 @@
           <button
             mat-icon-button
             matTooltip="Edit dashboard"
-            [disabled]="!('dashboard-edit' | hasRight | async)"
+            [disabled]="!('dashboard-write' | hasRight | async)"
             (click)="navigateToDashboard(element, true)"
           >
             <step-icon name="edit"></step-icon>
