@@ -1,20 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
-import {
-  AxesSettings,
-  ChartFilterItem,
-  ChartSettings,
-  DashboardItem,
-  DynamicValueString,
-  ExecutiontTaskParameters,
-  FunctionConfigurationDialogData,
-  MetricAttribute,
-  Plan,
-} from '@exense/step-core';
+import { AxesSettings, ChartFilterItem, ChartSettings, DashboardItem, MetricAttribute, Plan } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ChartDashletSettingsData } from './chart-dashlet-settings-data';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { NotificationEventType } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/notification/types/notification-event-type.enum';
-import { GatewayInfo } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/client/generated';
 import { FilterBarItemType, TsFilterItem } from '../../../../performance-view/filter-bar/model/ts-filter-item';
 import { FilterUtils } from '../../../../util/filter-utils';
 
