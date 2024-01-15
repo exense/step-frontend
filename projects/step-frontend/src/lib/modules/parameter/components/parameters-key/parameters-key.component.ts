@@ -11,10 +11,11 @@ import { ParameterListLogicService } from '../../services/parameter-list-logic.s
 export class ParametersKeyComponent implements CustomComponent {
   private _logic = inject(ParameterListLogicService, { optional: true });
   private _customColumnOptions = inject(CustomColumnOptions, { optional: true });
+  private readonly options$ = this._customColumnOptions?.options$ ?? of([]);
 
-  readonly noLink$ = (this._customColumnOptions?.options$ || of([])).pipe(
-    map((options) => options.includes('noEditorLink'))
-  );
+  readonly noLink$ = this.options$.pipe(map((options) => options.includes('noEditorLink')));
+
+  readonly noDescriptionHint$ = this.options$.pipe(map((options) => options.includes('noDescriptionHint')));
 
   context?: Parameter;
 

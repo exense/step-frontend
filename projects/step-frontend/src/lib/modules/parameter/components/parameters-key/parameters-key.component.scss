@@ -1,10 +1,5 @@
 :host {
   display: flex;
   align-items: center;
-}
-
-mat-icon {
-  transform: scale(0.7);
-  margin-bottom: 6px;
-  vertical-align: middle;
+  gap: 0.5rem;
 }
