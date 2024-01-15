@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { FunctionTypeFormComponent, higherOrderValidator } from '@exense/step-core';
+import { FunctionTypeFormComponent } from '@exense/step-core';
 import { FunctionJMeter } from './function-jmeter.interface';
 import {
   FunctionTypeJMeterForm,
@@ -18,13 +18,12 @@ export class FunctionTypeJMeterComponent extends FunctionTypeFormComponent<Funct
   private _formBuilder = inject(FormBuilder);
 
   protected readonly formGroup = functionTypeJMeterFormCreate(this._formBuilder);
-  protected readonly formGroupValidator = higherOrderValidator(this.formGroup);
 
-  protected override setValueToForm(): void {
-    functionTypeJMeterFormSetValueToForm(this.formGroup, this.context!.keyword as FunctionJMeter);
+  override setValueToForm(): void {
+    functionTypeJMeterFormSetValueToForm(this.formGroup, this._parent.keyword as FunctionJMeter);
   }
 
-  protected override setValueToModel(): void {
-    functionTypeJMeterFormSetValueToModel(this.formGroup, this.context!.keyword as FunctionJMeter);
+  override setValueToModel(): void {
+    functionTypeJMeterFormSetValueToModel(this.formGroup, this._parent.keyword as FunctionJMeter);
   }
 }
