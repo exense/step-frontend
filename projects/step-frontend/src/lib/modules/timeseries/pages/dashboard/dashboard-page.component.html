@@ -1,8 +1,8 @@
-<div *ngIf="dashboard" style="margin: 12px">
+<div *ngIf="dashboard" class="page-container">
   <div class="header-container">
     <div></div>
     <div class="header-buttons-container">
-      <ng-container *ngIf="!editMode">
+      <ng-container *ngIf="!editMode && hasWritePermission">
         <button
           mat-button
           mat-flat-button

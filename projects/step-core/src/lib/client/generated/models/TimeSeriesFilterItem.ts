@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type ChartFilterItem = {
+export type TimeSeriesFilterItem = {
   label?: string;
   attribute: string;
   type: 'OPTIONS' | 'FREE_TEXT' | 'EXECUTION' | 'TASK' | 'PLAN' | 'NUMERIC' | 'DATE';

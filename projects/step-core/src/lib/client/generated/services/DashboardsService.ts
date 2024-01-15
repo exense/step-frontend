@@ -168,6 +168,41 @@ export class DashboardsService {
   }
 
   /**
+   * Get entity locking state
+   * @param id
+   * @returns boolean default response
+   * @throws ApiError
+   */
+  public isEntityLocked5(id: string): Observable<boolean> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/dashboards/{id}/locked',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
+   * Lock this entity
+   * @param id
+   * @param requestBody
+   * @returns any default response
+   * @throws ApiError
+   */
+  public lockEntity5(id: string, requestBody?: boolean): Observable<any> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/dashboards/{id}/locked',
+      path: {
+        id: id,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
    * Get the table view according to provided request
    * @param requestBody
    * @returns TableResponseDashboardView default response

@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ChartFilterItem } from './ChartFilterItem';
 import type { DashboardItem } from './DashboardItem';
 import type { TimeRangeSelection } from './TimeRangeSelection';
+import type { TimeSeriesFilterItem } from './TimeSeriesFilterItem';
 
 export type DashboardView = {
   customFields?: Record<string, any>;
@@ -14,7 +14,7 @@ export type DashboardView = {
   resolution?: number;
   timeRange: TimeRangeSelection;
   grouping: Array<string>;
-  filters: Array<ChartFilterItem>;
+  filters: Array<TimeSeriesFilterItem>;
   dashlets: Array<DashboardItem>;
   metadata?: Record<string, any>;
   id?: string;

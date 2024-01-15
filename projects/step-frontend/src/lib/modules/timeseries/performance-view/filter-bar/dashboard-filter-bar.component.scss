@@ -21,13 +21,13 @@ step-ts-dashboard-filter-bar {
   }
 
   .filters-section {
-    padding-top: 12px;
+    padding-top: 1.2rem;
     border-top: 1px solid var.$gray-200;
   }
 
   .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
-    line-height: 22px;
-    font-size: 12px;
+    line-height: 2.2rem;
+    font-size: 1.2rem;
   }
 
   .settings-section {
@@ -38,13 +38,13 @@ step-ts-dashboard-filter-bar {
   }
 
   .warning {
-    font-size: 11px;
+    font-size: 1.1rem;
     padding: 0.8rem;
   }
 
   .filters {
     display: flex;
-    gap: 12px;
+    gap: 1.2rem;
     align-items: center;
     min-height: 3.6rem;
   }
@@ -53,13 +53,13 @@ step-ts-dashboard-filter-bar {
     flex: 1;
     display: flex;
     flex-wrap: nowrap;
-    gap: 8px;
+    gap: 0.8rem;
     overflow: auto;
-    margin-top: 8px;
+    margin-top: 0.8rem;
 
     &::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 0.6rem;
+      height: 0.6rem;
     }
 
     &::-webkit-scrollbar-track {
@@ -78,14 +78,14 @@ step-ts-dashboard-filter-bar {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0 6px 0 12px;
+      padding: 0 0.6rem 0 1.2rem;
       cursor: pointer;
-      border-radius: 4px;
-      font-size: 12px;
+      border-radius: 0.4rem;
+      font-size: 1.2rem;
       flex-direction: row;
       min-width: unset;
       height: 100%;
-      line-height: 32px;
+      line-height: 3.2rem;
 
       step-icon {
         transform: scale(0.6);
@@ -96,17 +96,17 @@ step-ts-dashboard-filter-bar {
   .more-applied-filters {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
-    padding: 0 8px;
+    gap: 1.6rem;
+    padding: 0 0.8rem;
   }
 
   /**
   These got override by the theme scss file
    */
   .filers-row button.apply-btn {
-    font-size: 12px;
-    line-height: 28px;
-    margin-right: 12px;
+    font-size: 1.2rem;
+    line-height: 2.8rem;
+    margin-right: 1.2rem;
     font-weight: bold;
   }
 
@@ -118,13 +118,13 @@ step-ts-dashboard-filter-bar {
     .oql-input {
       height: 100%;
       flex-grow: 1;
-      padding-right: 28px;
+      padding-right: 2.8rem;
       background: var.$gray-50;
       border: 1px solid var.$gray-200;
       border-radius: 2px;
       color: var.$gray-500;
-      font-size: 13px;
-      padding-left: 8px;
+      font-size: 1.3rem;
+      padding-left: 0.8rem;
 
       &:focus-visible {
         outline: 0;
@@ -140,11 +140,11 @@ step-ts-dashboard-filter-bar {
       position: absolute;
       right: 0;
       top: 0px;
-      width: 28px;
-      height: 28px;
+      width: 2.8rem;
+      height: 2.8rem;
       cursor: pointer;
-      padding: 4px;
-      font-size: 12px;
+      padding: 0.4rem;
+      font-size: 1.2rem;
       transform: scale(0.8);
       opacity: 0.6;
     }
@@ -156,11 +156,11 @@ step-ts-dashboard-filter-bar {
     right: 0;
     color: white;
     background: #d70000;
-    padding: 0 10px;
-    font-size: 12px;
+    padding: 0 1rem;
+    font-size: 1.2rem;
   }
 
   .grouping-container {
-    margin-right: 6px;
+    margin-right: 0.6rem;
   }
 }

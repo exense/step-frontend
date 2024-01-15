@@ -21,7 +21,7 @@ import { FilterBarItemComponent } from './item/filter-bar-item.component';
 import { FilterBarItemType, TsFilterItem } from './model/ts-filter-item';
 import { TsFilteringSettings } from '../../model/ts-filtering-settings';
 import { TimeSeriesConfig } from '../../time-series.config';
-import { ChartFilterItem, Execution, TimeRange, TimeSeriesService } from '@exense/step-core';
+import { TimeSeriesFilterItem, Execution, TimeRange, TimeSeriesService } from '@exense/step-core';
 import { OqlVerifyResponse } from '../../model/oql-verify-response';
 import { TsFilteringMode } from '../../model/ts-filtering-mode';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
@@ -47,7 +47,7 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
 })
 export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
-  @Input() filters: ChartFilterItem[] = [];
+  @Input() filters: TimeSeriesFilterItem[] = [];
 
   _internalFilters: TsFilterItem[] = [];
   @Input() compactView = false;

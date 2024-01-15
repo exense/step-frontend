@@ -3,14 +3,14 @@
 /* eslint-disable */
 
 import type { AxesSettings } from './AxesSettings';
-import type { ChartFilterItem } from './ChartFilterItem';
 import type { MetricAttribute } from './MetricAttribute';
+import type { TimeSeriesFilterItem } from './TimeSeriesFilterItem';
 
 export type ChartSettings = {
   metricKey: string;
   attributes: Array<MetricAttribute>;
   primaryAxes: AxesSettings;
-  filters: Array<ChartFilterItem>;
+  filters: Array<TimeSeriesFilterItem>;
   oql?: string;
   grouping: Array<string>;
   inheritGlobalFilters: boolean;

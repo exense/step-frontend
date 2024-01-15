@@ -96,7 +96,6 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
       default:
         throw new Error('Unhandled item type: ' + this.item.type);
     }
-    console.log(this.item.label);
     if (!this.item.isLocked && !isEntityFilter) {
       this.item.label = this.item.attributeName;
     }

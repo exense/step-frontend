@@ -21,7 +21,7 @@ export const $ChartSettings = {
     filters: {
       type: 'array',
       contains: {
-        type: 'ChartFilterItem',
+        type: 'TimeSeriesFilterItem',
       },
       isRequired: true,
     },

@@ -82,9 +82,12 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   editMode = false;
   metricTypes?: MetricType[];
 
+  hasWritePermission = false;
+
   ngOnInit(): void {
     const pageParams = this.extractUrlParams();
     this.removeOneTimeUrlParams();
+    this.hasWritePermission = this._authService.hasRight('dashboard_write');
     this._route.paramMap.subscribe((params) => {
       const id: string = params.get('id')!;
       if (!id) {
@@ -95,7 +98,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
         this.context = this.createContext(this.dashboard);
         this.subscribeForContextChange();
         this.subscribeForTimeRangeChange();
-        if (pageParams.editMode && this._authService.hasRight('dashboard_write')) {
+        if (pageParams.editMode && this.hasWritePermission) {
           this.fetchMetricTypes();
           this.enableEditMode();
         }
@@ -282,10 +285,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     this.context.updateFullRange(range, false);
     this.context.updateSelectedRange(range, false);
     let refreshRanger$ = this.filterBar?.timeSelection?.refreshRanger();
-    console.log('refreshranger');
-    forkJoin([this.refreshAllCharts(), refreshRanger$]).subscribe(() => {
-      console.log('yei');
-    });
+    forkJoin([this.refreshAllCharts(), refreshRanger$]).subscribe(() => {});
   }
 
   removeOneTimeUrlParams() {

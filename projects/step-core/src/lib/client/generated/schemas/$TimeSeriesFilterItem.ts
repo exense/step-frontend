@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $ChartFilterItem = {
+export const $TimeSeriesFilterItem = {
   properties: {
     label: {
       type: 'string',

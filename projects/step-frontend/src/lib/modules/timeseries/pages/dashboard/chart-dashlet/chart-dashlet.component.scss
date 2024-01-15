@@ -2,8 +2,8 @@
 
 .settings-container {
   position: absolute;
-  right: 8px;
-  top: 4px;
+  right: 0.8rem;
+  top: 0.4rem;
   z-index: 1;
   transform: scale(0.9);
 
@@ -13,7 +13,7 @@
 }
 
 .checkbox-row {
-  gap: 12px;
+  gap: 1.2rem;
   align-items: center;
   display: flex;
 }

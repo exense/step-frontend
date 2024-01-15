@@ -40,7 +40,7 @@ export const $DashboardView = {
     filters: {
       type: 'array',
       contains: {
-        type: 'ChartFilterItem',
+        type: 'TimeSeriesFilterItem',
       },
       isRequired: true,
     },

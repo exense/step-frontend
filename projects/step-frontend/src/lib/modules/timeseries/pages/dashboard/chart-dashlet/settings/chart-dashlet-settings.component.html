@@ -32,26 +32,6 @@
       </div>
 
       <div class="section">
-        <div class="title">Attributes</div>
-        <table class="attributes-table">
-          <thead>
-            <th>Display Name</th>
-            <th>Value</th>
-          </thead>
-          <tbody>
-            <tr *ngFor="let attr of item.chartSettings!.attributes">
-              <td><input class="hidden-input" [(ngModel)]="attr.displayName" /></td>
-              <td><input class="hidden-input" [(ngModel)]="attr.name" /></td>
-            </tr>
-            <tr>
-              <td class="pointer" (click)="addAttribute()">+ Add attribute</td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="section">
         <div class="title">Filters</div>
         <div class="filters-container">
           <step-ts-filter-bar-item
@@ -118,14 +98,6 @@
 
       <step-form-field *ngIf="!item.chartSettings!.inheritGlobalGrouping">
         <step-label>Grouping</step-label>
-        <!--        <mat-chip-grid #chipGrid aria-label="Fruit selection">-->
-        <!--          <mat-chip-row *ngFor="let attr of item.chartSettings!.attributes">-->
-        <!--            {{attr.displayName}}-->
-        <!--            <button matChipRemove>-->
-        <!--              <mat-icon>cancel</mat-icon>-->
-        <!--            </button>-->
-        <!--          </mat-chip-row>-->
-        <!--        </mat-chip-grid>-->
         <mat-select [(ngModel)]="item.chartSettings!.grouping" multiple>
           <mat-option *ngFor="let attr of item.chartSettings!.attributes" [value]="attr.name">{{
             attr.displayName

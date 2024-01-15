@@ -1,5 +1,5 @@
 import { TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
-import { ChartFilterItem } from '@exense/step-core';
+import { TimeSeriesFilterItem } from '@exense/step-core';
 import { map } from 'rxjs';
 
 export class FilterUtils {
@@ -34,7 +34,7 @@ export class FilterUtils {
   /**
    * Method to convert API filters to a valid OQL. Local items take precedence.
    */
-  static combineGlobalWithChartFilters(globalFilters: TsFilterItem[], items: ChartFilterItem[]): TsFilterItem[] {
+  static combineGlobalWithChartFilters(globalFilters: TsFilterItem[], items: TimeSeriesFilterItem[]): TsFilterItem[] {
     const convertedItems: TsFilterItem[] = items.map((item) => this.convertApiFilterItem(item));
     const localItemsIdsMap: Record<string, boolean> = {};
     convertedItems.forEach((item) => {
@@ -110,7 +110,7 @@ export class FilterUtils {
     return andFilters.filter((f) => f).join(' and ');
   }
 
-  static convertToApiFilterItem(item: TsFilterItem): ChartFilterItem {
+  static convertToApiFilterItem(item: TsFilterItem): TimeSeriesFilterItem {
     let textValues: string[] = [];
     switch (item.type) {
       case 'OPTIONS':
@@ -137,7 +137,7 @@ export class FilterUtils {
     };
   }
 
-  static convertApiFilterItem(item: ChartFilterItem): TsFilterItem {
+  static convertApiFilterItem(item: TimeSeriesFilterItem): TsFilterItem {
     const mappedItem: TsFilterItem = {
       label: item.label,
       attributeName: item.attribute!,
@@ -177,7 +177,6 @@ export class FilterUtils {
         mappedItem.max = item.max;
         break;
     }
-    console.log(mappedItem);
 
     return mappedItem;
   }

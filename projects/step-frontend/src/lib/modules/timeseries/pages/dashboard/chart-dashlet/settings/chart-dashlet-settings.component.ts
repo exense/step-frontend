@@ -1,5 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { AxesSettings, ChartFilterItem, ChartSettings, DashboardItem, MetricAttribute, Plan } from '@exense/step-core';
+import {
+  AxesSettings,
+  TimeSeriesFilterItem,
+  ChartSettings,
+  DashboardItem,
+  MetricAttribute,
+  Plan,
+} from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ChartDashletSettingsData } from './chart-dashlet-settings-data';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -16,7 +23,7 @@ export type ChartSettingsForm = FormGroup<{
   metricKey: FormControl<string | null>;
   attributes: FormControl<Array<MetricAttribute> | null>;
   primaryAxes: FormControl<AxesSettings | null>;
-  filters: FormControl<Array<ChartFilterItem> | null>;
+  filters: FormControl<Array<TimeSeriesFilterItem> | null>;
   grouping: FormControl<Array<string> | null>;
   inheritGlobalFilters: FormControl<boolean | null>;
   inheritGlobalGrouping: FormControl<boolean | null>;
@@ -37,7 +44,6 @@ export class ChartDashletSettingsComponent implements OnInit {
   formGroup!: ChartForm;
 
   item!: DashboardItem;
-  newAttributeInputValue = '';
   filterItems: TsFilterItem[] = [];
 
   ngOnInit(): void {
@@ -60,10 +66,6 @@ export class ChartDashletSettingsComponent implements OnInit {
       removable: true,
       searchEntities: [],
     });
-  }
-
-  addAttribute(): void {
-    this.item.chartSettings!.attributes.push({ name: '', displayName: '' });
   }
 
   private createFormGroup(fb: FormBuilder, item: DashboardItem): ChartForm {
