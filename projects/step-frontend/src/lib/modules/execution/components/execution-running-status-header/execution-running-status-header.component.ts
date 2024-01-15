@@ -38,7 +38,7 @@ export class ExecutionRunningStatusHeaderComponent implements OnChanges {
   @HostListener('click', ['$event'])
   handleBadgeClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
-    if (!target.classList.contains('mat-badge-content')) {
+    if (!target.classList.contains('step-badge')) {
       return;
     }
     event.preventDefault();
