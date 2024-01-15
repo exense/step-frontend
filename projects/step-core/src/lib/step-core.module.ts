@@ -80,11 +80,7 @@ import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.
 import { SettingsComponent } from './components/settings/settings.component';
 import { ImportDialogComponent } from './components/import-dialog/import-dialog.component';
 import { CronModule } from './modules/cron/cron.module';
-import { PopoverComponent } from './components/popover/popover.component';
-import { TriggerPopoverDirective } from './directives/trigger-popover.directive';
 import { HtmlDescriptionCellComponent } from './components/html-description-cell/html-description-cell.component';
-import { SafeHtmlPipe } from './pipes/safe-html.pipe';
-import { PopoverContentDirective } from './directives/popover-content.directive';
 import { EnterTextValueDialogComponent } from './components/enter-text-value-dialog/enter-text-value-dialog.component';
 import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
 import { MessagesListDialogComponent } from './components/messages-list-dialog/messages-list-dialog.component';
@@ -152,11 +148,7 @@ import { DatePickerModule } from './modules/date-picker/date-picker.module';
     SimpleOutletComponent,
     SettingsComponent,
     ImportDialogComponent,
-    PopoverComponent,
-    TriggerPopoverDirective,
     HtmlDescriptionCellComponent,
-    SafeHtmlPipe,
-    PopoverContentDirective,
     EnterTextValueDialogComponent,
     ConfirmationDialogComponent,
     MessagesListDialogComponent,
@@ -260,11 +252,7 @@ import { DatePickerModule } from './modules/date-picker/date-picker.module';
     SettingsComponent,
     ImportDialogComponent,
     CronModule,
-    PopoverComponent,
-    TriggerPopoverDirective,
-    PopoverContentDirective,
     HtmlDescriptionCellComponent,
-    SafeHtmlPipe,
     EnterTextValueDialogComponent,
     ConfirmationDialogComponent,
     MessagesListDialogComponent,
@@ -356,9 +344,6 @@ export * from './components/artefact-details/artefact-details.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export * from './components/settings/settings.component';
 export * from './directives/caps-lock.directive';
-export * from './components/popover/popover.component';
-export * from './directives/trigger-popover.directive';
-export * from './directives/popover-content.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
 export { FocusableDirective } from './directives/focusable.directive';
 export { FocusablesDirective } from './directives/focusables.directive';
@@ -387,7 +372,6 @@ export * from './modules/cron/cron.module';
 export * from './modules/date-picker/date-picker.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/dynamic-attribute.pipe';
-export * from './pipes/safe-html.pipe';
 export * from './pipes/is-chart-empty.pipe';
 export * from './pipes/project-name.pipe';
 export * from './pipes/matching-authenticator.pipe';

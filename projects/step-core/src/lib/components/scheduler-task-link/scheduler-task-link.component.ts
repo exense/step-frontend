@@ -18,8 +18,6 @@ export class SchedulerTaskLinkComponent implements CustomComponent {
 
   @Input() linkDisplayType: LinkDisplayType = LinkDisplayType.TEXT_ONLY;
 
-  protected descriptionToggledActive = false;
-
   editParameter(): void {
     if (!this._logic || !this.context) {
       return;
