@@ -5,7 +5,7 @@ import { TimeRangePickerSelection } from '../../time-selection/time-range-picker
 import { TimeSeriesDashboardComponent } from '../../dashboard/time-series-dashboard.component';
 import { TimeSeriesDashboardSettings } from '../../dashboard/model/ts-dashboard-settings';
 import { TsUtils } from '../../util/ts-utils';
-import { FilterBarItemType, TsFilterItem } from '../../performance-view/filter-bar/model/ts-filter-item';
+import { FilterBarItemType, FilterBarItem } from '../../performance-view/filter-bar/model/filter-bar-item';
 import { range, Subject, takeUntil, timer } from 'rxjs';
 import { TimeSeriesUtils } from '../../time-series-utils';
 import { MatMenuTrigger } from '@angular/material/menu';
@@ -102,7 +102,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     this.activeTimeRange = range;
   }
 
-  private getDefaultFilters(): TsFilterItem[] {
+  private getDefaultFilters(): FilterBarItem[] {
     return [
       {
         label: 'Status',

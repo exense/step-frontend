@@ -18,7 +18,7 @@ import { TimeSeriesContext } from '../../../time-series-context';
 import { FilterUtils } from '../../../util/filter-utils';
 import { PerformanceViewTimeSelectionComponent } from '../../time-selection/performance-view-time-selection.component';
 import { FilterBarItemComponent } from '../item/filter-bar-item.component';
-import { FilterBarItemType, TsFilterItem } from '../model/ts-filter-item';
+import { FilterBarItemType, FilterBarItem } from '../model/filter-bar-item';
 import { TsFilteringSettings } from '../../../model/ts-filtering-settings';
 import { TimeSeriesConfig } from '../../../time-series.config';
 import { Execution, TimeRange, TimeSeriesService } from '@exense/step-core';
@@ -47,14 +47,14 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
 })
 export class FilterBarComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
-  @Input() activeFilters: TsFilterItem[] = [];
+  @Input() activeFilters: FilterBarItem[] = [];
   @Input() activeGrouping = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS[0].attributes;
   @Input() compactView = false;
 
   @Input() timeRangeOptions!: TimeRangePickerSelection[];
   @Input() activeTimeRange!: TimeRangePickerSelection;
 
-  @Input() filterOptions: TsFilterItem[] = [];
+  @Input() filterOptions: FilterBarItem[] = [];
 
   @Output() timeRangeChange = new EventEmitter<{ selection: TimeRangePickerSelection; triggerRefresh: boolean }>();
 
@@ -95,7 +95,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     });
   }
 
-  getValidFilters(): TsFilterItem[] {
+  getValidFilters(): FilterBarItem[] {
     return this.activeFilters.filter(FilterUtils.filterItemIsValid);
   }
 
@@ -130,7 +130,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
           this.activeFilters.filter(FilterUtils.filterItemIsValid),
           TimeSeriesConfig.ATTRIBUTES_PREFIX
         );
-    let groupingItems: TsFilterItem[] = groupDimensions.map((dimension) => ({
+    let groupingItems: FilterBarItem[] = groupDimensions.map((dimension) => ({
       attributeName: dimension,
       type: 'FREE_TEXT',
       freeTextValues: ['fake-group-dimension'],
@@ -187,7 +187,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleFilterChange(index: number, item: TsFilterItem) {
+  handleFilterChange(index: number, item: FilterBarItem) {
     this.activeFilters[index] = item;
     if (!item.attributeName) {
       this.removeFilterItem(index);
@@ -210,7 +210,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     this.emitFilterChange$.next();
   }
 
-  private getExecutionsTimeRange(item: TsFilterItem): TimeRange {
+  private getExecutionsTimeRange(item: FilterBarItem): TimeRange {
     let allExecutionsAreKnown = true;
     let min = Number.MAX_VALUE;
     let max = 0;
@@ -236,7 +236,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     return { from: min, to: max };
   }
 
-  addFilterItem(item: TsFilterItem) {
+  addFilterItem(item: FilterBarItem) {
     const filterIndex = this.activeFilters.findIndex((i) => i.attributeName === item.attributeName);
 
     if (filterIndex !== -1) {
@@ -271,7 +271,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  private addFilter(item: TsFilterItem): void {
+  private addFilter(item: FilterBarItem): void {
     this.activeFilters.push(item);
     this._changeDetectorRef.detectChanges();
     this.filterComponents!.last.openMenu();

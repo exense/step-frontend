@@ -18,7 +18,7 @@ import { TimeSeriesContext } from '../../time-series-context';
 import { FilterUtils } from '../../util/filter-utils';
 import { PerformanceViewTimeSelectionComponent } from '../time-selection/performance-view-time-selection.component';
 import { FilterBarItemComponent } from './item/filter-bar-item.component';
-import { FilterBarItemType, TsFilterItem } from './model/ts-filter-item';
+import { FilterBarItemType, FilterBarItem } from './model/filter-bar-item';
 import { TsFilteringSettings } from '../../model/ts-filtering-settings';
 import { TimeSeriesConfig } from '../../time-series.config';
 import { TimeSeriesFilterItem, Execution, TimeRange, TimeSeriesService } from '@exense/step-core';
@@ -49,14 +49,14 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
   @Input() filters: TimeSeriesFilterItem[] = [];
 
-  _internalFilters: TsFilterItem[] = [];
+  _internalFilters: FilterBarItem[] = [];
   @Input() compactView = false;
 
   @Input() timeRangeOptions!: TimeRangePickerSelection[];
   @Input() activeTimeRange!: TimeRangePickerSelection;
   @Input() editMode = false;
 
-  @Input() filterOptions: TsFilterItem[] = [];
+  @Input() filterOptions: FilterBarItem[] = [];
 
   @Output() timeRangeChange = new EventEmitter<{ selection: TimeRangePickerSelection; triggerRefresh: boolean }>();
 
@@ -104,7 +104,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     });
   }
 
-  getValidFilters(): TsFilterItem[] {
+  getValidFilters(): FilterBarItem[] {
     return this._internalFilters.filter(FilterUtils.filterItemIsValid);
   }
 
@@ -139,7 +139,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
           this._internalFilters.filter(FilterUtils.filterItemIsValid),
           TimeSeriesConfig.ATTRIBUTES_PREFIX
         );
-    let groupingItems: TsFilterItem[] = groupDimensions.map((dimension) => ({
+    let groupingItems: FilterBarItem[] = groupDimensions.map((dimension) => ({
       attributeName: dimension,
       type: 'FREE_TEXT',
       freeTextValues: ['fake-group-dimension'],
@@ -196,7 +196,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleFilterChange(index: number, item: TsFilterItem) {
+  handleFilterChange(index: number, item: FilterBarItem) {
     this._internalFilters[index] = item;
     if (!item.attributeName) {
       this.removeFilterItem(index);
@@ -219,7 +219,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     this.emitFilterChange$.next();
   }
 
-  private getExecutionsTimeRange(item: TsFilterItem): TimeRange {
+  private getExecutionsTimeRange(item: FilterBarItem): TimeRange {
     let allExecutionsAreKnown = true;
     let min = Number.MAX_VALUE;
     let max = 0;
@@ -245,7 +245,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     return { from: min, to: max };
   }
 
-  addFilterItem(item: TsFilterItem) {
+  addFilterItem(item: FilterBarItem) {
     const filterIndex = this._internalFilters.findIndex((i) => i.attributeName === item.attributeName);
 
     if (filterIndex !== -1) {
@@ -280,7 +280,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  private addFilter(item: TsFilterItem): void {
+  private addFilter(item: FilterBarItem): void {
     this._internalFilters.push(item);
     this._changeDetectorRef.detectChanges();
     this.filterComponents!.last.openMenu();

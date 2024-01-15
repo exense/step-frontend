@@ -1,4 +1,4 @@
-import { TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
+import { FilterBarItem } from '../performance-view/filter-bar/model/filter-bar-item';
 import { OQLBuilder } from './oql-builder';
 import { FilterUtils } from './filter-utils';
 import { TsFilteringSettings } from '../model/ts-filtering-settings';
@@ -10,7 +10,7 @@ export class FindBucketsRequestBuilder {
   readonly attributesPrefix = 'attributes';
 
   private customAttributes: { [key: string]: any } = {};
-  private customFilters: TsFilterItem[] = [];
+  private customFilters: FilterBarItem[] = [];
   private range?: TimeRange;
   private groupDimensions?: string[];
   private percentiles?: number[];

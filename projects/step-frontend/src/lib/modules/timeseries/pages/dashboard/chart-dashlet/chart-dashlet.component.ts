@@ -19,7 +19,7 @@ import { TimeSeriesConfig } from '../../../time-series.config';
 import { UPlotUtils } from '../../../uplot/uPlot.utils';
 import { TimeSeriesContext } from '../../../time-series-context';
 import { TimeseriesColorsPool } from '../../../util/timeseries-colors-pool';
-import { TsFilterItem } from '../../../performance-view/filter-bar/model/ts-filter-item';
+import { FilterBarItem } from '../../../performance-view/filter-bar/model/filter-bar-item';
 import { TimeSeriesChartComponent } from '../../../chart/time-series-chart.component';
 import { Observable, of, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
@@ -106,7 +106,7 @@ export class ChartDashletComponent implements OnInit, Dashlet {
   }
 
   private composeRequestFilter(metricKey: string): string {
-    let filterItems: TsFilterItem[] = [
+    let filterItems: FilterBarItem[] = [
       {
         attributeName: 'metricType',
         type: 'FREE_TEXT',

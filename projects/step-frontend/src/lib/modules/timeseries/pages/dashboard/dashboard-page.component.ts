@@ -28,7 +28,7 @@ import { TimeRangePickerSelection } from '../../time-selection/time-range-picker
 
 //@ts-ignore
 import uPlot = require('uplot');
-import { TsFilterItem } from '../../performance-view/filter-bar/model/ts-filter-item';
+import { FilterBarItem } from '../../performance-view/filter-bar/model/filter-bar-item';
 import { defaultIfEmpty, filter, forkJoin, merge, Observable, of, Subject, switchMap, takeUntil, throttle } from 'rxjs';
 import { ChartDashletComponent } from './chart-dashlet/chart-dashlet.component';
 import { Dashlet } from './model/dashlet';

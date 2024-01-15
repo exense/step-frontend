@@ -1,7 +1,7 @@
 import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { filter, forkJoin, merge, Subject, Subscription, switchMap, takeUntil, tap, throttle } from 'rxjs';
 import { FilterBarComponent } from '../performance-view/filter-bar/legacy/filter-bar.component';
-import { FilterBarItemType, TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
+import { FilterBarItemType, FilterBarItem } from '../performance-view/filter-bar/model/filter-bar-item';
 import { PerformanceViewSettings } from '../performance-view/model/performance-view-settings';
 import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
 import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
@@ -45,13 +45,13 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     { label: 'Last Hour', timeInMs: this.ONE_HOUR_MS },
   ];
 
-  filterItems: TsFilterItem[] = [];
-  filterOptions: TsFilterItem[] = [];
+  filterItems: FilterBarItem[] = [];
+  filterOptions: FilterBarItem[] = [];
 
   compareModeEnabled: boolean = false;
   compareModeContext: TimeSeriesContext | undefined;
-  compareModeFilterOptions: TsFilterItem[] = [];
-  compareModeFilterItems: TsFilterItem[] = [];
+  compareModeFilterOptions: FilterBarItem[] = [];
+  compareModeFilterItems: FilterBarItem[] = [];
   compareModeTimeRangeOptions = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   compareModeActiveRangeOption: TimeRangePickerSelection = { type: 'FULL' };
 
@@ -87,7 +87,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
 
   private mergeContextualParamsWithActiveFilters(
     contextualParams: Record<string, string>,
-    activeFilters: TsFilterItem[]
+    activeFilters: FilterBarItem[]
   ) {
     const contextualFilters = Object.keys(contextualParams).map((key) => {
       const fieldType = this.getFilterFieldType(key);
@@ -103,7 +103,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
         searchEntities: isEntityFilter ? [{ searchValue: searchValue }] : [],
         isLocked: false,
         exactMatch: true,
-      } as TsFilterItem;
+      } as FilterBarItem;
     });
     let notContextualFilters = activeFilters.filter((item) => !contextualParams[item.attributeName]);
     return [...contextualFilters, ...notContextualFilters];
@@ -114,7 +114,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
    * @param settings
    * @private
    */
-  private prepareFilterOptions(activeFilters: TsFilterItem[], settings: TimeSeriesDashboardSettings): TsFilterItem[] {
+  private prepareFilterOptions(activeFilters: FilterBarItem[], settings: TimeSeriesDashboardSettings): FilterBarItem[] {
     const hiddenFilters = activeFilters.filter((f) => f.isHidden).map((f) => f.attributeName) || [];
     return settings.filterOptions.map((f) => {
       if (hiddenFilters.includes(f.attributeName)) {
@@ -199,7 +199,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  handleFiltersChange(filters: TsFilterItem[]): void {
+  handleFiltersChange(filters: FilterBarItem[]): void {
     this.context.updateActiveFilters(filters);
   }
 
@@ -350,7 +350,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
-  private prepareFiltersForCompareMode(): TsFilterItem[] {
+  private prepareFiltersForCompareMode(): FilterBarItem[] {
     return this.filterItems.map((i) => ({ ...JSON.parse(JSON.stringify(i)), isHidden: false })); // deep clone the objects
   }
 

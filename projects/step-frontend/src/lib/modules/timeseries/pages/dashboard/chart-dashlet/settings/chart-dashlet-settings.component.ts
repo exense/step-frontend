@@ -10,7 +10,7 @@ import {
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ChartDashletSettingsData } from './chart-dashlet-settings-data';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { FilterBarItemType, TsFilterItem } from '../../../../performance-view/filter-bar/model/ts-filter-item';
+import { FilterBarItemType, FilterBarItem } from '../../../../performance-view/filter-bar/model/filter-bar-item';
 import { FilterUtils } from '../../../../util/filter-utils';
 
 export type ChartForm = FormGroup<{
@@ -44,7 +44,7 @@ export class ChartDashletSettingsComponent implements OnInit {
   formGroup!: ChartForm;
 
   item!: DashboardItem;
-  filterItems: TsFilterItem[] = [];
+  filterItems: FilterBarItem[] = [];
 
   ngOnInit(): void {
     this.item = JSON.parse(JSON.stringify(this._inputData.item));

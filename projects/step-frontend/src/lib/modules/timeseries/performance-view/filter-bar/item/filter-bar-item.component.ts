@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } 
 import { MatMenuTrigger } from '@angular/material/menu';
 import { DateTime } from 'luxon';
 import { TimeSeriesUtils } from '../../../time-series-utils';
-import { FilterBarItemType, TsFilterItem } from '../model/ts-filter-item';
+import { FilterBarItemType, FilterBarItem } from '../model/filter-bar-item';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
@@ -12,12 +12,12 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
   styleUrls: ['./filter-bar-item.component.scss'],
 })
 export class FilterBarItemComponent implements OnInit, OnChanges {
-  @Input() item!: TsFilterItem;
+  @Input() item!: FilterBarItem;
   @Input() removable?: boolean;
   @Input() compact = false;
 
   @Output() removeItem: EventEmitter<void> = new EventEmitter<void>();
-  @Output() filterChange: EventEmitter<TsFilterItem> = new EventEmitter<TsFilterItem>();
+  @Output() filterChange: EventEmitter<FilterBarItem> = new EventEmitter<FilterBarItem>();
 
   @ViewChild('matTrigger') matTrigger!: MatMenuTrigger;
   @ViewChild(MatMenuTrigger) menuTrigger?: MatMenuTrigger;
@@ -116,7 +116,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     this.formattedValue = this.getFormattedValue(this.item);
   }
 
-  private getFormattedValue(item: TsFilterItem): string | undefined {
+  private getFormattedValue(item: FilterBarItem): string | undefined {
     let formattedValue: string | undefined = '';
     switch (item.type) {
       case 'EXECUTION':

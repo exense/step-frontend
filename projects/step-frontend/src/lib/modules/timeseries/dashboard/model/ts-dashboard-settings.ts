@@ -1,4 +1,4 @@
-import { TsFilterItem } from '../../performance-view/filter-bar/model/ts-filter-item';
+import { FilterBarItem } from '../../performance-view/filter-bar/model/filter-bar-item';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
 import { Execution, TimeRange } from '@exense/step-core';
 
@@ -11,8 +11,8 @@ export interface TimeSeriesDashboardSettings {
   timeRange: TimeRange;
   timeRangeOptions: TimeRangePickerSelection[];
   activeTimeRange: TimeRangePickerSelection;
-  filterOptions: TsFilterItem[];
-  activeFilters?: TsFilterItem[];
+  filterOptions: FilterBarItem[];
+  activeFilters?: FilterBarItem[];
 
   execution?: Execution;
 }

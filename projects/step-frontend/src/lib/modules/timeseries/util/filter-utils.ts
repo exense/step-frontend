@@ -1,9 +1,9 @@
-import { TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
+import { FilterBarItem } from '../performance-view/filter-bar/model/filter-bar-item';
 import { TimeSeriesFilterItem } from '@exense/step-core';
 import { map } from 'rxjs';
 
 export class FilterUtils {
-  static filterItemIsValid(item: TsFilterItem): boolean {
+  static filterItemIsValid(item: FilterBarItem): boolean {
     return (
       (item.freeTextValues && item.freeTextValues.length > 0) ||
       item.textValues?.some((v) => v.isSelected) ||
@@ -34,8 +34,8 @@ export class FilterUtils {
   /**
    * Method to convert API filters to a valid OQL. Local items take precedence.
    */
-  static combineGlobalWithChartFilters(globalFilters: TsFilterItem[], items: TimeSeriesFilterItem[]): TsFilterItem[] {
-    const convertedItems: TsFilterItem[] = items.map((item) => this.convertApiFilterItem(item));
+  static combineGlobalWithChartFilters(globalFilters: FilterBarItem[], items: TimeSeriesFilterItem[]): FilterBarItem[] {
+    const convertedItems: FilterBarItem[] = items.map((item) => this.convertApiFilterItem(item));
     const localItemsIdsMap: Record<string, boolean> = {};
     convertedItems.forEach((item) => {
       localItemsIdsMap[item.attributeName!] = true;
@@ -49,7 +49,7 @@ export class FilterUtils {
    * Method to convert FE filters to a valid OQL
    */
   static filtersToOQL(
-    items: TsFilterItem[],
+    items: FilterBarItem[],
     attributesPrefix?: string,
     attributeProcessFn?: (attribute: string) => string
   ): string {
@@ -110,7 +110,7 @@ export class FilterUtils {
     return andFilters.filter((f) => f).join(' and ');
   }
 
-  static convertToApiFilterItem(item: TsFilterItem): TimeSeriesFilterItem {
+  static convertToApiFilterItem(item: FilterBarItem): TimeSeriesFilterItem {
     let textValues: string[] = [];
     switch (item.type) {
       case 'OPTIONS':
@@ -137,8 +137,8 @@ export class FilterUtils {
     };
   }
 
-  static convertApiFilterItem(item: TimeSeriesFilterItem): TsFilterItem {
-    const mappedItem: TsFilterItem = {
+  static convertApiFilterItem(item: TimeSeriesFilterItem): FilterBarItem {
+    const mappedItem: FilterBarItem = {
       label: item.label,
       attributeName: item.attribute!,
       exactMatch: item.exactMatch!,

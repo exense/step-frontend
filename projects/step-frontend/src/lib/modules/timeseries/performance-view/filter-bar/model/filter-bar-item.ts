@@ -3,7 +3,7 @@ import { EntitySearchValue } from '../item/entity-search-value';
 /**
  * Frontend entity for mapping a filter item. This entity stores more elements than the backend item.
  */
-export interface TsFilterItem {
+export interface FilterBarItem {
   label?: string;
   attributeName: string;
   type: FilterBarItemType;

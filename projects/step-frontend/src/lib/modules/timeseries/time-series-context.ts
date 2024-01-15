@@ -2,7 +2,7 @@ import { BehaviorSubject, Observable, skip, Subject } from 'rxjs';
 import { TimeSeriesKeywordsContext } from './pages/execution-page/time-series-keywords.context';
 import { TimeseriesColorsPool } from './util/timeseries-colors-pool';
 import { Execution, TimeRange } from '@exense/step-core';
-import { TsFilterItem } from './performance-view/filter-bar/model/ts-filter-item';
+import { FilterBarItem } from './performance-view/filter-bar/model/filter-bar-item';
 import { TimeSeriesContextParams } from './time-series-context-params';
 import { TsFilteringMode } from './model/ts-filtering-mode';
 import { TsFilteringSettings } from './model/ts-filtering-settings';
@@ -32,7 +32,7 @@ export class TimeSeriesContext {
 
   private readonly activeGroupings$: BehaviorSubject<string[]>;
 
-  private readonly activeFilters$: BehaviorSubject<TsFilterItem[]>;
+  private readonly activeFilters$: BehaviorSubject<FilterBarItem[]>;
   private readonly filterSettings$: BehaviorSubject<TsFilteringSettings>;
   private readonly chartsResolution$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   private readonly chartsLockedState$ = new BehaviorSubject<boolean>(false);
@@ -93,7 +93,7 @@ export class TimeSeriesContext {
     this.inProgress$.next(inProgress);
   }
 
-  getDynamicFilters(): TsFilterItem[] {
+  getDynamicFilters(): FilterBarItem[] {
     return this.activeFilters$.getValue();
   }
 
@@ -101,7 +101,7 @@ export class TimeSeriesContext {
     return this.inProgress$.asObservable();
   }
 
-  updateFilters(items: TsFilterItem[]) {
+  updateFilters(items: FilterBarItem[]) {
     this.activeFilters$.next(items);
   }
 
@@ -195,7 +195,7 @@ export class TimeSeriesContext {
     return this.activeGroupings$.asObservable().pipe(skip(1));
   }
 
-  onFiltersChange(): Observable<TsFilterItem[]> {
+  onFiltersChange(): Observable<FilterBarItem[]> {
     return this.activeFilters$.asObservable().pipe(skip(1));
   }
 
@@ -203,7 +203,7 @@ export class TimeSeriesContext {
     return this.filterSettings$.asObservable().pipe(skip(1));
   }
 
-  updateActiveFilters(items: TsFilterItem[]): void {
+  updateActiveFilters(items: FilterBarItem[]): void {
     this.activeFilters$.next(items);
   }
 
