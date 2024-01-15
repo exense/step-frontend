@@ -35,15 +35,7 @@
       >
         <step-icon name="plus"></step-icon>
       </button>
-      <button
-        type="button"
-        mat-flat-button
-        color="primary"
-        [disabled]="!('kw-write' | hasRight | async)"
-        (click)="addFunctionPackage()"
-      >
-        Upload package
-      </button>
+      <step-dashlet itemKey="uploadPackageBtn" [context]="dataSource"> </step-dashlet>
     </step-btn-group>
   </section>
 

@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { FunctionTypeFormComponent, higherOrderValidator } from '@exense/step-core';
+import { FunctionTypeFormComponent } from '@exense/step-core';
 import { FunctionNodeJS } from './function-node-js.interface';
 import {
   FunctionTypeNodeJSForm,
@@ -18,13 +18,12 @@ export class FunctionTypeNodeJSComponent extends FunctionTypeFormComponent<Funct
   private _formBuilder = inject(FormBuilder);
 
   protected readonly formGroup = functionTypeNodeJSFormCreate(this._formBuilder);
-  protected readonly formGroupValidator = higherOrderValidator(this.formGroup);
 
-  protected override setValueToForm(): void {
-    functionTypeNodeJSFormSetValueToForm(this.formGroup, this.context!.keyword as FunctionNodeJS);
+  override setValueToForm(): void {
+    functionTypeNodeJSFormSetValueToForm(this.formGroup, this._parent.keyword as FunctionNodeJS);
   }
 
-  protected override setValueToModel(): void {
-    functionTypeNodeJSFormSetValueToModel(this.formGroup, this.context!.keyword as FunctionNodeJS);
+  override setValueToModel(): void {
+    functionTypeNodeJSFormSetValueToModel(this.formGroup, this._parent.keyword as FunctionNodeJS);
   }
 }

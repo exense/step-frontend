@@ -60,6 +60,7 @@ export * from './injectables/function-actions.service';
 export * from './injectables/function-dialogs-config-factory.service';
 export * from './injectables/function-configuration.service';
 export * from './injectables/function-configuration-api.service';
+export * from './injectables/function-type-parent-form.service';
 export * from './types/function-dialogs-config.interface';
 export * from './types/function-configuration-dialog-data.interface';
 export * from './types/function-configuration-dialog.form';
