@@ -121,11 +121,15 @@
       <step-form-field *ngIf="!config?.hideUser" alignLabelAddon="near">
         <step-label>User</step-label>
         <step-label-addon>
-          <step-icon
-            name="help-circle"
-            matTooltip="The user on behalfe of which the plan is executed. Note that user has to have rights to execute the plan."
-          >
-          </step-icon>
+          <step-popover>
+            <step-icon name="help-circle"> </step-icon>
+            <step-popover-content>
+              <span
+                >The user on behalfe of which the plan is executed. <b>Note</b> that user has to have rights to execute
+                the plan.</span
+              >
+            </step-popover-content>
+          </step-popover>
         </step-label-addon>
         <input
           type="text"
