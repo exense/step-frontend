@@ -31,7 +31,7 @@ export class ExecutionRunningStatusHeaderComponent implements OnChanges {
     if (cRunningExecutions?.previousValue !== cRunningExecutions?.currentValue || cRunningExecutions?.firstChange) {
       const count = cRunningExecutions?.currentValue ?? 0;
       this.badgeText = count > MAX_DISPLAY_COUNT_IN_BADGE ? '+' : count.toString();
-      this.tooltipText = count > MAX_DISPLAY_COUNT_IN_BADGE ? `Currently running executions: ${count}` : '';
+      this.tooltipText = `Currently running executions: ${count}`;
     }
   }
 
