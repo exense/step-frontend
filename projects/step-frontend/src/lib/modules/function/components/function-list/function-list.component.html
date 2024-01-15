@@ -59,11 +59,11 @@
       <step-btn-group>
         <button
           mat-icon-button
-          matTooltip="Configure keyword"
+          matTooltip="Open keyword in editor"
           [disabled]="!('kw-write' | hasRight | async)"
-          (click)="configureFunction(element.id)"
+          (click)="editFunction(element)"
         >
-          <step-icon name="tool"></step-icon>
+          <step-icon name="edit-2"></step-icon>
         </button>
         <button
           mat-icon-button
@@ -90,9 +90,9 @@
 </step-table>
 <step-entity-menu #entityMenu entity="functions" (entityOperationSuccess)="table.reload()">
   <ng-container *stepEntityMenuContent="let element">
-    <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="editFunction(element)">
-      <step-icon name="edit-2"></step-icon>
-      Edit keyword
+    <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="configureFunction(element.id)">
+      <step-icon name="tool"></step-icon>
+      Configure keyword
     </button>
 
     <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="duplicateFunction(element.id)">
