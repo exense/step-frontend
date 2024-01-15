@@ -1,0 +1,9 @@
+@use 'sass:map';
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-execution-running-status-header {
+  span.mat-badge-content {
+    background: map-get(var.$statuses, 'RUNNING') !important;
+    pointer-events: auto !important;
+  }
+}

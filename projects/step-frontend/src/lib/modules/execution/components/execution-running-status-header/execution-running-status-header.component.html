@@ -1,0 +1,10 @@
+<div
+  [matBadge]="badgeText"
+  matBadgeSize="small"
+  matBadgePosition="below"
+  [matBadgeHidden]="!runningExecutionsCount"
+  [matTooltip]="tooltipText"
+  matTooltipPosition="above"
+>
+  <ng-content> </ng-content>
+</div>
