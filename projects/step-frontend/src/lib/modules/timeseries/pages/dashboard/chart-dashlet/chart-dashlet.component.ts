@@ -65,6 +65,7 @@ export class ChartDashletComponent implements OnInit, Dashlet {
       throw new Error('Missing input values');
     }
     this.groupingSelection = this.prepareGroupingAttributes();
+    this.selectedAggregate = this.item.chartSettings!.primaryAxes!.aggregation;
     this.fetchDataAndCreateChart().subscribe();
   }
 
@@ -144,7 +145,7 @@ export class ChartDashletComponent implements OnInit, Dashlet {
     const groupDimensions = this.getChartGrouping();
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const primaryAxes = this.item.chartSettings!.primaryAxes!;
-    const primaryAggregation = primaryAxes.aggregation!;
+    const primaryAggregation = this.selectedAggregate!;
     const series: TSChartSeries[] = response.matrix.map((series, i) => {
       const labelItems = this.getSeriesKeys(response.matrixKeys[i], groupDimensions);
       const seriesKey = labelItems.join(' | ');
