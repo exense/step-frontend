@@ -20,9 +20,4 @@
     </ng-container>
   </div>
 </a>
-<step-popover *ngIf="!!context?.attributes?.['description']" (toggledEvent)="descriptionToggledActive = $event">
-  <step-icon [name]="descriptionToggledActive ? 'x-circle' : 'help-circle'"></step-icon>
-  <step-popover-content>
-    <div [innerHTML]="context?.attributes?.['description'] | safeHtml"></div>
-  </step-popover-content>
-</step-popover>
+<step-description-hint [description]="context?.attributes?.['description']"> </step-description-hint>

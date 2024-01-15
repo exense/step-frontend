@@ -144,15 +144,6 @@ export class FunctionActionsImplService implements FunctionActionsService {
     );
   }
 
-  selectFunction(): Observable<Keyword> {
-    const selectedEntity$ = this._entityDialogs.selectEntityOfType('function');
-    const function$ = selectedEntity$.pipe(
-      map((result) => result.item as Keyword),
-      switchMap((keyword) => this._functionApiService.getFunctionById(keyword.id!))
-    );
-    return function$;
-  }
-
   resolveConfigureLinkIfExits(parentInjector: Injector, dialogConfig?: FunctionDialogsConfig): void {
     this._editorResolver
       .onEditEntity(CONFIGURER_KEYWORD_ID)

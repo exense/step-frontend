@@ -4,7 +4,6 @@ import {
   FunctionTypeFormComponent,
   FunctionTypeScriptOption,
   FUNCTION_TYPE_SCRIPT_OPTIONS,
-  higherOrderValidator,
   ScriptLanguage,
 } from '@exense/step-core';
 import { FunctionScript } from './function-script.interface';
@@ -24,7 +23,6 @@ export class FunctionTypeScriptComponent extends FunctionTypeFormComponent<Funct
   private _formBuilder = inject(FormBuilder);
 
   protected readonly formGroup = functionTypeScriptFormCreate(this._formBuilder);
-  protected readonly formGroupValidator = higherOrderValidator(this.formGroup);
   protected readonly functionTypeScriptOptions = inject<FunctionTypeScriptOption[]>(FUNCTION_TYPE_SCRIPT_OPTIONS);
   protected readonly ScriptLanguage = ScriptLanguage;
 
@@ -32,11 +30,11 @@ export class FunctionTypeScriptComponent extends FunctionTypeFormComponent<Funct
     return this.formGroup.controls.scriptLanguage.value;
   }
 
-  protected override setValueToForm(): void {
-    functionTypeScriptFormSetValueToForm(this.formGroup, this.context!.keyword as FunctionScript);
+  override setValueToForm(): void {
+    functionTypeScriptFormSetValueToForm(this.formGroup, this._parent.keyword as FunctionScript);
   }
 
-  protected override setValueToModel(): void {
-    functionTypeScriptFormSetValueToModel(this.formGroup, this.context!.keyword as FunctionScript);
+  override setValueToModel(): void {
+    functionTypeScriptFormSetValueToModel(this.formGroup, this._parent.keyword as FunctionScript);
   }
 }

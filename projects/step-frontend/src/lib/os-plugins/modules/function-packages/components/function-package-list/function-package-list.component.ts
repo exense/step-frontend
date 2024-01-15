@@ -7,7 +7,7 @@ import {
   STORE_ALL,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
+import { FunctionPackageActionsService } from '../../injectables/function-package-actions.service';
 
 @Component({
   selector: 'step-function-package-list',
@@ -55,9 +55,7 @@ export class FunctionPackageListComponent implements AfterViewInit {
 
   delete(id: string, name: string): void {
     this._actions.deleteFunctionPackage(id, name).subscribe((result) => {
-      if (result) {
-        this.dataSource.reload();
-      }
+      this.dataSource.reload();
     });
   }
 }

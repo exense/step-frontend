@@ -10,6 +10,7 @@
       ></step-plan-link>
       <step-function-link
         *ngIf="element.type === 'KEYWORD'"
+        [openEditorOnClick]="true"
         (edit)="closeDialog()"
         [context]="element.linkContext"
       ></step-function-link>

@@ -11,6 +11,7 @@
 @use 'step-menu';
 @use 'step-datepicker';
 @use 'step-alert';
+@use 'step-tooltip';
 @use '../core-variables' as var;
 
 @forward 'step-sidebar' show step-define-sidebar-config;
@@ -164,20 +165,11 @@ $light-primary-text: var.$white;
   @include step-menu.menu();
   @include step-datepicker.datepicker();
   @include step-alert.step-alert();
+  @include step-tooltip.tooltip($text-color);
 
   .cdk-overlay-pane {
     z-index: 1050;
     padding-top: 8px;
-  }
-
-  .tooltip-inner {
-    background: rgba(97, 97, 97, 0.9);
-    margin: 14px;
-    max-width: 250px;
-    padding-left: 8px;
-    padding-right: 8px;
-    overflow: hidden;
-    text-align: unset;
   }
 
   &.modal-open .cdk-overlay-container {
@@ -270,10 +262,6 @@ $light-primary-text: var.$white;
 
   .mat-mdc-card {
     border-radius: 8px;
-  }
-
-  .mat-mdc-tooltip {
-    white-space: pre-line;
   }
 
   label {

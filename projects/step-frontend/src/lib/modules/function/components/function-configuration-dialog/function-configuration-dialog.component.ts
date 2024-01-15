@@ -1,5 +1,5 @@
 import { KeyValue } from '@angular/common';
-import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, forwardRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
@@ -15,6 +15,9 @@ import {
   FunctionTypeRegistryService,
   Keyword,
   FunctionConfigurationApiService,
+  FunctionTypeParentFormService,
+  FunctionTypeComponent,
+  FunctionTypeFormComponent,
 } from '@exense/step-core';
 import { of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Router } from '@angular/router';
@@ -23,8 +26,14 @@ import { Router } from '@angular/router';
   selector: 'step-function-configuration-dialog',
   templateUrl: './function-configuration-dialog.component.html',
   styleUrls: ['./function-configuration-dialog.component.scss'],
+  providers: [
+    {
+      provide: FunctionTypeParentFormService,
+      useExisting: forwardRef(() => FunctionConfigurationDialogComponent),
+    },
+  ],
 })
-export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
+export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, FunctionTypeParentFormService {
   private _functionConfigurationDialogData = inject<FunctionConfigurationDialogData>(MAT_DIALOG_DATA);
   private _api = inject(FunctionConfigurationApiService);
   private _matDialogRef = inject<MatDialogRef<FunctionConfigurationDialogComponent, Keyword>>(MatDialogRef);
@@ -36,26 +45,25 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
   private _changeDetectorRef = inject(ChangeDetectorRef);
 
   private readonly terminator$ = new Subject<void>();
-  private readonly setValueToFormInternal$ = new Subject<void>();
-  private readonly setValueToModelInternal$ = new Subject<void>();
 
   protected readonly lightForm = this._functionConfigurationDialogData.dialogConfig.lightForm;
   protected readonly schemaEnforced = this._authService.getConf()?.miscParams?.['enforceschemas'] === 'true';
-  protected readonly setValueToForm$ = this.setValueToFormInternal$.asObservable();
-  protected readonly setValueToModel$ = this.setValueToModelInternal$.asObservable();
   protected readonly AlertType = AlertType;
   protected readonly schemaErrorsDictionary: Record<string, string> = {
     format: 'The schema must be in a JSON format',
     required: 'This field is required',
   };
 
-  protected keyword?: Keyword;
-  protected formGroup?: FunctionConfigurationDialogForm;
+  keyword?: Keyword;
+  formGroup?: FunctionConfigurationDialogForm;
 
   protected functionTypeItemInfos = this._functionTypeRegistryService.getItemInfos();
   protected modalTitle: string = !this._functionConfigurationDialogData.keyword ? 'New Keyword' : 'Edit Keyword';
   protected isLoading: boolean = false;
   protected tokenSelectionCriteria: KeyValue<string, string>[] = [];
+
+  @ViewChild('functionTypeComponent', { static: true })
+  private functionTypeChild!: FunctionTypeComponent;
 
   ngOnInit(): void {
     this.formGroup = functionConfigurationDialogFormCreate(
@@ -83,8 +91,6 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.terminator$.next();
     this.terminator$.complete();
-    this.setValueToFormInternal$.complete();
-    this.setValueToModelInternal$.complete();
   }
 
   protected get functionType(): string {
@@ -99,15 +105,10 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
     return this.formGroup!.controls.executeLocally.value;
   }
 
-  protected onFunctionTypeRenderComplete(): void {
-    this.setValueToFormInternal$.next();
-    this.formGroup!.updateValueAndValidity();
-  }
-
   protected save(edit?: boolean): void {
     functionConfigurationDialogFormSetValueToModel(this.formGroup!, this.keyword!);
 
-    this.setValueToModelInternal$.next();
+    (this.functionTypeChild.componentInstance as FunctionTypeFormComponent<any>).setValueToModel();
 
     this._api
       .saveFunction(this.keyword!)
@@ -132,13 +133,17 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
+  private determineDefaultType(): string {
+    const allowedTypes = this.functionTypeItemInfos.map((item) => item.type);
+    const defaultTypeCandidate =
+      this._functionConfigurationDialogData?.dialogConfig?.functionTypeFilters?.[0] ?? FunctionType.SCRIPT;
+    return allowedTypes.includes(defaultTypeCandidate) ? defaultTypeCandidate : allowedTypes[0];
+  }
+
   private initStepFunction(): void {
     if (!this._functionConfigurationDialogData.keyword) {
-      const { functionTypeFilters } = this._functionConfigurationDialogData.dialogConfig;
-      const [type] = functionTypeFilters.length ? functionTypeFilters : [FunctionType.SCRIPT];
-
       this.keyword = {
-        type,
+        type: this.determineDefaultType(),
       };
       this.fetchStepFunction(this.keyword.type);
     } else {

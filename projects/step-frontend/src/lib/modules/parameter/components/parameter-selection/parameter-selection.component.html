@@ -23,7 +23,7 @@
     </td>
   </ng-container>
 
-  <step-custom-columns screen="parameterTable" options="noEditorLink"> </step-custom-columns>
+  <step-custom-columns screen="parameterTable" [options]="['noEditorLink', 'noDescriptionHint']"> </step-custom-columns>
 
   <ng-container matColumnDef="singleSelect" *ngIf="!multipleSelection">
     <th mat-header-cell *matHeaderCellDef></th>

@@ -1,5 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { AugmentedKeywordsService, Keyword, Plan, PlanEditorApiService } from '@exense/step-core';
+import { Component, inject } from '@angular/core';
+import { Plan, PlanEditorApiService } from '@exense/step-core';
 import { CompositeKeywordPlanApiService } from '../../services/composite-keyword-plan-api.service';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
@@ -11,27 +11,13 @@ import { map } from 'rxjs';
   providers: [
     {
       provide: PlanEditorApiService,
-      useClass: CompositeKeywordPlanApiService,
+      useExisting: CompositeKeywordPlanApiService,
     },
   ],
 })
-export class CompositeFunctionEditorComponent implements OnInit {
-  private _functionApiService = inject(AugmentedKeywordsService);
+export class CompositeFunctionEditorComponent {
+  readonly _compositePlan$ = inject(ActivatedRoute).data.pipe(map((data) => data['compositePlan'] as Plan | undefined));
   protected _id: string | undefined = inject(ActivatedRoute).snapshot.params['id'];
 
-  protected composite?: Keyword;
-
-  ngOnInit(): void {
-    this.loadKeyword(this._id);
-  }
-
-  private loadKeyword(id?: string): void {
-    if (!id) {
-      this.composite = undefined;
-      return;
-    }
-    this._functionApiService.getFunctionById(id).subscribe((keywordFunction) => {
-      this.composite = keywordFunction;
-    });
-  }
+  readonly _composite$ = inject(CompositeKeywordPlanApiService).keyword$;
 }
