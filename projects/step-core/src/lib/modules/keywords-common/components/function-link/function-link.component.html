@@ -6,3 +6,5 @@
 <ng-container *ngIf="noLink$ | async; else link">
   {{ (context?.attributes)!['name'] }}
 </ng-container>
+<step-description-hint *ngIf="!(noDescriptionHint$ | async)" [description]="context?.description">
+</step-description-hint>

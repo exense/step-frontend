@@ -7,13 +7,12 @@
   [matSortDisableClear]="true"
 >
   <step-entity-column-container entityName="functions"></step-entity-column-container>
-  <step-custom-columns screen="functionTable" options="noEditorLink"></step-custom-columns>
+  <step-custom-columns screen="functionTable" [options]="['noEditorLink', 'noDescriptionHint']"></step-custom-columns>
   <ng-container matColumnDef="actions">
     <th mat-header-cell *matHeaderCellDef></th>
     <td mat-cell *matCellDef="let element">
       <div class="actions">
-        <step-icon *ngIf="element.description" [matTooltip]="element.description" name="help-circle"></step-icon>
-
+        <step-description-hint [description]="element.description" yPosition="below"> </step-description-hint>
         <button mat-icon-button matTooltip="Add function" (click)="addFunction(element.id)">
           <step-icon name="plus-circle"></step-icon>
         </button>

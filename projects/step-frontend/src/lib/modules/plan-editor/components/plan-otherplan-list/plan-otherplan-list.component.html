@@ -17,6 +17,7 @@
     <th mat-header-cell *matHeaderCellDef></th>
     <td mat-cell *matCellDef="let element">
       <div class="actions">
+        <step-description-hint [description]="element.root.description"></step-description-hint>
         <button mat-icon-button matTooltip="Add plan" (click)="addPlan(element.id)">
           <step-icon name="plus-circle"></step-icon>
         </button>

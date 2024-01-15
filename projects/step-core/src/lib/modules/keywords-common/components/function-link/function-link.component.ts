@@ -13,13 +13,14 @@ import { FunctionActionsService } from '../../injectables/function-actions.servi
 export class FunctionLinkComponent implements CustomComponent {
   private _functionActions = inject(FunctionActionsService, { optional: true });
   private _customColumnOptions = inject(CustomColumnOptions, { optional: true });
+  private readonly options$ = this._customColumnOptions?.options$ ?? of([]);
 
   @Input() context?: Keyword;
   @Output() edit = new EventEmitter<void>();
 
-  readonly noLink$ = (this._customColumnOptions?.options$ || of([])).pipe(
-    map((options) => options.includes('noEditorLink'))
-  );
+  readonly noLink$ = this.options$.pipe(map((options) => options.includes('noEditorLink')));
+
+  readonly noDescriptionHint$ = this.options$.pipe(map((options) => options.includes('noDescriptionHint')));
 
   editFunction(): void {
     if (!this.context?.id || !this._functionActions) {
