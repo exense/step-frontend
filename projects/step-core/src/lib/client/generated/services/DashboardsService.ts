@@ -23,7 +23,9 @@ export class DashboardsService {
    * @returns AsyncTaskStatusTableBulkOperationReport default response
    * @throws ApiError
    */
-  public deleteEntityS5(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatusTableBulkOperationReport> {
+  public deleteDashboards(
+    requestBody?: TableBulkOperationRequest
+  ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/dashboards/bulk/delete',
@@ -38,7 +40,7 @@ export class DashboardsService {
    * @returns DashboardView default response
    * @throws ApiError
    */
-  public cloneEntity5(id: string): Observable<DashboardView> {
+  public cloneDashboard(id: string): Observable<DashboardView> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/dashboards/{id}/clone',
@@ -54,7 +56,7 @@ export class DashboardsService {
    * @returns AsyncTaskStatusTableBulkOperationReport default response
    * @throws ApiError
    */
-  public cloneEntityS5(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatusTableBulkOperationReport> {
+  public cloneDashboards(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/dashboards/bulk/clone',
@@ -69,7 +71,7 @@ export class DashboardsService {
    * @returns DashboardView default response
    * @throws ApiError
    */
-  public getEntityById5(id: string): Observable<DashboardView> {
+  public getDashboardById(id: string): Observable<DashboardView> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/dashboards/{id}',
@@ -85,7 +87,7 @@ export class DashboardsService {
    * @returns any default response
    * @throws ApiError
    */
-  public deleteEntity5(id: string): Observable<any> {
+  public deleteDashboard(id: string): Observable<any> {
     return this.httpRequest.request({
       method: 'DELETE',
       url: '/dashboards/{id}',
@@ -101,7 +103,7 @@ export class DashboardsService {
    * @returns DashboardView default response
    * @throws ApiError
    */
-  public findEntitySByIds5(requestBody?: Array<string>): Observable<Array<DashboardView>> {
+  public findDashboardsByIds(requestBody?: Array<string>): Observable<Array<DashboardView>> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/dashboards/find/by/ids',
@@ -116,7 +118,7 @@ export class DashboardsService {
    * @returns DashboardView default response
    * @throws ApiError
    */
-  public findEntitySByAttributes5(requestBody?: Record<string, string>): Observable<Array<DashboardView>> {
+  public findDashboardsByAttributes(requestBody?: Record<string, string>): Observable<Array<DashboardView>> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/dashboards/find',
@@ -142,7 +144,7 @@ export class DashboardsService {
    * @returns DashboardView default response
    * @throws ApiError
    */
-  public saveEntity5(requestBody?: DashboardView): Observable<DashboardView> {
+  public saveDashboard(requestBody?: DashboardView): Observable<DashboardView> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/dashboards',
@@ -157,7 +159,7 @@ export class DashboardsService {
    * @returns History default response
    * @throws ApiError
    */
-  public getEntityVersions5(id: string): Observable<Array<History>> {
+  public getDashboardVersions(id: string): Observable<Array<History>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/dashboards/{id}/versions',
@@ -173,7 +175,7 @@ export class DashboardsService {
    * @returns boolean default response
    * @throws ApiError
    */
-  public isEntityLocked5(id: string): Observable<boolean> {
+  public isDashboardLocked(id: string): Observable<boolean> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/dashboards/{id}/locked',
@@ -190,7 +192,7 @@ export class DashboardsService {
    * @returns any default response
    * @throws ApiError
    */
-  public lockEntity5(id: string, requestBody?: boolean): Observable<any> {
+  public lockDashboard(id: string, requestBody?: boolean): Observable<any> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/dashboards/{id}/locked',
@@ -208,7 +210,7 @@ export class DashboardsService {
    * @returns TableResponseDashboardView default response
    * @throws ApiError
    */
-  public getEntityTable5(requestBody?: TableRequest): Observable<TableResponseDashboardView> {
+  public getDashboardTable(requestBody?: TableRequest): Observable<TableResponseDashboardView> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/dashboards/table',
@@ -224,7 +226,7 @@ export class DashboardsService {
    * @returns DashboardView default response
    * @throws ApiError
    */
-  public restoreEntityVersion5(id: string, versionId: string): Observable<DashboardView> {
+  public restoreDashboardVersion(id: string, versionId: string): Observable<DashboardView> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/dashboards/{id}/restore/{versionId}',

@@ -36,7 +36,7 @@ export class DashboardsListPageComponent {
   }
 
   saveNewDashboard(edit = false) {
-    this._dashboardsService.saveEntity5(this.createDashboardModel).subscribe((dashboard) => {
+    this._dashboardsService.saveDashboard(this.createDashboardModel).subscribe((dashboard) => {
       if (edit) {
         this.navigateToDashboard(dashboard, true);
       } else {
@@ -64,7 +64,7 @@ export class DashboardsListPageComponent {
         filter((confirm) => confirm),
         catchError(() => of(false)),
         switchMap((isDeleteConfirmed) =>
-          isDeleteConfirmed ? this._dashboardsService.deleteEntity5(dashboard.id!).pipe(map(() => true)) : of(false)
+          isDeleteConfirmed ? this._dashboardsService.deleteDashboard(dashboard.id!).pipe(map(() => true)) : of(false)
         )
       )
       .subscribe((deleteConfirmed) => {

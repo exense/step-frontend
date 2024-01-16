@@ -93,7 +93,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
       if (!id) {
         throw new Error('Dashboard id not present');
       }
-      this._dashboardService.getEntityById5(id).subscribe((dashboard) => {
+      this._dashboardService.getDashboardById(id).subscribe((dashboard) => {
         this.dashboard = dashboard;
         this.context = this.createContext(this.dashboard);
         this.subscribeForContextChange();
@@ -145,7 +145,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     this.dashboard.grouping = this.context.getGroupDimensions();
     this.dashboard.timeRange = this.timeRangeSelection;
     this.dashboard.filters = this.filterBar?._internalFilters.map(FilterUtils.convertToApiFilterItem) || [];
-    this._dashboardService.saveEntity5(this.dashboard).subscribe((response) => {});
+    this._dashboardService.saveDashboard(this.dashboard).subscribe((response) => {});
   }
 
   addDashlet(metric: MetricType) {
