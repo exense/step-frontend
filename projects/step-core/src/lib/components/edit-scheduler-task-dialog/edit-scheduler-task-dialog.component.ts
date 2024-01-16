@@ -48,6 +48,8 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
   protected error = '';
   protected showParameters = false;
   protected parametersRawValue: string = '';
+  protected repositoryId?: string;
+  protected repositoryPlanId?: string;
 
   @ViewChild('formContainer', { static: false })
   private form!: NgForm;
@@ -155,14 +157,21 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
       this.task.executionsParameters.customParameters = {};
     }
 
-    const planId = this.task.executionsParameters?.repositoryObject?.repositoryParameters?.['planid'];
-    if (planId) {
-      const id = planId;
-      const name = this.task.executionsParameters.description ?? '';
-      this.plan = {
-        id,
-        attributes: { name },
-      };
+    const repository = this.task?.executionsParameters?.repositoryObject;
+    if (repository?.repositoryID === 'local') {
+      const planId = repository?.repositoryParameters?.['planid'];
+      if (planId) {
+        const id = planId;
+        const name = this.task.executionsParameters.description ?? '';
+        this.plan = {
+          id,
+          attributes: { name },
+        };
+      }
+    } else {
+      this.repositoryId = repository?.repositoryID;
+      this.repositoryPlanId =
+        repository?.repositoryParameters?.['planid'] ?? repository?.repositoryParameters?.['planId'];
     }
     this.updateParametersRawValue();
   }

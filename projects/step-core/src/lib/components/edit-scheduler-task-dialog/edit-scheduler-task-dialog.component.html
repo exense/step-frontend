@@ -8,15 +8,27 @@
         <step-label>Name</step-label>
         <input type="text" placeholder="Name" required [(ngModel)]="task.attributes!['name']" name="name" />
       </step-form-field>
-      <step-select-plan
-        [showRequiredMarker]="true"
-        required
-        [ngModel]="plan"
-        (ngModelChange)="handlePlanChange($event)"
-        [disabled]="config?.disablePlan ?? false"
-        name="plan"
-      >
-      </step-select-plan>
+      <ng-container *ngIf="repositoryId; else localPlan">
+        <step-form-field>
+          <step-label>Repository</step-label>
+          <input type="text" [ngModel]="repositoryId" [disabled]="true" name="repository" />
+        </step-form-field>
+        <step-form-field>
+          <step-label>Repository Plan Id</step-label>
+          <input type="text" [ngModel]="repositoryPlanId" [disabled]="true" name="repositoryPlanId" />
+        </step-form-field>
+      </ng-container>
+      <ng-template #localPlan>
+        <step-select-plan
+          [showRequiredMarker]="true"
+          required
+          [ngModel]="plan"
+          (ngModelChange)="handlePlanChange($event)"
+          [disabled]="config?.disablePlan ?? false"
+          name="plan"
+        >
+        </step-select-plan>
+      </ng-template>
       <step-form-field [showRequiredMarker]="true" alignLabelAddon="near">
         <step-label>CRON expression</step-label>
         <step-label-addon>
