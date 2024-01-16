@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Component,
   ElementRef,
   EventEmitter,
@@ -22,6 +21,8 @@ import MouseListener = uPlot.Cursor.MouseListener;
 import uPlot = require('uplot');
 import { Execution, ExecutionsService, TimeRange } from '@exense/step-core';
 import { Observable } from 'rxjs';
+
+const DEFAULT_STROKE_COLOR = '#cccccc';
 
 @Component({
   selector: 'step-timeseries-chart',
@@ -143,7 +144,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy {
         // aggregate series don't have stroke (e.g total)
         this.legendSettings.items.push({
           seriesId: series.id,
-          color: (series.stroke as string) || '#cccccc',
+          color: (series.stroke as string) || DEFAULT_STROKE_COLOR,
           label: this.mergeLabelItems(series.labelItems),
           isVisible: series.show ?? true,
         });

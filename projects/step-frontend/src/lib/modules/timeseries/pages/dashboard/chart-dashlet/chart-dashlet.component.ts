@@ -93,17 +93,13 @@ export class ChartDashletComponent implements OnInit, Dashlet {
   }
 
   switchAggregate(aggregate: AggregationType) {
-    // this.isLoading = true;
     this.selectedAggregate = aggregate;
     this.refresh().subscribe();
-    // this.fetchDataAndCreateChart(this.settings);
   }
 
   toggleGroupingAttribute(attribute: MetricAttributeSelection) {
-    // this.isLoading = true;
     attribute.selected = !attribute.selected;
     this.refresh().subscribe();
-    // this.fetchDataAndCreateChart(this.settings);
   }
 
   private composeRequestFilter(metricKey: string): string {
@@ -238,12 +234,13 @@ export class ChartDashletComponent implements OnInit, Dashlet {
     if (aggregation === 'RATE') {
       return '/h';
     }
-    if (unit === '%') {
-      return '%';
-    } else if (unit === 'ms') {
-      return ' ms';
-    } else {
-      return '';
+    switch (unit) {
+      case '%':
+        return '%';
+      case 'ms':
+        return ' ms';
+      default:
+        return '';
     }
   }
 
@@ -278,7 +275,7 @@ export class ChartDashletComponent implements OnInit, Dashlet {
       case 'MEDIAN':
         return b.pclValues?.[50];
       case 'PERCENTILE':
-      // return b.pclValues?.[this.selectedPclValue];
+        return b.pclValues?.[this.selectedPclValue];
       default:
         throw new Error('Unhandled aggregation value: ' + aggregation);
     }

@@ -1,34 +1,16 @@
 import { Component, inject, OnInit } from '@angular/core';
-import {
-  AxesSettings,
-  TimeSeriesFilterItem,
-  ChartSettings,
-  DashboardItem,
-  MetricAttribute,
-  Plan,
-} from '@exense/step-core';
+import { DashboardItem } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ChartDashletSettingsData } from './chart-dashlet-settings-data';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { FilterBarItemType, FilterBarItem } from '../../../../performance-view/filter-bar/model/filter-bar-item';
 import { FilterUtils } from '../../../../util/filter-utils';
+import { ChartSettingsForm, createChartSettingsGroup } from './chart-settings.form';
 
 export type ChartForm = FormGroup<{
   name: FormControl<string | null>;
   chartSettings: ChartSettingsForm;
   size: FormControl<number | null>;
-}>;
-
-export type ChartSettingsForm = FormGroup<{
-  metricKey: FormControl<string | null>;
-  attributes: FormControl<Array<MetricAttribute> | null>;
-  primaryAxes: FormControl<AxesSettings | null>;
-  filters: FormControl<Array<TimeSeriesFilterItem> | null>;
-  grouping: FormControl<Array<string> | null>;
-  inheritGlobalFilters: FormControl<boolean | null>;
-  inheritGlobalGrouping: FormControl<boolean | null>;
-  readonlyGrouping: FormControl<boolean | null>;
-  readonlyAggregate: FormControl<boolean | null>;
 }>;
 
 @Component({
@@ -48,7 +30,7 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.item = JSON.parse(JSON.stringify(this._inputData.item));
-    this.formGroup = this.createFormGroup(this._formBuilder, this.item);
+    this.formGroup = this.createFormGroup(this.item);
     this.filterItems = this.item.chartSettings!.filters.map((item) => ({
       type: item.type,
       attributeName: item.attribute,
@@ -68,26 +50,12 @@ export class ChartDashletSettingsComponent implements OnInit {
     });
   }
 
-  private createFormGroup(fb: FormBuilder, item: DashboardItem): ChartForm {
-    return fb.group({
-      name: fb.control(item.name, [Validators.required]),
-      chartSettings: item.chartSettings ? this.createChartSettingsGroup(fb, item.chartSettings) : null,
-      size: fb.control(item.size, [Validators.required, Validators.min(1)]),
+  private createFormGroup(item: DashboardItem): ChartForm {
+    return this._formBuilder.group({
+      name: this._formBuilder.control(item.name, [Validators.required]),
+      chartSettings: item.chartSettings ? createChartSettingsGroup(this._formBuilder, item.chartSettings) : null,
+      size: this._formBuilder.control(item.size, [Validators.required, Validators.min(1)]),
     }) as unknown as ChartForm;
-  }
-
-  private createChartSettingsGroup(fb: FormBuilder, settings: ChartSettings): ChartSettingsForm {
-    return fb.group({
-      metricKey: fb.control(settings.metricKey, [Validators.required]),
-      attributes: fb.control(settings.attributes, [Validators.required]),
-      primaryAxes: fb.control(settings.primaryAxes, [Validators.required]),
-      filters: fb.control(settings.filters, [Validators.required]),
-      grouping: fb.control(settings.grouping, [Validators.required]),
-      inheritGlobalFilters: fb.control(settings.inheritGlobalFilters, [Validators.required]),
-      inheritGlobalGrouping: fb.control(settings.inheritGlobalGrouping, [Validators.required]),
-      readonlyGrouping: fb.control(settings.readonlyGrouping, [Validators.required]),
-      readonlyAggregate: fb.control(settings.readonlyAggregate, [Validators.required]),
-    }) as ChartSettingsForm;
   }
 
   submitForm() {

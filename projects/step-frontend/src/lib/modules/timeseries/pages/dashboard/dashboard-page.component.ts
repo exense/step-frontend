@@ -106,6 +106,10 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  trackByName(index: number, item: MetricType): string {
+    return item.name;
+  }
+
   private extractUrlParams(): PageParams {
     const initialParams: Params = this._route.snapshot.queryParams;
     return {
@@ -115,6 +119,8 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this._timeSeriesContextFactory?.destroyContext(this.context?.id);
+    this.terminator$.next();
+    this.terminator$.complete();
   }
 
   enableEditMode() {
@@ -129,7 +135,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     this._timeSeriesService.getMetricTypes().subscribe((metrics) => (this.metricTypes = metrics));
   }
 
-  disableEditMode() {
+  cancelEditMode() {
     this.dashboard = { ...this.dashboardBackup };
     this.editMode = false;
   }
@@ -170,11 +176,9 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     switch (selection.type) {
       case 'ABSOLUTE':
         return { from: selection.absoluteSelection!.from!, to: selection.absoluteSelection!.to! };
-        break;
       case 'RELATIVE':
         let now = new Date().getTime();
         return { from: now - selection.relativeSelection!.timeInMs!, to: now };
-        break;
       default:
         throw new Error('Unsupported time selection type: ' + selection.type);
     }
@@ -213,17 +217,6 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.refreshAllCharts().subscribe();
       });
-    // this.throttledRefreshTrigger$
-    //   .pipe(
-    //     throttle(() => this.context.inProgressChange().pipe(filter((inProgress) => !inProgress))),
-    //     takeUntil(this.terminator$)
-    //   )
-    //   .subscribe(() => {
-    //     // let's calculate the new time range
-    //     let fullRange = this.calculateTimeRange(this.timeRangeSelection);
-    //     this.setRanges(fullRange);
-    //     this.updateBaseCharts();
-    //   });
   }
 
   private getContext(compare: boolean): TimeSeriesContext {

@@ -1,8 +1,8 @@
 <div
   class="chart-wrapper"
-  [style.height]="height + 'px'"
-  [style.minHeight]="height + 'px'"
-  [style.maxHeight]="height + 'px'"
+  [style.height.px]="height"
+  [style.minHeight.px]="height"
+  [style.maxHeight.px]="height"
   [class.pointer]="!!settings.showExecutionsLinks"
   (stepElementResize)="resize()"
 >

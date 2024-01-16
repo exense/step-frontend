@@ -117,13 +117,13 @@
           <step-label>Chart display</step-label>
           <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.displayType">
             <mat-option [value]="'LINE'" class="option-with-icon">
-              <div style="display: flex; align-items: center; gap: 12px">
+              <div class="inner">
                 <step-icon name="trending-up"></step-icon>
                 <span>Line chart</span>
               </div>
             </mat-option>
             <mat-option [disabled]="true" [value]="'BAR_CHART'" class="option-with-icon">
-              <div style="display: flex; align-items: center; gap: 12px">
+              <div class="inner">
                 <step-icon name="bar-chart-2"></step-icon>
                 <span>Bar chart</span>
               </div>

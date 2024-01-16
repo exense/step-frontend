@@ -44,12 +44,8 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   migrationInProgress = false;
 
   timeSeriesService = inject(TimeSeriesService);
-  metricTypes?: MetricType[];
-  customChartsMetrics: MetricType[] = [];
 
   ngOnInit(): void {
-    this.timeSeriesService.getMetricTypes().subscribe((metrics) => (this.metricTypes = metrics));
-
     let now = new Date().getTime();
     let start;
     let end;
@@ -164,10 +160,6 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   handleResolutionChange(resolution: number) {
     this.menuTrigger.closeMenu();
     this.dashboard.setChartsResolution(resolution);
-  }
-
-  addCustomChart(metric: MetricType) {
-    this.customChartsMetrics.push(metric);
   }
 
   changeRefreshInterval(newInterval: { label: string; value: number }) {
