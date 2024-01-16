@@ -44,16 +44,7 @@
         </mat-select>
       </step-form-field>
 
-      <step-function-type
-        [itemKey]="functionType"
-        [context]="{
-          formGroup: formGroup,
-          keyword: keyword,
-          setValueToForm$: setValueToForm$,
-          setValueToModel$: setValueToModel$
-        }"
-        (renderComplete)="onFunctionTypeRenderComplete()"
-      ></step-function-type>
+      <step-function-type #functionTypeComponent [itemKey]="functionType"> </step-function-type>
 
       <ng-container *ngIf="!lightForm">
         <mat-expansion-panel>

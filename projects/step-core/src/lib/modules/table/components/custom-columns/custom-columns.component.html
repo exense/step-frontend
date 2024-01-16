@@ -10,10 +10,10 @@
     </step-search-custom-cell>
   </ng-container>
   <th mat-header-cell *matHeaderCellDef mat-sort-header>
+    {{ col.label }}
     <ng-container *ngIf="col.description">
       <step-icon [matTooltip]="col.description" name="help-circle"></step-icon>
     </ng-container>
-    {{ col.label }}
   </th>
   <td mat-cell *matCellDef="let element">
     <ng-template #cellValue>

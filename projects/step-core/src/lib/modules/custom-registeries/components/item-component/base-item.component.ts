@@ -1,9 +1,10 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, Type } from '@angular/core';
+import { Component, inject, Input, OnChanges, SimpleChanges, Type, ViewChild } from '@angular/core';
 import { CustomRegistryType } from '../../shared/custom-registry-type.enum';
 import { CustomRegistryItem } from '../../shared/custom-registry-item';
 import { Mutable } from '../../../../shared';
 import { CustomRegistryService } from '../../services/custom-registry.service';
 import { CustomComponent } from '../../shared/custom-component';
+import { CustomItemRenderComponent } from '../custom-item-render/custom-item-render.component';
 
 type FieldAccessor = Mutable<Pick<BaseItemComponent<any>, 'component'>>;
 
@@ -11,6 +12,7 @@ type FieldAccessor = Mutable<Pick<BaseItemComponent<any>, 'component'>>;
   template: '',
 })
 export abstract class BaseItemComponent<T extends CustomRegistryItem> implements OnChanges {
+  protected _customRegistryService = inject(CustomRegistryService);
   readonly component?: Type<CustomComponent>;
 
   protected abstract readonly registryType: CustomRegistryType;
@@ -18,9 +20,12 @@ export abstract class BaseItemComponent<T extends CustomRegistryItem> implements
   @Input() itemKey?: string;
   @Input() context?: any;
 
-  @Output() renderComplete = new EventEmitter<void>();
+  @ViewChild('renderer', { static: true })
+  private renderer!: CustomItemRenderComponent;
 
-  protected constructor(private _customRegistryService: CustomRegistryService) {}
+  get componentInstance(): CustomComponent | undefined {
+    return this.renderer.componentInstance;
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     const cItemKey = changes['itemKey'];

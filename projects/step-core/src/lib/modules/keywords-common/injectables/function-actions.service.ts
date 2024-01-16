@@ -20,6 +20,5 @@ export abstract class FunctionActionsService {
   abstract openExportFunctionDialog(id: string, name: string): Observable<boolean>;
   abstract openExportAllFunctionsDialog(): Observable<boolean>;
   abstract openImportFunctionDialog(): Observable<boolean | string[]>;
-  abstract selectFunction(): Observable<Keyword>;
   abstract resolveConfigureLinkIfExits(parentInjector: Injector, dialogConfig?: FunctionDialogsConfig): void;
 }
