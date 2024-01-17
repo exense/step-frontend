@@ -156,8 +156,8 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
       chartSettings: {
         filters: [],
         metricKey: metric.name!,
-        inheritGlobalFilters: false,
-        inheritGlobalGrouping: !metric.defaultGroupingAttributes?.length,
+        inheritGlobalFilters: true,
+        inheritGlobalGrouping: true,
         grouping: metric.defaultGroupingAttributes || [],
         attributes: metric.attributes || [],
         readonlyAggregate: false,
