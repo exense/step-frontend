@@ -30,6 +30,7 @@ export class PlanEditorActionsComponent implements OnChanges {
 
   @Input() currentPlanId?: string;
   @Input() plan?: Plan | null;
+  @Input() compositeId?: string;
 
   @Input() hasUndo?: boolean | null;
   @Input() hasRedo?: boolean | null;
@@ -65,6 +66,7 @@ export class PlanEditorActionsComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     let currentPlanId: string | undefined;
     let plan: Plan | undefined;
+    let compositeId: string | undefined;
 
     const cCurrentPlanId = changes['currentPlanId'];
     if (cCurrentPlanId?.previousValue !== cCurrentPlanId?.currentValue || cCurrentPlanId?.firstChange) {
@@ -76,8 +78,13 @@ export class PlanEditorActionsComponent implements OnChanges {
       plan = cPlan?.currentValue;
     }
 
-    if (currentPlanId || plan) {
-      this.setupContext(currentPlanId, plan);
+    const cCompositeId = changes['compositeId'];
+    if (cCompositeId?.previousValue !== cCompositeId?.currentValue || cCompositeId?.firstChange) {
+      compositeId = cCompositeId?.currentValue;
+    }
+
+    if (currentPlanId || plan || compositeId) {
+      this.setupContext(currentPlanId, plan, compositeId);
     }
   }
 
@@ -100,12 +107,15 @@ export class PlanEditorActionsComponent implements OnChanges {
     this.startInteractive.emit();
   }
 
-  private setupContext(currentPlanId?: string, plan?: Plan): void {
+  private setupContext(currentPlanId?: string, plan?: Plan, compositeId?: string): void {
     currentPlanId = currentPlanId ?? this.currentPlanId;
     plan = plan ?? this.plan ?? undefined;
+    compositeId = compositeId ?? this.compositeId;
+
     this.planEditorContext = {
       currentPlanId,
       plan,
+      compositeId,
     };
   }
 }

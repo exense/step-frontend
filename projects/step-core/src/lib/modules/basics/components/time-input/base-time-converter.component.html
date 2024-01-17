@@ -3,11 +3,14 @@
   [showRequiredMarker]="showRequiredMarker"
   [class.ng-invalid]="_ngControl.invalid"
   [class.ng-touched]="_ngControl.touched"
+  alignLabelAddon="near"
 >
   <step-label *ngIf="label">
     {{ label }}
-    <step-icon *ngIf="tooltip" name="help-circle" [matTooltip]="tooltip"> </step-icon>
   </step-label>
+  <step-label-addon *ngIf="tooltip">
+    <step-icon name="help-circle" [matTooltip]="tooltip"> </step-icon>
+  </step-label-addon>
   <input
     type="number"
     [ngModel]="displayValue"

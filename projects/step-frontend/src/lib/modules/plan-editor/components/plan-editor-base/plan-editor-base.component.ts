@@ -144,11 +144,6 @@ export class PlanEditorBaseComponent
       this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference((cPlan?.currentValue as Plan)?.id);
     }
 
-    const cCompositeId = changes['compositeId'];
-    if (cCompositeId?.previousValue !== cCompositeId?.currentValue || cCompositeId?.firstChange) {
-      this.loadPlan(cCompositeId?.currentValue, true);
-      this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference(cCompositeId?.currentValue);
-    }
   }
 
   ngOnDestroy(): void {
@@ -289,14 +284,6 @@ export class PlanEditorBaseComponent
         this.keywords._leafReportsDataSource.reload();
       }
     });
-  }
-
-  private loadPlan(id?: string, preselectArtefact?: boolean): void {
-    if (!id) {
-      return;
-    }
-
-    this._planEditorApi.loadPlan(id).subscribe((plan) => this.setupPlan(plan, preselectArtefact));
   }
 
   setupPlan(plan?: Plan, preselectArtefact?: boolean): void {

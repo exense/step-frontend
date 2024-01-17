@@ -1,8 +1,7 @@
-import { Component, forwardRef, Input, OnDestroy, QueryList } from '@angular/core';
-import { CustomColumnsBaseComponent, SearchColDirective } from '../../modules/table/table.module';
-import { Observable, Subject } from 'rxjs';
-import { MatColumnDef } from '@angular/material/table';
-import { EntityColumnContainer } from '../../shared';
+import { Component, forwardRef, Input } from '@angular/core';
+import { CustomColumnsBaseComponent } from '../../modules/table/table.module';
+import { ColumnContainer } from '../../shared';
+import { BaseColumnContainerComponent } from '../base-column-container/base-column-container.component';
 
 @Component({
   selector: 'step-entity-column-container',
@@ -10,7 +9,7 @@ import { EntityColumnContainer } from '../../shared';
   styleUrls: ['./entity-column-container.component.scss'],
   providers: [
     {
-      provide: EntityColumnContainer,
+      provide: ColumnContainer,
       useExisting: forwardRef(() => EntityColumnContainerComponent),
     },
     {
@@ -19,25 +18,6 @@ import { EntityColumnContainer } from '../../shared';
     },
   ],
 })
-export class EntityColumnContainerComponent implements EntityColumnContainer, CustomColumnsBaseComponent, OnDestroy {
-  private columnsReadyInternal$ = new Subject<boolean>();
-
+export class EntityColumnContainerComponent extends BaseColumnContainerComponent {
   @Input() entityName!: string;
-
-  colDef?: QueryList<MatColumnDef>;
-  searchColDef?: QueryList<SearchColDirective>;
-
-  readonly columnsReady$: Observable<boolean> = this.columnsReadyInternal$.asObservable();
-
-  ngOnDestroy(): void {
-    this.colDef = undefined;
-    this.searchColDef = undefined;
-    this.columnsReadyInternal$.complete();
-  }
-
-  initColumns(colDef?: QueryList<MatColumnDef>, searchColDef?: QueryList<SearchColDirective>): void {
-    this.colDef = colDef;
-    this.searchColDef = searchColDef;
-    this.columnsReadyInternal$.next(true);
-  }
 }

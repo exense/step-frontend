@@ -23,11 +23,13 @@ export class CustomItemRenderComponent implements OnChanges, AfterViewInit {
   @Input() context?: any;
   @Input() artefactId?: string;
 
-  @Output() renderComplete = new EventEmitter<void>();
-
   @ViewChild('container', { read: ViewContainerRef }) container!: ViewContainerRef;
 
   private componentRef?: ComponentRef<CustomComponent>;
+
+  get componentInstance(): CustomComponent | undefined {
+    return this.componentRef?.instance;
+  }
 
   ngAfterViewInit(): void {
     // Rendering synchronously in `ngAfterViewInit` hook may cause `ExpressionChangedAfterItHasBeenCheckedError`
@@ -70,8 +72,6 @@ export class CustomItemRenderComponent implements OnChanges, AfterViewInit {
     if (this.context) {
       this.updateContext(this.context);
     }
-
-    this.renderComplete.emit();
   }
 
   private updateContext(context?: any): void {
