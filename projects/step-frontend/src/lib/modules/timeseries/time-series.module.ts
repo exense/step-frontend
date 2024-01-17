@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { EntityModule, SimpleOutletComponent, StepCoreModule, ViewRegistryService } from '@exense/step-core';
+import { EntityModule, StepCoreModule, ViewRegistryService } from '@exense/step-core';
 import { TimeSeriesChartComponent } from './chart/time-series-chart.component';
 import { TSRangerComponent } from './ranger/ts-ranger.component';
 import { TableModule } from '@exense/step-core';
@@ -35,10 +35,10 @@ import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import { FilterBarPlanItemComponent } from './performance-view/filter-bar/item/plan/filter-bar-plan-item.component';
 import { MetricChartComponent } from './metric-chart/metric-chart.component';
 import { ResolutionPickerComponent } from './components/resolution-picker/resolution-picker.component';
-import { DashboardPageComponent } from './pages/dashboard/dashboard-page.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { ChartDashletComponent } from './pages/dashboard/chart-dashlet/chart-dashlet.component';
 import { DashboardFilterBarComponent } from './performance-view/filter-bar/dashboard-filter-bar.component';
-import { DashboardsListPageComponent } from './pages/dashboards-list/dashboards-list-page.component';
+import { DashboardListComponent } from './pages/dashboard-list/dashboard-list.component';
 import { ChartDashletSettingsComponent } from './pages/dashboard/chart-dashlet/settings/chart-dashlet-settings.component';
 
 @NgModule({
@@ -66,16 +66,16 @@ import { ChartDashletSettingsComponent } from './pages/dashboard/chart-dashlet/s
     FilterBarTaskItemComponent,
     MetricChartComponent,
     ResolutionPickerComponent,
-    DashboardPageComponent,
+    DashboardComponent,
     ChartDashletComponent,
     DashboardFilterBarComponent,
-    DashboardsListPageComponent,
+    DashboardListComponent,
     ChartDashletSettingsComponent,
   ],
   exports: [
     ExecutionPerformanceComponent,
-    DashboardPageComponent,
-    DashboardsListPageComponent,
+    DashboardComponent,
+    DashboardListComponent,
     AnalyticsPageComponent,
     MetricChartComponent,
   ],
@@ -103,11 +103,11 @@ export class TimeSeriesModule {
     });
     _viewRegistry.registerRoute({
       path: 'dashboards',
-      component: DashboardsListPageComponent,
+      component: DashboardListComponent,
     });
     _viewRegistry.registerRoute({
       path: 'dashboards/:id',
-      component: DashboardPageComponent,
+      component: DashboardComponent,
     });
   }
 }

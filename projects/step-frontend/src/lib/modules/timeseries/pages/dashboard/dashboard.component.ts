@@ -50,10 +50,10 @@ const EDIT_PARAM_NAME = 'edit';
 
 @Component({
   selector: 'step-dashboard-page',
-  templateUrl: './dashboard-page.component.html',
-  styleUrls: ['./dashboard-page.component.scss'],
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardPageComponent implements OnInit, OnDestroy {
+export class DashboardComponent implements OnInit, OnDestroy {
   readonly AGGREGATES: AggregationType[] = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'RATE', 'MEDIAN'];
   readonly DASHLET_HEIGHT = 300;
 

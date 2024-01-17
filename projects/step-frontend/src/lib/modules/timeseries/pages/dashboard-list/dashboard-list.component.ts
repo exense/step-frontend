@@ -1,22 +1,21 @@
-import { Component, inject, OnChanges, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
-  a1Promise2Observable,
   DashboardsService,
   DashboardView,
   DialogsService,
   StepDataSource,
   TableRemoteDataSourceFactoryService,
 } from '@exense/step-core';
-import { catchError, filter, map, Observable, of, switchMap } from 'rxjs';
+import { catchError, filter, map, of, switchMap } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
 @Component({
-  selector: 'step-dashboards-list-page',
-  templateUrl: './dashboards-list-page.component.html',
-  styleUrls: ['./dashboards-list-page.component.scss'],
+  selector: 'step-dashboard-list',
+  templateUrl: './dashboard-list.component.html',
+  styleUrls: ['./dashboard-list.component.scss'],
 })
-export class DashboardsListPageComponent {
+export class DashboardListComponent {
   private readonly TABLE_ID = 'dashboards';
   private _matDialog = inject(MatDialog);
   private readonly _dialogs = inject(DialogsService);
