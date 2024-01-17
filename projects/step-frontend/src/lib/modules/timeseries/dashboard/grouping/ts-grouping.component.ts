@@ -11,6 +11,7 @@ const EMPTY_DIMENSIONS_LABEL = 'Empty';
   styleUrls: ['./ts-grouping.component.scss'],
 })
 export class TsGroupingComponent implements OnInit, OnChanges {
+  readonly NO_GROUPING_OPTION = { label: 'Empty', attributes: [] };
   @Output() groupingChange = new EventEmitter<string[]>();
 
   @ViewChild('matTrigger') matTrigger!: MatMenuTrigger;

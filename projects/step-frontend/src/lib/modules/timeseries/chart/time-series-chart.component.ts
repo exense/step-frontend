@@ -319,6 +319,9 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private mergeLabelItems(items: (string | undefined)[]): string {
+    if (items.length === 0) {
+      return 'Value';
+    }
     return items.map((i) => i ?? '<Empty>').join(' | ');
   }
 

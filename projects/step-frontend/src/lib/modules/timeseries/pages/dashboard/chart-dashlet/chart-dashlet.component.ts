@@ -282,9 +282,6 @@ export class ChartDashletComponent implements OnInit, Dashlet {
   }
 
   private getSeriesKeys(attributes: BucketAttributes, groupDimensions: string[]): (string | undefined)[] {
-    if (Object.keys(attributes).length === 0) {
-      return [undefined];
-    }
-    return groupDimensions.map((field) => attributes[field]);
+    return groupDimensions.map((field) => attributes?.[field]);
   }
 }

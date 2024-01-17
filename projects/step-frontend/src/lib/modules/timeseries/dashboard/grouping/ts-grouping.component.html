@@ -2,6 +2,7 @@
   <span class="grouping-title"> Grouping: {{ label }} </span>
 </div>
 <mat-menu #groupingMenu="matMenu">
+  <button mat-menu-item (click)="selectGrouping(NO_GROUPING_OPTION)">No grouping</button>
   <button mat-menu-item *ngFor="let grouping of groupingOptions" (click)="selectGrouping(grouping)">
     {{ grouping.label }}
   </button>
