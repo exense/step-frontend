@@ -332,4 +332,12 @@ $light-primary-text: var.$white;
   .mat-mdc-checkbox-frame {
     border-radius: 0.4rem;
   }
+
+  .mat-mdc-paginator {
+    --mat-form-field-container-height: 2rem;
+    --mat-form-field-container-vertical-padding: 0.2rem;
+    --mat-form-field-filled-with-label-container-padding-top: 0.2rem;
+    --mat-form-field-filled-with-label-container-padding-bottom: 0.2rem;
+    --mat-paginator-container-text-size: 1.2rem;
+  }
 }
