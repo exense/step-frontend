@@ -405,6 +405,7 @@ export * from './services/view-state.service';
 export * from './services/artefact.service';
 export * from './services/artefact-form-change-helper.service';
 export * from './services/function-actions-impl.service';
+export * from './services/plan-editor-persistence-state.service';
 export * from './shared';
 export * from './modules/basics/shared/api-token.interface';
 export * from './components/base-artefact/base-artefact.component';
