@@ -87,7 +87,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const pageParams = this.extractUrlParams();
     this.removeOneTimeUrlParams();
-    this.hasWritePermission = this._authService.hasRight('dashboard_write');
+    this.hasWritePermission = this._authService.hasRight('dashboard-write');
     this._route.paramMap.subscribe((params) => {
       const id: string = params.get('id')!;
       if (!id) {
