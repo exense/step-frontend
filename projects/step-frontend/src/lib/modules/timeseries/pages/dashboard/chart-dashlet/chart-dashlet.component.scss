@@ -1,0 +1,19 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+.settings-container {
+  position: absolute;
+  right: 0.8rem;
+  top: 0.4rem;
+  z-index: 1;
+  transform: scale(0.9);
+
+  .edit-buttons {
+    background-color: var.$yellow-5;
+  }
+}
+
+.checkbox-row {
+  gap: 1.2rem;
+  align-items: center;
+  display: flex;
+}

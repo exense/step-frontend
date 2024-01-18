@@ -53,7 +53,10 @@ export class PurePlanEditApiService implements PlanEditorApiService {
   }
 
   restorePlanVersion(id: string, versionId: string): Observable<Plan> {
-    return this._planApi.restorePlanVersion(id, versionId);
+    if (versionId) {
+      return this._planApi.restorePlanVersion(id, versionId);
+    }
+    return this._planApi.getPlanById(id);
   }
 
   getPlanVersion(id: string, plan: Plan): Observable<string> {

@@ -1,6 +1,6 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { EntityRegistry } from '../../services/entity-registry';
+import { EntityRegistry } from '../../injectables/entity-registry';
 import { SelectEntityOfTypeData } from '../../types/select-entity-of-type-data.interface';
 import { SelectEntityOfTypeResult } from '../../types/select-entity-of-type-result.interface';
 import { SelectEntityContext } from '../../types/select-entity-context.interface';

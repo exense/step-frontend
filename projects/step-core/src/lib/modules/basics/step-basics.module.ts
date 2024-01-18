@@ -39,6 +39,11 @@ import { ItemHoverDirective } from './directives/item-hover.directive';
 import { ItemHoldDirective } from './directives/item-hold.directive';
 import { PerTimeUnitInputComponent } from './components/time-input/per-time-unit-input.component';
 import { AutocompleteInputComponent } from './components/autocomplete-input/autocomplete-input.component';
+import { PopoverContentDirective } from './directives/popover-content.directive';
+import { TriggerPopoverDirective } from './directives/trigger-popover.directive';
+import { PopoverComponent } from './components/popover/popover.component';
+import { SafeHtmlPipe } from './pipes/safe-html.pipe';
+import { DescriptionHintComponent } from './components/description-hint/description-hint.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -79,6 +84,11 @@ import { AutocompleteInputComponent } from './components/autocomplete-input/auto
     ItemHoverDirective,
     ItemHoldDirective,
     AutocompleteInputComponent,
+    PopoverContentDirective,
+    TriggerPopoverDirective,
+    PopoverComponent,
+    SafeHtmlPipe,
+    DescriptionHintComponent,
   ],
   exports: [
     CommonModule,
@@ -122,6 +132,11 @@ import { AutocompleteInputComponent } from './components/autocomplete-input/auto
     ItemHoverDirective,
     ItemHoldDirective,
     AutocompleteInputComponent,
+    PopoverContentDirective,
+    TriggerPopoverDirective,
+    PopoverComponent,
+    SafeHtmlPipe,
+    DescriptionHintComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -207,3 +222,8 @@ export * from './services/item-hold-receiver.service';
 export * from './shared/bulk-operation-type.enum';
 export * from './shared/auth.guards';
 export * from './shared/string-array-regex';
+export * from './directives/popover-content.directive';
+export * from './directives/trigger-popover.directive';
+export * from './components/popover/popover.component';
+export * from './pipes/safe-html.pipe';
+export * from './components/description-hint/description-hint.component';

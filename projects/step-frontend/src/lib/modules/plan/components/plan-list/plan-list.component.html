@@ -44,6 +44,7 @@
     </td>
   </ng-container>
   <step-entity-column-container entityName="plans"></step-entity-column-container>
+  <step-lock-column-container></step-lock-column-container>
   <step-custom-columns screen="planTable" [isSearchDisabled]="false"></step-custom-columns>
   <ng-container matColumnDef="type" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
@@ -80,7 +81,7 @@
           mat-icon-button
           matTooltip="Delete plan"
           [disabled]="!('plan-delete' | hasRight | async)"
-          (click)="deletePlan(element.id, element.attributes.name)"
+          (click)="deletePlan(element)"
         >
           <step-icon name="trash-2"></step-icon>
         </button>

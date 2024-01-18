@@ -1,19 +1,17 @@
-import { TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
-import { TSTimeRange } from '../chart/model/ts-time-range';
-import { FindBucketsRequest } from '../find-buckets-request';
+import { FilterBarItem } from '../performance-view/filter-bar/model/filter-bar-item';
 import { OQLBuilder } from './oql-builder';
 import { FilterUtils } from './filter-utils';
 import { TsFilteringSettings } from '../model/ts-filtering-settings';
 import { TsFilteringMode } from '../model/ts-filtering-mode';
 
 import { TimeSeriesConfig } from '../time-series.config';
-import { FetchBucketsRequest } from '@exense/step-core';
+import { FetchBucketsRequest, TimeRange } from '@exense/step-core';
 export class FindBucketsRequestBuilder {
   readonly attributesPrefix = 'attributes';
 
   private customAttributes: { [key: string]: any } = {};
-  private customFilters: TsFilterItem[] = [];
-  private range?: TSTimeRange;
+  private customFilters: FilterBarItem[] = [];
+  private range?: TimeRange;
   private groupDimensions?: string[];
   private percentiles?: number[];
   private numberOfBuckets?: number;
@@ -90,7 +88,7 @@ export class FindBucketsRequestBuilder {
     return this;
   }
 
-  withRange(range: TSTimeRange): FindBucketsRequestBuilder {
+  withRange(range: TimeRange): FindBucketsRequestBuilder {
     this.range = range;
     return this;
   }
@@ -105,7 +103,7 @@ export class FindBucketsRequestBuilder {
     return this;
   }
 
-  getRange(): TSTimeRange | undefined {
+  getRange(): TimeRange | undefined {
     return this.range;
   }
 

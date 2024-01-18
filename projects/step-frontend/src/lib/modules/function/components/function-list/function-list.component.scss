@@ -10,8 +10,9 @@
 
 @include core.table-common-cells;
 
-.create-keyword-button-group button {
-  margin-left: 1rem;
+.create-keyword-button-group {
+  display: flex;
+  gap: 1rem;
 }
 
 .import-keyword-button-group button {

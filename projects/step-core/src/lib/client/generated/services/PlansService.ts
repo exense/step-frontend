@@ -279,6 +279,41 @@ export class PlansService {
   }
 
   /**
+   * Get entity locking state
+   * @param id
+   * @returns boolean default response
+   * @throws ApiError
+   */
+  public isPlanLocked(id: string): Observable<boolean> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/plans/{id}/locked',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
+   * Lock this entity
+   * @param id
+   * @param requestBody
+   * @returns any default response
+   * @throws ApiError
+   */
+  public lockPlan(id: string, requestBody?: boolean): Observable<any> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/plans/{id}/locked',
+      path: {
+        id: id,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
    * Returns the plan referenced by the given CallPlan.
    * @param requestBody
    * @returns Plan default response

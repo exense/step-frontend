@@ -16,10 +16,12 @@ import { PlanEditorComponent } from './components/plan-editor/plan-editor.compon
 import { PlanSelectionComponent } from './components/plan-selection/plan-selection.component';
 import { PlansBulkOperationsRegisterService } from './injectables/plans-bulk-operations-register.service';
 import { planResolver } from './guards/plan.resolver';
+import { PlanActionsModule } from '../plan-actions/plan-actions.module';
+import { planDeactivate } from './guards/plan.deactivate';
 
 @NgModule({
   declarations: [PlanListComponent, PlanEditorComponent, PlanSelectionComponent],
-  imports: [StepCommonModule, ExecutionModule, PlanEditorModule],
+  imports: [StepCommonModule, ExecutionModule, PlanEditorModule, PlanActionsModule],
   exports: [PlanEditorModule, PlanListComponent, PlanEditorComponent, PlanSelectionComponent],
   providers: [
     {
@@ -56,6 +58,7 @@ export class PlanModule {
           resolve: {
             plan: planResolver,
           },
+          canDeactivate: [planDeactivate],
         },
       ],
     });

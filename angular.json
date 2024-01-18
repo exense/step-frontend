@@ -40,8 +40,8 @@
             "tsConfig": "projects/step-app/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "projects/step-app/src/favicon.png",
               "projects/step-app/src/assets",
+              "projects/step-app/src/favicon.png",
               {
                 "glob": "**/*",
                 "input": "dist/step-frontend/images",

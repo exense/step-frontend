@@ -1,8 +1,6 @@
 import { AfterViewInit, Component, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
-import { TSTimeRange } from '../chart/model/ts-time-range';
 import {
-  AugmentedSchedulerService,
   BucketAttributes,
   BucketResponse,
   Execution,
@@ -14,6 +12,7 @@ import {
   Plan,
   PlansService,
   SchedulerService,
+  TimeRange,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
@@ -25,9 +24,7 @@ import { TimeSeriesConfig } from '../time-series.config';
 import uPlot = require('uplot');
 import { FilterUtils } from '../util/filter-utils';
 import { TimeseriesColorsPool } from '../util/timeseries-colors-pool';
-import MouseListener = uPlot.Cursor.MouseListener;
 import { TimeSeriesChartComponent } from '../chart/time-series-chart.component';
-import { ScheduledTaskLogicService } from '../../scheduler/services/scheduled-task-logic.service';
 import { Observable } from 'rxjs';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
@@ -47,7 +44,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
 
   @Input() filters: Record<string, any> = {};
   @Input() settings!: MetricType;
-  @Input() range!: TSTimeRange;
+  @Input() range!: TimeRange;
   @Input() allowGroupingChange = true;
   @Input() allowMetricChange = true;
   @Input() colorsPool: TimeseriesColorsPool = new TimeseriesColorsPool();
@@ -102,9 +99,9 @@ export class MetricChartComponent implements OnInit, OnChanges {
     });
   }
 
-  changeSelection(range: TSTimeRange) {
-    range.from = Math.floor(range.from);
-    range.to = Math.floor(range.to);
+  changeSelection(range: TimeRange) {
+    range.from = Math.floor(range.from!);
+    range.to = Math.floor(range.to!);
     if (this.selectedRange.from !== range.from || this.selectedRange.to !== range.to) {
       this.selectedRange = range;
       this.fetchDataAndCreateChart(this.settings);
@@ -149,8 +146,8 @@ export class MetricChartComponent implements OnInit, OnChanges {
   private createChartSettings(response: TimeSeriesAPIResponse, groupDimensions: string[]): TSChartSettings {
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const series: TSChartSeries[] = response.matrix.map((series, i) => {
-      const labelItems = this.getSeriesLabels(response.matrixKeys[i], groupDimensions);
-      const seriesKey = TimeSeriesUtils.getSeriesKey(response.matrixKeys[i], groupDimensions);
+      const labelItems = this.getSeriesKeys(response.matrixKeys[i], groupDimensions);
+      const seriesKey = labelItems.join(' | ');
       const color = this.settings.renderingSettings?.seriesColors?.[seriesKey] || this.colorsPool.getColor(seriesKey);
       return {
         id: seriesKey,
@@ -339,7 +336,10 @@ export class MetricChartComponent implements OnInit, OnChanges {
     }
   }
 
-  private getSeriesLabels(attributes: BucketAttributes, groupDimensions: string[]): (string | undefined)[] {
+  private getSeriesKeys(attributes: BucketAttributes, groupDimensions: string[]): (string | undefined)[] {
+    if (Object.keys(attributes).length === 0) {
+      return [undefined];
+    }
     return groupDimensions.map((field) => attributes[field]);
   }
 }

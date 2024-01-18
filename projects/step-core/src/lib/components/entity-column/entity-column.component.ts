@@ -2,7 +2,7 @@ import { AfterViewInit, Component, inject, QueryList, ViewChildren } from '@angu
 import { MatColumnDef } from '@angular/material/table';
 import { SearchColDirective } from '../../modules/table/table.module';
 import { CustomComponent } from '../../modules/custom-registeries/custom-registries.module';
-import { EntityColumnContainer } from '../../shared';
+import { ColumnContainer } from '../../shared';
 
 @Component({
   selector: 'step-entity-column',
@@ -10,7 +10,7 @@ import { EntityColumnContainer } from '../../shared';
   styleUrls: ['./entity-column.component.scss'],
 })
 export class EntityColumnComponent implements CustomComponent, AfterViewInit {
-  private entityColumnContainer = inject(EntityColumnContainer);
+  private _entityColumnContainer = inject(ColumnContainer);
 
   context!: string;
 
@@ -18,6 +18,6 @@ export class EntityColumnComponent implements CustomComponent, AfterViewInit {
   @ViewChildren(SearchColDirective) searchColDef?: QueryList<SearchColDirective>;
 
   ngAfterViewInit(): void {
-    this.entityColumnContainer.initColumns(this.colDef, this.searchColDef);
+    this._entityColumnContainer.initColumns(this.colDef, this.searchColDef);
   }
 }
