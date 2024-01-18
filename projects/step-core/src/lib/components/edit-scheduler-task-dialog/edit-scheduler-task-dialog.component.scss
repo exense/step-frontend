@@ -5,6 +5,9 @@ div[step-modal-window-body],
 div[step-modal-window-body] > form,
 .advanced-body {
   @include core.common-dialog-content;
+  textarea {
+    font-family: var.$code-font;
+  }
 }
 
 mat-expansion-panel:last-child {
