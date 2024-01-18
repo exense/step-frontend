@@ -31,8 +31,8 @@
 
   <div class="filters">
     <mat-menu #addFilterMenu="matMenu">
-      <ng-container *ngFor="let option of filterOptions">
-        <button mat-menu-item *ngIf="!option.isHidden" (click)="addFilterItem(option)">
+      <ng-container *ngFor="let option of filterOptions | visibleFilterItems; trackBy: trackByAttributeFn">
+        <button mat-menu-item (click)="addFilterItem(option)">
           <span>{{ option.label }}</span>
         </button>
       </ng-container>
@@ -41,9 +41,9 @@
     </mat-menu>
 
     <mat-menu #typesMenu="matMenu">
-      <button mat-menu-item (click)="addCustomFilter('FREE_TEXT')">Text Filter</button>
-      <button mat-menu-item (click)="addCustomFilter('NUMERIC')">Numeric Filter</button>
-      <button mat-menu-item (click)="addCustomFilter('DATE')">Date Filter</button>
+      <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.FREE_TEXT)">Text Filter</button>
+      <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.NUMERIC)">Numeric Filter</button>
+      <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.DATE)">Date Filter</button>
     </mat-menu>
 
     <div
@@ -52,10 +52,11 @@
       [style.flexWrap]="compactView ? 'wrap' : 'nowrap'"
     >
       <ng-container *ngIf="!oqlModeActive">
-        <ng-container *ngFor="let item of _internalFilters; let i = index">
+        <ng-container
+          *ngFor="let item of _internalFilters | visibleFilterItems; let i = index; trackBy: trackByAttributeFn"
+        >
           <step-ts-filter-bar-item
             #appliedFilter
-            *ngIf="!item.isHidden"
             [item]="item"
             [compact]="compactView"
             [removable]="item.removable || editMode"

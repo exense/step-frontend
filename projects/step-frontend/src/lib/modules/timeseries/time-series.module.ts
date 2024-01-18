@@ -40,6 +40,7 @@ import { ChartDashletComponent } from './pages/dashboard/chart-dashlet/chart-das
 import { DashboardFilterBarComponent } from './performance-view/filter-bar/dashboard-filter-bar.component';
 import { DashboardListComponent } from './pages/dashboard-list/dashboard-list.component';
 import { ChartDashletSettingsComponent } from './pages/dashboard/chart-dashlet/settings/chart-dashlet-settings.component';
+import { VisibleFilterBarItemPipe } from './pipes/visible-filter-item.pipe';
 
 @NgModule({
   declarations: [
@@ -71,6 +72,7 @@ import { ChartDashletSettingsComponent } from './pages/dashboard/chart-dashlet/s
     DashboardFilterBarComponent,
     DashboardListComponent,
     ChartDashletSettingsComponent,
+    VisibleFilterBarItemPipe,
   ],
   exports: [
     ExecutionPerformanceComponent,

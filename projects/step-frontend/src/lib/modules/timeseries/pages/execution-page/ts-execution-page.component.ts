@@ -118,7 +118,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
       {
         label: 'Execution',
         attributeName: 'eId',
-        type: 'EXECUTION',
+        type: FilterBarItemType.EXECUTION,
         searchEntities: [],
         removable: true,
         exactMatch: true,
@@ -127,7 +127,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
       {
         label: 'Status',
         attributeName: 'rnStatus',
-        type: 'OPTIONS',
+        type: FilterBarItemType.OPTIONS,
         textValues: [{ value: 'PASSED' }, { value: 'FAILED' }, { value: 'TECHNICAL_ERROR' }, { value: 'INTERRUPTED' }],
         isLocked: true,
         searchEntities: [],
@@ -135,7 +135,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
       {
         label: 'Type',
         attributeName: 'type',
-        type: 'OPTIONS',
+        type: FilterBarItemType.OPTIONS,
         textValues: [{ value: 'keyword' }, { value: 'custom' }],
         isLocked: true,
         searchEntities: [],
@@ -143,7 +143,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
       {
         label: 'Name',
         attributeName: 'name',
-        type: 'FREE_TEXT',
+        type: FilterBarItemType.FREE_TEXT,
         isLocked: true,
         searchEntities: [],
       },

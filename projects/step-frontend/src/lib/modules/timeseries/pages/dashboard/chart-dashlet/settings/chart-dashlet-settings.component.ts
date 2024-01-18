@@ -32,7 +32,7 @@ export class ChartDashletSettingsComponent implements OnInit {
     this.item = JSON.parse(JSON.stringify(this._inputData.item));
     this.formGroup = this.createFormGroup(this.item);
     this.filterItems = this.item.chartSettings!.filters.map((item) => ({
-      type: item.type,
+      type: item.type as FilterBarItemType,
       attributeName: item.attribute,
       searchEntities: [],
       freeTextValues: item.textValues,
@@ -64,5 +64,9 @@ export class ChartDashletSettingsComponent implements OnInit {
       .map(FilterUtils.convertToApiFilterItem);
     this.item.chartSettings!.attributes = this.item.chartSettings!.attributes.filter((a) => a.name && a.displayName); // keep only non null attributes
     this._dialogRef.close({ ...this.item });
+  }
+
+  get FilterBarItemType() {
+    return FilterBarItemType;
   }
 }

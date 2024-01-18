@@ -22,4 +22,12 @@ export interface FilterBarItem {
   updateTimeSelectionOnFilterChange?: boolean;
 }
 
-export type FilterBarItemType = 'OPTIONS' | 'FREE_TEXT' | 'EXECUTION' | 'TASK' | 'PLAN' | 'NUMERIC' | 'DATE';
+export enum FilterBarItemType {
+  OPTIONS = 'OPTIONS',
+  FREE_TEXT = 'FREE_TEXT',
+  EXECUTION = 'EXECUTION',
+  TASK = 'TASK',
+  PLAN = 'PLAN',
+  NUMERIC = 'NUMERIC',
+  DATE = 'DATE',
+}

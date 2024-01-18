@@ -77,19 +77,19 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     }
     let isEntityFilter = false;
     switch (this.item.type) {
-      case 'EXECUTION':
-      case 'PLAN':
-      case 'TASK':
+      case FilterBarItemType.EXECUTION:
+      case FilterBarItemType.PLAN:
+      case FilterBarItemType.TASK:
         this.item.freeTextValues = this.item.searchEntities.map((e) => e.searchValue);
         isEntityFilter = true;
         break;
-      case 'OPTIONS':
+      case FilterBarItemType.OPTIONS:
         break;
-      case 'FREE_TEXT':
+      case FilterBarItemType.FREE_TEXT:
         this.item.freeTextValues = this.freeTextValues;
         break;
-      case 'NUMERIC':
-      case 'DATE':
+      case FilterBarItemType.NUMERIC:
+      case FilterBarItemType.DATE:
         this.item.min = this.minValue;
         this.item.max = this.maxValue;
         break;
@@ -119,16 +119,16 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
   private getFormattedValue(item: FilterBarItem): string | undefined {
     let formattedValue: string | undefined = '';
     switch (item.type) {
-      case 'EXECUTION':
-      case 'PLAN':
-      case 'TASK':
+      case FilterBarItemType.EXECUTION:
+      case FilterBarItemType.PLAN:
+      case FilterBarItemType.TASK:
         const count = this.item.searchEntities?.length;
         formattedValue = count ? (count > 1 ? `${count} items` : `1 item`) : '-';
         break;
-      case 'FREE_TEXT':
+      case FilterBarItemType.FREE_TEXT:
         formattedValue = this.item.freeTextValues?.join(', ');
         break;
-      case 'NUMERIC':
+      case FilterBarItemType.NUMERIC:
         if (item.min != undefined && item.max != undefined) {
           formattedValue = `${item.min} - ${item.max}`;
         } else if (item.min != undefined) {
@@ -142,7 +142,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
 
         break;
 
-      case 'DATE':
+      case FilterBarItemType.DATE:
         const min = item.min ? TimeSeriesUtils.formatInputDate(new Date(item.min), false) : '';
         const max = item.max ? TimeSeriesUtils.formatInputDate(new Date(item.max), false) : '';
 
@@ -156,7 +156,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
 
         break;
 
-      case 'OPTIONS':
+      case FilterBarItemType.OPTIONS:
         const selectedValues = item.textValues ? item.textValues.filter((v) => v.isSelected).map((v) => v.value) : [];
 
         formattedValue = selectedValues.join(', ');
@@ -177,5 +177,9 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
 
     // Clear the input value
     this.chipInputValue = '';
+  }
+
+  get FilterBarItemType() {
+    return FilterBarItemType;
   }
 }

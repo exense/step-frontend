@@ -132,7 +132,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
         );
     let groupingItems: FilterBarItem[] = groupDimensions.map((dimension) => ({
       attributeName: dimension,
-      type: 'FREE_TEXT',
+      type: FilterBarItemType.FREE_TEXT,
       freeTextValues: ['fake-group-dimension'],
       exactMatch: true,
       label: '',
@@ -322,5 +322,9 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.emitFilterChange$.complete();
+  }
+
+  get FilterBarItemType() {
+    return FilterBarItemType;
   }
 }

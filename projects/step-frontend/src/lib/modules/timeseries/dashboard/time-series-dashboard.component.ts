@@ -91,7 +91,9 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   ) {
     const contextualFilters = Object.keys(contextualParams).map((key) => {
       const fieldType = this.getFilterFieldType(key);
-      const isEntityFilter = ['PLAN', 'TASK', 'EXECUTION'].includes(fieldType);
+      const isEntityFilter = [FilterBarItemType.PLAN, FilterBarItemType.TASK, FilterBarItemType.EXECUTION].includes(
+        fieldType
+      );
       const searchValue = contextualParams[key];
       return {
         isHidden: !this.settings.showContextualFilters,
@@ -140,13 +142,13 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   private getFilterFieldType(attribute: string): FilterBarItemType {
     switch (attribute) {
       case 'eId':
-        return 'EXECUTION';
+        return FilterBarItemType.EXECUTION;
       case 'taskId':
-        return 'TASK';
+        return FilterBarItemType.TASK;
       case 'planId':
-        return 'PLAN';
+        return FilterBarItemType.PLAN;
       default:
-        return 'FREE_TEXT';
+        return FilterBarItemType.FREE_TEXT;
     }
   }
 

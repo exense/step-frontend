@@ -81,6 +81,10 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   private _matDialog = inject(MatDialog);
   private _snackbar = inject(MatSnackBar);
 
+  trackByAttributeFn = (index: number, item: FilterBarItem): string => {
+    return item.attributeName;
+  };
+
   getInternalFilters() {
     return this._internalFilters;
   }
@@ -141,7 +145,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
         );
     let groupingItems: FilterBarItem[] = groupDimensions.map((dimension) => ({
       attributeName: dimension,
-      type: 'FREE_TEXT',
+      type: FilterBarItemType.FREE_TEXT,
       freeTextValues: ['fake-group-dimension'],
       exactMatch: true,
       label: '',
@@ -331,5 +335,9 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.emitFilterChange$.complete();
+  }
+
+  get FilterBarItemType() {
+    return FilterBarItemType;
   }
 }

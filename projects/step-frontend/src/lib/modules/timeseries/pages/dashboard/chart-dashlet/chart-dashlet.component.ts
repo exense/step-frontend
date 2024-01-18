@@ -19,7 +19,7 @@ import { TimeSeriesConfig } from '../../../time-series.config';
 import { UPlotUtils } from '../../../uplot/uPlot.utils';
 import { TimeSeriesContext } from '../../../time-series-context';
 import { TimeseriesColorsPool } from '../../../util/timeseries-colors-pool';
-import { FilterBarItem } from '../../../performance-view/filter-bar/model/filter-bar-item';
+import { FilterBarItem, FilterBarItemType } from '../../../performance-view/filter-bar/model/filter-bar-item';
 import { TimeSeriesChartComponent } from '../../../chart/time-series-chart.component';
 import { Observable, of, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
@@ -106,7 +106,7 @@ export class ChartDashletComponent implements OnInit, Dashlet {
     let filterItems: FilterBarItem[] = [
       {
         attributeName: 'metricType',
-        type: 'FREE_TEXT',
+        type: FilterBarItemType.FREE_TEXT,
         exactMatch: true,
         freeTextValues: [`"${metricKey}"`],
         searchEntities: [],
@@ -194,7 +194,7 @@ export class ChartDashletComponent implements OnInit, Dashlet {
       groupDimensions: groupDimensions,
       oqlFilter: this.composeRequestFilter(settings.metricKey!),
       numberOfBuckets: 100,
-      percentiles: this.getChartPclToRequest(settings.primaryAxes!.aggregation!),
+      percentiles: this.getRequiredPercentiles(settings.primaryAxes!.aggregation!),
     };
     return this._timeSeriesService.getTimeSeries(request).pipe(
       tap((response) => {
@@ -244,7 +244,7 @@ export class ChartDashletComponent implements OnInit, Dashlet {
     }
   }
 
-  private getChartPclToRequest(aggregation: AggregationType): number[] {
+  private getRequiredPercentiles(aggregation: AggregationType): number[] {
     switch (aggregation) {
       case 'MEDIAN':
         return [50];

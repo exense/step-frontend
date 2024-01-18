@@ -1,4 +1,4 @@
-import { FilterBarItem } from '../performance-view/filter-bar/model/filter-bar-item';
+import { FilterBarItem, FilterBarItemType } from '../performance-view/filter-bar/model/filter-bar-item';
 import { TimeSeriesFilterItem } from '@exense/step-core';
 import { map } from 'rxjs';
 
@@ -64,7 +64,7 @@ export class FilterUtils {
         finalAttributeName = `"${finalAttributeName}"`;
       }
       switch (item.type) {
-        case 'OPTIONS':
+        case FilterBarItemType.OPTIONS:
           clause = item.textValues
             ?.filter((f) => f.isSelected)
             .map((f) => {
@@ -72,7 +72,7 @@ export class FilterUtils {
             })
             .join(' or ');
           break;
-        case 'FREE_TEXT':
+        case FilterBarItemType.FREE_TEXT:
           clause = item.freeTextValues
             ?.map((value) => {
               let regexMatch = `${finalAttributeName} ~ ".*${value}.*"`;
@@ -81,17 +81,17 @@ export class FilterUtils {
             })
             .join(' or ');
           break;
-        case 'EXECUTION':
-        case 'PLAN':
-        case 'TASK':
+        case FilterBarItemType.EXECUTION:
+        case FilterBarItemType.PLAN:
+        case FilterBarItemType.TASK:
           clause = item.searchEntities
             ?.map((value) => {
               return `${finalAttributeName} = ${value.searchValue}`; // we need exact match for indexes efficiency
             })
             .join(' or ');
           break;
-        case 'NUMERIC':
-        case 'DATE':
+        case FilterBarItemType.NUMERIC:
+        case FilterBarItemType.DATE:
           let clauses = [];
           if (item.min != null) {
             clauses.push(`${finalAttributeName} >= ${item.min}`);
@@ -113,15 +113,15 @@ export class FilterUtils {
   static convertToApiFilterItem(item: FilterBarItem): TimeSeriesFilterItem {
     let textValues: string[] = [];
     switch (item.type) {
-      case 'OPTIONS':
+      case FilterBarItemType.OPTIONS:
         textValues = item.textValues?.filter((i) => i.isSelected).map((item) => item.value) || [];
         break;
-      case 'FREE_TEXT':
+      case FilterBarItemType.FREE_TEXT:
         textValues = item.freeTextValues || [];
         break;
-      case 'EXECUTION':
-      case 'TASK':
-      case 'PLAN':
+      case FilterBarItemType.EXECUTION:
+      case FilterBarItemType.TASK:
+      case FilterBarItemType.PLAN:
         textValues = item.searchEntities.map((e) => e.searchValue).filter((x) => !!x) || [];
         break;
     }
@@ -144,14 +144,14 @@ export class FilterUtils {
       exactMatch: item.exactMatch!,
       min: item.min,
       max: item.max,
-      type: item.type!,
+      type: item.type! as FilterBarItemType,
       searchEntities: [],
       textValues: [],
       freeTextValues: [],
       removable: item.removable,
     };
     switch (item.type) {
-      case 'OPTIONS':
+      case FilterBarItemType.OPTIONS:
         const options = item.textOptions?.map((o) => ({ value: o, isSelected: false })) || [];
         item.textValues?.forEach((v) => {
           const foundOption = options.find((o) => o.value === v);
@@ -163,16 +163,16 @@ export class FilterUtils {
         });
         mappedItem.textValues = options;
         break;
-      case 'FREE_TEXT':
+      case FilterBarItemType.FREE_TEXT:
         mappedItem.freeTextValues = item.textValues;
         break;
-      case 'EXECUTION':
-      case 'TASK':
-      case 'PLAN':
+      case FilterBarItemType.EXECUTION:
+      case FilterBarItemType.TASK:
+      case FilterBarItemType.PLAN:
         mappedItem.searchEntities = item.textValues?.map((v) => ({ searchValue: v, entity: undefined })) || [];
         break;
-      case 'NUMERIC':
-      case 'DATE':
+      case FilterBarItemType.NUMERIC:
+      case FilterBarItemType.DATE:
         mappedItem.min = item.min;
         mappedItem.max = item.max;
         break;
