@@ -12,6 +12,7 @@
 @use 'step-datepicker';
 @use 'step-alert';
 @use 'step-tooltip';
+@use 'material-overrides' as mat-ov;
 @use '../core-variables' as var;
 
 @forward 'step-sidebar' show step-define-sidebar-config;
@@ -238,31 +239,7 @@ $light-primary-text: var.$white;
     margin-bottom: 15px;
   }
 
-  .mat-mdc-accordion .mat-mdc-expansion-panel:first-of-type {
-    border-top-right-radius: 0;
-    border-top-left-radius: 0;
-  }
-
-  .mat-mdc-accordion .mat-mdc-expansion-panel:last-of-type {
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
-  }
-
-  .mat-mdc-accordion > .mat-mdc-expansion-panel:first-child,
-  .mat-mdc-accordion > *:first-child .mat-mdc-expansion-panel {
-    border-top-right-radius: 8px;
-    border-top-left-radius: 8px;
-  }
-
-  .mat-mdc-accordion > .mat-mdc-expansion-panel:last-child,
-  .mat-mdc-accordion > *:last-child .mat-mdc-expansion-panel {
-    border-bottom-right-radius: 8px;
-    border-bottom-left-radius: 8px;
-  }
-
-  .mat-mdc-card {
-    border-radius: 8px;
-  }
+  @include mat-ov.material-overrides($primary-color);
 
   label {
     margin: 0;
@@ -273,71 +250,5 @@ $light-primary-text: var.$white;
     // a scrollbar sometimes appears due to an unknown reason, adding 1px padding-bottom seems to fix it
     // TODO: investigate why is it happening
     padding-bottom: 1px;
-  }
-
-  step-modal-window .mat-mdc-expansion-panel {
-    border: 1px solid var.$gray-300;
-    border-radius: 0.8rem;
-
-    .mat-mdc-expansion-panel-header {
-      padding: 0 1.6rem;
-      height: 4rem;
-
-      .mat-mdc-expansion-panel-header-title {
-        font-weight: 500;
-      }
-
-      &.mat-mdc-expanded {
-        border-bottom: 1px solid var.$gray-300;
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-      }
-    }
-
-    .mat-mdc-expansion-panel-content {
-      font-size: 1.4rem;
-
-      .mat-mdc-expansion-panel-body {
-        display: flex;
-        flex-direction: column;
-        gap: 0.8rem;
-        padding: 1.2rem 1.6rem;
-      }
-    }
-
-    &:not([class*='mat-elevation-z']) {
-      box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14),
-        0px 0px 0px 0px rgba(0, 0, 0, 0.12);
-    }
-  }
-
-  /**
-  This will create a nice scrollbar inside the form field when the chips content are very long.
-  Otherwise they will overflow the container.
-   */
-  .mat-mdc-chip-list-wrapper {
-    overflow-x: auto;
-  }
-
-  .mat-mdc-menu-panel.wide {
-    max-width: 380px;
-    width: 380px;
-  }
-
-  .mat-mdc-checkbox-label {
-    font-weight: 500;
-  }
-
-  .mat-mdc-checkbox-background,
-  .mat-mdc-checkbox-frame {
-    border-radius: 0.4rem;
-  }
-
-  .mat-mdc-paginator {
-    --mat-form-field-container-height: 2rem;
-    --mat-form-field-container-vertical-padding: 0.2rem;
-    --mat-form-field-filled-with-label-container-padding-top: 0.2rem;
-    --mat-form-field-filled-with-label-container-padding-bottom: 0.2rem;
-    --mat-paginator-container-text-size: 1.2rem;
   }
 }
