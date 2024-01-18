@@ -1,9 +1,8 @@
 import { KeyValue } from '@angular/common';
 import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { BucketAttributes, Execution, TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
+import { BucketAttributes, Execution, TimeRange, TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
 import { forkJoin, Observable, of, skip, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
-import { TSTimeRange } from '../chart/model/ts-time-range';
 import { TimeSeriesChartComponent } from '../chart/time-series-chart.component';
 import { KeywordSelection, TimeSeriesKeywordsContext } from '../pages/execution-page/time-series-keywords.context';
 import { FindBucketsRequest } from '../find-buckets-request';
@@ -67,8 +66,8 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   @Input() timeSelection?: PerformanceViewTimeSelectionComponent;
   @Input() includeThreadGroupChart = true;
 
-  @Output() onInitializationComplete: EventEmitter<void> = new EventEmitter<void>();
-  @Output() onUpdateComplete: EventEmitter<void> = new EventEmitter<void>();
+  @Output() initializationComplete: EventEmitter<void> = new EventEmitter<void>();
+  @Output() updateComplete: EventEmitter<void> = new EventEmitter<void>();
 
   chartsAreLoading = false;
   compareChartsAreLoading = false;
@@ -286,7 +285,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     );
   }
 
-  handleSelectionChange(selection: TSTimeRange): Observable<any> {
+  handleSelectionChange(selection: TimeRange): Observable<any> {
     if (TimeSeriesUtils.intervalsEqual(this.findRequestBuilder.getRange(), selection)) {
       // nothing happened
       return of(undefined);
@@ -298,7 +297,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     return this.refreshAllCharts();
   }
 
-  handleCompareSelectionChange(selection: TSTimeRange): Observable<any> {
+  handleCompareSelectionChange(selection: TimeRange): Observable<any> {
     if (TimeSeriesUtils.intervalsEqual(this.compareRequestBuilder.getRange(), selection)) {
       // nothing happened
       return of(undefined);
@@ -341,7 +340,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
 
     forkJoin(charts$)
       .pipe(takeUntil(this.terminator$))
-      .subscribe((allCompleted) => this.onInitializationComplete.emit());
+      .subscribe((allCompleted) => this.initializationComplete.emit());
   }
 
   createAllCompareCharts(context: TimeSeriesContext) {
@@ -622,7 +621,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
           ? this.selectedCompareResponseTimeMetric
           : this.selectedResponseTimeMetric;
         response.matrixKeys.map((key, i) => {
-          const seriesKey = TimeSeriesUtils.getSeriesKey(key, groupDimensions);
+          const seriesKey = this.getSeriesKey(key, groupDimensions);
           const responseTimeData: (number | null | undefined)[] = [];
           const color = this.keywordsService.getColor(seriesKey);
           const metadata: any[] = [];
@@ -812,6 +811,16 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     }
     this.selectedThroughputMetric = metric;
     this.switchThroughputMetric(this.throughputChart, this.byKeywordsChartResponseCache, metric);
+  }
+
+  getSeriesKey(attributes: BucketAttributes, groupDimensions: string[]): string {
+    if (Object.keys(attributes).length === 0) {
+      return '<empty>';
+    }
+    return groupDimensions
+      .map((field) => attributes[field])
+      .filter((f) => !!f)
+      .join(' | ');
   }
 
   private getContext(compareMode = false): TimeSeriesContext {

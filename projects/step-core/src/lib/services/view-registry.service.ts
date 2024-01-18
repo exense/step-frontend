@@ -86,7 +86,7 @@ export class ViewRegistryService implements OnDestroy {
 
     // Sub Menus Execute
     this.registerMenuEntry('Executions', 'executions', 'rocket', { weight: 10, parentId: 'execute-root' });
-    this.registerMenuEntry('Analytics', 'analytics', 'bar-chart-square-01', { weight: 20, parentId: 'execute-root' });
+    this.registerMenuEntry('Analytics', 'dashboards', 'bar-chart-square-01', { weight: 20, parentId: 'execute-root' });
     // Sub Menus Status
     this.registerMenuEntry('Current Operations', 'operations', 'airplay', { weight: 10, parentId: 'status-root' });
     this.registerMenuEntry('Agents', 'gridagents', 'agent', { weight: 20, parentId: 'status-root' });
