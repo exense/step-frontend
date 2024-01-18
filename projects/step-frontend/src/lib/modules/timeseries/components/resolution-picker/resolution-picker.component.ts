@@ -7,7 +7,7 @@ import { ResolutionPickerOption } from './resolution-picker-option';
   styleUrls: ['./resolution-picker.component.scss'],
 })
 export class ResolutionPickerComponent {
-  @Output() onResolutionChange = new EventEmitter<number>();
+  @Output() resolutionChange = new EventEmitter<number>();
   readonly UNITS: ResolutionPickerOption[] = [
     { label: 'Seconds', ms: 1_000 },
     { label: 'Minutes', ms: 60_000 },
@@ -23,9 +23,9 @@ export class ResolutionPickerComponent {
     const isValidNumber = this.inputValue && !isNaN(parseInt(this.inputValue)) && isFinite(this.inputValue as any);
     if (isValidNumber) {
       let numberValue = parseInt(this.inputValue!);
-      this.onResolutionChange.emit(this.selectedUnit.ms * numberValue);
+      this.resolutionChange.emit(this.selectedUnit.ms * numberValue);
     } else {
-      this.onResolutionChange.emit(0);
+      this.resolutionChange.emit(0);
     }
   }
 }
