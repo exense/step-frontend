@@ -15,6 +15,7 @@ import { map, Observable, of, pipe, switchMap, take, tap } from 'rxjs';
 import { Router } from '@angular/router';
 
 const TASK_ID = 'taskId';
+const EDITOR_URL = '/root/scheduler';
 
 @Injectable()
 export class ScheduledTaskLogicService implements SchedulerActionsService {
@@ -97,7 +98,7 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
     if (this._multipleProjectList.isEntityBelongsToCurrentProject(scheduledTask)) {
       return this.editTaskInternal(scheduledTask.id!);
     }
-    const url = this._router.url;
+    const url = EDITOR_URL;
     const editParams = { [TASK_ID]: scheduledTask.id! };
 
     return this._multipleProjectList
@@ -125,8 +126,11 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
   resolveEditLinkIfExists(): void {
     this._editorResolver
       .onEditEntity(TASK_ID)
-      .pipe(take(1))
-      .subscribe((taskId) => this.editTaskInternal(taskId));
+      .pipe(
+        take(1),
+        switchMap((taskId) => this.editTaskInternal(taskId))
+      )
+      .subscribe();
   }
 
   private editTaskInternal(id: string): Observable<boolean> {
