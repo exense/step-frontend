@@ -1,0 +1,9 @@
+step-time-raw-input {
+  mat-select {
+    min-width: 12rem;
+  }
+
+  step-form-field.with-tooltip .form-field-content input {
+    border-right-style: none;
+  }
+}

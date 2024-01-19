@@ -33,6 +33,7 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
   @Input() tooltip?: string;
   @Input() showRequiredMarker: boolean = false;
   @Input() errorsDictionary?: Record<string, string>;
+  @Output() blur = new EventEmitter<void>();
   protected separator?: string;
 
   @Input() allowedMeasures: TimeUnit[] = [
@@ -44,6 +45,9 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
   ];
 
   @Input() measuresDictionary?: TimeUnitDictionary;
+
+  protected internalDisplayMeasure?: TimeUnit;
+  @Input() defaultDisplayMeasure?: TimeUnit;
   @Input() displayMeasure?: TimeUnit;
   @Output() displayMeasureChange = new EventEmitter<TimeUnit | undefined>();
 
@@ -76,12 +80,17 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
   }
 
   writeValue(value: number): void {
+    if (!this.displayMeasure) {
+      this.internalDisplayMeasure = this.autoDetermineDisplayMeasure(value, this.modelMeasure);
+    }
     this.modelValue = value;
-    this.displayValue = this.calculateDisplayValue(this.modelValue, this.modelMeasure, this.displayMeasure);
+    this.displayValue = this.calculateDisplayValue(this.modelValue, this.modelMeasure, this.internalDisplayMeasure);
   }
 
   ngOnInit(): void {
-    this.fillMeasureItems(this.allowedMeasures, this.measuresDictionary);
+    if (!this.measureItems.length) {
+      this.fillMeasureItems(this.allowedMeasures, this.measuresDictionary);
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -105,48 +114,45 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
 
     const cModelMeasure = changes['modelMeasure'];
     if (cModelMeasure?.previousValue !== cModelMeasure?.currentValue || cModelMeasure?.firstChange) {
-      this.displayValue = this.calculateDisplayValue(this.modelValue, cModelMeasure!.currentValue, this.displayMeasure);
+      this.displayValue = this.calculateDisplayValue(
+        this.modelValue,
+        cModelMeasure!.currentValue,
+        this.internalDisplayMeasure
+      );
     }
 
     const cDisplayMeasure = changes['displayMeasure'];
     if (cDisplayMeasure?.previousValue !== cDisplayMeasure?.currentValue || cDisplayMeasure?.firstChange) {
-      this.displayValue = this.calculateDisplayValue(this.modelValue, this.modelMeasure, cDisplayMeasure!.currentValue);
+      const measure = cDisplayMeasure?.currentValue;
+      if (measure) {
+        this.internalDisplayMeasure = measure;
+        this.displayValue = this.calculateDisplayValue(this.modelValue, this.modelMeasure, this.internalDisplayMeasure);
+      }
     }
   }
 
   protected handleDisplayValueChange(value: number): void {
     this.displayValue = value;
-    this.modelValue = this.calculateModelValue(this.displayValue, this.modelMeasure, this.displayMeasure);
+    this.modelValue = this.calculateModelValue(this.displayValue, this.modelMeasure, this.internalDisplayMeasure);
     this.onChange?.(this.modelValue);
   }
 
   protected handleDisplayMeasureChange(value: TimeUnit): void {
-    this.displayMeasure = value;
-    this.displayMeasureChange.emit(value);
-    this.modelValue = this.calculateModelValue(this.displayValue, this.modelMeasure, this.displayMeasure);
+    if (this.displayMeasure) {
+      this.displayMeasure = value;
+      this.displayMeasureChange.emit(value);
+    }
+    this.internalDisplayMeasure = value;
+    this.modelValue = this.calculateModelValue(this.displayValue, this.modelMeasure, this.internalDisplayMeasure);
     this.onChange?.(this.modelValue);
   }
 
   protected handleBlur(): void {
     this.onTouch?.();
+    this.blur.emit();
   }
 
-  private fillMeasureItems(allowedMeasures?: TimeUnit[], measuresDictionary?: TimeUnitDictionary): void {
-    allowedMeasures = allowedMeasures ?? this.allowedMeasures ?? [];
-    measuresDictionary = measuresDictionary ?? this.measuresDictionary ?? {};
-
-    this.measureItems = allowedMeasures.map((key) => {
-      const value = measuresDictionary?.[key] ?? DEFAULT_TIME_LABELS_DICTIONARY[key]!;
-      return { key, value };
-    });
-
-    if (allowedMeasures.includes(this.displayMeasure!)) {
-      return;
-    }
-
-    this.displayMeasure = allowedMeasures[0];
-    this.displayMeasureChange.emit(this.displayMeasure);
-  }
+  protected abstract calculateBaseValue(modelValue: number, modelMeasure: TimeUnit): number;
 
   protected abstract calculateDisplayValue(
     modelValue: number,
@@ -159,4 +165,45 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
     modelMeasure: TimeUnit,
     displayMeasure?: TimeUnit
   ): number;
+
+  private fillMeasureItems(allowedMeasures?: TimeUnit[], measuresDictionary?: TimeUnitDictionary): void {
+    allowedMeasures = allowedMeasures ?? this.allowedMeasures ?? [];
+    measuresDictionary = measuresDictionary ?? this.measuresDictionary ?? {};
+
+    this.measureItems = allowedMeasures.map((key) => {
+      const value = measuresDictionary?.[key] ?? DEFAULT_TIME_LABELS_DICTIONARY[key]!;
+      return { key, value };
+    });
+
+    if (allowedMeasures.includes(this.internalDisplayMeasure!)) {
+      return;
+    }
+
+    if (this.displayMeasure) {
+      this.internalDisplayMeasure = allowedMeasures[0];
+      this.displayMeasure = allowedMeasures[0];
+      this.displayMeasureChange.emit(this.displayMeasure);
+    }
+  }
+
+  /*
+   * This calculates the best fitting timeUnit for a given number of milliseconds
+   *
+   * TODO: we should instead save the timeUnit in the BE and remove this
+   */
+  private autoDetermineDisplayMeasure(model: number, modelMeasure: TimeUnit): TimeUnit {
+    const baseValue = this.calculateBaseValue(model, modelMeasure);
+    const allowedMeasures = [...this.allowedMeasures].sort((a, b) => b - a);
+    if (!baseValue) {
+      return this.defaultDisplayMeasure ?? allowedMeasures[0];
+    }
+
+    for (const unit of allowedMeasures) {
+      if (baseValue % unit === 0 && baseValue / unit >= 1) {
+        return unit;
+      }
+    }
+
+    return this.defaultDisplayMeasure ?? allowedMeasures[0];
+  }
 }

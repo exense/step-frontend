@@ -8,15 +8,14 @@
     name="maxRetries"
   >
   </step-dynamic-textfield>
-  <step-dynamic-textfield
-    label="Grace period (ms)"
+  <step-dynamic-time-input
+    label="Grace period"
     tooltip="Duration to wait after a failed attempt"
-    [isNumber]="true"
     [(ngModel)]="context.artefact!.gracePeriod"
     [disabled]="context.readonly"
     name="gracePeriod"
   >
-  </step-dynamic-textfield>
+  </step-dynamic-time-input>
   <step-dynamic-textfield
     label="Timeout"
     tooltip="Maximum execution time for the whole execution retries"
