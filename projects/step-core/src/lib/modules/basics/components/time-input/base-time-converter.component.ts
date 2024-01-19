@@ -194,8 +194,9 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
   private autoDetermineDisplayMeasure(model: number, modelMeasure: TimeUnit): TimeUnit {
     const baseValue = this.calculateBaseValue(model, modelMeasure);
     const allowedMeasures = [...this.allowedMeasures].sort((a, b) => b - a);
+    const defaultValue = this.defaultDisplayMeasure ?? allowedMeasures[allowedMeasures.length - 1];
     if (!baseValue) {
-      return this.defaultDisplayMeasure ?? allowedMeasures[0];
+      return defaultValue;
     }
 
     for (const unit of allowedMeasures) {
@@ -204,6 +205,6 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
       }
     }
 
-    return this.defaultDisplayMeasure ?? allowedMeasures[0];
+    return defaultValue;
   }
 }
