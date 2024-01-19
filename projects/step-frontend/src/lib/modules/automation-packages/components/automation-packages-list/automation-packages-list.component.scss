@@ -1,0 +1,17 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
+:host {
+  @include core.table-container;
+}
+
+.header {
+  @include core.table-header;
+}
+
+.cell-actions {
+  width: 20rem;
+}
+
+.bulk-selection-cell {
+  width: 6rem;
+}
