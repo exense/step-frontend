@@ -126,8 +126,11 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
   resolveEditLinkIfExists(): void {
     this._editorResolver
       .onEditEntity(TASK_ID)
-      .pipe(take(1))
-      .subscribe((taskId) => this.editTaskInternal(taskId));
+      .pipe(
+        take(1),
+        switchMap((taskId) => this.editTaskInternal(taskId))
+      )
+      .subscribe();
   }
 
   private editTaskInternal(id: string): Observable<boolean> {

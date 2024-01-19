@@ -9,7 +9,7 @@ import {
 } from '@exense/step-core';
 import { map, Observable, of, switchMap, take } from 'rxjs';
 import { AutomationPackageUploadDialogComponent } from '../components/automation-package-upload-dialog/automation-package-upload-dialog.component';
-import { ENTITY_ID } from '../types/constants';
+import { ENTITY_ID, PATH } from '../types/constants';
 
 const AUTOMATION_PACKAGE_ID = 'automationPackageId';
 
@@ -49,7 +49,7 @@ export class AutomationPackagesDialogsService {
       return this.openAutomationPackageEditDialog(automationPackage);
     }
 
-    const url = `/root/${ENTITY_ID}/list`;
+    const url = `/root/${PATH}/list`;
     const editParams = { [AUTOMATION_PACKAGE_ID]: automationPackage.id! };
 
     return this._multipleProjects
