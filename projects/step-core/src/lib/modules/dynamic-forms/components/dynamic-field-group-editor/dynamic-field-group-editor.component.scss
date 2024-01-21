@@ -1,18 +1,22 @@
-:host {
-  > *:last-child {
-    padding-bottom: 3.2rem;
-  }
-}
-
-step-dynamic-field {
+step-dynamic-field,
+.other-content {
   margin-bottom: 1rem;
   display: block;
 }
 
 h5 {
-  margin-top: 16px;
+  margin-top: 1.6rem;
 }
 
 p.description {
   font-style: italic;
+}
+
+.divider {
+  height: 3.4rem;
+  display: flex;
+  align-items: center;
+  hr {
+    width: 100%;
+  }
 }

@@ -21,7 +21,7 @@ export class DynamicFieldEditorComponent implements OnChanges {
   @Output() valueChange = new EventEmitter<string | undefined>();
   @Output() blur = new EventEmitter<void>();
 
-  protected showJson: boolean = false;
+  @Input() showJson: boolean = false;
   protected internalValue?: DynamicFieldGroupValue;
 
   ngOnChanges(changes: SimpleChanges): void {
