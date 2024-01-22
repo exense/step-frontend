@@ -230,7 +230,7 @@ $border-radius: 8px;
         flex: auto;
       }
 
-      & > input:not(:first-child) {
+      & > step-suffix + input {
         border-left: none;
       }
 

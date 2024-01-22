@@ -20,6 +20,7 @@ import { RootComponent } from './components/root/root.component';
 import { StepCommonModule } from './modules/_common/step-common.module';
 import { MainViewComponent } from './components/main-view/main-view.component';
 import { APP_ROUTES, DEFAULT_ROUTE_INITIALIZER } from './app.routes';
+import { AutomationPackagesModule } from './modules/automation-packages/automation-packages.module';
 
 Settings.defaultLocale = 'en';
 
@@ -32,6 +33,7 @@ Settings.defaultLocale = 'en';
     AdminModule,
     PlanModule,
     FunctionModule,
+    AutomationPackagesModule,
     ExecutionModule,
     BrowserAnimationsModule,
     SchedulerModule,

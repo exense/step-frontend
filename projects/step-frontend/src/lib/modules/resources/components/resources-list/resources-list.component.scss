@@ -8,20 +8,8 @@
   margin-left: 5px;
 }
 
-.cell-actions {
-  width: 20rem;
-
-  button {
-    padding: 0;
-    min-width: 4rem;
-    min-height: 4rem;
-  }
-}
-
 .header {
   @include core.table-header;
 }
 
-.bulk-selection-cell {
-  width: 6rem;
-}
+@include core.table-common-cells;
