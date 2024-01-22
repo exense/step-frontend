@@ -23,7 +23,7 @@ export interface FilterBarItem {
 }
 
 export enum FilterBarItemType {
-  OPTIONS = 'OPTIONS',
+  OPTIONS = 'OPTIONS', // TODO merge with FREE_TEXT and change filter-bar-item component
   FREE_TEXT = 'FREE_TEXT',
   EXECUTION = 'EXECUTION',
   TASK = 'TASK',
