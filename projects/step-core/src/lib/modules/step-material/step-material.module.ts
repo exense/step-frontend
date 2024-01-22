@@ -40,6 +40,7 @@ import { MatBadgeModule } from '@angular/material/badge';
   imports: [CommonModule, StepIconsModule],
   declarations: [BtnGroupComponent, ThemeComponent],
   exports: [
+    MatBadgeModule,
     MatCheckboxModule,
     MatChipsModule,
     MatStepperModule,

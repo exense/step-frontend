@@ -4,7 +4,7 @@ import { Observable, Subject, takeUntil } from 'rxjs';
 
 @Directive({})
 export abstract class BaseFilterComponent<T, CV = T> implements OnInit, OnDestroy {
-  private _cd = inject(ChangeDetectorRef);
+  protected _cd = inject(ChangeDetectorRef);
   protected _formBuilder = inject(FormBuilder);
 
   readonly filterControl = this.createControl(this._formBuilder);

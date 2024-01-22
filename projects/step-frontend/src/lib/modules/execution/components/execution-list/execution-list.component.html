@@ -31,7 +31,7 @@
         [class.is-importing]="element.status === 'IMPORTING'"
         [node]="element.rootReportNode"
       ></step-report-node-icon>
-      <a (click)="navigateToExecution(element.id); (false)">{{ element?.description }}</a>
+      <a href="#" (click)="navigateToExecution(element.id); (false)">{{ element?.description }}</a>
     </td>
   </ng-container>
   <ng-container matColumnDef="startTime" stepSearchCol>
