@@ -1,7 +1,10 @@
 import { EntitySearchValue } from '../item/entity-search-value';
 
-export interface TsFilterItem {
-  label: string;
+/**
+ * Frontend entity for mapping a filter item. This entity stores more elements than the backend item.
+ */
+export interface FilterBarItem {
+  label?: string;
   attributeName: string;
   type: FilterBarItemType;
   isHidden?: boolean;
@@ -20,11 +23,11 @@ export interface TsFilterItem {
 }
 
 export enum FilterBarItemType {
-  OPTIONS = 'OPTIONS', // this is a text with suggestions
-  FREE_TEXT = 'FREE_TEXT', // used for custom attributes we don't know the values
-  EXECUTION = 'EXECUTION', // custom behavior with picker for executions
-  TASK = 'TASK', // custom behavior with picker for tasks
-  PLAN = 'PLAN', // custom behavior with picker for plans
+  OPTIONS = 'OPTIONS',
+  FREE_TEXT = 'FREE_TEXT',
+  EXECUTION = 'EXECUTION',
+  TASK = 'TASK',
+  PLAN = 'PLAN',
   NUMERIC = 'NUMERIC',
   DATE = 'DATE',
 }

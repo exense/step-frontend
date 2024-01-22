@@ -12,7 +12,7 @@ import { ChartSkeletonComponent } from './chart/skeleton/chart-skeleton.componen
 import { MeasurementsPickerComponent } from './performance-view/measurements/measurements-picker.component';
 import { PerformanceViewTimeSelectionComponent } from './performance-view/time-selection/performance-view-time-selection.component';
 import { MeasurementsFilterPipe } from './performance-view/measurements/measurements-filter.pipe';
-import { FilterBarComponent } from './performance-view/filter-bar/filter-bar.component';
+import { FilterBarComponent } from './performance-view/filter-bar/legacy/filter-bar.component';
 import { FilterBarItemComponent } from './performance-view/filter-bar/item/filter-bar-item.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { TimeSeriesDashboardComponent } from './dashboard/time-series-dashboard.component';
@@ -35,6 +35,12 @@ import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import { FilterBarPlanItemComponent } from './performance-view/filter-bar/item/plan/filter-bar-plan-item.component';
 import { MetricChartComponent } from './metric-chart/metric-chart.component';
 import { ResolutionPickerComponent } from './components/resolution-picker/resolution-picker.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { ChartDashletComponent } from './pages/dashboard/chart-dashlet/chart-dashlet.component';
+import { DashboardFilterBarComponent } from './performance-view/filter-bar/dashboard-filter-bar.component';
+import { DashboardListComponent } from './pages/dashboard-list/dashboard-list.component';
+import { ChartDashletSettingsComponent } from './pages/dashboard/chart-dashlet/settings/chart-dashlet-settings.component';
+import { VisibleFilterBarItemPipe } from './pipes/visible-filter-item.pipe';
 
 @NgModule({
   declarations: [
@@ -61,8 +67,20 @@ import { ResolutionPickerComponent } from './components/resolution-picker/resolu
     FilterBarTaskItemComponent,
     MetricChartComponent,
     ResolutionPickerComponent,
+    DashboardComponent,
+    ChartDashletComponent,
+    DashboardFilterBarComponent,
+    DashboardListComponent,
+    ChartDashletSettingsComponent,
+    VisibleFilterBarItemPipe,
   ],
-  exports: [ExecutionPerformanceComponent, AnalyticsPageComponent, MetricChartComponent],
+  exports: [
+    ExecutionPerformanceComponent,
+    DashboardComponent,
+    DashboardListComponent,
+    AnalyticsPageComponent,
+    MetricChartComponent,
+  ],
   providers: [{ provide: MatPaginatorIntl, useClass: NoTotalCountPaginator }],
   imports: [
     StepCoreModule,
@@ -84,6 +102,14 @@ export class TimeSeriesModule {
     _viewRegistry.registerRoute({
       path: 'analytics',
       component: AnalyticsPageComponent,
+    });
+    _viewRegistry.registerRoute({
+      path: 'dashboards',
+      component: DashboardListComponent,
+    });
+    _viewRegistry.registerRoute({
+      path: 'dashboards/:id',
+      component: DashboardComponent,
     });
   }
 }

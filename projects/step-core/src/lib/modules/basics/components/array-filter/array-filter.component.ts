@@ -4,6 +4,7 @@ import { KeyValue } from '@angular/common';
 import { BaseFilterComponent } from '../base-filter/base-filter.component';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { map, Observable } from 'rxjs';
+import { arrayToRegex, regexToArray } from '../../shared/string-array-regex';
 
 @Component({
   selector: 'step-array-filter',
@@ -50,36 +51,11 @@ export class ArrayFilterComponent<T = unknown> extends BaseFilterComponent<strin
   }
 
   protected override createControlChangeStream(control: FormControl<unknown>): Observable<string> {
-    return control.valueChanges.pipe(
-      map((value: unknown) => value as unknown[]),
-      map((values: unknown[]) => {
-        let value = '';
-        if (values.length === 1) {
-          value = `^${values[0]}$`;
-        } else if (values.length > 1) {
-          value = values.map((value) => `^${value}$`).join('|');
-          value = `(${value})`;
-        }
-        return value;
-      })
-    );
+    return control.valueChanges.pipe(map((value) => arrayToRegex(value as string[])));
   }
 
   protected override transformFilterValueToControlValue(value: string): unknown {
-    let result: string[];
-
-    if (value.startsWith('(') && value.endsWith(')') && value.includes('|')) {
-      result = value.substring(1, value.length - 1).split('|');
-    } else {
-      result = [value];
-    }
-
-    return result.map((value) => {
-      if (value.startsWith('^') && value.endsWith('$')) {
-        return value.substring(1, value.length - 1);
-      }
-      return value;
-    });
+    return regexToArray(value);
   }
 
   private setupDisplayItems(
