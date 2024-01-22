@@ -11,6 +11,7 @@ export class AugmentedPlansService extends PlansService {
     return this._dataSourceFactory.createDataSource(this.PLANS_TABLE_ID, {
       name: 'attributes.name',
       type: 'root._class',
+      automationPackage: 'customFields.automationPackageId',
       actions: '',
     });
   }

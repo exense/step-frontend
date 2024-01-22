@@ -79,7 +79,8 @@ export class ScreenConfigurationListComponent implements AfterViewInit {
       return;
     }
 
-    const screenLink = this._router.url;
+    const url = this._router.url;
+    const screenLink = url.includes('?') ? url.slice(0, url.indexOf('?')) : url;
     const screenEditParams = { [SCREEN_ID]: screen.id! };
     this._multipleProjectList
       .confirmEntityEditInASeparateProject(screen, { url: screenLink, search: screenEditParams }, 'screen input')

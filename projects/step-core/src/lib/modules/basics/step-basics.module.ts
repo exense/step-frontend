@@ -220,6 +220,7 @@ export * from './services/item-hover-receiver.service';
 export * from './services/item-hold-receiver.service';
 export * from './shared/bulk-operation-type.enum';
 export * from './shared/auth.guards';
+export * from './shared/string-array-regex';
 export * from './directives/popover-content.directive';
 export * from './directives/trigger-popover.directive';
 export * from './components/popover/popover.component';

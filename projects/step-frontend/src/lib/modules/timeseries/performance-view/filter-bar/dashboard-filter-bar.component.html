@@ -4,7 +4,7 @@
   </div>
   <div>
     <step-time-range-picker
-      (onSelectionChange)="handleTimeRangeChange($event)"
+      (selectionChange)="handleTimeRangeChange($event)"
       [selectOptions]="timeRangeOptions"
       [activeSelection]="activeTimeRange"
       [compact]="compactView"
@@ -25,14 +25,14 @@
     </mat-button-toggle-group>
     <step-timeseries-grouping
       [dimensions]="activeGrouping"
-      (onGroupingChange)="handleGroupingChange($event)"
+      (groupingChange)="handleGroupingChange($event)"
     ></step-timeseries-grouping>
   </div>
 
   <div class="filters">
     <mat-menu #addFilterMenu="matMenu">
-      <ng-container *ngFor="let option of filterOptions">
-        <button mat-menu-item *ngIf="!option.isHidden" (click)="addFilterItem(option)">
+      <ng-container *ngFor="let option of filterOptions | visibleFilterItems; trackBy: trackByAttributeFn">
+        <button mat-menu-item (click)="addFilterItem(option)">
           <span>{{ option.label }}</span>
         </button>
       </ng-container>
@@ -52,15 +52,16 @@
       [style.flexWrap]="compactView ? 'wrap' : 'nowrap'"
     >
       <ng-container *ngIf="!oqlModeActive">
-        <ng-container *ngFor="let item of activeFilters; let i = index">
+        <ng-container
+          *ngFor="let item of _internalFilters | visibleFilterItems; let i = index; trackBy: trackByAttributeFn"
+        >
           <step-ts-filter-bar-item
             #appliedFilter
-            *ngIf="!item.isHidden"
             [item]="item"
             [compact]="compactView"
-            [removable]="item.removable"
-            (onRemoveItem)="removeFilterItem(i)"
-            (onFilterChange)="handleFilterChange(i, $event)"
+            [removable]="item.removable || editMode"
+            (removeItem)="removeFilterItem(i)"
+            (filterChange)="handleFilterChange(i, $event)"
           >
           </step-ts-filter-bar-item>
         </ng-container>
@@ -102,12 +103,12 @@
 
     <div class="settings-section" *ngIf="!compactView">
       <mat-button-toggle-group [(ngModel)]="oqlModeActive" (change)="toggleOQLMode()">
-        <mat-button-toggle [value]="false"> Basic</mat-button-toggle>
-        <mat-button-toggle [value]="true"> OQL</mat-button-toggle>
+        <mat-button-toggle [value]="false">Basic</mat-button-toggle>
+        <mat-button-toggle [value]="true">OQL</mat-button-toggle>
       </mat-button-toggle-group>
       <step-timeseries-grouping
         [dimensions]="activeGrouping"
-        (onGroupingChange)="handleGroupingChange($event)"
+        (groupingChange)="handleGroupingChange($event)"
       ></step-timeseries-grouping>
     </div>
   </div>
