@@ -16,7 +16,6 @@ import { ResourceInputModule } from '../resource-input/resource-input.module';
 import { DynamicResourceComponent } from './components/dynamic-resource/dynamic-resource.component';
 import { AddFieldSchemaButtonComponent } from './components/add-field-schema-button/add-field-schema-button.component';
 import { AddSchemaFieldDialogComponent } from './components/add-schema-field-dialog/add-schema-field-dialog.component';
-import { ToggleDynamicFieldTooltipPipe } from './pipe/toggle-dynamic-field-tooltip.pipe';
 
 @NgModule({
   declarations: [
@@ -31,7 +30,6 @@ import { ToggleDynamicFieldTooltipPipe } from './pipe/toggle-dynamic-field-toolt
     DynamicResourceComponent,
     AddFieldSchemaButtonComponent,
     AddSchemaFieldDialogComponent,
-    ToggleDynamicFieldTooltipPipe,
   ],
   imports: [
     CommonModule,
@@ -69,4 +67,4 @@ export * from './components/add-field-button/add-field-button.component';
 export * from './components/add-field-schema-button/add-field-schema-button.component';
 export * from './shared/dynamic-fields-schema';
 export * from './shared/dynamic-field-group-value';
-export * from './injectables/schemas-factory.service';
+export * from './services/schemas-factory.service';

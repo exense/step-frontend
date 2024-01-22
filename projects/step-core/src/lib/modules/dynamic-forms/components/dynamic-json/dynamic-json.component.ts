@@ -1,4 +1,4 @@
-import { Component, HostBinding, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { DynamicValueString } from '../../../../client/step-client-module';
 import { NgControl } from '@angular/forms';
 import { DynamicFieldsSchema } from '../../shared/dynamic-fields-schema';
@@ -19,9 +19,6 @@ export class DynamicJsonComponent extends DynamicValueBaseComponent<DynamicValue
   @Input() addFieldBtnLabel?: string;
   @Input() jsonFieldsLabel?: string;
   @Input() schema?: DynamicFieldsSchema;
-
-  @HostBinding('class.buttons-visible')
-  protected showJson = false;
 
   constructor(_ngControl: NgControl) {
     super(_ngControl);
