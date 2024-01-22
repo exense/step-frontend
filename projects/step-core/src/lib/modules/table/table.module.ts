@@ -90,11 +90,6 @@ import { DateFilterComponent } from './components/date-filter/date-filter.compon
       provide: BulkOperationPerformStrategy,
       useExisting: BulkOperationPerformStrategyImplService,
     },
-    {
-      provide: LOGOUT_CLEANUP,
-      useExisting: TableStorageService,
-      multi: true,
-    },
   ],
 })
 export class TableModule {
