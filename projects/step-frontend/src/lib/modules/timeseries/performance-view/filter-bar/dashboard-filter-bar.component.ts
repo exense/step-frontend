@@ -18,10 +18,10 @@ import { TimeSeriesContext } from '../../time-series-context';
 import { FilterUtils } from '../../util/filter-utils';
 import { PerformanceViewTimeSelectionComponent } from '../time-selection/performance-view-time-selection.component';
 import { FilterBarItemComponent } from './item/filter-bar-item.component';
-import { FilterBarItemType, TsFilterItem } from './model/ts-filter-item';
+import { FilterBarItemType, FilterBarItem } from './model/filter-bar-item';
 import { TsFilteringSettings } from '../../model/ts-filtering-settings';
 import { TimeSeriesConfig } from '../../time-series.config';
-import { Execution, TimeSeriesService } from '@exense/step-core';
+import { TimeSeriesFilterItem, Execution, TimeRange, TimeSeriesService } from '@exense/step-core';
 import { OqlVerifyResponse } from '../../model/oql-verify-response';
 import { TsFilteringMode } from '../../model/ts-filtering-mode';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
@@ -29,8 +29,6 @@ import { OQLBuilder } from '../../util/oql-builder';
 import { MatDialog } from '@angular/material/dialog';
 import { DiscoverComponent } from '../../discover/discover.component';
 import { DiscoverDialogData } from '../../discover/discover-dialog-data';
-import { TSTimeRange } from '../../chart/model/ts-time-range';
-import { RangeSelectionType } from '../../time-selection/model/range-selection-type';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
@@ -42,33 +40,35 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
 };
 
 @Component({
-  selector: 'step-ts-filter-bar',
-  templateUrl: './filter-bar.component.html',
-  styleUrls: ['./filter-bar.component.scss'],
+  selector: 'step-ts-dashboard-filter-bar',
+  templateUrl: './dashboard-filter-bar.component.html',
+  styleUrls: ['./dashboard-filter-bar.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class FilterBarComponent implements OnInit, OnDestroy {
+export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
-  @Input() activeFilters: TsFilterItem[] = [];
-  @Input() activeGrouping = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS[0].attributes;
+  @Input() filters: TimeSeriesFilterItem[] = [];
+
+  _internalFilters: FilterBarItem[] = [];
   @Input() compactView = false;
 
   @Input() timeRangeOptions!: TimeRangePickerSelection[];
   @Input() activeTimeRange!: TimeRangePickerSelection;
+  @Input() editMode = false;
 
-  @Input() filterOptions: TsFilterItem[] = [];
+  @Input() filterOptions: FilterBarItem[] = [];
 
-  @Output() onTimeRangeChange = new EventEmitter<{ selection: TimeRangePickerSelection; triggerRefresh: boolean }>();
+  @Output() timeRangeChange = new EventEmitter<{ selection: TimeRangePickerSelection; triggerRefresh: boolean }>();
 
   @ViewChild(PerformanceViewTimeSelectionComponent) timeSelection?: PerformanceViewTimeSelectionComponent;
-
   @ViewChildren(FilterBarItemComponent) filterComponents?: QueryList<FilterBarItemComponent>;
   @ViewChildren('appliedFilter', { read: ElementRef }) appliedFilters?: QueryList<ElementRef<HTMLElement>>;
+
+  activeGrouping: string[] = [];
 
   private emitFilterChange$ = new Subject<void>();
 
   readonly EMIT_DEBOUNCE_TIME = 300;
-  readonly FilterBarItemType = FilterBarItemType;
 
   rawMeasurementsModeActive = false;
 
@@ -81,6 +81,14 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   private _matDialog = inject(MatDialog);
   private _snackbar = inject(MatSnackBar);
 
+  trackByAttributeFn = (index: number, item: FilterBarItem): string => {
+    return item.attributeName;
+  };
+
+  getInternalFilters() {
+    return this._internalFilters;
+  }
+
   ngOnInit(): void {
     if (!this.context) {
       throw new Error('Context input is mandatory');
@@ -88,6 +96,8 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     if (this.context.getGroupDimensions()) {
       this.activeGrouping = this.context.getGroupDimensions();
     }
+    this._internalFilters = this.context.getFilteringSettings().filterItems;
+
     this.emitFilterChange$.pipe(debounceTime(this.EMIT_DEBOUNCE_TIME)).subscribe(() => {
       this.composeAndVerifyFullOql(this.activeGrouping).subscribe((response) => {
         this.rawMeasurementsModeActive = response.hasUnknownFields;
@@ -98,8 +108,8 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     });
   }
 
-  getValidFilters(): TsFilterItem[] {
-    return this.activeFilters.filter(FilterUtils.filterItemIsValid);
+  getValidFilters(): FilterBarItem[] {
+    return this._internalFilters.filter(FilterUtils.filterItemIsValid);
   }
 
   handleOqlChange(event: any) {
@@ -118,7 +128,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   }
 
   handleTimeRangeChange(selection: TimeRangePickerSelection) {
-    this.onTimeRangeChange.next({ selection, triggerRefresh: true });
+    this.timeRangeChange.next({ selection, triggerRefresh: true });
   }
 
   disableOqlMode() {
@@ -130,10 +140,10 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     const filtersOql = this.oqlModeActive
       ? this.oqlValue
       : FilterUtils.filtersToOQL(
-          this.activeFilters.filter(FilterUtils.filterItemIsValid),
+          this._internalFilters.filter(FilterUtils.filterItemIsValid),
           TimeSeriesConfig.ATTRIBUTES_PREFIX
         );
-    let groupingItems: TsFilterItem[] = groupDimensions.map((dimension) => ({
+    let groupingItems: FilterBarItem[] = groupDimensions.map((dimension) => ({
       attributeName: dimension,
       type: FilterBarItemType.FREE_TEXT,
       freeTextValues: ['fake-group-dimension'],
@@ -190,13 +200,13 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleFilterChange(index: number, item: TsFilterItem) {
-    this.activeFilters[index] = item;
+  handleFilterChange(index: number, item: FilterBarItem) {
+    this._internalFilters[index] = item;
     if (!item.attributeName) {
       this.removeFilterItem(index);
       return;
     }
-    const existingItems = this.activeFilters.filter((i) => i.attributeName === item.attributeName);
+    const existingItems = this._internalFilters.filter((i) => i.attributeName === item.attributeName);
     if (existingItems.length > 1) {
       // the filter is duplicated
       this._snackbar.open('Filter not applied', 'dismiss');
@@ -206,14 +216,14 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     if (item.updateTimeSelectionOnFilterChange && item.searchEntities.length > 0) {
       // calculate the new time range. if all the entities were deleted, keep the last range.
       const newRange = this.getExecutionsTimeRange(item);
-      this.activeTimeRange = { type: RangeSelectionType.ABSOLUTE, absoluteSelection: newRange };
-      this.onTimeRangeChange.next({ selection: this.activeTimeRange, triggerRefresh: false });
+      this.activeTimeRange = { type: 'ABSOLUTE', absoluteSelection: newRange };
+      this.timeRangeChange.next({ selection: this.activeTimeRange, triggerRefresh: false });
     }
 
     this.emitFilterChange$.next();
   }
 
-  private getExecutionsTimeRange(item: TsFilterItem): TSTimeRange {
+  private getExecutionsTimeRange(item: FilterBarItem): TimeRange {
     let allExecutionsAreKnown = true;
     let min = Number.MAX_VALUE;
     let max = 0;
@@ -233,20 +243,20 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     if (!allExecutionsAreKnown) {
       // don't reduce the interval because we have execution with no info
       let fullTimeRange = this.context.getFullTimeRange();
-      min = Math.min(fullTimeRange.from, min);
-      max = Math.max(fullTimeRange.to, max);
+      min = Math.min(fullTimeRange.from!, min);
+      max = Math.max(fullTimeRange.to!, max);
     }
     return { from: min, to: max };
   }
 
-  addFilterItem(item: TsFilterItem) {
-    const filterIndex = this.activeFilters.findIndex((i) => i.attributeName === item.attributeName);
+  addFilterItem(item: FilterBarItem) {
+    const filterIndex = this._internalFilters.findIndex((i) => i.attributeName === item.attributeName);
 
     if (filterIndex !== -1) {
       const index =
-        filterIndex < this.activeFilters.length - this.activeFilters.length
+        filterIndex < this._internalFilters.length - this._internalFilters.length
           ? filterIndex
-          : filterIndex + this.activeFilters.length;
+          : filterIndex + this._internalFilters.length;
 
       this.filterComponents!.toArray()[index].menuTrigger!.openMenu();
     } else {
@@ -265,22 +275,22 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   }
 
   removeFilterItem(index: number) {
-    const itemToDelete = this.activeFilters[index];
+    const itemToDelete = this._internalFilters[index];
 
-    this.activeFilters.splice(index, 1);
+    this._internalFilters.splice(index, 1);
 
     if (FilterUtils.filterItemIsValid(itemToDelete)) {
       this.emitFilterChange$.next();
     }
   }
 
-  private addFilter(item: TsFilterItem): void {
-    this.activeFilters.push(item);
+  private addFilter(item: FilterBarItem): void {
+    this._internalFilters.push(item);
     this._changeDetectorRef.detectChanges();
     this.filterComponents!.last.openMenu();
     this.filterComponents!.last.menuTrigger!.menuClosed.pipe(take(1)).subscribe(() => {
       if (!item.attributeName) {
-        this.activeFilters.pop();
+        this._internalFilters.pop();
       }
     });
   }
@@ -318,12 +328,16 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     const selectedTimeRange = this.context.getSelectedTimeRange();
     return new OQLBuilder()
       .open('and')
-      .append(`(begin < ${Math.trunc(selectedTimeRange.to)} and begin > ${Math.trunc(selectedTimeRange.from)})`)
+      .append(`(begin < ${Math.trunc(selectedTimeRange.to!)} and begin > ${Math.trunc(selectedTimeRange.from!)})`)
       .append(filtersOql)
       .build();
   }
 
   ngOnDestroy(): void {
     this.emitFilterChange$.complete();
+  }
+
+  get FilterBarItemType() {
+    return FilterBarItemType;
   }
 }

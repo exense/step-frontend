@@ -86,6 +86,7 @@ import { ConfirmationDialogComponent } from './components/confirmation-dialog/co
 import { MessagesListDialogComponent } from './components/messages-list-dialog/messages-list-dialog.component';
 import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
 import { ReportNodeIconComponent } from './components/report-node-icon/report-node-icon.component';
+import { AutomationPackageCommonModule } from './modules/automation-package-common/automation-package-common.module';
 import { LockColumnContainerComponent } from './components/lock-column-container/lock-column-container.component';
 import { LockColumnComponent } from './components/lock-column/lock-column.component';
 import { DatePickerModule } from './modules/date-picker/date-picker.module';
@@ -175,6 +176,7 @@ import { DatePickerModule } from './modules/date-picker/date-picker.module';
     JsonViewerModule,
     ResourceInputModule,
     KeywordsCommonModule,
+    AutomationPackageCommonModule,
     WizardModule,
     CronModule,
     DatePickerModule,
@@ -246,6 +248,7 @@ import { DatePickerModule } from './modules/date-picker/date-picker.module';
     ResourceInputModule,
     ProjectNamePipe,
     KeywordsCommonModule,
+    AutomationPackageCommonModule,
     MyAccountButtonComponent,
     SelectTaskComponent,
     ResourceInputWrapperComponent,
@@ -368,6 +371,7 @@ export * from './modules/json-viewer/json-viewer.module';
 export * from './modules/resource-input/resource-input.module';
 export * from './modules/keywords-common/keywords-common.module';
 export * from './modules/wizard/wizards.module';
+export * from './modules/automation-package-common/automation-package-common.module';
 export * from './modules/cron/cron.module';
 export * from './modules/date-picker/date-picker.module';
 export * from './pipes/dashboard-link.pipe';

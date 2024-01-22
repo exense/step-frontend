@@ -17,7 +17,7 @@
       </button>
     </div>
     <mat-menu #menu="matMenu">
-      <step-ts-resolution-picker (onResolutionChange)="handleResolutionChange($event)"></step-ts-resolution-picker>
+      <step-ts-resolution-picker (resolutionChange)="handleResolutionChange($event)"></step-ts-resolution-picker>
       <button mat-menu-item (click)="toggleCompareMode()">
         <step-icon name="bar-chart-2" [class.active]="compareModeEnabled"></step-icon>
         {{ compareModeEnabled ? 'Disable Compare Mode' : 'Enable Compare Mode' }}
@@ -36,21 +36,6 @@
     #dashboard
     *ngIf="dashboardSettings"
     [settings]="dashboardSettings"
-    (onTimeRangeChange)="handleDashboardTimeRangeChange($event)"
+    (timeRangeChange)="handleDashboardTimeRangeChange($event)"
   ></step-timeseries-dashboard>
-
-  <div>
-    <div id="add-custom-chart" *ngIf="metricTypes" [matMenuTriggerFor]="menu">
-      <span>+ Custom Metric Chart</span>
-      <mat-menu #menu="matMenu">
-        <button *ngFor="let metric of metricTypes" mat-menu-item (click)="addCustomChart(metric)">
-          {{ metric.displayName }}
-        </button>
-      </mat-menu>
-    </div>
-  </div>
-
-  <div *ngFor="let settings of customChartsMetrics" class="metric-type-container">
-    <step-metric-chart [settings]="settings" [range]="activeTimeRange"></step-metric-chart>
-  </div>
 </div>

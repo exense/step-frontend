@@ -1,4 +1,4 @@
 export interface RelativeTimeSelection {
-  label: string;
+  label?: string;
   timeInMs: number;
 }

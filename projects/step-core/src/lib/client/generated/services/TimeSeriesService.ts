@@ -43,7 +43,7 @@ export class TimeSeriesService {
    * @returns TimeSeriesAPIResponse default response
    * @throws ApiError
    */
-  public getMeasurements(requestBody?: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
+  public getMeasurements(requestBody: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/time-series/measurements',
@@ -99,7 +99,7 @@ export class TimeSeriesService {
    * @returns TimeSeriesAPIResponse default response
    * @throws ApiError
    */
-  public getTimeSeries(requestBody?: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
+  public getTimeSeries(requestBody: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/time-series',
@@ -114,7 +114,7 @@ export class TimeSeriesService {
    * @returns AsyncTaskStatusObject default response
    * @throws ApiError
    */
-  public rebuildTimeSeries(requestBody?: TimeSeriesRebuildRequest): Observable<AsyncTaskStatusObject> {
+  public rebuildTimeSeries(requestBody: TimeSeriesRebuildRequest): Observable<AsyncTaskStatusObject> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/time-series/rebuild',

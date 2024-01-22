@@ -6,9 +6,9 @@
     [class.compact-btn]="compact"
   >
     <ng-container *ngIf="!compact">
-      {{ activeSelection.type === RangeSelectionType.FULL ? 'Full time range' : '' }}
-      {{ activeSelection.type === RangeSelectionType.RELATIVE ? activeSelection.relativeSelection!.label : '' }}
-      {{ activeSelection.type === RangeSelectionType.ABSOLUTE ? 'Custom Selection' : '' }}
+      {{ activeSelection.type === 'FULL' ? 'Full time range' : '' }}
+      {{ activeSelection.type === 'RELATIVE' ? activeSelection.relativeSelection!.label : '' }}
+      {{ activeSelection.type === 'ABSOLUTE' ? 'Custom Selection' : '' }}
     </ng-container>
     <step-icon name="clock" *ngIf="compact"></step-icon>
   </button>
@@ -50,7 +50,7 @@
             [class.active]="rangeOption.relativeSelection?.timeInMs === activeSelection.relativeSelection?.timeInMs"
           >
             {{ rangeOption.relativeSelection?.label }}
-            {{ rangeOption.type === RangeSelectionType.FULL ? 'Full Range' : '' }}
+            {{ rangeOption.type === 'FULL' ? 'Full Range' : '' }}
           </div>
         </div>
       </div>
