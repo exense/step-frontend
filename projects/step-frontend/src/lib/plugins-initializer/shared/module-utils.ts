@@ -19,9 +19,9 @@ export const compileModule = (name: string, module: Type<any>, injector: Injecto
   }
 };
 
-export const registerCompiledModules = (modules: CompiledModule[]): Promise<void> | void => {
+export const registerCompiledModules = (modules: CompiledModule[]): Promise<void> => {
   if (!modules.length) {
-    return;
+    return Promise.resolve();
   }
 
   const modulesWithInit = modules
@@ -31,4 +31,5 @@ export const registerCompiledModules = (modules: CompiledModule[]): Promise<void
   if (modulesWithInit.length > 0) {
     return Promise.all(modulesWithInit.map((m) => m.pluginOnInit())).then();
   }
+  return Promise.resolve();
 };

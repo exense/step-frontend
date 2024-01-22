@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Component,
   ElementRef,
   EventEmitter,
@@ -9,7 +8,6 @@ import {
   OnDestroy,
   OnInit,
   Output,
-  Self,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -21,27 +19,29 @@ import MouseListener = uPlot.Cursor.MouseListener;
 
 //@ts-ignore
 import uPlot = require('uplot');
-import { TSTimeRange } from './model/ts-time-range';
-import { Execution, ExecutionsService } from '@exense/step-core';
+import { Execution, ExecutionsService, TimeRange } from '@exense/step-core';
 import { Observable } from 'rxjs';
-import { TimeSeriesUtils } from '../time-series-utils';
+
+const DEFAULT_STROKE_COLOR = '#cccccc';
 
 @Component({
   selector: 'step-timeseries-chart',
   templateUrl: './time-series-chart.component.html',
   styleUrls: ['./time-series-chart.component.scss'],
 })
-export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
-  private readonly HEADER_WITH_FOOTER_SIZE = 48;
+export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy {
+  private readonly HEADER_HEIGHT = 27;
+  private readonly LEGEND_HEIGHT = 24;
   chartMetadata: Record<string, any>[] = [[]]; // 1 on 1 to chart 'data'. first item is time axes
-  @ViewChild('chart') private chartElement!: ElementRef;
+  @ViewChild('chart', { static: true }) private chartElement!: ElementRef;
 
   @Input() title!: string;
   @Input() settings!: TSChartSettings;
   @Input() syncKey: string | undefined; // all the charts with the same syncKey in the app will be synced
+  @Input() height: number = 300;
 
   @Output() zoomReset = new EventEmitter<void>();
-  @Output() zoomChange = new EventEmitter<TSTimeRange>();
+  @Output() zoomChange = new EventEmitter<TimeRange>(); // warning! this event will be emitted by all charts synchronized.
   @Output() lockStateChange = new EventEmitter<boolean>();
 
   uplot!: uPlot;
@@ -61,11 +61,26 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   getSize = () => {
     return {
       width: this._element.nativeElement.parentElement.offsetWidth - 32,
-      height: this._element.nativeElement.parentElement.offsetHeight - this.HEADER_WITH_FOOTER_SIZE,
+      height: this.height - this.HEADER_HEIGHT - this.LEGEND_HEIGHT,
     };
   };
 
-  constructor() {}
+  ngOnInit(): void {
+    if (!this.settings) {
+      throw new Error('Missing settings input');
+    }
+    if (this.syncKey) {
+      uPlot.sync(this.syncKey);
+    }
+    this.createChart(this.settings);
+  }
+
+  setTitle(title: string): void {
+    let titles = this.chartElement.nativeElement.getElementsByClassName('u-title');
+    if (titles.length) {
+      titles[0].innerHTML = title;
+    }
+  }
 
   // used by the tooltip
   getExecutionDetails(executionIds: string[]): Observable<Execution[]> {
@@ -82,23 +97,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       overlay.style.backdropFilter = 'blur(2px)';
     } else {
       overlay.style.removeProperty('backdrop-filter');
-    }
-  }
-
-  ngOnInit(): void {
-    if (this.syncKey) {
-      uPlot.sync(this.syncKey);
-    }
-  }
-
-  ngAfterViewInit(): void {
-    this.createChart(this.settings);
-  }
-
-  setTitle(title: string): void {
-    let titles = this.chartElement.nativeElement.getElementsByClassName('u-title');
-    if (titles.length) {
-      titles[0].innerHTML = title;
     }
   }
 
@@ -137,19 +135,17 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
       this.legendSettings.zAxisLabel = this.settings.tooltipOptions.zAxisLabel || 'Total';
     }
     settings.series.forEach((series, i) => {
-      if (!series.id) {
-        throw new Error('Every series must have an id');
+      if (series.id) {
+        this.seriesIndexesByIds[series.id] = i + 1; // because the first series is the time
       }
-      this.seriesIndexesByIds[series.id] = i + 1; // because the first series is the time
-
-      series.label = TimeSeriesUtils.mergeSeriesLabels(series.labelItems);
+      series.label = this.mergeLabelItems(series.labelItems);
       this.chartMetadata.push(series.metadata || []);
       if (series.stroke) {
         // aggregate series don't have stroke (e.g total)
         this.legendSettings.items.push({
           seriesId: series.id,
-          color: (series.stroke as string) || '#cccccc',
-          label: series.label,
+          color: (series.stroke as string) || DEFAULT_STROKE_COLOR,
+          label: this.mergeLabelItems(series.labelItems),
           isVisible: series.show ?? true,
         });
       }
@@ -308,19 +304,25 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit, OnChange
   }
 
   setLabelItem(seriesId: string, labelIndex: number, label?: string): void {
-    console.log('foundIndexes', this.seriesIndexesByIds);
     const index = this.seriesIndexesByIds[seriesId];
     if (index === undefined || !label) return;
     const series = this.uplot.series[index];
     // @ts-ignore
     const labelItems = series.labelItems;
     labelItems[labelIndex] = label;
-    const finalLabel = TimeSeriesUtils.mergeSeriesLabels(labelItems);
+    const finalLabel = this.mergeLabelItems(labelItems);
     series.label = finalLabel;
     const legendItem = this.legendSettings.items.find((i) => i.seriesId === seriesId);
     if (legendItem) {
       legendItem.label = finalLabel;
     }
+  }
+
+  private mergeLabelItems(items: (string | undefined)[]): string {
+    if (items.length === 0) {
+      return 'Value';
+    }
+    return items.map((i) => i ?? '<Empty>').join(' | ');
   }
 
   setSeriesLabel(id: string, label: string): void {

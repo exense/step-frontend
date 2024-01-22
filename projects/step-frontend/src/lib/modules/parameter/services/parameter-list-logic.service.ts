@@ -66,10 +66,6 @@ export class ParameterListLogicService {
 
   deleteParameter(id: string, label: string): void {
     this._parameterDialogs.deleteParameter(id, label).subscribe((result: boolean) => {
-      if (!result) {
-        return;
-      }
-
       this.dataSource.reload();
     });
   }

@@ -121,31 +121,6 @@ export const toRecord = <T>(keyValuePairs: KeyValue<string, T>[]): Record<string
     {}
   );
 
-export const getFlatControls = (
-  abstractControl: AbstractControl,
-  predicate?: (item: AbstractControl) => boolean
-): AbstractControl[] => {
-  return breadthFirstSearch<AbstractControl>({
-    items: [abstractControl],
-    children: (control) => {
-      if (control instanceof FormGroup) {
-        return Object.values(control.controls);
-      }
-
-      if (control instanceof FormArray) {
-        return control.controls;
-      }
-
-      if (control instanceof FormControl) {
-        return [control];
-      }
-
-      return [];
-    },
-    predicate,
-  });
-};
-
 export const routesPrioritySortPredicate = (routeA: Route, routeB: Route) => {
   const weightA = routeA.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
   const weightB = routeB.data?.[SUB_ROUTE_DATA]?.weight ?? 1;

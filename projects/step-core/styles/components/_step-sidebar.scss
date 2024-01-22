@@ -420,8 +420,11 @@ $menu-sub-item-height: 3.2rem;
 
     .version {
       max-height: 16px;
+      max-width: 100%;
       overflow: hidden;
       cursor: pointer;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
 
     .sidebar:not(.sidebar-closed) {

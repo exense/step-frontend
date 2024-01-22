@@ -97,7 +97,7 @@ export class ExecutionsService {
   }
 
   /**
-   * Stops the execution with the given execution id.
+   * Force stop the execution with the given execution id.
    * @param id
    * @returns any default response
    * @throws ApiError

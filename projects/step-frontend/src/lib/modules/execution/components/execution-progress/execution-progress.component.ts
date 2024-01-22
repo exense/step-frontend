@@ -88,6 +88,7 @@ export class ExecutionProgressComponent
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
   private isFirstUpdate = true;
+  private isTreeInitialized = false;
 
   readonly trackByItemInfo: TrackByFunction<ItemInfo> = (index, item) => item.type;
 
@@ -142,7 +143,6 @@ export class ExecutionProgressComponent
     private _executionTreeState: TreeStateService<ReportNode, ReportTreeNode>,
     public _executionPanels: SingleExecutionPanelsService,
     public _testCasesSelection: SelectionCollector<string, ReportNode>,
-    private _treeState: TreeStateService<ReportNode, ReportTreeNode>,
     private _treeUtils: ReportTreeNodeUtilsService
   ) {}
 
@@ -203,13 +203,14 @@ export class ExecutionProgressComponent
     this._executionPanels.initialize(this.executionId);
     this.activeExecution.execution$.pipe(takeUntil(this._terminator$)).subscribe((execution) => {
       this.execution = execution;
-      this.showAutoRefreshButton = this.execution.status !== 'ENDED';
+      const isExecutionCompleted = execution.status === 'ENDED';
+      this.showAutoRefreshButton = !isExecutionCompleted;
       this.handleExecutionRefresh({ updateSelection: this.isFirstUpdate ? UpdateSelection.ALL : UpdateSelection.NONE });
       this.refreshOther();
       if (this.isFirstUpdate) {
         this.loadExecutionTree();
       } else {
-        this.refreshExecutionTree();
+        this.refreshExecutionTree(isExecutionCompleted);
       }
       this.refreshTestCaseTable({
         updateSelection: this.isFirstUpdate ? UpdateSelection.ALL : UpdateSelection.ONLY_NEW,
@@ -307,11 +308,12 @@ export class ExecutionProgressComponent
     this._treeUtils.loadNodes(this.executionId).subscribe((nodes) => {
       if (nodes[0]) {
         this._executionTreeState.init(nodes[0], { expandAllByDefault: false });
+        this.isTreeInitialized = true;
       }
     });
   }
 
-  private refreshExecutionTree(): void {
+  private refreshExecutionTree(isForceRefresh?: boolean): void {
     if (!this.executionId) {
       return;
     }
@@ -321,7 +323,7 @@ export class ExecutionProgressComponent
       .pipe(
         map((nodes) => nodes[0]),
         switchMap((rootNode) => {
-          if (!rootNode) {
+          if (!rootNode || !this.isTreeInitialized || isForceRefresh) {
             return of(rootNode);
           }
           return this._treeUtils.restoreTree(rootNode, expandedNodIds);
@@ -330,6 +332,7 @@ export class ExecutionProgressComponent
       .subscribe((rootNode) => {
         if (rootNode) {
           this._executionTreeState.init(rootNode, { expandAllByDefault: false });
+          this.isTreeInitialized = true;
         }
       });
   }

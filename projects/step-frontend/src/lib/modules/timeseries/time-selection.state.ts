@@ -1,24 +1,23 @@
 import { Observable, Subject } from 'rxjs';
 import { ExecutionTimeSelection } from './time-selection/model/execution-time-selection';
-import { RangeSelectionType } from './time-selection/model/range-selection-type';
-import { TSTimeRange } from './chart/model/ts-time-range';
+import { TimeRange } from '@exense/step-core';
 
 export class TimeSelectionState {
   private readonly zoomReset$ = new Subject<void>();
   private readonly activeSelectionChange$ = new Subject<ExecutionTimeSelection>();
 
-  activeTimeSelection: ExecutionTimeSelection = { type: RangeSelectionType.FULL };
+  activeTimeSelection: ExecutionTimeSelection = { type: 'FULL' };
 
-  resetZoom(range: TSTimeRange) {
+  resetZoom(range: TimeRange) {
     if (
-      this.activeTimeSelection.type === RangeSelectionType.FULL &&
+      this.activeTimeSelection.type === 'FULL' &&
       this.activeTimeSelection.absoluteSelection?.from === range.from &&
       this.activeTimeSelection.absoluteSelection?.to === range.to
     ) {
       // nothing changed
       return;
     }
-    this.activeTimeSelection = { type: RangeSelectionType.FULL, absoluteSelection: range };
+    this.activeTimeSelection = { type: 'FULL', absoluteSelection: range };
     this.activeSelectionChange$.next(this.activeTimeSelection);
     this.zoomReset$.next();
   }

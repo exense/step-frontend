@@ -28,6 +28,7 @@ export class AugmentedSchedulerService extends SchedulerService {
       'attributes.name': 'attributes.name',
       'executionsParameters.customParameters.env': 'executionsParameters.customParameters.env',
       cronExpression: 'cronExpression',
+      automationPackage: 'customFields.automationPackageId',
     });
   }
 
