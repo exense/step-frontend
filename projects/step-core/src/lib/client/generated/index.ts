@@ -17,6 +17,7 @@ export type { AsyncTaskStatusTableBulkOperationReport } from './models/AsyncTask
 export type { Attachment } from './models/Attachment';
 export type { AttachmentMeta } from './models/AttachmentMeta';
 export type { AttributeStats } from './models/AttributeStats';
+export type { AutomationPackage } from './models/AutomationPackage';
 export type { AxesSettings } from './models/AxesSettings';
 export type { BucketAttributes } from './models/BucketAttributes';
 export type { BucketResponse } from './models/BucketResponse';
@@ -140,6 +141,7 @@ export { $Attachment } from './schemas/$Attachment';
 export { $AttachmentMeta } from './schemas/$AttachmentMeta';
 export { $AttributeStats } from './schemas/$AttributeStats';
 export { $AxesSettings } from './schemas/$AxesSettings';
+export { $AutomationPackage } from './schemas/$AutomationPackage';
 export { $BucketAttributes } from './schemas/$BucketAttributes';
 export { $BucketResponse } from './schemas/$BucketResponse';
 export { $CallFunction } from './schemas/$CallFunction';
@@ -248,6 +250,7 @@ export { $Version } from './schemas/$Version';
 export { $ViewModel } from './schemas/$ViewModel';
 
 export { AsyncTasksService } from './services/AsyncTasksService';
+export { AutomationPackagesService } from './services/AutomationPackagesService';
 export { CollectionsService } from './services/CollectionsService';
 export { CompositesService } from './services/CompositesService';
 export { ControllerService } from './services/ControllerService';

@@ -18,6 +18,7 @@ import { IsUsedByDialogService } from './is-used-by-dialog.service';
 
 const CONFIGURER_KEYWORD_ID = 'configurerKeywordId';
 const ENTITY_TYPE = 'keyword';
+const EDITOR_URL = '/root/functions';
 
 @Injectable({
   providedIn: 'root',
@@ -30,7 +31,6 @@ export class FunctionActionsImplService implements FunctionActionsService {
   private _exportDialogs = inject(ExportDialogsService);
   private _importDialogs = inject(ImportDialogsService);
   protected _isUsedByDialog = inject(IsUsedByDialogService);
-  private _entityDialogs = inject(EntityDialogsService);
   private _router = inject(Router);
   private _functionDialogsConfigFactoryService = inject(FunctionDialogsConfigFactoryService);
   private _functionConfigurationService = inject(FunctionConfigurationService);
@@ -61,7 +61,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
           return of({ keyword, continueEdit: true });
         }
 
-        const url = this._router.url;
+        const url = EDITOR_URL;
         const editParam = { [CONFIGURER_KEYWORD_ID]: id };
 
         return this._multipleProjectService
