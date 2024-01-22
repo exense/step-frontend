@@ -1,18 +1,46 @@
+@use 'projects/step-core/styles/core-variables' as var;
 @use 'projects/step-core/styles/core-mixins' as core;
 
 step-dynamic-json {
+  position: relative;
+
+  &:hover,
+  &.buttons-visible {
+    .button-content {
+      opacity: 1;
+    }
+  }
+
   .button-content {
-    display: flex;
-    justify-content: flex-end;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    opacity: 0;
+    transition: opacity 0.2s linear;
 
     button {
-      width: 3.2rem;
-      height: 3.2rem;
-      border-radius: 0.8rem;
+      width: 3.4rem;
+      height: 3.4rem;
       min-width: auto;
+      border-radius: 0;
+      background: var.$white !important;
 
       step-icon {
         @include core.step-icon-size(1.6rem);
+      }
+
+      &:first-child {
+        border-top-left-radius: 0.8rem;
+        border-bottom-left-radius: 0.8rem;
+      }
+
+      &:not(:last-child) {
+        border-right: none;
+      }
+
+      &:last-child {
+        border-top-right-radius: 0.8rem;
+        border-bottom-right-radius: 0.8rem;
       }
     }
   }

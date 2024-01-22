@@ -37,11 +37,20 @@
     </ng-container>
   </ng-container>
 
+  <div class="other-content">
+    <ng-content> </ng-content>
+  </div>
+
   <step-add-field-button
-    *ngIf="!isDisabled && (possibleFieldsToAdd.length > 0 || !schema?.properties || allowNotSchemaFields)"
+    *ngIf="!isDisabled && (possibleFieldsToAdd.length > 0 || !schema?.properties || allowNotSchemaFields); else divider"
     [addLabel]="addFieldBtnLabel || ''"
     [possibleFields]="possibleFieldsToAdd"
     (addField)="addOptionalField($event)"
   >
   </step-add-field-button>
+  <ng-template #divider>
+    <div class="divider">
+      <hr />
+    </div>
+  </ng-template>
 </div>

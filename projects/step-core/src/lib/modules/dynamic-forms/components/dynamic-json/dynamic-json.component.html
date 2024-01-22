@@ -10,9 +10,13 @@
 ></step-expression-input>
 <ng-template #constantValueTemplate>
   <section class="button-content">
+    <button type="button" mat-stroked-button [color]="showJson ? 'primary' : undefined" (click)="showJson = !showJson">
+      <step-icon name="edit-2"></step-icon>
+    </button>
     <button
       type="button"
       mat-stroked-button
+      [matTooltip]="label | toggleDynamicFieldTooltip"
       matTooltip="Use a dynamic expression to set this attribute"
       matTooltipPosition="below"
       [disabled]="isDisabled"
@@ -29,6 +33,7 @@
     [optionalFieldsLabel]="optionalFieldsLabel"
     [addFieldBtnLabel]="addFieldBtnLabel"
     [jsonFieldsLabel]="jsonFieldsLabel"
+    [showJson]="showJson"
     [isDisabled]="isDisabled"
     (blur)="onBlur()"
   >

@@ -7,19 +7,14 @@
   (valueChange)="handleChange($event)"
   [isDisabled]="isDisabled"
 >
+  <ng-container *ngIf="showJson">
+    <h5>{{ jsonFieldsLabel ?? 'Input (raw JSON)' }}</h5>
+    <step-json-raw-editor
+      [ngModel]="internalValue"
+      (ngModelChange)="handleChange($event)"
+      (blur)="blur.emit()"
+      [disabled]="!!isDisabled"
+    >
+    </step-json-raw-editor>
+  </ng-container>
 </step-dynamic-field-group>
-<div class="toggle-bar" (click)="showJson = !showJson">
-  <div>
-    <step-icon name="code"></step-icon>
-    <span>{{ jsonFieldsLabel ?? 'Input (raw JSON)' }}</span>
-  </div>
-  <step-icon [name]="showJson ? 'chevron-up' : 'chevron-down'"></step-icon>
-</div>
-<step-json-raw-editor
-  *ngIf="showJson"
-  [ngModel]="internalValue"
-  (ngModelChange)="handleChange($event)"
-  (blur)="blur.emit()"
-  [disabled]="!!isDisabled"
->
-</step-json-raw-editor>
