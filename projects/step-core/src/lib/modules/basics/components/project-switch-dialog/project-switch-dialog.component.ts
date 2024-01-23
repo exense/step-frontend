@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProjectSwitchDialogData } from '../../shared/project-switch-dialog-data.interface';
 import { ProjectSwitchDialogResult } from '../../shared/project-switch-dialog-result.enum';
@@ -19,6 +19,7 @@ export class ProjectSwitchDialogComponent {
     this._dialogRef.close(ProjectSwitchDialogResult.OPEN_IN_CURRENT);
   }
 
+  @HostListener('keydown.enter')
   openInTarget(): void {
     this._dialogRef.close(ProjectSwitchDialogResult.OPEN_IN_TARGET);
   }

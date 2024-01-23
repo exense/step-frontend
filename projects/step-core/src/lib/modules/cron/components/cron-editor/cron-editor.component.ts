@@ -1,4 +1,4 @@
-import { Component, inject, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, inject, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Tab } from '../../../tabs/tabs.module';
 import { CronValidation } from '../../types/cron/_cron-validation';
@@ -52,8 +52,13 @@ export class CronEditorComponent {
     this.isExpressionValid = CronValidation.validate(this.cronExpression);
   }
 
+  @HostListener('keydown.enter')
   apply(): void {
+    if (!this.cronExpression) {
+      this.isExpressionValid = false;
+    }
     if (!this.isExpressionValid) {
+      this.isTouched = true;
       return;
     }
     this._dialogRef.close(this.cronExpression);

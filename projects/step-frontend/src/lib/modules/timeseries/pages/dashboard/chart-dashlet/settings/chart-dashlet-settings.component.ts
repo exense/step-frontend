@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { DashboardItem } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ChartDashletSettingsData } from './chart-dashlet-settings-data';
@@ -58,7 +58,13 @@ export class ChartDashletSettingsComponent implements OnInit {
     }) as unknown as ChartForm;
   }
 
-  submitForm() {
+  @HostListener('keydown.enter')
+  submitForm(): void {
+    // TODO It seems the form's validators doesn't setup correctly. Needs to be clarified
+    // if (this.formGroup.invalid) {
+    //   this.formGroup.markAllAsTouched();
+    //   return;
+    // }
     this.item.chartSettings!.filters = this.filterItems
       .filter(FilterUtils.filterItemIsValid)
       .map(FilterUtils.convertToApiFilterItem);

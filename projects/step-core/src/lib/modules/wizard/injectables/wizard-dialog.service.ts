@@ -18,7 +18,6 @@ export class WizardDialogService {
     const data: WizardDialogData<T> = { steps, title, initialModel, additionalDescription };
     this._matDialog.open(WizardDialogComponent, {
       data,
-      disableClose: true,
       width: '70rem',
     });
   }

@@ -1,5 +1,14 @@
 import { KeyValue } from '@angular/common';
-import { ChangeDetectorRef, Component, forwardRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  forwardRef,
+  HostListener,
+  inject,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
@@ -106,6 +115,10 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
   }
 
   protected save(edit?: boolean): void {
+    if (this.formGroup!.invalid) {
+      this.formGroup!.markAllAsTouched();
+      return;
+    }
     functionConfigurationDialogFormSetValueToModel(this.formGroup!, this.keyword!);
 
     (this.functionTypeChild.componentInstance as FunctionTypeFormComponent<any>).setValueToModel();
@@ -151,6 +164,11 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
 
       functionConfigurationDialogFormSetValueToForm(this.formGroup!, this.keyword, this._formBuilder);
     }
+  }
+
+  @HostListener('keydown.enter')
+  private saveByEnter(): void {
+    this.save(false);
   }
 
   protected fetchStepFunction(stepFunctionType: string): void {
