@@ -60,11 +60,6 @@ import { IsMenuItemActivePipe } from './pipes/is-menu-item-active.pipe';
     },
     {
       provide: LOGOUT_CLEANUP,
-      useExisting: MenuStorageService,
-      multi: true,
-    },
-    {
-      provide: LOGOUT_CLEANUP,
       useExisting: SidebarStateService,
       multi: true,
     },
