@@ -3,7 +3,7 @@
   <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
     <step-btn-group>
       <button
-        (click)="openDialog(createTemplate)"
+        (click)="createNewDashboard()"
         type="button"
         mat-mini-fab
         color="primary"
@@ -77,41 +77,3 @@
     </td>
   </ng-container>
 </step-table>
-<!--
-TODO needs to be passed in a separate component to apply common dialogs logic
--->
-<ng-template #createTemplate>
-  <step-modal-window title="New Dashboard">
-    <div step-modal-window-body>
-      <step-form-field>
-        <step-label>Name</step-label>
-        <input [(ngModel)]="createDashboardModel.name" />
-      </step-form-field>
-      <step-form-field>
-        <step-label>Description</step-label>
-        <textarea [rows]="4" [(ngModel)]="createDashboardModel.description"></textarea>
-      </step-form-field>
-    </div>
-    <div step-modal-window-buttons>
-      <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
-      <button
-        type="button"
-        [disabled]="!createDashboardModel.name"
-        mat-flat-button
-        color="primary"
-        (click)="saveNewDashboard()"
-      >
-        Save
-      </button>
-      <button
-        type="button"
-        [disabled]="!createDashboardModel.name"
-        mat-flat-button
-        color="primary"
-        (click)="saveNewDashboard(true)"
-      >
-        Save and edit
-      </button>
-    </div>
-  </step-modal-window>
-</ng-template>
