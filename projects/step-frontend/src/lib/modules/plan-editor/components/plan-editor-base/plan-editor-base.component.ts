@@ -41,6 +41,9 @@ import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-no
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
 import { ActivatedRoute } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { PlanSourceDialogComponent } from '../plan-source-dialog/plan-source-dialog.component';
+import { PlanSourceStubService } from '../../injectables/plan-source-stub.service';
 
 @Component({
   selector: 'step-plan-editor-base',
@@ -89,6 +92,8 @@ export class PlanEditorBaseComponent
   public _planEditService = inject(PlanEditorService);
   private _activatedRoute = inject(ActivatedRoute);
   private _planOpen = inject(PlanOpenService);
+  private _planSourceStub = inject(PlanSourceStubService);
+  private _matDialog = inject(MatDialog);
   private _cd = inject(ChangeDetectorRef);
 
   private get artefactIdFromUrl(): string | undefined {
@@ -143,7 +148,6 @@ export class PlanEditorBaseComponent
       this.setupPlan(cPlan?.currentValue, true);
       this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference((cPlan?.currentValue as Plan)?.id);
     }
-
   }
 
   ngOnDestroy(): void {
@@ -207,6 +211,12 @@ export class PlanEditorBaseComponent
 
   resetInteractive(): void {
     this._interactiveSession.resetInteractive().subscribe();
+  }
+
+  showPlanSource(): void {
+    this._planSourceStub
+      .getPlanSource(this.initialPlan)
+      .subscribe((source) => this._matDialog.open(PlanSourceDialogComponent, { data: source }));
   }
 
   openArtefact(node?: AbstractArtefact): void {

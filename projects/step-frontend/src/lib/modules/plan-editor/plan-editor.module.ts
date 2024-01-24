@@ -10,6 +10,7 @@ import { PlanEditorActionsComponent } from './components/plan-editor-actions/pla
 import { PlanCommonTreeEditorFormComponent } from './components/plan-common-tree-editor-form/plan-common-tree-editor-form.component';
 import { PlanEditorKeyHandlerDirective } from './directives/plan-editor-key-handler.directive';
 import { PlanAlertsComponent } from './components/plan-alerts/plan-alerts.component';
+import { PlanSourceDialogComponent } from './components/plan-source-dialog/plan-source-dialog.component';
 
 @NgModule({
   declarations: [
@@ -21,9 +22,15 @@ import { PlanAlertsComponent } from './components/plan-alerts/plan-alerts.compon
     PlanCommonTreeEditorFormComponent,
     PlanEditorKeyHandlerDirective,
     PlanAlertsComponent,
+    PlanSourceDialogComponent,
   ],
   imports: [StepCommonModule, ExecutionModule],
-  exports: [PlanEditorBaseComponent, PlanCommonTreeEditorFormComponent, PlanEditorKeyHandlerDirective],
+  exports: [
+    PlanEditorBaseComponent,
+    PlanCommonTreeEditorFormComponent,
+    PlanEditorKeyHandlerDirective,
+    PlanSourceDialogComponent,
+  ],
 })
 export class PlanEditorModule {
   constructor(_planTypeRegistry: PlanTypeRegistryService) {
