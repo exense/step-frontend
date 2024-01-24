@@ -11,5 +11,16 @@ export const $MetricAttribute = {
       type: 'string',
       isRequired: true,
     },
+    type: {
+      type: 'Enum',
+      isRequired: true,
+    },
+    metadata: {
+      type: 'dictionary',
+      contains: {
+        properties: {},
+      },
+      isRequired: true,
+    },
   },
 } as const;
