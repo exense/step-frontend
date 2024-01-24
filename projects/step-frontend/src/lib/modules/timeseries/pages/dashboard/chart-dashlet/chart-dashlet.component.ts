@@ -5,8 +5,11 @@ import {
   BucketResponse,
   ChartSettings,
   DashboardItem,
+  Execution,
+  ExecutiontTaskParameters,
   FetchBucketsRequest,
   MetricAttribute,
+  Plan,
   TimeRange,
   TimeRangeSelection,
   TimeSeriesAPIResponse,
@@ -24,6 +27,7 @@ import { TimeSeriesChartComponent } from '../../../chart/time-series-chart.compo
 import { Observable, of, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from './settings/chart-dashlet-settings.component';
+import { TimeSeriesUtilityService } from '../../../time-series-utility.service';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -43,6 +47,7 @@ export class ChartDashletComponent implements OnInit, Dashlet {
 
   @ViewChild('chart') chart!: TimeSeriesChartComponent;
   _internalSettings?: TSChartSettings;
+  _attributesByIds: Record<string, MetricAttribute> = {};
 
   @Input() item!: DashboardItem;
   @Input() context!: TimeSeriesContext;
@@ -59,11 +64,13 @@ export class ChartDashletComponent implements OnInit, Dashlet {
   selectedAggregate!: AggregationType;
 
   private _timeSeriesService = inject(TimeSeriesService);
+  private _timeSeriesUtilityService = inject(TimeSeriesUtilityService);
 
   ngOnInit(): void {
     if (!this.item || !this.context || !this.height) {
       throw new Error('Missing input values');
     }
+    this.item.chartSettings!.attributes?.forEach((attr) => (this._attributesByIds[attr.name] = attr));
     this.groupingSelection = this.prepareGroupingAttributes();
     this.selectedAggregate = this.item.chartSettings!.primaryAxes!.aggregation;
     this.fetchDataAndCreateChart().subscribe();
@@ -183,6 +190,39 @@ export class ChartDashletComponent implements OnInit, Dashlet {
         },
       ],
     };
+    groupDimensions.forEach((attributeKey, i) => {
+      const attribute = this._attributesByIds[attributeKey];
+      const entityName = attribute?.metadata['entity'];
+      if (!entityName) {
+        return;
+      }
+      switch (entityName) {
+        case 'execution':
+          this.fetchAndSetLabels(
+            series,
+            i,
+            (ids) => this._timeSeriesUtilityService.getExecutionByIds(ids),
+            (e: Execution) => e.description!
+          );
+          break;
+        case 'plan':
+          this.fetchAndSetLabels(
+            series,
+            i,
+            (ids) => this._timeSeriesUtilityService.getPlansByIds(ids),
+            (plan: Plan) => plan.attributes?.['name']
+          );
+          break;
+        case 'task':
+          this.fetchAndSetLabels(
+            series,
+            i,
+            (ids) => this._timeSeriesUtilityService.getTasksByIds(ids),
+            (task: ExecutiontTaskParameters) => task.attributes?.['name']
+          );
+          break;
+      }
+    });
   }
 
   private fetchDataAndCreateChart(): Observable<TimeSeriesAPIResponse> {
@@ -201,6 +241,71 @@ export class ChartDashletComponent implements OnInit, Dashlet {
         this.createChart(response);
       })
     );
+  }
+
+  /**
+   * This function will fetch the entities found in the labels, and replace their ids with the appropriate name.
+   * @param series
+   * @param groupDimensionIndex
+   * @param fetchByIds
+   * @param mapEntityToLabel
+   * @private
+   */
+  private fetchAndSetLabels<T>(
+    series: TSChartSeries[],
+    groupDimensionIndex: number,
+    fetchByIds: (ids: string[]) => Observable<T[]>,
+    mapEntityToLabel: (entity: T) => string | undefined
+  ) {
+    const ids: string[] = series.map((s) => s.labelItems[groupDimensionIndex] as string).filter((id) => !!id);
+    if (!ids.length) {
+      return;
+    }
+    fetchByIds(ids).subscribe(
+      (entities) => {
+        const entitiesByIds = new Map<string, T>();
+        entities.forEach((entity) => {
+          // Assuming each entity has an 'id' property
+          const entityId = (entity as any).id as string; // Cast to any to access 'id' property
+          if (entityId) {
+            entitiesByIds.set(entityId, entity);
+          }
+        });
+        series.forEach((s) => {
+          const entityId = s.labelItems[groupDimensionIndex];
+          if (entityId) {
+            const entity = entitiesByIds.get(entityId);
+            if (entity) {
+              this.chart.setLabelItem(s.id, groupDimensionIndex, mapEntityToLabel(entity));
+            } else {
+              // entity was not fetched
+              this.chart.setLabelItem(s.id, groupDimensionIndex, this.updateFailedToLoadLabel(entityId));
+            }
+          }
+        });
+      },
+      (error) => {
+        this.handleEntityLoadingFailed(series, groupDimensionIndex);
+      }
+    );
+  }
+
+  private handleEntityLoadingFailed(series: TSChartSeries[], groupDimensionIndex: number) {
+    series.forEach((s) => {
+      const entityId = s.labelItems[groupDimensionIndex];
+      if (entityId) {
+        this.chart.setLabelItem(s.id, groupDimensionIndex, this.updateFailedToLoadLabel(entityId));
+      }
+    });
+  }
+
+  /**
+   * Function that updates the label of a series, which was not able to be fetched for more information
+   * @param label
+   * @private
+   */
+  private updateFailedToLoadLabel(label: string): string {
+    return label + ' (unresolved)';
   }
 
   private getChartGrouping(): string[] {
