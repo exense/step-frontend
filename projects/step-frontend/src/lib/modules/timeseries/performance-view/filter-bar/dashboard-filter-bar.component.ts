@@ -81,6 +81,10 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   private _matDialog = inject(MatDialog);
   private _snackbar = inject(MatSnackBar);
 
+  trackByAttributeFn = (index: number, item: FilterBarItem): string => {
+    return item.attributeName;
+  };
+
   getInternalFilters() {
     return this._internalFilters;
   }
