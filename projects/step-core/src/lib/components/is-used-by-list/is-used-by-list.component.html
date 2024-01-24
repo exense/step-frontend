@@ -8,12 +8,11 @@
         (edit)="closeDialog()"
         [context]="element.linkContext"
       ></step-plan-link>
-      <step-function-link
+      <step-function-link-editor
         *ngIf="element.type === 'KEYWORD'"
-        [openEditorOnClick]="true"
         (edit)="closeDialog()"
         [context]="element.linkContext"
-      ></step-function-link>
+      ></step-function-link-editor>
       <span *ngIf="element.type !== 'PLAN' && element.type !== 'KEYWORD'">{{ element.name }}</span>
     </td>
   </ng-container>
