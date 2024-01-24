@@ -1,69 +1,38 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
-:host {
+step-my-account {
   min-width: 600px;
   display: flex;
   flex-direction: column;
   gap: 3rem;
-}
 
-@mixin text-label {
-  step-label {
-    font-size: 1.5rem;
-    strong {
-      color: var.$gray-500;
+  .mat-card-header-text {
+    margin: 0 !important;
+  }
+
+  .credentials {
+    display: flex;
+    flex-direction: column;
+
+    section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: solid 0.1rem var.$gray-300;
+      padding: 1rem 0;
     }
   }
-}
 
-.credentials {
-  display: flex;
-  flex-direction: column;
-  section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: solid 0.1rem var.$gray-300;
+  .role section {
     padding: 1rem 0;
-
-    @include text-label;
-  }
-}
-
-.role section {
-  padding: 1rem 0;
-  @include text-label;
-}
-
-table.account-table {
-  width: 100%;
-  font-size: 1.5rem;
-  th,
-  td {
-    padding: 1rem 0.5rem;
-  }
-  th {
-    border-bottom: solid 0.2rem var.$gray-300;
   }
 
-  tbody > tr:not(:last-child) > td {
-    border-bottom: solid 0.1rem var.$gray-300;
+  .header {
+    display: flex;
+    justify-content: flex-end;
   }
-}
 
-.api-token-table {
-  margin-top: 2rem;
-  &.disabled {
-    opacity: 0.5;
-  }
-}
-
-.preferences-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  mat-card-title {
-    margin-bottom: 0;
+  .actions {
+    width: 2rem;
   }
 }
