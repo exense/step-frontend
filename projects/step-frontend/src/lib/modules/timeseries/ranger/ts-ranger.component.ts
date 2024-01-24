@@ -102,11 +102,14 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     const rightSelect = leftSelect + width;
     const leftPercent = (100 * leftSelect) / fullWidth;
     const rightPercent = (100 * rightSelect) / fullWidth;
-    this.uplot.setSize(this.getSize());
+    const newSize = this.getSize();
+    console.log('full width' + fullWidth);
+    this.uplot.setSize(newSize);
     let newChartWidth = this.uplot.width - chartPadding;
 
     const newLeft = (leftPercent / 100) * newChartWidth;
     const newRight = (rightPercent / 100) * newChartWidth;
+    console.log(`left/right: ${newLeft}/${newRight}`);
     this.uplot.setSelect({ left: newLeft, width: newRight - newLeft, top: 0 }, false);
   }
 
