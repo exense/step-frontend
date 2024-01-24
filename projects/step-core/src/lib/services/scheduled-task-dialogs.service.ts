@@ -51,22 +51,27 @@ export class ScheduledTaskDialogsService {
   private fillScheduledTaskDialogConfig(task: ExecutiontTaskParameters): EditSchedulerTaskDialogConfig {
     let hideUser = false;
     let disableUser = false;
-    const hasRightOnBehalfOf = this._auth.hasRight('on-behalf-of');
-
-    if (!task.id) {
-      // New task case.
-      // Hide user field if there is no right, otherwise prefill the field
-      if (!hasRightOnBehalfOf) {
-        hideUser = true;
-      } else {
-        task.executionsParameters!.userID = this._auth.getUserID();
-      }
+    if (!this._auth.isAuthenticated()) {
+      hideUser = true;
+      task.executionsParameters!.userID = this._auth.getUserID();
     } else {
-      // Existing task case
-      // If there is no right hide user field, if it is empty, otherwise disable it
-      if (!hasRightOnBehalfOf) {
-        hideUser = !task.executionsParameters?.userID;
-        disableUser = !!task.executionsParameters?.userID;
+      const hasRightOnBehalfOf = this._auth.hasRight('on-behalf-of');
+
+      if (!task.id) {
+        // New task case.
+        // Hide user field if there is no right, otherwise prefill the field
+        if (!hasRightOnBehalfOf) {
+          hideUser = true;
+        } else {
+          task.executionsParameters!.userID = this._auth.getUserID();
+        }
+      } else {
+        // Existing task case
+        // If there is no right hide user field, if it is empty, otherwise disable it
+        if (!hasRightOnBehalfOf) {
+          hideUser = !task.executionsParameters?.userID;
+          disableUser = !!task.executionsParameters?.userID;
+        }
       }
     }
 
