@@ -43,6 +43,13 @@
           <button mat-button [matMenuTriggerFor]="typesMenu">+ Add Filter</button>
         </div>
         <mat-menu #typesMenu="matMenu">
+          <button
+            mat-menu-item
+            *ngFor="let attribute of item.chartSettings!.attributes"
+            (click)="addFilterItem(attribute)"
+          >
+            {{ attribute.displayName }}
+          </button>
           <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.FREE_TEXT)">Text Filter</button>
           <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.NUMERIC)">Numeric Filter</button>
           <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.DATE)">Date Filter</button>

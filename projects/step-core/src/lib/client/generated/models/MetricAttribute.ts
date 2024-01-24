@@ -5,4 +5,6 @@
 export type MetricAttribute = {
   name: string;
   displayName: string;
+  type: 'TEXT' | 'NUMBER' | 'DATE';
+  metadata: Record<string, any>;
 };
