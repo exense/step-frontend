@@ -336,6 +336,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
         ],
         setSelect: [
           (uRanger: uPlot) => {
+            console.log('set select called');
             // this is triggered when the synced charts are zooming
             // this is triggered many times when clicking on the ranger.
             this.emitRangeEventIfChanged();
