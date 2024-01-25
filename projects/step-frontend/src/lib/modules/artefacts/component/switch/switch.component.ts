@@ -1,5 +1,10 @@
 import { Component, ViewChild } from '@angular/core';
-import { AbstractArtefact, BaseArtefactComponent, DynamicValueString } from '@exense/step-core';
+import {
+  AbstractArtefact,
+  ArtefactFormChangeHelperService,
+  BaseArtefactComponent,
+  DynamicValueString,
+} from '@exense/step-core';
 import { NgForm } from '@angular/forms';
 
 interface SwitchArtefact extends AbstractArtefact {
@@ -10,6 +15,7 @@ interface SwitchArtefact extends AbstractArtefact {
   selector: 'step-switch',
   templateUrl: './switch.component.html',
   styleUrls: ['./switch.component.scss'],
+  providers: [ArtefactFormChangeHelperService],
 })
 export class SwitchComponent extends BaseArtefactComponent<SwitchArtefact> {
   @ViewChild('form')
