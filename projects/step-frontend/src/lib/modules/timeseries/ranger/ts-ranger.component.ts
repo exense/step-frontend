@@ -91,29 +91,8 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     this.createRanger();
   }
 
-  /**
-   * This method is responsible to move the selection, because the chart itself automatically adjust from the getSize() function.
-   */
   resizeChart() {
-    const chartPadding = 50; // this is the way uplot works
-    const fullWidth = this.uplot.width - chartPadding;
-    const leftSelect = this.uplot.select.left;
-    const width = this.uplot.select.width;
-    const rightSelect = leftSelect + width;
-    const leftPercent = (100 * leftSelect) / fullWidth;
-    const rightPercent = (100 * rightSelect) / fullWidth;
-    const newSize = this.getSize();
-    console.log('full width' + fullWidth);
-    this.uplot.setSize(newSize);
-    let newChartWidth = this.uplot.width - chartPadding;
-
-    const newLeft = (leftPercent / 100) * newChartWidth;
-    const newRight = (rightPercent / 100) * newChartWidth;
-    console.log(`left/right: ${newLeft}/${newRight}`);
-    setTimeout(() => {
-      this.uplot.setSelect({ left: newLeft, width: newRight - newLeft, top: 0 }, false);
-      console.log('selected');
-    }, 500);
+    this.uplot.setSize(this.getSize());
   }
 
   init(settings: TSRangerSettings) {
