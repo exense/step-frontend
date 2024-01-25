@@ -1,8 +1,7 @@
 import { NgModule } from '@angular/core';
-import { EntityModule, StepCoreModule, ViewRegistryService } from '@exense/step-core';
+import { NAVIGATOR_QUERY_PARAMS_CLEANUP, StepCoreModule, ViewRegistryService } from '@exense/step-core';
 import { TimeSeriesChartComponent } from './chart/time-series-chart.component';
 import { TSRangerComponent } from './ranger/ts-ranger.component';
-import { TableModule } from '@exense/step-core';
 import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
@@ -41,6 +40,7 @@ import { DashboardFilterBarComponent } from './performance-view/filter-bar/dashb
 import { DashboardListComponent } from './pages/dashboard-list/dashboard-list.component';
 import { ChartDashletSettingsComponent } from './pages/dashboard/chart-dashlet/settings/chart-dashlet-settings.component';
 import { VisibleFilterBarItemPipe } from './pipes/visible-filter-item.pipe';
+import { TsNavigatorQueryParamsCleanupService } from './ts-navigator-query-params-cleanup.service';
 
 @NgModule({
   declarations: [
@@ -81,10 +81,19 @@ import { VisibleFilterBarItemPipe } from './pipes/visible-filter-item.pipe';
     AnalyticsPageComponent,
     MetricChartComponent,
   ],
-  providers: [{ provide: MatPaginatorIntl, useClass: NoTotalCountPaginator }],
+  providers: [
+    {
+      provide: MatPaginatorIntl,
+      useClass: NoTotalCountPaginator,
+    },
+    {
+      provide: NAVIGATOR_QUERY_PARAMS_CLEANUP,
+      useClass: TsNavigatorQueryParamsCleanupService,
+      multi: true,
+    },
+  ],
   imports: [
     StepCoreModule,
-    TableModule,
     FormsModule,
     MatTableModule,
     CommonModule,
@@ -94,7 +103,6 @@ import { VisibleFilterBarItemPipe } from './pipes/visible-filter-item.pipe';
     MatFormFieldModule,
     MatInputModule,
     ReportNodesModule,
-    EntityModule,
   ],
 })
 export class TimeSeriesModule {

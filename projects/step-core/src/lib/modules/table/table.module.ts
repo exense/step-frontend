@@ -21,7 +21,7 @@ import { BulkOperationsComponent } from './components/bulk-operations/bulk-opera
 import { BulkOperationPerformStrategy, EntitiesSelectionModule } from '../entities-selection/entities-selection.module';
 import { AsyncOperationsModule } from '../async-operations/async-operations.module';
 import { CustomSearchCellComponentsPipe } from './pipe/custom-search-cell-components.pipe';
-import { LOGOUT_CLEANUP, StepBasicsModule } from '../basics/step-basics.module';
+import { LOGOUT_CLEANUP, NAVIGATOR_QUERY_PARAMS_CLEANUP, StepBasicsModule } from '../basics/step-basics.module';
 import { SearchColMetaDirective } from './directives/search-col-meta.directive';
 import { FilterConnectDirective } from './directives/filter-connect.directive';
 import { CustomSearchDropdownComponent } from './components/custom-search-dropdown/custom-search-dropdown.component';
@@ -34,6 +34,7 @@ import { HighlightTableRowDirective } from './directives/highlight-table-row.dir
 import { DatePickerModule } from '../date-picker/date-picker.module';
 import { RangeFilterComponent } from './components/range-filter/range-filter.component';
 import { DateFilterComponent } from './components/date-filter/date-filter.component';
+import { TableNavigatorQueryParamsCleanupService } from './services/table-navigator-query-params-cleanup.service';
 
 @NgModule({
   imports: [
@@ -89,6 +90,11 @@ import { DateFilterComponent } from './components/date-filter/date-filter.compon
     {
       provide: BulkOperationPerformStrategy,
       useExisting: BulkOperationPerformStrategyImplService,
+    },
+    {
+      provide: NAVIGATOR_QUERY_PARAMS_CLEANUP,
+      useClass: TableNavigatorQueryParamsCleanupService,
+      multi: true,
     },
   ],
 })

@@ -218,6 +218,8 @@ export * from './directives/item-hover.directive';
 export * from './directives/item-hold.directive';
 export * from './services/item-hover-receiver.service';
 export * from './services/item-hold-receiver.service';
+export * from './services/navigator-query-params-cleanup.service';
+export * from './shared/navigator-query-params-cleanup.token';
 export * from './shared/bulk-operation-type.enum';
 export * from './shared/auth.guards';
 export * from './shared/string-array-regex';

@@ -3,7 +3,8 @@ import { DEFAULT_PAGE } from './default-page.token';
 import { DOCUMENT, Location } from '@angular/common';
 import { VIEW_ID_LINK_PREFIX } from './view-id-link-prefix.token';
 import { ActivatedRoute, NavigationEnd, Params, QueryParamsHandling, Router } from '@angular/router';
-import { filter, from, map, Observable, shareReplay, startWith, switchMap, timer } from 'rxjs';
+import { filter, from, map, Observable, shareReplay, startWith, switchMap, tap, timer } from 'rxjs';
+import { NAVIGATOR_QUERY_PARAMS_CLEANUP } from '../shared/navigator-query-params-cleanup.token';
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +16,7 @@ export class NavigatorService {
   private _defaultPage = inject(DEFAULT_PAGE);
   private _window = inject(DOCUMENT).defaultView!;
   private _viewIdLinkPrefix = inject(VIEW_ID_LINK_PREFIX);
+  private _queryParamsCleanups = inject(NAVIGATOR_QUERY_PARAMS_CLEANUP);
 
   readonly activeUrl$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
@@ -97,12 +99,11 @@ export class NavigatorService {
 
   private prepareQueryParams(): Params | null {
     const queryParams = { ...this._activatedRoute.snapshot.queryParams };
-    if (!queryParams?.['tsParams']) {
+    const cleanupsToPerform = this._queryParamsCleanups.filter((clenaup) => clenaup.isCleanUpRequired(queryParams));
+    if (!cleanupsToPerform.length) {
       return null;
     }
-    const clear = queryParams['tsParams'].split(',');
-    clear.forEach((value: string) => delete queryParams[value]);
-    delete queryParams['tsParams'];
+    cleanupsToPerform.forEach((cleanup) => cleanup.cleanup(queryParams));
     return queryParams;
   }
 }
