@@ -215,7 +215,7 @@ export class PlanEditorBaseComponent
 
   showPlanSource(): void {
     this._planSourceStub
-      .getPlanSource(this.initialPlan)
+      .getPlanSource(this.initialPlan!)
       .subscribe((source) => this._matDialog.open(PlanSourceDialogComponent, { data: source }));
   }
 
