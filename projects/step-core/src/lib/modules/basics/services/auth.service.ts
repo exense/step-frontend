@@ -77,8 +77,7 @@ export class AuthService implements OnDestroy {
   }
 
   getUserID(): string {
-    const userID = this.getContext().userID;
-    return userID === ANONYMOUS ? '' : userID;
+    return this.getContext().userID;
   }
 
   updateContext(info: Partial<AuthContext>): void {
