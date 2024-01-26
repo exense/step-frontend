@@ -278,14 +278,14 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     const itemToDelete = this._internalFilters[index];
 
     this._internalFilters.splice(index, 1);
-
+    this._internalFilters = [...this._internalFilters];
     if (FilterUtils.filterItemIsValid(itemToDelete)) {
       this.emitFilterChange$.next();
     }
   }
 
   private addFilter(item: FilterBarItem): void {
-    this._internalFilters.push(item);
+    this._internalFilters = [...this._internalFilters, item];
     this._changeDetectorRef.detectChanges();
     this.filterComponents!.last.openMenu();
     this.filterComponents!.last.menuTrigger!.menuClosed.pipe(take(1)).subscribe(() => {

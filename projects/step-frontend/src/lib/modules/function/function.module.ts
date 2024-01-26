@@ -10,9 +10,7 @@ import {
   FunctionConfigurationService,
   SimpleOutletComponent,
   FunctionPackageTypeRegistryService,
-  PlansService,
-  AugmentedKeywordsService,
-  Plan,
+  FunctionLinkEditorComponent,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
@@ -80,6 +78,7 @@ export class FunctionModule {
 
   private registerCells(): void {
     this._cellsRegistry.registerCell('functionLink', FunctionLinkComponent);
+    this._cellsRegistry.registerCell('functionLinkEditor', FunctionLinkEditorComponent);
   }
 
   private registerFunctionTypes(): void {

@@ -1,22 +1,21 @@
-<h3>My account</h3>
 <mat-card>
   <mat-card-header>
     <mat-card-title>Credentials</mat-card-title>
   </mat-card-header>
   <mat-card-content class="credentials">
     <section>
-      <step-label>
-        <strong>Username </strong>
-        <span>{{ user.username }}</span>
-      </step-label>
+      <step-form-field alignLabelAddon="near">
+        <step-label>Username</step-label>
+        <step-label-addon>{{ user.username }}</step-label-addon>
+      </step-form-field>
       <button type="button" mat-flat-button color="primary" (click)="changePwd()" [disabled]="!canChangePassword">
         Change password
       </button>
     </section>
     <section>
-      <step-label>
-        <strong>Api key</strong>
-      </step-label>
+      <step-form-field alignLabelAddon="near">
+        <step-label>Api key</step-label>
+      </step-form-field>
       <button
         type="button"
         mat-flat-button
@@ -27,30 +26,34 @@
         Generate new Key
       </button>
     </section>
-    <table class="account-table api-token-table" [class.disabled]="!canGenerateApiKey">
-      <thead>
-        <tr>
-          <th>Label</th>
-          <th>Created</th>
-          <th>Valid until</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let token of tokens; trackBy: trackByToken">
-          <td [matTooltip]="token.token">
-            {{ token.label || token.id }}
-          </td>
-          <td>
-            {{ token.creationTime | date }}
-          </td>
-          <td>
-            {{ token.expiryTime | date }}
-          </td>
-          <td><a (click)="revokeAPIToken(token.id)">revoke</a></td>
-        </tr>
-      </tbody>
-    </table>
+    <step-table [dataSource]="tokensSource">
+      <ng-container matColumnDef="label">
+        <th mat-header-cell *matHeaderCellDef>Label</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.label || element.id }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="created">
+        <th mat-header-cell *matHeaderCellDef>Created</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.creationTime | date }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="expired">
+        <th mat-header-cell *matHeaderCellDef>Expired</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.expiryTime | date }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th class="actions" mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-icon-button matTooltip="Revoke token" (click)="revokeAPIToken(element.id)">
+            <step-icon name="trash-2"></step-icon>
+          </button>
+        </td>
+      </ng-container>
+    </step-table>
   </mat-card-content>
 </mat-card>
 <mat-card>
@@ -59,42 +62,48 @@
   </mat-card-header>
   <mat-card-content class="role">
     <section>
-      <step-label>
-        <strong>Role </strong>
-        <span>{{ user.role }}</span>
-      </step-label>
+      <step-form-field alignLabelAddon="near">
+        <step-label>Role</step-label>
+        <step-label-addon>{{ user.role }}</step-label-addon>
+      </step-form-field>
     </section>
   </mat-card-content>
 </mat-card>
 <mat-card>
-  <mat-card-header class="preferences-title">
+  <mat-card-header>
     <mat-card-title> Preferences </mat-card-title>
-    <button type="button" mat-icon-button mat-flat-button color="primary" (click)="addPreference()">
-      <step-icon name="plus"></step-icon>
-    </button>
   </mat-card-header>
   <mat-card-content>
-    <table class="account-table">
-      <thead>
-        <tr>
-          <th>Key</th>
-          <th>Value</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let pref of preferences">
-          <td>
-            <step-form-field>
-              <input [(ngModel)]="pref.key" placeholder="Key" (blur)="savePreferences()" />
-            </step-form-field>
-          </td>
-          <td>
-            <step-form-field>
-              <input [(ngModel)]="pref.value" placeholder="Value" (blur)="savePreferences()" />
-            </step-form-field>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <step-table [dataSource]="preferences$">
+      <section class="header" *stepAdditionalHeader="'add-preference'">
+        <button type="button" mat-mini-fab color="primary" (click)="addPreference()">
+          <step-icon name="plus"></step-icon>
+        </button>
+      </section>
+      <ng-container matColumnDef="key">
+        <th mat-header-cell *matHeaderCellDef>Key</th>
+        <td mat-cell *matCellDef="let element">
+          <step-form-field>
+            <input [(ngModel)]="element.key" placeholder="Key" (blur)="savePreferences()" />
+          </step-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="value">
+        <th mat-header-cell *matHeaderCellDef>Value</th>
+        <td mat-cell *matCellDef="let element">
+          <step-form-field>
+            <input [(ngModel)]="element.value" placeholder="Value" (blur)="savePreferences()" />
+          </step-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th class="actions" mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-icon-button matTooltip="Delete preference" (click)="removePreference(element)">
+            <step-icon name="trash-2"></step-icon>
+          </button>
+        </td>
+      </ng-container>
+    </step-table>
   </mat-card-content>
 </mat-card>
