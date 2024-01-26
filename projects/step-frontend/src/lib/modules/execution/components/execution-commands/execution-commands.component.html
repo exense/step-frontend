@@ -17,7 +17,7 @@
       <button
         type="button"
         mat-icon-button
-        [disabled]="!('plan-execute' | hasRight | async)"
+        [disabled]="!('plan-execute' | hasRight | async) || isExecutionIsolated"
         aria-label="Left Align"
         matTooltip="New execution"
         (click)="execute(false)"
