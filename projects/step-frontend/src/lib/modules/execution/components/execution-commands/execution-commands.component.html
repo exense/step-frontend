@@ -27,7 +27,7 @@
       <button
         type="button"
         mat-icon-button
-        [disabled]="!('plan-execute' | hasRight | async)"
+        [disabled]="!('plan-execute' | hasRight | async) || isExecutionIsolated"
         aria-label="Left Align"
         matTooltip="Schedule"
         (click)="schedule()"
@@ -74,7 +74,7 @@
       type="button"
       mat-icon-button
       aria-label="Left Align"
-      [disabled]="!('plan-execute' | hasRight | async)"
+      [disabled]="!('plan-execute' | hasRight | async) || isExecutionIsolated"
       matTooltip="Copy start request as curl command to clipboard"
       (click)="copyExecutionServiceAsCurlToClipboard()"
     >
