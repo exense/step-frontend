@@ -10,5 +10,7 @@ import { Panels } from '../../shared/panels.enum';
 export class PanelExecutionDetailsComponent {
   readonly Panels = Panels;
 
-  constructor(public _state: ExecutionStateService) {}
+  constructor(public _state: ExecutionStateService) {
+    console.log(_state?.execution?.executionParameters?.['isolatedExecution']);
+  }
 }
