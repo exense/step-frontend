@@ -68,8 +68,8 @@ export const LEGACY_URL_HANDLER: FactoryProvider = {
     const _location = inject(Location);
     return () => {
       let path = _location.path(true);
-      if (path.includes('#/root')) {
-        path = path.replace('#/root', '#/');
+      if (path.includes('/root')) {
+        path = path.replace('/root', '/');
         _location.go(path);
       }
       return true;
