@@ -1,13 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import {
   AsyncTaskStatusTableBulkOperationReport,
-  Equals,
   Execution,
   ExecutionParameters,
   ExecutionsService,
+  FieldFilter,
   TableBulkOperationRequest,
 } from '../../generated';
-import { map, Observable } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import {
   StepDataSource,
@@ -80,5 +80,16 @@ export class AugmentedExecutionsService extends ExecutionsService {
     return this._tableApiWrapper
       .requestTable<Execution>(this.EXECUTIONS_TABLE_ID, { filters: [idsFilter] })
       .pipe(map((response) => response.data));
+  }
+
+  countExecutionsByStatus(status: string): Observable<number> {
+    const runningFilter: FieldFilter = {
+      field: 'status',
+      regex: true,
+      value: `^${status}$`,
+    };
+    return this._tableApiWrapper
+      .requestTable<Execution>(this.EXECUTIONS_TABLE_ID, { filters: [runningFilter] })
+      .pipe(map((response) => response.recordsFiltered));
   }
 }

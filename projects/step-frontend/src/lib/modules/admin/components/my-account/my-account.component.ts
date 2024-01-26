@@ -2,24 +2,26 @@ import { KeyValue } from '@angular/common';
 import {
   Component,
   EventEmitter,
+  inject,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   Output,
   SimpleChanges,
-  TrackByFunction,
-  inject,
+  ViewEncapsulation,
 } from '@angular/core';
 import {
-  ApiToken,
   AuthService,
   CredentialsService,
   DialogsService,
   GenerateApiKeyService,
   Preferences,
+  TableFetchLocalDataSource,
   User,
   UserService,
 } from '@exense/step-core';
+import { BehaviorSubject, filter, of, pipe, switchMap, tap } from 'rxjs';
 
 const preferencesToKVPairArray = (preferences?: Preferences): KeyValue<string, string>[] => {
   const prefsObject = preferences?.preferences || {};
@@ -42,8 +44,9 @@ const kvPairArrayToPreferences = (values?: KeyValue<string, string>[]): Preferen
   selector: 'step-my-account',
   templateUrl: './my-account.component.html',
   styleUrls: ['./my-account.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
-export class MyAccountComponent implements OnInit, OnChanges {
+export class MyAccountComponent implements OnInit, OnChanges, OnDestroy {
   private _userApi = inject(UserService);
   private _authService = inject(AuthService);
   private _credentialsService = inject(CredentialsService);
@@ -52,46 +55,28 @@ export class MyAccountComponent implements OnInit, OnChanges {
 
   readonly canChangePassword = !!this._authService.getConf()?.passwordManagement;
   readonly canGenerateApiKey = !!this._authService.getConf()?.authentication;
+  readonly preferences$ = new BehaviorSubject<KeyValue<string, string>[]>([]);
 
   @Input() error?: string;
   @Output() errorChange: EventEmitter<string | undefined> = new EventEmitter<string | undefined>();
 
-  readonly trackByToken: TrackByFunction<ApiToken> = (index, item) => item.id;
-
   user: Partial<User> = {};
   preferences: KeyValue<string, string>[] = [];
-  tokens: Array<any> = [];
 
-  changePwd(): void {
-    this._credentialsService.changePassword(false);
-  }
+  readonly tokensSource = new TableFetchLocalDataSource(() => {
+    if (!this.canGenerateApiKey) {
+      return of([]);
+    }
+    return this._generateApiKey.getServiceAccountTokens();
+  });
 
-  invokeShowGenerateApiKeyDialog(): void {
-    this._generateApiKey.showGenerateApiKeyDialog().subscribe(() => this.updateTokens());
-  }
-
-  addPreference(): void {
-    const key = '';
-    const value = '';
-    this.preferences.push({ key, value });
-  }
-
-  savePreferences(): void {
-    const preferences = kvPairArrayToPreferences(this.preferences);
-    this._userApi.putPreferences(preferences).subscribe({
-      error: (err) => {
-        this.error = 'Unable to save preferences. Please contact your administrator.';
-        this.errorChange.emit(this.error);
-      },
-    });
-  }
+  private reloadTokens = pipe(tap((result) => this.tokensSource.reload()));
 
   ngOnInit(): void {
     this._userApi.getMyUser().subscribe((user) => {
       this.user = user || {};
-      this.preferences = preferencesToKVPairArray(this.user?.preferences);
+      this.preferences$.next(preferencesToKVPairArray(this.user?.preferences));
     });
-    this.updateTokens();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -101,19 +86,49 @@ export class MyAccountComponent implements OnInit, OnChanges {
     }
   }
 
-  updateTokens(): void {
-    if (this.canGenerateApiKey) {
-      this._generateApiKey.getServiceAccountTokens().subscribe((tokens) => (this.tokens = tokens));
-    }
+  ngOnDestroy(): void {
+    this.preferences$.complete();
+  }
+
+  changePwd(): void {
+    this._credentialsService.changePassword(false);
+  }
+
+  invokeShowGenerateApiKeyDialog(): void {
+    this._generateApiKey.showGenerateApiKeyDialog().pipe(this.reloadTokens).subscribe();
   }
 
   revokeAPIToken(id: string) {
     this._dialogs
       .showWarning('Revoking will make the API key permanently unusable. Do you want to proceed?')
-      .subscribe((isConfirmed) => {
-        if (isConfirmed) {
-          this._generateApiKey.revoke(id).subscribe(() => this.updateTokens());
-        }
-      });
+      .pipe(
+        filter((isConfirmed) => !!isConfirmed),
+        switchMap(() => this._generateApiKey.revoke(id)),
+        this.reloadTokens
+      )
+      .subscribe();
+  }
+
+  addPreference(): void {
+    const key = '';
+    const value = '';
+    const preferences = [...this.preferences$.value, { key, value }];
+    this.preferences$.next(preferences);
+  }
+
+  removePreference(itemToRemove: KeyValue<string, string>): void {
+    const preferences = this.preferences$.value.filter((item) => item !== itemToRemove);
+    this.preferences$.next(preferences);
+    this.savePreferences();
+  }
+
+  savePreferences(): void {
+    const preferences = kvPairArrayToPreferences(this.preferences$.value);
+    this._userApi.putPreferences(preferences).subscribe({
+      error: (err) => {
+        this.error = 'Unable to save preferences. Please contact your administrator.';
+        this.errorChange.emit(this.error);
+      },
+    });
   }
 }

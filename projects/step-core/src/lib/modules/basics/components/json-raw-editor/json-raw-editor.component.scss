@@ -1,6 +1,9 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 textarea {
-  font-size: 16px;
-  line-height: 24px;
+  font-family: var.$code-font;
+  font-size: 1.4rem;
+  line-height: 2.4rem;
   font-weight: 400;
   min-height: 15rem;
 }

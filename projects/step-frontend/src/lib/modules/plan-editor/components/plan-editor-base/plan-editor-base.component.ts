@@ -34,6 +34,7 @@ import {
   PlanOpenService,
   PlanSetupService,
   PlanEditorApiService,
+  PlanEditorPersistenceStateService,
 } from '@exense/step-core';
 import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
@@ -41,6 +42,9 @@ import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-no
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
 import { ActivatedRoute } from '@angular/router';
+
+const PLAN_SIZE = 'PLAN_SIZE';
+const PLAN_CONTROLS_SIZE = 'PLAN_CONTROLS_SIZE';
 
 @Component({
   selector: 'step-plan-editor-base',
@@ -89,6 +93,7 @@ export class PlanEditorBaseComponent
   public _planEditService = inject(PlanEditorService);
   private _activatedRoute = inject(ActivatedRoute);
   private _planOpen = inject(PlanOpenService);
+  private _planEditorPersistenceState = inject(PlanEditorPersistenceStateService);
   private _cd = inject(ChangeDetectorRef);
 
   private get artefactIdFromUrl(): string | undefined {
@@ -130,6 +135,9 @@ export class PlanEditorBaseComponent
   @ViewChild('keywordCalls', { read: KeywordCallsComponent, static: false })
   private keywords?: KeywordCallsComponent;
 
+  protected planSize = this._planEditorPersistenceState.getPanelSize(PLAN_SIZE);
+  protected planControlsSize = this._planEditorPersistenceState.getPanelSize(PLAN_CONTROLS_SIZE);
+
   ngOnInit(): void {
     this._interactiveSession.init();
     this.initConsoleTabToggle();
@@ -148,6 +156,14 @@ export class PlanEditorBaseComponent
   ngOnDestroy(): void {
     this.terminator$.next();
     this.terminator$.complete();
+  }
+
+  handlePlanSizeChange(size: number): void {
+    this._planEditorPersistenceState.setPanelSize(PLAN_SIZE, size);
+  }
+
+  handlePlanControlsChange(size: number): void {
+    this._planEditorPersistenceState.setPanelSize(PLAN_CONTROLS_SIZE, size);
   }
 
   addControl(artefactTypeId: string): void {

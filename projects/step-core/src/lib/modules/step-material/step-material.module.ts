@@ -33,7 +33,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
 import { ThemeComponent } from './components/theme/theme.component';
 import { StepIconsModule } from '../step-icons/step-icons.module';
-import { MatAutocomplete, MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatBadgeModule } from '@angular/material/badge';
 
 @NgModule({
@@ -75,6 +75,7 @@ import { MatBadgeModule } from '@angular/material/badge';
     ThemeComponent,
     StepIconsModule,
     MatAutocompleteModule,
+    MatBadgeModule,
   ],
 })
 export class StepMaterialModule {}

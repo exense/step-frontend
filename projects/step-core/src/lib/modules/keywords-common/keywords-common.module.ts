@@ -12,10 +12,12 @@ import { FunctionSelectionTableComponent } from './components/function-selection
 import { EntityModule, EntityRegistry } from '../entity/entity.module';
 import { CustomRegistriesModule } from '../custom-registeries/custom-registries.module';
 import { FunctionBulkOperationsRegisterService } from './injectables/function-bulk-operations-register.service';
+import { FunctionLinkEditorComponent } from './components/function-link/function-link-editor.component';
 
 @NgModule({
   declarations: [
     FunctionLinkComponent,
+    FunctionLinkEditorComponent,
     AgentTokenSelectionCriteriaComponent,
     FunctionTypeLabelPipe,
     FunctionSelectionTableComponent,
@@ -33,6 +35,7 @@ import { FunctionBulkOperationsRegisterService } from './injectables/function-bu
   ],
   exports: [
     FunctionLinkComponent,
+    FunctionLinkEditorComponent,
     AgentTokenSelectionCriteriaComponent,
     FunctionTypeLabelPipe,
     FunctionSelectionTableComponent,
@@ -53,6 +56,7 @@ export class KeywordsCommonModule {
 }
 
 export * from './components/function-link/function-link.component';
+export * from './components/function-link/function-link-editor.component';
 export * from './components/function-type-form/function-type-form-component';
 export * from './components/agent-token-selection-criteria/agent-token-selection-criteria.component';
 export * from './components/function-selection-table/function-selection-table.component';
