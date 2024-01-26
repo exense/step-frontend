@@ -2,11 +2,18 @@
   <step-status [status]="_state.execution?.status" titleAddon> </step-status>
   <ul class="list-unstyled">
     <li>
-      <strong>Plan</strong>&nbsp;<span
-        ><a routerLink="/root/plans/editor/{{ _state.execution!.planId! }}">{{
-          _state.execution!.description
-        }}</a></span
-      >
+      <strong>Plan</strong>
+      <span>
+        <a
+          routerLink="/root/plans/editor/{{ _state.execution!.planId }}"
+          *ngIf="!_state?.execution?.executionParameters?.['isolatedExecution']; else isolatedPlan"
+        >
+          {{ _state.execution!.description }}
+        </a>
+        <ng-template #isolatedPlan>
+          {{ _state.execution!.description }}
+        </ng-template>
+      </span>
     </li>
     <ng-container *ngIf="_state.execution?.executionParameters?.customParameters as execParams">
       <li *ngFor="let item of execParams | keyvalue">
