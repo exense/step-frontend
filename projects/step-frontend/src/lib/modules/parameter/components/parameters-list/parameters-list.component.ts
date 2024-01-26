@@ -1,10 +1,11 @@
-import { AfterViewInit, Component, inject } from '@angular/core';
+import { Component, forwardRef, inject } from '@angular/core';
 import {
   AutoDeselectStrategy,
   Parameter,
   selectionCollectionProvider,
   tablePersistenceConfigProvider,
   STORE_ALL,
+  DialogParentService,
 } from '@exense/step-core';
 import { ParameterListLogicService } from '../../services/parameter-list-logic.service';
 
@@ -16,12 +17,18 @@ import { ParameterListLogicService } from '../../services/parameter-list-logic.s
     tablePersistenceConfigProvider('parametersList', STORE_ALL),
     ...selectionCollectionProvider<string, Parameter>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     ParameterListLogicService,
+    {
+      provide: DialogParentService,
+      useExisting: forwardRef(() => ParametersListComponent),
+    },
   ],
 })
-export class ParametersListComponent implements AfterViewInit {
+export class ParametersListComponent implements DialogParentService {
   protected _logic = inject(ParameterListLogicService);
 
-  ngAfterViewInit(): void {
-    this._logic.resolveEditLinkIfExists();
+  readonly returnParentUrl = this._logic.ROOT_URL;
+
+  dialogSuccessfullyClosed(): void {
+    this._logic.dataSource.reload();
   }
 }
