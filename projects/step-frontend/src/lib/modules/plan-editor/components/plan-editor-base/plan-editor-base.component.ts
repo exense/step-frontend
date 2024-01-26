@@ -24,7 +24,6 @@ import {
   PlanArtefactResolverService,
   PlanEditorService,
   PlanInteractiveSessionService,
-  PlansService,
   RepositoryObjectReference,
   TreeNodeUtilsService,
   TreeStateService,
@@ -34,6 +33,7 @@ import {
   PlanOpenService,
   PlanSetupService,
   PlanEditorApiService,
+  AugmentedPlansService,
 } from '@exense/step-core';
 import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
@@ -43,7 +43,6 @@ import { PlanHistoryService } from '../../injectables/plan-history.service';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { PlanSourceDialogComponent } from '../plan-source-dialog/plan-source-dialog.component';
-import { PlanSourceStubService } from '../../injectables/plan-source-stub.service';
 
 @Component({
   selector: 'step-plan-editor-base',
@@ -83,7 +82,7 @@ export class PlanEditorBaseComponent
   readonly _interactiveSession = inject(InteractiveSessionService);
   private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
   private _planEditorApi = inject(PlanEditorApiService);
-  private _planApi = inject(PlansService);
+  private _planApi = inject(AugmentedPlansService);
   private _keywordCallsApi = inject(KeywordsService);
   private _dialogsService = inject(DialogsService);
   private _functionActions = inject(FunctionActionsService);
@@ -92,7 +91,6 @@ export class PlanEditorBaseComponent
   public _planEditService = inject(PlanEditorService);
   private _activatedRoute = inject(ActivatedRoute);
   private _planOpen = inject(PlanOpenService);
-  private _planSourceStub = inject(PlanSourceStubService);
   private _matDialog = inject(MatDialog);
   private _cd = inject(ChangeDetectorRef);
 
@@ -214,8 +212,8 @@ export class PlanEditorBaseComponent
   }
 
   showPlanSource(): void {
-    this._planSourceStub
-      .getPlanSource(this.initialPlan!)
+    this._planApi
+      .getYamlPlan(this.currentPlanId!)
       .subscribe((source) => this._matDialog.open(PlanSourceDialogComponent, { data: source }));
   }
 

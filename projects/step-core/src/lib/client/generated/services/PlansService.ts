@@ -279,6 +279,22 @@ export class PlansService {
   }
 
   /**
+   * Returns the plan in yaml format.
+   * @param id
+   * @returns any default response
+   * @throws ApiError
+   */
+  public getYamlPlan(id: string): Observable<any> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/plans/{id}/yaml',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
    * Get entity locking state
    * @param id
    * @returns boolean default response
