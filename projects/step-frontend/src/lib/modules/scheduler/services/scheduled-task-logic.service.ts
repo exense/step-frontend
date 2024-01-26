@@ -15,7 +15,7 @@ import { map, Observable, of, pipe, switchMap, take, tap } from 'rxjs';
 import { Router } from '@angular/router';
 
 const TASK_ID = 'taskId';
-const EDITOR_URL = '/root/scheduler';
+const EDITOR_URL = '/scheduler';
 
 @Injectable()
 export class ScheduledTaskLogicService implements SchedulerActionsService {

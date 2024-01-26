@@ -49,7 +49,7 @@ export class AutomationPackagesDialogsService {
       return this.openAutomationPackageEditDialog(automationPackage);
     }
 
-    const url = `/root/${PATH}/list`;
+    const url = `/${PATH}/list`;
     const editParams = { [AUTOMATION_PACKAGE_ID]: automationPackage.id! };
 
     return this._multipleProjects

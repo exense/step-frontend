@@ -18,7 +18,7 @@ import { IsUsedByDialogService } from './is-used-by-dialog.service';
 
 const CONFIGURER_KEYWORD_ID = 'configurerKeywordId';
 const ENTITY_TYPE = 'keyword';
-const EDITOR_URL = '/root/functions';
+const EDITOR_URL = '/functions';
 
 @Injectable({
   providedIn: 'root',
