@@ -43,7 +43,7 @@ Settings.defaultLocale = 'en';
     DefaultThemeModule,
     ArtefactsModule,
     ResourcesModule,
-    RouterModule.forRoot(APP_ROUTES),
+    RouterModule.forRoot(APP_ROUTES, { useHash: true }),
   ],
   exports: [RootComponent],
   providers: [LEGACY_URL_HANDLER, PLUGINS_INITIALIZER, DEFAULT_ROUTE_INITIALIZER],

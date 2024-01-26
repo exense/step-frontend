@@ -1,14 +1,13 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import { inject, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 
 import { AngularHttpRequest } from './core/AngularHttpRequest';
 import { BaseHttpRequest } from './core/BaseHttpRequest';
 import type { OpenAPIConfig } from './core/OpenAPI';
 import { OpenAPI } from './core/OpenAPI';
-import { DOCUMENT } from '@angular/common';
 
 @NgModule({
   imports: [HttpClientModule],
@@ -16,11 +15,8 @@ import { DOCUMENT } from '@angular/common';
     {
       provide: OpenAPI,
       useFactory: () => {
-        const document = inject(DOCUMENT);
-        let root = document.baseURI.replace(location.origin, '');
-        root = root.endsWith('/') ? root : `${root}/`;
         return {
-          BASE: `${root}${OpenAPI?.BASE ?? 'rest'}`,
+          BASE: OpenAPI?.BASE ?? 'rest',
           VERSION: OpenAPI?.VERSION ?? '3.24.0',
           WITH_CREDENTIALS: OpenAPI?.WITH_CREDENTIALS ?? false,
           CREDENTIALS: OpenAPI?.CREDENTIALS ?? 'include',
