@@ -1,6 +1,5 @@
-import { inject, Injectable } from '@angular/core';
-import { PlanEditorApiService } from '../../plan-editor/plan-editor.module';
-import { from, map, Observable, pipe, tap } from 'rxjs';
+import { inject, Injectable, OnDestroy } from '@angular/core';
+import { BehaviorSubject, switchMap, map, Observable, of, pipe, tap, filter } from 'rxjs';
 import {
   AugmentedInteractivePlanExecutionService,
   AugmentedKeywordsService,
@@ -10,20 +9,33 @@ import {
   RepositoryObjectReference,
   Keyword,
   History,
+  PlanEditorApiService,
+  CompositesService,
+  PlansService,
 } from '@exense/step-core';
 import { Router } from '@angular/router';
 
-@Injectable()
-export class CompositeKeywordPlanApiService implements PlanEditorApiService {
+@Injectable({
+  providedIn: 'root',
+})
+export class CompositeKeywordPlanApiService implements PlanEditorApiService, OnDestroy {
   private _keywordApi = inject(AugmentedKeywordsService);
+  private _compositeApi = inject(CompositesService);
+  private _planApi = inject(PlansService);
   private _router = inject(Router);
   private _interactiveApi = inject(AugmentedInteractivePlanExecutionService);
   private _exportDialogs = inject(ExportDialogsService);
 
-  private keyword?: Keyword;
+  private keywordInternal$ = new BehaviorSubject<Keyword | undefined>(undefined);
 
-  private readonly getPlanWidthId = pipe(
-    tap((keyword: Keyword) => (this.keyword = keyword)),
+  ngOnDestroy(): void {
+    this.keywordInternal$.complete();
+  }
+
+  readonly keyword$ = this.keywordInternal$.asObservable();
+
+  private readonly getPlanWithId = pipe(
+    tap((keyword: Keyword) => this.keywordInternal$.next(keyword)),
     map((keyword) => {
       const id = keyword.id!;
       const plan = (keyword as any).plan as Plan;
@@ -32,12 +44,12 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService {
   );
 
   private readonly getPlan = pipe(
-    this.getPlanWidthId,
+    this.getPlanWithId,
     map(({ plan }) => plan)
   );
 
   clonePlan(id: string): Observable<Plan> {
-    return this._keywordApi.cloneFunction(id).pipe(this.getPlan);
+    return this._compositeApi.cloneCompositePlan(id);
   }
 
   createRepositoryObjectReference(id?: string): RepositoryObjectReference | undefined {
@@ -52,32 +64,58 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService {
   }
 
   exportPlan(id: string, fileName: string): Observable<boolean> {
-    return this._exportDialogs.displayExportDialog('Composite Keyword export', `functions`, fileName, id);
+    return this._exportDialogs.displayExportDialog('Composite Keyword export', 'functions', fileName, id);
   }
 
   getPlanHistory(id: string): Observable<History[]> {
-    return this._keywordApi.getFunctionVersions(id);
+    return this.keyword$.pipe(
+      map((keyword) => keyword!),
+      switchMap((keyword: Keyword) => this._keywordApi.getFunctionVersions(keyword.id!))
+    );
   }
 
   loadPlan(id: string): Observable<Plan> {
     return this._keywordApi.getFunctionById(id).pipe(this.getPlan);
   }
 
-  navigateToPlan(id: string): void {
-    const EDITOR_URL = '/composites/editor';
+  navigateToPlan(id: string, enforcePurePlan?: boolean): void {
+    const EDITOR_URL = enforcePurePlan ? '/plans/editor' : '/composites/editor';
     this._router.navigateByUrl(`${EDITOR_URL}/${id}`);
   }
 
   restorePlanVersion(id: string, versionId: string): Observable<Plan> {
-    return this._keywordApi.restoreFunctionVersion(id, versionId).pipe(this.getPlan);
+    if (versionId) {
+      return this.keyword$.pipe(
+        map((keyword) => keyword!),
+        switchMap((keyword: Keyword) => this._keywordApi.restoreFunctionVersion(keyword.id!, versionId)),
+        this.getPlan
+      );
+    }
+    return this.keyword$.pipe(
+      map((keyword) => keyword!),
+      this.getPlan
+    );
+  }
+
+  getPlanVersion(id: string, plan: Plan): Observable<string> {
+    return this._keywordApi.getFunctionById(id).pipe(map((keyword) => keyword?.customFields?.['versionId']));
   }
 
   savePlan(plan: Plan): Observable<{ id: string; plan: Plan }> {
     const keyword = {
-      ...this.keyword!,
+      ...this.keywordInternal$.value!,
       plan,
     } as Keyword;
 
-    return this._keywordApi.saveFunction(keyword).pipe(this.getPlanWidthId);
+    return this._keywordApi.saveFunction(keyword).pipe(this.getPlanWithId);
+  }
+
+  renamePlan(plan: Plan, name: string): Observable<{ id: string; plan: Plan }> {
+    plan.attributes!['name'] = name;
+    return this._planApi.savePlan(plan).pipe(
+      map((plan: Plan) => {
+        return { id: plan.id!, plan };
+      })
+    );
   }
 }

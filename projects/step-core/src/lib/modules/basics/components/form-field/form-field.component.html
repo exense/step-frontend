@@ -1,11 +1,15 @@
 <div
   class="label-container"
+  [class.show-required-marker]="showRequiredMarker"
   [class.align-left]="alignLabelAddon === 'near'"
   [class.without-children]="!label.children.length && !labelAddon.children.length"
 >
   <label #label>
     <ng-content select="step-label"> </ng-content>
   </label>
+  <div class="required-marker-container">
+    <span>REQUIRED</span>
+  </div>
   <div #labelAddon class="label-addon">
     <ng-content select="step-label-addon"></ng-content>
   </div>

@@ -4,20 +4,53 @@
       {{ error }}
     </step-alert>
     <form #formContainer="ngForm">
-      <step-form-field>
+      <step-form-field [showRequiredMarker]="true">
         <step-label>Name</step-label>
-        <input type="text" placeholder="Name" required [(ngModel)]="_task.attributes!['name']" name="name" />
+        <input type="text" placeholder="Name" required [(ngModel)]="task.attributes!['name']" name="name" />
       </step-form-field>
-      <step-select-plan required [ngModel]="plan" (ngModelChange)="handlePlanChange($event)" name="plan">
-      </step-select-plan>
-      <step-form-field>
+      <ng-container *ngIf="repositoryId; else localPlan">
+        <step-form-field>
+          <step-label>Repository</step-label>
+          <input type="text" [ngModel]="repositoryId" [disabled]="true" name="repository" />
+        </step-form-field>
+        <step-form-field>
+          <step-label>Repository Plan Id</step-label>
+          <input type="text" [ngModel]="repositoryPlanId" [disabled]="true" name="repositoryPlanId" />
+        </step-form-field>
+      </ng-container>
+      <ng-template #localPlan>
+        <step-select-plan
+          [showRequiredMarker]="true"
+          required
+          [ngModel]="plan"
+          (ngModelChange)="handlePlanChange($event)"
+          [disabled]="config?.disablePlan ?? false"
+          name="plan"
+        >
+        </step-select-plan>
+      </ng-template>
+      <step-form-field [showRequiredMarker]="true" alignLabelAddon="near">
         <step-label>CRON expression</step-label>
+        <step-label-addon>
+          <step-popover>
+            <step-icon name="help-circle"></step-icon>
+            <step-popover-content>
+              <span>
+                The CRON expression when to cyclical execute a plan (see
+                <a href="https://step.exense.ch/knowledgebase/userdocs/executions/#schedule" target="_blank"
+                  >knowledgebase</a
+                >
+                )
+              </span>
+            </step-popover-content>
+          </step-popover>
+        </step-label-addon>
         <input
           type="text"
           placeholder="CRON expression"
           required
           stepValidateCron
-          [(ngModel)]="_task.cronExpression"
+          [(ngModel)]="task.cronExpression"
           name="cron"
         />
         <step-suffix class="button-suffix">
@@ -37,7 +70,7 @@
         <input
           type="text"
           placeholder="Description"
-          [ngModel]="_task.attributes!['description']"
+          [ngModel]="task.attributes!['description']"
           (ngModelChange)="handleDescriptionChange($event)"
           name="description"
         />
@@ -53,8 +86,8 @@
             <step-icon name="plus">plus</step-icon>
           </button>
         </div>
-        <div class="exclusions-container" *ngIf="_task.cronExclusions && _task.cronExclusions.length > 0">
-          <div *ngFor="let exclusion of _task.cronExclusions; let i = index" class="exclusion-item">
+        <div class="exclusions-container" *ngIf="task.cronExclusions && task.cronExclusions.length > 0">
+          <div *ngFor="let exclusion of task.cronExclusions; let i = index" class="exclusion-item">
             <step-form-field>
               <input
                 type="text"
@@ -92,22 +125,34 @@
       </div>
 
       <step-custom-forms
-        [stModel]="_task.executionsParameters!.customParameters!"
+        [stModel]="task.executionsParameters!.customParameters!"
         (stModelChange)="handleCustomParametersChange($event)"
         stScreen="executionParameters"
       >
       </step-custom-forms>
-      <step-form-field>
+      <step-form-field *ngIf="!config?.hideUser" alignLabelAddon="near">
         <step-label>User</step-label>
+        <step-label-addon>
+          <step-popover>
+            <step-icon name="help-circle"> </step-icon>
+            <step-popover-content>
+              <span
+                >The user on behalfe of which the plan is executed. <b>Note</b> that user has to have rights to execute
+                the plan.</span
+              >
+            </step-popover-content>
+          </step-popover>
+        </step-label-addon>
         <input
           type="text"
           placeholder="User"
-          [ngModel]="_task.executionsParameters!.userID"
+          [ngModel]="task.executionsParameters!.userID"
           (ngModelChange)="handleUserIdChange($event)"
+          [disabled]="config?.disableUser ?? false"
           name="user"
         />
       </step-form-field>
-      <step-dashlet itemKey="taskAddon" [context]="_task"></step-dashlet>
+      <step-dashlet itemKey="taskAddon" [context]="task"></step-dashlet>
       <mat-expansion-panel [(expanded)]="showParameters">
         <mat-expansion-panel-header>
           <mat-panel-title>Advanced</mat-panel-title>

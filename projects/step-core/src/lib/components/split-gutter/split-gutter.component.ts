@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, HostBinding, HostListener } from '@angular/core';
+import { AfterViewInit, Component, HostBinding, HostListener, inject } from '@angular/core';
 import { SplitAreaComponent } from '../split-area/split-area.component';
 import { SplitComponent } from '../split/split.component';
 
@@ -8,6 +8,7 @@ import { SplitComponent } from '../split/split.component';
   styleUrls: ['./split-gutter.component.scss'],
 })
 export class SplitGutterComponent implements AfterViewInit {
+  private _splitComponent = inject(SplitComponent);
   private leftArea?: SplitAreaComponent;
   private rightArea?: SplitAreaComponent;
   private eventX?: number;
@@ -17,15 +18,13 @@ export class SplitGutterComponent implements AfterViewInit {
   @HostBinding('class.active')
   active?: boolean;
 
-  constructor(private splitComponent: SplitComponent) {}
-
   ngAfterViewInit(): void {
-    if (!this.splitComponent.areas || !this.splitComponent.gutters) {
+    if (!this._splitComponent.areas || !this._splitComponent.gutters) {
       return;
     }
 
-    const gutters = this.splitComponent.gutters.toArray();
-    const areas = this.splitComponent.areas.toArray();
+    const gutters = this._splitComponent.gutters.toArray();
+    const areas = this._splitComponent.areas.toArray();
     const index = gutters.indexOf(this);
 
     this.leftArea = areas[index];
@@ -42,8 +41,8 @@ export class SplitGutterComponent implements AfterViewInit {
   }
 
   setFlex(): void {
-    this.setLeftAreaFlex(this.leftAreaWidth!);
-    this.setRightAreaFlex(this.rightAreaWidth!);
+    this.leftArea?.setSize(this.leftAreaWidth!);
+    this.rightArea?.setSize(this.rightAreaWidth!);
   }
 
   @HostListener('mousedown', ['$event'])
@@ -53,14 +52,14 @@ export class SplitGutterComponent implements AfterViewInit {
     this.active = true;
     this.eventX = event.clientX;
 
-    if (!this.splitComponent.gutters) {
+    if (!this._splitComponent.gutters) {
       return;
     }
 
-    this.splitComponent.gutters.forEach((gutter) => {
+    this._splitComponent.gutters.forEach((gutter) => {
       gutter.setAreaWidths();
     });
-    this.splitComponent.gutters.forEach((gutter) => {
+    this._splitComponent.gutters.forEach((gutter) => {
       gutter.setFlex();
     });
   }
@@ -90,8 +89,8 @@ export class SplitGutterComponent implements AfterViewInit {
     const leftAreaWidth = this.leftAreaWidth - delta;
     const rightAreaWidth = this.rightAreaWidth + delta;
 
-    this.setLeftAreaFlex(leftAreaWidth);
-    this.setRightAreaFlex(rightAreaWidth);
+    this.leftArea?.setSize(leftAreaWidth);
+    this.rightArea?.setSize(rightAreaWidth);
   }
 
   @HostListener('window:mouseup')
@@ -100,27 +99,5 @@ export class SplitGutterComponent implements AfterViewInit {
     delete this.eventX;
     delete this.leftAreaWidth;
     delete this.rightAreaWidth;
-  }
-
-  private setLeftAreaFlex(leftAreaWidth: number): void {
-    if (!this.leftArea) {
-      return;
-    }
-
-    this.leftArea.setFlex({
-      flexBasis: `${leftAreaWidth}px`,
-      ...(this.leftArea.sizeType === 'flex' ? { flexGrow: this.leftArea.size } : {}),
-    });
-  }
-
-  private setRightAreaFlex(rightAreaWidth: number): void {
-    if (!this.rightArea) {
-      return;
-    }
-
-    this.rightArea.setFlex({
-      flexBasis: `${rightAreaWidth}px`,
-      ...(this.rightArea.sizeType === 'flex' ? { flexGrow: this.rightArea.size } : {}),
-    });
   }
 }

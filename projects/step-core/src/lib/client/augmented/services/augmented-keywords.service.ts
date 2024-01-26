@@ -18,6 +18,7 @@ export class AugmentedKeywordsService extends KeywordsService {
       {
         name: 'attributes.name',
         type: 'type',
+        automationPackage: 'customFields.automationPackageId',
         actions: '',
       },
       filter ? { type: filter } : undefined

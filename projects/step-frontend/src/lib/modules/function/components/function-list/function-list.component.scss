@@ -4,21 +4,15 @@
   @include core.table-container;
 }
 
-.cell-actions {
-  width: 20rem;
-  button {
-    padding: 0;
-    min-width: 4rem;
-    min-height: 4rem;
-  }
-}
-
 .header {
   @include core.table-header;
 }
 
-.create-keyword-button-group button {
-  margin-left: 1rem;
+@include core.table-common-cells;
+
+.create-keyword-button-group {
+  display: flex;
+  gap: 1rem;
 }
 
 .import-keyword-button-group button {
@@ -27,8 +21,4 @@
 
 .bulk-selection-cell {
   width: 6rem;
-}
-
-.history {
-  display: none;
 }

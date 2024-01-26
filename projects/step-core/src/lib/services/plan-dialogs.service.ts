@@ -1,35 +1,28 @@
 import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { map, Observable, of, switchMap, tap } from 'rxjs';
+import { map, Observable, switchMap } from 'rxjs';
 import { AbstractArtefact, AugmentedPlansService, Plan } from '../client/step-client-module';
 import { PlanCreateDialogComponent } from '../components/plan-create-dialog/plan-create-dialog.component';
 import { PlanLinkDialogService } from '../components/plan-link/plan-link-dialog.service';
 import { ThreadDistributionWizardDialogComponent } from '../components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
-import { AuthService } from '../modules/basics/services/auth.service';
-import { MultipleProjectsService } from '../modules/basics/services/multiple-projects.service';
-import { EntityDialogsService } from '../modules/entity/services/entity-dialogs.service';
-import { DialogsService } from '../shared';
+import { EntityDialogsService, EntityActionInvokerService } from '../modules/entity/entity.module';
 import { ExportDialogsService } from './export-dialogs.service';
 import { ImportDialogsService } from './import-dialogs.service';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
-
-const ARTEFACT_ID = 'artefactId';
-const EDITOR_URL = '/plans/editor';
+import { PlanAction } from '../shared';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PlanDialogsService implements PlanLinkDialogService {
+  private _entityActionsInvoker = inject(EntityActionInvokerService);
   private _matDialog = inject(MatDialog);
   private _plansApiService = inject(AugmentedPlansService);
-  private _dialogs = inject(DialogsService);
   private _entityDialogs = inject(EntityDialogsService);
-  private _authService = inject(AuthService);
   private _exportDialogs = inject(ExportDialogsService);
   private _importDialogs = inject(ImportDialogsService);
   private _isUsedByDialogs = inject(IsUsedByDialogService);
-  private _multipleProjects = inject(MultipleProjectsService);
   private _router = inject(Router);
 
   createPlan(): Observable<Plan | undefined> {
@@ -53,14 +46,8 @@ export class PlanDialogsService implements PlanLinkDialogService {
     return this._plansApiService.clonePlan(id).pipe(switchMap((clone) => this._plansApiService.savePlan(clone)));
   }
 
-  deletePlan(id: string, name: string): Observable<boolean> {
-    return this._dialogs
-      .showDeleteWarning(1, `Plan "${name}"`)
-      .pipe(
-        switchMap((isDeleteConfirmed) =>
-          isDeleteConfirmed ? this._plansApiService.deletePlan(id).pipe(map(() => true)) : of(false)
-        )
-      );
+  deletePlan(plan: Plan): Observable<boolean> {
+    return this._entityActionsInvoker.invokeAction('plans', PlanAction.DELETE, plan);
   }
 
   importPlans(): Observable<boolean | string[]> {
@@ -80,30 +67,7 @@ export class PlanDialogsService implements PlanLinkDialogService {
   }
 
   editPlan(plan: Plan, artefactId?: string): Observable<boolean> {
-    const planEditLink = `${EDITOR_URL}/${plan.id}`;
-
-    if (
-      this._authService.hasRight('admin-no-multitenancy') ||
-      this._multipleProjects.isEntityBelongsToCurrentProject(plan)
-    ) {
-      this.openPlanInternal(planEditLink, artefactId);
-      return of(true);
-    }
-
-    const editLinkParams = !artefactId
-      ? planEditLink
-      : {
-          url: planEditLink,
-          search: { [ARTEFACT_ID]: artefactId },
-        };
-
-    return this._multipleProjects.confirmEntityEditInASeparateProject(plan, editLinkParams, 'plan').pipe(
-      tap((continueEdit) => {
-        if (continueEdit) {
-          this.openPlanInternal(planEditLink, artefactId);
-        }
-      })
-    );
+    return this._entityActionsInvoker.invokeAction('plans', PlanAction.EDIT, plan, { artefactId });
   }
 
   executePlan(planId: string): void {
@@ -113,11 +77,5 @@ export class PlanDialogsService implements PlanLinkDialogService {
         planid: planId,
       },
     });
-  }
-
-  private openPlanInternal(planEditLink: string, artefactId?: string): void {
-    const queryParams = artefactId ? { [ARTEFACT_ID]: artefactId } : undefined;
-    const commands = planEditLink.split('/');
-    this._router.navigate(commands, { queryParams });
   }
 }

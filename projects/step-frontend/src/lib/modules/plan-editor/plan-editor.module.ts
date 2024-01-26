@@ -9,6 +9,7 @@ import { PlanOtherplanListComponent } from './components/plan-otherplan-list/pla
 import { PlanEditorActionsComponent } from './components/plan-editor-actions/plan-editor-actions.component';
 import { PlanCommonTreeEditorFormComponent } from './components/plan-common-tree-editor-form/plan-common-tree-editor-form.component';
 import { PlanEditorKeyHandlerDirective } from './directives/plan-editor-key-handler.directive';
+import { PlanAlertsComponent } from './components/plan-alerts/plan-alerts.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { PlanEditorKeyHandlerDirective } from './directives/plan-editor-key-hand
     PlanEditorActionsComponent,
     PlanCommonTreeEditorFormComponent,
     PlanEditorKeyHandlerDirective,
+    PlanAlertsComponent,
   ],
   imports: [StepCommonModule, ExecutionModule],
   exports: [PlanEditorBaseComponent, PlanCommonTreeEditorFormComponent, PlanEditorKeyHandlerDirective],
@@ -32,4 +34,3 @@ export class PlanEditorModule {
 export * from './injectables/artefact-tree-node-utils.service';
 export * from './injectables/interactive-session.service';
 export * from './injectables/plan-history.service';
-export * from './injectables/plan-editor-api.service';

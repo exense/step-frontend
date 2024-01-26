@@ -21,7 +21,7 @@ import { DOCUMENT } from '@angular/common';
         root = root.endsWith('/') ? root : `${root}/`;
         return {
           BASE: `${root}${OpenAPI?.BASE ?? 'rest'}`,
-          VERSION: OpenAPI?.VERSION ?? '3.23.0',
+          VERSION: OpenAPI?.VERSION ?? '3.24.0',
           WITH_CREDENTIALS: OpenAPI?.WITH_CREDENTIALS ?? false,
           CREDENTIALS: OpenAPI?.CREDENTIALS ?? 'include',
           TOKEN: OpenAPI?.TOKEN,

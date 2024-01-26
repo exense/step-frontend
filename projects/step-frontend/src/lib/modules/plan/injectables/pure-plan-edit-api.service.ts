@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, map, Observable } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 import {
   Plan,
   PlansService,
@@ -9,9 +9,9 @@ import {
   ReportNode,
   ExportDialogsService,
   GlobalProgressSpinnerService,
+  PlanEditorApiService,
 } from '@exense/step-core';
 import { Router } from '@angular/router';
-import { PlanEditorApiService } from '../../plan-editor/plan-editor.module';
 
 @Injectable()
 export class PurePlanEditApiService implements PlanEditorApiService {
@@ -53,7 +53,14 @@ export class PurePlanEditApiService implements PlanEditorApiService {
   }
 
   restorePlanVersion(id: string, versionId: string): Observable<Plan> {
-    return this._planApi.restorePlanVersion(id, versionId);
+    if (versionId) {
+      return this._planApi.restorePlanVersion(id, versionId);
+    }
+    return this._planApi.getPlanById(id);
+  }
+
+  getPlanVersion(id: string, plan: Plan): Observable<string> {
+    return of(plan.customFields?.['versionId']);
   }
 
   savePlan(plan: Plan): Observable<{ id: string; plan: Plan; forceRefresh?: boolean }> {
@@ -70,7 +77,12 @@ export class PurePlanEditApiService implements PlanEditorApiService {
     );
   }
 
-  navigateToPlan(id: string): void {
+  renamePlan(plan: Plan, name: string): Observable<{ id: string; plan: Plan }> {
+    plan.attributes!['name'] = name;
+    return this.savePlan(plan);
+  }
+
+  navigateToPlan(id: string, enforcePurePlan?: boolean): void {
     const EDITOR_URL = `/plans/editor`;
     this._router.navigateByUrl(`${EDITOR_URL}/${id}`);
   }

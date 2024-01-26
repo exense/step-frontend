@@ -1,0 +1,17 @@
+mat-card {
+  min-width: 38rem;
+
+  .bulk-selection-cell {
+    width: 6rem;
+  }
+
+  .clear-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  mat-card-title {
+    font-size: 2rem;
+  }
+}

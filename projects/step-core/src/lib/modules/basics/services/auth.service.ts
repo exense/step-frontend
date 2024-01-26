@@ -72,8 +72,12 @@ export class AuthService implements OnDestroy {
     this.contextInternal$.next(context);
   }
 
-  getContext(): AuthContext {
+  private getContext(): AuthContext {
     return this.contextInternal$.value as AuthContext;
+  }
+
+  getUserID(): string {
+    return this.getContext().userID;
   }
 
   updateContext(info: Partial<AuthContext>): void {
@@ -122,6 +126,10 @@ export class AuthService implements OnDestroy {
 
   isExtLoginAuth(): boolean {
     return !!this._serviceContext?.conf?.noLoginMask;
+  }
+
+  hasRight$(right: string): Observable<boolean> {
+    return this.triggerRightCheck$.pipe(map(() => this.hasRight(right)));
   }
 
   hasRight(right: string): boolean {

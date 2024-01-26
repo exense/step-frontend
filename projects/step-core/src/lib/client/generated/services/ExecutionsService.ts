@@ -51,7 +51,7 @@ export class ExecutionsService {
   }
 
   /**
-   * Delete the execution with the given execution id.
+   * Delete the execution with the given execution id, use the housekeeping services for full deletion
    * @param id
    * @returns any default response
    * @throws ApiError
@@ -93,6 +93,22 @@ export class ExecutionsService {
       url: '/executions/search/by/critera',
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Force stop the execution with the given execution id.
+   * @param id
+   * @returns any default response
+   * @throws ApiError
+   */
+  public forceStop(id: string): Observable<any> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/{id}/force-stop',
+      path: {
+        id: id,
+      },
     });
   }
 

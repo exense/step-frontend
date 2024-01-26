@@ -4,15 +4,6 @@
   @include core.table-container;
 }
 
-.cell-actions {
-  width: 20rem;
-  button {
-    padding: 0;
-    min-width: 4rem;
-    min-height: 4rem;
-  }
-}
-
 .header {
   @include core.table-header;
 
@@ -26,6 +17,4 @@
   width: 6rem;
 }
 
-.history {
-  display: none;
-}
+@include core.table-common-cells;

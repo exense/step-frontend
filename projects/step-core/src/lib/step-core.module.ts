@@ -22,7 +22,6 @@ import { ExportDialogComponent } from './components/export-dialog/export-dialog.
 import { IsUsedByListComponent } from './components/is-used-by-list/is-used-by-list.component';
 import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 import { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
-import { NewSchedulerTaskDialogComponent } from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 import { PlanLinkComponent } from './components/plan-link/plan-link.component';
 import { PlanNameComponent } from './components/plan-name/plan-name.component';
@@ -30,7 +29,6 @@ import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { PredefinedOptionsInputComponent } from './components/predefined-options-input/predefined-options-input.component';
 import { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
-import { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 import { SelectPlanComponent } from './components/select-plan/select-plan.component';
 import { SettingButtonComponent } from './components/setting-button/setting-button.component';
 import { SplitAreaComponent } from './components/split-area/split-area.component';
@@ -81,16 +79,16 @@ import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.
 import { SettingsComponent } from './components/settings/settings.component';
 import { ImportDialogComponent } from './components/import-dialog/import-dialog.component';
 import { CronModule } from './modules/cron/cron.module';
-import { PopoverComponent } from './components/popover/popover.component';
-import { TriggerPopoverDirective } from './directives/trigger-popover.directive';
 import { HtmlDescriptionCellComponent } from './components/html-description-cell/html-description-cell.component';
-import { SafeHtmlPipe } from './pipes/safe-html.pipe';
-import { PopoverContentDirective } from './directives/popover-content.directive';
 import { EnterTextValueDialogComponent } from './components/enter-text-value-dialog/enter-text-value-dialog.component';
 import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
 import { MessagesListDialogComponent } from './components/messages-list-dialog/messages-list-dialog.component';
 import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
 import { ReportNodeIconComponent } from './components/report-node-icon/report-node-icon.component';
+import { AutomationPackageCommonModule } from './modules/automation-package-common/automation-package-common.module';
+import { LockColumnContainerComponent } from './components/lock-column-container/lock-column-container.component';
+import { LockColumnComponent } from './components/lock-column/lock-column.component';
+import { DatePickerModule } from './modules/date-picker/date-picker.module';
 
 @NgModule({
   declarations: [
@@ -109,7 +107,6 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     AutorefreshToggleComponent,
     SettingButtonComponent,
     PlanTreeComponent,
-    RestoreDialogComponent,
     EditableActionsComponent,
     EditableLabelComponent,
     EditableTextareaLabelComponent,
@@ -139,7 +136,6 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     CustomFormWrapperComponent,
     EntityColumnComponent,
     EntityColumnContainerComponent,
-    NewSchedulerTaskDialogComponent,
     EditSchedulerTaskDialogComponent,
     ExportDialogComponent,
     ArtefactDetailsComponent,
@@ -151,15 +147,13 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     SimpleOutletComponent,
     SettingsComponent,
     ImportDialogComponent,
-    PopoverComponent,
-    TriggerPopoverDirective,
     HtmlDescriptionCellComponent,
-    SafeHtmlPipe,
-    PopoverContentDirective,
     EnterTextValueDialogComponent,
     ConfirmationDialogComponent,
     MessagesListDialogComponent,
     MessageDialogComponent,
+    LockColumnContainerComponent,
+    LockColumnComponent,
   ],
   imports: [
     CommonModule,
@@ -180,8 +174,10 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     JsonViewerModule,
     ResourceInputModule,
     KeywordsCommonModule,
+    AutomationPackageCommonModule,
     WizardModule,
     CronModule,
+    DatePickerModule,
   ],
   exports: [
     CommonModule,
@@ -214,7 +210,6 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     PlanTreeComponent,
     AutorefreshToggleComponent,
     SettingButtonComponent,
-    RestoreDialogComponent,
     EditableLabelComponent,
     EditableTextareaLabelComponent,
     EditableDropdownLabelComponent,
@@ -242,7 +237,7 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     CustomFormWrapperComponent,
     EntityColumnComponent,
     EntityColumnContainerComponent,
-    NewSchedulerTaskDialogComponent,
+    LockColumnContainerComponent,
     EditSchedulerTaskDialogComponent,
     ExportDialogComponent,
     ArtefactDetailsComponent,
@@ -250,21 +245,20 @@ import { ReportNodeIconComponent } from './components/report-node-icon/report-no
     ResourceInputModule,
     ProjectNamePipe,
     KeywordsCommonModule,
+    AutomationPackageCommonModule,
     MyAccountButtonComponent,
     SelectTaskComponent,
     ResourceInputWrapperComponent,
     SettingsComponent,
     ImportDialogComponent,
     CronModule,
-    PopoverComponent,
-    TriggerPopoverDirective,
-    PopoverContentDirective,
     HtmlDescriptionCellComponent,
-    SafeHtmlPipe,
     EnterTextValueDialogComponent,
     ConfirmationDialogComponent,
     MessagesListDialogComponent,
     MessageDialogComponent,
+    LockColumnComponent,
+    DatePickerModule,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -316,13 +310,14 @@ export { EditableLabelComponent } from './components/editable-label/editable-lab
 export { EditableTextareaLabelComponent } from './components/editable-textarea-label/editable-textarea-label.component';
 export * from './components/entity-column-container/entity-column-container.component';
 export * from './components/entity-column/entity-column.component';
+export * from './components/lock-column-container/lock-column-container.component';
+export * from './components/lock-column/lock-column.component';
 export * from './components/export-dialog/export-dialog.component';
 export * from './components/import-dialog/import-dialog.component';
 export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 export * from './components/html-description-cell/html-description-cell.component';
 export { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
-export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 export * from './components/plan-link/plan-link.component';
 export * from './components/scheduler-task-link/scheduler-task-link.component';
@@ -331,7 +326,6 @@ export { PlanNameComponent } from './components/plan-name/plan-name.component';
 export * from './components/plan-tree/plan-tree.component';
 export { PredefinedOptionsInputComponent } from './components/predefined-options-input/predefined-options-input.component';
 export * from './components/report-node-status/report-node-status.component';
-export { RestoreDialogComponent } from './components/restore-dialog/restore-dialog.component';
 export * from './components/select-plan/select-plan.component';
 export * from './components/select-task/select-task.component';
 export * from './components/setting-button/setting-button.component';
@@ -343,15 +337,11 @@ export { SplitComponent } from './components/split/split.component';
 export * from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 export * from './components/entity-column/entity-column.component';
 export * from './components/entity-column-container/entity-column-container.component';
-export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 export * from './components/artefact-details/artefact-details.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export * from './components/settings/settings.component';
 export * from './directives/caps-lock.directive';
-export * from './components/popover/popover.component';
-export * from './directives/trigger-popover.directive';
-export * from './directives/popover-content.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
 export { FocusableDirective } from './directives/focusable.directive';
 export { FocusablesDirective } from './directives/focusables.directive';
@@ -376,10 +366,11 @@ export * from './modules/json-viewer/json-viewer.module';
 export * from './modules/resource-input/resource-input.module';
 export * from './modules/keywords-common/keywords-common.module';
 export * from './modules/wizard/wizards.module';
+export * from './modules/automation-package-common/automation-package-common.module';
 export * from './modules/cron/cron.module';
+export * from './modules/date-picker/date-picker.module';
 export * from './pipes/dashboard-link.pipe';
 export * from './pipes/dynamic-attribute.pipe';
-export * from './pipes/safe-html.pipe';
 export * from './pipes/is-chart-empty.pipe';
 export * from './pipes/project-name.pipe';
 export * from './pipes/matching-authenticator.pipe';
@@ -404,14 +395,16 @@ export * from './services/task-by-id-cache.service';
 export { PlanDialogsService } from './services/plan-dialogs.service';
 export * from './services/plan-editor.service';
 export * from './services/plan-interactive-session.service';
+export * from './services/plan-setup.service';
 export * from './services/plugin-info-registry.service';
-export * from './services/restore-dialogs.service';
+export * from './services/plan-editor-api.service';
 export * from './services/scheduled-task-dialogs.service';
 export * from './services/view-registry.service';
 export * from './services/view-state.service';
 export * from './services/artefact.service';
 export * from './services/artefact-form-change-helper.service';
 export * from './services/function-actions-impl.service';
+export * from './services/plan-editor-persistence-state.service';
 export * from './shared';
 export * from './modules/basics/shared/api-token.interface';
 export * from './components/base-artefact/base-artefact.component';

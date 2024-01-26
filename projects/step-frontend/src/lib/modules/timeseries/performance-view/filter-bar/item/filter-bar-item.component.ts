@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } 
 import { MatMenuTrigger } from '@angular/material/menu';
 import { DateTime } from 'luxon';
 import { TimeSeriesUtils } from '../../../time-series-utils';
-import { FilterBarItemType, TsFilterItem } from '../model/ts-filter-item';
+import { FilterBarItemType, FilterBarItem } from '../model/filter-bar-item';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
@@ -12,17 +12,15 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
   styleUrls: ['./filter-bar-item.component.scss'],
 })
 export class FilterBarItemComponent implements OnInit, OnChanges {
-  @Input() item!: TsFilterItem;
+  @Input() item!: FilterBarItem;
   @Input() removable?: boolean;
   @Input() compact = false;
 
-  @Output() onRemoveItem: EventEmitter<any> = new EventEmitter<any>();
-  @Output() onFilterChange: EventEmitter<TsFilterItem> = new EventEmitter<TsFilterItem>();
+  @Output() removeItem: EventEmitter<void> = new EventEmitter<void>();
+  @Output() filterChange: EventEmitter<FilterBarItem> = new EventEmitter<FilterBarItem>();
 
   @ViewChild('matTrigger') matTrigger!: MatMenuTrigger;
   @ViewChild(MatMenuTrigger) menuTrigger?: MatMenuTrigger;
-
-  readonly FilterBarType = FilterBarItemType;
 
   freeTextValues: string[] = [];
 
@@ -69,7 +67,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     }
 
     this.formattedValue = this.getFormattedValue(this.item);
-    this.onFilterChange.emit(this.item);
+    this.filterChange.emit(this.item);
     this.changesApplied = true;
   }
 
@@ -77,14 +75,13 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     if (this.chipInputValue) {
       this.addSearchValue(this.chipInputValue);
     }
-    if (!this.item.isLocked) {
-      this.item.label = this.item.attributeName;
-    }
+    let isEntityFilter = false;
     switch (this.item.type) {
       case FilterBarItemType.EXECUTION:
       case FilterBarItemType.PLAN:
       case FilterBarItemType.TASK:
         this.item.freeTextValues = this.item.searchEntities.map((e) => e.searchValue);
+        isEntityFilter = true;
         break;
       case FilterBarItemType.OPTIONS:
         break;
@@ -99,8 +96,12 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
       default:
         throw new Error('Unhandled item type: ' + this.item.type);
     }
+    if (!this.item.isLocked && !isEntityFilter) {
+      this.item.label = this.item.attributeName;
+    }
+
     this.formattedValue = this.getFormattedValue(this.item);
-    this.onFilterChange.emit(this.item);
+    this.filterChange.emit(this.item);
     this.changesApplied = true;
     this.matTrigger.closeMenu();
   }
@@ -115,7 +116,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     this.formattedValue = this.getFormattedValue(this.item);
   }
 
-  private getFormattedValue(item: TsFilterItem): string | undefined {
+  private getFormattedValue(item: FilterBarItem): string | undefined {
     let formattedValue: string | undefined = '';
     switch (item.type) {
       case FilterBarItemType.EXECUTION:
@@ -176,5 +177,9 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
 
     // Clear the input value
     this.chipInputValue = '';
+  }
+
+  get FilterBarItemType() {
+    return FilterBarItemType;
   }
 }

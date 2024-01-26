@@ -31,6 +31,9 @@ import { TableRemoteDataSourceFactoryImplService } from './services/table-remote
 import { TableStorageService } from './services/table-storage.service';
 import { BulkOperationPerformStrategyImplService } from './services/bulk-operation-perform-strategy-impl.service';
 import { HighlightTableRowDirective } from './directives/highlight-table-row.directive';
+import { DatePickerModule } from '../date-picker/date-picker.module';
+import { RangeFilterComponent } from './components/range-filter/range-filter.component';
+import { DateFilterComponent } from './components/date-filter/date-filter.component';
 
 @NgModule({
   imports: [
@@ -41,6 +44,7 @@ import { HighlightTableRowDirective } from './directives/highlight-table-row.dir
     CustomRegistriesModule,
     AsyncOperationsModule,
     StepBasicsModule,
+    DatePickerModule,
   ],
   declarations: [
     TableComponent,
@@ -58,6 +62,8 @@ import { HighlightTableRowDirective } from './directives/highlight-table-row.dir
     CustomSearchDropdownComponent,
     CustomSearchCheckboxComponent,
     HighlightTableRowDirective,
+    RangeFilterComponent,
+    DateFilterComponent,
   ],
   exports: [
     TableComponent,
@@ -71,6 +77,8 @@ import { HighlightTableRowDirective } from './directives/highlight-table-row.dir
     CustomSearchDropdownComponent,
     CustomSearchCheckboxComponent,
     HighlightTableRowDirective,
+    RangeFilterComponent,
+    DateFilterComponent,
   ],
   providers: [
     TitleCasePipe,
@@ -81,11 +89,6 @@ import { HighlightTableRowDirective } from './directives/highlight-table-row.dir
     {
       provide: BulkOperationPerformStrategy,
       useExisting: BulkOperationPerformStrategyImplService,
-    },
-    {
-      provide: LOGOUT_CLEANUP,
-      useExisting: TableStorageService,
-      multi: true,
     },
   ],
 })
@@ -104,6 +107,8 @@ export * from './components/custom-columns/custom-columns.component';
 export * from './components/custom-search-dropdown/custom-search-dropdown.component';
 export * from './components/custom-search-dropdown/custom-search-checkbox.component';
 export * from './components/custom-columns/custom-columns-base.component';
+export * from './components/range-filter/range-filter.component';
+export * from './components/date-filter/date-filter.component';
 export * from './directives/column.directive';
 export * from './shared/search-value';
 export * from './shared/table-remote-data-source';

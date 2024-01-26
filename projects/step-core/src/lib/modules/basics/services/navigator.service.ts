@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { DEFAULT_PAGE } from './default-page.token';
 import { DOCUMENT, Location } from '@angular/common';
 import { VIEW_ID_LINK_PREFIX } from './view-id-link-prefix.token';
-import { ActivatedRoute, NavigationEnd, Params, QueryParamsHandling, Router, UrlTree } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Params, QueryParamsHandling, Router } from '@angular/router';
 import { filter, from, map, Observable, shareReplay, startWith, switchMap, timer } from 'rxjs';
 
 @Injectable({
@@ -19,13 +19,15 @@ export class NavigatorService {
   readonly activeUrl$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
     map(() => this._router.url),
-    startWith(this._router.url),
     shareReplay(1)
   );
 
   isViewIdActive(viewId: string): Observable<boolean> {
     const viewLink = `/${viewId}`;
-    return this.activeUrl$.pipe(map((url) => url.startsWith(viewLink)));
+    return this.activeUrl$.pipe(
+      startWith(this._router.url),
+      map((url) => url.startsWith(viewLink))
+    );
   }
 
   navigate(viewId: string, isOpenInSeparateTab: boolean = false): void {

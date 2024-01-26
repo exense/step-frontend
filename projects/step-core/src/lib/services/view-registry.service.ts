@@ -79,10 +79,6 @@ export class ViewRegistryService implements OnDestroy {
     this.registerMenuEntry('Support', 'support-root', 'life-buoy', { weight: 100 });
 
     // Sub Menus Automation
-    this.registerMenuEntry('Keyword packages', 'functionPackages', 'package', {
-      weight: 20,
-      parentId: 'automation-root',
-    });
     this.registerMenuEntry('Keywords', 'functions', 'keyword', { weight: 10, parentId: 'automation-root' });
     this.registerMenuEntry('Plans', 'plans', 'plan', { weight: 30, parentId: 'automation-root' });
     this.registerMenuEntry('Parameters', 'parameters', 'list', { weight: 40, parentId: 'automation-root' });
@@ -90,7 +86,7 @@ export class ViewRegistryService implements OnDestroy {
 
     // Sub Menus Execute
     this.registerMenuEntry('Executions', 'executions', 'rocket', { weight: 10, parentId: 'execute-root' });
-    this.registerMenuEntry('Analytics', 'analytics', 'bar-chart-square-01', { weight: 20, parentId: 'execute-root' });
+    this.registerMenuEntry('Analytics', 'dashboards', 'bar-chart-square-01', { weight: 20, parentId: 'execute-root' });
     // Sub Menus Status
     this.registerMenuEntry('Current Operations', 'operations', 'airplay', { weight: 10, parentId: 'status-root' });
     this.registerMenuEntry('Agents', 'gridagents', 'agent', { weight: 20, parentId: 'status-root' });

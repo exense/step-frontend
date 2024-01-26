@@ -5,7 +5,6 @@ import {
   FilterConditionFactoryService,
   MultipleProjectsService,
   Parameter,
-  RestoreDialogsService,
 } from '@exense/step-core';
 import { ParameterDialogsService } from './parameter-dialogs.service';
 import { take } from 'rxjs';
@@ -18,7 +17,6 @@ export class ParameterListLogicService {
   private _editorResolver = inject(EditorResolverService);
   private _parametersService = inject(AugmentedParametersService);
   private _parameterDialogs = inject(ParameterDialogsService);
-  private _restoreDialogsService = inject(RestoreDialogsService);
 
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
 
@@ -68,34 +66,9 @@ export class ParameterListLogicService {
 
   deleteParameter(id: string, label: string): void {
     this._parameterDialogs.deleteParameter(id, label).subscribe((result: boolean) => {
-      if (!result) {
-        return;
-      }
-
       this.dataSource.reload();
     });
   }
-  displayHistory(parameter: Parameter, permission: string): void {
-    if (!parameter.id) {
-      return;
-    }
-
-    const resourceVersion = parameter.customFields ? parameter.customFields['versionId'] : undefined;
-    const versionHistory = this._parametersService.getParameterVersions(parameter.id!);
-
-    this._restoreDialogsService
-      .showRestoreDialog(resourceVersion, versionHistory, permission)
-      .subscribe((restoreVersion) => {
-        if (!restoreVersion) {
-          return;
-        }
-
-        this._parametersService
-          .restoreParameterVersion(parameter.id!, restoreVersion)
-          .subscribe(() => this.dataSource.reload());
-      });
-  }
-
   resolveEditLinkIfExists(): void {
     this._editorResolver
       .onEditEntity(PARAMETER_ID)
