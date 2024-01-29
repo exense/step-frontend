@@ -21,7 +21,8 @@
     "paths": {
       "@exense/step-core": ["dist/step-core", "dist/step-core/*"],
       "@exense/step-frontend": ["dist/step-frontend", "dist/step-frontend/*"]
-    }
+    },
+    "skipLibCheck": true
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

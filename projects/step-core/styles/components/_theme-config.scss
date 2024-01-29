@@ -16,6 +16,7 @@
 @use '../core-variables' as var;
 
 @forward 'step-sidebar' show step-define-sidebar-config;
+@forward 'step-login' show step-define-login-config;
 @forward 'step-header' show step-define-header-config;
 @forward 'step-alert' show step-define-alert-color, step-alert-colors;
 

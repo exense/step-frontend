@@ -48,6 +48,7 @@
             "assets": [
               "projects/step-app/src/assets",
               "projects/step-app/src/favicon.png",
+              "projects/step-app/src/step-variables.css",
               {
                 "glob": "**/*",
                 "input": "dist/step-frontend/images",
@@ -107,15 +108,15 @@
           "builder": "ngx-build-plus:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "@exense/step-app:build:production",
+              "buildTarget": "@exense/step-app:build:production",
               "extraWebpackConfig": "projects/step-app/webpack.prod.config.js"
             },
             "development": {
-              "browserTarget": "@exense/step-app:build:development",
+              "buildTarget": "@exense/step-app:build:development",
               "proxyConfig": "projects/step-app/proxy.conf.json"
             },
             "local": {
-              "browserTarget": "@exense/step-app:build:development",
+              "buildTarget": "@exense/step-app:build:development",
               "proxyConfig": "projects/step-app/proxy-local.conf.json"
             }
           },
@@ -129,7 +130,7 @@
         "extract-i18n": {
           "builder": "ngx-build-plus:extract-i18n",
           "options": {
-            "browserTarget": "@exense/step-app:build",
+            "buildTarget": "@exense/step-app:build",
             "extraWebpackConfig": "projects/step-app/webpack.config.js"
           }
         },

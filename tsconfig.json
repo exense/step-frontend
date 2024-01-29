@@ -10,6 +10,7 @@
       "@exense/step-core": ["projects/step-core/src/public-api.ts"],
       "@exense/step-frontend": ["projects/step-frontend/src/public-api.ts"]
     },
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "skipLibCheck": true
   }
 }
