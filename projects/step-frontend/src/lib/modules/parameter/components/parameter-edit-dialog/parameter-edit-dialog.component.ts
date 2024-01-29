@@ -4,6 +4,7 @@ import {
   AugmentedScreenService,
   AuthService,
   DateFormat,
+  DialogRouteResult,
   Parameter,
 } from '@exense/step-core';
 import { ParameterScopeRendererService } from '../../services/parameter-scope-renderer.service';
@@ -25,7 +26,7 @@ export class ParameterEditDialogComponent implements OnInit {
   private _dialogData = inject<ParameterEditDialogData>(MAT_DIALOG_DATA);
   private _authService = inject(AuthService);
   private _allScopeItems = inject(SCOPE_ITEMS);
-  private _matDialogRef = inject(MatDialogRef);
+  private _matDialogRef = inject<MatDialogRef<ParameterEditDialogData, DialogRouteResult>>(MatDialogRef);
   private _api = inject(AugmentedParametersService);
   private _screenApi = inject(AugmentedScreenService);
   private _parameterScopeRenderer = inject(ParameterScopeRendererService);
@@ -51,7 +52,7 @@ export class ParameterEditDialogComponent implements OnInit {
   @HostListener('keydown.enter')
   save(): void {
     this._api.saveParameter(this.parameter).subscribe((parameter) => {
-      this._matDialogRef.close(parameter);
+      this._matDialogRef.close({ isSuccess: !!parameter });
     });
   }
 

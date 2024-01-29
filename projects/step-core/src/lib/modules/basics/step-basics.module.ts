@@ -226,6 +226,7 @@ export * from './shared/bulk-operation-type.enum';
 export * from './shared/auth.guards';
 export * from './shared/string-array-regex';
 export * from './shared/dialog-route';
+export * from './shared/dialog-route-result';
 export * from './directives/popover-content.directive';
 export * from './directives/trigger-popover.directive';
 export * from './components/popover/popover.component';

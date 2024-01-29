@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { MatDialogRef } from '@angular/material/dialog';
 import { AugmentedPlansService, Plan } from '../../client/step-client-module';
 import { ItemInfo, PlanTypeRegistryService } from '../../modules/custom-registeries/custom-registries.module';
+import { DialogRouteResult } from '../../modules/basics/step-basics.module';
 
 @Component({
   selector: 'step-plan-create-dialog',
@@ -12,7 +13,7 @@ import { ItemInfo, PlanTypeRegistryService } from '../../modules/custom-register
 })
 export class PlanCreateDialogComponent {
   private _api = inject(AugmentedPlansService);
-  private _matDialogRef = inject<MatDialogRef<PlanCreateDialogComponent>>(MatDialogRef);
+  private _matDialogRef = inject<MatDialogRef<PlanCreateDialogComponent, DialogRouteResult>>(MatDialogRef);
   private _router = inject(Router);
 
   protected template: string = 'TestCase';
@@ -42,7 +43,7 @@ export class PlanCreateDialogComponent {
         if (editAfterSave) {
           this._router.navigate(['root', 'plans', 'editor', plan.id]);
         }
-        this._matDialogRef.close(plan);
+        this._matDialogRef.close({ isSuccess: !!plan, canNavigateBack: !editAfterSave });
       });
   }
 }

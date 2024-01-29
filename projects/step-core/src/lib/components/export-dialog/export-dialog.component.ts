@@ -10,7 +10,7 @@ import {
   ExportsService,
   pollAsyncTask,
 } from '../../client/step-client-module';
-import { AlertType } from '../../modules/basics/step-basics.module';
+import { AlertType, DialogRouteResult } from '../../modules/basics/step-basics.module';
 import { DialogsService, ExportDialogData } from '../../shared';
 
 @Component({
@@ -24,7 +24,7 @@ export class ExportDialogComponent {
   private _exportApi = inject(ExportsService);
   private _resourcesApi = inject(AugmentedResourcesService);
   private _asyncService = inject(AsyncTasksService);
-  private _matDialogRef = inject<MatDialogRef<ExportDialogComponent, boolean>>(MatDialogRef);
+  private _matDialogRef = inject<MatDialogRef<ExportDialogComponent, DialogRouteResult>>(MatDialogRef);
   private _data = inject<ExportDialogData>(MAT_DIALOG_DATA);
 
   protected progress = 0;
@@ -93,7 +93,7 @@ export class ExportDialogComponent {
             return;
           }
           this._resourcesApi.downloadResource(result.attachmentID, filename);
-          queueMicrotask(() => this._matDialogRef.close(true));
+          queueMicrotask(() => this._matDialogRef.close({ isSuccess: true }));
         },
         complete: () => {
           this.exportForm.enable();

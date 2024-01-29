@@ -3,6 +3,8 @@ import { ActivatedRoute, Data, Router } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Subject, takeUntil } from 'rxjs';
 import { DialogParentService } from '../../services/dialog-parent.service';
+import { DialogRouteResult } from '../../shared/dialog-route-result';
+import { ComponentType } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'step-dialog-route',
@@ -39,17 +41,20 @@ export class DialogRouteComponent implements OnInit, OnDestroy {
     this.dialogCloseTerminator$ = new Subject<void>();
 
     this._matDialog
-      .open(dialogComponent, { data })
+      .open<unknown, unknown, DialogRouteResult>(dialogComponent, { data })
       .afterClosed()
       .pipe(takeUntil(this.dialogCloseTerminator$))
-      .subscribe((result: unknown) => {
-        if (result) {
+      .subscribe((result) => {
+        if (result?.isSuccess) {
           this._dialogParent?.dialogSuccessfullyClosed();
         }
-        if (this._dialogParent?.returnParentUrl) {
-          this._router.navigateByUrl(this._dialogParent.returnParentUrl);
-        } else {
-          this._router.navigate(['..'], { relativeTo: this._activatedRoute });
+        const canNavigateBack = result?.canNavigateBack ?? true;
+        if (canNavigateBack) {
+          if (this._dialogParent?.returnParentUrl) {
+            this._router.navigateByUrl(this._dialogParent.returnParentUrl);
+          } else {
+            this._router.navigate(['..'], { relativeTo: this._activatedRoute });
+          }
         }
       });
   }
