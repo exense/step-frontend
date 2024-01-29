@@ -11,6 +11,12 @@ import {
   SimpleOutletComponent,
   FunctionPackageTypeRegistryService,
   FunctionLinkEditorComponent,
+  dialogRoute,
+  FunctionDialogsConfigFactoryService,
+  AugmentedKeywordsService,
+  ImportDialogComponent,
+  ExportDialogComponent,
+  FunctionConfigurationDialogResolver,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
@@ -19,9 +25,10 @@ import { FunctionConfigurationDialogComponent } from './components/function-conf
 import { FunctionListComponent } from './components/function-list/function-list.component';
 import { FunctionTypeCompositeComponent } from './components/function-type-composite/function-type-composite.component';
 import { FunctionTypeFilterComponent } from './components/function-type-filter/function-type-filter.component';
-import { FunctionConfigurationImplService } from './services/function-configuration-impl.service';
 import { ActivatedRouteSnapshot } from '@angular/router';
-import { CompositeKeywordPlanApiService } from './services/composite-keyword-plan-api.service';
+import { CompositeKeywordPlanApiService } from './injectables/composite-keyword-plan-api.service';
+import { map } from 'rxjs';
+import { FunctionConfigurationDialogImplResolver } from './injectables/function-configuration-dialog-impl.resolver';
 
 @NgModule({
   imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule],
@@ -34,8 +41,8 @@ import { CompositeKeywordPlanApiService } from './services/composite-keyword-pla
   ],
   providers: [
     {
-      provide: FunctionConfigurationService,
-      useExisting: FunctionConfigurationImplService,
+      provide: FunctionConfigurationDialogResolver,
+      useExisting: FunctionConfigurationDialogImplResolver,
     },
   ],
   exports: [FunctionListComponent, CompositeFunctionEditorComponent, FunctionConfigurationDialogComponent],
@@ -57,6 +64,74 @@ export class FunctionModule {
     this._viewRegistry.registerRoute({
       path: 'functions',
       component: FunctionListComponent,
+      children: [
+        {
+          path: 'configure',
+          component: SimpleOutletComponent,
+          children: [
+            dialogRoute({
+              path: 'new',
+              resolveDialogComponent: () => inject(FunctionConfigurationDialogResolver).getDialogComponent(),
+              resolve: {
+                dialogConfig: () => inject(FunctionDialogsConfigFactoryService).getDefaultConfig(),
+              },
+            }),
+            dialogRoute({
+              path: ':id',
+              resolveDialogComponent: () => inject(FunctionConfigurationDialogResolver).getDialogComponent(),
+              resolve: {
+                keyword: (route: ActivatedRouteSnapshot) =>
+                  inject(AugmentedKeywordsService).getFunctionById(route.params['id']),
+                dialogConfig: () => inject(FunctionDialogsConfigFactoryService).getDefaultConfig(),
+              },
+            }),
+          ],
+        },
+        dialogRoute({
+          path: 'import',
+          dialogComponent: ImportDialogComponent,
+          data: {
+            title: 'Keywords import',
+            entity: 'functions',
+            override: false,
+            importAll: false,
+          },
+        }),
+        {
+          path: 'export',
+          component: SimpleOutletComponent,
+          children: [
+            dialogRoute({
+              path: 'all',
+              dialogComponent: ExportDialogComponent,
+              data: {
+                title: 'Keywords export',
+                entity: 'functions',
+                filename: 'allKeywords.sta',
+              },
+            }),
+            dialogRoute({
+              path: ':id',
+              dialogComponent: ExportDialogComponent,
+              resolve: {
+                id: (route: ActivatedRouteSnapshot) => route.params['id'],
+                filename: (route: ActivatedRouteSnapshot) => {
+                  const api = inject(AugmentedKeywordsService);
+                  const id = route.params['id'];
+                  return api.getFunctionById(id).pipe(
+                    map((keyword) => keyword.attributes!['name']),
+                    map((name) => `${name}.sta`)
+                  );
+                },
+              },
+              data: {
+                title: 'Keywords export',
+                entity: 'functions',
+              },
+            }),
+          ],
+        },
+      ],
     });
     this._viewRegistry.registerRoute({
       path: 'composites',

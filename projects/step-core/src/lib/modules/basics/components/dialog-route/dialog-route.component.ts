@@ -1,10 +1,9 @@
-import { Component, inject, OnDestroy, OnInit, Type } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, Type, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, Data, Router } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Subject, takeUntil } from 'rxjs';
 import { DialogParentService } from '../../services/dialog-parent.service';
 import { DialogRouteResult } from '../../shared/dialog-route-result';
-import { ComponentType } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'step-dialog-route',
@@ -14,6 +13,7 @@ import { ComponentType } from '@angular/cdk/overlay';
 export class DialogRouteComponent implements OnInit, OnDestroy {
   private _matDialog = inject(MatDialog);
   private _activatedRoute = inject(ActivatedRoute);
+  private _viewContainerRef = inject(ViewContainerRef);
   private _router = inject(Router);
   private _dialogParent = inject(DialogParentService, { optional: true });
 
@@ -40,8 +40,12 @@ export class DialogRouteComponent implements OnInit, OnDestroy {
 
     this.dialogCloseTerminator$ = new Subject<void>();
 
-    this._matDialog
-      .open<unknown, unknown, DialogRouteResult>(dialogComponent, { data })
+    this.modalRef = this._matDialog.open<unknown, unknown, DialogRouteResult>(dialogComponent, {
+      data,
+      viewContainerRef: this._viewContainerRef,
+    });
+
+    this.modalRef
       .afterClosed()
       .pipe(takeUntil(this.dialogCloseTerminator$))
       .subscribe((result) => {

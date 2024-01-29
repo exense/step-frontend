@@ -1,7 +1,6 @@
-import { Component, inject, Injector } from '@angular/core';
+import { Component } from '@angular/core';
 import { Keyword } from '../../../../client/step-client-module';
 import { CustomComponent } from '../../../custom-registeries/shared/custom-component';
-import { TableReload } from '../../../table/table.module';
 import { BaseFunctionLinkComponent } from './base-function-link.component';
 
 @Component({
@@ -10,9 +9,6 @@ import { BaseFunctionLinkComponent } from './base-function-link.component';
   styleUrls: ['./function-link.component.scss'],
 })
 export class FunctionLinkComponent extends BaseFunctionLinkComponent implements CustomComponent {
-  private _injector = inject(Injector);
-  private _tableReload = inject(TableReload, { optional: true });
-
   override handleLinkClick(): void {
     if (!this.context?.id || !this._functionActions) {
       return;
@@ -21,10 +17,6 @@ export class FunctionLinkComponent extends BaseFunctionLinkComponent implements 
   }
 
   editFunction(keyword: Keyword): void {
-    this._functionActions!.configureFunction(this._injector, keyword.id!).subscribe((keyword) => {
-      if (keyword && this._tableReload) {
-        this._tableReload.reload();
-      }
-    });
+    this._functionActions!.configureFunction2(keyword.id!);
   }
 }
