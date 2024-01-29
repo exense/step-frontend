@@ -9,7 +9,7 @@
 
 <div class="cards">
   <mat-card>
-    <mat-card-content>
+    <mat-card-content class="charts-section">
       <div class="chart">
         <div *ngIf="compareModeEnabled" class="stamp"></div>
         <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.OVERVIEW]"></step-chart-skeleton>
@@ -68,7 +68,7 @@
   </mat-card>
 
   <mat-card>
-    <mat-card-content>
+    <mat-card-content class="charts-section">
       <div class="chart">
         <div *ngIf="compareModeEnabled" class="stamp"></div>
         <div class="chart-settings" *ngIf="currentChartsSettings[TsChartType.RESPONSE_TIME]">
@@ -242,7 +242,7 @@
   </mat-card>
 
   <mat-card *ngIf="settings?.includeThreadGroupChart">
-    <mat-card-content>
+    <mat-card-content class="charts-section">
       <div class="chart">
         <div *ngIf="compareModeEnabled" class="stamp"></div>
         <step-chart-skeleton *ngIf="!currentChartsSettings[TsChartType.THREAD_GROUP]"></step-chart-skeleton>

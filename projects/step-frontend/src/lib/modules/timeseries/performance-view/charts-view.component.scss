@@ -15,6 +15,13 @@
   }
 }
 
+.charts-section {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 .chart {
   width: calc(50% - 12px);
   min-width: 484px;

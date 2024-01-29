@@ -83,6 +83,12 @@
     max-width: 38rem;
     width: 38rem;
   }
+  .mat-mdc-menu-item-text {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+  }
 }
 
 @mixin mat-mdc-checkbox {
@@ -119,6 +125,15 @@
   }
 }
 
+@mixin mat-button {
+  .mdc-button__label {
+    display: flex;
+    gap: 1rem;
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
 @mixin mat-table {
   --mat-table-row-item-container-height: 4.8rem;
   --mat-table-footer-container-height: 4.8rem;
@@ -141,5 +156,6 @@
   @include mat-mdc-checkbox;
   @include mat-mdc-paginator;
   @include mat-table;
+  @include mat-button;
   @include mat-select($primary-color);
 }

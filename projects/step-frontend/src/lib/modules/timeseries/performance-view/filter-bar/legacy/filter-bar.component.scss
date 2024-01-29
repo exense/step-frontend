@@ -21,13 +21,13 @@ step-ts-filter-bar {
   }
 
   .filters-section {
-    padding-top: 12px;
+    padding-top: 1.2rem;
     border-top: 1px solid var.$gray-200;
   }
 
-  .mat-mdc-button-toggle-appearance-standard .mat-mdc-button-toggle-label-content {
-    line-height: 22px;
-    font-size: 12px;
+  .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
+    line-height: 2.2rem;
+    font-size: 1.2rem;
   }
 
   .settings-section {
@@ -44,7 +44,7 @@ step-ts-filter-bar {
 
   .filters {
     display: flex;
-    gap: 12px;
+    gap: 1.2rem;
     align-items: center;
     min-height: 3.6rem;
   }
