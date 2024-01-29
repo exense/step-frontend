@@ -285,7 +285,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   private addFilter(item: FilterBarItem): void {
-    this._internalFilters.push(item);
+    this._internalFilters = [...this._internalFilters, item];
     this._changeDetectorRef.detectChanges();
     this.filterComponents!.last.openMenu();
     this.filterComponents!.last.menuTrigger!.menuClosed.pipe(take(1)).subscribe(() => {
