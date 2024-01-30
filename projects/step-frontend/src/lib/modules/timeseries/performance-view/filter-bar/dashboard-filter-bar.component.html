@@ -52,9 +52,7 @@
       [style.flexWrap]="compactView ? 'wrap' : 'nowrap'"
     >
       <ng-container *ngIf="!oqlModeActive">
-        <ng-container
-          *ngFor="let item of _internalFilters | visibleFilterItems; let i = index; trackBy: trackByAttributeFn"
-        >
+        <ng-container *ngFor="let item of _internalFilters | visibleFilterItems; let i = index">
           <step-ts-filter-bar-item
             #appliedFilter
             [item]="item"

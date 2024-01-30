@@ -1,9 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { DashboardItem } from '@exense/step-core';
+import { DashboardItem, MetricAttribute } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ChartDashletSettingsData } from './chart-dashlet-settings-data';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { FilterBarItemType, FilterBarItem } from '../../../../performance-view/filter-bar/model/filter-bar-item';
+import { FilterBarItem, FilterBarItemType } from '../../../../performance-view/filter-bar/model/filter-bar-item';
 import { FilterUtils } from '../../../../util/filter-utils';
 import { ChartSettingsForm, createChartSettingsGroup } from './chart-settings.form';
 
@@ -23,6 +23,9 @@ export class ChartDashletSettingsComponent implements OnInit {
   private _inputData: ChartDashletSettingsData = inject<ChartDashletSettingsData>(MAT_DIALOG_DATA);
   private _formBuilder = inject(FormBuilder);
   private _dialogRef = inject(MatDialogRef);
+
+  _attributesByKey: Record<string, MetricAttribute> = {};
+
   formGroup!: ChartForm;
 
   item!: DashboardItem;
@@ -30,13 +33,15 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.item = JSON.parse(JSON.stringify(this._inputData.item));
+    this.item.chartSettings!.attributes.forEach((attr) => (this._attributesByKey[attr.name] = attr));
     this.formGroup = this.createFormGroup(this.item);
-    this.filterItems = this.item.chartSettings!.filters.map((item) => ({
-      type: item.type as FilterBarItemType,
-      attributeName: item.attribute,
-      searchEntities: [],
-      freeTextValues: item.textValues,
-    }));
+    this.filterItems = this.item.chartSettings!.filters.map((item) => {
+      return FilterUtils.convertApiFilterItem(item);
+    });
+  }
+
+  addFilterItem(attribute: MetricAttribute) {
+    this.filterItems.push(FilterUtils.createFilterItemFromAttribute(attribute));
   }
 
   addCustomFilter(type: FilterBarItemType) {
