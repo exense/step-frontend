@@ -11,6 +11,8 @@ import { HoursEditorComponent } from '../hours-editor/hours-editor.component';
   encapsulation: ViewEncapsulation.None,
 })
 export class EveryWeekDayEditorComponent extends HoursEditorComponent {
+  protected override hour = 0;
+
   protected override getExpression(): string {
     return `${this.second} ${this.minute} ${this.hour} ? * MON-FRI *`;
   }
