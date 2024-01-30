@@ -1,5 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
-import { ExpressionChangeEvent } from '../base-editor/base-editor.component';
+import { Component, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
 
 enum DailyType {
   EVERY_DAY = 'every_day',
@@ -15,14 +14,10 @@ enum DailyType {
   },
   encapsulation: ViewEncapsulation.None,
 })
-export class DailyEditorComponent implements AfterViewInit {
-  @Output() expressionChange = new EventEmitter<ExpressionChangeEvent>();
+export class DailyEditorComponent {
+  @Output() expressionChange = new EventEmitter<string>();
 
   readonly DailyType = DailyType;
 
-  protected selected?: DailyType;
-
-  ngAfterViewInit(): void {
-    this.expressionChange.emit({ expression: '', isTouched: false });
-  }
+  protected selected = DailyType.EVERY_DAY;
 }
