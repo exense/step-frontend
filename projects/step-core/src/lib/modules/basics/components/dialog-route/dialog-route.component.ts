@@ -49,9 +49,10 @@ export class DialogRouteComponent implements OnInit, OnDestroy {
       .afterClosed()
       .pipe(takeUntil(this.dialogCloseTerminator$))
       .subscribe((result) => {
-        if (result?.isSuccess) {
-          this._dialogParent?.dialogSuccessfullyClosed();
-        }
+        result?.isSuccess
+          ? this._dialogParent?.dialogSuccessfullyClosed()
+          : this._dialogParent?.dialogNotSuccessfullyClosed?.();
+
         const canNavigateBack = result?.canNavigateBack ?? true;
         if (canNavigateBack) {
           if (this._dialogParent?.returnParentUrl) {
