@@ -1,7 +1,13 @@
 import { Component, TrackByFunction, ViewChild } from '@angular/core';
 import { KeyValue } from '@angular/common';
 import { NgForm } from '@angular/forms';
-import { BaseArtefactComponent, dynamicValueFactory, AbstractArtefact, DynamicValueString } from '@exense/step-core';
+import {
+  BaseArtefactComponent,
+  dynamicValueFactory,
+  AbstractArtefact,
+  DynamicValueString,
+  ArtefactFormChangeHelperService,
+} from '@exense/step-core';
 import { AggregatorType, AssertOperatorType } from '@exense/step-core';
 
 const { createDynamicValueString } = dynamicValueFactory();
@@ -27,6 +33,7 @@ interface AssertPerformanceArtefact extends AbstractArtefact {
   selector: 'step-assert-performance',
   templateUrl: './assert-performance.component.html',
   styleUrls: ['./assert-performance.component.scss'],
+  providers: [ArtefactFormChangeHelperService],
 })
 export class AssertPerformanceComponent extends BaseArtefactComponent<AssertPerformanceArtefact> {
   @ViewChild('form')
