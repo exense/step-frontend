@@ -7,7 +7,6 @@ import {
   StepBasicsModule,
   StepCoreModule,
   ViewRegistryService,
-  FunctionConfigurationService,
   SimpleOutletComponent,
   FunctionPackageTypeRegistryService,
   FunctionLinkEditorComponent,

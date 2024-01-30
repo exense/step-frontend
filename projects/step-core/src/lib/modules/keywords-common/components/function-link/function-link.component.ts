@@ -17,6 +17,6 @@ export class FunctionLinkComponent extends BaseFunctionLinkComponent implements 
   }
 
   editFunction(keyword: Keyword): void {
-    this._functionActions!.configureFunction2(keyword.id!);
+    this._functionActions!.configureFunction(keyword.id!);
   }
 }
