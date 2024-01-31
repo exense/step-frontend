@@ -16,6 +16,8 @@ export class MonthlyWeekEditorComponent extends HoursEditorComponent {
   readonly _DAY_NUM = inject(RANGE_DAY_NUM);
   readonly _WEEK_DAY = inject(RANGE_WEEK_DAY);
 
+  protected override hour = 0;
+
   protected month = this._MONTHS[0].key;
 
   protected dayNum = this._DAY_NUM[0].key;

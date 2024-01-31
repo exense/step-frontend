@@ -27,6 +27,7 @@ import { CallPlanComponent } from './component/call-plan/call-plan.component';
 import { CallKeywordComponent } from './component/call-keyword/call-keyword.component';
 import { ScriptComponent } from './component/script/script.component';
 import { AssertionPlanComponent } from './component/assertion-plan/assertion-plan.component';
+import { AssertPerformanceComponent } from './component/assert-performance/assert-performance.component';
 
 @NgModule({
   declarations: [
@@ -56,6 +57,7 @@ import { AssertionPlanComponent } from './component/assertion-plan/assertion-pla
     CallKeywordComponent,
     ScriptComponent,
     AssertionPlanComponent,
+    AssertPerformanceComponent,
   ],
   imports: [StepCommonModule],
   exports: [
@@ -85,6 +87,7 @@ import { AssertionPlanComponent } from './component/assertion-plan/assertion-pla
     CallKeywordComponent,
     ScriptComponent,
     AssertionPlanComponent,
+    AssertPerformanceComponent,
   ],
 })
 export class ArtefactsModule {
@@ -249,6 +252,10 @@ export class ArtefactsModule {
     this._artefactService.register('Failure', {
       icon: 'x-octagon',
       isSelectable: false,
+    });
+    this._artefactService.register('PerformanceAssert', {
+      icon: 'check',
+      component: AssertPerformanceComponent,
     });
 
     /* plan type control only */

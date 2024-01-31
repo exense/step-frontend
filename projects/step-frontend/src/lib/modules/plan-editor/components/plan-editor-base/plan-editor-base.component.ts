@@ -24,7 +24,6 @@ import {
   PlanArtefactResolverService,
   PlanEditorService,
   PlanInteractiveSessionService,
-  PlansService,
   RepositoryObjectReference,
   TreeNodeUtilsService,
   TreeStateService,
@@ -35,6 +34,7 @@ import {
   PlanSetupService,
   PlanEditorApiService,
   PlanEditorPersistenceStateService,
+  AugmentedPlansService,
 } from '@exense/step-core';
 import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
@@ -42,6 +42,8 @@ import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-no
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
 import { ActivatedRoute } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { PlanSourceDialogComponent } from '../plan-source-dialog/plan-source-dialog.component';
 
 const PLAN_SIZE = 'PLAN_SIZE';
 const PLAN_CONTROLS_SIZE = 'PLAN_CONTROLS_SIZE';
@@ -84,7 +86,7 @@ export class PlanEditorBaseComponent
   readonly _interactiveSession = inject(InteractiveSessionService);
   private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
   private _planEditorApi = inject(PlanEditorApiService);
-  private _planApi = inject(PlansService);
+  private _planApi = inject(AugmentedPlansService);
   private _keywordCallsApi = inject(KeywordsService);
   private _dialogsService = inject(DialogsService);
   private _functionActions = inject(FunctionActionsService);
@@ -94,6 +96,7 @@ export class PlanEditorBaseComponent
   private _activatedRoute = inject(ActivatedRoute);
   private _planOpen = inject(PlanOpenService);
   private _planEditorPersistenceState = inject(PlanEditorPersistenceStateService);
+  private _matDialog = inject(MatDialog);
   private _cd = inject(ChangeDetectorRef);
 
   private get artefactIdFromUrl(): string | undefined {
@@ -222,6 +225,12 @@ export class PlanEditorBaseComponent
 
   resetInteractive(): void {
     this._interactiveSession.resetInteractive().subscribe();
+  }
+
+  showPlanSource(): void {
+    this._planApi
+      .getYamlPlan(this.currentPlanId!)
+      .subscribe((source) => this._matDialog.open(PlanSourceDialogComponent, { data: source }));
   }
 
   openArtefact(node?: AbstractArtefact): void {
