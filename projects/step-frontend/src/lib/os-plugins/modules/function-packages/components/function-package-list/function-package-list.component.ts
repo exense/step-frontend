@@ -1,7 +1,8 @@
-import { AfterViewInit, Component, inject } from '@angular/core';
+import { Component, forwardRef, inject } from '@angular/core';
 import {
   AugmentedKeywordPackagesService,
   AutoDeselectStrategy,
+  DialogParentService,
   FunctionPackage,
   selectionCollectionProvider,
   STORE_ALL,
@@ -16,33 +17,31 @@ import { FunctionPackageActionsService } from '../../injectables/function-packag
   providers: [
     tablePersistenceConfigProvider('functionPackageList', STORE_ALL),
     ...selectionCollectionProvider<string, FunctionPackage>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    {
+      provide: DialogParentService,
+      useExisting: forwardRef(() => FunctionPackageListComponent),
+    },
   ],
 })
-export class FunctionPackageListComponent implements AfterViewInit {
+export class FunctionPackageListComponent implements DialogParentService {
   private _augApi = inject(AugmentedKeywordPackagesService);
   private _actions = inject(FunctionPackageActionsService);
   readonly dataSource = this._augApi.createDataSource();
 
   isRefreshing: boolean = false;
 
-  ngAfterViewInit(): void {
-    this._actions.resolveEditLinkIfExists();
+  readonly returnParentUrl = this._actions.rootUrl;
+
+  dialogSuccessfullyClosed(): void {
+    this.dataSource.reload();
   }
 
   add(): void {
-    this._actions.openAddFunctionPackageDialog().subscribe((result) => {
-      if (result) {
-        this.dataSource.reload();
-      }
-    });
+    this._actions.newFunctionPackage();
   }
 
   edit(functionPackage: FunctionPackage): void {
-    this._actions.editFunctionPackage(functionPackage).subscribe((result) => {
-      if (result) {
-        this.dataSource.reload();
-      }
-    });
+    this._actions.editFunctionPackage(functionPackage);
   }
 
   refresh(id: string): void {
