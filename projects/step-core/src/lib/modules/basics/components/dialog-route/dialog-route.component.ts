@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy, OnInit, Type, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, Data, Router } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { Subject, takeUntil } from 'rxjs';
+import { map, Subject, switchMap, takeUntil, timer } from 'rxjs';
 import { DialogParentService } from '../../services/dialog-parent.service';
 import { DialogRouteResult } from '../../shared/dialog-route-result';
 
@@ -22,7 +22,12 @@ export class DialogRouteComponent implements OnInit, OnDestroy {
   private dialogCloseTerminator$?: Subject<void>;
 
   ngOnInit(): void {
-    this._activatedRoute.data.pipe(takeUntil(this.terminator$)).subscribe((data) => this.createModal(data));
+    this._activatedRoute.data
+      .pipe(
+        switchMap((data) => timer(100).pipe(map(() => data))),
+        takeUntil(this.terminator$)
+      )
+      .subscribe((data) => this.createModal(data));
   }
 
   ngOnDestroy(): void {

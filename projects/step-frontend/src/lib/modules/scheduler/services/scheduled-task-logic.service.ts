@@ -4,6 +4,8 @@ import {
   AugmentedSchedulerService,
   AuthService,
   DashboardService,
+  DialogParentService,
+  DialogRouteResult,
   EditorResolverService,
   ExecutiontTaskParameters,
   MultipleProjectsService,
@@ -15,10 +17,10 @@ import { map, Observable, of, pipe, switchMap, take, tap } from 'rxjs';
 import { Router } from '@angular/router';
 
 const TASK_ID = 'taskId';
-const EDITOR_URL = '/root/scheduler';
+const ROOT_URL = '/root/scheduler';
 
 @Injectable()
-export class ScheduledTaskLogicService implements SchedulerActionsService {
+export class ScheduledTaskLogicService implements SchedulerActionsService, DialogParentService {
   private _plansApi = inject(AugmentedPlansService);
   private _plansLink = inject(PlanLinkDialogService);
   private _authService = inject(AuthService);
@@ -30,8 +32,10 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
   private _editorResolver = inject(EditorResolverService);
 
   private updateDataSourceAfterChange = pipe(
-    tap((result?: ExecutiontTaskParameters | boolean) => {
-      this.dataSource.reload();
+    tap((result?: DialogRouteResult) => {
+      if (result?.isSuccess) {
+        this.dataSource.reload();
+      }
     })
   );
 
@@ -40,6 +44,10 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
   readonly STATUS: ReadonlyArray<string> = [this.STATUS_ACTIVE_STRING, this.STATUS_INACTIVE_STRING];
 
   readonly dataSource = this._schedulerService.createSelectionDataSource();
+  readonly returnParentUrl = ROOT_URL;
+  dialogSuccessfullyClosed(): void {
+    this.dataSource.reload();
+  }
 
   isSchedulerEnabled(): Observable<boolean> {
     return this._schedulerService.isSchedulerEnabled();
@@ -91,14 +99,20 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
   }
 
   deleteTask(scheduledTask: ExecutiontTaskParameters): void {
-    this._scheduledTaskDialogs.removeScheduledTask(scheduledTask).pipe(this.updateDataSourceAfterChange).subscribe();
+    this._scheduledTaskDialogs
+      .removeScheduledTask(scheduledTask)
+      .pipe(
+        map((isSuccess) => ({ isSuccess })),
+        this.updateDataSourceAfterChange
+      )
+      .subscribe();
   }
 
   editTask(scheduledTask: ExecutiontTaskParameters): Observable<boolean> {
     if (this._multipleProjectList.isEntityBelongsToCurrentProject(scheduledTask)) {
       return this.editTaskInternal(scheduledTask.id!);
     }
-    const url = EDITOR_URL;
+    const url = ROOT_URL;
     const editParams = { [TASK_ID]: scheduledTask.id! };
 
     return this._multipleProjectList
@@ -113,14 +127,24 @@ export class ScheduledTaskLogicService implements SchedulerActionsService {
       );
   }
 
-  createTask() {
-    this._schedulerService
-      .createExecutionTask()
-      .pipe(
-        switchMap((task) => this._scheduledTaskDialogs.editScheduledTask(task)),
-        this.updateDataSourceAfterChange
-      )
-      .subscribe();
+  createTask(): void {
+    this._router.navigateByUrl(`${ROOT_URL}/editor/new`);
+  }
+
+  navigateToTaskEditor(scheduledTask: ExecutiontTaskParameters): void {
+    const url = `${ROOT_URL}/editor/${scheduledTask.id}`;
+    if (this._multipleProjectList.isEntityBelongsToCurrentProject(scheduledTask)) {
+      this._router.navigateByUrl(url);
+      return;
+    }
+
+    this._multipleProjectList
+      .confirmEntityEditInASeparateProject(scheduledTask, url, 'task')
+      .subscribe((continueEdit) => {
+        if (continueEdit) {
+          this._router.navigateByUrl(url);
+        }
+      });
   }
 
   resolveEditLinkIfExists(): void {
