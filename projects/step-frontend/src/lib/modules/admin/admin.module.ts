@@ -17,6 +17,7 @@ import { ScreenInputDropdownOptionsComponent } from './components/screen-input-d
 import { RenderOptionsPipe } from './pipes/render-options.pipe';
 import { UserSelectionComponent } from './components/user-selection/user-selection.component';
 import { ActivatedRouteSnapshot } from '@angular/router';
+import { CURRENT_SCREEN_CHOICE_DEFAULT } from './types/constants';
 
 @NgModule({
   declarations: [
@@ -56,33 +57,46 @@ export class AdminModule {
     this._viewRegistry.registerRoute(
       {
         path: 'screens',
-        component: ScreenConfigurationListComponent,
+        component: SimpleOutletComponent,
         children: [
           {
-            path: 'editor',
-            component: SimpleOutletComponent,
+            path: '',
+            redirectTo: CURRENT_SCREEN_CHOICE_DEFAULT,
+          },
+          {
+            path: ':screenId',
+            component: ScreenConfigurationListComponent,
+            resolve: {
+              availableScreens: () => inject(AugmentedScreenService).getScreens(),
+            },
             children: [
-              dialogRoute({
-                path: 'new/:screenId',
-                dialogComponent: ScreenInputEditDialogComponent,
-                resolve: {
-                  screenInput: (route: ActivatedRouteSnapshot) => {
-                    const screenId = route.params['screenId'];
-                    return {
-                      screenId,
-                      input: { type: 'TEXT' },
-                    } as ScreenInput;
-                  },
-                },
-              }),
-              dialogRoute({
-                path: ':id',
-                dialogComponent: ScreenInputEditDialogComponent,
-                resolve: {
-                  screenInput: (route: ActivatedRouteSnapshot) =>
-                    inject(AugmentedScreenService).getInput(route.params['id']),
-                },
-              }),
+              {
+                path: 'editor',
+                component: SimpleOutletComponent,
+                children: [
+                  dialogRoute({
+                    path: 'new',
+                    dialogComponent: ScreenInputEditDialogComponent,
+                    resolve: {
+                      screenInput: (route: ActivatedRouteSnapshot) => {
+                        const screenId = route.parent!.parent!.params['screenId'];
+                        return {
+                          screenId,
+                          input: { type: 'TEXT' },
+                        } as ScreenInput;
+                      },
+                    },
+                  }),
+                  dialogRoute({
+                    path: ':id',
+                    dialogComponent: ScreenInputEditDialogComponent,
+                    resolve: {
+                      screenInput: (route: ActivatedRouteSnapshot) =>
+                        inject(AugmentedScreenService).getInput(route.params['id']),
+                    },
+                  }),
+                ],
+              },
             ],
           },
         ],

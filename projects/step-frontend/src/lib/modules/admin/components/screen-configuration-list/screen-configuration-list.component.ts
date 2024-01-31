@@ -1,4 +1,4 @@
-import { Component, forwardRef, inject } from '@angular/core';
+import { Component, forwardRef, inject, OnDestroy, OnInit } from '@angular/core';
 import {
   TableFetchLocalDataSource,
   ScreenInput,
@@ -8,8 +8,8 @@ import {
   DialogParentService,
 } from '@exense/step-core';
 import { RenderOptionsPipe } from '../../pipes/render-options.pipe';
-import { filter, switchMap } from 'rxjs';
-import { Router } from '@angular/router';
+import { filter, map, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'step-screen-configuration-list',
@@ -22,20 +22,24 @@ import { Router } from '@angular/router';
     },
   ],
 })
-export class ScreenConfigurationListComponent implements DialogParentService {
+export class ScreenConfigurationListComponent implements DialogParentService, OnInit, OnDestroy {
+  private terminator$ = new Subject<void>();
+  private _activatedRoute = inject(ActivatedRoute);
   private _screenApi = inject(AugmentedScreenService);
   private _dialogs = inject(DialogsService);
   private _renderOptions = inject(RenderOptionsPipe);
   private _multipleProjectList = inject(MultipleProjectsService);
   private _router = inject(Router);
 
-  public readonly CURRENT_SCREEN_CHOICE_DEFAULT = 'executionParameters';
+  readonly screenChoicesRequest$ = this._activatedRoute.data.pipe(map((data) => data['availableScreens']));
 
-  public currentlySelectedScreenChoice: string = this.CURRENT_SCREEN_CHOICE_DEFAULT;
+  protected currentlySelectedScreenChoice?: string;
 
-  readonly _screenChoicesRequest$ = this._screenApi.getScreens();
   readonly searchableScreens = new TableFetchLocalDataSource(
-    () => this._screenApi.getScreenInputsByScreenId(this.currentlySelectedScreenChoice),
+    () =>
+      this.currentlySelectedScreenChoice
+        ? this._screenApi.getScreenInputsByScreenId(this.currentlySelectedScreenChoice)
+        : of([]),
     TableFetchLocalDataSource.configBuilder<ScreenInput>()
       .addSearchStringPredicate('label', (item) => item.input!.label!)
       .addSearchStringPredicate('id', (item) => item.input!.id!)
@@ -46,27 +50,45 @@ export class ScreenConfigurationListComponent implements DialogParentService {
   );
 
   private get baseScreenConfigurationUrl(): string {
-    const screensSegment = 'screens';
+    const screensSegment = this.currentlySelectedScreenChoice;
     let url = this._router.url;
-    if (url.includes(screensSegment)) {
+    if (screensSegment && url.includes(screensSegment)) {
       url = url.slice(0, url.indexOf(screensSegment) + screensSegment.length);
     }
     return url;
   }
 
-  readonly returnParentUrl = this.baseScreenConfigurationUrl;
+  get returnParentUrl(): string {
+    return this.baseScreenConfigurationUrl;
+  }
+
+  ngOnInit(): void {
+    this._activatedRoute.params
+      .pipe(
+        map((params) => params['screenId']),
+        takeUntil(this.terminator$)
+      )
+      .subscribe((screenId) => {
+        this.currentlySelectedScreenChoice = screenId;
+        this.searchableScreens.reload();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.terminator$.next();
+    this.terminator$.complete();
+  }
 
   dialogSuccessfullyClosed(): void {
     this.searchableScreens.reload();
   }
 
   reloadTableForCurrentChoice(choice: string) {
-    this.currentlySelectedScreenChoice = choice;
-    this.searchableScreens.reload();
+    this._router.navigate(['..', choice], { relativeTo: this._activatedRoute });
   }
 
   addScreen(): void {
-    this._router.navigateByUrl(`${this.baseScreenConfigurationUrl}/editor/new/${this.currentlySelectedScreenChoice}`);
+    this._router.navigateByUrl(`${this.baseScreenConfigurationUrl}/editor/new`);
   }
 
   editScreen(screen: ScreenInput): void {
