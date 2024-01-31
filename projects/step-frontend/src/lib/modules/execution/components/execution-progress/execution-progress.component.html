@@ -12,7 +12,10 @@
     <div class="tab-panel">
       <step-tabs [tabs]="tabs" [activeTabId]="activeTabId" (activeTabIdChange)="selectTab($event)"></step-tabs>
       <step-btn-group>
-        <step-autorefresh-toggle *ngIf="showAutoRefreshButton" [model]="activeExecution.autoRefreshModel">
+        <step-autorefresh-toggle
+          *ngIf="showAutoRefreshButton && activeExecution"
+          [model]="activeExecution.autoRefreshModel"
+        >
         </step-autorefresh-toggle>
       </step-btn-group>
     </div>
@@ -34,7 +37,7 @@
             [repositoryObjectRef]="execution!.executionParameters!.repositoryObject"
             [includedTestcases]="includedTestcases$ | async"
             [execution]="execution"
-            (refresh)="activeExecution.manualRefresh()"
+            (refresh)="activeExecution?.manualRefresh()"
           >
           </step-execution-commands>
         </ng-container>
