@@ -14,6 +14,7 @@ import { RANGE_DAYS } from '../../injectables/ranges.tokens';
 export class EveryDayEditorComponent extends HoursEditorComponent {
   readonly _DAYS = inject(RANGE_DAYS);
 
+  protected override hour = 0;
   protected day = this._DAYS[0].key;
 
   protected handleDayChange(value: number): void {

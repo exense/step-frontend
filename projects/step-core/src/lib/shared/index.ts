@@ -24,3 +24,5 @@ export * from './sub-router-config.interface';
 export * from './auto-refresh-model.interface';
 export * from './base-plan.action';
 export * from './plan-action.enum';
+export * from './aggregator-type.enum';
+export * from './assert-operator-type.enum';
