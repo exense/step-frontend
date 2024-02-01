@@ -24,7 +24,7 @@ import { ExecutionErrorMessageItem } from '../../shared/execution-error-message-
 import { ExecutionErrorCodeItem } from '../../shared/execution-error-code-item';
 import { ErrorDistributionStatus } from '../../shared/error-distribution-status.enum';
 import { ExecutionStateService } from '../../services/execution-state.service';
-import { filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { distinctUntilChanged, filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Panels } from '../../shared/panels.enum';
 import { ReportTreeNode } from '../../shared/report-tree-node';
 import { ReportTreeNodeUtilsService } from '../../services/report-tree-node-utils.service';
@@ -33,7 +33,7 @@ import { DOCUMENT } from '@angular/common';
 import { IncludeTestcases } from '../../shared/include-testcases.interface';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ActiveExecutionsService } from '../../services/active-executions.service';
+import { ActiveExecution, ActiveExecutionsService } from '../../services/active-executions.service';
 
 const R_ERROR_KEY = /\\\\u([\d\w]{4})/gi;
 
@@ -95,6 +95,7 @@ export class ExecutionProgressComponent
   private _activatedRoute = inject(ActivatedRoute);
   private _router = inject(Router);
   private _terminator$ = new Subject<void>();
+  private _currentExecutionTerminator$?: Subject<void>;
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
   private isFirstUpdate = true;
@@ -139,9 +140,9 @@ export class ExecutionProgressComponent
     })
   );
 
-  readonly executionId = this._activatedRoute.snapshot.url[0].path!;
-  readonly activeExecution = this._activeExecutions.getActiveExecution(this.executionId);
-  protected activeTabId?: string = this._activatedRoute.snapshot.url?.[1]?.path;
+  executionId?: string;
+  activeExecution?: ActiveExecution;
+  protected activeTabId?: string;
 
   throughputchart: any | { series: any[]; data: any[][] } = {};
 
@@ -189,33 +190,13 @@ export class ExecutionProgressComponent
   }
 
   ngOnInit(): void {
-    this.initRefreshExecution();
-    this.initTabs();
+    this.initExecutionChangeByRouting();
   }
 
   ngOnDestroy(): void {
+    this.terminateCurrentExecutionChanges();
     this._terminator$.next();
     this._terminator$.complete();
-  }
-
-  initRefreshExecution(): void {
-    this._executionPanels.initialize(this.executionId);
-    this.activeExecution.execution$.pipe(takeUntil(this._terminator$)).subscribe((execution) => {
-      this.execution = execution;
-      const isExecutionCompleted = execution.status === 'ENDED';
-      this.showAutoRefreshButton = !isExecutionCompleted;
-      this.handleExecutionRefresh({ updateSelection: this.isFirstUpdate ? UpdateSelection.ALL : UpdateSelection.NONE });
-      this.refreshOther();
-      if (this.isFirstUpdate) {
-        this.loadExecutionTree();
-      } else {
-        this.refreshExecutionTree(isExecutionCompleted);
-      }
-      this.refreshTestCaseTable({
-        updateSelection: this.isFirstUpdate ? UpdateSelection.ALL : UpdateSelection.ONLY_NEW,
-      });
-      this.isFirstUpdate = false;
-    });
   }
 
   drillDownTestCase(id: string): void {
@@ -242,6 +223,50 @@ export class ExecutionProgressComponent
   closeExecution(openList: boolean = true): void {
     const executionId = this.executionId!;
     this._executionTabManager.handleTabClose(executionId, openList);
+  }
+
+  private terminateCurrentExecutionChanges(): void {
+    this._currentExecutionTerminator$?.next();
+    this._currentExecutionTerminator$?.complete();
+    this._currentExecutionTerminator$ = undefined;
+  }
+
+  private initExecutionChangeByRouting(): void {
+    const executionId$ = this._activatedRoute.url.pipe(
+      map((url) => url[0].path),
+      distinctUntilChanged(),
+      takeUntil(this._terminator$)
+    );
+
+    executionId$.subscribe((executionId) => {
+      this.terminateCurrentExecutionChanges();
+      this._currentExecutionTerminator$ = new Subject<void>();
+      this.executionId = executionId;
+      this.activeExecution = this._activeExecutions.getActiveExecution(executionId);
+      this.activeTabId = this._activatedRoute.snapshot.url?.[1]?.path;
+      this.initRefreshExecution();
+      this.initTabs();
+    });
+  }
+
+  private initRefreshExecution(): void {
+    this._executionPanels.initialize(this.executionId!);
+    this.activeExecution!.execution$.pipe(takeUntil(this._currentExecutionTerminator$!)).subscribe((execution) => {
+      this.execution = execution;
+      const isExecutionCompleted = execution.status === 'ENDED';
+      this.showAutoRefreshButton = !isExecutionCompleted;
+      this.handleExecutionRefresh({ updateSelection: this.isFirstUpdate ? UpdateSelection.ALL : UpdateSelection.NONE });
+      this.refreshOther();
+      if (this.isFirstUpdate) {
+        this.loadExecutionTree();
+      } else {
+        this.refreshExecutionTree(isExecutionCompleted);
+      }
+      this.refreshTestCaseTable({
+        updateSelection: this.isFirstUpdate ? UpdateSelection.ALL : UpdateSelection.ONLY_NEW,
+      });
+      this.isFirstUpdate = false;
+    });
   }
 
   private initTabs(): void {

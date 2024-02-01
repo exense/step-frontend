@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import type { AutomationPackage } from '../models/AutomationPackage';
+import type { FormDataBodyPart } from '../models/FormDataBodyPart';
 import type { FormDataContentDisposition } from '../models/FormDataContentDisposition';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -91,6 +92,23 @@ export class AutomationPackagesService {
       path: {
         id: id,
       },
+    });
+  }
+
+  /**
+   * @param formData
+   * @returns string default response
+   * @throws ApiError
+   */
+  public executeAutomationPackage(formData?: {
+    file?: FormDataContentDisposition;
+    executionParams?: FormDataBodyPart;
+  }): Observable<Array<string>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/automation-packages/execute',
+      formData: formData,
+      mediaType: 'multipart/form-data',
     });
   }
 }

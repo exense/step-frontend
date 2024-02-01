@@ -35,9 +35,7 @@
         <ng-container *ngSwitchDefault> </ng-container>
       </section>
       <section *ngIf="cronExpression"><strong>Generated CRON Expression:</strong> {{ cronExpression }}</section>
-      <step-alert *ngIf="!isExpressionValid && isTouched" [type]="AlertType.DANGER">
-        CRON Expression is invalid
-      </step-alert>
+      <step-alert *ngIf="!isExpressionValid" [type]="AlertType.DANGER"> CRON Expression is invalid </step-alert>
     </div>
   </div>
   <div step-modal-window-buttons>
