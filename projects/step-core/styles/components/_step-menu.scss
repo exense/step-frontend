@@ -1,9 +1,9 @@
 @mixin menu() {
-  .mat-menu-panel {
+  .mat-mdc-menu-panel {
     border-radius: 0.8rem;
     min-height: 3.2rem;
 
-    .mat-menu-content:not(:empty) {
+    .mat-mdc-menu-content:not(:empty) {
       padding-top: 0;
       padding-bottom: 0;
     }

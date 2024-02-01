@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject, Inject } from '@angular/core';
 import { AugmentedResourcesService, Resource } from '../../../../client/step-client-module';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
@@ -8,16 +8,12 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   styleUrls: ['./search-resource-dialog.component.scss'],
 })
 export class SearchResourceDialogComponent {
-  readonly dataSource = this._augmentedResourceService.createDataSource();
-  readonly filter: string;
+  private _augmentedResourceService = inject(AugmentedResourcesService);
+  private _matDialogRef = inject<MatDialogRef<SearchResourceDialogComponent>>(MatDialogRef);
+  private _resourceType = inject<string>(MAT_DIALOG_DATA);
 
-  constructor(
-    private _augmentedResourceService: AugmentedResourcesService,
-    private _matDialogRef: MatDialogRef<SearchResourceDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) resourceType: string
-  ) {
-    this.filter = `resourceType=${resourceType}`;
-  }
+  readonly filter: string = `resourceType=${this._resourceType}`;
+  readonly dataSource = this._augmentedResourceService.createDataSource();
 
   select(resource: Resource): void {
     this._matDialogRef.close(resource.id);

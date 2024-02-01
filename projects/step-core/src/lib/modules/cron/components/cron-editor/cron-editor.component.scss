@@ -2,7 +2,7 @@ step-cron-editor {
   step-tabs > nav {
     border: none !important;
 
-    .mat-tab-links {
+    .mat-mdc-tab-links {
       margin: 0 !important;
 
       & > a {
@@ -47,7 +47,7 @@ step-cron-editor {
       gap: 2rem;
     }
 
-    label.mat-radio-label {
+    label.mat-mdc-radio-label {
       font-weight: normal;
     }
   }

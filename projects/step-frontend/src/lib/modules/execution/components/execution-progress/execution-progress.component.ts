@@ -80,6 +80,16 @@ interface RefreshParams {
 export class ExecutionProgressComponent
   implements OnInit, ExecutionStateService, ExecutionCloseHandleService, OnDestroy
 {
+  private _document = inject(DOCUMENT);
+  private _executionService = inject(AugmentedExecutionsService);
+  private _controllerService = inject(ControllerService);
+  private _viewService = inject(PrivateViewPluginService);
+  private _systemService = inject(SystemService);
+  private _viewRegistry = inject(ViewRegistryService);
+  private _executionTreeState = inject<TreeStateService<ReportNode, ReportTreeNode>>(TreeStateService);
+  public _executionPanels = inject(SingleExecutionPanelsService);
+  public _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
+  private _treeUtils = inject(ReportTreeNodeUtilsService);
   private _activeExecutions = inject(ActiveExecutionsService);
   private _executionTabManager = inject(ExecutionTabManagerService);
   private _activatedRoute = inject(ActivatedRoute);
@@ -134,18 +144,7 @@ export class ExecutionProgressComponent
   activeExecution?: ActiveExecution;
   protected activeTabId?: string;
 
-  constructor(
-    @Inject(DOCUMENT) private _document: Document,
-    private _executionService: AugmentedExecutionsService,
-    private _controllerService: ControllerService,
-    private _viewService: PrivateViewPluginService,
-    private _systemService: SystemService,
-    private _viewRegistry: ViewRegistryService,
-    private _executionTreeState: TreeStateService<ReportNode, ReportTreeNode>,
-    public _executionPanels: SingleExecutionPanelsService,
-    public _testCasesSelection: SelectionCollector<string, ReportNode>,
-    private _treeUtils: ReportTreeNodeUtilsService
-  ) {}
+  throughputchart: any | { series: any[]; data: any[][] } = {};
 
   showNodeInTree(nodeId: string): void {
     this._controllerService

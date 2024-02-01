@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ControllerService, KeyValuePair, Tab } from '@exense/step-core';
 import { map, Observable, shareReplay } from 'rxjs';
 
@@ -13,6 +13,8 @@ enum VersionDialogTabs {
   styleUrls: ['./versions-dialog.component.scss'],
 })
 export class VersionsDialogComponent {
+  private _controllerService = inject(ControllerService);
+
   readonly tabs: Tab[] = [
     {
       id: VersionDialogTabs.FE,
@@ -48,6 +50,4 @@ export class VersionsDialogComponent {
     }),
     shareReplay(1)
   );
-
-  constructor(private _controllerService: ControllerService) {}
 }

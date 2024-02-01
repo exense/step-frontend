@@ -1,4 +1,4 @@
-<nav mat-tab-nav-bar [disablePagination]="disablePagination">
+<nav mat-tab-nav-bar [disablePagination]="disablePagination" [tabPanel]="tabPanel">
   <ng-container *ngFor="let tab of tabs; trackBy: trackByTab">
     <a href="#" mat-tab-link [active]="tab.id === activeTabId" (click)="selectTab(tab); (false)">
       <ng-template #label>{{ tab.label }}</ng-template>
@@ -8,3 +8,4 @@
     </a>
   </ng-container>
 </nav>
+<mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>

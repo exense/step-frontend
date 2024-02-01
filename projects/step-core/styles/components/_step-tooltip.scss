@@ -1,7 +1,7 @@
 @use '../core-variables' as var;
 
 @mixin tooltip($text-color) {
-  .mat-tooltip {
+  .mat-mdc-tooltip > div {
     white-space: pre-line;
     background: var.$white;
     color: $text-color;

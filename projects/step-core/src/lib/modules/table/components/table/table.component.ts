@@ -4,6 +4,7 @@ import {
   ContentChildren,
   EventEmitter,
   forwardRef,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -81,6 +82,8 @@ export class TableComponent<T>
     HasFilter,
     TableHighlightItemContainer
 {
+  private _tableState = inject(TablePersistenceStateService);
+
   @Output() onReload = new EventEmitter<unknown>();
   @Input() trackBy: TrackByFunction<T> = (index) => index;
   @Input() dataSource?: DataSource<T>;
@@ -169,11 +172,7 @@ export class TableComponent<T>
 
   highlightedItem?: unknown;
 
-  constructor(
-    @Optional() private _sort: MatSort,
-    _itemsPerPageService: ItemsPerPageService,
-    private _tableState: TablePersistenceStateService
-  ) {
+  constructor(@Optional() private _sort: MatSort, _itemsPerPageService: ItemsPerPageService) {
     this.pageSizeOptions = _itemsPerPageService.getItemsPerPage((userPreferredItemsPerPage: number) =>
       this.page._changePageSize(userPreferredItemsPerPage)
     );
