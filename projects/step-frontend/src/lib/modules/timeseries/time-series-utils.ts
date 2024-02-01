@@ -1,4 +1,3 @@
-import { FilterBarItemType, FilterBarItem } from './performance-view/filter-bar/model/filter-bar-item';
 import { Execution, TimeRange } from '@exense/step-core';
 import { TimeRangePickerSelection } from './time-selection/time-range-picker-selection';
 
