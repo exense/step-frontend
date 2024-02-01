@@ -1,7 +1,6 @@
-import { AfterViewInit, Component, inject, Inject, OnChanges, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, inject, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DateFormat, Measurement, MeasurementsStats, TimeSeriesService } from '@exense/step-core';
-import { HttpClient } from '@angular/common/http';
 import { DiscoverDialogData } from './discover-dialog-data';
 import { MatTableDataSource } from '@angular/material/table';
 import { PageEvent } from '@angular/material/paginator';

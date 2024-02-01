@@ -77,7 +77,6 @@
     "@angular/cli": "14.2.7",
     "@angular/compiler-cli": "14.2.8",
     "@schematics/angular": "14.2.7",
-    "@types/angular": "1.7.4",
     "@types/jasmine": "3.10.0",
     "@types/luxon": "2.3.2",
     "@types/node": "12.11.1",

@@ -1,6 +1,5 @@
 import { ThroughputMetric } from './model/throughput-metric';
 import { ThroughputMetricType } from '../model/throughput-metric-type';
-import { TimeSeriesUtils } from '../time-series-utils';
 import { BucketResponse } from '@exense/step-core';
 import { ResponseTimeMetric } from './model/response-time-metric';
 import { TimeSeriesConfig } from '../time-series.config';

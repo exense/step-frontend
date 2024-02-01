@@ -1,5 +1,4 @@
 import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { FindBucketsRequest } from '../../find-buckets-request';
 import { TimeSeriesUtils } from '../../time-series-utils';
 import { TSRangerComponent } from '../../ranger/ts-ranger.component';
 import { TimeSeriesContext } from '../../time-series-context';
