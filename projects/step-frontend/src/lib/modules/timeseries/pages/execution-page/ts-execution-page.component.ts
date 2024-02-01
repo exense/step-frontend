@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { AsyncTasksService, Execution, pollAsyncTask, TimeSeriesService } from '@exense/step-core';
 import { PerformanceViewSettings } from '../../performance-view/model/performance-view-settings';
-import { Subject, Subscription, switchMap, takeUntil, tap, timer } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
 import { TimeSeriesConfig } from '../../time-series.config';
 import { MatMenuTrigger } from '@angular/material/menu';

@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Execution, ExecutiontTaskParameters } from '../../../client/generated';
+import { ExecutiontTaskParameters } from '../../../client/step-client-module';
 
 @Pipe({ name: 'castToTask' })
 export class CastEntityToTaskPipe implements PipeTransform {

@@ -17,7 +17,6 @@ import { LoadingInterceptor } from './interceptors/loading.interceptor';
 import { ContainsVersionPipe } from './pipes/contains-version.pipe';
 import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
 import { MenuFilterPipe } from './pipes/menu-filter.pipe';
-import { MenuStorageService } from './injectables/menu-storage.service';
 import { SidebarStateService } from './injectables/sidebar-state.service';
 import { IsMenuItemActivePipe } from './pipes/is-menu-item-active.pipe';
 

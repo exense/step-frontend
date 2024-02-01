@@ -1,5 +1,4 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Observable } from 'rxjs';
 import { DashboardService } from '../services/dashboard.service';
 
 @Pipe({

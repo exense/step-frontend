@@ -1,17 +1,14 @@
-import { AfterViewInit, Component, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
 import {
   BucketAttributes,
   BucketResponse,
   Execution,
-  ExecutionsService,
   ExecutiontTaskParameters,
   FetchBucketsRequest,
   MetricAttribute,
   MetricType,
   Plan,
-  PlansService,
-  SchedulerService,
   TimeRange,
   TimeSeriesAPIResponse,
   TimeSeriesService,
