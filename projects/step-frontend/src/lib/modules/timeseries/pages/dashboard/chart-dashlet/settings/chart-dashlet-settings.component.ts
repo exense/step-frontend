@@ -1,5 +1,5 @@
 import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import { DashboardItem } from '@exense/step-core';
+import { DashboardItem, MetricAttribute } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ChartDashletSettingsData } from './chart-dashlet-settings-data';
 import { FilterBarItemType, FilterBarItem } from '../../../../performance-view/filter-bar/model/filter-bar-item';
@@ -32,6 +32,10 @@ export class ChartDashletSettingsComponent implements OnInit {
       searchEntities: [],
       freeTextValues: item.textValues,
     }));
+  }
+
+  addFilterItem(attribute: MetricAttribute) {
+    this.filterItems.push(FilterUtils.createFilterItemFromAttribute(attribute));
   }
 
   addCustomFilter(type: FilterBarItemType) {
