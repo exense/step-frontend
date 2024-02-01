@@ -1,16 +1,17 @@
-import { AfterViewInit, Component, inject, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, forwardRef, inject, OnDestroy, ViewChild } from '@angular/core';
 import {
   AugmentedAutomationPackagesService,
   AutoDeselectStrategy,
   AutomationPackage,
+  DialogParentService,
   selectionCollectionProvider,
   STORE_ALL,
   TableComponent,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { ENTITY_ID } from '../../types/constants';
-import { AutomationPackagesDialogsService } from '../../injectables/automation-packages-dialogs.service';
-import { filter, map, pipe, Subject, takeUntil, tap } from 'rxjs';
+import { AutomationPackagesActionsService } from '../../injectables/automation-packages-actions.service';
+import { filter, map, Subject, takeUntil } from 'rxjs';
 import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -21,10 +22,14 @@ import { ActivatedRoute, Router } from '@angular/router';
   providers: [
     tablePersistenceConfigProvider('automationPackagesList', STORE_ALL),
     selectionCollectionProvider<string, AutomationPackage>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    {
+      provide: DialogParentService,
+      useExisting: forwardRef(() => AutomationPackagesListComponent),
+    },
   ],
 })
-export class AutomationPackagesListComponent implements AfterViewInit, OnDestroy {
-  private _dialogs = inject(AutomationPackagesDialogsService);
+export class AutomationPackagesListComponent implements AfterViewInit, OnDestroy, DialogParentService {
+  private _actions = inject(AutomationPackagesActionsService);
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
 
@@ -39,16 +44,13 @@ export class AutomationPackagesListComponent implements AfterViewInit, OnDestroy
   @ViewChild('table', { static: true })
   private table?: TableComponent<AutomationPackage>;
 
-  private updateDataSourceAfterChange = pipe(
-    tap((changeResult?: boolean) => {
-      if (changeResult) {
-        this._dataSource.reload();
-      }
-    })
-  );
+  readonly returnParentUrl = this._actions.rootUrl;
+
+  dialogSuccessfullyClosed(): void {
+    this._dataSource.reload();
+  }
 
   ngAfterViewInit(): void {
-    this._dialogs.resolveEditLinkIfExists().pipe(this.updateDataSourceAfterChange).subscribe();
     this.predefineAutomationPackageFileFilter();
   }
 
@@ -58,15 +60,19 @@ export class AutomationPackagesListComponent implements AfterViewInit, OnDestroy
   }
 
   createPackage(): void {
-    this._dialogs.createAutomationPackage().pipe(this.updateDataSourceAfterChange).subscribe();
+    this._actions.createAutomationPackage();
   }
 
   editPackage(automationPackage: AutomationPackage): void {
-    this._dialogs.editAutomationPackage(automationPackage).pipe(this.updateDataSourceAfterChange).subscribe();
+    this._actions.editAutomationPackage(automationPackage);
   }
 
   deletePackage(automationPackage: AutomationPackage): void {
-    this._dialogs.deleteAutomationPackage(automationPackage).pipe(this.updateDataSourceAfterChange).subscribe();
+    this._actions.deleteAutomationPackage(automationPackage).subscribe((isSuccess) => {
+      if (isSuccess) {
+        this._dataSource.reload();
+      }
+    });
   }
 
   private predefineAutomationPackageFileFilter(): void {
