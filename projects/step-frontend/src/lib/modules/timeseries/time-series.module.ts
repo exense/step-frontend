@@ -1,5 +1,11 @@
 import { NgModule } from '@angular/core';
-import { EntityModule, StepCoreModule, ViewRegistryService } from '@exense/step-core';
+import {
+  dialogRoute,
+  EntityModule,
+  SimpleOutletComponent,
+  StepCoreModule,
+  ViewRegistryService,
+} from '@exense/step-core';
 import { TimeSeriesChartComponent } from './chart/time-series-chart.component';
 import { TSRangerComponent } from './ranger/ts-ranger.component';
 import { TableModule } from '@exense/step-core';
@@ -107,11 +113,23 @@ export class TimeSeriesModule {
     });
     _viewRegistry.registerRoute({
       path: 'dashboards',
-      component: DashboardListComponent,
-    });
-    _viewRegistry.registerRoute({
-      path: 'dashboards/:id',
-      component: DashboardComponent,
+      component: SimpleOutletComponent,
+      children: [
+        {
+          path: '',
+          component: DashboardListComponent,
+          children: [
+            dialogRoute({
+              path: 'new',
+              dialogComponent: NewDashboardDialogComponent,
+            }),
+          ],
+        },
+        {
+          path: ':id',
+          component: DashboardComponent,
+        },
+      ],
     });
   }
 }
