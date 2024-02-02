@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { TimeSeriesConfig } from '../../time-series.config';
 import { MatMenuTrigger } from '@angular/material/menu';
-import { isChildNodeOf } from '@angular-eslint/eslint-plugin-template/dist/eslint-plugin-template/src/utils/is-child-node-of';
 
 const EMPTY_DIMENSIONS_LABEL = 'Empty';
 

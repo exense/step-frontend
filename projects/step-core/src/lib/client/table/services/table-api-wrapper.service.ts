@@ -4,7 +4,6 @@ import { TableResponseGeneric } from '../shared/table-response-generic';
 import { map, Observable, pipe, tap } from 'rxjs';
 import { AsyncTasksService, AsyncTaskStatusResource, TablesService } from '../../generated';
 import { pollAsyncTask, AsyncTaskStatus } from '../../async-task/async-task.module';
-import { DOCUMENT } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FileDownloaderService } from '../../../modules/basics/services/file-downloader.service';
 

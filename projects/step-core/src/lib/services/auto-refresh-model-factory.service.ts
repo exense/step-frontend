@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { interval, Observable, Subject, Subscription, take, tap } from 'rxjs';
+import { interval, Observable, Subject, Subscription } from 'rxjs';
 import { Mutable, AutoRefreshModel } from '../shared';
 
 type FieldAccessor = Mutable<Pick<AutoRefreshModel, 'autoIncreaseTo' | 'disabled' | 'interval'>>;

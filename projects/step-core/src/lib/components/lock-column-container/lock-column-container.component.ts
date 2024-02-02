@@ -1,4 +1,4 @@
-import { Component, forwardRef, OnInit } from '@angular/core';
+import { Component, forwardRef } from '@angular/core';
 import { BaseColumnContainerComponent } from '../base-column-container/base-column-container.component';
 import { ColumnContainer } from '../../shared';
 import { CustomColumnsBaseComponent } from '../../modules/table/table.module';

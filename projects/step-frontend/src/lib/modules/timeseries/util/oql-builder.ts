@@ -1,5 +1,3 @@
-import { FilterUtils } from './filter-utils';
-
 export class OQLBuilder {
   clauses: string[] = [];
   separator: string = 'and';

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, switchMap } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Resource, ResourcesService, ResourceUploadResponse } from '../../generated';
 import { TableRemoteDataSourceFactoryService, StepDataSource } from '../../table/step-table-client.module';
 import { uploadWithProgress } from '../shared/pipe-operators';

@@ -211,7 +211,7 @@ export class PlanEditorBaseComponent
         if (!id) {
           return;
         }
-        this._planEditorApi.navigateToPlan(id, true);
+        this._planEditorApi.navigateToPlan(id!, true);
       });
   }
 

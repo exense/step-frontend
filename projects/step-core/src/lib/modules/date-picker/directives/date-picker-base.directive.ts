@@ -34,7 +34,7 @@ export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChan
   @Input() showTime: boolean = false;
 
   @HostBinding('attr.disabled')
-  protected isDisabled?: boolean;
+  protected isDisabled: boolean | null = null;
 
   @Output() dateChange = new EventEmitter<D | null | undefined>();
 
@@ -51,7 +51,7 @@ export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChan
     this.onTouch = onTouch;
   }
   setDisabledState(isDisabled: boolean): void {
-    this.isDisabled = isDisabled;
+    this.isDisabled = isDisabled || null;
   }
 
   ngOnChanges(changes: SimpleChanges): void {

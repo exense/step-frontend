@@ -5,7 +5,7 @@ import { inject, Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
-import { Execution, ExecutiontTaskParameters, SchedulerService } from '../../generated';
+import { ExecutiontTaskParameters, SchedulerService } from '../../generated';
 import {
   StepDataSource,
   TableApiWrapperService,

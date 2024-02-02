@@ -28,7 +28,6 @@ import { CustomSearchDropdownComponent } from './components/custom-search-dropdo
 import { CustomSearchCheckboxComponent } from './components/custom-search-dropdown/custom-search-checkbox.component';
 import { Input as ColInput } from '../../client/generated';
 import { TableRemoteDataSourceFactoryImplService } from './services/table-remote-data-source-factory-impl.service';
-import { TableStorageService } from './services/table-storage.service';
 import { BulkOperationPerformStrategyImplService } from './services/bulk-operation-perform-strategy-impl.service';
 import { HighlightTableRowDirective } from './directives/highlight-table-row.directive';
 import { DatePickerModule } from '../date-picker/date-picker.module';
