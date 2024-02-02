@@ -54,7 +54,6 @@ export class CronEditorComponent {
       this.isExpressionValid = false;
     }
     if (!this.isExpressionValid) {
-      this.isTouched = true;
       return;
     }
     this._dialogRef.close(this.cronExpression);
