@@ -20,6 +20,8 @@
     [helpIconTooltip]="tooltip"
     [withDynamicSwitch]="true"
     [stModel]="value"
+    [isInvalid]="!!_ngControl.invalid"
+    [isTouched]="!!_ngControl.touched"
     [isDisabled]="isDisabled"
     (stModelChange)="onValueChange($event)"
     (dynamicSwitch)="toggleDynamicExpression(true)"

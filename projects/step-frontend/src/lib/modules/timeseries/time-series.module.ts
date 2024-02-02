@@ -40,6 +40,7 @@ import { DashboardFilterBarComponent } from './performance-view/filter-bar/dashb
 import { DashboardListComponent } from './pages/dashboard-list/dashboard-list.component';
 import { ChartDashletSettingsComponent } from './pages/dashboard/chart-dashlet/settings/chart-dashlet-settings.component';
 import { VisibleFilterBarItemPipe } from './pipes/visible-filter-item.pipe';
+import { NewDashboardDialogComponent } from './pages/new-dashboard-dialog/new-dashboard-dialog.component';
 import { TsNavigatorQueryParamsCleanupService } from './ts-navigator-query-params-cleanup.service';
 
 @NgModule({
@@ -73,6 +74,7 @@ import { TsNavigatorQueryParamsCleanupService } from './ts-navigator-query-param
     DashboardListComponent,
     ChartDashletSettingsComponent,
     VisibleFilterBarItemPipe,
+    NewDashboardDialogComponent,
   ],
   exports: [
     ExecutionPerformanceComponent,
