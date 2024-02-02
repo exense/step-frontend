@@ -1,0 +1,42 @@
+<h4>Performance assertions</h4>
+<section>With this control you can make performance assertions.</section>
+<section>
+  The assertions are based on the measurements generated within and by your Keywords. Each Keyword execution generates
+  at least one measurement named after the Keyword. In addition to the Keyword-Measurement so called custom Measurements
+  measured within the Keyword are generated.<br />
+  With this control you can for instance assert that the average response time of a particular Keyword is less than a
+  specific threshold.
+</section>
+<form #form="ngForm">
+  <div><b>Assert</b> that</div>
+  <step-form-field>
+    <mat-select [(ngModel)]="context.artefact!.aggregator" [disabled]="context.readonly" name="aggregator">
+      <mat-option *ngFor="let item of aggregatorTypes; trackBy: trackByAggregator" [value]="item.key">
+        {{ item.value }}
+      </mat-option>
+    </mat-select>
+  </step-form-field>
+  <div>of measurments matching name</div>
+  <step-dynamic-textfield
+    *ngIf="context.artefact?.filters?.length"
+    [(ngModel)]="context.artefact!.filters![0]!.filter"
+    [disabled]="context.readonly"
+    name="filter"
+  >
+  </step-dynamic-textfield>
+  <div>are</div>
+  <step-form-field>
+    <mat-select [(ngModel)]="context.artefact!.comparator" [disabled]="context.readonly" name="comparator">
+      <mat-option *ngFor="let item of operatorTypes; trackBy: trackByOperator" [value]="item.key">
+        {{ item.value }}
+      </mat-option>
+    </mat-select>
+  </step-form-field>
+  <step-dynamic-textfield
+    [(ngModel)]="context.artefact!.expectedValue"
+    [disabled]="context.readonly"
+    name="expectedValue"
+  >
+  </step-dynamic-textfield>
+  <div>ms</div>
+</form>

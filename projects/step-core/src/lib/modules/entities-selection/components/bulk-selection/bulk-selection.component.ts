@@ -10,7 +10,6 @@ import {
 } from '@angular/core';
 import { BulkSelectionType } from '../../shared/bulk-selection-type.enum';
 import { SelectionCollector } from '../../services/selection-collector/selection-collector';
-import { Mutable } from '../../../../shared';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { MAT_CHECKBOX_DEFAULT_OPTIONS, MatCheckboxDefaultOptions } from '@angular/material/checkbox';
 

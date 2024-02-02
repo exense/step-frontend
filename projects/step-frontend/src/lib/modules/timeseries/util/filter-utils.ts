@@ -1,6 +1,5 @@
 import { FilterBarItem, FilterBarItemType } from '../performance-view/filter-bar/model/filter-bar-item';
-import { TimeSeriesFilterItem } from '@exense/step-core';
-import { map } from 'rxjs';
+import { MetricAttribute, TimeSeriesFilterItem } from '@exense/step-core';
 
 export class FilterUtils {
   static filterItemIsValid(item: FilterBarItem): boolean {
@@ -179,5 +178,50 @@ export class FilterUtils {
     }
 
     return mappedItem;
+  }
+
+  static createFilterItemFromAttribute(attribute: MetricAttribute) {
+    const item: FilterBarItem = {
+      attributeName: attribute.name,
+      label: attribute.displayName,
+      isLocked: true,
+      isHidden: false,
+      textValues: [],
+      searchEntities: [],
+      type: this.mapAttributeTypeToFilterType(attribute.type),
+    };
+    const entity = attribute.metadata['entity'];
+    switch (entity) {
+      case 'execution':
+        item.type = FilterBarItemType.EXECUTION;
+        break;
+      case 'plan':
+        item.type = FilterBarItemType.PLAN;
+        break;
+      case 'task':
+        item.type = FilterBarItemType.TASK;
+        break;
+      default:
+        break;
+    }
+    const knownValues = attribute.metadata['knownValues'];
+    if (knownValues && knownValues.length > 0) {
+      item.type = FilterBarItemType.OPTIONS;
+      item.textValues = knownValues.map((v: string) => ({ value: v, isSelected: false }));
+    }
+    return item;
+  }
+
+  private static mapAttributeTypeToFilterType(type: string): FilterBarItemType {
+    switch (type) {
+      case 'TEXT':
+        return FilterBarItemType.FREE_TEXT;
+      case 'NUMBER':
+        return FilterBarItemType.NUMERIC;
+      case 'DATE':
+        return FilterBarItemType.DATE;
+      default:
+        throw new Error('Unrecognized type: ' + type);
+    }
   }
 }

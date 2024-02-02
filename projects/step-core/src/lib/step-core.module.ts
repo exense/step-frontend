@@ -22,7 +22,6 @@ import { ExportDialogComponent } from './components/export-dialog/export-dialog.
 import { IsUsedByListComponent } from './components/is-used-by-list/is-used-by-list.component';
 import { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by-modal.component';
 import { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
-import { NewSchedulerTaskDialogComponent } from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 import { PlanLinkComponent } from './components/plan-link/plan-link.component';
 import { PlanNameComponent } from './components/plan-name/plan-name.component';
@@ -137,7 +136,6 @@ import { DatePickerModule } from './modules/date-picker/date-picker.module';
     CustomFormWrapperComponent,
     EntityColumnComponent,
     EntityColumnContainerComponent,
-    NewSchedulerTaskDialogComponent,
     EditSchedulerTaskDialogComponent,
     ExportDialogComponent,
     ArtefactDetailsComponent,
@@ -240,7 +238,6 @@ import { DatePickerModule } from './modules/date-picker/date-picker.module';
     EntityColumnComponent,
     EntityColumnContainerComponent,
     LockColumnContainerComponent,
-    NewSchedulerTaskDialogComponent,
     EditSchedulerTaskDialogComponent,
     ExportDialogComponent,
     ArtefactDetailsComponent,
@@ -321,7 +318,6 @@ export { IsUsedByModalComponent } from './components/is-used-by-modal/is-used-by
 export * from './components/html-description-cell/html-description-cell.component';
 export { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
-export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 export * from './components/plan-link/plan-link.component';
 export * from './components/scheduler-task-link/scheduler-task-link.component';
@@ -341,7 +337,6 @@ export { SplitComponent } from './components/split/split.component';
 export * from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 export * from './components/entity-column/entity-column.component';
 export * from './components/entity-column-container/entity-column-container.component';
-export * from './components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
 export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 export * from './components/artefact-details/artefact-details.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
@@ -409,6 +404,7 @@ export * from './services/view-state.service';
 export * from './services/artefact.service';
 export * from './services/artefact-form-change-helper.service';
 export * from './services/function-actions-impl.service';
+export * from './services/plan-editor-persistence-state.service';
 export * from './shared';
 export * from './modules/basics/shared/api-token.interface';
 export * from './components/base-artefact/base-artefact.component';

@@ -1,4 +1,4 @@
-import { Component, inject, TrackByFunction } from '@angular/core';
+import { Component, inject, TrackByFunction, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ViewRegistryService } from '../../services/view-registry.service';
 import { SubRouteData } from '../../shared';
@@ -8,6 +8,7 @@ import { AuthService } from '../../modules/basics/services/auth.service';
   selector: 'step-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class SettingsComponent {
   private _auth = inject(AuthService);

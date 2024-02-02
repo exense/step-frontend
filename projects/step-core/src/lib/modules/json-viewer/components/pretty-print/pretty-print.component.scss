@@ -3,7 +3,7 @@
 step-pretty-print {
   pre {
     white-space: pre-wrap;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: var.$code-font;
     background-color: var.$white !important;
     margin-bottom: 0;
     border: none;

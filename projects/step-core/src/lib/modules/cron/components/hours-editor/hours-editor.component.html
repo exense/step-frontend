@@ -5,6 +5,7 @@
   </mat-select>
   <span>hour(s) on minute</span>
   <mat-select [ngModel]="minute" (ngModelChange)="handleMinuteChange($event)">
+    <mat-option [value]="0">00</mat-option>
     <mat-option *ngFor="let m of _MINUTES; trackBy: trackByKeyValue" [value]="m.key">{{ m.value }}</mat-option>
   </mat-select>
   <span>and second</span>

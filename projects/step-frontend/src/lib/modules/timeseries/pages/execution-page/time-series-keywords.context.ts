@@ -1,4 +1,3 @@
-import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { TimeseriesColorsPool } from '../../util/timeseries-colors-pool';
 

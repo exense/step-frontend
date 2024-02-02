@@ -1,17 +1,14 @@
-import { AfterViewInit, Component, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
 import {
   BucketAttributes,
   BucketResponse,
   Execution,
-  ExecutionsService,
   ExecutiontTaskParameters,
   FetchBucketsRequest,
   MetricAttribute,
   MetricType,
   Plan,
-  PlansService,
-  SchedulerService,
   TimeRange,
   TimeSeriesAPIResponse,
   TimeSeriesService,
@@ -26,6 +23,7 @@ import { FilterUtils } from '../util/filter-utils';
 import { TimeseriesColorsPool } from '../util/timeseries-colors-pool';
 import { TimeSeriesChartComponent } from '../chart/time-series-chart.component';
 import { Observable } from 'rxjs';
+import { TimeSeriesUtilityService } from '../time-series-utility.service';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -59,9 +57,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
   isLoading = false;
 
   private _timeSeriesService = inject(TimeSeriesService);
-  private _executionService = inject(ExecutionsService);
-  private _planService = inject(PlansService);
-  private _schedulerService = inject(SchedulerService);
+  private _timeSeriesUtilityService = inject(TimeSeriesUtilityService);
 
   ngOnInit(): void {
     this.selectedRange = this.range;
@@ -170,7 +166,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
           this.fetchAndSetLabels(
             series,
             i,
-            (entitiesIds) => this._executionService.getExecutionsByIds(entitiesIds),
+            (entitiesIds) => this._timeSeriesUtilityService.getExecutionByIds(entitiesIds),
             (e: Execution) => e.description!
           );
           break;
@@ -178,7 +174,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
           this.fetchAndSetLabels(
             series,
             i,
-            (entitiesIds) => this._schedulerService.findExecutionTasksByIds(entitiesIds),
+            (entitiesIds) => this._timeSeriesUtilityService.getTasksByIds(entitiesIds),
             (task: ExecutiontTaskParameters) => task.attributes?.['name']
           );
           break;
@@ -186,7 +182,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
           this.fetchAndSetLabels(
             series,
             i,
-            (entitiesIds) => this._planService.findPlansByIds(entitiesIds),
+            (entitiesIds) => this._timeSeriesUtilityService.getPlansByIds(entitiesIds),
             (plan: Plan) => plan.attributes?.['name']
           );
           break;

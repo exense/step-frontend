@@ -1,12 +1,12 @@
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MetricType, TimeRange, TimeSeriesService } from '@exense/step-core';
+import { TimeRange, TimeSeriesService } from '@exense/step-core';
 import { TimeSeriesConfig } from '../../time-series.config';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
 import { TimeSeriesDashboardComponent } from '../../dashboard/time-series-dashboard.component';
 import { TimeSeriesDashboardSettings } from '../../dashboard/model/ts-dashboard-settings';
 import { TsUtils } from '../../util/ts-utils';
 import { FilterBarItemType, FilterBarItem } from '../../performance-view/filter-bar/model/filter-bar-item';
-import { range, Subject, takeUntil, timer } from 'rxjs';
+import { Subject, takeUntil, timer } from 'rxjs';
 import { TimeSeriesUtils } from '../../time-series-utils';
 import { MatMenuTrigger } from '@angular/material/menu';
 

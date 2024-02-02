@@ -15,6 +15,18 @@ export const $ExecutionParameters = {
         type: 'string',
       },
     },
+    customParameters: {
+      type: 'dictionary',
+      contains: {
+        type: 'string',
+      },
+    },
+    userID: {
+      type: 'string',
+    },
+    artefactFilter: {
+      type: 'ArtefactFilter',
+    },
     mode: {
       type: 'Enum',
     },
@@ -24,21 +36,6 @@ export const $ExecutionParameters = {
     repositoryObject: {
       type: 'RepositoryObjectReference',
     },
-    customParameters: {
-      type: 'dictionary',
-      contains: {
-        type: 'string',
-      },
-    },
-    description: {
-      type: 'string',
-    },
-    userID: {
-      type: 'string',
-    },
-    artefactFilter: {
-      type: 'ArtefactFilter',
-    },
     isolatedExecution: {
       type: 'boolean',
     },
@@ -47,6 +44,9 @@ export const $ExecutionParameters = {
       contains: {
         type: 'RepositoryObjectReference',
       },
+    },
+    description: {
+      type: 'string',
     },
     id: {
       type: 'string',
