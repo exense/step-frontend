@@ -24,7 +24,7 @@ export class SchedulerTaskLinkComponent implements CustomComponent {
     if (!this._logic || !this.context) {
       return;
     }
-    // TODO temporary solution, while scheduler dialog supports two variants, how it can be opened
+    // TODO temporary solution - scheduler dialog only uses new route based dialog when directly opend on the schedule page
     if (this._activatedRoute.routeConfig?.path === 'scheduler') {
       this._logic.navigateToTaskEditor(this.context);
     } else {
