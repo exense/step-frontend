@@ -10,21 +10,18 @@
 <section *ngIf="execution" [class.small-screen]="_isSmallScreen$ | async">
   <ng-template #executionTabs>
     <div class="tab-panel">
-      <step-tabs [tabs]="tabs" [activeTabId]="activeTabId" (activeTabIdChange)="selectTab($event)"> </step-tabs>
+      <step-tabs [tabs]="tabs" [activeTabId]="activeTabId" (activeTabIdChange)="selectTab($event)"></step-tabs>
       <step-btn-group>
         <step-autorefresh-toggle
-          *ngIf="showAutoRefreshButton"
-          [(disabled)]="autoRefreshDisabled"
-          [interval]="autoRefreshInterval"
-          [autoIncreaseTo]="autoRefreshIncreasedTo"
-          (refresh)="refresh()"
+          *ngIf="showAutoRefreshButton && activeExecution"
+          [model]="activeExecution.autoRefreshModel"
         >
         </step-autorefresh-toggle>
       </step-btn-group>
     </div>
     <div class="tab-content">
       <div class="tab-pane" *ngFor="let tab of tabs" [class.active]="tab.id === activeTabId">
-        <step-dashlet *ngIf="tab | includeTab: activeTabId" [itemKey]="tab.template"> </step-dashlet>
+        <step-dashlet *ngIf="tab | includeTab: activeTabId" [itemKey]="tab.template"></step-dashlet>
       </div>
     </div>
   </ng-template>
@@ -40,13 +37,13 @@
             [repositoryObjectRef]="execution!.executionParameters!.repositoryObject"
             [includedTestcases]="includedTestcases$ | async"
             [execution]="execution"
-            (onExecute)="closeExecution(false)"
+            (refresh)="activeExecution?.manualRefresh()"
           >
           </step-execution-commands>
         </ng-container>
       </mat-expansion-panel>
 
-      <step-panel-execution-details> </step-panel-execution-details>
+      <step-panel-execution-details></step-panel-execution-details>
 
       <ng-container *ngFor="let customPanel of _executionPanels.customPanels; trackBy: trackByItemInfo">
         <step-panel [panelType]="customPanel.type">
@@ -54,28 +51,28 @@
           </step-execution-custom-panel>
         </step-panel>
       </ng-container>
-      <step-panel-operations> </step-panel-operations>
-
-      <step-panel [panelType]="Panels.THROUGHPUT" *ngIf="!(throughputchart | isChartEmpty)">
-        <step-simple-line-chart chartId="throughput-chart" [handle]="throughputchart"> </step-simple-line-chart>
-      </step-panel>
+      <step-panel-operations></step-panel-operations>
     </mat-accordion>
   </ng-template>
   <ng-template #splitView>
     <as-split>
       <as-split-area [size]="75">
-        <ng-container *ngTemplateOutlet="executionTabs"> </ng-container>
+        <div class="split-area-content">
+          <ng-container *ngTemplateOutlet="executionTabs"></ng-container>
+        </div>
       </as-split-area>
       <as-split-area [size]="25">
-        <ng-container *ngTemplateOutlet="executionParameters"> </ng-container>
+        <div class="split-area-content">
+          <ng-container *ngTemplateOutlet="executionParameters"></ng-container>
+        </div>
       </as-split-area>
     </as-split>
   </ng-template>
   <ng-template #smallView>
     <div class="small-container">
-      <ng-container *ngTemplateOutlet="executionTabs"> </ng-container>
-      <ng-container *ngTemplateOutlet="executionParameters"> </ng-container>
+      <ng-container *ngTemplateOutlet="executionTabs"></ng-container>
+      <ng-container *ngTemplateOutlet="executionParameters"></ng-container>
     </div>
   </ng-template>
-  <ng-container *ngIf="_isSmallScreen$ | async; then smallView; else splitView"> </ng-container>
+  <ng-container *ngIf="_isSmallScreen$ | async; then smallView; else splitView"></ng-container>
 </section>

@@ -4,6 +4,9 @@
   padding: 0 19px;
   max-width: 100%;
   width: 100%;
+  margin-bottom: 1rem;
+  display: block;
+  box-sizing: border-box;
 }
 
 .header-buttons {
@@ -11,6 +14,7 @@
   margin-bottom: 0.8rem;
   flex-direction: row;
   gap: 1.2rem;
+  margin-top: 2px; // only to make inner shadow visible
 }
 
 .active {
@@ -24,4 +28,18 @@
 .menu-btn {
   display: flex;
   align-items: center;
+}
+
+#add-custom-chart {
+  border: 1px dashed grey;
+  padding: 2.4rem;
+  cursor: pointer;
+  margin: 2.4rem 0;
+  display: inline-block;
+}
+
+.metric-type-container {
+  height: 400px;
+  width: 50%;
+  margin-bottom: 12px;
 }

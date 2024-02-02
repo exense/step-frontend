@@ -1,6 +1,7 @@
 <step-modal-window
   [title]="_resourceConfigurationDialogData.resource ? 'Edit Resource' : 'New Resource'"
   [showSpinner]="resourceInput?.initializingResource"
+  [disableCloseByEsc]="true"
 >
   <div step-modal-window-body>
     <form [formGroup]="formGroup">
@@ -38,8 +39,6 @@
   </div>
 
   <div step-modal-window-buttons>
-    <button type="button" [disabled]="!!resourceInput?.progress$" (click)="close()" mat-flat-button color="primary">
-      Close
-    </button>
+    <button type="button" [disabled]="!!resourceInput?.progress$" (click)="close()" mat-stroked-button>Close</button>
   </div>
 </step-modal-window>

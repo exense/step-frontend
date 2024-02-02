@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { Subject } from 'rxjs';
-import { AJS_MODULE } from '../shared';
 
 export enum BridgeEventType {
   REQUEST = 'REQUEST',
@@ -38,7 +36,3 @@ export class HttpInterceptorBridgeService<T> {
     this.bridgeHttpEventInternal.next(event);
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .service('HttpInterceptorBridgeService', downgradeInjectable(HttpInterceptorBridgeService));

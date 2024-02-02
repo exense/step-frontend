@@ -2,7 +2,7 @@ import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
 import { KeywordSelection, TimeSeriesKeywordsContext } from '../../pages/execution-page/time-series-keywords.context';
 import { KeyValue } from '@angular/common';
-import { Subject, Subscription, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'step-measurements-picker',

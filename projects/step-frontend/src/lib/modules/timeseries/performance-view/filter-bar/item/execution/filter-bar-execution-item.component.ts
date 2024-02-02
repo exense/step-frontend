@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { EntitySearchValue } from '../entity-search-value';
 import { DateFormat, EntityDialogsService, Execution } from '@exense/step-core';
 
@@ -14,7 +14,7 @@ export class FilterBarExecutionItemComponent {
   private _entityDialogs = inject(EntityDialogsService);
 
   showExecutionPicker() {
-    this._entityDialogs.selectEntityOfType('executions', true).subscribe((result) => {
+    this._entityDialogs.selectEntityOfType('executions').subscribe((result) => {
       this.addSearchExecution(result.item as Execution);
     });
   }

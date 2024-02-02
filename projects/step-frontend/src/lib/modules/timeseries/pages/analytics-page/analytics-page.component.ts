@@ -1,15 +1,12 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, DashboardService } from '@exense/step-core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { TimeRange, TimeSeriesService } from '@exense/step-core';
 import { TimeSeriesConfig } from '../../time-series.config';
 import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
 import { TimeSeriesDashboardComponent } from '../../dashboard/time-series-dashboard.component';
-import { RangeSelectionType } from '../../time-selection/model/range-selection-type';
-import { TSTimeRange } from '../../chart/model/ts-time-range';
 import { TimeSeriesDashboardSettings } from '../../dashboard/model/ts-dashboard-settings';
 import { TsUtils } from '../../util/ts-utils';
-import { FilterBarItemType, TsFilterItem } from '../../performance-view/filter-bar/model/ts-filter-item';
-import { range, Subject, takeUntil, timer } from 'rxjs';
+import { FilterBarItemType, FilterBarItem } from '../../performance-view/filter-bar/model/filter-bar-item';
+import { Subject, takeUntil, timer } from 'rxjs';
 import { TimeSeriesUtils } from '../../time-series-utils';
 import { MatMenuTrigger } from '@angular/material/menu';
 
@@ -29,6 +26,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
 
   timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   timeRangeSelection!: TimeRangePickerSelection;
+  activeTimeRange: TimeRange = { from: 0, to: 0 };
 
   // this is just for running executions
   refreshIntervals = TimeSeriesConfig.AUTO_REFRESH_INTERVALS;
@@ -45,6 +43,8 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   executionHasToBeBuilt = false;
   migrationInProgress = false;
 
+  timeSeriesService = inject(TimeSeriesService);
+
   ngOnInit(): void {
     let now = new Date().getTime();
     let start;
@@ -58,7 +58,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     if (urlParams.start) {
       start = parseInt(urlParams.start);
       end = parseInt(urlParams.end) ? parseInt(urlParams.end) : now;
-      this.timeRangeSelection = { type: RangeSelectionType.ABSOLUTE, absoluteSelection: { from: start, to: end } };
+      this.timeRangeSelection = { type: 'ABSOLUTE', absoluteSelection: { from: start, to: end } };
     } else {
       if (urlParams.relativeRange && !isNaN(urlParams.relativeRange)) {
         const range = Number(urlParams.relativeRange);
@@ -75,11 +75,13 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     delete urlParams.start;
     delete urlParams.end;
 
+    let timeRange = { from: start, to: end };
+    this.activeTimeRange = timeRange;
     this.dashboardSettings = {
       contextId: new Date().getTime().toString(),
       includeThreadGroupChart: true,
       disableThreadGroupOnOqlMode: true,
-      timeRange: { from: start, to: end },
+      timeRange: timeRange,
       contextualFilters: urlParams,
       showContextualFilters: true,
       timeRangeOptions: TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS,
@@ -92,7 +94,11 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getDefaultFilters(): TsFilterItem[] {
+  handleDashboardTimeRangeChange(range: TimeRange) {
+    this.activeTimeRange = range;
+  }
+
+  private getDefaultFilters(): FilterBarItem[] {
     return [
       {
         label: 'Status',
@@ -192,7 +198,7 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     let lastRelativeOption: TimeRangePickerSelection = this.timeRangeOptions[0];
     for (let i = 0; i < this.timeRangeOptions.length; i++) {
       const currentOption = this.timeRangeOptions[i];
-      if (currentOption.type === RangeSelectionType.RELATIVE) {
+      if (currentOption.type === 'RELATIVE') {
         if (currentOption.relativeSelection!.timeInMs === rangeMs) {
           return currentOption;
         }
@@ -223,7 +229,3 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     this.terminator$.complete();
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepAnalyticsPage', downgradeComponent({ component: AnalyticsPageComponent }));

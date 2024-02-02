@@ -1,4 +1,11 @@
-<div class="chart-wrapper" (stepElementResize)="resize()">
+<div
+  class="chart-wrapper"
+  [style.height.px]="height"
+  [style.minHeight.px]="height"
+  [style.maxHeight.px]="height"
+  [class.pointer]="!!settings.showExecutionsLinks"
+  (stepElementResize)="resize()"
+>
   <div #chart></div>
   <div class="no-data-tag" *ngIf="chartIsEmpty">No data...</div>
   <div class="no-data-tag" *ngIf="chartIsUnavailable">Chart is unavailable for current settings</div>
@@ -6,7 +13,7 @@
     class="ts-chart-legend"
     *ngIf="!chartIsUnavailable && (legendSettings.items.length || legendSettings.zAxisLabel)"
   >
-    <div class="left-section">
+    <div class="left-section" *ngIf="legendSettings.show">
       <ng-container *ngFor="let item of legendSettings.items">
         <div class="item" *ngIf="item.isVisible">
           <div class="color-square" [style.background]="item.color"></div>

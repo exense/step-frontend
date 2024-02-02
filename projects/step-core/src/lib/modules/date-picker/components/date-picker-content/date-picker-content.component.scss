@@ -1,0 +1,16 @@
+step-date-picker-content {
+  mat-card {
+    padding: 0 !important;
+
+    mat-calendar {
+      width: 29.6rem;
+      height: 35.4rem;
+    }
+
+    mat-card-content {
+      display: flex !important;
+      align-items: baseline;
+      gap: 1rem;
+    }
+  }
+}

@@ -1,10 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
 import { SessionDto } from '../../../domain';
-import { BehaviorSubject, catchError, map, Observable, of, switchMap, tap } from 'rxjs';
-import { AJS_LOCATION, AJS_PREFERENCES, AJS_ROOT_SCOPE } from '../../../shared/angularjs-providers';
-import { AJS_MODULE } from '../../../shared/constants';
+import { BehaviorSubject, catchError, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
 import { AdditionalRightRuleService } from '../../../services/additional-right-rule.service';
 import { ApplicationConfiguration, PrivateApplicationService } from '../../../client/generated';
 import { Mutable } from '../../../shared';
@@ -12,6 +9,7 @@ import { AuthContext } from '../shared/auth-context.interface';
 import { CredentialsService } from './credentials.service';
 import { AppConfigContainerService } from './app-config-container.service';
 import { NavigatorService } from './navigator.service';
+import { Router } from '@angular/router';
 
 type FieldAccessor = Mutable<Pick<AuthService, 'isOidc'>>;
 
@@ -23,25 +21,40 @@ const ANONYMOUS = 'anonymous';
   providedIn: 'root',
 })
 export class AuthService implements OnDestroy {
-  private _$rootScope = inject(AJS_ROOT_SCOPE);
-  private _$location = inject(AJS_LOCATION);
+  private _router = inject(Router);
   private _document = inject(DOCUMENT);
-  private _preferences = inject(AJS_PREFERENCES);
+
   private _additionalRightRules = inject(AdditionalRightRuleService);
   private _privateApplicationApi = inject(PrivateApplicationService);
   private _credentialsService = inject(CredentialsService);
   private _serviceContext = inject(AppConfigContainerService);
   private _navigator = inject(NavigatorService);
 
-  private _triggerRightCheck$ = new BehaviorSubject<unknown>(undefined);
+  private triggerRightCheckInternal$ = new BehaviorSubject<unknown>(undefined);
 
-  readonly triggerRightCheck$ = this._triggerRightCheck$.asObservable();
+  readonly triggerRightCheck$ = this.triggerRightCheckInternal$.asObservable();
 
-  private _context$ = new BehaviorSubject<AuthContext | undefined>(undefined);
+  private contextInternal$ = new BehaviorSubject<AuthContext | undefined>(undefined);
 
-  readonly context$ = this._context$.asObservable();
+  readonly context$ = this.contextInternal$.asObservable();
+
+  readonly isAuthenticated$ = this.context$.pipe(map((context) => !!context?.userID && context?.userID !== ANONYMOUS));
 
   readonly isOidc: boolean = false;
+
+  readonly initialize$ = this._privateApplicationApi.getApplicationConfiguration().pipe(
+    tap((conf) => {
+      this._serviceContext.setConfiguration(conf);
+      if (conf.title) {
+        this._document.title = conf.title;
+      }
+      const startOidcEndpoint = conf?.miscParams?.[OIDC_ENDPOINT_PARAM] || undefined;
+      (this as FieldAccessor).isOidc = !!startOidcEndpoint && !!conf?.noLoginMask && !!conf.authentication;
+    }),
+    switchMap(() => this.getSession()),
+    map(() => this._serviceContext?.conf?.debug || false),
+    shareReplay(1)
+  );
 
   private setContextFromSession(session: SessionDto): void {
     const context: AuthContext = {
@@ -53,16 +66,18 @@ export class AuthService implements OnDestroy {
     };
     this.setContext(context);
     this.triggerRightCheck();
-    this._preferences.load();
   }
 
   private setContext(context: AuthContext) {
-    (this._$rootScope as any).context = context;
-    this._context$.next(context);
+    this.contextInternal$.next(context);
   }
 
-  getContext(): AuthContext {
-    return this._context$.value as AuthContext;
+  private getContext(): AuthContext {
+    return this.contextInternal$.value as AuthContext;
+  }
+
+  getUserID(): string {
+    return this.getContext().userID;
   }
 
   updateContext(info: Partial<AuthContext>): void {
@@ -76,10 +91,9 @@ export class AuthService implements OnDestroy {
       tap(() => {
         const context = this.getContext();
         if (context && !context.otp) {
-          if (this._$location.path().indexOf('login') !== -1) {
-            this._navigator.navigateToHome();
+          if (this._router.url.indexOf('login') !== -1) {
+            this._navigator.navigateAfterLogin();
           }
-          (this._$rootScope as any).broadcast('step.login.succeeded');
         }
       })
     );
@@ -91,7 +105,7 @@ export class AuthService implements OnDestroy {
 
   performPostLogoutActions(): void {
     this.setContext({ userID: ANONYMOUS });
-    this._navigator.navigateToHome();
+    this._navigator.navigateToRoot();
   }
 
   goToLoginPage(): void {
@@ -114,6 +128,10 @@ export class AuthService implements OnDestroy {
     return !!this._serviceContext?.conf?.noLoginMask;
   }
 
+  hasRight$(right: string): Observable<boolean> {
+    return this.triggerRightCheck$.pipe(map(() => this.hasRight(right)));
+  }
+
   hasRight(right: string): boolean {
     const conf = this.getConf();
     if (!!conf && !conf.authentication) {
@@ -125,8 +143,16 @@ export class AuthService implements OnDestroy {
       return false;
     }
 
-    const context = this._context$.value;
+    const context = this.contextInternal$.value;
     return !!context?.rights ? context.rights.indexOf(right) !== -1 : false;
+  }
+
+  hasAnyRights(rights: string[]): boolean {
+    return rights.reduce((res, right) => res || this.hasRight(right), false);
+  }
+
+  hasAllRights(rights: string[]): boolean {
+    return rights.reduce((res, right) => res && this.hasRight(right), true);
   }
 
   getConf(): ApplicationConfiguration | undefined {
@@ -139,27 +165,12 @@ export class AuthService implements OnDestroy {
   }
 
   triggerRightCheck(): void {
-    this._triggerRightCheck$.next(undefined);
+    this.triggerRightCheckInternal$.next(undefined);
   }
 
   ngOnDestroy(): void {
-    this._context$.complete();
-    this._triggerRightCheck$.complete();
-  }
-
-  initialize(): Observable<boolean> {
-    return this._privateApplicationApi.getApplicationConfiguration().pipe(
-      tap((conf) => {
-        this._serviceContext.setConfiguration(conf);
-        if (conf.title) {
-          this._document.title = conf.title;
-        }
-        const startOidcEndpoint = conf?.miscParams?.[OIDC_ENDPOINT_PARAM] || undefined;
-        (this as FieldAccessor).isOidc = !!startOidcEndpoint && !!conf?.noLoginMask && !!conf.authentication;
-      }),
-      switchMap(() => this.getSession()),
-      map(() => this._serviceContext?.conf?.debug || false)
-    );
+    this.contextInternal$.complete();
+    this.triggerRightCheckInternal$.complete();
   }
 
   private redirectToOidc(): void {
@@ -180,6 +191,9 @@ export class AuthService implements OnDestroy {
           map(() => {
             session.otp = true;
             return session;
+          }),
+          tap(() => {
+            this._navigator.navigateAfterLogin();
           })
         );
       }),
@@ -191,5 +205,3 @@ export class AuthService implements OnDestroy {
     );
   }
 }
-
-getAngularJSGlobal().module(AJS_MODULE).service('AuthService', downgradeInjectable(AuthService));

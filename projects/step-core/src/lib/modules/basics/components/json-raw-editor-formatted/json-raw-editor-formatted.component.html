@@ -1,8 +1,9 @@
 <step-form-field
+  [showRequiredMarker]="showRequiredMarker"
   [class.ng-invalid]="_ngControl?.invalid || rawValueFormControl.invalid"
   [class.ng-touched]="_ngControl?.touched"
 >
-  <step-label [attr.show-required-marker]="showRequiredMarker || null">
+  <step-label>
     {{ label }}
   </step-label>
 

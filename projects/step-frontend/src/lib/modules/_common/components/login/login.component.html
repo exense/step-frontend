@@ -17,12 +17,13 @@
           [(ngModel)]="credentials.username"
           name="username"
           autocomplete="username"
+          type="text"
           (keyup.enter)="login()"
           placeholder="Enter your username"
         />
       </div>
 
-      <div class="step-login-input-wrapper" (stepCapsLock)="capsLock = $event" style="width: 100%">
+      <div class="step-login-input-wrapper" (stepCapsLock)="capsLock = $event">
         <p class="step-login-input-label">Password</p>
         <input
           [(ngModel)]="credentials.password"

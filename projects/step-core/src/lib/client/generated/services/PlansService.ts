@@ -160,6 +160,21 @@ export class PlansService {
   }
 
   /**
+   * Returns the list of entities for the provided list of IDs
+   * @param requestBody
+   * @returns Plan default response
+   * @throws ApiError
+   */
+  public findPlansByIds(requestBody?: Array<string>): Observable<Array<Plan>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/plans/find/by/ids',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
    * Returns the list of entities matching the provided attributes
    * @param requestBody
    * @returns Plan default response
@@ -193,7 +208,7 @@ export class PlansService {
   }
 
   /**
-   * Returns the names of the supported artefacts.
+   * Returns the list of artefact types that can be used as root element of Plans.
    * @returns string default response
    * @throws ApiError
    */
@@ -221,7 +236,7 @@ export class PlansService {
   }
 
   /**
-   * Returns the supported artefact types.
+   * Returns the list of artefact types that can be used as control within Plans
    * @returns string default response
    * @throws ApiError
    */
@@ -260,6 +275,57 @@ export class PlansService {
       path: {
         id: id,
       },
+    });
+  }
+
+  /**
+   * Returns the plan in yaml format.
+   * @param id
+   * @returns any default response
+   * @throws ApiError
+   */
+  public getYamlPlan(id: string): Observable<any> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/plans/{id}/yaml',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
+   * Get entity locking state
+   * @param id
+   * @returns boolean default response
+   * @throws ApiError
+   */
+  public isPlanLocked(id: string): Observable<boolean> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/plans/{id}/locked',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
+   * Lock this entity
+   * @param id
+   * @param requestBody
+   * @returns any default response
+   * @throws ApiError
+   */
+  public lockPlan(id: string, requestBody?: boolean): Observable<any> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/plans/{id}/locked',
+      path: {
+        id: id,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
     });
   }
 

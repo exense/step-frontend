@@ -1,11 +1,11 @@
 <step-modal-window title="Add field to schema">
   <div step-modal-window-body [formGroup]="fieldForm" [class.with-enum]="isEnum$ | async">
-    <step-form-field>
-      <step-label show-required-marker>Name</step-label>
+    <step-form-field [showRequiredMarker]="true">
+      <step-label>Name</step-label>
       <input type="text" formControlName="name" />
     </step-form-field>
-    <step-form-field>
-      <step-label show-required-marker>Field type</step-label>
+    <step-form-field [showRequiredMarker]="true">
+      <step-label>Field type</step-label>
       <mat-select formControlName="fieldType">
         <mat-option [value]="undefined"></mat-option>
         <mat-option *ngFor="let item of typeItems" [value]="item">

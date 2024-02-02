@@ -14,12 +14,7 @@ import { KeywordCallsComponent } from './components/keyword-calls/keyword-calls.
 import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import { ExecutionTabsComponent } from './components/execution-tabs/execution-tabs.component';
 import './components/execution-tabs/execution-tabs.component';
-import {
-  CustomCellRegistryService,
-  DashletRegistryService,
-  EntityRegistry,
-  ViewRegistryService,
-} from '@exense/step-core';
+import { DashletRegistryService, EntityRegistry, ViewRegistryService } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
 import { ExecutionTreeComponent } from './components/execution-tree/execution-tree.component';
@@ -35,10 +30,12 @@ import { PanelExecutionDetailsComponent } from './components/panel-execution-det
 import { PanelComponent } from './components/panel/panel.component';
 import { PanelOperationsComponent } from './components/panel-operations/panel-operations.component';
 import { RepositoryComponent } from './components/repository/repository.component';
-import { ExecutionPageComponent } from './components/execution-page/execution-page.component';
 import { ExecutionSelectionTableComponent } from './components/execution-selection-table/execution-selection-table.component';
 import { ExecutionBulkOperationsRegisterService } from './services/execution-bulk-operations-register.service';
 import { IsExecutionProgressPipe } from './pipes/is-execution-progress.pipe';
+import { ExecutionsComponent } from './components/executions/executions.component';
+import { ExecutionOpenerComponent } from './components/execution-opener/execution-opener.component';
+import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
 
 @NgModule({
   declarations: [
@@ -64,9 +61,11 @@ import { IsExecutionProgressPipe } from './pipes/is-execution-progress.pipe';
     PanelExecutionDetailsComponent,
     PanelComponent,
     PanelOperationsComponent,
-    ExecutionPageComponent,
     ExecutionSelectionTableComponent,
     IsExecutionProgressPipe,
+    ExecutionsComponent,
+    ExecutionOpenerComponent,
+    ExecutionRunningStatusHeaderComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [
@@ -79,29 +78,38 @@ import { IsExecutionProgressPipe } from './pipes/is-execution-progress.pipe';
     ExecutionCommandsComponent,
     ExecutionProgressComponent,
     RepositoryComponent,
-    ExecutionPageComponent,
     ExecutionSelectionTableComponent,
   ],
 })
 export class ExecutionModule {
   constructor(
-    _entityRegistry: EntityRegistry,
-    _cellsRegister: CustomCellRegistryService,
-    _dashletRegistry: DashletRegistryService,
-    _viewRegistry: ViewRegistryService,
+    private _entityRegistry: EntityRegistry,
+    private _dashletRegistry: DashletRegistryService,
+    private _viewRegistry: ViewRegistryService,
     _bulkOperationsRegistry: ExecutionBulkOperationsRegisterService
   ) {
-    _entityRegistry.register('executions', 'Execution', {
+    _bulkOperationsRegistry.register();
+    this.registerEntities();
+    this.registerDashlets();
+    this.registerRoutes();
+  }
+
+  private registerEntities(): void {
+    this._entityRegistry.register('executions', 'Execution', {
       icon: 'rocket',
       component: ExecutionSelectionTableComponent,
     });
-    _bulkOperationsRegistry.register();
-    _dashletRegistry.registerDashlet('executionStep', DashletExecutionStepComponent);
-    _dashletRegistry.registerDashlet('executionTree', DashletExecutionTreeComponent);
-    _dashletRegistry.registerDashlet('executionViz', DashletExecutionVizComponent);
-    _dashletRegistry.registerDashlet('executionError', DashletExecutionErrorsComponent);
 
-    _viewRegistry.registerDashletAdvanced(
+    this._entityRegistry.registerEntity('Repository', 'repository', 'database');
+  }
+
+  private registerDashlets(): void {
+    this._dashletRegistry.registerDashlet('executionStep', DashletExecutionStepComponent);
+    this._dashletRegistry.registerDashlet('executionTree', DashletExecutionTreeComponent);
+    this._dashletRegistry.registerDashlet('executionViz', DashletExecutionVizComponent);
+    this._dashletRegistry.registerDashlet('executionError', DashletExecutionErrorsComponent);
+
+    this._viewRegistry.registerDashletAdvanced(
       'executionTabMigrated',
       'Execution steps',
       'executionStep',
@@ -110,7 +118,7 @@ export class ExecutionModule {
       () => true
     );
 
-    _viewRegistry.registerDashletAdvanced(
+    this._viewRegistry.registerDashletAdvanced(
       'executionTabMigrated',
       'Execution tree',
       'executionTree',
@@ -121,12 +129,63 @@ export class ExecutionModule {
       }
     );
 
-    _viewRegistry.registerDashletAdvanced('executionTabMigrated', 'Performance', 'executionViz', 'viz', 2, function () {
-      return true;
+    this._viewRegistry.registerDashletAdvanced(
+      'executionTabMigrated',
+      'Performance',
+      'executionViz',
+      'viz',
+      2,
+      function () {
+        return true;
+      }
+    );
+
+    this._viewRegistry.registerDashletAdvanced(
+      'executionTabMigrated',
+      'Errors',
+      'executionError',
+      'errors',
+      3,
+      function () {
+        return true;
+      }
+    );
+  }
+
+  private registerRoutes(): void {
+    this._viewRegistry.registerRoute({
+      path: 'repository',
+      component: RepositoryComponent,
     });
 
-    _viewRegistry.registerDashletAdvanced('executionTabMigrated', 'Errors', 'executionError', 'errors', 3, function () {
-      return true;
+    this._viewRegistry.registerRoute({
+      path: 'executions',
+      component: ExecutionsComponent,
+      children: [
+        {
+          path: '',
+          redirectTo: 'list',
+        },
+        {
+          path: 'list',
+          component: ExecutionListComponent,
+        },
+        {
+          // This additional route is required, to rerender the execution progress component properly
+          // when the user navigates from one execution to another
+          path: 'open/:id',
+          component: ExecutionOpenerComponent,
+        },
+        {
+          matcher: (url) => {
+            if (url[0].path === 'list' || url[0].path === 'open') {
+              return null;
+            }
+            return { consumed: url };
+          },
+          component: ExecutionProgressComponent,
+        },
+      ],
     });
   }
 }

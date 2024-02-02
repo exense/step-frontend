@@ -1,6 +1,16 @@
-const libraryConfig = (conf = {}) => {
+const libraryConfig = (conf = {}, disableSecondaries = true) => {
   const defaultConfig = { singleton: true, strictVersion: true, requiredVersion: 'auto' };
-  return { ...defaultConfig, ...conf };
+  const res = { ...defaultConfig, ...conf };
+
+  if (disableSecondaries) {
+    Object.defineProperty(res, 'includeSecondaries', {
+      enumerable: false,
+      configurable: false,
+      value: false,
+    });
+  }
+
+  return res;
 };
 
 module.exports = {
@@ -24,7 +34,7 @@ module.exports = {
   '@angular/material/menu': libraryConfig(),
   '@angular/material/progress-bar': libraryConfig(),
   '@angular/material/core': libraryConfig(),
-  '@angular/material/side-nav': libraryConfig(),
+  '@angular/material/sidenav': libraryConfig(),
   '@angular/material/progress-spinner': libraryConfig(),
   '@angular/material/paginator': libraryConfig(),
   '@angular/material/slide-toggle': libraryConfig(),
@@ -43,5 +53,5 @@ module.exports = {
   '@angular/cdk/portal': libraryConfig(),
   'angular-split': libraryConfig(),
   '@exense/step-core': libraryConfig({ requiredVersion: '0.2.0' }),
-  luxon: libraryConfig({ requiredVersion: '2.0.0' }),
+  luxon: libraryConfig({ requiredVersion: '3.4.4' }),
 };

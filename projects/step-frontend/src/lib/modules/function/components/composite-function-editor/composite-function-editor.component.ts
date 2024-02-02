@@ -1,8 +1,8 @@
-import { Component, inject, Input, SimpleChanges } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE, AugmentedKeywordsService, Keyword } from '@exense/step-core';
-import { PlanEditorApiService } from '../../../plan-editor/plan-editor.module';
+import { Component, inject } from '@angular/core';
+import { Plan, PlanEditorApiService } from '@exense/step-core';
 import { CompositeKeywordPlanApiService } from '../../services/composite-keyword-plan-api.service';
+import { ActivatedRoute } from '@angular/router';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'step-composite-function-editor',
@@ -11,35 +11,13 @@ import { CompositeKeywordPlanApiService } from '../../services/composite-keyword
   providers: [
     {
       provide: PlanEditorApiService,
-      useClass: CompositeKeywordPlanApiService,
+      useExisting: CompositeKeywordPlanApiService,
     },
   ],
 })
 export class CompositeFunctionEditorComponent {
-  @Input() id?: string;
+  readonly _compositePlan$ = inject(ActivatedRoute).data.pipe(map((data) => data['compositePlan'] as Plan | undefined));
+  protected _id: string | undefined = inject(ActivatedRoute).snapshot.params['id'];
 
-  private _functionApiService = inject(AugmentedKeywordsService);
-
-  protected composite?: Keyword;
-
-  ngOnChanges(changes: SimpleChanges): void {
-    const cId = changes['id'];
-    if (cId?.previousValue !== cId?.currentValue || cId?.firstChange) {
-      this.loadKeyword(cId?.currentValue);
-    }
-  }
-
-  private loadKeyword(id?: string): void {
-    if (!id) {
-      this.composite = undefined;
-      return;
-    }
-    this._functionApiService.getFunctionById(id).subscribe((keywordFunction) => {
-      this.composite = keywordFunction;
-    });
-  }
+  readonly _composite$ = inject(CompositeKeywordPlanApiService).keyword$;
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepCompositeFunctionEditor', downgradeComponent({ component: CompositeFunctionEditorComponent }));

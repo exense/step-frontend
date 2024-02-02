@@ -1,16 +1,17 @@
 import { Component, HostListener, inject } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Observable, map, of, tap, timer } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import {
-  AsyncTasksService,
   AsyncTaskStatusResource,
+  AsyncTasksService,
   AugmentedResourcesService,
   ExportsService,
   pollAsyncTask,
 } from '../../client/step-client-module';
-import { a1Promise2Observable, DialogsService, ExportDialogData } from '../../shared';
-import { map, Observable, of, tap, timer } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
-import { FormBuilder, Validators } from '@angular/forms';
+import { AlertType } from '../../modules/basics/step-basics.module';
+import { DialogsService, ExportDialogData } from '../../shared';
 
 @Component({
   selector: 'step-export-dialog',
@@ -36,6 +37,7 @@ export class ExportDialogComponent {
     recursively: this._fb.control(true),
     parameters: this._fb.control(false),
   });
+  readonly AlertType = AlertType;
 
   @HostListener('keydown.enter')
   save(): void {
@@ -70,13 +72,12 @@ export class ExportDialogComponent {
           if (!status?.warnings?.length) {
             return of({ attachmentID });
           }
-          return a1Promise2Observable(this._dialogs.showListOfMsgs(status.warnings!)).pipe(
-            map(() => ({ attachmentID })),
-            catchError(() => of(undefined))
-          );
+          return this._dialogs
+            .showListOfMsgs(status.warnings!)
+            .pipe(switchMap((isConfirmed) => (isConfirmed ? of({ attachmentID }) : of(undefined))));
         }),
         catchError((error) => {
-          this._dialogs.showErrorMsg(error);
+          this._dialogs.showErrorMsg(error).subscribe();
           return of(undefined);
         })
       )
@@ -86,9 +87,9 @@ export class ExportDialogComponent {
             return;
           }
           if (!result.attachmentID) {
-            this._dialogs.showErrorMsg(
-              'The export file could not be created, check the controller logs for more details'
-            );
+            this._dialogs
+              .showErrorMsg('The export file could not be created, check the controller logs for more details')
+              .subscribe();
             return;
           }
           this._resourcesApi.downloadResource(result.attachmentID, filename);

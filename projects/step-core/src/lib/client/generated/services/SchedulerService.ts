@@ -164,6 +164,21 @@ export class SchedulerService {
   }
 
   /**
+   * Returns the list of entities for the provided list of IDs
+   * @param requestBody
+   * @returns ExecutiontTaskParameters default response
+   * @throws ApiError
+   */
+  public findExecutionTasksByIds(requestBody?: Array<string>): Observable<Array<ExecutiontTaskParameters>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/scheduler/task/find/by/ids',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
    * Returns the list of entities matching the provided attributes
    * @param requestBody
    * @returns ExecutiontTaskParameters default response
@@ -220,6 +235,41 @@ export class SchedulerService {
       path: {
         id: id,
       },
+    });
+  }
+
+  /**
+   * Get entity locking state
+   * @param id
+   * @returns boolean default response
+   * @throws ApiError
+   */
+  public isExecutionTaskLocked(id: string): Observable<boolean> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/scheduler/task/{id}/locked',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
+   * Lock this entity
+   * @param id
+   * @param requestBody
+   * @returns any default response
+   * @throws ApiError
+   */
+  public lockExecutionTask(id: string, requestBody?: boolean): Observable<any> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/scheduler/task/{id}/locked',
+      path: {
+        id: id,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
     });
   }
 

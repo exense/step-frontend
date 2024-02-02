@@ -51,7 +51,7 @@ export class ExecutionsService {
   }
 
   /**
-   * Delete the execution with the given execution id.
+   * Delete the execution with the given execution id, use the housekeeping services for full deletion
    * @param id
    * @returns any default response
    * @throws ApiError
@@ -93,6 +93,22 @@ export class ExecutionsService {
       url: '/executions/search/by/critera',
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Force stop the execution with the given execution id.
+   * @param id
+   * @returns any default response
+   * @throws ApiError
+   */
+  public forceStop(id: string): Observable<any> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/{id}/force-stop',
+      path: {
+        id: id,
+      },
     });
   }
 
@@ -145,6 +161,21 @@ export class ExecutionsService {
   }
 
   /**
+   * Returns a list of executions by the provided ids.
+   * @param requestBody
+   * @returns Execution default response
+   * @throws ApiError
+   */
+  public getExecutionsByIds(requestBody?: Array<string>): Observable<Array<Execution>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/executions/search/by/ids',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
    * Returns the execution matching the provided repository object reference.
    * @param requestBody
    * @returns Execution default response
@@ -158,6 +189,28 @@ export class ExecutionsService {
       url: '/executions/search/by/ref',
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Returns the list of report nodes with contributing errors for the given execution
+   * @param id
+   * @param skip
+   * @param limit
+   * @returns ReportNode default response
+   * @throws ApiError
+   */
+  public getReportNodeWithContributingErrors(id: string, skip?: number, limit?: number): Observable<Array<ReportNode>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/{id}/reportnodes-with-errors',
+      path: {
+        id: id,
+      },
+      query: {
+        skip: skip,
+        limit: limit,
+      },
     });
   }
 

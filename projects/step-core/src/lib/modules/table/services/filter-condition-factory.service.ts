@@ -13,6 +13,8 @@ import { ParametersFilterCondition } from '../shared/parameters-filter-condition
 import { FilterConditionJson } from '../shared/filter-condition-json.interface';
 import { FilterConditionType } from '../shared/filter-condition-type.enum';
 import { BooleanFilterCondition } from '../shared/boolean-filter-condition';
+import { DateRangeFilterCondition } from '../shared/date-range-filter-condition';
+import { DateRange } from '../../date-picker/date-picker.module';
 
 @Injectable({
   providedIn: 'root',
@@ -26,6 +28,10 @@ export class FilterConditionFactoryService {
 
   singleDateFilterCondition(date?: DateTime): FilterCondition {
     return new SingleDateFilterCondition(date);
+  }
+
+  dateRangeFilterCondition(range?: DateRange): FilterCondition {
+    return new DateRangeFilterCondition(range);
   }
 
   scopeFilterCondition(value?: string): FilterCondition {
@@ -71,6 +77,8 @@ export class FilterConditionFactoryService {
         return this.scopeFilterCondition(filterCondition?.sourceObject);
       case FilterConditionType.SINGLE_DATE:
         return this.singleDateFilterCondition(filterCondition?.sourceObject);
+      case FilterConditionType.DATE_RANGE:
+        return this.dateRangeFilterCondition(filterCondition?.sourceObject);
       default:
         return undefined;
     }

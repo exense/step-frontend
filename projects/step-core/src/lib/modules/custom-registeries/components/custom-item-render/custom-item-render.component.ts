@@ -2,10 +2,8 @@ import {
   AfterViewInit,
   Component,
   ComponentRef,
-  EventEmitter,
   Input,
   OnChanges,
-  Output,
   SimpleChanges,
   Type,
   ViewChild,
@@ -21,12 +19,15 @@ import { CustomComponent } from '../../shared/custom-component';
 export class CustomItemRenderComponent implements OnChanges, AfterViewInit {
   @Input() component?: Type<CustomComponent>;
   @Input() context?: any;
-
-  @Output() renderComplete = new EventEmitter<void>();
+  @Input() artefactId?: string;
 
   @ViewChild('container', { read: ViewContainerRef }) container!: ViewContainerRef;
 
   private componentRef?: ComponentRef<CustomComponent>;
+
+  get componentInstance(): CustomComponent | undefined {
+    return this.componentRef?.instance;
+  }
 
   ngAfterViewInit(): void {
     // Rendering synchronously in `ngAfterViewInit` hook may cause `ExpressionChangedAfterItHasBeenCheckedError`
@@ -36,15 +37,19 @@ export class CustomItemRenderComponent implements OnChanges, AfterViewInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     const cComponent = changes['component'];
-
     if (cComponent?.previousValue !== cComponent?.currentValue) {
       this.render(cComponent?.currentValue);
     }
 
     const cContext = changes['context'];
-
     if (cContext?.previousValue !== cContext?.currentValue) {
       this.updateContext(cContext?.currentValue);
+    }
+
+    const cArtefactId = changes['artefactId'];
+    if (cArtefactId?.previousValue !== cArtefactId?.currentValue) {
+      // force a re-rendering since the component might have stayed the same but displays a different artefact
+      this.render(this.component);
     }
   }
 
@@ -65,8 +70,6 @@ export class CustomItemRenderComponent implements OnChanges, AfterViewInit {
     if (this.context) {
       this.updateContext(this.context);
     }
-
-    this.renderComplete.emit();
   }
 
   private updateContext(context?: any): void {

@@ -98,6 +98,21 @@ export class ParametersService {
   }
 
   /**
+   * Returns the list of entities for the provided list of IDs
+   * @param requestBody
+   * @returns Parameter default response
+   * @throws ApiError
+   */
+  public findParametersByIds(requestBody?: Array<string>): Observable<Array<Parameter>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/parameters/find/by/ids',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
    * Returns the list of entities matching the provided attributes
    * @param requestBody
    * @returns Parameter default response
@@ -156,6 +171,41 @@ export class ParametersService {
       path: {
         id: id,
       },
+    });
+  }
+
+  /**
+   * Get entity locking state
+   * @param id
+   * @returns boolean default response
+   * @throws ApiError
+   */
+  public isParameterLocked(id: string): Observable<boolean> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/parameters/{id}/locked',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
+   * Lock this entity
+   * @param id
+   * @param requestBody
+   * @returns any default response
+   * @throws ApiError
+   */
+  public lockParameter(id: string, requestBody?: boolean): Observable<any> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/parameters/{id}/locked',
+      path: {
+        id: id,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
     });
   }
 

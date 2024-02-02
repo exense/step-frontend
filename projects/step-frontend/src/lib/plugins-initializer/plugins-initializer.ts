@@ -1,49 +1,16 @@
-import { APP_INITIALIZER, Compiler, FactoryProvider, inject, Injector } from '@angular/core';
-import { LegacyPluginDefinition } from './shared/legacy-plugin-definition';
+import { APP_INITIALIZER, FactoryProvider, inject, Injector } from '@angular/core';
 import { MicrofrontendPluginDefinition } from './shared/microfrontend-plugin-definition';
-import { registerLegacyPlugins } from './register-legacy-plugins';
 import { registerMicrofrontendPlugins } from './register-microfrontend-plugins';
 import { PluginInfoRegistryService } from '@exense/step-core';
 import { registerOsPlugins } from './register-os-plugins';
 
-const OVERRIDE_PLUGINS = new Map<string, string>();
-
-// Ignore original plugin since it's become part of enterprise core
-const IGNORE_PLUGINS: ReadonlyArray<string> = [
-  'multitenancy',
-  'monitoringdashboard',
-  'executionreport',
-  'dualPlanEditor',
-  'notifications',
-  'planBrowser',
-  'housekeeping',
-  'menuConfig',
-  'scriptEditor',
-  'eventbrokermonitor',
-  'azureDevops',
-  'QFTestPlugin',
-  'soapUIPlugin',
-  'NodePlugin',
-  'jmeterPlugin',
-  'cypress',
-  'sikulix',
-  'DotNetPlugin',
-  'javaPlugin',
-  'oryonPlugin',
-  'compareEditor',
-  'silkPerformer',
-  'EnterpriseArtefacts',
-  'wizard',
-  'messages',
-];
-
 // For testing purposes only
-// Allows to add plugins, that don't returned from BE
+// Allows to add plugins that aren't enabled in the BE
 const ADDITIONAL_PLUGINS: ReadonlyArray<MicrofrontendPluginDefinition> = [
   // Add object like this {name: 'pluginName', entryPoint: 'pluginName/remoteEntry.js' }
 ];
 
-export type PluginDefinition = LegacyPluginDefinition | MicrofrontendPluginDefinition;
+export type PluginDefinition = MicrofrontendPluginDefinition;
 
 const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
   let result: PluginDefinition[] = [];
@@ -53,19 +20,8 @@ const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
     result = ((await pluginsResponse.json()) as PluginDefinition[]).map((plugin) => {
       console.log('received plugins', plugin);
 
-      //@ts-ignore
       if (plugin['entryPoint']) {
-        //@ts-ignore
         plugin['entryPoint'] += '?v=${project.version}';
-      }
-
-      const angularModules = (plugin as LegacyPluginDefinition)?.angularModules || [];
-      const toOverride = angularModules.find((m) => OVERRIDE_PLUGINS.has(m));
-      if (toOverride) {
-        const name = toOverride;
-        const entryPoint = OVERRIDE_PLUGINS.get(toOverride)!;
-        console.log(`Plugin "${name}" configuration was overridden to the new format`);
-        return { entryPoint, name };
       }
 
       return plugin;
@@ -81,7 +37,6 @@ const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
 };
 
 const registerPlugins = () => {
-  const compiler = inject(Compiler);
   const injector = inject(Injector);
   const registry = inject(PluginInfoRegistryService);
 
@@ -91,39 +46,29 @@ const registerPlugins = () => {
       return;
     }
 
-    let { legacy, microfrontend } = pluginDefinitions.reduce(
+    let { microfrontend } = pluginDefinitions.reduce(
       (res, plugin) => {
         if (plugin.hasOwnProperty('entryPoint')) {
           res.microfrontend.push(plugin as MicrofrontendPluginDefinition);
-        } else {
-          res.legacy.push(plugin as LegacyPluginDefinition);
         }
         return res;
       },
       {
-        legacy: [] as LegacyPluginDefinition[],
         microfrontend: [] as MicrofrontendPluginDefinition[],
       }
     );
 
-    const pluginNames = [
-      ...legacy.reduce((res, pluginInfo) => [...res, ...pluginInfo.angularModules], [] as string[]),
-      ...microfrontend.map((pluginInfo) => pluginInfo.name),
-    ];
+    const pluginNames = [...microfrontend.map((pluginInfo) => pluginInfo.name)];
+
     registry.register(...pluginNames);
 
-    legacy = legacy.filter((l) => {
-      const ignoredPlugins = IGNORE_PLUGINS.filter((name) => l.angularModules.includes(name));
-      return ignoredPlugins.length === 0;
+    const entryPoints = new Set<string>();
+
+    microfrontend.forEach((plugin) => {
+      entryPoints.add(plugin.entryPoint);
     });
 
-    microfrontend = microfrontend.filter((m) => !IGNORE_PLUGINS.includes(m.name));
-
-    await Promise.all([
-      registerLegacyPlugins(legacy),
-      registerMicrofrontendPlugins(microfrontend, { compiler, injector }),
-      registerOsPlugins({ compiler, injector }),
-    ]);
+    await Promise.all([registerMicrofrontendPlugins(Array.from(entryPoints), injector), registerOsPlugins(injector)]);
   };
 };
 

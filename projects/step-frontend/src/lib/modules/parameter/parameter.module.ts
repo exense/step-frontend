@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CustomCellRegistryService, EntityRegistry, StepCoreModule } from '@exense/step-core';
+import { CustomCellRegistryService, EntityRegistry, StepCoreModule, ViewRegistryService } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { ParameterScopeComponent } from './components/parameter-scope/parameter-scope.component';
 import './components/parameter-selection/parameter-selection.component';
@@ -26,7 +26,8 @@ export class ParameterModule {
   constructor(
     _entityRegistry: EntityRegistry,
     _cellRegister: CustomCellRegistryService,
-    _parametersRegister: ParametersBulkOperationsRegisterService
+    _parametersRegister: ParametersBulkOperationsRegisterService,
+    _vewRegistry: ViewRegistryService
   ) {
     _entityRegistry.register('parameters', 'Parameters', {
       icon: 'list',
@@ -36,5 +37,9 @@ export class ParameterModule {
 
     _cellRegister.registerCell('parameterLastModification', ParameterLastModificationComponent);
     _cellRegister.registerCell('parameterKey', ParametersKeyComponent);
+    _vewRegistry.registerRoute({
+      path: 'parameters',
+      component: ParametersListComponent,
+    });
   }
 }

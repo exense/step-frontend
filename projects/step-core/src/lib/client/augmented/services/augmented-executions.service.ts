@@ -4,11 +4,18 @@ import {
   Execution,
   ExecutionParameters,
   ExecutionsService,
+  FieldFilter,
   TableBulkOperationRequest,
 } from '../../generated';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { StepDataSource, TableRemoteDataSourceFactoryService } from '../../table/step-table-client.module';
+import {
+  StepDataSource,
+  TableApiWrapperService,
+  TableCollectionFilter,
+  TableRemoteDataSourceFactoryService,
+} from '../../table/step-table-client.module';
+import { CompareCondition } from '../../../modules/basics/shared/compare-condition.enum';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedExecutionsService extends ExecutionsService {
@@ -16,6 +23,7 @@ export class AugmentedExecutionsService extends ExecutionsService {
 
   private _httpClient = inject(HttpClient);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
+  private _tableApiWrapper = inject(TableApiWrapperService);
 
   getExecutionsTableDataSource(): StepDataSource<Execution> {
     return this._dataSourceFactory.createDataSource(this.EXECUTIONS_TABLE_ID, {
@@ -55,5 +63,33 @@ export class AugmentedExecutionsService extends ExecutionsService {
       body: requestBody,
       mediaType: 'application/json',
     });
+  }
+
+  searchByIds(executionIds: string[]): Observable<Execution[]> {
+    const idsFilter: TableCollectionFilter = {
+      collectionFilter: {
+        type: CompareCondition.OR,
+        children: executionIds.map((expectedValue) => ({
+          type: CompareCondition.EQUALS,
+          field: 'id',
+          expectedValue,
+        })),
+      },
+    };
+
+    return this._tableApiWrapper
+      .requestTable<Execution>(this.EXECUTIONS_TABLE_ID, { filters: [idsFilter] })
+      .pipe(map((response) => response.data));
+  }
+
+  countExecutionsByStatus(status: string): Observable<number> {
+    const runningFilter: FieldFilter = {
+      field: 'status',
+      regex: true,
+      value: `^${status}$`,
+    };
+    return this._tableApiWrapper
+      .requestTable<Execution>(this.EXECUTIONS_TABLE_ID, { filters: [runningFilter] })
+      .pipe(map((response) => response.recordsFiltered));
   }
 }

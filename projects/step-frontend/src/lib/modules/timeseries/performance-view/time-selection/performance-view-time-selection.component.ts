@@ -1,26 +1,33 @@
-import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { FindBucketsRequest } from '../../find-buckets-request';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { TimeSeriesUtils } from '../../time-series-utils';
 import { TSRangerComponent } from '../../ranger/ts-ranger.component';
-import { TSTimeRange } from '../../chart/model/ts-time-range';
 import { TimeSeriesContext } from '../../time-series-context';
 import { TimeSeriesConfig } from '../../time-series.config';
 import { TSRangerSettings } from '../../ranger/ts-ranger-settings';
-import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
-import { PerformanceViewSettings } from '../model/performance-view-settings';
 import { Observable, Subject, takeUntil, tap } from 'rxjs';
-import { TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
+import { TimeRange, TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
 import { FindBucketsRequestBuilder } from '../../util/find-buckets-request-builder';
 
 @Component({
   selector: 'step-execution-time-selection',
   templateUrl: './performance-view-time-selection.component.html',
   styleUrls: ['./performance-view-time-selection.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
 
-  @Output() onRangerLoaded = new EventEmitter<void>();
+  @Output() rangerLoaded = new EventEmitter<void>();
 
   rangerSettings: TSRangerSettings | undefined;
   @ViewChild(TSRangerComponent) rangerComponent!: TSRangerComponent;
@@ -35,7 +42,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
     if (!this.context) {
       throw new Error('Settings input is required');
     }
-    this.createRanger(this.context.getFullTimeRange()).subscribe(() => this.onRangerLoaded.next());
+    this.createRanger(this.context.getFullTimeRange()).subscribe(() => this.rangerLoaded.next());
     this.context
       .onTimeSelectionChange()
       .pipe(takeUntil(this.terminator$))
@@ -59,7 +66,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
       });
   }
 
-  updateFullTimeRange(range: TSTimeRange) {
+  updateFullTimeRange(range: TimeRange) {
     // this.settings.timeRange = range;
   }
 
@@ -71,7 +78,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
     );
   }
 
-  createRanger(fullTimeRange: TSTimeRange, selection?: TSTimeRange): Observable<TimeSeriesAPIResponse> {
+  createRanger(fullTimeRange: TimeRange, selection?: TimeRange): Observable<TimeSeriesAPIResponse> {
     const request = new FindBucketsRequestBuilder()
       .withRange(fullTimeRange)
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
@@ -80,7 +87,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
       .withFilterAttributesMask(TimeSeriesConfig.RANGER_FILTER_FIELDS)
       .withSkipCustomOQL(true)
       .build();
-    return this.timeSeriesService.getBuckets(request).pipe(
+    return this.timeSeriesService.getMeasurements(request).pipe(
       tap((response) => {
         this.timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
         let avgData: (number | null)[] = [];
@@ -95,6 +102,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
             {
               id: 'avg',
               label: 'Response Time',
+              labelItems: ['Response Time'],
               data: avgData,
               // value: (self, x) => Math.trunc(x) + ' ms',
               stroke: 'red',
@@ -106,7 +114,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
     );
   }
 
-  onRangerSelectionChange(event: TSTimeRange) {
+  onRangerSelectionChange(event: TimeRange) {
     // check for full range selection
     this.context.updateSelectedRange(event);
     // the linked charts are automatically updated by the uplot sync feature. if that will be replaced, the charts must subscribe to the state change

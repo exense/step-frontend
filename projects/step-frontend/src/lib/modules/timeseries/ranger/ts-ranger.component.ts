@@ -5,6 +5,7 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   Output,
   Self,
@@ -13,11 +14,11 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { TSRangerSettings } from './ts-ranger-settings';
-import { TSTimeRange } from '../chart/model/ts-time-range';
 
 //@ts-ignore
 import uPlot = require('uplot');
 import MouseListener = uPlot.Cursor.MouseListener;
+import { TimeRange } from '@exense/step-core';
 
 /**
  * There are 3 ways of interaction with the ranger:
@@ -32,7 +33,7 @@ import MouseListener = uPlot.Cursor.MouseListener;
   styleUrls: ['./ts-ranger.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
+export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   private readonly CHART_HEIGHT = 100;
 
   @ViewChild('chart') private chartElement!: ElementRef;
@@ -45,14 +46,14 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
    * 1. when a synced chart or this chart is zooming
    * 2. when the grips are moved
    */
-  @Output() onRangeChange = new EventEmitter<TSTimeRange>();
+  @Output() rangeChange = new EventEmitter<TimeRange>();
 
-  @Output() onZoomReset = new EventEmitter<TSTimeRange>();
+  @Output() zoomReset = new EventEmitter<TimeRange>();
 
-  @Output() onChartLoaded = new EventEmitter<void>();
+  @Output() chartLoaded = new EventEmitter<void>();
 
   uplot!: any;
-  previousRange: TSTimeRange | undefined;
+  previousRange: TimeRange | undefined;
 
   start!: number;
   end!: number;
@@ -65,6 +66,10 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
   };
 
   constructor(@Self() private element: ElementRef) {}
+
+  ngOnDestroy(): void {
+    this.uplot?.destroy();
+  }
 
   redraw(): void {
     this.uplot.setData(this.uplot.data);
@@ -86,23 +91,8 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     this.createRanger();
   }
 
-  /**
-   * This method is responsible to move the selection, because the chart itself automatically adjust from the getSize() function.
-   */
   resizeChart() {
-    const chartPadding = 50; // this is the way uplot works
-    const fullWidth = this.uplot.width - chartPadding;
-    const leftSelect = this.uplot.select.left;
-    const width = this.uplot.select.width;
-    const rightSelect = leftSelect + width;
-    const leftPercent = (100 * leftSelect) / fullWidth;
-    const rightPercent = (100 * rightSelect) / fullWidth;
     this.uplot.setSize(this.getSize());
-    let newChartWidth = this.uplot.width - chartPadding;
-
-    const newLeft = (leftPercent / 100) * newChartWidth;
-    const newRight = (rightPercent / 100) * newChartWidth;
-    this.uplot.setSelect({ left: newLeft, width: newRight - newLeft, top: 0 }, false);
   }
 
   init(settings: TSRangerSettings) {
@@ -119,13 +109,13 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     }
   }
 
-  selectRange(range: TSTimeRange) {
+  selectRange(range: TimeRange) {
     const select = this.transformRangeToSelect(range);
     this.uplot.setSelect(select, false);
     this.emitSelectionToLinkedCharts();
   }
 
-  transformRangeToSelect(range: TSTimeRange): uPlot.Select {
+  transformRangeToSelect(range: TimeRange): uPlot.Select {
     const fromTimestamp = range.from;
     const toTimestamp = range.to;
     let left, width;
@@ -154,7 +144,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       const end = xData[xData.length - 1];
       this.emitSelectionToLinkedCharts();
       if (emitResetEvent) {
-        this.onZoomReset.emit({ from: start, to: end });
+        this.zoomReset.emit({ from: start, to: end });
       }
     }, 50);
   }
@@ -264,7 +254,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
               handler(e);
               if (hasSelection) {
                 // has selection
-                this.onZoomReset.emit();
+                this.zoomReset.emit();
                 // this.resetSelect(true);
               }
               return null;
@@ -347,7 +337,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
       [this.settings.xValues, ...this.settings.series.map((s) => s.data)],
       this.chartElement.nativeElement
     );
-    this.onChartLoaded.emit();
+    this.chartLoaded.emit();
   }
 
   emitSelectionToLinkedCharts() {
@@ -380,7 +370,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges {
     if (min != this.previousRange?.from || max !== this.previousRange?.to) {
       const currentRange = { from: min, to: max };
       this.previousRange = currentRange;
-      this.onRangeChange.next(currentRange);
+      this.rangeChange.next(currentRange);
     }
   }
 }

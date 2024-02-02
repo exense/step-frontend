@@ -20,11 +20,4 @@
     </ng-container>
   </div>
 </a>
-<step-icon
-  *ngIf="allowNavToPlan && !!context?.executionsParameters?.repositoryObject?.repositoryParameters?.['planid']"
-  class="nav-to-plan-icon"
-  matTooltip="Go to plan"
-  name="file"
-  (click)="navToPlan()"
->
-</step-icon>
+<step-description-hint [description]="context?.attributes?.['description']"> </step-description-hint>

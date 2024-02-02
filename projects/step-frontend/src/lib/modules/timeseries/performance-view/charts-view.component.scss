@@ -15,8 +15,14 @@
   }
 }
 
+.charts-section {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 .chart {
-  height: 360px;
   width: calc(50% - 12px);
   min-width: 484px;
   position: relative;
@@ -60,7 +66,7 @@
   margin-bottom: 16px;
 }
 
-.mat-card {
+.mat-mdc-card {
   display: flex;
   flex-wrap: wrap;
   gap: 2.4rem;
@@ -68,7 +74,6 @@
 
 .charts-table {
   width: 100%;
-  padding-top: 1.8rem;
 }
 
 .chart-settings {

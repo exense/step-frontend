@@ -1,23 +1,23 @@
-import { TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
-import { TSTimeRange } from '../chart/model/ts-time-range';
-import { FindBucketsRequest } from '../find-buckets-request';
+import { FilterBarItem } from '../performance-view/filter-bar/model/filter-bar-item';
 import { OQLBuilder } from './oql-builder';
 import { FilterUtils } from './filter-utils';
 import { TsFilteringSettings } from '../model/ts-filtering-settings';
 import { TsFilteringMode } from '../model/ts-filtering-mode';
 
 import { TimeSeriesConfig } from '../time-series.config';
+import { FetchBucketsRequest, TimeRange } from '@exense/step-core';
 export class FindBucketsRequestBuilder {
   readonly attributesPrefix = 'attributes';
 
   private customAttributes: { [key: string]: any } = {};
-  private customFilters: TsFilterItem[] = [];
-  private range?: TSTimeRange;
+  private customFilters: FilterBarItem[] = [];
+  private range?: TimeRange;
   private groupDimensions?: string[];
   private percentiles?: number[];
   private numberOfBuckets?: number;
   private intervalSize?: number; // in ms
   private filteringSettings?: TsFilteringSettings;
+  private collectAttributeKeys?: string[];
 
   /**
    * If present, only the that that are specified in the mask are preserved in the final filter. The other are removed.
@@ -37,6 +37,7 @@ export class FindBucketsRequestBuilder {
       this.intervalSize = builder.intervalSize;
       this.filteringSettings = JSON.parse(JSON.stringify(builder.filteringSettings));
       this.customAttributes = JSON.parse(JSON.stringify(builder.customAttributes));
+      this.collectAttributeKeys = builder.collectAttributeKeys;
     }
   }
 
@@ -77,12 +78,17 @@ export class FindBucketsRequestBuilder {
     return this;
   }
 
+  withCollectAttributeKeys(keys: string[]) {
+    this.collectAttributeKeys = keys;
+    return this;
+  }
+
   addAttribute(key: string, value: string): FindBucketsRequestBuilder {
     this.customAttributes[key] = value;
     return this;
   }
 
-  withRange(range: TSTimeRange): FindBucketsRequestBuilder {
+  withRange(range: TimeRange): FindBucketsRequestBuilder {
     this.range = range;
     return this;
   }
@@ -97,11 +103,11 @@ export class FindBucketsRequestBuilder {
     return this;
   }
 
-  getRange(): TSTimeRange | undefined {
+  getRange(): TimeRange | undefined {
     return this.range;
   }
 
-  build(): FindBucketsRequest {
+  build(): FetchBucketsRequest {
     if (!this.filteringSettings) {
       throw new Error('Filtering settings are mandatory');
     }
@@ -113,7 +119,6 @@ export class FindBucketsRequestBuilder {
     }
     const hiddenFilters = filterItems.filter(FilterUtils.filterItemIsValid).filter((item) => item.isHidden);
     const customFilters = filterItems.filter(FilterUtils.filterItemIsValid).filter((item) => !item.isHidden);
-    console.log(hiddenFilters);
     if (Object.keys(this.customAttributes).length > 0) {
       customAttributesOql = FilterUtils.objectToOQL(this.customAttributes, this.attributesPrefix);
     }
@@ -141,6 +146,8 @@ export class FindBucketsRequestBuilder {
       groupDimensions: this.groupDimensions,
       numberOfBuckets: this.numberOfBuckets,
       intervalSize: this.intervalSize,
+      collectAttributeKeys: this.collectAttributeKeys,
+      collectAttributesValuesLimit: 10,
     };
   }
 }

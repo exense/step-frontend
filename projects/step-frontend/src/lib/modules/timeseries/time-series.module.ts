@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { EntityModule, StepCoreModule } from '@exense/step-core';
+import { EntityModule, StepCoreModule, ViewRegistryService } from '@exense/step-core';
 import { TimeSeriesChartComponent } from './chart/time-series-chart.component';
 import { TSRangerComponent } from './ranger/ts-ranger.component';
 import { TableModule } from '@exense/step-core';
@@ -12,7 +12,7 @@ import { ChartSkeletonComponent } from './chart/skeleton/chart-skeleton.componen
 import { MeasurementsPickerComponent } from './performance-view/measurements/measurements-picker.component';
 import { PerformanceViewTimeSelectionComponent } from './performance-view/time-selection/performance-view-time-selection.component';
 import { MeasurementsFilterPipe } from './performance-view/measurements/measurements-filter.pipe';
-import { FilterBarComponent } from './performance-view/filter-bar/filter-bar.component';
+import { FilterBarComponent } from './performance-view/filter-bar/legacy/filter-bar.component';
 import { FilterBarItemComponent } from './performance-view/filter-bar/item/filter-bar-item.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { TimeSeriesDashboardComponent } from './dashboard/time-series-dashboard.component';
@@ -27,13 +27,21 @@ import { DiscoverComponent } from './discover/discover.component';
 import { DiscoverAttributeStatsComponent } from './discover/attribute-stats/attribute-stats.component';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { NoTotalCountPaginator } from './discover/no-total-count-paginator';
-import { TsComparePercentagePipe } from './dashboard/compare/ts-compare-percentage.pipe';
 import { ChartsViewComponent } from './performance-view/charts-view.component';
+import { TsComparePercentagePipe } from './dashboard/compare/ts-compare-percentage.pipe';
 import { FilterBarExecutionItemComponent } from './performance-view/filter-bar/item/execution/filter-bar-execution-item.component';
 import { FilterBarTaskItemComponent } from './performance-view/filter-bar/item/task/filter-bar-task-item.component';
 import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import { FilterBarPlanItemComponent } from './performance-view/filter-bar/item/plan/filter-bar-plan-item.component';
+import { MetricChartComponent } from './metric-chart/metric-chart.component';
 import { ResolutionPickerComponent } from './components/resolution-picker/resolution-picker.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { ChartDashletComponent } from './pages/dashboard/chart-dashlet/chart-dashlet.component';
+import { DashboardFilterBarComponent } from './performance-view/filter-bar/dashboard-filter-bar.component';
+import { DashboardListComponent } from './pages/dashboard-list/dashboard-list.component';
+import { ChartDashletSettingsComponent } from './pages/dashboard/chart-dashlet/settings/chart-dashlet-settings.component';
+import { VisibleFilterBarItemPipe } from './pipes/visible-filter-item.pipe';
+import { NewDashboardDialogComponent } from './pages/new-dashboard-dialog/new-dashboard-dialog.component';
 
 @NgModule({
   declarations: [
@@ -58,9 +66,23 @@ import { ResolutionPickerComponent } from './components/resolution-picker/resolu
     DiscoverAttributeStatsComponent,
     FilterBarExecutionItemComponent,
     FilterBarTaskItemComponent,
+    MetricChartComponent,
     ResolutionPickerComponent,
+    DashboardComponent,
+    ChartDashletComponent,
+    DashboardFilterBarComponent,
+    DashboardListComponent,
+    ChartDashletSettingsComponent,
+    VisibleFilterBarItemPipe,
+    NewDashboardDialogComponent,
   ],
-  exports: [ExecutionPerformanceComponent, AnalyticsPageComponent],
+  exports: [
+    ExecutionPerformanceComponent,
+    DashboardComponent,
+    DashboardListComponent,
+    AnalyticsPageComponent,
+    MetricChartComponent,
+  ],
   providers: [{ provide: MatPaginatorIntl, useClass: NoTotalCountPaginator }],
   imports: [
     StepCoreModule,
@@ -77,4 +99,19 @@ import { ResolutionPickerComponent } from './components/resolution-picker/resolu
     EntityModule,
   ],
 })
-export class TimeSeriesModule {}
+export class TimeSeriesModule {
+  constructor(_viewRegistry: ViewRegistryService) {
+    _viewRegistry.registerRoute({
+      path: 'analytics',
+      component: AnalyticsPageComponent,
+    });
+    _viewRegistry.registerRoute({
+      path: 'dashboards',
+      component: DashboardListComponent,
+    });
+    _viewRegistry.registerRoute({
+      path: 'dashboards/:id',
+      component: DashboardComponent,
+    });
+  }
+}

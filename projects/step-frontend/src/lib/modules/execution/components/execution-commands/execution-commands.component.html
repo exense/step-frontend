@@ -7,7 +7,7 @@
       <button
         type="button"
         mat-icon-button
-        [disabled]="!('plan-execute' | hasRight | async)"
+        [disabled]="!('plan-execute' | hasRight | async) || isExecutionIsolated"
         aria-label="Left Align"
         matTooltip="Simulate execution"
         (click)="execute(true)"
@@ -17,7 +17,7 @@
       <button
         type="button"
         mat-icon-button
-        [disabled]="!('plan-execute' | hasRight | async)"
+        [disabled]="!('plan-execute' | hasRight | async) || isExecutionIsolated"
         aria-label="Left Align"
         matTooltip="New execution"
         (click)="execute(false)"
@@ -27,7 +27,7 @@
       <button
         type="button"
         mat-icon-button
-        [disabled]="!('plan-execute' | hasRight | async)"
+        [disabled]="!('plan-execute' | hasRight | async) || isExecutionIsolated"
         aria-label="Left Align"
         matTooltip="Schedule"
         (click)="schedule()"
@@ -35,7 +35,15 @@
         <step-icon name="clock" aria-hidden="true"></step-icon>
       </button>
     </div>
-    <div class="flex" *ngIf="execution && execution.status !== 'ENDED'">
+    <div
+      class="flex"
+      *ngIf="
+        execution &&
+        execution.status !== 'ENDED' &&
+        execution.status !== 'ABORTING' &&
+        execution.status !== 'FORCING_ABORT'
+      "
+    >
       <button
         type="button"
         mat-icon-button
@@ -47,13 +55,26 @@
         <step-icon name="stop-circle" aria-hidden="true"></step-icon>
       </button>
     </div>
+    <div class="flex" *ngIf="execution && execution.status === 'ABORTING'">
+      <button
+        type="button"
+        mat-icon-button
+        class="warning"
+        aria-label="Left Align"
+        matTooltip="Force stop"
+        [disabled]="!('plan-execute' | hasRight | async)"
+        (click)="forceStop()"
+      >
+        <step-icon name="stop-circle" aria-hidden="true"></step-icon>
+      </button>
+    </div>
   </div>
   <div class="flex">
     <button
       type="button"
       mat-icon-button
       aria-label="Left Align"
-      [disabled]="!('plan-execute' | hasRight | async)"
+      [disabled]="!('plan-execute' | hasRight | async) || isExecutionIsolated"
       matTooltip="Copy start request as curl command to clipboard"
       (click)="copyExecutionServiceAsCurlToClipboard()"
     >

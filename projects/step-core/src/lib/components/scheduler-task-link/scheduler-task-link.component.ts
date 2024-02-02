@@ -17,19 +17,11 @@ export class SchedulerTaskLinkComponent implements CustomComponent {
   readonly LinkDisplayType = LinkDisplayType;
 
   @Input() linkDisplayType: LinkDisplayType = LinkDisplayType.TEXT_ONLY;
-  @Input() allowNavToPlan = true;
 
   editParameter(): void {
     if (!this._logic || !this.context) {
       return;
     }
     this._logic.editTask(this.context).subscribe();
-  }
-
-  navToPlan(): void {
-    if (!this._logic || !this.context) {
-      return;
-    }
-    this._logic.navToPlan(this.context!.executionsParameters!.repositoryObject!.repositoryParameters!['planid']!);
   }
 }

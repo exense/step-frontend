@@ -1,22 +1,14 @@
 import { AfterViewInit, Component, inject, Injector } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  AJS_LOCATION,
-  AJS_MODULE,
-  AJS_ROOT_SCOPE,
   AugmentedKeywordsService,
   AutoDeselectStrategy,
   Keyword,
-  InteractivePlanExecutionService,
   selectionCollectionProvider,
   tablePersistenceConfigProvider,
   STORE_ALL,
   FunctionActionsService,
-  Plan,
-  FunctionType,
-  RestoreDialogsService,
+  KeywordExecutorService,
 } from '@exense/step-core';
-import { FunctionPackageActionsService } from '../../services/function-package-actions.service';
 
 @Component({
   selector: 'step-function-list',
@@ -24,18 +16,14 @@ import { FunctionPackageActionsService } from '../../services/function-package-a
   styleUrls: ['./function-list.component.scss'],
   providers: [
     tablePersistenceConfigProvider('functionList', STORE_ALL),
-    selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
 })
 export class FunctionListComponent implements AfterViewInit {
   private _injector = inject(Injector);
   private _functionApiService = inject(AugmentedKeywordsService);
-  private _interactivePlanExecutionApiService = inject(InteractivePlanExecutionService);
   private _functionActions = inject(FunctionActionsService);
-  private _functionPackageDialogs = inject(FunctionPackageActionsService);
-  private _restoreDialogsService = inject(RestoreDialogsService);
-  private _$rootScope = inject(AJS_ROOT_SCOPE);
-  private _location = inject(AJS_LOCATION);
+  private _keywordExecutor = inject(KeywordExecutorService);
 
   readonly dataSource = this._functionApiService.createFilteredTableDataSource();
 
@@ -47,26 +35,12 @@ export class FunctionListComponent implements AfterViewInit {
     this._functionActions.openAddFunctionModal(this._injector).subscribe(() => this.dataSource.reload());
   }
 
-  addFunctionPackage(): void {
-    this._functionPackageDialogs.openAddFunctionPackageDialog().subscribe((result) => {
-      if (result) {
-        this.dataSource.reload();
-      }
-    });
-  }
-
   editFunction(keyword: Keyword): void {
     this._functionActions.openFunctionEditor(keyword).subscribe();
   }
 
   executeFunction(id: string): void {
-    this._interactivePlanExecutionApiService.startFunctionTestingSession(id).subscribe((result: any) => {
-      (this._$rootScope as any).planEditorInitialState = {
-        interactive: true,
-        selectedNode: result.callFunctionId,
-      };
-      this._location.path('/root/plans/editor/' + result.planId);
-    });
+    this._keywordExecutor.executeKeyword(id);
   }
 
   duplicateFunction(id: string): void {
@@ -104,28 +78,4 @@ export class FunctionListComponent implements AfterViewInit {
       }
     });
   }
-
-  displayHistory(keyword: Keyword, permission: string): void {
-    if (!keyword.id) {
-      return;
-    }
-
-    const id = keyword.id!;
-    const keywordVersion = keyword.customFields ? keyword.customFields['versionId'] : undefined;
-    const versionHistory = this._functionApiService.getFunctionVersions(id);
-
-    this._restoreDialogsService
-      .showRestoreDialog(keywordVersion, versionHistory, permission)
-      .subscribe((restoreVersion) => {
-        if (!restoreVersion) {
-          return;
-        }
-
-        this._functionApiService.restoreFunctionVersion(id, restoreVersion).subscribe(() => this.dataSource.reload());
-      });
-  }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepFunctionList', downgradeComponent({ component: FunctionListComponent }));

@@ -1,8 +1,10 @@
 <ng-template #link>
-  <a href="#" (click)="editFunction(); (false)">
+  <a href="#" (click)="handleLinkClick(); (false)">
     {{ (context?.attributes)!['name'] }}
   </a>
 </ng-template>
 <ng-container *ngIf="noLink$ | async; else link">
   {{ (context?.attributes)!['name'] }}
 </ng-container>
+<step-description-hint *ngIf="!(noDescriptionHint$ | async)" [description]="context?.description">
+</step-description-hint>

@@ -1,9 +1,10 @@
-import { TSTimeRange } from '../../chart/model/ts-time-range';
+import { TimeRange } from '@exense/step-core';
 
 export interface PerformanceViewSettings {
   contextId: string; // this must be unique across the application
   contextualFilters: { [key: string]: string };
-  timeRange: TSTimeRange;
+  timeRange: TimeRange;
   includeThreadGroupChart?: boolean;
   disableThreadGroupOnOqlMode?: boolean;
+  displayTooltipLinks?: boolean;
 }

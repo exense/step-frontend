@@ -1,12 +1,9 @@
 import { Component, inject } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  AJS_MODULE,
   AugmentedPlansService,
   AutoDeselectStrategy,
   Plan,
   PlanDialogsService,
-  RestoreDialogsService,
   selectionCollectionProvider,
   STORE_ALL,
   tablePersistenceConfigProvider,
@@ -19,12 +16,11 @@ import { pipe, tap } from 'rxjs';
   styleUrls: ['./plan-list.component.scss'],
   providers: [
     tablePersistenceConfigProvider('planList', STORE_ALL),
-    selectionCollectionProvider<string, Plan>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...selectionCollectionProvider<string, Plan>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
 })
 export class PlanListComponent {
   private _planDialogs = inject(PlanDialogsService);
-  private _restoreDialogsService = inject(RestoreDialogsService);
   readonly _plansApiService = inject(AugmentedPlansService);
 
   readonly dataSource = this._plansApiService.getPlansTableDataSource();
@@ -53,12 +49,19 @@ export class PlanListComponent {
     this._planDialogs.duplicatePlan(id).pipe(this.updateDataSourceAfterChange).subscribe();
   }
 
-  deletePlan(id: string, name: string): void {
-    this._planDialogs.deletePlan(id, name).pipe(this.updateDataSourceAfterChange).subscribe();
+  deletePlan(plan: Plan): void {
+    this._planDialogs.deletePlan(plan).pipe(this.updateDataSourceAfterChange).subscribe();
   }
 
   importPlans(): void {
-    this._planDialogs.importPlans().pipe(this.updateDataSourceAfterChange).subscribe();
+    this._planDialogs
+      .importPlans()
+      .pipe(this.updateDataSourceAfterChange)
+      .subscribe((result) => {
+        if (result) {
+          this.dataSource.reload();
+        }
+      });
   }
 
   exportPlans(): void {
@@ -72,28 +75,4 @@ export class PlanListComponent {
   lookUp(id: string, name: string): void {
     this._planDialogs.lookUp(id, name);
   }
-
-  displayHistory(plan: Plan, permission: string): void {
-    if (!plan.id) {
-      return;
-    }
-
-    const id = plan.id!;
-    const planVersion = plan.customFields ? plan.customFields['versionId'] : undefined;
-    const versionHistory = this._plansApiService.getPlanVersions(id);
-
-    this._restoreDialogsService
-      .showRestoreDialog(planVersion, versionHistory, permission)
-      .subscribe((restoreVersion) => {
-        if (!restoreVersion) {
-          return;
-        }
-
-        this._plansApiService.restorePlanVersion(id, restoreVersion).subscribe(() => this.dataSource.reload());
-      });
-  }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepPlanList', downgradeComponent({ component: PlanListComponent }));

@@ -18,11 +18,11 @@ import { DateTime } from 'luxon';
   selector: 'step-execution-selection-table',
   templateUrl: './execution-selection-table.component.html',
   styleUrls: ['./execution-selection-table.component.scss'],
-  providers: [selectionCollectionProvider<string, Execution>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
+  providers: [...selectionCollectionProvider<string, Execution>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
 })
 export class ExecutionSelectionTableComponent extends BaseEntitySelectionTableComponent {
   private _filterConditionFactory = inject(FilterConditionFactoryService);
-  protected _selectionCollector = inject(SelectionCollector<string, Execution>);
+  protected _selectionCollector = inject<SelectionCollector<string, Execution>>(SelectionCollector);
 
   @ViewChild('tableRef', { read: TableComponent })
   protected _tableRef?: TableComponent<FunctionPackage>;

@@ -9,6 +9,7 @@ $light-white-gray: #ddd;
 $light-blue-gray: #f2f4f7;
 $dark-blue: #0082cb;
 $orange: #ff8f4b;
+$highlight: #293e500d;
 
 //#region Gray
 $gray-50: #f9fafb;
@@ -29,6 +30,7 @@ $blue-15: #bce8f1;
 $blue-600: #0082cb;
 $blue-625: #006299;
 $blue-650: #31708f;
+$blue-675: #337ab7;
 $blue-700: #293e50;
 //#endregion
 
@@ -41,6 +43,7 @@ $red-650: #a94442;
 //#endregion
 
 //#region yellow
+$yellow-5: #fffdb0;
 $yellow-10: #fcf8e3;
 $yellow-15: #faebcc;
 $yellow-20: #ead5bd;
@@ -73,6 +76,7 @@ $statuses: (
   'EXPORTING': orange,
   'RUNNING': #337ab7,
   'ABORTING': #d9534f,
+  'FORCING_ABORT': #d9534f,
   'SKIPPED': #a0a0a0,
   'NORUN': #a0a0a0,
   'PASSED': #5cb85c,
@@ -90,3 +94,5 @@ $tokenstates: (
   'MAINTENANCE_REQUESTED': #749dc0,
   'MAINTENANCE': #fbd544,
 );
+
+$code-font: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'Source Code Pro', 'source-code-pro', monospace;

@@ -21,6 +21,12 @@
     },
     "@schematics/angular:application": {
       "strict": true
+    },
+    "@angular-eslint/schematics:application": {
+      "setParserOptionsProject": true
+    },
+    "@angular-eslint/schematics:library": {
+      "setParserOptionsProject": true
     }
   },
   "projects": {
@@ -40,17 +46,13 @@
             "tsConfig": "projects/step-app/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "projects/step-app/src/favicon.ico",
               "projects/step-app/src/assets",
+              "projects/step-app/src/favicon.png",
+              "projects/step-app/src/step-variables.css",
               {
                 "glob": "**/*",
-                "input": "projects/step-app/src/plugins",
-                "output": "/"
-              },
-              {
-                "glob": "**/*",
-                "input": "dist/step-frontend/src/lib/angularjs",
-                "output": "/"
+                "input": "dist/step-frontend/images",
+                "output": "/images"
               },
               {
                 "glob": "worker-javascript.js",
@@ -106,15 +108,15 @@
           "builder": "ngx-build-plus:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "@exense/step-app:build:production",
+              "buildTarget": "@exense/step-app:build:production",
               "extraWebpackConfig": "projects/step-app/webpack.prod.config.js"
             },
             "development": {
-              "browserTarget": "@exense/step-app:build:development",
+              "buildTarget": "@exense/step-app:build:development",
               "proxyConfig": "projects/step-app/proxy.conf.json"
             },
             "local": {
-              "browserTarget": "@exense/step-app:build:development",
+              "buildTarget": "@exense/step-app:build:development",
               "proxyConfig": "projects/step-app/proxy-local.conf.json"
             }
           },
@@ -128,21 +130,8 @@
         "extract-i18n": {
           "builder": "ngx-build-plus:extract-i18n",
           "options": {
-            "browserTarget": "@exense/step-app:build",
+            "buildTarget": "@exense/step-app:build",
             "extraWebpackConfig": "projects/step-app/webpack.config.js"
-          }
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "src/test.ts",
-            "polyfills": "src/polyfills.ts",
-            "tsConfig": "tsconfig.spec.json",
-            "karmaConfig": "karma.conf.js",
-            "inlineStyleLanguage": "scss",
-            "assets": ["src/favicon.ico", "src/assets"],
-            "styles": ["src/styles.scss"],
-            "scripts": []
           }
         },
         "lint": {
@@ -174,14 +163,6 @@
           },
           "defaultConfiguration": "production"
         },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "projects/step-core/src/test.ts",
-            "tsConfig": "projects/step-core/tsconfig.spec.json",
-            "karmaConfig": "projects/step-core/karma.conf.js"
-          }
-        },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
@@ -210,14 +191,6 @@
             }
           },
           "defaultConfiguration": "production"
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "projects/step-frontend/src/test.ts",
-            "tsConfig": "projects/step-frontend/tsconfig.spec.json",
-            "karmaConfig": "projects/step-frontend/karma.conf.js"
-          }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",

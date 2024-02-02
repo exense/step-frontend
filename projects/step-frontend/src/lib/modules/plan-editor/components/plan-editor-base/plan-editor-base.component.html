@@ -1,9 +1,9 @@
 <div>
+  <step-plan-alerts [compositeId]="compositeId" [plan]="_planEditService.plan$ | async"> </step-plan-alerts>
   <step-alert type="info" *ngIf="showInteractiveWarning$ | async">
     Welcome to the interactive mode. In this mode you can select tree nodes and run them directly by clicking the
     &nbsp;'Run interactively' button
   </step-alert>
-
   <div class="actions-header">
     <div class="editable-labels">
       <ng-container *ngIf="planTypes$ | async as planTypes">
@@ -37,6 +37,9 @@
     </div>
     <ng-container *ngIf="_planEditService.plan$ | async as plan">
       <step-plan-editor-actions
+        [currentPlanId]="initialPlan?.id"
+        [plan]="plan"
+        [compositeId]="compositeId"
         [showExecuteButton]="showExecuteButton"
         [hasUndo]="_planEditService.hasUndo$ | async"
         [hasRedo]="_planEditService.hasRedo$ | async"
@@ -46,18 +49,18 @@
         (discardAll)="_planEditService.discardAll()"
         (undo)="_planEditService.undo()"
         (redo)="_planEditService.redo()"
-        (displayHistory)="displayHistory('plan-write', plan)"
         (clone)="clonePlan()"
         (export)="exportPlan()"
         (startInteractive)="startInteractive()"
         (reset)="resetInteractive()"
         (stop)="stopInteractive()"
+        (showSource)="showPlanSource()"
       ></step-plan-editor-actions>
     </ng-container>
   </div>
 
   <step-split stepMaxHeightViewportHeightMinusOffsetTop>
-    <step-split-area sizeType="flex" size="1">
+    <step-split-area sizeType="flex" [size]="planSize" (sizeChange)="handlePlanSizeChange($event)">
       <ng-container *ngIf="planClass">
         <step-plan-type [itemKey]="planClass"> </step-plan-type>
       </ng-container>
@@ -65,7 +68,10 @@
 
     <step-split-gutter></step-split-gutter>
 
-    <step-split-area (sizeUpdate)="rightTabs.updatePagination()">
+    <step-split-area
+      [size]="planControlsSize"
+      (sizeChange)="handlePlanControlsChange($event); rightTabs.updatePagination()"
+    >
       <step-tabs #rightTabs="StepTabs" [tabs]="componentTabs" [(activeTabId)]="selectedTab" [shrink]="true">
       </step-tabs>
       <div class="tab-content" [ngSwitch]="selectedTab">

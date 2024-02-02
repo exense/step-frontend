@@ -1,7 +1,7 @@
 <step-modal-window title="Load Distribution Wizard">
   <div step-modal-window-body>
     <ng-container [formGroup]="wizardForm">
-      <step-form-field>
+      <step-form-field [showRequiredMarker]="true">
         <step-label
           >Target throughput
           <step-icon
@@ -20,7 +20,7 @@
           </mat-select>
         </step-suffix>
       </step-form-field>
-      <step-form-field>
+      <step-form-field [showRequiredMarker]="true">
         <step-label
           >Estimated iteration durations max
           <step-icon
@@ -49,13 +49,7 @@
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
-    <button
-      type="button"
-      mat-flat-button
-      color="primary"
-      [disabled]="wizardForm.invalid || !(isCalculationValid$ | async)"
-      (click)="applyCalculatedParams()"
-    >
+    <button type="button" mat-flat-button color="primary" (click)="applyCalculatedParams()">
       Apply calculated params
     </button>
   </div>

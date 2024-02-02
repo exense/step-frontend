@@ -1,13 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ExecutionStepPanel } from '../shared/execution-step-panel';
-import {
-  AJS_MODULE,
-  ExecutionCustomPanelRegistryService,
-  ItemInfo,
-  Mutable,
-  ViewRegistryService,
-} from '@exense/step-core';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
+import { ExecutionCustomPanelRegistryService, ItemInfo, Mutable, ViewRegistryService } from '@exense/step-core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 type FieldsAccessor = Mutable<Pick<ExecutionsPanelsService, 'panels' | 'customPanels'>>;
@@ -51,58 +44,60 @@ export class ExecutionsPanelsService {
     });
   }
 
-  getPanel(viewId: string, eid: string): ExecutionStepPanel | undefined {
-    if (this._panels[eid]) {
-      return this._panels[eid][viewId];
+  getPanel(viewId: string, executionId: string): ExecutionStepPanel | undefined {
+    if (this._panels[executionId]) {
+      return this._panels[executionId][viewId];
     }
     return this._defaultPanels[viewId];
   }
 
-  observePanel(viewId: string, eid: string): Observable<ExecutionStepPanel | undefined> {
-    if (!this._panels$?.[eid]?.[viewId]) {
-      this._panels$[eid] = this._panels$[eid] || {};
-      this._panels$[eid][viewId] = new BehaviorSubject<ExecutionStepPanel | undefined>(this.getPanel(viewId, eid));
-      return this._panels$[eid][viewId];
+  observePanel(viewId: string, executionId: string): Observable<ExecutionStepPanel | undefined> {
+    if (!this._panels$?.[executionId]?.[viewId]) {
+      this._panels$[executionId] = this._panels$[executionId] || {};
+      this._panels$[executionId][viewId] = new BehaviorSubject<ExecutionStepPanel | undefined>(
+        this.getPanel(viewId, executionId)
+      );
+      return this._panels$[executionId][viewId];
     }
-    return this._panels$[eid][viewId];
+    return this._panels$[executionId][viewId];
   }
 
-  isShowPanel(viewId: string, eid: string): boolean {
-    return !!this.getPanel(viewId, eid)?.show;
+  isShowPanel(viewId: string, executionId: string): boolean {
+    return !!this.getPanel(viewId, executionId)?.show;
   }
 
-  setShowPanel(viewId: string, show: boolean, eid: string): void {
-    if (!this._panels[eid]) {
-      this._panels[eid] = this._copyDefaultPanels();
+  setShowPanel(viewId: string, show: boolean, executionId: string): void {
+    if (!this._panels[executionId]) {
+      this._panels[executionId] = this._copyDefaultPanels();
     }
-    (this._panels[eid][viewId] as EditablePanel).show = show;
-    this.updateObservable(viewId, eid);
+    (this._panels[executionId][viewId] as EditablePanel).show = show;
+    this.updateObservable(viewId, executionId);
   }
 
-  isPanelEnabled(viewId: string, eid: string): boolean {
-    return !!this.getPanel(viewId, eid)?.enabled;
+  isPanelEnabled(viewId: string, executionId: string): boolean {
+    return !!this.getPanel(viewId, executionId)?.enabled;
   }
 
-  toggleShowPanel(viewId: string, eid: string) {
-    this.setShowPanel(viewId, !this.isShowPanel(viewId, eid), eid);
+  toggleShowPanel(viewId: string, executionId: string) {
+    this.setShowPanel(viewId, !this.isShowPanel(viewId, executionId), executionId);
   }
 
-  enablePanel(viewId: string, enabled: boolean, eid: string): void {
-    if (!this._panels[eid]) {
-      this._panels[eid] = this._copyDefaultPanels();
+  enablePanel(viewId: string, enabled: boolean, executionId: string): void {
+    if (!this._panels[executionId]) {
+      this._panels[executionId] = this._copyDefaultPanels();
     }
-    (this._panels[eid][viewId] as EditablePanel).enabled = enabled;
+    (this._panels[executionId][viewId] as EditablePanel).enabled = enabled;
 
-    this.updateObservable(viewId, eid);
+    this.updateObservable(viewId, executionId);
   }
 
-  getPanelTitle(viewId: string, eid: string): string {
-    return this.getPanel(viewId, eid)?.label || '';
+  getPanelTitle(viewId: string, executionId: string): string {
+    return this.getPanel(viewId, executionId)?.label || '';
   }
 
-  updateObservable(viewId: string, eid: string) {
-    if (this._panels$[eid] && this._panels$[eid][viewId]) {
-      this._panels$[eid][viewId].next(this._panels[eid][viewId]);
+  updateObservable(viewId: string, executionId: string) {
+    if (this._panels$[executionId] && this._panels$[executionId][viewId]) {
+      this._panels$[executionId][viewId].next(this._panels[executionId][viewId]);
     }
   }
 
@@ -113,7 +108,3 @@ export class ExecutionsPanelsService {
     }, {} as Record<string, ExecutionStepPanel>);
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .service('executionsPanelsService', downgradeInjectable(ExecutionsPanelsService));

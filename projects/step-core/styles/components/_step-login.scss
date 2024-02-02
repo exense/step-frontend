@@ -1,18 +1,12 @@
 @use 'sass:map';
 
-@function step-define-login-config(
-  $palette: null,
-  $login-secondary-text-color: gray,
-  $login-button-text-color: white,
-  $login-bg-path: 'images/login-mountain-piz-palue.jpg'
-) {
+@function step-define-login-config($palette: null, $login-secondary-text-color: gray, $login-button-text-color: white) {
   $config: (
     login-button-bg-color: map.get($palette, 500),
     login-secondary-text-color: $login-secondary-text-color,
     login-button-text-color: $login-button-text-color,
     login-input-field-border-color: map.get($palette, 500),
     login-link-text-color: map.get($palette, 600),
-    login-bg-path: $login-bg-path,
   );
 
   @return $config;
@@ -25,6 +19,7 @@
 
   step-login {
     width: 100%;
+    min-height: 100%;
     display: flex;
 
     .step-login-flex-child {
@@ -126,15 +121,7 @@
     }
 
     .step-mountain-background {
-      $bg-path: map.get($config, login-bg-path);
-      /**
-      '^' sign is used to prevent file check during the build and pass url without '/'.
-      But this '^' feature probably will be removed in next versions of angular-cli.
-      Check the following links for details:
-      https://github.com/angular/angular-cli/issues/12797#issuecomment-598534241
-      https://github.com/angular/angular-cli/issues/18013#issuecomment-649373940
-      **/
-      background: url('^#{$bg-path}') no-repeat no-repeat right;
+      background: var(--step-login-bg-path) no-repeat no-repeat right;
       background-size: cover;
     }
 

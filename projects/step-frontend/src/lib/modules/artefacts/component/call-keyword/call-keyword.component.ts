@@ -6,6 +6,7 @@ import {
   DynamicValueBoolean,
   DynamicValueString,
   DynamicFieldsSchema,
+  ArtefactFormChangeHelperService,
 } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
 
@@ -21,6 +22,7 @@ interface KeywordArtefact extends AbstractArtefact {
   selector: 'step-call-keyword',
   templateUrl: './call-keyword.component.html',
   styleUrls: ['./call-keyword.component.scss'],
+  providers: [ArtefactFormChangeHelperService],
 })
 export class CallKeywordComponent extends BaseArtefactComponent<KeywordArtefact> {
   @ViewChild('form')

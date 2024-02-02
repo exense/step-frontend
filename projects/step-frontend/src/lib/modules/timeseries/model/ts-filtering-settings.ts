@@ -1,8 +1,8 @@
 import { TsFilteringMode } from './ts-filtering-mode';
-import { TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
+import { FilterBarItem } from '../performance-view/filter-bar/model/filter-bar-item';
 
 export interface TsFilteringSettings {
   mode: TsFilteringMode;
   oql: string; // for oql mode
-  filterItems: TsFilterItem[]; // custom filters
+  filterItems: FilterBarItem[]; // custom filters
 }

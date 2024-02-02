@@ -11,14 +11,17 @@
 @use 'step-menu';
 @use 'step-datepicker';
 @use 'step-alert';
+@use 'step-tooltip';
+@use 'material-overrides' as mat-ov;
 @use '../core-variables' as var;
 
 @forward 'step-sidebar' show step-define-sidebar-config;
+@forward 'step-login' show step-define-login-config;
 @forward 'step-header' show step-define-header-config;
 @forward 'step-alert' show step-define-alert-color, step-alert-colors;
 
-$dark-primary-text: #293e50;
-$light-primary-text: white;
+$dark-primary-text: var.$blue-700;
+$light-primary-text: var.$white;
 
 @function extend-mat-theme($theme, $overrides) {
   $color: map.get($theme, color);
@@ -34,10 +37,17 @@ $light-primary-text: white;
     )
   );
 
-  $result: map.merge(
+  $result-color: map.merge(
     $color,
     (
       foreground: $foreground-ext,
+    )
+  );
+
+  $result: map.merge(
+    $theme,
+    (
+      color: $result-color,
     )
   );
 
@@ -89,6 +99,7 @@ $light-primary-text: white;
   $mat-primary-palette: null,
   $mat-typography-config: null,
   $mat-accent-palette: null,
+  $mat-warn-palette: null,
   $step-sidebar-config: null,
   $step-header-config: null,
   $step-login-config: null
@@ -105,12 +116,19 @@ $light-primary-text: white;
     $mat-accent-palette: mat.define-palette(mat.$pink-palette);
   }
 
+  @if not $mat-warn-palette {
+    $mat-warn-palette: mat.define-palette(mat.$red-palette);
+  }
+
   $mat-theme: mat.define-light-theme(
     (
       color: (
         primary: $mat-primary-palette,
         accent: $mat-accent-palette,
+        warn: $mat-warn-palette,
       ),
+      typograhpy: $mat-typography-config,
+      density: 0,
     )
   );
 
@@ -125,8 +143,10 @@ $light-primary-text: white;
   );
 
   font-family: map-get($mat-typography-config, font-family);
-  @include mat.core($mat-typography-config);
+  @include mat.core();
   @include mat.all-component-themes($mat-theme-ext);
+  @include mat.dialog-typography($mat-typography-config);
+  @include mat.card-typography($mat-typography-config);
 
   $primary-color: map-get($mat-primary-palette, default);
 
@@ -147,20 +167,11 @@ $light-primary-text: white;
   @include step-menu.menu();
   @include step-datepicker.datepicker();
   @include step-alert.step-alert();
+  @include step-tooltip.tooltip($text-color);
 
   .cdk-overlay-pane {
     z-index: 1050;
     padding-top: 8px;
-  }
-
-  .tooltip-inner {
-    background: rgba(97, 97, 97, 0.9);
-    margin: 14px;
-    max-width: 250px;
-    padding-left: 8px;
-    padding-right: 8px;
-    overflow: hidden;
-    text-align: unset;
   }
 
   &.modal-open .cdk-overlay-container {
@@ -170,15 +181,20 @@ $light-primary-text: white;
   color: $text-color;
   line-height: 16px;
 
-  .mat-mini-fab {
+  .mat-mdc-mini-fab {
     box-shadow: none !important;
-    width: 36px;
-    height: 36px;
+    width: 3.6rem;
+    height: 3.6rem;
   }
 
-  .mat-button-wrapper {
+  .mat-mdc-icon-button.mat-mdc-button-base {
+    width: 4rem;
+    height: 4rem;
     padding: 0;
-    display: flex;
+  }
+
+  .mat-mdc-button-base {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
 
@@ -195,16 +211,14 @@ $light-primary-text: white;
   step-dynamic-checkbox,
   step-expression-input,
   step-resource-input {
-    .mat-button-wrapper {
+    .mat-mdc-button-base {
       @include step-icon.step-icon(16px);
     }
   }
 
   .btn-xs {
     @include step-icon.step-icon(12px);
-    step-icon,
-    step-ajs-icon,
-    .step-ajs-icon {
+    step-icon {
       vertical-align: text-top;
     }
   }
@@ -212,57 +226,21 @@ $light-primary-text: white;
   .btn-auto-size,
   a:not(.jstree-anchor) {
     @include step-icon.step-icon(16px);
-    step-icon,
-    step-ajs-icon,
-    .step-ajs-icon {
+    step-icon {
       vertical-align: top;
     }
   }
 
-  label + step-ajs-icon,
   step-label > step-icon {
     @include step-icon.step-icon-size(18px);
     vertical-align: text-top;
-  }
-
-  .jstree-icon.step-ajs-icon {
-    @include step-icon.step-icon-size(18px);
-    margin-top: -2px;
   }
 
   tbody .form-group {
     margin-bottom: 15px;
   }
 
-  .mat-accordion .mat-expansion-panel:first-of-type {
-    border-top-right-radius: 0;
-    border-top-left-radius: 0;
-  }
-
-  .mat-accordion .mat-expansion-panel:last-of-type {
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
-  }
-
-  .mat-accordion > .mat-expansion-panel:first-child,
-  .mat-accordion > *:first-child .mat-expansion-panel {
-    border-top-right-radius: 8px;
-    border-top-left-radius: 8px;
-  }
-
-  .mat-accordion > .mat-expansion-panel:last-child,
-  .mat-accordion > *:last-child .mat-expansion-panel {
-    border-bottom-right-radius: 8px;
-    border-bottom-left-radius: 8px;
-  }
-
-  .mat-card {
-    border-radius: 8px;
-  }
-
-  .mat-tooltip {
-    white-space: pre-line;
-  }
+  @include mat-ov.material-overrides($primary-color);
 
   label {
     margin: 0;
@@ -273,63 +251,5 @@ $light-primary-text: white;
     // a scrollbar sometimes appears due to an unknown reason, adding 1px padding-bottom seems to fix it
     // TODO: investigate why is it happening
     padding-bottom: 1px;
-  }
-
-  step-modal-window .mat-expansion-panel {
-    border: 1px solid var.$gray-300;
-    border-radius: 0.8rem;
-
-    .mat-expansion-panel-header {
-      padding: 0 1.6rem;
-      height: 4rem;
-
-      .mat-expansion-panel-header-title {
-        font-weight: 500;
-      }
-
-      &.mat-expanded {
-        border-bottom: 1px solid var.$gray-300;
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-      }
-    }
-
-    .mat-expansion-panel-content {
-      font-size: 1.4rem;
-
-      .mat-expansion-panel-body {
-        display: flex;
-        flex-direction: column;
-        gap: 0.8rem;
-        padding: 1.2rem 1.6rem;
-      }
-    }
-
-    &:not([class*='mat-elevation-z']) {
-      box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14),
-        0px 0px 0px 0px rgba(0, 0, 0, 0.12);
-    }
-  }
-
-  /**
-  This will create a nice scrollbar inside the form field when the chips content are very long.
-  Otherwise they will overflow the container.
-   */
-  .mat-chip-list-wrapper {
-    overflow-x: auto;
-  }
-
-  .mat-menu-panel.wide {
-    max-width: 380px;
-    width: 380px;
-  }
-
-  .mat-checkbox-label {
-    font-weight: 500;
-  }
-
-  .mat-checkbox-background,
-  .mat-checkbox-frame {
-    border-radius: 0.4rem;
   }
 }

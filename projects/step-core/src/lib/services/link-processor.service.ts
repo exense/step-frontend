@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '../shared';
 
 export type LinkProcessorFn = (context: any) => Promise<unknown>;
 
@@ -23,5 +21,3 @@ export class LinkProcessorService {
     this._processors = [];
   }
 }
-
-getAngularJSGlobal().module(AJS_MODULE).service('LinkProcessor', downgradeInjectable(LinkProcessorService));

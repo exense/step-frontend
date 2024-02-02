@@ -1,8 +1,8 @@
-import { Component, Input } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '@exense/step-core';
-import { PlanEditorApiService } from '../../../plan-editor/injectables/plan-editor-api.service';
+import { Component, inject } from '@angular/core';
 import { PurePlanEditApiService } from '../../injectables/pure-plan-edit-api.service';
+import { ActivatedRoute } from '@angular/router';
+import { map } from 'rxjs';
+import { Plan, PlanEditorApiService } from '@exense/step-core';
 
 @Component({
   selector: 'step-plan-editor',
@@ -16,9 +16,5 @@ import { PurePlanEditApiService } from '../../injectables/pure-plan-edit-api.ser
   ],
 })
 export class PlanEditorComponent {
-  @Input() id?: string;
+  readonly _plan$ = inject(ActivatedRoute).data.pipe(map((data) => data['plan'] as Plan | undefined));
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepPlanEditor', downgradeComponent({ component: PlanEditorComponent }));

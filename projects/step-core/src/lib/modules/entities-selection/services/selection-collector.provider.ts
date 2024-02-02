@@ -1,4 +1,4 @@
-import { FactoryProvider } from '@angular/core';
+import { inject, Provider } from '@angular/core';
 import { SelectionCollector } from './selection-collector/selection-collector';
 import { AutoDeselectStrategy } from '../shared/auto-deselect-strategy.enum';
 import { SelectionCollectorFactoryService } from './selection-collector/selection-collector-factory.service';
@@ -13,15 +13,18 @@ export interface SelectionCollectorProviderConfig {
 export const selectionCollectionProvider = <KEY, ENTITY>(
   selectionKeyPropertyOrConfig: string | SelectionCollectorProviderConfig,
   autoDeselectStrategy?: AutoDeselectStrategy
-): FactoryProvider => ({
-  provide: SelectionCollector,
-  useFactory: (f: SelectionCollectorFactoryService) => {
-    if (typeof selectionKeyPropertyOrConfig === 'string') {
-      const selectionKeyProperty = selectionKeyPropertyOrConfig;
-      return f.create<KEY, ENTITY>(selectionKeyProperty, autoDeselectStrategy);
-    }
-    const conf = selectionKeyPropertyOrConfig;
-    return f.create<KEY, ENTITY>(conf.selectionKeyProperty, conf.autoDeselectStrategy, conf.registrationStrategy);
+): Provider[] => [
+  SelectionCollectorFactoryService,
+  {
+    provide: SelectionCollector,
+    useFactory: () => {
+      const f = inject(SelectionCollectorFactoryService);
+      if (typeof selectionKeyPropertyOrConfig === 'string') {
+        const selectionKeyProperty = selectionKeyPropertyOrConfig;
+        return f.create<KEY, ENTITY>(selectionKeyProperty, autoDeselectStrategy);
+      }
+      const conf = selectionKeyPropertyOrConfig;
+      return f.create<KEY, ENTITY>(conf.selectionKeyProperty, conf.autoDeselectStrategy, conf.registrationStrategy);
+    },
   },
-  deps: [SelectionCollectorFactoryService],
-});
+];

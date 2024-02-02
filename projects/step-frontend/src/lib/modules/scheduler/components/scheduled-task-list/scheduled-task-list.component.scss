@@ -29,16 +29,6 @@
   color: var.$white;
 }
 
-.cell-actions {
-  width: 20rem;
-
-  button {
-    padding: 0;
-    min-width: 4rem;
-    min-height: 4rem;
-  }
-}
-
 .header {
   @include core.table-header;
 
@@ -52,6 +42,4 @@
   @include core.table-container;
 }
 
-.bulk-selection-cell {
-  width: 6rem;
-}
+@include core.table-common-cells;

@@ -71,11 +71,18 @@
 
 <step-upload-container (filesChange)="onFilesChange($event)">
   <ng-container *ngIf="!isResource; else resourceTemplate">
-    <step-form-field [class.ng-invalid]="isInvalid" [class.ng-touched]="isTouched">
-      <step-label *ngIf="label" [attr.show-required-marker]="showRequiredMarker || null">
+    <step-form-field
+      [class.ng-invalid]="isInvalid"
+      [class.ng-touched]="isTouched"
+      alignLabelAddon="near"
+      [showRequiredMarker]="showRequiredMarker"
+    >
+      <step-label *ngIf="label">
         <span>{{ label }}</span>
-        <step-icon *ngIf="withHelpIcon" name="help-circle" [matTooltip]="helpIconTooltip || ''"></step-icon>
       </step-label>
+      <step-label-addon *ngIf="withHelpIcon">
+        <step-icon name="help-circle" [matTooltip]="helpIconTooltip || ''"></step-icon>
+      </step-label-addon>
 
       <input
         type="text"
@@ -100,11 +107,18 @@
 
   <ng-template #resourceTemplate>
     <ng-container *ngIf="!resourceNotExisting">
-      <step-form-field [class.ng-invalid]="isInvalid" [class.ng-touched]="isTouched">
-        <step-label *ngIf="label" [attr.show-required-marker]="showRequiredMarker || null">
+      <step-form-field
+        [class.ng-invalid]="isInvalid"
+        [class.ng-touched]="isTouched"
+        alignLabelAddon="near"
+        [showRequiredMarker]="showRequiredMarker"
+      >
+        <step-label *ngIf="label">
           <span>{{ label }}</span>
-          <step-icon *ngIf="withHelpIcon" name="help-circle" [matTooltip]="helpIconTooltip || ''"></step-icon>
         </step-label>
+        <step-label-addon *ngIf="withHelpIcon">
+          <step-icon *ngIf="withHelpIcon" name="help-circle" [matTooltip]="helpIconTooltip || ''"></step-icon>
+        </step-label-addon>
 
         <input
           type="text"
@@ -122,11 +136,18 @@
     </ng-container>
 
     <ng-container *ngIf="resourceNotExisting">
-      <step-form-field [class.ng-invalid]="isInvalid" [class.ng-touched]="isTouched">
-        <step-label *ngIf="label" [attr.show-required-marker]="showRequiredMarker || null">
+      <step-form-field
+        [class.ng-invalid]="isInvalid"
+        [class.ng-touched]="isTouched"
+        alignLabelAddon="near"
+        [showRequiredMarker]="showRequiredMarker"
+      >
+        <step-label *ngIf="label">
           <span>{{ label }}</span>
-          <step-icon *ngIf="withHelpIcon" name="help-circle" [matTooltip]="helpIconTooltip || ''"></step-icon>
         </step-label>
+        <step-label-addon *ngIf="withHelpIcon">
+          <step-icon name="help-circle" [matTooltip]="helpIconTooltip || ''"></step-icon>
+        </step-label-addon>
 
         <input
           type="text"

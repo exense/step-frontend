@@ -1,7 +1,5 @@
 import { AfterViewInit, Component, inject } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  AJS_MODULE,
   AutoDeselectStrategy,
   ExecutiontTaskParameters,
   selectionCollectionProvider,
@@ -9,7 +7,6 @@ import {
   STORE_ALL,
   ArrayItemLabelValueExtractor,
   FilterConditionFactoryService,
-  AJS_LOCATION,
 } from '@exense/step-core';
 import { ScheduledTaskLogicService } from '../../services/scheduled-task-logic.service';
 import { KeyValue } from '@angular/common';
@@ -23,7 +20,7 @@ type StatusItem = KeyValue<string, string>;
   providers: [
     tablePersistenceConfigProvider('scheduledTaskList', STORE_ALL),
     ScheduledTaskLogicService,
-    selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
 })
 export class ScheduledTaskListComponent implements AfterViewInit {
@@ -53,7 +50,3 @@ export class ScheduledTaskListComponent implements AfterViewInit {
     this._logic.resolveEditLinkIfExists();
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepScheduledTaskList', downgradeComponent({ component: ScheduledTaskListComponent }));

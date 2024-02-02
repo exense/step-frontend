@@ -1,9 +1,8 @@
 import { RelativeTimeSelection } from './relative-time-selection';
-import { TSTimeRange } from '../../chart/model/ts-time-range';
-import { RangeSelectionType } from './range-selection-type';
+import { TimeRange } from '@exense/step-core';
 
 export interface ExecutionTimeSelection {
-  type: RangeSelectionType;
+  type: 'ABSOLUTE' | 'FULL' | 'RELATIVE';
   relativeSelection?: RelativeTimeSelection; // last X minutes
-  absoluteSelection?: TSTimeRange; // the translation in concrete time values
+  absoluteSelection?: TimeRange; // the translation in concrete time values
 }

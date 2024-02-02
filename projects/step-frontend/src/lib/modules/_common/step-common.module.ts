@@ -1,6 +1,12 @@
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { DashletRegistryService, EntityColumnComponent, LOGOUT_CLEANUP, StepCoreModule } from '@exense/step-core';
+import {
+  DashletRegistryService,
+  EntityColumnComponent,
+  LOGOUT_CLEANUP,
+  StepCoreModule,
+  LockColumnComponent,
+} from '@exense/step-core';
 import { ExecutionLinkComponent } from './components/execution-link/execution-link.component';
 import { LoginComponent } from './components/login/login.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
@@ -11,8 +17,8 @@ import { LoadingInterceptor } from './interceptors/loading.interceptor';
 import { ContainsVersionPipe } from './pipes/contains-version.pipe';
 import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
 import { MenuFilterPipe } from './pipes/menu-filter.pipe';
-import { MenuStorageService } from './injectables/menu-storage.service';
 import { SidebarStateService } from './injectables/sidebar-state.service';
+import { IsMenuItemActivePipe } from './pipes/is-menu-item-active.pipe';
 
 @NgModule({
   declarations: [
@@ -23,6 +29,7 @@ import { SidebarStateService } from './injectables/sidebar-state.service';
     ContainsVersionPipe,
     MenuFilterPipe,
     VersionsDialogComponent,
+    IsMenuItemActivePipe,
   ],
   exports: [
     StepCoreModule,
@@ -52,11 +59,6 @@ import { SidebarStateService } from './injectables/sidebar-state.service';
     },
     {
       provide: LOGOUT_CLEANUP,
-      useExisting: MenuStorageService,
-      multi: true,
-    },
-    {
-      provide: LOGOUT_CLEANUP,
       useExisting: SidebarStateService,
       multi: true,
     },
@@ -65,7 +67,9 @@ import { SidebarStateService } from './injectables/sidebar-state.service';
 export class StepCommonModule {
   constructor(dashletRegistryService: DashletRegistryService) {
     dashletRegistryService.registerDashlet('entityColumn', EntityColumnComponent);
+    dashletRegistryService.registerDashlet('entityLock', LockColumnComponent);
   }
 }
 
 export * from './shared/status.enum';
+export * from './components/login/login.component';

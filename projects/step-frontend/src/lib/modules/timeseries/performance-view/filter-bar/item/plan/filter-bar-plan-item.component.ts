@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { EntitySearchValue } from '../entity-search-value';
 import { DateFormat, EntityDialogsService, Plan } from '@exense/step-core';
 
@@ -14,7 +14,7 @@ export class FilterBarPlanItemComponent {
   private _entityDialogs = inject(EntityDialogsService);
 
   showPicker() {
-    this._entityDialogs.selectEntityOfType('plans', true).subscribe((result) => {
+    this._entityDialogs.selectEntityOfType('plans').subscribe((result) => {
       this.addSearchEntity(result.item as Plan);
     });
   }

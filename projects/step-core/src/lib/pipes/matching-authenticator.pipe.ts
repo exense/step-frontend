@@ -1,5 +1,4 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { map, Observable } from 'rxjs';
 import { AuthService } from '../modules/basics/services/auth.service';
 
 @Pipe({

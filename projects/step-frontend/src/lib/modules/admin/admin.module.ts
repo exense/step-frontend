@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { EntityRegistry, StepCoreModule, ViewRegistryService } from '@exense/step-core';
+import { EntityRegistry, SettingsComponent, StepCoreModule, ViewRegistryService } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { MyAccountComponent } from './components/my-account/my-account.component';
 import { ScreenConfigurationListComponent } from './components/screen-configuration-list/screen-configuration-list.component';
@@ -27,10 +27,43 @@ import { UserSelectionComponent } from './components/user-selection/user-selecti
   providers: [RenderOptionsPipe],
 })
 export class AdminModule {
-  constructor(_entityRegistry: EntityRegistry, _viewRegistry: ViewRegistryService) {
+  constructor(_entityRegistry: EntityRegistry, private _viewRegistry: ViewRegistryService) {
     _entityRegistry.register('users', 'User', { icon: 'user', component: UserSelectionComponent });
 
-    _viewRegistry.registerDashlet('admin/controller', 'My account', 'partials/myaccount.html', 'myaccount');
-    _viewRegistry.registerDashlet('settings', 'My account', 'partials/myaccount.html', 'myaccount');
+    this.registerSettingsSubRoutes('settings');
+    this.registerSettingsSubRoutes('admin/controller');
+
+    _viewRegistry.registerRoute({
+      path: 'settings',
+      component: SettingsComponent,
+      data: {
+        resolveChildFor: 'settings',
+      },
+    });
+  }
+
+  private registerSettingsSubRoutes(parentPath: string): void {
+    this._viewRegistry.registerRoute(
+      {
+        path: 'screens',
+        component: ScreenConfigurationListComponent,
+      },
+      {
+        parentPath,
+        label: 'Screens',
+        accessPermissions: ['settings-ui-menu', 'admin-ui-menu'],
+      }
+    );
+
+    this._viewRegistry.registerRoute(
+      {
+        path: 'myaccount',
+        component: MyAccountComponent,
+      },
+      {
+        parentPath,
+        label: 'My Account',
+      }
+    );
   }
 }

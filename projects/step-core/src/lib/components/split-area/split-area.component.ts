@@ -4,6 +4,7 @@ import {
   ElementRef,
   EventEmitter,
   HostListener,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -20,47 +21,20 @@ type SplitAreaSizeType = 'pixel' | 'percent' | 'flex';
   styleUrls: ['./split-area.component.scss'],
 })
 export class SplitAreaComponent implements AfterViewInit, OnChanges, OnDestroy {
+  private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private sizeUpdateInternal$?: Subject<void>;
+  private isViewInitialized = false;
 
   @Input() sizeUpdateDebounce: number = 300;
-  @Input() sizeType?: SplitAreaSizeType;
-  @Input() size?: string;
+  @Input() sizeType: SplitAreaSizeType = 'pixel';
+  @Input() size?: number;
   @Input() padding?: string;
 
-  @Output() sizeUpdate = new EventEmitter<void>();
-
-  constructor(private _elementRef: ElementRef<HTMLElement>) {}
+  @Output() sizeChange = new EventEmitter<number>();
 
   ngAfterViewInit(): void {
-    switch (this.sizeType) {
-      case 'pixel':
-        this.setFlex({
-          flexBasis: `${this.size}px`,
-        });
-
-        break;
-
-      case 'percent':
-        this.setFlex({
-          flexBasis: `${this.size}%`,
-        });
-
-        break;
-
-      case 'flex':
-        this.setFlex({
-          flexGrow: this.size,
-        });
-
-        break;
-
-      default:
-        this.setFlex({
-          flexBasis: `${this.width}px`,
-        });
-
-        break;
-    }
+    this.isViewInitialized = true;
+    this.changeSize();
     this.setupSizeUpdate();
   }
 
@@ -68,6 +42,24 @@ export class SplitAreaComponent implements AfterViewInit, OnChanges, OnDestroy {
     const cSizeUpdateDebounce = changes['sizeUpdateDebounce'];
     if (cSizeUpdateDebounce?.previousValue !== cSizeUpdateDebounce?.currentValue || cSizeUpdateDebounce?.firstChange) {
       this.setupSizeUpdate(cSizeUpdateDebounce?.currentValue);
+    }
+
+    const cSizeType = changes['sizeType'];
+    const cSize = changes['size'];
+
+    let size: number | undefined;
+    let sizeType: SplitAreaSizeType | undefined;
+
+    if (cSize?.currentValue !== cSize?.previousValue || cSize?.firstChange) {
+      size = cSize?.currentValue;
+    }
+
+    if (cSizeType?.currentValue !== cSizeType?.previousValue || cSizeType?.firstChange) {
+      sizeType = cSizeType.currentValue;
+    }
+
+    if (size || sizeType) {
+      this.changeSize(size, sizeType);
     }
   }
 
@@ -79,29 +71,19 @@ export class SplitAreaComponent implements AfterViewInit, OnChanges, OnDestroy {
     return this.boundingClientRect.width;
   }
 
-  private get boundingClientRect(): DOMRect {
-    return this._elementRef.nativeElement.getBoundingClientRect();
-  }
-
   @HostListener('focusin')
   onFocusIn(): void {
     this._elementRef.nativeElement.scrollTop = 0;
     this._elementRef.nativeElement.scrollLeft = 0;
   }
 
-  setFlex({
-    flexBasis = '0',
-    flexGrow = '0',
-    flexShrink = '1',
-  }: {
-    flexBasis?: string;
-    flexGrow?: string;
-    flexShrink?: string;
-  }): void {
-    this._elementRef.nativeElement.style.setProperty('flex-basis', flexBasis || '');
-    this._elementRef.nativeElement.style.setProperty('flex-grow', flexGrow || '');
-    this._elementRef.nativeElement.style.setProperty('flex-shrink', flexShrink || '');
-    this.sizeUpdateInternal$?.next();
+  setSize(size: number): void {
+    this.size = size;
+    this.changeSize(size);
+  }
+
+  private get boundingClientRect(): DOMRect {
+    return this._elementRef.nativeElement.getBoundingClientRect();
   }
 
   private destroySizeUpdate(): void {
@@ -116,6 +98,48 @@ export class SplitAreaComponent implements AfterViewInit, OnChanges, OnDestroy {
     this.destroySizeUpdate();
     sizeUpdateDebounce = sizeUpdateDebounce || this.sizeUpdateDebounce;
     this.sizeUpdateInternal$ = new Subject<void>();
-    this.sizeUpdateInternal$.pipe(debounceTime(sizeUpdateDebounce)).subscribe(() => this.sizeUpdate.emit());
+    this.sizeUpdateInternal$.pipe(debounceTime(sizeUpdateDebounce)).subscribe(() => this.sizeChange.emit(this.size));
+  }
+
+  private changeSize(size?: number, sizeType?: SplitAreaSizeType): void {
+    if (!this.isViewInitialized) {
+      return;
+    }
+    size = size ?? this.size;
+    sizeType = sizeType ?? this.sizeType;
+    switch (sizeType) {
+      case 'percent':
+        this.setFlex({
+          flexBasis: `${size}%`,
+        });
+        break;
+
+      case 'flex':
+        this.setFlex({
+          flexBasis: `${size}px`,
+          flexGrow: '1',
+        });
+        break;
+
+      default:
+        this.setFlex({
+          flexBasis: `${size ?? this.width}px`,
+        });
+        break;
+    }
+  }
+  private setFlex({
+    flexBasis = '0',
+    flexGrow = '0',
+    flexShrink = '1',
+  }: {
+    flexBasis?: string;
+    flexGrow?: string;
+    flexShrink?: string;
+  }): void {
+    this._elementRef.nativeElement.style.setProperty('flex-basis', flexBasis || '');
+    this._elementRef.nativeElement.style.setProperty('flex-grow', flexGrow || '');
+    this._elementRef.nativeElement.style.setProperty('flex-shrink', flexShrink || '');
+    this.sizeUpdateInternal$?.next();
   }
 }

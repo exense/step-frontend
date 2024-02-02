@@ -1,5 +1,7 @@
 <mat-card>
-  <mat-card-title> Repository plan </mat-card-title>
+  <mat-card-header>
+    <mat-card-title> Repository plan </mat-card-title>
+  </mat-card-header>
   <mat-card-content *ngIf="reload">
     <ng-container *ngIf="error">
       <step-alert type="danger" role="alert">
@@ -32,18 +34,14 @@
               [description]="artefact.name"
               [repositoryObjectRef]="repoRef"
               [isolateExecution]="isolateExecution"
-              [includedTestcases]="includeTestcases$ | async"
+              [includedTestcases]="planTestCases?.includedTestcases$ | async"
             >
             </step-execution-commands>
           </mat-card-content>
         </mat-card>
       </div>
       <ng-container *ngIf="artefact.type === 'TestSet'">
-        <step-repository-plan-testcase-list
-          [(selectionType)]="testcaseSelectionType"
-          (selectionTypeChange)="setupTestCases()"
-          [repoRef]="repoRef"
-        >
+        <step-repository-plan-testcase-list [repoRef]="repoRef" #planTestcaseListComponent>
         </step-repository-plan-testcase-list>
       </ng-container>
     </ng-container>

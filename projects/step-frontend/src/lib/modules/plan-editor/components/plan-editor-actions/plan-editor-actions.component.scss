@@ -1,15 +1,27 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
-:host {
+step-plan-editor-actions {
   display: flex;
   gap: 2rem;
+
+  .interactive-trigger {
+    visibility: hidden;
+  }
+
+  button.activeMode {
+    color: white;
+    background: var.$dark-blue;
+  }
+
+  step-btn-group.with-borders {
+    step-dashlet .mat-stroked-button {
+      border-radius: 0 !important;
+      border-right: 1px solid var.$gray-300;
+    }
+  }
 }
 
-.interactive-trigger {
-  visibility: hidden;
-}
-
-span.mat-menu-item.plan-execution-menu {
+span.mat-mdc-menu-item.plan-execution-menu {
   height: auto;
   font-size: inherit;
   line-height: initial;
@@ -33,9 +45,4 @@ span.mat-menu-item.plan-execution-menu {
     gap: 1rem;
     padding-bottom: 1rem;
   }
-}
-
-button.activeMode {
-  color: white;
-  background: var.$dark-blue;
 }

@@ -1,19 +1,10 @@
-import { AbstractControl, FormArray, FormControl, FormGroup } from '@angular/forms';
-import { IPromise } from 'angular';
-import { Observable, from } from 'rxjs';
 import { DynamicValueInteger, DynamicValueString } from '../client/generated';
 import { AceMode } from './ace-mode.enum';
 import { Collection } from './collection.interface';
 import { ScriptLanguage } from './script-language.enum';
 import { KeyValue } from '@angular/common';
-
-export const a1Promise2Promise = <T>(promise: IPromise<T>): Promise<T> =>
-  Promise.resolve(promise as unknown as Promise<T>);
-
-export const a1Promise2Observable = <T>(promise: IPromise<T>): Observable<T> => {
-  const pr = a1Promise2Promise(promise);
-  return from(pr);
-};
+import { Route } from '@angular/router';
+import { SUB_ROUTE_DATA } from './constants';
 
 export const getObjectFieldValue = (object: Record<string, unknown>, fieldPath: string): unknown => {
   const pathParts = fieldPath.split('.');
@@ -119,27 +110,8 @@ export const toRecord = <T>(keyValuePairs: KeyValue<string, T>[]): Record<string
     {}
   );
 
-export const getFlatControls = (
-  abstractControl: AbstractControl,
-  predicate?: (item: AbstractControl) => boolean
-): AbstractControl[] => {
-  return breadthFirstSearch<AbstractControl>({
-    items: [abstractControl],
-    children: (control) => {
-      if (control instanceof FormGroup) {
-        return Object.values(control.controls);
-      }
-
-      if (control instanceof FormArray) {
-        return control.controls;
-      }
-
-      if (control instanceof FormControl) {
-        return [control];
-      }
-
-      return [];
-    },
-    predicate,
-  });
+export const routesPrioritySortPredicate = (routeA: Route, routeB: Route) => {
+  const weightA = routeA.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
+  const weightB = routeB.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
+  return weightA - weightB;
 };

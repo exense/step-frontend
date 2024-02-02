@@ -243,8 +243,8 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   }
 
   reload(reloadOptions?: { hideProgress: boolean }) {
-    let val = this._request$.value;
-    val!.hideProgress = reloadOptions?.hideProgress;
+    let val = this._request$.value ?? { request: {} as TableRequestInternal };
+    val.hideProgress = reloadOptions?.hideProgress;
     this._request$.next(val);
   }
 

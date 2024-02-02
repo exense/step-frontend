@@ -4,9 +4,11 @@ import {
   ContentChildren,
   EventEmitter,
   forwardRef,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
+  OnInit,
   Optional,
   Output,
   QueryList,
@@ -15,18 +17,7 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import {
-  BehaviorSubject,
-  combineLatest,
-  map,
-  Observable,
-  of,
-  startWith,
-  Subject,
-  takeUntil,
-  tap,
-  timestamp,
-} from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, of, startWith, Subject, takeUntil, timestamp } from 'rxjs';
 import { TableDataSource } from '../../shared/table-data-source';
 import { MatColumnDef, MatTable } from '@angular/material/table';
 import { MatSort, Sort } from '@angular/material/sort';
@@ -46,6 +37,7 @@ import { HasFilter } from '../../../entities-selection/services/has-filter';
 import { FilterCondition } from '../../shared/filter-condition';
 import { SearchColumn } from '../../shared/search-column.interface';
 import { TablePersistenceStateService } from '../../services/table-persistence-state.service';
+import { TableHighlightItemContainer } from '../../services/table-highlight-item-container.service';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -71,12 +63,27 @@ export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Obser
       provide: HasFilter,
       useExisting: forwardRef(() => TableComponent),
     },
+    {
+      provide: TableHighlightItemContainer,
+      useExisting: forwardRef(() => TableComponent),
+    },
     TablePersistenceStateService,
   ],
 })
 export class TableComponent<T>
-  implements AfterViewInit, OnChanges, OnDestroy, TableSearch, TableFilter, TableReload, HasFilter
+  implements
+    OnInit,
+    AfterViewInit,
+    OnChanges,
+    OnDestroy,
+    TableSearch,
+    TableFilter,
+    TableReload,
+    HasFilter,
+    TableHighlightItemContainer
 {
+  private _tableState = inject(TablePersistenceStateService);
+
   @Output() onReload = new EventEmitter<unknown>();
   @Input() trackBy: TrackByFunction<T> = (index) => index;
   @Input() dataSource?: DataSource<T>;
@@ -84,6 +91,7 @@ export class TableComponent<T>
   tableDataSource?: TableDataSource<T>;
   @Input() pageSizeInputDisabled?: boolean;
   @Input() visibleColumns?: string[];
+  @Input() defaultSearch?: Record<string, SearchValue>;
 
   @Input() set filter(value: string | undefined) {
     if (value === this.filter) {
@@ -133,7 +141,6 @@ export class TableComponent<T>
   searchColumns: SearchColumn[] = [];
 
   pageSizeOptions: Array<number>;
-
   readonly trackBySearchColumn: TrackByFunction<SearchColumn> = (index, item) => item.colName;
 
   private terminator$ = new Subject<void>();
@@ -163,11 +170,9 @@ export class TableComponent<T>
     })
   );
 
-  constructor(
-    @Optional() private _sort: MatSort,
-    _itemsPerPageService: ItemsPerPageService,
-    private _tableState: TablePersistenceStateService
-  ) {
+  highlightedItem?: unknown;
+
+  constructor(@Optional() private _sort: MatSort, _itemsPerPageService: ItemsPerPageService) {
     this.pageSizeOptions = _itemsPerPageService.getItemsPerPage((userPreferredItemsPerPage: number) =>
       this.page._changePageSize(userPreferredItemsPerPage)
     );
@@ -355,6 +360,14 @@ export class TableComponent<T>
     });
   }
 
+  private setupDefaultSearch(): void {
+    if (!this.defaultSearch) {
+      return;
+    }
+    const searchValue = { ...this.defaultSearch, ...this.search$.value };
+    this.search$.next(searchValue);
+  }
+
   onSearch(column: string, searchValue: SearchValue): void;
   onSearch(column: string, value: string, regex?: boolean): void;
   onSearch(column: string, searchValue: string | SearchValue, regex: boolean = true): void {
@@ -379,6 +392,10 @@ export class TableComponent<T>
   reload(): void {
     this.onReload.emit({});
     this.tableDataSource?.reload();
+  }
+
+  ngOnInit(): void {
+    this.setupDefaultSearch();
   }
 
   ngAfterViewInit(): void {

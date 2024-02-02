@@ -26,4 +26,7 @@ export { AugmentedControllerService } from './services/augmented-controller.serv
 export { AugmentedInteractivePlanExecutionService } from './services/augmented-interactive-plan-execution.service';
 export { AssignEntityParameters } from './shared/assign-entity-parameters';
 export { AugmentedUserService } from './services/augmented-user.service';
+export { AugmentedQuotaManagerService } from './services/augmented-quota-manager.service';
+export { AugmentedAutomationPackagesService } from './services/augmented-automation-packages.service';
+export * from './shared/pipe-operators';
 export * from './shared/keyword';

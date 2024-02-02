@@ -1,28 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { StepCoreModule, Plugin, PluginLazyLoad, ImportMeta } from '@exense/step-core';
-import { UpgradeModule } from '@angular/upgrade/static';
-import { osPluginModule } from './angularjs/os-plugin.module';
+import { StepCoreModule, PluginLazyLoad, ImportMeta } from '@exense/step-core';
+import { ScriptEditorModule } from './modules/script-editor/script-editor.module';
+import { FunctionPackagesModule } from './modules/function-packages/function-packages.module';
+import { NodePluginModule } from './modules/node-plugin/node-plugin.module';
+import { JmeterPluginModule } from './modules/jmeter-plugin/jmeter-plugin.module';
 
-@Plugin(osPluginModule.name)
 @NgModule({
   declarations: [],
-  imports: [CommonModule, StepCoreModule, UpgradeModule],
+  imports: [CommonModule, StepCoreModule],
 })
 export class PluginModule extends PluginLazyLoad {
-  constructor() {
-    super(osPluginModule);
-  }
-
   protected override getPluginsLazyLoadMeta(): Record<string, ImportMeta> {
     return {
-      scriptEditor: () =>
-        import('./modules/script-editor/script-editor.module').then((m) => ({
-          Module: m.ScriptEditorModule,
-          ajsModuleName: m.scriptEditorModule.name,
-        })),
+      scriptEditor: () => Promise.resolve({ Module: ScriptEditorModule }),
+      functionPackages: () => Promise.resolve({ Module: FunctionPackagesModule }),
+      NodePlugin: () => Promise.resolve({ Module: NodePluginModule }),
+      jmeterPlugin: () => Promise.resolve({ Module: JmeterPluginModule }),
     };
   }
 }
-
-export * from './angularjs/os-plugin.module';

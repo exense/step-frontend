@@ -20,8 +20,7 @@ $default-color: dc.default-colors();
   $elements-padding: 12px,
   $elements-text-padding: 14px,
   $settings-divider-padding-right: 45px,
-  $aligned-text-margin-left: 60px,
-  $logo-path: 'images/logotopleft.png'
+  $aligned-text-margin-left: 60px
 ) {
   $config: (
     background-color: $background-color,
@@ -41,7 +40,6 @@ $default-color: dc.default-colors();
     elements-text-padding: $elements-text-padding,
     settings-divider-padding-right: $settings-divider-padding-right,
     aligned-text-margin-left: $aligned-text-margin-left,
-    logo-path: $logo-path,
   );
 
   @return $config;
@@ -88,14 +86,14 @@ $menu-sub-item-height: 3.2rem;
     margin-left: map.get($config, width-closed-small-screen);
   }
 
-  step-tenant-selection-downgraded {
+  step-tenant-selection {
     display: block;
     position: fixed;
-    top: 70px;
-    left: 56px;
-    z-index: 2;
-    max-width: 150px;
-    min-width: 150px;
+    top: 7rem;
+    left: 5.6rem;
+    z-index: 3;
+    max-width: 15rem;
+    min-width: 15rem;
   }
   .tenant-selector-when-sidebar-closed {
     display: none;
@@ -110,7 +108,7 @@ $menu-sub-item-height: 3.2rem;
       height: 100%;
       width: 0;
       position: fixed;
-      z-index: 1;
+      z-index: 2;
       top: 0;
       left: 0;
       background-color: map.get($config, background-color);
@@ -163,19 +161,11 @@ $menu-sub-item-height: 3.2rem;
     }
 
     .sidebar-logo {
-      $logo-path: map.get($config, logo-path);
       width: 100%;
       height: 30px;
       margin-left: -12px;
       transform: scale(0.8);
-      /**
-      '^' sign is used to prevent file check during the build and pass url without '/'.
-      But this '^' feature probably will be removed in next versions of angular-cli.
-      Check the following links for details:
-      https://github.com/angular/angular-cli/issues/12797#issuecomment-598534241
-      https://github.com/angular/angular-cli/issues/18013#issuecomment-649373940
-      **/
-      background: url('^#{$logo-path}') no-repeat no-repeat;
+      background: var(--step-logo-path) no-repeat no-repeat;
       background-size: contain;
     }
 
@@ -417,8 +407,11 @@ $menu-sub-item-height: 3.2rem;
 
     .version {
       max-height: 16px;
+      max-width: 100%;
       overflow: hidden;
       cursor: pointer;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
 
     .sidebar:not(.sidebar-closed) {
@@ -513,7 +506,7 @@ $menu-sub-item-height: 3.2rem;
       }
       // MENU ITEMS TOOLTIPS FOR SMALL SCREEN END
 
-      & ~ step-tenant-selection-downgraded {
+      & ~ #project-select {
         width: map.get($config, width-closed);
         visibility: hidden;
       }

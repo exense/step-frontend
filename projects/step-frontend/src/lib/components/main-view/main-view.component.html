@@ -1,0 +1,46 @@
+<section>
+  <step-dashlet id="project-select" itemKey="projectSelect"></step-dashlet>
+  <step-sidebar></step-sidebar>
+  <div id="main">
+    <header class="app-header">
+      <section class="content">
+        <div></div>
+        <div class="app-header-nav">
+          <step-dashlet *ngFor="let item of navBarRightMenuItems; trackBy: trackByDashlet" [itemKey]="item.template">
+          </step-dashlet>
+          <a href="#" (click)="(false)" [matMenuTriggerFor]="sessionMenu">
+            <step-icon name="user"></step-icon>
+            <ng-container *ngIf="_authService.context$ | async as ctx">
+              {{ ctx.userID }} [{{ ctx.role }}]
+            </ng-container>
+          </a>
+        </div>
+      </section>
+    </header>
+    <div id="step-main-scrollable-content">
+      <step-dashlet itemKey="projectAlerts"></step-dashlet>
+      <step-dashlet *ngFor="let alert of adminAlerts; trackBy: trackByDashlet" [itemKey]="alert.template">
+      </step-dashlet>
+      <div id="mainView">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+</section>
+<mat-menu #sessionMenu>
+  <button type="button" mat-menu-item>
+    <step-my-account-button></step-my-account-button>
+  </button>
+  <ng-template #signIn>
+    <button type="button" mat-menu-item (click)="_authService.goToLoginPage()">Sign in</button>
+  </ng-template>
+  <ng-template #logout>
+    <button type="button" mat-menu-item (click)="_authService.logout()">
+      <step-icon name="power"></step-icon>
+      Logout
+    </button>
+  </ng-template>
+  <ng-container *ngIf="_appConfig.conf?.authentication">
+    <ng-container *ngIf="_authService.isAuthenticated$ | async; then logout; else signIn"></ng-container>
+  </ng-container>
+</mat-menu>

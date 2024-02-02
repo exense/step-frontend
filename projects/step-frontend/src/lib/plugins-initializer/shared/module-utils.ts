@@ -1,25 +1,14 @@
-import { Compiler, Injector, Type } from '@angular/core';
-import { AJS_MODULE, getPluginMetaInfo, PluginOnInit } from '@exense/step-core';
-import { getAngularJSGlobal } from '@angular/upgrade/static';
-
-export interface CompileCtx {
-  compiler: Compiler;
-  injector: Injector;
-}
+import { createNgModule, Injector, Type } from '@angular/core';
+import { PluginOnInit } from '@exense/step-core';
 
 export interface CompiledModule {
   moduleClass: Type<any>;
   moduleInstance: any;
 }
 
-export const compileModule = async (
-  name: string,
-  module: Type<any>,
-  { compiler, injector }: CompileCtx
-): Promise<CompiledModule | undefined> => {
+export const compileModule = (name: string, module: Type<any>, injector: Injector): CompiledModule | undefined => {
   try {
-    const moduleFactory = await compiler.compileModuleAsync(module);
-    const moduleRef = moduleFactory.create(injector);
+    const moduleRef = createNgModule(module, injector);
     return {
       moduleClass: module,
       moduleInstance: moduleRef.instance,
@@ -30,9 +19,9 @@ export const compileModule = async (
   }
 };
 
-export const registerCompiledModules = async (modules: CompiledModule[]): Promise<void> => {
+export const registerCompiledModules = (modules: CompiledModule[]): Promise<void> => {
   if (!modules.length) {
-    return;
+    return Promise.resolve();
   }
 
   const modulesWithInit = modules
@@ -40,15 +29,7 @@ export const registerCompiledModules = async (modules: CompiledModule[]): Promis
     .filter((m) => !!m.pluginOnInit) as PluginOnInit[];
 
   if (modulesWithInit.length > 0) {
-    await Promise.all(modulesWithInit.map((m) => m.pluginOnInit()));
+    return Promise.all(modulesWithInit.map((m) => m.pluginOnInit())).then();
   }
-
-  const hybridModules = modules
-    .map((module) => getPluginMetaInfo(module.moduleClass)?.hybridModuleName)
-    .filter((x) => !!x);
-
-  if (hybridModules.length > 0) {
-    const hostModule = getAngularJSGlobal().module(AJS_MODULE);
-    hostModule.requires.push(...hybridModules);
-  }
+  return Promise.resolve();
 };

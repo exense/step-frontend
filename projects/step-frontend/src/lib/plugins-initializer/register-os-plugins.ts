@@ -1,10 +1,11 @@
-import { CompileCtx, compileModule, registerCompiledModules } from './shared/module-utils';
+import { compileModule, registerCompiledModules } from './shared/module-utils';
+import { Injector } from '@angular/core';
+import { PluginModule } from '../os-plugins/plugin.module';
 
-export const registerOsPlugins = async (ctx: CompileCtx): Promise<void> => {
-  const { PluginModule } = await import('../os-plugins/plugin.module');
-  const pluginModuleCompiled = await compileModule('os_plugin', PluginModule, ctx);
+export const registerOsPlugins = (injector: Injector): Promise<void> => {
+  const pluginModuleCompiled = compileModule('os_plugin', PluginModule, injector);
   if (!pluginModuleCompiled) {
-    return;
+    return Promise.resolve();
   }
-  await registerCompiledModules([pluginModuleCompiled]);
+  return registerCompiledModules([pluginModuleCompiled]);
 };

@@ -1,10 +1,8 @@
-import { Component, inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { filter, forkJoin, merge, Subject, Subscription, switchMap, takeUntil, tap, throttle } from 'rxjs';
-import { TSTimeRange } from '../chart/model/ts-time-range';
-import { FilterBarComponent } from '../performance-view/filter-bar/filter-bar.component';
-import { FilterBarItemType, TsFilterItem } from '../performance-view/filter-bar/model/ts-filter-item';
+import { FilterBarComponent } from '../performance-view/filter-bar/legacy/filter-bar.component';
+import { FilterBarItemType, FilterBarItem } from '../performance-view/filter-bar/model/filter-bar-item';
 import { PerformanceViewSettings } from '../performance-view/model/performance-view-settings';
-import { RangeSelectionType } from '../time-selection/model/range-selection-type';
 import { RelativeTimeSelection } from '../time-selection/model/relative-time-selection';
 import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
 import { TimeSeriesContext } from '../time-series-context';
@@ -14,7 +12,7 @@ import { TimeSeriesDashboardSettings } from './model/ts-dashboard-settings';
 import { TimeSeriesUtils } from '../time-series-utils';
 import { ChartsViewComponent } from '../performance-view/charts-view.component';
 import { TimeSeriesConfig } from '../time-series.config';
-import { TableApiWrapperService, TimeSeriesService } from '@exense/step-core';
+import { TableApiWrapperService, TimeRange, TimeSeriesService } from '@exense/step-core';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -24,12 +22,14 @@ import { TableApiWrapperService, TimeSeriesService } from '@exense/step-core';
 export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   readonly ONE_HOUR_MS = 3600 * 1000;
 
+  @Output() timeRangeChange: EventEmitter<TimeRange> = new EventEmitter<TimeRange>();
+
   @Input() settings!: TimeSeriesDashboardSettings;
   @ViewChild(ChartsViewComponent) chartsView!: ChartsViewComponent;
   @ViewChild(FilterBarComponent) filterBar?: FilterBarComponent;
   @ViewChild('compareFilterBar') compareFilterBar?: FilterBarComponent;
 
-  timeRangeSelection: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
+  timeRangeSelection: TimeRangePickerSelection = { type: 'FULL' };
   context!: TimeSeriesContext;
   performanceViewSettings: PerformanceViewSettings | undefined;
   private updateBaseChartsSubscription = new Subscription();
@@ -45,15 +45,15 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     { label: 'Last Hour', timeInMs: this.ONE_HOUR_MS },
   ];
 
-  filterItems: TsFilterItem[] = [];
-  filterOptions: TsFilterItem[] = [];
+  filterItems: FilterBarItem[] = [];
+  filterOptions: FilterBarItem[] = [];
 
   compareModeEnabled: boolean = false;
   compareModeContext: TimeSeriesContext | undefined;
-  compareModeFilterOptions: TsFilterItem[] = [];
-  compareModeFilterItems: TsFilterItem[] = [];
+  compareModeFilterOptions: FilterBarItem[] = [];
+  compareModeFilterItems: FilterBarItem[] = [];
   compareModeTimeRangeOptions = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
-  compareModeActiveRangeOption: TimeRangePickerSelection = { type: RangeSelectionType.FULL };
+  compareModeActiveRangeOption: TimeRangePickerSelection = { type: 'FULL' };
 
   exportInProgress = false;
 
@@ -81,19 +81,19 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.context = this._contextsFactory.createContext(contextParams);
 
     this.performanceViewSettings = this.settings;
+    this.performanceViewSettings.displayTooltipLinks = !this.settings.execution; // we're on analytics
     this.subscribeForContextChange();
   }
 
   private mergeContextualParamsWithActiveFilters(
     contextualParams: Record<string, string>,
-    activeFilters: TsFilterItem[]
+    activeFilters: FilterBarItem[]
   ) {
     const contextualFilters = Object.keys(contextualParams).map((key) => {
       const fieldType = this.getFilterFieldType(key);
-      const isEntityFilter =
-        fieldType === FilterBarItemType.PLAN ||
-        fieldType === FilterBarItemType.TASK ||
-        fieldType === FilterBarItemType.EXECUTION;
+      const isEntityFilter = [FilterBarItemType.PLAN, FilterBarItemType.TASK, FilterBarItemType.EXECUTION].includes(
+        fieldType
+      );
       const searchValue = contextualParams[key];
       return {
         isHidden: !this.settings.showContextualFilters,
@@ -101,11 +101,11 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
         label: this.getFilterFieldLabel(key),
         type: fieldType,
         attributeName: key,
-        freeTextValues: fieldType === FilterBarItemType.FREE_TEXT ? [searchValue] : [],
+        freeTextValues: fieldType === 'FREE_TEXT' ? [searchValue] : [],
         searchEntities: isEntityFilter ? [{ searchValue: searchValue }] : [],
         isLocked: false,
         exactMatch: true,
-      } as TsFilterItem;
+      } as FilterBarItem;
     });
     let notContextualFilters = activeFilters.filter((item) => !contextualParams[item.attributeName]);
     return [...contextualFilters, ...notContextualFilters];
@@ -116,7 +116,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
    * @param settings
    * @private
    */
-  private prepareFilterOptions(activeFilters: TsFilterItem[], settings: TimeSeriesDashboardSettings): TsFilterItem[] {
+  private prepareFilterOptions(activeFilters: FilterBarItem[], settings: TimeSeriesDashboardSettings): FilterBarItem[] {
     const hiddenFilters = activeFilters.filter((f) => f.isHidden).map((f) => f.attributeName) || [];
     return settings.filterOptions.map((f) => {
       if (hiddenFilters.includes(f.attributeName)) {
@@ -157,7 +157,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   private updateBaseCharts(showLoading = false) {
-    console.log('updating base charts');
     this.updateBaseChartsSubscription?.unsubscribe();
     let updateCharts$ = this.chartsView.updateBaseCharts({
       updateRanger: true,
@@ -202,18 +201,18 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  handleFiltersChange(filters: TsFilterItem[]): void {
+  handleFiltersChange(filters: FilterBarItem[]): void {
     this.context.updateActiveFilters(filters);
   }
 
   handleTimeRangeChange(params: { selection: TimeRangePickerSelection; triggerRefresh: boolean }) {
     this.timeRangeSelection = params.selection;
-    let newTimeRange: TSTimeRange = this.calculateTimeRange(params.selection);
+    let newTimeRange: TimeRange = this.calculateTimeRange(params.selection);
     this.updateFullRange(newTimeRange, params.triggerRefresh);
   }
 
-  private calculateTimeRange(selection: TimeRangePickerSelection): TSTimeRange {
-    let newTimeRange: TSTimeRange;
+  private calculateTimeRange(selection: TimeRangePickerSelection): TimeRange {
+    let newTimeRange: TimeRange;
     if (this.settings.execution) {
       // we have an execution
       newTimeRange = TimeSeriesUtils.convertExecutionAndSelectionToTimeRange(
@@ -234,7 +233,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     );
   }
 
-  setRanges(fullRange: TSTimeRange, selection?: TSTimeRange) {
+  setRanges(fullRange: TimeRange, selection?: TimeRange) {
     const isFullRangeSelected = this.context.isFullRangeSelected();
     let newSelection = selection || this.context.getSelectedTimeRange();
     this.context.updateFullRange(fullRange, false);
@@ -242,8 +241,8 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       newSelection = fullRange;
     } else {
       // we crop it
-      const newFrom = Math.max(fullRange.from, newSelection.from);
-      const newTo = Math.min(fullRange.to, newSelection.to);
+      const newFrom = Math.max(fullRange.from!, newSelection.from!);
+      const newTo = Math.min(fullRange.to!, newSelection.to!);
       if (newTo - newFrom < 3) {
         newSelection = fullRange; // zoom reset when the interval is very small
       } else {
@@ -254,8 +253,8 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
   }
 
   refresh() {
-    if (this.compareModeEnabled) {
-      // don't do the update while in compare mode
+    if (this.compareModeEnabled || this.context.getChartsLockedState()) {
+      // don't do the update while in compare mode or charts are locked
       return;
     }
     this.throttledRefreshTrigger$.next(true);
@@ -267,7 +266,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
    * @param range
    *  @Deprecated - the range is calculated inside the refresh
    */
-  refreshWithNewRange(range: TSTimeRange, selection?: TSTimeRange): void {
+  refreshWithNewRange(range: TimeRange, selection?: TimeRange): void {
     this.setRanges(range, selection);
     if (this.compareModeEnabled) {
       // don't do the update while in compare mode
@@ -280,7 +279,8 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
    * This is a force refresh (instantly triggered).
    * The selection will be set to full selection.
    */
-  updateFullRange(range: TSTimeRange, forceRefresh = true): void {
+  updateFullRange(range: TimeRange, forceRefresh = true): void {
+    this.timeRangeChange.emit(range);
     this.updateBaseChartsSubscription?.unsubscribe(); // end current execution
     this.context.updateFullRange(range, false);
     this.context.updateSelectedRange(range, false);
@@ -295,7 +295,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  updateCompareChartsFullRange(range: TSTimeRange, refreshCharts = true) {
+  updateCompareChartsFullRange(range: TimeRange, refreshCharts = true) {
     this.compareChartsSubscription?.unsubscribe(); // end current execution
     this.compareModeContext?.updateFullRange(range, false);
     this.compareModeContext?.updateSelectedRange(range, false);
@@ -326,7 +326,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       filters: this.compareModeFilterItems,
       keywordsContext: this.context.keywordsContext, // share the same keywords context and colors
     });
-    this.compareModeActiveRangeOption = { type: RangeSelectionType.ABSOLUTE, absoluteSelection: timeRange };
+    this.compareModeActiveRangeOption = { type: 'ABSOLUTE', absoluteSelection: timeRange };
     merge(compareContext.onFilteringChange(), compareContext.onGroupingChange())
       .pipe(takeUntil(this.compareTerminator$))
       .subscribe(() => {
@@ -352,7 +352,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
-  private prepareFiltersForCompareMode(): TsFilterItem[] {
+  private prepareFiltersForCompareMode(): FilterBarItem[] {
     return this.filterItems.map((i) => ({ ...JSON.parse(JSON.stringify(i)), isHidden: false })); // deep clone the objects
   }
 

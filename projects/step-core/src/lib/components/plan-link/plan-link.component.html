@@ -28,3 +28,5 @@
 </ng-template>
 
 <ng-container *ngIf="noLink$ | async; then contentTemplate; else linkTemplate"></ng-container>
+<step-description-hint *ngIf="!(noDescriptionHint$ | async)" [description]="context?.root?.description">
+</step-description-hint>

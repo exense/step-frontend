@@ -3,10 +3,9 @@ import { ErrorDistributionStatus } from '../shared/error-distribution-status.enu
 import { ExecutionErrorMessageItem } from '../shared/execution-error-message-item';
 import { ExecutionErrorCodeItem } from '../shared/execution-error-code-item';
 import { ExecutionViewServices } from '../../operations/operations.module';
-import { Observable } from 'rxjs';
 
 export abstract class ExecutionStateService extends ExecutionViewServices {
-  abstract eId?: string;
+  abstract executionId?: string;
   abstract testCasesProgress?: ExecutionSummaryDto;
   abstract progress?: ExecutionSummaryDto;
   abstract execution?: Execution;

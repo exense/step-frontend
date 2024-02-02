@@ -14,7 +14,7 @@ declare class uPlot {
   /** status */
   readonly status: 0 | 1;
 
-  /** width of the plotting area + axes in CSS pixels */
+  /** width of the plotting area + axes in CSS pixels */ f;
   readonly width: number;
 
   /** height of the plotting area + axes in CSS pixels (excludes title & legend height) */

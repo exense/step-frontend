@@ -1,10 +1,8 @@
-import { Injectable, inject, Injector, EnvironmentInjector } from '@angular/core';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { ILocationService } from 'angular';
-import { Observable, catchError, map, of, switchMap, tap, take } from 'rxjs';
+import { EnvironmentInjector, Injectable, Injector, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { Observable, catchError, map, of, switchMap, take, tap } from 'rxjs';
 import { AugmentedKeywordsService, Keyword } from '../client/step-client-module';
 import { EditorResolverService, MultipleProjectsService } from '../modules/basics/step-basics.module';
-import { EntityDialogsService } from '../modules/entity/entity.module';
 import {
   FunctionActionsService,
   FunctionConfigurationApiService,
@@ -12,13 +10,14 @@ import {
   FunctionDialogsConfig,
   FunctionDialogsConfigFactoryService,
 } from '../modules/keywords-common/keywords-common.module';
-import { a1Promise2Observable, AJS_LOCATION, AJS_MODULE, DialogsService } from '../shared';
+import { DialogsService } from '../shared';
 import { ExportDialogsService } from './export-dialogs.service';
 import { ImportDialogsService } from './import-dialogs.service';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
 
 const CONFIGURER_KEYWORD_ID = 'configurerKeywordId';
 const ENTITY_TYPE = 'keyword';
+const EDITOR_URL = '/root/functions';
 
 @Injectable({
   providedIn: 'root',
@@ -31,8 +30,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
   private _exportDialogs = inject(ExportDialogsService);
   private _importDialogs = inject(ImportDialogsService);
   protected _isUsedByDialog = inject(IsUsedByDialogService);
-  private _entityDialogs = inject(EntityDialogsService);
-  private _$location = inject<ILocationService>(AJS_LOCATION);
+  private _router = inject(Router);
   private _functionDialogsConfigFactoryService = inject(FunctionDialogsConfigFactoryService);
   private _functionConfigurationService = inject(FunctionConfigurationService);
 
@@ -62,7 +60,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
           return of({ keyword, continueEdit: true });
         }
 
-        const url = this._$location.path();
+        const url = EDITOR_URL;
         const editParam = { [CONFIGURER_KEYWORD_ID]: id };
 
         return this._multipleProjectService
@@ -79,13 +77,13 @@ export class FunctionActionsImplService implements FunctionActionsService {
   }
 
   openDeleteFunctionDialog(id: string, name: string): Observable<boolean> {
-    return a1Promise2Observable(this._dialogs.showDeleteWarning(1, `Keyword "${name}"`)).pipe(
-      map(() => true),
-      catchError(() => of(false)),
-      switchMap((isDeleteConfirmed) =>
-        isDeleteConfirmed ? this._functionApiService.deleteFunction(id).pipe(map(() => true)) : of(false)
-      )
-    );
+    return this._dialogs
+      .showDeleteWarning(1, `Keyword "${name}"`)
+      .pipe(
+        switchMap((isDeleteConfirmed) =>
+          isDeleteConfirmed ? this._functionApiService.deleteFunction(id).pipe(map(() => true)) : of(false)
+        )
+      );
   }
 
   openLookUpFunctionDialog(id: string, name: string): void {
@@ -118,7 +116,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
     return this.getFunctionEditor(keyword.id!).pipe(
       tap((path) => {
         if (!path) {
-          this._dialogs.showErrorMsg('No editor configured for this function type');
+          this._dialogs.showErrorMsg('No editor configured for this function type').subscribe();
           throw new Error('No path');
         }
       }),
@@ -134,7 +132,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
       }),
       map((result) => {
         if (result.continueEdit) {
-          this._$location.path(result.editorPath);
+          this._router.navigateByUrl(result.editorPath);
         }
         return result.continueEdit;
       }),
@@ -143,15 +141,6 @@ export class FunctionActionsImplService implements FunctionActionsService {
         return of(undefined);
       })
     );
-  }
-
-  selectFunction(): Observable<Keyword> {
-    const selectedEntity$ = this._entityDialogs.selectEntityOfType('function', true);
-    const function$ = selectedEntity$.pipe(
-      map((result) => result.item as Keyword),
-      switchMap((keyword) => this._functionApiService.getFunctionById(keyword.id!))
-    );
-    return function$;
   }
 
   resolveConfigureLinkIfExits(parentInjector: Injector, dialogConfig?: FunctionDialogsConfig): void {
@@ -226,5 +215,3 @@ export class FunctionActionsImplService implements FunctionActionsService {
       .pipe(tap(() => modalInjector.destroy()));
   }
 }
-
-getAngularJSGlobal().module(AJS_MODULE).service('FunctionDialogs', downgradeInjectable(FunctionActionsImplService));

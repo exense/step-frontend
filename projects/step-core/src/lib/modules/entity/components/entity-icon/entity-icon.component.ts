@@ -1,10 +1,8 @@
 import { Component, inject, Input, SimpleChanges } from '@angular/core';
-import { EntityTypeResolver } from '../../services/entity-type-resolver';
+import { EntityTypeResolver } from '../../injectables/entity-type-resolver';
 import { Entity } from '../../types/entity';
-import { EntityRegistry } from '../../services/entity-registry';
+import { EntityRegistry } from '../../injectables/entity-registry';
 
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '../../../../shared';
 import { AugmentedPlansService } from '../../../../client/augmented/services/augmented-plans.service';
 import { Plan } from '../../../../client/generated';
 import { ArtefactService } from '../../../../services/artefact.service';
@@ -60,7 +58,3 @@ export class EntityIconComponent {
     return { icon: iconOverride?.icon ?? entityType?.icon ?? '', tooltip: iconOverride?.tooltip ?? '' };
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('entityIcon', downgradeComponent({ component: EntityIconComponent }));

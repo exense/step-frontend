@@ -1,16 +1,38 @@
-:host {
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-my-account {
   min-width: 600px;
-  display: block;
-}
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
 
-.generate-key {
-  vertical-align: top;
-}
+  .mat-card-header-text {
+    margin: 0 !important;
+  }
 
-.api-token-table {
-  margin-top: 3rem;
+  .credentials {
+    display: flex;
+    flex-direction: column;
 
-  &.disabled {
-    opacity: 0.5;
+    section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: solid 0.1rem var.$gray-300;
+      padding: 1rem 0;
+    }
+  }
+
+  .role section {
+    padding: 1rem 0;
+  }
+
+  .header {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .actions {
+    width: 2rem;
   }
 }

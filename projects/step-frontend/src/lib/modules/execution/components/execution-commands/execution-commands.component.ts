@@ -1,20 +1,19 @@
-import { Component, EventEmitter, Inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import {
-  AJS_LOCATION,
-  AJS_MODULE,
-  AJS_ROOT_SCOPE,
   ArtefactFilter,
   AugmentedExecutionsService,
   AugmentedScreenService,
+  AuthService,
   Execution,
   ExecutionParameters,
+  ExecutiontTaskParameters,
   RepositoryObjectReference,
   ScheduledTaskDialogsService,
 } from '@exense/step-core';
-import { ILocationService, IRootScopeService } from 'angular';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { DOCUMENT } from '@angular/common';
 import { IncludeTestcases } from '../../shared/include-testcases.interface';
+import { Router } from '@angular/router';
+import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 
 @Component({
   selector: 'step-execution-commands',
@@ -22,24 +21,24 @@ import { IncludeTestcases } from '../../shared/include-testcases.interface';
   styleUrls: ['./execution-commands.component.scss'],
 })
 export class ExecutionCommandsComponent implements OnInit, OnChanges {
+  private _executionTabManager = inject(ExecutionTabManagerService, { optional: true });
+  private _router = inject(Router);
+  private _executionService = inject(AugmentedExecutionsService);
+  private _screenTemplates = inject(AugmentedScreenService);
+  private _scheduledTaskDialogs = inject(ScheduledTaskDialogsService);
+  private _authService = inject(AuthService);
+  private _document = inject(DOCUMENT);
+
   @Input() description?: string;
   @Input() repositoryObjectRef?: RepositoryObjectReference;
   @Input() isolateExecution?: boolean;
   @Input() includedTestcases?: IncludeTestcases | null;
   @Input() execution?: Execution;
-  @Output() onExecute = new EventEmitter<unknown>();
+
+  @Output() refresh = new EventEmitter<void>();
 
   executionParameters?: Record<string, string>;
   isExecutionIsolated: boolean = false;
-
-  constructor(
-    private _executionService: AugmentedExecutionsService,
-    private _screenTemplates: AugmentedScreenService,
-    private _scheduledTaskDialogs: ScheduledTaskDialogsService,
-    @Inject(AJS_ROOT_SCOPE) private _rootScope$: IRootScopeService,
-    @Inject(AJS_LOCATION) private _location$: ILocationService,
-    @Inject(DOCUMENT) private _document: Document
-  ) {}
 
   ngOnInit(): void {
     if (!this.executionParameters) {
@@ -72,23 +71,29 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
   }
 
   execute(simulate: boolean): void {
+    const currentEId = this.execution?.id;
     const executionParams = this.buildExecutionParams(simulate);
     this._executionService.execute(executionParams).subscribe((eId) => {
-      (this._location$ as any)['$$search'] = {};
-      this._location$.path(`/root/executions/${eId}`);
-      this.onExecute.emit({});
+      if (currentEId && this._executionTabManager) {
+        this._executionTabManager.handleTabClose(currentEId, false);
+      }
+      this._router.navigateByUrl(`/root/executions/open/${eId}`);
     });
   }
 
   stop(): void {
-    this._executionService.abort(this.execution!.id!).subscribe();
+    this._executionService.abort(this.execution!.id!).subscribe(() => this.refresh.emit());
+  }
+
+  forceStop(): void {
+    this._executionService.forceStop(this.execution!.id!).subscribe(() => this.refresh.emit());
   }
 
   schedule(): void {
-    const executionParams = this.buildExecutionParams(false);
-    this._scheduledTaskDialogs.newScheduledTask(executionParams).subscribe((result) => {
+    const task = this.prefillScheduledTask();
+    this._scheduledTaskDialogs.editScheduledTask(task).subscribe((result) => {
       if (result) {
-        this._location$.path('/root/scheduler/');
+        this._router.navigate(['root', 'scheduler']);
       }
     });
   }
@@ -122,8 +127,8 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
     this.isExecutionIsolated = isolateExecution ? true : execution?.executionParameters?.isolatedExecution || false;
   }
 
-  private buildExecutionParams(simulate: boolean): ExecutionParameters {
-    const userID = (this._rootScope$ as any)['context']['userID'];
+  private buildExecutionParams(simulate: boolean, includeUserId = true): ExecutionParameters {
+    const userID = includeUserId ? this._authService.getUserID() : undefined;
     const description = this.description;
     const mode = simulate ? 'SIMULATION' : 'RUN';
     const repositoryObject = this.repositoryObjectRef;
@@ -158,8 +163,13 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
       customParameters: this.executionParameters,
     };
   }
-}
 
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepExecutionCommands', downgradeComponent({ component: ExecutionCommandsComponent }));
+  private prefillScheduledTask(): ExecutiontTaskParameters {
+    const executionsParameters = this.buildExecutionParams(false, false);
+    const name = executionsParameters.description ?? '';
+    return {
+      attributes: { name },
+      executionsParameters,
+    };
+  }
+}

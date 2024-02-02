@@ -31,17 +31,12 @@
   >
     <step-icon name="rotate-cw"></step-icon>
   </button>
-  <button
-    type="button"
-    mat-stroked-button
-    (click)="displayHistory.emit()"
-    [matTooltip]="captions.history"
-    class="history"
-    matTooltipPosition="below"
+  <step-dashlet
+    *ngFor="let editorAction of _planActions; trackBy: trackByDashlet"
+    [itemKey]="editorAction.template"
+    [context]="planEditorContext"
   >
-    <step-icon name="git-branch"></step-icon>
-  </button>
-
+  </step-dashlet>
   <button
     type="button"
     mat-stroked-button
@@ -60,6 +55,15 @@
     matTooltipPosition="below"
   >
     <step-icon name="upload"></step-icon>
+  </button>
+  <button
+    type="button"
+    mat-stroked-button
+    (click)="showSource.emit()"
+    [matTooltip]="captions.showSource"
+    matTooltipPosition="below"
+  >
+    <step-icon name="code"></step-icon>
   </button>
 </step-btn-group>
 <step-btn-group class="with-borders">

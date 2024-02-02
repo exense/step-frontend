@@ -15,10 +15,16 @@ import { SchedulerConfigurationComponent } from './components/scheduler-configur
 import './components/scheduler-configuration/scheduler-configuration.component';
 import { ScheduledTaskLogicService } from './services/scheduled-task-logic.service';
 import { ScheduledTaskBulkOperationsRegisterService } from './services/scheduled-task-bulk-operations-register.service';
+import { CronExpressionCellComponent } from './components/cron-expression-cell/cron-expression-cell.component';
 
 @NgModule({
   imports: [StepCoreModule, StepCommonModule],
-  declarations: [ScheduledTaskListComponent, SchedulerTaskSelectionComponent, SchedulerConfigurationComponent],
+  declarations: [
+    ScheduledTaskListComponent,
+    SchedulerTaskSelectionComponent,
+    SchedulerConfigurationComponent,
+    CronExpressionCellComponent,
+  ],
   exports: [ScheduledTaskListComponent, SchedulerTaskSelectionComponent, SchedulerConfigurationComponent],
   providers: [
     {
@@ -37,7 +43,7 @@ export class SchedulerModule {
     this.registerEntity();
     this.registerCells();
     this.registerViews();
-    this.registerDashlets();
+    this.registerSettings();
     _taskBulkOperations.register();
   }
 
@@ -53,25 +59,28 @@ export class SchedulerModule {
   }
 
   private registerViews(): void {
-    this._viewRegistry.registerView('scheduler', 'partials/scheduler.html');
+    this._viewRegistry.registerRoute({
+      path: 'scheduler',
+      component: ScheduledTaskListComponent,
+    });
   }
 
-  private registerDashlets(): void {
-    this._viewRegistry.registerDashlet(
-      'admin/controller',
-      'Scheduler',
-      'partials/scheduler/schedulerConfiguration.html',
-      'scheduler',
-      false,
-      1
-    );
-    this._viewRegistry.registerDashlet(
-      'settings',
-      'Scheduler',
-      'partials/scheduler/schedulerConfiguration.html',
-      'scheduler',
-      false,
-      1
-    );
+  private registerSettings(): void {
+    const register = (parentPath: string) => {
+      this._viewRegistry.registerRoute(
+        {
+          path: 'scheduler',
+          component: SchedulerConfigurationComponent,
+        },
+        {
+          parentPath,
+          label: 'Scheduler',
+          weight: 0,
+          accessPermissions: ['settings-ui-menu', 'admin-ui-menu'],
+        }
+      );
+    };
+    register('settings');
+    register('admin/controller');
   }
 }

@@ -1,7 +1,9 @@
-import { inject, Injectable } from '@angular/core';
-import { downgradeInjectable, getAngularJSGlobal } from '@angular/upgrade/static';
-import { AJS_MODULE } from '../shared';
+import { inject, Injectable, OnDestroy } from '@angular/core';
+import { routesPrioritySortPredicate, SUB_ROUTE_DATA, SubRouteData, SubRouterConfig } from '../shared';
+import { Route, Router, Routes } from '@angular/router';
+import { checkPermissionsGuard } from './check-permissions-guard.service';
 import { VIEW_ID_LINK_PREFIX } from '../modules/basics/services/view-id-link-prefix.token';
+import { BehaviorSubject } from 'rxjs';
 
 export interface CustomView {
   template: string;
@@ -15,6 +17,7 @@ export interface MenuEntry {
   icon: string;
   weight?: number;
   parentId?: string;
+
   isEnabledFct(): boolean;
 }
 
@@ -23,22 +26,46 @@ export interface Dashlet {
   template: string;
   id: string;
   weight?: number;
+
   isEnabledFct?(): boolean;
 }
 
 @Injectable({
   providedIn: 'root',
 })
-export class ViewRegistryService {
+export class ViewRegistryService implements OnDestroy {
   private _viewIdLinkPrefix = inject(VIEW_ID_LINK_PREFIX);
+  private _router = inject(Router);
+
+  private temporaryRouteChildren = new Map<string, Routes>();
+
+  private isNavigationInitializedInternal$ = new BehaviorSubject(false);
+  readonly isNavigationInitialized$ = this.isNavigationInitializedInternal$.asObservable();
 
   registeredViews: { [key: string]: CustomView } = {};
   registeredMenuEntries: MenuEntry[] = [];
   registeredMenuIds: string[] = [];
   registeredDashlets: { [key: string]: Dashlet[] | undefined } = {};
 
+  private static registeredRoutes: string[] = [];
+
+  isMigratedRoute(view: string): boolean {
+    return ViewRegistryService.registeredRoutes.includes(view);
+  }
+
   constructor() {
     this.registerStandardMenuEntries();
+  }
+
+  ngOnDestroy(): void {
+    this.isNavigationInitializedInternal$.complete();
+  }
+
+  initialNavigation(): void {
+    this._router.initialNavigation();
+    if (!this.isNavigationInitializedInternal$.value) {
+      this.isNavigationInitializedInternal$.next(true);
+    }
   }
 
   /**
@@ -55,11 +82,11 @@ export class ViewRegistryService {
     this.registerMenuEntry('Keywords', 'functions', 'keyword', { weight: 10, parentId: 'automation-root' });
     this.registerMenuEntry('Plans', 'plans', 'plan', { weight: 30, parentId: 'automation-root' });
     this.registerMenuEntry('Parameters', 'parameters', 'list', { weight: 40, parentId: 'automation-root' });
-    this.registerMenuEntry('Scheduler', 'scheduler', 'clock', { weight: 100, parentId: 'automation-root' });
+    this.registerMenuEntry('Schedules', 'scheduler', 'clock', { weight: 100, parentId: 'automation-root' });
 
     // Sub Menus Execute
     this.registerMenuEntry('Executions', 'executions', 'rocket', { weight: 10, parentId: 'execute-root' });
-    this.registerMenuEntry('Analytics', 'analytics', 'bar-chart-square-01', { weight: 20, parentId: 'execute-root' });
+    this.registerMenuEntry('Analytics', 'dashboards', 'bar-chart-square-01', { weight: 20, parentId: 'execute-root' });
     // Sub Menus Status
     this.registerMenuEntry('Current Operations', 'operations', 'airplay', { weight: 10, parentId: 'status-root' });
     this.registerMenuEntry('Agents', 'gridagents', 'agent', { weight: 20, parentId: 'status-root' });
@@ -98,22 +125,149 @@ export class ViewRegistryService {
     }
   }
 
+  /**
+   * @deprecated use getCustomView instead
+   * @param view
+   */
   getViewTemplate(view: string) {
     return this.getCustomView(view).template;
   }
 
+  /**
+   * @deprecated use getCustomView instead
+   * @param view
+   */
   isPublicView(view: string) {
     return this.getCustomView(view).isPublicView;
   }
 
+  /**
+   * @deprecated use getCustomView instead
+   * @param view
+   */
   isStaticView(view: string) {
     return this.getCustomView(view).isStaticView;
   }
 
+  /**
+   * @deprecated
+   * **/
   registerView(viewId: string, template: string, isPublicView?: boolean): void {
     this.registerViewWithConfig(viewId, template, { isPublicView: isPublicView });
   }
 
+  getChildrenRouteInfo(parentPath: string): SubRouteData[] {
+    const parentChildren = this.getRouteParentChildren(parentPath);
+    return parentChildren
+      .map((child) => {
+        const data = child.data?.[SUB_ROUTE_DATA];
+        if (!data) {
+          return undefined;
+        }
+        const path = child.path;
+        return { ...data, path } as SubRouteData;
+      })
+      .filter((data) => !!data)
+      .sort((a, b) => {
+        const weightA = a?.weight ?? 1;
+        const weightB = b?.weight ?? 1;
+        return weightA - weightB;
+      }) as SubRouteData[];
+  }
+
+  private getRootRoute(): Route {
+    return this._router.config[0]!.children!.find((route) => route.path === 'root')!;
+  }
+
+  private getRouteParentChildren(parentPath: string): Routes {
+    const root = this.getRootRoute();
+    let parentChildren = root.children!;
+
+    if (!parentPath) {
+      return parentChildren;
+    }
+
+    const parts = parentPath.split('/');
+
+    for (const parentPathPart of parts) {
+      const parent = parentChildren.find((route) => route.path === parentPathPart);
+
+      if (parent) {
+        parent.children = parent.children ?? [];
+        parentChildren = parent.children;
+        continue;
+      }
+
+      if (this.temporaryRouteChildren.has(parentPathPart)) {
+        parentChildren = this.temporaryRouteChildren.get(parentPathPart)!;
+      } else {
+        parentChildren = [];
+        this.temporaryRouteChildren.set(parentPathPart, parentChildren);
+      }
+    }
+
+    return parentChildren;
+  }
+
+  registerRoute(route: Route, { parentPath, label, weight, accessPermissions }: SubRouterConfig = {}): void {
+    const root = this.getRootRoute();
+    if (!root?.children) {
+      return;
+    }
+
+    if (route.path && this.temporaryRouteChildren.has(route.path)) {
+      route.children = route.children || [];
+      route.children.push(...this.temporaryRouteChildren.get(route.path)!);
+      this.temporaryRouteChildren.delete(route.path);
+    }
+
+    if (!parentPath) {
+      if (route.path) {
+        let path = route.path;
+        if (path.includes('/') && path.includes(':')) {
+          path = path.split('/')[0];
+        }
+        ViewRegistryService.registeredRoutes.push(path);
+      }
+
+      if (weight || label || accessPermissions) {
+        route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label, accessPermissions } };
+      }
+
+      if (accessPermissions) {
+        route.canActivate = route.canActivate ?? [];
+        route.canActivate.push(checkPermissionsGuard);
+      }
+      root.children.push(route);
+      return;
+    }
+
+    const parentChildren = this.getRouteParentChildren(parentPath);
+
+    let redirectRoute = parentChildren!.find((route) => route.path === '')!;
+    if (!redirectRoute) {
+      redirectRoute = { path: '', redirectTo: route.path };
+      parentChildren.push(redirectRoute);
+    }
+
+    if (weight || label || accessPermissions) {
+      route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label, accessPermissions } };
+    }
+
+    if (accessPermissions) {
+      route.canActivate = route.canActivate ?? [];
+      route.canActivate.push(checkPermissionsGuard);
+    }
+
+    parentChildren!.push(route);
+    const otherRoutes = parentChildren!.filter((route) => route.path !== '').sort(routesPrioritySortPredicate);
+
+    redirectRoute.redirectTo = otherRoutes[0].path;
+  }
+
+  /**
+   * @deprecated
+   * **/
   registerViewWithConfig(
     viewId: string,
     template: string,
@@ -203,5 +357,3 @@ export class ViewRegistryService {
     return dashlets;
   }
 }
-
-getAngularJSGlobal().module(AJS_MODULE).service('ViewRegistry', downgradeInjectable(ViewRegistryService));

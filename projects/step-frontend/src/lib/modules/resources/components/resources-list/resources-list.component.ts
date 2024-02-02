@@ -1,8 +1,6 @@
 import { AfterViewInit, Component, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  AJS_MODULE,
   AugmentedResourcesService,
   AutoDeselectStrategy,
   EditorResolverService,
@@ -14,7 +12,7 @@ import {
   STORE_ALL,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { Observable, of, pipe, switchMap, take, tap } from 'rxjs';
+import { map, Observable, of, pipe, switchMap, take, tap } from 'rxjs';
 import { ResourceConfigurationDialogData } from '../resource-configuration-dialog/resource-configuration-dialog-data.interface';
 import { ResourceConfigurationDialogComponent } from '../resource-configuration-dialog/resource-configuration-dialog.component';
 
@@ -26,7 +24,7 @@ const RESOURCE_ID = 'resourceId';
   styleUrls: ['./resources-list.component.scss'],
   providers: [
     tablePersistenceConfigProvider('resourceList', STORE_ALL),
-    selectionCollectionProvider<string, Resource>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...selectionCollectionProvider<string, Resource>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
 })
 export class ResourcesListComponent implements AfterViewInit {
@@ -83,7 +81,13 @@ export class ResourcesListComponent implements AfterViewInit {
   }
 
   protected deleteResource(id: string, label: string): void {
-    this._resourceDialogs.deleteResource(id, label).pipe(this.updateDataSourceAfterChange).subscribe();
+    this._resourceDialogs
+      .deleteResource(id, label)
+      .pipe(
+        map((mutatedResource) => true),
+        this.updateDataSourceAfterChange
+      )
+      .subscribe();
   }
 
   protected downloadResource(id: string): void {
@@ -128,7 +132,3 @@ export class ResourcesListComponent implements AfterViewInit {
       .subscribe();
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepResourcesList', downgradeComponent({ component: ResourcesListComponent }));

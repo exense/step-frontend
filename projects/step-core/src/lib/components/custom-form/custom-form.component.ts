@@ -1,7 +1,6 @@
 import { Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import { Input as StInput, ScreensService } from '../../client/generated';
-import { AJS_MODULE, setObjectFieldValue } from '../../shared';
+import { setObjectFieldValue } from '../../shared';
 
 @Component({
   selector: 'step-custom-forms',
@@ -25,8 +24,15 @@ export class CustomFormComponent implements OnInit {
   constructor(private _screensService: ScreensService) {}
 
   ngOnInit(): void {
+    this.updateInputs();
+  }
+
+  protected updateInputs() {
     this._screensService.getInputsForScreenPost(this.stScreen, this.stModel).subscribe((inputs) => {
-      this.inputs = inputs.filter((input) => !this.stExcludeFields.includes(input.id!));
+      const updatedInputs = inputs.filter((input) => !this.stExcludeFields.includes(input.id!));
+      if (JSON.stringify(this.inputs) !== JSON.stringify(updatedInputs)) {
+        this.inputs = updatedInputs;
+      }
     });
   }
 
@@ -35,13 +41,10 @@ export class CustomFormComponent implements OnInit {
     this.stModelChange.emit({
       ...this.stModel,
     });
+    this.updateInputs();
   }
 
   protected onCustomInputTouched(): void {
     this.customInputTouch.emit();
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepCustomForms', downgradeComponent({ component: CustomFormComponent }));

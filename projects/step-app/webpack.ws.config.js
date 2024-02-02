@@ -7,6 +7,7 @@ const sharedMappings = new mf.SharedMappings();
 sharedMappings.register(path.join(__dirname, '../../../tsconfig.workspace.json'), ['@exense/step-core']);
 
 const sharedLibraryConfig = require('./shared-libraries.config');
+const packageJsonPath = path.join(__dirname, '../..');
 
 module.exports = {
   output: {
@@ -32,9 +33,12 @@ module.exports = {
       remotes: {},
 
       // NOTE: all required descriptors, for shared libraries should be set manually
-      shared: share({
-        ...sharedLibraryConfig,
-      }),
+      shared: share(
+        {
+          ...sharedLibraryConfig,
+        },
+        packageJsonPath
+      ),
     }),
     sharedMappings.getPlugin(),
   ],

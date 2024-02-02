@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { EntitySearchValue } from '../entity-search-value';
 import { DateFormat, EntityDialogsService, ExecutiontTaskParameters } from '@exense/step-core';
 
@@ -14,7 +14,7 @@ export class FilterBarTaskItemComponent {
   private _entityDialogs = inject(EntityDialogsService);
 
   showPicker() {
-    this._entityDialogs.selectEntityOfType('tasks', true).subscribe((result) => {
+    this._entityDialogs.selectEntityOfType('tasks').subscribe((result) => {
       this.addSearchTask(result.item as ExecutiontTaskParameters);
     });
   }

@@ -1,9 +1,17 @@
 import { KeyValue } from '@angular/common';
-import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  forwardRef,
+  HostListener,
+  inject,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
-  AJS_LOCATION,
   AlertType,
   AuthService,
   DialogsService,
@@ -16,20 +24,29 @@ import {
   FunctionTypeRegistryService,
   Keyword,
   FunctionConfigurationApiService,
+  FunctionTypeParentFormService,
+  FunctionTypeComponent,
+  FunctionTypeFormComponent,
 } from '@exense/step-core';
-import { ILocationService } from 'angular';
 import { of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'step-function-configuration-dialog',
   templateUrl: './function-configuration-dialog.component.html',
   styleUrls: ['./function-configuration-dialog.component.scss'],
+  providers: [
+    {
+      provide: FunctionTypeParentFormService,
+      useExisting: forwardRef(() => FunctionConfigurationDialogComponent),
+    },
+  ],
 })
-export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
+export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, FunctionTypeParentFormService {
   private _functionConfigurationDialogData = inject<FunctionConfigurationDialogData>(MAT_DIALOG_DATA);
   private _api = inject(FunctionConfigurationApiService);
   private _matDialogRef = inject<MatDialogRef<FunctionConfigurationDialogComponent, Keyword>>(MatDialogRef);
-  private _ajsLocation = inject<ILocationService>(AJS_LOCATION);
+  private _router = inject(Router);
   private _dialogsService = inject(DialogsService);
   private _functionTypeRegistryService = inject(FunctionTypeRegistryService);
   private _formBuilder = inject(FormBuilder);
@@ -37,26 +54,25 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
   private _changeDetectorRef = inject(ChangeDetectorRef);
 
   private readonly terminator$ = new Subject<void>();
-  private readonly setValueToFormInternal$ = new Subject<void>();
-  private readonly setValueToModelInternal$ = new Subject<void>();
 
   protected readonly lightForm = this._functionConfigurationDialogData.dialogConfig.lightForm;
   protected readonly schemaEnforced = this._authService.getConf()?.miscParams?.['enforceschemas'] === 'true';
-  protected readonly setValueToForm$ = this.setValueToFormInternal$.asObservable();
-  protected readonly setValueToModel$ = this.setValueToModelInternal$.asObservable();
   protected readonly AlertType = AlertType;
   protected readonly schemaErrorsDictionary: Record<string, string> = {
     format: 'The schema must be in a JSON format',
     required: 'This field is required',
   };
 
-  protected keyword?: Keyword;
-  protected formGroup?: FunctionConfigurationDialogForm;
+  keyword?: Keyword;
+  formGroup?: FunctionConfigurationDialogForm;
 
   protected functionTypeItemInfos = this._functionTypeRegistryService.getItemInfos();
   protected modalTitle: string = !this._functionConfigurationDialogData.keyword ? 'New Keyword' : 'Edit Keyword';
   protected isLoading: boolean = false;
   protected tokenSelectionCriteria: KeyValue<string, string>[] = [];
+
+  @ViewChild('functionTypeComponent', { static: true })
+  private functionTypeChild!: FunctionTypeComponent;
 
   ngOnInit(): void {
     this.formGroup = functionConfigurationDialogFormCreate(
@@ -84,8 +100,6 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.terminator$.next();
     this.terminator$.complete();
-    this.setValueToFormInternal$.complete();
-    this.setValueToModelInternal$.complete();
   }
 
   protected get functionType(): string {
@@ -100,15 +114,14 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
     return this.formGroup!.controls.executeLocally.value;
   }
 
-  protected onFunctionTypeRenderComplete(): void {
-    this.setValueToFormInternal$.next();
-    this.formGroup!.updateValueAndValidity();
-  }
-
   protected save(edit?: boolean): void {
+    if (this.formGroup!.invalid) {
+      this.formGroup!.markAllAsTouched();
+      return;
+    }
     functionConfigurationDialogFormSetValueToModel(this.formGroup!, this.keyword!);
 
-    this.setValueToModelInternal$.next();
+    (this.functionTypeChild.componentInstance as FunctionTypeFormComponent<any>).setValueToModel();
 
     this._api
       .saveFunction(this.keyword!)
@@ -124,22 +137,26 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
         }),
         tap((path) => {
           if (path) {
-            this._ajsLocation.path(path);
+            this._router.navigateByUrl(path);
           } else {
-            this._dialogsService.showErrorMsg('No editor configured for this function type');
+            this._dialogsService.showErrorMsg('No editor configured for this function type').subscribe();
           }
         })
       )
       .subscribe();
   }
 
+  private determineDefaultType(): string {
+    const allowedTypes = this.functionTypeItemInfos.map((item) => item.type);
+    const defaultTypeCandidate =
+      this._functionConfigurationDialogData?.dialogConfig?.functionTypeFilters?.[0] ?? FunctionType.SCRIPT;
+    return allowedTypes.includes(defaultTypeCandidate) ? defaultTypeCandidate : allowedTypes[0];
+  }
+
   private initStepFunction(): void {
     if (!this._functionConfigurationDialogData.keyword) {
-      const { functionTypeFilters } = this._functionConfigurationDialogData.dialogConfig;
-      const [type] = functionTypeFilters.length ? functionTypeFilters : [FunctionType.SCRIPT];
-
       this.keyword = {
-        type,
+        type: this.determineDefaultType(),
       };
       this.fetchStepFunction(this.keyword.type);
     } else {
@@ -147,6 +164,11 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy {
 
       functionConfigurationDialogFormSetValueToForm(this.formGroup!, this.keyword, this._formBuilder);
     }
+  }
+
+  @HostListener('keydown.enter')
+  private saveByEnter(): void {
+    this.save(false);
   }
 
   protected fetchStepFunction(stepFunctionType: string): void {

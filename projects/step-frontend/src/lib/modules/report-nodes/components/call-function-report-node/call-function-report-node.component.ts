@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { DateFormat, Execution, ExecutionSummaryDto, Measure, ReportNode } from '@exense/step-core';
+import { DateFormat, Execution, Measure, ReportNode } from '@exense/step-core';
 import { ReportNodeType } from '../../shared/report-node-type.enum';
 import { ExecutionStateService } from '../../../execution/services/execution-state.service';
 
@@ -36,7 +36,7 @@ export class CallFunctionReportNodeComponent implements OnChanges {
     const start = this.execution.startTime;
     const executionInProgress = !this.execution.endTime;
     const params: any = {
-      eId: this.execution.id,
+      executionId: this.execution.id,
       name: measure.name,
       start: start,
       refresh: executionInProgress ? '1' : '0',

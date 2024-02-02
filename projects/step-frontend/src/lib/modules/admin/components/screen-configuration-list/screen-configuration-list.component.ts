@@ -1,17 +1,15 @@
 import { AfterViewInit, Component, inject } from '@angular/core';
-import { downgradeComponent, getAngularJSGlobal } from '@angular/upgrade/static';
 import {
-  AJS_MODULE,
   ScreensService,
   TableFetchLocalDataSource,
   ScreenInput,
   MultipleProjectsService,
   EditorResolverService,
-  AJS_LOCATION,
 } from '@exense/step-core';
 import { ScreenDialogsService } from '../../services/screen-dialogs.service';
 import { RenderOptionsPipe } from '../../pipes/render-options.pipe';
 import { pipe, take, tap } from 'rxjs';
+import { Router } from '@angular/router';
 
 const SCREEN_ID = 'screenId';
 
@@ -26,7 +24,7 @@ export class ScreenConfigurationListComponent implements AfterViewInit {
   private _renderOptions = inject(RenderOptionsPipe);
   private _multipleProjectList = inject(MultipleProjectsService);
   private _editorResolver = inject(EditorResolverService);
-  private _$location = inject(AJS_LOCATION);
+  private _router = inject(Router);
 
   private updateDataSourceAfterChange = pipe(
     tap((result?: boolean) => {
@@ -81,7 +79,8 @@ export class ScreenConfigurationListComponent implements AfterViewInit {
       return;
     }
 
-    const screenLink = this._$location.path();
+    const url = this._router.url;
+    const screenLink = url.includes('?') ? url.slice(0, url.indexOf('?')) : url;
     const screenEditParams = { [SCREEN_ID]: screen.id! };
     this._multipleProjectList
       .confirmEntityEditInASeparateProject(screen, { url: screenLink, search: screenEditParams }, 'screen input')
@@ -97,14 +96,10 @@ export class ScreenConfigurationListComponent implements AfterViewInit {
   }
 
   removeScreen(dbId: string, label: string): void {
-    this._screenDialogs.removeScreen(dbId, label).pipe(this.updateDataSourceAfterChange).subscribe();
+    this._screenDialogs.removeScreen(dbId, label).pipe(this.updateDataSource).subscribe();
   }
 
   private editScreenInternal(inputId: string): void {
     this._screenDialogs.editScreen({ inputId }).pipe(this.updateDataSourceAfterChange).subscribe();
   }
 }
-
-getAngularJSGlobal()
-  .module(AJS_MODULE)
-  .directive('stepScreenConfigurationList', downgradeComponent({ component: ScreenConfigurationListComponent }));
