@@ -20,7 +20,6 @@ export class ExportDialogsService {
           filename,
           id,
         },
-        disableClose: true,
       })
       .afterClosed()
       .pipe(map((result) => !!result?.isSuccess));

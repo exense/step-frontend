@@ -20,7 +20,6 @@ export class ImportDialogsService {
           overwrite: false,
           importAll: false,
         },
-        disableClose: true,
       })
       .afterClosed()
       .pipe(map((result) => !!result?.isSuccess));

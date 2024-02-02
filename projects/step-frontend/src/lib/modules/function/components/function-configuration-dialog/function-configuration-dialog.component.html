@@ -78,9 +78,7 @@
 
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
-    <button type="button" [disabled]="formGroup!.invalid" (click)="save()" mat-flat-button color="primary">Save</button>
-    <button type="button" [disabled]="formGroup!.invalid" (click)="save(true)" mat-flat-button color="primary">
-      Save and edit
-    </button>
+    <button type="button" (click)="save(true)" mat-stroked-button>Save and edit</button>
+    <button type="button" (click)="save()" mat-flat-button color="primary">Save</button>
   </div>
 </step-modal-window>

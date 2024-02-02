@@ -51,6 +51,9 @@ export class ParameterEditDialogComponent implements OnInit {
 
   @HostListener('keydown.enter')
   save(): void {
+    if (this.parameter?.scope === 'GLOBAL' && !this._authService.hasRight('param-global-write')) {
+      return;
+    }
     this._api.saveParameter(this.parameter).subscribe((parameter) => {
       this._matDialogRef.close({ isSuccess: !!parameter });
     });

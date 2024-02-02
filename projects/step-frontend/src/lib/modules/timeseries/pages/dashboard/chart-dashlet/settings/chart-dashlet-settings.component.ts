@@ -26,12 +26,10 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.item = JSON.parse(JSON.stringify(this._inputData.item));
-    this.filterItems = this.item.chartSettings!.filters.map((item) => ({
-      type: item.type as FilterBarItemType,
-      attributeName: item.attribute,
-      searchEntities: [],
-      freeTextValues: item.textValues,
-    }));
+    this.item.chartSettings!.attributes.forEach((attr) => (this._attributesByKey[attr.name] = attr));
+    this.filterItems = this.item.chartSettings!.filters.map((item) => {
+      return FilterUtils.convertApiFilterItem(item);
+    });
   }
 
   addFilterItem(attribute: MetricAttribute) {

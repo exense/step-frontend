@@ -1,9 +1,10 @@
-import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
   AugmentedResourcesService,
   DialogRouteResult,
+  ModalWindowComponent,
   MultipleProjectsService,
   Resource,
   ResourceInputComponent,
@@ -40,7 +41,10 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
 
   protected readonly formGroup = resourceConfigurationDialogFormCreate(this._formBuilder);
 
-  @ViewChild('resourceInputControl', { static: false })
+  @ViewChild(ModalWindowComponent, { static: true })
+  private modalWindow!: ModalWindowComponent;
+
+  @ViewChild('resourceInputControl')
   protected resourceInput?: ResourceInputComponent;
 
   protected loading = false;
@@ -87,7 +91,11 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
     this.uploading = true;
   }
 
+  @HostListener('window:keyup.esc')
   protected close(): void {
+    if (!!this.resourceInput?.progress$ || !this.modalWindow.isTopDialog()) {
+      return;
+    }
     if (!this.contentUpdated) {
       this._matDialogRef.close();
       return;

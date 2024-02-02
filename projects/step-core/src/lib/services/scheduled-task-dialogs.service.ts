@@ -35,7 +35,7 @@ export class ScheduledTaskDialogsService {
     return this._matDialog
       .open<EditSchedulerTaskDialogComponent, EditSchedulerTaskDialogData, DialogRouteResult | undefined>(
         EditSchedulerTaskDialogComponent,
-        { data: { taskAndConfig }, disableClose: true }
+        { data: { taskAndConfig } }
       )
       .afterClosed();
   }

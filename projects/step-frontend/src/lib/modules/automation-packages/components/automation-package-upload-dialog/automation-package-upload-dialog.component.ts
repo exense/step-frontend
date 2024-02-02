@@ -1,7 +1,8 @@
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, ViewChild } from '@angular/core';
 import { AugmentedAutomationPackagesService, AutomationPackage, DialogRouteResult } from '@exense/step-core';
 import { catchError, map, Observable, of } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { NgForm } from '@angular/forms';
 
 export interface AutomationPackageUploadDialogData {
   automationPackage?: AutomationPackage;
@@ -21,6 +22,7 @@ export class AutomationPackageUploadDialogComponent {
   private _package = inject<AutomationPackageUploadDialogData>(MAT_DIALOG_DATA)?.automationPackage;
 
   @ViewChild('fileInput') private fileInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('formContainer') private formContainer?: NgForm;
 
   readonly dialogTitle = !this._package
     ? 'Upload New Automation Package'
@@ -41,8 +43,14 @@ export class AutomationPackageUploadDialogComponent {
     this.file = file?.[0] ?? undefined;
   }
 
+  @HostListener('keydown.enter')
   upload(): void {
+    if (this.progress$) {
+      return;
+    }
+
     if (!this.file) {
+      this.formContainer?.form?.markAllAsTouched();
       return;
     }
 

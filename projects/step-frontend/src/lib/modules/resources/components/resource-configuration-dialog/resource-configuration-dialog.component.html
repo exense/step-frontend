@@ -1,4 +1,4 @@
-<step-modal-window [title]="title" [showSpinner]="initializingResource">
+<step-modal-window [title]="title" [showSpinner]="initializingResource" [disableCloseByEsc]="true">
   <div step-modal-window-body>
     <form [formGroup]="formGroup">
       <step-form-field *ngIf="_resourceConfigurationDialogData.resource">
@@ -36,8 +36,6 @@
   </div>
 
   <div step-modal-window-buttons>
-    <button type="button" [disabled]="!!resourceInput?.progress$" (click)="close()" mat-flat-button color="primary">
-      Close
-    </button>
+    <button type="button" [disabled]="!!resourceInput?.progress$" (click)="close()" mat-stroked-button>Close</button>
   </div>
 </step-modal-window>
