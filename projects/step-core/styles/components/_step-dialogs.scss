@@ -1,10 +1,9 @@
 @mixin dialogs {
-  .mat-dialog-container {
-    box-shadow: 0px 20px 24px -4px rgba(16, 24, 40, 0.08), 0px 8px 8px -4px rgba(16, 24, 40, 0.03);
-    border-radius: 12px;
-
-    .mat-dialog-content {
+  .mat-mdc-dialog-container {
+    .mat-mdc-dialog-surface {
       min-width: 572px;
+      box-shadow: 0px 20px 24px -4px rgba(16, 24, 40, 0.08), 0px 8px 8px -4px rgba(16, 24, 40, 0.03);
+      border-radius: 12px;
     }
 
     .without-children {
@@ -16,10 +15,8 @@
       font-weight: normal;
     }
 
-    .mat-dialog-actions {
-      margin-bottom: 0;
-      padding: 28px 0 0;
-      min-height: 0;
+    .mat-mdc-dialog-actions {
+      padding: 2.4rem;
 
       step-btn-group {
         flex: 1;
@@ -36,14 +33,14 @@
           }
         }
 
-        .mat-flat-button,
-        .mat-stroked-button {
+        .mat-mdc-unelevated-button,
+        .mat-mdc-outlined-button {
           flex: 1;
           border-radius: 8px;
           height: 36px;
         }
 
-        .mat-button-base + .mat-button-base {
+        .mat-mdc-button-base + .mat-mdc-button-base {
           margin-left: 0;
         }
       }

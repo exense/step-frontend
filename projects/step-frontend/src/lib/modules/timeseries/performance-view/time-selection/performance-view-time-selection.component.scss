@@ -1,49 +1,51 @@
-.main-container {
-  display: flex;
-  justify-content: space-between;
-  max-width: 100%;
-}
+step-execution-time-selection {
+  .main-container {
+    display: flex;
+    justify-content: space-between;
+    max-width: 100%;
+  }
 
-.ranger-skeleton {
-  width: 100%;
-  height: 60px;
-  margin-bottom: 40px;
-  background: #e5e4e4;
-  position: relative;
-  display: inline-block;
-  overflow: hidden;
+  .ranger-skeleton {
+    width: 100%;
+    height: 60px;
+    margin-bottom: 40px;
+    background: #e5e4e4;
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
 
-  @keyframes shimmer {
-    100% {
-      transform: translateX(100%);
+    @keyframes shimmer {
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    &:after {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      transform: translateX(-100%);
+      background-image: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0,
+        rgba(255, 255, 255, 0) 35%,
+        rgba(255, 255, 255, 0.7) 50%,
+        rgba(255, 255, 255, 0) 65%,
+        rgba(255, 255, 255, 0)
+      );
+      animation: shimmer 2s infinite;
+      content: '';
     }
   }
 
-  &:after {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    transform: translateX(-100%);
-    background-image: linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0) 0,
-      rgba(255, 255, 255, 0) 35%,
-      rgba(255, 255, 255, 0.7) 50%,
-      rgba(255, 255, 255, 0) 65%,
-      rgba(255, 255, 255, 0)
-    );
-    animation: shimmer 2s infinite;
-    content: '';
+  .ranger-container {
+    flex-grow: 1;
+    max-width: 100%;
   }
-}
 
-.ranger-container {
-  flex-grow: 1;
-  max-width: 100%;
-}
-
-.time-picker-container {
-  margin-right: 0.2rem;
+  .time-picker-container {
+    margin-right: 0.2rem;
+  }
 }

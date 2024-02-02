@@ -1,5 +1,4 @@
-import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { FindBucketsRequest } from '../../find-buckets-request';
+import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { TimeSeriesUtils } from '../../time-series-utils';
 import { TSRangerComponent } from '../../ranger/ts-ranger.component';
 import { TimeSeriesContext } from '../../time-series-context';
@@ -13,6 +12,7 @@ import { FindBucketsRequestBuilder } from '../../util/find-buckets-request-build
   selector: 'step-execution-time-selection',
   templateUrl: './performance-view-time-selection.component.html',
   styleUrls: ['./performance-view-time-selection.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;

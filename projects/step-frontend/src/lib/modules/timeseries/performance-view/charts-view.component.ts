@@ -1,7 +1,7 @@
 import { KeyValue } from '@angular/common';
 import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { BucketAttributes, Execution, TimeRange, TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
-import { forkJoin, Observable, of, skip, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
+import { forkJoin, Observable, of, skip, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { TSChartSeries, TSChartSettings } from '../chart/model/ts-chart-settings';
 import { TimeSeriesChartComponent } from '../chart/time-series-chart.component';
 import { KeywordSelection, TimeSeriesKeywordsContext } from '../pages/execution-page/time-series-keywords.context';

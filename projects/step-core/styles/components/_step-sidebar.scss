@@ -20,8 +20,7 @@ $default-color: dc.default-colors();
   $elements-padding: 12px,
   $elements-text-padding: 14px,
   $settings-divider-padding-right: 45px,
-  $aligned-text-margin-left: 60px,
-  $logo-path: 'images/logotopleft.png'
+  $aligned-text-margin-left: 60px
 ) {
   $config: (
     background-color: $background-color,
@@ -41,7 +40,6 @@ $default-color: dc.default-colors();
     elements-text-padding: $elements-text-padding,
     settings-divider-padding-right: $settings-divider-padding-right,
     aligned-text-margin-left: $aligned-text-margin-left,
-    logo-path: $logo-path,
   );
 
   @return $config;
@@ -163,22 +161,11 @@ $menu-sub-item-height: 3.2rem;
     }
 
     .sidebar-logo {
-      $logo-path: map.get($config, logo-path);
       width: 100%;
       height: 30px;
       margin-left: -12px;
       transform: scale(0.8);
-      /**
-      '^' sign is used to prevent file check during the build and pass url without '/'.
-      But this '^' feature probably will be removed in next versions of angular-cli.
-      Check the following links for details:
-      https://github.com/angular/angular-cli/issues/12797#issuecomment-598534241
-      https://github.com/angular/angular-cli/issues/18013#issuecomment-649373940
-
-      Due to a new issue that renders "^" as part of the file name we added a duplicated logo file with appended %5E,
-      this needs to be removed after fixing the underlying issue
-      **/
-      background: url('^#{$logo-path}') no-repeat no-repeat;
+      background: var(--step-logo-path) no-repeat no-repeat;
       background-size: contain;
     }
 

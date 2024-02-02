@@ -3,7 +3,6 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Tab } from '../../../tabs/tabs.module';
 import { CronValidation } from '../../types/cron/_cron-validation';
 import { AlertType } from '../../../basics/shared/alert-type.enum';
-import { ExpressionChangeEvent } from '../base-editor/base-editor.component';
 import { CronEditorTab } from '../../types/cron-editor-tab.enum';
 
 type DialogRef = MatDialogRef<CronEditorComponent, string>;
@@ -44,11 +43,8 @@ export class CronEditorComponent {
 
   protected isExpressionValid = false;
 
-  protected isTouched = false;
-
-  handleExpressionChange({ expression, isTouched }: ExpressionChangeEvent): void {
+  handleExpressionChange(expression: string): void {
     this.cronExpression = expression;
-    this.isTouched = isTouched;
     this.isExpressionValid = CronValidation.validate(this.cronExpression);
   }
 
