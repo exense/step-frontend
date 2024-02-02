@@ -15,6 +15,8 @@ export class ChartDashletSettingsComponent implements OnInit {
   private _inputData: ChartDashletSettingsData = inject<ChartDashletSettingsData>(MAT_DIALOG_DATA);
   private _dialogRef = inject(MatDialogRef);
 
+  _attributesByKey: Record<string, MetricAttribute> = {};
+
   @ViewChild('formContainer', { static: true })
   private formContainer!: NgForm;
 
