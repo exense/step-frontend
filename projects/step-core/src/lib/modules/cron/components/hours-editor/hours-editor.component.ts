@@ -11,7 +11,7 @@ import { RANGE_HOURS } from '../../injectables/ranges.tokens';
 export class HoursEditorComponent extends MinutesEditorComponent {
   readonly _HOURS = inject(RANGE_HOURS);
 
-  protected override minute = this._MINUTES[0].key;
+  protected override minute = 0;
 
   protected hour = this._HOURS[0].key;
 

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, inject, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, inject } from '@angular/core';
 import { AugmentedAutomationPackagesService, AutomationPackage } from '../../../../client/step-client-module';
 import {
   selectionCollectionProvider,

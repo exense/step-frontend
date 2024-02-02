@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { debounceTime, pairwise, Subject, takeUntil } from 'rxjs';
-import { FormGroup, NgForm } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 
 @Injectable()
 export class ArtefactFormChangeHelperService implements OnDestroy {

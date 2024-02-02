@@ -4,6 +4,7 @@ import {
   ContentChildren,
   EventEmitter,
   forwardRef,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -16,18 +17,7 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import {
-  BehaviorSubject,
-  combineLatest,
-  map,
-  Observable,
-  of,
-  startWith,
-  Subject,
-  takeUntil,
-  tap,
-  timestamp,
-} from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, of, startWith, Subject, takeUntil, timestamp } from 'rxjs';
 import { TableDataSource } from '../../shared/table-data-source';
 import { MatColumnDef, MatTable } from '@angular/material/table';
 import { MatSort, Sort } from '@angular/material/sort';
@@ -96,6 +86,8 @@ export class TableComponent<T>
     HasFilter,
     TableHighlightItemContainer
 {
+  private _tableState = inject(TablePersistenceStateService);
+
   @Output() onReload = new EventEmitter<unknown>();
   @Input() trackBy: TrackByFunction<T> = (index) => index;
   @Input() dataSource?: DataSource<T>;
@@ -184,11 +176,7 @@ export class TableComponent<T>
 
   highlightedItem?: unknown;
 
-  constructor(
-    @Optional() private _sort: MatSort,
-    _itemsPerPageService: ItemsPerPageService,
-    private _tableState: TablePersistenceStateService
-  ) {
+  constructor(@Optional() private _sort: MatSort, _itemsPerPageService: ItemsPerPageService) {
     this.pageSizeOptions = _itemsPerPageService.getItemsPerPage((userPreferredItemsPerPage: number) =>
       this.page._changePageSize(userPreferredItemsPerPage)
     );

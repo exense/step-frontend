@@ -37,8 +37,8 @@
       class="content-row"
       [class.row-highlight]="row === highlightedItem"
     ></tr>
-    <tr class="mat-row" *matNoDataRow>
-      <td class="mat-cell no-data" [colSpan]="displayColumns.length">
+    <tr class="mat-mdc-row" *matNoDataRow>
+      <td class="mat-mdc-cell no-data" [colSpan]="displayColumns.length">
         <ng-container *ngIf="(tableDataSource?.total$ | async) === 0; then noTotal; else noSearch"></ng-container>
         <ng-template #noTotal> No data available in table </ng-template>
         <ng-template #noSearch> No matching records found </ng-template>
