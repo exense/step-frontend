@@ -10,5 +10,5 @@ import { Component, Input } from '@angular/core';
 })
 export class EntityComponent extends BaseItemComponent<EntityItem> {
   protected override readonly registryType: CustomRegistryType = CustomRegistryType.ENTITY;
-  @Input('entity') override itemKey?: string;
+  @Input('entity') override itemKey?: string = undefined;
 }

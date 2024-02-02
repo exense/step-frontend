@@ -193,6 +193,28 @@ export class ExecutionsService {
   }
 
   /**
+   * Returns the list of report nodes with contributing errors for the given execution
+   * @param id
+   * @param skip
+   * @param limit
+   * @returns ReportNode default response
+   * @throws ApiError
+   */
+  public getReportNodeWithContributingErrors(id: string, skip?: number, limit?: number): Observable<Array<ReportNode>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/{id}/reportnodes-with-errors',
+      path: {
+        id: id,
+      },
+      query: {
+        skip: skip,
+        limit: limit,
+      },
+    });
+  }
+
+  /**
    * Returns the report nodes of the given execution and matching the given class.
    * @param id
    * @param _class

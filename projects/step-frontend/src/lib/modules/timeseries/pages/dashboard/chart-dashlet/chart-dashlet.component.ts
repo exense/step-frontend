@@ -3,15 +3,12 @@ import { Dashlet } from '../model/dashlet';
 import {
   BucketAttributes,
   BucketResponse,
-  ChartSettings,
   DashboardItem,
   Execution,
   ExecutiontTaskParameters,
   FetchBucketsRequest,
   MetricAttribute,
   Plan,
-  TimeRange,
-  TimeRangeSelection,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
@@ -21,10 +18,9 @@ import { TimeSeriesUtils } from '../../../time-series-utils';
 import { TimeSeriesConfig } from '../../../time-series.config';
 import { UPlotUtils } from '../../../uplot/uPlot.utils';
 import { TimeSeriesContext } from '../../../time-series-context';
-import { TimeseriesColorsPool } from '../../../util/timeseries-colors-pool';
 import { FilterBarItem, FilterBarItemType } from '../../../performance-view/filter-bar/model/filter-bar-item';
 import { TimeSeriesChartComponent } from '../../../chart/time-series-chart.component';
-import { Observable, of, tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from './settings/chart-dashlet-settings.component';
 import { TimeSeriesUtilityService } from '../../../time-series-utility.service';

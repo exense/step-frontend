@@ -19,6 +19,7 @@ export class WaitingArtefactsAdvancedComponent
   extends BaseArtefactComponent<WaitingArtefactsAdvancedArtefact>
   implements OnChanges
 {
+  // @ts-ignore
   @Input() override context!: ArtefactContext<WaitingArtefactsAdvancedArtefact>;
 
   @ViewChild('form')

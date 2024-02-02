@@ -1,26 +1,16 @@
 import { Component, inject, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import {
   AuthService,
-  BucketAttributes,
-  BucketResponse,
-  ChartSettings,
-  DashboardItem,
   DashboardsService,
   DashboardView,
-  DashletComponent,
-  FetchBucketsRequest,
   MetricAttribute,
   MetricType,
   TimeRange,
   TimeRangeSelection,
-  TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
-import { TSChartSeries, TSChartSettings } from '../../chart/model/ts-chart-settings';
 import { FilterUtils } from '../../util/filter-utils';
-import { TimeSeriesUtils } from '../../time-series-utils';
 import { TimeSeriesConfig } from '../../time-series.config';
-import { UPlotUtils } from '../../uplot/uPlot.utils';
 import { TimeseriesColorsPool } from '../../util/timeseries-colors-pool';
 import { TimeSeriesContext } from '../../time-series-context';
 import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
@@ -28,12 +18,10 @@ import { TimeRangePickerSelection } from '../../time-selection/time-range-picker
 
 //@ts-ignore
 import uPlot = require('uplot');
-import { FilterBarItem } from '../../performance-view/filter-bar/model/filter-bar-item';
-import { defaultIfEmpty, filter, forkJoin, merge, Observable, of, Subject, switchMap, takeUntil, throttle } from 'rxjs';
+import { defaultIfEmpty, forkJoin, merge, Observable, Subject, switchMap, takeUntil } from 'rxjs';
 import { ChartDashletComponent } from './chart-dashlet/chart-dashlet.component';
 import { Dashlet } from './model/dashlet';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { FilterBarComponent } from '../../performance-view/filter-bar/legacy/filter-bar.component';
 import { DashboardFilterBarComponent } from '../../performance-view/filter-bar/dashboard-filter-bar.component';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';

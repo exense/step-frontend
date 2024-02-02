@@ -1,6 +1,5 @@
 import { FilterBarItem, FilterBarItemType } from '../performance-view/filter-bar/model/filter-bar-item';
 import { MetricAttribute, TimeSeriesFilterItem } from '@exense/step-core';
-import { map } from 'rxjs';
 
 export class FilterUtils {
   static filterItemIsValid(item: FilterBarItem): boolean {

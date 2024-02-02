@@ -1,6 +1,5 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
-import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { TimeRangePickerSelection } from './time-range-picker-selection';
 import { ExecutionTimeSelection } from './model/execution-time-selection';
 import { TimeSeriesUtils } from '../time-series-utils';

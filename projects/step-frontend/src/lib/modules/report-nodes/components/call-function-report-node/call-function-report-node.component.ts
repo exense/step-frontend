@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { DateFormat, Execution, ExecutionSummaryDto, Measure, ReportNode } from '@exense/step-core';
+import { DateFormat, Execution, Measure, ReportNode } from '@exense/step-core';
 import { ReportNodeType } from '../../shared/report-node-type.enum';
 import { ExecutionStateService } from '../../../execution/services/execution-state.service';
 

@@ -1,4 +1,4 @@
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import { dynamicValueFactory, DynamicValueString } from '@exense/step-core';
 import { FunctionNodeJS } from './function-node-js.interface';
 

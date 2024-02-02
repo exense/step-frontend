@@ -70,23 +70,23 @@
 
       <mat-form-field class="w-100" appearance="fill">
         <mat-label>Search values</mat-label>
-        <mat-chip-list #chipList aria-label="Enter values">
-          <mat-chip *ngFor="let value of freeTextValues; let i = index" (removed)="freeTextValues.splice(i, 1)">
+        <mat-chip-grid #chipGrid aria-label="Enter values">
+          <mat-chip-row *ngFor="let value of freeTextValues; let i = index" (removed)="freeTextValues.splice(i, 1)">
             {{ value }}
             <button matChipRemove [attr.aria-label]="'remove'">
               <step-icon name="x"></step-icon>
             </button>
-          </mat-chip>
+          </mat-chip-row>
           <input
             stepFocusable
             matChipInput
             [(ngModel)]="chipInputValue"
             [ngModelOptions]="{ standalone: true }"
-            [matChipInputFor]="chipList"
+            [matChipInputFor]="chipGrid"
             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
             (matChipInputTokenEnd)="addSearchValue($event.value || '')"
           />
-        </mat-chip-list>
+        </mat-chip-grid>
         <mat-hint>Use "Enter" to add values</mat-hint>
       </mat-form-field>
 

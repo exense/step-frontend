@@ -7,7 +7,7 @@ import {
   FieldFilter,
   TableBulkOperationRequest,
 } from '../../generated';
-import { map, Observable, of } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import {
   StepDataSource,

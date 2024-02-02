@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { Observable, catchError, map, of, switchMap, take, tap } from 'rxjs';
 import { AugmentedKeywordsService, Keyword } from '../client/step-client-module';
 import { EditorResolverService, MultipleProjectsService } from '../modules/basics/step-basics.module';
-import { EntityDialogsService } from '../modules/entity/entity.module';
 import {
   FunctionActionsService,
   FunctionConfigurationApiService,

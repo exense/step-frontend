@@ -1,6 +1,7 @@
 import {
   Component,
   EventEmitter,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -26,6 +27,7 @@ const DEFAULT_FIELD_VALUE: DynamicValueString = { value: undefined, dynamic: fal
   styleUrls: ['./dynamic-field-group-editor.component.scss'],
 })
 export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
+  private _fb = inject(FormBuilder);
   private terminator$?: Subject<void>;
 
   private readonly formBuilder: NonNullableFormBuilder = this._fb.nonNullable;
@@ -49,8 +51,6 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
   protected form = this.formBuilder.group({});
   protected possibleFieldsToAdd: string[] = [];
   readonly trackByField: TrackByFunction<DynamicFieldMetaData> = (index, item) => item.trackId;
-
-  constructor(private _fb: FormBuilder) {}
 
   ngOnDestroy(): void {
     this.destroyForm();
