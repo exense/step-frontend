@@ -4,6 +4,7 @@
     <section>
       <step-btn-group class="with-borders">
         <button
+          *ngIf="'kw-write' | hasRight | async"
           type="button"
           mat-stroked-button
           (click)="save()"
