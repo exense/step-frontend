@@ -89,6 +89,7 @@ import { AutomationPackageCommonModule } from './modules/automation-package-comm
 import { LockColumnContainerComponent } from './components/lock-column-container/lock-column-container.component';
 import { LockColumnComponent } from './components/lock-column/lock-column.component';
 import { DatePickerModule } from './modules/date-picker/date-picker.module';
+import { EditorStateTextPipe } from './pipes/editor-state-text.pipe';
 
 @NgModule({
   declarations: [
@@ -154,6 +155,7 @@ import { DatePickerModule } from './modules/date-picker/date-picker.module';
     MessageDialogComponent,
     LockColumnContainerComponent,
     LockColumnComponent,
+    EditorStateTextPipe,
   ],
   imports: [
     CommonModule,
@@ -259,6 +261,7 @@ import { DatePickerModule } from './modules/date-picker/date-picker.module';
     MessageDialogComponent,
     LockColumnComponent,
     DatePickerModule,
+    EditorStateTextPipe,
   ],
   providers: [
     CORE_INITIALIZER,

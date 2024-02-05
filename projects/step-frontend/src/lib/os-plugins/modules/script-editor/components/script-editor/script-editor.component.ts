@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, inject, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, inject, OnDestroy, ViewChild } from '@angular/core';
 import {
   AceMode,
   AugmentedKeywordEditorService,
@@ -65,7 +65,12 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
       this.keyword = keyword;
       this.editor!.getSession().setMode(this.determineKeywordMode());
       this.editor!.setValue(keywordScript);
+      this.focusOnText();
     });
+  }
+
+  private focusOnText(): void {
+    this.editor!.focus();
   }
 
   private determineKeywordMode(): AceMode {

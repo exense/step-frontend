@@ -1,13 +1,17 @@
 :host {
   display: block;
   padding: 1.6rem;
-  width: 100%;
+  max-width: 100%;
 }
 
 mat-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  .color-green {
+    color: green;
+  }
 }
 
 .editor {
