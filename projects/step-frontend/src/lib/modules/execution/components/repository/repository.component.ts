@@ -1,8 +1,7 @@
-import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { ArtefactInfo, AuthService, ControllerService, RepositoryObjectReference } from '@exense/step-core';
-import { noop } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { RepositoryPlanTestcaseListComponent } from '../repository-plan-testcase-list/repository-plan-testcase-list.component';
+import { IncludeTestcases } from '../../shared/include-testcases.interface';
 
 @Component({
   selector: 'step-repository',
@@ -12,17 +11,13 @@ import { RepositoryPlanTestcaseListComponent } from '../repository-plan-testcase
     class: 'container',
   },
 })
-export class RepositoryComponent implements OnInit, OnDestroy {
+export class RepositoryComponent implements OnInit {
   private _auth = inject(AuthService);
   private _controllersApi = inject(ControllerService);
   private _activatedRoute = inject(ActivatedRoute);
+  private _cd = inject(ChangeDetectorRef);
 
-  private cancelRootScopeEvent: () => void = noop;
-
-  protected reload: boolean = true;
-
-  @ViewChild('planTestcaseListComponent')
-  readonly planTestCases?: RepositoryPlanTestcaseListComponent;
+  protected includedTestcases?: IncludeTestcases;
 
   protected loading: boolean = false;
   protected isolateExecution: boolean = false;
@@ -34,23 +29,13 @@ export class RepositoryComponent implements OnInit, OnDestroy {
   protected error?: Error;
 
   ngOnInit(): void {
-    this.setupReloadLogic();
     this.setupLocationParams();
     this.loadArtefact();
   }
 
-  ngOnDestroy(): void {
-    this.cancelRootScopeEvent();
-  }
-
-  private setupReloadLogic(): void {
-    // TODO CHECK
-    /*
-    this.cancelRootScopeEvent = this._$rootScope.$on('$locationChangeSuccess', () => {
-      this.reload = false;
-      setTimeout(() => (this.reload = true));
-    });
-*/
+  handleIncludedTestCasesChange(includedTestcases: IncludeTestcases): void {
+    this.includedTestcases = includedTestcases;
+    this._cd.detectChanges();
   }
 
   private setupLocationParams(): void {

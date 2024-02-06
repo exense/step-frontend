@@ -1,4 +1,16 @@
-import { Component, inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  EventEmitter,
+  inject,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import {
   BulkSelectionType,
   ControllerService,
@@ -9,9 +21,10 @@ import {
   TableFetchLocalDataSource,
   TestRunStatus,
 } from '@exense/step-core';
-import { BehaviorSubject, combineLatest, first, map, Observable, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, map, Observable, of, switchMap, take, tap } from 'rxjs';
 import { Status } from '../../../_common/step-common.module';
 import { IncludeTestcases } from '../../shared/include-testcases.interface';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === index;
 
@@ -22,15 +35,18 @@ const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === 
   providers: [
     ...selectionCollectionProvider<string, TestRunStatus>({
       selectionKeyProperty: 'id',
-      registrationStrategy: RegistrationStrategy.MANUAL,
+      registrationStrategy: RegistrationStrategy.AUTO,
     }),
   ],
 })
 export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, OnDestroy {
+  private _cd = inject(ChangeDetectorRef);
+  private _destroyRef = inject(DestroyRef);
   readonly _controllerService = inject(ControllerService);
   readonly _selectionCollector = inject<SelectionCollector<string, TestRunStatus>>(SelectionCollector);
 
   @Input() repoRef?: RepositoryObjectReference;
+  @Output() includedTestCasesChange = new EventEmitter<IncludeTestcases>();
 
   readonly selectionType$ = new BehaviorSubject<BulkSelectionType>(BulkSelectionType.NONE);
 
@@ -46,23 +62,27 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, O
     map((testRunStatusList) => testRunStatusList.map((testRunStatus) => testRunStatus.status as Status).filter(unique))
   );
 
-  readonly includedTestcases$: Observable<IncludeTestcases> = combineLatest([
-    this.selectionType$,
-    this._selectionCollector.selected$,
-  ]).pipe(
-    map(([selectionType, ids]) => {
-      const list = ids as string[];
-      let by: IncludeTestcases['by'] = this.repoRef?.repositoryID === 'local' ? 'id' : 'name';
-      by = selectionType === BulkSelectionType.ALL ? 'all' : by;
-      return { by, list };
-    })
-  );
-
   ngOnInit(): void {
-    this.searchableRepositoryReport.allData$.pipe(first()).subscribe((items) => {
-      this._selectionCollector.registerPossibleSelectionManually(items);
-      this.selectionType$.next(BulkSelectionType.ALL);
-    });
+    combineLatest([this.selectionType$, this._selectionCollector.selected$])
+      .pipe(
+        map(([selectionType, ids]) => {
+          const list = ids as string[];
+          let by: IncludeTestcases['by'] = this.repoRef?.repositoryID === 'local' ? 'id' : 'name';
+          by = selectionType === BulkSelectionType.ALL ? 'all' : by;
+          return { by, list } as IncludeTestcases;
+        }),
+        takeUntilDestroyed(this._destroyRef)
+      )
+      .subscribe((includedTestCases) => this.includedTestCasesChange.emit(includedTestCases));
+
+    this.searchableRepositoryReport.allData$
+      .pipe(
+        filter((items) => !!items.length),
+        take(1)
+      )
+      .subscribe((items) => {
+        this.selectionType$.next(BulkSelectionType.ALL);
+      });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -74,6 +94,11 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, O
 
   ngOnDestroy(): void {
     this.selectionType$.complete();
+  }
+
+  handleSelectionTypeChange(selectionType: BulkSelectionType): void {
+    this.selectionType$.next(selectionType);
+    this._cd.detectChanges();
   }
 
   private getTestRuns(repoRef?: RepositoryObjectReference): Observable<TestRunStatus[]> {
