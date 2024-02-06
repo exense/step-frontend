@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, inject, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, OnDestroy, ViewChild } from '@angular/core';
 import {
   AceMode,
   AugmentedKeywordEditorService,
@@ -16,13 +16,14 @@ import 'ace-builds/src-min-noconflict/mode-javascript.js';
 import 'ace-builds/src-min-noconflict/mode-groovy.js';
 import 'ace-builds/src-min-noconflict/mode-java.js';
 import 'ace-builds/src-min-noconflict/ext-searchbox';
+import { DeactivateComponentDataInterface } from '../../types/deactivate-component-data.interface';
 
 @Component({
   selector: 'step-script-editor',
   templateUrl: './script-editor.component.html',
   styleUrls: ['./script-editor.component.scss'],
 })
-export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
+export class ScriptEditorComponent implements AfterViewInit, OnDestroy, DeactivateComponentDataInterface {
   private _keywordApi = inject(KeywordsService);
   private _keywordEditorApi = inject(AugmentedKeywordEditorService);
   private _keywordExecutor = inject(KeywordExecutorService);
@@ -54,6 +55,14 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
 
   execute(): void {
     this.saveInternal().subscribe(() => this._keywordExecutor.executeKeyword(this._functionId));
+  }
+
+  canExit(): boolean {
+    if (this.noChanges) {
+      return true;
+    } else {
+      return confirm('You have unsaved changes. Do you want to navigate anyway?');
+    }
   }
 
   private setupEditor(): void {
