@@ -26,6 +26,7 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
   private _keywordApi = inject(KeywordsService);
   private _keywordEditorApi = inject(AugmentedKeywordEditorService);
   private _keywordExecutor = inject(KeywordExecutorService);
+  private initialScript?: String;
 
   @ViewChild('editor', { static: false })
   private editorElement!: ElementRef<HTMLDivElement>;
@@ -34,6 +35,9 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
   protected _functionId = inject(ActivatedRoute).snapshot.params['id']! as string;
 
   protected keyword?: Keyword;
+
+  noChanges = true;
+  isAfterSave = false;
 
   ngAfterViewInit(): void {
     this.setupEditor();
@@ -63,14 +67,33 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
       this._keywordEditorApi.getFunctionScript(this._functionId),
     ]).subscribe(([keyword, keywordScript]) => {
       this.keyword = keyword;
+      this.initialScript = keywordScript;
       this.editor!.getSession().setMode(this.determineKeywordMode());
       this.editor!.setValue(keywordScript);
       this.focusOnText();
+      this.trackChanges();
+    });
+  }
+
+  private trackChanges(): void {
+    this.editor!.on('change', (value) => {
+      this.isAfterSave = false;
+      if (this.editor!.getValue() === this.initialScript) {
+        this.noChanges = true;
+      } else {
+        this.noChanges = false;
+      }
     });
   }
 
   private focusOnText(): void {
     this.editor!.focus();
+  }
+
+  private refreshInitVars(val?: string): void {
+    this.isAfterSave = true;
+    this.noChanges = true;
+    this.initialScript = val;
   }
 
   private determineKeywordMode(): AceMode {
@@ -79,6 +102,8 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
   }
 
   private saveInternal(): Observable<void> {
-    return this._keywordEditorApi.saveFunctionScript(this._functionId, this.editor!.getValue());
+    const editorValue = this.editor!.getValue();
+    this.refreshInitVars(editorValue);
+    return this._keywordEditorApi.saveFunctionScript(this._functionId, editorValue);
   }
 }
