@@ -2,7 +2,7 @@
   <step-bulk-operations
     *stepAdditionalHeader
     [selectionType]="(selectionType$ | async)!"
-    (selectionTypeChange)="selectionType$.next($event)"
+    (selectionTypeChange)="handleSelectionTypeChange($event)"
   ></step-bulk-operations>
 
   <ng-container matColumnDef="bulkSelection">
