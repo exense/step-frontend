@@ -30,7 +30,7 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy, Deactiva
   private _keywordExecutor = inject(KeywordExecutorService);
   private _dialogsService = inject(DialogsService);
   private initialScript?: String;
-  private subscriptions: Array<Observable<any>> = [];
+  private trackChangesFn = () => this.trackChanges();
 
   @ViewChild('editor', { static: false })
   private editorElement!: ElementRef<HTMLDivElement>;
@@ -49,6 +49,7 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy, Deactiva
   }
 
   ngOnDestroy(): void {
+    this.editor!.off('change', this.trackChangesFn);
     this.editor!.destroy();
   }
 
@@ -83,19 +84,17 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy, Deactiva
       this.editor!.getSession().setMode(this.determineKeywordMode());
       this.editor!.setValue(keywordScript);
       this.focusOnText();
-      this.trackChanges();
+      this.editor!.on('change', this.trackChangesFn);
     });
   }
 
   private trackChanges(): void {
-    this.editor!.on('change', (value) => {
-      this.isAfterSave = false;
-      if (this.editor!.getValue() === this.initialScript) {
-        this.noChanges = true;
-      } else {
-        this.noChanges = false;
-      }
-    });
+    this.isAfterSave = false;
+    if (this.editor!.getValue() === this.initialScript) {
+      this.noChanges = true;
+    } else {
+      this.noChanges = false;
+    }
   }
 
   private focusOnText(): void {
