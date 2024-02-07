@@ -1,11 +1,10 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { AsyncOperationDialogComponent } from './components/async-operation-dialog/async-operation-dialog.component';
-import { StepMaterialModule } from '../step-material/step-material.module';
+import { StepBasicsModule } from '../basics/step-basics.module';
 
 @NgModule({
   declarations: [AsyncOperationDialogComponent],
-  imports: [StepMaterialModule, CommonModule],
+  imports: [StepBasicsModule],
   exports: [AsyncOperationDialogComponent],
 })
 export class AsyncOperationsModule {}

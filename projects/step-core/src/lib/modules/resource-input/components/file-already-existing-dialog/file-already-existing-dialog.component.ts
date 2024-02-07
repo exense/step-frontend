@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, HostListener } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Resource } from '../../../../client/step-client-module';
 import { TableLocalDataSource } from '../../../../modules/table/table.module';
@@ -12,7 +12,7 @@ export interface FileAlreadyExistingDialogData {
   templateUrl: './file-already-existing-dialog.component.html',
   styleUrls: ['./file-already-existing-dialog.component.scss'],
 })
-export class FileAlreadyExistingDialogComponent implements OnInit {
+export class FileAlreadyExistingDialogComponent {
   protected _matDialogRef = inject<MatDialogRef<FileAlreadyExistingDialogComponent, string | undefined>>(MatDialogRef);
 
   private _matDialogData = inject<FileAlreadyExistingDialogData>(MAT_DIALOG_DATA);
@@ -25,15 +25,11 @@ export class FileAlreadyExistingDialogComponent implements OnInit {
       .build()
   );
 
-  ngOnInit(): void {
-    // Disable automatic closing, switch to manual
-    this._matDialogRef.disableClose = true;
-  }
-
   protected selectResource(resourceId: string): void {
     this._matDialogRef.close(resourceId);
   }
 
+  @HostListener('keydown.enter')
   protected createNewResource(): void {
     this._matDialogRef.close();
   }

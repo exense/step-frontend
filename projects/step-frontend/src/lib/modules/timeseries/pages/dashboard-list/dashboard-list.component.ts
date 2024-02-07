@@ -9,6 +9,10 @@ import {
 import { catchError, filter, map, of, switchMap } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
+import {
+  NewDashboardDialogComponent,
+  NewDashboardDialogResult,
+} from '../new-dashboard-dialog/new-dashboard-dialog.component';
 
 @Component({
   selector: 'step-dashboard-list',
@@ -28,32 +32,18 @@ export class DashboardListComponent {
     actions: '',
   });
 
-  createDashboardModel: DashboardView = this.createEmptyDashboardObject();
-
-  openDialog(template: any) {
-    this._matDialog.open(template);
-  }
-
-  saveNewDashboard(edit = false) {
-    this._dashboardsService.saveDashboard(this.createDashboardModel).subscribe((dashboard) => {
-      if (edit) {
-        this.navigateToDashboard(dashboard, true);
-      } else {
-        this.dataSource.reload();
-      }
-      this._matDialog.closeAll();
-      this.createDashboardModel = this.createEmptyDashboardObject();
-    });
-  }
-
-  private createEmptyDashboardObject(): DashboardView {
-    return {
-      name: '',
-      timeRange: { type: 'RELATIVE', relativeSelection: { timeInMs: 3600_000 } },
-      grouping: [],
-      filters: [],
-      dashlets: [],
-    };
+  createNewDashboard(): void {
+    this._matDialog
+      .open<NewDashboardDialogComponent, unknown, NewDashboardDialogResult>(NewDashboardDialogComponent)
+      .afterClosed()
+      .pipe(filter((result) => !!result))
+      .subscribe((result) => {
+        if (result!.isEditAfterSave) {
+          this.navigateToDashboard(result!.dashboard);
+        } else {
+          this.dataSource.reload();
+        }
+      });
   }
 
   delete(dashboard: DashboardView) {

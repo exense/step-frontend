@@ -1,19 +1,19 @@
 <mat-card>
   <mat-card-header>
-    <mat-card-title> Repository plan </mat-card-title>
+    <mat-card-title> Repository plan</mat-card-title>
   </mat-card-header>
-  <mat-card-content *ngIf="reload">
-    <ng-container *ngIf="error">
+  <mat-card-content>
+    @if (error) {
       <step-alert type="danger" role="alert">
-        <step-icon name="alert-circle" aria-hidden="true"></step-icon>
+        <step-icon name="alert-circle" aria-hidden="true" />
         <span class="sr-only">Error:</span>
         {{ error }}
       </step-alert>
-    </ng-container>
-    <ng-container *ngIf="loading">
-      <step-icon name="refresh-cw" class="icon-refresh-animate"></step-icon>
-    </ng-container>
-    <ng-container *ngIf="artefact && repoRef">
+    }
+    @if (loading) {
+      <step-icon name="refresh-cw" class="icon-refresh-animate" />
+    }
+    @if (artefact && repoRef) {
       <div class="artefact-info">
         <section>
           <h4>{{ artefact.name }}</h4>
@@ -34,16 +34,17 @@
               [description]="artefact.name"
               [repositoryObjectRef]="repoRef"
               [isolateExecution]="isolateExecution"
-              [includedTestcases]="planTestCases?.includedTestcases$ | async"
-            >
-            </step-execution-commands>
+              [includedTestcases]="includedTestcases"
+            />
           </mat-card-content>
         </mat-card>
       </div>
-      <ng-container *ngIf="artefact.type === 'TestSet'">
-        <step-repository-plan-testcase-list [repoRef]="repoRef" #planTestcaseListComponent>
-        </step-repository-plan-testcase-list>
-      </ng-container>
-    </ng-container>
+      @if (artefact.type === 'TestSet') {
+        <step-repository-plan-testcase-list
+          [repoRef]="repoRef"
+          (includedTestCasesChange)="handleIncludedTestCasesChange($event)"
+        />
+      }
+    }
   </mat-card-content>
 </mat-card>
