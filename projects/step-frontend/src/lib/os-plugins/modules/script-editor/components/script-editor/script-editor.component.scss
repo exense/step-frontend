@@ -3,7 +3,6 @@
 :host {
   display: block;
   max-width: 100%;
-  height: 100%;
 }
 mat-card {
   height: 100%;
@@ -14,19 +13,19 @@ mat-card {
     justify-content: space-between;
     align-items: center;
 
-    .mr2 {
+    .left-btn-group {
       margin-right: 2rem;
     }
 
-    .color-green {
+    .status-saved {
       color: var.$green-650;
     }
 
-    .color-black {
+    .status-no-changes {
       color: #000;
     }
 
-    .color-orange {
+    .status-has-changes {
       color: var.$orange;
     }
   }

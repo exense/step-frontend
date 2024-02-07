@@ -2,7 +2,7 @@
   <mat-card-header>
     <mat-card-title> Script Editor - Keyword: {{keyword?.attributes?.['name']}}</mat-card-title>
     <section>
-      <step-btn-group *ngIf="'kw-write' | hasRight | async" class="with-borders mr2">
+      <step-btn-group *ngIf="'kw-write' | hasRight | async" class="with-borders left-btn-group">
         <button
           type="button"
           mat-stroked-button
@@ -13,11 +13,9 @@
           <step-icon name="save"></step-icon>
         </button>
         <button
-          [ngClass]="{
-            'color-green': noChanges && isAfterSave,
-            'color-black': noChanges && !isAfterSave,
-            'color-orange': !noChanges
-          }"
+          [class.status-no-changes]="noChanges && !isAfterSave"
+          [class.status-has-changes]="!noChanges"
+          [class.status-saved]="noChanges && isAfterSave"
           disabled
           type="button"
           mat-stroked-button
