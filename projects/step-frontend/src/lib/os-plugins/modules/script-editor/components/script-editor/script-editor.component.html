@@ -1,7 +1,7 @@
 <mat-card appearance="outlined">
   <mat-card-header>
-    <mat-card-title> Script Editor - Keyword: {{keyword?.attributes?.['name']}}</mat-card-title>
-    <section>
+    <mat-card-title> Script Editor - Keyword: {{ keyword?.attributes?.['name'] }}</mat-card-title>
+    <section class="editor-buttons">
       <step-btn-group *ngIf="'kw-write' | hasRight | async" class="with-borders left-btn-group">
         <button
           type="button"
