@@ -14,7 +14,10 @@ export interface PluginCtx {
 const loadModule = async (entryPoint: string): Promise<PluginCtx | undefined> => {
   let result: PluginCtx | undefined = undefined;
   try {
-    let href = window.document.baseURI;
+    let href = window.location.href;
+    if (href.includes('#')) {
+      href = href.substring(0, href.indexOf('#'));
+    }
     if (!href.endsWith('/')) {
       href += '/';
     }

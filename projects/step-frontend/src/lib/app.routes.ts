@@ -13,7 +13,7 @@ export const APP_ROUTES: Routes = [
       () =>
         inject(AuthService).initialize$.pipe(
           take(1),
-          map(() => true)
+          map(() => true),
         ),
     ],
     children: [
@@ -69,7 +69,10 @@ export const LEGACY_URL_HANDLER: FactoryProvider = {
     return () => {
       let path = _location.path(true);
       if (path.includes('/root')) {
-        path = path.replace('/root', '/');
+        path = path.replace('/root', '');
+        if (!path.startsWith('/')) {
+          path = `/${path}`;
+        }
         _location.go(path);
       }
       return true;
