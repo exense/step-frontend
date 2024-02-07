@@ -5,7 +5,7 @@ declare class uPlot {
   constructor(
     opts: uPlot.Options,
     data?: uPlot.AlignedData,
-    targ?: HTMLElement | ((self: uPlot, init: Function) => void)
+    targ?: HTMLElement | ((self: uPlot, init: Function) => void),
   );
 
   /** chart container */
@@ -14,7 +14,8 @@ declare class uPlot {
   /** status */
   readonly status: 0 | 1;
 
-  /** width of the plotting area + axes in CSS pixels */ readonly width: number;
+  /** width of the plotting area + axes in CSS pixels */
+  readonly width: number;
 
   /** height of the plotting area + axes in CSS pixels (excludes title & legend height) */
   readonly height: number;
@@ -178,7 +179,7 @@ declare namespace uPlot {
     lineTo: LineToH | LineToV,
     rect: RectH | RectV,
     arc: ArcH | ArcV,
-    bezierCurveTo: BezierCurveToH | BezierCurveToV
+    bezierCurveTo: BezierCurveToH | BezierCurveToV,
   ) => any;
 
   type ValToPos = (val: number, scale: Scale, fullDim: number, offset: number) => number;
@@ -200,7 +201,7 @@ declare namespace uPlot {
     bp2x: number,
     bp2y: number,
     p2x: number,
-    p2y: number
+    p2y: number,
   ) => void;
   type BezierCurveToV = (
     p: Drawable,
@@ -209,7 +210,7 @@ declare namespace uPlot {
     bp2y: number,
     bp2x: number,
     p2y: number,
-    p2x: number
+    p2x: number,
   ) => void;
 
   export const enum JoinNullMode {
@@ -505,7 +506,7 @@ declare namespace uPlot {
         y: number,
         w: number,
         h: number,
-        i: number
+        i: number,
       ) => boolean;
 
       export interface Filters {
@@ -734,7 +735,7 @@ declare namespace uPlot {
         left: number,
         top: number,
         width: number,
-        height: number
+        height: number,
       ) => void;
     }
 
@@ -791,7 +792,7 @@ declare namespace uPlot {
         seriesIdx: number,
         idx0: number,
         idx1: number,
-        filtIdxs?: number[] | null
+        filtIdxs?: number[] | null,
       ) => Paths | null;
     }
 
@@ -850,7 +851,7 @@ declare namespace uPlot {
       left: number,
       top: number,
       width: number,
-      height: number
+      height: number,
     ) => Path2D | null;
 
     export type PathBuilder = (self: uPlot, seriesIdx: number, idx0: number, idx1: number) => Paths | null;
@@ -949,7 +950,7 @@ declare namespace uPlot {
       | ((
           self: uPlot,
           bandIdx: number,
-          highSeriesFill: CanvasRenderingContext2D['fillStyle']
+          highSeriesFill: CanvasRenderingContext2D['fillStyle'],
         ) => CanvasRenderingContext2D['fillStyle']);
 
     export type Bounds = [fromSeriesIdx: number, toSeriesIdx: number];
@@ -976,7 +977,7 @@ declare namespace uPlot {
       splits: number[],
       axisIdx: number,
       foundSpace: number,
-      foundIncr: number
+      foundIncr: number,
     ) => (number | null)[];
 
     export type Size = number | ((self: uPlot, values: string[], axisIdx: number, cycleNum: number) => number);
@@ -993,7 +994,7 @@ declare namespace uPlot {
           scaleMin: number,
           scaleMax: number,
           fullDim: number,
-          minSpace: number
+          minSpace: number,
         ) => number[]);
 
     export type Splits =
@@ -1004,7 +1005,7 @@ declare namespace uPlot {
           scaleMin: number,
           scaleMax: number,
           foundIncr: number,
-          foundSpace: number
+          foundSpace: number,
         ) => number[]);
 
     export type StaticValues = (string | number | null)[];
@@ -1014,7 +1015,7 @@ declare namespace uPlot {
       splits: number[],
       axisIdx: number,
       foundSpace: number,
-      foundIncr: number
+      foundIncr: number,
     ) => StaticValues;
 
     export type TimeValuesConfig = (string | number | null)[][];
