@@ -3,6 +3,7 @@ import {
   AceMode,
   AugmentedKeywordEditorService,
   convertScriptLanguageToAce,
+  DialogsService,
   Keyword,
   KeywordExecutorService,
   KeywordsService,
@@ -27,7 +28,9 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy, Deactiva
   private _keywordApi = inject(KeywordsService);
   private _keywordEditorApi = inject(AugmentedKeywordEditorService);
   private _keywordExecutor = inject(KeywordExecutorService);
+  private _dialogsService = inject(DialogsService);
   private initialScript?: String;
+  private subscriptions: Array<Observable<any>> = [];
 
   @ViewChild('editor', { static: false })
   private editorElement!: ElementRef<HTMLDivElement>;
@@ -57,11 +60,11 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy, Deactiva
     this.saveInternal().subscribe(() => this._keywordExecutor.executeKeyword(this._functionId));
   }
 
-  canExit(): boolean {
+  canExit(): boolean | Observable<boolean> {
     if (this.noChanges) {
       return true;
     } else {
-      return confirm('You have unsaved changes. Do you want to navigate anyway?');
+      return this._dialogsService.showWarning('You have unsaved changes. Do you want to navigate anyway?');
     }
   }
 

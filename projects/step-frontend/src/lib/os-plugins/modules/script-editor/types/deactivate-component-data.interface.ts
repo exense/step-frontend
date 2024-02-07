@@ -1,3 +1,5 @@
+import { Observable } from 'rxjs';
+
 export interface DeactivateComponentDataInterface {
-  canExit(): boolean;
+  canExit(): boolean | Observable<boolean>;
 }

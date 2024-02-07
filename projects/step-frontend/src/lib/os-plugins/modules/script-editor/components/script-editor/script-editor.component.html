@@ -1,4 +1,4 @@
-<mat-card>
+<mat-card appearance="outlined">
   <mat-card-header>
     <mat-card-title> Script Editor - Keyword: {{keyword?.attributes?.['name']}}</mat-card-title>
     <section>
@@ -13,7 +13,11 @@
           <step-icon name="save"></step-icon>
         </button>
         <button
-          [ngClass]="{ 'color-green': noChanges && isAfterSave, 'color-black': !noChanges }"
+          [ngClass]="{
+            'color-green': noChanges && isAfterSave,
+            'color-black': noChanges && !isAfterSave,
+            'color-orange': !noChanges
+          }"
           disabled
           type="button"
           mat-stroked-button

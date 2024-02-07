@@ -1,27 +1,37 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 :host {
   display: block;
-  padding: 1.6rem;
   max-width: 100%;
+  height: 100%;
 }
+mat-card {
+  height: 100%;
+  border: none;
 
-mat-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  mat-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
-  .color-green {
-    color: green;
-  }
+    .mr2 {
+      margin-right: 2rem;
+    }
 
-  .color-black {
-    color: black;
+    .color-green {
+      color: var.$green-650;
+    }
+
+    .color-black {
+      color: #000;
+    }
+
+    .color-orange {
+      color: var.$orange;
+    }
   }
 }
 
 .editor {
   min-height: 60rem;
-}
-
-.mr2 {
-  margin-right: 2rem;
 }
