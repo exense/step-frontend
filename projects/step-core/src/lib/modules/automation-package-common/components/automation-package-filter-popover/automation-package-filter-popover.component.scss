@@ -1,5 +1,5 @@
 mat-card {
-  min-width: 38rem;
+  min-width: 40rem;
 
   .bulk-selection-cell {
     width: 6rem;
@@ -12,6 +12,8 @@ mat-card {
   }
 
   mat-card-title {
-    font-size: 2rem;
+    font-size: 1.8rem;
+    padding: 16px;
+    line-height: 1.8rem;
   }
 }
