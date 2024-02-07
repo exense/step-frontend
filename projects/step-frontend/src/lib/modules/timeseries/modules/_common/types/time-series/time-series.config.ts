@@ -11,6 +11,7 @@ export class TimeSeriesConfig {
   static readonly TIMESTAMP_ATTRIBUTE = 'begin';
   static readonly CHART_LEGEND_SIZE = 65;
   static readonly TOTAL_BARS_COLOR = '#7689c0';
+  static readonly OVERVIEW_COLORS = ['#80C1E5', '#A4D5F6'];
   static readonly METRIC_TYPE_KEY = 'metricType';
   static readonly METRIC_TYPE_RESPONSE_TIME = 'response-time'; // this is for normal measurements
   static readonly METRIC_TYPE_SAMPLER = 'sampler'; // this is for thread groups measurements

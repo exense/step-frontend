@@ -1,4 +1,4 @@
-export interface Tab {
-  id: string;
+export interface Tab<T extends string | number> {
+  id: T;
   label?: string;
 }

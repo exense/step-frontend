@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -20,6 +21,8 @@ import uPlot = require('uplot');
 import MouseListener = uPlot.Cursor.MouseListener;
 import { TimeRange } from '@exense/step-core';
 import { COMMON_IMPORTS } from '../../../_common';
+import { DOCUMENT } from '@angular/common';
+import UPlot from '../../../_common/types/uPlot';
 
 /**
  * There are 3 ways of interaction with the ranger:
@@ -37,7 +40,10 @@ import { COMMON_IMPORTS } from '../../../_common';
   imports: [COMMON_IMPORTS],
 })
 export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
-  private readonly CHART_HEIGHT = 100;
+  private _element = inject(ElementRef);
+  private _doc = inject(DOCUMENT);
+
+  private readonly CHART_HEIGHT = 130;
 
   @ViewChild('chart') private chartElement!: ElementRef;
 
@@ -55,7 +61,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
   @Output() chartLoaded = new EventEmitter<void>();
 
-  uplot!: any;
+  uplot!: UPlot;
   previousRange: TimeRange | undefined;
 
   start!: number;
@@ -63,12 +69,10 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
   getSize = () => {
     return {
-      width: this.element.nativeElement.parentElement.offsetWidth,
+      width: this._element.nativeElement.parentElement.offsetWidth,
       height: this.CHART_HEIGHT,
     };
   };
-
-  constructor(@Self() private element: ElementRef) {}
 
   ngOnDestroy(): void {
     this.uplot?.destroy();
@@ -141,7 +145,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
       const left = 0;
       const width = Math.round(this.uplot.valToPos(this.end, 'x')) - left;
       const height = this.uplot.bbox.height / devicePixelRatio;
-      this.uplot.setSelect({ left, width, height }, false); // this is just to change the highlight
+      this.uplot.setSelect({ left, width, height, top: this.uplot.select.top }, false); // this is just to change the highlight
       const xData = this.uplot.data[0];
       const start = xData[0];
       const end = xData[xData.length - 1];
@@ -152,31 +156,27 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     }, 50);
   }
 
-  recreateChart() {
-    this.createRanger();
-  }
-
   private createRanger() {
     let x0: number;
     let lft0: number;
     let wid0: number;
-    const lftWid: { left: number; width: number } = { left: 0, width: 0 };
 
-    const placeDiv = function (par: any, cls: any) {
-      let el = document.createElement('div');
+    const placeDiv = (par: Element, cls: string) => {
+      let el = this._doc.createElement('div');
       el.classList.add(cls);
       par.appendChild(el);
       return el;
     };
-    const on = function (ev: any, el: any, fn: any) {
-      el.addEventListener(ev, fn);
+
+    const on = (ev: string, el: Node, fn: (event: MouseEvent) => void) => {
+      el.addEventListener(ev, fn as EventListenerOrEventListenerObject);
     };
-    const off = function (ev: any, el: any, fn: any) {
-      el.removeEventListener(ev, fn);
+    const off = (ev: string, el: Node, fn: (event: MouseEvent) => void) => {
+      el.removeEventListener(ev, fn as EventListenerOrEventListenerObject);
     };
-    const debounce = function (fn: any) {
-      let raf: any;
-      return (...args: any[]) => {
+    const debounce = (fn: Function) => {
+      let raf: number | null;
+      return (...args: unknown[]) => {
         if (raf) return;
 
         raf = requestAnimationFrame(() => {
@@ -185,7 +185,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
         });
       };
     };
-    const bindMove = (e: any, onMove: any) => {
+    const bindMove = (e: MouseEvent, onMove: (event: MouseEvent) => void) => {
       x0 = e.clientX;
       lft0 = this.uplot.select.left;
       wid0 = this.uplot.select.width;
@@ -193,7 +193,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
       const _onMove = debounce(onMove);
       on('mousemove', document, _onMove);
 
-      const _onUp = (e: any) => {
+      const _onUp = (e: MouseEvent) => {
         off('mouseup', document, _onUp);
         off('mousemove', document, _onMove);
 
@@ -207,10 +207,10 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
       e.stopPropagation();
     };
 
-    const setSelect = (newLft: number, newWid: number) => {
-      lftWid.left = newLft;
-      lftWid.width = newWid;
-      this.uplot.setSelect(lftWid, false);
+    const setSelect = (left: number, width: number) => {
+      const top = this.uplot.select.top;
+      const height = this.uplot.select.height;
+      this.uplot.setSelect({ top, left, height, width }, false);
     };
 
     const update = (newLft: number, newWid: number) => {
@@ -219,20 +219,24 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
       if (newLft >= 0 && newRgt <= maxRgt) {
         setSelect(newLft, newWid);
-        // zoom(newLft, newWid);
       }
     };
+
     let rangerOpts: uPlot.Options = {
       ...this.getSize(),
       ms: 1, // if not specified it's going be in seconds
       // select: {left: 0, width: 300, height: 33},
       // select: select,
       axes: [
-        {},
+        {
+          grid: {
+            stroke: '#fff',
+            width: 1,
+          },
+        },
         {
           show: false,
           scale: 'y',
-
           grid: { show: false },
         },
       ],
@@ -252,7 +256,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
         bind: {
           // this is not trigger when dblclick is fired on synced charts, but just on the ranger
           dblclick: (self: uPlot, b, handler: MouseListener) => {
-            return (e: any) => {
+            return (e: MouseEvent) => {
               let hasSelection = this.uplot.select.width > 0;
               handler(e);
               if (hasSelection) {
@@ -282,7 +286,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
           fill: (self: uPlot, seriesIdx: number) => {
             let gradient = this.uplot.ctx.createLinearGradient(0, 0, 0, 100);
             gradient.addColorStop(0, '#2e6c7c');
-            gradient.addColorStop(1, '#2e6c7c' + '07');
+            gradient.addColorStop(1, '#2e6c7c07');
             return gradient;
           },
           // fill: "#9fd6ff"
@@ -301,18 +305,18 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
               uRanger.setSelect(this.transformRangeToSelect(this.settings.selection));
             }
             this.previousRange = { from: this.start, to: this.end };
-            const sel = uRanger.root.querySelector('.u-select');
+            const sel = uRanger.root.querySelector('.u-select')!;
 
-            on('mousedown', sel, (e: any) => {
-              bindMove(e, (e: any) => update(lft0 + (e.clientX - x0), wid0));
+            on('mousedown', sel, (event: MouseEvent) => {
+              bindMove(event, (e: MouseEvent) => update(lft0 + (e.clientX - x0), wid0));
             });
 
-            on('mousedown', placeDiv(sel, 'u-grip-l'), (e: any) => {
-              bindMove(e, (e: any) => update(lft0 + (e.clientX - x0), wid0 - (e.clientX - x0)));
+            on('mousedown', placeDiv(sel, 'u-grip-l'), (event: MouseEvent) => {
+              bindMove(event, (e: MouseEvent) => update(lft0 + (e.clientX - x0), wid0 - (e.clientX - x0)));
             });
 
-            on('mousedown', placeDiv(sel, 'u-grip-r'), (e: any) => {
-              bindMove(e, (e: any) => update(lft0, wid0 + (e.clientX - x0)));
+            on('mousedown', placeDiv(sel, 'u-grip-r'), (event: MouseEvent) => {
+              bindMove(event, (e: MouseEvent) => update(lft0, wid0 + (e.clientX - x0)));
             });
           },
         ],
@@ -338,14 +342,14 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     this.uplot = new uPlot(
       rangerOpts,
       [this.settings.xValues, ...this.settings.series.map((s) => s.data)],
-      this.chartElement.nativeElement
-    );
+      this.chartElement.nativeElement,
+    ) as unknown as UPlot;
     this.chartLoaded.emit();
   }
 
   emitSelectionToLinkedCharts() {
     const linkedCharts = uPlot.sync(this.syncKey).plots;
-    const minMax: any = {
+    const minMax = {
       min: this.uplot.posToVal(this.uplot.select.left, 'x'),
       max: this.uplot.posToVal(this.uplot.select.left + this.uplot.select.width, 'x'),
     };
@@ -373,7 +377,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     if (min != this.previousRange?.from || max !== this.previousRange?.to) {
       const currentRange = { from: min, to: max };
       this.previousRange = currentRange;
-      this.rangeChange.next(currentRange);
+      this.rangeChange.emit(currentRange);
     }
   }
 }

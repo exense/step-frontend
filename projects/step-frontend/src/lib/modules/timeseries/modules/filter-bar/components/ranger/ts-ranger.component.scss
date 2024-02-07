@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 step-ts-ranger {
   .chart-wrapper {
     width: 100%;
@@ -6,11 +8,15 @@ step-ts-ranger {
   }
 
   .ranger {
+    .u-under {
+      background: linear-gradient(90deg, var.$blue-100, var.$blue-600);
+    }
+
     .u-select {
       pointer-events: all;
       cursor: grabbing;
-      box-shadow: rgb(135 135 135) 1px 1px 7px;
-      background: rgb(19 92 255 / 18%);
+      box-shadow: var.$gray-450 1px 1px 7px;
+      background: var.$glass;
       min-height: 100% !important;
     }
 
@@ -18,10 +24,10 @@ step-ts-ranger {
       position: absolute;
       width: 6px;
       height: 100%;
-      background: white;
-      border: 1px solid #b7b7b7;
+      background: var.$white;
+      border: 1px solid var.$gray-125;
       cursor: ew-resize;
-      box-shadow: 1px 1px 5px #bdbbbb;
+      box-shadow: 1px 1px 5px var.$gray-150;
       border-radius: 2px;
     }
 

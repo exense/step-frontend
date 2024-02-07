@@ -9,6 +9,7 @@
 @forward 'components/step-table';
 @forward 'components/step-icon';
 @forward 'components/step-inputs' show step-form-field-vertical-layout;
+@forward 'components/step-buttons' show button-round;
 
 @mixin status-common {
   display: inline-flex;

@@ -1,9 +1,7 @@
 <ng-container *ngIf="!executionHasToBeBuilt">
   <div class="header-buttons">
-    <button class="menu-btn" #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="menu" mat-button>
-      <div class="icon-container">
-        <step-icon name="settings"></step-icon>
-      </div>
+    <button mat-raised-button class="btn-settings" #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="menu">
+      <step-icon name="settings" />
       <span>Settings</span>
     </button>
   </div>

@@ -33,3 +33,11 @@
 
   @include mat-stroked-button($config);
 }
+
+@mixin button-round {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  border-radius: 2.8rem;
+  padding: 0 1.4rem;
+}

@@ -2,6 +2,7 @@ import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular
 import {
   BucketAttributes,
   BucketResponse,
+  MarkerType,
   TableDataSource,
   TableLocalDataSource,
   TableLocalDataSourceConfig,
@@ -45,6 +46,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   readonly BASE_COLUMNS = ['name', 'count', 'sum', 'avg', 'min', 'max', 'pcl_80', 'pcl_90', 'pcl_99', 'tps', 'tph'];
   readonly COMPARE_COLUMN_ID_SUFFIX = '_comp';
   readonly DIFF_COLUMN_ID_SUFFIX = '_diff';
+  readonly MarkerType = MarkerType;
 
   tableIsLoading = true;
   dimensionKey = 'name';
@@ -314,7 +316,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     this.compareResponse = undefined;
   }
 
-  onAllSeriesCheckboxClick(event: any) {
+  onAllSeriesCheckboxClick() {
     this.keywordsService.toggleSelectAll();
   }
 

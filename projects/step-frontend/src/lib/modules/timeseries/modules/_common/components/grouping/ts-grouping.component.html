@@ -1,11 +1,15 @@
-<div mat-button [matMenuTriggerFor]="groupingMenu" #matTrigger="matMenuTrigger" class="filter-item-container">
-  <span class="grouping-title"> Grouping: {{ label }} </span>
-</div>
+<step-form-field [matMenuTriggerFor]="groupingMenu" #matTrigger="matMenuTrigger">
+  <mat-select #sel ngModel="selected" (click)="sel.close()">
+    <mat-option value="selected"> Grouping: {{ label }} </mat-option>
+  </mat-select>
+</step-form-field>
 <mat-menu #groupingMenu="matMenu">
   <button mat-menu-item (click)="selectGrouping(NO_GROUPING_OPTION)">No grouping</button>
-  <button mat-menu-item *ngFor="let grouping of groupingOptions" (click)="selectGrouping(grouping)">
-    {{ grouping.label }}
-  </button>
+  @for (grouping of groupingOptions; track grouping.label) {
+    <button mat-menu-item (click)="selectGrouping(grouping)">
+      {{ grouping.label }}
+    </button>
+  }
   <div mat-menu-item [matMenuTriggerFor]="customGroupingMenu">Other</div>
   <mat-menu #customGroupingMenu="matMenu">
     <div (click)="$event.stopPropagation()" style="padding: 12px">

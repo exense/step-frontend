@@ -7,23 +7,33 @@
   (stepElementResize)="resize()"
 >
   <div #chart></div>
-  <div class="no-data-tag" *ngIf="chartIsEmpty">No data...</div>
-  <div class="no-data-tag" *ngIf="chartIsUnavailable">Chart is unavailable for current settings</div>
-  <div
-    class="ts-chart-legend"
-    *ngIf="!chartIsUnavailable && (legendSettings.items.length || legendSettings.zAxisLabel)"
-  >
-    <div class="left-section" *ngIf="legendSettings.show">
-      <ng-container *ngFor="let item of legendSettings.items">
-        <div class="item" *ngIf="item.isVisible">
-          <div class="color-square" [style.background]="item.color"></div>
-          <div class="item-label" [title]="item.label">{{ item.label }}</div>
-        </div>
-      </ng-container>
-    </div>
-    <div class="aggregate-section" *ngIf="legendSettings.zAxisLabel">
-      <step-icon name="bar-chart-2" class="total-value-icon"></step-icon>
-      <span class="item-label">{{ legendSettings.zAxisLabel }}</span>
-    </div>
-  </div>
+  @if (chartIsEmpty) {
+    <div class="no-data-tag">No data...</div>
+  }
+  @if (chartIsUnavailable) {
+    <div class="no-data-tag">Chart is unavailable for current settings</div>
+  }
 </div>
+
+@if (!chartIsUnavailable && !chartIsEmpty && (legendSettings.items.length || legendSettings.zAxisLabel)) {
+  <div class="ts-chart-legend">
+    @if (legendSettings.show) {
+      <div class="left-section">
+        @for (item of legendSettings.items; track item.label) {
+          @if (item.isVisible) {
+            <div class="item">
+              <step-marker [markerType]="legendMarker" [color]="item.color" />
+              <div class="item-label" [title]="item.label">{{ item.label }}</div>
+            </div>
+          }
+        }
+      </div>
+    }
+    @if (legendSettings.zAxisLabel) {
+      <div class="aggregate-section">
+        <step-icon name="bar-chart-2" class="total-value-icon" />
+        <span class="item-label">{{ legendSettings.zAxisLabel }}</span>
+      </div>
+    }
+  </div>
+}
