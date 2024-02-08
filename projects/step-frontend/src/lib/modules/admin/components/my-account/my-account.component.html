@@ -6,13 +6,13 @@
     </button>
   </mat-card-header>
   <mat-card-content class="credentials">
-    <section>
+    <section class="text-field-section">
       <step-form-field alignLabelAddon="near">
         <step-label>Username</step-label>
         <step-label-addon>{{ user.username }}</step-label-addon>
       </step-form-field>
     </section>
-    <section class="last-text-section">
+    <section class="text-field-section">
       <step-form-field alignLabelAddon="near">
         <step-label>Role</step-label>
         <step-label-addon>{{ user.role }}</step-label-addon>
@@ -22,7 +22,10 @@
 </mat-card>
 <mat-card>
   <mat-card-header class="header-with-button">
-    <mat-card-title>Api key</mat-card-title>
+    <mat-card-title class="title-with-hint">
+      <div>Api key</div>
+      <step-description-hint [description]="apiKeyDescription"></step-description-hint>
+    </mat-card-title>
     <button
       type="button"
       mat-flat-button
@@ -69,6 +72,7 @@
 <mat-card>
   <mat-card-header>
     <mat-card-title> Preferences </mat-card-title>
+    <step-description-hint [description]="preferencesDescription"></step-description-hint>
   </mat-card-header>
   <mat-card-content>
     <step-table [dataSource]="preferences$">

@@ -15,6 +15,11 @@ step-my-account {
     justify-content: space-between;
   }
 
+  .test {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .credentials {
     display: flex;
     flex-direction: column;
@@ -26,7 +31,7 @@ step-my-account {
       border-bottom: solid 0.1rem var.$gray-300;
       padding: 1rem 0;
 
-      &.last-text-section {
+      &.text-field-section {
         border-bottom: none;
       }
     }
@@ -43,5 +48,17 @@ step-my-account {
 
   .actions {
     width: 2rem;
+  }
+
+  step-description-hint {
+    display: flex;
+    align-items: center;
+    padding-left: 0.5rem;
+    font-size: 1.4rem;
+  }
+
+  .title-with-hint {
+    display: flex;
+    flex-direction: row;
   }
 }

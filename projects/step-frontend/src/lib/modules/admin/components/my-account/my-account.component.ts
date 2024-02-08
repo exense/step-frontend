@@ -25,18 +25,24 @@ import { BehaviorSubject, filter, of, pipe, switchMap, tap } from 'rxjs';
 
 const preferencesToKVPairArray = (preferences?: Preferences): KeyValue<string, string>[] => {
   const prefsObject = preferences?.preferences || {};
-  const result = Object.keys(prefsObject).reduce((result, key) => {
-    const value = prefsObject[key] || '';
-    return [...result, { key, value }];
-  }, [] as KeyValue<string, string>[]);
+  const result = Object.keys(prefsObject).reduce(
+    (result, key) => {
+      const value = prefsObject[key] || '';
+      return [...result, { key, value }];
+    },
+    [] as KeyValue<string, string>[],
+  );
   return result;
 };
 
 const kvPairArrayToPreferences = (values?: KeyValue<string, string>[]): Preferences => {
-  const preferences = (values || []).reduce((res, { key, value }) => {
-    res[key] = value;
-    return res;
-  }, {} as { [key: string]: string });
+  const preferences = (values || []).reduce(
+    (res, { key, value }) => {
+      res[key] = value;
+      return res;
+    },
+    {} as { [key: string]: string },
+  );
   return { preferences };
 };
 
@@ -52,10 +58,15 @@ export class MyAccountComponent implements OnInit, OnChanges, OnDestroy {
   private _credentialsService = inject(CredentialsService);
   private _generateApiKey = inject(GenerateApiKeyService);
   private _dialogs = inject(DialogsService);
+  private credentialsUrl =
+    'https://step.exense.ch/knowledgebase/userdocs/userpreferences/#user-credentials-and-api-keys';
+  private preferencesUrl = 'https://step.exense.ch/knowledgebase/userdocs/userpreferences/#preferences';
 
   readonly canChangePassword = !!this._authService.getConf()?.passwordManagement;
   readonly canGenerateApiKey = !!this._authService.getConf()?.authentication;
   readonly preferences$ = new BehaviorSubject<KeyValue<string, string>[]>([]);
+  readonly apiKeyDescription = `API keys can be used for authentication with the step API (<a href="${this.credentialsUrl}">knowledgebase</a>)`;
+  readonly preferencesDescription = `Add key/value pairs of custom preferences (<a href="${this.preferencesUrl}">knowledgebase</a>)`;
 
   @Input() error?: string;
   @Output() errorChange: EventEmitter<string | undefined> = new EventEmitter<string | undefined>();
@@ -104,7 +115,7 @@ export class MyAccountComponent implements OnInit, OnChanges, OnDestroy {
       .pipe(
         filter((isConfirmed) => !!isConfirmed),
         switchMap(() => this._generateApiKey.revoke(id)),
-        this.reloadTokens
+        this.reloadTokens,
       )
       .subscribe();
   }
