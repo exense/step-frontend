@@ -10,6 +10,11 @@ step-my-account {
     margin: 0 !important;
   }
 
+  .header-with-button {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .credentials {
     display: flex;
     flex-direction: column;
@@ -20,6 +25,10 @@ step-my-account {
       align-items: center;
       border-bottom: solid 0.1rem var.$gray-300;
       padding: 1rem 0;
+
+      &.last-text-section {
+        border-bottom: none;
+      }
     }
   }
 
