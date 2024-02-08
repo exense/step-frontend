@@ -14,7 +14,14 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { debounceTime, Observable, Subject, take } from 'rxjs';
-import { Execution, OQLVerifyResponse, Tab, TimeRange, TimeSeriesService } from '@exense/step-core';
+import {
+  Execution,
+  OQLVerifyResponse,
+  Tab,
+  TimeRange,
+  TimeSeriesFilterItem,
+  TimeSeriesService,
+} from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';
 import {
   COMMON_IMPORTS,
@@ -33,7 +40,8 @@ import {
   TsGroupingComponent,
 } from '../../../_common';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { FilterBarItemComponent, PerformanceViewTimeSelectionComponent } from '../../../filter-bar';
+import { PerformanceViewTimeSelectionComponent } from '../perfomance-view-time-selection/performance-view-time-selection.component';
+import { FilterBarItemComponent } from '../filter-bar-item/filter-bar-item.component';
 
 const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
   if (field.startsWith('attributes.')) {
@@ -43,6 +51,9 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
   }
 };
 
+/**
+ * @deprecated
+ */
 @Component({
   selector: 'step-ts-filter-bar',
   templateUrl: './filter-bar.component.html',
@@ -80,6 +91,8 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   readonly EMIT_DEBOUNCE_TIME = 300;
 
   rawMeasurementsModeActive = false;
+
+  readonly FilterBarItemType = FilterBarItemType;
 
   readonly modes: Tab<TsFilteringMode>[] = [
     {
@@ -346,9 +359,5 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.emitFilterChange$.complete();
-  }
-
-  get FilterBarItemType() {
-    return FilterBarItemType;
   }
 }

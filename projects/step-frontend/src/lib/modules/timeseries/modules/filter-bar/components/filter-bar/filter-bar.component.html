@@ -31,11 +31,13 @@
 
   <div class="filters">
     <mat-menu #addFilterMenu="matMenu">
-      <ng-container *ngFor="let option of filterOptions">
-        <button mat-menu-item *ngIf="!option.isHidden" (click)="addFilterItem(option)">
-          <span>{{ option.label }}</span>
-        </button>
-      </ng-container>
+      @for (option of filterOptions; track option.attributeName) {
+        @if (!option.isHidden) {
+          <button mat-menu-item (click)="addFilterItem(option)">
+            <span>{{ option.label }}</span>
+          </button>
+        }
+      }
       <button mat-menu-item [matMenuTriggerFor]="typesMenu">Other</button>
       <button mat-menu-item (click)="openDiscovery()">Discover...</button>
     </mat-menu>
@@ -62,7 +64,7 @@
         </step-form-field>
         <button class="apply-btn" mat-button color="primary" (click)="manuallyApplyFilters()">Apply Filters</button>
       } @else {
-        @for (item of activeFilters; track item.label; let i = $index) {
+        @for (item of activeFilters; track item.attributeName; let i = $index) {
           <step-ts-filter-bar-item
             #appliedFilter
             *ngIf="!item.isHidden"

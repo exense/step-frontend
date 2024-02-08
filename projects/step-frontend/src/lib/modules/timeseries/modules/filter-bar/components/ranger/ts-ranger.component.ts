@@ -9,7 +9,6 @@ import {
   OnDestroy,
   OnInit,
   Output,
-  Self,
   SimpleChanges,
   ViewChild,
   ViewEncapsulation,
@@ -20,7 +19,7 @@ import { TSRangerSettings } from './ts-ranger-settings';
 import uPlot = require('uplot');
 import MouseListener = uPlot.Cursor.MouseListener;
 import { TimeRange } from '@exense/step-core';
-import { COMMON_IMPORTS } from '../../../_common';
+import { COMMON_IMPORTS, TimeSeriesConfig, UPlotUtilsService } from '../../../_common';
 import { DOCUMENT } from '@angular/common';
 import UPlot from '../../../_common/types/uPlot';
 
@@ -42,6 +41,7 @@ import UPlot from '../../../_common/types/uPlot';
 export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   private _element = inject(ElementRef);
   private _doc = inject(DOCUMENT);
+  private _utils = inject(UPlotUtilsService);
 
   private readonly CHART_HEIGHT = 130;
 
@@ -230,7 +230,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
       axes: [
         {
           grid: {
-            stroke: '#fff',
+            stroke: TimeSeriesConfig.RANGER_COLORS.axesStroke,
             width: 1,
           },
         },
@@ -282,14 +282,13 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
         {
           scale: 'y',
           points: { show: false },
-          stroke: '#9fd6ff',
+          stroke: TimeSeriesConfig.RANGER_COLORS.seriesStroke,
           fill: (self: uPlot, seriesIdx: number) => {
-            let gradient = this.uplot.ctx.createLinearGradient(0, 0, 0, 100);
-            gradient.addColorStop(0, '#2e6c7c');
-            gradient.addColorStop(1, '#2e6c7c07');
-            return gradient;
+            return this._utils.multiColorsGradientFill(self, [
+              { offset: 0, color: TimeSeriesConfig.RANGER_COLORS.seriesGradientStart },
+              { offset: 1, color: TimeSeriesConfig.RANGER_COLORS.seriesGradientEnd },
+            ]);
           },
-          // fill: "#9fd6ff"
         },
       ],
       hooks: {
