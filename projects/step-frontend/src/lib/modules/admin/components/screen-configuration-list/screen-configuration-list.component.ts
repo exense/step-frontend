@@ -5,6 +5,7 @@ import {
   ScreenInput,
   MultipleProjectsService,
   EditorResolverService,
+  AugmentedScreenService,
 } from '@exense/step-core';
 import { ScreenDialogsService } from '../../services/screen-dialogs.service';
 import { RenderOptionsPipe } from '../../pipes/render-options.pipe';
@@ -19,7 +20,7 @@ const SCREEN_ID = 'screenId';
   styleUrls: ['./screen-configuration-list.component.scss'],
 })
 export class ScreenConfigurationListComponent implements AfterViewInit {
-  private _screensService = inject(ScreensService);
+  private _screensService = inject(AugmentedScreenService);
   private _screenDialogs = inject(ScreenDialogsService);
   private _renderOptions = inject(RenderOptionsPipe);
   private _multipleProjectList = inject(MultipleProjectsService);
@@ -31,7 +32,7 @@ export class ScreenConfigurationListComponent implements AfterViewInit {
       if (result) {
         this.searchableScreens.reload();
       }
-    })
+    }),
   );
 
   private updateDataSource = pipe(tap(() => this.searchableScreens.reload()));
@@ -49,7 +50,7 @@ export class ScreenConfigurationListComponent implements AfterViewInit {
       .addSearchStringPredicate('type', (item) => item.input!.type!)
       .addSearchStringPredicate('options', (item) => this._renderOptions.transform(item.input!.options!))
       .addSearchStringPredicate('activationScript', (item) => item.input!.activationExpression!.script!)
-      .build()
+      .build(),
   );
 
   ngAfterViewInit(): void {
@@ -92,11 +93,17 @@ export class ScreenConfigurationListComponent implements AfterViewInit {
   }
 
   moveScreen(dbId: string, offset: number): void {
-    this._screensService.moveInput(dbId, offset).pipe(this.updateDataSource).subscribe();
+    this._screensService
+      .moveInput(dbId, offset, this.currentlySelectedScreenChoice)
+      .pipe(this.updateDataSource)
+      .subscribe();
   }
 
   removeScreen(dbId: string, label: string): void {
-    this._screenDialogs.removeScreen(dbId, label).pipe(this.updateDataSource).subscribe();
+    this._screenDialogs
+      .removeScreen(dbId, label, this.currentlySelectedScreenChoice)
+      .pipe(this.updateDataSource)
+      .subscribe();
   }
 
   private editScreenInternal(inputId: string): void {
