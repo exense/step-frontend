@@ -24,11 +24,6 @@ export class AppConfigContainerService {
     if (forceClientUrl) {
       return this.defaultClientUrl;
     }
-    let result = this.conf?.defaultUrl ?? this.defaultClientUrl;
-    if (result.startsWith('/root')) {
-      //TODO: temporary fix, until server side default url isn't reconfigured
-      result = result.replace('/root', '');
-    }
-    return result;
+    return this.conf?.defaultUrl ?? this.defaultClientUrl;
   }
 }
