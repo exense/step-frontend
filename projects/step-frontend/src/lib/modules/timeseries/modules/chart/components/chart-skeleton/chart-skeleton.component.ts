@@ -1,0 +1,16 @@
+import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
+import { COMMON_IMPORTS } from '../../../_common';
+
+/**
+ * This component represents a visual effect for a loading chart.
+ */
+@Component({
+  selector: 'step-chart-skeleton',
+  templateUrl: './chart-skeleton.component.html',
+  styleUrls: ['./chart-skeleton.component.scss'],
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [COMMON_IMPORTS],
+})
+export class ChartSkeletonComponent {}
