@@ -5,6 +5,7 @@ import { authGuard, AuthService, DEFAULT_PAGE, nonAuthGuard } from '@exense/step
 import { map, take } from 'rxjs';
 import { MainViewComponent } from './components/main-view/main-view.component';
 import { Location } from '@angular/common';
+import { NotFoundComponent } from './components/not-found/not-found.component';
 
 export const APP_ROUTES: Routes = [
   {
@@ -28,6 +29,11 @@ export const APP_ROUTES: Routes = [
         path: 'login',
         component: LoginComponent,
         canActivate: [nonAuthGuard],
+      },
+      {
+        path: '**',
+        component: NotFoundComponent,
+        canActivate: [authGuard],
       },
     ],
   },

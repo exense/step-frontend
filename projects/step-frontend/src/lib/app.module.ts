@@ -21,11 +21,12 @@ import { StepCommonModule } from './modules/_common/step-common.module';
 import { MainViewComponent } from './components/main-view/main-view.component';
 import { APP_ROUTES, DEFAULT_ROUTE_INITIALIZER, LEGACY_URL_HANDLER } from './app.routes';
 import { AutomationPackagesModule } from './modules/automation-packages/automation-packages.module';
+import { NotFoundComponent } from './components/not-found/not-found.component';
 
 Settings.defaultLocale = 'en';
 
 @NgModule({
-  declarations: [RootComponent, MainViewComponent],
+  declarations: [RootComponent, MainViewComponent, NotFoundComponent],
   imports: [
     StepCommonModule,
     BrowserModule,
