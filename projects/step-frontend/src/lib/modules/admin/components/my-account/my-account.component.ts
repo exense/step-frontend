@@ -58,15 +58,10 @@ export class MyAccountComponent implements OnInit, OnChanges, OnDestroy {
   private _credentialsService = inject(CredentialsService);
   private _generateApiKey = inject(GenerateApiKeyService);
   private _dialogs = inject(DialogsService);
-  private credentialsUrl =
-    'https://step.exense.ch/knowledgebase/userdocs/userpreferences/#user-credentials-and-api-keys';
-  private preferencesUrl = 'https://step.exense.ch/knowledgebase/userdocs/userpreferences/#preferences';
 
   readonly canChangePassword = !!this._authService.getConf()?.passwordManagement;
   readonly canGenerateApiKey = !!this._authService.getConf()?.authentication;
   readonly preferences$ = new BehaviorSubject<KeyValue<string, string>[]>([]);
-  readonly apiKeyDescription = `API keys can be used for authentication with the step API (<a href="${this.credentialsUrl}">knowledgebase</a>)`;
-  readonly preferencesDescription = `Add key/value pairs of custom preferences (<a href="${this.preferencesUrl}">knowledgebase</a>)`;
 
   @Input() error?: string;
   @Output() errorChange: EventEmitter<string | undefined> = new EventEmitter<string | undefined>();

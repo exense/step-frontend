@@ -6,13 +6,13 @@
     </button>
   </mat-card-header>
   <mat-card-content class="credentials">
-    <section class="text-field-section">
+    <section>
       <step-form-field alignLabelAddon="near">
         <step-label>Username</step-label>
         <step-label-addon>{{ user.username }}</step-label-addon>
       </step-form-field>
     </section>
-    <section class="text-field-section">
+    <section>
       <step-form-field alignLabelAddon="near">
         <step-label>Role</step-label>
         <step-label-addon>{{ user.role }}</step-label-addon>
@@ -24,7 +24,10 @@
   <mat-card-header class="header-with-button">
     <mat-card-title class="title-with-hint">
       <div>Api key</div>
-      <step-description-hint [description]="apiKeyDescription"></step-description-hint>
+      <step-description-hint
+        description="API keys can be used for authentication with the step API (<a href='https://step.exense.ch/knowledgebase/userdocs/userpreferences/#user-credentials-and-api-keys' target='_blank'>knowledgebase</a>)"
+      >
+      </step-description-hint>
     </mat-card-title>
     <button
       type="button"
@@ -72,7 +75,10 @@
 <mat-card>
   <mat-card-header>
     <mat-card-title> Preferences </mat-card-title>
-    <step-description-hint [description]="preferencesDescription"></step-description-hint>
+    <step-description-hint
+      description="Add key/value pairs of custom preferences (<a href='https://step.exense.ch/knowledgebase/userdocs/userpreferences/#preferences' target='_blank'>knowledgebase</a>)"
+    >
+    </step-description-hint>
   </mat-card-header>
   <mat-card-content>
     <step-table [dataSource]="preferences$">
