@@ -16,10 +16,6 @@ Run `ng build step-core` to build the project. The build artifacts will be store
 
 After building your library with `ng build step-core`, go to the dist folder `cd dist/step-core` and run `npm publish`.
 
-## Running unit tests
-
-Run `ng test step-core` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
