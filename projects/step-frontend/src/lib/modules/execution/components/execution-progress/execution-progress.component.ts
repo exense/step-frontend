@@ -215,8 +215,13 @@ export class ExecutionProgressComponent
   selectTab(tabId: string): void {
     this.activeTabId = tabId;
     this.activeTab = this.tabs.find((tab) => tab.id === tabId);
+    const routeUrl = this._activatedRoute.snapshot.url;
+    const currentPath = routeUrl[routeUrl.length - 1].path;
+    if (currentPath === tabId) {
+      return;
+    }
+    const relativePath = routeUrl.length === 1 ? '.' : '..';
     const relativeTo = this._activatedRoute;
-    const relativePath = this._activatedRoute.snapshot.url.length === 1 ? '.' : '..';
     this._router.navigate([relativePath, tabId], { relativeTo });
   }
 
