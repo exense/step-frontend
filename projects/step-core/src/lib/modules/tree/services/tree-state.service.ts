@@ -3,7 +3,7 @@ import { inject, Injectable, OnDestroy } from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { BehaviorSubject, combineLatest, map, Observable, of, Subject, tap } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
-import { Mutable } from '../../../shared';
+import {Mutable, PlanTreeAction} from '../../../shared';
 import { DropType } from '../shared/drop-type.enum';
 import { TreeFlatNode } from '../shared/tree-flat-node';
 import { TreeNode } from '../shared/tree-node';
@@ -137,7 +137,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     this.editNodeIdInternal$.next(undefined);
   }
 
-  toggleSkip(): void {
+  toggleSkip(actionId?: string): void {
     const nodeIds = this.selectedNodeIds$.value;
     const nodes: any[] = [];
 
@@ -152,7 +152,12 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     let isUpdated = false;
 
     nodes.forEach(node => {
-      const isSkipped = !node.isSkipped;
+      let isSkipped;
+      if (actionId) {
+        isSkipped = actionId === PlanTreeAction.DISABLE ? true : false;
+      } else {
+        isSkipped = !node.isSkipped;
+      }
       const tmpIsUpdated = this._treeNodeUtils.updateNodeData(this.originalRoot!, node.id, { isSkipped });
 
       if (tmpIsUpdated) {

@@ -38,7 +38,7 @@ export abstract class PlanEditorStrategy {
 
   abstract rename(node?: AbstractArtefact): void;
 
-  abstract toggleSkip(node?: AbstractArtefact): void;
+  abstract toggleSkip(node?: AbstractArtefact, actionId?: string): void;
 
   //abstract initPlanUpdate(): void;
 

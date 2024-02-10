@@ -10,7 +10,7 @@ import { TreeNode } from '../shared/tree-node';
 export class TreeNodeActionsPipe implements PipeTransform {
   constructor(@Optional() private treeActions?: TreeActionsService) {}
 
-  transform(node: TreeNode): Observable<TreeAction[]> {
-    return !this.treeActions ? of([]) : this.treeActions.getActionsForNode(node);
+  transform(node: TreeNode, multipleNodes?: boolean): Observable<TreeAction[]> {
+    return !this.treeActions ? of([]) : this.treeActions.getActionsForNode(node, multipleNodes);
   }
 }

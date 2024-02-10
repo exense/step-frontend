@@ -19,6 +19,7 @@ import { TreeAction } from '../../shared/tree-action';
 import { TreeNode } from '../../shared/tree-node';
 import { TreeNodeTemplateDirective } from '../../directives/tree-node-template.directive';
 import { TreeNodeTemplateContainerService } from '../../services/tree-node-template-container.service';
+import {take} from "rxjs";
 
 @Component({
   selector: 'step-tree',
@@ -54,13 +55,16 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
 
   @Input() dragDisabled: boolean = false;
 
-  @Output() treeContextAction = new EventEmitter<{ actionId: string; node?: N }>();
+  @Output() treeContextAction = new EventEmitter<{ actionId: string; node?: N, multipleNodes?: boolean }>();
 
   @Output() nodeDblClick = new EventEmitter<{ node: N; event: MouseEvent }>();
 
   protected openedMenuNodeId?: string;
 
+  multipleNodes = false;
+
   openContextMenu({ event, nodeId }: { event: MouseEvent; nodeId: string }): void {
+    this._treeState.selectedNodes$.pipe(take(1)).subscribe(data => this.multipleNodes = data.length > 1);
     const node = this._treeState.findNodeById(nodeId);
     if (!node) {
       return;
@@ -80,7 +84,7 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
 
   handleContextAction(action: TreeAction, node?: N): void {
     const actionId = action.id;
-    this.treeContextAction.emit({ actionId, node });
+    this.treeContextAction.emit({ actionId, node, multipleNodes: this.multipleNodes });
   }
 
   handleDblClick(node: N, event: MouseEvent): void {

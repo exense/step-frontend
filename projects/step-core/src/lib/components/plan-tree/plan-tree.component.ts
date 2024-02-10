@@ -62,7 +62,22 @@ export class PlanTreeComponent implements TreeActionsService {
     { id: PlanTreeAction.MOVE_RIGHT, label: 'Move Right (Ctrl + ➡️)' },
   ];
 
-  getActionsForNode(node: ArtefactTreeNode): Observable<TreeAction[]> {
+  private actionsMultiple: Map<string, string> = new Map<string, string>([
+    [ PlanTreeAction.OPEN, 'Open (Ctrl + O)'],
+    [ PlanTreeAction.RENAME, 'Rename (F2)'],
+    [ PlanTreeAction.ENABLE, 'Enable All Selected (Ctrl + E)'],
+    [ PlanTreeAction.DISABLE, 'Disable All Selected (Ctrl + E)'],
+    [ PlanTreeAction.COPY, 'Copy All Selected (Ctrl + C)'],
+    [ PlanTreeAction.PASTE, 'Paste All Selected (Ctrl + V)'],
+    [ PlanTreeAction.DUPLICATE, 'Duplicate All Selected (Ctrl + D)'],
+    [ PlanTreeAction.DELETE, 'Delete All Selected (Del)'],
+    [ PlanTreeAction.MOVE_UP, 'Move Up All Selected (Ctrl + ⬆️)'],
+    [ PlanTreeAction.MOVE_DOWN, 'Move Down All Selected (Ctrl + ⬇️)'],
+    [ PlanTreeAction.MOVE_LEFT, 'Move Left All Selected (Ctrl + ⬅️)'],
+    [ PlanTreeAction.MOVE_RIGHT, 'Move Right All Selected (Ctrl + ➡️)'],
+  ]);
+
+  getActionsForNode(node: ArtefactTreeNode, multipleNodes?: boolean): Observable<TreeAction[]> {
     const isSkipped = node.isSkipped;
 
     return of(this.actions).pipe(
@@ -75,15 +90,25 @@ export class PlanTreeComponent implements TreeActionsService {
             } else if (action.id === PlanTreeAction.OPEN) {
               disabled = !this.canOpenArtefact(node.originalArtefact);
             }
-            return { ...action, disabled };
+            if (multipleNodes && ((action.id === PlanTreeAction.OPEN) || (action.id === PlanTreeAction.RENAME))) {
+              disabled = true;
+            }
+
+            const newLabel = multipleNodes ? this.actionsMultiple.get(action.id)! : action.label;
+
+            return { ...action, disabled, label: newLabel };
           })
           .filter((action) => {
-            if (action.id === PlanTreeAction.DISABLE && isSkipped) {
+            if (action.id === PlanTreeAction.DISABLE && isSkipped && !multipleNodes) {
               return false;
             }
 
-            if (action.id === PlanTreeAction.ENABLE && !isSkipped) {
+            if (action.id === PlanTreeAction.ENABLE && !isSkipped && !multipleNodes) {
               return false;
+            }
+
+            if (multipleNodes && action.id === PlanTreeAction.ENABLE) {
+              action.hasSeparator = false;
             }
 
             return true;
@@ -116,42 +141,42 @@ export class PlanTreeComponent implements TreeActionsService {
     this._planArtefactResolver.openArtefact(node.originalArtefact);
   }
 
-  proceedAction(actionId: string, node?: ArtefactTreeNode): void {
+  proceedAction(actionId: string, node?: ArtefactTreeNode, multipleNodes?: boolean): void {
     const artefact = node?.originalArtefact;
     switch (actionId) {
       case PlanTreeAction.RENAME:
         this._planEditService.rename(artefact);
         break;
       case PlanTreeAction.MOVE_UP:
-        this._planEditService.moveUp(artefact);
+        this._planEditService.moveUp(multipleNodes ? undefined : artefact);
         break;
       case PlanTreeAction.MOVE_DOWN:
-        this._planEditService.moveDown(artefact);
+        this._planEditService.moveDown(multipleNodes ? undefined : artefact);
         break;
       case PlanTreeAction.MOVE_LEFT:
-        this._planEditService.moveOut(artefact);
+        this._planEditService.moveOut(multipleNodes ? undefined : artefact);
         break;
       case PlanTreeAction.MOVE_RIGHT:
-        this._planEditService.moveInPrevSibling(artefact);
+        this._planEditService.moveInPrevSibling(multipleNodes ? undefined : artefact);
         break;
       case PlanTreeAction.COPY:
-        this._planEditService.copy(artefact);
+        this._planEditService.copy(multipleNodes ? undefined : artefact);
         break;
       case PlanTreeAction.PASTE:
-        this._planEditService.paste(artefact);
+        this._planEditService.paste(multipleNodes ? undefined : artefact);
         break;
       case PlanTreeAction.DUPLICATE:
-        this._planEditService.duplicate(artefact);
+        this._planEditService.duplicate(multipleNodes ? undefined : artefact);
         break;
       case PlanTreeAction.DELETE:
-        this._planEditService.delete(artefact);
+        this._planEditService.delete(multipleNodes ? undefined : artefact);
         break;
       case PlanTreeAction.OPEN:
         this._planArtefactResolver?.openArtefact(artefact);
         break;
       case PlanTreeAction.DISABLE:
       case PlanTreeAction.ENABLE:
-        this._planEditService?.toggleSkip(artefact);
+        this._planEditService?.toggleSkip(multipleNodes ? undefined : artefact, actionId);
         break;
       default:
         break;
