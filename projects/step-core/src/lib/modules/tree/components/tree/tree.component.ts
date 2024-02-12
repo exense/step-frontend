@@ -64,8 +64,8 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
   multipleNodes = false;
 
   openContextMenu({ event, nodeId }: { event: MouseEvent; nodeId: string }): void {
-    this._treeState.selectedNodes$.pipe(take(1)).subscribe(data => this.multipleNodes = data.length > 1);
     const node = this._treeState.findNodeById(nodeId);
+    this._treeState.selectedNodes$.pipe(take(1)).subscribe((data) => this.multipleNodes = data.length > 1 && !!data.find(el => el.id === nodeId));
     if (!node) {
       return;
     }
