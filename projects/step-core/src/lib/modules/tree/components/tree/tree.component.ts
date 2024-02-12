@@ -19,7 +19,7 @@ import { TreeAction } from '../../shared/tree-action';
 import { TreeNode } from '../../shared/tree-node';
 import { TreeNodeTemplateDirective } from '../../directives/tree-node-template.directive';
 import { TreeNodeTemplateContainerService } from '../../services/tree-node-template-container.service';
-import {take} from "rxjs";
+import { take } from "rxjs";
 
 @Component({
   selector: 'step-tree',

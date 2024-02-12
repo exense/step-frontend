@@ -3,7 +3,7 @@ import { inject, Injectable, OnDestroy } from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { BehaviorSubject, combineLatest, map, Observable, of, Subject, tap } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
-import {Mutable, PlanTreeAction} from '../../../shared';
+import { Mutable, PlanTreeAction } from '../../../shared';
 import { DropType } from '../shared/drop-type.enum';
 import { TreeFlatNode } from '../shared/tree-flat-node';
 import { TreeNode } from '../shared/tree-node';
