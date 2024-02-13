@@ -25,7 +25,6 @@ export class PlanCreateDialogComponent {
 
   readonly artefactTypes$ = this._api.getArtefactTemplates().pipe(shareReplay(1));
 
-  @HostListener('keydown.enter')
   save(editAfterSave?: boolean): void {
     this._api
       .newPlan(this.planType, this.template)
@@ -44,5 +43,10 @@ export class PlanCreateDialogComponent {
         }
         this._matDialogRef.close(plan);
       });
+  }
+
+  @HostListener('keydown.enter')
+  private handleKeyEnter(): void {
+    this.save(true);
   }
 }

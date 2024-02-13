@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { AfterViewInit, Component, HostListener, inject, ViewChild } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { AlertType } from '../../../../modules/basics/step-basics.module';
+import { AlertType, ModalWindowComponent } from '../../../../modules/basics/step-basics.module';
 import { UpdateResourceWarningResultState } from '../../shared/update-resource-warning-result-state.enum';
 
 @Component({
@@ -8,10 +8,24 @@ import { UpdateResourceWarningResultState } from '../../shared/update-resource-w
   templateUrl: './update-resource-warning-dialog.component.html',
   styleUrls: ['./update-resource-warning-dialog.component.scss'],
 })
-export class UpdateResourceWarningDialogComponent {
+export class UpdateResourceWarningDialogComponent implements AfterViewInit {
+  @ViewChild(ModalWindowComponent, { static: true })
+  private modalWindow!: ModalWindowComponent;
+
   protected _matDialogRef =
     inject<MatDialogRef<UpdateResourceWarningDialogComponent, UpdateResourceWarningResultState>>(MatDialogRef);
 
   protected readonly AlertType = AlertType;
-  protected readonly UpdateResourceWarningResultState = UpdateResourceWarningResultState;
+  ngAfterViewInit(): void {
+    this.modalWindow.focusDialog();
+  }
+
+  @HostListener('keydown.enter')
+  update(): void {
+    this._matDialogRef.close(UpdateResourceWarningResultState.UPDATE_RESOURCE);
+  }
+
+  create(): void {
+    this._matDialogRef.close(UpdateResourceWarningResultState.NEW_RESOURCE);
+  }
 }

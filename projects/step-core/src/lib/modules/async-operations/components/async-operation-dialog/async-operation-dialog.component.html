@@ -1,6 +1,7 @@
 <h3 mat-dialog-title [innerHTML]="_dialogData.title"></h3>
 <div mat-dialog-content>
   <div class="content">
+    <input type="text" class="track-focus" #trackFocus />
     <ng-container [ngSwitch]="state">
       <ng-container *ngSwitchCase="AsyncOperationDialogState.SUCCESS">
         <div [innerHTML]="successMessage"></div>

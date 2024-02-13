@@ -14,7 +14,8 @@ interface TableFetchConfig<T, R> extends TableLocalDataSourceConfig<T> {
 export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<T> {
   private inProgressInternal$!: BehaviorSubject<boolean>;
 
-  private reload$!: BehaviorSubject<ReloadOptions<R>>;
+  private reload$?: BehaviorSubject<ReloadOptions<R>>;
+  private pendingReload?: ReloadOptions<R>;
 
   override readonly inProgress$ = of(false);
 
@@ -27,13 +28,17 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
   }
 
   override reload(reloadOptions?: ReloadOptions<R>): void {
+    if (!this.reload$) {
+      this.pendingReload = reloadOptions;
+      return;
+    }
     this.reload$.next(reloadOptions);
   }
 
   override disconnect(collectionViewer: CollectionViewer) {
     super.disconnect(collectionViewer);
     this.inProgressInternal$.complete();
-    this.reload$.complete();
+    this.reload$?.complete();
     (this.retrieveData as unknown) = undefined;
   }
 
@@ -55,6 +60,10 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
       this.reload$ = reload$;
       this.inProgressInternal$ = inProgressInternal$;
       (this as FieldAccessor).inProgress$ = inProgressInternal$.asObservable();
+      if (this.pendingReload) {
+        this.reload$.next(this.pendingReload);
+        this.pendingReload = undefined;
+      }
     });
   }
 
