@@ -22,11 +22,11 @@ export class TsGroupingComponent implements OnInit, OnChanges {
   };
 
   @Input() dimensions: string[] = [];
+  @Input() groupingOptions!: { label: string; attributes: string[] }[];
 
   label: string = EMPTY_DIMENSIONS_LABEL;
 
   customGroupingString = '';
-  groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS;
 
   attributesLabelMappings: { [key: string]: string } = {
     name: 'Name',
@@ -41,6 +41,7 @@ export class TsGroupingComponent implements OnInit, OnChanges {
     if (changes['dimensions']) {
       this.label = this.formatDimensions(this.dimensions);
     }
+    console.log('changes', this.groupingOptions);
   }
 
   selectGrouping(grouping: { label: string; attributes: string[] }) {

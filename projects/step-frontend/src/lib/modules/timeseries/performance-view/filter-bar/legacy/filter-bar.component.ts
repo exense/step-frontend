@@ -69,6 +69,8 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   rawMeasurementsModeActive = false;
 
+  groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS;
+
   oqlModeActive = false;
   oqlValue: string = '';
   invalidOql = false;

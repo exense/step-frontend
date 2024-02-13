@@ -1,7 +1,7 @@
 <div
   class="filter-item-container"
   [class.active]="active"
-  [title]="formattedValue"
+  [title]="formattedValue || 'Empty filter'"
   [class.compact]="compact"
   [matMenuTriggerFor]="menu"
   #matTrigger="matMenuTrigger"
@@ -10,8 +10,8 @@
   <div class="filter-label">{{ item.label || formattedValue || 'Unspecified' }}</div>
   <div class="filter-value">{{ formattedValue || '-' }}</div>
 
-  <div (click)="removeItem.emit()" class="remove-btn" *ngIf="removable">
-    <step-icon class="remove-btn" name="x"></step-icon>
+  <div (click)="removeItem.emit()" class="remove-btn" *ngIf="removable" title="Remove">
+    <step-icon class="remove-btn" [class.highlight]="highlightRemoveButton" name="x"></step-icon>
   </div>
 </div>
 

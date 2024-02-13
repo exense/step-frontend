@@ -25,6 +25,7 @@
     </mat-button-toggle-group>
     <step-timeseries-grouping
       [dimensions]="activeGrouping"
+      [groupingOptions]="groupingOptions"
       (groupingChange)="handleGroupingChange($event)"
     ></step-timeseries-grouping>
   </div>
@@ -56,6 +57,7 @@
           <step-ts-filter-bar-item
             #appliedFilter
             [item]="item"
+            [highlightRemoveButton]="editMode"
             [compact]="compactView"
             [removable]="item.removable || editMode"
             (removeItem)="removeFilterItem(i)"
@@ -106,6 +108,7 @@
       </mat-button-toggle-group>
       <step-timeseries-grouping
         [dimensions]="activeGrouping"
+        [groupingOptions]="groupingOptions"
         (groupingChange)="handleGroupingChange($event)"
       ></step-timeseries-grouping>
     </div>

@@ -32,7 +32,6 @@
       *ngIf="context"
       [editMode]="editMode"
       [context]="context"
-      [filters]="dashboard.filters || []"
       (timeRangeChange)="handleTimeRangeChange($event)"
       [timeRangeOptions]="timeRangeOptions"
       [activeTimeRange]="timeRangeSelection"

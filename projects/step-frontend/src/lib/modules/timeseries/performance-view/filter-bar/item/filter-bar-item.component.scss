@@ -43,6 +43,10 @@
     min-height: 1.4rem;
     padding: 2px;
 
+    &.highlight {
+      background-color: var.$yellow-5;
+    }
+
     &:hover {
       background: var.$gray-200;
     }

@@ -15,6 +15,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
   @Input() item!: FilterBarItem;
   @Input() removable?: boolean;
   @Input() compact = false;
+  @Input() highlightRemoveButton? = false;
 
   @Output() removeItem: EventEmitter<void> = new EventEmitter<void>();
   @Output() filterChange: EventEmitter<FilterBarItem> = new EventEmitter<FilterBarItem>();
@@ -123,7 +124,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
       case FilterBarItemType.PLAN:
       case FilterBarItemType.TASK:
         const count = this.item.searchEntities?.length;
-        formattedValue = count ? (count > 1 ? `${count} items` : `1 item`) : '-';
+        formattedValue = count ? (count > 1 ? `${count} items` : `1 item`) : '';
         break;
       case FilterBarItemType.FREE_TEXT:
         formattedValue = this.item.freeTextValues?.join(', ');

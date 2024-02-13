@@ -106,6 +106,7 @@
         <mat-button-toggle [value]="true"> OQL</mat-button-toggle>
       </mat-button-toggle-group>
       <step-timeseries-grouping
+        [groupingOptions]="groupingOptions"
         [dimensions]="activeGrouping"
         (groupingChange)="handleGroupingChange($event)"
       ></step-timeseries-grouping>
