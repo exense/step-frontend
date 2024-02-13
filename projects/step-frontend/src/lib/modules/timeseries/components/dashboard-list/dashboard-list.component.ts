@@ -4,6 +4,8 @@ import {
   DashboardView,
   DialogsService,
   StepDataSource,
+  STORE_ALL,
+  tablePersistenceConfigProvider,
   TableRemoteDataSourceFactoryService,
 } from '@exense/step-core';
 import { catchError, filter, map, of, switchMap } from 'rxjs';
@@ -21,6 +23,7 @@ import { COMMON_IMPORTS } from '../../modules/_common';
   styleUrls: ['./dashboard-list.component.scss'],
   standalone: true,
   imports: [COMMON_IMPORTS, NewDashboardDialogComponent],
+  providers: [tablePersistenceConfigProvider('analyticsDashboard', STORE_ALL)],
 })
 export class DashboardListComponent {
   private readonly TABLE_ID = 'dashboards';

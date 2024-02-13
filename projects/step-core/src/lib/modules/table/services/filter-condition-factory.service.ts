@@ -71,7 +71,7 @@ export class FilterConditionFactoryService {
       case FilterConditionType.REPORT_NODE:
         return this.reportNodeFilterCondition(
           filterCondition?.sourceObject?.searchValue,
-          filterCondition?.sourceObject?.attributeValues
+          filterCondition?.sourceObject?.attributeValues,
         );
       case FilterConditionType.SCOPE:
         return this.scopeFilterCondition(filterCondition?.sourceObject);
@@ -79,6 +79,8 @@ export class FilterConditionFactoryService {
         return this.singleDateFilterCondition(filterCondition?.sourceObject);
       case FilterConditionType.DATE_RANGE:
         return this.dateRangeFilterCondition(filterCondition?.sourceObject);
+      case FilterConditionType.BOOLEAN:
+        return this.booleanFilterCondition(filterCondition?.sourceObject);
       default:
         return undefined;
     }
