@@ -6,6 +6,7 @@ import {
   AugmentedScreenService,
   DialogsService,
   DialogParentService,
+  AugmentedScreenService,
 } from '@exense/step-core';
 import { RenderOptionsPipe } from '../../pipes/render-options.pipe';
 import { filter, map, of, Subject, switchMap, takeUntil } from 'rxjs';
@@ -46,7 +47,7 @@ export class ScreenConfigurationListComponent implements DialogParentService, On
       .addSearchStringPredicate('type', (item) => item.input!.type!)
       .addSearchStringPredicate('options', (item) => this._renderOptions.transform(item.input!.options!))
       .addSearchStringPredicate('activationScript', (item) => item.input!.activationExpression!.script!)
-      .build()
+      .build(),
   );
 
   private get baseScreenConfigurationUrl(): string {
@@ -66,7 +67,7 @@ export class ScreenConfigurationListComponent implements DialogParentService, On
     this._activatedRoute.params
       .pipe(
         map((params) => params['screenId']),
-        takeUntil(this.terminator$)
+        takeUntil(this.terminator$),
       )
       .subscribe((screenId) => {
         this.currentlySelectedScreenChoice = screenId;
@@ -108,7 +109,9 @@ export class ScreenConfigurationListComponent implements DialogParentService, On
   }
 
   moveScreen(dbId: string, offset: number): void {
-    this._screenApi.moveInput(dbId, offset).subscribe(() => this.searchableScreens.reload());
+    this._screenApi
+      .moveInput(dbId, offset, this.currentlySelectedScreenChoice)
+      .subscribe(() => this.searchableScreens.reload());
   }
 
   removeScreen(dbId: string, label: string): void {
@@ -116,7 +119,7 @@ export class ScreenConfigurationListComponent implements DialogParentService, On
       .showDeleteWarning(1, `Screen "${label}"`)
       .pipe(
         filter((result) => result),
-        switchMap(() => this._screenApi.deleteInput(dbId))
+        switchMap(() => this._screenApi.deleteInput(dbId)),
       )
       .subscribe(() => this.searchableScreens.reload());
   }

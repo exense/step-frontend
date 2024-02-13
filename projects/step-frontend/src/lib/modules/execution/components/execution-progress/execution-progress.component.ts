@@ -137,7 +137,7 @@ export class ExecutionProgressComponent
         .map(({ artefactID, name }) => (by === 'id' ? artefactID! : name!));
 
       return { by, list };
-    })
+    }),
   );
 
   executionId?: string;
@@ -158,7 +158,7 @@ export class ExecutionProgressComponent
         switchMap((path) => {
           const finalNodeId = path[path.length - 1];
           return this._executionTreeState.expandNode(path).pipe(map(() => finalNodeId));
-        })
+        }),
       )
       .subscribe((nodeId) => this._executionTreeState.selectNodeById(nodeId));
   }
@@ -181,7 +181,7 @@ export class ExecutionProgressComponent
         tap((node) => {
           this._executionPanels.enablePanel(Panels.TEST_CASES, true);
           this._executionPanels.setShowPanel(Panels.TEST_CASES, true);
-        })
+        }),
       )
       .subscribe(() => {
         this.selectTab('steps');
@@ -215,8 +215,13 @@ export class ExecutionProgressComponent
   selectTab(tabId: string): void {
     this.activeTabId = tabId;
     this.activeTab = this.tabs.find((tab) => tab.id === tabId);
+    const routeUrl = this._activatedRoute.snapshot.url;
+    const currentPath = routeUrl[routeUrl.length - 1].path;
+    if (currentPath === tabId) {
+      return;
+    }
+    const relativePath = routeUrl.length === 1 ? '.' : '..';
     const relativeTo = this._activatedRoute;
-    const relativePath = this._activatedRoute.snapshot.url.length === 1 ? '.' : '..';
     this._router.navigate([relativePath, tabId], { relativeTo });
   }
 
@@ -235,7 +240,7 @@ export class ExecutionProgressComponent
     const executionId$ = this._activatedRoute.url.pipe(
       map((url) => url[0].path),
       distinctUntilChanged(),
-      takeUntil(this._terminator$)
+      takeUntil(this._terminator$),
     );
 
     executionId$.subscribe((executionId) => {
@@ -320,7 +325,7 @@ export class ExecutionProgressComponent
     }
     const parameters: { key: string; value: string }[] = (execution.parameters as any) || [];
     const showTestCaseCurrentOperation = parameters.find(
-      (o) => o.key === 'step.executionView.testcases.current-operations'
+      (o) => o.key === 'step.executionView.testcases.current-operations',
     );
     this.showTestCaseCurrentOperation = showTestCaseCurrentOperation?.value.toLowerCase() === 'true';
   }
@@ -351,7 +356,7 @@ export class ExecutionProgressComponent
             return of(rootNode);
           }
           return this._treeUtils.restoreTree(rootNode, expandedNodIds);
-        })
+        }),
       )
       .subscribe((rootNode) => {
         if (rootNode) {
