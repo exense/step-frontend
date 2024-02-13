@@ -62,41 +62,37 @@ export class PlanTreeComponent implements TreeActionsService {
     { id: PlanTreeAction.MOVE_RIGHT, label: 'Move Right (Ctrl + ➡️)' },
   ];
 
-  private actionsMultiple: Map<string, string> = new Map<string, string>([
-    [ PlanTreeAction.OPEN, 'Open (Ctrl + O)'],
-    [ PlanTreeAction.RENAME, 'Rename (F2)'],
-    [ PlanTreeAction.ENABLE, 'Enable All Selected (Ctrl + E)'],
-    [ PlanTreeAction.DISABLE, 'Disable All Selected (Ctrl + E)'],
-    [ PlanTreeAction.COPY, 'Copy All Selected (Ctrl + C)'],
-    [ PlanTreeAction.PASTE, 'Paste All Selected (Ctrl + V)'],
-    [ PlanTreeAction.DUPLICATE, 'Duplicate All Selected (Ctrl + D)'],
-    [ PlanTreeAction.DELETE, 'Delete All Selected (Del)'],
-    [ PlanTreeAction.MOVE_UP, 'Move Up All Selected (Ctrl + ⬆️)'],
-    [ PlanTreeAction.MOVE_DOWN, 'Move Down All Selected (Ctrl + ⬇️)'],
-    [ PlanTreeAction.MOVE_LEFT, 'Move Left All Selected (Ctrl + ⬅️)'],
-    [ PlanTreeAction.MOVE_RIGHT, 'Move Right All Selected (Ctrl + ➡️)'],
-  ]);
+  private actionsMultiple: TreeAction[] = [
+      { id: PlanTreeAction.OPEN, label: 'Open (Ctrl + O)', disabled: true },
+      { id: PlanTreeAction.RENAME, label: 'Rename (F2)', disabled: true },
+      { id: PlanTreeAction.ENABLE, label: 'Enable All Selected (Ctrl + E)'},
+      { id: PlanTreeAction.DISABLE, label: 'Disable All Selected (Ctrl + E)'},
+      { id: PlanTreeAction.COPY, label: 'Copy All Selected (Ctrl + C)'},
+      { id: PlanTreeAction.PASTE, label: 'Paste All Selected (Ctrl + V)'},
+      { id: PlanTreeAction.DUPLICATE, label: 'Duplicate All Selected (Ctrl + D)'},
+      { id: PlanTreeAction.DELETE, label: 'Delete All Selected (Del)'},
+      { id: PlanTreeAction.MOVE_UP, label: 'Move Up All Selected (Ctrl + ⬆️)'},
+      { id: PlanTreeAction.MOVE_DOWN, label: 'Move Down All Selected (Ctrl + ⬇️)'},
+      { id: PlanTreeAction.MOVE_LEFT, label: 'Move Left All Selected (Ctrl + ⬅️)'},
+      { id: PlanTreeAction.MOVE_RIGHT, label: 'Move Right All Selected (Ctrl + ➡️)'},
+  ];
 
   getActionsForNode(node: ArtefactTreeNode, multipleNodes?: boolean): Observable<TreeAction[]> {
     const isSkipped = node.isSkipped;
+    const actions = multipleNodes ? this.actionsMultiple : this.actions;
 
-    return of(this.actions).pipe(
+    return of(actions).pipe(
       map((actions) =>
         actions
           .map((action) => {
             let disabled = false;
-            if (this.isReadonly) {
+            if (this.isReadonly || action.disabled) {
               disabled = true;
             } else if (action.id === PlanTreeAction.OPEN) {
               disabled = !this.canOpenArtefact(node.originalArtefact);
             }
-            if (multipleNodes && ((action.id === PlanTreeAction.OPEN) || (action.id === PlanTreeAction.RENAME))) {
-              disabled = true;
-            }
 
-            const newLabel = multipleNodes ? this.actionsMultiple.get(action.id)! : action.label;
-
-            return { ...action, disabled, label: newLabel };
+            return { ...action, disabled };
           })
           .filter((action) => {
             if (action.id === PlanTreeAction.DISABLE && isSkipped && !multipleNodes) {
