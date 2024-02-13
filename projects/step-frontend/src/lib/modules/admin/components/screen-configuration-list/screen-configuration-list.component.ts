@@ -1,16 +1,16 @@
-import { Component, forwardRef, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, forwardRef, inject, OnInit } from '@angular/core';
 import {
   TableFetchLocalDataSource,
   ScreenInput,
   MultipleProjectsService,
-  AugmentedScreenService,
   DialogsService,
   DialogParentService,
   AugmentedScreenService,
 } from '@exense/step-core';
 import { RenderOptionsPipe } from '../../pipes/render-options.pipe';
-import { filter, map, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { filter, map, of, switchMap } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-screen-configuration-list',
@@ -23,8 +23,8 @@ import { ActivatedRoute, Router } from '@angular/router';
     },
   ],
 })
-export class ScreenConfigurationListComponent implements DialogParentService, OnInit, OnDestroy {
-  private terminator$ = new Subject<void>();
+export class ScreenConfigurationListComponent implements DialogParentService, OnInit {
+  private _destroyRef = inject(DestroyRef);
   private _activatedRoute = inject(ActivatedRoute);
   private _screenApi = inject(AugmentedScreenService);
   private _dialogs = inject(DialogsService);
@@ -67,17 +67,12 @@ export class ScreenConfigurationListComponent implements DialogParentService, On
     this._activatedRoute.params
       .pipe(
         map((params) => params['screenId']),
-        takeUntil(this.terminator$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((screenId) => {
         this.currentlySelectedScreenChoice = screenId;
         this.searchableScreens.reload();
       });
-  }
-
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   dialogSuccessfullyClosed(): void {
