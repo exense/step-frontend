@@ -154,7 +154,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     nodes.forEach(node => {
       let isSkipped;
       if (actionId) {
-        isSkipped = actionId === PlanTreeAction.DISABLE ? true : false;
+        isSkipped = (actionId === PlanTreeAction.DISABLE);
       } else {
         isSkipped = !node.isSkipped;
       }
