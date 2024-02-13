@@ -35,6 +35,7 @@ import { ThemeComponent } from './components/theme/theme.component';
 import { StepIconsModule } from '../step-icons/step-icons.module';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @NgModule({
   imports: [CommonModule, StepIconsModule],
@@ -76,6 +77,7 @@ import { MatBadgeModule } from '@angular/material/badge';
     StepIconsModule,
     MatAutocompleteModule,
     MatBadgeModule,
+    MatButtonToggleModule,
   ],
 })
 export class StepMaterialModule {}

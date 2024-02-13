@@ -14,26 +14,31 @@ interface TableFetchConfig<T, R> extends TableLocalDataSourceConfig<T> {
 export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<T> {
   private inProgressInternal$!: BehaviorSubject<boolean>;
 
-  private reload$!: BehaviorSubject<ReloadOptions<R>>;
+  private reload$?: BehaviorSubject<ReloadOptions<R>>;
+  private pendingReload?: ReloadOptions<R>;
 
   override readonly inProgress$ = of(false);
 
   constructor(
     private retrieveData: (request?: R) => Observable<T[]>,
     config: TableLocalDataSourceConfig<T> = {},
-    initialReloadOptions?: ReloadOptions<R>
+    initialReloadOptions?: ReloadOptions<R>,
   ) {
     super([], { ...config, initialReloadOptions } as TableLocalDataSourceConfig<T>);
   }
 
   override reload(reloadOptions?: ReloadOptions<R>): void {
+    if (!this.reload$) {
+      this.pendingReload = reloadOptions;
+      return;
+    }
     this.reload$.next(reloadOptions);
   }
 
   override disconnect(collectionViewer: CollectionViewer) {
     super.disconnect(collectionViewer);
     this.inProgressInternal$.complete();
-    this.reload$.complete();
+    this.reload$?.complete();
     (this.retrieveData as unknown) = undefined;
   }
 
@@ -55,12 +60,16 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
       this.reload$ = reload$;
       this.inProgressInternal$ = inProgressInternal$;
       (this as FieldAccessor).inProgress$ = inProgressInternal$.asObservable();
+      if (this.pendingReload) {
+        this.reload$.next(this.pendingReload);
+        this.pendingReload = undefined;
+      }
     });
   }
 
   private createDataStream(
     reload$: BehaviorSubject<ReloadOptions<R>>,
-    inProgressInternal$: BehaviorSubject<boolean>
+    inProgressInternal$: BehaviorSubject<boolean>,
   ): Observable<T[]> {
     return reload$.pipe(
       map((reloadOptions) => reloadOptions || {}),
@@ -70,7 +79,7 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
         }
       }),
       switchMap(({ request }) => this.retrieveData(request)),
-      tap(() => inProgressInternal$.next(false))
+      tap(() => inProgressInternal$.next(false)),
     );
   }
 }
