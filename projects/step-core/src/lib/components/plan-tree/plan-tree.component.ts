@@ -142,41 +142,42 @@ export class PlanTreeComponent implements TreeActionsService {
   }
 
   proceedAction(actionId: string, node?: ArtefactTreeNode, multipleNodes?: boolean): void {
-    const artefact = node?.originalArtefact;
+    const artefact = multipleNodes ? undefined : node?.originalArtefact;
+    const forceSkip = actionId === PlanTreeAction.DISABLE;
     switch (actionId) {
       case PlanTreeAction.RENAME:
         this._planEditService.rename(artefact);
         break;
       case PlanTreeAction.MOVE_UP:
-        this._planEditService.moveUp(multipleNodes ? undefined : artefact);
+        this._planEditService.moveUp(artefact);
         break;
       case PlanTreeAction.MOVE_DOWN:
-        this._planEditService.moveDown(multipleNodes ? undefined : artefact);
+        this._planEditService.moveDown(artefact);
         break;
       case PlanTreeAction.MOVE_LEFT:
-        this._planEditService.moveOut(multipleNodes ? undefined : artefact);
+        this._planEditService.moveOut(artefact);
         break;
       case PlanTreeAction.MOVE_RIGHT:
-        this._planEditService.moveInPrevSibling(multipleNodes ? undefined : artefact);
+        this._planEditService.moveInPrevSibling(artefact);
         break;
       case PlanTreeAction.COPY:
-        this._planEditService.copy(multipleNodes ? undefined : artefact);
+        this._planEditService.copy(artefact);
         break;
       case PlanTreeAction.PASTE:
-        this._planEditService.paste(multipleNodes ? undefined : artefact);
+        this._planEditService.paste(artefact);
         break;
       case PlanTreeAction.DUPLICATE:
-        this._planEditService.duplicate(multipleNodes ? undefined : artefact);
+        this._planEditService.duplicate(artefact);
         break;
       case PlanTreeAction.DELETE:
-        this._planEditService.delete(multipleNodes ? undefined : artefact);
+        this._planEditService.delete(artefact);
         break;
       case PlanTreeAction.OPEN:
         this._planArtefactResolver?.openArtefact(artefact);
         break;
       case PlanTreeAction.DISABLE:
       case PlanTreeAction.ENABLE:
-        this._planEditService?.toggleSkip(multipleNodes ? undefined : artefact, actionId);
+        this._planEditService?.toggleSkip(artefact, forceSkip);
         break;
       default:
         break;

@@ -178,11 +178,11 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
     this.strategy.rename(node);
   }
 
-  toggleSkip(node?: AbstractArtefact, actionId?: string): void {
+  toggleSkip(node?: AbstractArtefact, forceSkip?: boolean): void {
     if (!this.strategy) {
       return;
     }
-    this.strategy.toggleSkip(node, actionId);
+    this.strategy.toggleSkip(node, forceSkip);
   }
 
   init(plan: Plan, selectedArtefactId?: string): void {

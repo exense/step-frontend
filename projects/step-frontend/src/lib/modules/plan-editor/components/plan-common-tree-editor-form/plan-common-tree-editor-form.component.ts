@@ -239,11 +239,11 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
     this._treeState.editSelectedNode();
   }
 
-  toggleSkip(node?: AbstractArtefact, actionId?: string): void {
+  toggleSkip(node?: AbstractArtefact, forceSkip?: boolean): void {
     if (node) {
       this._treeState.selectNodeById(node.id!);
     }
-    this._treeState.toggleSkip(actionId);
+    this._treeState.toggleSkip(forceSkip);
   }
 
   private initPlanUpdate(): void {
