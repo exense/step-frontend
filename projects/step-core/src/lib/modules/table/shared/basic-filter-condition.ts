@@ -13,6 +13,6 @@ export class BasicFilterCondition extends FilterCondition<TableRequestFilter[] |
   }
 
   override isEmpty(): boolean {
-    return !!this.sourceObject?.length;
+    return !this.sourceObject?.length;
   }
 }
