@@ -29,4 +29,18 @@ step-execution-list {
   th step-array-filter step-form-field .form-field-content mat-select {
     width: 8rem !important;
   }
+
+  .duration {
+    user-select: none;
+  }
+}
+
+step-popover-content > .execution-duration-description {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 0.5rem;
+
+  & > div:nth-child(2n - 1) {
+    font-weight: 500;
+  }
 }

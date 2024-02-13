@@ -30,8 +30,8 @@ export class FilterConditionFactoryService {
     return new SingleDateFilterCondition(date);
   }
 
-  dateRangeFilterCondition(range?: DateRange): FilterCondition {
-    return new DateRangeFilterCondition(range);
+  dateRangeFilterCondition(range?: DateRange, columnsOverride?: { start?: string; end?: string }): FilterCondition {
+    return new DateRangeFilterCondition({ range, columnsOverride });
   }
 
   scopeFilterCondition(value?: string): FilterCondition {
@@ -71,14 +71,17 @@ export class FilterConditionFactoryService {
       case FilterConditionType.REPORT_NODE:
         return this.reportNodeFilterCondition(
           filterCondition?.sourceObject?.searchValue,
-          filterCondition?.sourceObject?.attributeValues
+          filterCondition?.sourceObject?.attributeValues,
         );
       case FilterConditionType.SCOPE:
         return this.scopeFilterCondition(filterCondition?.sourceObject);
       case FilterConditionType.SINGLE_DATE:
         return this.singleDateFilterCondition(filterCondition?.sourceObject);
       case FilterConditionType.DATE_RANGE:
-        return this.dateRangeFilterCondition(filterCondition?.sourceObject);
+        return this.dateRangeFilterCondition(
+          filterCondition?.sourceObject?.range,
+          filterCondition?.sourceObject?.columnsOverride,
+        );
       default:
         return undefined;
     }

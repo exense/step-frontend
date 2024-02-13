@@ -20,7 +20,8 @@ export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit, O
     return !!this._searchCol && !!this._filter;
   }
 
-  @Input() createConditionFn?: (value: T) => FilterCondition;
+  @Input() createConditionFn?: (value: T, additionalParams?: any) => FilterCondition;
+  @Input() conditionFnAdditionalParams?: any;
   @Input() useRegex?: boolean;
 
   ngAfterViewInit(): void {
@@ -52,13 +53,13 @@ export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit, O
     }
     this._filter!.filterChange.pipe(
       map((filterValue) => this.convertToSearchValue(filterValue)),
-      takeUntil(this.terminator$)
+      takeUntil(this.terminator$),
     ).subscribe((searchValue) => this._searchCol!.search(searchValue));
   }
 
   private convertToSearchValue(value: T): SearchValue {
     if (this.createConditionFn) {
-      return this.createConditionFn.call(this._filterConditionFactory, value);
+      return this.createConditionFn.call(this._filterConditionFactory, value, this.conditionFnAdditionalParams);
     }
 
     if (this.useRegex !== undefined) {

@@ -44,6 +44,7 @@ import { TriggerPopoverDirective } from './directives/trigger-popover.directive'
 import { PopoverComponent } from './components/popover/popover.component';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { DescriptionHintComponent } from './components/description-hint/description-hint.component';
+import { DurationPipe } from './pipes/duration.pipe';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -89,6 +90,7 @@ import { DescriptionHintComponent } from './components/description-hint/descript
     PopoverComponent,
     SafeHtmlPipe,
     DescriptionHintComponent,
+    DurationPipe,
   ],
   exports: [
     CommonModule,
@@ -137,6 +139,7 @@ import { DescriptionHintComponent } from './components/description-hint/descript
     PopoverComponent,
     SafeHtmlPipe,
     DescriptionHintComponent,
+    DurationPipe,
   ],
 })
 export class StepBasicsModule {}
@@ -225,4 +228,5 @@ export * from './directives/popover-content.directive';
 export * from './directives/trigger-popover.directive';
 export * from './components/popover/popover.component';
 export * from './pipes/safe-html.pipe';
+export * from './pipes/duration.pipe';
 export * from './components/description-hint/description-hint.component';
