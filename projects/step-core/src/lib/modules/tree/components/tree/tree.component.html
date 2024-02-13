@@ -62,7 +62,7 @@
   (menuClosed)="handleContextClose()"
 ></div>
 <mat-menu #nodeContextMenu="matMenu">
-  <ng-template matMenuContent let-node="node">
+  <ng-template matMenuContent let-node="node" let-multipleNodes="multipleNodes">
     <ng-container *ngFor="let action of node | treeNodeActions:multipleNodes | async; trackBy: trackByAction">
       <button
         class="tree-action-item"

@@ -19,7 +19,6 @@ import { TreeAction } from '../../shared/tree-action';
 import { TreeNode } from '../../shared/tree-node';
 import { TreeNodeTemplateDirective } from '../../directives/tree-node-template.directive';
 import { TreeNodeTemplateContainerService } from '../../services/tree-node-template-container.service';
-import { take } from "rxjs";
 
 @Component({
   selector: 'step-tree',
@@ -61,12 +60,10 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
 
   protected openedMenuNodeId?: string;
 
-  multipleNodes = false;
-
   openContextMenu({ event, nodeId }: { event: MouseEvent; nodeId: string }): void {
     const node = this._treeState.findNodeById(nodeId);
     const nodes = this._treeState.getSelectedNodes();
-    this.multipleNodes = (nodes.length > 1 && !!nodes.find(el => el.id === nodeId));
+    const multipleNodes = (nodes.length > 1 && !!nodes.find(el => el.id === nodeId));
     if (!node) {
       return;
     }
@@ -78,14 +75,15 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
     event.preventDefault();
     this.contextMenuPosition.x = event.clientX;
     this.contextMenuPosition.y = event.clientY;
-    this.contextMenuTrigger.menuData = { node };
+    this.contextMenuTrigger.menuData = { node, multipleNodes };
     this.contextMenuTrigger.openMenu();
     this.openedMenuNodeId = nodeId;
   }
 
   handleContextAction(action: TreeAction, node?: N): void {
     const actionId = action.id;
-    this.treeContextAction.emit({ actionId, node, multipleNodes: this.multipleNodes });
+    const multipleNodes = this.contextMenuTrigger.menuData.multipleNodes;
+    this.treeContextAction.emit({ actionId, node, multipleNodes });
   }
 
   handleDblClick(node: N, event: MouseEvent): void {
