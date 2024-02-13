@@ -1,6 +1,3 @@
-import { AbstractControl, FormArray, FormControl, FormGroup } from '@angular/forms';
-import { IPromise } from 'angular';
-import { Observable, from } from 'rxjs';
 import { DynamicValueInteger, DynamicValueString } from '../client/generated';
 import { AceMode } from './ace-mode.enum';
 import { Collection } from './collection.interface';
@@ -8,14 +5,6 @@ import { ScriptLanguage } from './script-language.enum';
 import { KeyValue } from '@angular/common';
 import { Route } from '@angular/router';
 import { SUB_ROUTE_DATA } from './constants';
-
-export const a1Promise2Promise = <T>(promise: IPromise<T>): Promise<T> =>
-  Promise.resolve(promise as unknown as Promise<T>);
-
-export const a1Promise2Observable = <T>(promise: IPromise<T>): Observable<T> => {
-  const pr = a1Promise2Promise(promise);
-  return from(pr);
-};
 
 export const getObjectFieldValue = (object: Record<string, unknown>, fieldPath: string): unknown => {
   const pathParts = fieldPath.split('.');
@@ -118,7 +107,7 @@ export const toRecord = <T>(keyValuePairs: KeyValue<string, T>[]): Record<string
       ...acc,
       [key]: value,
     }),
-    {}
+    {},
   );
 
 export const routesPrioritySortPredicate = (routeA: Route, routeB: Route) => {

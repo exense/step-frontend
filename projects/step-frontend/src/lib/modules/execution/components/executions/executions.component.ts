@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ExecutionTab } from '../../shared/execution-tab';
-import { filter, map, startWith, Subject, takeUntil } from 'rxjs';
+import { filter, map, of, startWith, Subject, switchMap, takeUntil } from 'rxjs';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 import { IS_SMALL_SCREEN } from '@exense/step-core';
@@ -37,14 +37,15 @@ export class ExecutionsComponent implements OnInit, OnDestroy, ExecutionTabManag
       filter((event) => {
         return event instanceof NavigationEnd;
       }),
-      startWith(undefined)
+      startWith(undefined),
     );
 
     $routeChanged
       .pipe(
-        map(() => this._activatedRoute.snapshot.firstChild?.url?.[0]?.path),
+        switchMap(() => this._activatedRoute.firstChild?.url ?? of(undefined)),
+        map((url) => url?.[0]?.path),
         filter((path) => !!path && this.activeTab?.id !== path),
-        takeUntil(this.terminator$)
+        takeUntil(this.terminator$),
       )
       .subscribe((executionId) => this.handleLocationChange(executionId!));
   }

@@ -41,6 +41,9 @@ export class ParameterEditDialogComponent implements OnInit {
 
   @HostListener('keydown.enter')
   save(): void {
+    if (this.parameter?.scope === 'GLOBAL' && !this._authService.hasRight('param-global-write')) {
+      return;
+    }
     this._api.saveParameter(this.parameter).subscribe((parameter) => {
       this._matDialogRef.close(parameter);
     });
@@ -64,7 +67,7 @@ export class ParameterEditDialogComponent implements OnInit {
           parameter.scope = this._parameterScopeRenderer.normalizeScope(parameter.scope);
         }
         this.protectedParameter = !!parameter.protectedValue;
-      })
+      }),
     );
 
     iif(() => this.isEditMode, openForEdit$, createNew$).subscribe((parameter) => {
@@ -84,9 +87,9 @@ export class ParameterEditDialogComponent implements OnInit {
       .pipe(
         map(([scopeItems, hasGlobal, hasApplication]) => {
           return scopeItems.filter(
-            (item) => (item.scope !== 'GLOBAL' || hasGlobal) && (item.scope !== 'APPLICATION' || hasApplication)
+            (item) => (item.scope !== 'GLOBAL' || hasGlobal) && (item.scope !== 'APPLICATION' || hasApplication),
           );
-        })
+        }),
       )
       .subscribe((scopeItems) => (this.scopeItems = scopeItems));
   }

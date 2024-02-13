@@ -182,13 +182,35 @@ export class ExecutionsService {
    * @throws ApiError
    */
   public getExecutionsByRepositoryObjectReference(
-    requestBody?: RepositoryObjectReference
+    requestBody?: RepositoryObjectReference,
   ): Observable<Array<Execution>> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/executions/search/by/ref',
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Returns the list of report nodes with contributing errors for the given execution
+   * @param id
+   * @param skip
+   * @param limit
+   * @returns ReportNode default response
+   * @throws ApiError
+   */
+  public getReportNodeWithContributingErrors(id: string, skip?: number, limit?: number): Observable<Array<ReportNode>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/{id}/reportnodes-with-errors',
+      path: {
+        id: id,
+      },
+      query: {
+        skip: skip,
+        limit: limit,
+      },
     });
   }
 
@@ -221,7 +243,7 @@ export class ExecutionsService {
    * @throws ApiError
    */
   public restartExecutions(
-    requestBody?: TableBulkOperationRequest
+    requestBody?: TableBulkOperationRequest,
   ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',

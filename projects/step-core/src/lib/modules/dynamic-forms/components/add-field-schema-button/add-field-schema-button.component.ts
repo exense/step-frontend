@@ -17,9 +17,7 @@ export class AddFieldSchemaButtonComponent {
 
   openAddFieldDialog(): void {
     this._matDialog
-      .open<AddSchemaFieldDialogComponent, unknown, FieldSchemaMeta>(AddSchemaFieldDialogComponent, {
-        disableClose: true,
-      })
+      .open<AddSchemaFieldDialogComponent, unknown, FieldSchemaMeta>(AddSchemaFieldDialogComponent)
       .afterClosed()
       .subscribe((fieldMeta) => {
         if (!fieldMeta || !this._ngControl) {

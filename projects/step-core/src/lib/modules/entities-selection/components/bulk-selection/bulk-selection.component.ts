@@ -10,7 +10,6 @@ import {
 } from '@angular/core';
 import { BulkSelectionType } from '../../shared/bulk-selection-type.enum';
 import { SelectionCollector } from '../../services/selection-collector/selection-collector';
-import { Mutable } from '../../../../shared';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { MAT_CHECKBOX_DEFAULT_OPTIONS, MatCheckboxDefaultOptions } from '@angular/material/checkbox';
 
@@ -111,9 +110,9 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
       .pipe(
         filter(
           (selected) =>
-            (selected.length > 0 && selected.length < selectionCollector!.possibleLength) || selected.length === 1
+            (selected.length > 0 && selected.length < selectionCollector!.possibleLength) || selected.length === 1,
         ),
-        takeUntil(this.terminator$)
+        takeUntil(this.terminator$),
       )
       .subscribe(() => {
         if (!selectionCollector?.isSelectingPossible() && this.selectionType !== BulkSelectionType.INDIVIDUAL) {
@@ -125,7 +124,7 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
     selectionCollector.selected$
       .pipe(
         filter((selected) => selected.length === 0),
-        takeUntil(this.terminator$)
+        takeUntil(this.terminator$),
       )
       .subscribe(() => {
         if (this.selectionType !== BulkSelectionType.NONE) {

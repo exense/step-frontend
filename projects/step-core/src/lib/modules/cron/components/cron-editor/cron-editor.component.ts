@@ -1,9 +1,8 @@
-import { Component, inject, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, inject, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Tab } from '../../../tabs/tabs.module';
 import { CronValidation } from '../../types/cron/_cron-validation';
 import { AlertType } from '../../../basics/shared/alert-type.enum';
-import { ExpressionChangeEvent } from '../base-editor/base-editor.component';
 import { CronEditorTab } from '../../types/cron-editor-tab.enum';
 
 type DialogRef = MatDialogRef<CronEditorComponent, string>;
@@ -44,15 +43,16 @@ export class CronEditorComponent {
 
   protected isExpressionValid = false;
 
-  protected isTouched = false;
-
-  handleExpressionChange({ expression, isTouched }: ExpressionChangeEvent): void {
+  handleExpressionChange(expression: string): void {
     this.cronExpression = expression;
-    this.isTouched = isTouched;
     this.isExpressionValid = CronValidation.validate(this.cronExpression);
   }
 
+  @HostListener('keydown.enter')
   apply(): void {
+    if (!this.cronExpression) {
+      this.isExpressionValid = false;
+    }
     if (!this.isExpressionValid) {
       return;
     }

@@ -1,7 +1,7 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
 import { routesPrioritySortPredicate, SUB_ROUTE_DATA, SubRouteData, SubRouterConfig } from '../shared';
 import { Route, Router, Routes } from '@angular/router';
-import { CheckPermissionsGuard } from './check-permissions.guard';
+import { checkPermissionsGuard } from './check-permissions-guard.service';
 import { VIEW_ID_LINK_PREFIX } from '../modules/basics/services/view-id-link-prefix.token';
 import { BehaviorSubject } from 'rxjs';
 
@@ -104,7 +104,7 @@ export class ViewRegistryService implements OnDestroy {
       {
         weight: 10,
         parentId: 'support-root',
-      }
+      },
     );
     this.registerMenuEntry('REST API', this._viewIdLinkPrefix.concat('doc/rest/'), 'compass', {
       weight: 20,
@@ -236,7 +236,7 @@ export class ViewRegistryService implements OnDestroy {
 
       if (accessPermissions) {
         route.canActivate = route.canActivate ?? [];
-        route.canActivate.push(CheckPermissionsGuard);
+        route.canActivate.push(checkPermissionsGuard);
       }
       root.children.push(route);
       return;
@@ -256,7 +256,7 @@ export class ViewRegistryService implements OnDestroy {
 
     if (accessPermissions) {
       route.canActivate = route.canActivate ?? [];
-      route.canActivate.push(CheckPermissionsGuard);
+      route.canActivate.push(checkPermissionsGuard);
     }
 
     parentChildren!.push(route);
@@ -271,7 +271,7 @@ export class ViewRegistryService implements OnDestroy {
   registerViewWithConfig(
     viewId: string,
     template: string,
-    config: { isPublicView?: boolean; isStaticView?: boolean }
+    config: { isPublicView?: boolean; isStaticView?: boolean },
   ): void {
     const isPublicView = config.isPublicView || false;
     const isStaticView = config.isStaticView || false;
@@ -336,7 +336,7 @@ export class ViewRegistryService implements OnDestroy {
     template: string,
     id: string,
     position: number,
-    isEnabledFct: () => boolean
+    isEnabledFct: () => boolean,
   ): void {
     this.getDashlets(path).splice(position, 0, {
       label: label,

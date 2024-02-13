@@ -1,5 +1,5 @@
-import { AfterViewInit, Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { AfterViewInit, Component, ElementRef, HostListener, inject, ViewChild } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AsyncOperationDialogState } from '../../shared/async-operation-dialog-state.enum';
 import { AsyncOperationDialogOptions } from '../../shared/async-operation-dialog-options';
 import { AsyncTasksService, AsyncTaskStatus, pollAsyncTask } from '../../../../client/step-client-module';
@@ -8,13 +8,17 @@ import { map, of, timer } from 'rxjs';
 import { AsyncOperationDialogResult } from '../../shared/async-operation-dialog-result';
 import { AsyncOperationCloseStatus } from '../../shared/async-operation-close-status.enum';
 import { SafeHtml } from '@angular/platform-browser';
+import { BaseModalWindowComponent } from '../../../basics/components/modal-window/base-modal-window.component';
 
 @Component({
   selector: 'step-async-operation-dialog',
   templateUrl: './async-operation-dialog.component.html',
   styleUrls: ['./async-operation-dialog.component.scss'],
 })
-export class AsyncOperationDialogComponent implements AfterViewInit {
+export class AsyncOperationDialogComponent extends BaseModalWindowComponent implements AfterViewInit {
+  private _asyncService = inject(AsyncTasksService);
+  readonly _dialogData: AsyncOperationDialogOptions = inject<AsyncOperationDialogOptions>(MAT_DIALOG_DATA);
+
   readonly AsyncOperationDialogState = AsyncOperationDialogState;
 
   state: AsyncOperationDialogState = AsyncOperationDialogState.PROGRESS;
@@ -26,11 +30,8 @@ export class AsyncOperationDialogComponent implements AfterViewInit {
   error?: AsyncTaskStatus | Error;
   operationStatus?: AsyncTaskStatus;
 
-  constructor(
-    private _dialogRef: MatDialogRef<AsyncOperationDialogComponent>,
-    private _asyncService: AsyncTasksService,
-    @Inject(MAT_DIALOG_DATA) public _dialogData: AsyncOperationDialogOptions
-  ) {}
+  @ViewChild('trackFocus')
+  private trackFocus!: ElementRef<HTMLInputElement>;
 
   ngAfterViewInit(): void {
     this.performAnOperation();
@@ -41,7 +42,11 @@ export class AsyncOperationDialogComponent implements AfterViewInit {
     this._dialogRef.close(result);
   }
 
+  @HostListener('keydown.enter')
   closeOk(): void {
+    if (this.state === AsyncOperationDialogState.PROGRESS) {
+      return;
+    }
     let result: AsyncOperationDialogResult;
     if (this.state === AsyncOperationDialogState.SUCCESS) {
       result = {
@@ -55,6 +60,18 @@ export class AsyncOperationDialogComponent implements AfterViewInit {
       };
     }
     this._dialogRef.close(result);
+  }
+
+  override focusDialog(): void {
+    this.trackFocus.nativeElement.focus();
+  }
+
+  @HostListener('window:keyup.esc')
+  protected override closeByEsc() {
+    if (this.state === AsyncOperationDialogState.PROGRESS) {
+      return;
+    }
+    super.closeByEsc();
   }
 
   private performAnOperation(): void {
@@ -73,12 +90,12 @@ export class AsyncOperationDialogComponent implements AfterViewInit {
         catchError((err) => {
           this.errorMessage = this._dialogData.errorMessage(err);
           this.error = err;
-          this.state = AsyncOperationDialogState.ERROR;
+          this.switchState(AsyncOperationDialogState.ERROR);
           console.error(err);
           return of(undefined);
         }),
         // A small delay to show the last progress value
-        switchMap((result) => timer(500).pipe(map(() => result)))
+        switchMap((result) => timer(500).pipe(map(() => result))),
       )
       .subscribe((result) => {
         if (!result) {
@@ -86,7 +103,12 @@ export class AsyncOperationDialogComponent implements AfterViewInit {
         }
         this.successMessage = this._dialogData.successMessage(result);
         this.operationStatus = result;
-        this.state = AsyncOperationDialogState.SUCCESS;
+        this.switchState(AsyncOperationDialogState.SUCCESS);
       });
+  }
+
+  private switchState(state: AsyncOperationDialogState): void {
+    this.state = state;
+    this.focusDialog();
   }
 }

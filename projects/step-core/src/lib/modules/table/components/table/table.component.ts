@@ -4,6 +4,7 @@ import {
   ContentChildren,
   EventEmitter,
   forwardRef,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -16,18 +17,7 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import {
-  BehaviorSubject,
-  combineLatest,
-  map,
-  Observable,
-  of,
-  startWith,
-  Subject,
-  takeUntil,
-  tap,
-  timestamp,
-} from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, of, startWith, Subject, takeUntil, timestamp } from 'rxjs';
 import { TableDataSource } from '../../shared/table-data-source';
 import { MatColumnDef, MatTable } from '@angular/material/table';
 import { MatSort, Sort } from '@angular/material/sort';
@@ -92,6 +82,8 @@ export class TableComponent<T>
     HasFilter,
     TableHighlightItemContainer
 {
+  private _tableState = inject(TablePersistenceStateService);
+
   @Output() onReload = new EventEmitter<unknown>();
   @Input() trackBy: TrackByFunction<T> = (index) => index;
   @Input() dataSource?: DataSource<T>;
@@ -175,7 +167,7 @@ export class TableComponent<T>
       });
 
       return hasFilter;
-    })
+    }),
   );
 
   highlightedItem?: unknown;
@@ -183,10 +175,9 @@ export class TableComponent<T>
   constructor(
     @Optional() private _sort: MatSort,
     _itemsPerPageService: ItemsPerPageService,
-    private _tableState: TablePersistenceStateService
   ) {
     this.pageSizeOptions = _itemsPerPageService.getItemsPerPage((userPreferredItemsPerPage: number) =>
-      this.page._changePageSize(userPreferredItemsPerPage)
+      this.page._changePageSize(userPreferredItemsPerPage),
     );
   }
 
@@ -237,7 +228,7 @@ export class TableComponent<T>
           this.page!.firstPage();
         }
         return { page, search };
-      })
+      }),
     );
 
     combineLatest([pageAndSearch$, sort$, this.filter$, this.tableParams$])
@@ -352,12 +343,15 @@ export class TableComponent<T>
       .filter((header) => !header.headerGroupId)
       .forEach((header, i) => (header.headerGroupId = `non-grouped-header-${i + 1}`));
 
-    const headerGroupIdToHeaders = this.additionalHeaders.reduce((result, additionalHeader) => {
-      const id = additionalHeader.headerGroupId!;
-      const headerGroup = (result[id] = result[id] || []);
-      headerGroup.push(additionalHeader);
-      return result;
-    }, {} as Record<string, AdditionalHeaderDirective[]>);
+    const headerGroupIdToHeaders = this.additionalHeaders.reduce(
+      (result, additionalHeader) => {
+        const id = additionalHeader.headerGroupId!;
+        const headerGroup = (result[id] = result[id] || []);
+        headerGroup.push(additionalHeader);
+        return result;
+      },
+      {} as Record<string, AdditionalHeaderDirective[]>,
+    );
 
     this.additionalHeaderGroups = Object.values(headerGroupIdToHeaders);
   }

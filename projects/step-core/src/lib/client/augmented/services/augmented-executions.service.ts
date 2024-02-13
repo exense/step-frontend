@@ -1,10 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import {
   AsyncTaskStatusTableBulkOperationReport,
-  Equals,
   Execution,
   ExecutionParameters,
   ExecutionsService,
+  FieldFilter,
   TableBulkOperationRequest,
 } from '../../generated';
 import { map, Observable } from 'rxjs';
@@ -55,7 +55,7 @@ export class AugmentedExecutionsService extends ExecutionsService {
    * @throws ApiError
    */
   public deleteExecutions(
-    requestBody?: TableBulkOperationRequest
+    requestBody?: TableBulkOperationRequest,
   ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'DELETE',
@@ -80,5 +80,16 @@ export class AugmentedExecutionsService extends ExecutionsService {
     return this._tableApiWrapper
       .requestTable<Execution>(this.EXECUTIONS_TABLE_ID, { filters: [idsFilter] })
       .pipe(map((response) => response.data));
+  }
+
+  countExecutionsByStatus(status: string): Observable<number> {
+    const runningFilter: FieldFilter = {
+      field: 'status',
+      regex: true,
+      value: `^${status}$`,
+    };
+    return this._tableApiWrapper
+      .requestTable<Execution>(this.EXECUTIONS_TABLE_ID, { filters: [runningFilter] })
+      .pipe(map((response) => response.recordsFiltered));
   }
 }

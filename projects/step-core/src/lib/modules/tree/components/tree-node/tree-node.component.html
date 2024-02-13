@@ -16,7 +16,7 @@
   <ng-template #noToggle>
     <div class="no-toggle"></div>
   </ng-template>
-  <button *ngIf="canToggle; else noToggle" mat-button mat-icon-button (click)="toggle()">
+  <button *ngIf="canToggle; else noToggle" mat-icon-button (click)="toggle()">
     <step-icon class="toggle-state" [name]="toggleStateIcon"></step-icon>
   </button>
   <div class="node-content" cdkDragHandle (contextmenu)="openContextMenu($event)">

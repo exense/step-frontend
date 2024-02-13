@@ -1,5 +1,14 @@
 import { KeyValue } from '@angular/common';
-import { ChangeDetectorRef, Component, forwardRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  forwardRef,
+  HostListener,
+  inject,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
@@ -70,7 +79,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
       this._formBuilder,
       this.lightForm,
       this.schemaEnforced,
-      this._functionConfigurationDialogData
+      this._functionConfigurationDialogData,
     );
 
     this.formGroup.statusChanges.pipe(takeUntil(this.terminator$)).subscribe(() => {
@@ -81,7 +90,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
 
     if (functionTypeFilters?.length) {
       this.functionTypeItemInfos = this.functionTypeItemInfos.filter((functionTypeItemInfo) =>
-        this._functionConfigurationDialogData.dialogConfig.functionTypeFilters.includes(functionTypeItemInfo.type)
+        this._functionConfigurationDialogData.dialogConfig.functionTypeFilters.includes(functionTypeItemInfo.type),
       );
     }
 
@@ -106,6 +115,10 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
   }
 
   protected save(edit?: boolean): void {
+    if (this.formGroup!.invalid) {
+      this.formGroup!.markAllAsTouched();
+      return;
+    }
     functionConfigurationDialogFormSetValueToModel(this.formGroup!, this.keyword!);
 
     (this.functionTypeChild.componentInstance as FunctionTypeFormComponent<any>).setValueToModel();
@@ -128,7 +141,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
           } else {
             this._dialogsService.showErrorMsg('No editor configured for this function type').subscribe();
           }
-        })
+        }),
       )
       .subscribe();
   }
@@ -153,6 +166,11 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
     }
   }
 
+  @HostListener('keydown.enter')
+  private saveByEnter(): void {
+    this.save(false);
+  }
+
   protected fetchStepFunction(stepFunctionType: string): void {
     this._api
       .newFunctionTypeConf(stepFunctionType)
@@ -171,7 +189,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
           if (this.keyword.schema) {
             keyword.schema = this.keyword.schema;
           }
-        })
+        }),
       )
       .subscribe((keyword) => {
         this.keyword = keyword;

@@ -35,6 +35,7 @@ import { ExecutionBulkOperationsRegisterService } from './services/execution-bul
 import { IsExecutionProgressPipe } from './pipes/is-execution-progress.pipe';
 import { ExecutionsComponent } from './components/executions/executions.component';
 import { ExecutionOpenerComponent } from './components/execution-opener/execution-opener.component';
+import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
 
 @NgModule({
   declarations: [
@@ -64,6 +65,7 @@ import { ExecutionOpenerComponent } from './components/execution-opener/executio
     IsExecutionProgressPipe,
     ExecutionsComponent,
     ExecutionOpenerComponent,
+    ExecutionRunningStatusHeaderComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [
@@ -84,7 +86,7 @@ export class ExecutionModule {
     private _entityRegistry: EntityRegistry,
     private _dashletRegistry: DashletRegistryService,
     private _viewRegistry: ViewRegistryService,
-    _bulkOperationsRegistry: ExecutionBulkOperationsRegisterService
+    _bulkOperationsRegistry: ExecutionBulkOperationsRegisterService,
   ) {
     _bulkOperationsRegistry.register();
     this.registerEntities();
@@ -113,7 +115,7 @@ export class ExecutionModule {
       'executionStep',
       'steps',
       0,
-      () => true
+      () => true,
     );
 
     this._viewRegistry.registerDashletAdvanced(
@@ -124,7 +126,7 @@ export class ExecutionModule {
       1,
       function () {
         return true;
-      }
+      },
     );
 
     this._viewRegistry.registerDashletAdvanced(
@@ -135,7 +137,7 @@ export class ExecutionModule {
       2,
       function () {
         return true;
-      }
+      },
     );
 
     this._viewRegistry.registerDashletAdvanced(
@@ -146,7 +148,7 @@ export class ExecutionModule {
       3,
       function () {
         return true;
-      }
+      },
     );
   }
 

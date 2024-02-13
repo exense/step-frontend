@@ -56,6 +56,15 @@
   >
     <step-icon name="upload"></step-icon>
   </button>
+  <button
+    type="button"
+    mat-stroked-button
+    (click)="showSource.emit()"
+    [matTooltip]="captions.showSource"
+    matTooltipPosition="below"
+  >
+    <step-icon name="code"></step-icon>
+  </button>
 </step-btn-group>
 <step-btn-group class="with-borders">
   <button

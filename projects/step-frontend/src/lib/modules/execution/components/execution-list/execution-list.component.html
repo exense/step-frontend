@@ -62,9 +62,22 @@
   </ng-container>
   <step-custom-columns screen="executionTable"></step-custom-columns>
   <ng-container matColumnDef="status" stepSearchCol>
-    <step-array-filter *stepSearchCellDef stepFilterConnect [useRegex]="true" [items]="(statusItems$ | async)!">
+    <step-array-filter
+      *stepSearchCellDef
+      #statusFilter
+      stepFilterConnect
+      [useRegex]="true"
+      [items]="(statusItems$ | async)!"
+    >
     </step-array-filter>
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+      <step-execution-running-status-header
+        [runningExecutionsCount]="runningExecutionsCount$ | async"
+        (statusBadgeClick)="handleRunningStatusClick()"
+      >
+        Status
+      </step-execution-running-status-header>
+    </th>
     <td mat-cell *matCellDef="let element">
       <step-status [status]="element?.status"></step-status>
     </td>

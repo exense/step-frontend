@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ControllerService, KeyValuePair, Tab } from '@exense/step-core';
 import { map, Observable, shareReplay } from 'rxjs';
 
@@ -13,6 +13,8 @@ enum VersionDialogTabs {
   styleUrls: ['./versions-dialog.component.scss'],
 })
 export class VersionsDialogComponent {
+  private _controllerService = inject(ControllerService);
+
   readonly tabs: Tab[] = [
     {
       id: VersionDialogTabs.FE,
@@ -37,7 +39,7 @@ export class VersionsDialogComponent {
           stepEnterpriseController,
           stepControllerBackend,
           ...Object.keys(versions).sort((a, b) => a.localeCompare(b)),
-        ])
+        ]),
       );
       const keyValuePairs: KeyValuePair<string, string>[] = orderedKeys.map((key) => ({
         key,
@@ -46,8 +48,6 @@ export class VersionsDialogComponent {
 
       return keyValuePairs;
     }),
-    shareReplay(1)
+    shareReplay(1),
   );
-
-  constructor(private _controllerService: ControllerService) {}
 }

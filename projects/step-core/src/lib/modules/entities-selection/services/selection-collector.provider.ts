@@ -1,4 +1,4 @@
-import { FactoryProvider, inject, Provider } from '@angular/core';
+import { inject, Provider } from '@angular/core';
 import { SelectionCollector } from './selection-collector/selection-collector';
 import { AutoDeselectStrategy } from '../shared/auto-deselect-strategy.enum';
 import { SelectionCollectorFactoryService } from './selection-collector/selection-collector-factory.service';
@@ -12,7 +12,7 @@ export interface SelectionCollectorProviderConfig {
 
 export const selectionCollectionProvider = <KEY, ENTITY>(
   selectionKeyPropertyOrConfig: string | SelectionCollectorProviderConfig,
-  autoDeselectStrategy?: AutoDeselectStrategy
+  autoDeselectStrategy?: AutoDeselectStrategy,
 ): Provider[] => [
   SelectionCollectorFactoryService,
   {

@@ -1,0 +1,28 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+@use 'projects/step-frontend/styles/common-mixins' as common-mixins;
+@include common-mixins.ts-filter-bar();
+
+:host {
+  display: flex;
+}
+
+.filter-item-container {
+  background: var.$gray-100;
+  color: unset;
+  height: 2.4rem;
+  padding: 0 1.6rem;
+  max-width: unset;
+  margin-left: 0.8rem;
+}
+
+.grouping-title {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mat-mdc-raised-button.mat-mdc-primary {
+  background: var.$blue-700;
+}

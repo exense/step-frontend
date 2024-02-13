@@ -1,13 +1,4 @@
-import {
-  Component,
-  ElementRef,
-  forwardRef,
-  inject,
-  Input,
-  Optional,
-  ViewChild,
-  ViewEncapsulation,
-} from '@angular/core';
+import { Component, ElementRef, forwardRef, inject, Input, ViewChild, ViewEncapsulation } from '@angular/core';
 import { map, Observable, of } from 'rxjs';
 import { AbstractArtefact } from '../../client/generated';
 import {
@@ -21,6 +12,10 @@ import { PlanArtefactResolverService } from '../../services/plan-artefact-resolv
 import { PlanEditorService } from '../../services/plan-editor.service';
 import { PlanInteractiveSessionService } from '../../services/plan-interactive-session.service';
 import { PlanTreeAction } from '../../shared/plan-tree-action.enum';
+import { PlanEditorPersistenceStateService } from '../../services/plan-editor-persistence-state.service';
+
+const TREE_SIZE = 'TREE_SIZE';
+const ARTEFACT_DETAILS_SIZE = 'ARTEFACT_DETAILS_SIZE';
 
 @Component({
   selector: 'step-plan-tree',
@@ -37,6 +32,7 @@ import { PlanTreeAction } from '../../shared/plan-tree-action.enum';
 export class PlanTreeComponent implements TreeActionsService {
   private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
   private _planArtefactResolver? = inject(PlanArtefactResolverService, { optional: true });
+  private _planPersistenceState = inject(PlanEditorPersistenceStateService);
   readonly _planEditService = inject(PlanEditorService);
   readonly _planInteractiveSession? = inject(PlanInteractiveSessionService, { optional: true });
 
@@ -46,6 +42,9 @@ export class PlanTreeComponent implements TreeActionsService {
   @ViewChild('area') splitAreaElementRef?: ElementRef<HTMLElement>;
 
   @ViewChild(TreeComponent) tree?: TreeComponent<ArtefactTreeNode>;
+
+  protected treeSize = this._planPersistenceState.getPanelSize(TREE_SIZE);
+  protected artefactDetailsSize = this._planPersistenceState.getPanelSize(ARTEFACT_DETAILS_SIZE);
 
   private actions: TreeAction[] = [
     { id: PlanTreeAction.OPEN, label: 'Open (Ctrl + O)' },
@@ -87,8 +86,8 @@ export class PlanTreeComponent implements TreeActionsService {
             }
 
             return true;
-          })
-      )
+          }),
+      ),
     );
   }
 
@@ -158,13 +157,21 @@ export class PlanTreeComponent implements TreeActionsService {
     }
   }
 
-  private canOpenArtefact(artefact: AbstractArtefact): boolean {
-    return ['CallPlan', 'CallKeyword'].includes(artefact._class);
-  }
-
   handlePlanChange() {
     // Timeout is needed to prevent update issue when clicking into the tree and leaving a property field that triggers
     // a plan change
     setTimeout(() => this._planEditService.handlePlanChange(), 200);
+  }
+
+  handleTreeSizeChange(size: number): void {
+    this._planPersistenceState.setPanelSize(TREE_SIZE, size);
+  }
+
+  handleArtefactDetailsSizeChange(size: number): void {
+    this._planPersistenceState.setPanelSize(ARTEFACT_DETAILS_SIZE, size);
+  }
+
+  private canOpenArtefact(artefact: AbstractArtefact): boolean {
+    return ['CallPlan', 'CallKeyword'].includes(artefact._class);
   }
 }

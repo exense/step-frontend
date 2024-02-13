@@ -53,7 +53,7 @@ export class AuthService implements OnDestroy {
     }),
     switchMap(() => this.getSession()),
     map(() => this._serviceContext?.conf?.debug || false),
-    shareReplay(1)
+    shareReplay(1),
   );
 
   private setContextFromSession(session: SessionDto): void {
@@ -72,8 +72,12 @@ export class AuthService implements OnDestroy {
     this.contextInternal$.next(context);
   }
 
-  getContext(): AuthContext {
+  private getContext(): AuthContext {
     return this.contextInternal$.value as AuthContext;
+  }
+
+  getUserID(): string {
+    return this.getContext().userID;
   }
 
   updateContext(info: Partial<AuthContext>): void {
@@ -91,7 +95,7 @@ export class AuthService implements OnDestroy {
             this._navigator.navigateAfterLogin();
           }
         }
-      })
+      }),
     );
   }
 
@@ -190,14 +194,14 @@ export class AuthService implements OnDestroy {
           }),
           tap(() => {
             this._navigator.navigateAfterLogin();
-          })
+          }),
         );
       }),
       tap((session) => this.setContextFromSession(session)),
       catchError((err) => {
         this.setContext({ userID: ANONYMOUS, role: 'public' });
         return of(err);
-      })
+      }),
     );
   }
 }

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import {
   AbstractArtefact,
   ArtefactsFactoryService,
@@ -7,8 +7,6 @@ import {
   COPIED_ARTEFACTS,
   CustomComponent,
   DialogsService,
-  KeywordsService,
-  PersistenceService,
   Plan,
   PlanEditorService,
   PlanEditorStrategy,
@@ -18,6 +16,7 @@ import {
 } from '@exense/step-core';
 import { BehaviorSubject, filter, first, map, merge, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
+import { CopyBufferService } from '../../injectables/copy-buffer.service';
 
 const MESSAGE_ADD_AT_MULTIPLE_NODES =
   'Adding elements is not supported when more then one node is selected in the tree';
@@ -34,7 +33,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
   private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
   private _planHistory = inject(PlanHistoryService);
   private _dialogs = inject(DialogsService);
-  private _persistenceService = inject(PersistenceService);
+  private _copyBuffer = inject(CopyBufferService);
   private _artefactsFactory = inject(ArtefactsFactoryService);
 
   context?: any;
@@ -168,7 +167,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
     }
 
     const artefacts = this.getNodesForCopy().map((node) => node.originalArtefact);
-    this._persistenceService.setItem(COPIED_ARTEFACTS, JSON.stringify(artefacts));
+    this._copyBuffer.setItem(COPIED_ARTEFACTS, JSON.stringify(artefacts));
   }
 
   paste(node?: AbstractArtefact): void {
@@ -250,7 +249,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
     const planUpdateByTree$ = this._treeState.treeUpdate$.pipe(
       map(() => this.plan),
       filter((plan) => !!plan),
-      tap((plan) => this._planHistory.addToHistory(plan!))
+      tap((plan) => this._planHistory.addToHistory(plan!)),
     );
 
     const planUpdateByEditor$ = this.planChange$.pipe(
@@ -258,20 +257,20 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
         this._treeState.init(plan.root!, { expandAllByDefault: false });
         this._planHistory.addToHistory(plan);
         this.planInternal$.next(plan);
-      })
+      }),
     );
 
     const planUpdatedByHistory$ = this._planHistory.planChange$.pipe(
       tap((plan) => {
         this._treeState.init(plan.root!, { expandAllByDefault: false });
         this.planInternal$.next(plan);
-      })
+      }),
     );
 
     merge(planUpdateByTree$, planUpdateByEditor$, planUpdatedByHistory$)
       .pipe(
         switchMap((plan) => this._planEditorApi.savePlan(plan!)),
-        takeUntil(this.terminator$)
+        takeUntil(this.terminator$),
       )
       .subscribe(({ plan, forceRefresh }) => {
         if (forceRefresh) {
@@ -284,7 +283,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
   }
 
   private cloneArtefactsFromBuffer(): Observable<AbstractArtefact[] | undefined> {
-    const copiedArtefactsJSON = this._persistenceService.getItem(COPIED_ARTEFACTS);
+    const copiedArtefactsJSON = this._copyBuffer.getItem(COPIED_ARTEFACTS);
 
     if (!copiedArtefactsJSON) {
       return of(undefined);

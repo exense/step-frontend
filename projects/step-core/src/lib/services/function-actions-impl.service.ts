@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { Observable, catchError, map, of, switchMap, take, tap } from 'rxjs';
 import { AugmentedKeywordsService, Keyword } from '../client/step-client-module';
 import { EditorResolverService, MultipleProjectsService } from '../modules/basics/step-basics.module';
-import { EntityDialogsService } from '../modules/entity/entity.module';
 import {
   FunctionActionsService,
   FunctionConfigurationApiService,
@@ -39,7 +38,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
 
   openAddFunctionModal(
     parentInjector: Injector,
-    dialogConfig?: FunctionDialogsConfig
+    dialogConfig?: FunctionDialogsConfig,
   ): Observable<Keyword | undefined> {
     return this.openModal(parentInjector, {
       dialogConfig,
@@ -49,7 +48,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
   configureFunction(
     parentInjector: Injector,
     id: string,
-    dialogConfig?: FunctionDialogsConfig
+    dialogConfig?: FunctionDialogsConfig,
   ): Observable<Keyword | undefined> {
     return this.getFunctionById(id).pipe(
       switchMap((keyword) => {
@@ -73,7 +72,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
           return this.openModal(parentInjector, { keyword, dialogConfig });
         }
         return of(undefined);
-      })
+      }),
     );
   }
 
@@ -82,8 +81,8 @@ export class FunctionActionsImplService implements FunctionActionsService {
       .showDeleteWarning(1, `Keyword "${name}"`)
       .pipe(
         switchMap((isDeleteConfirmed) =>
-          isDeleteConfirmed ? this._functionApiService.deleteFunction(id).pipe(map(() => true)) : of(false)
-        )
+          isDeleteConfirmed ? this._functionApiService.deleteFunction(id).pipe(map(() => true)) : of(false),
+        ),
       );
   }
 
@@ -97,7 +96,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
       catchError((err) => {
         console.error(err);
         return of(false);
-      })
+      }),
     );
   }
 
@@ -140,7 +139,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
       catchError((error) => {
         console.error(error);
         return of(undefined);
-      })
+      }),
     );
   }
 
@@ -150,7 +149,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
       .pipe(
         take(1),
         switchMap((keywordId) => (keywordId ? this.getFunctionById(keywordId) : of(undefined))),
-        switchMap((keyword) => (keyword ? this.openModal(parentInjector, { keyword, dialogConfig }) : of(undefined)))
+        switchMap((keyword) => (keyword ? this.openModal(parentInjector, { keyword, dialogConfig }) : of(undefined))),
       )
       .subscribe();
   }
@@ -178,15 +177,15 @@ export class FunctionActionsImplService implements FunctionActionsService {
   private configureFunctionInternal(
     parentInjector: Injector,
     id: string,
-    dialogConfig?: FunctionDialogsConfig
+    dialogConfig?: FunctionDialogsConfig,
   ): Observable<Keyword | undefined> {
     return this.getFunctionById(id).pipe(
       switchMap((keyword) =>
         this.openModal(parentInjector, {
           keyword,
           dialogConfig,
-        })
-      )
+        }),
+      ),
     );
   }
 
@@ -195,7 +194,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
     params: {
       keyword?: Keyword;
       dialogConfig?: FunctionDialogsConfig;
-    }
+    },
   ): Observable<Keyword | undefined> {
     const modalInjector = Injector.create({
       providers: [

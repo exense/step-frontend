@@ -1,13 +1,10 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { TreeStateService } from '../../services/tree-state.service';
 import { map, of } from 'rxjs';
 import { Mutable } from '../../../../shared';
 import { TreeNode } from '../../shared/tree-node';
 
 type FieldAccessor = Mutable<Pick<TreeDragPreviewComponent, 'label$' | 'icon$'>>;
-
-const CURSOR_GRABBING = 'grabbing';
-const CURSOR_NOT_ALLOWED = 'not-allowed';
 
 @Component({
   selector: 'step-tree-drag-preview',
@@ -39,7 +36,7 @@ export class TreeDragPreviewComponent implements OnInit {
         }
 
         return { label, icon };
-      })
+      }),
     );
 
     (this as FieldAccessor).label$ = labelAndIcon$.pipe(map((x) => x.label));

@@ -1,5 +1,9 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
+pre {
+  font-family: var.$code-font;
+}
+
 pre.disabled {
   color: var.$gray-400;
 }

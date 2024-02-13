@@ -24,7 +24,7 @@ import { ExecutionErrorMessageItem } from '../../shared/execution-error-message-
 import { ExecutionErrorCodeItem } from '../../shared/execution-error-code-item';
 import { ErrorDistributionStatus } from '../../shared/error-distribution-status.enum';
 import { ExecutionStateService } from '../../services/execution-state.service';
-import { filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { distinctUntilChanged, filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Panels } from '../../shared/panels.enum';
 import { ReportTreeNode } from '../../shared/report-tree-node';
 import { ReportTreeNodeUtilsService } from '../../services/report-tree-node-utils.service';
@@ -33,7 +33,7 @@ import { DOCUMENT } from '@angular/common';
 import { IncludeTestcases } from '../../shared/include-testcases.interface';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ActiveExecutionsService } from '../../services/active-executions.service';
+import { ActiveExecution, ActiveExecutionsService } from '../../services/active-executions.service';
 
 const R_ERROR_KEY = /\\\\u([\d\w]{4})/gi;
 
@@ -80,11 +80,22 @@ interface RefreshParams {
 export class ExecutionProgressComponent
   implements OnInit, ExecutionStateService, ExecutionCloseHandleService, OnDestroy
 {
+  private _document = inject(DOCUMENT);
+  private _executionService = inject(AugmentedExecutionsService);
+  private _controllerService = inject(ControllerService);
+  private _viewService = inject(PrivateViewPluginService);
+  private _systemService = inject(SystemService);
+  private _viewRegistry = inject(ViewRegistryService);
+  private _executionTreeState = inject<TreeStateService<ReportNode, ReportTreeNode>>(TreeStateService);
+  public _executionPanels = inject(SingleExecutionPanelsService);
+  public _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
+  private _treeUtils = inject(ReportTreeNodeUtilsService);
   private _activeExecutions = inject(ActiveExecutionsService);
   private _executionTabManager = inject(ExecutionTabManagerService);
   private _activatedRoute = inject(ActivatedRoute);
   private _router = inject(Router);
   private _terminator$ = new Subject<void>();
+  private _currentExecutionTerminator$?: Subject<void>;
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
   private isFirstUpdate = true;
@@ -126,25 +137,14 @@ export class ExecutionProgressComponent
         .map(({ artefactID, name }) => (by === 'id' ? artefactID! : name!));
 
       return { by, list };
-    })
+    }),
   );
 
-  readonly executionId = this._activatedRoute.snapshot.url[0].path!;
-  readonly activeExecution = this._activeExecutions.getActiveExecution(this.executionId);
-  protected activeTabId?: string = this._activatedRoute.snapshot.url?.[1]?.path;
+  executionId?: string;
+  activeExecution?: ActiveExecution;
+  protected activeTabId?: string;
 
-  constructor(
-    @Inject(DOCUMENT) private _document: Document,
-    private _executionService: AugmentedExecutionsService,
-    private _controllerService: ControllerService,
-    private _viewService: PrivateViewPluginService,
-    private _systemService: SystemService,
-    private _viewRegistry: ViewRegistryService,
-    private _executionTreeState: TreeStateService<ReportNode, ReportTreeNode>,
-    public _executionPanels: SingleExecutionPanelsService,
-    public _testCasesSelection: SelectionCollector<string, ReportNode>,
-    private _treeUtils: ReportTreeNodeUtilsService
-  ) {}
+  throughputchart: any | { series: any[]; data: any[][] } = {};
 
   showNodeInTree(nodeId: string): void {
     this._controllerService
@@ -158,7 +158,7 @@ export class ExecutionProgressComponent
         switchMap((path) => {
           const finalNodeId = path[path.length - 1];
           return this._executionTreeState.expandNode(path).pipe(map(() => finalNodeId));
-        })
+        }),
       )
       .subscribe((nodeId) => this._executionTreeState.selectNodeById(nodeId));
   }
@@ -181,7 +181,7 @@ export class ExecutionProgressComponent
         tap((node) => {
           this._executionPanels.enablePanel(Panels.TEST_CASES, true);
           this._executionPanels.setShowPanel(Panels.TEST_CASES, true);
-        })
+        }),
       )
       .subscribe(() => {
         this.selectTab('steps');
@@ -190,33 +190,13 @@ export class ExecutionProgressComponent
   }
 
   ngOnInit(): void {
-    this.initRefreshExecution();
-    this.initTabs();
+    this.initExecutionChangeByRouting();
   }
 
   ngOnDestroy(): void {
+    this.terminateCurrentExecutionChanges();
     this._terminator$.next();
     this._terminator$.complete();
-  }
-
-  initRefreshExecution(): void {
-    this._executionPanels.initialize(this.executionId);
-    this.activeExecution.execution$.pipe(takeUntil(this._terminator$)).subscribe((execution) => {
-      this.execution = execution;
-      const isExecutionCompleted = execution.status === 'ENDED';
-      this.showAutoRefreshButton = !isExecutionCompleted;
-      this.handleExecutionRefresh({ updateSelection: this.isFirstUpdate ? UpdateSelection.ALL : UpdateSelection.NONE });
-      this.refreshOther();
-      if (this.isFirstUpdate) {
-        this.loadExecutionTree();
-      } else {
-        this.refreshExecutionTree(isExecutionCompleted);
-      }
-      this.refreshTestCaseTable({
-        updateSelection: this.isFirstUpdate ? UpdateSelection.ALL : UpdateSelection.ONLY_NEW,
-      });
-      this.isFirstUpdate = false;
-    });
   }
 
   drillDownTestCase(id: string): void {
@@ -235,14 +215,63 @@ export class ExecutionProgressComponent
   selectTab(tabId: string): void {
     this.activeTabId = tabId;
     this.activeTab = this.tabs.find((tab) => tab.id === tabId);
+    const routeUrl = this._activatedRoute.snapshot.url;
+    const currentPath = routeUrl[routeUrl.length - 1].path;
+    if (currentPath === tabId) {
+      return;
+    }
+    const relativePath = routeUrl.length === 1 ? '.' : '..';
     const relativeTo = this._activatedRoute;
-    const relativePath = this._activatedRoute.snapshot.url.length === 1 ? '.' : '..';
     this._router.navigate([relativePath, tabId], { relativeTo });
   }
 
   closeExecution(openList: boolean = true): void {
     const executionId = this.executionId!;
     this._executionTabManager.handleTabClose(executionId, openList);
+  }
+
+  private terminateCurrentExecutionChanges(): void {
+    this._currentExecutionTerminator$?.next();
+    this._currentExecutionTerminator$?.complete();
+    this._currentExecutionTerminator$ = undefined;
+  }
+
+  private initExecutionChangeByRouting(): void {
+    const executionId$ = this._activatedRoute.url.pipe(
+      map((url) => url[0].path),
+      distinctUntilChanged(),
+      takeUntil(this._terminator$),
+    );
+
+    executionId$.subscribe((executionId) => {
+      this.terminateCurrentExecutionChanges();
+      this._currentExecutionTerminator$ = new Subject<void>();
+      this.executionId = executionId;
+      this.activeExecution = this._activeExecutions.getActiveExecution(executionId);
+      this.activeTabId = this._activatedRoute.snapshot.url?.[1]?.path;
+      this.initRefreshExecution();
+      this.initTabs();
+    });
+  }
+
+  private initRefreshExecution(): void {
+    this._executionPanels.initialize(this.executionId!);
+    this.activeExecution!.execution$.pipe(takeUntil(this._currentExecutionTerminator$!)).subscribe((execution) => {
+      this.execution = execution;
+      const isExecutionCompleted = execution.status === 'ENDED';
+      this.showAutoRefreshButton = !isExecutionCompleted;
+      this.handleExecutionRefresh({ updateSelection: this.isFirstUpdate ? UpdateSelection.ALL : UpdateSelection.NONE });
+      this.refreshOther();
+      if (this.isFirstUpdate) {
+        this.loadExecutionTree();
+      } else {
+        this.refreshExecutionTree(isExecutionCompleted);
+      }
+      this.refreshTestCaseTable({
+        updateSelection: this.isFirstUpdate ? UpdateSelection.ALL : UpdateSelection.ONLY_NEW,
+      });
+      this.isFirstUpdate = false;
+    });
   }
 
   private initTabs(): void {
@@ -296,7 +325,7 @@ export class ExecutionProgressComponent
     }
     const parameters: { key: string; value: string }[] = (execution.parameters as any) || [];
     const showTestCaseCurrentOperation = parameters.find(
-      (o) => o.key === 'step.executionView.testcases.current-operations'
+      (o) => o.key === 'step.executionView.testcases.current-operations',
     );
     this.showTestCaseCurrentOperation = showTestCaseCurrentOperation?.value.toLowerCase() === 'true';
   }
@@ -327,7 +356,7 @@ export class ExecutionProgressComponent
             return of(rootNode);
           }
           return this._treeUtils.restoreTree(rootNode, expandedNodIds);
-        })
+        }),
       )
       .subscribe((rootNode) => {
         if (rootNode) {

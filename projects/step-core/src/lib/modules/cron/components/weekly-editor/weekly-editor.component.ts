@@ -13,6 +13,8 @@ import { HoursEditorComponent } from '../hours-editor/hours-editor.component';
 export class WeeklyEditorComponent extends HoursEditorComponent {
   protected selectedDays: string[] = [];
 
+  protected override hour = 0;
+
   protected handleSelectedDayChange(selectedDays: string[]): void {
     this.selectedDays = selectedDays;
     this.updateExpression();

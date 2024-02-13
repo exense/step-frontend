@@ -203,7 +203,6 @@ export * from './shared/validators/boolean-validator';
 export * from './shared/validators/coma-split-array-validator';
 export * from './shared/is-used-by-dialog-data';
 export * from './shared/is-used-by-search-type';
-export * from './services/persistence.service';
 export * from './services/default-page.token';
 export * from './services/view-id-link-prefix.token';
 export * from './services/navigator.service';

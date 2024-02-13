@@ -1,4 +1,4 @@
-import { Component, inject, TrackByFunction } from '@angular/core';
+import { Component, HostListener, inject, TrackByFunction } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AbstractArtefact, DynamicValueInteger } from '../../client/generated';
 import { KeyValue } from '@angular/common';
@@ -75,11 +75,12 @@ export class ThreadDistributionWizardDialogComponent {
     startWith(this.wizardForm.value),
     debounceTime(300),
     map((value) => calculateValues(value, this.durationUnits)),
-    shareReplay(1)
+    shareReplay(1),
   );
 
   readonly isCalculationValid$ = this.calculationResult$.pipe(map((result) => result.isCalculationValid));
 
+  @HostListener('keydown.enter')
   applyCalculatedParams(): void {
     if (this.wizardForm.invalid) {
       this.wizardForm.markAllAsTouched();

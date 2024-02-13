@@ -15,6 +15,7 @@ export class MonthlyDayEditorComponent extends HoursEditorComponent {
   readonly _MONTHS = inject(RANGE_MONTHS_NUMBERS);
   readonly _DAYS = inject(RANGE_MONTHLY_DAYS);
 
+  protected override hour = 0;
   protected month = this._MONTHS[0].key;
 
   handleMonthChange(value: number): void {

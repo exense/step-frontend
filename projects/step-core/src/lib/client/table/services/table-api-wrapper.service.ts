@@ -4,7 +4,6 @@ import { TableResponseGeneric } from '../shared/table-response-generic';
 import { map, Observable, pipe, tap } from 'rxjs';
 import { AsyncTasksService, AsyncTaskStatusResource, TablesService } from '../../generated';
 import { pollAsyncTask, AsyncTaskStatus } from '../../async-task/async-task.module';
-import { DOCUMENT } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FileDownloaderService } from '../../../modules/basics/services/file-downloader.service';
 
@@ -26,7 +25,7 @@ export class TableApiWrapperService {
       return status.result;
     }),
     tap((resource) => this.downloadDatasource(resource.id!, resource.resourceName!)),
-    map((resourse) => resourse.id!)
+    map((resourse) => resourse.id!),
   );
 
   requestTable<T>(tableId: string, tableRequest: TableRequestData): Observable<TableResponseGeneric<T>> {

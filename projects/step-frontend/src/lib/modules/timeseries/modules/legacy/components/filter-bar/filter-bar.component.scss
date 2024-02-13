@@ -1,0 +1,163 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-ts-filter-bar {
+  display: flex;
+  flex-direction: column;
+  padding: 1.6rem;
+
+  .time-container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    margin-top: 1.2rem;
+
+    .ranger-section {
+      width: calc(100% - 150px);
+
+      &.compact {
+        width: calc(100% - 40px);
+      }
+    }
+  }
+
+  .filters-section {
+    padding-top: 1.2rem;
+    border-top: 1px solid var.$gray-200;
+  }
+
+  .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
+    line-height: 2.2rem;
+    font-size: 1.2rem;
+  }
+
+  .settings-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .warning {
+    font-size: 11px;
+    padding: 0.8rem;
+  }
+
+  .filters {
+    display: flex;
+    gap: 1.2rem;
+    align-items: center;
+    min-height: 3.6rem;
+  }
+
+  .filers-row {
+    flex: 1;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    overflow: auto;
+    margin-top: 8px;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: var.$gray-100;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var.$gray-500;
+    }
+  }
+
+  .more-btn-container {
+    .more-btn {
+      border: 1px solid var.$gray-200;
+      color: var.$gray-500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 6px 0 12px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 12px;
+      flex-direction: row;
+      min-width: unset;
+      height: 100%;
+      line-height: 32px;
+
+      step-icon {
+        transform: scale(0.6);
+      }
+    }
+  }
+
+  .more-applied-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 0 8px;
+  }
+
+  /**
+  These got override by the theme scss file
+   */
+  .filers-row button.apply-btn {
+    font-size: 12px;
+    line-height: 28px;
+    margin-right: 12px;
+    font-weight: bold;
+  }
+
+  .oql-container {
+    position: relative;
+
+    .oql-input {
+      flex-grow: 1;
+      padding-right: 28px;
+      background: var.$gray-50;
+      border: 1px solid var.$gray-200;
+      border-radius: 2px;
+      color: var.$gray-500;
+      font-size: 13px;
+      padding-left: 8px;
+
+      &:focus-visible {
+        outline: 0;
+      }
+    }
+
+    .invalid-input {
+      border: 1px solid #d70000;
+      color: #d70000;
+    }
+
+    .info-btn {
+      position: absolute;
+      right: 0;
+      top: 0px;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      padding: 4px;
+      font-size: 12px;
+      transform: scale(0.8);
+      opacity: 0.6;
+    }
+  }
+
+  .error-info {
+    position: absolute;
+    top: -15px;
+    right: 0;
+    color: white;
+    background: #d70000;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .grouping-container {
+    margin-right: 6px;
+  }
+}

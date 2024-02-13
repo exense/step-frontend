@@ -11,7 +11,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { BehaviorSubject, Subject, combineLatest, startWith, debounceTime, takeUntil, map, take } from 'rxjs';
+import { BehaviorSubject, Subject, combineLatest, startWith, debounceTime, takeUntil, map } from 'rxjs';
 import { KeyValue } from '@angular/common';
 import { ArrayItemLabelValueExtractor } from '../../services/array-item-label-value-extractor';
 import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
@@ -53,13 +53,13 @@ export class AutocompleteInputComponent<T = unknown> implements ControlValueAcce
   ]).pipe(
     map(([availableItems, filter]) => {
       let result = availableItems.filter(
-        ({ value }) => !filter || value.toLowerCase().includes(filter.trim().toLowerCase())
+        ({ value }) => !filter || value.toLowerCase().includes(filter.trim().toLowerCase()),
       );
       if (result.length === 0 && !!filter.trim()) {
         result = [{ key: filter, value: filter }];
       }
       return result;
-    })
+    }),
   );
 
   @Input() possibleItems?: T[];

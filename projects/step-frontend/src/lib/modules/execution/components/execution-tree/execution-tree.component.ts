@@ -1,4 +1,4 @@
-import { Component, forwardRef, Inject, ViewEncapsulation } from '@angular/core';
+import { Component, forwardRef, inject, ViewEncapsulation } from '@angular/core';
 import {
   AbstractArtefact,
   ReportNode,
@@ -7,12 +7,7 @@ import {
   TreeNode,
   TreeStateService,
 } from '@exense/step-core';
-import {
-  EXECUTION_TREE_PAGE_LIMIT,
-  EXECUTION_TREE_PAGING,
-  ExecutionTreePaging,
-} from '../../services/execution-tree-paging';
-import { ReportTreeNodeUtilsService } from '../../services/report-tree-node-utils.service';
+import { EXECUTION_TREE_PAGE_LIMIT, EXECUTION_TREE_PAGING } from '../../services/execution-tree-paging';
 import { ExecutionTreeAction } from '../../shared/execution-tree-action.enum';
 import { ReportTreeNode } from '../../shared/report-tree-node';
 import { Observable, of } from 'rxjs';
@@ -30,13 +25,9 @@ import { Observable, of } from 'rxjs';
   encapsulation: ViewEncapsulation.None,
 })
 export class ExecutionTreeComponent implements TreeActionsService {
+  private _paging = inject(EXECUTION_TREE_PAGING);
+  private _treeState = inject<TreeStateService<ReportNode, ReportTreeNode>>(TreeStateService);
   readonly selectedNode$: Observable<ReportTreeNode | undefined> = this._treeState.selectedNode$;
-
-  constructor(
-    @Inject(EXECUTION_TREE_PAGING) private _paging: ExecutionTreePaging,
-    private _treeState: TreeStateService<ReportNode, ReportTreeNode>,
-    private _treeUtils: ReportTreeNodeUtilsService
-  ) {}
 
   handleContextAction(actionId: string, node?: AbstractArtefact): void {
     const nodeId = node?.id!;
