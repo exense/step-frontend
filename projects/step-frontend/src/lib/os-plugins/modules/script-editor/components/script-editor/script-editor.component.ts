@@ -3,6 +3,7 @@ import {
   AceMode,
   AugmentedKeywordEditorService,
   convertScriptLanguageToAce,
+  DialogsService,
   Keyword,
   KeywordExecutorService,
   KeywordsService,
@@ -16,16 +17,20 @@ import 'ace-builds/src-min-noconflict/mode-javascript.js';
 import 'ace-builds/src-min-noconflict/mode-groovy.js';
 import 'ace-builds/src-min-noconflict/mode-java.js';
 import 'ace-builds/src-min-noconflict/ext-searchbox';
+import { DeactivateComponentDataInterface } from '../../types/deactivate-component-data.interface';
 
 @Component({
   selector: 'step-script-editor',
   templateUrl: './script-editor.component.html',
   styleUrls: ['./script-editor.component.scss'],
 })
-export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
+export class ScriptEditorComponent implements AfterViewInit, OnDestroy, DeactivateComponentDataInterface {
   private _keywordApi = inject(KeywordsService);
   private _keywordEditorApi = inject(AugmentedKeywordEditorService);
   private _keywordExecutor = inject(KeywordExecutorService);
+  private _dialogsService = inject(DialogsService);
+  private initialScript?: String;
+  private trackChangesFn = () => this.trackChanges();
 
   @ViewChild('editor', { static: false })
   private editorElement!: ElementRef<HTMLDivElement>;
@@ -35,12 +40,16 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
 
   protected keyword?: Keyword;
 
+  noChanges = true;
+  isAfterSave = false;
+
   ngAfterViewInit(): void {
     this.setupEditor();
     this.loadKeyword();
   }
 
   ngOnDestroy(): void {
+    this.editor!.off('change', this.trackChangesFn);
     this.editor!.destroy();
   }
 
@@ -50,6 +59,14 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
 
   execute(): void {
     this.saveInternal().subscribe(() => this._keywordExecutor.executeKeyword(this._functionId));
+  }
+
+  canExit(): boolean | Observable<boolean> {
+    if (this.noChanges) {
+      return true;
+    } else {
+      return this._dialogsService.showWarning('You have unsaved changes. Do you want to navigate anyway?');
+    }
   }
 
   private setupEditor(): void {
@@ -63,9 +80,31 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
       this._keywordEditorApi.getFunctionScript(this._functionId),
     ]).subscribe(([keyword, keywordScript]) => {
       this.keyword = keyword;
+      this.initialScript = keywordScript;
       this.editor!.getSession().setMode(this.determineKeywordMode());
       this.editor!.setValue(keywordScript);
+      this.focusOnText();
+      this.editor!.on('change', this.trackChangesFn);
     });
+  }
+
+  private trackChanges(): void {
+    this.isAfterSave = false;
+    if (this.editor!.getValue() === this.initialScript) {
+      this.noChanges = true;
+    } else {
+      this.noChanges = false;
+    }
+  }
+
+  private focusOnText(): void {
+    this.editor!.focus();
+  }
+
+  private refreshInitVars(val?: string): void {
+    this.isAfterSave = true;
+    this.noChanges = true;
+    this.initialScript = val;
   }
 
   private determineKeywordMode(): AceMode {
@@ -74,6 +113,8 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy {
   }
 
   private saveInternal(): Observable<void> {
-    return this._keywordEditorApi.saveFunctionScript(this._functionId, this.editor!.getValue());
+    const editorValue = this.editor!.getValue();
+    this.refreshInitVars(editorValue);
+    return this._keywordEditorApi.saveFunctionScript(this._functionId, editorValue);
   }
 }

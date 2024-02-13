@@ -1,15 +1,47 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 :host {
   display: block;
-  padding: 1.6rem;
-  width: 100%;
+  max-width: 100%;
+  height: 100%;
 }
+mat-card {
+  height: 100%;
+  border: none;
+  height: 100%;
 
-mat-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  mat-card-content {
+    height: 100%;
+  }
+
+  mat-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0;
+
+    .editor-buttons {
+      padding-bottom: 1rem;
+    }
+
+    .left-btn-group {
+      margin-right: 2rem;
+    }
+
+    .status-saved {
+      color: var.$green-650;
+    }
+
+    .status-no-changes {
+      color: #000;
+    }
+
+    .status-has-changes {
+      color: var.$orange;
+    }
+  }
 }
 
 .editor {
-  min-height: 60rem;
+  height: 100%;
 }
