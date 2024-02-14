@@ -24,13 +24,13 @@
   <ng-container matColumnDef="name" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
     <td mat-cell *matCellDef="let element">
-      {{element.attributes?.['name']}}
+      {{ element.attributes?.['name'] }}
     </td>
   </ng-container>
   <ng-container matColumnDef="fileName" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Package file</th>
     <td mat-cell *matCellDef="let element">
-      {{element.customFields?.['automationPackageFileName']}}
+      {{ element.customFields?.['automationPackageFileName'] }}
     </td>
   </ng-container>
   <ng-container matColumnDef="actions">
@@ -59,7 +59,7 @@
           *ngIf="entityMenu.hasContent"
           mat-icon-button
           [matMenuTriggerFor]="entityMenu.menu!"
-          [matMenuTriggerData]="{element}"
+          [matMenuTriggerData]="{ element }"
         >
           <step-icon name="more-horizontal"></step-icon>
         </button>
@@ -68,3 +68,4 @@
   </ng-container>
 </step-table>
 <step-entity-menu #entityMenu [entity]="ENTITY_ID" (entityOperationSuccess)="table.reload()"> </step-entity-menu>
+<router-outlet></router-outlet>

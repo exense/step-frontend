@@ -21,14 +21,14 @@ export class NavigatorService {
   readonly activeUrl$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
     map(() => this._router.url),
-    shareReplay(1)
+    shareReplay(1),
   );
 
   isViewIdActive(viewId: string): Observable<boolean> {
-    const viewLink = `/root/${viewId}`;
+    const viewLink = `/${viewId}`;
     return this.activeUrl$.pipe(
       startWith(this._router.url),
-      map((url) => url.startsWith(viewLink))
+      map((url) => url.startsWith(viewLink)),
     );
   }
 
@@ -38,7 +38,7 @@ export class NavigatorService {
       this._window.open(link, '_blank');
       return;
     }
-    const link = `/root/${viewId}`;
+    const link = `/${viewId}`;
     this.navigateInternal(link, isOpenInSeparateTab);
   }
 
@@ -58,7 +58,7 @@ export class NavigatorService {
   }
 
   navigateAfterLogin(): void {
-    const emptyUrls = ['', '/', 'root'];
+    const emptyUrls = ['', '/'];
     const url = this._location.path();
     if (emptyUrls.includes(url)) {
       this.navigateToHome();
