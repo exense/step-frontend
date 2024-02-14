@@ -9,7 +9,7 @@ import { EntityDialogsService, EntityActionInvokerService } from '../modules/ent
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
 import { PlanAction } from '../shared';
 
-const PLANS_LIST = '/root/plans/list';
+const PLANS_LIST = '/plans/list';
 
 @Injectable({
   providedIn: 'root',
