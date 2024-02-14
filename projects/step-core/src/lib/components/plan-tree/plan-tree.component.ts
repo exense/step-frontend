@@ -68,7 +68,7 @@ export class PlanTreeComponent implements TreeActionsService {
       { id: PlanTreeAction.ENABLE, label: 'Enable All Selected (Ctrl + E)', hasSeparator: true},
       { id: PlanTreeAction.DISABLE, label: 'Disable All Selected (Ctrl + E)', hasSeparator: true},
       { id: PlanTreeAction.COPY, label: 'Copy All Selected (Ctrl + C)'},
-      { id: PlanTreeAction.PASTE, label: 'Paste All Selected (Ctrl + V)'},
+      { id: PlanTreeAction.PASTE, label: 'Paste (Ctrl + V)'},
       { id: PlanTreeAction.DUPLICATE, label: 'Duplicate All Selected (Ctrl + D)'},
       { id: PlanTreeAction.DELETE, label: 'Delete All Selected (Del)', hasSeparator: true},
       { id: PlanTreeAction.MOVE_UP, label: 'Move Up All Selected (Ctrl + ⬆️)'},
