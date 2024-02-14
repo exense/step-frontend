@@ -19,7 +19,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
   @Input() item!: FilterBarItem;
   @Input() removable?: boolean;
   @Input() compact = false;
-  @Input() highlightRemoveButton? = false;
+  @Input() highlightRemoveButton = false;
 
   @Output() removeItem: EventEmitter<void> = new EventEmitter<void>();
   @Output() filterChange: EventEmitter<FilterBarItem> = new EventEmitter<FilterBarItem>();

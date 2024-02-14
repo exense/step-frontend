@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import {
   AuthService,
   DashboardItem,
@@ -20,11 +20,12 @@ import {
 
 //@ts-ignore
 import uPlot = require('uplot');
-import { defaultIfEmpty, forkJoin, merge, Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { defaultIfEmpty, forkJoin, merge, Observable, Subject, switchMap } from 'rxjs';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TimeRangePickerSelection, FilterUtils } from '../../modules/_common';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -54,6 +55,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private _route: ActivatedRoute = inject(ActivatedRoute);
   private _router: Router = inject(Router);
   private _authService: AuthService = inject(AuthService);
+  private _destroyRef = inject(DestroyRef);
   colorsPool: TimeseriesColorsPool = new TimeseriesColorsPool();
 
   dashboard!: DashboardView;
@@ -64,8 +66,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   compareModeEnabled = false;
   timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   timeRangeSelection: TimeRangePickerSelection = this.timeRangeOptions[0];
-
-  terminator$ = new Subject<void>();
 
   editMode = false;
   metricTypes?: MetricType[];
@@ -107,8 +107,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this._timeSeriesContextFactory?.destroyContext(this.context?.id);
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   enableEditMode() {
@@ -216,7 +214,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   subscribeForContextChange(): void {
     merge(this.context.onFilteringChange(), this.context.onGroupingChange())
-      .pipe(takeUntil(this.terminator$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(() => {
         this.refreshAllCharts().subscribe();
       });
@@ -232,7 +230,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .onTimeSelectionChange()
       .pipe(
         switchMap((newRange) => this.handleSelectionChange(newRange)),
-        takeUntil(compareCharts ? this.terminator$ : this.terminator$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe();
   }
@@ -284,7 +282,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     forkJoin([this.refreshAllCharts(), refreshRanger$]).subscribe(() => {});
   }
 
-  collectAllAttributes() {
+  collectAllAttributes(): MetricAttribute[] {
     return this.dashboard.dashlets.flatMap((d) => d.chartSettings!.attributes);
   }
 

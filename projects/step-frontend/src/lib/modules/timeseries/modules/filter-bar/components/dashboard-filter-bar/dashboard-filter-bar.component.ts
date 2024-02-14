@@ -120,7 +120,6 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
       this.activeGrouping = this.context.getGroupDimensions();
     }
     this.context.onAttributesChange().subscribe((attributes: Record<string, MetricAttribute>) => {
-      console.log('attributes change', attributes);
       const customGroupingOptions: { label: string; attributes: string[] }[] = [];
       if (attributes[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE]) {
         customGroupingOptions.push({ label: 'Execution', attributes: [TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE] });

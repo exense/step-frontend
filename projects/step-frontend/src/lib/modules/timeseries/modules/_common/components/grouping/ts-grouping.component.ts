@@ -43,7 +43,6 @@ export class TsGroupingComponent implements OnInit, OnChanges {
     if (changes['dimensions']) {
       this.label = this.formatDimensions(this.dimensions);
     }
-    console.log('changes', this.groupingOptions);
   }
 
   selectGrouping(grouping: { label: string; attributes: string[] }) {
