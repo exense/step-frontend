@@ -107,11 +107,7 @@
       Duplicate keyword
     </button>
 
-    <button
-      mat-menu-item
-      [disabled]="!('kw-read' | hasRight | async)"
-      (click)="exportFunction(element.id, element.attributes.name)"
-    >
+    <button mat-menu-item [disabled]="!('kw-read' | hasRight | async)" (click)="exportFunction(element.id)">
       <step-icon name="upload"></step-icon>
       Export keyword
     </button>
@@ -126,3 +122,4 @@
     </button>
   </ng-container>
 </step-entity-menu>
+<router-outlet></router-outlet>

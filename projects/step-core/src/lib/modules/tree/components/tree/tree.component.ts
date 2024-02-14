@@ -54,7 +54,7 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
 
   @Input() dragDisabled: boolean = false;
 
-  @Output() treeContextAction = new EventEmitter<{ actionId: string; node?: N }>();
+  @Output() treeContextAction = new EventEmitter<{ actionId: string; node?: N; multipleNodes?: boolean }>();
 
   @Output() nodeDblClick = new EventEmitter<{ node: N; event: MouseEvent }>();
 
@@ -62,6 +62,8 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
 
   openContextMenu({ event, nodeId }: { event: MouseEvent; nodeId: string }): void {
     const node = this._treeState.findNodeById(nodeId);
+    const nodes = this._treeState.getSelectedNodes();
+    const multipleNodes = nodes.length > 1 && !!nodes.find((el) => el.id === nodeId);
     if (!node) {
       return;
     }
@@ -73,14 +75,15 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
     event.preventDefault();
     this.contextMenuPosition.x = event.clientX;
     this.contextMenuPosition.y = event.clientY;
-    this.contextMenuTrigger.menuData = { node };
+    this.contextMenuTrigger.menuData = { node, multipleNodes };
     this.contextMenuTrigger.openMenu();
     this.openedMenuNodeId = nodeId;
   }
 
   handleContextAction(action: TreeAction, node?: N): void {
     const actionId = action.id;
-    this.treeContextAction.emit({ actionId, node });
+    const multipleNodes = this.contextMenuTrigger.menuData.multipleNodes;
+    this.treeContextAction.emit({ actionId, node, multipleNodes });
   }
 
   handleDblClick(node: N, event: MouseEvent): void {

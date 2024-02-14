@@ -1,16 +1,27 @@
-import { NgModule } from '@angular/core';
-import { EntityRegistry, SimpleOutletComponent, StepCoreModule, ViewRegistryService } from '@exense/step-core';
+import { inject, NgModule } from '@angular/core';
+import {
+  AugmentedAutomationPackagesService,
+  dialogRoute,
+  EntityRegistry,
+  SimpleOutletComponent,
+  StepCoreModule,
+  ViewRegistryService,
+} from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { AutomationPackagesListComponent } from './components/automation-packages-list/automation-packages-list.component';
 import { ENTITY_ID, ICON, LABEL_ENTITY, LABEL_MENU, PATH } from './types/constants';
 import { AutomationPackageUploadDialogComponent } from './components/automation-package-upload-dialog/automation-package-upload-dialog.component';
+import { ActivatedRouteSnapshot } from '@angular/router';
 
 @NgModule({
   declarations: [AutomationPackagesListComponent, AutomationPackageUploadDialogComponent],
   imports: [StepCommonModule, StepCoreModule],
 })
 export class AutomationPackagesModule {
-  constructor(private _entityRegistry: EntityRegistry, private _viewRegistry: ViewRegistryService) {
+  constructor(
+    private _entityRegistry: EntityRegistry,
+    private _viewRegistry: ViewRegistryService,
+  ) {
     this.registerEntities();
     this.registerRoutes();
     this.registerMenuEntries();
@@ -34,10 +45,30 @@ export class AutomationPackagesModule {
           {
             path: 'list',
             component: AutomationPackagesListComponent,
+            children: [
+              {
+                path: 'upload',
+                component: SimpleOutletComponent,
+                children: [
+                  dialogRoute({
+                    path: 'new',
+                    dialogComponent: AutomationPackageUploadDialogComponent,
+                  }),
+                  dialogRoute({
+                    path: ':id',
+                    dialogComponent: AutomationPackageUploadDialogComponent,
+                    resolve: {
+                      automationPackage: (route: ActivatedRouteSnapshot) =>
+                        inject(AugmentedAutomationPackagesService).getAutomationPackage(route.params['id']),
+                    },
+                  }),
+                ],
+              },
+            ],
           },
         ],
       },
-      { accessPermissions: ['automation-package-read'] }
+      { accessPermissions: ['automation-package-read'] },
     );
   }
 

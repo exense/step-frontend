@@ -1,15 +1,11 @@
 import { Component, HostListener, inject } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { DashboardsService, DashboardView } from '@exense/step-core';
+import { DashboardsService, DashboardView, DialogRouteResult } from '@exense/step-core';
 import { MatDialogRef } from '@angular/material/dialog';
+import { DashboardNavigatorService } from '../../injectables/dashboard-navigator.service';
 import { COMMON_IMPORTS } from '../../modules/_common';
 
-export interface NewDashboardDialogResult {
-  isEditAfterSave: boolean;
-  dashboard: DashboardView;
-}
-
-type DialogRef = MatDialogRef<NewDashboardDialogComponent, NewDashboardDialogResult>;
+type DialogRef = MatDialogRef<NewDashboardDialogComponent, DialogRouteResult>;
 type FormValue = NewDashboardDialogComponent['form']['value'];
 
 @Component({
@@ -23,6 +19,7 @@ export class NewDashboardDialogComponent {
   private _dialogRef = inject<DialogRef>(MatDialogRef);
   private _fb = inject(FormBuilder).nonNullable;
   private _dashboardsService = inject(DashboardsService);
+  private _dashboardNavigator = inject(DashboardNavigatorService);
 
   readonly form = this._fb.group({
     name: this._fb.control('', Validators.required),
@@ -48,7 +45,12 @@ export class NewDashboardDialogComponent {
     }
     const dashboard = this.createEmptyDashboardObject(this.form.value);
     this._dashboardsService.saveDashboard(dashboard).subscribe((dashboard) => {
-      this._dialogRef.close({ dashboard, isEditAfterSave });
+      const isSuccess = !!dashboard;
+      const canNavigateBack = !isEditAfterSave;
+      if (isEditAfterSave) {
+        this._dashboardNavigator.navigateToDashboard(dashboard);
+      }
+      this._dialogRef.close({ isSuccess, canNavigateBack });
     });
   }
 

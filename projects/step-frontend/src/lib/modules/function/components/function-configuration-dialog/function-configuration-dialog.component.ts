@@ -27,8 +27,9 @@ import {
   FunctionTypeParentFormService,
   FunctionTypeComponent,
   FunctionTypeFormComponent,
+  DialogRouteResult,
 } from '@exense/step-core';
-import { of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { map, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
@@ -45,7 +46,7 @@ import { Router } from '@angular/router';
 export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, FunctionTypeParentFormService {
   private _functionConfigurationDialogData = inject<FunctionConfigurationDialogData>(MAT_DIALOG_DATA);
   private _api = inject(FunctionConfigurationApiService);
-  private _matDialogRef = inject<MatDialogRef<FunctionConfigurationDialogComponent, Keyword>>(MatDialogRef);
+  private _matDialogRef = inject<MatDialogRef<FunctionConfigurationDialogComponent, DialogRouteResult>>(MatDialogRef);
   private _router = inject(Router);
   private _dialogsService = inject(DialogsService);
   private _functionTypeRegistryService = inject(FunctionTypeRegistryService);
@@ -79,7 +80,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
       this._formBuilder,
       this.lightForm,
       this.schemaEnforced,
-      this._functionConfigurationDialogData
+      this._functionConfigurationDialogData,
     );
 
     this.formGroup.statusChanges.pipe(takeUntil(this.terminator$)).subscribe(() => {
@@ -90,7 +91,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
 
     if (functionTypeFilters?.length) {
       this.functionTypeItemInfos = this.functionTypeItemInfos.filter((functionTypeItemInfo) =>
-        this._functionConfigurationDialogData.dialogConfig.functionTypeFilters.includes(functionTypeItemInfo.type)
+        this._functionConfigurationDialogData.dialogConfig.functionTypeFilters.includes(functionTypeItemInfo.type),
       );
     }
 
@@ -127,23 +128,28 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
       .saveFunction(this.keyword!)
       .pipe(
         switchMap((keyword) => {
-          this._matDialogRef.close(keyword);
+          const isSuccess = !!keyword;
 
           if (!edit) {
-            return of();
+            return of({ isSuccess, path: undefined });
           }
 
-          return this._api.getFunctionEditor(keyword.id!);
+          return this._api.getFunctionEditor(keyword.id!).pipe(map((path) => ({ isSuccess, path })));
         }),
-        tap((path) => {
-          if (path) {
-            this._router.navigateByUrl(path);
-          } else {
-            this._dialogsService.showErrorMsg('No editor configured for this function type').subscribe();
-          }
-        })
       )
-      .subscribe();
+      .subscribe(({ isSuccess, path }) => {
+        if (!edit) {
+          this._matDialogRef.close({ isSuccess });
+          return;
+        }
+
+        if (path) {
+          this._router.navigateByUrl(path);
+        } else {
+          this._dialogsService.showErrorMsg('No editor configured for this function type').subscribe();
+        }
+        this._matDialogRef.close({ isSuccess, canNavigateBack: !path });
+      });
   }
 
   private determineDefaultType(): string {
@@ -189,7 +195,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
           if (this.keyword.schema) {
             keyword.schema = this.keyword.schema;
           }
-        })
+        }),
       )
       .subscribe((keyword) => {
         this.keyword = keyword;

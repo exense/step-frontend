@@ -55,11 +55,11 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, O
     TableFetchLocalDataSource.configBuilder<TestRunStatus>()
       .addSearchStringRegexPredicate('status', (item) => item.status)
       .addSortStringPredicate('status', (item) => item.status)
-      .build()
+      .build(),
   );
 
   readonly statusItems$ = this.searchableRepositoryReport.allData$.pipe(
-    map((testRunStatusList) => testRunStatusList.map((testRunStatus) => testRunStatus.status as Status).filter(unique))
+    map((testRunStatusList) => testRunStatusList.map((testRunStatus) => testRunStatus.status as Status).filter(unique)),
   );
 
   ngOnInit(): void {
@@ -71,14 +71,14 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, O
           by = selectionType === BulkSelectionType.ALL ? 'all' : by;
           return { by, list } as IncludeTestcases;
         }),
-        takeUntilDestroyed(this._destroyRef)
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((includedTestCases) => this.includedTestCasesChange.emit(includedTestCases));
 
     this.searchableRepositoryReport.allData$
       .pipe(
         filter((items) => !!items.length),
-        take(1)
+        take(1),
       )
       .subscribe((items) => {
         this.selectionType$.next(BulkSelectionType.ALL);
@@ -119,7 +119,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, O
                 });
               }
               return value;
-            })
+            }),
           );
         }
         return this._controllerService.getReport({
@@ -128,7 +128,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, O
         });
       }),
       map((testSetStatusOverview) => testSetStatusOverview?.runs || []),
-      tap(() => this._selectionCollector.clear())
+      tap(() => this._selectionCollector.clear()),
     );
   }
 }
