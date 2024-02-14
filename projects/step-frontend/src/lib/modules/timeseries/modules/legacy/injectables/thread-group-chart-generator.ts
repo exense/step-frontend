@@ -18,7 +18,7 @@ export class ThreadGroupChartGenerator {
   createChart(
     request: FetchBucketsRequest,
     response: TimeSeriesAPIResponse,
-    colorsPool: TimeseriesColorsPool
+    colorsPool: TimeseriesColorsPool,
   ): TSChartSettings {
     if (!colorsPool) {
       throw 'Colors pool is mandatory';

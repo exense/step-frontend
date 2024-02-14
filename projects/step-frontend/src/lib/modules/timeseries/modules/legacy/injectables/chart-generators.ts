@@ -22,7 +22,7 @@ export class ChartGenerators {
     type: TsChartType,
     request: FetchBucketsRequest,
     response: TimeSeriesAPIResponse,
-    colorsPool?: TimeseriesColorsPool
+    colorsPool?: TimeseriesColorsPool,
   ): TSChartSettings {
     switch (type) {
       case TsChartType.OVERVIEW:

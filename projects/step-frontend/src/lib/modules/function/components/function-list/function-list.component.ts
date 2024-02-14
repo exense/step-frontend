@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, Injector } from '@angular/core';
+import { Component, forwardRef, inject } from '@angular/core';
 import {
   AugmentedKeywordsService,
   AutoDeselectStrategy,
@@ -8,7 +8,10 @@ import {
   STORE_ALL,
   FunctionActionsService,
   KeywordExecutorService,
+  FunctionConfigurationApiService,
+  DialogParentService,
 } from '@exense/step-core';
+import { FunctionConfigurationApiImplService } from '../../injectables/function-configuration-api-impl.service';
 
 @Component({
   selector: 'step-function-list',
@@ -17,22 +20,30 @@ import {
   providers: [
     tablePersistenceConfigProvider('functionList', STORE_ALL),
     ...selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    {
+      provide: FunctionConfigurationApiService,
+      useClass: FunctionConfigurationApiImplService,
+    },
+    {
+      provide: DialogParentService,
+      useExisting: forwardRef(() => FunctionListComponent),
+    },
   ],
 })
-export class FunctionListComponent implements AfterViewInit {
-  private _injector = inject(Injector);
+export class FunctionListComponent implements DialogParentService {
   private _functionApiService = inject(AugmentedKeywordsService);
   private _functionActions = inject(FunctionActionsService);
   private _keywordExecutor = inject(KeywordExecutorService);
 
   readonly dataSource = this._functionApiService.createFilteredTableDataSource();
+  readonly returnParentUrl = this._functionActions.baseUrl;
 
-  ngAfterViewInit(): void {
-    this._functionActions.resolveConfigureLinkIfExits(this._injector);
+  dialogSuccessfullyClosed(): void {
+    this.dataSource.reload();
   }
 
   addFunction(): void {
-    this._functionActions.openAddFunctionModal(this._injector).subscribe(() => this.dataSource.reload());
+    this._functionActions.addFunction();
   }
 
   editFunction(keyword: Keyword): void {
@@ -55,16 +66,16 @@ export class FunctionListComponent implements AfterViewInit {
     });
   }
 
-  exportFunction(id: string, name: string): void {
-    this._functionActions.openExportFunctionDialog(id, name).subscribe(() => this.dataSource.reload());
+  exportFunction(id: string): void {
+    this._functionActions.openExportFunctionDialog(id);
   }
 
   exportFunctions(): void {
-    this._functionActions.openExportAllFunctionsDialog().subscribe(() => this.dataSource.reload());
+    this._functionActions.openExportAllFunctionsDialog();
   }
 
   importFunctions(): void {
-    this._functionActions.openImportFunctionDialog().subscribe(() => this.dataSource.reload());
+    this._functionActions.openImportFunctionDialog();
   }
 
   lookUp(id: string, name: string): void {
@@ -72,10 +83,6 @@ export class FunctionListComponent implements AfterViewInit {
   }
 
   configureFunction(id: string): void {
-    this._functionActions.configureFunction(this._injector, id).subscribe((result) => {
-      if (result) {
-        this.dataSource.reload();
-      }
-    });
+    this._functionActions.configureFunction(id);
   }
 }

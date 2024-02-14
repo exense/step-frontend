@@ -45,6 +45,7 @@ import { PopoverComponent } from './components/popover/popover.component';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { DescriptionHintComponent } from './components/description-hint/description-hint.component';
 import { DurationPipe } from './pipes/duration.pipe';
+import { DialogRouteComponent } from './components/dialog-route/dialog-route.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -91,6 +92,7 @@ import { DurationPipe } from './pipes/duration.pipe';
     SafeHtmlPipe,
     DescriptionHintComponent,
     DurationPipe,
+    DialogRouteComponent,
   ],
   exports: [
     CommonModule,
@@ -140,6 +142,7 @@ import { DurationPipe } from './pipes/duration.pipe';
     SafeHtmlPipe,
     DescriptionHintComponent,
     DurationPipe,
+    DialogRouteComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -221,12 +224,16 @@ export * from './directives/item-hover.directive';
 export * from './directives/item-hold.directive';
 export * from './services/item-hover-receiver.service';
 export * from './services/item-hold-receiver.service';
+export * from './services/dialog-parent.service';
 export * from './shared/bulk-operation-type.enum';
 export * from './shared/auth.guards';
 export * from './shared/string-array-regex';
+export * from './shared/dialog-route';
+export * from './shared/dialog-route-result';
 export * from './directives/popover-content.directive';
 export * from './directives/trigger-popover.directive';
 export * from './components/popover/popover.component';
 export * from './pipes/safe-html.pipe';
 export * from './pipes/duration.pipe';
 export * from './components/description-hint/description-hint.component';
+export * from './components/dialog-route/dialog-route.component';

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import {
   AutoDeselectStrategy,
   ExecutiontTaskParameters,
@@ -7,6 +7,7 @@ import {
   STORE_ALL,
   ArrayItemLabelValueExtractor,
   FilterConditionFactoryService,
+  DialogParentService,
 } from '@exense/step-core';
 import { ScheduledTaskLogicService } from '../../services/scheduled-task-logic.service';
 import { KeyValue } from '@angular/common';
@@ -21,9 +22,13 @@ type StatusItem = KeyValue<string, string>;
     tablePersistenceConfigProvider('scheduledTaskList', STORE_ALL),
     ScheduledTaskLogicService,
     ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    {
+      provide: DialogParentService,
+      useExisting: ScheduledTaskLogicService,
+    },
   ],
 })
-export class ScheduledTaskListComponent implements AfterViewInit {
+export class ScheduledTaskListComponent implements OnInit {
   readonly _logic = inject(ScheduledTaskLogicService);
 
   isSchedulerEnabled: boolean = false;
@@ -44,9 +49,5 @@ export class ScheduledTaskListComponent implements AfterViewInit {
     this._logic.isSchedulerEnabled().subscribe((data) => {
       this.isSchedulerEnabled = data;
     });
-  }
-
-  ngAfterViewInit(): void {
-    this._logic.resolveEditLinkIfExists();
   }
 }

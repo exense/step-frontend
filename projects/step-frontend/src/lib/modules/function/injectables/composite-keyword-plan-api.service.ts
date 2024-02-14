@@ -40,12 +40,12 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService, OnD
       const id = keyword.id!;
       const plan = (keyword as any).plan as Plan;
       return { id, plan };
-    })
+    }),
   );
 
   private readonly getPlan = pipe(
     this.getPlanWithId,
-    map(({ plan }) => plan)
+    map(({ plan }) => plan),
   );
 
   clonePlan(id: string): Observable<Plan> {
@@ -70,7 +70,7 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService, OnD
   getPlanHistory(id: string): Observable<History[]> {
     return this.keyword$.pipe(
       map((keyword) => keyword!),
-      switchMap((keyword: Keyword) => this._keywordApi.getFunctionVersions(keyword.id!))
+      switchMap((keyword: Keyword) => this._keywordApi.getFunctionVersions(keyword.id!)),
     );
   }
 
@@ -88,12 +88,12 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService, OnD
       return this.keyword$.pipe(
         map((keyword) => keyword!),
         switchMap((keyword: Keyword) => this._keywordApi.restoreFunctionVersion(keyword.id!, versionId)),
-        this.getPlan
+        this.getPlan,
       );
     }
     return this.keyword$.pipe(
       map((keyword) => keyword!),
-      this.getPlan
+      this.getPlan,
     );
   }
 
@@ -115,7 +115,7 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService, OnD
     return this._planApi.savePlan(plan).pipe(
       map((plan: Plan) => {
         return { id: plan.id!, plan };
-      })
+      }),
     );
   }
 }

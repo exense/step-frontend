@@ -238,18 +238,18 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
     this._treeState.editSelectedNode();
   }
 
-  toggleSkip(node?: AbstractArtefact): void {
+  toggleSkip(node?: AbstractArtefact, forceSkip?: boolean): void {
     if (node) {
       this._treeState.selectNodeById(node.id!);
     }
-    this._treeState.toggleSkip();
+    this._treeState.toggleSkip(forceSkip);
   }
 
   private initPlanUpdate(): void {
     const planUpdateByTree$ = this._treeState.treeUpdate$.pipe(
       map(() => this.plan),
       filter((plan) => !!plan),
-      tap((plan) => this._planHistory.addToHistory(plan!))
+      tap((plan) => this._planHistory.addToHistory(plan!)),
     );
 
     const planUpdateByEditor$ = this.planChange$.pipe(
@@ -257,20 +257,20 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
         this._treeState.init(plan.root!, { expandAllByDefault: false });
         this._planHistory.addToHistory(plan);
         this.planInternal$.next(plan);
-      })
+      }),
     );
 
     const planUpdatedByHistory$ = this._planHistory.planChange$.pipe(
       tap((plan) => {
         this._treeState.init(plan.root!, { expandAllByDefault: false });
         this.planInternal$.next(plan);
-      })
+      }),
     );
 
     merge(planUpdateByTree$, planUpdateByEditor$, planUpdatedByHistory$)
       .pipe(
         switchMap((plan) => this._planEditorApi.savePlan(plan!)),
-        takeUntil(this.terminator$)
+        takeUntil(this.terminator$),
       )
       .subscribe(({ plan, forceRefresh }) => {
         if (forceRefresh) {

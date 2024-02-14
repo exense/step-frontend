@@ -4,21 +4,14 @@ import { FunctionDialogsConfig } from '../types/function-dialogs-config.interfac
 import { Keyword } from '../../../client/step-client-module';
 
 export abstract class FunctionActionsService {
-  abstract openAddFunctionModal(
-    parentInjector: Injector,
-    dialogConfig?: FunctionDialogsConfig
-  ): Observable<Keyword | undefined>;
+  abstract readonly baseUrl: string;
+  abstract addFunction(): void;
   abstract openFunctionEditor(keyword: Keyword): Observable<boolean | undefined>;
   abstract duplicateFunction(keyword: Keyword): Observable<boolean>;
   abstract openLookUpFunctionDialog(id: string, name: string): void;
-  abstract configureFunction(
-    parentInjector: Injector,
-    id: string,
-    dialogConfig?: FunctionDialogsConfig
-  ): Observable<Keyword | undefined>;
+  abstract configureFunction(id: string): void;
   abstract openDeleteFunctionDialog(id: string, name: string): Observable<boolean>;
-  abstract openExportFunctionDialog(id: string, name: string): Observable<boolean>;
-  abstract openExportAllFunctionsDialog(): Observable<boolean>;
-  abstract openImportFunctionDialog(): Observable<boolean | string[]>;
-  abstract resolveConfigureLinkIfExits(parentInjector: Injector, dialogConfig?: FunctionDialogsConfig): void;
+  abstract openExportFunctionDialog(id: string): void;
+  abstract openExportAllFunctionsDialog(): void;
+  abstract openImportFunctionDialog(): void;
 }

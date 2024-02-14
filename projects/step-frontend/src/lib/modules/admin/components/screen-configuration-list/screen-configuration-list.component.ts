@@ -1,49 +1,46 @@
-import { AfterViewInit, Component, inject } from '@angular/core';
+import { Component, DestroyRef, forwardRef, inject, OnInit } from '@angular/core';
 import {
-  ScreensService,
   TableFetchLocalDataSource,
   ScreenInput,
   MultipleProjectsService,
-  EditorResolverService,
+  DialogsService,
+  DialogParentService,
   AugmentedScreenService,
 } from '@exense/step-core';
-import { ScreenDialogsService } from '../../services/screen-dialogs.service';
 import { RenderOptionsPipe } from '../../pipes/render-options.pipe';
-import { pipe, take, tap } from 'rxjs';
-import { Router } from '@angular/router';
-
-const SCREEN_ID = 'screenId';
+import { filter, map, of, switchMap } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-screen-configuration-list',
   templateUrl: './screen-configuration-list.component.html',
   styleUrls: ['./screen-configuration-list.component.scss'],
+  providers: [
+    {
+      provide: DialogParentService,
+      useExisting: forwardRef(() => ScreenConfigurationListComponent),
+    },
+  ],
 })
-export class ScreenConfigurationListComponent implements AfterViewInit {
-  private _screensService = inject(AugmentedScreenService);
-  private _screenDialogs = inject(ScreenDialogsService);
+export class ScreenConfigurationListComponent implements DialogParentService, OnInit {
+  private _destroyRef = inject(DestroyRef);
+  private _activatedRoute = inject(ActivatedRoute);
+  private _screenApi = inject(AugmentedScreenService);
+  private _dialogs = inject(DialogsService);
   private _renderOptions = inject(RenderOptionsPipe);
   private _multipleProjectList = inject(MultipleProjectsService);
-  private _editorResolver = inject(EditorResolverService);
   private _router = inject(Router);
 
-  private updateDataSourceAfterChange = pipe(
-    tap((result?: boolean) => {
-      if (result) {
-        this.searchableScreens.reload();
-      }
-    }),
-  );
+  readonly screenChoicesRequest$ = this._activatedRoute.data.pipe(map((data) => data['availableScreens']));
 
-  private updateDataSource = pipe(tap(() => this.searchableScreens.reload()));
+  protected currentlySelectedScreenChoice?: string;
 
-  public readonly CURRENT_SCREEN_CHOICE_DEFAULT = 'executionParameters';
-
-  public currentlySelectedScreenChoice: string = this.CURRENT_SCREEN_CHOICE_DEFAULT;
-
-  readonly _screenChoicesRequest$ = this._screensService.getScreens();
   readonly searchableScreens = new TableFetchLocalDataSource(
-    () => this._screensService.getScreenInputsByScreenId(this.currentlySelectedScreenChoice),
+    () =>
+      this.currentlySelectedScreenChoice
+        ? this._screenApi.getScreenInputsByScreenId(this.currentlySelectedScreenChoice)
+        : of([]),
     TableFetchLocalDataSource.configBuilder<ScreenInput>()
       .addSearchStringPredicate('label', (item) => item.input!.label!)
       .addSearchStringPredicate('id', (item) => item.input!.id!)
@@ -53,60 +50,72 @@ export class ScreenConfigurationListComponent implements AfterViewInit {
       .build(),
   );
 
-  ngAfterViewInit(): void {
-    this._editorResolver
-      .onEditEntity(SCREEN_ID)
-      .pipe(take(1))
+  private get baseScreenConfigurationUrl(): string {
+    const screensSegment = this.currentlySelectedScreenChoice;
+    let url = this._router.url;
+    if (screensSegment && url.includes(screensSegment)) {
+      url = url.slice(0, url.indexOf(screensSegment) + screensSegment.length);
+    }
+    return url;
+  }
+
+  get returnParentUrl(): string {
+    return this.baseScreenConfigurationUrl;
+  }
+
+  ngOnInit(): void {
+    this._activatedRoute.params
+      .pipe(
+        map((params) => params['screenId']),
+        takeUntilDestroyed(this._destroyRef),
+      )
       .subscribe((screenId) => {
-        this.editScreenInternal(screenId);
+        this.currentlySelectedScreenChoice = screenId;
+        this.searchableScreens.reload();
       });
   }
 
-  reloadTableForCurrentChoice(choice: string) {
-    this.currentlySelectedScreenChoice = choice;
+  dialogSuccessfullyClosed(): void {
     this.searchableScreens.reload();
   }
 
+  reloadTableForCurrentChoice(choice: string) {
+    this._router.navigate(['..', choice], { relativeTo: this._activatedRoute });
+  }
+
   addScreen(): void {
-    this._screenDialogs
-      .editScreen({ screenId: this.currentlySelectedScreenChoice })
-      .pipe(this.updateDataSourceAfterChange)
-      .subscribe();
+    this._router.navigateByUrl(`${this.baseScreenConfigurationUrl}/editor/new`);
   }
 
   editScreen(screen: ScreenInput): void {
+    const url = `${this.baseScreenConfigurationUrl}/editor/${screen.id!}`;
     if (this._multipleProjectList.isEntityBelongsToCurrentProject(screen)) {
-      this.editScreenInternal(screen.id!);
+      this._router.navigateByUrl(url);
       return;
     }
 
-    const url = this._router.url;
-    const screenLink = url.includes('?') ? url.slice(0, url.indexOf('?')) : url;
-    const screenEditParams = { [SCREEN_ID]: screen.id! };
     this._multipleProjectList
-      .confirmEntityEditInASeparateProject(screen, { url: screenLink, search: screenEditParams }, 'screen input')
+      .confirmEntityEditInASeparateProject(screen, url, 'screen input')
       .subscribe((continueEdit) => {
         if (continueEdit) {
-          this.editScreenInternal(screen.id!);
+          this._router.navigateByUrl(url);
         }
       });
   }
 
   moveScreen(dbId: string, offset: number): void {
-    this._screensService
+    this._screenApi
       .moveInput(dbId, offset, this.currentlySelectedScreenChoice)
-      .pipe(this.updateDataSource)
-      .subscribe();
+      .subscribe(() => this.searchableScreens.reload());
   }
 
   removeScreen(dbId: string, label: string): void {
-    this._screenDialogs
-      .removeScreen(dbId, label, this.currentlySelectedScreenChoice)
-      .pipe(this.updateDataSource)
-      .subscribe();
-  }
-
-  private editScreenInternal(inputId: string): void {
-    this._screenDialogs.editScreen({ inputId }).pipe(this.updateDataSourceAfterChange).subscribe();
+    this._dialogs
+      .showDeleteWarning(1, `Screen "${label}"`)
+      .pipe(
+        filter((result) => result),
+        switchMap(() => this._screenApi.deleteInput(dbId)),
+      )
+      .subscribe(() => this.searchableScreens.reload());
   }
 }

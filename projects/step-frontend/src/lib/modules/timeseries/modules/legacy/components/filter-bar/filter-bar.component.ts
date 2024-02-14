@@ -119,7 +119,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     if (this.oqlModeActive) {
       this.oqlValue = FilterUtils.filtersToOQL(
         this.getValidFilters().filter((item) => !item.isHidden),
-        TimeSeriesConfig.ATTRIBUTES_PREFIX
+        TimeSeriesConfig.ATTRIBUTES_PREFIX,
       );
     } else {
       this.invalidOql = false;
@@ -140,7 +140,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
       ? this.oqlValue
       : FilterUtils.filtersToOQL(
           this.activeFilters.filter(FilterUtils.filterItemIsValid),
-          TimeSeriesConfig.ATTRIBUTES_PREFIX
+          TimeSeriesConfig.ATTRIBUTES_PREFIX,
         );
     let groupingItems: FilterBarItem[] = groupDimensions.map((dimension) => ({
       attributeName: dimension,

@@ -338,7 +338,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     this.uplot = new uPlot(
       rangerOpts,
       [this.settings.xValues, ...this.settings.series.map((s) => s.data)],
-      this.chartElement.nativeElement
+      this.chartElement.nativeElement,
     );
     this.chartLoaded.emit();
   }

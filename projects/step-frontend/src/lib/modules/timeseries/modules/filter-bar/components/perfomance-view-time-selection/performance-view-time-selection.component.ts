@@ -74,7 +74,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
     const selection = this.context.getSelectedTimeRange();
     return this.createRanger(
       this.context.getFullTimeRange(),
-      this.context.isFullRangeSelected() ? undefined : selection
+      this.context.isFullRangeSelected() ? undefined : selection,
     );
   }
 
@@ -110,7 +110,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
             },
           ],
         };
-      })
+      }),
     );
   }
 

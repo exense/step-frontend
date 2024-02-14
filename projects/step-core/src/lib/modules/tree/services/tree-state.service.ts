@@ -26,7 +26,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
   readonly treeControl = new FlatTreeControl<TreeFlatNode>(
     (node) => node.level,
-    (node) => node.expandable
+    (node) => node.expandable,
   );
   readonly treeFlattener = new MatTreeFlattener(
     (node: TreeNode, level: number) => {
@@ -34,7 +34,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     },
     (node) => node.level,
     (node) => node.expandable,
-    (node) => node.children || []
+    (node) => node.children || [],
   );
   readonly dataSource = new MatTreeFlatDataSource<TreeNode, TreeFlatNode>(this.treeControl, this.treeFlattener);
 
@@ -50,7 +50,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     map(([nodes, root]) => {
       const selectedNodeIds = nodes.filter((nodeId) => nodeId !== root?.id);
       return selectedNodeIds.map((nodeId) => this.treeControl.dataNodes.find((n) => n.id === nodeId)!);
-    })
+    }),
   );
 
   private editNodeIdInternal$ = new BehaviorSubject<string | undefined>(undefined);
@@ -101,7 +101,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
           return false;
         }
         return selectedInsertionParentId === nodeId;
-      })
+      }),
     );
   }
 
@@ -137,16 +137,24 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     this.editNodeIdInternal$.next(undefined);
   }
 
-  toggleSkip(): void {
-    const nodeId = this.selectedNodeIds$.value[0];
-    const node = this.findNodeById(nodeId);
-
-    if (!node) {
+  toggleSkip(forceSkip?: boolean): void {
+    const nodes = this.getSelectedNodes();
+    if (!nodes.length) {
       return;
     }
 
-    const isSkipped = !node.isSkipped;
-    const isUpdated = this._treeNodeUtils.updateNodeData(this.originalRoot!, nodeId, { isSkipped });
+    let isUpdated = false;
+
+    nodes.forEach((node) => {
+      let isSkipped;
+      if (forceSkip !== undefined) {
+        isSkipped = forceSkip;
+      } else {
+        isSkipped = !node.isSkipped;
+      }
+      isUpdated = this._treeNodeUtils.updateNodeData(this.originalRoot!, node.id, { isSkipped }) || isUpdated;
+    });
+
     if (isUpdated) {
       this.refresh();
     }
@@ -271,7 +279,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   canInsertTo(nodeId: string, checkParent: boolean): boolean {
     const artefacts = this.selectedNodeIds$.value
       .filter(
-        (nodeId) => nodeId !== this.rootNode$.value?.id && !!this.treeControl.dataNodes.find((n) => n.id === nodeId)
+        (nodeId) => nodeId !== this.rootNode$.value?.id && !!this.treeControl.dataNodes.find((n) => n.id === nodeId),
       )
       .map((nodeId) => this.findNodeById(nodeId))
       .filter((x) => !!x) as N[];
@@ -333,26 +341,29 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
         }, [] as number[][])
         .filter((group) => group.length > 0);
 
-      const newParentsAndNodes = nodesIndicesGroup.reduce((res, group) => {
-        let possibleParent: N | undefined;
-        if (direction === 'nextSibling') {
-          const last = group[group.length - 1];
-          possibleParent = children[last + 1];
-        } else {
-          const first = group[0];
-          possibleParent = children[first - 1];
-        }
+      const newParentsAndNodes = nodesIndicesGroup.reduce(
+        (res, group) => {
+          let possibleParent: N | undefined;
+          if (direction === 'nextSibling') {
+            const last = group[group.length - 1];
+            possibleParent = children[last + 1];
+          } else {
+            const first = group[0];
+            possibleParent = children[first - 1];
+          }
 
-        if (possibleParent && !nodeIds.includes(possibleParent.id)) {
-          const newChildren = group.map((index) => children[index]);
-          res[possibleParent.id] =
-            direction === 'nextSibling'
-              ? [...newChildren, ...((possibleParent.children ?? []) as N[])]
-              : [...((possibleParent.children ?? []) as N[]), ...newChildren];
-        }
+          if (possibleParent && !nodeIds.includes(possibleParent.id)) {
+            const newChildren = group.map((index) => children[index]);
+            res[possibleParent.id] =
+              direction === 'nextSibling'
+                ? [...newChildren, ...((possibleParent.children ?? []) as N[])]
+                : [...((possibleParent.children ?? []) as N[]), ...newChildren];
+          }
 
-        return res;
-      }, {} as Record<string, N[]>);
+          return res;
+        },
+        {} as Record<string, N[]>,
+      );
 
       const realNodesToMove = Object.values(newParentsAndNodes).reduce((res, nodes) => [...res, ...nodes], []);
       if (realNodesToMove.length === 0) {
@@ -720,16 +731,19 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   private getParentChildRelationsForSelectedNodes(): { nodeIds: string[]; parentId: string }[] {
     const selectedNodeIds = this.selectedNodeIds$.value.filter((nodeId) => nodeId !== this.rootNode$.value?.id);
 
-    const relationDictionary = selectedNodeIds.reduce((result, nodeId) => {
-      const flatNode = this.treeControl.dataNodes.find((n) => n.id === nodeId);
-      const parentId = flatNode!.parentId!;
-      if (!result[parentId]) {
-        result[parentId] = [nodeId];
-      } else {
-        result[parentId].push(nodeId);
-      }
-      return result;
-    }, {} as Record<string, string[]>);
+    const relationDictionary = selectedNodeIds.reduce(
+      (result, nodeId) => {
+        const flatNode = this.treeControl.dataNodes.find((n) => n.id === nodeId);
+        const parentId = flatNode!.parentId!;
+        if (!result[parentId]) {
+          result[parentId] = [nodeId];
+        } else {
+          result[parentId].push(nodeId);
+        }
+        return result;
+      },
+      {} as Record<string, string[]>,
+    );
 
     return Object.entries(relationDictionary).map(([parentId, nodeIds]) => ({ parentId, nodeIds }));
   }
@@ -745,7 +759,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     this.dataSource.data.forEach((node) => {
       addExpandedChildren(
         node as N,
-        this.treeControl.expansionModel.selected.map((node) => node.id)
+        this.treeControl.expansionModel.selected.map((node) => node.id),
       );
     });
     return result;
@@ -800,7 +814,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
             this.toggleNodeInternal(nodeId);
           }),
           map(() => true),
-          catchError(() => of(false))
+          catchError(() => of(false)),
         );
       }
 
@@ -816,7 +830,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
             return of(result);
           }
           return expandChild(pathItem);
-        })
+        }),
       );
     }, expandChild(first));
 

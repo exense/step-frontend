@@ -136,7 +136,7 @@ export class FindBucketsRequestBuilder {
           ? this.skipCustomOQL
             ? ''
             : this.filteringSettings.oql
-          : FilterUtils.filtersToOQL(customFilters, this.attributesPrefix)
+          : FilterUtils.filtersToOQL(customFilters, this.attributesPrefix),
       )
       .build();
 

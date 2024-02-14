@@ -16,7 +16,7 @@ export class ByStatusChartGenerator {
   createChart(
     request: FetchBucketsRequest,
     response: TimeSeriesAPIResponse,
-    colorsPool?: TimeseriesColorsPool
+    colorsPool?: TimeseriesColorsPool,
   ): TSChartSettings {
     if (!colorsPool) {
       throw 'Colors pool is mandatory for this type of chart';

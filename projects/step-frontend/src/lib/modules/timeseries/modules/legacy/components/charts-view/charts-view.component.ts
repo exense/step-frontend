@@ -188,11 +188,11 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
                 updateRanger: false,
                 updateCharts: true,
                 showLoadingBar: true,
-              })
+              }),
             );
           }
           return forkJoin(chartsUpdates$);
-        })
+        }),
       )
       .subscribe();
 
@@ -243,9 +243,9 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       .onTimeSelectionChange()
       .pipe(
         switchMap((newRange) =>
-          compareCharts ? this.handleCompareSelectionChange(newRange) : this.handleSelectionChange(newRange)
+          compareCharts ? this.handleCompareSelectionChange(newRange) : this.handleSelectionChange(newRange),
         ),
-        takeUntil(compareCharts ? this.compareTerminator$ : this.terminator$)
+        takeUntil(compareCharts ? this.compareTerminator$ : this.terminator$),
       )
       .subscribe();
   }
@@ -275,7 +275,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       tap(() => {
         this.chartsAreLoading = false;
         this.context.setInProgress(false);
-      })
+      }),
     );
   }
 
@@ -305,7 +305,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       tap(() => {
         this.compareChartsAreLoading = false;
         this.compareModeContext?.setInProgress(false);
-      })
+      }),
     );
   }
 
@@ -476,7 +476,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       type,
       request,
       response,
-      this.context.keywordsContext.colorsPool
+      this.context.keywordsContext.colorsPool,
     );
     if (compareChart) {
       this.compareChartsSettings[type] = newChartSettings;
@@ -557,7 +557,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
         } else {
           this.tableChart.updateData(response);
         }
-      })
+      }),
     );
   }
 
@@ -592,7 +592,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     return this.timeSeriesService.getMeasurements(request).pipe(
       tap((response) => {
         this.tableChart.updateCompareData(response, context);
-      })
+      }),
     );
   }
 
@@ -714,7 +714,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
                 vals.map((v) =>
                   this.compareModeEnabled
                     ? this.selectedCompareThroughputMetric.labelFunction(v)
-                    : this.selectedThroughputMetric.labelFunction(v)
+                    : this.selectedThroughputMetric.labelFunction(v),
                 ),
             },
             {
@@ -725,7 +725,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
                 vals.map((v) =>
                   this.compareModeEnabled
                     ? this.selectedCompareThroughputMetric.labelFunction(v)
-                    : this.selectedThroughputMetric.labelFunction(v)
+                    : this.selectedThroughputMetric.labelFunction(v),
                 ),
               grid: { show: false },
             },
@@ -756,7 +756,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
           this.currentChartsSettings[TsChartType.RESPONSE_TIME] = responseTimeSettings;
           this.currentChartsSettings[TsChartType.THROUGHPUT] = throughputChartSettings;
         }
-      })
+      }),
     );
   }
 
@@ -784,7 +784,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   private switchResponseTimeMetric(
     chart: TimeSeriesChartComponent,
     apiResponse: TimeSeriesAPIResponse,
-    metric: ResponseTimeMetric
+    metric: ResponseTimeMetric,
   ) {
     chart.setTitle(TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${metric.label})`);
     const data = chart.getData();
@@ -797,7 +797,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   private switchThroughputMetric(
     chart: TimeSeriesChartComponent,
     apiResponse: TimeSeriesAPIResponse,
-    metric: ThroughputMetric
+    metric: ThroughputMetric,
   ): void {
     chart.settings.tooltipOptions.zAxisLabel = metric.tooltipZAxisLabel;
     chart.legendSettings.zAxisLabel = metric.tooltipZAxisLabel;

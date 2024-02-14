@@ -64,7 +64,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
 
   private uplotSyncFunction: UPlot.default.Cursor.Sync.ScaleKeyMatcher = (
     subScaleKey: string | null,
-    pubScaleKey: string | null
+    pubScaleKey: string | null,
   ) => subScaleKey == pubScaleKey;
 
   getSize = () => {

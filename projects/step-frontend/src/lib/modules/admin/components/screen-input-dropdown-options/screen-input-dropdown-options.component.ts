@@ -1,7 +1,7 @@
 import { Component, Input, ViewChild } from '@angular/core';
 import { Input as SInput } from '@exense/step-core';
 import { MatExpansionPanel } from '@angular/material/expansion';
-import { EXPRESSION_SCRIPT_FORMATTER } from '../../shared/model-formatters';
+import { EXPRESSION_SCRIPT_FORMATTER } from '../../types/model-formatters';
 
 @Component({
   selector: 'step-screen-input-dropdown-options',
