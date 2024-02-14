@@ -1,3 +1,4 @@
+@use 'projects/step-core/styles/core-variables' as var;
 @use 'projects/step-core/styles/core-mixins' as core;
 
 step-execution-list {
@@ -30,8 +31,26 @@ step-execution-list {
     width: 8rem !important;
   }
 
+  .execution-time {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    white-space: nowrap;
+    margin-right: 0.5rem;
+  }
+
   .duration {
+    color: var.$white;
+    background-color: var.$gray-525;
+    border-radius: 0.6rem;
+    padding: 0.4rem;
+    font-size: 75%;
     user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
   }
 }
 
