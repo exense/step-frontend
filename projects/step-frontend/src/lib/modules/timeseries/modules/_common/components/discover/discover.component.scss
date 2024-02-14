@@ -1,8 +1,13 @@
 .container {
   display: flex;
   flex-direction: row;
-  height: calc(65vh - 80px);
+  height: calc(65vh - 136px);
   max-width: 1095px;
+}
+
+.description {
+  margin: 0.6rem;
+  margin-bottom: 2rem;
 }
 
 .columns-container {

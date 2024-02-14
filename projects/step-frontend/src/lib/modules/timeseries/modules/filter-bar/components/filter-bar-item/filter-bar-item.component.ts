@@ -20,6 +20,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
   @Input() removable?: boolean;
   @Input() compact = false;
   @Input() highlightRemoveButton = false;
+  @Input() updateTimeRangeOption = true; // execution filter item provide the 'Update time range' option.
 
   @Output() removeItem: EventEmitter<void> = new EventEmitter<void>();
   @Output() filterChange: EventEmitter<FilterBarItem> = new EventEmitter<FilterBarItem>();
