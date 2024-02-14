@@ -137,16 +137,24 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     this.editNodeIdInternal$.next(undefined);
   }
 
-  toggleSkip(): void {
-    const nodeId = this.selectedNodeIds$.value[0];
-    const node = this.findNodeById(nodeId);
-
-    if (!node) {
+  toggleSkip(forceSkip?: boolean): void {
+    const nodes = this.getSelectedNodes();
+    if (!nodes.length) {
       return;
     }
 
-    const isSkipped = !node.isSkipped;
-    const isUpdated = this._treeNodeUtils.updateNodeData(this.originalRoot!, nodeId, { isSkipped });
+    let isUpdated = false;
+
+    nodes.forEach(node => {
+      let isSkipped;
+      if (forceSkip !== undefined) {
+        isSkipped = forceSkip;
+      } else {
+        isSkipped = !node.isSkipped;
+      }
+      isUpdated = this._treeNodeUtils.updateNodeData(this.originalRoot!, node.id, { isSkipped }) || isUpdated
+    })
+
     if (isUpdated) {
       this.refresh();
     }
