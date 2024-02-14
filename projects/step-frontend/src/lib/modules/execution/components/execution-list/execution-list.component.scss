@@ -1,5 +1,6 @@
 @use 'projects/step-core/styles/core-variables' as var;
 @use 'projects/step-core/styles/core-mixins' as core;
+@use 'sass:map';
 
 step-execution-list {
   @include core.table-container;
@@ -31,6 +32,10 @@ step-execution-list {
     width: 8rem !important;
   }
 
+  td.execution-time-cell {
+    width: 0;
+  }
+
   .execution-time {
     display: flex;
     align-items: center;
@@ -42,10 +47,10 @@ step-execution-list {
 
   .duration {
     color: var.$white;
-    background-color: var.$gray-525;
-    border-radius: 0.6rem;
-    padding: 0.4rem;
-    font-size: 75%;
+    background-color: map.get(var.$statuses, 'ENDED');
+    border-radius: 0.8rem;
+    min-width: 5rem;
+    padding: 0.3rem 1rem;
     user-select: none;
     display: flex;
     align-items: center;
