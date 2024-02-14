@@ -80,7 +80,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
       this._formBuilder,
       this.lightForm,
       this.schemaEnforced,
-      this._functionConfigurationDialogData
+      this._functionConfigurationDialogData,
     );
 
     this.formGroup.statusChanges.pipe(takeUntil(this.terminator$)).subscribe(() => {
@@ -91,7 +91,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
 
     if (functionTypeFilters?.length) {
       this.functionTypeItemInfos = this.functionTypeItemInfos.filter((functionTypeItemInfo) =>
-        this._functionConfigurationDialogData.dialogConfig.functionTypeFilters.includes(functionTypeItemInfo.type)
+        this._functionConfigurationDialogData.dialogConfig.functionTypeFilters.includes(functionTypeItemInfo.type),
       );
     }
 
@@ -135,7 +135,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
           }
 
           return this._api.getFunctionEditor(keyword.id!).pipe(map((path) => ({ isSuccess, path })));
-        })
+        }),
       )
       .subscribe(({ isSuccess, path }) => {
         if (!edit) {
@@ -195,7 +195,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
           if (this.keyword.schema) {
             keyword.schema = this.keyword.schema;
           }
-        })
+        }),
       )
       .subscribe((keyword) => {
         this.keyword = keyword;

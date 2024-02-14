@@ -9,19 +9,19 @@ export class DashboardNavigatorService {
   private _router = inject(Router);
 
   createDashboard(): void {
-    this._router.navigate(['root', 'dashboards', 'new']);
+    this._router.navigate(['dashboards', 'new']);
   }
 
   navigateToDashboard(dashboard: DashboardView, editMode = false): void {
     if (dashboard.metadata?.['isLegacy']) {
       const link = dashboard.metadata?.['link'];
       if (link) {
-        this._router.navigate(['root', link]);
+        this._router.navigate([link]);
       } else {
         console.error('No link specified for dashboard');
       }
     } else {
-      this._router.navigate(['root', 'dashboards', dashboard.id], {
+      this._router.navigate(['dashboards', dashboard.id], {
         queryParams: { edit: editMode ? '1' : '0' },
         queryParamsHandling: 'merge',
       });

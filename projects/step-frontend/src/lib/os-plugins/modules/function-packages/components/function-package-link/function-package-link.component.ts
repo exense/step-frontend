@@ -33,7 +33,7 @@ export class FunctionPackageLinkComponent implements CustomComponent {
 
   constructor(
     private _api: KeywordPackagesService,
-    private _functionPackageActionsService: FunctionPackageActionsService
+    private _functionPackageActionsService: FunctionPackageActionsService,
   ) {}
 
   delete(): void {

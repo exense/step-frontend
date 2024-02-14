@@ -62,18 +62,18 @@ export class PlanTreeComponent implements TreeActionsService {
   ];
 
   private actionsMultiple: TreeAction[] = [
-      { id: PlanTreeAction.OPEN, label: 'Open (Ctrl + O)', disabled: true },
-      { id: PlanTreeAction.RENAME, label: 'Rename (F2)', disabled: true },
-      { id: PlanTreeAction.ENABLE, label: 'Enable All Selected (Ctrl + E)', hasSeparator: true},
-      { id: PlanTreeAction.DISABLE, label: 'Disable All Selected (Ctrl + E)', hasSeparator: true},
-      { id: PlanTreeAction.COPY, label: 'Copy All Selected (Ctrl + C)'},
-      { id: PlanTreeAction.PASTE, label: 'Paste (Ctrl + V)'},
-      { id: PlanTreeAction.DUPLICATE, label: 'Duplicate All Selected (Ctrl + D)'},
-      { id: PlanTreeAction.DELETE, label: 'Delete All Selected (Del)', hasSeparator: true},
-      { id: PlanTreeAction.MOVE_UP, label: 'Move Up All Selected (Ctrl + ⬆️)'},
-      { id: PlanTreeAction.MOVE_DOWN, label: 'Move Down All Selected (Ctrl + ⬇️)'},
-      { id: PlanTreeAction.MOVE_LEFT, label: 'Move Left All Selected (Ctrl + ⬅️)'},
-      { id: PlanTreeAction.MOVE_RIGHT, label: 'Move Right All Selected (Ctrl + ➡️)'},
+    { id: PlanTreeAction.OPEN, label: 'Open (Ctrl + O)', disabled: true },
+    { id: PlanTreeAction.RENAME, label: 'Rename (F2)', disabled: true },
+    { id: PlanTreeAction.ENABLE, label: 'Enable All Selected (Ctrl + E)', hasSeparator: true },
+    { id: PlanTreeAction.DISABLE, label: 'Disable All Selected (Ctrl + E)', hasSeparator: true },
+    { id: PlanTreeAction.COPY, label: 'Copy All Selected (Ctrl + C)' },
+    { id: PlanTreeAction.PASTE, label: 'Paste (Ctrl + V)' },
+    { id: PlanTreeAction.DUPLICATE, label: 'Duplicate All Selected (Ctrl + D)' },
+    { id: PlanTreeAction.DELETE, label: 'Delete All Selected (Del)', hasSeparator: true },
+    { id: PlanTreeAction.MOVE_UP, label: 'Move Up All Selected (Ctrl + ⬆️)' },
+    { id: PlanTreeAction.MOVE_DOWN, label: 'Move Down All Selected (Ctrl + ⬇️)' },
+    { id: PlanTreeAction.MOVE_LEFT, label: 'Move Left All Selected (Ctrl + ⬅️)' },
+    { id: PlanTreeAction.MOVE_RIGHT, label: 'Move Right All Selected (Ctrl + ➡️)' },
   ];
 
   getActionsForNode(node: ArtefactTreeNode, multipleNodes?: boolean): Observable<TreeAction[]> {
@@ -107,8 +107,8 @@ export class PlanTreeComponent implements TreeActionsService {
             }
 
             return true;
-          })
-      )
+          }),
+      ),
     );
   }
 

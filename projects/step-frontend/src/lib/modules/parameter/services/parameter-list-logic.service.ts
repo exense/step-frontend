@@ -9,7 +9,7 @@ import {
 import { filter, switchMap } from 'rxjs';
 import { Router } from '@angular/router';
 
-const ROOT_URL = '/root/parameters';
+const ROOT_URL = '/parameters';
 
 @Injectable()
 export class ParameterListLogicService {
@@ -60,7 +60,7 @@ export class ParameterListLogicService {
       .showDeleteWarning(1, `Parameter "${label}"`)
       .pipe(
         filter((result) => result),
-        switchMap(() => this._parametersService.deleteParameter(id))
+        switchMap(() => this._parametersService.deleteParameter(id)),
       )
       .subscribe((result: boolean) => {
         this.dataSource.reload();

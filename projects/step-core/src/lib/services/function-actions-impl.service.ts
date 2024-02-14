@@ -8,7 +8,7 @@ import { DialogsService } from '../shared';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
 
 const ENTITY_TYPE = 'keyword';
-const EDITOR_URL = '/root/functions';
+const EDITOR_URL = '/functions';
 
 @Injectable({
   providedIn: 'root',
@@ -41,7 +41,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
           }
 
           return this._multipleProjectService.confirmEntityEditInASeparateProject(keyword, url, ENTITY_TYPE);
-        })
+        }),
       )
       .subscribe((continueEdit) => {
         if (!continueEdit) {
@@ -56,8 +56,8 @@ export class FunctionActionsImplService implements FunctionActionsService {
       .showDeleteWarning(1, `Keyword "${name}"`)
       .pipe(
         switchMap((isDeleteConfirmed) =>
-          isDeleteConfirmed ? this._functionApiService.deleteFunction(id).pipe(map(() => true)) : of(false)
-        )
+          isDeleteConfirmed ? this._functionApiService.deleteFunction(id).pipe(map(() => true)) : of(false),
+        ),
       );
   }
 
@@ -71,7 +71,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
       catchError((err) => {
         console.error(err);
         return of(false);
-      })
+      }),
     );
   }
 
@@ -114,7 +114,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
       catchError((error) => {
         console.error(error);
         return of(undefined);
-      })
+      }),
     );
   }
 

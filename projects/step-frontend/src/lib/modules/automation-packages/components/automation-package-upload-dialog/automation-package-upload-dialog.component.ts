@@ -66,7 +66,7 @@ export class AutomationPackageUploadDialogComponent {
         catchError((err) => {
           console.error(err);
           return of(false);
-        })
+        }),
       )
       .subscribe((result) => this._dialogRef.close({ isSuccess: result }));
   }

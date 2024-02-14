@@ -35,7 +35,7 @@ export class PlanListComponent implements DialogParentService {
       if (changeResult) {
         this.dataSource.reload();
       }
-    })
+    }),
   );
 
   dialogSuccessfullyClosed(): void {

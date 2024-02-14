@@ -45,7 +45,7 @@ export class SchedulerModule {
     private _entityRegistry: EntityRegistry,
     private _cellRegistry: CustomCellRegistryService,
     private _viewRegistry: ViewRegistryService,
-    _taskBulkOperations: ScheduledTaskBulkOperationsRegisterService
+    _taskBulkOperations: ScheduledTaskBulkOperationsRegisterService,
   ) {
     this.registerEntity();
     this.registerCells();
@@ -115,7 +115,7 @@ export class SchedulerModule {
           label: 'Scheduler',
           weight: 0,
           accessPermissions: ['settings-ui-menu', 'admin-ui-menu'],
-        }
+        },
       );
     };
     register('settings');

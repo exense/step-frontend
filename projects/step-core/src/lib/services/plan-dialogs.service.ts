@@ -9,7 +9,7 @@ import { EntityDialogsService, EntityActionInvokerService } from '../modules/ent
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
 import { PlanAction } from '../shared';
 
-const PLANS_LIST = '/root/plans/list';
+const PLANS_LIST = '/plans/list';
 
 @Injectable({
   providedIn: 'root',
@@ -34,7 +34,7 @@ export class PlanDialogsService implements PlanLinkDialogService {
     const selectedEntity$ = this._entityDialogs.selectEntityOfType('plans', { tableFilter });
     const plan$ = selectedEntity$.pipe(
       map((result) => result.item as Plan),
-      switchMap((plan) => this._plansApiService.getPlanById(plan.id!))
+      switchMap((plan) => this._plansApiService.getPlanById(plan.id!)),
     );
     return plan$;
   }
@@ -68,7 +68,7 @@ export class PlanDialogsService implements PlanLinkDialogService {
   }
 
   executePlan(planId: string): void {
-    this._router.navigate(['root', 'repository'], {
+    this._router.navigate(['repository'], {
       queryParams: {
         repositoryId: 'local',
         planid: planId,

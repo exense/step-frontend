@@ -42,7 +42,10 @@ import { FunctionLinkEditorComponent } from './components/function-link/function
   ],
 })
 export class KeywordsCommonModule {
-  constructor(private _entityRegistry: EntityRegistry, private _bulkRegister: FunctionBulkOperationsRegisterService) {
+  constructor(
+    private _entityRegistry: EntityRegistry,
+    private _bulkRegister: FunctionBulkOperationsRegisterService,
+  ) {
     this.registerEntities();
     this._bulkRegister.register();
   }

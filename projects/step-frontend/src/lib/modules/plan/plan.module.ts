@@ -42,7 +42,7 @@ export class PlanModule {
     _entityRegistry: EntityRegistry,
     _planBulkOperations: PlansBulkOperationsRegisterService,
     _cellsRegister: CustomCellRegistryService,
-    _viewRegistry: ViewRegistryService
+    _viewRegistry: ViewRegistryService,
   ) {
     _planBulkOperations.register();
     _entityRegistry.register('plans', 'Plan', { icon: 'plan', component: PlanSelectionComponent });
@@ -96,7 +96,7 @@ export class PlanModule {
                       const id = route.params['id'];
                       return api.getPlanById(id).pipe(
                         map((plan) => plan.attributes!['name']),
-                        map((name) => `${name}.sta`)
+                        map((name) => `${name}.sta`),
                       );
                     },
                   },

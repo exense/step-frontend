@@ -45,7 +45,7 @@ export class FunctionPackagesModule {
     private _cellsRegistry: CustomCellRegistryService,
     private _viewRegistry: ViewRegistryService,
     private _searchCellsRegistry: CustomSearchCellRegistryService,
-    private _dashletsRegistry: DashletRegistryService
+    private _dashletsRegistry: DashletRegistryService,
   ) {
     this.registerEntities();
     this.registerViews();
@@ -64,7 +64,7 @@ export class FunctionPackagesModule {
       'rest/functionpackages/',
       'rest/functionpackages/',
       'st-table',
-      FunctionPackageSelectionComponent
+      FunctionPackageSelectionComponent,
     );
   }
 
@@ -103,7 +103,7 @@ export class FunctionPackagesModule {
   private registerSearchCells(): void {
     this._searchCellsRegistry.registerSearchCell(
       'rest/table/functionPackage/searchIdsBy/attributes.name',
-      FunctionPackageSearchComponent
+      FunctionPackageSearchComponent,
     );
   }
 

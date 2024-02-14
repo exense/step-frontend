@@ -46,7 +46,7 @@ export class CallFunctionReportNodeComponent implements OnChanges {
       params.end = this.execution.endTime;
     }
     let paramsString = new URLSearchParams(params).toString();
-    const url = `/#/root/analytics?${paramsString}`;
+    const url = `/#/analytics?${paramsString}`;
     window.open(url, '_blank');
   }
 

@@ -89,9 +89,9 @@ export class ParameterEditDialogComponent implements OnInit {
       .pipe(
         map(([scopeItems, hasGlobal, hasApplication]) => {
           return scopeItems.filter(
-            (item) => (item.scope !== 'GLOBAL' || hasGlobal) && (item.scope !== 'APPLICATION' || hasApplication)
+            (item) => (item.scope !== 'GLOBAL' || hasGlobal) && (item.scope !== 'APPLICATION' || hasApplication),
           );
-        })
+        }),
       )
       .subscribe((scopeItems) => (this.scopeItems = scopeItems));
   }

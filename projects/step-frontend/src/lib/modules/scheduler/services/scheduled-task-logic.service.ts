@@ -17,7 +17,7 @@ import { map, Observable, of, pipe, switchMap, take, tap } from 'rxjs';
 import { Router } from '@angular/router';
 
 const TASK_ID = 'taskId';
-const ROOT_URL = '/root/scheduler';
+const ROOT_URL = '/scheduler';
 
 @Injectable()
 export class ScheduledTaskLogicService implements SchedulerActionsService, DialogParentService {
@@ -36,7 +36,7 @@ export class ScheduledTaskLogicService implements SchedulerActionsService, Dialo
       if (result?.isSuccess) {
         this.dataSource.reload();
       }
-    })
+    }),
   );
 
   readonly STATUS_ACTIVE_STRING = 'On';
@@ -55,7 +55,7 @@ export class ScheduledTaskLogicService implements SchedulerActionsService, Dialo
 
   executeTask(scheduledTask: ExecutiontTaskParameters) {
     this._schedulerService.executeTask(scheduledTask.id!).subscribe((executionId) => {
-      this._router.navigate(['root', 'executions', executionId]);
+      this._router.navigate(['executions', executionId]);
     });
   }
 
@@ -71,9 +71,9 @@ export class ScheduledTaskLogicService implements SchedulerActionsService, Dialo
         switchMap((task) =>
           task.active
             ? this._schedulerService.enableExecutionTask(task.id!, false)
-            : this._schedulerService.enableExecutionTask(task.id!, true)
+            : this._schedulerService.enableExecutionTask(task.id!, true),
         ),
-        this.updateDataSourceAfterChange
+        this.updateDataSourceAfterChange,
       )
       .subscribe();
   }
@@ -92,9 +92,9 @@ export class ScheduledTaskLogicService implements SchedulerActionsService, Dialo
 
   navToSettings() {
     if (this._authService.hasRight('admin-ui-menu') && this._authService.isAuthenticated()) {
-      this._router.navigate(['root', 'admin', 'controller', 'scheduler']);
+      this._router.navigate(['admin', 'controller', 'scheduler']);
     } else {
-      this._router.navigate(['root', 'settings', 'scheduler']);
+      this._router.navigate(['settings', 'scheduler']);
     }
   }
 
@@ -103,7 +103,7 @@ export class ScheduledTaskLogicService implements SchedulerActionsService, Dialo
       .removeScheduledTask(scheduledTask)
       .pipe(
         map((isSuccess) => ({ isSuccess })),
-        this.updateDataSourceAfterChange
+        this.updateDataSourceAfterChange,
       )
       .subscribe();
   }
@@ -123,7 +123,7 @@ export class ScheduledTaskLogicService implements SchedulerActionsService, Dialo
             return this.editTaskInternal(scheduledTask.id!);
           }
           return of(continueEdit);
-        })
+        }),
       );
   }
 
@@ -152,7 +152,7 @@ export class ScheduledTaskLogicService implements SchedulerActionsService, Dialo
       .onEditEntity(TASK_ID)
       .pipe(
         take(1),
-        switchMap((taskId) => this.editTaskInternal(taskId))
+        switchMap((taskId) => this.editTaskInternal(taskId)),
       )
       .subscribe();
   }
@@ -161,7 +161,7 @@ export class ScheduledTaskLogicService implements SchedulerActionsService, Dialo
     return this._schedulerService.getExecutionTaskById(id).pipe(
       switchMap((task) => this._scheduledTaskDialogs.editScheduledTask(task)),
       this.updateDataSourceAfterChange,
-      map((result) => !!result)
+      map((result) => !!result),
     );
   }
 }

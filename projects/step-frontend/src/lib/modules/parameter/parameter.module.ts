@@ -38,7 +38,7 @@ export class ParameterModule {
     _entityRegistry: EntityRegistry,
     _cellRegister: CustomCellRegistryService,
     _parametersRegister: ParametersBulkOperationsRegisterService,
-    _vewRegistry: ViewRegistryService
+    _vewRegistry: ViewRegistryService,
   ) {
     _entityRegistry.register('parameters', 'Parameters', {
       icon: 'list',

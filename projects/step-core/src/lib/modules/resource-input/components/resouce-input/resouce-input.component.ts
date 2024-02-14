@@ -72,7 +72,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   constructor(
     private _augmentedResourcesService: AugmentedResourcesService,
     private _resourceDialogsService: ResourceDialogsService,
-    private _resourceInputBridgeService: ResourceInputBridgeService
+    private _resourceInputBridgeService: ResourceInputBridgeService,
   ) {}
 
   ngOnInit(): void {

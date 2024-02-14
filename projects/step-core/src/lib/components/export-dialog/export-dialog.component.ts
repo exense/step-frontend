@@ -79,7 +79,7 @@ export class ExportDialogComponent {
         catchError((error) => {
           this._dialogs.showErrorMsg(error).subscribe();
           return of(undefined);
-        })
+        }),
       )
       .subscribe({
         next: (result) => {

@@ -80,7 +80,7 @@ export class AutomationPackagesListComponent implements AfterViewInit, OnDestroy
       .pipe(
         map((params) => params?.['automationPackageFileName']),
         filter((automationPackageFileName) => !!automationPackageFileName),
-        takeUntil(this.terminator$)
+        takeUntil(this.terminator$),
       )
       .subscribe((automationPackageFileName) => {
         this.table?.onSearch('fileName', automationPackageFileName);

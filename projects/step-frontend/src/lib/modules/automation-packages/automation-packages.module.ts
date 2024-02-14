@@ -18,7 +18,10 @@ import { ActivatedRouteSnapshot } from '@angular/router';
   imports: [StepCommonModule, StepCoreModule],
 })
 export class AutomationPackagesModule {
-  constructor(private _entityRegistry: EntityRegistry, private _viewRegistry: ViewRegistryService) {
+  constructor(
+    private _entityRegistry: EntityRegistry,
+    private _viewRegistry: ViewRegistryService,
+  ) {
     this.registerEntities();
     this.registerRoutes();
     this.registerMenuEntries();
@@ -65,7 +68,7 @@ export class AutomationPackagesModule {
           },
         ],
       },
-      { accessPermissions: ['automation-package-read'] }
+      { accessPermissions: ['automation-package-read'] },
     );
   }
 

@@ -18,7 +18,6 @@ const loadModule = async (entryPoint: string): Promise<PluginCtx | undefined> =>
     if (href.includes('#')) {
       href = href.substring(0, href.indexOf('#'));
     }
-
     if (!href.endsWith('/')) {
       href += '/';
     }

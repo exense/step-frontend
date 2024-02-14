@@ -37,7 +37,7 @@ export class ImportDialogComponent {
       .pipe(
         tap(() => {
           this.isImporting = true;
-        })
+        }),
       )
       .subscribe({
         next: (response: string[]) => {

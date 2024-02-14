@@ -6,7 +6,7 @@ import { FunctionPackageConfigurationDialogComponent } from '../components/funct
 import { FunctionPackageConfigurationDialogData } from '../types/function-package-configuration-dialog-data.interface';
 import { Router } from '@angular/router';
 
-const ROOT_URL = '/root/functionPackages';
+const ROOT_URL = '/functionPackages';
 
 @Injectable({
   providedIn: 'root',
@@ -47,7 +47,7 @@ export class FunctionPackageActionsService {
   deleteFunctionPackage(id: string, name: string): Observable<boolean> {
     return this._dialogs.showDeleteWarning(1, `Keyword Package "${name}"`).pipe(
       filter((result) => result),
-      switchMap(() => this._api.deleteFunctionPackage(id))
+      switchMap(() => this._api.deleteFunctionPackage(id)),
     );
   }
 

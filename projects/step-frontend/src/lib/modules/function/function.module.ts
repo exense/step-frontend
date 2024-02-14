@@ -51,7 +51,7 @@ export class FunctionModule {
     private _cellsRegistry: CustomCellRegistryService,
     private _viewRegistry: ViewRegistryService,
     private _functionTypeRegistryService: FunctionTypeRegistryService,
-    private _functionPackageTypeRegistryService: FunctionPackageTypeRegistryService
+    private _functionPackageTypeRegistryService: FunctionPackageTypeRegistryService,
   ) {
     this.registerViews();
     this.registerCells();
@@ -119,7 +119,7 @@ export class FunctionModule {
                   const id = route.params['id'];
                   return api.getFunctionById(id).pipe(
                     map((keyword) => keyword.attributes!['name']),
-                    map((name) => `${name}.sta`)
+                    map((name) => `${name}.sta`),
                   );
                 },
               },

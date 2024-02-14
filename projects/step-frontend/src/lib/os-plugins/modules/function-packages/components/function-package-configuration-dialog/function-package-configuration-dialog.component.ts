@@ -56,7 +56,7 @@ export class FunctionPackageConfigurationDialogComponent {
           this._resourceInputBridgeService.deleteUploadedResource();
           return of(false);
         }),
-        tap(() => (this.isLoading = false))
+        tap(() => (this.isLoading = false)),
       )
       .subscribe((result) => this._matDialogRef.close({ isSuccess: !!result }));
   }
@@ -73,10 +73,13 @@ export class FunctionPackageConfigurationDialogComponent {
   saveRoutingCriteria(): void {
     this.functionPackage.tokenSelectionCriteria = this.criteria
       .filter((item) => !!item.key)
-      .reduce((res, item) => {
-        res[item.key] = item.value;
-        return res;
-      }, {} as Record<string, string>);
+      .reduce(
+        (res, item) => {
+          res[item.key] = item.value;
+          return res;
+        },
+        {} as Record<string, string>,
+      );
   }
 
   removeRoutingCriteria(criterion: KeyValue<string, string>): void {
@@ -124,12 +127,12 @@ export class FunctionPackageConfigurationDialogComponent {
                 of({
                   previewError: error.data,
                   addedFunctions: undefined,
-                })
-              )
-            )
-          )
+                }),
+              ),
+            ),
+          ),
         ),
-        tap(() => (this.isLoading = false))
+        tap(() => (this.isLoading = false)),
       )
       .subscribe((result) => {
         this.addedFunctions = result?.addedFunctions;
@@ -147,7 +150,7 @@ export class FunctionPackageConfigurationDialogComponent {
 
   private createTokenSelectionCriteria(): KeyValue<string, string>[] {
     return Object.entries(this.functionPackage?.tokenSelectionCriteria || {}).map(
-      ([key, value]) => ({ key, value } as KeyValue<string, string>)
+      ([key, value]) => ({ key, value }) as KeyValue<string, string>,
     );
   }
 }

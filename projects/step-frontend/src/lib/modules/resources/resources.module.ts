@@ -19,7 +19,10 @@ import { ActivatedRouteSnapshot } from '@angular/router';
   exports: [ResourceSelectionComponent, ResourcesListComponent, ResourceConfigurationDialogComponent],
 })
 export class ResourcesModule {
-  constructor(private _entityRegistry: EntityRegistry, private _viewRegistry: ViewRegistryService) {
+  constructor(
+    private _entityRegistry: EntityRegistry,
+    private _viewRegistry: ViewRegistryService,
+  ) {
     this.registerEntities();
     this.registerMenuEntries();
     this.registerRoutes();

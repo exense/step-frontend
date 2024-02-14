@@ -38,7 +38,10 @@ import { CURRENT_SCREEN_CHOICE_DEFAULT } from './types/constants';
   providers: [RenderOptionsPipe],
 })
 export class AdminModule {
-  constructor(_entityRegistry: EntityRegistry, private _viewRegistry: ViewRegistryService) {
+  constructor(
+    _entityRegistry: EntityRegistry,
+    private _viewRegistry: ViewRegistryService,
+  ) {
     _entityRegistry.register('users', 'User', { icon: 'user', component: UserSelectionComponent });
 
     this.registerSettingsSubRoutes('settings');
@@ -105,7 +108,7 @@ export class AdminModule {
         parentPath,
         label: 'Screens',
         accessPermissions: ['settings-ui-menu', 'admin-ui-menu'],
-      }
+      },
     );
 
     this._viewRegistry.registerRoute(
@@ -116,7 +119,7 @@ export class AdminModule {
       {
         parentPath,
         label: 'My Account',
-      }
+      },
     );
   }
 }

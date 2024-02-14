@@ -25,7 +25,7 @@ export class DialogRouteComponent implements OnInit, OnDestroy {
     this._activatedRoute.data
       .pipe(
         switchMap((data) => timer(100).pipe(map(() => data))),
-        takeUntil(this.terminator$)
+        takeUntil(this.terminator$),
       )
       .subscribe((data) => this.createModal(data));
   }

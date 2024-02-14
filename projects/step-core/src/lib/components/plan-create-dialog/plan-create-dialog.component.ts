@@ -36,11 +36,11 @@ export class PlanCreateDialogComponent {
             createdPlan.root.attributes = createdPlan.attributes;
           }
         }),
-        switchMap((createdPlan) => this._api.savePlan(createdPlan))
+        switchMap((createdPlan) => this._api.savePlan(createdPlan)),
       )
       .subscribe((plan) => {
         if (editAfterSave) {
-          this._router.navigate(['root', 'plans', 'editor', plan.id]);
+          this._router.navigate(['plans', 'editor', plan.id]);
         }
         this._matDialogRef.close({ isSuccess: !!plan, canNavigateBack: !editAfterSave });
       });

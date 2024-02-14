@@ -25,7 +25,7 @@ export class ScheduledTaskDialogsService {
   selectTask(): Observable<ExecutiontTaskParameters | undefined> {
     return this._entityDialogs.selectEntityOfType('tasks').pipe(
       map((result) => result?.item?.id),
-      switchMap((id) => (!id ? of(undefined) : this._schedulerService.getExecutionTaskById(id)))
+      switchMap((id) => (!id ? of(undefined) : this._schedulerService.getExecutionTaskById(id))),
     );
   }
 
@@ -33,10 +33,11 @@ export class ScheduledTaskDialogsService {
     const taskAndConfig = this.prepareTaskAndConfig(task);
 
     return this._matDialog
-      .open<EditSchedulerTaskDialogComponent, EditSchedulerTaskDialogData, DialogRouteResult | undefined>(
+      .open<
         EditSchedulerTaskDialogComponent,
-        { data: { taskAndConfig } }
-      )
+        EditSchedulerTaskDialogData,
+        DialogRouteResult | undefined
+      >(EditSchedulerTaskDialogComponent, { data: { taskAndConfig } })
       .afterClosed();
   }
 
@@ -45,7 +46,7 @@ export class ScheduledTaskDialogsService {
 
     return this._dialogs.showDeleteWarning(1, `Task "${paramName}"`).pipe(
       filter((result) => result),
-      switchMap(() => this._schedulerService.deleteExecutionTask(task.id!))
+      switchMap(() => this._schedulerService.deleteExecutionTask(task.id!)),
     );
   }
 
