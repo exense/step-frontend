@@ -267,10 +267,6 @@ import { DatePickerModule } from './modules/date-picker/date-picker.module';
     CORE_INITIALIZER,
     REPOSITORY_PARAMETERS_INITIALIZER,
     {
-      provide: MAT_LUXON_DATE_ADAPTER_OPTIONS,
-      useValue: { useUtc: true },
-    },
-    {
       provide: MAT_DATE_FORMATS,
       useValue: {
         parse: {
