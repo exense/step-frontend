@@ -76,6 +76,7 @@ export class ViewRegistryService implements OnDestroy {
     this.registerMenuEntry('Design', 'automation-root', 'edit', { weight: 10 });
     this.registerMenuEntry('Reporting', 'execute-root', 'file-check-03', { weight: 20 });
     this.registerMenuEntry('Status', 'status-root', 'check-square', { weight: 50 });
+    this.registerMenuEntry('Bookmarks', 'bookmarks-root', 'bookmark', { weight: 80 });
     this.registerMenuEntry('Support', 'support-root', 'life-buoy', { weight: 100 });
 
     // Sub Menus Automation
@@ -104,7 +105,7 @@ export class ViewRegistryService implements OnDestroy {
       {
         weight: 10,
         parentId: 'support-root',
-      }
+      },
     );
     this.registerMenuEntry('REST API', this._viewIdLinkPrefix.concat('doc/rest/'), 'compass', {
       weight: 20,
@@ -271,7 +272,7 @@ export class ViewRegistryService implements OnDestroy {
   registerViewWithConfig(
     viewId: string,
     template: string,
-    config: { isPublicView?: boolean; isStaticView?: boolean }
+    config: { isPublicView?: boolean; isStaticView?: boolean },
   ): void {
     const isPublicView = config.isPublicView || false;
     const isStaticView = config.isStaticView || false;
@@ -336,7 +337,7 @@ export class ViewRegistryService implements OnDestroy {
     template: string,
     id: string,
     position: number,
-    isEnabledFct: () => boolean
+    isEnabledFct: () => boolean,
   ): void {
     this.getDashlets(path).splice(position, 0, {
       label: label,

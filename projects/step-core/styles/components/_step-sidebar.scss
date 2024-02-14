@@ -219,6 +219,15 @@ $menu-sub-item-height: 3.2rem;
         position: absolute;
         padding: 18px 14px 14px 14px;
       }
+
+      > .sidebar-home-and-bookmark-icon {
+        right: map.get($config, elements-text-padding);
+        margin-right: 48px;
+        font-size: medium;
+        cursor: pointer;
+        position: absolute;
+        padding: 18px 14px 14px 14px;
+      }
     }
 
     .sidebar-home-button {
