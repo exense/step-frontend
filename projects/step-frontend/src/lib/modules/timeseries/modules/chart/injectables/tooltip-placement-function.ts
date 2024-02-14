@@ -12,7 +12,7 @@ export class TooltipPlacementFunction {
     anchor: TooltipAnchor,
     side: string = 'bottom',
     alignment: string = 'center',
-    boundContainer?: any
+    boundContainer?: any,
   ) {
     const anchorBoundaries = {
       top: anchor.bottom,
@@ -91,8 +91,8 @@ export class TooltipPlacementFunction {
         screenBoundaries[primaryAttributes.before],
         Math.min(
           value,
-          screenBoundaries[primaryAttributes.after] - overlay[primaryAttributes.offsetSize] - totalOffsetMargin
-        )
+          screenBoundaries[primaryAttributes.after] - overlay[primaryAttributes.offsetSize] - totalOffsetMargin,
+        ),
       );
     };
 
@@ -100,7 +100,7 @@ export class TooltipPlacementFunction {
       overlay.style[primaryAttributes.before] = `${
         primaryScrollOffset +
         calculatePrimaryPosition(
-          anchorBoundaries[primaryAttributes.before] - overlay[primaryAttributes.offsetSize] - totalOffsetMargin
+          anchorBoundaries[primaryAttributes.before] - overlay[primaryAttributes.offsetSize] - totalOffsetMargin,
         )
       }px`;
       overlay.style[primaryAttributes.after] = 'auto';
@@ -117,8 +117,8 @@ export class TooltipPlacementFunction {
         screenBoundaries[secondaryAttributes.before],
         Math.min(
           value,
-          screenBoundaries[secondaryAttributes.after] - overlay[secondaryAttributes.offsetSize] - totalMargin
-        )
+          screenBoundaries[secondaryAttributes.after] - overlay[secondaryAttributes.offsetSize] - totalMargin,
+        ),
       );
     };
 
@@ -136,7 +136,7 @@ export class TooltipPlacementFunction {
           calculateSecondaryPosition(
             document.documentElement[secondaryAttributes.clientSize] -
               anchorBoundaries[secondaryAttributes.after] -
-              marginEnd
+              marginEnd,
           )
         }px`;
         break;
@@ -148,7 +148,7 @@ export class TooltipPlacementFunction {
             anchorBoundaries[secondaryAttributes.before] +
               midpoint / 2 -
               overlay[secondaryAttributes.offsetSize] / 2 -
-              marginStart
+              marginStart,
           )
         }px`;
         overlay.style[secondaryAttributes.after] = 'auto';

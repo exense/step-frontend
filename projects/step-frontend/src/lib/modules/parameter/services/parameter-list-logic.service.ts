@@ -1,37 +1,35 @@
 import { inject, Injectable } from '@angular/core';
 import {
   AugmentedParametersService,
-  EditorResolverService,
+  DialogsService,
   FilterConditionFactoryService,
   MultipleProjectsService,
   Parameter,
 } from '@exense/step-core';
-import { ParameterDialogsService } from './parameter-dialogs.service';
-import { take } from 'rxjs';
+import { filter, switchMap } from 'rxjs';
+import { Router } from '@angular/router';
 
-const PARAMETER_ID = 'parameterId';
+const ROOT_URL = '/root/parameters';
 
 @Injectable()
 export class ParameterListLogicService {
+  private _router = inject(Router);
   private _multipleProject = inject(MultipleProjectsService);
-  private _editorResolver = inject(EditorResolverService);
+  private _dialogs = inject(DialogsService);
   private _parametersService = inject(AugmentedParametersService);
-  private _parameterDialogs = inject(ParameterDialogsService);
 
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
 
   readonly dataSource = this._parametersService.createDataSource();
 
+  readonly ROOT_URL = ROOT_URL;
+
   importParameter(): void {
-    this._parameterDialogs.importParameter().subscribe((result) => {
-      if (result) {
-        this.dataSource.reload();
-      }
-    });
+    this._router.navigateByUrl(`${ROOT_URL}/import`);
   }
 
   exportParameter(): void {
-    this._parameterDialogs.exportParameter().subscribe();
+    this._router.navigateByUrl(`${ROOT_URL}/export`);
   }
 
   duplicateParameter(parameter: Parameter): void {
@@ -44,43 +42,32 @@ export class ParameterListLogicService {
       return;
     }
 
-    const url = '/root/parameters';
-    const editParams = { [PARAMETER_ID]: parameter.id! };
+    const url = `${ROOT_URL}/editor/${parameter.id!}`;
 
-    this._multipleProject
-      .confirmEntityEditInASeparateProject(parameter, { url, search: editParams }, 'parameter')
-      .subscribe((continueEdit) => {
-        if (continueEdit) {
-          this.editParameterInternal(parameter.id!);
-        }
-      });
+    this._multipleProject.confirmEntityEditInASeparateProject(parameter, url, 'parameter').subscribe((continueEdit) => {
+      if (continueEdit) {
+        this.editParameterInternal(parameter.id!);
+      }
+    });
   }
 
   createParameter(): void {
-    this._parameterDialogs.editParameter().subscribe((savedParameter) => {
-      if (savedParameter) {
-        this.dataSource.reload();
-      }
-    });
+    this._router.navigateByUrl(`${ROOT_URL}/editor`);
   }
 
   deleteParameter(id: string, label: string): void {
-    this._parameterDialogs.deleteParameter(id, label).subscribe((result: boolean) => {
-      this.dataSource.reload();
-    });
-  }
-  resolveEditLinkIfExists(): void {
-    this._editorResolver
-      .onEditEntity(PARAMETER_ID)
-      .pipe(take(1))
-      .subscribe((parameterId) => this.editParameterInternal(parameterId));
+    this._dialogs
+      .showDeleteWarning(1, `Parameter "${label}"`)
+      .pipe(
+        filter((result) => result),
+        switchMap(() => this._parametersService.deleteParameter(id))
+      )
+      .subscribe((result: boolean) => {
+        this.dataSource.reload();
+      });
   }
 
   private editParameterInternal(parameterId: string): void {
-    this._parameterDialogs.editParameter(parameterId).subscribe((savedParameter) => {
-      if (savedParameter) {
-        this.dataSource.reload();
-      }
-    });
+    this._router.navigateByUrl(`${ROOT_URL}/editor/${parameterId}`);
   }
 }

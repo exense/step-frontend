@@ -49,12 +49,15 @@ export class RepositoryComponent implements OnInit {
     if (search['repositoryId']) {
       this.repoRef = {
         repositoryID: search['repositoryId'],
-        repositoryParameters: Object.entries(search).reduce((result, [key, value]) => {
-          if (!['repositoryId', 'tenant'].includes(key)) {
-            result[key] = value as string;
-          }
-          return result;
-        }, {} as Record<string, string>),
+        repositoryParameters: Object.entries(search).reduce(
+          (result, [key, value]) => {
+            if (!['repositoryId', 'tenant'].includes(key)) {
+              result[key] = value as string;
+            }
+            return result;
+          },
+          {} as Record<string, string>,
+        ),
       };
     }
   }

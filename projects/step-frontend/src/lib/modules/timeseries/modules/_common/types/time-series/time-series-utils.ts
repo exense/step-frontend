@@ -39,7 +39,7 @@ export class TimeSeriesUtils {
 
   static convertExecutionAndSelectionToTimeRange(
     execution: Execution,
-    timeRangeSelection: TimeRangePickerSelection
+    timeRangeSelection: TimeRangePickerSelection,
   ): TimeRange {
     const now = new Date().getTime();
     let selection: TimeRange;

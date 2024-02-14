@@ -1,9 +1,14 @@
-import { NgModule } from '@angular/core';
+import { inject, NgModule } from '@angular/core';
 import {
+  AugmentedSchedulerService,
   CustomCellRegistryService,
+  dialogRoute,
+  EditSchedulerTaskDialogComponent,
   EntityRegistry,
+  ScheduledTaskDialogsService,
   SchedulerActionsService,
   SchedulerTaskLinkComponent,
+  SimpleOutletComponent,
   StepCoreModule,
   ViewRegistryService,
 } from '@exense/step-core';
@@ -16,6 +21,8 @@ import './components/scheduler-configuration/scheduler-configuration.component';
 import { ScheduledTaskLogicService } from './services/scheduled-task-logic.service';
 import { ScheduledTaskBulkOperationsRegisterService } from './services/scheduled-task-bulk-operations-register.service';
 import { CronExpressionCellComponent } from './components/cron-expression-cell/cron-expression-cell.component';
+import { map } from 'rxjs';
+import { ActivatedRouteSnapshot } from '@angular/router';
 
 @NgModule({
   imports: [StepCoreModule, StepCommonModule],
@@ -62,6 +69,37 @@ export class SchedulerModule {
     this._viewRegistry.registerRoute({
       path: 'scheduler',
       component: ScheduledTaskListComponent,
+      children: [
+        {
+          path: 'editor',
+          component: SimpleOutletComponent,
+          children: [
+            dialogRoute({
+              path: 'new',
+              dialogComponent: EditSchedulerTaskDialogComponent,
+              resolve: {
+                taskAndConfig: () => {
+                  const _api = inject(AugmentedSchedulerService);
+                  const _dialogs = inject(ScheduledTaskDialogsService);
+                  return _api.createExecutionTask().pipe(map((task) => _dialogs.prepareTaskAndConfig(task)));
+                },
+              },
+            }),
+            dialogRoute({
+              path: ':id',
+              dialogComponent: EditSchedulerTaskDialogComponent,
+              resolve: {
+                taskAndConfig: (route: ActivatedRouteSnapshot) => {
+                  const taskId = route.params['id'];
+                  const _api = inject(AugmentedSchedulerService);
+                  const _dialogs = inject(ScheduledTaskDialogsService);
+                  return _api.getExecutionTaskById(taskId).pipe(map((task) => _dialogs.prepareTaskAndConfig(task)));
+                },
+              },
+            }),
+          ],
+        },
+      ],
     });
   }
 

@@ -15,7 +15,7 @@ export class FilterUtils {
   static objectToOQL(
     object: { [key: string]: string },
     attributesPrefix?: string,
-    attributeProcessFn?: (x: string) => string
+    attributeProcessFn?: (x: string) => string,
   ) {
     if (!object || Object.keys(object).length === 0) {
       return '';
@@ -50,7 +50,7 @@ export class FilterUtils {
   static filtersToOQL(
     items: FilterBarItem[],
     attributesPrefix?: string,
-    attributeProcessFn?: (attribute: string) => string
+    attributeProcessFn?: (attribute: string) => string,
   ): string {
     if (!items || items.length === 0) {
       return '';

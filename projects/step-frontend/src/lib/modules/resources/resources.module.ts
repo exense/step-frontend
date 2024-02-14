@@ -1,9 +1,17 @@
-import { NgModule } from '@angular/core';
-import { EntityRegistry, StepCoreModule, ViewRegistryService } from '@exense/step-core';
+import { inject, NgModule } from '@angular/core';
+import {
+  AugmentedResourcesService,
+  dialogRoute,
+  EntityRegistry,
+  SimpleOutletComponent,
+  StepCoreModule,
+  ViewRegistryService,
+} from '@exense/step-core';
 import { ResourceConfigurationDialogComponent } from './components/resource-configuration-dialog/resource-configuration-dialog.component';
 import './components/resource-selection/resource-selection.component';
 import { ResourceSelectionComponent } from './components/resource-selection/resource-selection.component';
 import { ResourcesListComponent } from './components/resources-list/resources-list.component';
+import { ActivatedRouteSnapshot } from '@angular/router';
 
 @NgModule({
   imports: [StepCoreModule],
@@ -28,6 +36,26 @@ export class ResourcesModule {
     this._viewRegistry.registerRoute({
       path: 'resources',
       component: ResourcesListComponent,
+      children: [
+        {
+          path: 'editor',
+          component: SimpleOutletComponent,
+          children: [
+            dialogRoute({
+              path: 'new',
+              dialogComponent: ResourceConfigurationDialogComponent,
+            }),
+            dialogRoute({
+              path: ':id',
+              dialogComponent: ResourceConfigurationDialogComponent,
+              resolve: {
+                resource: (route: ActivatedRouteSnapshot) =>
+                  inject(AugmentedResourcesService).getResource(route.params['id']),
+              },
+            }),
+          ],
+        },
+      ],
     });
   }
 

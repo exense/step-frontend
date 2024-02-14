@@ -1,8 +1,4 @@
-<step-modal-window
-  [title]="_resourceConfigurationDialogData.resource ? 'Edit Resource' : 'New Resource'"
-  [showSpinner]="resourceInput?.initializingResource"
-  [disableCloseByEsc]="true"
->
+<step-modal-window [title]="title" [showSpinner]="initializingResource" [disableCloseByEsc]="true">
   <div step-modal-window-body>
     <form [formGroup]="formGroup">
       <step-form-field *ngIf="_resourceConfigurationDialogData.resource">
@@ -28,6 +24,7 @@
         [stModel]="formGroup.controls.content.value.value"
         (stModelChange)="onContentChange($event)"
         (filesChange)="onFilesChange()"
+        (initializingResourceChange)="handleResourceInitialize($event)"
       ></step-resource-input>
       <ng-template #readonlyContent>
         <step-form-field>

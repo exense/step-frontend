@@ -220,7 +220,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .onTimeSelectionChange()
       .pipe(
         switchMap((newRange) => this.handleSelectionChange(newRange)),
-        takeUntil(compareCharts ? this.terminator$ : this.terminator$)
+        takeUntil(compareCharts ? this.terminator$ : this.terminator$),
       )
       .subscribe();
   }

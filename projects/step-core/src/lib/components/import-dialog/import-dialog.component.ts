@@ -2,7 +2,7 @@ import { Component, HostListener, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Observable, tap } from 'rxjs';
 import { ImportsService } from '../../client/step-client-module';
-import { AlertType } from '../../modules/basics/step-basics.module';
+import { AlertType, DialogRouteResult } from '../../modules/basics/step-basics.module';
 import { DialogsService } from '../../shared';
 import { ImportDialogData } from '../../shared/import-dialog-data.interface';
 
@@ -12,7 +12,7 @@ import { ImportDialogData } from '../../shared/import-dialog-data.interface';
   styleUrls: ['./import-dialog.component.scss'],
 })
 export class ImportDialogComponent {
-  private _matDialogRef = inject<MatDialogRef<ImportDialogComponent, boolean>>(MatDialogRef);
+  private _matDialogRef = inject<MatDialogRef<ImportDialogComponent, DialogRouteResult>>(MatDialogRef);
   private _dialogs = inject(DialogsService);
   private _data = inject<ImportDialogData>(MAT_DIALOG_DATA);
   private _importsService = inject(ImportsService);
@@ -41,7 +41,7 @@ export class ImportDialogComponent {
       )
       .subscribe({
         next: (response: string[]) => {
-          this._matDialogRef.close(true);
+          this._matDialogRef.close({ isSuccess: true });
 
           if (!!response?.length) {
             this._dialogs.showListOfMsgs(response).subscribe();

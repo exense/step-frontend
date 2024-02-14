@@ -173,7 +173,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
             series,
             i,
             (entitiesIds) => this._timeSeriesUtilityService.getExecutionByIds(entitiesIds),
-            (e: Execution) => e.description!
+            (e: Execution) => e.description!,
           );
           break;
         case TimeSeriesConfig.TASK_ID_ATTRIBUTE:
@@ -181,7 +181,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
             series,
             i,
             (entitiesIds) => this._timeSeriesUtilityService.getTasksByIds(entitiesIds),
-            (task: ExecutiontTaskParameters) => task.attributes?.['name']
+            (task: ExecutiontTaskParameters) => task.attributes?.['name'],
           );
           break;
         case TimeSeriesConfig.PLAN_ID_ATTRIBUTE:
@@ -189,7 +189,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
             series,
             i,
             (entitiesIds) => this._timeSeriesUtilityService.getPlansByIds(entitiesIds),
-            (plan: Plan) => plan.attributes?.['name']
+            (plan: Plan) => plan.attributes?.['name'],
           );
           break;
         default:
@@ -232,7 +232,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
     series: TSChartSeries[],
     groupDimensionIndex: number,
     fetchByIds: (ids: string[]) => Observable<T[]>,
-    mapEntityToLabel: (entity: T) => string | undefined
+    mapEntityToLabel: (entity: T) => string | undefined,
   ) {
     const ids: string[] = series.map((s) => s.labelItems[groupDimensionIndex] as string).filter((id) => !!id);
     if (!ids.length) {
@@ -263,7 +263,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
       },
       (error) => {
         this.handleEntityLoadingFailed(series, groupDimensionIndex);
-      }
+      },
     );
   }
 
