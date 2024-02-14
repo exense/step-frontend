@@ -1,9 +1,5 @@
 import { BehaviorSubject, Observable, skip, Subject } from 'rxjs';
-import { Execution, TimeRange } from '@exense/step-core';
-import { TimeSeriesKeywordsContext } from './pages/execution-page/time-series-keywords.context';
-import { TimeseriesColorsPool } from './util/timeseries-colors-pool';
 import { Execution, MetricAttribute, TimeRange } from '@exense/step-core';
-import { FilterBarItem } from './performance-view/filter-bar/model/filter-bar-item';
 import { TimeSeriesContextParams } from './time-series-context-params';
 import { TsFilteringMode } from '../filter/ts-filtering-mode.enum';
 import { FilterBarItem } from '../filter/filter-bar-item';

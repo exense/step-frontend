@@ -1,6 +1,7 @@
 import { Component, inject, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import {
   AuthService,
+  DashboardItem,
   DashboardsService,
   DashboardView,
   MetricAttribute,
@@ -10,18 +11,12 @@ import {
   TimeSeriesService,
 } from '@exense/step-core';
 import {
-  TimeSeriesConfig,
+  COMMON_IMPORTS,
   TimeseriesColorsPool,
+  TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesContextsFactory,
-  COMMON_IMPORTS,
 } from '../../modules/_common';
-import { FilterUtils } from '../../util/filter-utils';
-import { TimeSeriesConfig } from '../../time-series.config';
-import { TimeseriesColorsPool } from '../../util/timeseries-colors-pool';
-import { TimeSeriesContext } from '../../time-series-context';
-import { TimeSeriesContextsFactory } from '../../time-series-contexts-factory.service';
-import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
 
 //@ts-ignore
 import uPlot = require('uplot');
@@ -30,7 +25,6 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TimeRangePickerSelection, FilterUtils } from '../../modules/_common';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
-import { DashboardFilterBarComponent } from '../../performance-view/filter-bar/dashboard-filter-bar.component';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 

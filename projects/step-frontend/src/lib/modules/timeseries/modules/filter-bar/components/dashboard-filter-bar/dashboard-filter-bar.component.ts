@@ -14,19 +14,14 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { debounceTime, Observable, Subject, take } from 'rxjs';
-import { TimeSeriesFilterItem, Execution, TimeRange, TimeSeriesService, OQLVerifyResponse } from '@exense/step-core';
-import { TimeSeriesContext } from '../../time-series-context';
-import { FilterUtils } from '../../util/filter-utils';
-import { PerformanceViewTimeSelectionComponent } from '../time-selection/performance-view-time-selection.component';
-import { FilterBarItemComponent } from './item/filter-bar-item.component';
-import { FilterBarItemType, FilterBarItem } from './model/filter-bar-item';
-import { TsFilteringSettings } from '../../model/ts-filtering-settings';
-import { TimeSeriesConfig } from '../../time-series.config';
-import { TimeSeriesFilterItem, Execution, TimeRange, TimeSeriesService, MetricAttribute } from '@exense/step-core';
-import { OqlVerifyResponse } from '../../model/oql-verify-response';
-import { TsFilteringMode } from '../../model/ts-filtering-mode';
-import { TimeRangePickerSelection } from '../../time-selection/time-range-picker-selection';
-import { OQLBuilder } from '../../util/oql-builder';
+import {
+  TimeSeriesFilterItem,
+  Execution,
+  TimeRange,
+  TimeSeriesService,
+  MetricAttribute,
+  OQLVerifyResponse,
+} from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';
 import {
   DiscoverDialogData,

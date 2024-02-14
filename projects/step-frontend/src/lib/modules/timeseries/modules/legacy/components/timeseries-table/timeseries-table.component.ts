@@ -382,7 +382,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.tableData$.complete();
-    this.terminator$.next();
+    this.terminator$.next(undefined);
     this.terminator$.complete();
   }
 
