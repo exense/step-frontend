@@ -38,11 +38,6 @@ export class ExecutionListComponent implements OnDestroy {
     switchMap(() => this._augmentedExecutionsService.countExecutionsByStatus(Status.RUNNING)),
   );
 
-  readonly durationFilterColumnsOverride = {
-    start: 'startTime',
-    end: 'endTime',
-  };
-
   autoRefreshDisabled: boolean = false;
 
   @ViewChild('statusFilter')
