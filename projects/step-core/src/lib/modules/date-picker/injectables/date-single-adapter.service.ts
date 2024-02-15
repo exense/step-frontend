@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { DateAdapterService } from './date-adapter.service';
-import { DateTime } from 'luxon';
+import { DateObjectUnits, DateTime } from 'luxon';
 import { STEP_DATE_TIME_DELIMITER, STEP_FORMAT_DATE, STEP_FORMAT_TIME } from './step-date-format-config.providers';
 
 @Injectable()
@@ -48,6 +48,13 @@ export class DateSingleAdapterService implements DateAdapterService<DateTime> {
   compare(a: DateTime | null | undefined, b: DateTime | null | undefined): number {
     const aMillis = a?.toMillis() ?? 0;
     const bMillis = b?.toMillis() ?? 0;
+    return aMillis - bMillis;
+  }
+
+  compareWithoutTime(a: DateTime | null | undefined, b: DateTime | null | undefined): number {
+    const zeroTime: DateObjectUnits = { hour: 0, minute: 0, second: 0, millisecond: 0 };
+    const aMillis = a?.set(zeroTime)?.toMillis() ?? 0;
+    const bMillis = b?.set(zeroTime)?.toMillis() ?? 0;
     return aMillis - bMillis;
   }
 
