@@ -29,9 +29,6 @@ export class TimeSeriesContext {
 
   inProgress$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  /**
-   * Attributes union from all the charts visible in the dashboard
-   */
   private dashboardAttributes$: BehaviorSubject<Record<string, MetricAttribute>>;
 
   private fullTimeRange: TimeRange; // this represents the entire time-series interval. usually this is displayed entirely in the time-ranger
