@@ -771,8 +771,8 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   private refresh(): void {
     const root = this._treeNodeUtils.convertItem(this.originalRoot!);
     this.nodesAccessCache.clear();
-    this.updateData([root]);
     this.rootNode$.next(root);
+    this.updateData([root]);
     this.treeUpdateInternal$.next(this.originalRoot!);
   }
 
