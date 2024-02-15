@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { SpecialLinksStrategy } from '../shared/special-links-strategy';
 
 const DEFAULT_STRATEGY: SpecialLinksStrategy = {
-  settings: () => '/root/settings',
-  myAccount: () => '/root/settings/myaccount',
+  settings: () => '/settings',
+  myAccount: () => '/settings/myaccount',
 };
 
 @Injectable({

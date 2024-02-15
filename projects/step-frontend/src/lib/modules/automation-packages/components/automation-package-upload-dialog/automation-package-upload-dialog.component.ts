@@ -1,8 +1,14 @@
 import { Component, ElementRef, HostListener, inject, ViewChild } from '@angular/core';
-import { AugmentedAutomationPackagesService, AutomationPackage } from '@exense/step-core';
+import { AugmentedAutomationPackagesService, AutomationPackage, DialogRouteResult } from '@exense/step-core';
 import { catchError, map, Observable, of } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
+
+export interface AutomationPackageUploadDialogData {
+  automationPackage?: AutomationPackage;
+}
+
+type DialogRef = MatDialogRef<AutomationPackageUploadDialogComponent, DialogRouteResult>;
 
 @Component({
   selector: 'step-automation-package-upload-dialog',
@@ -11,9 +17,9 @@ import { NgForm } from '@angular/forms';
 })
 export class AutomationPackageUploadDialogComponent {
   private _api = inject(AugmentedAutomationPackagesService);
-  private _dialogRef = inject(MatDialogRef);
+  private _dialogRef = inject<DialogRef>(MatDialogRef);
 
-  private _package = inject<AutomationPackage | undefined>(MAT_DIALOG_DATA);
+  private _package = inject<AutomationPackageUploadDialogData>(MAT_DIALOG_DATA)?.automationPackage;
 
   @ViewChild('fileInput') private fileInput!: ElementRef<HTMLInputElement>;
   @ViewChild('formContainer') private formContainer?: NgForm;
@@ -62,6 +68,6 @@ export class AutomationPackageUploadDialogComponent {
           return of(false);
         }),
       )
-      .subscribe((result) => this._dialogRef.close(result));
+      .subscribe((result) => this._dialogRef.close({ isSuccess: result }));
   }
 }

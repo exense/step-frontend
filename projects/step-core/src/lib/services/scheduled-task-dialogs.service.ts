@@ -10,6 +10,7 @@ import {
 import { EntityDialogsService } from '../modules/entity/injectables/entity-dialogs.service';
 import { DialogsService } from '../shared';
 import { AuthService } from '../modules/basics/services/auth.service';
+import { DialogRouteResult } from '../modules/basics/shared/dialog-route-result';
 
 @Injectable({
   providedIn: 'root',
@@ -28,15 +29,15 @@ export class ScheduledTaskDialogsService {
     );
   }
 
-  editScheduledTask(task: ExecutiontTaskParameters): Observable<ExecutiontTaskParameters | undefined> {
-    const config = this.fillScheduledTaskDialogConfig(task);
+  editScheduledTask(task: ExecutiontTaskParameters): Observable<DialogRouteResult | undefined> {
+    const taskAndConfig = this.prepareTaskAndConfig(task);
 
     return this._matDialog
       .open<
         EditSchedulerTaskDialogComponent,
         EditSchedulerTaskDialogData,
-        ExecutiontTaskParameters | undefined
-      >(EditSchedulerTaskDialogComponent, { data: { task, config } })
+        DialogRouteResult | undefined
+      >(EditSchedulerTaskDialogComponent, { data: { taskAndConfig } })
       .afterClosed();
   }
 
@@ -49,7 +50,7 @@ export class ScheduledTaskDialogsService {
     );
   }
 
-  private fillScheduledTaskDialogConfig(task: ExecutiontTaskParameters): EditSchedulerTaskDialogConfig {
+  prepareTaskAndConfig(task: ExecutiontTaskParameters): EditSchedulerTaskDialogData['taskAndConfig'] {
     let hideUser = false;
     let disableUser = false;
     if (!this._auth.isAuthenticated()) {
@@ -77,10 +78,10 @@ export class ScheduledTaskDialogsService {
     }
 
     // TODO: Fill disablePlan flag, when it will be clarified how to fill it
-    const result: EditSchedulerTaskDialogConfig = {
+    const config: EditSchedulerTaskDialogConfig = {
       hideUser,
       disableUser,
     };
-    return result;
+    return { task, config };
   }
 }

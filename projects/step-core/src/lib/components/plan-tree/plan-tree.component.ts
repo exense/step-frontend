@@ -61,28 +61,49 @@ export class PlanTreeComponent implements TreeActionsService {
     { id: PlanTreeAction.MOVE_RIGHT, label: 'Move Right (Ctrl + ➡️)' },
   ];
 
-  getActionsForNode(node: ArtefactTreeNode): Observable<TreeAction[]> {
-    const isSkipped = node.isSkipped;
+  private actionsMultiple: TreeAction[] = [
+    { id: PlanTreeAction.OPEN, label: 'Open (Ctrl + O)', disabled: true },
+    { id: PlanTreeAction.RENAME, label: 'Rename (F2)', disabled: true },
+    { id: PlanTreeAction.ENABLE, label: 'Enable All Selected (Ctrl + E)', hasSeparator: true },
+    { id: PlanTreeAction.DISABLE, label: 'Disable All Selected (Ctrl + E)', hasSeparator: true },
+    { id: PlanTreeAction.COPY, label: 'Copy All Selected (Ctrl + C)' },
+    { id: PlanTreeAction.PASTE, label: 'Paste (Ctrl + V)' },
+    { id: PlanTreeAction.DUPLICATE, label: 'Duplicate All Selected (Ctrl + D)' },
+    { id: PlanTreeAction.DELETE, label: 'Delete All Selected (Del)', hasSeparator: true },
+    { id: PlanTreeAction.MOVE_UP, label: 'Move Up All Selected (Ctrl + ⬆️)' },
+    { id: PlanTreeAction.MOVE_DOWN, label: 'Move Down All Selected (Ctrl + ⬇️)' },
+    { id: PlanTreeAction.MOVE_LEFT, label: 'Move Left All Selected (Ctrl + ⬅️)' },
+    { id: PlanTreeAction.MOVE_RIGHT, label: 'Move Right All Selected (Ctrl + ➡️)' },
+  ];
 
-    return of(this.actions).pipe(
+  getActionsForNode(node: ArtefactTreeNode, multipleNodes?: boolean): Observable<TreeAction[]> {
+    const isSkipped = node.isSkipped;
+    const actions = multipleNodes ? this.actionsMultiple : this.actions;
+
+    return of(actions).pipe(
       map((actions) =>
         actions
           .map((action) => {
             let disabled = false;
-            if (this.isReadonly) {
+            if (this.isReadonly || action.disabled) {
               disabled = true;
             } else if (action.id === PlanTreeAction.OPEN) {
               disabled = !this.canOpenArtefact(node.originalArtefact);
             }
+
             return { ...action, disabled };
           })
           .filter((action) => {
-            if (action.id === PlanTreeAction.DISABLE && isSkipped) {
+            if (action.id === PlanTreeAction.DISABLE && isSkipped && !multipleNodes) {
               return false;
             }
 
-            if (action.id === PlanTreeAction.ENABLE && !isSkipped) {
+            if (action.id === PlanTreeAction.ENABLE && !isSkipped && !multipleNodes) {
               return false;
+            }
+
+            if (multipleNodes && action.id === PlanTreeAction.ENABLE) {
+              action.hasSeparator = false;
             }
 
             return true;
@@ -115,8 +136,9 @@ export class PlanTreeComponent implements TreeActionsService {
     this._planArtefactResolver.openArtefact(node.originalArtefact);
   }
 
-  proceedAction(actionId: string, node?: ArtefactTreeNode): void {
-    const artefact = node?.originalArtefact;
+  proceedAction(actionId: string, node?: ArtefactTreeNode, multipleNodes?: boolean): void {
+    const artefact = multipleNodes ? undefined : node?.originalArtefact;
+    const forceSkip = actionId === PlanTreeAction.DISABLE;
     switch (actionId) {
       case PlanTreeAction.RENAME:
         this._planEditService.rename(artefact);
@@ -150,7 +172,7 @@ export class PlanTreeComponent implements TreeActionsService {
         break;
       case PlanTreeAction.DISABLE:
       case PlanTreeAction.ENABLE:
-        this._planEditService?.toggleSkip(artefact);
+        this._planEditService?.toggleSkip(artefact, forceSkip);
         break;
       default:
         break;

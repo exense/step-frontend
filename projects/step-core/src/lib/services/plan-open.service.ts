@@ -21,6 +21,6 @@ export class PlanOpenService {
 
   open(planId: string, planOpenState?: PlanOpenState): void {
     this.lastOpenState = planOpenState;
-    this._router.navigateByUrl(`/root/plans/editor/${planId}`);
+    this._router.navigateByUrl(`/plans/editor/${planId}`);
   }
 }

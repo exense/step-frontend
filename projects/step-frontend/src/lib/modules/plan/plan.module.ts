@@ -1,7 +1,12 @@
-import { NgModule } from '@angular/core';
+import { inject, NgModule } from '@angular/core';
 import {
+  AugmentedPlansService,
   CustomCellRegistryService,
+  dialogRoute,
   EntityRegistry,
+  ExportDialogComponent,
+  ImportDialogComponent,
+  PlanCreateDialogComponent,
   PlanDialogsService,
   PlanLinkComponent,
   PlanLinkDialogService,
@@ -18,6 +23,8 @@ import { PlansBulkOperationsRegisterService } from './injectables/plans-bulk-ope
 import { planResolver } from './guards/plan.resolver';
 import { PlanActionsModule } from '../plan-actions/plan-actions.module';
 import { planDeactivate } from './guards/plan.deactivate';
+import { ActivatedRouteSnapshot } from '@angular/router';
+import { map } from 'rxjs';
 
 @NgModule({
   declarations: [PlanListComponent, PlanEditorComponent, PlanSelectionComponent],
@@ -35,7 +42,7 @@ export class PlanModule {
     _entityRegistry: EntityRegistry,
     _planBulkOperations: PlansBulkOperationsRegisterService,
     _cellsRegister: CustomCellRegistryService,
-    _viewRegistry: ViewRegistryService
+    _viewRegistry: ViewRegistryService,
   ) {
     _planBulkOperations.register();
     _entityRegistry.register('plans', 'Plan', { icon: 'plan', component: PlanSelectionComponent });
@@ -51,6 +58,56 @@ export class PlanModule {
         {
           path: 'list',
           component: PlanListComponent,
+          children: [
+            dialogRoute({
+              path: 'new',
+              dialogComponent: PlanCreateDialogComponent,
+            }),
+            dialogRoute({
+              path: 'import',
+              dialogComponent: ImportDialogComponent,
+              data: {
+                title: 'Plans import',
+                entity: 'plans',
+                overwrite: false,
+                importAll: false,
+              },
+            }),
+            {
+              path: 'export',
+              component: SimpleOutletComponent,
+              children: [
+                dialogRoute({
+                  path: 'all',
+                  dialogComponent: ExportDialogComponent,
+                  data: {
+                    title: 'Plans export',
+                    entity: 'plans',
+                    filename: 'allPlans.sta',
+                  },
+                }),
+                dialogRoute({
+                  path: ':id',
+                  dialogComponent: ExportDialogComponent,
+                  resolve: {
+                    id: (route: ActivatedRouteSnapshot) => route.params['id'],
+                    filename: (route: ActivatedRouteSnapshot) => {
+                      const api = inject(AugmentedPlansService);
+                      const id = route.params['id'];
+                      return api.getPlanById(id).pipe(
+                        map((plan) => plan.attributes!['name']),
+                        map((name) => `${name}.sta`),
+                      );
+                    },
+                  },
+                  data: {
+                    title: 'Plans export',
+                    entity: 'plans',
+                  },
+                }),
+              ],
+            },
+          ],
         },
         {
           path: 'editor/:id',

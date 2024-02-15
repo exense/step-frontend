@@ -98,11 +98,7 @@
       <step-icon name="edit-2"></step-icon>
       Edit plan
     </button>
-    <button
-      mat-menu-item
-      [disabled]="!('plan-read' | hasRight | async)"
-      (click)="exportPlan(element.id, element.attributes.name)"
-    >
+    <button mat-menu-item [disabled]="!('plan-read' | hasRight | async)" (click)="exportPlan(element.id)">
       <step-icon name="upload"></step-icon>
       Export plan
     </button>
@@ -116,3 +112,4 @@
     </button>
   </ng-container>
 </step-entity-menu>
+<router-outlet></router-outlet>

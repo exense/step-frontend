@@ -1,79 +1,54 @@
-import { EnvironmentInjector, Injectable, Injector, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, catchError, map, of, switchMap, take, tap } from 'rxjs';
+import { Observable, catchError, map, of, switchMap, tap } from 'rxjs';
 import { AugmentedKeywordsService, Keyword } from '../client/step-client-module';
-import { EditorResolverService, MultipleProjectsService } from '../modules/basics/step-basics.module';
-import {
-  FunctionActionsService,
-  FunctionConfigurationApiService,
-  FunctionConfigurationService,
-  FunctionDialogsConfig,
-  FunctionDialogsConfigFactoryService,
-} from '../modules/keywords-common/keywords-common.module';
+import { MultipleProjectsService } from '../modules/basics/step-basics.module';
+import { FunctionActionsService } from '../modules/keywords-common/keywords-common.module';
 import { DialogsService } from '../shared';
-import { ExportDialogsService } from './export-dialogs.service';
-import { ImportDialogsService } from './import-dialogs.service';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
 
-const CONFIGURER_KEYWORD_ID = 'configurerKeywordId';
 const ENTITY_TYPE = 'keyword';
-const EDITOR_URL = '/root/functions';
+const EDITOR_URL = '/functions';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FunctionActionsImplService implements FunctionActionsService {
-  private _editorResolver = inject(EditorResolverService);
   private _multipleProjectService = inject(MultipleProjectsService);
   private _functionApiService = inject(AugmentedKeywordsService);
   private _dialogs = inject(DialogsService);
-  private _exportDialogs = inject(ExportDialogsService);
-  private _importDialogs = inject(ImportDialogsService);
   protected _isUsedByDialog = inject(IsUsedByDialogService);
   private _router = inject(Router);
-  private _functionDialogsConfigFactoryService = inject(FunctionDialogsConfigFactoryService);
-  private _functionConfigurationService = inject(FunctionConfigurationService);
 
-  private defaultDialogConfig = this._functionDialogsConfigFactoryService.getDefaultConfig();
-
-  openAddFunctionModal(
-    parentInjector: Injector,
-    dialogConfig?: FunctionDialogsConfig,
-  ): Observable<Keyword | undefined> {
-    return this.openModal(parentInjector, {
-      dialogConfig,
-    });
+  get baseUrl(): string {
+    return EDITOR_URL;
   }
 
-  configureFunction(
-    parentInjector: Injector,
-    id: string,
-    dialogConfig?: FunctionDialogsConfig,
-  ): Observable<Keyword | undefined> {
-    return this.getFunctionById(id).pipe(
-      switchMap((keyword) => {
-        if (!keyword) {
-          return of({ keyword, continueEdit: false });
-        }
+  addFunction(): void {
+    this._router.navigateByUrl(`${this.baseUrl}/configure/new`);
+  }
 
-        if (this._multipleProjectService.isEntityBelongsToCurrentProject(keyword)) {
-          return of({ keyword, continueEdit: true });
-        }
+  configureFunction(id: string): void {
+    const url = `${this.baseUrl}/configure/${id}`;
+    this.getFunctionById(id)
+      .pipe(
+        switchMap((keyword) => {
+          if (!keyword) {
+            return of(false);
+          }
+          if (this._multipleProjectService.isEntityBelongsToCurrentProject(keyword)) {
+            return of(true);
+          }
 
-        const url = EDITOR_URL;
-        const editParam = { [CONFIGURER_KEYWORD_ID]: id };
-
-        return this._multipleProjectService
-          .confirmEntityEditInASeparateProject(keyword, { url, search: editParam }, ENTITY_TYPE)
-          .pipe(map((continueEdit) => ({ keyword, continueEdit })));
-      }),
-      switchMap(({ continueEdit, keyword }) => {
-        if (continueEdit) {
-          return this.openModal(parentInjector, { keyword, dialogConfig });
+          return this._multipleProjectService.confirmEntityEditInASeparateProject(keyword, url, ENTITY_TYPE);
+        }),
+      )
+      .subscribe((continueEdit) => {
+        if (!continueEdit) {
+          return;
         }
-        return of(undefined);
-      }),
-    );
+        this._router.navigateByUrl(url);
+      });
   }
 
   openDeleteFunctionDialog(id: string, name: string): Observable<boolean> {
@@ -100,16 +75,16 @@ export class FunctionActionsImplService implements FunctionActionsService {
     );
   }
 
-  openExportFunctionDialog(id: string, name: string): Observable<boolean> {
-    return this._exportDialogs.displayExportDialog('Keyword export', 'functions', `${name}.sta`, id);
+  openExportFunctionDialog(id: string): void {
+    this._router.navigateByUrl(`${this.baseUrl}/export/${id}`);
   }
 
-  openExportAllFunctionsDialog(): Observable<boolean> {
-    return this._exportDialogs.displayExportDialog('Keyword export', 'functions', 'allKeywords.sta');
+  openExportAllFunctionsDialog(): void {
+    this._router.navigateByUrl(`${this.baseUrl}/export/all`);
   }
 
-  openImportFunctionDialog(): Observable<boolean | string[]> {
-    return this._importDialogs.displayImportDialog('Keyword import', 'functions');
+  openImportFunctionDialog(): void {
+    this._router.navigateByUrl(`${this.baseUrl}/import`);
   }
 
   openFunctionEditor(keyword: Keyword): Observable<boolean | undefined> {
@@ -143,25 +118,6 @@ export class FunctionActionsImplService implements FunctionActionsService {
     );
   }
 
-  resolveConfigureLinkIfExits(parentInjector: Injector, dialogConfig?: FunctionDialogsConfig): void {
-    this._editorResolver
-      .onEditEntity(CONFIGURER_KEYWORD_ID)
-      .pipe(
-        take(1),
-        switchMap((keywordId) => (keywordId ? this.getFunctionById(keywordId) : of(undefined))),
-        switchMap((keyword) => (keyword ? this.openModal(parentInjector, { keyword, dialogConfig }) : of(undefined))),
-      )
-      .subscribe();
-  }
-
-  protected newFunctionTypeConf(type: string): Observable<Keyword> {
-    return this._functionApiService.newFunctionTypeConf(type);
-  }
-
-  protected saveFunction(keyword?: Keyword): Observable<Keyword> {
-    return this._functionApiService.saveFunction(keyword);
-  }
-
   protected getFunctionEditor(id: string): Observable<string> {
     return this._functionApiService.getFunctionEditor(id);
   }
@@ -172,46 +128,5 @@ export class FunctionActionsImplService implements FunctionActionsService {
 
   protected duplicateFunctionById(id: string): Observable<Keyword> {
     return this._functionApiService.cloneFunction(id);
-  }
-
-  private configureFunctionInternal(
-    parentInjector: Injector,
-    id: string,
-    dialogConfig?: FunctionDialogsConfig,
-  ): Observable<Keyword | undefined> {
-    return this.getFunctionById(id).pipe(
-      switchMap((keyword) =>
-        this.openModal(parentInjector, {
-          keyword,
-          dialogConfig,
-        }),
-      ),
-    );
-  }
-
-  private openModal(
-    parentInjector: Injector,
-    params: {
-      keyword?: Keyword;
-      dialogConfig?: FunctionDialogsConfig;
-    },
-  ): Observable<Keyword | undefined> {
-    const modalInjector = Injector.create({
-      providers: [
-        {
-          provide: FunctionConfigurationApiService,
-          useValue: {
-            newFunctionTypeConf: (type: string) => this.newFunctionTypeConf(type),
-            saveFunction: (keyword?: Keyword) => this.saveFunction(keyword),
-            getFunctionEditor: (id: string) => this.getFunctionEditor(id),
-          } as FunctionConfigurationApiService,
-        },
-      ],
-      parent: parentInjector,
-    }) as EnvironmentInjector;
-
-    return this._functionConfigurationService
-      .configure(modalInjector, params.keyword, params.dialogConfig ?? this.defaultDialogConfig)
-      .pipe(tap(() => modalInjector.destroy()));
   }
 }

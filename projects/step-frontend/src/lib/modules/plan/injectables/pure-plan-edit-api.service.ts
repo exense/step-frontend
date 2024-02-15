@@ -71,9 +71,9 @@ export class PurePlanEditApiService implements PlanEditorApiService {
         return this.loadPlan(plan.id!).pipe(
           map((restoredPlan) => {
             return { id: restoredPlan.id!, plan: restoredPlan, forceRefresh: true };
-          })
+          }),
         );
-      })
+      }),
     );
   }
 
@@ -83,7 +83,7 @@ export class PurePlanEditApiService implements PlanEditorApiService {
   }
 
   navigateToPlan(id: string, enforcePurePlan?: boolean): void {
-    const EDITOR_URL = `/root/plans/editor`;
+    const EDITOR_URL = `/plans/editor`;
     this._router.navigateByUrl(`${EDITOR_URL}/${id}`);
   }
 }

@@ -42,7 +42,10 @@ import { FunctionLinkEditorComponent } from './components/function-link/function
   ],
 })
 export class KeywordsCommonModule {
-  constructor(private _entityRegistry: EntityRegistry, private _bulkRegister: FunctionBulkOperationsRegisterService) {
+  constructor(
+    private _entityRegistry: EntityRegistry,
+    private _bulkRegister: FunctionBulkOperationsRegisterService,
+  ) {
     this.registerEntities();
     this._bulkRegister.register();
   }
@@ -62,9 +65,9 @@ export * from './components/agent-token-selection-criteria/agent-token-selection
 export * from './components/function-selection-table/function-selection-table.component';
 export * from './injectables/function-actions.service';
 export * from './injectables/function-dialogs-config-factory.service';
-export * from './injectables/function-configuration.service';
 export * from './injectables/function-configuration-api.service';
 export * from './injectables/function-type-parent-form.service';
+export * from './injectables/function-configuration-dialog.resolver';
 export * from './types/function-dialogs-config.interface';
 export * from './types/function-configuration-dialog-data.interface';
 export * from './types/function-configuration-dialog.form';
