@@ -161,7 +161,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         },
       },
     };
-    this.filterBar!.addFilterItems(
+    this.filterBar!.addUniqueFilterItems(
       newDashlet.chartSettings!.attributes.map((item) => FilterUtils.createFilterItemFromAttribute(item)),
     );
     this.dashboard.dashlets.push(newDashlet);

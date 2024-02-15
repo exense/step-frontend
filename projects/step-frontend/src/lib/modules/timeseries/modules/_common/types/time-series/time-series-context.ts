@@ -76,8 +76,7 @@ export class TimeSeriesContext {
   }
 
   /**
-   * This method will not trigger change event, only if there are real changes in at least one attribute was added/removed
-   * @param attributes
+   * This method will not trigger change event, only if there are real changes in at least one attribute, added or removed
    */
   updateAttributes(attributes: MetricAttribute[]): void {
     const newAttributesByIds: Record<string, MetricAttribute> = {};

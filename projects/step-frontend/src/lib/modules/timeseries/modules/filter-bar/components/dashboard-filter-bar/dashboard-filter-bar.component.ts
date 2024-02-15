@@ -144,11 +144,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Duplicated items will be ignored. New items will be added to the end of the list
-   * @param items
-   */
-  public addFilterItems(items: FilterBarItem[]) {
+  public addUniqueFilterItems(items: FilterBarItem[]) {
     const existingFilterAttributes: Record<string, boolean> = {};
     this._internalFilters.forEach((item) => (existingFilterAttributes[item.attributeName] = true));
     this._internalFilters = this._internalFilters.concat(
