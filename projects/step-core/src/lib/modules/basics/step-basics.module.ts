@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StepMaterialModule } from '../step-material/step-material.module';
 import { ArrayFilterComponent } from './components/array-filter/array-filter.component';
+import { ArrayFilterAdvancedComponent } from './components/array-filter-advanced/array-filter-advanced.component';
 import { HexadecimalInputFilterComponent } from './components/input-filter/hexadecimal-input-filter.component';
 import { InputFilterComponent } from './components/input-filter/input-filter.component';
 import { ResourceLabelComponent } from './components/resource-label/resource-label.component';
@@ -50,6 +51,7 @@ import { DescriptionHintComponent } from './components/description-hint/descript
   declarations: [
     ResourceLabelComponent,
     ArrayFilterComponent,
+    ArrayFilterAdvancedComponent,
     InputFilterComponent,
     HasRightPipe,
     HexadecimalInputFilterComponent,
@@ -137,12 +139,14 @@ import { DescriptionHintComponent } from './components/description-hint/descript
     PopoverComponent,
     SafeHtmlPipe,
     DescriptionHintComponent,
+    ArrayFilterAdvancedComponent,
   ],
 })
 export class StepBasicsModule {}
 
 export * from './components/base-filter/base-filter.component';
 export * from './components/array-filter/array-filter.component';
+export * from './components/array-filter-advanced/array-filter-advanced.component';
 export * from './components/single-item-array-filter/single-item-array-filter.component';
 export * from './components/input-filter/hexadecimal-input-filter.component';
 export * from './components/input-filter/input-filter.component';

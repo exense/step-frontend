@@ -70,8 +70,13 @@
     </td>
   </ng-container>
   <ng-container matColumnDef="result" stepSearchCol #searchResult="SearchCol">
-    <step-array-filter *stepSearchCellDef stepFilterConnect [useRegex]="true" [items]="(resultItems$ | async)!">
-    </step-array-filter>
+    <step-array-filter-advanced
+      *stepSearchCellDef
+      stepFilterConnect
+      [createConditionFn]="_filterConditionFactory.arrayFilterCondition"
+      [items]="(statusItems$ | async)!"
+    >
+    </step-array-filter-advanced>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Result</th>
     <td mat-cell *matCellDef="let element">
       <div class="result">

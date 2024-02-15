@@ -40,7 +40,7 @@ export class KeywordCallsComponent implements OnInit {
     'agentUrl',
   ];
 
-  private _filterConditionFactory = inject(FilterConditionFactoryService);
+  readonly _filterConditionFactory = inject(FilterConditionFactoryService);
   private _screenApiService = inject(AugmentedScreenService);
   readonly _leafReportsDataSource = inject(AugmentedControllerService).createDataSource();
 
@@ -55,7 +55,7 @@ export class KeywordCallsComponent implements OnInit {
         catchError((err) => {
           console.error(err);
           return of([]);
-        })
+        }),
       )
       .subscribe((functionColumnIds) => (this.functionColumnsIds = functionColumnIds));
   }
