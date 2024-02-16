@@ -1,8 +1,10 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
 import { Bookmark } from '../../client/generated/models/Bookmark';
 import { Router } from '@angular/router';
 import { BookmarkService } from '../../services/bookmark.service';
 import { getIconAndPageById } from '../../shared';
+import { NgForm } from '@angular/forms';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'step-bookmark-create-dialog',
@@ -12,7 +14,12 @@ import { getIconAndPageById } from '../../shared';
 export class BookmarkCreateDialogComponent implements OnInit {
   private router = inject(Router);
   private bookmarkService = inject(BookmarkService);
+  private _matDialogRef = inject(MatDialogRef);
+
   protected bookmark: Partial<Bookmark> = {};
+
+  @ViewChild('formContainer', { static: false })
+  private form!: NgForm;
 
   ngOnInit(): void {
     const link = this.router.url.slice(6);
@@ -26,8 +33,14 @@ export class BookmarkCreateDialogComponent implements OnInit {
     };
   }
 
+  @HostListener('keydown.enter')
   save(): void {
+    if (this.form.control.invalid) {
+      this.form.control.markAllAsTouched();
+      return;
+    }
     this.bookmarkService.createBookmark(this.bookmark);
+    this._matDialogRef.close();
   }
 
   private getIconAndPage(link: string): Bookmark | undefined {

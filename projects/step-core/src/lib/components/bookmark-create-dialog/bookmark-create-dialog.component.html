@@ -1,21 +1,23 @@
 <step-modal-window title="New Bookmark">
   <div step-modal-window-body>
-    <step-form-field>
-      <step-label>Label</step-label>
-      <input type="text" placeholder="label" [(ngModel)]="bookmark!.label" name="label" />
-    </step-form-field>
-    <step-form-field>
-      <step-label>Page</step-label>
-      <input type="text" placeholder="page" [ngModel]="bookmark!.page" name="page" [disabled]="true" />
-    </step-form-field>
-    <step-form-field>
-      <step-label>Link</step-label>
-      <input type="text" placeholder="link" [ngModel]="bookmark!.link" name="link" [disabled]="true" />
-    </step-form-field>
-    <step-form-field>
-      <step-label>Tenant</step-label>
-      <input type="text" placeholder="tenant" [ngModel]="bookmark!.tenant" name="tenant" [disabled]="true" />
-    </step-form-field>
+    <form #formContainer="ngForm">
+      <step-form-field [showRequiredMarker]="true">
+        <step-label>Label</step-label>
+        <input type="text" placeholder="label" required [(ngModel)]="bookmark!.label" name="label" />
+      </step-form-field>
+      <step-form-field>
+        <step-label>Page</step-label>
+        <input type="text" placeholder="page" [ngModel]="bookmark!.page" name="page" [disabled]="true" />
+      </step-form-field>
+      <step-form-field>
+        <step-label>Link</step-label>
+        <input type="text" placeholder="link" [ngModel]="bookmark!.link" name="link" [disabled]="true" />
+      </step-form-field>
+      <step-form-field>
+        <step-label>Tenant</step-label>
+        <input type="text" placeholder="tenant" [ngModel]="bookmark!.tenant" name="tenant" [disabled]="true" />
+      </step-form-field>
+    </form>
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
