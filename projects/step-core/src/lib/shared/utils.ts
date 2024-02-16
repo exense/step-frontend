@@ -107,11 +107,60 @@ export const toRecord = <T>(keyValuePairs: KeyValue<string, T>[]): Record<string
       ...acc,
       [key]: value,
     }),
-    {}
+    {},
   );
 
 export const routesPrioritySortPredicate = (routeA: Route, routeB: Route) => {
   const weightA = routeA.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
   const weightB = routeB.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
   return weightA - weightB;
+};
+
+export const getIconNameById = (id: string): string => {
+  switch (id) {
+    case 'functions':
+      return 'keyword';
+      break;
+    case 'plans':
+      return 'plan';
+      break;
+    case 'parameters':
+      return 'list';
+      break;
+    case 'scheduler':
+      return 'clock';
+      break;
+    case 'dashboards':
+      return 'bar-chart-square-01';
+      break;
+    case 'operations':
+      return 'airplay';
+      break;
+    case 'gridagents':
+      return 'agent';
+      break;
+    case 'gridtokens':
+      return 'agent-token';
+      break;
+    case 'gridtokengroups':
+      return 'agent-token-group';
+      break;
+    case 'gridquotamanager':
+      return 'sidebar';
+      break;
+    case 'functionPackages':
+      return 'package';
+      break;
+    case 'resources':
+      return 'file-attachment-03';
+      break;
+    case 'automationPackage':
+      return 'automation';
+      break;
+    case 'executions':
+      return 'rocket';
+      break;
+    default:
+      return '';
+  }
 };

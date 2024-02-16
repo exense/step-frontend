@@ -13,7 +13,15 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { IS_SMALL_SCREEN, MenuEntry, NavigatorService, ViewRegistryService, ViewStateService } from '@exense/step-core';
+import {
+  IS_SMALL_SCREEN,
+  MenuEntry,
+  NavigatorService,
+  ViewRegistryService,
+  ViewStateService,
+  BookmarkService,
+  BookmarkCreateDialogComponent,
+} from '@exense/step-core';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
 import { MENU_ITEMS } from '../../injectables/menu-items';
 import { Subject, SubscriptionLike, takeUntil } from 'rxjs';
@@ -33,6 +41,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _zone = inject(NgZone);
   public _viewStateService = inject(ViewStateService);
   private _matDialog = inject(MatDialog);
+  private _bookmarkService = inject(BookmarkService);
 
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
   @ViewChild('tabs') tabs?: ElementRef<HTMLElement>;
@@ -96,7 +105,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
 
   private initializeMainMenuItemsFromState(): void {
     Object.entries(this._sideBarState.openedMenuItems || {}).forEach(([mainMenuKey, isOpened]) =>
-      this.openMainMenu(mainMenuKey, isOpened)
+      this.openMainMenu(mainMenuKey, isOpened),
     );
   }
 
@@ -138,5 +147,9 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
       const scrollTop = ($event.target as HTMLElement).scrollTop;
       this.tabs!.nativeElement.setAttribute('style', `--scrollOffset: -${scrollTop}px`);
     });
+  }
+
+  addBookmark(): void {
+    this._matDialog.open(BookmarkCreateDialogComponent);
   }
 }

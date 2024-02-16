@@ -23,7 +23,7 @@
       <step-icon name="home"></step-icon>
     </span>
     <ng-container *ngIf="('settings-ui-menu' | hasRight | async) || ('admin-ui-menu' | hasRight | async)">
-      <step-bookmark-button class="sidebar-home-and-bookmark-icon"></step-bookmark-button>
+      <step-icon class="sidebar-home-and-bookmark-icon" name="star" (click)="addBookmark()"></step-icon>
       <step-settings-button class="sidebar-home-and-settings-icon"></step-settings-button>
     </ng-container>
   </div>

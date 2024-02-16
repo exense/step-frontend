@@ -3,4 +3,5 @@ export type Bookmark = {
   page?: string;
   link?: string;
   tenant?: string;
+  icon?: string;
 };

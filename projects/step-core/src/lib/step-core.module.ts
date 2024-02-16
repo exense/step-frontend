@@ -89,7 +89,6 @@ import { AutomationPackageCommonModule } from './modules/automation-package-comm
 import { LockColumnContainerComponent } from './components/lock-column-container/lock-column-container.component';
 import { LockColumnComponent } from './components/lock-column/lock-column.component';
 import { DatePickerModule } from './modules/date-picker/date-picker.module';
-import { BookmarkButtonComponent } from './components/bookmark-button/bookmark-button.component';
 import { BookmarkCreateDialogComponent } from './components/bookmark-create-dialog/bookmark-create-dialog.component';
 
 @NgModule({
@@ -156,7 +155,6 @@ import { BookmarkCreateDialogComponent } from './components/bookmark-create-dial
     MessageDialogComponent,
     LockColumnContainerComponent,
     LockColumnComponent,
-    BookmarkButtonComponent,
     BookmarkCreateDialogComponent,
   ],
   imports: [
@@ -263,7 +261,6 @@ import { BookmarkCreateDialogComponent } from './components/bookmark-create-dial
     MessageDialogComponent,
     LockColumnComponent,
     DatePickerModule,
-    BookmarkButtonComponent,
     BookmarkCreateDialogComponent,
   ],
   providers: [
@@ -431,5 +428,5 @@ export * from './components/confirmation-dialog/confirmation-dialog.component';
 export * from './components/messages-list-dialog/messages-list-dialog.component';
 export * from './components/message-dialog/message-dialog.component';
 export * from './components/report-node-icon/report-node-icon.component';
-export * from './components/bookmark-button/bookmark-button.component';
 export * from './components/bookmark-create-dialog/bookmark-create-dialog.component';
+export * from './services/bookmark.service';

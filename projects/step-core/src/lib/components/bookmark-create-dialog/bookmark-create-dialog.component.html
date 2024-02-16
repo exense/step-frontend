@@ -1,9 +1,8 @@
 <step-modal-window title="New Bookmark">
   <div step-modal-window-body>
-    <!--    <step-custom-forms [(stModel)]="bookmark" stScreen="planTable"> </step-custom-forms>-->
     <step-form-field>
       <step-label>Label</step-label>
-      <input type="text" placeholder="label" [ngModel]="bookmark!.label" name="label" />
+      <input type="text" placeholder="label" [(ngModel)]="bookmark!.label" name="label" />
     </step-form-field>
     <step-form-field>
       <step-label>Page</step-label>
