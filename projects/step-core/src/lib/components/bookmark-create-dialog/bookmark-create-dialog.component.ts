@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Bookmark } from '../../client/generated/models/Bookmark';
 import { Router } from '@angular/router';
 import { BookmarkService } from '../../services/bookmark.service';
-import { getIconNameById } from '../../shared';
+import { getIconAndPageById } from '../../shared';
 
 @Component({
   selector: 'step-bookmark-create-dialog',
@@ -16,13 +16,13 @@ export class BookmarkCreateDialogComponent implements OnInit {
 
   ngOnInit(): void {
     const link = this.router.url.slice(6);
-    const icon = this.getIcon(link);
+    const initBookmark = this.getIconAndPage(link);
     this.bookmark = {
       label: '',
-      page: '',
-      link,
+      page: initBookmark?.page,
+      link: link,
       tenant: '',
-      icon,
+      icon: initBookmark?.icon,
     };
   }
 
@@ -30,9 +30,9 @@ export class BookmarkCreateDialogComponent implements OnInit {
     this.bookmarkService.createBookmark(this.bookmark);
   }
 
-  private getIcon(link: string): string {
+  private getIconAndPage(link: string): Bookmark | undefined {
     const firstDashIndex = link.indexOf('/');
     const prefix = link.slice(0, firstDashIndex === -1 ? undefined : firstDashIndex);
-    return getIconNameById(prefix);
+    return getIconAndPageById(prefix);
   }
 }

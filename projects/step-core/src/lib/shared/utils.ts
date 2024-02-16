@@ -5,6 +5,7 @@ import { ScriptLanguage } from './script-language.enum';
 import { KeyValue } from '@angular/common';
 import { Route } from '@angular/router';
 import { SUB_ROUTE_DATA } from './constants';
+import { Bookmark } from '../client/generated/models/Bookmark';
 
 export const getObjectFieldValue = (object: Record<string, unknown>, fieldPath: string): unknown => {
   const pathParts = fieldPath.split('.');
@@ -116,51 +117,51 @@ export const routesPrioritySortPredicate = (routeA: Route, routeB: Route) => {
   return weightA - weightB;
 };
 
-export const getIconNameById = (id: string): string => {
+export const getIconAndPageById = (id: string): Bookmark | undefined => {
   switch (id) {
     case 'functions':
-      return 'keyword';
+      return { icon: 'keyword', page: 'Keywords' };
       break;
     case 'plans':
-      return 'plan';
+      return { icon: 'plan', page: 'Plans' };
       break;
     case 'parameters':
-      return 'list';
+      return { icon: 'list', page: 'Parameters' };
       break;
     case 'scheduler':
-      return 'clock';
+      return { icon: 'clock', page: 'Schedules' };
       break;
     case 'dashboards':
-      return 'bar-chart-square-01';
+      return { icon: 'bar-chart-square-01', page: 'Analytics' };
       break;
     case 'operations':
-      return 'airplay';
+      return { icon: 'airplay', page: 'Current Operations' };
       break;
     case 'gridagents':
-      return 'agent';
+      return { icon: 'agent', page: 'Agents' };
       break;
     case 'gridtokens':
-      return 'agent-token';
+      return { icon: 'agent-token', page: 'Agent tokens' };
       break;
     case 'gridtokengroups':
-      return 'agent-token-group';
+      return { icon: 'agent-token-group', page: 'Token Groups' };
       break;
     case 'gridquotamanager':
-      return 'sidebar';
+      return { icon: 'sidebar', page: 'Quota Manager' };
       break;
     case 'functionPackages':
-      return 'package';
+      return { icon: 'package', page: 'Keywords packages' };
       break;
     case 'resources':
-      return 'file-attachment-03';
+      return { icon: 'file-attachment-03', page: 'Resources' };
       break;
     case 'automationPackage':
-      return 'automation';
+      return { icon: 'automation', page: 'Automation Packages' };
       break;
     case 'executions':
-      return 'rocket';
+      return { icon: 'rocket', page: 'Executions' };
       break;
     default:
-      return '';
+      return undefined;
   }
 };
