@@ -28,7 +28,7 @@ import { distinctUntilChanged, filter, map, Observable, of, Subject, switchMap, 
 import { Panels } from '../../shared/panels.enum';
 import { ReportTreeNode } from '../../shared/report-tree-node';
 import { ReportTreeNodeUtilsService } from '../../services/report-tree-node-utils.service';
-import { EXECUTION_TREE_PAGING } from '../../services/execution-tree-paging';
+import { EXECUTION_TREE_PAGING, ExecutionTreePaging } from '../../services/execution-tree-paging';
 import { DOCUMENT } from '@angular/common';
 import { IncludeTestcases } from '../../shared/include-testcases.interface';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
@@ -73,6 +73,7 @@ interface RefreshParams {
       useExisting: forwardRef(() => ExecutionProgressComponent),
     },
     SingleExecutionPanelsService,
+    ExecutionTreePaging,
     ...selectionCollectionProvider('artefactID', AutoDeselectStrategy.KEEP_SELECTION),
     TreeStateService,
   ],

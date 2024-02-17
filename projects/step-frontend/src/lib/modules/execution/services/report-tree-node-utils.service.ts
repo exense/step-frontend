@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { ArtefactService, ControllerService, ReportNode, TreeNode, TreeNodeUtilsService } from '@exense/step-core';
-import { EXECUTION_TREE_PAGE_LIMIT, EXECUTION_TREE_PAGING, ExecutionTreePaging } from './execution-tree-paging';
+import { EXECUTION_TREE_PAGING, ExecutionTreePagingSetting, ExecutionTreePaging } from './execution-tree-paging';
 import { ReportTreeNode } from '../shared/report-tree-node';
 import { forkJoin, map, Observable, tap } from 'rxjs';
 import { ReportNodeWithChildren } from '../shared/report-node-with-children';
@@ -10,9 +10,10 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
   private readonly hasChildrenFlags: Record<string, boolean> = {};
 
   constructor(
-    @Inject(EXECUTION_TREE_PAGING) private _paging: ExecutionTreePaging,
+    @Inject(EXECUTION_TREE_PAGING) private _paging: ExecutionTreePagingSetting,
     private _artefactTypes: ArtefactService,
-    private _controllerService: ControllerService
+    private _controllerService: ControllerService,
+    private _executionTreePaging: ExecutionTreePaging
   ) {}
 
   convertItem(
@@ -108,9 +109,11 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
 
   loadNodes(nodeId: string): Observable<ReportNode[]> {
     const skip = this._paging[nodeId]?.skip || 0;
-    return this._controllerService.getReportNodeChildren(nodeId, skip, EXECUTION_TREE_PAGE_LIMIT).pipe(
-      map((nodes) => nodes.filter((node) => node.resolvedArtefact !== null)),
-      tap((nodes) => (this.hasChildrenFlags[nodeId] = nodes.length > 0))
-    );
+    return this._controllerService
+      .getReportNodeChildren(nodeId, skip, this._executionTreePaging.getExecutionTreePaging())
+      .pipe(
+        map((nodes) => nodes.filter((node) => node.resolvedArtefact !== null)),
+        tap((nodes) => (this.hasChildrenFlags[nodeId] = nodes.length > 0))
+      );
   }
 }
