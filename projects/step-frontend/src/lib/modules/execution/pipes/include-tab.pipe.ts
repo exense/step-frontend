@@ -5,7 +5,7 @@ import { Tab } from '@exense/step-core';
   name: 'includeTab',
 })
 export class IncludeTabPipe implements PipeTransform {
-  transform({ id: tabId }: Tab, activeTabId?: string): boolean {
+  transform({ id: tabId }: Tab<string>, activeTabId?: string): boolean {
     return (
       tabId === activeTabId ||
       (tabId === 'steps' && activeTabId === 'tree') ||

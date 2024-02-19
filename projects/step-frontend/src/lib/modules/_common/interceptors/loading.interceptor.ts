@@ -30,7 +30,7 @@ export class LoadingInterceptor implements HttpInterceptor {
             this._globalProgressSpinnerService.hideSpinner();
             break;
         }
-      })
+      }),
     );
   }
 }

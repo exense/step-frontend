@@ -1,14 +1,15 @@
 <div class="main-container">
   <div class="ranger-container">
-    <div class="ranger-skeleton" *ngIf="!rangerSettings"></div>
-    <step-ts-ranger
-      *ngIf="rangerSettings"
-      [settings]="rangerSettings"
-      [syncKey]="context.id"
-      (chartLoaded)="rangerLoaded.emit()"
-      (rangeChange)="onRangerSelectionChange($event)"
-      (zoomReset)="onRangerZoomReset()"
-    >
-    </step-ts-ranger>
+    @if (!rangerSettings) {
+      <div class="ranger-skeleton"></div>
+    } @else {
+      <step-ts-ranger
+        [settings]="rangerSettings"
+        [syncKey]="context.id"
+        (chartLoaded)="rangerLoaded.emit()"
+        (rangeChange)="onRangerSelectionChange($event)"
+        (zoomReset)="onRangerZoomReset()"
+      />
+    }
   </div>
 </div>

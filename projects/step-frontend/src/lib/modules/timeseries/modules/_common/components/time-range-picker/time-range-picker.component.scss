@@ -1,4 +1,5 @@
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
 
 .time-selector-container {
   display: flex;
@@ -44,10 +45,13 @@
   }
 }
 
-.compact-btn {
-  height: 40px;
-  padding: 0 4px;
-  min-width: 40px;
+.range-btn {
+  @include core.button-round;
+  &.compact-btn {
+    height: 40px;
+    padding: 0 4px;
+    min-width: 40px;
+  }
 }
 
 .timezone-container {

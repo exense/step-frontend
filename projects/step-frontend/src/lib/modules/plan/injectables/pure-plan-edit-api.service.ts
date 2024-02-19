@@ -71,9 +71,9 @@ export class PurePlanEditApiService implements PlanEditorApiService {
         return this.loadPlan(plan.id!).pipe(
           map((restoredPlan) => {
             return { id: restoredPlan.id!, plan: restoredPlan, forceRefresh: true };
-          })
+          }),
         );
-      })
+      }),
     );
   }
 

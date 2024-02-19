@@ -1,16 +1,27 @@
 <div>
   <button
     mat-raised-button
+    class="range-btn"
     [matMenuTriggerFor]="menu"
     [title]="compact ? 'Time Range' : ''"
     [class.compact-btn]="compact"
   >
-    <ng-container *ngIf="!compact">
-      {{ activeSelection.type === 'FULL' ? 'Full time range' : '' }}
-      {{ activeSelection.type === 'RELATIVE' ? activeSelection.relativeSelection!.label : '' }}
-      {{ activeSelection.type === 'ABSOLUTE' ? 'Custom Selection' : '' }}
-    </ng-container>
-    <step-icon name="clock" *ngIf="compact"></step-icon>
+    @if (compact) {
+      <step-icon name="clock" />
+    } @else {
+      @switch (activeSelection.type) {
+        @case ('FULL') {
+          Full time range
+        }
+        @case ('RELATIVE') {
+          {{ activeSelection.relativeSelection!.label }}
+        }
+        @case ('ABSOLUTE') {
+          Custom Selection
+        }
+        @default {}
+      }
+    }
   </button>
   <mat-menu #menu="matMenu" class="time-selector-menu">
     <div (click)="$event.stopPropagation()">
@@ -43,15 +54,16 @@
         </div>
         <div class="right-section" (click)="closeMenu()">
           <div class="title">Relative time ranges</div>
-          <div
-            *ngFor="let rangeOption of selectOptions"
-            (click)="onRelativeSelectionSelected(rangeOption)"
-            class="time-option"
-            [class.active]="rangeOption.relativeSelection?.timeInMs === activeSelection.relativeSelection?.timeInMs"
-          >
-            {{ rangeOption.relativeSelection?.label }}
-            {{ rangeOption.type === 'FULL' ? 'Full Range' : '' }}
-          </div>
+          @for (rangeOption of selectOptions; track rangeOption.relativeSelection?.label) {
+            <div
+              (click)="onRelativeSelectionSelected(rangeOption)"
+              class="time-option"
+              [class.active]="rangeOption.relativeSelection?.timeInMs === activeSelection.relativeSelection?.timeInMs"
+            >
+              {{ rangeOption.relativeSelection?.label }}
+              {{ rangeOption.type === 'FULL' ? 'Full Range' : '' }}
+            </div>
+          }
         </div>
       </div>
       <div class="timezone-container">

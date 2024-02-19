@@ -46,6 +46,7 @@ import { PopoverComponent } from './components/popover/popover.component';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { DescriptionHintComponent } from './components/description-hint/description-hint.component';
 import { DialogRouteComponent } from './components/dialog-route/dialog-route.component';
+import { MarkerComponent } from './components/marker/marker.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -93,6 +94,7 @@ import { DialogRouteComponent } from './components/dialog-route/dialog-route.com
     SafeHtmlPipe,
     DescriptionHintComponent,
     DialogRouteComponent,
+    MarkerComponent,
   ],
   exports: [
     CommonModule,
@@ -143,6 +145,7 @@ import { DialogRouteComponent } from './components/dialog-route/dialog-route.com
     DescriptionHintComponent,
     DialogRouteComponent,
     ArrayFilterAdvancedComponent,
+    MarkerComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -167,6 +170,7 @@ export * from './components/autocomplete-input/autocomplete-input.component';
 export { TimeUnitDictionary } from './components/time-input/base-time-converter.component';
 export * from './components/time-input/time-input.component';
 export * from './components/time-input/per-time-unit-input.component';
+export * from './components/marker/marker.component';
 export * from './components/string-array-input/string-array-input.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
@@ -228,6 +232,7 @@ export * from './services/item-hold-receiver.service';
 export * from './services/dialog-parent.service';
 export * from './shared/bulk-operation-type.enum';
 export * from './shared/auth.guards';
+export * from './shared/marker-type.enum';
 export * from './shared/string-array-regex';
 export * from './shared/dialog-route';
 export * from './shared/dialog-route-result';

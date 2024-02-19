@@ -1,5 +1,5 @@
 <div class="time-container">
-  <div class="ranger-section" [class.compact]="compactView">
+  <div class="ranger-section">
     <step-execution-time-selection [context]="context" />
   </div>
   <step-time-range-picker
@@ -31,10 +31,12 @@
 
   <div class="filters">
     <mat-menu #addFilterMenu="matMenu">
-      @for (option of filterOptions | visibleFilterItems; track option.attributeName) {
-        <button mat-menu-item (click)="addFilterItem(option)">
-          <span>{{ option.label }}</span>
-        </button>
+      @for (option of filterOptions; track option.attributeName) {
+        @if (!option.isHidden) {
+          <button mat-menu-item (click)="addFilterItem(option)">
+            <span>{{ option.label }}</span>
+          </button>
+        }
       }
       <button mat-menu-item [matMenuTriggerFor]="typesMenu">Other</button>
       <button mat-menu-item (click)="openDiscovery()">Discover...</button>
@@ -62,7 +64,7 @@
         </step-form-field>
         <button class="apply-btn" mat-button color="primary" (click)="manuallyApplyFilters()">Apply Filters</button>
       } @else {
-        @for (item of _internalFilters | visibleFilterItems; track item.attributeName; let i = $index) {
+        @for (item of activeFilters; track item.attributeName; let i = $index) {
           <step-ts-filter-bar-item
             #appliedFilter
             *ngIf="!item.isHidden"

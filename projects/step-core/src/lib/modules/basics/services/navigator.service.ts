@@ -19,14 +19,14 @@ export class NavigatorService {
   readonly activeUrl$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
     map(() => this._router.url),
-    shareReplay(1)
+    shareReplay(1),
   );
 
   isViewIdActive(viewId: string): Observable<boolean> {
     const viewLink = `/${viewId}`;
     return this.activeUrl$.pipe(
       startWith(this._router.url),
-      map((url) => url.startsWith(viewLink))
+      map((url) => url.startsWith(viewLink)),
     );
   }
 

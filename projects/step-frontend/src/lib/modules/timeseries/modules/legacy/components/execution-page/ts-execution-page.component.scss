@@ -1,13 +1,15 @@
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
 
 :host {
   position: relative;
+  display: block;
 }
 
 .header-buttons {
   position: absolute;
-  right: 44px;
-  top: -68px;
+  right: 0;
+  top: -6.4rem;
   display: flex;
   z-index: 100;
 }
@@ -46,13 +48,8 @@
   }
 }
 
-.icon-container {
-  margin-right: 0.8rem;
-}
-
-.menu-btn {
-  display: flex;
-  align-items: center;
+.btn-settings {
+  @include core.button-round;
 }
 
 .active {
