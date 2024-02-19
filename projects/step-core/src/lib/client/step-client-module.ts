@@ -18,3 +18,4 @@ export * from './generated/index';
 export * from './async-task/async-task.module';
 export * from './augmented/step-augmented-client.module';
 export * from './table/step-table-client.module';
+export * from './generated/models/Bookmark';

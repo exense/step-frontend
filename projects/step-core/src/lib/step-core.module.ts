@@ -430,3 +430,4 @@ export * from './components/message-dialog/message-dialog.component';
 export * from './components/report-node-icon/report-node-icon.component';
 export * from './components/bookmark-create-dialog/bookmark-create-dialog.component';
 export * from './services/bookmark.service';
+export * from './services/bookmark-dialogs.service';
