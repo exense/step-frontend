@@ -13,6 +13,7 @@ import {
   BulkSelectionType,
   Execution,
   ExecutionSummaryDto,
+  FilterConditionFactoryService,
   ReportNode,
   SelectionCollector,
   TableLocalDataSource,
@@ -122,11 +123,11 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
         eid: executionId,
         testcases: this.panelService.isPanelEnabled(Panels.TEST_CASES) ? testcases : undefined,
       })),
-      takeUntil(this.selectionTerminator$)
+      takeUntil(this.selectionTerminator$),
     );
 
     this._testCasesSelection!.selected$.pipe(takeUntil(this.selectionTerminator$)).subscribe((selected) =>
-      this.determineSelectionType(undefined, selected)
+      this.determineSelectionType(undefined, selected),
     );
   }
 
@@ -149,7 +150,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
       testCases ?? [],
       TableLocalDataSource.configBuilder<ReportNode>()
         .addSearchStringRegexPredicate('status', (item) => item.status)
-        .build()
+        .build(),
     );
   }
 
@@ -159,7 +160,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
     if (testCases.length > 0 && testCases.length === selected.length) {
       const isAllIncluded = testCases.reduce(
         (result, testCase) => result && selected!.includes(testCase.artefactID!),
-        true
+        true,
       );
       if (isAllIncluded) {
         this.selectionType = BulkSelectionType.ALL;

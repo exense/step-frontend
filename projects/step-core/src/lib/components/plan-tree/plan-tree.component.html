@@ -3,7 +3,7 @@
     <step-tree
       [dragDisabled]="isReadonly"
       (nodeDblClick)="handleDoubleClick($event.node, $event.event)"
-      (treeContextAction)="proceedAction($event.actionId, $event.node)"
+      (treeContextAction)="proceedAction($event.actionId, $event.node, $event.multipleNodes)"
     >
       <div
         *stepTreeNodeTemplate="let node"
