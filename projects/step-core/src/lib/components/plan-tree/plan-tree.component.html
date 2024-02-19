@@ -3,9 +3,13 @@
     <step-tree
       [dragDisabled]="isReadonly"
       (nodeDblClick)="handleDoubleClick($event.node, $event.event)"
-      (treeContextAction)="proceedAction($event.actionId, $event.node)"
+      (treeContextAction)="proceedAction($event.actionId, $event.node, $event.multipleNodes)"
     >
-      <div class="node-name" *stepTreeNodeTemplate="let node">
+      <div
+        *stepTreeNodeTemplate="let node"
+        class="node-name"
+        [class.node-displayed]="node.id === (selectedNode$ | async)?.id"
+      >
         <span>{{ node?.name }}</span>
         <button
           *ngIf="_planInteractiveSession?.isInteractiveSessionActive$ | async"

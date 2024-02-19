@@ -357,4 +357,4 @@ export class TooltipPlugin {
   }
 }
 
-const getExecutionLink = (executionId: string) => `#/root/executions/${executionId}/viz`;
+const getExecutionLink = (executionId: string) => `#/executions/${executionId}/viz`;

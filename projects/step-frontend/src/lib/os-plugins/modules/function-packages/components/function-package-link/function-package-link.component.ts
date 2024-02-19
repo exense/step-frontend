@@ -33,7 +33,7 @@ export class FunctionPackageLinkComponent implements CustomComponent {
 
   constructor(
     private _api: KeywordPackagesService,
-    private _functionPackageActionsService: FunctionPackageActionsService
+    private _functionPackageActionsService: FunctionPackageActionsService,
   ) {}
 
   delete(): void {
@@ -68,11 +68,7 @@ export class FunctionPackageLinkComponent implements CustomComponent {
     if (!this.functionPackage) {
       return;
     }
-    this.isRefreshing = true;
-    this._functionPackageActionsService
-      .editFunctionPackage(this.functionPackage)
-      .subscribe()
-      .add(() => (this.isRefreshing = false));
+    this._functionPackageActionsService.editFunctionPackage(this.functionPackage);
   }
 
   reload(): void {

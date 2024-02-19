@@ -1,7 +1,13 @@
 import { Component, HostBinding, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FunctionPackageConfigurationDialogData } from '../../types/function-package-configuration-dialog-data.interface';
-import { AlertType, AugmentedKeywordPackagesService, Keyword, ResourceInputBridgeService } from '@exense/step-core';
+import {
+  AlertType,
+  AugmentedKeywordPackagesService,
+  DialogRouteResult,
+  Keyword,
+  ResourceInputBridgeService,
+} from '@exense/step-core';
 import { catchError, iif, map, of, switchMap, tap } from 'rxjs';
 import { KeyValue } from '@angular/common';
 
@@ -14,7 +20,7 @@ export class FunctionPackageConfigurationDialogComponent {
   readonly AlertType = AlertType;
 
   private _api = inject(AugmentedKeywordPackagesService);
-  private _matDialogRef = inject<MatDialogRef<FunctionPackageConfigurationDialogData>>(MatDialogRef);
+  private _matDialogRef = inject<MatDialogRef<FunctionPackageConfigurationDialogData, DialogRouteResult>>(MatDialogRef);
   protected _data = inject<FunctionPackageConfigurationDialogData>(MAT_DIALOG_DATA, { optional: true });
   private _resourceInputBridgeService = inject(ResourceInputBridgeService);
 
@@ -50,14 +56,14 @@ export class FunctionPackageConfigurationDialogComponent {
           this._resourceInputBridgeService.deleteUploadedResource();
           return of(false);
         }),
-        tap(() => (this.isLoading = false))
+        tap(() => (this.isLoading = false)),
       )
-      .subscribe((result) => this._matDialogRef.close(result));
+      .subscribe((result) => this._matDialogRef.close({ isSuccess: !!result }));
   }
 
   cancel(): void {
     this._resourceInputBridgeService.deleteUploadedResource();
-    this._matDialogRef.close(false);
+    this._matDialogRef.close();
   }
 
   addRoutingCriteria(): void {
@@ -67,10 +73,13 @@ export class FunctionPackageConfigurationDialogComponent {
   saveRoutingCriteria(): void {
     this.functionPackage.tokenSelectionCriteria = this.criteria
       .filter((item) => !!item.key)
-      .reduce((res, item) => {
-        res[item.key] = item.value;
-        return res;
-      }, {} as Record<string, string>);
+      .reduce(
+        (res, item) => {
+          res[item.key] = item.value;
+          return res;
+        },
+        {} as Record<string, string>,
+      );
   }
 
   removeRoutingCriteria(criterion: KeyValue<string, string>): void {
@@ -118,12 +127,12 @@ export class FunctionPackageConfigurationDialogComponent {
                 of({
                   previewError: error.data,
                   addedFunctions: undefined,
-                })
-              )
-            )
-          )
+                }),
+              ),
+            ),
+          ),
         ),
-        tap(() => (this.isLoading = false))
+        tap(() => (this.isLoading = false)),
       )
       .subscribe((result) => {
         this.addedFunctions = result?.addedFunctions;
@@ -141,7 +150,7 @@ export class FunctionPackageConfigurationDialogComponent {
 
   private createTokenSelectionCriteria(): KeyValue<string, string>[] {
     return Object.entries(this.functionPackage?.tokenSelectionCriteria || {}).map(
-      ([key, value]) => ({ key, value } as KeyValue<string, string>)
+      ([key, value]) => ({ key, value }) as KeyValue<string, string>,
     );
   }
 }

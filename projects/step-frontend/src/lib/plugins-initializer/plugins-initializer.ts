@@ -10,18 +10,20 @@ const ADDITIONAL_PLUGINS: ReadonlyArray<MicrofrontendPluginDefinition> = [
   // Add object like this {name: 'pluginName', entryPoint: 'pluginName/remoteEntry.js' }
 ];
 
-export type PluginDefinition = MicrofrontendPluginDefinition;
+// The entry point name for the OS plugins.
+// Should be ignored during the registration
+const DEFAULT_ENTRY_POINT = 'default';
 
-const fetchDefinitions = async (): Promise<PluginDefinition[]> => {
-  let result: PluginDefinition[] = [];
+const fetchDefinitions = async (): Promise<MicrofrontendPluginDefinition[]> => {
+  let result: MicrofrontendPluginDefinition[] = [];
   try {
     const pluginsResponse = await fetch('rest/app/plugins');
 
-    result = ((await pluginsResponse.json()) as PluginDefinition[]).map((plugin) => {
+    result = ((await pluginsResponse.json()) as MicrofrontendPluginDefinition[]).map((plugin) => {
       console.log('received plugins', plugin);
 
-      if (plugin['entryPoint']) {
-        plugin['entryPoint'] += '?v=${project.version}';
+      if (plugin.entryPoint && plugin.entryPoint !== DEFAULT_ENTRY_POINT) {
+        plugin.entryPoint += '?v=${project.version}';
       }
 
       return plugin;
@@ -46,27 +48,17 @@ const registerPlugins = () => {
       return;
     }
 
-    let { microfrontend } = pluginDefinitions.reduce(
-      (res, plugin) => {
-        if (plugin.hasOwnProperty('entryPoint')) {
-          res.microfrontend.push(plugin as MicrofrontendPluginDefinition);
-        }
-        return res;
-      },
-      {
-        microfrontend: [] as MicrofrontendPluginDefinition[],
-      }
-    );
-
-    const pluginNames = [...microfrontend.map((pluginInfo) => pluginInfo.name)];
-
-    registry.register(...pluginNames);
-
+    const pluginNames: string[] = [];
     const entryPoints = new Set<string>();
 
-    microfrontend.forEach((plugin) => {
-      entryPoints.add(plugin.entryPoint);
+    pluginDefinitions.forEach((plugin) => {
+      pluginNames.push(plugin.name);
+      if (plugin.entryPoint !== DEFAULT_ENTRY_POINT) {
+        entryPoints.add(plugin.entryPoint);
+      }
     });
+
+    registry.register(...pluginNames);
 
     await Promise.all([registerMicrofrontendPlugins(Array.from(entryPoints), injector), registerOsPlugins(injector)]);
   };

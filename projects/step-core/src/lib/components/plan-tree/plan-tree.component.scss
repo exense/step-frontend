@@ -16,8 +16,8 @@ step-plan-tree {
   }
 
   step-tree-node {
-    .node-content {
-      .node-name {
+    .tree-node {
+      .node-content .node-name {
         display: flex;
         align-items: center;
         gap: 1rem;
@@ -25,10 +25,22 @@ step-plan-tree {
         button {
           padding: 0 0.1rem;
           min-width: 0;
+          background: none;
         }
 
         button.actions-button {
           visibility: hidden;
+        }
+
+        &.node-displayed {
+          font-weight: 500;
+          color: var.$blue-600;
+        }
+      }
+
+      &.skipped {
+        .node-content .node-name.node-displayed {
+          color: var.$blue-50;
         }
       }
     }

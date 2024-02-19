@@ -169,7 +169,7 @@ export class TimeSeriesContext {
         : FilterUtils.filtersToOQL(
             filteringSettings.filterItems,
             undefined,
-            TimeSeriesUtils.ATTRIBUTES_REMOVAL_FUNCTION
+            TimeSeriesUtils.ATTRIBUTES_REMOVAL_FUNCTION,
           );
     const selectedTimeRange = this.getSelectedTimeRange();
     return new OQLBuilder()

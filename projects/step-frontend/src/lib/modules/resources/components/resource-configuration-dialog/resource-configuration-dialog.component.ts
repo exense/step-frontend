@@ -1,8 +1,15 @@
-import { Component, HostListener, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { AugmentedResourcesService, ModalWindowComponent, Resource, ResourceInputComponent } from '@exense/step-core';
-import { Subject, takeUntil } from 'rxjs';
+import {
+  AugmentedResourcesService,
+  DialogRouteResult,
+  ModalWindowComponent,
+  MultipleProjectsService,
+  Resource,
+  ResourceInputComponent,
+} from '@exense/step-core';
+import { Subject } from 'rxjs';
 import { ResourceConfigurationDialogData } from './resource-configuration-dialog-data.interface';
 import {
   resourceConfigurationDialogFormCreate,
@@ -17,11 +24,14 @@ import { PredefinedResourceType } from './predefined-resource-type.enum';
   styleUrls: ['./resource-configuration-dialog.component.scss'],
 })
 export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
+  private _cd = inject(ChangeDetectorRef);
   private _formBuilder = inject(FormBuilder);
-  private _matDialogRef = inject<MatDialogRef<ResourceConfigurationDialogComponent, Resource>>(MatDialogRef);
+  private _matDialogRef = inject<MatDialogRef<ResourceConfigurationDialogComponent, DialogRouteResult>>(MatDialogRef);
   private _resourcesService = inject(AugmentedResourcesService);
+  private _multipleProjectsService = inject(MultipleProjectsService);
 
   protected _resourceConfigurationDialogData = inject<ResourceConfigurationDialogData>(MAT_DIALOG_DATA);
+  protected readonly title = this._resourceConfigurationDialogData?.resource ? 'Edit Resource' : 'New Resource';
   protected _predefinedResourceTypes = [
     { key: PredefinedResourceType.DATA_SOURCE, value: PredefinedResourceType.DATA_SOURCE },
     { key: PredefinedResourceType.FUNCTIONS, value: PredefinedResourceType.FUNCTIONS },
@@ -40,19 +50,25 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
   protected loading = false;
   protected uploading = false;
   protected contentUpdated = false;
+  protected initializingResource = false;
 
   ngOnInit(): void {
     // Disable automatic closing, switch to manual
     this._matDialogRef.disableClose = true;
 
-    const { resource, isReadonly } = this._resourceConfigurationDialogData;
+    const { resource } = this._resourceConfigurationDialogData;
+    const isReadonly = !!resource && !this._multipleProjectsService.isEntityBelongsToCurrentProject(resource);
     this.setFormValue(resource, isReadonly);
-    this.initBackdropClosing();
   }
 
   ngOnDestroy(): void {
     this.terminator$.next();
     this.terminator$.complete();
+  }
+
+  protected handleResourceInitialize(value: boolean): void {
+    this.initializingResource = value;
+    this._cd.detectChanges();
   }
 
   protected onContentChange(resourceId: string): void {
@@ -92,7 +108,7 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
     resourceConfigurationDialogFormSetValueToModel(this.formGroup, resource);
 
     this._resourcesService.saveResource(resource).subscribe((updatedResource) => {
-      this._matDialogRef.close(updatedResource);
+      this._matDialogRef.close({ isSuccess: !!updatedResource });
     });
   }
 
@@ -108,19 +124,5 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
     if (isReadonly) {
       this.formGroup.controls.content.disable();
     }
-  }
-
-  private initBackdropClosing(): void {
-    this._matDialogRef
-      .backdropClick()
-      .pipe(takeUntil(this.terminator$))
-      .subscribe(() => {
-        if (this.uploading) {
-          return;
-        }
-
-        // Account for closing by clicking the backdrop
-        this.close();
-      });
   }
 }

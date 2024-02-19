@@ -10,6 +10,7 @@ import { ScriptEditorComponent } from './components/script-editor/script-editor.
 import './components/script-editor/script-editor.component';
 import { FunctionTypeScriptComponent } from './components/function-type-script/function-type-script.component';
 import './components/function-type-script/function-type-script.component';
+import { canDeactivateFn } from './functions/can-deactivate-function';
 
 @NgModule({
   declarations: [ScriptEditorComponent, FunctionTypeScriptComponent],
@@ -19,7 +20,7 @@ import './components/function-type-script/function-type-script.component';
 export class ScriptEditorModule {
   constructor(
     private _viewRegistry: ViewRegistryService,
-    private _functionTypeRegistryService: FunctionTypeRegistryService
+    private _functionTypeRegistryService: FunctionTypeRegistryService,
   ) {
     this.registerViews();
     this.registerFunctionTypes();
@@ -33,6 +34,7 @@ export class ScriptEditorModule {
         {
           path: ':id',
           component: ScriptEditorComponent,
+          canDeactivate: [canDeactivateFn],
         },
       ],
     });
@@ -42,7 +44,7 @@ export class ScriptEditorModule {
     this._functionTypeRegistryService.register(
       FunctionType.SCRIPT,
       'Script (Java, JS, Groovy, etc)',
-      FunctionTypeScriptComponent
+      FunctionTypeScriptComponent,
     );
   }
 }

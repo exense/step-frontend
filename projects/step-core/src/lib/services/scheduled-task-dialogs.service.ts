@@ -10,6 +10,7 @@ import {
 import { EntityDialogsService } from '../modules/entity/injectables/entity-dialogs.service';
 import { DialogsService } from '../shared';
 import { AuthService } from '../modules/basics/services/auth.service';
+import { DialogRouteResult } from '../modules/basics/shared/dialog-route-result';
 
 @Injectable({
   providedIn: 'root',
@@ -24,18 +25,19 @@ export class ScheduledTaskDialogsService {
   selectTask(): Observable<ExecutiontTaskParameters | undefined> {
     return this._entityDialogs.selectEntityOfType('tasks').pipe(
       map((result) => result?.item?.id),
-      switchMap((id) => (!id ? of(undefined) : this._schedulerService.getExecutionTaskById(id)))
+      switchMap((id) => (!id ? of(undefined) : this._schedulerService.getExecutionTaskById(id))),
     );
   }
 
-  editScheduledTask(task: ExecutiontTaskParameters): Observable<ExecutiontTaskParameters | undefined> {
-    const config = this.fillScheduledTaskDialogConfig(task);
+  editScheduledTask(task: ExecutiontTaskParameters): Observable<DialogRouteResult | undefined> {
+    const taskAndConfig = this.prepareTaskAndConfig(task);
 
     return this._matDialog
-      .open<EditSchedulerTaskDialogComponent, EditSchedulerTaskDialogData, ExecutiontTaskParameters | undefined>(
+      .open<
         EditSchedulerTaskDialogComponent,
-        { data: { task, config } }
-      )
+        EditSchedulerTaskDialogData,
+        DialogRouteResult | undefined
+      >(EditSchedulerTaskDialogComponent, { data: { taskAndConfig } })
       .afterClosed();
   }
 
@@ -44,11 +46,11 @@ export class ScheduledTaskDialogsService {
 
     return this._dialogs.showDeleteWarning(1, `Task "${paramName}"`).pipe(
       filter((result) => result),
-      switchMap(() => this._schedulerService.deleteExecutionTask(task.id!))
+      switchMap(() => this._schedulerService.deleteExecutionTask(task.id!)),
     );
   }
 
-  private fillScheduledTaskDialogConfig(task: ExecutiontTaskParameters): EditSchedulerTaskDialogConfig {
+  prepareTaskAndConfig(task: ExecutiontTaskParameters): EditSchedulerTaskDialogData['taskAndConfig'] {
     let hideUser = false;
     let disableUser = false;
     if (!this._auth.isAuthenticated()) {
@@ -76,10 +78,10 @@ export class ScheduledTaskDialogsService {
     }
 
     // TODO: Fill disablePlan flag, when it will be clarified how to fill it
-    const result: EditSchedulerTaskDialogConfig = {
+    const config: EditSchedulerTaskDialogConfig = {
       hideUser,
       disableUser,
     };
-    return result;
+    return { task, config };
   }
 }
