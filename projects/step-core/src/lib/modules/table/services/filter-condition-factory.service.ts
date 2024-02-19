@@ -15,6 +15,7 @@ import { FilterConditionType } from '../shared/filter-condition-type.enum';
 import { BooleanFilterCondition } from '../shared/boolean-filter-condition';
 import { DateRangeFilterCondition } from '../shared/date-range-filter-condition';
 import { DateRange } from '../../date-picker/date-picker.module';
+import { ArrayFilterCondition } from '../shared/array-filter-condition';
 
 @Injectable({
   providedIn: 'root',
@@ -32,6 +33,10 @@ export class FilterConditionFactoryService {
 
   dateRangeFilterCondition(range?: DateRange): FilterCondition {
     return new DateRangeFilterCondition(range);
+  }
+
+  arrayFilterCondition(array?: Array<string>): FilterCondition {
+    return new ArrayFilterCondition(array);
   }
 
   scopeFilterCondition(value?: string): FilterCondition {
@@ -71,7 +76,7 @@ export class FilterConditionFactoryService {
       case FilterConditionType.REPORT_NODE:
         return this.reportNodeFilterCondition(
           filterCondition?.sourceObject?.searchValue,
-          filterCondition?.sourceObject?.attributeValues
+          filterCondition?.sourceObject?.attributeValues,
         );
       case FilterConditionType.SCOPE:
         return this.scopeFilterCondition(filterCondition?.sourceObject);
