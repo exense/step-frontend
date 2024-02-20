@@ -37,6 +37,7 @@ export class ExecutionListComponent implements OnDestroy {
   readonly runningExecutionsCount$ = this.reloadRunningExecutionsCount$.pipe(
     switchMap(() => this._augmentedExecutionsService.countExecutionsByStatus(Status.RUNNING)),
   );
+
   autoRefreshDisabled: boolean = false;
 
   @ViewChild('statusFilter')

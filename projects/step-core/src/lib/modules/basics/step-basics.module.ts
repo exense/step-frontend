@@ -45,6 +45,7 @@ import { TriggerPopoverDirective } from './directives/trigger-popover.directive'
 import { PopoverComponent } from './components/popover/popover.component';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { DescriptionHintComponent } from './components/description-hint/description-hint.component';
+import { DurationPipe } from './pipes/duration.pipe';
 import { DialogRouteComponent } from './components/dialog-route/dialog-route.component';
 import { MarkerComponent } from './components/marker/marker.component';
 
@@ -93,6 +94,7 @@ import { MarkerComponent } from './components/marker/marker.component';
     PopoverComponent,
     SafeHtmlPipe,
     DescriptionHintComponent,
+    DurationPipe,
     DialogRouteComponent,
     MarkerComponent,
   ],
@@ -143,6 +145,7 @@ import { MarkerComponent } from './components/marker/marker.component';
     PopoverComponent,
     SafeHtmlPipe,
     DescriptionHintComponent,
+    DurationPipe,
     DialogRouteComponent,
     ArrayFilterAdvancedComponent,
     MarkerComponent,
@@ -240,5 +243,6 @@ export * from './directives/popover-content.directive';
 export * from './directives/trigger-popover.directive';
 export * from './components/popover/popover.component';
 export * from './pipes/safe-html.pipe';
+export * from './pipes/duration.pipe';
 export * from './components/description-hint/description-hint.component';
 export * from './components/dialog-route/dialog-route.component';

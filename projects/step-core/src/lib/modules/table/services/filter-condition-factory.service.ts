@@ -31,8 +31,8 @@ export class FilterConditionFactoryService {
     return new SingleDateFilterCondition(date);
   }
 
-  dateRangeFilterCondition(range?: DateRange): FilterCondition {
-    return new DateRangeFilterCondition(range);
+  dateRangeFilterCondition(range?: DateRange, columnsOverride?: { start?: string; end?: string }): FilterCondition {
+    return new DateRangeFilterCondition({ range, columnsOverride });
   }
 
   arrayFilterCondition(array?: Array<string>): FilterCondition {
@@ -83,7 +83,10 @@ export class FilterConditionFactoryService {
       case FilterConditionType.SINGLE_DATE:
         return this.singleDateFilterCondition(filterCondition?.sourceObject);
       case FilterConditionType.DATE_RANGE:
-        return this.dateRangeFilterCondition(filterCondition?.sourceObject);
+        return this.dateRangeFilterCondition(
+          filterCondition?.sourceObject?.range,
+          filterCondition?.sourceObject?.columnsOverride,
+        );
       default:
         return undefined;
     }
