@@ -22,11 +22,15 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Page</th>
     <td mat-cell *matCellDef="let element">{{ element.page }}</td>
   </ng-container>
+  <ng-container matColumnDef="tenant" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Tenant</th>
+    <td mat-cell *matCellDef="let element">{{ element.tenant }}</td>
+  </ng-container>
   <ng-container matColumnDef="actions">
     <th mat-header-cell *matHeaderCellDef>Actions</th>
     <td mat-cell *matCellDef="let element" class="cell-actions">
       <step-btn-group>
-        <button mat-icon-button matTooltip="Rename Label" (click)="renameBookmark()">
+        <button mat-icon-button matTooltip="Rename Label" (click)="renameBookmark(element)">
           <step-icon name="edit"></step-icon></button
         ><button mat-icon-button matTooltip="Delete Bookmark" (click)="deleteBookmark(element)">
           <step-icon name="trash-2"></step-icon>
@@ -38,4 +42,4 @@
     </td>
   </ng-container>
 </step-table>
-<step-entity-menu #entityMenu entity="plans" (entityOperationSuccess)="table.reload()"> </step-entity-menu>
+<step-entity-menu #entityMenu entity="bookmarks" (entityOperationSuccess)="table.reload()"> </step-entity-menu>

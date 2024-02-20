@@ -1,6 +1,6 @@
 import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
 import { Bookmark } from '../../client/generated/models/Bookmark';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BookmarkService } from '../../services/bookmark.service';
 import { getIconAndPageById } from '../../shared';
 import { NgForm } from '@angular/forms';
@@ -15,6 +15,7 @@ export class BookmarkCreateDialogComponent implements OnInit {
   private router = inject(Router);
   private bookmarkService = inject(BookmarkService);
   private _matDialogRef = inject(MatDialogRef);
+  private route = inject(ActivatedRoute);
 
   protected bookmark: Partial<Bookmark> = {};
 
@@ -22,13 +23,14 @@ export class BookmarkCreateDialogComponent implements OnInit {
   private form!: NgForm;
 
   ngOnInit(): void {
-    const link = this.router.url.slice(6);
+    const tenant = this.route.snapshot.queryParams['tenant'];
+    const link = this.router.url.slice(6).split('?')[0];
     const initBookmark = this.getIconAndPage(link);
     this.bookmark = {
       label: '',
       page: initBookmark?.page,
-      link: link,
-      tenant: '',
+      link,
+      tenant,
       icon: initBookmark?.icon,
     };
   }
