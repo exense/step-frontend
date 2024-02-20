@@ -20,7 +20,6 @@ import { of, switchMap, take } from 'rxjs';
 export class ManageBookmarksListComponent {
   private _dialogs = inject(DialogsService);
   private _bookmarkService = inject(BookmarkService);
-  private _viewRegistryService = inject(ViewRegistryService);
 
   dataSource: Bookmark[] | undefined | StepDataSource<Bookmark> = inject(AugmentedBookmarksService).createDataSource();
 
@@ -35,7 +34,6 @@ export class ManageBookmarksListComponent {
       )
       .subscribe(() => {
         this.dataSource = this._bookmarkService.getBookmarks();
-        this._viewRegistryService.registerStandardMenuEntries();
       });
   }
 
