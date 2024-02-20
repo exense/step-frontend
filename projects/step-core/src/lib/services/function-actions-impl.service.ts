@@ -8,7 +8,7 @@ import { DialogsService } from '../shared';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
 
 const ENTITY_TYPE = 'keyword';
-const EDITOR_URL = '/root/functions';
+const EDITOR_URL = '/functions';
 
 @Injectable({
   providedIn: 'root',

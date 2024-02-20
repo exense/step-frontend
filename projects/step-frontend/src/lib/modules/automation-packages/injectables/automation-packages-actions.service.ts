@@ -9,7 +9,7 @@ import { map, Observable, of, switchMap } from 'rxjs';
 import { ENTITY_ID, PATH } from '../types/constants';
 import { Router } from '@angular/router';
 
-const ROOT_URL = `/root/${PATH}/list`;
+const ROOT_URL = `/${PATH}/list`;
 
 @Injectable({
   providedIn: 'root',

@@ -42,7 +42,8 @@ export class ByStatusChartGenerator {
         metadata: metadata,
         value: (self: uPlot, x: number) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x) + '/h',
         stroke: color,
-        fill: (self: uPlot, seriesIdx: number) => this._uPlotUtils.gradientFill(self, color),
+        width: 2,
+        fill: (self: uPlot, seriesIdx: number) => this._uPlotUtils.gradientFill(self, color, [0, 0.6]),
         points: { show: false },
         show: true,
       };

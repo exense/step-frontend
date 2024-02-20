@@ -61,7 +61,7 @@ export class ExecutionListComponent implements OnDestroy {
   }
 
   navigateToExecution(id: string): void {
-    this._router.navigate(['root', 'executions', id], { queryParamsHandling: 'preserve' });
+    this._router.navigate(['executions', id], { queryParamsHandling: 'preserve' });
   }
 
   handleRunningStatusClick(): void {

@@ -5,7 +5,7 @@
       <strong>Plan</strong>
       <span>
         <a
-          routerLink="/root/plans/editor/{{ _state.execution!.planId }}"
+          routerLink="/plans/editor/{{ _state.execution!.planId }}"
           *ngIf="!_state?.execution?.executionParameters?.['isolatedExecution']; else isolatedPlan"
         >
           {{ _state.execution!.description }}

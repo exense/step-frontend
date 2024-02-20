@@ -1,13 +1,13 @@
 step-execution-time-selection {
   .main-container {
-    display: flex;
-    justify-content: space-between;
     max-width: 100%;
+    height: 13rem;
+    position: relative;
   }
 
   .ranger-skeleton {
     width: 100%;
-    height: 60px;
+    height: 8rem;
     margin-bottom: 40px;
     background: #e5e4e4;
     position: relative;
@@ -41,8 +41,9 @@ step-execution-time-selection {
   }
 
   .ranger-container {
-    flex-grow: 1;
-    max-width: 100%;
+    position: absolute;
+    left: -2rem;
+    right: -2rem;
   }
 
   .time-picker-container {

@@ -4,6 +4,7 @@ import {
   BucketAttributes,
   Execution,
   FetchBucketsRequest,
+  MarkerType,
   TimeRange,
   TimeSeriesAPIResponse,
   TimeSeriesService,
@@ -141,6 +142,8 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
 
   compareModeEnabled: boolean = false;
   compareModeContext: TimeSeriesContext | undefined;
+
+  readonly MarkerType = MarkerType;
 
   valueAscOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => {
     return a.key.localeCompare(b.key);
@@ -644,7 +647,8 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
         const responseTimeMetric = this.compareModeEnabled
           ? this.selectedCompareResponseTimeMetric
           : this.selectedResponseTimeMetric;
-        response.matrixKeys.map((key, i) => {
+
+        response.matrixKeys.forEach((key, i) => {
           const seriesKey = this.getSeriesKey(key, groupDimensions);
           const responseTimeData: (number | null | undefined)[] = [];
           const color = this.keywordsService.getColor(seriesKey);
@@ -676,11 +680,19 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
             metadata: metadata,
             value: (x, v) => Math.trunc(v),
             stroke: color,
+            width: 2,
             points: { show: false },
           } as TSChartSeries;
-          throughputSeries.push({ ...series, data: throughputData });
-          responseTimeSeries.push({ ...series, data: responseTimeData });
-          return series;
+
+          throughputSeries.push({
+            ...series,
+            data: throughputData,
+          });
+          responseTimeSeries.push({
+            ...series,
+            data: responseTimeData,
+            points: { show: true, fill: color },
+          });
         });
 
         const throughputChartSettings: TSChartSettings = {
@@ -700,8 +712,12 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
               id: 'total',
               data: totalThroughput,
               value: (x, v: number) => Math.trunc(v) + ' total',
-              fill: (self: uPlot) => this._uPlotUtils.gradientFill(self, TimeSeriesConfig.TOTAL_BARS_COLOR),
-              paths: this._chartsGenerator.barsFunction({ size: [0.9, 100] }),
+              fill: (self: uPlot) =>
+                this._uPlotUtils.multiColorsGradientFill(self, [
+                  { offset: 0, color: TimeSeriesConfig.OVERVIEW_COLORS[0] },
+                  { offset: 1, color: TimeSeriesConfig.OVERVIEW_COLORS[1] },
+                ]),
+              paths: this._chartsGenerator.barsFunction({ size: [0.5, 100], radius: 0.2 }),
               points: { show: false },
             },
             ...throughputSeries,

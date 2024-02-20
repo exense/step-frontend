@@ -10,18 +10,18 @@ import {
   Output,
   SimpleChanges,
   ViewChild,
+  ViewEncapsulation,
 } from '@angular/core';
 import { AlignedData } from 'uplot';
 import { TooltipPlugin } from './../../injectables/tooltip-plugin';
-import MouseListener = uPlot.Cursor.MouseListener;
-
-//@ts-ignore
-import uPlot = require('uplot');
-import { TimeRange } from '@exense/step-core';
+import { MarkerType, TimeRange } from '@exense/step-core';
 import { COMMON_IMPORTS, UPlot } from '../../../_common';
 import { TSChartSeries } from '../../types/ts-chart-series';
 import { TSChartSettings } from '../../types/ts-chart-settings';
 import { TooltipParentContainer } from '../../types/tooltip-parent-container';
+//@ts-ignore
+import uPlot = require('uplot');
+import MouseListener = uPlot.Cursor.MouseListener;
 
 const DEFAULT_STROKE_COLOR = '#cccccc';
 
@@ -30,6 +30,7 @@ const DEFAULT_STROKE_COLOR = '#cccccc';
   templateUrl: './time-series-chart.component.html',
   styleUrls: ['./time-series-chart.component.scss'],
   providers: [TooltipPlugin],
+  encapsulation: ViewEncapsulation.None,
   standalone: true,
   imports: [COMMON_IMPORTS],
 })
@@ -39,6 +40,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
 
   private readonly HEADER_HEIGHT = 27;
   private readonly LEGEND_HEIGHT = 24;
+
   chartMetadata: Record<string, any>[] = [[]]; // 1 on 1 to chart 'data'. first item is time axes
   @ViewChild('chart', { static: true }) private chartElement!: ElementRef;
 
@@ -46,6 +48,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
   @Input() settings!: TSChartSettings;
   @Input() syncKey: string | undefined; // all the charts with the same syncKey in the app will be synced
   @Input() height: number = 300;
+  @Input() legendMarker: MarkerType = MarkerType.SQUARE;
 
   @Output() zoomReset = new EventEmitter<void>();
   @Output() zoomChange = new EventEmitter<TimeRange>(); // warning! this event will be emitted by all charts synchronized.

@@ -9,7 +9,7 @@ import {
 import { filter, switchMap } from 'rxjs';
 import { Router } from '@angular/router';
 
-const ROOT_URL = '/root/parameters';
+const ROOT_URL = '/parameters';
 
 @Injectable()
 export class ParameterListLogicService {

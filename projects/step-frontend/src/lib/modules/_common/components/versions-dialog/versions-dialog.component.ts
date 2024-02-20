@@ -15,7 +15,7 @@ enum VersionDialogTabs {
 export class VersionsDialogComponent {
   private _controllerService = inject(ControllerService);
 
-  readonly tabs: Tab[] = [
+  readonly tabs: Tab<VersionDialogTabs>[] = [
     {
       id: VersionDialogTabs.FE,
       label: 'FrontEnd',
@@ -39,7 +39,7 @@ export class VersionsDialogComponent {
           stepEnterpriseController,
           stepControllerBackend,
           ...Object.keys(versions).sort((a, b) => a.localeCompare(b)),
-        ])
+        ]),
       );
       const keyValuePairs: KeyValuePair<string, string>[] = orderedKeys.map((key) => ({
         key,
@@ -48,6 +48,6 @@ export class VersionsDialogComponent {
 
       return keyValuePairs;
     }),
-    shareReplay(1)
+    shareReplay(1),
   );
 }

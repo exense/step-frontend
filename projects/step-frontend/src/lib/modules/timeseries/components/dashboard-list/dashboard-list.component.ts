@@ -36,7 +36,7 @@ export class DashboardListComponent implements DialogParentService {
     actions: '',
   });
 
-  readonly returnParentUrl = '/root/dashboards';
+  readonly returnParentUrl = '/dashboards';
 
   dialogSuccessfullyClosed(): void {
     this.dataSource.reload();

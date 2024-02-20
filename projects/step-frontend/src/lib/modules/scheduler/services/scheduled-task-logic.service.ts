@@ -17,7 +17,7 @@ import { map, Observable, of, pipe, switchMap, take, tap } from 'rxjs';
 import { Router } from '@angular/router';
 
 const TASK_ID = 'taskId';
-const ROOT_URL = '/root/scheduler';
+const ROOT_URL = '/scheduler';
 
 @Injectable()
 export class ScheduledTaskLogicService implements SchedulerActionsService, DialogParentService {
@@ -55,7 +55,7 @@ export class ScheduledTaskLogicService implements SchedulerActionsService, Dialo
 
   executeTask(scheduledTask: ExecutiontTaskParameters) {
     this._schedulerService.executeTask(scheduledTask.id!).subscribe((executionId) => {
-      this._router.navigate(['root', 'executions', executionId]);
+      this._router.navigate(['executions', executionId]);
     });
   }
 
@@ -92,9 +92,9 @@ export class ScheduledTaskLogicService implements SchedulerActionsService, Dialo
 
   navToSettings() {
     if (this._authService.hasRight('admin-ui-menu') && this._authService.isAuthenticated()) {
-      this._router.navigate(['root', 'admin', 'controller', 'scheduler']);
+      this._router.navigate(['admin', 'controller', 'scheduler']);
     } else {
-      this._router.navigate(['root', 'settings', 'scheduler']);
+      this._router.navigate(['settings', 'scheduler']);
     }
   }
 

@@ -36,7 +36,8 @@ export class PlanTreeComponent implements TreeActionsService {
   readonly _planEditService = inject(PlanEditorService);
   readonly _planInteractiveSession? = inject(PlanInteractiveSessionService, { optional: true });
 
-  readonly selectedArtefact$ = this._treeState.selectedNode$.pipe(map((node) => node?.originalArtefact));
+  readonly selectedNode$ = this._treeState.selectedNode$;
+  readonly selectedArtefact$ = this.selectedNode$.pipe(map((node) => node?.originalArtefact));
   @Input() isReadonly: boolean = false;
 
   @ViewChild('area') splitAreaElementRef?: ElementRef<HTMLElement>;

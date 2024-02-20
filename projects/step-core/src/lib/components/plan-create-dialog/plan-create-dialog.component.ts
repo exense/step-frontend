@@ -40,7 +40,7 @@ export class PlanCreateDialogComponent {
       )
       .subscribe((plan) => {
         if (editAfterSave) {
-          this._router.navigate(['root', 'plans', 'editor', plan.id]);
+          this._router.navigate(['plans', 'editor', plan.id]);
         }
         this._matDialogRef.close({ isSuccess: !!plan, canNavigateBack: !editAfterSave });
       });

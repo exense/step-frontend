@@ -1,21 +1,23 @@
 <div class="actions-container">
   <button mat-icon-button matTooltip="Table Settings" [matMenuTriggerFor]="settingsMenu">
-    <step-icon name="settings"></step-icon>
+    <step-icon name="settings" />
   </button>
   <mat-menu #settingsMenu="matMenu">
     <button mat-menu-item [matMenuTriggerFor]="columnsMenu">Columns</button>
   </mat-menu>
   <mat-menu #columnsMenu="matMenu">
-    <button
-      mat-menu-item
-      *ngFor="let column of columns"
-      (click)="column.isVisible = !column.isVisible; prepareVisibleColumns(); $event.stopPropagation()"
-    >
-      <div class="flex flex-row" style="gap: 12px; align-items: center">
-        <input type="checkbox" class="checkbox" [ngModel]="column.isVisible" />
-        <span>{{ column.label }}</span>
-      </div>
-    </button>
+    @for (column of columns; track column.id) {
+      <button
+        mat-menu-item
+        (click)="column.isVisible = !column.isVisible; prepareVisibleColumns(); $event.stopPropagation()"
+      >
+        <div class="flex flex-row" style="gap: 12px; align-items: center">
+          <mat-checkbox color="primary" [ngModel]="column.isVisible">
+            <span>{{ column.label }}</span>
+          </mat-checkbox>
+        </div>
+      </button>
+    }
   </mat-menu>
 </div>
 
@@ -29,26 +31,23 @@
   >
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
-        <input
-          type="checkbox"
-          class="checkbox"
+        <mat-checkbox
+          color="primary"
           (click)="$event.stopPropagation()"
-          [(ngModel)]="allSeriesChecked"
-          (change)="onAllSeriesCheckboxClick($event)"
-        />
-        <span>Name</span>
+          [ngModel]="allSeriesChecked"
+          (ngModelChange)="onAllSeriesCheckboxClick()"
+        >
+          <span>Name</span>
+        </mat-checkbox>
       </th>
       <td mat-cell *matCellDef="let element">
         <div class="color-cell">
-          <input
-            style="margin: unset; margin-right: 6px"
-            type="checkbox"
-            [(ngModel)]="element.isSelected"
-            class="checkbox"
-            (change)="onKeywordToggle(element)"
-          />
-          <span class="color-square" [style.background-color]="element.color"></span>
-          <span>{{ element.name }}</span>
+          <mat-checkbox color="primary" [ngModel]="element.isSelected" (ngModelChange)="onKeywordToggle(element)">
+            <div class="element-name">
+              <span>{{ element.name }}</span>
+              <step-marker [color]="element.color" [markerType]="MarkerType.DOTS" />
+            </div>
+          </mat-checkbox>
         </div>
       </td>
     </ng-container>

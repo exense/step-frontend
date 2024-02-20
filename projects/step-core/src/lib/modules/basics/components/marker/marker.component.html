@@ -1,0 +1,13 @@
+@switch (markerType) {
+  @case (MarkerType.SQUARE) {
+    <div class="color-square" [style.--item-color]="color"></div>
+  }
+  @case (MarkerType.DOTS) {
+    <div class="color-dots" [style.--item-color]="color">
+      <div class="dot-left"></div>
+      <div class="dot-line"></div>
+      <div class="dot-right"></div>
+    </div>
+  }
+  @default {}
+}

@@ -13,7 +13,7 @@ import {
 } from '@exense/step-core';
 import { Router } from '@angular/router';
 
-const URL = '/root/resources';
+const URL = '/resources';
 
 @Component({
   selector: 'step-resources-list',
