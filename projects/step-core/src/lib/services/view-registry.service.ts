@@ -104,7 +104,7 @@ export class ViewRegistryService implements OnDestroy {
       {
         weight: 10,
         parentId: 'support-root',
-      }
+      },
     );
     this.registerMenuEntry('REST API', this._viewIdLinkPrefix.concat('doc/rest/'), 'compass', {
       weight: 20,
@@ -176,7 +176,7 @@ export class ViewRegistryService implements OnDestroy {
   }
 
   private getRootRoute(): Route {
-    return this._router.config[0]!.children!.find((route) => route.path === 'root')!;
+    return this._router.config[0]!.children!.find((route) => route.path === '')!;
   }
 
   private getRouteParentChildren(parentPath: string): Routes {
@@ -271,7 +271,7 @@ export class ViewRegistryService implements OnDestroy {
   registerViewWithConfig(
     viewId: string,
     template: string,
-    config: { isPublicView?: boolean; isStaticView?: boolean }
+    config: { isPublicView?: boolean; isStaticView?: boolean },
   ): void {
     const isPublicView = config.isPublicView || false;
     const isStaticView = config.isStaticView || false;
@@ -336,7 +336,7 @@ export class ViewRegistryService implements OnDestroy {
     template: string,
     id: string,
     position: number,
-    isEnabledFct: () => boolean
+    isEnabledFct: () => boolean,
   ): void {
     this.getDashlets(path).splice(position, 0, {
       label: label,

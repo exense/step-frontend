@@ -9,6 +9,12 @@
   box-sizing: border-box;
 }
 
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 1.8rem;
+}
+
 .header-buttons {
   display: flex;
   margin-bottom: 0.8rem;

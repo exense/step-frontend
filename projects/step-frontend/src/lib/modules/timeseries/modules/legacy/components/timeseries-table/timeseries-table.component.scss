@@ -1,9 +1,25 @@
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
 
 step-timeseries-table {
   .actions-container {
     margin-left: 12px;
     text-align: right;
+
+    button {
+      width: 2rem !important;
+      height: 2rem !important;
+      @include core.step-icon(1.6rem);
+      step-icon {
+        display: flex !important;
+      }
+    }
+  }
+
+  .element-name {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
   }
 
   .color-cell {

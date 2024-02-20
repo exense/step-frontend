@@ -1,4 +1,6 @@
+@use 'projects/step-core/styles/core-variables' as var;
 @use 'projects/step-core/styles/core-mixins' as core;
+@use 'sass:map';
 
 step-execution-list {
   @include core.table-container;
@@ -28,5 +30,41 @@ step-execution-list {
   th step-input-filter step-form-field .form-field-content input,
   th step-array-filter step-form-field .form-field-content mat-select {
     width: 8rem !important;
+  }
+
+  td.execution-time-cell {
+    width: 0;
+  }
+
+  .execution-time {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    white-space: nowrap;
+    margin-right: 0.5rem;
+  }
+
+  .duration {
+    color: var.$white;
+    background-color: map.get(var.$statuses, 'ENDED');
+    border-radius: 0.8rem;
+    min-width: 5rem;
+    padding: 0.3rem 1rem;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+  }
+}
+
+step-popover-content > .execution-duration-description {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 0.5rem;
+
+  & > div:nth-child(2n - 1) {
+    font-weight: 500;
   }
 }

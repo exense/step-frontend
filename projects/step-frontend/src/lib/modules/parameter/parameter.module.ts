@@ -1,5 +1,15 @@
-import { NgModule } from '@angular/core';
-import { CustomCellRegistryService, EntityRegistry, StepCoreModule, ViewRegistryService } from '@exense/step-core';
+import { inject, NgModule } from '@angular/core';
+import {
+  AugmentedParametersService,
+  CustomCellRegistryService,
+  dialogRoute,
+  EntityRegistry,
+  ExportDialogComponent,
+  ImportDialogComponent,
+  SimpleOutletComponent,
+  StepCoreModule,
+  ViewRegistryService,
+} from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { ParameterScopeComponent } from './components/parameter-scope/parameter-scope.component';
 import './components/parameter-selection/parameter-selection.component';
@@ -9,6 +19,7 @@ import { ParametersListComponent } from './components/parameters-list/parameters
 import { ParameterLastModificationComponent } from './components/parameter-last-modification/parameter-last-modification.component';
 import { ParameterEditDialogComponent } from './components/parameter-edit-dialog/parameter-edit-dialog.component';
 import { ParametersBulkOperationsRegisterService } from './services/parameters-bulk-operations-register.service';
+import { ActivatedRouteSnapshot } from '@angular/router';
 
 @NgModule({
   imports: [StepCoreModule, StepCommonModule],
@@ -27,7 +38,7 @@ export class ParameterModule {
     _entityRegistry: EntityRegistry,
     _cellRegister: CustomCellRegistryService,
     _parametersRegister: ParametersBulkOperationsRegisterService,
-    _vewRegistry: ViewRegistryService
+    _vewRegistry: ViewRegistryService,
   ) {
     _entityRegistry.register('parameters', 'Parameters', {
       icon: 'list',
@@ -40,6 +51,54 @@ export class ParameterModule {
     _vewRegistry.registerRoute({
       path: 'parameters',
       component: ParametersListComponent,
+      children: [
+        {
+          path: 'editor',
+          component: SimpleOutletComponent,
+          children: [
+            dialogRoute({
+              path: '',
+              dialogComponent: ParameterEditDialogComponent,
+              resolve: {
+                entity: () => inject(AugmentedParametersService).newParameter(),
+              },
+              data: {
+                isNew: true,
+              },
+            }),
+            dialogRoute({
+              path: ':id',
+              dialogComponent: ParameterEditDialogComponent,
+              resolve: {
+                entity: (route: ActivatedRouteSnapshot) =>
+                  inject(AugmentedParametersService).getParameterById(route.params['id']),
+              },
+              data: {
+                isNew: false,
+              },
+            }),
+          ],
+        },
+        dialogRoute({
+          path: 'import',
+          dialogComponent: ImportDialogComponent,
+          data: {
+            title: 'Parameters import',
+            entity: 'parameters',
+            overwrite: false,
+            importAll: false,
+          },
+        }),
+        dialogRoute({
+          path: 'export',
+          dialogComponent: ExportDialogComponent,
+          data: {
+            title: 'Parameters export',
+            entity: 'parameters',
+            filename: 'allParameters.sta',
+          },
+        }),
+      ],
     });
   }
 }

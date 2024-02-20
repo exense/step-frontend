@@ -9,8 +9,9 @@ import {
   Plan,
 } from '../../client/step-client-module';
 import { CronEditorTab, CronService } from '../../modules/cron/cron.module';
+import { DialogRouteResult } from '../../modules/basics/shared/dialog-route-result';
 
-type EditDialogRef = MatDialogRef<EditSchedulerTaskDialogComponent, ExecutiontTaskParameters>;
+type EditDialogRef = MatDialogRef<EditSchedulerTaskDialogComponent, DialogRouteResult>;
 
 export interface EditSchedulerTaskDialogConfig {
   disablePlan?: boolean;
@@ -19,8 +20,10 @@ export interface EditSchedulerTaskDialogConfig {
 }
 
 export interface EditSchedulerTaskDialogData {
-  task: ExecutiontTaskParameters;
-  config?: EditSchedulerTaskDialogConfig;
+  taskAndConfig: {
+    task: ExecutiontTaskParameters;
+    config?: EditSchedulerTaskDialogConfig;
+  };
 }
 
 @Component({
@@ -39,8 +42,8 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
   private _matDialogRef = inject<EditDialogRef>(MatDialogRef);
   private _dialogData = inject<EditSchedulerTaskDialogData>(MAT_DIALOG_DATA);
 
-  protected task = this._dialogData.task;
-  protected config = this._dialogData.config;
+  protected task = this._dialogData.taskAndConfig.task;
+  protected config = this._dialogData.taskAndConfig.config;
 
   protected plan?: Partial<Plan>;
 
@@ -65,7 +68,7 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
       return;
     }
     this._api.saveExecutionTask(this.task).subscribe({
-      next: (task) => this._matDialogRef.close(task),
+      next: (task) => this._matDialogRef.close({ isSuccess: !!task }),
       error: () => {
         this.error = 'Invalid CRON expression or server error.';
       },

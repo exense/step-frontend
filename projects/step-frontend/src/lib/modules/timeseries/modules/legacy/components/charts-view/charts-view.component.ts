@@ -4,6 +4,7 @@ import {
   BucketAttributes,
   Execution,
   FetchBucketsRequest,
+  MarkerType,
   TimeRange,
   TimeSeriesAPIResponse,
   TimeSeriesService,
@@ -142,6 +143,8 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   compareModeEnabled: boolean = false;
   compareModeContext: TimeSeriesContext | undefined;
 
+  readonly MarkerType = MarkerType;
+
   valueAscOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => {
     return a.key.localeCompare(b.key);
   };
@@ -188,11 +191,11 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
                 updateRanger: false,
                 updateCharts: true,
                 showLoadingBar: true,
-              })
+              }),
             );
           }
           return forkJoin(chartsUpdates$);
-        })
+        }),
       )
       .subscribe();
 
@@ -243,9 +246,9 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       .onTimeSelectionChange()
       .pipe(
         switchMap((newRange) =>
-          compareCharts ? this.handleCompareSelectionChange(newRange) : this.handleSelectionChange(newRange)
+          compareCharts ? this.handleCompareSelectionChange(newRange) : this.handleSelectionChange(newRange),
         ),
-        takeUntil(compareCharts ? this.compareTerminator$ : this.terminator$)
+        takeUntil(compareCharts ? this.compareTerminator$ : this.terminator$),
       )
       .subscribe();
   }
@@ -275,7 +278,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       tap(() => {
         this.chartsAreLoading = false;
         this.context.setInProgress(false);
-      })
+      }),
     );
   }
 
@@ -305,7 +308,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       tap(() => {
         this.compareChartsAreLoading = false;
         this.compareModeContext?.setInProgress(false);
-      })
+      }),
     );
   }
 
@@ -476,7 +479,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
       type,
       request,
       response,
-      this.context.keywordsContext.colorsPool
+      this.context.keywordsContext.colorsPool,
     );
     if (compareChart) {
       this.compareChartsSettings[type] = newChartSettings;
@@ -557,7 +560,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
         } else {
           this.tableChart.updateData(response);
         }
-      })
+      }),
     );
   }
 
@@ -592,7 +595,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     return this.timeSeriesService.getMeasurements(request).pipe(
       tap((response) => {
         this.tableChart.updateCompareData(response, context);
-      })
+      }),
     );
   }
 
@@ -644,7 +647,8 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
         const responseTimeMetric = this.compareModeEnabled
           ? this.selectedCompareResponseTimeMetric
           : this.selectedResponseTimeMetric;
-        response.matrixKeys.map((key, i) => {
+
+        response.matrixKeys.forEach((key, i) => {
           const seriesKey = this.getSeriesKey(key, groupDimensions);
           const responseTimeData: (number | null | undefined)[] = [];
           const color = this.keywordsService.getColor(seriesKey);
@@ -676,11 +680,19 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
             metadata: metadata,
             value: (x, v) => Math.trunc(v),
             stroke: color,
+            width: 2,
             points: { show: false },
           } as TSChartSeries;
-          throughputSeries.push({ ...series, data: throughputData });
-          responseTimeSeries.push({ ...series, data: responseTimeData });
-          return series;
+
+          throughputSeries.push({
+            ...series,
+            data: throughputData,
+          });
+          responseTimeSeries.push({
+            ...series,
+            data: responseTimeData,
+            points: { show: true, fill: color },
+          });
         });
 
         const throughputChartSettings: TSChartSettings = {
@@ -700,8 +712,12 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
               id: 'total',
               data: totalThroughput,
               value: (x, v: number) => Math.trunc(v) + ' total',
-              fill: (self: uPlot) => this._uPlotUtils.gradientFill(self, TimeSeriesConfig.TOTAL_BARS_COLOR),
-              paths: this._chartsGenerator.barsFunction({ size: [0.9, 100] }),
+              fill: (self: uPlot) =>
+                this._uPlotUtils.multiColorsGradientFill(self, [
+                  { offset: 0, color: TimeSeriesConfig.OVERVIEW_COLORS[0] },
+                  { offset: 1, color: TimeSeriesConfig.OVERVIEW_COLORS[1] },
+                ]),
+              paths: this._chartsGenerator.barsFunction({ size: [0.5, 100], radius: 0.2 }),
               points: { show: false },
             },
             ...throughputSeries,
@@ -714,7 +730,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
                 vals.map((v) =>
                   this.compareModeEnabled
                     ? this.selectedCompareThroughputMetric.labelFunction(v)
-                    : this.selectedThroughputMetric.labelFunction(v)
+                    : this.selectedThroughputMetric.labelFunction(v),
                 ),
             },
             {
@@ -725,7 +741,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
                 vals.map((v) =>
                   this.compareModeEnabled
                     ? this.selectedCompareThroughputMetric.labelFunction(v)
-                    : this.selectedThroughputMetric.labelFunction(v)
+                    : this.selectedThroughputMetric.labelFunction(v),
                 ),
               grid: { show: false },
             },
@@ -756,7 +772,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
           this.currentChartsSettings[TsChartType.RESPONSE_TIME] = responseTimeSettings;
           this.currentChartsSettings[TsChartType.THROUGHPUT] = throughputChartSettings;
         }
-      })
+      }),
     );
   }
 
@@ -784,7 +800,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   private switchResponseTimeMetric(
     chart: TimeSeriesChartComponent,
     apiResponse: TimeSeriesAPIResponse,
-    metric: ResponseTimeMetric
+    metric: ResponseTimeMetric,
   ) {
     chart.setTitle(TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${metric.label})`);
     const data = chart.getData();
@@ -797,7 +813,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
   private switchThroughputMetric(
     chart: TimeSeriesChartComponent,
     apiResponse: TimeSeriesAPIResponse,
-    metric: ThroughputMetric
+    metric: ThroughputMetric,
   ): void {
     chart.settings.tooltipOptions.zAxisLabel = metric.tooltipZAxisLabel;
     chart.legendSettings.zAxisLabel = metric.tooltipZAxisLabel;

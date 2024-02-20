@@ -126,7 +126,7 @@ export class ChartDashletComponent implements OnInit {
         ...filterItems,
         ...FilterUtils.combineGlobalWithChartFilters(
           this.context.getFilteringSettings().filterItems,
-          this.item.chartSettings!.filters
+          this.item.chartSettings!.filters,
         ),
       ];
     }
@@ -203,7 +203,7 @@ export class ChartDashletComponent implements OnInit {
             series,
             i,
             (ids) => this._timeSeriesUtilityService.getExecutionByIds(ids),
-            (e: Execution) => e.description!
+            (e: Execution) => e.description!,
           );
           break;
         case 'plan':
@@ -211,7 +211,7 @@ export class ChartDashletComponent implements OnInit {
             series,
             i,
             (ids) => this._timeSeriesUtilityService.getPlansByIds(ids),
-            (plan: Plan) => plan.attributes?.['name']
+            (plan: Plan) => plan.attributes?.['name'],
           );
           break;
         case 'task':
@@ -219,7 +219,7 @@ export class ChartDashletComponent implements OnInit {
             series,
             i,
             (ids) => this._timeSeriesUtilityService.getTasksByIds(ids),
-            (task: ExecutiontTaskParameters) => task.attributes?.['name']
+            (task: ExecutiontTaskParameters) => task.attributes?.['name'],
           );
           break;
       }
@@ -240,7 +240,7 @@ export class ChartDashletComponent implements OnInit {
     return this._timeSeriesService.getTimeSeries(request).pipe(
       tap((response) => {
         this.createChart(response);
-      })
+      }),
     );
   }
 
@@ -256,7 +256,7 @@ export class ChartDashletComponent implements OnInit {
     series: TSChartSeries[],
     groupDimensionIndex: number,
     fetchByIds: (ids: string[]) => Observable<T[]>,
-    mapEntityToLabel: (entity: T) => string | undefined
+    mapEntityToLabel: (entity: T) => string | undefined,
   ) {
     const ids: string[] = series.map((s) => s.labelItems[groupDimensionIndex] as string).filter((id) => !!id);
     if (!ids.length) {
@@ -287,7 +287,7 @@ export class ChartDashletComponent implements OnInit {
       },
       (error) => {
         this.handleEntityLoadingFailed(series, groupDimensionIndex);
-      }
+      },
     );
   }
 

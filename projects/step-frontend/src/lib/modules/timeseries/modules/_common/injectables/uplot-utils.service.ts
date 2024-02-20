@@ -20,14 +20,20 @@ export class UPlotUtilsService {
    * @param uPlot
    * @param strokeColor
    */
-  gradientFill(uPlot: uPlot, strokeColor: string) {
+  gradientFill(uPlot: uPlot, strokeColor: string, [offsetStart, offsetEnd]: [number, number] = [0, 1]) {
     if (strokeColor.length > 7) {
       strokeColor = strokeColor.slice(0, 7); // remove existing opacity
     }
-    let canvasHeight = uPlot.ctx.canvas.height;
-    let gradient = uPlot.ctx.createLinearGradient(0, 0, 0, canvasHeight);
-    gradient.addColorStop(0, strokeColor + '80');
-    gradient.addColorStop(1, strokeColor + '10');
+    return this.multiColorsGradientFill(uPlot, [
+      { offset: offsetStart, color: `${strokeColor}80` },
+      { offset: offsetEnd, color: `${strokeColor}10` },
+    ]);
+  }
+
+  multiColorsGradientFill(uPlot: uPlot, steps: { offset: number; color: string }[]): CanvasGradient {
+    const canvasHeight = uPlot.ctx.canvas.height;
+    const gradient = uPlot.ctx.createLinearGradient(0, 0, 0, canvasHeight);
+    steps.forEach(({ offset, color }) => gradient.addColorStop(offset, color));
     return gradient;
   }
 
