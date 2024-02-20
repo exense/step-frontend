@@ -9,10 +9,14 @@ import { extractTime } from '../types/extract-time';
 export class CalendarSingleStrategyService implements CalendarStrategyService<DateTime, Time> {
   private _adapter = inject(DateSingleAdapterService);
 
+  isCurrentSelectionEmpty(currentSelection?: DateTime | null): boolean {
+    return !currentSelection;
+  }
+
   handleDateSelection(
     date: DateTime | undefined | null,
     currentSelection: DateTime,
-    keepTime: boolean
+    keepTime: boolean,
   ): DateTime | undefined | null {
     if (this._adapter.areEqual(date, currentSelection)) {
       return currentSelection;

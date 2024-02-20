@@ -17,10 +17,14 @@ export class CalendarRangeStrategyService implements CalendarStrategyService<Dat
   private lastEndDate: DateTime | null = null;
   private lastEndTime?: Time;
 
+  isCurrentSelectionEmpty(currentSelection?: DateRange | null): boolean {
+    return !currentSelection?.start && !currentSelection?.end;
+  }
+
   handleDateSelection(
     date: DateTime | null | undefined,
     currentSelection: DateRange,
-    keepTime: boolean
+    keepTime: boolean,
   ): DateRange | null | undefined {
     let start = currentSelection?.start;
     let end = this.lastEndDate;
@@ -30,14 +34,17 @@ export class CalendarRangeStrategyService implements CalendarStrategyService<Dat
       if (start && !end) {
         end = start.set(END_RANGE_TIME);
       }
-    } else if (!end && date && this._adapter.compare(date, start) >= 0) {
+    } else if (
+      (!end || this._adapter.compareWithoutTime(start, end) === 0) &&
+      date &&
+      this._adapter.compare(date, start) >= 0
+    ) {
       if (!keepTime) {
         end = date;
         this.lastEndDate = end;
       } else {
         end = date.set(this.lastEndTime ?? END_RANGE_TIME);
         this.lastEndDate = end;
-        this.lastEndTime = undefined;
       }
     } else {
       if (!keepTime || !date) {
@@ -47,7 +54,7 @@ export class CalendarRangeStrategyService implements CalendarStrategyService<Dat
       }
 
       if (start) {
-        end = start.set(END_RANGE_TIME);
+        end = start.set(this.lastEndTime ?? END_RANGE_TIME);
       } else {
         end = null;
       }
@@ -58,11 +65,12 @@ export class CalendarRangeStrategyService implements CalendarStrategyService<Dat
 
   handleTimeSelection(time: TimeRange | undefined | null, currentSelection: DateRange): DateRange | undefined | null {
     if (!time?.start && !time?.end) {
+      this.lastEndTime = undefined;
       return currentSelection;
     }
 
     let start = currentSelection.start;
-    let end = this.lastEndDate;
+    let end = this.lastEndDate ?? currentSelection.end;
 
     let startChanged = false;
     let endChanged = false;
@@ -78,6 +86,9 @@ export class CalendarRangeStrategyService implements CalendarStrategyService<Dat
         this.lastEndDate = end;
         endChanged = true;
       }
+      this.lastEndTime = time.end;
+    } else {
+      this.lastEndTime = undefined;
     }
 
     if (startChanged || endChanged) {

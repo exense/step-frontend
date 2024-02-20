@@ -14,26 +14,34 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { debounceTime, Observable, Subject, take } from 'rxjs';
-import { Execution, OQLVerifyResponse, TimeRange, TimeSeriesService } from '@exense/step-core';
+import {
+  Execution,
+  OQLVerifyResponse,
+  Tab,
+  TimeRange,
+  TimeSeriesFilterItem,
+  TimeSeriesService,
+} from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';
 import {
-  DiscoverDialogData,
+  COMMON_IMPORTS,
   DiscoverComponent,
-  TimeRangePickerSelection,
-  TimeSeriesConfig,
-  OQLBuilder,
+  DiscoverDialogData,
   FilterBarItem,
   FilterBarItemType,
+  FilterUtils,
+  OQLBuilder,
+  TimeRangePickerComponent,
+  TimeRangePickerSelection,
+  TimeSeriesConfig,
+  TimeSeriesContext,
   TsFilteringMode,
   TsFilteringSettings,
-  FilterUtils,
-  TimeSeriesContext,
-  COMMON_IMPORTS,
-  TimeRangePickerComponent,
   TsGroupingComponent,
 } from '../../../_common';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { FilterBarItemComponent, PerformanceViewTimeSelectionComponent } from '../../../filter-bar';
+import { PerformanceViewTimeSelectionComponent } from '../perfomance-view-time-selection/performance-view-time-selection.component';
+import { FilterBarItemComponent } from '../filter-bar-item/filter-bar-item.component';
 
 const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
   if (field.startsWith('attributes.')) {
@@ -43,6 +51,9 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
   }
 };
 
+/**
+ * @deprecated
+ */
 @Component({
   selector: 'step-ts-filter-bar',
   templateUrl: './filter-bar.component.html',
@@ -81,7 +92,23 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   rawMeasurementsModeActive = false;
 
-  oqlModeActive = false;
+  readonly FilterBarItemType = FilterBarItemType;
+
+  readonly modes: Tab<TsFilteringMode>[] = [
+    {
+      id: TsFilteringMode.STANDARD,
+      label: 'Basic',
+    },
+    {
+      id: TsFilteringMode.OQL,
+      label: 'OQL',
+    },
+  ];
+
+  readonly TsFilteringMode = TsFilteringMode;
+
+  activeMode = TsFilteringMode.STANDARD;
+
   oqlValue: string = '';
   invalidOql = false;
 
@@ -115,8 +142,9 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     this.invalidOql = false;
   }
 
-  toggleOQLMode() {
-    if (this.oqlModeActive) {
+  toggleOQLMode(mode: number): void {
+    this.activeMode = mode as TsFilteringMode;
+    if (this.activeMode === TsFilteringMode.OQL) {
       this.oqlValue = FilterUtils.filtersToOQL(
         this.getValidFilters().filter((item) => !item.isHidden),
         TimeSeriesConfig.ATTRIBUTES_PREFIX,
@@ -130,18 +158,15 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     this.timeRangeChange.next({ selection, triggerRefresh: true });
   }
 
-  disableOqlMode() {
-    this.oqlModeActive = false;
-  }
-
   composeAndVerifyFullOql(groupDimensions: string[]): Observable<OQLVerifyResponse> {
     // we fake group dimensions as being filters, to verify altogether
-    const filtersOql = this.oqlModeActive
-      ? this.oqlValue
-      : FilterUtils.filtersToOQL(
-          this.activeFilters.filter(FilterUtils.filterItemIsValid),
-          TimeSeriesConfig.ATTRIBUTES_PREFIX,
-        );
+    const filtersOql =
+      this.activeMode === TsFilteringMode.OQL
+        ? this.oqlValue
+        : FilterUtils.filtersToOQL(
+            this.activeFilters.filter(FilterUtils.filterItemIsValid),
+            TimeSeriesConfig.ATTRIBUTES_PREFIX,
+          );
     let groupingItems: FilterBarItem[] = groupDimensions.map((dimension) => ({
       attributeName: dimension,
       type: FilterBarItemType.FREE_TEXT,
@@ -170,7 +195,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   emitFiltersChange() {
     const settings: TsFilteringSettings = {
-      mode: this.oqlModeActive ? TsFilteringMode.OQL : TsFilteringMode.STANDARD,
+      mode: this.activeMode,
       filterItems: this.getValidFilters(),
       oql: this.oqlValue,
     };
@@ -181,7 +206,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     if (this.haveNewGrouping()) {
       this.context.updateGrouping(this.activeGrouping);
     }
-    if (!this.oqlModeActive) {
+    if (this.activeMode === TsFilteringMode.STANDARD) {
       this.emitFiltersChange();
     } else {
       // oql mode
@@ -334,9 +359,5 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.emitFilterChange$.complete();
-  }
-
-  get FilterBarItemType() {
-    return FilterBarItemType;
   }
 }

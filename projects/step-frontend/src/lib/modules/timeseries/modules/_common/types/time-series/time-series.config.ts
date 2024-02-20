@@ -1,16 +1,17 @@
 import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
 
 export class TimeSeriesConfig {
-  public static readonly MAX_BUCKETS_IN_CHART = 100;
-  public static TRAILING_ZERO_PATTERN = /\.0+$|(\.[0-9]*[1-9])0+$/;
+  static readonly MAX_BUCKETS_IN_CHART = 100;
+  static TRAILING_ZERO_PATTERN = /\.0+$|(\.[0-9]*[1-9])0+$/;
   static readonly ONE_HOUR_MS = 3600 * 1000;
 
-  public static readonly RESPONSE_TIME_CHART_TITLE = 'Response Times';
+  static readonly RESPONSE_TIME_CHART_TITLE = 'Response Times';
   static readonly STATUS_ATTRIBUTE = 'rnStatus';
   static readonly ATTRIBUTES_PREFIX = 'attributes';
   static readonly TIMESTAMP_ATTRIBUTE = 'begin';
   static readonly CHART_LEGEND_SIZE = 65;
   static readonly TOTAL_BARS_COLOR = '#7689c0';
+  static readonly OVERVIEW_COLORS = ['#80C1E5', '#A4D5F6'];
   static readonly METRIC_TYPE_KEY = 'metricType';
   static readonly METRIC_TYPE_RESPONSE_TIME = 'response-time'; // this is for normal measurements
   static readonly METRIC_TYPE_SAMPLER = 'sampler'; // this is for thread groups measurements
@@ -19,6 +20,12 @@ export class TimeSeriesConfig {
   static readonly PLAN_ID_ATTRIBUTE = 'planId';
   static readonly TASK_ID_ATTRIBUTE = 'taskId';
   static readonly RANGER_FILTER_FIELDS = [this.EXECUTION_ID_ATTRIBUTE, this.PLAN_ID_ATTRIBUTE, this.TASK_ID_ATTRIBUTE];
+  static readonly RANGER_COLORS = {
+    axesStroke: '#bce8f1',
+    seriesStroke: '#d0d5dd',
+    seriesGradientStart: '#eeeeeedd',
+    seriesGradientEnd: '#eeeeee00',
+  };
   static readonly SERIES_LABEL_EMPTY = '<Empty>';
   static readonly SERIES_LABEL_VALUE = 'Value';
 

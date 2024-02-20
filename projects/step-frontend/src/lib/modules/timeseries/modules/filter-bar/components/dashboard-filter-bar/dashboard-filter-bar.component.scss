@@ -1,28 +1,21 @@
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
 
 step-ts-dashboard-filter-bar {
   display: flex;
   flex-direction: column;
-  padding: 1.6rem;
+  padding: 1.6rem 0.1rem;
+  gap: 2.4rem;
 
   .time-container {
     display: flex;
-    justify-content: space-between;
-    flex-direction: row;
+    flex-direction: column;
     margin-top: 1.2rem;
+    gap: 1.6rem;
 
-    .ranger-section {
-      width: calc(100% - 150px);
-
-      &.compact {
-        width: calc(100% - 40px);
-      }
+    step-time-range-picker {
+      align-self: flex-end;
     }
-  }
-
-  .filters-section {
-    padding-top: 1.2rem;
-    border-top: 1px solid var.$gray-200;
   }
 
   .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
@@ -32,13 +25,13 @@ step-ts-dashboard-filter-bar {
 
   .settings-section {
     display: flex;
-    flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    gap: 0.8rem;
   }
 
   .warning {
-    font-size: 1.1rem;
+    font-size: 11px;
     padding: 0.8rem;
   }
 
@@ -53,13 +46,22 @@ step-ts-dashboard-filter-bar {
     flex: 1;
     display: flex;
     flex-wrap: nowrap;
-    gap: 0.8rem;
-    overflow: auto;
-    margin-top: 0.8rem;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.2rem 0;
+
+    &.oql-mode {
+      overflow: unset;
+    }
+
+    &.compact-view {
+      flex-wrap: wrap;
+    }
 
     &::-webkit-scrollbar {
-      width: 0.6rem;
-      height: 0.6rem;
+      width: 6px;
+      height: 6px;
     }
 
     &::-webkit-scrollbar-track {
@@ -71,96 +73,47 @@ step-ts-dashboard-filter-bar {
     }
   }
 
-  .more-btn-container {
-    .more-btn {
-      border: 1px solid var.$gray-200;
-      color: var.$gray-500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 0.6rem 0 1.2rem;
-      cursor: pointer;
-      border-radius: 0.4rem;
-      font-size: 1.2rem;
-      flex-direction: row;
-      min-width: unset;
-      height: 100%;
-      line-height: 3.2rem;
-
-      step-icon {
-        transform: scale(0.6);
-      }
-    }
+  .more-btn {
+    @include core.button-round;
+    min-width: 9rem;
   }
 
   .more-applied-filters {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.6rem;
-    padding: 0 0.8rem;
+    gap: 16px;
+    padding: 0 8px;
   }
 
   /**
   These got override by the theme scss file
    */
   .filers-row button.apply-btn {
-    font-size: 1.2rem;
-    line-height: 2.8rem;
-    margin-right: 1.2rem;
+    font-size: 12px;
+    line-height: 28px;
+    margin-right: 12px;
     font-weight: bold;
-  }
-
-  .oql-container {
-    position: relative;
-    display: flex;
-    flex-grow: 1;
-
-    .oql-input {
-      height: 100%;
-      flex-grow: 1;
-      padding-right: 2.8rem;
-      background: var.$gray-50;
-      border: 1px solid var.$gray-200;
-      border-radius: 2px;
-      color: var.$gray-500;
-      font-size: 1.3rem;
-      padding-left: 0.8rem;
-
-      &:focus-visible {
-        outline: 0;
-      }
-    }
-
-    .invalid-input {
-      border: 1px solid #d70000;
-      color: #d70000;
-    }
-
-    .info-btn {
-      position: absolute;
-      right: 0;
-      top: 0px;
-      width: 2.8rem;
-      height: 2.8rem;
-      cursor: pointer;
-      padding: 0.4rem;
-      font-size: 1.2rem;
-      transform: scale(0.8);
-      opacity: 0.6;
-    }
-  }
-
-  .error-info {
-    position: absolute;
-    top: -15px;
-    right: 0;
-    color: white;
-    background: #d70000;
-    padding: 0 1rem;
-    font-size: 1.2rem;
+    white-space: nowrap;
   }
 
   .grouping-container {
-    margin-right: 0.6rem;
+    margin-right: 6px;
+  }
+
+  step-tabs.tab-mode-buttons.shrink {
+    nav.mat-mdc-tab-nav-bar {
+      border-bottom: none !important;
+      .mat-mdc-tab-links {
+        padding: 0.2rem;
+      }
+      .mat-mdc-tab-list {
+        margin: 0 !important;
+      }
+      a.mdc-tab {
+        height: 3.6rem !important;
+        min-width: 4rem !important;
+        margin: 0 !important;
+      }
+    }
   }
 }

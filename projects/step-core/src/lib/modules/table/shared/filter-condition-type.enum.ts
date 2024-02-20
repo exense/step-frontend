@@ -8,4 +8,5 @@ export enum FilterConditionType {
   SINGLE_DATE,
   BOOLEAN,
   DATE_RANGE,
+  ARRAY,
 }
