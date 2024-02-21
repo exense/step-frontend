@@ -24,7 +24,8 @@ export class BookmarkCreateDialogComponent implements OnInit {
 
   ngOnInit(): void {
     const tenant = this.route.snapshot.queryParams['tenant'];
-    const link = this.router.url.slice(6).split('?')[0];
+    const slashIndex = this.router.url.indexOf('/');
+    const link = this.router.url.slice(slashIndex + 1).split('?')[0];
     const initBookmark = this.getIconAndPage(link);
     this.bookmark = {
       label: '',
