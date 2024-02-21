@@ -17,6 +17,7 @@ import {
 import { BehaviorSubject, filter, first, map, merge, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
 import { CopyBufferService } from '../../injectables/copy-buffer.service';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 const MESSAGE_ADD_AT_MULTIPLE_NODES =
   'Adding elements is not supported when more then one node is selected in the tree';
@@ -24,7 +25,7 @@ const MESSAGE_ADD_AT_MULTIPLE_NODES =
 @Component({
   selector: 'step-plan-common-tree-editor-form',
   templateUrl: './plan-common-tree-editor-form.component.html',
-  styleUrls: ['./plan-common-tree-editor-form.component.scss'],
+  styleUrl: './plan-common-tree-editor-form.component.scss',
 })
 export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanEditorStrategy, OnInit, OnDestroy {
   private _planEditor = inject(PlanEditorService);
@@ -40,6 +41,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
   private terminator$ = new Subject<void>();
   private planChange$ = new Subject<Plan>();
 
+  private selectedNode$ = toObservable(this._treeState.selectedNode);
   private planInternal$ = new BehaviorSubject<Plan | undefined>(undefined);
 
   get plan(): Plan | undefined {
@@ -274,7 +276,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
       )
       .subscribe(({ plan, forceRefresh }) => {
         if (forceRefresh) {
-          this._treeState.selectedNode$.pipe(first()).subscribe((node) => this.init(plan, node?.id));
+          this.selectedNode$.pipe(first()).subscribe((node) => this.init(plan, node?.id));
         }
         if (this.planInternal$.value) {
           this.planInternal$.value.customFields = plan.customFields;

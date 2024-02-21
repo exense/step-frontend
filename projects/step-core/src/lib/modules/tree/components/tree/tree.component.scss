@@ -1,37 +1,56 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
-:host {
-  padding-bottom: 40px;
-}
+step-tree {
+  padding-left: 2.4rem;
+  padding-bottom: 4rem;
 
-cdk-tree-node {
-  display: flex;
-  position: relative;
+  .node-container {
+    display: flex;
+    position: relative;
+    padding-left: calc(var(--level, 0) * 3rem);
 
-  .node-line {
-    position: absolute;
-    top: 0;
-    // level * paddingIdent + level * paddingMultiplier + (24px - 2px) / 2
-    left: calc(var(--level) * 24px + var(--level) * 8px + 11px);
-    border-right: 1px solid var.$gray-100;
-    height: 100%;
+    .node-line {
+      position: absolute;
+      top: 0;
+      left: calc(var(--idx) * 3rem + 1.5rem);
+      border-right: 1px solid var.$gray-100;
+      height: 100%;
+    }
+
+    step-tree-node {
+      flex: 1;
+    }
+
+    section.middle-drop-container {
+      min-height: 3rem;
+      left: calc(var(--idx) * 3rem + 6rem);
+      position: absolute;
+      min-width: 10rem;
+      top: 2rem;
+      z-index: 1;
+      user-select: none;
+      &.dragover {
+        background: var.$gray-800;
+        opacity: 0.2;
+      }
+    }
+
+    step-tree-node.is-drag-in-progress ~ section.middle-drop-container {
+      top: 0.5rem;
+    }
   }
 
-  step-tree-node {
-    flex: 1;
+  .node-context-menu-trigger {
+    visibility: hidden;
+    position: fixed;
   }
-}
 
-.node-context-menu-trigger {
-  visibility: hidden;
-  position: fixed;
-}
+  .tree-action-item {
+    height: 3.2rem;
+    line-height: 3.2rem;
 
-.tree-action-item {
-  height: 3.2rem;
-  line-height: 3.2rem;
-
-  & + mat-divider {
-    margin: 0.7rem 0;
+    & + mat-divider {
+      margin: 0.7rem 0;
+    }
   }
 }

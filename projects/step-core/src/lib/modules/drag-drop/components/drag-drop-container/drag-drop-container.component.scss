@@ -1,0 +1,7 @@
+step-drag-drop-container {
+  .drag-preview,
+  .drag-image-container {
+    position: absolute;
+    transform: translateX(-1000rem);
+  }
+}
