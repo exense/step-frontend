@@ -61,7 +61,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private _route: ActivatedRoute = inject(ActivatedRoute);
   private _router: Router = inject(Router);
   private _authService: AuthService = inject(AuthService);
-  private _urlParamsService: DashboardUrlParamsService = inject(DashboardUrlParamsService);
   private _destroyRef = inject(DestroyRef);
 
   dashboard!: DashboardView;
@@ -90,7 +89,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this._dashboardService.getDashboardById(id).subscribe((dashboard) => {
         this.dashboard = dashboard;
         this.context = this.createContext(this.dashboard);
-        this._urlParamsService.updateUrlParams(this.context);
         this.subscribeForContextChange();
         this.subscribeForTimeRangeChange();
         if (pageParams.editMode && this.hasWritePermission) {
