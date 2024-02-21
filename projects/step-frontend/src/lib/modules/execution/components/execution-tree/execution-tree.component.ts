@@ -8,10 +8,10 @@ import {
   TreeStateService,
 } from '@exense/step-core';
 import {
-  EXECUTION_TREE_PAGE_LIMIT,
-  EXECUTION_TREE_PAGING,
-  ExecutionTreePaging,
-} from '../../services/execution-tree-paging';
+  EXECUTION_TREE_PAGING_SETTINGS,
+  ExecutionTreePagingService,
+  ExecutionTreePagingSetting,
+} from '../../services/execution-tree-paging.service';
 import { ReportTreeNodeUtilsService } from '../../services/report-tree-node-utils.service';
 import { ExecutionTreeAction } from '../../shared/execution-tree-action.enum';
 import { ReportTreeNode } from '../../shared/report-tree-node';
@@ -22,6 +22,7 @@ import { Observable, of } from 'rxjs';
   templateUrl: './execution-tree.component.html',
   styleUrls: ['./execution-tree.component.scss'],
   providers: [
+    ExecutionTreePagingService,
     {
       provide: TreeActionsService,
       useExisting: forwardRef(() => ExecutionTreeComponent),
@@ -33,9 +34,9 @@ export class ExecutionTreeComponent implements TreeActionsService {
   readonly selectedNode$: Observable<ReportTreeNode | undefined> = this._treeState.selectedNode$;
 
   constructor(
-    @Inject(EXECUTION_TREE_PAGING) private _paging: ExecutionTreePaging,
-    private _treeState: TreeStateService<ReportNode, ReportTreeNode>,
-    private _treeUtils: ReportTreeNodeUtilsService
+    @Inject(EXECUTION_TREE_PAGING_SETTINGS) private _paging: ExecutionTreePagingSetting,
+    private _executionTreePagingService: ExecutionTreePagingService,
+    private _treeState: TreeStateService<ReportNode, ReportTreeNode>
   ) {}
 
   handleContextAction(actionId: string, node?: AbstractArtefact): void {
@@ -56,7 +57,7 @@ export class ExecutionTreeComponent implements TreeActionsService {
   getActionsForNode(node: TreeNode): Observable<TreeAction[]> {
     const nodeId = node.id;
     const canPrevious = (this._paging[nodeId]?.skip || 0) > 0;
-    const canNext = (node?.children || []).length >= EXECUTION_TREE_PAGE_LIMIT;
+    const canNext = (node?.children || []).length >= this._executionTreePagingService.getExecutionTreePaging();
     return of([
       {
         id: ExecutionTreeAction.LOAD_PREVIOUS_NODES,
@@ -77,16 +78,16 @@ export class ExecutionTreeComponent implements TreeActionsService {
 
   private pageBefore(nodeId: string): void {
     if (this._paging[nodeId]) {
-      let skip = this._paging[nodeId].skip - EXECUTION_TREE_PAGE_LIMIT;
+      let skip = this._paging[nodeId].skip - this._executionTreePagingService.getExecutionTreePaging();
       skip = skip > 0 ? skip : 0;
       this._paging[nodeId] = { skip };
     }
   }
 
   private pageNext(nodeId: string): void {
-    let skip = EXECUTION_TREE_PAGE_LIMIT;
+    let skip = this._executionTreePagingService.getExecutionTreePaging();
     if (this._paging[nodeId]) {
-      skip = this._paging[nodeId].skip + EXECUTION_TREE_PAGE_LIMIT;
+      skip = this._paging[nodeId].skip + this._executionTreePagingService.getExecutionTreePaging();
     }
     this._paging[nodeId] = { skip };
   }
@@ -94,7 +95,10 @@ export class ExecutionTreeComponent implements TreeActionsService {
   private getPreviousLabel(node: TreeNode): string {
     const nodeId = node.id;
     const currentSkip = this._paging[nodeId]?.skip || 0;
-    const newSkip = currentSkip >= EXECUTION_TREE_PAGE_LIMIT ? currentSkip - EXECUTION_TREE_PAGE_LIMIT : 0;
+    const newSkip =
+      currentSkip >= this._executionTreePagingService.getExecutionTreePaging()
+        ? currentSkip - this._executionTreePagingService.getExecutionTreePaging()
+        : 0;
     return 'Previous Nodes' + (currentSkip > 0 ? ` (${newSkip}..${currentSkip})` : '');
   }
 
@@ -104,8 +108,10 @@ export class ExecutionTreeComponent implements TreeActionsService {
     const childrenLength = (node.children || []).length;
     return (
       'Next Nodes' +
-      (childrenLength >= EXECUTION_TREE_PAGE_LIMIT
-        ? ` (${currentSkip + EXECUTION_TREE_PAGE_LIMIT}..${currentSkip + EXECUTION_TREE_PAGE_LIMIT * 2})`
+      (childrenLength >= this._executionTreePagingService.getExecutionTreePaging()
+        ? ` (${currentSkip + this._executionTreePagingService.getExecutionTreePaging()}..${
+            currentSkip + this._executionTreePagingService.getExecutionTreePaging() * 2
+          })`
         : '')
     );
   }

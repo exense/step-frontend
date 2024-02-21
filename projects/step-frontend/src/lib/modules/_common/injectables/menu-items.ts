@@ -1,5 +1,5 @@
 import { inject, InjectionToken } from '@angular/core';
-import { map, Observable, of, shareReplay, switchMap } from 'rxjs';
+import { map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
 import { MenuEntry, MenuItemsOverrideConfigService, ViewRegistryService } from '@exense/step-core';
 
 export const MENU_ITEMS = new InjectionToken<Observable<MenuEntry[]>>('Menu items', {
