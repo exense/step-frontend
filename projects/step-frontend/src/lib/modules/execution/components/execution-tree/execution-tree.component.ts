@@ -33,7 +33,7 @@ import { toObservable } from '@angular/core/rxjs-interop';
 })
 export class ExecutionTreeComponent implements TreeActionsService {
   private _paging = inject(EXECUTION_TREE_PAGING_SETTINGS);
-  private _executionTreePagingService = inject<TreeStateService<ReportNode, ReportTreeNode>>(ExecutionTreePagingService);
+  private _executionTreePagingService = inject(ExecutionTreePagingService);
   private _treeState = inject<TreeStateService<ReportNode, ReportTreeNode>>(TreeStateService);
   readonly selectedNode$: Observable<ReportTreeNode | undefined> = toObservable(this._treeState.selectedNode);
 
