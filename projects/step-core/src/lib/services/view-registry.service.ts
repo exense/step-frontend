@@ -4,7 +4,6 @@ import { Route, Router, Routes } from '@angular/router';
 import { checkPermissionsGuard } from './check-permissions-guard.service';
 import { VIEW_ID_LINK_PREFIX } from '../modules/basics/services/view-id-link-prefix.token';
 import { BehaviorSubject } from 'rxjs';
-import { Bookmark } from '../shared/Bookmark';
 import { BookmarkService } from './bookmark.service';
 
 export interface CustomView {

@@ -1,4 +1,4 @@
-import { Inject, Injectable, OnInit } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { StorageProxy } from '../modules/basics/shared/storage-proxy';
 import { LOCAL_STORAGE } from '../modules/basics/shared/storage.token';
