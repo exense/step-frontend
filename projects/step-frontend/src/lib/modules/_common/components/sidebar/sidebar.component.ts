@@ -24,7 +24,7 @@ import {
 } from '@exense/step-core';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
 import { MENU_ITEMS } from '../../injectables/menu-items';
-import { Subject, SubscriptionLike, takeUntil } from 'rxjs';
+import { combineLatest, map, Subject, SubscriptionLike, takeUntil } from 'rxjs';
 import { SidebarStateService } from '../../injectables/sidebar-state.service';
 
 const MIDDLE_BUTTON = 1;
@@ -41,6 +41,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _zone = inject(NgZone);
   public _viewStateService = inject(ViewStateService);
   private _matDialog = inject(MatDialog);
+  private _bookmarkService = inject(BookmarkService);
 
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
   @ViewChild('tabs') tabs?: ElementRef<HTMLElement>;
@@ -51,6 +52,9 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _sideBarState = inject(SidebarStateService);
   readonly _menuItems$ = inject(MENU_ITEMS).pipe(takeUntil(this.terminator$));
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
+  readonly displayMenuItems$ = combineLatest([this._menuItems$, this._bookmarkService.getNewMenuEntries()]).pipe(
+    map(([menuItems, dynamicMenuItems]) => menuItems.concat(dynamicMenuItems)),
+  );
 
   readonly isOpened$ = this._sideBarState.isOpened$;
   readonly trackByMenuEntry: TrackByFunction<MenuEntry> = (index, item) => item.id;
@@ -63,7 +67,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this._sideBarState.initialize();
-    this._menuItems$.subscribe(() => {
+    this.displayMenuItems$.subscribe(() => {
       setTimeout(() => {
         // zero timout is used, to create a macrotasks
         // that will be invoked after menu render

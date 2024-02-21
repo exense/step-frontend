@@ -4,7 +4,6 @@ import { Route, Router, Routes } from '@angular/router';
 import { checkPermissionsGuard } from './check-permissions-guard.service';
 import { VIEW_ID_LINK_PREFIX } from '../modules/basics/services/view-id-link-prefix.token';
 import { BehaviorSubject } from 'rxjs';
-import { LOCAL_STORAGE } from '../modules/basics/shared/storage.token';
 import { Bookmark } from '../shared/Bookmark';
 import { BookmarkService } from './bookmark.service';
 
@@ -104,10 +103,6 @@ export class ViewRegistryService implements OnDestroy {
     this.registerMenuEntry('Quota Manager', 'gridquotamanager', 'sidebar', { weight: 50, parentId: 'status-root' });
     // Sub Menus Bookmarks
     this.registerMenuEntry('Manage Bookmarks', 'bookmarks', 'edit', { weight: 1, parentId: 'bookmarks-root' });
-    const bookmarks = this._bookmarkService.getStorageBookmarks();
-    bookmarks.forEach((entry: Bookmark, index: number) => {
-      this.registerMenuEntry(entry.label!, entry.link!, entry.icon!, { weight: ++index, parentId: 'bookmarks-root' });
-    });
     // Sub Menus Support
     this.registerMenuEntry(
       'Documentation',
