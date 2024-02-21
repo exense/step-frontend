@@ -83,7 +83,7 @@ export class BookmarkService extends StorageProxy {
     this.bookmarks$.value?.forEach((element) => {
       menuEntries.push({
         title: element.label!,
-        id: element.page!,
+        id: element.link!,
         icon: element.icon!,
         parentId: 'bookmarks-root',
         weight: 1000 + menuEntries.length,
