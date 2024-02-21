@@ -26,7 +26,6 @@ import { TimeRangePickerSelection, FilterUtils } from '../../modules/_common';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DashboardUrlParamsService } from '../../modules/_common/injectables/dashboard-url-params.service';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -45,7 +44,6 @@ const EDIT_PARAM_NAME = 'edit';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  providers: [DashboardUrlParamsService],
   imports: [COMMON_IMPORTS, DashboardFilterBarComponent, ChartDashletComponent],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
