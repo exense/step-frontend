@@ -4,28 +4,22 @@ import { BehaviorSubject } from 'rxjs';
 
 export type ExecutionTreePagingSetting = Record<string, { skip: number }>;
 
-export const EXECUTION_TREE_PAGING = new InjectionToken<ExecutionTreePagingSetting>('Execution tree paging');
+export const EXECUTION_TREE_PAGING_SETTINGS = new InjectionToken<ExecutionTreePagingSetting>(
+  'Execution tree paging settings'
+);
 
 @Injectable()
-export class ExecutionTreePaging {
+export class ExecutionTreePagingService {
   private _userService = inject(UserService);
   readonly MAX_NODES_DEFAULT = 1000;
-  private _preferencesFetched: boolean = false;
-  private _customPagingSubject: BehaviorSubject<number>;
-
-  constructor() {
-    this._customPagingSubject = new BehaviorSubject<number>(this.MAX_NODES_DEFAULT);
-  }
-
-  get customPaging$() {
-    return this._customPagingSubject.asObservable();
-  }
+  private _preferencesFetched = false;
+  private customPaging$ = new BehaviorSubject<number>(this.MAX_NODES_DEFAULT);
 
   getExecutionTreePaging(): number {
     if (!this._preferencesFetched) {
       this.initCustomPaging();
     }
-    return this._customPagingSubject.value;
+    return this.customPaging$.value;
   }
 
   private initCustomPaging(): void {
@@ -35,7 +29,7 @@ export class ExecutionTreePaging {
         this._preferencesFetched = true;
         _customPaging = preferences?.preferences?.['execution_tree_max_nodes'];
         if (_customPaging !== undefined) {
-          this._customPagingSubject.next(_customPaging);
+          this.customPaging$.next(_customPaging);
         }
       });
     }
