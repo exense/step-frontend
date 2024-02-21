@@ -31,6 +31,7 @@ step-tree-node {
         border-radius: 50%;
         padding: 5px;
         border: 1px solid transparent;
+        z-index: 2;
 
         > step-icon {
           @include core.step-icon-size(12px);
@@ -41,16 +42,18 @@ step-tree-node {
 
     > .no-toggle,
     > .mat-icon-button {
-      width: 24px;
-      height: 24px;
+      width: 2.4rem;
+      height: 2.4rem;
     }
 
     &.skipped {
-      color: var.$muted;
+      color: var.$muted-light;
     }
 
     &.tree-node-selected {
-      font-weight: 500;
+      step-tree-node-name {
+        background: var.$gray-100;
+      }
     }
 
     &.tree-node-hidden {

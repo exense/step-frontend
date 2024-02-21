@@ -32,6 +32,7 @@ export class DatePickerContentComponent {
   private _fieldContainer = inject<DateFieldContainerService<DateTime | DateRange>>(DateFieldContainerService);
   private _calendarStrategy = inject(CalendarStrategyService);
   private adapter = this._fieldContainer.dateAdapter();
+  private predefinedTime?: Time | TimeRange | null;
 
   readonly withTime = this._fieldContainer.withTime();
 
@@ -41,11 +42,19 @@ export class DatePickerContentComponent {
   startAt = this._calendarStrategy.getStartAt(this.model);
 
   handleSelectionChange(date: DateTime | undefined | null): void {
-    const changedModel = this._calendarStrategy.handleDateSelection(date, this.model, this.withTime);
+    let changedModel = this._calendarStrategy.handleDateSelection(date, this.model, this.withTime);
+    if (this.predefinedTime) {
+      changedModel = this._calendarStrategy.handleTimeSelection(this.predefinedTime, changedModel);
+      this.predefinedTime = undefined;
+    }
     this.updateModel(changedModel);
   }
 
   handleTimeChange(time: Time | TimeRange | undefined | null): void {
+    if (this._calendarStrategy.isCurrentSelectionEmpty(this.model)) {
+      this.predefinedTime = time;
+      return;
+    }
     const changedModel = this._calendarStrategy.handleTimeSelection(time, this.model);
     this.updateModel(changedModel);
   }
