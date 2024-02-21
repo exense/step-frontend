@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BookmarkService } from '../../services/bookmark.service';
 import { getIconAndPageById } from '../../shared';
 import { NgForm } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'step-bookmark-create-dialog',
@@ -16,6 +16,7 @@ export class BookmarkCreateDialogComponent implements OnInit {
   private bookmarkService = inject(BookmarkService);
   private _matDialogRef = inject(MatDialogRef);
   private route = inject(ActivatedRoute);
+  private data = inject(MAT_DIALOG_DATA);
 
   protected bookmark: Partial<Bookmark> = {};
 
@@ -34,6 +35,9 @@ export class BookmarkCreateDialogComponent implements OnInit {
       tenant,
       icon: initBookmark?.icon,
     };
+    if (this.data) {
+      this.bookmark.label = this.data;
+    }
   }
 
   @HostListener('keydown.enter')
@@ -42,7 +46,11 @@ export class BookmarkCreateDialogComponent implements OnInit {
       this.form.control.markAllAsTouched();
       return;
     }
-    this.bookmarkService.createBookmark(this.bookmark);
+    if (this.data) {
+      this.bookmarkService.renameBookmark(this.data, this.bookmark.label!);
+    } else {
+      this.bookmarkService.createBookmark(this.bookmark);
+    }
     this._matDialogRef.close();
   }
 

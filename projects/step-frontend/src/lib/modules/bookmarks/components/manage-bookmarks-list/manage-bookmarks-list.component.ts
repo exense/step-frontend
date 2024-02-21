@@ -3,12 +3,14 @@ import { COMMON_IMPORTS } from '../../../timeseries/modules/_common';
 import {
   AugmentedBookmarksService,
   Bookmark,
+  BookmarkCreateDialogComponent,
   BookmarkService,
   DialogsService,
   StepDataSource,
   ViewRegistryService,
 } from '@exense/step-core';
 import { of, switchMap, take } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'step-manage-bookmarks-list-page',
@@ -20,21 +22,16 @@ import { of, switchMap, take } from 'rxjs';
 export class ManageBookmarksListComponent {
   private _dialogs = inject(DialogsService);
   private _bookmarkService = inject(BookmarkService);
+  private _matDialog = inject(MatDialog);
 
   dataSource: Bookmark[] | undefined | StepDataSource<Bookmark> = inject(AugmentedBookmarksService).createDataSource();
 
   renameBookmark(bookmark: Bookmark): void {
-    this._dialogs
-      .enterValue('New Label', bookmark.label || '')
-      .pipe(
-        switchMap((newLabel) => {
-          return this._bookmarkService.renameBookmark(bookmark.label!, newLabel!);
-        }),
-        take(1),
-      )
-      .subscribe(() => {
-        this.dataSource = this._bookmarkService.getBookmarks();
-      });
+    this._matDialog
+      .open(BookmarkCreateDialogComponent, { data: bookmark.label })
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe(() => (this.dataSource = this._bookmarkService.getBookmarks()));
   }
 
   deleteBookmark(bookmark: Bookmark): any {
