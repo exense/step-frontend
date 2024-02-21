@@ -16,7 +16,7 @@ export class BookmarkCreateDialogComponent implements OnInit {
   private bookmarkService = inject(BookmarkService);
   private _matDialogRef = inject(MatDialogRef);
   private route = inject(ActivatedRoute);
-  private data = inject(MAT_DIALOG_DATA);
+  data = inject(MAT_DIALOG_DATA);
 
   protected bookmark: Partial<Bookmark> = {};
 
