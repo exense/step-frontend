@@ -352,13 +352,11 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     this.filterOptions = this.collectUnusedAttributes();
     this._changeDetectorRef.detectChanges();
     this.filterComponents!.last.openMenu();
-    if (!this.editMode || !item.attributeName) {
-      this.filterComponents!.last.menuTrigger!.menuClosed.pipe(take(1)).subscribe(() => {
-        if (!FilterUtils.filterItemIsValid(item)) {
-          this.removeFilterItem(this._internalFilters.length - 1);
-        }
-      });
-    }
+    this.filterComponents!.last.menuTrigger!.menuClosed.pipe(take(1)).subscribe(() => {
+      if (!item.attributeName || (!this.editMode && !FilterUtils.filterItemIsValid(item))) {
+        this.removeFilterItem(this._internalFilters.length - 1);
+      }
+    });
   }
 
   private haveNewGrouping() {
