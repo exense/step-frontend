@@ -35,8 +35,9 @@ export class ExecutionListComponent implements OnDestroy {
   readonly resultItems$ = of(EXECUTION_RESULT);
   readonly statusItems$ = of(EXECUTION_STATUS);
   readonly runningExecutionsCount$ = this.reloadRunningExecutionsCount$.pipe(
-    switchMap(() => this._augmentedExecutionsService.countExecutionsByStatus(Status.RUNNING))
+    switchMap(() => this._augmentedExecutionsService.countExecutionsByStatus(Status.RUNNING)),
   );
+
   autoRefreshDisabled: boolean = false;
 
   @ViewChild('statusFilter')
@@ -60,7 +61,7 @@ export class ExecutionListComponent implements OnDestroy {
   }
 
   navigateToExecution(id: string): void {
-    this._router.navigate(['root', 'executions', id], { queryParamsHandling: 'preserve' });
+    this._router.navigate(['executions', id], { queryParamsHandling: 'preserve' });
   }
 
   handleRunningStatusClick(): void {

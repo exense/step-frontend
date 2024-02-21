@@ -40,7 +40,7 @@ export class DiscoverComponent implements OnInit {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public _data: DiscoverDialogData,
-    public _matDialogRef: MatDialogRef<DiscoverComponent>
+    public _matDialogRef: MatDialogRef<DiscoverComponent>,
   ) {
     this.oqlFilter = _data.oqlFilter;
   }

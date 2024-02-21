@@ -46,15 +46,15 @@ export class CallFunctionReportNodeComponent implements OnChanges {
       params.end = this.execution.endTime;
     }
     let paramsString = new URLSearchParams(params).toString();
-    const url = `/#/root/analytics?${paramsString}`;
+    const url = `/#/analytics?${paramsString}`;
     window.open(url, '_blank');
   }
 
   private filterChildren(children?: ReportNode[]): void {
     this.displayChildren = (children || []).filter((child) =>
       ([ReportNodeType.ASSERT_REPORT_NODE, ReportNodeType.PERFORMANCE_ASSERT_REPORT_NODE] as string[]).includes(
-        child._class
-      )
+        child._class,
+      ),
     );
   }
 }

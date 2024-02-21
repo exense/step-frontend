@@ -15,8 +15,8 @@ import {
   TimeSeriesContextsFactory,
   COMMON_IMPORTS,
 } from '../../../_common';
-import { FilterBarComponent } from '../filter-bar/filter-bar.component';
 import { PerformanceViewSettings } from '../../types/performance-view-settings';
+import { FilterBarComponent } from '../../../filter-bar';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -74,7 +74,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     // combine contextual filters (from URL) with custom specified filters
     this.filterItems = this.mergeContextualParamsWithActiveFilters(
       this.settings.contextualFilters,
-      this.settings.activeFilters || []
+      this.settings.activeFilters || [],
     );
     this.timeRangeSelection = this.settings.activeTimeRange;
     this.filterOptions = this.prepareFilterOptions(this.filterItems, this.settings);
@@ -93,12 +93,12 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
 
   private mergeContextualParamsWithActiveFilters(
     contextualParams: Partial<Record<string, string>>,
-    activeFilters: FilterBarItem[]
+    activeFilters: FilterBarItem[],
   ) {
     const contextualFilters = Object.keys(contextualParams).map((key) => {
       const fieldType = this.getFilterFieldType(key);
       const isEntityFilter = [FilterBarItemType.PLAN, FilterBarItemType.TASK, FilterBarItemType.EXECUTION].includes(
-        fieldType
+        fieldType,
       );
       const searchValue = contextualParams[key];
       return {
@@ -193,7 +193,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.throttledRefreshTrigger$
       .pipe(
         throttle(() => this.context.inProgressChange().pipe(filter((inProgress) => !inProgress))),
-        takeUntil(this.terminator$)
+        takeUntil(this.terminator$),
       )
       .subscribe(() => {
         // let's calculate the new time range
@@ -223,7 +223,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       // we have an execution
       newTimeRange = TimeSeriesUtils.convertExecutionAndSelectionToTimeRange(
         this.settings.execution!,
-        this.timeRangeSelection
+        this.timeRangeSelection,
       );
     } else {
       newTimeRange = TimeSeriesUtils.convertSelectionToTimeRange(selection);
@@ -235,7 +235,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.compareModeActiveRangeOption = params.selection;
     this.updateCompareChartsFullRange(
       TimeSeriesUtils.convertSelectionToTimeRange(params.selection),
-      params.triggerRefresh
+      params.triggerRefresh,
     );
   }
 
@@ -351,9 +351,9 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       .getMeasurementsAttributes(filtersOql)
       .pipe(
         switchMap((fields) =>
-          this._tableApiService.exportAsCSV('measurements', fields, { filters: [{ oql: filtersOql }] })
+          this._tableApiService.exportAsCSV('measurements', fields, { filters: [{ oql: filtersOql }] }),
         ),
-        tap(() => (this.exportInProgress = false))
+        tap(() => (this.exportInProgress = false)),
       )
       .subscribe();
   }

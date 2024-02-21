@@ -7,7 +7,7 @@ import { CronEditorTab } from '../../types/cron-editor-tab.enum';
 
 type DialogRef = MatDialogRef<CronEditorComponent, string>;
 
-const createTab = (id: CronEditorTab, label: string): Tab => ({ id, label });
+const createTab = (id: CronEditorTab, label: string): Tab<CronEditorTab> => ({ id, label });
 
 const CRON_EDITOR_TAB_LABELS: Record<CronEditorTab, string> = {
   [CronEditorTab.PRESET]: 'Preset',

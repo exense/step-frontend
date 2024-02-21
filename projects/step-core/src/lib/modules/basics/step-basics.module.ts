@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StepMaterialModule } from '../step-material/step-material.module';
 import { ArrayFilterComponent } from './components/array-filter/array-filter.component';
+import { ArrayFilterAdvancedComponent } from './components/array-filter-advanced/array-filter-advanced.component';
 import { HexadecimalInputFilterComponent } from './components/input-filter/hexadecimal-input-filter.component';
 import { InputFilterComponent } from './components/input-filter/input-filter.component';
 import { ResourceLabelComponent } from './components/resource-label/resource-label.component';
@@ -44,12 +45,16 @@ import { TriggerPopoverDirective } from './directives/trigger-popover.directive'
 import { PopoverComponent } from './components/popover/popover.component';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { DescriptionHintComponent } from './components/description-hint/description-hint.component';
+import { DurationPipe } from './pipes/duration.pipe';
+import { DialogRouteComponent } from './components/dialog-route/dialog-route.component';
+import { MarkerComponent } from './components/marker/marker.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
   declarations: [
     ResourceLabelComponent,
     ArrayFilterComponent,
+    ArrayFilterAdvancedComponent,
     InputFilterComponent,
     HasRightPipe,
     HexadecimalInputFilterComponent,
@@ -89,6 +94,9 @@ import { DescriptionHintComponent } from './components/description-hint/descript
     PopoverComponent,
     SafeHtmlPipe,
     DescriptionHintComponent,
+    DurationPipe,
+    DialogRouteComponent,
+    MarkerComponent,
   ],
   exports: [
     CommonModule,
@@ -137,12 +145,17 @@ import { DescriptionHintComponent } from './components/description-hint/descript
     PopoverComponent,
     SafeHtmlPipe,
     DescriptionHintComponent,
+    DurationPipe,
+    DialogRouteComponent,
+    ArrayFilterAdvancedComponent,
+    MarkerComponent,
   ],
 })
 export class StepBasicsModule {}
 
 export * from './components/base-filter/base-filter.component';
 export * from './components/array-filter/array-filter.component';
+export * from './components/array-filter-advanced/array-filter-advanced.component';
 export * from './components/single-item-array-filter/single-item-array-filter.component';
 export * from './components/input-filter/hexadecimal-input-filter.component';
 export * from './components/input-filter/input-filter.component';
@@ -160,6 +173,7 @@ export * from './components/autocomplete-input/autocomplete-input.component';
 export { TimeUnitDictionary } from './components/time-input/base-time-converter.component';
 export * from './components/time-input/time-input.component';
 export * from './components/time-input/per-time-unit-input.component';
+export * from './components/marker/marker.component';
 export * from './components/string-array-input/string-array-input.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
@@ -218,11 +232,17 @@ export * from './directives/item-hover.directive';
 export * from './directives/item-hold.directive';
 export * from './services/item-hover-receiver.service';
 export * from './services/item-hold-receiver.service';
+export * from './services/dialog-parent.service';
 export * from './shared/bulk-operation-type.enum';
 export * from './shared/auth.guards';
+export * from './shared/marker-type.enum';
 export * from './shared/string-array-regex';
+export * from './shared/dialog-route';
+export * from './shared/dialog-route-result';
 export * from './directives/popover-content.directive';
 export * from './directives/trigger-popover.directive';
 export * from './components/popover/popover.component';
 export * from './pipes/safe-html.pipe';
+export * from './pipes/duration.pipe';
 export * from './components/description-hint/description-hint.component';
+export * from './components/dialog-route/dialog-route.component';

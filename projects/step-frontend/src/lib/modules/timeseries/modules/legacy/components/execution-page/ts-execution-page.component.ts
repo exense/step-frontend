@@ -83,7 +83,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
   onTimeRangeChange(selection: TimeRangePickerSelection) {
     this.timeRangeSelection = selection;
     this.dashboard.updateFullRange(
-      TimeSeriesUtils.convertExecutionAndSelectionToTimeRange(this.execution!, this.timeRangeSelection)
+      TimeSeriesUtils.convertExecutionAndSelectionToTimeRange(this.execution!, this.timeRangeSelection),
     );
   }
 

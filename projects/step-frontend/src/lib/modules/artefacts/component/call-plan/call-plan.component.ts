@@ -52,7 +52,7 @@ export class CallPlanComponent extends BaseArtefactComponent<CallPlanArtefact> {
       return;
     }
     from(this._linkProcessor.process(this.planProject))
-      .pipe(map(() => `/root/plans/editor/${this.context.artefact!.planId!}`))
+      .pipe(map(() => `/plans/editor/${this.context.artefact!.planId!}`))
       .subscribe({
         next: (url) => this._router.navigateByUrl(url),
         error: (error) => this._dialogs.showErrorMsg(error).subscribe(),

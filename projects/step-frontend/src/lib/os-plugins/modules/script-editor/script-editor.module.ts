@@ -20,7 +20,7 @@ import { canDeactivateFn } from './functions/can-deactivate-function';
 export class ScriptEditorModule {
   constructor(
     private _viewRegistry: ViewRegistryService,
-    private _functionTypeRegistryService: FunctionTypeRegistryService
+    private _functionTypeRegistryService: FunctionTypeRegistryService,
   ) {
     this.registerViews();
     this.registerFunctionTypes();
@@ -44,7 +44,7 @@ export class ScriptEditorModule {
     this._functionTypeRegistryService.register(
       FunctionType.SCRIPT,
       'Script (Java, JS, Groovy, etc)',
-      FunctionTypeScriptComponent
+      FunctionTypeScriptComponent,
     );
   }
 }

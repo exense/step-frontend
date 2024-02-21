@@ -62,7 +62,9 @@
     }
 
     &:not([class*='mat-elevation-z']) {
-      box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14),
+      box-shadow:
+        0px 0px 0px 0px rgba(0, 0, 0, 0.2),
+        0px 0px 0px 0px rgba(0, 0, 0, 0.14),
         0px 0px 0px 0px rgba(0, 0, 0, 0.12);
     }
   }
@@ -147,6 +149,11 @@
   }
 }
 
+@mixin mat-input {
+  --mat-form-field-state-layer-color: rgba(0, 0, 0, 0);
+  --mdc-filled-text-field-container-color: rgba(0, 0, 0, 0);
+}
+
 @mixin material-overrides($primary-color) {
   @include mat-mdc-accordion;
   @include mat-mdc-card;
@@ -158,4 +165,5 @@
   @include mat-table;
   @include mat-button;
   @include mat-select($primary-color);
+  @include mat-input;
 }

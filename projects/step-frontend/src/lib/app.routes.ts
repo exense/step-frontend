@@ -4,6 +4,8 @@ import { APP_INITIALIZER, FactoryProvider, inject } from '@angular/core';
 import { authGuard, AuthService, DEFAULT_PAGE, nonAuthGuard } from '@exense/step-core';
 import { map, take } from 'rxjs';
 import { MainViewComponent } from './components/main-view/main-view.component';
+import { Location } from '@angular/common';
+import { NotFoundComponent } from './components/not-found/not-found.component';
 
 export const APP_ROUTES: Routes = [
   {
@@ -12,17 +14,12 @@ export const APP_ROUTES: Routes = [
       () =>
         inject(AuthService).initialize$.pipe(
           take(1),
-          map(() => true)
+          map(() => true),
         ),
     ],
     children: [
       {
         path: '',
-        redirectTo: 'root',
-        pathMatch: 'full',
-      },
-      {
-        path: 'root',
         component: MainViewComponent,
         children: [],
         canActivate: [authGuard],
@@ -32,6 +29,11 @@ export const APP_ROUTES: Routes = [
         path: 'login',
         component: LoginComponent,
         canActivate: [nonAuthGuard],
+      },
+      {
+        path: '**',
+        component: NotFoundComponent,
+        canActivate: [authGuard],
       },
     ],
   },
@@ -44,7 +46,7 @@ export const DEFAULT_ROUTE_INITIALIZER: FactoryProvider = {
     const _router = inject(Router);
     const _defaultPage = inject(DEFAULT_PAGE);
     return () => {
-      const root = _router.config[0].children?.find((route) => route.path === 'root');
+      const root = _router.config[0].children?.find((route) => route.path === '');
       if (!root) {
         return true;
       }
@@ -60,6 +62,25 @@ export const DEFAULT_ROUTE_INITIALIZER: FactoryProvider = {
         pathMatch: 'full',
       });
 
+      return true;
+    };
+  },
+};
+
+export const LEGACY_URL_HANDLER: FactoryProvider = {
+  provide: APP_INITIALIZER,
+  multi: true,
+  useFactory: () => {
+    const _location = inject(Location);
+    return () => {
+      let path = _location.path(true);
+      if (path.includes('/root')) {
+        path = path.replace('/root', '');
+        if (!path.startsWith('/')) {
+          path = `/${path}`;
+        }
+        _location.go(path);
+      }
       return true;
     };
   },

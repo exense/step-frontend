@@ -3,7 +3,7 @@ import { DeactivateComponentDataInterface } from '../types/deactivate-component-
 import { Observable } from 'rxjs';
 
 export const canDeactivateFn: CanDeactivateFn<DeactivateComponentDataInterface> = (
-  component: DeactivateComponentDataInterface
+  component: DeactivateComponentDataInterface,
 ): boolean | Observable<boolean> => {
   return component.canExit();
 };
