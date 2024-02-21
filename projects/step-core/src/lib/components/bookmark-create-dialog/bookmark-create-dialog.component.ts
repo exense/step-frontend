@@ -1,8 +1,7 @@
 import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import { Bookmark } from '../../client/generated/models/Bookmark';
+import { Bookmark } from '../../shared/Bookmark';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BookmarkService } from '../../services/bookmark.service';
-import { getIconAndPageById } from '../../shared';
 import { NgForm } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
@@ -57,6 +56,55 @@ export class BookmarkCreateDialogComponent implements OnInit {
   private getIconAndPage(link: string): Bookmark | undefined {
     const firstDashIndex = link.indexOf('/');
     const prefix = link.slice(0, firstDashIndex === -1 ? undefined : firstDashIndex);
-    return getIconAndPageById(prefix);
+    return this.getIconAndPageById(prefix);
   }
+
+  private getIconAndPageById = (id: string): Bookmark | undefined => {
+    switch (id) {
+      case 'functions':
+        return { icon: 'keyword', page: 'Keywords' };
+        break;
+      case 'plans':
+        return { icon: 'plan', page: 'Plans' };
+        break;
+      case 'parameters':
+        return { icon: 'list', page: 'Parameters' };
+        break;
+      case 'scheduler':
+        return { icon: 'clock', page: 'Schedules' };
+        break;
+      case 'dashboards':
+        return { icon: 'bar-chart-square-01', page: 'Analytics' };
+        break;
+      case 'operations':
+        return { icon: 'airplay', page: 'Current Operations' };
+        break;
+      case 'gridagents':
+        return { icon: 'agent', page: 'Agents' };
+        break;
+      case 'gridtokens':
+        return { icon: 'agent-token', page: 'Agent tokens' };
+        break;
+      case 'gridtokengroups':
+        return { icon: 'agent-token-group', page: 'Token Groups' };
+        break;
+      case 'gridquotamanager':
+        return { icon: 'sidebar', page: 'Quota Manager' };
+        break;
+      case 'functionPackages':
+        return { icon: 'package', page: 'Keywords packages' };
+        break;
+      case 'resources':
+        return { icon: 'file-attachment-03', page: 'Resources' };
+        break;
+      case 'automationPackage':
+        return { icon: 'automation', page: 'Automation Packages' };
+        break;
+      case 'executions':
+        return { icon: 'rocket', page: 'Executions' };
+        break;
+      default:
+        return undefined;
+    }
+  };
 }

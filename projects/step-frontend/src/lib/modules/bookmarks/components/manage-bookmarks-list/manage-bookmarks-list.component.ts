@@ -1,13 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { COMMON_IMPORTS } from '../../../timeseries/modules/_common';
 import {
-  AugmentedBookmarksService,
   Bookmark,
   BookmarkCreateDialogComponent,
   BookmarkService,
   DialogsService,
   StepDataSource,
-  ViewRegistryService,
 } from '@exense/step-core';
 import { of, switchMap, take } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
@@ -24,7 +22,7 @@ export class ManageBookmarksListComponent {
   private _bookmarkService = inject(BookmarkService);
   private _matDialog = inject(MatDialog);
 
-  dataSource: Bookmark[] | undefined | StepDataSource<Bookmark> = inject(AugmentedBookmarksService).createDataSource();
+  dataSource: Bookmark[] | undefined | StepDataSource<Bookmark> = this._bookmarkService.createDataSource();
 
   renameBookmark(bookmark: Bookmark): void {
     this._matDialog

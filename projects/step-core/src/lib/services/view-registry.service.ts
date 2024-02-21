@@ -5,7 +5,8 @@ import { checkPermissionsGuard } from './check-permissions-guard.service';
 import { VIEW_ID_LINK_PREFIX } from '../modules/basics/services/view-id-link-prefix.token';
 import { BehaviorSubject } from 'rxjs';
 import { LOCAL_STORAGE } from '../modules/basics/shared/storage.token';
-import { Bookmark } from '../client/generated/models/Bookmark';
+import { Bookmark } from '../shared/Bookmark';
+import { BookmarkService } from './bookmark.service';
 
 export interface CustomView {
   template: string;
@@ -41,7 +42,7 @@ export class ViewRegistryService implements OnDestroy {
 
   private temporaryRouteChildren = new Map<string, Routes>();
 
-  private storage = inject(LOCAL_STORAGE);
+  private _bookmarkService = inject(BookmarkService);
 
   private isNavigationInitializedInternal$ = new BehaviorSubject(false);
   readonly isNavigationInitialized$ = this.isNavigationInitializedInternal$.asObservable();
@@ -103,7 +104,7 @@ export class ViewRegistryService implements OnDestroy {
     this.registerMenuEntry('Quota Manager', 'gridquotamanager', 'sidebar', { weight: 50, parentId: 'status-root' });
     // Sub Menus Bookmarks
     this.registerMenuEntry('Manage Bookmarks', 'bookmarks', 'edit', { weight: 1, parentId: 'bookmarks-root' });
-    const bookmarks = JSON.parse(this.storage.getItem('BOOKMARKS_BOOKMARKS') || '[]');
+    const bookmarks = this._bookmarkService.getStorageBookmarks();
     bookmarks.forEach((entry: Bookmark, index: number) => {
       this.registerMenuEntry(entry.label!, entry.link!, entry.icon!, { weight: ++index, parentId: 'bookmarks-root' });
     });
@@ -290,7 +291,7 @@ export class ViewRegistryService implements OnDestroy {
   }
 
   registerMenuEntry(title: string, id: string, icon: string, options?: { weight?: number; parentId?: string }): void {
-    if (!id) {
+    if (!id || this.registeredMenuIds.includes(id)) {
       return;
     }
     this.registeredMenuIds.push(id);

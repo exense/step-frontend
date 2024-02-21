@@ -5,7 +5,7 @@ import { ScriptLanguage } from './script-language.enum';
 import { KeyValue } from '@angular/common';
 import { Route } from '@angular/router';
 import { SUB_ROUTE_DATA } from './constants';
-import { Bookmark } from '../client/generated/models/Bookmark';
+import { Bookmark } from './Bookmark';
 
 export const getObjectFieldValue = (object: Record<string, unknown>, fieldPath: string): unknown => {
   const pathParts = fieldPath.split('.');
@@ -115,53 +115,4 @@ export const routesPrioritySortPredicate = (routeA: Route, routeB: Route) => {
   const weightA = routeA.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
   const weightB = routeB.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
   return weightA - weightB;
-};
-
-export const getIconAndPageById = (id: string): Bookmark | undefined => {
-  switch (id) {
-    case 'functions':
-      return { icon: 'keyword', page: 'Keywords' };
-      break;
-    case 'plans':
-      return { icon: 'plan', page: 'Plans' };
-      break;
-    case 'parameters':
-      return { icon: 'list', page: 'Parameters' };
-      break;
-    case 'scheduler':
-      return { icon: 'clock', page: 'Schedules' };
-      break;
-    case 'dashboards':
-      return { icon: 'bar-chart-square-01', page: 'Analytics' };
-      break;
-    case 'operations':
-      return { icon: 'airplay', page: 'Current Operations' };
-      break;
-    case 'gridagents':
-      return { icon: 'agent', page: 'Agents' };
-      break;
-    case 'gridtokens':
-      return { icon: 'agent-token', page: 'Agent tokens' };
-      break;
-    case 'gridtokengroups':
-      return { icon: 'agent-token-group', page: 'Token Groups' };
-      break;
-    case 'gridquotamanager':
-      return { icon: 'sidebar', page: 'Quota Manager' };
-      break;
-    case 'functionPackages':
-      return { icon: 'package', page: 'Keywords packages' };
-      break;
-    case 'resources':
-      return { icon: 'file-attachment-03', page: 'Resources' };
-      break;
-    case 'automationPackage':
-      return { icon: 'automation', page: 'Automation Packages' };
-      break;
-    case 'executions':
-      return { icon: 'rocket', page: 'Executions' };
-      break;
-    default:
-      return undefined;
-  }
 };
