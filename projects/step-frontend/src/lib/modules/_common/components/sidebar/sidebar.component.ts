@@ -21,9 +21,9 @@ import {
   ViewStateService,
   BookmarkService,
   BookmarkCreateDialogComponent,
+  MENU_ITEMS,
 } from '@exense/step-core';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
-import { MENU_ITEMS } from '../../injectables/menu-items';
 import { combineLatest, map, Subject, SubscriptionLike, takeUntil } from 'rxjs';
 import { SidebarStateService } from '../../injectables/sidebar-state.service';
 
@@ -52,7 +52,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _sideBarState = inject(SidebarStateService);
   readonly _menuItems$ = inject(MENU_ITEMS).pipe(takeUntil(this.terminator$));
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
-  readonly displayMenuItems$ = combineLatest([this._menuItems$, this._bookmarkService.getNewMenuEntries()]).pipe(
+  readonly displayMenuItems$ = combineLatest([this._menuItems$, this._bookmarkService.bookmarkMenuEntries$]).pipe(
     map(([menuItems, dynamicMenuItems]) => menuItems.concat(dynamicMenuItems)),
   );
 
@@ -67,7 +67,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this._sideBarState.initialize();
-    this.displayMenuItems$.subscribe(() => {
+    this._menuItems$.subscribe(() => {
       setTimeout(() => {
         // zero timout is used, to create a macrotasks
         // that will be invoked after menu render

@@ -1,9 +1,12 @@
 import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import { Bookmark } from '../../shared/Bookmark';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Bookmark } from '../../shared/bookmark';
+import { Router } from '@angular/router';
 import { BookmarkService } from '../../services/bookmark.service';
 import { NgForm } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MultipleProjectsService } from '../../modules/basics/services/multiple-projects.service';
+import { take } from 'rxjs';
+import { MENU_ITEMS } from '../../services/menu-items';
 
 @Component({
   selector: 'step-bookmark-create-dialog',
@@ -14,8 +17,9 @@ export class BookmarkCreateDialogComponent implements OnInit {
   private _router = inject(Router);
   private _bookmarkService = inject(BookmarkService);
   private _matDialogRef = inject(MatDialogRef);
-  private _route = inject(ActivatedRoute);
+  private _multipleProjects = inject(MultipleProjectsService);
   readonly _data = inject<string | undefined>(MAT_DIALOG_DATA);
+  readonly _menuItems$ = inject(MENU_ITEMS);
 
   protected bookmark: Partial<Bookmark> = {};
 
@@ -23,12 +27,12 @@ export class BookmarkCreateDialogComponent implements OnInit {
   private form!: NgForm;
 
   ngOnInit(): void {
-    const tenant = this.route.snapshot.queryParams['tenant'];
-    const slashIndex = this.router.url.indexOf('/');
-    const link = this.router.url.slice(slashIndex + 1).split('?')[0];
+    const tenant = this._multipleProjects.currentProject()?.name;
+    const slashIndex = this._router.url.indexOf('/');
+    const link = this._router.url.slice(slashIndex + 1).split('?')[0];
     const initBookmark = this.getIconAndPage(link);
     this.bookmark = {
-      label: this.data ?? '',
+      label: this._data ?? '',
       page: initBookmark?.page,
       link,
       tenant,
@@ -42,10 +46,10 @@ export class BookmarkCreateDialogComponent implements OnInit {
       this.form.control.markAllAsTouched();
       return;
     }
-    if (this.data) {
-      this.bookmarkService.renameBookmark(this.data, this.bookmark.label!);
+    if (this._data) {
+      this._bookmarkService.renameBookmark(this._data, this.bookmark.label!);
     } else {
-      this.bookmarkService.createBookmark(this.bookmark);
+      this._bookmarkService.createBookmark(this.bookmark);
     }
     this._matDialogRef.close();
   }
@@ -53,55 +57,11 @@ export class BookmarkCreateDialogComponent implements OnInit {
   private getIconAndPage(link: string): Bookmark | undefined {
     const firstDashIndex = link.indexOf('/');
     const prefix = link.slice(0, firstDashIndex === -1 ? undefined : firstDashIndex);
-    return this.getIconAndPageById(prefix);
+    let iconAndPage;
+    this._menuItems$.pipe(take(1)).subscribe((items) => {
+      const item = items.find((el) => el.id === prefix);
+      iconAndPage = { icon: item?.icon, page: item?.title };
+    });
+    return iconAndPage;
   }
-
-  private getIconAndPageById = (id: string): Bookmark | undefined => {
-    switch (id) {
-      case 'functions':
-        return { icon: 'keyword', page: 'Keywords' };
-        break;
-      case 'plans':
-        return { icon: 'plan', page: 'Plans' };
-        break;
-      case 'parameters':
-        return { icon: 'list', page: 'Parameters' };
-        break;
-      case 'scheduler':
-        return { icon: 'clock', page: 'Schedules' };
-        break;
-      case 'dashboards':
-        return { icon: 'bar-chart-square-01', page: 'Analytics' };
-        break;
-      case 'operations':
-        return { icon: 'airplay', page: 'Current Operations' };
-        break;
-      case 'gridagents':
-        return { icon: 'agent', page: 'Agents' };
-        break;
-      case 'gridtokens':
-        return { icon: 'agent-token', page: 'Agent tokens' };
-        break;
-      case 'gridtokengroups':
-        return { icon: 'agent-token-group', page: 'Token Groups' };
-        break;
-      case 'gridquotamanager':
-        return { icon: 'sidebar', page: 'Quota Manager' };
-        break;
-      case 'functionPackages':
-        return { icon: 'package', page: 'Keywords packages' };
-        break;
-      case 'resources':
-        return { icon: 'file-attachment-03', page: 'Resources' };
-        break;
-      case 'automationPackage':
-        return { icon: 'automation', page: 'Automation Packages' };
-        break;
-      case 'executions':
-        return { icon: 'rocket', page: 'Executions' };
-        break;
-      default:
-        return undefined;
-    }
-  };
 }

@@ -5,7 +5,7 @@ import {
   BookmarkCreateDialogComponent,
   BookmarkService,
   DialogsService,
-  StepDataSource,
+  TableLocalDataSource,
 } from '@exense/step-core';
 import { of, switchMap, take } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
@@ -22,14 +22,13 @@ export class ManageBookmarksListComponent {
   private _bookmarkService = inject(BookmarkService);
   private _matDialog = inject(MatDialog);
 
-  dataSource: Bookmark[] | undefined | StepDataSource<Bookmark> = this._bookmarkService.createDataSource();
+  readonly dataSource = new TableLocalDataSource(this._bookmarkService.bookmarks$);
 
   renameBookmark(bookmark: Bookmark): void {
     this._matDialog
       .open(BookmarkCreateDialogComponent, { data: bookmark.label })
       .afterClosed()
-      .pipe(take(1))
-      .subscribe(() => (this.dataSource = this._bookmarkService.getBookmarks()));
+      .subscribe(() => this.dataSource.reload());
   }
 
   deleteBookmark(bookmark: Bookmark): any {
@@ -45,6 +44,6 @@ export class ManageBookmarksListComponent {
         }),
         take(1),
       )
-      .subscribe(() => (this.dataSource = this._bookmarkService.getBookmarks()));
+      .subscribe(() => this.dataSource.reload());
   }
 }

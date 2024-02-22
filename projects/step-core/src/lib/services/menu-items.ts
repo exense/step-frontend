@@ -1,6 +1,7 @@
 import { inject, InjectionToken } from '@angular/core';
 import { map, Observable, of, shareReplay, switchMap } from 'rxjs';
-import { MenuEntry, MenuItemsOverrideConfigService, ViewRegistryService } from '@exense/step-core';
+import { MenuEntry, ViewRegistryService } from './view-registry.service';
+import { MenuItemsOverrideConfigService } from './menu-items-override-config.service';
 
 export const MENU_ITEMS = new InjectionToken<Observable<MenuEntry[]>>('Menu items', {
   providedIn: 'root',
@@ -11,7 +12,7 @@ export const MENU_ITEMS = new InjectionToken<Observable<MenuEntry[]>>('Menu item
     return of(undefined).pipe(
       switchMap(() => menuItemsOverrideConfig.menuItemsOverride$ || of(undefined)),
       map((menuItemsOverride) => menuItemsOverride ?? viewRegistry.registeredMenuEntries),
-      shareReplay(1)
+      shareReplay(1),
     );
   },
 });

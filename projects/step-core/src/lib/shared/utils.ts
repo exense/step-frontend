@@ -5,7 +5,7 @@ import { ScriptLanguage } from './script-language.enum';
 import { KeyValue } from '@angular/common';
 import { Route } from '@angular/router';
 import { SUB_ROUTE_DATA } from './constants';
-import { Bookmark } from './Bookmark';
+import { Bookmark } from './bookmark';
 
 export const getObjectFieldValue = (object: Record<string, unknown>, fieldPath: string): unknown => {
   const pathParts = fieldPath.split('.');
