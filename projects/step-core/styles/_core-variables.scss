@@ -76,6 +76,7 @@ $statuses: (
   'INITIALIZING': gray,
   'IMPORTING': orange,
   'EXPORTING': orange,
+  'DELAYED_UPDATE': orange,
   'RUNNING': #337ab7,
   'ABORTING': #d9534f,
   'FORCING_ABORT': #d9534f,
