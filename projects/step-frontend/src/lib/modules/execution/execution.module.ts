@@ -77,6 +77,7 @@ import { ExecutionOpenerComponent } from './components/execution-opener/executio
     ExecutionProgressComponent,
     RepositoryComponent,
     ExecutionSelectionTableComponent,
+    StatusComponent,
   ],
 })
 export class ExecutionModule {

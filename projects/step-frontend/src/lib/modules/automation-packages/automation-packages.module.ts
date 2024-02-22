@@ -4,10 +4,11 @@ import { StepCommonModule } from '../_common/step-common.module';
 import { AutomationPackagesListComponent } from './components/automation-packages-list/automation-packages-list.component';
 import { ENTITY_ID, ICON, LABEL_ENTITY, LABEL_MENU, PATH } from './types/constants';
 import { AutomationPackageUploadDialogComponent } from './components/automation-package-upload-dialog/automation-package-upload-dialog.component';
+import { ExecutionModule } from '../execution/execution.module';
 
 @NgModule({
   declarations: [AutomationPackagesListComponent, AutomationPackageUploadDialogComponent],
-  imports: [StepCommonModule, StepCoreModule],
+  imports: [StepCommonModule, StepCoreModule, ExecutionModule],
 })
 export class AutomationPackagesModule {
   constructor(private _entityRegistry: EntityRegistry, private _viewRegistry: ViewRegistryService) {
