@@ -6,13 +6,12 @@
     (keywordUpdate)="onUpdateKeyword($event)"
   >
   </step-keyword-name>
-  <ng-template #labelTemplate> Add text description </ng-template>
   <step-editable-textarea-label
-    [labelTemplate]="labelTemplate"
     [(ngModel)]="context.artefact!.description"
     [disabled]="context.readonly"
     name="description"
   >
+    <div *stepEditableLabelTemplate>Add text description</div>
   </step-editable-textarea-label>
   <step-dynamic-json
     label="Input"
