@@ -28,15 +28,12 @@ export class BookmarkCreateDialogComponent implements OnInit {
     const link = this.router.url.slice(slashIndex + 1).split('?')[0];
     const initBookmark = this.getIconAndPage(link);
     this.bookmark = {
-      label: '',
+      label: this.data ?? '',
       page: initBookmark?.page,
       link,
       tenant,
       icon: initBookmark?.icon,
     };
-    if (this.data) {
-      this.bookmark.label = this.data;
-    }
   }
 
   @HostListener('keydown.enter')
