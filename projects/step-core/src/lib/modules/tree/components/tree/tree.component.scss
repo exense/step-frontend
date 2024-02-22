@@ -23,20 +23,30 @@ step-tree {
 
     section.middle-drop-container {
       min-height: 3rem;
+      padding: 0.3rem 0;
       left: calc(var(--idx) * 3rem + 6rem);
       position: absolute;
       min-width: 10rem;
       top: 2rem;
+      display: flex;
+      justify-content: space-around;
       z-index: 1;
       user-select: none;
-      &.dragover {
+      & > div {
+        flex: 1;
+      }
+      &.dragover > div {
         background: var.$gray-800;
+        border-radius: 2rem;
         opacity: 0.2;
       }
     }
 
     step-tree-node.is-drag-in-progress ~ section.middle-drop-container {
-      top: 0.5rem;
+      top: 0.7rem;
+      padding: 0;
+      min-height: 2.4rem;
+      z-index: 1 !important;
     }
   }
 
@@ -51,6 +61,12 @@ step-tree {
 
     & + mat-divider {
       margin: 0.7rem 0;
+    }
+  }
+
+  step-drag-drop-container.drag-in-progress {
+    section.middle-drop-container {
+      z-index: 3 !important;
     }
   }
 }

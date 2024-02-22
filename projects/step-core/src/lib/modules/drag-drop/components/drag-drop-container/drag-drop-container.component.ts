@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  HostBinding,
   inject,
   NgZone,
   OnDestroy,
@@ -39,6 +40,7 @@ export class DragDropContainerComponent implements AfterViewInit, OnDestroy, Dra
   readonly dragStart$ = this.dragStartInternal$.asObservable();
   readonly dragEnd$ = this.dragEndInternal$.asObservable();
 
+  @HostBinding('class.drag-in-progress')
   private isDragStartedInternal = false;
 
   get isDragStarted(): boolean {
