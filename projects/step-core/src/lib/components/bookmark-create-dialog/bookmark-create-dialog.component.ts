@@ -11,11 +11,11 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   styleUrls: ['./bookmark-create-dialog.component.scss'],
 })
 export class BookmarkCreateDialogComponent implements OnInit {
-  private router = inject(Router);
-  private bookmarkService = inject(BookmarkService);
+  private _router = inject(Router);
+  private _bookmarkService = inject(BookmarkService);
   private _matDialogRef = inject(MatDialogRef);
-  private route = inject(ActivatedRoute);
-  data = inject(MAT_DIALOG_DATA);
+  private _route = inject(ActivatedRoute);
+  readonly _data = inject<string | undefined>(MAT_DIALOG_DATA);
 
   protected bookmark: Partial<Bookmark> = {};
 
