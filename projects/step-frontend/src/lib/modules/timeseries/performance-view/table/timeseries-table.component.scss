@@ -12,8 +12,8 @@ step-timeseries-table {
 
     span {
       max-width: 30rem;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      text-wrap: wrap;
+      word-wrap: break-word;
     }
 
     .color-square {
