@@ -12,10 +12,11 @@ import { AutomationPackagesListComponent } from './components/automation-package
 import { ENTITY_ID, ICON, LABEL_ENTITY, LABEL_MENU, PATH } from './types/constants';
 import { AutomationPackageUploadDialogComponent } from './components/automation-package-upload-dialog/automation-package-upload-dialog.component';
 import { ActivatedRouteSnapshot } from '@angular/router';
+import { ExecutionModule } from '../execution/execution.module';
 
 @NgModule({
   declarations: [AutomationPackagesListComponent, AutomationPackageUploadDialogComponent],
-  imports: [StepCommonModule, StepCoreModule],
+  imports: [StepCommonModule, StepCoreModule, ExecutionModule],
 })
 export class AutomationPackagesModule {
   constructor(
