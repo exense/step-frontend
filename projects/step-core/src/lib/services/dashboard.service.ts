@@ -1,8 +1,6 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { AuthService } from '../modules/basics/services/auth.service';
-import { ViewRegistryService } from './view-registry.service';
-import { MultipleProjectsService } from '../modules/basics/services/multiple-projects.service';
+import { inject, Injectable } from '@angular/core';
+import { HttpParams } from '@angular/common/http';
+import { MultipleProjectsService } from '../modules/basics/step-basics.module';
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -10,12 +8,7 @@ const ONE_DAY_MS = 24 * 60 * 60 * 1000;
   providedIn: 'root',
 })
 export class DashboardService {
-  constructor(
-    private _http: HttpClient,
-    private _authService: AuthService,
-    private _viewRegistryService: ViewRegistryService,
-    private _multipleProjects: MultipleProjectsService
-  ) {}
+  private _multipleProjects = inject(MultipleProjectsService);
 
   generateDashboardLink(parameters: Record<string, any>): string {
     let httpParams = new HttpParams();
@@ -27,7 +20,7 @@ export class DashboardService {
     const currentTenant = this._multipleProjects.currentProject()?.name || '';
     httpParams = httpParams.append('tenant', currentTenant);
 
-    return `#/root/analytics?${httpParams.toString()}`;
+    return `#/analytics?${httpParams.toString()}`;
   }
 
   getDashboardLink(taskId: string): string {

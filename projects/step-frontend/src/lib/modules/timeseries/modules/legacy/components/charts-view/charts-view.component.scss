@@ -1,0 +1,99 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
+#progress-bar {
+  height: 12px;
+  opacity: 0.2;
+  display: flex;
+  gap: 8px;
+
+  .bar-container {
+    flex-grow: 1;
+  }
+
+  mat-progress-bar {
+    border-radius: 4px;
+  }
+}
+
+.charts-section {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.chart {
+  width: 100%;
+  min-width: 484px;
+  position: relative;
+}
+
+.stamp {
+  position: absolute;
+  color: white;
+  padding: 0.2rem;
+  font-size: 1rem;
+  background-color: var.$gray-400;
+  opacity: 0.7;
+  top: 0;
+  left: 0;
+  text-align: center;
+  width: 78px;
+
+  &::before {
+    content: 'BASE';
+    display: block;
+    text-align: center;
+  }
+
+  &.compare {
+    background-color: var.$orange;
+
+    &::before {
+      content: 'COMPARE';
+    }
+  }
+}
+
+.selected-menu-item {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.charts {
+  $size: calc(50% - 1.2rem);
+  display: grid;
+  grid-template-columns: $size $size;
+  column-gap: 2.4rem;
+  row-gap: 1.6rem;
+  margin-bottom: 1.6rem;
+
+  hr {
+    grid-column: 1 / 3;
+    width: 100%;
+    margin: 0;
+    height: 0;
+    border: none;
+    border-top: solid 1px var.$gray-200;
+  }
+}
+
+.charts-table {
+  grid-column: 1 / 3;
+}
+
+.chart-settings {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1;
+
+  button {
+    width: 2rem !important;
+    height: 2rem !important;
+    @include core.step-icon(1.6rem);
+    step-icon {
+      display: flex !important;
+    }
+  }
+}

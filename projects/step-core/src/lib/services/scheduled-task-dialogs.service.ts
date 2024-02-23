@@ -1,11 +1,16 @@
 import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { filter, map, Observable, of, switchMap } from 'rxjs';
-import { AugmentedSchedulerService, ExecutionParameters, ExecutiontTaskParameters } from '../client/step-client-module';
-import { EditSchedulerTaskDialogComponent } from '../components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
-import { NewSchedulerTaskDialogComponent } from '../components/new-scheduler-task-dialog/new-scheduler-task-dialog.component';
+import { AugmentedSchedulerService, ExecutiontTaskParameters } from '../client/step-client-module';
+import {
+  EditSchedulerTaskDialogComponent,
+  EditSchedulerTaskDialogConfig,
+  EditSchedulerTaskDialogData,
+} from '../components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 import { EntityDialogsService } from '../modules/entity/injectables/entity-dialogs.service';
 import { DialogsService } from '../shared';
+import { AuthService } from '../modules/basics/services/auth.service';
+import { DialogRouteResult } from '../modules/basics/shared/dialog-route-result';
 
 @Injectable({
   providedIn: 'root',
@@ -15,37 +20,24 @@ export class ScheduledTaskDialogsService {
   private _dialogs = inject(DialogsService);
   private _schedulerService = inject(AugmentedSchedulerService);
   private _entityDialogs = inject(EntityDialogsService);
+  private _auth = inject(AuthService);
 
   selectTask(): Observable<ExecutiontTaskParameters | undefined> {
     return this._entityDialogs.selectEntityOfType('tasks').pipe(
       map((result) => result?.item?.id),
-      switchMap((id) => (!id ? of(undefined) : this._schedulerService.getExecutionTaskById(id)))
+      switchMap((id) => (!id ? of(undefined) : this._schedulerService.getExecutionTaskById(id))),
     );
   }
 
-  newScheduledTask(executionParams: ExecutionParameters): Observable<ExecutiontTaskParameters | undefined> {
-    return this._matDialog
-      .open<NewSchedulerTaskDialogComponent, ExecutionParameters, ExecutiontTaskParameters | undefined>(
-        NewSchedulerTaskDialogComponent,
-        { data: executionParams }
-      )
-      .afterClosed()
-      .pipe(
-        switchMap((result) => {
-          if (!result) {
-            return of(undefined);
-          }
-          return this._schedulerService.saveExecutionTask(result);
-        })
-      );
-  }
+  editScheduledTask(task: ExecutiontTaskParameters): Observable<DialogRouteResult | undefined> {
+    const taskAndConfig = this.prepareTaskAndConfig(task);
 
-  editScheduledTask(scheduledTask: ExecutiontTaskParameters): Observable<ExecutiontTaskParameters | undefined> {
     return this._matDialog
-      .open<EditSchedulerTaskDialogComponent, ExecutiontTaskParameters, ExecutiontTaskParameters | undefined>(
+      .open<
         EditSchedulerTaskDialogComponent,
-        { data: scheduledTask, disableClose: true }
-      )
+        EditSchedulerTaskDialogData,
+        DialogRouteResult | undefined
+      >(EditSchedulerTaskDialogComponent, { data: { taskAndConfig } })
       .afterClosed();
   }
 
@@ -54,7 +46,42 @@ export class ScheduledTaskDialogsService {
 
     return this._dialogs.showDeleteWarning(1, `Task "${paramName}"`).pipe(
       filter((result) => result),
-      switchMap(() => this._schedulerService.deleteExecutionTask(task.id!))
+      switchMap(() => this._schedulerService.deleteExecutionTask(task.id!)),
     );
+  }
+
+  prepareTaskAndConfig(task: ExecutiontTaskParameters): EditSchedulerTaskDialogData['taskAndConfig'] {
+    let hideUser = false;
+    let disableUser = false;
+    if (!this._auth.isAuthenticated()) {
+      hideUser = true;
+      task.executionsParameters!.userID = this._auth.getUserID();
+    } else {
+      const hasRightOnBehalfOf = this._auth.hasRight('on-behalf-of');
+
+      if (!task.id) {
+        // New task case.
+        // Hide user field if there is no right, otherwise prefill the field
+        if (!hasRightOnBehalfOf) {
+          hideUser = true;
+        } else {
+          task.executionsParameters!.userID = this._auth.getUserID();
+        }
+      } else {
+        // Existing task case
+        // If there is no right hide user field, if it is empty, otherwise disable it
+        if (!hasRightOnBehalfOf) {
+          hideUser = !task.executionsParameters?.userID;
+          disableUser = !!task.executionsParameters?.userID;
+        }
+      }
+    }
+
+    // TODO: Fill disablePlan flag, when it will be clarified how to fill it
+    const config: EditSchedulerTaskDialogConfig = {
+      hideUser,
+      disableUser,
+    };
+    return { task, config };
   }
 }

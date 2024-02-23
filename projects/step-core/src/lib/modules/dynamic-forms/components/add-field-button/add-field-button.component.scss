@@ -18,9 +18,14 @@ button.add-additional {
   font-size: 12px;
   line-height: 16px;
 
-  step-icon {
-    @include core.step-icon-size(16px);
-    vertical-align: top;
+  .add-additional-content {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    step-icon {
+      @include core.step-icon-size(16px);
+      vertical-align: top;
+    }
   }
 }
 

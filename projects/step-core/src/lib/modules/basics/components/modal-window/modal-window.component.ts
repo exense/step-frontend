@@ -1,12 +1,15 @@
-import { Component, HostBinding, inject, Input } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { Component, ElementRef, HostBinding, Input, ViewChild } from '@angular/core';
+import { BaseModalWindowComponent } from './base-modal-window.component';
 
 @Component({
   selector: 'step-modal-window',
   templateUrl: './modal-window.component.html',
   styleUrls: ['./modal-window.component.scss'],
 })
-export class ModalWindowComponent {
+export class ModalWindowComponent extends BaseModalWindowComponent {
+  @ViewChild('trackFocus', { static: true })
+  private trackFocus!: ElementRef<HTMLInputElement>;
+
   /**
    * This component has an input "title" which also works as assignment
    * of native html title attribute.
@@ -19,5 +22,7 @@ export class ModalWindowComponent {
   @Input() title = '';
   @Input() hideButtonsSection = false;
 
-  protected _dialogRef = inject(MatDialogRef);
+  override focusDialog() {
+    this.trackFocus.nativeElement.focus();
+  }
 }

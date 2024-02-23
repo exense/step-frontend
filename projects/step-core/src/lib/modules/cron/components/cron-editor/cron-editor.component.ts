@@ -1,4 +1,4 @@
-import { Component, inject, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, inject, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Tab } from '../../../tabs/tabs.module';
 import { CronValidation } from '../../types/cron/_cron-validation';
@@ -7,7 +7,7 @@ import { CronEditorTab } from '../../types/cron-editor-tab.enum';
 
 type DialogRef = MatDialogRef<CronEditorComponent, string>;
 
-const createTab = (id: CronEditorTab, label: string): Tab => ({ id, label });
+const createTab = (id: CronEditorTab, label: string): Tab<CronEditorTab> => ({ id, label });
 
 const CRON_EDITOR_TAB_LABELS: Record<CronEditorTab, string> = {
   [CronEditorTab.PRESET]: 'Preset',
@@ -48,7 +48,11 @@ export class CronEditorComponent {
     this.isExpressionValid = CronValidation.validate(this.cronExpression);
   }
 
+  @HostListener('keydown.enter')
   apply(): void {
+    if (!this.cronExpression) {
+      this.isExpressionValid = false;
+    }
     if (!this.isExpressionValid) {
       return;
     }

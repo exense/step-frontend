@@ -1,3 +1,5 @@
+@use '../core-variables' as var;
+
 @mixin tabbar-icon {
   width: 16px;
   height: 16px;
@@ -8,34 +10,40 @@
 @mixin tabbar($primary-tabs-color) {
   step-tabs,
   .step-tabs {
+    .mat-mdc-tab-header {
+      border-bottom: solid 1px rgba(0, 0, 0, 0.12);
+    }
+
+    .mat-mdc-tab-list {
+      flex-grow: 0;
+    }
+
+    .mat-mdc-tab-link {
+      flex-grow: 0;
+    }
+
     &.tab-mode-buttons {
       display: block;
+      width: 100%;
 
-      mat-ink-bar {
-        display: none;
-      }
-
-      .mat-elevation-z4 {
-        box-shadow: none;
-      }
-
-      .mat-tab-list {
+      .mat-mdc-tab-list {
         display: flex;
-        margin-bottom: 10px;
+        margin-bottom: 1rem;
       }
 
-      .mat-tab-links {
+      .mat-mdc-tab-links {
         border: solid 1px #f3f5f7;
         border-radius: 8px;
         background: #f9fafa;
         padding: 4px;
       }
 
-      .mat-tab-link {
+      .mat-mdc-tab-link {
         margin: 0 8px;
-        min-width: 100px;
+        min-width: 100px !important;
         text-decoration: none;
         height: 38px;
+        color: var.$blue-700 !important;
 
         &:first-child {
           margin-left: 0;
@@ -47,27 +55,38 @@
 
         border-radius: 8px;
 
-        &.mat-tab-label-active {
+        &.mdc-tab--active {
           background: #fff;
-          box-shadow: 0 3px 1px -2px #0003, 0 2px 2px #00000024, 0 1px 5px #0000001f;
-          font-weight: bold;
+          box-shadow:
+            0 3px 1px -2px #0003,
+            0 2px 2px #00000024,
+            0 1px 5px #0000001f;
+          font-weight: 500;
+
+          .mdc-tab__text-label {
+            color: inherit;
+          }
+        }
+
+        .mdc-tab-indicator {
+          display: none;
         }
       }
 
       &.shrink {
-        .mat-tab-links {
+        .mat-mdc-tab-links {
           margin-left: 0;
         }
 
-        .mat-tab-link {
-          min-width: 80px;
+        .mat-mdc-tab-link {
+          min-width: 8rem !important;
           padding: 0 8px;
         }
       }
     }
 
     &.tab-mode-tabs {
-      .mat-tab-link {
+      .mat-mdc-tab-link {
         min-width: auto;
         padding: 0 10px;
         opacity: 1;
@@ -78,15 +97,41 @@
         @include tabbar-icon();
       }
 
-      .mat-primary {
-        .mat-tab-link.mat-tab-label-active {
+      .mat-mdc-primary {
+        .mat-mdc-tab-link.mat-mdc-tab-label-active {
           color: $primary-tabs-color;
         }
       }
     }
 
-    .mat-tab-links {
+    .mat-mdc-tab-links {
       margin-left: 16px;
+    }
+  }
+
+  .step-legacy-tabs {
+    .mat-mdc-tab-links {
+      margin-left: 16px;
+    }
+
+    step-ajs-icon {
+      @include tabbar-icon;
+    }
+
+    &.mat-mdc-primary {
+      .mat-mdc-tab-link.mat-mdc-tab-label-active {
+        color: $primary-tabs-color;
+      }
+    }
+
+    .mat-mdc-tab-link {
+      min-width: auto;
+      padding: 0 10px;
+      opacity: 1;
+    }
+
+    execution-result {
+      margin-right: 11px;
     }
   }
 }

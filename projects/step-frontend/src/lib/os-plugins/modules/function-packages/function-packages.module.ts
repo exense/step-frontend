@@ -1,9 +1,12 @@
-import { NgModule } from '@angular/core';
+import { inject, NgModule } from '@angular/core';
 import {
+  AugmentedKeywordPackagesService,
   CustomCellRegistryService,
   CustomSearchCellRegistryService,
   DashletRegistryService,
+  dialogRoute,
   EntityRegistry,
+  SimpleOutletComponent,
   StepCoreModule,
   ViewRegistryService,
 } from '@exense/step-core';
@@ -15,6 +18,7 @@ import { FunctionPackageSelectionComponent } from './components/function-package
 
 import './components/function-package-selection/function-package-selection.component';
 import { UploadPackageBtnComponent } from './components/upload-package-btn/upload-package-btn.component';
+import { ActivatedRouteSnapshot } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -41,7 +45,7 @@ export class FunctionPackagesModule {
     private _cellsRegistry: CustomCellRegistryService,
     private _viewRegistry: ViewRegistryService,
     private _searchCellsRegistry: CustomSearchCellRegistryService,
-    private _dashletsRegistry: DashletRegistryService
+    private _dashletsRegistry: DashletRegistryService,
   ) {
     this.registerEntities();
     this.registerViews();
@@ -60,7 +64,7 @@ export class FunctionPackagesModule {
       'rest/functionpackages/',
       'rest/functionpackages/',
       'st-table',
-      FunctionPackageSelectionComponent
+      FunctionPackageSelectionComponent,
     );
   }
 
@@ -68,6 +72,27 @@ export class FunctionPackagesModule {
     this._viewRegistry.registerRoute({
       path: 'functionPackages',
       component: FunctionPackageListComponent,
+      children: [
+        {
+          path: 'editor',
+          component: SimpleOutletComponent,
+          children: [
+            dialogRoute({
+              path: 'new',
+              dialogComponent: FunctionPackageConfigurationDialogComponent,
+            }),
+            dialogRoute({
+              path: ':id',
+              dialogComponent: FunctionPackageConfigurationDialogComponent,
+              resolve: {
+                functionPackage: (route: ActivatedRouteSnapshot) => {
+                  return inject(AugmentedKeywordPackagesService).getFunctionPackage(route.params['id']);
+                },
+              },
+            }),
+          ],
+        },
+      ],
     });
   }
 
@@ -78,7 +103,7 @@ export class FunctionPackagesModule {
   private registerSearchCells(): void {
     this._searchCellsRegistry.registerSearchCell(
       'rest/table/functionPackage/searchIdsBy/attributes.name',
-      FunctionPackageSearchComponent
+      FunctionPackageSearchComponent,
     );
   }
 

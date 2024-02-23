@@ -60,7 +60,7 @@
   </div>
 
   <step-split stepMaxHeightViewportHeightMinusOffsetTop>
-    <step-split-area sizeType="flex" size="1">
+    <step-split-area sizeType="flex" [size]="planSize" (sizeChange)="handlePlanSizeChange($event)">
       <ng-container *ngIf="planClass">
         <step-plan-type [itemKey]="planClass"> </step-plan-type>
       </ng-container>
@@ -68,7 +68,10 @@
 
     <step-split-gutter></step-split-gutter>
 
-    <step-split-area (sizeUpdate)="rightTabs.updatePagination()">
+    <step-split-area
+      [size]="planControlsSize"
+      (sizeChange)="handlePlanControlsChange($event); rightTabs.updatePagination()"
+    >
       <step-tabs #rightTabs="StepTabs" [tabs]="componentTabs" [(activeTabId)]="selectedTab" [shrink]="true">
       </step-tabs>
       <div class="tab-content" [ngSwitch]="selectedTab">

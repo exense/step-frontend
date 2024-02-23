@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { MatDialogRef } from '@angular/material/dialog';
 import { AugmentedPlansService, Plan } from '../../client/step-client-module';
 import { ItemInfo, PlanTypeRegistryService } from '../../modules/custom-registeries/custom-registries.module';
+import { DialogRouteResult } from '../../modules/basics/step-basics.module';
 
 @Component({
   selector: 'step-plan-create-dialog',
@@ -12,7 +13,7 @@ import { ItemInfo, PlanTypeRegistryService } from '../../modules/custom-register
 })
 export class PlanCreateDialogComponent {
   private _api = inject(AugmentedPlansService);
-  private _matDialogRef = inject<MatDialogRef<PlanCreateDialogComponent>>(MatDialogRef);
+  private _matDialogRef = inject<MatDialogRef<PlanCreateDialogComponent, DialogRouteResult>>(MatDialogRef);
   private _router = inject(Router);
 
   protected template: string = 'TestCase';
@@ -25,7 +26,6 @@ export class PlanCreateDialogComponent {
 
   readonly artefactTypes$ = this._api.getArtefactTemplates().pipe(shareReplay(1));
 
-  @HostListener('keydown.enter')
   save(editAfterSave?: boolean): void {
     this._api
       .newPlan(this.planType, this.template)
@@ -36,13 +36,18 @@ export class PlanCreateDialogComponent {
             createdPlan.root.attributes = createdPlan.attributes;
           }
         }),
-        switchMap((createdPlan) => this._api.savePlan(createdPlan))
+        switchMap((createdPlan) => this._api.savePlan(createdPlan)),
       )
       .subscribe((plan) => {
         if (editAfterSave) {
-          this._router.navigate(['root', 'plans', 'editor', plan.id]);
+          this._router.navigate(['plans', 'editor', plan.id]);
         }
-        this._matDialogRef.close(plan);
+        this._matDialogRef.close({ isSuccess: !!plan, canNavigateBack: !editAfterSave });
       });
+  }
+
+  @HostListener('keydown.enter')
+  private handleKeyEnter(): void {
+    this.save(true);
   }
 }

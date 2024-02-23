@@ -1,0 +1,79 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+.page-container {
+  padding: 0 2rem;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 1.8rem;
+}
+
+.edit-alert {
+  padding: 1rem;
+  margin-bottom: 0;
+}
+
+.settings-container {
+  position: absolute;
+  right: 0.8rem;
+  top: 0.8rem;
+  z-index: 1;
+}
+
+.checkbox-row {
+  gap: 1.2rem;
+  align-items: center;
+}
+
+.dashlet-container {
+  $size: calc(50% - 1.2rem);
+  display: grid;
+  grid-template-columns: $size $size;
+  column-gap: 2.4rem;
+  row-gap: 1.6rem;
+  margin-bottom: 1.6rem;
+
+  .size-full {
+    grid-column: 1 / 3;
+  }
+}
+
+.dashlet {
+  position: relative;
+  border: 1px solid var.$gray-200;
+  transition: width 400ms ease-in-out;
+}
+
+.add-dashlet-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 3rem;
+  background-color: var.$gray-100;
+}
+
+.header-buttons-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1.4rem;
+  align-items: center;
+}
+
+.dashboard-name {
+  font-size: 1.8rem;
+  min-width: 10rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.no-charts-message {
+  background-color: var.$gray-200;
+  width: 50%;
+  margin: 3rem 25%;
+  text-align: center;
+  padding: 2rem 0;
+}

@@ -1,0 +1,86 @@
+@if (dashboard) {
+  <div class="page-container">
+    <div class="header-container">
+      <div></div>
+      <div class="header-buttons-container">
+        @if (hasWritePermission) {
+          @if (editMode) {
+            <step-alert class="edit-alert" type="WARNING"
+              >Saving will capture all the current settings, like filters, grouping, and charts settings</step-alert
+            >
+            <button [disabled]="!dashboard.name" mat-button mat-flat-button color="primary" (click)="saveEditChanges()">
+              Save
+            </button>
+            <button mat-button mat-stroked-button (click)="cancelEditMode()">Cancel</button>
+            <step-form-field>
+              <input type="text" [(ngModel)]="dashboard.name" />
+            </step-form-field>
+          } @else {
+            <button
+              mat-button
+              mat-flat-button
+              color="primary"
+              [disabled]="!('dashboard-write' | hasRight | async)"
+              (click)="enableEditMode()"
+            >
+              Edit
+            </button>
+            <span class="dashboard-name">{{ dashboard.name }}</span>
+          }
+        } @else {
+          <span class="dashboard-name">{{ dashboard.name }}</span>
+        }
+      </div>
+    </div>
+
+    <div>
+      @if (context) {
+        <step-ts-dashboard-filter-bar
+          [editMode]="editMode"
+          [context]="context"
+          [filters]="dashboard.filters || []"
+          (timeRangeChange)="handleTimeRangeChange($event)"
+          [timeRangeOptions]="timeRangeOptions"
+          [activeTimeRange]="timeRangeSelection"
+          [compactView]="compareModeEnabled"
+        />
+      }
+    </div>
+
+    <div class="dashlet-container">
+      @for (dashlet of dashboard.dashlets; let i = $index; track dashlet.name) {
+        <div class="dashlet" [class.size-full]="dashlet.size === 2">
+          <step-chart-dashlet
+            [editMode]="editMode"
+            [item]="dashlet"
+            [context]="context"
+            [height]="DASHLET_HEIGHT"
+            (remove)="handleChartDelete(i)"
+            (shiftLeft)="handleChartShiftLeft(i)"
+            (shiftRight)="handleChartShiftRight(i)"
+          />
+        </div>
+      }
+      @if (!editMode && !dashboard.dashlets.length) {
+        <div class="no-charts-message size-full">Dashboard has no charts.</div>
+      }
+      @if (editMode && metricTypes) {
+        <div class="add-dashlet-container size-full" [style.height.px]="DASHLET_HEIGHT">
+          <div [matMenuTriggerFor]="menu">
+            <button mat-raised-button color="primary">
+              <step-icon name="plus" />
+              Add Chart
+            </button>
+            <mat-menu #menu="matMenu">
+              @for (metric of metricTypes; track metric.name) {
+                <button mat-menu-item (click)="addDashlet(metric)">
+                  {{ metric.displayName }}
+                </button>
+              }
+            </mat-menu>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, forwardRef, inject } from '@angular/core';
 import {
   AugmentedPlansService,
   AutoDeselectStrategy,
+  DialogParentService,
   Plan,
   PlanDialogsService,
   selectionCollectionProvider,
@@ -17,9 +18,13 @@ import { pipe, tap } from 'rxjs';
   providers: [
     tablePersistenceConfigProvider('planList', STORE_ALL),
     ...selectionCollectionProvider<string, Plan>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    {
+      provide: DialogParentService,
+      useExisting: forwardRef(() => PlanListComponent),
+    },
   ],
 })
-export class PlanListComponent {
+export class PlanListComponent implements DialogParentService {
   private _planDialogs = inject(PlanDialogsService);
   readonly _plansApiService = inject(AugmentedPlansService);
 
@@ -30,11 +35,15 @@ export class PlanListComponent {
       if (changeResult) {
         this.dataSource.reload();
       }
-    })
+    }),
   );
 
+  dialogSuccessfullyClosed(): void {
+    this.dataSource.reload();
+  }
+
   addPlan(): void {
-    this._planDialogs.createPlan().pipe(this.updateDataSourceAfterChange).subscribe();
+    this._planDialogs.createPlan();
   }
 
   editPlan(plan: Plan): void {
@@ -54,22 +63,15 @@ export class PlanListComponent {
   }
 
   importPlans(): void {
-    this._planDialogs
-      .importPlans()
-      .pipe(this.updateDataSourceAfterChange)
-      .subscribe((result) => {
-        if (result) {
-          this.dataSource.reload();
-        }
-      });
+    this._planDialogs.importPlans();
   }
 
   exportPlans(): void {
-    this._planDialogs.exportPlans().pipe(this.updateDataSourceAfterChange).subscribe();
+    this._planDialogs.exportPlans();
   }
 
-  exportPlan(id: string, name: string): void {
-    this._planDialogs.exportPlan(id, name).subscribe();
+  exportPlan(id: string): void {
+    this._planDialogs.exportPlan(id);
   }
 
   lookUp(id: string, name: string): void {

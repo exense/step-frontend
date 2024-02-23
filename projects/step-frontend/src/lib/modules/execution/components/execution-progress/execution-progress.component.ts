@@ -84,6 +84,16 @@ interface RefreshParams {
 export class ExecutionProgressComponent
   implements OnInit, ExecutionStateService, ExecutionCloseHandleService, OnDestroy
 {
+  private _document = inject(DOCUMENT);
+  private _executionService = inject(AugmentedExecutionsService);
+  private _controllerService = inject(ControllerService);
+  private _viewService = inject(PrivateViewPluginService);
+  private _systemService = inject(SystemService);
+  private _viewRegistry = inject(ViewRegistryService);
+  private _executionTreeState = inject<TreeStateService<ReportNode, ReportTreeNode>>(TreeStateService);
+  public _executionPanels = inject(SingleExecutionPanelsService);
+  public _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
+  private _treeUtils = inject(ReportTreeNodeUtilsService);
   private _activeExecutions = inject(ActiveExecutionsService);
   private _executionTabManager = inject(ExecutionTabManagerService);
   private _activatedRoute = inject(ActivatedRoute);
@@ -131,25 +141,14 @@ export class ExecutionProgressComponent
         .map(({ artefactID, name }) => (by === 'id' ? artefactID! : name!));
 
       return { by, list };
-    })
+    }),
   );
 
   executionId?: string;
   activeExecution?: ActiveExecution;
   protected activeTabId?: string;
 
-  constructor(
-    @Inject(DOCUMENT) private _document: Document,
-    private _executionService: AugmentedExecutionsService,
-    private _controllerService: ControllerService,
-    private _viewService: PrivateViewPluginService,
-    private _systemService: SystemService,
-    private _viewRegistry: ViewRegistryService,
-    private _executionTreeState: TreeStateService<ReportNode, ReportTreeNode>,
-    public _executionPanels: SingleExecutionPanelsService,
-    public _testCasesSelection: SelectionCollector<string, ReportNode>,
-    private _treeUtils: ReportTreeNodeUtilsService
-  ) {}
+  throughputchart: any | { series: any[]; data: any[][] } = {};
 
   showNodeInTree(nodeId: string): void {
     this._controllerService
@@ -163,7 +162,7 @@ export class ExecutionProgressComponent
         switchMap((path) => {
           const finalNodeId = path[path.length - 1];
           return this._executionTreeState.expandNode(path).pipe(map(() => finalNodeId));
-        })
+        }),
       )
       .subscribe((nodeId) => this._executionTreeState.selectNodeById(nodeId));
   }
@@ -186,7 +185,7 @@ export class ExecutionProgressComponent
         tap((node) => {
           this._executionPanels.enablePanel(Panels.TEST_CASES, true);
           this._executionPanels.setShowPanel(Panels.TEST_CASES, true);
-        })
+        }),
       )
       .subscribe(() => {
         this.selectTab('steps');
@@ -245,7 +244,7 @@ export class ExecutionProgressComponent
     const executionId$ = this._activatedRoute.url.pipe(
       map((url) => url[0].path),
       distinctUntilChanged(),
-      takeUntil(this._terminator$)
+      takeUntil(this._terminator$),
     );
 
     executionId$.subscribe((executionId) => {
@@ -330,7 +329,7 @@ export class ExecutionProgressComponent
     }
     const parameters: { key: string; value: string }[] = (execution.parameters as any) || [];
     const showTestCaseCurrentOperation = parameters.find(
-      (o) => o.key === 'step.executionView.testcases.current-operations'
+      (o) => o.key === 'step.executionView.testcases.current-operations',
     );
     this.showTestCaseCurrentOperation = showTestCaseCurrentOperation?.value.toLowerCase() === 'true';
   }
@@ -361,7 +360,7 @@ export class ExecutionProgressComponent
             return of(rootNode);
           }
           return this._treeUtils.restoreTree(rootNode, expandedNodIds);
-        })
+        }),
       )
       .subscribe((rootNode) => {
         if (rootNode) {

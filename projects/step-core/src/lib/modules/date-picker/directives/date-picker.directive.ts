@@ -25,7 +25,7 @@ import { STEP_DATE_TIME_FORMAT_PROVIDERS } from '../injectables/step-date-format
   exportAs: 'DatePicker',
 })
 export class DatePickerDirective extends DatePickerBaseDirective<DateTime> {
-  @Input('stepDatePicker') override picker?: DatePickerComponent;
+  @Input('stepDatePicker') override picker?: DatePickerComponent = undefined;
 
   override isRangeField(): boolean {
     return false;

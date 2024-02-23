@@ -1,0 +1,88 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
+.time-selector-container {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px solid #d7d7d7;
+
+  .left-section {
+    border-right: 1px solid #d7d7d7;
+    white-space: nowrap;
+    padding: 1.2rem;
+    width: 232px;
+  }
+
+  .title {
+    font-weight: bold;
+  }
+
+  .right-section {
+    white-space: nowrap;
+    padding-bottom: 1.2rem;
+    width: 220px;
+
+    .title {
+      padding: 1.2rem;
+    }
+
+    .time-option {
+      cursor: pointer;
+      padding: 4px 12px;
+
+      &.full-range {
+        border-top: 1px solid var.$gray-200;
+      }
+
+      &.active {
+        background: #f6f6f6;
+      }
+
+      &:hover {
+        background: #f1f1f1;
+      }
+    }
+  }
+}
+
+.range-btn {
+  @include core.button-round;
+  &.compact-btn {
+    height: 40px;
+    padding: 0 4px;
+    min-width: 40px;
+  }
+}
+
+.timezone-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+
+  .tz-label {
+    margin-right: 12px;
+    padding: 4px;
+    background: #f1f1f1;
+    font-size: 12px;
+  }
+}
+
+::ng-deep {
+  .time-selector-menu {
+    max-width: unset !important;
+  }
+}
+
+.bottom-gap {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 20px;
+}
+
+.hidden-input {
+  visibility: hidden;
+  height: 0;
+  padding: 0;
+  border: 0;
+}

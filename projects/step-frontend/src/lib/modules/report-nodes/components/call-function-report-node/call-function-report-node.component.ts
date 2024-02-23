@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { DateFormat, Execution, ExecutionSummaryDto, Measure, ReportNode } from '@exense/step-core';
+import { DateFormat, Execution, Measure, ReportNode } from '@exense/step-core';
 import { ReportNodeType } from '../../shared/report-node-type.enum';
 import { ExecutionStateService } from '../../../execution/services/execution-state.service';
 
@@ -46,15 +46,15 @@ export class CallFunctionReportNodeComponent implements OnChanges {
       params.end = this.execution.endTime;
     }
     let paramsString = new URLSearchParams(params).toString();
-    const url = `/#/root/analytics?${paramsString}`;
+    const url = `/#/analytics?${paramsString}`;
     window.open(url, '_blank');
   }
 
   private filterChildren(children?: ReportNode[]): void {
     this.displayChildren = (children || []).filter((child) =>
       ([ReportNodeType.ASSERT_REPORT_NODE, ReportNodeType.PERFORMANCE_ASSERT_REPORT_NODE] as string[]).includes(
-        child._class
-      )
+        child._class,
+      ),
     );
   }
 }

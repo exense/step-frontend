@@ -54,7 +54,7 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
 
   @Input() dragDisabled: boolean = false;
 
-  @Output() treeContextAction = new EventEmitter<{ actionId: string; node?: N, multipleNodes?: boolean }>();
+  @Output() treeContextAction = new EventEmitter<{ actionId: string; node?: N; multipleNodes?: boolean }>();
 
   @Output() nodeDblClick = new EventEmitter<{ node: N; event: MouseEvent }>();
 
@@ -63,7 +63,7 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
   openContextMenu({ event, nodeId }: { event: MouseEvent; nodeId: string }): void {
     const node = this._treeState.findNodeById(nodeId);
     const nodes = this._treeState.getSelectedNodes();
-    const multipleNodes = (nodes.length > 1 && !!nodes.find(el => el.id === nodeId));
+    const multipleNodes = nodes.length > 1 && !!nodes.find((el) => el.id === nodeId);
     if (!node) {
       return;
     }

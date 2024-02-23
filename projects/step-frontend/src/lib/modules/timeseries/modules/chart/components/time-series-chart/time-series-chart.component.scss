@@ -1,0 +1,134 @@
+step-timeseries-chart {
+  display: block;
+
+  .chart-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    height: 400px;
+  }
+
+  .u-title {
+    font-size: 1.4rem;
+    line-height: 2rem;
+    font-weight: 600;
+    color: #475467;
+  }
+
+  .u-legend {
+    font-size: 1.3rem;
+    display: flex;
+    justify-content: space-around;
+
+    .u-series {
+      margin-right: 0.8rem;
+      white-space: nowrap;
+
+      .u-marker:empty {
+        display: none;
+      }
+    }
+  }
+
+  .chart-wrapper.pointer .u-over {
+    cursor: pointer;
+  }
+
+  .ranger {
+    .u-grip-l,
+    .u-grip-r {
+      z-index: 100 !important;
+    }
+  }
+
+  .no-data-tag {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 100%;
+    text-align: center;
+    font-weight: bold;
+    background: white;
+    font-size: 1.5rem;
+    padding: 0.8rem 1.6rem;
+    color: rgba(0, 0, 0, 0.38);
+    border-bottom: 1px solid #d9d9d9;
+    border-top: 1px solid #d9d9d9;
+  }
+
+  .ts-chart-legend {
+    display: flex;
+    flex-grow: 1;
+    justify-content: space-between;
+    flex-direction: row;
+    padding: 0.8rem 1.6rem;
+    align-items: center;
+    font-size: 1.3rem;
+    background: #f9fafb;
+    border-radius: 0.4rem;
+    height: 3.2rem;
+    font-weight: 500;
+
+    .left-section {
+      display: flex;
+      overflow: hidden;
+      max-width: 100%;
+
+      &:hover {
+        overflow: auto;
+      }
+    }
+
+    .item {
+      margin-right: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .item-label {
+      margin-left: 0.4rem;
+      display: inline-block;
+      white-space: nowrap;
+      max-width: 20rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .aggregate-section {
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      margin-left: 5rem;
+    }
+
+    /* width */
+    ::-webkit-scrollbar {
+      width: 2px;
+      height: 4px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+      background: rgba(41, 62, 80, 0.22);
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(41, 62, 80, 0.4);
+    }
+  }
+
+  .total-value-icon {
+    color: #c9d4dd;
+    stroke-width: 4px;
+  }
+}

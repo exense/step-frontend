@@ -8,3 +8,10 @@
   flex-direction: column;
   justify-content: center;
 }
+
+.track-focus {
+  position: absolute;
+  width: 0;
+  opacity: 0;
+  z-index: -1;
+}

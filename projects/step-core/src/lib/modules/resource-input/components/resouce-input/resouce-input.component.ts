@@ -50,6 +50,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   @Output() blur = new EventEmitter<void>();
   @Output() filesChange = new EventEmitter<void>();
   @Output() uploadComplete = new EventEmitter<void>();
+  @Output() initializingResourceChange = new EventEmitter<boolean>();
 
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
 
@@ -71,7 +72,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   constructor(
     private _augmentedResourcesService: AugmentedResourcesService,
     private _resourceDialogsService: ResourceDialogsService,
-    private _resourceInputBridgeService: ResourceInputBridgeService
+    private _resourceInputBridgeService: ResourceInputBridgeService,
   ) {}
 
   ngOnInit(): void {
@@ -224,6 +225,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
 
   initResource(id: string): void {
     this.initializingResource = true;
+    this.initializingResourceChange.emit(this.initializingResource);
 
     this._augmentedResourcesService.getResource(id).subscribe((resource) => {
       if (resource) {
@@ -234,6 +236,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
       }
 
       this.initializingResource = false;
+      this.initializingResourceChange.emit(this.initializingResource);
     });
   }
 

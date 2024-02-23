@@ -9,8 +9,22 @@ import {
   Plan,
 } from '../../client/step-client-module';
 import { CronEditorTab, CronService } from '../../modules/cron/cron.module';
+import { DialogRouteResult } from '../../modules/basics/shared/dialog-route-result';
 
-type EditDialogRef = MatDialogRef<EditSchedulerTaskDialogComponent, ExecutiontTaskParameters>;
+type EditDialogRef = MatDialogRef<EditSchedulerTaskDialogComponent, DialogRouteResult>;
+
+export interface EditSchedulerTaskDialogConfig {
+  disablePlan?: boolean;
+  disableUser?: boolean;
+  hideUser?: boolean;
+}
+
+export interface EditSchedulerTaskDialogData {
+  taskAndConfig: {
+    task: ExecutiontTaskParameters;
+    config?: EditSchedulerTaskDialogConfig;
+  };
+}
 
 @Component({
   selector: 'step-scheduled-task-edit-dialog',
@@ -26,7 +40,10 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
   private _cron = inject(CronService);
   private _api = inject(AugmentedSchedulerService);
   private _matDialogRef = inject<EditDialogRef>(MatDialogRef);
-  protected _task = inject<ExecutiontTaskParameters>(MAT_DIALOG_DATA);
+  private _dialogData = inject<EditSchedulerTaskDialogData>(MAT_DIALOG_DATA);
+
+  protected task = this._dialogData.taskAndConfig.task;
+  protected config = this._dialogData.taskAndConfig.config;
 
   protected plan?: Partial<Plan>;
 
@@ -34,6 +51,8 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
   protected error = '';
   protected showParameters = false;
   protected parametersRawValue: string = '';
+  protected repositoryId?: string;
+  protected repositoryPlanId?: string;
 
   @ViewChild('formContainer', { static: false })
   private form!: NgForm;
@@ -48,8 +67,8 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
       this.form.control.markAllAsTouched();
       return;
     }
-    this._api.saveExecutionTask(this._task).subscribe({
-      next: (task) => this._matDialogRef.close(task),
+    this._api.saveExecutionTask(this.task).subscribe({
+      next: (task) => this._matDialogRef.close({ isSuccess: !!task }),
       error: () => {
         this.error = 'Invalid CRON expression or server error.';
       },
@@ -58,35 +77,35 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
 
   handlePlanChange(plan: Plan): void {
     this.plan = plan;
-    if (!this._task.executionsParameters!.repositoryObject) {
-      this._task.executionsParameters!.repositoryObject = {};
+    if (!this.task.executionsParameters!.repositoryObject) {
+      this.task.executionsParameters!.repositoryObject = {};
     }
-    const repositoryObject = this._task.executionsParameters!.repositoryObject!;
+    const repositoryObject = this.task.executionsParameters!.repositoryObject!;
     if (!repositoryObject.repositoryParameters) {
       repositoryObject.repositoryParameters = {};
     }
     if (plan?.id) {
       repositoryObject.repositoryParameters!['planid'] = plan.id!;
-      this._task.executionsParameters!.description = plan?.attributes?.['name'] ?? undefined;
-      if (!this._task.attributes) {
-        this._task.attributes = {};
+      this.task.executionsParameters!.description = plan?.attributes?.['name'] ?? undefined;
+      if (!this.task.attributes) {
+        this.task.attributes = {};
       }
     }
     this.updateParametersRawValue();
   }
 
   handleDescriptionChange(description: string): void {
-    this._task.attributes!['description'] = description;
+    this.task.attributes!['description'] = description;
     this.updateParametersRawValue();
   }
 
   handleUserIdChange(userId: string): void {
-    this._task.executionsParameters!.userID = userId;
+    this.task.executionsParameters!.userID = userId;
     this.updateParametersRawValue();
   }
 
   handleCustomParametersChange(customParams: Record<string, unknown>): void {
-    this._task.executionsParameters!.customParameters = customParams as Record<string, string>;
+    this.task.executionsParameters!.customParameters = customParams as Record<string, string>;
     this.updateParametersRawValue();
   }
 
@@ -96,27 +115,27 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
       executionParameters = JSON.parse(rawValue);
     } catch (e) {}
     if (executionParameters) {
-      this._task.executionsParameters = executionParameters;
+      this.task.executionsParameters = executionParameters;
     }
   }
 
   configureCronExpression(): void {
     this._cron.configureExpression().subscribe((expression) => {
       if (expression) {
-        this._task.cronExpression = expression;
+        this.task.cronExpression = expression;
       }
     });
   }
 
   addCronExclusion() {
-    if (!this._task.cronExclusions) {
-      this._task.cronExclusions = [];
+    if (!this.task.cronExclusions) {
+      this.task.cronExclusions = [];
     }
-    this._task.cronExclusions.push({ description: undefined, cronExpression: undefined });
+    this.task.cronExclusions.push({ description: undefined, cronExpression: undefined });
   }
 
   removeExclusion(index: number) {
-    this._task.cronExclusions!.splice(index, 1);
+    this.task.cronExclusions!.splice(index, 1);
   }
 
   configureCronExpressionForExclusion(exclusion: CronExclusion): void {
@@ -130,30 +149,37 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
   }
 
   private initializeTask(): void {
-    if (!this._task.attributes) {
-      this._task.attributes = {};
+    if (!this.task.attributes) {
+      this.task.attributes = {};
     }
-    this.isNew = !this._task.attributes!['name'];
-    if (!this._task.executionsParameters) {
-      this._task.executionsParameters = {};
+    this.isNew = !this.task.attributes!['id'];
+    if (!this.task.executionsParameters) {
+      this.task.executionsParameters = {};
     }
-    if (!this._task.executionsParameters.customParameters) {
-      this._task.executionsParameters.customParameters = {};
+    if (!this.task.executionsParameters.customParameters) {
+      this.task.executionsParameters.customParameters = {};
     }
 
-    const planId = this._task.executionsParameters?.repositoryObject?.repositoryParameters?.['planid'];
-    if (planId) {
-      const id = planId;
-      const name = this._task.executionsParameters.description ?? '';
-      this.plan = {
-        id,
-        attributes: { name },
-      };
+    const repository = this.task?.executionsParameters?.repositoryObject;
+    if (repository?.repositoryID === 'local') {
+      const planId = repository?.repositoryParameters?.['planid'];
+      if (planId) {
+        const id = planId;
+        const name = this.task.executionsParameters.description ?? '';
+        this.plan = {
+          id,
+          attributes: { name },
+        };
+      }
+    } else {
+      this.repositoryId = repository?.repositoryID;
+      this.repositoryPlanId =
+        repository?.repositoryParameters?.['planid'] ?? repository?.repositoryParameters?.['planId'];
     }
     this.updateParametersRawValue();
   }
 
   private updateParametersRawValue(): void {
-    this.parametersRawValue = this._task.executionsParameters ? JSON.stringify(this._task.executionsParameters) : '';
+    this.parametersRawValue = this.task.executionsParameters ? JSON.stringify(this.task.executionsParameters) : '';
   }
 }

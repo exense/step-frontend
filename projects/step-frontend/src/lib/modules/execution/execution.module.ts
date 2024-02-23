@@ -35,6 +35,7 @@ import { ExecutionBulkOperationsRegisterService } from './services/execution-bul
 import { IsExecutionProgressPipe } from './pipes/is-execution-progress.pipe';
 import { ExecutionsComponent } from './components/executions/executions.component';
 import { ExecutionOpenerComponent } from './components/execution-opener/execution-opener.component';
+import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
 
 @NgModule({
   declarations: [
@@ -64,6 +65,7 @@ import { ExecutionOpenerComponent } from './components/execution-opener/executio
     IsExecutionProgressPipe,
     ExecutionsComponent,
     ExecutionOpenerComponent,
+    ExecutionRunningStatusHeaderComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [

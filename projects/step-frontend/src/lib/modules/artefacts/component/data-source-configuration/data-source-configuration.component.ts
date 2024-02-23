@@ -28,6 +28,7 @@ export class DataSourceConfigurationComponent
 {
   private _poolApi = inject(PrivateDataPoolPluginService);
 
+  // @ts-ignore
   @Input() override context!: ArtefactContext<DataSourceConfigurationArtefact>;
 
   @ViewChild('form')

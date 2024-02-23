@@ -1,11 +1,11 @@
 import { Directive, Input } from '@angular/core';
-import { MatMenuPanel, _MatMenuTriggerBase } from '@angular/material/menu';
+import { MatMenuPanel, MatMenuTrigger } from '@angular/material/menu';
 
 @Directive({
   selector: `[stepTriggerPopover]`,
   exportAs: 'stepTriggerPopover',
 })
-export class TriggerPopoverDirective extends _MatMenuTriggerBase {
+export class TriggerPopoverDirective extends MatMenuTrigger {
   override _handleClick(event: MouseEvent): void {}
 
   @Input('stepTriggerPopover')

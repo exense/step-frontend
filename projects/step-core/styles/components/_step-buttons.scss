@@ -19,8 +19,8 @@
 @mixin mat-stroked-button($config) {
   $border-color: map.get($config, border-color);
 
-  .mat-stroked-button {
-    &:not(.mat-button-disabled) {
+  .mat-mdc-outlined-button {
+    &:not(.mat-mdc-button-disabled) {
       border-color: $border-color;
     }
   }
@@ -32,4 +32,12 @@
   }
 
   @include mat-stroked-button($config);
+}
+
+@mixin button-round {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  border-radius: 2.8rem;
+  padding: 0 1.4rem;
 }

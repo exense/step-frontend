@@ -1,0 +1,308 @@
+<div id="progress-bar">
+  <div class="bar-container">
+    @if (chartsAreLoading) {
+      <mat-progress-bar style="height: 12px" [mode]="'indeterminate'" />
+    }
+  </div>
+  @if (compareModeEnabled) {
+    <div class="bar-container">
+      @if (compareChartsAreLoading) {
+        <mat-progress-bar style="height: 12px" [mode]="'indeterminate'" />
+      }
+    </div>
+  }
+</div>
+
+<div class="charts">
+  <hr />
+  <div class="chart">
+    @if (compareModeEnabled) {
+      <div class="stamp"></div>
+    }
+    @if (!currentChartsSettings[TsChartType.OVERVIEW]) {
+      <step-chart-skeleton />
+    } @else {
+      <step-timeseries-chart
+        #summaryChart
+        [settings]="currentChartsSettings[TsChartType.OVERVIEW]"
+        [syncKey]="settings.contextId"
+        (lockStateChange)="onChartsLockChange($event)"
+        (zoomReset)="onChartsZoomReset()"
+        [legendMarker]="MarkerType.DOTS"
+      />
+    }
+  </div>
+
+  @if (compareModeEnabled && compareModeContext) {
+    <div class="chart">
+      <div class="stamp compare"></div>
+      @if (!compareChartsSettings[TsChartType.OVERVIEW]) {
+        <step-chart-skeleton />
+      } @else {
+        <step-timeseries-chart
+          #summaryCompareChart
+          [settings]="compareChartsSettings[TsChartType.OVERVIEW]"
+          [syncKey]="compareModeContext!.id"
+          (zoomReset)="onCompareChartsZoomReset()"
+          [legendMarker]="MarkerType.DOTS"
+        />
+      }
+    </div>
+    <hr />
+  }
+
+  <div class="chart">
+    @if (compareModeEnabled) {
+      <div class="stamp"></div>
+    }
+    @if (!currentChartsSettings[TsChartType.BY_STATUS]) {
+      <step-chart-skeleton />
+    } @else {
+      <step-timeseries-chart
+        #byStatusChart
+        [settings]="currentChartsSettings[TsChartType.BY_STATUS]"
+        [syncKey]="settings.contextId"
+        (lockStateChange)="onChartsLockChange($event)"
+        (zoomReset)="onChartsZoomReset()"
+      />
+    }
+  </div>
+  @if (compareModeEnabled) {
+    <div class="chart">
+      <div class="stamp compare"></div>
+      @if (!currentChartsSettings[TsChartType.BY_STATUS]) {
+        <step-chart-skeleton />
+      } @else {
+        <step-timeseries-chart
+          #byStatusCompareChart
+          [settings]="compareChartsSettings[TsChartType.BY_STATUS]"
+          [syncKey]="compareModeContext!.id"
+          (lockStateChange)="onChartsLockChange($event)"
+          (zoomReset)="onCompareChartsZoomReset()"
+        />
+      }
+    </div>
+  }
+
+  <hr />
+
+  <div class="chart">
+    @if (compareModeEnabled) {
+      <div class="stamp"></div>
+    }
+    @if (!currentChartsSettings[TsChartType.RESPONSE_TIME]) {
+      <step-chart-skeleton />
+    } @else {
+      <div class="chart-settings">
+        <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
+          <step-icon name="settings" />
+        </button>
+
+        <mat-menu #settingsMenu="matMenu">
+          <button mat-menu-item [matMenuTriggerFor]="metricsMenu">Metric</button>
+          <button mat-menu-item [matMenuTriggerFor]="keywordsMenu">Measurements</button>
+        </mat-menu>
+
+        <mat-menu #metricsMenu="matMenu">
+          @for (metric of responseTimeMetrics; track metric.label) {
+            <button
+              (click)="switchBaseChartResponseTimeMetric(metric)"
+              mat-menu-item
+              [class.selected-menu-item]="metric.label === selectedThroughputMetric.label"
+            >
+              {{ metric.label }}
+            </button>
+          }
+        </mat-menu>
+
+        <mat-menu #keywordsMenu="matMenu">
+          @if (settings.contextId) {
+            <step-measurements-picker [contextId]="settings.contextId" />
+          }
+        </mat-menu>
+      </div>
+
+      <step-timeseries-chart
+        #responseTimeChart
+        [settings]="currentChartsSettings[TsChartType.RESPONSE_TIME]"
+        [syncKey]="settings.contextId"
+        (lockStateChange)="onChartsLockChange($event)"
+        (zoomReset)="onChartsZoomReset()"
+        [legendMarker]="MarkerType.DOTS"
+      />
+    }
+  </div>
+
+  @if (compareModeEnabled) {
+    <div class="chart">
+      <div class="stamp compare"></div>
+      @if (!currentChartsSettings[TsChartType.RESPONSE_TIME]) {
+        <step-chart-skeleton />
+      } @else {
+        <div class="chart-settings">
+          <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
+            <step-icon name="settings"></step-icon>
+          </button>
+
+          <mat-menu #settingsMenu="matMenu">
+            <button mat-menu-item [matMenuTriggerFor]="metricsMenu">Metric</button>
+            <button mat-menu-item [matMenuTriggerFor]="keywordsMenu">Measurements</button>
+          </mat-menu>
+
+          <mat-menu #metricsMenu="matMenu">
+            @for (metric of responseTimeMetrics; track metric.label) {
+              <button
+                (click)="switchCompareResponseTimeMetric(metric)"
+                mat-menu-item
+                [class.selected-menu-item]="metric.label === selectedCompareResponseTimeMetric.label"
+              >
+                {{ metric.label }}
+              </button>
+            }
+          </mat-menu>
+
+          <mat-menu #keywordsMenu="matMenu">
+            @if (compareModeContext) {
+              <step-measurements-picker [contextId]="compareModeContext!.id" />
+            }
+          </mat-menu>
+        </div>
+
+        <step-timeseries-chart
+          #responseTimeCompareChart
+          [settings]="compareChartsSettings[TsChartType.RESPONSE_TIME]"
+          [syncKey]="compareModeContext!.id"
+          (zoomReset)="onCompareChartsZoomReset()"
+          [legendMarker]="MarkerType.DOTS"
+        />
+      }
+    </div>
+    <hr />
+  }
+
+  <div class="chart">
+    @if (compareModeEnabled) {
+      <div class="stamp"></div>
+    }
+    @if (!currentChartsSettings[TsChartType.THROUGHPUT]) {
+      <step-chart-skeleton />
+    } @else {
+      <div class="chart-settings">
+        <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
+          <step-icon name="settings" />
+        </button>
+        <mat-menu #settingsMenu="matMenu">
+          <button mat-menu-item [matMenuTriggerFor]="metricsMenu">Metric</button>
+          <button mat-menu-item [matMenuTriggerFor]="keywordsMenu">Measurements</button>
+        </mat-menu>
+
+        <mat-menu #metricsMenu="matMenu">
+          <button
+            *ngFor="let metric of throughputMetrics"
+            (click)="switchBaseThroughputMetric(metric)"
+            mat-menu-item
+            [class.selected-menu-item]="metric.label === selectedThroughputMetric.label"
+          >
+            {{ metric.label }}
+          </button>
+        </mat-menu>
+
+        <mat-menu #keywordsMenu="matMenu">
+          @if (settings.contextId) {
+            <step-measurements-picker [contextId]="settings.contextId" />
+          }
+        </mat-menu>
+      </div>
+      <step-timeseries-chart
+        #throughputChart
+        [settings]="currentChartsSettings[TsChartType.THROUGHPUT]"
+        [syncKey]="settings.contextId"
+        (lockStateChange)="onChartsLockChange($event)"
+        (zoomReset)="onChartsZoomReset()"
+      />
+    }
+  </div>
+
+  @if (compareModeEnabled) {
+    <div class="chart">
+      <div class="stamp compare"></div>
+      @if (!currentChartsSettings[TsChartType.THROUGHPUT]) {
+        <step-chart-skeleton />
+      } @else {
+        <div class="chart-settings">
+          <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
+            <step-icon name="settings" />
+          </button>
+          <mat-menu #settingsMenu="matMenu">
+            <button mat-menu-item [matMenuTriggerFor]="metricsMenu">Metric</button>
+            <button mat-menu-item [matMenuTriggerFor]="keywordsMenu">Measurements</button>
+          </mat-menu>
+
+          <mat-menu #metricsMenu="matMenu">
+            @for (metric of throughputMetrics; track metric.label) {
+              <button
+                (click)="switchCompareThroughputMetric(metric)"
+                mat-menu-item
+                [class.selected-menu-item]="metric.label === selectedCompareThroughputMetric.label"
+              >
+                {{ metric.label }}
+              </button>
+            }
+          </mat-menu>
+
+          <mat-menu #keywordsMenu="matMenu">
+            @if (compareModeContext) {
+              <step-measurements-picker [contextId]="compareModeContext!.id" />
+            }
+          </mat-menu>
+        </div>
+        <step-timeseries-chart
+          #throughputCompareChart
+          [settings]="compareChartsSettings[TsChartType.THROUGHPUT]"
+          [syncKey]="compareModeContext!.id"
+          (zoomReset)="onCompareChartsZoomReset()"
+        />
+      }
+    </div>
+  }
+
+  <div class="charts-table">
+    @if (context) {
+      <step-timeseries-table #tableChart [executionContext]="context" />
+    }
+  </div>
+  @if (settings.includeThreadGroupChart) {
+    <div class="chart">
+      @if (compareModeEnabled) {
+        <div *ngIf="compareModeEnabled" class="stamp"></div>
+      }
+      @if (!currentChartsSettings[TsChartType.THREAD_GROUP]) {
+        <step-chart-skeleton />
+      } @else {
+        <step-timeseries-chart
+          #threadGroupChart
+          [settings]="currentChartsSettings[TsChartType.THREAD_GROUP]"
+          [syncKey]="settings.contextId"
+          (lockStateChange)="onChartsLockChange($event)"
+          (zoomReset)="onChartsZoomReset()"
+        />
+      }
+    </div>
+
+    @if (compareModeEnabled) {
+      <div class="chart" *ngIf="compareModeEnabled">
+        <div class="stamp compare"></div>
+        @if (!currentChartsSettings[TsChartType.THREAD_GROUP]) {
+          <step-chart-skeleton />
+        } @else {
+          <step-timeseries-chart
+            #threadGroupCompareChart
+            [settings]="compareChartsSettings[TsChartType.THREAD_GROUP]"
+            [syncKey]="compareModeContext!.id"
+            (zoomReset)="onCompareChartsZoomReset()"
+          />
+        }
+      </div>
+    }
+  }
+</div>

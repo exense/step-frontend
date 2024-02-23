@@ -1,4 +1,4 @@
-import { Component, forwardRef, Inject, ViewEncapsulation } from '@angular/core';
+import { Component, forwardRef, inject, ViewEncapsulation } from '@angular/core';
 import {
   AbstractArtefact,
   ReportNode,
@@ -31,13 +31,10 @@ import { Observable, of } from 'rxjs';
   encapsulation: ViewEncapsulation.None,
 })
 export class ExecutionTreeComponent implements TreeActionsService {
+  private _paging = inject(EXECUTION_TREE_PAGING_SETTINGS);
+  private _executionTreePagingService = inject(ExecutionTreePagingService);
+  private _treeState = inject<TreeStateService<ReportNode, ReportTreeNode>>(TreeStateService);
   readonly selectedNode$: Observable<ReportTreeNode | undefined> = this._treeState.selectedNode$;
-
-  constructor(
-    @Inject(EXECUTION_TREE_PAGING_SETTINGS) private _paging: ExecutionTreePagingSetting,
-    private _executionTreePagingService: ExecutionTreePagingService,
-    private _treeState: TreeStateService<ReportNode, ReportTreeNode>
-  ) {}
 
   handleContextAction(actionId: string, node?: AbstractArtefact): void {
     const nodeId = node?.id!;

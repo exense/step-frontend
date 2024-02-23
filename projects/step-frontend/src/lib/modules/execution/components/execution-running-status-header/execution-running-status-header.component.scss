@@ -1,0 +1,14 @@
+@use 'sass:map';
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-execution-running-status-header {
+  display: flex;
+  gap: 0.5rem;
+  .step-badge {
+    background: map-get(var.$statuses, 'RUNNING') !important;
+    color: var.$white;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+  }
+}

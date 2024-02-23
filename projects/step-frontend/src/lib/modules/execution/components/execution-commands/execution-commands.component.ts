@@ -1,14 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  inject,
-  Inject,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import {
   ArtefactFilter,
   AugmentedExecutionsService,
@@ -16,6 +6,7 @@ import {
   AuthService,
   Execution,
   ExecutionParameters,
+  ExecutiontTaskParameters,
   RepositoryObjectReference,
   ScheduledTaskDialogsService,
 } from '@exense/step-core';
@@ -32,6 +23,11 @@ import { ExecutionTabManagerService } from '../../services/execution-tab-manager
 export class ExecutionCommandsComponent implements OnInit, OnChanges {
   private _executionTabManager = inject(ExecutionTabManagerService, { optional: true });
   private _router = inject(Router);
+  private _executionService = inject(AugmentedExecutionsService);
+  private _screenTemplates = inject(AugmentedScreenService);
+  private _scheduledTaskDialogs = inject(ScheduledTaskDialogsService);
+  private _authService = inject(AuthService);
+  private _document = inject(DOCUMENT);
 
   @Input() description?: string;
   @Input() repositoryObjectRef?: RepositoryObjectReference;
@@ -43,14 +39,6 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
 
   executionParameters?: Record<string, string>;
   isExecutionIsolated: boolean = false;
-
-  constructor(
-    private _executionService: AugmentedExecutionsService,
-    private _screenTemplates: AugmentedScreenService,
-    private _scheduledTaskDialogs: ScheduledTaskDialogsService,
-    private _authService: AuthService,
-    @Inject(DOCUMENT) private _document: Document
-  ) {}
 
   ngOnInit(): void {
     if (!this.executionParameters) {
@@ -89,7 +77,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
       if (currentEId && this._executionTabManager) {
         this._executionTabManager.handleTabClose(currentEId, false);
       }
-      this._router.navigateByUrl(`/root/executions/open/${eId}`);
+      this._router.navigateByUrl(`/executions/open/${eId}`);
     });
   }
 
@@ -102,10 +90,10 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
   }
 
   schedule(): void {
-    const executionParams = this.buildExecutionParams(false);
-    this._scheduledTaskDialogs.newScheduledTask(executionParams).subscribe((result) => {
+    const task = this.prefillScheduledTask();
+    this._scheduledTaskDialogs.editScheduledTask(task).subscribe((result) => {
       if (result) {
-        this._router.navigate(['root', 'scheduler']);
+        this._router.navigate(['scheduler']);
       }
     });
   }
@@ -139,8 +127,8 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
     this.isExecutionIsolated = isolateExecution ? true : execution?.executionParameters?.isolatedExecution || false;
   }
 
-  private buildExecutionParams(simulate: boolean): ExecutionParameters {
-    const userID = this._authService.getContext().userID;
+  private buildExecutionParams(simulate: boolean, includeUserId = true): ExecutionParameters {
+    const userID = includeUserId ? this._authService.getUserID() : undefined;
     const description = this.description;
     const mode = simulate ? 'SIMULATION' : 'RUN';
     const repositoryObject = this.repositoryObjectRef;
@@ -173,6 +161,15 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
       isolatedExecution,
       artefactFilter,
       customParameters: this.executionParameters,
+    };
+  }
+
+  private prefillScheduledTask(): ExecutiontTaskParameters {
+    const executionsParameters = this.buildExecutionParams(false, false);
+    const name = executionsParameters.description ?? '';
+    return {
+      attributes: { name },
+      executionsParameters,
     };
   }
 }

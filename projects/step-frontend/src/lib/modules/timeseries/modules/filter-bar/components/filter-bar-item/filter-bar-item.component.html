@@ -1,0 +1,263 @@
+<step-form-field
+  [class.active]="active"
+  [matMenuTriggerFor]="menu"
+  #matTrigger="matMenuTrigger"
+  (menuOpened)="onMenuOpen(); focusables.scheduleRefocus()"
+  [matTooltip]="formattedValue ?? ''"
+>
+  <step-prefix>{{ item.label || formattedValue || 'Unspecified' }}</step-prefix>
+  <div class="step-field-container">{{ formattedValue || '-' }}</div>
+  @if (removable) {
+    <step-suffix class="icon-suffix">
+      <step-icon class="remove-btn" name="x" (click)="removeItem.emit()" />
+    </step-suffix>
+  }
+</step-form-field>
+
+<mat-menu
+  #menu="matMenu"
+  [ngSwitch]="item.type"
+  (close)="onMenuClose()"
+  [class]="item.type === 'FREE_TEXT' ? 'wide' : ''"
+>
+  <form
+    class="menu-container"
+    (click)="$event.stopPropagation()"
+    stepTrapFocus
+    stepFocusables
+    #focusables="stepFocusables"
+  >
+    <div *ngSwitchCase="'OPTIONS'">
+      <div class="item-header">
+        {{ item.label }}
+      </div>
+
+      <div class="checkboxes">
+        <mat-checkbox
+          *ngFor="let option of item.textValues; let i = index"
+          #checkbox
+          color="primary"
+          [name]="option.value"
+          [ngModel]="option.isSelected"
+          (change)="toggleOption(option, $event.checked)"
+          stepFocusable
+          [defaultSpace]="false"
+          (keydownSpace)="toggleOption(option, !option.isSelected, checkbox)"
+          [stepRecursiveTabIndex]="-1"
+        >
+          {{ option.value }}
+        </mat-checkbox>
+      </div>
+    </div>
+
+    <div *ngSwitchCase="'FREE_TEXT'">
+      <div *ngIf="item.label" class="item-header">
+        {{ item.label }}
+      </div>
+      <mat-form-field *ngIf="!item.isLocked" class="w-100">
+        <mat-label>Attribute name</mat-label>
+        <input
+          type="text"
+          autocomplete="off"
+          [readonly]="item.isLocked"
+          matInput
+          name="attributeName"
+          [(ngModel)]="item.attributeName"
+          stepFocusable
+        />
+      </mat-form-field>
+
+      <mat-form-field class="w-100" appearance="fill">
+        <mat-label>Search values</mat-label>
+        <mat-chip-grid #chipGrid aria-label="Enter values">
+          <mat-chip-row *ngFor="let value of freeTextValues; let i = index" (removed)="freeTextValues.splice(i, 1)">
+            {{ value }}
+            <button matChipRemove [attr.aria-label]="'remove'">
+              <step-icon name="x"></step-icon>
+            </button>
+          </mat-chip-row>
+          <input
+            stepFocusable
+            matChipInput
+            [(ngModel)]="chipInputValue"
+            [ngModelOptions]="{ standalone: true }"
+            [matChipInputFor]="chipGrid"
+            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+            (matChipInputTokenEnd)="addSearchValue($event.value || '')"
+          />
+        </mat-chip-grid>
+        <mat-hint>Use "Enter" to add values</mat-hint>
+      </mat-form-field>
+
+      <button
+        type="submit"
+        class="w-100 submit-btn"
+        (click)="applyChanges()"
+        mat-raised-button
+        color="primary"
+        stepFocusable
+        [defaultSpace]="false"
+        (keydownSpace)="applyChanges()"
+      >
+        Apply
+      </button>
+    </div>
+
+    <div *ngSwitchCase="'EXECUTION'">
+      <div class="item-header">
+        {{ item.label }}
+      </div>
+      <step-ts-filter-bar-execution-item [values]="item.searchEntities"></step-ts-filter-bar-execution-item>
+
+      <div class="apply-checkbox">
+        <mat-checkbox [(ngModel)]="item.updateTimeSelectionOnFilterChange" [ngModelOptions]="{ standalone: true }"
+          >Update time range
+        </mat-checkbox>
+        <step-icon
+          matTooltip="Enabling this, the chart time range selection will adjust to cover all your executions"
+          name="help-circle"
+        ></step-icon>
+      </div>
+      <button
+        type="submit"
+        class="w-100 submit-btn"
+        (click)="applyChanges()"
+        mat-raised-button
+        color="primary"
+        stepFocusable
+        [defaultSpace]="false"
+        (keydownSpace)="applyChanges()"
+      >
+        Apply
+      </button>
+    </div>
+
+    <div *ngSwitchCase="FilterBarItemType.TASK">
+      <div class="item-header">
+        {{ item.label }}
+      </div>
+      <step-ts-filter-bar-task-item [values]="item.searchEntities"></step-ts-filter-bar-task-item>
+
+      <button
+        type="submit"
+        class="w-100 submit-btn"
+        (click)="applyChanges()"
+        mat-raised-button
+        color="primary"
+        stepFocusable
+        [defaultSpace]="false"
+        (keydownSpace)="applyChanges()"
+      >
+        Apply
+      </button>
+    </div>
+
+    <div *ngSwitchCase="FilterBarItemType.PLAN">
+      <div class="item-header">
+        {{ item.label }}
+      </div>
+      <step-ts-filter-bar-plan-item [values]="item.searchEntities"></step-ts-filter-bar-plan-item>
+
+      <button
+        type="submit"
+        class="w-100 submit-btn"
+        (click)="applyChanges()"
+        mat-raised-button
+        color="primary"
+        stepFocusable
+        [defaultSpace]="false"
+        (keydownSpace)="applyChanges()"
+      >
+        Apply
+      </button>
+    </div>
+
+    <div *ngSwitchCase="'NUMERIC'">
+      <mat-form-field *ngIf="!item.isLocked" class="w-100">
+        <mat-label>Attribute name</mat-label>
+        <input
+          type="text"
+          autocomplete="off"
+          [readonly]="item.isLocked"
+          matInput
+          name="attributeName"
+          [(ngModel)]="item.attributeName"
+          stepFocusable
+        />
+      </mat-form-field>
+
+      <mat-form-field class="w-100">
+        <mat-label>Min</mat-label>
+        <input type="number" matInput name="min" [(ngModel)]="minValue" stepFocusable />
+      </mat-form-field>
+
+      <mat-form-field class="w-100">
+        <mat-label>Max</mat-label>
+        <input type="number" matInput name="max" [(ngModel)]="maxValue" stepFocusable />
+      </mat-form-field>
+
+      <button
+        type="submit"
+        class="w-100"
+        (click)="applyChanges()"
+        mat-raised-button
+        color="primary"
+        stepFocusable
+        [defaultSpace]="false"
+        (keydownSpace)="applyChanges()"
+      >
+        Apply
+      </button>
+    </div>
+
+    <div *ngSwitchCase="'DATE'">
+      <mat-form-field *ngIf="!item.isLocked" class="w-100">
+        <mat-label>Attribute name</mat-label>
+        <input
+          type="text"
+          autocomplete="off"
+          [readonly]="item.isLocked"
+          matInput
+          name="attributeName"
+          [(ngModel)]="item.attributeName"
+          stepFocusable
+        />
+      </mat-form-field>
+
+      <div class="date-filters">
+        <step-date-filter
+          label="From"
+          (filterChange)="onMinDateChanged($event)"
+          #from="stepDateFilter"
+          stepFocusable
+          [defaultSpace]="false"
+          (keydownSpace)="from.stepPicker?.open()"
+          [stepRecursiveTabIndex]="-1"
+        ></step-date-filter>
+
+        <step-date-filter
+          label="To"
+          (filterChange)="onMaxDateChanged($event)"
+          #to="stepDateFilter"
+          stepFocusable
+          [defaultSpace]="false"
+          (keydownSpace)="to.stepPicker?.open()"
+          [stepRecursiveTabIndex]="-1"
+        ></step-date-filter>
+      </div>
+
+      <button
+        type="submit"
+        class="w-100"
+        (click)="applyChanges()"
+        mat-raised-button
+        color="primary"
+        stepFocusable
+        [defaultSpace]="false"
+        (keydownSpace)="applyChanges()"
+      >
+        Apply
+      </button>
+    </div>
+  </form>
+</mat-menu>
