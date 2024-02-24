@@ -71,9 +71,9 @@
           <span class="sidebar-aligned-text">Home</span>
         </label>
       </div>
-      <div *ngIf="!(isOpened$ | async)" class="sidebar-collapsable-tab" (mouseup)="navigateTo('home', $event)">
+      <div *ngIf="!(isOpened$ | async)" class="sidebar-collapsable-tab" (click)="addBookmark()">
         <label>
-          <step-icon class="sidebar-home-and-bookmark-icon" name="star" (click)="addBookmark()"></step-icon>
+          <step-icon class="sidebar-home-and-bookmark-icon" name="star"></step-icon>
         </label>
       </div>
     </div>
