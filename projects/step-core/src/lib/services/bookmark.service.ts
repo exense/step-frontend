@@ -1,6 +1,5 @@
 import { inject, Inject, Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, of } from 'rxjs';
-import { StorageProxy } from '../modules/basics/shared/storage-proxy';
 import { LOCAL_STORAGE } from '../modules/basics/shared/storage.token';
 import { Bookmark } from '../shared/bookmark';
 import { BookmarkStorageService } from './bookmark-storage.service';
@@ -10,7 +9,7 @@ const bookmark = 'BOOKMARKS';
 @Injectable({
   providedIn: 'root',
 })
-export class BookmarkService extends StorageProxy {
+export class BookmarkService {
   private _bookmarkStorageService = inject(BookmarkStorageService);
   private bookmarksInternal$ = new BehaviorSubject<Bookmark[]>(this._bookmarkStorageService.getStorageBookmarks());
   readonly bookmarks$ = this.bookmarksInternal$.asObservable();
@@ -31,11 +30,6 @@ export class BookmarkService extends StorageProxy {
       }),
     ),
   );
-
-  constructor(@Inject(LOCAL_STORAGE) storage: Storage) {
-    super(storage, bookmark);
-    this.bookmarksInternal$.next(this._bookmarkStorageService.getStorageBookmarks());
-  }
 
   createDataSource(): Bookmark[] | undefined {
     let item = this._bookmarkStorageService.getStorageBookmarks();
