@@ -31,10 +31,6 @@ export class BookmarkService {
     ),
   );
 
-  createDataSource(): Bookmark[] | undefined {
-    let item = this._bookmarkStorageService.getStorageBookmarks();
-    return item;
-  }
 
   createBookmark(value: any): Observable<null | undefined> | any {
     const bookmarks = this._bookmarkStorageService.getStorageBookmarks();
