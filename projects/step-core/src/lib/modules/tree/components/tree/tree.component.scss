@@ -22,12 +22,12 @@ step-tree {
     }
 
     section.middle-drop-container {
-      min-height: 3rem;
+      min-height: 2.4rem;
       padding: 0.3rem 0;
       left: calc(var(--idx) * 3rem + 6rem);
       position: absolute;
       min-width: 10rem;
-      top: 2rem;
+      top: 2.7rem;
       display: flex;
       justify-content: space-around;
       z-index: 1;
