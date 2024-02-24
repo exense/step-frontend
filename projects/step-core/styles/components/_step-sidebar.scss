@@ -94,6 +94,10 @@ $menu-sub-item-height: 3.2rem;
     z-index: 3;
     max-width: 9.5rem;
     min-width: 9.5rem;
+
+    input {
+      width: 2rem !important;
+    }
   }
   .tenant-selector-when-sidebar-closed {
     display: none;
