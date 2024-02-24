@@ -65,17 +65,19 @@
           </section>
         </div>
       </div>
-      <div *ngIf="!(isOpened$ | async)" class="sidebar-collapsable-tab" (mouseup)="navigateTo('home', $event)">
-        <label>
-          <step-icon class="visible-when-collapsed" name="home"></step-icon>
-          <span class="sidebar-aligned-text">Home</span>
-        </label>
-      </div>
-      <div *ngIf="!(isOpened$ | async)" class="sidebar-collapsable-tab" (mouseup)="navigateTo('home', $event)">
-        <label>
-          <step-icon class="sidebar-home-and-bookmark-icon" name="star" (click)="addBookmark()"></step-icon>
-        </label>
-      </div>
+      <ng-container *ngIf="!(isOpened$ | async)">
+        <div class="sidebar-collapsable-tab" (mouseup)="navigateTo('home', $event)">
+          <label>
+            <step-icon class="visible-when-collapsed" name="home"></step-icon>
+            <span class="sidebar-aligned-text">Home</span>
+          </label>
+        </div>
+        <div class="sidebar-collapsable-tab" (click)="addBookmark()">
+          <label>
+            <step-icon class="sidebar-home-and-bookmark-icon" name="star"></step-icon>
+          </label>
+        </div>
+      </ng-container>
     </div>
   </div>
 
