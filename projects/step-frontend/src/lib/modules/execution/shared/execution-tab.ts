@@ -1,6 +1,6 @@
 import { Execution, Tab } from '@exense/step-core';
 
-export interface ExecutionTab extends Tab {
+export interface ExecutionTab extends Tab<string> {
   title?: string;
   active?: boolean;
   type?: 'list' | 'progress';

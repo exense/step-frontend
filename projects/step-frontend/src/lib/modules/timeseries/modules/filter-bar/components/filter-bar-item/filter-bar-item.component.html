@@ -1,19 +1,18 @@
-<div
-  class="filter-item-container"
+<step-form-field
   [class.active]="active"
-  [title]="formattedValue || 'Empty filter'"
-  [class.compact]="compact"
   [matMenuTriggerFor]="menu"
   #matTrigger="matMenuTrigger"
   (menuOpened)="onMenuOpen(); focusables.scheduleRefocus()"
+  [matTooltip]="formattedValue ?? ''"
 >
-  <div class="filter-label">{{ item.label || formattedValue || 'Unspecified' }}</div>
-  <div class="filter-value">{{ formattedValue || '-' }}</div>
-
-  <div (click)="removeItem.emit()" class="remove-btn" *ngIf="removable" title="Remove">
-    <step-icon class="remove-btn" [class.highlight]="highlightRemoveButton" name="x"></step-icon>
-  </div>
-</div>
+  <step-prefix>{{ item.label || formattedValue || 'Unspecified' }}</step-prefix>
+  <div class="step-field-container">{{ formattedValue || '-' }}</div>
+  @if (removable) {
+    <step-suffix class="icon-suffix">
+      <step-icon class="remove-btn" name="x" (click)="removeItem.emit()" />
+    </step-suffix>
+  }
+</step-form-field>
 
 <mat-menu
   #menu="matMenu"

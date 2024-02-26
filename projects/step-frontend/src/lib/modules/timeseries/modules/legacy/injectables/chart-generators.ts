@@ -60,6 +60,23 @@ export class ChartGenerators {
       },
       series: [
         {
+          id: 'count',
+          scale: 'total',
+          legendName: 'Hits/h',
+          label: 'Hits/h',
+          labelItems: ['Hits/h'],
+          data: countValues,
+          value: (x: unknown, v: number) => Math.trunc(v),
+          fill: (self: uPlot) =>
+            this._uPlotUtils.multiColorsGradientFill(self, [
+              { offset: 0, color: TimeSeriesConfig.OVERVIEW_COLORS[0] },
+              { offset: 1, color: TimeSeriesConfig.OVERVIEW_COLORS[1] },
+            ]),
+          paths: this.barsFunction({ size: [0.5, 100], radius: 0.2 }),
+          points: { show: false },
+          show: true,
+        },
+        {
           id: 'avg',
           scale: 'y',
           label: 'Response Time',
@@ -68,22 +85,12 @@ export class ChartGenerators {
           metadata: metadata,
           value: (x: unknown, v: number) => Math.trunc(v) + ' ms',
           width: 2,
-          stroke: 'rgba(255,109,18,0.59)',
+          stroke: '#f79009',
           legendName: 'Average Response Time',
           show: true,
-        },
-        {
-          id: 'count',
-          scale: 'total',
-          legendName: 'Hits/h',
-          label: 'Hits/h',
-          labelItems: ['Hits/h'],
-          data: countValues,
-          value: (x: unknown, v: number) => Math.trunc(v),
-          fill: (self: uPlot) => this._uPlotUtils.gradientFill(self, TimeSeriesConfig.TOTAL_BARS_COLOR),
-          paths: this.barsFunction({ size: [0.9, 100] }),
-          points: { show: false },
-          show: true,
+          points: {
+            fill: '#f79009',
+          },
         },
       ],
       axes: [

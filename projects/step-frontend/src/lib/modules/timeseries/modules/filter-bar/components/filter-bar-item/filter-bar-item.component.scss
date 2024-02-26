@@ -1,56 +1,17 @@
 @use 'projects/step-core/styles/core-variables' as var;
 @use 'projects/step-frontend/styles/common-mixins' as common-mixins;
-@include common-mixins.ts-filter-bar();
 
-:host {
-  background: var.$gray-100;
-  color: #293e50;
-  padding: 0.2rem;
-  border-radius: 4px;
+step-form-field:not(.active) {
+  color: var.$gray-500;
 }
 
-.filter-item-container {
-  &.active {
-    background: #fff;
-  }
-
-  .filter-label {
-    font-size: 1.2rem;
-    opacity: 0.7;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding-right: 0.6rem;
-  }
-
-  .filter-value {
-    font-size: 1.1rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .remove-btn {
-    cursor: pointer;
-    position: absolute;
-    right: 0;
-    top: 0;
-    font-size: 0.4rem;
-    border-radius: 50%;
-    width: 1.4rem;
-    height: 1.4rem;
-    min-width: 1.4rem;
-    min-height: 1.4rem;
-    padding: 2px;
-
-    &.highlight {
-      background-color: var.$yellow-5;
-    }
-
-    &:hover {
-      background: var.$gray-200;
-    }
-  }
+.step-field-container {
+  min-width: 5rem;
+  width: auto !important;
+  max-width: 15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .attribute-type {

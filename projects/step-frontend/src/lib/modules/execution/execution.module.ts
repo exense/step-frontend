@@ -79,6 +79,7 @@ import { ExecutionRunningStatusHeaderComponent } from './components/execution-ru
     ExecutionProgressComponent,
     RepositoryComponent,
     ExecutionSelectionTableComponent,
+    StatusComponent,
   ],
 })
 export class ExecutionModule {

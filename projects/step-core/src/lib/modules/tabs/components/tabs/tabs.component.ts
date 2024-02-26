@@ -21,18 +21,18 @@ import { MatTabNav } from '@angular/material/tabs';
   exportAs: 'StepTabs',
   encapsulation: ViewEncapsulation.None,
 })
-export class TabsComponent implements OnChanges {
-  readonly trackByTab: TrackByFunction<Tab> = (index, item) => item.id;
+export class TabsComponent<T extends string | number> implements OnChanges {
+  readonly trackByTab: TrackByFunction<Tab<T>> = (index, item) => item.id;
 
   @ViewChild(MatTabNav)
   private tabBar!: MatTabNav;
 
   @Input() tabMode: 'buttons' | 'tabs' = 'buttons';
   @Input() disablePagination: boolean = false;
-  @Input() tabs: Tab[] = [];
-  @Input() activeTabId?: string;
+  @Input() tabs: Tab<T>[] = [];
+  @Input() activeTabId?: T;
   @Input() tabTemplate?: TemplateRef<unknown>;
-  @Output() activeTabIdChange = new EventEmitter<string>();
+  @Output() activeTabIdChange = new EventEmitter<T>();
 
   @HostBinding('class.shrink') @Input() shrink: boolean = false;
   @HostBinding('class.tab-mode-buttons') isTabModeButtons: boolean = true;
@@ -47,7 +47,7 @@ export class TabsComponent implements OnChanges {
     }
   }
 
-  selectTab(tab: Tab): void {
+  selectTab(tab: Tab<T>): void {
     this.activeTabId = tab.id;
     this.activeTabIdChange.emit(tab.id);
   }

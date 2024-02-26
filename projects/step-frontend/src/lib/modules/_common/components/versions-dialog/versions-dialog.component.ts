@@ -15,7 +15,7 @@ enum VersionDialogTabs {
 export class VersionsDialogComponent {
   private _controllerService = inject(ControllerService);
 
-  readonly tabs: Tab[] = [
+  readonly tabs: Tab<VersionDialogTabs>[] = [
     {
       id: VersionDialogTabs.FE,
       label: 'FrontEnd',

@@ -1,6 +1,7 @@
 $white: #fff;
 $dark-gray: #555;
 $muted: #777;
+$muted-light: #7c7c7c;
 $on: #35c163;
 $of: #d90606;
 $light-blue: #beebff;
@@ -10,14 +11,19 @@ $light-blue-gray: #f2f4f7;
 $dark-blue: #0082cb;
 $orange: #ff8f4b;
 $highlight: #293e500d;
+$glass: #ffffff22;
 
 //#region Gray
 $gray-50: #f9fafb;
 $gray-100: #f2f4f7;
+$gray-125: #b7b7b7;
+$gray-150: #bdbbbb;
 $gray-200: #eaecf0;
 $gray-300: #d0d5dd;
 $gray-400: #98a2b3;
+$gray-450: #878787;
 $gray-500: #667085;
+$gray-525: #6d6d6d;
 $gray-550: #4b5565;
 $gray-700: #344054;
 $gray-750: #364152;
@@ -27,6 +33,8 @@ $gray-800: #1d2939;
 //#region Blue
 $blue-10: #d9edf7;
 $blue-15: #bce8f1;
+$blue-50: #6494c4;
+$blue-100: #4daeff;
 $blue-600: #0082cb;
 $blue-625: #006299;
 $blue-650: #31708f;
@@ -74,6 +82,7 @@ $statuses: (
   'INITIALIZING': gray,
   'IMPORTING': orange,
   'EXPORTING': orange,
+  'DELAYED_UPDATE': orange,
   'RUNNING': #337ab7,
   'ABORTING': #d9534f,
   'FORCING_ABORT': #d9534f,

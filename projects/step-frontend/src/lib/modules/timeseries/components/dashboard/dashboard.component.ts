@@ -94,10 +94,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  trackByName(index: number, item: MetricType): string {
-    return item.name;
-  }
-
   private extractUrlParams(): PageParams {
     const initialParams: Params = this._route.snapshot.queryParams;
     return {

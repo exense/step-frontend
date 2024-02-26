@@ -1,4 +1,5 @@
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
 
 #progress-bar {
   height: 12px;
@@ -23,7 +24,7 @@
 }
 
 .chart {
-  width: calc(50% - 12px);
+  width: 100%;
   min-width: 484px;
   position: relative;
 }
@@ -35,8 +36,8 @@
   font-size: 1rem;
   background-color: var.$gray-400;
   opacity: 0.7;
-  top: -8px;
-  right: -10px;
+  top: 0;
+  left: 0;
   text-align: center;
   width: 78px;
 
@@ -59,26 +60,40 @@
   background: rgba(0, 0, 0, 0.04);
 }
 
-.cards {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 16px;
-}
+.charts {
+  $size: calc(50% - 1.2rem);
+  display: grid;
+  grid-template-columns: $size $size;
+  column-gap: 2.4rem;
+  row-gap: 1.6rem;
+  margin-bottom: 1.6rem;
 
-.mat-mdc-card {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2.4rem;
+  hr {
+    grid-column: 1 / 3;
+    width: 100%;
+    margin: 0;
+    height: 0;
+    border: none;
+    border-top: solid 1px var.$gray-200;
+  }
 }
 
 .charts-table {
-  width: 100%;
+  grid-column: 1 / 3;
 }
 
 .chart-settings {
   position: absolute;
-  right: 8px;
-  top: 8px;
+  right: 0;
+  top: 0;
   z-index: 1;
+
+  button {
+    width: 2rem !important;
+    height: 2rem !important;
+    @include core.step-icon(1.6rem);
+    step-icon {
+      display: flex !important;
+    }
+  }
 }

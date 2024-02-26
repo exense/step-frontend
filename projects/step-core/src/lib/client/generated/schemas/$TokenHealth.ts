@@ -36,11 +36,11 @@ export const $TokenHealth = {
                     type: 'number',
                     format: 'int32',
                   },
-                  className: {
-                    type: 'string',
-                  },
                   nativeMethod: {
                     type: 'boolean',
+                  },
+                  className: {
+                    type: 'string',
                   },
                 },
               },
@@ -75,11 +75,11 @@ export const $TokenHealth = {
                           type: 'number',
                           format: 'int32',
                         },
-                        className: {
-                          type: 'string',
-                        },
                         nativeMethod: {
                           type: 'boolean',
+                        },
+                        className: {
+                          type: 'string',
                         },
                       },
                     },
@@ -121,11 +121,11 @@ export const $TokenHealth = {
                 type: 'number',
                 format: 'int32',
               },
-              className: {
-                type: 'string',
-              },
               nativeMethod: {
                 type: 'boolean',
+              },
+              className: {
+                type: 'string',
               },
             },
           },
@@ -160,11 +160,11 @@ export const $TokenHealth = {
                       type: 'number',
                       format: 'int32',
                     },
-                    className: {
-                      type: 'string',
-                    },
                     nativeMethod: {
                       type: 'boolean',
+                    },
+                    className: {
+                      type: 'string',
                     },
                   },
                 },

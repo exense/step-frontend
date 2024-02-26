@@ -24,19 +24,19 @@ import {
 } from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';
 import {
-  DiscoverDialogData,
+  COMMON_IMPORTS,
   DiscoverComponent,
+  DiscoverDialogData,
+  FilterBarItem,
+  FilterBarItemType,
+  FilterUtils,
+  OQLBuilder,
+  TimeRangePickerComponent,
   TimeRangePickerSelection,
   TimeSeriesConfig,
-  OQLBuilder,
-  FilterBarItem,
-  FilterUtils,
-  FilterBarItemType,
-  TsFilteringSettings,
-  TsFilteringMode,
   TimeSeriesContext,
-  COMMON_IMPORTS,
-  TimeRangePickerComponent,
+  TsFilteringMode,
+  TsFilteringSettings,
   TsGroupingComponent,
 } from '../../../_common';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -95,7 +95,23 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
 
   rawMeasurementsModeActive = false;
 
-  oqlModeActive = false;
+  readonly FilterBarItemType = FilterBarItemType;
+
+  readonly modes: Tab<TsFilteringMode>[] = [
+    {
+      id: TsFilteringMode.STANDARD,
+      label: 'Basic',
+    },
+    {
+      id: TsFilteringMode.OQL,
+      label: 'OQL',
+    },
+  ];
+
+  readonly TsFilteringMode = TsFilteringMode;
+
+  activeMode = TsFilteringMode.STANDARD;
+
   oqlValue: string = '';
   invalidOql = false;
 
@@ -103,10 +119,6 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   private _timeSeriesService = inject(TimeSeriesService);
   private _matDialog = inject(MatDialog);
   private _snackbar = inject(MatSnackBar);
-
-  trackByAttributeFn = (index: number, item: FilterBarItem): string => {
-    return item.attributeName;
-  };
 
   getInternalFilters() {
     return this._internalFilters;
@@ -160,8 +172,9 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     this.invalidOql = false;
   }
 
-  toggleOQLMode() {
-    if (this.oqlModeActive) {
+  toggleOQLMode(mode: number) {
+    this.activeMode = mode as TsFilteringMode;
+    if (this.activeMode === TsFilteringMode.OQL) {
       this.oqlValue = FilterUtils.filtersToOQL(
         this.getValidFilters().filter((item) => !item.isHidden),
         TimeSeriesConfig.ATTRIBUTES_PREFIX,
@@ -176,17 +189,18 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   disableOqlMode() {
-    this.oqlModeActive = false;
+    this.activeMode = TsFilteringMode.STANDARD;
   }
 
   composeAndVerifyFullOql(groupDimensions: string[]): Observable<OQLVerifyResponse> {
     // we fake group dimensions as being filters, to verify altogether
-    const filtersOql = this.oqlModeActive
-      ? this.oqlValue
-      : FilterUtils.filtersToOQL(
-          this._internalFilters.filter(FilterUtils.filterItemIsValid),
-          TimeSeriesConfig.ATTRIBUTES_PREFIX,
-        );
+    const filtersOql =
+      this.activeMode === TsFilteringMode.OQL
+        ? this.oqlValue
+        : FilterUtils.filtersToOQL(
+            this._internalFilters.filter(FilterUtils.filterItemIsValid),
+            TimeSeriesConfig.ATTRIBUTES_PREFIX,
+          );
     let groupingItems: FilterBarItem[] = groupDimensions.map((dimension) => ({
       attributeName: dimension,
       type: FilterBarItemType.FREE_TEXT,
@@ -215,7 +229,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
 
   emitFiltersChange() {
     const settings: TsFilteringSettings = {
-      mode: this.oqlModeActive ? TsFilteringMode.OQL : TsFilteringMode.STANDARD,
+      mode: this.activeMode,
       filterItems: this.getValidFilters(),
       oql: this.oqlValue,
     };
@@ -226,7 +240,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     if (this.haveNewGrouping()) {
       this.context.updateGrouping(this.activeGrouping);
     }
-    if (!this.oqlModeActive) {
+    if (this.activeMode === TsFilteringMode.STANDARD) {
       this.emitFiltersChange();
     } else {
       // oql mode
@@ -379,9 +393,5 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.emitFilterChange$.complete();
-  }
-
-  get FilterBarItemType() {
-    return FilterBarItemType;
   }
 }

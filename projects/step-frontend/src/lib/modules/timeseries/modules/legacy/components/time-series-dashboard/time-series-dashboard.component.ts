@@ -15,8 +15,8 @@ import {
   TimeSeriesContextsFactory,
   COMMON_IMPORTS,
 } from '../../../_common';
-import { FilterBarComponent } from '../filter-bar/filter-bar.component';
 import { PerformanceViewSettings } from '../../types/performance-view-settings';
+import { FilterBarComponent } from '../../../filter-bar';
 
 @Component({
   selector: 'step-timeseries-dashboard',

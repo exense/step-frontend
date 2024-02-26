@@ -79,7 +79,7 @@ export class TimeseriesColorsPool {
   }
 }
 
-const colors = ['#0b75ff', '#23ad9d', '#8c13ff'];
+const colors = ['#0082CB', '#23ad9d', '#8c13ff'];
 
 const statusColors: { [key: string]: string } = {
   technical_error: '#000000',
