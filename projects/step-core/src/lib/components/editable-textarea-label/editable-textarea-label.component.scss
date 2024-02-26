@@ -8,11 +8,14 @@
 }
 
 .editable-textarea-label {
-  line-height: 18px;
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1px solid transparent;
+  line-height: 1.8rem;
+  padding: 0.8rem 1.4rem;
+  border-radius: 0.8rem;
+  border: 0.1rem solid transparent;
   word-break: break-word;
+  & > .editable-textarea-placeholder {
+    color: var.$gray-525;
+  }
 
   &:hover {
     background: var.$gray-50;

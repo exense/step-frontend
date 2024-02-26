@@ -4,14 +4,13 @@
     [isDisabled]="context.readonly"
     (onSave)="context.save()"
     (keywordUpdate)="onUpdateKeyword($event)"
-  >
-  </step-keyword-name>
+  />
   <step-editable-textarea-label
     [(ngModel)]="context.artefact!.description"
     [disabled]="context.readonly"
     name="description"
   >
-    <div *stepEditableLabelTemplate>Add text description</div>
+    <div *stepEditableLabelTemplate>Add description</div>
   </step-editable-textarea-label>
   <step-dynamic-json
     label="Input"
@@ -20,15 +19,13 @@
     [schema]="schema"
     [enforceGroovyExpression]="true"
     name="input"
-  >
-  </step-dynamic-json>
+  />
   <step-dynamic-textfield
     label="Map output to"
     [(ngModel)]="context.artefact!.resultMap"
     [disabled]="context.readonly"
     name="resultMap"
-  >
-  </step-dynamic-textfield>
+  />
   <mat-expansion-panel [(expanded)]="showTokenSelectionParameters">
     <mat-expansion-panel-header>
       <mat-panel-title>Keyword routing</mat-panel-title>
@@ -40,8 +37,7 @@
         [(ngModel)]="context.artefact!.remote"
         [disabled]="context.readonly"
         name="remote"
-      >
-      </step-dynamic-checkbox>
+      />
       <step-dynamic-json
         label="Agent token selectors"
         jsonFieldsLabel="Selection criteria (raw JSON)"
@@ -51,8 +47,7 @@
         [(ngModel)]="context.artefact!.token"
         [disabled]="context.readonly"
         name="token"
-      >
-      </step-dynamic-json>
+      />
     </section>
   </mat-expansion-panel>
 </form>

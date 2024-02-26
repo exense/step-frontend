@@ -1,6 +1,6 @@
 @if (artefact) {
   <form #form="ngForm">
-    @if (!isKeyword) {
+    @if (!isKeyword && !isPlan) {
       <section class="artefact-info">
         @if (!artefact.dynamicName!.dynamic) {
           <div class="artefact-name">
@@ -25,7 +25,7 @@
           />
         }
         <step-editable-textarea-label [(ngModel)]="artefact.description" name="description" [disabled]="readonly">
-          <div *stepEditableLabelTemplate>Description</div>
+          <div *stepEditableLabelTemplate>Add description</div>
         </step-editable-textarea-label>
       </section>
     }

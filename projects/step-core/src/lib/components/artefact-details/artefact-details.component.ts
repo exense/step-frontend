@@ -45,6 +45,7 @@ export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, Aft
   protected showAttributes = true;
 
   protected isKeyword = false;
+  protected isPlan = false;
 
   protected artefactMeta?: ArtefactType;
 
@@ -92,9 +93,11 @@ export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, Aft
   private determineArtefactMetaData(classname?: string): void {
     if (!classname) {
       this.isKeyword = false;
+      this.isPlan = false;
       return;
     }
     this.isKeyword = classname === 'CallKeyword';
+    this.isPlan = classname === 'CallPlan';
     this.artefactMeta = this._artefactsService.getArtefactType(classname);
   }
 }

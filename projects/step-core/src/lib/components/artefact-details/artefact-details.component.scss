@@ -17,12 +17,14 @@ step-artefact-details {
       step-editable-label {
         font-size: 1.8rem;
         font-weight: 500;
-
-        & > .editable-label {
-          padding-left: 0;
-          padding-right: 0;
-        }
+        flex: 1;
+        min-width: 20rem;
+        margin-left: -1.6rem;
       }
+    }
+
+    step-editable-textarea-label {
+      margin-left: -1.6rem;
     }
   }
 
