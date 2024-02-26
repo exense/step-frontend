@@ -19,19 +19,14 @@
 
   @if (compactView) {
     <div class="settings-section">
-      <step-tabs
-        [tabs]="modes"
-        [shrink]="true"
-        [activeTabId]="activeMode"
-        (activeTabIdChange)="toggleOQLMode($event)"
-      />
+      <step-tabs [tabs]="modes" [shrink]="true" [activeTabId]="activeMode" (activeTabIdChange)="toggleOQLMode()" />
       <step-timeseries-grouping [dimensions]="activeGrouping" (groupingChange)="handleGroupingChange($event)" />
     </div>
   }
 
   <div class="filters">
     <mat-menu #addFilterMenu="matMenu">
-      @for (option of filterOptions | visibleFilterItems; track option.attributeName) {
+      @for (option of _internalFilters | visibleFilterItems; track option.attributeName) {
         <button mat-menu-item (click)="addFilterItem(option)">
           <span>{{ option.label }}</span>
         </button>
@@ -65,10 +60,9 @@
         @for (item of _internalFilters | visibleFilterItems; track item.attributeName; let i = $index) {
           <step-ts-filter-bar-item
             #appliedFilter
-            *ngIf="!item.isHidden"
             [item]="item"
             [compact]="compactView"
-            [removable]="item.removable"
+            [removable]="item.removable || editMode"
             (removeItem)="removeFilterItem(i)"
             (filterChange)="handleFilterChange(i, $event)"
           />
@@ -85,12 +79,7 @@
 
     @if (!compactView) {
       <div class="settings-section">
-        <step-tabs
-          [tabs]="modes"
-          [shrink]="true"
-          [activeTabId]="activeMode"
-          (activeTabIdChange)="toggleOQLMode($event)"
-        />
+        <step-tabs [tabs]="modes" [shrink]="true" [activeTabId]="activeMode" (activeTabIdChange)="toggleOQLMode()" />
         <step-timeseries-grouping [dimensions]="activeGrouping" (groupingChange)="handleGroupingChange($event)" />
       </div>
     }

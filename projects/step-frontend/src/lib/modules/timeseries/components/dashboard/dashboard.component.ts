@@ -1,6 +1,7 @@
-import { Component, inject, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import {
   AuthService,
+  DashboardItem,
   DashboardsService,
   DashboardView,
   MetricAttribute,
@@ -24,6 +25,7 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TimeRangePickerSelection, FilterUtils } from '../../modules/_common';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
+import { DashboardUrlParamsService } from '../../modules/_common/injectables/dashboard-url-params.service';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -31,17 +33,12 @@ interface MetricAttributeSelection extends MetricAttribute {
   selected: boolean;
 }
 
-interface PageParams {
-  editMode?: boolean;
-}
-
-const EDIT_PARAM_NAME = 'edit';
-
 @Component({
   selector: 'step-dashboard-page',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
+  providers: [DashboardUrlParamsService],
   imports: [COMMON_IMPORTS, DashboardFilterBarComponent, ChartDashletComponent],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
@@ -57,6 +54,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private _route: ActivatedRoute = inject(ActivatedRoute);
   private _router: Router = inject(Router);
   private _authService: AuthService = inject(AuthService);
+  private _urlParamsService: DashboardUrlParamsService = inject(DashboardUrlParamsService);
+  private _destroyRef = inject(DestroyRef);
   colorsPool: TimeseriesColorsPool = new TimeseriesColorsPool();
 
   dashboard!: DashboardView;
@@ -76,7 +75,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   hasWritePermission = false;
 
   ngOnInit(): void {
-    const pageParams = this.extractUrlParams();
+    const pageParams = this._urlParamsService.collectUrlParams();
     this.removeOneTimeUrlParams();
     this.hasWritePermission = this._authService.hasRight('dashboard-write');
     this._route.paramMap.subscribe((params) => {
@@ -87,6 +86,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this._dashboardService.getDashboardById(id).subscribe((dashboard) => {
         this.dashboard = dashboard;
         this.context = this.createContext(this.dashboard);
+        this.updateUrl();
+        this.context.onStateChange().subscribe((stateChanged) => {
+          console.log(this.timeRangeSelection);
+          this.updateUrl();
+        });
+
         this.subscribeForContextChange();
         this.subscribeForTimeRangeChange();
         if (pageParams.editMode && this.hasWritePermission) {
@@ -97,11 +102,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  private extractUrlParams(): PageParams {
-    const initialParams: Params = this._route.snapshot.queryParams;
-    return {
-      editMode: initialParams[EDIT_PARAM_NAME] == '1',
-    };
+  private updateUrl(): void {
+    this._urlParamsService.updateUrlParams(this.context, this.timeRangeSelection.type);
   }
 
   ngOnDestroy(): void {
@@ -131,12 +133,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.editMode = false;
     this.dashboard.grouping = this.context.getGroupDimensions();
     this.dashboard.timeRange = this.timeRangeSelection;
-    this.dashboard.filters = this.filterBar?._internalFilters.map(FilterUtils.convertToApiFilterItem) || [];
+    this.dashboard.filters =
+      this.filterBar?._internalFilters.map((item) => {
+        const apiFilter = FilterUtils.convertToApiFilterItem(item);
+        apiFilter.removable = false; // make all the fields not removable once saved
+        return apiFilter;
+      }) || [];
     this._dashboardService.saveDashboard(this.dashboard).subscribe((response) => {});
   }
 
   addDashlet(metric: MetricType) {
-    this.dashboard.dashlets.push({
+    let newDashlet: DashboardItem = {
       name: metric.displayName!,
       type: 'CHART',
       size: 1,
@@ -156,7 +163,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
           renderingSettings: metric.renderingSettings,
         },
       },
-    });
+    };
+    this.filterBar!.addUniqueFilterItems(
+      newDashlet.chartSettings!.attributes.map((item) => FilterUtils.createFilterItemFromAttribute(item)),
+    );
+    this.dashboard.dashlets.push(newDashlet);
+    this.context.updateAttributes(this.collectAllAttributes());
   }
 
   private getTimeRangeFromTimeSelection(selection: TimeRangeSelection): TimeRange {
@@ -268,12 +280,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
     forkJoin([this.refreshAllCharts(), refreshRanger$]).subscribe(() => {});
   }
 
+  collectAllAttributes(): MetricAttribute[] {
+    return this.dashboard.dashlets.flatMap((d) => d.chartSettings!.attributes);
+  }
+
   removeOneTimeUrlParams() {
     // Get a copy of the current query parameters
     const currentParams = { ...this._route.snapshot.queryParams };
 
     // Remove the specific parameter
-    currentParams[EDIT_PARAM_NAME] = null;
+    currentParams['edit'] = null;
 
     // Navigate with the updated parameters
     this._router.navigate([], {

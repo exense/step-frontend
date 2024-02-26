@@ -6,3 +6,9 @@ export interface TimeRangePickerSelection {
   absoluteSelection?: TimeRange;
   relativeSelection?: RelativeTimeSelection;
 }
+
+export interface TimeRangeType {
+  FULL: 'FULL';
+  ABSOLUTE: 'ABSOLUTE';
+  RELATIVE: 'RELATIVE';
+}
