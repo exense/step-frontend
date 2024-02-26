@@ -9,7 +9,6 @@ export interface TimeSeriesContextParams {
   timeRange: TimeRange;
   attributes?: Record<string, MetricAttribute>;
   grouping: string[];
-  attributes?: Record<string, MetricAttribute>;
   filters?: FilterBarItem[];
   colorsPool?: TimeseriesColorsPool;
   keywordsContext?: TimeSeriesKeywordsContext;
