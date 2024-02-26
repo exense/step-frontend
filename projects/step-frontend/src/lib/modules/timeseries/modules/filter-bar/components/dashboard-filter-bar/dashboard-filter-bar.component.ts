@@ -21,6 +21,7 @@ import {
   TimeSeriesService,
   MetricAttribute,
   OQLVerifyResponse,
+  Tab,
 } from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';
 import {
