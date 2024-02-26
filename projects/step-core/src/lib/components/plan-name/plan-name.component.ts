@@ -4,14 +4,15 @@ import { CallPlan, Plan, AugmentedPlansService, DynamicValueString } from '../..
 import { Observable } from 'rxjs';
 
 const PLAN_CAPTIONS: ReferenceArtefactNameConfig<CallPlan, Plan>['captions'] = {
-  searchReference: 'Select a plan',
+  searchReference: 'No plan selected',
+  searchHint: 'Click on (pencil icon) to specify selection criteria for any plan',
   dynamicReference: 'Dynamic plan',
   referenceNotFound: 'Plan not found',
   referenceLabel: 'Reference plan',
   editSelectionCriteria: 'Edit Plan selection criteria',
   selectionCriteria: 'Plan selection criteria',
   selectionCriteriaDescription:
-    'The Plan selection criteria are used to reference the Plan. Besides the name any other attribute of the Plan can be referenced.',
+    'Selection criteria are used to select a Plan. For this the Plans attribute (i.e. name) has to be referenced.',
   addSelectionCriteriaLabel: 'Add selection criteria',
 };
 

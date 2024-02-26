@@ -10,14 +10,15 @@ import { ReferenceArtefactNameConfig } from '../reference-artefact-name/referenc
 import { Observable } from 'rxjs';
 
 const KEYWORD_CAPTIONS: ReferenceArtefactNameConfig<CallFunction, Keyword>['captions'] = {
-  searchReference: 'Select a keyword',
+  searchReference: 'No Keyword selected',
+  searchHint: 'Click on (pencil icon) to specify selection criteria for any keyword',
   dynamicReference: 'Dynamic keyword',
   referenceNotFound: 'Keyword not found',
   referenceLabel: 'Reference keyword',
   editSelectionCriteria: 'Edit Keyword selection criteria',
   selectionCriteria: 'Keyword selection criteria',
   selectionCriteriaDescription:
-    'The Keyword selection criteria are used to reference the Keyword. Besides the name any other attribute of the Keyword can be referenced.',
+    'Selection criteria are used to select a Keyword. For this the Keywords attribute (i.e. name) has to be referenced.',
   addSelectionCriteriaLabel: 'Add selection criteria',
 };
 

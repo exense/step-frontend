@@ -49,6 +49,7 @@ export abstract class ReferenceArtefactNameConfig<A extends Artefact, T = any> {
     selectionCriteria: string;
     selectionCriteriaDescription: string;
     addSelectionCriteriaLabel: string;
+    searchHint?: string;
   };
   abstract readonly attributesScreenId?: string;
   abstract getSearchAttributes(artefact: A): DynamicValueString | undefined;
@@ -221,6 +222,7 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
       this.referenceMeta = {
         icon: 'search',
         description: this._artefactNameConfig.captions.searchReference,
+        tooltip: this._artefactNameConfig.captions.searchHint,
       };
       if (!this.isDisabled && !this.isEditorMode) {
         this.isEditorMode = true;
