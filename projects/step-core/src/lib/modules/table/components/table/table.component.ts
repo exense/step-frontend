@@ -167,14 +167,17 @@ export class TableComponent<T>
       });
 
       return hasFilter;
-    })
+    }),
   );
 
   highlightedItem?: unknown;
 
-  constructor(@Optional() private _sort: MatSort, _itemsPerPageService: ItemsPerPageService) {
+  constructor(
+    @Optional() private _sort: MatSort,
+    _itemsPerPageService: ItemsPerPageService,
+  ) {
     this.pageSizeOptions = _itemsPerPageService.getItemsPerPage((userPreferredItemsPerPage: number) =>
-      this.page._changePageSize(userPreferredItemsPerPage)
+      this.page._changePageSize(userPreferredItemsPerPage),
     );
   }
 
@@ -225,7 +228,7 @@ export class TableComponent<T>
           this.page!.firstPage();
         }
         return { page, search };
-      })
+      }),
     );
 
     combineLatest([pageAndSearch$, sort$, this.filter$, this.tableParams$])
@@ -340,12 +343,15 @@ export class TableComponent<T>
       .filter((header) => !header.headerGroupId)
       .forEach((header, i) => (header.headerGroupId = `non-grouped-header-${i + 1}`));
 
-    const headerGroupIdToHeaders = this.additionalHeaders.reduce((result, additionalHeader) => {
-      const id = additionalHeader.headerGroupId!;
-      const headerGroup = (result[id] = result[id] || []);
-      headerGroup.push(additionalHeader);
-      return result;
-    }, {} as Record<string, AdditionalHeaderDirective[]>);
+    const headerGroupIdToHeaders = this.additionalHeaders.reduce(
+      (result, additionalHeader) => {
+        const id = additionalHeader.headerGroupId!;
+        const headerGroup = (result[id] = result[id] || []);
+        headerGroup.push(additionalHeader);
+        return result;
+      },
+      {} as Record<string, AdditionalHeaderDirective[]>,
+    );
 
     this.additionalHeaderGroups = Object.values(headerGroupIdToHeaders);
   }

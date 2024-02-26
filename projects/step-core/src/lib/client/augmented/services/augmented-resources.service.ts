@@ -70,7 +70,7 @@ export class AugmentedResourcesService extends ResourcesService {
 
     const { progress$, response$: responseString$ } = uploadWithProgress(request$);
     const response$ = responseString$.pipe(
-      map((responseString) => JSON.parse(responseString) as ResourceUploadResponse)
+      map((responseString) => JSON.parse(responseString) as ResourceUploadResponse),
     );
     return { progress$, response$ };
   }

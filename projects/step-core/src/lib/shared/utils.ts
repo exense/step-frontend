@@ -107,7 +107,7 @@ export const toRecord = <T>(keyValuePairs: KeyValue<string, T>[]): Record<string
       ...acc,
       [key]: value,
     }),
-    {}
+    {},
   );
 
 export const routesPrioritySortPredicate = (routeA: Route, routeB: Route) => {

@@ -11,16 +11,16 @@ import {
   TimeSeriesService,
 } from '@exense/step-core';
 import {
+  COMMON_IMPORTS,
+  TimeseriesColorsPool,
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesContextsFactory,
-  COMMON_IMPORTS,
-  TimeseriesColorsPool,
 } from '../../modules/_common';
 
 //@ts-ignore
 import uPlot = require('uplot');
-import { defaultIfEmpty, forkJoin, merge, Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { defaultIfEmpty, forkJoin, merge, Observable, Subject, switchMap } from 'rxjs';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TimeRangePickerSelection, FilterUtils } from '../../modules/_common';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';

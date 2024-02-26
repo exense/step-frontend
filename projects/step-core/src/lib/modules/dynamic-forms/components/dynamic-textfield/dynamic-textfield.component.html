@@ -1,28 +1,29 @@
-<step-expression-input
-  *ngIf="dynamic; else constantValueTemplate"
-  [label]="label"
-  [tooltip]="tooltip"
-  [placeholder]="placeholder"
-  [isParentInvalid]="!!_ngControl.invalid"
-  [isParentTouched]="!!_ngControl.touched"
-  [isParentDisabled]="isDisabled"
-  [showRequiredMarker]="showRequiredMarker"
-  [ngModel]="expression"
-  (ngModelChange)="onExpressionChange($event)"
-  [disabled]="isDisabled"
-  (toggleConstantValue)="toggleDynamicExpression(false)"
-  (blur)="onBlur()"
-></step-expression-input>
-
-<ng-template #constantValueTemplate>
+@if (dynamic) {
+  <step-expression-input
+    [label]="label"
+    [tooltip]="tooltip"
+    [placeholder]="placeholder"
+    [isParentInvalid]="!!_ngControl.invalid"
+    [isParentTouched]="!!_ngControl.touched"
+    [isParentDisabled]="isDisabled"
+    [showRequiredMarker]="showRequiredMarker"
+    [ngModel]="expression"
+    (ngModelChange)="onExpressionChange($event)"
+    [disabled]="isDisabled"
+    (toggleConstantValue)="toggleDynamicExpression(false)"
+    (blur)="onBlur()"
+  />
+} @else {
   <step-form-field
     [showRequiredMarker]="showRequiredMarker"
     [class.ng-invalid]="!!_ngControl.invalid"
     [class.ng-touched]="_ngControl.touched"
     [class.with-tooltip]="tooltip"
   >
-    <step-label *ngIf="label">{{ label }}</step-label>
-    <ng-template #numberField>
+    @if (label) {
+      <step-label>{{ label }}</step-label>
+    }
+    @if (isNumber) {
       <input
         type="number"
         [placeholder]="placeholder"
@@ -33,8 +34,7 @@
         [stepAllowChars]="allowedChars"
         [min]="isNegativeNumberAllowed ? null : 0"
       />
-    </ng-template>
-    <ng-template #textField>
+    } @else {
       <input
         type="text"
         [placeholder]="placeholder"
@@ -43,16 +43,19 @@
         [disabled]="isDisabled"
         (blur)="onBlur()"
       />
-    </ng-template>
-    <ng-container *ngIf="isNumber; then numberField; else textField"> </ng-container>
-    <step-suffix *ngIf="tooltip" class="icon-suffix">
-      <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below"></step-icon>
-    </step-suffix>
-    <step-suffix class="button-suffix">
-      <button type="button" mat-stroked-button (click)="editConstantValue()" [disabled]="isDisabled">
-        <step-icon name="edit-2"></step-icon>
-      </button>
-    </step-suffix>
+    }
+    @if (tooltip) {
+      <step-suffix class="icon-suffix">
+        <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below" />
+      </step-suffix>
+    }
+    @if (!isNumber) {
+      <step-suffix class="button-suffix">
+        <button type="button" mat-stroked-button (click)="editConstantValue()" [disabled]="isDisabled">
+          <step-icon name="edit-2" />
+        </button>
+      </step-suffix>
+    }
     <step-suffix class="button-suffix">
       <button
         type="button"
@@ -62,8 +65,8 @@
         (click)="toggleDynamicExpression(true)"
         [disabled]="isDisabled"
       >
-        <step-icon name="zap"></step-icon>
+        <step-icon name="zap" />
       </button>
     </step-suffix>
   </step-form-field>
-</ng-template>
+}

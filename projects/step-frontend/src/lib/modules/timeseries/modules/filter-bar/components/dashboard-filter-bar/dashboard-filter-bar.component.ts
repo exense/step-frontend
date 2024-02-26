@@ -15,12 +15,12 @@ import {
 } from '@angular/core';
 import { debounceTime, Observable, Subject, take } from 'rxjs';
 import {
+  TimeSeriesFilterItem,
   Execution,
   MetricAttribute,
   OQLVerifyResponse,
   Tab,
   TimeRange,
-  TimeSeriesFilterItem,
   TimeSeriesService,
 } from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';

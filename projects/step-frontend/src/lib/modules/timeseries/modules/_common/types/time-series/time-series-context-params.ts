@@ -7,6 +7,7 @@ import { TsFilteringSettings } from '../filter/ts-filtering-settings';
 export interface TimeSeriesContextParams {
   id: string;
   timeRange: TimeRange;
+  attributes?: Record<string, MetricAttribute>;
   grouping: string[];
   attributes?: Record<string, MetricAttribute>;
   filters?: FilterBarItem[];
