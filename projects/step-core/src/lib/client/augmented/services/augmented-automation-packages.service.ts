@@ -89,7 +89,7 @@ export class AugmentedAutomationPackagesService extends AutomationPackagesServic
     const body = new FormData();
     body.set('file', file);
 
-    const request$ = this._http.request('PUT', `/rest/automation-packages/${id}`, {
+    const request$ = this._http.request('PUT', `/rest/automation-packages/${id}?async=true`, {
       body,
       headers: {
         enctype: 'multipart/form-data',
