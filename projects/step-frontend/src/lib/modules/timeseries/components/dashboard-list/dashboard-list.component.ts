@@ -5,6 +5,8 @@ import {
   DialogParentService,
   DialogsService,
   StepDataSource,
+  STORE_ALL,
+  tablePersistenceConfigProvider,
   TableRemoteDataSourceFactoryService,
 } from '@exense/step-core';
 import { catchError, filter, map, of, switchMap } from 'rxjs';
@@ -18,6 +20,7 @@ import { COMMON_IMPORTS } from '../../modules/_common';
   standalone: true,
   imports: [COMMON_IMPORTS],
   providers: [
+    tablePersistenceConfigProvider('analyticsDashboard', STORE_ALL),
     {
       provide: DialogParentService,
       useExisting: forwardRef(() => DashboardListComponent),
