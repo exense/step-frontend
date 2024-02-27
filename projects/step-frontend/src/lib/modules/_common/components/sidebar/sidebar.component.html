@@ -23,12 +23,6 @@
       <step-icon name="home"></step-icon>
     </span>
     <ng-container *ngIf="('settings-ui-menu' | hasRight | async) || ('admin-ui-menu' | hasRight | async)">
-      <step-icon
-        *ngIf="isOpened$ | async"
-        class="sidebar-home-and-bookmark-icon"
-        name="star"
-        (click)="addBookmark()"
-      ></step-icon>
       <step-settings-button class="sidebar-home-and-settings-icon"></step-settings-button>
     </ng-container>
   </div>
@@ -70,11 +64,6 @@
           <label>
             <step-icon class="visible-when-collapsed" name="home"></step-icon>
             <span class="sidebar-aligned-text">Home</span>
-          </label>
-        </div>
-        <div class="sidebar-collapsable-tab" (click)="addBookmark()">
-          <label>
-            <step-icon class="sidebar-home-and-bookmark-icon" name="star"></step-icon>
           </label>
         </div>
       </ng-container>

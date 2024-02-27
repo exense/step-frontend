@@ -92,13 +92,10 @@ $menu-sub-item-height: 3.2rem;
     top: 7rem;
     left: 5.6rem;
     z-index: 3;
-    max-width: 9.5rem;
-    min-width: 9.5rem;
-
-    input {
-      width: 2rem !important;
-    }
+    max-width: 15rem;
+    min-width: 15rem;
   }
+
   .tenant-selector-when-sidebar-closed {
     display: none;
   }
@@ -218,15 +215,6 @@ $menu-sub-item-height: 3.2rem;
       > .sidebar-home-and-settings-icon {
         right: map.get($config, elements-text-padding);
         margin-right: -10px;
-        font-size: medium;
-        cursor: pointer;
-        position: absolute;
-        padding: 18px 14px 14px 14px;
-      }
-
-      > .sidebar-home-and-bookmark-icon {
-        right: map.get($config, elements-text-padding);
-        margin-right: 4rem;
         font-size: medium;
         cursor: pointer;
         position: absolute;

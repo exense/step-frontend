@@ -8,6 +8,9 @@
         <div class="app-header-nav">
           <step-dashlet *ngFor="let item of navBarRightMenuItems; trackBy: trackByDashlet" [itemKey]="item.template">
           </step-dashlet>
+          <a id="a-star" (click)="addBookmark()">
+            <step-icon name="star"></step-icon>
+          </a>
           <a href="#" (click)="(false)" [matMenuTriggerFor]="sessionMenu">
             <step-icon name="user"></step-icon>
             <ng-container *ngIf="_authService.context$ | async as ctx">

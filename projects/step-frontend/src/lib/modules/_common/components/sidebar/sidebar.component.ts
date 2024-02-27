@@ -20,7 +20,6 @@ import {
   ViewRegistryService,
   ViewStateService,
   BookmarkService,
-  BookmarkCreateDialogComponent,
   MENU_ITEMS,
 } from '@exense/step-core';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
@@ -150,9 +149,5 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
       const scrollTop = ($event.target as HTMLElement).scrollTop;
       this.tabs!.nativeElement.setAttribute('style', `--scrollOffset: -${scrollTop}px`);
     });
-  }
-
-  addBookmark(): void {
-    this._matDialog.open(BookmarkCreateDialogComponent);
   }
 }
