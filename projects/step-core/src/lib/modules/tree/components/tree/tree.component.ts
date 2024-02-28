@@ -21,6 +21,7 @@ import { TreeNodeTemplateContainerService } from '../../services/tree-node-templ
 import { DragDataService, DropInfo } from '../../../drag-drop';
 import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TreeFlatNode } from '../../shared/tree-flat-node';
 
 @Component({
   selector: 'step-tree',
@@ -91,7 +92,8 @@ export class TreeComponent<N extends TreeNode> implements AfterViewInit, TreeNod
     this.treeContextAction.emit({ actionId, node, multipleNodes });
   }
 
-  handleDblClick(node: N | TreeNode, event: MouseEvent): void {
+  handleDblClick(flatNode: TreeFlatNode, event: MouseEvent): void {
+    const node = this._treeState.findNodeById(flatNode.id)!;
     this.nodeDblClick.emit({ node, event });
   }
 
