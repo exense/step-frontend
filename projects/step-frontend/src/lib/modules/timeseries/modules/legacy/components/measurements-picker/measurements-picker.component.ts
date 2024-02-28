@@ -65,6 +65,7 @@ export class MeasurementsPickerComponent implements OnInit, OnDestroy {
       .onKeywordToggled()
       .pipe(takeUntil(this.terminator$))
       .subscribe((selection) => {
+        console.log('selection', selection);
         let isSelected = this.keywords[selection.id].isSelected;
         if (isSelected) {
           this.activeKeywords++;
