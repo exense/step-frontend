@@ -25,7 +25,7 @@ export class TableApiWrapperService {
       return status.result;
     }),
     tap((resource) => this.downloadDatasource(resource.id!, resource.resourceName!)),
-    map((resourse) => resourse.id!)
+    map((resourse) => resourse.id!),
   );
 
   requestTable<T>(tableId: string, tableRequest: TableRequestData): Observable<TableResponseGeneric<T>> {

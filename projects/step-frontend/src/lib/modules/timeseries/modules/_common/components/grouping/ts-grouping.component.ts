@@ -24,11 +24,11 @@ export class TsGroupingComponent implements OnInit, OnChanges {
   };
 
   @Input() dimensions: string[] = [];
+  @Input() groupingOptions!: { label: string; attributes: string[] }[];
 
   label: string = EMPTY_DIMENSIONS_LABEL;
 
   customGroupingString = '';
-  groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS;
 
   attributesLabelMappings: { [key: string]: string } = {
     name: 'Name',

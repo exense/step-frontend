@@ -75,7 +75,7 @@ export class ThreadDistributionWizardDialogComponent {
     startWith(this.wizardForm.value),
     debounceTime(300),
     map((value) => calculateValues(value, this.durationUnits)),
-    shareReplay(1)
+    shareReplay(1),
   );
 
   readonly isCalculationValid$ = this.calculationResult$.pipe(map((result) => result.isCalculationValid));
