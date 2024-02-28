@@ -7,7 +7,7 @@ import {
   TableLocalDataSourceConfig,
   TimeSeriesAPIResponse,
 } from '@exense/step-core';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 import { KeywordSelection, TimeSeriesKeywordsContext } from '../../pages/execution-page/time-series-keywords.context';
 import { TimeSeriesContext } from '../../time-series-context';
 
@@ -71,27 +71,39 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
     this.keywordsService = this.executionContext.keywordsContext;
     const keywordsContext = this.executionContext.keywordsContext;
-    keywordsContext.onKeywordToggled().subscribe((selection) => {
-      // this.bucketsByKeywords[selection.id].attributes!['isSelected'] = selection.isSelected;
-      const entries = this.tableData$.getValue();
-      entries.forEach((entry) => {
-        if (entry.name === selection.id) {
-          entry.isSelected = selection.isSelected;
+    keywordsContext
+      .onKeywordToggled()
+      .pipe(takeUntil(this.terminator$))
+      .subscribe((selection) => {
+        // this.bucketsByKeywords[selection.id].attributes!['isSelected'] = selection.isSelected;
+        const entries = this.tableData$.getValue();
+        entries.forEach((entry) => {
+          if (entry.name === selection.id) {
+            entry.isSelected = selection.isSelected;
+          }
+        });
+        if (!selection.isSelected) {
+          this.allSeriesChecked = false;
         }
       });
-      if (!selection.isSelected) {
-        this.allSeriesChecked = false;
-      }
-    });
-    keywordsContext.onKeywordsUpdated().subscribe((keywords) => {
-      Object.keys(keywords).forEach((keyword) => {
-        const selection: KeywordSelection = keywords[keyword];
-        const existingEntry = this.entriesByIds.get(selection.id);
-        if (existingEntry) {
-          existingEntry.isSelected = selection.isSelected;
-        }
+    keywordsContext
+      .onKeywordsUpdated()
+      .pipe(takeUntil(this.terminator$))
+      .subscribe((keywords) => {
+        Object.keys(keywords).forEach((keyword) => {
+          const selection: KeywordSelection = keywords[keyword];
+          const existingEntry = this.entriesByIds.get(selection.id);
+          if (existingEntry) {
+            existingEntry.isSelected = selection.isSelected;
+          }
+        });
       });
-    });
+    keywordsContext
+      .onAllSelectionChanged()
+      .pipe(takeUntil(this.terminator$))
+      .subscribe((allSelected) => {
+        this.allSeriesChecked = allSelected;
+      });
   }
 
   private getInitialColumns(): TableColumn[] {
