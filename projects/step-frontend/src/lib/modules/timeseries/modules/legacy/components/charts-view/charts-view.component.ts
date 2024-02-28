@@ -747,7 +747,6 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
             },
           ],
         };
-        console.log(responseTimeSeries);
         const responseTimeSettings: TSChartSettings = {
           title: TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${responseTimeMetric.label})`,
           xValues: timeLabels,
