@@ -28,11 +28,11 @@
       {{ element.token!.attributes! | flatObjectStringFormat }}
     </td>
   </ng-container>
-  <ng-container matColumnDef="state" stepSearchCol #searchState="SearchCol">
+  <ng-container matColumnDef="state" stepSearchCol>
     <step-array-filter
       *stepSearchCellDef
       [items]="['IN_USE', 'MAINTENANCE', 'ERROR', 'FREE']"
-      (filterChange)="searchState.search($event, true)"
+      stepFilterConnect
     ></step-array-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>State</th>
     <td mat-cell *matCellDef="let element">

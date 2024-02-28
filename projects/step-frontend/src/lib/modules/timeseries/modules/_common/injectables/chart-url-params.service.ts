@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-const TS_PARAMS_KEY = 'tsParams';
+export const TS_PARAMS_KEY = 'tsParams';
 
 export interface ChartUrlParams {
   [key: string]: string | undefined;

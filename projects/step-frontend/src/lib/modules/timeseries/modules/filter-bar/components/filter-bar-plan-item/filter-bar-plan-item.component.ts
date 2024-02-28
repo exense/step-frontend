@@ -33,6 +33,7 @@ export class FilterBarPlanItemComponent {
   }
 
   removeSearchValue(index: number) {
+    console.log('REMOVING PLAN');
     this.values.splice(index, 1);
   }
 }

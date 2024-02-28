@@ -216,7 +216,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     const newAdditionalInputs = Object.keys(value).filter((fieldKey) => !formFieldKeys.includes(fieldKey));
 
     newAdditionalInputs.filter((fieldKey) =>
-      this.addFieldInternal(this.schema, fieldKey, value, { isAdditional: true })
+      this.addFieldInternal(this.schema, fieldKey, value, { isAdditional: true }),
     );
 
     this.enableDisableForm(this.isDisabled);
@@ -228,7 +228,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     schema: DynamicFieldsSchema | undefined,
     field: string,
     value: DynamicFieldGroupValue = {},
-    config?: { isRequired?: boolean; isAdditional?: boolean }
+    config?: { isRequired?: boolean; isAdditional?: boolean },
   ): void {
     const isRequired = !!config?.isRequired;
     const isAdditional = !!config?.isAdditional;
@@ -281,7 +281,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     const validator = isRequired ? DYNAMIC_FIELD_VALIDATOR : undefined;
     const control = this.formBuilder.control<DynamicValueString | DynamicValueBoolean | DynamicValueInteger>(
       fieldValue,
-      validator
+      validator,
     );
 
     if (!fieldType) {

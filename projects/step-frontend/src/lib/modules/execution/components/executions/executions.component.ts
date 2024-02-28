@@ -37,7 +37,7 @@ export class ExecutionsComponent implements OnInit, OnDestroy, ExecutionTabManag
       filter((event) => {
         return event instanceof NavigationEnd;
       }),
-      startWith(undefined)
+      startWith(undefined),
     );
 
     $routeChanged
@@ -45,7 +45,7 @@ export class ExecutionsComponent implements OnInit, OnDestroy, ExecutionTabManag
         switchMap(() => this._activatedRoute.firstChild?.url ?? of(undefined)),
         map((url) => url?.[0]?.path),
         filter((path) => !!path && this.activeTab?.id !== path),
-        takeUntil(this.terminator$)
+        takeUntil(this.terminator$),
       )
       .subscribe((executionId) => this.handleLocationChange(executionId!));
   }

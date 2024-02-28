@@ -8,7 +8,7 @@ import { NUMBER_CHARS_POSITIVE_ONLY, NUMBER_CHARS_WITH_NEGATIVE } from '../../sh
 @Component({
   selector: 'step-dynamic-textfield',
   templateUrl: './dynamic-textfield.component.html',
-  styleUrls: ['./dynamic-textfield.component.scss'],
+  styleUrl: './dynamic-textfield.component.scss',
   encapsulation: ViewEncapsulation.None,
 })
 export class DynamicTextfieldComponent
@@ -20,7 +20,10 @@ export class DynamicTextfieldComponent
 
   protected allowedChars = NUMBER_CHARS_POSITIVE_ONLY;
 
-  constructor(private _dialogsService: DialogsService, _ngControl: NgControl) {
+  constructor(
+    private _dialogsService: DialogsService,
+    _ngControl: NgControl,
+  ) {
     super(_ngControl);
   }
 

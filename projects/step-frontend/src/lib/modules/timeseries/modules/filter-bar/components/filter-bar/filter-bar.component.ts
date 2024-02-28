@@ -109,6 +109,9 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   activeMode = TsFilteringMode.STANDARD;
 
+  groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS;
+
+  oqlModeActive = false;
   oqlValue: string = '';
   invalidOql = false;
 

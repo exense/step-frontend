@@ -6,9 +6,11 @@
 </ng-template>
 <section class="header">
   <step-btn-group>
-    <a href="#" (click)="toggleFooter(); (false)">
-      {{ showFooter ? 'hide details' : 'display details' }}
-    </a>
+    <div class="display-details">
+      <a href="#" (click)="toggleFooter(); (false)">
+        {{ showFooter ? 'hide details' : 'display details' }}
+      </a>
+    </div>
     <button
       type="button"
       mat-icon-button

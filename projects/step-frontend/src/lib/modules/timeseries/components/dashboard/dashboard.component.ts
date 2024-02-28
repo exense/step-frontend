@@ -1,6 +1,7 @@
-import { Component, inject, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import {
   AuthService,
+  DashboardItem,
   DashboardsService,
   DashboardView,
   MetricAttribute,
@@ -10,26 +11,23 @@ import {
   TimeSeriesService,
 } from '@exense/step-core';
 import {
-  TimeSeriesConfig,
+  COMMON_IMPORTS,
   TimeseriesColorsPool,
+  TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesContextsFactory,
-  COMMON_IMPORTS,
 } from '../../modules/_common';
 
 //@ts-ignore
 import uPlot = require('uplot');
-import { defaultIfEmpty, forkJoin, merge, Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { defaultIfEmpty, forkJoin, merge, Observable, Subject, switchMap } from 'rxjs';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TimeRangePickerSelection, FilterUtils } from '../../modules/_common';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
-
-interface MetricAttributeSelection extends MetricAttribute {
-  selected: boolean;
-}
 
 interface PageParams {
   editMode?: boolean;
@@ -57,6 +55,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private _route: ActivatedRoute = inject(ActivatedRoute);
   private _router: Router = inject(Router);
   private _authService: AuthService = inject(AuthService);
+  private _destroyRef = inject(DestroyRef);
   colorsPool: TimeseriesColorsPool = new TimeseriesColorsPool();
 
   dashboard!: DashboardView;
@@ -67,8 +66,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   compareModeEnabled = false;
   timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   timeRangeSelection: TimeRangePickerSelection = this.timeRangeOptions[0];
-
-  terminator$ = new Subject<void>();
 
   editMode = false;
   metricTypes?: MetricType[];
@@ -106,8 +103,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this._timeSeriesContextFactory?.destroyContext(this.context?.id);
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   enableEditMode() {
@@ -131,12 +126,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.editMode = false;
     this.dashboard.grouping = this.context.getGroupDimensions();
     this.dashboard.timeRange = this.timeRangeSelection;
-    this.dashboard.filters = this.filterBar?._internalFilters.map(FilterUtils.convertToApiFilterItem) || [];
+    this.dashboard.filters =
+      this.filterBar?._internalFilters.map((item) => {
+        const apiFilter = FilterUtils.convertToApiFilterItem(item);
+        apiFilter.removable = false; // make all the fields not removable once saved
+        return apiFilter;
+      }) || [];
     this._dashboardService.saveDashboard(this.dashboard).subscribe((response) => {});
   }
 
   addDashlet(metric: MetricType) {
-    this.dashboard.dashlets.push({
+    let newDashlet: DashboardItem = {
       name: metric.displayName!,
       type: 'CHART',
       size: 1,
@@ -156,7 +156,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
           renderingSettings: metric.renderingSettings,
         },
       },
-    });
+    };
+    this.filterBar!.addUniqueFilterItems(
+      newDashlet.chartSettings!.attributes.map((item) => FilterUtils.createFilterItemFromAttribute(item)),
+    );
+    this.dashboard.dashlets.push(newDashlet);
+    this.context.updateAttributes(this.collectAllAttributes());
   }
 
   private getTimeRangeFromTimeSelection(selection: TimeRangeSelection): TimeRange {
@@ -190,9 +195,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
       // absolute
       this.timeRangeSelection = { ...dashboardTimeRange, type: dashboardTimeRange.type! };
     }
+    const attributesByIds: Record<string, MetricAttribute> = {};
+    this.dashboard.dashlets.forEach((d) =>
+      d.chartSettings?.attributes?.forEach((attr) => (attributesByIds[attr.name] = attr)),
+    );
     return this._timeSeriesContextFactory.createContext({
       id: dashboard.id!,
       timeRange: timeRange,
+      attributes: attributesByIds,
       grouping: dashboard.grouping || [],
       filters: dashboard.filters?.map(FilterUtils.convertApiFilterItem),
     });
@@ -200,7 +210,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   subscribeForContextChange(): void {
     merge(this.context.onFilteringChange(), this.context.onGroupingChange())
-      .pipe(takeUntil(this.terminator$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(() => {
         this.refreshAllCharts().subscribe();
       });
@@ -216,7 +226,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .onTimeSelectionChange()
       .pipe(
         switchMap((newRange) => this.handleSelectionChange(newRange)),
-        takeUntil(compareCharts ? this.terminator$ : this.terminator$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe();
   }
@@ -266,6 +276,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.context.updateSelectedRange(range, false);
     let refreshRanger$ = this.filterBar?.timeSelection?.refreshRanger();
     forkJoin([this.refreshAllCharts(), refreshRanger$]).subscribe(() => {});
+  }
+
+  collectAllAttributes(): MetricAttribute[] {
+    return this.dashboard.dashlets.flatMap((d) => d.chartSettings!.attributes);
   }
 
   removeOneTimeUrlParams() {
