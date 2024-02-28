@@ -6,8 +6,6 @@ import { TreeNodeUtilsService } from './tree-node-utils.service';
 import { TreeStateInitOptions } from '../shared/tree-state-init-options.interface';
 import { TreeFlattenerService } from './tree-flattener.service';
 
-const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === index;
-
 const DEFAULT_OPTIONS: TreeStateInitOptions = {
   expandAllByDefault: true,
 };
@@ -150,27 +148,27 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   selectNode(nodeOrId: N | TreeNode | string, $event?: MouseEvent, preventIfAlreadySelected: boolean = false): void {
     let nId = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id;
 
-    const selectedNodeIds = this.selectedNodeIdsInternal();
+    const selectedNodeIds = new Set(this.selectedNodeIdsInternal());
 
-    if (preventIfAlreadySelected && selectedNodeIds.includes(nId)) {
+    if (preventIfAlreadySelected && selectedNodeIds.has(nId)) {
       return;
     }
 
     if ($event?.ctrlKey) {
-      if (selectedNodeIds.includes(nId)) {
-        this.selectedNodeIdsInternal.set(selectedNodeIds.filter((nodeId) => nodeId !== nId));
+      if (selectedNodeIds.has(nId)) {
+        this.selectedNodeIdsInternal.update((selected) => selected.filter((nodeId) => nodeId !== nId));
       } else {
-        this.selectedNodeIdsInternal.set([...selectedNodeIds, nId].filter(unique));
+        this.addMultipleNodesToSelectionAndKeepOrder(nId);
         this.selectedInsertionParentId.set(nId);
       }
     } else if ($event?.shiftKey) {
-      if (selectedNodeIds.includes(nId)) {
-        this.selectedNodeIdsInternal.set(selectedNodeIds.filter((nodeId) => nodeId !== nId));
+      if (selectedNodeIds.has(nId)) {
+        this.selectedNodeIdsInternal.update((selected) => selected.filter((nodeId) => nodeId !== nId));
       } else {
-        const visibleNodes = this.getVisibleNodes();
+        const visibleNodes = this.flatTree();
         const nodeIndex = visibleNodes.findIndex((item) => item.id === nId);
         const selectedIndexes = visibleNodes.reduce((res, item, i) => {
-          if (selectedNodeIds.includes(item.id!)) {
+          if (selectedNodeIds.has(item.id!)) {
             res.push(i);
           }
           return res;
@@ -190,9 +188,9 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
           this.selectedNodeIdsInternal.set([nId]);
           this.selectedInsertionParentId.set(nId);
         } else {
-          const [start, end] = [nodeIndex, minDistanceIndex].sort();
+          const [start, end] = [nodeIndex, minDistanceIndex].sort((a, b) => a - b);
           const ids = visibleNodes.slice(start, end + 1).map((node) => node.id!);
-          this.selectedNodeIdsInternal.set([...selectedNodeIds, ...ids].filter(unique));
+          this.addMultipleNodesToSelectionAndKeepOrder(...ids);
           this.selectedInsertionParentId.set(nId);
         }
       }
@@ -660,22 +658,6 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     return Object.entries(relationDictionary).map(([parentId, nodeIds]) => ({ parentId, nodeIds }));
   }
 
-  private getVisibleNodes(): N[] {
-    const result: N[] = [];
-    const addExpandedChildren = (node: N, expanded: string[]) => {
-      result.push(node);
-      if (expanded.includes(node.id!)) {
-        node.children!.map((child) => addExpandedChildren(child as N, expanded));
-      }
-    };
-    const { tree, accessCache } = this.treeData();
-    const nodes = tree.map(({ id }) => accessCache.get(id) as N);
-    const expandedNodeIds = this.expandedNodeIdsInternal();
-    nodes.filter((node) => addExpandedChildren(node, expandedNodeIds));
-
-    return result;
-  }
-
   private isPossibleToInsert(newParentId: string, idsToInsert: string[]): boolean {
     const parentNode = this.treeData().tree.find((node) => node.id === newParentId);
     if (!parentNode) {
@@ -765,5 +747,17 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     } else {
       this.expandNodeInternal(nodeId);
     }
+  }
+
+  private addMultipleNodesToSelectionAndKeepOrder(...nodeIDs: string[]): void {
+    const selected = new Set(this.selectedNodeIdsInternal().concat(...nodeIDs));
+    const { tree } = this.treeData();
+    const selectedOrdered = tree.reduce((res, node) => {
+      if (selected.has(node.id)) {
+        res.push(node.id);
+      }
+      return res;
+    }, [] as string[]);
+    this.selectedNodeIdsInternal.set(selectedOrdered);
   }
 }
