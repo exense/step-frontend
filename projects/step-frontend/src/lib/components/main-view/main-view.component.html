@@ -8,7 +8,7 @@
         <div class="app-header-nav">
           <step-dashlet *ngFor="let item of navBarRightMenuItems; trackBy: trackByDashlet" [itemKey]="item.template">
           </step-dashlet>
-          <a id="a-star" (click)="addBookmark()">
+          <a class="icon-star" (click)="addBookmark()">
             <step-icon name="star"></step-icon>
           </a>
           <a href="#" (click)="(false)" [matMenuTriggerFor]="sessionMenu">
