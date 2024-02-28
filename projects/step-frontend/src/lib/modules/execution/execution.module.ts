@@ -87,7 +87,7 @@ export class ExecutionModule {
     private _entityRegistry: EntityRegistry,
     private _dashletRegistry: DashletRegistryService,
     private _viewRegistry: ViewRegistryService,
-    _bulkOperationsRegistry: ExecutionBulkOperationsRegisterService
+    _bulkOperationsRegistry: ExecutionBulkOperationsRegisterService,
   ) {
     _bulkOperationsRegistry.register();
     this.registerEntities();
@@ -116,7 +116,7 @@ export class ExecutionModule {
       'executionStep',
       'steps',
       0,
-      () => true
+      () => true,
     );
 
     this._viewRegistry.registerDashletAdvanced(
@@ -127,7 +127,7 @@ export class ExecutionModule {
       1,
       function () {
         return true;
-      }
+      },
     );
 
     this._viewRegistry.registerDashletAdvanced(
@@ -138,7 +138,7 @@ export class ExecutionModule {
       2,
       function () {
         return true;
-      }
+      },
     );
 
     this._viewRegistry.registerDashletAdvanced(
@@ -149,7 +149,7 @@ export class ExecutionModule {
       3,
       function () {
         return true;
-      }
+      },
     );
   }
 

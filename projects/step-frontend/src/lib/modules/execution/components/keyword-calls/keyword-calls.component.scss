@@ -2,6 +2,11 @@
 
 .header {
   @include core.table-header;
+
+  .display-details {
+    display: flex;
+    align-items: center;
+  }
 }
 
 th,

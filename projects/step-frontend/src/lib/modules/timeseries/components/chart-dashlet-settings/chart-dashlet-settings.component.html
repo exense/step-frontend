@@ -44,6 +44,7 @@
               [item]="item"
               (removeItem)="filterItems.splice(i, 1)"
               [removable]="true"
+              [updateTimeRangeOption]="false"
             ></step-ts-filter-bar-item>
             <button mat-button [matMenuTriggerFor]="typesMenu">+ Add Filter</button>
           </div>

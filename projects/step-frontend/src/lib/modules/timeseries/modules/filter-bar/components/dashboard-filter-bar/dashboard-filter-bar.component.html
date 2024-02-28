@@ -25,7 +25,11 @@
         [activeTabId]="activeMode"
         (activeTabIdChange)="toggleOQLMode($event)"
       />
-      <step-timeseries-grouping [dimensions]="activeGrouping" (groupingChange)="handleGroupingChange($event)" />
+      <step-timeseries-grouping
+        [dimensions]="activeGrouping"
+        [groupingOptions]="groupingOptions"
+        (groupingChange)="handleGroupingChange($event)"
+      />
     </div>
   }
 
@@ -65,10 +69,10 @@
         @for (item of _internalFilters | visibleFilterItems; track item.attributeName; let i = $index) {
           <step-ts-filter-bar-item
             #appliedFilter
-            *ngIf="!item.isHidden"
             [item]="item"
+            [highlightRemoveButton]="editMode"
             [compact]="compactView"
-            [removable]="item.removable"
+            [removable]="item.removable || editMode"
             (removeItem)="removeFilterItem(i)"
             (filterChange)="handleFilterChange(i, $event)"
           />
@@ -91,7 +95,11 @@
           [activeTabId]="activeMode"
           (activeTabIdChange)="toggleOQLMode($event)"
         />
-        <step-timeseries-grouping [dimensions]="activeGrouping" (groupingChange)="handleGroupingChange($event)" />
+        <step-timeseries-grouping
+          [dimensions]="activeGrouping"
+          [groupingOptions]="groupingOptions"
+          (groupingChange)="handleGroupingChange($event)"
+        />
       </div>
     }
   </div>

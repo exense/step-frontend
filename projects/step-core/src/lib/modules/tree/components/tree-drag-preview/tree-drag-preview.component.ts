@@ -36,7 +36,7 @@ export class TreeDragPreviewComponent implements OnInit {
         }
 
         return { label, icon };
-      })
+      }),
     );
 
     (this as FieldAccessor).label$ = labelAndIcon$.pipe(map((x) => x.label));

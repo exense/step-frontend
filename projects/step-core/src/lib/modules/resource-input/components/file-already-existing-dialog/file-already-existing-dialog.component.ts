@@ -22,7 +22,7 @@ export class FileAlreadyExistingDialogComponent {
     TableLocalDataSource.configBuilder<Resource>()
       .addSearchStringPredicate('resourceName', (item) => item.resourceName)
       .addSortStringPredicate('resourceName', (item) => item.resourceName)
-      .build()
+      .build(),
   );
 
   protected selectResource(resourceId: string): void {

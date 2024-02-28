@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, skip, Subject } from 'rxjs';
-import { Execution, TimeRange } from '@exense/step-core';
+import { Execution, MetricAttribute, TimeRange } from '@exense/step-core';
 import { TimeSeriesContextParams } from './time-series-context-params';
 import { TsFilteringMode } from '../filter/ts-filtering-mode.enum';
 import { FilterBarItem } from '../filter/filter-bar-item';
@@ -29,6 +29,8 @@ export class TimeSeriesContext {
 
   inProgress$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
+  private dashboardAttributes$: BehaviorSubject<Record<string, MetricAttribute>>;
+
   private fullTimeRange: TimeRange; // this represents the entire time-series interval. usually this is displayed entirely in the time-ranger
   private readonly fullTimeRangeChange$: Subject<TimeRange> = new Subject<TimeRange>();
   private selectedTimeRange: TimeRange; // this is the zooming selection.
@@ -55,6 +57,7 @@ export class TimeSeriesContext {
       filterItems: params.filters || [],
     });
     this.activeGroupings$ = new BehaviorSubject(params.grouping);
+    this.dashboardAttributes$ = new BehaviorSubject<Record<string, MetricAttribute>>(params.attributes || {});
     this.colorsPool = params.colorsPool || new TimeseriesColorsPool();
     this.keywordsContext = params.keywordsContext || new TimeSeriesKeywordsContext(this.colorsPool);
   }
@@ -67,6 +70,33 @@ export class TimeSeriesContext {
     this.activeFilters$.complete();
     this.filterSettings$.complete();
     this.chartsLockedState$.complete();
+  }
+
+  /**
+   * This method will not trigger change event, only if there are real changes in at least one attribute, added or removed
+   */
+  updateAttributes(attributes: MetricAttribute[]): void {
+    const newAttributesByIds: Record<string, MetricAttribute> = {};
+    attributes.forEach((newAttr) => {
+      newAttributesByIds[newAttr.name] = newAttr;
+    });
+    let hasChanges = false;
+    const existingAttributes = this.dashboardAttributes$.getValue();
+    Object.keys(newAttributesByIds).forEach((attr) => {
+      if (!existingAttributes[attr]) {
+        hasChanges = true;
+      }
+    });
+    if (!hasChanges && Object.keys(newAttributesByIds).length !== Object.keys(existingAttributes).length) {
+      hasChanges = true;
+    }
+    if (hasChanges) {
+      this.dashboardAttributes$.next(newAttributesByIds);
+    }
+  }
+
+  onAttributesChange(): Observable<Record<string, MetricAttribute>> {
+    return this.dashboardAttributes$.asObservable();
   }
 
   enableCompareMode(context: TimeSeriesContext) {

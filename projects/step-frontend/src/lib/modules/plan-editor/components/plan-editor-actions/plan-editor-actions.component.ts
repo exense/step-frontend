@@ -56,7 +56,7 @@ export class PlanEditorActionsComponent implements OnChanges {
     undo: 'Undo (Ctrl + Z)',
     redo: 'Redo (Ctrl + Y)',
     duplicate: 'Duplicate this plan',
-    showSource: 'Show plan\'s YAML source',
+    showSource: "Show plan's YAML source",
     export: 'Export this plan',
     start: 'Execute this plan',
     resetInteractive: 'Reset the session of the interactive mode',
