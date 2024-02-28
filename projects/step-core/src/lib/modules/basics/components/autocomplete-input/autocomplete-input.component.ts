@@ -53,13 +53,13 @@ export class AutocompleteInputComponent<T = unknown> implements ControlValueAcce
   ]).pipe(
     map(([availableItems, filter]) => {
       let result = availableItems.filter(
-        ({ value }) => !filter || value.toLowerCase().includes(filter.trim().toLowerCase())
+        ({ value }) => !filter || value.toLowerCase().includes(filter.trim().toLowerCase()),
       );
       if (result.length === 0 && !!filter.trim()) {
         result = [{ key: filter, value: filter }];
       }
       return result;
-    })
+    }),
   );
 
   @Input() possibleItems?: T[];

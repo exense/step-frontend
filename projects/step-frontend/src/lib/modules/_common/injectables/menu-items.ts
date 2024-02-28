@@ -11,7 +11,7 @@ export const MENU_ITEMS = new InjectionToken<Observable<MenuEntry[]>>('Menu item
     return of(undefined).pipe(
       switchMap(() => menuItemsOverrideConfig.menuItemsOverride$ || of(undefined)),
       map((menuItemsOverride) => menuItemsOverride ?? viewRegistry.registeredMenuEntries),
-      shareReplay(1)
+      shareReplay(1),
     );
   },
 });

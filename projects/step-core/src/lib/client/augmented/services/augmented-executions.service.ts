@@ -55,7 +55,7 @@ export class AugmentedExecutionsService extends ExecutionsService {
    * @throws ApiError
    */
   public deleteExecutions(
-    requestBody?: TableBulkOperationRequest
+    requestBody?: TableBulkOperationRequest,
   ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'DELETE',
