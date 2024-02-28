@@ -22,12 +22,14 @@ import { EntityTypeResolver } from '../../modules/entity/injectables/entity-type
 import { ArtefactRefreshNotificationService } from '../../services/artefact-refresh-notification.service';
 import { DynamicAttributePipe } from '../../pipes/dynamic-attribute.pipe';
 import { Entity } from '../../modules/entity/types/entity';
+import { HintFor } from '../../shared/hint-for.enum';
 
 interface ReferenceMeta {
   icon: string;
   tooltip?: string;
   description: string;
   isError?: boolean;
+  hintFor?: HintFor;
 }
 
 /**
@@ -49,7 +51,7 @@ export abstract class ReferenceArtefactNameConfig<A extends Artefact, T = any> {
     selectionCriteria: string;
     selectionCriteriaDescription: string;
     addSelectionCriteriaLabel: string;
-    searchHint?: string;
+    hintFor?: HintFor;
   };
   abstract readonly attributesScreenId?: string;
   abstract getSearchAttributes(artefact: A): DynamicValueString | undefined;
@@ -84,6 +86,8 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
   protected isEditorMode: boolean = false;
   protected referenceMeta?: ReferenceMeta;
   protected schema?: DynamicFieldsSchema;
+
+  hintFor = HintFor;
 
   ngOnInit(): void {
     this.setupArtefactExternalRefresh();
@@ -222,7 +226,7 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
       this.referenceMeta = {
         icon: 'search',
         description: this._artefactNameConfig.captions.searchReference,
-        tooltip: this._artefactNameConfig.captions.searchHint,
+        hintFor: this._artefactNameConfig.captions.hintFor,
       };
       if (!this.isDisabled && !this.isEditorMode) {
         this.isEditorMode = true;

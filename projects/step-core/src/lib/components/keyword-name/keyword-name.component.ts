@@ -8,10 +8,11 @@ import {
 } from '../../client/step-client-module';
 import { ReferenceArtefactNameConfig } from '../reference-artefact-name/reference-artefact-name.component';
 import { Observable } from 'rxjs';
+import { HintFor } from '../../shared/hint-for.enum';
 
 const KEYWORD_CAPTIONS: ReferenceArtefactNameConfig<CallFunction, Keyword>['captions'] = {
   searchReference: 'No Keyword selected',
-  searchHint: 'Click on (pencil icon) to specify selection criteria for any keyword',
+  hintFor: HintFor.KEYWORD,
   dynamicReference: 'Dynamic keyword',
   referenceNotFound: 'Keyword not found',
   referenceLabel: 'Reference keyword',

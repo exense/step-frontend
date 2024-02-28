@@ -2,8 +2,21 @@
   <step-editable-label [ngModel]="artefactName" (ngModelChange)="onArtefactNameChange($event)" [disabled]="isDisabled">
   </step-editable-label>
   <div *ngIf="referenceMeta" class="reference-meta" [class.reference-meta-error]="referenceMeta.isError">
-    <step-icon [name]="referenceMeta.icon"></step-icon>
-    <span [matTooltip]="referenceMeta.tooltip || referenceMeta.description">{{ referenceMeta.description }}</span>
+    <step-popover>
+      <step-icon [name]="referenceMeta.icon"></step-icon>
+      {{ referenceMeta.description }}
+      <step-popover-content>
+        @if (referenceMeta.hintFor === hintFor.KEYWORD) {
+          Click on
+          <step-icon name="edit-2"></step-icon>
+          to specify selection criteria for any keyword
+        } @else if (referenceMeta.hintFor === hintFor.PLAN) {
+          Click on
+          <step-icon name="edit-2"></step-icon>
+          to specify selection criteria for any plan
+        }
+      </step-popover-content>
+    </step-popover>
   </div>
   <button
     *ngIf="!isDisabled"
@@ -22,6 +35,7 @@
   <span>{{ referenceString }}</span>
 </div>
 <step-dynamic-field-group
+  class="selection-criteria"
   *ngIf="isEditorMode && !isDisabled && schema"
   [primaryFieldsLabel]="_artefactNameConfig.captions.selectionCriteria"
   [primaryFieldsDescription]="_artefactNameConfig.captions.selectionCriteriaDescription"

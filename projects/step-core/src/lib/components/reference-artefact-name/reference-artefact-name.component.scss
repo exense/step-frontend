@@ -51,3 +51,19 @@ step-reference-artefact-name {
     }
   }
 }
+
+.selection-criteria {
+  > div {
+    padding-top: 1rem;
+    background-color: #f9fafb !important;
+    border-radius: 1rem;
+
+    p {
+      padding: 0 1rem 0 1rem;
+    }
+
+    input {
+      background-color: #f9fafb !important;
+    }
+  }
+}
