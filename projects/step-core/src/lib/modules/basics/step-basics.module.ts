@@ -49,6 +49,7 @@ import { DurationPipe } from './pipes/duration.pipe';
 import { DialogRouteComponent } from './components/dialog-route/dialog-route.component';
 import { MarkerComponent } from './components/marker/marker.component';
 import { AlertsContainerComponent } from './components/alerts-container/alerts-container.component';
+import { InputModelFormatterDirective } from './directives/input-model-formatter.directive';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -99,6 +100,7 @@ import { AlertsContainerComponent } from './components/alerts-container/alerts-c
     DialogRouteComponent,
     MarkerComponent,
     AlertsContainerComponent,
+    InputModelFormatterDirective,
   ],
   exports: [
     CommonModule,
@@ -152,6 +154,7 @@ import { AlertsContainerComponent } from './components/alerts-container/alerts-c
     ArrayFilterAdvancedComponent,
     MarkerComponent,
     AlertsContainerComponent,
+    InputModelFormatterDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -248,8 +251,10 @@ export * from './shared/dialog-route';
 export * from './shared/dialog-route-result';
 export * from './directives/popover-content.directive';
 export * from './directives/trigger-popover.directive';
+export * from './directives/input-model-formatter.directive';
 export * from './components/popover/popover.component';
 export * from './pipes/safe-html.pipe';
 export * from './pipes/duration.pipe';
 export * from './components/description-hint/description-hint.component';
 export * from './components/dialog-route/dialog-route.component';
+export * from './shared/model-formatters';

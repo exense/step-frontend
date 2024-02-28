@@ -24,6 +24,10 @@ export class TablePersistenceStateService {
     return !!this._config?.tableId && !!this._config?.storePagination;
   }
 
+  private get canStoreColumnsOrder(): boolean {
+    return !!this.config?.tableId;
+  }
+
   private get searchKey(): string {
     return `${this._config!.tableId!}_SEARCH`;
   }
@@ -34,6 +38,10 @@ export class TablePersistenceStateService {
 
   private get paginationKey(): string {
     return `${this._config!.tableId!}_PAGE`;
+  }
+
+  private get columnsOrderKey(): string {
+    return `${this.config!.tableId}_COLUMN_ORDER`;
   }
 
   saveState(search: Record<string, SearchValue>, page: PageEvent, sort?: Sort): void {
@@ -60,17 +68,20 @@ export class TablePersistenceStateService {
       return {};
     }
     const json = JSON.parse(jsonString);
-    return Object.entries(json).reduce((res, [key, value]) => {
-      if ((value as FilterConditionJson).filterConditionType !== undefined) {
-        const filterCondition = this._filterConditionFactory.create(value as FilterConditionJson);
-        if (filterCondition) {
-          res[key] = filterCondition;
+    return Object.entries(json).reduce(
+      (res, [key, value]) => {
+        if ((value as FilterConditionJson).filterConditionType !== undefined) {
+          const filterCondition = this._filterConditionFactory.create(value as FilterConditionJson);
+          if (filterCondition) {
+            res[key] = filterCondition;
+          }
+        } else {
+          res[key] = value as SearchValue;
         }
-      } else {
-        res[key] = value as SearchValue;
-      }
-      return res;
-    }, {} as Record<string, SearchValue>);
+        return res;
+      },
+      {} as Record<string, SearchValue>,
+    );
   }
 
   savePage(page: PageEvent): void {
@@ -107,5 +118,23 @@ export class TablePersistenceStateService {
       return undefined;
     }
     return JSON.parse(jsonString) as Sort;
+  }
+
+  saveColumnsOrder(columnsOrder: string[]): void {
+    if (!this.canStoreColumnsOrder) {
+      return;
+    }
+    this.storage.setItem(this.columnsOrderKey, JSON.stringify(columnsOrder));
+  }
+
+  getColumnsOrder(): string[] {
+    if (!this.canStoreColumnsOrder) {
+      return [];
+    }
+    const jsonString = this.storage.getItem(this.columnsOrderKey);
+    if (!jsonString) {
+      return [];
+    }
+    return JSON.parse(jsonString) as string[];
   }
 }
