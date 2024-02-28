@@ -33,6 +33,17 @@ import { HighlightTableRowDirective } from './directives/highlight-table-row.dir
 import { DatePickerModule } from '../date-picker/date-picker.module';
 import { RangeFilterComponent } from './components/range-filter/range-filter.component';
 import { DateFilterComponent } from './components/date-filter/date-filter.component';
+import {
+  DragDropContainerComponent,
+  DragItemDirective,
+  DragPreviewDirective,
+  DropAreaDirective,
+  IsDragDataPipe,
+} from '../drag-drop';
+import { DragColumnCaptionComponent } from './components/drag-column-caption/drag-column-caption.component';
+import { CustomColumnEditorDialogComponent } from './components/custom-column-editor-dialog/custom-column-editor-dialog.component';
+import { CustomColumnEditorDropdownOptionsComponent } from './components/custom-column-editor-dropdown-options/custom-column-editor-dropdown-options.component';
+import { CustomColumnAddButtonComponent } from './components/custom-column-add-button/custom-column-add-button.component';
 
 @NgModule({
   imports: [
@@ -44,12 +55,18 @@ import { DateFilterComponent } from './components/date-filter/date-filter.compon
     AsyncOperationsModule,
     StepBasicsModule,
     DatePickerModule,
+    DragDropContainerComponent,
+    DragItemDirective,
+    DropAreaDirective,
+    DragPreviewDirective,
+    IsDragDataPipe,
   ],
   declarations: [
     TableComponent,
     SearchColDirective,
     SearchCellDefDirective,
     CustomColumnsComponent,
+    CustomColumnEditorDialogComponent,
     CustomCellValuePipe,
     ColumnDirective,
     CustomCellComponentsPipe,
@@ -63,6 +80,9 @@ import { DateFilterComponent } from './components/date-filter/date-filter.compon
     HighlightTableRowDirective,
     RangeFilterComponent,
     DateFilterComponent,
+    DragColumnCaptionComponent,
+    CustomColumnEditorDropdownOptionsComponent,
+    CustomColumnAddButtonComponent,
   ],
   exports: [
     TableComponent,
@@ -78,6 +98,9 @@ import { DateFilterComponent } from './components/date-filter/date-filter.compon
     HighlightTableRowDirective,
     RangeFilterComponent,
     DateFilterComponent,
+    DragColumnCaptionComponent,
+    CustomColumnEditorDialogComponent,
+    CustomColumnAddButtonComponent,
   ],
   providers: [
     TitleCasePipe,
@@ -108,6 +131,10 @@ export * from './components/custom-search-dropdown/custom-search-checkbox.compon
 export * from './components/custom-columns/custom-columns-base.component';
 export * from './components/range-filter/range-filter.component';
 export * from './components/date-filter/date-filter.component';
+export * from './components/custom-column-editor-dialog/custom-column-editor-dialog.component';
+export * from './components/custom-column-editor-dropdown-options/custom-column-editor-dropdown-options.component';
+export * from './components/drag-column-caption/drag-column-caption.component';
+export * from './components/custom-column-add-button/custom-column-add-button.component';
 export * from './directives/column.directive';
 export * from './shared/search-value';
 export * from './shared/table-remote-data-source';

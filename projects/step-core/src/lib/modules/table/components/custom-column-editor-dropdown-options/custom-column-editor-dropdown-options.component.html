@@ -1,0 +1,38 @@
+<mat-expansion-panel #panel>
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      Options
+      <button type="button" mat-icon-button (click)="addOption($event)">
+        <step-icon name="plus" />
+      </button>
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+  <section class="options">
+    @for (optionForm of options.controls; track $any(optionForm)[optionFormId]) {
+      <ng-container [formGroup]="optionForm">
+        <step-form-field>
+          <input type="text" formControlName="value" placeholder="Value" />
+        </step-form-field>
+        <step-form-field>
+          <input
+            type="text"
+            [stepModelFormatter]="activationExpressionFormatter"
+            formControlName="activationExpression"
+            placeholder="Activation expression"
+          />
+        </step-form-field>
+      </ng-container>
+      <step-btn-group>
+        <button type="button" mat-stroked-button (click)="moveOption(optionForm, -1)">
+          <step-icon name="chevron-up" />
+        </button>
+        <button type="button" mat-stroked-button (click)="moveOption(optionForm, 1)">
+          <step-icon name="chevron-down" />
+        </button>
+        <button type="button" mat-flat-button color="accent" (click)="removeOption(optionForm)">
+          <step-icon name="trash-2" />
+        </button>
+      </step-btn-group>
+    }
+  </section>
+</mat-expansion-panel>

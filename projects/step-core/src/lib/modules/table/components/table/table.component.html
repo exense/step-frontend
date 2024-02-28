@@ -18,7 +18,7 @@
       <th mat-header-cell *matHeaderCellDef>
         <ng-template #defaultSearchRender>
           <ng-container *ngIf="searchCol" [stepSearchColMeta]="searchCol">
-            <step-input-filter stepFilterConnect> </step-input-filter>
+            <step-input-filter stepFilterConnect></step-input-filter>
           </ng-container>
         </ng-template>
         <ng-container *ngIf="searchCol.searchName">
@@ -40,8 +40,8 @@
     <tr class="mat-mdc-row" *matNoDataRow>
       <td class="mat-mdc-cell no-data" [colSpan]="displayColumns.length">
         <ng-container *ngIf="(tableDataSource?.total$ | async) === 0; then noTotal; else noSearch"></ng-container>
-        <ng-template #noTotal> No data available in table </ng-template>
-        <ng-template #noSearch> No matching records found </ng-template>
+        <ng-template #noTotal> No data available in table</ng-template>
+        <ng-template #noSearch> No matching records found</ng-template>
       </td>
     </tr>
   </table>

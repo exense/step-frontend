@@ -1,27 +1,27 @@
-<ng-container
-  *ngFor="let col of columns; trackBy: trackByCol"
-  [matColumnDef]="col.id!"
-  internal
-  stepSearchCol
-  [isSearchDisabled]="isSearchDisabled"
->
-  <ng-container *ngIf="col | customSearchCellComponent as customSearchCellKey">
-    <step-search-custom-cell *stepSearchCellDef [itemKey]="customSearchCellKey" [context]="col">
-    </step-search-custom-cell>
+@for (col of displayColumns(); track col.input!.id!) {
+  <ng-container [matColumnDef]="col.input!.id!" internal stepSearchCol [isSearchDisabled]="isSearchDisabled">
+    @if (col.input! | customSearchCellComponent; as customSearchCellKey) {
+      <step-search-custom-cell *stepSearchCellDef [itemKey]="customSearchCellKey" [context]="col.input!" />
+    }
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+      <step-drag-column-caption>{{ col.input!.label }}</step-drag-column-caption>
+      @if (configurable) {
+        <step-icon class="col-settings" name="settings" (mousedown)="configureColumn(col, $event)" />
+      }
+      @if (col.input!.description) {
+        <step-icon class="col-description" [matTooltip]="col.input!.description" name="help-circle" />
+      }
+    </th>
+    <td mat-cell *matCellDef="let element">
+      @if (col.input! | customCellComponents; as customCellKeys) {
+        <div class="custom-cell-container">
+          @for (cellKey of customCellKeys; track cellKey) {
+            <step-custom-cell [itemKey]="cellKey" [context]="element" />
+          }
+        </div>
+      } @else {
+        {{ element | customCellValue: col.input!.id! }}
+      }
+    </td>
   </ng-container>
-  <th mat-header-cell *matHeaderCellDef mat-sort-header>
-    {{ col.label }}
-    <ng-container *ngIf="col.description">
-      <step-icon [matTooltip]="col.description" name="help-circle"></step-icon>
-    </ng-container>
-  </th>
-  <td mat-cell *matCellDef="let element">
-    <ng-template #cellValue>
-      {{ element | customCellValue: col.id! }}
-    </ng-template>
-    <div class="custom-cell-container" *ngIf="col | customCellComponents as customCellKeys; else cellValue">
-      <step-custom-cell *ngFor="let cellKey of customCellKeys" [itemKey]="cellKey" [context]="element">
-      </step-custom-cell>
-    </div>
-  </td>
-</ng-container>
+}
