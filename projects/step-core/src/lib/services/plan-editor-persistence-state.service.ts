@@ -26,7 +26,7 @@ export class PlanEditorPersistenceStateService extends StorageProxy {
     this._screenWidth$
       .pipe(
         pairwise(),
-        filter(([previousWidth, currentWidth]) => previousWidth !== currentWidth)
+        filter(([previousWidth, currentWidth]) => previousWidth !== currentWidth),
       )
       .subscribe(() => this.clearTokens());
   }

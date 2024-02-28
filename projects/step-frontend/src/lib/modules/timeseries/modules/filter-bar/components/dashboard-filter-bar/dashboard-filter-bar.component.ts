@@ -15,12 +15,13 @@ import {
 } from '@angular/core';
 import { debounceTime, Observable, Subject, take } from 'rxjs';
 import {
+  TimeSeriesFilterItem,
   Execution,
+  TimeRange,
+  TimeSeriesService,
+  MetricAttribute,
   OQLVerifyResponse,
   Tab,
-  TimeRange,
-  TimeSeriesFilterItem,
-  TimeSeriesService,
 } from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';
 import {
@@ -70,7 +71,6 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
 })
 export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
-  @Input() filters: TimeSeriesFilterItem[] = [];
 
   _internalFilters: FilterBarItem[] = [];
   @Input() compactView = false;
@@ -88,6 +88,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   @ViewChildren('appliedFilter', { read: ElementRef }) appliedFilters?: QueryList<ElementRef<HTMLElement>>;
 
   activeGrouping: string[] = [];
+  groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS;
 
   private emitFilterChange$ = new Subject<void>();
 
@@ -131,6 +132,19 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     if (this.context.getGroupDimensions()) {
       this.activeGrouping = this.context.getGroupDimensions();
     }
+    this.context.onAttributesChange().subscribe((attributes: Record<string, MetricAttribute>) => {
+      const customGroupingOptions: { label: string; attributes: string[] }[] = [];
+      if (attributes[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE]) {
+        customGroupingOptions.push({ label: 'Execution', attributes: [TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE] });
+      }
+      if (attributes[TimeSeriesConfig.PLAN_ID_ATTRIBUTE]) {
+        customGroupingOptions.push({ label: 'Plan', attributes: [TimeSeriesConfig.PLAN_ID_ATTRIBUTE] });
+      }
+      if (attributes[TimeSeriesConfig.TASK_ID_ATTRIBUTE]) {
+        customGroupingOptions.push({ label: 'Task', attributes: [TimeSeriesConfig.TASK_ID_ATTRIBUTE] });
+      }
+      this.groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS.concat(customGroupingOptions);
+    });
     this._internalFilters = this.context.getFilteringSettings().filterItems;
 
     this.emitFilterChange$.pipe(debounceTime(this.EMIT_DEBOUNCE_TIME)).subscribe(() => {
@@ -141,6 +155,14 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
         }
       });
     });
+  }
+
+  public addUniqueFilterItems(items: FilterBarItem[]) {
+    const existingFilterAttributes: Record<string, boolean> = {};
+    this._internalFilters.forEach((item) => (existingFilterAttributes[item.attributeName] = true));
+    this._internalFilters = this._internalFilters.concat(
+      items.filter((item) => !existingFilterAttributes[item.attributeName]),
+    );
   }
 
   getValidFilters(): FilterBarItem[] {

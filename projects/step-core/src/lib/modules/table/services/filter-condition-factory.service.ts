@@ -86,7 +86,9 @@ export class FilterConditionFactoryService {
         return this.dateRangeFilterCondition(
           filterCondition?.sourceObject?.range,
           filterCondition?.sourceObject?.columnsOverride,
-        );
+        );      
+      case FilterConditionType.BOOLEAN:
+        return this.booleanFilterCondition(filterCondition?.sourceObject);
       default:
         return undefined;
     }
