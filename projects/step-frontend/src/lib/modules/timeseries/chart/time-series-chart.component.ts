@@ -184,7 +184,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy {
             return date.toLocaleDateString() + ` ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
           },
         },
-        ...settings.series.filter((s) => s.show !== false),
+        ...settings.series,
       ],
       hooks: {
         ...settings.hooks,
