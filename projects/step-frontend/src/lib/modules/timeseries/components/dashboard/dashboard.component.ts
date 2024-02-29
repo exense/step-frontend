@@ -26,7 +26,10 @@ import { TimeRangePickerSelection, FilterUtils } from '../../modules/_common';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DashboardUrlParamsService } from '../../modules/_common/injectables/dashboard-url-params.service';
+import {
+  DashboardUrlParams,
+  DashboardUrlParamsService,
+} from '../../modules/_common/injectables/dashboard-url-params.service';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -79,6 +82,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const pageParams = this._urlParamsService.collectUrlParams();
+    console.log('page params:', pageParams);
     this.removeOneTimeUrlParams();
     this.hasWritePermission = this._authService.hasRight('dashboard-write');
     this._route.paramMap.subscribe((params) => {
@@ -88,7 +92,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
       this._dashboardService.getDashboardById(id).subscribe((dashboard) => {
         this.dashboard = dashboard;
-        this.context = this.createContext(this.dashboard);
+        this.context = this.createContext(this.dashboard, pageParams);
         this.updateUrl();
         this.context.onStateChange().subscribe((stateChanged) => {
           console.log(this.timeRangeSelection);
@@ -184,7 +188,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  createContext(dashboard: DashboardView): TimeSeriesContext {
+  createContext(dashboard: DashboardView, urlParams: DashboardUrlParams): TimeSeriesContext {
     const dashboardTimeRange = dashboard.timeRange!;
     const timeRange: TimeRange = this.getTimeRangeFromTimeSelection(dashboard.timeRange);
     if (dashboard.timeRange.type === 'RELATIVE') {

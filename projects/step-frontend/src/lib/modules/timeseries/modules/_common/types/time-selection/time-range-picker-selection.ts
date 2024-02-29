@@ -7,8 +7,8 @@ export interface TimeRangePickerSelection {
   relativeSelection?: RelativeTimeSelection;
 }
 
-export interface TimeRangeType {
-  FULL: 'FULL';
-  ABSOLUTE: 'ABSOLUTE';
-  RELATIVE: 'RELATIVE';
+export enum TimeRangeType {
+  FULL = 'FULL',
+  ABSOLUTE = 'ABSOLUTE',
+  RELATIVE = 'RELATIVE',
 }

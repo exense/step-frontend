@@ -1,6 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TimeSeriesContext } from '../types/time-series/time-series-context';
+import { TimeRangeSelection } from '@exense/step-core';
+import { TimeRangeType } from '../types/time-selection/time-range-picker-selection';
 
 const TS_PARAMS_KEY = 'tsParams';
 
@@ -9,7 +11,7 @@ export interface DashboardUrlParams {
   refresh?: string;
   start?: number;
   end?: number;
-  rangeType?: 'FULL' | 'RELATIVE' | 'ABSOLUTE';
+  timeRange?: TimeRangeSelection;
   grouping?: string;
   relativeRange?: string;
   editMode?: boolean;
@@ -21,14 +23,36 @@ export class DashboardUrlParamsService {
   private _router = inject(Router);
 
   collectUrlParams(): DashboardUrlParams {
+    const params = this._activatedRoute.snapshot.queryParams;
+    const editModeValue = params['edit'];
+    console.log(params['grouping'].length);
     return {
-      editMode: this._activatedRoute.snapshot.queryParams['edit'] || false,
+      editMode: editModeValue === '1',
+      start: params['start'],
+      end: params['end'],
+      timeRange: this.extractTimeRange(params),
+      grouping: params['grouping']?.split(',') || [],
     };
+  }
+
+  private extractTimeRange(params: Params): TimeRangeSelection | undefined {
+    const rangeType = params['rangeType'] as TimeRangeType;
+    switch (rangeType) {
+      case TimeRangeType.FULL:
+        break;
+      case TimeRangeType.ABSOLUTE:
+        break;
+      case TimeRangeType.RELATIVE:
+        break;
+      default:
+        return undefined;
+    }
+    return;
   }
 
   updateUrlParams(context: TimeSeriesContext, timeSelectionType: 'FULL' | 'ABSOLUTE' | 'RELATIVE') {
     const params = this.extractUrlParamsFromContext(context);
-    params.rangeType = timeSelectionType;
+    // params.rangeType = timeSelectionType;
     this._router.navigate([], {
       relativeTo: this._activatedRoute,
       queryParams: params,
