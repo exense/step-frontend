@@ -114,7 +114,8 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       } as FilterBarItem;
     });
     let notContextualFilters = activeFilters.filter((item) => !contextualParams[item.attributeName]);
-    return [...contextualFilters, ...notContextualFilters];
+    const filteredItems = ['Origin', 'Plan'];
+    return [...contextualFilters, ...notContextualFilters].filter((el) => !filteredItems.includes(el.label!));
   }
 
   /**
