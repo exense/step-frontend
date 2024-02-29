@@ -164,18 +164,18 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
       });
   }
 
-  private collectUnusedAttributes(): MetricAttribute[] {
-    return this.context
-      .getAllAttributes()
-      .filter((attr) => !this._internalFilters.find((i) => attr.name === i.attributeName));
-  }
-
   public addUniqueFilterItems(items: FilterBarItem[]) {
     const existingFilterAttributes: Record<string, boolean> = {};
     this._internalFilters.forEach((item) => (existingFilterAttributes[item.attributeName] = true));
     this._internalFilters = this._internalFilters.concat(
       items.filter((item) => !existingFilterAttributes[item.attributeName]),
     );
+  }
+
+  private collectUnusedAttributes(): MetricAttribute[] {
+    return this.context
+      .getAllAttributes()
+      .filter((attr) => !this._internalFilters.find((i) => attr.name === i.attributeName));
   }
 
   getValidFilters(): FilterBarItem[] {
@@ -342,7 +342,6 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
 
     this._internalFilters.splice(index, 1);
     this._internalFilters = [...this._internalFilters];
-    this.filterOptions = this.collectUnusedAttributes();
     if (FilterUtils.filterItemIsValid(itemToDelete)) {
       this.emitFilterChange$.next();
     }

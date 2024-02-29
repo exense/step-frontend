@@ -16,6 +16,7 @@ import {
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesContextsFactory,
+  COMMON_IMPORTS,
 } from '../../modules/_common';
 
 //@ts-ignore
@@ -28,10 +29,6 @@ import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
-
-interface MetricAttributeSelection extends MetricAttribute {
-  selected: boolean;
-}
 
 interface PageParams {
   editMode?: boolean;
@@ -60,6 +57,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private _router: Router = inject(Router);
   private _authService: AuthService = inject(AuthService);
   private _destroyRef = inject(DestroyRef);
+  colorsPool: TimeseriesColorsPool = new TimeseriesColorsPool();
 
   dashboard!: DashboardView;
   dashboardBackup!: DashboardView;
@@ -139,7 +137,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   addDashlet(metric: MetricType) {
-    const newDashlet: DashboardItem = {
+    this.dashboard.dashlets.push({
       name: metric.displayName!,
       type: 'CHART',
       size: 1,

@@ -38,6 +38,7 @@ import { FilterCondition } from '../../shared/filter-condition';
 import { SearchColumn } from '../../shared/search-column.interface';
 import { TablePersistenceStateService } from '../../services/table-persistence-state.service';
 import { TableHighlightItemContainer } from '../../services/table-highlight-item-container.service';
+import { TablePersistenceUrlStateService } from '../../services/table-persistence-url-state.service';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -67,7 +68,10 @@ export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Obser
       provide: TableHighlightItemContainer,
       useExisting: forwardRef(() => TableComponent),
     },
-    TablePersistenceStateService,
+    {
+      provide: TablePersistenceStateService,
+      useClass: TablePersistenceUrlStateService,
+    },
   ],
 })
 export class TableComponent<T>
