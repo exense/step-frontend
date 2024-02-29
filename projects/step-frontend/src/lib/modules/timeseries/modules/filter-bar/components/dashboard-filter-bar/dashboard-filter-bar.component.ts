@@ -342,6 +342,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
 
     this._internalFilters.splice(index, 1);
     this._internalFilters = [...this._internalFilters];
+    this.filterOptions = this.collectUnusedAttributes();
     if (FilterUtils.filterItemIsValid(itemToDelete)) {
       this.emitFilterChange$.next();
     }
