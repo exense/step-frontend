@@ -171,7 +171,8 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     this.invalidOql = false;
   }
 
-  toggleOQLMode() {
+  toggleOQLMode(mode: number) {
+    this.activeMode = mode as TsFilteringMode;
     if (this.activeMode === TsFilteringMode.OQL) {
       this.oqlValue = FilterUtils.filtersToOQL(
         this.getValidFilters().filter((item) => !item.isHidden),

@@ -48,6 +48,7 @@ import { DescriptionHintComponent } from './components/description-hint/descript
 import { DurationPipe } from './pipes/duration.pipe';
 import { DialogRouteComponent } from './components/dialog-route/dialog-route.component';
 import { MarkerComponent } from './components/marker/marker.component';
+import { AlertsContainerComponent } from './components/alerts-container/alerts-container.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -97,6 +98,7 @@ import { MarkerComponent } from './components/marker/marker.component';
     DurationPipe,
     DialogRouteComponent,
     MarkerComponent,
+    AlertsContainerComponent,
   ],
   exports: [
     CommonModule,
@@ -149,6 +151,7 @@ import { MarkerComponent } from './components/marker/marker.component';
     DialogRouteComponent,
     ArrayFilterAdvancedComponent,
     MarkerComponent,
+    AlertsContainerComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -170,6 +173,7 @@ export * from './components/progress-bar/progress-bar.component';
 export * from './components/upload-container/upload-container.component';
 export * from './components/array-input/array-input.component';
 export * from './components/autocomplete-input/autocomplete-input.component';
+export * from './components/alerts-container/alerts-container.component';
 export { TimeUnitDictionary } from './components/time-input/base-time-converter.component';
 export * from './components/time-input/time-input.component';
 export * from './components/time-input/per-time-unit-input.component';
@@ -233,6 +237,9 @@ export * from './directives/item-hold.directive';
 export * from './services/item-hover-receiver.service';
 export * from './services/item-hold-receiver.service';
 export * from './services/dialog-parent.service';
+export * from './services/alerts.service';
+export * from './services/navigator-query-params-cleanup.service';
+export * from './shared/navigator-query-params-cleanup.token';
 export * from './shared/bulk-operation-type.enum';
 export * from './shared/auth.guards';
 export * from './shared/marker-type.enum';

@@ -1,5 +1,5 @@
-import { Component, inject, TrackByFunction } from '@angular/core';
-import { AppConfigContainerService, AuthService, Dashlet, ViewRegistryService } from '@exense/step-core';
+import { Component, inject } from '@angular/core';
+import { AppConfigContainerService, AuthService, ViewRegistryService } from '@exense/step-core';
 
 @Component({
   selector: 'step-main-view',
@@ -13,6 +13,4 @@ export class MainViewComponent {
 
   readonly navBarRightMenuItems = this._viewRegistry.getDashlets('menu/navbar/right');
   readonly adminAlerts = this._viewRegistry.getDashlets('admin/alerts');
-
-  readonly trackByDashlet: TrackByFunction<Dashlet> = (index, item) => item.id;
 }

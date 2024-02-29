@@ -182,7 +182,7 @@ export class ExecutionsService {
    * @throws ApiError
    */
   public getExecutionsByRepositoryObjectReference(
-    requestBody?: RepositoryObjectReference
+    requestBody?: RepositoryObjectReference,
   ): Observable<Array<Execution>> {
     return this.httpRequest.request({
       method: 'POST',
@@ -243,7 +243,7 @@ export class ExecutionsService {
    * @throws ApiError
    */
   public restartExecutions(
-    requestBody?: TableBulkOperationRequest
+    requestBody?: TableBulkOperationRequest,
   ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',

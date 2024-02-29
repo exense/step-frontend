@@ -17,12 +17,12 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
     @Inject(EXECUTION_TREE_PAGING_SETTINGS) private _paging: ExecutionTreePagingSetting,
     private _artefactTypes: ArtefactService,
     private _controllerService: ControllerService,
-    private _executionTreePagingService: ExecutionTreePagingService
+    private _executionTreePagingService: ExecutionTreePagingService,
   ) {}
 
   convertItem(
     item: ReportNodeWithChildren,
-    params?: { parentId?: string; isParentVisuallySkipped?: boolean }
+    params?: { parentId?: string; isParentVisuallySkipped?: boolean },
   ): ReportTreeNode {
     const id = item.id!;
     const { parentId } = params ?? {};
@@ -52,13 +52,13 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
     root: ReportNodeWithChildren,
     nodeId: string,
     children: ReportTreeNode[],
-    updateType: 'append' | 'replace'
+    updateType: 'append' | 'replace',
   ): void {}
 
   updateNodeData(
     root: ReportNodeWithChildren,
     nodeId: string,
-    data: Partial<Pick<TreeNode, 'name' | 'isSkipped'>>
+    data: Partial<Pick<TreeNode, 'name' | 'isSkipped'>>,
   ): boolean {
     return false;
   }
@@ -76,13 +76,13 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
       tap((children) => {
         node.originalNode.children = children;
       }),
-      map((children) => children.length)
+      map((children) => children.length),
     );
   }
 
   restoreTree(root: ReportNodeWithChildren, nodeIdsToRestore: string[]): Observable<ReportNodeWithChildren> {
     const requests = nodeIdsToRestore.map((parentId) =>
-      this.loadNodes(parentId).pipe(map((nodes: ReportNodeWithChildren[]) => ({ parentId, nodes })))
+      this.loadNodes(parentId).pipe(map((nodes: ReportNodeWithChildren[]) => ({ parentId, nodes }))),
     );
 
     return forkJoin(requests).pipe(
@@ -96,8 +96,8 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
           {
             dictionary: {} as Record<string, ReportNodeWithChildren[]>,
             allNodes: [root],
-          }
-        )
+          },
+        ),
       ),
       map(({ dictionary, allNodes }) => {
         allNodes.forEach((node) => {
@@ -107,7 +107,7 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
         });
 
         return root;
-      })
+      }),
     );
   }
 
@@ -117,7 +117,7 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
       .getReportNodeChildren(nodeId, skip, this._executionTreePagingService.getExecutionTreePaging())
       .pipe(
         map((nodes) => nodes.filter((node) => node.resolvedArtefact !== null)),
-        tap((nodes) => (this.hasChildrenFlags[nodeId] = nodes.length > 0))
+        tap((nodes) => (this.hasChildrenFlags[nodeId] = nodes.length > 0)),
       );
   }
 }

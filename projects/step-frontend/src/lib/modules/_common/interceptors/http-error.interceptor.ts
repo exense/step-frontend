@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import {
   HttpErrorResponse,
   HttpEvent,
@@ -10,13 +10,16 @@ import {
 import { Observable, tap, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ConnectionError } from '../shared/connection-error';
+import { HttpErrorLoggerService } from '../injectables/http-error-logger.service';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
-  constructor(private _snackBar: MatSnackBar) {}
+  private _snackBar = inject(MatSnackBar);
+  private _errorLogger = inject(HttpErrorLoggerService);
 
   private handleHttpError(error: HttpErrorResponse, skip401: boolean = false): Observable<any> {
-    console.error('Network Error', error);
+    this._errorLogger.log('Network Error', error);
     if (error.status === 401 && skip401) {
       return throwError(() => error);
     }
@@ -31,6 +34,11 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     } else {
       parsedError = HttpErrorInterceptor.formatError('Unknown HTTP error');
     }
+
+    if (this.isConnectionError(parsedError)) {
+      return throwError(() => new ConnectionError(error));
+    }
+
     this.showError(parsedError);
 
     return throwError(() => error);
@@ -38,7 +46,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
   private handleAsyncError(response: HttpEvent<any>): HttpEvent<any> {
     if (response instanceof HttpResponse && response.body?.error) {
-      console.error('Non HTTP Error', response.body?.error);
+      this._errorLogger.log('Non HTTP Error', response.body?.error);
       const parsedError = HttpErrorInterceptor.formatError(response.body?.error);
       this.showError(parsedError);
     }
@@ -64,13 +72,14 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
   private showError(error: any) {
     if (typeof error !== 'string') {
-      console.error('Error with unknown format', error);
-    } else if (error.endsWith(': 0 Unknown Error')) {
-      /* ": 0 Unknown Error" indicates a general network error, for now we assume this is always the case and format it in a user-friendly way */
-      this._snackBar.open('An unknown Network Error occurred', 'dismiss');
+      this._errorLogger.log('Error with unknown format', error);
     } else {
       this._snackBar.open(error, 'dismiss');
     }
+  }
+
+  private isConnectionError(error: any): boolean {
+    return typeof error === 'string' && error.endsWith(': 0 Unknown Error');
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -78,7 +87,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       tap((response: HttpEvent<any>) => {
         this.handleAsyncError(response);
       }),
-      catchError((error) => this.handleHttpError(error, true))
+      catchError((error) => this.handleHttpError(error, true)),
     );
   }
 }

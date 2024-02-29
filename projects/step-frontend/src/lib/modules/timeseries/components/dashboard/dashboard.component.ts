@@ -20,11 +20,12 @@ import {
 
 //@ts-ignore
 import uPlot = require('uplot');
-import { defaultIfEmpty, forkJoin, merge, Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { defaultIfEmpty, forkJoin, merge, Observable, Subject, switchMap } from 'rxjs';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TimeRangePickerSelection, FilterUtils } from '../../modules/_common';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DashboardUrlParamsService } from '../../modules/_common/injectables/dashboard-url-params.service';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
@@ -32,6 +33,8 @@ type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIA
 interface MetricAttributeSelection extends MetricAttribute {
   selected: boolean;
 }
+
+const EDIT_PARAM_NAME = 'edit';
 
 @Component({
   selector: 'step-dashboard-page',
@@ -108,8 +111,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this._timeSeriesContextFactory?.destroyContext(this.context?.id);
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   enableEditMode() {
@@ -143,7 +144,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   addDashlet(metric: MetricType) {
-    let newDashlet: DashboardItem = {
+    const newDashlet: DashboardItem = {
       name: metric.displayName!,
       type: 'CHART',
       size: 1,
@@ -202,9 +203,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
       // absolute
       this.timeRangeSelection = { ...dashboardTimeRange, type: dashboardTimeRange.type! };
     }
+    const attributesByIds: Record<string, MetricAttribute> = {};
+    this.dashboard.dashlets.forEach((d) =>
+      d.chartSettings?.attributes?.forEach((attr) => (attributesByIds[attr.name] = attr)),
+    );
     return this._timeSeriesContextFactory.createContext({
       id: dashboard.id!,
       timeRange: timeRange,
+      attributes: attributesByIds,
       grouping: dashboard.grouping || [],
       filters: dashboard.filters?.map(FilterUtils.convertApiFilterItem),
     });
@@ -212,7 +218,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   subscribeForContextChange(): void {
     merge(this.context.onFilteringChange(), this.context.onGroupingChange())
-      .pipe(takeUntil(this.terminator$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(() => {
         this.refreshAllCharts().subscribe();
       });
@@ -228,7 +234,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .onTimeSelectionChange()
       .pipe(
         switchMap((newRange) => this.handleSelectionChange(newRange)),
-        takeUntil(compareCharts ? this.terminator$ : this.terminator$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe();
   }

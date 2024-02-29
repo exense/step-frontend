@@ -19,8 +19,17 @@
 
   @if (compactView) {
     <div class="settings-section">
-      <step-tabs [tabs]="modes" [shrink]="true" [activeTabId]="activeMode" (activeTabIdChange)="toggleOQLMode()" />
-      <step-timeseries-grouping [dimensions]="activeGrouping" (groupingChange)="handleGroupingChange($event)" />
+      <step-tabs
+        [tabs]="modes"
+        [shrink]="true"
+        [activeTabId]="activeMode"
+        (activeTabIdChange)="toggleOQLMode($event)"
+      />
+      <step-timeseries-grouping
+        [dimensions]="activeGrouping"
+        [groupingOptions]="groupingOptions"
+        (groupingChange)="handleGroupingChange($event)"
+      />
     </div>
   }
 
@@ -61,6 +70,7 @@
           <step-ts-filter-bar-item
             #appliedFilter
             [item]="item"
+            [highlightRemoveButton]="editMode"
             [compact]="compactView"
             [removable]="item.removable || editMode"
             (removeItem)="removeFilterItem(i)"
@@ -79,8 +89,17 @@
 
     @if (!compactView) {
       <div class="settings-section">
-        <step-tabs [tabs]="modes" [shrink]="true" [activeTabId]="activeMode" (activeTabIdChange)="toggleOQLMode()" />
-        <step-timeseries-grouping [dimensions]="activeGrouping" (groupingChange)="handleGroupingChange($event)" />
+        <step-tabs
+          [tabs]="modes"
+          [shrink]="true"
+          [activeTabId]="activeMode"
+          (activeTabIdChange)="toggleOQLMode($event)"
+        />
+        <step-timeseries-grouping
+          [dimensions]="activeGrouping"
+          [groupingOptions]="groupingOptions"
+          (groupingChange)="handleGroupingChange($event)"
+        />
       </div>
     }
   </div>

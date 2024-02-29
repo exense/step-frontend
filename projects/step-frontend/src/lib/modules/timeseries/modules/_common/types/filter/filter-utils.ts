@@ -146,6 +146,7 @@ export class FilterUtils {
       type: item.type! as FilterBarItemType,
       searchEntities: [],
       textValues: [],
+      isLocked: !!item.label, // if there is no label, we're dealing with a custom item
       freeTextValues: [],
       removable: item.removable,
     };
@@ -180,11 +181,12 @@ export class FilterUtils {
     return mappedItem;
   }
 
-  static createFilterItemFromAttribute(attribute: MetricAttribute) {
+  static createFilterItemFromAttribute(attribute: MetricAttribute): FilterBarItem {
     const item: FilterBarItem = {
       attributeName: attribute.name,
       label: attribute.displayName,
       isLocked: true,
+      removable: false,
       isHidden: false,
       textValues: [],
       searchEntities: [],

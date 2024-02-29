@@ -19,6 +19,7 @@ import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
 import { MenuFilterPipe } from './pipes/menu-filter.pipe';
 import { SidebarStateService } from './injectables/sidebar-state.service';
 import { IsMenuItemActivePipe } from './pipes/is-menu-item-active.pipe';
+import { ConnectionErrorInterceptor } from './interceptors/connection-error.interceptor';
 
 @NgModule({
   declarations: [
@@ -45,6 +46,11 @@ import { IsMenuItemActivePipe } from './pipes/is-menu-item-active.pipe';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ConnectionErrorInterceptor,
       multi: true,
     },
     {
