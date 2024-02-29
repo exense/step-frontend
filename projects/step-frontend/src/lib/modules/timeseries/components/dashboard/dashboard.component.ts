@@ -11,7 +11,6 @@ import {
   TimeSeriesService,
 } from '@exense/step-core';
 import {
-  COMMON_IMPORTS,
   TimeseriesColorsPool,
   TimeSeriesConfig,
   TimeSeriesContext,
@@ -137,7 +136,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   addDashlet(metric: MetricType) {
-    this.dashboard.dashlets.push({
+    const newDashlet: DashboardItem = {
       name: metric.displayName!,
       type: 'CHART',
       size: 1,
