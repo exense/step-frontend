@@ -70,8 +70,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     this.prepareVisibleColumns();
     this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
     this.keywordsService = this.executionContext.keywordsContext;
-    const keywordsContext = this.executionContext.keywordsContext;
-    keywordsContext
+    this.keywordsService
       .onKeywordToggled()
       .pipe(takeUntil(this.terminator$))
       .subscribe((selection) => {
@@ -86,19 +85,18 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
           this.allSeriesChecked = false;
         }
       });
-    keywordsContext
+    this.keywordsService
       .onKeywordsUpdated()
       .pipe(takeUntil(this.terminator$))
       .subscribe((keywords) => {
-        Object.keys(keywords).forEach((keyword) => {
-          const selection: KeywordSelection = keywords[keyword];
+        Object.entries(keywords).forEach(([keyword, selection]) => {
           const existingEntry = this.entriesByIds.get(selection.id);
           if (existingEntry) {
             existingEntry.isSelected = selection.isSelected;
           }
         });
       });
-    keywordsContext
+    this.keywordsService
       .onAllSelectionChanged()
       .pipe(takeUntil(this.terminator$))
       .subscribe((allSelected) => {
