@@ -139,7 +139,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   addDashlet(metric: MetricType) {
-    let newDashlet: DashboardItem = {
+    const newDashlet: DashboardItem = {
       name: metric.displayName!,
       type: 'CHART',
       size: 1,

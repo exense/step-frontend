@@ -76,23 +76,29 @@ export class TimeSeriesContext {
    * This method will not trigger change event, only if there are real changes in at least one attribute, added or removed
    */
   updateAttributes(attributes: MetricAttribute[]): void {
-    const newAttributesByIds: Record<string, MetricAttribute> = {};
     attributes.forEach((newAttr) => {
       newAttributesByIds[newAttr.name] = newAttr;
     });
-    let hasChanges = false;
     const existingAttributes = this.dashboardAttributes$.getValue();
-    Object.keys(newAttributesByIds).forEach((attr) => {
-      if (!existingAttributes[attr]) {
-        hasChanges = true;
-      }
-    });
-    if (!hasChanges && Object.keys(newAttributesByIds).length !== Object.keys(existingAttributes).length) {
-      hasChanges = true;
+    const existingAttributesSize = Object.keys(existingAttributes).length;
+    let hasChanges = attributes.length !== existingAttributesSize;
+    if (!hasChanges) {
+      // additional cycle to check all items is performed if lengths are not equal
+      hasChanges = attributes.some((newAttr) => !existingAttributes[newAttr.name]);
     }
-    if (hasChanges) {
-      this.dashboardAttributes$.next(newAttributesByIds);
+    if (!hasChanges) {
+      // no need to do anything else
+      return;
     }
+    // perform the final aggregation, when it really required
+    const newAttributesByIds = attributes.reduce(
+      (res, newAttr) => {
+        res[newAttr.name] = newAttr;
+        return res;
+      },
+      {} as Record<string, MetricAttribute>,
+    );
+    this.dashboardAttributes$.next(newAttributesByIds);
   }
 
   onAttributesChange(): Observable<Record<string, MetricAttribute>> {

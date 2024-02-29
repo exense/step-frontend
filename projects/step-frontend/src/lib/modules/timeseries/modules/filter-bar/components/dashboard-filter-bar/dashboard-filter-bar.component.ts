@@ -1,6 +1,7 @@
 import {
   ChangeDetectorRef,
   Component,
+  DestroyRef,
   ElementRef,
   EventEmitter,
   inject,
@@ -44,6 +45,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { PerformanceViewTimeSelectionComponent } from '../perfomance-view-time-selection/performance-view-time-selection.component';
 import { FilterBarItemComponent } from '../filter-bar-item/filter-bar-item.component';
 import { VisibleFilterBarItemPipe } from '../../pipes/visible-filter-item.pipe';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
   if (field.startsWith('attributes.')) {
@@ -84,6 +86,8 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   @ViewChild(PerformanceViewTimeSelectionComponent) timeSelection?: PerformanceViewTimeSelectionComponent;
   @ViewChildren(FilterBarItemComponent) filterComponents?: QueryList<FilterBarItemComponent>;
   @ViewChildren('appliedFilter', { read: ElementRef }) appliedFilters?: QueryList<ElementRef<HTMLElement>>;
+
+  private _destroyRef = inject(DestroyRef);
 
   filterOptions: MetricAttribute[] = []; // dashboard attributes that are not used in filters yet
 
@@ -138,29 +142,34 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     }
     this._internalFilters = this.context.getFilteringSettings().filterItems;
 
-    this.context.onAttributesChange().subscribe((attributes: Record<string, MetricAttribute>) => {
-      const customGroupingOptions: { label: string; attributes: string[] }[] = [];
-      if (attributes[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE]) {
-        customGroupingOptions.push({ label: 'Execution', attributes: [TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE] });
-      }
-      if (attributes[TimeSeriesConfig.PLAN_ID_ATTRIBUTE]) {
-        customGroupingOptions.push({ label: 'Plan', attributes: [TimeSeriesConfig.PLAN_ID_ATTRIBUTE] });
-      }
-      if (attributes[TimeSeriesConfig.TASK_ID_ATTRIBUTE]) {
-        customGroupingOptions.push({ label: 'Task', attributes: [TimeSeriesConfig.TASK_ID_ATTRIBUTE] });
-      }
-      this.groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS.concat(customGroupingOptions);
-      this.filterOptions = this.collectUnusedAttributes();
-    });
-
-    this.emitFilterChange$.pipe(debounceTime(this.EMIT_DEBOUNCE_TIME)).subscribe(() => {
-      this.composeAndVerifyFullOql(this.activeGrouping).subscribe((response) => {
-        this.rawMeasurementsModeActive = response.hasUnknownFields;
-        if (!this.rawMeasurementsModeActive) {
-          this.emitFiltersChange();
+    this.context
+      .onAttributesChange()
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((attributes: Record<string, MetricAttribute>) => {
+        const customGroupingOptions: { label: string; attributes: string[] }[] = [];
+        if (attributes[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE]) {
+          customGroupingOptions.push({ label: 'Execution', attributes: [TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE] });
         }
+        if (attributes[TimeSeriesConfig.PLAN_ID_ATTRIBUTE]) {
+          customGroupingOptions.push({ label: 'Plan', attributes: [TimeSeriesConfig.PLAN_ID_ATTRIBUTE] });
+        }
+        if (attributes[TimeSeriesConfig.TASK_ID_ATTRIBUTE]) {
+          customGroupingOptions.push({ label: 'Task', attributes: [TimeSeriesConfig.TASK_ID_ATTRIBUTE] });
+        }
+        this.groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS.concat(customGroupingOptions);
+        this.filterOptions = this.collectUnusedAttributes();
       });
-    });
+
+    this.emitFilterChange$
+      .pipe(debounceTime(this.EMIT_DEBOUNCE_TIME), takeUntilDestroyed(this._destroyRef))
+      .subscribe(() => {
+        this.composeAndVerifyFullOql(this.activeGrouping).subscribe((response) => {
+          this.rawMeasurementsModeActive = response.hasUnknownFields;
+          if (!this.rawMeasurementsModeActive) {
+            this.emitFiltersChange();
+          }
+        });
+      });
   }
 
   private collectUnusedAttributes(): MetricAttribute[] {
