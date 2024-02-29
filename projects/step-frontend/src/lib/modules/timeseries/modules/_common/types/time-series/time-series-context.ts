@@ -76,9 +76,6 @@ export class TimeSeriesContext {
    * This method will not trigger change event, only if there are real changes in at least one attribute, added or removed
    */
   updateAttributes(attributes: MetricAttribute[]): void {
-    attributes.forEach((newAttr) => {
-      newAttributesByIds[newAttr.name] = newAttr;
-    });
     const existingAttributes = this.dashboardAttributes$.getValue();
     const existingAttributesSize = Object.keys(existingAttributes).length;
     let hasChanges = attributes.length !== existingAttributesSize;
