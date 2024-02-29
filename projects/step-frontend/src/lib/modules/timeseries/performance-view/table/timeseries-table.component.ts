@@ -74,7 +74,6 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
       .onKeywordToggled()
       .pipe(takeUntil(this.terminator$))
       .subscribe((selection) => {
-        // this.bucketsByKeywords[selection.id].attributes!['isSelected'] = selection.isSelected;
         const entries = this.tableData$.getValue();
         entries.forEach((entry) => {
           if (entry.name === selection.id) {
