@@ -6,4 +6,4 @@ export * from './components/scheduler-task-link/scheduler-task-link.component';
 export * from './injectables/scheduled-task-dialogs.service';
 export * from './injectables/scheduler-actions.service';
 
-export const SCHEDULER_COMMON_COMPONENTS = [EditSchedulerTaskDialogComponent, SchedulerTaskLinkComponent];
+export const SCHEDULER_COMMON_EXPORTS = [EditSchedulerTaskDialogComponent, SchedulerTaskLinkComponent];

@@ -6,7 +6,7 @@ export * from './components/editable-label/editable-label.component';
 export * from './components/editable-textarea-label/editable-textarea-label.component';
 export * from './components/editable-dropdown-label/editable-dropdown-label.component';
 
-export const EDITABLE_LABELS_COMPONENTS = [
+export const EDITABLE_LABELS_EXPORTS = [
   EditableLabelComponent,
   EditableTextareaLabelComponent,
   EditableDropdownLabelComponent,

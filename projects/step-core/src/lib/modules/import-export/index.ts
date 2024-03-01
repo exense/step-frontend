@@ -8,4 +8,4 @@ export * from './types/import-dialog-data.interface';
 export * from './injectables/export-dialogs.service';
 export * from './injectables/import-dialogs.service';
 
-export const IMPORT_EXPORT_COMPONENTS = [ExportDialogComponent, ImportDialogComponent];
+export const IMPORT_EXPORT_EXPORTS = [ExportDialogComponent, ImportDialogComponent];

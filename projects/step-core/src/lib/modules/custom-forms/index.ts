@@ -6,8 +6,4 @@ export * from './components/custom-form/custom-form.component';
 export * from './components/custom-form-input/standard-custom-form-input.component';
 export * from './components/custom-form-wrapper/custom-form-wrapper.component';
 
-export const CUSTOM_FORMS_COMPONENTS = [
-  CustomFormComponent,
-  StandardCustomFormInputComponent,
-  CustomFormWrapperComponent,
-];
+export const CUSTOM_FORMS_EXPORTS = [CustomFormComponent, StandardCustomFormInputComponent, CustomFormWrapperComponent];

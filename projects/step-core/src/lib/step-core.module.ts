@@ -62,19 +62,13 @@ import { AutomationPackageCommonModule } from './modules/automation-package-comm
 import { LockColumnContainerComponent } from './components/lock-column-container/lock-column-container.component';
 import { LockColumnComponent } from './components/lock-column/lock-column.component';
 import { DatePickerModule } from './modules/date-picker/date-picker.module';
-import { EDITABLE_LABELS_COMPONENTS } from './modules/editable-labels';
-import { CUSTOM_FORMS_COMPONENTS } from './modules/custom-forms';
-import { SCHEDULER_COMMON_COMPONENTS } from './modules/scheduler-common';
-import { PLAN_COMMON_COMPONENTS } from './modules/plan-common';
-import { IMPORT_EXPORT_COMPONENTS } from './modules/import-export';
-import { AUTH_COMPONENTS } from './modules/auth';
-import {
-  DragDropContainerComponent,
-  DragItemDirective,
-  DragPreviewDirective,
-  DropAreaDirective,
-  IsDragDataPipe,
-} from './modules/drag-drop';
+import { EDITABLE_LABELS_EXPORTS } from './modules/editable-labels';
+import { CUSTOM_FORMS_EXPORTS } from './modules/custom-forms';
+import { SCHEDULER_COMMON_EXPORTS } from './modules/scheduler-common';
+import { PLAN_COMMON_EXPORTS } from './modules/plan-common';
+import { IMPORT_EXPORT_EXPORTS } from './modules/import-export';
+import { AUTH_EXPORTS } from './modules/auth';
+import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
 
 @NgModule({
   declarations: [
@@ -137,17 +131,13 @@ import {
     WizardModule,
     CronModule,
     DatePickerModule,
-    AUTH_COMPONENTS,
-    EDITABLE_LABELS_COMPONENTS,
-    CUSTOM_FORMS_COMPONENTS,
-    SCHEDULER_COMMON_COMPONENTS,
-    PLAN_COMMON_COMPONENTS,
-    IMPORT_EXPORT_COMPONENTS,
-    DragDropContainerComponent,
-    DragItemDirective,
-    DropAreaDirective,
-    DragPreviewDirective,
-    IsDragDataPipe,
+    AUTH_EXPORTS,
+    EDITABLE_LABELS_EXPORTS,
+    CUSTOM_FORMS_EXPORTS,
+    SCHEDULER_COMMON_EXPORTS,
+    PLAN_COMMON_EXPORTS,
+    IMPORT_EXPORT_EXPORTS,
+    DRAG_DROP_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -205,17 +195,13 @@ import {
     HtmlDescriptionCellComponent,
     LockColumnComponent,
     DatePickerModule,
-    AUTH_COMPONENTS,
-    EDITABLE_LABELS_COMPONENTS,
-    CUSTOM_FORMS_COMPONENTS,
-    SCHEDULER_COMMON_COMPONENTS,
-    PLAN_COMMON_COMPONENTS,
-    IMPORT_EXPORT_COMPONENTS,
-    DragDropContainerComponent,
-    DragItemDirective,
-    DropAreaDirective,
-    DragPreviewDirective,
-    IsDragDataPipe,
+    AUTH_EXPORTS,
+    EDITABLE_LABELS_EXPORTS,
+    CUSTOM_FORMS_EXPORTS,
+    SCHEDULER_COMMON_EXPORTS,
+    PLAN_COMMON_EXPORTS,
+    IMPORT_EXPORT_EXPORTS,
+    DRAG_DROP_EXPORTS,
   ],
   providers: [
     CORE_INITIALIZER,

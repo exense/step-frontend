@@ -14,4 +14,4 @@ export * from './types/additional-right-rule';
 export * from './types/auth-context.interface';
 export * from './types/credentials-strategy';
 
-export const AUTH_COMPONENTS = [HasRightPipe];
+export const AUTH_EXPORTS = [HasRightPipe];

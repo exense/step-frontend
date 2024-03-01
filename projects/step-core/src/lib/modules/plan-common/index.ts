@@ -28,7 +28,7 @@ export * from './types/base-plan.action';
 
 export * from './pipes/plan-name.pipe';
 
-export const PLAN_COMMON_COMPONENTS = [
+export const PLAN_COMMON_EXPORTS = [
   PlanCreateDialogComponent,
   PlanLinkComponent,
   SelectPlanComponent,
