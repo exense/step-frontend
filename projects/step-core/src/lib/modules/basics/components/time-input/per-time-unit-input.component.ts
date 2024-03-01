@@ -1,4 +1,4 @@
-import { TimeUnit } from '../../shared/time-unit.enum';
+import { TimeUnit } from '../../types/time-unit.enum';
 import { BaseTimeConverterComponent } from './base-time-converter.component';
 import { Component, ViewEncapsulation } from '@angular/core';
 import { NgControl } from '@angular/forms';

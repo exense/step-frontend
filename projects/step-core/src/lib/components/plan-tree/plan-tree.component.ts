@@ -8,11 +8,13 @@ import {
   TreeComponent,
   TreeStateService,
 } from '../../modules/tree/tree.module';
-import { PlanArtefactResolverService } from '../../services/plan-artefact-resolver.service';
-import { PlanEditorService } from '../../services/plan-editor.service';
-import { PlanInteractiveSessionService } from '../../services/plan-interactive-session.service';
-import { PlanTreeAction } from '../../shared/plan-tree-action.enum';
-import { PlanEditorPersistenceStateService } from '../../services/plan-editor-persistence-state.service';
+import {
+  PlanArtefactResolverService,
+  PlanEditorService,
+  PlanInteractiveSessionService,
+  PlanTreeAction,
+  PlanEditorPersistenceStateService,
+} from '../../modules/plan-common';
 
 const TREE_SIZE = 'TREE_SIZE';
 const ARTEFACT_DETAILS_SIZE = 'ARTEFACT_DETAILS_SIZE';

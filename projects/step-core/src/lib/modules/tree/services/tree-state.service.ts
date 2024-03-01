@@ -3,12 +3,12 @@ import { inject, Injectable, OnDestroy } from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { BehaviorSubject, combineLatest, map, Observable, of, Subject, tap } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
-import { Mutable } from '../../../shared';
 import { DropType } from '../shared/drop-type.enum';
 import { TreeFlatNode } from '../shared/tree-flat-node';
 import { TreeNode } from '../shared/tree-node';
 import { TreeNodeUtilsService } from './tree-node-utils.service';
 import { TreeStateInitOptions } from '../shared/tree-state-init-options.interface';
+import { Mutable } from '../../basics/step-basics.module';
 
 type FieldAccessor = Mutable<Pick<TreeStateService<any, any>, 'hideRoot'>>;
 

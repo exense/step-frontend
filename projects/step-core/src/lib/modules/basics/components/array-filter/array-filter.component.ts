@@ -1,10 +1,10 @@
 import { Component, forwardRef, Input, OnChanges, SimpleChanges, TrackByFunction } from '@angular/core';
-import { ArrayItemLabelValueExtractor } from '../../services/array-item-label-value-extractor';
+import { ArrayItemLabelValueExtractor } from '../../injectables/array-item-label-value-extractor';
 import { KeyValue } from '@angular/common';
 import { BaseFilterComponent } from '../base-filter/base-filter.component';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { map, Observable } from 'rxjs';
-import { arrayToRegex, regexToArray } from '../../shared/string-array-regex';
+import { arrayToRegex, regexToArray } from '../../types/string-array-regex';
 
 @Component({
   selector: 'step-array-filter',
@@ -60,7 +60,7 @@ export class ArrayFilterComponent<T = unknown> extends BaseFilterComponent<strin
 
   private setupDisplayItems(
     items?: T[] | ReadonlyArray<T>,
-    extractor?: ArrayItemLabelValueExtractor<T, unknown>
+    extractor?: ArrayItemLabelValueExtractor<T, unknown>,
   ): void {
     items = items ?? this.items;
     extractor = extractor ?? this.extractor;

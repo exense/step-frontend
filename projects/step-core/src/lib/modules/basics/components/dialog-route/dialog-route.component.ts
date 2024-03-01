@@ -2,8 +2,8 @@ import { Component, inject, OnDestroy, OnInit, Type, ViewContainerRef } from '@a
 import { ActivatedRoute, Data, Router } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { map, Subject, switchMap, takeUntil, timer } from 'rxjs';
-import { DialogParentService } from '../../services/dialog-parent.service';
-import { DialogRouteResult } from '../../shared/dialog-route-result';
+import { DialogParentService } from '../../injectables/dialog-parent.service';
+import { DialogRouteResult } from '../../types/dialog-route-result';
 
 @Component({
   selector: 'step-dialog-route',

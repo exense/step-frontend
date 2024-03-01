@@ -1,6 +1,6 @@
 import { FilterCondition } from './filter-condition';
 import { TableRequestFilter } from '../../../client/step-client-module';
-import { CompareCondition } from '../../basics/shared/compare-condition.enum';
+import { CompareCondition } from '../../basics/types/compare-condition.enum';
 import { FilterConditionType } from './filter-condition-type.enum';
 
 export class ScopeFilterCondition extends FilterCondition<string> {

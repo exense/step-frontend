@@ -1,5 +1,5 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { TimeUnit } from '../../shared/time-unit.enum';
+import { TimeUnit } from '../../types/time-unit.enum';
 import { BaseTimeConverterComponent } from './base-time-converter.component';
 import { NgControl } from '@angular/forms';
 
@@ -17,7 +17,7 @@ export class TimeInputComponent extends BaseTimeConverterComponent {
   protected override calculateDisplayValue(
     modelValue: number,
     modelMeasure: TimeUnit,
-    displayMeasure?: TimeUnit
+    displayMeasure?: TimeUnit,
   ): number {
     if (!displayMeasure) {
       return modelValue;
@@ -29,7 +29,7 @@ export class TimeInputComponent extends BaseTimeConverterComponent {
   protected override calculateModelValue(
     displayValue: number,
     modelMeasure: TimeUnit,
-    displayMeasure?: TimeUnit
+    displayMeasure?: TimeUnit,
   ): number {
     if (!displayMeasure) {
       return displayValue;

@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { BulkOperationType } from '../../basics/shared/bulk-operation-type.enum';
+import { BulkOperationType } from '../../basics/types/bulk-operation-type.enum';
 import { CustomRegistryService, CustomRegistryType } from '../../custom-registeries/custom-registries.module';
 import {
   EntityBulkOperation,
@@ -46,7 +46,15 @@ export class EntityBulkOperationsRegistryService {
 
   register(
     entity: string,
-    { type: operationType, label, icon, operation, performStrategy, permission, order }: EntityBulkOperationRegisterInfo
+    {
+      type: operationType,
+      label,
+      icon,
+      operation,
+      performStrategy,
+      permission,
+      order,
+    }: EntityBulkOperationRegisterInfo,
   ): this {
     const type = `${entity}_${operationType}`;
 

@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { forkJoin, map, switchMap, tap } from 'rxjs';
 import { ArtefactsFactoryService } from './artefacts-factory.service';
-import { PlanOpenService } from './plan-open.service';
+import { PlanOpenService } from '../modules/plan-common';
 import { AugmentedPlansService } from '../client/step-client-module';
 
 const PLAN_TYPE = 'step.core.plans.Plan';
@@ -21,7 +21,7 @@ export class KeywordExecutorService {
         createdPlan!.attributes = createdPlan!.attributes ?? {};
         createdPlan!.attributes!['name'] = PLAN_TEMPLATE;
         createdPlan!.visible = false;
-      })
+      }),
     );
 
     const keywordArtefact$ = this._artefactsFactory.createCallKeywordArtefact(keywordId);
@@ -32,7 +32,7 @@ export class KeywordExecutorService {
           plan!.root!.children = [keywordArtefact];
           return plan;
         }),
-        switchMap((plan) => this._planApi.savePlan(plan))
+        switchMap((plan) => this._planApi.savePlan(plan)),
       )
       .subscribe((plan) => {
         const artefactId = plan!.root!.children![0]!.id;

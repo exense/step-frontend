@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { TreeStateService } from '../../services/tree-state.service';
 import { map, of } from 'rxjs';
-import { Mutable } from '../../../../shared';
 import { TreeNode } from '../../shared/tree-node';
+import { Mutable } from '../../../basics/step-basics.module';
 
 type FieldAccessor = Mutable<Pick<TreeDragPreviewComponent, 'label$' | 'icon$'>>;
 

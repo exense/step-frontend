@@ -10,7 +10,7 @@ import {
   TrackByFunction,
 } from '@angular/core';
 import { KeyValue } from '@angular/common';
-import { TimeUnit } from '../../shared/time-unit.enum';
+import { TimeUnit } from '../../types/time-unit.enum';
 
 type OnChange = (value: number) => void;
 type OnTouch = () => void;
@@ -151,12 +151,12 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
   protected abstract calculateDisplayValue(
     modelValue: number,
     modelMeasure: TimeUnit,
-    displayMeasure?: TimeUnit
+    displayMeasure?: TimeUnit,
   ): number;
 
   protected abstract calculateModelValue(
     displayValue: number,
     modelMeasure: TimeUnit,
-    displayMeasure?: TimeUnit
+    displayMeasure?: TimeUnit,
   ): number;
 }
