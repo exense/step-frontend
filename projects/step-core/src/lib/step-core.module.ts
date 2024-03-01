@@ -68,6 +68,13 @@ import { SCHEDULER_COMMON_COMPONENTS } from './modules/scheduler-common';
 import { PLAN_COMMON_COMPONENTS } from './modules/plan-common';
 import { IMPORT_EXPORT_COMPONENTS } from './modules/import-export';
 import { AUTH_COMPONENTS } from './modules/auth';
+import {
+  DragDropContainerComponent,
+  DragItemDirective,
+  DragPreviewDirective,
+  DropAreaDirective,
+  IsDragDataPipe,
+} from './modules/drag-drop';
 
 @NgModule({
   declarations: [
@@ -136,6 +143,11 @@ import { AUTH_COMPONENTS } from './modules/auth';
     SCHEDULER_COMMON_COMPONENTS,
     PLAN_COMMON_COMPONENTS,
     IMPORT_EXPORT_COMPONENTS,
+    DragDropContainerComponent,
+    DragItemDirective,
+    DropAreaDirective,
+    DragPreviewDirective,
+    IsDragDataPipe,
   ],
   exports: [
     CommonModule,
@@ -199,6 +211,11 @@ import { AUTH_COMPONENTS } from './modules/auth';
     SCHEDULER_COMMON_COMPONENTS,
     PLAN_COMMON_COMPONENTS,
     IMPORT_EXPORT_COMPONENTS,
+    DragDropContainerComponent,
+    DragItemDirective,
+    DropAreaDirective,
+    DragPreviewDirective,
+    IsDragDataPipe,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -323,3 +340,4 @@ export * from './services/auto-refresh-model-factory.service';
 export * from './services/artefacts-factory.service';
 export * from './services/keyword-executor.service';
 export * from './components/report-node-icon/report-node-icon.component';
+export * from './modules/drag-drop';
