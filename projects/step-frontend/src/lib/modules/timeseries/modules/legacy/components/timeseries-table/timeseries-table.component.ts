@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, inject, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import {
   BucketAttributes,
   BucketResponse,
@@ -8,9 +8,10 @@ import {
   TableLocalDataSourceConfig,
   TimeSeriesAPIResponse,
 } from '@exense/step-core';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 import { KeywordSelection, TimeSeriesKeywordsContext, TimeSeriesContext, COMMON_IMPORTS } from '../../../_common';
 import { TsComparePercentagePipe } from '../../pipes/ts-compare-percentage.pipe';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface TableEntry {
   name: string;
@@ -62,9 +63,10 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   @Input() executionContext!: TimeSeriesContext;
   keywordsService!: TimeSeriesKeywordsContext;
 
-  private terminator$ = new Subject<void>();
   columns: TableColumn[] = [];
   visibleColumnsIds: string[] = [];
+
+  private _destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     if (!this.executionContext) {
@@ -74,28 +76,35 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
     this.prepareVisibleColumns();
     this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
     this.keywordsService = this.executionContext.keywordsContext;
-    const keywordsContext = this.executionContext.keywordsContext;
-    keywordsContext.onKeywordToggled().subscribe((selection) => {
-      // this.bucketsByKeywords[selection.id].attributes!['isSelected'] = selection.isSelected;
-      const entries = this.tableData$.getValue();
-      entries.forEach((entry) => {
-        if (entry.name === selection.id) {
-          entry.isSelected = selection.isSelected;
-        }
+    this.keywordsService
+      .onKeywordToggled()
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((selection) => {
+        const entries = this.tableData$.getValue();
+        entries.forEach((entry) => {
+          if (entry.name === selection.id) {
+            entry.isSelected = selection.isSelected;
+          }
+        });
       });
-      if (!selection.isSelected) {
-        this.allSeriesChecked = false;
-      }
-    });
-    keywordsContext.onKeywordsUpdated().subscribe((keywords) => {
-      Object.keys(keywords).forEach((keyword) => {
-        const selection: KeywordSelection = keywords[keyword];
-        const existingEntry = this.entriesByIds.get(selection.id);
-        if (existingEntry) {
-          existingEntry.isSelected = selection.isSelected;
-        }
+    this.keywordsService
+      .onAllSelectionChanged()
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((allSelected) => {
+        this.allSeriesChecked = allSelected;
       });
-    });
+    this.keywordsService
+      .onKeywordsUpdated()
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((keywords) => {
+        Object.keys(keywords).forEach((keyword) => {
+          const selection: KeywordSelection = keywords[keyword];
+          const existingEntry = this.entriesByIds.get(selection.id);
+          if (existingEntry) {
+            existingEntry.isSelected = selection.isSelected;
+          }
+        });
+      });
   }
 
   private getInitialColumns(): TableColumn[] {
@@ -384,8 +393,6 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.tableData$.complete();
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   get TableColumnType() {
