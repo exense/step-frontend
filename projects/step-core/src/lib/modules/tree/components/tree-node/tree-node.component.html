@@ -1,30 +1,27 @@
 <div
   class="tree-node"
-  [class.tree-node-selected]="node.id | isNodeSelected | async"
-  [class.tree-node-selected-for-insert]="node.id | isNodeSelectedForInsert | async"
-  [class.tree-node-hidden]="isHideRoot && (node.id | isRootNode | async)"
-  [class.skipped]="node.isVisuallySkipped"
-  cdkDrag
-  [class.root-node]="node.id | isRootNode | async"
-  [cdkDragBoundary]="treeContainer"
-  [cdkDragDisabled]="dragDisabled || (node.id | isRootNode | async)"
-  [cdkDragData]="node.id"
-  (cdkDragStarted)="dragStart($event)"
-  (cdkDragEntered)="dragEnter($event)"
-  (cdkDragEnded)="dragEnd()"
+  [class.tree-node-selected]="isSelected()"
+  [class.tree-node-selected-for-insert]="isSelectedForInsert()"
+  [class.tree-node-hidden]="isHidden()"
+  [class.skipped]="node().isVisuallySkipped"
+  [class.root-node]="isRootNode()"
 >
-  <ng-template #noToggle>
+  @if (canToggle) {
+    <button mat-icon-button (click)="toggle()">
+      <step-icon class="toggle-state" [name]="toggleStateIcon()" />
+    </button>
+  } @else {
     <div class="no-toggle"></div>
-  </ng-template>
-  <button *ngIf="canToggle; else noToggle" mat-icon-button (click)="toggle()">
-    <step-icon class="toggle-state" [name]="toggleStateIcon"></step-icon>
-  </button>
-  <div class="node-content" cdkDragHandle (contextmenu)="openContextMenu($event)">
+  }
+  <div
+    class="node-content"
+    (contextmenu)="openContextMenu($event)"
+    [stepDragItem]="node().id"
+    [dragDisabled]="dragDisabled"
+  >
     <div class="node-icon">
-      <step-icon [name]="node.icon" [class]="node.iconClassName"> </step-icon>
+      <step-icon [name]="node().icon" [class]="node().iconClassName" />
     </div>
-    <step-tree-node-name [node]="node"></step-tree-node-name>
+    <step-tree-node-name [node]="node()" />
   </div>
-  <step-tree-drag-placeholder *cdkDragPlaceholder [dropInfo]="dropInfo$ | async"> </step-tree-drag-placeholder>
-  <step-tree-drag-preview *cdkDragPreview> </step-tree-drag-preview>
 </div>
