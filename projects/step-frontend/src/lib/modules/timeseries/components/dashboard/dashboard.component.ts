@@ -234,7 +234,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const timeRange: TimeRange = this.getTimeRangeFromTimeSelection(timeRangeSelection);
     if (timeRangeSelection.type === 'RELATIVE') {
       const timeInMs = timeRangeSelection.relativeSelection!.timeInMs;
-      console.log(timeInMs, this.timeRangeOptions);
       const foundRelativeOption = this.timeRangeOptions.find((o) => {
         return timeInMs === o.relativeSelection?.timeInMs;
       });
@@ -259,13 +258,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const dashboardFilters = dashboard.filters
       ?.map(FilterUtils.convertApiFilterItem)
       .filter((filter) => !urlFilters.find((f) => f.attributeName === filter.attributeName));
-
+    console.log(urlFilters);
     return this._timeSeriesContextFactory.createContext({
       id: dashboard.id!,
       timeRange: timeRange,
       attributes: attributesByIds,
       grouping: urlParams.grouping || dashboard.grouping || [],
-      filters: [...dashboardFilters, ...urlFilters],
+      filters: [...urlFilters, ...dashboardFilters],
     });
   }
 
