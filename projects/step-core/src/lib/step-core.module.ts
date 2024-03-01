@@ -89,6 +89,13 @@ import { AutomationPackageCommonModule } from './modules/automation-package-comm
 import { LockColumnContainerComponent } from './components/lock-column-container/lock-column-container.component';
 import { LockColumnComponent } from './components/lock-column/lock-column.component';
 import { DatePickerModule } from './modules/date-picker/date-picker.module';
+import {
+  DragDropContainerComponent,
+  DragItemDirective,
+  DragPreviewDirective,
+  DropAreaDirective,
+  IsDragDataPipe,
+} from './modules/drag-drop';
 
 @NgModule({
   declarations: [
@@ -178,6 +185,11 @@ import { DatePickerModule } from './modules/date-picker/date-picker.module';
     WizardModule,
     CronModule,
     DatePickerModule,
+    DragDropContainerComponent,
+    DragItemDirective,
+    DropAreaDirective,
+    DragPreviewDirective,
+    IsDragDataPipe,
   ],
   exports: [
     CommonModule,
@@ -259,6 +271,11 @@ import { DatePickerModule } from './modules/date-picker/date-picker.module';
     MessageDialogComponent,
     LockColumnComponent,
     DatePickerModule,
+    DragDropContainerComponent,
+    DragItemDirective,
+    DropAreaDirective,
+    DragPreviewDirective,
+    IsDragDataPipe,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -421,3 +438,4 @@ export * from './components/confirmation-dialog/confirmation-dialog.component';
 export * from './components/messages-list-dialog/messages-list-dialog.component';
 export * from './components/message-dialog/message-dialog.component';
 export * from './components/report-node-icon/report-node-icon.component';
+export * from './modules/drag-drop';

@@ -6,8 +6,13 @@ step-tree-node-name {
   padding-left: 3.3rem;
   padding-right: 1rem;
   border-radius: 2rem;
+  white-space: nowrap;
 
   .hidden {
     display: none;
+  }
+
+  button {
+    max-height: 2rem !important;
   }
 }
