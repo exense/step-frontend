@@ -41,8 +41,7 @@ export class MeasurementsPickerComponent implements OnInit, OnDestroy {
         this.keywords = keywords;
         this.activeKeywords = 0;
         let visibleKeywords = 0;
-        Object.keys(keywords).forEach((key) => {
-          let keyword = keywords[key];
+        Object.entries(keywords).forEach(([key, keyword]) => {
           if (keyword.isVisible) {
             visibleKeywords++;
             if (keyword.isSelected) {
