@@ -226,4 +226,45 @@ export class FilterUtils {
         throw new Error('Unrecognized type: ' + type);
     }
   }
+
+  public static createEmptyFilterTextItem(attribute: string): FilterBarItem {
+    const fieldType = this.getFilterFieldType(attribute);
+    return {
+      removable: true,
+      label: this.getFilterFieldLabel(attribute),
+      type: fieldType,
+      attributeName: attribute,
+      isLocked: false,
+    } as FilterBarItem;
+  }
+
+  private static getFilterFieldType(attribute: string): FilterBarItemType {
+    switch (attribute) {
+      case 'eId':
+        return FilterBarItemType.EXECUTION;
+      case 'taskId':
+        return FilterBarItemType.TASK;
+      case 'planId':
+        return FilterBarItemType.PLAN;
+      default:
+        return FilterBarItemType.FREE_TEXT;
+    }
+  }
+
+  public static isEntityFilter(filterItem: FilterBarItem): boolean {
+    return [FilterBarItemType.PLAN, FilterBarItemType.TASK, FilterBarItemType.EXECUTION].includes(filterItem.type);
+  }
+
+  private static getFilterFieldLabel(attribute: string): string {
+    switch (attribute) {
+      case 'eId':
+        return 'Execution';
+      case 'taskId':
+        return 'Task';
+      case 'plan':
+        return 'Plan';
+      default:
+        return attribute;
+    }
+  }
 }

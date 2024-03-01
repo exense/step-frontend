@@ -8,6 +8,7 @@ import {
   MetricType,
   TimeRange,
   TimeRangeSelection,
+  TimeSeriesFilterItem,
   TimeSeriesService,
 } from '@exense/step-core';
 import {
@@ -16,6 +17,8 @@ import {
   TimeSeriesContext,
   TimeSeriesContextsFactory,
   COMMON_IMPORTS,
+  FilterBarItem,
+  FilterBarItemType,
 } from '../../modules/_common';
 
 //@ts-ignore
@@ -95,7 +98,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.context = this.createContext(this.dashboard, pageParams);
         this.updateUrl();
         this.context.onStateChange().subscribe((stateChanged) => {
-          console.log(this.timeRangeSelection);
           this.updateUrl();
         });
 
@@ -110,7 +112,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private updateUrl(): void {
-    this._urlParamsService.updateUrlParams(this.context, this.timeRangeSelection.type);
+    this._urlParamsService.updateUrlParams(this.context, this.timeRangeSelection);
   }
 
   ngOnDestroy(): void {
@@ -188,35 +190,82 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
+  private convertUrlFilters(
+    urlParams: DashboardUrlParams,
+    attributesDefinition: Record<string, MetricAttribute>,
+  ): FilterBarItem[] {
+    return urlParams.filters
+      .filter((i) => !!attributesDefinition[i.attribute])
+      .map((urlFilter) => {
+        const filterItem = FilterUtils.createFilterItemFromAttribute(attributesDefinition[urlFilter.attribute]);
+        switch (filterItem.type) {
+          case FilterBarItemType.OPTIONS:
+            urlFilter.values?.forEach((v) => {
+              let foundOptions = filterItem.textValues?.find((textValue) => textValue.value === v);
+              if (foundOptions) {
+                foundOptions.isSelected = true;
+              } else {
+                filterItem.textValues?.push({ value: v, isSelected: true });
+              }
+            });
+            filterItem.exactMatch = true;
+            break;
+          case FilterBarItemType.FREE_TEXT:
+            filterItem.freeTextValues = urlFilter.values;
+            break;
+          case FilterBarItemType.EXECUTION:
+          case FilterBarItemType.TASK:
+          case FilterBarItemType.PLAN:
+            filterItem.exactMatch = true;
+            filterItem.searchEntities = urlFilter.values?.map((v) => ({ searchValue: v, entity: undefined })) || [];
+            break;
+          case FilterBarItemType.NUMERIC:
+          case FilterBarItemType.DATE:
+            filterItem.min = urlFilter.min;
+            filterItem.max = urlFilter.max;
+            break;
+        }
+        return filterItem;
+      });
+  }
+
   createContext(dashboard: DashboardView, urlParams: DashboardUrlParams): TimeSeriesContext {
-    const dashboardTimeRange = dashboard.timeRange!;
-    const timeRange: TimeRange = this.getTimeRangeFromTimeSelection(dashboard.timeRange);
-    if (dashboard.timeRange.type === 'RELATIVE') {
-      const timeInMs = dashboardTimeRange.relativeSelection!.timeInMs;
+    const timeRangeSelection = urlParams.timeRange || dashboard.timeRange!;
+    const timeRange: TimeRange = this.getTimeRangeFromTimeSelection(timeRangeSelection);
+    if (timeRangeSelection.type === 'RELATIVE') {
+      const timeInMs = timeRangeSelection.relativeSelection!.timeInMs;
+      console.log(timeInMs, this.timeRangeOptions);
       const foundRelativeOption = this.timeRangeOptions.find((o) => {
-        return o.type === 'RELATIVE' && timeInMs === o.relativeSelection?.timeInMs;
+        return timeInMs === o.relativeSelection?.timeInMs;
       });
       this.timeRangeSelection = foundRelativeOption || {
         type: 'RELATIVE',
         relativeSelection: {
-          label: dashboardTimeRange.relativeSelection!.label || `Last ${timeInMs / 60000} minutes`,
+          label: timeRangeSelection.relativeSelection!.label || `Last ${timeInMs / 60000} minutes`,
           timeInMs: timeInMs,
         },
       };
     } else {
       // absolute
-      this.timeRangeSelection = { ...dashboardTimeRange, type: dashboardTimeRange.type! };
+      this.timeRangeSelection = { ...timeRangeSelection, type: timeRangeSelection.type! };
     }
     const attributesByIds: Record<string, MetricAttribute> = {};
     this.dashboard.dashlets.forEach((d) =>
       d.chartSettings?.attributes?.forEach((attr) => (attributesByIds[attr.name] = attr)),
     );
+    const urlFilters = this.convertUrlFilters(urlParams, attributesByIds).filter(FilterUtils.filterItemIsValid);
+
+    // url filters are excluded from the dashboard filters
+    const dashboardFilters = dashboard.filters
+      ?.map(FilterUtils.convertApiFilterItem)
+      .filter((filter) => !urlFilters.find((f) => f.attributeName === filter.attributeName));
+
     return this._timeSeriesContextFactory.createContext({
       id: dashboard.id!,
       timeRange: timeRange,
       attributes: attributesByIds,
-      grouping: dashboard.grouping || [],
-      filters: dashboard.filters?.map(FilterUtils.convertApiFilterItem),
+      grouping: urlParams.grouping || dashboard.grouping || [],
+      filters: [...dashboardFilters, ...urlFilters],
     });
   }
 
