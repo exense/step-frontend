@@ -25,7 +25,7 @@ export class TablePersistenceStateService {
   }
 
   private get canStoreColumnsOrder(): boolean {
-    return !!this.config?.tableId;
+    return !!this._config?.tableId;
   }
 
   private get searchKey(): string {
@@ -41,7 +41,7 @@ export class TablePersistenceStateService {
   }
 
   private get columnsOrderKey(): string {
-    return `${this.config!.tableId}_COLUMN_ORDER`;
+    return `${this._config!.tableId}_COLUMN_ORDER`;
   }
 
   saveState(search: Record<string, SearchValue>, page: PageEvent, sort?: Sort): void {
