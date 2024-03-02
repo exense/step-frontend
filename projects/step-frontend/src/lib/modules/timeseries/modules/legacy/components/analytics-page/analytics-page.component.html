@@ -2,12 +2,11 @@
   <div class="header-container">
     <div></div>
     <div class="header-buttons">
-      <button mat-raised-button [matMenuTriggerFor]="refreshMenu">Refresh ({{ selectedRefreshInterval.label }})</button>
-      <mat-menu #refreshMenu="matMenu">
-        <button mat-menu-item *ngFor="let interval of refreshIntervals" (click)="changeRefreshInterval(interval)">
-          {{ interval.label }}
-        </button>
-      </mat-menu>
+      <step-autorefresh-toggle
+        [interval]="refreshEnabled ? selectedRefreshInterval.value : 0"
+        [presets]="refreshIntervals"
+        (refresh)="triggerRefresh()"
+      ></step-autorefresh-toggle>
       <button class="menu-btn" #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="menu" mat-raised-button>
         <step-icon name="settings"></step-icon>
         Settings
