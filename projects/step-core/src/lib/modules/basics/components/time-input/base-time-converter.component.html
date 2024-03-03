@@ -21,7 +21,11 @@
     {{ separator }}
   </step-suffix>
   <step-suffix>
-    <mat-select [ngModel]="displayMeasure" (ngModelChange)="handleDisplayMeasureChange($event)" (blur)="handleBlur()">
+    <mat-select
+      [ngModel]="internalDisplayMeasure"
+      (ngModelChange)="handleDisplayMeasureChange($event)"
+      (blur)="handleBlur()"
+    >
       <mat-option *ngFor="let item of measureItems; trackBy: trackByMeasureItem" [value]="item.key">
         {{ item.value }}
       </mat-option>

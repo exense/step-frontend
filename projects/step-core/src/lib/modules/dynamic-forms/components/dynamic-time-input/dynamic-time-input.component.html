@@ -1,0 +1,38 @@
+<ng-container *ngIf="dynamic; then expressionTemplate; else constantTemplate"> </ng-container>
+<ng-template #expressionTemplate>
+  <step-expression-input
+    [label]="label"
+    [tooltip]="tooltip"
+    [placeholder]="placeholder"
+    [isParentInvalid]="!!_ngControl.invalid"
+    [isParentTouched]="!!_ngControl.touched"
+    [isParentDisabled]="isDisabled"
+    [showRequiredMarker]="showRequiredMarker"
+    [ngModel]="expression"
+    (ngModelChange)="onExpressionChange($event)"
+    [disabled]="isDisabled"
+    (toggleConstantValue)="toggleDynamicExpression(false)"
+    (blur)="onBlur()"
+  >
+  </step-expression-input>
+</ng-template>
+<ng-template #constantTemplate>
+  <step-time-raw-input
+    [label]="label"
+    [tooltip]="tooltip"
+    [placeholder]="placeholder"
+    [parentControl]="_ngControl"
+    [showRequiredMarker]="showRequiredMarker"
+    [ngModel]="value"
+    (ngModelChange)="onValueChange($event)"
+    [modelMeasure]="modelMeasure"
+    [allowedMeasures]="allowedMeasures"
+    [defaultDisplayMeasure]="defaultDisplayMeasure"
+    [displayMeasure]="displayMeasure"
+    (displayMeasureChange)="displayMeasureChange.emit($event)"
+    (editConstantValue)="editConstantValue()"
+    (toggleDynamicExpression)="toggleDynamicExpression(true)"
+    (blur)="onBlur()"
+  >
+  </step-time-raw-input>
+</ng-template>
