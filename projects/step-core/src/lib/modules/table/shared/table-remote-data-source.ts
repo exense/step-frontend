@@ -113,7 +113,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   readonly inProgress$ = this._inProgress$.asObservable();
   private isSkipOngoingRequest?: boolean;
   private _request$ = new BehaviorSubject<{ request: TableRequestInternal; hideProgress?: boolean } | undefined>(
-    undefined
+    undefined,
   );
   private _response$: Observable<TableResponseGeneric<T> | null> = this._request$.pipe(
     tap((x) => {
@@ -130,10 +130,9 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     exhaustMap((x) =>
       this._rest.requestTable<T>(this._tableId, x.request).pipe(
         catchError((err) => {
-          console.error(err);
           return of(null);
-        })
-      )
+        }),
+      ),
     ),
     tap(() => {
       this._inProgress$.next(false);
@@ -141,7 +140,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     startWith(null),
     shareReplay(1),
     filter(() => !this.isSkipOngoingRequest),
-    takeUntil(this._terminator$)
+    takeUntil(this._terminator$),
   ) as Observable<TableResponseGeneric<T> | null>;
   readonly data$: Observable<T[]> = this._response$.pipe(map((r) => r?.data || []));
 
@@ -153,7 +152,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
       const recordsFiltered = r?.recordsFiltered || 0;
       return recordsFiltered > 0 && recordsInPage === 0;
     }),
-    filter((forceNavigate) => forceNavigate === true)
+    filter((forceNavigate) => forceNavigate === true),
   );
 
   private filters: { [key: string]: SearchValue } = {};
@@ -162,7 +161,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     private _tableId: string,
     private _rest: TableApiWrapperService,
     private _requestColumnsMap: Record<string, string>,
-    private _filters?: Record<string, string[]>
+    private _filters?: Record<string, string[]>,
   ) {
     if (_filters) {
       for (const key in _filters) {

@@ -52,10 +52,10 @@
             <mat-panel-title>Advanced</mat-panel-title>
           </mat-expansion-panel-header>
 
-          <step-dynamic-textfield
-            label="Call timeout (ms)"
+          <step-dynamic-time-input
+            label="Call timeout"
             [formControl]="formGroup!.controls.callTimeout"
-          ></step-dynamic-textfield>
+          ></step-dynamic-time-input>
 
           <mat-checkbox color="primary" [formControl]="formGroup!.controls.executeLocally">
             Execute on controller&nbsp;

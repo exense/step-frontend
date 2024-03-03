@@ -14,11 +14,12 @@ import {
 import { ExecutionTreeAction } from '../../shared/execution-tree-action.enum';
 import { ReportTreeNode } from '../../shared/report-tree-node';
 import { Observable, of } from 'rxjs';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-execution-tree',
   templateUrl: './execution-tree.component.html',
-  styleUrls: ['./execution-tree.component.scss'],
+  styleUrl: './execution-tree.component.scss',
   providers: [
     ExecutionTreePagingService,
     {
@@ -32,7 +33,7 @@ export class ExecutionTreeComponent implements TreeActionsService {
   private _paging = inject(EXECUTION_TREE_PAGING_SETTINGS);
   private _executionTreePagingService = inject(ExecutionTreePagingService);
   private _treeState = inject<TreeStateService<ReportNode, ReportTreeNode>>(TreeStateService);
-  readonly selectedNode$: Observable<ReportTreeNode | undefined> = this._treeState.selectedNode$;
+  readonly selectedNode$: Observable<ReportTreeNode | undefined> = toObservable(this._treeState.selectedNode);
 
   handleContextAction(actionId: string, node?: AbstractArtefact): void {
     const nodeId = node?.id!;

@@ -43,15 +43,6 @@ step-plan-editor-base {
     box-sizing: content-box;
   }
 
-  step-tree cdk-tree {
-    display: block;
-    padding-left: 24px;
-
-    .node-content[cdkDragHandle] {
-      padding: 8px 24px 8px 0;
-    }
-  }
-
   step-tabs {
     padding: 24px 24px 0;
   }

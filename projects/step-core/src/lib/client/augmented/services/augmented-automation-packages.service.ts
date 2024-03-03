@@ -64,7 +64,7 @@ export class AugmentedAutomationPackagesService extends AutomationPackagesServic
         catchError((err) => {
           console.log(err);
           return of([]);
-        })
+        }),
       );
   }
 

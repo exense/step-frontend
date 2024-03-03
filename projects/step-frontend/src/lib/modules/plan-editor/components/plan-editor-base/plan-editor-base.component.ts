@@ -123,7 +123,7 @@ export class PlanEditorBaseComponent
         planType,
         icon: this._artefactService.getArtefactType(planType)?.icon ?? '',
       }));
-    })
+    }),
   );
   planTypeControl = new FormControl<{ planType: string; icon: string } | null>(null);
   protected componentTabs = [
@@ -203,9 +203,9 @@ export class PlanEditorBaseComponent
         switchMap((value) =>
           this._planEditorApi.clonePlan(this.currentPlanId!).pipe(
             switchMap((plan) => this._planEditorApi.renamePlan(plan, value)),
-            map(({ plan }) => plan.id)
-          )
-        )
+            map(({ plan }) => plan.id),
+          ),
+        ),
       )
       .subscribe((id) => {
         if (!id) {
@@ -265,7 +265,7 @@ export class PlanEditorBaseComponent
             }
 
             return this.openPlan(plan as Plan);
-          })
+          }),
         )
         .subscribe();
     } else if (isKeyword) {
@@ -288,7 +288,7 @@ export class PlanEditorBaseComponent
               return of('');
             }
             return this.openFunctionEditor(keyword as Keyword);
-          })
+          }),
         )
         .subscribe();
     }
@@ -325,7 +325,7 @@ export class PlanEditorBaseComponent
         planType: plan.root!._class,
         icon: this._artefactService.getArtefactType(plan.root!._class)!.icon,
       },
-      { emitEvent: false }
+      { emitEvent: false },
     );
 
     const planOpenState = this._planOpen.getLastPlanOpenState();
@@ -350,7 +350,7 @@ export class PlanEditorBaseComponent
             : this.componentTabs.filter((tab) => tab.id !== consoleTab.id);
           return { tabs, withConsole };
         }),
-        takeUntil(this.terminator$)
+        takeUntil(this.terminator$),
       )
       .subscribe(({ tabs, withConsole }) => {
         this.componentTabs = tabs;
@@ -395,9 +395,9 @@ export class PlanEditorBaseComponent
                 ...plan!.root,
                 _class: item!.planType,
               },
-            } as Plan)
+            }) as Plan,
         ),
-        switchMap((plan) => this._planEditorApi.savePlan(plan))
+        switchMap((plan) => this._planEditorApi.savePlan(plan)),
       )
       .subscribe(({ plan }) => {
         this.planClass = plan._class;

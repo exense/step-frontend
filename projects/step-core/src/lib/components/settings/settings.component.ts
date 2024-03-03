@@ -17,7 +17,7 @@ export class SettingsComponent {
   readonly _configurationItems = inject(ViewRegistryService)
     .getChildrenRouteInfo(this.resolveChildFor)
     .filter(
-      (routeData) => !routeData.accessPermissions?.length || this._auth.hasAnyRights(routeData.accessPermissions)
+      (routeData) => !routeData.accessPermissions?.length || this._auth.hasAnyRights(routeData.accessPermissions),
     );
   readonly trackByFn: TrackByFunction<SubRouteData> = (index, item) => item.path;
 }

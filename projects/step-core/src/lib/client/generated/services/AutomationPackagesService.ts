@@ -67,7 +67,7 @@ export class AutomationPackagesService {
     id: string,
     formData?: {
       file?: FormDataContentDisposition;
-    }
+    },
   ): Observable<any> {
     return this.httpRequest.request({
       method: 'PUT',

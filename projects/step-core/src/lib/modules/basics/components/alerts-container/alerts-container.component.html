@@ -1,0 +1,9 @@
+@for (alert of _alerts(); track alert.id) {
+  <step-alert [type]="alert.type">
+    @if (alert.template) {
+      <ng-container *ngTemplateOutlet="alert.template" />
+    } @else {
+      {{ alert.message }}
+    }
+  </step-alert>
+}

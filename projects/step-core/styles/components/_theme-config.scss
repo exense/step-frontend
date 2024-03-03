@@ -172,6 +172,7 @@ $light-primary-text: var.$white;
   .cdk-overlay-pane {
     z-index: 1050;
     padding-top: 8px;
+    min-width: fit-content !important;
   }
 
   &.modal-open .cdk-overlay-container {
@@ -180,6 +181,10 @@ $light-primary-text: var.$white;
 
   color: $text-color;
   line-height: 16px;
+
+  .mat-mdc-select-panel {
+    max-height: 50vh !important;
+  }
 
   .mat-mdc-mini-fab {
     box-shadow: none !important;

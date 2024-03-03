@@ -90,6 +90,13 @@ import { LockColumnContainerComponent } from './components/lock-column-container
 import { LockColumnComponent } from './components/lock-column/lock-column.component';
 import { DatePickerModule } from './modules/date-picker/date-picker.module';
 import { EditableLabelTemplateDirective } from './directives/editable-label-template.directive';
+import {
+  DragDropContainerComponent,
+  DragItemDirective,
+  DragPreviewDirective,
+  DropAreaDirective,
+  IsDragDataPipe,
+} from './modules/drag-drop';
 
 @NgModule({
   declarations: [
@@ -180,6 +187,11 @@ import { EditableLabelTemplateDirective } from './directives/editable-label-temp
     WizardModule,
     CronModule,
     DatePickerModule,
+    DragDropContainerComponent,
+    DragItemDirective,
+    DropAreaDirective,
+    DragPreviewDirective,
+    IsDragDataPipe,
   ],
   exports: [
     CommonModule,
@@ -262,6 +274,11 @@ import { EditableLabelTemplateDirective } from './directives/editable-label-temp
     LockColumnComponent,
     DatePickerModule,
     EditableLabelTemplateDirective,
+    DragDropContainerComponent,
+    DragItemDirective,
+    DropAreaDirective,
+    DragPreviewDirective,
+    IsDragDataPipe,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -425,3 +442,4 @@ export * from './components/messages-list-dialog/messages-list-dialog.component'
 export * from './components/message-dialog/message-dialog.component';
 export * from './components/report-node-icon/report-node-icon.component';
 export * from './directives/editable-label-template.directive';
+export * from './modules/drag-drop';
