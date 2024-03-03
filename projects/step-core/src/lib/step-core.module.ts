@@ -89,6 +89,7 @@ import { AutomationPackageCommonModule } from './modules/automation-package-comm
 import { LockColumnContainerComponent } from './components/lock-column-container/lock-column-container.component';
 import { LockColumnComponent } from './components/lock-column/lock-column.component';
 import { DatePickerModule } from './modules/date-picker/date-picker.module';
+import { EditableLabelTemplateDirective } from './directives/editable-label-template.directive';
 import {
   DragDropContainerComponent,
   DragItemDirective,
@@ -161,6 +162,7 @@ import {
     MessageDialogComponent,
     LockColumnContainerComponent,
     LockColumnComponent,
+    EditableLabelTemplateDirective,
   ],
   imports: [
     CommonModule,
@@ -271,6 +273,7 @@ import {
     MessageDialogComponent,
     LockColumnComponent,
     DatePickerModule,
+    EditableLabelTemplateDirective,
     DragDropContainerComponent,
     DragItemDirective,
     DropAreaDirective,
@@ -438,4 +441,5 @@ export * from './components/confirmation-dialog/confirmation-dialog.component';
 export * from './components/messages-list-dialog/messages-list-dialog.component';
 export * from './components/message-dialog/message-dialog.component';
 export * from './components/report-node-icon/report-node-icon.component';
+export * from './directives/editable-label-template.directive';
 export * from './modules/drag-drop';

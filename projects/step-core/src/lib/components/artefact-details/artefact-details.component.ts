@@ -9,6 +9,7 @@ import {
   Output,
   SimpleChanges,
   ViewChild,
+  ViewEncapsulation,
 } from '@angular/core';
 import { ArtefactService, ArtefactType } from '../../services/artefact.service';
 import { ArtefactContext } from '../../shared';
@@ -20,8 +21,9 @@ import { BehaviorSubject } from 'rxjs';
 @Component({
   selector: 'step-artefact-details',
   templateUrl: './artefact-details.component.html',
-  styleUrls: ['./artefact-details.component.scss'],
+  styleUrl: './artefact-details.component.scss',
   providers: [ArtefactFormChangeHelperService],
+  encapsulation: ViewEncapsulation.None,
 })
 export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, AfterViewInit, OnDestroy {
   private _artefactsService = inject(ArtefactService);
@@ -43,6 +45,7 @@ export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, Aft
   protected showAttributes = true;
 
   protected isKeyword = false;
+  protected isPlan = false;
 
   protected artefactMeta?: ArtefactType;
 
@@ -90,9 +93,11 @@ export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, Aft
   private determineArtefactMetaData(classname?: string): void {
     if (!classname) {
       this.isKeyword = false;
+      this.isPlan = false;
       return;
     }
     this.isKeyword = classname === 'CallKeyword';
+    this.isPlan = classname === 'CallPlan';
     this.artefactMeta = this._artefactsService.getArtefactType(classname);
   }
 }
