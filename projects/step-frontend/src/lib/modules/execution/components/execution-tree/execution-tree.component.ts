@@ -10,9 +10,7 @@ import {
 import {
   EXECUTION_TREE_PAGING_SETTINGS,
   ExecutionTreePagingService,
-  ExecutionTreePagingSetting,
 } from '../../services/execution-tree-paging.service';
-import { ReportTreeNodeUtilsService } from '../../services/report-tree-node-utils.service';
 import { ExecutionTreeAction } from '../../shared/execution-tree-action.enum';
 import { ReportTreeNode } from '../../shared/report-tree-node';
 import { Observable, of } from 'rxjs';
