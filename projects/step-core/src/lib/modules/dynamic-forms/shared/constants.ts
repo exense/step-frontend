@@ -1,0 +1,2 @@
+export const NUMBER_CHARS_POSITIVE_ONLY = '0123456789.,'.split('');
+export const NUMBER_CHARS_WITH_NEGATIVE = ['-', ...NUMBER_CHARS_POSITIVE_ONLY];

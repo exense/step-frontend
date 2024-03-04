@@ -11,32 +11,30 @@
   <div><b>Assert</b> that</div>
   <step-form-field>
     <mat-select [(ngModel)]="context.artefact!.aggregator" [disabled]="context.readonly" name="aggregator">
-      <mat-option *ngFor="let item of aggregatorTypes; trackBy: trackByAggregator" [value]="item.key">
-        {{ item.value }}
-      </mat-option>
+      @for (item of aggregatorTypes; track item.key) {
+        <mat-option [value]="item.key">{{ item.value }}</mat-option>
+      }
     </mat-select>
   </step-form-field>
   <div>of measurments matching name</div>
-  <step-dynamic-textfield
-    *ngIf="context.artefact?.filters?.length"
-    [(ngModel)]="context.artefact!.filters![0]!.filter"
-    [disabled]="context.readonly"
-    name="filter"
-  >
-  </step-dynamic-textfield>
+  @if (context.artefact?.filters?.length) {
+    <step-dynamic-textfield
+      [(ngModel)]="context.artefact!.filters![0]!.filter"
+      [disabled]="context.readonly"
+      name="filter"
+    />
+  }
   <div>are</div>
   <step-form-field>
     <mat-select [(ngModel)]="context.artefact!.comparator" [disabled]="context.readonly" name="comparator">
-      <mat-option *ngFor="let item of operatorTypes; trackBy: trackByOperator" [value]="item.key">
-        {{ item.value }}
-      </mat-option>
+      @for (item of operatorTypes; track item.key) {
+        <mat-option [value]="item.key">{{ item.value }}</mat-option>
+      }
     </mat-select>
   </step-form-field>
-  <step-dynamic-textfield
+  <step-dynamic-time-input
     [(ngModel)]="context.artefact!.expectedValue"
     [disabled]="context.readonly"
     name="expectedValue"
-  >
-  </step-dynamic-textfield>
-  <div>ms</div>
+  />
 </form>

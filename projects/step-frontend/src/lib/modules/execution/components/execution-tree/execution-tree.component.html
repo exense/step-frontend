@@ -1,7 +1,6 @@
 <as-split direction="horizontal">
   <as-split-area [size]="30" class="tree-container">
-    <step-tree (treeContextAction)="handleContextAction($event.actionId, $event.node)" [dragDisabled]="true">
-    </step-tree>
+    <step-tree (treeContextAction)="handleContextAction($event.actionId, $event.node)" [dragDisabled]="true" />
   </as-split-area>
   <as-split-area [size]="70">
     <ng-container *ngIf="selectedNode$ | async as node">
@@ -11,8 +10,7 @@
         [showDetails]="true"
         [isShowNodeInTreeVisible]="false"
         [showFooter]="true"
-      >
-      </step-report-node-short>
+      />
     </ng-container>
   </as-split-area>
 </as-split>
