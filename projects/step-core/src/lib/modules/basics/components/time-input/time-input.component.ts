@@ -14,6 +14,10 @@ export class TimeInputComponent extends BaseTimeConverterComponent {
     super(_ngControl);
   }
 
+  protected override calculateBaseValue(modelValue: number, modelMeasure: TimeUnit): number {
+    return modelValue * modelMeasure;
+  }
+
   protected override calculateDisplayValue(
     modelValue: number,
     modelMeasure: TimeUnit,
@@ -22,7 +26,7 @@ export class TimeInputComponent extends BaseTimeConverterComponent {
     if (!displayMeasure) {
       return modelValue;
     }
-    const ms = modelValue * modelMeasure;
+    const ms = this.calculateBaseValue(modelValue, modelMeasure);
     return Math.round(ms / displayMeasure);
   }
 

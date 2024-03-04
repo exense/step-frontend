@@ -6,26 +6,21 @@
     [(ngModel)]="context.artefact!.maxRetries"
     [disabled]="context.readonly"
     name="maxRetries"
-  >
-  </step-dynamic-textfield>
-  <step-dynamic-textfield
-    label="Grace period (ms)"
+  />
+  <step-dynamic-time-input
+    label="Grace period"
     tooltip="Duration to wait after a failed attempt"
-    [isNumber]="true"
     [(ngModel)]="context.artefact!.gracePeriod"
     [disabled]="context.readonly"
     name="gracePeriod"
-  >
-  </step-dynamic-textfield>
-  <step-dynamic-textfield
+  />
+  <step-dynamic-time-input
     label="Timeout"
     tooltip="Maximum execution time for the whole execution retries"
-    [isNumber]="true"
     [(ngModel)]="context.artefact!.timeout"
     [disabled]="context.readonly"
     name="timeout"
-  >
-  </step-dynamic-textfield>
+  />
   <mat-expansion-panel [(expanded)]="showAdvancedAttributes">
     <mat-expansion-panel-header>
       <mat-panel-title>Advanced</mat-panel-title>
@@ -37,16 +32,14 @@
         [(ngModel)]="context.artefact!.releaseTokens"
         [disabled]="context.readonly"
         name="releaseTokens"
-      >
-      </step-dynamic-checkbox>
+      />
       <step-dynamic-checkbox
         label="Report only last iteration"
         tooltip="If enabled, only the final iteration will be reported."
         [(ngModel)]="context.artefact!.reportLastTryOnly"
         [disabled]="context.readonly"
         name="reportLastTryOnly"
-      >
-      </step-dynamic-checkbox>
+      />
     </section>
   </mat-expansion-panel>
 </form>

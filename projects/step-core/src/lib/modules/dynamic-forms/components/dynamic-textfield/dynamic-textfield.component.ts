@@ -3,9 +3,10 @@ import { NgControl } from '@angular/forms';
 import { DynamicValueInteger, DynamicValueString } from '../../../../client/step-client-module';
 import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-base.component';
 import { DialogsService } from '../../../basics/step-basics.module';
+import { NUMBER_CHARS_POSITIVE_ONLY, NUMBER_CHARS_WITH_NEGATIVE } from '../../shared/constants';
 
-const NUMBER_CHARS_POSITIVE_ONLY = '0123456789.,'.split('');
-const NUMBER_CHARS_WITH_NEGATIVE = ['-', ...NUMBER_CHARS_POSITIVE_ONLY];
+// const NUMBER_CHARS_POSITIVE_ONLY = '0123456789.,'.split('');
+// const NUMBER_CHARS_WITH_NEGATIVE = ['-', ...NUMBER_CHARS_POSITIVE_ONLY];
 
 @Component({
   selector: 'step-dynamic-textfield',

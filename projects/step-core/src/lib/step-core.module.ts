@@ -62,6 +62,7 @@ import { AutomationPackageCommonModule } from './modules/automation-package-comm
 import { LockColumnContainerComponent } from './components/lock-column-container/lock-column-container.component';
 import { LockColumnComponent } from './components/lock-column/lock-column.component';
 import { DatePickerModule } from './modules/date-picker/date-picker.module';
+import { EditableLabelTemplateDirective } from './directives/editable-label-template.directive';
 import { EDITABLE_LABELS_EXPORTS } from './modules/editable-labels';
 import { CUSTOM_FORMS_EXPORTS } from './modules/custom-forms';
 import { SCHEDULER_COMMON_EXPORTS } from './modules/scheduler-common';
@@ -107,6 +108,7 @@ import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
     HtmlDescriptionCellComponent,
     LockColumnContainerComponent,
     LockColumnComponent,
+    EditableLabelTemplateDirective,
   ],
   imports: [
     CommonModule,
@@ -326,4 +328,5 @@ export * from './services/auto-refresh-model-factory.service';
 export * from './services/artefacts-factory.service';
 export * from './services/keyword-executor.service';
 export * from './components/report-node-icon/report-node-icon.component';
+export * from './directives/editable-label-template.directive';
 export * from './modules/drag-drop';

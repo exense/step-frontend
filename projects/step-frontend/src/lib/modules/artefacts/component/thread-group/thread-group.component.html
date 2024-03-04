@@ -22,22 +22,21 @@
         [disabled]="context.readonly"
         [(ngModel)]="context.artefact!.users"
       ></step-dynamic-textfield>
-      <step-dynamic-textfield
-        label="Pacing (ms)"
+      <step-dynamic-time-input
+        label="Pacing"
         tooltip="Specifies the amount of time between each iteration."
         name="pacing"
-        [isNumber]="true"
         [disabled]="context.readonly"
         [(ngModel)]="context.artefact!.pacing"
-      ></step-dynamic-textfield>
-      <step-dynamic-textfield
-        label="Ramp-up (ms)"
+      >
+      </step-dynamic-time-input>
+      <step-dynamic-time-input
+        label="Ramp-up"
         tooltip="Specifies the amount of time that should be taken to start all the threads. If left empty the ramp-up duration will be equal to the pacing."
         name="rampup"
-        [isNumber]="true"
         [disabled]="context.readonly"
         [(ngModel)]="context.artefact!.rampup"
-      ></step-dynamic-textfield>
+      ></step-dynamic-time-input>
       <step-dynamic-textfield
         label="Pack"
         tooltip="Defines number of threads started together during the ramp-up (Optional, by default threads are started one by one)"
@@ -46,14 +45,13 @@
         [disabled]="context.readonly"
         [(ngModel)]="context.artefact!.pack"
       ></step-dynamic-textfield>
-      <step-dynamic-textfield
-        label="Start offset (ms)"
+      <step-dynamic-time-input
+        label="Start offset"
         tooltip="Specifies the duration to wait before the ramp-up starts."
         name="startOffset"
-        [isNumber]="true"
         [disabled]="context.readonly"
         [(ngModel)]="context.artefact!.startOffset"
-      ></step-dynamic-textfield>
+      ></step-dynamic-time-input>
     </section>
   </mat-expansion-panel>
   <mat-expansion-panel [(expanded)]="showDurationParameters">
@@ -69,14 +67,13 @@
         [disabled]="context.readonly"
         [(ngModel)]="context.artefact!.iterations"
       ></step-dynamic-textfield>
-      <step-dynamic-textfield
-        label="Maximum duration (ms)"
+      <step-dynamic-time-input
+        label="Maximum duration"
         tooltip="Specifies the maximum duration of each thread. A zero-value means unlimited."
         name="maxDuration"
-        [isNumber]="true"
         [disabled]="context.readonly"
         [(ngModel)]="context.artefact!.maxDuration"
-      ></step-dynamic-textfield>
+      ></step-dynamic-time-input>
     </section>
   </mat-expansion-panel>
   <mat-expansion-panel [(expanded)]="showHandles">
