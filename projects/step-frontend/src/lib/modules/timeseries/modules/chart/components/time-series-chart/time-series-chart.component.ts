@@ -13,7 +13,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { AlignedData } from 'uplot';
-import { TooltipPlugin } from './../../injectables/tooltip-plugin';
+import { TooltipPlugin } from '../../injectables/tooltip-plugin';
 import { MarkerType, TimeRange } from '@exense/step-core';
 import { COMMON_IMPORTS, UPlot } from '../../../_common';
 import { TSChartSeries } from '../../types/ts-chart-series';
@@ -191,7 +191,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
             return date.toLocaleDateString() + ` ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
           },
         },
-        ...settings.series.filter((s) => s.show !== false),
+        ...settings.series, // show flag will show/hide series, but they will still exist in the chart
       ],
       hooks: {
         ...settings.hooks,

@@ -6,6 +6,7 @@ import {
   DynamicValueString,
   PlanDialogsService,
   BaseArtefactComponent,
+  TimeUnit,
 } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
 
@@ -37,6 +38,8 @@ export class ThreadGroupComponent extends BaseArtefactComponent<ThreadGroupArtef
   protected showLoadDistribution = true;
   protected showDurationParameters = true;
   protected showHandles = false;
+
+  readonly TimeUnit = TimeUnit;
 
   openDistributionWizard(): void {
     this._planDialogService.openThreadGroupDistributionWizard(this.context.artefact!).subscribe();

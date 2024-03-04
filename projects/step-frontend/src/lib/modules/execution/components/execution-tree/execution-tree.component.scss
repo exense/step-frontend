@@ -15,4 +15,9 @@ step-execution-tree {
   .tree-container {
     overflow: auto !important;
   }
+
+  step-report-node-short {
+    display: block;
+    margin-left: 0.8rem;
+  }
 }
