@@ -2,9 +2,7 @@ import { NgControl } from '@angular/forms';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-base.component';
 import { DynamicValueInteger } from '../../../../client/step-client-module';
-import { DialogsService } from '../../../../shared';
-import { TimeUnit } from '../../../basics/shared/time-unit.enum';
-import { TimeUnitDictionary } from '../../../basics/components/time-input/base-time-converter.component';
+import { DialogsService, TimeUnit, TimeUnitDictionary } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-dynamic-time-input',
