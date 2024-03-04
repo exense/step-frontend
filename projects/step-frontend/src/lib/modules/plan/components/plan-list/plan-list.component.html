@@ -94,10 +94,10 @@
 </step-table>
 <step-entity-menu #entityMenu entity="plans" (entityOperationSuccess)="table.reload()">
   <ng-container *stepEntityMenuContent="let element">
-    <button mat-menu-item [disabled]="!('plan-write' | hasRight | async)" (click)="editPlan(element)">
+    <a mat-menu-item [disabled]="!('plan-write' | hasRight | async)" [routerLink]="element | planUrl">
       <step-icon name="edit-2"></step-icon>
       Edit plan
-    </button>
+    </a>
     <button mat-menu-item [disabled]="!('plan-read' | hasRight | async)" (click)="exportPlan(element.id)">
       <step-icon name="upload"></step-icon>
       Export plan

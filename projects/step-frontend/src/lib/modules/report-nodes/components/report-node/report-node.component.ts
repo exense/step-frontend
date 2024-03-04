@@ -1,7 +1,8 @@
 import { Component, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { ControllerService, DialogsService, PlanLinkDialogService, ReportNode } from '@exense/step-core';
+import { ControllerService, DialogsService, PlanUrlPipe, ReportNode } from '@exense/step-core';
 import { catchError, forkJoin, of, switchMap } from 'rxjs';
 import { ReportNodeType } from '../../shared/report-node-type.enum';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'step-report-node',
@@ -11,7 +12,7 @@ import { ReportNodeType } from '../../shared/report-node-type.enum';
 export class ReportNodeComponent implements OnChanges {
   private _api = inject(ControllerService);
   private _dialogs = inject(DialogsService);
-  private _planLinkDialog = inject(PlanLinkDialogService, { optional: true });
+  private _router = inject(Router);
 
   @Input() reportNodeId?: string;
 
@@ -38,20 +39,20 @@ export class ReportNodeComponent implements OnChanges {
   }
 
   openPlan(): void {
-    if (!this.node || !this._planLinkDialog) {
+    if (!this.node) {
       return;
     }
     this._api
       .getReportNodeRootPlan(this.node!.id!)
       .pipe(
-        switchMap((plan) => this._planLinkDialog!.editPlan(plan, this.node!.artefactID!)),
+        switchMap((plan) => this._router.navigateByUrl(PlanUrlPipe.transform(plan)!)),
         catchError((errorMessage) => {
           if (errorMessage) {
             console.error('reportNodes.openPlan', errorMessage);
             this._dialogs.showErrorMsg(errorMessage).subscribe();
           }
           return of(false);
-        })
+        }),
       )
       .subscribe();
   }

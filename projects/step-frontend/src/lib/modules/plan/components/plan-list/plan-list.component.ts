@@ -26,6 +26,7 @@ import { pipe, tap } from 'rxjs';
 })
 export class PlanListComponent implements DialogParentService {
   private _planDialogs = inject(PlanDialogsService);
+
   readonly _plansApiService = inject(AugmentedPlansService);
 
   readonly dataSource = this._plansApiService.getPlansTableDataSource();
@@ -44,10 +45,6 @@ export class PlanListComponent implements DialogParentService {
 
   addPlan(): void {
     this._planDialogs.createPlan();
-  }
-
-  editPlan(plan: Plan): void {
-    this._planDialogs.editPlan(plan).pipe(this.updateDataSourceAfterChange).subscribe();
   }
 
   executePlan(id: string): void {

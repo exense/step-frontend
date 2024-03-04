@@ -7,9 +7,7 @@ import {
   ExportDialogComponent,
   ImportDialogComponent,
   PlanCreateDialogComponent,
-  PlanDialogsService,
   PlanLinkComponent,
-  PlanLinkDialogService,
   SimpleOutletComponent,
   ViewRegistryService,
 } from '@exense/step-core';
@@ -25,17 +23,12 @@ import { PlanActionsModule } from '../plan-actions/plan-actions.module';
 import { planDeactivate } from './guards/plan.deactivate';
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { map } from 'rxjs';
+import { planActivate } from './guards/plan.activate';
 
 @NgModule({
   declarations: [PlanListComponent, PlanEditorComponent, PlanSelectionComponent],
   imports: [StepCommonModule, ExecutionModule, PlanEditorModule, PlanActionsModule],
   exports: [PlanEditorModule, PlanListComponent, PlanEditorComponent, PlanSelectionComponent],
-  providers: [
-    {
-      provide: PlanLinkDialogService,
-      useExisting: PlanDialogsService,
-    },
-  ],
 })
 export class PlanModule {
   constructor(
@@ -112,6 +105,7 @@ export class PlanModule {
         {
           path: 'editor/:id',
           component: PlanEditorComponent,
+          canActivate: [planActivate],
           resolve: {
             plan: planResolver,
           },

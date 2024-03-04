@@ -58,7 +58,7 @@ import { TableModule } from './modules/table/table.module';
 import { TabsModule } from './modules/tabs/tabs.module';
 import { TreeModule } from './modules/tree/tree.module';
 import { CustomFormInputModelPipe } from './pipes/custom-form-input-model.pipe';
-import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
+import { DashboardUrlPipe } from './pipes/dashboard-url.pipe';
 import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
@@ -97,11 +97,12 @@ import {
   DropAreaDirective,
   IsDragDataPipe,
 } from './modules/drag-drop';
+import { PlanUrlPipe } from './pipes/plan-url.pipe';
 
 @NgModule({
   declarations: [
     MatchingAuthenticator,
-    DashboardLinkPipe,
+    DashboardUrlPipe,
     CapsLockDirective,
     TooltipImmediateCloseDirective,
     ReportNodeStatusComponent,
@@ -163,6 +164,7 @@ import {
     LockColumnContainerComponent,
     LockColumnComponent,
     EditableLabelTemplateDirective,
+    PlanUrlPipe,
   ],
   imports: [
     CommonModule,
@@ -202,7 +204,7 @@ import {
     StepMaterialModule,
     JsonViewerModule,
     MatchingAuthenticator,
-    DashboardLinkPipe,
+    DashboardUrlPipe,
     TableModule,
     StepBasicsModule,
     EntityModule,
@@ -279,6 +281,7 @@ import {
     DropAreaDirective,
     DragPreviewDirective,
     IsDragDataPipe,
+    PlanUrlPipe,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -337,7 +340,6 @@ export { KeywordNameComponent } from './components/keyword-name/keyword-name.com
 export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 export * from './components/plan-link/plan-link.component';
 export * from './components/scheduler-task-link/scheduler-task-link.component';
-export { PlanLinkDialogService } from './components/plan-link/plan-link-dialog.service';
 export { PlanNameComponent } from './components/plan-name/plan-name.component';
 export * from './components/plan-tree/plan-tree.component';
 export { PredefinedOptionsInputComponent } from './components/predefined-options-input/predefined-options-input.component';
@@ -385,11 +387,12 @@ export * from './modules/wizard/wizards.module';
 export * from './modules/automation-package-common/automation-package-common.module';
 export * from './modules/cron/cron.module';
 export * from './modules/date-picker/date-picker.module';
-export * from './pipes/dashboard-link.pipe';
+export * from './pipes/dashboard-url.pipe';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/is-chart-empty.pipe';
 export * from './pipes/project-name.pipe';
 export * from './pipes/matching-authenticator.pipe';
+export * from './pipes/plan-url.pipe';
 export { PlanNamePipe } from './pipes/plan-name.pipe';
 export * from './services/additional-right-rule.service';
 export * from './services/artefact-refresh-notification.service';

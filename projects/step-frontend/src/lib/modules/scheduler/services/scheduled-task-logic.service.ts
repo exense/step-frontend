@@ -1,6 +1,5 @@
 import { inject, Injectable } from '@angular/core';
 import {
-  AugmentedPlansService,
   AugmentedSchedulerService,
   AuthService,
   DashboardService,
@@ -9,7 +8,6 @@ import {
   EditorResolverService,
   ExecutiontTaskParameters,
   MultipleProjectsService,
-  PlanLinkDialogService,
   ScheduledTaskDialogsService,
   SchedulerActionsService,
 } from '@exense/step-core';
@@ -21,8 +19,6 @@ const ROOT_URL = '/scheduler';
 
 @Injectable()
 export class ScheduledTaskLogicService implements SchedulerActionsService, DialogParentService {
-  private _plansApi = inject(AugmentedPlansService);
-  private _plansLink = inject(PlanLinkDialogService);
   private _authService = inject(AuthService);
   private _dashboardService = inject(DashboardService);
   private _schedulerService = inject(AugmentedSchedulerService);
@@ -75,18 +71,6 @@ export class ScheduledTaskLogicService implements SchedulerActionsService, Dialo
         ),
         this.updateDataSourceAfterChange,
       )
-      .subscribe();
-  }
-
-  navToStats(scheduledTask: ExecutiontTaskParameters) {
-    const url = this._dashboardService.getDashboardLink(scheduledTask.id!);
-    window.open(url, '_blank');
-  }
-
-  navToPlan(planId: string): void {
-    this._plansApi
-      .getPlanById(planId)
-      .pipe(switchMap((plan) => this._plansLink.editPlan(plan)))
       .subscribe();
   }
 

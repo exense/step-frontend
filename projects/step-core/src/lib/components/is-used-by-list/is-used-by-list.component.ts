@@ -1,9 +1,11 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
-import { map, startWith } from 'rxjs';
+import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { filter, map, startWith } from 'rxjs';
 import { FindReferencesResponse, ReferencesService } from '../../client/step-client-module';
 import { TableFetchLocalDataSource } from '../../modules/table/table.module';
 import { ProjectNamePipe } from '../../pipes/project-name.pipe';
 import { IsUsedBySearchType } from '../../modules/basics/shared/is-used-by-search-type';
+import { NavigationStart, Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface FindReferenceWithLinkContext extends FindReferencesResponse {
   linkContext?: {
@@ -23,11 +25,13 @@ interface FindReferenceWithLinkContext extends FindReferencesResponse {
 export class IsUsedByListComponent implements OnInit {
   private _referencesService = inject(ReferencesService);
   private _projectName = inject(ProjectNamePipe);
+  private _destroyRef = inject(DestroyRef);
+  private _router = inject(Router);
 
   @Input() type?: IsUsedBySearchType;
   @Input() id: string = '';
 
-  @Output() onClose = new EventEmitter<any>();
+  @Output() close = new EventEmitter<any>();
 
   currentProjectName: string = '';
   entityType: string = '';
@@ -43,20 +47,21 @@ export class IsUsedByListComponent implements OnInit {
     TableFetchLocalDataSource.configBuilder<FindReferencesResponse>()
       .addSearchStringPredicate('project', (element) => this._projectName.transform(element))
       .addSortStringPredicate('project', (element) => this._projectName.transform(element))
-      .build()
+      .build(),
   );
 
   readonly emptyResults$ = this.searchableReferences.total$.pipe(
     map((total) => total === 0),
-    startWith(false)
+    startWith(false),
   );
 
   ngOnInit(): void {
     this.determineEntityType();
+    this.setupCloseOnNavigation();
   }
 
   closeDialog(): void {
-    this.onClose.emit({});
+    this.close.emit({});
   }
 
   private createReferenceWithLinkContext(ref: FindReferencesResponse): FindReferenceWithLinkContext {
@@ -94,5 +99,14 @@ export class IsUsedByListComponent implements OnInit {
       default:
         break;
     }
+  }
+
+  private setupCloseOnNavigation(): void {
+    this._router.events
+      .pipe(
+        filter((event) => event instanceof NavigationStart),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(() => this.close.emit());
   }
 }

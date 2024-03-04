@@ -3,7 +3,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { map, Observable, switchMap } from 'rxjs';
 import { AbstractArtefact, AugmentedPlansService, Plan } from '../client/step-client-module';
-import { PlanLinkDialogService } from '../components/plan-link/plan-link-dialog.service';
 import { ThreadDistributionWizardDialogComponent } from '../components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 import { EntityDialogsService, EntityActionInvokerService } from '../modules/entity/entity.module';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
@@ -14,7 +13,7 @@ const PLANS_LIST = '/plans/list';
 @Injectable({
   providedIn: 'root',
 })
-export class PlanDialogsService implements PlanLinkDialogService {
+export class PlanDialogsService {
   private _entityActionsInvoker = inject(EntityActionInvokerService);
   private _matDialog = inject(MatDialog);
   private _plansApiService = inject(AugmentedPlansService);
@@ -61,10 +60,6 @@ export class PlanDialogsService implements PlanLinkDialogService {
 
   lookUp(id: string, name: string): void {
     this._isUsedByDialogs.displayDialog(`Plan "${name}" is used by`, 'PLAN_ID', id);
-  }
-
-  editPlan(plan: Plan, artefactId?: string): Observable<boolean> {
-    return this._entityActionsInvoker.invokeAction('plans', PlanAction.EDIT, plan, { artefactId });
   }
 
   executePlan(planId: string): void {
