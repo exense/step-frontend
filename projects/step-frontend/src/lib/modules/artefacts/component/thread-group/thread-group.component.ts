@@ -4,11 +4,12 @@ import {
   ArtefactFormChangeHelperService,
   DynamicValueInteger,
   DynamicValueString,
-  PlanDialogsService,
   BaseArtefactComponent,
   TimeUnit,
+  ThreadDistributionWizardDialogComponent,
 } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 
 interface ThreadGroupArtefact extends AbstractArtefact {
   users: DynamicValueInteger;
@@ -30,7 +31,7 @@ interface ThreadGroupArtefact extends AbstractArtefact {
   providers: [ArtefactFormChangeHelperService],
 })
 export class ThreadGroupComponent extends BaseArtefactComponent<ThreadGroupArtefact> {
-  private _planDialogService = inject(PlanDialogsService);
+  private _matDialog = inject(MatDialog);
 
   @ViewChild('form')
   protected form!: NgForm;
@@ -42,6 +43,9 @@ export class ThreadGroupComponent extends BaseArtefactComponent<ThreadGroupArtef
   readonly TimeUnit = TimeUnit;
 
   openDistributionWizard(): void {
-    this._planDialogService.openThreadGroupDistributionWizard(this.context.artefact!).subscribe();
+    this._matDialog
+      .open(ThreadDistributionWizardDialogComponent, { data: this.context.artefact })
+      .afterClosed()
+      .subscribe();
   }
 }
