@@ -2,13 +2,9 @@ import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, catchError, map, of, switchMap, tap } from 'rxjs';
 import { AugmentedKeywordsService, Keyword } from '../client/step-client-module';
-import { MultipleProjectsService } from '../modules/basics/step-basics.module';
+import { CommonEditorUrlsService, MultipleProjectsService } from '../modules/basics/step-basics.module';
 import { FunctionActionsService } from '../modules/keywords-common/keywords-common.module';
 import { DialogsService } from '../shared';
-import { IsUsedByDialogService } from './is-used-by-dialog.service';
-
-const ENTITY_TYPE = 'keyword';
-const EDITOR_URL = '/functions';
 
 @Injectable({
   providedIn: 'root',
@@ -17,38 +13,11 @@ export class FunctionActionsImplService implements FunctionActionsService {
   private _multipleProjectService = inject(MultipleProjectsService);
   private _functionApiService = inject(AugmentedKeywordsService);
   private _dialogs = inject(DialogsService);
-  protected _isUsedByDialog = inject(IsUsedByDialogService);
   private _router = inject(Router);
+  private _commonEditorUrls = inject(CommonEditorUrlsService);
 
-  get baseUrl(): string {
-    return EDITOR_URL;
-  }
-
-  addFunction(): void {
-    this._router.navigateByUrl(`${this.baseUrl}/configure/new`);
-  }
-
-  configureFunction(id: string): void {
-    const url = `${this.baseUrl}/configure/${id}`;
-    this.getFunctionById(id)
-      .pipe(
-        switchMap((keyword) => {
-          if (!keyword) {
-            return of(false);
-          }
-          if (this._multipleProjectService.isEntityBelongsToCurrentProject(keyword)) {
-            return of(true);
-          }
-
-          return this._multipleProjectService.confirmEntityEditInASeparateProject(keyword, url, ENTITY_TYPE);
-        }),
-      )
-      .subscribe((continueEdit) => {
-        if (!continueEdit) {
-          return;
-        }
-        this._router.navigateByUrl(url);
-      });
+  resolveConfigurerUrl(idOrKeyword: string | Keyword): string {
+    return this._commonEditorUrls.keywordConfigurerUrl(idOrKeyword);
   }
 
   openDeleteFunctionDialog(id: string, name: string): Observable<boolean> {
@@ -59,32 +28,6 @@ export class FunctionActionsImplService implements FunctionActionsService {
           isDeleteConfirmed ? this._functionApiService.deleteFunction(id).pipe(map(() => true)) : of(false),
         ),
       );
-  }
-
-  openLookUpFunctionDialog(id: string, name: string): void {
-    this._isUsedByDialog.displayDialog(`Keyword "${name}" is used by`, 'KEYWORD_ID', id);
-  }
-
-  duplicateFunction(keyword: Keyword): Observable<boolean> {
-    return this.duplicateFunctionById(keyword.id!).pipe(
-      map((result) => !!result),
-      catchError((err) => {
-        console.error(err);
-        return of(false);
-      }),
-    );
-  }
-
-  openExportFunctionDialog(id: string): void {
-    this._router.navigateByUrl(`${this.baseUrl}/export/${id}`);
-  }
-
-  openExportAllFunctionsDialog(): void {
-    this._router.navigateByUrl(`${this.baseUrl}/export/all`);
-  }
-
-  openImportFunctionDialog(): void {
-    this._router.navigateByUrl(`${this.baseUrl}/import`);
   }
 
   openFunctionEditor(keyword: Keyword): Observable<boolean | undefined> {
@@ -102,7 +45,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
         }
 
         return this._multipleProjectService
-          .confirmEntityEditInASeparateProject(keyword, editorPath, ENTITY_TYPE)
+          .confirmEntityEditInASeparateProject(keyword, editorPath, 'keyword')
           .pipe(map((continueEdit) => ({ continueEdit, editorPath })));
       }),
       map((result) => {
@@ -120,13 +63,5 @@ export class FunctionActionsImplService implements FunctionActionsService {
 
   protected getFunctionEditor(id: string): Observable<string> {
     return this._functionApiService.getFunctionEditor(id);
-  }
-
-  protected getFunctionById(id: string): Observable<Keyword> {
-    return this._functionApiService.getFunctionById(id);
-  }
-
-  protected duplicateFunctionById(id: string): Observable<Keyword> {
-    return this._functionApiService.cloneFunction(id);
   }
 }

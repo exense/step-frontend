@@ -229,7 +229,7 @@ $light-primary-text: var.$white;
   }
   .btn-sm,
   .btn-auto-size,
-  a:not([mat-menu-item]):not([mat-icon-button]) {
+  a:not([mat-menu-item]):not([mat-icon-button]):not([mat-mini-fab]) {
     @include step-icon.step-icon(16px);
     step-icon {
       vertical-align: top;

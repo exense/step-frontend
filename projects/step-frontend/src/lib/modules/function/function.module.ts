@@ -28,6 +28,7 @@ import { ActivatedRouteSnapshot } from '@angular/router';
 import { CompositeKeywordPlanApiService } from './injectables/composite-keyword-plan-api.service';
 import { map } from 'rxjs';
 import { FunctionConfigurationDialogImplResolver } from './injectables/function-configuration-dialog-impl.resolver';
+import { keywordCheckProjectGuard } from './guards/keyword-check-project.guard';
 
 @NgModule({
   imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule],
@@ -78,11 +79,21 @@ export class FunctionModule {
             dialogRoute({
               path: ':id',
               resolveDialogComponent: () => inject(FunctionConfigurationDialogResolver).getDialogComponent(),
+              canActivate: [keywordCheckProjectGuard],
               resolve: {
-                keyword: (route: ActivatedRouteSnapshot) =>
-                  inject(AugmentedKeywordsService).getFunctionById(route.params['id']),
+                keyword: (route: ActivatedRouteSnapshot) => {
+                  const id = route.params['id'];
+                  if (!id) return undefined;
+                  return inject(AugmentedKeywordsService).getFunctionById(id);
+                },
                 dialogConfig: () => inject(FunctionDialogsConfigFactoryService).getDefaultConfig(),
               },
+              canDeactivate: [
+                () => {
+                  inject(AugmentedKeywordsService).cleanupCache();
+                  return true;
+                },
+              ],
             }),
           ],
         },
@@ -139,12 +150,19 @@ export class FunctionModule {
         {
           path: 'editor/:id',
           component: CompositeFunctionEditorComponent,
+          canActivate: [keywordCheckProjectGuard],
           resolve: {
             compositePlan: (route: ActivatedRouteSnapshot) => {
               const id = route.params['id'];
               return id ? inject(CompositeKeywordPlanApiService).loadPlan(id) : undefined;
             },
           },
+          canDeactivate: [
+            () => {
+              inject(AugmentedKeywordsService).cleanupCache();
+              return true;
+            },
+          ],
         },
       ],
     });
