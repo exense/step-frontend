@@ -9,7 +9,7 @@ export class PlanUrlPipe implements PipeTransform {
     if (!idOrPlan) {
       return '';
     }
-    const id = typeof idOrPlan === 'string' ? idOrPlan : idOrPlan.id;
+    const id = (typeof idOrPlan === 'string' ? idOrPlan : idOrPlan.id);
     return `/plans/editor/${id}`;
   }
 
