@@ -8,6 +8,7 @@ import {
   ImportDialogComponent,
   PlanCreateDialogComponent,
   PlanLinkComponent,
+  quickAccessRoute,
   SimpleOutletComponent,
   ViewRegistryService,
 } from '@exense/step-core';
@@ -18,16 +19,13 @@ import { PlanEditorModule } from '../plan-editor/plan-editor.module';
 import { PlanEditorComponent } from './components/plan-editor/plan-editor.component';
 import { PlanSelectionComponent } from './components/plan-selection/plan-selection.component';
 import { PlansBulkOperationsRegisterService } from './injectables/plans-bulk-operations-register.service';
-import { planResolver } from './guards/plan.resolver';
-import { PlanActionsModule } from '../plan-actions/plan-actions.module';
-import { planDeactivate } from './guards/plan.deactivate';
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { map } from 'rxjs';
-import { planActivate } from './guards/plan.activate';
+import { planCheckProjectGuard } from './guards/plan-check-project.guard';
 
 @NgModule({
   declarations: [PlanListComponent, PlanEditorComponent, PlanSelectionComponent],
-  imports: [StepCommonModule, ExecutionModule, PlanEditorModule, PlanActionsModule],
+  imports: [StepCommonModule, ExecutionModule, PlanEditorModule],
   exports: [PlanEditorModule, PlanListComponent, PlanEditorComponent, PlanSelectionComponent],
 })
 export class PlanModule {
@@ -102,15 +100,26 @@ export class PlanModule {
             },
           ],
         },
-        {
+        quickAccessRoute('plansEditor', {
           path: 'editor/:id',
           component: PlanEditorComponent,
-          canActivate: [planActivate],
+          canActivate: [planCheckProjectGuard],
           resolve: {
-            plan: planResolver,
+            plan: (route: ActivatedRouteSnapshot) => {
+              const id = route.params['id'];
+              if (!id) {
+                return undefined;
+              }
+              return inject(AugmentedPlansService).getPlanByIdCached(id);
+            },
           },
-          canDeactivate: [planDeactivate],
-        },
+          canDeactivate: [
+            (_: unknown, route: ActivatedRouteSnapshot) => {
+              inject(AugmentedPlansService).cleanupCache();
+              return true;
+            },
+          ],
+        }),
       ],
     });
   }

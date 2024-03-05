@@ -1,19 +1,14 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { inject, Pipe, PipeTransform } from '@angular/core';
 import { Plan } from '../client/step-client-module';
+import { CommonEditorUrlsService } from '../modules/basics/services/common-editor-urls.service';
 
 @Pipe({
   name: 'planUrl',
 })
 export class PlanUrlPipe implements PipeTransform {
-  static transform(idOrPlan?: string | Plan): string {
-    if (!idOrPlan) {
-      return '';
-    }
-    const id = (typeof idOrPlan === 'string' ? idOrPlan : idOrPlan.id);
-    return `/plans/editor/${id}`;
-  }
+  private _commonEditorUrls = inject(CommonEditorUrlsService);
 
   transform(idOrPlan?: string | Plan): string {
-    return PlanUrlPipe.transform(idOrPlan);
+    return this._commonEditorUrls.planEditorUrl(idOrPlan);
   }
 }

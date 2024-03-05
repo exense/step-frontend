@@ -3,8 +3,10 @@ import { AceMode } from './ace-mode.enum';
 import { Collection } from './collection.interface';
 import { ScriptLanguage } from './script-language.enum';
 import { KeyValue } from '@angular/common';
-import { Route } from '@angular/router';
+import { ActivatedRoute, ActivatedRouteSnapshot, CanActivateFn, Route, RouterStateSnapshot } from '@angular/router';
 import { SUB_ROUTE_DATA } from './constants';
+import { concatMap, from, last, Observable, of, takeWhile } from 'rxjs';
+import { inject, Injector, runInInjectionContext } from '@angular/core';
 
 export const getObjectFieldValue = (object: Record<string, unknown>, fieldPath: string): unknown => {
   const pathParts = fieldPath.split('.');
@@ -114,4 +116,24 @@ export const routesPrioritySortPredicate = (routeA: Route, routeB: Route) => {
   const weightA = routeA.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
   const weightB = routeB.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
   return weightA - weightB;
+};
+
+export const sequenceCanActivateGuards = (guards: CanActivateFn[]): CanActivateFn => {
+  const injector = inject(Injector);
+
+  return (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) =>
+    from(guards).pipe(
+      concatMap((guard) => {
+        const result = runInInjectionContext(injector, () => guard(route, state));
+        if (result instanceof Observable) {
+          return result;
+        }
+        if (result instanceof Promise) {
+          return from(result);
+        }
+        return of(result);
+      }),
+      takeWhile((value) => value === true, true),
+      last(),
+    );
 };

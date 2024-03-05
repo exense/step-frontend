@@ -2,8 +2,8 @@ import { inject, Injectable, OnDestroy } from '@angular/core';
 import { routesPrioritySortPredicate, SUB_ROUTE_DATA, SubRouteData, SubRouterConfig } from '../shared';
 import { Route, Router, Routes } from '@angular/router';
 import { checkPermissionsGuard } from './check-permissions-guard.service';
-import { VIEW_ID_LINK_PREFIX } from '../modules/basics/services/view-id-link-prefix.token';
 import { BehaviorSubject } from 'rxjs';
+import { QuickAccessRouteService, VIEW_ID_LINK_PREFIX } from '../modules/basics/step-basics.module';
 
 export interface CustomView {
   template: string;
@@ -35,6 +35,7 @@ export interface Dashlet {
 })
 export class ViewRegistryService implements OnDestroy {
   private _viewIdLinkPrefix = inject(VIEW_ID_LINK_PREFIX);
+  private _quickAccessRoute = inject(QuickAccessRouteService);
   private _router = inject(Router);
 
   private temporaryRouteChildren = new Map<string, Routes>();
@@ -210,6 +211,7 @@ export class ViewRegistryService implements OnDestroy {
   }
 
   registerRoute(route: Route, { parentPath, label, weight, accessPermissions }: SubRouterConfig = {}): void {
+    this._quickAccessRoute.registerQuickAccessRoutes(route);
     const root = this.getRootRoute();
     if (!root?.children) {
       return;

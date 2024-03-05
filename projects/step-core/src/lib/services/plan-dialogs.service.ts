@@ -1,12 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { map, Observable, switchMap } from 'rxjs';
+import { map, Observable, of, switchMap } from 'rxjs';
 import { AbstractArtefact, AugmentedPlansService, Plan } from '../client/step-client-module';
 import { ThreadDistributionWizardDialogComponent } from '../components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
-import { EntityDialogsService, EntityActionInvokerService } from '../modules/entity/entity.module';
+import { EntityDialogsService } from '../modules/entity/entity.module';
 import { IsUsedByDialogService } from './is-used-by-dialog.service';
-import { PlanAction } from '../shared';
+import { DialogsService } from '../shared';
 
 const PLANS_LIST = '/plans/list';
 
@@ -14,8 +14,8 @@ const PLANS_LIST = '/plans/list';
   providedIn: 'root',
 })
 export class PlanDialogsService {
-  private _entityActionsInvoker = inject(EntityActionInvokerService);
   private _matDialog = inject(MatDialog);
+  private _dialogs = inject(DialogsService);
   private _plansApiService = inject(AugmentedPlansService);
   private _entityDialogs = inject(EntityDialogsService);
   private _isUsedByDialogs = inject(IsUsedByDialogService);
@@ -43,7 +43,14 @@ export class PlanDialogsService {
   }
 
   deletePlan(plan: Plan): Observable<boolean> {
-    return this._entityActionsInvoker.invokeAction('plans', PlanAction.DELETE, plan);
+    const name = plan.attributes?.['name'];
+    return this._dialogs
+      .showDeleteWarning(1, `Plan "${name}"`)
+      .pipe(
+        switchMap((isDeleteConfirmed) =>
+          isDeleteConfirmed ? this._plansApiService.deletePlan(plan.id!).pipe(map(() => true)) : of(false),
+        ),
+      );
   }
 
   importPlans(): void {
