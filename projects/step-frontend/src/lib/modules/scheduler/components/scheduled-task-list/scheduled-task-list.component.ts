@@ -8,6 +8,7 @@ import {
   ArrayItemLabelValueExtractor,
   FilterConditionFactoryService,
   DialogParentService,
+  AuthService,
 } from '@exense/step-core';
 import { ScheduledTaskLogicService } from '../../services/scheduled-task-logic.service';
 import { KeyValue } from '@angular/common';
@@ -29,11 +30,18 @@ type StatusItem = KeyValue<string, string>;
   ],
 })
 export class ScheduledTaskListComponent implements OnInit {
+  private _auth = inject(AuthService);
+
   readonly _logic = inject(ScheduledTaskLogicService);
 
   isSchedulerEnabled: boolean = false;
 
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
+
+  readonly settingsUrl =
+    this._auth.hasRight('admin-ui-menu') && this._auth.isAuthenticated()
+      ? '/admin/controller/scheduler'
+      : '/settings/scheduler';
 
   readonly statusItems: StatusItem[] = [
     { key: true.toString(), value: this._logic.STATUS_ACTIVE_STRING },

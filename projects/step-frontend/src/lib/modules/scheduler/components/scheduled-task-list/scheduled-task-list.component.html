@@ -9,29 +9,28 @@
   <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-new'" entity="tasks"> </step-bulk-operations>
   <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
     <step-btn-group>
-      <button
-        type="button"
+      <a
         mat-mini-fab
         color="primary"
         matTooltip="New schedule"
         matTooltipPosition="below"
         [disabled]="!('task-write' | hasRight | async)"
-        (click)="_logic.createTask()"
+        [routerLink]="'new' | taskUrl"
       >
         <step-icon name="plus"></step-icon>
-      </button>
+      </a>
     </step-btn-group>
 
-    <button
+    <a
       type="button"
       mat-icon-button
       matTooltip="Configure scheduler"
       matTooltipPosition="below"
       [disabled]="!('scheduler-manage' | hasRight | async)"
-      (click)="_logic.navToSettings()"
+      [routerLink]="settingsUrl"
     >
       <step-icon name="settings"></step-icon>
-    </button>
+    </a>
   </section>
   <ng-container matColumnDef="bulkSelection">
     <th mat-header-cell *matHeaderCellDef class="bulk-selection-cell"></th>
@@ -98,14 +97,14 @@
         >
           <step-icon name="play"></step-icon>
         </button>
-        <button
+        <a
           mat-icon-button
           matTooltip="Edit schedule"
           [disabled]="!('task-write' | hasRight | async)"
-          (click)="_logic.navigateToTaskEditor(element)"
+          [routerLink]="element | taskUrl"
         >
           <step-icon name="edit-2"></step-icon>
-        </button>
+        </a>
         <button
           mat-icon-button
           matTooltip="Delete schedule"
@@ -118,8 +117,9 @@
           mat-icon-button
           matTooltip="Analyze performance"
           [disabled]="!('execution-read' | hasRight | async)"
-          [href]="element.id | dashboardUrl"
-          target="_blank"
+          routerLink="/analytics"
+          [queryParams]="element | dashboardNavigationParams"
+          queryParamsHandling="merge"
         >
           <step-icon name="trending-up"></step-icon>
         </a>

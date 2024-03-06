@@ -152,7 +152,7 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
     if (!this.task.attributes) {
       this.task.attributes = {};
     }
-    this.isNew = !this.task.attributes!['id'];
+    this.isNew = !this.task.attributes!['name'];
     if (!this.task.executionsParameters) {
       this.task.executionsParameters = {};
     }

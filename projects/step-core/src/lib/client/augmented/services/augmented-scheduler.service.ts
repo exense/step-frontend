@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import { inject, Injectable } from '@angular/core';
-import type { Observable } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 import { ExecutiontTaskParameters, SchedulerService } from '../../generated';
@@ -22,6 +22,8 @@ export class AugmentedSchedulerService extends SchedulerService {
   private _httpClient = inject(HttpClient);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   private _tableApiWrapper = inject(TableApiWrapperService);
+
+  private cachedTask?: ExecutiontTaskParameters;
 
   createSelectionDataSource(): StepDataSource<ExecutiontTaskParameters> {
     return this._dataSourceFactory.createDataSource(this.TASKS_TABLE_ID, {
@@ -64,5 +66,16 @@ export class AugmentedSchedulerService extends SchedulerService {
     return this._tableApiWrapper
       .requestTable<ExecutiontTaskParameters>(this.TASKS_TABLE_ID, { filters: [idsFilter] })
       .pipe(map((response) => response.data));
+  }
+
+  getExecutionTaskByIdCached(id: string): Observable<ExecutiontTaskParameters> {
+    if (this.cachedTask && this.cachedTask.id === id) {
+      return of(this.cachedTask);
+    }
+    return super.getExecutionTaskById(id).pipe(tap((task) => (this.cachedTask = task)));
+  }
+
+  cleanupCache(): void {
+    this.cachedTask = undefined;
   }
 }

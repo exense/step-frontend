@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Keyword, Parameter, Plan, Resource } from '../../../client/step-client-module';
+import { ExecutiontTaskParameters, Keyword, Parameter, Plan, Resource } from '../../../client/step-client-module';
 
 @Injectable({
   providedIn: 'root',
@@ -35,5 +35,13 @@ export class CommonEditorUrlsService {
     }
     const id = typeof idOrResource === 'string' ? idOrResource : idOrResource.id;
     return `/resources/editor/${id}`;
+  }
+
+  schedulerTaskEditorUrl(idOrTask?: string | ExecutiontTaskParameters): string {
+    if (!idOrTask) {
+      return '';
+    }
+    const id = typeof idOrTask === 'string' ? idOrTask : idOrTask.id;
+    return `/scheduler/editor/${id}`;
   }
 }

@@ -58,7 +58,6 @@ import { TableModule } from './modules/table/table.module';
 import { TabsModule } from './modules/tabs/tabs.module';
 import { TreeModule } from './modules/tree/tree.module';
 import { CustomFormInputModelPipe } from './pipes/custom-form-input-model.pipe';
-import { DashboardUrlPipe } from './pipes/dashboard-url.pipe';
 import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
@@ -98,11 +97,11 @@ import {
   IsDragDataPipe,
 } from './modules/drag-drop';
 import { PlanUrlPipe } from './pipes/plan-url.pipe';
+import { DashboardNavigationParamsPipe } from './pipes/dashboard-navigation-params.pipe';
 
 @NgModule({
   declarations: [
     MatchingAuthenticator,
-    DashboardUrlPipe,
     CapsLockDirective,
     TooltipImmediateCloseDirective,
     ReportNodeStatusComponent,
@@ -165,6 +164,7 @@ import { PlanUrlPipe } from './pipes/plan-url.pipe';
     LockColumnComponent,
     EditableLabelTemplateDirective,
     PlanUrlPipe,
+    DashboardNavigationParamsPipe,
   ],
   imports: [
     CommonModule,
@@ -204,7 +204,6 @@ import { PlanUrlPipe } from './pipes/plan-url.pipe';
     StepMaterialModule,
     JsonViewerModule,
     MatchingAuthenticator,
-    DashboardUrlPipe,
     TableModule,
     StepBasicsModule,
     EntityModule,
@@ -282,6 +281,7 @@ import { PlanUrlPipe } from './pipes/plan-url.pipe';
     DragPreviewDirective,
     IsDragDataPipe,
     PlanUrlPipe,
+    DashboardNavigationParamsPipe,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -387,7 +387,6 @@ export * from './modules/wizard/wizards.module';
 export * from './modules/automation-package-common/automation-package-common.module';
 export * from './modules/cron/cron.module';
 export * from './modules/date-picker/date-picker.module';
-export * from './pipes/dashboard-url.pipe';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/is-chart-empty.pipe';
 export * from './pipes/project-name.pipe';
@@ -396,7 +395,6 @@ export * from './pipes/plan-url.pipe';
 export { PlanNamePipe } from './pipes/plan-name.pipe';
 export * from './services/additional-right-rule.service';
 export * from './services/artefact-refresh-notification.service';
-export * from './services/dashboard.service';
 export * from './services/deferred-link-processor.service';
 export * from './services/execution-close-handle.service';
 export * from './services/export-dialogs.service';
@@ -446,3 +444,4 @@ export * from './components/message-dialog/message-dialog.component';
 export * from './components/report-node-icon/report-node-icon.component';
 export * from './directives/editable-label-template.directive';
 export * from './modules/drag-drop';
+export * from './pipes/dashboard-navigation-params.pipe';

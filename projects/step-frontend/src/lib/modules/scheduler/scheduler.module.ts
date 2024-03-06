@@ -1,6 +1,8 @@
 import { inject, NgModule } from '@angular/core';
 import {
   AugmentedSchedulerService,
+  checkProjectGuardFactory,
+  CommonEditorUrlsService,
   CustomCellRegistryService,
   dialogRoute,
   EditSchedulerTaskDialogComponent,
@@ -23,6 +25,7 @@ import { ScheduledTaskBulkOperationsRegisterService } from './services/scheduled
 import { CronExpressionCellComponent } from './components/cron-expression-cell/cron-expression-cell.component';
 import { map } from 'rxjs';
 import { ActivatedRouteSnapshot } from '@angular/router';
+import { TaskUrlPipe } from './pipes/task-url.pipe';
 
 @NgModule({
   imports: [StepCoreModule, StepCommonModule],
@@ -31,6 +34,7 @@ import { ActivatedRouteSnapshot } from '@angular/router';
     SchedulerTaskSelectionComponent,
     SchedulerConfigurationComponent,
     CronExpressionCellComponent,
+    TaskUrlPipe,
   ],
   exports: [ScheduledTaskListComponent, SchedulerTaskSelectionComponent, SchedulerConfigurationComponent],
   providers: [
@@ -88,14 +92,24 @@ export class SchedulerModule {
             dialogRoute({
               path: ':id',
               dialogComponent: EditSchedulerTaskDialogComponent,
+              canActivate: [
+                checkProjectGuardFactory({
+                  entityType: 'task',
+                  getEntity: (id) => inject(AugmentedSchedulerService).getExecutionTaskByIdCached(id),
+                  getEditorUrl: (id) => inject(CommonEditorUrlsService).schedulerTaskEditorUrl(id),
+                }),
+              ],
               resolve: {
                 taskAndConfig: (route: ActivatedRouteSnapshot) => {
                   const taskId = route.params['id'];
                   const _api = inject(AugmentedSchedulerService);
                   const _dialogs = inject(ScheduledTaskDialogsService);
-                  return _api.getExecutionTaskById(taskId).pipe(map((task) => _dialogs.prepareTaskAndConfig(task)));
+                  return _api
+                    .getExecutionTaskByIdCached(taskId)
+                    .pipe(map((task) => _dialogs.prepareTaskAndConfig(task)));
                 },
               },
+              canDeactivate: [() => inject(AugmentedSchedulerService).cleanupCache()],
             }),
           ],
         },

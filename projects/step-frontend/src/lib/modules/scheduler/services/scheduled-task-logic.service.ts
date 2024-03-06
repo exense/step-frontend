@@ -1,8 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import {
   AugmentedSchedulerService,
-  AuthService,
-  DashboardService,
   DialogParentService,
   DialogRouteResult,
   EditorResolverService,
@@ -19,8 +17,6 @@ const ROOT_URL = '/scheduler';
 
 @Injectable()
 export class ScheduledTaskLogicService implements SchedulerActionsService, DialogParentService {
-  private _authService = inject(AuthService);
-  private _dashboardService = inject(DashboardService);
   private _schedulerService = inject(AugmentedSchedulerService);
   private _scheduledTaskDialogs = inject(ScheduledTaskDialogsService);
   private _router = inject(Router);
@@ -74,14 +70,6 @@ export class ScheduledTaskLogicService implements SchedulerActionsService, Dialo
       .subscribe();
   }
 
-  navToSettings() {
-    if (this._authService.hasRight('admin-ui-menu') && this._authService.isAuthenticated()) {
-      this._router.navigate(['admin', 'controller', 'scheduler']);
-    } else {
-      this._router.navigate(['settings', 'scheduler']);
-    }
-  }
-
   deleteTask(scheduledTask: ExecutiontTaskParameters): void {
     this._scheduledTaskDialogs
       .removeScheduledTask(scheduledTask)
@@ -109,26 +97,6 @@ export class ScheduledTaskLogicService implements SchedulerActionsService, Dialo
           return of(continueEdit);
         }),
       );
-  }
-
-  createTask(): void {
-    this._router.navigateByUrl(`${ROOT_URL}/editor/new`);
-  }
-
-  navigateToTaskEditor(scheduledTask: ExecutiontTaskParameters): void {
-    const url = `${ROOT_URL}/editor/${scheduledTask.id}`;
-    if (this._multipleProjectList.isEntityBelongsToCurrentProject(scheduledTask)) {
-      this._router.navigateByUrl(url);
-      return;
-    }
-
-    this._multipleProjectList
-      .confirmEntityEditInASeparateProject(scheduledTask, url, 'task')
-      .subscribe((continueEdit) => {
-        if (continueEdit) {
-          this._router.navigateByUrl(url);
-        }
-      });
   }
 
   resolveEditLinkIfExists(): void {
