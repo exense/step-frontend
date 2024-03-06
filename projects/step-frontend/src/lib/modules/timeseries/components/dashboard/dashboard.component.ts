@@ -74,8 +74,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   timeRangeSelection: TimeRangePickerSelection = this.timeRangeOptions[0];
 
-  terminator$ = new Subject<void>();
-
   editMode = false;
   metricTypes?: MetricType[];
 
@@ -298,6 +296,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   handleChartDelete(index: number) {
     this.dashboard.dashlets.splice(index, 1);
+    this.context.updateAttributes(this.collectAllAttributes());
   }
 
   handleChartShiftLeft(index: number) {
@@ -344,7 +343,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const currentParams = { ...this._route.snapshot.queryParams };
 
     // Remove the specific parameter
-    currentParams['edit'] = null;
+    currentParams[TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + 'edit'] = null;
 
     // Navigate with the updated parameters
     this._router.navigate([], {
