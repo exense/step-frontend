@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Keyword, Parameter, Plan } from '../../../client/step-client-module';
+import { Keyword, Parameter, Plan, Resource } from '../../../client/step-client-module';
 
 @Injectable({
   providedIn: 'root',
@@ -27,5 +27,13 @@ export class CommonEditorUrlsService {
     }
     const id = typeof idOrParameter === 'string' ? idOrParameter : idOrParameter.id;
     return `/parameters/editor/${id}`;
+  }
+
+  resourceEditorUrl(idOrResource?: string | Resource): string {
+    if (!idOrResource) {
+      return '';
+    }
+    const id = typeof idOrResource === 'string' ? idOrResource : idOrResource.id;
+    return `/resources/editor/${id}`;
   }
 }
