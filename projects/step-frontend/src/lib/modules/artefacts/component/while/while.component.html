@@ -5,34 +5,28 @@
     [(ngModel)]="context.artefact!.condition"
     [disabled]="context.readonly"
     name="condition"
-  >
-  </step-dynamic-textfield>
+  />
   <step-dynamic-textfield
     label="Post Condition"
     tooltip="Condition to be evaluated at the end of each iteration"
     [(ngModel)]="context.artefact!.postCondition"
     [disabled]="context.readonly"
     name="postCondition"
-  >
-  </step-dynamic-textfield>
-  <step-dynamic-textfield
+  />
+  <step-dynamic-time-input
     label="Pacing"
     tooltip="Minimum execution time for the node content to be executed"
-    [isNumber]="true"
     [(ngModel)]="context.artefact!.pacing"
     [disabled]="context.readonly"
     name="pacing"
-  >
-  </step-dynamic-textfield>
-  <step-dynamic-textfield
+  />
+  <step-dynamic-time-input
     label="Timeout"
     tooltip="Stop the execution after the defined value (serves as a security to not enter in an endless loop)"
-    [isNumber]="true"
     [(ngModel)]="context.artefact!.timeout"
     [disabled]="context.readonly"
     name="timeout"
-  >
-  </step-dynamic-textfield>
+  />
   <step-dynamic-textfield
     label="MaxIterations"
     tooltip="Stop the execution after the defined amount of iterations (serves as a security to not enter in an endless loop)"
@@ -40,6 +34,5 @@
     [(ngModel)]="context.artefact!.maxIterations"
     [disabled]="context.readonly"
     name="maxIterations"
-  >
-  </step-dynamic-textfield>
+  />
 </form>

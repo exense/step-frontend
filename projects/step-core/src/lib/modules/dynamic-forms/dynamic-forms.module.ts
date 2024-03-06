@@ -16,6 +16,8 @@ import { ResourceInputModule } from '../resource-input/resource-input.module';
 import { DynamicResourceComponent } from './components/dynamic-resource/dynamic-resource.component';
 import { AddFieldSchemaButtonComponent } from './components/add-field-schema-button/add-field-schema-button.component';
 import { AddSchemaFieldDialogComponent } from './components/add-schema-field-dialog/add-schema-field-dialog.component';
+import { TimeRawInputComponent } from './components/time-raw-input/time-raw-input.component';
+import { DynamicTimeInputComponent } from './components/dynamic-time-input/dynamic-time-input.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +32,8 @@ import { AddSchemaFieldDialogComponent } from './components/add-schema-field-dia
     DynamicResourceComponent,
     AddFieldSchemaButtonComponent,
     AddSchemaFieldDialogComponent,
+    TimeRawInputComponent,
+    DynamicTimeInputComponent,
   ],
   imports: [
     CommonModule,
@@ -51,6 +55,7 @@ import { AddSchemaFieldDialogComponent } from './components/add-schema-field-dia
     AddFieldSchemaButtonComponent,
     DynamicJsonComponent,
     DynamicResourceComponent,
+    DynamicTimeInputComponent,
   ],
 })
 export class DynamicFormsModule {}
@@ -65,6 +70,7 @@ export * from './components/dynamic-json/dynamic-json.component';
 export * from './components/dynamic-resource/dynamic-resource.component';
 export * from './components/add-field-button/add-field-button.component';
 export * from './components/add-field-schema-button/add-field-schema-button.component';
+export * from './components/dynamic-time-input/dynamic-time-input.component';
 export * from './shared/dynamic-fields-schema';
 export * from './shared/dynamic-field-group-value';
 export * from './services/schemas-factory.service';
