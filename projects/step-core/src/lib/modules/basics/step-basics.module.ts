@@ -257,3 +257,4 @@ export * from './pipes/safe-html.pipe';
 export * from './pipes/duration.pipe';
 export * from './components/description-hint/description-hint.component';
 export * from './components/dialog-route/dialog-route.component';
+export * from './guards/check-project-guard.factory';

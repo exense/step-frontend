@@ -1,6 +1,8 @@
 import { inject, NgModule } from '@angular/core';
 import {
   AugmentedKeywordPackagesService,
+  checkProjectGuardFactory,
+  CommonEditorUrlsService,
   CustomCellRegistryService,
   CustomSearchCellRegistryService,
   DashletRegistryService,
@@ -19,7 +21,6 @@ import { FunctionPackageSelectionComponent } from './components/function-package
 import './components/function-package-selection/function-package-selection.component';
 import { UploadPackageBtnComponent } from './components/upload-package-btn/upload-package-btn.component';
 import { ActivatedRouteSnapshot } from '@angular/router';
-import { functionPackageCheckProjectGuard } from './guards/function-package-check-project.guard';
 import { PackageUrlPipe } from './pipes/package-url.pipe';
 
 @NgModule({
@@ -87,7 +88,13 @@ export class FunctionPackagesModule {
             dialogRoute({
               path: ':id',
               dialogComponent: FunctionPackageConfigurationDialogComponent,
-              canActivate: [functionPackageCheckProjectGuard],
+              canActivate: [
+                checkProjectGuardFactory({
+                  entityType: 'keyword package',
+                  getEntity: (id) => inject(AugmentedKeywordPackagesService).getFunctionPackageCached(id),
+                  getEditorUrl: (id) => `/functionPackages/editor/${id}`,
+                }),
+              ],
               resolve: {
                 functionPackage: (route: ActivatedRouteSnapshot) => {
                   return inject(AugmentedKeywordPackagesService).getFunctionPackageCached(route.params['id']);

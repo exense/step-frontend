@@ -38,21 +38,12 @@ export class FunctionActionsImplService implements FunctionActionsService {
           throw new Error('No path');
         }
       }),
-      switchMap((editorPath) => {
-        if (this._multipleProjectService.isEntityBelongsToCurrentProject(keyword)) {
-          const continueEdit = true;
-          return of({ continueEdit, editorPath });
+      map((path) => {
+        if (path) {
+          this._router.navigateByUrl(path);
+          return true;
         }
-
-        return this._multipleProjectService
-          .confirmEntityEditInASeparateProject(keyword, editorPath, 'keyword')
-          .pipe(map((continueEdit) => ({ continueEdit, editorPath })));
-      }),
-      map((result) => {
-        if (result.continueEdit) {
-          this._router.navigateByUrl(result.editorPath);
-        }
-        return result.continueEdit;
+        return false;
       }),
       catchError((error) => {
         console.error(error);

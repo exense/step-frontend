@@ -1,6 +1,8 @@
 import { inject, NgModule } from '@angular/core';
 import {
   AugmentedPlansService,
+  checkProjectGuardFactory,
+  CommonEditorUrlsService,
   CustomCellRegistryService,
   dialogRoute,
   EntityRegistry,
@@ -21,7 +23,6 @@ import { PlanSelectionComponent } from './components/plan-selection/plan-selecti
 import { PlansBulkOperationsRegisterService } from './injectables/plans-bulk-operations-register.service';
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { map } from 'rxjs';
-import { planCheckProjectGuard } from './guards/plan-check-project.guard';
 
 @NgModule({
   declarations: [PlanListComponent, PlanEditorComponent, PlanSelectionComponent],
@@ -103,7 +104,24 @@ export class PlanModule {
         quickAccessRoute('plansEditor', {
           path: 'editor/:id',
           component: PlanEditorComponent,
-          canActivate: [planCheckProjectGuard],
+          canActivate: [
+            checkProjectGuardFactory({
+              entityType: 'plan',
+              getEntity: (id) => inject(AugmentedPlansService).getPlanByIdCached(id),
+              getEditorUrl: (id, route) => {
+                const planEditLink = inject(CommonEditorUrlsService).planEditorUrl(id);
+                const artefactId = route.queryParams['artefactId'];
+
+                const editLinkParams = !artefactId
+                  ? planEditLink
+                  : {
+                      url: planEditLink,
+                      search: { ['artefactId']: artefactId },
+                    };
+                return editLinkParams;
+              },
+            }),
+          ],
           resolve: {
             plan: (route: ActivatedRouteSnapshot) => {
               const id = route.params['id'];
