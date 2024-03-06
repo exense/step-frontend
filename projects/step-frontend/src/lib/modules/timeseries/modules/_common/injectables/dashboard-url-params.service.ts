@@ -37,6 +37,7 @@ export class DashboardUrlParamsService {
 
   collectUrlParams(): DashboardUrlParams {
     let params = this._activatedRoute.snapshot.queryParams;
+    console.log('PARAMS', params);
     params = Object.keys(params)
       .filter((key) => key.startsWith(TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX))
       .reduce((acc, key) => {
