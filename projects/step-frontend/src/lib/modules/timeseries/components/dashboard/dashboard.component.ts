@@ -51,7 +51,6 @@ const EDIT_PARAM_NAME = 'edit';
   imports: [COMMON_IMPORTS, DashboardFilterBarComponent, ChartDashletComponent],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  readonly AGGREGATES: AggregationType[] = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'RATE', 'MEDIAN'];
   readonly DASHLET_HEIGHT = 300;
 
   @ViewChildren(ChartDashletComponent) dashlets: ChartDashletComponent[] = [];
@@ -65,7 +64,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private _authService: AuthService = inject(AuthService);
   private _urlParamsService: DashboardUrlParamsService = inject(DashboardUrlParamsService);
   private _destroyRef = inject(DestroyRef);
-  colorsPool: TimeseriesColorsPool = new TimeseriesColorsPool();
 
   dashboard!: DashboardView;
   dashboardBackup!: DashboardView;

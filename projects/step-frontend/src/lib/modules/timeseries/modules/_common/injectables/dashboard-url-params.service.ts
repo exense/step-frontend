@@ -8,10 +8,10 @@ import { TsFilteringMode } from '../types/filter/ts-filtering-mode.enum';
 import { FilterBarItemType } from '../types/filter/filter-bar-item';
 import { FilterUtils } from '../types/filter/filter-utils';
 import { min } from 'rxjs';
+import { TimeSeriesConfig } from '../types/time-series/time-series.config';
 
 const MIN_SUFFIX = '_min';
 const MAX_SUFFIX = '_max';
-const FILTER_PREFIX = 'q_';
 
 export interface DashboardUrlParams {
   // [key: any]: string | undefined;
@@ -36,7 +36,13 @@ export class DashboardUrlParamsService {
   private _router = inject(Router);
 
   collectUrlParams(): DashboardUrlParams {
-    const params = this._activatedRoute.snapshot.queryParams;
+    let params = this._activatedRoute.snapshot.queryParams;
+    params = Object.keys(params)
+      .filter((key) => key.startsWith(TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX))
+      .reduce((acc, key) => {
+        acc[key.substring(TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX.length)] = params[key];
+        return acc;
+      }, {} as Params);
     const editModeValue = params['edit'];
     return {
       editMode: editModeValue === '1',
@@ -66,9 +72,9 @@ export class DashboardUrlParamsService {
 
   private decodeUrlFilters(params: Params): UrlFilterAttribute[] {
     return Object.entries(params)
-      .filter(([key]) => key.startsWith(FILTER_PREFIX))
+      .filter(([key]) => key.startsWith(TimeSeriesConfig.DASHBOARD_URL_FILTER_PREFIX))
       .map(([key, value]) => {
-        key = key.substring(2);
+        key = key.substring(TimeSeriesConfig.DASHBOARD_URL_FILTER_PREFIX.length);
 
         const filterItem: UrlFilterAttribute = { attribute: key };
 
@@ -90,7 +96,7 @@ export class DashboardUrlParamsService {
     const encodedParams: Record<string, any> = {};
     if (filters.mode === TsFilteringMode.STANDARD) {
       filters.filterItems.filter(FilterUtils.filterItemIsValid).forEach((item) => {
-        const filterKey = FILTER_PREFIX + item.attributeName;
+        const filterKey = TimeSeriesConfig.DASHBOARD_URL_FILTER_PREFIX + item.attributeName;
         switch (item.type) {
           case FilterBarItemType.OPTIONS:
             encodedParams[filterKey] = item.textValues
@@ -123,11 +129,16 @@ export class DashboardUrlParamsService {
 
   updateUrlParams(context: TimeSeriesContext, timeSelection: TimeRangeSelection) {
     const params = this.convertContextToUrlParams(context, timeSelection);
-    let filterParams = this.encodeContextFilters(context.getFilteringSettings());
+    const filterParams = this.encodeContextFilters(context.getFilteringSettings());
+    const mergedParams = { ...params, ...filterParams };
+    const prefixedParams = Object.keys(mergedParams).reduce((accumulator: any, key: string) => {
+      accumulator[TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + key] = mergedParams[key];
+      return accumulator;
+    }, {});
     // params.rangeType = timeSelectionType;
     this._router.navigate([], {
       relativeTo: this._activatedRoute,
-      queryParams: { ...params, ...filterParams },
+      queryParams: prefixedParams,
     });
   }
 
