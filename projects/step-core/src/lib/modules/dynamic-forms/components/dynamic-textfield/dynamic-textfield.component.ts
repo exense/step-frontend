@@ -1,8 +1,8 @@
 import { Component, Input, OnChanges, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { DynamicValueInteger, DynamicValueString } from '../../../../client/step-client-module';
-import { DialogsService } from '../../../../shared';
 import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-base.component';
+import { DialogsService } from '../../../basics/step-basics.module';
 import { NUMBER_CHARS_POSITIVE_ONLY, NUMBER_CHARS_WITH_NEGATIVE } from '../../shared/constants';
 
 @Component({

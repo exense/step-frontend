@@ -35,9 +35,9 @@
 
   <div class="filters">
     <mat-menu #addFilterMenu="matMenu">
-      @for (option of filterOptions | visibleFilterItems; track option.attributeName) {
+      @for (option of filterOptions; track option.name) {
         <button mat-menu-item (click)="addFilterItem(option)">
-          <span>{{ option.label }}</span>
+          <span>{{ option.displayName }}</span>
         </button>
       }
       <button mat-menu-item [matMenuTriggerFor]="typesMenu">Other</button>

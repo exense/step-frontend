@@ -21,7 +21,7 @@ import { BulkOperationsComponent } from './components/bulk-operations/bulk-opera
 import { BulkOperationPerformStrategy, EntitiesSelectionModule } from '../entities-selection/entities-selection.module';
 import { AsyncOperationsModule } from '../async-operations/async-operations.module';
 import { CustomSearchCellComponentsPipe } from './pipe/custom-search-cell-components.pipe';
-import { LOGOUT_CLEANUP, NAVIGATOR_QUERY_PARAMS_CLEANUP, StepBasicsModule } from '../basics/step-basics.module';
+import { StepBasicsModule } from '../basics/step-basics.module';
 import { SearchColMetaDirective } from './directives/search-col-meta.directive';
 import { FilterConnectDirective } from './directives/filter-connect.directive';
 import { CustomSearchDropdownComponent } from './components/custom-search-dropdown/custom-search-dropdown.component';
@@ -34,6 +34,8 @@ import { DatePickerModule } from '../date-picker/date-picker.module';
 import { RangeFilterComponent } from './components/range-filter/range-filter.component';
 import { DateFilterComponent } from './components/date-filter/date-filter.component';
 import { TableNavigatorQueryParamsCleanupService } from './services/table-navigator-query-params-cleanup.service';
+import { NAVIGATOR_QUERY_PARAMS_CLEANUP } from '../routing';
+import { HasRightPipe } from '../auth';
 
 @NgModule({
   imports: [
@@ -45,6 +47,7 @@ import { TableNavigatorQueryParamsCleanupService } from './services/table-naviga
     AsyncOperationsModule,
     StepBasicsModule,
     DatePickerModule,
+    HasRightPipe,
   ],
   declarations: [
     TableComponent,
@@ -114,12 +117,14 @@ export * from './components/custom-search-dropdown/custom-search-checkbox.compon
 export * from './components/custom-columns/custom-columns-base.component';
 export * from './components/range-filter/range-filter.component';
 export * from './components/date-filter/date-filter.component';
+export * from './components/base-column-container/base-column-container.component';
 export * from './directives/column.directive';
 export * from './shared/search-value';
 export * from './shared/table-remote-data-source';
 export * from './shared/table-local-data-source';
 export * from './shared/table-fetch-local-data-source';
 export * from './shared/table-data-source';
+export * from './types/column-container';
 export * from './services/table-search';
 export * from './services/table-reload';
 export * from './directives/search-col.directive';

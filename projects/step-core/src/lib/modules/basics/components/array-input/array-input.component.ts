@@ -15,7 +15,7 @@ import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR } from '@angular/f
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { BehaviorSubject, combineLatest, debounceTime, map, startWith, Subject, takeUntil } from 'rxjs';
-import { ArrayItemLabelValueExtractor } from '../../services/array-item-label-value-extractor';
+import { ArrayItemLabelValueExtractor } from '../../injectables/array-item-label-value-extractor';
 import { KeyValue } from '@angular/common';
 
 type OnChange = (value?: string[]) => void;
@@ -58,13 +58,13 @@ export class ArrayInputComponent<T = unknown> implements ControlValueAccessor, O
   ]).pipe(
     map(([availableItems, filter]) => {
       let result = availableItems.filter(
-        ({ value }) => !filter || value.toLowerCase().includes(filter.trim().toLowerCase())
+        ({ value }) => !filter || value.toLowerCase().includes(filter.trim().toLowerCase()),
       );
       if (result.length === 0 && !!filter.trim()) {
         result = [{ key: filter, value: filter }];
       }
       return result;
-    })
+    }),
   );
 
   @Input() possibleItems?: T[];
@@ -171,7 +171,7 @@ export class ArrayInputComponent<T = unknown> implements ControlValueAccessor, O
       return { key, value } as KeyValue<string, string>;
     });
     this.selectedDisplayItems = selectedItems.map(
-      (selectedItem) => items.find((item) => item.key === selectedItem) ?? { key: selectedItem, value: selectedItem }
+      (selectedItem) => items.find((item) => item.key === selectedItem) ?? { key: selectedItem, value: selectedItem },
     );
     this.availableItems$.next(items.filter((item) => !selectedItems!.includes(item.key)));
   }

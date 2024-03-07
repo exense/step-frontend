@@ -1,5 +1,5 @@
 import { Directive, inject, Input, OnDestroy } from '@angular/core';
-import { ItemHoldReceiverService } from '../services/item-hold-receiver.service';
+import { ItemHoldReceiverService } from '../injectables/item-hold-receiver.service';
 
 @Directive({
   selector: '[stepItemHold]',

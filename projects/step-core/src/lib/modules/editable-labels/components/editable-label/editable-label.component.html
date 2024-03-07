@@ -1,0 +1,25 @@
+@switch (state) {
+  @case (State.READABLE) {
+    <div class="editable-label" [matTooltip]="tooltip" (click)="onLabelClick()">
+      @if (value) {
+        {{ value }}
+      } @else {
+        <ng-container *ngTemplateOutlet="labelTemplate"></ng-container>
+      }
+    </div>
+  }
+  @case (State.EDITABLE) {
+    <step-form-field>
+      <input
+        #input
+        type="text"
+        class="border-primary"
+        matInput
+        [ngModel]="value"
+        (ngModelChange)="onValueChange($event)"
+        (blur)="onBlur()"
+      />
+    </step-form-field>
+    <step-editable-actions (cancel)="onCancel()" (apply)="onApply()" />
+  }
+}

@@ -13,7 +13,7 @@ import {
 import { KeyValue } from '@angular/common';
 import { FormBuilder } from '@angular/forms';
 import { map, Subject, takeUntil } from 'rxjs';
-import { createRange } from '../../../basics/shared/create-range';
+import { createRange } from '../../../basics/types/create-range';
 import { Time } from '../../types/time';
 
 @Component({
@@ -45,7 +45,7 @@ export class SingleTimePickerComponent implements OnInit, OnChanges, OnDestroy {
     this.timeForm.valueChanges
       .pipe(
         map((value) => value as Time),
-        takeUntil(this.terminator$)
+        takeUntil(this.terminator$),
       )
       .subscribe((time) => this.timeChange.emit(time));
   }
@@ -60,7 +60,7 @@ export class SingleTimePickerComponent implements OnInit, OnChanges, OnDestroy {
           minute: time?.minute ?? 0,
           second: time?.second ?? 0,
         },
-        { emitEvent: false }
+        { emitEvent: false },
       );
     }
   }

@@ -2,7 +2,7 @@ import { Component, HostListener, inject, ViewEncapsulation } from '@angular/cor
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Tab } from '../../../tabs/tabs.module';
 import { CronValidation } from '../../types/cron/_cron-validation';
-import { AlertType } from '../../../basics/shared/alert-type.enum';
+import { AlertType } from '../../../basics/types/alert-type.enum';
 import { CronEditorTab } from '../../types/cron-editor-tab.enum';
 
 type DialogRef = MatDialogRef<CronEditorComponent, string>;
