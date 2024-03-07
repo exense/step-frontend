@@ -1,4 +1,4 @@
-import { Directive, HostListener, Inject, Optional } from '@angular/core';
+import { Directive, HostListener, inject } from '@angular/core';
 import {
   AuthService,
   PlanArtefactResolverService,
@@ -11,18 +11,19 @@ import { DOCUMENT } from '@angular/common';
   selector: '[stepPlanEditorKeyHandler]',
 })
 export class PlanEditorKeyHandlerDirective {
-  constructor(
-    private _authService: AuthService,
-    @Inject(DOCUMENT) private _document: Document,
+  private _authService = inject(AuthService);
+  private _document = inject(DOCUMENT);
 
-    private _planEditorService: PlanEditorService,
-    @Optional() private _planInteractiveSession?: PlanInteractiveSessionService,
-    @Optional() private _planArtefactResolver?: PlanArtefactResolverService
-  ) {}
+  private _planEditorService = inject(PlanEditorService);
+  private _planInteractiveSession = inject(PlanInteractiveSessionService, { optional: true });
+  private _planArtefactResolver = inject(PlanArtefactResolverService, { optional: true });
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
     const isCtrl = event.metaKey || event.ctrlKey;
+
+    // If text selection exits, ignore this handler for ctrl+c & ctrl+v shortcuts, to prevent native event cancellation
+    const hasTextSelection = !!this._document.defaultView?.getSelection()?.toString();
 
     if (isCtrl && event.shiftKey) {
       if (this.checkKey(event, true, ['Up', 'ArrowUp'], 'plan-write')) {
@@ -37,7 +38,7 @@ export class PlanEditorKeyHandlerDirective {
         return;
       }
 
-      if (this.checkKey(event, true, ['v', 'V'], 'plan-write')) {
+      if (!hasTextSelection && this.checkKey(event, true, ['v', 'V'], 'plan-write')) {
         event.preventDefault();
         this._planEditorService.pasteAfter();
         return;
@@ -81,13 +82,13 @@ export class PlanEditorKeyHandlerDirective {
         return;
       }
 
-      if (this.checkKey(event, true, 'c', 'plan-write')) {
+      if (!hasTextSelection && this.checkKey(event, true, 'c', 'plan-write')) {
         event.preventDefault();
         this._planEditorService.copy();
         return;
       }
 
-      if (this.checkKey(event, true, 'v', 'plan-write')) {
+      if (!hasTextSelection && this.checkKey(event, true, 'v', 'plan-write')) {
         event.preventDefault();
         this._planEditorService.paste();
         return;
