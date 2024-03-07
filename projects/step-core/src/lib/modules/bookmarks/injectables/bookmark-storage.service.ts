@@ -1,7 +1,6 @@
-import { StorageProxy } from '../modules/basics/shared/storage-proxy';
+import { StorageProxy, LOCAL_STORAGE } from '../../basics/step-basics.module';
 import { Inject, Injectable } from '@angular/core';
-import { LOCAL_STORAGE } from '../modules/basics/shared/storage.token';
-import { Bookmark } from '../shared/bookmark';
+import { Bookmark } from '../types/bookmark';
 
 const bookmark = 'BOOKMARKS';
 

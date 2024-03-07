@@ -1,17 +1,19 @@
 import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import { Bookmark } from '../../shared/bookmark';
 import { Router } from '@angular/router';
-import { BookmarkService } from '../../services/bookmark.service';
 import { NgForm } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MultipleProjectsService } from '../../modules/basics/services/multiple-projects.service';
 import { take } from 'rxjs';
-import { MENU_ITEMS } from '../../services/menu-items';
+import { BookmarkService } from '../../injectables/bookmark.service';
+import { MultipleProjectsService, StepBasicsModule } from '../../../basics/step-basics.module';
+import { MENU_ITEMS } from '../../../routing';
+import { Bookmark } from '../../types/bookmark';
 
 @Component({
   selector: 'step-bookmark-create-dialog',
   templateUrl: './bookmark-create-dialog.component.html',
   styleUrls: ['./bookmark-create-dialog.component.scss'],
+  imports: [StepBasicsModule],
+  standalone: true,
 })
 export class BookmarkCreateDialogComponent implements OnInit {
   private _router = inject(Router);

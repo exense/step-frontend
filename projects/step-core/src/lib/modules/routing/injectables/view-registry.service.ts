@@ -7,7 +7,6 @@ import { SUB_ROUTE_DATA } from '../types/constants';
 import { routesPrioritySortPredicate } from '../types/routes-priority-sort-predicate';
 import { checkPermissionsGuard } from '../../auth/guards/check-permissions.guard';
 import { SubRouterConfig } from '../types/sub-router-config.interface';
-import { BookmarkService } from './bookmark.service';
 
 export interface CustomView {
   template: string;
@@ -42,8 +41,6 @@ export class ViewRegistryService implements OnDestroy {
   private _router = inject(Router);
 
   private temporaryRouteChildren = new Map<string, Routes>();
-
-  private _bookmarkService = inject(BookmarkService);
 
   private isNavigationInitializedInternal$ = new BehaviorSubject(false);
   readonly isNavigationInitialized$ = this.isNavigationInitializedInternal$.asObservable();

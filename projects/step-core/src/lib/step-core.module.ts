@@ -62,7 +62,6 @@ import { AutomationPackageCommonModule } from './modules/automation-package-comm
 import { LockColumnContainerComponent } from './components/lock-column-container/lock-column-container.component';
 import { LockColumnComponent } from './components/lock-column/lock-column.component';
 import { DatePickerModule } from './modules/date-picker/date-picker.module';
-import { BookmarkCreateDialogComponent } from './components/bookmark-create-dialog/bookmark-create-dialog.component';
 import { EDITABLE_LABELS_EXPORTS } from './modules/editable-labels';
 import { CUSTOM_FORMS_EXPORTS } from './modules/custom-forms';
 import { SCHEDULER_COMMON_EXPORTS } from './modules/scheduler-common';
@@ -70,6 +69,7 @@ import { PLAN_COMMON_EXPORTS } from './modules/plan-common';
 import { IMPORT_EXPORT_EXPORTS } from './modules/import-export';
 import { AUTH_EXPORTS } from './modules/auth';
 import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
+import { BOOKMARKS_EXPORTS } from './modules/bookmarks';
 
 @NgModule({
   declarations: [
@@ -108,7 +108,6 @@ import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
     HtmlDescriptionCellComponent,
     LockColumnContainerComponent,
     LockColumnComponent,
-    BookmarkCreateDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -140,6 +139,7 @@ import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
     PLAN_COMMON_EXPORTS,
     IMPORT_EXPORT_EXPORTS,
     DRAG_DROP_EXPORTS,
+    BOOKMARKS_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -197,7 +197,6 @@ import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
     HtmlDescriptionCellComponent,
     LockColumnComponent,
     DatePickerModule,
-    BookmarkCreateDialogComponent,
     AUTH_EXPORTS,
     EDITABLE_LABELS_EXPORTS,
     CUSTOM_FORMS_EXPORTS,
@@ -205,6 +204,7 @@ import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
     PLAN_COMMON_EXPORTS,
     IMPORT_EXPORT_EXPORTS,
     DRAG_DROP_EXPORTS,
+    BOOKMARKS_EXPORTS,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -305,7 +305,6 @@ export * from './services/global-progress-spinner.service';
 export * from './services/http-interceptor-bridge.service';
 export * from './services/invoke-run.service';
 export * from './services/link-processor.service';
-export * from './services/menu-items-override-config.service';
 export * from './services/task-by-id-cache.service';
 export * from './services/plugin-info-registry.service';
 export * from './services/artefact.service';
@@ -325,13 +324,9 @@ export * from './shared/special-links-strategy';
 export * from './modules/entity/pipes/cast-entity-to-plan.pipe';
 export * from './modules/entity/pipes/cast-entity-to-execution.pipe';
 export * from './modules/entity/pipes/cast-entity-to-task.pipe';
+export * from './modules/bookmarks';
 export * from './services/auto-refresh-model-factory.service';
 export * from './services/artefacts-factory.service';
 export * from './services/keyword-executor.service';
 export * from './components/report-node-icon/report-node-icon.component';
-export * from './components/bookmark-create-dialog/bookmark-create-dialog.component';
-export * from './services/bookmark.service';
-export * from './shared/bookmark';
-export * from './services/menu-items';
-export * from './services/bookmark-storage.service';
 export * from './modules/drag-drop';

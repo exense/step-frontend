@@ -3,8 +3,6 @@ import { AceMode } from './ace-mode.enum';
 import { Collection } from './collection.interface';
 import { ScriptLanguage } from './script-language.enum';
 import { KeyValue } from '@angular/common';
-import { Route } from '@angular/router';
-import { SUB_ROUTE_DATA } from './constants';
 
 /**
  * The time complexity of a Breadth-First Search (BFS) algorithm is O(|V| + |E|),

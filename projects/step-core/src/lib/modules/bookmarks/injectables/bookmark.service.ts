@@ -1,7 +1,6 @@
-import { inject, Inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, of } from 'rxjs';
-import { LOCAL_STORAGE } from '../modules/basics/shared/storage.token';
-import { Bookmark } from '../shared/bookmark';
+import { Bookmark } from '../types/bookmark';
 import { BookmarkStorageService } from './bookmark-storage.service';
 
 const bookmark = 'BOOKMARKS';
@@ -30,7 +29,6 @@ export class BookmarkService {
       }),
     ),
   );
-
 
   createBookmark(value: any): Observable<null | undefined> | any {
     const bookmarks = this._bookmarkStorageService.getStorageBookmarks();
